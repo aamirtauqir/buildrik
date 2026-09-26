@@ -179,7 +179,7 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
                 ? `${block.label} added`
                 : `${block.label} added to ${elementLocation(composer, insertedId)}`,
             tone: "success",
-            action: { label: "Undo", onClick: () => composer.history.undo() },
+            action: { label: "Undo", onClick: composer.history.captureUndo() },
           });
         } else {
           // Build contextual nesting error message

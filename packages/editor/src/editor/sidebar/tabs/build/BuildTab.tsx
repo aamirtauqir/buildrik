@@ -30,6 +30,7 @@ import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGr
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { useComponentList } from "../component-library/useComponentList";
+import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "../component-library/instantiate";
 import { fetchLibraryComponent } from "@/services/componentSync";
 import "./BuildTab.css";
 
@@ -117,18 +118,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   // uses: selected element is the parent, else the active page root.
   const insertMine = React.useCallback(async (c: ComponentDefinition) => {
     if (!composer) return;
-    let parentId = composer.selection.getSelectedIds()[0];
-    if (!parentId) parentId = composer.elements.getActivePage()?.root?.id ?? "";
-    if (!parentId) {
-      addToast({ description: "Open a page first to add this component.", tone: "warning" });
-      return;
-    }
-    try {
-      await composer.components.instantiateComponent(c.id, parentId);
-      addToast({ description: "Component added to canvas", tone: "success" });
-    } catch {
-      addToast({ description: "Couldn't add component. Try again.", tone: "error" });
-    }
+    addToast(INSTANTIATE_TOASTS[await instantiateComponentAtSelection(composer, c.id)]);
   }, [composer, addToast]);
 
   /* FROM LIBRARY: bring the workspace master onto this site under its shared
@@ -145,8 +135,15 @@ export const BuildTab: React.FC<BuildTabProps> = ({
       }
       const adopted = existing ?? (await composer.components.adoptLibraryComponent(definition));
       await insertMine(adopted);
-    } catch {
-      addToast({ description: "Couldn't add component. Try again.", tone: "error" });
+    } catch (err) {
+      // A damaged library copy fails the same way every time — retrying won't help.
+      const damaged = err instanceof Error && err.message === "LIBRARY_MASTER_MALFORMED";
+      addToast({
+        description: damaged
+          ? "This library component is damaged and can't be added."
+          : "Couldn't add component. Try again.",
+        tone: "error",
+      });
     }
   }, [composer, addToast, insertMine]);
 

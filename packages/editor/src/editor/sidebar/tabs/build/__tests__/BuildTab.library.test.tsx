@@ -33,6 +33,7 @@ function makeComposer(saved: Def[]) {
   };
   const composer = {
     on: vi.fn(), off: vi.fn(), emit: vi.fn(),
+    beginTransaction: vi.fn(), endTransaction: vi.fn(),
     components,
     selection: { getSelectedIds: () => [] },
     elements: { getActivePage: () => ({ id: "page-home", root: { id: "root" } }) },
@@ -106,5 +107,18 @@ describe("FROM LIBRARY", () => {
     await waitFor(() => expect(components.instantiateComponent).toHaveBeenCalledWith("btn", "root"));
     expect(sync.fetchLibraryComponent).not.toHaveBeenCalled();
     expect(components.adoptLibraryComponent).not.toHaveBeenCalled();
+  });
+
+  it("a damaged library master says so instead of asking to try again", async () => {
+    sync.fetchComponentLibrary.mockResolvedValue([{ componentId: "price", name: "Price row", siteCount: 2, onThisSite: false }]);
+    sync.fetchLibraryComponent.mockResolvedValue({ id: "price", name: "Price row" });
+    const { composer, components } = makeComposer([]);
+    components.adoptLibraryComponent.mockRejectedValueOnce(new Error("LIBRARY_MASTER_MALFORMED"));
+    renderTab(composer);
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(await screen.findByTestId("insert-library-price"));
+    expect(await screen.findByText("This library component is damaged and can't be added.")).toBeTruthy();
+    expect(screen.queryByText("Couldn't add component. Try again.")).toBeNull();
+    expect(components.instantiateComponent).not.toHaveBeenCalled();
   });
 });

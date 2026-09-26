@@ -13,6 +13,7 @@
  * Counting is line-based per pattern, chrome TSX/TS only, tests excluded.
  */
 import { execSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -100,12 +101,63 @@ const RATCHETS = [
     baseline: 0,
     css: true,
   },
+  {
+    id: "font-weight-700",
+    /* DESIGN.md caps chrome font weight at 600 (Inter/Inter Tight both hit
+       their semibold step there — 700 reaches for a heavier cut the type
+       ramp doesn't define). 6 → 0 (B-11 decision-free fix, 2026-09-26):
+       `tw:font-bold` (Tailwind's 700 utility) and inline `fontWeight: 700`
+       snapped onto `tw:font-semibold` / `fontWeight: 600`. Locked at 0. */
+    pattern: String.raw`tw:font-bold|fontWeight: ?700\b`,
+    baseline: 0,
+    excludeDesignSystem: true,
+  },
 ];
 
-function count(pattern, css = false) {
+/** B-11: count `<Button` JSX usages with no `size=` prop on the tag — the
+ *  population a future default `size` (PD-31) will change. NOT a
+ *  pass/fail ratchet by itself (no default exists yet to hold pixels
+ *  steady against), so it only reports; growth doesn't fail the build.
+ *  chrome-ui/Button.tsx itself (the definition) and tests are excluded. */
+function countUnsizedButtons() {
+  let files;
   try {
+    files = execSync(
+      `grep -rlE '<Button[ />]' src/editor --include='*.tsx' | grep -v __tests__ | grep -v '\\.test\\.' | grep -v 'chrome-ui/Button.tsx'`,
+      { cwd: ROOT, encoding: "utf8", shell: "/bin/bash" },
+    )
+      .trim()
+      .split("\n")
+      .filter(Boolean);
+  } catch {
+    return 0;
+  }
+  let unsized = 0;
+  for (const rel of files) {
+    const text = readFileSync(join(ROOT, rel), "utf8");
+    const tagRe = /<Button\b[\s\S]*?(?:\/>|>)/g;
+    let m;
+    while ((m = tagRe.exec(text))) {
+      if (!/\bsize=/.test(m[0])) unsized++;
+    }
+  }
+  return unsized;
+}
+
+function count(pattern, css = false, excludeDesignSystem = false) {
+  try {
+    // B-11 fix-round-1 (controller finding): `/design-system/` is scoped to
+    // whichever ratchet passes excludeDesignSystem — NOT applied to the
+    // other, pre-existing ratchets, so their baselines cannot shift under
+    // them. Only font-weight-700 sets it (design-system/ is the customer's
+    // published-site domain, not chrome — packages/editor/CLAUDE.md's DS
+    // SSOT table — so a heavy weight there isn't a chrome violation; the
+    // pre-existing ratchets never needed this exclusion because their one
+    // real design-system/ hit, BrandPreview.tsx's offscale font size, was
+    // already covered by the specimen-rendering exclusion above).
+    const designSystemExclude = excludeDesignSystem ? "| grep -v '/design-system/' " : "";
     const out = execSync(
-      `grep -rEn ${JSON.stringify(pattern)} src/editor ${css ? "src/themes --include='*.css'" : "--include='*.tsx' --include='*.ts'"} | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx | wc -l`,
+      `grep -rEn ${JSON.stringify(pattern)} src/editor ${css ? "src/themes --include='*.css'" : "--include='*.tsx' --include='*.ts'"} | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx ${designSystemExclude}| wc -l`,
       { cwd: ROOT, encoding: "utf8", shell: "/bin/bash" },
     );
     return parseInt(out.trim(), 10);
@@ -116,7 +168,7 @@ function count(pattern, css = false) {
 
 let failed = false;
 for (const r of RATCHETS) {
-  const n = count(r.pattern, r.css);
+  const n = count(r.pattern, r.css, r.excludeDesignSystem === true);
   if (n > r.baseline) {
     console.error(
       `[design-debt-ratchet] FAIL — ${r.id}: ${n} > baseline ${r.baseline}. ` +
@@ -133,6 +185,13 @@ for (const r of RATCHETS) {
     console.log(`[design-debt-ratchet] ok   ${r.id}: ${n} (baseline ${r.baseline})`);
   }
 }
+
+// B-11: report-only — no default Button size exists yet to hold pixels
+// steady against (PD-31), so this counts but never fails the build.
+console.log(
+  `[design-debt-ratchet] info unsized-button: ${countUnsizedButtons()} <Button> usages ` +
+    `with no size= prop (report-only until PD-31 sets a default; see ledger B-11).`,
+);
 
 if (failed) process.exit(1);
 console.log("[design-debt-ratchet] PASS — every population at or below baseline.");

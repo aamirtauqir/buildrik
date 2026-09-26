@@ -6,8 +6,19 @@
  * @license BSD-3-Clause
  */
 
-import { gsap } from "gsap";
+import type { gsap } from "gsap";
 import { devWarn } from "../../shared/utils/devLogger";
+
+/* D-12: gsap is a heavy dep needed only once an interaction/animation
+   actually builds a timeline — lazy-loaded and cached on first use instead
+   of a static top-level import. */
+let gsapModulePromise: Promise<typeof gsap> | null = null;
+function loadGsap(): Promise<typeof gsap> {
+  if (!gsapModulePromise) {
+    gsapModulePromise = import("gsap").then((m) => m.gsap);
+  }
+  return gsapModulePromise;
+}
 
 // =============================================================================
 // TYPES
@@ -97,12 +108,14 @@ export class GSAPEngine {
   /**
    * Create a GSAP timeline animation
    */
-  createAnimation(config: GSAPAnimationConfig): AnimationInstance | null {
+  async createAnimation(config: GSAPAnimationConfig): Promise<AnimationInstance | null> {
     const target = this.getTargetElement(config.target);
     if (!target) {
       devWarn("GSAPEngine", `Target not found: ${config.target}`);
       return null;
     }
+
+    const gsap = await loadGsap();
 
     const prefersReducedMotion =
       typeof window !== "undefined"

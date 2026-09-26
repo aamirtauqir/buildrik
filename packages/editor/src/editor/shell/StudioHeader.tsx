@@ -49,10 +49,13 @@ import { SiteMenu } from "./SiteMenu";
 import { PermissionsHost } from "./PermissionsHost";
 import { TimeTravelHost } from "./TimeTravelHost";
 import { SaveFailedBanner } from "./SaveFailedBanner";
+import { shellDirty, useShellDirty } from "./shellDirtyRegistry";
 import "./header.css";
 
 /** Selected element minimal info */
 import type { SelectedElementInfo } from "@/shared/types";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
+import { endUnloadGuardBypass, isUnloadGuardBypassed, navigateBypassingUnloadGuard } from "./unloadGuardBypass";
 export type { SelectedElementInfo };
 
 export interface StudioHeaderProps {
@@ -149,16 +152,22 @@ export interface StudioHeaderProps {
  * "Not sent" is drawn only where a send is the site's next act — an
  * approval workspace. Elsewhere, with no round, the control is still there:
  * board 4418:123573 draws a permanent Review door ("Review ›"), so the
- * no-round state is that door without a count (owner flag 2026-09-24).
+ * no-round state is that door without a count (owner flag 2026-09-24) —
+ * BUT ONLY where reviews are enabled for the site. TabRouter's "review"
+ * case returns null for every state when `!reviewsEnabled`
+ * (TabRouter.tsx:239), so a chip offered anyway opened a door onto a blank
+ * panel (A-8). Return null instead of a pill in that case — same
+ * "no door, not a disabled one" rule the Comments toggle already follows.
  */
 function reviewChip(
   status: ReviewStatus,
   openCount: number | null,
-): Omit<ReviewPill, "onClick"> {
+): Omit<ReviewPill, "onClick"> | null {
+  if (!status.reviewsEnabled) return null;
   const who = status.reviewerName;
   switch (status.state) {
     case "none":
-      return status.reviewsEnabled && status.editsRequireApproval
+      return status.editsRequireApproval
         ? { label: "Not sent", tone: "info", title: "Not sent for review yet" }
         : { label: "Review", tone: "neutral", title: "Open Review" };
     case "pending":
@@ -287,7 +296,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      `!== false` keeps the house rule: an unknown role still asks the server,
      a known-insufficient one does not. Same shape as PublishHistory.tsx:104,
      which already gates rollback this way two files over. */
-  const canUnpublish = roleAtLeast(editorRole, "ADMIN") !== false;
+  const atLeastAdmin = roleAtLeast(editorRole, "ADMIN") !== false;
   /* A VIEWER is held in view mode by the /edit route (it redirects them to
      ?view=readonly), so "Back to editing" would only bounce off that redirect. */
   const canLeaveView = roleAtLeast(editorRole, "EDITOR") !== false;
@@ -450,29 +459,43 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   type ExitDialog = { kind: "dirty" | "risky" | "stranded"; error?: string; pending?: number; nav: () => void };
   const [exitDialog, setExitDialog] = React.useState<ExitDialog | null>(null);
   const [leaving, setLeaving] = React.useState(false);
-  // 2A: set immediately before a user-confirmed programmatic navigation so the
-  // beforeunload guard doesn't double-prompt. Reset on a timer in case the
-  // navigation is somehow cancelled — a stuck flag would disarm the guard.
-  const bypassRef = React.useRef(false);
-  const bypassAndNavigate = React.useCallback((nav: () => void) => {
-    bypassRef.current = true;
-    try {
-      nav();
-    } finally {
-      window.setTimeout(() => {
-        bypassRef.current = false;
-      }, 1000);
-    }
-  }, []);
+  // 2A: a user-confirmed programmatic navigation runs through the unload
+  // guard's bypass (unloadGuardBypass.ts, shared with the view-mode switch
+  // after a refused save) so beforeunload does not double-prompt.
+  React.useEffect(() => endUnloadGuardBypass, []);
+
+  /* Brand stages its token edits in a provider this header sits outside, so it
+     announces them. Without this the chip read "Saved · just now" with a green
+     dot while the Brand footer two panels away said "Unsaved brand changes" —
+     same concept, two surfacings, and the global one is the one a user watches.
+     It is deliberately not the project's dirty flag: see the emit site.
+     The announcement goes into the shell dirty registry (B-1), the ONE source
+     the exit guard, beforeunload and this chip read — alongside Settings'
+     and an open CMS record's entries, which their own surfaces register. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onBrandDirty = (p?: { dirty?: boolean }) => shellDirty.set("brand", Boolean(p?.dirty));
+    composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+    /* Block body, not a shorthand: `off` is chainable and returns the composer,
+       so an arrow shorthand hands React an instance where a destructor belongs. */
+    return () => {
+      composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+      shellDirty.set("brand", false);
+    };
+  }, [composer]);
+  const shellIsDirty = useShellDirty();
 
   const guardNavigation = React.useCallback(
     (nav: () => void) => {
-      if (bypassRef.current) return nav();
+      if (isUnloadGuardBypassed()) return nav();
       // 5A: while offline the save pipeline reports queued saves as clean
       // (useSaveCallback settles to idle) but the queue dies on navigation —
       // never offer a fake "Save & leave" here.
-      if (offline && isDirty) return setExitDialog({ kind: "risky", nav });
-      if (isDirty || saveStatus === "saving" || saveStatus === "error") {
+      // The registry is read at call time, not from render: a surface's
+      // entry can change in the same gesture that triggers the exit.
+      const unsaved = isDirty || shellDirty.get();
+      if (offline && unsaved) return setExitDialog({ kind: "risky", nav });
+      if (unsaved || saveStatus === "saving" || saveStatus === "error") {
         return setExitDialog({
           kind: "dirty",
           error: saveStatus === "error" ? "The last save failed." : undefined,
@@ -504,7 +527,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     if (outcome === "saved") {
       const { nav } = exitDialog;
       setExitDialog(null);
-      bypassAndNavigate(nav);
+      navigateBypassingUnloadGuard(nav);
     } else if (outcome === "queued-offline" || outcome === "conflict") {
       // The save did NOT durably land — switch to the honest dialog.
       setExitDialog({ kind: "risky", nav: exitDialog.nav });
@@ -514,7 +537,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       setLeaveAfterSave(() => exitDialog.nav);
       setExitDialog(null);
     }
-  }, [exitDialog, onSave, bypassAndNavigate]);
+  }, [exitDialog, onSave]);
 
   /* ── Save failed (4418:124938 / 125678) — the red card on the canvas. ── */
   const [leaveAfterSave, setLeaveAfterSave] = React.useState<(() => void) | null>(null);
@@ -530,16 +553,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     if (outcome === "saved" && leaveAfterSave) {
       const nav = leaveAfterSave;
       setLeaveAfterSave(null);
-      bypassAndNavigate(nav);
+      navigateBypassingUnloadGuard(nav);
     }
-  }, [onSave, leaveAfterSave, bypassAndNavigate]);
+  }, [onSave, leaveAfterSave]);
 
   const leaveAnyway = React.useCallback(() => {
     if (!exitDialog) return;
     const { nav } = exitDialog;
     setExitDialog(null);
-    bypassAndNavigate(nav);
-  }, [exitDialog, bypassAndNavigate]);
+    navigateBypassingUnloadGuard(nav);
+  }, [exitDialog]);
 
   // 2A: browser-chrome exits (⌘W, refresh, tab close) get the native prompt
   // while there is anything a navigation would strand.
@@ -550,8 +573,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
        in between, so a listener gated on React state would still be absent at
        the moment it was needed. Reading at fire time has no staleness. */
     const onBefore = (e: BeforeUnloadEvent) => {
-      if (bypassRef.current) return;
+      if (isUnloadGuardBypassed()) return;
       const stranded = totalPendingMirrors();
+      const shellUnsaved = shellDirty.get();
       /* Dev-only, and LOAD-BEARING: `e2e/boot-clean.spec.ts` reads
          `__bkExitReason` and fails as UNMEASURED if this is removed.
          This guard has three independent reasons to prompt, and a
@@ -560,9 +584,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
          from the pill afterwards. */
       if (IS_DEV_BUILD && typeof window !== "undefined") {
         const w = window as unknown as { __bkExitReason?: unknown[] };
-        (w.__bkExitReason ??= []).push({ isDirty, saveStatus, stranded, at: Date.now() });
+        (w.__bkExitReason ??= []).push({ isDirty, shellUnsaved, saveStatus, stranded, at: Date.now() });
       }
-      if (!isDirty && saveStatus !== "saving" && stranded === 0) return;
+      if (!isDirty && !shellUnsaved && saveStatus !== "saving" && stranded === 0) return;
       e.preventDefault();
       e.returnValue = "";
     };
@@ -632,23 +656,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       );
   }, [composer, currentUser, addToast]);
 
-  /* Brand stages its token edits in a provider this header sits outside, so it
-     announces them. Without this the chip read "Saved · just now" with a green
-     dot while the Brand footer two panels away said "Unsaved brand changes" —
-     same concept, two surfacings, and the global one is the one a user watches.
-     It is deliberately not the project's dirty flag: see the emit site. */
-  const [brandDirty, setBrandDirty] = React.useState(false);
-  React.useEffect(() => {
-    if (!composer) return;
-    const onBrandDirty = (p?: { dirty?: boolean }) => setBrandDirty(Boolean(p?.dirty));
-    composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-    /* Block body, not a shorthand: `off` is chainable and returns the composer,
-       so an arrow shorthand hands React an instance where a destructor belongs. */
-    return () => {
-      composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-    };
-  }, [composer]);
-
   /* SaveStatus has carried a "conflict" state — label, amber pill, dot — that
      this derivation could not produce, so board 66:640's condition showed the
      chip as Saved. */
@@ -660,7 +667,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         ? "conflict"
         : saveStatus === "error"
           ? "error"
-          : isDirty || brandDirty
+          : isDirty || shellIsDirty
             ? "unsaved"
             : "saved";
 
@@ -758,7 +765,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
   // the bar renders exactly what it receives. View mode is itself a preview,
   // so it gets Comments only.
-  const toggleComments = composer ? () => composer.emit("ui:comment-mode", {}) : undefined;
+  /* A-8/PD-7/PD-8: comment mode is a review-flow tool — offering it while
+     the site's workspace has no agency layer (reviewsEnabled false) opened
+     a door with nothing behind it: comments had nowhere to be reviewed
+     from. Gated alongside the Review rail tab (TabRouter.tsx) and the
+     Review/SendForReview doors below. */
+  const toggleComments = composer && reviewStatus.reviewsEnabled ? () => composer.emit("ui:comment-mode", {}) : undefined;
   /* A workspace VIEWER is always in view mode, and board 4418:126059 keeps
      their topbar: Preview works, Publish is there but disabled with the role
      it needs. An owner's own view mode stays the bare preview bar. */
@@ -778,21 +790,17 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   const copyLiveUrl = React.useCallback(() => {
     if (!publishedUrl) return;
-    // navigator.clipboard is absent on insecure origins, and writeText can be
-    // refused. Either way the user hears about it rather than pressing again.
-    const done = navigator.clipboard?.writeText(publishedUrl);
-    if (!done) {
-      addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" });
-      return;
-    }
-    void done.then(
+    // A refused copy is reported rather than leaving the user pressing again.
+    void writeClipboardText(publishedUrl).then(
       () => addToast({ title: "Live URL copied", description: publishedUrl, tone: "success" }),
       () => addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" }),
     );
   }, [publishedUrl, addToast]);
 
-  // F3: every review state opens the same door — the Review panel.
-  const review: ReviewPill = { ...reviewChip(reviewStatus, openCommentCount), onClick: onOpenReview };
+  // F3: every review state opens the same door — the Review panel. `null`
+  // (reviews disabled for this site) means no door at all — see reviewChip.
+  const reviewChipResult = reviewChip(reviewStatus, openCommentCount);
+  const review: ReviewPill | null = reviewChipResult ? { ...reviewChipResult, onClick: onOpenReview } : null;
 
   return (
     <div className="bk-header" ref={headerRef}>
@@ -810,8 +818,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         pageName={crumbCtx ?? pageName}
         onOpenPages={viewMode.readOnlyView ? undefined : onOpenPages}
         onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
-        /* Board 4418:123573's shell search is the ⌘K door. */
-        onOpenSearch={composer ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
+        /* Board 4418:123573's shell search is the ⌘K door. View mode has no
+           palette (above), so it draws no door to one (gap walk 93 #7;
+           a viewer palette is OD-GW-3). */
+        onOpenSearch={composer && !viewMode.readOnlyView ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
         contextSearch={
           searchCtx && composer
             ? {
@@ -906,7 +916,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
             collabEnabled={collabOn}
             onUnpublish={
-              !publishedUrl || !canUnpublish
+              !publishedUrl || !atLeastAdmin
                 ? undefined
                 : () => {
                     onOpenPublish?.();
@@ -915,6 +925,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             }
             publishedUrl={publishedUrl}
             onCopyLiveUrl={copyLiveUrl}
+            /* team.* is ADMIN too — the same known-insufficient rule. */
+            canInviteTeammates={atLeastAdmin}
             onReplayOnboarding={
               viewMode.readOnlyView || !composer ? undefined : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
             }

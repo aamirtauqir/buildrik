@@ -33,18 +33,8 @@ import {
   handleTemplateDrop,
   handleBlockDrop,
   type DropContext,
+  type DropPayloads,
 } from "./dropOperations";
-
-// Inline payload shape — dropOperations doesn't (yet) export this; was a
-// dangling import before S6 catalog drop landed. Inlining keeps the type
-// in lockstep with the dispatcher's pre-snapshot sites.
-interface DropPayloads {
-  multiData: string;
-  elementData: string;
-  componentId: string;
-  templateData: string;
-  blockData: string;
-}
 import type { SnapLine } from "../useCanvasSnapping";
 import type { DropError, DropSuccess } from "../useCanvasDragDrop";
 
@@ -185,7 +175,7 @@ export function useDropExecution({
       // DataTransfer object is only reliably readable inside the synchronous
       // native drop handler — a single microtask boundary (e.g. `await`) zeros
       // it out. We pre-read once and pass the cached payloads down.
-      const payloads: DropPayloads & { catalogComponentId: string } = {
+      const payloads: Required<DropPayloads> = {
         multiData: e.dataTransfer.getData("application/x-aquibra-multi"),
         elementData: e.dataTransfer.getData("element"),
         componentId: e.dataTransfer.getData("application/x-aquibra-component"),
@@ -286,21 +276,20 @@ export function useDropExecution({
 
       // Dispatch chain
       let dropSucceeded = false;
-      if ((handleMultiElementDrop as any)(e, ctx, payloads)) {
+      if (handleMultiElementDrop(e, ctx, payloads)) {
         dropSucceeded = true;
-      } else if ((handleElementDrop as any)(e, ctx, dropTargetId, payloads)) {
+      } else if (handleElementDrop(e, ctx, dropTargetId, payloads)) {
         dropSucceeded = true;
-      } else if (await (handleComponentDrop as any)(e, ctx, payloads)) {
+      } else if (await handleComponentDrop(e, ctx, payloads)) {
         dropSucceeded = true;
       } else if (handleCatalogDrop(e, ctx, payloads)) {
         // S6 catalog drop. Payload is pre-snapshotted into `payloads` above
         // so the dataTransfer microtask zero-out doesn't bite this branch.
         dropSucceeded = true;
-      } else if ((handleTemplateDrop as any)(e, ctx, payloads)) {
+      } else if (handleTemplateDrop(e, ctx, payloads)) {
         dropSucceeded = true;
       } else {
-        (handleBlockDrop as any)(e, ctx, payloads);
-        dropSucceeded = true;
+        dropSucceeded = handleBlockDrop(e, ctx, payloads);
       }
 
       composer.canvas.drag?.end(dropSucceeded);

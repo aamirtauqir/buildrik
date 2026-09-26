@@ -12,6 +12,7 @@
  * @license BSD-3-Clause
  */
 import { renderHook, act } from "@testing-library/react";
+import { TRPCClientError } from "@trpc/client";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { THRESHOLDS } from "../../../../shared/constants/config";
 import { useComposerInit, type UseComposerInitParams } from "../useComposerInit";
@@ -54,8 +55,20 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
   saveProject: vi.fn(() => Promise.reject(new Error("Failed to fetch"))),
+  isSaveConflictPending: vi.fn(() => false),
+  SAVE_CONFLICT_EVENT: "buildrik:save-conflict",
   SaveConflictError: class extends Error {},
 }));
+
+const invalidateMyRole = vi.hoisted(() => vi.fn());
+const fetchMyRole = vi.hoisted(() => vi.fn(() => Promise.resolve("EDITOR")));
+vi.mock("@/services/RoleService", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/RoleService")>()),
+  invalidateMyRole,
+  fetchMyRole,
+}));
+
+import { saveProject as syncSaveProject } from "@/services/BuildrikSyncProvider";
 
 function params(): UseComposerInitParams {
   return {
@@ -126,5 +139,112 @@ describe("autosave while offline", () => {
       toasts.find((t) => t.title === "Couldn't reach the server — not saved")?.description,
     ).toMatch(/try saving again/);
     expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
+  });
+});
+
+/* A15-9: a role revoked mid-session refuses the autosave. The edit existed
+   only in this tab — it is kept for the reload like a network failure's, and
+   the cached role that offered the edit is dropped. */
+describe("autosave refused with FORBIDDEN", () => {
+  it("keeps the refused work recoverable and forgets the cached role", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("FORBIDDEN"));
+    const p = params();
+    const toasts = await runAutosave(p);
+
+    expect(toasts.some((t) => t.title === "You don't have access to save this site")).toBe(true);
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
+    expect(invalidateMyRole).toHaveBeenCalledTimes(1);
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+  });
+
+  // C-9 (live): the server's FORBIDDEN arrives as a TRPCClientError whose
+  // message is "Insufficient permissions" — the code, not the text, says 403.
+  it("recognises the real TRPCClientError FORBIDDEN shape", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(
+      TRPCClientError.from({
+        error: {
+          message: "Insufficient permissions",
+          code: -32603,
+          data: { code: "FORBIDDEN", httpStatus: 403, path: "sites.saveProject" },
+        },
+      }),
+    );
+    const toasts = await runAutosave(params());
+
+    expect(toasts.some((t) => t.title === "You don't have access to save this site")).toBe(true);
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+  });
+});
+
+/* C-9 (verify pass 3): after a forbidden save the toast and the restore
+   prompt worked, but the editor never went read-only — Add and Publish stayed
+   live and the next autosave repainted the generic "Couldn't save … check
+   your connection" banner. The refusal now re-asks the role; below EDITOR the
+   editor opens the view mode a VIEWER is sent to (?view=readonly), and a
+   read-only view never autosaves. */
+describe("C-9 — a demoted member lands in view mode and autosave stops", () => {
+  const original = window.location;
+  const fakeLocation = (search: string) => {
+    const replace = vi.fn();
+    Object.defineProperty(window, "location", {
+      value: { href: `http://localhost:3000/edit/site-1${search}`, search, replace },
+      writable: true,
+    });
+    return replace;
+  };
+  afterEach(() => {
+    Object.defineProperty(window, "location", { value: original, writable: true });
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+  });
+
+  it("re-asks the role and, now a VIEWER, opens ?view=readonly", async () => {
+    const replace = fakeLocation("");
+    fetchMyRole.mockResolvedValueOnce("VIEWER");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("FORBIDDEN"));
+    await runAutosave(params());
+
+    expect(invalidateMyRole).toHaveBeenCalled();
+    expect(fetchMyRole).toHaveBeenCalled();
+    await act(async () => { await vi.runAllTimersAsync(); });
+    expect(replace).toHaveBeenCalledTimes(1);
+    expect(new URL(replace.mock.calls[0][0] as string).searchParams.get("view")).toBe("readonly");
+  });
+
+  /* Review #5: the switch navigated with the editor still dirty — the
+     beforeunload guard prompts on that, and a Leave/Stay prompt over a
+     refused save loses the explanation. The edits are already kept
+     (keepUnsaved), so the editor is marked clean BEFORE it navigates; the
+     view-mode load then shows the "kept in this browser" notice. */
+  it("marks the editor clean before it navigates, with the edits already kept", async () => {
+    const replace = fakeLocation("");
+    fetchMyRole.mockResolvedValueOnce("VIEWER");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("FORBIDDEN"));
+    const p = params();
+    const order: string[] = [];
+    vi.mocked(p.setIsDirty!).mockImplementation(((v: boolean) => { if (v === false) order.push("clean"); }) as never);
+    replace.mockImplementation(() => order.push("navigate"));
+    await runAutosave(p);
+    await act(async () => { await vi.runAllTimersAsync(); });
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
+    expect(order).toEqual(["clean", "navigate"]);
+  });
+
+  it("stays put when the role still allows editing", async () => {
+    const replace = fakeLocation("");
+    fetchMyRole.mockResolvedValueOnce("EDITOR");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("FORBIDDEN"));
+    await runAutosave(params());
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it("a read-only view never sends an autosave", async () => {
+    fakeLocation("?view=readonly");
+    const p = params();
+    await runAutosave(p);
+    expect(syncSaveProject).not.toHaveBeenCalled();
+    expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(false);
   });
 });

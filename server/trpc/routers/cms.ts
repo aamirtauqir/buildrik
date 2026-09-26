@@ -14,6 +14,8 @@ import {
   deleteEntry,
   resolveDynamicPages,
   generateDynamicPages,
+  previewCsvImport,
+  importCsvEntries,
   CmsError,
 } from "@/server/services/cms.service";
 import {
@@ -25,6 +27,8 @@ import {
   deleteEntryInput,
   dynamicPagesInput,
   generateDynamicPagesInput,
+  previewCsvEntriesInput,
+  importCsvEntriesInput,
 } from "@buildrik/shared/schemas/cms";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,6 +123,25 @@ export const cmsRouter = router({
       try {
         await deleteEntry(input.siteId, input.id);
         return { ok: true as const };
+      } catch (e) {
+        translateCms(e);
+      }
+    }),
+    // CSV import (fix-all round, 2026-09-25 — decision: build CSV, no OAuth
+    // connectors). Both steps require EDITOR+ (same floor as every other
+    // write here): a preview is part of the import action, not a plain read.
+    importCsvPreview: protectedProcedure.input(previewCsvEntriesInput).mutation(async ({ ctx, input }) => {
+      await requireWrite(ctx, input.siteId);
+      try {
+        return await previewCsvImport(input.siteId, input.collectionId, input.csv);
+      } catch (e) {
+        translateCms(e);
+      }
+    }),
+    importCsv: protectedProcedure.input(importCsvEntriesInput).mutation(async ({ ctx, input }) => {
+      await requireWrite(ctx, input.siteId);
+      try {
+        return await importCsvEntries(input.siteId, input.collectionId, input.csv, input.columnMapping);
       } catch (e) {
         translateCms(e);
       }

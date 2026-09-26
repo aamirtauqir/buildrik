@@ -33,4 +33,26 @@ describe("useCanvasContent — DOMParser memoization", () => {
       globalThis.DOMParser = OriginalDOMParser;
     }
   });
+
+  it("D-7: never constructs a DOMParser when composer has no CMS bindings", () => {
+    const content = "<div data-buildrick-id='root'><p data-buildrick-id='el-1'>text</p></div>";
+    let parseCount = 0;
+
+    const OriginalDOMParser = globalThis.DOMParser;
+    const DOMParserSpy = class extends OriginalDOMParser {
+      constructor(...args: []) {
+        super(...args);
+        parseCount++;
+      }
+    };
+    globalThis.DOMParser = DOMParserSpy as typeof DOMParser;
+
+    try {
+      const { result } = renderHook(() => useCanvasContent({ composer: null, content }));
+      expect(parseCount).toBe(0);
+      expect(result.current.displayContent).toBe(content);
+    } finally {
+      globalThis.DOMParser = OriginalDOMParser;
+    }
+  });
 });

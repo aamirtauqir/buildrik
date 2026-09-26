@@ -7,6 +7,7 @@
 import React from "react";
 import { Copy, Check } from "lucide-react";
 import { useToast } from "./Toast";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 const BASE =
   "tw:inline-flex tw:items-center tw:gap-1 tw:border tw:border-transparent tw:rounded-sm tw:cursor-pointer " +
@@ -56,7 +57,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
 
   const handleCopy = React.useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(content);
+      await writeClipboardText(content);
       setCopied(true);
       addToast({ description: "Copied to clipboard!", tone: "success", duration: 2000 });
       setTimeout(() => setCopied(false), 2000);

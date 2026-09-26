@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, PlanName } from "@/lib/constants/plan-limits";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
+import { blankPageRoot } from "@buildrik/shared/content/elementIds";
 import type {
   CreatePageInput,
   UpdatePageInput,
@@ -81,6 +82,9 @@ export async function createPage(input: CreatePageInput) {
       slug,
       position,
       isHomePage: input.isHomePage ?? false,
+      // X-A1: its own root (id unique per page), not the column's [] default
+      // — every [] page used to load with one shared "root".
+      blocks: blankPageRoot(`${input.siteId}:${slug}`),
     },
   });
 

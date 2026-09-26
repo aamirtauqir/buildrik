@@ -62,8 +62,16 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
      * single Escape closed both. The overlay root appends in mount order, so
      * the last `aria-modal` dialog in the document is the one on top.
      */
+    /* B-7: also matches role="alertdialog" — ReplaceAcrossDialog and
+       AchievementPrompt predate OverlayMount and hand-roll their own
+       backdrop with that (correct, for a confirm/warning dialog) role
+       instead of "dialog". A query scoped to "dialog" alone never saw them
+       stacked against a real dialog, and never saw them at all for
+       isModalOpen() below. */
     const isTopmost = () => {
-      const dialogs = document.querySelectorAll('[role="dialog"][aria-modal="true"]');
+      const dialogs = document.querySelectorAll(
+        '[role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]',
+      );
       return dialogs.length === 0 || dialogs[dialogs.length - 1] === container;
     };
 
@@ -109,5 +117,8 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
  * mode and left the modal open).
  */
 export function isModalOpen(): boolean {
-  return Boolean(document.querySelector('[role="dialog"][aria-modal="true"]'));
+  // B-7: alertdialog too — see the isTopmost() comment above.
+  return Boolean(
+    document.querySelector('[role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]'),
+  );
 }

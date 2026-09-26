@@ -86,7 +86,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
        one undo step. Bindings ARE in the history snapshot now
        (Composer.exportProject writes cmsBindings, importProject restores them,
        clearing first), so Undo restores the map and the text together. Loads
-       and history restores call bind() without a label and stay unrecorded. */
+       and history restores go through import(), which never binds. */
     if (historyLabel) this.composer.history?.flushPending?.();
     const elementBindings = this.bindings.get(elementId) || [];
     const key = this.getBindingKey(binding);
@@ -158,6 +158,15 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
   }
 
   /**
+   * True if any element has at least one binding. Cheap existence check for
+   * callers that want to skip resolution work entirely when there is nothing
+   * to resolve (e.g. useCMSPreview's no-bindings short-circuit).
+   */
+  hasAny(): boolean {
+    return this.bindings.size > 0;
+  }
+
+  /**
    * Export bindings for persistence.
    */
   export(): Record<string, T[]> {
@@ -171,13 +180,22 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
   }
 
   /**
-   * Import bindings from persisted data.
+   * Import bindings from persisted data (load, version restore, undo).
+   *
+   * Restores the map only — never applies. Applying writes the resolved value
+   * into the element (setContent → markDirty → PROJECT_CHANGED), so a load
+   * went dirty and autosaved on every open of a site with a binding (a
+   * VIEWER got a 403 "Couldn't save" banner), and a fallback resolved before
+   * the data arrived overwrote the stored text with "". The imported element
+   * already carries its persisted value; the canvas preview resolves bindings
+   * for display, and a data-source update still re-applies.
    */
   import(data: Record<string, T[]>): void {
     this.bindings.clear();
 
     for (const [elementId, bindings] of Object.entries(data)) {
-      bindings.forEach((binding) => this.bind(elementId, binding));
+      this.bindings.set(elementId, [...bindings]);
+      bindings.forEach((binding) => this.composer.emit(EVENTS.BINDING_CREATED, { elementId, binding }));
     }
   }
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { checkSiteRole, assertSiteAccess, PermissionError } from "@/server/services/permission.service";
+import { checkSiteRole, assertSiteAccess, getSiteWorkspace, PermissionError } from "@/server/services/permission.service";
 import type { PlanName } from "@/lib/constants/plan-limits";
 import { getSettingsOverview, getSiteOverview, getLocales, getRedirectSuggestions } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
@@ -172,12 +172,14 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        const member = await ctx.prisma.workspaceMember.findFirst({
-          where: { userId: ctx.session.user!.id! },
-          include: { workspace: { select: { plan: true } } },
-        });
-        const planResult = z.enum(["FREE", "PRO", "BUSINESS"] as const).safeParse(member?.workspace?.plan ?? "FREE");
-        const safePlan: PlanName = planResult.success ? planResult.data : "FREE";
+        // Read the plan from the SITE's own workspace, not an arbitrary
+        // membership row for the caller — a caller who belongs to several
+        // workspaces could otherwise have their redirect limit computed
+        // against the wrong workspace's plan (S-10). The plan belongs to the
+        // workspace, not to a membership row, so no member lookup is needed
+        // at all (IMPORTANT 4).
+        const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+        const safePlan: PlanName = siteWorkspace?.plan ?? "FREE";
         const { siteId, ...data } = input;
         try {
           return await createRedirect(siteId, data, safePlan);
@@ -240,12 +242,8 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        const member = await ctx.prisma.workspaceMember.findFirst({
-          where: { userId: ctx.session.user!.id! },
-          include: { workspace: { select: { plan: true } } },
-        });
-        const planResult = z.enum(["FREE", "PRO", "BUSINESS"]).safeParse(member?.workspace?.plan ?? "FREE");
-        const plan: PlanName = planResult.success ? planResult.data : "FREE";
+        const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+        const plan: PlanName = siteWorkspace?.plan ?? "FREE";
         try {
           return await importRedirects(input.siteId, input.csv, plan);
         } catch (e: unknown) {
@@ -291,7 +289,7 @@ export const siteDetailRouter = router({
     // Cross-site monitor: every domain in the caller's workspace.
     listForWorkspace: protectedProcedure.query(async ({ ctx }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
-      return listWorkspaceDomains(workspaceId);
+      return listWorkspaceDomains(workspaceId, ctx.session.user!.id!);
     }),
 
     // The Add-a-domain dialog's `Available` / `Already connected` tag. Not
@@ -426,7 +424,16 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return listShareLinks(input.siteId);
+        // Token is the bearer credential — reveal it only to someone who could
+        // also mint one (EDITOR+), not to every member who can merely view (S-10).
+        let revealToken = true;
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+        } catch (e) {
+          if (!(e instanceof PermissionError)) throw e;
+          revealToken = false;
+        }
+        return listShareLinks(input.siteId, revealToken);
       }),
 
     create: protectedProcedure
@@ -460,6 +467,10 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "FORBIDDEN", message: "You are not an active member of this workspace" });
           if (e instanceof Error && e.message === "EDITORS_CANNOT_CREATE_LINKS")
             throw new TRPCError({ code: "FORBIDDEN", message: "Editors cannot create share links for this workspace" });
+          // A-9: the workspace requires a password on every link; the request
+          // is malformed as submitted (not a permission or plan problem).
+          if (e instanceof Error && e.message === "PASSWORD_REQUIRED")
+            throw new TRPCError({ code: "BAD_REQUEST", message: "This workspace requires a password on every share link." });
           // Plan limits reached the client as a bare 500 (a password link on
           // FREE, walk 2026-09-24). FORBIDDEN + the plan's reason, like the
           // page limit in pages.create.

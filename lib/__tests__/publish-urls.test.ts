@@ -2,7 +2,7 @@
  * Every page used to declare the same canonical — see publish-urls.ts.
  */
 import { describe, it, expect } from "vitest";
-import { normalizeCanonicalOrigin, pageCanonicalUrl } from "../publish-urls";
+import { normalizeCanonicalOrigin, pageCanonicalUrl, resolveSiteOrigins } from "../publish-urls";
 
 describe("normalizeCanonicalOrigin", () => {
   it("accepts a bare domain and assumes https", () => {
@@ -127,5 +127,37 @@ describe("withSitemapDirective", () => {
 
   it("adds nothing when there is no origin to point at", () => {
     expect(withSitemapDirective("User-agent: *\n", null)).toBe("User-agent: *\n");
+  });
+});
+
+describe("resolveSiteOrigins", () => {
+  it("lists every known origin, not just the preferred one", () => {
+    const origins = resolveSiteOrigins({
+      canonicalUrl: "https://example.com",
+      verifiedDomain: "other.example.com",
+      vercelProjectName: "buildrik-site-abc",
+    });
+    expect(origins).toContain("https://example.com");
+    expect(origins).toContain("https://other.example.com");
+    expect(origins).toContain("https://buildrik-site-abc.vercel.app");
+  });
+
+  it("includes the apex+www counterpart of a custom domain", () => {
+    const origins = resolveSiteOrigins({ canonicalUrl: "https://www.example.com", verifiedDomain: null });
+    expect(origins).toContain("https://www.example.com");
+    expect(origins).toContain("https://example.com");
+  });
+
+  it("returns an empty list when nothing is configured", () => {
+    expect(resolveSiteOrigins({ canonicalUrl: null, verifiedDomain: null })).toEqual([]);
+  });
+
+  it("never includes an attacker-controlled origin", () => {
+    const origins = resolveSiteOrigins({
+      canonicalUrl: "https://mysite.example.com",
+      verifiedDomain: null,
+      vercelProjectName: "my-site",
+    });
+    expect(origins).not.toContain("https://evil.example.com");
   });
 });

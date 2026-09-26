@@ -14,7 +14,6 @@ import type { HandlePosition } from "../../../engine/canvas/ResizeHandler";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { useCanvasResize } from "../hooks";
 import { SelectionHandles } from "./SelectionHandles";
-// import { useSelectionAnimation } from "../hooks/useSelectionAnimation";
 
 // CSS variable references for colors - single source of truth is Canvas.css
 const SELECTION_VARS = {

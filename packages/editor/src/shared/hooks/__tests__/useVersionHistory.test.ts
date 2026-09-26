@@ -34,7 +34,7 @@ function createMockComposer(versions: NamedVersion[] = []) {
       getLoadState: vi.fn((): "loading" | "ready" | "error" => "loading"),
       getVersions: vi.fn(() => versions),
       createVersion: vi.fn().mockResolvedValue(undefined),
-      restoreVersion: vi.fn().mockResolvedValue(undefined),
+      restoreVersion: vi.fn().mockResolvedValue(true),
       deleteVersion: vi.fn().mockResolvedValue(undefined),
       compareVersions: vi.fn().mockResolvedValue({ added: [], removed: [], modified: [] }),
       updateVersion: vi.fn().mockResolvedValue(undefined),
@@ -124,7 +124,9 @@ describe("useVersionHistory", () => {
     await act(() => result.current.createVersion("Pre-launch", "before publish"));
     expect(composer.versions.createVersion).toHaveBeenCalledWith("Pre-launch", "before publish");
 
-    await act(() => result.current.restoreVersion("v9"));
+    await act(async () => {
+      expect(await result.current.restoreVersion("v9")).toBe(true);
+    });
     expect(composer.versions.restoreVersion).toHaveBeenCalledWith("v9");
 
     await act(() => result.current.deleteVersion("v9"));

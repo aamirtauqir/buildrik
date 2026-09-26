@@ -82,15 +82,16 @@ describe("saveProjectData · dsSchemaVersion write", () => {
       const tx = {
         page: {
           findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(null),
           upsert: vi.fn(),
           update: vi.fn(),
           deleteMany: vi.fn(),
         },
         formBlock: { deleteMany: vi.fn() },
         site: {
-          update: vi.fn(async (args: any) => {
+          updateMany: vi.fn(async (args: any) => {
             capturedSiteUpdate = args;
-            return {};
+            return { count: 1 };
           }),
         },
       };
@@ -115,15 +116,16 @@ describe("saveProjectData · dsSchemaVersion write", () => {
       const tx = {
         page: {
           findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(null),
           upsert: vi.fn(),
           update: vi.fn(),
           deleteMany: vi.fn(),
         },
         formBlock: { deleteMany: vi.fn() },
         site: {
-          update: vi.fn(async (args: any) => {
+          updateMany: vi.fn(async (args: any) => {
             capturedSiteUpdate = args;
-            return {};
+            return { count: 1 };
           }),
         },
       };

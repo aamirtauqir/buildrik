@@ -27,7 +27,7 @@ const link = (token: string, over: Record<string, unknown> = {}) => ({
   id: `id-${token}`,
   token,
   name: "Draft preview",
-  passwordHash: null,
+  hasPassword: false,
   expiresAt: null,
   ...over,
 });
@@ -63,8 +63,19 @@ describe("PreviewShareModal", () => {
   it("mints a link when every existing one is expired or password-locked", async () => {
     list.mockResolvedValue([
       link("tok-old", { expiresAt: new Date(Date.now() - 1000) }),
-      link("tok-locked", { passwordHash: "x" }),
+      link("tok-locked", { hasPassword: true }),
     ]);
+    create.mockResolvedValue(link("tok-new"));
+    renderModal();
+    const row = await screen.findByTestId("preview-share-link");
+    expect(row.textContent).toMatch(/\/share\/tok-new$/);
+    expect(create).toHaveBeenCalledWith({ siteId: "site-abc", name: "Draft preview" });
+  });
+
+  // IMPORTANT 6: a row whose token the server
+  // redacted (null — this caller isn't EDITOR+) must never be reused.
+  it("mints a link when the only existing one has a redacted (null) token", async () => {
+    list.mockResolvedValue([link("tok-hidden", { token: null })]);
     create.mockResolvedValue(link("tok-new"));
     renderModal();
     const row = await screen.findByTestId("preview-share-link");

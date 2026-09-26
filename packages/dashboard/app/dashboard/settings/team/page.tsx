@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { Suspense, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
@@ -13,10 +14,14 @@ import { Button, MetricValue } from "@/components/dashboard/primitives";
 import { PageHeaderActions } from "@/components/dashboard/shell/page-actions";
 import { UserPlus } from "lucide-react";
 
-export default function TeamPage() {
+function TeamPageInner() {
   const { data: session } = useSession();
   const { addToast } = useToast();
-  const [inviteOpen, setInviteOpen] = useState(false);
+  const searchParams = useSearchParams();
+  // Command palette's "Invite Member" links here with ?invite=true — this
+  // page read no search params, so the deep link landed on the plain member
+  // list with the invite modal closed.
+  const [inviteOpen, setInviteOpen] = useState(() => searchParams.get("invite") === "true");
   const [selectMode, setSelectMode] = useState(false);
 
   // Queries
@@ -27,12 +32,29 @@ export default function TeamPage() {
 
   // Mutations
   const inviteMutation = trpc.team.invite.useMutation({
+    // B-5: team.service.inviteMembers swallows a failed invite email and
+    // still counts it as "sent" — the invite row is created (the invitee
+    // can still be added to sites/roles) but no email ever reaches them.
+    // `emailFailed` is the per-invite list of addresses whose email did
+    // NOT go out; read defensively (optional cast) until the service-side
+    // contract lands, since AppRouter's generated type may not carry the
+    // field yet.
     onSuccess: (result) => {
       membersQuery.refetch();
       pendingQuery.refetch();
       statsQuery.refetch();
       setInviteOpen(false);
-      addToast("success", `${result.sent} invitation${result.sent > 1 ? "s" : ""} sent`);
+      const emailFailed = (result as { emailFailed?: string[] }).emailFailed ?? [];
+      if (emailFailed.length > 0) {
+        addToast(
+          "error",
+          "Invite created, but the email couldn't be sent",
+          `${emailFailed.join(", ")} — ask them to check with you directly, or resend from Pending invitations.`,
+        );
+      }
+      if (result.sent > 0) {
+        addToast("success", `${result.sent} invitation${result.sent > 1 ? "s" : ""} sent`);
+      }
     },
     onError: (err) => addToast("error", "Failed to invite", err.message),
   });
@@ -252,5 +274,15 @@ export default function TeamPage() {
         isLoading={inviteMutation.isPending}
       />
     </div>
+  );
+}
+
+export default function TeamPage() {
+  // useSearchParams (?invite=true from the command palette) needs a Suspense
+  // boundary to prerender — same shape as the billing page.
+  return (
+    <Suspense fallback={<div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />}>
+      <TeamPageInner />
+    </Suspense>
   );
 }

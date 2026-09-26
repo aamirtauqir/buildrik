@@ -18,7 +18,9 @@ const siteFindUnique = vi.fn();
 const siteUpdate = vi.fn();
 const workspaceFindUnique = vi.fn();
 const memberFindUnique = vi.fn();
+const effectiveRole = vi.fn();
 const reviewFindFirst = vi.fn();
+const isFeatureEnabledMock = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -43,6 +45,17 @@ vi.mock("@server/services/integrations.service", () => ({
   getActiveVercelConnection: vi.fn(() => Promise.resolve(null)),
   markInactive: vi.fn(),
 }));
+// M-8: the gate reads the caller's EFFECTIVE site role (PD-6 cap), not the
+// raw workspace membership.
+vi.mock("@/server/services/permission.service", () => ({
+  getEffectiveSiteRole: (...a: unknown[]) => effectiveRole(...a),
+  PermissionError: class PermissionError extends Error {
+    constructor(public code: string, msg?: string) { super(msg ?? code); }
+  },
+}));
+vi.mock("@server/services/feature-flag.service", () => ({
+  isFeatureEnabled: (...a: unknown[]) => isFeatureEnabledMock(...a),
+}));
 
 import { startPublish } from "@server/services/publish.service";
 
@@ -57,12 +70,16 @@ describe("startPublish · approval gate enforcement", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubEnv("NODE_ENV", "development"); // skip the Vercel-connection check
+    // Every existing test in this file predates PD-7/8 and asserts against a
+    // workspace where the layer IS on (that was implicit before; the gate now
+    // also checks it) — default true so those keep exercising "layer on".
+    isFeatureEnabledMock.mockResolvedValue(true);
   });
 
   it("Editor + gate ON + never sent for review → throws APPROVAL_NONE (no job queued)", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
-    memberFindUnique.mockResolvedValue({ role: "EDITOR" });
+    effectiveRole.mockResolvedValue("EDITOR");
 
     await expect(startPublish("site-1", "ws-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled(); // gate fires before queueing
@@ -90,7 +107,7 @@ describe("startPublish · approval gate enforcement", () => {
     workspaceFindUnique.mockImplementation((args: { where: { id: string } }) =>
       Promise.resolve({ editsRequireApproval: args.where.id === "ws-1" }),
     );
-    memberFindUnique.mockResolvedValue({ role: "EDITOR" });
+    effectiveRole.mockResolvedValue("EDITOR");
 
     await expect(startPublish("site-1", "ws-2", "user-editor")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled();
@@ -105,7 +122,7 @@ describe("startPublish · approval gate enforcement", () => {
   it("Admin + gate ON + never sent for review → throws APPROVAL_NONE (no job queued) (§13-C1)", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
-    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    effectiveRole.mockResolvedValue("ADMIN");
 
     await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled();
@@ -114,7 +131,7 @@ describe("startPublish · approval gate enforcement", () => {
   it("Admin + gate ON + latest review CHANGES_REQUESTED → throws APPROVAL_CHANGES, not the same error as no review", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
-    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    effectiveRole.mockResolvedValue("ADMIN");
     reviewFindFirst.mockResolvedValue({ status: "CHANGES_REQUESTED" });
 
     await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_CHANGES");
@@ -124,7 +141,7 @@ describe("startPublish · approval gate enforcement", () => {
   it("Admin + gate ON + latest review APPROVED → NOT blocked by approval", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
-    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    effectiveRole.mockResolvedValue("ADMIN");
     reviewFindFirst.mockResolvedValue({ status: "APPROVED" });
     jobCreate.mockResolvedValue({ id: "job-1" });
     siteUpdate.mockResolvedValue({});
@@ -152,7 +169,7 @@ describe("startPublish · approval gate enforcement", () => {
   it("a revoked PENDING round stops answering for the site, so the publisher is told nobody has asked yet", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
-    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    effectiveRole.mockResolvedValue("ADMIN");
     reviewFindFirst.mockImplementation(
       revokedAwareFindFirst({ status: "PENDING", resolvedAt: null, revokedAt: new Date() })
     );
@@ -164,7 +181,7 @@ describe("startPublish · approval gate enforcement", () => {
   it("a revoked APPROVAL stops permitting the publish it approved", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
-    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    effectiveRole.mockResolvedValue("ADMIN");
     reviewFindFirst.mockImplementation(
       revokedAwareFindFirst({ status: "APPROVED", resolvedAt: new Date(), revokedAt: new Date() })
     );
@@ -176,7 +193,7 @@ describe("startPublish · approval gate enforcement", () => {
   it("an unrevoked PENDING round still blocks, so the filter did not disable the gate", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
-    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    effectiveRole.mockResolvedValue("ADMIN");
     reviewFindFirst.mockImplementation(
       revokedAwareFindFirst({ status: "PENDING", resolvedAt: null, revokedAt: null })
     );
@@ -184,10 +201,24 @@ describe("startPublish · approval gate enforcement", () => {
     await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_PENDING");
   });
 
-  it("Owner + gate ON + no review → NOT blocked by approval (exempt)", async () => {
+  /* M-8: a workspace OWNER whose role on THIS site is capped to EDITOR by a
+     site roleOverride (PD-6 — a cap, never an upgrade) is not exempt here:
+     the raw membership read made them so. */
+  it("workspace OWNER capped to EDITOR on this site + gate ON + no review → throws APPROVAL_NONE", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
     memberFindUnique.mockResolvedValue({ role: "OWNER" });
+    effectiveRole.mockResolvedValue("EDITOR");
+
+    await expect(startPublish("site-1", "ws-1", "user-owner")).rejects.toThrow("APPROVAL_NONE");
+    expect(effectiveRole).toHaveBeenCalledWith(expect.anything(), "user-owner", "site-1");
+    expect(jobCreate).not.toHaveBeenCalled();
+  });
+
+  it("Owner + gate ON + no review → NOT blocked by approval (exempt)", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    effectiveRole.mockResolvedValue("OWNER");
     jobCreate.mockResolvedValue({ id: "job-1" });
     siteUpdate.mockResolvedValue({});
 
@@ -204,7 +235,7 @@ describe("startPublish · approval gate enforcement", () => {
   it("Editor + gate ON + latest review APPROVED → NOT blocked by approval", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
-    memberFindUnique.mockResolvedValue({ role: "EDITOR" });
+    effectiveRole.mockResolvedValue("EDITOR");
     reviewFindFirst.mockResolvedValue({ status: "APPROVED" });
     jobCreate.mockResolvedValue({ id: "job-1" });
     siteUpdate.mockResolvedValue({});
@@ -221,7 +252,7 @@ describe("startPublish · approval gate enforcement", () => {
   it("gate OFF → Editor publishes without approval (no block)", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: false });
-    memberFindUnique.mockResolvedValue({ role: "EDITOR" });
+    effectiveRole.mockResolvedValue("EDITOR");
     jobCreate.mockResolvedValue({ id: "job-1" });
     siteUpdate.mockResolvedValue({});
 
@@ -232,5 +263,57 @@ describe("startPublish · approval gate enforcement", () => {
       if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
     expect(approvalError).toBe(false);
+  });
+
+  /* PD-7/8: editsRequireApproval=true with
+     agency_layer=false is not a config anyone can ever satisfy — reviews.submit
+     hard-refuses (requireAgencyLayer) when the layer is off, so no review can
+     ever reach APPROVED, and the gate deadlocked every non-owner publish
+     forever. */
+  it("approval ON + agency_layer OFF → EDITOR can publish (gate skips enforcement, no deadlock)", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    effectiveRole.mockResolvedValue("EDITOR");
+    isFeatureEnabledMock.mockResolvedValue(false);
+    jobCreate.mockResolvedValue({ id: "job-1" });
+    siteUpdate.mockResolvedValue({});
+
+    let approvalError = false;
+    try {
+      await startPublish("site-1", "ws-1", "user-editor");
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
+    }
+    expect(approvalError).toBe(false);
+    // Never even asked for the latest review — the gate short-circuited before it.
+    expect(reviewFindFirst).not.toHaveBeenCalled();
+  });
+
+  it("approval ON + agency_layer ON → unchanged: EDITOR with no review still throws APPROVAL_NONE", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    effectiveRole.mockResolvedValue("EDITOR");
+    isFeatureEnabledMock.mockResolvedValue(true);
+
+    await expect(startPublish("site-1", "ws-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
+    expect(jobCreate).not.toHaveBeenCalled();
+  });
+
+  it("asks isFeatureEnabled about the SITE's workspace, not the caller's session workspace", async () => {
+    baseHappyMocks();
+    siteFindUnique.mockResolvedValue({
+      name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws-1", lastEditedAt: null,
+    });
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    effectiveRole.mockResolvedValue("EDITOR");
+    isFeatureEnabledMock.mockResolvedValue(false);
+    jobCreate.mockResolvedValue({ id: "job-1" });
+    siteUpdate.mockResolvedValue({});
+
+    // Not asserting the outcome here (a later, unrelated Vercel-connection
+    // check may still throw) — only that the approval gate asked about the
+    // right workspace before getting there.
+    await startPublish("site-1", "ws-2", "user-editor").catch(() => {});
+    expect(isFeatureEnabledMock).toHaveBeenCalledWith("ws-1", "agency_layer");
   });
 });

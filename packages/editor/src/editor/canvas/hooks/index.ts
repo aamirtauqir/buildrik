@@ -89,6 +89,7 @@ export {
 
 // Content and UI state hooks
 export { useCanvasContent } from "./useCanvasContent";
+export { useSliderRuntime } from "./useSliderRuntime";
 export {
   useCanvasContextMenu,
   type ContextMenuState,

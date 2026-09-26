@@ -19,11 +19,12 @@ import {
   mirrorComponentUpsert,
   mirrorComponentDelete,
   hydrateComponentsFromServer,
+  getComponentHydrationStatus,
   onComponentSyncError,
   getComponentSyncPendingCount,
   retryComponentSync,
 } from "../../../services/componentSync";
-import { currentSiteId } from "../../../services/ReviewService";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { captureComponentThumbnail } from "@/editor/sidebar/tabs/component-library/captureComponentThumbnail";
 
 export function useComponentSync(
@@ -37,12 +38,25 @@ export function useComponentSync(
     // ComponentManager already loaded IndexedDB at init (before hydrate writes),
     // so when hydrate adds server items, re-read the store + emit the list-updated
     // event (setProjectId) so the panel shows them WITHOUT a second reload.
-    void hydrateComponentsFromServer().then((added) => {
-      if (added > 0) {
-        const sid = currentSiteId();
-        if (sid) void composer.components.setProjectId(sid);
-      }
-    });
+    const hydrate = () =>
+      void hydrateComponentsFromServer().then((written) => {
+        if (written > 0) {
+          const sid = getSiteIdFromUrl();
+          if (sid) void composer.components.setProjectId(sid);
+        }
+        /* C-4: a failed pull used to leave the library quietly short — the
+           shared masters simply were not there. Say it, and offer the pull
+           again. */
+        if (getComponentHydrationStatus() === "error" && addToast) {
+          addToast({
+            title: "Couldn't load your shared components",
+            description: "Components from your other sites and teammates may be missing. This is a connection problem, not a change to your data.",
+            tone: "warning",
+            action: { label: "Retry", onClick: hydrate },
+          });
+        }
+      });
+    hydrate();
 
     const onUpsert = (p: ComponentCreatedPayload | ComponentUpdatedPayload) =>
       void mirrorComponentUpsert(p.component);

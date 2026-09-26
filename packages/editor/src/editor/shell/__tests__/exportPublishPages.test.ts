@@ -75,6 +75,18 @@ describe("exportPublishPages — the stylesheet has to travel", () => {
     }
   });
 
+  it("keeps the folded stylesheet inside its <style> (S-1)", async () => {
+    const { inlinePublishStylesheet } = await import("../exportPublishPages");
+    const [out] = inlinePublishStylesheet([
+      { name: "index.html", content: page("<h1>Home</h1>") },
+      { name: "styles.css", content: ".a{content:\"$'\"}</Style><script>alert(1)</script>" },
+    ]);
+    const doc = new DOMParser().parseFromString(out.html, "text/html");
+    expect(doc.querySelectorAll("script")).toHaveLength(0);
+    expect(doc.querySelector("h1")?.textContent).toBe("Home");
+    expect(doc.querySelector("style")?.textContent).toContain(".a{content:\"$'\"}");
+  });
+
   it("returns page files only — the payload schema takes pages, nothing else", async () => {
     const { inlinePublishStylesheet } = await import("../exportPublishPages");
     const out = inlinePublishStylesheet([

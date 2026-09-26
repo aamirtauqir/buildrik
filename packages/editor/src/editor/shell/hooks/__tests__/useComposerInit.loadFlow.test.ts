@@ -97,6 +97,8 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   saveProject: vi.fn(() => Promise.resolve({ success: true })),
   /* The real class, so `instanceof` in the autosave catch behaves as it does
      in the app. */
+  isSaveConflictPending: vi.fn(() => false),
+  SAVE_CONFLICT_EVENT: "buildrik:save-conflict",
   SaveConflictError: class SaveConflictError extends Error {
     constructor(public serverToken?: string) {
       super("SAVE_CONFLICT");
@@ -110,8 +112,10 @@ vi.mock("@/services/AssetUploadService", () => ({
 }));
 
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
+import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 import {
   getSiteIdFromUrl,
+  isSaveConflictPending,
   loadProject,
   loadServerMedia,
   saveProject as syncSaveProject,
@@ -224,6 +228,38 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
        loaded one is this codebase's documented data-loss precondition, so the
        only import so far is the server's own. */
     expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
+  });
+
+  /* C-9: a member demoted mid-save is sent to view mode, where nothing can
+     be saved — offering "Restore my edits" there would put back edits that
+     can only be refused again. The record stays for when the role returns. */
+  it("in view mode, says the work is kept but does not offer to restore it", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
+    localStorage.setItem(
+      "bk-unsaved-v1-site-9",
+      JSON.stringify({ project: { pages: [{ id: "p" }], styles: [] }, at: "2026-09-26T00:00:00.000Z" }),
+    );
+    const before = window.location.href;
+    window.history.replaceState(null, "", "?view=readonly");
+    try {
+      const params = makeParams();
+      renderHook(() => useComposerInit(params));
+      await act(async () => {
+        mockComposer.emit("composer:ready");
+        await flushMicrotasks();
+      });
+      const toast = vi
+        .mocked(params.addToast!)
+        .mock.calls.map(([t]) => t)
+        .find((t) => /never reached the server/i.test(t.title ?? ""));
+      expect(toast).toBeTruthy();
+      expect(toast!.action).toBeUndefined();
+      expect(localStorage.getItem("bk-unsaved-v1-site-9")).not.toBeNull();
+    } finally {
+      window.history.replaceState(null, "", before);
+      localStorage.removeItem("bk-unsaved-v1-site-9");
+    }
   });
 
   it("restores only when the user asks, and clears the record once it has", async () => {
@@ -539,6 +575,84 @@ describe("useComposerInit — autosave conflict handling", () => {
     );
     expect(states.some((st) => st && st.status === "conflict")).toBe(true);
     expect(states.some((st) => st && st.status === "error")).toBe(false);
+  });
+
+  /* A-2 / PD-11: once a save was refused, every later autosave carries the
+     same stale token and would be refused again — re-raising the dialog the
+     user just dismissed. Autosave holds until the conflict is resolved. */
+  it("sends no autosave while a conflict is waiting on the user's choice", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(isSaveConflictPending).mockReturnValue(true);
+
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+
+    expect(syncSaveProject).not.toHaveBeenCalled();
+    expect(params.setIsDirty).toHaveBeenLastCalledWith(true);
+    const states = vi.mocked(params.setSaveState).mock.calls.map(([arg]) =>
+      typeof arg === "function" ? arg({ status: "conflict" }) : arg,
+    );
+    expect(states.some((st) => st && st.status === "saving")).toBe(false);
+
+    // Resolved (Overwrite / reload clears the hold) → autosave resumes.
+    vi.mocked(isSaveConflictPending).mockReturnValue(false);
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+    expect(syncSaveProject).toHaveBeenCalledTimes(1);
+  });
+
+  /* Fix / IMPORTANT 1: a conflict raised by a PUBLISH (C-3) went
+     through raiseSaveConflict only — autosave held, but no save path set the
+     chip, so after Escape there was no Conflict pill, no Publish blocker, and
+     every later edit lived only in this tab. */
+  it("a publish-raised conflict puts the chip in conflict, blocks Publish, and keeps held edits", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    localStorage.removeItem("bk-unsaved-v1-site-9");
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+
+    // PublishService → raiseSaveConflict dispatches this; no save is involved.
+    act(() => {
+      window.dispatchEvent(new CustomEvent("buildrik:save-conflict", { detail: { serverLastEditedAt: "2026-09-26T00:00:00.000Z" } }));
+    });
+    const status = () =>
+      vi.mocked(params.setSaveState).mock.calls
+        .map(([arg]) => (typeof arg === "function" ? arg({ status: "idle" }) : arg))
+        .map((st) => st?.status);
+    expect(status()).toContain("conflict");
+    // …which is what the lifecycle reads for its Publish blocker.
+    expect(
+      deriveLifecycleState({
+        reviewState: "approved", reviewsEnabled: true, editsRequireApproval: true,
+        isPublished: false, hasUnpublishedChanges: null, isViewer: false,
+        publishEnabled: true, offline: false, errorCount: 0,
+        saveConflict: status().includes("conflict"),
+      })?.blockedReason,
+    ).toBe("Resolve the sync conflict before publishing");
+
+    // A later edit is held (hold is on) and kept for the reload.
+    vi.mocked(isSaveConflictPending).mockReturnValue(true);
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+    expect(syncSaveProject).not.toHaveBeenCalled();
+    expect(localStorage.getItem("bk-unsaved-v1-site-9")).not.toBeNull();
+    vi.mocked(isSaveConflictPending).mockReturnValue(false);
+    localStorage.removeItem("bk-unsaved-v1-site-9");
   });
 
   it("a real failure still says so", async () => {

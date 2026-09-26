@@ -28,9 +28,10 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import type { HistoryDisplayEntry } from "@/engine/HistoryManager";
-import { Button, Portal } from "@/editor/chrome-ui";
+import { Button, Portal, Tooltip } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { renderProjectPages } from "./exportPublishPages";
+import { useEditorRole } from "./hooks/useEditorRole";
 
 type Frame = { status: "live" } | { status: "loading" } | { status: "ready"; html: string } | { status: "none" };
 
@@ -57,6 +58,9 @@ function measure() {
 }
 
 export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ composer }) => {
+  /* FC-9 (fix-all 2026-09-25): Time-Travel opens from History's own ⋯ menu,
+     so a viewer can still scrub and preview — only Restore is a write. */
+  const isViewer = useEditorRole() === "VIEWER";
   const [active, setActive] = React.useState(false);
   const [entries, setEntries] = React.useState<HistoryDisplayEntry[]>([]);
   const [index, setIndex] = React.useState(0);
@@ -79,6 +83,31 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
     setConfirming(false);
     setFrame({ status: "live" });
   }, []);
+
+  /* A-18: the preview band drew over the live canvas but left it
+     pointer-events and keyboard-live underneath — a click landed on an
+     element you could not see, and Delete/⌘Z ran through CommandCenter
+     against the live document while "nothing is written until you restore"
+     sat on screen above it. The overlay below drops pointer-events-none so
+     clicks land on the (sandboxed) preview iframe instead of falling
+     through, and the composer goes read-only for the duration — the
+     registry's own MUTATING_COMMANDS gate (CommandCenter.ts) then refuses
+     Delete/duplicate/undo/redo/etc. the same way ?view=readonly does.
+     Restores whatever readOnly was before (not a hard-coded false — a
+     readOnly VIEW route sets it independently), and only once: exit() is
+     called first inside restore(), so this always restores before the
+     actual history write runs. */
+  const prevReadOnlyRef = React.useRef<boolean | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    if (active) {
+      if (prevReadOnlyRef.current === null) prevReadOnlyRef.current = composer.readOnly;
+      composer.readOnly = true;
+    } else if (prevReadOnlyRef.current !== null) {
+      composer.readOnly = prevReadOnlyRef.current;
+      prevReadOnlyRef.current = null;
+    }
+  }, [active, composer]);
 
   /* ⌃⇧T is global — it used to live in HistoryTab, so it only worked with the
      panel already open. */
@@ -247,15 +276,29 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
         <Button color="light" size="xs" className={BAND_BTN} onClick={exit} data-testid="tt-exit">
           Exit
         </Button>
-        <Button
-          size="xs"
-          className={`${BAND_BTN} tw:bg-[var(--bk-ink)] tw:text-white tw:hover:bg-[var(--bk-ink)]`}
-          disabled={index >= newest}
-          onClick={() => setConfirming(true)}
-          data-testid="tt-restore"
-        >
-          Restore…
-        </Button>
+        {isViewer ? (
+          <Tooltip content="Viewers can't restore — ask an editor" placement="top" arrow={false}>
+            <Button
+              size="xs"
+              className={`${BAND_BTN} tw:bg-[var(--bk-ink)] tw:text-white tw:hover:bg-[var(--bk-ink)]`}
+              aria-disabled="true"
+              onClick={() => {}}
+              data-testid="tt-restore"
+            >
+              Restore…
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button
+            size="xs"
+            className={`${BAND_BTN} tw:bg-[var(--bk-ink)] tw:text-white tw:hover:bg-[var(--bk-ink)]`}
+            disabled={index >= newest}
+            onClick={() => setConfirming(true)}
+            data-testid="tt-restore"
+          >
+            Restore…
+          </Button>
+        )}
       </div>
       {confirming && entry ? (
         /* 4418:76095 draws this at the top of the History panel; it sits
@@ -285,7 +328,7 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
       ) : null}
       {fr && frame.status !== "live" ? (
         <div
-          className="tw:pointer-events-none tw:fixed tw:z-[55] tw:overflow-hidden tw:bg-[var(--bk-bg-card)]"
+          className="tw:fixed tw:z-[55] tw:overflow-hidden tw:bg-[var(--bk-bg-card)]"
           style={{ left: fr.left, top: fr.top, width: fr.width, height: fr.height }}
           data-testid="tt-preview"
           data-status={frame.status}

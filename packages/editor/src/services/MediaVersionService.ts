@@ -28,6 +28,10 @@ export interface AssetVersion {
   edits: unknown;
   // tRPC (superjson) deserializes the Prisma timestamp to a Date on the client.
   createdAt: string | Date;
+  /** Bare id of who saved this version (never a relation — see the schema note). */
+  createdBy?: string | null;
+  /** Board Assets 4418:62883's author line ("Ali", "Sara"). Absent = unknown author. */
+  createdByName?: string | null;
 }
 
 /** Server-side version history for a synced asset, newest first. */

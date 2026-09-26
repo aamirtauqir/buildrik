@@ -60,10 +60,15 @@ export async function peekRateLimit(
   maxAttempts: number
 ): Promise<{ allowed: boolean }> {
   const now = new Date();
-  const rows = await prisma.$queryRaw<{ count: number; resetAt: Date }[]>`
-    SELECT "count", "resetAt" FROM "rate_limit_buckets" WHERE "key" = ${key}
+  // S-11: `resetAt` is `timestamp WITHOUT time zone` — comparing it to a JS
+  // Date IN NODE (as this used to) reads it shifted by the server's UTC
+  // offset, so on a negative-offset box `resetAt < now` was true for a
+  // still-live bucket and peek always reported allowed. Do the comparison
+  // IN POSTGRES, same discipline as checkRateLimit's write.
+  const rows = await prisma.$queryRaw<{ count: number; expired: boolean }[]>`
+    SELECT "count", ("resetAt" < ${now}) AS "expired" FROM "rate_limit_buckets" WHERE "key" = ${key}
   `;
   const row = rows[0];
-  if (!row || row.resetAt < now) return { allowed: true };
+  if (!row || row.expired) return { allowed: true };
   return { allowed: row.count < maxAttempts };
 }

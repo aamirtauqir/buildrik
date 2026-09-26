@@ -11,14 +11,18 @@ const pages = [
   { path: "menu.html", html: "<p>menu</p>", name: "Our menu", slug: "menu" },
 ];
 
+const renderProjectPages = vi.hoisted(() => vi.fn());
+const cmsSnapshot = { collections: [], items: [] };
 vi.mock("@buildrik/editor", () => ({
   projectDataFromRows: () => ({}),
-  renderProjectPages: () => Promise.resolve(pages),
+  renderProjectPages,
+  cmsFromRows: () => cmsSnapshot,
 }));
 
 import { DraftPreview, pageIndexForSlug } from "../draft-preview";
 
-const rows = { site: {}, pages: [], siteColumns: {}, siteFonts: [] };
+const rows = { site: {}, pages: [], siteColumns: {}, siteFonts: [], cms: { collections: [], entries: [] } };
+renderProjectPages.mockImplementation(() => Promise.resolve(pages));
 
 afterEach(() => {
   cleanup();
@@ -56,5 +60,13 @@ describe("DraftPreview", () => {
     fireEvent.click(screen.getByRole("button", { name: /Change page/ }));
     fireEvent.click(screen.getByRole("menuitem", { name: "Home" }));
     await waitFor(() => expect(window.location.search).toBe(""));
+  });
+
+  /* Lv3 #10: the published CMS entries in the rows reach the render — without
+     them every bound element showed its last-saved text. */
+  it("hands the rows' CMS snapshot to the render", async () => {
+    render(<DraftPreview siteName="Bella" rows={rows} />);
+    await waitFor(() => expect(renderProjectPages).toHaveBeenCalled());
+    expect(renderProjectPages.mock.calls.at(-1)![2]).toBe(cmsSnapshot);
   });
 });

@@ -42,6 +42,12 @@ export const publishInputSchema = z
      *  was approved) and chose to publish anyway (contracts §1.5). Without it, a
      *  stale approval blocks the publish with APPROVAL_STALE. */
     acknowledgeStale: z.boolean().optional(),
+    /** C-3: the `lastEditedAt` the publishing tab last loaded or saved. The
+     *  tab publishes its IN-MEMORY pages, so a tab that fell behind another
+     *  writer would ship the older copy over theirs; the server refuses with
+     *  SAVE_CONFLICT when the site moved past this. Optional — callers that
+     *  send no pages (cron, dashboard) are not checked. */
+    expectedLastEditedAt: z.string().datetime().nullish(),
   })
   .refine(
     (input) => {
@@ -125,4 +131,8 @@ export const publishDiffInput = z.object({
   toJobId: z.string().min(1),
 });
 export type PublishDiffInput = z.infer<typeof publishDiffInput>;
+
+/** One COMPLETED publish job of a site whose pages Compare renders. */
+export const publishedSnapshotInput = z.object({ siteId: z.string().min(1), jobId: z.string().min(1) });
+export type PublishedSnapshotInput = z.infer<typeof publishedSnapshotInput>;
 export type RollbackInput = z.infer<typeof rollbackInput>;

@@ -12,7 +12,9 @@ import { LINKABLE_TYPES, LinkSection } from "../LinkSection";
 import { ContentSection } from "../ContentSection";
 import { CollectionListSection } from "../CollectionListSection";
 import { FormFieldsSection } from "../FormFieldsSection";
+import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
 import { SlidesSection } from "../SlidesSection";
+import { SliderPlaybackSection } from "../SliderPlaybackSection";
 
 export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   link: defineSection({
@@ -81,11 +83,44 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
     }),
   }),
 
+  /* Board 4428:141878 — a Form's AFTER SUBMIT + PROTECTION; the server-side
+     FormBlock row (action, redirect, notify email, spam guard). */
+  "form-settings": defineSection({
+    tab: "element",
+    title: "After submit",
+    Component: FormAfterSubmitSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({
+      elementId: ctx.selectedElement.id,
+      composer: ctx.composer ?? null,
+      isOpen: ctx.isOpen,
+      onToggle: ctx.onToggle,
+      tier: ctx.tier,
+    }),
+  }),
+
   /* Board 4428:142450 — a Slider's SLIDES; only the slider profile lists it. */
   slides: defineSection({
     tab: "element",
     title: "Slides",
     Component: SlidesSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({
+      elementId: ctx.selectedElement.id,
+      composer: ctx.composer ?? null,
+      isOpen: ctx.isOpen,
+      onToggle: ctx.onToggle,
+      tier: ctx.tier,
+    }),
+  }),
+
+  /* Board 4428:142450 — a Slider's PLAYBACK + CONTROLS (autoplay/interval,
+     arrows/dots). Client-only — data-* attributes on the slider element,
+     read by the same canvas + publish-time carousel runtime. */
+  "slider-settings": defineSection({
+    tab: "element",
+    title: "Playback",
+    Component: SliderPlaybackSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
       elementId: ctx.selectedElement.id,

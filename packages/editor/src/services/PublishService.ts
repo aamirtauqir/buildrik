@@ -8,8 +8,10 @@
  */
 
 import { createBuildrikApiClient } from "./api-client";
+import { settledBaselineLastEditedAt, raiseSaveConflict } from "./BuildrikSyncProvider";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
+import type { ComparePage } from "../shared/utils/html";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
@@ -65,10 +67,24 @@ export async function publishSite(
   // (contracts §1.5): the site changed after the client signed off, and the
   // publisher is choosing to ship the un-approved changes. Omitted on a normal
   // publish so the server gate can still block.
-  const result = await getClient().sites.publish.mutate(
-    acknowledgeStale ? { siteId, pages, acknowledgeStale: true } : { siteId, pages },
-  );
-  return { jobId: result.id };
+  // C-3: the pages are this tab's; the server refuses them if the site moved
+  // on since this tab last loaded or saved it.
+  const expectedLastEditedAt = await settledBaselineLastEditedAt();
+  try {
+    const result = await getClient().sites.publish.mutate(
+      acknowledgeStale
+        ? { siteId, pages, acknowledgeStale: true, expectedLastEditedAt }
+        : { siteId, pages, expectedLastEditedAt },
+    );
+    return { jobId: result.id };
+  } catch (err) {
+    /* A behind-copy is the save conflict, not a failed publish: the same
+       dialog opens and the Publish button locks on the conflict. */
+    if (raiseSaveConflict(err)) {
+      throw new Error("This site changed somewhere else since you opened it. Resolve the conflict, then publish.");
+    }
+    throw err;
+  }
 }
 
 /**
@@ -253,4 +269,11 @@ export interface PublishDiff {
  *  fetch error — same rule as fetchPublishHistory. */
 export async function fetchPublishDiff(siteId: string, fromJobId: string, toJobId: string): Promise<PublishDiff> {
   return getClient().sites.publishDiff.query({ siteId, fromJobId, toJobId });
+}
+
+/** The pages one published version shipped — a Compare side (B8). `null` =
+ *  the payload was pruned past the retained window (a state). THROWS on a
+ *  fetch error, same rule as fetchPublishHistory. */
+export async function fetchPublishedSnapshot(siteId: string, jobId: string): Promise<ComparePage[] | null> {
+  return getClient().sites.publishedSnapshot.query({ siteId, jobId });
 }

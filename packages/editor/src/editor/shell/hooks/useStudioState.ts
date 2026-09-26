@@ -10,6 +10,8 @@ import * as React from "react";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import type { DeviceType } from "../../../shared/types";
 import { migrateLegacyPanelState } from "./panelStateMigration";
+import { getTabMode, isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
+import { useViewerChrome } from "./useEditorRole";
 
 // ============================================
 // Constants
@@ -99,6 +101,14 @@ export interface Issue {
    * land — the Issues panel's page scope and the topbar chip count read it.
    */
   pageId?: string;
+  /**
+   * Which content detector produced this (`useContentIssueScanner` /
+   * `@buildrik/shared/content/contentIssues`). Absent on DS-lint token issues. Tells
+   * the Issues panel which fix affordance to render: an inline alt-text
+   * field for `missing-alt`, or "Fix" → select + open the Link section for
+   * `broken-link`.
+   */
+  contentKind?: "missing-alt" | "broken-link";
 }
 
 /**
@@ -215,6 +225,18 @@ export function useStudioState(): UseStudioStateReturn {
   // Load saved panel state once on mount
   const savedState = React.useMemo(() => getSavedPanelState(), []);
 
+  /* The VIEWER rail gate used to live only in
+     StudioPanels' rail click and "ui:switch-tab" handler — every OTHER door
+     onto a left-panel tab (⌘K's UI_PANEL_OPEN commands, deep links, the
+     topbar's Settings/Publish/History/Pages/Activity/Review buttons) called
+     setLeftPanelTab/openLeftPanelToTab straight through
+     useEditorEventListeners and AquibraStudio, with no gate at all — a
+     VIEWER could open Brand/Add/CMS/Settings from ⌘K even though the rail
+     refused the same click. Gating HERE, at the one sink every door
+     eventually calls, closes all of them at once instead of chasing each
+     caller individually. */
+  const viewerChrome = useViewerChrome();
+
   // Device and zoom state
   const [device, setDevice] = React.useState<DeviceType>("desktop");
   const [zoom, setZoom] = React.useState(100);
@@ -260,12 +282,29 @@ export function useStudioState(): UseStudioStateReturn {
   const [canUndo, setCanUndo] = React.useState(false);
   const [canRedo, setCanRedo] = React.useState(false);
 
+  // A-7: the last non-fullpage ("drawer") tab. A full-page tab (Settings,
+  // Templates, the Asset library) is a destination you navigate TO, not a
+  // steady state to reopen the editor into — persisting it verbatim meant a
+  // reload dropped a user who had Settings open back into Settings instead
+  // of the canvas. Read at persist time, not from render, since it must lag
+  // one tab behind whenever the current tab is a full-page one.
+  const prevDrawerTabRef = React.useRef(leftPanelTab);
+  React.useEffect(() => {
+    if (getTabMode(leftPanelTab as GroupedTabId) !== "fullpage") {
+      prevDrawerTabRef.current = leftPanelTab;
+    }
+  }, [leftPanelTab]);
+
   // Persist panel state to localStorage when it changes.
   // `isLeftPanelOpen` intentionally excluded — see initializer above.
+  // `leftPanelSubTabs` intentionally excluded — sub-tabs are a one-shot deep
+  // link (see openLeftPanelToTab's consume-once write below), not a steady
+  // preference to restore; persisting it left a stale sub-tab that a later
+  // `openLeftPanelToTab(primaryTab)` with no subTab would silently reuse.
   React.useEffect(() => {
     savePanelState({
-      leftPanelTab,
-      leftPanelSubTabs,
+      leftPanelTab:
+        getTabMode(leftPanelTab as GroupedTabId) === "fullpage" ? prevDrawerTabRef.current : leftPanelTab,
       rightPanelTab,
       overlays: {
         showXRay,
@@ -278,7 +317,6 @@ export function useStudioState(): UseStudioStateReturn {
     });
   }, [
     leftPanelTab,
-    leftPanelSubTabs,
     rightPanelTab,
     showXRay,
     showSpacingIndicators,
@@ -290,8 +328,9 @@ export function useStudioState(): UseStudioStateReturn {
 
   // Wrapped setters that update state and trigger persistence
   const setLeftPanelTab = React.useCallback((tab: string) => {
+    if (!isTabAllowedForViewer(tab as GroupedTabId, viewerChrome)) return;
     _setLeftPanelTab(tab);
-  }, []);
+  }, [viewerChrome]);
 
   const setLeftPanelSubTabs = React.useCallback(
     (updater: React.SetStateAction<Record<string, string>>) => {
@@ -311,16 +350,23 @@ export function useStudioState(): UseStudioStateReturn {
 
   // Navigation functions for specific panel tabs
   const openLeftPanelToTab = React.useCallback((primaryTab: string, subTab?: string) => {
+    if (!isTabAllowedForViewer(primaryTab as GroupedTabId, viewerChrome)) return;
     setIsLeftPanelOpen(true);
     _setLeftPanelTab(primaryTab);
 
-    if (subTab) {
-      _setLeftPanelSubTabs((prev) => ({
-        ...prev,
-        [primaryTab]: subTab,
-      }));
-    }
-  }, []);
+    /* A-7 consume-once: a deep link's sub-tab is a one-shot destination, not
+       a sticky preference. Previously a call with no subTab left whatever
+       sub-tab a PRIOR deep link had written for this primaryTab — so opening
+       Settings plain, after once landing on Settings > SEO, silently
+       reopened SEO instead of the overview. */
+    _setLeftPanelSubTabs((prev) => {
+      if (subTab) return { ...prev, [primaryTab]: subTab };
+      if (!(primaryTab in prev)) return prev;
+      const next = { ...prev };
+      delete next[primaryTab];
+      return next;
+    });
+  }, [viewerChrome]);
 
   const openBlocks = React.useCallback(() => {
     openLeftPanelToTab("add");

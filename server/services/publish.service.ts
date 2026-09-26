@@ -1,10 +1,13 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
+import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
-import { appendDynamicPagesToPublish } from "@/server/services/cms.service";
+import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
 import { publishApprovalBlock } from "@server/services/publish-approval";
+import { isFeatureEnabled } from "@server/services/feature-flag.service";
+import { getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
   createVercelDeployment,
   waitForDeploymentReady,
@@ -26,7 +29,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
        null-safe path filter is more fragile than reading a handful of rows. */
     prisma.page.findMany({
       where: { siteId },
-      select: { id: true, name: true, blocks: true, settings: true },
+      select: { id: true, name: true, blocks: true, settings: true, slug: true, isHomePage: true },
     }),
     prisma.site.findUnique({
       where: { id: siteId },
@@ -43,9 +46,14 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   };
   const livePages = allPages.filter(isLive);
   const pageCount = livePages.length;
-  const emptyPages = livePages.filter(
-    (p) => Array.isArray(p.blocks) && p.blocks.length === 0
-  );
+  /* Empty = legacy `[]`, or an element root with no children. Real pages
+     store a root object, so the `[]` test alone never warned for one — and
+     new pages are written as an empty root (blankPageRoot), not `[]`. */
+  const emptyPages = livePages.filter((p) => {
+    if (Array.isArray(p.blocks)) return p.blocks.length === 0;
+    const root = asContentRoot(p.blocks);
+    return root !== undefined && !(Array.isArray(root.children) && root.children.length > 0);
+  });
 
   const checks: PrePublishChecksResult["checks"] = [];
 
@@ -57,6 +65,16 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   const vercel = site ? await getActiveVercelConnection(site.workspaceId) : null;
   if (vercel) {
     checks.push({ label: VERCEL_CHECK_LABEL, status: "pass", detail: "This workspace is connected to Vercel." });
+  } else if (process.env.PUBLISH_ALLOW_SIMULATION === "true") {
+    /* The same explicit opt-in startPublish and the worker already honour
+       (never NODE_ENV): with no connection the publish runs the simulation.
+       Failing here left "Publish now" disabled, so the local loop the flag
+       exists for could not be reached from the editor (verify pass 3). */
+    checks.push({
+      label: VERCEL_CHECK_LABEL,
+      status: "warning",
+      detail: "Not connected — PUBLISH_ALLOW_SIMULATION is on, so this publish is simulated and nothing is deployed.",
+    });
   } else {
     checks.push({
       label: VERCEL_CHECK_LABEL,
@@ -103,6 +121,60 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     checks.push({ label: "Favicon", status: "warning", detail: "No favicon set. Browsers will show a default icon." });
   } else {
     checks.push({ label: "Favicon", status: "pass", detail: "Favicon is configured." });
+  }
+
+  /* Content (B-14 / A02-9): the shared detector the editor's Issues scanner
+     runs, over the pages that ship, so Issues and Publish state the same
+     facts. Warnings only — an unlabelled image or a dead link degrades the
+     site, it does not stop the deploy. A `#page:` target is checked against
+     every page, the editor's own rule. */
+  const contentFindings = detectContentIssues(
+    livePages.map((p) => ({ id: p.id, name: p.name, root: asContentRoot(p.blocks) })),
+    allPages.map((p) => p.id),
+  );
+  const altCount = contentFindings.filter((f) => f.kind === "missing-alt").length;
+  const linkCount = contentFindings.filter((f) => f.kind === "broken-link").length;
+  checks.push(
+    altCount > 0
+      ? { label: CONTENT_CHECK_LABELS["missing-alt"], status: "warning", detail: `${altCount} image${altCount > 1 ? "s are" : " is"} missing alt text.` }
+      : { label: CONTENT_CHECK_LABELS["missing-alt"], status: "pass", detail: "Every image has alt text." },
+  );
+  checks.push(
+    linkCount > 0
+      ? { label: CONTENT_CHECK_LABELS["broken-link"], status: "warning", detail: `${linkCount} link${linkCount > 1 ? "s are" : " is"} broken or missing a destination.` }
+      : { label: CONTENT_CHECK_LABELS["broken-link"], status: "pass", detail: "Every link has a destination." },
+  );
+
+  // CMS dynamic-page templates (A-17): a page-generating collection whose
+  // bound template page was deleted/renamed since binding would otherwise
+  // silently ship without its generated pages — surfaced here, before publish,
+  // instead of only as a server log at publish time. Skipped entirely (no
+  // row at all) when the site has no page-generating collection — a "pass"
+  // row for a check that never applies is noise.
+  const templateBindings = await findStaleTemplateBindings(siteId, allPages);
+  if (templateBindings.hasPageGeneratingCollections) {
+    if (templateBindings.stale.length > 0) {
+      const names = templateBindings.stale.map((s) => s.collectionName).join(", ");
+      checks.push({
+        label: "CMS templates",
+        status: "warning",
+        detail: `${templateBindings.stale.length === 1 ? "Collection" : "Collections"} ${names}: the bound template page no longer exists — its generated pages won't be published.`,
+      });
+    } else {
+      checks.push({ label: "CMS templates", status: "pass", detail: "Every dynamic-page collection's template page exists." });
+    }
+    /* A bound template page is a blueprint: appendDynamicPagesToPublish
+       publishes the pages it generates, not the page itself — say so by name
+       before the publish, rather than letting the page vanish (Lv3 #7). */
+    if (templateBindings.templates.length > 0) {
+      checks.push({
+        label: "Template pages",
+        status: "warning",
+        detail: templateBindings.templates
+          .map((t) => `${t.pageName} is a template for ${t.collectionName} — not published.`)
+          .join(" "),
+      });
+    }
   }
 
   const hasFail = checks.some((c) => c.status === "fail");
@@ -193,7 +265,7 @@ export async function startPublish(
   /** P1 rollback: `bypassApproval` skips the approval gate — an ADMIN restoring
    *  a previously-shipped version is not a new change needing sign-off.
    *  `rolledBackFrom` tags the new job with the version it re-deployed. */
-  opts?: { bypassApproval?: boolean; rolledBackFrom?: string },
+  opts?: { bypassApproval?: boolean; rolledBackFrom?: string; expectedLastEditedAt?: string | null },
 ) {
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
@@ -238,6 +310,17 @@ export async function startPublish(
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
+  /* C-3 freshness: the editor publishes the pages in ITS tab. If the site was
+     saved by someone else after this tab last loaded or saved it, those pages
+     are a behind-copy and would silently replace the newer work on the live
+     site. Same token and same refusal the save path uses. */
+  if (
+    opts?.expectedLastEditedAt &&
+    site.lastEditedAt.getTime() > new Date(opts.expectedLastEditedAt).getTime()
+  ) {
+    throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+  }
+
   // m-approval gate: in a workspace that requires approval, a publish is blocked
   // unless the site's latest review is APPROVED. Only the OWNER is exempt; ADMINs
   // AND designers (EDITOR site-role) are gated. As of the M3 permission change
@@ -258,17 +341,29 @@ export async function startPublish(
        approval and no error. The deploy 50 lines below already uses
        `site.workspaceId`; only the gate was reading the session value. */
     const gateWorkspaceId = site.workspaceId;
-    const [workspace, member] = await Promise.all([
+    // PD-7/8: reviews live behind `agency_layer` —
+    // reviews.submit hard-refuses (requireAgencyLayer) when the flag is off, so
+    // a workspace with editsRequireApproval=true but agency_layer=false has NO
+    // way to ever produce an APPROVED review. Enforcing the gate there deadlocks
+    // every non-owner publish forever. Only enforce approval when the layer is
+    // actually on for this site's workspace.
+    const [workspace, agencyLayerOn] = await Promise.all([
       prisma.workspace.findUnique({
         where: { id: gateWorkspaceId },
         select: { editsRequireApproval: true },
       }),
-      prisma.workspaceMember.findUnique({
-        where: { userId_workspaceId: { userId, workspaceId: gateWorkspaceId } },
-        select: { role: true },
-      }),
+      isFeatureEnabled(gateWorkspaceId, "agency_layer"),
     ]);
-    if (workspace?.editsRequireApproval) {
+    if (workspace?.editsRequireApproval && agencyLayerOn) {
+      /* M-8: the exemption follows the caller's EFFECTIVE role on this site —
+         a site roleOverride caps the workspace role (PD-6), so a workspace
+         OWNER capped to EDITOR here is gated like one. The raw membership read
+         exempted them. A caller with no membership any more (a scheduled
+         publish whose creator left) is gated as EDITOR, as before. */
+      const role = await getEffectiveSiteRole(prisma, userId, siteId).catch((e: unknown) => {
+        if (e instanceof PermissionError) return "EDITOR" as const;
+        throw e;
+      });
       /* `revokedAt: null` is load-bearing. Revoking a round is the only way out
          of a review nobody can resolve — the submitter is refused a self-resolve
          by design, so on a one-seat workspace a PENDING round is otherwise
@@ -283,7 +378,7 @@ export async function startPublish(
       });
       const block = publishApprovalBlock({
         editsRequireApproval: true,
-        role: member?.role ?? "EDITOR",
+        role,
         latestReviewStatus: latestReview?.status ?? null,
         latestReviewResolvedAt: latestReview?.resolvedAt ?? null,
         siteLastEditedAt: site.lastEditedAt,
@@ -435,7 +530,11 @@ export async function cancelPublish(jobId: string) {
  *  the HTML-at-rest; the most-recent (the live version) is always retained. */
 const PUBLISH_HISTORY_RETAINED = 20;
 
-export async function completePublish(jobId: string, publicUrl: string) {
+export async function completePublish(
+  jobId: string,
+  publicUrl: string,
+  extra?: { progress?: number; steps?: Prisma.InputJsonValue },
+) {
   const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
   if (!job) throw new Error("JOB_NOT_FOUND");
 
@@ -444,7 +543,15 @@ export async function completePublish(jobId: string, publicUrl: string) {
       where: { id: jobId },
       // P1: KEEP the log payload (was `log: Prisma.DbNull`) so this version can
       // be rolled back later. Storage is bounded by the prune below.
-      data: { status: "COMPLETED", completedAt: new Date() },
+      data: {
+        status: "COMPLETED",
+        completedAt: new Date(),
+        // D-1: the worker's inline write also carried progress:100 and the
+        // final steps array so the SSE/poll progress UI reaches 100% — carry
+        // them through here now that the worker calls this instead.
+        ...(extra?.progress !== undefined ? { progress: extra.progress } : {}),
+        ...(extra?.steps !== undefined ? { steps: extra.steps } : {}),
+      },
     }),
     prisma.site.update({
       where: { id: job.siteId },
@@ -548,6 +655,36 @@ export async function getPublishDiff(siteId: string, fromJobId: string, toJobId:
   });
   const count = (c: PublishPageChange) => pages.filter((p) => p.change === c).length;
   return { retained: true, pages, added: count("added"), removed: count("removed"), changed: count("changed") };
+}
+
+/**
+ * The pages one published version shipped — a side of the editor's Compare
+ * (B8: a published version against the draft, a saved version or the
+ * approval). Page-by-page HTML, because Compare renders both sides.
+ *
+ * The exception to "HTML never leaves the service" (getPublishDiff /
+ * getPublishStatus / getPublishHistory keep it in): those are list/status
+ * payloads where HTML would be dead weight, while this is the one lazy read
+ * whose whole job is the content — and `jobId` can point at ANY COMPLETED
+ * publish job for the site, not only the current live one, so this can
+ * expose a superseded or since-unpublished version's HTML. It is not public
+ * by that fact alone; the router gates the call at EDITOR. Same shape and
+ * laziness as `getApprovedSnapshot`.
+ *
+ * Throws NOT_FOUND when the job is not a COMPLETED publish of this site; null
+ * when its payload was pruned past the retained window (a state, not an error).
+ */
+export async function getPublishedSnapshot(siteId: string, jobId: string): Promise<PublishPage[] | null> {
+  const job = await prisma.publishBuildJob.findFirst({
+    where: { id: jobId, siteId, status: "COMPLETED" },
+    select: { log: true },
+  });
+  if (!job) throw new Error("NOT_FOUND");
+  const pages = (job.log as RetainedPayload)?.pages;
+  if (!Array.isArray(pages)) return null;
+  return pages
+    .filter((p): p is { path: string; html: string } => typeof p?.path === "string" && typeof p.html === "string")
+    .map((p) => ({ path: p.path, html: p.html }));
 }
 
 /**

@@ -14,9 +14,12 @@ import { roleLabel } from "@lib/constants/enums";
 
 /**
  * Every state the backend already distinguishes gets its own designed screen.
- * `acceptInvite` throws CONFLICT (already a member), FORBIDDEN (invite is bound
- * to another email) and UNAUTHORIZED (no session) — these used to collapse into
- * one generic error banner. Decline is irreversible (the invite row flips to
+ * `acceptInvite` throws CONFLICT (already a member), FORBIDDEN — with
+ * `data.cause.reason` EMAIL_MISMATCH (invite is bound to another email) or
+ * EMAIL_UNVERIFIED (PD-5: accepting needs a verified email) — and
+ * UNAUTHORIZED (no session). These used to collapse into one generic error
+ * banner, and then every FORBIDDEN into the wrong-account screen, which told
+ * an unverified invitee the invite was for "another email" — their own. Decline is irreversible (the invite row flips to
  * DECLINED), so it now goes through a confirm step.
  */
 type View =
@@ -25,6 +28,7 @@ type View =
   | "decline-confirm"
   | "declined"
   | "wrong-account"
+  | "verify-email"
   | "already-member"
   | "accepted";
 
@@ -66,7 +70,7 @@ function InviteContent() {
   // accepts on their behalf. It needs a hard navigation (fresh session cookie),
   // so the success screen is carried across in the URL rather than in state.
   const justAccepted = searchParams.get("accepted") === "1";
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
   const sessionEmail = session?.user?.email ?? "";
 
   const [view, setView] = useState<View | null>(justAccepted ? "accepted" : null);
@@ -76,16 +80,30 @@ function InviteContent() {
   const inviteUrl = `/auth/invite?token=${encodeURIComponent(token)}`;
 
   const acceptMutation = trpc.auth.acceptInvite.useMutation({
-    onSuccess: () => setView("accepted"),
+    // Without switching the session's active workspace, landing on
+    // /dashboard after accepting still showed whatever workspace the JWT
+    // already carried — the newly-joined workspace's sites only appeared
+    // after manually using the workspace switcher. auth.config.ts's jwt
+    // callback re-validates membership server-side on `trigger==="update"`,
+    // so this can't be used to switch into a workspace not just joined.
+    onSuccess: async (data) => {
+      await updateSession({ workspaceId: data.workspaceId });
+      setView("accepted");
+    },
     onError: (err) => {
       const code = err.data?.code;
       if (code === "CONFLICT") return setView("already-member");
-      if (code === "FORBIDDEN") return setView("wrong-account");
+      if (code === "FORBIDDEN") {
+        const reason = (err.data?.cause as { reason?: string } | undefined)?.reason;
+        return setView(reason === "EMAIL_UNVERIFIED" ? "verify-email" : "wrong-account");
+      }
       if (code === "UNAUTHORIZED") return setView("signin-required");
       if (code === "NOT_FOUND") return router.push("/auth/error/invite-expired");
       setError(err.message);
     },
   });
+
+  const resendMutation = trpc.auth.resendVerification.useMutation();
 
   const declineMutation = trpc.auth.declineInvite.useMutation({
     onSuccess: () => setView("declined"),
@@ -154,6 +172,35 @@ function InviteContent() {
         subtitle={`You've already accepted this invitation and joined ${invite.workspaceName}. Head to your dashboard.`}
       >
         <AuthButton onClick={() => router.push("/dashboard")}>Go to dashboard</AuthButton>
+      </StatusView>
+    );
+  }
+
+  if (effectiveView === "verify-email") {
+    return (
+      <StatusView
+        icon={<AlertCircle className="h-[26px] w-[26px] text-[#C27803]" strokeWidth={1.7} />}
+        title="Verify your email to accept"
+        subtitle={
+          <>
+            Joining {invite.workspaceName} needs a verified email. Open the verification link we sent to{" "}
+            {sessionEmail || "your email"}, then come back here to accept.
+          </>
+        }
+      >
+        {resendMutation.isSuccess ? (
+          <FormBanner variant="success" title="Verification email sent" subtitle="Check your inbox, then accept again." />
+        ) : null}
+        <AuthButton
+          loading={resendMutation.isPending}
+          disabled={!sessionEmail}
+          onClick={() => resendMutation.mutate({ email: sessionEmail })}
+        >
+          Resend verification email
+        </AuthButton>
+        <AuthButton variant="secondary" onClick={() => setView("invite")}>
+          View invitation
+        </AuthButton>
       </StatusView>
     );
   }

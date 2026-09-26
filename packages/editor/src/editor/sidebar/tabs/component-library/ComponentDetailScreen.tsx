@@ -15,6 +15,7 @@ import type { Composer } from "../../../../engine";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
 import { captureComponentThumbnail } from "./captureComponentThumbnail";
+import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
 // ============================================
 // Types
 // ============================================
@@ -110,43 +111,12 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const [renaming, setRenaming] = React.useState(false);
   const [draftName, setDraftName] = React.useState(component.name);
 
-  // Handle insert action
+  // Handle insert action — the shared insert (A-15), same words as Add.
   const handleInsert = async () => {
     if (!composer) return;
-
-    // Get parent element - selected element or active page root
-    const selectedIds = composer.selection?.getSelectedIds() || [];
-    let parentId = selectedIds[0];
-    if (!parentId) {
-      const activePage = composer.elements.getActivePage();
-      if (activePage?.root) parentId = activePage.root.id;
-    }
-    if (!parentId) {
-      /* The row action on the list says this; the detail screen's own Insert
-         button returned in silence — same click, same nothing, no message. */
-      addToast({
-        description: "Open a page first to add this component.",
-        tone: "warning",
-        duration: 4000,
-      });
-      return;
-    }
-
-    composer.beginTransaction("insert-component");
-    try {
-      const id = await composer.components.instantiateComponent(component.id, parentId);
-      if (!id) {
-        addToast({
-          description: `Couldn't add "${component.name}" here.`,
-          tone: "error",
-          duration: 4000,
-        });
-        return;
-      }
-      onInsert?.();
-    } finally {
-      composer.endTransaction();
-    }
+    const result = await instantiateComponentAtSelection(composer, component.id);
+    addToast({ ...INSTANTIATE_TOASTS[result], duration: 4000 });
+    if (result === "ok") onInsert?.();
   };
 
   // Handle duplicate action

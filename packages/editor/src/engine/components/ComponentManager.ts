@@ -21,8 +21,9 @@ import type {
   OverrideType,
 } from "../../shared/types/components";
 import { deepClone } from "../../shared/utils/helpers";
+import { sanitizeElementTreeContent } from "../../shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
-import { ComponentInstanceUtils } from "./ComponentInstance";
+import { ComponentInstanceUtils, usableOverrides } from "./ComponentInstance";
 import {
   type InstanceMaps,
   instantiateComponent,
@@ -77,6 +78,15 @@ function generateComponentId(): string {
 }
 
 // ─── Component Manager ───────────────────────────────────────────────────────
+
+/** A stored master is used only when its tree is an element object whose
+ *  `children`, if present, is an array — stored rows are unchecked JSON. */
+function hasUsableMaster(definition: ComponentDefinition | null | undefined): boolean {
+  const tree: unknown = definition?.masterTree;
+  if (typeof tree !== "object" || tree === null || Array.isArray(tree)) return false;
+  const children = "children" in tree ? tree.children : undefined;
+  return children === undefined || Array.isArray(children);
+}
 
 /**
  * Manages the component registry and delegates instance/variant operations.
@@ -137,6 +147,15 @@ export class ComponentManager {
 
     this.components.clear();
     componentList.forEach((comp) => {
+      // One malformed row (any member can store one; the server only checks
+      // it is an object) must not take every other master down with it.
+      if (!hasUsableMaster(comp)) {
+        console.warn(`[components] skipped "${comp?.id}": its master tree is not an element`);
+        return;
+      }
+      // A master reaches the canvas by instancing, never via importProject,
+      // so it gets importProject's ingest sanitizing here.
+      sanitizeElementTreeContent(comp.masterTree);
       this.components.set(comp.id, comp);
     });
 
@@ -161,7 +180,12 @@ export class ComponentManager {
       if (instance && instance.componentId && !instance.isDetached) {
         // Re-key on the live element id (ids are stable across import, but be
         // defensive) and keep the persisted overrides/variant selection.
-        this.instances.set(el.getId(), { ...instance, elementId: el.getId() });
+        // Overrides are unchecked JSON from the stored project: keep only ops.
+        this.instances.set(el.getId(), {
+          ...instance,
+          elementId: el.getId(),
+          overrides: usableOverrides(instance.overrides),
+        });
       }
     }
   }
@@ -265,7 +289,14 @@ export class ComponentManager {
   async adoptLibraryComponent(definition: ComponentDefinition): Promise<ComponentDefinition> {
     const existing = this.components.get(definition.id);
     if (existing) return existing;
+    if (!hasUsableMaster(definition)) {
+      console.warn(`[components] refused library master "${definition?.id}": its master tree is not an element`);
+      throw new Error("LIBRARY_MASTER_MALFORMED");
+    }
     const component: ComponentDefinition = { ...deepClone(definition), pageId: null };
+    // Workspace-shared, and rows stored before the server sanitized masters
+    // were never cleaned: the same ingest boundary as importProject.
+    sanitizeElementTreeContent(component.masterTree);
     await saveComponent(component, this.projectId);
     this.components.set(component.id, component);
     this.composer.emit(EVENTS.COMPONENT_CREATED, { component });

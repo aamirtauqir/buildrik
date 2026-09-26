@@ -1,14 +1,6 @@
-import type { PrismaClient } from "@prisma/client";
-import type { UserRoleType } from "@/lib/constants/enums";
-
-const ROLE_RANK: Record<UserRoleType, number> = {
-  VIEWER: 0,
-  EDITOR: 1,
-  // a5-invite: Designer has the same site-edit access as a Content editor.
-  DESIGNER: 1,
-  ADMIN: 2,
-  OWNER: 3,
-};
+import type { PrismaClient, Prisma } from "@prisma/client";
+import { ROLE_RANK, type UserRoleType } from "@/lib/constants/enums";
+import type { PlanName } from "@/lib/constants/plan-limits";
 
 export class PermissionError extends Error {
   constructor(public code: "NOT_FOUND" | "FORBIDDEN", message?: string) {
@@ -32,6 +24,14 @@ interface ScopedMember {
   _count: { sitePermissions: number };
 }
 
+// ADMIN/OWNER manage the whole workspace and are never site-scoped — shared
+// by resolveSiteScope (single-site check) and siteScopeWhere (workspace-wide
+// list/aggregate filter) so the "who is exempt from scoping" rule has one
+// home instead of two copies that could drift.
+function managesWorkspace(role: string): boolean {
+  return role === "ADMIN" || role === "OWNER";
+}
+
 /**
  * Enforce per-site scoping. A member invited to "specific sites" has one
  * SitePermission row per allowed site; such a member may reach ONLY those
@@ -52,11 +52,41 @@ async function resolveSiteScope(
     where: { memberId_siteId: { memberId: member.id, siteId } },
     select: { roleOverride: true },
   });
-  const managesWorkspace = member.role === "ADMIN" || member.role === "OWNER";
-  if (!managesWorkspace && member._count.sitePermissions > 0 && !row) {
+  if (!managesWorkspace(member.role) && member._count.sitePermissions > 0 && !row) {
     throw new PermissionError("FORBIDDEN", "You don't have access to this site.");
   }
   return row;
+}
+
+/**
+ * S-9: the same "specific sites" scoping rule as resolveSiteScope, for
+ * workspace-wide LIST/aggregate queries that never had a single siteId to
+ * check against. Returns a Prisma `Site.where` fragment: `{}` (no
+ * restriction) for ADMIN/OWNER or an unscoped member, or `{ id: { in: [...] } }`
+ * for a member scoped to specific sites. Spread the result into any query's
+ * `where` (directly for a `Site` query, or under a `site: {...}` relation
+ * filter for a query on a related model).
+ */
+export async function siteScopeWhere(
+  db: PrismaClient,
+  userId: string,
+  workspaceId: string,
+): Promise<Prisma.SiteWhereInput> {
+  const member = await db.workspaceMember.findFirst({
+    where: { userId, workspaceId, status: "ACTIVE" },
+    select: { id: true, role: true, _count: { select: { sitePermissions: true } } },
+  });
+  // No ACTIVE member: callers resolve workspaceId through a membership check
+  // before reaching here, so this is defensive — deny rather than leak.
+  if (!member) return { id: "__no_workspace_access__" };
+
+  if (managesWorkspace(member.role) || member._count.sitePermissions === 0) return {};
+
+  const rows = await db.sitePermission.findMany({
+    where: { memberId: member.id },
+    select: { siteId: true },
+  });
+  return { id: { in: rows.map((r) => r.siteId) } };
 }
 
 export async function assertSiteAccess(
@@ -81,10 +111,47 @@ export async function assertSiteAccess(
 }
 
 /**
+ * The one answer to "which workspace is this SITE in, and what does that
+ * workspace say" — `workspaceId`, `plan`, `editsRequireApproval`.
+ *
+ * Consolidates three call sites (IMPORTANT 4) that
+ * each read `site.workspaceId` off a bare `ctx.prisma.site.findUnique` and
+ * then, in two of them, did a SECOND round-trip through `workspaceMember` just
+ * to reach `workspace.plan` — the plan belongs to the workspace, not to a
+ * membership row, so that join was unnecessary. Every caller here has already
+ * proven site access via `checkSiteRole`/`assertSiteAccess`; this is a plain
+ * read, not an authorization check.
+ */
+const PLAN_NAMES: readonly PlanName[] = ["FREE", "PRO", "BUSINESS"];
+
+export async function getSiteWorkspace(
+  db: PrismaClient,
+  siteId: string,
+): Promise<{ workspaceId: string; plan: PlanName; editsRequireApproval: boolean } | null> {
+  const site = await db.site.findUnique({
+    where: { id: siteId },
+    select: { workspaceId: true, workspace: { select: { plan: true, editsRequireApproval: true } } },
+  });
+  if (!site) return null;
+  // `Workspace.plan` is a plain String column, not a DB-level enum — defend
+  // against a corrupt/unrecognized value the same way every prior caller did.
+  const rawPlan = site.workspace?.plan;
+  const plan: PlanName = (PLAN_NAMES as readonly string[]).includes(rawPlan ?? "")
+    ? (rawPlan as PlanName)
+    : "FREE";
+  return {
+    workspaceId: site.workspaceId,
+    plan,
+    editsRequireApproval: site.workspace?.editsRequireApproval ?? false,
+  };
+}
+
+/**
  * The one answer to "what role does this user have ON THIS SITE".
  *
  * Site scope is enforced on the way through, and this site's `roleOverride`
- * wins over the workspace role — which is the whole reason this exists as its
+ * (when present) caps the workspace role by ROLE_RANK — PD-6, S-6 — never
+ * upgrades it. That resolution is the whole reason this exists as its
  * own export. `sites.myRole` used to answer the chrome's version of this
  * question with a bare `workspaceMember.findFirst` and return `member.role`, so
  * a member with a per-site override was told one thing by the UI and a
@@ -112,7 +179,14 @@ export async function getEffectiveSiteRole(
 
   // Enforce site scope AND read this site's role override in one step.
   const row = await resolveSiteScope(db, member, siteId);
-  return (row?.roleOverride ?? member.role) as UserRoleType;
+  if (!row) return member.role as UserRoleType;
+  // PD-6: roleOverride is a CAP, never an upgrade. Effective role is the
+  // lower-ranked of the member's workspace role and this site's override —
+  // a demotion takes effect immediately on every site. On a tie, keep the
+  // override so a DESIGNER/EDITOR label survives (same ROLE_RANK).
+  const override = row.roleOverride as UserRoleType;
+  const effective = ROLE_RANK[override] <= ROLE_RANK[member.role as UserRoleType] ? override : (member.role as UserRoleType);
+  return effective;
 }
 
 export async function checkSiteRole(

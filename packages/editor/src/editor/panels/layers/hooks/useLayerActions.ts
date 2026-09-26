@@ -14,6 +14,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
+import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
@@ -160,17 +161,88 @@ export function useLayerActions(
     if (el) el.setAttribute("data-hidden", String(pending.hidden));
   }, [hiddenIds]);
 
-  const toggleLock = React.useCallback((id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setLockedIds((prev) => {
-      const next = new Set(prev);
-      const isNowLocked = !prev.has(id);
-      if (isNowLocked) next.add(id);
-      else next.delete(id);
-      pendingLockRef.current = { id, locked: isNowLocked };
-      return next;
-    });
-  }, []);
+  const toggleLock = React.useCallback(
+    (id: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      // A-5: read the lock straight off the element, not this panel's own
+      // set — a canvas-menu lock (or anything else calling el.setLocked
+      // directly) drifted from the panel's tracking after hydration, so a
+      // second Layers click could re-lock an already-locked element instead
+      // of unlocking it.
+      const isNowLocked = !composer?.elements.getElement(id)?.isLocked();
+      setLockedIds((prev) => {
+        const next = new Set(prev);
+        if (isNowLocked) next.add(id);
+        else next.delete(id);
+        pendingLockRef.current = { id, locked: isNowLocked };
+        return next;
+      });
+    },
+    [composer]
+  );
+
+  // Re-derive lockedIds from the elements whenever one changes — keeps the
+  // panel in sync with a lock/unlock that happened outside toggleLock (the
+  // canvas context menu's Lock action, for one).
+  //
+  // IMPORTANT 3: ELEMENT_UPDATED fires on EVERY
+  // element mutation (style edits included — see ElementStyles.ts), and this
+  // used to rescan every element and build a brand-new Set on each one, so a
+  // style tweak on an unrelated, unlocked element replaced lockedIds's
+  // identity for no reason — every consumer re-rendered on every edit
+  // anywhere in the document. Now reads only the updated element's own lock
+  // state and returns the SAME Set (React bails on identical state) unless
+  // that element's membership actually needs to change.
+  React.useEffect(() => {
+    if (!composer) return;
+    const resync = (el: Element) => {
+      const id = el.getId();
+      const isLocked = el.isLocked();
+      setLockedIds((prev) => {
+        const wasLocked = prev.has(id);
+        if (wasLocked === isLocked) return prev;
+        const next = new Set(prev);
+        if (isLocked) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+    };
+    composer.on(EVENTS.ELEMENT_UPDATED, resync);
+    /* Block body, not a shorthand: `off` is chainable and returns the
+       composer, so an arrow shorthand hands React an instance where a
+       destructor belongs. */
+    return () => {
+      composer.off(EVENTS.ELEMENT_UPDATED, resync);
+    };
+  }, [composer]);
+
+  /* Carry-over 14: an undo/redo that crosses a lock/unlock, or a fresh
+     import/load, changes lock state on elements this hook never got a
+     per-element ELEMENT_UPDATED for (undo/redo replay the whole snapshot;
+     PROJECT_LOADED swaps the document out from under it) — lockedIds went
+     stale, showing rows as unlocked (or locked) that the engine disagreed
+     with. Unlike the single-element resync above, a bulk change can move
+     membership in both directions at once, so this rebuilds the whole set
+     from a full rescan — cheap next to an undo/redo/import, which already
+     re-renders the entire tree. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const rescanAll = () => {
+      const next = new Set<string>();
+      for (const el of composer.elements.getAllElements() ?? []) {
+        if (el.isLocked()) next.add(el.getId());
+      }
+      setLockedIds(next);
+    };
+    composer.on(EVENTS.HISTORY_UNDO, rescanAll);
+    composer.on(EVENTS.HISTORY_REDO, rescanAll);
+    composer.on(EVENTS.PROJECT_LOADED, rescanAll);
+    return () => {
+      composer.off(EVENTS.HISTORY_UNDO, rescanAll);
+      composer.off(EVENTS.HISTORY_REDO, rescanAll);
+      composer.off(EVENTS.PROJECT_LOADED, rescanAll);
+    };
+  }, [composer]);
 
   // Apply DOM lock attribute + engine lock state after state commit
   React.useEffect(() => {

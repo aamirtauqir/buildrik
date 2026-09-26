@@ -13,10 +13,10 @@ import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
-import { getTabConfig, getFigmaRailGroups } from "../rail/tabsConfig";
+import { getTabConfig, getFigmaRailGroups, RAIL_FIGMA_IDS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
-import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
+import { Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -35,6 +35,8 @@ import {
   Sparkles,
   Rocket,
   HelpCircle,
+  Activity,
+  MessageSquare,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 // ============================================
@@ -53,6 +55,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Timer,
   Sparkles,
   Rocket,
+  Activity,
+  MessageSquare,
 };
 
 // ============================================
@@ -75,9 +79,6 @@ export interface LeftSidebarProps {
   onElementSelect?: (elementId: string) => void;
   onBlockClick?: (block: BlockData) => void;
   canvasHoveredId?: string | null;
-  /** Settings' unsaved-edit flag, owned by the shell — see the guard below. */
-  settingsDirty?: boolean;
-  onSettingsDirtyChange?: (dirty: boolean) => void;
   /** `ui:pages-open-settings`, held by the shell for the Pages panel. */
   pagesOpen?: PageSettingsOpenRequest | null;
   projectId?: string | null;
@@ -98,6 +99,9 @@ export interface LeftSidebarProps {
   ) => void;
   /** FB-4: see `TabRouter.reviewsEnabled` — also closes the "R" shortcut. */
   reviewsEnabled?: boolean | null;
+  /** A workspace VIEWER's read-only chrome (`useViewerChrome`): the rail adds
+   *  the read-only surfaces the six-item Figma rail leaves out (X-8). */
+  viewerChrome?: boolean;
 }
 
 // ============================================
@@ -145,8 +149,15 @@ function RailZone({
             <Button
               color="light"
               className={`ls-btn ls-btn--labeled${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
+              id={`rail-tab-${tab.id}`}
               onClick={() => onBtnClick(tab.id)}
               role="tab"
+              /* B-9: roving tabindex — every rail tab sat at the button's own
+                 default (focusable), so Tab walked all six before leaving
+                 the rail. Only the active tab is a Tab stop; handleKeyDown
+                 above already moves both selection and focus with the
+                 arrows. */
+              tabIndex={isSelectedTab ? 0 : -1}
               aria-selected={isVisibleActive}
               aria-label={tab.ariaLabel}
               data-tab={tab.id}
@@ -189,16 +200,36 @@ function RailZone({
 // Templates, Components, Settings, Publish, History) still open from ⌘K +
 // shortcuts + topbar — nothing is stranded (see tabsConfig RAIL_FIGMA +
 // tabsConfig.figma.test.ts).
+//
+// X-8: a VIEWER reaches none of those off-rail doors — the site menu
+// collapses to "View only" and the topbar save pill is hidden — so the
+// read-only surfaces FC-9 opened to them (VIEWER_TABS beyond the six) join
+// a viewer's rail below a divider. Review only when the server's review
+// layer is on (FB-4).
 function FigmaRail({
   activeTab,
   drawerOpen,
   onBtnClick,
+  viewerChrome,
+  reviewsEnabled,
 }: {
   activeTab: GroupedTabId;
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
+  viewerChrome: boolean;
+  reviewsEnabled: boolean;
 }) {
   const groups = React.useMemo(() => getFigmaRailGroups(), []);
+  const viewerTabs = React.useMemo(
+    () =>
+      viewerChrome
+        ? [...VIEWER_TABS]
+            .filter((id) => !RAIL_FIGMA_IDS.has(id) && (id !== "review" || reviewsEnabled))
+            .map((id) => getTabConfig(id))
+            .filter((t): t is GroupedTabConfig => Boolean(t))
+        : [],
+    [viewerChrome, reviewsEnabled],
+  );
   return (
     <>
       {groups.map((g, i) => (
@@ -207,6 +238,12 @@ function FigmaRail({
           {i < groups.length - 1 && <div className="ls-divider" />}
         </React.Fragment>
       ))}
+      {viewerTabs.length > 0 && (
+        <>
+          <div className="ls-divider" />
+          <RailZone tabs={viewerTabs} activeTab={activeTab} drawerOpen={drawerOpen} onBtnClick={onBtnClick} />
+        </>
+      )}
     </>
   );
 }
@@ -228,8 +265,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onElementSelect,
   onBlockClick,
   canvasHoveredId,
-  settingsDirty = false,
-  onSettingsDirtyChange,
   pagesOpen,
   projectId,
   onOpenLibrary,
@@ -237,6 +272,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onOpenImageEditor,
   onOpenIconPicker,
   reviewsEnabled,
+  viewerChrome = false,
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
   const railTab = useRailTab(activeTab);
@@ -250,49 +286,17 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const isExpanded = controlledExpanded ?? internalExpanded;
   const onExpandToggle = controlledExpandToggle ?? (() => setInternalExpanded((p) => !p));
 
-  /* `settingsDirty` is OWNED BY THE SHELL, not by this component. Settings is
-     a full-page tab, so the copy the user types into is the one FullPageView
-     mounts, and only the shell sees both that and this rail. While the flag
-     lived here it was fed by a second, invisible SettingsTab that no edit
-     ever reached — so the guard below never fired and leaving Settings
-     dropped unsaved changes without a word. */
-  const [tabGuard, setTabGuard] = React.useState<{
-    open: boolean;
-    pendingTab: GroupedTabId | null;
-  }>({ open: false, pendingTab: null });
-
-  const safeTabChange = React.useCallback(
-    (tab: GroupedTabId) => {
-      if (activeTab === "settings" && settingsDirty) {
-        setTabGuard({ open: true, pendingTab: tab });
-      } else {
-        onTabChange(tab);
-      }
-    },
-    [activeTab, onTabChange, settingsDirty]
-  );
-
-  const confirmTabSwitch = React.useCallback(() => {
-    const dest = tabGuard.pendingTab;
-    setTabGuard({ open: false, pendingTab: null });
-    onSettingsDirtyChange?.(false);
-    if (dest) onTabChange(dest);
-  }, [tabGuard.pendingTab, onTabChange, onSettingsDirtyChange]);
-
-  const cancelTabSwitch = React.useCallback(() => {
-    setTabGuard({ open: false, pendingTab: null });
-    if (activeTab !== "settings") {
-      onTabChange("settings");
-    }
-  }, [activeTab, onTabChange]);
-
+  /* No Settings guard here: every rail door calls `onTabChange`, which the
+     shell routes through its one tab-switch guard (useTabSwitchGuard, fed by
+     the shell dirty registry — B-1). A second, rail-only confirm duplicated
+     that guard and could prompt twice for one click. */
   // Rail button click: open drawer if closed, switch tab if different.
   // Clicking the already-active tab TOGGLES the drawer (closes when open,
   // reopens when closed) — replaces the removed `.ls-panel-close` × icon.
   const handleBtnClick = React.useCallback(
     (tabId: GroupedTabId) => {
       if (tabId !== activeTab) {
-        safeTabChange(tabId);
+        onTabChange(tabId);
         if (!drawerOpen) onDrawerToggle();
       } else {
         // Clicking the already-active rail icon toggles the drawer
@@ -301,7 +305,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         onDrawerToggle();
       }
     },
-    [activeTab, drawerOpen, onDrawerToggle, safeTabChange]
+    [activeTab, drawerOpen, onDrawerToggle, onTabChange]
   );
 
   // Keyboard nav within rail
@@ -332,11 +336,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       if (nextIdx !== idx) {
         const nextButton = arr[nextIdx];
         const tabId = nextButton.dataset.tab as GroupedTabId | undefined;
-        if (tabId) safeTabChange(tabId);
+        if (tabId) onTabChange(tabId);
         nextButton.focus();
       }
     },
-    [safeTabChange]
+    [onTabChange]
   );
 
   // Global keyboard shortcuts (A, T, Z, etc.)
@@ -347,7 +351,15 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     () => (reviewsEnabled ? new Set() : new Set<GroupedTabId>(["review"])),
     [reviewsEnabled],
   );
-  useSidebarKeyboard(safeTabChange, openAssistant, disabledTabs);
+  /* Gap walk 93 #1: a letter is a door, not a tab switch. Switching alone
+     left a closed column closed (U → Esc → H opened nothing), so the letters
+     take the same open-this-tab event I does: it switches, opens the panel,
+     and applies the viewer gate. */
+  const openTab = React.useCallback(
+    (tab: GroupedTabId) => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab }),
+    [composer],
+  );
+  useSidebarKeyboard(openTab, openAssistant, disabledTabs);
 
   const { addToast } = useToast();
 
@@ -423,7 +435,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       >
         {/* Board 4418:123573: the rail starts with its first item — no logo
             mark, no divider. */}
-        <FigmaRail activeTab={railTab} drawerOpen={drawerOpen} onBtnClick={handleBtnClick} />
+        <FigmaRail
+          activeTab={railTab}
+          drawerOpen={drawerOpen}
+          onBtnClick={handleBtnClick}
+          viewerChrome={viewerChrome}
+          reviewsEnabled={Boolean(reviewsEnabled)}
+        />
 
         <div className="ls-spacer" />
 
@@ -453,6 +471,10 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         }
         data-testid="sidebar-panel"
         role="tabpanel"
+        /* B-9: the panel had no accessible name tying it to the rail tab
+           that opened it — a screen reader landing here after Tab/arrow nav
+           heard "tabpanel", not which one. */
+        aria-labelledby={`rail-tab-${activeTab}`}
         aria-hidden={!drawerOpen}
         /* `inert` as well as aria-hidden: the closed drawer is width 0 and
            opacity 0 but its whole tree stays mounted, so every control inside
@@ -483,7 +505,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onBlockClick={onBlockClick}
                   onElementSelect={onElementSelect}
                   canvasHoveredId={canvasHoveredId}
-                  onSwitchToTemplates={() => safeTabChange("templates")}
+                  onSwitchToTemplates={() => onTabChange("templates")}
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}
                   onOpenLibrary={onOpenLibrary}
@@ -498,16 +520,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           </InspectorErrorBoundary>
         </div>
       </div>
-      {/* Settings dirty guard */}
-      <ConfirmDialog
-        open={tabGuard.open}
-        onClose={cancelTabSwitch}
-        onConfirm={confirmTabSwitch}
-        title="Unsaved Changes"
-        message="You have unsaved changes in Settings. Switching tabs will discard them."
-        confirmLabel="Discard & Switch"
-        tone="destructive"
-      />
     </div>
   );
 };

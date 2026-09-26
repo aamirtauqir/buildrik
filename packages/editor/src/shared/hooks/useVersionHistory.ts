@@ -9,6 +9,7 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import type { NamedVersion, CompareResult } from "../types/versions";
 import { EVENTS } from "../constants/events";
+import { mirrorVersionRename } from "../../services/versionSync";
 
 export interface UseVersionHistoryReturn {
   /** List of saved versions */
@@ -22,10 +23,14 @@ export interface UseVersionHistoryReturn {
   retryLoad: () => void;
   /** Create a new version */
   createVersion: (name: string, description?: string) => Promise<void>;
-  /** Restore a version by id */
-  restoreVersion: (id: string) => Promise<void>;
+  /** Restore a version by id. Resolves false if the restore did not happen
+   *  (e.g. the version no longer exists) — callers must check it, not treat
+   *  every non-throw as success. */
+  restoreVersion: (id: string) => Promise<boolean>;
   /** Delete a version by id */
   deleteVersion: (id: string) => Promise<void>;
+  /** Rename a version ("Name this version…", board 6930:82577) */
+  renameVersion: (id: string, name: string) => Promise<void>;
   /** Get a specific version by id */
   getVersion: (id: string) => NamedVersion | undefined;
   /** Compare two versions and return diff */
@@ -99,8 +104,8 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
 
   const restoreVersion = React.useCallback(
     async (id: string) => {
-      if (!composer?.versions) return;
-      await composer.versions.restoreVersion(id);
+      if (!composer?.versions) return false;
+      return (await composer.versions.restoreVersion(id)) === true;
     },
     [composer]
   );
@@ -109,6 +114,17 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     async (id: string) => {
       if (!composer?.versions) return;
       await composer.versions.deleteVersion(id);
+    },
+    [composer]
+  );
+
+  const renameVersion = React.useCallback(
+    async (id: string, name: string) => {
+      if (!composer?.versions) return;
+      await composer.versions.updateVersion(id, { name });
+      // Best-effort mirror, same failure contract as create/delete — the
+      // local rename already landed, a failed mirror never rolls it back.
+      void mirrorVersionRename(id, name);
     },
     [composer]
   );
@@ -152,6 +168,7 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     createVersion,
     restoreVersion,
     deleteVersion,
+    renameVersion,
     getVersion,
     compareVersions,
     updateAiSummary,

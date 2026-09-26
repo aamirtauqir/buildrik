@@ -28,6 +28,11 @@ vi.mock("@/lib/prisma", () => ({
     reviewRequest: {
       findFirst: vi.fn().mockResolvedValue(null),
     },
+    // A-17: runPrePublishChecks' CMS-templates check reads this via
+    // cms.service's findStaleTemplateBindings.
+    cmsCollection: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     publishBuildJob: {
       findFirst: vi.fn(),
       findUnique: vi.fn(),
@@ -38,6 +43,14 @@ vi.mock("@/lib/prisma", () => ({
     },
     $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
   },
+}));
+
+// PD-7/8: startPublish's approval gate now also checks agency_layer. Default
+// true so the existing gate-ON tests (workspace.editsRequireApproval: false
+// by default above, so this is inert for most of them) keep their prior
+// behavior when a test flips editsRequireApproval to true.
+vi.mock("@server/services/feature-flag.service", () => ({
+  isFeatureEnabled: vi.fn().mockResolvedValue(true),
 }));
 
 // Sites deploy into the workspace's OWN Vercel account, so runPrePublishChecks
@@ -319,6 +332,31 @@ describe("Publish Service", () => {
       const job = await getPublishStatus("job1");
       expect(job?.status).toBe("BUILDING");
       expect(job?.progress).toBe(40);
+    });
+
+    // S-10 / SSE route: a test that
+    // just checks the RETURNED object lacks `log` is tautological against a
+    // mocked Prisma client — the mock returns exactly what a test hands it
+    // and doesn't enforce `select` the way real Postgres does, so a mock
+    // simply omitting `log` proves nothing. The real guarantee is the QUERY
+    // itself: assert the `select` argument is an explicit field allowlist
+    // that never names `log`.
+    it("queries with an explicit select that never names `log`", async () => {
+      vi.mocked(prisma.publishBuildJob.findUnique).mockResolvedValue({
+        id: "job1",
+        status: "COMPLETED",
+        progress: 100,
+        steps: [],
+        error: null,
+      } as any);
+
+      await getPublishStatus("job1");
+      const selectArg = vi.mocked(prisma.publishBuildJob.findUnique).mock.calls[0][0]?.select as
+        | Record<string, unknown>
+        | undefined;
+      expect(selectArg).toBeDefined();
+      expect(Object.keys(selectArg ?? {}).length).toBeGreaterThan(0);
+      expect(Object.keys(selectArg ?? {})).not.toContain("log");
     });
   });
 

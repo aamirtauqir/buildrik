@@ -8,7 +8,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 
 export type WorkspaceRole = "VIEWER" | "EDITOR" | "DESIGNER" | "ADMIN" | "OWNER";
 
@@ -27,13 +27,20 @@ let cached: Promise<WorkspaceRole | null> | null = null;
  *  server enforces; unknown keeps the chrome as-is. */
 export function fetchMyRole(): Promise<WorkspaceRole | null> {
   if (cached) return cached;
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return Promise.resolve(null);
   cached = getBuildrikClient(DASHBOARD_URL)
     .sites.myRole.query({ siteId })
     .then((r: { role: string }) => (r.role as WorkspaceRole) ?? null)
     .catch(() => null);
   return cached;
+}
+
+/** Forget the cached role. The server just refused a write the cached role
+ *  allowed (A15-9) — the member was demoted mid-session — so the next reader
+ *  asks again instead of trusting the answer from page load. */
+export function invalidateMyRole(): void {
+  cached = null;
 }
 
 export function roleAtLeast(role: WorkspaceRole | null, min: WorkspaceRole): boolean | null {

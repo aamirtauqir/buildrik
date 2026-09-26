@@ -76,6 +76,11 @@ const nextConfig = {
   // did NOT trace it through the bundled path, so the standalone shipped
   // without it and every AI call died on "Cannot find module 'openai'".
   serverExternalPackages: ["@prisma/client", "bcryptjs", "isomorphic-dompurify", "openai"],
+  // `next dev` refuses its own scripts and HMR socket to any host but
+  // localhost, so opened from a phone or another machine on the LAN the page
+  // never hydrates and the login form falls back to a native GET. Private
+  // ranges only; production (`next start`) ignores this key.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.local"],
   transpilePackages: ["@buildrik/editor"],
   compiler: { emotion: true },
   // Legacy ?siteId= bookmark forwarding on dashboard origin only.

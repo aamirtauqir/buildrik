@@ -51,6 +51,9 @@ describe("PublishHistory — details overlay (6881:70883)", () => {
       </ToastProvider>,
     );
     expect(await screen.findByTestId("publish-history-notes-info")).toBeTruthy();
+    /* Gap walk 93 #6: the note was a <p>, and the ⓘ Tooltip renders a <div> —
+       invalid nesting, a hydration error in the Next-hosted editor. */
+    expect(document.querySelector("p div")).toBeNull();
   });
 });
 

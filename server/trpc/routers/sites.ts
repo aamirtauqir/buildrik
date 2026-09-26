@@ -14,7 +14,6 @@ import {
   bulkAction,
   checkSlugAvailability,
   transferSite,
-  saveProjectData,
   saveProjectFromEditor,
   getProjectData,
 } from "@/server/services/sites.service";
@@ -32,6 +31,7 @@ import {
   cancelPublish,
   unpublishSite,
   getPublishDiff,
+  getPublishedSnapshot,
   getPublishHistory,
   rollbackPublish,
 } from "@/server/services/publish.service";
@@ -41,7 +41,6 @@ import {
   bulkActionSchema,
   transferSiteSchema,
   checkSlugSchema,
-  saveProjectDataSchema,
   getProjectDataSchema,
   editorSaveProjectSchema,
 } from "@buildrik/shared/schemas/sites";
@@ -51,7 +50,7 @@ import {
   getScheduledPublish,
   ScheduledPublishError,
 } from "@/server/services/scheduled-publish.service";
-import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publishDiffInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
+import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publishDiffInput, publishedSnapshotInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
@@ -61,7 +60,7 @@ export const sitesRouter = router({
     .input(listSitesSchema)
     .query(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
-      return listSites(workspaceId, input);
+      return listSites(workspaceId, ctx.session.user!.id!, input);
     }),
 
   get: protectedProcedure
@@ -126,6 +125,17 @@ export const sitesRouter = router({
         throw e;
       }
       const workspaceId = await getWorkspaceId(ctx);
+      // duplicateSite lands the copy in the caller's CURRENT session workspace,
+      // which can differ from the source site's workspace (checkSiteRole above
+      // only proved EDITOR on the source). Require EDITOR on the destination
+      // workspace too, or a member with only a foreign site's role could
+      // duplicate into a workspace they have no standing in (S-10).
+      try {
+        await checkWorkspaceRole(ctx.prisma, ctx.session.user!.id!, workspaceId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await duplicateSite(input.id, workspaceId, ctx.session.user.id);
       } catch (e: unknown) {
@@ -279,6 +289,13 @@ export const sitesRouter = router({
       try {
         return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined);
       } catch (e: unknown) {
+        /* I-2: a page id in the save belongs to another site. BAD_REQUEST, not
+           FORBIDDEN — the editor treats FORBIDDEN as a revoked role. */
+        if (e instanceof Error && e.message === "PAGE_NOT_IN_SITE")
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This save includes a page that belongs to another site, so it was not applied. Reload the site before editing.",
+          });
         if (e instanceof Error && e.message === "SITE_NOT_FOUND")
           throw new TRPCError({
             code: "NOT_FOUND",
@@ -332,6 +349,18 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
+      // acknowledgeStale deliberately ships past a stale-approval block (the
+      // reviewer signed off on an earlier version of the site) — that override
+      // is ADMIN+, not the plain EDITOR who may publish under a fresh approval
+      // (S-7 / PD-9).
+      if (input.acknowledgeStale) {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+      }
       const workspaceId = await getWorkspaceId(ctx);
       try {
         return await startPublish(
@@ -340,8 +369,13 @@ export const sitesRouter = router({
           ctx.session.user.id,
           input.pages,
           input.acknowledgeStale,
+          { expectedLastEditedAt: input.expectedLastEditedAt },
         );
       } catch (e: unknown) {
+        // C-3: the tab's copy is behind the server's — same CONFLICT (and the
+        // same `SAVE_CONFLICT:<iso>` message) the save path returns.
+        if (e instanceof Error && e.message.startsWith("SAVE_CONFLICT"))
+          throw new TRPCError({ code: "CONFLICT", message: e.message });
         if (e instanceof Error && e.message === "ALREADY_PUBLISHING")
           throw new TRPCError({
             code: "CONFLICT",
@@ -490,7 +524,12 @@ export const sitesRouter = router({
          does not compile. Anyone who can open the site can see that a publish
          is scheduled — the same `assertSiteAccess` the site read and the
          pre-publish check already use. */
-      await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       return getScheduledPublish(input.siteId);
     }),
 
@@ -544,6 +583,27 @@ export const sitesRouter = router({
       return getPublishDiff(input.siteId, input.fromJobId, input.toJobId);
     }),
 
+  // The pages one published version shipped, for the editor's Compare (B8).
+  // EDITOR, like publishHistory/publishDiff. Lazy, its own query: full HTML
+  // per page (see getPublishedSnapshot for why this one returns HTML).
+  publishedSnapshot: protectedProcedure
+    .input(publishedSnapshotInput)
+    .query(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return await getPublishedSnapshot(input.siteId, input.jobId);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "That published version was not found." });
+        throw e;
+      }
+    }),
+
   // P1: roll back = re-publish a prior version as a NEW job (contract §5).
   // ADMIN — a destructive/cross-history action (§2). Bypasses the approval gate
   // in the service (restoring an already-shipped version). Activity-logged.
@@ -580,31 +640,6 @@ export const sitesRouter = router({
         description: `Rolled back from version ${input.jobId}`,
       });
       return result;
-    }),
-
-  saveProjectData: protectedProcedure
-    .input(saveProjectDataSchema)
-    .mutation(async ({ ctx, input }) => {
-      try {
-        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
-      } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
-        throw e;
-      }
-      try {
-        return await saveProjectData(input);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
-          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
-        // Same refusal as the editor save above — this door writes through the
-        // same boundary, so it must report the same thing.
-        if (e instanceof Error && e.message === "EMPTY_SNAPSHOT")
-          throw new TRPCError({
-            code: "PRECONDITION_FAILED",
-            message: "This save carried no pages, so it was not applied. Reload the site before editing.",
-          });
-        throw e;
-      }
     }),
 
   getProjectData: protectedProcedure

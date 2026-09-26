@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Globe, Plus, Palette, UserPlus } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
@@ -39,6 +39,9 @@ function BrandingDialog({
   const [brandColor, setBrandColor] = useState(initial.brandColor ?? "");
   const [customDomain, setCustomDomain] = useState(initial.customDomain ?? "");
   const label = "text-body-sm font-semibold";
+  const brandColorId = useId();
+  const logoUrlId = useId();
+  const customDomainId = useId();
   return (
     <Modal
       open={true}
@@ -58,19 +61,19 @@ function BrandingDialog({
     >
       <div className="space-y-3">
         <div>
-          <label className={label} style={{ color: "var(--color-text-secondary)" }}>Brand color</label>
+          <label htmlFor={brandColorId} className={label} style={{ color: "var(--color-text-secondary)" }}>Brand color</label>
           <div className="mt-1 flex items-center gap-2">
-            <input type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="h-9 w-12 rounded border" style={{ borderColor: "var(--color-border-default)" }} aria-label="Brand color" />
-            <InputField type="text" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} wrapperClassName="flex-1" />
+            <input id={brandColorId} type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="h-9 w-12 rounded border" style={{ borderColor: "var(--color-border-default)" }} />
+            <InputField type="text" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} wrapperClassName="flex-1" aria-label="Brand color hex value" />
           </div>
         </div>
         <div>
-          <label className={label} style={{ color: "var(--color-text-secondary)" }}>Logo URL</label>
-          <InputField type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} wrapperClassName="mt-1 w-full" />
+          <label htmlFor={logoUrlId} className={label} style={{ color: "var(--color-text-secondary)" }}>Logo URL</label>
+          <InputField id={logoUrlId} type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} wrapperClassName="mt-1 w-full" />
         </div>
         <div>
-          <label className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
-          <InputField type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} wrapperClassName="mt-1 w-full" />
+          <label htmlFor={customDomainId} className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
+          <InputField id={customDomainId} type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} wrapperClassName="mt-1 w-full" />
         </div>
         {/* The badge is decided by PLAN, not by this box: the publish worker sets
             `showBadge = plan === "FREE"` and `injectBadge` never reads the client

@@ -17,7 +17,7 @@
 import * as React from "react";
 import { ToggleSwitch } from "@/editor/chrome-ui";
 import type { BuildrikApiClient } from "@/services/api-client";
-import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SCREEN_INFO, SaveErrorBanner, Screen, Section } from "../shared";
+import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SCREEN_INFO, SaveErrorBanner, Screen, Section, SiteColumnGate } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
@@ -212,7 +212,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
       </div>
 
       <Section title="Site SEO">
-        <Field label="Meta title" htmlFor="seo-meta-title">
+        <Field label="Meta title" htmlFor="seo-meta-title" siteColumn="seo.metaTitle">
           <Input
             id="seo-meta-title"
             type="text"
@@ -230,7 +230,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           )}
         </Field>
 
-        <Field label="Meta description" htmlFor="seo-meta-description">
+        <Field label="Meta description" htmlFor="seo-meta-description" siteColumn="seo.metaDescription">
           <Input
             id="seo-meta-description"
             type="text"
@@ -261,7 +261,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           />
         </Field>
 
-        <Field label="Default OG Image URL" htmlFor="seo-og">
+        <Field label="Default OG Image URL" htmlFor="seo-og" siteColumn="seo.defaultOgImage">
           <Input
             id="seo-og"
             type="url"
@@ -292,16 +292,18 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           >
             Allow search indexing
           </span>
-          <ToggleSwitch
-            id="seo-allow-indexing"
-            checked={allowIndexing}
-            onChange={(next) => {
-              setAllowIndexing(next);
-              markDirty();
-            }}
-            aria-labelledby="seo-allow-indexing-label"
-            sizing="md"
-          />
+          <SiteColumnGate field="seo.allowIndexing">
+            <ToggleSwitch
+              id="seo-allow-indexing"
+              checked={allowIndexing}
+              onChange={(next) => {
+                setAllowIndexing(next);
+                markDirty();
+              }}
+              aria-labelledby="seo-allow-indexing-label"
+              sizing="md"
+            />
+          </SiteColumnGate>
         </div>
         <div className="tw:col-span-full tw:flex tw:items-start tw:gap-4">
           <span

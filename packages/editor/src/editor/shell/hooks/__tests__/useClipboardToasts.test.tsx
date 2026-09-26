@@ -21,7 +21,7 @@ function fakeComposer() {
     composer: {
       on: (e: string, cb: (p?: unknown) => void) => { (handlers[e] ??= []).push(cb); },
       off: (e: string, cb: (p?: unknown) => void) => { handlers[e] = (handlers[e] ?? []).filter((h) => h !== cb); },
-      history: { undo: vi.fn() },
+      history: { undo: vi.fn(), captureUndo(this: { undo: () => void }) { return () => this.undo(); } },
     } as unknown as Composer,
     fire: (e: string, payload?: unknown) => (handlers[e] ?? []).forEach((h) => h(payload)),
     count: (e: string) => (handlers[e] ?? []).length,
@@ -106,6 +106,24 @@ describe("useClipboardToasts", () => {
     expect(count(EVENTS.CLIPBOARD_COPY)).toBe(1);
     unmount();
     expect(count(EVENTS.CLIPBOARD_COPY)).toBe(0);
+  });
+
+  // LOCKED_ELEMENTS_SKIPPED (delete, cut,
+  // nudge — A-5) had no listener anywhere, so a locked element quietly
+  // staying put looked identical to nothing having happened at all.
+  it("toasts when locked elements were skipped, and unsubscribes on unmount", () => {
+    const { composer, fire, count } = fakeComposer();
+    const addToast = vi.fn();
+    const { unmount } = renderHook(() => useClipboardToasts(composer, addToast));
+    expect(count(EVENTS.LOCKED_ELEMENTS_SKIPPED)).toBe(1);
+
+    fire(EVENTS.LOCKED_ELEMENTS_SKIPPED);
+
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ description: "Locked elements were skipped" }),
+    );
+    unmount();
+    expect(count(EVENTS.LOCKED_ELEMENTS_SKIPPED)).toBe(0);
   });
 });
 

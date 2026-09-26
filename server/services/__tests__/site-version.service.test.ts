@@ -4,6 +4,7 @@ const upsert = vi.fn();
 const findMany = vi.fn();
 const findUnique = vi.fn();
 const deleteMany = vi.fn();
+const updateMany = vi.fn();
 const userFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
@@ -13,6 +14,7 @@ vi.mock("@/lib/prisma", () => ({
       findMany: (...a: unknown[]) => findMany(...a),
       findUnique: (...a: unknown[]) => findUnique(...a),
       deleteMany: (...a: unknown[]) => deleteMany(...a),
+      updateMany: (...a: unknown[]) => updateMany(...a),
     },
     user: { findMany: (...a: unknown[]) => userFindMany(...a) },
   },
@@ -22,12 +24,27 @@ import {
   createSiteVersion,
   listSiteVersions,
   getSiteVersion,
+  renameSiteVersion,
   deleteSiteVersion,
 } from "@server/services/site-version.service";
 
-beforeEach(() => [upsert, findMany, findUnique, deleteMany, userFindMany].forEach((m) => m.mockReset()));
+beforeEach(() => [upsert, findMany, findUnique, deleteMany, updateMany, userFindMany].forEach((m) => m.mockReset()));
 
 describe("site-version.service", () => {
+  it("stores the snapshot's page roots sanitized, on create and update (S-1a)", async () => {
+    upsert.mockResolvedValueOnce({ versionId: "v1" });
+    findMany.mockResolvedValueOnce([]);
+    await createSiteVersion({
+      siteId: "s1", versionId: "v1", name: "V", isAuto: true,
+      payload: { id: "v1", snapshot: { pages: [{ id: "p", root: { id: "r", type: "container", tagName: "img src=x onerror=alert(1) x", attributes: { srcdoc: "<script>x</script>" } } }] } },
+    });
+    const { create, update } = upsert.mock.calls[0][0];
+    for (const payload of [create.payload, update.payload]) {
+      expect(payload.snapshot.pages[0].root.tagName).toBe("div");
+      expect(payload.snapshot.pages[0].root.attributes).toEqual({});
+    }
+  });
+
   it("createSiteVersion upserts on (siteId, versionId) carrying the payload", async () => {
     upsert.mockResolvedValueOnce({ versionId: "v1" });
     findMany.mockResolvedValueOnce([{ id: "a" }]); // prune: under cap
@@ -83,7 +100,7 @@ describe("site-version.service", () => {
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { siteId: "s1" },
-        select: { versionId: true, name: true, isAuto: true, createdBy: true, createdAt: true },
+        select: { versionId: true, name: true, isAuto: true, createdBy: true, createdAt: true, updatedAt: true },
       })
     );
   });
@@ -113,5 +130,26 @@ describe("site-version.service", () => {
     deleteMany.mockResolvedValueOnce({ count: 0 });
     expect(await deleteSiteVersion("s1", "gone")).toEqual({ ok: true });
     expect(deleteMany).toHaveBeenCalledWith({ where: { siteId: "s1", versionId: "gone" } });
+  });
+
+  /* Board Saves 6930:82577 — "Name this version…". updateMany (not update) so a
+     version deleted out from under a stale client is a no-op, matching
+     deleteSiteVersion's idempotency contract. */
+  it("renameSiteVersion updates the name by (siteId, versionId)", async () => {
+    updateMany.mockResolvedValueOnce({ count: 1 });
+    const at = new Date("2026-09-26T10:00:00Z");
+    findUnique.mockResolvedValueOnce({ updatedAt: at });
+    /* X-1: the new clock goes back so the renaming browser can stamp it. */
+    expect(await renameSiteVersion("s1", "v1", "Launch draft")).toEqual({ ok: true, updatedAt: at });
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { siteId: "s1", versionId: "v1" },
+      data: { name: "Launch draft" },
+    });
+  });
+
+  it("renameSiteVersion is a no-op (not a throw) when the version is gone", async () => {
+    updateMany.mockResolvedValueOnce({ count: 0 });
+    findUnique.mockResolvedValueOnce(null);
+    expect(await renameSiteVersion("s1", "gone", "New name")).toEqual({ ok: true, updatedAt: null });
   });
 });

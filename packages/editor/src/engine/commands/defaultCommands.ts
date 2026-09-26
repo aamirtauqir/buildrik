@@ -13,7 +13,7 @@ import type { CommandData, ElementType } from "../../shared/types";
 import type { Element } from "../elements/Element";
 import { canNestElement } from "../../shared/utils/nesting";
 import type { Composer } from "../Composer";
-import { nudgeSelected, reorderElement } from "./commandOperations";
+import { nudgeSelected, reorderElement, dropLockedAndInstances } from "./commandOperations";
 
 /**
  * Build the full list of default commands.
@@ -96,7 +96,11 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         /* Pruned like cut: removing a parent already removes its children and
            the descendant's own removeElement then no-ops, but the history
            label would still count it. */
-        const selected = topMost(c.selection.getAllSelected());
+        /* A-5: filter the RAW selection first (dropLockedAndInstances), then
+           prune — pruning first hid a locked image inside a selected section. */
+        const { kept, skipped } = dropLockedAndInstances(c.selection.getAllSelected());
+        const selected = topMost(kept);
+        if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
         if (selected.length === 0) return;
         /* Decision #17: one element deletes at once (Undo follows); more than
            one asks first. Every door — Delete/Backspace, ⌘K — lands here, so
@@ -197,7 +201,9 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       shortcut: "ctrl+x",
       requiresSelection: true,
       run: (c) => {
-        const selected = topMost(c.selection.getAllSelected());
+        const { kept, skipped } = dropLockedAndInstances(c.selection.getAllSelected());
+        const selected = topMost(kept);
+        if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
         if (selected.length === 0) return;
         const ids = selected.map((el) => el.getId());
         c.clipboard = ids
@@ -630,7 +636,12 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Open export settings",
       group: "Navigation",
       keywords: ["export", "code", "download"],
-      run: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "export" }),
+      /* A-7: "export" is a door (SETTINGS_SCREENS constants.ts kind: "door"),
+         not a SettingsTab screen — SettingsTab only navigates targets with
+         kind: "screen", so the old UI_PANEL_OPEN landed on the Settings
+         overview instead. UI_OPEN_EXPORTER is the same event the Export row
+         itself emits, opening the modal directly. */
+      run: () => composer.emit(EVENTS.UI_OPEN_EXPORTER, undefined),
     },
     {
       id: "open-integrations",

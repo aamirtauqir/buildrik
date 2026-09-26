@@ -183,6 +183,10 @@ export const EVENTS = {
   CLIPBOARD_COPY: "clipboard:copy",
   CLIPBOARD_CUT: "clipboard:cut",
   CLIPBOARD_PASTE: "clipboard:paste",
+  /* A-5: delete/cut skip locked elements and elements inside a component
+     instance — this tells the shell so it can toast why the selection count
+     shrank instead of doing nothing silently. */
+  LOCKED_ELEMENTS_SKIPPED: "clipboard:locked-elements-skipped",
 
   // ============================================
   // Data Binding Events
@@ -755,8 +759,9 @@ export const EVENTS = {
  * on PROJECT_CHANGED is not a subscription — anyone who wants page switches
  * has to filter every project change to find them."
  *
- * Autosave can afford to re-save on a page switch. A dirty MARKER cannot: it
- * would light an unsaved dot on a page the user only looked at. Every other
+ * Neither autosave nor a dirty MARKER may treat it as an edit: one sent a
+ * save for a page the user only looked at (L-3), the other lit an unsaved dot
+ * on it. Every other
  * payload type on this event — page:created / updated / deleted / home /
  * reordered / imported — is a real mutation and must still count.
  */
@@ -900,7 +905,13 @@ export interface EventPayloads {
   [EVENTS.HISTORY_REDO]: {
     entry: { timestamp: number; snapshot: import("../types").ProjectData; label?: string };
   };
-  [EVENTS.HISTORY_NOOP]: { direction: "undo" | "redo"; reason?: string };
+  [EVENTS.HISTORY_NOOP]: {
+    direction: "undo" | "redo";
+    reason?: string;
+    /** A captured undo (HistoryManager.captureUndo) refused: newer history
+     *  came after the action it was bound to — this is that action's label. */
+    superseded?: string;
+  };
   [EVENTS.HISTORY_UNRECORDED]: { label: string };
   [EVENTS.HISTORY_RECORDED]: { label?: string };
   [EVENTS.HISTORY_CLEARED]: void;

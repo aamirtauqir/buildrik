@@ -168,7 +168,6 @@ export const DEFAULTS = {
   ELEMENT_COLOR: "#3b82f6",
 
   // Typography
-  FONT_FAMILY: "Inter, system-ui, sans-serif",
   FONT_SIZE: 16,
   LINE_HEIGHT: 1.5,
 

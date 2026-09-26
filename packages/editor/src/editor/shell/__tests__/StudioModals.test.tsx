@@ -24,9 +24,14 @@ vi.mock("../../export", () => ({
   ExportModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-export" /> : null,
 }));
-vi.mock("../../media", () => ({
+// D-12: ImageEditorModal is React.lazy-loaded from its own module path
+// (not the ../../media barrel) so react-easy-crop stays out of the shell's
+// eager bundle — mock that submodule directly.
+vi.mock("../../media/ImageEditorModal", () => ({
   ImageEditorModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-image-editor" /> : null,
+}));
+vi.mock("../../media", () => ({
   IconPickerModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-icon-picker" /> : null,
 }));
@@ -150,7 +155,7 @@ describe("StudioModals — mounting contract", () => {
   );
 
   // Context-gated modals: flag alone is NOT enough.
-  it("image editor needs flag AND context", () => {
+  it("image editor needs flag AND context", async () => {
     renderModals({ showImageEditor: true });
     expect(screen.queryByTestId("modal-image-editor")).toBeNull();
     cleanup();
@@ -158,7 +163,9 @@ describe("StudioModals — mounting contract", () => {
       showImageEditor: true,
       imageEditorContext: { imageSrc: "data:image/png;base64,x", onSave: vi.fn() },
     });
-    expect(screen.getByTestId("modal-image-editor")).toBeInTheDocument();
+    // D-12: ImageEditorModal is React.lazy — the marker appears after the
+    // Suspense boundary resolves.
+    expect(await screen.findByTestId("modal-image-editor")).toBeInTheDocument();
   });
 
   it("icon picker needs flag AND context", () => {

@@ -7,7 +7,9 @@
  * on form/SVG attributes surviving the round-trip — the sanitizer must keep them.
  */
 import { describe, it, expect } from "vitest";
-import { sanitizeHTML, sanitizeElementTreeContent } from "../sanitization";
+import { isAllowedElementTag } from "@buildrik/shared/schemas/element-markup";
+import { isSafeAttrValue, sanitizeHTML, sanitizeElementTreeContent } from "../sanitization";
+import { TYPE_TO_TAG_MAP } from "../typeMapping";
 import type { ElementData } from "../../../types";
 
 describe("sanitizeHTML — XSS invariants", () => {
@@ -158,5 +160,108 @@ describe("sanitizeElementTreeContent — attributes", () => {
 
     expect(t.attributes).toMatchObject({ title: "fine" });
     expect(t.children?.[0].attributes).toMatchObject({ rel: "noopener", "data-x": "1" });
+  });
+});
+
+describe("tag and attribute allowlist (S-1a, A19-1)", () => {
+  it("refuses srcdoc whatever its value or case", () => {
+    expect(isSafeAttrValue("srcdoc", "<script>alert(1)</script>", "iframe")).toBe(false);
+    expect(isSafeAttrValue("SRCDOC", "<p>hi</p>", "iframe")).toBe(false);
+  });
+
+  it("refuses an attribute name that smuggles a handler", () => {
+    expect(isSafeAttrValue("x onerror=alert(1) y", "v", "div")).toBe(false);
+    expect(isSafeAttrValue("data-buildrick-x", "v", "div")).toBe(true);
+    expect(isSafeAttrValue("xlink:href", "#icon", "use")).toBe(true);
+  });
+
+  it("refuses an upper-case event handler", () => {
+    expect(isSafeAttrValue("ONCLICK", "x", "div")).toBe(false);
+  });
+
+  it("scheme-checks srcset, formaction, xlink:href and poster", () => {
+    expect(isSafeAttrValue("srcset", "a.jpg 1x, javascript:alert(1) 2x", "img")).toBe(false);
+    expect(isSafeAttrValue("srcset", "a.jpg 1x, blob:https://x/1 2x", "img")).toBe(true);
+    expect(isSafeAttrValue("formaction", "javascript:alert(1)", "button")).toBe(false);
+    expect(isSafeAttrValue("formaction", "/submit", "button")).toBe(true);
+    expect(isSafeAttrValue("xlink:href", "javascript:alert(1)", "use")).toBe(false);
+    expect(isSafeAttrValue("poster", "https://cdn/x.jpg", "video")).toBe(true);
+  });
+
+  it("rewrites a disallowed or malformed tagName to div and keeps the content", () => {
+    const tree: ElementData = {
+      id: "r",
+      type: "container",
+      tagName: "script",
+      content: "hello",
+      children: [
+        { id: "i", type: "image", tagName: "img src=x onerror=alert(1) x" },
+        { id: "f", type: "container", tagName: "iframe", attributes: { srcdoc: "<script>x</script>", title: "t" } },
+      ],
+    };
+    sanitizeElementTreeContent(tree);
+    expect(tree.tagName).toBe("div");
+    expect(tree.content).toBe("hello");
+    expect(tree.children?.[0].tagName).toBe("div");
+    expect(tree.children?.[1].tagName).toBe("div");
+    expect(tree.children?.[1].attributes).toEqual({ title: "t" });
+  });
+
+  it("keeps audio, video, svg children and upper-case DIV", () => {
+    const tree: ElementData = {
+      id: "r",
+      type: "container",
+      tagName: "DIV",
+      children: [
+        { id: "a", type: "audio", tagName: "audio" },
+        { id: "v", type: "video", tagName: "video" },
+        { id: "s", type: "svg", tagName: "svg", children: [{ id: "g", type: "custom", tagName: "linearGradient" }] },
+      ],
+    };
+    sanitizeElementTreeContent(tree);
+    expect(tree.tagName).toBe("DIV");
+    expect(tree.children?.map((c) => c.tagName)).toEqual(["audio", "video", "svg"]);
+    expect(tree.children?.[2].children?.[0].tagName).toBe("linearGradient");
+  });
+
+  it("every tag the type map emits is on the shared allowlist", () => {
+    for (const tag of new Set(Object.values(TYPE_TO_TAG_MAP))) {
+      expect(isAllowedElementTag(tag), tag).toBe(true);
+    }
+  });
+});
+
+describe("URL schemes a browser would still run (S-1 review fix 2)", () => {
+  it.each(["java\tscript:alert(1)", "java\nscript:alert(1)", "\x01javascript:alert(1)", "data:application/xhtml+xml,x"])(
+    "refuses %j on every URL attribute",
+    (url) => {
+      for (const attr of ["href", "src", "formaction", "xlink:href", "poster", "action"]) {
+        expect(isSafeAttrValue(attr, url, "a"), attr).toBe(false);
+      }
+      expect(isSafeAttrValue("srcset", `a.jpg 1x, ${url} 2x`, "img")).toBe(false);
+    }
+  );
+});
+
+describe("target links get rel=noopener noreferrer (S-1 review fix 3)", () => {
+  it("sanitizeHTML adds it, merging an existing rel", () => {
+    const out = sanitizeHTML('<a href="/a" target="_blank">a</a><a href="/b" target="_blank" rel="nofollow">b</a>');
+    expect(out).toContain('<a href="/a" target="_blank" rel="noopener noreferrer">a</a>');
+    expect(out).toContain('rel="nofollow noopener noreferrer"');
+  });
+});
+
+describe("style declarations on load (S-1)", () => {
+  it("drops breakout declarations from styles and breakpoint maps, keeps the rest", () => {
+    const tree = {
+      id: "r",
+      type: "container",
+      tagName: "div",
+      styles: { color: "red}</style><script>x</script>", padding: "4px" },
+      breakpointStyles: { tablet: { margin: "8px", color: "blue</style>" } },
+    } as ElementData;
+    sanitizeElementTreeContent(tree);
+    expect(tree.styles).toEqual({ padding: "4px" });
+    expect(tree.breakpointStyles?.tablet).toEqual({ margin: "8px" });
   });
 });

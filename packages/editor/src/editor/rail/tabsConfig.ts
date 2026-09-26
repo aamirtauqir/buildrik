@@ -311,3 +311,87 @@ export function getFigmaRailGroups(): Array<{ zone: TabZone; tabs: GroupedTabCon
     tabs: g.ids.map((id) => TAB_CONFIG_MAP.get(id)).filter((t): t is GroupedTabConfig => Boolean(t)),
   }));
 }
+
+/**
+ * What a VIEWER may open: inspection surfaces, plus History/Review/Activity —
+ * FC-9 (fix-all 2026-09-25) lets a viewer open those three READ-ONLY (every
+ * write control inside them is hidden or disabled with a tooltip; server
+ * authz already refuses the mutations).
+ *
+ * Canonical home for the VIEWER gate on left-panel tabs: StudioPanels (rail
+ * click, "ui:switch-tab" bus), useStudioState's openLeftPanelToTab/
+ * setLeftPanelTab (the sink every door funnels into — UI_PANEL_OPEN,
+ * deep links, topbar buttons), and CommandPalette (which nav commands to
+ * even show a VIEWER) all read this ONE set through `isTabAllowedForViewer`
+ * so they cannot drift from each other.
+ */
+export const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>([
+  "layers",
+  "assets",
+  "history",
+  "review",
+  "activity",
+]);
+
+export function isTabAllowedForViewer(tab: GroupedTabId, viewerChrome: boolean): boolean {
+  return !viewerChrome || VIEWER_TABS.has(tab);
+}
+
+/** Panels that take the inspector's column instead of the left drawer. */
+export const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>([
+  "publish",
+  "review",
+  "history",
+  "activity",
+]);
+
+/**
+ * Whether the active tab is showing in the inspector's column (boards
+ * 4418:97118 / 4418:115784 / 4418:73791: Publish, Review and History REPLACE
+ * the inspector, the drawer closed).
+ *
+ * - A read-only view hosts nothing there — except a VIEWER's, whose read-only
+ *   History/Review/Activity (FC-9) live in this column like everyone else's.
+ *   Without that exception the H shortcut switched a viewer to History and it
+ *   rendered nowhere: the drawer skips a column-hosted tab (X-8).
+ * - FB-4: Review only when the server's review layer is on — a gated door
+ *   that still swaps the inspector out for an empty panel is worse than the
+ *   door not opening.
+ */
+export function isColumnTabOpen(s: {
+  readOnlyView: boolean;
+  viewerChrome: boolean;
+  isLeftPanelOpen: boolean;
+  activeTabId: GroupedTabId;
+  reviewsEnabled: boolean | null | undefined;
+}): boolean {
+  return (
+    (!s.readOnlyView || s.viewerChrome) &&
+    s.isLeftPanelOpen &&
+    RIGHT_COLUMN_TABS.has(s.activeTabId) &&
+    (s.activeTabId !== "review" || Boolean(s.reviewsEnabled))
+  );
+}
+
+/**
+ * Whether the inspector's column is on screen. Gap walk 93 #2: the column's
+ * panels (Publish · Review · History · Activity, Issues, AI) were gated on the
+ * inspector's own hide preference, so with the inspector hidden they opened
+ * into a 0-px column. Hiding the inspector hides the inspector; a panel that
+ * lives in its column still shows the column.
+ *
+ * - A VIEWER always has it (board 4418:126059's role notice lives there).
+ * - A full page, the CMS workspace and an owner's read-only view never do.
+ */
+export function isInspectorColumnOpen(s: {
+  readOnlyView: boolean;
+  viewerChrome: boolean;
+  fullPage: boolean;
+  cmsWorkspaceOpen: boolean;
+  inspectorShown: boolean;
+  columnModeOpen: boolean;
+}): boolean {
+  if (s.viewerChrome) return true;
+  if (s.readOnlyView || s.fullPage || s.cmsWorkspaceOpen) return false;
+  return s.inspectorShown || s.columnModeOpen;
+}

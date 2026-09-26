@@ -56,7 +56,18 @@ function showErrorToast(title: string, message?: string) {
   }, 5000);
 }
 
-function handleTRPCError(error: unknown) {
+/** /review/<token> and /share/<token> are reached by people with no login at
+ *  all (a client reviewing a draft, a share-link visitor) — bouncing them to
+ *  /auth/login on an UNAUTHORIZED answer (e.g. a stale/rotated token) dumps
+ *  them out of the flow they were sent. Every other route keeps the
+ *  redirect. */
+function isPublicUnauthenticatedRoute(): boolean {
+  if (typeof window === "undefined") return false;
+  const path = window.location.pathname;
+  return path.startsWith("/review/") || path.startsWith("/share/");
+}
+
+export function handleTRPCError(error: unknown) {
   if (!(error instanceof TRPCClientError)) {
     if (
       error instanceof Error &&
@@ -69,7 +80,7 @@ function handleTRPCError(error: unknown) {
 
   const code = error.data?.code as string | undefined;
 
-  if (code === "UNAUTHORIZED") {
+  if (code === "UNAUTHORIZED" && !isPublicUnauthenticatedRoute()) {
     window.location.href = "/auth/login";
     return;
   }
@@ -81,6 +92,14 @@ function handleTRPCError(error: unknown) {
 
   if (error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
     showErrorToast("Network error", "Check your connection.");
+    return;
+  }
+
+  // Every other tRPC error (4xx, including UNAUTHORIZED on a public route)
+  // carries a server message worth surfacing — a hook-level onError still
+  // overrides this default, and mutate(..., {onError}) runs alongside it.
+  if (typeof code === "string") {
+    showErrorToast("Couldn't complete that", error.message);
   }
 }
 
@@ -90,6 +109,12 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
+            // D-13: the default staleTime is 0, so every remount/refocus
+            // refetched — navigating Projects → Media → Projects inside 30s
+            // re-issued sites.list every time. A query that needs fresher
+            // data invalidates explicitly on mutation (grep onSuccess) or
+            // overrides staleTime per-call; this is a floor, not a cap.
+            staleTime: 30_000,
             retry: (failureCount, error) => {
               /* A definitive answer is not worth asking again. Only
                  UNAUTHORIZED was listed here, so opening a site you have no

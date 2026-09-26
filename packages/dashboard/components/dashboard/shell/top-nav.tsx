@@ -46,13 +46,14 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
         </span>
         <span className="text-[15.5px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>Buildrick</span>
       </Link>
-      <nav className="flex items-center gap-1">
+      <nav aria-label="Primary" className="flex items-center gap-1">
         {/* Dashboard is the main working mode, not something you "explore" — so it
             sits OUTSIDE the Explore cluster as the workspace anchor, before the
             label, with a rule separating it from the ecosystem tabs. Active on any
             workspace page (wherever the sidebar is showing). */}
         <Link
           href="/dashboard"
+          aria-current={!isFullWidthRoute(pathname) ? "page" : undefined}
           className={cn("relative rounded-lg px-3 py-1.5 text-[13.5px] font-[530] transition-colors", isFullWidthRoute(pathname) ? "hover:bg-[var(--color-bg-subtle)]" : "")}
           style={{ color: isFullWidthRoute(pathname) ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}
         >
@@ -70,6 +71,7 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               className={cn("relative rounded-lg px-3 py-1.5 text-[13.5px] font-[530] transition-colors", active ? "" : "hover:bg-[var(--color-bg-subtle)]")}
               style={{ color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}
             >

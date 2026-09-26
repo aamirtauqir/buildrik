@@ -10,6 +10,7 @@ import superjson from "superjson";
 import type { AppRouter } from "../../../../../server/trpc/router";
 import { aiCache } from "./AICache";
 import { createAIError, type AIError } from "./AIErrors";
+import type { CompareResult } from "@/shared/types/versions";
 
 const DEFAULT_TIMEOUT = 30000;
 const MAX_RETRIES = 2;
@@ -197,12 +198,29 @@ class AiTrpcClient {
     );
   }
 
-  async generateLayout(
-    input: { prompt: string; sectionType?: string },
+  /* C-1 / D-3: the History panel's summary and the auto-milestone name used
+     to POST plain JSON to `/api/trpc/ai.*` by hand. The router speaks
+     superjson, so every one of those requests was a 400 ("expected object,
+     received undefined") and both features were dead. They ride this client
+     now — the same transport, rate limiter and queue as every other AI call. */
+  async summarize(
+    input: { versionName: string; changes: CompareResult },
     options: AIRequestOptions = {}
-  ): Promise<AIResponse<{ html: string; css?: string }>> {
-    return this.execute("ai.layout", input, options, () =>
-      trpc().ai.layout.mutate(input)
+  ): Promise<AIResponse<{ summary: string }>> {
+    return this.execute("ai.summarize", input, options, () =>
+      trpc().ai.summarize.mutate(input)
+    );
+  }
+
+  async suggestMilestone(
+    input: {
+      recentChanges: Array<{ id: string; label: string; timestamp: number; type: "checkpoint" | "patch" }>;
+      pageStructure?: { pageCount: number; elementCount: number };
+    },
+    options: AIRequestOptions = {}
+  ): Promise<AIResponse<{ suggestedName: string; reasoning: string }>> {
+    return this.execute("ai.milestoneSuggest", input, options, () =>
+      trpc().ai.milestoneSuggest.mutate(input)
     );
   }
 

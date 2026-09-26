@@ -10,12 +10,14 @@ import {
   createSiteVersion,
   listSiteVersions,
   getSiteVersion,
+  renameSiteVersion,
   deleteSiteVersion,
 } from "@/server/services/site-version.service";
 import {
   createSiteVersionSchema,
   listSiteVersionsSchema,
   getSiteVersionSchema,
+  renameSiteVersionSchema,
   deleteSiteVersionSchema,
 } from "@buildrik/shared/schemas/site-version";
 import { guardSiteAccess as guardSite, guardSiteRole } from "@/server/trpc/guards";
@@ -42,6 +44,13 @@ export const siteVersionsRouter = router({
     .query(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
       return getSiteVersion(input.siteId, input.versionId);
+    }),
+
+  rename: protectedProcedure
+    .input(renameSiteVersionSchema)
+    .mutation(async ({ ctx, input }) => {
+      await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
+      return renameSiteVersion(input.siteId, input.versionId, input.name);
     }),
 
   delete: protectedProcedure

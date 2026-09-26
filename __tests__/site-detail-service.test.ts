@@ -164,13 +164,29 @@ describe("Site Detail Service", () => {
   });
 
   describe("Share Link Service", () => {
-    it("listShareLinks returns active links", async () => {
+    it("listShareLinks returns active links, token redacted by default (S-10)", async () => {
       const { listShareLinks } = await import("@/server/services/share-link.service");
       vi.mocked(prisma.shareLink.findMany).mockResolvedValue([
-        { id: "sl1", name: "Client Review", token: "abc123", viewCount: 5, isActive: true, createdAt: new Date() },
+        { id: "sl1", name: "Client Review", token: "abc123", passwordHash: "$2a$hash", viewCount: 5, isActive: true, createdAt: new Date() },
       ] as any);
       const result = await listShareLinks("s1");
       expect(result).toHaveLength(1);
+      expect(result[0].token).toBeNull();
+      // hasPassword boolean — never the real bcrypt hash, and the raw hash
+      // field is dropped entirely from the returned shape.
+      expect(result[0].hasPassword).toBe(true);
+      expect(result[0]).not.toHaveProperty("passwordHash");
+    });
+
+    it("listShareLinks reveals the token when revealToken=true", async () => {
+      const { listShareLinks } = await import("@/server/services/share-link.service");
+      vi.mocked(prisma.shareLink.findMany).mockResolvedValue([
+        { id: "sl1", name: "Client Review", token: "abc123", passwordHash: null, viewCount: 5, isActive: true, createdAt: new Date() },
+      ] as any);
+      const result = await listShareLinks("s1", true);
+      expect(result[0].token).toBe("abc123");
+      expect(result[0].hasPassword).toBe(false);
+      expect(result[0]).not.toHaveProperty("passwordHash");
     });
 
     it("createShareLink generates token", async () => {
@@ -184,6 +200,30 @@ describe("Site Detail Service", () => {
       const result = await createShareLink("s1", { name: "New Link" });
       expect(result.name).toBe("New Link");
       expect(result.isActive).toBe(true);
+    });
+
+    it("createShareLink never returns the bcrypt hash — same redacted shape as list (S-10)", async () => {
+      const { createShareLink } = await import("@/server/services/share-link.service");
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1" } as any);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ id: "ws1", plan: "PRO" } as any);
+      vi.mocked(prisma.shareLink.count).mockResolvedValue(0);
+      vi.mocked(prisma.shareLink.create).mockResolvedValue({
+        id: "sl3", name: "Password Link", token: "tok-3", passwordHash: "$2a$realhash", viewCount: 0, isActive: true,
+      } as any);
+      const result = await createShareLink("s1", { name: "Password Link", password: "secret-1" });
+      expect(result).not.toHaveProperty("passwordHash");
+      expect((result as any).hasPassword).toBe(true);
+    });
+
+    it("revokeShareLink never returns the bcrypt hash — same redacted shape as list/create (S-10, round 4)", async () => {
+      const { revokeShareLink } = await import("@/server/services/share-link.service");
+      vi.mocked(prisma.shareLink.update).mockResolvedValue({
+        id: "sl4", name: "Password Link", token: "tok-4", passwordHash: "$2a$realhash", viewCount: 2, isActive: false,
+      } as any);
+      const result = await revokeShareLink("sl4");
+      expect(result).not.toHaveProperty("passwordHash");
+      expect((result as any).hasPassword).toBe(true);
+      expect(result.isActive).toBe(false);
     });
   });
 

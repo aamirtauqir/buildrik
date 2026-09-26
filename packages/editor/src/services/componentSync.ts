@@ -14,10 +14,19 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import { loadComponents, saveComponent } from "../engine/components/ComponentStorage";
 import type { ComponentDefinition } from "../shared/types/components";
-import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
+import {
+  SyncRetryQueue,
+  hasServerStamp,
+  markStampMigrationDone,
+  recordServerStamp,
+  registerPendingSource,
+  sameContent,
+  serverCopyWins,
+  stampMigrationDue,
+} from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -45,7 +54,7 @@ export function retryComponentSync(): Promise<void> {
 
 /** Mirror a created/updated component master to the server (upsert). */
 export async function mirrorComponentUpsert(component: ComponentDefinition): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `componentUpsert:${component.id}`,
@@ -57,6 +66,10 @@ export async function mirrorComponentUpsert(component: ComponentDefinition): Pro
         payload: component as unknown as Record<string, unknown>,
         // Scope (board 6971:77663): null = the whole site.
         pageId: component.pageId ?? null,
+      }).then((row) => {
+        /* No row back is still a mirror that landed; reading updatedAt off
+           undefined made it a "failure", queued and replayed forever. */
+        if (row?.updatedAt) recordServerStamp(`component:${component.id}`, row.updatedAt, component.updatedAt);
       }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[component-sync] upsert mirror failed (kept locally)", e)
@@ -65,7 +78,7 @@ export async function mirrorComponentUpsert(component: ComponentDefinition): Pro
 
 /** Mirror a component deletion to the server. */
 export async function mirrorComponentDelete(componentId: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   // A pending upsert for the same component is moot — deletion wins, so drop it
   // to avoid resurrecting a deleted master on a reconnect retry.
@@ -79,30 +92,81 @@ export async function mirrorComponentDelete(componentId: string): Promise<void> 
 }
 
 /**
- * Cross-device load: pull server components into the local IndexedDB cache on
- * editor open. ADDITIVE — only componentIds not already local are written, so a
- * local unsynced master is never clobbered. Best-effort; never throws.
+ * Hydration status (C-4), the CMS pattern: "could not ask" is told apart from
+ * "nothing there" so the editor can say so and offer Retry — the hydrate used
+ * to `console.warn` and leave the library looking empty. "ready" means nothing
+ * is pending, so a surface that never hydrates is not stuck in "loading".
+ */
+export type ComponentHydrationStatus = "loading" | "ready" | "error";
+let hydrationStatus: ComponentHydrationStatus = "ready";
+
+export function getComponentHydrationStatus(): ComponentHydrationStatus {
+  return hydrationStatus;
+}
+
+function setHydrationStatus(next: ComponentHydrationStatus): void {
+  hydrationStatus = next;
+}
+
+/**
+ * Cross-device load (C-4, PD-36): pull server components into the local
+ * IndexedDB cache on editor open. SERVER-FIRST, on the server's clock (stamps,
+ * see `serverCopyWins`): a master is written when it is missing locally or the
+ * server moved past the copy it last confirmed — the old additive pass skipped every id already local, so a
+ * teammate's edit to a shared master never arrived. A master with a mirror
+ * still queued here is left alone (the local change is the newer one).
+ * Nothing local is deleted. Returns how many masters were written.
  */
 export async function hydrateComponentsFromServer(): Promise<number> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return 0;
-  let added = 0;
+  let written = 0;
+  setHydrationStatus("loading");
   try {
     const remote = await client().siteComponents.list.query({ siteId });
-    if (!remote.length) return 0;
-    const localIds = new Set((await loadComponents(siteId)).map((c) => c.id));
-    for (const r of remote) {
-      if (localIds.has(r.componentId)) continue;
-      const payload = await client().siteComponents.get.query({ siteId, componentId: r.componentId });
-      if (!payload) continue;
-      await saveComponent(payload as ComponentDefinition, siteId);
-      added++;
+    const migrationScope = `component:${siteId}`;
+    const firstPass = stampMigrationDue(migrationScope);
+    if (!remote.length) {
+      markStampMigrationDone(migrationScope);
+      setHydrationStatus("ready");
+      return 0;
     }
+    const local = new Map((await loadComponents(siteId)).map((c) => [c.id, c]));
+    const fetchPayload = async (key: string) =>
+      (await client().siteComponents.get.query({ siteId, componentId: key })) as ComponentDefinition | null;
+    /* A master passed over for a queued mirror was not reconciled, so the
+       scope's one-time pass is not done — it re-runs on the next hydrate. */
+    let skippedQueued = false;
+    for (const r of remote) {
+      const key = r.componentId;
+      const stampKey = `component:${key}`;
+      if (queue.isPending(`componentUpsert:${key}`) || queue.isPending(`componentDelete:${key}`)) {
+        skippedQueued = true;
+        continue;
+      }
+      const mine = local.get(key);
+      if (!serverCopyWins(stampKey, r.updatedAt, mine?.updatedAt, !!mine, firstPass)) {
+        /* Unstamped and equal to the server's copy → adopt it (one get), so
+           the next server edit reaches this browser. */
+        if (mine && !hasServerStamp(stampKey) && sameContent(mine, await fetchPayload(key))) {
+          recordServerStamp(stampKey, r.updatedAt, mine.updatedAt);
+        }
+        continue;
+      }
+      const payload = await fetchPayload(key);
+      if (!payload) continue;
+      await saveComponent(payload, siteId);
+      recordServerStamp(stampKey, r.updatedAt, payload.updatedAt);
+      written++;
+    }
+    if (!skippedQueued) markStampMigrationDone(migrationScope);
+    setHydrationStatus("ready");
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[component-sync] hydrate from server failed", e);
+    setHydrationStatus("error");
   }
-  return added;
+  return written;
 }
 
 /** One entry of the workspace component library (FROM LIBRARY, board 4418:99857). */
@@ -118,7 +182,7 @@ export interface LibraryComponentEntry {
 /** The workspace's shared masters as seen from this site; [] when there is no
  *  site (demo) or the read fails — the group then simply has no rows. */
 export async function fetchComponentLibrary(): Promise<LibraryComponentEntry[]> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return [];
   try {
     const rows = await client().siteComponents.library.query({ siteId });
@@ -132,7 +196,7 @@ export async function fetchComponentLibrary(): Promise<LibraryComponentEntry[]> 
 
 /** A library master's full definition, to bring onto this site. */
 export async function fetchLibraryComponent(componentId: string): Promise<ComponentDefinition | null> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return null;
   const payload = await client().siteComponents.libraryGet.query({ siteId, componentId });
   return (payload as ComponentDefinition | null) ?? null;

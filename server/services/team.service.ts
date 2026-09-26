@@ -106,6 +106,12 @@ export async function inviteMembers(
   const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { name: true } });
   const inviter = await prisma.user.findUnique({ where: { id: inviterId }, select: { fullName: true } });
 
+  // B-5: a send failure must not be invisible. The invite row is created
+  // either way (the pending row is real and the admin can Resend it), but the
+  // caller needs to know which addresses never actually got mail — an
+  // "N invitations sent" toast when SMTP is down told the admin nothing was
+  // wrong while nobody it invited ever heard from the product.
+  const emailFailed: string[] = [];
   for (const email of toInvite) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
@@ -126,10 +132,13 @@ export async function inviteMembers(
 
     try {
       await sendTeamInviteEmail(email, workspace?.name ?? "Workspace", inviter?.fullName ?? "A team member", invite.token);
-    } catch { /* Email failure shouldn't block invite */ }
+    } catch (err) {
+      emailFailed.push(email);
+      console.error(`[team.inviteMembers] invite email failed for invite=${invite.id} email=${email}:`, err);
+    }
   }
 
-  return { sent: toInvite.length, skipped };
+  return { sent: toInvite.length - emailFailed.length, skipped, emailFailed };
 }
 
 export async function changeRole(
@@ -241,23 +250,27 @@ export async function resendInvite(inviteId: string, workspaceId: string) {
   if (!invite || invite.workspaceId !== workspaceId) throw new Error("INVITE_NOT_FOUND");
   if (invite.resendCount >= 2) throw new Error("MAX_RESENDS");
 
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
-
-  const updated = await prisma.invite.update({
-    where: { id: inviteId },
-    data: { expiresAt, resendCount: { increment: 1 } },
-  });
-
-  // Actually re-send the email — the whole point of "resend". Without this the
-  // UI toasted "Invitation resent" while the invitee received nothing.
+  // B-5: send BEFORE any bookkeeping write. The old order incremented
+  // resendCount unconditionally, then swallowed a send failure — a resend
+  // that never went out still spent one of the 2 allowed resends and told
+  // the admin it succeeded. Send first; only a successful send earns the
+  // bumped resendCount/expiresAt.
   const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { name: true } });
   const inviter = await prisma.user.findUnique({ where: { id: invite.invitedBy }, select: { fullName: true } });
   try {
     await sendTeamInviteEmail(invite.email, workspace?.name ?? "Workspace", inviter?.fullName ?? "A team member", invite.token);
-  } catch { /* Email failure shouldn't block the resend bookkeeping */ }
+  } catch (err) {
+    console.error(`[team.resendInvite] resend email failed for invite=${invite.id} email=${invite.email}:`, err);
+    throw new Error("INVITE_EMAIL_FAILED");
+  }
 
-  return updated;
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  return prisma.invite.update({
+    where: { id: inviteId },
+    data: { expiresAt, resendCount: { increment: 1 } },
+  });
 }
 
 export async function getTeamActivity(workspaceId: string, limit = 5) {

@@ -9,10 +9,13 @@
  */
 
 import { createBuildrikApiClient } from "./api-client";
+import { fetchMyRole, roleAtLeast } from "./RoleService";
+import { resumeKeepingUnsaved } from "./unsavedRecovery";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { dropSessionMediaUrls } from "@/shared/utils/html";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
+import { blankPageRoot } from "@buildrik/shared/content/elementIds";
 
 /**
  * Shape of a page row returned by `pages.list`. Extended in Phase 1 to
@@ -46,6 +49,26 @@ function getClient() {
 // Sent with each save so the server can detect a behind-copy. Updated on every
 // successful save; the caller may force it (to the server's value) to overwrite.
 let _baselineLastEditedAt: string | null = null;
+
+/* A-2 / PD-11: set when the server refused a behind-copy, cleared only when the
+   user resolves it (Overwrite adopts the server token; Reload re-loads). While
+   it stands, autosave holds back: every further autosave would carry the same
+   stale token, be refused again, and re-raise the dialog the user just
+   dismissed — the "Conflict — reload" pill is the standing notice instead. */
+let _conflictToken: string | null = null;
+
+/** Whether a save conflict is waiting on the user's choice. Autosave reads it
+ *  and holds the edit; a manual save is not sent either — saveProjectNow
+ *  refuses with the held SaveConflictError, which re-surfaces the dialog. */
+export function isSaveConflictPending(): boolean {
+  return _conflictToken !== null;
+}
+
+/* A-1 / PD-1: the Site-column values this editor last knew the server held —
+   captured at load, advanced after each successful mirror. The mirror sends
+   only what differs from it, so a dashboard edit to a field this editor never
+   touched is no longer overwritten with the load-time copy on every autosave. */
+let _baselineSiteColumns: SiteColumnSettings = {};
 
 /** Assets per `loadServerMedia` page. The drawer's "Load more" walks the rest.
  *  Not exported: nothing outside this module decides the page size, and an
@@ -99,6 +122,7 @@ export class SaveConflictError extends Error {
  *  save matches the server and wins. */
 export function setBaselineLastEditedAt(iso: string | null): void {
   _baselineLastEditedAt = iso;
+  _conflictToken = null;
 }
 
 // Conflict signal — emitted on a window CustomEvent so BOTH manual save and
@@ -106,17 +130,42 @@ export function setBaselineLastEditedAt(iso: string | null): void {
 // (the editor's "emit events, UI subscribes" convention). The shell listens for
 // `buildrik:save-conflict`.
 export const SAVE_CONFLICT_EVENT = "buildrik:save-conflict";
-function emitSaveConflict(serverLastEditedAt: string): void {
+
+/** Read a server `SAVE_CONFLICT:<iso>` refusal — from a save OR a publish
+ *  (C-3) — into the one conflict state: hold autosave, raise the dialog, and
+ *  hand back the typed error. Returns null for any other failure. */
+export function raiseSaveConflict(err: unknown): SaveConflictError | null {
+  const msg = err instanceof Error ? err.message : String(err);
+  const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
+  if (!match) return null;
+  _conflictToken = match[1].trim();
+  return announceConflict(_conflictToken);
+}
+
+function announceConflict(serverToken: string): SaveConflictError {
+  /* A conflict raised after a Reload whose unload prompt was cancelled: the
+     page lives on, and its refused work must be kept again. */
+  resumeKeepingUnsaved();
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt } }));
+    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken } }));
   }
+  return new SaveConflictError(serverToken);
+}
+
+/** C-3: the freshness token a publish carries. Read only once every save
+ *  already in flight has landed — a save advances the server's lastEditedAt
+ *  before its response advances this baseline, and reading in that gap would
+ *  refuse the tab's publish over its own save. */
+export async function settledBaselineLastEditedAt(): Promise<string | null> {
+  await _saveChain;
+  return _baselineLastEditedAt;
 }
 
 /**
  * The pages saved and the site-column mirror beside them did not.
  *
- * These two ride in one batch, and `Promise.all` made either one failing read
- * as "Save failed — retry" for both. It happened for real: `ogImage: ""` is
+ * These two used to ride in one batch, and `Promise.all` made either one
+ * failing read as "Save failed — retry" for both. It happened for real: `ogImage: ""` is
  * not a URL, so every site without an OG image saved its pages under a red
  * banner. The page save is the one the status chip is about; a refused mirror
  * is its own, smaller sentence.
@@ -128,11 +177,6 @@ function emitSettingsMirrorError(message: string): void {
   }
 }
 
-const DEFAULT_ROOT: ElementData = {
-  id: "root",
-  type: "container",
-  children: [],
-};
 
 /**
  * P0.2b SSOT: shape of Site columns that mirror editor projectSettings fields.
@@ -190,7 +234,33 @@ function emptyToNull(value: string | null | undefined): string | null {
   return trimmed ? trimmed : null;
 }
 
-function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
+/**
+ * The projectSettings fields extractSiteColumnPatch reads — each one is a Site
+ * column the dashboard owns, mirrored from the editor only for an ADMIN (A-1).
+ * The Settings screens lock exactly these below ADMIN (M7 / PD-1);
+ * `siteColumnFields.test.ts` pins this list to the function's reads, so a new
+ * mirrored field cannot land without being locked, and project data (Author,
+ * Twitter handle, Global CSS) is never locked by mistake.
+ */
+export const SITE_COLUMN_FIELDS = [
+  "seo.siteName",
+  "seo.favicon",
+  "seo.language",
+  "seo.metaTitle",
+  "seo.metaDescription",
+  "seo.metaTitleTemplate",
+  "seo.defaultOgImage",
+  "seo.allowIndexing",
+  "seo.robotsTxt",
+  "seo.touchIcon",
+  "seo.socialLinks",
+  "customCode.headScripts",
+  "customCode.bodyScripts",
+  "publishing.publishedPassword",
+] as const;
+export type SiteColumnField = (typeof SITE_COLUMN_FIELDS)[number];
+
+export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const settings = projectData.settings;
   if (!settings) return {};
   const seo = settings.seo;
@@ -327,6 +397,7 @@ export function projectDataFromRows(
     publishedUrl?: string | null;
     projectStyles?: unknown;
     projectSettings?: unknown;
+    projectCmsBindings?: ProjectData["cmsBindings"] | null;
     dsSchemaVersion?: number;
   };
   // tRPC `pages.list` returns Prisma rows with Json columns typed as
@@ -353,9 +424,12 @@ export function projectDataFromRows(
       name: p.name,
       slug: p.slug,
       isHome: p.isHomePage,
+      /* A page that has never been saved stores `[]`. Each gets its OWN root,
+         with an id derived from the page: one shared DEFAULT_ROOT object
+         made every blank page one element, so an edit on one landed on all. */
       root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
         ? p.blocks
-        : DEFAULT_ROOT,
+        : (blankPageRoot(p.id) as ElementData),
       settings: p.settings,
       meta: p.meta ?? undefined,
       updatedAt: p.updatedAt,
@@ -380,6 +454,8 @@ export function projectDataFromRows(
     assets: [],
     settings: mergedSettings,
     dsSchemaVersion: siteRow.dsSchemaVersion ?? 0,
+    // Stored by sites.saveProject from exportProject()'s own `cmsBindings`.
+    cmsBindings: siteRow.projectCmsBindings ?? undefined,
     metadata: {
       name: siteRow.name,
       domain: siteRow.domain,
@@ -410,6 +486,8 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     // 61-conflict: record the load-time version as the save baseline.
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
+    _conflictToken = null;
+    _baselineSiteColumns = extractSiteColumnPatch(data);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
@@ -441,12 +519,28 @@ export function saveProject(
   return run;
 }
 
+/** The mirrored fields whose value differs from what the server was last
+ *  known to hold. Compared as JSON so `socialLinks` (an object) diffs by value. */
+function diffSiteColumns(patch: SiteColumnSettings, baseline: SiteColumnSettings): SiteColumnSettings {
+  const diff: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(patch)) {
+    if (JSON.stringify(value) !== JSON.stringify(baseline[key as keyof SiteColumnSettings])) {
+      diff[key] = value;
+    }
+  }
+  return diff as SiteColumnSettings;
+}
+
 /**
  * P0.2b dual-save: routes Site-column fields to siteDetail.settings.update
  * (canonical for those fields server-side) and the rest of projectData to
  * sites.saveProject (page tree, element data, non-mirrored config).
  *
- * Both calls run in parallel. If only one half changes, the other is skipped.
+ * A-1 / PD-1 (dashboard owns Site columns): the mirror runs only AFTER the
+ * project save succeeded — a refused save (SAVE_CONFLICT) sends no settings at
+ * all — carries only the fields that changed since load, and is skipped for a
+ * member below ADMIN, whom `siteDetail.settings.update` refuses anyway (every
+ * EDITOR autosave used to raise a "settings mirror" error for it).
  */
 async function saveProjectNow(
   siteId: string,
@@ -455,6 +549,10 @@ async function saveProjectNow(
   if (!_loadedSites.has(siteId)) {
     throw new ProjectNotLoadedError(siteId, _missingSites.has(siteId));
   }
+  /* A save queued behind the one that was refused carries the same stale
+     token — sending it would only be refused again. It is refused here, with
+     the same conflict, until the user resolves it (Overwrite / reload). */
+  if (_conflictToken !== null) throw announceConflict(_conflictToken);
   const client = getClient();
   /* Never persist a session Object URL: it is a broken image on every later
      open. The live element keeps its preview; once its upload reaches the
@@ -469,46 +567,36 @@ async function saveProjectNow(
       return { ...page, root };
     }),
   };
-  const siteColumnPatch = extractSiteColumnPatch(persisted);
-  const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;
-
-  // Both mutations start in the same tick so the httpBatchLink still batches
-  // them; they are AWAITED separately so one cannot speak for the other.
-  const primaryCall = client.sites.saveProject.mutate({
-    siteId,
-    projectData: persisted,
-    // 61-conflict: opt into behind-copy detection.
-    expectedLastEditedAt: _baselineLastEditedAt,
-  });
-  const settingsCall = hasSiteColumnChanges
-    ? client.siteDetail.settings.update
-        .mutate({ id: siteId, ...siteColumnPatch })
-        .then(() => null)
-        .catch((e: unknown) => (e instanceof Error ? e.message : String(e)))
-    : null;
 
   let primaryResult: unknown;
   try {
-    primaryResult = await primaryCall;
+    primaryResult = await client.sites.saveProject.mutate({
+      siteId,
+      projectData: persisted,
+      // 61-conflict: opt into behind-copy detection.
+      expectedLastEditedAt: _baselineLastEditedAt,
+    });
   } catch (err) {
     // Translate the server's CONFLICT into a typed error the shell can catch to
     // show the conflict dialog (rather than a generic save-failed toast).
-    const msg = err instanceof Error ? err.message : String(err);
-    const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
-    if (match) {
-      const serverToken = match[1].trim();
-      emitSaveConflict(serverToken);
-      throw new SaveConflictError(serverToken);
-    }
-    throw err;
+    throw raiseSaveConflict(err) ?? err;
   }
-
-  const mirrorError = settingsCall ? await settingsCall : null;
-  if (mirrorError) emitSettingsMirrorError(mirrorError);
 
   const result = primaryResult as { success: boolean; savedAt: Date };
   // Advance the baseline so the editor's own next save isn't seen as a conflict.
   _baselineLastEditedAt = new Date(result.savedAt).toISOString();
+
+  const changed = diffSiteColumns(extractSiteColumnPatch(persisted), _baselineSiteColumns);
+  if (Object.keys(changed).length > 0 && roleAtLeast(await fetchMyRole(), "ADMIN") !== false) {
+    /* Awaited on its own: a refused mirror is its own, smaller sentence — the
+       pages are already on the server and the chip is about them. */
+    try {
+      await client.siteDetail.settings.update.mutate({ id: siteId, ...changed });
+      _baselineSiteColumns = { ..._baselineSiteColumns, ...changed };
+    } catch (e) {
+      emitSettingsMirrorError(e instanceof Error ? e.message : String(e));
+    }
+  }
   return result;
 }
 

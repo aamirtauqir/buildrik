@@ -21,9 +21,16 @@ vi.mock("../../../shared/utils/editorViewMode", () => ({
 }));
 vi.mock("../../../services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),
-  currentSiteId: vi.fn(() => null),
 }));
-vi.mock("@/services/syncRetryQueue", () => ({ totalPendingMirrors: () => 0 }));
+/* L3's C-4 stamps added a SyncRetryQueue export (versionSync.ts constructs
+   one at module scope: `new SyncRetryQueue()`) — a mock that only supplies
+   totalPendingMirrors leaves that constructor call reaching `undefined`.
+   importOriginal keeps the real class (and registerPendingSource, etc.)
+   intact and only overrides the one function this test controls. */
+vi.mock("@/services/syncRetryQueue", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/services/syncRetryQueue")>();
+  return { ...actual, totalPendingMirrors: () => 0 };
+});
 vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => null }));
 vi.mock("../../../services/NotificationService", () => ({
   fetchRecentNotifications: vi.fn(() => Promise.resolve([])),

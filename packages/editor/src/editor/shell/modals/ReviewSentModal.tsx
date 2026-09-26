@@ -23,6 +23,7 @@
  */
 import * as React from "react";
 import { Button, ModalRoot, ModalContent, ModalTitle, Spinner, TYPE_BODY_CLASS, TYPE_HINT_CLASS } from "@/editor/chrome-ui";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export type ReviewSendState = "sending" | "sent" | "email-failed";
 
@@ -59,7 +60,7 @@ export const ReviewSentModal: React.FC<ReviewSentModalProps> = ({
 
   const copy = React.useCallback(() => {
     if (!reviewUrl) return;
-    void navigator.clipboard?.writeText(reviewUrl)
+    void writeClipboardText(reviewUrl)
       .then(() => setCopied(true))
       .catch(() => setCopied(false));
   }, [reviewUrl]);

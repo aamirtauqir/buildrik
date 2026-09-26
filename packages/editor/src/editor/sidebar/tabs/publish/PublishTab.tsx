@@ -268,6 +268,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const justPublished =
     publishJob?.jobId != null && publishJob.uiState === "published" && snapshot.changeCount === 0;
   const hasFailed = publishJob?.uiState === "failed" && !!error;
+  /* B-2: a poll-lost failure is not a dead job — the worker may still be
+     running server-side and the fix is to resume watching it, not start a
+     second publish. `pollLost` + a live jobId is what tells "Check status"
+     apart from a genuine terminal FAILED, which has no job left to resume. */
+  const pollLostRetry = hasFailed && !!publishJob?.pollLost && !!publishJob?.jobId;
   /* Board 4418:98663 — the run was cancelled. Only a job THIS session started
      can be cancelled, so a job id is implied; nothing was deployed. */
   const wasCancelled = publishJob?.uiState === "cancelled";
@@ -538,7 +543,16 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           : ""}
       </p>
       <div className="tw:mt-3 tw:flex tw:items-center tw:gap-4">
-        {connectionRefused ? (
+        {pollLostRetry ? (
+          <Button
+            size="xs"
+            onClick={() => publishJob?.track?.(publishJob.jobId!)}
+            className="tw:h-7 tw:px-3"
+            data-testid="publish-check-status"
+          >
+            Check status
+          </Button>
+        ) : connectionRefused ? (
           <Button size="xs" onClick={() => setReconnectOpen(true)} className="tw:h-7 tw:px-3" data-testid="publish-repair">
             Repair connection
           </Button>

@@ -28,7 +28,9 @@ import {
   SETTINGS_MIRROR_ERROR_EVENT,
 } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
 import { clearUnsaved, keepUnsaved } from "@/services/unsavedRecovery";
+import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -49,8 +51,68 @@ export function isAuthSaveError(message: string): boolean {
   return /unauthorized|401|session expired|not signed in/i.test(message);
 }
 
-export function isForbiddenSaveError(message: string): boolean {
-  return /forbidden|403/i.test(message);
+/** A role refusal. Decided on the STRUCTURED tRPC error: the server's
+ *  FORBIDDEN carries human text ("Insufficient permissions" from
+ *  checkSiteRole) with neither "forbidden" nor "403" in it, so matching the
+ *  message sent a real mid-edit demotion (C-9) to the generic "Save failed"
+ *  and skipped keepUnsaved. Duck-typed on `data` rather than `instanceof
+ *  TRPCClientError`, which a second bundled copy of @trpc/client would fail.
+ *  The message test stays for errors that are not tRPC's. */
+export function isForbiddenSaveError(err: unknown): boolean {
+  if (typeof err !== "object" || err === null) return false;
+  const data = (err as { data?: { code?: unknown; httpStatus?: unknown } | null }).data;
+  if (data?.code === "FORBIDDEN" || data?.httpStatus === 403) return true;
+  return err instanceof Error && /forbidden|403/i.test(err.message);
+}
+
+/**
+ * A save refused FORBIDDEN mid-session (A15-9 / C-9) — one handler for the
+ * manual save and autosave. The refused edit existed only in this tab, so it
+ * is kept for the reload (a role can come back). The cached role that offered
+ * the edit is dropped and asked for again; if it is now below EDITOR, the
+ * editor opens the view mode a VIEWER is sent to (`?view=readonly`: the
+ * VIEWER rail, Publish disabled with its reason, and no autosave). Before
+ * this the chrome stayed editable and every autosave retried into another
+ * 403, repainting the generic "check your connection" banner.
+ *
+ * Before navigating, the editor is marked clean — the edits are already in
+ * keepUnsaved — so the beforeunload guard does not put a Leave/Stay prompt
+ * over the switch (review #5). The navigation waits a frame and a task, so
+ * the guard has re-read the clean state. The explanation survives the reload
+ * through that kept record: the view-mode load shows "Your role no longer
+ * allows editing … the edits are kept in this browser" (useComposerInit).
+ */
+export function refuseForbiddenSave(opts: {
+  siteId: string | null;
+  composer: Composer;
+  addToast: (input: ToastInput) => string;
+  setIsDirty: (dirty: boolean) => void;
+  setSaveState: React.Dispatch<React.SetStateAction<SaveState>>;
+  /** Injectable for tests; the real one replaces the location. */
+  navigate?: (url: string) => void;
+}): void {
+  const { siteId, composer, addToast, setIsDirty, setSaveState } = opts;
+  const navigate = opts.navigate ?? ((url: string) => window.location.replace(url));
+  if (siteId) keepUnsaved(siteId, composer.exportProject());
+  invalidateMyRole();
+  addToast({
+    title: "You don't have access to save this site",
+    description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
+    tone: "warning",
+  });
+  void fetchMyRole().then((role) => {
+    if (roleAtLeast(role, "EDITOR") !== false || !siteId) return;
+    setIsDirty(false);
+    setSaveState({ status: "idle", error: undefined });
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", "readonly");
+    /* L-2: through the unload guard's bypass — clearing isDirty alone left
+       its other reasons (shell-dirty surfaces, a save in flight, queued
+       mirrors) to put "Leave site?" over the switch. */
+    requestAnimationFrame(() =>
+      window.setTimeout(() => navigateBypassingUnloadGuard(() => navigate(url.toString())), 0),
+    );
+  });
 }
 
 /**
@@ -67,6 +129,11 @@ export type SaveProjectFn = () => Promise<SaveOutcome>;
 // alongside the hook so future contributors see all save-error mapping
 // in one place.
 function explainSaveError(rawMessage: string): string {
+  /* I-2: the server refused a page that belongs to another site (sites.saveProject
+     BAD_REQUEST); retrying the same snapshot cannot succeed. */
+  if (rawMessage.includes("belongs to another site")) {
+    return "This save included a page from another site and was refused. Reload the site before editing.";
+  }
   if (rawMessage.includes("network") || rawMessage.includes("fetch")) {
     return "Network error — check your internet connection and try again.";
   }
@@ -237,13 +304,9 @@ export function useSaveCallback({
         /* FORBIDDEN used to ride the same regex as 401, so a role revocation
            read as "Session expired" and sent the user to sign in — which would
            change nothing. Different truths, different surfaces. */
-        if (isForbiddenSaveError(errorMessage)) {
+        if (isForbiddenSaveError(err)) {
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-          addToast({
-            title: "You don't have access to save this site",
-            description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
-            tone: "warning",
-          });
+          refuseForbiddenSave({ siteId, composer, addToast, setIsDirty, setSaveState });
           return "error";
         }
         if (isAuthSaveError(errorMessage)) {
@@ -255,10 +318,10 @@ export function useSaveCallback({
              even says so, "they live in this tab" — and it was the ONE
              recoverable failure that kept nothing, so closing the tab (or the
              reload the user is nudged toward) lost the work a network blip
-             would have preserved. `missing` and `forbidden` are deliberately
-             NOT given this: nothing can ever be saved to those sites, and
-             offering a restore later would be the lie this module exists to
-             stop. */
+             would have preserved. `missing` is deliberately NOT given this:
+             nothing can ever be saved to a deleted site, and offering a
+             restore later would be the lie this module exists to stop.
+             `forbidden` IS (A15-9, above): a role can change back. */
           if (siteId) keepUnsaved(siteId, composer.exportProject());
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
           if (onAuthExpired) {

@@ -24,7 +24,7 @@ import {
 } from "./version-history/VersionList";
 import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
-import { Button, ConfirmDialog, Modal, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, Modal, Tooltip, useToast } from "@/editor/chrome-ui";
 import { SaveVersionFooter } from "./version-history/SaveVersionFooter";
 import { ALL_SAVES, SavesFilter, applySavesFilter, type SavesFilterValue } from "./version-history/SavesFilter";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
@@ -101,12 +101,16 @@ export function VersionHistoryPanel({
   composer,
   searchQuery = "",
   onMatchCount,
+  readOnly = false,
 }: {
   composer: Composer | null;
   searchQuery?: string;
   /** Board 4418:165744's "1 of 4 match" band is drawn by the tab, above the
    *  approval band; the counts live here. */
   onMatchCount?: (shown: number, total: number) => void;
+  /** FC-9 (fix-all 2026-09-25): a viewer keeps browsing/comparing saves,
+   *  loses Restore and Delete. */
+  readOnly?: boolean;
 }) {
   const {
     versions,
@@ -116,6 +120,7 @@ export function VersionHistoryPanel({
     retryLoad,
     restoreVersion,
     deleteVersion,
+    renameVersion,
     compareVersions,
     updateAiSummary,
   } = useVersionHistory(composer);
@@ -190,7 +195,14 @@ export function VersionHistoryPanel({
     const target = versions.find((v) => v.id === versionId);
     safetyIdRef.current = null;
     try {
-      await restoreVersion(versionId);
+      const ok = await restoreVersion(versionId);
+      if (!ok) {
+        pushToast(
+          "Couldn't restore — nothing changed. Your current work was not saved as a version.",
+          "error"
+        );
+        return;
+      }
       /* G1-071: the restore saved the work on screen first; "Undo restore"
          restores that save (itself a confirmed-safe restore). */
       const safetyId = safetyIdRef.current;
@@ -234,6 +246,17 @@ export function VersionHistoryPanel({
   const handleDeleteCancel = () => {
     setDeleteConfirmId(null);
   };
+
+  const handleRename = React.useCallback(
+    async (versionId: string, name: string) => {
+      try {
+        await renameVersion(versionId, name);
+      } catch {
+        pushToast("Rename failed", "error");
+      }
+    },
+    [renameVersion, pushToast],
+  );
 
   // Handle Compare click
   const handleCompare = React.useCallback(
@@ -418,6 +441,8 @@ export function VersionHistoryPanel({
         onDeleteCancel={handleDeleteCancel}
         onCompare={handleCompare}
         onDetails={setDetailsId}
+        onRename={handleRename}
+        readOnly={readOnly}
       />
 
       {/* Board 4418:173587 — a save's details, with the two things one does
@@ -442,15 +467,23 @@ export function VersionHistoryPanel({
             >
               Compare with current
             </Button>
-            <Button
-              size="xs"
-              onClick={() => {
-                if (detailsVersion) handleRestoreClick(detailsVersion.id);
-                setDetailsId(null);
-              }}
-            >
-              Restore this save…
-            </Button>
+            {readOnly ? (
+              <Tooltip content="Viewers can't restore — ask an editor" placement="top" arrow={false}>
+                <Button size="xs" aria-disabled="true" onClick={() => {}}>
+                  Restore this save…
+                </Button>
+              </Tooltip>
+            ) : (
+              <Button
+                size="xs"
+                onClick={() => {
+                  if (detailsVersion) handleRestoreClick(detailsVersion.id);
+                  setDetailsId(null);
+                }}
+              >
+                Restore this save…
+              </Button>
+            )}
           </>
         }
       >
@@ -480,7 +513,10 @@ export function VersionHistoryPanel({
           />
         </div>
       )}
-      <SaveVersionFooter composer={composer} />
+      <SaveVersionFooter
+        composer={composer}
+        disabledReason={readOnly ? "Viewers can't save a version — ask an editor" : undefined}
+      />
     </div>
   );
 }

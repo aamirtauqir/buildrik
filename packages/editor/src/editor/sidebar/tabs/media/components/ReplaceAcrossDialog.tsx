@@ -22,7 +22,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../../engine/Composer";
-import { Button, Checkbox } from "@/editor/chrome-ui";
+import { Button, Checkbox, useFocusTrap } from "@/editor/chrome-ui";
 import { ReplaceResultModal, replacingLabel, resultIds, type ReplaceOutcome } from "@/editor/media/components/ReplaceResultModal";
 /* `.med-rx-*` lives in MediaTab.css, which only MediaTab imported — so this
    dialog drew as unstyled block flow anywhere it was mounted without its
@@ -176,6 +176,15 @@ export function ReplaceAcrossDialog({
       .then((result) => setState({ phase: "result", pageIds, ...result }));
   }, [composer, sources, newSrc, state]);
 
+  /* B-7/A13-10: this dialog predates OverlayMount and hand-rolls its own
+     backdrop, so it had 0 focus-trap/Escape coverage — the shared
+     useFocusTrap hook plugs the same gap here without the larger rewrite of
+     moving the whole dialog onto OverlayMount's portal/scrim. Always called
+     (rules of hooks); `active` gates it to the preview phase, since the
+     result phase renders ReplaceResultModal, which already goes through
+     ModalRoot/OverlayMount. */
+  const dialogRef = useFocusTrap(state.phase === "preview", onClose);
+
   if (state.phase !== "preview") {
     const { pageIds } = state;
     return (
@@ -196,6 +205,7 @@ export function ReplaceAcrossDialog({
     <>
       <div className="med-rx-backdrop" onClick={onClose} aria-hidden="true" />
       <div
+        ref={dialogRef}
         className="med-rx-dialog"
         role="alertdialog"
         aria-modal="true"

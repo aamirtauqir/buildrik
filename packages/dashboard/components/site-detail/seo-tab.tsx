@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 import { Button, SectionCard } from "@/components/dashboard/primitives";
+import { ErrorState } from "@/components/states";
 
 /**
  * SEO content (meta title/description, social image) has ONE edit home: the
@@ -110,9 +111,21 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
   const [canonicalUrl, setCanonicalUrl] = useState<string | null>(null);
   const [allowIndexing, setAllowIndexing] = useState<boolean | null>(null);
   const [robotsTxt, setRobotsTxt] = useState<string | null>(null);
+  const canonicalId = useId();
+  const robotsId = useId();
 
   const update = trpc.siteDetail.settings.update.useMutation({
-    onSuccess: () => { settings.refetch(); addToast("success", "Technical SEO saved"); },
+    onSuccess: () => {
+      settings.refetch();
+      addToast("success", "Technical SEO saved");
+      // Local state existed only to hold an in-progress edit — once the
+      // server has confirmed it, go back to reading straight from
+      // settings.data so a later refetch (another tab, a webhook) isn't
+      // masked by a stale local value.
+      setCanonicalUrl(null);
+      setAllowIndexing(null);
+      setRobotsTxt(null);
+    },
     onError: (e) => addToast("error", "Couldn't save", e.message),
   });
 
@@ -122,23 +135,36 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
   const indexing = allowIndexing ?? data?.allowIndexing ?? true;
   const robots = robotsTxt ?? data?.robotsTxt ?? "";
 
-  const save = () => update.mutate({
-    id: siteId,
-    canonicalUrl: canonical.trim() || null,
-    allowIndexing: indexing,
-    robotsTxt: robots.trim() || null,
-  });
+  const save = () => {
+    // Only send fields the user actually touched (non-null local state) —
+    // sending every field unconditionally meant an edit to ONE field (e.g.
+    // toggling indexing) silently re-saved the other two from whatever the
+    // local `""` fallback was, overwriting a canonical URL or robots.txt the
+    // user never touched this session.
+    const payload: { id: string; canonicalUrl?: string | null; allowIndexing?: boolean; robotsTxt?: string | null } = { id: siteId };
+    if (canonicalUrl !== null) payload.canonicalUrl = canonicalUrl.trim() || null;
+    if (allowIndexing !== null) payload.allowIndexing = allowIndexing;
+    if (robotsTxt !== null) payload.robotsTxt = robotsTxt.trim() || null;
+    update.mutate(payload);
+  };
 
   return (
     <SectionCard title="Technical SEO">
-      {settings.isLoading ? (
+      {settings.isError ? (
+        <ErrorState
+          title="Couldn't load technical SEO settings"
+          description="Something went wrong on our end."
+          onRetry={() => settings.refetch()}
+        />
+      ) : settings.isLoading ? (
         <div className="h-40 animate-pulse rounded-lg bg-neutral-100" />
       ) : (
         <div className="space-y-5">
           <div>
-            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Canonical domain</label>
+            <label htmlFor={canonicalId} className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Canonical domain</label>
             <p className="mb-1.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>The preferred URL search engines should index (e.g. https://www.example.com).</p>
             <input
+              id={canonicalId}
               value={canonical}
               onChange={(e) => setCanonicalUrl(e.target.value)}
               placeholder="https://www.example.com"
@@ -169,9 +195,10 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
           </div>
 
           <div>
-            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>robots.txt</label>
+            <label htmlFor={robotsId} className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>robots.txt</label>
             <p className="mb-1.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Leave blank for the sensible default. Custom rules override it.</p>
             <textarea
+              id={robotsId}
               value={robots}
               onChange={(e) => setRobotsTxt(e.target.value)}
               rows={4}
@@ -189,7 +216,7 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
             <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
               Applied when you next publish — the live site keeps its current rules until then.
             </p>
-            <Button type="button" onClick={save} disabled={update.isPending}>
+            <Button type="button" onClick={save} disabled={update.isPending || !settings.data || settings.isLoading}>
               {update.isPending ? "Saving…" : "Save technical SEO"}
             </Button>
           </div>

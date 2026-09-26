@@ -64,6 +64,8 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
   saveProject: (...a: unknown[]) => syncSave(...(a as [])),
+  isSaveConflictPending: vi.fn(() => false),
+  SAVE_CONFLICT_EVENT: "buildrik:save-conflict",
   SaveConflictError: class extends Error {},
 }));
 
@@ -163,5 +165,28 @@ describe("dashboard autosave announces the save to the engine", () => {
     await autosave();
     expect(composer.saveProject).not.toHaveBeenCalled();
     expect(composer.markSaved).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* L-3: switching page tabs sent a saveProject with no edit (live re-check,
+   with and without CMS bindings). PageManager.setActivePage emits
+   project:changed { type: "page:activated" } — a view change riding the
+   document-changed event. Autosave now filters it the way the dirty markers
+   already did (isNavigationOnlyChange). */
+describe("a page switch is not an edit", () => {
+  it("sends no save and does not mark the project dirty", async () => {
+    const p = params();
+    renderHook(() => useComposerInit(p));
+    act(() => { composer.emit("project:changed", { type: "page:activated", page: { id: "p2" } }); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
+    expect(syncSave).not.toHaveBeenCalled();
+    expect(p.setIsDirty).not.toHaveBeenCalledWith(true);
+  });
+
+  it("a real page mutation still saves", async () => {
+    renderHook(() => useComposerInit(params()));
+    act(() => { composer.emit("project:changed", { type: "page:updated", page: { id: "p2" } }); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
+    expect(syncSave).toHaveBeenCalledTimes(1);
   });
 });

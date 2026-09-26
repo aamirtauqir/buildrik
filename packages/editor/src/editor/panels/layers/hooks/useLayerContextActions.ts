@@ -16,6 +16,7 @@ import { findById } from "../data/layerUtils";
 import type { LayerAction } from "../types";
 import type { UseLayersStateReturn } from "./useLayersState";
 import { useToast } from "@/editor/chrome-ui";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface LayerContextActionOptions {
   /** Delete asked for N ≥ 2 elements — open the confirm (board 6887:78291). */
@@ -59,9 +60,9 @@ export function useLayerContextActions(
           const url = new URL(window.location.href);
           url.searchParams.set("el", nodeId);
           if (pageId) url.searchParams.set("page", pageId);
-          navigator.clipboard.writeText(url.toString()).then(
+          writeClipboardText(url.toString()).then(
             () => addToast({ description: "Link copied — opens the editor with this element selected", tone: "success" }),
-            () => addToast({ description: "Couldn't copy the link", tone: "error" }),
+            () => addToast({ title: "Couldn't copy the link", description: url.toString(), tone: "error" }),
           );
           break;
         }
@@ -127,7 +128,7 @@ export function useLayerContextActions(
           addToast({
             description: `${label} deleted`,
             tone: "info",
-            action: { label: "Undo", onClick: () => composer?.history.undo() },
+            action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
           });
           break;
         }
@@ -138,7 +139,7 @@ export function useLayerContextActions(
           actionsHook.groupLayers(ids, treeHook.layers);
           addToast({
             description: `Wrapped ${multi ? `${ids.length} elements` : name.charAt(0).toUpperCase() + name.slice(1)} in a group`,
-            action: { label: "Undo", onClick: () => composer?.history.undo() },
+            action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
           });
           break;
         }

@@ -12,6 +12,16 @@
  */
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup, within, waitFor } from "@testing-library/react";
+
+/* A VIEWER should not see a live-looking "Open Brand" /
+   "Open Site settings" / "Open Add" row that the openLeftPanelToTab/
+   setLeftPanelTab sink now silently no-ops on — mocked directly so the
+   viewer-hidden-commands tests below are deterministic instead of racing
+   the real fetchMyRole → network path. Defaults to false (non-viewer) so
+   every pre-existing test in this file keeps seeing the full command set. */
+const mockViewerChrome = vi.hoisted(() => vi.fn<() => boolean>(() => false));
+vi.mock("../../hooks/useEditorRole", () => ({ useViewerChrome: () => mockViewerChrome() }));
+
 import { CommandPalette } from "../CommandPalette";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { Composer } from "../../../../engine";
@@ -32,7 +42,13 @@ function makeComposer(
   return {
     emit: vi.fn(),
     setZoom: vi.fn(),
-    history: { undo: vi.fn(), redo: vi.fn(), canUndo: vi.fn(() => opts.canUndo ?? true), canRedo: vi.fn(() => true) },
+    history: {
+      undo: vi.fn(),
+      redo: vi.fn(),
+      clear: vi.fn(),
+      canUndo: vi.fn(() => opts.canUndo ?? true),
+      canRedo: vi.fn(() => true),
+    },
     selection: {
       getSelectedIds: vi.fn(() => selected),
       getSelected: vi.fn(() => (selected.length ? { getType: () => opts.type ?? "heading" } : null)),
@@ -86,7 +102,10 @@ const type = (q: string) => fireEvent.change(input(), { target: { value: q } });
 const bands = () => screen.queryAllByTestId(/^cmdk-band-/).map((b) => b.textContent);
 const labels = () => screen.queryAllByTestId(/^cmdk-label-/).map((l) => l.textContent ?? "");
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  mockViewerChrome.mockReturnValue(false);
+});
 beforeEach(() => localStorage.clear());
 
 describe("CommandPalette — board 4418:141220 structure", () => {
@@ -192,6 +211,47 @@ describe("CommandPalette — doors", () => {
   });
 });
 
+/* Most nav rows call openPanel() → UI_PANEL_OPEN, which
+   the sink (useStudioState's openLeftPanelToTab) now no-ops for a VIEWER —
+   so a VIEWER must not see the row at all ("dead commands"), not just have
+   it fail silently on click. */
+describe("CommandPalette — VIEWER hides disallowed nav commands", () => {
+  it("a non-viewer sees every nav door", () => {
+    mockViewerChrome.mockReturnValue(false);
+    renderPalette();
+    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Open AI assistant", "Browse Templates", "Open Pages"]) {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    }
+  });
+
+  it("a viewer does not see Add/Brand/Settings/CMS/Components/Publish/AI/Templates/Pages", () => {
+    mockViewerChrome.mockReturnValue(true);
+    renderPalette();
+    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Open AI assistant", "Browse Templates", "Open Pages"]) {
+      expect(screen.queryByText(label)).toBeNull();
+    }
+  });
+
+  it("a viewer STILL sees the read-only doors: Layers, Assets, Activity, Review, History", () => {
+    mockViewerChrome.mockReturnValue(true);
+    renderPalette();
+    expect(screen.getByText("Open Layers")).toBeInTheDocument();
+    expect(screen.getByText("Open Assets")).toBeInTheDocument();
+    expect(screen.getByText("Open Activity")).toBeInTheDocument();
+    expect(screen.getByText("Open Review")).toBeInTheDocument();
+    expect(screen.getByText("Open History")).toBeInTheDocument();
+    expect(screen.getByText("Search stock photos")).toBeInTheDocument();
+  });
+
+  it("a viewer clicking an allowed door still emits it", () => {
+    mockViewerChrome.mockReturnValue(true);
+    const { composer, onClose } = renderPalette();
+    fireEvent.click(screen.getByText("Open Layers"));
+    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "layers" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("CommandPalette — search", () => {
   it("filters every command by label, case-insensitively and trimmed", () => {
     renderPalette();
@@ -248,6 +308,31 @@ describe("CommandPalette — search", () => {
     renderPalette();
     type("fit");
     expect(screen.getByTestId("cmdk-kbd-view-fit").textContent).toMatch(/1$/);
+  });
+
+  /* PD-38 / C-6 (A14-3): "Clear history" used to emit HISTORY_CLEARED as pure
+     notification — nothing actually cleared the undo stack. Kept, but now a
+     real op behind a confirm. */
+  it("Clear history asks first and does nothing on Cancel", () => {
+    const { composer, onClose } = renderPalette();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+    type("clear history");
+    fireEvent.click(screen.getByTestId("cmdk-row-history-clear"));
+    expect(confirmSpy).toHaveBeenCalled();
+    expect(composer!.history.clear).not.toHaveBeenCalled();
+    expect(composer!.emit).not.toHaveBeenCalledWith(EVENTS.HISTORY_CLEARED, undefined);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    confirmSpy.mockRestore();
+  });
+
+  it("Clear history clears the undo stack once confirmed", () => {
+    const { composer } = renderPalette();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    type("clear history");
+    fireEvent.click(screen.getByTestId("cmdk-row-history-clear"));
+    expect(composer!.history.clear).toHaveBeenCalled();
+    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.HISTORY_CLEARED, undefined);
+    confirmSpy.mockRestore();
   });
 
   it("a query that matches nothing offers stock photos for it, and AI", () => {

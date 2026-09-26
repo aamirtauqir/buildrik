@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0.0] Audit fix — security, data integrity, broken flows — 2026-09-26
+
+Fixes the 2026-09-25 full audit: all six security P0s, 50 of 75 findings fully (18 more guarded, with follow-up plans), and 55 more bugs caught by walking the running app. Status of every finding, what was and was not verified in the browser, and the owner decision list: `docs/audits/2026-09-25-full-audit/92-fix-report.md`.
+
+### Fixed — security
+- Stored script injection is closed at every entry and exit: page markup, project styles and selectors, component masters and instance overrides, CMS bindings, CMS entry text, and analytics ids are cleaned on save and escaped where they are written into the canvas, preview, share draft, export and published site. The CMS record preview's "Open in new tab" is sandboxed.
+- Permissions hold end to end: a per-site role can only lower a workspace role, viewers stay read-only in every panel and endpoint, a scoped editor sees only their sites, and a save can no longer write pages that belong to another site.
+- Share links check expiry, revocation and password before loading anything, and carry only the published CMS fields the shared pages show.
+- Unverified accounts can sign in but cannot accept invites or receive a transfer; re-signing up with an abandoned address no longer wipes the old account's data.
+
+### Fixed — data
+- Pages no longer collapse into each other when two pages or two sites share element ids (seeded templates, AI drafts, blank pages, duplicated sites); ids are made unique on every server write and on load.
+- One site's publish no longer overwrites another site's form settings and submissions; forms are keyed per site.
+- CMS bindings are saved, survive a reload, and appear in the published page and in share drafts.
+- Saves use a compare-and-swap, so a stale tab cannot overwrite newer work, and a demoted member keeps their unsaved edits in the browser and drops to read-only.
+
+### Fixed — editor and dashboard
+- Clicking a link on the canvas no longer navigates the editor away; opening a site or switching page tabs no longer saves by itself; locked elements survive Delete and Cut; a toast's Undo only undoes its own action; Delete works on a Layers row.
+- Every panel door found dead or misrouted by walking the app as owner, editor, viewer and scoped editor now works (272 doors, 10 fixed), including Bind to CMS field, letter shortcuts after Esc, and panels with the inspector hidden.
+- Copy buttons no longer crash on a plain-http origin, and an API token is only reported copied when the copy worked.
+
+### Added
+- Form inspector "After submit" section: Action (Show message / Redirect), redirect URL (must be an absolute http(s) URL — `absoluteRedirectUrlSchema`, stricter than the general `isDangerousUrl` allowlist used for hrefs), Send-to-email address, Spam protection toggle. Server-backed by new `forms.getBlock` / `forms.updateBlock`.
+- Published forms: honeypot field (`_honeypot`) injected when spam protection is on, rejected silently server-side (already built); after-submit redirect honored by the public route; a same-page "show message" script swaps the form for its configured message.
+- Form notification email now goes to the block's own configured address (inspector "Send to email") AND always copies the workspace owner, deduped case-insensitively when they're the same address.
+- Slider inspector "Playback" section: Autoplay + Interval, Arrows + Dots — written as `data-*` attributes on the slider element.
+- Carousel runtime for `.buildrick-slider` (autoplay, arrows, dots, respects `prefers-reduced-motion`) — shared behaviour between the canvas (`useSliderRuntime`, live DOM effect) and the published page (`lib/publish-sliders.ts`, the same logic inlined as a script), closing "slider exports as stacked slides with no behaviour."
+
+### Deploy
+**Ordered procedure. The full commands are in `docs/cpanel-deploy.md` §"Ordered deploy — audit-fix release".**
+1. `pnpm run env:check:prod`.
+2. Take a DB snapshot (`pg_dump` over the SSH tunnel) and open an **editors-quiet window**: no edit and no publish until step 5. Migration `20261003100000` is not atomic with a concurrent publish on the old code, because the old worker upserts `form_blocks` by `id = blockId` while the migration merges duplicates and builds the `(siteId, blockId)` index. The step-4 backfill also bypasses the save CAS.
+3. `prisma migrate deploy` through the tunnel (`ssh -f -N -L 127.0.0.1:15432:127.0.0.1:5432 vortyoyz`). Run `migrate status` first. This branch's five migrations apply in this order: `20261001100000_notification_site_id` → `20261001120000_form_block_after_submit` → `20261002100000_site_version_updated_at` → `20261003100000_form_block_site_scoped_identity` → `20261003110000_site_project_cms_bindings`. Earlier `main` migrations may still be pending in production (the `20260909*` pair was recorded unapplied, plus the `20260914*` and `20260924*` ones). `migrate deploy` applies them in the same run. **The new code 500s until `20261001120000` and later are applied.**
+4. `scripts/audit/reid-duplicate-elements.mjs --i-know-this-is-production`: run the dry run, check the per-site counts and that no site is `FAILED`, then run it again with `--apply`. It needs migration `20261003100000` applied first. Without it, the new editor re-ids colliding form elements on load. Those elements then have no `form_blocks` row under their new id, and their form settings (notify email, webhook, redirect, message, spam protection) revert to defaults on the next publish.
+5. Deploy the code. Run `npx prisma generate` before `pnpm build`, because `next build` does not run it. `NEXT_PUBLIC_*` must be present at build time. Use `rsync -az --delete …` and then `touch tmp/restart.txt`. The quiet window ends here.
+6. Run `scripts/audit/sanitize-dry-run.mjs` on a **local restore** of the step-2 snapshot. It refuses non-localhost. A legitimate tag listed under `tag` means extending the allowlist before users re-save.
+
+Per migration:
+- Run `prisma migrate deploy` BEFORE deploying: `20261003110000_site_project_cms_bindings` (adds nullable `Site.projectCmsBindings` JSONB, no backfill — the editor's CMS bindings were never stored before, so every server reload unbound every element and publish shipped placeholder copy; an editor build without this deploy's server would have its bindings stripped again).
+- Run `prisma migrate deploy` BEFORE deploying: `20261003100000_form_block_site_scoped_identity` (FormBlock identity becomes `(siteId, blockId)` — adds unique index `form_blocks_siteId_blockId_key`; `id` stays the PK as a surrogate and `form_submissions.formBlockId` is untouched. Before the index it merges any site's duplicate rows for one blockId onto the one the writers addressed (`id = blockId`): a nullable setting the survivor lacks (notifyEmail, webhookUrl, successMessage, redirectUrl, pageId) is taken from the removed rows newest first, their submissions are repointed, then they are dropped. Fixes one site's publish overwriting another site's form row when both came from the same template; a site that lost its row that way gets one on its next publish.)
+- Run `prisma migrate deploy` BEFORE deploying: `20261002100000_site_version_updated_at` (adds `SiteVersion.updatedAt`, default `now()` for existing rows, no data migration — the editor stamps cached versions against it so a version rename syncs across browsers without overwriting an offline rename).
+- Run `prisma migrate deploy` BEFORE deploying: `20261001120000_form_block_after_submit` (adds `FormBlock.successAction`, `redirectUrl`, `spamProtection` — all with safe defaults, no data migration needed).
+
 ## [0.4.0.0] Code-gap Oct 1 — Editor v3 to Figma — 2026-09-24
 
 The editor now follows the Figma v3 IA boards (`4418:45431`) across rail, drawers, inspector, canvas, CMS, media, publish and settings. Tracked row by row in `packages/editor/docs/plans/2026-09-23-c5-ledger.md`.
@@ -21,7 +64,7 @@ The editor now follows the Figma v3 IA boards (`4418:45431`) across rail, drawer
 - Publish panel remounted the editor; 50× `siteVersions.get` load storm; migration rerun on every open; `darkValue` lost on save; nested headings; published sites missing their base font; Share creating duplicate links; CMS key rename / duplicate key.
 
 ### Deploy
-- Run `prisma migrate deploy` BEFORE deploying: `20260924120000_page_folders`, `20260924140000_site_component_page_scope`.
+- Run `prisma migrate deploy` BEFORE deploying: `20260924120000_page_folders`, `20260924140000_site_component_page_scope`, `20261001100000_notification_site_id`.
 
 ## Buildrik DS V1 — 2026-04-19
 

@@ -43,9 +43,18 @@ vi.mock("@/server/services/email.service", () => ({
 }));
 
 const issueReviewToken = vi.fn();
-vi.mock("@/server/services/client-review.service", () => ({
-  issueReviewToken: (...a: unknown[]) => issueReviewToken(...a),
-}));
+vi.mock("@/server/services/client-review.service", async () => {
+  // Real normalizeReviewEmail (not stubbed) — submitReview's self-invite
+  // guard depends on its actual behavior (S-7), and duplicating its logic
+  // here would drift from the source of truth.
+  const actual = await vi.importActual<typeof import("@/server/services/client-review.service")>(
+    "@/server/services/client-review.service",
+  );
+  return {
+    issueReviewToken: (...a: unknown[]) => issueReviewToken(...a),
+    normalizeReviewEmail: actual.normalizeReviewEmail,
+  };
+});
 
 import {
   submitReview,
@@ -145,6 +154,53 @@ describe("submitReview", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     await expect(submitReview("s1", "u1", "ready")).resolves.toMatchObject({ id: "r1" });
     spy.mockRestore();
+  });
+
+  describe("clientEmail self-invite guard (S-7)", () => {
+    it("rejects the submitter's own email — mints no token, creates no round", async () => {
+      // beforeEach default: userFindUnique → { email: "edie@x.com" }, requestedById "u1"
+      await expect(
+        submitReview("s1", "u1", "ready", undefined, "EDIE@x.com"),
+      ).rejects.toThrow(ReviewError);
+      expect(create).not.toHaveBeenCalled();
+      expect(issueReviewToken).not.toHaveBeenCalled();
+    });
+
+    it("rejects an ACTIVE workspace member's email", async () => {
+      memberFindMany.mockResolvedValueOnce([{ user: { email: "member@x.com" } }]);
+      await expect(
+        submitReview("s1", "u1", "ready", undefined, "member@x.com"),
+      ).rejects.toThrow(ReviewError);
+      expect(create).not.toHaveBeenCalled();
+      expect(issueReviewToken).not.toHaveBeenCalled();
+    });
+
+    // S-7 a naive trim+lowercase let a +tagged or
+    // gmail-dotted variant of the submitter's own address slip past.
+    it("rejects a +tagged variant of the submitter's own email", async () => {
+      // beforeEach default: userFindUnique → { email: "edie@x.com" }
+      await expect(
+        submitReview("s1", "u1", "ready", undefined, "edie+client@x.com"),
+      ).rejects.toThrow(ReviewError);
+      expect(create).not.toHaveBeenCalled();
+    });
+
+    it("rejects a +tagged variant of an ACTIVE member's email", async () => {
+      memberFindMany.mockResolvedValueOnce([{ user: { email: "member@x.com" } }]);
+      await expect(
+        submitReview("s1", "u1", "ready", undefined, "member+invite@x.com"),
+      ).rejects.toThrow(ReviewError);
+      expect(create).not.toHaveBeenCalled();
+    });
+
+    it("still accepts a genuinely external address", async () => {
+      findFirst.mockResolvedValueOnce(null);
+      create.mockResolvedValueOnce({ id: "r1" });
+      await expect(
+        submitReview("s1", "u1", "ready", undefined, "outside-client@example.com"),
+      ).resolves.toMatchObject({ id: "r1" });
+      expect(issueReviewToken).toHaveBeenCalledWith("r1", "outside-client@example.com");
+    });
   });
 });
 

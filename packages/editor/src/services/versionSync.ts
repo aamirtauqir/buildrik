@@ -16,10 +16,18 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import { loadVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
 import type { NamedVersion } from "../shared/types/versions";
-import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
+import {
+  SyncRetryQueue,
+  registerPendingSource,
+  recordServerStamp,
+  serverCopyWins,
+  hasServerStamp,
+  stampMigrationDue,
+  markStampMigrationDone,
+} from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -47,7 +55,7 @@ export function retryVersionSync(): Promise<void> {
 
 /** Mirror a newly-created (named or auto) version to the server. */
 export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `versionCreate:${version.id}`,
@@ -64,9 +72,31 @@ export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean
   );
 }
 
+/** The persisted server stamp (`syncRetryQueue` C-4) for a cached version.
+ *  Its "local" half is the version's NAME — the one field that syncs after
+ *  create — so "unchanged since the stamp" means "not renamed here since". */
+const stampKey = (versionId: string) => `version:${versionId}`;
+
+/** Mirror a version rename ("Name this version…", board 6930:82577) to the server. */
+export async function mirrorVersionRename(versionId: string, name: string): Promise<boolean> {
+  const siteId = getSiteIdFromUrl();
+  if (!siteId) return false;
+  return queue.run(
+    `versionRename:${versionId}`,
+    async () => {
+      const res = await client().siteVersions.rename.mutate({ siteId, versionId, name });
+      /* Confirmed: this browser's name is the server's as of this clock. A
+         replay after a reload stamps the same way. */
+      if (res.updatedAt) recordServerStamp(stampKey(versionId), res.updatedAt, name);
+    },
+    // eslint-disable-next-line no-console
+    (e) => console.warn("[version-sync] rename mirror failed", e)
+  );
+}
+
 /** Mirror a version deletion to the server. */
 export async function mirrorVersionDelete(versionId: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   // A pending create for the same version is moot — deletion wins, so drop it
   // to avoid resurrecting a deleted version on a reconnect retry.
@@ -86,9 +116,14 @@ const HYDRATE_CHUNK = 10;
 
 /**
  * Cross-device load: pull server versions into the local IndexedDB cache on
- * editor open. ADDITIVE — only versionIds not already local are written, so a
- * local unsynced version is never clobbered. They surface on the next version-
- * list read. Best-effort; never throws.
+ * editor open. Only versionIds not already local are fetched. A cached
+ * version's name is reconciled on the persisted server stamp (C-4): the
+ * server's name wins when this browser's copy was confirmed by the server and
+ * not renamed here since, or — on the site's one-time first pass — when the copy
+ * has no stamp at all; otherwise the local name stays and its rename is mirrored
+ * again (a rename made offline survives a reload — the retry queue is in memory
+ * and does not). Returns how many versions were added or renamed —
+ * they surface on the next version-list read. Best-effort; never throws.
  *
  * Bounded (walk 2026-09-24): on a cold cache it fetched every missing payload
  * one after another — 50 sequential `siteVersions.get` in 6.7 s on open,
@@ -97,7 +132,7 @@ const HYDRATE_CHUNK = 10;
  * chunks so tRPC batches each chunk into one request.
  */
 export async function hydrateVersionsFromServer(): Promise<number> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return 0;
   let added = 0;
   try {
@@ -105,13 +140,50 @@ export async function hydrateVersionsFromServer(): Promise<number> {
     if (!remote.length) return 0;
     const local = await loadVersions(siteId);
     const localIds = new Set(local.map((v) => v.id));
-    /* Backfill author names onto versions already cached (G1-075): the list
-       carries them; a version hydrated before it did has only the id. */
-    const nameById = new Map(remote.map((r) => [r.versionId, r.createdByName ?? null]));
+    /* Refresh versions already cached from their list row:
+       - author names (G1-075): a version hydrated before the list carried
+         them has only the id;
+       - the version's own name (X-1): a rename updates `site_versions.name`
+         only, so a rename made in another browser never reached this cache.
+         Same name → confirmed, stamp it. Different → the server's wins only
+         on a stamped, locally-unrenamed copy (`serverCopyWins`); an
+         unstamped or renamed-here copy is an unconfirmed local rename, so it
+         keeps its name and is mirrored again. */
+    const rowById = new Map(remote.map((r) => [r.versionId, r]));
+    /* The first hydrate of a site after stamps existed has no stamps to go
+       on. An unstamped cached name that differs is then far more likely a
+       teammate's rename this cache never saw than an offline rename of ours
+       (which the in-memory queue lost across a reload anyway), so on that one
+       pass the server's name is ADOPTED and stamped. Marked done only when
+       the pass completed with no failed mirror (same per-scope marker as the
+       CMS/component hydrates). */
+    const migrationScope = `version:${siteId}`;
+    const firstPass = stampMigrationDue(migrationScope);
+    let mirrorFailed = false;
     for (const v of local) {
-      const name = nameById.get(v.id);
-      if (name && !v.authorName) await saveVersion({ ...v, authorName: name });
+      const r = rowById.get(v.id);
+      if (!r) continue;
+      const authorName = !v.authorName && r.createdByName ? r.createdByName : v.authorName;
+      let renamed = false;
+      if (r.name === v.name) {
+        recordServerStamp(stampKey(v.id), r.updatedAt, v.name);
+      } else if (
+        (firstPass && !hasServerStamp(stampKey(v.id))) ||
+        serverCopyWins(stampKey(v.id), r.updatedAt, v.name, true, false)
+      ) {
+        renamed = true;
+      } else if (!(await mirrorVersionRename(v.id, v.name))) {
+        mirrorFailed = true;
+      }
+      if (renamed || authorName !== v.authorName) {
+        await saveVersion({ ...v, authorName, name: renamed ? r.name : v.name });
+        if (renamed) {
+          recordServerStamp(stampKey(v.id), r.updatedAt, r.name);
+          added++;
+        }
+      }
     }
+    if (!mirrorFailed) markStampMigrationDone(migrationScope);
     const missing = remote.filter((r) => !localIds.has(r.versionId)).slice(0, HYDRATE_LIMIT);
     for (let i = 0; i < missing.length; i += HYDRATE_CHUNK) {
       const chunk = missing.slice(i, i + HYDRATE_CHUNK);
@@ -134,12 +206,16 @@ export async function hydrateVersionsFromServer(): Promise<number> {
            was on the server the whole time and simply never read back; the editor
            has no other reference to `createdBy` anywhere. Taking it here is what
            gives a version made on someone else's machine an author at all. */
+        /* `name` off the list row too: the payload keeps the name the version
+           was created with, and a rename changes only the column (X-1). */
         await saveVersion({
           ...(payload as NamedVersion),
+          name: r.name,
           projectId: siteId,
           userId: r.createdBy ?? null,
           authorName: r.createdByName ?? null,
         });
+        recordServerStamp(stampKey(r.versionId), r.updatedAt, r.name);
         added++;
       }
     }

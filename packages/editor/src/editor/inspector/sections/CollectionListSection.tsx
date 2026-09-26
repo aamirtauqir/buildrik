@@ -7,6 +7,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
@@ -66,7 +67,8 @@ export const CollectionListSection: React.FC<CollectionListSectionProps> = ({ el
           value={binding.limit ? String(binding.limit) : ""}
           onChange={(v) => {
             const n = Number.parseInt(v, 10);
-            bind(binding.collectionId, n > 0 ? n : undefined);
+            // The stored limit is bounded; past it the save would drop the binding.
+            bind(binding.collectionId, n > 0 ? Math.min(n, CMS_COLLECTION_LIMIT_MAX) : undefined);
           }}
         />
       ) : null}

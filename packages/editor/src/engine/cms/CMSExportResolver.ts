@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 import { RepeaterRenderer } from "./RepeaterRenderer";
 import type { Composer } from "../Composer";
 
@@ -161,19 +162,12 @@ export class CMSExportResolver {
    * Apply value to element based on property type
    */
   private applyValue(el: HTMLElement, property: string, value: string): void {
-    switch (property) {
-      case "content":
-        el.textContent = value;
-        break;
-      case "src":
-      case "href":
-      case "alt":
-      case "title":
-        el.setAttribute(property, value);
-        break;
-      default:
-        el.setAttribute(property, value);
-    }
+    /* `property` comes from stored bindings and `value` from CMS entries —
+       neither from this session. Anything off the shared allowlist, or a
+       dangerous src/href URL, is not written (stored-XSS sink). */
+    if (!isSafeCmsBoundValue(property, value)) return;
+    if (property === "content") el.textContent = value;
+    else el.setAttribute(property, value);
   }
 
   /**

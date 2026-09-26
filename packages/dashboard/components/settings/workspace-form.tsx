@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useId } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useUnsavedChanges } from "@lib/hooks/use-unsaved-changes";
 import { SectionCard, Button, InputField, SelectField } from "@/components/dashboard/primitives";
@@ -95,6 +95,11 @@ export function WorkspaceForm({
   const [accentColor, setAccentColor] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
   const [hexInput, setHexInput] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
   const [editsRequireApproval, setEditsRequireApproval] = useState(initialData?.editsRequireApproval ?? false);
+  const nameId = useId();
+  const slugId = useId();
+  const defaultLanguageId = useId();
+  const timezoneId = useId();
+  const linkExpirationId = useId();
   const presignMutation = trpc.upload.presign.useMutation();
   const confirmMutation = trpc.upload.confirm.useMutation();
   const [defaultExpiration, setDefaultExpiration] = useState<string | null>(
@@ -170,10 +175,11 @@ export function WorkspaceForm({
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label htmlFor={nameId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Workspace name
             </label>
             <InputField
+              id={nameId}
               type="text"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
@@ -185,7 +191,7 @@ export function WorkspaceForm({
           </div>
 
           <div>
-            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label htmlFor={slugId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Workspace URL
             </label>
             <div className="flex items-center gap-2">
@@ -193,6 +199,7 @@ export function WorkspaceForm({
                 buildrik.io/
               </span>
               <InputField
+                id={slugId}
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(slugify(e.target.value))}
@@ -210,10 +217,10 @@ export function WorkspaceForm({
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label htmlFor={defaultLanguageId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Default language
             </label>
-            <SelectField value={defaultLanguage} onChange={(e) => setDefaultLanguage(e.target.value)}>
+            <SelectField id={defaultLanguageId} value={defaultLanguage} onChange={(e) => setDefaultLanguage(e.target.value)}>
               {LANGUAGES.map((l) => (
                 <option key={l.value} value={l.value}>
                   {l.label}
@@ -223,10 +230,10 @@ export function WorkspaceForm({
           </div>
 
           <div>
-            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label htmlFor={timezoneId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Timezone
             </label>
-            <SelectField value={timezone} onChange={(e) => setTimezone(e.target.value)}>
+            <SelectField id={timezoneId} value={timezone} onChange={(e) => setTimezone(e.target.value)}>
               {TIMEZONES.map((tz) => (
                 <option key={tz.value} value={tz.value}>
                   {tz.label}
@@ -353,10 +360,11 @@ export function WorkspaceForm({
       <form onSubmit={handleSharingSubmit} className="space-y-4">
         <div className="space-y-3">
           <div>
-            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label htmlFor={linkExpirationId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Link expiration
             </label>
             <SelectField
+              id={linkExpirationId}
               value={defaultExpiration ?? ""}
               onChange={(e) => setDefaultExpiration(e.target.value || null)}
               wrapperClassName="max-w-xs"
@@ -378,7 +386,9 @@ export function WorkspaceForm({
                 Require password on shared links
               </p>
               <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                New shared links will require a password by default.
+                New shared links will require a password by default. Has no
+                effect on the Free plan, which doesn&apos;t support
+                password-protected links.
               </p>
             </div>
             <button

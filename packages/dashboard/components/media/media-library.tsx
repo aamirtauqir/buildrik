@@ -4,9 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageOff, MoreHorizontal, Pencil, AlertTriangle, Plus } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
+import { safeBlobName } from "@buildrik/shared/schemas/upload";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, Modal, PageHeader, InputField, FilterTabs, SelectField } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
+import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 type MediaType = "image" | "video" | "icon" | "font";
 
@@ -48,7 +51,6 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [folderId, setFolderId] = useState<string | null | undefined>(undefined);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
-  const [limit, setLimit] = useState(PAGE_SIZE);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -67,12 +69,21 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [createValue, setCreateValue] = useState("");
   const folderMenuRef = useRef<HTMLDivElement>(null);
 
-  const assets = trpc.media.listAssets.useQuery({
-    search: search || undefined,
-    folderId,
-    type: typeFilter === "all" ? undefined : typeFilter,
-    limit,
-  });
+  const debouncedSearch = useDebouncedValue(search, 250);
+  // "Load more" grew a `limit` prop by PAGE_SIZE and re-fetched the whole
+  // widening page from offset 0 — the DB and network cost of every page
+  // already fetched, on every click. useInfiniteQuery keeps each PAGE_SIZE
+  // page cached and fetches only the next one, walking the same `cursor`
+  // listAssets already returns as `nextCursor`.
+  const assets = trpc.media.listAssets.useInfiniteQuery(
+    {
+      search: debouncedSearch || undefined,
+      folderId,
+      type: typeFilter === "all" ? undefined : typeFilter,
+      limit: PAGE_SIZE,
+    },
+    { getNextPageParam: (last) => last.nextCursor ?? undefined }
+  );
   const folders = trpc.media.listFolders.useQuery({});
   const quota = trpc.media.checkStorageQuota.useQuery({});
 
@@ -81,6 +92,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
     onError: (err) => addToast("error", "Couldn't delete asset", err.message),
   });
   const createAsset = trpc.media.createAsset.useMutation();
+  const utils = trpc.useUtils();
 
   const moveAsset = trpc.media.moveAsset.useMutation({
     onSuccess: () => { assets.refetch(); setMoveTarget(null); addToast("success", "Asset moved"); },
@@ -139,9 +151,12 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
     if (files.length === 0) return;
     setUploading(true);
     try {
+      // The signing route only issues tokens under the caller's own prefix
+      // (`u/<userId>/`, audit S-4); the file keeps its name on the row.
+      const { prefix } = await utils.media.uploadPrefix.fetch();
       for (const file of files) {
         const type = mediaTypeFromMime(file.type);
-        const blob = await upload(file.name, file, {
+        const blob = await upload(`${prefix}${safeBlobName(file.name)}`, file, {
           access: "public",
           handleUploadUrl: "/api/asset-upload",
           clientPayload: JSON.stringify({ bytes: file.size, type, mimeType: file.type, filename: file.name }),
@@ -162,14 +177,18 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   };
 
   const copyUrl = (id: string, url: string) => {
-    navigator.clipboard.writeText(url);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId((c) => (c === id ? null : c)), 1500);
+    writeClipboardText(url).then(
+      () => {
+        setCopiedId(id);
+        setTimeout(() => setCopiedId((c) => (c === id ? null : c)), 1500);
+      },
+      () => addToast("error", "Couldn't copy the URL", url),
+    );
   };
 
-  const rawItems = assets.data?.items ?? [];
+  const rawItems = assets.data?.pages.flatMap((p) => p.items) ?? [];
   const items = sortBy === "name" ? [...rawItems].sort((a, b) => a.filename.localeCompare(b.filename)) : rawItems;
-  const hasMore = Boolean(assets.data?.nextCursor);
+  const hasMore = Boolean(assets.hasNextPage);
   const q = quota.data;
 
   return (
@@ -353,8 +372,8 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               </div>
               {hasMore && (
                 <div className="mt-5 flex justify-center">
-                  <Button type="button" variant="ghost" onClick={() => setLimit((l) => l + PAGE_SIZE)} disabled={assets.isFetching}>
-                    {assets.isFetching ? "Loading…" : "Load more assets"}
+                  <Button type="button" variant="ghost" onClick={() => assets.fetchNextPage()} disabled={assets.isFetchingNextPage}>
+                    {assets.isFetchingNextPage ? "Loading…" : "Load more assets"}
                   </Button>
                 </div>
               )}

@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Kbd, Button, ConfirmDialog } from "@/editor/chrome-ui";
+import { Kbd, Button, ConfirmDialog, Tooltip } from "@/editor/chrome-ui";
 // react-window 1.8.x ships JS only; stub the minimal surface we use.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — module has no bundled .d.ts (see @types/react-window stub)
@@ -80,6 +80,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
   searchQuery = "",
   error,
   onRetry,
+  readOnly = false,
 }) => {
   const { historyStack, isLoading, canRedo } = useHistoryState(composer);
   const reducedMotion = useReducedMotion();
@@ -439,6 +440,22 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
               <div className="entry-label" data-testid={`history-change-label-${globalIndex}`}>
                 {author ? `${entry.label} · ${author}` : entry.label}
               </div>
+              {readOnly ? (
+                <Tooltip content="Viewers can't restore — ask an editor" placement="top" arrow={false}>
+                  <Button
+                    type="button"
+                    className="entry-time-btn tw:h-4 tw:min-h-0"
+                    aria-disabled="true"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`Restore the project to ${timeLabel}`}
+                    style={STYLE_TIME_BTN}
+                  >
+                    <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
+                      {timeLabel}
+                    </span>
+                  </Button>
+                </Tooltip>
+              ) : (
               <Button
                 type="button"
                 /* flowbite's Button is 40 tall and a plain class cannot
@@ -457,6 +474,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                   {timeLabel}
                 </span>
               </Button>
+              )}
             </div>
 
             {isExpanded && hasChanges && (

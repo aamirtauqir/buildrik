@@ -185,7 +185,7 @@ function thumbFor(item: LibraryItem, viewMode: "grid" | "list"): React.ReactNode
       <span
         style={{
           fontSize: viewMode === "list" ? 18 : 32,
-          fontWeight: 700,
+          fontWeight: 600,
           color: "var(--bk-ink)",
         }}
       >
@@ -739,9 +739,19 @@ export function AssetGrid({
               <span
                 className={`mgr-list-check${all ? " on" : ""}`}
                 role="checkbox"
+                tabIndex={0}
                 aria-checked={all}
                 aria-label="Select all files"
                 onClick={() => {
+                  if (!state.selMode) state.toggleSelMode();
+                  if (all) state.toggleSelMode();
+                  else state.selectAll();
+                }}
+                /* B-9: a role="checkbox" span reaches no keyboard control by
+                   default — Tab skipped it and Space/Enter did nothing. */
+                onKeyDown={(e) => {
+                  if (e.key !== " " && e.key !== "Enter") return;
+                  e.preventDefault();
                   if (!state.selMode) state.toggleSelMode();
                   if (all) state.toggleSelMode();
                   else state.selectAll();
@@ -855,9 +865,18 @@ export function AssetGrid({
                     className={`mgr-list-check${checked ? " on" : ""}`}
                     data-testid={`mgr-list-check-${item.key}`}
                     role="checkbox"
+                    tabIndex={0}
                     aria-checked={checked}
                     aria-label={`Select ${item.name}`}
                     onClick={(e) => {
+                      e.stopPropagation();
+                      if (!state.selMode) state.toggleSelMode();
+                      state.toggleSelect(item.key);
+                    }}
+                    /* B-9: same reachability gap as "Select all files" above. */
+                    onKeyDown={(e) => {
+                      if (e.key !== " " && e.key !== "Enter") return;
+                      e.preventDefault();
                       e.stopPropagation();
                       if (!state.selMode) state.toggleSelMode();
                       state.toggleSelect(item.key);

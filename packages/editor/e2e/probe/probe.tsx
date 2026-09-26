@@ -54,7 +54,7 @@ import { AssetDetailOverlay } from "@/editor/sidebar/tabs/media/components/Asset
 import { IconBrowserOverlay } from "@/editor/sidebar/tabs/media/components/IconBrowserOverlay";
 import { getAllIcons } from "@/shared/constants/icons";
 import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
-import { StockBrowserOverlay } from "@/editor/sidebar/tabs/media/components/StockBrowserOverlay";
+import { StockSourceModal } from "@/editor/sidebar/tabs/media/components/StockSourceModal";
 import { ReplaceAcrossDialog } from "@/editor/sidebar/tabs/media/components/ReplaceAcrossDialog";
 import { UploadAssetModal } from "@/editor/media/UploadAssetModal";
 import { LibraryManager } from "@/editor/media/LibraryManager";
@@ -130,7 +130,6 @@ import {
   HeadersScreen,
   RedirectsScreen,
   FormsScreen,
-  WebhooksScreen,
   LocalizationScreen,
 } from "@/editor/sidebar/tabs/settings/screens";
 import type { PageData } from "@/shared/types";
@@ -2192,7 +2191,7 @@ const CASES: Record<string, () => React.ReactElement> = {
      callbacks it takes. */
   "shell-state-11-saving-conflict": () => (
     <div data-probe="shell-state-11-saving-conflict">
-      <ConflictModal open onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
+      <ConflictModal open siteId={null} onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
     </div>
   ),
   /* Layers drawer, boards 142:2 / 143:2 / 143:295 / 1082:4589 / 1171:4829.
@@ -2661,11 +2660,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-stock-browser": () => (
     <div data-probe="media-stock-browser">
       {drillHost(
-        <StockBrowserOverlay
+        <StockSourceModal
+          open
           onClose={() => {}}
           photos={STOCK_PHOTOS}
           videos={[]}
-          loading={{ img: true, vid: false }}
+          loading={{ img: true, vid: false, ico: false, fnt: false }}
           searchQuery="restaurant interior"
           orientation="all"
           color="all"
@@ -3346,26 +3346,10 @@ const CASES: Record<string, () => React.ReactElement> = {
       </SettingsPane>
     );
   },
-  /* Board 640:3849 — a connected endpoint, which is what the board draws
-     (a URL, an event list and a masked secret), not the empty state. */
-  "settings-webhooks": () => {
-    stubTrpc({
-      "webhooks.status": {
-        url: "https://api.bellacucina.com/hooks/buildrick",
-        events: ["site.publish"],
-        secret: "whsec_9f2c41a8b7e3",
-        lastDeliveryAt: "2026-09-01T10:00:00.000Z",
-        lastStatus: "200",
-        failures24h: 0,
-        recentFailures: [],
-      },
-    });
-    return (
-      <SettingsPane case_="settings-webhooks">
-        <WebhooksScreen />
-      </SettingsPane>
-    );
-  },
+  // "settings-webhooks" (board 640:3849) removed A-12/A01-6 — webhooks moved
+  // from this pane's WebhooksScreen to the dashboard's Settings >
+  // Integrations, which this probe harness does not render. Board 640:3849
+  // is retired in boards.json and its s7-settings-webhooks recipe deleted.
   /* Board 639:3092 — the connected-domain state, in the S7 pane rather than
      the DNS drill-in `settings-domains-dns` measures. */
   "settings-domains": () => {
@@ -3442,22 +3426,14 @@ const CASES: Record<string, () => React.ReactElement> = {
           </AutoOpen>
         </ToastProvider>
       </div>
-      <div className="tw:relative tw:h-203 tw:w-70 tw:overflow-hidden tw:bg-white">
-        <StockBrowserOverlay
-          onClose={() => {}}
-          photos={STOCK_PHOTOS}
-          videos={[]}
-          loading={{ img: false, vid: false }}
-          searchQuery="restaurant interior"
-          orientation="all"
-          color="all"
-          onSearch={() => {}}
-          onSetOrientation={() => {}}
-          onSetColor={() => {}}
-          onLoadMore={() => {}}
-          onSave={() => {}}
-        />
-      </div>
+      {/* FC-6 (fix-all 2026-09-25): the fourth destination used to be the
+          drawer's `StockBrowserOverlay`, mountable inline at the 320 drawer
+          width like its three siblings above. It is gone — the one stock
+          surface is now `StockSourceModal`, a full-page Modal that portals
+          itself over the whole viewport and cannot be composited side by
+          side with the other destinations in this same screenshot. It has
+          no target in this recipe's `targets` list any more; the
+          probe's own `media-stock-browser` case still measures it alone. */}
     </div>
   ),
   "publish-load-error": () => {

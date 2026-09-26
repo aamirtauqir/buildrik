@@ -16,13 +16,14 @@ import type { Composer } from "../../engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId } from "../rail/tabsConfig";
-import { getTabMode } from "../rail/tabsConfig";
+import { getTabMode, isColumnTabOpen, isInspectorColumnOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
+import type { FocusSectionPayload } from "../inspector/hooks/usePropertyJump";
 import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
@@ -48,15 +49,18 @@ import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
-import { useEditorRole } from "./hooks/useEditorRole";
+import { useViewerChrome } from "./hooks/useEditorRole";
 import { ViewerRoleNotice } from "./ViewerRoleNotice";
 
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
-/** Panels that take the inspector's column instead of the left drawer. */
-/** What a VIEWER's rail opens: inspection surfaces only. */
-const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["layers", "assets"]);
-const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history", "activity"]);
+
+/* VIEWER_TABS / isTabAllowedForViewer moved to `../rail/tabsConfig` — the
+ * tab registry is the ONE place every door that gates a
+ * VIEWER's left-panel tabs reads from: this file's rail click and
+ * "ui:switch-tab" handler, useStudioState's openLeftPanelToTab/
+ * setLeftPanelTab (the sink UI_PANEL_OPEN/deep-links/topbar buttons funnel
+ * into), and CommandPalette (which nav commands to show a VIEWER). */
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -79,7 +83,10 @@ export interface StudioPanelsProps {
   onLeftPanelToggle?: () => void;
   leftPanelTab?: string;
   leftPanelSubTab?: string;
-  onLeftPanelTabChange?: (tab: string) => void;
+  /** The shell's guarded switch (B-1). `onSwitched` runs only once the switch
+   *  actually happens — not while its unsaved-changes confirm is pending, and
+   *  never if the user keeps editing. */
+  onLeftPanelTabChange?: (tab: string, onSwitched?: () => void) => void;
   onLeftPanelSubTabChange?: (tab: string) => void;
   blocks: BlockData[];
   onQuickAdd: (block: BlockData) => void;
@@ -110,8 +117,6 @@ export interface StudioPanelsProps {
   ) => void;
   canvasRef?: React.RefObject<CanvasRef | null>;
   composerContainerRef?: React.RefObject<HTMLDivElement | null>;
-  /** Whether the active tab is in fullpage mode (derived from useStudioState) */
-  isFullPageMode?: boolean;
   /** Drawer width in pixels for the active tab (derived from useStudioState) */
   drawerWidth?: number;
   /** Canonical publish state machine (shared with the Topbar), forwarded to
@@ -129,9 +134,10 @@ export interface StudioPanelsProps {
    *  floating an absolute overlay on top of it. AquibraStudio owns the open
    *  state and builds the panel (it needs `composer.designSystem` +
    *  `requestBrandToken`, already in scope there); this just says where it
-   *  renders. */
+   *  renders. It is handed the back row's action (M-1: "‹ Inspector" leads
+   *  to the inspector, shown even if it was hidden). */
   issuesOpen?: boolean;
-  issuesPanel?: React.ReactNode;
+  renderIssuesPanel?: (onBack: () => void) => React.ReactNode;
   onCloseIssues?: () => void;
   /** FB-4: server flag for the agency review layer — see `TabRouter.reviewsEnabled`. */
   reviewsEnabled?: boolean | null;
@@ -140,6 +146,9 @@ export interface StudioPanelsProps {
 // ============================================================================
 // STYLES
 // ============================================================================
+
+/** How long a section-focus request waits for the inspector body (m-1). */
+const PENDING_FOCUS_MS = 500;
 
 const styles = {
   container: {
@@ -210,13 +219,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onOpenImageEditor,
   canvasRef,
   composerContainerRef,
-  isFullPageMode = false,
   drawerWidth,
   publishJob,
   nextMove = null,
   onRequestPublish,
   issuesOpen = false,
-  issuesPanel,
+  renderIssuesPanel,
   onCloseIssues,
   reviewsEnabled,
 }) => {
@@ -255,12 +263,14 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* URL-derived, so it is stable for the life of the document — view mode
      is entered by navigation (StudioHeader.toggleReadOnlyView), never by state. */
   const readOnlyView = React.useMemo(() => getEditorViewMode().readOnlyView, []);
-  const editorRole = useEditorRole();
   /* A workspace VIEWER is always in view mode (dashboard redirect), and board
      4418:126059 still draws the editor chrome for them: the rail, Layers, and
      the role notice in the inspector column. View mode for anyone else stays
-     the bare canvas (founder call, 2026-08-23). */
-  const viewerChrome = readOnlyView && editorRole === "VIEWER";
+     the bare canvas (founder call, 2026-08-23). useViewerChrome is the SAME
+     computation useStudioState's openLeftPanelToTab/setLeftPanelTab sink and
+     CommandPalette use — one source, so this file's rail/drawer layout can't
+     disagree with what the sink actually lets through. */
+  const viewerChrome = useViewerChrome();
   /* A root class, not a prop, because the surfaces that still leak editing
      chrome into view mode are reached by CSS alone: the empty-container
      placeholder is a ::after in Canvas.css, and the footer's selection label is
@@ -287,22 +297,30 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   }, [readOnlyView, viewerChrome]);
 
   const [aiInInspector, setAiInInspector] = React.useState(false);
-  /* Inspector visibility, user-operated and remembered. Defaults to SHOWN so
-     the drawn no-selection board is still the default state — collapsing it
+  /* Inspector visibility, user-operated. Defaults to SHOWN so the drawn
+     no-selection board is still the default state — collapsing it
      automatically was tried before and rendered that board off-viewport.
-     This is the opt-out. */
-  const [inspectorShown, setInspectorShown] = React.useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    try { return localStorage.getItem("buildrick-inspector-shown") !== "false"; }
-    catch { return true; }
-  });
+     Session-only (gap walk 93 #3): persisted, a reload left the inspector
+     hidden with no visible way back, and no board draws a "Show inspector"
+     control. The hide answers with a toast whose action is that way back;
+     ⌘K "Toggle inspector" stays the other door. */
+  const [inspectorShown, setInspectorShown] = React.useState<boolean>(true);
+  const inspectorShownRef = React.useRef(inspectorShown);
+  /* What the inspector column shows this render (assigned below, once known):
+     read by the toggle's toast and the section-focus route. */
+  const columnRef = React.useRef({ bodyShown: false, blocked: false, rightColumnTab: false });
+  inspectorShownRef.current = inspectorShown;
   const toggleInspector = React.useCallback(() => {
-    setInspectorShown((v) => {
-      const next = !v;
-      try { localStorage.setItem("buildrick-inspector-shown", String(next)); } catch { /* private mode */ }
-      return next;
-    });
-  }, []);
+    const next = !inspectorShownRef.current;
+    setInspectorShown(next);
+    /* M-2: with a mode over the inspector (⌘K Toggle inspector while AI is
+       up) nothing on screen changes, so there is nothing to announce. */
+    if (!next && columnRef.current.bodyShown)
+      addToast({
+        description: "Inspector hidden",
+        action: { label: "Show", onClick: () => setInspectorShown(true) },
+      });
+  }, [addToast]);
   /* The toggle's doors are the inspector's own ✕ and the ⌘K row
      (`toggle-inspector`, commands registry) — both emit this event (G2-037:
      the footer word bar's Inspector toggle had no home on the board). */
@@ -317,10 +335,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
   const [mediaFullPage, setMediaFullPage] = React.useState(false);
 
-  /* Settings' unsaved-edit flag lives here because two children need it:
-     FullPageView mounts the SettingsTab that raises it, and LeftSidebar's
-     rail draws the dirty dot and guards the tab switch against it. */
-  const [settingsDirty, setSettingsDirty] = React.useState(false);
   const [settingsOpen, setSettingsOpen] = React.useState<SettingsOpenRequest | null>(null);
   const [pagesOpen, setPagesOpen] = React.useState<PageSettingsOpenRequest | null>(null);
   /* `ui:browse-templates` — the New-page modal's name + "Add to site
@@ -330,6 +344,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
+
+  /* A-7: the drawer tab to fall back to when a full page (Settings,
+     Templates, the Asset library) closes — the tab the user was actually on
+     before they navigated away, not always "add". Mirrors useStudioState's
+     own prevDrawerTabRef (persistence), kept separately here because the
+     hook does not expose it. */
+  const prevDrawerTabRef = React.useRef<string>("add");
+  React.useEffect(() => {
+    if (getTabMode(activeTabId) !== "fullpage") prevDrawerTabRef.current = activeTabId;
+  }, [activeTabId]);
   /* A CMS field's image pick opens in the Assets drawer but keeps the CMS
      workspace (and the record being edited) open beside it. */
   const railTab = useRailTab(activeTabId);
@@ -344,14 +368,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      column (300), with the left drawer closed. Every door still opens them
      the way it did (openLeftPanelToTab / ui:switch-tab); only where they
      render moved. ✕ closes the panel and the inspector returns. */
-  /* FB-4: don't hand Review the right column when the server's agency
-     review layer is off — a gated door that still swaps the inspector out
-     for an empty panel is worse than the door not opening. */
-  const rightColumnTab =
-    !readOnlyView &&
-    isLeftPanelOpen &&
-    RIGHT_COLUMN_TABS.has(activeTabId) &&
-    (activeTabId !== "review" || Boolean(reviewsEnabled));
+  const rightColumnTab = isColumnTabOpen({
+    readOnlyView,
+    viewerChrome,
+    isLeftPanelOpen,
+    activeTabId,
+    reviewsEnabled,
+  });
   useColumnPanelEscape(rightColumnTab, () => onLeftPanelToggle?.());
   /* FB-8: Issues is a right-column mode too — Escape returns to the
      Inspector the same way it does for Publish/Review/History. */
@@ -397,17 +420,89 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     if (activeTabId !== "publish") setUnpublishIntent(false);
   }, [activeTabId]);
   const effectiveFullPageMode =
-    isFullPageMode ||
-    getTabMode(activeTabId) === "fullpage" ||
-    (activeTabId === "assets" && mediaFullPage);
+    getTabMode(activeTabId) === "fullpage" || (activeTabId === "assets" && mediaFullPage);
 
   /* v3 IA (4428:140486): rail CMS keeps its drawer and REPLACES the canvas +
      inspector with the CMS workspace. The canvas stays mounted underneath
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
   const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
-  const inspectorOpen =
-    viewerChrome || (!readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen);
+  const inspectorOpen = isInspectorColumnOpen({
+    readOnlyView,
+    viewerChrome,
+    fullPage: effectiveFullPageMode,
+    cmsWorkspaceOpen,
+    inspectorShown,
+    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector,
+  });
+  /* The inspector BODY (ProInspector) is on screen: its column is open and no
+     mode (Issues · a column tab · AI) has replaced it. */
+  const inspectorBodyShown =
+    !readOnlyView && inspectorOpen && !(issuesOpen && renderIssuesPanel) && !rightColumnTab && !aiInInspector;
+
+  /* I-1: UI_INSPECTOR_FOCUS_SECTION ("Bind to CMS field…", "Add
+     interaction", ⌘K Jump to property) is heard by the inspector body. With a
+     mode over it, or the inspector hidden, the request landed nowhere visible.
+     Here it clears the way — inspector shown, the covering mode closed — and
+     is re-sent on the next frame, once the body is up and listening. Only
+     requests the visible body could not take are held, so the re-send does
+     not loop. A full page or the CMS workspace has no inspector to show. */
+  columnRef.current = {
+    bodyShown: inspectorBodyShown,
+    blocked: readOnlyView || effectiveFullPageMode || cmsWorkspaceOpen,
+    rightColumnTab,
+  };
+  /* m-1: a held request lapses — after PENDING_FOCUS_MS if the body never
+     came up, and on any selection change — so it cannot fire later, at a
+     moment the user no longer connects with it. */
+  const pendingFocus = React.useRef<FocusSectionPayload | null>(null);
+  const pendingLapse = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const dropPendingFocus = React.useCallback(() => {
+    pendingFocus.current = null;
+    clearTimeout(pendingLapse.current);
+  }, []);
+  React.useEffect(() => dropPendingFocus, [dropPendingFocus]);
+  React.useEffect(() => {
+    if (!composer) return;
+    const selectionEvents = [
+      EVENTS.ELEMENT_SELECTED,
+      EVENTS.SELECTION_MULTIPLE,
+      EVENTS.SELECTION_CLEARED,
+      EVENTS.SELECTION_ADDED,
+      EVENTS.SELECTION_REMOVED,
+    ] as const;
+    for (const ev of selectionEvents) composer.on(ev, dropPendingFocus);
+    return () => {
+      for (const ev of selectionEvents) composer.off(ev, dropPendingFocus);
+    };
+  }, [composer, dropPendingFocus]);
+  React.useEffect(() => {
+    if (!composer) return;
+    const route = (payload: FocusSectionPayload) => {
+      const r = columnRef.current;
+      if (r.bodyShown || r.blocked) return;
+      pendingFocus.current = payload;
+      clearTimeout(pendingLapse.current);
+      pendingLapse.current = setTimeout(dropPendingFocus, PENDING_FOCUS_MS);
+      setInspectorShown(true);
+      setAiInInspector(false);
+      onCloseIssues?.();
+      if (r.rightColumnTab) onLeftPanelToggle?.();
+    };
+    composer.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, route);
+    return () => {
+      composer.off(EVENTS.UI_INSPECTOR_FOCUS_SECTION, route);
+    };
+  }, [composer, onCloseIssues, onLeftPanelToggle, dropPendingFocus]);
+  React.useEffect(() => {
+    if (!composer || !inspectorBodyShown || !pendingFocus.current) return;
+    const frame = requestAnimationFrame(() => {
+      const payload = pendingFocus.current;
+      dropPendingFocus();
+      if (payload) composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, payload);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [composer, inspectorBodyShown, dropPendingFocus]);
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
@@ -416,19 +511,33 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     }
   }, [activeTabId, mediaFullPage]);
 
+  /* A-6: a full-page surface hides the canvas selection but does not clear
+     it — the command guard now refuses shortcuts on that surface, but the
+     selection itself should not sit stale (highlighted on a canvas the user
+     cannot see) while a full page is open. */
+  React.useEffect(() => {
+    if (effectiveFullPageMode) composer?.selection.clear();
+  }, [effectiveFullPageMode, composer]);
+
   // Listen for panel open events from composer
   React.useEffect(() => {
     if (!composer) return;
 
-    const openTemplates = (data?: TemplatesOpenRequest) => {
-      /* A fresh object per request → the view re-reads it each time. */
-      setTemplatesOpen({ ...data });
-      onLeftPanelTabChange?.("templates");
+    /* Each door's side effects ride the switch's `onSwitched`: a request
+       handed down, or a drawer opened, for a switch still waiting on (or
+       refused by) the unsaved-changes confirm would land on the wrong tab. */
+    const openDrawer = () => {
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
+    const openTemplates = (data?: TemplatesOpenRequest) => {
+      onLeftPanelTabChange?.("templates", () => {
+        /* A fresh object per request → the view re-reads it each time. */
+        setTemplatesOpen({ ...data });
+        openDrawer();
+      });
+    };
     const openDesign = () => {
-      onLeftPanelTabChange?.("design");
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      onLeftPanelTabChange?.("design", openDrawer);
     };
 
     /* Clone 3519:19920 — the Pages panel's `Add redirect` opens Settings ON
@@ -436,25 +545,28 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
        on the switch, after the emit, so a listener inside it would miss the
        request. A fresh object per request → the tab re-navigates each time. */
     const openSettings = (data: SettingsOpenRequest) => {
-      setSettingsOpen({ screen: data.screen, repair: data.repair ?? null });
-      onLeftPanelTabChange?.("settings");
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      onLeftPanelTabChange?.("settings", () => {
+        setSettingsOpen({ screen: data.screen, repair: data.repair ?? null });
+        openDrawer();
+      });
     };
     /* The way back (3519:20096 `Back to <Page> SEO`): the same shape — the
        Pages panel is lazy and unmounted under the Settings fullpage, so the
        request waits here for it. */
     const openPageSettings = (data: PageSettingsOpenRequest) => {
-      setPagesOpen({ pageId: data.pageId, tab: data.tab });
-      onLeftPanelTabChange?.("pages");
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      onLeftPanelTabChange?.("pages", () => {
+        setPagesOpen({ pageId: data.pageId, tab: data.tab });
+        openDrawer();
+      });
     };
 
     /* ⌘K → a collection or record. The workspace reads its store, which
        outlives it, so the request is written there and the tab switched. */
     const openCms = (data: CmsOpenRequest) => {
-      cmsWorkspace.openRequest(data);
-      onLeftPanelTabChange?.("content");
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      onLeftPanelTabChange?.("content", () => {
+        cmsWorkspace.openRequest(data);
+        openDrawer();
+      });
     };
 
     composer.on(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
@@ -483,6 +595,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const handler = (data: { tab: string; fullPage?: boolean }) => {
+      /* Every "ui:switch-tab" emitter (⌘K palette, canvas context menus,
+         inspector doors, PublishTab, CmsWorkspace, …) is a second door onto
+         the same tabs the rail gates — without this check a VIEWER could not
+         click into Add/CMS/Brand from the rail, but ⌘K "Open AI assistant"
+         or CmsWorkspace's own emit routed them there anyway. Same predicate
+         the rail uses (isTabAllowedForViewer), so the two doors can't drift. */
+      if (!isTabAllowedForViewer(data.tab as GroupedTabId, viewerChrome)) {
+        addToast({ description: "View only — adding, pages, CMS and brand edits need an Editor role." });
+        return;
+      }
       /* Boards 170:2 and 66:225 put AI in the INSPECTOR column with a
          "‹ Inspector" way back — not in the left sidebar. Every existing
          entry point (the inspector's ✦ AI chip, the multi-select toolbar, the
@@ -493,21 +615,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            opening hidden under it (Issues wins the render, so both open meant
            an invisible AI that one Escape also closed). */
         onCloseIssues?.();
+        /* A-14: with the inspector hidden, AI used to mount into a 0-px
+           column; isInspectorColumnOpen now opens the column for any panel
+           it hosts, AI included. */
         setAiInInspector(true);
         return;
       }
-      onLeftPanelTabChange?.(data.tab);
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
-      /* Clone 3724:43815 — the inspector's "Manage video" opens the Asset
-         LIBRARY (the fullpage), not the drawer; the file to select rides on
-         the engine's media selection the way the drawer's own door hands it. */
-      if (data.tab === "assets" && data.fullPage) setMediaFullPage(true);
+      onLeftPanelTabChange?.(data.tab, () => {
+        if (!isLeftPanelOpen) onLeftPanelToggle?.();
+        /* Clone 3724:43815 — the inspector's "Manage video" opens the Asset
+           LIBRARY (the fullpage), not the drawer; the file to select rides on
+           the engine's media selection the way the drawer's own door hands it. */
+        if (data.tab === "assets" && data.fullPage) setMediaFullPage(true);
+      });
     };
     composer.on("ui:switch-tab", handler);
     return () => {
       composer.off("ui:switch-tab", handler);
     };
-  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
+  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle, viewerChrome, addToast]);
 
   // Canvas hover sync
   React.useEffect(() => {
@@ -542,12 +668,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         description: `${elementLabel} deleted`,
         tone: "info",
         duration: 5000,
-        action: {
-          label: "Undo",
-          onClick: () => {
-            composer.history?.undo?.();
-          },
-        },
+        action: { label: "Undo", onClick: composer.history.captureUndo() },
       });
     },
     [composer, addToast]
@@ -557,7 +678,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     (tab: GroupedTabId) => {
       /* A viewer inspects: Layers, and Assets (view-only since B5). The other
          rail doors lead to writing surfaces, so they say why instead. */
-      if (viewerChrome && !VIEWER_TABS.has(tab)) {
+      if (!isTabAllowedForViewer(tab, viewerChrome)) {
         addToast({ description: "View only — adding, pages, CMS and brand edits need an Editor role." });
         return;
       }
@@ -580,8 +701,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       // Media dual-mode: return to panel (slim launcher), don't switch tabs
       setMediaFullPage(false);
     } else {
-      // Return to last panel tab (default: Add)
-      onLeftPanelTabChange?.("add");
+      // Return to the drawer tab the user was actually on (default: Add).
+      onLeftPanelTabChange?.(prevDrawerTabRef.current);
     }
   }, [activeTabId, mediaFullPage, onLeftPanelTabChange]);
 
@@ -608,6 +729,28 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     },
     [onOpenImageEditor, composer]
   );
+
+  /* The column-hosted tab (Publish · Review · History · Activity). One
+     element, two hosts: the inspector column, and a VIEWER's (X-8). */
+  const columnPanel = rightColumnTab ? (
+    <RightColumnPanel>
+      <TabRouter
+        activeTab={activeTabId}
+        activeSubTab={leftPanelSubTab}
+        composer={composer}
+        commonTabProps={{ isExpanded: false, onClose: () => onLeftPanelToggle?.() }}
+        onCreateComponent={() => {}}
+        unpublishIntent={unpublishIntent}
+        onUnpublishIntentConsumed={() => setUnpublishIntent(false)}
+        projectId={projectId}
+        publishJob={publishJob}
+        nextMove={nextMove}
+        onRequestPublish={onRequestPublish}
+        onResendReview={onResendReview}
+        reviewsEnabled={reviewsEnabled}
+      />
+    </RightColumnPanel>
+  ) : null;
 
   return (
     <DSModeProvider>
@@ -651,12 +794,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             /* QA 2026-09-24: the closed drawer still mounted a second copy of
                the column's panel (two subscriptions, two fetches). */
             hostedInColumn={RIGHT_COLUMN_TABS.has(activeTabId)}
+            viewerChrome={viewerChrome}
             onDrawerToggle={onLeftPanelToggle ?? (() => {})}
             onElementSelect={handleElementSelect}
             onBlockClick={handleBlockClick}
             canvasHoveredId={canvasHoveredId}
-            settingsDirty={settingsDirty}
-            onSettingsDirtyChange={setSettingsDirty}
             pagesOpen={pagesOpen}
             projectId={projectId}
             onOpenLibrary={handleOpenLibrary}
@@ -718,38 +860,33 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         {readOnlyView ? (
           viewerChrome ? (
             <LayoutShell.Inspector>
-              <ViewerRoleNotice role="VIEWER" />
+              {/* X-8: a VIEWER's read-only History/Review/Activity replace the
+                  role notice here, the way they replace the inspector for
+                  everyone else. */}
+              {rightColumnTab ? columnPanel : <ViewerRoleNotice role="VIEWER" />}
             </LayoutShell.Inspector>
           ) : null
         ) : (
         <LayoutShell.Inspector>
-          {issuesOpen && issuesPanel ? (
-            issuesPanel
+          {issuesOpen && renderIssuesPanel ? (
+            renderIssuesPanel(() => {
+              onCloseIssues?.();
+              setInspectorShown(true);
+            })
           ) : rightColumnTab ? (
-            <RightColumnPanel>
-              <TabRouter
-                activeTab={activeTabId}
-                activeSubTab={leftPanelSubTab}
-                composer={composer}
-                commonTabProps={{ isExpanded: false, onClose: () => onLeftPanelToggle?.() }}
-                onCreateComponent={() => {}}
-                unpublishIntent={unpublishIntent}
-                onUnpublishIntentConsumed={() => setUnpublishIntent(false)}
-                projectId={projectId}
-                publishJob={publishJob}
-                nextMove={nextMove}
-                onRequestPublish={onRequestPublish}
-                onResendReview={onResendReview}
-                reviewsEnabled={reviewsEnabled}
-              />
-            </RightColumnPanel>
+            columnPanel
           ) : aiInInspector ? (
             <AITab
               composer={composer}
               isExpanded={false}
               onExpandToggle={() => {}}
               onClose={() => setAiInInspector(false)}
-              onBack={() => setAiInInspector(false)}
+              /* M-1: "‹ Inspector" leads to the inspector — shown even if it
+                 was hidden, where closing AI alone took the column with it. */
+              onBack={() => {
+                setAiInInspector(false);
+                setInspectorShown(true);
+              }}
             />
           ) : (
           <ProInspector
@@ -787,7 +924,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                menu's "Plugins" landed on the Settings root and looked like a
                dead door. */
             activeSubTab={leftPanelSubTab}
-            onSettingsDirtyChange={setSettingsDirty}
             settingsOpen={settingsOpen}
             projectId={projectId}
             onOpenImageEditor={onOpenImageEditor}

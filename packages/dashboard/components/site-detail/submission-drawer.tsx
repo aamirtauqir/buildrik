@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, Trash2 } from "lucide-react";
 import { ToggleSwitch } from "flowbite-react";
-import { Button } from "@/components/dashboard/primitives";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 export interface FormSubmissionData {
   id: string;
@@ -57,6 +57,7 @@ export function SubmissionDrawer({
   onDelete,
 }: SubmissionDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   // onClose arrives as an inline arrow from the panel that also owns the
   // drawer's state, so its identity changes on every toggle and refetch. Read
   // it through a ref: with onClose in the dep array the trap tore down and
@@ -235,13 +236,41 @@ export function SubmissionDrawer({
             className="border-t px-6 py-4"
             style={{ borderColor: "var(--color-border-default)" }}
           >
-            <Button onClick={() => onDelete(submission.id)} className="w-full">
+            <Button variant="danger" onClick={() => setConfirmingDelete(true)} className="w-full">
               <Trash2 className="h-4 w-4" />
               Delete Submission
             </Button>
           </div>
         )}
       </div>
+
+      {onDelete && confirmingDelete && (
+        <Modal
+          open={confirmingDelete}
+          onClose={() => setConfirmingDelete(false)}
+          title="Delete submission"
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setConfirmingDelete(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  setConfirmingDelete(false);
+                  onDelete(submission.id);
+                }}
+              >
+                Delete
+              </Button>
+            </>
+          }
+        >
+          <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+            This permanently deletes the submission. This can't be undone.
+          </p>
+        </Modal>
+      )}
     </div>
   );
 }

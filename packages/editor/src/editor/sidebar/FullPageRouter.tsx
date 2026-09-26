@@ -87,7 +87,6 @@ export interface FullPageRouterProps {
   onSwitchToAdd?: () => void;
   onSwitchToDesign?: () => void;
   projectId?: string | null;
-  onSettingsDirtyChange?: (dirty: boolean) => void;
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
@@ -104,7 +103,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onSwitchToAdd,
   onSwitchToDesign,
   projectId,
-  onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
   templatesOpen,
@@ -119,6 +117,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
           <div
             className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
             data-testid="tpl-host"
+            data-bk-surface="fullpage"
           >
             <TemplatesTab
               composer={composer}
@@ -142,7 +141,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
     case "assets":
       return composer ? (
         <Portal>
-          <div className="mgr-host" data-testid="mgr-host">
+          <div className="mgr-host" data-testid="mgr-host" data-bk-surface="fullpage">
             <LibraryManager
               composer={composer}
               onClose={commonTabProps.onClose}
@@ -164,12 +163,12 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
           <div
             className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
             data-testid="set-host"
+            data-bk-surface="fullpage"
           >
             <SettingsTab
               initialScreen={activeSubTab}
               composer={composer}
               projectId={projectId}
-              onDirtyChange={onSettingsDirtyChange}
               openRequest={settingsOpen}
               onOpenDesignTab={onSwitchToDesign}
               onClose={commonTabProps.onClose}

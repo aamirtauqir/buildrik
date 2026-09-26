@@ -56,7 +56,20 @@ describe("IssuesPanel", () => {
 
   it("shows a clean state when there are zero issues", () => {
     renderPanel({ issues: [] });
-    expect(screen.getByText(/no issues/i)).toBeInTheDocument();
+    expect(screen.getByText(/no brand issues/i)).toBeInTheDocument();
+  });
+
+  it("renders an Ignored (n) row per suppressed token, and Restore calls onUnignore", () => {
+    const onUnignore = vi.fn();
+    renderPanel({ suppressedTokenIds: ["color.accent", "color.border"], onUnignore });
+    expect(screen.getByTestId("issues-ignored-row")).toHaveTextContent("Ignored (2)");
+    fireEvent.click(screen.getByTestId("issue-restore-color.accent"));
+    expect(onUnignore).toHaveBeenCalledWith("color.accent");
+  });
+
+  it("renders no Ignored row when nothing is suppressed", () => {
+    renderPanel();
+    expect(screen.queryByTestId("issues-ignored-row")).toBeNull();
   });
 
   it("hands the clicked issue to the locate handler (B9 / SH-63)", () => {
@@ -97,6 +110,28 @@ describe("IssuesPanel", () => {
       expect(screen.getByText(/Missing alt on About/)).toBeInTheDocument();
       expect(screen.getByText("Open issues: 3")).toBeInTheDocument();
     });
+  });
+});
+
+// ── x3: content-scan states ──────────────────────────────────────────────
+describe("IssuesPanel — content-scan states", () => {
+  it("shows nothing extra when scanState is idle (default)", () => {
+    renderPanel();
+    expect(screen.queryByTestId("issues-scan-banner")).not.toBeInTheDocument();
+  });
+
+  it("shows a scanning banner", () => {
+    renderPanel({ scanState: "scanning" });
+    expect(screen.getByTestId("issues-scan-banner")).toHaveTextContent(/scanning/i);
+  });
+
+  it("shows a scan-failed banner with Try again, which calls onRescan", () => {
+    const onRescan = vi.fn();
+    renderPanel({ scanState: "error", onRescan });
+    const banner = screen.getByTestId("issues-scan-banner");
+    expect(banner).toHaveTextContent(/scan failed/i);
+    fireEvent.click(screen.getByRole("button", { name: /try again/i }));
+    expect(onRescan).toHaveBeenCalledTimes(1);
   });
 });
 

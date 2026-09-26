@@ -17,6 +17,7 @@ import { useUploadState } from "./useUploadState";
 import { useDiscoveryState } from "./useDiscoveryState";
 import { useServerStorageQuota } from "./useServerStorageQuota";
 import { endAssetPick, requestAssetPick, useAssetPick, type AssetPickRequest } from "../data/assetPick";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export function useMediaState(composer: Composer): MediaStateResult {
   const { addToast } = useToast();
@@ -299,11 +300,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
 
   const copyUrl = useCallback(
     (item: LibraryItem) => {
-      if (!navigator.clipboard) {
-        showToast("Clipboard not available in this browser", "error");
-        return;
-      }
-      navigator.clipboard.writeText(item.src).then(
+      writeClipboardText(item.src).then(
         () => showToast("URL copied ✓", "success"),
         () => showToast("Could not copy URL", "error")
       );

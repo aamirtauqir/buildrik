@@ -29,15 +29,29 @@ describe("user-template.service", () => {
     siteFindUnique.mockResolvedValueOnce({ workspaceId: "ws1" });
     upsert.mockResolvedValueOnce({});
     const res = await upsertUserTemplate({
-      siteId: "s1", templateId: "user-1", name: "Hero", html: "<p>", css: null, thumbnail: null,
+      siteId: "s1", templateId: "user-1", name: "Hero", html: "<p>Hi</p>", css: null, thumbnail: null,
     });
     expect(res).toEqual({ templateId: "user-1" });
     expect(upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { workspaceId_templateId: { workspaceId: "ws1", templateId: "user-1" } },
-        create: expect.objectContaining({ workspaceId: "ws1", templateId: "user-1", name: "Hero", html: "<p>" }),
+        create: expect.objectContaining({ workspaceId: "ws1", templateId: "user-1", name: "Hero", html: "<p>Hi</p>" }),
       })
     );
+  });
+
+  it("stores the html sanitized, on create and update (S-1a)", async () => {
+    siteFindUnique.mockResolvedValueOnce({ workspaceId: "ws1" });
+    upsert.mockResolvedValueOnce({});
+    await upsertUserTemplate({
+      siteId: "s1", templateId: "user-1", name: "X",
+      html: '<div><iframe srcdoc="<script>x</script>"></iframe><img src="a.png" onerror="alert(1)"></div>',
+    });
+    const { create, update } = upsert.mock.calls[0][0];
+    for (const html of [create.html, update.html]) {
+      expect(html).not.toMatch(/srcdoc|onerror|<iframe/i);
+      expect(html).toContain('src="a.png"');
+    }
   });
 
   it("no-ops the write when the site (and thus workspace) is not found", async () => {

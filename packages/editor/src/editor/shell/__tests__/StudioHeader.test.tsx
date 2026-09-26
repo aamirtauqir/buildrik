@@ -42,17 +42,26 @@ vi.mock("../../../services/ReviewService", () => ({
     reviewsEnabled: null,
     editsRequireApproval: null,
   },
-  // RoleService (P6) resolves the site id through ReviewService — null keeps
-  // the role "unknown" so no chrome gating kicks in during these tests.
-  currentSiteId: vi.fn(() => null),
 }));
+
+// A-22: RoleService and StudioHeader itself now resolve the site id through
+// BuildrikSyncProvider.getSiteIdFromUrl (currentSiteId was a duplicate,
+// deleted) — real jsdom URL has no /edit/<id>, so this resolves to null the
+// same way the old mock forced it to, keeping the role "unknown" so no
+// chrome gating kicks in during these tests.
 
 // P6 role gating — controllable per test; null = unknown (no gating).
 const roleState = vi.hoisted(() => ({ role: null as string | null }));
 let strandedMirrors = 0;
-vi.mock("@/services/syncRetryQueue", () => ({
-  totalPendingMirrors: () => strandedMirrors,
-}));
+/* L3's C-4 stamps added a SyncRetryQueue export (versionSync.ts constructs
+   one at module scope: `new SyncRetryQueue()`) — a mock that only supplies
+   totalPendingMirrors leaves that constructor call reaching `undefined`.
+   importOriginal keeps the real class (and registerPendingSource, etc.)
+   intact and only overrides the one function this test controls. */
+vi.mock("@/services/syncRetryQueue", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/services/syncRetryQueue")>();
+  return { ...actual, totalPendingMirrors: () => strandedMirrors };
+});
 
 vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => roleState.role }));
 
@@ -85,6 +94,7 @@ vi.mock("../modals/CommandPalette", () => ({
 
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 import { deriveLifecycleState } from "../lifecycle";
+import { shellDirty } from "../shellDirtyRegistry";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "../../../shared/utils/editorViewMode";
 import { submitForReview } from "../../../services/ReviewService";
@@ -550,6 +560,21 @@ describe("StudioHeader", () => {
       fireEvent.click(door);
       expect(onOpenReview).toHaveBeenCalledTimes(1);
     });
+
+    /* A-8: with reviewsEnabled false, TabRouter renders `null` for
+       the "review" tab (TabRouter.tsx:239 `if (!reviewsEnabled) return
+       null;`) — the permanent "Review ›" door from the case above led
+       straight into a blank panel. There is nowhere for this door to open
+       to, so it must not render, same as the Comments toggle right above. */
+    it("A-8: reviewsEnabled false — no Review door at all (it would open a blank panel)", () => {
+      const onOpenReview = vi.fn();
+      render(
+        <StudioHeader
+          {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "none", editsRequireApproval: false, reviewsEnabled: false }) })}
+        />,
+      );
+      expect(screen.queryByTestId("topbar-review-pill")).toBeNull();
+    });
   });
 
   /* Rewritten 2026-08-23. These asserted that view mode REPLACED Publish with
@@ -574,6 +599,20 @@ describe("StudioHeader", () => {
       setViewMode({ readOnlyView: false });
       render(<StudioHeader {...makeProps()} />);
       expect(screen.getByRole("button", { name: /^Publish/ })).toBeTruthy();
+    });
+    /* Gap walk 93 #7: the shell search is the ⌘K door, and view mode has no
+       palette (OD-GW-3 keeps it that way for now) — the field did nothing. */
+    const searchComposer = () => ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Home" }) } });
+
+    it("draws no ⌘K search field, since view mode has no palette", () => {
+      render(<StudioHeader {...makeProps({ composer: searchComposer() as never })} />);
+      expect(screen.queryByTestId("topbar-search")).toBeNull();
+    });
+
+    it("keeps the ⌘K search field in the ordinary editor", () => {
+      setViewMode({ readOnlyView: false });
+      render(<StudioHeader {...makeProps({ composer: searchComposer() as never })} />);
+      expect(screen.getByTestId("topbar-search")).toBeTruthy();
     });
   });
 
@@ -696,6 +735,25 @@ describe("StudioHeader", () => {
 
     it("no composer, no Comments toggle — nothing to toggle", () => {
       render(<StudioHeader {...makeProps()} />);
+      expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
+    });
+
+    it("A-8/PD-7/PD-8: reviewsEnabled false disables the Comments toggle — a review-flow tool with nowhere to review from", () => {
+      const composer = {
+        on: vi.fn(),
+        off: vi.fn(),
+        emit: vi.fn(),
+        getProjectMetadata: vi.fn(() => ({ name: "x" })),
+        exportHTML: vi.fn(() => ({ combined: "" })),
+      } as unknown as StudioHeaderProps["composer"];
+      render(
+        <StudioHeader
+          {...makeProps({ composer, reviewStatus: reviewStatus({ reviewsEnabled: false }) })}
+        />,
+      );
+      // No handler means the bar renders no Comments toggle at all —
+      // stronger than a disabled button, since there's genuinely nowhere
+      // for a comment to go review.
       expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
     });
 
@@ -861,6 +919,35 @@ describe("F1 dirty-exit guard", () => {
     await waitFor(() => expect(assign).toHaveBeenCalled());
   });
 
+  // B-1: the exit guard used to check only the project's `isDirty`, so a
+  // staged-but-unsaved Brand token edit (project clean) walked straight out
+  // with no dialog — the same gap the beforeunload tests below close.
+  function brandComposerForExit() {
+    const handlers = new Map<string, Set<(p?: unknown) => void>>();
+    return {
+      on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      }),
+      off: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        handlers.get(ev)?.delete(fn);
+      }),
+      emit: (ev: string, payload?: unknown) => {
+        handlers.get(ev)?.forEach((fn) => fn(payload));
+      },
+    };
+  }
+
+  it("a staged Brand edit with a clean project still opens the exit dialog", () => {
+    const assign = stubLocation();
+    const composer = brandComposerForExit();
+    render(<StudioHeader {...makeProps({ isDirty: false, composer: composer as never })} />);
+    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
+    fireEvent.click(exitBtn());
+    expect(assign).not.toHaveBeenCalled();
+    expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
+  });
+
   it("offline + dirty: Exit goes straight to the risky dialog (5A — never fake-save)", () => {
     render(<StudioHeader {...makeProps({ isDirty: true, isOffline: true })} />);
     fireEvent.click(exitBtn());
@@ -922,6 +1009,79 @@ describe("F1 dirty-exit guard", () => {
     lastProps = makeProps();
     expect(fireBeforeUnload().prevented).toBe(true);
     strandedMirrors = 0;
+  });
+
+  // B-1: a staged Brand edit with a clean project used to leave the native
+  // beforeunload prompt silent too — reload with unsaved token changes lost
+  // them with no warning at all.
+  it("beforeunload prompts on a CLEAN project when Brand has a staged edit", () => {
+    strandedMirrors = 0;
+    const handlers = new Map<string, Set<(p?: unknown) => void>>();
+    const composer = {
+      on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      }),
+      off: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        handlers.get(ev)?.delete(fn);
+      }),
+      emit: (ev: string, payload?: unknown) => {
+        handlers.get(ev)?.forEach((fn) => fn(payload));
+      },
+    };
+    const spy = vi.spyOn(window, "addEventListener");
+    const { unmount } = render(
+      <StudioHeader {...makeProps({ isDirty: false, composer: composer as never })} />,
+    );
+    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
+    const handler = spy.mock.calls.filter(([t]) => t === "beforeunload").pop()?.[1] as (
+      e: Partial<BeforeUnloadEvent>,
+    ) => void;
+    const e = { preventDefault: vi.fn(), returnValue: undefined as unknown };
+    handler(e as unknown as BeforeUnloadEvent);
+    spy.mockRestore();
+    unmount();
+    expect((e.preventDefault as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(0);
+  });
+
+  /* B-1 fix: the exit guard, beforeunload and the chip read the ONE
+     shell dirty registry — a dirty Settings screen or an open CMS record with
+     unsaved fields (project clean) walked out of the editor unprompted while
+     only `isDirty || brandDirty` was consulted. */
+  describe("reads the shell dirty registry", () => {
+    afterEach(() => {
+      act(() => {
+        shellDirty.set("settings", false);
+        shellDirty.set("cms-record", false);
+      });
+    });
+
+    it.each(["settings", "cms-record"] as const)(
+      "%s dirty with a clean project: Exit prompts and beforeunload prevents",
+      (domain) => {
+        strandedMirrors = 0;
+        const assign = stubLocation();
+        act(() => shellDirty.set(domain, true));
+        render(<StudioHeader {...makeProps({ isDirty: false })} />);
+        fireEvent.click(exitBtn());
+        expect(assign).not.toHaveBeenCalled();
+        expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
+        cleanup();
+        lastProps = makeProps({ isDirty: false });
+        expect(fireBeforeUnload().prevented).toBe(true);
+      },
+    );
+
+    it("clean registry and clean project: Exit navigates, beforeunload stays silent", () => {
+      strandedMirrors = 0;
+      const assign = stubLocation();
+      render(<StudioHeader {...makeProps({ isDirty: false })} />);
+      fireEvent.click(exitBtn());
+      expect(assign).toHaveBeenCalled();
+      cleanup();
+      lastProps = makeProps({ isDirty: false });
+      expect(fireBeforeUnload().prevented).toBe(false);
+    });
   });
 });
 

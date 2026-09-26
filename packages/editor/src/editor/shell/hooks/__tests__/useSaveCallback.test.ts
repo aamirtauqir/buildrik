@@ -7,12 +7,19 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { TRPCClientError } from "@trpc/client";
 import { useSaveCallback, type UseSaveCallbackOptions } from "../useSaveCallback";
 
 /* The siteId branch calls the SERVICE's saveProject, not the composer's, so
    the two have to be controllable apart. getSiteIdFromUrl stays real — the
    tests drive it by setting window.location, which is what the hook reads. */
 const svc = vi.hoisted(() => ({ saveProject: vi.fn().mockResolvedValue(undefined) }));
+const invalidateMyRole = vi.hoisted(() => vi.fn());
+vi.mock("@/services/RoleService", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/RoleService")>()),
+  invalidateMyRole,
+}));
+
 vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/services/BuildrikSyncProvider")>();
   return { ...actual, saveProject: svc.saveProject };
@@ -370,8 +377,8 @@ describe("useSaveCallback — an expired session is not a retryable save failure
      why `unsavedRecovery`'s header says a reload otherwise seeds "Saved just
      now" over discarded work. A 401 lands in the same state and can still be
      saved once the user signs in, and it was the only such branch that kept
-     no copy. `missing` and `forbidden` stay uncovered on purpose: nothing can
-     ever be saved to those sites. */
+     no copy. `missing` stays uncovered on purpose: nothing can ever be saved
+     to a deleted site. (`forbidden` is covered since A15-9 — below.) */
   it.each(AUTH_ERRORS)("%s keeps the work for the reload, like a network failure does", async (raw) => {
     const url = new URL("http://localhost:3000/edit/site_auth");
     const original = window.location;
@@ -402,7 +409,10 @@ describe("useSaveCallback — an expired session is not a retryable save failure
     }
   });
 
-  it("FORBIDDEN keeps nothing — a site you cannot save to has no work to restore", async () => {
+  /* A15-9: a mid-session demotion refused the edit. It existed only in this
+     tab; it is kept for the reload (a role can come back), and the cached
+     role that offered the edit is dropped so the next reader asks again. */
+  it("FORBIDDEN keeps the refused work and forgets the cached role", async () => {
     const url = new URL("http://localhost:3000/edit/site_forbidden");
     const original = window.location;
     Object.defineProperty(window, "location", { value: url, writable: true });
@@ -422,7 +432,53 @@ describe("useSaveCallback — an expired session is not a retryable save failure
         await result.current();
         await flushMicrotasks();
       });
-      expect(localStorage.getItem("bk-unsaved-v1-site_forbidden")).toBeNull();
+      expect(localStorage.getItem("bk-unsaved-v1-site_forbidden")).not.toBeNull();
+      expect(invalidateMyRole).toHaveBeenCalled();
+      localStorage.removeItem("bk-unsaved-v1-site_forbidden");
+    } finally {
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
+
+  /* C-9 (live): a VIEWER-demoted save gets the server's TRPCError FORBIDDEN,
+     whose MESSAGE is "Insufficient permissions" (permission.service
+     checkSiteRole) — no "forbidden" or "403" in it. The string-matching
+     helper let it fall through to the generic "Save failed", so keepUnsaved
+     and the role invalidation never ran. The tests above invented messages;
+     this one is the error object tRPC's client actually rejects with. */
+  it("a real TRPCClientError FORBIDDEN (message 'Insufficient permissions') keeps the work", async () => {
+    const url = new URL("http://localhost:3000/edit/site_trpc403");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    localStorage.removeItem("bk-unsaved-v1-site_trpc403");
+    try {
+      const opts = makeOpts();
+      svc.saveProject.mockRejectedValueOnce(
+        TRPCClientError.from({
+          error: {
+            message: "Insufficient permissions",
+            code: -32603,
+            data: { code: "FORBIDDEN", httpStatus: 403, path: "sites.saveProject" },
+          },
+        }),
+      );
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+        }),
+      );
+      await act(async () => {
+        await result.current();
+        await flushMicrotasks();
+      });
+      expect(localStorage.getItem("bk-unsaved-v1-site_trpc403")).not.toBeNull();
+      expect(invalidateMyRole).toHaveBeenCalled();
+      const toast = opts.addToast.mock.calls.at(-1)?.[0] as { title: string };
+      expect(toast.title).toBe("You don't have access to save this site");
+      localStorage.removeItem("bk-unsaved-v1-site_trpc403");
     } finally {
       Object.defineProperty(window, "location", { value: original, writable: true });
     }
@@ -477,6 +533,40 @@ describe("useSaveCallback — an expired session is not a retryable save failure
     // engine's localStorage write, so "saved on this device" would be a lie.
     expect(description).not.toMatch(/on this device|saved locally|will sync/i);
     expect(description).toMatch(/sign in/i);
+  });
+
+  /* I-2: the server refuses a save carrying a page that belongs to another
+     site with BAD_REQUEST (never FORBIDDEN — that reads as a revoked role
+     and drops the tab into view mode). The editor says what happened. */
+  it("a cross-site page refusal says so — no view-mode switch, no role copy", async () => {
+    const opts = makeOpts();
+    const roleInvalidationsBefore = invalidateMyRole.mock.calls.length;
+    opts.saveProject.mockRejectedValueOnce(
+      TRPCClientError.from({
+        error: {
+          message: "This save includes a page that belongs to another site, so it was not applied. Reload the site before editing.",
+          code: -32600,
+          data: { code: "BAD_REQUEST", httpStatus: 400, path: "sites.saveProject" },
+        },
+      }),
+    );
+    const { result } = renderHook(() =>
+      useSaveCallback({
+        composer: opts.composer,
+        addToast: opts.addToast,
+        setSaveState: opts.setSaveState,
+        setIsDirty: opts.setIsDirty,
+      }),
+    );
+    await act(async () => {
+      await result.current();
+      await flushMicrotasks();
+    });
+    expect(invalidateMyRole.mock.calls.length).toBe(roleInvalidationsBefore);
+    const toast = opts.addToast.mock.calls.at(-1)?.[0] as { title: string; description: string };
+    expect(toast.title).toBe("Save failed");
+    expect(toast.description).toMatch(/another site/i);
+    expect(toast.description).toMatch(/reload/i);
   });
 
   it("a plain failure still gets Retry", async () => {

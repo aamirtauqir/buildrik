@@ -587,4 +587,29 @@ describe("RepeaterRenderer", () => {
       expect(renderer.getRepeaterBinding("rep")).toBeNull();
     });
   });
+
+  /* Ldata round 3: a repeated URL attribute takes its value from a CMS entry;
+     a javascript:/data: URL must not reach it (the canvas renders this on the
+     app origin, the published page on the site's). */
+  it("drops a URL attribute whose substituted CMS value is dangerous", async () => {
+    const { composer } = makeComposer({
+      bindings: { rep: makeBinding() },
+      itemsByCollection: {
+        "col-posts": [
+          makeItem("i1", "col-posts", { url: "javascript:alert(1)", img: "data:text/html,x" }),
+          makeItem("i2", "col-posts", { url: "https://ok.test/", img: "https://ok.test/a.png" }),
+        ],
+      },
+    });
+    const html =
+      '<div data-buildrick-id="rep" data-cms-repeater-template="true">' +
+      '<a href="{{item.url}}"><img src="{{item.img}}"></a></div>';
+
+    const doc = parse(await new RepeaterRenderer(composer).expandRepeaters(html));
+    const [bad, good] = Array.from(doc.querySelectorAll("[data-cms-repeater-item]"));
+    expect(bad.querySelector("a")!.hasAttribute("href")).toBe(false);
+    expect(bad.querySelector("img")!.hasAttribute("src")).toBe(false);
+    expect(good.querySelector("a")!.getAttribute("href")).toBe("https://ok.test/");
+    expect(good.querySelector("img")!.getAttribute("src")).toBe("https://ok.test/a.png");
+  });
 });

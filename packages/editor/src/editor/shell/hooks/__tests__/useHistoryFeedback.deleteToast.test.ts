@@ -46,7 +46,7 @@ function makeComposer(selected: string[], elements: Record<string, { type: strin
           : null;
       },
     },
-    history: { undo: vi.fn(), redo: vi.fn() },
+    history: { undo: vi.fn(), redo: vi.fn(), captureUndo: vi.fn(() => vi.fn()) },
   };
 }
 
@@ -148,11 +148,34 @@ describe("undo/redo toasts always carry the reverse action", () => {
 
   it("non-destructive redo still offers Undo", () => {
     const c = makeComposer([], {});
+    const bound = vi.fn(() => true);
+    c.history.captureUndo = vi.fn(() => bound);
     renderHook(() => useHistoryFeedback(c as never, addToast as never));
     c.emit(EVENTS.HISTORY_REDO, { entry: { label: "style-change" } });
     const t = addToast.mock.calls[0][0] as { action?: { label?: string; onClick?: () => void } };
     expect(t.action?.label).toBe("Undo");
     t.action?.onClick?.();
-    expect(c.history.undo).toHaveBeenCalledTimes(1);
+    expect(bound).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* A-4 (verify pass 3): the delete toast's Undo called bare history.undo(),
+   which reverted a NEWER edit and left the element deleted. It is now bound to
+   the delete via history.captureUndo(), captured when the toast is raised. */
+describe("the delete toast's Undo is bound to the delete", () => {
+  it("captures the undo when the toast is raised, and a refusal says why", () => {
+    const c = makeComposer(["a"], { a: { type: "image", children: 0 } });
+    const bound = vi.fn(() => true);
+    const captureUndo = vi.fn(() => bound);
+    Object.assign(c.history, { captureUndo });
+    const toasts = run(c) as { action?: { onClick?: () => void } }[];
+    expect(captureUndo).toHaveBeenCalledTimes(1);
+    toasts[0].action?.onClick?.();
+    expect(bound).toHaveBeenCalledTimes(1);
+    expect(c.history.undo).not.toHaveBeenCalled();
+
+    addToast.mockClear();
+    c.emit(EVENTS.HISTORY_NOOP, { direction: "undo", superseded: "delete" });
+    expect(addToast.mock.calls[0][0].description).toMatch(/^Can't undo deleted element from here — newer edits came after it/);
   });
 });

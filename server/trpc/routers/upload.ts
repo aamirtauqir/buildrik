@@ -14,6 +14,7 @@ export const uploadRouter = router({
       if (e instanceof Error && e.message === "INVALID_FORMAT") throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid file format for this upload type." });
       if (e instanceof Error && e.message === "FILE_TOO_LARGE") throw new TRPCError({ code: "BAD_REQUEST", message: "File exceeds size limit." });
       if (e instanceof Error && e.message === "SITE_REQUIRED") throw new TRPCError({ code: "BAD_REQUEST", message: "This upload type needs a siteId." });
+      if (e instanceof Error && e.message === "SITE_NOT_ALLOWED") throw new TRPCError({ code: "BAD_REQUEST", message: "This upload type does not take a siteId." });
       if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
       throw e;
     }

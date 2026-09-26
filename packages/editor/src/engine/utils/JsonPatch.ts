@@ -324,17 +324,28 @@ function escapeJsonPointer(segment: string): string {
 }
 
 /**
- * Parse JSON pointer path into segments
+ * Keys that reach an object's prototype chain instead of the object. A patch
+ * path through one (`/__proto__/polluted`) wrote onto `Object.prototype` in
+ * every collaborator's browser (audit A16-6); patches arrive from other users.
+ */
+const PROTOTYPE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+/**
+ * Parse JSON pointer path into segments. Throws on a prototype key.
  */
 function parseJsonPointer(path: string): string[] {
   if (path === "" || path === "/") {
     return [];
   }
 
-  return path
+  const segments = path
     .split("/")
     .slice(1) // Remove leading empty string from split
     .map((s) => s.replace(/~1/g, "/").replace(/~0/g, "~"));
+  if (segments.some((s) => PROTOTYPE_KEYS.has(s))) {
+    throw new Error(`Refused patch path through a prototype key: ${path}`);
+  }
+  return segments;
 }
 
 /**
@@ -362,6 +373,7 @@ function deepCloneValue<T>(value: T): T {
 
   const result: Record<string, unknown> = {};
   for (const key of Object.keys(value as Record<string, unknown>)) {
+    if (PROTOTYPE_KEYS.has(key)) continue;
     result[key] = deepCloneValue((value as Record<string, unknown>)[key]);
   }
   return result as T;

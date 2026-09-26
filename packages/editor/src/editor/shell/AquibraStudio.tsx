@@ -38,13 +38,18 @@ import { hydrateUserTemplatesFromServer } from "@/services/templateSync";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { RecoveryBanner } from "./RecoveryBanner";
+import { useTabSwitchGuard } from "./hooks/useTabSwitchGuard";
+import type { DirtyDomain } from "./shellDirtyRegistry";
+import { useViewerChrome } from "./hooks/useEditorRole";
+import { isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
+import { UnsavedTabSwitchDialog } from "./modals/UnsavedTabSwitchDialog";
 import { LoadErrorBanner, type LoadErrorKind } from "./LoadErrorBanner";
 import { IssuesPanel } from "./IssuesPanel";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
-import { exportPublishPages } from "./exportPublishPages";
+import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
 import { submitForReview } from "../../services/ReviewService";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
@@ -52,6 +57,7 @@ import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
+import { useIssuesFeed } from "./hooks/useIssuesFeed";
 import { StudioHeader } from "./StudioHeader";
 import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
@@ -137,6 +143,13 @@ class StudioErrorBoundary extends React.Component<
   }
 }
 
+/** How a failed "Leave anyway" discard names its surface in the toast. */
+const DISCARD_SURFACE: Record<DirtyDomain, string> = {
+  settings: "Settings",
+  brand: "brand",
+  "cms-record": "record",
+};
+
 const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   licenseKey: _licenseKey,
   options,
@@ -154,6 +167,39 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const state = useStudioState();
   const modals = useStudioModals();
   const blocks: BlockData[] = React.useMemo(() => getBlockDefinitions(), []);
+
+  /* B-1: every left-panel tab-switch door gets these two guarded sinks, never
+     the raw `state.setLeftPanelTab` / `state.openLeftPanelToTab` — the rail,
+     ui:switch-tab and StudioPanels' open requests (setLeftPanelTab), and ⌘H,
+     ⇧A, the palette, UI_PANEL_OPEN and every onOpen* deep link
+     (openLeftPanelToTab). A switch that would unmount unsaved Settings or CMS
+     record work (shellDirtyRegistry) prompts first. The VIEWER gate stays in
+     the sinks themselves (useStudioState); a switch it refuses is not
+     prompted for. */
+  const viewerChrome = useViewerChrome();
+  const isTabAllowed = React.useCallback(
+    (tab: string) => isTabAllowedForViewer(tab as GroupedTabId, viewerChrome),
+    [viewerChrome],
+  );
+  const onDiscardFailed = React.useCallback(
+    (domains: DirtyDomain[]) =>
+      domains.forEach((d) =>
+        addToast({ tone: "error", description: `Couldn't discard ${DISCARD_SURFACE[d]} changes` }),
+      ),
+    [addToast],
+  );
+  const {
+    setLeftPanelTab: guardedSetLeftPanelTab,
+    openLeftPanelToTab: guardedOpenLeftPanelToTab,
+    dialogProps: tabSwitchDialogProps,
+  } = useTabSwitchGuard({
+    leftPanelTab: state.leftPanelTab,
+    leftPanelSubTabs: state.leftPanelSubTabs,
+    setLeftPanelTab: state.setLeftPanelTab,
+    openLeftPanelToTab: state.openLeftPanelToTab,
+    isTabAllowed,
+    onDiscardFailed,
+  });
 
   // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).
   const [loadError, setLoadError] = React.useState<LoadErrorKind>(null);
@@ -221,17 +267,27 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
    * chrome. The command reported success and the screen stayed put. They open
    * the overlay now, and toggle it closed if it is already up.
    */
+  const previewOpenRef = React.useRef(false);
+  previewOpenRef.current = previewHtml != null;
   React.useEffect(() => {
     if (!composer) return;
+    /* Building is async now — CMS bindings resolve as publish resolves them
+       (renderPreviewHtml) — so a toggle that lands while one is building
+       supersedes it instead of opening a stale preview. */
+    let run = 0;
     const handle = () => {
-      setPreviewHtml((current) => {
-        if (current != null) return null;
-        const raw = composer.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
-        return sanitizeHTMLForPreview(raw);
+      const mine = ++run;
+      if (previewOpenRef.current) {
+        setPreviewHtml(null);
+        return;
+      }
+      void renderPreviewHtml(composer).then((html) => {
+        if (mine === run) setPreviewHtml(sanitizeHTMLForPreview(html));
       });
     };
     composer.on(EVENTS.UI_TOGGLE_PREVIEW, handle);
     return () => {
+      run += 1;
       composer.off(EVENTS.UI_TOGGLE_PREVIEW, handle);
     };
   }, [composer]);
@@ -259,9 +315,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     modals,
     state: {
-      setLeftPanelTab: state.setLeftPanelTab,
+      setLeftPanelTab: guardedSetLeftPanelTab,
       setIsLeftPanelOpen: state.setIsLeftPanelOpen,
-      openLeftPanelToTab: state.openLeftPanelToTab,
+      openLeftPanelToTab: guardedOpenLeftPanelToTab,
       setShowSpacingIndicators: state.setShowSpacingIndicators,
       setShowBadges: state.setShowBadges,
       setShowGuides: state.setShowGuides,
@@ -325,31 +381,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }, [composer]);
 
   // The Issues panel had a state slot but no producer, so it rendered "No
-  // issues" no matter how many the DS linter had found. Bridge the one real
-  // source we have (designSystem.lintState) into it, and keep it live — the
-  // linter re-runs on token edits and emits 'lint:changed'.
-  const setIssues = state.setIssues;
-  React.useEffect(() => {
-    const lint = composer?.designSystem?.lintState;
-    if (!lint) return;
-    const sync = () => {
-      setIssues(
-        lint.getAllVisibleIssues().map(({ tokenId, issue }) => ({
-          id: `${tokenId}:${issue.type}`,
-          type: issue.severity === "error" ? ("error" as const) : ("warning" as const),
-          message: issue.message,
-          tokenId,
-          autoFixHint: issue.autoFixHint,
-          location: `Brand › ${tokenId}`,
-        })),
-      );
-    };
-    sync();
-    lint.on("lint:changed", sync);
-    return () => {
-      lint.off("lint:changed", sync);
-    };
-  }, [composer, setIssues]);
+  // issues" no matter how many the DS linter had found. `useIssuesFeed`
+  // bridges DS-lint (designSystem.lintState) live, and — B-15 / A02-9's
+  // decision-free fix — folds in the page-content scanner (missing alt,
+  // broken links) and the SAME pre-publish check list the Publish panel
+  // renders verbatim, so Issues and Publish stop disagreeing about what's
+  // wrong with the site.
+  const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues);
 
   // 60-save-states: track connectivity so the topbar can reassure "changes
   // queued, will sync" instead of looking like a failed/lost save.
@@ -377,20 +415,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
     return () => window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
   }, []);
-
-  // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
-  useEditorShortcuts({
-    composer,
-    modals,
-    saveProject,
-    openLeftPanelToTab: state.openLeftPanelToTab,
-    /* FC-11: same door the site menu's "Site settings" row uses — both go
-       straight to the Settings tab now, the way S and ⌘K already did. This
-       used to round-trip through a `showProjectSettings` flag that
-       StudioModals immediately converted back into this same call and
-       cleared — a modal that never rendered a modal. */
-    openSiteSettings: () => state.openLeftPanelToTab("settings"),
-  });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
   // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook
@@ -429,6 +453,29 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     lastPublishedAt: publishJob.lastPublishedAt,
     serverHasUnpublishedChanges: publishJob.hasUnpublishedChanges,
     serverBlock: publishJob.blockedReason,
+    saveConflict: state.saveState.status === "conflict",
+  });
+
+  // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1).
+  // Moved below useLifecycle so it can gate the C/comment-mode shortcut on
+  // reviewsEnabled (A-8/PD-7/PD-8) — the same flag StudioHeader/TabRouter
+  // already gate the comments toggle and Review rail tab on.
+  useEditorShortcuts({
+    composer,
+    modals,
+    saveProject,
+    openLeftPanelToTab: guardedOpenLeftPanelToTab,
+    /* FC-11: same door the site menu's "Site settings" row uses — both go
+       straight to the Settings tab now, the way S and ⌘K already did. This
+       used to round-trip through a `showProjectSettings` flag that
+       StudioModals immediately converted back into this same call and
+       cleared — a modal that never rendered a modal. */
+    openSiteSettings: () => guardedOpenLeftPanelToTab("settings"),
+    // reviewsEnabled is `boolean | null` before the status resolves (see
+    // ReviewStatus) — treat "unknown yet" the same as "on" (the hook's own
+    // default), never as "off": the C shortcut should not go dead for the
+    // brief window before the first status fetch lands.
+    reviewsEnabled: reviewStatus.reviewsEnabled ?? true,
   });
 
   /* ── The publish door (B4 — ONE confirm door, both entrances) ─────────────
@@ -536,12 +583,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
      swaps it in for ProInspector the same way it swaps in the AI drill-in.
      Built here (not in StudioPanels) because it needs `requestBrandToken`
      and `composer.designSystem`, both already in scope on this component. */
-  const issuesPanel = issuesOpen ? (
+  /* StudioPanels supplies the back row's action: "‹ Inspector" also shows a
+     hidden inspector, a state that lives there (M-1). */
+  const renderIssuesPanel = (onBack: () => void) => (
     <IssuesPanel
       issues={state.issues}
       activePageId={activePageId}
       onClose={() => setIssuesOpen(false)}
-      onBack={() => setIssuesOpen(false)}
+      onBack={onBack}
       /* B9 / SH-63 — a row click lands on the canvas: the element the
          issue names, else the first element that uses its token (the
          engine's usage tracker knows), else the Brand panel where the
@@ -572,8 +621,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         else composer.emit("ui:switch-tab", { tab: "design" });
       }}
       onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
+      onUnignore={(tokenId) => composer.designSystem.lintState.unsuppress(tokenId)}
+      suppressedTokenIds={composer.designSystem.lintState.suppressedIds()}
+      scanState={issuesFeed.scanState}
+      onRescan={issuesFeed.rescan}
     />
-  ) : null;
+  );
 
   return (
     <div
@@ -616,14 +669,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
           // canvas selection itself, so no element context needs threading.
           onShowExporter={modals.openExporter}
-          onOpenProjectSettings={() => state.openLeftPanelToTab("settings")}
-          onOpenPublish={() => state.openLeftPanelToTab("publish")}
-          onOpenHistory={() => state.openLeftPanelToTab("history")}
-          onOpenPages={() => state.openLeftPanelToTab("pages")}
+          onOpenProjectSettings={() => guardedOpenLeftPanelToTab("settings")}
+          onOpenPublish={() => guardedOpenLeftPanelToTab("publish")}
+          onOpenHistory={() => guardedOpenLeftPanelToTab("history")}
+          onOpenPages={() => guardedOpenLeftPanelToTab("pages")}
           onCloseDrawer={() => state.setIsLeftPanelOpen(false)}
-          onOpenActivity={() => state.openLeftPanelToTab("activity")}
+          onOpenActivity={() => guardedOpenLeftPanelToTab("activity")}
           onOpenIssues={() => setIssuesOpen(true)}
-          onOpenReview={() => state.openLeftPanelToTab("review")}
+          onOpenReview={() => guardedOpenLeftPanelToTab("review")}
           onOpenConflict={() => setConflict((c) => (c ? { ...c, open: true } : c))}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
@@ -654,7 +707,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onLeftPanelToggle={() => state.setIsLeftPanelOpen((v) => !v)}
         leftPanelTab={state.leftPanelTab}
         leftPanelSubTab={state.leftPanelSubTabs[state.leftPanelTab]}
-        onLeftPanelTabChange={state.setLeftPanelTab}
+        onLeftPanelTabChange={guardedSetLeftPanelTab}
         onLeftPanelSubTabChange={(subTab) =>
           state.setLeftPanelSubTabs((prev) => ({ ...prev, [state.leftPanelTab]: subTab }))
         }
@@ -695,7 +748,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         nextMove={nextMove}
         onRequestPublish={requestPublish}
         issuesOpen={issuesOpen}
-        issuesPanel={issuesPanel}
+        renderIssuesPanel={renderIssuesPanel}
         onCloseIssues={() => setIssuesOpen(false)}
         // FB-4: closes Review's ⌘K row, "R" shortcut and panel render when
         // the server's agency review layer is off — the topbar pill stays
@@ -735,6 +788,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       <ConflictModal
         open={!!conflict?.open}
+        siteId={getSiteIdFromUrl()}
         onClose={() => setConflict((c) => (c ? { ...c, open: false } : c))}
         onReload={() => window.location.reload()}
         onSaveBackup={() => {
@@ -773,6 +827,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       {/* First-time onboarding checklist (gated to new users by the orchestrator). */}
       <OnboardingMount composer={composer} />
+
+      {/* B-1: the shared tab-switch guard's confirm — Settings/Brand/CMS
+          record dirty, caught before ⌘H, ⇧A, the palette, ui:switch-tab or
+          UI_PANEL_OPEN silently discards it. */}
+      <UnsavedTabSwitchDialog {...tabSwitchDialogProps} />
 
       {/* Stale-approval gate (contracts §1.5, S5.6 board 131:201): the site
           changed after the client approved it. The modal itemizes the changed

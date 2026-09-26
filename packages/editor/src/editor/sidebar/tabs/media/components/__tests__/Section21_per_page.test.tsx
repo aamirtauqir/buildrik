@@ -108,6 +108,14 @@ describe("§21 — per-page replace selection (board 1164:4738)", () => {
     expect(btn.disabled).toBe(true);
   });
 
+  it("B-7/A13-10: moves focus into the dialog on open and closes on Escape", async () => {
+    const { onClose } = mount();
+    await flush();
+    expect(screen.getByTestId("rx-dialog")).toContainElement(document.activeElement as HTMLElement);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it("shows empty state when asset not used on any page", () => {
     const composer = makeComposer();
     (composer.mediaOps.getUsagesByPage as unknown as () => Map<string, unknown[]>) = () => new Map();

@@ -13,6 +13,7 @@ import type {
   Override,
   OverrideType,
 } from "../../shared/types/components";
+import { isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
 import type { Patch } from "../utils/JsonPatch";
 
@@ -32,6 +33,19 @@ import type { Patch } from "../utils/JsonPatch";
 // long as the master structure is unchanged — which is the F1a target case
 // (master edited without reorder/insert). Reorder/insert survival is F1b
 // (stable slotKey) and out of scope here.
+
+/**
+ * The entries of a stored overrides value that are ops at all — an object
+ * with a string `path`. Stored instances are unchecked JSON; a null entry or
+ * a numeric path threw in every reader (getStyles runs one per element).
+ */
+export function usableOverrides(value: unknown): Patch {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (op): op is Patch[number] =>
+      typeof op === "object" && op !== null && "path" in op && typeof op.path === "string"
+  );
+}
 
 /** Parse a canonical `#/<elementPath>/<type>/<property>` override path. */
 function parseCanonicalOverridePath(
@@ -67,27 +81,37 @@ function resolveNodeByElementPath(tree: ElementData, elementPath: string): Eleme
   return node;
 }
 
-/** Write one override value into the correct bucket of an ElementData node. */
+/**
+ * Write one override value into the correct bucket of an ElementData node.
+ * Returns false when the override is refused.
+ *
+ * Overrides come from the stored project (`componentInstance.overrides`) and
+ * land in a tree that is pasted and rendered as-is, so this is an ingest
+ * boundary like importProject: content goes through the content sanitizer, an
+ * attribute through the same name/value rule the serializer applies (A19-1).
+ */
 function applyOverrideToNode(
   node: ElementData,
   type: OverrideType,
   property: string,
   value: unknown
-): void {
+): boolean {
   switch (type) {
     case "style":
       node.styles = { ...(node.styles ?? {}), [property]: value as string };
-      break;
+      return true;
     case "content":
-      node.content = value as string;
-      break;
+      if (typeof value !== "string") return false;
+      node.content = sanitizeHTML(value);
+      return true;
     case "attribute":
-      node.attributes = { ...(node.attributes ?? {}), [property]: value as string };
-      break;
+      if (typeof value !== "string" || !isSafeAttrValue(property, value, node.tagName ?? "")) return false;
+      node.attributes = { ...(node.attributes ?? {}), [property]: value };
+      return true;
     case "trait": {
       const trait = node.traits?.find((t) => t.name === property);
       if (trait) trait.value = value as typeof trait.value;
-      break;
+      return true;
     }
   }
 }
@@ -96,8 +120,8 @@ function applyOverrideToNode(
  * Re-apply an instance's stored overrides onto a (freshly cloned) element tree,
  * in place. Returns how many applied vs. dropped (orphaned — the master element
  * the override targeted no longer exists at that position). Dropping is surfaced,
- * never silent (F1a #2). This is the SSOT override-application path used by both
- * sync (re-clone) and detach.
+ * never silent (F1a #2). This is the SSOT override-application path; sync
+ * (re-clone) is its caller — detach and reset apply no overrides.
  */
 export function applyOverridesToTree(
   tree: ElementData,
@@ -110,7 +134,7 @@ export function applyOverridesToTree(
      later master update re-reports the same lost edit — a warning that cries
      wolf is worse than the silence it replaced. */
   const kept: Patch = [];
-  for (const op of overrides) {
+  for (const op of usableOverrides(overrides)) {
     const parsed = parseCanonicalOverridePath(op.path);
     if (!parsed) {
       dropped++;
@@ -121,7 +145,10 @@ export function applyOverridesToTree(
       dropped++;
       continue;
     }
-    applyOverrideToNode(node, parsed.type, parsed.property, (op as { value?: unknown }).value);
+    if (!applyOverrideToNode(node, parsed.type, parsed.property, (op as { value?: unknown }).value)) {
+      dropped++;
+      continue;
+    }
     applied++;
     kept.push(op);
   }

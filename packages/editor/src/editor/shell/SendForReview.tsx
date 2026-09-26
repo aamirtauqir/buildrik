@@ -19,6 +19,7 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "@/shared/constants/events";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface SendForReviewProps {
   composer: Composer | null;
@@ -260,8 +261,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
                 color="light"
                 size="xs"
                 onClick={() => {
-                  void navigator.clipboard
-                    ?.writeText(reviewUrl)
+                  void writeClipboardText(reviewUrl)
                     .then(() => setLinkCopied(true))
                     .catch(() => setLinkCopied(false));
                 }}

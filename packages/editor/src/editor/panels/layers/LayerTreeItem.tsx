@@ -152,6 +152,16 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     .join(" ");
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    /* L-4: the global shortcut listener stands down inside role=tree, so
+       Delete here did nothing. The row runs the canvas's own "delete"
+       command (lock / instance rules, multi-select confirm, one undo step).
+       Only when the row itself has focus — never from the rename field. */
+    if ((e.key === "Delete" || e.key === "Backspace") && e.target === e.currentTarget) {
+      e.preventDefault();
+      if (!isSelected) onSelect(layer.id, {});
+      composer?.commands.run("delete");
+      return;
+    }
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onSelect(layer.id, {});
@@ -174,7 +184,15 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
       const delta = e.key === "ArrowDown" ? 1 : -1;
       const nextIndex = (currentIndex + delta + visibleIds.length) % visibleIds.length;
       const nextId = visibleIds[nextIndex];
-      if (nextId) onSelect(nextId, {});
+      if (nextId) {
+        onSelect(nextId, {});
+        /* B-9: this handler only fires from a keydown already targeting a
+           row inside the tree, so focus is known to be here — move it with
+           the selection (roving tabindex) instead of leaving it stranded on
+           the row that was just deselected (tabIndex -1 once isSelected
+           flips false below). */
+        document.querySelector<HTMLElement>(`[data-testid="layer-row-${nextId}"]`)?.focus();
+      }
     }
   };
 
@@ -183,11 +201,15 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
       <div
         className={rowClassNames}
         role="treeitem"
-        tabIndex={0}
+        /* B-9: roving tabindex — every row at tabIndex 0 meant Tab walked the
+           WHOLE tree one row at a time instead of leaving it after one stop.
+           Only the selected row (or, with nothing selected, the first
+           visible row) is in the Tab order; arrow keys move within it. */
+        tabIndex={isSelected || (selectedIds.size === 0 && getVisibleLayerIds()[0] === layer.id) ? 0 : -1}
         draggable={canDrag}
         aria-selected={isSelected}
         aria-expanded={hasChildren ? isExpanded : undefined}
-        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", hidden" : ""}${isLocked ? ", locked" : ""}`}
+        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", dimmed in editor" : ""}${isLocked ? ", locked" : ""}`}
         aria-level={layer.depth + 1}
         title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
         style={rowStyle}

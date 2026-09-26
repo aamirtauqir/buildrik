@@ -21,11 +21,26 @@ function slugify(name: string): string {
 export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProps) {
   const [name, setName] = useState("My New Site");
   const [debouncedSlug, setDebouncedSlug] = useState("");
+  // onSubmit hands off to the parent's sites.create mutation, whose
+  // isPending isn't visible here — a fast double-click on "Start from
+  // Scratch" fired two `sites.create` calls before the first response
+  // closed the modal. Guard locally and reset whenever the modal reopens.
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open) setSubmitting(false);
+  }, [open]);
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSlug(slugify(name)), 300);
     return () => clearTimeout(id);
   }, [name]);
+
+  function submitOnce(data: { name: string; method: string }) {
+    if (submitting) return;
+    setSubmitting(true);
+    onSubmit(data);
+  }
 
   const slugCheck = trpc.sites.checkSlug.useQuery(
     { slug: debouncedSlug },
@@ -100,11 +115,11 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         </div>
       ) : (
         <div className="mt-6 space-y-3">
-          <button onClick={() => onSubmit({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
+          <button disabled={submitting} onClick={() => submitOnce({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-60" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><LayoutTemplate className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
             <div><p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Use a Template</p><p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ templates</p></div>
           </button>
-          <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/50" style={{ borderColor: "var(--color-border-default)" }}>
+          <button disabled={submitting} onClick={() => submitOnce({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/50 disabled:opacity-60" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}><Sparkles className="h-5 w-5" style={{ color: "var(--color-primary)" }} /></div>
             <div className="flex-1">
               <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
@@ -124,7 +139,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
               </div>
             )}
           </button>
-          <button onClick={() => onSubmit({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
+          <button disabled={submitting} onClick={() => submitOnce({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-60" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><Plus className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
             <div><p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p><p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Full creative control</p></div>
           </button>

@@ -1,6 +1,8 @@
 import { type NextRequest } from "next/server";
 import { auth } from "@server/auth";
 import { prisma } from "@lib/prisma";
+import { getPublishStatus } from "@server/services/publish.service";
+import { assertSiteAccess, PermissionError } from "@server/services/permission.service";
 
 export const dynamic = "force-dynamic";
 
@@ -33,23 +35,27 @@ export async function GET(
         );
       }
 
-      // Send current state immediately
-      let job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
+      // Send current state immediately — getPublishStatus's explicit select
+      // NEVER includes the `log` column (raw page HTML payload).
+      let job = await getPublishStatus(jobId);
       if (!job) {
         send("error", { message: "Job not found" });
         controller.close();
         return;
       }
 
-      // Verify the requesting user is a member of the job's workspace
-      const isMember = await prisma.workspaceMember.findFirst({
-        where: { workspaceId: job.workspaceId, userId },
-        select: { id: true },
-      });
-      if (!isMember) {
-        send("error", { message: "Forbidden" });
-        controller.close();
-        return;
+      // Verify the requesting user has (ACTIVE, site-scoped) access to the
+      // job's site — was a bare workspace-membership findFirst with no ACTIVE
+      // filter and no site-scope check (S-10).
+      try {
+        await assertSiteAccess(prisma, userId, job.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) {
+          send("error", { message: "Forbidden" });
+          controller.close();
+          return;
+        }
+        throw e;
       }
       send("status", job);
 
@@ -68,7 +74,7 @@ export async function GET(
             controller.close();
             return;
           }
-          const updated = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
+          const updated = await getPublishStatus(jobId);
           if (!updated) {
             clearInterval(interval);
             controller.close();

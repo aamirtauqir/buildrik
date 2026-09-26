@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Copy, Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { shareUrl } from "@lib/utils";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
 import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 
@@ -24,6 +25,8 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
   const { addToast } = useToast();
   const [name, setName] = useState("Draft preview");
   const [password, setPassword] = useState("");
+  const nameId = useId();
+  const passwordId = useId();
   const [expiryDays, setExpiryDays] = useState("7");
   const [createdUrl, setCreatedUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -55,9 +58,14 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
 
   function handleCopy() {
     if (!createdUrl) return;
-    navigator.clipboard.writeText(`https://${createdUrl}`);
-    setCopied(true);
-    addToast("success", "Link copied");
+    const link = `https://${createdUrl}`;
+    writeClipboardText(link).then(
+      () => {
+        setCopied(true);
+        addToast("success", "Link copied");
+      },
+      () => addToast("error", "Couldn't copy the link", link),
+    );
   }
 
   const expiresInDays = expiryDays && expiryDays !== "0" ? Number(expiryDays) : undefined;
@@ -107,8 +115,9 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Link name</label>
+                <label htmlFor={nameId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Link name</label>
                 <InputField
+                  id={nameId}
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -118,11 +127,12 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
               </div>
 
               <div>
-                <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+                <label htmlFor={passwordId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                   Password{" "}
                   <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>(optional)</span>
                 </label>
                 <InputField
+                  id={passwordId}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

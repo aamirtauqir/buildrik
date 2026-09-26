@@ -29,6 +29,7 @@ vi.mock("@/services/api-client", () => ({
 }));
 
 import { AdvancedScreen } from "../AdvancedScreen";
+import { SiteColumnsLockedContext } from "../../shared";
 
 const getMock = api.siteDetail.settings.get.query;
 
@@ -48,6 +49,8 @@ function setup(opts: {
   onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
   saveError?: string | null;
   settings?: Record<string, unknown>;
+  /** M7: the viewer's known role is below ADMIN. */
+  siteColumnsLocked?: boolean;
 } = {}) {
   const composer = createMockComposer({ projectSettings: opts.settings ?? {} });
   const utils = render(
@@ -59,6 +62,11 @@ function setup(opts: {
       onLoadStateChange={opts.onLoadStateChange}
       saveError={opts.saveError}
     />,
+    {
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <SiteColumnsLockedContext.Provider value={opts.siteColumnsLocked ?? false}>{children}</SiteColumnsLockedContext.Provider>
+      ),
+    },
   );
   return { composer, ...utils };
 }
@@ -310,5 +318,18 @@ describe("AdvancedScreen — dirty wiring + flush handler", () => {
       bodyScripts: "<script>b()</script>",
       globalCss: ".c { top: 0; }",
     });
+  });
+});
+
+/* M7: Global CSS is project data, not a Site column — an EDITOR
+   could always edit it. Only head/body code are mirrored to Site columns. */
+describe("AdvancedScreen — Site-column fields below ADMIN", () => {
+  it("locks head and body code with the reason; Global CSS stays editable", async () => {
+    setup({ siteColumnsLocked: true });
+    await waitFor(() => expect(headBox()).toBeInTheDocument());
+    expect(headBox().matches(":disabled")).toBe(true);
+    expect(bodyBox().matches(":disabled")).toBe(true);
+    expect(screen.getAllByTestId("set-admin-only").length).toBe(2);
+    expect(cssBox().matches(":disabled")).toBe(false);
   });
 });

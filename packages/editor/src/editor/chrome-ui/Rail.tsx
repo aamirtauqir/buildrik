@@ -17,7 +17,7 @@ export function Rail({ label = "Editor tools", className, children, ...rest }: R
   return (
     <nav
       className={[
-        "tw:w-[60px] tw:flex-none tw:flex tw:flex-col tw:items-center tw:gap-1 tw:py-2 tw:bg-[var(--bk-gray-100)] tw:border-r tw:border-[var(--bk-gray-200)]",
+        "tw:w-[var(--bk-size-rail)] tw:flex-none tw:flex tw:flex-col tw:items-center tw:gap-1 tw:py-2 tw:bg-[var(--bk-gray-100)] tw:border-r tw:border-[var(--bk-gray-200)]",
         className,
       ]
         .filter(Boolean)

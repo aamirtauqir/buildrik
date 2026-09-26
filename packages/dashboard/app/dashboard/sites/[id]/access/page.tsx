@@ -6,6 +6,7 @@ import { AccessTab } from "@/components/site-detail/access-tab";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { ErrorState } from "@/components/states";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
+import { ROLE_RANK, type UserRoleType } from "@lib/constants/enums";
 
 export default function SiteAccessPage() {
   const params = useParams();
@@ -13,6 +14,13 @@ export default function SiteAccessPage() {
   const { addToast } = useToast();
 
   const linksQuery = trpc.siteDetail.sharing.list.useQuery({ siteId });
+  // sharing.revoke requires ADMIN on the server (checkSiteRole in
+  // site-detail.ts) — Revoke must not render for anyone below that, not
+  // just VIEWER. myRole is the same effective-role resolver the chrome
+  // already uses to disable controls the server would refuse (sites.ts
+  // comment above myRole).
+  const roleQuery = trpc.sites.myRole.useQuery({ siteId });
+  const canRevoke = roleQuery.data ? ROLE_RANK[roleQuery.data.role as UserRoleType] >= ROLE_RANK.ADMIN : false;
   // settings.get returns the workspace `plan`; overview does NOT — reading it
   // off overview silently collapsed every workspace to FREE (share-link
   // passwords disabled, expiry capped) regardless of the real plan.
@@ -58,6 +66,7 @@ export default function SiteAccessPage() {
       onRevokeLink={(id) => revokeMutation.mutate({ id })}
       maxExpiryDays={planLimits.shareLinkExpiryMaxDays as number}
       allowPasswords={!!planLimits.shareLinkPasswords}
+      canRevoke={canRevoke}
     />
   );
 }

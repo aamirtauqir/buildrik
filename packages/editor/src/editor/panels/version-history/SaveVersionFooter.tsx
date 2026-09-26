@@ -11,10 +11,15 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { Button, useToast } from "@/editor/chrome-ui";
+import { Button, Tooltip, useToast } from "@/editor/chrome-ui";
 import { SaveVersionModal } from "./SaveVersionModal";
 
-export const SaveVersionFooter: React.FC<{ composer: Composer | null }> = ({ composer }) => {
+export const SaveVersionFooter: React.FC<{
+  composer: Composer | null;
+  /** FC-9 (fix-all 2026-09-25): set for a viewer — the footer disables and
+   *  explains rather than disappearing. */
+  disabledReason?: string;
+}> = ({ composer, disabledReason }) => {
   const [open, setOpen] = React.useState(false);
   const { addToast, removeToast } = useToast();
 
@@ -44,6 +49,21 @@ export const SaveVersionFooter: React.FC<{ composer: Composer | null }> = ({ com
             label only in a tooltip, so the one action that creates a NAMED
             version (the kind the prune rule promises never to remove)
             announced itself as an unlabelled dot. */}
+        {disabledReason ? (
+          <Tooltip content={disabledReason} placement="top" arrow={false}>
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              aria-disabled="true"
+              onClick={() => {}}
+              data-testid="saves-save-version"
+              className="tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]"
+            >
+              + Save a version
+            </Button>
+          </Tooltip>
+        ) : (
         <Button
           type="button"
           color="light"
@@ -54,6 +74,7 @@ export const SaveVersionFooter: React.FC<{ composer: Composer | null }> = ({ com
         >
           + Save a version
         </Button>
+        )}
       </div>
       <SaveVersionModal
         open={open}

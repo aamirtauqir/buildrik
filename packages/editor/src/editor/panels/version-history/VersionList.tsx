@@ -31,9 +31,10 @@ import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components
 // strict.
 // @ts-expect-error — no declaration file for react-window@1.8.x
 import { FixedSizeList as FixedSizeListUntyped } from "react-window";
-import { Button, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 import { MoreHorizontal } from "lucide-react";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
+import { VERSION_NAME_MAX } from "@buildrik/shared/schemas/site-version";
 
 interface ListChildComponentProps {
   index: number;
@@ -115,8 +116,13 @@ interface VersionRowProps {
   onDeleteCancel: () => void;
   onCompare: () => void;
   onDetails: () => void;
+  /** Board 6930:82577's "Name this version…" — persists via siteVersions.rename. */
+  onRename: (name: string) => void;
   /** Changes this version captured since the previous one. Absent = not known. */
   changeCount?: number;
+  /** FC-9 (fix-all 2026-09-25): a viewer keeps View details/Compare, loses
+   *  Restore/Delete. */
+  readOnly?: boolean;
 }
 
 export function VersionRow({
@@ -129,13 +135,34 @@ export function VersionRow({
   onDeleteCancel,
   onCompare,
   onDetails,
+  onRename,
   changeCount,
+  readOnly = false,
 }: VersionRowProps) {
   const rowRef = React.useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showPreview, setShowPreview] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [previewRect, setPreviewRect] = React.useState<DOMRect | null>(null);
+  const [isRenaming, setIsRenaming] = React.useState(false);
+  const [renameValue, setRenameValue] = React.useState("");
+  const renameInputRef = React.useRef<HTMLInputElement>(null);
+
+  const startRename = React.useCallback(() => {
+    if (readOnly) return;
+    setRenameValue(versionDisplayName(version));
+    setIsRenaming(true);
+  }, [version, readOnly]);
+
+  React.useEffect(() => {
+    if (isRenaming) renameInputRef.current?.focus();
+  }, [isRenaming]);
+
+  const commitRename = React.useCallback(() => {
+    const trimmed = renameValue.trim();
+    setIsRenaming(false);
+    if (trimmed && trimmed !== versionDisplayName(version)) onRename(trimmed);
+  }, [renameValue, version, onRename]);
 
   const relative = formatRelativeTime(version.createdAt);
 
@@ -172,7 +199,36 @@ export function VersionRow({
           <div>
             {/* Board 162:2 — "Auto-save", not the engine event id the name
                 is stored as. See versionDisplayName. */}
-            <div className="version-name">{versionDisplayName(version)}</div>
+            {isRenaming ? (
+              <TextInput
+                ref={renameInputRef}
+                value={renameValue}
+                maxLength={VERSION_NAME_MAX}
+                onChange={(e) => setRenameValue(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                onBlur={commitRename}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitRename();
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    setIsRenaming(false);
+                  }
+                }}
+                aria-label={`Rename "${versionDisplayName(version)}"`}
+              />
+            ) : (
+              <div
+                className="version-name"
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  startRename();
+                }}
+              >
+                {versionDisplayName(version)}
+              </div>
+            )}
             <div className="version-meta">
               <span className="version-time">{formatTime(version.createdAt)}</span>
               <span>{relative}</span>
@@ -211,10 +267,8 @@ export function VersionRow({
                 </Button>
               </>
             ) : (
-              /* Board 6930:82577 — a save's actions live in its ⋯: Restore to
-                 draft… · Compare with current. Delete stays as a third item
-                 (parity never drops a capability). The board's "Name this
-                 version…" is not built: siteVersions has no rename endpoint. */
+              /* Board 6930:82577 — a save's actions live in its ⋯: Rename,
+                 Restore to draft…, Compare with current, Delete. */
               <Popover
                 open={menuOpen}
                 onClose={() => setMenuOpen(false)}
@@ -247,7 +301,20 @@ export function VersionRow({
                   </MenuItem>
                   <MenuItem
                     className={ROW_MENU_ITEM}
-                    disabled={isRestoring}
+                    disabled={readOnly}
+                    title={readOnly ? "Viewers can't rename versions — ask an editor" : undefined}
+                    aria-label={`Rename "${versionDisplayName(version)}"`}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      startRename();
+                    }}
+                  >
+                    Name this version…
+                  </MenuItem>
+                  <MenuItem
+                    className={ROW_MENU_ITEM}
+                    disabled={isRestoring || readOnly}
+                    title={readOnly ? "Viewers can't restore — ask an editor" : undefined}
                     aria-label={`Restore "${versionDisplayName(version)}"`}
                     onClick={() => {
                       setMenuOpen(false);
@@ -269,6 +336,8 @@ export function VersionRow({
                   <MenuItem
                     className={ROW_MENU_ITEM}
                     danger
+                    disabled={readOnly}
+                    title={readOnly ? "Viewers can't delete — ask an editor" : undefined}
                     aria-label={`Delete "${versionDisplayName(version)}"`}
                     onClick={() => {
                       setMenuOpen(false);
@@ -309,8 +378,12 @@ export interface VersionListProps {
   onDeleteCancel: () => void;
   onCompare: (versionId: string) => void;
   onDetails: (versionId: string) => void;
+  /** Board 6930:82577's "Name this version…". */
+  onRename: (versionId: string, name: string) => void;
   /** version id -> changes captured. Ids absent mean "not known". */
   changeCounts?: Map<string, number>;
+  /** FC-9 (fix-all 2026-09-25): threaded to every row's Restore/Delete. */
+  readOnly?: boolean;
 }
 
 export function VersionList({
@@ -324,7 +397,9 @@ export function VersionList({
   onDeleteCancel,
   onCompare,
   onDetails,
+  onRename,
   changeCounts,
+  readOnly = false,
 }: VersionListProps) {
   const listWrapperRef = React.useRef<HTMLDivElement>(null);
   const [listHeight, setListHeight] = React.useState(0);
@@ -394,7 +469,9 @@ export function VersionList({
             onDeleteCancel={onDeleteCancel}
             onCompare={() => onCompare(v.id)}
             onDetails={() => onDetails(v.id)}
+            onRename={(name) => onRename(v.id, name)}
             changeCount={changeCounts?.get(v.id)}
+            readOnly={readOnly}
           />
         </div>
       );
@@ -410,6 +487,8 @@ export function VersionList({
       onDeleteCancel,
       onCompare,
       onDetails,
+      onRename,
+      readOnly,
     ],
   );
 

@@ -5,6 +5,7 @@
  */
 import { beforeAll, describe, it, expect, vi } from "vitest";
 import { projectDataFromRows } from "../BuildrikSyncProvider";
+import { cmsFromRows } from "../cmsSync";
 import { renderProjectPages } from "@/editor/shell/exportPublishPages";
 
 /* jsdom has no canvas; MediaOptimizer asks for a 2d context at construction. */
@@ -80,5 +81,68 @@ describe("projectDataFromRows → renderProjectPages", () => {
 
     const [without] = await renderProjectPages(project);
     expect(without.html).not.toMatch(/@font-face/);
+  });
+
+  /* Ldata bug B: the Site row carries the editor's CMS bindings
+     (`projectCmsBindings`, written by sites.saveProject). The load must hand
+     them to Composer.importProject as `cmsBindings`, or every reload unbinds
+     every element and the next publish ships the placeholder copy. */
+  it("carries the stored CMS bindings into the project it loads", () => {
+    const cmsBindings = {
+      field: {
+        h: [{
+          binding: { sourceId: "cms:col-1", path: "title", type: "variable" },
+          collectionId: "col-1", fieldSlug: "title", property: "content",
+        }],
+      },
+      collection: { list: { elementId: "list", collectionId: "col-1", itemVar: "item" } },
+    };
+    const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "{{title}}") };
+
+    expect(projectDataFromRows({ name: "Bella", projectCmsBindings: cmsBindings }, [page], null).cmsBindings)
+      .toEqual(cmsBindings);
+    // A site saved before the column existed loads with no bindings, not a crash.
+    expect(projectDataFromRows({ name: "Bella", projectCmsBindings: null }, [page], null).cmsBindings)
+      .toBeUndefined();
+  });
+
+  /* Lv3 #10 (dashboard verify pass 3): /share/<token> showed a bound
+     element's last-saved text — "Nested", then an empty <p> — because the
+     scratch composer had the bindings but no CMS data to resolve them with.
+     The rows carry the site's published entries now, and the render resolves
+     them through the publish exporter's own CMSExportResolver: text
+     semantics (escaped), the first published record for an on-page binding. */
+  it("resolves a CMS-bound element from the rows' published entries, as publish does", async () => {
+    const cmsBindings = {
+      field: {
+        h: [{
+          binding: { sourceId: "cms:notes", path: "title", type: "variable" },
+          collectionId: "notes", fieldSlug: "title", property: "content",
+        }],
+      },
+    };
+    const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "Nested") };
+    const project = projectDataFromRows({ name: "Bella", projectCmsBindings: cmsBindings }, [page], null);
+    const cms = cmsFromRows({
+      collections: [{ id: "notes", name: "Notes", slug: "notes", displayField: "title", fields: [{ id: "title", name: "Title", type: "text" }] }],
+      entries: [{ id: "e1", collectionId: "notes", data: { title: "Tom & Jerry <3" }, status: "PUBLISHED", updatedAt: "2026-09-26T00:00:00.000Z" }],
+    });
+
+    const [resolved] = await renderProjectPages(project, [], cms);
+    expect(resolved.html).toContain("Tom &amp; Jerry &lt;3");
+    expect(resolved.html).not.toContain("Nested");
+  });
+
+  /* A binding whose collection is not in the rows (deleted since) resolves to
+     nothing and keeps the stored text — the snapshot is the whole store, the
+     visitor's own browser CMS cache is never read. */
+  it("keeps the stored text for a binding the rows cannot resolve", async () => {
+    const cmsBindings = {
+      field: { h: [{ binding: { sourceId: "cms:gone", path: "title", type: "variable" }, collectionId: "gone", fieldSlug: "title", property: "content" }] },
+    };
+    const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "Stored") };
+    const project = projectDataFromRows({ name: "Bella", projectCmsBindings: cmsBindings }, [page], null);
+    const [out] = await renderProjectPages(project, [], cmsFromRows({ collections: [], entries: [] }));
+    expect(out.html).toContain("Stored");
   });
 });

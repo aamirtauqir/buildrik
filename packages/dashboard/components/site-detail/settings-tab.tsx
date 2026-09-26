@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useId, isValidElement, cloneElement } from "react";
 import { ToggleSwitch } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { useUnsavedChanges } from "@lib/hooks/use-unsaved-changes";
@@ -335,10 +335,14 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
         <div className="space-y-3">
           {visiblePlatforms.map((platform) => (
             <div key={platform} className="flex items-center gap-2">
-              <label className="w-28 shrink-0 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+              {/* Horizontal label+field row — InputField's own `label` prop
+                  stacks the label above the field, which doesn't fit this
+                  layout, so htmlFor/id are wired manually instead. */}
+              <label htmlFor={`social-link-${platform}`} className="w-28 shrink-0 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 {PLATFORM_LABELS[platform]}
               </label>
               <InputField
+                id={`social-link-${platform}`}
                 type="url"
                 value={socialLinks[platform] ?? ""}
                 onChange={(e) => updateSocialLink(platform, e.target.value)}
@@ -371,9 +375,26 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
 }
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  const generatedId = useId();
+  // Most callers pass a single InputField/textarea as `children` — wire the
+  // label to it with htmlFor/id (id only if the child doesn't already carry
+  // one). A few callers pass a button + hidden file input instead (Favicon,
+  // Touch Icon), where there's no single labelable control to clone into —
+  // those keep an unassociated label, same as before.
+  const NATIVE_FORM_TAGS = new Set(["input", "textarea", "select"]);
+  const isSingleFormControl =
+    isValidElement(children) &&
+    (typeof children.type !== "string" || NATIVE_FORM_TAGS.has(children.type));
+  const fieldId = isSingleFormControl
+    ? ((children.props as { id?: string }).id ?? generatedId)
+    : undefined;
+  const wiredChildren = isSingleFormControl
+    ? cloneElement(children as React.ReactElement<{ id?: string }>, { id: fieldId })
+    : children;
+
   return (
     <div>
-      <label className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+      <label htmlFor={fieldId} className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
         {label}
       </label>
       {hint && (
@@ -381,7 +402,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
           {hint}
         </p>
       )}
-      <div className="mt-1">{children}</div>
+      <div className="mt-1">{wiredChildren}</div>
     </div>
   );
 }

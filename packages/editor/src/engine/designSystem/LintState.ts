@@ -124,6 +124,12 @@ export class LintState extends EventEmitter {
     return this.suppressed.size;
   }
 
+  /** The token ids currently hiding their warnings — lets a caller render an
+   *  "Ignored (n)" list with a per-token restore, not just a bare count. */
+  suppressedIds(): readonly string[] {
+    return [...this.suppressed];
+  }
+
   private persist(): void {
     if (typeof window === "undefined") return;
     try {

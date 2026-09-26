@@ -7,6 +7,7 @@
  */
 import * as React from "react";
 import { fetchMyRole, type WorkspaceRole } from "@/services/RoleService";
+import { getEditorViewMode } from "@shared/utils/editorViewMode";
 
 export function useEditorRole(): WorkspaceRole | null {
   const [role, setRole] = React.useState<WorkspaceRole | null>(null);
@@ -20,4 +21,18 @@ export function useEditorRole(): WorkspaceRole | null {
     };
   }, []);
   return role;
+}
+
+/**
+ * The one computation of "is this a VIEWER's read-only chrome" — StudioPanels
+ * (rail gate, drawer/inspector layout), useStudioState (the openLeftPanelToTab
+ * / setLeftPanelTab sink every tab-open door funnels into), and CommandPalette
+ * (which nav commands even show) all need the same answer. `?view=readonly`
+ * alone is not enough — it also covers the OWNER's own read-only preview —
+ * only readOnlyView AND a VIEWER role together mean "gate writing surfaces".
+ */
+export function useViewerChrome(): boolean {
+  const editorRole = useEditorRole();
+  const readOnlyView = React.useMemo(() => getEditorViewMode().readOnlyView, []);
+  return readOnlyView && editorRole === "VIEWER";
 }

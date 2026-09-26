@@ -56,6 +56,22 @@ export function roleLabel(role: string): string {
   return RoleLabel[role as UserRoleType] ?? role;
 }
 
+// SSOT for the linear role ordering — was previously a second copy in
+// server/services/permission.service.ts (audit-fix lane L1b). That
+// file's enforcement checks are the only thing that MUST run server-side;
+// the ranking itself is a plain-data fact about the roles, safe for a
+// client component to read (e.g. hiding a control the server would refuse)
+// as long as nothing client-side treats a passed rank check as authz —
+// the server still enforces every mutation independently.
+export const ROLE_RANK: Record<UserRoleType, number> = {
+  VIEWER: 0,
+  EDITOR: 1,
+  // a5-invite: Designer has the same site-edit access as a Content editor.
+  DESIGNER: 1,
+  ADMIN: 2,
+  OWNER: 3,
+};
+
 export const SiteStatus = {
   DRAFT: "DRAFT",
   PUBLISHED: "PUBLISHED",

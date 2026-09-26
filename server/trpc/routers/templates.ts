@@ -95,6 +95,14 @@ export const templatesRouter = router({
       .input(generateSiteSchema)
       .mutation(async ({ ctx, input }) => {
         const workspaceId = await getWorkspaceId(ctx);
+        // AI generation consumes plan quota and spins a paid job — gate to
+        // EDITOR+ like templates.use, not open to every ACTIVE member (S-8).
+        try {
+          await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
         try {
           return await createGenerationJob(workspaceId, ctx.session.user.id, input);
         } catch (e: unknown) {

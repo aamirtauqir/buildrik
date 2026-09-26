@@ -30,9 +30,9 @@ import {
   createPinnedComment,
   fetchReviewComments,
   reattachReviewComment,
-  currentSiteId,
   type ReviewComment,
 } from "@/services/ReviewService";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import {
   anchorSelector,
   detectOrphans,
@@ -140,7 +140,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
      is an announcement, not a status. Two comments whose elements really were
      deleted opened it on every load of the site (2026-09-25); the Detached
      group in Review is where they live after the first telling. */
-  const announcedKey = `buildrick-orphans-announced-${currentSiteId() ?? "local"}`;
+  const announcedKey = `buildrick-orphans-announced-${getSiteIdFromUrl() ?? "local"}`;
   const announcedOrphans = React.useRef<Set<string> | null>(null);
   if (announcedOrphans.current === null) {
     let stored: string[] = [];
@@ -158,7 +158,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
   const deletedLabels = React.useRef<Map<string, string>>(new Map());
 
   const activePageId = composer?.elements.getActivePage()?.id ?? null;
-  const hasSite = currentSiteId() != null;
+  const hasSite = getSiteIdFromUrl() != null;
 
   const refresh = React.useCallback(() => {
     if (!hasSite) return;

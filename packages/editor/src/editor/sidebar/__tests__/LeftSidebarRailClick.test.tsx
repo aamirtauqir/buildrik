@@ -21,6 +21,8 @@ vi.mock("../tabs/settings/SettingsTab", () => ({ default: () => null }));
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { LeftSidebar } from "../LeftSidebar";
+import type { Composer } from "@/engine/Composer";
+import { EVENTS } from "@/shared/constants/events";
 
 beforeAll(() => {
   if (typeof globalThis.window !== "undefined") {
@@ -141,5 +143,49 @@ describe("LeftSidebar rail click semantics", () => {
     // Removed in ISSUE-005 — the active rail icon owns the drawer toggle now.
     renderSidebar({ drawerOpen: true });
     expect(document.querySelector(".ls-panel-close")).toBeNull();
+  });
+});
+
+// B-9: every rail tab was an equal Tab stop, so Tab walked all six before
+// leaving the rail. Only the active tab is now in the Tab order.
+describe("LeftSidebar rail — roving tabindex + tabpanel naming", () => {
+  it("the active tab is tabIndex 0; the rest are -1", () => {
+    renderSidebar({ activeTab: "layers", drawerOpen: true });
+    expect(document.querySelector('[data-tab="layers"]')).toHaveAttribute("tabIndex", "0");
+    expect(document.querySelector('[data-tab="add"]')).toHaveAttribute("tabIndex", "-1");
+    expect(document.querySelector('[data-tab="pages"]')).toHaveAttribute("tabIndex", "-1");
+  });
+
+  it("the tabpanel is labelled by the active tab's button id", () => {
+    renderSidebar({ activeTab: "pages", drawerOpen: true });
+    const panel = screen.getByTestId("sidebar-panel");
+    expect(panel).toHaveAttribute("aria-labelledby", "rail-tab-pages");
+    expect(document.getElementById("rail-tab-pages")).not.toBeNull();
+  });
+});
+
+/* Gap walk 93 #1: a rail letter only SWITCHED the tab. After Esc closed a
+   right-column panel (isLeftPanelOpen false, tab kept), U → Esc → H switched
+   to History into a closed column — nothing opened. A letter is a door, so it
+   goes through the one open-this-tab event (ui:switch-tab), which switches
+   AND opens, and applies the viewer gate — the same event I already uses. */
+describe("LeftSidebar — rail letters open their tab", () => {
+  it("a letter emits ui:switch-tab for its tab instead of only switching", () => {
+    const emit = vi.fn();
+    const onTabChange = vi.fn();
+    render(
+      <ToastProvider>
+        <LeftSidebar
+          composer={{ emit } as unknown as Composer}
+          activeTab="publish"
+          onTabChange={onTabChange}
+          drawerOpen={false}
+          onDrawerToggle={vi.fn()}
+        />
+      </ToastProvider>
+    );
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "h" }));
+    expect(emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "history" });
+    expect(onTabChange).not.toHaveBeenCalled();
   });
 });

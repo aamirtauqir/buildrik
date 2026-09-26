@@ -67,6 +67,7 @@ function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     lastPublishedAt: null,
     hasUnpublishedChanges: null,
     unpublished: vi.fn(),
+    pollLost: false,
     publish: vi.fn(), cancel: vi.fn(), track: vi.fn(), reset: vi.fn(), dismissBlock: vi.fn(), ...over,
   };
 }
@@ -139,5 +140,25 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     );
     expect(container.textContent).toContain("x.vercel.app");
     expect(container.textContent).toContain("deploy failed");
+  });
+
+  /* B-2: when uiState is "failed" because POLLING was lost (not because the
+     job itself reached FAILED), the job may still be running server-side.
+     The panel must offer "Check status" (resumes tracking the same jobId)
+     instead of "Try again" (which would fire a brand-new publish on top of
+     one that might still be in flight). */
+  it("offers 'Check status' instead of 'Try again' when the failure is a lost poll", () => {
+    const track = vi.fn();
+    const { getByTestId, queryByText } = renderTab(
+      <PublishTab
+        composer={composer}
+        publishJob={makeJob({ uiState: "failed", jobId: "job-9", error: "network down", pollLost: true, track })}
+        nextMove={OPEN_MOVE}
+        onRequestPublish={vi.fn()}
+      />,
+    );
+    expect(queryByText("Try again")).toBeNull();
+    fireEvent.click(getByTestId("publish-check-status"));
+    expect(track).toHaveBeenCalledWith("job-9");
   });
 });

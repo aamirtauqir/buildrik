@@ -64,4 +64,20 @@ describe("PageRow ARIA", () => {
     const { container } = renderRow();
     expect(container.querySelector('[role="treeitem"]')!.getAttribute("aria-selected")).toBe("true");
   });
+
+  // B-9: the bulk-select checkbox icon was a bare div with only aria-hidden —
+  // no role, no state — when multi-select was wired up.
+  it("the bulk-select checkbox carries role=checkbox + aria-checked when wired", () => {
+    const { container } = renderRow({ onToggleSelect: vi.fn(), isSelected: true });
+    const box = container.querySelector(".bd-pg-row-checkbox")!;
+    expect(box.getAttribute("role")).toBe("checkbox");
+    expect(box.getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("the bulk-select checkbox stays aria-hidden, no checkbox role, without multi-select", () => {
+    const { container } = renderRow();
+    const box = container.querySelector(".bd-pg-row-checkbox")!;
+    expect(box.hasAttribute("role")).toBe(false);
+    expect(box.getAttribute("aria-hidden")).toBe("true");
+  });
 });

@@ -8,6 +8,7 @@
  * @license BSD-3-Clause
  */
 import { prisma } from "@/lib/prisma";
+import { sanitizeTemplateHtml } from "@/lib/sanitize-blocks";
 import type { UpsertUserTemplateInput } from "@buildrik/shared/schemas/user-template";
 
 async function workspaceOf(siteId: string): Promise<string | null> {
@@ -20,6 +21,8 @@ export async function upsertUserTemplate(
 ): Promise<{ templateId: string }> {
   const workspaceId = await workspaceOf(input.siteId);
   if (!workspaceId) return { templateId: input.templateId };
+  // Workspace-wide: every site of the agency can apply it.
+  const html = sanitizeTemplateHtml(input.html);
   await prisma.userTemplate.upsert({
     where: { workspaceId_templateId: { workspaceId, templateId: input.templateId } },
     create: {
@@ -28,7 +31,7 @@ export async function upsertUserTemplate(
       name: input.name,
       category: input.category ?? null,
       description: input.description ?? null,
-      html: input.html,
+      html,
       css: input.css ?? null,
       thumbnail: input.thumbnail ?? null,
       createdBy: input.createdBy ?? null,
@@ -37,7 +40,7 @@ export async function upsertUserTemplate(
       name: input.name,
       category: input.category ?? null,
       description: input.description ?? null,
-      html: input.html,
+      html,
       css: input.css ?? null,
       thumbnail: input.thumbnail ?? null,
     },

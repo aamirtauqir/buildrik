@@ -12,18 +12,72 @@
  *
  * @license BSD-3-Clause
  */
+import { omit } from "@shared/utils/helpers/object";
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import * as Storage from "../engine/cms/CollectionStorage";
 import type { CMSCollection, CMSContentItem, CMSField } from "../shared/types/cms";
-import { SyncRetryQueue, type SyncRetryInfo, registerPendingSource } from "./syncRetryQueue";
+import {
+  SyncRetryQueue,
+  type SyncRetryInfo,
+  registerPendingSource,
+  hasServerStamp,
+  markStampMigrationDone,
+  recordServerStamp,
+  sameContent,
+  serverCopyWins,
+  stampMigrationDue,
+} from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
 }
 
 const iso = (d: Date | string): string => (typeof d === "string" ? d : d.toISOString());
+
+/* A field stored without a slug (verify seed: { id, name, type }) rendered
+   blank in every cell — the table reads data[field.slug]. Its id is the key
+   those rows were written under. */
+const withSlugs = (fields: unknown): CMSField[] =>
+  ((fields as CMSField[]) ?? []).map((f) => (f.slug ? f : { ...f, slug: f.id }));
+
+/** Server CMS rows as the /share draft carries them (`getShareDraftRows` →
+ *  `getPublishedCmsForBindings`): the collections a site's bindings name and
+ *  their published entries. */
+export interface CmsRows {
+  collections: ReadonlyArray<{
+    id: string; name: string; slug: string; displayField?: string | null; fields: unknown;
+    createdAt?: Date | string; updatedAt?: Date | string;
+  }>;
+  entries: ReadonlyArray<{
+    id: string; collectionId: string; data: unknown; status?: string;
+    createdAt?: Date | string; updatedAt: Date | string;
+  }>;
+}
+
+/**
+ * Server CMS rows in the engine's collection/record shapes — the mapping
+ * `hydrateCmsFromServer` writes to IndexedDB, for a scratch composer that
+ * must never read or write that store (`CollectionManager.loadSnapshot`).
+ */
+export function cmsFromRows(rows: CmsRows): { collections: CMSCollection[]; items: CMSContentItem[] } {
+  return {
+    collections: rows.collections.map((c) => ({
+      id: c.id, name: c.name, slug: c.slug,
+      displayField: c.displayField ?? undefined,
+      fields: withSlugs(c.fields),
+      createdAt: iso(c.createdAt ?? c.updatedAt ?? new Date(0)),
+      updatedAt: iso(c.updatedAt ?? new Date(0)),
+    })),
+    items: rows.entries.map((e) => ({
+      id: e.id, collectionId: e.collectionId,
+      data: (e.data as Record<string, unknown>) ?? {},
+      status: e.status === "PUBLISHED" ? "published" : "draft",
+      createdAt: iso(e.createdAt ?? e.updatedAt), updatedAt: iso(e.updatedAt),
+    })),
+  };
+}
 
 // ── E7 reliability (#5/#6, 2026-06-24): stop the silent drop ────────────────
 // The local IndexedDB write already happened when a sync fires, so a failed
@@ -57,11 +111,18 @@ export function retryCmsSync(): Promise<void> {
 }
 
 /**
- * Cross-device load (E7): pull server collections + entries into the engine's
- * IndexedDB on editor open. ADDITIVE — only collections whose id isn't already
- * local are written, so a local unsynced edit is never clobbered. Best-effort.
- * Populates local storage; the engine reads it (immediately on a fresh device
- * whose store was empty, otherwise on the next load).
+ * Cross-device load (E7 / C-4, PD-36): pull server collections + entries into
+ * the engine's IndexedDB on editor open. SERVER-FIRST, on the server's clock:
+ * a row is written when it is missing locally, or when the server confirmed
+ * this browser's copy (a stamp, see `serverCopyWins`), it has not changed
+ * locally since, and the server's updatedAt moved past the stamp; every
+ * collection's entries are re-read — the old additive pass skipped any
+ * collection already local, so another member's entry edits never arrived. A
+ * row with a mirror still queued here (upsert or delete) is left alone: that
+ * local change is newer than anything the server holds. Nothing local is
+ * deleted in this step. Best-effort. Populates local storage; the engine reads
+ * it (immediately on a fresh device whose store was empty, otherwise on the
+ * next load).
  */
 /**
  * Hydration status, so the Content drawer can tell "no collections" from
@@ -102,8 +163,12 @@ export async function retryCmsHydration(): Promise<void> {
   await hydrateCmsFromServer();
 }
 
+function hasQueuedMirror(kind: "collection" | "entry", id: string): boolean {
+  return queue.isPending(`${kind}Upsert:${id}`) || queue.isPending(`${kind}Delete:${id}`);
+}
+
 export async function hydrateCmsFromServer(): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   // No site or no storage is not a failure — there is nothing to hydrate FROM,
   // and the local collections (if any) are the whole truth.
   if (!siteId || !Storage.isStorageAvailable()) {
@@ -117,42 +182,102 @@ export async function hydrateCmsFromServer(): Promise<void> {
       displayField: string | null; fields: unknown; createdAt: Date | string; updatedAt: Date | string;
       pageSlugPattern: string | null; pageSeoTitle: string | null; pageSeoDescription: string | null; pageTemplatePath: string | null;
     }>;
+    const migrationScope = `cms:${siteId}`;
+    const firstPass = stampMigrationDue(migrationScope);
     if (!remote.length) {
+      markStampMigrationDone(migrationScope);
       setHydrationStatus("ready");
       return;
     }
-    const localIds = new Set((await Storage.loadCollections()).map((c) => c.id));
-    for (const rc of remote) {
-      if (localIds.has(rc.id)) continue;
-      const collection: CMSCollection = {
-        id: rc.id,
-        /* Stamped with the site it came FROM. Hydration writes straight into
-           IndexedDB, past `CollectionManager`, so without this the rows would
-           land unscoped and keep showing on every other site in this browser —
-           the store is browser-global. (2026-08-24.) */
-        siteId,
-        name: rc.name, slug: rc.slug,
-        description: rc.description ?? undefined, icon: rc.icon ?? undefined,
-        displayField: rc.displayField ?? undefined,
-        fields: (rc.fields as CMSField[]) ?? [],
-        pageSlugPattern: rc.pageSlugPattern ?? undefined,
-        pageSeoTitle: rc.pageSeoTitle ?? undefined,
-        pageSeoDescription: rc.pageSeoDescription ?? undefined,
-        pageTemplatePath: rc.pageTemplatePath ?? undefined,
-        createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
-      };
-      await Storage.saveCollection(collection);
-      const entries = (await client().cms.entries.list.query({ siteId, collectionId: rc.id })) as Array<{
-        id: string; data: Record<string, unknown>; status: string; createdAt: Date | string; updatedAt: Date | string;
-      }>;
-      for (const e of entries) {
-        await Storage.saveContentItem({
-          id: e.id, collectionId: rc.id, data: e.data,
-          status: e.status === "PUBLISHED" ? "published" : "draft",
-          createdAt: iso(e.createdAt), updatedAt: iso(e.updatedAt),
-        });
-      }
-    }
+    const localCollections = new Map((await Storage.loadCollections()).map((c) => [c.id, c]));
+    /* A row passed over for a queued mirror was not reconciled, so the scope's
+       one-time pass is not done — it re-runs on the next hydrate. */
+    let skippedQueued = false;
+    const markSkipped = () => {
+      skippedQueued = true;
+    };
+
+    /* D-11: collections used to reconcile one at a time — each one's entries
+       fetch waited for the previous collection's writes to finish, an N+1
+       sequential fan-out. Every collection is now reconciled concurrently
+       (tRPC batches the parallel `entries.list.query` calls into one
+       request), and a collection's own entry writes run as one Promise.all
+       instead of a sequential per-entry await. */
+    await Promise.all(
+      remote.map(async (rc) => {
+        /* A queued DELETE: the collection is going away here — nothing of it
+           is written. A queued UPSERT only protects the collection row
+           itself; its entries are separate rows and still reconcile below. */
+        if (queue.isPending(`collectionDelete:${rc.id}`)) {
+          markSkipped();
+          return;
+        }
+        const collectionQueued = queue.isPending(`collectionUpsert:${rc.id}`);
+        if (collectionQueued) markSkipped();
+        const localCollection = localCollections.get(rc.id);
+        const collection: CMSCollection = {
+          id: rc.id,
+          /* Stamped with the site it came FROM. Hydration writes straight into
+             IndexedDB, past `CollectionManager`, so without this the rows would
+             land unscoped and keep showing on every other site in this browser —
+             the store is browser-global. (2026-08-24.) */
+          siteId,
+          name: rc.name, slug: rc.slug,
+          description: rc.description ?? undefined, icon: rc.icon ?? undefined,
+          displayField: rc.displayField ?? undefined,
+          fields: withSlugs(rc.fields),
+          pageSlugPattern: rc.pageSlugPattern ?? undefined,
+          pageSeoTitle: rc.pageSeoTitle ?? undefined,
+          pageSeoDescription: rc.pageSeoDescription ?? undefined,
+          pageTemplatePath: rc.pageTemplatePath ?? undefined,
+          createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
+        };
+        // A queued upsert: the local change is newer and still on its way.
+        if (!collectionQueued) {
+          if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
+            await Storage.saveCollection(collection);
+            recordServerStamp(`collection:${rc.id}`, rc.updatedAt, collection.updatedAt);
+          } else if (
+            localCollection && !hasServerStamp(`collection:${rc.id}`) &&
+            sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
+          ) {
+            recordServerStamp(`collection:${rc.id}`, rc.updatedAt, localCollection.updatedAt);
+          }
+        }
+        const [entries, localEntriesList] = await Promise.all([
+          client().cms.entries.list.query({ siteId, collectionId: rc.id }) as Promise<Array<{
+            id: string; data: Record<string, unknown>; status: string; createdAt: Date | string; updatedAt: Date | string;
+          }>>,
+          Storage.loadContentItems(rc.id),
+        ]);
+        const localEntries = new Map(localEntriesList.map((i) => [i.id, i]));
+        await Promise.all(
+          entries.map(async (e) => {
+            if (hasQueuedMirror("entry", e.id)) {
+              markSkipped();
+              return;
+            }
+            const localEntry = localEntries.get(e.id);
+            const status = e.status === "PUBLISHED" ? "published" : "draft";
+            if (!serverCopyWins(`entry:${e.id}`, e.updatedAt, localEntry?.updatedAt, !!localEntry, firstPass)) {
+              if (
+                localEntry && !hasServerStamp(`entry:${e.id}`) &&
+                localEntry.status === status && sameContent(localEntry.data, e.data)
+              ) {
+                recordServerStamp(`entry:${e.id}`, e.updatedAt, localEntry.updatedAt);
+              }
+              return;
+            }
+            await Storage.saveContentItem({
+              id: e.id, collectionId: rc.id, data: e.data, status,
+              createdAt: iso(e.createdAt), updatedAt: iso(e.updatedAt),
+            });
+            recordServerStamp(`entry:${e.id}`, e.updatedAt, iso(e.updatedAt));
+          }),
+        );
+      }),
+    );
+    if (!skippedQueued) markStampMigrationDone(migrationScope);
     setHydrationStatus("ready");
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -162,7 +287,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
 }
 
 export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `collectionUpsert:${c.id}`,
@@ -180,6 +305,10 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
         pageSeoTitle: c.pageSeoTitle ?? null,
         pageSeoDescription: c.pageSeoDescription ?? null,
         pageTemplatePath: c.pageTemplatePath ?? null,
+      }).then((row) => {
+        /* No row back is still a mirror that landed; reading updatedAt off
+           undefined made it a "failure", queued and replayed forever. */
+        if (row?.updatedAt) recordServerStamp(`collection:${c.id}`, row.updatedAt, c.updatedAt);
       }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] collection upsert failed (kept locally, queued)", e)
@@ -187,7 +316,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
 }
 
 export async function syncCollectionDelete(id: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   // A pending upsert for the same collection is now moot — deletion wins, so
   // drop it to avoid resurrecting a deleted collection on retry.
@@ -201,7 +330,7 @@ export async function syncCollectionDelete(id: string): Promise<void> {
 }
 
 export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `entryUpsert:${item.id}`,
@@ -212,6 +341,10 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
         collectionId: item.collectionId,
         data: item.data,
         status: item.status === "published" ? "PUBLISHED" : "DRAFT",
+      }).then((row) => {
+        /* No row back is still a mirror that landed; reading updatedAt off
+           undefined made it a "failure", queued and replayed forever. */
+        if (row?.updatedAt) recordServerStamp(`entry:${item.id}`, row.updatedAt, item.updatedAt);
       }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e)
@@ -219,7 +352,7 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
 }
 
 export async function syncEntryDelete(id: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   queue.drop(`entryUpsert:${id}`);
   await queue.run(

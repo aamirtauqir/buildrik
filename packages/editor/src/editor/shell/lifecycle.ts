@@ -111,6 +111,9 @@ export interface LifecycleInput {
   offline: boolean;
   /** Blocking issues on the site. Does not block publish — it re-labels it. */
   errorCount: number;
+  /** C-3: a save was refused because this tab is behind the server. Its
+   *  pages are a behind-copy, so publishing them would overwrite newer work. */
+  saveConflict?: boolean;
 }
 
 /** Which door the single filled button opens. Both review kinds land on the
@@ -231,6 +234,7 @@ function publishBlocker(i: LifecycleInput): string | null {
   if (!i.publishEnabled) return "Publishing isn't switched on for this workspace yet";
   if (i.isViewer) return "Viewers can't publish — ask an editor";
   if (i.offline) return "Can't publish while offline";
+  if (i.saveConflict) return "Resolve the sync conflict before publishing";
   return null;
 }
 

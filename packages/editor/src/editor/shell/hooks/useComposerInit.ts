@@ -11,18 +11,20 @@ import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS, isNavigationOnlyChange } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
 import { importMigratedProject } from "@/editor/design-system";
 import {
   getSiteIdFromUrl,
+  isSaveConflictPending,
   loadCurrentUserId,
   loadProject,
   loadServerMedia,
   saveProject,
   SaveConflictError,
+  SAVE_CONFLICT_EVENT,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import { clearUnsaved, keepUnsaved, readUnsaved } from "@/services/unsavedRecovery";
@@ -31,7 +33,8 @@ import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
-import { isAuthSaveError, isForbiddenSaveError } from "./useSaveCallback";
+import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave } from "./useSaveCallback";
+import { getEditorViewMode } from "@shared/utils/editorViewMode";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -212,7 +215,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                warned failure into a silent loss. Measured: edit, save blocked,
                reload, edit gone, topbar green. */
             const unsaved = readUnsaved(siteId);
-            if (unsaved) {
+            /* In view mode (a member demoted mid-save lands here, C-9) the
+               edits cannot be saved, so they are not offered back — they stay
+               on this device for when the role returns. */
+            if (unsaved && getEditorViewMode().readOnlyView) {
+              addToastRef.current?.({
+                title: "Some work never reached the server",
+                description:
+                  "Your role no longer allows editing this site, so you're in view mode. The edits are kept in this browser — ask the owner, and they come back once you can edit again.",
+                tone: "warning",
+                duration: Infinity,
+              });
+              setSaveState({ status: "idle", error: undefined });
+            } else if (unsaved) {
               setSaveState({
                 status: "error",
                 error: "This site has edits that never reached the server.",
@@ -286,8 +301,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                got "You're seeing local changes for now" and a Retry that can
                never succeed. This file already imports the helper for the
                autosave path (:34); the load path just never used it. */
-            const isForbidden =
-              err instanceof Error && isForbiddenSaveError(err.message);
+            const isForbidden = isForbiddenSaveError(err);
             // S1.5: prefer a persistent banner over a transient toast when the
             // shell wired onLoadError; the toast stays as the back-compat path.
             if (isMissing) {
@@ -487,11 +501,22 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        tab. Close it there and the edit is gone. */
     let changeSeq = 0;
 
-    const handler = () => {
+    /* A read-only VIEW (?view=readonly — a VIEWER, or a member demoted
+       mid-session, see refuseForbiddenSave) never writes: an autosave from it
+       can only be refused, and each refusal repainted the save-failed banner.
+       Read once, like every other view-mode consumer — the mode is the URL. */
+    const readOnlyView = getEditorViewMode().readOnlyView;
+
+    const handler = (payload?: unknown) => {
+      if (readOnlyView) return;
+      /* L-3: `project:changed` also fires on `page:activated`, i.e. merely
+         looking at another page. That is not an edit: it neither dirties the
+         project nor sends a save (the same filter the per-page dirty markers
+         use, so the two cannot disagree). */
+      if (isNavigationOnlyChange(payload)) return;
       /* Dev-only: four events share this handler and none of them proves a user
-         edit — `project:changed` also fires on `page:activated`, i.e. merely
-         looking at another page. Recording which one arrived, and when, is the
-         only way to tell a real edit from a boot-sequence emit. */
+         edit. Recording which one arrived, and when, is the only way to tell a
+         real edit from a boot-sequence emit. */
       if (IS_DEV_BUILD && typeof window !== "undefined") {
         const w = window as unknown as { __bkDirtySource?: unknown[] };
         (w.__bkDirtySource ??= []).push({
@@ -503,6 +528,18 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       changeSeq += 1;
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
+        /* A-2 / PD-11: a refused save is waiting on the user's choice. Sending
+           again would carry the same stale token and be refused again, so the
+           edit stays dirty under the "Conflict" pill until the dialog resolves
+           it (Overwrite clears the hold and saves; Reload re-loads). */
+        if (siteId && isSaveConflictPending()) {
+          /* Held, not sent — so this edit exists only in the tab. Keep it for
+             the reload, the same as an offline edit. */
+          keepUnsaved(siteId, composer.exportProject());
+          setSaveState((prev) => ({ ...prev, status: "conflict", error: undefined }));
+          setIsDirty(true);
+          return;
+        }
         const seqAtSend = changeSeq;
         setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
 
@@ -617,12 +654,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               }
               return;
             }
-            if (isForbiddenSaveError(message)) {
-              addToast({
-                title: "You don't have access to save this site",
-                description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
-                tone: "warning",
-              });
+            if (isForbiddenSaveError(err)) {
+              refuseForbiddenSave({ siteId, composer, addToast, setIsDirty, setSaveState });
               return;
             }
             if (siteId) {
@@ -662,11 +695,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // never project:changed), so without these listeners an undo or a
     // "Restore version" was never auto-saved — the change was lost on reload
     // while the server kept the pre-undo state.
+    /* Every conflict — from a save OR a publish (C-3) — puts the chip in the
+       conflict state. Only the save paths set it before, so a publish-raised
+       conflict held autosave with no pill, no Publish blocker and no sign
+       anything was wrong. */
+    const onConflict = () =>
+      setSaveState((prev) => ({ ...prev, status: "conflict", error: undefined }));
+    if (typeof window !== "undefined") window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
     composer.on("project:changed", handler);
     composer.on("history:undo", handler);
     composer.on("history:redo", handler);
     composer.on("version:restored", handler);
     return () => {
+      if (typeof window !== "undefined") window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
       composer.off("project:changed", handler);
       composer.off("history:undo", handler);
       composer.off("history:redo", handler);
@@ -762,4 +803,3 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
   return composer;
 }
 
-export default useComposerInit;

@@ -1,7 +1,8 @@
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { auth } from "@server/auth";
 import { getEditorAccess } from "@server/services/sites.service";
 import { EditorClient } from "@/components/editor-route/EditorClient";
+import { DeniedState } from "@/components/states";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +17,38 @@ export default async function EditPage({
 
   const session = await auth();
   if (!session?.user?.id) {
-    redirect(`/auth/login?next=/edit/${encodeURIComponent(siteId)}`);
+    // Preserve the deep-link (?el=<id>&page=<slug>, etc.) through the login
+    // round trip — dropping it landed a signed-out visitor back at the bare
+    // editor with the element/page they were on lost. The query is folded
+    // into `next` as one encoded segment so it survives login's own parsing
+    // of `next` as a single value.
+    const query = (await searchParams) ?? {};
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(query)) {
+      if (typeof v === "string") qs.set(k, v);
+    }
+    const qsString = qs.toString();
+    redirect(
+      `/auth/login?next=/edit/${encodeURIComponent(siteId)}${qsString ? encodeURIComponent(`?${qsString}`) : ""}`,
+    );
   }
 
   const access = await getEditorAccess(session.user.id, siteId);
-  if (!access) notFound();
+  /* Access is correctly denied here; the generic 404 just did not say so, and
+     left no way back (gap walk 93 #10). One answer covers no-such-site and
+     no-access alike — the same words the site-detail screen uses — so the
+     screen does not reveal which. */
+  if (!access) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[var(--color-bg-page)] p-4">
+        <DeniedState
+          title="You don't have access to this site"
+          description="This site may have been deleted, or you don't have access to it. Ask a workspace admin to add you."
+          action={{ label: "Back to sites", href: "/dashboard/projects" }}
+        />
+      </main>
+    );
+  }
 
   /* A VIEWER opens the editor in its read-only view mode, which is a URL mode
      (`?view=readonly`, read by the editor's getEditorViewMode). Forcing it here

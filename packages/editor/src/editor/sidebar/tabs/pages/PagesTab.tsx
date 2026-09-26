@@ -41,6 +41,7 @@ import { usePages } from "./usePages";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
+import { useDynamicPagesSummary } from "./useDynamicPagesSummary";
 import "./PagesTab.css";
 
 export interface PagesTabProps {
@@ -83,6 +84,16 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   );
   const f = useFolders(folderScopeId, livePageIds);
   const bulk = useBulkSelect();
+
+  /* FC-1 (fix-all 2026-09-25): pages a page-generating CMS collection
+     produces at publish don't have Page rows and never showed up here.
+     Read-only hint row only — opening a collection's own Dynamic pages tab
+     is still where the pattern/template are edited. */
+  const dynamicPages = useDynamicPagesSummary(composer);
+  const openDynamicPages = React.useCallback(() => {
+    if (!dynamicPages.collectionId) return;
+    composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId: dynamicPages.collectionId, tab: "dynamic-pages" });
+  }, [composer, dynamicPages.collectionId]);
 
   // Prune stale folder references when pages are deleted
   React.useEffect(() => {
@@ -459,6 +470,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onFolderDelete={f.deleteFolder}
             onMovePageToFolder={f.movePageToFolder}
             onRemovePageFromFolder={f.removePageFromFolder}
+            dynamicPagesCount={dynamicPages.count}
+            onOpenDynamicPages={openDynamicPages}
           />
           )}
       </PanelFrame.Body>

@@ -9,6 +9,7 @@
 import type { ElementData } from "../../types";
 import { camelToKebab } from "../helpers";
 import { escapeAttr } from "./encoding";
+import { toAllowedElementTag } from "@buildrik/shared/schemas/element-markup";
 import { isSafeAttrValue } from "./sanitization";
 import { isSelfClosing } from "./tagCategories";
 
@@ -124,7 +125,7 @@ export function buildAttributeString(
 export function elementDataToHTML(data: ElementData, options: HTMLGenerationOptions = {}): string {
   const { prettyPrint = false, indentString = "  ", indentLevel = 0, xhtml = false } = options;
 
-  const tag = data.tagName || "div";
+  const tag = toAllowedElementTag(data.tagName || "div");
   const attrs = buildAttributeString(data, options);
   const content = data.content || "";
   const indent = prettyPrint ? indentString.repeat(indentLevel) : "";

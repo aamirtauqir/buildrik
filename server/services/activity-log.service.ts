@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
+import type { SiteActivityEntry, SiteActivityFilter, SiteActivityKind } from "@buildrik/shared/schemas/activity";
 
 export type ActivityAction =
   | "site.settings.updated"
@@ -132,4 +134,127 @@ export async function listWorkspaceActivity(
     page,
     totalPages: Math.ceil(total / perPage) || 1,
   };
+}
+
+/** Site actions that are a publish event. Everything else a site records is an
+ *  edit, except the review actions, which sit with the comments. */
+const PUBLISH_ACTIONS: readonly ActivityAction[] = ["site.published", "site.publish_failed", "site.unpublished", "site.rolled_back"];
+const REVIEW_ACTIONS: readonly ActivityAction[] = ["review.revoked"];
+
+/** Fallback text for a row recorded without a description. */
+const ACTION_SUMMARY: Partial<Record<ActivityAction, string>> = {
+  "site.settings.updated": "Updated site settings",
+  "site.published": "Published the site",
+  "site.publish_failed": "A publish failed",
+  "site.unpublished": "Unpublished the site",
+  "site.rolled_back": "Rolled back to an earlier version",
+  "site.share_link.created": "Created a share link",
+  "site.share_link.revoked": "Revoked a share link",
+  "site.domain.connected": "Connected a domain",
+  "site.domain.removed": "Removed a domain",
+  "site.redirect.created": "Added a redirect",
+  "site.redirect.deleted": "Removed a redirect",
+  "review.revoked": "Withdrew the review request",
+};
+
+function kindOfAction(action: string): SiteActivityKind {
+  if ((PUBLISH_ACTIONS as readonly string[]).includes(action)) return "publish";
+  if ((REVIEW_ACTIONS as readonly string[]).includes(action)) return "comment";
+  return "edit";
+}
+
+const COMMENT_EXCERPT = 80;
+
+/**
+ * One site's activity, newest first — the editor History › Activity tab (B6).
+ *
+ * Two sources, merged by time: the site's `activity_logs` rows (edits, publish
+ * events, review actions) and its comments (`comments` rows — comment creation
+ * is not written to the activity log). The filter narrows on the server, per
+ * source: "Publish" and "Edits" never read comments, and "Comments" reads only
+ * the log's review actions.
+ * Actor names resolve in one user read; a client comment names its reviewer.
+ */
+export async function listSiteActivity(
+  siteId: string,
+  filter: SiteActivityFilter,
+  limit = 30,
+): Promise<SiteActivityEntry[]> {
+  const logActions: Record<SiteActivityFilter, Prisma.ActivityLogWhereInput> = {
+    all: {},
+    edits: { action: { notIn: [...PUBLISH_ACTIONS, ...REVIEW_ACTIONS] } },
+    comments: { action: { in: [...REVIEW_ACTIONS] } },
+    publish: { action: { in: [...PUBLISH_ACTIONS] } },
+  };
+  const logWhere = logActions[filter];
+  // Headroom for the collapse below, so a run of repeats seldom shortens the page.
+  const fetchSize = limit * 4;
+  const readComments = filter === "all" || filter === "comments";
+
+  const [logs, comments] = await Promise.all([
+    prisma.activityLog.findMany({
+      where: { siteId, ...logWhere },
+      orderBy: { createdAt: "desc" },
+      take: fetchSize,
+      select: { id: true, action: true, description: true, actorId: true, createdAt: true },
+    }),
+    readComments
+      ? prisma.comment.findMany({
+          where: { siteId },
+          orderBy: { createdAt: "desc" },
+          take: fetchSize,
+          select: { id: true, body: true, authorId: true, createdAt: true, reviewer: { select: { name: true } } },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const userIds = [
+    ...new Set([...logs.map((l) => l.actorId), ...comments.map((c) => c.authorId)].filter((id): id is string => !!id)),
+  ];
+  const users = userIds.length
+    ? await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, fullName: true } })
+    : [];
+  const names = new Map(users.map((u) => [u.id, u.fullName]));
+  const nameOf = (id: string | null) => (id ? (names.get(id) ?? null) : null);
+
+  const rows: SiteActivityEntry[] = [
+    ...logs.map((l) => ({
+      id: `log:${l.id}`,
+      kind: kindOfAction(l.action),
+      actorName: nameOf(l.actorId),
+      summary: l.description ?? ACTION_SUMMARY[l.action as ActivityAction] ?? l.action,
+      actionUrl: null,
+      createdAt: l.createdAt,
+    })),
+    ...comments.map((c) => {
+      const body = c.body.trim();
+      const excerpt = body.length > COMMENT_EXCERPT ? `${body.slice(0, COMMENT_EXCERPT - 1)}…` : body;
+      return {
+        id: `comment:${c.id}`,
+        kind: "comment" as const,
+        actorName: c.authorId ? nameOf(c.authorId) : (c.reviewer?.name ?? null),
+        summary: `Commented: “${excerpt}”`,
+        actionUrl: null,
+        createdAt: c.createdAt,
+      };
+    }),
+  ];
+  rows.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+  /* Most of `activity_logs` is `site.settings.updated` (the Overview card
+     counted 96%), so an uncollapsed list repeats one sentence down the tab.
+     Same rule as the Overview card: consecutive rows with the same actor and
+     text fold into the newest, which says how many it stands for. */
+  const out: Array<SiteActivityEntry & { count: number }> = [];
+  for (const r of rows) {
+    const last = out[out.length - 1];
+    if (last && last.kind === r.kind && last.actorName === r.actorName && last.summary === r.summary) {
+      last.count += 1;
+      continue;
+    }
+    out.push({ ...r, count: 1 });
+  }
+  return out
+    .slice(0, limit)
+    .map(({ count, ...r }) => (count > 1 ? { ...r, summary: `${r.summary} · ${count} times` } : r));
 }

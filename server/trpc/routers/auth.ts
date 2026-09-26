@@ -16,6 +16,7 @@ import { captchaEnabled, verifyTurnstile } from "@/server/services/turnstile.ser
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createNotification } from "@/server/services/notification.trigger";
 import { record as recordActivity } from "@/server/services/activity-log.service";
+import { clientIp } from "@/lib/request-ip";
 
 // Strict: 5 attempts per 15 min (2FA, token verification)
 const strictRateLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
@@ -28,8 +29,6 @@ const LOGIN_MAX_FAILURES = 10;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 // Require a captcha solve once an IP has this many recent failed logins.
 const LOGIN_CAPTCHA_AFTER = 3;
-const clientIp = (headers: Headers | undefined) =>
-  headers?.get("x-forwarded-for")?.split(",")[0]?.trim() || headers?.get("x-real-ip") || "unknown";
 
 function handleAuthError(err: unknown): never {
   if (err instanceof AuthError) {
@@ -281,6 +280,22 @@ export const authRouter = router({
         throw new TRPCError({ code: "UNAUTHORIZED", message: "Not authenticated" });
       }
       const userId = user.id;
+
+      // S-5/PD-5: read verification status from the DB, not the session — a
+      // session predates a later account compromise/reset and can't be trusted
+      // for this check.
+      const dbUser = await ctx.prisma.user.findUnique({ where: { id: userId }, select: { emailVerified: true } });
+      if (!dbUser?.emailVerified) {
+        /* `reason` tells the invite page this refusal from the email-mismatch
+           one below — both are FORBIDDEN, and the page showed "This invite is
+           for another email" to an invitee whose email matched. */
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Verify your email before accepting an invite.",
+          cause: { reason: "EMAIL_UNVERIFIED" },
+        });
+      }
+
       const existing = await ctx.prisma.workspaceMember.findUnique({
         where: { userId_workspaceId: { userId, workspaceId: invite.workspaceId } },
       });
@@ -298,6 +313,7 @@ export const authRouter = router({
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "This invite was sent to a different email address.",
+          cause: { reason: "EMAIL_MISMATCH" },
         });
       }
 

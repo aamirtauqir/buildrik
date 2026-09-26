@@ -75,6 +75,13 @@ describe("Sites Service", () => {
 
   describe("listSites", () => {
     it("returns paginated sites", async () => {
+      // S-9: listSites now resolves siteScopeWhere(userId, workspaceId) first.
+      // An ADMIN is never site-scoped, so this keeps the unrestricted list.
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        id: "m1",
+        role: "ADMIN",
+        _count: { sitePermissions: 0 },
+      } as any);
       vi.mocked(prisma.site.count).mockResolvedValue(2);
       vi.mocked(prisma.site.findMany).mockResolvedValue([
         {
@@ -111,7 +118,7 @@ describe("Sites Service", () => {
         },
       ] as any);
 
-      const result = await listSites("ws_123", {
+      const result = await listSites("ws_123", "u_1", {
         page: 1,
         perPage: 12,
         sort: "lastEdited",
@@ -144,6 +151,17 @@ describe("Sites Service", () => {
       });
       expect(site.name).toBe("My Portfolio");
       expect(site.slug).toBe("my-portfolio");
+    });
+
+    it("a blank site's Home stores its own root, not []", async () => {
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.site.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.site.create).mockResolvedValue({ id: "new-site", name: "X", slug: "x" } as any);
+      await createSite("ws_123", "user_1", { name: "X", method: "blank" });
+      const blocks = vi.mocked(prisma.page.create).mock.calls.at(-1)![0].data.blocks as { id: string };
+      expect(Array.isArray(blocks)).toBe(false);
+      expect(blocks.id).not.toBe("root");
     });
 
     it("throws when site limit reached", async () => {
@@ -279,6 +297,85 @@ describe("Sites Service", () => {
 
       // all writes rode a transaction
       expect(prisma.$transaction).toHaveBeenCalled();
+    });
+
+    /* X-A1 round 1: a duplicate of a site whose pages share element ids
+       (legacy data) is written with unique ids; the id-keyed style rule and
+       the form block of a renamed element follow it. */
+    it("re-ids colliding pages and carries id-keyed styles + form blocks along", async () => {
+      const root = (text: string) => ({ id: "root", type: "container", children: [{ id: "form-1", type: "form", content: text, children: [] }] });
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        id: "s1", name: "Orig", deletedAt: null, projectAssets: null, projectSettings: null,
+        projectStyles: [{ id: "st1", selector: '[data-buildrick-id="form-1"]', properties: { color: "red" } }],
+      } as never);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "PRO" } } as never);
+      vi.mocked(prisma.site.count).mockResolvedValue(1);
+      vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.site.create).mockResolvedValue({ id: "s2", name: "Orig (Copy)" } as never);
+      vi.mocked(prisma.site.update).mockResolvedValue({} as never);
+      vi.mocked(prisma.page.findMany)
+        .mockResolvedValueOnce([
+          { id: "p1", name: "Home", slug: "home", position: 0, blocks: root("a"), isHomePage: true },
+          { id: "p2", name: "About", slug: "about", position: 1, blocks: root("b"), isHomePage: false },
+        ] as never)
+        .mockResolvedValueOnce([{ id: "np1", slug: "home" }, { id: "np2", slug: "about" }] as never);
+      // As every real writer leaves it: id === blockId === element id, no pageId.
+      vi.mocked(prisma.formBlock.findMany).mockResolvedValue([
+        { id: "form-1", siteId: "s1", pageId: null, blockId: "form-1", name: "C", fields: [], submitButtonText: "Send",
+          successMessage: null, notifyEmail: null, webhookUrl: null, isActive: true },
+      ] as never);
+      vi.mocked(prisma.page.createMany).mockResolvedValue({ count: 2 } as never);
+      vi.mocked(prisma.formBlock.createMany).mockResolvedValue({ count: 1 } as never);
+
+      await duplicateSite("s1", "ws1", "u1");
+
+      const pages = vi.mocked(prisma.page.createMany).mock.calls.at(-1)![0].data as Array<{ blocks: { id: string; children: Array<{ id: string }> } }>;
+      expect(pages[0].blocks.id).toBe("root");
+      expect(pages[0].blocks.children[0].id).toBe("form-1");
+      const aboutForm = pages[1].blocks.children[0].id;
+      expect(pages[1].blocks.id).not.toBe("root");
+      expect(aboutForm).not.toBe("form-1");
+      // COPY, not move: Home's form keeps its row, About's renamed form gets one.
+      const form = vi.mocked(prisma.formBlock.createMany).mock.calls.at(-1)![0].data as Array<{ blockId: string; name: string }>;
+      expect(form.map((f) => f.blockId)).toEqual(["form-1", aboutForm]);
+      expect(form[1].name).toBe("C");
+      const styleWrites = [
+        vi.mocked(prisma.site.create).mock.calls.at(-1)![0].data.projectStyles,
+        ...vi.mocked(prisma.site.update).mock.calls.map((c) => c[0].data.projectStyles),
+      ].filter(Boolean) as Array<Array<{ selector: string }>>;
+      const finalStyles = styleWrites.at(-1)!;
+      expect(finalStyles.map((r) => r.selector)).toEqual([
+        '[data-buildrick-id="form-1"]',
+        `[data-buildrick-id="${aboutForm}"]`,
+      ]);
+    });
+
+    /* S-1 class carry-over: the copy wrote original.projectStyles straight
+       into the new site with no sanitization. An unsafe rule saved before the
+       allowlist sanitizer shipped (or by a path that skipped it) would
+       otherwise ride along into every duplicate made from that site. */
+    it("sanitizes projectStyles on copy instead of trusting the source row", async () => {
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        id: "s1", name: "Orig", deletedAt: null,
+        projectStyles: [
+          { selector: "[data-buildrik-id=a]" },
+          { selector: "</style><script>alert(1)</script>" },
+        ],
+        projectAssets: null, projectSettings: null,
+      } as never);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "PRO" } } as never);
+      vi.mocked(prisma.site.count).mockResolvedValue(1);
+      vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.site.create).mockResolvedValue({ id: "s2", name: "Orig (Copy)" } as never);
+      vi.mocked(prisma.page.findMany).mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+      vi.mocked(prisma.formBlock.findMany).mockResolvedValue([]);
+
+      await duplicateSite("s1", "ws1", "u1");
+
+      const createData = vi.mocked(prisma.site.create).mock.calls[0][0].data;
+      expect(createData.projectStyles).toEqual([{ selector: "[data-buildrik-id=a]" }]);
     });
   });
 

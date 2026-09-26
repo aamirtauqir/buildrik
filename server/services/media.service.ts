@@ -45,6 +45,47 @@ async function getUserPlan(userId: string): Promise<PlanName> {
   return (member?.workspace?.plan ?? "FREE") as PlanName;
 }
 
+/** Every media-library upload lands under this key prefix — `/api/asset-upload`
+ *  refuses a token for any other pathname. */
+export function ownedBlobPrefix(userId: string): string {
+  return `u/${userId}/`;
+}
+
+/**
+ * Whether `url` is a Vercel Blob this user uploaded through the media library:
+ * https, a `*.public.blob.vercel-storage.com` host, and a path under
+ * `ownedBlobPrefix(userId)` (dot segments resolved first by the URL parser;
+ * any `%` or `\` refused outright).
+ *
+ * The one ownership test for media (audit 2026-09-25 S-4). Ownership used to
+ * be inferred from which MediaAsset/Version rows existed — but favicon, OG,
+ * touch-icon, avatar and workspace-icon blobs never get a row, so a victim's
+ * favicon URL passed every row check and the attacker's `deleteAsset` then
+ * called `del()` on it. Those keys live under `sites/`, `avatars/`,
+ * `workspaces/`, never `u/`, so this can never admit them.
+ */
+export function isOwnedBlobUrl(url: string, userId: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  // Our own keys are `u/<cuid>/` + safeBlobName ([A-Za-z0-9._-]), so they
+  // never hold `%` or `\`. Refusing both closes the encoded-separator bypass
+  // (`u/<me>/..%2F..%2Fsites%2F…`), which the URL parser leaves undecoded.
+  if (url.includes("\\") || parsed.pathname.includes("%")) return false;
+  return (
+    parsed.protocol === "https:" &&
+    parsed.hostname.endsWith(".public.blob.vercel-storage.com") &&
+    parsed.pathname.startsWith(`/${ownedBlobPrefix(userId)}`)
+  );
+}
+
+function assertOwnedBlobUrl(url: string, userId: string): void {
+  if (!isOwnedBlobUrl(url, userId)) throw new Error("URL_NOT_OWNED");
+}
+
 /**
  * Phase B5++ codex re-review pass 4 P1 fix: cross-tenant URL guard
  * applied at every URL-mutation surface, not just createAsset.
@@ -119,7 +160,9 @@ export async function listAssets(userId: string, input: ListAssetsInput) {
   const [assets, total] = await Promise.all([
     prisma.mediaAsset.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      // `id` breaks createdAt ties (a bulk upload shares one timestamp) so the
+      // cursor order is total and no row is skipped or repeated across pages.
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: input.limit + 1, // fetch one extra for hasMore detection
       ...(input.cursor
         ? { cursor: { id: input.cursor }, skip: 1 }
@@ -163,6 +206,7 @@ export async function createAsset(userId: string, input: CreateAssetInput): Prom
   // because that case is "completion handler raced ahead with no bytes
   // info"; the client's later call carries the real value.
   await assertMediaWrite(userId, input.siteId);
+  assertOwnedBlobUrl(input.url, userId);
   const quota = await checkStorageQuota(userId);
 
   // Validate folder ownership if set.
@@ -354,7 +398,9 @@ export async function deleteAsset(userId: string, input: DeleteAssetInput) {
   // del() won't fire while another tenant's row still points at it.
   // Cost: orphan blobs accumulate when references exist; recoverable
   // via a future reconciliation job. Worth it for the safety property.
-  if (asset.url && process.env.BLOB_READ_WRITE_TOKEN) {
+  // S-4: and never outside the caller's own prefix. A legacy row at the
+  // blob root, or one pointing at a favicon, loses its row but keeps its blob.
+  if (asset.url && isOwnedBlobUrl(asset.url, userId) && process.env.BLOB_READ_WRITE_TOKEN) {
     // Phase B5++++ codex re-review pass 5 P1 fix: count BOTH tables.
     // Pre-fix only counted MediaAsset rows, missing the case where
     // another user's MediaAssetVersion still pointed at the URL —
@@ -408,6 +454,12 @@ export async function moveAsset(userId: string, input: MoveAssetInput) {
 
 // ─── Asset versions (Phase B) ──────────────────────────────────────────────
 
+/**
+ * Board Assets 4418:62883 draws an author line under each version ("Ali",
+ * "Sara"). `createdBy` is a bare user id (no relation, by design — a version
+ * survives the account that made it being deleted), so the display name is
+ * joined here the same way `listSiteVersions` does it for Saves rows.
+ */
 export async function listAssetVersions(userId: string, input: ListAssetVersionsInput) {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: input.assetId },
@@ -416,10 +468,16 @@ export async function listAssetVersions(userId: string, input: ListAssetVersions
   if (!asset || asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
-  return prisma.mediaAssetVersion.findMany({
+  const rows = await prisma.mediaAssetVersion.findMany({
     where: { assetId: input.assetId },
     orderBy: { createdAt: "desc" },
   });
+  const ids = [...new Set(rows.map((r) => r.createdBy).filter((id): id is string => !!id))];
+  const users = ids.length
+    ? await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, displayName: true, fullName: true, email: true } })
+    : [];
+  const nameOf = new Map(users.map((u) => [u.id, u.displayName || u.fullName || u.email]));
+  return rows.map((r) => ({ ...r, createdByName: r.createdBy ? nameOf.get(r.createdBy) ?? null : null }));
 }
 
 /**
@@ -443,6 +501,7 @@ export async function createAssetVersion(userId: string, input: CreateAssetVersi
   // up with their tenant's row pointing at another tenant's blob —
   // re-opening the cross-tenant blob deletion vulnerability that the
   // B5++ createAsset URL_CONFLICT guard was meant to close.
+  assertOwnedBlobUrl(input.url, userId);
   await assertUrlNotOwnedByOther(userId, input.url);
 
   const plan = await getUserPlan(userId);
@@ -504,6 +563,7 @@ export async function restoreAssetVersion(userId: string, input: RestoreAssetVer
   // parent asset row at restore. Re-checking here closes that gap
   // for legacy data and protects against any future code path that
   // bypasses the createAssetVersion guard.
+  assertOwnedBlobUrl(version.url, userId);
   await assertUrlNotOwnedByOther(userId, version.url);
 
   // Restore = update the parent asset to point at this version's URL.

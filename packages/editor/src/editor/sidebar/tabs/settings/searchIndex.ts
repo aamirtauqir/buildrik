@@ -201,15 +201,13 @@ const SECTIONS: SectionDef[] = [
   },
   { screen: "integrations", title: "Integrations", description: "Third-party services", group: ADVANCED },
   {
+    // A-12/A01-6: webhooks moved to the dashboard's Settings > Integrations
+    // (an external door, not a screen this pane renders) — no field-level
+    // deep links to route to here anymore.
     screen: "webhooks",
     title: "Webhooks",
     description: "Workspace event deliveries",
     group: WORKSPACE,
-    fields: [
-      ["Endpoint URL", "Endpoint", "endpoint-url"],
-      ["Events", "Endpoint", "events"],
-      ["Signing secret", "Endpoint", "signing-secret"],
-    ],
   },
   { screen: "members", title: "Members", description: "Members, roles & seats", group: WORKSPACE },
   { screen: "billing", title: "Billing", description: "Invoices & payment method", group: WORKSPACE },

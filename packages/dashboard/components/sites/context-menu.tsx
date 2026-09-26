@@ -29,12 +29,16 @@ interface ContextMenuProps {
   siteStatus?: string;
   /** Names the trigger for assistive tech: "More options for <site>". */
   siteName?: string;
+  /** Transfer is the site owner's act on the server (sites.transfer: site role
+   *  OWNER, and only the creator). Offered only when true (gap walk 93 #9). */
+  canTransfer?: boolean;
   onAction: (action: string) => void;
 }
 
-export function ContextMenu({ siteStatus, siteName, onAction }: ContextMenuProps) {
+export function ContextMenu({ siteStatus, siteName, canTransfer = false, onAction }: ContextMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -44,12 +48,28 @@ export function ContextMenu({ siteStatus, siteName, onAction }: ContextMenuProps
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        // Without this, Escape closed the menu but left focus on whatever the
+        // browser default-focuses (often the document body) — a keyboard user
+        // lost their place on the row entirely.
+        triggerRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
   return (
     <div ref={ref} className="relative">
       {/* An icon-only trigger with no text: axe reported "Element does not
           have inner text that is visible to screen readers" for every row on
           the Sites page. */}
       <button
+        ref={triggerRef}
         type="button"
         aria-label={siteName ? `More options for ${siteName}` : "More options"}
         aria-haspopup="menu"
@@ -60,11 +80,11 @@ export function ContextMenu({ siteStatus, siteName, onAction }: ContextMenuProps
         <MoreHorizontal className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-20 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
+        <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
           {(siteStatus === "ARCHIVED"
             ? CONTEXT_MENU_ITEMS.map((i) => (i.action === "archive" ? RESTORE_ITEM : i))
             : CONTEXT_MENU_ITEMS
-          ).map((item) => {
+          ).filter((item) => canTransfer || item.action !== "transfer").map((item) => {
             const Icon = iconMap[item.icon as keyof typeof iconMap];
             const isDestructive = item.action === "archive" || item.action === "delete";
             const showDivider = item.action === "copyUrl";
@@ -77,9 +97,9 @@ export function ContextMenu({ siteStatus, siteName, onAction }: ContextMenuProps
                     disabled={isDisabled}
                     onClick={() => { onAction(item.action); setOpen(false); }}
                     className="flex w-full items-center gap-2.5 px-3 py-1.5 text-body transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-40"
-                    style={{ color: isDestructive ? "var(--color-primary)" : "var(--color-text-primary)" }}
+                    style={{ color: isDestructive ? "var(--color-error)" : "var(--color-text-primary)" }}
                   >
-                    <Icon className="h-4 w-4" style={{ color: isDestructive ? "var(--color-primary)" : "var(--color-text-secondary)" }} />{item.label}
+                    <Icon className="h-4 w-4" style={{ color: isDestructive ? "var(--color-error)" : "var(--color-text-secondary)" }} />{item.label}
                   </button>
                   {isDisabled && (
                     <div className="pointer-events-none absolute bottom-full left-1/2 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-body-sm text-white group-hover:block" style={{ backgroundColor: "var(--color-text-primary)" }}>

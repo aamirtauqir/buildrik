@@ -26,7 +26,7 @@ describe("fetchRecentActivity", () => {
   });
 
   it.each([
-    ["NOT_FOUND", "unavailable"],
+    ["NOT_FOUND", "unauthorized"],
     ["UNAUTHORIZED", "unauthorized"],
     ["FORBIDDEN", "unauthorized"],
     ["INTERNAL_SERVER_ERROR", "failed"],

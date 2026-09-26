@@ -59,6 +59,19 @@ describe("DeleteConfirmModal", () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
+  /* B-7: DeleteConfirmModal renders a visible ModalTitle but never
+     wires ModalRoot's `labelledBy` prop by hand — this is the representative
+     dialog the finding names: a real, unmodified consumer that must pick up
+     an accessible name on the actual role=dialog node purely from
+     ModalParts' auto-detection (ModalTitle.tsx), with nothing in this file
+     touched. */
+  it("has an accessible name on the role=dialog node (B-7)", () => {
+    render(
+      <DeleteConfirmModal isOpen onClose={vi.fn()} onConfirm={vi.fn()} elementLabel="Hero Section" />
+    );
+    expect(screen.getByRole("dialog", { name: "Delete Hero Section?" })).toBeInTheDocument();
+  });
+
   it("renders nothing when closed", () => {
     render(
       <DeleteConfirmModal isOpen={false} onClose={vi.fn()} onConfirm={vi.fn()} elementLabel="Card" />

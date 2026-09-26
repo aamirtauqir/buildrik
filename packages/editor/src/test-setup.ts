@@ -8,9 +8,18 @@
  * @license BSD-3-Clause
  */
 import "@testing-library/jest-dom";
+import { configure } from "@testing-library/react";
 // flowbite-bigbang Task 2: configure flowbite-react's tw: class prefix
 // (spec §4.1) before any flowbite-react component renders in a test.
 import "./editor/chrome-ui/flowbiteStore";
+
+// A20-13: `waitFor`/`findBy*` default to a 1000ms timeout. Under a loaded CI
+// runner (multiple suites sharing 4 cores) that's tight enough to flake —
+// RedirectsScreen.test.tsx failed a different assertion each run in the
+// inventory's loaded pass despite being deterministic in isolation. 3000ms
+// gives async state (IndexedDB seeds, accordion mounts) enough headroom
+// without masking a genuinely broken wait.
+configure({ asyncUtilTimeout: 3000 });
 
 if (typeof globalThis.ResizeObserver === "undefined") {
   class ResizeObserverPolyfill {

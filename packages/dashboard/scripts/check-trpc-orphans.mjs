@@ -34,6 +34,7 @@ const ROOT = path.resolve(DASHBOARD, "../..");
 
 /** Router file basename -> the key it is mounted under in server/trpc/router.ts. */
 const ROUTER_KEYS = {
+  activity: "activity",
   auth: "auth", dashboard: "dashboard", sites: "sites", "site-detail": "siteDetail",
   templates: "templates", team: "team", billing: "billing", account: "account",
   help: "help", learn: "learn", notifications: "notifications", onboarding: "onboarding",
@@ -59,7 +60,6 @@ const ALLOWED = {
   "dashboard.recentSites": "Home shows recent ACTIVITY, not recent sites; the sites list is its own screen.",
   "auth.logout": "Sign-out goes through NextAuth signOut + /api/auth/logout.",
   "sites.getProjectData": "The editor loads through sites.get; saves through sites.saveProject.",
-  "sites.saveProjectData": "Superseded by sites.saveProject (editorSaveProjectSchema) — see packages/shared/schemas/sites.ts.",
   "upload.limits": "Upload limits are read from PLAN_LIMITS on the client.",
   "siteComponents.usage": "The editor's component library shows usage from its own local registry.",
   "help.categories": "The Help index renders its categories from help.articles.",
@@ -75,7 +75,8 @@ const ALLOWED = {
   "pages.getTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",
   "pages.setTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",
   "pages.removeTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",
-  "cms.dynamicPages": "Collection-driven pages: server half complete, no UI. FOUNDER DECISION.",
+  "ai.page": "No screen calls it: its only caller was a dead AiTrpcClient wrapper removed by audit A-14 (2026-09-26). Kept pending the owner call on AI page generation; delete the procedure if that is dropped.",
+  "ai.layout": "No screen calls it: its only caller was a dead AiTrpcClient wrapper removed by audit A-14 (2026-09-26). Kept pending the owner call on AI layout generation; delete the procedure if that is dropped.",
   "cms.generateDynamicPages": "Collection-driven pages: server half complete, no UI. FOUNDER DECISION.",
   "templates.cloneFromSite": "\"Save this site as a template\" has no entry point. FOUNDER DECISION.",
   "media.moveFolder": "Re-parents a folder; the media UI is deliberately a flat folder list.",

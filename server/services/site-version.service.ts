@@ -8,11 +8,14 @@
  * @license BSD-3-Clause
  */
 import { prisma } from "@/lib/prisma";
+import { sanitizeVersionPayload } from "@/lib/sanitize-blocks";
 import type { CreateSiteVersionInput } from "@buildrik/shared/schemas/site-version";
 
 const MAX_VERSIONS_PER_SITE = 50;
 
 export async function createSiteVersion(input: CreateSiteVersionInput): Promise<{ versionId: string }> {
+  // A restore imports this snapshot straight into the canvas.
+  const payload = sanitizeVersionPayload(input.payload);
   const row = await prisma.siteVersion.upsert({
     where: { siteId_versionId: { siteId: input.siteId, versionId: input.versionId } },
     create: {
@@ -20,13 +23,13 @@ export async function createSiteVersion(input: CreateSiteVersionInput): Promise<
       versionId: input.versionId,
       name: input.name,
       isAuto: input.isAuto,
-      payload: input.payload as never,
+      payload: payload as never,
       createdBy: input.createdBy ?? null,
     },
     update: {
       name: input.name,
       isAuto: input.isAuto,
-      payload: input.payload as never,
+      payload: payload as never,
     },
   });
   await pruneSiteVersions(input.siteId);
@@ -37,7 +40,7 @@ export async function listSiteVersions(siteId: string) {
   const rows = await prisma.siteVersion.findMany({
     where: { siteId },
     orderBy: { createdAt: "desc" },
-    select: { versionId: true, name: true, isAuto: true, createdBy: true, createdAt: true },
+    select: { versionId: true, name: true, isAuto: true, createdBy: true, createdAt: true, updatedAt: true },
   });
   /* `createdBy` is a bare user id (no relation on SiteVersion), and the
      editor's History author filter (G1-075, boards 7291:81049 / 6930:79873)
@@ -56,6 +59,28 @@ export async function getSiteVersion(siteId: string, versionId: string): Promise
     select: { payload: true },
   });
   return row?.payload ?? null;
+}
+
+/**
+ * Rename a saved version ("Name this version…", boards Saves 6930:82577). The
+ * router already gates this at EDITOR role (guardSiteRole), so a viewer never
+ * reaches here. `updateMany` (not `update`) so a version deleted out from
+ * under a stale client is a no-op, matching `deleteSiteVersion`'s idempotency.
+ */
+export async function renameSiteVersion(
+  siteId: string,
+  versionId: string,
+  name: string,
+): Promise<{ ok: true; updatedAt: Date | null }> {
+  await prisma.siteVersion.updateMany({ where: { siteId, versionId }, data: { name } });
+  /* The row's new clock goes back to the renaming browser, which stamps its
+     cached copy with it (X-1) — so a later rename from another browser is
+     recognisably newer. Null when the version is gone. */
+  const row = await prisma.siteVersion.findUnique({
+    where: { siteId_versionId: { siteId, versionId } },
+    select: { updatedAt: true },
+  });
+  return { ok: true, updatedAt: row?.updatedAt ?? null };
 }
 
 export async function deleteSiteVersion(siteId: string, versionId: string): Promise<{ ok: true }> {

@@ -38,6 +38,8 @@ import { RESET_CSS, siteFontCSS, siteFontFaceCSS, siteTokensCSS, googleFontsHead
 import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
+import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
+import { copyIdKeyedRecord, copyIdKeyedStyles, type IdRename } from "@buildrik/shared/content/elementIds";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
@@ -462,6 +464,15 @@ export class Composer extends EventEmitter {
       this.fonts.unregisterLibraryFont(a.originalName);
     };
     this.media.on(MEDIA_EVENTS.MEDIA_ADDED, syncLibraryFont);
+    /* D-10: importServerAssets (called on every project load,
+       useComposerInit.ts:257) now emits one MEDIA_ADDED_BATCH instead of
+       one MEDIA_ADDED per asset. Without this, a synced site font hydrated
+       from the server silently never registers — this listener never fires
+       for it. */
+    this.media.on(MEDIA_EVENTS.MEDIA_ADDED_BATCH, (assets: unknown) => {
+      if (!Array.isArray(assets)) return;
+      for (const asset of assets) syncLibraryFont(asset);
+    });
     this.media.on(MEDIA_EVENTS.MEDIA_UPDATED, (payload: unknown) => {
       const p = payload as { asset?: unknown } | undefined;
       syncLibraryFont(p && "asset" in p ? p.asset : payload);
@@ -609,27 +620,32 @@ export class Composer extends EventEmitter {
     // trust boundary — external project JSON (localStorage, dashboard blocks,
     // templates) reaches the element tree here without otherwise passing the
     // HTML sanitizer, and content is later emitted raw onto the canvas.
+    const renames: IdRename[] = [];
     if (data.pages) {
       data.pages.forEach((page) => {
         if (page.root) {
           sanitizeElementTreeContent(page.root);
           dropSessionMediaUrls(page.root, this.localMediaUrlRemap);
         }
-        this.elements.importPage(page);
+        renames.push(...this.elements.importPage(page));
       });
     }
 
-    // Import global styles
+    /* An element re-id'd on import (X-A1: its id was another page's too)
+       keeps what was keyed by its old id — breakpoint/pseudo style rules and
+       CMS bindings are COPIED to the new id; the originals stay with the
+       page that kept the old id. */
     if (data.styles) {
-      this.styles.importStyles(data.styles);
+      this.styles.importStyles([...data.styles, ...copyIdKeyedStyles(data.styles, renames)]);
     }
 
     // Restore CMS bindings before settings, so anything that reacts to a
     // settings change already sees the element->field wiring.
     if (data.cmsBindings) {
-      if (data.cmsBindings.field) this.cms.bindings.import(data.cmsBindings.field as never);
+      if (data.cmsBindings.field)
+        this.cms.bindings.import(copyIdKeyedRecord(data.cmsBindings.field, renames) as never);
       if (data.cmsBindings.collection)
-        this.cms.bindings.importCollectionBindings(data.cmsBindings.collection as never);
+        this.cms.bindings.importCollectionBindings(copyIdKeyedRecord(data.cmsBindings.collection, renames) as never);
     }
 
     // Import project settings
@@ -781,7 +797,7 @@ export class Composer extends EventEmitter {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHTML(title)}</title>
-${fontLinks ? `${fontLinks}\n` : ""}  <style>${faces}${RESET_CSS}${css}${siteCss}</style>
+${fontLinks ? `${fontLinks}\n` : ""}  <style>${escapeStyleText(`${faces}${RESET_CSS}${css}${siteCss}`)}</style>
 </head>
 <body>
 ${html}${interactionScript}

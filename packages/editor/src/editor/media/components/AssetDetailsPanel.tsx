@@ -429,7 +429,7 @@ export function AssetDetailsPanel({
             ) : selectedItem.type === "ico" ? (
               <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
             ) : isFont ? (
-              <span className="tw:text-5xl tw:font-bold tw:text-[var(--bk-ink)]">Aa Bb</span>
+              <span className="tw:text-5xl tw:font-semibold tw:text-[var(--bk-ink)]">Aa Bb</span>
             ) : null}
           </div>
           <div className="mgr-det-filename">{selectedItem.displayName ?? selectedItem.name}</div>

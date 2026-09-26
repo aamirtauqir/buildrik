@@ -8,34 +8,39 @@
  * @license BSD-3-Clause
  */
 import { prisma } from "@/lib/prisma";
+import { sanitizeComponentPayload } from "@/lib/sanitize-blocks";
 import type { UpsertSiteComponentInput } from "@buildrik/shared/schemas/site-component";
+import { siteScopeWhere } from "@/server/services/permission.service";
 
 export async function upsertSiteComponent(
   input: UpsertSiteComponentInput
-): Promise<{ componentId: string }> {
+): Promise<{ componentId: string; updatedAt: Date }> {
   // "This page" scope must name a page of THIS site.
   const pageId = input.pageId ?? null;
   if (pageId) {
     const page = await prisma.page.findUnique({ where: { id: pageId }, select: { siteId: true } });
     if (!page || page.siteId !== input.siteId) throw new Error("PAGE_NOT_FOUND");
   }
+  // Masters are shared across the workspace and rendered on the canvas.
+  const payload = sanitizeComponentPayload(input.payload);
   const row = await prisma.siteComponent.upsert({
     where: { siteId_componentId: { siteId: input.siteId, componentId: input.componentId } },
     create: {
       siteId: input.siteId,
       componentId: input.componentId,
       name: input.name,
-      payload: input.payload as never,
+      payload: payload as never,
       pageId,
       createdBy: input.createdBy ?? null,
     },
     update: {
       name: input.name,
-      payload: input.payload as never,
+      payload: payload as never,
       pageId,
     },
   });
-  return { componentId: row.componentId };
+  // updatedAt: the editor stamps its local copy with the SERVER's clock (C-4).
+  return { componentId: row.componentId, updatedAt: row.updatedAt };
 }
 
 export async function listSiteComponents(siteId: string) {
@@ -72,10 +77,14 @@ export async function deleteSiteComponent(
  * caller's workspace is supplied from the session, never client input).
  */
 export async function listWorkspaceComponents(
-  workspaceId: string
+  workspaceId: string,
+  userId: string
 ): Promise<Array<{ componentId: string; name: string; siteCount: number; updatedAt: Date }>> {
+  // S-9: a member scoped to specific sites must never see components from a
+  // site outside their grant, or have its usage counted in "used on N sites".
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
   const rows = await prisma.siteComponent.findMany({
-    where: { site: { workspaceId, deletedAt: null } },
+    where: { site: { workspaceId, deletedAt: null, ...scope } },
     select: { componentId: true, name: true, updatedAt: true },
   });
   const byId = new Map<

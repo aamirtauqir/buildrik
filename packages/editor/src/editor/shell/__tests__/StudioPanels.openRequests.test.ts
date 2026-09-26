@@ -16,6 +16,10 @@ const src = readFileSync(
   resolve(dirname(fileURLToPath(import.meta.url)), "../StudioPanels.tsx"),
   "utf8"
 );
+const tabsConfigSrc = readFileSync(
+  resolve(dirname(fileURLToPath(import.meta.url)), "../../rail/tabsConfig.ts"),
+  "utf8"
+);
 
 describe("StudioPanels — the two open requests wait here for a lazy panel", () => {
   it("listens for ui:settings-open and ui:pages-open-settings, and unsubscribes", () => {
@@ -25,9 +29,12 @@ describe("StudioPanels — the two open requests wait here for a lazy panel", ()
     expect(src).toContain("composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings)");
   });
 
-  it("each request switches the tab itself and opens the drawer", () => {
-    expect(src).toMatch(/setSettingsOpen\(\{ screen: data\.screen, repair: data\.repair \?\? null \}\);\s*onLeftPanelTabChange\?\.\("settings"\)/);
-    expect(src).toMatch(/setPagesOpen\(\{ pageId: data\.pageId, tab: data\.tab \}\);\s*onLeftPanelTabChange\?\.\("pages"\)/);
+  /* B-1 fix: the request and the drawer ride the guarded switch's
+     onSwitched — a switch held (or refused) by the unsaved-changes confirm
+     must not hand a request to, or open the drawer on, the wrong tab. */
+  it("each request switches the tab itself and, once switched, hands the request down and opens the drawer", () => {
+    expect(src).toMatch(/onLeftPanelTabChange\?\.\("settings", \(\) => \{\s*setSettingsOpen\(\{ screen: data\.screen, repair: data\.repair \?\? null \}\);\s*openDrawer\(\);/);
+    expect(src).toMatch(/onLeftPanelTabChange\?\.\("pages", \(\) => \{\s*setPagesOpen\(\{ pageId: data\.pageId, tab: data\.tab \}\);\s*openDrawer\(\);/);
   });
 
   it("hands the requests down and drops each one when its tab is left", () => {
@@ -44,6 +51,64 @@ describe("StudioPanels — ui:cms-open (⌘K → a collection or a record)", () 
   });
 
   it("writes the request to the workspace store, then switches to rail CMS", () => {
-    expect(src).toMatch(/cmsWorkspace\.openRequest\(data\);\s*onLeftPanelTabChange\?\.\("content"\)/);
+    expect(src).toMatch(/onLeftPanelTabChange\?\.\("content", \(\) => \{\s*cmsWorkspace\.openRequest\(data\);\s*openDrawer\(\);/);
+  });
+});
+
+/* Security carry-over (same class as the VIEWER rail gate): "ui:switch-tab"
+ * is a SECOND door onto the tabs the rail gates — the ⌘K palette, canvas
+ * context menus, PublishTab, CmsWorkspace and others all route through it.
+ * Before this fix, the handler called onLeftPanelTabChange?.(data.tab)
+ * unconditionally, so a VIEWER blocked from clicking "Add" on the rail could
+ * still reach it via ⌘K or any other ui:switch-tab emitter. */
+describe("StudioPanels — ui:switch-tab respects the VIEWER rail gate", () => {
+  it("gates the handler with the SAME predicate the rail uses (isTabAllowedForViewer), not a copy", () => {
+    // The handler's own gate.
+    expect(src).toMatch(
+      /const handler = \(data: \{ tab: string; fullPage\?: boolean \}\) => \{\s*[\s\S]{0,800}if \(!isTabAllowedForViewer\(data\.tab as GroupedTabId, viewerChrome\)\)/
+    );
+    // The rail's gate — same function, not a re-derived VIEWER_TABS.has(...) check.
+    expect(src).toMatch(/if \(!isTabAllowedForViewer\(tab, viewerChrome\)\)/);
+    // Imported from the tab registry, not locally re-defined here.
+    expect(src).toMatch(/import \{[^}]*\bisTabAllowedForViewer\b[^}]*\bVIEWER_TABS\b[^}]*\} from "\.\.\/rail\/tabsConfig"/);
+    expect(src).not.toMatch(/function isTabAllowedForViewer/);
+    // Exactly ONE canonical definition exists, in the tab registry.
+    expect(tabsConfigSrc.match(/export function isTabAllowedForViewer/g)).toHaveLength(1);
+  });
+
+  it("the effect re-subscribes when viewerChrome changes (so a mid-session role change re-gates it)", () => {
+    expect(src).toMatch(/composer\.on\("ui:switch-tab", handler\);[\s\S]{0,200}\}, \[composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle, viewerChrome, addToast\]\);/);
+  });
+});
+
+describe("isTabAllowedForViewer", () => {
+  it("a non-viewer may open any tab", async () => {
+    const { isTabAllowedForViewer } = await import("../../rail/tabsConfig");
+    expect(isTabAllowedForViewer("add" as never, false)).toBe(true);
+    expect(isTabAllowedForViewer("content" as never, false)).toBe(true);
+  });
+
+  it("a viewer may only open layers/assets/history/review/activity (FC-9)", async () => {
+    const { isTabAllowedForViewer } = await import("../../rail/tabsConfig");
+    expect(isTabAllowedForViewer("layers" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("assets" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("history" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("review" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("activity" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("add" as never, true)).toBe(false);
+    expect(isTabAllowedForViewer("content" as never, true)).toBe(false);
+    expect(isTabAllowedForViewer("design" as never, true)).toBe(false);
+    expect(isTabAllowedForViewer("settings" as never, true)).toBe(false);
+    expect(isTabAllowedForViewer("ai" as never, true)).toBe(false);
+  });
+});
+
+/* X-8: a VIEWER's column used to be the role notice and nothing else, so the
+   read-only History/Review/Activity (FC-9) rendered nowhere. */
+describe("StudioPanels — a VIEWER's column hosts the column-tab panel", () => {
+  it("decides the column with the shared predicate and renders it in the viewer's column", () => {
+    expect(src).toContain("const rightColumnTab = isColumnTabOpen({");
+    expect(src).toContain('{rightColumnTab ? columnPanel : <ViewerRoleNotice role="VIEWER" />}');
+    expect(src).toContain("viewerChrome={viewerChrome}");
   });
 });

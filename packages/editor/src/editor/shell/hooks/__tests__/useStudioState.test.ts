@@ -7,7 +7,17 @@
  */
 
 import { renderHook, act } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+/* openLeftPanelToTab/setLeftPanelTab is the ONE sink
+   every tab-open door funnels into (rail, ui:switch-tab, UI_PANEL_OPEN /
+   ⌘K, deep links, topbar buttons) — mocked directly so the viewer-gating
+   tests below are deterministic instead of racing the real
+   fetchMyRole → network path. Defaults to false (non-viewer) so every
+   pre-existing test in this file keeps exercising the ungated setters. */
+const mockViewerChrome = vi.hoisted(() => vi.fn<() => boolean>(() => false));
+vi.mock("../useEditorRole", () => ({ useViewerChrome: () => mockViewerChrome() }));
+
 import { useStudioState, type OverlayState } from "../useStudioState";
 
 const PANEL_STATE_KEY = "buildrick-panel-state";
@@ -24,6 +34,7 @@ describe("useStudioState", () => {
 
   afterEach(() => {
     localStorage.clear();
+    mockViewerChrome.mockReturnValue(false);
   });
 
   // Defaults -------------------------------------------------------------------
@@ -71,18 +82,37 @@ describe("useStudioState", () => {
 
   // Persistence ----------------------------------------------------------------
   describe("panel-state persistence", () => {
-    it("persists leftPanelTab / subTabs / rightPanelTab to buildrick-panel-state", () => {
+    it("persists leftPanelTab / rightPanelTab to buildrick-panel-state", () => {
       const { result } = renderHook(() => useStudioState());
       act(() => {
         result.current.setLeftPanelTab("pages");
-        result.current.setLeftPanelSubTabs({ pages: "list" });
         result.current.setRightPanelTab("styles");
       });
       expect(readPersisted()).toMatchObject({
         leftPanelTab: "pages",
-        leftPanelSubTabs: { pages: "list" },
         rightPanelTab: "styles",
       });
+    });
+
+    /* A-7: a sub-tab is a one-shot deep-link destination, not a sticky
+       preference — persisting it left a stale sub-tab that a later plain
+       openLeftPanelToTab(primaryTab) call would silently reuse. */
+    it("does NOT persist leftPanelSubTabs", () => {
+      const { result } = renderHook(() => useStudioState());
+      act(() => {
+        result.current.setLeftPanelSubTabs({ pages: "list" });
+      });
+      expect(readPersisted()?.leftPanelSubTabs).toBeUndefined();
+    });
+
+    /* A-7: a full-page tab (Settings, Templates, the Asset library) is a
+       destination, not a steady state — persisting it verbatim dropped a
+       reload right back into Settings instead of the canvas. */
+    it("persists the last DRAWER tab, not a full-page tab, while a full page is open", () => {
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.setLeftPanelTab("pages"));
+      act(() => result.current.setLeftPanelTab("settings"));
+      expect(readPersisted()).toMatchObject({ leftPanelTab: "pages" });
     });
 
     /* Board 817:4649: "Toggles persist per-user per-project." They did not —
@@ -98,7 +128,55 @@ describe("useStudioState", () => {
       expect(remount.result.current.overlays.showRulers).toBe(true);
       expect(remount.result.current.overlays.showGuides).toBe(false);
     });
+  });
 
+  // VIEWER gate at the sink ---------------------------------------
+  describe("openLeftPanelToTab / setLeftPanelTab — the VIEWER gate every door funnels into", () => {
+    it("a non-viewer may open any tab", () => {
+      mockViewerChrome.mockReturnValue(false);
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.openLeftPanelToTab("design"));
+      expect(result.current.leftPanelTab).toBe("design");
+      act(() => result.current.setLeftPanelTab("settings"));
+      expect(result.current.leftPanelTab).toBe("settings");
+    });
+
+    it("a viewer's openLeftPanelToTab no-ops for a disallowed tab (Brand)", () => {
+      mockViewerChrome.mockReturnValue(true);
+      const { result } = renderHook(() => useStudioState());
+      expect(result.current.leftPanelTab).toBe("add"); // default
+      act(() => result.current.openLeftPanelToTab("design"));
+      expect(result.current.leftPanelTab).toBe("add"); // unchanged
+    });
+
+    it("a viewer's openLeftPanelToTab no-ops for Settings and Add too", () => {
+      mockViewerChrome.mockReturnValue(true);
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.openLeftPanelToTab("settings"));
+      expect(result.current.leftPanelTab).toBe("add");
+      act(() => result.current.setLeftPanelTab("content"));
+      expect(result.current.leftPanelTab).toBe("add");
+    });
+
+    it("a viewer CAN still open layers/assets/history/review/activity (FC-9)", () => {
+      mockViewerChrome.mockReturnValue(true);
+      const { result } = renderHook(() => useStudioState());
+      for (const tab of ["layers", "assets", "history", "review", "activity"]) {
+        act(() => result.current.openLeftPanelToTab(tab));
+        expect(result.current.leftPanelTab).toBe(tab);
+      }
+    });
+
+    it("does not flip isLeftPanelOpen for a viewer's blocked openLeftPanelToTab", () => {
+      mockViewerChrome.mockReturnValue(true);
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.setIsLeftPanelOpen(false));
+      act(() => result.current.openLeftPanelToTab("design"));
+      expect(result.current.isLeftPanelOpen).toBe(false);
+    });
+  });
+
+  describe("panel-state persistence", () => {
     /* A payload written before overlays existed must not read as all-false —
        showGuides defaults on. */
     it("falls back to defaults for a stored payload with no overlays key", () => {
@@ -171,11 +249,23 @@ describe("useStudioState", () => {
       expect(result.current.leftPanelSubTabs).toEqual({ design: "colors" });
     });
 
-    it("openLeftPanelToTab without a sub-tab leaves subTabs untouched", () => {
+    it("openLeftPanelToTab without a sub-tab leaves ANOTHER tab's subTab untouched", () => {
       const { result } = renderHook(() => useStudioState());
       act(() => result.current.setLeftPanelSubTabs({ add: "blocks" }));
       act(() => result.current.openLeftPanelToTab("pages"));
       expect(result.current.leftPanelSubTabs).toEqual({ add: "blocks" });
+    });
+
+    /* A-7 consume-once: a deep link's sub-tab is a one-shot destination. A
+       plain re-open of the SAME primary tab with no subTab must not silently
+       reuse whatever a prior deep link had left there — Settings opened
+       plain, after once landing on Settings > SEO, must show the overview. */
+    it("openLeftPanelToTab without a sub-tab clears a PRIOR sub-tab for the SAME primary tab", () => {
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.openLeftPanelToTab("settings", "seo"));
+      expect(result.current.leftPanelSubTabs).toEqual({ settings: "seo" });
+      act(() => result.current.openLeftPanelToTab("settings"));
+      expect(result.current.leftPanelSubTabs).toEqual({});
     });
 
     it("openBlocks / openPages / openLayers target add / pages / layers", () => {

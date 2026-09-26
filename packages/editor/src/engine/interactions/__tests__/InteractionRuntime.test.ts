@@ -116,14 +116,19 @@ describe("InteractionRuntime", () => {
     MockIntersectionObserver.instances = [];
     vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
     play = vi.fn();
+    // D-12: createAnimation is now async (lazy-loads gsap). The mock must
+    // resolve like the real API instead of returning the instance directly.
     mockCreate.mockImplementation(
-      () =>
-        ({ timeline: { play } }) as unknown as ReturnType<
-          typeof gsapEngine.createAnimation
+      async () =>
+        ({ timeline: { play } }) as unknown as Awaited<
+          ReturnType<typeof gsapEngine.createAnimation>
         >,
     );
     runtime = new InteractionRuntime();
   });
+
+  /** Flushes the microtask queue so `createAnimation(...).then(...)` settles. */
+  const flushCreateAnimation = () => Promise.resolve().then(() => Promise.resolve());
 
   afterEach(() => {
     runtime.stop();
@@ -133,13 +138,14 @@ describe("InteractionRuntime", () => {
   });
 
   describe("start / stop lifecycle", () => {
-    it("attaches to every [data-buildrick-id] element in the document", () => {
+    it("attaches to every [data-buildrick-id] element in the document", async () => {
       const a = makeElement("el-a", [makeInteraction("click")]);
       const b = makeElement("el-b", [makeInteraction("click")]);
       runtime.start();
 
       a.dispatchEvent(new MouseEvent("click"));
       b.dispatchEvent(new MouseEvent("click"));
+      await flushCreateAnimation();
 
       expect(callsFor("el-a")).toHaveLength(1);
       expect(callsFor("el-b")).toHaveLength(1);
@@ -242,10 +248,11 @@ describe("InteractionRuntime", () => {
   });
 
   describe("trigger wiring", () => {
-    it("click plays the animation with trigger passed through to GSAP", () => {
+    it("click plays the animation with trigger passed through to GSAP", async () => {
       const el = makeElement("el-click", [makeInteraction("click")]);
       runtime.start();
       el.dispatchEvent(new MouseEvent("click"));
+      await flushCreateAnimation();
 
       expect(callsFor("el-click")).toHaveLength(1);
       expect(mockCreate).toHaveBeenCalledWith(
@@ -602,12 +609,13 @@ describe("InteractionRuntime", () => {
       expect(firstConfigFor("el-x1")).toMatchObject({ loop: false, repeatCount: 0 });
     });
 
-    it("survives gsapEngine.createAnimation returning null", () => {
+    it("survives gsapEngine.createAnimation returning null", async () => {
       const el = makeElement("el-null", [makeInteraction("click")]);
       runtime.start();
-      mockCreate.mockImplementationOnce(() => null);
+      mockCreate.mockImplementationOnce(async () => null);
 
       expect(() => el.dispatchEvent(new MouseEvent("click"))).not.toThrow();
+      await flushCreateAnimation();
       expect(play).not.toHaveBeenCalled();
     });
   });

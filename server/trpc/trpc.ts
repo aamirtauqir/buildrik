@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/server/auth";
 import { checkRateLimit } from "@/server/services/rate-limiter";
 import { extractBearer, verifyApiToken, type Scope } from "@/server/services/api-token.service";
+import { clientIp } from "@/lib/request-ip";
 
 interface BearerSession {
   user: { id: string };
@@ -143,8 +144,7 @@ export function scopedProcedure(requiredScope: Scope) {
 
 export function createRateLimitedProcedure(maxAttempts: number, windowMs: number) {
   return publicProcedure.use(async ({ ctx, path, next }) => {
-    const forwarded = ctx.headers?.get("x-forwarded-for");
-    const ip = forwarded?.split(",")[0]?.trim() || "unknown";
+    const ip = clientIp(ctx.headers);
     const key = `${ip}:${path}`;
     const result = await checkRateLimit(key, maxAttempts, windowMs);
     if (!result.allowed) {

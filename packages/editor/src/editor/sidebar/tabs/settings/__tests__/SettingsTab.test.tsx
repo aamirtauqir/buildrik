@@ -38,6 +38,9 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
   getEditorPlanTier: () => "starter",
 }));
 
+const role = vi.hoisted(() => ({ value: null as string | null }));
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({ useEditorRole: () => role.value }));
+
 vi.mock("../hooks/useSettingsScreen", () => ({
   useSettingsScreen: vi.fn(
     (
@@ -180,6 +183,7 @@ vi.mock("../screens/RedirectsScreen", () => ({
 }));
 
 import { SettingsTab } from "../SettingsTab";
+import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
 
 afterEach(() => {
@@ -260,7 +264,7 @@ describe("SettingsTab — the shell", () => {
       .map((el) => el.textContent);
     expect(groups).toEqual(["Site setup", "SEO & publishing", "Visitors", "Advanced", "Workspace"]);
     expect(screen.getByTestId("set-nav-overview").getAttribute("aria-current")).toBe("page");
-    for (const id of ["members", "billing"]) {
+    for (const id of ["members", "billing", "webhooks"]) {
       const link = screen.getByTestId(`set-nav-${id}`);
       expect(link.tagName).toBe("A");
       expect(link.getAttribute("target")).toBe("_blank");
@@ -268,6 +272,9 @@ describe("SettingsTab — the shell", () => {
     }
     expect(screen.getByTestId("set-nav-members").getAttribute("href")).toContain("/dashboard/settings/team");
     expect(screen.getByTestId("set-nav-billing").getAttribute("href")).toContain("/dashboard/settings/billing");
+    // A-12/A01-6: webhooks moved to the dashboard's Settings > Integrations —
+    // workspace-scoped, alongside Vercel/Slack/Zapier — not a Settings screen.
+    expect(screen.getByTestId("set-nav-webhooks").getAttribute("href")).toContain("/dashboard/settings/integrations");
   });
 
   it("keeps the Pro badge on the locked rows for a starter plan", () => {
@@ -781,5 +788,113 @@ describe("SettingsTab — a screen mounted with the shell keeps its handlers", (
     fireEvent.click(screen.getByTestId("set-foot-save"));
     await waitFor(() => expect(composer.saveProject).toHaveBeenCalled());
     expect(seoFlushes).toEqual(["flushed"]);
+  });
+});
+
+/* M7 (PD-1), narrowed in review: only the fields the sync provider
+   mirrors to Site columns (SITE_COLUMN_FIELDS) are the dashboard's. Below
+   ADMIN those are read-only and say why; everything else on the screen —
+   Author, Twitter handle, Global CSS — is project data the EDITOR could always
+   change, and still can, with the Save footer to save it. */
+describe("SettingsTab — Site-column fields below ADMIN", () => {
+  afterEach(() => {
+    role.value = null;
+  });
+
+  it("an EDITOR on General: Site name is read-only with the reason; Author edits and saves", async () => {
+    role.value = "EDITOR";
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(true);
+    expect(screen.getAllByTestId("set-admin-only")[0].textContent).toBe("Only admins can change this");
+    const author = screen.getByLabelText("Author") as HTMLInputElement;
+    expect(author.matches(":disabled")).toBe(false);
+    fireEvent.change(author, { target: { value: "Sam" } });
+    await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
+    expect(screen.getByTestId("set-foot-save")).toBeTruthy();
+  });
+
+  it("an ADMIN edits every field", async () => {
+    role.value = "ADMIN";
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(false);
+    expect(screen.queryByTestId("set-admin-only")).toBeNull();
+  });
+
+  it("an unknown role (demo, lookup failed) stays editable — the server decides", async () => {
+    role.value = null;
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(false);
+    expect(screen.queryByTestId("set-admin-only")).toBeNull();
+  });
+});
+
+/* B-1: Settings owns its entry in the shell dirty registry — the one source
+   the shell's tab-switch guard, the exit guard and beforeunload read. It is
+   cleared only when Settings actually unmounts (its buffers are gone then). */
+describe("SettingsTab — shell dirty registry entry", () => {
+  it("registers dirty while a screen has unsaved edits and clears it on unmount", async () => {
+    const composer = makeComposer();
+    const { unmount } = renderS(<SettingsTab composer={asComposer(composer)} />);
+    expect(shellDirty.get()).toBe(false);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
+    await waitFor(() => expect(shellDirty.get()).toBe(true));
+    unmount();
+    expect(shellDirty.get()).toBe(false);
+  });
+});
+
+/* B-1 fix. The shell's tab-switch guard reads the registry the moment
+   Settings' own door runs onClose — Settings' own Discard / Save and
+   continue already answered the question, so by then its entry must be
+   clear, or the user is asked twice. And the shell's "Leave anyway" runs
+   Settings' registered discard: the screens write to the composer live, so
+   leaving without a rollback would keep the "lost" values for the next save. */
+describe("SettingsTab — its registry entry is honest at every door", () => {
+  async function editGeneral() {
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
+    fireEvent.change(screen.getByLabelText("Site name"), { target: { value: "x" } });
+    await waitFor(() => expect(shellDirty.get()).toBe(true));
+  }
+
+  it("Discard in Settings' own dialog clears the entry before leaving — the shell guard sees nothing", async () => {
+    let dirtyAtClose: boolean | null = null;
+    const onClose = vi.fn(() => (dirtyAtClose = shellDirty.get()));
+    renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    await editGeneral();
+    fireEvent.click(screen.getByTestId("set-back"));
+    fireEvent.click(screen.getByTestId("set-unsaved-discard"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(dirtyAtClose).toBe(false);
+  });
+
+  it("Save and continue clears the entry before leaving — the shell guard sees nothing", async () => {
+    let dirtyAtClose: boolean | null = null;
+    const onClose = vi.fn(() => (dirtyAtClose = shellDirty.get()));
+    renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    await editGeneral();
+    fireEvent.click(screen.getByTestId("set-back"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect(dirtyAtClose).toBe(false);
+  });
+
+  it("the shell's Leave anyway (discardDirty) rolls composer back to the snapshot and clears the entry", async () => {
+    const composer = makeComposer();
+    renderS(<SettingsTab composer={asComposer(composer)} />);
+    await editGeneral();
+    const snapshot = composer.getProjectSettings();
+    act(() => shellDirty.discardDirty());
+    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
+    expect(composer.setProjectSettings.mock.calls[0][0]).toEqual(snapshot);
+    expect(shellDirty.get()).toBe(false);
   });
 });

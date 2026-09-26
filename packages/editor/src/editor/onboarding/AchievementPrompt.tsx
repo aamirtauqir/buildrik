@@ -40,7 +40,7 @@
 
 import * as React from "react";
 import { ACHIEVEMENT_AUTO_DISMISS_MS, type AchievementPromptState } from "./useOnboardingOrchestrator";
-import { Button } from "@/editor/chrome-ui";
+import { Button, useFocusTrap } from "@/editor/chrome-ui";
 
 export interface AchievementPromptProps extends AchievementPromptState {
   onDismiss: () => void;
@@ -68,7 +68,7 @@ const HEAD = "tw:flex tw:items-start tw:gap-[14px]";
    in the board's direction: 20 was what shipped. */
 const BADGE =
   "tw:size-10 tw:flex-none tw:rounded-full tw:flex tw:items-center tw:justify-center " +
-  "tw:text-[length:var(--bk-text-16)] tw:font-bold tw:text-[var(--bk-accent-on)]";
+  "tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-accent-on)]";
 const HEAD_TEXT = "tw:flex tw:flex-col tw:gap-1 tw:flex-1 tw:min-w-0";
 /* 11/600/uppercase/0.88 tracking is the board's kicker on BOTH states, in
    `--bk-success-text` either way — it names the fact that a step landed, not
@@ -129,6 +129,12 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
 
   const fill = isLastStep ? FILL_DONE : FILL_STEP;
 
+  // B-7/A13-10: this overlay had 0 ModalRoot/OverlayMount/useFocusTrap hits —
+  // `autoFocus` on the CTA moved focus in but Tab was never trapped inside
+  // the card and Escape did nothing. useFocusTrap covers both (and moving
+  // focus in), so the CTA's `autoFocus` prop below is redundant now.
+  const cardRef = useFocusTrap(true, onDismiss);
+
   return (
     <>
       {/* Accessible live region — invisible, read by screen readers on mount */}
@@ -143,6 +149,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
       <div onClick={onDismiss} aria-hidden="true" className={SCRIM} />
       {/* Achievement card */}
       <div
+        ref={cardRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="achievement-title"
@@ -210,7 +217,6 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           <Button
             type="button"
             onClick={onDismiss}
-            autoFocus
             className={`${CTA} ${fill}`}
             data-testid="achievement-cta"
           >

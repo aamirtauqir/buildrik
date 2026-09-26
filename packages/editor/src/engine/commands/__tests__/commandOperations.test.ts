@@ -16,6 +16,8 @@ interface Sel {
   getParent?: () => unknown;
   insertAfter?: ReturnType<typeof vi.fn>;
   insertBefore?: ReturnType<typeof vi.fn>;
+  isLocked?: () => boolean;
+  isComponentInstance?: () => boolean;
 }
 
 function makeComposer(selected: unknown, state = { snapToGrid: false, gridSize: 8 }) {
@@ -51,6 +53,58 @@ describe("nudgeSelected", () => {
     const composer = makeComposer(selected);
     nudgeSelected(composer as unknown as Composer, 5, 0);
     expect(composer.beginTransaction).not.toHaveBeenCalled();
+  });
+
+  // IMPORTANT 2: the arrow-key nudge path never
+  // reached the lock/instance guard A-5 added to delete/cut — a locked
+  // element still moved.
+  it("skips a locked element and emits LOCKED_ELEMENTS_SKIPPED", () => {
+    mountEl("el");
+    const selected: Sel = {
+      getId: () => "el",
+      setStyle: vi.fn(),
+      isLocked: () => true,
+      isComponentInstance: () => false,
+    };
+    const composer = makeComposer(selected);
+
+    nudgeSelected(composer as unknown as Composer, 5, 0);
+
+    expect(composer.beginTransaction).not.toHaveBeenCalled();
+    expect(selected.setStyle).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+  });
+
+  it("skips an element inside a component instance", () => {
+    mountEl("el");
+    const selected: Sel = {
+      getId: () => "el",
+      setStyle: vi.fn(),
+      isLocked: () => false,
+      isComponentInstance: () => true,
+    };
+    const composer = makeComposer(selected);
+
+    nudgeSelected(composer as unknown as Composer, 5, 0);
+
+    expect(composer.beginTransaction).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+  });
+
+  it("still nudges an unlocked element (isLocked/isComponentInstance both false)", () => {
+    mountEl("el", { position: "static" });
+    const selected: Sel = {
+      getId: () => "el",
+      setStyle: vi.fn(),
+      isLocked: () => false,
+      isComponentInstance: () => false,
+    };
+    const composer = makeComposer(selected);
+
+    nudgeSelected(composer as unknown as Composer, 5, 0);
+
+    expect(composer.beginTransaction).toHaveBeenCalled();
+    expect(selected.setStyle).toHaveBeenCalledWith("left", "5px");
   });
 
   it("sets relative positioning for static elements and applies the delta", () => {

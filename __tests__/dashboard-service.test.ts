@@ -29,6 +29,13 @@ describe("Dashboard Service", () => {
 
   describe("getDashboardStats", () => {
     it("returns correct stat structure", async () => {
+      // S-9: getDashboardStats now resolves siteScopeWhere(userId, workspaceId)
+      // first. An ADMIN is never site-scoped, so this keeps stats unrestricted.
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        id: "m1",
+        role: "ADMIN",
+        _count: { sitePermissions: 0 },
+      } as any);
       vi.mocked(prisma.site.count)
         .mockResolvedValueOnce(5)   // totalSites
         .mockResolvedValueOnce(3)   // publishedSites
@@ -45,7 +52,7 @@ describe("Dashboard Service", () => {
         { name: "Portfolio", lastPublishedAt: new Date("2026-03-20") },
       ] as any);
 
-      const stats = await getDashboardStats("ws_123", "OWNER");
+      const stats = await getDashboardStats("ws_123", "u_1", "OWNER");
       expect(stats.totalSites).toBe(5);
       expect(stats.publishedSites).toBe(3);
       expect(stats.collaborators).toBe(3);
@@ -68,8 +75,13 @@ describe("Dashboard Service", () => {
           publishedUrl: "https://site-1.buildrik.app",
         },
       ];
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        id: "m1",
+        role: "ADMIN",
+        _count: { sitePermissions: 0 },
+      } as any);
       vi.mocked(prisma.site.findMany).mockResolvedValue(mockSites as any);
-      const sites = await getRecentSites("ws_123");
+      const sites = await getRecentSites("ws_123", "u_1");
       expect(sites).toHaveLength(1);
       expect(sites[0].id).toBe("s1");
     });

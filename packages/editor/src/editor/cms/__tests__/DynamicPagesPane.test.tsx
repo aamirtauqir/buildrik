@@ -74,4 +74,17 @@ describe("DynamicPagesPane", () => {
     mount({ ...MENU, pageSlugPattern: "/menu/{slug}" } as CMSCollection, [rec("a", "Margherita", "draft")]);
     expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("1 record, none published.");
   });
+
+  it("A-17: a saved template page that no longer exists is surfaced as a dangling reference, not Ready", () => {
+    // "old-item.html" matches no page in fakeCmsEngine's getAllPages() —
+    // the template was renamed or deleted after this collection bound to it.
+    mount(
+      { ...MENU, pageSlugPattern: "/menu/{slug}", pageTemplatePath: "old-item.html" } as CMSCollection,
+      [rec("a", "Margherita")],
+    );
+    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent(
+      "The saved template page is missing — choose one again",
+    );
+    expect(screen.getByTestId("cms-dp-status")).not.toHaveTextContent("Ready");
+  });
 });

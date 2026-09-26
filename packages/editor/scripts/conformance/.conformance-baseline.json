@@ -1096,14 +1096,6 @@
     },
     "nonTextPairs": {}
   },
-  "media-drill-in-stock-browser": {
-    "skipped": 0,
-    "compared": 28,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
   "media-drill-in-versions": {
     "skipped": 0,
     "compared": 31,
@@ -1326,14 +1318,6 @@
     "nonTextPairs": {}
   },
   "s7-settings-domains": {
-    "skipped": 0,
-    "compared": 14,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
-  "s7-settings-webhooks": {
     "skipped": 0,
     "compared": 14,
     "contrastFailures": 0,

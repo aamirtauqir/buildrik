@@ -39,6 +39,7 @@ describe("siteDetail.sharing.create — plan errors", () => {
     ["EXPIRY_EXCEEDS_PLAN", "FORBIDDEN", /expiry/],
     ["SHARE_LINK_LIMIT", "FORBIDDEN", /3 active share links/],
     ["SITE_NOT_FOUND", "NOT_FOUND", /Site not found/],
+    ["PASSWORD_REQUIRED", "BAD_REQUEST", /requires a password/],
   ])("%s → %s with a readable message", async (domain, code, message) => {
     createShareLinkMock.mockRejectedValueOnce(new Error(domain));
     await expect(

@@ -19,7 +19,7 @@
 
 import * as React from "react";
 import { CheckCircle2, X } from "lucide-react";
-import { PanelHeader, Button, IconButton, EmptyState, Progress, Row } from "@/editor/chrome-ui";
+import { PanelHeader, Button, IconButton, EmptyState, Spinner, Row } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
 
 export interface IssuesPanelProps {
@@ -51,6 +51,21 @@ export interface IssuesPanelProps {
   onOpenBrand?: (tokenId?: string) => void;
   /** Suppress this token's issues for the session. */
   onIgnore?: (tokenId: string) => void;
+  /** Restore a previously-ignored token's issues. */
+  onUnignore?: (tokenId: string) => void;
+  /** Token ids currently suppressed — drives the "Ignored (n)" row. */
+  suppressedTokenIds?: readonly string[];
+  /**
+   * Content-scan state (x3: `useContentIssueScanner` — the client-side alt-
+   * text / broken-link detectors). DS-lint and the publish-check bridge are
+   * synchronous/fetch-and-forget, so this is the one source that runs long
+   * enough, and can fail loudly enough, to need its own banner. Absent when
+   * the caller has no scanner wired up — the panel then renders as it always
+   * did.
+   */
+  scanState?: "idle" | "scanning" | "error";
+  /** Re-run the scan — the scan-failed banner's "Try again". */
+  onRescan?: () => void;
 }
 
 type Filter = "all" | "error" | "warning";
@@ -128,6 +143,10 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   onFix,
   onOpenBrand,
   onIgnore,
+  onUnignore,
+  suppressedTokenIds = [],
+  scanState = "idle",
+  onRescan,
 }) => {
   const [filter, setFilter] = React.useState<Filter>("all");
   // T10 page scope. Defaults to "page" — "what's wrong with what I'm looking
@@ -193,6 +212,22 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
         <PanelHeader title="Issues" onClose={onClose} size="panel" />
       )}
 
+      {scanState === "scanning" && (
+        <div className={`${BAND} tw:bg-[var(--bk-accent-tint)]`} role="status" aria-live="polite" data-testid="issues-scan-banner">
+          <span className="tw:text-xs tw:text-[var(--bk-accent-text)]">Scanning for issues…</span>
+        </div>
+      )}
+      {scanState === "error" && (
+        <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert" data-testid="issues-scan-banner">
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+            <span className="tw:text-xs tw:text-[var(--bk-error-text)]">Scan failed.</span>
+            <Button color="light" size="xs" className={GHOST} onClick={() => onRescan?.()}>
+              Try again
+            </Button>
+          </div>
+        </div>
+      )}
+
       {issues.length === 0 ? (
         /* Board 164:35: two lines under the header — the verdict in green, and
            what it means for publishing under it. No icon, and not floating in
@@ -201,10 +236,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
            header and insets both to the panel's 24px gutter; the pair sat one
            spacing step high and one step narrow until 2026-09-01. */
         <div className="tw:px-6 tw:pt-10 tw:text-center" role="status">
-          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No issues.</p>
-          <p className="tw:m-0 tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]">
-            This page is ready to publish.
-          </p>
+          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No brand issues.</p>
         </div>
       ) : (
         <>
@@ -242,20 +274,11 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               <div className="tw:text-xs tw:text-[var(--bk-accent-text)]">
                 Fixing {fixing.message.toLowerCase()}…
               </div>
-              {/* The engine reports no percentage, so this bar has always been a
-                  fixed activity indicator rather than real progress. It is
-                  flowbite's Progress now instead of a hand-built track+fill. */}
-              <div className="tw:my-2">
-                {/* flowbite fills Progress with `bg-primary-600` = `var(--bk-blue-600)` (blue-600), one
-                step off the single accent `var(--bk-blue-700)`. DESIGN.md allows ONE blue, so
-                this override is a project rule rather than a board reading — no
-                board is being conformed to here. `theme.color` and not
-                `theme.bar`, because the colour class is twMerged AFTER bar and
-                would win. A themed wrapper would be the SSOT fix, but the closed
-                wrapper set is [TextInput, Select] and `gate:chrome-ui-surface`
-                requires every flowbite export in the barrel to stay a pure
-                re-export — so the override belongs at the call site. */}
-                <Progress progress={60} size="sm" aria-label="Applying the fix" theme={{ color: { default: "tw:bg-[var(--bk-accent)]" } }} />
+              {/* The engine reports no percentage, so a determinate bar was
+                  always a lie about progress it doesn't have. A spinner makes
+                  no numeric claim. */}
+              <div className="tw:my-2 tw:flex tw:items-center">
+                <Spinner size="sm" aria-label="Applying the fix" />
               </div>
               <div className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">
                 Auto-fix lands as ONE undo step.
@@ -283,7 +306,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                     setFailed(null);
                   }}
                 >
-                  Ignore once
+                  Ignore for this token
                 </Button>
               </div>
             </div>
@@ -365,6 +388,31 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             ● red = error · ● amber = warning
           </p>
         </>
+      )}
+      {suppressedTokenIds.length > 0 && (
+        <div className="tw:flex-none tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2" data-testid="issues-ignored-row">
+          <div className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">
+            Ignored ({suppressedTokenIds.length})
+          </div>
+          <ul className="tw:m-0 tw:mt-1 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0">
+            {suppressedTokenIds.map((tokenId) => (
+              <li key={tokenId} className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+                <span className="tw:truncate tw:text-[11px] tw:text-[var(--bk-ink-muted)]" title={tokenId}>
+                  {tokenId}
+                </span>
+                <Button
+                  color="light"
+                  size="xs"
+                  variant="link"
+                  data-testid={`issue-restore-${tokenId}`}
+                  onClick={() => onUnignore?.(tokenId)}
+                >
+                  Restore
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

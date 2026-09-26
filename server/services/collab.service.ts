@@ -18,6 +18,17 @@ const RETENTION_MS = 24 * 60 * 60 * 1000;
 // modulo gives a steady, test-deterministic cadence regardless of per-site rate.
 const PRUNE_EVERY = 50;
 
+/**
+ * Server kill switch for both collab routes. Reads the SAME variable the
+ * editor's "Start collaboration" reads, so the UI and the endpoints cannot
+ * disagree: off in production means the op channel does not exist there
+ * (A19-14 — the routes were live while the flag hid only the button). Next
+ * inlines `NEXT_PUBLIC_*` at build time on the server too.
+ */
+export function isCollabEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_FEATURE_COLLAB === "true";
+}
+
 export async function appendCollabOp(
   siteId: string,
   authorId: string,

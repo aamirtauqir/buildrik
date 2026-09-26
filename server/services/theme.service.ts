@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 
 /**
  * Shared-theme push (redesign E2-T5b) — the ONLY layer that reads/writes the
@@ -7,15 +8,87 @@ import { prisma } from "@/lib/prisma";
  * (IDOR guard): the router supplies workspaceId from the session, never from
  * client input, and site targets are filtered to the workspace.
  *
- * Model: an agency captures one site's tokens as `Workspace.sharedTheme`, then
- * pushes that token set onto its client sites' `projectStyles`. Push is
- * per-site and partial-fail tolerant (one site erroring never aborts the rest),
- * and skips sites with `themeLocked` (the per-site override).
+ * Model: an agency captures one site's design tokens as `Workspace.sharedTheme`,
+ * then pushes that token set onto its client sites. Push is per-site and
+ * partial-fail tolerant (one site erroring never aborts the rest), and skips
+ * sites with `themeLocked` (the per-site override).
+ *
+ * A-3: the tokens live in `projectSettings.designTokens` (+ `designPresets`) —
+ * that is what the editor's Brand panel reads and writes. Every op here used to
+ * read and write `projectStyles` instead, which holds the editor's per-element
+ * CSS rules (`[data-buildrik-id]` selectors): capture copied one site's element
+ * rules, and push REPLACED the target's element rules with them, wiping its
+ * canvas styling while its brand tokens never changed. Shared themes, presets
+ * and snapshots now hold a `TokenTheme`; one captured in the old
+ * projectStyles shape is refused rather than written into a site.
  */
+
+/** What a shared theme, a preset and a pre-push snapshot hold. */
+interface TokenTheme {
+  designTokens: unknown[];
+  designPresets?: unknown[];
+}
+
+/** The token set inside `projectSettings` (or a stored TokenTheme); null for
+ *  anything else, including the legacy projectStyles-shaped rule array. */
+function readTokenTheme(value: unknown): TokenTheme | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const { designTokens, designPresets } = value as { designTokens?: unknown; designPresets?: unknown };
+  if (!Array.isArray(designTokens)) return null;
+  return Array.isArray(designPresets) ? { designTokens, designPresets } : { designTokens };
+}
+
+/** `projectSettings` with a token set written into it; every other setting kept. */
+function withTokens(projectSettings: unknown, theme: TokenTheme): Prisma.InputJsonValue {
+  const current =
+    projectSettings && typeof projectSettings === "object" && !Array.isArray(projectSettings)
+      ? (projectSettings as Record<string, unknown>)
+      : {};
+  return {
+    ...current,
+    designTokens: theme.designTokens,
+    ...(theme.designPresets ? { designPresets: theme.designPresets } : {}),
+  } as Prisma.InputJsonValue;
+}
+
+/** A site's token set exactly as it stands — designPresets absence included,
+ *  so a rollback can put the site back to "no presets". */
+function snapshotTokens(projectSettings: unknown): TokenTheme {
+  const current =
+    projectSettings && typeof projectSettings === "object" && !Array.isArray(projectSettings)
+      ? (projectSettings as { designTokens?: unknown; designPresets?: unknown })
+      : {};
+  const designTokens = Array.isArray(current.designTokens) ? current.designTokens : [];
+  return Array.isArray(current.designPresets)
+    ? { designTokens, designPresets: current.designPresets }
+    : { designTokens };
+}
+
+/** `projectSettings` put back to a snapshot's token set — presets removed when
+ *  the snapshot had none (withTokens leaves them, which is right for a push). */
+function restoreTokens(projectSettings: unknown, snapshot: TokenTheme): Prisma.InputJsonValue {
+  const restored = { ...(withTokens(projectSettings, snapshot) as Record<string, unknown>) };
+  if (!snapshot.designPresets) delete restored.designPresets;
+  return restored as Prisma.InputJsonValue;
+}
+
+const LEGACY_THEME_MESSAGE =
+  "This theme was captured in an older format that would overwrite page styles. Capture it again from a source site.";
+
+/** The workspace's shared theme as a token set, or NO_THEME. */
+async function requireTokenTheme(workspaceId: string): Promise<TokenTheme> {
+  const shared = await getSharedTheme(workspaceId);
+  if (!shared) {
+    throw new ThemeError("NO_THEME", "No shared theme has been captured for this workspace");
+  }
+  const theme = readTokenTheme(shared.styles);
+  if (!theme) throw new ThemeError("NO_THEME", LEGACY_THEME_MESSAGE);
+  return theme;
+}
 
 export class ThemeError extends Error {
   constructor(
-    public code: "NOT_FOUND" | "NO_THEME" | "BAD_REQUEST",
+    public code: "NOT_FOUND" | "NO_THEME" | "BAD_REQUEST" | "CONFLICT",
     message: string,
   ) {
     super(message);
@@ -74,33 +147,37 @@ export async function captureSharedTheme(
   workspaceId: string,
   sourceSiteId: string,
 ): Promise<{ updatedAt: Date }> {
-  const site = await prisma.site.findFirst({
-    where: { id: sourceSiteId, workspaceId },
-    select: { projectStyles: true },
-  });
-  if (!site) throw new ThemeError("NOT_FOUND", "Source site not found");
-
-  /* A brand-new site has no `projectStyles` — `createSite` never seeds it — so
-     this used to write `Prisma.DbNull`, `getSharedTheme` read it back as null,
-     and the UI toasted "Theme captured" while still showing "No shared theme
-     captured yet" with Push disabled. That is a new user's FIRST agency action
-     reporting success over a no-op. Capturing nothing is not a capture. */
-  if (site.projectStyles == null) {
-    throw new ThemeError(
-      "BAD_REQUEST",
-      "That site has no styles to capture yet — open it, set your brand colours and type, then capture.",
-    );
-  }
-
+  const theme = await readSourceTokens(workspaceId, sourceSiteId);
   const updatedAt = new Date();
   await prisma.workspace.update({
     where: { id: workspaceId },
     data: {
-      sharedTheme: site.projectStyles as Prisma.InputJsonValue,
+      sharedTheme: theme as unknown as Prisma.InputJsonValue,
       sharedThemeUpdatedAt: updatedAt,
     },
   });
   return { updatedAt };
+}
+
+/**
+ * A source site's token set, workspace-scoped. A site with no brand tokens yet
+ * is refused: capturing nothing used to report "Theme captured" over a no-op —
+ * a new user's FIRST agency action succeeding at nothing.
+ */
+async function readSourceTokens(workspaceId: string, sourceSiteId: string): Promise<TokenTheme> {
+  const site = await prisma.site.findFirst({
+    where: { id: sourceSiteId, workspaceId },
+    select: { projectSettings: true },
+  });
+  if (!site) throw new ThemeError("NOT_FOUND", "Source site not found");
+  const theme = readTokenTheme(site.projectSettings);
+  if (!theme || theme.designTokens.length === 0) {
+    throw new ThemeError(
+      "BAD_REQUEST",
+      "That site has no brand tokens to capture yet — open it, set your brand colours and type, then capture.",
+    );
+  }
+  return theme;
 }
 
 /** Every site in the workspace with its push-relevant state (drives the UI). */
@@ -139,10 +216,7 @@ export async function pushSharedTheme(
   workspaceId: string,
   siteIds?: string[],
 ): Promise<PushResult[]> {
-  const theme = await getSharedTheme(workspaceId);
-  if (!theme) {
-    throw new ThemeError("NO_THEME", "No shared theme has been captured for this workspace");
-  }
+  const theme = await requireTokenTheme(workspaceId);
 
   const targets = await prisma.site.findMany({
     where: {
@@ -150,10 +224,9 @@ export async function pushSharedTheme(
       deletedAt: null,
       ...(siteIds ? { id: { in: siteIds } } : {}),
     },
-    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectStyles: true },
+    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectSettings: true, lastEditedAt: true },
   });
 
-  const styles = theme.styles as Prisma.InputJsonValue;
   const results: PushResult[] = [];
   const savedAt = new Date();
 
@@ -166,27 +239,29 @@ export async function pushSharedTheme(
       // D2: snapshot the site's CURRENT tokens before the push overwrites them,
       // atomically with the overwrite, so a bad push can be rolled back. Push was
       // previously a wholesale overwrite with no prior-value capture.
-      await prisma.$transaction([
-        prisma.siteThemeSnapshot.create({
+      /* CAS on the lastEditedAt read above: projectSettings is merged from
+         that read, so an editor save landing in between would be silently
+         reverted by this write. It fails that site instead ("changed while
+         pushing" — push again). */
+      await prisma.$transaction(async (tx) => {
+        const claimed = await tx.site.updateMany({
+          where: { id: site.id, lastEditedAt: site.lastEditedAt },
           data: {
-            siteId: site.id,
-            workspaceId,
-            prevStyles:
-              site.projectStyles == null
-                ? Prisma.DbNull
-                : (site.projectStyles as Prisma.InputJsonValue),
-            prevDsSchemaVersion: site.dsSchemaVersion,
-          },
-        }),
-        prisma.site.update({
-          where: { id: site.id },
-          data: {
-            projectStyles: styles,
+            projectSettings: withTokens(site.projectSettings, theme),
             dsSchemaVersion: site.dsSchemaVersion + 1,
             lastEditedAt: savedAt,
           },
-        }),
-      ]);
+        });
+        if (claimed.count === 0) throw new Error("This site changed while pushing — push again.");
+        await tx.siteThemeSnapshot.create({
+          data: {
+            siteId: site.id,
+            workspaceId,
+            prevStyles: snapshotTokens(site.projectSettings) as unknown as Prisma.InputJsonValue,
+            prevDsSchemaVersion: site.dsSchemaVersion,
+          },
+        });
+      });
       await pruneSnapshots(site.id);
       results.push({ siteId: site.id, name: site.name, status: "pushed" });
     } catch (e) {
@@ -224,21 +299,18 @@ export async function previewSharedThemePush(
   workspaceId: string,
   siteIds?: string[],
 ): Promise<PushPreview[]> {
-  const theme = await getSharedTheme(workspaceId);
-  if (!theme) {
-    throw new ThemeError("NO_THEME", "No shared theme has been captured for this workspace");
-  }
+  const theme = await requireTokenTheme(workspaceId);
   const targets = await prisma.site.findMany({
     where: { workspaceId, deletedAt: null, ...(siteIds ? { id: { in: siteIds } } : {}) },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, themeLocked: true, projectStyles: true },
+    select: { id: true, name: true, themeLocked: true, projectSettings: true },
   });
-  const after = JSON.stringify(theme.styles ?? null);
+  const after = JSON.stringify(theme.designTokens);
   return targets.map((site) => {
     if (site.themeLocked) {
       return { siteId: site.id, name: site.name, status: "skipped-locked" as const, willChange: false };
     }
-    const before = JSON.stringify(site.projectStyles ?? null);
+    const before = JSON.stringify(readTokenTheme(site.projectSettings)?.designTokens ?? []);
     return { siteId: site.id, name: site.name, status: "would-push" as const, willChange: before !== after };
   });
 }
@@ -254,7 +326,7 @@ export async function rollbackSiteTheme(
 ): Promise<{ rolledBackTo: Date }> {
   const site = await prisma.site.findFirst({
     where: { id: siteId, workspaceId },
-    select: { id: true, dsSchemaVersion: true },
+    select: { id: true, dsSchemaVersion: true, projectSettings: true, lastEditedAt: true },
   });
   if (!site) throw new ThemeError("NOT_FOUND", "Site not found");
 
@@ -264,18 +336,38 @@ export async function rollbackSiteTheme(
   });
   if (!snap) throw new ThemeError("NO_THEME", "No theme snapshot to roll back to");
 
-  await prisma.$transaction([
-    prisma.site.update({
-      where: { id: siteId },
+  /* A token snapshot restores the tokens. A snapshot taken by the old
+     projectStyles push holds the element rules that push overwrote, so
+     restoring them there is still the right undo. */
+  const prevTokens = readTokenTheme(snap.prevStyles);
+  /* CAS on the lastEditedAt read above, like push: projectSettings is merged
+     from that read, so an editor save landing in between would be silently
+     reverted by a blind write. A lost race refuses and keeps the snapshot. */
+  await prisma.$transaction(async (tx) => {
+    const claimed = await tx.site.updateMany({
+      where: { id: siteId, lastEditedAt: site.lastEditedAt },
       data: {
-        projectStyles:
-          snap.prevStyles == null ? Prisma.DbNull : (snap.prevStyles as Prisma.InputJsonValue),
+        ...(prevTokens
+          ? { projectSettings: restoreTokens(site.projectSettings, prevTokens) }
+          : {
+              // S-1 class: a legacy snapshot's `prevStyles` was frozen before
+              // the allowlist sanitizer shipped (or by a path that predates
+              // it) — re-run it on restore rather than writing the snapshot
+              // back verbatim.
+              projectStyles:
+                snap.prevStyles == null
+                  ? Prisma.DbNull
+                  : (sanitizeProjectStyles(snap.prevStyles) as Prisma.InputJsonValue),
+            }),
         dsSchemaVersion: site.dsSchemaVersion + 1,
         lastEditedAt: new Date(),
       },
-    }),
-    prisma.siteThemeSnapshot.delete({ where: { id: snap.id } }),
-  ]);
+    });
+    if (claimed.count === 0) {
+      throw new ThemeError("CONFLICT", "This site changed while rolling back — nothing was changed. Try again.");
+    }
+    await tx.siteThemeSnapshot.delete({ where: { id: snap.id } });
+  });
   return { rolledBackTo: snap.createdAt };
 }
 
@@ -307,13 +399,7 @@ export async function saveWorkspacePreset(
   sourceSiteId: string,
   createdBy?: string | null,
 ): Promise<{ name: string }> {
-  const site = await prisma.site.findFirst({
-    where: { id: sourceSiteId, workspaceId },
-    select: { projectStyles: true },
-  });
-  if (!site) throw new ThemeError("NOT_FOUND", "Source site not found");
-  const styles =
-    site.projectStyles == null ? Prisma.DbNull : (site.projectStyles as Prisma.InputJsonValue);
+  const styles = (await readSourceTokens(workspaceId, sourceSiteId)) as unknown as Prisma.InputJsonValue;
   await prisma.workspacePreset.upsert({
     where: { workspaceId_name: { workspaceId, name } },
     create: { workspaceId, name, styles, createdBy: createdBy ?? null },
@@ -355,11 +441,13 @@ export async function applyWorkspacePreset(
     select: { styles: true },
   });
   if (!preset) throw new ThemeError("NOT_FOUND", "Preset not found");
+  const theme = readTokenTheme(preset.styles);
+  if (!theme) throw new ThemeError("BAD_REQUEST", LEGACY_THEME_MESSAGE);
   const updatedAt = new Date();
   await prisma.workspace.update({
     where: { id: workspaceId },
     data: {
-      sharedTheme: preset.styles == null ? Prisma.DbNull : (preset.styles as Prisma.InputJsonValue),
+      sharedTheme: theme as unknown as Prisma.InputJsonValue,
       sharedThemeUpdatedAt: updatedAt,
     },
   });

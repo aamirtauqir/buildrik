@@ -18,6 +18,7 @@
  */
 import * as React from "react";
 import { MoreHorizontal, TriangleAlert, X } from "lucide-react";
+import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import {
@@ -38,8 +39,10 @@ import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
+import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { resolveUrl, slugify } from "./DynamicPagesPane";
 import type { CmsTab } from "./cmsWorkspaceStore";
+import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 
 export type OpenMediaLibrary = (
   allowedTypes: MediaAssetType[],
@@ -48,6 +51,7 @@ export type OpenMediaLibrary = (
 ) => void;
 
 export interface RecordSheetProps {
+  composer: Composer | null;
   collection: CMSCollection;
   /** null → a new record. */
   record: CMSContentItem | null;
@@ -104,6 +108,7 @@ function rowsOf(fields: CMSField[]): CMSField[][] {
 }
 
 export function RecordSheet({
+  composer,
   collection,
   record,
   onClose,
@@ -136,6 +141,7 @@ export function RecordSheet({
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [typedDelete, setTypedDelete] = React.useState(false);
+  const [templatePreviewOpen, setTemplatePreviewOpen] = React.useState(false);
 
   React.useEffect(() => {
     setForm(initial);
@@ -152,6 +158,27 @@ export function RecordSheet({
   const crumb = record ? title : "New record";
 
   const guard = (go: () => void) => (dirty ? setLeaveTo(() => go) : go());
+
+  // shellDirtyRegistry (B-1): this sheet already guards its OWN Cancel/Close
+  // via `guard` above, but a shell-level tab switch (⌘H, ⇧A, the palette,
+  // ui:switch-tab, UI_PANEL_OPEN) doesn't go through that — it just
+  // unmounts this sheet. Registering `dirty` here lets the shell's own
+  // switch guard catch that case too. Cleared on unmount so a closed sheet
+  // never leaves a stale block behind.
+  React.useEffect(() => {
+    shellDirty.set("cms-record", dirty);
+    return () => shellDirty.set("cms-record", false);
+  }, [dirty]);
+  /* The shell's "Leave anyway" runs this: the edits live only in this
+     sheet's fields, so resetting them is exactly the loss the confirm names. */
+  React.useEffect(() => {
+    shellDirty.setDiscard("cms-record", () => {
+      setForm(initial);
+      setPublished(initialPublished);
+      shellDirty.set("cms-record", false);
+    });
+    return () => shellDirty.setDiscard("cms-record", null);
+  }, [initial, initialPublished]);
 
   const save = async () => {
     setSaving(true);
@@ -346,6 +373,15 @@ export function RecordSheet({
             }
           >
             <Menu label="Record menu">
+              <MenuItem
+                data-testid="cms-sheet-preview-template"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setTemplatePreviewOpen(true);
+                }}
+              >
+                Preview saved record
+              </MenuItem>
               <MenuItem danger data-testid="cms-sheet-delete" onClick={() => void remove()}>
                 Delete record…
               </MenuItem>
@@ -508,6 +544,18 @@ export function RecordSheet({
           consequence={`Deleting removes this record and its generated page ${resolveUrl(collection.pageSlugPattern ?? "", record.data)}.`}
           confirmLabel="Delete record"
           testId="cms-delete-record"
+        />
+      ) : null}
+      {templatePreviewOpen && record ? (
+        <RecordTemplatePreviewDialog
+          composer={composer}
+          collection={collection}
+          record={record}
+          onClose={() => setTemplatePreviewOpen(false)}
+          onChooseTemplate={() => {
+            setTemplatePreviewOpen(false);
+            onOpenTab("dynamic-pages");
+          }}
         />
       ) : null}
     </div>

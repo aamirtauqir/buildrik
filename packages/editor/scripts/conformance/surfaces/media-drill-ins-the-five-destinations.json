@@ -39,10 +39,6 @@
     {
       "name": "icon-tile",
       "testId": "icon-tile-zap"
-    },
-    {
-      "name": "stock-thumb",
-      "testId": "stock-thumb-p0"
     }
   ],
   "_note": [

@@ -134,7 +134,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
             <Button onClick={onPublish}>Publish</Button>
           )}
           {site.status === "PUBLISHED" && onUnpublish && (
-            <Button onClick={() => setConfirmUnpublish(true)}>Unpublish</Button>
+            <Button variant="ghost" onClick={() => setConfirmUnpublish(true)}>Unpublish</Button>
           )}
           <div ref={menuRef} className="relative">
             <button

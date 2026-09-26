@@ -7,6 +7,19 @@ import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
 
+// Type the GitHub
+// `userinfo.request` override's parameter from @auth/core's own types
+// without importing `@auth/core` directly — it's a transitive dependency of
+// `next-auth`, not hoisted into this package's own node_modules under pnpm's
+// strict layout, so a direct `@auth/core/providers/oauth` import would be a
+// phantom-dependency risk. Deriving the type from the already-imported
+// `GitHub` provider factory's own parameter type reaches the exact same
+// `UserinfoEndpointHandler["request"]` type structurally, through a
+// dependency this file already declares.
+type GitHubUserinfoConfig = NonNullable<Parameters<typeof GitHub>[0]>["userinfo"];
+type GitHubUserinfoRequest = NonNullable<Extract<GitHubUserinfoConfig, { request?: unknown }>["request"]>;
+type GitHubUserinfoRequestContext = Parameters<GitHubUserinfoRequest>[0];
+
 /** userId of the currently-signed-in session (if any) — distinguishes an
  *  authenticated "Connect provider from Settings" from a fresh public login. */
 async function currentSessionUserId(): Promise<string | null> {
@@ -36,6 +49,43 @@ export const authConfig: NextAuthConfig = {
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      // The default @auth/core
+      // GitHub provider does NOT prove the email it hands back is verified.
+      // It uses `/user`'s `email` field (the user's chosen "public email" —
+      // settable to any address they merely typed in, not necessarily one
+      // GitHub itself verified) and, only when that's blank, falls back to
+      // `/user/emails`'s `find(e => e.primary) ?? emails[0]` — primary, not
+      // verified, and it NEVER reads the `verified` field at all. An
+      // attacker can add a victim's address to their own GitHub account
+      // (GitHub allows adding an unverified email) and have it returned
+      // here. This override ignores `/user`'s email entirely and always
+      // asks `/user/emails`, picking the primary+verified address, else any
+      // verified address, else none — a missing email makes `signIn` below
+      // refuse the sign-in instead of trusting an unverified fallback.
+      userinfo: {
+        url: "https://api.github.com/user",
+        async request({ tokens }: GitHubUserinfoRequestContext) {
+          const headers = {
+            Authorization: `Bearer ${tokens.access_token}`,
+            "User-Agent": "authjs",
+          };
+          const profile = await fetch("https://api.github.com/user", { headers }).then((res) => res.json());
+
+          const emailsRes = await fetch("https://api.github.com/user/emails", { headers });
+          let verifiedEmail: string | undefined;
+          if (emailsRes.ok) {
+            const emails = (await emailsRes.json()) as Array<{
+              email: string;
+              primary: boolean;
+              verified: boolean;
+            }>;
+            verifiedEmail =
+              emails.find((e) => e.primary && e.verified)?.email ?? emails.find((e) => e.verified)?.email;
+          }
+          profile.email = verifiedEmail ?? null;
+          return profile;
+        },
+      },
     }),
   ],
   session: { strategy: "jwt" },
@@ -45,19 +95,89 @@ export const authConfig: NextAuthConfig = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account && user.email) {
+      // Checking `user.email`
+      // in this condition (as the previous version did) let a provider with
+      // NO verified email fall all the way through to the unconditional
+      // `return true` at the bottom — signing in with a bare provider `id`
+      // and no DB user.id set, instead of being refused. Gate on `account`
+      // alone and refuse explicitly below when there's no trusted email.
+      if (account) {
+        // Account-first: resolve
+        // identity by the PHYSICAL provider link before any email-based
+        // branching. The previous ordering decided create/clear/link by
+        // looking up `user.email` first and only checked for an existing
+        // provider link afterward (the ownership guard at the bottom) — so a
+        // user who changes which email their provider reports as verified
+        // between logins hit the "no existing row for this email" branch,
+        // created a SECOND, orphaned "verified" user + workspace for the new
+        // email, and only THEN got refused by the ownership guard. Every
+        // later login from that provider would keep hitting the orphan
+        // (never the original account, which password signup can no longer
+        // reclaim once EMAIL_EXISTS — permanent lockout from the account
+        // this really is).
+        //
+        // A provider_providerAccountId match now settles identity
+        // completely: sign in as whichever user that physical account is
+        // already linked to, ignoring whatever email the provider reports
+        // THIS time, with NO writes ("bump nothing else" — no lastLoginAt,
+        // no emailVerified, no credential clearing, no audit log). Setting
+        // `user.id` here is sufficient for the `jwt` callback below to
+        // resolve the LINKED user, not an email-matched one — verified by
+        // this file's own existing pattern (every branch below already
+        // relies on exactly this to attach a DB id to the session).
+        if (account.providerAccountId) {
+          const linkedAccount = await prisma.account.findUnique({
+            where: {
+              provider_providerAccountId: {
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+              },
+            },
+            select: { userId: true },
+          });
+          if (linkedAccount) {
+            // Connect-provider guard: a public login has no active session
+            // (currentSessionUserId() → null) and keeps the account-first
+            // behaviour above unchanged. But when SOMEONE IS ALREADY SIGNED
+            // IN (Settings → Connect provider) and the provider account they
+            // just authorized turns out to be linked to a DIFFERENT user,
+            // silently switching `user.id` here would silently switch their
+            // session onto that other user's account. Refuse instead.
+            const sessionUserId = await currentSessionUserId();
+            if (sessionUserId && sessionUserId !== linkedAccount.userId) {
+              return "/auth/error/social-error?reason=provider-linked-elsewhere";
+            }
+            user.id = linkedAccount.userId;
+            return true;
+          }
+        }
+
+        // No existing link for this provider identity — first-time login or
+        // first-time link. The ownership guard further down is now
+        // unreachable by construction (we just proved no Account row exists
+        // for this provider_providerAccountId), kept only as defense in
+        // depth against a race between this read and the eventual upsert.
+        //
         // Never link/log-in on an UNVERIFIED provider email — otherwise an
-        // attacker who sets a victim's address as an unverified email on their
-        // own provider account could take over the victim's Buildrick account.
-        // Google asserts `email_verified`; Auth.js's GitHub provider only ever
-        // returns the primary *verified* email, so it's trusted.
+        // attacker who sets a victim's address as an unverified email on
+        // their own provider account could take over the victim's Buildrick
+        // account. Google asserts `email_verified` on the ID token profile.
+        // GitHub has no such single flag — the provider's own `userinfo`
+        // override above already resolves `profile.email` to an address
+        // GitHub's `/user/emails` reports `verified: true` for (or `null` if
+        // none), so "GitHub gave us an email at all" IS the verification
+        // signal here, not a hardcoded trust.
         const emailVerified =
           account.provider === "google"
             ? (profile as { email_verified?: boolean } | undefined)?.email_verified === true
             : account.provider === "github"
-              ? true
+              ? Boolean((profile as { email?: string | null } | undefined)?.email)
               : false;
-        if (!emailVerified) {
+        // This SAME check gates every path below it — new-user creation, the
+        // never-verified-row clearing branch, AND the already-verified-row
+        // link/login branch — so an unverified provider email can never
+        // create, clear-and-take-over, or link into any row.
+        if (!emailVerified || !user.email) {
           return "/auth/error/social-error?reason=unverified-email";
         }
 
@@ -83,22 +203,76 @@ export const authConfig: NextAuthConfig = {
         } else {
           const providerLinked = existing.accounts.some((a) => a.provider === account.provider);
           const isSelfLink = (await currentSessionUserId()) === existing.id;
-          // A fresh PUBLIC OAuth login (not the owner self-linking from Settings)
-          // into a password account whose provider isn't linked yet → do NOT
-          // silently link it; send them to use their password. This prevents
-          // login-method confusion + email-based account absorption.
-          if (existing.passwordHash && !providerLinked && !isSelfLink) {
-            return `/auth/oauth-conflict?email=${encodeURIComponent(user.email)}`;
+
+          if (!existing.emailVerified) {
+            // S-5 anti-pre-
+            // account-hijack: OAuth already proved control of this email —
+            // `emailVerified` above is true only for a Google-asserted
+            // `email_verified` ID-token claim or a GitHub email the
+            // provider's own `userinfo` override
+            // resolved via `/user/emails`'s `verified: true` flag — so this
+            // IS the real owner's first verification of a never-verified
+            // row. Same clearing as verifyMagicLink: an attacker who
+            // pre-registered this address with a known password must not
+            // keep access once the real owner signs in through their
+            // provider. No oauth-conflict redirect here — an unverified row
+            // was never provably the password-setter's in the first place.
+            await prisma.user.update({
+              where: { id: existing.id },
+              data: {
+                emailVerified: new Date(),
+                passwordHash: null,
+                twoFactorEnabled: false,
+                twoFactorSecret: null,
+                backupCodes: [],
+                sessionVersion: { increment: 1 },
+                lastLoginAt: new Date(),
+              },
+            });
+            user.id = existing.id;
+            await logAuditEvent("OAUTH_LOGIN", "success", { userId: existing.id, email: user.email });
+          } else {
+            // A fresh PUBLIC OAuth login (not the owner self-linking from
+            // Settings) into an ALREADY-VERIFIED password account whose
+            // provider isn't linked yet → do NOT silently link it; send them
+            // to use their password. This prevents login-method confusion +
+            // email-based account absorption.
+            if (existing.passwordHash && !providerLinked && !isSelfLink) {
+              return `/auth/oauth-conflict?email=${encodeURIComponent(user.email)}`;
+            }
+            user.id = existing.id;
+            await prisma.user.update({ where: { id: existing.id }, data: { lastLoginAt: new Date() } });
+            await logAuditEvent("OAUTH_LOGIN", "success", { userId: existing.id, email: user.email });
           }
-          user.id = existing.id;
-          await prisma.user.update({ where: { id: existing.id }, data: { lastLoginAt: new Date() } });
-          await logAuditEvent("OAUTH_LOGIN", "success", { userId: existing.id, email: user.email });
         }
 
         // Record the provider link so Settings → Account can show + manage
         // connected accounts. The provider already authenticated this email,
         // so the link is verified by the OAuth handshake itself.
         if (account.providerAccountId && user.id) {
+          const linkedElsewhere = await prisma.account.findUnique({
+            where: {
+              provider_providerAccountId: {
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+              },
+            },
+            select: { userId: true },
+          });
+          // `update: { userId }` on a provider_providerAccountId
+          // conflict would silently REASSIGN an existing provider link from
+          // whichever user it currently belongs to onto `user.id` — a
+          // provider identity's ownership must be permanent once
+          // established. The account-first lookup at the top of this
+          // callback already makes this branch unreachable in the normal
+          // case (we already proved no Account row exists for this
+          // provider_providerAccountId before doing any create/update/clear
+          // above) — this re-check is defense in depth against a
+          // TOCTOU race between that read and this upsert, not the primary
+          // guard anymore.
+          if (linkedElsewhere && linkedElsewhere.userId !== user.id) {
+            return "/auth/error/social-error?reason=provider-linked-elsewhere";
+          }
           await prisma.account.upsert({
             where: {
               provider_providerAccountId: {

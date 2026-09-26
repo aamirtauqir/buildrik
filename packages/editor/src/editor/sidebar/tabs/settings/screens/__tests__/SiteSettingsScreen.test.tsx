@@ -30,6 +30,7 @@ vi.mock("@/services/api-client", () => ({
 }));
 
 import { SiteSettingsScreen } from "../SiteSettingsScreen";
+import { SiteColumnsLockedContext } from "../../shared";
 
 const getMock = api.siteDetail.settings.get.query;
 
@@ -73,6 +74,8 @@ function setup(opts: {
   registerRetryLoad?: (fn: (() => void) | null) => void;
   saveError?: string | null;
   settings?: Record<string, unknown>;
+  /** M7: the viewer's known role is below ADMIN. */
+  siteColumnsLocked?: boolean;
 } = {}) {
   const composer = createMockComposer({ projectSettings: opts.settings ?? baseSettings() });
   const utils = render(
@@ -85,6 +88,11 @@ function setup(opts: {
       registerRetryLoad={opts.registerRetryLoad}
       saveError={opts.saveError}
     />,
+    {
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <SiteColumnsLockedContext.Provider value={opts.siteColumnsLocked ?? false}>{children}</SiteColumnsLockedContext.Provider>
+      ),
+    },
   );
   return { composer, ...utils };
 }
@@ -380,5 +388,19 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     expect(composer.updateProjectMetadata).toHaveBeenCalledWith(expect.objectContaining({ author: "Bella Cucina team" }));
     expect(screen.queryByRole("spinbutton", { name: /Grid size/ })).toBeNull();
     expect(screen.queryByTestId("set-card-canvas")).toBeNull();
+  });
+});
+
+/* M7: Author is project metadata, not a Site column. */
+describe("SiteSettingsScreen — Site-column fields below ADMIN", () => {
+  it("locks name / favicon / language / social links with the reason; Author stays editable", async () => {
+    setup({ siteColumnsLocked: true });
+    await loaded();
+    expect(siteName().matches(":disabled")).toBe(true);
+    expect(favicon().matches(":disabled")).toBe(true);
+    expect(language().matches(":disabled")).toBe(true);
+    expect(twitter().matches(":disabled")).toBe(true);
+    expect(screen.getAllByTestId("set-admin-only").length).toBeGreaterThan(0);
+    expect((screen.getByLabelText("Author") as HTMLInputElement).matches(":disabled")).toBe(false);
   });
 });

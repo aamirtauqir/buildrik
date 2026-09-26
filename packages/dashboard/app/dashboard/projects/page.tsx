@@ -16,13 +16,21 @@ import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
 import { Button, InputField, Modal, PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Plus, Search, CheckSquare, Folder } from "lucide-react";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export default function ProjectsPage() {
   const { addToast } = useToast();
   const router = useRouter();
   const unified = useUnifiedEditorFlag();
+  // sites.transfer accepts only a site-role OWNER who created the site, so
+  // Transfer is offered on exactly those rows (gap walk 93 #9).
+  const { data: session } = useSession();
+  const health = trpc.dashboard.health.useQuery();
+  const transferOwnerId = health.data?.role === "OWNER" ? session?.user?.id ?? null : null;
 
   // Preferences
   const prefs = trpc.account.preferences.get.useQuery();
@@ -107,6 +115,8 @@ export default function ProjectsPage() {
     name: string;
   } | null>(null);
 
+  const debouncedSearch = useDebouncedValue(search, 250);
+
   // Queries
   const sitesQuery = trpc.sites.list.useQuery({
     page,
@@ -119,7 +129,7 @@ export default function ProjectsPage() {
       | "traffic"
       | "pages"
       | "published",
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     // null is the "All sites" selection, which must not filter at all. Passing it
     // through reached the service as `where.folderId = null`, i.e. only sites with
     // NO folder — so any site inside a folder vanished from "All sites".
@@ -353,8 +363,10 @@ export default function ProjectsPage() {
             // every "copied" link was dead the moment it was pasted.
             const url = site.domain ? `https://${site.domain}` : site.publishedUrl;
             if (url) {
-              navigator.clipboard.writeText(url);
-              addToast("success", "URL copied to clipboard");
+              writeClipboardText(url).then(
+                () => addToast("success", "URL copied to clipboard"),
+                () => addToast("error", "Couldn't copy the URL", url),
+              );
             } else {
               addToast("error", "This site isn't published yet");
             }
@@ -598,6 +610,7 @@ export default function ProjectsPage() {
               selectedIds={selectedIds}
               onSelect={handleSelect}
               onAction={handleSiteAction}
+              transferOwnerId={transferOwnerId}
             />
           ) : (
             <SiteListView
@@ -607,6 +620,7 @@ export default function ProjectsPage() {
               onSelectAll={handleSelectAll}
               allSelected={allSelected}
               onAction={handleSiteAction}
+              transferOwnerId={transferOwnerId}
             />
           )}
         </div>

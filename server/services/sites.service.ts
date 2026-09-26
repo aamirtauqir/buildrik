@@ -1,14 +1,18 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { sanitizeBlocks } from "@/lib/sanitize-blocks";
+import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
-import { checkSiteRole, getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
+import { blankPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
+import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
   ListSitesInput,
   BulkActionInput,
   SaveProjectDataInput,
+  CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
+import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
+import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 
@@ -46,14 +50,20 @@ const SORT_MAP: Record<string, Record<string, string>> = {
 
 export async function listSites(
   workspaceId: string,
+  userId: string,
   filters: ListSitesInput
 ) {
   const { page, perPage, status, sort, search, folderId, clientId, createdBy, dateRange, templateUsed, hasCustomDomain, hasTraffic } = filters;
   const skip = (page - 1) * perPage;
 
+  // S-9: a member scoped to specific sites must never see sites outside
+  // their grant in the workspace-wide list.
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
+
   const where: Record<string, unknown> = {
     workspaceId,
     deletedAt: null,
+    ...scope,
   };
 
   if (status) where.status = status;
@@ -70,94 +80,109 @@ export async function listSites(
   if (hasCustomDomain === false) where.domains = { none: {} };
 
   const orderBy = SORT_MAP[sort] ?? SORT_MAP.lastEdited;
+  const SITE_SELECT = {
+    id: true,
+    name: true,
+    slug: true,
+    status: true,
+    thumbnail: true,
+    pages: true,
+    lastEditedAt: true,
+    publishedUrl: true,
+    createdAt: true,
+    createdBy: true,
+    template: true,
+    folderId: true,
+    clientId: true,
+    themeLocked: true,
+    domains: { take: 1, select: { domain: true, isPrimary: true } },
+    analytics: {
+      where: { date: { gte: new Date(Date.now() - 30 * 86400000) } },
+      select: { visitors: true },
+    },
+  } as const;
+
+  // Regression fix (dashboard tsc, fix): the previous inline object
+  // type for `site` mixed named properties with an index signature
+  // (`[key: string]: unknown`) as an escape hatch for the rest-spread below.
+  // TS's rest-destructuring inference collapses that combination — `...rest`
+  // typed as `{}` rather than the named fields — so `enrich`'s return type
+  // silently narrowed to just `{ domain, visitors30d }` and every dashboard
+  // consumer of `sites.list` (projects page, client detail view, command
+  // palette, invite modal, use-template modal) broke on `.id`/`.name`/etc.
+  // A precise Prisma-derived payload type has no index signature, so the
+  // rest spread keeps its named fields.
+  type SiteRow = Prisma.SiteGetPayload<{ select: typeof SITE_SELECT }>;
+  const enrich = (site: SiteRow) => {
+    const { analytics, domains, ...rest } = site;
+    return {
+      ...rest,
+      domain: domains[0]?.domain ?? null,
+      visitors30d: analytics.reduce((sum, a) => sum + a.visitors, 0),
+    };
+  };
 
   // visitors30d is a 30-day aggregate, not a column, so it can't be filtered or
-  // sorted in SQL here. When the request needs it (traffic filter or traffic
-  // sort) we scan all matching sites and paginate in memory; otherwise we keep
-  // efficient DB pagination. Was: filter applied AFTER skip/take, which dropped
-  // matching sites on other pages and reported the wrong total.
-  const needsFullScan = !!hasTraffic || sort === "traffic";
-
-  const [total, data] = await Promise.all([
-    prisma.site.count({ where }),
-    prisma.site.findMany({
-      where,
-      orderBy,
-      ...(needsFullScan ? {} : { skip, take: perPage }),
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        status: true,
-        thumbnail: true,
-        pages: true,
-        lastEditedAt: true,
-        publishedUrl: true,
-        createdAt: true,
-        createdBy: true,
-        template: true,
-        folderId: true,
-        clientId: true,
-        themeLocked: true,
-        domains: { take: 1, select: { domain: true, isPrimary: true } },
-        analytics: {
-          where: { date: { gte: new Date(Date.now() - 30 * 86400000) } },
-          select: { visitors: true },
-        },
-      },
-    }),
-  ]);
-
-  const enriched = data.map((site) => {
-    const visitors30d = site.analytics.reduce((sum, a) => sum + a.visitors, 0);
-    const domain = site.domains[0]?.domain ?? null;
-    return {
-      id: site.id,
-      name: site.name,
-      slug: site.slug,
-      status: site.status,
-      thumbnail: site.thumbnail,
-      pages: site.pages,
-      lastEditedAt: site.lastEditedAt,
-      publishedUrl: site.publishedUrl,
-      createdAt: site.createdAt,
-      createdBy: site.createdBy,
-      template: site.template,
-      folderId: site.folderId,
-      clientId: site.clientId,
-      themeLocked: site.themeLocked,
-      domain,
-      visitors30d,
-    };
-  });
-
-  // Fast path: no traffic filter/sort → enriched is already the correct page.
-  if (!needsFullScan) {
-    return { data: enriched, total, page, totalPages: Math.ceil(total / perPage) };
+  // sorted directly in the Site query. When the request needs it (traffic
+  // filter or traffic sort), fetch just the matching ids in DB order, sum
+  // visitors per id with one groupBy on siteAnalytics, filter/sort/paginate
+  // that id list in memory, then fetch the full payload for only the
+  // resulting page (D-11: was one query pulling every matching site's full
+  // payload — domains + every analytics row — to reduce() in JS regardless
+  // of page).
+  if (!hasTraffic && sort !== "traffic") {
+    const [total, data] = await Promise.all([
+      prisma.site.count({ where }),
+      prisma.site.findMany({ where, orderBy, skip, take: perPage, select: SITE_SELECT }),
+    ]);
+    return { data: data.map(enrich), total, page, totalPages: Math.ceil(total / perPage) };
   }
 
-  let rows = enriched;
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
+  const matching = await prisma.site.findMany({ where, orderBy, select: { id: true } });
+  const orderedIds = matching.map((s) => s.id);
+
+  const sums = await prisma.siteAnalytics.groupBy({
+    by: ["siteId"],
+    where: { siteId: { in: orderedIds }, date: { gte: thirtyDaysAgo } },
+    _sum: { visitors: true },
+  });
+  const visitorsById = new Map<string, number>(orderedIds.map((id) => [id, 0]));
+  for (const row of sums) visitorsById.set(row.siteId, row._sum.visitors ?? 0);
+
+  let ids = orderedIds;
   if (sort === "traffic") {
-    rows = [...rows].sort((a, b) => b.visitors30d - a.visitors30d);
+    ids = [...ids].sort((a, b) => (visitorsById.get(b) ?? 0) - (visitorsById.get(a) ?? 0));
   }
   if (hasTraffic) {
-    rows = rows.filter((s) => {
+    ids = ids.filter((id) => {
+      const v = visitorsById.get(id) ?? 0;
       switch (hasTraffic) {
-        case "none": return s.visitors30d === 0;
-        case "1-100": return s.visitors30d >= 1 && s.visitors30d <= 100;
-        case "100-1000": return s.visitors30d > 100 && s.visitors30d <= 1000;
-        case "1000+": return s.visitors30d > 1000;
+        case "none": return v === 0;
+        case "1-100": return v >= 1 && v <= 100;
+        case "100-1000": return v > 100 && v <= 1000;
+        case "1000+": return v > 1000;
         default: return true;
       }
     });
   }
 
-  const pageRows = rows.slice(skip, skip + perPage);
+  const pageIds = ids.slice(skip, skip + perPage);
+  const pageSites = await prisma.site.findMany({ where: { id: { in: pageIds } }, select: SITE_SELECT });
+  const byId = new Map(pageSites.map((s) => [s.id, s]));
+  // A page id can go missing between the id query and this fetch (deleted
+  // concurrently) — skip it instead of a non-null assertion that would throw
+  // on a legitimate race rather than just returning one fewer row.
+  const pageRows = pageIds.flatMap((id) => {
+    const site = byId.get(id);
+    return site ? [enrich(site)] : [];
+  });
+
   return {
     data: pageRows,
-    total: rows.length,
+    total: ids.length,
     page,
-    totalPages: Math.ceil(rows.length / perPage),
+    totalPages: Math.ceil(ids.length / perPage),
   };
 }
 
@@ -232,7 +257,9 @@ export async function createSite(
         name: "Home",
         slug: "home",
         position: 0,
-        blocks: [],
+        // X-A1: its own root (id unique per page), not [] — every [] page
+        // used to load with one shared "root".
+        blocks: blankPageRoot(`${created.id}:home`),
         isHomePage: true,
       },
     });
@@ -257,18 +284,27 @@ export async function transferSite(
 
   const currentMember = await prisma.workspaceMember.findFirst({
     where: { userId: currentUserId, workspaceId: site.workspaceId },
+    select: { id: true, _count: { select: { sitePermissions: true } } },
   });
   const newOwnerMember = await prisma.workspaceMember.findFirst({
     where: { userId: newOwnerId, workspaceId: site.workspaceId },
   });
   if (!newOwnerMember) throw new Error("MEMBER_NOT_FOUND");
 
+  // A-10: only preserve a SitePermission row for the previous owner when
+  // they were ALREADY site-scoped (has other grants). Writing one
+  // unconditionally newly scoped a previously-unscoped ("all sites")
+  // creator down to just this one transferred site — resolveSiteScope
+  // treats any SitePermission row as proof of scoping. Keep an existing
+  // override on update instead of stomping it with "EDITOR" every transfer.
+  const preserveScope = currentMember && currentMember._count.sitePermissions > 0;
+
   await prisma.$transaction([
     prisma.site.update({
       where: { id: siteId },
       data: { createdBy: newOwnerId },
     }),
-    ...(currentMember
+    ...(preserveScope
       ? [
           prisma.sitePermission.upsert({
             where: {
@@ -280,7 +316,7 @@ export async function transferSite(
               roleOverride: "EDITOR",
               grantedBy: currentUserId,
             },
-            update: { roleOverride: "EDITOR" },
+            update: {},
           }),
         ]
       : []),
@@ -361,6 +397,14 @@ export async function duplicateSite(
   });
   const originalForms = await prisma.formBlock.findMany({ where: { siteId } });
 
+  /* X-A1: legacy pages can share element ids ("root" everywhere), which the
+     editor loads as one tree. The copy is written with the editor's own
+     deterministic re-id — keyed by the ORIGINAL page id, so the duplicate
+     gets exactly the ids the editor gives the original on load — and what is
+     keyed by a renamed id (style rules, form blocks, CMS bindings) is copied
+     along. */
+  const reid = reidSite(originalPages, sanitizeProjectStyles(original.projectStyles));
+
   // Site + pages + form blocks must be copied atomically — a crash mid-copy
   // previously left an orphan half-built site. The page copy also dropped
   // meta/settings/slugHistory/slugManuallySet/translations and every
@@ -374,21 +418,28 @@ export async function duplicateSite(
         workspaceId,
         createdBy: userId,
         pages: originalPages.length,
-        projectStyles: (original.projectStyles as Prisma.InputJsonValue) ?? undefined,
+        // S-1 class: the original row's own stored projectStyles could predate
+        // sanitization (or have been written by a path that skipped it) — the
+        // copy re-runs the same allowlist sanitizer the direct-save path uses
+        // (:639) rather than trusting the source row.
+        projectStyles: (reid.styles as Prisma.InputJsonValue) ?? undefined,
         projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
         projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
+        projectCmsBindings: copyCmsBindings(original.projectCmsBindings, reid.renames),
         lastEditedAt: new Date(),
       },
     });
 
     if (originalPages.length > 0) {
       await tx.page.createMany({
-        data: originalPages.map((p) => ({
+        data: originalPages.map((p, i) => ({
           siteId: newSite.id,
           name: p.name,
           slug: p.slug,
           position: p.position,
-          blocks: (p.blocks ?? []) as Prisma.InputJsonValue,
+          // M-6: same write-boundary sanitizer as the save path — the source
+          // row may predate it, like projectStyles above.
+          blocks: sanitizeBlocks(reid.pages[i].blocks ?? []) as Prisma.InputJsonValue,
           isHomePage: p.isHomePage,
           seoTitle: p.seoTitle,
           seoDescription: p.seoDescription,
@@ -410,28 +461,56 @@ export async function duplicateSite(
         select: { id: true, slug: true },
       });
       const slugToNewPageId = new Map(newPages.map((p) => [p.slug, p.id]));
+      const copyForm = (f: (typeof originalForms)[number], blockId: string) => {
+        const slugForForm = f.pageId ? oldPageIdToSlug.get(f.pageId) : undefined;
+        const newPageId = slugForForm ? slugToNewPageId.get(slugForForm) ?? null : null;
+        return {
+          siteId: newSite.id,
+          pageId: newPageId,
+          blockId,
+          name: f.name,
+          fields: f.fields as Prisma.InputJsonValue,
+          submitButtonText: f.submitButtonText,
+          successMessage: f.successMessage,
+          successAction: f.successAction,
+          redirectUrl: f.redirectUrl,
+          spamProtection: f.spamProtection,
+          notifyEmail: f.notifyEmail,
+          webhookUrl: f.webhookUrl,
+          isActive: f.isActive,
+        };
+      };
+      /* A form row is keyed by (site, element id) — no writer sets pageId — so
+         it serves every page carrying that id. The copy's rows sit under the
+         copy's siteId (a fresh surrogate id each), where its publish and its
+         public form look them up. Each page whose copy of the element was
+         re-id'd gets its own row; the original id's row stays for the page
+         that kept it. */
       await tx.formBlock.createMany({
-        data: originalForms.map((f) => {
-          const slugForForm = f.pageId ? oldPageIdToSlug.get(f.pageId) : undefined;
-          const newPageId = slugForForm ? slugToNewPageId.get(slugForForm) ?? null : null;
-          return {
-            siteId: newSite.id,
-            pageId: newPageId,
-            blockId: f.blockId,
-            name: f.name,
-            fields: f.fields as Prisma.InputJsonValue,
-            submitButtonText: f.submitButtonText,
-            successMessage: f.successMessage,
-            notifyEmail: f.notifyEmail,
-            webhookUrl: f.webhookUrl,
-            isActive: f.isActive,
-          };
-        }),
+        data: [
+          ...originalForms.map((f) => copyForm(f, f.blockId)),
+          ...copiesForRenamedIds(originalForms, reid.renames).map(({ row, to }) => copyForm(row, to)),
+        ],
+        // A renamed id that coincides with a kept one must not abort the copy.
+        skipDuplicates: true,
       });
     }
 
     return newSite;
   });
+}
+
+/** A site's stored CMS bindings for its copy: every entry kept, plus one per
+ *  element id the copy's re-id renamed (the same copy the editor makes on
+ *  load — `Composer.importProject`). Null stays unset. */
+function copyCmsBindings(stored: Prisma.JsonValue, renames: IdRename[]): Prisma.InputJsonValue | undefined {
+  const filtered = filterCmsBindings(stored);
+  if (!filtered) return undefined;
+  const { field, collection } = filtered;
+  return {
+    ...(field ? { field: copyIdKeyedRecord(field, renames) } : {}),
+    ...(collection ? { collection: copyIdKeyedRecord(collection, renames) } : {}),
+  } as Prisma.InputJsonValue;
 }
 
 export async function archiveSite(siteId: string) {
@@ -509,6 +588,7 @@ export async function saveProjectFromEditor(
     metadata?: unknown;
     settings?: unknown;
     dsSchemaVersion?: number;
+    cmsBindings?: CmsBindingsInput;
   },
   expectedLastEditedAt?: string,
 ) {
@@ -539,6 +619,7 @@ export async function saveProjectFromEditor(
     assets: projectData.assets,
     settings: projectData.settings,
     dsSchemaVersion: projectData.dsSchemaVersion,
+    cmsBindings: projectData.cmsBindings,
   }, expectedLastEditedAt);
 }
 
@@ -578,6 +659,38 @@ export async function bulkAction(
   }
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * I-1c: `projectSettings.analytics` with every injection-shaped id emptied
+ * (and that provider's `verifiedAt` dropped) — the ids are written into every
+ * published page's inline scripts, and `settings` is `z.unknown()` at the save
+ * boundary. Deliberately NOT the editor's strict per-provider formats: ids
+ * saved under the screen's older, looser rules must survive a save. A safe id
+ * is stored trimmed. Lenient: the rest of the settings, and the save, land.
+ */
+function withValidAnalyticsIds(settings: unknown): unknown {
+  if (!isPlainObject(settings) || !isPlainObject(settings.analytics)) return settings;
+  const analytics: Record<string, unknown> = { ...settings.analytics };
+  for (const provider of Object.keys(ANALYTICS_ID_FIELDS) as AnalyticsProvider[]) {
+    const block = analytics[provider];
+    if (!isPlainObject(block)) continue;
+    const field = ANALYTICS_ID_FIELDS[provider];
+    const id = block[field];
+    if (id === undefined || id === "") continue;
+    if (typeof id === "string" && ANALYTICS_ID_SAFE.test(id.trim())) {
+      if (id !== id.trim()) analytics[provider] = { ...block, [field]: id.trim() };
+      continue;
+    }
+    const emptied: Record<string, unknown> = { ...block, [field]: "" };
+    delete emptied.verifiedAt;
+    analytics[provider] = emptied;
+  }
+  return { ...settings, analytics };
+}
+
 /**
  * Phase -1: canonical project-data persistence path.
  *
@@ -585,35 +698,97 @@ export async function bulkAction(
  *   - Per page: blocks, name, slug, position, isHomePage, seoTitle, seoDescription,
  *     meta (Json?), settings (Json?), slugHistory (Json?), slugManuallySet (Boolean).
  *   - Upserts incoming pages by id, deletes pages no longer present.
- *   - Site-level: projectStyles, projectAssets, projectSettings, lastEditedAt.
+ *   - Site-level: projectStyles, projectAssets, projectSettings,
+ *     projectCmsBindings, lastEditedAt.
  *
  * REGRESSION-1 (codex finding C23): `pages[].meta` was previously dropped on
  * save, breaking applied-template state across reload. Persisting meta is
  * load-bearing for P2 + P9 (template version pinning + applied-template badge).
  */
 export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
-  const site = await prisma.site.findUnique({ where: { id: input.siteId } });
+  const site = await prisma.site.findUnique({
+    where: { id: input.siteId },
+    select: { deletedAt: true },
+  });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
-  // 61-conflict: optimistic concurrency. When the caller supplies the
-  // lastEditedAt it loaded and it no longer matches the row, another writer
-  // saved in between — reject rather than clobber. The server value is appended
-  // so the client can fetch + reload it. Skipped when expectedLastEditedAt is
-  // omitted (non-regressive) or when the site has never been edited.
-  if (expectedLastEditedAt && site.lastEditedAt) {
-    const current = site.lastEditedAt.toISOString();
-    if (current !== expectedLastEditedAt) {
-      throw new Error(`SAVE_CONFLICT:${current}`);
-    }
+  const savedAt = new Date();
+  // Delete pages not in incoming set (only when caller supplies position
+  // for every page — that's how we infer the editor sent a full project
+  // snapshot, not a partial blocks update).
+  const isFullSnapshot = input.pages.every((p: { position?: number }) => p.position !== undefined);
+
+  // Site-level project artifacts. The style rules' selectors and media
+  // queries are written raw into the published stylesheet — same boundary.
+  sanitizeProjectStyles(input.styles);
+  const settings = withValidAnalyticsIds(input.settings);
+
+  // Bad entries were already dropped per entry (cmsBindingsSchema). A map
+  // past the size cap is not stored — the save and its pages still land, the
+  // previously stored bindings stay.
+  let cmsBindings = input.cmsBindings;
+  if (cmsBindings && JSON.stringify(cmsBindings).length > MAX_CMS_BINDINGS_CHARS) {
+    console.warn(`[saveProjectData] site=${input.siteId} cmsBindings over ${MAX_CMS_BINDINGS_CHARS} chars — not stored`);
+    cmsBindings = undefined;
   }
 
-  const savedAt = new Date();
-
   await prisma.$transaction(async (tx) => {
-    // Delete pages not in incoming set (only when caller supplies position
-    // for every page — that's how we infer the editor sent a full project
-    // snapshot, not a partial blocks update).
-    const isFullSnapshot = input.pages.every((p: { position?: number }) => p.position !== undefined);
+    /* 61-conflict / A-2: optimistic concurrency as a compare-and-swap, FIRST in
+       the transaction. The `lastEditedAt` match is part of the UPDATE's WHERE,
+       so a concurrent save holding the same token blocks on the row lock,
+       re-evaluates the WHERE against the winner's committed row, matches 0
+       rows and lands here — and every page write below rolls back with it. A
+       read-then-compare before the transaction (what this was) let both pass.
+       The server value is appended so the client can fetch + reload it. The
+       check is skipped when expectedLastEditedAt is omitted (non-regressive). */
+    const claimed = await tx.site.updateMany({
+      where: {
+        id: input.siteId,
+        deletedAt: null,
+        ...(expectedLastEditedAt ? { lastEditedAt: new Date(expectedLastEditedAt) } : {}),
+      },
+      data: {
+        projectStyles:
+          input.styles === undefined
+            ? undefined
+            : ((input.styles as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        projectAssets:
+          input.assets === undefined
+            ? undefined
+            : ((input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        projectSettings:
+          settings === undefined
+            ? undefined
+            : ((settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        dsSchemaVersion: input.dsSchemaVersion,
+        // Undefined (an editor build that predates the field) leaves the
+        // stored bindings alone; the editor always sends its full map.
+        projectCmsBindings: cmsBindings as Prisma.InputJsonValue | undefined,
+        lastEditedAt: savedAt,
+        ...(isFullSnapshot ? { pages: input.pages.length } : {}),
+      },
+    });
+    if (claimed.count === 0) {
+      const current = await tx.site.findUnique({
+        where: { id: input.siteId },
+        select: { lastEditedAt: true, deletedAt: true },
+      });
+      if (!current || current.deletedAt) throw new Error("SITE_NOT_FOUND");
+      throw new Error(`SAVE_CONFLICT:${current.lastEditedAt.toISOString()}`);
+    }
+
+    /* I-2: the page writes below go by id alone (upsert / update where {id}),
+       and the caller's role was checked on THIS site only — a page id that
+       already lives under another site would overwrite that site's page.
+       Refused here, inside the transaction, so nothing of the save lands.
+       Not a PermissionError: the router's FORBIDDEN is read by the editor as
+       a revoked role (view mode, "no access" copy), which this is not. */
+    const foreignPage = await tx.page.findFirst({
+      where: { id: { in: input.pages.map((p: { id: string }) => p.id) }, siteId: { not: input.siteId } },
+      select: { id: true },
+    });
+    if (foreignPage) throw new Error("PAGE_NOT_IN_SITE");
+
     if (isFullSnapshot) {
       const existingPages = await tx.page.findMany({
         where: { siteId: input.siteId },
@@ -720,28 +895,6 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
         });
       }
     }
-
-    // Site-level project artifacts.
-    await tx.site.update({
-      where: { id: input.siteId },
-      data: {
-        projectStyles:
-          input.styles === undefined
-            ? undefined
-            : ((input.styles as Prisma.InputJsonValue) ?? Prisma.DbNull),
-        projectAssets:
-          input.assets === undefined
-            ? undefined
-            : ((input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull),
-        projectSettings:
-          input.settings === undefined
-            ? undefined
-            : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
-        dsSchemaVersion: input.dsSchemaVersion,
-        lastEditedAt: savedAt,
-        ...(isFullSnapshot ? { pages: input.pages.length } : {}),
-      },
-    });
   });
 
   return { success: true, savedAt };
@@ -757,6 +910,7 @@ export async function getProjectData(siteId: string) {
       projectStyles: true,
       projectAssets: true,
       projectSettings: true,
+      projectCmsBindings: true,
       dsSchemaVersion: true,
       sitePages: {
         select: {
@@ -789,6 +943,7 @@ export async function getProjectData(siteId: string) {
     assets: site.projectAssets ?? [],
     settings: site.projectSettings ?? {},
     dsSchemaVersion: site.dsSchemaVersion,
+    cmsBindings: site.projectCmsBindings ?? undefined,
   };
 }
 

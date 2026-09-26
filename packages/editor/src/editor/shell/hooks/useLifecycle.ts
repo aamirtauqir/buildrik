@@ -60,6 +60,8 @@ export interface UseLifecycleInput {
    *  pre-click derivation did not predict means the round moved under us;
    *  re-read it so every surface catches up. */
   serverBlock: string | null;
+  /** C-3: the save state is `conflict` — this tab is behind the server. */
+  saveConflict: boolean;
 }
 
 export interface Lifecycle {
@@ -91,6 +93,7 @@ export function useLifecycle({
   lastPublishedAt,
   serverHasUnpublishedChanges,
   serverBlock,
+  saveConflict,
 }: UseLifecycleInput): Lifecycle {
   const isViewer = useEditorRole() === "VIEWER";
   const publishEnabled = isFeatureEnabled("publish");
@@ -208,8 +211,9 @@ export function useLifecycle({
       publishEnabled,
       offline,
       errorCount,
+      saveConflict,
     }),
-    [reviewStatus, publishedUrl, hasUnpublishedChanges, isViewer, publishEnabled, offline, errorCount],
+    [reviewStatus, publishedUrl, hasUnpublishedChanges, isViewer, publishEnabled, offline, errorCount, saveConflict],
   );
 
   const nextMove = React.useMemo(() => deriveLifecycleState(input), [input]);

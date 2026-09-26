@@ -7,7 +7,7 @@
  *   - 60s per-version rate-limit gate using a timestamp Map ref
  *   - cooldown countdown re-render via a tick state setter
  *   - cached-summary short-circuit (skips the fetch + cooldown)
- *   - fetch against `/api/trpc/ai.summarize` with the version's
+ *   - `ai.summarize` through the shared AI tRPC client with the version's
  *     compare data
  *   - persist-back via the version-history hook's updateAiSummary
  *
@@ -21,6 +21,7 @@
 import * as React from "react";
 import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
 import type { AISummaryState } from "./AIPanel";
+import { aiTrpcClient } from "@/services/ai/AiTrpcClient";
 
 const AI_COOLDOWN_MS = 60_000;
 
@@ -106,20 +107,14 @@ export function useAISummary({
         if (!compareData) {
           throw new Error("Compare data not loaded yet");
         }
-        const response = await fetch("/api/trpc/ai.summarize", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            versionName: version?.name ?? "",
-            changes: compareData,
-          }),
-        });
-
-        if (!response.ok) throw new Error("AI summary unavailable");
-        const json = await response.json();
-        // tRPC HTTP endpoint wraps the result in { result: { data: T } }
-        const summary: string =
-          json?.result?.data?.summary ?? json?.summary ?? "";
+        /* `versionName` is `.min(1)` on the server: an unnamed version sent
+           "" and was refused before the model was ever asked. */
+        const response = await aiTrpcClient
+          .summarize({ versionName: version?.name || "Untitled", changes: compareData })
+          .catch(() => {
+            throw new Error("AI summary unavailable");
+          });
+        const summary = response.data.summary;
         if (!summary) throw new Error("Empty summary returned");
 
         await updateAiSummary(versionId, summary);

@@ -20,6 +20,9 @@ Owns all business logic and DB access for the dashboard app. Does NOT own: UI (p
 - Outbound webhook URLs must pass the SSRF guard (see integrations service) before any fetch.
 - Raw SQL (`$queryRaw`) must use the **physical** table name from `@@map` in the Prisma schema, not the model name.
 - Non-OAuth JWTs must carry `workspaceId` — editor auth 401s without it.
+- Stored element trees (pages, component masters, version snapshots, templates, CMS) are sanitized at the write boundary by `lib/sanitize-blocks.ts`. Its tag/attribute allowlist is `packages/shared/schemas/element-markup.ts`, the same list the editor applies. Extend the allowlist there, never in one side only (S-1, 2026-09-26).
+- Element ids are made unique on every server write that creates or copies page trees (`packages/shared/content/elementIds.ts`, used by the page, sites and template services). Two pages sharing an id collapsed into each other before this.
+- The caller's IP comes only from `clientIp()` in `lib/request-ip.ts` (rate-limit keys, session records, device alerts). Never read `x-forwarded-for` directly. Its leftmost-entry body is provisional; see `docs/cpanel-deploy.md` §"Reverse-proxy IP header".
 
 ## Pitfalls
 

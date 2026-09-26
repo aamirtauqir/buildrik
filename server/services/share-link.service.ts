@@ -1,12 +1,52 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { getEffectiveSiteRole } from "@/server/services/permission.service";
+import { filterCmsBindings, type CmsBindingsInput } from "@buildrik/shared/schemas/sites";
+import { getPublishedCmsForBindings } from "@/server/services/cms.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
-export async function listShareLinks(siteId: string) {
-  return prisma.shareLink.findMany({
+// The link token IS the bearer credential for the draft it unlocks — a
+// VIEWER should not be able to read it off the list, only an EDITOR+ who
+// could also create one. passwordHash never leaves the server at all — a
+// `hasPassword` boolean replaces it (an earlier
+// "set"/null STRING placeholder was still typed `passwordHash: string` on
+// the consuming UI, so nothing forced callers to stop treating it as the
+// real hash's presence-or-shape; a boolean field with its own name is
+// harder to misuse that way, and matches what the UI actually needs).
+//
+// SSOT for every response shape this file hands back for a ShareLink row.
+// The same destructure was hand-copied for createShareLink, and a THIRD
+// copy would have been needed for revokeShareLink, which was still
+// returning the raw Prisma
+// row (passwordHash included) straight to the client. One helper now, so
+// there's nothing left to forget to copy a fourth time.
+function redactShareLink<T extends { passwordHash: string | null }>(
+  row: T,
+): Omit<T, "passwordHash"> & { hasPassword: boolean } {
+  const { passwordHash, ...rest } = row;
+  return { ...rest, hasPassword: passwordHash != null };
+}
+
+export async function listShareLinks(siteId: string, revealToken = false) {
+  const rows = await prisma.shareLink.findMany({
     where: { siteId, isActive: true },
     orderBy: { createdAt: "desc" },
   });
+  return rows.map((row) => {
+    const redacted = redactShareLink(row);
+    return { ...redacted, token: revealToken ? redacted.token : null };
+  });
+}
+
+// Workspace sharing-settings' `defaultExpiration` is a free-form string from
+// the settings form's fixed option list ("24h" | "7d" | "30d" | "" for no
+// expiration). Converts to fractional days for `expiresInDays`.
+function parseDefaultExpirationDays(value: string | null | undefined): number | undefined {
+  if (!value) return undefined;
+  const m = /^(\d+)(h|d)$/.exec(value.trim());
+  if (!m) return undefined;
+  const n = Number(m[1]);
+  return m[2] === "h" ? n / 24 : n;
 }
 
 export async function createShareLink(
@@ -17,24 +57,48 @@ export async function createShareLink(
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, deletedAt: true } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
   let plan: PlanName;
+  let settings: { requirePw: boolean; allowEditors: boolean; defaultExpiration: string | null } | null | undefined;
   if (userId) {
     const member = await prisma.workspaceMember.findFirst({
       where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
       include: { workspace: { select: { plan: true, sharingSettings: true } } },
     });
     if (!member) throw new Error("NOT_WORKSPACE_MEMBER");
-    const settings = member.workspace?.sharingSettings;
-    if (member.role === "EDITOR" && settings?.allowEditors === false) {
+    settings = member.workspace?.sharingSettings;
+    // A-9: DESIGNER has the same site-edit rank as EDITOR (permission.service
+    // ROLE_RANK) — the gate only checked "EDITOR" literally, so a DESIGNER
+    // bypassed it entirely. M-8: the role is the EFFECTIVE one on this site —
+    // a site roleOverride caps the workspace role (PD-6), so a workspace ADMIN
+    // capped to EDITOR here is an editor for this gate.
+    const role = await getEffectiveSiteRole(prisma, userId, siteId);
+    if ((role === "EDITOR" || role === "DESIGNER") && settings?.allowEditors === false) {
       throw new Error("EDITORS_CANNOT_CREATE_LINKS");
     }
     plan = (member.workspace?.plan ?? "FREE") as PlanName;
   } else {
-    const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
+    const ws = await prisma.workspace.findUnique({
+      where: { id: site.workspaceId },
+      select: { plan: true, sharingSettings: true },
+    });
     plan = (ws?.plan ?? "FREE") as PlanName;
+    settings = ws?.sharingSettings;
   }
   const limits = PLAN_LIMITS[plan];
   const maxDays = limits.shareLinkExpiryMaxDays as number;
   const allowPasswords = limits.shareLinkPasswords as boolean;
+
+  // A-9: the UI already promises "require password" and "default expiration"
+  // from workspace sharing settings; the service silently ignored both,
+  // creating unprotected/non-expiring links regardless of the settings.
+  // requirePw is meaningless on a plan with no password links at all (FREE) —
+  // enforcing it there would make link creation impossible, not safer.
+  if (settings?.requirePw && !data.password && allowPasswords) {
+    throw new Error("PASSWORD_REQUIRED");
+  }
+  if (!data.expiresInDays) {
+    const fromDefault = parseDefaultExpirationDays(settings?.defaultExpiration);
+    if (fromDefault !== undefined) data.expiresInDays = Math.min(fromDefault, maxDays);
+  }
 
   if (data.expiresInDays && data.expiresInDays > maxDays) {
     throw new Error("EXPIRY_EXCEEDS_PLAN");
@@ -65,7 +129,7 @@ export async function createShareLink(
     expiresAt.setDate(expiresAt.getDate() + data.expiresInDays);
   }
 
-  return prisma.shareLink.create({
+  const row = await prisma.shareLink.create({
     data: {
       siteId,
       name: data.name,
@@ -74,13 +138,23 @@ export async function createShareLink(
       expiresAt,
     },
   });
+  // S-10: the caller of sharing.create is the person who just minted this
+  // link, so the token is fine to return — but the bcrypt hash is not. Same
+  // redacted shape listShareLinks already returns, so nothing downstream
+  // treats "the row from create" differently from "a row from list".
+  return redactShareLink(row);
 }
 
 export async function revokeShareLink(id: string) {
-  return prisma.shareLink.update({
+  // S-10: this used to return the raw prisma.shareLink.update
+  // row, passwordHash included, straight through site-detail.ts's revoke
+  // mutation — the router itself never had to look at it. Same redaction
+  // as list/create.
+  const row = await prisma.shareLink.update({
     where: { id },
     data: { isActive: false },
   });
+  return redactShareLink(row);
 }
 
 // ─── Visitor side: /share/<token> ──────────────────────────────────────────
@@ -168,6 +242,7 @@ export async function getShareDraftRows(siteId: string) {
       publishedUrl: true,
       projectStyles: true,
       projectSettings: true,
+      projectCmsBindings: true,
       dsSchemaVersion: true,
       favicon: true,
       defaultLocale: true,
@@ -208,15 +283,86 @@ export async function getShareDraftRows(siteId: string) {
     select: { filename: true, url: true },
     orderBy: { createdAt: "asc" },
   });
-  const { sitePages, name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion, ...columns } = site;
+  const { sitePages, name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion, ...columns } = site;
   const pages = sitePages.filter((p) => {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;
     return visibility === undefined || visibility === "live";
   });
+  /* The bindings alone resolve nothing: the draft is rendered in a scratch
+     composer with no CMS store, so every bound element showed its last-saved
+     text — stale, then empty (dashboard verify pass 3). The render gets the
+     CMS data the bindings on the DELIVERED pages read, and resolves it with
+     the publish exporter's own CMSExportResolver. */
+  /* L-5: the bindings map ships projected to the delivered pages' elements
+     too — verbatim, a binding on a hidden page still handed an anonymous
+     visitor its collection id and field slug. */
+  const deliveredBindings = deliveredCmsBindings(projectCmsBindings, pages);
+  const cms = await getPublishedCmsForBindings(siteId, boundCmsFields(deliveredBindings, pages));
   return {
-    site: { name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion },
+    site: { name, publishedUrl, projectStyles, projectSettings, projectCmsBindings: deliveredBindings, dsSchemaVersion },
     pages,
     siteColumns: { name, ...columns },
     siteFonts: fontAssets,
+    cms,
   };
+}
+
+interface BlockNode {
+  id?: unknown;
+  children?: unknown;
+}
+
+/** Every element node on the given pages, with its id — the one walk both
+ *  projections below share. */
+function forEachElement(pages: ReadonlyArray<{ blocks: unknown }>, visit: (id: string, node: object) => void): void {
+  const walk = (node: unknown): void => {
+    if (typeof node !== "object" || node === null) return;
+    const { id, children } = node as BlockNode;
+    if (typeof id === "string") visit(id, node);
+    if (Array.isArray(children)) children.forEach(walk);
+  };
+  pages.forEach((p) => walk(p.blocks));
+}
+
+/** The stored bindings, kept only for elements on the delivered pages. */
+function deliveredCmsBindings(stored: unknown, pages: ReadonlyArray<{ blocks: unknown }>): CmsBindingsInput | null {
+  const bindings = filterCmsBindings(stored);
+  if (!bindings) return null;
+  const ids = new Set<string>();
+  forEachElement(pages, (id) => ids.add(id));
+  const keep = <T>(map: Record<string, T> | undefined) => {
+    const kept = Object.entries(map ?? {}).filter(([elementId]) => ids.has(elementId));
+    return kept.length > 0 ? Object.fromEntries(kept) : undefined;
+  };
+  const field = keep(bindings.field);
+  const collection = keep(bindings.collection);
+  return { ...(field ? { field } : {}), ...(collection ? { collection } : {}) };
+}
+
+/**
+ * Per collection, the field slugs the draft's bindings read — only bindings
+ * on elements of the DELIVERED pages (a collection bound on a hidden page is
+ * not sent, review I-2). A field binding reads its `fieldSlug`; a collection
+ * list reads the `{{<itemVar>.<field>}}` placeholders inside its own subtree
+ * (RepeaterRenderer's syntax).
+ */
+function boundCmsFields(bindings: CmsBindingsInput | null, pages: ReadonlyArray<{ blocks: unknown }>): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>();
+  if (!bindings) return out;
+  const add = (collectionId: string, slug: string) => {
+    const set = out.get(collectionId) ?? new Set<string>();
+    set.add(slug);
+    out.set(collectionId, set);
+  };
+  forEachElement(pages, (id, node) => {
+    for (const b of bindings.field?.[id] ?? []) add(b.collectionId, b.fieldSlug);
+    const list = bindings.collection?.[id];
+    if (list) {
+      const itemVar = (list.itemVar ?? "item").replace(/[^\w]/g, "");
+      const re = new RegExp(`\\{\\{\\s*${itemVar}\\.([\\w-]+)\\s*\\}\\}`, "g");
+      out.set(list.collectionId, out.get(list.collectionId) ?? new Set());
+      for (const m of JSON.stringify(node).matchAll(re)) add(list.collectionId, m[1]);
+    }
+  });
+  return out;
 }

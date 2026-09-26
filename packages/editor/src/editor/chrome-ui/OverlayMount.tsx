@@ -38,10 +38,13 @@ export interface OverlayMountProps {
    */
   dirty?: boolean;
   labelledBy?: string;
+  /** Direct accessible name when the dialog has no visible heading id to
+   *  point `aria-labelledby` at (B-7 / A13-4). */
+  ariaLabel?: string;
 }
 
 export function OverlayMount({
-  open, onClose, children, align = "center", dismissOnScrimClick = true, dirty = false, labelledBy,
+  open, onClose, children, align = "center", dismissOnScrimClick = true, dirty = false, labelledBy, ariaLabel,
 }: OverlayMountProps) {
   const ref = useFocusTrap(open, onClose);
   const [pulse, setPulse] = React.useState(false);
@@ -72,6 +75,7 @@ export function OverlayMount({
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
+        aria-label={labelledBy ? undefined : ariaLabel}
         data-dirty={dirty ? "true" : undefined}
         className={pulse ? "bk-overlay-pulse" : undefined}
         style={pulse ? undefined : { display: "contents" }}

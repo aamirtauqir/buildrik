@@ -178,6 +178,7 @@ describe("deriveLifecycleState — off the happy path", () => {
     const cases: Array<[Partial<LifecycleInput>, string]> = [
       [{ publishEnabled: false }, "Publishing isn't switched on for this workspace yet"],
       [{ isViewer: true }, "Viewers can't publish — ask an editor"],
+      [{ saveConflict: true }, "Resolve the sync conflict before publishing"],
       [{ offline: true }, "Can't publish while offline"],
     ];
     for (const [over, reason] of cases) {
