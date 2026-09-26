@@ -17,6 +17,7 @@ import type { SectionProgress } from "./manager/HTMLParser";
 import { HTMLParser } from "./manager/HTMLParser";
 import { PageManager } from "./manager/PageManager";
 import type { ElementManagerContext } from "./manager/types";
+import type { IdRename } from "@buildrik/shared/content/elementIds";
 
 /**
  * Manages the element tree and operations
@@ -126,9 +127,9 @@ export class ElementManager {
     return this.pageManager.reorderPage(pageId, afterId);
   }
 
-  /** Import a page */
-  importPage(pageData: PageData): void {
-    this.pageManager.importPage(pageData);
+  /** Import a page; returns the element ids it had to change. */
+  importPage(pageData: PageData): IdRename[] {
+    return this.pageManager.importPage(pageData);
   }
 
   /** Export all pages */

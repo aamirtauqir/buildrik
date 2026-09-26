@@ -21,7 +21,8 @@
  */
 
 import { EVENTS } from "../../../shared/constants";
-import type { ElementData, PageData, SlugChange } from "../../../shared/types";
+import { claimUniqueIds, type IdRename } from "@buildrik/shared/content/elementIds";
+import type { PageData, SlugChange } from "../../../shared/types";
 import { generateId, slugify } from "../../../shared/utils/helpers";
 import type { ElementManagerContext } from "./types";
 import { liftParserHoisted } from "./liftParserHoisted";
@@ -360,9 +361,19 @@ export class PageManager {
    * Import a page record. Normalizes new Phase 1 fields so legacy exports load
    * cleanly: missing `updatedAt`, `slugManuallySet`, `slugHistory` get defaults.
    */
-  importPage(pageData: PageData): void {
+  /**
+   * Returns the element ids it had to change (see `claimUniqueIds`): the
+   * caller copies whatever is keyed by those ids — style rules, CMS bindings —
+   * onto the new ids.
+   */
+  importPage(pageData: PageData): IdRename[] {
     const normalized: PageData = {
       ...pageData,
+      /* A copy: Element keeps its data by reference, so importing the
+         caller's object let two pages handed the same root object (the sync
+         provider's old shared DEFAULT_ROOT) resolve to one element — and the
+         re-id below would have rewritten the caller's data. */
+      root: structuredClone(pageData.root),
       updatedAt: pageData.updatedAt ?? new Date().toISOString(),
       slugManuallySet: pageData.slugManuallySet ?? false,
       slugHistory: pageData.slugHistory ?? [],
@@ -371,8 +382,13 @@ export class PageManager {
        are lifted the way the browser renders them, so model and DOM agree. */
     const lifted = liftParserHoisted(normalized.root);
     if (lifted) console.info(`[pages] "${normalized.name}": lifted ${lifted} element(s) out of parents the browser would not keep them in`);
-    const renamed = this.claimUniqueIds(normalized.root);
-    if (renamed) console.info(`[pages] "${normalized.name}": re-id'd ${renamed} element(s) whose id another page already owns`);
+    /* X-A1: the element registry is keyed by id across ALL pages, and stored
+       pages repeat ids ("root" on every AI/template/seed/blank page). Ids
+       another page — or this page — already registered get the shared
+       deterministic replacement, so the first page keeps its ids and the
+       same stored page gets the same ids on every load. */
+    const renames = claimUniqueIds(normalized.root, normalized.id, new Set(this.ctx.elements.keys()));
+    if (renames.length) console.info(`[pages] "${normalized.name}": re-id'd ${renames.length} element(s) whose id another page already owns`);
     this.ctx.pages.set(normalized.id, normalized);
     this.ctx.buildElementTree(normalized.root);
     this.registerRoute(normalized);
@@ -380,32 +396,7 @@ export class PageManager {
     if (!this.ctx.getActivePageId()) {
       this.ctx.setActivePageId(normalized.id);
     }
-  }
-
-  /**
-   * The element registry is keyed by id across ALL pages, so a page whose
-   * ids another page already registered silently hands its elements to that
-   * page (X-A1). Stored pages do collide: every page the AI-generate worker
-   * writes has `id: "root"` and section ids like `ai-hero-0`, as do the seed
-   * sites. The last page imported then owned "root" — the canvas drew it
-   * under the first page's tab, and a save wrote its tree into every page.
-   * Ids already taken (by an earlier page, or earlier in this tree) get a
-   * fresh id here, before the tree is registered; the first owner keeps its
-   * stored ids, and the next save persists the new ones.
-   */
-  private claimUniqueIds(root: ElementData): number {
-    const seen = new Set<string>();
-    let renamed = 0;
-    const walk = (el: ElementData) => {
-      if (this.ctx.elements.has(el.id) || seen.has(el.id)) {
-        el.id = generateId(el.type);
-        renamed++;
-      }
-      seen.add(el.id);
-      if (Array.isArray(el.children)) el.children.forEach(walk);
-    };
-    walk(root);
-    return renamed;
+    return renames;
   }
 
   /**
