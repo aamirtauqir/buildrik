@@ -12,7 +12,7 @@ import type {
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
-import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_PATTERNS, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
+import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 
@@ -664,21 +664,26 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * I-1c: `projectSettings.analytics` with every id that is not of its
- * provider's documented shape emptied (and that provider's `verifiedAt`
- * dropped) — the ids are written into every published page's inline scripts,
- * and `settings` is `z.unknown()` at the save boundary. Lenient: the rest of
- * the settings, and the save, still land.
+ * I-1c: `projectSettings.analytics` with every injection-shaped id emptied
+ * (and that provider's `verifiedAt` dropped) — the ids are written into every
+ * published page's inline scripts, and `settings` is `z.unknown()` at the save
+ * boundary. Deliberately NOT the editor's strict per-provider formats: ids
+ * saved under the screen's older, looser rules must survive a save. A safe id
+ * is stored trimmed. Lenient: the rest of the settings, and the save, land.
  */
 function withValidAnalyticsIds(settings: unknown): unknown {
   if (!isPlainObject(settings) || !isPlainObject(settings.analytics)) return settings;
   const analytics: Record<string, unknown> = { ...settings.analytics };
-  for (const provider of Object.keys(ANALYTICS_ID_PATTERNS) as AnalyticsProvider[]) {
+  for (const provider of Object.keys(ANALYTICS_ID_FIELDS) as AnalyticsProvider[]) {
     const block = analytics[provider];
     if (!isPlainObject(block)) continue;
     const field = ANALYTICS_ID_FIELDS[provider];
     const id = block[field];
-    if (id === undefined || (typeof id === "string" && (id === "" || ANALYTICS_ID_PATTERNS[provider].test(id)))) continue;
+    if (id === undefined || id === "") continue;
+    if (typeof id === "string" && ANALYTICS_ID_SAFE.test(id.trim())) {
+      if (id !== id.trim()) analytics[provider] = { ...block, [field]: id.trim() };
+      continue;
+    }
     const emptied: Record<string, unknown> = { ...block, [field]: "" };
     delete emptied.verifiedAt;
     analytics[provider] = emptied;

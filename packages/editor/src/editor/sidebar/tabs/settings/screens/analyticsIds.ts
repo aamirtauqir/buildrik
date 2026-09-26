@@ -8,8 +8,9 @@
  * Empty is "not set", never an error — the toggle beside an empty id is
  * ANDed off at flush time. Case is the screen's business (it uppercases the
  * GA and GTM ids as they are typed); the rules read case-insensitively so a
- * stored lowercase id is not flagged on open. The patterns are shared with
- * the server's save boundary (`@buildrik/shared/schemas/analytics-ids`).
+ * stored lowercase id is not flagged on open. The patterns live in
+ * `@buildrik/shared/schemas/analytics-ids`; they are this screen's hint only —
+ * the server enforces the looser injection-only `ANALYTICS_ID_SAFE`.
  *
  * @license BSD-3-Clause
  */

@@ -1,13 +1,18 @@
 /**
- * The shape each analytics provider's id must have — one list for the
- * editor's Analytics screen (`analyticsIds.ts`, which refuses Save on a
- * malformed id) and the server's save boundary (`saveProjectData`, which
- * drops one), so the two cannot drift apart (I-1c). The ids end up inside
- * every published page's inline <script>, so the server must not trust the
- * client's check.
+ * Analytics provider ids — two rules with two jobs (I-1c).
  *
- * Case-insensitive where the screen uppercases as the user types, so a
- * stored lowercase id is not flagged.
+ * `ANALYTICS_ID_PATTERNS` are the strict per-provider formats. They are the
+ * editor's Save-time hint only (`analyticsIds.ts` refuses Save and shows the
+ * field's sentence). They were tightened on 2026-09-14, and ids saved under
+ * the screen's earlier, looser rules (GTM-XXXX and up, 6-15 character
+ * Clarity) are still in customers' settings. The server must NOT enforce
+ * these patterns, or it would silently empty those ids on the next save.
+ * Case-insensitive where the screen uppercases as the user types.
+ *
+ * `ANALYTICS_ID_SAFE` is the server's save-boundary rule (`saveProjectData`),
+ * one rule for every provider. It refuses only injection-shaped values. Every
+ * real provider id is letters, digits, "-" and "_". Output escaping
+ * (`AnalyticsInjector`) covers the rest.
  */
 
 export type AnalyticsProvider = "googleAnalytics" | "googleTagManager" | "facebookPixel" | "microsoftClarity";
@@ -18,6 +23,9 @@ export const ANALYTICS_ID_PATTERNS: Readonly<Record<AnalyticsProvider, RegExp>> 
   facebookPixel: /^\d{15,16}$/,
   microsoftClarity: /^[A-Z0-9]{10}$/i,
 };
+
+/** Checked after trimming. */
+export const ANALYTICS_ID_SAFE = /^[A-Za-z0-9_-]{1,128}$/;
 
 /** The key the id sits under in each provider's block of `projectSettings.analytics`. */
 export const ANALYTICS_ID_FIELDS: Readonly<Record<AnalyticsProvider, string>> = {

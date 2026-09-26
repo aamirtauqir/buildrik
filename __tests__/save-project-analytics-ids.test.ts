@@ -1,9 +1,12 @@
 /**
  * I-1c: `settings` (Site.projectSettings) is `z.unknown()` at the save
  * boundary, and its analytics ids reach every published page's inline
- * scripts. The write boundary keeps only ids of the documented shapes — the
- * same rules the Analytics screen applies (`@buildrik/shared/schemas/analytics-ids`)
- * — and drops a malformed id leniently: the save and everything else lands.
+ * scripts. The write boundary refuses only injection-shaped ids
+ * (`ANALYTICS_ID_SAFE`, one rule for all providers) and empties them
+ * leniently: the save and everything else lands. It does NOT apply the
+ * editor's strict per-provider formats — ids saved under the looser rules the
+ * screen had before 2026-09-14 (GTM-XXXX, 6-15 char Clarity) must survive a
+ * save with their verifiedAt. Output escaping (AnalyticsInjector) covers the rest.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -72,6 +75,25 @@ describe("saveProjectData — analytics ids (I-1c)", () => {
       googleAds: { enabled: false, conversionId: "AW-123" },
     });
     expect(stored.seo).toEqual({ titleTemplate: "%s" });
+  });
+
+  it("keeps ids saved under the pre-2026-09-14 looser client rules, with verifiedAt", async () => {
+    const analytics = {
+      googleTagManager: { enabled: true, containerId: "GTM-ABCD", verifiedAt: "2026-09-01T00:00:00.000Z" },
+      microsoftClarity: { enabled: true, projectId: "abc123", verifiedAt: "2026-09-01T00:00:00.000Z" },
+      googleAnalytics: { enabled: true, measurementId: "G-ABCD1234", verifiedAt: "2026-09-01T00:00:00.000Z" },
+    };
+    expect((await storedSettings({ analytics })).analytics).toEqual(analytics);
+    siteUpdate.mockClear();
+    const longGtm = { googleTagManager: { enabled: true, containerId: "GTM-ABCDEFGHIJ", verifiedAt: "2026-09-01T00:00:00.000Z" } };
+    expect((await storedSettings({ analytics: longGtm })).analytics).toEqual(longGtm);
+  });
+
+  it("empties the classic breakout payload", async () => {
+    const stored = await storedSettings({
+      analytics: { googleAnalytics: { enabled: true, measurementId: "x');alert(1)//", verifiedAt: "2026-09-01T00:00:00.000Z" } },
+    });
+    expect(stored.analytics).toEqual({ googleAnalytics: { enabled: true, measurementId: "" } });
   });
 
   it("drops a non-string id too", async () => {
