@@ -357,6 +357,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     pendingId.current = null;
     addAsNewPageRef.current = false;
     setAppliedId(null);
+    /* Bound right after the apply commits, not inside the frame below — an
+       edit landing before that frame would be what the toast's Undo undid. */
+    const undoApply = composer?.history.captureUndo();
     requestAnimationFrame(() => {
       setAppliedId(id);
       /* Board 4428:150147 — a replace says what it replaced and offers Undo
@@ -369,7 +372,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           tone: "success",
           title: `${replacedName} replaced`,
           description: backupTakenRef.current ? "Backup saved in History › Saves." : `“${t.name}” applied.`,
-          action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
+          action: undoApply ? { label: "Undo", onClick: undoApply } : undefined,
         });
       } else {
         addToast({ description: `"${t.name}" applied successfully`, tone: "success" });

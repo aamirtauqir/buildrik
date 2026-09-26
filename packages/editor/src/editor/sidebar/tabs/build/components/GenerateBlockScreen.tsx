@@ -110,6 +110,9 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
   const [phase, setPhase] = React.useState<Phase>({ kind: "idle" });
   const target = React.useMemo(() => generateTarget(composer), [composer]);
   const runId = React.useRef(0);
+  /* Bound when the insert lands (history.captureUndo) — capturing on Done
+     would bind an edit made in between instead. */
+  const undoInsert = React.useRef<(() => boolean) | null>(null);
   const quota = useAiQuota(phase.kind);
   const quotaLabel = quota && quotaLeftLabel(quota, phase.kind === "idle" ? "generations" : undefined);
 
@@ -135,6 +138,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
       const added = rootChildIds().find((c) => !before.has(c));
       const addedEl = added ? composer.elements.getElement(added) : null;
       if (addedEl) composer.selection.select(addedEl);
+      undoInsert.current = composer.history.captureUndo();
       setPhase({ kind: "inserted", edit });
     } catch (e) {
       if (id !== runId.current) return;
@@ -144,7 +148,8 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
 
   // Done (6881:74045): back to Add, and the insert stays one Undo away.
   const done = () => {
-    addToast({ description: "Block added", action: { label: "Undo", onClick: composer.history.captureUndo() } });
+    const undoIt = undoInsert.current;
+    addToast({ description: "Block added", ...(undoIt ? { action: { label: "Undo", onClick: undoIt } } : {}) });
     onBack();
   };
 
