@@ -20,6 +20,7 @@ import { useSession } from "next-auth/react";
 import { Plus, Search, CheckSquare, Folder } from "lucide-react";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
+import { writeClipboardText } from "@lib/clipboard";
 
 export default function ProjectsPage() {
   const { addToast } = useToast();
@@ -362,8 +363,10 @@ export default function ProjectsPage() {
             // every "copied" link was dead the moment it was pasted.
             const url = site.domain ? `https://${site.domain}` : site.publishedUrl;
             if (url) {
-              navigator.clipboard.writeText(url);
-              addToast("success", "URL copied to clipboard");
+              writeClipboardText(url).then(
+                () => addToast("success", "URL copied to clipboard"),
+                () => addToast("error", "Couldn't copy the URL", url),
+              );
             } else {
               addToast("error", "This site isn't published yet");
             }

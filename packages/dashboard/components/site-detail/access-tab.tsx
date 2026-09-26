@@ -2,6 +2,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Copy, Eye, Trash2, Plus, Lock, Calendar, QrCode } from "lucide-react";
 import { shareUrl } from "@lib/utils";
+import { writeClipboardText } from "@lib/clipboard";
+import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, SectionCard, MetricValue, InputField } from "@/components/dashboard/primitives";
 
 // `token` is null for a caller the server didn't reveal it to (VIEWER — S-10);
@@ -101,6 +103,12 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
   const [linkPw, setLinkPw] = useState("");
   const [linkExpiry, setLinkExpiry] = useState("");
   const [showQr, setShowQr] = useState<string | null>(null);
+  const { addToast } = useToast();
+  const copyLink = (url: string) =>
+    writeClipboardText(url).then(
+      () => addToast("success", "Link copied"),
+      () => addToast("error", "Couldn't copy the link", url),
+    );
 
   const handleCreate = useCallback(() => {
     // "No expiry" sets linkExpiry to the string "0" (truthy!), which sent
@@ -195,7 +203,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                       {url && (
                         <>
                           <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="QR Code" aria-label="Show QR code"><QrCode className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
-                          <button onClick={() => navigator.clipboard.writeText(url)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link" aria-label="Copy share link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                          <button onClick={() => copyLink(url)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link" aria-label="Copy share link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
                         </>
                       )}
                       {canRevoke && (

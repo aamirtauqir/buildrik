@@ -7,6 +7,8 @@ import { Globe, Pencil, ArrowRight, Upload, Link2, Check } from "lucide-react";
 import type { RecentSite } from "@buildrik/shared/schemas/dashboard";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
+import { writeClipboardText } from "@lib/clipboard";
+import { useToast } from "@/components/dashboard/toast-provider";
 
 const STATUS_TONE: Record<string, PillTone> = {
   published: "success",
@@ -31,14 +33,20 @@ type SiteCardProps = {
 
 export function SiteCard({ site }: SiteCardProps) {
   const [copied, setCopied] = useState(false);
+  const { addToast } = useToast();
 
   function handleCopyUrl(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (!site.publishedUrl) return;
-    navigator.clipboard.writeText(site.publishedUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const url = site.publishedUrl;
+    writeClipboardText(url).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      },
+      () => addToast("error", "Couldn't copy the URL", url),
+    );
   }
 
   return (

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Users, TrendingUp, Wallet, Copy, Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
+import { writeClipboardText } from "@lib/clipboard";
+import { useToast } from "@/components/dashboard/toast-provider";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { StatCard, MetricValue, ProgressBar, DataTable, type Column } from "@/components/dashboard/primitives";
 
@@ -14,16 +16,20 @@ const usd = (cents: number) => {
 export default function PartnerPage() {
   const query = trpc.dashboard.partner.useQuery(undefined, { retry: false });
   const [copied, setCopied] = useState(false);
+  const { addToast } = useToast();
 
   type Referral = NonNullable<typeof query.data>["referrals"][number];
 
   const copyLink = () => {
     if (!query.data) return;
     const url = `${window.location.origin}/?ref=${query.data.referralCode}`;
-    navigator.clipboard?.writeText(url).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    });
+    writeClipboardText(url).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1600);
+      },
+      () => addToast("error", "Couldn't copy the link", url),
+    );
   };
 
   const d = query.data;
