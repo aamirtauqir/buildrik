@@ -121,15 +121,17 @@ describe("reidSite", () => {
   });
 });
 
-/* Round 2: FormBlock rows are keyed by the element id (FormBlock.id ===
-   blockId; no writer sets pageId), so a row belongs to EVERY page carrying
+/* Round 2: FormBlock rows are keyed by (siteId, blockId = element id; no
+   writer sets pageId), so a row belongs to EVERY page of its site carrying
    that id. Each renamed occurrence gets its own copy; the original stays. */
 describe("copiesForRenamedIds", () => {
-  it("one copy per new id of a row whose id or blockId was renamed", () => {
+  it("one copy per new id of a row whose blockId was renamed (id is a surrogate)", () => {
     const rows = [
       { id: "form-1", blockId: "form-1", pageId: null },
       { id: "cuid-x", blockId: "form-2", pageId: null },
       { id: "other", blockId: "other", pageId: null },
+      // Another element's row whose surrogate id happens to equal a renamed id.
+      { id: "form-2", blockId: "unrelated", pageId: null },
     ];
     const renames = [
       { from: "form-1", to: "el-a" },

@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
-import { blankPageRoot, copiesForRenamedIds, reidSite } from "@buildrik/shared/content/elementIds";
+import { blankPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
 import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
@@ -399,7 +399,8 @@ export async function duplicateSite(
      editor loads as one tree. The copy is written with the editor's own
      deterministic re-id — keyed by the ORIGINAL page id, so the duplicate
      gets exactly the ids the editor gives the original on load — and what is
-     keyed by a renamed id (style rules, form blocks) is copied along. */
+     keyed by a renamed id (style rules, form blocks, CMS bindings) is copied
+     along. */
   const reid = reidSite(originalPages, sanitizeProjectStyles(original.projectStyles));
 
   // Site + pages + form blocks must be copied atomically — a crash mid-copy
@@ -422,6 +423,7 @@ export async function duplicateSite(
         projectStyles: (reid.styles as Prisma.InputJsonValue) ?? undefined,
         projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
         projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
+        projectCmsBindings: copyCmsBindings(original.projectCmsBindings, reid.renames),
         lastEditedAt: new Date(),
       },
     });
@@ -466,15 +468,20 @@ export async function duplicateSite(
           fields: f.fields as Prisma.InputJsonValue,
           submitButtonText: f.submitButtonText,
           successMessage: f.successMessage,
+          successAction: f.successAction,
+          redirectUrl: f.redirectUrl,
+          spamProtection: f.spamProtection,
           notifyEmail: f.notifyEmail,
           webhookUrl: f.webhookUrl,
           isActive: f.isActive,
         };
       };
-      /* A form row is keyed by its element id (no writer sets pageId), so it
-         serves every page carrying that id. Each page whose copy of the
-         element was re-id'd gets its own COPY of the row; the original row
-         stays for the page that kept the id. */
+      /* A form row is keyed by (site, element id) — no writer sets pageId — so
+         it serves every page carrying that id. The copy's rows sit under the
+         copy's siteId (a fresh surrogate id each), where its publish and its
+         public form look them up. Each page whose copy of the element was
+         re-id'd gets its own row; the original id's row stays for the page
+         that kept it. */
       await tx.formBlock.createMany({
         data: [
           ...originalForms.map((f) => copyForm(f, f.blockId)),
@@ -485,6 +492,19 @@ export async function duplicateSite(
 
     return newSite;
   });
+}
+
+/** A site's stored CMS bindings for its copy: every entry kept, plus one per
+ *  element id the copy's re-id renamed (the same copy the editor makes on
+ *  load — `Composer.importProject`). Null stays unset. */
+function copyCmsBindings(stored: Prisma.JsonValue, renames: IdRename[]): Prisma.InputJsonValue | undefined {
+  if (!stored) return undefined;
+  // Written only through cmsBindingsSchema (saveProjectData).
+  const { field, collection } = stored as CmsBindingsInput;
+  return {
+    ...(field ? { field: copyIdKeyedRecord(field, renames) } : {}),
+    ...(collection ? { collection: copyIdKeyedRecord(collection, renames) } : {}),
+  } as Prisma.InputJsonValue;
 }
 
 export async function archiveSite(siteId: string) {

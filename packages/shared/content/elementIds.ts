@@ -194,20 +194,19 @@ export function reidSite<P extends { id: string; blocks: unknown }>(pages: P[], 
 /**
  * Rows keyed by an element id that a re-id renamed, one entry per new id —
  * for the caller to COPY (the original row stays with the page that kept the
- * old id). Built for FormBlock: `FormBlock.id === blockId === element id`
- * (form-submission.service / the publish worker upsert on it) and no writer
- * sets `pageId`, so a row serves every page carrying that id and has to be
- * matched on the id itself. Matches `id` or `blockId` (a row an earlier
- * duplicate wrote has a cuid id but the element's blockId).
+ * old id). Built for FormBlock: a row is keyed by (siteId, blockId = element
+ * id) — form-submission.service and the publish worker upsert on it — and no
+ * writer sets `pageId`, so a row serves every page carrying that id and is
+ * matched on `blockId` (`id` is a surrogate).
  */
-export function copiesForRenamedIds<R extends { id: string; blockId: string }>(
+export function copiesForRenamedIds<R extends { blockId: string }>(
   rows: R[],
   renames: IdRename[],
 ): Array<{ row: R; to: string }> {
   const out: Array<{ row: R; to: string }> = [];
   for (const row of rows) {
     for (const { from, to } of renames) {
-      if (row.id === from || row.blockId === from) out.push({ row, to });
+      if (row.blockId === from) out.push({ row, to });
     }
   }
   return out;
