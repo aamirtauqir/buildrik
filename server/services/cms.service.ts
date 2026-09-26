@@ -69,9 +69,10 @@ function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknow
  * repeatedly re-escaping `<` (e.g. `<img src=x onerror=alert(1)>` wrapped as
  * `<<<...<img…>...i>i>i>` N times) can still contain live markup after N
  * passes, and a cap would hand that back untouched. As a fail-closed
- * backstop for anything the loop above did not anticipate, any leftover
- * `<`/`>` is stripped from the converged result — a fixed point that still
- * contains one is not actually markup-free.
+ * backstop for a parser disagreement the loop cannot see, a converged result
+ * that still holds a tag opener (`<` followed by a letter, `!`, `/` or `?`)
+ * loses every angle bracket. A bare `<` or `>` is never markup, so ordinary
+ * text ("5 < 10", "a -> b", "<3") comes back exactly as typed.
  */
 function stripMarkup(value: string): string {
   let text = value;
@@ -81,7 +82,7 @@ function stripMarkup(value: string): string {
     if (next === text) break;
     text = next;
   }
-  return text.replace(/[<>]/g, "");
+  return /<[a-z!/?]/i.test(text) ? text.replace(/[<>]/g, "") : text;
 }
 
 export async function listCollections(siteId: string) {

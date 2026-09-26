@@ -125,14 +125,10 @@ describe("entries cross-site guard", () => {
   });
 
   it("x4: stores text as typed — no entity encoding, stable across saves, escaped once at the page sink", async () => {
-    // `&` round-trips exactly; a literal `<`/`>` does not — stripMarkup's
-    // fail-closed backstop removes any leftover angle bracket from the
-    // converged result (see stripMarkup's doc comment), since a fixed point
-    // that still contains one cannot be told apart from unparsed markup.
-    const typed = { title: "Tom & Jerry 3", quote: 'Say "hi"  bye', literal: "AT&amp;T" };
+    const typed = { title: "Tom & Jerry <3", quote: 'Say "hi" > bye', literal: "AT&amp;T", math: "5 < 10", arrow: "a -> b" };
     colFindFirst.mockResolvedValue({ id: "c1" });
     entCreate.mockResolvedValue({ id: "e1" });
-    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: "Tom & Jerry <3", quote: 'Say "hi" > bye', literal: "AT&amp;T" } });
+    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: typed });
     const first = entCreate.mock.calls[0][0].data.data as Record<string, unknown>;
     expect(first).toEqual(typed);
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: first }); // a second save of what came back
@@ -142,7 +138,7 @@ describe("entries cross-site guard", () => {
     colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/x", pageSeoTitle: null, pageSeoDescription: null });
     entFindMany.mockResolvedValueOnce([{ id: "e1", data: first }]);
     const page = await generateDynamicPages("s1", "c1", "<html><head></head><body><h1>{title}</h1></body></html>");
-    expect(page[0].content).toContain("<h1>Tom &amp; Jerry 3</h1>");
+    expect(page[0].content).toContain("<h1>Tom &amp; Jerry &lt;3</h1>");
   });
 
   it("x4: stored text never re-forms markup when a tag is cut out of the middle of one", async () => {
