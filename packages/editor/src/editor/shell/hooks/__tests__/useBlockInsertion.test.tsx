@@ -84,6 +84,7 @@ describe("useBlockInsertion", () => {
       removeElement: ReturnType<typeof vi.fn>;
     };
     selection: { getSelectedIds: ReturnType<typeof vi.fn>; select: ReturnType<typeof vi.fn> };
+    history: { captureUndo: ReturnType<typeof vi.fn> };
   };
 
   beforeEach(() => {

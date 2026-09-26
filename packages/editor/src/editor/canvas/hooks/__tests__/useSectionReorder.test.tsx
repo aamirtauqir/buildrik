@@ -50,6 +50,7 @@ describe("useSectionReorder", () => {
     beginTransaction: ReturnType<typeof vi.fn>;
     endTransaction: ReturnType<typeof vi.fn>;
     rollbackTransaction: ReturnType<typeof vi.fn>;
+    history: { captureUndo: ReturnType<typeof vi.fn> };
   };
   let handlers: Map<string, () => void>;
   let sectionIds: string[];
