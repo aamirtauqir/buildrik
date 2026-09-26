@@ -42,3 +42,6 @@ packages/editor/src/shared/utils/html/accessibility.ts
 # changed WHERE they mount, so their appearance and close behaviour are
 # untouched. Nothing replaced these entries — this section is intentionally
 # empty of paths now.
+# ── Clipboard fallback — a transient offscreen textarea for the legacy copy
+# command on insecure origins, removed in the same call. Never a UI surface.
+packages/editor/src/shared/utils/clipboard.ts

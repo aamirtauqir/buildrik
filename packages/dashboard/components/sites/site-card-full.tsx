@@ -14,6 +14,7 @@ interface SiteCardFullProps {
   selected: boolean;
   onSelect: (id: string, event?: React.MouseEvent) => void;
   onAction: (action: string, siteId: string) => void;
+  canTransfer?: boolean;
 }
 
 function getTimeAgo(date: Date): string {
@@ -31,7 +32,7 @@ function formatVisitors(count: number): string {
   return String(count);
 }
 
-export function SiteCardFull({ site, selected, selectionActive, onSelect, onAction }: SiteCardFullProps) {
+export function SiteCardFull({ site, selected, selectionActive, onSelect, onAction, canTransfer = false }: SiteCardFullProps) {
   return (
     <div
       className={cn("group relative overflow-hidden rounded-lg border bg-white shadow-card transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")}
@@ -116,7 +117,7 @@ export function SiteCardFull({ site, selected, selectionActive, onSelect, onActi
           <Settings className="h-3.5 w-3.5" />Manage
         </Link>
         <div className="ml-auto">
-          <ContextMenu siteStatus={site.status} siteName={site.name} onAction={(action) => onAction(action, site.id)} />
+          <ContextMenu siteStatus={site.status} siteName={site.name} canTransfer={canTransfer} onAction={(action) => onAction(action, site.id)} />
         </div>
       </div>
     </div>

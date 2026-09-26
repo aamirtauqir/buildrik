@@ -16,13 +16,14 @@ import type { Composer } from "../../engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId } from "../rail/tabsConfig";
-import { getTabMode, isColumnTabOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
+import { getTabMode, isColumnTabOpen, isInspectorColumnOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
+import type { FocusSectionPayload } from "../inspector/hooks/usePropertyJump";
 import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
@@ -133,9 +134,10 @@ export interface StudioPanelsProps {
    *  floating an absolute overlay on top of it. AquibraStudio owns the open
    *  state and builds the panel (it needs `composer.designSystem` +
    *  `requestBrandToken`, already in scope there); this just says where it
-   *  renders. */
+   *  renders. It is handed the back row's action (M-1: "‹ Inspector" leads
+   *  to the inspector, shown even if it was hidden). */
   issuesOpen?: boolean;
-  issuesPanel?: React.ReactNode;
+  renderIssuesPanel?: (onBack: () => void) => React.ReactNode;
   onCloseIssues?: () => void;
   /** FB-4: server flag for the agency review layer — see `TabRouter.reviewsEnabled`. */
   reviewsEnabled?: boolean | null;
@@ -144,6 +146,9 @@ export interface StudioPanelsProps {
 // ============================================================================
 // STYLES
 // ============================================================================
+
+/** How long a section-focus request waits for the inspector body (m-1). */
+const PENDING_FOCUS_MS = 500;
 
 const styles = {
   container: {
@@ -219,7 +224,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   nextMove = null,
   onRequestPublish,
   issuesOpen = false,
-  issuesPanel,
+  renderIssuesPanel,
   onCloseIssues,
   reviewsEnabled,
 }) => {
@@ -292,22 +297,30 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   }, [readOnlyView, viewerChrome]);
 
   const [aiInInspector, setAiInInspector] = React.useState(false);
-  /* Inspector visibility, user-operated and remembered. Defaults to SHOWN so
-     the drawn no-selection board is still the default state — collapsing it
+  /* Inspector visibility, user-operated. Defaults to SHOWN so the drawn
+     no-selection board is still the default state — collapsing it
      automatically was tried before and rendered that board off-viewport.
-     This is the opt-out. */
-  const [inspectorShown, setInspectorShown] = React.useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    try { return localStorage.getItem("buildrick-inspector-shown") !== "false"; }
-    catch { return true; }
-  });
+     Session-only (gap walk 93 #3): persisted, a reload left the inspector
+     hidden with no visible way back, and no board draws a "Show inspector"
+     control. The hide answers with a toast whose action is that way back;
+     ⌘K "Toggle inspector" stays the other door. */
+  const [inspectorShown, setInspectorShown] = React.useState<boolean>(true);
+  const inspectorShownRef = React.useRef(inspectorShown);
+  /* What the inspector column shows this render (assigned below, once known):
+     read by the toggle's toast and the section-focus route. */
+  const columnRef = React.useRef({ bodyShown: false, blocked: false, rightColumnTab: false });
+  inspectorShownRef.current = inspectorShown;
   const toggleInspector = React.useCallback(() => {
-    setInspectorShown((v) => {
-      const next = !v;
-      try { localStorage.setItem("buildrick-inspector-shown", String(next)); } catch { /* private mode */ }
-      return next;
-    });
-  }, []);
+    const next = !inspectorShownRef.current;
+    setInspectorShown(next);
+    /* M-2: with a mode over the inspector (⌘K Toggle inspector while AI is
+       up) nothing on screen changes, so there is nothing to announce. */
+    if (!next && columnRef.current.bodyShown)
+      addToast({
+        description: "Inspector hidden",
+        action: { label: "Show", onClick: () => setInspectorShown(true) },
+      });
+  }, [addToast]);
   /* The toggle's doors are the inspector's own ✕ and the ⌘K row
      (`toggle-inspector`, commands registry) — both emit this event (G2-037:
      the footer word bar's Inspector toggle had no home on the board). */
@@ -414,8 +427,82 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
   const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
-  const inspectorOpen =
-    viewerChrome || (!readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen);
+  const inspectorOpen = isInspectorColumnOpen({
+    readOnlyView,
+    viewerChrome,
+    fullPage: effectiveFullPageMode,
+    cmsWorkspaceOpen,
+    inspectorShown,
+    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector,
+  });
+  /* The inspector BODY (ProInspector) is on screen: its column is open and no
+     mode (Issues · a column tab · AI) has replaced it. */
+  const inspectorBodyShown =
+    !readOnlyView && inspectorOpen && !(issuesOpen && renderIssuesPanel) && !rightColumnTab && !aiInInspector;
+
+  /* I-1: UI_INSPECTOR_FOCUS_SECTION ("Bind to CMS field…", "Add
+     interaction", ⌘K Jump to property) is heard by the inspector body. With a
+     mode over it, or the inspector hidden, the request landed nowhere visible.
+     Here it clears the way — inspector shown, the covering mode closed — and
+     is re-sent on the next frame, once the body is up and listening. Only
+     requests the visible body could not take are held, so the re-send does
+     not loop. A full page or the CMS workspace has no inspector to show. */
+  columnRef.current = {
+    bodyShown: inspectorBodyShown,
+    blocked: readOnlyView || effectiveFullPageMode || cmsWorkspaceOpen,
+    rightColumnTab,
+  };
+  /* m-1: a held request lapses — after PENDING_FOCUS_MS if the body never
+     came up, and on any selection change — so it cannot fire later, at a
+     moment the user no longer connects with it. */
+  const pendingFocus = React.useRef<FocusSectionPayload | null>(null);
+  const pendingLapse = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const dropPendingFocus = React.useCallback(() => {
+    pendingFocus.current = null;
+    clearTimeout(pendingLapse.current);
+  }, []);
+  React.useEffect(() => dropPendingFocus, [dropPendingFocus]);
+  React.useEffect(() => {
+    if (!composer) return;
+    const selectionEvents = [
+      EVENTS.ELEMENT_SELECTED,
+      EVENTS.SELECTION_MULTIPLE,
+      EVENTS.SELECTION_CLEARED,
+      EVENTS.SELECTION_ADDED,
+      EVENTS.SELECTION_REMOVED,
+    ] as const;
+    for (const ev of selectionEvents) composer.on(ev, dropPendingFocus);
+    return () => {
+      for (const ev of selectionEvents) composer.off(ev, dropPendingFocus);
+    };
+  }, [composer, dropPendingFocus]);
+  React.useEffect(() => {
+    if (!composer) return;
+    const route = (payload: FocusSectionPayload) => {
+      const r = columnRef.current;
+      if (r.bodyShown || r.blocked) return;
+      pendingFocus.current = payload;
+      clearTimeout(pendingLapse.current);
+      pendingLapse.current = setTimeout(dropPendingFocus, PENDING_FOCUS_MS);
+      setInspectorShown(true);
+      setAiInInspector(false);
+      onCloseIssues?.();
+      if (r.rightColumnTab) onLeftPanelToggle?.();
+    };
+    composer.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, route);
+    return () => {
+      composer.off(EVENTS.UI_INSPECTOR_FOCUS_SECTION, route);
+    };
+  }, [composer, onCloseIssues, onLeftPanelToggle, dropPendingFocus]);
+  React.useEffect(() => {
+    if (!composer || !inspectorBodyShown || !pendingFocus.current) return;
+    const frame = requestAnimationFrame(() => {
+      const payload = pendingFocus.current;
+      dropPendingFocus();
+      if (payload) composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, payload);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [composer, inspectorBodyShown, dropPendingFocus]);
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
@@ -528,20 +615,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            opening hidden under it (Issues wins the render, so both open meant
            an invisible AI that one Escape also closed). */
         onCloseIssues?.();
+        /* A-14: with the inspector hidden, AI used to mount into a 0-px
+           column; isInspectorColumnOpen now opens the column for any panel
+           it hosts, AI included. */
         setAiInInspector(true);
-        /* A-14: inspectorOpen is `inspectorShown && !effectiveFullPageMode &&
-           ...` — a user who had collapsed the inspector (its own ✕) got
-           aiInInspector=true with nothing rendering it: AITab mounted into a
-           zero-width column. Every ⌘J/✦-AI door means "show me the AI chat",
-           so force the column open the same way the inspector's own toggle
-           persists it, overriding the collapsed preference on this explicit
-           open. */
-        setInspectorShown(true);
-        try {
-          localStorage.setItem("buildrick-inspector-shown", "true");
-        } catch {
-          /* private mode */
-        }
         return;
       }
       onLeftPanelTabChange?.(data.tab, () => {
@@ -791,8 +868,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           ) : null
         ) : (
         <LayoutShell.Inspector>
-          {issuesOpen && issuesPanel ? (
-            issuesPanel
+          {issuesOpen && renderIssuesPanel ? (
+            renderIssuesPanel(() => {
+              onCloseIssues?.();
+              setInspectorShown(true);
+            })
           ) : rightColumnTab ? (
             columnPanel
           ) : aiInInspector ? (
@@ -801,7 +881,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               isExpanded={false}
               onExpandToggle={() => {}}
               onClose={() => setAiInInspector(false)}
-              onBack={() => setAiInInspector(false)}
+              /* M-1: "‹ Inspector" leads to the inspector — shown even if it
+                 was hidden, where closing AI alone took the column with it. */
+              onBack={() => {
+                setAiInInspector(false);
+                setInspectorShown(true);
+              }}
             />
           ) : (
           <ProInspector

@@ -366,7 +366,10 @@ describe("usePages copyPageLink", () => {
     );
   });
 
-  it("falls back to a copy-manually toast when navigator.clipboard is unavailable", () => {
+  /* Gap walk 93 #5: copies go through writeClipboardText, which tries the
+     legacy copy command before giving up; when nothing copies the toast still
+     carries the URL so the user can copy it by hand. */
+  it("shows the URL to copy by hand when nothing can copy", async () => {
     const composer = createMockComposer({
       pages: [pg("p1", "Home")],
       projectMetadata: { domain: "example.com" },
@@ -376,10 +379,12 @@ describe("usePages copyPageLink", () => {
 
     act(() => result.current.copyPageLink("p1"));
 
-    expect(lastToast()).toMatchObject({
-      description: "Copy manually: https://example.com/home",
-      tone: "info",
-    });
+    await waitFor(() =>
+      expect(lastToast()).toMatchObject({
+        description: "Couldn't copy. Link: https://example.com/home",
+        tone: "error",
+      }),
+    );
   });
 });
 

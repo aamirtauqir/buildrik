@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { standaloneActions } from "../standaloneActions";
+import { BINDABLE_TYPES, standaloneActions } from "../standaloneActions";
 import { EVENTS } from "../../../../../shared/constants/events";
 import type { ActionContext } from "../../contextMenuRegistry";
 import {
@@ -17,6 +17,7 @@ import {
   type ElementStub,
 } from "../../../__tests__/testHarness";
 import type { Element } from "../../../../../engine";
+import { getProfileFor } from "@/editor/inspector/config/elementProfiles";
 
 function action(id: string) {
   const found = standaloneActions.find((a) => a.id === id);
@@ -39,6 +40,29 @@ describe("standaloneActions", () => {
       element: element as unknown as Element,
       isRoot: false,
     };
+  });
+
+  /* Gap walk 93 #4: the row opened the CMS workspace on its collection list,
+     over the canvas and the element being bound — no field picker. The
+     picker is the inspector's Content section (Source · Collection · Field),
+     so the row selects the element and reveals that section, the same way
+     "Add interaction" reveals Interactions. */
+  describe("bind-to-cms", () => {
+    it("reveals the element's Content binding section instead of opening the CMS workspace", () => {
+      const heading = makeElementStub({ id: "h-1", type: "heading", parent });
+      action("bind-to-cms").handler!({ ...ctx, element: heading as unknown as Element });
+      expect(composer.selection.select).toHaveBeenCalledWith(heading);
+      expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" });
+      expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "content" });
+    });
+
+    it("is offered only on types whose inspector profile carries the Content section", () => {
+      for (const type of BINDABLE_TYPES) {
+        const el = makeElementStub({ id: `x-${type}`, type, parent });
+        expect(action("bind-to-cms").isVisible!({ ...ctx, element: el as unknown as Element })).toBe(true);
+        expect(getProfileFor(type).order).toContain("content");
+      }
+    });
   });
 
   describe("save-as-component", () => {

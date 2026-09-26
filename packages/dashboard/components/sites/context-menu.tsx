@@ -29,10 +29,13 @@ interface ContextMenuProps {
   siteStatus?: string;
   /** Names the trigger for assistive tech: "More options for <site>". */
   siteName?: string;
+  /** Transfer is the site owner's act on the server (sites.transfer: site role
+   *  OWNER, and only the creator). Offered only when true (gap walk 93 #9). */
+  canTransfer?: boolean;
   onAction: (action: string) => void;
 }
 
-export function ContextMenu({ siteStatus, siteName, onAction }: ContextMenuProps) {
+export function ContextMenu({ siteStatus, siteName, canTransfer = false, onAction }: ContextMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -81,7 +84,7 @@ export function ContextMenu({ siteStatus, siteName, onAction }: ContextMenuProps
           {(siteStatus === "ARCHIVED"
             ? CONTEXT_MENU_ITEMS.map((i) => (i.action === "archive" ? RESTORE_ITEM : i))
             : CONTEXT_MENU_ITEMS
-          ).map((item) => {
+          ).filter((item) => canTransfer || item.action !== "transfer").map((item) => {
             const Icon = iconMap[item.icon as keyof typeof iconMap];
             const isDestructive = item.action === "archive" || item.action === "delete";
             const showDivider = item.action === "copyUrl";

@@ -9,6 +9,7 @@ import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
 import { requestInsertGroup, requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
+import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
 
 /** Grey left each side of the page card when the canvas fits on load. */
 const FIT_GUTTER = 60;
@@ -106,7 +107,17 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     /* The element getCanvasStyles styles — the one carrying `transform: scale`.
        `canvasRef` is its CHILD (the content div that receives customer HTML),
        so zoom compensation applied there styles the wrong box. */
-    const frameRef = React.useRef<HTMLDivElement>(null);
+    const frameRef = React.useRef<HTMLDivElement | null>(null);
+    /* L-1 / I-2: the page's own links and forms must never navigate the
+       editor — on every node the frame becomes (the device frame remounts it). */
+    const guardFrame = useCanvasNavigationGuard();
+    const setFrameRef = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        frameRef.current = node;
+        guardFrame(node);
+      },
+      [guardFrame],
+    );
 
     // Toast notifications for drop errors and success
     const { addToast } = useToast();
@@ -740,7 +751,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             handleCanvasMouseLeave();
             handleMarqueeEnd();
           }}
-          ref={frameRef}
+          ref={setFrameRef}
           /* Pick mode's crosshair cannot be an inline style on this frame.
              `cursor` inherits, and an inherited value loses to any declaration
              that matches the element itself — and Canvas.css matches every one

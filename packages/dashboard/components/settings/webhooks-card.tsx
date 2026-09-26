@@ -13,6 +13,8 @@
 import { useEffect, useId, useState } from "react";
 import { Checkbox } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
+import { writeClipboardText } from "@lib/clipboard";
+import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, InputField, Pill } from "@/components/dashboard/primitives";
 import { IntegrationCard } from "@/components/settings/integration-card";
 
@@ -50,6 +52,7 @@ export function WebhooksCard() {
   const eventsHeadingId = useId();
   const [confirming, setConfirming] = useState<"regenerate" | "disconnect" | null>(null);
   const [secretVisible, setSecretVisible] = useState(false);
+  const { addToast } = useToast();
 
   const connect = trpc.webhooks.connect.useMutation({
     onSuccess: () => { utils.webhooks.status.invalidate(); setEditing(false); },
@@ -162,7 +165,12 @@ export function WebhooksCard() {
             <div className="flex items-center gap-2">
               <code className="text-body-sm">{secretVisible ? data.secret : maskSecret(data.secret)}</code>
               <Button type="button" variant="ghost" size="sm" onClick={() => setSecretVisible((v) => !v)}>{secretVisible ? "Hide" : "Reveal"}</Button>
-              <Button type="button" variant="ghost" size="sm" onClick={() => navigator.clipboard?.writeText(data.secret)}>Copy</Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() =>
+                  writeClipboardText(data.secret).then(
+                    () => addToast("success", "Signing secret copied"),
+                    () => addToast("error", "Couldn't copy the secret", "Reveal it and copy it by hand."),
+                  )
+                }>Copy</Button>
             </div>
           </div>
 

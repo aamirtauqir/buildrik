@@ -4,6 +4,7 @@ import { Copy, Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { shareUrl } from "@lib/utils";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { writeClipboardText } from "@lib/clipboard";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
 import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 
@@ -57,9 +58,14 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
 
   function handleCopy() {
     if (!createdUrl) return;
-    navigator.clipboard.writeText(`https://${createdUrl}`);
-    setCopied(true);
-    addToast("success", "Link copied");
+    const link = `https://${createdUrl}`;
+    writeClipboardText(link).then(
+      () => {
+        setCopied(true);
+        addToast("success", "Link copied");
+      },
+      () => addToast("error", "Couldn't copy the link", link),
+    );
   }
 
   const expiresInDays = expiryDays && expiryDays !== "0" ? Number(expiryDays) : undefined;

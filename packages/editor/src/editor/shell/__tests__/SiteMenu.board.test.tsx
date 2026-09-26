@@ -68,6 +68,16 @@ describe("SiteMenu — board 4418:126034", () => {
     ]);
   });
 
+  /* Gap walk 93 #8: team.* is ADMIN-gated, so "Invite teammates ↗" landed a
+     non-admin on the dashboard's "Team is admin-only" — the same dead end as
+     the dashboard Home quick action. Withheld like Unpublish (also ADMIN). */
+  it("withholds Invite teammates ↗ from a role that cannot manage the team", () => {
+    render(<ToastProvider><SiteMenu {...all} canInviteTeammates={false} /></ToastProvider>);
+    openMenu();
+    expect(screen.queryByRole("menuitem", { name: "Invite teammates ↗" })).toBeNull();
+    expect(screen.getByRole("menuitem", { name: "Account settings ↗" })).toBeTruthy();
+  });
+
   it("carries none of the rows the board and the owner dropped", () => {
     render(<ToastProvider><SiteMenu {...all} /></ToastProvider>);
     openMenu();

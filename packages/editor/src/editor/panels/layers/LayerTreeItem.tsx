@@ -152,6 +152,16 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     .join(" ");
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    /* L-4: the global shortcut listener stands down inside role=tree, so
+       Delete here did nothing. The row runs the canvas's own "delete"
+       command (lock / instance rules, multi-select confirm, one undo step).
+       Only when the row itself has focus — never from the rename field. */
+    if ((e.key === "Delete" || e.key === "Backspace") && e.target === e.currentTarget) {
+      e.preventDefault();
+      if (!isSelected) onSelect(layer.id, {});
+      composer?.commands.run("delete");
+      return;
+    }
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onSelect(layer.id, {});

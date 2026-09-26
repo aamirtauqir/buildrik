@@ -54,6 +54,8 @@ import "./header.css";
 
 /** Selected element minimal info */
 import type { SelectedElementInfo } from "@/shared/types";
+import { writeClipboardText } from "@/shared/utils/clipboard";
+import { endUnloadGuardBypass, isUnloadGuardBypassed, navigateBypassingUnloadGuard } from "./unloadGuardBypass";
 export type { SelectedElementInfo };
 
 export interface StudioHeaderProps {
@@ -294,7 +296,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      `!== false` keeps the house rule: an unknown role still asks the server,
      a known-insufficient one does not. Same shape as PublishHistory.tsx:104,
      which already gates rollback this way two files over. */
-  const canUnpublish = roleAtLeast(editorRole, "ADMIN") !== false;
+  const atLeastAdmin = roleAtLeast(editorRole, "ADMIN") !== false;
   /* A VIEWER is held in view mode by the /edit route (it redirects them to
      ?view=readonly), so "Back to editing" would only bounce off that redirect. */
   const canLeaveView = roleAtLeast(editorRole, "EDITOR") !== false;
@@ -457,20 +459,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   type ExitDialog = { kind: "dirty" | "risky" | "stranded"; error?: string; pending?: number; nav: () => void };
   const [exitDialog, setExitDialog] = React.useState<ExitDialog | null>(null);
   const [leaving, setLeaving] = React.useState(false);
-  // 2A: set immediately before a user-confirmed programmatic navigation so the
-  // beforeunload guard doesn't double-prompt. Reset on a timer in case the
-  // navigation is somehow cancelled — a stuck flag would disarm the guard.
-  const bypassRef = React.useRef(false);
-  const bypassAndNavigate = React.useCallback((nav: () => void) => {
-    bypassRef.current = true;
-    try {
-      nav();
-    } finally {
-      window.setTimeout(() => {
-        bypassRef.current = false;
-      }, 1000);
-    }
-  }, []);
+  // 2A: a user-confirmed programmatic navigation runs through the unload
+  // guard's bypass (unloadGuardBypass.ts, shared with the view-mode switch
+  // after a refused save) so beforeunload does not double-prompt.
+  React.useEffect(() => endUnloadGuardBypass, []);
 
   /* Brand stages its token edits in a provider this header sits outside, so it
      announces them. Without this the chip read "Saved · just now" with a green
@@ -495,7 +487,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   const guardNavigation = React.useCallback(
     (nav: () => void) => {
-      if (bypassRef.current) return nav();
+      if (isUnloadGuardBypassed()) return nav();
       // 5A: while offline the save pipeline reports queued saves as clean
       // (useSaveCallback settles to idle) but the queue dies on navigation —
       // never offer a fake "Save & leave" here.
@@ -535,7 +527,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     if (outcome === "saved") {
       const { nav } = exitDialog;
       setExitDialog(null);
-      bypassAndNavigate(nav);
+      navigateBypassingUnloadGuard(nav);
     } else if (outcome === "queued-offline" || outcome === "conflict") {
       // The save did NOT durably land — switch to the honest dialog.
       setExitDialog({ kind: "risky", nav: exitDialog.nav });
@@ -545,7 +537,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       setLeaveAfterSave(() => exitDialog.nav);
       setExitDialog(null);
     }
-  }, [exitDialog, onSave, bypassAndNavigate]);
+  }, [exitDialog, onSave]);
 
   /* ── Save failed (4418:124938 / 125678) — the red card on the canvas. ── */
   const [leaveAfterSave, setLeaveAfterSave] = React.useState<(() => void) | null>(null);
@@ -561,16 +553,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     if (outcome === "saved" && leaveAfterSave) {
       const nav = leaveAfterSave;
       setLeaveAfterSave(null);
-      bypassAndNavigate(nav);
+      navigateBypassingUnloadGuard(nav);
     }
-  }, [onSave, leaveAfterSave, bypassAndNavigate]);
+  }, [onSave, leaveAfterSave]);
 
   const leaveAnyway = React.useCallback(() => {
     if (!exitDialog) return;
     const { nav } = exitDialog;
     setExitDialog(null);
-    bypassAndNavigate(nav);
-  }, [exitDialog, bypassAndNavigate]);
+    navigateBypassingUnloadGuard(nav);
+  }, [exitDialog]);
 
   // 2A: browser-chrome exits (⌘W, refresh, tab close) get the native prompt
   // while there is anything a navigation would strand.
@@ -581,7 +573,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
        in between, so a listener gated on React state would still be absent at
        the moment it was needed. Reading at fire time has no staleness. */
     const onBefore = (e: BeforeUnloadEvent) => {
-      if (bypassRef.current) return;
+      if (isUnloadGuardBypassed()) return;
       const stranded = totalPendingMirrors();
       const shellUnsaved = shellDirty.get();
       /* Dev-only, and LOAD-BEARING: `e2e/boot-clean.spec.ts` reads
@@ -798,14 +790,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   const copyLiveUrl = React.useCallback(() => {
     if (!publishedUrl) return;
-    // navigator.clipboard is absent on insecure origins, and writeText can be
-    // refused. Either way the user hears about it rather than pressing again.
-    const done = navigator.clipboard?.writeText(publishedUrl);
-    if (!done) {
-      addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" });
-      return;
-    }
-    void done.then(
+    // A refused copy is reported rather than leaving the user pressing again.
+    void writeClipboardText(publishedUrl).then(
       () => addToast({ title: "Live URL copied", description: publishedUrl, tone: "success" }),
       () => addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" }),
     );
@@ -832,8 +818,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         pageName={crumbCtx ?? pageName}
         onOpenPages={viewMode.readOnlyView ? undefined : onOpenPages}
         onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
-        /* Board 4418:123573's shell search is the ⌘K door. */
-        onOpenSearch={composer ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
+        /* Board 4418:123573's shell search is the ⌘K door. View mode has no
+           palette (above), so it draws no door to one (gap walk 93 #7;
+           a viewer palette is OD-GW-3). */
+        onOpenSearch={composer && !viewMode.readOnlyView ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
         contextSearch={
           searchCtx && composer
             ? {
@@ -928,7 +916,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
             collabEnabled={collabOn}
             onUnpublish={
-              !publishedUrl || !canUnpublish
+              !publishedUrl || !atLeastAdmin
                 ? undefined
                 : () => {
                     onOpenPublish?.();
@@ -937,6 +925,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             }
             publishedUrl={publishedUrl}
             onCopyLiveUrl={copyLiveUrl}
+            /* team.* is ADMIN too — the same known-insufficient rule. */
+            canInviteTeammates={atLeastAdmin}
             onReplayOnboarding={
               viewMode.readOnlyView || !composer ? undefined : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
             }

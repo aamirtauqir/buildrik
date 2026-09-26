@@ -759,8 +759,9 @@ export const EVENTS = {
  * on PROJECT_CHANGED is not a subscription — anyone who wants page switches
  * has to filter every project change to find them."
  *
- * Autosave can afford to re-save on a page switch. A dirty MARKER cannot: it
- * would light an unsaved dot on a page the user only looked at. Every other
+ * Neither autosave nor a dirty MARKER may treat it as an edit: one sent a
+ * save for a page the user only looked at (L-3), the other lit an unsaved dot
+ * on it. Every other
  * payload type on this event — page:created / updated / deleted / home /
  * reordered / imported — is a real mutation and must still count.
  */

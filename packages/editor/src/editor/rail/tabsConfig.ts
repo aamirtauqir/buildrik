@@ -372,3 +372,26 @@ export function isColumnTabOpen(s: {
     (s.activeTabId !== "review" || Boolean(s.reviewsEnabled))
   );
 }
+
+/**
+ * Whether the inspector's column is on screen. Gap walk 93 #2: the column's
+ * panels (Publish · Review · History · Activity, Issues, AI) were gated on the
+ * inspector's own hide preference, so with the inspector hidden they opened
+ * into a 0-px column. Hiding the inspector hides the inspector; a panel that
+ * lives in its column still shows the column.
+ *
+ * - A VIEWER always has it (board 4418:126059's role notice lives there).
+ * - A full page, the CMS workspace and an owner's read-only view never do.
+ */
+export function isInspectorColumnOpen(s: {
+  readOnlyView: boolean;
+  viewerChrome: boolean;
+  fullPage: boolean;
+  cmsWorkspaceOpen: boolean;
+  inspectorShown: boolean;
+  columnModeOpen: boolean;
+}): boolean {
+  if (s.viewerChrome) return true;
+  if (s.readOnlyView || s.fullPage || s.cmsWorkspaceOpen) return false;
+  return s.inspectorShown || s.columnModeOpen;
+}
