@@ -16,6 +16,7 @@ import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
 import { Button, InputField, Modal, PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Plus, Search, CheckSquare, Folder } from "lucide-react";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
@@ -24,6 +25,11 @@ export default function ProjectsPage() {
   const { addToast } = useToast();
   const router = useRouter();
   const unified = useUnifiedEditorFlag();
+  // sites.transfer accepts only a site-role OWNER who created the site, so
+  // Transfer is offered on exactly those rows (gap walk 93 #9).
+  const { data: session } = useSession();
+  const health = trpc.dashboard.health.useQuery();
+  const transferOwnerId = health.data?.role === "OWNER" ? session?.user?.id ?? null : null;
 
   // Preferences
   const prefs = trpc.account.preferences.get.useQuery();
@@ -601,6 +607,7 @@ export default function ProjectsPage() {
               selectedIds={selectedIds}
               onSelect={handleSelect}
               onAction={handleSiteAction}
+              transferOwnerId={transferOwnerId}
             />
           ) : (
             <SiteListView
@@ -610,6 +617,7 @@ export default function ProjectsPage() {
               onSelectAll={handleSelectAll}
               allSelected={allSelected}
               onAction={handleSiteAction}
+              transferOwnerId={transferOwnerId}
             />
           )}
         </div>
