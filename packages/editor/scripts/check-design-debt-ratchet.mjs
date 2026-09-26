@@ -110,6 +110,7 @@ const RATCHETS = [
        snapped onto `tw:font-semibold` / `fontWeight: 600`. Locked at 0. */
     pattern: String.raw`tw:font-bold|fontWeight: ?700\b`,
     baseline: 0,
+    excludeDesignSystem: true,
   },
 ];
 
@@ -143,10 +144,20 @@ function countUnsizedButtons() {
   return unsized;
 }
 
-function count(pattern, css = false) {
+function count(pattern, css = false, excludeDesignSystem = false) {
   try {
+    // B-11 fix-round-1 (controller finding): `/design-system/` is scoped to
+    // whichever ratchet passes excludeDesignSystem — NOT applied to the
+    // other, pre-existing ratchets, so their baselines cannot shift under
+    // them. Only font-weight-700 sets it (design-system/ is the customer's
+    // published-site domain, not chrome — packages/editor/CLAUDE.md's DS
+    // SSOT table — so a heavy weight there isn't a chrome violation; the
+    // pre-existing ratchets never needed this exclusion because their one
+    // real design-system/ hit, BrandPreview.tsx's offscale font size, was
+    // already covered by the specimen-rendering exclusion above).
+    const designSystemExclude = excludeDesignSystem ? "| grep -v '/design-system/' " : "";
     const out = execSync(
-      `grep -rEn ${JSON.stringify(pattern)} src/editor ${css ? "src/themes --include='*.css'" : "--include='*.tsx' --include='*.ts'"} | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx | grep -v '/design-system/' | wc -l`,
+      `grep -rEn ${JSON.stringify(pattern)} src/editor ${css ? "src/themes --include='*.css'" : "--include='*.tsx' --include='*.ts'"} | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx ${designSystemExclude}| wc -l`,
       { cwd: ROOT, encoding: "utf8", shell: "/bin/bash" },
     );
     return parseInt(out.trim(), 10);
@@ -157,7 +168,7 @@ function count(pattern, css = false) {
 
 let failed = false;
 for (const r of RATCHETS) {
-  const n = count(r.pattern, r.css);
+  const n = count(r.pattern, r.css, r.excludeDesignSystem === true);
   if (n > r.baseline) {
     console.error(
       `[design-debt-ratchet] FAIL — ${r.id}: ${n} > baseline ${r.baseline}. ` +
