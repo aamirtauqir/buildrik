@@ -464,9 +464,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => dropPendingFocus, [dropPendingFocus]);
   React.useEffect(() => {
     if (!composer) return;
-    composer.on(EVENTS.SELECTION_CHANGED, dropPendingFocus);
+    const selectionEvents = [
+      EVENTS.ELEMENT_SELECTED,
+      EVENTS.SELECTION_MULTIPLE,
+      EVENTS.SELECTION_CLEARED,
+      EVENTS.SELECTION_ADDED,
+      EVENTS.SELECTION_REMOVED,
+    ] as const;
+    for (const ev of selectionEvents) composer.on(ev, dropPendingFocus);
     return () => {
-      composer.off(EVENTS.SELECTION_CHANGED, dropPendingFocus);
+      for (const ev of selectionEvents) composer.off(ev, dropPendingFocus);
     };
   }, [composer, dropPendingFocus]);
   React.useEffect(() => {

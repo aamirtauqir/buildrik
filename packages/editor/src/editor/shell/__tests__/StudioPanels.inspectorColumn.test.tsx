@@ -281,7 +281,7 @@ describe("StudioPanels — a held focus request lapses (m-1)", () => {
     const composer = makeComposer();
     render(<Harness composer={composer} leftPanelTab="history" onLeftPanelToggle={undefined} />);
     act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
-    act(() => composer.emit(EVENTS.SELECTION_CHANGED, { selected: ["other"] }));
+    act(() => composer.emit(EVENTS.SELECTION_CLEARED));
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
     await flushFrame();
     expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("");
