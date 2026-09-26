@@ -65,20 +65,46 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     await waitFor(() => expect(screen.getByLabelText("Success message")).toBeInTheDocument());
   });
 
-  it("switches to a redirect URL field and saves it", async () => {
+  it("I1: switching to Redirect with no URL yet does NOT save a call the schema would reject", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("After-submit action"));
 
     fireEvent.change(screen.getByLabelText("After-submit action"), { target: { value: "REDIRECT" } });
-    await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
-      expect.objectContaining({ siteId: "s1", blockId: "f", successAction: "REDIRECT" }),
-    ));
     await waitFor(() => expect(screen.getByLabelText("Redirect URL")).toBeInTheDocument());
+    // No network call yet — the row would be `REDIRECT` with no target, which
+    // the server schema refuses. Sending it anyway (and the UI just showing
+    // REDIRECT as if it saved) was exactly I1's silent-failure bug.
+    expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
+  });
+
+  it("I1: typing the URL then blurring sends successAction + redirectUrl bundled in one call", async () => {
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("After-submit action"));
+    fireEvent.change(screen.getByLabelText("After-submit action"), { target: { value: "REDIRECT" } });
+    await waitFor(() => screen.getByLabelText("Redirect URL"));
 
     fireEvent.change(screen.getByLabelText("Redirect URL"), { target: { value: "https://example.com/thanks" } });
     fireEvent.blur(screen.getByLabelText("Redirect URL"));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
-      expect.objectContaining({ redirectUrl: "https://example.com/thanks" }),
+      expect.objectContaining({
+        siteId: "s1",
+        blockId: "f",
+        successAction: "REDIRECT",
+        redirectUrl: "https://example.com/thanks",
+      }),
+    ));
+  });
+
+  it("I1: switching action away from Redirect (with an existing URL) saves immediately, both fields bundled", async () => {
+    api.forms.getBlock.query.mockResolvedValue({
+      ...defaults, successAction: "REDIRECT", redirectUrl: "https://example.com/thanks",
+    });
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Redirect URL"));
+
+    fireEvent.change(screen.getByLabelText("After-submit action"), { target: { value: "MESSAGE" } });
+    await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({ successAction: "MESSAGE", redirectUrl: "https://example.com/thanks" }),
     ));
   });
 
@@ -97,6 +123,43 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     await waitFor(() => screen.getByRole("switch"));
     fireEvent.click(screen.getByRole("switch"));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({ spamProtection: false }),
+    ));
+  });
+
+  it("M6: the spam protection toggle has an accessible name", async () => {
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => expect(screen.getByRole("switch", { name: "Spam protection" })).toBeInTheDocument());
+  });
+
+  it("I4: a non-admin's notify-email edit is reverted and explained on FORBIDDEN", async () => {
+    api.forms.updateBlock.mutate.mockRejectedValueOnce(
+      Object.assign(new Error("FORBIDDEN"), { data: { code: "FORBIDDEN" } }),
+    );
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Notification email"));
+
+    fireEvent.change(screen.getByLabelText("Notification email"), { target: { value: "me@example.com" } });
+    fireEvent.blur(screen.getByLabelText("Notification email"));
+
+    await waitFor(() => expect(screen.getByText(/Only workspace Admins/)).toBeInTheDocument());
+    // Reverted — the field no longer shows the edit that was never actually saved.
+    expect((screen.getByLabelText("Notification email") as HTMLInputElement).value).toBe("");
+  });
+
+  it("I4: other fields stay editable after a notify-email FORBIDDEN — the gate is per-field", async () => {
+    api.forms.updateBlock.mutate.mockRejectedValueOnce(
+      Object.assign(new Error("FORBIDDEN"), { data: { code: "FORBIDDEN" } }),
+    );
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Notification email"));
+    fireEvent.change(screen.getByLabelText("Notification email"), { target: { value: "me@example.com" } });
+    fireEvent.blur(screen.getByLabelText("Notification email"));
+    await waitFor(() => expect(screen.getByText(/Only workspace Admins/)).toBeInTheDocument());
+
+    api.forms.updateBlock.mutate.mockResolvedValue({});
+    fireEvent.click(screen.getByRole("switch", { name: "Spam protection" }));
+    await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenLastCalledWith(
       expect.objectContaining({ spamProtection: false }),
     ));
   });
