@@ -19,6 +19,7 @@
 import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
+import { sanitizeHTML } from "@/shared/utils/html/sanitization";
 
 export type RecordTemplatePreview =
   | { ok: true; html: string }
@@ -42,9 +43,21 @@ export async function renderRecordTemplatePreview(
   }
   const page = pages.find((p) => p.path === collection.pageTemplatePath);
   if (!page) return { ok: false, reason: "template-missing" };
-  const html = page.html.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
+  const substituted = page.html.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
     const v = record.data[key];
     return v === undefined || v === null ? "" : escapeHtml(String(v));
   });
-  return { ok: true, html };
+  /* Controller review round 2: this duplicates cms.service.ts's server-side
+     substitution (a different environment — server uses isomorphic-dompurify/
+     jsdom, this runs in the browser bundle and must not pull that in) and,
+     before this fix, had no scheme check at all — a `javascript:` value
+     substituted into `href="{field}"` above survives entity-escaping (it has
+     no `<`, `>` or `"`). The server pass runs a full parser-based sanitizer
+     over the whole page (`sanitizeGeneratedPageHtml`); this is a preview
+     rendered into a `sandbox=""` iframe (RecordTemplatePreviewDialog.tsx —
+     never removes that sandbox attribute), so the editor's own canonical
+     `sanitizeHTML` (browser DOMPurify) closing the same class of gap here is
+     sufficient defense-in-depth without needing the same srcset/style url()
+     hooks the server pass adds for the PUBLISHED page. */
+  return { ok: true, html: sanitizeHTML(substituted) };
 }

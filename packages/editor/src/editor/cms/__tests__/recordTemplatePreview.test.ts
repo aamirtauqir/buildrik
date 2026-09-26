@@ -54,4 +54,12 @@ describe("renderRecordTemplatePreview", () => {
     const out = await renderRecordTemplatePreview({} as never, MENU, RECORD);
     expect(out).toEqual({ ok: true, html: "<h1>Margherita &amp; Basil</h1><p>$12</p><p></p>" });
   });
+
+  it("controller review round 2: a javascript: value substituted into an href never reaches the preview iframe's srcDoc", async () => {
+    exportPublishPagesMock.mockResolvedValueOnce([{ path: "menu-item.html", html: '<a href="{link}">Go</a>' }]);
+    const record = { ...RECORD, data: { link: "javascript:alert(1)" } };
+    const out = await renderRecordTemplatePreview({} as never, MENU, record);
+    expect(out.ok).toBe(true);
+    if (out.ok) expect(out.html).not.toMatch(/javascript:/i);
+  });
 });
