@@ -58,7 +58,7 @@ export type StockItem = StockPhoto | StockVideo;
  * FC-6: the only stock surface now (drawer's `StockBrowserOverlay` deleted —
  * this failure copy was ported over verbatim, L8's fix in `56fb0ec76`).
  */
-export const FAILURE_COPY: Record<StockFailureReason, { message: string; retryable: boolean }> = {
+const FAILURE_COPY: Record<StockFailureReason, { message: string; retryable: boolean }> = {
   "not-configured": {
     message: "Stock search isn't configured for this site yet. Ask an admin to add a stock provider key.",
     retryable: false,
@@ -73,14 +73,14 @@ export const FAILURE_COPY: Record<StockFailureReason, { message: string; retryab
   },
 };
 
-export const ORIENTATIONS: Array<{ id: DiscOrientation; label: string }> = [
+const ORIENTATIONS: Array<{ id: DiscOrientation; label: string }> = [
   { id: "all", label: "Any" },
   { id: "landscape", label: "Landscape" },
   { id: "portrait", label: "Portrait" },
   { id: "squarish", label: "Square" },
 ];
 
-export const COLORS: Array<{ id: DiscColor; label: string }> = [
+const COLORS: Array<{ id: DiscColor; label: string }> = [
   { id: "all", label: "All" },
   { id: "black_and_white", label: "B&W" },
   { id: "black", label: "Black" },
@@ -93,7 +93,7 @@ export const COLORS: Array<{ id: DiscColor; label: string }> = [
   { id: "blue", label: "Blue" },
 ];
 
-export const TYPES: Array<{ id: "img" | "vid"; label: string }> = [
+const TYPES: Array<{ id: "img" | "vid"; label: string }> = [
   { id: "img", label: "Photo" },
   { id: "vid", label: "Video" },
 ];
@@ -102,7 +102,7 @@ const DROPDOWN =
   "tw:h-7 tw:w-[88px] tw:shrink-0 tw:justify-between tw:gap-0.5 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] " +
   "tw:bg-white tw:px-1.5 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-gray-50)]";
 
-export function FilterDropdown<T extends string>({
+function FilterDropdown<T extends string>({
   label,
   value,
   options,

@@ -54,7 +54,7 @@ import { AssetDetailOverlay } from "@/editor/sidebar/tabs/media/components/Asset
 import { IconBrowserOverlay } from "@/editor/sidebar/tabs/media/components/IconBrowserOverlay";
 import { getAllIcons } from "@/shared/constants/icons";
 import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
-import { StockBrowserOverlay } from "@/editor/sidebar/tabs/media/components/StockBrowserOverlay";
+import { StockSourceModal } from "@/editor/sidebar/tabs/media/components/StockSourceModal";
 import { ReplaceAcrossDialog } from "@/editor/sidebar/tabs/media/components/ReplaceAcrossDialog";
 import { UploadAssetModal } from "@/editor/media/UploadAssetModal";
 import { LibraryManager } from "@/editor/media/LibraryManager";
@@ -2661,11 +2661,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-stock-browser": () => (
     <div data-probe="media-stock-browser">
       {drillHost(
-        <StockBrowserOverlay
+        <StockSourceModal
+          open
           onClose={() => {}}
           photos={STOCK_PHOTOS}
           videos={[]}
-          loading={{ img: true, vid: false }}
+          loading={{ img: true, vid: false, ico: false, fnt: false }}
           searchQuery="restaurant interior"
           orientation="all"
           color="all"
@@ -3442,22 +3443,14 @@ const CASES: Record<string, () => React.ReactElement> = {
           </AutoOpen>
         </ToastProvider>
       </div>
-      <div className="tw:relative tw:h-203 tw:w-70 tw:overflow-hidden tw:bg-white">
-        <StockBrowserOverlay
-          onClose={() => {}}
-          photos={STOCK_PHOTOS}
-          videos={[]}
-          loading={{ img: false, vid: false }}
-          searchQuery="restaurant interior"
-          orientation="all"
-          color="all"
-          onSearch={() => {}}
-          onSetOrientation={() => {}}
-          onSetColor={() => {}}
-          onLoadMore={() => {}}
-          onSave={() => {}}
-        />
-      </div>
+      {/* FC-6 (fix-all 2026-09-25): the fourth destination used to be the
+          drawer's `StockBrowserOverlay`, mountable inline at the 320 drawer
+          width like its three siblings above. It is gone — the one stock
+          surface is now `StockSourceModal`, a full-page Modal that portals
+          itself over the whole viewport and cannot be composited side by
+          side with the other destinations in this same screenshot. It has
+          no target in this recipe's `targets` list any more; the
+          probe's own `media-stock-browser` case still measures it alone. */}
     </div>
   ),
   "publish-load-error": () => {
