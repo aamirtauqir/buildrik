@@ -6,13 +6,14 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { CmsWorkspace } from "../CmsWorkspace";
 import { cmsWorkspace } from "../cmsWorkspaceStore";
 import { makeEngine } from "./fakeCmsEngine";
+import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 
 const MENU = {
   id: "col-1",
@@ -131,6 +132,28 @@ describe("RecordSheet", () => {
     fireEvent.click(screen.getByTestId("cms-sheet-close"));
     fireEvent.click(await screen.findByText("Discard and leave"));
     await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
+  });
+
+  /* B-1 fix round 2: the shell's "Leave anyway" runs this sheet's discard,
+     so a switch away really does drop the edits it promised to drop, and
+     the sheet's own "Discard and leave" clears the entry before it leaves. */
+  it("registers its dirt with the shell; the shell's discard resets the fields and the entry", async () => {
+    mount();
+    await openRow();
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$99" } });
+    await waitFor(() => expect(shellDirty.get()).toBe(true));
+    act(() => shellDirty.discardDirty());
+    expect(shellDirty.get()).toBe(false);
+    expect((screen.getByLabelText("Price *") as HTMLInputElement).value).toBe("$12");
+  });
+
+  it("its own Discard and leave clears the shell entry before leaving", async () => {
+    mount();
+    await openRow();
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$99" } });
+    fireEvent.click(screen.getByTestId("cms-sheet-close"));
+    fireEvent.click(await screen.findByText("Discard and leave"));
+    expect(shellDirty.get()).toBe(false);
   });
 
   it("deletes a record without a page at once, with Undo on the toast (#17)", async () => {

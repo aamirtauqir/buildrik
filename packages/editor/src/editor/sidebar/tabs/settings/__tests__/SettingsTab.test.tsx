@@ -886,4 +886,15 @@ describe("SettingsTab — its registry entry is honest at every door", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     expect(dirtyAtClose).toBe(false);
   });
+
+  it("the shell's Leave anyway (discardDirty) rolls composer back to the snapshot and clears the entry", async () => {
+    const composer = makeComposer();
+    renderS(<SettingsTab composer={asComposer(composer)} />);
+    await editGeneral();
+    const snapshot = composer.getProjectSettings();
+    act(() => shellDirty.discardDirty());
+    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
+    expect(composer.setProjectSettings.mock.calls[0][0]).toEqual(snapshot);
+    expect(shellDirty.get()).toBe(false);
+  });
 });

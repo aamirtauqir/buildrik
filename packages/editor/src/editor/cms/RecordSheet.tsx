@@ -169,6 +169,16 @@ export function RecordSheet({
     shellDirty.set("cms-record", dirty);
     return () => shellDirty.set("cms-record", false);
   }, [dirty]);
+  /* The shell's "Leave anyway" runs this: the edits live only in this
+     sheet's fields, so resetting them is exactly the loss the confirm names. */
+  React.useEffect(() => {
+    shellDirty.setDiscard("cms-record", () => {
+      setForm(initial);
+      setPublished(initialPublished);
+      shellDirty.set("cms-record", false);
+    });
+    return () => shellDirty.setDiscard("cms-record", null);
+  }, [initial, initialPublished]);
 
   const save = async () => {
     setSaving(true);

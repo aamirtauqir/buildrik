@@ -406,6 +406,14 @@ export const SettingsTab: React.FC<
     setSaveError(null);
   }, [composer, markScreenDirty]);
 
+  /* The shell's "Leave anyway" runs this: the screens write to the composer
+     live, so leaving without the rollback would keep the "lost" values in
+     project settings for the next save to persist. */
+  React.useEffect(() => {
+    shellDirty.setDiscard("settings", rollBack);
+    return () => shellDirty.setDiscard("settings", null);
+  }, [rollBack]);
+
   const handleDiscard = React.useCallback(() => {
     const pending = pendingRef.current;
     pendingRef.current = null;
