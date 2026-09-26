@@ -57,3 +57,43 @@ describe("StudioPanels — ui:switch-tab 'ai' forces the inspector column open",
     expect(src).toContain('localStorage.setItem("buildrick-inspector-shown", "true")');
   });
 });
+
+/* Security carry-over (same class as the VIEWER rail gate): "ui:switch-tab"
+ * is a SECOND door onto the tabs the rail gates — the ⌘K palette, canvas
+ * context menus, PublishTab, CmsWorkspace and others all route through it.
+ * Before this fix, the handler called onLeftPanelTabChange?.(data.tab)
+ * unconditionally, so a VIEWER blocked from clicking "Add" on the rail could
+ * still reach it via ⌘K or any other ui:switch-tab emitter. */
+describe("StudioPanels — ui:switch-tab respects the VIEWER rail gate", () => {
+  it("gates the handler with the SAME predicate the rail uses (isTabAllowedForViewer), not a copy", () => {
+    // The handler's own gate.
+    expect(src).toMatch(
+      /const handler = \(data: \{ tab: string; fullPage\?: boolean \}\) => \{\s*[\s\S]{0,800}if \(!isTabAllowedForViewer\(data\.tab as GroupedTabId, viewerChrome\)\)/
+    );
+    // The rail's gate — same function, not a re-derived VIEWER_TABS.has(...) check.
+    expect(src).toMatch(/if \(!isTabAllowedForViewer\(tab, viewerChrome\)\)/);
+    // Only ONE definition of the predicate exists in this file.
+    expect(src.match(/function isTabAllowedForViewer/g)).toHaveLength(1);
+  });
+
+  it("the effect re-subscribes when viewerChrome changes (so a mid-session role change re-gates it)", () => {
+    expect(src).toMatch(/composer\.on\("ui:switch-tab", handler\);[\s\S]{0,200}\}, \[composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle, viewerChrome, addToast\]\);/);
+  });
+});
+
+describe("isTabAllowedForViewer", () => {
+  it("a non-viewer may open any tab", async () => {
+    const { isTabAllowedForViewer } = await import("../StudioPanels");
+    expect(isTabAllowedForViewer("add" as never, false)).toBe(true);
+    expect(isTabAllowedForViewer("content" as never, false)).toBe(true);
+  });
+
+  it("a viewer may only open layers/assets", async () => {
+    const { isTabAllowedForViewer } = await import("../StudioPanels");
+    expect(isTabAllowedForViewer("layers" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("assets" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("add" as never, true)).toBe(false);
+    expect(isTabAllowedForViewer("content" as never, true)).toBe(false);
+    expect(isTabAllowedForViewer("ai" as never, true)).toBe(false);
+  });
+});

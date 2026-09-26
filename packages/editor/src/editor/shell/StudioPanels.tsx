@@ -66,6 +66,18 @@ const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>([
   "activity",
 ]);
 const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history", "activity"]);
+
+/**
+ * The one VIEWER-role gate on left-panel tabs. Both the rail (a click) and
+ * "ui:switch-tab" (⌘K palette, canvas context menus, inspector doors,
+ * PublishTab, CmsWorkspace, …) must open the SAME set of tabs for a VIEWER —
+ * the rail used to be the only door that checked this, so any of those other
+ * emitters could route a VIEWER straight into a writing surface (Add, CMS,
+ * Brand) the rail itself refuses to open.
+ */
+export function isTabAllowedForViewer(tab: GroupedTabId, viewerChrome: boolean): boolean {
+  return !viewerChrome || VIEWER_TABS.has(tab);
+}
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -505,6 +517,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const handler = (data: { tab: string; fullPage?: boolean }) => {
+      /* Every "ui:switch-tab" emitter (⌘K palette, canvas context menus,
+         inspector doors, PublishTab, CmsWorkspace, …) is a second door onto
+         the same tabs the rail gates — without this check a VIEWER could not
+         click into Add/CMS/Brand from the rail, but ⌘K "Open AI assistant"
+         or CmsWorkspace's own emit routed them there anyway. Same predicate
+         the rail uses (isTabAllowedForViewer), so the two doors can't drift. */
+      if (!isTabAllowedForViewer(data.tab as GroupedTabId, viewerChrome)) {
+        addToast({ description: "View only — adding, pages, CMS and brand edits need an Editor role." });
+        return;
+      }
       /* Boards 170:2 and 66:225 put AI in the INSPECTOR column with a
          "‹ Inspector" way back — not in the left sidebar. Every existing
          entry point (the inspector's ✦ AI chip, the multi-select toolbar, the
@@ -542,7 +564,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     return () => {
       composer.off("ui:switch-tab", handler);
     };
-  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
+  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle, viewerChrome, addToast]);
 
   // Canvas hover sync
   React.useEffect(() => {
@@ -592,7 +614,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     (tab: GroupedTabId) => {
       /* A viewer inspects: Layers, and Assets (view-only since B5). The other
          rail doors lead to writing surfaces, so they say why instead. */
-      if (viewerChrome && !VIEWER_TABS.has(tab)) {
+      if (!isTabAllowedForViewer(tab, viewerChrome)) {
         addToast({ description: "View only — adding, pages, CMS and brand edits need an Editor role." });
         return;
       }
