@@ -33,6 +33,7 @@ import { randomUUID } from "node:crypto";
 import DOMPurify, { type UponSanitizeElementHook, type UponSanitizeAttributeHook } from "isomorphic-dompurify";
 import {
   FORBIDDEN_ATTRIBUTES,
+  cssValueHasDangerousUrl,
   URL_ATTRIBUTES,
   isAllowedElementTag,
   isDangerousUrl,
@@ -284,8 +285,6 @@ export function sanitizeTemplateHtml(html: string): string {
 // `unsafeAttributeReason` does (round 2's own test asserts the safe candidate
 // survives).
 
-const STYLE_URL_RE = /url\(\s*(['"]?)([^'")]*)\1\s*\)/gi;
-
 /** Each `srcset` candidate is `<url> [descriptor]`; a dangerous URL can sit
  *  in any candidate, not just the first. Reuses `srcsetUrls`'s descriptor
  *  stripping (called per-candidate, so a single dangerous entry doesn't cost
@@ -301,23 +300,6 @@ function sanitizeSrcsetValue(value: string): string {
       return url !== undefined && !isDangerousUrl(url);
     })
     .join(", ");
-}
-
-/** `background: url(javascript:...)` doesn't run in current browsers, but a
- *  parser-based check is cheap here and the controller asked for it as
- *  explicit defense-in-depth — drop the WHOLE style value rather than try to
- *  surgically edit one url() out of a longer declaration list (unlike
- *  `isSafeCssDeclaration`, which drops one declaration from a structured
- *  styles object: this is a raw `style="…"` ATTRIBUTE STRING from rendered
- *  HTML, and reconstructing it declaration-by-declaration risks reformatting
- *  values that were never unsafe). */
-function styleHasDangerousUrl(value: string): boolean {
-  STYLE_URL_RE.lastIndex = 0;
-  let m: RegExpExecArray | null;
-  while ((m = STYLE_URL_RE.exec(value))) {
-    if (isDangerousUrl(m[2])) return true;
-  }
-  return false;
 }
 
 // `<script>`/`<style>` content is raw text a browser never parses as HTML —
@@ -368,7 +350,10 @@ export function sanitizeGeneratedPageHtml(html: string): string {
     if (name === "srcset") {
       data.attrValue = sanitizeSrcsetValue(data.attrValue);
     } else if (name === "style") {
-      if (styleHasDangerousUrl(data.attrValue)) data.attrValue = "";
+      // The whole value is dropped rather than one url() cut out of it: this
+      // is a raw attribute string, and rewriting it declaration by declaration
+      // would reformat values that were never unsafe.
+      if (cssValueHasDangerousUrl(data.attrValue)) data.attrValue = "";
     } else if (URL_ATTRIBUTES.has(name) && isDangerousUrl(data.attrValue)) {
       data.attrValue = "";
     }

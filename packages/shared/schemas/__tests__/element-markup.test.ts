@@ -5,6 +5,7 @@
  */
 import { describe, it, expect } from "vitest";
 import {
+  cssValueHasDangerousUrl,
   escapeStyleText,
   isDangerousUrl,
   isSafeCssDeclaration,
@@ -79,6 +80,22 @@ describe("isSafeCssDeclaration (S-1 review round 3)", () => {
     ["background", "{{token.color.primary}}"],
     ["box-shadow", "0 4px 12px {{token.color-shadow}}"],
   ])("allows %j: %j", (property, value) => expect(isSafeCssDeclaration(property, value)).toBe(true));
+});
+
+describe("cssValueHasDangerousUrl (x4 fix round 3 — one url() scan)", () => {
+  it.each([
+    "url(javascript:alert(1))",
+    `url("javascript:a')")`,
+    "color:red;background:url( 'java\tscript:x' )",
+    'url("data:text/html,x")',
+    "background:url(/ok.png), URL(vbscript:x)",
+  ])("finds a dangerous url() in %j", (value) => expect(cssValueHasDangerousUrl(value)).toBe(true));
+
+  it.each([
+    "background:url(/bg.jpg);color:red",
+    'background-image:url("data:image/png;base64,AAAA")',
+    "color:#1A56DB",
+  ])("finds none in %j", (value) => expect(cssValueHasDangerousUrl(value)).toBe(false));
 });
 
 const HOSTILE_SELECTOR = "a{}</style><script>alert(1)</script><style>";

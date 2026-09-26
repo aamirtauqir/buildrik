@@ -85,6 +85,20 @@ const CSS_DANGEROUS = [/expression\s*\(/i, /-moz-binding/i, /behavior\s*:/i, /ja
 const CSS_URL = /url\(\s*(['"]?)([\s\S]*?)\1\s*\)/gi;
 
 /**
+ * Whether any `url(...)` in CSS text — one declaration's value or a whole
+ * `style="…"` attribute — names a dangerous URL (`isDangerousUrl`). The one
+ * url() scan: `isSafeCssDeclaration` and the generated-page sanitizer both use
+ * it, so a quoting trick like `url("javascript:a')")` cannot slip past one of
+ * them only.
+ */
+export function cssValueHasDangerousUrl(value: string): boolean {
+  for (const match of value.matchAll(CSS_URL)) {
+    if (isDangerousUrl(match[2] ?? "")) return true;
+  }
+  return false;
+}
+
+/**
  * One style declaration that is safe to write into a stylesheet — a published
  * page's `<style>`, where a value reading `red}</style><script>…` would leave
  * the rule, then the element. The one check the export writers, the server
@@ -95,10 +109,7 @@ export function isSafeCssDeclaration(property: string, value: unknown): boolean 
   if (["behavior", "-moz-binding"].includes(property.toLowerCase())) return false;
   if (CSS_BREAKOUT.test(value.replace(CSS_TOKEN_PLACEHOLDER, ""))) return false;
   if (CSS_DANGEROUS.some((pattern) => pattern.test(value))) return false;
-  for (const match of value.matchAll(CSS_URL)) {
-    if (isDangerousUrl(match[2] ?? "")) return false;
-  }
-  return true;
+  return !cssValueHasDangerousUrl(value);
 }
 
 /**

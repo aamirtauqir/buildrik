@@ -411,6 +411,15 @@ describe("sanitizeGeneratedPageHtml", () => {
     expect(out).not.toMatch(/javascript:/i);
   });
 
+  it("drops a style whose url() the old STYLE_URL_RE could not see (quote/paren mismatch), keeps a data:image one", () => {
+    const html =
+      '<html><body><div style="background:url(&quot;javascript:a\')&quot;)">x</div>' +
+      '<div style="background:url(&quot;data:image/png;base64,AAAA&quot;)">y</div></body></html>';
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).not.toMatch(/javascript:/i);
+    expect(out).toContain("data:image/png;base64,AAAA");
+  });
+
   it("leaves a safe style url() and every other URL-bearing attribute shape untouched", () => {
     const html =
       '<html><body>' +
