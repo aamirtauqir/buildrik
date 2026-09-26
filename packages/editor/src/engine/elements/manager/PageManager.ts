@@ -21,7 +21,7 @@
  */
 
 import { EVENTS } from "../../../shared/constants";
-import type { PageData, SlugChange } from "../../../shared/types";
+import type { ElementData, PageData, SlugChange } from "../../../shared/types";
 import { generateId, slugify } from "../../../shared/utils/helpers";
 import type { ElementManagerContext } from "./types";
 import { liftParserHoisted } from "./liftParserHoisted";
@@ -363,6 +363,7 @@ export class PageManager {
   importPage(pageData: PageData): void {
     const normalized: PageData = {
       ...pageData,
+      root: this.withUniqueIds(pageData.root),
       updatedAt: pageData.updatedAt ?? new Date().toISOString(),
       slugManuallySet: pageData.slugManuallySet ?? false,
       slugHistory: pageData.slugHistory ?? [],
@@ -378,6 +379,35 @@ export class PageManager {
     if (!this.ctx.getActivePageId()) {
       this.ctx.setActivePageId(normalized.id);
     }
+  }
+
+  /**
+   * X-4: the element registry is ONE map across every page, but the seed, the
+   * AI-generate worker and an empty `pages.blocks` (the sync provider's
+   * DEFAULT_ROOT) all give every page the root id "root". The roots collided —
+   * every page showed one tree, and `exportPages` below resolves each page
+   * through `elements.get(root.id)`, so every save wrote the active page's
+   * tree into every page. Any id already registered (or repeated within this
+   * page) gets a fresh one on a copy; a project whose ids are unique is
+   * returned as-is.
+   */
+  private withUniqueIds(root: ElementData): ElementData {
+    const clashes = (id: string, seen: Set<string>) => this.ctx.elements.has(id) || seen.has(id);
+    const scan = (node: ElementData, seen: Set<string>): boolean => {
+      if (clashes(node.id, seen)) return true;
+      seen.add(node.id);
+      return (node.children ?? []).some((c) => scan(c, seen));
+    };
+    if (!scan(root, new Set())) return root;
+    const copy = structuredClone(root);
+    const seen = new Set<string>();
+    const reId = (node: ElementData, isRoot: boolean) => {
+      if (clashes(node.id, seen)) node.id = generateId(isRoot ? "root" : "el");
+      seen.add(node.id);
+      node.children?.forEach((c) => reId(c, false));
+    };
+    reId(copy, true);
+    return copy;
   }
 
   /**
