@@ -78,7 +78,7 @@ function makeComposer() {
 }
 type FakeComposer = ReturnType<typeof makeComposer>;
 
-function Harness({ composer, ...rest }: { composer: FakeComposer } & Partial<StudioPanelsProps>) {
+function Harness({ composer, ...rest }: { composer: FakeComposer } & Omit<Partial<StudioPanelsProps>, "composer">) {
   const [open, setOpen] = React.useState(true);
   const [tab, setTab] = React.useState(rest.leftPanelTab ?? "add");
   return (
