@@ -295,7 +295,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      `!== false` keeps the house rule: an unknown role still asks the server,
      a known-insufficient one does not. Same shape as PublishHistory.tsx:104,
      which already gates rollback this way two files over. */
-  const canUnpublish = roleAtLeast(editorRole, "ADMIN") !== false;
+  const atLeastAdmin = roleAtLeast(editorRole, "ADMIN") !== false;
   /* A VIEWER is held in view mode by the /edit route (it redirects them to
      ?view=readonly), so "Back to editing" would only bounce off that redirect. */
   const canLeaveView = roleAtLeast(editorRole, "EDITOR") !== false;
@@ -925,7 +925,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
             collabEnabled={collabOn}
             onUnpublish={
-              !publishedUrl || !canUnpublish
+              !publishedUrl || !atLeastAdmin
                 ? undefined
                 : () => {
                     onOpenPublish?.();
@@ -934,6 +934,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             }
             publishedUrl={publishedUrl}
             onCopyLiveUrl={copyLiveUrl}
+            /* team.* is ADMIN too — the same known-insufficient rule. */
+            canInviteTeammates={atLeastAdmin}
             onReplayOnboarding={
               viewMode.readOnlyView || !composer ? undefined : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
             }
