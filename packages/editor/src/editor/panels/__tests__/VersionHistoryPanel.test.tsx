@@ -224,7 +224,7 @@ describe("VersionHistoryPanel — restore flow", () => {
       makeVersion({ id: "v1", name: "Save A" }),
       makeVersion({ id: "v2", name: "Save B" }),
     ];
-    mocks.restoreVersion.mockResolvedValue(undefined);
+    mocks.restoreVersion.mockResolvedValue(true);
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 

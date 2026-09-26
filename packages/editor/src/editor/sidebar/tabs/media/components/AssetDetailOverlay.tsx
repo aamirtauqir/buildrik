@@ -14,8 +14,10 @@
  * 56h full-bleed row) — and restore confirms INLINE in the 84h band 146:64
  * draws ("a drill-in that spawns a modal has lost the plot"). The data is
  * the server restore points; the old sibling-filename heuristic list is gone
- * (those are separate library items the grid already shows). No author line —
- * AssetVersion carries none; the board's "Ali/Sara" is sample shape.
+ * (those are separate library items the grid already shows). The author line
+ * (L8, 4418:62883) is real: `media.listAssetVersions` joins `createdBy` to a
+ * display name server-side; omitted (not "Unknown") when the row predates the
+ * column or the account no longer resolves.
  *
  * Used-in view: one 44h chip PER HIT — page name over the element's own name
  * with a "Go ›" link — and no page-group header, per board 75:90, which beat
@@ -73,7 +75,10 @@ const ROW =
   "tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
 const VERSION_ROW = "tw:flex tw:h-14 tw:w-full tw:items-start tw:gap-3 tw:pt-2.5 tw:pl-5 tw:pr-4";
 const VERSION_DOT = "tw:mt-1.5 tw:size-2 tw:shrink-0 tw:rounded-full";
-const VERSION_TIME = "tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const VERSION_TIME_COL = "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col";
+const VERSION_TIME = "tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+/* Board 4418:62883 — the author line under the time, "Ali" / "Sara". */
+const VERSION_AUTHOR = "tw:min-w-0 tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const VERSION_META = "tw:mt-0.5 tw:w-[72px] tw:shrink-0 tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-gray-500)]";
 /* Board 4418:61698: the nav rows end in a 12px ink › in a 24 box, and
    Versions' count is 11/400 ink beside it. */
@@ -558,7 +563,9 @@ export function AssetDetailOverlay({
             <div className={`${VERSION_ROW} tw:relative tw:bg-[var(--bk-accent-tint)]`} data-testid="media-version-current" role="listitem">
               <span className="tw:absolute tw:inset-y-0 tw:left-0 tw:w-[3px] tw:bg-[var(--bk-accent)]" aria-hidden="true" />
               <span className={`${VERSION_DOT} tw:bg-[var(--bk-accent)]`} aria-hidden="true" />
-              <span className={VERSION_TIME}>now</span>
+              <span className={VERSION_TIME_COL}>
+                <span className={VERSION_TIME}>now</span>
+              </span>
               <span className={VERSION_META}>current</span>
               <span className="tw:w-6 tw:shrink-0" aria-hidden="true" />
             </div>
@@ -577,7 +584,14 @@ export function AssetDetailOverlay({
               <React.Fragment key={v.id}>
                 <div className={VERSION_ROW} data-testid={`media-version-${v.id}`} role="listitem">
                   <span className={`${VERSION_DOT} tw:bg-[var(--bk-gray-300)]`} aria-hidden="true" />
-                  <span className={VERSION_TIME}>{formatRelativeTime(ts, { fallback: "daysShort" })}</span>
+                  <span className={VERSION_TIME_COL}>
+                    <span className={VERSION_TIME}>{formatRelativeTime(ts, { fallback: "daysShort" })}</span>
+                    {v.createdByName ? (
+                      <span className={VERSION_AUTHOR} data-testid={`media-version-author-${v.id}`}>
+                        {v.createdByName}
+                      </span>
+                    ) : null}
+                  </span>
                   <span className={VERSION_META}>{meta}</span>
                   <Button
                     type="button"

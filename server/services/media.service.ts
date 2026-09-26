@@ -452,6 +452,12 @@ export async function moveAsset(userId: string, input: MoveAssetInput) {
 
 // ─── Asset versions (Phase B) ──────────────────────────────────────────────
 
+/**
+ * Board Assets 4418:62883 draws an author line under each version ("Ali",
+ * "Sara"). `createdBy` is a bare user id (no relation, by design — a version
+ * survives the account that made it being deleted), so the display name is
+ * joined here the same way `listSiteVersions` does it for Saves rows.
+ */
 export async function listAssetVersions(userId: string, input: ListAssetVersionsInput) {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: input.assetId },
@@ -460,10 +466,16 @@ export async function listAssetVersions(userId: string, input: ListAssetVersions
   if (!asset || asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
-  return prisma.mediaAssetVersion.findMany({
+  const rows = await prisma.mediaAssetVersion.findMany({
     where: { assetId: input.assetId },
     orderBy: { createdAt: "desc" },
   });
+  const ids = [...new Set(rows.map((r) => r.createdBy).filter((id): id is string => !!id))];
+  const users = ids.length
+    ? await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, displayName: true, fullName: true, email: true } })
+    : [];
+  const nameOf = new Map(users.map((u) => [u.id, u.displayName || u.fullName || u.email]));
+  return rows.map((r) => ({ ...r, createdByName: r.createdBy ? nameOf.get(r.createdBy) ?? null : null }));
 }
 
 /**

@@ -116,6 +116,7 @@ export function VersionHistoryPanel({
     retryLoad,
     restoreVersion,
     deleteVersion,
+    renameVersion,
     compareVersions,
     updateAiSummary,
   } = useVersionHistory(composer);
@@ -190,7 +191,14 @@ export function VersionHistoryPanel({
     const target = versions.find((v) => v.id === versionId);
     safetyIdRef.current = null;
     try {
-      await restoreVersion(versionId);
+      const ok = await restoreVersion(versionId);
+      if (!ok) {
+        pushToast(
+          "Couldn't restore — nothing changed. Your current work was not saved as a version.",
+          "error"
+        );
+        return;
+      }
       /* G1-071: the restore saved the work on screen first; "Undo restore"
          restores that save (itself a confirmed-safe restore). */
       const safetyId = safetyIdRef.current;
@@ -234,6 +242,17 @@ export function VersionHistoryPanel({
   const handleDeleteCancel = () => {
     setDeleteConfirmId(null);
   };
+
+  const handleRename = React.useCallback(
+    async (versionId: string, name: string) => {
+      try {
+        await renameVersion(versionId, name);
+      } catch {
+        pushToast("Rename failed", "error");
+      }
+    },
+    [renameVersion, pushToast],
+  );
 
   // Handle Compare click
   const handleCompare = React.useCallback(
@@ -418,6 +437,7 @@ export function VersionHistoryPanel({
         onDeleteCancel={handleDeleteCancel}
         onCompare={handleCompare}
         onDetails={setDetailsId}
+        onRename={handleRename}
       />
 
       {/* Board 4418:173587 — a save's details, with the two things one does

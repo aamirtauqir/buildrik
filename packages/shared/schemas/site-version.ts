@@ -22,8 +22,14 @@ export const createSiteVersionSchema = z.object({
 export const listSiteVersionsSchema = z.object({ siteId: z.string() });
 export const getSiteVersionSchema = z.object({ siteId: z.string(), versionId: z.string() });
 export const deleteSiteVersionSchema = z.object({ siteId: z.string(), versionId: z.string() });
+export const renameSiteVersionSchema = z.object({
+  siteId: z.string(),
+  versionId: z.string(),
+  name: z.string().min(1).max(200),
+});
 
 export type CreateSiteVersionInput = z.infer<typeof createSiteVersionSchema>;
 export type ListSiteVersionsInput = z.infer<typeof listSiteVersionsSchema>;
 export type GetSiteVersionInput = z.infer<typeof getSiteVersionSchema>;
 export type DeleteSiteVersionInput = z.infer<typeof deleteSiteVersionSchema>;
+export type RenameSiteVersionInput = z.infer<typeof renameSiteVersionSchema>;

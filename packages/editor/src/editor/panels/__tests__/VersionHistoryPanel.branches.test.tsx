@@ -276,7 +276,7 @@ describe("VersionHistoryPanel — restore branches", () => {
 
   it("successful restore shows the 'Restored to <time>' toast", async () => {
     mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
-    mocks.restoreVersion.mockResolvedValue(undefined);
+    mocks.restoreVersion.mockResolvedValue(true);
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
@@ -287,6 +287,28 @@ describe("VersionHistoryPanel — restore branches", () => {
 
     expect(await screen.findByText(/^Restored to /)).toBeTruthy();
     expect(mocks.restoreVersion).toHaveBeenCalledWith("v1");
+  });
+
+  /* C-8 — a resolved `false` means the restore did not happen (e.g. the
+     version was gone by the time it ran). Any non-throw used to read as
+     success; it must now show an error and never the "Restored to" toast. */
+  it("restoreVersion resolving false shows an error toast, not success", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    mocks.restoreVersion.mockResolvedValue(false);
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} />);
+
+    openSaveMenu("Save A");
+    fireEvent.click(screen.getByLabelText('Restore "Save A"'));
+    await screen.findByText("Restore “Save A” to the draft?");
+    fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
+
+    expect(
+      await screen.findByText(
+        "Couldn't restore — nothing changed. Your current work was not saved as a version."
+      )
+    ).toBeTruthy();
+    expect(screen.queryByText(/^Restored to /)).toBeNull();
   });
 
   /* G1-071 — the restore saved the open work first; its toast offers
@@ -301,6 +323,7 @@ describe("VersionHistoryPanel — restore branches", () => {
     } as unknown as Composer;
     mocks.restoreVersion.mockImplementation(async (id: string) => {
       if (id === "v1") handlers.get("version:restored")?.({ version: { id }, safetyVersionId: "safety-1" });
+      return true;
     });
     const Panel = await loadPanel();
     render(<Panel composer={composer} />);
