@@ -12,6 +12,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { duplicateSite } from "@/server/services/sites.service";
+import { reidSite } from "@buildrik/shared/content/elementIds";
 import { recordPublishedForms, getFormBlockSettings } from "@/server/services/form-submission.service";
 import {
   createTestUser,
@@ -119,5 +120,19 @@ describe("duplicateSite — forms and bindings under the copy's keys", () => {
     const stored = (await prisma.site.findUniqueOrThrow({ where: { id: copy.id } })).projectCmsBindings as typeof BINDINGS;
     expect(stored.field["contact-form"]).toEqual(BINDINGS.field["contact-form"]);
     expect(stored.field[renamedForm]).toEqual(BINDINGS.field["contact-form"]);
+  });
+
+  /* A stale row (no element carries it any more) whose blockId equals an id
+     the copy's re-id produces must not abort the whole duplicate on the
+     (siteId, blockId) unique index. */
+  it("a stale row colliding with a renamed id does not abort the copy", async () => {
+    const { user, workspace, site } = await seed();
+    const pages = await prisma.page.findMany({ where: { siteId: site.id }, orderBy: [{ position: "asc" }, { id: "asc" }] });
+    const renamedTo = reidSite(pages, []).renames.find((r) => r.from === "contact-form")!.to;
+    await prisma.formBlock.create({ data: { siteId: site.id, blockId: renamedTo, name: "Stale", fields: [] } });
+
+    const copy = await duplicateSite(site.id, workspace.id, user.id);
+
+    expect(await prisma.formBlock.count({ where: { siteId: copy.id, blockId: renamedTo } })).toBe(1);
   });
 });

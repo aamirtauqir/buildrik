@@ -488,6 +488,8 @@ export async function duplicateSite(
           ...originalForms.map((f) => copyForm(f, f.blockId)),
           ...copiesForRenamedIds(originalForms, reid.renames).map(({ row, to }) => copyForm(row, to)),
         ],
+        // A renamed id that coincides with a kept one must not abort the copy.
+        skipDuplicates: true,
       });
     }
 

@@ -42,6 +42,10 @@
  * A site whose transaction fails is logged `site=<id> FAILED <msg>` and
  * skipped; the run continues and exits non-zero if any site failed.
  *
+ * Run with editors quiet: these writes bypass the lastEditedAt CAS
+ * (saveProjectData), so an editor tab open on a site during --apply can save
+ * its pre-backfill copy over the result without a conflict.
+ *
  * DRY RUN by default — prints per-site counts, writes nothing.
  *   --apply                         write the changes (one transaction per site)
  *   --i-know-this-is-production     allow a non-localhost DATABASE_URL
