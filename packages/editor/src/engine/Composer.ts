@@ -38,6 +38,7 @@ import { RESET_CSS, siteFontCSS, siteFontFaceCSS, siteTokensCSS, googleFontsHead
 import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
+import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
@@ -781,7 +782,7 @@ export class Composer extends EventEmitter {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHTML(title)}</title>
-${fontLinks ? `${fontLinks}\n` : ""}  <style>${faces}${RESET_CSS}${css}${siteCss}</style>
+${fontLinks ? `${fontLinks}\n` : ""}  <style>${escapeStyleText(`${faces}${RESET_CSS}${css}${siteCss}`)}</style>
 </head>
 <body>
 ${html}${interactionScript}

@@ -1,5 +1,6 @@
 import { createComposer, type Composer } from "@/engine";
 import { ExportEngine } from "@/engine/export";
+import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import type { ProjectData } from "@/shared/types/project";
 
 /** A page ready to publish: a path + its rendered HTML. Matches the server's
@@ -27,12 +28,13 @@ export function inlinePublishStylesheet(
   const css = files.find((f) => f.name === "styles.css")?.content ?? "";
   const pages = files.filter((f) => f.name.endsWith(".html"));
   if (!css) return pages.map((f) => ({ path: f.name, html: f.content }));
+  // The sheet goes inside a <style> on a visitor's page, so nothing in it may
+  // close that element; and it is inserted by a function, so a `$'` in the
+  // CSS is not read as a replacement pattern.
+  const styleTag = `  <style>${escapeStyleText(css)}</style>\n`;
   return pages.map((f) => ({
     path: f.name,
-    html: f.content.replace(
-      /[ \t]*<link rel="stylesheet" href="styles\.css">\n?/,
-      `  <style>${css}</style>\n`
-    ),
+    html: f.content.replace(/[ \t]*<link rel="stylesheet" href="styles\.css">\n?/, () => styleTag),
   }));
 }
 

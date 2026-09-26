@@ -5,6 +5,7 @@
  */
 
 import JSZip from "jszip";
+import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/element-markup";
 import type { PageData } from "../../shared/types";
 import type {
   ExportConfig,
@@ -491,7 +492,9 @@ export class ExportEngine {
     let css = "";
     const className = `.${config.cssPrefix}${id}`;
 
-    if (Object.keys(styles).length > 0) {
+    // The id is written into the selector; one that is not a plain word never
+    // is (the load sanitizer regenerates it — this is the writer's own check).
+    if (Object.keys(styles).length > 0 && isSafeElementId(id)) {
       const styleStr = stylesToCSS(styles, config.minify);
       css += config.minify ? `${className}{${styleStr}}` : `${className} {\n${styleStr}}\n\n`;
       // …and the breakpoint hides those styles carry, the same way the publish
@@ -537,7 +540,7 @@ export class ExportEngine {
     const walk = (el: PageData["root"] | undefined): void => {
       if (!el) return;
       const styles = el.styles;
-      if (el.id && styles && Object.keys(styles).length > 0) {
+      if (isSafeElementId(el.id) && styles && Object.keys(styles).length > 0) {
         const sel = `.${prefix}${el.id}`;
         // Same defense-in-depth guard buildAttributeString applies — drop the
         // whole rule if it carries a dangerous CSS pattern (F1 carried over).
@@ -604,7 +607,7 @@ export class ExportEngine {
     }
 
     if (embeddedCSS) {
-      head += `${indent}<style>${nl}${embeddedCSS}${indent}</style>${nl}`;
+      head += `${indent}<style>${nl}${escapeStyleText(embeddedCSS)}${indent}</style>${nl}`;
     } else if (config.cssStyle === "external") {
       head += `${indent}<link rel="stylesheet" href="styles.css">${nl}`;
     }
@@ -627,7 +630,7 @@ export class ExportEngine {
     const customCode = this.composer.getProjectSettings?.()?.customCode;
     const globalCss = customCode?.globalCss;
     if (globalCss && globalCss.trim()) {
-      head += `${indent}<style>${nl}${globalCss}${nl}${indent}</style>${nl}`;
+      head += `${indent}<style>${nl}${escapeStyleText(globalCss)}${nl}${indent}</style>${nl}`;
     }
 
     // …and the head scripts from the same screen, which said "Custom code runs
@@ -966,7 +969,7 @@ export class ExportEngine {
     const siteCustomCode = this.composer.getProjectSettings?.()?.customCode;
     const globalCss = siteCustomCode?.globalCss;
     if (globalCss && globalCss.trim()) {
-      headParts.push(`  <style>\n${globalCss}\n  </style>`);
+      headParts.push(`  <style>\n${escapeStyleText(globalCss)}\n  </style>`);
     }
 
     // The site's head scripts, on every published page — see the note in

@@ -340,7 +340,7 @@ export class StyleEngine {
     const tabletQuery = getBreakpointQuery("tablet");
     const mobileQuery = getBreakpointQuery("mobile");
 
-    this.styles.forEach((style) => {
+    this.writableRules().forEach((style) => {
       const css = this.generateStyleRule(style);
 
       if (!style.mediaQuery) {
@@ -466,7 +466,7 @@ export class StyleEngine {
     const rules: string[] = [];
     const mediaRules: Map<string, string[]> = new Map();
 
-    this.styles.forEach((style) => {
+    this.writableRules().forEach((style) => {
       const css = this.generateStyleRule(style, opts.scope);
 
       if (style.mediaQuery) {
@@ -495,6 +495,18 @@ export class StyleEngine {
     }
 
     return output;
+  }
+
+  /**
+   * The rules a stylesheet may be written from. `importStyles` already keeps
+   * out a selector or media query that could leave the stylesheet; this is the
+   * writers' own check, for a rule set live (setRule takes any string) or by a
+   * path that skips the load boundary (S-1).
+   */
+  private writableRules(): StyleData[] {
+    return [...this.styles.values()].filter((style) =>
+      isSafeStyleRuleTarget(style.selector, style.mediaQuery)
+    );
   }
 
   /**
@@ -639,7 +651,7 @@ export class StyleEngine {
     for (const bp of cascade) {
       const query = getBreakpointQuery(bp);
       if (!query) continue;
-      this.styles.forEach((style) => {
+      this.writableRules().forEach((style) => {
         // !important, because the canvas renders an element's BASE styles
         // inline and inline beats any stylesheet. The publish path solved the
         // same collision by emitting base styles as class rules instead
