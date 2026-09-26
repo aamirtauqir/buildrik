@@ -110,4 +110,18 @@ describe("A-5 — select-all destructive ops keep locked descendants", () => {
     expect(c.elements.getElement(ids.text)).toBeTruthy();
     expect(c.elements.getElement(ids.heading)).toBeFalsy();
   });
+
+  it("a child picked on its own inside a locked container can still be deleted", () => {
+    const { c, ids, skipped } = setup();
+    c.elements.getElement(ids.img)!.setLocked(false);
+    c.elements.getElement(ids.section)!.setLocked(true);
+    c.selection.clear();
+    c.selection.select(c.elements.getElement(ids.text)!);
+    skipped.mockClear();
+    c.commands.run("delete", { confirmed: true });
+    expect(c.elements.getElement(ids.text)).toBeFalsy();
+    expect(c.elements.getElement(ids.section)).toBeTruthy();
+    expect(c.elements.getElement(ids.img)).toBeTruthy();
+    expect(skipped).not.toHaveBeenCalled();
+  });
 });

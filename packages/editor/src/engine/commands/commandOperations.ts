@@ -23,18 +23,23 @@ export type ReorderDirection = "forward" | "backward" | "front" | "back";
  * Takes the RAW selection (callers apply topMost() to what it keeps) and
  * never substitutes anything for what was selected. An element goes only if
  * it is not locked, not in a component instance, and removing it takes no
- * locked element with it — no locked descendant (its subtree goes with it)
- * and no locked ancestor (a locked container locks its contents). So ⌘A,
- * which selects every element, still removes the unlocked siblings of a
- * locked image, while an explicit Delete on the section around it removes
- * nothing — the first A-5 fix swapped in that section's other children and
- * deleted them unasked (review I-1). `skipped` says the selection shrank.
+ * locked element with it — no locked descendant (its subtree goes with it),
+ * and no locked ancestor that is itself in the selection (⌘A selected the
+ * locked container, so its contents stay with it). A lock covers only the
+ * element itself elsewhere in the editor, so a child picked on its own
+ * inside a locked container can still be deleted. ⌘A still removes the
+ * unlocked siblings of a locked image, while an explicit Delete on the
+ * section around it removes nothing — the first A-5 fix swapped in that
+ * section's other children and deleted them unasked (review I-1). `skipped`
+ * says the selection shrank.
  * Lives here (not defaultCommands.ts, which imports FROM this module) so
  * delete/cut and nudgeSelected below share it without a circular import.
  */
 export function dropLockedAndInstances(elements: Element[]): { kept: Element[]; skipped: boolean } {
+  const selected = new Set(elements.map((el) => el.getId()));
   const kept = elements.filter(
-    (el) => !el.isLocked() && !el.isComponentInstance() && !hasLockedDescendant(el) && !hasLockedAncestor(el),
+    (el) =>
+      !el.isLocked() && !el.isComponentInstance() && !hasLockedDescendant(el) && !hasSelectedLockedAncestor(el, selected),
   );
   return { kept, skipped: kept.length !== elements.length };
 }
@@ -43,8 +48,8 @@ function hasLockedDescendant(el: Element): boolean {
   return el.getChildren().some((child) => child.isLocked() || hasLockedDescendant(child));
 }
 
-function hasLockedAncestor(el: Element): boolean {
-  for (let p = el.getParent(); p; p = p.getParent()) if (p.isLocked()) return true;
+function hasSelectedLockedAncestor(el: Element, selected: Set<string>): boolean {
+  for (let p = el.getParent(); p; p = p.getParent()) if (p.isLocked() && selected.has(p.getId())) return true;
   return false;
 }
 
