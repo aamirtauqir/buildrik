@@ -44,6 +44,7 @@ import {
 beforeEach(async () => {
   window.history.replaceState({}, "", "/edit/site-123");
   [create, del, list, get, rename, loadVersions, saveVersion].forEach((m) => m.mockReset());
+  localStorage.clear();
   // The retry queue is module-level shared state; flush anything a prior test
   // left queued (reset mocks now resolve) so each test starts from empty, then
   // clear the call history the flush incurred so per-test counts start at 0.
@@ -132,25 +133,6 @@ describe("versionSync", () => {
     get.mockResolvedValueOnce({ id: "srv1", name: "X1-orig-name", snapshot: {}, createdAt: 0 });
     await hydrateVersionsFromServer();
     expect(saveVersion.mock.calls[0][0]).toMatchObject({ id: "srv1", name: "X1-renamed-owner" });
-  });
-
-  it("X-1: an already-cached version is renamed to the server's name, and counts as a change", async () => {
-    list.mockResolvedValueOnce([{ versionId: "local1", name: "Renamed elsewhere" }]);
-    loadVersions.mockResolvedValueOnce([{ id: "local1", name: "Old name", snapshot: {} }]);
-    const changed = await hydrateVersionsFromServer();
-    expect(get).not.toHaveBeenCalled();
-    expect(saveVersion).toHaveBeenCalledWith(expect.objectContaining({ id: "local1", name: "Renamed elsewhere" }));
-    expect(changed).toBe(1);
-  });
-
-  it("X-1: a local rename still queued for the server is not overwritten by the server's older name", async () => {
-    rename.mockRejectedValueOnce(new Error("offline"));
-    await mirrorVersionRename("local1", "Local new name");
-    list.mockResolvedValueOnce([{ versionId: "local1", name: "Old name" }]);
-    loadVersions.mockResolvedValueOnce([{ id: "local1", name: "Local new name", snapshot: {} }]);
-    const changed = await hydrateVersionsFromServer();
-    expect(saveVersion).not.toHaveBeenCalled();
-    expect(changed).toBe(0);
   });
 
   it("leaves the author null when the server has none, rather than inventing one", async () => {
@@ -342,5 +324,97 @@ describe("versionSync hydrate is bounded (walk 2026-09-24: 50 sequential gets on
     expect(get).toHaveBeenCalledTimes(HYDRATE_LIMIT);
     expect(get.mock.calls.map((c) => c[0].versionId)).toEqual(rows.slice(0, HYDRATE_LIMIT).map((r) => r.versionId));
     expect(peak).toBeGreaterThan(1);
+  });
+});
+
+/* X-1 fix round 1: the "don't overwrite an unsynced local rename" guard read
+   the retry queue, which is in memory — after a reload it is empty, and a
+   rename made offline (already in IndexedDB) lost to the older server name.
+   Names now reconcile on the persisted server stamp (C-4, localStorage). A
+   RELOAD is simulated as a fresh module graph (new queue instance) with
+   IndexedDB (the loadVersions/saveVersion mocks) and localStorage kept. */
+describe("X-1 — version names reconcile on the persisted server stamp", () => {
+  const T0 = "2026-09-26T10:00:00.000Z";
+  const T1 = "2026-09-26T11:00:00.000Z";
+  const T2 = "2026-09-26T12:00:00.000Z";
+  const v1 = (name: string) => ({ id: "v1", name, snapshot: {}, createdAt: 0, isAutoCheckpoint: false });
+  const row = (name: string, updatedAt: string) => ({ versionId: "v1", name, updatedAt });
+
+  async function reload() {
+    vi.resetModules();
+    return import("../versionSync");
+  }
+
+  /** First open: the version is on both sides with the same name → stamped. */
+  async function syncedAt(name: string, at: string) {
+    list.mockResolvedValueOnce([row(name, at)]);
+    loadVersions.mockResolvedValueOnce([v1(name)]);
+    await hydrateVersionsFromServer();
+    saveVersion.mockClear();
+  }
+
+  it("an offline rename survives a reload and is mirrored again", async () => {
+    await syncedAt("A", T0);
+    rename.mockRejectedValueOnce(new Error("offline"));
+    await mirrorVersionRename("v1", "B"); // local IndexedDB now holds "B"
+
+    const fresh = await reload();
+    expect(fresh.getVersionSyncPendingCount()).toBe(0); // the queue did not survive
+    rename.mockResolvedValueOnce({ ok: true, updatedAt: T1 });
+    list.mockResolvedValueOnce([row("A", T0)]);
+    loadVersions.mockResolvedValueOnce([v1("B")]);
+    const changed = await fresh.hydrateVersionsFromServer();
+
+    expect(saveVersion).not.toHaveBeenCalledWith(expect.objectContaining({ name: "A" }));
+    expect(changed).toBe(0);
+    expect(rename).toHaveBeenLastCalledWith({ siteId: "site-123", versionId: "v1", name: "B" });
+  });
+
+  it("a teammate's server-side rename reaches an untouched cached version", async () => {
+    await syncedAt("A", T0);
+    const fresh = await reload();
+    list.mockResolvedValueOnce([row("C", T1)]);
+    loadVersions.mockResolvedValueOnce([v1("A")]);
+    const changed = await fresh.hydrateVersionsFromServer();
+    expect(saveVersion).toHaveBeenCalledWith(expect.objectContaining({ id: "v1", name: "C" }));
+    expect(changed).toBe(1);
+    expect(rename).not.toHaveBeenCalled();
+  });
+
+  it("after this browser's rename reaches the server, a later teammate rename still wins", async () => {
+    await syncedAt("A", T0);
+    rename.mockResolvedValueOnce({ ok: true, updatedAt: T1 });
+    await mirrorVersionRename("v1", "B"); // confirmed → stamped {B, T1}
+
+    const fresh = await reload();
+    list.mockResolvedValueOnce([row("C", T2)]);
+    loadVersions.mockResolvedValueOnce([v1("B")]);
+    await fresh.hydrateVersionsFromServer();
+    expect(saveVersion).toHaveBeenCalledWith(expect.objectContaining({ id: "v1", name: "C" }));
+  });
+
+  it("an unstamped cached version whose name differs keeps its name and is mirrored", async () => {
+    rename.mockResolvedValueOnce({ ok: true, updatedAt: T1 });
+    list.mockResolvedValueOnce([row("Server", T0)]);
+    loadVersions.mockResolvedValueOnce([v1("Mine")]);
+    const changed = await hydrateVersionsFromServer();
+    expect(saveVersion).not.toHaveBeenCalled();
+    expect(changed).toBe(0);
+    expect(rename).toHaveBeenCalledWith({ siteId: "site-123", versionId: "v1", name: "Mine" });
+  });
+
+  it("a freshly hydrated version is stamped, so the next teammate rename reaches it", async () => {
+    list.mockResolvedValueOnce([row("A", T0)]);
+    loadVersions.mockResolvedValueOnce([]);
+    get.mockResolvedValueOnce({ ...v1("stale-payload-name") });
+    await hydrateVersionsFromServer();
+    expect(saveVersion.mock.calls[0][0]).toMatchObject({ id: "v1", name: "A" });
+
+    saveVersion.mockClear();
+    const fresh = await reload();
+    list.mockResolvedValueOnce([row("C", T1)]);
+    loadVersions.mockResolvedValueOnce([v1("A")]);
+    await fresh.hydrateVersionsFromServer();
+    expect(saveVersion).toHaveBeenCalledWith(expect.objectContaining({ id: "v1", name: "C" }));
   });
 });

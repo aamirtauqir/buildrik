@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Carousel runtime for `.buildrick-slider` (autoplay, arrows, dots, respects `prefers-reduced-motion`) — shared behaviour between the canvas (`useSliderRuntime`, live DOM effect) and the published page (`lib/publish-sliders.ts`, the same logic inlined as a script), closing "slider exports as stacked slides with no behaviour."
 
 ### Deploy
+- Run `prisma migrate deploy` BEFORE deploying: `20261002100000_site_version_updated_at` (adds `SiteVersion.updatedAt`, default `now()` for existing rows, no data migration — the editor stamps cached versions against it so a version rename syncs across browsers without overwriting an offline rename).
 - Run `prisma migrate deploy` BEFORE deploying: `20261001120000_form_block_after_submit` (adds `FormBlock.successAction`, `redirectUrl`, `spamProtection` — all with safe defaults, no data migration needed).
 
 ## [0.4.0.0] Code-gap Oct 1 — Editor v3 to Figma — 2026-09-24
