@@ -404,7 +404,12 @@ export async function duplicateSite(
         workspaceId,
         createdBy: userId,
         pages: originalPages.length,
-        projectStyles: (original.projectStyles as Prisma.InputJsonValue) ?? undefined,
+        // S-1 class: the original row's own stored projectStyles could predate
+        // sanitization (or have been written by a path that skipped it) — the
+        // copy re-runs the same allowlist sanitizer the direct-save path uses
+        // (:639) rather than trusting the source row.
+        projectStyles:
+          (sanitizeProjectStyles(original.projectStyles) as Prisma.InputJsonValue) ?? undefined,
         projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
         projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
         lastEditedAt: new Date(),

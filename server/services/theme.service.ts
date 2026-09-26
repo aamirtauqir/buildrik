@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 
 /**
  * Shared-theme push (redesign E2-T5b) — the ONLY layer that reads/writes the
@@ -349,8 +350,14 @@ export async function rollbackSiteTheme(
         ...(prevTokens
           ? { projectSettings: restoreTokens(site.projectSettings, prevTokens) }
           : {
+              // S-1 class: a legacy snapshot's `prevStyles` was frozen before
+              // the allowlist sanitizer shipped (or by a path that predates
+              // it) — re-run it on restore rather than writing the snapshot
+              // back verbatim.
               projectStyles:
-                snap.prevStyles == null ? Prisma.DbNull : (snap.prevStyles as Prisma.InputJsonValue),
+                snap.prevStyles == null
+                  ? Prisma.DbNull
+                  : (sanitizeProjectStyles(snap.prevStyles) as Prisma.InputJsonValue),
             }),
         dsSchemaVersion: site.dsSchemaVersion + 1,
         lastEditedAt: new Date(),

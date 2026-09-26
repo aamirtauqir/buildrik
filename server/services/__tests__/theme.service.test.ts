@@ -314,6 +314,28 @@ describe("rollbackSiteTheme — a snapshot from the old projectStyles push", () 
     expect(siteUpdateMany.mock.calls[0][0].data).toMatchObject({ projectStyles: [{ selector: "[data-buildrik-id=a]" }] });
     expect("projectSettings" in siteUpdateMany.mock.calls[0][0].data).toBe(false);
   });
+
+  /* S-1 class carry-over: a legacy snapshot's prevStyles is written straight
+     back to the site on rollback. If it predates the allowlist sanitizer (or
+     was frozen from a row that skipped it), rolling back must not resurrect
+     an unsafe rule verbatim. */
+  it("sanitizes an unsafe rule out of a legacy snapshot instead of restoring it verbatim", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4, projectSettings: {} });
+    snapFindFirst.mockResolvedValueOnce({
+      id: "old",
+      prevStyles: [
+        { selector: "[data-buildrik-id=a]" },
+        { selector: "</style><script>alert(1)</script>" },
+      ],
+      createdAt: new Date(),
+    });
+    siteUpdateMany.mockResolvedValue({ count: 1 });
+    snapDelete.mockResolvedValue({});
+    await rollbackSiteTheme("w1", "s1");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectStyles).toEqual([
+      { selector: "[data-buildrik-id=a]" },
+    ]);
+  });
 });
 
 describe("rollbackSiteTheme — presets (review M3)", () => {

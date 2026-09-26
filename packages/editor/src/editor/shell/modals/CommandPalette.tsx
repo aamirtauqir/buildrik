@@ -31,6 +31,8 @@ import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 import { requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
+import { useViewerChrome } from "../hooks/useEditorRole";
 
 // =============================================================================
 // TYPES
@@ -71,10 +73,40 @@ const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tool
 // COMMANDS
 // =============================================================================
 
+/**
+ * The tab a nav row's `openPanel`/`ui:switch-tab` call actually opens, for
+ * gating against `isTabAllowedForViewer` — the SAME predicate
+ * StudioPanels' rail/ui:switch-tab handler and useStudioState's
+ * openLeftPanelToTab/setLeftPanelTab sink use. A row absent from this map
+ * opens no tab (new-page, replace-layout, issues, shortcuts, permissions)
+ * and is never hidden here. "ai" is not a formal GroupedTabId (it opens the
+ * inspector column, not a rail tab) but shares the same VIEWER_TABS gate at
+ * the sink, so it is included for consistency — a VIEWER's ⌘K would
+ * otherwise show a live "Open AI assistant" row that the sink silently
+ * swallows.
+ */
+const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId>> = {
+  pages: "pages",
+  add: "add",
+  layers: "layers",
+  assets: "assets",
+  "asset-library": "assets",
+  content: "content",
+  design: "design",
+  publish: "publish",
+  ai: "ai" as GroupedTabId,
+  templates: "templates",
+  review: "review",
+  activity: "activity",
+  settings: "settings",
+  components: "components",
+};
+
 function buildCommands(
   composer: Composer | null,
   onClose: () => void,
   reviewsEnabled: boolean | null | undefined,
+  viewerChrome: boolean,
 ): PaletteCommand[] {
   const commands: PaletteCommand[] = [];
   const run = (fn: () => void) => () => {
@@ -113,6 +145,8 @@ function buildCommands(
     ["shortcuts", "Keyboard shortcuts", () => composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {})],
   ];
   for (const [id, label, fn, keywords] of nav) {
+    const target = NAV_TAB_TARGET[id];
+    if (target !== undefined && !isTabAllowedForViewer(target, viewerChrome)) continue;
     commands.push({ id: `nav-${id}`, label, group: "Navigate", keywords, handler: run(fn) });
   }
   /* The Permissions dialog's door for every role but a viewer (whose door is
@@ -205,16 +239,18 @@ function buildCommands(
   // TOOLS
   fromRegistry("cms-records", "Tools");
   fromRegistry("save-template", "Tools");
-  commands.push(
-    { id: "tools-history", label: "Open History", group: "Tools", handler: run(() => openPanel("history")) },
-    {
+  if (isTabAllowedForViewer("history", viewerChrome)) {
+    commands.push({ id: "tools-history", label: "Open History", group: "Tools", handler: run(() => openPanel("history")) });
+  }
+  if (isTabAllowedForViewer("assets", viewerChrome)) {
+    commands.push({
       id: "tools-stock",
       label: "Search stock photos",
       group: "Tools",
       keywords: ["unsplash", "pexels", "image", "photo"],
       handler: run(() => openPanel("assets", "stock")),
-    },
-  );
+    });
+  }
 
   // MORE — searchable, not in the opening list.
   commands.push(
@@ -384,14 +420,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
+  /* Same predicate + same viewer computation StudioPanels' rail/ui:switch-tab
+     gate and useStudioState's openLeftPanelToTab/setLeftPanelTab sink use —
+     a VIEWER should not see a live-looking "Open Brand"/"Open Site settings"
+     row for a tab the sink now silently no-ops on. */
+  const viewerChrome = useViewerChrome();
 
   /* The palette unmounts on close (StudioHeader renders it conditionally), so
      this list — and every "cannot run" reason in it — is rebuilt on each open
      against the selection of that moment. */
   const commands = React.useMemo(
-    () => buildCommands(composer, onClose, reviewsEnabled),
+    () => buildCommands(composer, onClose, reviewsEnabled, viewerChrome),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [composer, reviewsEnabled],
+    [composer, reviewsEnabled, viewerChrome],
   );
 
   /* RECORDS — CMS records answer by their display field and open in the

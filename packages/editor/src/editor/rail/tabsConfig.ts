@@ -311,3 +311,28 @@ export function getFigmaRailGroups(): Array<{ zone: TabZone; tabs: GroupedTabCon
     tabs: g.ids.map((id) => TAB_CONFIG_MAP.get(id)).filter((t): t is GroupedTabConfig => Boolean(t)),
   }));
 }
+
+/**
+ * What a VIEWER may open: inspection surfaces, plus History/Review/Activity —
+ * FC-9 (fix-all 2026-09-25) lets a viewer open those three READ-ONLY (every
+ * write control inside them is hidden or disabled with a tooltip; server
+ * authz already refuses the mutations).
+ *
+ * Canonical home for the VIEWER gate on left-panel tabs: StudioPanels (rail
+ * click, "ui:switch-tab" bus), useStudioState's openLeftPanelToTab/
+ * setLeftPanelTab (the sink every door funnels into — UI_PANEL_OPEN,
+ * deep links, topbar buttons), and CommandPalette (which nav commands to
+ * even show a VIEWER) all read this ONE set through `isTabAllowedForViewer`
+ * so they cannot drift from each other.
+ */
+export const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>([
+  "layers",
+  "assets",
+  "history",
+  "review",
+  "activity",
+]);
+
+export function isTabAllowedForViewer(tab: GroupedTabId, viewerChrome: boolean): boolean {
+  return !viewerChrome || VIEWER_TABS.has(tab);
+}

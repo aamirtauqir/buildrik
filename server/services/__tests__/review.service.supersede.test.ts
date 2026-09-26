@@ -41,9 +41,13 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 const issueReviewToken = vi.fn().mockResolvedValue({ token: "fresh-token" });
-vi.mock("@/server/services/client-review.service", () => ({
-  issueReviewToken: (...a: unknown[]) => issueReviewToken(...a),
-}));
+vi.mock("@/server/services/client-review.service", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/server/services/client-review.service")>();
+  return {
+    ...actual,
+    issueReviewToken: (...a: unknown[]) => issueReviewToken(...a),
+  };
+});
 
 import { submitReview } from "@server/services/review.service";
 

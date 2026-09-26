@@ -287,6 +287,33 @@ describe("Sites Service", () => {
       // all writes rode a transaction
       expect(prisma.$transaction).toHaveBeenCalled();
     });
+
+    /* S-1 class carry-over: the copy wrote original.projectStyles straight
+       into the new site with no sanitization. An unsafe rule saved before the
+       allowlist sanitizer shipped (or by a path that skipped it) would
+       otherwise ride along into every duplicate made from that site. */
+    it("sanitizes projectStyles on copy instead of trusting the source row", async () => {
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        id: "s1", name: "Orig", deletedAt: null,
+        projectStyles: [
+          { selector: "[data-buildrik-id=a]" },
+          { selector: "</style><script>alert(1)</script>" },
+        ],
+        projectAssets: null, projectSettings: null,
+      } as never);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "PRO" } } as never);
+      vi.mocked(prisma.site.count).mockResolvedValue(1);
+      vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.site.create).mockResolvedValue({ id: "s2", name: "Orig (Copy)" } as never);
+      vi.mocked(prisma.page.findMany).mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+      vi.mocked(prisma.formBlock.findMany).mockResolvedValue([]);
+
+      await duplicateSite("s1", "ws1", "u1");
+
+      const createData = vi.mocked(prisma.site.create).mock.calls[0][0].data;
+      expect(createData.projectStyles).toEqual([{ selector: "[data-buildrik-id=a]" }]);
+    });
   });
 
   describe("Folder Service", () => {

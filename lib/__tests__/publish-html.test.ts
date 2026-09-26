@@ -140,4 +140,37 @@ describe("the rest of the head the worker adds", () => {
     expect(publishPage("index.html", page("H"), { badge: true })).toContain("Made with Buildrick");
     expect(publishPage("index.html", page("H"), { badge: false })).not.toContain("Made with Buildrick");
   });
+
+  /**
+   * escapeStyleText (packages/shared/schemas/element-markup.ts) only escapes
+   * `</style` inside global CSS — a literal `</head>` in a CSS string value
+   * or comment reaches this HTML untouched, sitting inside the <style> block
+   * that is itself inside <head>, BEFORE the real closing tag. A naive
+   * `.replace("</head>", …)` (String.replace matches the FIRST occurrence)
+   * would land the injected block inside that <style> block instead of at
+   * the actual head close.
+   */
+  it("inserts before the REAL </head>, not a literal one embedded in global CSS", () => {
+    const htmlWithCssHeadLiteral =
+      `<!doctype html><html><head>` +
+      `<style>.x::before{content:"</head>"}</style>` +
+      `</head><body><h1>H</h1></body></html>`;
+
+    const out = publishPage("index.html", htmlWithCssHeadLiteral, {
+      canonicalDomain: "example.com",
+      scripts: "<script>window.chat=1</script>",
+    });
+
+    // The injected tags must land after the <style> block's fake "</head>",
+    // i.e. right before the tag that actually opens <body>.
+    const styleEnd = out.indexOf("</style>") + "</style>".length;
+    const bodyStart = out.indexOf("<body>");
+    const injected = out.slice(styleEnd, bodyStart);
+    expect(injected).toContain("canonical");
+    expect(injected).toContain("window.chat=1");
+    // And nothing was injected earlier, inside the <style> block.
+    const styleBlock = out.slice(out.indexOf("<style>"), styleEnd);
+    expect(styleBlock).not.toContain("canonical");
+    expect(styleBlock).not.toContain("window.chat=1");
+  });
 });

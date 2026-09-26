@@ -16,7 +16,7 @@ import type { Composer } from "../../engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId } from "../rail/tabsConfig";
-import { getTabMode } from "../rail/tabsConfig";
+import { getTabMode, isTabAllowedForViewer, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useToast } from "@/editor/chrome-ui";
@@ -48,24 +48,20 @@ import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
-import { useEditorRole } from "./hooks/useEditorRole";
+import { useViewerChrome } from "./hooks/useEditorRole";
 import { ViewerRoleNotice } from "./ViewerRoleNotice";
 
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
 /** Panels that take the inspector's column instead of the left drawer. */
-/** What a VIEWER's rail opens: inspection surfaces, plus History/Review/
- *  Activity — FC-9 (fix-all 2026-09-25) lets a viewer open those three
- *  READ-ONLY (every write control inside them is hidden or disabled with a
- *  tooltip; server authz already refuses the mutations). */
-const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>([
-  "layers",
-  "assets",
-  "history",
-  "review",
-  "activity",
-]);
 const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history", "activity"]);
+
+/* VIEWER_TABS / isTabAllowedForViewer moved to `../rail/tabsConfig` (fix
+ * round 1) — the tab registry is the ONE place every door that gates a
+ * VIEWER's left-panel tabs reads from: this file's rail click and
+ * "ui:switch-tab" handler, useStudioState's openLeftPanelToTab/
+ * setLeftPanelTab (the sink UI_PANEL_OPEN/deep-links/topbar buttons funnel
+ * into), and CommandPalette (which nav commands to show a VIEWER). */
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -261,12 +257,14 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* URL-derived, so it is stable for the life of the document — view mode
      is entered by navigation (StudioHeader.toggleReadOnlyView), never by state. */
   const readOnlyView = React.useMemo(() => getEditorViewMode().readOnlyView, []);
-  const editorRole = useEditorRole();
   /* A workspace VIEWER is always in view mode (dashboard redirect), and board
      4418:126059 still draws the editor chrome for them: the rail, Layers, and
      the role notice in the inspector column. View mode for anyone else stays
-     the bare canvas (founder call, 2026-08-23). */
-  const viewerChrome = readOnlyView && editorRole === "VIEWER";
+     the bare canvas (founder call, 2026-08-23). useViewerChrome is the SAME
+     computation useStudioState's openLeftPanelToTab/setLeftPanelTab sink and
+     CommandPalette use — one source, so this file's rail/drawer layout can't
+     disagree with what the sink actually lets through. */
+  const viewerChrome = useViewerChrome();
   /* A root class, not a prop, because the surfaces that still leak editing
      chrome into view mode are reached by CSS alone: the empty-container
      placeholder is a ::after in Canvas.css, and the footer's selection label is
@@ -505,6 +503,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const handler = (data: { tab: string; fullPage?: boolean }) => {
+      /* Every "ui:switch-tab" emitter (⌘K palette, canvas context menus,
+         inspector doors, PublishTab, CmsWorkspace, …) is a second door onto
+         the same tabs the rail gates — without this check a VIEWER could not
+         click into Add/CMS/Brand from the rail, but ⌘K "Open AI assistant"
+         or CmsWorkspace's own emit routed them there anyway. Same predicate
+         the rail uses (isTabAllowedForViewer), so the two doors can't drift. */
+      if (!isTabAllowedForViewer(data.tab as GroupedTabId, viewerChrome)) {
+        addToast({ description: "View only — adding, pages, CMS and brand edits need an Editor role." });
+        return;
+      }
       /* Boards 170:2 and 66:225 put AI in the INSPECTOR column with a
          "‹ Inspector" way back — not in the left sidebar. Every existing
          entry point (the inspector's ✦ AI chip, the multi-select toolbar, the
@@ -542,7 +550,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     return () => {
       composer.off("ui:switch-tab", handler);
     };
-  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
+  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle, viewerChrome, addToast]);
 
   // Canvas hover sync
   React.useEffect(() => {
@@ -592,7 +600,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     (tab: GroupedTabId) => {
       /* A viewer inspects: Layers, and Assets (view-only since B5). The other
          rail doors lead to writing surfaces, so they say why instead. */
-      if (viewerChrome && !VIEWER_TABS.has(tab)) {
+      if (!isTabAllowedForViewer(tab, viewerChrome)) {
         addToast({ description: "View only — adding, pages, CMS and brand edits need an Editor role." });
         return;
       }

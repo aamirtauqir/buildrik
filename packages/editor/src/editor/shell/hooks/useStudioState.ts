@@ -10,7 +10,8 @@ import * as React from "react";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import type { DeviceType } from "../../../shared/types";
 import { migrateLegacyPanelState } from "./panelStateMigration";
-import { getTabMode, type GroupedTabId } from "@/editor/rail/tabsConfig";
+import { getTabMode, isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
+import { useViewerChrome } from "./useEditorRole";
 
 // ============================================
 // Constants
@@ -224,6 +225,18 @@ export function useStudioState(): UseStudioStateReturn {
   // Load saved panel state once on mount
   const savedState = React.useMemo(() => getSavedPanelState(), []);
 
+  /* Fix round 1 (Lfix): the VIEWER rail gate used to live only in
+     StudioPanels' rail click and "ui:switch-tab" handler — every OTHER door
+     onto a left-panel tab (⌘K's UI_PANEL_OPEN commands, deep links, the
+     topbar's Settings/Publish/History/Pages/Activity/Review buttons) called
+     setLeftPanelTab/openLeftPanelToTab straight through
+     useEditorEventListeners and AquibraStudio, with no gate at all — a
+     VIEWER could open Brand/Add/CMS/Settings from ⌘K even though the rail
+     refused the same click. Gating HERE, at the one sink every door
+     eventually calls, closes all of them at once instead of chasing each
+     caller individually. */
+  const viewerChrome = useViewerChrome();
+
   // Device and zoom state
   const [device, setDevice] = React.useState<DeviceType>("desktop");
   const [zoom, setZoom] = React.useState(100);
@@ -315,8 +328,9 @@ export function useStudioState(): UseStudioStateReturn {
 
   // Wrapped setters that update state and trigger persistence
   const setLeftPanelTab = React.useCallback((tab: string) => {
+    if (!isTabAllowedForViewer(tab as GroupedTabId, viewerChrome)) return;
     _setLeftPanelTab(tab);
-  }, []);
+  }, [viewerChrome]);
 
   const setLeftPanelSubTabs = React.useCallback(
     (updater: React.SetStateAction<Record<string, string>>) => {
@@ -336,6 +350,7 @@ export function useStudioState(): UseStudioStateReturn {
 
   // Navigation functions for specific panel tabs
   const openLeftPanelToTab = React.useCallback((primaryTab: string, subTab?: string) => {
+    if (!isTabAllowedForViewer(primaryTab as GroupedTabId, viewerChrome)) return;
     setIsLeftPanelOpen(true);
     _setLeftPanelTab(primaryTab);
 
@@ -351,7 +366,7 @@ export function useStudioState(): UseStudioStateReturn {
       delete next[primaryTab];
       return next;
     });
-  }, []);
+  }, [viewerChrome]);
 
   const openBlocks = React.useCallback(() => {
     openLeftPanelToTab("add");

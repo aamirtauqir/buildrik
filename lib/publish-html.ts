@@ -33,14 +33,33 @@ export function escapeAttr(s: string): string {
 }
 
 /**
+ * Insert `block` immediately before the document's real </head>.
+ *
+ * The engine's `escapeStyleText` only escapes `</style` inside global CSS
+ * (Composer.ts / ExportEngine.ts) — a literal `</head>` inside a CSS string
+ * value or comment (e.g. `content: "</head>"`) reaches this HTML untouched,
+ * sitting inside the <style> block that is itself inside <head>, BEFORE the
+ * real closing tag. A plain `.replace("</head>", …)` (String.replace matches
+ * the FIRST occurrence) would land the injected block inside that <style>
+ * block instead of the actual head close. Using the LAST occurrence is safe
+ * here because everything after the true </head> is <body>, and body content
+ * is serialized through element/attribute encoding that turns "<" into an
+ * entity — a raw "</head>" substring cannot occur there.
+ */
+export function insertBeforeHeadClose(html: string, block: string): string {
+  const i = html.lastIndexOf("</head>");
+  if (i === -1) return block + html;
+  return html.slice(0, i) + block + html.slice(i);
+}
+
+/**
  * Inject installed workspace-app head scripts (Live Chat, …) before </head>.
  * `scripts` is prebuilt once per deploy from WorkspaceApp config; empty means
  * nothing installed/configured, so the page is returned untouched.
  */
 export function injectWorkspaceApps(html: string, scripts: string): string {
   if (!scripts) return html;
-  if (html.includes("</head>")) return html.replace("</head>", `${scripts}</head>`);
-  return scripts + html;
+  return insertBeforeHeadClose(html, scripts);
 }
 
 /**
@@ -65,9 +84,7 @@ export function injectHeadTags(
     tags.push(`<meta property="og:image" content="${escapeAttr(icons.ogImage)}">`);
   }
   if (tags.length === 0) return html;
-  const block = tags.join("");
-  if (html.includes("</head>")) return html.replace("</head>", `${block}</head>`);
-  return block + html;
+  return insertBeforeHeadClose(html, tags.join(""));
 }
 
 /**
@@ -99,9 +116,7 @@ export function injectSeoTags(
     tags.push(`<meta name="robots" content="noindex,nofollow">`);
   }
   if (tags.length === 0) return html;
-  const block = tags.join("");
-  if (html.includes("</head>")) return html.replace("</head>", `${block}</head>`);
-  return block + html;
+  return insertBeforeHeadClose(html, tags.join(""));
 }
 
 /**

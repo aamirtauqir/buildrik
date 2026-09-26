@@ -109,6 +109,8 @@ describe("sites.publish — acknowledgeStale requires ADMIN (S-7 / PD-9)", () =>
     await expect(
       caller.publish({ siteId: "s1", pages: [], acknowledgeStale: true } as never),
     ).resolves.toEqual({ jobId: "job_1" });
-    expect(startPublishMock).toHaveBeenCalledWith("s1", "ws_1", "u_1", [], true);
+    expect(startPublishMock).toHaveBeenCalledWith("s1", "ws_1", "u_1", [], true, {
+      expectedLastEditedAt: undefined,
+    });
   });
 });

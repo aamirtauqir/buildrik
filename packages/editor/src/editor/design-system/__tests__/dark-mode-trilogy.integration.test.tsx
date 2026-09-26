@@ -98,22 +98,22 @@ describe("dark-mode trilogy · end-to-end", () => {
   });
 
   it("real Composer + real TokenRegistryProvider: colorMode.set('dark') triggers darkValue setProperty across the full chain", () => {
-    // Seed a single color token with a darkValue.
-    localStorage.setItem(
-      "buildrick-design-tokens-int-test-v1",
-      JSON.stringify({
-        schemaVersion: 1,
-        tokens: [
-          {
-            id: "color-primary", name: "Primary", value: "#fff",
-            category: "colors", cssVar: "--bd-color-primary", type: "color",
-            darkValue: "#000",
-          },
-        ],
-      })
-    );
-
     const composer = new Composer({} as any);
+    // D-4: ProjectTokensHydrator merges `projectSettings.designTokens` into the
+    // registries on mount (not the localStorage cache), so the token to
+    // exercise must be seeded on the composer's project settings. A non-default
+    // id ("test-color-primary") goes through mergeProjectTokens' `added` path
+    // and keeps its own cssVar/darkValue verbatim, instead of colliding with a
+    // DEFAULT_TOKENS id and inheriting that default's `--buildrick-design-*` cssVar.
+    composer.setProjectSettingsRaw({
+      designTokens: [
+        {
+          id: "test-color-primary", name: "Primary", value: "#fff",
+          category: "colors", cssVar: "--bd-color-primary", type: "color",
+          darkValue: "#000",
+        },
+      ],
+    } as any);
 
     render(
       <TokenRegistryProvider projectId="int-test" composer={composer}>
@@ -139,20 +139,15 @@ describe("dark-mode trilogy · end-to-end", () => {
   });
 
   it("real chain: token without darkValue under dark mode falls back to value", () => {
-    localStorage.setItem(
-      "buildrick-design-tokens-int-test-v1",
-      JSON.stringify({
-        schemaVersion: 1,
-        tokens: [
-          {
-            id: "color-secondary", name: "Secondary", value: "#aaa",
-            category: "colors", cssVar: "--bd-color-secondary", type: "color",
-          },
-        ],
-      })
-    );
-
     const composer = new Composer({} as any);
+    composer.setProjectSettingsRaw({
+      designTokens: [
+        {
+          id: "test-color-secondary", name: "Secondary", value: "#aaa",
+          category: "colors", cssVar: "--bd-color-secondary", type: "color",
+        },
+      ],
+    } as any);
 
     render(
       <TokenRegistryProvider projectId="int-test" composer={composer}>

@@ -171,9 +171,21 @@ describe("Notification Service", () => {
       const { getRecentNotifications } = await import("@/server/services/notification.service");
       vi.mocked(prisma.notification.findMany).mockResolvedValue([]);
 
-      await getRecentNotifications("user1", 10);
+      await getRecentNotifications("user1", undefined, 10);
       expect(prisma.notification.findMany).toHaveBeenCalledWith({
         where: { userId: "user1" },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      });
+    });
+
+    it("scopes to siteId when provided", async () => {
+      const { getRecentNotifications } = await import("@/server/services/notification.service");
+      vi.mocked(prisma.notification.findMany).mockResolvedValue([]);
+
+      await getRecentNotifications("user1", "site1", 10);
+      expect(prisma.notification.findMany).toHaveBeenCalledWith({
+        where: { userId: "user1", siteId: "site1" },
         orderBy: { createdAt: "desc" },
         take: 10,
       });
