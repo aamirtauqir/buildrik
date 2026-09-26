@@ -11,6 +11,7 @@ import {
   sanitizeProjectStyles,
   sanitizeTemplateHtml,
   sanitizeVersionPayload,
+  sanitizeGeneratedPageHtml,
 } from "../sanitize-blocks";
 
 describe("sanitizeBlocks", () => {
@@ -376,5 +377,79 @@ describe("project style rules and element ids (S-1 review round 4)", () => {
     expect(good.id).toBe("el-ok_1");
     expect(tree.id).toBe("root");
     expect(reasons).toEqual(["id"]);
+  });
+});
+
+// controller review round 2: a regex "is this substitution inside a URL
+// attribute" detector is bypassable (unquoted attributes, a non-first
+// srcset candidate, style="url(...)", case). This runs a real parser
+// (DOMPurify/jsdom) instead of pattern-matching HTML context. Consumer:
+// `cms.service.ts`'s `generateDynamicPages`, over the WHOLE substituted page.
+describe("sanitizeGeneratedPageHtml", () => {
+  it("removes a javascript: href regardless of quoting, case, or whitespace", () => {
+    const html =
+      '<html><body>' +
+      '<a href="javascript:alert(1)">quoted</a>' +
+      "<a href=javascript:alert(1)>unquoted</a>" +
+      '<a HREF="  JavaScript:alert(1)">uppercase+whitespace</a>' +
+      "</body></html>";
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).not.toMatch(/javascript:/i);
+  });
+
+  it("filters a dangerous srcset candidate without dropping the safe ones", () => {
+    const html = '<html><body><img srcset="/a.jpg 1x, javascript:alert(1) 2x, /b.jpg 3x"></body></html>';
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).not.toMatch(/javascript:/i);
+    expect(out).toContain("/a.jpg");
+    expect(out).toContain("/b.jpg");
+  });
+
+  it("blanks a style attribute whose url() resolves to a dangerous scheme", () => {
+    const html = '<html><body><div style="background:url(javascript:alert(1));color:red">x</div></body></html>';
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).not.toMatch(/javascript:/i);
+  });
+
+  it("leaves a safe style url() and every other URL-bearing attribute shape untouched", () => {
+    const html =
+      '<html><body>' +
+      '<div style="background:url(/bg.jpg);color:red">x</div>' +
+      '<img srcset="/a.jpg 1x, /b.jpg 2x">' +
+      '<a href="https://example.com">ok</a>' +
+      "</body></html>";
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).toContain("url(/bg.jpg)");
+    expect(out).toContain('srcset="/a.jpg 1x, /b.jpg 2x"');
+    expect(out).toContain('href="https://example.com"');
+  });
+
+  it("preserves DOCTYPE, which DOMPurify's WHOLE_DOCUMENT mode drops on its own", () => {
+    const out = sanitizeGeneratedPageHtml("<!DOCTYPE html><html><body>x</body></html>");
+    expect(out.startsWith("<!DOCTYPE html>")).toBe(true);
+  });
+
+  it("keeps script/style content byte-for-byte, even when it contains HTML-tag-shaped text that could confuse a naive parser", () => {
+    const html =
+      '<html><head><script>var s = "<b>not a tag</b>&amp;";</script></head>' +
+      "<body><style>.a{content:'<x>'}</style>x</body></html>";
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).toContain('<script>var s = "<b>not a tag</b>&amp;";</script>');
+    expect(out).toContain("<style>.a{content:'<x>'}</style>");
+  });
+
+  it("keeps a hook-immune legitimate tag/attribute pair (SVG <use xlink:href>) and a same-site form formaction", () => {
+    const html =
+      '<html><body><svg><use xlink:href="#icon"></use></svg>' +
+      '<form><button formaction="/alt">go</button></form></body></html>';
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).toContain('<use xlink:href="#icon">');
+    expect(out).toContain('formaction="/alt"');
+  });
+
+  it("still strips an on* event-handler attribute (defense-in-depth, not overridden by the allow-everything hook)", () => {
+    const html = '<html><body><a onclick="alert(1)">x</a></body></html>';
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).not.toMatch(/onclick/i);
   });
 });

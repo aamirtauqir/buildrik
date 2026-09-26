@@ -174,6 +174,12 @@ describe("CSV import (fix-all round, 2026-09-25)", () => {
       const csv = `Name,Price\n${"a".repeat(5001)},12`;
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
     });
+
+    it("rejects a file whose HEADER cell is over the per-cell length cap, not only data cells (fix round 2)", async () => {
+      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      const csv = `${"a".repeat(5001)},Price\nMargherita,12`;
+      await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
+    });
   });
 
   describe("importCsvEntries", () => {
@@ -264,7 +270,7 @@ describe("generateDynamicPages", () => {
   });
 });
 
-describe("generateDynamicPages — dangerous-scheme sink defence (controller review round 1)", () => {
+describe("generateDynamicPages — dangerous-scheme sink defence (controller review round 1 + 2)", () => {
   const TEMPLATE = '<html><head></head><body><a href="{link}">Go</a></body></html>';
 
   it("neutralizes a javascript: value substituted into an href — the published HTML carries no javascript: href", async () => {
@@ -323,6 +329,86 @@ describe("generateDynamicPages — dangerous-scheme sink defence (controller rev
     entFindMany.mockResolvedValueOnce([{ id: "e1", data: storedData }]);
     const pages = await generateDynamicPages("s1", "c1", TEMPLATE);
     expect(pages[0].content).not.toContain("javascript:");
+  });
+});
+
+describe("generateDynamicPages — the four live bypass shapes of round 1's regex detector (controller review round 2)", () => {
+  it("bypass 1 — unquoted href attribute", async () => {
+    const template = '<html><head></head><body><a href={link}>Go</a></body></html>';
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
+    const out = await generateDynamicPages("s1", "c1", template);
+    expect(out[0].content).not.toMatch(/javascript:/i);
+  });
+
+  it("bypass 2 — a dangerous URL in a later (non-first) srcset candidate", async () => {
+    const template = '<html><head></head><body><img srcset="{safe} 1x, {unsafe} 2x"></body></html>';
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { safe: "/safe.jpg", unsafe: "javascript:alert(1)", n: "x" } }]);
+    const out = await generateDynamicPages("s1", "c1", template);
+    expect(out[0].content).not.toMatch(/javascript:/i);
+    expect(out[0].content).toContain("/safe.jpg"); // the safe candidate survives — the whole attribute isn't blanked
+  });
+
+  it("bypass 3 — style attribute background: url() with a dangerous scheme", async () => {
+    const template = '<html><head></head><body><div style="background:url({link})">x</div></body></html>';
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
+    const out = await generateDynamicPages("s1", "c1", template);
+    expect(out[0].content).not.toMatch(/javascript:/i);
+  });
+
+  it("bypass 4 — uppercase HREF attribute name", async () => {
+    const template = '<html><head></head><body><a HREF="{link}">Go</a></body></html>';
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
+    const out = await generateDynamicPages("s1", "c1", template);
+    expect(out[0].content).not.toMatch(/javascript:/i);
+  });
+});
+
+describe("generateDynamicPages — legitimate template markup survives the parser-based sink (controller review round 2)", () => {
+  // No literal "stock/seeded template" fixture set exists in this repo for
+  // CMS dynamic pages (checked: packages/editor/src/templates/ holds
+  // SaveTemplate.tsx, not page markup). This is representative of what
+  // ExportEngine actually emits for a real page (verified against
+  // ExportEngine.ts: DOCTYPE + <html lang>, every attribute quoted, `<style>`
+  // for embedded CSS) — ranging over the element kinds a CMS template page
+  // plausibly contains: nav links, an image with srcset, a form with
+  // formaction, an SVG icon (`<use xlink:href>`), an external link with
+  // target/rel, an inline style with url(), and an entity in text content.
+  // `<title>`/meta-description are deliberately left out of the fixture —
+  // `stripExistingSeoTags` + the SEO-tag injection this function already
+  // does to those two (A17, tested elsewhere) would make a byte-equality
+  // assertion about THIS test's subject — the sanitizer — fight an unrelated
+  // transform, so asserted per-element below instead.
+  const CLEAN_TEMPLATE =
+    '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><style>.hero{color:red}</style></head>' +
+    '<body class="page"><header><nav><a href="/about">About</a><a href="https://x.com/site" target="_blank" rel="noopener">X</a></nav></header>' +
+    '<main><section class="hero"><h1>{title}</h1><img src="/hero.jpg" srcset="/hero.jpg 1x, /hero@2x.jpg 2x" alt="Hero" loading="lazy">' +
+    '<svg class="icon"><use xlink:href="#arrow"></use></svg>' +
+    '<form action="/subscribe"><input type="email" name="email" required=""><button formaction="/subscribe/alt" type="submit">Go</button></form>' +
+    '<div style="background:url(/bg.jpg);color:#111">content</div></section></main>' +
+    "<footer>&copy; 2026</footer></body></html>";
+
+  it("clean, non-dangerous data leaves every real-world element/attribute shape untouched", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{title}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Welcome" } }]);
+    const html = (await generateDynamicPages("s1", "c1", CLEAN_TEMPLATE))[0].content;
+
+    expect(html.startsWith("<!DOCTYPE html>")).toBe(true);
+    expect(html).toContain('<html lang="en">');
+    expect(html).toContain("<style>.hero{color:red}</style>");
+    expect(html).toContain('<h1>Welcome</h1>'); // {title} substituted
+    expect(html).toContain('<a href="/about">About</a>');
+    expect(html).toContain('<a href="https://x.com/site" target="_blank" rel="noopener">X</a>');
+    expect(html).toContain('<img src="/hero.jpg" srcset="/hero.jpg 1x, /hero@2x.jpg 2x" alt="Hero" loading="lazy">');
+    expect(html).toContain('<use xlink:href="#arrow">'); // SVG icon survives (a hook-immune tag/attr in a naive allow-list)
+    expect(html).toContain('<form action="/subscribe">');
+    expect(html).toContain('<input type="email" name="email" required="">');
+    expect(html).toContain('formaction="/subscribe/alt"'); // formaction survives on a real <input>/<button>, not just named-and-checked
+    expect(html).toContain('style="background:url(/bg.jpg);color:#111"'); // a SAFE style url() is untouched
+    expect(html).toContain("© 2026"); // the entity round-trips as its character, same as the pre-existing escapeHtml/HTML-parsing behavior elsewhere in this file
   });
 });
 

@@ -1,7 +1,7 @@
 import DOMPurify from "isomorphic-dompurify";
 import { prisma } from "@/lib/prisma";
 import { parseCsvText } from "@/lib/csv";
-import { isDangerousUrl } from "@buildrik/shared/schemas/element-markup";
+import { sanitizeGeneratedPageHtml } from "@/lib/sanitize-blocks";
 import type { Prisma } from "@prisma/client";
 import type {
   UpsertCollectionInput,
@@ -171,7 +171,7 @@ function parseAndCapCsv(csv: string): { headers: string[]; dataRows: string[][] 
   if (headers.length > CSV_IMPORT_MAX_COLUMNS) {
     throw new CmsError("BAD_REQUEST", `This file has ${headers.length} columns — the limit is ${CSV_IMPORT_MAX_COLUMNS}.`);
   }
-  for (const row of dataRows) {
+  for (const row of [headers, ...dataRows]) {
     for (const cell of row) {
       if (cell.length > CSV_IMPORT_MAX_CELL_LENGTH) {
         throw new CmsError("BAD_REQUEST", `A cell is longer than ${CSV_IMPORT_MAX_CELL_LENGTH} characters — split this file up.`);
@@ -386,59 +386,23 @@ export async function resolveDynamicPages(
  * yield []. (The editor supplies templateHtml from the page bound to this
  * collection; the deploy of these files is verified at publish time.)
  */
-// URL-bearing attributes: a substituted value that lands here is navigated
-// or loaded by the browser, so entity-escaping it (which only defeats
-// breaking OUT of the attribute) is not enough — a value with no `<`, `>` or
-// `"` at all, like `javascript:alert(1)`, escapes to itself and still runs
-// when the attribute is clicked/loaded. Controller review round 1 (S-1
-// follow-up): reported live as `<a href="{fieldSlug}">` with a CSV-imported
-// `javascript:` value producing exactly that in the published page.
-const URL_ATTR_RE = /\b(href|src|srcset|action|formaction|poster|xlink:href)(\s*=\s*)(["'])((?:(?!\3)[\s\S])*)\3/gi;
-
-function subFieldTokens(segment: string, data: Record<string, unknown>): string {
-  return segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-    const v = data[key];
-    return v == null ? "" : escapeHtml(String(v));
-  });
-}
-
-/**
- * `{fieldSlug}` substitution for one script/style-free segment. Splits the
- * segment further into URL-bearing-attribute-value spans and everything
- * else: ordinary text/attributes get the plain entity-escaped substitution;
- * a URL attribute's value is substituted the same way and then, as a WHOLE,
- * run through the dangerous-scheme check `sanitize-blocks.ts` uses for block
- * attributes — a resolved value that is `javascript:`/`vbscript:`/a
- * non-image `data:` URL becomes empty rather than reaching the published
- * HTML. Applied to every URL attribute in the segment, not only ones that
- * contain a `{field}` token — a static template URL passes through
- * unchanged (it can't match a dangerous scheme), so this costs nothing and
- * doesn't depend on correctly guessing which attributes came from CMS data.
- */
-function subSegment(segment: string, data: Record<string, unknown>): string {
-  let result = "";
-  let last = 0;
-  let m: RegExpExecArray | null;
-  URL_ATTR_RE.lastIndex = 0;
-  while ((m = URL_ATTR_RE.exec(segment))) {
-    const [whole, attrName, eq, quote, rawValue] = m;
-    result += subFieldTokens(segment.slice(last, m.index), data);
-    const resolvedValue = subFieldTokens(rawValue, data);
-    const safeValue = isDangerousUrl(resolvedValue) ? "" : resolvedValue;
-    result += `${attrName}${eq}${quote}${safeValue}${quote}`;
-    last = m.index + whole.length;
-    URL_ATTR_RE.lastIndex = last;
-  }
-  result += subFieldTokens(segment.slice(last), data);
-  return result;
-}
-
 // A17: substitution must not reach inside <script>/<style> — a field value
 // containing e.g. `{` could otherwise land inside inline JS/CSS unescaped
 // and unexpected (the surrounding markup is HTML-escaped by design;
 // script/style content is not HTML). Splits the template into
 // script/style spans and the rest, substitutes only the rest, and
 // reassembles in order.
+//
+// Controller review round 1 found this entity-escaped substitution alone
+// isn't enough for a URL-bearing attribute (`<a href="{fieldSlug}">` with a
+// `javascript:` value survives entity-escaping — it has no `<`, `>` or `"`
+// to escape). Round 1's fix was a regex "is this substitution inside a URL
+// attribute" detector; round 2 found that detector bypassable (unquoted
+// attributes, a non-first `srcset` candidate, `style="url(...)"`, and case
+// all need real parsing to resolve correctly). BINDING RULING: stop
+// detecting HTML context with regex here — this function goes back to plain
+// entity-escaped substitution, and `generateDynamicPages` runs the whole
+// resulting page through `sanitizeGeneratedPageHtml` (a real parser) below.
 function substituteOutsideScriptStyle(
   html: string,
   data: Record<string, unknown>,
@@ -447,12 +411,17 @@ function substituteOutsideScriptStyle(
   let result = "";
   let last = 0;
   let m: RegExpExecArray | null;
+  const sub = (segment: string) =>
+    segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
+      const v = data[key];
+      return v == null ? "" : escapeHtml(String(v));
+    });
   while ((m = spanRe.exec(html))) {
-    result += subSegment(html.slice(last, m.index), data);
+    result += sub(html.slice(last, m.index));
     result += m[0]; // script/style span verbatim — never substituted
     last = spanRe.lastIndex;
   }
-  result += subSegment(html.slice(last), data);
+  result += sub(html.slice(last));
   return result;
 }
 
@@ -494,6 +463,10 @@ export async function generateDynamicPages(
       `<title>${escapeHtml(seoTitle)}</title>` +
       (seoDescription ? `<meta name="description" content="${escapeHtml(seoDescription)}">` : "");
     html = html.includes("</head>") ? html.replace("</head>", `${seoTags}</head>`) : seoTags + html;
+    // Controller review round 2: the sink defense against a dangerous URL a
+    // substitution introduced runs here, over the FINAL page, through a real
+    // parser — not as a step of the substitution above.
+    html = sanitizeGeneratedPageHtml(html);
     const cleanSlug = slug.replace(/^\/+|\/+$/g, "") || "index";
     return { path: `${cleanSlug}/index.html`, content: html };
   });

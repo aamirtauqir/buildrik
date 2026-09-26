@@ -30,7 +30,7 @@
  * isomorphic-dompurify and must never reach the client bundle.
  */
 import { randomUUID } from "node:crypto";
-import DOMPurify from "isomorphic-dompurify";
+import DOMPurify, { type UponSanitizeElementHook, type UponSanitizeAttributeHook } from "isomorphic-dompurify";
 import {
   FORBIDDEN_ATTRIBUTES,
   URL_ATTRIBUTES,
@@ -262,4 +262,131 @@ export function sanitizeVersionPayload<T>(payload: T, onChange?: OnSanitizeChang
 /** A saved user template's exported page markup. */
 export function sanitizeTemplateHtml(html: string): string {
   return purify(html);
+}
+
+// ── Generated-page HTML sanitizer (controller review round 2) ──────────────
+//
+// A regex "is this substitution inside a URL attribute" detector (round 1's
+// fix) is bypassable: unquoted attributes, a later `srcset` candidate,
+// `style="background:url(...)"`, and case all need real HTML parsing to
+// resolve correctly (verified live — each of those four shapes got through).
+// This runs the WHOLE generated page through DOMPurify (a real parser, so
+// quoting/case/whitespace stop being the caller's problem) instead of
+// pattern-matching context. `isDangerousUrl` and `srcsetUrls` are the same
+// helpers `unsafeAttributeReason` above uses for the blocks tree (SSOT,
+// `@buildrik/shared/schemas/element-markup`) — this function only adds what
+// that one doesn't need: a whole-DOCUMENT pass (not a JSON attribute map), a
+// force-allow-everything hook set (a template's markup is already trusted —
+// this exists only to catch a dangerous URL a SUBSTITUTION introduced, not to
+// re-litigate which tags a page may contain, the way the tag/attribute
+// allowlist does for untrusted stored trees), and keeping a SAFE srcset
+// candidate instead of dropping the whole attribute the way
+// `unsafeAttributeReason` does (round 2's own test asserts the safe candidate
+// survives).
+
+const STYLE_URL_RE = /url\(\s*(['"]?)([^'")]*)\1\s*\)/gi;
+
+/** Each `srcset` candidate is `<url> [descriptor]`; a dangerous URL can sit
+ *  in any candidate, not just the first. Reuses `srcsetUrls`'s descriptor
+ *  stripping (called per-candidate, so a single dangerous entry doesn't cost
+ *  the safe ones their descriptors) rather than a second regex for the same
+ *  shape. */
+function sanitizeSrcsetValue(value: string): string {
+  return value
+    .split(",")
+    .map((candidate) => candidate.trim())
+    .filter((candidate) => {
+      if (!candidate) return false;
+      const [url] = srcsetUrls(candidate);
+      return url !== undefined && !isDangerousUrl(url);
+    })
+    .join(", ");
+}
+
+/** `background: url(javascript:...)` doesn't run in current browsers, but a
+ *  parser-based check is cheap here and the controller asked for it as
+ *  explicit defense-in-depth — drop the WHOLE style value rather than try to
+ *  surgically edit one url() out of a longer declaration list (unlike
+ *  `isSafeCssDeclaration`, which drops one declaration from a structured
+ *  styles object: this is a raw `style="…"` ATTRIBUTE STRING from rendered
+ *  HTML, and reconstructing it declaration-by-declaration risks reformatting
+ *  values that were never unsafe). */
+function styleHasDangerousUrl(value: string): boolean {
+  STYLE_URL_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = STYLE_URL_RE.exec(value))) {
+    if (isDangerousUrl(m[2])) return true;
+  }
+  return false;
+}
+
+// `<script>`/`<style>` content is raw text a browser never parses as HTML —
+// but DOMPurify's underlying parser can still misparse a `<`-containing JS/CSS
+// string INSIDE one (e.g. `var s = "<b>";`) and drop the whole element. Their
+// content is never CMS-influenced (the substitution step that runs before
+// this already excludes script/style spans), so there's nothing to sanitize
+// inside them — swap each span for a `<style>` placeholder (valid in both
+// <head> and <body>, so it can't be foster-parented to the wrong place the
+// way a bare text placeholder would be) before sanitizing, then restore the
+// original span verbatim afterward.
+const SCRIPT_STYLE_SPAN_RE = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
+const SPAN_PLACEHOLDER = (i: number) => `<style>/*BD_DYNPAGE_SPAN_${i}*/</style>`;
+const SPAN_PLACEHOLDER_RE = /<style>\/\*BD_DYNPAGE_SPAN_(\d+)\*\/<\/style>/g;
+
+/**
+ * Sanitize a fully-substituted CMS dynamic-page HTML document. Every
+ * tag/attribute NAME is force-allowed (the template's own markup is already
+ * trusted — sanitized at the S-1 write boundary when it was saved — this
+ * pass exists only to catch a dangerous URL a template substitution
+ * introduced, never to re-litigate which tags a page may contain); `on*`
+ * event-handler attributes are the one exception, left to DOMPurify's
+ * default stripping. A URL-bearing attribute (`URL_ATTRIBUTES` — href/src/
+ * action/formaction/poster/xlink:href), each `srcset` candidate, and a
+ * `style` value containing a dangerous `url()` are checked with
+ * `isDangerousUrl` and blanked if unsafe. DOCTYPE is preserved manually —
+ * DOMPurify's WHOLE_DOCUMENT mode drops it.
+ */
+export function sanitizeGeneratedPageHtml(html: string): string {
+  const spans: string[] = [];
+  const withPlaceholders = html.replace(SCRIPT_STYLE_SPAN_RE, (match) => {
+    const token = SPAN_PLACEHOLDER(spans.length);
+    spans.push(match);
+    return token;
+  });
+
+  const doctypeMatch = withPlaceholders.match(/^\s*<!DOCTYPE[^>]*>/i);
+  const doctype = doctypeMatch ? doctypeMatch[0] : "";
+  const body = doctypeMatch ? withPlaceholders.slice(doctypeMatch[0].length) : withPlaceholders;
+
+  const elementHook: UponSanitizeElementHook = (_currentNode, data) => {
+    data.allowedTags[data.tagName] = true;
+  };
+  const attributeHook: UponSanitizeAttributeHook = (_currentNode, data) => {
+    const name = data.attrName.toLowerCase();
+    if (EVENT_HANDLER_ATTR.test(name)) return; // defense-in-depth: keep DOMPurify's default strip
+    data.allowedAttributes[name] = true;
+    if (name === "srcset") {
+      data.attrValue = sanitizeSrcsetValue(data.attrValue);
+    } else if (name === "style") {
+      if (styleHasDangerousUrl(data.attrValue)) data.attrValue = "";
+    } else if (URL_ATTRIBUTES.has(name) && isDangerousUrl(data.attrValue)) {
+      data.attrValue = "";
+    }
+  };
+
+  DOMPurify.addHook("uponSanitizeElement", elementHook);
+  DOMPurify.addHook("uponSanitizeAttribute", attributeHook);
+  let sanitized: string;
+  try {
+    sanitized = String(DOMPurify.sanitize(body, { WHOLE_DOCUMENT: true }));
+  } finally {
+    DOMPurify.removeHook("uponSanitizeElement");
+    DOMPurify.removeHook("uponSanitizeAttribute");
+  }
+
+  const restored = (doctype ? `${doctype}${sanitized}` : sanitized).replace(SPAN_PLACEHOLDER_RE, (_m, i: string) => {
+    const span = spans[Number(i)];
+    return span ?? "";
+  });
+  return restored;
 }
