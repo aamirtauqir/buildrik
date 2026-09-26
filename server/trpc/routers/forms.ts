@@ -71,10 +71,24 @@ export const formsRouter = router({
       await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
       // Who a form's submissions get emailed to is a data-exfil surface —
       // same precedent as the outbound-webhook gate (account.ts
-      // integrations.add): changing it needs ADMIN. Every other AFTER
+      // integrations.add): CHANGING it needs ADMIN. Every other AFTER
       // SUBMIT / PROTECTION field stays EDITOR-writable via the guard above.
+      //
+      // Gated on an actual diff against the stored row, not on the field's
+      // mere presence in the payload — the inspector saves on every blur
+      // (fix round 2, finding 1), so an EDITOR tabbing through the field
+      // untouched, or saving a different linked field that happens to
+      // bundle notifyEmail, would otherwise hit a FORBIDDEN for a no-op
+      // write. "" and null both mean "unset".
       if (input.notifyEmail !== undefined) {
-        await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
+        const existing = await ctx.prisma.formBlock.findUnique({
+          where: { id: input.blockId },
+          select: { notifyEmail: true },
+        });
+        const normalize = (v: string | null | undefined) => v || "";
+        if (normalize(existing?.notifyEmail) !== normalize(input.notifyEmail)) {
+          await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
+        }
       }
       try {
         return await updateFormBlock(input);

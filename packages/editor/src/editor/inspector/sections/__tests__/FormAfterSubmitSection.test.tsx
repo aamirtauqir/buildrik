@@ -108,6 +108,19 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     ));
   });
 
+  it("Fix round 2 (finding 1): blurring a field without changing it saves nothing", async () => {
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Notification email"));
+    // Tabbing through the field — focus then blur, no typing — must not
+    // trigger a write. An EDITOR would otherwise hit a FORBIDDEN for the
+    // notify-email field having never touched it.
+    fireEvent.blur(screen.getByLabelText("Notification email"));
+    fireEvent.blur(screen.getByLabelText("Success message"));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
+    expect(screen.queryByText(/Only workspace Admins/)).not.toBeInTheDocument();
+  });
+
   it("saves the notify email on blur", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Notification email"));

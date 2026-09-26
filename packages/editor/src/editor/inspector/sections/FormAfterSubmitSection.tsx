@@ -60,6 +60,14 @@ function isForbidden(e: unknown): boolean {
   return e instanceof Error && (e as { data?: { code?: string } }).data?.code === "FORBIDDEN";
 }
 
+/** "" and null both mean "unset" — a blur that didn't change anything must
+ *  look identical to one that did, regardless of which of the two the
+ *  server/local state happens to be holding. */
+function valuesEqual(a: unknown, b: unknown): boolean {
+  const normalize = (v: unknown) => (v === null || v === undefined || v === "" ? "" : v);
+  return normalize(a) === normalize(b);
+}
+
 export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
   elementId,
   composer,
@@ -100,6 +108,16 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
 
   const save = (patch: Partial<Settings>) => {
     if (!projectId || !settings) return;
+
+    // A blur that didn't actually change the field (an EDITOR tabbing
+    // through, or re-blurring an already-saved value) must not fire a
+    // write — for `notifyEmail` specifically, an EDITOR would otherwise
+    // hit a server FORBIDDEN having never touched the value.
+    const changed = Object.entries(patch).some(
+      ([k, v]) => !valuesEqual(v, settings[k as keyof Settings]),
+    );
+    if (!changed) return;
+
     const prev = settings;
     const next = { ...settings, ...patch };
     setSettings(next);
