@@ -509,7 +509,8 @@ export async function generateDynamicPages(
  * with no page-generating collection gets its pages back unchanged, so existing
  * publishes are untouched. For each collection that has both a slug pattern and a
  * pageTemplatePath present in the payload, it renders one page per entry from
- * that template and appends them. Called by startPublish before the job persists.
+ * that template and appends them, and the template page itself leaves the set
+ * (see below). Called by startPublish before the job persists.
  */
 export async function appendDynamicPagesToPublish(
   siteId: string,
@@ -520,7 +521,17 @@ export async function appendDynamicPagesToPublish(
     select: { id: true, pageTemplatePath: true },
   });
   if (cols.length === 0) return pages;
-  const result = [...pages];
+  /* A bound template page is a blueprint, not a page. The exporter writes a
+     binding to "the record on this page" as the `{fieldSlug}` token this
+     step fills per record (CMSExportResolver), so the template's own HTML is
+     full of placeholders — published as-is it shipped `<h1>{title}</h1>`
+     beside the pages it generated (A-17, walked live). It is replaced by what
+     it generates, even when that is nothing yet. The home page is the one
+     exception: dropping index.html would leave the site root empty. */
+  const templatePaths = new Set(
+    cols.map((c) => c.pageTemplatePath).filter((path): path is string => !!path && path !== "index.html"),
+  );
+  const result = pages.filter((p) => !templatePaths.has(p.path));
   for (const col of cols) {
     const template = pages.find((p) => p.path === col.pageTemplatePath);
     if (!template) {

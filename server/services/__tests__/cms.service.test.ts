@@ -469,9 +469,34 @@ describe("appendDynamicPagesToPublish", () => {
       { path: "blog/_t/index.html", html: "<html><head></head><body>{title}</body></html>" },
     ];
     const out = await appendDynamicPagesToPublish("s1", pages);
-    expect(out).toHaveLength(3); // 2 original + 1 generated
-    expect(out[2]).toMatchObject({ path: "blog/hello-world/index.html" });
-    expect(out[2].html).toContain("<body>Hello World</body>");
+    /* The template page is a blueprint, not a page: it carries the `{title}`
+       tokens the worker fills per record (CMSExportResolver writes them), so
+       published as-is it shipped `<h1>{title}</h1>` — A-17 live, about.html
+       next to blog/verify-post-1/index.html. It is replaced by what it
+       generates. */
+    expect(out.map((p) => p.path)).toEqual(["index.html", "blog/hello-world/index.html"]);
+    expect(out[1].html).toContain("<body>Hello World</body>");
+  });
+
+  it("drops the template page even when the collection has no published entry yet", async () => {
+    colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "about.html" }]);
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([]);
+    const pages = [
+      { path: "index.html", html: "<html></html>" },
+      { path: "about.html", html: "<html><body><h1>{title}</h1></body></html>" },
+    ];
+    const out = await appendDynamicPagesToPublish("s1", pages);
+    expect(out.map((p) => p.path)).toEqual(["index.html"]);
+  });
+
+  it("keeps a home page used as a template — the site root cannot be dropped", async () => {
+    colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "index.html" }]);
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "A" } }]);
+    const pages = [{ path: "index.html", html: "<html><head></head><body>{title}</body></html>" }];
+    const out = await appendDynamicPagesToPublish("s1", pages);
+    expect(out.map((p) => p.path)).toEqual(["index.html", "blog/a/index.html"]);
   });
 
   it("A-17: skips (never throws) and logs when the bound template page is not in this publish", async () => {
