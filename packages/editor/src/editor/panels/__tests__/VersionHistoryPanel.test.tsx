@@ -379,3 +379,68 @@ describe("VersionHistoryPanel — load error", () => {
     expect(mocks.retryLoad).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("VersionHistoryPanel — FC-9 (fix-all 2026-09-25): readOnly disables writes", () => {
+  beforeEach(() => {
+    // The "load error" suite above sets these and the shared beforeEach does
+    // not reset them — without this every test here inherits its error state.
+    mocks.state.loadError = false;
+    mocks.state.isLoading = false;
+  });
+
+  it("readOnly: row Restore/Delete are aria-disabled with a reason and never call the mutation", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} readOnly />);
+
+    openSaveMenu("Save A");
+    const restoreItem = screen.getByLabelText('Restore "Save A"');
+    expect(restoreItem).toHaveAttribute("aria-disabled", "true");
+    expect(restoreItem).toHaveAttribute("title", "Viewers can't restore — ask an editor");
+    fireEvent.click(restoreItem);
+    expect(mocks.restoreVersion).not.toHaveBeenCalled();
+    // The inline confirm never appears behind the disabled item.
+    expect(screen.queryByText(/to the draft\?/)).toBeNull();
+
+    const deleteItem = screen.getByLabelText('Delete "Save A"');
+    expect(deleteItem).toHaveAttribute("aria-disabled", "true");
+    expect(deleteItem).toHaveAttribute("title", "Viewers can't delete — ask an editor");
+    fireEvent.click(deleteItem);
+    expect(mocks.deleteVersion).not.toHaveBeenCalled();
+  });
+
+  it("not readOnly (default): row Restore/Delete stay enabled", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} />);
+
+    openSaveMenu("Save A");
+    expect(screen.getByLabelText('Restore "Save A"')).not.toHaveAttribute("aria-disabled");
+    expect(screen.getByLabelText('Delete "Save A"')).not.toHaveAttribute("aria-disabled");
+  });
+
+  it("readOnly: 'Restore this save…' in the details modal is aria-disabled and calls nothing", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} readOnly />);
+
+    openSaveMenu("Save A");
+    fireEvent.click(screen.getByRole("menuitem", { name: "View details" }));
+    const restoreThis = await screen.findByRole("button", { name: "Restore this save…" });
+    expect(restoreThis).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(restoreThis);
+    expect(mocks.restoreVersion).not.toHaveBeenCalled();
+  });
+
+  it("readOnly: '+ Save a version' is aria-disabled with a reason", async () => {
+    mocks.state.versions = [];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} readOnly />);
+
+    const save = screen.getByTestId("saves-save-version");
+    expect(save).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(save);
+    // No save-version modal opens behind the disabled control.
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+});
