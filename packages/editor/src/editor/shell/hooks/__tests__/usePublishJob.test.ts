@@ -303,20 +303,51 @@ describe("usePublishJob", () => {
       await flushMicrotasks();
       // Failure 1 of 3 — no error surfaced yet, polling keeps going.
       expect(result.current.error).toBeNull();
+      expect(result.current.uiState).toBe("publishing");
       expect(mockFetchStatus).toHaveBeenCalledTimes(1);
 
       await advance(2000);
       // Failure 2 of 3 — still no error.
       expect(result.current.error).toBeNull();
+      expect(result.current.uiState).toBe("publishing");
       expect(mockFetchStatus).toHaveBeenCalledTimes(2);
 
       await advance(2000);
-      // Failure 3 of 3 — now surfaces and stops.
+      // Failure 3 of 3 — now surfaces and stops. B-2: jobId stays set (the
+      // job never reached a terminal status on its own) so uiState MUST fold
+      // the lost poll in as "failed" — otherwise the panel spins forever with
+      // no retry, which is the bug this test pins.
       expect(result.current.error).toBe("network down");
+      expect(result.current.uiState).toBe("failed");
       expect(mockFetchStatus).toHaveBeenCalledTimes(3);
 
       await advance(10000);
       expect(mockFetchStatus).toHaveBeenCalledTimes(3);
+    });
+
+    it("track() resumes polling and clears the poll-lost failed state on success", async () => {
+      mockFetchStatus.mockRejectedValue(new Error("network down"));
+
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+      await advance(2000);
+      await advance(2000);
+      expect(result.current.uiState).toBe("failed");
+      const lostJobId = result.current.jobId;
+      expect(lostJobId).not.toBeNull();
+
+      // The panel's "Check status" retry resumes tracking the SAME job.
+      mockFetchStatus.mockReset();
+      mockFetchStatus.mockResolvedValue(statusOf("COMPLETED", { jobId: lostJobId! }));
+
+      act(() => result.current.track(lostJobId!));
+      await flushMicrotasks();
+
+      expect(result.current.uiState).toBe("published");
+      expect(result.current.error).toBeNull();
     });
 
     it("a single dropped poll does not stop polling", async () => {

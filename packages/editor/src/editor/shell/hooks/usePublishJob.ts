@@ -125,6 +125,12 @@ export interface UsePublishJobResult {
    *  last job's URL and the hydrated live state so the topbar and panel stop
    *  saying live — the shell's `publishedUrl` is derived from both. */
   unpublished: () => void;
+  /** True when `uiState === "failed"` because polling was lost (network,
+   *  not the job itself) rather than the job reaching a real FAILED status.
+   *  The job may still be running server-side — the recovery is "Check
+   *  status" (`track(jobId)`, resumes polling the SAME job), not a fresh
+   *  publish. */
+  pollLost: boolean;
 }
 
 export function usePublishJob(): UsePublishJobResult {
@@ -152,6 +158,12 @@ export function usePublishJob(): UsePublishJobResult {
   // last-known status was never terminal.
   const pollFailCountRef = React.useRef(0);
   const pollLostRef = React.useRef(false);
+  // Mirrors pollLostRef into state so `uiState` (a plain derivation, not an
+  // effect) actually re-renders on poll-loss — a ref alone is invisible to
+  // callers until something else happens to re-render. Without this, jobId
+  // stays set and status never reaches a terminal value, so uiState computed
+  // "publishing" forever: no failed state, no retry, an infinite spinner.
+  const [pollLost, setPollLost] = React.useState(false);
   // Mirror status into a ref so publish()'s re-entrancy guard can read latest
   // status without rotating useCallback identity per poll tick.
   const statusRef = React.useRef<PublishStatus | null>(null);
@@ -187,6 +199,7 @@ export function usePublishJob(): UsePublishJobResult {
       setError(msg);
       stopPolling();
       pollLostRef.current = true;
+      setPollLost(true);
     }
   }, [stopPolling]);
 
@@ -195,6 +208,7 @@ export function usePublishJob(): UsePublishJobResult {
     abortRef.current = false;
     pollFailCountRef.current = 0;
     pollLostRef.current = false;
+    setPollLost(false);
     // Immediate first poll, then interval.
     void tick(id);
     pollTimer.current = setInterval(() => void tick(id), POLL_INTERVAL_MS);
@@ -278,6 +292,7 @@ export function usePublishJob(): UsePublishJobResult {
     setStatus(null);
     setError(null);
     setBlockedReason(null);
+    setPollLost(false);
   }, [stopPolling]);
 
   // Cleanup on unmount.
@@ -332,8 +347,15 @@ export function usePublishJob(): UsePublishJobResult {
     `error` is only otherwise set from a poll or a cancel, and both of those
     have a `jobId`, so this branch is reached only by a pre-job failure.
   */
+  // B-2: a job whose polling was lost (MAX_CONSECUTIVE_POLL_FAILURES) never
+  // reaches a terminal status on its own — jobId stays set with a
+  // "publishing"-shaped status forever. Fold that into "failed" so the
+  // panel's existing failed-state UI (retry included) picks it up instead of
+  // spinning indefinitely with no way out.
   const uiState: PublishUiState = jobId
-    ? status?.status === "COMPLETED"
+    ? pollLost
+      ? "failed"
+      : status?.status === "COMPLETED"
       ? "published"
       : status?.status === "FAILED"
         ? "failed"
@@ -370,5 +392,6 @@ export function usePublishJob(): UsePublishJobResult {
     track,
     reset,
     dismissBlock,
+    pollLost,
   };
 }
