@@ -111,10 +111,8 @@ function GoogleAnalyticsConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Tracking ID
-        </label>
         <InputField
+          label="Tracking ID"
           type="text"
           value={values["trackingId"] ?? ""}
           onChange={(e) => onChange("trackingId", e.target.value)}
@@ -156,10 +154,8 @@ function MailchimpConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          API Key
-        </label>
         <InputField
+          label="API Key"
           type="text"
           value={values["apiKey"] ?? ""}
           onChange={(e) => onChange("apiKey", e.target.value)}
@@ -168,10 +164,8 @@ function MailchimpConfig({
         />
       </div>
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Audience ID
-        </label>
         <InputField
+          label="Audience ID"
           type="text"
           value={values["audienceId"] ?? ""}
           onChange={(e) => onChange("audienceId", e.target.value)}
@@ -215,10 +209,8 @@ function ZapierConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Webhook URL
-        </label>
         <InputField
+          label="Webhook URL"
           type="text"
           value={values["webhookUrl"] ?? ""}
           onChange={(e) => onChange("webhookUrl", e.target.value)}
@@ -265,10 +257,8 @@ function SlackConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Webhook URL
-        </label>
         <InputField
+          label="Webhook URL"
           type="text"
           value={values["webhookUrl"] ?? ""}
           onChange={(e) => onChange("webhookUrl", e.target.value)}
@@ -277,10 +267,8 @@ function SlackConfig({
         />
       </div>
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Channel name
-        </label>
         <InputField
+          label="Channel name"
           type="text"
           value={values["channelName"] ?? ""}
           onChange={(e) => onChange("channelName", e.target.value)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, useId } from "react";
 import { cn } from "@lib/utils";
 import { Eye, EyeOff, Mail, Lock, User, type LucideIcon } from "lucide-react";
 import { InlineError } from "./inline-error";
@@ -25,8 +25,10 @@ function defaultIcon(type?: string): LucideIcon | null {
 }
 
 export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
-  ({ label, error, type, icon, hideLabel, invalid, className, ...props }, ref) => {
+  ({ label, error, type, icon, hideLabel, invalid, className, id, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
     const isPassword = type === "password";
     const inputType = isPassword && showPassword ? "text" : type;
     const Icon = icon === undefined ? defaultIcon(type) : icon;
@@ -35,6 +37,7 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
     return (
       <div className="w-full">
         <label
+          htmlFor={inputId}
           className={cn(
             "block text-auth-label text-auth-text-secondary mb-1.5",
             hideLabel && "sr-only"
@@ -54,6 +57,7 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
           )}
           <input
             ref={ref}
+            id={inputId}
             type={inputType}
             suppressHydrationWarning
             className={cn(

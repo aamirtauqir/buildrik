@@ -120,10 +120,8 @@ export default function WorkspaceSettingsPage() {
             }}
           >
             <div className="flex-1">
-              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-                New owner&apos;s email
-              </label>
               <InputField
+                label="New owner's email"
                 type="email"
                 value={transferEmail}
                 onChange={(e) => setTransferEmail(e.target.value)}

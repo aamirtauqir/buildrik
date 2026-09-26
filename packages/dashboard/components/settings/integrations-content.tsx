@@ -295,10 +295,8 @@ export function IntegrationsContent() {
               <div className="space-y-3">
                 {cfg.fields.map((f) => (
                   <div key={f.key}>
-                    <label className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>
-                      {f.label}
-                    </label>
                     <InputField
+                      label={f.label}
                       type="text"
                       value={draftValue(cfg.provider, f.key, existing)}
                       onChange={(e) => setDraft(cfg.provider, f.key, e.target.value)}

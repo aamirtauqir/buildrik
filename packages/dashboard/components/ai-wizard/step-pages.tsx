@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 
 // Module-local — no external consumers. Was exported, but grep across
@@ -43,6 +43,7 @@ export function StepPages({ businessType, suggestedPages, onBack, onGenerate }: 
   const [images, setImages] = useState("");
 
   const allPages = [...new Set(["Home", ...suggestedPages, ...DEFAULT_PAGES])];
+  const descriptionId = useId();
 
   const togglePage = (page: string) => {
     if (page === "Home") return;
@@ -73,8 +74,8 @@ export function StepPages({ businessType, suggestedPages, onBack, onGenerate }: 
 
       {/* Description */}
       <div className="mt-6">
-        <label className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Describe your business (optional)</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} rows={3} className="mt-1 w-full rounded-lg border px-3 py-2 text-body" style={{ borderColor: "var(--color-border-default)" }} placeholder="Describe your business (optional)" />
+        <label htmlFor={descriptionId} className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Describe your business (optional)</label>
+        <textarea id={descriptionId} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} rows={3} className="mt-1 w-full rounded-lg border px-3 py-2 text-body" style={{ borderColor: "var(--color-border-default)" }} placeholder="Describe your business (optional)" />
         <p className="mt-1 text-body-sm text-right" style={{ color: description.length > 450 ? "var(--color-primary)" : "var(--color-text-muted)" }}>{description.length}/500</p>
       </div>
 

@@ -107,8 +107,8 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Link name</label>
                 <InputField
+                  label="Link name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -118,11 +118,8 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
               </div>
 
               <div>
-                <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
-                  Password{" "}
-                  <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>(optional)</span>
-                </label>
                 <InputField
+                  label={<>Password{" "}<span className="font-normal" style={{ color: "var(--color-text-muted)" }}>(optional)</span></>}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

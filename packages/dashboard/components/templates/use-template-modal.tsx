@@ -181,8 +181,8 @@ export function UseTemplateModal(props: UseTemplateModalProps) {
       {/* Step: name the new site (from a template) */}
       {step === "new" && (
         <div>
-          <label className="mb-1.5 block text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Site name</label>
           <InputField
+            label="Site name"
             autoFocus
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}

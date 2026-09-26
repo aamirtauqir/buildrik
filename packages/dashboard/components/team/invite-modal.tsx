@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 import { Button, Modal } from "@/components/dashboard/primitives";
@@ -50,6 +50,8 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
   const [emailsRaw, setEmailsRaw] = useState("");
   const [role, setRole] = useState<RoleValue>("EDITOR");
   const [message, setMessage] = useState("");
+  const emailsId = useId();
+  const messageId = useId();
   const [accessMode, setAccessMode] = useState<SiteAccessMode>("all");
   const [selectedSiteIds, setSelectedSiteIds] = useState<Set<string>>(new Set());
 
@@ -120,10 +122,11 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
       <form id="invite-modal-form" onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
           {/* Email input */}
           <div>
-            <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+            <label htmlFor={emailsId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
               Email addresses
             </label>
             <textarea
+              id={emailsId}
               rows={4}
               value={emailsRaw}
               onChange={(e) => setEmailsRaw(e.target.value)}
@@ -243,13 +246,14 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
 
           {/* Personal message */}
           <div>
-            <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+            <label htmlFor={messageId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
               Personal message{" "}
               <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>
                 (optional)
               </span>
             </label>
             <textarea
+              id={messageId}
               rows={2}
               value={message}
               onChange={(e) => setMessage(e.target.value)}

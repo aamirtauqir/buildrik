@@ -103,8 +103,8 @@ function NewSitePageInner() {
           Choose how you want to get started
         </p>
         <div className="mt-6 text-left">
-          <label className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>Site name</label>
           <InputField
+            label="Site name"
             type="text"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}

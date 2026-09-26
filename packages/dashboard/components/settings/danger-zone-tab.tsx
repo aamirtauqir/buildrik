@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { SectionCard, MetricValue, Button, InputField } from "@/components/dashboard/primitives";
 
 interface PreviousExport {
@@ -62,6 +62,7 @@ export function DangerZoneTab({
 }: DangerZoneTabProps) {
   const [confirmText, setConfirmText] = useState("");
   const [reason, setReason] = useState("");
+  const reasonId = useId();
   const [showDeleteForm, setShowDeleteForm] = useState(false);
 
   // Blocked = a prerequisite (sole ownership / live subscription) isn't cleared.
@@ -219,10 +220,11 @@ export function DangerZoneTab({
         ) : (
           <form onSubmit={handleDelete} className="space-y-4 max-w-sm">
             <div>
-              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              <label htmlFor={reasonId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Reason (optional)
               </label>
               <textarea
+                id={reasonId}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 rows={3}
@@ -234,17 +236,19 @@ export function DangerZoneTab({
             </div>
 
             <div>
-              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-                Type{" "}
-                <code
-                  className="px-1 py-0.5 rounded text-body-sm font-mono"
-                  style={{ backgroundColor: "var(--color-border-default)" }}
-                >
-                  DELETE
-                </code>{" "}
-                to confirm
-              </label>
               <InputField
+                label={
+                  <>
+                    Type{" "}
+                    <code
+                      className="px-1 py-0.5 rounded text-body-sm font-mono"
+                      style={{ backgroundColor: "var(--color-border-default)" }}
+                    >
+                      DELETE
+                    </code>{" "}
+                    to confirm
+                  </>
+                }
                 type="text"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}

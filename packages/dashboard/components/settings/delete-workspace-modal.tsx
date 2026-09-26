@@ -49,10 +49,8 @@ export function DeleteWorkspaceModal({
       </div>
 
       <div className="mt-4">
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Type <span className="font-semibold">{workspaceName}</span> to confirm
-        </label>
         <InputField
+          label={<>Type <span className="font-semibold">{workspaceName}</span> to confirm</>}
           type="text"
           value={confirmText}
           onChange={(e) => setConfirmText(e.target.value)}

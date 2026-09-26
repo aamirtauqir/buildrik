@@ -201,8 +201,8 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Name</label>
             <InputField
+              label="Name"
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}

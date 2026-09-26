@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useId } from "react";
 import { trpc } from "@lib/trpc/client";
 import { Button, InputField, SelectField } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
@@ -70,6 +70,9 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
   const [bio, setBio] = useState(initialData?.bio ?? "");
   const [language, setLanguage] = useState(initialData?.language ?? "en");
   const [timezone, setTimezone] = useState(initialData?.timezone ?? "UTC");
+  const bioId = useId();
+  const languageId = useId();
+  const timezoneId = useId();
   // avatarUrl = the persisted CDN URL we save; preview = transient data URL
   // shown while the upload is in flight.
   const [avatarUrl, setAvatarUrl] = useState<string | null>(initialData?.avatarUrl ?? null);
@@ -183,10 +186,8 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-            Full name
-          </label>
           <InputField
+            label="Full name"
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
@@ -198,10 +199,8 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
         </div>
 
         <div>
-          <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-            Display name
-          </label>
           <InputField
+            label="Display name"
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
@@ -214,10 +213,8 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
       </div>
 
       <div>
-        <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Email
-        </label>
         <InputField
+          label="Email"
           type="email"
           value={initialData?.email ?? ""}
           readOnly
@@ -228,10 +225,11 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
       </div>
 
       <div>
-        <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label htmlFor={bioId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Bio
         </label>
         <textarea
+          id={bioId}
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           rows={3}
@@ -250,10 +248,10 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+          <label htmlFor={languageId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Language
           </label>
-          <SelectField value={language} onChange={(e) => setLanguage(e.target.value)}>
+          <SelectField id={languageId} value={language} onChange={(e) => setLanguage(e.target.value)}>
             {LANGUAGES.map((l) => (
               <option key={l.value} value={l.value}>
                 {l.label}
@@ -266,10 +264,10 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
         </div>
 
         <div>
-          <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+          <label htmlFor={timezoneId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Timezone
           </label>
-          <SelectField value={timezone} onChange={(e) => setTimezone(e.target.value)}>
+          <SelectField id={timezoneId} value={timezone} onChange={(e) => setTimezone(e.target.value)}>
             {TIMEZONES.map((tz) => (
               <option key={tz.value} value={tz.value}>
                 {tz.label}

@@ -145,13 +145,11 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
           ) : (
             <div className="flex flex-wrap items-end gap-2">
               <div className="flex-1 min-w-[140px]">
-                <label className="block text-body-sm font-medium text-[var(--color-text-muted)]">From</label>
-                <InputField value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="font-mono" wrapperClassName="mt-1" />
+                <InputField label="From" value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="font-mono" />
               </div>
               <ArrowRight size={16} className="mb-2 text-neutral-400" />
               <div className="flex-1 min-w-[140px]">
-                <label className="block text-body-sm font-medium text-[var(--color-text-muted)]">To</label>
-                <InputField value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="font-mono" wrapperClassName="mt-1" />
+                <InputField label="To" value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="font-mono" />
               </div>
               {/* Named: the two option values are the only text near it, so a
                   screen reader announced "combo box" with no idea it chose the
