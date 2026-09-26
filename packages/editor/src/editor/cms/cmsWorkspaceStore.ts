@@ -23,10 +23,13 @@ export interface CmsWorkspaceState {
 }
 
 /** `ui:cms-open` (EVENTS.UI_CMS_OPEN) — open a collection's table, and with
- *  `recordId` its side sheet on that record (⌘K jumps here). */
+ *  `recordId` its side sheet on that record (⌘K jumps here). `tab` lands on
+ *  a specific tab instead of records (FC-1: Pages' "+N from collections"
+ *  row opens straight to Dynamic pages). */
 export interface CmsOpenRequest {
   collectionId: string;
   recordId?: string;
+  tab?: CmsTab;
 }
 
 const INITIAL: CmsWorkspaceState = { collectionId: null, tab: "records", recordId: null };
@@ -46,8 +49,8 @@ export const cmsWorkspace = {
   setTab: (tab: CmsTab): void => set({ ...state, tab, recordId: null }),
   openRecord: (recordId: string | null): void => set({ ...state, tab: "records", recordId }),
   /** One write for both, so the table never renders a frame without its sheet. */
-  openRequest: ({ collectionId, recordId }: CmsOpenRequest): void =>
-    set({ collectionId, tab: "records", recordId: recordId ?? null }),
+  openRequest: ({ collectionId, recordId, tab }: CmsOpenRequest): void =>
+    set({ collectionId, tab: tab ?? "records", recordId: recordId ?? null }),
   reset: (): void => set(INITIAL),
   subscribe: (l: () => void): (() => void) => {
     listeners.add(l);

@@ -28,9 +28,10 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import type { HistoryDisplayEntry } from "@/engine/HistoryManager";
-import { Button, Portal } from "@/editor/chrome-ui";
+import { Button, Portal, Tooltip } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { renderProjectPages } from "./exportPublishPages";
+import { useEditorRole } from "./hooks/useEditorRole";
 
 type Frame = { status: "live" } | { status: "loading" } | { status: "ready"; html: string } | { status: "none" };
 
@@ -57,6 +58,9 @@ function measure() {
 }
 
 export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ composer }) => {
+  /* FC-9 (fix-all 2026-09-25): Time-Travel opens from History's own ⋯ menu,
+     so a viewer can still scrub and preview — only Restore is a write. */
+  const isViewer = useEditorRole() === "VIEWER";
   const [active, setActive] = React.useState(false);
   const [entries, setEntries] = React.useState<HistoryDisplayEntry[]>([]);
   const [index, setIndex] = React.useState(0);
@@ -272,15 +276,29 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
         <Button color="light" size="xs" className={BAND_BTN} onClick={exit} data-testid="tt-exit">
           Exit
         </Button>
-        <Button
-          size="xs"
-          className={`${BAND_BTN} tw:bg-[var(--bk-ink)] tw:text-white tw:hover:bg-[var(--bk-ink)]`}
-          disabled={index >= newest}
-          onClick={() => setConfirming(true)}
-          data-testid="tt-restore"
-        >
-          Restore…
-        </Button>
+        {isViewer ? (
+          <Tooltip content="Viewers can't restore — ask an editor" placement="top" arrow={false}>
+            <Button
+              size="xs"
+              className={`${BAND_BTN} tw:bg-[var(--bk-ink)] tw:text-white tw:hover:bg-[var(--bk-ink)]`}
+              aria-disabled="true"
+              onClick={() => {}}
+              data-testid="tt-restore"
+            >
+              Restore…
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button
+            size="xs"
+            className={`${BAND_BTN} tw:bg-[var(--bk-ink)] tw:text-white tw:hover:bg-[var(--bk-ink)]`}
+            disabled={index >= newest}
+            onClick={() => setConfirming(true)}
+            data-testid="tt-restore"
+          >
+            Restore…
+          </Button>
+        )}
       </div>
       {confirming && entry ? (
         /* 4418:76095 draws this at the top of the History panel; it sits

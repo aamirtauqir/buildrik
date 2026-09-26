@@ -48,6 +48,7 @@ import {
   Spinner,
   Textarea,
   Toolbar,
+  Tooltip,
   useToast,
 } from "@/editor/chrome-ui";
 import { SendForReview } from "@/editor/shell/SendForReview";
@@ -430,7 +431,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               current link), 4418:120059 after a revoke. */}
           {onResend ? (
             <MenuItem
-              disabled={resending}
+              disabled={resending || isViewer}
+              title={isViewer ? "Viewers can't resend the review link — ask an editor" : undefined}
               onClick={() => {
                 setRoundMenuOpen(false);
                 setConfirmResend(true);
@@ -447,6 +449,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           {!round.revoked ? (
             <MenuItem
               danger
+              disabled={isViewer}
+              title={isViewer ? "Viewers can't revoke the review link — ask an editor" : undefined}
               onClick={() => {
                 setRoundMenuOpen(false);
                 setConfirmRevoke(true);
@@ -695,11 +699,28 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     return `${pageName(c.pageId)} · ${shortAge(c.createdAt)}`;
   };
 
-  const resolveButton = (c: ReviewComment) => (
-    <Button color="light" size="xs" onClick={() => void onResolve(c)} className={GHOST}>
-      {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
-    </Button>
-  );
+  /* FC-9 (fix-all 2026-09-25): viewers open Review read-only — server authz
+     already refuses the resolveReviewComment mutation for a VIEWER, this is
+     the chrome not offering a control it cannot honor. Same aria-disabled +
+     Tooltip shape as SendForReview's disabledReason, so the reason stays
+     reachable by keyboard (native `disabled` would hide it). */
+  const resolveButton = (c: ReviewComment) => {
+    const label = c.status === "RESOLVED" ? "Reopen" : "Resolve";
+    if (isViewer) {
+      return (
+        <Tooltip content="Viewers can't resolve comments — ask an editor" placement="top" arrow={false}>
+          <Button color="light" size="xs" aria-disabled="true" onClick={() => {}} className={GHOST}>
+            {label}
+          </Button>
+        </Tooltip>
+      );
+    }
+    return (
+      <Button color="light" size="xs" onClick={() => void onResolve(c)} className={GHOST}>
+        {label}
+      </Button>
+    );
+  };
 
   const row = (
     c: ReviewComment,
@@ -955,20 +976,28 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                 detachedNote: "element deleted",
                 footer: (
                   <>
-                    <Button
-                      color="light"
-                      size="xs"
-                      onClick={() => {
-                        /* The list is the comment's page, and the registry
-                           holds the active page only — so go there first. */
-                        const active = composer?.elements.getActivePage()?.id;
-                        if (composer && c.pageId && c.pageId !== active) composer.elements.setActivePage(c.pageId);
-                        setReattaching(c);
-                      }}
-                      className={GHOST}
-                    >
-                      Reattach comment
-                    </Button>
+                    {isViewer ? (
+                      <Tooltip content="Viewers can't reattach comments — ask an editor" placement="top" arrow={false}>
+                        <Button color="light" size="xs" aria-disabled="true" onClick={() => {}} className={GHOST}>
+                          Reattach comment
+                        </Button>
+                      </Tooltip>
+                    ) : (
+                      <Button
+                        color="light"
+                        size="xs"
+                        onClick={() => {
+                          /* The list is the comment's page, and the registry
+                             holds the active page only — so go there first. */
+                          const active = composer?.elements.getActivePage()?.id;
+                          if (composer && c.pageId && c.pageId !== active) composer.elements.setActivePage(c.pageId);
+                          setReattaching(c);
+                        }}
+                        className={GHOST}
+                      >
+                        Reattach comment
+                      </Button>
+                    )}
                     {resolveButton(c)}
                   </>
                 ),
@@ -1040,8 +1069,12 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           /* Board 4418:115784: the composer is a page comment — the page it
              lands on is named under it. It stays team-only (the client's
              review page lists only the client's own notes), so the board's
-             "Shared" is not claimed; designer note logged. */
-          placeholder={`Comment on ${pageName(activePage ?? null)}…`}
+             "Shared" is not claimed; designer note logged.
+             FC-9 (fix-all 2026-09-25): a viewer's textarea stays disabled —
+             the placeholder itself is the reason, since a disabled textarea
+             cannot carry a hover tooltip. */
+          placeholder={isViewer ? "Viewers can't comment — ask an editor" : `Comment on ${pageName(activePage ?? null)}…`}
+          disabled={isViewer}
           rows={2}
           maxLength={2000}
         />
@@ -1057,7 +1090,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             /* Board 4418:115784: Send is the blue primary — disabled is the
                same blue, dimmed, not the grey the theme gives. */
             className="tw:disabled:bg-[var(--bk-accent)] tw:disabled:text-[var(--bk-accent-on)] tw:disabled:opacity-50"
-            disabled={!draft.trim() || sending}
+            disabled={!draft.trim() || sending || isViewer}
             onClick={() => void send()}
             aria-busy={sending || undefined}
           >

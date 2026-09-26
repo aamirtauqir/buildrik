@@ -54,8 +54,17 @@ import { ViewerRoleNotice } from "./ViewerRoleNotice";
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
 /** Panels that take the inspector's column instead of the left drawer. */
-/** What a VIEWER's rail opens: inspection surfaces only. */
-const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["layers", "assets"]);
+/** What a VIEWER's rail opens: inspection surfaces, plus History/Review/
+ *  Activity — FC-9 (fix-all 2026-09-25) lets a viewer open those three
+ *  READ-ONLY (every write control inside them is hidden or disabled with a
+ *  tooltip; server authz already refuses the mutations). */
+const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>([
+  "layers",
+  "assets",
+  "history",
+  "review",
+  "activity",
+]);
 const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history", "activity"]);
 // ============================================================================
 // TYPES

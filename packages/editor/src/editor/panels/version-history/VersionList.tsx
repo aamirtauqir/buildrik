@@ -119,6 +119,9 @@ interface VersionRowProps {
   onRename: (name: string) => void;
   /** Changes this version captured since the previous one. Absent = not known. */
   changeCount?: number;
+  /** FC-9 (fix-all 2026-09-25): a viewer keeps View details/Compare, loses
+   *  Restore/Delete. */
+  readOnly?: boolean;
 }
 
 export function VersionRow({
@@ -133,6 +136,7 @@ export function VersionRow({
   onDetails,
   onRename,
   changeCount,
+  readOnly = false,
 }: VersionRowProps) {
   const rowRef = React.useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -144,9 +148,10 @@ export function VersionRow({
   const renameInputRef = React.useRef<HTMLInputElement>(null);
 
   const startRename = React.useCallback(() => {
+    if (readOnly) return;
     setRenameValue(versionDisplayName(version));
     setIsRenaming(true);
-  }, [version]);
+  }, [version, readOnly]);
 
   React.useEffect(() => {
     if (isRenaming) renameInputRef.current?.focus();
@@ -294,6 +299,8 @@ export function VersionRow({
                   </MenuItem>
                   <MenuItem
                     className={ROW_MENU_ITEM}
+                    disabled={readOnly}
+                    title={readOnly ? "Viewers can't rename versions — ask an editor" : undefined}
                     aria-label={`Rename "${versionDisplayName(version)}"`}
                     onClick={() => {
                       setMenuOpen(false);
@@ -304,7 +311,8 @@ export function VersionRow({
                   </MenuItem>
                   <MenuItem
                     className={ROW_MENU_ITEM}
-                    disabled={isRestoring}
+                    disabled={isRestoring || readOnly}
+                    title={readOnly ? "Viewers can't restore — ask an editor" : undefined}
                     aria-label={`Restore "${versionDisplayName(version)}"`}
                     onClick={() => {
                       setMenuOpen(false);
@@ -326,6 +334,8 @@ export function VersionRow({
                   <MenuItem
                     className={ROW_MENU_ITEM}
                     danger
+                    disabled={readOnly}
+                    title={readOnly ? "Viewers can't delete — ask an editor" : undefined}
                     aria-label={`Delete "${versionDisplayName(version)}"`}
                     onClick={() => {
                       setMenuOpen(false);
@@ -370,6 +380,8 @@ export interface VersionListProps {
   onRename: (versionId: string, name: string) => void;
   /** version id -> changes captured. Ids absent mean "not known". */
   changeCounts?: Map<string, number>;
+  /** FC-9 (fix-all 2026-09-25): threaded to every row's Restore/Delete. */
+  readOnly?: boolean;
 }
 
 export function VersionList({
@@ -385,6 +397,7 @@ export function VersionList({
   onDetails,
   onRename,
   changeCounts,
+  readOnly = false,
 }: VersionListProps) {
   const listWrapperRef = React.useRef<HTMLDivElement>(null);
   const [listHeight, setListHeight] = React.useState(0);
@@ -456,6 +469,7 @@ export function VersionList({
             onDetails={() => onDetails(v.id)}
             onRename={(name) => onRename(v.id, name)}
             changeCount={changeCounts?.get(v.id)}
+            readOnly={readOnly}
           />
         </div>
       );
@@ -472,6 +486,7 @@ export function VersionList({
       onCompare,
       onDetails,
       onRename,
+      readOnly,
     ],
   );
 

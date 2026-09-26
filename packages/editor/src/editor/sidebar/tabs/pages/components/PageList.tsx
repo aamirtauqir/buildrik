@@ -60,6 +60,10 @@ interface Props {
   onFolderDelete: (folderId: string) => void;
   onMovePageToFolder: (pageId: string, folderId: string) => void;
   onRemovePageFromFolder: (pageId: string) => void;
+  /** FC-1 (fix-all 2026-09-25): published pages a CMS collection generates,
+   *  which have no Page row of their own. 0 → the row is not rendered. */
+  dynamicPagesCount?: number;
+  onOpenDynamicPages?: () => void;
 }
 
 export const PageList: React.FC<Props> = ({
@@ -96,6 +100,8 @@ export const PageList: React.FC<Props> = ({
   onFolderDelete,
   onMovePageToFolder,
   onRemovePageFromFolder,
+  dynamicPagesCount = 0,
+  onOpenDynamicPages,
 }) => {
   /* A drop lands BEFORE or AFTER the row it is on. The engine only knows
      "after <id>", so before-X is after X's predecessor in site order (or
@@ -315,6 +321,23 @@ export const PageList: React.FC<Props> = ({
         {/* Drop indicator placeholder — toggled via .show during dragover (CSS owns visibility) */}
         <div className="bd-pg-drop-indicator" aria-hidden="true" />
       </div>
+      )}
+      {/* FC-1 (fix-all 2026-09-25): a page-generating CMS collection produces
+          published pages that have no Page row here at all — this is the only
+          hint they exist. Read-only: it opens the collection's Dynamic pages
+          tab, where the pattern/template actually live, rather than pretending
+          to be a page row itself. */}
+      {!loadError && selectedIds.size === 0 && dynamicPagesCount > 0 && (
+        <Button
+          type="button"
+          variant="link"
+          size="xs"
+          className="tw:w-full tw:justify-start tw:px-3 tw:py-1.5 tw:text-[length:var(--bk-text-12)]"
+          data-testid="pages-dynamic-pages-row"
+          onClick={onOpenDynamicPages}
+        >
+          {`+${dynamicPagesCount} from collections`} {"›"}
+        </Button>
       )}
       {/* Board 141:78: the band appears with ANY checkbox selection —
           it replaces the Add-page footer. */}

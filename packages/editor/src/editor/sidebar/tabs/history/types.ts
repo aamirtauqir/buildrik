@@ -56,4 +56,7 @@ export interface ActivityViewProps {
   error?: string | null;
   /** Retry callback for the error state */
   onRetry?: () => void;
+  /** FC-9 (fix-all 2026-09-25): a viewer keeps browsing/expanding entries,
+   *  loses the per-entry Restore. */
+  readOnly?: boolean;
 }

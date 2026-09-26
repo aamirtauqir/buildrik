@@ -14,9 +14,9 @@
       "drift-open": 3,
       "unreachable": 46
     },
-    "retired": 20,
+    "retired": 24,
     "total": 632,
-    "active": 514
+    "active": 505
   },
   "activeFamilies": [
     "AI",
@@ -1651,11 +1651,11 @@
       "state": "drill-in · stock-browser",
       "width": 280,
       "height": 812,
-      "status": "active",
+      "status": "retired",
       "authority": "superseded:board:clone-3695:45569",
-      "recipe": "media-drill-in-stock-browser",
-      "verifiedNote": "conformed + measured 2026-09-08 (recipe media-drill-in-stock-browser): 28 properties. BOARD LOST, declared: the 2-up 136-wide cards (147:72) contradict board 75:2, recorded drift-fixed a day earlier. Superseded 2026-09-13: re-drawn by Clone 3695:45569 (Phase 3), which wins (founder, grilling Q3). Row kept active — its recipe still measures the live surface.",
-      "verified": "drift-fixed"
+      "recipe": null,
+      "verifiedNote": "RETIRED 2026-09-26 (fix-all FC-6, owner decision fixall-brief.md): the drawer's StockBrowserOverlay this row measured is deleted — the one stock surface is now the full-page StockSourceModal (a Modal, different DOM shape and testid scheme entirely). Kept active from 2026-09-08 to 2026-09-26 on the theory that a superseded board's recipe still measures a live surface; that stopped being true the day the surface it measured was removed. media-drill-in-stock-browser.json recipe deleted in the same fix.",
+      "verified": "unreachable"
     },
     {
       "nodeId": "146:68",
@@ -8378,6 +8378,6 @@
       "verifiedNote": "Clone S3 walk 2026-09-14 (unified editor, worktree on localhost:3001, scratch-ver seeded, migration settings_s3_redirects applied locally with migrate deploy, the walk's rows and slug history removed and the seed reset and re-run after). X-Frame-Options → DENY, Max age → 1 year: footer `Unsaved changes`, Save changes; Cancel → Unsaved settings. live-3397-34227-headers-unsaved."
     }
   ],
-  "coveredFloor": 186,
+  "coveredFloor": 185,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

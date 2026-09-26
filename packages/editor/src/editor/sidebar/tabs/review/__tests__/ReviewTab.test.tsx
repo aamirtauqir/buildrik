@@ -13,7 +13,7 @@
  * inline and race-safe, resolve reaching the canvas.
  */
 import * as React from "react";
-import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup, within, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const fetchCurrentRound = vi.fn();
@@ -40,6 +40,15 @@ vi.mock("../../../../../services/ReviewService", () => ({
    gating that did not travel with the control when it moved here. */
 vi.mock("../../../../../services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: () => "site_test",
+}));
+/* FC-9 (fix-all 2026-09-25): mocked directly (rather than left to the real
+   fetchMyRole → network → catch(() => null) path) so the VIEWER-gating
+   tests below are deterministic instead of racing a jsdom fetch failure.
+   Defaults to a non-viewer role so every pre-existing test in this file
+   keeps exercising the full (non-gated) control set. */
+const mockRole = vi.fn<() => string | null>(() => "EDITOR");
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({
+  useEditorRole: () => mockRole(),
 }));
 
 import { fetchRounds } from "../../../../../services/ReviewService";
@@ -85,6 +94,7 @@ beforeEach(() => {
   postReply.mockResolvedValue(undefined);
   resolveReviewComment.mockResolvedValue(undefined);
   revokeReview.mockResolvedValue({ revoked: true });
+  mockRole.mockReturnValue("EDITOR");
 });
 afterEach(() => {
   cleanup();
@@ -663,5 +673,120 @@ describe("ReviewTab — opened from the Activity panel", () => {
     renderTab();
     await screen.findByTestId("review-status-line");
     expect(screen.queryByTestId("back-to-activity")).toBeNull();
+  });
+});
+
+describe("ReviewTab — FC-9 (fix-all 2026-09-25): a VIEWER is read-only", () => {
+  beforeEach(() => {
+    mockRole.mockReturnValue("VIEWER");
+  });
+
+  it("Resolve is aria-disabled with a reason, and does not call resolveReviewComment", async () => {
+    renderTab();
+    const resolve = (await screen.findAllByRole("button", { name: "Resolve" }))[0];
+    expect(resolve).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(resolve);
+    expect(resolveReviewComment).not.toHaveBeenCalled();
+  });
+
+  it("Re-send and Revoke are disabled in the round menu, with a reason, and never call revokeReview", async () => {
+    const onResend = vi.fn(() => Promise.resolve());
+    renderTab({ onResend });
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    const resend = screen.getByTestId("review-menu-resend");
+    expect(resend).toHaveAttribute("aria-disabled", "true");
+    expect(resend).toHaveAttribute("title", "Viewers can't resend the review link — ask an editor");
+    fireEvent.click(resend);
+    expect(onResend).not.toHaveBeenCalled();
+    // The re-send confirm dialog never opens behind the disabled item.
+    expect(screen.queryByTestId("review-resend-confirm")).not.toBeInTheDocument();
+
+    const revoke = screen.getByRole("menuitem", { name: "Revoke link" });
+    expect(revoke).toHaveAttribute("aria-disabled", "true");
+    expect(revoke).toHaveAttribute("title", "Viewers can't revoke the review link — ask an editor");
+    fireEvent.click(revoke);
+    expect(revokeReview).not.toHaveBeenCalled();
+    // The revoke confirm dialog never opens behind the disabled item.
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+  });
+
+  it("Reattach comment (detached group) is aria-disabled with a reason, and never opens the reattach flow", async () => {
+    // A composer that records its "comments:orphans" handler, the same way
+    // the canvas layer replies to the panel's mount-time
+    // "comments:orphans-request" — this is how a comment becomes detached
+    // without driving the real Locate-› flow.
+    const handlers = new Map<string, (p: { ids?: string[] }) => void>();
+    const composer = {
+      on: (event: string, fn: (p: { ids?: string[] }) => void) => handlers.set(event, fn),
+      off: vi.fn(),
+      emit: vi.fn(),
+      elements: { getAllPages: () => [], getActivePage: () => null, setActivePage: vi.fn() },
+    };
+    renderTab({ composer: composer as never });
+    await screen.findByTestId("review-status-line");
+    act(() => handlers.get("comments:orphans")?.({ ids: ["c1"] }));
+
+    const reattach = await screen.findByRole("button", { name: "Reattach comment" });
+    expect(reattach).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(reattach);
+    // setActivePage is the first thing the real handler does — it must
+    // never fire behind the disabled button.
+    expect(composer.elements.setActivePage).not.toHaveBeenCalled();
+  });
+
+  it("the comment composer is disabled and Send never posts", async () => {
+    renderTab();
+    await screen.findByTestId("review-status-line");
+    const textarea = screen.getByPlaceholderText("Viewers can't comment — ask an editor");
+    expect(textarea).toBeDisabled();
+    const send = screen.getByRole("button", { name: "Send" });
+    expect(send).toBeDisabled();
+    fireEvent.click(send);
+    expect(postReply).not.toHaveBeenCalled();
+  });
+});
+
+describe("ReviewTab — FC-9: an EDITOR keeps full control", () => {
+  beforeEach(() => {
+    mockRole.mockReturnValue("EDITOR");
+  });
+
+  it("Resolve is enabled and calls resolveReviewComment", async () => {
+    renderTab();
+    const resolve = (await screen.findAllByRole("button", { name: "Resolve" }))[0];
+    expect(resolve).not.toHaveAttribute("aria-disabled");
+    fireEvent.click(resolve);
+    await waitFor(() => expect(resolveReviewComment).toHaveBeenCalled());
+  });
+
+  it("Re-send and Revoke are enabled in the round menu", async () => {
+    renderTab();
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    expect(screen.getByTestId("review-menu-resend")).not.toHaveAttribute("aria-disabled");
+    expect(screen.getByRole("menuitem", { name: "Revoke link" })).not.toHaveAttribute("aria-disabled");
+  });
+
+  it("the comment composer is enabled", async () => {
+    renderTab();
+    await screen.findByTestId("review-status-line");
+    expect(screen.getByPlaceholderText(/Comment on/)).not.toBeDisabled();
+  });
+
+  it("Reattach comment is enabled and opens the reattach flow", async () => {
+    const handlers = new Map<string, (p: { ids?: string[] }) => void>();
+    const composer = {
+      on: (event: string, fn: (p: { ids?: string[] }) => void) => handlers.set(event, fn),
+      off: vi.fn(),
+      emit: vi.fn(),
+      elements: { getAllPages: () => [], getActivePage: () => null, setActivePage: vi.fn() },
+    };
+    renderTab({ composer: composer as never });
+    await screen.findByTestId("review-status-line");
+    act(() => handlers.get("comments:orphans")?.({ ids: ["c1"] }));
+
+    const reattach = await screen.findByRole("button", { name: "Reattach comment" });
+    expect(reattach).not.toHaveAttribute("aria-disabled");
+    fireEvent.click(reattach);
+    expect(composer.elements.setActivePage).toHaveBeenCalledWith("page-home");
   });
 });

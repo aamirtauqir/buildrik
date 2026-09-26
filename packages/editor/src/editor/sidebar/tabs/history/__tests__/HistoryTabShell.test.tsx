@@ -43,14 +43,19 @@ vi.mock("../../../shared/PanelHeader", () => ({
   PanelHeader: ({ title }: { title: string }) => <header>{title}</header>,
 }));
 
+/* FC-9 (fix-all 2026-09-25): canUndo controllable per-test so the "Clear
+   undo history…" viewer-gating tests can enable the item without touching
+   every pre-existing test in this file, which relies on the false default. */
+const historyStateFixture = vi.hoisted(() => ({ canUndo: false }));
+const clearMock = vi.hoisted(() => vi.fn());
 vi.mock("../../../../../shared/hooks/useHistoryState", () => ({
   useHistoryState: () => ({
     historyStack: [],
-    canUndo: false,
+    canUndo: historyStateFixture.canUndo,
     canRedo: false,
     undo: vi.fn(),
     redo: vi.fn(),
-    clear: vi.fn(),
+    clear: clearMock,
     isLoading: false,
   }),
 }));
@@ -88,6 +93,15 @@ vi.mock("../../../../../shared/hooks/useAutoMilestone", () => ({
   }),
 }));
 
+/* FC-9 (fix-all 2026-09-25): mocked directly so the viewer-gating tests are
+   deterministic instead of racing the real fetchMyRole → network path.
+   Defaults to a non-viewer role — every pre-existing test in this file keeps
+   exercising the full control set. */
+const mockRole = vi.hoisted(() => vi.fn<() => string | null>(() => "EDITOR"));
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({
+  useEditorRole: () => mockRole(),
+}));
+
 import { HistoryTab } from "../HistoryTab";
 import { EVENTS } from "@/shared/constants/events";
 import { ToastProvider } from "@/editor/chrome-ui";
@@ -118,6 +132,9 @@ const showChanges = () => fireEvent.click(screen.getByRole("tab", { name: /Sessi
 describe("HistoryTab shell", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    historyStateFixture.canUndo = false;
+    clearMock.mockClear();
+    mockRole.mockReturnValue("EDITOR");
   });
   afterEach(cleanup);
 
@@ -357,5 +374,33 @@ describe("HistoryTab — opened by an Activity row, with the way back", () => {
     expect(screen.queryByTestId("back-to-activity")).toBeNull();
     expect(screen.getByTestId("history-view-tab-session").getAttribute("aria-selected")).toBe("true");
     expect(screen.queryByTestId("history-view-tab-activity")).toBeNull();
+  });
+});
+
+describe("HistoryTab — FC-9 (fix-all 2026-09-25): a VIEWER can't clear undo history", () => {
+  beforeEach(() => {
+    historyStateFixture.canUndo = true;
+    mockRole.mockReturnValue("VIEWER");
+  });
+
+  it("Clear undo history… is aria-disabled with a reason, and opens no confirm", () => {
+    renderTab();
+    fireEvent.click(screen.getByTestId("history-menu"));
+    const clearItem = screen.getByRole("menuitem", { name: "Clear undo history…" });
+    expect(clearItem).toHaveAttribute("aria-disabled", "true");
+    expect(clearItem).toHaveAttribute("title", "Viewers can't clear undo history — ask an editor");
+    fireEvent.click(clearItem);
+    expect(screen.queryByText("Clear undo history?")).toBeNull();
+    expect(clearMock).not.toHaveBeenCalled();
+  });
+
+  it("as an EDITOR with undo history, Clear undo history… is enabled", () => {
+    mockRole.mockReturnValue("EDITOR");
+    renderTab();
+    fireEvent.click(screen.getByTestId("history-menu"));
+    const clearItem = screen.getByRole("menuitem", { name: "Clear undo history…" });
+    expect(clearItem).not.toHaveAttribute("aria-disabled");
+    fireEvent.click(clearItem);
+    expect(screen.getByText("Clear undo history?")).toBeInTheDocument();
   });
 });

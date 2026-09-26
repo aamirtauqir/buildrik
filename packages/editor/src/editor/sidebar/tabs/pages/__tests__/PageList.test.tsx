@@ -180,3 +180,29 @@ describe("PageList — drag reorder lands on the half it is dropped on", () => {
     expect(composer.elements.reorderPage).toHaveBeenCalledWith("p3", "p1");
   });
 });
+
+describe("PageList — FC-1 (fix-all 2026-09-25): CMS-generated pages hint", () => {
+  it("renders no row when dynamicPagesCount is 0 (default)", () => {
+    render(<PageList {...makeProps()} />);
+    expect(screen.queryByTestId("pages-dynamic-pages-row")).not.toBeInTheDocument();
+  });
+
+  it("renders '+N from collections ›' when dynamicPagesCount > 0, and opens it on click", () => {
+    const onOpenDynamicPages = vi.fn();
+    render(<PageList {...makeProps({ dynamicPagesCount: 4, onOpenDynamicPages })} />);
+    const row = screen.getByTestId("pages-dynamic-pages-row");
+    expect(row).toHaveTextContent("+4 from collections");
+    expect(row).toHaveTextContent("›");
+    fireEvent.click(row);
+    expect(onOpenDynamicPages).toHaveBeenCalledTimes(1);
+  });
+
+  it("hides the row during a bulk selection", () => {
+    render(
+      <PageList
+        {...makeProps({ dynamicPagesCount: 2, selectedIds: new Set(["p1"]) })}
+      />,
+    );
+    expect(screen.queryByTestId("pages-dynamic-pages-row")).not.toBeInTheDocument();
+  });
+});

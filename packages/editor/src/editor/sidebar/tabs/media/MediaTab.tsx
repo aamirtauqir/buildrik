@@ -19,7 +19,7 @@ import { SlimLauncher } from "./components/SlimLauncher";
 import { RenameAssetModal } from "@/editor/media/components/RenameAssetModal";
 import { useMediaWriteAccess } from "./hooks/useMediaWriteAccess";
 import { IconBrowserOverlay } from "./components/IconBrowserOverlay";
-import { StockBrowserOverlay } from "./components/StockBrowserOverlay";
+import { StockSourceModal } from "./components/StockSourceModal";
 import { PickModePanel } from "./components/PickModePanel";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
@@ -199,9 +199,10 @@ function MediaTabWithComposer({
     the delete confirm used to live inside the fullpage return, so the drawer —
     the surface the board's five drill-ins hang off — could not reach
     asset-detail, versions or used-in at all. A modal that only one of three
-    renderers mounts is a feature that exists for a third of its users. (A
-    StockSourceModal mount sat here until Clone Phase 3 with nothing that ever
-    opened it — the drawer's Browse stock opens StockBrowserOverlay.)
+    renderers mounts is a feature that exists for a third of its users.
+    FC-6: the drawer's own `StockBrowserOverlay` is gone — its Browse stock
+    now opens the same `StockSourceModal` the fullpage manager uses (rendered
+    below, outside this block since it also needs `stockBrowserOpen`).
   */
   const sharedOverlays = (
     <>
@@ -353,23 +354,28 @@ function MediaTabWithComposer({
         onOpenDetail={state.openDetail}
         onOpenIconPicker={() => setIconBrowserOpen(true)}
       />
-      {stockBrowserOpen && (
-        <StockBrowserOverlay
-          onClose={() => setStockBrowserOpen(false)}
-          photos={state.stockPhotos}
-          videos={state.stockVideos}
-          loading={state.discLoading}
-          searchQuery={state.discoverySearch}
-          searchFailed={state.searchFailed}
-          orientation={state.discOrientation}
-          color={state.discColor}
-          onSearch={state.discSearchAll}
-          onSetOrientation={state.setDiscOrientation}
-          onSetColor={state.setDiscColor}
-          onLoadMore={state.loadMoreDisc}
-          onSave={(type, item) => state.saveToLibrary(type, item)}
-        />
-      )}
+      <StockSourceModal
+        open={stockBrowserOpen}
+        onClose={() => setStockBrowserOpen(false)}
+        photos={state.stockPhotos}
+        videos={state.stockVideos}
+        loading={state.discLoading}
+        searchQuery={state.discoverySearch}
+        searchFailed={state.searchFailed}
+        orientation={state.discOrientation}
+        color={state.discColor}
+        onSearch={state.discSearchAll}
+        onSetOrientation={state.setDiscOrientation}
+        onSetColor={state.setDiscColor}
+        onLoadMore={state.loadMoreDisc}
+        onSave={async (type, item) => {
+          const saved = await state.saveToLibrary(type, item);
+          if (saved) {
+            setStockBrowserOpen(false);
+            showToast("Stock image saved", "success");
+          }
+        }}
+      />
       {iconBrowserOpen && (
         <IconBrowserOverlay
           onClose={() => setIconBrowserOpen(false)}

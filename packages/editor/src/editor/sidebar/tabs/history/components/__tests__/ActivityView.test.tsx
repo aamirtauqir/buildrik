@@ -248,3 +248,42 @@ describe("ActivityView — Session rows are board 4418:73791", () => {
     }
   });
 });
+
+describe("ActivityView — FC-9 (fix-all 2026-09-25): readOnly disables Restore", () => {
+  const makeComposer = () => ({
+    history: { restoreEntry: vi.fn() },
+    isDirty: () => false,
+  });
+
+  it("readOnly: the per-entry Restore is aria-disabled with a reason, and never restores", () => {
+    const restore = withHeight(400);
+    try {
+      const composer = makeComposer();
+      setHistory([entry({ id: "h1", label: "Move heading" })], false);
+      const { container } = render(<ActivityView composer={composer as never} readOnly />);
+
+      const timeBtn = container.querySelector(".entry-time-btn") as HTMLElement;
+      expect(timeBtn).toHaveAttribute("aria-disabled", "true");
+      fireEvent.click(timeBtn);
+      expect(composer.history.restoreEntry).not.toHaveBeenCalled();
+      // No confirm dialog opens behind the disabled control.
+      expect(screen.queryByRole("dialog")).toBeNull();
+    } finally {
+      restore();
+    }
+  });
+
+  it("not readOnly (default): Restore still works as before", () => {
+    const restore = withHeight(400);
+    try {
+      const composer = makeComposer();
+      setHistory([entry({ id: "h1", label: "Move heading" })], false);
+      const { container } = render(<ActivityView composer={composer as never} />);
+
+      const timeBtn = container.querySelector(".entry-time-btn") as HTMLElement;
+      expect(timeBtn).not.toHaveAttribute("aria-disabled");
+    } finally {
+      restore();
+    }
+  });
+});

@@ -11,12 +11,20 @@ import * as React from "react";
 const renderProjectPages = vi.fn();
 vi.mock("../exportPublishPages", () => ({ renderProjectPages: (...a: unknown[]) => renderProjectPages(...a) }));
 
+/* FC-9 (fix-all 2026-09-25): mocked directly so the viewer-gating test is
+   deterministic instead of racing the real fetchMyRole → network path.
+   Defaults to a non-viewer role — every pre-existing test in this file
+   keeps exercising the full (non-gated) Restore control. */
+const mockRole = vi.hoisted(() => vi.fn<() => string | null>(() => "EDITOR"));
+vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => mockRole() }));
+
 import { TimeTravelHost } from "../TimeTravelHost";
 import { EVENTS } from "@/shared/constants/events";
 
 afterEach(() => {
   cleanup();
   renderProjectPages.mockReset();
+  mockRole.mockReturnValue("EDITOR");
 });
 
 function makeComposer() {
@@ -173,5 +181,36 @@ describe("TimeTravelHost", () => {
     expect(screen.getByTestId("tt-band-text").textContent).toMatch(/^Previewing/);
     c.fire(EVENTS.HISTORY_RECORDED);
     expect(screen.queryByTestId("tt-band")).toBeNull();
+  });
+});
+
+describe("TimeTravelHost — FC-9 (fix-all 2026-09-25): a VIEWER can preview, not restore", () => {
+  it("VIEWER: Restore… is aria-disabled with a reason, and clicking never calls restoreEntry", () => {
+    renderProjectPages.mockResolvedValue([]);
+    mockRole.mockReturnValue("VIEWER");
+    const c = makeComposer();
+    render(<TimeTravelHost composer={c as never} />);
+    chord();
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
+    const restore = screen.getByTestId("tt-restore");
+    expect(restore).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(restore);
+    expect(c.history.restoreEntry).not.toHaveBeenCalled();
+    // No confirm band opens behind the disabled control.
+    expect(screen.queryByTestId("tt-confirm")).toBeNull();
+  });
+
+  it("EDITOR: Restore… is not aria-disabled and still works", async () => {
+    renderProjectPages.mockResolvedValue([]);
+    mockRole.mockReturnValue("EDITOR");
+    const c = makeComposer();
+    render(<TimeTravelHost composer={c as never} />);
+    chord();
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
+    const restore = screen.getByTestId("tt-restore");
+    expect(restore).not.toHaveAttribute("aria-disabled");
+    fireEvent.click(restore);
+    fireEvent.click(screen.getByTestId("tt-confirm-restore"));
+    await waitFor(() => expect(c.history.restoreEntry).toHaveBeenCalledWith("e2"));
   });
 });
