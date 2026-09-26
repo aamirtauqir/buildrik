@@ -761,7 +761,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
   // the bar renders exactly what it receives. View mode is itself a preview,
   // so it gets Comments only.
-  const toggleComments = composer ? () => composer.emit("ui:comment-mode", {}) : undefined;
+  /* A-8/PD-7/PD-8: comment mode is a review-flow tool — offering it while
+     the site's workspace has no agency layer (reviewsEnabled false) opened
+     a door with nothing behind it: comments had nowhere to be reviewed
+     from. Gated alongside the Review rail tab (TabRouter.tsx) and the
+     Review/SendForReview doors below. */
+  const toggleComments = composer && reviewStatus.reviewsEnabled ? () => composer.emit("ui:comment-mode", {}) : undefined;
   /* A workspace VIEWER is always in view mode, and board 4418:126059 keeps
      their topbar: Preview works, Publish is there but disabled with the role
      it needs. An owner's own view mode stays the bare preview bar. */

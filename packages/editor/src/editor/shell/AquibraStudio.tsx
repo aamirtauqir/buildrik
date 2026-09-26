@@ -361,20 +361,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     return () => window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
   }, []);
 
-  // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
-  useEditorShortcuts({
-    composer,
-    modals,
-    saveProject,
-    openLeftPanelToTab: state.openLeftPanelToTab,
-    /* FC-11: same door the site menu's "Site settings" row uses — both go
-       straight to the Settings tab now, the way S and ⌘K already did. This
-       used to round-trip through a `showProjectSettings` flag that
-       StudioModals immediately converted back into this same call and
-       cleared — a modal that never rendered a modal. */
-    openSiteSettings: () => state.openLeftPanelToTab("settings"),
-  });
-
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
   // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook
   // owns its own publishJob instance and surfaces it back so the orchestrator
@@ -413,6 +399,24 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     serverHasUnpublishedChanges: publishJob.hasUnpublishedChanges,
     serverBlock: publishJob.blockedReason,
     saveConflict: state.saveState.status === "conflict",
+  });
+
+  // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1).
+  // Moved below useLifecycle so it can gate the C/comment-mode shortcut on
+  // reviewsEnabled (A-8/PD-7/PD-8) — the same flag StudioHeader/TabRouter
+  // already gate the comments toggle and Review rail tab on.
+  useEditorShortcuts({
+    composer,
+    modals,
+    saveProject,
+    openLeftPanelToTab: state.openLeftPanelToTab,
+    /* FC-11: same door the site menu's "Site settings" row uses — both go
+       straight to the Settings tab now, the way S and ⌘K already did. This
+       used to round-trip through a `showProjectSettings` flag that
+       StudioModals immediately converted back into this same call and
+       cleared — a modal that never rendered a modal. */
+    openSiteSettings: () => state.openLeftPanelToTab("settings"),
+    reviewsEnabled: reviewStatus.reviewsEnabled,
   });
 
   /* ── The publish door (B4 — ONE confirm door, both entrances) ─────────────

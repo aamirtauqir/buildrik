@@ -702,6 +702,25 @@ describe("StudioHeader", () => {
       expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
     });
 
+    it("A-8/PD-7/PD-8: reviewsEnabled false disables the Comments toggle — a review-flow tool with nowhere to review from", () => {
+      const composer = {
+        on: vi.fn(),
+        off: vi.fn(),
+        emit: vi.fn(),
+        getProjectMetadata: vi.fn(() => ({ name: "x" })),
+        exportHTML: vi.fn(() => ({ combined: "" })),
+      } as unknown as StudioHeaderProps["composer"];
+      render(
+        <StudioHeader
+          {...makeProps({ composer, reviewStatus: reviewStatus({ reviewsEnabled: false }) })}
+        />,
+      );
+      // No handler means the bar renders no Comments toggle at all —
+      // stronger than a disabled button, since there's genuinely nowhere
+      // for a comment to go review.
+      expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
+    });
+
     it("offers the live URL only once the site has one", () => {
       render(<StudioHeader {...makeProps()} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
