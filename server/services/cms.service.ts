@@ -33,7 +33,8 @@ export class CmsError extends Error {
  * `lib/sanitize-blocks.ts` uses for page blocks. Applied by `upsertEntry`, so
  * every write path (manual save, CSV import, any future importer) shares it.
  *
- * This strips MARKUP only (tags/attributes an HTML parser would honor) — it
+ * This strips MARKUP only (tags/attributes an HTML parser would honor) and
+ * stores the remaining text raw; every sink escapes it (`escapeHtml` below) — it
  * does nothing about a plain-text value like `javascript:alert(1)` (no tags,
  * nothing for DOMPurify to remove) that later lands in a URL-bearing
  * attribute at template-substitution time. That is a different threat with a
@@ -45,9 +46,29 @@ export class CmsError extends Error {
 function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(data)) {
-    out[key] = typeof value === "string" ? String(DOMPurify.sanitize(value, { ALLOWED_TAGS: [] })) : value;
+    out[key] = typeof value === "string" ? stripMarkup(value) : value;
   }
   return out;
+}
+
+/**
+ * The text of `value` with its markup removed, NOT serialized HTML: the
+ * serialized form entity-encoded the text ("Tom & Jerry" stored as
+ * "Tom &amp; Jerry"), the page sink escaped it again, and every save encoded
+ * it once more. `&` is escaped before parsing so nothing reads as an entity —
+ * the text comes back exactly as typed. Escaping belongs to the sink.
+ *
+ * Repeated until nothing changes: cutting a tag out of the middle of another
+ * (`<<img …>img …>`) leaves text that is itself a tag.
+ */
+function stripMarkup(value: string): string {
+  let text = value;
+  for (;;) {
+    const fragment = DOMPurify.sanitize(text.replace(/&/g, "&amp;"), { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true });
+    const next = fragment.textContent ?? "";
+    if (next === text) return text;
+    text = next;
+  }
 }
 
 export async function listCollections(siteId: string) {

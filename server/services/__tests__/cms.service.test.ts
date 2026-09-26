@@ -123,6 +123,32 @@ describe("entries cross-site guard", () => {
     });
     expect(entCreate.mock.calls[0][0].data.data).toEqual({ title: "Hi", price: 12, ok: true });
   });
+
+  it("x4 round 3: stores text as typed — no entity encoding, stable across saves, escaped once at the page sink", async () => {
+    const typed = { title: "Tom & Jerry <3", quote: 'Say "hi" > bye', literal: "AT&amp;T" };
+    colFindFirst.mockResolvedValue({ id: "c1" });
+    entCreate.mockResolvedValue({ id: "e1" });
+    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: typed });
+    const first = entCreate.mock.calls[0][0].data.data as Record<string, unknown>;
+    expect(first).toEqual(typed);
+    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: first }); // a second save of what came back
+    expect(entCreate.mock.calls[1][0].data.data).toEqual(typed);
+    colFindFirst.mockReset();
+
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/x", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: first }]);
+    const page = await generateDynamicPages("s1", "c1", "<html><head></head><body><h1>{title}</h1></body></html>");
+    expect(page[0].content).toContain("<h1>Tom &amp; Jerry &lt;3</h1>");
+  });
+
+  it("x4 round 3: stored text never re-forms markup when a tag is cut out of the middle of one", async () => {
+    colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    entCreate.mockResolvedValueOnce({ id: "e1" });
+    const nested = "<<img src=x onerror=alert(1)>img src=x onerror=alert(1)>";
+    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: nested } });
+    const stored = (entCreate.mock.calls[0][0].data.data as { title: string }).title;
+    expect(stored).not.toMatch(/<img/i);
+  });
 });
 
 describe("CSV import (fix-all round, 2026-09-25)", () => {
