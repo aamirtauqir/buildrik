@@ -5,13 +5,13 @@
 // Expects the dashboard dev server already running on http://localhost:3100
 // (started separately with DATABASE_URL pointed at buildrik_verify).
 
-import playwright from "/Users/shahg/Desktop/buildrik-code-gap-A/node_modules/.pnpm/playwright@1.61.1/node_modules/playwright/index.js";
+import playwright from "/Users/shahg/Desktop/buildrik-worktrees/earlier-arcs/buildrik-code-gap-A/node_modules/.pnpm/playwright@1.61.1/node_modules/playwright/index.js";
 const { chromium } = playwright;
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const BASE_URL = "http://localhost:3100";
-const OUT_DIR = "/Users/shahg/Desktop/buildrik-af-verify/docs/audits/2026-09-25-full-audit/verify";
+const BASE_URL = process.env.BASE_URL ?? "http://192.168.100.5:3100";
+const OUT_DIR = "/Users/shahg/Desktop/buildrik-worktrees/audit-2026-09-25/buildrik-af-verify/docs/audits/2026-09-25-full-audit/verify";
 const AUTH_DIR = join(OUT_DIR, "auth");
 const PASSWORD = "verify-1234";
 
