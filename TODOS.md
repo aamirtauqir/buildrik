@@ -13,13 +13,14 @@ consciously not done, not when they were forgotten.
   `Content-Security-Policy-Report-Only` with a report endpoint first, watch for a
   week, then enforce — tightening a CSP by guessing is how you take a site down.
 
-- [ ] **Sanitize AI-generated HTML at the worker boundary.** `ExportEngine` now
+- [x] **Sanitize AI-generated HTML at the worker boundary.** `ExportEngine` now
   sanitizes `contentFormat: "html"` content before publishing it, so published
   sites are safe. The canvas still mounts the AI worker's raw output un-escaped
   (`Canvas.tsx:511`), on an authenticated same-origin route, and the worker
   bypasses the `HTMLParser` sanitize path entirely. That is a real XSS surface,
   narrowed but not closed. Sanitize in `ai-generate/[jobId]/route.ts` before the
   content is ever stored.
+  **Completed:** v0.5.0.0 (2026-09-26) — the worker runs `sanitizeBlocks` before storing.
 
 - [ ] **Audit the token-authenticated surface.** The 2026-07-20 `/cso` pass found
   the session-authenticated surface clean, and the one real hole of the day was

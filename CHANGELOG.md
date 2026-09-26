@@ -2,7 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
-## Fix-all — Form after-submit / honeypot / notify email, Slider playback + controls — 2026-09-26
+## [0.5.0.0] Audit fix — security, data integrity, broken flows — 2026-09-26
+
+Fixes the 2026-09-25 full audit: all six security P0s, 50 of 75 findings fully (18 more guarded, with follow-up plans), and 55 more bugs caught by walking the running app. Status of every finding, what was and was not verified in the browser, and the owner decision list: `docs/audits/2026-09-25-full-audit/92-fix-report.md`.
+
+### Fixed — security
+- Stored script injection is closed at every entry and exit: page markup, project styles and selectors, component masters and instance overrides, CMS bindings, CMS entry text, and analytics ids are cleaned on save and escaped where they are written into the canvas, preview, share draft, export and published site. The CMS record preview's "Open in new tab" is sandboxed.
+- Permissions hold end to end: a per-site role can only lower a workspace role, viewers stay read-only in every panel and endpoint, a scoped editor sees only their sites, and a save can no longer write pages that belong to another site.
+- Share links check expiry, revocation and password before loading anything, and carry only the published CMS fields the shared pages show.
+- Unverified accounts can sign in but cannot accept invites or receive a transfer; re-signing up with an abandoned address no longer wipes the old account's data.
+
+### Fixed — data
+- Pages no longer collapse into each other when two pages or two sites share element ids (seeded templates, AI drafts, blank pages, duplicated sites); ids are made unique on every server write and on load.
+- One site's publish no longer overwrites another site's form settings and submissions; forms are keyed per site.
+- CMS bindings are saved, survive a reload, and appear in the published page and in share drafts.
+- Saves use a compare-and-swap, so a stale tab cannot overwrite newer work, and a demoted member keeps their unsaved edits in the browser and drops to read-only.
+
+### Fixed — editor and dashboard
+- Clicking a link on the canvas no longer navigates the editor away; opening a site or switching page tabs no longer saves by itself; locked elements survive Delete and Cut; a toast's Undo only undoes its own action; Delete works on a Layers row.
+- Every panel door found dead or misrouted by walking the app as owner, editor, viewer and scoped editor now works (272 doors, 10 fixed), including Bind to CMS field, letter shortcuts after Esc, and panels with the inspector hidden.
+- Copy buttons no longer crash on a plain-http origin, and an API token is only reported copied when the copy worked.
 
 ### Added
 - Form inspector "After submit" section: Action (Show message / Redirect), redirect URL (must be an absolute http(s) URL — `absoluteRedirectUrlSchema`, stricter than the general `isDangerousUrl` allowlist used for hrefs), Send-to-email address, Spam protection toggle. Server-backed by new `forms.getBlock` / `forms.updateBlock`.
