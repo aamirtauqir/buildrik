@@ -12,12 +12,15 @@
 
 function legacyCopy(text: string): boolean {
   if (typeof document === "undefined" || typeof document.execCommand !== "function") return false;
+  /* Selecting the textarea takes focus; the caller's control gets it back. */
+  const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const area = document.createElement("textarea");
   area.value = text;
   area.setAttribute("readonly", "");
   area.style.position = "fixed";
   area.style.top = "-1000px";
   document.body.appendChild(area);
+  area.focus();
   area.select();
   try {
     return document.execCommand("copy");
@@ -25,6 +28,7 @@ function legacyCopy(text: string): boolean {
     return false;
   } finally {
     area.remove();
+    previous?.focus({ preventScroll: true });
   }
 }
 

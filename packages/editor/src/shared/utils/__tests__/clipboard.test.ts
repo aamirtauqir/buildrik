@@ -40,6 +40,18 @@ describe("writeClipboardText", () => {
     expect(document.querySelector("textarea")).toBeNull();
   });
 
+  /* M-4: select() moves focus to the offscreen textarea; the caller's
+     control (a menu row, the rename field) must get it back. */
+  it("gives focus back to what had it before the fallback copy", async () => {
+    setClipboard(undefined);
+    Object.defineProperty(document, "execCommand", { value: vi.fn().mockReturnValue(true), configurable: true });
+    const field = document.createElement("input");
+    document.body.appendChild(field);
+    field.focus();
+    await writeClipboardText("x");
+    expect(document.activeElement).toBe(field);
+  });
+
   it("rejects — never throws synchronously — when nothing can copy", async () => {
     setClipboard(undefined);
     Object.defineProperty(document, "execCommand", { value: vi.fn().mockReturnValue(false), configurable: true });
