@@ -27,7 +27,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { shellDirty } from "../shellDirtyRegistry";
+import { shellDirty, type DirtyDomain } from "../shellDirtyRegistry";
 
 export interface TabSwitchGuardDialogProps {
   open: boolean;
@@ -44,6 +44,9 @@ export interface TabSwitchSinks {
   openLeftPanelToTab: (primaryTab: string, subTab?: string) => void;
   /** The sink's own gate (VIEWER). A refused switch is not guarded. */
   isTabAllowed: (tab: string) => boolean;
+  /** Told which domains' discards threw during "Leave anyway" — the switch
+   *  still happens; those domains stay dirty. */
+  onDiscardFailed: (domains: DirtyDomain[]) => void;
 }
 
 export interface UseTabSwitchGuardResult {
@@ -76,6 +79,7 @@ export function useTabSwitchGuard({
   setLeftPanelTab,
   openLeftPanelToTab,
   isTabAllowed,
+  onDiscardFailed,
 }: TabSwitchSinks): UseTabSwitchGuardResult {
   const pendingRef = React.useRef<(() => void) | null>(null);
   const [prompt, setPrompt] = React.useState<{ body: string; leaveLabel: string } | null>(null);
@@ -121,9 +125,10 @@ export function useTabSwitchGuard({
     const perform = pendingRef.current;
     pendingRef.current = null;
     setPrompt(null);
-    shellDirty.discardDirty();
+    const failed = shellDirty.discardDirty();
     perform?.();
-  }, []);
+    if (failed.length > 0) onDiscardFailed(failed);
+  }, [onDiscardFailed]);
 
   return {
     setLeftPanelTab: guardedSetLeftPanelTab,

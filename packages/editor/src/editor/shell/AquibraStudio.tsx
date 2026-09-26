@@ -39,6 +39,7 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { RecoveryBanner } from "./RecoveryBanner";
 import { useTabSwitchGuard } from "./hooks/useTabSwitchGuard";
+import type { DirtyDomain } from "./shellDirtyRegistry";
 import { useViewerChrome } from "./hooks/useEditorRole";
 import { isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
 import { UnsavedTabSwitchDialog } from "./modals/UnsavedTabSwitchDialog";
@@ -142,6 +143,13 @@ class StudioErrorBoundary extends React.Component<
   }
 }
 
+/** How a failed "Leave anyway" discard names its surface in the toast. */
+const DISCARD_SURFACE: Record<DirtyDomain, string> = {
+  settings: "Settings",
+  brand: "brand",
+  "cms-record": "record",
+};
+
 const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   licenseKey: _licenseKey,
   options,
@@ -173,6 +181,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     (tab: string) => isTabAllowedForViewer(tab as GroupedTabId, viewerChrome),
     [viewerChrome],
   );
+  const onDiscardFailed = React.useCallback(
+    (domains: DirtyDomain[]) =>
+      domains.forEach((d) =>
+        addToast({ tone: "error", description: `Couldn't discard ${DISCARD_SURFACE[d]} changes` }),
+      ),
+    [addToast],
+  );
   const {
     setLeftPanelTab: guardedSetLeftPanelTab,
     openLeftPanelToTab: guardedOpenLeftPanelToTab,
@@ -183,6 +198,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setLeftPanelTab: state.setLeftPanelTab,
     openLeftPanelToTab: state.openLeftPanelToTab,
     isTabAllowed,
+    onDiscardFailed,
   });
 
   // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).

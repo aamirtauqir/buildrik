@@ -45,6 +45,26 @@ describe("shellDirtyRegistry", () => {
     shellDirty.setDiscard("cms-record", null);
   });
 
+  /* Fix round 3: one throwing discard must not abort the rest, and its
+     domain stays dirty so Exit / beforeunload still warn. */
+  it("discardDirty() isolates a throwing discard: others still run, the failed domain stays dirty and is reported", () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {});
+    shellDirty.setDiscard("settings", () => {
+      throw new Error("boom");
+    });
+    const recordDiscard = vi.fn(() => shellDirty.set("cms-record", false));
+    shellDirty.setDiscard("cms-record", recordDiscard);
+    shellDirty.set("settings", true);
+    shellDirty.set("cms-record", true);
+    expect(shellDirty.discardDirty()).toEqual(["settings"]);
+    expect(recordDiscard).toHaveBeenCalledTimes(1);
+    expect(shellDirty.dirtyDomains()).toEqual(["settings"]);
+    expect(err).toHaveBeenCalledWith(expect.stringContaining("settings"), expect.any(Error));
+    shellDirty.setDiscard("settings", null);
+    shellDirty.setDiscard("cms-record", null);
+    err.mockRestore();
+  });
+
   it("everyDirtyDiscards() is false while a dirty domain has no discard (Brand)", () => {
     shellDirty.setDiscard("settings", () => {});
     shellDirty.set("settings", true);

@@ -51,6 +51,7 @@ function Harness({ composer }: { composer: ReturnType<typeof makeComposer> }) {
     setLeftPanelTab,
     openLeftPanelToTab,
     isTabAllowed: () => true,
+    onDiscardFailed: () => {},
   });
   const c = composer as unknown as Composer;
   useEditorShortcuts({

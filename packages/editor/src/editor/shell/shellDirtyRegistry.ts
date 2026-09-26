@@ -60,9 +60,24 @@ export const shellDirty = {
   },
   /** True when every dirty domain can actually discard its work. */
   everyDirtyDiscards: (): boolean => dirtyDomains().every((d) => d in discards),
-  /** "Leave anyway": each dirty domain that registered a discard runs it. */
-  discardDirty: (): void => {
-    dirtyDomains().forEach((d) => discards[d]?.());
+  /** "Leave anyway": each dirty domain that registered a discard runs it.
+   *  One that throws does not stop the others; it stays dirty (so exit and
+   *  beforeunload still warn about it) and is returned for the caller to
+   *  report. */
+  discardDirty: (): DirtyDomain[] => {
+    const failed: DirtyDomain[] = [];
+    for (const d of dirtyDomains()) {
+      const discard = discards[d];
+      if (!discard) continue;
+      try {
+        discard();
+      } catch (err) {
+        console.error(`[shellDirty] discard failed for "${d}"`, err);
+        failed.push(d);
+      }
+    }
+    failed.forEach((d) => shellDirty.set(d, true));
+    return failed;
   },
   subscribe: (l: () => void): (() => void) => {
     listeners.add(l);

@@ -17,6 +17,7 @@ const DOMAINS: DirtyDomain[] = ["settings", "brand", "cms-record"];
 
 function setup(opts: { tab?: string; subTabs?: Record<string, string>; allowed?: (t: string) => boolean } = {}) {
   const setLeftPanelTab = vi.fn();
+  const onDiscardFailed = vi.fn();
   const openLeftPanelToTab = vi.fn();
   const hook = renderHook(() =>
     useTabSwitchGuard({
@@ -25,9 +26,10 @@ function setup(opts: { tab?: string; subTabs?: Record<string, string>; allowed?:
       setLeftPanelTab,
       openLeftPanelToTab,
       isTabAllowed: opts.allowed ?? (() => true),
+      onDiscardFailed,
     }),
   );
-  return { ...hook, setLeftPanelTab, openLeftPanelToTab };
+  return { ...hook, setLeftPanelTab, openLeftPanelToTab, onDiscardFailed };
 }
 
 describe("useTabSwitchGuard", () => {
@@ -121,6 +123,31 @@ describe("useTabSwitchGuard", () => {
     // The registry is not reset: Settings clears its own entry when it
     // unmounts, and Brand's staged edits are still staged.
     expect(shellDirty.get()).toBe(true);
+  });
+
+  it("Leave anyway with a throwing discard: the other discards run, the switch still happens, the failure is reported and stays dirty", () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {});
+    const recordDiscard = vi.fn(() => shellDirty.set("cms-record", false));
+    act(() => {
+      shellDirty.setDiscard("settings", () => {
+        throw new Error("boom");
+      });
+      shellDirty.setDiscard("cms-record", recordDiscard);
+      shellDirty.set("settings", true);
+      shellDirty.set("cms-record", true);
+    });
+    const { result, setLeftPanelTab, onDiscardFailed } = setup({ tab: "content" });
+    act(() => result.current.setLeftPanelTab("add"));
+    act(() => result.current.dialogProps.onLeaveAnyway());
+    expect(recordDiscard).toHaveBeenCalledTimes(1);
+    expect(setLeftPanelTab).toHaveBeenCalledWith("add");
+    expect(onDiscardFailed).toHaveBeenCalledWith(["settings"]);
+    expect(shellDirty.dirtyDomains()).toEqual(["settings"]);
+    act(() => {
+      shellDirty.setDiscard("settings", null);
+      shellDirty.setDiscard("cms-record", null);
+    });
+    err.mockRestore();
   });
 
   it("the same tab (and sub-tab) is not a switch — no prompt", () => {
