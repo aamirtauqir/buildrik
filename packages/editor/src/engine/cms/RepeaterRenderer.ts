@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding } from "./CMSBindingManager";
@@ -35,18 +36,6 @@ export class RepeaterRenderer {
 
   constructor(composer: Composer) {
     this.composer = composer;
-  }
-
-  /**
-   * Escape HTML special characters to prevent XSS. Setting textContent stores
-   * the raw string; reading innerHTML serializes it with `&`, `<`, `>` encoded
-   * as entities. (Reading textContent back — the previous implementation —
-   * returned the input untouched, a no-op that only looked like escaping.)
-   */
-  private escapeHtml(text: string): string {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
   }
 
   /**
@@ -283,7 +272,7 @@ export class RepeaterRenderer {
         const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
         text = text.replace(fieldPattern, () => {
           injectedValue = true;
-          return this.escapeHtml(String(value ?? ""));
+          return escapeHtmlText(String(value ?? ""));
         });
       });
 
@@ -296,7 +285,7 @@ export class RepeaterRenderer {
         // A field value was substituted and HTML-escaped. Inject through an
         // innerHTML sink so the escaped entities decode back to inert text —
         // a raw "<script>" in a CMS value lands as literal characters, never
-        // a live node. This is the sink escapeHtml exists to protect.
+        // a live node. This is the sink escapeHtmlText exists to protect.
         const template = (el.ownerDocument ?? document).createElement("template");
         template.innerHTML = text;
         textNode.replaceWith(template.content);
@@ -334,9 +323,13 @@ export class RepeaterRenderer {
           }
         });
 
-        if (modified) {
-          element.setAttribute(attr.name, value);
+        if (!modified) return;
+        // A CMS value in a URL attribute: a javascript:/data: URL never lands.
+        if (URL_ATTRIBUTES.has(attr.name.toLowerCase()) && isDangerousUrl(value)) {
+          element.removeAttribute(attr.name);
+          return;
         }
+        element.setAttribute(attr.name, value);
       });
     });
   }

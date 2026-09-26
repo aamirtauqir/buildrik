@@ -9,8 +9,6 @@ import {
   exportSubmissions,
   getFormBlockSettings,
   updateFormBlock,
-  getStoredNotifyEmail,
-  FormError,
 } from "@/server/services/form-submission.service";
 import {
   listSubmissionsSchema,
@@ -82,20 +80,13 @@ export const formsRouter = router({
       // bundle notifyEmail, would otherwise hit a FORBIDDEN for a no-op
       // write. "" and null both mean "unset".
       if (input.notifyEmail !== undefined) {
-        const storedNotifyEmail = await getStoredNotifyEmail(input.siteId, input.blockId);
+        const existing = await getFormBlockSettings(input.siteId, input.blockId);
         const normalize = (v: string | null | undefined) => v || "";
-        if (normalize(storedNotifyEmail) !== normalize(input.notifyEmail)) {
+        if (normalize(existing.notifyEmail) !== normalize(input.notifyEmail)) {
           await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
         }
       }
-      try {
-        return await updateFormBlock(input);
-      } catch (e: unknown) {
-        if (e instanceof FormError) {
-          throw new TRPCError({ code: e.code, message: e.message });
-        }
-        throw e;
-      }
+      return updateFormBlock(input);
     }),
 
   exportSubmissions: protectedProcedure

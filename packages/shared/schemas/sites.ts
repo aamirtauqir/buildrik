@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isDangerousUrl, isSafeElementId } from "./element-markup";
 
 export const createSiteSchema = z.object({
   name: z.string().min(2).max(100),
@@ -144,6 +145,133 @@ export const slugHistorySchema = z.array(
   })
 );
 
+/* CMS bindings — which canvas element shows which collection field, and
+   which element repeats per record. The shape Composer.exportProject() writes
+   (`cmsBindings`: CMSBindingManager's export() / exportCollectionBindings()).
+   Keys are element ids, so they get the element-id rule the sanitizer uses;
+   counts are bounded because the whole map lands in one JSON column. */
+const MAX_BOUND_ELEMENTS = 5000;
+const MAX_BINDINGS_PER_ELEMENT = 50;
+/** Largest "Show N" a collection list stores — the inspector clamps to it. */
+export const CMS_COLLECTION_LIMIT_MAX = 10_000;
+/** Serialized length (UTF-16 units, `JSON.stringify(...).length`) above
+ *  which a save keeps its pages but not its bindings. */
+export const MAX_CMS_BINDINGS_CHARS = 1_000_000;
+
+/**
+ * The element properties a CMS field binding may fill — SSOT for the save
+ * schema and both sinks (CMSBindingManager on the canvas, CMSExportResolver on
+ * the published page). A stored binding's `property` becomes an attribute
+ * name, so anything else (`onmouseover`, `style`, …) is a stored XSS. The
+ * editor itself emits only content/src/href (ContentSection `boundProperty`).
+ */
+export const CMS_BINDABLE_PROPERTIES = ["content", "src", "href", "alt", "title"] as const;
+export type CmsBindableProperty = (typeof CMS_BINDABLE_PROPERTIES)[number];
+
+/**
+ * May `value` be written to `property` of a bound element? Only allowlisted
+ * properties, and never a URL `isDangerousUrl` refuses into src/href. Values
+ * resolve from CMS entries at render time, so the sinks call this on every
+ * write — the save schema cannot see them.
+ */
+export function isSafeCmsBoundValue(property: string, value: string): property is CmsBindableProperty {
+  if (!(CMS_BINDABLE_PROPERTIES as readonly string[]).includes(property)) return false;
+  return !((property === "src" || property === "href") && isDangerousUrl(value));
+}
+
+const bindingElementId = z.string().max(128).refine(isSafeElementId, { message: "Invalid element id" });
+
+const cmsFieldBindingSchema = z
+  .object({
+    binding: z.object({
+      sourceId: z.string().max(300),
+      path: z.string().max(500),
+      type: z.string().max(32),
+    }),
+    collectionId: z.string().max(200),
+    itemId: z.string().max(200).optional(),
+    fieldSlug: z.string().max(200),
+    property: z.enum(CMS_BINDABLE_PROPERTIES),
+    fallback: z.string().max(10_000).optional(),
+  })
+  .refine((b) => b.fallback === undefined || isSafeCmsBoundValue(b.property, b.fallback), {
+    message: "Unsafe fallback URL",
+  });
+
+const cmsCollectionBindingSchema = z.object({
+  elementId: bindingElementId,
+  collectionId: z.string().max(200),
+  itemVar: z.string().max(64),
+  indexVar: z.string().max(64).optional(),
+  limit: z.number().int().min(0).max(CMS_COLLECTION_LIMIT_MAX).optional(),
+  status: z.enum(["published", "draft", "all"]).optional(),
+  repeat: z.enum(["self", "children"]).optional(),
+});
+
+const boundedRecord = <T extends z.ZodTypeAny>(value: T) =>
+  z
+    .record(bindingElementId, value)
+    .refine((r) => Object.keys(r).length <= MAX_BOUND_ELEMENTS, { message: "Too many bound elements" });
+
+const cmsBindingsShape = z.object({
+  field: boundedRecord(z.array(cmsFieldBindingSchema).max(MAX_BINDINGS_PER_ELEMENT)).optional(),
+  collection: boundedRecord(cmsCollectionBindingSchema).optional(),
+});
+export type CmsBindingsInput = z.infer<typeof cmsBindingsShape>;
+
+const isPlainRecord = (v: unknown): v is Record<string, unknown> =>
+  v !== null && typeof v === "object" && !Array.isArray(v);
+
+/** The well-formed entries of an element-id-keyed record, capped in count. */
+function keepEntries<V>(raw: unknown, keep: (value: unknown) => V | null): Record<string, V> | undefined {
+  if (!isPlainRecord(raw)) return undefined;
+  const out: Record<string, V> = {};
+  let count = 0;
+  for (const [id, value] of Object.entries(raw)) {
+    if (count >= MAX_BOUND_ELEMENTS) break;
+    if (!bindingElementId.safeParse(id).success) continue;
+    const kept = keep(value);
+    if (kept === null) continue;
+    out[id] = kept;
+    count += 1;
+  }
+  return out;
+}
+
+/**
+ * Only the well-formed binding entries — one bad entry (an out-of-range
+ * limit, an unsafe element id, a malformed field binding) is dropped on its
+ * own, the way `sanitizeProjectStyles` drops a bad rule, instead of failing
+ * the whole save and losing the pages with it. Anything that is not a
+ * bindings object reads as "none sent". Also the read filter for a stored
+ * value (`duplicateSite`).
+ */
+export function filterCmsBindings(raw: unknown): CmsBindingsInput | undefined {
+  if (!isPlainRecord(raw)) return undefined;
+  const field = keepEntries(raw.field, (list) => {
+    if (!Array.isArray(list)) return null;
+    const kept = list
+      .slice(0, MAX_BINDINGS_PER_ELEMENT)
+      .flatMap((b) => {
+        const parsed = cmsFieldBindingSchema.safeParse(b);
+        return parsed.success ? [parsed.data] : [];
+      });
+    return kept.length > 0 ? kept : null;
+  });
+  const collection = keepEntries(raw.collection, (b) => {
+    const parsed = cmsCollectionBindingSchema.safeParse(b);
+    return parsed.success ? parsed.data : null;
+  });
+  return {
+    ...(field ? { field } : {}),
+    ...(collection ? { collection } : {}),
+  };
+}
+
+/** The save-side shape: lenient per entry (see filterCmsBindings), never a
+ *  reason to refuse a save. */
+export const cmsBindingsSchema = z.preprocess(filterCmsBindings, cmsBindingsShape.optional());
+
 export const saveProjectDataSchema = z.object({
   siteId: z.string(),
   pages: z.array(
@@ -168,6 +296,7 @@ export const saveProjectDataSchema = z.object({
   assets: z.unknown().optional(),
   settings: z.unknown().optional(),
   dsSchemaVersion: z.number().int().min(0).optional(),
+  cmsBindings: cmsBindingsSchema.optional(),
 });
 
 /**
@@ -216,6 +345,10 @@ export const editorSaveProjectSchema = z.object({
        reached Site.dsSchemaVersion and the migration re-ran on every open
        (walk A2, 2026-09-24). */
     dsSchemaVersion: z.number().int().min(0).optional(),
+    /* Stripped here like dsSchemaVersion was: Composer.exportProject() has
+       written it since bindings were made to round-trip, but the save dropped
+       it, so every server reload unbound every element (Ldata bug B). */
+    cmsBindings: cmsBindingsSchema.optional(),
   }),
 });
 

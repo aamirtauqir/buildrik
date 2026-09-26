@@ -5,11 +5,12 @@
  * what happens once a visitor submits: show a message or redirect, who gets
  * notified, and whether the honeypot spam guard is on.
  *
- * The block's id IS the form element's own id (`lib/publish-forms.ts` wires a
- * published form to `/api/public/forms/<siteId>/<elementId>`, and the publish
- * worker upserts the FormBlock row under that same id) — so a setting saved
- * here before the form is ever published still lands on the row publish
- * later creates.
+ * The row is keyed by (siteId, blockId = the form element's own id):
+ * `lib/publish-forms.ts` wires a published form to
+ * `/api/public/forms/<siteId>/<elementId>`, and the publish worker upserts the
+ * FormBlock row under that same (siteId, blockId) — so a setting saved here
+ * before the form is ever published still lands on the row publish later
+ * updates. The row's own `id` is a surrogate.
  *
  * `successAction`/`redirectUrl` are validated together server-side (a
  * REDIRECT row needs a URL) — `save()` always sends both when either

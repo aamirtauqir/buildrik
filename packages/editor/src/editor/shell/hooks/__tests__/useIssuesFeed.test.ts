@@ -30,7 +30,7 @@ function makeComposer(opts: {
     },
     off: (ev: string, fn: (...args: unknown[]) => void) => handlers.get(ev)?.delete(fn),
     emit: (ev: string) => handlers.get(ev)?.forEach((fn) => fn()),
-    elements: { getAllPages: () => opts.pages ?? [] },
+    elements: { exportPages: () => opts.pages ?? [] },
     designSystem: {
       lintState: {
         getAllVisibleIssues: () => opts.lintIssues ?? [],
@@ -140,5 +140,31 @@ describe("useIssuesFeed", () => {
     const issues = setIssuesHook();
     const { result } = renderHook(() => useIssuesFeed(composer, null, issues.setIssues));
     await waitFor(() => expect(result.current.scanState).toBe("idle"));
+  });
+
+  it("lists a content fact once: the scanner's per-element row, not the server's summary row too", async () => {
+    const composer = makeComposer({
+      pages: [
+        {
+          id: "home",
+          name: "Home",
+          root: { id: "img1", type: "image", tagName: "img", attributes: { src: "/a.png" } },
+        },
+      ],
+    });
+    fetchPrePublishChecks.mockResolvedValue({
+      ready: true,
+      checks: [
+        { label: "Image alt text", status: "warning", detail: "1 image is missing alt text." },
+        { label: "Domain connected", status: "warning", detail: "No custom domain" },
+      ],
+    });
+    const issues = setIssuesHook();
+    renderHook(() => useIssuesFeed(composer, "site-1", issues.setIssues));
+    await waitFor(() => {
+      expect(issues.get().some((i) => i.id === "publish-check:Domain connected")).toBe(true);
+      expect(issues.get().some((i) => i.id === "content:alt:img1")).toBe(true);
+    });
+    expect(issues.get().some((i) => i.id === "publish-check:Image alt text")).toBe(false);
   });
 });

@@ -2,13 +2,16 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
+import { blankPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
 import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
   ListSitesInput,
   BulkActionInput,
   SaveProjectDataInput,
+  CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
+import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 
@@ -253,7 +256,9 @@ export async function createSite(
         name: "Home",
         slug: "home",
         position: 0,
-        blocks: [],
+        // X-A1: its own root (id unique per page), not [] — every [] page
+        // used to load with one shared "root".
+        blocks: blankPageRoot(`${created.id}:home`),
         isHomePage: true,
       },
     });
@@ -391,6 +396,14 @@ export async function duplicateSite(
   });
   const originalForms = await prisma.formBlock.findMany({ where: { siteId } });
 
+  /* X-A1: legacy pages can share element ids ("root" everywhere), which the
+     editor loads as one tree. The copy is written with the editor's own
+     deterministic re-id — keyed by the ORIGINAL page id, so the duplicate
+     gets exactly the ids the editor gives the original on load — and what is
+     keyed by a renamed id (style rules, form blocks, CMS bindings) is copied
+     along. */
+  const reid = reidSite(originalPages, sanitizeProjectStyles(original.projectStyles));
+
   // Site + pages + form blocks must be copied atomically — a crash mid-copy
   // previously left an orphan half-built site. The page copy also dropped
   // meta/settings/slugHistory/slugManuallySet/translations and every
@@ -408,22 +421,22 @@ export async function duplicateSite(
         // sanitization (or have been written by a path that skipped it) — the
         // copy re-runs the same allowlist sanitizer the direct-save path uses
         // (:639) rather than trusting the source row.
-        projectStyles:
-          (sanitizeProjectStyles(original.projectStyles) as Prisma.InputJsonValue) ?? undefined,
+        projectStyles: (reid.styles as Prisma.InputJsonValue) ?? undefined,
         projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
         projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
+        projectCmsBindings: copyCmsBindings(original.projectCmsBindings, reid.renames),
         lastEditedAt: new Date(),
       },
     });
 
     if (originalPages.length > 0) {
       await tx.page.createMany({
-        data: originalPages.map((p) => ({
+        data: originalPages.map((p, i) => ({
           siteId: newSite.id,
           name: p.name,
           slug: p.slug,
           position: p.position,
-          blocks: (p.blocks ?? []) as Prisma.InputJsonValue,
+          blocks: (reid.pages[i].blocks ?? []) as Prisma.InputJsonValue,
           isHomePage: p.isHomePage,
           seoTitle: p.seoTitle,
           seoDescription: p.seoDescription,
@@ -445,28 +458,56 @@ export async function duplicateSite(
         select: { id: true, slug: true },
       });
       const slugToNewPageId = new Map(newPages.map((p) => [p.slug, p.id]));
+      const copyForm = (f: (typeof originalForms)[number], blockId: string) => {
+        const slugForForm = f.pageId ? oldPageIdToSlug.get(f.pageId) : undefined;
+        const newPageId = slugForForm ? slugToNewPageId.get(slugForForm) ?? null : null;
+        return {
+          siteId: newSite.id,
+          pageId: newPageId,
+          blockId,
+          name: f.name,
+          fields: f.fields as Prisma.InputJsonValue,
+          submitButtonText: f.submitButtonText,
+          successMessage: f.successMessage,
+          successAction: f.successAction,
+          redirectUrl: f.redirectUrl,
+          spamProtection: f.spamProtection,
+          notifyEmail: f.notifyEmail,
+          webhookUrl: f.webhookUrl,
+          isActive: f.isActive,
+        };
+      };
+      /* A form row is keyed by (site, element id) — no writer sets pageId — so
+         it serves every page carrying that id. The copy's rows sit under the
+         copy's siteId (a fresh surrogate id each), where its publish and its
+         public form look them up. Each page whose copy of the element was
+         re-id'd gets its own row; the original id's row stays for the page
+         that kept it. */
       await tx.formBlock.createMany({
-        data: originalForms.map((f) => {
-          const slugForForm = f.pageId ? oldPageIdToSlug.get(f.pageId) : undefined;
-          const newPageId = slugForForm ? slugToNewPageId.get(slugForForm) ?? null : null;
-          return {
-            siteId: newSite.id,
-            pageId: newPageId,
-            blockId: f.blockId,
-            name: f.name,
-            fields: f.fields as Prisma.InputJsonValue,
-            submitButtonText: f.submitButtonText,
-            successMessage: f.successMessage,
-            notifyEmail: f.notifyEmail,
-            webhookUrl: f.webhookUrl,
-            isActive: f.isActive,
-          };
-        }),
+        data: [
+          ...originalForms.map((f) => copyForm(f, f.blockId)),
+          ...copiesForRenamedIds(originalForms, reid.renames).map(({ row, to }) => copyForm(row, to)),
+        ],
+        // A renamed id that coincides with a kept one must not abort the copy.
+        skipDuplicates: true,
       });
     }
 
     return newSite;
   });
+}
+
+/** A site's stored CMS bindings for its copy: every entry kept, plus one per
+ *  element id the copy's re-id renamed (the same copy the editor makes on
+ *  load — `Composer.importProject`). Null stays unset. */
+function copyCmsBindings(stored: Prisma.JsonValue, renames: IdRename[]): Prisma.InputJsonValue | undefined {
+  const filtered = filterCmsBindings(stored);
+  if (!filtered) return undefined;
+  const { field, collection } = filtered;
+  return {
+    ...(field ? { field: copyIdKeyedRecord(field, renames) } : {}),
+    ...(collection ? { collection: copyIdKeyedRecord(collection, renames) } : {}),
+  } as Prisma.InputJsonValue;
 }
 
 export async function archiveSite(siteId: string) {
@@ -544,6 +585,7 @@ export async function saveProjectFromEditor(
     metadata?: unknown;
     settings?: unknown;
     dsSchemaVersion?: number;
+    cmsBindings?: CmsBindingsInput;
   },
   expectedLastEditedAt?: string,
 ) {
@@ -574,6 +616,7 @@ export async function saveProjectFromEditor(
     assets: projectData.assets,
     settings: projectData.settings,
     dsSchemaVersion: projectData.dsSchemaVersion,
+    cmsBindings: projectData.cmsBindings,
   }, expectedLastEditedAt);
 }
 
@@ -620,7 +663,8 @@ export async function bulkAction(
  *   - Per page: blocks, name, slug, position, isHomePage, seoTitle, seoDescription,
  *     meta (Json?), settings (Json?), slugHistory (Json?), slugManuallySet (Boolean).
  *   - Upserts incoming pages by id, deletes pages no longer present.
- *   - Site-level: projectStyles, projectAssets, projectSettings, lastEditedAt.
+ *   - Site-level: projectStyles, projectAssets, projectSettings,
+ *     projectCmsBindings, lastEditedAt.
  *
  * REGRESSION-1 (codex finding C23): `pages[].meta` was previously dropped on
  * save, breaking applied-template state across reload. Persisting meta is
@@ -642,6 +686,15 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // Site-level project artifacts. The style rules' selectors and media
   // queries are written raw into the published stylesheet — same boundary.
   sanitizeProjectStyles(input.styles);
+
+  // Bad entries were already dropped per entry (cmsBindingsSchema). A map
+  // past the size cap is not stored — the save and its pages still land, the
+  // previously stored bindings stay.
+  let cmsBindings = input.cmsBindings;
+  if (cmsBindings && JSON.stringify(cmsBindings).length > MAX_CMS_BINDINGS_CHARS) {
+    console.warn(`[saveProjectData] site=${input.siteId} cmsBindings over ${MAX_CMS_BINDINGS_CHARS} chars — not stored`);
+    cmsBindings = undefined;
+  }
 
   await prisma.$transaction(async (tx) => {
     /* 61-conflict / A-2: optimistic concurrency as a compare-and-swap, FIRST in
@@ -672,6 +725,9 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
             ? undefined
             : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
         dsSchemaVersion: input.dsSchemaVersion,
+        // Undefined (an editor build that predates the field) leaves the
+        // stored bindings alone; the editor always sends its full map.
+        projectCmsBindings: cmsBindings as Prisma.InputJsonValue | undefined,
         lastEditedAt: savedAt,
         ...(isFullSnapshot ? { pages: input.pages.length } : {}),
       },
@@ -806,6 +862,7 @@ export async function getProjectData(siteId: string) {
       projectStyles: true,
       projectAssets: true,
       projectSettings: true,
+      projectCmsBindings: true,
       dsSchemaVersion: true,
       sitePages: {
         select: {
@@ -838,6 +895,7 @@ export async function getProjectData(siteId: string) {
     assets: site.projectAssets ?? [],
     settings: site.projectSettings ?? {},
     dsSchemaVersion: site.dsSchemaVersion,
+    cmsBindings: site.projectCmsBindings ?? undefined,
   };
 }
 

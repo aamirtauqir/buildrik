@@ -80,7 +80,7 @@ describe("StudioPanels — ui:switch-tab respects the VIEWER rail gate", () => {
     // The rail's gate — same function, not a re-derived VIEWER_TABS.has(...) check.
     expect(src).toMatch(/if \(!isTabAllowedForViewer\(tab, viewerChrome\)\)/);
     // Imported from the tab registry, not locally re-defined here.
-    expect(src).toContain('import { getTabMode, isTabAllowedForViewer, VIEWER_TABS } from "../rail/tabsConfig"');
+    expect(src).toMatch(/import \{[^}]*\bisTabAllowedForViewer\b[^}]*\bVIEWER_TABS\b[^}]*\} from "\.\.\/rail\/tabsConfig"/);
     expect(src).not.toMatch(/function isTabAllowedForViewer/);
     // Exactly ONE canonical definition exists, in the tab registry.
     expect(tabsConfigSrc.match(/export function isTabAllowedForViewer/g)).toHaveLength(1);
@@ -110,5 +110,15 @@ describe("isTabAllowedForViewer", () => {
     expect(isTabAllowedForViewer("design" as never, true)).toBe(false);
     expect(isTabAllowedForViewer("settings" as never, true)).toBe(false);
     expect(isTabAllowedForViewer("ai" as never, true)).toBe(false);
+  });
+});
+
+/* X-8: a VIEWER's column used to be the role notice and nothing else, so the
+   read-only History/Review/Activity (FC-9) rendered nowhere. */
+describe("StudioPanels — a VIEWER's column hosts the column-tab panel", () => {
+  it("decides the column with the shared predicate and renders it in the viewer's column", () => {
+    expect(src).toContain("const rightColumnTab = isColumnTabOpen({");
+    expect(src).toContain('{rightColumnTab ? columnPanel : <ViewerRoleNotice role="VIEWER" />}');
+    expect(src).toContain("viewerChrome={viewerChrome}");
   });
 });

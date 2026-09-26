@@ -236,6 +236,7 @@ export async function getShareDraftRows(siteId: string) {
       publishedUrl: true,
       projectStyles: true,
       projectSettings: true,
+      projectCmsBindings: true,
       dsSchemaVersion: true,
       favicon: true,
       defaultLocale: true,
@@ -276,13 +277,13 @@ export async function getShareDraftRows(siteId: string) {
     select: { filename: true, url: true },
     orderBy: { createdAt: "asc" },
   });
-  const { sitePages, name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion, ...columns } = site;
+  const { sitePages, name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion, ...columns } = site;
   const pages = sitePages.filter((p) => {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;
     return visibility === undefined || visibility === "live";
   });
   return {
-    site: { name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion },
+    site: { name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion },
     pages,
     siteColumns: { name, ...columns },
     siteFonts: fontAssets,

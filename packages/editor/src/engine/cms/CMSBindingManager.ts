@@ -20,6 +20,8 @@
  */
 
 import type { CMSContentItem, CMSFieldType } from "../../shared/types/cms";
+import { filterCmsBindings, isSafeCmsBoundValue, type CmsBindableProperty } from "@buildrik/shared/schemas/sites";
+import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
@@ -35,8 +37,8 @@ export interface CMSElementBinding extends BindingWithData {
   itemId?: string;
   /** Field slug to bind */
   fieldSlug: string;
-  /** Element property to bind (content, src, href, alt) */
-  property: string;
+  /** Element property to bind — the shared allowlist (content, src, href, alt, title) */
+  property: CmsBindableProperty;
   /** Fallback value if binding fails */
   fallback?: string;
 }
@@ -95,7 +97,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     collectionId: string,
     itemId: string | undefined,
     fieldSlug: string,
-    property: string,
+    property: CmsBindableProperty,
     fallback?: string,
     /** Makes the bind one undo step (the inspector passes it; loads don't). */
     historyLabel?: string
@@ -200,21 +202,16 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
        was silently re-armed 1000ms later. `runWithoutTracking` stops the
        recorder seeing this one emit while leaving the dirty flag and autosave
        untouched — they read the same event through their own listeners. */
+    /* Stored bindings and CMS entry values are data, not this session's
+       input: off-allowlist properties (onclick, style, …) and dangerous
+       src/href URLs never reach the element. */
+    if (!isSafeCmsBoundValue(binding.property, value)) return;
+    const property = binding.property;
     const write = () => {
-      switch (binding.property) {
-        case "content":
-          element.setContent(value);
-          break;
-        case "src":
-        case "href":
-        case "alt":
-        case "title":
-          element.setTrait(binding.property, value);
-          break;
-        default:
-          // For other properties, try setting as trait
-          element.setTrait(binding.property, value);
-      }
+      // Text semantics, as publish (textContent): the value is escaped, or
+      // toHTML would emit a CMS entry's markup raw into the canvas.
+      if (property === "content") element.setContent(escapeHtmlText(value));
+      else element.setTrait(property, value);
     };
     const history = this.composer.history;
     if (history?.runWithoutTracking) history.runWithoutTracking(write);
@@ -332,6 +329,17 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   /**
    * Export collection bindings for persistence
    */
+  /**
+   * Field bindings arrive here from version restore, the local cache and
+   * collab as well as the server — only the server's save filters them. The
+   * same per-entry filter (shared filterCmsBindings) runs here: an entry off
+   * the property allowlist, with a dangerous URL fallback or an unsafe
+   * element id is dropped; the rest import as before.
+   */
+  override import(data: Record<string, CMSElementBinding[]>): void {
+    super.import((filterCmsBindings({ field: data })?.field ?? {}) as Record<string, CMSElementBinding[]>);
+  }
+
   exportCollectionBindings(): Record<string, CMSCollectionBinding> {
     const exported: Record<string, CMSCollectionBinding> = {};
     for (const [elementId, binding] of this.collectionBindings) {
@@ -345,7 +353,9 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
    */
   importCollectionBindings(data: Record<string, CMSCollectionBinding>): void {
     this.collectionBindings.clear();
-    for (const [elementId, binding] of Object.entries(data)) {
+    // Same per-entry filter as import(): ids, bounds and shape.
+    const safe = filterCmsBindings({ collection: data })?.collection ?? {};
+    for (const [elementId, binding] of Object.entries(safe)) {
       this.collectionBindings.set(elementId, binding);
     }
   }

@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { isDangerousUrl } from "@buildrik/shared/schemas/element-markup";
 import type { CMSElementBinding } from "./CMSBindingManager";
 
 /**
@@ -95,6 +96,7 @@ export function resolveDataBindings(element: Element, data: Record<string, unkno
 
     const value = String(data[field] ?? "");
 
+    if ((el.tagName === "IMG" || el.tagName === "A") && isDangerousUrl(value)) continue;
     if (el.tagName === "IMG") {
       el.setAttribute("src", value);
       // Also update alt if not already set

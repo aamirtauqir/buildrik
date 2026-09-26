@@ -3,6 +3,7 @@ import {
   GROUPED_TABS_CONFIG,
   getTabMode,
   getTabConfig,
+  isColumnTabOpen,
 } from "../tabsConfig";
 // ONE width for every panel (founder-approved 2026-07-24). These assertions
 // used to hardcode 280, which is how the superseded two-width rule survived
@@ -70,5 +71,30 @@ describe("tabsConfig helpers", () => {
         expect((tab as unknown as Record<string, unknown>).panelWidth).toBeUndefined();
       }
     });
+  });
+});
+
+/* X-8 (live verify 2026-09-26): a VIEWER's H shortcut switched to History,
+   and History rendered nowhere — the right column was withheld from every
+   read-only view, and the drawer skips a column-hosted tab. The column's
+   one predicate now serves a VIEWER too; an owner's own read-only preview
+   stays panel-free. */
+describe("isColumnTabOpen", () => {
+  const base = { readOnlyView: false, viewerChrome: false, isLeftPanelOpen: true, reviewsEnabled: true };
+  it("hosts History / Review / Activity for a VIEWER", () => {
+    for (const tab of ["history", "review", "activity"] as const) {
+      expect(isColumnTabOpen({ ...base, readOnlyView: true, viewerChrome: true, activeTabId: tab })).toBe(true);
+    }
+  });
+  it("hosts nothing in an owner's read-only preview", () => {
+    expect(isColumnTabOpen({ ...base, readOnlyView: true, activeTabId: "history" })).toBe(false);
+  });
+  it("keeps Review closed when the review layer is off (FB-4), and drawer tabs out", () => {
+    expect(isColumnTabOpen({ ...base, reviewsEnabled: false, activeTabId: "review" })).toBe(false);
+    expect(isColumnTabOpen({ ...base, activeTabId: "layers" })).toBe(false);
+    expect(isColumnTabOpen({ ...base, activeTabId: "publish" })).toBe(true);
+  });
+  it("is closed while the panel is closed", () => {
+    expect(isColumnTabOpen({ ...base, isLeftPanelOpen: false, activeTabId: "history" })).toBe(false);
   });
 });

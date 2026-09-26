@@ -73,6 +73,21 @@ export function isDangerousUrl(value: string): boolean {
   return compact.startsWith("data:") && !compact.startsWith("data:image/");
 }
 
+/**
+ * Text -> HTML: `&`, `<`, `>`, `"` and `'` as entities, so a value spliced into
+ * markup (an element's content, a template, an attribute) stays inert text.
+ * The one escaper for CMS values on every path (canvas binding, repeater,
+ * record preview, server dynamic pages).
+ */
+export function escapeHtmlText(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /** A style key as stored: kebab or camelCase, vendor-prefixed, or a custom property. */
 const CSS_PROPERTY_SHAPE = /^(?:--[a-zA-Z0-9_-]+|-?[a-zA-Z][a-zA-Z0-9-]*)$/;
 /**

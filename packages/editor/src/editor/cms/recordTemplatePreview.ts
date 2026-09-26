@@ -20,14 +20,11 @@ import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 import { sanitizeHTML } from "@/shared/utils/html/sanitization";
+import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 
 export type RecordTemplatePreview =
   | { ok: true; html: string }
   | { ok: false; reason: "no-template" | "template-missing" | "render-failed" };
-
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
 
 export async function renderRecordTemplatePreview(
   composer: Composer,
@@ -58,7 +55,7 @@ export async function renderRecordTemplatePreview(
   const end = bodyEnd >= bodyStart ? bodyEnd : page.html.length;
   const body = page.html.slice(bodyStart, end).replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
     const v = record.data[key];
-    return v === undefined || v === null ? "" : escapeHtml(String(v));
+    return v === undefined || v === null ? "" : escapeHtmlText(String(v));
   });
   return { ok: true, html: page.html.slice(0, bodyStart) + sanitizeHTML(body) + page.html.slice(end) };
 }

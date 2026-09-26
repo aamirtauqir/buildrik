@@ -12,6 +12,7 @@
  * @license BSD-3-Clause
  */
 import { renderHook, act } from "@testing-library/react";
+import { TRPCClientError } from "@trpc/client";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { THRESHOLDS } from "../../../../shared/constants/config";
 import { useComposerInit, type UseComposerInitParams } from "../useComposerInit";
@@ -149,6 +150,26 @@ describe("autosave refused with FORBIDDEN", () => {
     expect(toasts.some((t) => t.title === "You don't have access to save this site")).toBe(true);
     expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
     expect(invalidateMyRole).toHaveBeenCalledTimes(1);
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+  });
+
+  // C-9 (live): the server's FORBIDDEN arrives as a TRPCClientError whose
+  // message is "Insufficient permissions" — the code, not the text, says 403.
+  it("recognises the real TRPCClientError FORBIDDEN shape", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(
+      TRPCClientError.from({
+        error: {
+          message: "Insufficient permissions",
+          code: -32603,
+          data: { code: "FORBIDDEN", httpStatus: 403, path: "sites.saveProject" },
+        },
+      }),
+    );
+    const toasts = await runAutosave(params());
+
+    expect(toasts.some((t) => t.title === "You don't have access to save this site")).toBe(true);
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
     localStorage.removeItem("bk-unsaved-v1-site-1");
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { detectContentIssues } from "../contentIssues";
-import type { ElementData, PageData } from "../../../shared/types";
+import { asContentRoot, detectContentIssues } from "../contentIssues";
+import type { ContentElement as ElementData, ContentPage as PageData } from "../contentIssues";
 
 function el(partial: Partial<ElementData> & { id: string }): ElementData {
   return { type: "container", ...partial } as ElementData;
@@ -128,5 +128,27 @@ describe("detectContentIssues", () => {
     expect(findings).toHaveLength(2);
     expect(findings.find((f) => f.elementId === "img1")?.pageId).toBe("home");
     expect(findings.find((f) => f.elementId === "l1")?.pageId).toBe("about");
+  });
+
+  it("treats a #page: target as alive when it is in existingPageIds but not scanned (server: hidden pages)", () => {
+    const pages = [
+      page({ id: "home", root: el({ id: "a1", type: "link", tagName: "a", attributes: { href: "#page:hidden" } }) }),
+    ];
+    expect(detectContentIssues(pages)).toHaveLength(1);
+    expect(detectContentIssues(pages, ["home", "hidden"])).toHaveLength(0);
+  });
+
+  it("skips a malformed stored children value instead of throwing", () => {
+    const root = { id: "r", type: "container", children: "oops" } as unknown as ElementData;
+    expect(() => detectContentIssues([page({ id: "home", root })])).not.toThrow();
+  });
+});
+
+describe("asContentRoot", () => {
+  it("accepts a stored element root and rejects legacy/empty shapes", () => {
+    expect(asContentRoot({ id: "root", type: "container" })?.id).toBe("root");
+    expect(asContentRoot([])).toBeUndefined();
+    expect(asContentRoot(null)).toBeUndefined();
+    expect(asContentRoot({ type: "container" })).toBeUndefined();
   });
 });

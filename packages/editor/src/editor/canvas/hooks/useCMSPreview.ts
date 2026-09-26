@@ -9,6 +9,7 @@ import type { Composer } from "../../../engine";
 import { devError } from "../../../shared/utils/devLogger";
 import { EVENTS } from "@/shared/constants/events";
 import { RepeaterRenderer } from "@/engine/cms/RepeaterRenderer";
+import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 
 interface UseCMSPreviewOptions {
   composer: Composer | null;
@@ -76,26 +77,13 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
             const promise = composer.cms.bindings.resolveBinding(binding).then((value) => {
               if (!value) return;
 
-              switch (binding.property) {
-                case "content":
-                  el.textContent = value;
-                  break;
-                case "src":
-                  el.setAttribute("src", value);
-                  break;
-                case "href":
-                  el.setAttribute("href", value);
-                  break;
-                case "alt":
-                  el.setAttribute("alt", value);
-                  break;
-                case "title":
-                  el.setAttribute("title", value);
-                  break;
-                default:
-                  // Try setting as attribute
-                  el.setAttribute(binding.property, value);
-              }
+              /* Rendered into the app origin (Canvas innerHTML): stored
+                 property names and CMS entry values are data — only the
+                 shared allowlist, and never a dangerous src/href URL. */
+              const property = binding.property;
+              if (!isSafeCmsBoundValue(property, value)) return;
+              if (property === "content") el.textContent = value;
+              else el.setAttribute(property, value);
 
               // Add visual indicator that this element has CMS binding
               el.setAttribute("data-cms-bound", "true");

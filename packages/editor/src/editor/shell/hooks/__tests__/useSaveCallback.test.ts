@@ -7,6 +7,7 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { TRPCClientError } from "@trpc/client";
 import { useSaveCallback, type UseSaveCallbackOptions } from "../useSaveCallback";
 
 /* The siteId branch calls the SERVICE's saveProject, not the composer's, so
@@ -434,6 +435,50 @@ describe("useSaveCallback — an expired session is not a retryable save failure
       expect(localStorage.getItem("bk-unsaved-v1-site_forbidden")).not.toBeNull();
       expect(invalidateMyRole).toHaveBeenCalled();
       localStorage.removeItem("bk-unsaved-v1-site_forbidden");
+    } finally {
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
+
+  /* C-9 (live): a VIEWER-demoted save gets the server's TRPCError FORBIDDEN,
+     whose MESSAGE is "Insufficient permissions" (permission.service
+     checkSiteRole) — no "forbidden" or "403" in it. The string-matching
+     helper let it fall through to the generic "Save failed", so keepUnsaved
+     and the role invalidation never ran. The tests above invented messages;
+     this one is the error object tRPC's client actually rejects with. */
+  it("a real TRPCClientError FORBIDDEN (message 'Insufficient permissions') keeps the work", async () => {
+    const url = new URL("http://localhost:3000/edit/site_trpc403");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    localStorage.removeItem("bk-unsaved-v1-site_trpc403");
+    try {
+      const opts = makeOpts();
+      svc.saveProject.mockRejectedValueOnce(
+        TRPCClientError.from({
+          error: {
+            message: "Insufficient permissions",
+            code: -32603,
+            data: { code: "FORBIDDEN", httpStatus: 403, path: "sites.saveProject" },
+          },
+        }),
+      );
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+        }),
+      );
+      await act(async () => {
+        await result.current();
+        await flushMicrotasks();
+      });
+      expect(localStorage.getItem("bk-unsaved-v1-site_trpc403")).not.toBeNull();
+      expect(invalidateMyRole).toHaveBeenCalled();
+      const toast = opts.addToast.mock.calls.at(-1)?.[0] as { title: string };
+      expect(toast.title).toBe("You don't have access to save this site");
+      localStorage.removeItem("bk-unsaved-v1-site_trpc403");
     } finally {
       Object.defineProperty(window, "location", { value: original, writable: true });
     }

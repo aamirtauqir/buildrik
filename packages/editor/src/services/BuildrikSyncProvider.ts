@@ -15,6 +15,7 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { dropSessionMediaUrls } from "@/shared/utils/html";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
+import { blankPageRoot } from "@buildrik/shared/content/elementIds";
 
 /**
  * Shape of a page row returned by `pages.list`. Extended in Phase 1 to
@@ -176,11 +177,6 @@ function emitSettingsMirrorError(message: string): void {
   }
 }
 
-const DEFAULT_ROOT: ElementData = {
-  id: "root",
-  type: "container",
-  children: [],
-};
 
 /**
  * P0.2b SSOT: shape of Site columns that mirror editor projectSettings fields.
@@ -401,6 +397,7 @@ export function projectDataFromRows(
     publishedUrl?: string | null;
     projectStyles?: unknown;
     projectSettings?: unknown;
+    projectCmsBindings?: ProjectData["cmsBindings"] | null;
     dsSchemaVersion?: number;
   };
   // tRPC `pages.list` returns Prisma rows with Json columns typed as
@@ -427,9 +424,12 @@ export function projectDataFromRows(
       name: p.name,
       slug: p.slug,
       isHome: p.isHomePage,
+      /* A page that has never been saved stores `[]`. Each gets its OWN root,
+         with an id derived from the page: one shared DEFAULT_ROOT object
+         made every blank page one element, so an edit on one landed on all. */
       root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
         ? p.blocks
-        : DEFAULT_ROOT,
+        : (blankPageRoot(p.id) as ElementData),
       settings: p.settings,
       meta: p.meta ?? undefined,
       updatedAt: p.updatedAt,
@@ -454,6 +454,8 @@ export function projectDataFromRows(
     assets: [],
     settings: mergedSettings,
     dsSchemaVersion: siteRow.dsSchemaVersion ?? 0,
+    // Stored by sites.saveProject from exportProject()'s own `cmsBindings`.
+    cmsBindings: siteRow.projectCmsBindings ?? undefined,
     metadata: {
       name: siteRow.name,
       domain: siteRow.domain,

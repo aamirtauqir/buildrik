@@ -75,17 +75,25 @@ export function useDynamicPagesSummary(composer: Composer | null): DynamicPagesS
       });
     };
 
+    /* These are the CollectionManager's OWN events — it is a separate emitter
+       from the composer (X-6: subscribed on the composer, the row computed
+       once against a store not yet loaded and never heard the refresh). The
+       entry events matter too: the count is PUBLISHED entries only. */
+    const store = composer.cms?.collections;
+    const storeEvents = [
+      EVENTS.CMS_STORE_REFRESHED,
+      EVENTS.CMS_COLLECTION_CREATED,
+      EVENTS.CMS_COLLECTION_UPDATED,
+      EVENTS.CMS_COLLECTION_DELETED,
+      EVENTS.CMS_CONTENT_PUBLISHED,
+      EVENTS.CMS_CONTENT_UNPUBLISHED,
+      EVENTS.CMS_CONTENT_DELETED,
+    ] as const;
     recompute();
-    composer.on(EVENTS.CMS_STORE_REFRESHED, recompute);
-    composer.on(EVENTS.CMS_COLLECTION_UPDATED, recompute);
-    composer.on(EVENTS.CMS_COLLECTION_CREATED, recompute);
-    composer.on(EVENTS.CMS_COLLECTION_DELETED, recompute);
+    storeEvents.forEach((ev) => store?.on(ev, recompute));
     return () => {
       cancelled = true;
-      composer.off(EVENTS.CMS_STORE_REFRESHED, recompute);
-      composer.off(EVENTS.CMS_COLLECTION_UPDATED, recompute);
-      composer.off(EVENTS.CMS_COLLECTION_CREATED, recompute);
-      composer.off(EVENTS.CMS_COLLECTION_DELETED, recompute);
+      storeEvents.forEach((ev) => store?.off(ev, recompute));
     };
   }, [composer]);
 
