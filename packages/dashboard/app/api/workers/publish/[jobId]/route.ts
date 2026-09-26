@@ -339,8 +339,8 @@ async function runVercelDeployJob(
      all built; nothing ever created the FormBlock row they need, and the export
      only sets an action for Formspree or a custom webhook — so a form built in
      the editor published with no action at all and submitting reloaded the
-     page. The row id IS the form element's id, taken from the URL we ship, so
-     the two cannot drift. */
+     page. The row is keyed by (siteId, the form element's id), taken from the
+     URL we ship, so the two cannot drift. */
   const plan = planFormWiring(pages, {
     siteId,
     appOrigin: process.env.NEXT_PUBLIC_APP_URL ?? "",

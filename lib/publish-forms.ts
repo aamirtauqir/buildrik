@@ -11,14 +11,15 @@
  *
  * This closes it at publish time, where the siteId is known for certain: every
  * form without an action is pointed at the endpoint, keyed by its own element
- * id, and the worker upserts a FormBlock row under that same id. The ids come
- * from the URLs we ship, so the two cannot drift.
+ * id, and the worker upserts the site's FormBlock row under (siteId, that id).
+ * The ids come from the URLs we ship, so the two cannot drift. The element id
+ * is only unique within a site — sites made from one template share them.
  */
 import { escapeAttr } from "@lib/publish-html";
 
 /** A form found in a published page, with what it needs a row for. */
 export interface DiscoveredForm {
-  /** The form element's id — used verbatim as the FormBlock id. */
+  /** The form element's id — used verbatim as the FormBlock's `blockId`. */
   blockId: string;
   /** Page path the form lives on, for naming it in the dashboard. */
   path: string;

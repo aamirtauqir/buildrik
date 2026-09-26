@@ -975,6 +975,10 @@ model FormBlock {
   site        Site             @relation(fields: [siteId], references: [id], onDelete: Cascade)
   submissions FormSubmission[]
 
+  // A form is identified by its site plus the element/HTML id it carries into
+  // the published page (`/api/public/forms/<siteId>/<blockId>`). `id` is a
+  // surrogate: two sites built from one template share element ids.
+  @@unique([siteId, blockId])
   @@map("form_blocks")
 }
 

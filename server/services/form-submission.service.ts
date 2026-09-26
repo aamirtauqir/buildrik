@@ -77,7 +77,7 @@ export interface SubmitFormResult {
 
 export async function submitForm(
   siteId: string,
-  formBlockId: string,
+  blockId: string,
   input: FormSubmissionInput,
   ip: string,
   refererHeader?: string,
@@ -90,7 +90,7 @@ export async function submitForm(
   }
 
   const formBlock = await prisma.formBlock.findFirst({
-    where: { id: formBlockId, siteId, isActive: true },
+    where: { siteId, blockId, isActive: true },
   });
   if (!formBlock) throw new FormError("NOT_FOUND", "FORM_NOT_FOUND");
 
@@ -123,7 +123,7 @@ export async function submitForm(
   }
 
   const submission = await prisma.formSubmission.create({
-    data: { formBlockId, siteId, data: input.data, ip },
+    data: { formBlockId: formBlock.id, siteId, data: input.data, ip },
   });
 
   notifyWorkspaceOwner(
@@ -166,7 +166,7 @@ export async function submitForm(
       );
       return Promise.all(recipients.map((to) => sendFormSubmissionEmail(to, site!.name, fields, siteId)));
     })
-    .catch((err) => console.error(`[form-submission] notify email failed for form=${formBlockId}:`, err));
+    .catch((err) => console.error(`[form-submission] notify email failed for form=${formBlock.id}:`, err));
 
   // P6 workspace webhook — best-effort, never blocks the submission.
   if (site?.workspaceId) {
@@ -268,7 +268,7 @@ export async function getFormBlockSettings(
   siteId: string,
   blockId: string,
 ): Promise<FormBlockSettings> {
-  const row = await prisma.formBlock.findFirst({ where: { id: blockId, siteId } });
+  const row = await prisma.formBlock.findUnique({ where: { siteId_blockId: { siteId, blockId } } });
   if (!row) return DEFAULT_FORM_BLOCK_SETTINGS;
   return {
     successMessage: row.successMessage,
@@ -280,10 +280,10 @@ export async function getFormBlockSettings(
 }
 
 /**
- * Inspector AFTER SUBMIT / PROTECTION write. Upserts by the form element's
- * own id (the same id `wireForms` uses as the FormBlock id at publish time),
- * so a setting saved before the form is ever published still lands on the
- * row publish later creates/updates.
+ * Inspector AFTER SUBMIT / PROTECTION write. Upserts by (site, form element
+ * id) — the same key `wireForms` posts to and the publish worker records — so
+ * a setting saved before the form is ever published still lands on the row
+ * publish later updates.
  */
 export async function updateFormBlock(input: UpdateFormBlockInput) {
   const { siteId, blockId, ...settings } = input;
@@ -294,24 +294,14 @@ export async function updateFormBlock(input: UpdateFormBlockInput) {
   if (settings.notifyEmail !== undefined) data.notifyEmail = settings.notifyEmail || null;
   if (settings.spamProtection !== undefined) data.spamProtection = settings.spamProtection;
 
-  // `id` is globally unique, not scoped to siteId — an upsert keyed only on
-  // `where: { id }` would let a member of one site overwrite another site's
-  // row by guessing its element id. Check ownership of any existing row
-  // before writing.
-  const existing = await prisma.formBlock.findUnique({ where: { id: blockId }, select: { siteId: true } });
-  if (existing && existing.siteId !== siteId) {
-    throw new FormError("NOT_FOUND", "FORM_NOT_FOUND");
-  }
-
   return prisma.formBlock.upsert({
-    where: { id: blockId },
+    where: { siteId_blockId: { siteId, blockId } },
     // Not `...data` — `Prisma.FormBlockUpdateInput`'s fields are typed for
     // PATCH semantics (`string | StringFieldUpdateOperationsInput`), which
     // poisons a Create input's plain-scalar fields when spread in. Every
     // field here has its own default because a settings save can be the
     // FIRST write this row ever gets (before the form is ever published).
     create: {
-      id: blockId,
       siteId,
       blockId,
       name: "Untitled form",
@@ -334,10 +324,10 @@ export async function getPublishedFormSettings(
 ): Promise<Record<string, FormBlockWireSettings>> {
   const rows = await prisma.formBlock.findMany({
     where: { siteId },
-    select: { id: true, spamProtection: true, successMessage: true },
+    select: { blockId: true, spamProtection: true, successMessage: true },
   });
   return Object.fromEntries(
-    rows.map((b) => [b.id, { spamProtection: b.spamProtection, successMessage: b.successMessage }]),
+    rows.map((b) => [b.blockId, { spamProtection: b.spamProtection, successMessage: b.successMessage }]),
   );
 }
 
@@ -357,9 +347,8 @@ export async function recordPublishedForms(
 ): Promise<void> {
   for (const form of forms) {
     await prisma.formBlock.upsert({
-      where: { id: form.blockId },
+      where: { siteId_blockId: { siteId, blockId: form.blockId } },
       create: {
-        id: form.blockId,
         siteId,
         blockId: form.blockId,
         name: form.name,
@@ -371,7 +360,7 @@ export async function recordPublishedForms(
   }
   if (deactivateMissing) {
     await prisma.formBlock.updateMany({
-      where: { siteId, id: { notIn: forms.map((f) => f.blockId) } },
+      where: { siteId, blockId: { notIn: forms.map((f) => f.blockId) } },
       data: { isActive: false },
     });
   }
