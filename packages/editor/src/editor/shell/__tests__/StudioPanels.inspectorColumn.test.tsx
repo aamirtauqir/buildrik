@@ -11,7 +11,7 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, act, cleanup } from "@testing-library/react";
+import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 
 vi.mock("../../canvas/Canvas", () => ({ Canvas: React.forwardRef(() => null) }));
 vi.mock("../../sidebar/LeftSidebar", () => ({ LeftSidebar: () => null }));
@@ -162,3 +162,33 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
   });
 });
 
+
+describe("StudioPanels — Hide inspector (GW-3 / M-2)", () => {
+  it("hiding the visible inspector raises a toast whose Show brings it back", async () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByText("Inspector hidden")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Show" }));
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+
+  it("the hidden state does not survive a remount (no persistence)", () => {
+    const composer = makeComposer();
+    const { unmount } = render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    unmount();
+    render(<Harness composer={makeComposer()} />);
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+
+  it("no toast when a mode covers the inspector — nothing on screen changed", () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    expect(screen.getByTestId("ai-tab")).toBeTruthy();
+    expect(screen.queryByText("Inspector hidden")).toBeNull();
+  });
+});

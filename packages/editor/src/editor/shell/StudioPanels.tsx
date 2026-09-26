@@ -302,11 +302,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      ⌘K "Toggle inspector" stays the other door. */
   const [inspectorShown, setInspectorShown] = React.useState<boolean>(true);
   const inspectorShownRef = React.useRef(inspectorShown);
+  /* What the inspector column shows this render (assigned below, once known):
+     read by the toggle's toast and the section-focus route. */
+  const columnRef = React.useRef({ bodyShown: false, blocked: false, rightColumnTab: false });
   inspectorShownRef.current = inspectorShown;
   const toggleInspector = React.useCallback(() => {
     const next = !inspectorShownRef.current;
     setInspectorShown(next);
-    if (!next)
+    /* M-2: with a mode over the inspector (⌘K Toggle inspector while AI is
+       up) nothing on screen changes, so there is nothing to announce. */
+    if (!next && columnRef.current.bodyShown)
       addToast({
         description: "Inspector hidden",
         action: { label: "Show", onClick: () => setInspectorShown(true) },
@@ -438,8 +443,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      is re-sent on the next frame, once the body is up and listening. Only
      requests the visible body could not take are held, so the re-send does
      not loop. A full page or the CMS workspace has no inspector to show. */
-  const focusRoute = React.useRef({ bodyShown: false, blocked: false, rightColumnTab: false });
-  focusRoute.current = {
+  columnRef.current = {
     bodyShown: inspectorBodyShown,
     blocked: readOnlyView || effectiveFullPageMode || cmsWorkspaceOpen,
     rightColumnTab,
@@ -448,7 +452,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const route = (payload: FocusSectionPayload) => {
-      const r = focusRoute.current;
+      const r = columnRef.current;
       if (r.bodyShown || r.blocked) return;
       pendingFocus.current = payload;
       setInspectorShown(true);
