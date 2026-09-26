@@ -30,7 +30,7 @@ function makeComposer(opts: {
     },
     off: (ev: string, fn: (...args: unknown[]) => void) => handlers.get(ev)?.delete(fn),
     emit: (ev: string) => handlers.get(ev)?.forEach((fn) => fn()),
-    elements: { getAllPages: () => opts.pages ?? [] },
+    elements: { exportPages: () => opts.pages ?? [] },
     designSystem: {
       lintState: {
         getAllVisibleIssues: () => opts.lintIssues ?? [],

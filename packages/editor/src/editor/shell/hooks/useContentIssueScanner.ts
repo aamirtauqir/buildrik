@@ -47,7 +47,10 @@ export function useContentIssueScanner(composer: Composer | null): UseContentIss
   const scanNow = React.useCallback(() => {
     if (!composer) return;
     try {
-      const pages = composer.elements.getAllPages();
+      // exportPages(), not getAllPages(): the page map's `root` is a snapshot
+      // whose children are emptied once `buildElementTree` hands them to the
+      // element registry, so scanning it found nothing on any loaded project.
+      const pages = composer.elements.exportPages();
       const findings = detectContentIssues(pages);
       setIssues(
         findings.map((f) => ({
