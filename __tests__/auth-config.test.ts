@@ -40,6 +40,18 @@ vi.mock("@/server/services/auth.service", () => ({
   createWorkspaceForUser: vi.fn().mockResolvedValue({ workspaceId: "ws-123" }),
 }));
 
+// currentSessionUserId() reads the session cookie via next/headers + next-auth/jwt
+// decode. Mocked so tests can simulate an "already signed in" Connect-provider
+// flow vs. a public login (no session cookie → decode never reached).
+const mockCookieGet = vi.fn();
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(async () => ({ get: mockCookieGet })),
+}));
+const mockDecode = vi.fn();
+vi.mock("next-auth/jwt", () => ({
+  decode: (...args: unknown[]) => mockDecode(...args),
+}));
+
 import { authConfig } from "@/server/auth.config";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
@@ -502,5 +514,47 @@ describe("signIn callback — account-first identity resolution (IMPORTANT, fix 
 
     expect(result).toBe("/auth/error/social-error?reason=provider-linked-elsewhere");
     expect(mockPrisma.account.upsert).not.toHaveBeenCalled();
+  });
+
+  // The Connect-provider bug: a SIGNED-IN user (Settings → Connect provider)
+  // authorizes a provider account that turns out to already be linked to a
+  // DIFFERENT user. Account-first must not silently switch the active session
+  // onto that other user — it must refuse.
+  it("refuses when an already signed-in user connects a provider account linked to a DIFFERENT user", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-other" } as any);
+    mockCookieGet.mockReturnValue({ value: "session-cookie" });
+    mockDecode.mockResolvedValue({ userId: "user-self" });
+
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const userObj = { id: "temp", email: "self@example.com" } as any;
+    const result = await signInCallback({
+      user: userObj,
+      account: { provider: "github", type: "oauth", providerAccountId: "gh-other" } as any,
+      profile: { email: "self@example.com" } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe("/auth/error/social-error?reason=provider-linked-elsewhere");
+    expect(mockPrisma.account.upsert).not.toHaveBeenCalled();
+    expect(mockPrisma.user.update).not.toHaveBeenCalled();
+  });
+
+  // Public logins (no active session) keep the existing account-first
+  // behaviour — signing in as whichever user the provider is linked to.
+  it("public login (no active session) still signs in as the linked user unchanged", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-a" } as any);
+    mockCookieGet.mockReturnValue(undefined); // no session cookie
+
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const userObj = { id: "temp", email: "b@x.example.com" } as any;
+    const result = await signInCallback({
+      user: userObj,
+      account: { provider: "github", type: "oauth", providerAccountId: "gh-a" } as any,
+      profile: { email: "b@x.example.com" } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe(true);
+    expect(userObj.id).toBe("user-a");
   });
 });

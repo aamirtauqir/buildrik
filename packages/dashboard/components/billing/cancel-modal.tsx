@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Modal } from "@/components/dashboard/primitives";
 
 export const CANCEL_REASONS = [
@@ -29,6 +29,7 @@ function formatDate(date: Date): string {
 export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, isLoading = false }: CancelModalProps) {
   const [reason, setReason] = useState<CancelReason | "">("");
   const [feedback, setFeedback] = useState("");
+  const feedbackId = useId();
 
   function handleSubmit() {
     if (!reason) return;
@@ -109,13 +110,14 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
       </fieldset>
 
       <div className="mt-5">
-        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label htmlFor={feedbackId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Additional feedback{" "}
           <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>
             (optional)
           </span>
         </label>
         <textarea
+          id={feedbackId}
           value={feedback}
           onChange={(e) => setFeedback(e.target.value.slice(0, 500))}
           maxLength={500}

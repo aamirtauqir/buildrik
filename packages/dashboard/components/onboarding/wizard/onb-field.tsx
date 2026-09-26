@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useId } from "react";
 import { cn } from "@lib/utils";
 
 interface OnbFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -14,11 +14,15 @@ interface OnbFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
  *  drops the fill to white and thickens the ring to 1.5px red. Rings are
  *  inset shadows so they don't affect layout height. */
 export const OnbField = forwardRef<HTMLInputElement, OnbFieldProps>(
-  ({ label, hint, error, className, ...props }, ref) => (
+  ({ label, hint, error, className, id, ...props }, ref) => {
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
+    return (
     <div className="w-full">
-      <label className="block text-sm font-semibold text-onb-text mb-2">{label}</label>
+      <label htmlFor={inputId} className="block text-sm font-semibold text-onb-text mb-2">{label}</label>
       <input
         ref={ref}
+        id={inputId}
         className={cn(
           "w-full h-onb-input px-4 rounded-onb text-[13.5px] text-onb-text",
           "transition-colors outline-none placeholder:text-onb-muted",
@@ -35,6 +39,7 @@ export const OnbField = forwardRef<HTMLInputElement, OnbFieldProps>(
         <p className="mt-2 text-xs leading-[1.4] text-onb-muted">{hint}</p>
       ) : null}
     </div>
-  )
+    );
+  }
 );
 OnbField.displayName = "OnbField";

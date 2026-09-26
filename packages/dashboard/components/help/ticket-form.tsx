@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useId } from "react";
 import { Paperclip, X, CheckCircle } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { InputField, SelectField } from "@/components/dashboard/primitives";
@@ -34,6 +34,9 @@ export function TicketForm() {
   const [subject, setSubject] = useState("");
   const [category, setCategory] = useState<SupportTicketInput["category"]>("GENERAL");
   const [description, setDescription] = useState("");
+  const subjectId = useId();
+  const categoryId = useId();
+  const descriptionId = useId();
   const [attachments, setAttachments] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmation, setConfirmation] = useState<TicketConfirmation | null>(null);
@@ -177,10 +180,11 @@ export function TicketForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Subject */}
       <div>
-        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label htmlFor={subjectId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Subject
         </label>
         <InputField
+          id={subjectId}
           type="text"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
@@ -197,10 +201,10 @@ export function TicketForm() {
 
       {/* Category */}
       <div>
-        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label htmlFor={categoryId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Category
         </label>
-        <SelectField value={category} onChange={(e) => setCategory(e.target.value as SupportTicketInput["category"])}>
+        <SelectField id={categoryId} value={category} onChange={(e) => setCategory(e.target.value as SupportTicketInput["category"])}>
           {TICKET_CATEGORIES.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
@@ -209,10 +213,11 @@ export function TicketForm() {
 
       {/* Description */}
       <div>
-        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label htmlFor={descriptionId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Description
         </label>
         <textarea
+          id={descriptionId}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Describe your issue in detail. Include steps to reproduce if it's a bug."

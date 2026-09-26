@@ -50,7 +50,6 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [folderId, setFolderId] = useState<string | null | undefined>(undefined);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
-  const [limit, setLimit] = useState(PAGE_SIZE);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -70,12 +69,20 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const folderMenuRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebouncedValue(search, 250);
-  const assets = trpc.media.listAssets.useQuery({
-    search: debouncedSearch || undefined,
-    folderId,
-    type: typeFilter === "all" ? undefined : typeFilter,
-    limit,
-  });
+  // "Load more" grew a `limit` prop by PAGE_SIZE and re-fetched the whole
+  // widening page from offset 0 — the DB and network cost of every page
+  // already fetched, on every click. useInfiniteQuery keeps each PAGE_SIZE
+  // page cached and fetches only the next one, walking the same `cursor`
+  // listAssets already returns as `nextCursor`.
+  const assets = trpc.media.listAssets.useInfiniteQuery(
+    {
+      search: debouncedSearch || undefined,
+      folderId,
+      type: typeFilter === "all" ? undefined : typeFilter,
+      limit: PAGE_SIZE,
+    },
+    { getNextPageParam: (last) => last.nextCursor ?? undefined }
+  );
   const folders = trpc.media.listFolders.useQuery({});
   const quota = trpc.media.checkStorageQuota.useQuery({});
 
@@ -174,9 +181,9 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
     setTimeout(() => setCopiedId((c) => (c === id ? null : c)), 1500);
   };
 
-  const rawItems = assets.data?.items ?? [];
+  const rawItems = assets.data?.pages.flatMap((p) => p.items) ?? [];
   const items = sortBy === "name" ? [...rawItems].sort((a, b) => a.filename.localeCompare(b.filename)) : rawItems;
-  const hasMore = Boolean(assets.data?.nextCursor);
+  const hasMore = Boolean(assets.hasNextPage);
   const q = quota.data;
 
   return (
@@ -360,8 +367,8 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               </div>
               {hasMore && (
                 <div className="mt-5 flex justify-center">
-                  <Button type="button" variant="ghost" onClick={() => setLimit((l) => l + PAGE_SIZE)} disabled={assets.isFetching}>
-                    {assets.isFetching ? "Loading…" : "Load more assets"}
+                  <Button type="button" variant="ghost" onClick={() => assets.fetchNextPage()} disabled={assets.isFetchingNextPage}>
+                    {assets.isFetchingNextPage ? "Loading…" : "Load more assets"}
                   </Button>
                 </div>
               )}

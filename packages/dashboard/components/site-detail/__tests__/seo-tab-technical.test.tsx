@@ -73,4 +73,12 @@ describe("TechnicalSeoSection", () => {
     const [payload] = mutateMock.mock.calls[0];
     expect(payload).toEqual({ id: "site-1", allowIndexing: false });
   });
+
+  // B-8 remainder: "Canonical domain" and "robots.txt" sat as sibling
+  // <label>s with no htmlFor/id.
+  it("Canonical domain and robots.txt are reachable via getByLabelText", () => {
+    render(<SeoTab site={{ id: "site-1" }} />);
+    expect(screen.getByLabelText("Canonical domain")).toBeInTheDocument();
+    expect(screen.getByLabelText("robots.txt")).toBeInTheDocument();
+  });
 });

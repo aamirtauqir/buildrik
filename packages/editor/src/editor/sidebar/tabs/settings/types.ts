@@ -49,8 +49,6 @@ export interface SettingsTabProps {
   userPlan?: PlanTier;
   /** Project ID — scopes localStorage key so nav position is per-project */
   projectId?: string | null;
-  /** Called when the sub-screen's unsaved-changes state changes — used by shell to guard tab switch */
-  onDirtyChange?: (isDirty: boolean) => void;
 }
 
 /** The screen's server read, as the shell's footer reports it. */
