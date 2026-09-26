@@ -21,6 +21,7 @@
  */
 
 import { EVENTS } from "../../../shared/constants";
+import { claimUniqueIds, type IdRename } from "@buildrik/shared/content/elementIds";
 import type { PageData, SlugChange } from "../../../shared/types";
 import { generateId, slugify } from "../../../shared/utils/helpers";
 import type { ElementManagerContext } from "./types";
@@ -360,9 +361,19 @@ export class PageManager {
    * Import a page record. Normalizes new Phase 1 fields so legacy exports load
    * cleanly: missing `updatedAt`, `slugManuallySet`, `slugHistory` get defaults.
    */
-  importPage(pageData: PageData): void {
+  /**
+   * Returns the element ids it had to change (see `claimUniqueIds`): the
+   * caller copies whatever is keyed by those ids — style rules, CMS bindings —
+   * onto the new ids.
+   */
+  importPage(pageData: PageData): IdRename[] {
     const normalized: PageData = {
       ...pageData,
+      /* A copy: Element keeps its data by reference, so importing the
+         caller's object let two pages handed the same root object (the sync
+         provider's old shared DEFAULT_ROOT) resolve to one element — and the
+         re-id below would have rewritten the caller's data. */
+      root: structuredClone(pageData.root),
       updatedAt: pageData.updatedAt ?? new Date().toISOString(),
       slugManuallySet: pageData.slugManuallySet ?? false,
       slugHistory: pageData.slugHistory ?? [],
@@ -371,6 +382,13 @@ export class PageManager {
        are lifted the way the browser renders them, so model and DOM agree. */
     const lifted = liftParserHoisted(normalized.root);
     if (lifted) console.info(`[pages] "${normalized.name}": lifted ${lifted} element(s) out of parents the browser would not keep them in`);
+    /* X-A1: the element registry is keyed by id across ALL pages, and stored
+       pages repeat ids ("root" on every AI/template/seed/blank page). Ids
+       another page — or this page — already registered get the shared
+       deterministic replacement, so the first page keeps its ids and the
+       same stored page gets the same ids on every load. */
+    const renames = claimUniqueIds(normalized.root, normalized.id, new Set(this.ctx.elements.keys()));
+    if (renames.length) console.info(`[pages] "${normalized.name}": re-id'd ${renames.length} element(s) whose id another page already owns`);
     this.ctx.pages.set(normalized.id, normalized);
     this.ctx.buildElementTree(normalized.root);
     this.registerRoute(normalized);
@@ -378,6 +396,7 @@ export class PageManager {
     if (!this.ctx.getActivePageId()) {
       this.ctx.setActivePageId(normalized.id);
     }
+    return renames;
   }
 
   /**

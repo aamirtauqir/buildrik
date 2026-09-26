@@ -50,8 +50,18 @@ export function isAuthSaveError(message: string): boolean {
   return /unauthorized|401|session expired|not signed in/i.test(message);
 }
 
-export function isForbiddenSaveError(message: string): boolean {
-  return /forbidden|403/i.test(message);
+/** A role refusal. Decided on the STRUCTURED tRPC error: the server's
+ *  FORBIDDEN carries human text ("Insufficient permissions" from
+ *  checkSiteRole) with neither "forbidden" nor "403" in it, so matching the
+ *  message sent a real mid-edit demotion (C-9) to the generic "Save failed"
+ *  and skipped keepUnsaved. Duck-typed on `data` rather than `instanceof
+ *  TRPCClientError`, which a second bundled copy of @trpc/client would fail.
+ *  The message test stays for errors that are not tRPC's. */
+export function isForbiddenSaveError(err: unknown): boolean {
+  if (typeof err !== "object" || err === null) return false;
+  const data = (err as { data?: { code?: unknown; httpStatus?: unknown } | null }).data;
+  if (data?.code === "FORBIDDEN" || data?.httpStatus === 403) return true;
+  return err instanceof Error && /forbidden|403/i.test(err.message);
 }
 
 /**
@@ -238,7 +248,7 @@ export function useSaveCallback({
         /* FORBIDDEN used to ride the same regex as 401, so a role revocation
            read as "Session expired" and sent the user to sign in — which would
            change nothing. Different truths, different surfaces. */
-        if (isForbiddenSaveError(errorMessage)) {
+        if (isForbiddenSaveError(err)) {
           /* A15-9: a mid-session demotion refuses edits that exist only in
              this tab. Keep them recoverable (a reload offers them back, and
              an owner can restore the role), and drop the cached role that

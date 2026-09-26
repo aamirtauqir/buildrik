@@ -575,7 +575,7 @@ describe("hydrateCmsFromServer", () => {
       description: "Blog posts",
       icon: undefined,
       displayField: "title",
-      fields: [{ id: "f1", name: "title", type: "text" }],
+      fields: [{ id: "f1", name: "title", type: "text", slug: "f1" }], // slugless stored field gets slug = id
       pageSlugPattern: undefined,
       pageSeoTitle: undefined,
       pageSeoDescription: undefined,
@@ -583,5 +583,25 @@ describe("hydrateCmsFromServer", () => {
       createdAt: "2026-07-01T00:00:00.000Z", // Date → ISO
       updatedAt: "2026-07-02T00:00:00.000Z", // string passes through
     });
+  });
+});
+
+/* C-4 minor (Lrt round 1): the verify seed stored fields as { id, name, type }
+   with no slug. RecordsTable no longer crashes on that, but every cell read
+   data[undefined] and showed blank. Hydration normalizes slug ?? id. */
+describe("hydrateCmsFromServer · slugless stored fields", () => {
+  it("fills a missing field slug from its id", async () => {
+    colListQuery.mockResolvedValueOnce([
+      {
+        id: "c", name: "Posts", slug: "posts", description: null, icon: null, displayField: null,
+        fields: [{ id: "title", name: "Title", type: "text" }, { id: "b", name: "Body", slug: "body", type: "richtext" }],
+        createdAt: new Date(0), updatedAt: new Date(0),
+      },
+    ]);
+    loadCollections.mockResolvedValueOnce([]);
+    entListQuery.mockResolvedValueOnce([]);
+    await hydrateCmsFromServer();
+    const saved = saveCollection.mock.calls[0][0] as { fields: Array<{ slug: string }> };
+    expect(saved.fields.map((f) => f.slug)).toEqual(["title", "body"]);
   });
 });

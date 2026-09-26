@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { withUniqueIds } from "../packages/shared/content/elementIds";
 
 const prisma = new PrismaClient();
 
@@ -233,12 +234,15 @@ const SEED_TEMPLATES: SeedTemplate[] = [
 
 async function seedTemplates() {
   for (const t of SEED_TEMPLATES) {
+    // X-A1: every page's root is "root" — stored with ids unique across the
+    // template (the editor's scheme), so sites built from it never collide.
+    const unique = withUniqueIds(t.pages.map((p) => ({ key: `${t.slug}:${p.slug}`, blocks: pageBlocks(p.sections) })));
     const pages = t.pages.map((p, i) => ({
       name: p.name,
       slug: p.slug,
       position: i,
       isHomePage: p.isHomePage ?? i === 0,
-      blocks: pageBlocks(p.sections),
+      blocks: unique[i].blocks,
     }));
     await prisma.template.upsert({
       where: { slug: t.slug },

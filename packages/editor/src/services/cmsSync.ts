@@ -182,7 +182,10 @@ export async function hydrateCmsFromServer(): Promise<void> {
           name: rc.name, slug: rc.slug,
           description: rc.description ?? undefined, icon: rc.icon ?? undefined,
           displayField: rc.displayField ?? undefined,
-          fields: (rc.fields as CMSField[]) ?? [],
+          /* A field stored without a slug (verify seed: { id, name, type })
+             rendered blank in every cell — the table reads data[field.slug].
+             Its id is the key those rows were written under. */
+          fields: ((rc.fields as CMSField[]) ?? []).map((f) => (f.slug ? f : { ...f, slug: f.id })),
           pageSlugPattern: rc.pageSlugPattern ?? undefined,
           pageSeoTitle: rc.pageSeoTitle ?? undefined,
           pageSeoDescription: rc.pageSeoDescription ?? undefined,
