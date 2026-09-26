@@ -426,7 +426,7 @@ const CloneBadge: React.FC<{ rect: DOMRect }> = ({ rect }) => (
       color: "var(--bk-accent-on)",
       borderRadius: "var(--bk-radius-full)",
       fontSize: 12,
-      fontWeight: 700,
+      fontWeight: 600,
       fontFamily: "var(--bk-font-ui)",
       display: "flex",
       alignItems: "center",
