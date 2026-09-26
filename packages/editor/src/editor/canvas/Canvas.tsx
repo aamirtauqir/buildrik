@@ -9,6 +9,7 @@ import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
 import { requestInsertGroup, requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
+import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
 
 /** Grey left each side of the page card when the canvas fits on load. */
 const FIT_GUTTER = 60;
@@ -107,6 +108,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        `canvasRef` is its CHILD (the content div that receives customer HTML),
        so zoom compensation applied there styles the wrong box. */
     const frameRef = React.useRef<HTMLDivElement>(null);
+    /* L-1: the page's own links and forms must never navigate the editor. */
+    useCanvasNavigationGuard(frameRef);
 
     // Toast notifications for drop errors and success
     const { addToast } = useToast();
