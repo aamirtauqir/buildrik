@@ -13,7 +13,7 @@
  * inline and race-safe, resolve reaching the canvas.
  */
 import * as React from "react";
-import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup, within, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const fetchCurrentRound = vi.fn();
@@ -690,11 +690,17 @@ describe("ReviewTab — FC-9 (fix-all 2026-09-25): a VIEWER is read-only", () =>
   });
 
   it("Re-send and Revoke are disabled in the round menu, with a reason, and never call revokeReview", async () => {
-    renderTab();
+    const onResend = vi.fn(() => Promise.resolve());
+    renderTab({ onResend });
     fireEvent.click(await screen.findByTestId("review-round-menu"));
     const resend = screen.getByTestId("review-menu-resend");
     expect(resend).toHaveAttribute("aria-disabled", "true");
     expect(resend).toHaveAttribute("title", "Viewers can't resend the review link — ask an editor");
+    fireEvent.click(resend);
+    expect(onResend).not.toHaveBeenCalled();
+    // The re-send confirm dialog never opens behind the disabled item.
+    expect(screen.queryByTestId("review-resend-confirm")).not.toBeInTheDocument();
+
     const revoke = screen.getByRole("menuitem", { name: "Revoke link" });
     expect(revoke).toHaveAttribute("aria-disabled", "true");
     expect(revoke).toHaveAttribute("title", "Viewers can't revoke the review link — ask an editor");
@@ -702,6 +708,30 @@ describe("ReviewTab — FC-9 (fix-all 2026-09-25): a VIEWER is read-only", () =>
     expect(revokeReview).not.toHaveBeenCalled();
     // The revoke confirm dialog never opens behind the disabled item.
     expect(screen.queryByRole("alertdialog")).toBeNull();
+  });
+
+  it("Reattach comment (detached group) is aria-disabled with a reason, and never opens the reattach flow", async () => {
+    // A composer that records its "comments:orphans" handler, the same way
+    // the canvas layer replies to the panel's mount-time
+    // "comments:orphans-request" — this is how a comment becomes detached
+    // without driving the real Locate-› flow.
+    const handlers = new Map<string, (p: { ids?: string[] }) => void>();
+    const composer = {
+      on: (event: string, fn: (p: { ids?: string[] }) => void) => handlers.set(event, fn),
+      off: vi.fn(),
+      emit: vi.fn(),
+      elements: { getAllPages: () => [], getActivePage: () => null, setActivePage: vi.fn() },
+    };
+    renderTab({ composer: composer as never });
+    await screen.findByTestId("review-status-line");
+    act(() => handlers.get("comments:orphans")?.({ ids: ["c1"] }));
+
+    const reattach = await screen.findByRole("button", { name: "Reattach comment" });
+    expect(reattach).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(reattach);
+    // setActivePage is the first thing the real handler does — it must
+    // never fire behind the disabled button.
+    expect(composer.elements.setActivePage).not.toHaveBeenCalled();
   });
 
   it("the comment composer is disabled and Send never posts", async () => {
@@ -740,5 +770,23 @@ describe("ReviewTab — FC-9: an EDITOR keeps full control", () => {
     renderTab();
     await screen.findByTestId("review-status-line");
     expect(screen.getByPlaceholderText(/Comment on/)).not.toBeDisabled();
+  });
+
+  it("Reattach comment is enabled and opens the reattach flow", async () => {
+    const handlers = new Map<string, (p: { ids?: string[] }) => void>();
+    const composer = {
+      on: (event: string, fn: (p: { ids?: string[] }) => void) => handlers.set(event, fn),
+      off: vi.fn(),
+      emit: vi.fn(),
+      elements: { getAllPages: () => [], getActivePage: () => null, setActivePage: vi.fn() },
+    };
+    renderTab({ composer: composer as never });
+    await screen.findByTestId("review-status-line");
+    act(() => handlers.get("comments:orphans")?.({ ids: ["c1"] }));
+
+    const reattach = await screen.findByRole("button", { name: "Reattach comment" });
+    expect(reattach).not.toHaveAttribute("aria-disabled");
+    fireEvent.click(reattach);
+    expect(composer.elements.setActivePage).toHaveBeenCalledWith("page-home");
   });
 });
