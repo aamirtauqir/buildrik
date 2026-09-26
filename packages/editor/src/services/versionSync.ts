@@ -66,7 +66,7 @@ export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean
 
 /** Mirror a version rename ("Name this version…", board 6930:82577) to the server. */
 export async function mirrorVersionRename(versionId: string, name: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `versionRename:${versionId}`,
