@@ -21,7 +21,7 @@
  */
 
 import { EVENTS } from "../../../shared/constants";
-import type { PageData, SlugChange } from "../../../shared/types";
+import type { ElementData, PageData, SlugChange } from "../../../shared/types";
 import { generateId, slugify } from "../../../shared/utils/helpers";
 import type { ElementManagerContext } from "./types";
 import { liftParserHoisted } from "./liftParserHoisted";
@@ -371,6 +371,8 @@ export class PageManager {
        are lifted the way the browser renders them, so model and DOM agree. */
     const lifted = liftParserHoisted(normalized.root);
     if (lifted) console.info(`[pages] "${normalized.name}": lifted ${lifted} element(s) out of parents the browser would not keep them in`);
+    const renamed = this.claimUniqueIds(normalized.root);
+    if (renamed) console.info(`[pages] "${normalized.name}": re-id'd ${renamed} element(s) whose id another page already owns`);
     this.ctx.pages.set(normalized.id, normalized);
     this.ctx.buildElementTree(normalized.root);
     this.registerRoute(normalized);
@@ -378,6 +380,32 @@ export class PageManager {
     if (!this.ctx.getActivePageId()) {
       this.ctx.setActivePageId(normalized.id);
     }
+  }
+
+  /**
+   * The element registry is keyed by id across ALL pages, so a page whose
+   * ids another page already registered silently hands its elements to that
+   * page (X-A1). Stored pages do collide: every page the AI-generate worker
+   * writes has `id: "root"` and section ids like `ai-hero-0`, as do the seed
+   * sites. The last page imported then owned "root" — the canvas drew it
+   * under the first page's tab, and a save wrote its tree into every page.
+   * Ids already taken (by an earlier page, or earlier in this tree) get a
+   * fresh id here, before the tree is registered; the first owner keeps its
+   * stored ids, and the next save persists the new ones.
+   */
+  private claimUniqueIds(root: ElementData): number {
+    const seen = new Set<string>();
+    let renamed = 0;
+    const walk = (el: ElementData) => {
+      if (this.ctx.elements.has(el.id) || seen.has(el.id)) {
+        el.id = generateId(el.type);
+        renamed++;
+      }
+      seen.add(el.id);
+      if (Array.isArray(el.children)) el.children.forEach(walk);
+    };
+    walk(root);
+    return renamed;
   }
 
   /**
