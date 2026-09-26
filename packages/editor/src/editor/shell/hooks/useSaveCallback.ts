@@ -30,6 +30,7 @@ import {
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
 import { clearUnsaved, keepUnsaved } from "@/services/unsavedRecovery";
+import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -87,8 +88,11 @@ export function refuseForbiddenSave(opts: {
   addToast: (input: ToastInput) => string;
   setIsDirty: (dirty: boolean) => void;
   setSaveState: React.Dispatch<React.SetStateAction<SaveState>>;
+  /** Injectable for tests; the real one replaces the location. */
+  navigate?: (url: string) => void;
 }): void {
   const { siteId, composer, addToast, setIsDirty, setSaveState } = opts;
+  const navigate = opts.navigate ?? ((url: string) => window.location.replace(url));
   if (siteId) keepUnsaved(siteId, composer.exportProject());
   invalidateMyRole();
   addToast({
@@ -102,7 +106,12 @@ export function refuseForbiddenSave(opts: {
     setSaveState({ status: "idle", error: undefined });
     const url = new URL(window.location.href);
     url.searchParams.set("view", "readonly");
-    requestAnimationFrame(() => window.setTimeout(() => window.location.replace(url.toString()), 0));
+    /* L-2: through the unload guard's bypass — clearing isDirty alone left
+       its other reasons (shell-dirty surfaces, a save in flight, queued
+       mirrors) to put "Leave site?" over the switch. */
+    requestAnimationFrame(() =>
+      window.setTimeout(() => navigateBypassingUnloadGuard(() => navigate(url.toString())), 0),
+    );
   });
 }
 

@@ -55,6 +55,7 @@ import "./header.css";
 /** Selected element minimal info */
 import type { SelectedElementInfo } from "@/shared/types";
 import { writeClipboardText } from "@/shared/utils/clipboard";
+import { endUnloadGuardBypass, isUnloadGuardBypassed, navigateBypassingUnloadGuard } from "./unloadGuardBypass";
 export type { SelectedElementInfo };
 
 export interface StudioHeaderProps {
@@ -458,20 +459,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   type ExitDialog = { kind: "dirty" | "risky" | "stranded"; error?: string; pending?: number; nav: () => void };
   const [exitDialog, setExitDialog] = React.useState<ExitDialog | null>(null);
   const [leaving, setLeaving] = React.useState(false);
-  // 2A: set immediately before a user-confirmed programmatic navigation so the
-  // beforeunload guard doesn't double-prompt. Reset on a timer in case the
-  // navigation is somehow cancelled — a stuck flag would disarm the guard.
-  const bypassRef = React.useRef(false);
-  const bypassAndNavigate = React.useCallback((nav: () => void) => {
-    bypassRef.current = true;
-    try {
-      nav();
-    } finally {
-      window.setTimeout(() => {
-        bypassRef.current = false;
-      }, 1000);
-    }
-  }, []);
+  // 2A: a user-confirmed programmatic navigation runs through the unload
+  // guard's bypass (unloadGuardBypass.ts, shared with the view-mode switch
+  // after a refused save) so beforeunload does not double-prompt.
+  React.useEffect(() => endUnloadGuardBypass, []);
 
   /* Brand stages its token edits in a provider this header sits outside, so it
      announces them. Without this the chip read "Saved · just now" with a green
@@ -496,7 +487,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   const guardNavigation = React.useCallback(
     (nav: () => void) => {
-      if (bypassRef.current) return nav();
+      if (isUnloadGuardBypassed()) return nav();
       // 5A: while offline the save pipeline reports queued saves as clean
       // (useSaveCallback settles to idle) but the queue dies on navigation —
       // never offer a fake "Save & leave" here.
@@ -536,7 +527,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     if (outcome === "saved") {
       const { nav } = exitDialog;
       setExitDialog(null);
-      bypassAndNavigate(nav);
+      navigateBypassingUnloadGuard(nav);
     } else if (outcome === "queued-offline" || outcome === "conflict") {
       // The save did NOT durably land — switch to the honest dialog.
       setExitDialog({ kind: "risky", nav: exitDialog.nav });
@@ -546,7 +537,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       setLeaveAfterSave(() => exitDialog.nav);
       setExitDialog(null);
     }
-  }, [exitDialog, onSave, bypassAndNavigate]);
+  }, [exitDialog, onSave]);
 
   /* ── Save failed (4418:124938 / 125678) — the red card on the canvas. ── */
   const [leaveAfterSave, setLeaveAfterSave] = React.useState<(() => void) | null>(null);
@@ -562,16 +553,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     if (outcome === "saved" && leaveAfterSave) {
       const nav = leaveAfterSave;
       setLeaveAfterSave(null);
-      bypassAndNavigate(nav);
+      navigateBypassingUnloadGuard(nav);
     }
-  }, [onSave, leaveAfterSave, bypassAndNavigate]);
+  }, [onSave, leaveAfterSave]);
 
   const leaveAnyway = React.useCallback(() => {
     if (!exitDialog) return;
     const { nav } = exitDialog;
     setExitDialog(null);
-    bypassAndNavigate(nav);
-  }, [exitDialog, bypassAndNavigate]);
+    navigateBypassingUnloadGuard(nav);
+  }, [exitDialog]);
 
   // 2A: browser-chrome exits (⌘W, refresh, tab close) get the native prompt
   // while there is anything a navigation would strand.
@@ -582,7 +573,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
        in between, so a listener gated on React state would still be absent at
        the moment it was needed. Reading at fire time has no staleness. */
     const onBefore = (e: BeforeUnloadEvent) => {
-      if (bypassRef.current) return;
+      if (isUnloadGuardBypassed()) return;
       const stranded = totalPendingMirrors();
       const shellUnsaved = shellDirty.get();
       /* Dev-only, and LOAD-BEARING: `e2e/boot-clean.spec.ts` reads
