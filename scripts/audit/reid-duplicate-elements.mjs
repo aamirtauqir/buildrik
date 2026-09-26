@@ -15,13 +15,15 @@
  * in `sites.projectStyles` are COPIED to the new id. Idempotent: a second
  * run finds nothing.
  *
- * form_blocks: a row is keyed by its element id (FormBlock.id === blockId,
- * form-submission.service / the publish worker upsert on it; no writer sets
- * pageId), so it serves EVERY page carrying that id. For each renamed
- * occurrence of a form element the row is COPIED to a new row
- * { id: <new id>, blockId: <new id>, same site, fields and settings };
- * submissions stay on the original. Skipped when a row with that id exists
- * (idempotent).
+ * form_blocks: a row is keyed by (siteId, blockId = element id) —
+ * form-submission.service and the publish worker upsert on it (Ldata bug A,
+ * migration 20261003100000_form_block_site_scoped_identity; `id` is a cuid
+ * surrogate); no writer sets pageId, so it serves EVERY page of its site
+ * carrying that id. For each renamed occurrence of a form element the row is
+ * COPIED to a new row { blockId: <new id>, same site, fields and settings,
+ * fresh surrogate id }; submissions stay on the original. Skipped when the
+ * site already has a row for that blockId (idempotent). Needs that migration
+ * applied first — the idempotency check reads the (siteId, blockId) key.
  *
  * ORDER: run this BEFORE the editor re-id ships to production. The editor
  * re-ids colliding elements on load and saves the new ids; a form element
@@ -31,8 +33,18 @@
  * Counted, not rewritten: pages whose content is already a copy of another
  * page of the site — the collapse happened, and no id rewrite brings the lost
  * content back (restore from a version).
- * CMS bindings are not stored server-side (editorSaveProjectSchema has no
- * cmsBindings field), so there is nothing element-keyed to copy there.
+ * CMS bindings (`sites.projectCmsBindings`, Ldata bug B, migration
+ * 20261003110000_site_project_cms_bindings) are element-keyed too: entries
+ * for a renamed id are COPIED to the new id (existing keys win, so a second
+ * run is a no-op). The column is new, so before the editor saves any this is
+ * normally a no-op.
+ *
+ * A site whose transaction fails is logged `site=<id> FAILED <msg>` and
+ * skipped; the run continues and exits non-zero if any site failed.
+ *
+ * Run with editors quiet: these writes bypass the lastEditedAt CAS
+ * (saveProjectData), so an editor tab open on a site during --apply can save
+ * its pre-backfill copy over the result without a conflict.
  *
  * DRY RUN by default — prints per-site counts, writes nothing.
  *   --apply                         write the changes (one transaction per site)
@@ -48,7 +60,7 @@ import { PrismaClient } from "@prisma/client";
 
 // The TS sources are CommonJS to tsx; require them (same as sanitize-dry-run.mjs).
 const require = createRequire(import.meta.url);
-const { reidSite, copiesForRenamedIds } = require("../../packages/shared/content/elementIds.ts");
+const { reidSite, copiesForRenamedIds, copyIdKeyedRecord } = require("../../packages/shared/content/elementIds.ts");
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 const args = new Set(process.argv.slice(2));
@@ -79,6 +91,20 @@ function identicalPageCount(pages) {
   return n;
 }
 
+/** The site's stored bindings with an entry copied onto every renamed id, and
+ *  how many entries that added (0 = nothing to write). */
+function copyBindings(stored, renames) {
+  if (!stored || typeof stored !== "object") return { value: stored, added: 0 };
+  let added = 0;
+  const value = { ...stored };
+  for (const key of ["field", "collection"]) {
+    if (!stored[key]) continue;
+    value[key] = copyIdKeyedRecord(stored[key], renames);
+    added += Object.keys(value[key]).length - Object.keys(stored[key]).length;
+  }
+  return { value, added };
+}
+
 async function main() {
   const url = databaseUrl();
   if (!url) throw new Error("No DATABASE_URL (env or .env.local).");
@@ -91,8 +117,10 @@ async function main() {
 
   const prisma = new PrismaClient({ datasources: { db: { url } } });
   try {
-    const sites = await prisma.site.findMany({ select: { id: true, name: true, projectStyles: true } });
-    const totals = { sites: 0, pages: 0, elements: 0, styleRules: 0, formBlocks: 0, identicalPages: 0 };
+    const sites = await prisma.site.findMany({
+      select: { id: true, name: true, projectStyles: true, projectCmsBindings: true },
+    });
+    const totals = { sites: 0, pages: 0, elements: 0, styleRules: 0, formBlocks: 0, bindings: 0, identicalPages: 0, failed: 0 };
 
     for (const site of sites) {
       const pages = await prisma.page.findMany({
@@ -114,43 +142,59 @@ async function main() {
       const forms = await prisma.formBlock.findMany({ where: { siteId: site.id }, select: { id: true, blockId: true } });
       const formCopies = copiesForRenamedIds(forms, plan.renames);
       const formsOnRenamed = formCopies.length;
+      const bindings = copyBindings(site.projectCmsBindings, plan.renames);
 
       totals.sites += plan.renames.length > 0 ? 1 : 0;
       totals.pages += changedPages.length;
       totals.elements += plan.renames.length;
       totals.styleRules += styleCopies;
       totals.formBlocks += formsOnRenamed;
+      totals.bindings += bindings.added;
       totals.identicalPages += identical;
       console.log(
         `  site ${site.id} "${site.name}": pages=${pages.length} pagesToRewrite=${changedPages.length} ` +
           `elementsRenamed=${plan.renames.length} styleRulesCopied=${styleCopies} ` +
-          `formBlockCopies=${formsOnRenamed} identicalPages=${identical}` +
+          `formBlockCopies=${formsOnRenamed} bindingsCopied=${bindings.added} identicalPages=${identical}` +
           ` [${changedPages.map((p) => p.slug).join(", ")}]`,
       );
 
-      if (APPLY && (changedPages.length > 0 || formCopies.length > 0)) {
-        await prisma.$transaction(async (tx) => {
-          for (const page of changedPages) {
-            await tx.page.update({ where: { id: page.id }, data: { blocks: page.blocks } });
-          }
-          if (styleCopies > 0) {
-            await tx.site.update({ where: { id: site.id }, data: { projectStyles: plan.styles } });
-          }
-          for (const { row, to } of formCopies) {
-            if (await tx.formBlock.findUnique({ where: { id: to }, select: { id: true } })) continue;
-            const full = await tx.formBlock.findUniqueOrThrow({ where: { id: row.id } });
-            const { id: _id, blockId: _blockId, createdAt: _c, updatedAt: _u, ...settings } = full;
-            await tx.formBlock.create({ data: { ...settings, id: to, blockId: to } });
-          }
-        });
+      if (APPLY && (changedPages.length > 0 || formCopies.length > 0 || bindings.added > 0)) {
+        try {
+          await prisma.$transaction(async (tx) => {
+            for (const page of changedPages) {
+              await tx.page.update({ where: { id: page.id }, data: { blocks: page.blocks } });
+            }
+            if (styleCopies > 0) {
+              await tx.site.update({ where: { id: site.id }, data: { projectStyles: plan.styles } });
+            }
+            if (bindings.added > 0) {
+              await tx.site.update({ where: { id: site.id }, data: { projectCmsBindings: bindings.value } });
+            }
+            for (const { row, to } of formCopies) {
+              const existing = await tx.formBlock.findUnique({
+                where: { siteId_blockId: { siteId: site.id, blockId: to } },
+                select: { id: true },
+              });
+              if (existing) continue;
+              const full = await tx.formBlock.findUniqueOrThrow({ where: { id: row.id } });
+              const { id: _id, blockId: _blockId, createdAt: _c, updatedAt: _u, ...settings } = full;
+              await tx.formBlock.create({ data: { ...settings, blockId: to } });
+            }
+          });
+        } catch (e) {
+          totals.failed += 1;
+          console.error(`  site=${site.id} FAILED ${e instanceof Error ? e.message : String(e)}`);
+        }
       }
     }
 
     console.log(
       `[reid] totals: sites=${totals.sites} pagesToRewrite=${totals.pages} elementsRenamed=${totals.elements} ` +
-        `styleRulesCopied=${totals.styleRules} formBlockCopies=${totals.formBlocks} ` +
-        `identicalPages(already collapsed)=${totals.identicalPages}${APPLY ? " — APPLIED" : " — dry run, nothing written"}`,
+        `styleRulesCopied=${totals.styleRules} formBlockCopies=${totals.formBlocks} bindingsCopied=${totals.bindings} ` +
+        `identicalPages(already collapsed)=${totals.identicalPages} failedSites=${totals.failed}` +
+        `${APPLY ? " — APPLIED" : " — dry run, nothing written"}`,
     );
+    if (totals.failed > 0) process.exitCode = 1;
   } finally {
     await prisma.$disconnect();
   }

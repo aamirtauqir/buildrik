@@ -100,7 +100,13 @@ describe("duplicate element ids across stored pages", () => {
           { id: "s-hero-m", selector: '[data-buildrick-id="ai-hero-0"]', properties: { color: "red" }, mediaQuery: "(max-width: 767px)" },
         ],
         cmsBindings: {
-          field: { "ai-hero-0": [{ id: "b1", elementId: "ai-hero-0", collectionId: "c1", itemId: "r1", fieldSlug: "title", property: "textContent" }] },
+          // The shape CMSBindingManager.bindToField stores (cmsBindingsSchema).
+          field: {
+            "ai-hero-0": [{
+              binding: { sourceId: "cms:c1", path: "r1.title", type: "variable" },
+              collectionId: "c1", itemId: "r1", fieldSlug: "title", property: "content",
+            }],
+          },
         },
       },
     );

@@ -40,8 +40,8 @@ export const updateSubmissionSchema = z.object({
 
 // Inspector AFTER SUBMIT + PROTECTION write path (board 4428:141878).
 // `blockId` is the form element's own id — the same id `wireForms` (publish
-// time) uses as the FormBlock row id, so an editor edit before the form's
-// first publish still lands on the right row once it does.
+// time) posts to, and the row's key together with `siteId`, so an editor edit
+// before the form's first publish still lands on the right row once it does.
 export const getFormBlockSchema = z.object({
   siteId: z.string(),
   blockId: z.string(),

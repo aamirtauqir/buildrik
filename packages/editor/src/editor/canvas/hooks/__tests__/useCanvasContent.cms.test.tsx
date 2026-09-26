@@ -73,7 +73,7 @@ describe("useCanvasContent — CMS binding resolution", () => {
     expect(resolveBinding).toHaveBeenCalledWith({ elementId: "el-1", property: "content" });
   });
 
-  it("resolves src / href / arbitrary-attribute bindings onto the bound element", async () => {
+  it("resolves src / href bindings onto the bound element; an off-allowlist property is never applied", async () => {
     const { composer } = makeComposer(
       {
         "img-1": [{ elementId: "img-1", property: "src" }],
@@ -95,7 +95,27 @@ describe("useCanvasContent — CMS binding resolution", () => {
       expect(result.current.displayContent).toContain('src="cms-value"');
     });
     expect(result.current.displayContent).toContain('href="cms-value"');
-    expect(result.current.displayContent).toContain('data-sku="cms-value"');
+    // Ldata round 3: `property` is stored data — only the shared allowlist lands.
+    expect(result.current.displayContent).not.toContain("data-sku");
+  });
+
+  /* Ldata round 3 (I1): the canvas preview is rendered into the app origin; a
+     CMS entry's javascript: URL must not reach an href. */
+  it("does not write a javascript: href from a CMS entry", async () => {
+    const { composer } = makeComposer(
+      { "link-1": [{ elementId: "link-1", property: "href" }], "el-1": [{ elementId: "el-1", property: "content" }] },
+      "javascript:alert(1)",
+    );
+    const content =
+      '<div data-buildrick-id="root-1"><a data-buildrick-id="link-1" href="#">Link</a>' +
+      '<p data-buildrick-id="el-1">x</p></div>';
+
+    const { result } = renderHook(() => useCanvasContent({ composer, content }));
+
+    // The content binding (a control) resolves; the href one is refused.
+    await waitFor(() => expect(result.current.displayContent).toContain(">javascript:alert(1)</p>"));
+    expect(result.current.displayContent).toContain('href="#"');
+    expect(result.current.displayContent).not.toContain('href="javascript:');
   });
 
   it("passes content through untouched when no element carries bindings", async () => {

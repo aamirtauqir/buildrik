@@ -6,6 +6,7 @@ import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
 import { buildDeployFiles } from "@lib/publish-files";
 import { planFormWiring } from "@lib/publish-forms";
+import { getPublishedFormSettings, recordPublishedForms } from "@server/services/form-submission.service";
 import { wireSliders } from "@lib/publish-sliders";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
@@ -338,53 +339,16 @@ async function runVercelDeployJob(
      all built; nothing ever created the FormBlock row they need, and the export
      only sets an action for Formspree or a custom webhook — so a form built in
      the editor published with no action at all and submitting reloaded the
-     page. The row id IS the form element's id, taken from the URL we ship, so
-     the two cannot drift. */
-  // Carry forward what the owner already set in the inspector (spam
-  // protection, success message) — republishing must not silently turn the
-  // honeypot off or blank a custom message just because this pass didn't
-  // touch that form.
-  const existingFormBlocks = await prisma.formBlock.findMany({
-    where: { siteId },
-    select: { id: true, spamProtection: true, successMessage: true },
-  });
-  const formSettings = Object.fromEntries(
-    existingFormBlocks.map((b) => [b.id, { spamProtection: b.spamProtection, successMessage: b.successMessage }]),
-  );
-
+     page. The row is keyed by (siteId, the form element's id), taken from the
+     URL we ship, so the two cannot drift. */
   const plan = planFormWiring(pages, {
     siteId,
     appOrigin: process.env.NEXT_PUBLIC_APP_URL ?? "",
-    formSettings,
+    formSettings: await getPublishedFormSettings(siteId),
   });
   if (plan.error) throw new Error(plan.error);
   const { pages: wiredPages, forms: discovered } = plan;
-
-  for (const form of discovered) {
-    await prisma.formBlock.upsert({
-      where: { id: form.blockId },
-      create: {
-        id: form.blockId,
-        siteId,
-        blockId: form.blockId,
-        name: form.name,
-        fields: form.fields,
-        isActive: true,
-      },
-      // Republishing must not clobber what the owner set in the dashboard
-      // (notify email, webhook, the name they gave it) — only the shape.
-      update: { fields: form.fields, isActive: true },
-    });
-  }
-  /* Forms deleted from the site stop accepting submissions, but their rows and
-     everything already submitted stay — the Submissions tab is a record, not a
-     mirror of the current design. */
-  if (plan.deactivateMissing) {
-    await prisma.formBlock.updateMany({
-      where: { siteId, id: { notIn: discovered.map((f) => f.blockId) } },
-      data: { isActive: false },
-    });
-  }
+  await recordPublishedForms(siteId, discovered, plan.deactivateMissing);
 
   // Slider/Carousel runtime (autoplay/interval, arrows/dots) — the block
   // exported as stacked slides with no behaviour; inject the runtime only on

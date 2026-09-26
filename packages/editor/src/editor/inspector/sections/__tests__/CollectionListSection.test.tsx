@@ -58,6 +58,15 @@ describe("CollectionListSection", () => {
     expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 3 });
   });
 
+  /* Ldata I2a: the stored binding's limit is bounded (cmsBindingsSchema);
+     a bigger number typed here must not produce a binding the save drops. */
+  it("the Show field clamps an oversized count to the stored maximum", () => {
+    const { composer, bindCollectionList } = makeComposer({ collectionId: "menu" });
+    renderSection(composer);
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Show" }), { target: { value: "999999" } });
+    expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 10_000 });
+  });
+
   it("None unbinds", () => {
     const { composer, unbindCollection } = makeComposer({ collectionId: "menu" });
     renderSection(composer);

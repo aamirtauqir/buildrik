@@ -117,7 +117,7 @@ describe("LayersPanel — the options change the tree", () => {
   it("Highlight CMS-bound tints only the rows with a binding", () => {
     const composer = seeded();
     act(() => {
-      composer.cms.bindings.bindToField("lx-heading", "col-1", undefined, "title", "text");
+      composer.cms.bindings.bindToField("lx-heading", "col-1", undefined, "title", "content");
     });
     mountPanel(composer);
     expect(screen.getByTestId("layer-row-lx-heading").className).not.toMatch(/bdc-cms-bound/);
