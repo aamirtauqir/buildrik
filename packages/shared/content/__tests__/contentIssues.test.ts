@@ -111,7 +111,8 @@ describe("detectContentIssues", () => {
      so `/about`, `/services` and `/` were all "malformed" in the Issues panel
      and the Links pre-check (live S1: "2 links are broken", every link valid). */
   it("does not flag root-relative, dot-relative, query, protocol-relative or bare-file links", () => {
-    const hrefs = ["/", "/about", "/services?x=1#top", "./contact", "../index.html", "?q=1", "//cdn.example.com/a.png", "about.html"];
+    // Review #1: `ftp/docs` and `http/x` are real relative folders, not typos.
+    const hrefs = ["/", "/about", "/services?x=1#top", "./contact", "../index.html", "?q=1", "//cdn.example.com/a.png", "about.html", "ftp/docs", "http/x"];
     const pages = [
       page({
         id: "home",

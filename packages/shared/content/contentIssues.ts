@@ -54,8 +54,9 @@ export interface ContentIssueFinding {
 }
 
 const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
-/** A bare path that is really a mistyped absolute URL: `http//x`, `www.x.com`. */
-const SCHEME_TYPO = /^(?:(?:https?|ftp):?\/{1,2}|www\.)/i;
+/** A bare path that is really a mistyped absolute URL: `http//x`, `www.x.com`.
+ *  Anchored on the `//` — `http/x` and `ftp/docs` are real relative folders. */
+const SCHEME_TYPO = /^(?:(?:https?|ftp):?\/\/|www\.)/i;
 /** Resolution base for relative hrefs — only whether they parse matters. */
 const RELATIVE_BASE = "https://site.invalid/";
 
