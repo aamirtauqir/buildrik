@@ -217,28 +217,23 @@ export default [
       ],
     },
   },
-  // Phase 3 contract E2 + E4 — engine encapsulation + companion-lib boundary.
-  // Forbids re-exporting types or values from @radix-ui/*, cmdk, react-colorful
-  // in vibcoder wrapper files. Internal imports remain allowed; only public
-  // re-export is forbidden. Scope is enforced inside the rule itself
-  // (path-aware filter) so registering it here is a no-op for non-vibcoder files.
-  {
-    files: ["src/editor/shared/vibcoder/*.tsx"],
-    rules: {
-      "buildrik/no-engine-public-export": "error",
-    },
-  },
   // Layer-boundary rules (Audit Remediation 2026-05-07, PR2 ERROR-flip 2026-05-08).
   // Enforces import direction per packages/editor/CLAUDE.md "Import Direction Rules":
   //   engine/   → shared/ ONLY
-  //   shared/   → leaf (no editor/), EXCEPT shared/extensions/ → editor/shared/vibcoder/
+  //   shared/   → leaf (no editor/)
   //   services/ → shared/ ONLY
   // Uses @typescript-eslint/no-restricted-imports with allowTypeImports: true so
   // type-only imports stay legal where idiomatic. ERROR mode flipped 2026-05-08
-  // after PR1 closed the only engine→editor value import (StockService) and
-  // shared/forms + 2 shared/ui keep-as-extension files were exempted (composing
-  // vibcoder is the documented intent of shared/extensions; physical relocation
-  // deferred to a separate "extensions consolidation" arc).
+  // after PR1 closed the only engine→editor value import (StockService).
+  //
+  // D-6 (2026-09-26): the vibcoder-specific `no-engine-public-export` block
+  // and the shared/extensions + ErrorState/HelpTooltip exemptions above it
+  // were dropped — src/editor/shared/vibcoder/ and src/shared/extensions/
+  // were deleted 2026-07-28 (packages/editor/CLAUDE.md, ds/fresh-token-system
+  // stage 6), so the rule/ignores matched nothing. shared/forms/ keeps its
+  // exemption: packages/editor/CLAUDE.md documents shared/forms/ → chrome-ui
+  // as the one intentional shared/→editor/ edge (forms/ composes chrome-ui
+  // controls with field wiring), not a vibcoder residual.
   {
     files: ["src/engine/**/*.{ts,tsx}"],
     rules: {
@@ -251,27 +246,40 @@ export default [
       }],
     },
   },
+  // D-6: engine/ ↔ services/ boundary is new — WARN, not ERROR, until the
+  // existing crossings it flags (Composer.ts's EmailService import,
+  // FormHandler.ts, cmsSync/componentSync/versionSync) are triaged. See
+  // ledger D-6 decision_free_fix. Uses the CORE `no-restricted-imports`
+  // rule (a different key from `@typescript-eslint/no-restricted-imports`
+  // above) so its "warn" severity does not get replaced by the ERROR
+  // block's later-wins config-merge for the same files glob — flat config
+  // has no per-pattern severity within one rule invocation. This rule has
+  // no allowTypeImports equivalent, so a bare `import type` from services/
+  // will also warn; acceptable at WARN (advisory) for a boundary this new.
+  {
+    files: ["src/engine/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": ["warn", {
+        patterns: [{
+          group: ["**/services/**", "@/services/**", "@services/**"],
+          message: "engine/ importing services/ — flagged for triage (D-6). engine/ should stay pure logic; services/ does transport/sync.",
+        }],
+      }],
+    },
+  },
   {
     files: ["src/shared/**/*.{ts,tsx}"],
     ignores: [
-      "src/shared/extensions/**",
-      // shared/forms/* are vibcoder-primitive compositions by design
-      // (Phase 4 keep-as-extension tier). Same intent as shared/extensions/;
-      // physically still in forms/ pending a future relocation arc.
+      // shared/forms/* compose @/editor/chrome-ui controls with field
+      // wiring — the one documented shared/→editor/ edge (root CLAUDE.md
+      // Global Invariants; packages/editor/CLAUDE.md folder-structure table).
       "src/shared/forms/**",
-      // Phase 4 T7 keep-as-extension files: ErrorState composes vibcoder
-      // EmptyState/Button + class-component ErrorBoundary; HelpTooltip
-      // composes the Tooltip extension. Headers self-document the
-      // intent. Move to shared/extensions/ when their consumer counts
-      // shrink enough for a low-touch codemod (currently broad reach).
-      "src/shared/ui/ErrorState.tsx",
-      "src/shared/ui/HelpTooltip.tsx",
     ],
     rules: {
       "@typescript-eslint/no-restricted-imports": ["error", {
         patterns: [{
           group: ["**/editor/**", "@/editor/**", "@editor/**"],
-          message: "shared/ is leaf — may not import from editor/. Use shared/extensions/ for vibcoder compositions.",
+          message: "shared/ is leaf — may not import from editor/.",
           allowTypeImports: true,
         }],
       }],
@@ -285,6 +293,21 @@ export default [
           group: ["**/editor/**", "@/editor/**", "@editor/**"],
           message: "services/ may not import from editor/ (services consume shared/ only). Type-only imports allowed via `import type`.",
           allowTypeImports: true,
+        }],
+      }],
+    },
+  },
+  // D-6: services/ ↔ engine/ boundary is new — WARN, not ERROR, until the
+  // existing crossings it flags (cmsSync/componentSync/versionSync import
+  // engine/cms types, etc.) are triaged. See ledger D-6 decision_free_fix
+  // and the engine/ block above for why this uses the core rule key.
+  {
+    files: ["src/services/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": ["warn", {
+        patterns: [{
+          group: ["**/engine/**", "@/engine/**", "@engine/**"],
+          message: "services/ importing engine/ — flagged for triage (D-6).",
         }],
       }],
     },
