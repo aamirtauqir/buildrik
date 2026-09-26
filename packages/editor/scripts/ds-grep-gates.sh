@@ -648,6 +648,29 @@ fi
 #     memory/project_bare_button_variant_20260518.md.
 check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use @/editor/chrome-ui) — ZERO TOLERANCE" || exit 1
 
+# Gate 24b (B-12, 2026-09-26): same AST scan, scope extended to shared/forms/.
+# packages/editor/CLAUDE.md's DS SSOT table names shared/forms/ as an
+# intentional shared/→chrome-ui edge (field wiring composed on top of
+# chrome-ui controls) — but Gate 24 only ever scanned src/editor, so raw
+# native elements written INSIDE shared/forms/ itself were invisible to it.
+# RATCHET, not zero-tolerance: 4 pre-existing hits (FileField.tsx,
+# ColorField.tsx) may only go down, never up.
+GATE24B_FILE_COUNT=$(find packages/editor/src/shared/forms -name '*.tsx' \
+  -not -path '*/__tests__/*' \
+  -not -name '*.test.tsx' 2>/dev/null | wc -l | tr -d ' ')
+
+if [ "$GATE24B_FILE_COUNT" -eq 0 ]; then
+  GATE24B_HITS=0
+else
+  GATE24B_HITS=$(find packages/editor/src/shared/forms -name '*.tsx' \
+    -not -path '*/__tests__/*' \
+    -not -name '*.test.tsx' 2>/dev/null \
+    | xargs npx tsx packages/editor/scripts/jsx-inline-element-scanner.ts 2>/dev/null \
+    | jq -s 'add | length' 2>/dev/null || echo "0")
+fi
+
+check_gate 24b "$GATE24B_HITS" "4" "inline <button>/<input>/<select>/<textarea> in shared/forms/ — RATCHET" || exit 1
+
 # Gate 25: Orphan codemod fixtures.
 # Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —
 # either a 1:1 sibling `<name>.codemod.test.ts` (Phase 5 Bucket pattern) OR
