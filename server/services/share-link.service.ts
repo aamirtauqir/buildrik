@@ -308,18 +308,24 @@ interface BlockNode {
   children?: unknown;
 }
 
+/** Every element node on the given pages, with its id — the one walk both
+ *  projections below share. */
+function forEachElement(pages: ReadonlyArray<{ blocks: unknown }>, visit: (id: string, node: object) => void): void {
+  const walk = (node: unknown): void => {
+    if (typeof node !== "object" || node === null) return;
+    const { id, children } = node as BlockNode;
+    if (typeof id === "string") visit(id, node);
+    if (Array.isArray(children)) children.forEach(walk);
+  };
+  pages.forEach((p) => walk(p.blocks));
+}
+
 /** The stored bindings, kept only for elements on the delivered pages. */
 function deliveredCmsBindings(stored: unknown, pages: ReadonlyArray<{ blocks: unknown }>): CmsBindingsInput | null {
   const bindings = filterCmsBindings(stored);
   if (!bindings) return null;
   const ids = new Set<string>();
-  const walk = (node: unknown): void => {
-    if (typeof node !== "object" || node === null) return;
-    const { id, children } = node as BlockNode;
-    if (typeof id === "string") ids.add(id);
-    if (Array.isArray(children)) children.forEach(walk);
-  };
-  pages.forEach((p) => walk(p.blocks));
+  forEachElement(pages, (id) => ids.add(id));
   const keep = <T>(map: Record<string, T> | undefined) => {
     const kept = Object.entries(map ?? {}).filter(([elementId]) => ids.has(elementId));
     return kept.length > 0 ? Object.fromEntries(kept) : undefined;
@@ -344,21 +350,15 @@ function boundCmsFields(bindings: CmsBindingsInput | null, pages: ReadonlyArray<
     set.add(slug);
     out.set(collectionId, set);
   };
-  const walk = (node: unknown): void => {
-    if (typeof node !== "object" || node === null) return;
-    const { id, children } = node as BlockNode;
-    if (typeof id === "string") {
-      for (const b of bindings.field?.[id] ?? []) add(b.collectionId, b.fieldSlug);
-      const list = bindings.collection?.[id];
-      if (list) {
-        const itemVar = (list.itemVar ?? "item").replace(/[^\w]/g, "");
-        const re = new RegExp(`\\{\\{\\s*${itemVar}\\.([\\w-]+)\\s*\\}\\}`, "g");
-        out.set(list.collectionId, out.get(list.collectionId) ?? new Set());
-        for (const m of JSON.stringify(node).matchAll(re)) add(list.collectionId, m[1]);
-      }
+  forEachElement(pages, (id, node) => {
+    for (const b of bindings.field?.[id] ?? []) add(b.collectionId, b.fieldSlug);
+    const list = bindings.collection?.[id];
+    if (list) {
+      const itemVar = (list.itemVar ?? "item").replace(/[^\w]/g, "");
+      const re = new RegExp(`\\{\\{\\s*${itemVar}\\.([\\w-]+)\\s*\\}\\}`, "g");
+      out.set(list.collectionId, out.get(list.collectionId) ?? new Set());
+      for (const m of JSON.stringify(node).matchAll(re)) add(list.collectionId, m[1]);
     }
-    if (Array.isArray(children)) children.forEach(walk);
-  };
-  pages.forEach((p) => walk(p.blocks));
+  });
   return out;
 }
