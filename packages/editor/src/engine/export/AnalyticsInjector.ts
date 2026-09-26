@@ -8,17 +8,25 @@
 
 import type { AnalyticsConfig } from "../../shared/types";
 
+/* I-1b: provider ids come from project settings (a direct API write reaches
+   them too) and land inside inline <script> bodies and URL attributes. A JS
+   string literal via JSON.stringify, with "<" escaped so no "</script" can
+   close the element; a URL position gets percent-encoding. */
+function jsString(value: string): string {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
 /**
  * Generate Google Analytics 4 script tags
  * Includes privacy protections: IP anonymization and disabled remarketing signals
  */
 function generateGoogleAnalytics(measurementId: string): string {
-  return `  <script async src="https://www.googletagmanager.com/gtag/js?id=${measurementId}"></script>
+  return `  <script async src="https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '${measurementId}', {
+    gtag('config', ${jsString(measurementId)}, {
       'anonymize_ip': true,
       'allow_google_signals': false
     });
@@ -38,11 +46,11 @@ function generateFacebookPixel(pixelId: string): string {
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '${pixelId}');
+    fbq('init', ${jsString(pixelId)});
     fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1"
+    src="https://www.facebook.com/tr?id=${encodeURIComponent(pixelId)}&ev=PageView&noscript=1"
   /></noscript>`;
 }
 
@@ -50,12 +58,12 @@ function generateFacebookPixel(pixelId: string): string {
  * Generate Google Ads conversion tracking script
  */
 function generateGoogleAds(conversionId: string): string {
-  return `  <script async src="https://www.googletagmanager.com/gtag/js?id=${conversionId}"></script>
+  return `  <script async src="https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(conversionId)}"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '${conversionId}');
+    gtag('config', ${jsString(conversionId)});
   </script>`;
 }
 
@@ -65,7 +73,7 @@ function generateGoogleAds(conversionId: string): string {
  */
 function generateMicrosoftClarity(projectId: string): string {
   return `  <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${projectId}");
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",${jsString(projectId)});
   </script>`;
 }
 
@@ -75,7 +83,7 @@ function generateMicrosoftClarity(projectId: string): string {
  * analytics) so it is intentionally omitted here where injection is head-only.
  */
 function generateGoogleTagManager(containerId: string): string {
-  return `  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${containerId}');</script>`;
+  return `  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',${jsString(containerId)});</script>`;
 }
 
 /**
