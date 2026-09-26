@@ -60,7 +60,6 @@ import {
   HeadersScreen,
   LocalizationScreen,
   DomainsScreen,
-  WebhooksScreen,
   OverviewScreen,
 } from "./index";
 import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
@@ -295,8 +294,11 @@ export const SettingsTab: React.FC<
           return;
         case "members":
         case "billing":
+        case "webhooks":
           /* The sidebar's rows are links; a Search result or an Overview
-             `Open ›` naming these takes the same door. */
+             `Open ›` naming these takes the same door. Webhooks moved to the
+             dashboard's Settings > Integrations (A-12/A01-6) — workspace-
+             scoped, so it belongs beside Vercel/Slack/Zapier there. */
           window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS[id]}`, "_blank", "noopener,noreferrer");
           return;
         default:
@@ -555,8 +557,6 @@ export const SettingsTab: React.FC<
         return <FormsScreen {...common} />;
       case "domains":
         return <DomainsScreen {...common} />;
-      case "webhooks":
-        return <WebhooksScreen {...common} />;
       default:
         return null;
     }

@@ -254,7 +254,7 @@ describe("SettingsTab — the shell", () => {
       { id: "set-nav-custom-code", text: "Custom code" },
       { id: "set-nav-headers", text: "Headers" },
       { id: "set-nav-integrations", text: "Integrations" },
-      { id: "set-nav-webhooks", text: "Webhooks" },
+      { id: "set-nav-webhooks", text: "Webhooks ↗" },
       { id: "set-nav-members", text: "Members" },
       { id: "set-nav-billing", text: "Billing" },
     ]);
@@ -263,7 +263,7 @@ describe("SettingsTab — the shell", () => {
       .map((el) => el.textContent);
     expect(groups).toEqual(["Site setup", "SEO & publishing", "Visitors", "Advanced", "Workspace"]);
     expect(screen.getByTestId("set-nav-overview").getAttribute("aria-current")).toBe("page");
-    for (const id of ["members", "billing"]) {
+    for (const id of ["members", "billing", "webhooks"]) {
       const link = screen.getByTestId(`set-nav-${id}`);
       expect(link.tagName).toBe("A");
       expect(link.getAttribute("target")).toBe("_blank");
@@ -271,6 +271,9 @@ describe("SettingsTab — the shell", () => {
     }
     expect(screen.getByTestId("set-nav-members").getAttribute("href")).toContain("/dashboard/settings/team");
     expect(screen.getByTestId("set-nav-billing").getAttribute("href")).toContain("/dashboard/settings/billing");
+    // A-12/A01-6: webhooks moved to the dashboard's Settings > Integrations —
+    // workspace-scoped, alongside Vercel/Slack/Zapier — not a Settings screen.
+    expect(screen.getByTestId("set-nav-webhooks").getAttribute("href")).toContain("/dashboard/settings/integrations");
   });
 
   it("keeps the Pro badge on the locked rows for a starter plan", () => {

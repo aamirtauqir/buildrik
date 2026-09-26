@@ -6,6 +6,7 @@ import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { INTEGRATION_CONFIGS } from "@/components/settings/integrations-tab";
+import { WebhooksCard } from "@/components/settings/webhooks-card";
 import { SectionCard, Pill, MetricValue, Button, InputField } from "@/components/dashboard/primitives";
 
 /** dc categorical tints cycled across the integration tiles (teal→amber→primary→pink). */
@@ -31,7 +32,7 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
-function IntegrationCard({
+export function IntegrationCard({
   tintIndex,
   initial,
   name,
@@ -258,6 +259,7 @@ export function IntegrationsContent() {
 
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
         {workspaceId && <VercelCard workspaceId={workspaceId} />}
+        <WebhooksCard />
 
         {INTEGRATION_CONFIGS.map((cfg, i) => {
           const connection = connected.find((c) => c.provider === cfg.provider);
