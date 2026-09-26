@@ -210,6 +210,24 @@ export function ConnectSourceDialog({
           {error}
         </p>
       ) : null}
+      {/* Sheets/Airtable need OAuth apps + credentials that don't exist in any
+          env, plus a security review (fix-all round, 2026-09-25 decision) —
+          named and visibly disabled rather than silently absent. */}
+      <div className="tw:mt-4 tw:flex tw:flex-col tw:gap-1.5 tw:border-t tw:border-[var(--bk-border)] tw:pt-3">
+        {[
+          { key: "sheets", label: "Google Sheets" },
+          { key: "airtable", label: "Airtable" },
+        ].map((s) => (
+          <div
+            key={s.key}
+            className="tw:flex tw:h-8 tw:items-center tw:justify-between tw:rounded-[6px] tw:px-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-disabled)]"
+            data-testid={`content-source-connect-${s.key}`}
+          >
+            <span>{s.label}</span>
+            <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">Coming soon</span>
+          </div>
+        ))}
+      </div>
     </Modal>
   );
 }

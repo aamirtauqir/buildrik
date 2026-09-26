@@ -1,9 +1,13 @@
+import DOMPurify from "isomorphic-dompurify";
 import { prisma } from "@/lib/prisma";
+import { parseCsvText } from "@/lib/csv";
+import { sanitizeGeneratedPageHtml } from "@/lib/sanitize-blocks";
 import type { Prisma } from "@prisma/client";
 import type {
   UpsertCollectionInput,
   UpsertEntryInput,
 } from "@buildrik/shared/schemas/cms";
+import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -14,11 +18,56 @@ import type {
 
 export class CmsError extends Error {
   constructor(
-    public code: "NOT_FOUND",
+    public code: "NOT_FOUND" | "BAD_REQUEST",
     message: string,
   ) {
     super(message);
     this.name = "CmsError";
+  }
+}
+
+/**
+ * Defense-in-depth at the write boundary (audit S-1 class: "some stores never
+ * sanitized on the server"). Entry `data` is opaque JSON supplied by the
+ * client; every string value is run through the same DOMPurify sanitizer
+ * `lib/sanitize-blocks.ts` uses for page blocks. Applied by `upsertEntry`, so
+ * every write path (manual save, CSV import, any future importer) shares it.
+ *
+ * This strips MARKUP only (tags/attributes an HTML parser would honor) and
+ * stores the remaining text raw; every sink escapes it (`escapeHtml` below) — it
+ * does nothing about a plain-text value like `javascript:alert(1)` (no tags,
+ * nothing for DOMPurify to remove) that later lands in a URL-bearing
+ * attribute at template-substitution time. That is a different threat with a
+ * different fix location: the scheme check lives at the SUBSTITUTION SINK
+ * (`substituteOutsideScriptStyle`, below), which is where untrusted text
+ * meets an attribute an HTML parser will navigate/load — not here at write
+ * time, and not by guessing which fields are "URL fields" up front.
+ */
+function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    out[key] = typeof value === "string" ? stripMarkup(value) : value;
+  }
+  return out;
+}
+
+/**
+ * The text of `value` with its markup removed, NOT serialized HTML: the
+ * serialized form entity-encoded the text ("Tom & Jerry" stored as
+ * "Tom &amp; Jerry"), the page sink escaped it again, and every save encoded
+ * it once more. `&` is escaped before parsing so nothing reads as an entity —
+ * the text comes back exactly as typed. Escaping belongs to the sink.
+ *
+ * Repeated until nothing changes: cutting a tag out of the middle of another
+ * (`<<img …>img …>`) leaves text that is itself a tag.
+ */
+function stripMarkup(value: string): string {
+  let text = value;
+  for (;;) {
+    const fragment = DOMPurify.sanitize(text.replace(/&/g, "&amp;"), { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true });
+    const next = fragment.textContent ?? "";
+    if (next === text) return text;
+    text = next;
   }
 }
 
@@ -83,7 +132,7 @@ export async function listEntries(siteId: string, collectionId: string) {
 export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
   await assertCollectionInSite(siteId, input.collectionId);
   const data = {
-    data: input.data as unknown as Prisma.InputJsonValue,
+    data: sanitizeEntryData(input.data) as unknown as Prisma.InputJsonValue,
     ...(input.status ? { status: input.status } : {}),
   };
   if (input.id) {
@@ -108,6 +157,141 @@ export async function deleteEntry(siteId: string, id: string): Promise<void> {
   });
   if (!owned) throw new CmsError("NOT_FOUND", "Entry not found");
   await prisma.cmsEntry.delete({ where: { id } });
+}
+
+// ── CSV import (fix-all round, 2026-09-25) ──────────────────────────────────
+// Server-side parsing + validation: the client only reads the file as text
+// and posts it, never parses it. `previewCsvImport` and `importCsvEntries`
+// both re-parse the raw CSV rather than trust a client-computed row count, so
+// the size/row caps are enforced against what the server itself decodes.
+
+interface CmsFieldShape {
+  slug: string;
+  name: string;
+}
+
+async function loadCollectionFields(siteId: string, collectionId: string): Promise<CmsFieldShape[]> {
+  const col = await prisma.cmsCollection.findFirst({ where: { id: collectionId, siteId }, select: { fields: true } });
+  if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
+  const fields = col.fields as unknown;
+  if (!Array.isArray(fields)) return [];
+  return fields
+    .filter((f): f is CmsFieldShape => !!f && typeof f === "object" && typeof (f as CmsFieldShape).slug === "string")
+    .map((f) => ({ slug: f.slug, name: typeof (f as { name?: unknown }).name === "string" ? (f as { name: string }).name : f.slug }));
+}
+
+function parseAndCapCsv(csv: string): { headers: string[]; dataRows: string[][] } {
+  const rows = parseCsvText(csv).filter((r) => !(r.length === 1 && r[0] === ""));
+  if (rows.length === 0) throw new CmsError("BAD_REQUEST", "This file has no rows.");
+  const [headers, ...dataRows] = rows;
+  if (headers.every((h) => h.trim() === "")) throw new CmsError("BAD_REQUEST", "This file has no header row.");
+  if (dataRows.length === 0) throw new CmsError("BAD_REQUEST", "This file has a header row but no data.");
+  if (dataRows.length > CSV_IMPORT_MAX_ROWS) {
+    throw new CmsError("BAD_REQUEST", `This file has ${dataRows.length} rows — the limit is ${CSV_IMPORT_MAX_ROWS}.`);
+  }
+  if (headers.length > CSV_IMPORT_MAX_COLUMNS) {
+    throw new CmsError("BAD_REQUEST", `This file has ${headers.length} columns — the limit is ${CSV_IMPORT_MAX_COLUMNS}.`);
+  }
+  for (const row of [headers, ...dataRows]) {
+    for (const cell of row) {
+      if (cell.length > CSV_IMPORT_MAX_CELL_LENGTH) {
+        throw new CmsError("BAD_REQUEST", `A cell is longer than ${CSV_IMPORT_MAX_CELL_LENGTH} characters — split this file up.`);
+      }
+    }
+  }
+  return { headers, dataRows };
+}
+
+/** Case-insensitive match of a collection field to a CSV header, by slug or
+ *  by name — the same rule `parseRecordsJson` (JSON import) uses on the
+ *  client, kept in step so the two importers read the same way. */
+function suggestColumnMapping(fields: CmsFieldShape[], headers: string[]): Record<string, string> {
+  const headerByKey = new Map<string, string>();
+  for (const h of headers) {
+    headerByKey.set(h.trim().toLowerCase(), h);
+  }
+  const mapping: Record<string, string> = {};
+  for (const f of fields) {
+    const header = headerByKey.get(f.slug.toLowerCase()) ?? headerByKey.get(f.name.toLowerCase());
+    if (header) mapping[f.slug] = header;
+  }
+  return mapping;
+}
+
+export interface CsvImportPreview {
+  headers: string[];
+  totalRows: number;
+  /** First few data rows, keyed by header, for the mapping screen. */
+  sampleRows: Array<Record<string, string>>;
+  /** fieldSlug -> CSV header, guessed by matching field slug/name to a header. */
+  suggestedMapping: Record<string, string>;
+}
+
+const CSV_PREVIEW_SAMPLE_ROWS = 5;
+
+export async function previewCsvImport(siteId: string, collectionId: string, csv: string): Promise<CsvImportPreview> {
+  const fields = await loadCollectionFields(siteId, collectionId);
+  const { headers, dataRows } = parseAndCapCsv(csv);
+  const sampleRows = dataRows.slice(0, CSV_PREVIEW_SAMPLE_ROWS).map((row) => {
+    const record: Record<string, string> = {};
+    headers.forEach((h, i) => {
+      record[h] = row[i] ?? "";
+    });
+    return record;
+  });
+  return { headers, totalRows: dataRows.length, sampleRows, suggestedMapping: suggestColumnMapping(fields, headers) };
+}
+
+export interface CsvImportRowError {
+  row: number; // 1-based, header excluded (row 1 = first data row)
+  message: string;
+}
+
+export interface CsvImportResult {
+  imported: number;
+  total: number;
+  errors: CsvImportRowError[];
+}
+
+/**
+ * Create one entry per CSV data row, mapped by `columnMapping`
+ * (fieldSlug -> CSV header) and written through `upsertEntry` — the exact
+ * write manual "Add record" uses, so sanitization/validation stay in one
+ * place. A row that fails to write is reported by its 1-based position and
+ * the rest of the file still imports (partial success, like JSON import).
+ */
+export async function importCsvEntries(
+  siteId: string,
+  collectionId: string,
+  csv: string,
+  columnMapping: Record<string, string>,
+): Promise<CsvImportResult> {
+  await assertCollectionInSite(siteId, collectionId);
+  const { headers, dataRows } = parseAndCapCsv(csv);
+  const columnIndex = new Map(headers.map((h, i) => [h, i]));
+  const mappedFields = Object.entries(columnMapping).filter(([, header]) => columnIndex.has(header));
+
+  let imported = 0;
+  const errors: CsvImportRowError[] = [];
+  for (const [i, row] of dataRows.entries()) {
+    const rowNumber = i + 1;
+    const data: Record<string, unknown> = {};
+    for (const [fieldSlug, header] of mappedFields) {
+      const value = row[columnIndex.get(header)!];
+      if (value !== undefined && value !== "") data[fieldSlug] = value;
+    }
+    if (Object.keys(data).length === 0) {
+      errors.push({ row: rowNumber, message: "No mapped column had a value" });
+      continue;
+    }
+    try {
+      await upsertEntry(siteId, { siteId, collectionId, data });
+      imported += 1;
+    } catch (e) {
+      errors.push({ row: rowNumber, message: e instanceof Error ? e.message : "Could not be saved" });
+    }
+  }
+  return { imported, total: dataRows.length, errors };
 }
 
 // ── Dynamic pages (E7) ──────────────────────────────────────────────────────
@@ -229,6 +413,17 @@ export async function resolveDynamicPages(
 // script/style content is not HTML). Splits the template into
 // script/style spans and the rest, substitutes only the rest, and
 // reassembles in order.
+//
+// Controller review round 1 found this entity-escaped substitution alone
+// isn't enough for a URL-bearing attribute (`<a href="{fieldSlug}">` with a
+// `javascript:` value survives entity-escaping — it has no `<`, `>` or `"`
+// to escape). Round 1's fix was a regex "is this substitution inside a URL
+// attribute" detector; round 2 found that detector bypassable (unquoted
+// attributes, a non-first `srcset` candidate, `style="url(...)"`, and case
+// all need real parsing to resolve correctly). BINDING RULING: stop
+// detecting HTML context with regex here — this function goes back to plain
+// entity-escaped substitution, and `generateDynamicPages` runs the whole
+// resulting page through `sanitizeGeneratedPageHtml` (a real parser) below.
 function substituteOutsideScriptStyle(
   html: string,
   data: Record<string, unknown>,
@@ -289,6 +484,10 @@ export async function generateDynamicPages(
       `<title>${escapeHtml(seoTitle)}</title>` +
       (seoDescription ? `<meta name="description" content="${escapeHtml(seoDescription)}">` : "");
     html = html.includes("</head>") ? html.replace("</head>", `${seoTags}</head>`) : seoTags + html;
+    // Controller review round 2: the sink defense against a dangerous URL a
+    // substitution introduced runs here, over the FINAL page, through a real
+    // parser — not as a step of the substitution above.
+    html = sanitizeGeneratedPageHtml(html);
     const cleanSlug = slug.replace(/^\/+|\/+$/g, "") || "index";
     return { path: `${cleanSlug}/index.html`, content: html };
   });

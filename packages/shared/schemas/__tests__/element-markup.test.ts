@@ -5,6 +5,7 @@
  */
 import { describe, it, expect } from "vitest";
 import {
+  cssValueHasDangerousUrl,
   escapeStyleText,
   isDangerousUrl,
   isAbsoluteHttpUrl,
@@ -14,6 +15,7 @@ import {
   isSafeElementId,
   isSafeMediaQuery,
   isSafeStyleRuleTarget,
+  srcsetCandidates,
   srcsetUrls,
 } from "../element-markup";
 
@@ -40,6 +42,21 @@ describe("srcsetUrls", () => {
   it("cuts only the trailing descriptor", () => {
     expect(srcsetUrls("a.jpg 1x, b.jpg 200w,c.jpg")).toEqual(["a.jpg", "b.jpg", "c.jpg"]);
     expect(srcsetUrls("a.jpg 1x, java\tscript:alert(1) 2x")).toEqual(["a.jpg", "java\tscript:alert(1)"]);
+  });
+
+  it("keeps a comma inside a candidate's URL (data: image) — only a comma after the URL ends a candidate", () => {
+    expect(srcsetUrls("data:image/png;base64,AAA 1x, /b.png 2x")).toEqual(["data:image/png;base64,AAA", "/b.png"]);
+    expect(srcsetUrls("data:image/png;base64,AAA,/b.png 2x")).toEqual(["data:image/png;base64,AAA,/b.png"]);
+    expect(srcsetUrls("a.jpg, b.jpg")).toEqual(["a.jpg", "b.jpg"]);
+    expect(srcsetUrls("/a.jpg 1x, java\tscript:a,b 2x")).toEqual(["/a.jpg", "java\tscript:a", "b"]);
+  });
+});
+
+describe("srcsetCandidates", () => {
+  it("returns each candidate with its descriptor, trimmed", () => {
+    expect(srcsetCandidates(" data:image/png;base64,AAA 1x ,/b.png 2x")).toEqual(["data:image/png;base64,AAA 1x", "/b.png 2x"]);
+    expect(srcsetCandidates("a.jpg 1x,")).toEqual(["a.jpg 1x"]);
+    expect(srcsetCandidates(" , ")).toEqual([]);
   });
 });
 
@@ -81,6 +98,22 @@ describe("isSafeCssDeclaration (S-1 review round 3)", () => {
     ["background", "{{token.color.primary}}"],
     ["box-shadow", "0 4px 12px {{token.color-shadow}}"],
   ])("allows %j: %j", (property, value) => expect(isSafeCssDeclaration(property, value)).toBe(true));
+});
+
+describe("cssValueHasDangerousUrl (x4 fix round 3 — one url() scan)", () => {
+  it.each([
+    "url(javascript:alert(1))",
+    `url("javascript:a')")`,
+    "color:red;background:url( 'java\tscript:x' )",
+    'url("data:text/html,x")',
+    "background:url(/ok.png), URL(vbscript:x)",
+  ])("finds a dangerous url() in %j", (value) => expect(cssValueHasDangerousUrl(value)).toBe(true));
+
+  it.each([
+    "background:url(/bg.jpg);color:red",
+    'background-image:url("data:image/png;base64,AAAA")',
+    "color:#1A56DB",
+  ])("finds none in %j", (value) => expect(cssValueHasDangerousUrl(value)).toBe(false));
 });
 
 const HOSTILE_SELECTOR = "a{}</style><script>alert(1)</script><style>";

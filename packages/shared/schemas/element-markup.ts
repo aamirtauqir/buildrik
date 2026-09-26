@@ -87,6 +87,20 @@ const CSS_DANGEROUS = [/expression\s*\(/i, /-moz-binding/i, /behavior\s*:/i, /ja
 const CSS_URL = /url\(\s*(['"]?)([\s\S]*?)\1\s*\)/gi;
 
 /**
+ * Whether any `url(...)` in CSS text — one declaration's value or a whole
+ * `style="…"` attribute — names a dangerous URL (`isDangerousUrl`). The one
+ * url() scan: `isSafeCssDeclaration` and the generated-page sanitizer both use
+ * it, so a quoting trick like `url("javascript:a')")` cannot slip past one of
+ * them only.
+ */
+export function cssValueHasDangerousUrl(value: string): boolean {
+  for (const match of value.matchAll(CSS_URL)) {
+    if (isDangerousUrl(match[2] ?? "")) return true;
+  }
+  return false;
+}
+
+/**
  * One style declaration that is safe to write into a stylesheet — a published
  * page's `<style>`, where a value reading `red}</style><script>…` would leave
  * the rule, then the element. The one check the export writers, the server
@@ -97,10 +111,7 @@ export function isSafeCssDeclaration(property: string, value: unknown): boolean 
   if (["behavior", "-moz-binding"].includes(property.toLowerCase())) return false;
   if (CSS_BREAKOUT.test(value.replace(CSS_TOKEN_PLACEHOLDER, ""))) return false;
   if (CSS_DANGEROUS.some((pattern) => pattern.test(value))) return false;
-  for (const match of value.matchAll(CSS_URL)) {
-    if (isDangerousUrl(match[2] ?? "")) return false;
-  }
-  return true;
+  return !cssValueHasDangerousUrl(value);
 }
 
 /**
@@ -209,14 +220,44 @@ export function withSafeTargets(clean: string, parse: (html: string) => Document
 }
 
 /**
+ * The candidates of a `srcset` value, each `<url> [descriptor]`, split the way
+ * a browser splits them: a candidate's URL is a run of non-whitespace — commas
+ * included, so `data:image/png;base64,AAA 1x` stays one candidate — and only a
+ * comma that ends that URL, or one after its descriptor, starts the next.
+ */
+export function srcsetCandidates(value: string): string[] {
+  const candidates: string[] = [];
+  let pos = 0;
+  while (pos < value.length) {
+    while (pos < value.length && /[\s,]/.test(value[pos])) pos++;
+    const start = pos;
+    while (pos < value.length && !/\s/.test(value[pos])) pos++;
+    if (pos === start) break;
+    if (value[pos - 1] === ",") {
+      // The URL itself ended in a comma: that comma closes the candidate.
+      candidates.push(value.slice(start, pos).replace(/,+$/, ""));
+      continue;
+    }
+    let depth = 0;
+    while (pos < value.length && (value[pos] !== "," || depth > 0)) {
+      if (value[pos] === "(") depth++;
+      else if (value[pos] === ")" && depth > 0) depth--;
+      pos++;
+    }
+    const candidate = value.slice(start, pos).trim();
+    if (candidate) candidates.push(candidate);
+  }
+  return candidates;
+}
+
+/**
  * The URLs a `srcset` value names ("a.jpg 1x, b.jpg 200w" → ["a.jpg", "b.jpg"]).
  * Only a trailing width/density descriptor is cut, not everything after the
  * first space: whitespace inside "java\tscript:" must not split the URL off.
  */
 export function srcsetUrls(value: string): string[] {
-  return value
-    .split(",")
-    .map((candidate) => candidate.trim().replace(/\s+\d+(?:\.\d+)?[wxh]$/i, ""))
+  return srcsetCandidates(value)
+    .map((candidate) => candidate.replace(/\s+\d+(?:\.\d+)?[wxh]$/i, ""))
     .filter((url) => url.length > 0);
 }
 
