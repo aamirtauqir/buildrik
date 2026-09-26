@@ -437,7 +437,9 @@ export async function duplicateSite(
           name: p.name,
           slug: p.slug,
           position: p.position,
-          blocks: (reid.pages[i].blocks ?? []) as Prisma.InputJsonValue,
+          // M-6: same write-boundary sanitizer as the save path — the source
+          // row may predate it, like projectStyles above.
+          blocks: sanitizeBlocks(reid.pages[i].blocks ?? []) as Prisma.InputJsonValue,
           isHomePage: p.isHomePage,
           seoTitle: p.seoTitle,
           seoDescription: p.seoDescription,

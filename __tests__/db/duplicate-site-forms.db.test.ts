@@ -136,3 +136,36 @@ describe("duplicateSite — forms and bindings under the copy's keys", () => {
     expect(await prisma.formBlock.count({ where: { siteId: copy.id, blockId: renamedTo } })).toBe(1);
   });
 });
+
+/* M-6: the copy's pages are written by a new path, so they get the same
+   write-boundary sanitizer the save path runs — a source row stored before
+   sanitization (or by a path that skipped it) is not trusted into the copy. */
+describe("duplicateSite — the copy's page blocks are sanitized (M-6)", () => {
+  it("drops event handlers and javascript: hrefs from the copied tree", async () => {
+    const user = await createTestUser();
+    const workspace = await createTestWorkspace({ ownerId: user.id });
+    await createTestWorkspaceMember({ userId: user.id, workspaceId: workspace.id, role: "OWNER" });
+    const site = await createTestSite({ workspaceId: workspace.id, createdBy: user.id });
+    await createTestPage({
+      siteId: site.id,
+      name: "Home",
+      slug: "home",
+      position: 0,
+      blocks: {
+        id: "root",
+        type: "container",
+        children: [
+          { id: "img-1", type: "image", tagName: "img", attributes: { src: "x", onerror: "alert(1)" } },
+          { id: "a-1", type: "link", tagName: "a", attributes: { href: "javascript:alert(1)" } },
+        ],
+      },
+    });
+
+    const copy = await duplicateSite(site.id, workspace.id, user.id);
+    const [page] = await prisma.page.findMany({ where: { siteId: copy.id } });
+    const children = (page.blocks as { children: Array<{ attributes: Record<string, unknown> }> }).children;
+    expect(children[0].attributes).not.toHaveProperty("onerror");
+    expect(children[0].attributes.src).toBe("x");
+    expect(String(children[1].attributes.href ?? "")).not.toMatch(/javascript:/i);
+  });
+});
