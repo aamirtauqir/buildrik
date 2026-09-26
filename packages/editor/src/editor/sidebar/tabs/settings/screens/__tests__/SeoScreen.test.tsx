@@ -343,7 +343,7 @@ describe("SeoScreen — the fields say what the server will accept", () => {
   });
 });
 
-/* M7 round 2: below ADMIN only the Site-column fields lock. */
+/* M7: below ADMIN only the Site-column fields lock. */
 describe("SeoScreen — Site-column fields below ADMIN", () => {
   it("locks meta title / description / OG image / indexing with the reason; the Twitter handle stays editable", async () => {
     setup({ siteColumnsLocked: true });

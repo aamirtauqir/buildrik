@@ -196,7 +196,7 @@ describe("useAutoMilestone — triggers", () => {
     visibilitySpy.mockRestore();
   });
 
-  it("carry-over 15 round 2: requires the significance threshold on the FIRST attempt too — no exemption", async () => {
+  it("carry-over 15: requires the significance threshold on the FIRST attempt too — no exemption", async () => {
     // Fake ONLY Date — real setTimeout/setInterval stay so `waitFor`'s
     // internal polling keeps working (faking the whole clock leaves
     // `waitFor` polling a clock that never advances, which hangs the test
@@ -209,7 +209,7 @@ describe("useAutoMilestone — triggers", () => {
 
     // A remount reset lastSuggestionTime to 0 before, and an exempted first
     // attempt made that indistinguishable from "the gate never armed" — the
-    // exact bypass carry-over 15 round 2 closes. With no exemption, a
+    // exact bypass carry-over 15 closes. With no exemption, a
     // qualifying event with NO recorded activity yet must be withheld.
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
     expect(suggestMock).not.toHaveBeenCalled();
@@ -228,7 +228,7 @@ describe("useAutoMilestone — triggers", () => {
     vi.useRealTimers();
   });
 
-  it("carry-over 15 round 2: lastSuggestionTime survives a remount (persisted per site) — cooldown still holds", async () => {
+  it("carry-over 15: lastSuggestionTime survives a remount (persisted per site) — cooldown still holds", async () => {
     mockGetSiteId.mockReturnValue("site-remount-1");
     vi.useFakeTimers({ toFake: ["Date"] });
     const suggestMock = stubSuggest();

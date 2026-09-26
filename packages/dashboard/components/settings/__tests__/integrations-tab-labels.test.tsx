@@ -1,7 +1,7 @@
 /**
  * B-8: every provider-config field is reachable by its label once its
  * provider is expanded, and the label keeps the panel's original
- * body-sm / text-primary look (fix round 1).
+ * body-sm / text-primary look.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";

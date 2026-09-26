@@ -134,7 +134,7 @@ describe("RecordSheet", () => {
     await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
   });
 
-  /* B-1 fix round 2: the shell's "Leave anyway" runs this sheet's discard,
+  /* B-1 fix: the shell's "Leave anyway" runs this sheet's discard,
      so a switch away really does drop the edits it promised to drop, and
      the sheet's own "Discard and leave" clears the entry before it leaves. */
   it("registers its dirt with the shell; the shell's discard resets the fields and the entry", async () => {

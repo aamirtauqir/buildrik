@@ -281,7 +281,7 @@ describe("rollbackSiteTheme (D2)", () => {
     siteUpdateMany.mockResolvedValue({ count: 1 });
     snapDelete.mockResolvedValue({});
     const res = await rollbackSiteTheme("w1", "s1");
-    // CAS on the lastEditedAt read (round 2), like push.
+    // CAS on the lastEditedAt read, like push.
     expect(siteUpdateMany.mock.calls[0][0].where).toEqual({ id: "s1", lastEditedAt: new Date("2026-06-01T00:00:00Z") });
     expect(siteUpdateMany.mock.calls[0][0].data).toMatchObject({
       projectSettings: { designTokens: [{ was: 1 }], seo: { metaTitle: "Keep" } },
@@ -291,7 +291,7 @@ describe("rollbackSiteTheme (D2)", () => {
     expect(res.rolledBackTo).toBeInstanceOf(Date);
   });
 
-  /* Round 2: rollback merged into the projectSettings it read and wrote it
+  /* Rollback merged into the projectSettings it read and wrote it
      back blind — an editor save landing in between was silently reverted.
      Now a CAS like push; a lost race fails clearly and keeps the snapshot. */
   it("a site edited since the read is not overwritten — CONFLICT, snapshot kept", async () => {

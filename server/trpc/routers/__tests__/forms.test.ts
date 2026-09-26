@@ -1,6 +1,6 @@
 /**
- * forms router — `updateBlock`'s notifyEmail ADMIN gate (fix round 2,
- * finding 1). Requiring ADMIN whenever `notifyEmail` is present in the
+ * forms router — `updateBlock`'s notifyEmail ADMIN gate. Requiring ADMIN
+ * whenever `notifyEmail` is present in the
  * payload (rather than when it actually CHANGES) meant an EDITOR blurring
  * the field without editing it — or saving any other field bundled through
  * the same call shape — hit a FORBIDDEN for a no-op write. The gate must
@@ -82,5 +82,14 @@ describe("forms.updateBlock — notifyEmail ADMIN gate", () => {
     svc.getFormBlockSettings.mockResolvedValue({ notifyEmail: null }); // no row yet → defaults
     await caller().updateBlock({ siteId: "s1", blockId: "f1", notifyEmail: "new@example.com" });
     expect(guards.guardSiteRole).toHaveBeenCalledWith(prismaMock, "u1", "s1", "ADMIN");
+  });
+
+  it("reads the stored notifyEmail through the service, never through ctx.prisma directly (routers never touch Prisma)", async () => {
+    svc.getFormBlockSettings.mockResolvedValue({ notifyEmail: "team@example.com" });
+    await caller().updateBlock({ siteId: "s1", blockId: "f1", notifyEmail: "new@example.com" });
+    expect(svc.getFormBlockSettings).toHaveBeenCalledWith("s1", "f1");
+    // prismaMock is `{}` — no `formBlock` property was ever attached to it,
+    // which is only possible if nothing in this call read `ctx.prisma.formBlock.*`.
+    expect((prismaMock as { formBlock?: unknown }).formBlock).toBeUndefined();
   });
 });

@@ -297,7 +297,7 @@ describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
   });
 });
 
-/* Round 2: a mirror that resolved but returned no row (an older server, a
+/* A mirror that resolved but returned no row (an older server, a
    mock) reached the server. Reading `row.updatedAt` off undefined threw inside
    the queued op, so it counted as a FAILED mirror and sat in the retry queue
    forever — replayed, "failing" again, on every reconnect. */
@@ -337,10 +337,10 @@ describe("hydrateCmsFromServer", () => {
     id, data, status: "DRAFT", createdAt: new Date(0), updatedAt: new Date(updatedAt),
   });
 
-  /* Round 2 #3: rows hydrated or mirrored before stamps existed have none, and
+  /* Rows hydrated or mirrored before stamps existed have none, and
      one never edited again would never be mirrored → never stamped → hidden
      from every teammate edit forever. */
-  describe("unstamped rows (C-4 round 2)", () => {
+  describe("unstamped rows (C-4)", () => {
     it("first hydrate for this site: the old updatedAt comparison runs ONCE — an older unstamped row takes the server's copy and is stamped", async () => {
       colListQuery.mockResolvedValueOnce([col("c", 0)]);
       loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(0) }]);
@@ -391,7 +391,7 @@ describe("hydrateCmsFromServer", () => {
       expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "e", data: { a: 1, b: 3 } });
     });
 
-    /* Round 3: a collection with a queued mirror used to `continue` past its
+    /* A collection with a queued mirror used to `continue` past its
        ENTRY loop too, while the scope was still marked done — its unstamped
        entries never got the pass and a teammate's edit stayed hidden. */
     it("a queued collection mirror skips only the collection write — its entries still get the pass, and the scope stays due", async () => {

@@ -1,6 +1,6 @@
 /**
  * B-8: Link name and Password are reachable by their labels, which keep
- * their original mb-1.5 / text-primary look (fix round 1).
+ * their original mb-1.5 / text-primary look.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";

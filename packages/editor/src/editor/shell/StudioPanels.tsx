@@ -54,8 +54,8 @@ import { ViewerRoleNotice } from "./ViewerRoleNotice";
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
 
-/* VIEWER_TABS / isTabAllowedForViewer moved to `../rail/tabsConfig` (fix
- * round 1) — the tab registry is the ONE place every door that gates a
+/* VIEWER_TABS / isTabAllowedForViewer moved to `../rail/tabsConfig` — the
+ * tab registry is the ONE place every door that gates a
  * VIEWER's left-panel tabs reads from: this file's rail click and
  * "ui:switch-tab" handler, useStudioState's openLeftPanelToTab/
  * setLeftPanelTab (the sink UI_PANEL_OPEN/deep-links/topbar buttons funnel

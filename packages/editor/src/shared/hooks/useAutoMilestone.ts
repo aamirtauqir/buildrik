@@ -61,7 +61,7 @@ const SUGGESTION_COOLDOWN_MS = 10 * 60_000; // 10 minutes
    still spend a call the moment the cooldown lifts. */
 const MIN_CHANGES_SINCE_LAST_SUGGESTION = 5;
 
-/* carry-over 15 round 2: `lastSuggestionTime` lived only in React state, so a
+/* carry-over 15: `lastSuggestionTime` lived only in React state, so a
    remount (StrictMode double-mount aside, a real one happens on any panel
    that unmounts/remounts this hook) reset it to 0 — `hasAttempted` read
    false again, which bypassed BOTH the 10-minute cooldown and the

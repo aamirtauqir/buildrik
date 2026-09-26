@@ -13,7 +13,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup, within, waitFor } from "@testing-library/react";
 
-/* Fix round 1 (Lfix): a VIEWER should not see a live-looking "Open Brand" /
+/* A VIEWER should not see a live-looking "Open Brand" /
    "Open Site settings" / "Open Add" row that the openLeftPanelToTab/
    setLeftPanelTab sink now silently no-ops on — mocked directly so the
    viewer-hidden-commands tests below are deterministic instead of racing
@@ -211,7 +211,7 @@ describe("CommandPalette — doors", () => {
   });
 });
 
-/* Fix round 1 (Lfix): most nav rows call openPanel() → UI_PANEL_OPEN, which
+/* Most nav rows call openPanel() → UI_PANEL_OPEN, which
    the sink (useStudioState's openLeftPanelToTab) now no-ops for a VIEWER —
    so a VIEWER must not see the row at all ("dead commands"), not just have
    it fail silently on click. */

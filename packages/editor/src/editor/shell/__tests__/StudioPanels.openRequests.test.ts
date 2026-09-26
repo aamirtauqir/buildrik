@@ -29,7 +29,7 @@ describe("StudioPanels — the two open requests wait here for a lazy panel", ()
     expect(src).toContain("composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings)");
   });
 
-  /* B-1 fix round 1: the request and the drawer ride the guarded switch's
+  /* B-1 fix: the request and the drawer ride the guarded switch's
      onSwitched — a switch held (or refused) by the unsaved-changes confirm
      must not hand a request to, or open the drawer on, the wrong tab. */
   it("each request switches the tab itself and, once switched, hands the request down and opens the drawer", () => {

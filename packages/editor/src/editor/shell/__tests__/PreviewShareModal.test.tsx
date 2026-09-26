@@ -72,7 +72,7 @@ describe("PreviewShareModal", () => {
     expect(create).toHaveBeenCalledWith({ siteId: "site-abc", name: "Draft preview" });
   });
 
-  // controller review round 1, IMPORTANT 6: a row whose token the server
+  // IMPORTANT 6: a row whose token the server
   // redacted (null — this caller isn't EDITOR+) must never be reused.
   it("mints a link when the only existing one has a redacted (null) token", async () => {
     list.mockResolvedValue([link("tok-hidden", { token: null })]);

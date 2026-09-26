@@ -114,7 +114,7 @@ describe("pre-publish checks count what ships", () => {
   // A-17: a page-generating CMS collection whose bound template page is gone
   // used to ship silently with no generated pages — surface it as a warning
   // before publish.
-  // Minor fix (controller review round 1): a "pass" row for a check that
+  // Minor fix: a "pass" row for a check that
   // never applies is noise on the near-all-sites-have-no-CMS-collection
   // case — the row is absent entirely, not a pass.
   it("omits the CMS templates row entirely when there is no page-generating collection", async () => {

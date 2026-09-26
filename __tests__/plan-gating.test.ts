@@ -174,7 +174,7 @@ describe("Share link requirePw + defaultExpiration policy (A-9)", () => {
     ).resolves.toBeDefined();
   });
 
-  // Minor fix (controller review round 1): FREE has no password links at
+  // FREE has no password links at
   // all (PLAN_LIMITS.FREE.shareLinkPasswords is false) — enforcing requirePw
   // there would make link creation impossible, not safer.
   it("requirePw=true on FREE (no password links on this plan) → does NOT throw", async () => {

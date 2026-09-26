@@ -225,7 +225,7 @@ export function useStudioState(): UseStudioStateReturn {
   // Load saved panel state once on mount
   const savedState = React.useMemo(() => getSavedPanelState(), []);
 
-  /* Fix round 1 (Lfix): the VIEWER rail gate used to live only in
+  /* The VIEWER rail gate used to live only in
      StudioPanels' rail click and "ui:switch-tab" handler — every OTHER door
      onto a left-panel tab (⌘K's UI_PANEL_OPEN commands, deep links, the
      topbar's Settings/Publish/History/Pages/Activity/Review buttons) called

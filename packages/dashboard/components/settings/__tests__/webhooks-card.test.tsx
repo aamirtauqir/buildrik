@@ -66,7 +66,7 @@ describe("WebhooksCard", () => {
     expect(screen.getByText("whsec_••••3456")).toBeInTheDocument();
   });
 
-  /* Fix round 1: the form is Flowbite-first and properly labelled — the
+  /* Fix: the form is Flowbite-first and properly labelled — the
      Endpoint URL field is an InputField its label names, the events are
      flowbite Checkboxes in a group named "Events", and "Signing secret" /
      "Events" are headings, not <label>s pointing at nothing. */

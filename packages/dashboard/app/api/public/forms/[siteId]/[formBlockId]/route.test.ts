@@ -1,6 +1,6 @@
 /**
- * Public form-submit route — the "show message" fallback (fix round 2,
- * finding 3). `submitForm` is the only thing allowed to decide what's a
+ * Public form-submit route — the "show message" fallback.
+ * `submitForm` is the only thing allowed to decide what's a
  * safe redirect target (`returnUrl`/`refererUrl`, both validated against the
  * site's own known origins); the route must never fall back to the raw
  * `Referer` header itself, and must land on the site's own origin root when

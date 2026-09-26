@@ -45,7 +45,7 @@ describe("shellDirtyRegistry", () => {
     shellDirty.setDiscard("cms-record", null);
   });
 
-  /* Fix round 3: one throwing discard must not abort the rest, and its
+  /* Fix: one throwing discard must not abort the rest, and its
      domain stays dirty so Exit / beforeunload still warn. */
   it("discardDirty() isolates a throwing discard: others still run, the failed domain stays dirty and is reported", () => {
     const err = vi.spyOn(console, "error").mockImplementation(() => {});

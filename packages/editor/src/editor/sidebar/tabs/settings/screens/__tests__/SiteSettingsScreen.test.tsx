@@ -391,7 +391,7 @@ describe("SiteSettingsScreen — flush handler contract", () => {
   });
 });
 
-/* M7 round 2: Author is project metadata, not a Site column. */
+/* M7: Author is project metadata, not a Site column. */
 describe("SiteSettingsScreen — Site-column fields below ADMIN", () => {
   it("locks name / favicon / language / social links with the reason; Author stays editable", async () => {
     setup({ siteColumnsLocked: true });

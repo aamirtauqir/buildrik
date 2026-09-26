@@ -1,6 +1,6 @@
 /**
  * B-8: the new-site Site name field is reachable by its label, which keeps
- * its original inline body / text-secondary look (fix round 1).
+ * its original inline body / text-secondary look.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";

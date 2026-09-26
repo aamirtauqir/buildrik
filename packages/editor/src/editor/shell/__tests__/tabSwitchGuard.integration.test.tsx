@@ -1,5 +1,5 @@
 /**
- * B-1 fix round 1 — the real doors, not the hook in isolation: ⌘H (through
+ * B-1 fix — the real doors, not the hook in isolation: ⌘H (through
  * useEditorShortcuts) and UI_PANEL_OPEN (through useEditorEventListeners)
  * wired to the guarded sinks exactly as AquibraStudio wires them, with a
  * dirty Settings entry in the shell registry → the confirm appears and the

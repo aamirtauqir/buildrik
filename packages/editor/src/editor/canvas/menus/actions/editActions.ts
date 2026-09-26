@@ -47,7 +47,7 @@ export const editSubmenu: ContextAction[] = [
     group: "Edit",
     shortcut: "Cmd+X",
     isVisible: ({ isRoot }) => !isRoot,
-    /* Follow-up to A-5 (controller review, round 1): this used to call
+    /* Follow-up to A-5: this used to call
        composer.elements.removeElement directly, bypassing the lock/instance
        filter the engine `cut` command applies — a right-click Cut on a
        locked element removed it anyway. Routed through commands.run("cut")

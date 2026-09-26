@@ -5,8 +5,8 @@ import { shareUrl } from "@lib/utils";
 import { Button, SectionCard, MetricValue, InputField } from "@/components/dashboard/primitives";
 
 // `token` is null for a caller the server didn't reveal it to (VIEWER — S-10);
-// `hasPassword` replaces the raw hash entirely (controller review round 1,
-// IMPORTANT 6) — the service never sends passwordHash, not even redacted.
+// `hasPassword` replaces the raw hash entirely — the service never sends
+// passwordHash, not even redacted.
 interface ShareLinkEntry { id: string; name: string; token: string | null; viewCount: number; isActive: boolean; expiresAt: Date | null; hasPassword: boolean; createdAt: Date; }
 
 interface AccessTabProps {
@@ -19,7 +19,7 @@ interface AccessTabProps {
   // site-detail.ts) — the caller's real effective role (sites.myRole),
   // not a proxy off `token` presence. `token !== null` only tells VIEWER
   // apart from EDITOR+; EDITOR/DESIGNER get a token but are still below
-  // ADMIN and would still be refused (controller review round 3).
+  // ADMIN and would still be refused.
   canRevoke: boolean;
 }
 
@@ -176,8 +176,8 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
               // token presence — `sharing.revoke` requires ADMIN, one rank
               // above the EDITOR/DESIGNER gate that reveals the token, so
               // an EDITOR/DESIGNER would still see a token but still be
-              // refused by the server (round 2's token-based proxy missed
-              // exactly this; controller review round 3).
+              // refused by the server (an earlier token-based proxy missed
+              // exactly this).
               const url = link.token ? shareUrl(link.token) : null;
               return (
                 <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>

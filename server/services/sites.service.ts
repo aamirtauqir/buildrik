@@ -101,7 +101,7 @@ export async function listSites(
     },
   } as const;
 
-  // Regression fix (dashboard tsc, fix round 1): the previous inline object
+  // Regression fix (dashboard tsc, fix): the previous inline object
   // type for `site` mixed named properties with an index signature
   // (`[key: string]: unknown`) as an escape hatch for the rest-spread below.
   // TS's rest-destructuring inference collapses that combination — `...rest`

@@ -5,7 +5,7 @@
  * last page loaded owned "root", the canvas drew it under another page's tab,
  * and every autosave copied the open page's content into every page.
  *
- * Covers the controller's fix-round-1 rulings: fresh roots for blank pages
+ * Covers fresh roots for blank pages
  * (no shared DEFAULT_ROOT object), import never mutates caller data, re-id is
  * deterministic with the first page keeping its ids, and id-keyed style
  * rules + CMS bindings follow a re-id'd element.

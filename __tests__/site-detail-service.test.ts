@@ -173,8 +173,7 @@ describe("Site Detail Service", () => {
       expect(result).toHaveLength(1);
       expect(result[0].token).toBeNull();
       // hasPassword boolean — never the real bcrypt hash, and the raw hash
-      // field is dropped entirely from the returned shape (controller review
-      // round 1, IMPORTANT 6).
+      // field is dropped entirely from the returned shape.
       expect(result[0].hasPassword).toBe(true);
       expect(result[0]).not.toHaveProperty("passwordHash");
     });

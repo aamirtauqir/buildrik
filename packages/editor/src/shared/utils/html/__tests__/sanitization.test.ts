@@ -251,7 +251,7 @@ describe("target links get rel=noopener noreferrer (S-1 review fix 3)", () => {
   });
 });
 
-describe("style declarations on load (S-1 review round 3)", () => {
+describe("style declarations on load (S-1)", () => {
   it("drops breakout declarations from styles and breakpoint maps, keeps the rest", () => {
     const tree = {
       id: "r",

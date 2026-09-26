@@ -1,5 +1,5 @@
 /**
- * S-1 (review round 4): the CSS writers are the last check. A rule, element id
+ * S-1: the CSS writers are the last check. A rule, element id
  * or class that got past the load boundary (set live, or by a future path)
  * must still not leave the stylesheet, and nothing placed inside a <style> —
  * including the site's own Global CSS — may close it.

@@ -164,7 +164,7 @@ describe("ai router", () => {
     expect(reserveQuota).toHaveBeenCalled();
   });
 
-  // S-8 round 2 (controller review): content/page/layout still echoed
+  // S-8: content/page/layout still echoed
   // e.message, and never released quota on failure — only summarize/
   // milestoneSuggest/componentSchema did.
   it.each([

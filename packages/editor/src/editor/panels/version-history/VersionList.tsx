@@ -34,6 +34,7 @@ import { FixedSizeList as FixedSizeListUntyped } from "react-window";
 import { Button, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 import { MoreHorizontal } from "lucide-react";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
+import { VERSION_NAME_MAX } from "@buildrik/shared/schemas/site-version";
 
 interface ListChildComponentProps {
   index: number;
@@ -202,6 +203,7 @@ export function VersionRow({
               <TextInput
                 ref={renameInputRef}
                 value={renameValue}
+                maxLength={VERSION_NAME_MAX}
                 onChange={(e) => setRenameValue(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 onBlur={commitRename}

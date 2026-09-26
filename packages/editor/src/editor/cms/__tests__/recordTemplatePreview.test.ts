@@ -55,7 +55,7 @@ describe("renderRecordTemplatePreview", () => {
     expect(out).toEqual({ ok: true, html: "<h1>Margherita &amp; Basil</h1><p>$12</p><p></p>" });
   });
 
-  it("controller review round 2: a javascript: value substituted into an href never reaches the preview iframe's srcDoc", async () => {
+  it("a javascript: value substituted into an href never reaches the preview iframe's srcDoc", async () => {
     exportPublishPagesMock.mockResolvedValueOnce([{ path: "menu-item.html", html: '<a href="{link}">Go</a>' }]);
     const record = { ...RECORD, data: { link: "javascript:alert(1)" } };
     const out = await renderRecordTemplatePreview({} as never, MENU, record);
@@ -63,7 +63,7 @@ describe("renderRecordTemplatePreview", () => {
     if (out.ok) expect(out.html).not.toMatch(/javascript:/i);
   });
 
-  it("x4 round 3: keeps the export's own <head> — the page stylesheet reaches the preview — and sanitizes only the body", async () => {
+  it("x4: keeps the export's own <head> — the page stylesheet reaches the preview — and sanitizes only the body", async () => {
     const head =
       '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>{name}</title>' +
       "<style>.hero{color:#1A56DB}</style></head><body>";

@@ -76,7 +76,7 @@ describe("resolveReviewByToken — self-approval block (S-7)", () => {
     expect(userFindUnique).not.toHaveBeenCalled();
   });
 
-  // Controller review round 1: the original check only covered the requester —
+  // The original check only covered the requester —
   // any OTHER active workspace member's email must be blocked too.
   it("refuses APPROVED when the invited email belongs to an ACTIVE workspace member who isn't the requester", async () => {
     userFindUnique.mockResolvedValueOnce({ email: "designer@agency.com" });
@@ -97,7 +97,7 @@ describe("resolveReviewByToken — self-approval block (S-7)", () => {
     await expect(resolveReviewByToken("tok", "APPROVED")).resolves.toMatchObject({ status: "APPROVED" });
   });
 
-  // S-7 controller review round 1: plus-tag/gmail-dot normalization must
+  // S-7 plus-tag/gmail-dot normalization must
   // apply here too, not just at submit time.
   it("refuses a +tagged variant of the requester's email", async () => {
     userFindUnique.mockResolvedValueOnce({ email: "shared+internal@example.com" });

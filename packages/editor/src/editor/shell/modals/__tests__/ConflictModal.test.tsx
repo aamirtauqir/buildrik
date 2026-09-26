@@ -172,7 +172,7 @@ describe("ConflictModal", () => {
     expect(dialog.getAttribute("aria-labelledby")).toBe(screen.getByTestId("conflict-title").id);
   });
 
-  /* Round 2 #1: the conflict hold keeps the held edit in `bk-unsaved-v1-*` so a
+  /* The conflict hold keeps the held edit in `bk-unsaved-v1-*` so a
      reload can offer it back. Choosing Reload (or Backup, which downloads it)
      is the user discarding that behind copy — if the record survived, the
      reload would say "Some work never reached the server" and Restore would
@@ -219,7 +219,7 @@ describe("ConflictModal", () => {
       expect(readUnsaved("s2")).not.toBeNull();
     });
   
-    /* Round 3: the reload can be cancelled (the unsaved-changes prompt), and
+    /* The reload can be cancelled (the unsaved-changes prompt), and
        the page lives on. A discard latch that outlived that would make every
        later keepUnsaved a no-op — a failed Overwrite, or a new conflict,
        would leave a tab-only edit unrecoverable. */

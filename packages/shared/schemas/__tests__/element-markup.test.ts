@@ -60,7 +60,7 @@ describe("srcsetCandidates", () => {
   });
 });
 
-describe("isSafeCssDeclaration (S-1 review round 3)", () => {
+describe("isSafeCssDeclaration (S-1)", () => {
   it.each([
     ["color", "red}</style><script>alert(1)</script>"],
     ["color", "red</style"],
@@ -100,7 +100,7 @@ describe("isSafeCssDeclaration (S-1 review round 3)", () => {
   ])("allows %j: %j", (property, value) => expect(isSafeCssDeclaration(property, value)).toBe(true));
 });
 
-describe("cssValueHasDangerousUrl (x4 fix round 3 — one url() scan)", () => {
+describe("cssValueHasDangerousUrl (x4 fix — one url() scan)", () => {
   it.each([
     "url(javascript:alert(1))",
     `url("javascript:a')")`,
@@ -118,7 +118,7 @@ describe("cssValueHasDangerousUrl (x4 fix round 3 — one url() scan)", () => {
 
 const HOSTILE_SELECTOR = "a{}</style><script>alert(1)</script><style>";
 
-describe("isSafeCssSelector (S-1 review round 4)", () => {
+describe("isSafeCssSelector (S-1)", () => {
   it.each([
     HOSTILE_SELECTOR,
     "a{color:red}",
@@ -163,7 +163,7 @@ describe("isSafeCssSelector (S-1 review round 4)", () => {
   ])("allows %j", (selector) => expect(isSafeCssSelector(selector)).toBe(true));
 });
 
-describe("isSafeMediaQuery (S-1 review round 4)", () => {
+describe("isSafeMediaQuery (S-1)", () => {
   it.each([
     "(max-width: 1023px)",
     "(max-width: 767px)",
@@ -181,7 +181,7 @@ describe("isSafeMediaQuery (S-1 review round 4)", () => {
   ])("refuses %j", (query) => expect(isSafeMediaQuery(query)).toBe(false));
 });
 
-describe("isSafeStyleRuleTarget (S-1 review round 4)", () => {
+describe("isSafeStyleRuleTarget (S-1)", () => {
   it("takes a safe selector with no media query", () => {
     expect(isSafeStyleRuleTarget(".a", undefined)).toBe(true);
     expect(isSafeStyleRuleTarget(".a", null)).toBe(true);
@@ -194,14 +194,14 @@ describe("isSafeStyleRuleTarget (S-1 review round 4)", () => {
   });
 });
 
-describe("isSafeElementId (S-1 review round 4)", () => {
+describe("isSafeElementId (S-1)", () => {
   it.each(["el-mt1euvra-1dxo08g1p58", "root", "hero_1", "A-9"])("allows %j", (id) =>
     expect(isSafeElementId(id)).toBe(true));
   it.each(['x"]{}</style><script>alert(1)</script>', "a b", "a.b", "", 7, null])("refuses %j", (id) =>
     expect(isSafeElementId(id)).toBe(false));
 });
 
-describe("escapeStyleText (S-1 review round 4)", () => {
+describe("escapeStyleText (S-1)", () => {
   it("cannot close the surrounding <style>, in any case", () => {
     const out = escapeStyleText("a{}</style><script>x</script></STYLE ><StYlE>");
     expect(out).not.toMatch(/<\/style/i);
@@ -214,7 +214,7 @@ describe("escapeStyleText (S-1 review round 4)", () => {
   });
 });
 
-// I2 (form after-submit redirect, controller fix round 1): isDangerousUrl
+// I2 (form after-submit redirect): isDangerousUrl
 // above correctly allows relative paths/#anchors/mailto:/tel: — right for
 // an href, wrong for a redirect target (NextResponse.redirect needs an
 // absolute URL). isAbsoluteHttpUrl / absoluteRedirectUrlSchema are the
