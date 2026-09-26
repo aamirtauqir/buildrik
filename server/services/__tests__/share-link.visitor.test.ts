@@ -9,6 +9,8 @@ vi.mock("@/lib/prisma", () => ({
     shareLink: { findUnique: vi.fn(), update: vi.fn() },
     site: { findUnique: vi.fn() },
     mediaAsset: { findMany: vi.fn().mockResolvedValue([]) },
+    cmsCollection: { findMany: vi.fn().mockResolvedValue([]) },
+    cmsEntry: { findMany: vi.fn().mockResolvedValue([]) },
   },
 }));
 
@@ -123,5 +125,44 @@ describe("getShareDraftRows", () => {
     expect(select.projectCmsBindings).toBe(true);
     expect(rows.site.projectCmsBindings).toEqual(bindings);
     expect(rows.siteColumns).not.toHaveProperty("projectCmsBindings");
+  });
+
+  /* Lv3 #10 (dashboard verify pass 3): the bindings reached the draft render
+     but no CMS data did, so the scratch composer could resolve nothing and the
+     page showed the element's last-saved text — stale, then an empty <p>. The
+     rows now carry the collections the bindings reference and their PUBLISHED
+     entries only — an anonymous link holder never sees a draft record. */
+  it("carries the referenced collections and only their published entries, scoped to the site", async () => {
+    const bindings = {
+      field: { t2: [{ binding: { sourceId: "cms:notes", path: "title", type: "variable" }, collectionId: "notes", fieldSlug: "title", property: "content" }] },
+      collection: { list1: { elementId: "list1", collectionId: "posts", itemVar: "item" } },
+    };
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: bindings, sitePages: [] } as never);
+    vi.mocked(prisma.cmsCollection.findMany).mockResolvedValue([
+      { id: "notes", name: "Notes", slug: "notes", displayField: "title", fields: [{ id: "title", slug: "title", name: "Title", type: "text" }] },
+    ] as never);
+    vi.mocked(prisma.cmsEntry.findMany).mockResolvedValue([
+      { id: "e1", collectionId: "notes", data: { title: "Tom & Jerry <3" }, updatedAt: new Date("2026-09-26T00:00:00Z") },
+    ] as never);
+
+    const rows = await getShareDraftRows("s1");
+
+    const colWhere = vi.mocked(prisma.cmsCollection.findMany).mock.calls.at(-1)![0]!.where;
+    expect(colWhere).toEqual({ siteId: "s1", id: { in: ["notes", "posts"] } });
+    const entryArgs = vi.mocked(prisma.cmsEntry.findMany).mock.calls.at(-1)![0]!;
+    expect(entryArgs.where).toEqual({ collectionId: { in: ["notes"] }, status: "PUBLISHED" });
+    expect(entryArgs.orderBy).toEqual({ updatedAt: "desc" });
+    expect(rows.cms.collections.map((c) => c.id)).toEqual(["notes"]);
+    expect(rows.cms.entries).toEqual([
+      { id: "e1", collectionId: "notes", data: { title: "Tom & Jerry <3" }, updatedAt: new Date("2026-09-26T00:00:00Z") },
+    ]);
+  });
+
+  it("queries no CMS at all for a site without bindings", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: null, sitePages: [] } as never);
+    vi.mocked(prisma.cmsCollection.findMany).mockClear();
+    const rows = await getShareDraftRows("s1");
+    expect(prisma.cmsCollection.findMany).not.toHaveBeenCalled();
+    expect(rows.cms).toEqual({ collections: [], entries: [] });
   });
 });

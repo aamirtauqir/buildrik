@@ -1,5 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { filterCmsBindings } from "@buildrik/shared/schemas/sites";
+import { getPublishedCmsForBindings } from "@/server/services/cms.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 // The link token IS the bearer credential for the draft it unlocks — a
@@ -278,6 +280,19 @@ export async function getShareDraftRows(siteId: string) {
     orderBy: { createdAt: "asc" },
   });
   const { sitePages, name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion, ...columns } = site;
+  /* The bindings alone resolve nothing: the draft is rendered in a scratch
+     composer with no CMS store, so every bound element showed its last-saved
+     text — stale, then empty (dashboard verify pass 3). The render gets the
+     collections the bindings name and their PUBLISHED entries, and resolves
+     them with the publish exporter's own CMSExportResolver. */
+  const bindings = filterCmsBindings(projectCmsBindings);
+  const collectionIds = [
+    ...new Set([
+      ...Object.values(bindings?.field ?? {}).flatMap((list) => list.map((b) => b.collectionId)),
+      ...Object.values(bindings?.collection ?? {}).map((b) => b.collectionId),
+    ]),
+  ];
+  const cms = await getPublishedCmsForBindings(siteId, collectionIds);
   const pages = sitePages.filter((p) => {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;
     return visibility === undefined || visibility === "live";
@@ -287,5 +302,6 @@ export async function getShareDraftRows(siteId: string) {
     pages,
     siteColumns: { name, ...columns },
     siteFonts: fontAssets,
+    cms,
   };
 }

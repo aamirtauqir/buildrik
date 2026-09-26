@@ -504,6 +504,31 @@ export async function generateDynamicPages(
 }
 
 /**
+ * The CMS data a draft render needs to resolve a site's bindings: the named
+ * collections of THIS site, and their PUBLISHED entries only — the read is for
+ * the /share/<token> draft, whose holder may be anonymous, so a draft record
+ * never leaves the server. Entries come newest-first, the editor store's own
+ * order (CollectionStorage.loadContentItems), so "the first published
+ * record" a binding without an itemId previews is the same record the canvas
+ * shows. Only the columns the resolver reads are selected.
+ */
+export async function getPublishedCmsForBindings(siteId: string, collectionIds: string[]) {
+  if (collectionIds.length === 0) return { collections: [], entries: [] };
+  const collections = await prisma.cmsCollection.findMany({
+    where: { siteId, id: { in: collectionIds } },
+    select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
+  });
+  const entries = collections.length
+    ? await prisma.cmsEntry.findMany({
+        where: { collectionId: { in: collections.map((c) => c.id) }, status: "PUBLISHED" },
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, collectionId: true, data: true, status: true, createdAt: true, updatedAt: true },
+      })
+    : [];
+  return { collections, entries };
+}
+
+/**
  * Publish-pipeline step: expand a publish page-set with the dynamic pages each
  * page-generating collection produces. SAFE NO-OP for the common case — a site
  * with no page-generating collection gets its pages back unchanged, so existing
