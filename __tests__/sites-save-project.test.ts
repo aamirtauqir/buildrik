@@ -19,6 +19,7 @@ vi.mock("@/lib/prisma", () => ({
       fn({
         page: {
           findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(null),
           deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
           upsert: vi.fn().mockResolvedValue({}),
           update: vi.fn().mockResolvedValue({}),
@@ -48,6 +49,7 @@ import {
 function makeTx() {
   const txPage = {
     findMany: vi.fn().mockResolvedValue([]),
+    findFirst: vi.fn().mockResolvedValue(null),
     deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
     upsert: vi.fn().mockResolvedValue({}),
     update: vi.fn().mockResolvedValue({}),

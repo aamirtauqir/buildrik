@@ -82,6 +82,7 @@ describe("saveProjectData · dsSchemaVersion write", () => {
       const tx = {
         page: {
           findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(null),
           upsert: vi.fn(),
           update: vi.fn(),
           deleteMany: vi.fn(),
@@ -115,6 +116,7 @@ describe("saveProjectData · dsSchemaVersion write", () => {
       const tx = {
         page: {
           findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(null),
           upsert: vi.fn(),
           update: vi.fn(),
           deleteMany: vi.fn(),

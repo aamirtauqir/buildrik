@@ -289,6 +289,8 @@ export const sitesRouter = router({
       try {
         return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined);
       } catch (e: unknown) {
+        // I-2: a page id in the save that belongs to another site.
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         if (e instanceof Error && e.message === "SITE_NOT_FOUND")
           throw new TRPCError({
             code: "NOT_FOUND",

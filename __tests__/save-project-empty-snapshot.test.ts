@@ -25,6 +25,7 @@ vi.mock("@/lib/prisma", () => {
   const tx = {
     page: {
       findMany: (...a: unknown[]) => pageFindMany(...a),
+      findFirst: vi.fn(async () => null),
       deleteMany: (...a: unknown[]) => pageDeleteMany(...a),
       upsert: vi.fn(),
       update: vi.fn(),

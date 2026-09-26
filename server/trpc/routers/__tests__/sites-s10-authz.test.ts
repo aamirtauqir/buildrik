@@ -13,6 +13,7 @@ const checkWorkspaceRoleMock = vi.fn();
 const assertSiteAccessMock = vi.fn();
 const duplicateSiteMock = vi.fn();
 const getScheduledPublishMock = vi.fn();
+const saveProjectFromEditorMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -40,7 +41,7 @@ vi.mock("@/server/services/sites.service", () => ({
   listSites: vi.fn(), getSite: vi.fn(), renameSite: vi.fn(), archiveSite: vi.fn(),
   unarchiveSite: vi.fn(), deleteSite: vi.fn(), bulkAction: vi.fn(),
   checkSlugAvailability: vi.fn(), transferSite: vi.fn(), saveProjectData: vi.fn(),
-  saveProjectFromEditor: vi.fn(), getProjectData: vi.fn(), createSite: vi.fn(),
+  saveProjectFromEditor: (...a: unknown[]) => saveProjectFromEditorMock(...a), getProjectData: vi.fn(), createSite: vi.fn(),
   duplicateSite: (...a: unknown[]) => duplicateSiteMock(...a),
 }));
 vi.mock("@/server/services/folder.service", () => ({
@@ -81,7 +82,7 @@ import { PermissionError } from "@/server/services/permission.service";
 const ctx = () => ({ session: { user: { id: "u_1" } }, prisma: {} as never });
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkWorkspaceRoleMock, assertSiteAccessMock, duplicateSiteMock, getScheduledPublishMock].forEach((m) =>
+  [checkSiteRoleMock, checkWorkspaceRoleMock, assertSiteAccessMock, duplicateSiteMock, getScheduledPublishMock, saveProjectFromEditorMock].forEach((m) =>
     m.mockReset(),
   );
 });
@@ -118,5 +119,16 @@ describe("sites.getScheduledPublish — PermissionError translation (S-10)", () 
     getScheduledPublishMock.mockResolvedValueOnce({ scheduledFor: null });
     const caller = sitesRouter.createCaller(ctx() as never);
     await expect(caller.getScheduledPublish({ siteId: "s_1" })).resolves.toEqual({ scheduledFor: null });
+  });
+});
+
+describe("sites.saveProject — a page of another site (I-2)", () => {
+  it("the service's PermissionError reaches the client as FORBIDDEN, not a 500", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    saveProjectFromEditorMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "belongs to another site"));
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await expect(
+      caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 });
