@@ -208,8 +208,28 @@ describe("C-9 — a demoted member lands in view mode and autosave stops", () =>
 
     expect(invalidateMyRole).toHaveBeenCalled();
     expect(fetchMyRole).toHaveBeenCalled();
+    await act(async () => { await vi.runAllTimersAsync(); });
     expect(replace).toHaveBeenCalledTimes(1);
     expect(new URL(replace.mock.calls[0][0] as string).searchParams.get("view")).toBe("readonly");
+  });
+
+  /* Review #5: the switch navigated with the editor still dirty — the
+     beforeunload guard prompts on that, and a Leave/Stay prompt over a
+     refused save loses the explanation. The edits are already kept
+     (keepUnsaved), so the editor is marked clean BEFORE it navigates; the
+     view-mode load then shows the "kept in this browser" notice. */
+  it("marks the editor clean before it navigates, with the edits already kept", async () => {
+    const replace = fakeLocation("");
+    fetchMyRole.mockResolvedValueOnce("VIEWER");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("FORBIDDEN"));
+    const p = params();
+    const order: string[] = [];
+    vi.mocked(p.setIsDirty!).mockImplementation(((v: boolean) => { if (v === false) order.push("clean"); }) as never);
+    replace.mockImplementation(() => order.push("navigate"));
+    await runAutosave(p);
+    await act(async () => { await vi.runAllTimersAsync(); });
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
+    expect(order).toEqual(["clean", "navigate"]);
   });
 
   it("stays put when the role still allows editing", async () => {

@@ -73,13 +73,23 @@ export function isForbiddenSaveError(err: unknown): boolean {
  * VIEWER rail, Publish disabled with its reason, and no autosave). Before
  * this the chrome stayed editable and every autosave retried into another
  * 403, repainting the generic "check your connection" banner.
+ *
+ * Before navigating, the editor is marked clean — the edits are already in
+ * keepUnsaved — so the beforeunload guard does not put a Leave/Stay prompt
+ * over the switch (review #5). The navigation waits a frame and a task, so
+ * the guard has re-read the clean state. The explanation survives the reload
+ * through that kept record: the view-mode load shows "Your role no longer
+ * allows editing … the edits are kept in this browser" (useComposerInit).
  */
-export function refuseForbiddenSave(
-  siteId: string | null,
-  project: ReturnType<Composer["exportProject"]>,
-  addToast: (input: ToastInput) => string,
-): void {
-  if (siteId) keepUnsaved(siteId, project);
+export function refuseForbiddenSave(opts: {
+  siteId: string | null;
+  composer: Composer;
+  addToast: (input: ToastInput) => string;
+  setIsDirty: (dirty: boolean) => void;
+  setSaveState: React.Dispatch<React.SetStateAction<SaveState>>;
+}): void {
+  const { siteId, composer, addToast, setIsDirty, setSaveState } = opts;
+  if (siteId) keepUnsaved(siteId, composer.exportProject());
   invalidateMyRole();
   addToast({
     title: "You don't have access to save this site",
@@ -87,10 +97,12 @@ export function refuseForbiddenSave(
     tone: "warning",
   });
   void fetchMyRole().then((role) => {
-    if (roleAtLeast(role, "EDITOR") !== false) return;
+    if (roleAtLeast(role, "EDITOR") !== false || !siteId) return;
+    setIsDirty(false);
+    setSaveState({ status: "idle", error: undefined });
     const url = new URL(window.location.href);
     url.searchParams.set("view", "readonly");
-    window.location.replace(url.toString());
+    requestAnimationFrame(() => window.setTimeout(() => window.location.replace(url.toString()), 0));
   });
 }
 
@@ -280,7 +292,7 @@ export function useSaveCallback({
            change nothing. Different truths, different surfaces. */
         if (isForbiddenSaveError(err)) {
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-          refuseForbiddenSave(siteId, composer.exportProject(), addToast);
+          refuseForbiddenSave({ siteId, composer, addToast, setIsDirty, setSaveState });
           return "error";
         }
         if (isAuthSaveError(errorMessage)) {

@@ -651,7 +651,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             if (isForbiddenSaveError(err)) {
-              refuseForbiddenSave(siteId, composer.exportProject(), addToast);
+              refuseForbiddenSave({ siteId, composer, addToast, setIsDirty, setSaveState });
               return;
             }
             if (siteId) {
