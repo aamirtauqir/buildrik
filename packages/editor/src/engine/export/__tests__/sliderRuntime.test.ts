@@ -2,7 +2,8 @@
  * The Slider block exported as stacked slides with no behaviour — this is
  * the runtime that fixes it, shared between the canvas
  * (`useSliderRuntime.ts`) and the published page (`lib/publish-sliders.ts`,
- * a copy of this same function's body — see its header).
+ * which imports this same function and serializes it via
+ * `Function.prototype.toString()` — no longer a hand copy, see its header).
  *
  * @license BSD-3-Clause
  */
