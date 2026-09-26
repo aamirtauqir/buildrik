@@ -53,9 +53,15 @@ vi.mock("../../../services/ReviewService", () => ({
 // P6 role gating — controllable per test; null = unknown (no gating).
 const roleState = vi.hoisted(() => ({ role: null as string | null }));
 let strandedMirrors = 0;
-vi.mock("@/services/syncRetryQueue", () => ({
-  totalPendingMirrors: () => strandedMirrors,
-}));
+/* L3's C-4 stamps added a SyncRetryQueue export (versionSync.ts constructs
+   one at module scope: `new SyncRetryQueue()`) — a mock that only supplies
+   totalPendingMirrors leaves that constructor call reaching `undefined`.
+   importOriginal keeps the real class (and registerPendingSource, etc.)
+   intact and only overrides the one function this test controls. */
+vi.mock("@/services/syncRetryQueue", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/services/syncRetryQueue")>();
+  return { ...actual, totalPendingMirrors: () => strandedMirrors };
+});
 
 vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => roleState.role }));
 
