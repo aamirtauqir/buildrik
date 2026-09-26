@@ -57,16 +57,26 @@ export interface ModalRootProps {
   dismissOnScrimClick?: boolean;
   /** Board 183:16 — a form with unsaved input pulses instead of closing. */
   dirty?: boolean;
+  /** Id of the element that names this dialog (usually a ModalTitle) — set
+   *  on the role=dialog node's aria-labelledby. B-7/A13-4: ModalRoot used to
+   *  drop this on the floor, so every compound-form dialog's dialog node was
+   *  unnamed to assistive tech even though ModalContent's own srTitle prop
+   *  only ever reached a redundant aria-label on the CONTENT div, one level
+   *  in from the actual role=dialog element OverlayMount renders. */
+  labelledBy?: string;
+  /** Direct accessible name for a dialog with no visible heading to point
+   *  labelledBy at. Ignored when labelledBy is set. */
+  ariaLabel?: string;
 }
 
 /** Compound root: owns the portal, scrim and focus trap. */
-export function ModalRoot({ open, onOpenChange, onClose, children, dismissOnScrimClick, dirty }: ModalRootProps) {
+export function ModalRoot({ open, onOpenChange, onClose, children, dismissOnScrimClick, dirty, labelledBy, ariaLabel }: ModalRootProps) {
   const close = React.useCallback(() => {
     onClose?.();
     onOpenChange?.(false);
   }, [onClose, onOpenChange]);
   return (
-    <OverlayMount open={open} onClose={close} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
+    <OverlayMount open={open} onClose={close} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty} labelledBy={labelledBy} ariaLabel={ariaLabel}>
       <ModalCloseContext.Provider value={close}>{children}</ModalCloseContext.Provider>
     </OverlayMount>
   );

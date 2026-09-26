@@ -191,4 +191,22 @@ describe("dismiss interactions", () => {
     fireEvent.click(overlay);
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it("B-7/A13-10: moves focus into the card on mount and Escape calls onDismiss", () => {
+    const onDismiss = vi.fn();
+    render(
+      <AchievementPrompt
+        completedStep={completedStep}
+        nextStep={nextStep}
+        isLastStep={false}
+        onDismiss={onDismiss}
+      />
+    );
+
+    expect(screen.getByTestId("achievement-card")).toContainElement(
+      document.activeElement as HTMLElement,
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
 });
