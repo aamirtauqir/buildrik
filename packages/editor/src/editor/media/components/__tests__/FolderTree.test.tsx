@@ -215,3 +215,19 @@ describe("FolderTree — Tags ▾ (4418:58292)", () => {
     expect(screen.getByText(/No tags yet/)).toBeInTheDocument();
   });
 });
+
+describe("FolderTree — FC-4 (fix-all 2026-09-25): folders are per-user, never shared", () => {
+  it("labels the section 'My folders', not the bare, shareable-sounding 'Folders'", () => {
+    mount();
+    expect(screen.getByTestId("mgr-section-folders")).toHaveTextContent("My folders");
+    expect(screen.queryByText("Folders")).not.toBeInTheDocument();
+  });
+
+  it("the section header carries an ownership tooltip", () => {
+    mount();
+    expect(screen.getByTestId("mgr-section-folders")).toHaveAttribute(
+      "title",
+      "My folders · Only you see these",
+    );
+  });
+});
