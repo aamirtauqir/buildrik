@@ -150,73 +150,90 @@ export async function hydrateCmsFromServer(): Promise<void> {
     /* A row passed over for a queued mirror was not reconciled, so the scope's
        one-time pass is not done — it re-runs on the next hydrate. */
     let skippedQueued = false;
-    for (const rc of remote) {
-      /* A queued DELETE: the collection is going away here — nothing of it is
-         written. A queued UPSERT only protects the collection row itself; its
-         entries are separate rows and still reconcile below. */
-      if (queue.isPending(`collectionDelete:${rc.id}`)) {
-        skippedQueued = true;
-        continue;
-      }
-      const collectionQueued = queue.isPending(`collectionUpsert:${rc.id}`);
-      if (collectionQueued) skippedQueued = true;
-      const localCollection = localCollections.get(rc.id);
-      const collection: CMSCollection = {
-        id: rc.id,
-        /* Stamped with the site it came FROM. Hydration writes straight into
-           IndexedDB, past `CollectionManager`, so without this the rows would
-           land unscoped and keep showing on every other site in this browser —
-           the store is browser-global. (2026-08-24.) */
-        siteId,
-        name: rc.name, slug: rc.slug,
-        description: rc.description ?? undefined, icon: rc.icon ?? undefined,
-        displayField: rc.displayField ?? undefined,
-        fields: (rc.fields as CMSField[]) ?? [],
-        pageSlugPattern: rc.pageSlugPattern ?? undefined,
-        pageSeoTitle: rc.pageSeoTitle ?? undefined,
-        pageSeoDescription: rc.pageSeoDescription ?? undefined,
-        pageTemplatePath: rc.pageTemplatePath ?? undefined,
-        createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
-      };
-      // A queued upsert: the local change is newer and still on its way.
-      if (!collectionQueued) {
-        if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
-          await Storage.saveCollection(collection);
-          recordServerStamp(`collection:${rc.id}`, rc.updatedAt, collection.updatedAt);
-        } else if (
-          localCollection && !hasServerStamp(`collection:${rc.id}`) &&
-          sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
-        ) {
-          recordServerStamp(`collection:${rc.id}`, rc.updatedAt, localCollection.updatedAt);
+    const markSkipped = () => {
+      skippedQueued = true;
+    };
+
+    /* D-11: collections used to reconcile one at a time — each one's entries
+       fetch waited for the previous collection's writes to finish, an N+1
+       sequential fan-out. Every collection is now reconciled concurrently
+       (tRPC batches the parallel `entries.list.query` calls into one
+       request), and a collection's own entry writes run as one Promise.all
+       instead of a sequential per-entry await. */
+    await Promise.all(
+      remote.map(async (rc) => {
+        /* A queued DELETE: the collection is going away here — nothing of it
+           is written. A queued UPSERT only protects the collection row
+           itself; its entries are separate rows and still reconcile below. */
+        if (queue.isPending(`collectionDelete:${rc.id}`)) {
+          markSkipped();
+          return;
         }
-      }
-      const entries = (await client().cms.entries.list.query({ siteId, collectionId: rc.id })) as Array<{
-        id: string; data: Record<string, unknown>; status: string; createdAt: Date | string; updatedAt: Date | string;
-      }>;
-      const localEntries = new Map((await Storage.loadContentItems(rc.id)).map((i) => [i.id, i]));
-      for (const e of entries) {
-        if (hasQueuedMirror("entry", e.id)) {
-          skippedQueued = true;
-          continue;
-        }
-        const localEntry = localEntries.get(e.id);
-        const status = e.status === "PUBLISHED" ? "published" : "draft";
-        if (!serverCopyWins(`entry:${e.id}`, e.updatedAt, localEntry?.updatedAt, !!localEntry, firstPass)) {
-          if (
-            localEntry && !hasServerStamp(`entry:${e.id}`) &&
-            localEntry.status === status && sameContent(localEntry.data, e.data)
+        const collectionQueued = queue.isPending(`collectionUpsert:${rc.id}`);
+        if (collectionQueued) markSkipped();
+        const localCollection = localCollections.get(rc.id);
+        const collection: CMSCollection = {
+          id: rc.id,
+          /* Stamped with the site it came FROM. Hydration writes straight into
+             IndexedDB, past `CollectionManager`, so without this the rows would
+             land unscoped and keep showing on every other site in this browser —
+             the store is browser-global. (2026-08-24.) */
+          siteId,
+          name: rc.name, slug: rc.slug,
+          description: rc.description ?? undefined, icon: rc.icon ?? undefined,
+          displayField: rc.displayField ?? undefined,
+          fields: (rc.fields as CMSField[]) ?? [],
+          pageSlugPattern: rc.pageSlugPattern ?? undefined,
+          pageSeoTitle: rc.pageSeoTitle ?? undefined,
+          pageSeoDescription: rc.pageSeoDescription ?? undefined,
+          pageTemplatePath: rc.pageTemplatePath ?? undefined,
+          createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
+        };
+        // A queued upsert: the local change is newer and still on its way.
+        if (!collectionQueued) {
+          if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
+            await Storage.saveCollection(collection);
+            recordServerStamp(`collection:${rc.id}`, rc.updatedAt, collection.updatedAt);
+          } else if (
+            localCollection && !hasServerStamp(`collection:${rc.id}`) &&
+            sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
           ) {
-            recordServerStamp(`entry:${e.id}`, e.updatedAt, localEntry.updatedAt);
+            recordServerStamp(`collection:${rc.id}`, rc.updatedAt, localCollection.updatedAt);
           }
-          continue;
         }
-        await Storage.saveContentItem({
-          id: e.id, collectionId: rc.id, data: e.data, status,
-          createdAt: iso(e.createdAt), updatedAt: iso(e.updatedAt),
-        });
-        recordServerStamp(`entry:${e.id}`, e.updatedAt, iso(e.updatedAt));
-      }
-    }
+        const [entries, localEntriesList] = await Promise.all([
+          client().cms.entries.list.query({ siteId, collectionId: rc.id }) as Promise<Array<{
+            id: string; data: Record<string, unknown>; status: string; createdAt: Date | string; updatedAt: Date | string;
+          }>>,
+          Storage.loadContentItems(rc.id),
+        ]);
+        const localEntries = new Map(localEntriesList.map((i) => [i.id, i]));
+        await Promise.all(
+          entries.map(async (e) => {
+            if (hasQueuedMirror("entry", e.id)) {
+              markSkipped();
+              return;
+            }
+            const localEntry = localEntries.get(e.id);
+            const status = e.status === "PUBLISHED" ? "published" : "draft";
+            if (!serverCopyWins(`entry:${e.id}`, e.updatedAt, localEntry?.updatedAt, !!localEntry, firstPass)) {
+              if (
+                localEntry && !hasServerStamp(`entry:${e.id}`) &&
+                localEntry.status === status && sameContent(localEntry.data, e.data)
+              ) {
+                recordServerStamp(`entry:${e.id}`, e.updatedAt, localEntry.updatedAt);
+              }
+              return;
+            }
+            await Storage.saveContentItem({
+              id: e.id, collectionId: rc.id, data: e.data, status,
+              createdAt: iso(e.createdAt), updatedAt: iso(e.updatedAt),
+            });
+            recordServerStamp(`entry:${e.id}`, e.updatedAt, iso(e.updatedAt));
+          }),
+        );
+      }),
+    );
     if (!skippedQueued) markStampMigrationDone(migrationScope);
     setHydrationStatus("ready");
   } catch (err) {

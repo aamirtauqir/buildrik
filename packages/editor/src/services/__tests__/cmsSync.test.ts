@@ -435,9 +435,14 @@ describe("hydrateCmsFromServer", () => {
     loadCollections.mockResolvedValueOnce([{ id: "local-1", updatedAt: T(0) }]);
     recordServerStamp("collection:local-1", T(0), T(0));
     recordServerStamp("entry:e2", T(1000), T(1000));
-    entListQuery
-      .mockResolvedValueOnce([{ id: "e1", data: { t: 1 }, status: "PUBLISHED", createdAt: new Date(0), updatedAt: new Date(0) }])
-      .mockResolvedValueOnce([{ id: "e2", data: { t: "server" }, status: "DRAFT", createdAt: new Date(0), updatedAt: new Date(5000) }]);
+    // D-11: collections now reconcile concurrently, so which one's
+    // `entries.list.query` fires first is not guaranteed — key the mock
+    // response on `collectionId` rather than call order.
+    entListQuery.mockImplementation(async ({ collectionId }: { collectionId: string }) =>
+      collectionId === "srv-new"
+        ? [{ id: "e1", data: { t: 1 }, status: "PUBLISHED", createdAt: new Date(0), updatedAt: new Date(0) }]
+        : [{ id: "e2", data: { t: "server" }, status: "DRAFT", createdAt: new Date(0), updatedAt: new Date(5000) }],
+    );
     loadContentItems.mockImplementation(async (id: string) =>
       id === "local-1" ? [{ id: "e2", data: { t: "stale" }, updatedAt: T(1000) }] : [],
     );
@@ -445,10 +450,18 @@ describe("hydrateCmsFromServer", () => {
     // only the non-local collection is written (local-1 is unchanged on the server)
     expect(saveCollection).toHaveBeenCalledTimes(1);
     expect(saveCollection.mock.calls[0][0]).toMatchObject({ id: "srv-new", slug: "srv-new" });
+    // D-11: collections reconcile concurrently now, so entry writes across
+    // DIFFERENT collections are no longer guaranteed to land in array order —
+    // assert set membership, not call index.
+    const savedEntries = saveContentItem.mock.calls.map((c) => c[0]);
     // its entry, with status mapped back to engine casing …
-    expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "e1", collectionId: "srv-new", status: "published" });
+    expect(savedEntries).toContainEqual(
+      expect.objectContaining({ id: "e1", collectionId: "srv-new", status: "published" }),
+    );
     // … AND the newer server copy of an entry in the already-local collection
-    expect(saveContentItem.mock.calls[1][0]).toMatchObject({ id: "e2", collectionId: "local-1", data: { t: "server" } });
+    expect(savedEntries).toContainEqual(
+      expect.objectContaining({ id: "e2", collectionId: "local-1", data: { t: "server" } }),
+    );
   });
 
   it("client clock AHEAD: a confirmed local copy stamped far in the future still takes the server's newer edit", async () => {
