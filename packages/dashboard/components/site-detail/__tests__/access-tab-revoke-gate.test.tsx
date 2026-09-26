@@ -1,13 +1,13 @@
 /**
  * `sharing.revoke` requires ADMIN on the server (site-detail.ts's
  * `checkSiteRole(..., "ADMIN")`) — VIEWER, EDITOR and DESIGNER are all
- * refused. Round 2 hid Revoke on `token !== null`, which only distinguishes
+ * refused. Hiding Revoke on `token !== null` alone only distinguishes
  * VIEWER (never gets a token — S-10's revealToken gate is EDITOR+) from
  * EDITOR+ — an EDITOR/DESIGNER still got a token and still saw a
  * working-looking Revoke button that would 403 on click. Revoke is now
  * gated on the `canRevoke` prop, which the page derives from the caller's
  * real effective site role (`sites.myRole`) against the same ADMIN rank
- * the server enforces (controller review round 3).
+ * the server enforces.
  *
  * @license BSD-3-Clause
  */
@@ -45,7 +45,7 @@ describe("AccessTab — Revoke gated on canRevoke (the caller's real site role),
     expect(screen.queryByLabelText("Copy share link")).toBeNull();
   });
 
-  it("hides Revoke for an EDITOR/DESIGNER even though they have a token — the round-2 gap", () => {
+  it("hides Revoke for an EDITOR/DESIGNER even though they have a token", () => {
     renderTab(false, "tok-editor");
     expect(screen.queryByLabelText("Revoke share link")).toBeNull();
     // Copy/Open/QR are unaffected by canRevoke — an EDITOR still has a

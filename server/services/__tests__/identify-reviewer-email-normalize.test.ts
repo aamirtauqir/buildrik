@@ -1,5 +1,5 @@
 /**
- * S-7 (controller review round 1): identifyReviewer's invitedEmail match, and
+ * S-7: identifyReviewer's invitedEmail match, and
  * normalizeReviewEmail itself, must treat plus-tagged and (for gmail) dotted
  * variants of an address as the SAME address — most providers deliver them to
  * the same mailbox, so a naive trim+lowercase comparison let a token holder

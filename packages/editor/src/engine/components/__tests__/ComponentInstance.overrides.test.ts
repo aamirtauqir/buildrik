@@ -1,5 +1,5 @@
 /**
- * S-1 (review round 2): overrides come from the stored project, and
+ * S-1: overrides come from the stored project, and
  * applyOverridesToTree is the one place both sync paths write them into a
  * tree that is then pasted and rendered. Unsafe ones never land.
  *

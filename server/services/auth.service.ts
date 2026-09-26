@@ -190,7 +190,7 @@ export async function signup(fullName: string, email: string, password: string) 
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  // CRITICAL 3 (controller ruling, fix round 1) + hardening (fix round 2):
+  // CRITICAL 3 (controller ruling) + hardening (fix):
   // the reclaimable check above reads outside any transaction, purely as a
   // fast-path (fail before spending a bcrypt hash on a signup that can't
   // succeed) — it is NOT what makes this safe. Two concurrent signups for
@@ -314,7 +314,7 @@ export async function verifyEmail(token: string) {
   }
 
   await invalidateToken(token);
-  // Controller ruling (fix round 1): verifyEmail does NOT clear credentials.
+  // Controller ruling (fix): verifyEmail does NOT clear credentials.
   // Clicking your OWN signup's verification link confirms that signup — it
   // is the legitimate owner using the password they just set. PD-5's
   // anti-pre-account-hijack clearing applies only where the first
@@ -427,8 +427,8 @@ export async function verifyMagicLink(token: string) {
 
   // Set emailVerified if not already set. PD-5 anti-pre-account-hijack: the
   // first verification of a never-verified row via magic link also clears any
-  // pre-set password/2FA and bumps sessionVersion. Controller ruling (fix
-  // round 1): verifyEmail does NOT do this — clicking your own signup's
+  // pre-set password/2FA and bumps sessionVersion. Controller ruling:
+  // verifyEmail does NOT do this — clicking your own signup's
   // verification link is the legitimate owner using the password they just
   // set, unlike a magic-link or OAuth first verification. See verifyEmail's
   // own comment and the OAuth branch in auth.config.ts for the other two

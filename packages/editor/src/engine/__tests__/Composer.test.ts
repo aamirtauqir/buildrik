@@ -254,7 +254,7 @@ describe("Composer listener hygiene", () => {
     vi.unstubAllGlobals();
   });
 
-  /* D-10 fix-round-1 (controller finding): this used to fake the event
+  /* D-10: this used to fake the event
      directly (`composer.media.emitEvent("media:added", ...)`), which
      never exercised `importServerAssets` — the ACTUAL path
      `useComposerInit.ts:257` calls on every project load, and the one

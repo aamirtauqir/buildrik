@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
 
-// CRITICAL N1 fix round 4 (controller, merge-gate tsc): type the GitHub
+// CRITICAL N1 fix (controller, merge-gate tsc): type the GitHub
 // `userinfo.request` override's parameter from @auth/core's own types
 // without importing `@auth/core` directly — it's a transitive dependency of
 // `next-auth`, not hoisted into this package's own node_modules under pnpm's
@@ -49,7 +49,7 @@ export const authConfig: NextAuthConfig = {
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      // CRITICAL N1 (controller ruling, fix round 2): the default @auth/core
+      // CRITICAL N1 (controller ruling): the default @auth/core
       // GitHub provider does NOT prove the email it hands back is verified.
       // It uses `/user`'s `email` field (the user's chosen "public email" —
       // settable to any address they merely typed in, not necessarily one
@@ -95,14 +95,14 @@ export const authConfig: NextAuthConfig = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      // CRITICAL N1 (controller ruling, fix round 2): checking `user.email`
+      // CRITICAL N1 (controller ruling): checking `user.email`
       // in this condition (as the previous version did) let a provider with
       // NO verified email fall all the way through to the unconditional
       // `return true` at the bottom — signing in with a bare provider `id`
       // and no DB user.id set, instead of being refused. Gate on `account`
       // alone and refuse explicitly below when there's no trusted email.
       if (account) {
-        // IMPORTANT (controller ruling, fix round 3) — account-first: resolve
+        // IMPORTANT (controller ruling) — account-first: resolve
         // identity by the PHYSICAL provider link before any email-based
         // branching. The previous ordering decided create/clear/link by
         // looking up `user.email` first and only checked for an existing
@@ -205,11 +205,11 @@ export const authConfig: NextAuthConfig = {
           const isSelfLink = (await currentSessionUserId()) === existing.id;
 
           if (!existing.emailVerified) {
-            // CRITICAL 2 (controller ruling, fix round 1) / S-5 anti-pre-
+            // CRITICAL 2 (controller ruling) / S-5 anti-pre-
             // account-hijack: OAuth already proved control of this email —
             // `emailVerified` above is true only for a Google-asserted
             // `email_verified` ID-token claim or a GitHub email the
-            // provider's own `userinfo` override (CRITICAL N1, fix round 2)
+            // provider's own `userinfo` override (CRITICAL N1, fix)
             // resolved via `/user/emails`'s `verified: true` flag — so this
             // IS the real owner's first verification of a never-verified
             // row. Same clearing as verifyMagicLink: an attacker who
@@ -259,7 +259,7 @@ export const authConfig: NextAuthConfig = {
             },
             select: { userId: true },
           });
-          // CRITICAL N1 (fix round 2) / IMPORTANT (fix round 3, controller
+          // CRITICAL N1 (fix) / IMPORTANT (fix, controller
           // rulings): `update: { userId }` on a provider_providerAccountId
           // conflict would silently REASSIGN an existing provider link from
           // whichever user it currently belongs to onto `user.id` — a

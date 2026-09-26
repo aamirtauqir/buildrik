@@ -124,7 +124,7 @@ describe("entries cross-site guard", () => {
     expect(entCreate.mock.calls[0][0].data.data).toEqual({ title: "Hi", price: 12, ok: true });
   });
 
-  it("x4 round 3: stores text as typed — no entity encoding, stable across saves, escaped once at the page sink", async () => {
+  it("x4: stores text as typed — no entity encoding, stable across saves, escaped once at the page sink", async () => {
     const typed = { title: "Tom & Jerry <3", quote: 'Say "hi" > bye', literal: "AT&amp;T" };
     colFindFirst.mockResolvedValue({ id: "c1" });
     entCreate.mockResolvedValue({ id: "e1" });
@@ -141,7 +141,7 @@ describe("entries cross-site guard", () => {
     expect(page[0].content).toContain("<h1>Tom &amp; Jerry &lt;3</h1>");
   });
 
-  it("x4 round 3: stored text never re-forms markup when a tag is cut out of the middle of one", async () => {
+  it("x4: stored text never re-forms markup when a tag is cut out of the middle of one", async () => {
     colFindFirst.mockResolvedValueOnce({ id: "c1" });
     entCreate.mockResolvedValueOnce({ id: "e1" });
     const nested = "<<img src=x onerror=alert(1)>img src=x onerror=alert(1)>";
@@ -201,7 +201,7 @@ describe("CSV import (fix-all round, 2026-09-25)", () => {
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
     });
 
-    it("rejects a file whose HEADER cell is over the per-cell length cap, not only data cells (fix round 2)", async () => {
+    it("rejects a file whose HEADER cell is over the per-cell length cap, not only data cells (fix)", async () => {
       colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
       const csv = `${"a".repeat(5001)},Price\nMargherita,12`;
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
@@ -296,7 +296,7 @@ describe("generateDynamicPages", () => {
   });
 });
 
-describe("generateDynamicPages — dangerous-scheme sink defence (controller review round 1 + 2)", () => {
+describe("generateDynamicPages — dangerous-scheme sink defence", () => {
   const TEMPLATE = '<html><head></head><body><a href="{link}">Go</a></body></html>';
 
   it("neutralizes a javascript: value substituted into an href — the published HTML carries no javascript: href", async () => {
@@ -358,7 +358,7 @@ describe("generateDynamicPages — dangerous-scheme sink defence (controller rev
   });
 });
 
-describe("generateDynamicPages — the four live bypass shapes of round 1's regex detector (controller review round 2)", () => {
+describe("generateDynamicPages — the four live bypass shapes of the earlier regex detector", () => {
   it("bypass 1 — unquoted href attribute", async () => {
     const template = '<html><head></head><body><a href={link}>Go</a></body></html>';
     colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
@@ -393,7 +393,7 @@ describe("generateDynamicPages — the four live bypass shapes of round 1's rege
   });
 });
 
-describe("generateDynamicPages — legitimate template markup survives the parser-based sink (controller review round 2)", () => {
+describe("generateDynamicPages — legitimate template markup survives the parser-based sink", () => {
   // No literal "stock/seeded template" fixture set exists in this repo for
   // CMS dynamic pages (checked: packages/editor/src/templates/ holds
   // SaveTemplate.tsx, not page markup). This is representative of what
@@ -434,7 +434,7 @@ describe("generateDynamicPages — legitimate template markup survives the parse
     expect(html).toContain('<input type="email" name="email" required="">');
     expect(html).toContain('formaction="/subscribe/alt"'); // formaction survives on a real <input>/<button>, not just named-and-checked
     expect(html).toContain('style="background:url(/bg.jpg);color:#111"'); // a SAFE style url() is untouched
-    // x4 round 3: a clean page is not re-serialized at all — the only
+    // x4: a clean page is not re-serialized at all — the only
     // differences from the template are the substitution and the SEO title.
     expect(html).toBe(CLEAN_TEMPLATE.replace("{title}", "Welcome").replace("</head>", "<title></title></head>"));
   });

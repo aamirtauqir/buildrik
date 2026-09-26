@@ -160,7 +160,7 @@ export async function deleteEntry(siteId: string, id: string): Promise<void> {
   await prisma.cmsEntry.delete({ where: { id } });
 }
 
-// ── CSV import (fix-all round, 2026-09-25) ──────────────────────────────────
+// ── CSV import ────────────────────────────────────────────────────────────
 // Server-side parsing + validation: the client only reads the file as text
 // and posts it, never parses it. `previewCsvImport` and `importCsvEntries`
 // both re-parse the raw CSV rather than trust a client-computed row count, so
@@ -339,7 +339,7 @@ export interface DynamicPage {
 export interface StaleTemplateBindingsResult {
   /** True when the site has at least one page-generating collection — lets a
    *  caller distinguish "nothing to check" from "checked, none stale"
-   *  (controller review round 1: a pre-publish check that always shows a
+   * (a pre-publish check that always shows a
    *  "pass" row is noise for the near-all-sites-have-no-CMS-collection case). */
   hasPageGeneratingCollections: boolean;
   stale: { collectionId: string; collectionName: string; templatePath: string }[];
@@ -415,11 +415,11 @@ export async function resolveDynamicPages(
 // script/style spans and the rest, substitutes only the rest, and
 // reassembles in order.
 //
-// Controller review round 1 found this entity-escaped substitution alone
+// Found this entity-escaped substitution alone
 // isn't enough for a URL-bearing attribute (`<a href="{fieldSlug}">` with a
 // `javascript:` value survives entity-escaping — it has no `<`, `>` or `"`
-// to escape). Round 1's fix was a regex "is this substitution inside a URL
-// attribute" detector; round 2 found that detector bypassable (unquoted
+// to escape). An earlier fix used a regex "is this substitution inside a URL
+// attribute" detector, but that detector proved bypassable (unquoted
 // attributes, a non-first `srcset` candidate, `style="url(...)"`, and case
 // all need real parsing to resolve correctly). BINDING RULING: stop
 // detecting HTML context with regex here — this function goes back to plain
@@ -485,7 +485,7 @@ export async function generateDynamicPages(
       `<title>${escapeHtml(seoTitle)}</title>` +
       (seoDescription ? `<meta name="description" content="${escapeHtml(seoDescription)}">` : "");
     html = insertBeforeHeadClose(html, seoTags);
-    // Controller review round 2: the sink defense against a dangerous URL a
+    // The sink defense against a dangerous URL a
     // substitution introduced runs here, over the FINAL page, through a real
     // parser — not as a step of the substitution above.
     html = sanitizeGeneratedPageHtml(html);

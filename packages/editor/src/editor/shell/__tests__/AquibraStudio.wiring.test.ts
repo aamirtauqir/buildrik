@@ -51,7 +51,7 @@ describe("AquibraStudio — the Preview command reaches board 65:211", () => {
   });
 });
 
-/* B-1 fix round 1: every left-panel tab-switch door must reach the GUARDED
+/* B-1 fix: every left-panel tab-switch door must reach the GUARDED
    sinks useTabSwitchGuard returns. A raw `state.setLeftPanelTab` /
    `state.openLeftPanelToTab` anywhere else in the shell is a door that
    silently drops unsaved Settings / CMS-record work. */

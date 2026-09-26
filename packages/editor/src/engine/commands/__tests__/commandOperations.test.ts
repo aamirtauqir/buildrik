@@ -55,7 +55,7 @@ describe("nudgeSelected", () => {
     expect(composer.beginTransaction).not.toHaveBeenCalled();
   });
 
-  // Controller review round 1, IMPORTANT 2: the arrow-key nudge path never
+  // IMPORTANT 2: the arrow-key nudge path never
   // reached the lock/instance guard A-5 added to delete/cut — a locked
   // element still moved.
   it("skips a locked element and emits LOCKED_ELEMENTS_SKIPPED", () => {

@@ -154,7 +154,7 @@ export interface StudioHeaderProps {
  * BUT ONLY where reviews are enabled for the site. TabRouter's "review"
  * case returns null for every state when `!reviewsEnabled`
  * (TabRouter.tsx:239), so a chip offered anyway opened a door onto a blank
- * panel (A-8 round 2). Return null instead of a pill in that case — same
+ * panel (A-8). Return null instead of a pill in that case — same
  * "no door, not a disabled one" rule the Comments toggle already follows.
  */
 function reviewChip(

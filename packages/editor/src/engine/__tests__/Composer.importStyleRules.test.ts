@@ -1,5 +1,5 @@
 /**
- * S-1 (review round 4): project-level style rules are written as
+ * S-1: project-level style rules are written as
  * `${selector} {` inside `@media ${query}` into the preview document, the
  * single-file export's <style> and the published stylesheet, and element ids
  * into `.buildrick-<id>` / `[data-buildrick-id="<id>"]`. The load boundary

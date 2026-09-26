@@ -56,8 +56,8 @@ const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 /** Panels that take the inspector's column instead of the left drawer. */
 const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history", "activity"]);
 
-/* VIEWER_TABS / isTabAllowedForViewer moved to `../rail/tabsConfig` (fix
- * round 1) — the tab registry is the ONE place every door that gates a
+/* VIEWER_TABS / isTabAllowedForViewer moved to `../rail/tabsConfig` — the
+ * tab registry is the ONE place every door that gates a
  * VIEWER's left-panel tabs reads from: this file's rail click and
  * "ui:switch-tab" handler, useStudioState's openLeftPanelToTab/
  * setLeftPanelTab (the sink UI_PANEL_OPEN/deep-links/topbar buttons funnel

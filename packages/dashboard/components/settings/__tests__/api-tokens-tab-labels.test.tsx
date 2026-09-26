@@ -1,6 +1,6 @@
 /**
  * B-8: the New API token modal's Name field is reachable by its label,
- * which keeps its original body / text-primary look (fix round 1).
+ * which keeps its original body / text-primary look (fix).
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";

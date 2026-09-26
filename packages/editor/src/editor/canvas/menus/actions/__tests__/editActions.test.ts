@@ -127,7 +127,7 @@ describe("editActions — delete runs the engine command", () => {
   });
 });
 
-/* Controller review round 1 (follow-up to A-5): this row used to call
+/* (follow-up to A-5): this row used to call
    composer.elements.removeElement directly, bypassing the engine `cut`
    command's lock/instance filter entirely — a right-click Cut on a locked
    element removed it anyway. It's now routed through commands.run("cut"),

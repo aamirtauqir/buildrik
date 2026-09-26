@@ -49,10 +49,10 @@ const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
 const ModalCloseContext = React.createContext<(() => void) | null>(null);
 
 /**
- * B-7 round 2: ~50 existing ModalRoot consumers render a visible
+ * B-7: ~50 existing ModalRoot consumers render a visible
  * `<ModalTitle>` (or set ModalContent's `srTitle`) but never separately wire
  * `labelledBy`/`ariaLabel` on ModalRoot itself — that was the ONLY way the
- * dialog node got a name after the round-1 fix, so those ~50 dialogs stayed
+ * dialog node got a name, so those ~50 dialogs stayed
  * unnamed. ModalTitle/ModalContent register their name into this context;
  * ModalRoot reads it and forwards it to OverlayMount, so every existing
  * consumer gets a name with no file of theirs touched. An explicit
@@ -131,7 +131,7 @@ export const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
   { size = "question", srTitle, className, children, ...rest },
   ref,
 ) {
-  // B-7 round 2: registers as the dialog's fallback name (below a visible
+  // B-7: registers as the dialog's fallback name (below a visible
   // ModalTitle) so the ~50 existing callers that only ever set `srTitle`
   // here get it applied to the actual role=dialog node, not just this div.
   const { setAriaLabel } = React.useContext(ModalAutoNameContext);
@@ -181,7 +181,7 @@ export interface ModalTitleProps extends React.HTMLAttributes<HTMLHeadingElement
 
 export const ModalTitle = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
   function ModalTitle({ inset = true, className, id, children, ...rest }, ref) {
-    // B-7 round 2: a visible ModalTitle is the preferred name for the
+    // B-7: a visible ModalTitle is the preferred name for the
     // dialog — registers its id (the caller's own `id` prop if given, else
     // one generated here) as the auto-detected labelledBy so ModalRoot can
     // wire it up without the ~50 existing callers passing `labelledBy`

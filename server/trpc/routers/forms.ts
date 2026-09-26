@@ -77,7 +77,7 @@ export const formsRouter = router({
       //
       // Gated on an actual diff against the stored row, not on the field's
       // mere presence in the payload — the inspector saves on every blur
-      // (fix round 2, finding 1), so an EDITOR tabbing through the field
+      // (fix, finding 1), so an EDITOR tabbing through the field
       // untouched, or saving a different linked field that happens to
       // bundle notifyEmail, would otherwise hit a FORBIDDEN for a no-op
       // write. "" and null both mean "unset".

@@ -1,5 +1,5 @@
 /**
- * S-1 (review round 3): element style values are written into the published
+ * S-1: element style values are written into the published
  * page's <style>. A stored value reading `red}</style><script>…` left the rule
  * and then the element, running script for every visitor. Such declarations
  * never reach a stylesheet; legitimate ones do.

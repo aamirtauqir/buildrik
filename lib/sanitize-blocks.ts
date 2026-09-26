@@ -266,10 +266,10 @@ export function sanitizeTemplateHtml(html: string): string {
   return purify(html);
 }
 
-// ── Generated-page HTML sanitizer (controller review round 2) ──────────────
+// ── Generated-page HTML sanitizer ──────────────
 //
-// A regex "is this substitution inside a URL attribute" detector (round 1's
-// fix) is bypassable: unquoted attributes, a later `srcset` candidate,
+// A regex "is this substitution inside a URL attribute" detector is
+// bypassable: unquoted attributes, a later `srcset` candidate,
 // `style="background:url(...)"`, and case all need real HTML parsing to
 // resolve correctly (verified live — each of those four shapes got through).
 // This runs the WHOLE generated page through DOMPurify (a real parser, so
@@ -283,8 +283,8 @@ export function sanitizeTemplateHtml(html: string): string {
 // re-litigate which tags a page may contain, the way the tag/attribute
 // allowlist does for untrusted stored trees), and keeping a SAFE srcset
 // candidate instead of dropping the whole attribute the way
-// `unsafeAttributeReason` does (round 2's own test asserts the safe candidate
-// survives).
+// `unsafeAttributeReason` does (this file's own test asserts the safe
+// candidate survives).
 
 // `<script>`/`<style>` content is raw text a browser never parses as HTML —
 // but DOMPurify's underlying parser can still misparse a `<`-containing JS/CSS

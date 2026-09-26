@@ -561,12 +561,12 @@ describe("StudioHeader", () => {
       expect(onOpenReview).toHaveBeenCalledTimes(1);
     });
 
-    /* A-8 round 2: with reviewsEnabled false, TabRouter renders `null` for
+    /* A-8: with reviewsEnabled false, TabRouter renders `null` for
        the "review" tab (TabRouter.tsx:239 `if (!reviewsEnabled) return
        null;`) — the permanent "Review ›" door from the case above led
        straight into a blank panel. There is nowhere for this door to open
        to, so it must not render, same as the Comments toggle right above. */
-    it("A-8 round 2: reviewsEnabled false — no Review door at all (it would open a blank panel)", () => {
+    it("A-8: reviewsEnabled false — no Review door at all (it would open a blank panel)", () => {
       const onOpenReview = vi.fn();
       render(
         <StudioHeader
@@ -1030,7 +1030,7 @@ describe("F1 dirty-exit guard", () => {
     expect((e.preventDefault as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(0);
   });
 
-  /* B-1 fix round 1: the exit guard, beforeunload and the chip read the ONE
+  /* B-1 fix: the exit guard, beforeunload and the chip read the ONE
      shell dirty registry — a dirty Settings screen or an open CMS record with
      unsaved fields (project clean) walked out of the editor unprompted while
      only `isDirty || brandDirty` was consulted. */

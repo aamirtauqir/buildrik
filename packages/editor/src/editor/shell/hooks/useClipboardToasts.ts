@@ -44,7 +44,7 @@ export function useClipboardToasts(
     const cut = (e: unknown) =>
       addToast({ description: `${plural(count(e), "Element", "elements")} cut`, tone: "info", duration: 2000 });
 
-    /* Round-1 controller review, MINOR 4: LOCKED_ELEMENTS_SKIPPED (delete,
+    /* Controller review, MINOR 4: LOCKED_ELEMENTS_SKIPPED (delete,
        cut, nudge — A-5) had no listener anywhere, so a locked element quietly
        staying put looked identical to nothing having been selected at all. */
     const lockedSkipped = () =>

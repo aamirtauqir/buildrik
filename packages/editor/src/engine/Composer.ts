@@ -463,7 +463,7 @@ export class Composer extends EventEmitter {
       this.fonts.unregisterLibraryFont(a.originalName);
     };
     this.media.on(MEDIA_EVENTS.MEDIA_ADDED, syncLibraryFont);
-    /* D-10 fix-round-1: importServerAssets (called on every project load,
+    /* D-10: importServerAssets (called on every project load,
        useComposerInit.ts:257) now emits one MEDIA_ADDED_BATCH instead of
        one MEDIA_ADDED per asset. Without this, a synced site font hydrated
        from the server silently never registers — this listener never fires

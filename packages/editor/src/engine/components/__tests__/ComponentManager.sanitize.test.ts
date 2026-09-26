@@ -72,7 +72,7 @@ describe("component masters are sanitized on the way in", () => {
   });
 });
 
-describe("a malformed master does not break the library (S-1 review round 2)", () => {
+describe("a malformed master does not break the library (S-1)", () => {
   const malformed = (id: string, masterTree: unknown): ComponentDefinition =>
     ({ ...hostile(id), masterTree }) as unknown as ComponentDefinition;
 
@@ -106,7 +106,7 @@ describe("a malformed master does not break the library (S-1 review round 2)", (
   });
 });
 
-describe("instance overrides are sanitized where they are applied (S-1 review round 2)", () => {
+describe("instance overrides are sanitized where they are applied (S-1)", () => {
   const safeMaster = (id: string): ComponentDefinition => ({
     id,
     name: "Card",
@@ -153,7 +153,7 @@ describe("instance overrides are sanitized where they are applied (S-1 review ro
   });
 });
 
-describe("malformed overrides and failing syncs leave the instance in place (S-1 review round 3)", () => {
+describe("malformed overrides and failing syncs leave the instance in place (S-1)", () => {
   const master = (id: string): ComponentDefinition => ({
     id,
     name: "Card",

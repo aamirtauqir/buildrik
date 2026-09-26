@@ -243,7 +243,7 @@ describe("target links get rel=noopener noreferrer (S-1 review fix 3)", () => {
   });
 });
 
-describe("component instance overrides (S-1 review round 2)", () => {
+describe("component instance overrides (S-1)", () => {
   it("sanitizes content overrides and drops unsafe attribute overrides on write", () => {
     const overrides = [
       { op: "replace", path: "#/children[0]/content/content", value: '<img src=x onerror="alert(1)">Owned' },
@@ -278,7 +278,7 @@ describe("component instance overrides (S-1 review round 2)", () => {
   });
 });
 
-describe("style declarations (S-1 review round 3)", () => {
+describe("style declarations (S-1)", () => {
   it("drops breakout / dangerous declarations from styles and every breakpoint map on write", () => {
     const blocks = {
       id: "r",
@@ -313,7 +313,7 @@ describe("style declarations (S-1 review round 3)", () => {
   });
 });
 
-describe("malformed override entries (S-1 review round 3)", () => {
+describe("malformed override entries (S-1)", () => {
   it("removes entries that are not ops and resets a non-array list", () => {
     const good = { op: "replace", path: "#/style/color", value: "red" };
     const a = { id: "a", type: "container", data: { componentInstance: { overrides: [null, "x", { path: 5 }, { op: "replace" }, good] } } };
@@ -326,7 +326,7 @@ describe("malformed override entries (S-1 review round 3)", () => {
 
 const HOSTILE_SELECTOR = "a{}</style><script>alert(1)</script><style>";
 
-describe("project style rules and element ids (S-1 review round 4)", () => {
+describe("project style rules and element ids (S-1)", () => {
   function rules() {
     return [
       { id: "s1", selector: '[data-buildrick-id="el-a1"]', properties: { color: "red" }, mediaQuery: "(max-width: 767px)" },
@@ -380,7 +380,7 @@ describe("project style rules and element ids (S-1 review round 4)", () => {
   });
 });
 
-// controller review round 2: a regex "is this substitution inside a URL
+// a regex "is this substitution inside a URL
 // attribute" detector is bypassable (unquoted attributes, a non-first
 // srcset candidate, style="url(...)", case). This runs a real parser
 // (DOMPurify/jsdom) instead of pattern-matching HTML context. Consumer:

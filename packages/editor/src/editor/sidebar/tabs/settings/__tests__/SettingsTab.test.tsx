@@ -791,7 +791,7 @@ describe("SettingsTab — a screen mounted with the shell keeps its handlers", (
   });
 });
 
-/* M7 (PD-1), narrowed in review round 2: only the fields the sync provider
+/* M7 (PD-1), narrowed in review: only the fields the sync provider
    mirrors to Site columns (SITE_COLUMN_FIELDS) are the dashboard's. Below
    ADMIN those are read-only and say why; everything else on the screen —
    Author, Twitter handle, Global CSS — is project data the EDITOR could always
@@ -851,7 +851,7 @@ describe("SettingsTab — shell dirty registry entry", () => {
   });
 });
 
-/* B-1 fix round 2. The shell's tab-switch guard reads the registry the moment
+/* B-1 fix. The shell's tab-switch guard reads the registry the moment
    Settings' own door runs onClose — Settings' own Discard / Save and
    continue already answered the question, so by then its entry must be
    clear, or the user is asked twice. And the shell's "Leave anyway" runs

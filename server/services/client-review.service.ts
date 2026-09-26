@@ -34,7 +34,7 @@ import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 const TOKEN_TTL_DAYS = 90;
 
 /**
- * S-7 (controller review round 1): the self-invite/self-approve guards
+ * S-7: the self-invite/self-approve guards
  * (submitReview's clientEmail check, identifyReviewer's invitedEmail match,
  * resolveReviewByToken's self-approval block) all compare email ADDRESSES —
  * and a plain `trim().toLowerCase()` treats `edie+client@x.com` as a
@@ -338,7 +338,7 @@ export async function resolveReviewByToken(
   // member can be added to the workspace AFTER the invite was sent — never
   // let the signer be the person who submitted the round, or anyone
   // currently an ACTIVE member of the site's workspace (controller review
-  // round 1: the original check only covered the submitter, not other
+  // the original check only covered the submitter, not other
   // members).
   if (status === "APPROVED" && review.invitedEmail) {
     const invited = normalizeReviewEmail(review.invitedEmail);

@@ -1,5 +1,5 @@
 /**
- * forms router — `updateBlock`'s notifyEmail ADMIN gate (fix round 2,
+ * forms router — `updateBlock`'s notifyEmail ADMIN gate (fix,
  * finding 1). Requiring ADMIN whenever `notifyEmail` is present in the
  * payload (rather than when it actually CHANGES) meant an EDITOR blurring
  * the field without editing it — or saving any other field bundled through

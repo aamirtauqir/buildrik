@@ -242,7 +242,7 @@ describe("startPublish · approval gate enforcement", () => {
     expect(approvalError).toBe(false);
   });
 
-  /* PD-7/8 (controller review round 1): editsRequireApproval=true with
+  /* PD-7/8: editsRequireApproval=true with
      agency_layer=false is not a config anyone can ever satisfy — reviews.submit
      hard-refuses (requireAgencyLayer) when the layer is off, so no review can
      ever reach APPROVED, and the gate deadlocked every non-owner publish

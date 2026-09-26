@@ -74,7 +74,7 @@ describe("media.service listAssetVersions", () => {
   });
 });
 
-/* D-13 fix round 1: cursor paging over `createdAt desc` alone is not a total
+/* D-13 fix: cursor paging over `createdAt desc` alone is not a total
    order — a bulk upload stamps many assets with the same createdAt, and
    Prisma's cursor then skips or repeats rows at a page boundary. `id` breaks
    the tie so every page continues exactly where the last one stopped. */

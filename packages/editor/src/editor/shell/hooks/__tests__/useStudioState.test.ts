@@ -9,7 +9,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-/* Fix round 1 (Lfix): openLeftPanelToTab/setLeftPanelTab is the ONE sink
+/* Fix (Lfix): openLeftPanelToTab/setLeftPanelTab is the ONE sink
    every tab-open door funnels into (rail, ui:switch-tab, UI_PANEL_OPEN /
    ⌘K, deep links, topbar buttons) — mocked directly so the viewer-gating
    tests below are deterministic instead of racing the real
@@ -130,7 +130,7 @@ describe("useStudioState", () => {
     });
   });
 
-  // VIEWER gate at the sink (fix round 1) ---------------------------------------
+  // VIEWER gate at the sink (fix) ---------------------------------------
   describe("openLeftPanelToTab / setLeftPanelTab — the VIEWER gate every door funnels into", () => {
     it("a non-viewer may open any tab", () => {
       mockViewerChrome.mockReturnValue(false);

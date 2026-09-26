@@ -111,7 +111,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   // silently ship without its generated pages — surfaced here, before publish,
   // instead of only as a server log at publish time. Skipped entirely (no
   // row at all) when the site has no page-generating collection — a "pass"
-  // row for a check that never applies is noise (controller review round 1).
+  // row for a check that never applies is noise.
   const templateBindings = await findStaleTemplateBindings(siteId, allPages);
   if (templateBindings.hasPageGeneratingCollections) {
     if (templateBindings.stale.length > 0) {
@@ -290,7 +290,7 @@ export async function startPublish(
        approval and no error. The deploy 50 lines below already uses
        `site.workspaceId`; only the gate was reading the session value. */
     const gateWorkspaceId = site.workspaceId;
-    // PD-7/8 (controller review round 1): reviews live behind `agency_layer` —
+    // PD-7/8: reviews live behind `agency_layer` —
     // reviews.submit hard-refuses (requireAgencyLayer) when the flag is off, so
     // a workspace with editsRequireApproval=true but agency_layer=false has NO
     // way to ever produce an APPROVED review. Enforcing the gate there deadlocks

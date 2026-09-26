@@ -1,7 +1,7 @@
 /**
  * focus.ts — useFocusTrap / isModalOpen: dialog-role selectors.
  *
- * B-7 round 2: both `isTopmost()` (inside useFocusTrap's Escape handler) and
+ * B-7: both `isTopmost()` (inside useFocusTrap's Escape handler) and
  * `isModalOpen()` query only `[role="dialog"][aria-modal="true"]`.
  * ReplaceAcrossDialog and AchievementPrompt predate OverlayMount and render
  * `role="alertdialog"` directly (the correct ARIA role for a confirm/warning

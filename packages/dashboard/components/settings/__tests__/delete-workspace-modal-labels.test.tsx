@@ -14,7 +14,7 @@ describe("DeleteWorkspaceModal — label association", () => {
     expect(screen.getByLabelText(/type/i)).toBeInTheDocument();
   });
 
-  // Fix round 1: associating the label must not restyle it (controller ruling).
+  // Fix: associating the label must not restyle it (controller ruling).
   it("keeps the original body-sm, text-primary label", () => {
     render(
       <DeleteWorkspaceModal workspaceName="Acme Inc." onConfirm={vi.fn()} onClose={vi.fn()} deleting={false} />

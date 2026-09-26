@@ -154,7 +154,7 @@ export const reviewsRouter = router({
            would offer Send for review as a door into a mutation that
            hard-fails requireAgencyLayer. `editsRequireApproval` is the
            EFFECTIVE value — `agencyLayerOn && rawEditsRequireApproval`
-           (PD-7/8, controller review round 1) — not the raw workspace
+           (PD-7/8) — not the raw workspace
            setting: with the layer off, reviews.submit can never produce an
            APPROVED round, so startPublish's approval gate now skips
            enforcement entirely in that state (publish.service.ts
@@ -222,7 +222,7 @@ export const reviewsRouter = router({
   rounds: protectedProcedure
     .input(currentRoundInput)
     .query(async ({ ctx, input }) => {
-      // A-8 round 2: read from the SITE's workspace, not the caller's
+      // A-8: read from the SITE's workspace, not the caller's
       // session workspace — an EDITOR on another workspace's site couldn't
       // otherwise see their own round's history.
       const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
@@ -243,7 +243,7 @@ export const reviewsRouter = router({
   approvedSnapshot: protectedProcedure
     .input(currentRoundInput)
     .query(async ({ ctx, input }) => {
-      // A-8 round 2: site's workspace, not the caller's session workspace.
+      // A-8: site's workspace, not the caller's session workspace.
       const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
       if (!siteWorkspace) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
       if (!(await isFeatureEnabled(siteWorkspace.workspaceId, "agency_layer"))) return null;
@@ -263,7 +263,7 @@ export const reviewsRouter = router({
   revoke: protectedProcedure
     .input(revokeReviewInput)
     .mutation(async ({ ctx, input }) => {
-      // A-8 round 2: site's workspace, not the caller's session workspace —
+      // A-8: site's workspace, not the caller's session workspace —
       // an EDITOR on another workspace's site couldn't otherwise revoke their
       // own round.
       const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);

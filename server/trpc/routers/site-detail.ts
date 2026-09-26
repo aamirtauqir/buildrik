@@ -177,7 +177,7 @@ export const siteDetailRouter = router({
         // workspaces could otherwise have their redirect limit computed
         // against the wrong workspace's plan (S-10). The plan belongs to the
         // workspace, not to a membership row, so no member lookup is needed
-        // at all (IMPORTANT 4, controller review round 1).
+        // at all (IMPORTANT 4).
         const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
         const safePlan: PlanName = siteWorkspace?.plan ?? "FREE";
         const { siteId, ...data } = input;
