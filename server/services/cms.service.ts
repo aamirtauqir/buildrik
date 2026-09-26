@@ -1,9 +1,12 @@
+import DOMPurify from "isomorphic-dompurify";
 import { prisma } from "@/lib/prisma";
+import { parseCsvText } from "@/lib/csv";
 import type { Prisma } from "@prisma/client";
 import type {
   UpsertCollectionInput,
   UpsertEntryInput,
 } from "@buildrik/shared/schemas/cms";
+import { CSV_IMPORT_MAX_ROWS } from "@buildrik/shared/schemas/cms";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -14,12 +17,29 @@ import type {
 
 export class CmsError extends Error {
   constructor(
-    public code: "NOT_FOUND",
+    public code: "NOT_FOUND" | "BAD_REQUEST",
     message: string,
   ) {
     super(message);
     this.name = "CmsError";
   }
+}
+
+/**
+ * Defense-in-depth at the write boundary (audit S-1 class: "some stores never
+ * sanitized on the server"). Entry `data` is opaque JSON supplied by the
+ * client; every string value is run through the same DOMPurify sanitizer
+ * `lib/sanitize-blocks.ts` uses for page blocks — stripped to plain text
+ * rather than trusted to stay inert because `generateDynamicPages` happens to
+ * HTML-escape it at render time today. Applied by `upsertEntry`, so every
+ * write path (manual save, CSV import, any future importer) shares it.
+ */
+function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    out[key] = typeof value === "string" ? String(DOMPurify.sanitize(value, { ALLOWED_TAGS: [] })) : value;
+  }
+  return out;
 }
 
 export async function listCollections(siteId: string) {
@@ -83,7 +103,7 @@ export async function listEntries(siteId: string, collectionId: string) {
 export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
   await assertCollectionInSite(siteId, input.collectionId);
   const data = {
-    data: input.data as unknown as Prisma.InputJsonValue,
+    data: sanitizeEntryData(input.data) as unknown as Prisma.InputJsonValue,
     ...(input.status ? { status: input.status } : {}),
   };
   if (input.id) {
@@ -108,6 +128,131 @@ export async function deleteEntry(siteId: string, id: string): Promise<void> {
   });
   if (!owned) throw new CmsError("NOT_FOUND", "Entry not found");
   await prisma.cmsEntry.delete({ where: { id } });
+}
+
+// ── CSV import (fix-all round, 2026-09-25) ──────────────────────────────────
+// Server-side parsing + validation: the client only reads the file as text
+// and posts it, never parses it. `previewCsvImport` and `importCsvEntries`
+// both re-parse the raw CSV rather than trust a client-computed row count, so
+// the size/row caps are enforced against what the server itself decodes.
+
+interface CmsFieldShape {
+  slug: string;
+  name: string;
+}
+
+async function loadCollectionFields(siteId: string, collectionId: string): Promise<CmsFieldShape[]> {
+  const col = await prisma.cmsCollection.findFirst({ where: { id: collectionId, siteId }, select: { fields: true } });
+  if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
+  const fields = col.fields as unknown;
+  if (!Array.isArray(fields)) return [];
+  return fields
+    .filter((f): f is CmsFieldShape => !!f && typeof f === "object" && typeof (f as CmsFieldShape).slug === "string")
+    .map((f) => ({ slug: f.slug, name: typeof (f as { name?: unknown }).name === "string" ? (f as { name: string }).name : f.slug }));
+}
+
+function parseAndCapCsv(csv: string): { headers: string[]; dataRows: string[][] } {
+  const rows = parseCsvText(csv).filter((r) => !(r.length === 1 && r[0] === ""));
+  if (rows.length === 0) throw new CmsError("BAD_REQUEST", "This file has no rows.");
+  const [headers, ...dataRows] = rows;
+  if (headers.every((h) => h.trim() === "")) throw new CmsError("BAD_REQUEST", "This file has no header row.");
+  if (dataRows.length === 0) throw new CmsError("BAD_REQUEST", "This file has a header row but no data.");
+  if (dataRows.length > CSV_IMPORT_MAX_ROWS) {
+    throw new CmsError("BAD_REQUEST", `This file has ${dataRows.length} rows — the limit is ${CSV_IMPORT_MAX_ROWS}.`);
+  }
+  return { headers, dataRows };
+}
+
+/** Case-insensitive match of a collection field to a CSV header, by slug or
+ *  by name — the same rule `parseRecordsJson` (JSON import) uses on the
+ *  client, kept in step so the two importers read the same way. */
+function suggestColumnMapping(fields: CmsFieldShape[], headers: string[]): Record<string, string> {
+  const headerByKey = new Map<string, string>();
+  for (const h of headers) {
+    headerByKey.set(h.trim().toLowerCase(), h);
+  }
+  const mapping: Record<string, string> = {};
+  for (const f of fields) {
+    const header = headerByKey.get(f.slug.toLowerCase()) ?? headerByKey.get(f.name.toLowerCase());
+    if (header) mapping[f.slug] = header;
+  }
+  return mapping;
+}
+
+export interface CsvImportPreview {
+  headers: string[];
+  totalRows: number;
+  /** First few data rows, keyed by header, for the mapping screen. */
+  sampleRows: Array<Record<string, string>>;
+  /** fieldSlug -> CSV header, guessed by matching field slug/name to a header. */
+  suggestedMapping: Record<string, string>;
+}
+
+const CSV_PREVIEW_SAMPLE_ROWS = 5;
+
+export async function previewCsvImport(siteId: string, collectionId: string, csv: string): Promise<CsvImportPreview> {
+  const fields = await loadCollectionFields(siteId, collectionId);
+  const { headers, dataRows } = parseAndCapCsv(csv);
+  const sampleRows = dataRows.slice(0, CSV_PREVIEW_SAMPLE_ROWS).map((row) => {
+    const record: Record<string, string> = {};
+    headers.forEach((h, i) => {
+      record[h] = row[i] ?? "";
+    });
+    return record;
+  });
+  return { headers, totalRows: dataRows.length, sampleRows, suggestedMapping: suggestColumnMapping(fields, headers) };
+}
+
+export interface CsvImportRowError {
+  row: number; // 1-based, header excluded (row 1 = first data row)
+  message: string;
+}
+
+export interface CsvImportResult {
+  imported: number;
+  total: number;
+  errors: CsvImportRowError[];
+}
+
+/**
+ * Create one entry per CSV data row, mapped by `columnMapping`
+ * (fieldSlug -> CSV header) and written through `upsertEntry` — the exact
+ * write manual "Add record" uses, so sanitization/validation stay in one
+ * place. A row that fails to write is reported by its 1-based position and
+ * the rest of the file still imports (partial success, like JSON import).
+ */
+export async function importCsvEntries(
+  siteId: string,
+  collectionId: string,
+  csv: string,
+  columnMapping: Record<string, string>,
+): Promise<CsvImportResult> {
+  await assertCollectionInSite(siteId, collectionId);
+  const { headers, dataRows } = parseAndCapCsv(csv);
+  const columnIndex = new Map(headers.map((h, i) => [h, i]));
+  const mappedFields = Object.entries(columnMapping).filter(([, header]) => columnIndex.has(header));
+
+  let imported = 0;
+  const errors: CsvImportRowError[] = [];
+  for (const [i, row] of dataRows.entries()) {
+    const rowNumber = i + 1;
+    const data: Record<string, unknown> = {};
+    for (const [fieldSlug, header] of mappedFields) {
+      const value = row[columnIndex.get(header)!];
+      if (value !== undefined && value !== "") data[fieldSlug] = value;
+    }
+    if (Object.keys(data).length === 0) {
+      errors.push({ row: rowNumber, message: "No mapped column had a value" });
+      continue;
+    }
+    try {
+      await upsertEntry(siteId, { siteId, collectionId, data });
+      imported += 1;
+    } catch (e) {
+      errors.push({ row: rowNumber, message: e instanceof Error ? e.message : "Could not be saved" });
+    }
+  }
+  return { imported, total: dataRows.length, errors };
 }
 
 // ── Dynamic pages (E7) ──────────────────────────────────────────────────────

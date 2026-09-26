@@ -46,6 +46,8 @@ import {
   generateDynamicPages,
   appendDynamicPagesToPublish,
   findStaleTemplateBindings,
+  previewCsvImport,
+  importCsvEntries,
   CmsError,
 } from "@server/services/cms.service";
 
@@ -109,6 +111,93 @@ describe("entries cross-site guard", () => {
       upsertEntry("s1", { id: "e-x", siteId: "s1", collectionId: "c1", data: {} }),
     ).rejects.toBeInstanceOf(CmsError);
     expect(entUpsert).not.toHaveBeenCalled();
+  });
+
+  it("upsertEntry strips markup out of string field values before writing (audit S-1 class)", async () => {
+    colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    entCreate.mockResolvedValueOnce({ id: "e1" });
+    await upsertEntry("s1", {
+      siteId: "s1",
+      collectionId: "c1",
+      data: { title: '<script>alert(1)</script>Hi', price: 12, ok: true },
+    });
+    expect(entCreate.mock.calls[0][0].data.data).toEqual({ title: "Hi", price: 12, ok: true });
+  });
+});
+
+describe("CSV import (fix-all round, 2026-09-25)", () => {
+  const FIELDS = [
+    { id: "f1", name: "Name", slug: "name" },
+    { id: "f2", name: "Price", slug: "price" },
+  ];
+
+  describe("previewCsvImport", () => {
+    it("parses headers + sample rows and suggests a mapping by slug/name (case-insensitive)", async () => {
+      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      const csv = "Name,Price\nMargherita,12\nDiavola,14";
+      const out = await previewCsvImport("s1", "c1", csv);
+      expect(out.headers).toEqual(["Name", "Price"]);
+      expect(out.totalRows).toBe(2);
+      expect(out.suggestedMapping).toEqual({ name: "Name", price: "Price" });
+      expect(out.sampleRows).toEqual([
+        { Name: "Margherita", Price: "12" },
+        { Name: "Diavola", Price: "14" },
+      ]);
+    });
+
+    it("throws NOT_FOUND for a collection outside the site", async () => {
+      colFindFirst.mockResolvedValueOnce(null);
+      await expect(previewCsvImport("s1", "nope", "a\n1")).rejects.toBeInstanceOf(CmsError);
+    });
+
+    it("rejects a file with a header row but no data", async () => {
+      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      await expect(previewCsvImport("s1", "c1", "Name,Price")).rejects.toThrow(/no data/);
+    });
+
+    it("rejects a file over the row cap", async () => {
+      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      const rows = Array.from({ length: 501 }, (_, i) => `Item ${i}`);
+      const csv = ["Name", ...rows].join("\n");
+      await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/limit is 500/);
+    });
+  });
+
+  describe("importCsvEntries", () => {
+    it("creates one entry per row through upsertEntry, mapped by the given column mapping", async () => {
+      colFindFirst.mockResolvedValue({ id: "c1" });
+      entCreate.mockResolvedValue({ id: "e1" });
+      const csv = "Name,Price\nMargherita,12\nDiavola,14";
+      const out = await importCsvEntries("s1", "c1", csv, { name: "Name", price: "Price" });
+      expect(out).toEqual({ imported: 2, total: 2, errors: [] });
+      expect(entCreate).toHaveBeenCalledTimes(2);
+      expect(entCreate.mock.calls[0][0].data).toMatchObject({ collectionId: "c1", data: { name: "Margherita", price: "12" } });
+    });
+
+    it("reports a row with no mapped value as a per-row error without failing the rest", async () => {
+      colFindFirst.mockResolvedValue({ id: "c1" });
+      entCreate.mockResolvedValue({ id: "e1" });
+      const csv = "Name,Price\nMargherita,12\n,";
+      const out = await importCsvEntries("s1", "c1", csv, { name: "Name", price: "Price" });
+      expect(out.imported).toBe(1);
+      expect(out.total).toBe(2);
+      expect(out.errors).toEqual([{ row: 2, message: "No mapped column had a value" }]);
+    });
+
+    it("skips a mapping whose header the file doesn't have", async () => {
+      colFindFirst.mockResolvedValue({ id: "c1" });
+      entCreate.mockResolvedValue({ id: "e1" });
+      const csv = "Name\nMargherita";
+      const out = await importCsvEntries("s1", "c1", csv, { name: "Name", price: "Price (not in file)" });
+      expect(out.imported).toBe(1);
+      expect(entCreate.mock.calls[0][0].data.data).toEqual({ name: "Margherita" });
+    });
+
+    it("throws NOT_FOUND up front for a collection outside the site, before writing anything", async () => {
+      colFindFirst.mockResolvedValueOnce(null);
+      await expect(importCsvEntries("s1", "nope", "a\n1", {})).rejects.toBeInstanceOf(CmsError);
+      expect(entCreate).not.toHaveBeenCalled();
+    });
   });
 });
 

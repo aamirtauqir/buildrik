@@ -58,3 +58,28 @@ export type UpsertEntryInput = z.infer<typeof upsertEntryInput>;
 export const listEntriesInput = z.object({ siteId: z.string().min(1), collectionId: z.string().min(1) });
 
 export const deleteEntryInput = z.object({ siteId: z.string().min(1), id: z.string().min(1) });
+
+// ── CSV import (fix-all round, 2026-09-25 — decision: "build CSV import now") ─
+// Upload → preview → map columns → create records, entirely server-side
+// (Page → tRPC → Router → Service → Prisma): the raw CSV text is parsed and
+// validated on the server, never in the browser, so size/row caps and
+// sanitization are enforced at one boundary regardless of client.
+export const CSV_IMPORT_MAX_BYTES = 300_000; // ~300KB of CSV text
+export const CSV_IMPORT_MAX_ROWS = 500; // data rows, header excluded
+
+export const previewCsvEntriesInput = z.object({
+  siteId: z.string().min(1),
+  collectionId: z.string().min(1),
+  csv: z.string().min(1).max(CSV_IMPORT_MAX_BYTES),
+});
+export type PreviewCsvEntriesInput = z.infer<typeof previewCsvEntriesInput>;
+
+export const importCsvEntriesInput = z.object({
+  siteId: z.string().min(1),
+  collectionId: z.string().min(1),
+  csv: z.string().min(1).max(CSV_IMPORT_MAX_BYTES),
+  // fieldSlug -> CSV column header. A field left unmapped (or mapped to a
+  // header the file doesn't have) is skipped for every row.
+  columnMapping: z.record(z.string(), z.string().min(1)),
+});
+export type ImportCsvEntriesInput = z.infer<typeof importCsvEntriesInput>;

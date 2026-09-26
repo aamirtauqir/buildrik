@@ -27,6 +27,7 @@ import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore"
 import { RecordsTable } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
+import { CsvImportDialog } from "./CsvImportDialog";
 
 export interface CmsWorkspaceProps {
   composer: Composer | null;
@@ -80,6 +81,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
   const ws = useCmsWorkspace();
   const collection = ws.collectionId ? panel.collections.find((c) => c.id === ws.collectionId) ?? null : null;
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [csvImportOpen, setCsvImportOpen] = React.useState(false);
   const [addingField, setAddingField] = React.useState(false);
   const [fieldId, setFieldId] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
@@ -189,6 +191,15 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
             Add record
           </Button>
           <ImportRecordsButton importer={importer} />
+          <Button
+            size="xs"
+            variant="secondary"
+            className="tw:h-8 tw:px-3 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]"
+            data-testid="cms-ws-empty-import-csv"
+            onClick={() => setCsvImportOpen(true)}
+          >
+            Import CSV
+          </Button>
         </div>
       </div>
     ) : (
@@ -270,8 +281,21 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
                 Settings
               </MenuItem>
               <MenuSeparator />
+              <MenuItem data-testid="cms-ws-menu-import-csv" onClick={() => { setMenuOpen(false); setCsvImportOpen(true); }}>
+                Import CSV…
+              </MenuItem>
               <MenuItem data-testid="cms-ws-menu-import" onClick={() => { setMenuOpen(false); importer.pick(); }}>
                 Import JSON…
+              </MenuItem>
+              {/* External connectors need OAuth apps + credentials that don't
+                  exist in any env, plus a security review (fix-all round,
+                  2026-09-25 decision) — a clear disabled row, not a dead
+                  button that looks live. */}
+              <MenuItem disabled kbd="Coming soon" data-testid="cms-ws-menu-import-sheets">
+                Google Sheets
+              </MenuItem>
+              <MenuItem disabled kbd="Coming soon" data-testid="cms-ws-menu-import-airtable">
+                Airtable
               </MenuItem>
             </Menu>
           </Popover>
@@ -298,6 +322,13 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
           onClose={() => setFieldId(null)}
           onDeleteField={deleteField}
           onOpenUse={openUse}
+        />
+      ) : null}
+      {csvImportOpen ? (
+        <CsvImportDialog
+          collection={collection}
+          onClose={() => setCsvImportOpen(false)}
+          onImported={() => void loadRecords(collection.id)}
         />
       ) : null}
       {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
