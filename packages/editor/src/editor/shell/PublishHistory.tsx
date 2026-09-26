@@ -450,7 +450,8 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
       {/* Board 949:4474 states the rule that makes a republish safe to try,
           once, under the list. Both halves matter: nothing is lost, AND a
           republish is itself a deploy. */}
-      <p className={`${FOOTER_NOTE} tw:flex tw:items-center tw:gap-1`}>
+      {/* A <div>, not a <p>: the ⓘ Tooltip renders a <div> (gap walk 93 #6). */}
+      <div className={`${FOOTER_NOTE} tw:flex tw:items-center tw:gap-1`}>
         Every publish is restorable. Republishing a version redeploys it as a new one.
         {/* Board 7293:80948 — the notes ⓘ. */}
         <Tooltip
@@ -466,7 +467,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
             <Info size={12} aria-hidden="true" />
           </span>
         </Tooltip>
-      </p>
+      </div>
 
       <Modal
         open={details !== null}

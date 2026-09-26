@@ -109,11 +109,16 @@ export function usePropertyJump(o: UsePropertyJumpOptions): void {
       const entry = SECTION_REGISTRY[section];
       if (!entry) return;
       latest.current.setActiveTab(entry.tab);
-      /* Next frame: the tab switch has reset Show all (a tab change does). */
+      /* Next frame: the tab switch has reset Show all (a tab change does).
+         The type is read then, not from this closure: a door that selects and
+         asks in one gesture reached a listener holding the previous
+         selection's type (M-6). */
       requestAnimationFrame(() => {
         const s = latest.current;
-        if (s.tier === "beginner" && isAdvancedIn(getProfileFor(selectedType), section, entry.tier)) s.setShowAll(true);
-        if (!s.expandedSections.has(`${selectedType}:${section}`)) s.toggleSection(selectedType, section);
+        const type = s.selectedType;
+        if (!type) return;
+        if (s.tier === "beginner" && isAdvancedIn(getProfileFor(type), section, entry.tier)) s.setShowAll(true);
+        if (!s.expandedSections.has(`${type}:${section}`)) s.toggleSection(type, section);
         if (property && entry.advancedKey && entry.advancedProps?.includes(property)) s.advancedState.expand(entry.advancedKey);
         /* Two frames: the expanded body needs a render and a layout. */
         requestAnimationFrame(() => requestAnimationFrame(() => revealRow(latest.current.contentRef.current, section, property)));

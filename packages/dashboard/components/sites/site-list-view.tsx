@@ -16,6 +16,7 @@ interface Site {
   folderId: string | null;
   domain: string | null;
   visitors30d: number;
+  createdBy: string;
 }
 
 interface SiteListViewProps {
@@ -25,6 +26,8 @@ interface SiteListViewProps {
   onSelectAll: () => void;
   allSelected: boolean;
   onAction: (action: string, siteId: string) => void;
+  /** See SiteGrid — the workspace OWNER's id, else null. */
+  transferOwnerId?: string | null;
 }
 
 function getTimeAgo(date: Date): string {
@@ -37,7 +40,7 @@ function getTimeAgo(date: Date): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSelected, onAction }: SiteListViewProps) {
+export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSelected, onAction, transferOwnerId = null }: SiteListViewProps) {
   return (
     <div className="overflow-hidden rounded-lg border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
       <table className="w-full text-body">
@@ -60,7 +63,7 @@ export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSel
               </td>
               <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{getTimeAgo(site.lastEditedAt)}</MetricValue></td>
               <td className="px-4 py-3"><Pill tone={siteStatusTone(site.status)}>{siteStatusLabel(site.status)}</Pill></td>
-              <td className="px-4 py-3"><ContextMenu siteStatus={site.status} siteName={site.name} onAction={(action) => onAction(action, site.id)} /></td>
+              <td className="px-4 py-3"><ContextMenu siteStatus={site.status} siteName={site.name} canTransfer={transferOwnerId !== null && site.createdBy === transferOwnerId} onAction={(action) => onAction(action, site.id)} /></td>
             </tr>
           ))}
         </tbody>

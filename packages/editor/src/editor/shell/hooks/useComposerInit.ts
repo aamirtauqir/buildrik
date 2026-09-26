@@ -11,7 +11,7 @@ import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS, isNavigationOnlyChange } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
@@ -507,12 +507,16 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        Read once, like every other view-mode consumer — the mode is the URL. */
     const readOnlyView = getEditorViewMode().readOnlyView;
 
-    const handler = () => {
+    const handler = (payload?: unknown) => {
       if (readOnlyView) return;
+      /* L-3: `project:changed` also fires on `page:activated`, i.e. merely
+         looking at another page. That is not an edit: it neither dirties the
+         project nor sends a save (the same filter the per-page dirty markers
+         use, so the two cannot disagree). */
+      if (isNavigationOnlyChange(payload)) return;
       /* Dev-only: four events share this handler and none of them proves a user
-         edit — `project:changed` also fires on `page:activated`, i.e. merely
-         looking at another page. Recording which one arrived, and when, is the
-         only way to tell a real edit from a boot-sequence emit. */
+         edit. Recording which one arrived, and when, is the only way to tell a
+         real edit from a boot-sequence emit. */
       if (IS_DEV_BUILD && typeof window !== "undefined") {
         const w = window as unknown as { __bkDirtySource?: unknown[] };
         (w.__bkDirtySource ??= []).push({

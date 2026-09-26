@@ -1,11 +1,13 @@
 /**
  * Unification spec §550 — EditPage auth/permission gates.
  * - no session → redirect /auth/login?next=/edit/<id>
- * - non-member → notFound()
+ * - no access (non-member, out of scope, or no such site) → the no-access
+ *   screen with a way back, not the generic 404 (gap walk 93 #10)
  * - EDITOR+ → renders EditorClient with siteId
  * - VIEWER → redirected into read-only view mode, then renders (2026-09-24)
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
 
 const authMock = vi.fn();
 const canEditMock = vi.fn();
@@ -84,15 +86,18 @@ describe("EditPage", () => {
     expect(redirectMock).toHaveBeenCalledWith("/auth/login?next=/edit/abc%20def");
   });
 
-  it("calls notFound() when user is not a workspace member", async () => {
+  it("shows the no-access screen with a way back when the user has no access", async () => {
     authMock.mockResolvedValueOnce({ user: { id: "user-1" } });
     canEditMock.mockResolvedValueOnce(null);
-    await expect(
-      EditPage({ params: Promise.resolve({ siteId: "abc" }) }),
-    ).rejects.toMatchObject({ name: "NotFoundError" });
+    const node = await EditPage({ params: Promise.resolve({ siteId: "abc" }) });
     expect(canEditMock).toHaveBeenCalledWith("user-1", "abc");
-    expect(notFoundMock).toHaveBeenCalled();
+    expect(notFoundMock).not.toHaveBeenCalled();
     expect(redirectMock).not.toHaveBeenCalled();
+    render(node);
+    expect(screen.getByRole("heading", { name: "You don't have access to this site" })).toBeTruthy();
+    expect(screen.getByText(/may have been deleted, or you don't have access to it/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Back to sites" })).toHaveAttribute("href", "/dashboard/projects");
+    expect(screen.queryByTestId("editor-abc")).toBeNull();
   });
 
   it("renders EditorClient with siteId when authorized", async () => {

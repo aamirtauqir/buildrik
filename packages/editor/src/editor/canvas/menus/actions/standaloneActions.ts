@@ -15,7 +15,7 @@ const SECTION_TYPES = new Set([
   "cta", "card", "pricing", "columns", "grid", "flex",
 ]);
 /** Element types the CMS can feed a field into. */
-const BINDABLE_TYPES = new Set(["text", "heading", "paragraph", "image", "button", "link"]);
+export const BINDABLE_TYPES: ReadonlySet<string> = new Set(["text", "heading", "paragraph", "image", "button", "link"]);
 
 /** Save the selection (or `element` alone) as a component — the canvas ⋯ and
  *  the inspector ⋯ open the same dialog. Bindings are extracted up-front so
@@ -64,11 +64,12 @@ export const standaloneActions: ContextAction[] = [
     icon: "database",
     group: "standalone",
     isVisible: ({ element, isRoot }) => !isRoot && BINDABLE_TYPES.has(element.getType?.() ?? ""),
+    // Binding happens in the inspector's Content section (Source · Collection ·
+    // Field, board 4428:149540). This row opened the CMS workspace instead —
+    // a collection list over the canvas, no field picker (gap walk 93 #4).
     handler: ({ composer, element }) => {
-      // The CMS panel binds the CURRENT selection (Content › record › field);
-      // select first so the panel opens on the right element.
       composer.selection.select(element as never);
-      composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "content" });
+      composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" });
     },
   },
   {

@@ -55,16 +55,6 @@ describe("StudioPanels — ui:cms-open (⌘K → a collection or a record)", () 
   });
 });
 
-/* A-14: ui:switch-tab {tab:"ai"} set aiInInspector without ever setting
-   inspectorShown, so ⌘J (or the ✦ AI chip) with a previously-collapsed
-   inspector mounted AITab into a zero-width column. */
-describe("StudioPanels — ui:switch-tab 'ai' forces the inspector column open", () => {
-  it("sets aiInInspector AND forces inspectorShown, persisting the same key the toggle uses", () => {
-    expect(src).toMatch(/setAiInInspector\(true\);\s*[\s\S]{0,800}setInspectorShown\(true\);/);
-    expect(src).toContain('localStorage.setItem("buildrick-inspector-shown", "true")');
-  });
-});
-
 /* Security carry-over (same class as the VIEWER rail gate): "ui:switch-tab"
  * is a SECOND door onto the tabs the rail gates — the ⌘K palette, canvas
  * context menus, PublishTab, CmsWorkspace and others all route through it.

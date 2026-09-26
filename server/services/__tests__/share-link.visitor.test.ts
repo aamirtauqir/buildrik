@@ -118,7 +118,8 @@ describe("getShareDraftRows", () => {
      CMS-bound element in a shared draft showed its placeholder copy. */
   it("carries the site's CMS bindings to the draft render", async () => {
     const bindings = { field: { h1: [{ binding: { sourceId: "cms:c", path: "t", type: "variable" }, collectionId: "c", fieldSlug: "t", property: "content" }] } };
-    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: bindings, sitePages: [] } as never);
+    const page = { id: "p1", name: "Home", slug: "home", position: 0, isHomePage: true, meta: null, settings: null, blocks: { id: "h1", type: "heading" } };
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: bindings, sitePages: [page] } as never);
 
     const rows = await getShareDraftRows("s1");
 
@@ -189,6 +190,19 @@ describe("getShareDraftRows", () => {
     const notes = rows.cms.collections.find((c) => c.id === "notes")!;
     expect((notes.fields as Array<{ slug: string }>).map((f) => f.slug)).toEqual(["title", "name"]);
     expect(JSON.stringify(rows.cms)).not.toContain("fire Bob");
+  });
+
+  /* L-5: the bindings map itself went out verbatim, so a binding on a HIDDEN
+     page still told an anonymous visitor its collection id and field slug.
+     Only bindings on the delivered pages' elements ship. */
+  it("ships only the bindings on the delivered pages' elements", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: bindings, sitePages: [visible, hidden] } as never);
+    vi.mocked(prisma.cmsCollection.findMany).mockResolvedValue([] as never);
+
+    const rows = await getShareDraftRows("s1");
+
+    expect(rows.site.projectCmsBindings).toEqual({ field: { t2: bindings.field.t2 }, collection: bindings.collection });
+    expect(JSON.stringify(rows)).not.toContain("secret");
   });
 
   it("queries no CMS at all for a site without bindings", async () => {

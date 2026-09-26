@@ -351,7 +351,15 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     () => (reviewsEnabled ? new Set() : new Set<GroupedTabId>(["review"])),
     [reviewsEnabled],
   );
-  useSidebarKeyboard(onTabChange, openAssistant, disabledTabs);
+  /* Gap walk 93 #1: a letter is a door, not a tab switch. Switching alone
+     left a closed column closed (U → Esc → H opened nothing), so the letters
+     take the same open-this-tab event I does: it switches, opens the panel,
+     and applies the viewer gate. */
+  const openTab = React.useCallback(
+    (tab: GroupedTabId) => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab }),
+    [composer],
+  );
+  useSidebarKeyboard(openTab, openAssistant, disabledTabs);
 
   const { addToast } = useToast();
 

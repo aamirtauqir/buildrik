@@ -73,6 +73,7 @@ import {
   type RoundListRow,
   type ReviewComment,
 } from "../../../../services/ReviewService";
+import { writeClipboardText } from "@/shared/utils/clipboard";
 
 export interface ReviewTabProps {
   /** Opened from a History › Activity row: draw the "‹ Activity" row. */
@@ -511,7 +512,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      unanchored comment links to its page. */
   const copyLink = React.useCallback(async (c: ReviewComment) => {
     try {
-      await navigator.clipboard.writeText(elementDeepLink(c.targetSelector ? anchorId(c.targetSelector) : null, c.pageId));
+      await writeClipboardText(elementDeepLink(c.targetSelector ? anchorId(c.targetSelector) : null, c.pageId));
       setNotice("Link copied");
     } catch {
       setNotice("Couldn't copy the link — copy it from the address bar.");

@@ -17,6 +17,7 @@ let statusState: {
   error?: { data?: { code: string } } | null;
 };
 
+vi.mock("@/components/dashboard/toast-provider", () => ({ useToast: () => ({ addToast: vi.fn() }) }));
 vi.mock("@lib/trpc/client", () => ({
   trpc: {
     webhooks: {

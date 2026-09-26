@@ -9,6 +9,7 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, Modal, PageHeader, InputField, FilterTabs, SelectField } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
 import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
+import { writeClipboardText } from "@lib/clipboard";
 
 type MediaType = "image" | "video" | "icon" | "font";
 
@@ -176,9 +177,13 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   };
 
   const copyUrl = (id: string, url: string) => {
-    navigator.clipboard.writeText(url);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId((c) => (c === id ? null : c)), 1500);
+    writeClipboardText(url).then(
+      () => {
+        setCopiedId(id);
+        setTimeout(() => setCopiedId((c) => (c === id ? null : c)), 1500);
+      },
+      () => addToast("error", "Couldn't copy the URL", url),
+    );
   };
 
   const rawItems = assets.data?.pages.flatMap((p) => p.items) ?? [];

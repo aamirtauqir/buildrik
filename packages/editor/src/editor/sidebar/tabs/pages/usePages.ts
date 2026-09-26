@@ -25,6 +25,7 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { slugify } from "@shared/utils/helpers/string";
 import type { PageItem, PageStatus } from "./types";
 import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
+import { writeClipboardText } from "@/shared/utils/clipboard";
 
 /** A page's stored visibility → its panel status. Unset is "live" (what the
  *  deploy does with it). C4 #26: a "password" stored before Password pages
@@ -333,20 +334,9 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       const url = `https://${domain}/${slug}`;
       const successMsg = `Link copied: ${url}`;
 
-      // A8: navigator.clipboard is undefined in non-secure contexts (http://,
-      // some iframes). Fall back to a toast that shows the URL so the user
-      // can copy manually, instead of throwing TypeError.
-      if (!navigator.clipboard?.writeText) {
-        addToast({
-          description: `Copy manually: ${url}`,
-          tone: "info",
-          duration: 8000,
-        });
-        return;
-      }
-
-      navigator.clipboard
-        .writeText(url)
+      // A8: a copy that cannot land (no clipboard on an insecure origin,
+      // or refused) shows the URL so the user can copy it by hand.
+      writeClipboardText(url)
         .then(() => addToast({ description: successMsg, tone: "success", duration: 5000 }))
         .catch(() => {
           addToast({

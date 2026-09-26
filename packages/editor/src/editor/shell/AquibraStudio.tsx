@@ -583,12 +583,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
      swaps it in for ProInspector the same way it swaps in the AI drill-in.
      Built here (not in StudioPanels) because it needs `requestBrandToken`
      and `composer.designSystem`, both already in scope on this component. */
-  const issuesPanel = issuesOpen ? (
+  /* StudioPanels supplies the back row's action: "‹ Inspector" also shows a
+     hidden inspector, a state that lives there (M-1). */
+  const renderIssuesPanel = (onBack: () => void) => (
     <IssuesPanel
       issues={state.issues}
       activePageId={activePageId}
       onClose={() => setIssuesOpen(false)}
-      onBack={() => setIssuesOpen(false)}
+      onBack={onBack}
       /* B9 / SH-63 — a row click lands on the canvas: the element the
          issue names, else the first element that uses its token (the
          engine's usage tracker knows), else the Brand panel where the
@@ -624,7 +626,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       scanState={issuesFeed.scanState}
       onRescan={issuesFeed.rescan}
     />
-  ) : null;
+  );
 
   return (
     <div
@@ -746,7 +748,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         nextMove={nextMove}
         onRequestPublish={requestPublish}
         issuesOpen={issuesOpen}
-        issuesPanel={issuesPanel}
+        renderIssuesPanel={renderIssuesPanel}
         onCloseIssues={() => setIssuesOpen(false)}
         // FB-4: closes Review's ⌘K row, "R" shortcut and panel render when
         // the server's agency review layer is off — the topbar pill stays

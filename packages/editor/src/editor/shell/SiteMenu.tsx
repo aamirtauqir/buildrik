@@ -66,6 +66,9 @@ export interface SiteMenuProps {
   onReplayOnboarding?: () => void;
   /** Copies the live URL — off-board, kept (see the header). */
   onCopyLiveUrl?: () => void;
+  /** team.* is ADMIN-gated; false withholds "Invite teammates ↗", which
+   *  otherwise lands a non-admin on "Team is admin-only" (gap walk 93 #8). */
+  canInviteTeammates?: boolean;
 }
 
 function openDashboard(path: string) {
@@ -86,6 +89,7 @@ const PLANNED = "tw:ml-auto tw:text-[11px] tw:font-medium tw:uppercase tw:tracki
 export const SiteMenu: React.FC<SiteMenuProps> = ({
   onReplayOnboarding,
   onCopyLiveUrl,
+  canInviteTeammates = true,
   onOpenSiteSettings,
   onExportCode,
   onDuplicateSite,
@@ -248,7 +252,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                     Site health ↗
                   </MenuItem>
                 ) : null}
-                <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates ↗</MenuItem>
+                {canInviteTeammates ? (
+                  <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates ↗</MenuItem>
+                ) : null}
                 <MenuItem onClick={run(() => openDashboard("/dashboard/settings/account"))}>Account settings ↗</MenuItem>
               </MenuGroup>
             </>
