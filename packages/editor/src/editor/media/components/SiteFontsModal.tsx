@@ -107,10 +107,12 @@ export function SiteFontsModal({ composer }: SiteFontsModalProps) {
     const reload = () => setFonts(composer.media.getAssets({ type: "font" }));
     reload();
     composer.media.on(MEDIA_EVENTS.MEDIA_ADDED, reload);
+    composer.media.on(MEDIA_EVENTS.MEDIA_ADDED_BATCH, reload);
     composer.media.on(MEDIA_EVENTS.MEDIA_UPDATED, reload);
     composer.media.on(MEDIA_EVENTS.MEDIA_DELETED, reload);
     return () => {
       composer.media.off(MEDIA_EVENTS.MEDIA_ADDED, reload);
+      composer.media.off(MEDIA_EVENTS.MEDIA_ADDED_BATCH, reload);
       composer.media.off(MEDIA_EVENTS.MEDIA_UPDATED, reload);
       composer.media.off(MEDIA_EVENTS.MEDIA_DELETED, reload);
     };

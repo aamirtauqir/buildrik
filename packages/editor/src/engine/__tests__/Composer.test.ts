@@ -254,12 +254,46 @@ describe("Composer listener hygiene", () => {
     vi.unstubAllGlobals();
   });
 
+  /* D-10 fix-round-1 (controller finding): this used to fake the event
+     directly (`composer.media.emitEvent("media:added", ...)`), which
+     never exercised `importServerAssets` — the ACTUAL path
+     `useComposerInit.ts:257` calls on every project load, and the one
+     D-10 changed to emit MEDIA_ADDED_BATCH instead of one MEDIA_ADDED per
+     asset. That rewrite let a real regression (Composer.ts's
+     syncLibraryFont only listened for MEDIA_ADDED) pass silently. Calling
+     the real `importServerAssets` is what proves the wiring end to end. */
   it("3686:42317 · a font added on another device is registered when the library imports it", async () => {
     stubFontFaces();
     const composer = new Composer({} as any);
     await composer.whenReady();
-    // `importServerAssets` announces each row as media:added, carrying the flag it read back.
-    composer.media.emitEvent("media:added", interVar({ id: "srv-2", src: "https://cdn/inter.woff2", siteFont: true }));
+    // The jsdom indexedDB polyfill above only stubs the raw open/get/put/
+    // getAll calls this file's OTHER tests never exercise (they emit fake
+    // events directly). importServerAssets goes through
+    // MediaStorage.saveAsset's IndexedDBAdapter.runTransaction, which needs
+    // real transaction (oncomplete) semantics the polyfill doesn't provide
+    // — stub the storage write the same way MediaManager.serverMirror.test.ts
+    // does, since this test is about the Composer↔MediaManager event wiring,
+    // not IndexedDB persistence.
+    (composer.media as unknown as { storage: { saveAsset: () => Promise<void> } }).storage.saveAsset =
+      vi.fn(async () => {});
+    await composer.media.importServerAssets(
+      [
+        {
+          id: "srv-2",
+          url: "https://cdn/inter.woff2",
+          bytes: 1024,
+          type: "font",
+          mimeType: "font/woff2",
+          filename: "Inter-Var.woff2",
+          altText: null,
+          folderId: null,
+          createdAt: "2026-09-26T00:00:00.000Z",
+          updatedAt: "2026-09-26T00:00:00.000Z",
+          userMetadata: { siteFont: true },
+        },
+      ],
+      [],
+    );
     await vi.waitFor(() =>
       expect(composer.fonts.getAllFonts({ source: "custom" }).map((f) => f.family)).toEqual(["Inter Var"]),
     );
