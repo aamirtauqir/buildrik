@@ -7,7 +7,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-const role = vi.hoisted(() => ({ current: "OWNER" as string }));
+const role = vi.hoisted(() => ({ current: "OWNER" as string | undefined }));
 
 vi.mock("@lib/trpc/client", async () => {
   const { trpcStub } = await import("@/components/__test-utils__/trpc-stub");
@@ -16,7 +16,7 @@ vi.mock("@lib/trpc/client", async () => {
     trpc: new Proxy(stub.trpc as object, {
       get(target, key) {
         if (key === "dashboard") {
-          return { health: { useQuery: () => ({ data: { role: role.current }, isLoading: false }) }, stats: { invalidate: vi.fn() } };
+          return { health: { useQuery: () => (role.current ? { data: { role: role.current }, isLoading: false } : { data: undefined, isLoading: true }) }, stats: { invalidate: vi.fn() } };
         }
         return Reflect.get(target, key);
       },
@@ -42,5 +42,16 @@ describe("QuickActions — Invite teammate is admin-only", () => {
     const button = screen.getByRole("button", { name: /Invite teammate/ });
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute("title", "Only workspace admins can invite teammates.");
+  });
+});
+
+/* M-8: while dashboard.health loads (or fails) the role is unknown — an admin
+   must not see their own door disabled with "Only workspace admins…". The
+   server still answers; only a KNOWN non-admin is withheld. */
+describe("QuickActions — an unknown role keeps the door", () => {
+  it("links Invite teammate while the role is still loading", () => {
+    role.current = undefined;
+    render(<QuickActions />);
+    expect(screen.getByRole("link", { name: /Invite teammate/ })).toHaveAttribute("href", "/dashboard/settings/team");
   });
 });

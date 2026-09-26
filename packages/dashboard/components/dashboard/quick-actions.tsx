@@ -25,8 +25,11 @@ export function QuickActions() {
   // team.* is ADMIN-gated, so "Invite teammate" led everyone else to "Team is
   // admin-only" (gap walk 93 #8). Withheld the way api-tokens and integrations
   // withhold their admin doors: disabled, with the reason, from the same role.
+  // Only a KNOWN non-admin is withheld: while the role loads or the query
+  // fails it is unknown, and the server still decides (M-8).
   const health = trpc.dashboard.health.useQuery();
-  const isAdmin = health.data?.role === "OWNER" || health.data?.role === "ADMIN";
+  const role = health.data?.role;
+  const knownNonAdmin = role != null && role !== "OWNER" && role !== "ADMIN";
 
   // Same contract the Projects screen uses: a blank site is created inline,
   // the template and AI methods carry the name into the full flow.
@@ -51,7 +54,7 @@ export function QuickActions() {
 
       {ACTIONS.map((action) => {
         const Icon = action.icon;
-        if (action.adminOnly && !isAdmin) {
+        if (action.adminOnly && knownNonAdmin) {
           return (
             <Button key={action.label} variant="ghost" disabled title={ADMIN_ONLY_INVITE} className="tw:justify-start gap-[9px]">
               <Icon className="h-4 w-4" strokeWidth={2} /> {action.label}
