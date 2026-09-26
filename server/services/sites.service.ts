@@ -11,6 +11,7 @@ import type {
   SaveProjectDataInput,
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
+import { filterCmsBindings, MAX_CMS_BINDINGS_BYTES } from "@buildrik/shared/schemas/sites";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 
@@ -498,9 +499,9 @@ export async function duplicateSite(
  *  element id the copy's re-id renamed (the same copy the editor makes on
  *  load — `Composer.importProject`). Null stays unset. */
 function copyCmsBindings(stored: Prisma.JsonValue, renames: IdRename[]): Prisma.InputJsonValue | undefined {
-  if (!stored) return undefined;
-  // Written only through cmsBindingsSchema (saveProjectData).
-  const { field, collection } = stored as CmsBindingsInput;
+  const filtered = filterCmsBindings(stored);
+  if (!filtered) return undefined;
+  const { field, collection } = filtered;
   return {
     ...(field ? { field: copyIdKeyedRecord(field, renames) } : {}),
     ...(collection ? { collection: copyIdKeyedRecord(collection, renames) } : {}),
@@ -684,6 +685,15 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // queries are written raw into the published stylesheet — same boundary.
   sanitizeProjectStyles(input.styles);
 
+  // Bad entries were already dropped per entry (cmsBindingsSchema). A map
+  // past the size cap is not stored — the save and its pages still land, the
+  // previously stored bindings stay.
+  let cmsBindings = input.cmsBindings;
+  if (cmsBindings && JSON.stringify(cmsBindings).length > MAX_CMS_BINDINGS_BYTES) {
+    console.warn(`[saveProjectData] site=${input.siteId} cmsBindings over ${MAX_CMS_BINDINGS_BYTES} bytes — not stored`);
+    cmsBindings = undefined;
+  }
+
   await prisma.$transaction(async (tx) => {
     /* 61-conflict / A-2: optimistic concurrency as a compare-and-swap, FIRST in
        the transaction. The `lastEditedAt` match is part of the UPDATE's WHERE,
@@ -715,7 +725,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
         dsSchemaVersion: input.dsSchemaVersion,
         // Undefined (an editor build that predates the field) leaves the
         // stored bindings alone; the editor always sends its full map.
-        projectCmsBindings: input.cmsBindings as Prisma.InputJsonValue | undefined,
+        projectCmsBindings: cmsBindings as Prisma.InputJsonValue | undefined,
         lastEditedAt: savedAt,
         ...(isFullSnapshot ? { pages: input.pages.length } : {}),
       },

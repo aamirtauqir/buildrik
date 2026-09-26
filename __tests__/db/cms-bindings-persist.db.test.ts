@@ -10,6 +10,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { editorSaveProjectSchema } from "@buildrik/shared/schemas/sites";
+import { prisma } from "@/lib/prisma";
 import { getProjectData, getSite, saveProjectFromEditor } from "@/server/services/sites.service";
 import { createTestUser, createTestWorkspace, createTestSite, createTestPage, truncateTables } from "./helpers";
 
@@ -87,13 +88,45 @@ describe("CMS bindings persistence (Ldata bug B)", () => {
     expect((await getSite(site.id))?.projectCmsBindings).toEqual(BINDINGS);
   });
 
-  it("refuses an element id that is not a safe element id", () => {
-    const bad = { field: { 'x"><script>': BINDINGS.field["heading-1"] } };
-    expect(() =>
-      editorSaveProjectSchema.parse({
-        siteId: "s",
-        projectData: { version: "1", pages: [], styles: [], assets: [], cmsBindings: bad },
-      }),
-    ).toThrow();
+  /* Ldata I2: one bad entry used to fail the whole save (zod rejected the
+     request), so the pages were lost with it. Bad entries are now dropped one
+     by one, like sanitizeProjectStyles drops bad rules. */
+  it("a save with one bad binding persists the pages and the valid bindings", async () => {
+    const { site, page } = await seed();
+    const good = BINDINGS.field["heading-1"][0];
+    const withBad = {
+      field: {
+        "heading-1": [good, { ...good, property: 42 }], // second entry malformed
+        'x"><script>': [good], // unsafe element id
+      },
+      collection: {
+        "list-1": BINDINGS.collection["list-1"],
+        "list-2": { ...BINDINGS.collection["list-1"], elementId: "list-2", limit: 999_999 }, // out of range
+      },
+    };
+
+    await editorSave(site.id, page.id, withBad, site.lastEditedAt.toISOString());
+
+    const stored = await getSite(site.id);
+    expect(stored?.projectCmsBindings).toEqual(BINDINGS);
+    const savedPage = await prisma.page.findUniqueOrThrow({ where: { id: page.id } });
+    expect(savedPage.blocks).toEqual({ id: "root", type: "container", children: [] });
+  });
+
+  it("an oversized binding map is not stored, and the save still lands", async () => {
+    const { site, page } = await seed();
+    await editorSave(site.id, page.id, BINDINGS);
+    const huge = {
+      field: Object.fromEntries(
+        Array.from({ length: 4000 }, (_, i) => [
+          `el-${i}`,
+          [{ ...BINDINGS.field["heading-1"][0], fallback: "x".repeat(400) }],
+        ]),
+      ),
+    };
+
+    await editorSave(site.id, page.id, huge);
+
+    expect((await getSite(site.id))?.projectCmsBindings).toEqual(BINDINGS);
   });
 });
