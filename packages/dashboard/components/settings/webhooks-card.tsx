@@ -14,7 +14,7 @@ import { useEffect, useId, useState } from "react";
 import { Checkbox } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { Button, InputField, Pill } from "@/components/dashboard/primitives";
-import { IntegrationCard } from "@/components/settings/integrations-content";
+import { IntegrationCard } from "@/components/settings/integration-card";
 
 const EVENTS = [
   { id: "site.publish", label: "site.publish — fires after every successful publish" },
