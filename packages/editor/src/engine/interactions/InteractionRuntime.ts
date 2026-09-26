@@ -315,7 +315,10 @@ export class InteractionRuntime {
     );
     const loop = animation.loop ?? legacy.iterations ?? 1;
 
-    gsapEngine
+    // D-12: createAnimation is async (lazy-loads gsap on first use). The
+    // interaction hooks that call playAnimation are all fire-and-forget
+    // event callbacks, so this stays void and plays once gsap resolves.
+    void gsapEngine
       .createAnimation({
         id: `${interaction.id}-${Date.now()}`,
         target: targetId,
@@ -324,7 +327,7 @@ export class InteractionRuntime {
         loop: loop === -1,
         repeatCount: loop > 0 ? loop - 1 : 0,
       })
-      ?.timeline.play();
+      .then((instance) => instance?.timeline.play());
   }
 
   private reverseAnimation(id: string, interaction: Interaction): void {

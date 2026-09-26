@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import JSZip from "jszip";
+import type JSZip from "jszip";
 import type { PageData } from "../../shared/types";
 import type {
   ExportConfig,
@@ -1248,7 +1248,10 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
    */
   async generateZip(config?: Partial<ExportConfig>): Promise<Blob> {
     const cfg = { ...this.config, ...config };
-    const zip = new JSZip();
+    // D-12: JSZip is a heavy dep only needed on the ZIP export path — lazy
+    // import keeps it out of the /edit/:id first-load chunk.
+    const { default: JSZipCtor } = await import("jszip");
+    const zip: JSZip = new JSZipCtor();
     const bundler = new AssetBundler();
 
     // EVERY page, not just the open one. This built its archive from
