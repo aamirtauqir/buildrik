@@ -278,7 +278,7 @@ describe("generateDynamicPages — dangerous-scheme sink defence (controller rev
     entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)" } }]);
     const out = await generateDynamicPages("s1", "c1", TEMPLATE);
     expect(out[0].content).not.toContain("javascript:");
-    expect(out[0].content).toContain('<a href="">Go</a>');
+    expect(out[0].content).toContain("<a>Go</a>"); // the attribute is removed, the link text kept
   });
 
   it("catches a scheme hidden behind control characters (java\\tscript:)", async () => {
@@ -292,12 +292,12 @@ describe("generateDynamicPages — dangerous-scheme sink defence (controller rev
     colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
     entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "vbscript:msgbox(1)" } }]);
     const vb = await generateDynamicPages("s1", "c1", TEMPLATE);
-    expect(vb[0].content).toContain('href=""');
+    expect(vb[0].content).toContain("<a>Go</a>");
 
     colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
     entFindMany.mockResolvedValueOnce([{ id: "e2", data: { link: "data:text/html,<script>alert(1)</script>" } }]);
     const data = await generateDynamicPages("s1", "c1", TEMPLATE);
-    expect(data[0].content).toContain('href=""');
+    expect(data[0].content).toContain("<a>Go</a>");
   });
 
   it("leaves a legitimate https value, and a same-site relative path, untouched", async () => {
@@ -408,7 +408,9 @@ describe("generateDynamicPages — legitimate template markup survives the parse
     expect(html).toContain('<input type="email" name="email" required="">');
     expect(html).toContain('formaction="/subscribe/alt"'); // formaction survives on a real <input>/<button>, not just named-and-checked
     expect(html).toContain('style="background:url(/bg.jpg);color:#111"'); // a SAFE style url() is untouched
-    expect(html).toContain("© 2026"); // the entity round-trips as its character, same as the pre-existing escapeHtml/HTML-parsing behavior elsewhere in this file
+    // x4 round 3: a clean page is not re-serialized at all — the only
+    // differences from the template are the substitution and the SEO title.
+    expect(html).toBe(CLEAN_TEMPLATE.replace("{title}", "Welcome").replace("</head>", "<title></title></head>"));
   });
 });
 

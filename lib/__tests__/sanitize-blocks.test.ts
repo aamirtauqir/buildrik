@@ -385,7 +385,87 @@ describe("project style rules and element ids (S-1 review round 4)", () => {
 // srcset candidate, style="url(...)", case). This runs a real parser
 // (DOMPurify/jsdom) instead of pattern-matching HTML context. Consumer:
 // `cms.service.ts`'s `generateDynamicPages`, over the WHOLE substituted page.
+/**
+ * A clean dynamic page as publish produces it: ExportEngine.wrapInDocument's
+ * minified shell (DOCTYPE, `<html lang>`, meta charset/viewport), SEOInjector's
+ * head (description, canonical, og:*, twitter:*, icon, robots, JSON-LD), the
+ * inlined stylesheet (exportPublishPages), the Google Fonts links
+ * (googleFontsHeadLinks — boolean `crossorigin`, a raw `&` in the href), the
+ * locale-redirect snippet, and the body the publish worker hands on: a wired
+ * form (x2's `_return`/honeypot fields, `data-success-message`, the form page
+ * script), a slider with its runtime script, srcset with a data: image, SVG
+ * `<use xlink:href>`, `whatsapp:`/`mailto:`/`tel:` links, and ids/names that
+ * are also DOM property names (DOMPurify's clobbering check strips those).
+ * Hand-built from those emitters, not captured from a live publish.
+ */
+const EXPORTED_PAGE = [
+  "<!DOCTYPE html>",
+  '<html lang="en"><head>',
+  '<meta charset="UTF-8">',
+  '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+  "<title>Bella Cucina — Menu</title>",
+  '<meta name="description" content="Seasonal plates &amp; natural wine.">',
+  '<link rel="canonical" href="https://bella.example.com/menu">',
+  '<meta property="og:locale" content="en">',
+  '<meta property="og:type" content="website">',
+  '<meta property="og:title" content="Bella Cucina — Menu">',
+  '<meta property="og:description" content="Seasonal plates &amp; natural wine.">',
+  '<meta property="og:image" content="https://cdn.example.com/og.jpg">',
+  '<meta property="og:url" content="https://bella.example.com/menu">',
+  '<meta property="og:site_name" content="Bella Cucina">',
+  '<meta name="twitter:card" content="summary_large_image">',
+  '<meta name="twitter:title" content="Bella Cucina — Menu">',
+  '<link rel="icon" href="/favicon.png">',
+  '<meta name="robots" content="index, follow">',
+  '<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Bella Cucina — Menu","url":"https://bella.example.com/menu"}</script>',
+  "<style>body{margin:0;font-family:Inter}.hero{background:url(/bg.jpg)}.a>.b{content:\"<\"}</style>",
+  '<link rel="preconnect" href="https://fonts.googleapis.com">',
+  '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
+  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">',
+  '<script>(function(){try{if(sessionStorage.getItem("brk-locale-redirect"))return;var p=location.pathname;if(p.length>1&&p.indexOf("/fr/")<0){}}catch(e){}})();</script>',
+  "</head><body>",
+  '<nav class="buildrick-el-nav"><a href="/">Home</a><a href="/menu" target="_blank" rel="noopener noreferrer">Menu</a>',
+  '<a href="whatsapp://send?text=Hi">WhatsApp</a><a href="mailto:hi@bella.example.com">Email</a><a href="tel:+15551234">Call</a></nav>',
+  '<section id="location" class="hero" style="background:url(&quot;/hero.jpg&quot;) center/cover;color:#fff" data-buildrick-id="el-1">',
+  '<h1 id="title">Tom &amp; Jerry &lt;3</h1>',
+  '<img src="/dish.jpg" srcset="data:image/png;base64,iVBORw0KGgo= 1x, /dish@2x.jpg 2x" alt="Dish" loading="lazy" width="640" height="480">',
+  '<picture><source srcset="/dish.webp 1x, /dish@2x.webp 2x" type="image/webp"><img src="/dish.jpg" alt=""></picture>',
+  '<video src="/clip.mp4" poster="/clip.jpg" controls muted playsinline></video>',
+  '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><use xlink:href="#icon-star"></use></svg>',
+  "</section>",
+  '<div class="bk-slider" data-buildrick-slider="1" data-autoplay="true" data-interval="5000" data-buildrick-id="el-2">',
+  '<div class="bk-slide"><img src="/s1.jpg" alt="One"></div><div class="bk-slide"><img src="/s2.jpg" alt="Two"></div></div>',
+  '<form data-buildrick-id="el-3" name="reserve" aria-label="Reserve" action="https://app.buildrick.io/api/public/forms/site1/el-3" method="POST" data-success-message="Thanks — see you soon!">',
+  '<input type="hidden" name="_return" value="">',
+  '<input type="text" name="_honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" data-buildrick-honeypot="1">',
+  '<label for="email">Email</label><input id="email" type="email" name="email" required placeholder="you@example.com">',
+  '<button type="submit" name="submit">Book</button><button formaction="/alt" name="action">Alt</button></form>',
+  "<script data-buildrick-slider-runtime>(function(){var s=document.querySelectorAll('[data-buildrick-slider]');for(var i=0;i<s.length;i++){if(s[i].children.length<2)continue;}})();</script>",
+  '<script data-buildrick-form-success>(function(){\ntry{\nvar r=document.querySelectorAll(\'input[name="_return"]\');\nfor(var i=0;i<r.length;i++){r[i].value=location.href;}\n}catch(e){}\n})();</script>',
+  "</body></html>",
+].join("");
+
 describe("sanitizeGeneratedPageHtml", () => {
+  it("returns a clean exported page byte-for-byte (og:* meta, JSON-LD, form/slider scripts, whatsapp:, DOM-named ids)", () => {
+    expect(sanitizeGeneratedPageHtml(EXPORTED_PAGE)).toBe(EXPORTED_PAGE);
+  });
+
+  it("still catches a dangerous substitution inside that page, and keeps the rest", () => {
+    const hostile = EXPORTED_PAGE.replace('href="/menu" target', 'href="javascript:alert(1)" target');
+    const out = sanitizeGeneratedPageHtml(hostile);
+    expect(out).not.toMatch(/javascript:/i);
+    expect(out).toContain('<meta property="og:title" content="Bella Cucina — Menu">');
+    expect(out).toContain('href="whatsapp://send?text=Hi"');
+    expect(out).toContain('id="title"');
+    expect(out).toContain('name="submit"');
+  });
+
+  it("drops srcdoc (the shared FORBIDDEN_ATTRIBUTES) from a generated page", () => {
+    const out = sanitizeGeneratedPageHtml('<html><body><iframe srcdoc="&lt;img src=x onerror=alert(1)&gt;" title="ok"></iframe>x</div></body></html>');
+    expect(out).not.toMatch(/srcdoc/i);
+    expect(out).toContain('title="ok"');
+  });
+
   it("removes a javascript: href regardless of quoting, case, or whitespace", () => {
     const html =
       '<html><body>' +
@@ -405,7 +485,7 @@ describe("sanitizeGeneratedPageHtml", () => {
     expect(out).toContain("/b.jpg");
   });
 
-  it("blanks a style attribute whose url() resolves to a dangerous scheme", () => {
+  it("removes a style attribute whose url() resolves to a dangerous scheme", () => {
     const html = '<html><body><div style="background:url(javascript:alert(1));color:red">x</div></body></html>';
     const out = sanitizeGeneratedPageHtml(html);
     expect(out).not.toMatch(/javascript:/i);
@@ -418,6 +498,12 @@ describe("sanitizeGeneratedPageHtml", () => {
     const out = sanitizeGeneratedPageHtml(html);
     expect(out).not.toMatch(/javascript:/i);
     expect(out).toContain("data:image/png;base64,AAAA");
+  });
+
+  it("keeps a data: image srcset candidate whole — its base64 comma is not a candidate break", () => {
+    const html = '<html><body><img srcset="data:image/png;base64,AAAA 1x, /b.png 2x"></body></html>';
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).toContain('srcset="data:image/png;base64,AAAA 1x, /b.png 2x"');
   });
 
   it("leaves a safe style url() and every other URL-bearing attribute shape untouched", () => {

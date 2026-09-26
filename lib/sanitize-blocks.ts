@@ -286,14 +286,6 @@ export function sanitizeTemplateHtml(html: string): string {
 // `unsafeAttributeReason` does (round 2's own test asserts the safe candidate
 // survives).
 
-/** Each `srcset` candidate is `<url> [descriptor]`; a dangerous URL can sit
- *  in any candidate, not just the first. The safe candidates are kept. */
-function sanitizeSrcsetValue(value: string): string {
-  return srcsetCandidates(value)
-    .filter((candidate) => !srcsetUrls(candidate).some(isDangerousUrl))
-    .join(", ");
-}
-
 // `<script>`/`<style>` content is raw text a browser never parses as HTML —
 // but DOMPurify's underlying parser can still misparse a `<`-containing JS/CSS
 // string INSIDE one (e.g. `var s = "<b>";`) and drop the whole element. Their
@@ -314,11 +306,12 @@ const SPAN_PLACEHOLDER_RE = /<style>\/\*BD_DYNPAGE_SPAN_(\d+)\*\/<\/style>/g;
  * pass exists only to catch a dangerous URL a template substitution
  * introduced, never to re-litigate which tags a page may contain); `on*`
  * event-handler attributes are the one exception, left to DOMPurify's
- * default stripping. A URL-bearing attribute (`URL_ATTRIBUTES` — href/src/
- * action/formaction/poster/xlink:href), each `srcset` candidate, and a
- * `style` value containing a dangerous `url()` are checked with
- * `isDangerousUrl` and blanked if unsafe. DOCTYPE is preserved manually —
- * DOMPurify's WHOLE_DOCUMENT mode drops it.
+ * default stripping, and `FORBIDDEN_ATTRIBUTES` (srcdoc) is always dropped.
+ * A URL-bearing attribute (`URL_ATTRIBUTES` — href/src/action/formaction/
+ * poster/xlink:href) with a dangerous URL, and a `style` with a dangerous
+ * `url()` (`cssValueHasDangerousUrl`), are removed; a `srcset` loses only its
+ * dangerous candidates. A clean page is returned byte-for-byte. DOCTYPE is
+ * preserved manually — DOMPurify's WHOLE_DOCUMENT mode drops it.
  */
 export function sanitizeGeneratedPageHtml(html: string): string {
   const spans: string[] = [];
@@ -335,31 +328,58 @@ export function sanitizeGeneratedPageHtml(html: string): string {
   const elementHook: UponSanitizeElementHook = (_currentNode, data) => {
     data.allowedTags[data.tagName] = true;
   };
-  const attributeHook: UponSanitizeAttributeHook = (_currentNode, data) => {
-    const name = data.attrName.toLowerCase();
-    if (EVENT_HANDLER_ATTR.test(name)) return; // defense-in-depth: keep DOMPurify's default strip
-    data.allowedAttributes[name] = true;
-    if (name === "srcset") {
-      data.attrValue = sanitizeSrcsetValue(data.attrValue);
-    } else if (name === "style") {
-      // The whole value is dropped rather than one url() cut out of it: this
-      // is a raw attribute string, and rewriting it declaration by declaration
-      // would reformat values that were never unsafe.
-      if (cssValueHasDangerousUrl(data.attrValue)) data.attrValue = "";
-    } else if (URL_ATTRIBUTES.has(name) && isDangerousUrl(data.attrValue)) {
-      data.attrValue = "";
+  let srcsetRewritten = false;
+  // This hook is the whole attribute check. DOMPurify's own
+  // `_isValidAttribute` runs after the hook unless `forceKeepAttr` is set, and
+  // it tests every non-URI-safe value against its URL allowlist — it dropped
+  // `<meta property="og:title">`'s `property`, `whatsapp:` hrefs and ids like
+  // `title`. `forceKeepAttr` skips that and keeps the attribute's CURRENT DOM
+  // value, not `data.attrValue`: an attribute is therefore either removed
+  // (`keepAttr = false`) or rewritten on the node before being force-kept.
+  const attributeHook: UponSanitizeAttributeHook = (node, data) => {
+    const name = data.attrName;
+    const value = data.attrValue;
+    if (EVENT_HANDLER_ATTR.test(name)) return; // DOMPurify's default strip
+    if (
+      FORBIDDEN_ATTRIBUTES.has(name) ||
+      (name === "style" && cssValueHasDangerousUrl(value)) ||
+      (name !== "srcset" && URL_ATTRIBUTES.has(name) && isDangerousUrl(value))
+    ) {
+      data.keepAttr = false;
+      return;
     }
+    if (name === "srcset") {
+      // A dangerous URL can sit in any candidate; the safe ones are kept.
+      const candidates = srcsetCandidates(value);
+      const safe = candidates.filter((candidate) => !srcsetUrls(candidate).some(isDangerousUrl));
+      if (safe.length < candidates.length) {
+        if (safe.length === 0) {
+          data.keepAttr = false;
+          return;
+        }
+        node.setAttribute(name, safe.join(", "));
+        srcsetRewritten = true;
+      }
+    }
+    data.forceKeepAttr = true;
   };
 
   DOMPurify.addHook("uponSanitizeElement", elementHook);
   DOMPurify.addHook("uponSanitizeAttribute", attributeHook);
   let sanitized: string;
+  let untouched: boolean;
   try {
     sanitized = String(DOMPurify.sanitize(body, { WHOLE_DOCUMENT: true }));
+    untouched = DOMPurify.removed.length === 0 && !srcsetRewritten;
   } finally {
     DOMPurify.removeHook("uponSanitizeElement");
     DOMPurify.removeHook("uponSanitizeAttribute");
   }
+  // Nothing was removed or rewritten: the page the browser will parse is the
+  // one DOMPurify just parsed, so it goes out exactly as the exporter wrote it
+  // rather than re-serialized (`crossorigin` → `crossorigin=""`, `&` → `&amp;`
+  // in every href).
+  if (untouched) return html;
 
   const restored = (doctype ? `${doctype}${sanitized}` : sanitized).replace(SPAN_PLACEHOLDER_RE, (_m, i: string) => {
     const span = spans[Number(i)];
