@@ -73,7 +73,11 @@ describe("ComponentDetailScreen — Insert", () => {
     await waitFor(() => expect(toastText()).toContain("Couldn't add"));
   });
 
-  it("stays quiet on a successful insert", async () => {
+  /* A-15 (verify pass 3): Add › Saved components toasted "Component added to
+     canvas"; this Insert — the same action from the Components panel — said
+     nothing, because it carried its own copy of the insert instead of
+     instantiateComponentAtSelection. Both doors now say the same thing. */
+  it("says 'Component added to canvas' on a successful insert, like the Add panel", async () => {
     const composer = makeComposer({ activePage: { id: "p1", root: { id: "root-1" } } });
     render(
       <ToastProvider>
@@ -87,6 +91,6 @@ describe("ComponentDetailScreen — Insert", () => {
           .instantiateComponent,
       ).toHaveBeenCalled(),
     );
-    expect(toastText()).toBe("");
+    await waitFor(() => expect(toastText()).toContain("Component added to canvas"));
   });
 });

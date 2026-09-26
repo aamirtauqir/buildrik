@@ -21,6 +21,8 @@ function makeComposer(opts: {
       getActivePage: () =>
         opts.rootId === null ? null : { root: { id: opts.rootId ?? "root-1" } },
     },
+    beginTransaction: vi.fn(),
+    endTransaction: vi.fn(),
     components: {
       instantiateComponent: opts.instantiate ?? vi.fn().mockResolvedValue("new-el"),
     },
@@ -65,5 +67,12 @@ describe("instantiateComponentAtSelection", () => {
     const result = await instantiateComponentAtSelection(composer, "comp-1");
 
     expect(result).toBe("error");
+  });
+
+  /* instantiateComponent returns null when it refuses the placement; that
+     is not a success (the detail screen knew, the shared helper said "ok"). */
+  it("returns error when the engine refuses the placement (null id)", async () => {
+    const composer = makeComposer({ selectedIds: ["el-1"], instantiate: vi.fn().mockResolvedValue(null) });
+    expect(await instantiateComponentAtSelection(composer, "comp-1")).toBe("error");
   });
 });

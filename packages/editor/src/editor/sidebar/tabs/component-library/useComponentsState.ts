@@ -11,7 +11,7 @@ import type { ComponentDefinition } from "../../../../shared/types/components";
 import { takePendingMaster } from "./openMasterRequest";
 import { deleteComponentWithUndo } from "./ComponentDetailScreen";
 import { useComponentList } from "./useComponentList";
-import { instantiateComponentAtSelection } from "./instantiate";
+import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
 import type { ToastInput } from "@/editor/chrome-ui";
 
 const MAX_COMPONENTS = 100;
@@ -103,20 +103,8 @@ export function useComponentsState({
   const handleInstantiate = React.useCallback(
     async (componentId: string) => {
       if (!composer) return;
-      const result = await instantiateComponentAtSelection(composer, componentId);
-      if (result === "no-parent") {
-        // No selection and no active page root — there's nowhere to drop it.
-        // Previously this silently no-opped: the user clicked "insert" and
-        // nothing happened, with no message.
-        setPendingToast({
-          message: "Open a page first to add this component.",
-          variant: "warning",
-        });
-      } else if (result === "ok") {
-        setPendingToast({ message: "Component added to canvas", variant: "success" });
-      } else {
-        setPendingToast({ message: "Couldn't add component. Try again.", variant: "error" });
-      }
+      const { description, tone } = INSTANTIATE_TOASTS[await instantiateComponentAtSelection(composer, componentId)];
+      setPendingToast({ message: description, variant: tone });
     },
     [composer]
   );
