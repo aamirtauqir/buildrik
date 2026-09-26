@@ -95,167 +95,69 @@ describe("useCanvasKeyboard — Shift+F10 context menu shortcut", () => {
   });
 });
 
-describe("useCanvasKeyboard — multi-select delete", () => {
-  it("deletes all selected elements when multiple are selected and Delete is pressed", () => {
-    const removeElementMock = vi.fn();
-    const syncFromComposerMock = vi.fn();
-    const multiMockComposer = {
+/* Delete/Backspace on the canvas run the ONE delete command. This handler
+   used to delete on its own — removing a locked element's unlocked ancestor
+   whole (A-5: ⌘A + Delete took the locked image with its section), skipping
+   the multi-delete confirm, and toasting an Undo bound to nothing. The lock
+   guard and confirm are the command's (deleteLockedDescendant.test.ts); this
+   pins that the canvas goes there and only hands focus on afterwards. */
+describe("useCanvasKeyboard — Delete runs the delete command", () => {
+  function setup(selectedId: string | null, selectedIds: string[]) {
+    const live = new Set(["el-1", "el-2", "el-3", "root-id"]);
+    const parent = { getId: () => "root-id" };
+    const make = (id: string) => ({
+      getId: () => id,
+      getParent: () => ({ ...parent, getChildren: () => ["el-1", "el-2", "el-3"].map((c) => ({ getId: () => c })) }),
+      getChildren: () => [],
+    });
+    const composer = {
       elements: {
-        removeElement: removeElementMock,
-        getElement: vi.fn().mockImplementation((id) => ({
-          remove: vi.fn(),
-          isLocked: () => false,
-        })),
+        removeElement: vi.fn(),
+        getElement: vi.fn((id: string) => (live.has(id) ? make(id) : null)),
         getActivePage: vi.fn().mockReturnValue({ root: { id: "root-id" } }),
       },
-      beginTransaction: vi.fn(),
-      endTransaction: vi.fn(),
-      selection: { clear: vi.fn() },
-      history: { undo: vi.fn() },
+      commands: { run: vi.fn(() => selectedIds.forEach((id) => live.delete(id))) },
     };
-
+    const select = vi.fn();
+    const clear = vi.fn();
+    const sync = vi.fn();
     const { result } = renderHook(() =>
       useCanvasKeyboard({
-        composer: multiMockComposer as unknown as Composer,
-        selectedId: "el-1",
-        selectedIds: ["el-1", "el-2", "el-3"],
+        composer: composer as unknown as Composer,
+        selectedId,
+        selectedIds,
         editingId: null,
-        select: vi.fn(),
-        clear: vi.fn(),
-        syncFromComposer: syncFromComposerMock,
+        select,
+        clear,
+        syncFromComposer: sync,
       })
     );
+    const press = (key: string) =>
+      act(() => {
+        result.current.handleKeyDown(new KeyboardEvent("keydown", { key }) as unknown as React.KeyboardEvent);
+      });
+    return { composer, select, clear, sync, press };
+  }
 
-    act(() => {
-      result.current.handleKeyDown(
-        new KeyboardEvent("keydown", { key: "Delete" }) as unknown as React.KeyboardEvent
-      );
-    });
-
-    expect(removeElementMock).toHaveBeenCalledTimes(3);
-    expect(multiMockComposer.beginTransaction).toHaveBeenCalled();
-    expect(multiMockComposer.endTransaction).toHaveBeenCalled();
-    expect(multiMockComposer.selection.clear).toHaveBeenCalled();
-    expect(syncFromComposerMock).toHaveBeenCalled();
+  it.each(["Delete", "Backspace"])("a multi-selection %s goes through the command, never removeElement", (key) => {
+    const { composer, sync, press } = setup("el-1", ["el-1", "el-2", "el-3"]);
+    press(key);
+    expect(composer.commands.run).toHaveBeenCalledWith("delete");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(sync).toHaveBeenCalled();
   });
 
-  it("deletes all selected elements when multiple are selected and Backspace is pressed", () => {
-    const removeElementMock = vi.fn();
-    const syncFromComposerMock = vi.fn();
-    const multiMockComposer = {
-      elements: {
-        removeElement: removeElementMock,
-        getElement: vi.fn().mockImplementation(() => ({
-          remove: vi.fn(),
-          isLocked: () => false,
-        })),
-        getActivePage: vi.fn().mockReturnValue({ root: { id: "root-id" } }),
-      },
-      beginTransaction: vi.fn(),
-      endTransaction: vi.fn(),
-      selection: { clear: vi.fn() },
-      history: { undo: vi.fn() },
-    };
-
-    const { result } = renderHook(() =>
-      useCanvasKeyboard({
-        composer: multiMockComposer as unknown as Composer,
-        selectedId: "el-1",
-        selectedIds: ["el-1", "el-2", "el-3"],
-        editingId: null,
-        select: vi.fn(),
-        clear: vi.fn(),
-        syncFromComposer: syncFromComposerMock,
-      })
-    );
-
-    act(() => {
-      result.current.handleKeyDown(
-        new KeyboardEvent("keydown", { key: "Backspace" }) as unknown as React.KeyboardEvent
-      );
-    });
-
-    expect(removeElementMock).toHaveBeenCalledTimes(3);
-    expect(multiMockComposer.selection.clear).toHaveBeenCalled();
-    expect(syncFromComposerMock).toHaveBeenCalled();
+  it("a single delete goes through the command, then focuses the next sibling", () => {
+    const { composer, select, press } = setup("el-2", ["el-2"]);
+    press("Delete");
+    expect(composer.commands.run).toHaveBeenCalledWith("delete");
+    expect(select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
+    expect(select.mock.calls[0][0].getId()).toBe("el-3");
   });
 
-  it("does not delete the root element in multi-select", () => {
-    const removeElementMock = vi.fn();
-    const rootMockComposer = {
-      elements: {
-        removeElement: removeElementMock,
-        getElement: vi.fn().mockImplementation(() => ({
-          remove: vi.fn(),
-          isLocked: () => false,
-        })),
-        getActivePage: vi.fn().mockReturnValue({ root: { id: "root-id" } }),
-      },
-      beginTransaction: vi.fn(),
-      endTransaction: vi.fn(),
-      selection: { clear: vi.fn() },
-      history: { undo: vi.fn() },
-    };
-
-    const { result } = renderHook(() =>
-      useCanvasKeyboard({
-        composer: rootMockComposer as unknown as Composer,
-        selectedId: "el-1",
-        selectedIds: ["el-1", "root-id", "el-2"],
-        editingId: null,
-        select: vi.fn(),
-        clear: vi.fn(),
-        syncFromComposer: vi.fn(),
-      })
-    );
-
-    act(() => {
-      result.current.handleKeyDown(
-        new KeyboardEvent("keydown", { key: "Delete" }) as unknown as React.KeyboardEvent
-      );
-    });
-
-    // Only el-1 and el-2 should be deleted; root-id must be skipped
-    expect(removeElementMock).toHaveBeenCalledTimes(2);
-    expect(removeElementMock).not.toHaveBeenCalledWith("root-id");
-  });
-
-  it("does not delete locked elements in multi-select", () => {
-    const removeMock = vi.fn();
-    const lockMockComposer = {
-      elements: {
-        getElement: vi.fn().mockImplementation((id) => {
-          if (id === "el-locked") return { remove: vi.fn(), isLocked: () => true };
-          return { remove: removeMock, isLocked: () => false };
-        }),
-        getActivePage: vi.fn().mockReturnValue({ root: { id: "root-id" } }),
-        removeElement: removeMock,
-      },
-      beginTransaction: vi.fn(),
-      endTransaction: vi.fn(),
-      selection: { clear: vi.fn() },
-      history: { undo: vi.fn() },
-    };
-
-    const { result } = renderHook(() =>
-      useCanvasKeyboard({
-        composer: lockMockComposer as unknown as Composer,
-        selectedId: "el-1",
-        selectedIds: ["el-1", "el-locked", "el-2"],
-        editingId: null,
-        select: vi.fn(),
-        clear: vi.fn(),
-        syncFromComposer: vi.fn(),
-      })
-    );
-
-    act(() => {
-      result.current.handleKeyDown(
-        new KeyboardEvent("keydown", { key: "Delete" }) as unknown as React.KeyboardEvent
-      );
-    });
-
-    expect(removeMock).toHaveBeenCalledTimes(2); // el-1 and el-2 only, not el-locked
-    expect(removeMock).not.toHaveBeenCalledWith("el-locked");
+  it("the page root alone is left alone", () => {
+    const { composer, press } = setup("root-id", ["root-id"]);
+    press("Delete");
+    expect(composer.commands.run).not.toHaveBeenCalled();
   });
 });

@@ -16,7 +16,8 @@ export type ReorderDirection = "forward" | "backward" | "front" | "back";
 
 /**
  * A-5: drop locked elements and elements inside a component instance from a
- * destructive multi-selection op (delete/cut/nudge). Locking and instance
+ * destructive multi-selection op (delete/cut), and never remove a locked
+ * element as part of an ancestor's subtree. Locking and instance
  * membership are read straight from the element (the single source of
  * truth — see ElementSerialization.isLocked/isComponentInstance), not from a
  * panel's own tracking set. Returns the survivors and whether anything was
@@ -26,8 +27,32 @@ export type ReorderDirection = "forward" | "backward" | "front" | "back";
  * a circular import.
  */
 export function dropLockedAndInstances(elements: Element[]): { kept: Element[]; skipped: boolean } {
-  const kept = elements.filter((el) => !el.isLocked() && !el.isComponentInstance());
-  return { kept, skipped: kept.length !== elements.length };
+  const kept: Element[] = [];
+  let skipped = false;
+  /* An unlocked element is removed with its whole subtree, so one holding a
+     locked descendant is not removed itself: its children are considered in
+     its place, down to the locked one. Callers pass the topMost()-pruned
+     selection, and ⌘A selects every element — so without this descent a
+     locked image inside a selected section was never looked at and went
+     with the section (A-5, walked live: 11 → 3, the locked image gone). */
+  const visit = (el: Element): void => {
+    if (el.isLocked() || el.isComponentInstance()) {
+      skipped = true;
+      return;
+    }
+    if (!hasLockedDescendant(el)) {
+      kept.push(el);
+      return;
+    }
+    skipped = true;
+    el.getChildren().forEach(visit);
+  };
+  elements.forEach(visit);
+  return { kept, skipped };
+}
+
+function hasLockedDescendant(el: Element): boolean {
+  return el.getChildren().some((child) => child.isLocked() || hasLockedDescendant(child));
 }
 
 /**
