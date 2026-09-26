@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isSafeElementId } from "./element-markup";
+import { isDangerousUrl, isSafeElementId } from "./element-markup";
 
 export const createSiteSchema = z.object({
   name: z.string().min(2).max(100),
@@ -154,23 +154,49 @@ const MAX_BOUND_ELEMENTS = 5000;
 const MAX_BINDINGS_PER_ELEMENT = 50;
 /** Largest "Show N" a collection list stores — the inspector clamps to it. */
 export const CMS_COLLECTION_LIMIT_MAX = 10_000;
-/** Serialized size above which a save keeps its pages but not its bindings. */
-export const MAX_CMS_BINDINGS_BYTES = 1_000_000;
+/** Serialized length (UTF-16 units, `JSON.stringify(...).length`) above
+ *  which a save keeps its pages but not its bindings. */
+export const MAX_CMS_BINDINGS_CHARS = 1_000_000;
+
+/**
+ * The element properties a CMS field binding may fill — SSOT for the save
+ * schema and both sinks (CMSBindingManager on the canvas, CMSExportResolver on
+ * the published page). A stored binding's `property` becomes an attribute
+ * name, so anything else (`onmouseover`, `style`, …) is a stored XSS. The
+ * editor itself emits only content/src/href (ContentSection `boundProperty`).
+ */
+export const CMS_BINDABLE_PROPERTIES = ["content", "src", "href", "alt", "title"] as const;
+export type CmsBindableProperty = (typeof CMS_BINDABLE_PROPERTIES)[number];
+
+/**
+ * May `value` be written to `property` of a bound element? Only allowlisted
+ * properties, and never a URL `isDangerousUrl` refuses into src/href. Values
+ * resolve from CMS entries at render time, so the sinks call this on every
+ * write — the save schema cannot see them.
+ */
+export function isSafeCmsBoundValue(property: string, value: string): property is CmsBindableProperty {
+  if (!(CMS_BINDABLE_PROPERTIES as readonly string[]).includes(property)) return false;
+  return !((property === "src" || property === "href") && isDangerousUrl(value));
+}
 
 const bindingElementId = z.string().max(128).refine(isSafeElementId, { message: "Invalid element id" });
 
-const cmsFieldBindingSchema = z.object({
-  binding: z.object({
-    sourceId: z.string().max(300),
-    path: z.string().max(500),
-    type: z.string().max(32),
-  }),
-  collectionId: z.string().max(200),
-  itemId: z.string().max(200).optional(),
-  fieldSlug: z.string().max(200),
-  property: z.string().max(64),
-  fallback: z.string().max(10_000).optional(),
-});
+const cmsFieldBindingSchema = z
+  .object({
+    binding: z.object({
+      sourceId: z.string().max(300),
+      path: z.string().max(500),
+      type: z.string().max(32),
+    }),
+    collectionId: z.string().max(200),
+    itemId: z.string().max(200).optional(),
+    fieldSlug: z.string().max(200),
+    property: z.enum(CMS_BINDABLE_PROPERTIES),
+    fallback: z.string().max(10_000).optional(),
+  })
+  .refine((b) => b.fallback === undefined || isSafeCmsBoundValue(b.property, b.fallback), {
+    message: "Unsafe fallback URL",
+  });
 
 const cmsCollectionBindingSchema = z.object({
   elementId: bindingElementId,

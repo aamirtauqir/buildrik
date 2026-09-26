@@ -91,7 +91,7 @@ describe("projectDataFromRows → renderProjectPages", () => {
       field: {
         h: [{
           binding: { sourceId: "cms:col-1", path: "title", type: "variable" },
-          collectionId: "col-1", fieldSlug: "title", property: "textContent",
+          collectionId: "col-1", fieldSlug: "title", property: "content",
         }],
       },
       collection: { list: { elementId: "list", collectionId: "col-1", itemVar: "item" } },

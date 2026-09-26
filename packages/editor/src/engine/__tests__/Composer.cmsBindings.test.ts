@@ -22,7 +22,7 @@ afterAll(() => removeEngineBrowserStubs());
 describe("Composer — CMS bindings round-trip", () => {
   it("carries a field binding through exportProject -> importProject", () => {
     const a = createTestComposer();
-    a.cms.bindings.bindToField("el-1", "col-1", "rec-1", "title", "textContent", "Fallback");
+    a.cms.bindings.bindToField("el-1", "col-1", "rec-1", "title", "content", "Fallback");
     const snapshot = a.exportProject();
 
     expect(snapshot.cmsBindings?.field?.["el-1"]).toBeTruthy();
@@ -35,7 +35,7 @@ describe("Composer — CMS bindings round-trip", () => {
     expect(restored).toHaveLength(1);
     expect(restored[0].collectionId).toBe("col-1");
     expect(restored[0].fieldSlug).toBe("title");
-    expect(restored[0].property).toBe("textContent");
+    expect(restored[0].property).toBe("content");
   });
 
   it("a project saved before the field existed still loads", () => {

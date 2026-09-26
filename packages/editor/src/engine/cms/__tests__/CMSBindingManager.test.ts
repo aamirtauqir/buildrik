@@ -106,7 +106,7 @@ describe("CMSBindingManager — field bindings", () => {
       collectionId: collection.id,
       itemId: item.id,
       fieldSlug: "title",
-      property: "content",
+      property: "content" as const,
       fallback: "fallback!",
     });
 
@@ -132,12 +132,32 @@ describe("CMSBindingManager — field bindings", () => {
     manager.bindToField("el-img", collection.id, item.id, "image", "src");
     await vi.waitFor(() => expect(el.setTrait).toHaveBeenCalledWith("src", "https://x/a.jpg"));
 
-    // Unknown properties also fall through to setTrait.
-    manager.bindToField("el-img", collection.id, item.id, "title", "data-label");
-    await vi.waitFor(() =>
-      expect(el.setTrait).toHaveBeenCalledWith("data-label", "Hello World")
-    );
+    manager.bindToField("el-img", collection.id, item.id, "title", "title");
+    await vi.waitFor(() => expect(el.setTrait).toHaveBeenCalledWith("title", "Hello World"));
     expect(el.setContent).not.toHaveBeenCalled();
+  });
+
+  /* Ldata round 2: bindings are persisted now, so `property` and CMS entry
+     values are data from storage, not from this editor. Only the shared
+     allowlist (CMS_BINDABLE_PROPERTIES) reaches the element, and a
+     src/href value that isDangerousUrl refuses is never written. */
+  it("never applies a property outside the allowlist, nor a dangerous URL", async () => {
+    const cms = new CollectionManager();
+    const collection = await cms.createCollection("Links");
+    const draft = (await cms.createContentItem(collection.id, { link: "javascript:alert(1)", title: "Hi" }))!;
+    const item = (await cms.updateContentItem(draft.id, { status: "published" }))!;
+    const el = makeElementStub();
+    const { composer } = makeComposer({ "el-a": el });
+    const manager = new CMSBindingManager(composer, cms);
+
+    // Stored data can carry any name — the type does not protect the sink.
+    manager.bindToField("el-a", collection.id, item.id, "title", "onclick" as never);
+    manager.bindToField("el-a", collection.id, item.id, "link", "href");
+    manager.bindToField("el-a", collection.id, item.id, "title", "alt"); // control: this one lands
+    await vi.waitFor(() => expect(el.setTrait).toHaveBeenCalledWith("alt", "Hi"));
+
+    expect(el.setTrait).not.toHaveBeenCalledWith("onclick", expect.anything());
+    expect(el.setTrait).not.toHaveBeenCalledWith("href", expect.anything());
   });
 
   it("silently skips application when the element does not exist", async () => {
@@ -177,7 +197,7 @@ describe("CMSBindingManager — field bindings", () => {
           collectionId: collection.id,
           itemId: item.id,
           fieldSlug: "views",
-          property: "content",
+          property: "content" as const,
         })
       ).resolves.toBe("42");
     });
@@ -197,7 +217,7 @@ describe("CMSBindingManager — field bindings", () => {
         collectionId: collection.id,
         itemId,
         fieldSlug: "title",
-        property: "content",
+        property: "content" as const,
         fallback: "FB",
       };
       await expect(manager.resolveBinding(binding)).resolves.toBe("Hello World");
@@ -215,7 +235,7 @@ describe("CMSBindingManager — field bindings", () => {
           collectionId: collection.id,
           itemId: "missing",
           fieldSlug: "title",
-          property: "content",
+          property: "content" as const,
           fallback: "FB",
         })
       ).resolves.toBe("FB");
@@ -226,7 +246,7 @@ describe("CMSBindingManager — field bindings", () => {
           collectionId: collection.id,
           itemId: item.id,
           fieldSlug: "empty",
-          property: "content",
+          property: "content" as const,
         })
       ).resolves.toBe("");
     });
@@ -258,7 +278,7 @@ describe("CMSBindingManager — field bindings", () => {
           collectionId: collection.id,
           itemId: unpublished.id,
           fieldSlug: "title",
-          property: "content",
+          property: "content" as const,
           fallback: "FB",
         })
       ).resolves.toBe("FB");
@@ -277,7 +297,7 @@ describe("CMSBindingManager — field bindings", () => {
             binding: { sourceId: "cms:c", path: "name", type: "variable" },
             collectionId: "c",
             fieldSlug: "name",
-            property: "content",
+            property: "content" as const,
           },
           contextItem
         )
@@ -292,7 +312,7 @@ describe("CMSBindingManager — field bindings", () => {
         binding: { sourceId: "cms:c", path: "name", type: "variable" as const },
         collectionId: "c",
         fieldSlug: "name",
-        property: "content",
+        property: "content" as const,
       };
 
       await expect(
@@ -481,7 +501,7 @@ describe("CMSBindingManager — page-record bindings and undo (G3-078)", () => {
         binding: { sourceId: `cms:${collection.id}`, path: "title", type: "variable" },
         collectionId: collection.id,
         fieldSlug: "title",
-        property: "content",
+        property: "content" as const,
       }),
     ).resolves.toBe("Hello World");
   });

@@ -104,7 +104,7 @@ describe("duplicate element ids across stored pages", () => {
           field: {
             "ai-hero-0": [{
               binding: { sourceId: "cms:c1", path: "r1.title", type: "variable" },
-              collectionId: "c1", itemId: "r1", fieldSlug: "title", property: "textContent",
+              collectionId: "c1", itemId: "r1", fieldSlug: "title", property: "content",
             }],
           },
         },

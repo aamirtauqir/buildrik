@@ -40,7 +40,7 @@ const BINDINGS = {
         binding: { sourceId: "cms:col-1", path: "title", type: "variable" },
         collectionId: "col-1",
         fieldSlug: "title",
-        property: "textContent",
+        property: "content",
       },
     ],
   },

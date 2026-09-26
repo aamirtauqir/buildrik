@@ -11,7 +11,7 @@ import type {
   SaveProjectDataInput,
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
-import { filterCmsBindings, MAX_CMS_BINDINGS_BYTES } from "@buildrik/shared/schemas/sites";
+import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 
@@ -691,8 +691,8 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // past the size cap is not stored — the save and its pages still land, the
   // previously stored bindings stay.
   let cmsBindings = input.cmsBindings;
-  if (cmsBindings && JSON.stringify(cmsBindings).length > MAX_CMS_BINDINGS_BYTES) {
-    console.warn(`[saveProjectData] site=${input.siteId} cmsBindings over ${MAX_CMS_BINDINGS_BYTES} bytes — not stored`);
+  if (cmsBindings && JSON.stringify(cmsBindings).length > MAX_CMS_BINDINGS_CHARS) {
+    console.warn(`[saveProjectData] site=${input.siteId} cmsBindings over ${MAX_CMS_BINDINGS_CHARS} chars — not stored`);
     cmsBindings = undefined;
   }
 

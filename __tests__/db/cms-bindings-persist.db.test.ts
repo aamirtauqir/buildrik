@@ -25,7 +25,7 @@ const BINDINGS = {
         binding: { sourceId: "cms:col-1", path: "title", type: "variable" },
         collectionId: "col-1",
         fieldSlug: "title",
-        property: "textContent",
+        property: "content",
         fallback: "Untitled",
       },
     ],
@@ -128,5 +128,31 @@ describe("CMS bindings persistence (Ldata bug B)", () => {
     await editorSave(site.id, page.id, huge);
 
     expect((await getSite(site.id))?.projectCmsBindings).toEqual(BINDINGS);
+  });
+
+  /* Ldata round 2: a persisted binding's `property` becomes an attribute name
+     and its `fallback` a value on the published page — an event-handler name
+     or a javascript: URL is a stored XSS. Such entries are dropped per entry;
+     the save and the valid bindings still land. */
+  it("drops event-handler properties and dangerous URL fallbacks, keeps the rest", async () => {
+    const { site, page } = await seed();
+    const good = BINDINGS.field["heading-1"][0];
+    const hostile = {
+      field: {
+        "heading-1": [
+          good,
+          { ...good, property: "onmouseover", fallback: "alert(1)" },
+          { ...good, property: "href", fieldSlug: "link", fallback: "javascript:alert(1)" },
+          { ...good, property: "src", fieldSlug: "img", fallback: "data:text/html,<script>alert(1)</script>" },
+        ],
+      },
+      collection: BINDINGS.collection,
+    };
+
+    await editorSave(site.id, page.id, hostile, site.lastEditedAt.toISOString());
+
+    expect((await getSite(site.id))?.projectCmsBindings).toEqual(BINDINGS);
+    const savedPage = await prisma.page.findUniqueOrThrow({ where: { id: page.id } });
+    expect(savedPage.blocks).toEqual({ id: "root", type: "container", children: [] });
   });
 });

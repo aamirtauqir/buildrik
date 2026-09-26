@@ -114,7 +114,7 @@ describe("getShareDraftRows", () => {
      projectDataFromRows, which reads `projectCmsBindings` — without it every
      CMS-bound element in a shared draft showed its placeholder copy. */
   it("carries the site's CMS bindings to the draft render", async () => {
-    const bindings = { field: { h1: [{ binding: { sourceId: "cms:c", path: "t", type: "variable" }, collectionId: "c", fieldSlug: "t", property: "textContent" }] } };
+    const bindings = { field: { h1: [{ binding: { sourceId: "cms:c", path: "t", type: "variable" }, collectionId: "c", fieldSlug: "t", property: "content" }] } };
     vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: bindings, sitePages: [] } as never);
 
     const rows = await getShareDraftRows("s1");

@@ -170,3 +170,36 @@ describe("only published records reach the exported page", () => {
     expect(await exported()).not.toContain(DRAFT_COPY);
   });
 });
+
+/* Ldata round 2: the published page is the XSS sink — `property` comes from
+   stored bindings and the value from CMS entries, neither from this session. */
+describe("static resolution writes only allowlisted, safe values", () => {
+  const PAGE_A = '<a data-buildrick-id="h1" href="/ok">Placeholder</a>';
+  const boundAs = (property: string, value: string) => ({
+    getBindings: (id: string) => (id === "h1" ? [{ property, collectionId: "c", fieldSlug: "f" }] : []),
+    resolveBinding: vi.fn().mockResolvedValue(value),
+  });
+
+  it("does not write a javascript: href from a CMS entry", async () => {
+    const html = await new CMSExportResolver(composerWith(boundAs("href", "javascript:alert(1)"))).resolve(PAGE_A, {
+      mode: "static",
+    });
+    expect(html).not.toContain("javascript:");
+    expect(html).toContain('href="/ok"');
+  });
+
+  it("does not apply a binding whose property is an event handler", async () => {
+    const html = await new CMSExportResolver(composerWith(boundAs("onclick", "alert(1)"))).resolve(PAGE_A, {
+      mode: "static",
+    });
+    expect(html).not.toContain("onclick");
+    expect(html).not.toContain("alert(1)");
+  });
+
+  it("still writes a safe href", async () => {
+    const html = await new CMSExportResolver(composerWith(boundAs("href", "https://example.test/x"))).resolve(PAGE_A, {
+      mode: "static",
+    });
+    expect(html).toContain('href="https://example.test/x"');
+  });
+});
