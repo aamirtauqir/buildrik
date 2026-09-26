@@ -71,7 +71,7 @@ export async function POST(
   }
 
   try {
-    const result = await submitForm(siteId, formBlockId, parsed.data, ip);
+    const result = await submitForm(siteId, formBlockId, parsed.data, ip, req.headers.get("referer") ?? undefined);
     /* A browser that posted a form expects a page, not JSON. Send it back where
        it came from with a marker the site can act on; a scripted caller still
        gets the id. */
@@ -92,14 +92,18 @@ export async function POST(
         return NextResponse.redirect(result.redirectUrl, 303);
       }
       /* "Show message": land back on the page the visitor actually submitted
-         from. `result.returnUrl` (the page's own `location.href`, validated
-         against the site's own origins by the service) is preferred — a
-         cross-origin form POST's `Referer` is origin-only under the default
-         `strict-origin-when-cross-origin` policy, so the path is already
-         gone by the time it reaches here and a Referer-only redirect always
-         lands on the home page. Referer is kept as a fallback for a
-         same-origin post or an older cached page without the return field. */
-      const back = result.returnUrl ?? req.headers.get("referer");
+         from. `result.returnUrl` (the page's own `location.href`) is
+         preferred — a cross-origin form POST's `Referer` is origin-only
+         under the default `strict-origin-when-cross-origin` policy, so the
+         path is already gone by the time it reaches here and a Referer-only
+         redirect always lands on the home page. `result.refererUrl` is the
+         fallback — the RAW `Referer` header is never used directly here; it
+         went through the exact same exact-origin check as `_return` inside
+         `submitForm` (an unvalidated Referer is attacker-influenceable, the
+         same open-redirect risk `_return` itself guards against). Neither
+         validating → land on the site's own resolved origin root, never on
+         an unchecked string. */
+      const back = result.returnUrl ?? result.refererUrl;
       if (back) {
         try {
           const url = new URL(back);
@@ -107,7 +111,19 @@ export async function POST(
           url.searchParams.set("form", formBlockId);
           return NextResponse.redirect(url.toString(), 303);
         } catch {
-          // Malformed Referer header — fall through to the no-referer page.
+          // Unreachable in practice — submitForm only ever returns an
+          // absolute, already-`new URL`-parsed value here.
+        }
+      }
+      if (result.siteOrigin) {
+        try {
+          const url = new URL(result.siteOrigin);
+          url.searchParams.set("submitted", "1");
+          url.searchParams.set("form", formBlockId);
+          return NextResponse.redirect(url.toString(), 303);
+        } catch {
+          // Unreachable — siteOrigin is built by resolveSiteOrigins, which
+          // only ever returns `new URL`-parsed origins.
         }
       }
       const message = result.successMessage || "Thanks — your message was sent.";

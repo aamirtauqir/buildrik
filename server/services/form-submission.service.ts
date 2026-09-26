@@ -9,7 +9,7 @@ import type {
   UpdateFormBlockInput,
 } from "@buildrik/shared/schemas/forms";
 import { isAbsoluteHttpUrl } from "@buildrik/shared/schemas/element-markup";
-import { resolveSiteOrigin } from "@/lib/publish-urls";
+import { resolveSiteOrigins } from "@/lib/publish-urls";
 import { slugifyProjectName } from "@/lib/vercel";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
@@ -27,28 +27,28 @@ export class FormError extends Error {
 }
 
 /**
- * Validates the visitor's own `location.href` (sent as `returnUrl`, filled
- * by the page script in `lib/publish-forms.ts`) against the site's own known
- * origins before trusting it as a redirect target — an arbitrary attacker
- * string here would be an open redirect. `slugifyProjectName`/`resolveSiteOrigin`
- * mirror exactly what the publish worker resolves the live origin to
- * (`packages/dashboard/app/api/workers/publish/[jobId]/route.ts`).
+ * Validates a URL against one of the site's own known origins before
+ * trusting it as a redirect target — an arbitrary attacker string here
+ * would be an open redirect. Used for BOTH the visitor's own `location.href`
+ * (sent as `returnUrl`, filled by the page script in `lib/publish-forms.ts`)
+ * and the raw `Referer` header — the Referer is attacker-influenceable too
+ * (any page can link to a form with a crafted opener, and some browsers/
+ * extensions strip or rewrite it), so it gets the exact same exact-origin
+ * check as `_return`, never trusted raw.
  */
-function safeReturnUrl(
-  returnUrl: string | undefined,
-  site: { canonicalUrl: string | null; slug: string; verifiedDomain: string | null },
-): string | null {
-  if (!returnUrl || !isAbsoluteHttpUrl(returnUrl)) return null;
-
-  const resolved = resolveSiteOrigin({
-    canonicalUrl: site.canonicalUrl,
-    verifiedDomain: site.verifiedDomain,
-    vercelProjectName: slugifyProjectName(site.slug),
-  });
-  if (!resolved) return null;
-
+function safeUrlOnOrigins(url: string | undefined | null, origins: string[]): string | null {
+  if (!url || !isAbsoluteHttpUrl(url) || origins.length === 0) return null;
   try {
-    return new URL(returnUrl).origin === new URL(resolved).origin ? returnUrl : null;
+    const parsedOrigin = new URL(url).origin;
+    return origins.some((o) => {
+      try {
+        return new URL(o).origin === parsedOrigin;
+      } catch {
+        return false;
+      }
+    })
+      ? url
+      : null;
   } catch {
     return null;
   }
@@ -68,6 +68,10 @@ export interface SubmitFormResult {
   successMessage: string | null;
   /** The visitor's own page URL, validated against the site's own origins — null when absent/unvalidated/off-site. */
   returnUrl: string | null;
+  /** The `Referer` header, validated against the exact same site origins as `returnUrl` — never trusted raw. Null when absent/unvalidated/off-site. */
+  refererUrl: string | null;
+  /** The site's own preferred origin, for a redirect fallback when neither `returnUrl` nor `refererUrl` validates — never an attacker-controlled string. Null only when the site has no resolvable origin at all. */
+  siteOrigin: string | null;
 }
 
 export async function submitForm(
@@ -75,9 +79,13 @@ export async function submitForm(
   formBlockId: string,
   input: FormSubmissionInput,
   ip: string,
+  refererHeader?: string,
 ): Promise<SubmitFormResult> {
   if (input.honeypot) {
-    return { id: "honeypot", successAction: "MESSAGE", redirectUrl: null, successMessage: null, returnUrl: null };
+    return {
+      id: "honeypot", successAction: "MESSAGE", redirectUrl: null, successMessage: null,
+      returnUrl: null, refererUrl: null, siteOrigin: null,
+    };
   }
 
   const formBlock = await prisma.formBlock.findFirst({
@@ -174,16 +182,20 @@ export async function submitForm(
   const redirectUrl = formBlock.redirectUrl && isAbsoluteHttpUrl(formBlock.redirectUrl) ? formBlock.redirectUrl : null;
   const successAction: "MESSAGE" | "REDIRECT" = formBlock.successAction === "REDIRECT" && redirectUrl ? "REDIRECT" : "MESSAGE";
 
+  const origins = resolveSiteOrigins({
+    canonicalUrl: site.canonicalUrl,
+    verifiedDomain: verifiedDomain?.domain ?? null,
+    vercelProjectName: site.slug ? slugifyProjectName(site.slug) : null,
+  });
+
   return {
     id: submission.id,
     successAction,
     redirectUrl,
     successMessage: formBlock.successMessage ?? null,
-    returnUrl: safeReturnUrl(input.returnUrl, {
-      canonicalUrl: site.canonicalUrl,
-      slug: site.slug,
-      verifiedDomain: verifiedDomain?.domain ?? null,
-    }),
+    returnUrl: safeUrlOnOrigins(input.returnUrl, origins),
+    refererUrl: safeUrlOnOrigins(refererHeader, origins),
+    siteOrigin: origins[0] ?? null,
   };
 }
 

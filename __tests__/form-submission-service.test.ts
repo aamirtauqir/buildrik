@@ -121,6 +121,43 @@ describe("Form Submission Service", () => {
       expect(other.returnUrl).toBeNull();
     });
 
+    it("Fix round 2 (finding 3): validates the Referer fallback against the same site origins, never trusting it raw", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2e" } as any);
+
+      const legit = await submitForm(
+        "s1", "fb1", { data: {} }, "1.2.3.4", "https://mysite.example.com/contact",
+      );
+      expect(legit.refererUrl).toBe("https://mysite.example.com/contact");
+
+      const attacker = await submitForm(
+        "s1", "fb1", { data: {} }, "1.2.3.4", "https://evil.example.com/phish",
+      );
+      expect(attacker.refererUrl).toBeNull();
+    });
+
+    it("Fix round 2 (finding 3): always exposes the site's own resolved origin as a safe redirect fallback", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2f" } as any);
+
+      const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      expect(result.siteOrigin).toBe("https://mysite.example.com");
+    });
+
     it("logs (not swallows) a failed notification email — the submission is already saved", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
