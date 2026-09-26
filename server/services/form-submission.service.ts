@@ -140,9 +140,18 @@ export async function submitForm(
       select: { user: { select: { email: true } } },
     })
     .then((owner) => {
-      const recipients = Array.from(
-        new Set([formBlock.notifyEmail, owner?.user?.email].filter((e): e is string => Boolean(e))),
-      );
+      // Dedup case-insensitively — email addresses are case-insensitive in
+      // practice, and a notifyEmail set with different casing than the
+      // owner's own account email is still the same mailbox, not two.
+      const seen = new Set<string>();
+      const recipients = [formBlock.notifyEmail, owner?.user?.email]
+        .filter((e): e is string => Boolean(e))
+        .filter((e) => {
+          const key = e.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
       const fields = Object.entries((input.data ?? {}) as Record<string, unknown>).map(
         ([label, value]) => ({ label, value: String(value) }),
       );

@@ -186,6 +186,24 @@ describe("Form Submission Service", () => {
       expect(sendFormSubmissionEmail).toHaveBeenCalledWith("same@example.com", "Site", expect.any(Array), "s1");
     });
 
+    it("Fix round 2 (finding 5): doesn't double-send when the owner and notifyEmail differ only by case", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "Same@Example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockImplementation(((args: any) =>
+        args?.select?.workspace
+          ? Promise.resolve({ workspace: { plan: "FREE" } })
+          : Promise.resolve({ user: { email: "same@example.com" } })) as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub4b", data: {} } as any);
+
+      await submitForm("s1", "fb1", { data: { name: "A" } }, "1.2.3.4");
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sendFormSubmissionEmail).toHaveBeenCalledTimes(1);
+    });
+
     it("still notifies the owner when the block has no notifyEmail configured", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
