@@ -286,7 +286,14 @@ export const authRouter = router({
       // for this check.
       const dbUser = await ctx.prisma.user.findUnique({ where: { id: userId }, select: { emailVerified: true } });
       if (!dbUser?.emailVerified) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Verify your email before accepting an invite." });
+        /* `reason` tells the invite page this refusal from the email-mismatch
+           one below — both are FORBIDDEN, and the page showed "This invite is
+           for another email" to an invitee whose email matched. */
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Verify your email before accepting an invite.",
+          cause: { reason: "EMAIL_UNVERIFIED" },
+        });
       }
 
       const existing = await ctx.prisma.workspaceMember.findUnique({
@@ -306,6 +313,7 @@ export const authRouter = router({
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "This invite was sent to a different email address.",
+          cause: { reason: "EMAIL_MISMATCH" },
         });
       }
 
