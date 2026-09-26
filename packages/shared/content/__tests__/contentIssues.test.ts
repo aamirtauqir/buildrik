@@ -107,6 +107,39 @@ describe("detectContentIssues", () => {
     expect(detectContentIssues(pages)).toHaveLength(0);
   });
 
+  /* Lv3 #1: `new URL(href)` with no base threw on every root-relative path,
+     so `/about`, `/services` and `/` were all "malformed" in the Issues panel
+     and the Links pre-check (live S1: "2 links are broken", every link valid). */
+  it("does not flag root-relative, dot-relative, query, protocol-relative or bare-file links", () => {
+    const hrefs = ["/", "/about", "/services?x=1#top", "./contact", "../index.html", "?q=1", "//cdn.example.com/a.png", "about.html"];
+    const pages = [
+      page({
+        id: "home",
+        root: el({
+          id: "root",
+          children: hrefs.map((href, i) => el({ id: `l${i}`, type: "link", tagName: "a", attributes: { href } })),
+        }),
+      }),
+    ];
+    expect(detectContentIssues(pages)).toEqual([]);
+  });
+
+  it("still flags scheme typos and unparseable absolute URLs", () => {
+    const hrefs = ["http//example.com", "https:/", "www.example.com", "ht!tp://broken", "https://exa mple.com:99999"];
+    const pages = [
+      page({
+        id: "home",
+        root: el({
+          id: "root",
+          children: hrefs.map((href, i) => el({ id: `l${i}`, type: "link", tagName: "a", attributes: { href } })),
+        }),
+      }),
+    ];
+    const findings = detectContentIssues(pages);
+    expect(findings.map((f) => f.elementId)).toEqual(["l0", "l1", "l2", "l3", "l4"]);
+    expect(findings.every((f) => f.message === "Link URL looks malformed")).toBe(true);
+  });
+
   it("walks nested children across multiple pages, tagging each finding with its own pageId", () => {
     const pages = [
       page({

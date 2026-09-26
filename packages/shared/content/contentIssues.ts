@@ -53,9 +53,31 @@ export interface ContentIssueFinding {
   pageId: string;
 }
 
-function parsesAsUrl(value: string): boolean {
+const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
+/** A bare path that is really a mistyped absolute URL: `http//x`, `www.x.com`. */
+const SCHEME_TYPO = /^(?:(?:https?|ftp):?\/{1,2}|www\.)/i;
+/** Resolution base for relative hrefs — only whether they parse matters. */
+const RELATIVE_BASE = "https://site.invalid/";
+
+/**
+ * Whether an href is a well-formed URL reference. An absolute URL (it has a
+ * scheme) must parse on its own. Anything else is a relative reference —
+ * `/about`, `./x`, `?q`, `//cdn`, `about.html` — and is resolved against a
+ * base, the way the browser resolves it against the page; `new URL(href)`
+ * with no base rejects every one of them. A relative reference whose first
+ * segment holds a `:` is invalid (RFC 3986 §4.2), and one that reads as a
+ * scheme typo is flagged rather than silently resolved to a local path.
+ */
+function isWellFormedHref(href: string): boolean {
+  const absolute = HAS_SCHEME.test(href);
+  if (!absolute) {
+    const firstSegment = href.split(/[/?#]/, 1)[0] ?? "";
+    if (firstSegment.includes(":") || SCHEME_TYPO.test(href)) return false;
+  }
   try {
-    new URL(value);
+    // No base for an absolute URL: `https:/` against an https base would
+    // resolve as a relative reference and pass.
+    new URL(href, absolute ? undefined : RELATIVE_BASE);
     return true;
   } catch {
     return false;
@@ -99,7 +121,8 @@ function checkImage(el: ContentElement, pageId: string, pageName: string): Conte
 /**
  * Link defects: no destination, a bare `#` stub, a dead internal page (the
  * `#page:<id>` format `LinkSection` writes), or a URL the browser itself
- * cannot parse. `mailto:` / `tel:` / same-page anchors are left alone — this
+ * cannot resolve. Root-relative internal paths (`/about`) are valid.
+ * `mailto:` / `tel:` / same-page anchors are left alone — this
  * checks reachability, not taste.
  */
 function checkLink(
@@ -142,7 +165,7 @@ function checkLink(
     return null;
   }
   if (trimmed.startsWith("mailto:") || trimmed.startsWith("tel:") || trimmed.startsWith("#")) return null;
-  if (!parsesAsUrl(trimmed)) {
+  if (!isWellFormedHref(trimmed)) {
     return {
       ...base,
       id: `content:link-malformed:${el.id}`,

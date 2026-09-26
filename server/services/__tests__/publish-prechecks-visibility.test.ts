@@ -174,6 +174,17 @@ describe("pre-publish content checks (shared detector)", () => {
     expect(result.ready).toBe(true);
   });
 
+  it("passes Links for root-relative internal paths (/, /about, /services)", async () => {
+    const nav = ["/", "/about", "/services"].map((href, i) => ({
+      id: `nav-${i}`, type: "link", tagName: "a", content: href, children: [], attributes: { href },
+    }));
+    pageFindManyMock.mockResolvedValue([
+      { id: "p1", name: "Home", blocks: { id: "root", type: "container", tagName: "div", children: nav }, settings: null },
+    ]);
+    const { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "Links")).toBe("pass");
+  });
+
   it("passes both rows when content is clean, and tolerates legacy array blocks", async () => {
     pageFindManyMock.mockResolvedValue([
       { id: "p1", name: "Home", blocks: [], settings: null },
