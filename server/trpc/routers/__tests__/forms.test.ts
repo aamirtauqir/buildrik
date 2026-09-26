@@ -1,6 +1,6 @@
 /**
- * forms router — `updateBlock`'s notifyEmail ADMIN gate (fix round 2,
- * finding 1). Requiring ADMIN whenever `notifyEmail` is present in the
+ * forms router — `updateBlock`'s notifyEmail ADMIN gate. Requiring ADMIN
+ * whenever `notifyEmail` is present in the
  * payload (rather than when it actually CHANGES) meant an EDITOR blurring
  * the field without editing it — or saving any other field bundled through
  * the same call shape — hit a FORBIDDEN for a no-op write. The gate must

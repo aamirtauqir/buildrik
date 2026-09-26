@@ -337,9 +337,8 @@ export async function resolveReviewByToken(
   // predate that check, its invitedEmail can be edited some other way, or a
   // member can be added to the workspace AFTER the invite was sent — never
   // let the signer be the person who submitted the round, or anyone
-  // currently an ACTIVE member of the site's workspace (controller review
-  // the original check only covered the submitter, not other
-  // members).
+  // currently an ACTIVE member of the site's workspace — the original check
+  // only covered the submitter, not other members.
   if (status === "APPROVED" && review.invitedEmail) {
     const invited = normalizeReviewEmail(review.invitedEmail);
     const [requester, members] = await Promise.all([

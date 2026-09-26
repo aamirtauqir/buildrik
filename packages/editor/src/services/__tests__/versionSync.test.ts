@@ -328,7 +328,7 @@ describe("versionSync hydrate is bounded (walk 2026-09-24: 50 sequential gets on
   });
 });
 
-/* X-1 fix round 1: the "don't overwrite an unsynced local rename" guard read
+/* X-1: the "don't overwrite an unsynced local rename" guard read
    the retry queue, which is in memory — after a reload it is empty, and a
    rename made offline (already in IndexedDB) lost to the older server name.
    Names now reconcile on the persisted server stamp (C-4, localStorage). A
@@ -405,7 +405,7 @@ describe("X-1 — version names reconcile on the persisted server stamp", () => 
     expect(rename).toHaveBeenCalledWith({ siteId: "site-123", versionId: "v1", name: "Mine" });
   });
 
-  /* Fix round 2 (controller ruling): the first hydrate of a site after
+  /* The first hydrate of a site after
      deploy has no stamps. An unstamped name that differs then ADOPTS the
      server's once (a teammate's rename this cache never saw), is stamped,
      and is not pushed back. From the next load on, the stamp rules apply. */

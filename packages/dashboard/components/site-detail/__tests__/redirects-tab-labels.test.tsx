@@ -23,7 +23,7 @@ describe("RedirectsTab — label association", () => {
     expect(screen.getByLabelText("To")).toBeInTheDocument();
   });
 
-  // Fix: associating the label must not restyle it (controller ruling).
+  // Associating the label must not restyle it.
   it("keeps the original muted body-sm labels and the field's mt-1 gap", () => {
     render(
       <RedirectsTab redirects={[]} limit={-1} canEdit onCreate={vi.fn()} onDelete={vi.fn()} onImport={vi.fn()} onExport={vi.fn()} />

@@ -1,5 +1,5 @@
 /**
- * S-1 review round 4: `styles` (Site.projectStyles) is `z.unknown()` on both
+ * S-1: `styles` (Site.projectStyles) is `z.unknown()` on both
  * save procedures, and its rules' selector / media query are written raw into
  * the published stylesheet and the single-file export's <style>. The write
  * boundary drops a rule that could leave it.

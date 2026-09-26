@@ -334,7 +334,7 @@ describe("Publish Service", () => {
       expect(job?.progress).toBe(40);
     });
 
-    // S-10 / SSE route (controller review round 1, minor fix): a test that
+    // S-10 / SSE route: a test that
     // just checks the RETURNED object lacks `log` is tautological against a
     // mocked Prisma client — the mock returns exactly what a test hands it
     // and doesn't enforce `select` the way real Postgres does, so a mock

@@ -214,7 +214,7 @@ describe("escapeStyleText (S-1)", () => {
   });
 });
 
-// I2 (form after-submit redirect, controller fix): isDangerousUrl
+// I2 (form after-submit redirect): isDangerousUrl
 // above correctly allows relative paths/#anchors/mailto:/tel: — right for
 // an href, wrong for a redirect target (NextResponse.redirect needs an
 // absolute URL). isAbsoluteHttpUrl / absoluteRedirectUrlSchema are the

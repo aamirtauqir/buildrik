@@ -1,6 +1,6 @@
 /**
  * B-8: Subject, Category and Description are reachable by their labels, and
- * the Subject label keeps its original look (fix).
+ * the Subject label keeps its original look.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";

@@ -1,6 +1,6 @@
 /**
  * B-8: every profile field is reachable by its visible label, and the label
- * keeps its original body / text-primary look (fix).
+ * keeps its original body / text-primary look.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";

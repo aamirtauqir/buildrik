@@ -74,11 +74,10 @@ export const formsRouter = router({
       // SUBMIT / PROTECTION field stays EDITOR-writable via the guard above.
       //
       // Gated on an actual diff against the stored row, not on the field's
-      // mere presence in the payload — the inspector saves on every blur
-      // (fix, finding 1), so an EDITOR tabbing through the field
-      // untouched, or saving a different linked field that happens to
-      // bundle notifyEmail, would otherwise hit a FORBIDDEN for a no-op
-      // write. "" and null both mean "unset".
+      // mere presence in the payload — the inspector saves on every blur, so
+      // an EDITOR tabbing through the field untouched, or saving a different
+      // linked field that happens to bundle notifyEmail, would otherwise hit
+      // a FORBIDDEN for a no-op write. "" and null both mean "unset".
       if (input.notifyEmail !== undefined) {
         const existing = await getFormBlockSettings(input.siteId, input.blockId);
         const normalize = (v: string | null | undefined) => v || "";

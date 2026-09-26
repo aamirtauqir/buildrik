@@ -108,7 +108,7 @@ describe("useClipboardToasts", () => {
     expect(count(EVENTS.CLIPBOARD_COPY)).toBe(0);
   });
 
-  // Controller review, MINOR 4: LOCKED_ELEMENTS_SKIPPED (delete, cut,
+  // LOCKED_ELEMENTS_SKIPPED (delete, cut,
   // nudge — A-5) had no listener anywhere, so a locked element quietly
   // staying put looked identical to nothing having happened at all.
   it("toasts when locked elements were skipped, and unsubscribes on unmount", () => {

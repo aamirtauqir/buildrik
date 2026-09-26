@@ -33,7 +33,7 @@ describe("UseTemplateModal — label association", () => {
     expect(screen.getByLabelText("Site name")).toBeInTheDocument();
   });
 
-  // Fix: associating the label must not restyle it (controller ruling).
+  // Associating the label must not restyle it.
   it("keeps the original body-sm, text-primary label", async () => {
     const user = userEvent.setup();
     render(<UseTemplateModal open templateId="tmpl-1" templateName="Bella Cucina" onClose={vi.fn()} />);

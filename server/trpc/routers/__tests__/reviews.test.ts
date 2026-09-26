@@ -215,7 +215,7 @@ describe("reviews router", () => {
     expect(checkSiteRoleMock).not.toHaveBeenCalled();
   });
 
-  // A-8 (controller review): rounds/approvedSnapshot/revoke also read
+  // A-8: rounds/approvedSnapshot/revoke also read
   // the caller's SESSION workspace instead of the SITE's — an EDITOR on
   // another workspace's site couldn't see their own round history or revoke
   // their own round.

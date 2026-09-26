@@ -121,7 +121,7 @@ describe("Form Submission Service", () => {
       expect(other.returnUrl).toBeNull();
     });
 
-    it("Fix round 2 (finding 3): validates the Referer fallback against the same site origins, never trusting it raw", async () => {
+    it("validates the Referer fallback against the same site origins, never trusting it raw", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
@@ -143,7 +143,7 @@ describe("Form Submission Service", () => {
       expect(attacker.refererUrl).toBeNull();
     });
 
-    it("Fix round 2 (finding 3): always exposes the site's own resolved origin as a safe redirect fallback", async () => {
+    it("always exposes the site's own resolved origin as a safe redirect fallback", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
@@ -223,7 +223,7 @@ describe("Form Submission Service", () => {
       expect(sendFormSubmissionEmail).toHaveBeenCalledWith("same@example.com", "Site", expect.any(Array), "s1");
     });
 
-    it("Fix round 2 (finding 5): doesn't double-send when the owner and notifyEmail differ only by case", async () => {
+    it("doesn't double-send when the owner and notifyEmail differ only by case", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
         id: "fb1", siteId: "s1", isActive: true, notifyEmail: "Same@Example.com",

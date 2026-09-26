@@ -108,7 +108,7 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     ));
   });
 
-  it("Fix (finding 1): blurring a field without changing it saves nothing", async () => {
+  it("blurring a field without changing it saves nothing", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Notification email"));
     // Tabbing through the field — focus then blur, no typing — must not

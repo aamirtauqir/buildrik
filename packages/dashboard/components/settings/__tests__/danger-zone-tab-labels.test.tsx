@@ -18,7 +18,7 @@ describe("DangerZoneTab — label association", () => {
     expect(screen.getByLabelText(/to confirm/i)).toBeInTheDocument();
   });
 
-  // Fix: associating the label must not restyle it (controller ruling).
+  // Associating the label must not restyle it.
   it("the DELETE-confirm label keeps its original body, text-primary style", async () => {
     const user = userEvent.setup();
     render(<DangerZoneTab />);

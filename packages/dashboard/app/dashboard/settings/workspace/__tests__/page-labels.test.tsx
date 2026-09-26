@@ -1,6 +1,6 @@
 /**
  * B-8: the Transfer ownership field is reachable by its label, which keeps
- * its original body / text-primary look (fix).
+ * its original body / text-primary look.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";

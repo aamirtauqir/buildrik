@@ -217,7 +217,7 @@ describe("CSV import", () => {
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
     });
 
-    it("rejects a file whose HEADER cell is over the per-cell length cap, not only data cells (fix)", async () => {
+    it("rejects a file whose HEADER cell is over the per-cell length cap, not only data cells", async () => {
       colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
       const csv = `${"a".repeat(5001)},Price\nMargherita,12`;
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
