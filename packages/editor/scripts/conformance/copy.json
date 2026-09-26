@@ -83,10 +83,11 @@
     },
     {
       "surface": "Issues panel · clean",
-      "copy": "This page is ready to publish.",
+      "copy": "No brand issues.",
       "status": "ships",
       "file": "src/editor/shell/IssuesPanel.tsx",
-      "note": "Board 164:35 draws the verdict and its consequence as TWO lines, and the panel ships them that way: a green \"No issues.\" with \"This page is ready to publish.\" under it. Recorded as the second line because the checker greps one literal; the pair together is the §5.7 sentence. The old shipsInstead note (\"Your site is clean — nothing to fix.\") described copy that is no longer there."
+      "shipsInstead": "This page is ready to publish.",
+      "note": "B-14 (2026-09-26, audit-fix lane L4b): board 164:35 draws the verdict as two lines — \"No issues.\" plus \"This page is ready to publish.\" — but the panel only ever knows about brand-lint issues (DS-lint + the page-content scanner's overlap with it), not the whole pre-publish checklist Publish itself runs. \"Ready to publish\" overclaimed what a clean Issues panel actually verified, so it was dropped; the zero state now reads \"No brand issues.\" alone. Board precedence for VISUAL content still applies generally, but a false publish-readiness claim is the behaviour-contract exception CLAUDE.md carves out — see A-20 in the same lane for the same class of fix (an unsupported claim, not a layout choice)."
     },
     {
       "surface": "Comments · none",
