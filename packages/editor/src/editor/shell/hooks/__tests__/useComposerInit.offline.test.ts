@@ -61,7 +61,12 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
 }));
 
 const invalidateMyRole = vi.hoisted(() => vi.fn());
-vi.mock("@/services/RoleService", () => ({ invalidateMyRole }));
+const fetchMyRole = vi.hoisted(() => vi.fn(() => Promise.resolve("EDITOR")));
+vi.mock("@/services/RoleService", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/RoleService")>()),
+  invalidateMyRole,
+  fetchMyRole,
+}));
 
 import { saveProject as syncSaveProject } from "@/services/BuildrikSyncProvider";
 
@@ -171,5 +176,55 @@ describe("autosave refused with FORBIDDEN", () => {
     expect(toasts.some((t) => t.title === "You don't have access to save this site")).toBe(true);
     expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
     localStorage.removeItem("bk-unsaved-v1-site-1");
+  });
+});
+
+/* C-9 (verify pass 3): after a forbidden save the toast and the restore
+   prompt worked, but the editor never went read-only — Add and Publish stayed
+   live and the next autosave repainted the generic "Couldn't save … check
+   your connection" banner. The refusal now re-asks the role; below EDITOR the
+   editor opens the view mode a VIEWER is sent to (?view=readonly), and a
+   read-only view never autosaves. */
+describe("C-9 — a demoted member lands in view mode and autosave stops", () => {
+  const original = window.location;
+  const fakeLocation = (search: string) => {
+    const replace = vi.fn();
+    Object.defineProperty(window, "location", {
+      value: { href: `http://localhost:3000/edit/site-1${search}`, search, replace },
+      writable: true,
+    });
+    return replace;
+  };
+  afterEach(() => {
+    Object.defineProperty(window, "location", { value: original, writable: true });
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+  });
+
+  it("re-asks the role and, now a VIEWER, opens ?view=readonly", async () => {
+    const replace = fakeLocation("");
+    fetchMyRole.mockResolvedValueOnce("VIEWER");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("FORBIDDEN"));
+    await runAutosave(params());
+
+    expect(invalidateMyRole).toHaveBeenCalled();
+    expect(fetchMyRole).toHaveBeenCalled();
+    expect(replace).toHaveBeenCalledTimes(1);
+    expect(new URL(replace.mock.calls[0][0] as string).searchParams.get("view")).toBe("readonly");
+  });
+
+  it("stays put when the role still allows editing", async () => {
+    const replace = fakeLocation("");
+    fetchMyRole.mockResolvedValueOnce("EDITOR");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("FORBIDDEN"));
+    await runAutosave(params());
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it("a read-only view never sends an autosave", async () => {
+    fakeLocation("?view=readonly");
+    const p = params();
+    await runAutosave(p);
+    expect(syncSaveProject).not.toHaveBeenCalled();
+    expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(false);
   });
 });

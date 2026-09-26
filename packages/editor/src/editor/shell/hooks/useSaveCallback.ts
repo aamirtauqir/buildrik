@@ -28,7 +28,7 @@ import {
   SETTINGS_MIRROR_ERROR_EVENT,
 } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { invalidateMyRole } from "@/services/RoleService";
+import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
 import { clearUnsaved, keepUnsaved } from "@/services/unsavedRecovery";
 
 export interface UseSaveCallbackOptions {
@@ -62,6 +62,36 @@ export function isForbiddenSaveError(err: unknown): boolean {
   const data = (err as { data?: { code?: unknown; httpStatus?: unknown } | null }).data;
   if (data?.code === "FORBIDDEN" || data?.httpStatus === 403) return true;
   return err instanceof Error && /forbidden|403/i.test(err.message);
+}
+
+/**
+ * A save refused FORBIDDEN mid-session (A15-9 / C-9) — one handler for the
+ * manual save and autosave. The refused edit existed only in this tab, so it
+ * is kept for the reload (a role can come back). The cached role that offered
+ * the edit is dropped and asked for again; if it is now below EDITOR, the
+ * editor opens the view mode a VIEWER is sent to (`?view=readonly`: the
+ * VIEWER rail, Publish disabled with its reason, and no autosave). Before
+ * this the chrome stayed editable and every autosave retried into another
+ * 403, repainting the generic "check your connection" banner.
+ */
+export function refuseForbiddenSave(
+  siteId: string | null,
+  project: ReturnType<Composer["exportProject"]>,
+  addToast: (input: ToastInput) => string,
+): void {
+  if (siteId) keepUnsaved(siteId, project);
+  invalidateMyRole();
+  addToast({
+    title: "You don't have access to save this site",
+    description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
+    tone: "warning",
+  });
+  void fetchMyRole().then((role) => {
+    if (roleAtLeast(role, "EDITOR") !== false) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", "readonly");
+    window.location.replace(url.toString());
+  });
 }
 
 /**
@@ -249,18 +279,8 @@ export function useSaveCallback({
            read as "Session expired" and sent the user to sign in — which would
            change nothing. Different truths, different surfaces. */
         if (isForbiddenSaveError(err)) {
-          /* A15-9: a mid-session demotion refuses edits that exist only in
-             this tab. Keep them recoverable (a reload offers them back, and
-             an owner can restore the role), and drop the cached role that
-             let the chrome offer the edit. */
-          if (siteId) keepUnsaved(siteId, composer.exportProject());
-          invalidateMyRole();
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-          addToast({
-            title: "You don't have access to save this site",
-            description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
-            tone: "warning",
-          });
+          refuseForbiddenSave(siteId, composer.exportProject(), addToast);
           return "error";
         }
         if (isAuthSaveError(errorMessage)) {
