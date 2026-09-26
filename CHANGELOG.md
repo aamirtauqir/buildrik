@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## Fix-all — Form after-submit / honeypot / notify email, Slider playback + controls — 2026-09-26
+
+### Added
+- Form inspector "After submit" section: Action (Show message / Redirect), redirect URL (must be an absolute http(s) URL — `absoluteRedirectUrlSchema`, stricter than the general `isDangerousUrl` allowlist used for hrefs), Send-to-email address, Spam protection toggle. Server-backed by new `forms.getBlock` / `forms.updateBlock`.
+- Published forms: honeypot field (`_honeypot`) injected when spam protection is on, rejected silently server-side (already built); after-submit redirect honored by the public route; a same-page "show message" script swaps the form for its configured message.
+- Form notification email now goes to the block's own configured address (inspector "Send to email") AND always copies the workspace owner, deduped case-insensitively when they're the same address.
+- Slider inspector "Playback" section: Autoplay + Interval, Arrows + Dots — written as `data-*` attributes on the slider element.
+- Carousel runtime for `.buildrick-slider` (autoplay, arrows, dots, respects `prefers-reduced-motion`) — shared behaviour between the canvas (`useSliderRuntime`, live DOM effect) and the published page (`lib/publish-sliders.ts`, the same logic inlined as a script), closing "slider exports as stacked slides with no behaviour."
+
+### Deploy
+- Run `prisma migrate deploy` BEFORE deploying: `20261001120000_form_block_after_submit` (adds `FormBlock.successAction`, `redirectUrl`, `spamProtection` — all with safe defaults, no data migration needed).
+
 ## [0.4.0.0] Code-gap Oct 1 — Editor v3 to Figma — 2026-09-24
 
 The editor now follows the Figma v3 IA boards (`4418:45431`) across rail, drawers, inspector, canvas, CMS, media, publish and settings. Tracked row by row in `packages/editor/docs/plans/2026-09-23-c5-ledger.md`.

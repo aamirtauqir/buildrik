@@ -75,6 +75,14 @@ export default defineConfig({
       // Workspace package — editor's "../shared" lands here from root POV.
       "@buildrik/shared": path.resolve(__dirname, "packages/shared"),
 
+      // Workspace package — lib/publish-sliders.ts imports the carousel
+      // runtime straight from the editor package (packages/dashboard has it
+      // as a real `workspace:*` dependency + `transpilePackages`; root-level
+      // vitest has no node_modules symlink for it, only packages/dashboard's
+      // does, so it needs the same alias treatment as @buildrik/shared
+      // above). Matches the package's own exports map ("./src/*": "./src/*").
+      "@buildrik/editor": path.resolve(__dirname, "packages/editor"),
+
       // Keep this last — most general match. Falls back to repo root for
       // `@/<anything-else>` that isn't an editor-known subtree.
       "@": path.resolve(__dirname, "."),

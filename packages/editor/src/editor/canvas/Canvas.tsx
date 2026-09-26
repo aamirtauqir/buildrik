@@ -43,6 +43,7 @@ import {
   useCanvasKeyboard,
   useCanvasHover,
   useCanvasContent,
+  useSliderRuntime,
   useCanvasContextMenu,
   useCursorSync,
   useSelectionBehavior,
@@ -486,6 +487,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     // Content with CMS bindings resolved — selection/drop highlighting handled by overlay layer
     const { displayContent } = useCanvasContent({ composer, content });
+
+    // Slider PLAYBACK/CONTROLS (autoplay, arrows, dots) — same runtime the
+    // published page gets; re-runs whenever the rendered DOM changes.
+    useSliderRuntime({ canvasRef, content: displayContent });
 
     // Memoize the inner-HTML prop object so its reference is stable across
     // renders when `displayContent` hasn't actually changed. Without this,

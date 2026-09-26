@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /**
  * What a stored element tree may render as — the one list the server write
  * boundary (`lib/sanitize-blocks.ts`) and the editor (`Element.getTagName`,
@@ -217,3 +219,32 @@ export function srcsetUrls(value: string): string[] {
     .map((candidate) => candidate.trim().replace(/\s+\d+(?:\.\d+)?[wxh]$/i, ""))
     .filter((url) => url.length > 0);
 }
+
+/**
+ * True only for a parseable, absolute `http:`/`https:` URL — not a relative
+ * path, not `#anchor`, not `mailto:`/`tel:`. A form's after-submit redirect
+ * ends up in `NextResponse.redirect(url)` — a relative value there either
+ * throws ("Invalid URL") or resolves against the wrong host, and a bare
+ * `#section` or `mailto:` is meaningless as a page destination. A different
+ * (stricter, additive) rule from `isDangerousUrl` above, which correctly
+ * allows relative/`#`/`mailto:`/`tel:` for an `href` — composed with it
+ * below rather than replacing it, so this file stays the one place either
+ * check can change.
+ */
+export function isAbsoluteHttpUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+/** After-submit redirect: absolute http(s) only, on top of the shared dangerous-scheme guard above. */
+export const absoluteRedirectUrlSchema = z
+  .string()
+  .trim()
+  .max(2000)
+  .refine((v) => v === "" || (isAbsoluteHttpUrl(v) && !isDangerousUrl(v)), {
+    message: "Redirect URL must be a full address starting with https:// (or http://)",
+  });

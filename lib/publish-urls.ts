@@ -61,6 +61,37 @@ export function resolveSiteOrigin(opts: {
   );
 }
 
+/**
+ * Every origin a published site might actually be reached from — not just
+ * the single "preferred" one `resolveSiteOrigin` picks. A site can have a
+ * verified custom domain AND still be reachable at its own *.vercel.app
+ * project URL, and a custom domain is commonly configured for both the apex
+ * and `www` at once. Used to widen an exact-origin check (the form
+ * after-submit `_return`/Referer validation in `form-submission.service.ts`)
+ * beyond the one origin a canonical or sitemap would use — never itself
+ * written into either of those.
+ */
+export function resolveSiteOrigins(opts: {
+  canonicalUrl: string | null;
+  verifiedDomain?: string | null;
+  vercelProjectName?: string | null;
+}): string[] {
+  const origins = new Set<string>();
+  const addWithWwwCounterpart = (raw: string | null | undefined) => {
+    const normalized = normalizeCanonicalOrigin(raw ?? "");
+    if (!normalized) return;
+    origins.add(normalized);
+    const url = new URL(normalized);
+    const host = url.hostname;
+    const counterpart = host.startsWith("www.") ? host.slice(4) : `www.${host}`;
+    origins.add(`${url.protocol}//${counterpart}`);
+  };
+  addWithWwwCounterpart(opts.canonicalUrl);
+  addWithWwwCounterpart(opts.verifiedDomain);
+  if (opts.vercelProjectName) origins.add(`https://${opts.vercelProjectName}.vercel.app`);
+  return Array.from(origins);
+}
+
 function escapeXml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

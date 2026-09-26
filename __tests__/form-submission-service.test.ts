@@ -2,14 +2,28 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    formBlock: { findFirst: vi.fn(), findMany: vi.fn() },
+    formBlock: { findFirst: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), upsert: vi.fn() },
     formSubmission: { create: vi.fn(), findMany: vi.fn(), count: vi.fn(), update: vi.fn(), delete: vi.fn() },
     site: { findUnique: vi.fn() },
+    domain: { findFirst: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
   },
 }));
 
+vi.mock("@/server/services/email.service", () => ({
+  sendFormSubmissionEmail: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock("@/server/services/webhook.service", () => ({
+  deliverWebhook: vi.fn(),
+}));
+
+vi.mock("@/server/services/notification.trigger", () => ({
+  notifyWorkspaceOwner: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { prisma } from "@/lib/prisma";
+import { sendFormSubmissionEmail } from "@/server/services/email.service";
 
 describe("Form Submission Service", () => {
   beforeEach(() => { vi.clearAllMocks(); });
@@ -47,6 +61,249 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
 
       await expect(submitForm("s1", "fb1", { data: {} }, "1.2.3.4")).rejects.toThrow("FORM_SUBMISSION_LIMIT");
+    });
+
+    it("returns the block's after-submit settings so the route can redirect / show the message", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true,
+        successAction: "REDIRECT", redirectUrl: "https://example.com/thanks", successMessage: "Thanks!",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2" } as any);
+
+      const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      expect(result).toMatchObject({
+        id: "sub2",
+        successAction: "REDIRECT",
+        redirectUrl: "https://example.com/thanks",
+        successMessage: "Thanks!",
+      });
+    });
+
+    it("falls back to MESSAGE when a REDIRECT row somehow has no usable URL (defense in depth — the write path already validates it)", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true,
+        successAction: "REDIRECT", redirectUrl: "/relative-not-absolute", successMessage: "Thanks!",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2b" } as any);
+
+      const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      expect(result.successAction).toBe("MESSAGE");
+      expect(result.redirectUrl).toBeNull();
+    });
+
+    it("validates returnUrl against the site's own origin before trusting it", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2c" } as any);
+
+      const same = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://mysite.example.com/contact" }, "1.2.3.4",
+      );
+      expect(same.returnUrl).toBe("https://mysite.example.com/contact");
+
+      const other = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://evil.example.com/phish" }, "1.2.3.4",
+      );
+      expect(other.returnUrl).toBeNull();
+    });
+
+    it("Fix round 2 (finding 3): validates the Referer fallback against the same site origins, never trusting it raw", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2e" } as any);
+
+      const legit = await submitForm(
+        "s1", "fb1", { data: {} }, "1.2.3.4", "https://mysite.example.com/contact",
+      );
+      expect(legit.refererUrl).toBe("https://mysite.example.com/contact");
+
+      const attacker = await submitForm(
+        "s1", "fb1", { data: {} }, "1.2.3.4", "https://evil.example.com/phish",
+      );
+      expect(attacker.refererUrl).toBeNull();
+    });
+
+    it("Fix round 2 (finding 3): always exposes the site's own resolved origin as a safe redirect fallback", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2f" } as any);
+
+      const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      expect(result.siteOrigin).toBe("https://mysite.example.com");
+    });
+
+    it("logs (not swallows) a failed notification email — the submission is already saved", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "team@example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2d" } as any);
+      vi.mocked(sendFormSubmissionEmail).mockRejectedValueOnce(new Error("SMTP down"));
+      const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(result.id).toBe("sub2d"); // submission itself is unaffected
+      expect(errSpy).toHaveBeenCalledWith(
+        expect.stringContaining("[form-submission] notify email failed"),
+        expect.any(Error),
+      );
+      errSpy.mockRestore();
+    });
+
+    it("notifies BOTH the block's configured address and the workspace owner", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "team@example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      // Two different findFirst calls share this mock (plan check, owner
+      // lookup) — distinguish by the `select` shape each actually passes.
+      vi.mocked(prisma.workspaceMember.findFirst).mockImplementation(((args: any) =>
+        args?.select?.workspace
+          ? Promise.resolve({ workspace: { plan: "FREE" } })
+          : Promise.resolve({ user: { email: "owner@example.com" } })) as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub3", data: {} } as any);
+
+      await submitForm("s1", "fb1", { data: { name: "A" } }, "1.2.3.4");
+      // The notification is fire-and-forget (`.then().catch()`); flush microtasks.
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith("team@example.com", "Site", expect.any(Array), "s1");
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith("owner@example.com", "Site", expect.any(Array), "s1");
+      expect(sendFormSubmissionEmail).toHaveBeenCalledTimes(2);
+    });
+
+    it("doesn't double-send when the owner IS the configured notify address", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "same@example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockImplementation(((args: any) =>
+        args?.select?.workspace
+          ? Promise.resolve({ workspace: { plan: "FREE" } })
+          : Promise.resolve({ user: { email: "same@example.com" } })) as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub4", data: {} } as any);
+
+      await submitForm("s1", "fb1", { data: { name: "A" } }, "1.2.3.4");
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sendFormSubmissionEmail).toHaveBeenCalledTimes(1);
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith("same@example.com", "Site", expect.any(Array), "s1");
+    });
+
+    it("Fix round 2 (finding 5): doesn't double-send when the owner and notifyEmail differ only by case", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "Same@Example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockImplementation(((args: any) =>
+        args?.select?.workspace
+          ? Promise.resolve({ workspace: { plan: "FREE" } })
+          : Promise.resolve({ user: { email: "same@example.com" } })) as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub4b", data: {} } as any);
+
+      await submitForm("s1", "fb1", { data: { name: "A" } }, "1.2.3.4");
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sendFormSubmissionEmail).toHaveBeenCalledTimes(1);
+    });
+
+    it("still notifies the owner when the block has no notifyEmail configured", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockImplementation(((args: any) =>
+        args?.select?.workspace
+          ? Promise.resolve({ workspace: { plan: "FREE" } })
+          : Promise.resolve({ user: { email: "owner@example.com" } })) as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub5", data: {} } as any);
+
+      await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith("owner@example.com", "Site", expect.any(Array), "s1");
+    });
+  });
+
+  describe("getFormBlockSettings", () => {
+    it("returns defaults when the row doesn't exist yet (form never published)", async () => {
+      const { getFormBlockSettings } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue(null);
+      const settings = await getFormBlockSettings("s1", "el1");
+      expect(settings).toEqual({
+        successMessage: null, successAction: "MESSAGE", redirectUrl: null, notifyEmail: null, spamProtection: true,
+      });
+    });
+
+    it("reads the existing row's settings", async () => {
+      const { getFormBlockSettings } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        successMessage: "Thanks", successAction: "REDIRECT", redirectUrl: "https://x.com",
+        notifyEmail: "a@b.com", spamProtection: false,
+      } as any);
+      const settings = await getFormBlockSettings("s1", "el1");
+      expect(settings.successAction).toBe("REDIRECT");
+      expect(settings.spamProtection).toBe(false);
+    });
+  });
+
+  describe("updateFormBlock", () => {
+    it("creates a row when none exists yet", async () => {
+      const { updateFormBlock } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findUnique).mockResolvedValue(null);
+      vi.mocked(prisma.formBlock.upsert).mockResolvedValue({ id: "el1" } as any);
+
+      await updateFormBlock({ siteId: "s1", blockId: "el1", spamProtection: false });
+      expect(prisma.formBlock.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "el1" },
+          create: expect.objectContaining({ id: "el1", siteId: "s1", blockId: "el1", spamProtection: false }),
+          update: { spamProtection: false },
+        }),
+      );
+    });
+
+    it("refuses to write a row that belongs to a different site", async () => {
+      const { updateFormBlock } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findUnique).mockResolvedValue({ siteId: "other-site" } as any);
+
+      await expect(updateFormBlock({ siteId: "s1", blockId: "el1", spamProtection: false })).rejects.toThrow(
+        "FORM_NOT_FOUND",
+      );
+      expect(prisma.formBlock.upsert).not.toHaveBeenCalled();
     });
   });
 

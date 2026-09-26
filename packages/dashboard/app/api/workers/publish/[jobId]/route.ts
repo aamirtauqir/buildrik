@@ -6,6 +6,7 @@ import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
 import { buildDeployFiles } from "@lib/publish-files";
 import { planFormWiring } from "@lib/publish-forms";
+import { wireSliders } from "@lib/publish-sliders";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
@@ -339,9 +340,22 @@ async function runVercelDeployJob(
      the editor published with no action at all and submitting reloaded the
      page. The row id IS the form element's id, taken from the URL we ship, so
      the two cannot drift. */
+  // Carry forward what the owner already set in the inspector (spam
+  // protection, success message) — republishing must not silently turn the
+  // honeypot off or blank a custom message just because this pass didn't
+  // touch that form.
+  const existingFormBlocks = await prisma.formBlock.findMany({
+    where: { siteId },
+    select: { id: true, spamProtection: true, successMessage: true },
+  });
+  const formSettings = Object.fromEntries(
+    existingFormBlocks.map((b) => [b.id, { spamProtection: b.spamProtection, successMessage: b.successMessage }]),
+  );
+
   const plan = planFormWiring(pages, {
     siteId,
     appOrigin: process.env.NEXT_PUBLIC_APP_URL ?? "",
+    formSettings,
   });
   if (plan.error) throw new Error(plan.error);
   const { pages: wiredPages, forms: discovered } = plan;
@@ -372,9 +386,14 @@ async function runVercelDeployJob(
     });
   }
 
+  // Slider/Carousel runtime (autoplay/interval, arrows/dots) — the block
+  // exported as stacked slides with no behaviour; inject the runtime only on
+  // pages that actually have one.
+  const slidedPages = wiredPages.map((page) => ({ ...page, html: wireSliders(page.html) }));
+
   const files: VercelFile[] = buildDeployFiles({
     siteId,
-    pages: wiredPages,
+    pages: slidedPages,
     origin: resolveSiteOrigin({
       canonicalUrl: site.canonicalUrl,
       verifiedDomain: verifiedDomain?.domain ?? null,
