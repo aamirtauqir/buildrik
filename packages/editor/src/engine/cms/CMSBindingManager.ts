@@ -20,7 +20,8 @@
  */
 
 import type { CMSContentItem, CMSFieldType } from "../../shared/types/cms";
-import { isSafeCmsBoundValue, type CmsBindableProperty } from "@buildrik/shared/schemas/sites";
+import { filterCmsBindings, isSafeCmsBoundValue, type CmsBindableProperty } from "@buildrik/shared/schemas/sites";
+import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
@@ -207,7 +208,9 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     if (!isSafeCmsBoundValue(binding.property, value)) return;
     const property = binding.property;
     const write = () => {
-      if (property === "content") element.setContent(value);
+      // Text semantics, as publish (textContent): the value is escaped, or
+      // toHTML would emit a CMS entry's markup raw into the canvas.
+      if (property === "content") element.setContent(escapeHtmlText(value));
       else element.setTrait(property, value);
     };
     const history = this.composer.history;
@@ -326,6 +329,17 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   /**
    * Export collection bindings for persistence
    */
+  /**
+   * Field bindings arrive here from version restore, the local cache and
+   * collab as well as the server — only the server's save filters them. The
+   * same per-entry filter (shared filterCmsBindings) runs here: an entry off
+   * the property allowlist, with a dangerous URL fallback or an unsafe
+   * element id is dropped; the rest import as before.
+   */
+  override import(data: Record<string, CMSElementBinding[]>): void {
+    super.import((filterCmsBindings({ field: data })?.field ?? {}) as Record<string, CMSElementBinding[]>);
+  }
+
   exportCollectionBindings(): Record<string, CMSCollectionBinding> {
     const exported: Record<string, CMSCollectionBinding> = {};
     for (const [elementId, binding] of this.collectionBindings) {
@@ -339,7 +353,9 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
    */
   importCollectionBindings(data: Record<string, CMSCollectionBinding>): void {
     this.collectionBindings.clear();
-    for (const [elementId, binding] of Object.entries(data)) {
+    // Same per-entry filter as import(): ids, bounds and shape.
+    const safe = filterCmsBindings({ collection: data })?.collection ?? {};
+    for (const [elementId, binding] of Object.entries(safe)) {
       this.collectionBindings.set(elementId, binding);
     }
   }

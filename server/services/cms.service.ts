@@ -9,6 +9,7 @@ import type {
 } from "@buildrik/shared/schemas/cms";
 import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
+import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -35,7 +36,7 @@ export class CmsError extends Error {
  * every write path (manual save, CSV import, any future importer) shares it.
  *
  * This strips MARKUP only (tags/attributes an HTML parser would honor) and
- * stores the remaining text raw; every sink escapes it (`escapeHtml` below) — it
+ * stores the remaining text raw; every sink escapes it (`escapeHtmlText`) — it
  * does nothing about a plain-text value like `javascript:alert(1)` (no tags,
  * nothing for DOMPurify to remove) that later lands in a URL-bearing
  * attribute at template-substitution time. That is a different threat with a
@@ -311,10 +312,6 @@ function applyPattern(pattern: string, data: Record<string, unknown>, asSlug: bo
   });
 }
 
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
 export interface DynamicPage {
   entryId: string;
   slug: string;
@@ -436,7 +433,7 @@ function substituteOutsideScriptStyle(
   const sub = (segment: string) =>
     segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
       const v = data[key];
-      return v == null ? "" : escapeHtml(String(v));
+      return v == null ? "" : escapeHtmlText(String(v));
     });
   while ((m = spanRe.exec(html))) {
     result += sub(html.slice(last, m.index));
@@ -482,8 +479,8 @@ export async function generateDynamicPages(
     const seoDescription = col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "";
     let html = substituteOutsideScriptStyle(cleanedTemplate, data);
     const seoTags =
-      `<title>${escapeHtml(seoTitle)}</title>` +
-      (seoDescription ? `<meta name="description" content="${escapeHtml(seoDescription)}">` : "");
+      `<title>${escapeHtmlText(seoTitle)}</title>` +
+      (seoDescription ? `<meta name="description" content="${escapeHtmlText(seoDescription)}">` : "");
     html = insertBeforeHeadClose(html, seoTags);
     // Controller review round 2: the sink defense against a dangerous URL a
     // substitution introduced runs here, over the FINAL page, through a real
