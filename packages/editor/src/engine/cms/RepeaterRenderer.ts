@@ -285,7 +285,7 @@ export class RepeaterRenderer {
         // A field value was substituted and HTML-escaped. Inject through an
         // innerHTML sink so the escaped entities decode back to inert text —
         // a raw "<script>" in a CMS value lands as literal characters, never
-        // a live node. This is the sink escapeHtml exists to protect.
+        // a live node. This is the sink escapeHtmlText exists to protect.
         const template = (el.ownerDocument ?? document).createElement("template");
         template.innerHTML = text;
         textNode.replaceWith(template.content);
