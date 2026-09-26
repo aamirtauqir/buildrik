@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 
 export type InstantiateResult = "ok" | "no-parent" | "error";
 
