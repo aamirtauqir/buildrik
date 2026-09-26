@@ -6,6 +6,7 @@ import { decode } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
+import { generateToken } from "@/server/services/token.service";
 
 // Type the GitHub
 // `userinfo.request` override's parameter from @auth/core's own types
@@ -34,6 +35,15 @@ async function currentSessionUserId(): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/** A 2FA account signing in through a provider stops at the same /auth/2fa
+ *  step password and magic-link logins do: returning this URL from `signIn`
+ *  aborts the NextAuth session, and /auth/2fa → verify2FA → create-session
+ *  mints it once the code checks out. Same 5-minute `2fa_temp` ticket. */
+async function twoFactorRedirect(userId: string): Promise<string> {
+  const tempToken = await generateToken("2fa_temp", userId, 5);
+  return `/auth/2fa?token=${encodeURIComponent(tempToken)}`;
 }
 
 // Password login goes through tRPC `auth.login` → /api/auth/create-session, which
@@ -133,7 +143,7 @@ export const authConfig: NextAuthConfig = {
                 providerAccountId: account.providerAccountId,
               },
             },
-            select: { userId: true },
+            select: { userId: true, user: { select: { twoFactorEnabled: true } } },
           });
           if (linkedAccount) {
             // Connect-provider guard: a public login has no active session
@@ -146,6 +156,10 @@ export const authConfig: NextAuthConfig = {
             const sessionUserId = await currentSessionUserId();
             if (sessionUserId && sessionUserId !== linkedAccount.userId) {
               return "/auth/error/social-error?reason=provider-linked-elsewhere";
+            }
+            // Re-authorizing your own provider while signed in is not a login.
+            if (linkedAccount.user?.twoFactorEnabled && sessionUserId !== linkedAccount.userId) {
+              return twoFactorRedirect(linkedAccount.userId);
             }
             user.id = linkedAccount.userId;
             return true;
@@ -239,6 +253,11 @@ export const authConfig: NextAuthConfig = {
             // email-based account absorption.
             if (existing.passwordHash && !providerLinked && !isSelfLink) {
               return `/auth/oauth-conflict?email=${encodeURIComponent(user.email)}`;
+            }
+            // Before any write or provider link: an unfinished 2FA login must
+            // not attach a new provider to the account.
+            if (existing.twoFactorEnabled && !isSelfLink) {
+              return twoFactorRedirect(existing.id);
             }
             user.id = existing.id;
             await prisma.user.update({ where: { id: existing.id }, data: { lastLoginAt: new Date() } });
