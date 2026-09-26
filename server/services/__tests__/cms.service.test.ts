@@ -499,6 +499,23 @@ describe("generateDynamicPages — A-17 title dedupe + script/style-safe substit
     expect(out[0].content).toContain("content: '{title}'"); // untouched inside <style>
     expect(out[0].content).toContain("const t = '{title}'"); // untouched inside <script>
   });
+
+  /* A literal "</head>" inside global CSS (a content value or comment) is not
+     escaped by escapeStyleText (only "</style" is) — it reaches this HTML
+     verbatim, before the real closing tag. Injection must land at the real
+     </head>, not inside the <style> block. */
+  it("injects SEO tags before the REAL </head>, not one embedded in template CSS", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
+    const template =
+      '<html><head><style>.x::before{content:"</head>"}</style></head>' +
+      "<body><h1>{title}</h1></body></html>";
+    const out = await generateDynamicPages("s1", "c1", template);
+    const styleEnd = out[0].content.indexOf("</style>") + "</style>".length;
+    const bodyStart = out[0].content.indexOf("<body>");
+    expect(out[0].content.slice(styleEnd, bodyStart)).toContain("<title>Hello</title>");
+    expect(out[0].content.slice(0, styleEnd)).not.toContain("<title>Hello</title>");
+  });
 });
 
 describe("findStaleTemplateBindings (A-17)", () => {

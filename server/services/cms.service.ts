@@ -8,6 +8,7 @@ import type {
   UpsertEntryInput,
 } from "@buildrik/shared/schemas/cms";
 import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
+import { insertBeforeHeadClose } from "@/lib/publish-html";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -483,7 +484,7 @@ export async function generateDynamicPages(
     const seoTags =
       `<title>${escapeHtml(seoTitle)}</title>` +
       (seoDescription ? `<meta name="description" content="${escapeHtml(seoDescription)}">` : "");
-    html = html.includes("</head>") ? html.replace("</head>", `${seoTags}</head>`) : seoTags + html;
+    html = insertBeforeHeadClose(html, seoTags);
     // Controller review round 2: the sink defense against a dangerous URL a
     // substitution introduced runs here, over the FINAL page, through a real
     // parser — not as a step of the substitution above.
