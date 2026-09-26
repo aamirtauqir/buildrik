@@ -7,7 +7,7 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const pageFindManyMock = vi.fn();
 const siteFindUniqueMock = vi.fn();
@@ -208,5 +208,37 @@ describe("pre-publish content checks (shared detector)", () => {
     const { checks } = await runPrePublishChecks("s1");
     expect(status(checks, "Image alt text")).toBe("pass");
     expect(status(checks, "Links")).toBe("pass");
+  });
+});
+
+/* Lv3 (verify pass 3, Found #3): under PUBLISH_ALLOW_SIMULATION startPublish
+   and the worker skip the Vercel connection, and root CLAUDE.md says the flag
+   skips this check — but the check still FAILED with no connection, so the
+   editor's "Publish now" stayed disabled and the local simulation loop could
+   not be reached from the UI. Keyed on the flag, never on NODE_ENV. */
+describe("Vercel connected check — PUBLISH_ALLOW_SIMULATION", () => {
+  afterEach(() => vi.unstubAllEnvs());
+  const noConnection = async () => {
+    const { getActiveVercelConnection } = await import("@server/services/integrations.service");
+    vi.mocked(getActiveVercelConnection).mockResolvedValueOnce(null as never);
+    pageFindManyMock.mockResolvedValue([{ id: "1", name: "Home", blocks: [{}], settings: null, slug: "home", isHomePage: true }]);
+  };
+
+  it("does not fail the publish under the flag with no connection — it says it will simulate", async () => {
+    vi.stubEnv("PUBLISH_ALLOW_SIMULATION", "true");
+    await noConnection();
+    const { checks, ready } = await runPrePublishChecks("s1");
+    expect(status(checks, "Vercel connected")).toBe("warning");
+    expect(detail(checks, "Vercel connected")).toMatch(/simulat/i);
+    expect(ready).toBe(true);
+  });
+
+  it("still fails without the flag, whatever NODE_ENV says", async () => {
+    vi.stubEnv("PUBLISH_ALLOW_SIMULATION", "");
+    vi.stubEnv("NODE_ENV", "development");
+    await noConnection();
+    const { checks, ready } = await runPrePublishChecks("s1");
+    expect(status(checks, "Vercel connected")).toBe("fail");
+    expect(ready).toBe(false);
   });
 });
