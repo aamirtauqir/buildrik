@@ -292,22 +292,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   }, [readOnlyView, viewerChrome]);
 
   const [aiInInspector, setAiInInspector] = React.useState(false);
-  /* Inspector visibility, user-operated and remembered. Defaults to SHOWN so
-     the drawn no-selection board is still the default state — collapsing it
+  /* Inspector visibility, user-operated. Defaults to SHOWN so the drawn
+     no-selection board is still the default state — collapsing it
      automatically was tried before and rendered that board off-viewport.
-     This is the opt-out. */
-  const [inspectorShown, setInspectorShown] = React.useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    try { return localStorage.getItem("buildrick-inspector-shown") !== "false"; }
-    catch { return true; }
-  });
+     Session-only (gap walk 93 #3): persisted, a reload left the inspector
+     hidden with no visible way back, and no board draws a "Show inspector"
+     control. The hide answers with a toast whose action is that way back;
+     ⌘K "Toggle inspector" stays the other door. */
+  const [inspectorShown, setInspectorShown] = React.useState<boolean>(true);
+  const inspectorShownRef = React.useRef(inspectorShown);
+  inspectorShownRef.current = inspectorShown;
   const toggleInspector = React.useCallback(() => {
-    setInspectorShown((v) => {
-      const next = !v;
-      try { localStorage.setItem("buildrick-inspector-shown", String(next)); } catch { /* private mode */ }
-      return next;
-    });
-  }, []);
+    const next = !inspectorShownRef.current;
+    setInspectorShown(next);
+    if (!next)
+      addToast({
+        description: "Inspector hidden",
+        action: { label: "Show", onClick: () => setInspectorShown(true) },
+      });
+  }, [addToast]);
   /* The toggle's doors are the inspector's own ✕ and the ⌘K row
      (`toggle-inspector`, commands registry) — both emit this event (G2-037:
      the footer word bar's Inspector toggle had no home on the board). */
