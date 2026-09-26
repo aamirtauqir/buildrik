@@ -1,5 +1,5 @@
 /**
- * Runs the engine's page-content detectors (`engine/content/contentIssues`)
+ * Runs the engine's page-content detectors (`@buildrik/shared/content/contentIssues`, the same detector the server pre-publish checks run)
  * over the live project and turns findings into `Issue` rows for the Issues
  * panel — the same shape the DS-lint producer already writes, so the panel,
  * the topbar chip and the publish gate (`lifecycle.ts`'s `errorCount`) don't
@@ -23,7 +23,7 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
-import { detectContentIssues } from "@/engine/content/contentIssues";
+import { detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import type { Issue } from "./useStudioState";
 
 export type ContentScanState = "idle" | "scanning" | "error";
@@ -47,7 +47,10 @@ export function useContentIssueScanner(composer: Composer | null): UseContentIss
   const scanNow = React.useCallback(() => {
     if (!composer) return;
     try {
-      const pages = composer.elements.getAllPages();
+      // exportPages(), not getAllPages(): the page map's `root` is a snapshot
+      // whose children are emptied once `buildElementTree` hands them to the
+      // element registry, so scanning it found nothing on any loaded project.
+      const pages = composer.elements.exportPages();
       const findings = detectContentIssues(pages);
       setIssues(
         findings.map((f) => ({

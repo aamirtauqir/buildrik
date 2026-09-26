@@ -1,20 +1,44 @@
 /**
- * Page-content issue detectors (missing-features L2 "Issues", boards
- * 6158:52193 / 52437 / 52681, 6883:…). The Issues panel used to list DS-lint
+ * Page-content issue detectors — the ONE source for "missing alt text" and
+ * "broken link" facts (audit B-14 / B-15 / A02-9). The editor's Issues panel
+ * (`useContentIssueScanner`) runs it over the live element tree and the
+ * server's `runPrePublishChecks` runs it over the stored `pages.blocks`, so
+ * Issues and Publish report the same facts from the same rules. It lives in
+ * `packages/shared` because both sides import it; it takes a structural
+ * element shape (`ContentElement`) rather than the editor's `ElementData`,
+ * which the server cannot import.
+ *
+ * Built for the Issues boards (missing-features L2, 6158:52193 / 52437 /
+ * 52681, 6883:…). The Issues panel used to list DS-lint
  * token warnings only — nothing looked at the actual page content, so a page
  * could ship with an unlabelled image or a link to nowhere and the panel
  * would say "No issues."
  *
- * Pure and side-effect-free per the engine contract (`engine/AGENTS.md`): no
- * React, no Composer, `PageData[]` in and findings out. The editor shell
+ * Pure and side-effect-free: no React, no Composer, no Prisma — pages in,
+ * findings out. The editor shell
  * (`AquibraStudio`, via `useContentIssueScanner`) calls this on demand and
  * wraps the call in try/catch — a detector that throws becomes the panel's
  * "Scan failed" state, not a crash that takes the whole panel down.
  *
  * @license BSD-3-Clause
  */
-import type { ElementData, PageData } from "../../shared/types";
-import { isUrl } from "../../shared/utils/helpers/validation";
+/** The element fields the detectors read. The editor's `ElementData` and the
+ *  JSON stored in `pages.blocks` both satisfy it. */
+export interface ContentElement {
+  id: string;
+  type: string;
+  tagName?: string;
+  content?: string;
+  attributes?: Record<string, string>;
+  data?: unknown;
+  children?: ContentElement[];
+}
+
+export interface ContentPage {
+  id: string;
+  name: string;
+  root: ContentElement | undefined;
+}
 
 export type ContentIssueSeverity = "error" | "warning";
 export type ContentIssueKind = "missing-alt" | "broken-link";
@@ -29,14 +53,23 @@ export interface ContentIssueFinding {
   pageId: string;
 }
 
-function isImageElement(el: ElementData): boolean {
+function parsesAsUrl(value: string): boolean {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isImageElement(el: ContentElement): boolean {
   return el.type === "image" || el.tagName?.toLowerCase() === "img";
 }
 
 /** A readable label for the row's "location" column — the element's own text
  *  or its type/tag, since neither the raw id nor a truncated `src` reads as
  *  a place a person recognizes. */
-function describeElement(el: ElementData, pageName: string): string {
+function describeElement(el: ContentElement, pageName: string): string {
   const label = el.content?.trim().slice(0, 40) || el.tagName?.toUpperCase() || el.type;
   return `${pageName} › ${label}`;
 }
@@ -48,7 +81,7 @@ function describeElement(el: ElementData, pageName: string): string {
  * `data.decorative` flag, if a producer ever sets one instead of the
  * attribute, skips the same way before the attribute is even read.
  */
-function checkImage(el: ElementData, pageId: string, pageName: string): ContentIssueFinding | null {
+function checkImage(el: ContentElement, pageId: string, pageName: string): ContentIssueFinding | null {
   const decorative = (el.data as { decorative?: boolean } | undefined)?.decorative;
   if (decorative === true) return null;
   if (el.attributes?.alt !== undefined) return null;
@@ -63,10 +96,6 @@ function checkImage(el: ElementData, pageId: string, pageName: string): ContentI
   };
 }
 
-function pageExists(pages: PageData[], pageId: string): boolean {
-  return pages.some((p) => p.id === pageId);
-}
-
 /**
  * Link defects: no destination, a bare `#` stub, a dead internal page (the
  * `#page:<id>` format `LinkSection` writes), or a URL the browser itself
@@ -74,10 +103,10 @@ function pageExists(pages: PageData[], pageId: string): boolean {
  * checks reachability, not taste.
  */
 function checkLink(
-  el: ElementData,
+  el: ContentElement,
   pageId: string,
   pageName: string,
-  pages: PageData[],
+  pageIds: ReadonlySet<string>,
 ): ContentIssueFinding | null {
   const href = el.attributes?.href;
   if (href === undefined) return null;
@@ -102,7 +131,7 @@ function checkLink(
   }
   if (trimmed.startsWith("#page:")) {
     const targetId = trimmed.slice("#page:".length);
-    if (!pageExists(pages, targetId)) {
+    if (!pageIds.has(targetId)) {
       return {
         ...base,
         id: `content:link-dead-page:${el.id}`,
@@ -113,7 +142,7 @@ function checkLink(
     return null;
   }
   if (trimmed.startsWith("mailto:") || trimmed.startsWith("tel:") || trimmed.startsWith("#")) return null;
-  if (!isUrl(trimmed)) {
+  if (!parsesAsUrl(trimmed)) {
     return {
       ...base,
       id: `content:link-malformed:${el.id}`,
@@ -125,10 +154,10 @@ function checkLink(
 }
 
 function walkPage(
-  root: ElementData | undefined,
+  root: ContentElement | undefined,
   pageId: string,
   pageName: string,
-  pages: PageData[],
+  pageIds: ReadonlySet<string>,
   out: ContentIssueFinding[],
 ): void {
   if (!root) return;
@@ -136,9 +165,10 @@ function walkPage(
     const issue = checkImage(root, pageId, pageName);
     if (issue) out.push(issue);
   }
-  const linkIssue = checkLink(root, pageId, pageName, pages);
+  const linkIssue = checkLink(root, pageId, pageName, pageIds);
   if (linkIssue) out.push(linkIssue);
-  root.children?.forEach((child) => walkPage(child, pageId, pageName, pages, out));
+  // Stored JSON is not type-checked: a malformed `children` is skipped, not thrown on.
+  if (Array.isArray(root.children)) root.children.forEach((child) => walkPage(child, pageId, pageName, pageIds, out));
 }
 
 /**
@@ -147,10 +177,32 @@ function walkPage(
  * finding here carries its own `pageId`, so it composes with that filter
  * without the panel needing to know detectors exist.
  */
-export function detectContentIssues(pages: PageData[]): ContentIssueFinding[] {
+export function detectContentIssues(
+  pages: ContentPage[],
+  /** Pages a `#page:` link may target, when that is more than the pages
+   *  scanned (the server scans only the live ones). Defaults to `pages`. */
+  existingPageIds: readonly string[] = pages.map((p) => p.id),
+): ContentIssueFinding[] {
   const out: ContentIssueFinding[] = [];
+  const pageIds = new Set(existingPageIds);
   for (const page of pages) {
-    walkPage(page.root, page.id, page.name, pages, out);
+    walkPage(page.root, page.id, page.name, pageIds, out);
   }
   return out;
 }
+
+/** A stored `pages.blocks` value as a detector root, or undefined when it is
+ *  not an element (legacy `[]`, null). */
+export function asContentRoot(blocks: unknown): ContentElement | undefined {
+  if (typeof blocks !== "object" || blocks === null || Array.isArray(blocks)) return undefined;
+  const id = (blocks as { id?: unknown }).id;
+  return typeof id === "string" ? (blocks as ContentElement) : undefined;
+}
+
+/** Pre-publish check labels for the two detector kinds. The editor's Issues
+ *  feed drops server rows with these labels — its own live scan already lists
+ *  the same facts per element. */
+export const CONTENT_CHECK_LABELS: Record<ContentIssueKind, string> = {
+  "missing-alt": "Image alt text",
+  "broken-link": "Links",
+};

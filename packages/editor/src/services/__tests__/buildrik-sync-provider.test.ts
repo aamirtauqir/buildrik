@@ -46,6 +46,7 @@ vi.mock("../api-client", () => ({
 }));
 
 import type { ProjectData } from "@/shared/types/project";
+import { blankPageRoot } from "@buildrik/shared/content/elementIds";
 import {
   loadProject,
   saveProject,
@@ -135,11 +136,10 @@ describe("loadProject", () => {
     ]);
 
     const project = await loadProject("s1");
-    expect(project.pages[0].root).toEqual({
-      id: "root",
-      type: "container",
-      children: [],
-    });
+    // X-A1: a per-page blank root (id derived from the page), never a shared
+    // "root" object that made every blank page one element.
+    expect(project.pages[0].root).toEqual(blankPageRoot("p1"));
+    expect(project.pages[0].root.id).not.toBe("root");
   });
 
   it("throws when sites.get fails", async () => {

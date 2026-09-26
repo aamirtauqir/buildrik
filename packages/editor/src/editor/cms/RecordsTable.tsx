@@ -124,21 +124,28 @@ export function RecordsTable({ collection, records, query, onOpenRecord }: Recor
   const current = Math.min(page, pages - 1);
   const visible = rows.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE);
 
+  /* `sort?.key === key` was true for NO sort when `key` was undefined — a
+     stored field without a `slug` (the verify seed's `{ id, name, type }`) —
+     and `sort.dir` then read null and took the CMS panel down. Compare only
+     against a real sort. */
   const toggleSort = (key: string) =>
-    setSort((s) => (s?.key !== key ? { key, dir: "asc" } : s.dir === "asc" ? { key, dir: "desc" } : null));
+    setSort((s) => (s === null || s.key !== key ? { key, dir: "asc" } : s.dir === "asc" ? { key, dir: "desc" } : null));
 
-  const head = (key: string, label: string, width: string) => (
-    <div
-      className={`${HEAD_CELL} ${width}`}
-      role="columnheader"
-      aria-sort={sort?.key === key ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
-    >
-      <Button type="button" size="xs" color="light" className={HEAD_BTN} data-testid={`cms-th-${key}`} onClick={() => toggleSort(key)}>
-        {label}
-        {sort?.key === key ? <span aria-hidden="true">{sort.dir === "asc" ? "↑" : "↓"}</span> : null}
-      </Button>
-    </div>
-  );
+  const head = (key: string, label: string, width: string) => {
+    const dir = sort !== null && sort.key === key ? sort.dir : null;
+    return (
+      <div
+        className={`${HEAD_CELL} ${width}`}
+        role="columnheader"
+        aria-sort={dir === null ? "none" : dir === "asc" ? "ascending" : "descending"}
+      >
+        <Button type="button" size="xs" color="light" className={HEAD_BTN} data-testid={`cms-th-${key}`} onClick={() => toggleSort(key)}>
+          {label}
+          {dir === null ? null : <span aria-hidden="true">{dir === "asc" ? "↑" : "↓"}</span>}
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" role="table" aria-label={`${collection.name} records`} data-testid="cms-table">

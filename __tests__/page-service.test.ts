@@ -42,6 +42,24 @@ describe("Page Service", () => {
       expect(prisma.site.update).toHaveBeenCalled();
     });
 
+    /* X-A1 round 1: a page stored as [] loaded with a root shared by every
+       blank page; a new page now stores its own root, id unique per site. */
+    it("writes a blank root whose id is unique to the page, not []", async () => {
+      const { createPage } = await import("@/server/services/page.service");
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1", pages: 1 } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.page.count).mockResolvedValue(1);
+      vi.mocked(prisma.page.findUnique).mockResolvedValue(null);
+      vi.mocked(prisma.page.create).mockResolvedValue({ id: "p2" } as any);
+      vi.mocked(prisma.site.update).mockResolvedValue({} as any);
+
+      await createPage({ siteId: "s1", name: "Contact" });
+      const blocks = vi.mocked(prisma.page.create).mock.calls.at(-1)![0].data.blocks as { id: string; children: unknown[] };
+      expect(Array.isArray(blocks)).toBe(false);
+      expect(blocks.id).not.toBe("root");
+      expect(blocks.children).toEqual([]);
+    });
+
     it("throws PAGE_LIMIT when at plan limit", async () => {
       const { createPage } = await import("@/server/services/page.service");
       vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1", pages: 10 } as any);
