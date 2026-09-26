@@ -55,13 +55,14 @@ describe("StudioPanels — ui:cms-open (⌘K → a collection or a record)", () 
   });
 });
 
-/* A-14: ui:switch-tab {tab:"ai"} set aiInInspector without ever setting
-   inspectorShown, so ⌘J (or the ✦ AI chip) with a previously-collapsed
-   inspector mounted AITab into a zero-width column. */
-describe("StudioPanels — ui:switch-tab 'ai' forces the inspector column open", () => {
-  it("sets aiInInspector AND forces inspectorShown, persisting the same key the toggle uses", () => {
-    expect(src).toMatch(/setAiInInspector\(true\);\s*[\s\S]{0,800}setInspectorShown\(true\);/);
-    expect(src).toContain('localStorage.setItem("buildrick-inspector-shown", "true")');
+/* A-14: ui:switch-tab {tab:"ai"} set aiInInspector while the inspector column
+   was gated on the inspector's hide preference, so ⌘J with a hidden inspector
+   mounted AITab into a zero-width column. Gap walk 93 #2 had the same shape
+   for Publish/Review/History/Activity/Issues: the column now opens for any
+   panel it hosts (isInspectorColumnOpen, unit-tested in tabsConfig.test.ts). */
+describe("StudioPanels — the column opens for every panel it hosts", () => {
+  it("feeds AI, Issues and the column tabs into isInspectorColumnOpen", () => {
+    expect(src).toContain("columnModeOpen: rightColumnTab || issuesOpen || aiInInspector");
   });
 });
 

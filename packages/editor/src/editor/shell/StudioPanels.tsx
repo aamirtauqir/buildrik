@@ -16,7 +16,7 @@ import type { Composer } from "../../engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId } from "../rail/tabsConfig";
-import { getTabMode, isColumnTabOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
+import { getTabMode, isColumnTabOpen, isInspectorColumnOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useToast } from "@/editor/chrome-ui";
@@ -414,8 +414,14 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
   const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
-  const inspectorOpen =
-    viewerChrome || (!readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen);
+  const inspectorOpen = isInspectorColumnOpen({
+    readOnlyView,
+    viewerChrome,
+    fullPage: effectiveFullPageMode,
+    cmsWorkspaceOpen,
+    inspectorShown,
+    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector,
+  });
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
@@ -528,20 +534,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            opening hidden under it (Issues wins the render, so both open meant
            an invisible AI that one Escape also closed). */
         onCloseIssues?.();
+        /* A-14: with the inspector hidden, AI used to mount into a 0-px
+           column; isInspectorColumnOpen now opens the column for any panel
+           it hosts, AI included. */
         setAiInInspector(true);
-        /* A-14: inspectorOpen is `inspectorShown && !effectiveFullPageMode &&
-           ...` — a user who had collapsed the inspector (its own ✕) got
-           aiInInspector=true with nothing rendering it: AITab mounted into a
-           zero-width column. Every ⌘J/✦-AI door means "show me the AI chat",
-           so force the column open the same way the inspector's own toggle
-           persists it, overriding the collapsed preference on this explicit
-           open. */
-        setInspectorShown(true);
-        try {
-          localStorage.setItem("buildrick-inspector-shown", "true");
-        } catch {
-          /* private mode */
-        }
         return;
       }
       onLeftPanelTabChange?.(data.tab, () => {

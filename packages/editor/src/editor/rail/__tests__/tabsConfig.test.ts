@@ -4,6 +4,7 @@ import {
   getTabMode,
   getTabConfig,
   isColumnTabOpen,
+  isInspectorColumnOpen,
 } from "../tabsConfig";
 // ONE width for every panel (founder-approved 2026-07-24). These assertions
 // used to hardcode 280, which is how the superseded two-width rule survived
@@ -96,5 +97,35 @@ describe("isColumnTabOpen", () => {
   });
   it("is closed while the panel is closed", () => {
     expect(isColumnTabOpen({ ...base, isLeftPanelOpen: false, activeTabId: "history" })).toBe(false);
+  });
+});
+
+/* Gap walk 93 #2: with the inspector hidden, History/Publish/Review/Activity
+   (and Issues) opened into a 0-px column — the column's panels were gated on
+   the INSPECTOR's own visibility preference. Hiding the inspector hides the
+   inspector; a panel that lives in its column still shows the column. */
+describe("isInspectorColumnOpen", () => {
+  const base = {
+    readOnlyView: false,
+    viewerChrome: false,
+    fullPage: false,
+    cmsWorkspaceOpen: false,
+    inspectorShown: true,
+    columnModeOpen: false,
+  };
+  it("is open by default and closed when the inspector is hidden with nothing else in the column", () => {
+    expect(isInspectorColumnOpen(base)).toBe(true);
+    expect(isInspectorColumnOpen({ ...base, inspectorShown: false })).toBe(false);
+  });
+  it("opens for a column panel even with the inspector hidden", () => {
+    expect(isInspectorColumnOpen({ ...base, inspectorShown: false, columnModeOpen: true })).toBe(true);
+  });
+  it("stays closed under a full page, the CMS workspace, and an owner's read-only view", () => {
+    for (const k of ["fullPage", "cmsWorkspaceOpen", "readOnlyView"] as const) {
+      expect(isInspectorColumnOpen({ ...base, columnModeOpen: true, [k]: true })).toBe(false);
+    }
+  });
+  it("is always open for a VIEWER (the role notice lives there)", () => {
+    expect(isInspectorColumnOpen({ ...base, readOnlyView: true, viewerChrome: true, inspectorShown: false })).toBe(true);
   });
 });
