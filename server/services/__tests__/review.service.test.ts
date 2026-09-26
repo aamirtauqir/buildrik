@@ -175,7 +175,7 @@ describe("submitReview", () => {
       expect(issueReviewToken).not.toHaveBeenCalled();
     });
 
-    // S-7 controller review round 1: a naive trim+lowercase let a +tagged or
+    // S-7 a naive trim+lowercase let a +tagged or
     // gmail-dotted variant of the submitter's own address slip past.
     it("rejects a +tagged variant of the submitter's own email", async () => {
       // beforeEach default: userFindUnique → { email: "edie@x.com" }

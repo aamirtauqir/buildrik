@@ -59,7 +59,7 @@ describe("DeleteConfirmModal", () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
-  /* B-7 round 2: DeleteConfirmModal renders a visible ModalTitle but never
+  /* B-7: DeleteConfirmModal renders a visible ModalTitle but never
      wires ModalRoot's `labelledBy` prop by hand — this is the representative
      dialog the finding names: a real, unmodified consumer that must pick up
      an accessible name on the actual role=dialog node purely from

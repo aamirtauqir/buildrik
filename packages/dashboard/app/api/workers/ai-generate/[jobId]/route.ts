@@ -4,6 +4,7 @@ import { prisma } from "@lib/prisma";
 import { generatePage } from "@server/services/ai.service";
 import { rewriteImageSources, type ImagesPreference } from "@lib/ai/rewrite-image-sources";
 import { checkWorkerAuth } from "@/lib/cron-auth";
+import { withUniqueIds } from "@buildrik/shared/content/elementIds";
 
 // AI site-generation worker. The dashboard creates an AIGenerationJob (QUEUED)
 // and polls it — but nothing processed the queue, so the "AI is building your
@@ -210,15 +211,20 @@ export async function POST(
         siteRowId = site.id;
       }
 
+      const rows = generated.map((g, i) => ({
+        siteId: siteRowId,
+        name: g.name,
+        slug: i === 0 ? "home" : slugify(g.name),
+        position: i,
+        isHomePage: i === 0,
+        blocks: g.blocks,
+      }));
+      /* X-A1: every generated page roots at "root" with sections
+         ai-<type>-<i>; the editor keys elements by id across pages, so the
+         site loaded as one tree. Written unique, with the editor's scheme. */
+      const unique = withUniqueIds(rows.map((r, i) => ({ key: `${siteRowId}:${i}`, blocks: r.blocks })));
       await tx.page.createMany({
-        data: generated.map((g, i) => ({
-          siteId: siteRowId,
-          name: g.name,
-          slug: i === 0 ? "home" : slugify(g.name),
-          position: i,
-          isHomePage: i === 0,
-          blocks: g.blocks,
-        })),
+        data: rows.map((r, i) => ({ ...r, blocks: unique[i].blocks as Prisma.InputJsonValue })),
       });
       const flipped = await tx.aIGenerationJob.updateMany({
         where: { id: jobId, status: { not: "CANCELLED" } },

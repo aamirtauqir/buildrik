@@ -223,3 +223,56 @@ describe("applyTemplateToSite (Part ③ — replace an existing site's pages)", 
     expect(siteUpdate.mock.calls[0][0].data.pages).toBe(0);
   });
 });
+
+/* X-A1 round 1: every template page stores its root as "root" (seed.ts,
+   AI-built and cloned sites), and the editor's element registry is keyed by
+   id across pages — a site built from a template loaded as ONE tree. The
+   template→site copy (useTemplate / applyTemplateToSite / sites.create) and
+   clone-as-template now write ids unique across the site, with the shared
+   deterministic scheme: first page keeps its ids. */
+describe("template paths write element ids unique across pages", () => {
+  const root = (text: string) => ({
+    id: "root", type: "container", children: [{ id: "seed-hero-0", type: "container", content: text, children: [] }],
+  });
+  const allIds = (pages: Array<{ blocks: unknown }>) => {
+    const ids: string[] = [];
+    const walk = (n: { id: string; children?: unknown[] }) => { ids.push(n.id); (n.children ?? []).forEach((c) => walk(c as never)); };
+    pages.forEach((p) => { if (p.blocks && !Array.isArray(p.blocks)) walk(p.blocks as never); });
+    return ids;
+  };
+
+  it("applyTemplateToSite (pagesFromTemplate) re-ids later pages; the first keeps \"root\"", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    tplFindFirst.mockResolvedValueOnce({
+      id: "tpl1",
+      pages: [
+        { name: "About", slug: "about", position: 1, isHomePage: false, blocks: root("about") },
+        { name: "Home", slug: "home", position: 0, isHomePage: true, blocks: root("home") },
+      ],
+    });
+    siteUpdate.mockResolvedValue({ id: "s1" });
+    await applyTemplateToSite("w1", "u1", "s1", "tpl1");
+    const created = pageCreateMany.mock.calls[0][0].data as Array<{ slug: string; blocks: { id: string } }>;
+    const home = created.find((p) => p.slug === "home")!;
+    const about = created.find((p) => p.slug === "about")!;
+    expect(home.blocks.id).toBe("root");
+    expect(about.blocks.id).not.toBe("root");
+    const ids = allIds(created);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("cloneSiteAsTemplate stores pages with unique ids", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    pageFindMany.mockResolvedValueOnce([
+      { name: "Home", slug: "home", position: 0, isHomePage: true, blocks: root("home") },
+      { name: "About", slug: "about", position: 1, isHomePage: false, blocks: root("about") },
+    ]);
+    tplFindUnique.mockResolvedValueOnce(null);
+    tplCreate.mockResolvedValueOnce({ id: "tpl_new" });
+    await cloneSiteAsTemplate("w1", "s1", "My Site");
+    const ids = allIds(tplCreate.mock.calls[0][0].data.pages);
+    expect(ids).toHaveLength(4);
+    expect(new Set(ids).size).toBe(4);
+  });
+});
+

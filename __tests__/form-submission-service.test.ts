@@ -121,7 +121,7 @@ describe("Form Submission Service", () => {
       expect(other.returnUrl).toBeNull();
     });
 
-    it("Fix round 2 (finding 3): validates the Referer fallback against the same site origins, never trusting it raw", async () => {
+    it("validates the Referer fallback against the same site origins, never trusting it raw", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
@@ -143,7 +143,7 @@ describe("Form Submission Service", () => {
       expect(attacker.refererUrl).toBeNull();
     });
 
-    it("Fix round 2 (finding 3): always exposes the site's own resolved origin as a safe redirect fallback", async () => {
+    it("always exposes the site's own resolved origin as a safe redirect fallback", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
@@ -223,7 +223,7 @@ describe("Form Submission Service", () => {
       expect(sendFormSubmissionEmail).toHaveBeenCalledWith("same@example.com", "Site", expect.any(Array), "s1");
     });
 
-    it("Fix round 2 (finding 5): doesn't double-send when the owner and notifyEmail differ only by case", async () => {
+    it("doesn't double-send when the owner and notifyEmail differ only by case", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
         id: "fb1", siteId: "s1", isActive: true, notifyEmail: "Same@Example.com",
@@ -261,7 +261,7 @@ describe("Form Submission Service", () => {
   describe("getFormBlockSettings", () => {
     it("returns defaults when the row doesn't exist yet (form never published)", async () => {
       const { getFormBlockSettings } = await import("@/server/services/form-submission.service");
-      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.formBlock.findUnique).mockResolvedValue(null);
       const settings = await getFormBlockSettings("s1", "el1");
       expect(settings).toEqual({
         successMessage: null, successAction: "MESSAGE", redirectUrl: null, notifyEmail: null, spamProtection: true,
@@ -270,7 +270,7 @@ describe("Form Submission Service", () => {
 
     it("reads the existing row's settings", async () => {
       const { getFormBlockSettings } = await import("@/server/services/form-submission.service");
-      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+      vi.mocked(prisma.formBlock.findUnique).mockResolvedValue({
         successMessage: "Thanks", successAction: "REDIRECT", redirectUrl: "https://x.com",
         notifyEmail: "a@b.com", spamProtection: false,
       } as any);
@@ -283,27 +283,18 @@ describe("Form Submission Service", () => {
   describe("updateFormBlock", () => {
     it("creates a row when none exists yet", async () => {
       const { updateFormBlock } = await import("@/server/services/form-submission.service");
-      vi.mocked(prisma.formBlock.findUnique).mockResolvedValue(null);
       vi.mocked(prisma.formBlock.upsert).mockResolvedValue({ id: "el1" } as any);
 
       await updateFormBlock({ siteId: "s1", blockId: "el1", spamProtection: false });
       expect(prisma.formBlock.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: "el1" },
-          create: expect.objectContaining({ id: "el1", siteId: "s1", blockId: "el1", spamProtection: false }),
+          // Keyed by (site, element id): the same element id on another site
+          // is another row (Ldata bug A — form-block-site-scope.db.test.ts).
+          where: { siteId_blockId: { siteId: "s1", blockId: "el1" } },
+          create: expect.objectContaining({ siteId: "s1", blockId: "el1", spamProtection: false }),
           update: { spamProtection: false },
         }),
       );
-    });
-
-    it("refuses to write a row that belongs to a different site", async () => {
-      const { updateFormBlock } = await import("@/server/services/form-submission.service");
-      vi.mocked(prisma.formBlock.findUnique).mockResolvedValue({ siteId: "other-site" } as any);
-
-      await expect(updateFormBlock({ siteId: "s1", blockId: "el1", spamProtection: false })).rejects.toThrow(
-        "FORM_NOT_FOUND",
-      );
-      expect(prisma.formBlock.upsert).not.toHaveBeenCalled();
     });
   });
 

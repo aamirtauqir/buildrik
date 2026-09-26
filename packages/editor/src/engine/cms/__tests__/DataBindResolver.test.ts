@@ -142,6 +142,14 @@ describe("resolveDataBindings", () => {
     expect(a.textContent).toBe("link");
   });
 
+  /* Ldata round 3: data values are not this session's input. */
+  it("never writes a dangerous URL into src or href", () => {
+    const el = elementFrom('<div><img data-bind="image" src="/keep.png" /><a data-bind="url" href="/keep">x</a></div>');
+    resolveDataBindings(el, { image: "data:text/html,<script>alert(1)</script>", url: "javascript:alert(1)" });
+    expect(el.querySelector("img")!.getAttribute("src")).toBe("/keep.png");
+    expect(el.querySelector("a")!.getAttribute("href")).toBe("/keep");
+  });
+
   it("skips fields absent from the data object", () => {
     const el = elementFrom('<div><p data-bind="missing">keep</p></div>');
     resolveDataBindings(el, { other: "x" });

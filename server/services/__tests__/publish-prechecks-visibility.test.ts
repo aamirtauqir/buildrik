@@ -90,6 +90,19 @@ describe("pre-publish checks count what ships", () => {
     expect(status(checks, "Empty pages")).toBe("warning");
   });
 
+  /* Lrt round 1: a real page stores an element ROOT, not an array, so the
+     [] test never warned for one — and new pages now store an empty root
+     object (blankPageRoot) instead of []. Both shapes are empty. */
+  it("warns about a page whose stored root has no children", async () => {
+    pageFindManyMock.mockResolvedValue([
+      { id: "1", name: "Home", blocks: { id: "root", type: "container", children: [{ id: "h", type: "heading" }] }, settings: null },
+      { id: "2", name: "New", blocks: { id: "el-x", type: "container", children: [] }, settings: null },
+    ]);
+    const { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "Empty pages")).toBe("warning");
+    expect(detail(checks, "Empty pages")).toContain("1 page has");
+  });
+
   it("fails when every page is non-live, rather than claiming pages are ready", async () => {
     pageFindManyMock.mockResolvedValue([
       { id: "1", name: "Home", blocks: [{}], settings: { visibility: "password" } },
@@ -101,7 +114,7 @@ describe("pre-publish checks count what ships", () => {
   // A-17: a page-generating CMS collection whose bound template page is gone
   // used to ship silently with no generated pages — surface it as a warning
   // before publish.
-  // Minor fix (controller review round 1): a "pass" row for a check that
+  // Minor fix: a "pass" row for a check that
   // never applies is noise on the near-all-sites-have-no-CMS-collection
   // case — the row is absent entirely, not a pass.
   it("omits the CMS templates row entirely when there is no page-generating collection", async () => {
@@ -126,5 +139,48 @@ describe("pre-publish checks count what ships", () => {
     cmsCollectionFindManyMock.mockResolvedValue([{ id: "c1", name: "Blog", pageTemplatePath: "blog-template.html" }]);
     const { checks } = await runPrePublishChecks("s1");
     expect(status(checks, "CMS templates")).toBe("pass");
+  });
+});
+
+/* B-14 / A02-9: Publish listed no content facts at all, so the Issues panel
+   and Publish could not agree on an image with no alt text or a link to a
+   deleted page. The checks now run the shared detector
+   (`@buildrik/shared/content/contentIssues`) over the stored blocks — the
+   same one the editor scanner runs — as warnings, never blocking. Shapes
+   below are the real stored `pages.blocks` root (buildrik_verify S2/Home). */
+describe("pre-publish content checks (shared detector)", () => {
+  const storedHome = {
+    id: "root",
+    type: "container",
+    tagName: "div",
+    children: [
+      { id: "img-noalt", type: "image", tagName: "img", children: [], attributes: { src: "https://placehold.co/300x200" } },
+      { id: "img-ok", type: "image", tagName: "img", children: [], attributes: { alt: "Image" } },
+      { id: "link-dead", type: "link", tagName: "a", content: "Dead", children: [], attributes: { href: "#page:does-not-exist-xyz" } },
+      { id: "link-ok", type: "link", tagName: "a", content: "Services", children: [], attributes: { href: "#page:p2" } },
+    ],
+  };
+
+  it("warns about a missing alt and a dead internal link, without blocking", async () => {
+    pageFindManyMock.mockResolvedValue([
+      { id: "p1", name: "Home", blocks: storedHome, settings: null },
+      { id: "p2", name: "Services", blocks: { id: "r2", type: "container", children: [] }, settings: null },
+    ]);
+    const result = await runPrePublishChecks("s1");
+    expect(status(result.checks, "Image alt text")).toBe("warning");
+    expect(detail(result.checks, "Image alt text")).toContain("1 image");
+    expect(status(result.checks, "Links")).toBe("warning");
+    expect(detail(result.checks, "Links")).toContain("1 link");
+    expect(result.ready).toBe(true);
+  });
+
+  it("passes both rows when content is clean, and tolerates legacy array blocks", async () => {
+    pageFindManyMock.mockResolvedValue([
+      { id: "p1", name: "Home", blocks: [], settings: null },
+      { id: "p2", name: "Services", blocks: { id: "r2", type: "container", children: [] }, settings: null },
+    ]);
+    const { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "Image alt text")).toBe("pass");
+    expect(status(checks, "Links")).toBe("pass");
   });
 });

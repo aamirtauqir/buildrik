@@ -5,16 +5,16 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 // The link token IS the bearer credential for the draft it unlocks — a
 // VIEWER should not be able to read it off the list, only an EDITOR+ who
 // could also create one. passwordHash never leaves the server at all — a
-// `hasPassword` boolean replaces it (controller review round 1: an earlier
+// `hasPassword` boolean replaces it (an earlier
 // "set"/null STRING placeholder was still typed `passwordHash: string` on
 // the consuming UI, so nothing forced callers to stop treating it as the
 // real hash's presence-or-shape; a boolean field with its own name is
 // harder to misuse that way, and matches what the UI actually needs).
 //
 // SSOT for every response shape this file hands back for a ShareLink row.
-// Round 2 fixed this drop for createShareLink by hand-copying the same
-// destructure a second time; round 4 found a THIRD copy would have been
-// needed for revokeShareLink, which was still returning the raw Prisma
+// The same destructure was hand-copied for createShareLink, and a THIRD
+// copy would have been needed for revokeShareLink, which was still
+// returning the raw Prisma
 // row (passwordHash included) straight to the client. One helper now, so
 // there's nothing left to forget to copy a fourth time.
 function redactShareLink<T extends { passwordHash: string | null }>(
@@ -140,7 +140,7 @@ export async function createShareLink(
 }
 
 export async function revokeShareLink(id: string) {
-  // S-10 (round 4): this used to return the raw prisma.shareLink.update
+  // S-10: this used to return the raw prisma.shareLink.update
   // row, passwordHash included, straight through site-detail.ts's revoke
   // mutation — the router itself never had to look at it. Same redaction
   // as list/create.
@@ -236,6 +236,7 @@ export async function getShareDraftRows(siteId: string) {
       publishedUrl: true,
       projectStyles: true,
       projectSettings: true,
+      projectCmsBindings: true,
       dsSchemaVersion: true,
       favicon: true,
       defaultLocale: true,
@@ -276,13 +277,13 @@ export async function getShareDraftRows(siteId: string) {
     select: { filename: true, url: true },
     orderBy: { createdAt: "asc" },
   });
-  const { sitePages, name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion, ...columns } = site;
+  const { sitePages, name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion, ...columns } = site;
   const pages = sitePages.filter((p) => {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;
     return visibility === undefined || visibility === "live";
   });
   return {
-    site: { name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion },
+    site: { name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion },
     pages,
     siteColumns: { name, ...columns },
     siteFonts: fontAssets,

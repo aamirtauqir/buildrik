@@ -49,7 +49,7 @@ type LinkState =
 const DEFAULT_LINK_NAME = "Draft preview";
 
 function isOpenToAnyone(row: ShareLinkRow, now: number): boolean {
-  // controller review round 1 (IMPORTANT 6): the service no longer sends
+  // (IMPORTANT 6): the service no longer sends
   // passwordHash at all (not even a redacted placeholder) — hasPassword is
   // the boolean the server computed server-side. A row with no token (never
   // revealed to this caller) can't be reused either.

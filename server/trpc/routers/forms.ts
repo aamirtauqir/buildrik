@@ -9,7 +9,6 @@ import {
   exportSubmissions,
   getFormBlockSettings,
   updateFormBlock,
-  FormError,
 } from "@/server/services/form-submission.service";
 import {
   listSubmissionsSchema,
@@ -75,29 +74,18 @@ export const formsRouter = router({
       // SUBMIT / PROTECTION field stays EDITOR-writable via the guard above.
       //
       // Gated on an actual diff against the stored row, not on the field's
-      // mere presence in the payload — the inspector saves on every blur
-      // (fix round 2, finding 1), so an EDITOR tabbing through the field
-      // untouched, or saving a different linked field that happens to
-      // bundle notifyEmail, would otherwise hit a FORBIDDEN for a no-op
-      // write. "" and null both mean "unset".
+      // mere presence in the payload — the inspector saves on every blur, so
+      // an EDITOR tabbing through the field untouched, or saving a different
+      // linked field that happens to bundle notifyEmail, would otherwise hit
+      // a FORBIDDEN for a no-op write. "" and null both mean "unset".
       if (input.notifyEmail !== undefined) {
-        const existing = await ctx.prisma.formBlock.findUnique({
-          where: { id: input.blockId },
-          select: { notifyEmail: true },
-        });
+        const existing = await getFormBlockSettings(input.siteId, input.blockId);
         const normalize = (v: string | null | undefined) => v || "";
-        if (normalize(existing?.notifyEmail) !== normalize(input.notifyEmail)) {
+        if (normalize(existing.notifyEmail) !== normalize(input.notifyEmail)) {
           await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
         }
       }
-      try {
-        return await updateFormBlock(input);
-      } catch (e: unknown) {
-        if (e instanceof FormError) {
-          throw new TRPCError({ code: e.code, message: e.message });
-        }
-        throw e;
-      }
+      return updateFormBlock(input);
     }),
 
   exportSubmissions: protectedProcedure

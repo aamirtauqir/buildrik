@@ -1,7 +1,7 @@
 /**
  * B-8: the Branding dialog's Brand color, Logo URL and Custom domain are
  * reachable by their labels, which keep the dialog's original body-sm /
- * semibold / text-secondary look (fix round 1).
+ * semibold / text-secondary look.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";

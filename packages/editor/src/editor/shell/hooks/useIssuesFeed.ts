@@ -28,6 +28,7 @@
  */
 import * as React from "react";
 import type { Composer } from "@/engine";
+import { CONTENT_CHECK_LABELS } from "@buildrik/shared/content/contentIssues";
 import { fetchPrePublishChecks } from "@/services/PublishService";
 import { useContentIssueScanner } from "./useContentIssueScanner";
 import type { Issue } from "./useStudioState";
@@ -41,6 +42,8 @@ export interface UseIssuesFeedReturn {
    *  panel's one "Try again" affordance covers both fallible sources. */
   rescan: () => void;
 }
+
+const SERVER_CONTENT_LABELS = new Set(Object.values(CONTENT_CHECK_LABELS));
 
 export function useIssuesFeed(
   composer: Composer | null,
@@ -88,7 +91,10 @@ export function useIssuesFeed(
         if (!alive) return;
         setCheckIssues(
           result.checks
-            .filter((c) => c.status !== "pass")
+            // The server's content rows ("Image alt text", "Links") are the
+            // same shared detector the scanner above runs per element on the
+            // live tree — listing both would count each fact twice.
+            .filter((c) => c.status !== "pass" && !SERVER_CONTENT_LABELS.has(c.label))
             .map((c) => ({
               id: `publish-check:${c.label}`,
               type: c.status === "fail" ? ("error" as const) : ("warning" as const),

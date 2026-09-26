@@ -109,4 +109,19 @@ describe("getShareDraftRows", () => {
     const where = vi.mocked(prisma.mediaAsset.findMany).mock.calls.at(-1)![0]!.where;
     expect(where).toEqual({ siteId: "s1", type: "font", userMetadata: { path: ["siteFont"], equals: true } });
   });
+
+  /* Ldata I1: the draft is rendered from these rows by the editor's own
+     projectDataFromRows, which reads `projectCmsBindings` — without it every
+     CMS-bound element in a shared draft showed its placeholder copy. */
+  it("carries the site's CMS bindings to the draft render", async () => {
+    const bindings = { field: { h1: [{ binding: { sourceId: "cms:c", path: "t", type: "variable" }, collectionId: "c", fieldSlug: "t", property: "content" }] } };
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: bindings, sitePages: [] } as never);
+
+    const rows = await getShareDraftRows("s1");
+
+    const select = vi.mocked(prisma.site.findUnique).mock.calls.at(-1)![0].select as Record<string, unknown>;
+    expect(select.projectCmsBindings).toBe(true);
+    expect(rows.site.projectCmsBindings).toEqual(bindings);
+    expect(rows.siteColumns).not.toHaveProperty("projectCmsBindings");
+  });
 });

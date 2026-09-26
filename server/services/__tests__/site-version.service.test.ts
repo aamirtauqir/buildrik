@@ -100,7 +100,7 @@ describe("site-version.service", () => {
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { siteId: "s1" },
-        select: { versionId: true, name: true, isAuto: true, createdBy: true, createdAt: true },
+        select: { versionId: true, name: true, isAuto: true, createdBy: true, createdAt: true, updatedAt: true },
       })
     );
   });
@@ -137,7 +137,10 @@ describe("site-version.service", () => {
      deleteSiteVersion's idempotency contract. */
   it("renameSiteVersion updates the name by (siteId, versionId)", async () => {
     updateMany.mockResolvedValueOnce({ count: 1 });
-    expect(await renameSiteVersion("s1", "v1", "Launch draft")).toEqual({ ok: true });
+    const at = new Date("2026-09-26T10:00:00Z");
+    findUnique.mockResolvedValueOnce({ updatedAt: at });
+    /* X-1: the new clock goes back so the renaming browser can stamp it. */
+    expect(await renameSiteVersion("s1", "v1", "Launch draft")).toEqual({ ok: true, updatedAt: at });
     expect(updateMany).toHaveBeenCalledWith({
       where: { siteId: "s1", versionId: "v1" },
       data: { name: "Launch draft" },
@@ -146,6 +149,7 @@ describe("site-version.service", () => {
 
   it("renameSiteVersion is a no-op (not a throw) when the version is gone", async () => {
     updateMany.mockResolvedValueOnce({ count: 0 });
-    expect(await renameSiteVersion("s1", "gone", "New name")).toEqual({ ok: true });
+    findUnique.mockResolvedValueOnce(null);
+    expect(await renameSiteVersion("s1", "gone", "New name")).toEqual({ ok: true, updatedAt: null });
   });
 });

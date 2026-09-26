@@ -1,5 +1,5 @@
 /**
- * IMPORTANT (controller ruling, fix round 3) — the signIn callback
+ * The signIn callback
  * (server/auth.config.ts) must resolve identity by the physical provider
  * link (Account.provider_providerAccountId) BEFORE any email-based
  * branching. Scenario: user A signed up via GitHub with verified a@x, then
@@ -33,7 +33,7 @@ beforeEach(async () => {
   await truncateTables("account", "workspaceMember", "workspace", "user");
 });
 
-describe("signIn callback — account-first identity resolution against real Postgres (IMPORTANT, fix round 3)", () => {
+describe("signIn callback — account-first identity resolution against real Postgres", () => {
   it("A's GitHub email changes to b@x on next login: signs in as A, no new user, no new workspace, A's credentials untouched", async () => {
     const userA = await createTestUser({
       email: "a@x.example.com",

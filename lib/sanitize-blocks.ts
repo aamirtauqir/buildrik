@@ -266,10 +266,10 @@ export function sanitizeTemplateHtml(html: string): string {
   return purify(html);
 }
 
-// ── Generated-page HTML sanitizer (controller review round 2) ──────────────
+// ── Generated-page HTML sanitizer ──────────────
 //
-// A regex "is this substitution inside a URL attribute" detector (round 1's
-// fix) is bypassable: unquoted attributes, a later `srcset` candidate,
+// A regex "is this substitution inside a URL attribute" detector is
+// bypassable: unquoted attributes, a later `srcset` candidate,
 // `style="background:url(...)"`, and case all need real HTML parsing to
 // resolve correctly (verified live — each of those four shapes got through).
 // This runs the WHOLE generated page through DOMPurify (a real parser, so
@@ -283,8 +283,8 @@ export function sanitizeTemplateHtml(html: string): string {
 // re-litigate which tags a page may contain, the way the tag/attribute
 // allowlist does for untrusted stored trees), and keeping a SAFE srcset
 // candidate instead of dropping the whole attribute the way
-// `unsafeAttributeReason` does (round 2's own test asserts the safe candidate
-// survives).
+// `unsafeAttributeReason` does (this file's own test asserts the safe
+// candidate survives).
 
 // `<script>`/`<style>` content is raw text a browser never parses as HTML —
 // but DOMPurify's underlying parser can still misparse a `<`-containing JS/CSS
@@ -295,6 +295,13 @@ export function sanitizeTemplateHtml(html: string): string {
 // <head> and <body>, so it can't be foster-parented to the wrong place the
 // way a bare text placeholder would be) before sanitizing, then restore the
 // original span verbatim afterward.
+// URL_ATTRIBUTES is the SSOT for the blocks-tree sanitizer (S-1 write
+// boundary); `data` (`<object data="...">`) is added only for THIS pass —
+// a force-allowed page can contain an `<object>` the blocks allowlist would
+// never let through in the first place, but a dangerous `data=` URL on one
+// must not survive force-keep here either.
+const GENERATED_PAGE_URL_ATTRIBUTES: ReadonlySet<string> = new Set([...URL_ATTRIBUTES, "data"]);
+
 const SCRIPT_STYLE_SPAN_RE = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
 const SPAN_PLACEHOLDER = (i: number) => `<style>/*BD_DYNPAGE_SPAN_${i}*/</style>`;
 const SPAN_PLACEHOLDER_RE = /<style>\/\*BD_DYNPAGE_SPAN_(\d+)\*\/<\/style>/g;
@@ -314,8 +321,9 @@ const SPAN_PLACEHOLDER_RE = /<style>\/\*BD_DYNPAGE_SPAN_(\d+)\*\/<\/style>/g;
  * introduced, never to re-litigate which tags a page may contain); `on*`
  * event-handler attributes are the one exception, left to DOMPurify's
  * default stripping, and `FORBIDDEN_ATTRIBUTES` (srcdoc) is always dropped.
- * A URL-bearing attribute (`URL_ATTRIBUTES` — href/src/action/formaction/
- * poster/xlink:href) with a dangerous URL, and a `style` with a dangerous
+ * A URL-bearing attribute (`GENERATED_PAGE_URL_ATTRIBUTES` — `URL_ATTRIBUTES`
+ * plus `data`, for `<object data="...">` — href/src/action/formaction/
+ * poster/xlink:href/data) with a dangerous URL, and a `style` with a dangerous
  * `url()` (`cssValueHasDangerousUrl`), are removed; a `srcset` loses only its
  * dangerous candidates. A clean page is returned byte-for-byte. DOCTYPE is
  * preserved manually — DOMPurify's WHOLE_DOCUMENT mode drops it.
@@ -350,7 +358,7 @@ export function sanitizeGeneratedPageHtml(html: string): string {
     if (
       FORBIDDEN_ATTRIBUTES.has(name) ||
       (name === "style" && cssValueHasDangerousUrl(value)) ||
-      (name !== "srcset" && URL_ATTRIBUTES.has(name) && isDangerousUrl(value))
+      (name !== "srcset" && GENERATED_PAGE_URL_ATTRIBUTES.has(name) && isDangerousUrl(value))
     ) {
       data.keepAttr = false;
       return;

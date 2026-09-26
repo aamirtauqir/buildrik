@@ -3,12 +3,12 @@
  *
  * Sums cms.dynamicPages across every collection with a pageSlugPattern set,
  * tolerates one collection's query failing without blanking the others, and
- * recomputes when the composer says the CMS store changed.
+ * recomputes when the CMS store (the CollectionManager's own emitter) changes.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 
 const dynamicPagesQuery = vi.fn();
 
@@ -22,37 +22,44 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: () => "site-1",
 }));
 
+const storedCollections = vi.fn();
+vi.mock("@/engine/cms/CollectionStorage", () => ({
+  loadCollections: () => storedCollections(),
+}));
+
 import { useDynamicPagesSummary } from "../useDynamicPagesSummary";
 import { EVENTS } from "@/shared/constants/events";
+import { EventEmitter } from "@/engine/EventEmitter";
+import { CollectionManager } from "@/engine/cms/CollectionManager";
 
 interface FakeCollection {
   id: string;
   pageSlugPattern?: string;
 }
 
+/* X-6 (live verify 2026-09-26): the CMS events are emitted by the
+   CollectionManager ITSELF, not by the composer — the composer is a different
+   emitter. The earlier fake re-emitted them on the composer, so the tests
+   passed while the live row never appeared: the Pages tab computed once,
+   before the store loaded, and never heard the refresh. The fake now has the
+   real topology: a real CollectionManager (storage mocked) under a composer
+   whose own emitter never carries CMS events. */
 function fakeComposer(collections: FakeCollection[]) {
-  const listeners = new Map<string, Set<(...a: unknown[]) => void>>();
-  return {
-    cms: {
-      collections: {
-        getAllCollections: () => collections,
-      },
-    },
-    on: (event: string, fn: (...a: unknown[]) => void) => {
-      if (!listeners.has(event)) listeners.set(event, new Set());
-      listeners.get(event)!.add(fn);
-    },
-    off: (event: string, fn: (...a: unknown[]) => void) => {
-      listeners.get(event)?.delete(fn);
-    },
-    emit: (event: string, ...args: unknown[]) => {
-      listeners.get(event)?.forEach((fn) => fn(...args));
-    },
-  };
+  storedCollections.mockResolvedValue(collections.map((c) => ({ name: c.id, ...c })));
+  const manager = new CollectionManager();
+  const composer = Object.assign(new EventEmitter(), { cms: { collections: manager } });
+  return { composer, manager };
+}
+
+async function loaded(collections: FakeCollection[]) {
+  const f = fakeComposer(collections);
+  await f.manager.refreshFromStorage();
+  return f;
 }
 
 beforeEach(() => {
   dynamicPagesQuery.mockReset();
+  storedCollections.mockReset();
 });
 
 describe("useDynamicPagesSummary", () => {
@@ -62,14 +69,14 @@ describe("useDynamicPagesSummary", () => {
   });
 
   it("is empty when no collection has a pageSlugPattern", async () => {
-    const composer = fakeComposer([{ id: "c1" }, { id: "c2" }]);
+    const { composer } = await loaded([{ id: "c1" }, { id: "c2" }]);
     const { result } = renderHook(() => useDynamicPagesSummary(composer as never));
     await waitFor(() => expect(result.current).toEqual({ count: 0, collectionId: null }));
     expect(dynamicPagesQuery).not.toHaveBeenCalled();
   });
 
   it("sums published pages across every page-generating collection", async () => {
-    const composer = fakeComposer([
+    const { composer } = await loaded([
       { id: "blog", pageSlugPattern: "/blog/{slug}" },
       { id: "docs", pageSlugPattern: "/docs/{slug}" },
       { id: "no-pages" },
@@ -87,7 +94,7 @@ describe("useDynamicPagesSummary", () => {
   });
 
   it("tolerates one collection's query failing — the others still count", async () => {
-    const composer = fakeComposer([
+    const { composer } = await loaded([
       { id: "blog", pageSlugPattern: "/blog/{slug}" },
       { id: "broken", pageSlugPattern: "/broken/{slug}" },
     ]);
@@ -101,16 +108,43 @@ describe("useDynamicPagesSummary", () => {
     expect(result.current.collectionId).toBe("blog");
   });
 
-  it("re-fetches when the composer reports the CMS store refreshed", async () => {
-    const composer = fakeComposer([{ id: "blog", pageSlugPattern: "/blog/{slug}" }]);
+  it("X-6: counts a collection that only arrives when the store loads after mount", async () => {
+    // Live shape: the Pages tab is open at load, so the hook mounts while the
+    // store is still empty; the server hydrate lands later and the manager
+    // announces it with CMS_STORE_REFRESHED on ITSELF.
+    const { composer, manager } = fakeComposer([]);
+    dynamicPagesQuery.mockResolvedValue([{ entryId: "e1", slug: "/blog/" }]);
+    const { result } = renderHook(() => useDynamicPagesSummary(composer as never));
+    await waitFor(() => expect(result.current.count).toBe(0));
+
+    storedCollections.mockResolvedValue([{ id: "posts", name: "Posts", pageSlugPattern: "/blog/{slug}" }]);
+    await act(() => manager.refreshFromStorage());
+    await waitFor(() => expect(result.current).toEqual({ count: 1, collectionId: "posts" }));
+  });
+
+  it("re-fetches when an entry is published or unpublished", async () => {
+    const { composer, manager } = await loaded([{ id: "blog", pageSlugPattern: "/blog/{slug}" }]);
     dynamicPagesQuery.mockResolvedValue([{ entryId: "1" }]);
     const { result } = renderHook(() => useDynamicPagesSummary(composer as never));
     await waitFor(() => expect(result.current.count).toBe(1));
-    expect(dynamicPagesQuery).toHaveBeenCalledTimes(1);
 
-    dynamicPagesQuery.mockResolvedValue([{ entryId: "1" }, { entryId: "2" }, { entryId: "3" }]);
-    composer.emit(EVENTS.CMS_STORE_REFRESHED, []);
-    await waitFor(() => expect(result.current.count).toBe(3));
-    expect(dynamicPagesQuery).toHaveBeenCalledTimes(2);
+    dynamicPagesQuery.mockResolvedValue([{ entryId: "1" }, { entryId: "2" }]);
+    act(() => manager.emit(EVENTS.CMS_CONTENT_PUBLISHED, {}));
+    await waitFor(() => expect(result.current.count).toBe(2));
+
+    dynamicPagesQuery.mockResolvedValue([]);
+    act(() => manager.emit(EVENTS.CMS_CONTENT_UNPUBLISHED, {}));
+    await waitFor(() => expect(result.current.count).toBe(0));
+  });
+
+  it("stops listening on unmount", async () => {
+    const { composer, manager } = await loaded([{ id: "blog", pageSlugPattern: "/blog/{slug}" }]);
+    dynamicPagesQuery.mockResolvedValue([{ entryId: "1" }]);
+    const { result, unmount } = renderHook(() => useDynamicPagesSummary(composer as never));
+    await waitFor(() => expect(result.current.count).toBe(1));
+    unmount();
+    dynamicPagesQuery.mockClear();
+    manager.emit(EVENTS.CMS_STORE_REFRESHED, []);
+    expect(dynamicPagesQuery).not.toHaveBeenCalled();
   });
 });

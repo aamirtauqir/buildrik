@@ -580,7 +580,7 @@ describe("useComposerInit — autosave conflict handling", () => {
     expect(syncSaveProject).toHaveBeenCalledTimes(1);
   });
 
-  /* Fix round 1 / IMPORTANT 1: a conflict raised by a PUBLISH (C-3) went
+  /* Fix / IMPORTANT 1: a conflict raised by a PUBLISH (C-3) went
      through raiseSaveConflict only — autosave held, but no save path set the
      chip, so after Escape there was no Conflict pill, no Publish blocker, and
      every later edit lived only in this tab. */

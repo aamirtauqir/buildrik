@@ -99,7 +99,7 @@ describe("S-9 site-scoped workspace lists", () => {
     expect(result.data.map((s) => s.id).sort()).toEqual([s1.id, s2.id].sort());
   });
 
-  // IMPORTANT 10 (controller, fix round 1): the ADMIN case above proves the
+  // The ADMIN case above proves the
   // "manages the whole workspace" exemption; this proves the OTHER unscoped
   // case — a non-admin member with zero SitePermission rows is on the "all
   // sites" default and must also see everything, not just admins.

@@ -35,11 +35,11 @@ export function dropLockedAndInstances(elements: Element[]): { kept: Element[]; 
  * Applies position changes via inline styles.
  * Respects snap-to-grid setting when enabled.
  *
- * Controller review round 1, IMPORTANT 2: a locked element nudged anyway —
+ * IMPORTANT 2: a locked element nudged anyway —
  * the delete/cut/toggleLock/drop-target guards from A-5 never reached the
  * keyboard-arrow path. Skips a locked (or instance-owned) selection and
  * emits the same LOCKED_ELEMENTS_SKIPPED event delete/cut emit, so the
- * shell's toast (round 1 MINOR 4) fires the same way.
+ * shell's toast fires the same way.
  */
 export function nudgeSelected(composer: Composer, deltaX: number, deltaY: number): void {
   const selected = composer.selection.getSelected();

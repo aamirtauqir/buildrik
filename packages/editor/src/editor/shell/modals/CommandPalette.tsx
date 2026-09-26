@@ -85,7 +85,7 @@ const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tool
  * otherwise show a live "Open AI assistant" row that the sink silently
  * swallows.
  */
-const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId>> = {
+const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId | "ai">> = {
   pages: "pages",
   add: "add",
   layers: "layers",
@@ -94,7 +94,7 @@ const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId>> = {
   content: "content",
   design: "design",
   publish: "publish",
-  ai: "ai" as GroupedTabId,
+  ai: "ai",
   templates: "templates",
   review: "review",
   activity: "activity",
@@ -146,7 +146,14 @@ function buildCommands(
   ];
   for (const [id, label, fn, keywords] of nav) {
     const target = NAV_TAB_TARGET[id];
-    if (target !== undefined && !isTabAllowedForViewer(target, viewerChrome)) continue;
+    // "ai" isn't a real GroupedTabId (it opens the inspector column, not a
+    // rail tab) but shares VIEWER_TABS' gate: it isn't in that set, so a
+    // VIEWER never sees it, same as every other tab absent from the set.
+    if (target === "ai") {
+      if (viewerChrome) continue;
+    } else if (target !== undefined && !isTabAllowedForViewer(target, viewerChrome)) {
+      continue;
+    }
     commands.push({ id: `nav-${id}`, label, group: "Navigate", keywords, handler: run(fn) });
   }
   /* The Permissions dialog's door for every role but a viewer (whose door is

@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
+import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
@@ -44,9 +45,14 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   };
   const livePages = allPages.filter(isLive);
   const pageCount = livePages.length;
-  const emptyPages = livePages.filter(
-    (p) => Array.isArray(p.blocks) && p.blocks.length === 0
-  );
+  /* Empty = legacy `[]`, or an element root with no children. Real pages
+     store a root object, so the `[]` test alone never warned for one — and
+     new pages are written as an empty root (blankPageRoot), not `[]`. */
+  const emptyPages = livePages.filter((p) => {
+    if (Array.isArray(p.blocks)) return p.blocks.length === 0;
+    const root = asContentRoot(p.blocks);
+    return root !== undefined && !(Array.isArray(root.children) && root.children.length > 0);
+  });
 
   const checks: PrePublishChecksResult["checks"] = [];
 
@@ -106,12 +112,34 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     checks.push({ label: "Favicon", status: "pass", detail: "Favicon is configured." });
   }
 
+  /* Content (B-14 / A02-9): the shared detector the editor's Issues scanner
+     runs, over the pages that ship, so Issues and Publish state the same
+     facts. Warnings only — an unlabelled image or a dead link degrades the
+     site, it does not stop the deploy. A `#page:` target is checked against
+     every page, the editor's own rule. */
+  const contentFindings = detectContentIssues(
+    livePages.map((p) => ({ id: p.id, name: p.name, root: asContentRoot(p.blocks) })),
+    allPages.map((p) => p.id),
+  );
+  const altCount = contentFindings.filter((f) => f.kind === "missing-alt").length;
+  const linkCount = contentFindings.filter((f) => f.kind === "broken-link").length;
+  checks.push(
+    altCount > 0
+      ? { label: CONTENT_CHECK_LABELS["missing-alt"], status: "warning", detail: `${altCount} image${altCount > 1 ? "s are" : " is"} missing alt text.` }
+      : { label: CONTENT_CHECK_LABELS["missing-alt"], status: "pass", detail: "Every image has alt text." },
+  );
+  checks.push(
+    linkCount > 0
+      ? { label: CONTENT_CHECK_LABELS["broken-link"], status: "warning", detail: `${linkCount} link${linkCount > 1 ? "s are" : " is"} broken or missing a destination.` }
+      : { label: CONTENT_CHECK_LABELS["broken-link"], status: "pass", detail: "Every link has a destination." },
+  );
+
   // CMS dynamic-page templates (A-17): a page-generating collection whose
   // bound template page was deleted/renamed since binding would otherwise
   // silently ship without its generated pages — surfaced here, before publish,
   // instead of only as a server log at publish time. Skipped entirely (no
   // row at all) when the site has no page-generating collection — a "pass"
-  // row for a check that never applies is noise (controller review round 1).
+  // row for a check that never applies is noise.
   const templateBindings = await findStaleTemplateBindings(siteId, allPages);
   if (templateBindings.hasPageGeneratingCollections) {
     if (templateBindings.stale.length > 0) {
@@ -290,7 +318,7 @@ export async function startPublish(
        approval and no error. The deploy 50 lines below already uses
        `site.workspaceId`; only the gate was reading the session value. */
     const gateWorkspaceId = site.workspaceId;
-    // PD-7/8 (controller review round 1): reviews live behind `agency_layer` —
+    // PD-7/8: reviews live behind `agency_layer` —
     // reviews.submit hard-refuses (requireAgencyLayer) when the flag is off, so
     // a workspace with editsRequireApproval=true but agency_layer=false has NO
     // way to ever produce an APPROVED review. Enforcing the gate there deadlocks

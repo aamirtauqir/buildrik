@@ -321,7 +321,7 @@ describe("AdvancedScreen — dirty wiring + flush handler", () => {
   });
 });
 
-/* M7 round 2: Global CSS is project data, not a Site column — an EDITOR
+/* M7: Global CSS is project data, not a Site column — an EDITOR
    could always edit it. Only head/body code are mirrored to Site columns. */
 describe("AdvancedScreen — Site-column fields below ADMIN", () => {
   it("locks head and body code with the reason; Global CSS stays editable", async () => {

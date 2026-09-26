@@ -63,10 +63,10 @@ describe("layer-boundary lint — shared/", () => {
     expect(hasBoundaryViolation(msgs)).toBe(true);
   });
 
-  it("allows shared/extensions/ → editor/shared/vibcoder (whitelist)", async () => {
+  it("allows shared/forms/ → editor/chrome-ui (the one documented shared→editor edge)", async () => {
     const msgs = await lintFixture(
-      path.join(editorRoot, "src/shared/extensions/__fixture__.tsx"),
-      `import { Button } from "@/editor/shared/vibcoder";\nButton;\n`
+      path.join(editorRoot, "src/shared/forms/__fixture__.tsx"),
+      `import { Button } from "@/editor/chrome-ui";\nButton;\n`
     );
     expect(hasBoundaryViolation(msgs)).toBe(false);
   });

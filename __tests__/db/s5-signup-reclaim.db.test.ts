@@ -123,7 +123,7 @@ describe("acceptInvite requires a DB-verified email (S-5)", () => {
   });
 });
 
-describe("first-verification credential clearing (PD-5, controller ruling fix round 1)", () => {
+describe("first-verification credential clearing (PD-5)", () => {
   it("verifyMagicLink on a never-verified row clears passwordHash/2FA and bumps sessionVersion", async () => {
     const user = await createTestUser({
       email: "magiclink-victim@test.buildrik.local",
@@ -173,7 +173,7 @@ describe("first-verification credential clearing (PD-5, controller ruling fix ro
   });
 });
 
-describe("signup() concurrent-signup race (CRITICAL 3, controller ruling fix round 1)", () => {
+describe("signup() concurrent-signup race", () => {
   it("two concurrent signups for the same brand-new email: exactly one succeeds, the other gets EMAIL_EXISTS, no 500", async () => {
     const email = `race-${Date.now()}@test.buildrik.local`;
 

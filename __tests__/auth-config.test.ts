@@ -193,7 +193,7 @@ describe("OAuth signIn callback", () => {
     });
   });
 
-  // CRITICAL 2 (controller ruling, fix round 1): OAuth already proves control
+  // OAuth already proves control
   // of the email (email_verified asserted above), so a never-verified row is
   // the real owner's first verification — same anti-pre-account-hijack
   // clearing as verifyMagicLink, and no oauth-conflict redirect (an
@@ -252,11 +252,10 @@ describe("OAuth signIn callback", () => {
   });
 });
 
-// CRITICAL N1 (controller ruling, fix round 2) — GitHub's own `userinfo`
-// override must resolve email from `/user/emails`' `verified: true` flag,
-// never from `/user`'s free-text "public email" field or an
-// unverified-but-primary fallback.
-describe("GitHub provider userinfo() — real profile/userinfo function (CRITICAL N1)", () => {
+// GitHub's own `userinfo` override must resolve email from
+// `/user/emails`'s `verified: true` flag, never from `/user`'s free-text
+// "public email" field or an unverified-but-primary fallback.
+describe("GitHub provider userinfo() — real profile/userinfo function", () => {
   // NextAuth's `GitHub(config)` factory stores whatever config we pass under
   // `.options` on the returned provider object — the DEFAULT `.userinfo` on
   // that object is untouched; Auth.js only deep-merges `.options` onto the
@@ -370,7 +369,7 @@ describe("GitHub provider userinfo() — real profile/userinfo function (CRITICA
   });
 });
 
-describe("signIn callback — GitHub unverified email refused on both paths (CRITICAL N1)", () => {
+describe("signIn callback — GitHub unverified email refused on both paths", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -392,7 +391,7 @@ describe("signIn callback — GitHub unverified email refused on both paths (CRI
   });
 
   it("link path: refuses linking into an existing row when GitHub gave no verified email", async () => {
-    // Minor (controller, fix round 3): mock an actual existing VERIFIED row
+    // Mock an actual existing VERIFIED row
     // that a real DB lookup-by-email would find — proving the refusal
     // happens before the existing-row lookup even runs, not merely because
     // the mock happened to be unset. If this branch were ever reached
@@ -439,7 +438,7 @@ describe("signIn callback — GitHub unverified email refused on both paths (CRI
   });
 });
 
-describe("signIn callback — account-first identity resolution (IMPORTANT, fix round 3)", () => {
+describe("signIn callback — account-first identity resolution", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

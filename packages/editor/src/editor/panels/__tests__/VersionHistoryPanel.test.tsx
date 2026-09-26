@@ -443,4 +443,37 @@ describe("VersionHistoryPanel — FC-9 (fix-all 2026-09-25): readOnly disables w
     // No save-version modal opens behind the disabled control.
     expect(screen.queryByRole("dialog")).toBeNull();
   });
+
+  it("readOnly: the Rename menu item is aria-disabled with the viewer tooltip", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} readOnly />);
+
+    openSaveMenu("Save A");
+    const renameItem = screen.getByLabelText('Rename "Save A"');
+    expect(renameItem).toHaveAttribute("aria-disabled", "true");
+    expect(renameItem).toHaveAttribute("title", "Viewers can't rename versions — ask an editor");
+    fireEvent.click(renameItem);
+    // No rename input opens behind the disabled item.
+    expect(screen.queryByLabelText('Rename "Save A"', { selector: "input" })).toBeNull();
+  });
+
+  it("readOnly: double-clicking a version's title does not open the rename input (startRename is a no-op)", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} readOnly />);
+
+    fireEvent.doubleClick(screen.getByText("Save A"));
+    expect(screen.queryByRole("textbox", { name: 'Rename "Save A"' })).toBeNull();
+    expect(screen.getByText("Save A")).toBeInTheDocument();
+  });
+
+  it("not readOnly (default): double-clicking a version's title opens the rename input", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} />);
+
+    fireEvent.doubleClick(screen.getByText("Save A"));
+    expect(screen.getByRole("textbox", { name: 'Rename "Save A"' })).toBeInTheDocument();
+  });
 });

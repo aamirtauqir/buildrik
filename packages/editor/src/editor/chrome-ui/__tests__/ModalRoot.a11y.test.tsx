@@ -45,7 +45,7 @@ describe("ModalRoot — dialog naming", () => {
     expect(dialog.getAttribute("aria-label")).toBeNull();
   });
 
-  /* B-7 round 2: ~50 existing ModalRoot consumers render a visible
+  /* B-7: ~50 existing ModalRoot consumers render a visible
      `<ModalTitle>` but never wire `labelledBy` up to ModalRoot manually —
      DeleteConfirmModal.tsx is one (see the twin test in that file). Without
      wiring every one of them by hand, the dialog node they render was

@@ -114,7 +114,7 @@ export async function assertSiteAccess(
  * The one answer to "which workspace is this SITE in, and what does that
  * workspace say" — `workspaceId`, `plan`, `editsRequireApproval`.
  *
- * Consolidates three call sites (controller review round 1, IMPORTANT 4) that
+ * Consolidates three call sites (IMPORTANT 4) that
  * each read `site.workspaceId` off a bare `ctx.prisma.site.findUnique` and
  * then, in two of them, did a SECOND round-trip through `workspaceMember` just
  * to reach `workspace.plan` — the plan belongs to the workspace, not to a

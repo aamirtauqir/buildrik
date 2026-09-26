@@ -8,11 +8,16 @@
  */
 import { z } from "zod";
 
+/** SSOT for a version's name length cap — shared by the schema below and the
+ *  editor's rename input (VersionList.tsx), so the client can never type
+ *  past what the server will accept. */
+export const VERSION_NAME_MAX = 200;
+
 export const createSiteVersionSchema = z.object({
   siteId: z.string(),
   /** Engine NamedVersion.id — canonical key for dedupe + restore. */
   versionId: z.string(),
-  name: z.string().min(1).max(200),
+  name: z.string().min(1).max(VERSION_NAME_MAX),
   isAuto: z.boolean().default(false),
   /** Full engine NamedVersion (includes the project snapshot). */
   payload: z.record(z.unknown()),
@@ -25,7 +30,7 @@ export const deleteSiteVersionSchema = z.object({ siteId: z.string(), versionId:
 export const renameSiteVersionSchema = z.object({
   siteId: z.string(),
   versionId: z.string(),
-  name: z.string().min(1).max(200),
+  name: z.string().min(1).max(VERSION_NAME_MAX),
 });
 
 export type CreateSiteVersionInput = z.infer<typeof createSiteVersionSchema>;

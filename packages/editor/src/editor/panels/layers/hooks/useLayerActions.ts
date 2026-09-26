@@ -185,7 +185,7 @@ export function useLayerActions(
   // panel in sync with a lock/unlock that happened outside toggleLock (the
   // canvas context menu's Lock action, for one).
   //
-  // Controller review round 1, IMPORTANT 3: ELEMENT_UPDATED fires on EVERY
+  // IMPORTANT 3: ELEMENT_UPDATED fires on EVERY
   // element mutation (style edits included — see ElementStyles.ts), and this
   // used to rescan every element and build a brand-new Set on each one, so a
   // style tweak on an unrelated, unlocked element replaced lockedIds's

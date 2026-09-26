@@ -1,5 +1,5 @@
 /**
- * IMPORTANT 5 (controller, fix round 1) — D-11's own runtime_check asks for
+ * D-11's own runtime_check asks for
  * "one aggregate query and no per-site analytics fetch." A DB-tier
  * correctness test can't read a query log directly against the shared
  * `prisma` singleton (no `log: [{emit:'event', level:'query'}]` config, and

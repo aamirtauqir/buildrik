@@ -106,6 +106,28 @@ describe("ai-generate worker", () => {
    * apart. Style still collapses — that is correct for a visual axis — but tone
    * now rides its own field.
    */
+  /* X-A1 round 1: every generated page was rooted at "root" with sections
+     ai-<type>-<i>, so a two-page site loaded in the editor as ONE tree. */
+  it("writes element ids unique across the generated pages", async () => {
+    p.aIGenerationJob.findUnique.mockResolvedValue({
+      id: "j1", status: "QUEUED", workspaceId: "w1", userId: "u1",
+      businessType: "BUSINESS", selectedPages: ["landing", "about"], description: "A bakery", metadata: {},
+    });
+    p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
+    p.site.findMany.mockResolvedValue([]);
+    txSiteCreate.mockResolvedValue({ id: "site-1" });
+    txPageCreateMany.mockResolvedValue({ count: 2 });
+    txJobUpdateMany.mockResolvedValue({ count: 1 });
+    genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
+
+    await POST(req("secret"), ctx);
+    const rows = txPageCreateMany.mock.calls.at(-1)![0].data as Array<{ blocks: { id: string; children: Array<{ id: string }> } }>;
+    const ids = rows.flatMap((r) => [r.blocks.id, ...r.blocks.children.map((c) => c.id)]);
+    expect(ids).toHaveLength(4);
+    expect(new Set(ids).size).toBe(4);
+    expect(rows[0].blocks.id).toBe("root");
+  });
+
   it("forwards a tone the 3-value style cannot express", async () => {
     p.aIGenerationJob.findUnique.mockResolvedValue({
       id: "j2", status: "QUEUED", workspaceId: "w1", userId: "u1",

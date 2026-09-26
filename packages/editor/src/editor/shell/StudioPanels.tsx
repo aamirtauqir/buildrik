@@ -16,7 +16,7 @@ import type { Composer } from "../../engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId } from "../rail/tabsConfig";
-import { getTabMode, isTabAllowedForViewer, VIEWER_TABS } from "../rail/tabsConfig";
+import { getTabMode, isColumnTabOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useToast } from "@/editor/chrome-ui";
@@ -53,11 +53,9 @@ import { ViewerRoleNotice } from "./ViewerRoleNotice";
 
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
-/** Panels that take the inspector's column instead of the left drawer. */
-const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history", "activity"]);
 
-/* VIEWER_TABS / isTabAllowedForViewer moved to `../rail/tabsConfig` (fix
- * round 1) — the tab registry is the ONE place every door that gates a
+/* VIEWER_TABS / isTabAllowedForViewer moved to `../rail/tabsConfig` — the
+ * tab registry is the ONE place every door that gates a
  * VIEWER's left-panel tabs reads from: this file's rail click and
  * "ui:switch-tab" handler, useStudioState's openLeftPanelToTab/
  * setLeftPanelTab (the sink UI_PANEL_OPEN/deep-links/topbar buttons funnel
@@ -357,14 +355,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      column (300), with the left drawer closed. Every door still opens them
      the way it did (openLeftPanelToTab / ui:switch-tab); only where they
      render moved. ✕ closes the panel and the inspector returns. */
-  /* FB-4: don't hand Review the right column when the server's agency
-     review layer is off — a gated door that still swaps the inspector out
-     for an empty panel is worse than the door not opening. */
-  const rightColumnTab =
-    !readOnlyView &&
-    isLeftPanelOpen &&
-    RIGHT_COLUMN_TABS.has(activeTabId) &&
-    (activeTabId !== "review" || Boolean(reviewsEnabled));
+  const rightColumnTab = isColumnTabOpen({
+    readOnlyView,
+    viewerChrome,
+    isLeftPanelOpen,
+    activeTabId,
+    reviewsEnabled,
+  });
   useColumnPanelEscape(rightColumnTab, () => onLeftPanelToggle?.());
   /* FB-8: Issues is a right-column mode too — Escape returns to the
      Inspector the same way it does for Publish/Review/History. */
@@ -661,6 +658,28 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     [onOpenImageEditor, composer]
   );
 
+  /* The column-hosted tab (Publish · Review · History · Activity). One
+     element, two hosts: the inspector column, and a VIEWER's (X-8). */
+  const columnPanel = rightColumnTab ? (
+    <RightColumnPanel>
+      <TabRouter
+        activeTab={activeTabId}
+        activeSubTab={leftPanelSubTab}
+        composer={composer}
+        commonTabProps={{ isExpanded: false, onClose: () => onLeftPanelToggle?.() }}
+        onCreateComponent={() => {}}
+        unpublishIntent={unpublishIntent}
+        onUnpublishIntentConsumed={() => setUnpublishIntent(false)}
+        projectId={projectId}
+        publishJob={publishJob}
+        nextMove={nextMove}
+        onRequestPublish={onRequestPublish}
+        onResendReview={onResendReview}
+        reviewsEnabled={reviewsEnabled}
+      />
+    </RightColumnPanel>
+  ) : null;
+
   return (
     <DSModeProvider>
     <TokenRegistryProvider projectId={projectId} composer={composer ?? undefined}>
@@ -703,6 +722,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             /* QA 2026-09-24: the closed drawer still mounted a second copy of
                the column's panel (two subscriptions, two fetches). */
             hostedInColumn={RIGHT_COLUMN_TABS.has(activeTabId)}
+            viewerChrome={viewerChrome}
             onDrawerToggle={onLeftPanelToggle ?? (() => {})}
             onElementSelect={handleElementSelect}
             onBlockClick={handleBlockClick}
@@ -768,7 +788,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         {readOnlyView ? (
           viewerChrome ? (
             <LayoutShell.Inspector>
-              <ViewerRoleNotice role="VIEWER" />
+              {/* X-8: a VIEWER's read-only History/Review/Activity replace the
+                  role notice here, the way they replace the inspector for
+                  everyone else. */}
+              {rightColumnTab ? columnPanel : <ViewerRoleNotice role="VIEWER" />}
             </LayoutShell.Inspector>
           ) : null
         ) : (
@@ -776,23 +799,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           {issuesOpen && issuesPanel ? (
             issuesPanel
           ) : rightColumnTab ? (
-            <RightColumnPanel>
-              <TabRouter
-                activeTab={activeTabId}
-                activeSubTab={leftPanelSubTab}
-                composer={composer}
-                commonTabProps={{ isExpanded: false, onClose: () => onLeftPanelToggle?.() }}
-                onCreateComponent={() => {}}
-                unpublishIntent={unpublishIntent}
-                onUnpublishIntentConsumed={() => setUnpublishIntent(false)}
-                projectId={projectId}
-                publishJob={publishJob}
-                nextMove={nextMove}
-                onRequestPublish={onRequestPublish}
-                onResendReview={onResendReview}
-                reviewsEnabled={reviewsEnabled}
-              />
-            </RightColumnPanel>
+            columnPanel
           ) : aiInInspector ? (
             <AITab
               composer={composer}

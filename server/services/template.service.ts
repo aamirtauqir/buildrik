@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
+import { withUniqueIds } from "@buildrik/shared/content/elementIds";
 import type { ListTemplatesInput } from "@buildrik/shared/schemas/templates";
 import { assertSiteQuota } from "@/server/services/site-quota";
 
@@ -115,14 +116,21 @@ type TemplatePageInput = {
  */
 export function pagesFromTemplate(template: { pages: Prisma.JsonValue }, siteId: string) {
   const templatePages = (template.pages ?? []) as unknown as TemplatePageInput[];
-  return templatePages.map((p, i) => ({
-    siteId,
-    name: p.name,
-    slug: p.slug,
-    position: p.position ?? i,
-    isHomePage: p.isHomePage ?? i === 0,
-    blocks: sanitizeBlocks(p.blocks ?? []),
-  }));
+  const rows = templatePages
+    .map((p, i) => ({
+      siteId,
+      name: p.name,
+      slug: p.slug,
+      position: p.position ?? i,
+      isHomePage: p.isHomePage ?? i === 0,
+      blocks: sanitizeBlocks(p.blocks ?? []),
+    }))
+    .sort((a, b) => a.position - b.position);
+  /* X-A1: template pages all root at "root" — ids unique across the site, the
+     editor's own scheme (first page keeps its ids). No row id exists yet, so
+     the page key is site + slug (unique per site). */
+  const unique = withUniqueIds(rows.map((r) => ({ key: `${siteId}:${r.slug}`, blocks: r.blocks })));
+  return rows.map((r, i) => ({ ...r, blocks: unique[i].blocks as Prisma.InputJsonValue }));
 }
 
 export async function useTemplate(
@@ -268,6 +276,9 @@ export async function cloneSiteAsTemplate(
   });
 
   const slug = await uniqueTemplateSlug(name);
+  // X-A1: a site whose pages share element ids (legacy data) must not seed
+  // a template that re-creates the collision on every site built from it.
+  const uniqueBlocks = withUniqueIds(pages.map((p) => ({ key: `${slug}:${p.slug}`, blocks: p.blocks })));
   const tpl = await prisma.template.create({
     data: {
       name,
@@ -276,12 +287,12 @@ export async function cloneSiteAsTemplate(
       description: `Cloned from a workspace site`,
       workspaceId,
       isActive: true,
-      pages: pages.map((p) => ({
+      pages: pages.map((p, i) => ({
         name: p.name,
         slug: p.slug,
         position: p.position,
         isHomePage: p.isHomePage,
-        blocks: (p.blocks ?? []) as Prisma.InputJsonValue,
+        blocks: (uniqueBlocks[i].blocks ?? []) as Prisma.InputJsonValue,
       })) as Prisma.InputJsonValue,
     },
     select: { id: true },

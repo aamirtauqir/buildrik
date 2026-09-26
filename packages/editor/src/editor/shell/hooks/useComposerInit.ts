@@ -289,8 +289,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                got "You're seeing local changes for now" and a Retry that can
                never succeed. This file already imports the helper for the
                autosave path (:34); the load path just never used it. */
-            const isForbidden =
-              err instanceof Error && isForbiddenSaveError(err.message);
+            const isForbidden = isForbiddenSaveError(err);
             // S1.5: prefer a persistent banner over a transient toast when the
             // shell wired onLoadError; the toast stays as the back-compat path.
             if (isMissing) {
@@ -632,7 +631,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               }
               return;
             }
-            if (isForbiddenSaveError(message)) {
+            if (isForbiddenSaveError(err)) {
               /* A15-9: the refused edit existed only in this tab — keep it
                  recoverable, exactly as the network branch does, and drop the
                  cached role that let the chrome offer the edit at all. */
@@ -790,4 +789,3 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
   return composer;
 }
 
-export default useComposerInit;

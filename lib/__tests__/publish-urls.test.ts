@@ -130,7 +130,7 @@ describe("withSitemapDirective", () => {
   });
 });
 
-describe("resolveSiteOrigins (fix round 2, finding 3)", () => {
+describe("resolveSiteOrigins", () => {
   it("lists every known origin, not just the preferred one", () => {
     const origins = resolveSiteOrigins({
       canonicalUrl: "https://example.com",

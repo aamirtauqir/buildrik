@@ -176,7 +176,7 @@ describe("useLayerActions — names and locks live in element data", () => {
     expect(result.current.lockedIds.has("a")).toBe(false);
   });
 
-  // Controller review round 1, IMPORTANT 3: ELEMENT_UPDATED fires on every
+  // IMPORTANT 3: ELEMENT_UPDATED fires on every
   // element mutation, not just lock changes — a style edit on an unrelated,
   // still-unlocked element used to rebuild lockedIds from scratch (a new Set
   // every time), so every consumer re-rendered on every edit anywhere in the

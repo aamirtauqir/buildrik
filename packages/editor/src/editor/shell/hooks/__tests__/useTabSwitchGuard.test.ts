@@ -4,8 +4,8 @@
  * surface holding unsaved work (Settings, an open CMS record) waits behind a
  * confirm; everything else runs straight through.
  *
- * Fix round 1: no global reset on "Leave anyway" — each surface owns its
- * registry entry. Fix round 2: Brand prompts too, and "Leave anyway" runs
+ * Fix: no global reset on "Leave anyway" — each surface owns its
+ * registry entry. Fix: Brand prompts too, and "Leave anyway" runs
  * each dirty surface's registered discard before switching.
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
@@ -61,7 +61,7 @@ describe("useTabSwitchGuard", () => {
     expect(setLeftPanelTab).not.toHaveBeenCalled();
   });
 
-  /* Fix round 2 (ruling): Brand staging does NOT reliably survive a switch
+  /* Fix (ruling): Brand staging does NOT reliably survive a switch
      (a BrandWorkspace remount can reset staged registries; the draft store
      restores only part of it), so Brand prompts too — with copy that does
      not overclaim, since Brand registers no discard. */

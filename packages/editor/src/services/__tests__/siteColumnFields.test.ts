@@ -1,5 +1,5 @@
 /**
- * M7 round 2 — SITE_COLUMN_FIELDS is the list the Settings screens lock below
+ * M7 — SITE_COLUMN_FIELDS is the list the Settings screens lock below
  * ADMIN. It must be exactly the projectSettings fields extractSiteColumnPatch
  * mirrors to Site columns: a field missing from the list is an EDITOR edit
  * that silently never reaches the site; an extra one locks project data (Global

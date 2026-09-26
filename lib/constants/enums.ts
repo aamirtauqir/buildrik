@@ -57,7 +57,7 @@ export function roleLabel(role: string): string {
 }
 
 // SSOT for the linear role ordering — was previously a second copy in
-// server/services/permission.service.ts (audit-fix lane L1b, round 3). That
+// server/services/permission.service.ts (audit-fix lane L1b). That
 // file's enforcement checks are the only thing that MUST run server-side;
 // the ranking itself is a plain-data fact about the roles, safe for a
 // client component to read (e.g. hiding a control the server would refuse)

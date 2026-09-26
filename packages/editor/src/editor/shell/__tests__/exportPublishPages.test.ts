@@ -75,7 +75,7 @@ describe("exportPublishPages — the stylesheet has to travel", () => {
     }
   });
 
-  it("keeps the folded stylesheet inside its <style> (S-1 review round 4)", async () => {
+  it("keeps the folded stylesheet inside its <style> (S-1)", async () => {
     const { inlinePublishStylesheet } = await import("../exportPublishPages");
     const [out] = inlinePublishStylesheet([
       { name: "index.html", content: page("<h1>Home</h1>") },
