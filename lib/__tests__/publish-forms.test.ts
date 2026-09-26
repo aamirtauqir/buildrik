@@ -58,6 +58,28 @@ describe("wireForms", () => {
     const page = "<html><body><p>no forms here</p></body></html>";
     expect(wireForms(page, opts)).toEqual({ html: page, forms: [] });
   });
+
+  it("injects a honeypot field by default (spam protection on)", () => {
+    const { html } = wireForms(FORM, opts);
+    expect(html).toContain('name="_honeypot"');
+    expect(html).toContain('aria-hidden="true"');
+  });
+
+  it("omits the honeypot field when the block turned spam protection off", () => {
+    const { html } = wireForms(FORM, opts, { f1: { spamProtection: false } });
+    expect(html).not.toContain('name="_honeypot"');
+  });
+
+  it("writes the configured success message onto the form as a data attribute", () => {
+    const { html } = wireForms(FORM, opts, { f1: { successMessage: "Thanks a lot!" } });
+    expect(html).toContain('data-success-message="Thanks a lot!"');
+  });
+
+  it("appends the same-page success-message script once, only when a form was wired", () => {
+    const { html } = wireForms(FORM, opts);
+    expect(html).toContain("data-buildrick-form-success");
+    expect(wireForms("<p>none</p>", opts).html).not.toContain("data-buildrick-form-success");
+  });
 });
 
 describe("planFormWiring", () => {

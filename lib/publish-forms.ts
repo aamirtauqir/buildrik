@@ -60,6 +60,43 @@ function fieldsOf(body: string): Array<{ name: string; type: string }> {
   return fields;
 }
 
+/** Per-form settings that came from a prior publish's FormBlock row (inspector
+ *  AFTER SUBMIT / PROTECTION). Missing keys — a form never edited from the
+ *  inspector — get the same defaults their row would get. */
+export interface FormBlockWireSettings {
+  spamProtection?: boolean;
+  successMessage?: string | null;
+}
+
+function escapeAttr(s: string): string {
+  return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+}
+
+const HONEYPOT_FIELD =
+  '<input type="text" name="_honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" ' +
+  'style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" data-buildrick-honeypot="1">';
+
+/** Reads `?submitted=1&form=<id>` after a same-page redirect (the common
+ *  case: a browser posting a form with no `action` override) and swaps that
+ *  form for its configured success message. Appended once per page, only
+ *  when the page actually has a wired form — a redirect-based after-submit
+ *  action never reaches this (the browser lands on the redirect target
+ *  instead), and a scripted/JSON submitter never loads a page at all. */
+const SUCCESS_MESSAGE_SCRIPT = `<script data-buildrick-form-success>(function(){
+try{
+var p=new URLSearchParams(location.search);
+if(p.get("submitted")!=="1")return;
+var id=p.get("form");
+var f=id&&(document.querySelector('[data-buildrick-id="'+id+'"]')||document.getElementById(id));
+if(!f)return;
+var m=f.getAttribute("data-success-message")||"Thanks — your message was sent.";
+var el=document.createElement("p");
+el.className="bk-form-success";
+el.textContent=m;
+f.replaceWith(el);
+}catch(e){}
+})();</script>`;
+
 /**
  * Point every actionless form at the public endpoint and report what was found.
  * A form that already has an action (Formspree, a custom webhook, anything the
@@ -68,6 +105,7 @@ function fieldsOf(body: string): Array<{ name: string; type: string }> {
 export function wireForms(
   html: string,
   opts: { siteId: string; appOrigin: string; path: string },
+  formSettings: Record<string, FormBlockWireSettings> = {},
 ): { html: string; forms: DiscoveredForm[] } {
   const found: DiscoveredForm[] = [];
   let out = html;
@@ -77,8 +115,15 @@ export function wireForms(
     const blockId = ATTR(open, "data-buildrick-id") ?? ATTR(open, "id");
     if (!blockId) continue;
 
+    const settings = formSettings[blockId];
+    const spamProtection = settings?.spamProtection ?? true;
+    const successMessage = settings?.successMessage;
+
     const action = `${opts.appOrigin.replace(/\/+$/, "")}/api/public/forms/${opts.siteId}/${blockId}`;
-    const rewritten = open.replace(/>$/, ` action="${action}" method="POST">`);
+    let attrs = ` action="${action}" method="POST"`;
+    if (successMessage) attrs += ` data-success-message="${escapeAttr(successMessage)}"`;
+    const rewritten =
+      open.replace(/>$/, `${attrs}>`) + (spamProtection ? HONEYPOT_FIELD : "");
     out = out.replace(open, rewritten);
 
     found.push({
@@ -87,6 +132,12 @@ export function wireForms(
       name: ATTR(open, "aria-label") ?? ATTR(open, "name") ?? `Form on ${opts.path}`,
       fields: fieldsOf(body),
     });
+  }
+
+  if (found.length > 0) {
+    out = /<\/body>/i.test(out)
+      ? out.replace(/<\/body>/i, `${SUCCESS_MESSAGE_SCRIPT}</body>`)
+      : out + SUCCESS_MESSAGE_SCRIPT;
   }
 
   return { html: out, forms: found };
@@ -131,7 +182,7 @@ const wouldHaveWired = (pages: PublishPage[]): boolean =>
  */
 export function planFormWiring(
   pages: PublishPage[],
-  opts: { siteId: string; appOrigin: string },
+  opts: { siteId: string; appOrigin: string; formSettings?: Record<string, FormBlockWireSettings> },
 ): FormWiringPlan {
   const appOrigin = opts.appOrigin.replace(/\/+$/, "");
   if (!appOrigin) {
@@ -147,7 +198,7 @@ export function planFormWiring(
 
   const forms: DiscoveredForm[] = [];
   const wired = pages.map((page) => {
-    const r = wireForms(page.html, { siteId: opts.siteId, appOrigin, path: page.path });
+    const r = wireForms(page.html, { siteId: opts.siteId, appOrigin, path: page.path }, opts.formSettings);
     forms.push(...r.forms);
     return { ...page, html: r.html };
   });

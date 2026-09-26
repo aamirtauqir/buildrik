@@ -2,7 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { deliverWebhook } from "@/server/services/webhook.service";
 import { csvCell } from "@/lib/utils";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { FormSubmissionInput, ListSubmissionsInput } from "@buildrik/shared/schemas/forms";
+import type {
+  FormSubmissionInput,
+  ListSubmissionsInput,
+  UpdateFormBlockInput,
+} from "@buildrik/shared/schemas/forms";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
 
@@ -13,14 +17,21 @@ type UpdateInput = {
   isArchived?: boolean;
 };
 
+export interface SubmitFormResult {
+  id: string;
+  successAction: "MESSAGE" | "REDIRECT";
+  redirectUrl: string | null;
+  successMessage: string | null;
+}
+
 export async function submitForm(
   siteId: string,
   formBlockId: string,
   input: FormSubmissionInput,
   ip: string,
-) {
+): Promise<SubmitFormResult> {
   if (input.honeypot) {
-    return { id: "honeypot" };
+    return { id: "honeypot", successAction: "MESSAGE", redirectUrl: null, successMessage: null };
   }
 
   const formBlock = await prisma.formBlock.findFirst({
@@ -63,15 +74,25 @@ export async function submitForm(
     siteId,
   ).catch(() => {});
 
-  prisma.workspaceMember.findFirst({
-    where: { workspaceId: site!.workspaceId, role: "OWNER" },
-    select: { user: { select: { email: true } } },
-  }).then((owner) => {
-    if (!owner?.user.email) return;
+  // Notify: the block's own configured address wins (inspector › AFTER SUBMIT
+  // › Send to email); no address configured falls back to the workspace
+  // owner, same as before that setting existed. Fire-and-forget — a failed
+  // send (bad SMTP creds, provider outage) must never lose the submission,
+  // which is already committed above.
+  (formBlock.notifyEmail
+    ? Promise.resolve(formBlock.notifyEmail)
+    : prisma.workspaceMember
+        .findFirst({
+          where: { workspaceId: site!.workspaceId, role: "OWNER" },
+          select: { user: { select: { email: true } } },
+        })
+        .then((owner) => owner?.user.email)
+  ).then((to) => {
+    if (!to) return;
     const fields = Object.entries((input.data ?? {}) as Record<string, unknown>).map(
       ([label, value]) => ({ label, value: String(value) }),
     );
-    return sendFormSubmissionEmail(owner.user.email, site!.name, fields, siteId);
+    return sendFormSubmissionEmail(to, site!.name, fields, siteId);
   }).catch(() => {});
 
   // P6 workspace webhook — best-effort, never blocks the submission.
@@ -83,7 +104,14 @@ export async function submitForm(
     });
   }
 
-  return submission;
+  return {
+    id: submission.id,
+    successAction: (formBlock.successAction === "REDIRECT" ? "REDIRECT" : "MESSAGE") as
+      | "MESSAGE"
+      | "REDIRECT",
+    redirectUrl: formBlock.redirectUrl ?? null,
+    successMessage: formBlock.successMessage ?? null,
+  };
 }
 
 export async function listSubmissions(input: ListSubmissionsInput) {
@@ -125,6 +153,81 @@ export async function listFormBlocks(siteId: string) {
     where: { siteId },
     include: { _count: { select: { submissions: true } } },
     orderBy: { createdAt: "desc" },
+  });
+}
+
+export interface FormBlockSettings {
+  successMessage: string | null;
+  successAction: "MESSAGE" | "REDIRECT";
+  redirectUrl: string | null;
+  notifyEmail: string | null;
+  spamProtection: boolean;
+}
+
+const DEFAULT_FORM_BLOCK_SETTINGS: FormBlockSettings = {
+  successMessage: null,
+  successAction: "MESSAGE",
+  redirectUrl: null,
+  notifyEmail: null,
+  spamProtection: true,
+};
+
+/**
+ * Inspector AFTER SUBMIT / PROTECTION read. The block's row may not exist yet
+ * — the row is created at first publish (`planFormWiring` → the publish
+ * worker's upsert) — so an unpublished form reads as the same defaults its
+ * row will get once it exists.
+ */
+export async function getFormBlockSettings(
+  siteId: string,
+  blockId: string,
+): Promise<FormBlockSettings> {
+  const row = await prisma.formBlock.findFirst({ where: { id: blockId, siteId } });
+  if (!row) return DEFAULT_FORM_BLOCK_SETTINGS;
+  return {
+    successMessage: row.successMessage,
+    successAction: row.successAction === "REDIRECT" ? "REDIRECT" : "MESSAGE",
+    redirectUrl: row.redirectUrl,
+    notifyEmail: row.notifyEmail,
+    spamProtection: row.spamProtection,
+  };
+}
+
+/**
+ * Inspector AFTER SUBMIT / PROTECTION write. Upserts by the form element's
+ * own id (the same id `wireForms` uses as the FormBlock id at publish time),
+ * so a setting saved before the form is ever published still lands on the
+ * row publish later creates/updates.
+ */
+export async function updateFormBlock(input: UpdateFormBlockInput) {
+  const { siteId, blockId, ...settings } = input;
+  const data: Record<string, unknown> = {};
+  if (settings.successMessage !== undefined) data.successMessage = settings.successMessage || null;
+  if (settings.successAction !== undefined) data.successAction = settings.successAction;
+  if (settings.redirectUrl !== undefined) data.redirectUrl = settings.redirectUrl || null;
+  if (settings.notifyEmail !== undefined) data.notifyEmail = settings.notifyEmail || null;
+  if (settings.spamProtection !== undefined) data.spamProtection = settings.spamProtection;
+
+  // `id` is globally unique, not scoped to siteId — an upsert keyed only on
+  // `where: { id }` would let a member of one site overwrite another site's
+  // row by guessing its element id. Check ownership of any existing row
+  // before writing.
+  const existing = await prisma.formBlock.findUnique({ where: { id: blockId }, select: { siteId: true } });
+  if (existing && existing.siteId !== siteId) {
+    throw new Error("FORM_NOT_FOUND");
+  }
+
+  return prisma.formBlock.upsert({
+    where: { id: blockId },
+    create: {
+      id: blockId,
+      siteId,
+      blockId,
+      name: "Untitled form",
+      fields: [],
+      ...data,
+    },
+    update: data,
   });
 }
 

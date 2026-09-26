@@ -7,8 +7,15 @@ import {
   updateSubmission,
   deleteSubmission,
   exportSubmissions,
+  getFormBlockSettings,
+  updateFormBlock,
 } from "@/server/services/form-submission.service";
-import { listSubmissionsSchema, updateSubmissionSchema } from "@buildrik/shared/schemas/forms";
+import {
+  listSubmissionsSchema,
+  updateSubmissionSchema,
+  getFormBlockSchema,
+  updateFormBlockSchema,
+} from "@buildrik/shared/schemas/forms";
 import { guardSiteAccess as guardSite, guardSiteRole } from "@/server/trpc/guards";
 
 export const formsRouter = router({
@@ -48,6 +55,27 @@ export const formsRouter = router({
       if (!submission) throw new TRPCError({ code: "NOT_FOUND" });
       await guardSiteRole(ctx.prisma, ctx.session.user.id, submission.siteId);
       return deleteSubmission(input.id);
+    }),
+
+  getBlock: protectedProcedure
+    .input(getFormBlockSchema)
+    .query(async ({ ctx, input }) => {
+      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+      return getFormBlockSettings(input.siteId, input.blockId);
+    }),
+
+  updateBlock: protectedProcedure
+    .input(updateFormBlockSchema)
+    .mutation(async ({ ctx, input }) => {
+      await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
+      try {
+        return await updateFormBlock(input);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "FORM_NOT_FOUND") {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        throw e;
+      }
     }),
 
   exportSubmissions: protectedProcedure

@@ -963,6 +963,9 @@ model FormBlock {
   fields           Json
   submitButtonText String   @default("Submit")
   successMessage   String?
+  successAction    String   @default("MESSAGE")
+  redirectUrl      String?
+  spamProtection   Boolean  @default(true)
   notifyEmail      String?
   webhookUrl       String?
   isActive         Boolean  @default(true)

@@ -7,6 +7,8 @@ import { describe, it, expect } from "vitest";
 import {
   escapeStyleText,
   isDangerousUrl,
+  isAbsoluteHttpUrl,
+  absoluteRedirectUrlSchema,
   isSafeCssDeclaration,
   isSafeCssSelector,
   isSafeElementId,
@@ -176,5 +178,49 @@ describe("escapeStyleText (S-1 review round 4)", () => {
   it("leaves ordinary CSS alone", () => {
     const css = ".a > .b { content: \"<>\"; color: red }";
     expect(escapeStyleText(css)).toBe(css);
+  });
+});
+
+// I2 (form after-submit redirect, controller fix round 1): isDangerousUrl
+// above correctly allows relative paths/#anchors/mailto:/tel: — right for
+// an href, wrong for a redirect target (NextResponse.redirect needs an
+// absolute URL). isAbsoluteHttpUrl / absoluteRedirectUrlSchema are the
+// stricter, additive rule for that one call site, composed with (not
+// replacing) isDangerousUrl.
+describe("isAbsoluteHttpUrl", () => {
+  it("accepts absolute http/https URLs only", () => {
+    expect(isAbsoluteHttpUrl("https://example.com")).toBe(true);
+    expect(isAbsoluteHttpUrl("http://example.com/thanks")).toBe(true);
+  });
+
+  it("rejects relative paths, anchors, mailto/tel, and other schemes", () => {
+    expect(isAbsoluteHttpUrl("/thanks")).toBe(false);
+    expect(isAbsoluteHttpUrl("#section")).toBe(false);
+    expect(isAbsoluteHttpUrl("mailto:a@b.com")).toBe(false);
+    expect(isAbsoluteHttpUrl("javascript:alert(1)")).toBe(false);
+    expect(isAbsoluteHttpUrl("not a url")).toBe(false);
+  });
+});
+
+describe("absoluteRedirectUrlSchema", () => {
+  it("accepts an absolute https URL and an empty string", () => {
+    expect(absoluteRedirectUrlSchema.safeParse("https://example.com").success).toBe(true);
+    expect(absoluteRedirectUrlSchema.safeParse("").success).toBe(true);
+  });
+
+  it("refuses a javascript: URL", () => {
+    expect(absoluteRedirectUrlSchema.safeParse("javascript:alert(1)").success).toBe(false);
+  });
+
+  it("refuses a relative path — NextResponse.redirect needs an absolute URL", () => {
+    expect(absoluteRedirectUrlSchema.safeParse("/thanks").success).toBe(false);
+  });
+
+  it("stays stricter than the shared isDangerousUrl alone — file: passes THAT but fails here", () => {
+    // The shared isDangerousUrl (above) does not flag file: at all; a page
+    // redirect to it is still meaningless, so the composed schema still
+    // refuses it via isAbsoluteHttpUrl's protocol allowlist.
+    expect(isDangerousUrl("file:///etc/passwd")).toBe(false);
+    expect(absoluteRedirectUrlSchema.safeParse("file:///etc/passwd").success).toBe(false);
   });
 });

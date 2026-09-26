@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { submitForm } from "@server/services/form-submission.service";
 import { checkRateLimit } from "@server/services/rate-limiter";
 import { formSubmissionSchema } from "@buildrik/shared/schemas/forms";
+import { isDangerousUrl } from "@buildrik/shared/schemas/element-markup";
 import { clientIp } from "@lib/request-ip";
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+}
 
 const FORM_SUBMIT_MAX = 10;
 const FORM_SUBMIT_WINDOW_MS = 60_000;
@@ -67,14 +72,22 @@ export async function POST(
        it came from with a marker the site can act on; a scripted caller still
        gets the id. */
     if (isForm) {
+      // Redirect after submit: re-checked here (defense in depth — the
+      // inspector's write path already refused an unsafe URL) because this
+      // is the response that actually sends a browser's `Location` header.
+      if (result.successAction === "REDIRECT" && result.redirectUrl && !isDangerousUrl(result.redirectUrl)) {
+        return NextResponse.redirect(result.redirectUrl, 303);
+      }
       const back = req.headers.get("referer");
       if (back) {
         const url = new URL(back);
         url.searchParams.set("submitted", "1");
+        url.searchParams.set("form", formBlockId);
         return NextResponse.redirect(url.toString(), 303);
       }
+      const message = result.successMessage || "Thanks — your message was sent.";
       return new NextResponse(
-        "<!DOCTYPE html><meta charset=\"utf-8\"><title>Thanks</title><p>Thanks — your message was sent.</p>",
+        `<!DOCTYPE html><meta charset="utf-8"><title>Thanks</title><p>${escapeHtml(message)}</p>`,
         { status: 200, headers: { "content-type": "text/html; charset=utf-8" } },
       );
     }

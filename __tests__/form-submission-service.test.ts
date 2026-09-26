@@ -2,14 +2,27 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    formBlock: { findFirst: vi.fn(), findMany: vi.fn() },
+    formBlock: { findFirst: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), upsert: vi.fn() },
     formSubmission: { create: vi.fn(), findMany: vi.fn(), count: vi.fn(), update: vi.fn(), delete: vi.fn() },
     site: { findUnique: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
   },
 }));
 
+vi.mock("@/server/services/email.service", () => ({
+  sendFormSubmissionEmail: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock("@/server/services/webhook.service", () => ({
+  deliverWebhook: vi.fn(),
+}));
+
+vi.mock("@/server/services/notification.trigger", () => ({
+  notifyWorkspaceOwner: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { prisma } from "@/lib/prisma";
+import { sendFormSubmissionEmail } from "@/server/services/email.service";
 
 describe("Form Submission Service", () => {
   beforeEach(() => { vi.clearAllMocks(); });
@@ -47,6 +60,98 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
 
       await expect(submitForm("s1", "fb1", { data: {} }, "1.2.3.4")).rejects.toThrow("FORM_SUBMISSION_LIMIT");
+    });
+
+    it("returns the block's after-submit settings so the route can redirect / show the message", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true,
+        successAction: "REDIRECT", redirectUrl: "https://example.com/thanks", successMessage: "Thanks!",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2" } as any);
+
+      const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      expect(result).toMatchObject({
+        id: "sub2",
+        successAction: "REDIRECT",
+        redirectUrl: "https://example.com/thanks",
+        successMessage: "Thanks!",
+      });
+    });
+
+    it("notifies the block's own configured address, not the workspace owner, when one is set", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "owner-of-the-form@example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub3", data: {} } as any);
+
+      await submitForm("s1", "fb1", { data: { name: "A" } }, "1.2.3.4");
+      // The notification is fire-and-forget (`.then().catch()`); flush microtasks.
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith(
+        "owner-of-the-form@example.com",
+        "Site",
+        expect.any(Array),
+        "s1",
+      );
+      // The block address won, so the owner lookup used for the fallback never ran.
+      expect(prisma.workspaceMember.findFirst).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("getFormBlockSettings", () => {
+    it("returns defaults when the row doesn't exist yet (form never published)", async () => {
+      const { getFormBlockSettings } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue(null);
+      const settings = await getFormBlockSettings("s1", "el1");
+      expect(settings).toEqual({
+        successMessage: null, successAction: "MESSAGE", redirectUrl: null, notifyEmail: null, spamProtection: true,
+      });
+    });
+
+    it("reads the existing row's settings", async () => {
+      const { getFormBlockSettings } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        successMessage: "Thanks", successAction: "REDIRECT", redirectUrl: "https://x.com",
+        notifyEmail: "a@b.com", spamProtection: false,
+      } as any);
+      const settings = await getFormBlockSettings("s1", "el1");
+      expect(settings.successAction).toBe("REDIRECT");
+      expect(settings.spamProtection).toBe(false);
+    });
+  });
+
+  describe("updateFormBlock", () => {
+    it("creates a row when none exists yet", async () => {
+      const { updateFormBlock } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findUnique).mockResolvedValue(null);
+      vi.mocked(prisma.formBlock.upsert).mockResolvedValue({ id: "el1" } as any);
+
+      await updateFormBlock({ siteId: "s1", blockId: "el1", spamProtection: false });
+      expect(prisma.formBlock.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "el1" },
+          create: expect.objectContaining({ id: "el1", siteId: "s1", blockId: "el1", spamProtection: false }),
+          update: { spamProtection: false },
+        }),
+      );
+    });
+
+    it("refuses to write a row that belongs to a different site", async () => {
+      const { updateFormBlock } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findUnique).mockResolvedValue({ siteId: "other-site" } as any);
+
+      await expect(updateFormBlock({ siteId: "s1", blockId: "el1", spamProtection: false })).rejects.toThrow(
+        "FORM_NOT_FOUND",
+      );
+      expect(prisma.formBlock.upsert).not.toHaveBeenCalled();
     });
   });
 
