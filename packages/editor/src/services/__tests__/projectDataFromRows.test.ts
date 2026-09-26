@@ -81,4 +81,27 @@ describe("projectDataFromRows → renderProjectPages", () => {
     const [without] = await renderProjectPages(project);
     expect(without.html).not.toMatch(/@font-face/);
   });
+
+  /* Ldata bug B: the Site row carries the editor's CMS bindings
+     (`projectCmsBindings`, written by sites.saveProject). The load must hand
+     them to Composer.importProject as `cmsBindings`, or every reload unbinds
+     every element and the next publish ships the placeholder copy. */
+  it("carries the stored CMS bindings into the project it loads", () => {
+    const cmsBindings = {
+      field: {
+        h: [{
+          binding: { sourceId: "cms:col-1", path: "title", type: "variable" },
+          collectionId: "col-1", fieldSlug: "title", property: "textContent",
+        }],
+      },
+      collection: { list: { elementId: "list", collectionId: "col-1", itemVar: "item" } },
+    };
+    const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "{{title}}") };
+
+    expect(projectDataFromRows({ name: "Bella", projectCmsBindings: cmsBindings }, [page], null).cmsBindings)
+      .toEqual(cmsBindings);
+    // A site saved before the column existed loads with no bindings, not a crash.
+    expect(projectDataFromRows({ name: "Bella", projectCmsBindings: null }, [page], null).cmsBindings)
+      .toBeUndefined();
+  });
 });

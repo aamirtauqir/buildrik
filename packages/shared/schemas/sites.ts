@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isSafeElementId } from "./element-markup";
 
 export const createSiteSchema = z.object({
   name: z.string().min(2).max(100),
@@ -144,6 +145,50 @@ export const slugHistorySchema = z.array(
   })
 );
 
+/* CMS bindings — which canvas element shows which collection field, and
+   which element repeats per record. The shape Composer.exportProject() writes
+   (`cmsBindings`: CMSBindingManager's export() / exportCollectionBindings()).
+   Keys are element ids, so they get the element-id rule the sanitizer uses;
+   counts are bounded because the whole map lands in one JSON column. */
+const MAX_BOUND_ELEMENTS = 5000;
+const bindingElementId = z.string().max(128).refine(isSafeElementId, { message: "Invalid element id" });
+const boundedRecord = <T extends z.ZodTypeAny>(value: T) =>
+  z
+    .record(bindingElementId, value)
+    .refine((r) => Object.keys(r).length <= MAX_BOUND_ELEMENTS, { message: "Too many bound elements" });
+
+export const cmsBindingsSchema = z.object({
+  field: boundedRecord(
+    z
+      .array(
+        z.object({
+          binding: z.object({
+            sourceId: z.string().max(300),
+            path: z.string().max(500),
+            type: z.string().max(32),
+          }),
+          collectionId: z.string().max(200),
+          itemId: z.string().max(200).optional(),
+          fieldSlug: z.string().max(200),
+          property: z.string().max(64),
+          fallback: z.string().max(10_000).optional(),
+        }),
+      )
+      .max(50),
+  ).optional(),
+  collection: boundedRecord(
+    z.object({
+      elementId: bindingElementId,
+      collectionId: z.string().max(200),
+      itemVar: z.string().max(64),
+      indexVar: z.string().max(64).optional(),
+      limit: z.number().int().min(0).max(10_000).optional(),
+      status: z.enum(["published", "draft", "all"]).optional(),
+      repeat: z.enum(["self", "children"]).optional(),
+    }),
+  ).optional(),
+});
+
 export const saveProjectDataSchema = z.object({
   siteId: z.string(),
   pages: z.array(
@@ -168,6 +213,7 @@ export const saveProjectDataSchema = z.object({
   assets: z.unknown().optional(),
   settings: z.unknown().optional(),
   dsSchemaVersion: z.number().int().min(0).optional(),
+  cmsBindings: cmsBindingsSchema.optional(),
 });
 
 /**
@@ -216,6 +262,10 @@ export const editorSaveProjectSchema = z.object({
        reached Site.dsSchemaVersion and the migration re-ran on every open
        (walk A2, 2026-09-24). */
     dsSchemaVersion: z.number().int().min(0).optional(),
+    /* Stripped here like dsSchemaVersion was: Composer.exportProject() has
+       written it since bindings were made to round-trip, but the save dropped
+       it, so every server reload unbound every element (Ldata bug B). */
+    cmsBindings: cmsBindingsSchema.optional(),
   }),
 });
 
@@ -228,3 +278,4 @@ export type ListSitesInput = z.infer<typeof listSitesSchema>;
 export type BulkActionInput = z.infer<typeof bulkActionSchema>;
 export type SaveProjectDataInput = z.infer<typeof saveProjectDataSchema>;
 export type EditorSaveProjectInput = z.infer<typeof editorSaveProjectSchema>;
+export type CmsBindingsInput = z.infer<typeof cmsBindingsSchema>;

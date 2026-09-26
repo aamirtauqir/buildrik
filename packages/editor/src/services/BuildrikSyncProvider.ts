@@ -401,6 +401,7 @@ export function projectDataFromRows(
     publishedUrl?: string | null;
     projectStyles?: unknown;
     projectSettings?: unknown;
+    projectCmsBindings?: ProjectData["cmsBindings"] | null;
     dsSchemaVersion?: number;
   };
   // tRPC `pages.list` returns Prisma rows with Json columns typed as
@@ -454,6 +455,8 @@ export function projectDataFromRows(
     assets: [],
     settings: mergedSettings,
     dsSchemaVersion: siteRow.dsSchemaVersion ?? 0,
+    // Stored by sites.saveProject from exportProject()'s own `cmsBindings`.
+    cmsBindings: siteRow.projectCmsBindings ?? undefined,
     metadata: {
       name: siteRow.name,
       domain: siteRow.domain,

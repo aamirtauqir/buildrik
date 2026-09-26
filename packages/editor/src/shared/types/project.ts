@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import type { CmsBindingsInput } from "@buildrik/shared/schemas/sites";
 import type { AssetData } from "./asset";
 import type { CanvasGuide } from "./canvas";
 import type { ElementData } from "./element";
@@ -58,14 +59,12 @@ export interface ProjectData {
    * pre-binding placeholder copy with nothing said. The managers' own
    * export()/import() pair was written for exactly this and never called.
    *
-   * Optional, so a project saved before this field loads unchanged.
+   * Optional, so a project saved before this field loads unchanged. The
+   * shape is the save schema's (`cmsBindingsSchema`, SSOT): field = element id
+   * -> field bindings (BaseBindingManager.export()), collection = element id
+   * -> repeater binding (CMSBindingManager.exportCollectionBindings()).
    */
-  cmsBindings?: {
-    /** element id -> field bindings (BaseBindingManager.export()) */
-    field?: Record<string, unknown[]>;
-    /** element id -> collection binding (CMSBindingManager) */
-    collection?: Record<string, unknown>;
-  };
+  cmsBindings?: CmsBindingsInput;
 }
 
 export interface ProjectMetadata {

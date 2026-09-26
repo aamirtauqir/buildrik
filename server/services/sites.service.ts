@@ -8,6 +8,7 @@ import type {
   ListSitesInput,
   BulkActionInput,
   SaveProjectDataInput,
+  CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
@@ -544,6 +545,7 @@ export async function saveProjectFromEditor(
     metadata?: unknown;
     settings?: unknown;
     dsSchemaVersion?: number;
+    cmsBindings?: CmsBindingsInput;
   },
   expectedLastEditedAt?: string,
 ) {
@@ -574,6 +576,7 @@ export async function saveProjectFromEditor(
     assets: projectData.assets,
     settings: projectData.settings,
     dsSchemaVersion: projectData.dsSchemaVersion,
+    cmsBindings: projectData.cmsBindings,
   }, expectedLastEditedAt);
 }
 
@@ -620,7 +623,8 @@ export async function bulkAction(
  *   - Per page: blocks, name, slug, position, isHomePage, seoTitle, seoDescription,
  *     meta (Json?), settings (Json?), slugHistory (Json?), slugManuallySet (Boolean).
  *   - Upserts incoming pages by id, deletes pages no longer present.
- *   - Site-level: projectStyles, projectAssets, projectSettings, lastEditedAt.
+ *   - Site-level: projectStyles, projectAssets, projectSettings,
+ *     projectCmsBindings, lastEditedAt.
  *
  * REGRESSION-1 (codex finding C23): `pages[].meta` was previously dropped on
  * save, breaking applied-template state across reload. Persisting meta is
@@ -672,6 +676,9 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
             ? undefined
             : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
         dsSchemaVersion: input.dsSchemaVersion,
+        // Undefined (an editor build that predates the field) leaves the
+        // stored bindings alone; the editor always sends its full map.
+        projectCmsBindings: input.cmsBindings as Prisma.InputJsonValue | undefined,
         lastEditedAt: savedAt,
         ...(isFullSnapshot ? { pages: input.pages.length } : {}),
       },
@@ -806,6 +813,7 @@ export async function getProjectData(siteId: string) {
       projectStyles: true,
       projectAssets: true,
       projectSettings: true,
+      projectCmsBindings: true,
       dsSchemaVersion: true,
       sitePages: {
         select: {
@@ -838,6 +846,7 @@ export async function getProjectData(siteId: string) {
     assets: site.projectAssets ?? [],
     settings: site.projectSettings ?? {},
     dsSchemaVersion: site.dsSchemaVersion,
+    cmsBindings: site.projectCmsBindings ?? undefined,
   };
 }
 

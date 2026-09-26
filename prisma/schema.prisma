@@ -358,6 +358,9 @@ model Site {
   themeLocked       Boolean   @default(false)
   projectAssets     Json?
   projectSettings   Json?
+  // Editor CMS bindings (element id → collection field / repeater), as
+  // Composer.exportProject() writes `cmsBindings`. Null until first saved.
+  projectCmsBindings Json?
   cspPolicy         String?
   hstsMaxAge        Int?
   xFrameOptions     String?
