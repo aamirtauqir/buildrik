@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { filterCmsBindings } from "@buildrik/shared/schemas/sites";
+import { filterCmsBindings, type CmsBindingsInput } from "@buildrik/shared/schemas/sites";
 import { getPublishedCmsForBindings } from "@/server/services/cms.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
@@ -289,9 +289,13 @@ export async function getShareDraftRows(siteId: string) {
      text — stale, then empty (dashboard verify pass 3). The render gets the
      CMS data the bindings on the DELIVERED pages read, and resolves it with
      the publish exporter's own CMSExportResolver. */
-  const cms = await getPublishedCmsForBindings(siteId, boundCmsFields(projectCmsBindings, pages));
+  /* L-5: the bindings map ships projected to the delivered pages' elements
+     too — verbatim, a binding on a hidden page still handed an anonymous
+     visitor its collection id and field slug. */
+  const deliveredBindings = deliveredCmsBindings(projectCmsBindings, pages);
+  const cms = await getPublishedCmsForBindings(siteId, boundCmsFields(deliveredBindings, pages));
   return {
-    site: { name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion },
+    site: { name, publishedUrl, projectStyles, projectSettings, projectCmsBindings: deliveredBindings, dsSchemaVersion },
     pages,
     siteColumns: { name, ...columns },
     siteFonts: fontAssets,
@@ -304,6 +308,27 @@ interface BlockNode {
   children?: unknown;
 }
 
+/** The stored bindings, kept only for elements on the delivered pages. */
+function deliveredCmsBindings(stored: unknown, pages: ReadonlyArray<{ blocks: unknown }>): CmsBindingsInput | null {
+  const bindings = filterCmsBindings(stored);
+  if (!bindings) return null;
+  const ids = new Set<string>();
+  const walk = (node: unknown): void => {
+    if (typeof node !== "object" || node === null) return;
+    const { id, children } = node as BlockNode;
+    if (typeof id === "string") ids.add(id);
+    if (Array.isArray(children)) children.forEach(walk);
+  };
+  pages.forEach((p) => walk(p.blocks));
+  const keep = <T>(map: Record<string, T> | undefined) => {
+    const kept = Object.entries(map ?? {}).filter(([elementId]) => ids.has(elementId));
+    return kept.length > 0 ? Object.fromEntries(kept) : undefined;
+  };
+  const field = keep(bindings.field);
+  const collection = keep(bindings.collection);
+  return { ...(field ? { field } : {}), ...(collection ? { collection } : {}) };
+}
+
 /**
  * Per collection, the field slugs the draft's bindings read — only bindings
  * on elements of the DELIVERED pages (a collection bound on a hidden page is
@@ -311,8 +336,7 @@ interface BlockNode {
  * list reads the `{{<itemVar>.<field>}}` placeholders inside its own subtree
  * (RepeaterRenderer's syntax).
  */
-function boundCmsFields(stored: unknown, pages: ReadonlyArray<{ blocks: unknown }>): Map<string, Set<string>> {
-  const bindings = filterCmsBindings(stored);
+function boundCmsFields(bindings: CmsBindingsInput | null, pages: ReadonlyArray<{ blocks: unknown }>): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
   if (!bindings) return out;
   const add = (collectionId: string, slug: string) => {
