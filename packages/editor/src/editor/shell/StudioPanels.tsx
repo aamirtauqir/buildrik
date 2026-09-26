@@ -23,6 +23,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
+import type { FocusSectionPayload } from "../inspector/hooks/usePropertyJump";
 import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
@@ -425,6 +426,50 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     inspectorShown,
     columnModeOpen: rightColumnTab || issuesOpen || aiInInspector,
   });
+  /* The inspector BODY (ProInspector) is on screen: its column is open and no
+     mode (Issues · a column tab · AI) has replaced it. */
+  const inspectorBodyShown =
+    !readOnlyView && inspectorOpen && !(issuesOpen && issuesPanel) && !rightColumnTab && !aiInInspector;
+
+  /* I-1: UI_INSPECTOR_FOCUS_SECTION ("Bind to CMS field…", "Add
+     interaction", ⌘K Jump to property) is heard by the inspector body. With a
+     mode over it, or the inspector hidden, the request landed nowhere visible.
+     Here it clears the way — inspector shown, the covering mode closed — and
+     is re-sent on the next frame, once the body is up and listening. Only
+     requests the visible body could not take are held, so the re-send does
+     not loop. A full page or the CMS workspace has no inspector to show. */
+  const focusRoute = React.useRef({ bodyShown: false, blocked: false, rightColumnTab: false });
+  focusRoute.current = {
+    bodyShown: inspectorBodyShown,
+    blocked: readOnlyView || effectiveFullPageMode || cmsWorkspaceOpen,
+    rightColumnTab,
+  };
+  const pendingFocus = React.useRef<FocusSectionPayload | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const route = (payload: FocusSectionPayload) => {
+      const r = focusRoute.current;
+      if (r.bodyShown || r.blocked) return;
+      pendingFocus.current = payload;
+      setInspectorShown(true);
+      setAiInInspector(false);
+      onCloseIssues?.();
+      if (r.rightColumnTab) onLeftPanelToggle?.();
+    };
+    composer.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, route);
+    return () => {
+      composer.off(EVENTS.UI_INSPECTOR_FOCUS_SECTION, route);
+    };
+  }, [composer, onCloseIssues, onLeftPanelToggle]);
+  React.useEffect(() => {
+    if (!composer || !inspectorBodyShown || !pendingFocus.current) return;
+    const frame = requestAnimationFrame(() => {
+      const payload = pendingFocus.current;
+      pendingFocus.current = null;
+      if (payload) composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, payload);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [composer, inspectorBodyShown]);
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {

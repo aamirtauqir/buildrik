@@ -105,3 +105,22 @@ describe("usePropertyJump — the reveal", () => {
     expect((document.activeElement as HTMLElement).dataset.t).toBe("margin");
   });
 });
+
+/* M-6: a door that selects AND asks for a section in one gesture ("Bind to
+   CMS field…" on an element that was not selected) reached a listener whose
+   closure still held the PREVIOUS selection's type — the section was toggled
+   under the wrong element key. The deferred half reads the current one. */
+describe("usePropertyJump — the reveal follows the current selection", () => {
+  it("expands the section for the type selected when the frame runs", () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+      frames.push(cb);
+      return frames.length;
+    });
+    const { composer, opts, hook } = setup("container");
+    composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" });
+    hook.rerender({ ...opts, selectedType: "heading" });
+    frames.shift()!(0);
+    expect(opts.toggleSection).toHaveBeenCalledWith("heading", "content");
+  });
+});
