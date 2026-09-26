@@ -14,6 +14,7 @@
  * id, and the worker upserts a FormBlock row under that same id. The ids come
  * from the URLs we ship, so the two cannot drift.
  */
+import { escapeAttr } from "@lib/publish-html";
 
 /** A form found in a published page, with what it needs a row for. */
 export interface DiscoveredForm {
@@ -68,26 +69,39 @@ export interface FormBlockWireSettings {
   successMessage?: string | null;
 }
 
-function escapeAttr(s: string): string {
-  return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
-}
-
 const HONEYPOT_FIELD =
   '<input type="text" name="_honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" ' +
   'style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" data-buildrick-honeypot="1">';
 
-/** Reads `?submitted=1&form=<id>` after a same-page redirect (the common
- *  case: a browser posting a form with no `action` override) and swaps that
- *  form for its configured success message. Appended once per page, only
- *  when the page actually has a wired form — a redirect-based after-submit
- *  action never reaches this (the browser lands on the redirect target
- *  instead), and a scripted/JSON submitter never loads a page at all. */
-const SUCCESS_MESSAGE_SCRIPT = `<script data-buildrick-form-success>(function(){
+/** Carries the visitor's own `location.href` back to the submit endpoint
+ *  (`_return`, filled by the script below) — a cross-origin form POST's
+ *  `Referer` is origin-only by default, so without this the "show message"
+ *  redirect always lands on the site's home page regardless of which page
+ *  the form was actually on. Unconditional, not gated by any inspector
+ *  setting. */
+const RETURN_FIELD = '<input type="hidden" name="_return" value="">';
+
+/** Runs on every page that has a wired form:
+ *  1. Fills each `_return` field with `location.href` before submit.
+ *  2. After a same-page redirect (`?submitted=1&form=<id>`), swaps that form
+ *     for its configured success message. A redirect-based after-submit
+ *     action never reaches this (the browser lands on the redirect target
+ *     instead), and a scripted/JSON submitter never loads a page at all.
+ *  `id` from the query string is untrusted — CSS.escape it before it reaches
+ *  a selector string, or a crafted `?form=` value could break out of the
+ *  attribute-selector syntax. */
+const FORM_PAGE_SCRIPT = `<script data-buildrick-form-success>(function(){
+try{
+var r=document.querySelectorAll('input[name="_return"]');
+for(var i=0;i<r.length;i++){r[i].value=location.href;}
+}catch(e){}
 try{
 var p=new URLSearchParams(location.search);
 if(p.get("submitted")!=="1")return;
 var id=p.get("form");
-var f=id&&(document.querySelector('[data-buildrick-id="'+id+'"]')||document.getElementById(id));
+if(!id)return;
+var esc=(window.CSS&&CSS.escape)?CSS.escape(id):id.replace(/[^a-zA-Z0-9_-]/g,"");
+var f=document.querySelector('[data-buildrick-id="'+esc+'"]')||document.getElementById(id);
 if(!f)return;
 var m=f.getAttribute("data-success-message")||"Thanks — your message was sent.";
 var el=document.createElement("p");
@@ -123,7 +137,7 @@ export function wireForms(
     let attrs = ` action="${action}" method="POST"`;
     if (successMessage) attrs += ` data-success-message="${escapeAttr(successMessage)}"`;
     const rewritten =
-      open.replace(/>$/, `${attrs}>`) + (spamProtection ? HONEYPOT_FIELD : "");
+      open.replace(/>$/, `${attrs}>`) + RETURN_FIELD + (spamProtection ? HONEYPOT_FIELD : "");
     out = out.replace(open, rewritten);
 
     found.push({
@@ -136,8 +150,8 @@ export function wireForms(
 
   if (found.length > 0) {
     out = /<\/body>/i.test(out)
-      ? out.replace(/<\/body>/i, `${SUCCESS_MESSAGE_SCRIPT}</body>`)
-      : out + SUCCESS_MESSAGE_SCRIPT;
+      ? out.replace(/<\/body>/i, `${FORM_PAGE_SCRIPT}</body>`)
+      : out + FORM_PAGE_SCRIPT;
   }
 
   return { html: out, forms: found };

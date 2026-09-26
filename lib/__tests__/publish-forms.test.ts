@@ -80,6 +80,25 @@ describe("wireForms", () => {
     expect(html).toContain("data-buildrick-form-success");
     expect(wireForms("<p>none</p>", opts).html).not.toContain("data-buildrick-form-success");
   });
+
+  it("I3: injects a hidden _return field, unconditionally, so the endpoint learns the visitor's actual page", () => {
+    const { html } = wireForms(FORM, opts);
+    expect(html).toContain('name="_return"');
+    // Not gated by spam protection — it's plumbing, not a spam guard.
+    const { html: off } = wireForms(FORM, opts, { f1: { spamProtection: false } });
+    expect(off).toContain('name="_return"');
+  });
+
+  it("I3: the page script fills every _return field with location.href on load", () => {
+    const { html } = wireForms(FORM, opts);
+    expect(html).toMatch(/input\[name="_return"\]/);
+    expect(html).toContain(".value=location.href");
+  });
+
+  it("M2: the success-message script CSS.escapes the ?form= id before using it as a selector", () => {
+    const { html } = wireForms(FORM, opts);
+    expect(html).toContain("CSS.escape");
+  });
 });
 
 describe("planFormWiring", () => {
