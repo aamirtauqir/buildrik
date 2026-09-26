@@ -24,27 +24,45 @@ let state: Record<DirtyDomain, boolean> = {
   brand: false,
   "cms-record": false,
 };
+/* A producer whose unsaved work really is thrown away by "Leave anyway"
+   registers how to throw it away (Settings rolls its live composer writes
+   back; a record sheet resets its fields). One that cannot — Brand, whose
+   staging lives in TokenRegistryProvider — registers nothing, and the
+   confirm then must not promise the edits are lost. Not part of the
+   subscribed snapshot: nothing renders from it. */
+const discards: Partial<Record<DirtyDomain, () => void>> = {};
 const listeners = new Set<() => void>();
 
 function emit(): void {
   listeners.forEach((l) => l());
 }
 
+const DOMAINS: DirtyDomain[] = ["settings", "brand", "cms-record"];
+const dirtyDomains = (): DirtyDomain[] => DOMAINS.filter((d) => state[d]);
+
 export const shellDirty = {
   /** True when ANY registered domain is dirty — what leaving the editor
-   *  (exit, beforeunload) would lose. */
-  get: (): boolean => state.settings || state.brand || state["cms-record"],
-  /** True when a left-panel tab switch would lose work: the surfaces a switch
-   *  UNMOUNTS (Settings' screen buffers, an open record's fields). Brand is
-   *  left out on purpose — its staged edits live in TokenRegistryProvider,
-   *  above the panels, and are still staged after a switch. */
-  blocksTabSwitch: (): boolean => state.settings || state["cms-record"],
+   *  (exit, beforeunload) or switching a left-panel tab can lose. */
+  get: (): boolean => dirtyDomains().length > 0,
+  /** The dirty domains, in a fixed order — for the confirm's copy. */
+  dirtyDomains,
   /** Each producer owns its own entry: it sets it from its dirty state and
    *  clears it when its surface unmounts or discards — never anyone else. */
   set: (domain: DirtyDomain, dirty: boolean): void => {
     if (state[domain] === dirty) return;
     state = { ...state, [domain]: dirty };
     emit();
+  },
+  /** Register (or with null, drop) this domain's discard. */
+  setDiscard: (domain: DirtyDomain, discard: (() => void) | null): void => {
+    if (discard) discards[domain] = discard;
+    else delete discards[domain];
+  },
+  /** True when every dirty domain can actually discard its work. */
+  everyDirtyDiscards: (): boolean => dirtyDomains().every((d) => d in discards),
+  /** "Leave anyway": each dirty domain that registered a discard runs it. */
+  discardDirty: (): void => {
+    dirtyDomains().forEach((d) => discards[d]?.());
   },
   subscribe: (l: () => void): (() => void) => {
     listeners.add(l);

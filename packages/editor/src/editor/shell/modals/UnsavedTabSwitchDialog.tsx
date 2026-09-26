@@ -1,16 +1,12 @@
 /**
  * UnsavedTabSwitchDialog — the shared confirm shown by `useTabSwitchGuard`
- * (B-1) whenever a tab switch would unmount a dirty Settings screen or an
- * open CMS record with unsaved fields — both lose their edits when they
- * unmount, so "Switching away will lose them" is literally true. Brand never
- * raises it: its staged edits live in TokenRegistryProvider and are still
- * staged after a switch (the exit guard and beforeunload count them). Two
- * answers only
- * (no per-domain "Save and continue" — the registry doesn't know which
- * domain(s) are dirty or how to save them): Keep editing (safe answer, gets
- * focus) or Leave and lose changes (danger), same copy as the exit-to-
- * dashboard guard in StudioHeader for one consistent phrase across both
- * guards.
+ * (B-1) whenever a tab switch would leave a dirty Settings screen, a staged
+ * Brand edit, or an open CMS record with unsaved fields. The body and the
+ * leave button's words come from the guard: loss is promised only when every
+ * dirty surface really discards on leave (Brand cannot, so its copy says
+ * "may discard some of them"). Two answers only (no per-domain "Save and
+ * continue" — the registry doesn't know how to save each domain): Keep
+ * editing (safe answer, gets focus) or the leave action (danger).
  *
  * @license BSD-3-Clause
  */
@@ -25,7 +21,7 @@ import {
 } from "@/editor/media/components/libraryModal";
 import type { TabSwitchGuardDialogProps } from "../hooks/useTabSwitchGuard";
 
-export function UnsavedTabSwitchDialog({ open, onKeepEditing, onLeaveAnyway }: TabSwitchGuardDialogProps) {
+export function UnsavedTabSwitchDialog({ open, body, leaveLabel, onKeepEditing, onLeaveAnyway }: TabSwitchGuardDialogProps) {
   const keepRef = React.useRef<HTMLButtonElement | null>(null);
   React.useEffect(() => {
     if (!open) return;
@@ -42,7 +38,7 @@ export function UnsavedTabSwitchDialog({ open, onKeepEditing, onLeaveAnyway }: T
         </h2>
         <ModalBody>
           <p className={LIBRARY_MODAL_BODY} data-testid="tab-switch-unsaved-body">
-            You have unsaved changes. Switching away will lose them.
+            {body}
           </p>
         </ModalBody>
         <div className={LIBRARY_MODAL_FOOT} data-testid="tab-switch-unsaved-foot">
@@ -53,7 +49,7 @@ export function UnsavedTabSwitchDialog({ open, onKeepEditing, onLeaveAnyway }: T
             onClick={onLeaveAnyway}
             data-testid="tab-switch-unsaved-leave"
           >
-            Leave and lose changes
+            {leaveLabel}
           </Button>
           <Button
             size="xs"

@@ -5,9 +5,8 @@
  * confirm; everything else runs straight through.
  *
  * Fix round 1: no global reset on "Leave anyway" — each surface owns its
- * registry entry and clears it when it actually unmounts. Brand's staged
- * edits live in TokenRegistryProvider and survive a tab switch, so Brand
- * never blocks one (the exit guard and beforeunload still count it).
+ * registry entry. Fix round 2: Brand prompts too, and "Leave anyway" runs
+ * each dirty surface's registered discard before switching.
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
@@ -60,14 +59,39 @@ describe("useTabSwitchGuard", () => {
     expect(setLeftPanelTab).not.toHaveBeenCalled();
   });
 
-  it("Brand staged edits persist across a switch, so Brand alone never prompts", () => {
+  /* Fix round 2 (ruling): Brand staging does NOT reliably survive a switch
+     (a BrandWorkspace remount can reset staged registries; the draft store
+     restores only part of it), so Brand prompts too — with copy that does
+     not overclaim, since Brand registers no discard. */
+  it("Brand staged edits prompt on a switch, with honest may-discard copy", () => {
     act(() => shellDirty.set("brand", true));
     const { result, setLeftPanelTab } = setup({ tab: "design" });
     act(() => result.current.setLeftPanelTab("pages"));
-    expect(setLeftPanelTab).toHaveBeenCalledWith("pages");
-    expect(result.current.dialogProps.open).toBe(false);
-    // ...and the entry is still there for the exit guard / beforeunload.
-    expect(shellDirty.get()).toBe(true);
+    expect(setLeftPanelTab).not.toHaveBeenCalled();
+    expect(result.current.dialogProps.open).toBe(true);
+    expect(result.current.dialogProps.body).toBe("You have unsaved brand changes. Switching away may discard some of them.");
+    expect(result.current.dialogProps.leaveLabel).toBe("Leave anyway");
+  });
+
+  it("Leave anyway runs each dirty surface's discard BEFORE the switch; loss copy only when all can discard", () => {
+    const order: string[] = [];
+    const discard = vi.fn(() => {
+      order.push("discard");
+      shellDirty.set("settings", false);
+    });
+    act(() => {
+      shellDirty.setDiscard("settings", discard);
+      shellDirty.set("settings", true);
+    });
+    const { result, setLeftPanelTab } = setup();
+    setLeftPanelTab.mockImplementation(() => order.push("switch"));
+    act(() => result.current.setLeftPanelTab("add"));
+    expect(result.current.dialogProps.body).toBe("You have unsaved changes. Switching away will lose them.");
+    expect(result.current.dialogProps.leaveLabel).toBe("Leave and lose changes");
+    act(() => result.current.dialogProps.onLeaveAnyway());
+    expect(order).toEqual(["discard", "switch"]);
+    expect(shellDirty.get()).toBe(false);
+    act(() => shellDirty.setDiscard("settings", null));
   });
 
   it("Keep editing drops the switch and keeps the entry", () => {

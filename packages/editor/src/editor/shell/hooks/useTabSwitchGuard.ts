@@ -13,12 +13,16 @@
  *   - a tab the sink will refuse (`isTabAllowed` false — the VIEWER gate that
  *     lives inside useStudioState): it goes straight to the sink, which
  *     no-ops, and `onSwitched` is not run;
- *   - Brand's staged edits alone — they live in TokenRegistryProvider and
- *     survive the switch (`shellDirty.blocksTabSwitch()` leaves them out;
- *     the exit guard and beforeunload still count them).
  *
- * "Leave anyway" runs the deferred switch and nothing else: each surface owns
- * its registry entry and clears it when it actually unmounts.
+ * Every dirty domain prompts, Brand included: its staging lives in
+ * TokenRegistryProvider but does not reliably survive a switch (a
+ * BrandWorkspace remount can reset staged registries, and the draft store
+ * restores only part of the staging).
+ *
+ * "Leave anyway" first runs each dirty surface's registered discard (Settings
+ * rolls back its live composer writes, a record sheet resets its fields), then
+ * switches. The copy promises loss only when every dirty surface can discard;
+ * Brand registers none, so its copy says "may discard some of them".
  *
  * @license BSD-3-Clause
  */
@@ -27,6 +31,8 @@ import { shellDirty } from "../shellDirtyRegistry";
 
 export interface TabSwitchGuardDialogProps {
   open: boolean;
+  body: string;
+  leaveLabel: string;
   onKeepEditing: () => void;
   onLeaveAnyway: () => void;
 }
@@ -49,6 +55,21 @@ export interface UseTabSwitchGuardResult {
   dialogProps: TabSwitchGuardDialogProps;
 }
 
+/** The confirm's words, read when it opens: loss is promised only when every
+ *  dirty surface will really discard on "Leave anyway". */
+function leaveCopy(): { body: string; leaveLabel: string } {
+  if (shellDirty.everyDirtyDiscards()) {
+    return { body: "You have unsaved changes. Switching away will lose them.", leaveLabel: "Leave and lose changes" };
+  }
+  const onlyBrand = shellDirty.dirtyDomains().every((d) => d === "brand");
+  return {
+    body: onlyBrand
+      ? "You have unsaved brand changes. Switching away may discard some of them."
+      : "You have unsaved changes. Switching away may discard some of them.",
+    leaveLabel: "Leave anyway",
+  };
+}
+
 export function useTabSwitchGuard({
   leftPanelTab,
   leftPanelSubTabs,
@@ -57,15 +78,15 @@ export function useTabSwitchGuard({
   isTabAllowed,
 }: TabSwitchSinks): UseTabSwitchGuardResult {
   const pendingRef = React.useRef<(() => void) | null>(null);
-  const [open, setOpen] = React.useState(false);
+  const [prompt, setPrompt] = React.useState<{ body: string; leaveLabel: string } | null>(null);
 
   const guard = React.useCallback((switchesAway: boolean, perform: () => void) => {
-    if (!switchesAway || !shellDirty.blocksTabSwitch()) {
+    if (!switchesAway || !shellDirty.get()) {
       perform();
       return;
     }
     pendingRef.current = perform;
-    setOpen(true);
+    setPrompt(leaveCopy());
   }, []);
 
   const guardedSetLeftPanelTab = React.useCallback(
@@ -93,19 +114,26 @@ export function useTabSwitchGuard({
 
   const onKeepEditing = React.useCallback(() => {
     pendingRef.current = null;
-    setOpen(false);
+    setPrompt(null);
   }, []);
 
   const onLeaveAnyway = React.useCallback(() => {
     const perform = pendingRef.current;
     pendingRef.current = null;
-    setOpen(false);
+    setPrompt(null);
+    shellDirty.discardDirty();
     perform?.();
   }, []);
 
   return {
     setLeftPanelTab: guardedSetLeftPanelTab,
     openLeftPanelToTab: guardedOpenLeftPanelToTab,
-    dialogProps: { open, onKeepEditing, onLeaveAnyway },
+    dialogProps: {
+      open: prompt !== null,
+      body: prompt?.body ?? "",
+      leaveLabel: prompt?.leaveLabel ?? "",
+      onKeepEditing,
+      onLeaveAnyway,
+    },
   };
 }
