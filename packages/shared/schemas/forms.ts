@@ -9,6 +9,16 @@ export const formSubmissionSchema = z.object({
     .refine((d) => Object.keys(d).length <= 100, { message: "Too many fields" })
     .refine((d) => Object.keys(d).every((k) => k.length <= 200), { message: "Field name too long" }),
   honeypot: z.string().optional(),
+  // `location.href` of the page the visitor actually posted from — the
+  // injected page script fills it (`_return` on the form, lib/publish-forms.ts).
+  // Needed because a cross-origin form POST's `Referer` header is
+  // origin-only under the default `strict-origin-when-cross-origin` policy
+  // (the published site posts to app.buildrick.io from its own domain), so
+  // the path is gone by the time it reaches this endpoint — the "show
+  // message" redirect landed on the site's home page no matter which page
+  // the form was on. Validated against the site's own known origins before
+  // use (form-submission.service.ts), never trusted as-is.
+  returnUrl: z.string().max(2000).optional(),
 });
 
 export const listSubmissionsSchema = z.object({
