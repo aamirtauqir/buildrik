@@ -18,7 +18,41 @@
 -- site was then hard-deleted the copy's publish created a second row keyed by
 -- the element id. Keep the row the writers have been addressing (id = blockId,
 -- else the most recently updated), move the others' submissions onto it, and
--- drop the others — so the unique index below can be created.
+-- drop the others — so the unique index below can be created. Before the
+-- drop, a nullable setting the survivor lacks is taken from the removed rows,
+-- newest first, so an address or URL set only on a copy is not lost.
+WITH ranked AS (
+  SELECT "id",
+         ROW_NUMBER() OVER (
+           PARTITION BY "siteId", "blockId"
+           ORDER BY ("id" = "blockId") DESC, "updatedAt" DESC, "id"
+         ) AS rn,
+         FIRST_VALUE("id") OVER (
+           PARTITION BY "siteId", "blockId"
+           ORDER BY ("id" = "blockId") DESC, "updatedAt" DESC, "id"
+         ) AS keeper
+  FROM "form_blocks"
+), donor AS (
+  SELECT r.keeper,
+         (ARRAY_AGG(f."pageId"         ORDER BY f."updatedAt" DESC) FILTER (WHERE f."pageId" IS NOT NULL))[1]         AS "pageId",
+         (ARRAY_AGG(f."successMessage" ORDER BY f."updatedAt" DESC) FILTER (WHERE f."successMessage" IS NOT NULL))[1] AS "successMessage",
+         (ARRAY_AGG(f."redirectUrl"    ORDER BY f."updatedAt" DESC) FILTER (WHERE f."redirectUrl" IS NOT NULL))[1]    AS "redirectUrl",
+         (ARRAY_AGG(f."notifyEmail"    ORDER BY f."updatedAt" DESC) FILTER (WHERE f."notifyEmail" IS NOT NULL))[1]    AS "notifyEmail",
+         (ARRAY_AGG(f."webhookUrl"     ORDER BY f."updatedAt" DESC) FILTER (WHERE f."webhookUrl" IS NOT NULL))[1]     AS "webhookUrl"
+  FROM ranked r
+  JOIN "form_blocks" f ON f."id" = r."id"
+  WHERE r.rn > 1
+  GROUP BY r.keeper
+)
+UPDATE "form_blocks" k
+SET "pageId"         = COALESCE(k."pageId", d."pageId"),
+    "successMessage" = COALESCE(k."successMessage", d."successMessage"),
+    "redirectUrl"    = COALESCE(k."redirectUrl", d."redirectUrl"),
+    "notifyEmail"    = COALESCE(k."notifyEmail", d."notifyEmail"),
+    "webhookUrl"     = COALESCE(k."webhookUrl", d."webhookUrl")
+FROM donor d
+WHERE k."id" = d.keeper;
+
 WITH ranked AS (
   SELECT "id", "siteId", "blockId",
          ROW_NUMBER() OVER (
