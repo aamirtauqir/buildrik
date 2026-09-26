@@ -78,9 +78,10 @@ function makeComposer() {
 }
 type FakeComposer = ReturnType<typeof makeComposer>;
 
-function Harness({ composer, ...rest }: { composer: FakeComposer } & Omit<Partial<StudioPanelsProps>, "composer">) {
+function Harness({ composer, leftPanelTab, ...rest }: { composer: FakeComposer } & Omit<Partial<StudioPanelsProps>, "composer">) {
   const [open, setOpen] = React.useState(true);
-  const [tab, setTab] = React.useState(rest.leftPanelTab ?? "add");
+  /* The initial tab; afterwards the harness owns it, like AquibraStudio. */
+  const [tab, setTab] = React.useState(leftPanelTab ?? "add");
   return (
     <ToastProvider>
       <StudioPanels
@@ -258,5 +259,31 @@ describe("StudioPanels — the column opens for every panel it hosts", () => {
     rerender(<Harness composer={composer} issuesOpen renderIssuesPanel={() => <div data-testid="issues" />} />);
     expect(screen.getByTestId("issues")).toBeTruthy();
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+});
+
+/* m-1: a held section-focus request must not fire later, at a moment the user
+   no longer connects with it. It lapses after PENDING_FOCUS_MS if the body
+   never came up, and on any selection change. Here the column tab cannot be
+   closed by the route (no toggle wired), so the body stays covered. */
+describe("StudioPanels — a held focus request lapses (m-1)", () => {
+  it("expires if the inspector body does not come up in time", async () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} leftPanelTab="history" onLeftPanelToggle={undefined} />);
+    act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
+    await act(() => new Promise<void>((r) => setTimeout(r, 600)));
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    await flushFrame();
+    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("");
+  });
+
+  it("is dropped when the selection changes", async () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} leftPanelTab="history" onLeftPanelToggle={undefined} />);
+    act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
+    act(() => composer.emit(EVENTS.SELECTION_CHANGED, { selected: ["other"] }));
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    await flushFrame();
+    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("");
   });
 });

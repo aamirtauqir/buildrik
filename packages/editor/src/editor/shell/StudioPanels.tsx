@@ -147,6 +147,9 @@ export interface StudioPanelsProps {
 // STYLES
 // ============================================================================
 
+/** How long a section-focus request waits for the inspector body (m-1). */
+const PENDING_FOCUS_MS = 500;
+
 const styles = {
   container: {
     flex: 1,
@@ -449,13 +452,31 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     blocked: readOnlyView || effectiveFullPageMode || cmsWorkspaceOpen,
     rightColumnTab,
   };
+  /* m-1: a held request lapses — after PENDING_FOCUS_MS if the body never
+     came up, and on any selection change — so it cannot fire later, at a
+     moment the user no longer connects with it. */
   const pendingFocus = React.useRef<FocusSectionPayload | null>(null);
+  const pendingLapse = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const dropPendingFocus = React.useCallback(() => {
+    pendingFocus.current = null;
+    clearTimeout(pendingLapse.current);
+  }, []);
+  React.useEffect(() => dropPendingFocus, [dropPendingFocus]);
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.on(EVENTS.SELECTION_CHANGED, dropPendingFocus);
+    return () => {
+      composer.off(EVENTS.SELECTION_CHANGED, dropPendingFocus);
+    };
+  }, [composer, dropPendingFocus]);
   React.useEffect(() => {
     if (!composer) return;
     const route = (payload: FocusSectionPayload) => {
       const r = columnRef.current;
       if (r.bodyShown || r.blocked) return;
       pendingFocus.current = payload;
+      clearTimeout(pendingLapse.current);
+      pendingLapse.current = setTimeout(dropPendingFocus, PENDING_FOCUS_MS);
       setInspectorShown(true);
       setAiInInspector(false);
       onCloseIssues?.();
@@ -465,16 +486,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     return () => {
       composer.off(EVENTS.UI_INSPECTOR_FOCUS_SECTION, route);
     };
-  }, [composer, onCloseIssues, onLeftPanelToggle]);
+  }, [composer, onCloseIssues, onLeftPanelToggle, dropPendingFocus]);
   React.useEffect(() => {
     if (!composer || !inspectorBodyShown || !pendingFocus.current) return;
     const frame = requestAnimationFrame(() => {
       const payload = pendingFocus.current;
-      pendingFocus.current = null;
+      dropPendingFocus();
       if (payload) composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, payload);
     });
     return () => cancelAnimationFrame(frame);
-  }, [composer, inspectorBodyShown]);
+  }, [composer, inspectorBodyShown, dropPendingFocus]);
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
