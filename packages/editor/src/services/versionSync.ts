@@ -98,9 +98,11 @@ const HYDRATE_CHUNK = 10;
 
 /**
  * Cross-device load: pull server versions into the local IndexedDB cache on
- * editor open. ADDITIVE — only versionIds not already local are written, so a
- * local unsynced version is never clobbered. They surface on the next version-
- * list read. Best-effort; never throws.
+ * editor open. Only versionIds not already local are fetched, so a local
+ * unsynced version is never clobbered; a cached version only takes the
+ * server's current name (unless a local rename is still queued). Returns how
+ * many cached versions were added or renamed — they surface on the next
+ * version-list read. Best-effort; never throws.
  *
  * Bounded (walk 2026-09-24): on a cold cache it fetched every missing payload
  * one after another — 50 sequential `siteVersions.get` in 6.7 s on open,
@@ -117,12 +119,23 @@ export async function hydrateVersionsFromServer(): Promise<number> {
     if (!remote.length) return 0;
     const local = await loadVersions(siteId);
     const localIds = new Set(local.map((v) => v.id));
-    /* Backfill author names onto versions already cached (G1-075): the list
-       carries them; a version hydrated before it did has only the id. */
-    const nameById = new Map(remote.map((r) => [r.versionId, r.createdByName ?? null]));
+    /* Refresh versions already cached from their list row:
+       - author names (G1-075): a version hydrated before the list carried
+         them has only the id;
+       - the version's own name (X-1): a rename updates `site_versions.name`
+         only, so a rename made in another browser never reached this cache.
+         A rename of ours still queued for the server is newer than the
+         server's name, so it keeps the local one (the C-4 pending guard). */
+    const rowById = new Map(remote.map((r) => [r.versionId, r]));
     for (const v of local) {
-      const name = nameById.get(v.id);
-      if (name && !v.authorName) await saveVersion({ ...v, authorName: name });
+      const r = rowById.get(v.id);
+      if (!r) continue;
+      const authorName = !v.authorName && r.createdByName ? r.createdByName : v.authorName;
+      const renamed = r.name !== v.name && !queue.isPending(`versionRename:${v.id}`);
+      if (renamed || authorName !== v.authorName) {
+        await saveVersion({ ...v, authorName, name: renamed ? r.name : v.name });
+        if (renamed) added++;
+      }
     }
     const missing = remote.filter((r) => !localIds.has(r.versionId)).slice(0, HYDRATE_LIMIT);
     for (let i = 0; i < missing.length; i += HYDRATE_CHUNK) {
@@ -146,8 +159,11 @@ export async function hydrateVersionsFromServer(): Promise<number> {
            was on the server the whole time and simply never read back; the editor
            has no other reference to `createdBy` anywhere. Taking it here is what
            gives a version made on someone else's machine an author at all. */
+        /* `name` off the list row too: the payload keeps the name the version
+           was created with, and a rename changes only the column (X-1). */
         await saveVersion({
           ...(payload as NamedVersion),
+          name: r.name,
           projectId: siteId,
           userId: r.createdBy ?? null,
           authorName: r.createdByName ?? null,

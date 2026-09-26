@@ -9,6 +9,7 @@ const create = vi.fn();
 const del = vi.fn();
 const list = vi.fn();
 const get = vi.fn();
+const rename = vi.fn();
 
 vi.mock("../api-client", () => ({
   getBuildrikClient: () => ({
@@ -17,6 +18,7 @@ vi.mock("../api-client", () => ({
       delete: { mutate: del },
       list: { query: list },
       get: { query: get },
+      rename: { mutate: rename },
     },
   }),
 }));
@@ -32,6 +34,7 @@ vi.mock("../../engine/storage/VersionHistoryStorage", () => ({
 import {
   mirrorVersionCreate,
   mirrorVersionDelete,
+  mirrorVersionRename,
   hydrateVersionsFromServer,
   onVersionSyncError,
   retryVersionSync,
@@ -40,12 +43,12 @@ import {
 
 beforeEach(async () => {
   window.history.replaceState({}, "", "/edit/site-123");
-  [create, del, list, get, loadVersions, saveVersion].forEach((m) => m.mockReset());
+  [create, del, list, get, rename, loadVersions, saveVersion].forEach((m) => m.mockReset());
   // The retry queue is module-level shared state; flush anything a prior test
   // left queued (reset mocks now resolve) so each test starts from empty, then
   // clear the call history the flush incurred so per-test counts start at 0.
   await retryVersionSync();
-  [create, del].forEach((m) => m.mockClear());
+  [create, del, rename].forEach((m) => m.mockClear());
 });
 
 const ver = (id: string, name = "V") =>
@@ -116,6 +119,38 @@ describe("versionSync", () => {
     const saved = saveVersion.mock.calls.map((c) => c[0]);
     expect(saved).toContainEqual(expect.objectContaining({ id: "local1", authorName: "Sara" }));
     expect(saved).toContainEqual(expect.objectContaining({ id: "srv1", authorName: "Sara" }));
+  });
+
+  /* X-1 (live verify 2026-09-26): a rename lands in `site_versions.name`, but
+     the stored payload keeps the name it was created with. A fresh browser
+     hydrated the payload and showed the pre-rename name; a browser that
+     already cached the version never took the new one at all. The list row's
+     `name` is the server's current name and wins. */
+  it("X-1: a freshly hydrated version takes the server's current name, not the payload's", async () => {
+    list.mockResolvedValueOnce([{ versionId: "srv1", name: "X1-renamed-owner" }]);
+    loadVersions.mockResolvedValueOnce([]);
+    get.mockResolvedValueOnce({ id: "srv1", name: "X1-orig-name", snapshot: {}, createdAt: 0 });
+    await hydrateVersionsFromServer();
+    expect(saveVersion.mock.calls[0][0]).toMatchObject({ id: "srv1", name: "X1-renamed-owner" });
+  });
+
+  it("X-1: an already-cached version is renamed to the server's name, and counts as a change", async () => {
+    list.mockResolvedValueOnce([{ versionId: "local1", name: "Renamed elsewhere" }]);
+    loadVersions.mockResolvedValueOnce([{ id: "local1", name: "Old name", snapshot: {} }]);
+    const changed = await hydrateVersionsFromServer();
+    expect(get).not.toHaveBeenCalled();
+    expect(saveVersion).toHaveBeenCalledWith(expect.objectContaining({ id: "local1", name: "Renamed elsewhere" }));
+    expect(changed).toBe(1);
+  });
+
+  it("X-1: a local rename still queued for the server is not overwritten by the server's older name", async () => {
+    rename.mockRejectedValueOnce(new Error("offline"));
+    await mirrorVersionRename("local1", "Local new name");
+    list.mockResolvedValueOnce([{ versionId: "local1", name: "Old name" }]);
+    loadVersions.mockResolvedValueOnce([{ id: "local1", name: "Local new name", snapshot: {} }]);
+    const changed = await hydrateVersionsFromServer();
+    expect(saveVersion).not.toHaveBeenCalled();
+    expect(changed).toBe(0);
   });
 
   it("leaves the author null when the server has none, rather than inventing one", async () => {
