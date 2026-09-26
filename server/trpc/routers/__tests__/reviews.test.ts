@@ -141,6 +141,18 @@ describe("reviews router", () => {
     ).resolves.toMatchObject({ id: "r1", token: "secret-token" });
   });
 
+  it("submit translates a ReviewError from submitReview (self-invite, S-7) into BAD_REQUEST, not a 500", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined); // EDITOR gate
+    const { ReviewError } = await import("@/server/services/review.service");
+    submitMock.mockRejectedValueOnce(
+      new ReviewError("BAD_REQUEST", "You can't invite yourself to review your own submission."),
+    );
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(
+      caller.submit({ siteId: "s1", clientEmail: "me@example.com" }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST", message: /can't invite yourself/i });
+  });
+
   it("list is Admin-gated and never queries if denied", async () => {
     checkWorkspaceRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs ADMIN"));
     const caller = reviewsRouter.createCaller(makeCtx() as never);

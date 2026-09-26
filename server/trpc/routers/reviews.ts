@@ -87,14 +87,19 @@ export const reviewsRouter = router({
       if (!rl.allowed) {
         throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many review submissions. Please try again later." });
       }
-      const result = await submitReview(
-        input.siteId,
-        ctx.session.user.id,
-        input.note,
-        input.changeSummary,
-        input.clientEmail,
-        input.snapshotPages,
-      );
+      let result;
+      try {
+        result = await submitReview(
+          input.siteId,
+          ctx.session.user.id,
+          input.note,
+          input.changeSummary,
+          input.clientEmail,
+          input.snapshotPages,
+        );
+      } catch (e) {
+        translateReviewError(e);
+      }
       // S-7: the token is the bearer credential for the client review link.
       // Mirrors currentRound's includeToken gate — only ADMIN+ gets it back;
       // an EDITOR (who can invite a client but shouldn't also be handed the
