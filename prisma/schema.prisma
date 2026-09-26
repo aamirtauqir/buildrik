@@ -1143,6 +1143,10 @@ model SiteVersion {
   payload   Json
   createdBy String?
   createdAt DateTime @default(now())
+  /// The server clock a browser stamps its cached copy against (X-1: a rename
+  /// from another browser must reach a cache; an offline rename must not be
+  /// overwritten by the older server name). Bumped by rename and re-mirror.
+  updatedAt DateTime @default(now()) @updatedAt
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 

@@ -336,3 +336,39 @@ export const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>([
 export function isTabAllowedForViewer(tab: GroupedTabId, viewerChrome: boolean): boolean {
   return !viewerChrome || VIEWER_TABS.has(tab);
 }
+
+/** Panels that take the inspector's column instead of the left drawer. */
+export const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>([
+  "publish",
+  "review",
+  "history",
+  "activity",
+]);
+
+/**
+ * Whether the active tab is showing in the inspector's column (boards
+ * 4418:97118 / 4418:115784 / 4418:73791: Publish, Review and History REPLACE
+ * the inspector, the drawer closed).
+ *
+ * - A read-only view hosts nothing there — except a VIEWER's, whose read-only
+ *   History/Review/Activity (FC-9) live in this column like everyone else's.
+ *   Without that exception the H shortcut switched a viewer to History and it
+ *   rendered nowhere: the drawer skips a column-hosted tab (X-8).
+ * - FB-4: Review only when the server's review layer is on — a gated door
+ *   that still swaps the inspector out for an empty panel is worse than the
+ *   door not opening.
+ */
+export function isColumnTabOpen(s: {
+  readOnlyView: boolean;
+  viewerChrome: boolean;
+  isLeftPanelOpen: boolean;
+  activeTabId: GroupedTabId;
+  reviewsEnabled: boolean | null | undefined;
+}): boolean {
+  return (
+    (!s.readOnlyView || s.viewerChrome) &&
+    s.isLeftPanelOpen &&
+    RIGHT_COLUMN_TABS.has(s.activeTabId) &&
+    (s.activeTabId !== "review" || Boolean(s.reviewsEnabled))
+  );
+}
