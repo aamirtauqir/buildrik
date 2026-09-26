@@ -11,6 +11,7 @@ import type { Composer } from "@/engine";
 import type { CMSCollection } from "@/shared/types/cms";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { findItemFieldRefs } from "@/engine/cms/CMSBindingManager";
 
 export interface FieldUse {
   label: string;
@@ -39,6 +40,26 @@ export function fieldUsage(composer: Composer | null, collection: CMSCollection)
     for (const [elementId, bindings] of Object.entries(composer.cms.bindings.export())) {
       for (const b of bindings) {
         if (b.collectionId === collection.id) add(b.fieldSlug, { label: usedByLabel(composer, elementId), elementId });
+      }
+    }
+    /* A Collection-bound repeater/list never registers a field-level binding
+       above — its records fill in `{{item.<field>}}` placeholders on the
+       template element (`repeat: "self"`) or its children (`repeat:
+       "children"`, the Collection list). Without this, deleting a field
+       still referenced by one of those templates passed the "unbound" path
+       in DeleteFieldDialog and silently broke the repeat (fallback/blank on
+       every record) instead of being locked. */
+    for (const cb of composer.cms.bindings.getAllCollectionBindings?.() ?? []) {
+      if (cb.collectionId !== collection.id) continue;
+      const root = composer.elements.getElement(cb.elementId);
+      if (!root) continue;
+      const templates = cb.repeat === "children" ? root.getDescendants?.() ?? [] : [root];
+      for (const el of templates) {
+        for (const slug of findItemFieldRefs(el.getContent?.() ?? "")) {
+          if (collection.fields.some((f) => f.slug === slug)) {
+            add(slug, { label: usedByLabel(composer, cb.elementId), elementId: cb.elementId });
+          }
+        }
       }
     }
   }

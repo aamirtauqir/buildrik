@@ -15,20 +15,27 @@ export function makeEngine(opts?: {
   items?: CMSContentItem[];
   /** cms.bindings.export(): element id → its CMS field bindings. */
   bindings?: Record<string, Array<{ collectionId: string; fieldSlug: string; property: string }>>;
+  /** cms.bindings.getAllCollectionBindings(): a repeater/Collection-list's
+   *  binding to a collection (fieldUsage.ts scans its template for
+   *  `{{item.<field>}}` refs since those carry no field-level binding). */
+  collectionBindings?: Array<{ elementId: string; collectionId: string; repeat?: "self" | "children" }>;
 }) {
   let collections = opts?.collections ?? [];
   let items = opts?.items ?? [];
   const listeners = new Map<string, Set<Handler>>();
   let settings: Record<string, unknown> = {};
   const sources = new Map<string, { id: string; name: string; type: string; data?: unknown }>();
-  const elements: Array<{
+  type FakeElement = {
     getId: () => string;
     getType: () => string;
     getContent: () => string;
     getCustomData?: (key: string) => unknown;
     getDataBindings: () => Record<string, unknown>;
     removeDataBinding: (p: string) => void;
-  }> = [];
+    /** A repeater/Collection-list's own template (`repeat: "children"`). */
+    getDescendants?: () => FakeElement[];
+  };
+  const elements: FakeElement[] = [];
   const updateCollection = vi.fn((id: string, updates: Record<string, unknown>) => {
     collections = collections.map((c) => (c.id === id ? { ...c, ...updates } : c));
     return Promise.resolve(collections.find((c) => c.id === id) ?? null);
@@ -83,7 +90,10 @@ export function makeEngine(opts?: {
       bindCondition: vi.fn(),
     },
     cms: {
-      bindings: { export: () => opts?.bindings ?? {} },
+      bindings: {
+        export: () => opts?.bindings ?? {},
+        getAllCollectionBindings: () => opts?.collectionBindings ?? [],
+      },
       collections: {
         on: vi.fn(),
         off: vi.fn(),
