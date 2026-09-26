@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -183,6 +183,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const listRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  /* ARIA combobox (B-7 / A13-9): the input keeps focus and names the
+     highlighted result through aria-activedescendant, so these ids tie the
+     input, the listbox and each option together. */
+  const baseId = useId();
+  const listboxId = `${baseId}-results`;
+  const optionId = (index: number) => `${baseId}-opt-${index}`;
 
   const { scope, term } = useMemo(() => parseScope(debouncedQuery), [debouncedQuery]);
   const isSearching = term.length >= 2;
@@ -422,6 +428,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]">
       <div className="fixed inset-0" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }} onClick={onClose} />
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search Buildrick"
         className="relative w-full overflow-hidden rounded-lg border bg-white shadow-2xl"
         style={{ maxWidth: 640, maxHeight: 480, borderColor: "var(--color-border-default)" }}
       >
@@ -441,6 +450,11 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             onKeyDown={handleKeyDown}
             placeholder="Search or jump to..."
             aria-label="Search Buildrick"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={flatItems.length > 0}
+            aria-controls={listboxId}
+            aria-activedescendant={flatItems[selectedIndex] ? optionId(selectedIndex) : undefined}
             className="flex-1 border-0 bg-transparent py-3 text-body outline-none"
             style={{ color: "var(--color-text-primary)" }}
           />
@@ -452,7 +466,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[400px] overflow-y-auto py-2">
+        <div ref={listRef} id={listboxId} role="listbox" aria-label="Results" className="max-h-[400px] overflow-y-auto py-2">
           {isSearching && flatItems.length === 0 ? (
             <p
               className="px-4 py-8 text-center text-body"
@@ -464,8 +478,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             groupedResults.map((group) => {
               const ScopeIcon = SCOPE_ICONS[group.scope] ?? Search;
               return (
-                <div key={group.scope}>
+                <div key={group.scope} role="group" aria-labelledby={`${baseId}-group-${group.scope}`}>
                   <p
+                    id={`${baseId}-group-${group.scope}`}
                     className="px-4 py-1.5 text-body-sm font-medium uppercase tracking-wide"
                     style={{ color: "var(--color-text-secondary)" }}
                   >
@@ -476,6 +491,10 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     return (
                       <button
                         key={item.id}
+                        id={optionId(idx)}
+                        role="option"
+                        aria-selected={selectedIndex === idx}
+                        tabIndex={-1}
                         data-index={idx}
                         onClick={() => selectItem(item)}
                         className="flex w-full items-center gap-3 px-4 py-2 text-left text-body transition-colors"
