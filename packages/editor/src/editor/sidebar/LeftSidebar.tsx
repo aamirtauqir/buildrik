@@ -13,7 +13,7 @@ import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
-import { getTabConfig, getFigmaRailGroups } from "../rail/tabsConfig";
+import { getTabConfig, getFigmaRailGroups, RAIL_FIGMA_IDS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { Button, HintTooltip, useToast } from "@/editor/chrome-ui";
@@ -35,6 +35,8 @@ import {
   Sparkles,
   Rocket,
   HelpCircle,
+  Activity,
+  MessageSquare,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 // ============================================
@@ -53,6 +55,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Timer,
   Sparkles,
   Rocket,
+  Activity,
+  MessageSquare,
 };
 
 // ============================================
@@ -95,6 +99,9 @@ export interface LeftSidebarProps {
   ) => void;
   /** FB-4: see `TabRouter.reviewsEnabled` — also closes the "R" shortcut. */
   reviewsEnabled?: boolean | null;
+  /** A workspace VIEWER's read-only chrome (`useViewerChrome`): the rail adds
+   *  the read-only surfaces the six-item Figma rail leaves out (X-8). */
+  viewerChrome?: boolean;
 }
 
 // ============================================
@@ -193,16 +200,36 @@ function RailZone({
 // Templates, Components, Settings, Publish, History) still open from ⌘K +
 // shortcuts + topbar — nothing is stranded (see tabsConfig RAIL_FIGMA +
 // tabsConfig.figma.test.ts).
+//
+// X-8: a VIEWER reaches none of those off-rail doors — the site menu
+// collapses to "View only" and the topbar save pill is hidden — so the
+// read-only surfaces FC-9 opened to them (VIEWER_TABS beyond the six) join
+// a viewer's rail below a divider. Review only when the server's review
+// layer is on (FB-4).
 function FigmaRail({
   activeTab,
   drawerOpen,
   onBtnClick,
+  viewerChrome,
+  reviewsEnabled,
 }: {
   activeTab: GroupedTabId;
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
+  viewerChrome: boolean;
+  reviewsEnabled: boolean;
 }) {
   const groups = React.useMemo(() => getFigmaRailGroups(), []);
+  const viewerTabs = React.useMemo(
+    () =>
+      viewerChrome
+        ? [...VIEWER_TABS]
+            .filter((id) => !RAIL_FIGMA_IDS.has(id) && (id !== "review" || reviewsEnabled))
+            .map((id) => getTabConfig(id))
+            .filter((t): t is GroupedTabConfig => Boolean(t))
+        : [],
+    [viewerChrome, reviewsEnabled],
+  );
   return (
     <>
       {groups.map((g, i) => (
@@ -211,6 +238,12 @@ function FigmaRail({
           {i < groups.length - 1 && <div className="ls-divider" />}
         </React.Fragment>
       ))}
+      {viewerTabs.length > 0 && (
+        <>
+          <div className="ls-divider" />
+          <RailZone tabs={viewerTabs} activeTab={activeTab} drawerOpen={drawerOpen} onBtnClick={onBtnClick} />
+        </>
+      )}
     </>
   );
 }
@@ -239,6 +272,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onOpenImageEditor,
   onOpenIconPicker,
   reviewsEnabled,
+  viewerChrome = false,
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
   const railTab = useRailTab(activeTab);
@@ -393,7 +427,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       >
         {/* Board 4418:123573: the rail starts with its first item — no logo
             mark, no divider. */}
-        <FigmaRail activeTab={railTab} drawerOpen={drawerOpen} onBtnClick={handleBtnClick} />
+        <FigmaRail
+          activeTab={railTab}
+          drawerOpen={drawerOpen}
+          onBtnClick={handleBtnClick}
+          viewerChrome={viewerChrome}
+          reviewsEnabled={Boolean(reviewsEnabled)}
+        />
 
         <div className="ls-spacer" />
 
