@@ -353,22 +353,29 @@ export interface StaleTemplateBindingsResult {
    *  "pass" row is noise for the near-all-sites-have-no-CMS-collection case). */
   hasPageGeneratingCollections: boolean;
   stale: { collectionId: string; collectionName: string; templatePath: string }[];
+  /** Existing template pages that leave the publish (appendDynamicPagesToPublish
+   *  drops them — they are blueprints). index.html is not listed: it stays. */
+  templates: { collectionName: string; pageName: string }[];
 }
 
 export async function findStaleTemplateBindings(
   siteId: string,
-  pages: { slug: string; isHomePage: boolean }[],
+  pages: { slug: string; isHomePage: boolean; name?: string }[],
 ): Promise<StaleTemplateBindingsResult> {
   const cols = await prisma.cmsCollection.findMany({
     where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
     select: { id: true, name: true, pageTemplatePath: true },
   });
-  if (cols.length === 0) return { hasPageGeneratingCollections: false, stale: [] };
-  const fileNames = new Set(pages.map((p) => (p.isHomePage ? "index.html" : `${p.slug}.html`)));
+  if (cols.length === 0) return { hasPageGeneratingCollections: false, stale: [], templates: [] };
+  const byFile = new Map(pages.map((p) => [p.isHomePage ? "index.html" : `${p.slug}.html`, p]));
   const stale = cols
-    .filter((c) => !fileNames.has(c.pageTemplatePath as string))
+    .filter((c) => !byFile.has(c.pageTemplatePath as string))
     .map((c) => ({ collectionId: c.id, collectionName: c.name, templatePath: c.pageTemplatePath as string }));
-  return { hasPageGeneratingCollections: true, stale };
+  const templates = cols.flatMap((c) => {
+    const page = c.pageTemplatePath === "index.html" ? undefined : byFile.get(c.pageTemplatePath as string);
+    return page ? [{ collectionName: c.name, pageName: page.name ?? page.slug }] : [];
+  });
+  return { hasPageGeneratingCollections: true, stale, templates };
 }
 
 export interface GeneratedPage {

@@ -561,6 +561,7 @@ describe("findStaleTemplateBindings (A-17)", () => {
     await expect(findStaleTemplateBindings("s1", [{ slug: "home", isHomePage: true }])).resolves.toEqual({
       hasPageGeneratingCollections: false,
       stale: [],
+      templates: [],
     });
   });
 
@@ -573,6 +574,7 @@ describe("findStaleTemplateBindings (A-17)", () => {
     expect(out).toEqual({
       hasPageGeneratingCollections: true,
       stale: [{ collectionId: "c1", collectionName: "Blog", templatePath: "deleted-page.html" }],
+      templates: [],
     });
   });
 
@@ -585,6 +587,11 @@ describe("findStaleTemplateBindings (A-17)", () => {
       { slug: "home", isHomePage: true },
       { slug: "about", isHomePage: false },
     ]);
-    expect(out).toEqual({ hasPageGeneratingCollections: true, stale: [] });
+    // index.html stays published (the site root), so only "about" is listed.
+    expect(out).toEqual({
+      hasPageGeneratingCollections: true,
+      stale: [],
+      templates: [{ collectionName: "Blog", pageName: "about" }],
+    });
   });
 });

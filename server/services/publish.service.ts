@@ -152,6 +152,18 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     } else {
       checks.push({ label: "CMS templates", status: "pass", detail: "Every dynamic-page collection's template page exists." });
     }
+    /* A bound template page is a blueprint: appendDynamicPagesToPublish
+       publishes the pages it generates, not the page itself — say so by name
+       before the publish, rather than letting the page vanish (Lv3 #7). */
+    if (templateBindings.templates.length > 0) {
+      checks.push({
+        label: "Template pages",
+        status: "warning",
+        detail: templateBindings.templates
+          .map((t) => `${t.pageName} is a template for ${t.collectionName} — not published.`)
+          .join(" "),
+      });
+    }
   }
 
   const hasFail = checks.some((c) => c.status === "fail");

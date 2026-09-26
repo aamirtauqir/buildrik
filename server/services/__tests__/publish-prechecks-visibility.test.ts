@@ -140,6 +140,21 @@ describe("pre-publish checks count what ships", () => {
     const { checks } = await runPrePublishChecks("s1");
     expect(status(checks, "CMS templates")).toBe("pass");
   });
+
+  /* Lv3 review #7: a bound template page is a blueprint and is no longer
+     published as a page of its own (appendDynamicPagesToPublish) — the
+     checks say so, by name, before the publish. */
+  it("names each template page that will not be published as a page", async () => {
+    pageFindManyMock.mockResolvedValue([
+      { id: "1", name: "Home", blocks: [{}], settings: null, slug: "home", isHomePage: true },
+      { id: "2", name: "Blog template", blocks: [{}], settings: null, slug: "blog-template", isHomePage: false },
+    ]);
+    cmsCollectionFindManyMock.mockResolvedValue([{ id: "c1", name: "Blog", pageTemplatePath: "blog-template.html" }]);
+    const { checks, ready } = await runPrePublishChecks("s1");
+    expect(status(checks, "Template pages")).toBe("warning");
+    expect(detail(checks, "Template pages")).toBe("Blog template is a template for Blog — not published.");
+    expect(ready).toBe(true);
+  });
 });
 
 /* B-14 / A02-9: Publish listed no content facts at all, so the Issues panel
