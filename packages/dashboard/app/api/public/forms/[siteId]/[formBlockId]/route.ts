@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { submitForm } from "@server/services/form-submission.service";
+import { submitForm, FormError } from "@server/services/form-submission.service";
 import { checkRateLimit } from "@server/services/rate-limiter";
 import { formSubmissionSchema } from "@buildrik/shared/schemas/forms";
-import { isDangerousUrl } from "@buildrik/shared/schemas/element-markup";
+import { isDangerousUrl, isAbsoluteHttpUrl } from "@buildrik/shared/schemas/element-markup";
 import { clientIp } from "@lib/request-ip";
 
 function escapeHtml(s: string): string {
@@ -52,8 +52,12 @@ export async function POST(
   let parsedJson: unknown;
   if (isForm) {
     const fields = Object.fromEntries(new URLSearchParams(raw).entries());
-    const { _honeypot, ...data } = fields;
-    parsedJson = { data, ...(_honeypot !== undefined ? { honeypot: _honeypot } : {}) };
+    const { _honeypot, _return, ...data } = fields;
+    parsedJson = {
+      data,
+      ...(_honeypot !== undefined ? { honeypot: _honeypot } : {}),
+      ...(_return !== undefined ? { returnUrl: _return } : {}),
+    };
   } else {
     try {
       parsedJson = JSON.parse(raw);
@@ -73,17 +77,38 @@ export async function POST(
        gets the id. */
     if (isForm) {
       // Redirect after submit: re-checked here (defense in depth — the
-      // inspector's write path already refused an unsafe URL) because this
-      // is the response that actually sends a browser's `Location` header.
-      if (result.successAction === "REDIRECT" && result.redirectUrl && !isDangerousUrl(result.redirectUrl)) {
+      // inspector's write path and the service both already validated it)
+      // because this is the response that actually sends a browser's
+      // `Location` header. `NextResponse.redirect` needs an absolute URL —
+      // a relative one either throws or resolves against the wrong (this
+      // API's) host, so isAbsoluteHttpUrl is required, not just "not
+      // dangerous".
+      if (
+        result.successAction === "REDIRECT" &&
+        result.redirectUrl &&
+        isAbsoluteHttpUrl(result.redirectUrl) &&
+        !isDangerousUrl(result.redirectUrl)
+      ) {
         return NextResponse.redirect(result.redirectUrl, 303);
       }
-      const back = req.headers.get("referer");
+      /* "Show message": land back on the page the visitor actually submitted
+         from. `result.returnUrl` (the page's own `location.href`, validated
+         against the site's own origins by the service) is preferred — a
+         cross-origin form POST's `Referer` is origin-only under the default
+         `strict-origin-when-cross-origin` policy, so the path is already
+         gone by the time it reaches here and a Referer-only redirect always
+         lands on the home page. Referer is kept as a fallback for a
+         same-origin post or an older cached page without the return field. */
+      const back = result.returnUrl ?? req.headers.get("referer");
       if (back) {
-        const url = new URL(back);
-        url.searchParams.set("submitted", "1");
-        url.searchParams.set("form", formBlockId);
-        return NextResponse.redirect(url.toString(), 303);
+        try {
+          const url = new URL(back);
+          url.searchParams.set("submitted", "1");
+          url.searchParams.set("form", formBlockId);
+          return NextResponse.redirect(url.toString(), 303);
+        } catch {
+          // Malformed Referer header — fall through to the no-referer page.
+        }
       }
       const message = result.successMessage || "Thanks — your message was sent.";
       return new NextResponse(
@@ -93,7 +118,7 @@ export async function POST(
     }
     return NextResponse.json({ id: result.id, message: "Submission received" }, { status: 201 });
   } catch (e: unknown) {
-    if (e instanceof Error) {
+    if (e instanceof FormError) {
       if (e.message === "FORM_NOT_FOUND") return NextResponse.json({ error: "Form not found" }, { status: 404 });
       if (e.message === "FORM_SUBMISSION_LIMIT") return NextResponse.json({ error: "Monthly submission limit reached" }, { status: 402 });
     }

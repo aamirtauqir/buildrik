@@ -5,6 +5,7 @@ vi.mock("@/lib/prisma", () => ({
     formBlock: { findFirst: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), upsert: vi.fn() },
     formSubmission: { create: vi.fn(), findMany: vi.fn(), count: vi.fn(), update: vi.fn(), delete: vi.fn() },
     site: { findUnique: vi.fn() },
+    domain: { findFirst: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
   },
 }));
@@ -82,27 +83,123 @@ describe("Form Submission Service", () => {
       });
     });
 
-    it("notifies the block's own configured address, not the workspace owner, when one is set", async () => {
+    it("falls back to MESSAGE when a REDIRECT row somehow has no usable URL (defense in depth — the write path already validates it)", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
-        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "owner-of-the-form@example.com",
+        id: "fb1", siteId: "s1", isActive: true,
+        successAction: "REDIRECT", redirectUrl: "/relative-not-absolute", successMessage: "Thanks!",
       } as any);
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2b" } as any);
+
+      const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      expect(result.successAction).toBe("MESSAGE");
+      expect(result.redirectUrl).toBeNull();
+    });
+
+    it("validates returnUrl against the site's own origin before trusting it", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2c" } as any);
+
+      const same = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://mysite.example.com/contact" }, "1.2.3.4",
+      );
+      expect(same.returnUrl).toBe("https://mysite.example.com/contact");
+
+      const other = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://evil.example.com/phish" }, "1.2.3.4",
+      );
+      expect(other.returnUrl).toBeNull();
+    });
+
+    it("logs (not swallows) a failed notification email — the submission is already saved", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "team@example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2d" } as any);
+      vi.mocked(sendFormSubmissionEmail).mockRejectedValueOnce(new Error("SMTP down"));
+      const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(result.id).toBe("sub2d"); // submission itself is unaffected
+      expect(errSpy).toHaveBeenCalledWith(
+        expect.stringContaining("[form-submission] notify email failed"),
+        expect.any(Error),
+      );
+      errSpy.mockRestore();
+    });
+
+    it("notifies BOTH the block's configured address and the workspace owner", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "team@example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      // Two different findFirst calls share this mock (plan check, owner
+      // lookup) — distinguish by the `select` shape each actually passes.
+      vi.mocked(prisma.workspaceMember.findFirst).mockImplementation(((args: any) =>
+        args?.select?.workspace
+          ? Promise.resolve({ workspace: { plan: "FREE" } })
+          : Promise.resolve({ user: { email: "owner@example.com" } })) as any);
       vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub3", data: {} } as any);
 
       await submitForm("s1", "fb1", { data: { name: "A" } }, "1.2.3.4");
       // The notification is fire-and-forget (`.then().catch()`); flush microtasks.
       await new Promise((r) => setTimeout(r, 0));
-      expect(sendFormSubmissionEmail).toHaveBeenCalledWith(
-        "owner-of-the-form@example.com",
-        "Site",
-        expect.any(Array),
-        "s1",
-      );
-      // The block address won, so the owner lookup used for the fallback never ran.
-      expect(prisma.workspaceMember.findFirst).toHaveBeenCalledTimes(1);
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith("team@example.com", "Site", expect.any(Array), "s1");
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith("owner@example.com", "Site", expect.any(Array), "s1");
+      expect(sendFormSubmissionEmail).toHaveBeenCalledTimes(2);
+    });
+
+    it("doesn't double-send when the owner IS the configured notify address", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, notifyEmail: "same@example.com",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockImplementation(((args: any) =>
+        args?.select?.workspace
+          ? Promise.resolve({ workspace: { plan: "FREE" } })
+          : Promise.resolve({ user: { email: "same@example.com" } })) as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub4", data: {} } as any);
+
+      await submitForm("s1", "fb1", { data: { name: "A" } }, "1.2.3.4");
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sendFormSubmissionEmail).toHaveBeenCalledTimes(1);
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith("same@example.com", "Site", expect.any(Array), "s1");
+    });
+
+    it("still notifies the owner when the block has no notifyEmail configured", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws1", name: "Site" } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockImplementation(((args: any) =>
+        args?.select?.workspace
+          ? Promise.resolve({ workspace: { plan: "FREE" } })
+          : Promise.resolve({ user: { email: "owner@example.com" } })) as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub5", data: {} } as any);
+
+      await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sendFormSubmissionEmail).toHaveBeenCalledWith("owner@example.com", "Site", expect.any(Array), "s1");
     });
   });
 

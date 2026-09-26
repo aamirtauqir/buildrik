@@ -9,6 +9,7 @@ import {
   exportSubmissions,
   getFormBlockSettings,
   updateFormBlock,
+  FormError,
 } from "@/server/services/form-submission.service";
 import {
   listSubmissionsSchema,
@@ -68,11 +69,18 @@ export const formsRouter = router({
     .input(updateFormBlockSchema)
     .mutation(async ({ ctx, input }) => {
       await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
+      // Who a form's submissions get emailed to is a data-exfil surface —
+      // same precedent as the outbound-webhook gate (account.ts
+      // integrations.add): changing it needs ADMIN. Every other AFTER
+      // SUBMIT / PROTECTION field stays EDITOR-writable via the guard above.
+      if (input.notifyEmail !== undefined) {
+        await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
+      }
       try {
         return await updateFormBlock(input);
       } catch (e: unknown) {
-        if (e instanceof Error && e.message === "FORM_NOT_FOUND") {
-          throw new TRPCError({ code: "NOT_FOUND" });
+        if (e instanceof FormError) {
+          throw new TRPCError({ code: e.code, message: e.message });
         }
         throw e;
       }

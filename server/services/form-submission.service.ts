@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { deliverWebhook } from "@/server/services/webhook.service";
 import { csvCell } from "@/lib/utils";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
@@ -7,8 +8,51 @@ import type {
   ListSubmissionsInput,
   UpdateFormBlockInput,
 } from "@buildrik/shared/schemas/forms";
+import { isAbsoluteHttpUrl } from "@buildrik/shared/schemas/element-markup";
+import { resolveSiteOrigin } from "@/lib/publish-urls";
+import { slugifyProjectName } from "@/lib/vercel";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
+
+/** Domain error for this service — mirrors `CmsError` (`cms.service.ts`):
+ *  routers translate `code` straight into a `TRPCError`. */
+export class FormError extends Error {
+  constructor(
+    public code: "NOT_FOUND" | "PRECONDITION_FAILED" | "FORBIDDEN",
+    message: string,
+  ) {
+    super(message);
+    this.name = "FormError";
+  }
+}
+
+/**
+ * Validates the visitor's own `location.href` (sent as `returnUrl`, filled
+ * by the page script in `lib/publish-forms.ts`) against the site's own known
+ * origins before trusting it as a redirect target — an arbitrary attacker
+ * string here would be an open redirect. `slugifyProjectName`/`resolveSiteOrigin`
+ * mirror exactly what the publish worker resolves the live origin to
+ * (`packages/dashboard/app/api/workers/publish/[jobId]/route.ts`).
+ */
+function safeReturnUrl(
+  returnUrl: string | undefined,
+  site: { canonicalUrl: string | null; slug: string; verifiedDomain: string | null },
+): string | null {
+  if (!returnUrl || !isAbsoluteHttpUrl(returnUrl)) return null;
+
+  const resolved = resolveSiteOrigin({
+    canonicalUrl: site.canonicalUrl,
+    verifiedDomain: site.verifiedDomain,
+    vercelProjectName: slugifyProjectName(site.slug),
+  });
+  if (!resolved) return null;
+
+  try {
+    return new URL(returnUrl).origin === new URL(resolved).origin ? returnUrl : null;
+  } catch {
+    return null;
+  }
+}
 
 type UpdateInput = {
   id: string;
@@ -22,6 +66,8 @@ export interface SubmitFormResult {
   successAction: "MESSAGE" | "REDIRECT";
   redirectUrl: string | null;
   successMessage: string | null;
+  /** The visitor's own page URL, validated against the site's own origins — null when absent/unvalidated/off-site. */
+  returnUrl: string | null;
 }
 
 export async function submitForm(
@@ -31,19 +77,24 @@ export async function submitForm(
   ip: string,
 ): Promise<SubmitFormResult> {
   if (input.honeypot) {
-    return { id: "honeypot", successAction: "MESSAGE", redirectUrl: null, successMessage: null };
+    return { id: "honeypot", successAction: "MESSAGE", redirectUrl: null, successMessage: null, returnUrl: null };
   }
 
   const formBlock = await prisma.formBlock.findFirst({
     where: { id: formBlockId, siteId, isActive: true },
   });
-  if (!formBlock) throw new Error("FORM_NOT_FOUND");
+  if (!formBlock) throw new FormError("NOT_FOUND", "FORM_NOT_FOUND");
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { workspaceId: true, name: true, deletedAt: true },
+    select: { workspaceId: true, name: true, deletedAt: true, canonicalUrl: true, slug: true },
   });
-  if (!site || site.deletedAt) throw new Error("FORM_NOT_FOUND");
+  if (!site || site.deletedAt) throw new FormError("NOT_FOUND", "FORM_NOT_FOUND");
+
+  const verifiedDomain = await prisma.domain.findFirst({
+    where: { siteId, status: "VERIFIED" },
+    select: { domain: true },
+  });
 
   const member = await prisma.workspaceMember.findFirst({
     where: { workspaceId: site.workspaceId },
@@ -59,7 +110,7 @@ export async function submitForm(
     const count = await prisma.formSubmission.count({
       where: { siteId, createdAt: { gte: monthStart } },
     });
-    if (count >= limit) throw new Error("FORM_SUBMISSION_LIMIT");
+    if (count >= limit) throw new FormError("PRECONDITION_FAILED", "FORM_SUBMISSION_LIMIT");
   }
 
   const submission = await prisma.formSubmission.create({
@@ -74,26 +125,30 @@ export async function submitForm(
     siteId,
   ).catch(() => {});
 
-  // Notify: the block's own configured address wins (inspector › AFTER SUBMIT
-  // › Send to email); no address configured falls back to the workspace
-  // owner, same as before that setting existed. Fire-and-forget — a failed
-  // send (bad SMTP creds, provider outage) must never lose the submission,
-  // which is already committed above.
-  (formBlock.notifyEmail
-    ? Promise.resolve(formBlock.notifyEmail)
-    : prisma.workspaceMember
-        .findFirst({
-          where: { workspaceId: site!.workspaceId, role: "OWNER" },
-          select: { user: { select: { email: true } } },
-        })
-        .then((owner) => owner?.user.email)
-  ).then((to) => {
-    if (!to) return;
-    const fields = Object.entries((input.data ?? {}) as Record<string, unknown>).map(
-      ([label, value]) => ({ label, value: String(value) }),
-    );
-    return sendFormSubmissionEmail(to, site!.name, fields, siteId);
-  }).catch(() => {});
+  // Notify: the block's own configured address (inspector › AFTER SUBMIT ›
+  // Send to email) AND the workspace owner, always — a form owner who set a
+  // team inbox as notifyEmail still wants to know their own site is getting
+  // submissions, and losing the owner silently was the previous behaviour's
+  // failure mode. Deduped when the owner IS the configured address. Both
+  // sends are fire-and-forget — a failed send (bad SMTP creds, provider
+  // outage) must never lose the submission, which is already committed
+  // above, but IS worth a log line instead of vanishing into a swallowed
+  // catch.
+  prisma.workspaceMember
+    .findFirst({
+      where: { workspaceId: site!.workspaceId, role: "OWNER" },
+      select: { user: { select: { email: true } } },
+    })
+    .then((owner) => {
+      const recipients = Array.from(
+        new Set([formBlock.notifyEmail, owner?.user?.email].filter((e): e is string => Boolean(e))),
+      );
+      const fields = Object.entries((input.data ?? {}) as Record<string, unknown>).map(
+        ([label, value]) => ({ label, value: String(value) }),
+      );
+      return Promise.all(recipients.map((to) => sendFormSubmissionEmail(to, site!.name, fields, siteId)));
+    })
+    .catch((err) => console.error(`[form-submission] notify email failed for form=${formBlockId}:`, err));
 
   // P6 workspace webhook — best-effort, never blocks the submission.
   if (site?.workspaceId) {
@@ -104,13 +159,22 @@ export async function submitForm(
     });
   }
 
+  // A row can only reach REDIRECT with no usable URL through direct DB
+  // tampering or a bug elsewhere (the write path validates it) — fail closed
+  // to the message behaviour rather than send a browser to `undefined`.
+  const redirectUrl = formBlock.redirectUrl && isAbsoluteHttpUrl(formBlock.redirectUrl) ? formBlock.redirectUrl : null;
+  const successAction: "MESSAGE" | "REDIRECT" = formBlock.successAction === "REDIRECT" && redirectUrl ? "REDIRECT" : "MESSAGE";
+
   return {
     id: submission.id,
-    successAction: (formBlock.successAction === "REDIRECT" ? "REDIRECT" : "MESSAGE") as
-      | "MESSAGE"
-      | "REDIRECT",
-    redirectUrl: formBlock.redirectUrl ?? null,
+    successAction,
+    redirectUrl,
     successMessage: formBlock.successMessage ?? null,
+    returnUrl: safeReturnUrl(input.returnUrl, {
+      canonicalUrl: site.canonicalUrl,
+      slug: site.slug,
+      verifiedDomain: verifiedDomain?.domain ?? null,
+    }),
   };
 }
 
@@ -201,7 +265,7 @@ export async function getFormBlockSettings(
  */
 export async function updateFormBlock(input: UpdateFormBlockInput) {
   const { siteId, blockId, ...settings } = input;
-  const data: Record<string, unknown> = {};
+  const data: Prisma.FormBlockUpdateInput = {};
   if (settings.successMessage !== undefined) data.successMessage = settings.successMessage || null;
   if (settings.successAction !== undefined) data.successAction = settings.successAction;
   if (settings.redirectUrl !== undefined) data.redirectUrl = settings.redirectUrl || null;
@@ -214,18 +278,27 @@ export async function updateFormBlock(input: UpdateFormBlockInput) {
   // before writing.
   const existing = await prisma.formBlock.findUnique({ where: { id: blockId }, select: { siteId: true } });
   if (existing && existing.siteId !== siteId) {
-    throw new Error("FORM_NOT_FOUND");
+    throw new FormError("NOT_FOUND", "FORM_NOT_FOUND");
   }
 
   return prisma.formBlock.upsert({
     where: { id: blockId },
+    // Not `...data` — `Prisma.FormBlockUpdateInput`'s fields are typed for
+    // PATCH semantics (`string | StringFieldUpdateOperationsInput`), which
+    // poisons a Create input's plain-scalar fields when spread in. Every
+    // field here has its own default because a settings save can be the
+    // FIRST write this row ever gets (before the form is ever published).
     create: {
       id: blockId,
       siteId,
       blockId,
       name: "Untitled form",
       fields: [],
-      ...data,
+      successMessage: settings.successMessage || null,
+      successAction: settings.successAction ?? "MESSAGE",
+      redirectUrl: settings.redirectUrl || null,
+      notifyEmail: settings.notifyEmail || null,
+      spamProtection: settings.spamProtection ?? true,
     },
     update: data,
   });
