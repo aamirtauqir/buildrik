@@ -6,7 +6,7 @@
  * it fires today (form capture is unbuilt); site.publish's copy is real.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 const invalidateMock = vi.fn();
@@ -64,6 +64,50 @@ describe("WebhooksCard", () => {
     await user.click(screen.getByText("Webhooks"));
     expect(screen.getByText("https://example.com/hook")).toBeInTheDocument();
     expect(screen.getByText("whsec_••••3456")).toBeInTheDocument();
+  });
+
+  /* Fix round 1: the form is Flowbite-first and properly labelled — the
+     Endpoint URL field is an InputField its label names, the events are
+     flowbite Checkboxes in a group named "Events", and "Signing secret" /
+     "Events" are headings, not <label>s pointing at nothing. */
+  it("edit form: labelled InputField, flowbite checkboxes in a named group", async () => {
+    const user = userEvent.setup();
+    render(<WebhooksCard />);
+    await user.click(screen.getByText("Connect"));
+    const url = screen.getByLabelText("Endpoint URL");
+    expect(url.parentElement?.className).toContain("h-[42px]");
+    const group = screen.getByRole("group", { name: "Events" });
+    const boxes = within(group).getAllByRole("checkbox");
+    expect(boxes).toHaveLength(2);
+    for (const box of boxes) expect(box.className).toMatch(/appearance-none/);
+    expect(within(group).getByRole("checkbox", { name: /site\.publish/ })).toBeChecked();
+    expect(screen.getByText("Events").tagName).not.toBe("LABEL");
+  });
+
+  it("the signing secret heading is not a <label>", async () => {
+    const user = userEvent.setup();
+    statusState = {
+      data: { url: "https://example.com/hook", events: ["site.publish"], secret: "whsec_abcdef123456", lastDeliveryAt: null, lastStatus: null, failures24h: 0, recentFailures: [] },
+      isLoading: false,
+      error: null,
+    };
+    render(<WebhooksCard />);
+    await user.click(screen.getByText("Webhooks"));
+    expect(screen.getByText("Signing secret").tagName).not.toBe("LABEL");
+  });
+
+  it("editing drops a stored event this card doesn't know instead of casting it through", async () => {
+    const user = userEvent.setup();
+    statusState = {
+      data: { url: "https://example.com/hook", events: ["site.publish", "site.deleted"], secret: "whsec_abcdef123456", lastDeliveryAt: null, lastStatus: null, failures24h: 0, recentFailures: [] },
+      isLoading: false,
+      error: null,
+    };
+    render(<WebhooksCard />);
+    await user.click(screen.getByText("Webhooks"));
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(connectMutateMock).toHaveBeenCalledWith({ url: "https://example.com/hook", events: ["site.publish"] });
   });
 
   it("shows a read-blocked explainer instead of the form for a non-admin (FORBIDDEN)", () => {

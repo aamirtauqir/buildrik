@@ -10,9 +10,10 @@
  * open owner-surface consolidation (PD-1).
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { Checkbox } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
-import { Button, Pill } from "@/components/dashboard/primitives";
+import { Button, InputField, Pill } from "@/components/dashboard/primitives";
 import { IntegrationCard } from "@/components/settings/integrations-content";
 
 const EVENTS = [
@@ -20,6 +21,8 @@ const EVENTS = [
   { id: "form.submit", label: "form.submit — ready, but nothing sends it yet (form capture is unbuilt)" },
 ] as const;
 type EventId = (typeof EVENTS)[number]["id"];
+const DEFAULT_EVENTS: EventId[] = ["site.publish", "form.submit"];
+const isEventId = (id: string): id is EventId => EVENTS.some((ev) => ev.id === id);
 
 function maskSecret(secret: string): string {
   return `${secret.slice(0, 6)}••••${secret.slice(-4)}`;
@@ -42,7 +45,9 @@ export function WebhooksCard() {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [url, setUrl] = useState("");
-  const [events, setEvents] = useState<EventId[]>(["site.publish", "form.submit"]);
+  const [events, setEvents] = useState<EventId[]>(DEFAULT_EVENTS);
+  const urlId = useId();
+  const eventsHeadingId = useId();
   const [confirming, setConfirming] = useState<"regenerate" | "disconnect" | null>(null);
   const [secretVisible, setSecretVisible] = useState(false);
 
@@ -62,7 +67,8 @@ export function WebhooksCard() {
   useEffect(() => {
     if (!editing) return;
     setUrl(data?.url ?? "");
-    setEvents((data?.events as EventId[] | undefined) ?? ["site.publish", "form.submit"]);
+    // A stored event this card has no row for is dropped, not cast through.
+    setEvents(data ? data.events.filter(isEventId) : DEFAULT_EVENTS);
     // Only re-seed when entering edit mode, not on every status refetch.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing]);
@@ -99,25 +105,27 @@ export function WebhooksCard() {
       ) : editing ? (
         <div className="space-y-3">
           <div>
-            <label className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>Endpoint URL</label>
-            <input
+            {/* Same eyebrow label the provider fields beside this card use
+                (integrations-content), tied to the field by id. */}
+            <label htmlFor={urlId} className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>Endpoint URL</label>
+            <InputField
+              id={urlId}
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://api.yourapp.com/hooks/buildrick"
-              className="w-full rounded-lg px-3 py-2 text-body-sm outline-none shadow-[inset_0_0_0_1px_var(--color-border-input)] focus:shadow-[inset_0_0_0_1px_var(--color-primary)]"
             />
           </div>
-          <div>
-            <label className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>Events</label>
+          <div role="group" aria-labelledby={eventsHeadingId}>
+            <p id={eventsHeadingId} className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>Events</p>
             <div className="space-y-1.5">
               {EVENTS.map((ev) => (
                 <label key={ev.id} className="flex items-start gap-2 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                  <input
-                    type="checkbox"
+                  <Checkbox
+                    color="blue"
                     checked={events.includes(ev.id)}
                     onChange={(e) => toggleEvent(ev.id, e.target.checked)}
-                    className="mt-0.5 accent-[var(--color-primary)]"
+                    className="mt-0.5"
                   />
                   <span>{ev.label}</span>
                 </label>
@@ -150,7 +158,7 @@ export function WebhooksCard() {
                 : `✓ Delivering — last delivery ${ago(data.lastDeliveryAt)}.`}
           </p>
           <div>
-            <label className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>Signing secret</label>
+            <p className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>Signing secret</p>
             <div className="flex items-center gap-2">
               <code className="text-body-sm">{secretVisible ? data.secret : maskSecret(data.secret)}</code>
               <Button type="button" variant="ghost" size="sm" onClick={() => setSecretVisible((v) => !v)}>{secretVisible ? "Hide" : "Reveal"}</Button>
