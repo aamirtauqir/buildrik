@@ -61,21 +61,27 @@ function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknow
  * the text comes back exactly as typed. Escaping belongs to the sink.
  *
  * Repeated until nothing changes: cutting a tag out of the middle of another
- * (`<<img …>img …>`) leaves text that is itself a tag. Capped at
- * STRIP_MARKUP_MAX_ITERATIONS as defense-in-depth against a pathological
- * input that never converges — real inputs stabilize in one or two passes.
+ * (`<<img …>img …>`) leaves text that is itself a tag. Unbounded by design —
+ * each changing pass strictly shortens the text (DOMPurify only ever removes
+ * a tag's markup characters, never adds any, and the `&`-escape means it
+ * never reintroduces one via entity decoding), so this always terminates. A
+ * fixed iteration cap here would fail OPEN instead: a payload built by
+ * repeatedly re-escaping `<` (e.g. `<img src=x onerror=alert(1)>` wrapped as
+ * `<<<...<img…>...i>i>i>` N times) can still contain live markup after N
+ * passes, and a cap would hand that back untouched. As a fail-closed
+ * backstop for anything the loop above did not anticipate, any leftover
+ * `<`/`>` is stripped from the converged result — a fixed point that still
+ * contains one is not actually markup-free.
  */
-const STRIP_MARKUP_MAX_ITERATIONS = 10;
-
 function stripMarkup(value: string): string {
   let text = value;
-  for (let i = 0; i < STRIP_MARKUP_MAX_ITERATIONS; i++) {
+  for (;;) {
     const fragment = DOMPurify.sanitize(text.replace(/&/g, "&amp;"), { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true });
     const next = fragment.textContent ?? "";
-    if (next === text) return text;
+    if (next === text) break;
     text = next;
   }
-  return text;
+  return text.replace(/[<>]/g, "");
 }
 
 export async function listCollections(siteId: string) {

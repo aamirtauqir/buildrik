@@ -565,4 +565,10 @@ describe("sanitizeGeneratedPageHtml", () => {
     const out = sanitizeGeneratedPageHtml(html);
     expect(out).not.toMatch(/javascript:/i);
   });
+
+  it("strips a data: URL in <object data=\"...\"> that is not an image (a whole navigable HTML document)", () => {
+    const html = '<html><body><object data="data:text/html,<script>alert(1)</script>"></object></body></html>';
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).not.toMatch(/data:text\/html/i);
+  });
 });

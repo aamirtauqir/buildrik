@@ -5,23 +5,6 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// Lets one test (stripMarkup's iteration cap) override `.sanitize` with an
-// implementation that never converges; every other test leaves the override
-// unset and gets the real isomorphic-dompurify behavior (including its other
-// methods, e.g. `.addHook`, used by lib/sanitize-blocks.ts's own tests).
-let sanitizeOverride: ((...args: unknown[]) => unknown) | null = null;
-vi.mock("isomorphic-dompurify", async (importOriginal) => {
-  const actual = await importOriginal<{ default: object }>();
-  return {
-    default: new Proxy(actual.default, {
-      get(target, prop, receiver) {
-        if (prop === "sanitize" && sanitizeOverride) return sanitizeOverride;
-        return Reflect.get(target, prop, receiver);
-      },
-    }),
-  };
-});
-
 const colFindMany = vi.fn();
 const colFindFirst = vi.fn();
 const colFindUnique = vi.fn();
@@ -142,10 +125,14 @@ describe("entries cross-site guard", () => {
   });
 
   it("x4: stores text as typed — no entity encoding, stable across saves, escaped once at the page sink", async () => {
-    const typed = { title: "Tom & Jerry <3", quote: 'Say "hi" > bye', literal: "AT&amp;T" };
+    // `&` round-trips exactly; a literal `<`/`>` does not — stripMarkup's
+    // fail-closed backstop removes any leftover angle bracket from the
+    // converged result (see stripMarkup's doc comment), since a fixed point
+    // that still contains one cannot be told apart from unparsed markup.
+    const typed = { title: "Tom & Jerry 3", quote: 'Say "hi"  bye', literal: "AT&amp;T" };
     colFindFirst.mockResolvedValue({ id: "c1" });
     entCreate.mockResolvedValue({ id: "e1" });
-    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: typed });
+    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: "Tom & Jerry <3", quote: 'Say "hi" > bye', literal: "AT&amp;T" } });
     const first = entCreate.mock.calls[0][0].data.data as Record<string, unknown>;
     expect(first).toEqual(typed);
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: first }); // a second save of what came back
@@ -155,7 +142,7 @@ describe("entries cross-site guard", () => {
     colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/x", pageSeoTitle: null, pageSeoDescription: null });
     entFindMany.mockResolvedValueOnce([{ id: "e1", data: first }]);
     const page = await generateDynamicPages("s1", "c1", "<html><head></head><body><h1>{title}</h1></body></html>");
-    expect(page[0].content).toContain("<h1>Tom &amp; Jerry &lt;3</h1>");
+    expect(page[0].content).toContain("<h1>Tom &amp; Jerry 3</h1>");
   });
 
   it("x4: stored text never re-forms markup when a tag is cut out of the middle of one", async () => {
@@ -167,22 +154,16 @@ describe("entries cross-site guard", () => {
     expect(stored).not.toMatch(/<img/i);
   });
 
-  it("stripMarkup stops after a bounded number of passes instead of looping forever on an input that never converges", async () => {
-    let call = 0;
-    sanitizeOverride = () => {
-      call += 1;
-      // Never stabilizes: each pass returns different text, so an uncapped
-      // loop would run forever.
-      return { textContent: `x${call}` };
-    };
-    try {
-      colFindFirst.mockResolvedValueOnce({ id: "c1" });
-      entCreate.mockResolvedValueOnce({ id: "e1" });
-      await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: "irrelevant" } });
-      expect(call).toBeLessThanOrEqual(10);
-    } finally {
-      sanitizeOverride = null;
-    }
+  it("stripMarkup has no fixed pass limit — a payload nested past any small cap still loses its markup", async () => {
+    // A fixed N-pass cap fails OPEN: build a payload that still has live
+    // markup after N passes by re-wrapping the tag N times over.
+    let payload = "<img src=x onerror=alert(1)>";
+    for (let i = 0; i < 10; i++) payload = payload.replace(/</g, "<<i>");
+    colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    entCreate.mockResolvedValueOnce({ id: "e1" });
+    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: payload } });
+    const stored = (entCreate.mock.calls[0][0].data.data as { title: string }).title;
+    expect(stored).not.toMatch(/<img/i);
   });
 });
 
