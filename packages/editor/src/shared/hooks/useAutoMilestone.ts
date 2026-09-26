@@ -8,7 +8,10 @@
  * - >50% of an element's properties changed
  * - 10 auto-checkpoints since last manual save
  *
- * Debounces suggestions to max once per 30 seconds.
+ * Debounces suggestions to max once per 10 minutes, and only past a
+ * significance threshold of history entries recorded since the last attempt
+ * — each attempt spends AI quota regardless of outcome (S-8), and never
+ * while the tab is hidden.
  *
  * @license BSD-3-Clause
  */
@@ -40,7 +43,22 @@ export interface UseAutoMilestoneReturn {
 }
 
 const AUTO_CHECKPOINT_THRESHOLD = 10;
-const SUGGESTION_COOLDOWN_MS = 30_000; // 30 seconds
+/* S-8/carry-over 15: every requestSuggestion call spends AI quota (the
+   client only skips the CALL, not the spend — a rejected/failed call still
+   burns a request against the account's budget). At 30s this hook could
+   fire up to ~120/h, and the cooldown only ever armed on SUCCESS
+   (`lastSuggestionTime` was set inside the try block) — a run of failures
+   (quota already exhausted, a flaky endpoint) left it at its initial 0
+   forever, so the "cooldown" gated nothing once it started failing: every
+   qualifying history entry retried immediately. Raised to 10 minutes and
+   the gate now arms on every ATTEMPT, not just a success. */
+const SUGGESTION_COOLDOWN_MS = 10 * 60_000; // 10 minutes
+/* A significance threshold on top of the cooldown — 30s of edits during a
+   burst was "significant" by the old clock alone; now also require at
+   least this many recorded history entries since the last suggestion
+   (attempted or shown), so a quiet 10 minutes with one small edit doesn't
+   still spend a call the moment the cooldown lifts. */
+const MIN_CHANGES_SINCE_LAST_SUGGESTION = 5;
 
 /**
  * Approximate property count per element type, used to normalize "mass change"
@@ -149,6 +167,9 @@ export function useAutoMilestone(
   const [lastSuggestionTime, setLastSuggestionTime] = React.useState(0);
 
   const autoCheckpointCountRef = React.useRef(0);
+  // Significance threshold: history entries recorded since the gate last
+  // armed (on an attempt, success or failure). Reset whenever the gate arms.
+  const changesSinceLastSuggestionRef = React.useRef(0);
 
   const isAvailable = composer?.versions?.isAvailable() ?? false;
 
@@ -156,9 +177,26 @@ export function useAutoMilestone(
     async (trigger: MilestoneSuggestion["trigger"]) => {
       if (!composer?.versions || !isAvailable) return;
 
-      // Rate limit: don't suggest if shown in last 30s
-      if (Date.now() - lastSuggestionTime < SUGGESTION_COOLDOWN_MS) return;
+      // Never spend quota while the tab isn't visible — nobody is here to
+      // see the suggestion, and a hidden tab left open overnight is exactly
+      // the shape that burned quota fastest.
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
 
+      // Rate limit: don't attempt more than once per cooldown window. Armed
+      // on every ATTEMPT below, not only a success, so a run of failures
+      // can't disable the gate. lastSuggestionTime === 0 means no attempt
+      // has happened yet this session — nothing to cool down from.
+      const hasAttempted = lastSuggestionTime !== 0;
+      if (hasAttempted && Date.now() - lastSuggestionTime < SUGGESTION_COOLDOWN_MS) return;
+
+      // Significance threshold: once the gate has armed at least once, a
+      // cooldown lifting is not itself a reason to spend another call —
+      // require real activity since it last armed. The very first attempt
+      // of a session has no "last" to measure since.
+      if (hasAttempted && changesSinceLastSuggestionRef.current < MIN_CHANGES_SINCE_LAST_SUGGESTION) return;
+
+      setLastSuggestionTime(Date.now());
+      changesSinceLastSuggestionRef.current = 0;
       setIsLoading(true);
 
       try {
@@ -189,7 +227,6 @@ export function useAutoMilestone(
           reasoning: data.reasoning ?? "",
           trigger,
         });
-        setLastSuggestionTime(Date.now());
       } catch (err) {
         // Best-effort — but said, not swallowed: a dead transport hid here
         // for months behind `catch {}`.
@@ -205,10 +242,13 @@ export function useAutoMilestone(
     if (!composer?.history) return;
 
     const handleRecorded = async (payload: { label?: string }) => {
+      changesSinceLastSuggestionRef.current += 1;
+
       // Mass-change check runs on every recorded entry (manual or auto), since
       // a single user action can flip more than half an element's properties.
-      // The 30s cooldown inside requestSuggestion prevents floods when this
-      // co-fires with checkpoint_threshold.
+      // The 10-minute cooldown + significance threshold inside
+      // requestSuggestion prevent floods when this co-fires with
+      // checkpoint_threshold.
       try {
         const stack = composer.history.getHistoryStack();
         const latest = stack[0];

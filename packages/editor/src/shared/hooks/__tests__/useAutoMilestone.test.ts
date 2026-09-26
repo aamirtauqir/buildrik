@@ -71,6 +71,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.useRealTimers();
 });
 
 describe("useAutoMilestone — availability", () => {
@@ -132,7 +133,7 @@ describe("useAutoMilestone — triggers", () => {
   });
 
 
-  it("enforces the 30s cooldown between suggestions", async () => {
+  it("enforces the 10-minute cooldown between suggestions (carry-over 15: raised from 30s)", async () => {
     const suggestMock = stubSuggest();
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
@@ -143,6 +144,59 @@ describe("useAutoMilestone — triggers", () => {
 
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "b" }));
     expect(suggestMock).toHaveBeenCalledTimes(1); // suppressed by cooldown
+  });
+
+  it("carry-over 15: a run of failed attempts still arms the cooldown — a flaky/quota-exhausted endpoint can't disable the gate", async () => {
+    suggestMilestone.mockRejectedValue(new Error("quota exceeded"));
+    const composer = createMockComposer();
+    const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
+    await waitFor(() => expect(suggestMilestone).toHaveBeenCalledTimes(1));
+    expect(result.current.suggestion).toBeNull();
+
+    // A second qualifying event immediately after the failed attempt must
+    // NOT retry — the old code only armed the cooldown on success, so a
+    // failure left it retrying on every subsequent qualifying event.
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "b" }));
+    expect(suggestMilestone).toHaveBeenCalledTimes(1);
+  });
+
+  it("carry-over 15: never requests a suggestion while the tab is hidden", async () => {
+    const suggestMock = stubSuggest();
+    const composer = createMockComposer();
+    const visibilitySpy = vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+    renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
+    expect(suggestMock).not.toHaveBeenCalled();
+
+    visibilitySpy.mockRestore();
+  });
+
+  it("carry-over 15: requires a significance threshold of recorded changes since the last attempt, not just cooldown elapsing", async () => {
+    // Fake ONLY Date — real setTimeout/setInterval stay so `waitFor`'s
+    // internal polling keeps working (faking the whole clock leaves
+    // `waitFor` polling a clock that never advances, which hangs the test
+    // for its full real-time timeout and corrupts every test after it,
+    // since the timeout races past this function's `finally`).
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const suggestMock = stubSuggest();
+    const composer = createMockComposer();
+    const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    // First-ever attempt: no "last suggestion" to measure activity since,
+    // so it goes through on the qualifying event alone.
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
+    await waitFor(() => expect(result.current.suggestion).not.toBeNull());
+    expect(suggestMock).toHaveBeenCalledTimes(1);
+
+    // Cooldown elapses, but nothing was recorded in between — the second
+    // attempt must still be withheld on significance, not just cooldown.
+    vi.setSystemTime(Date.now() + 11 * 60_000);
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "b" }));
+    expect(suggestMock).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
   });
 
   it("fires checkpoint_threshold after 10 consecutive 'Auto:' records", async () => {
