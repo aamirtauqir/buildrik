@@ -218,13 +218,43 @@ export function withSafeTargets(clean: string, parse: (html: string) => Document
 }
 
 /**
+ * The candidates of a `srcset` value, each `<url> [descriptor]`, split the way
+ * a browser splits them: a candidate's URL is a run of non-whitespace — commas
+ * included, so `data:image/png;base64,AAA 1x` stays one candidate — and only a
+ * comma that ends that URL, or one after its descriptor, starts the next.
+ */
+export function srcsetCandidates(value: string): string[] {
+  const candidates: string[] = [];
+  let pos = 0;
+  while (pos < value.length) {
+    while (pos < value.length && /[\s,]/.test(value[pos])) pos++;
+    const start = pos;
+    while (pos < value.length && !/\s/.test(value[pos])) pos++;
+    if (pos === start) break;
+    if (value[pos - 1] === ",") {
+      // The URL itself ended in a comma: that comma closes the candidate.
+      candidates.push(value.slice(start, pos).replace(/,+$/, ""));
+      continue;
+    }
+    let depth = 0;
+    while (pos < value.length && (value[pos] !== "," || depth > 0)) {
+      if (value[pos] === "(") depth++;
+      else if (value[pos] === ")" && depth > 0) depth--;
+      pos++;
+    }
+    const candidate = value.slice(start, pos).trim();
+    if (candidate) candidates.push(candidate);
+  }
+  return candidates;
+}
+
+/**
  * The URLs a `srcset` value names ("a.jpg 1x, b.jpg 200w" → ["a.jpg", "b.jpg"]).
  * Only a trailing width/density descriptor is cut, not everything after the
  * first space: whitespace inside "java\tscript:" must not split the URL off.
  */
 export function srcsetUrls(value: string): string[] {
-  return value
-    .split(",")
-    .map((candidate) => candidate.trim().replace(/\s+\d+(?:\.\d+)?[wxh]$/i, ""))
+  return srcsetCandidates(value)
+    .map((candidate) => candidate.replace(/\s+\d+(?:\.\d+)?[wxh]$/i, ""))
     .filter((url) => url.length > 0);
 }

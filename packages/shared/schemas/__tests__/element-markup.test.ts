@@ -13,6 +13,7 @@ import {
   isSafeElementId,
   isSafeMediaQuery,
   isSafeStyleRuleTarget,
+  srcsetCandidates,
   srcsetUrls,
 } from "../element-markup";
 
@@ -39,6 +40,21 @@ describe("srcsetUrls", () => {
   it("cuts only the trailing descriptor", () => {
     expect(srcsetUrls("a.jpg 1x, b.jpg 200w,c.jpg")).toEqual(["a.jpg", "b.jpg", "c.jpg"]);
     expect(srcsetUrls("a.jpg 1x, java\tscript:alert(1) 2x")).toEqual(["a.jpg", "java\tscript:alert(1)"]);
+  });
+
+  it("keeps a comma inside a candidate's URL (data: image) — only a comma after the URL ends a candidate", () => {
+    expect(srcsetUrls("data:image/png;base64,AAA 1x, /b.png 2x")).toEqual(["data:image/png;base64,AAA", "/b.png"]);
+    expect(srcsetUrls("data:image/png;base64,AAA,/b.png 2x")).toEqual(["data:image/png;base64,AAA,/b.png"]);
+    expect(srcsetUrls("a.jpg, b.jpg")).toEqual(["a.jpg", "b.jpg"]);
+    expect(srcsetUrls("/a.jpg 1x, java\tscript:a,b 2x")).toEqual(["/a.jpg", "java\tscript:a", "b"]);
+  });
+});
+
+describe("srcsetCandidates", () => {
+  it("returns each candidate with its descriptor, trimmed", () => {
+    expect(srcsetCandidates(" data:image/png;base64,AAA 1x ,/b.png 2x")).toEqual(["data:image/png;base64,AAA 1x", "/b.png 2x"]);
+    expect(srcsetCandidates("a.jpg 1x,")).toEqual(["a.jpg 1x"]);
+    expect(srcsetCandidates(" , ")).toEqual([]);
   });
 });
 

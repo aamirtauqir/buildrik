@@ -42,6 +42,7 @@ import {
   isSafeStyleRuleTarget,
   isValidAttributeName,
   withSafeTargets,
+  srcsetCandidates,
   srcsetUrls,
 } from "@buildrik/shared/schemas/element-markup";
 
@@ -286,19 +287,10 @@ export function sanitizeTemplateHtml(html: string): string {
 // survives).
 
 /** Each `srcset` candidate is `<url> [descriptor]`; a dangerous URL can sit
- *  in any candidate, not just the first. Reuses `srcsetUrls`'s descriptor
- *  stripping (called per-candidate, so a single dangerous entry doesn't cost
- *  the safe ones their descriptors) rather than a second regex for the same
- *  shape. */
+ *  in any candidate, not just the first. The safe candidates are kept. */
 function sanitizeSrcsetValue(value: string): string {
-  return value
-    .split(",")
-    .map((candidate) => candidate.trim())
-    .filter((candidate) => {
-      if (!candidate) return false;
-      const [url] = srcsetUrls(candidate);
-      return url !== undefined && !isDangerousUrl(url);
-    })
+  return srcsetCandidates(value)
+    .filter((candidate) => !srcsetUrls(candidate).some(isDangerousUrl))
     .join(", ");
 }
 
