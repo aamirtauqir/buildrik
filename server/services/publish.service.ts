@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
+import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
@@ -105,6 +106,28 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   } else {
     checks.push({ label: "Favicon", status: "pass", detail: "Favicon is configured." });
   }
+
+  /* Content (B-14 / A02-9): the shared detector the editor's Issues scanner
+     runs, over the pages that ship, so Issues and Publish state the same
+     facts. Warnings only — an unlabelled image or a dead link degrades the
+     site, it does not stop the deploy. A `#page:` target is checked against
+     every page, the editor's own rule. */
+  const contentFindings = detectContentIssues(
+    livePages.map((p) => ({ id: p.id, name: p.name, root: asContentRoot(p.blocks) })),
+    allPages.map((p) => p.id),
+  );
+  const altCount = contentFindings.filter((f) => f.kind === "missing-alt").length;
+  const linkCount = contentFindings.filter((f) => f.kind === "broken-link").length;
+  checks.push(
+    altCount > 0
+      ? { label: CONTENT_CHECK_LABELS["missing-alt"], status: "warning", detail: `${altCount} image${altCount > 1 ? "s are" : " is"} missing alt text.` }
+      : { label: CONTENT_CHECK_LABELS["missing-alt"], status: "pass", detail: "Every image has alt text." },
+  );
+  checks.push(
+    linkCount > 0
+      ? { label: CONTENT_CHECK_LABELS["broken-link"], status: "warning", detail: `${linkCount} link${linkCount > 1 ? "s are" : " is"} broken or missing a destination.` }
+      : { label: CONTENT_CHECK_LABELS["broken-link"], status: "pass", detail: "Every link has a destination." },
+  );
 
   // CMS dynamic-page templates (A-17): a page-generating collection whose
   // bound template page was deleted/renamed since binding would otherwise
