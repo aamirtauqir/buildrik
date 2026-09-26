@@ -12,6 +12,7 @@ import type {
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
+import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_PATTERNS, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 
@@ -656,6 +657,33 @@ export async function bulkAction(
   }
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * I-1c: `projectSettings.analytics` with every id that is not of its
+ * provider's documented shape emptied (and that provider's `verifiedAt`
+ * dropped) — the ids are written into every published page's inline scripts,
+ * and `settings` is `z.unknown()` at the save boundary. Lenient: the rest of
+ * the settings, and the save, still land.
+ */
+function withValidAnalyticsIds(settings: unknown): unknown {
+  if (!isPlainObject(settings) || !isPlainObject(settings.analytics)) return settings;
+  const analytics: Record<string, unknown> = { ...settings.analytics };
+  for (const provider of Object.keys(ANALYTICS_ID_PATTERNS) as AnalyticsProvider[]) {
+    const block = analytics[provider];
+    if (!isPlainObject(block)) continue;
+    const field = ANALYTICS_ID_FIELDS[provider];
+    const id = block[field];
+    if (id === undefined || (typeof id === "string" && (id === "" || ANALYTICS_ID_PATTERNS[provider].test(id)))) continue;
+    const emptied: Record<string, unknown> = { ...block, [field]: "" };
+    delete emptied.verifiedAt;
+    analytics[provider] = emptied;
+  }
+  return { ...settings, analytics };
+}
+
 /**
  * Phase -1: canonical project-data persistence path.
  *
@@ -686,6 +714,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // Site-level project artifacts. The style rules' selectors and media
   // queries are written raw into the published stylesheet — same boundary.
   sanitizeProjectStyles(input.styles);
+  const settings = withValidAnalyticsIds(input.settings);
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
   // past the size cap is not stored — the save and its pages still land, the
@@ -721,9 +750,9 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
             ? undefined
             : ((input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull),
         projectSettings:
-          input.settings === undefined
+          settings === undefined
             ? undefined
-            : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
+            : ((settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
         dsSchemaVersion: input.dsSchemaVersion,
         // Undefined (an editor build that predates the field) leaves the
         // stored bindings alone; the editor always sends its full map.
