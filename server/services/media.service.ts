@@ -160,7 +160,9 @@ export async function listAssets(userId: string, input: ListAssetsInput) {
   const [assets, total] = await Promise.all([
     prisma.mediaAsset.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      // `id` breaks createdAt ties (a bulk upload shares one timestamp) so the
+      // cursor order is total and no row is skipped or repeated across pages.
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: input.limit + 1, // fetch one extra for hasMore detection
       ...(input.cursor
         ? { cursor: { id: input.cursor }, skip: 1 }
