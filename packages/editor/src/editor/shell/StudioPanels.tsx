@@ -84,7 +84,10 @@ export interface StudioPanelsProps {
   onLeftPanelToggle?: () => void;
   leftPanelTab?: string;
   leftPanelSubTab?: string;
-  onLeftPanelTabChange?: (tab: string) => void;
+  /** The shell's guarded switch (B-1). `onSwitched` runs only once the switch
+   *  actually happens — not while its unsaved-changes confirm is pending, and
+   *  never if the user keeps editing. */
+  onLeftPanelTabChange?: (tab: string, onSwitched?: () => void) => void;
   onLeftPanelSubTabChange?: (tab: string) => void;
   blocks: BlockData[];
   onQuickAdd: (block: BlockData) => void;
@@ -436,15 +439,21 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (!composer) return;
 
-    const openTemplates = (data?: TemplatesOpenRequest) => {
-      /* A fresh object per request → the view re-reads it each time. */
-      setTemplatesOpen({ ...data });
-      onLeftPanelTabChange?.("templates");
+    /* Each door's side effects ride the switch's `onSwitched`: a request
+       handed down, or a drawer opened, for a switch still waiting on (or
+       refused by) the unsaved-changes confirm would land on the wrong tab. */
+    const openDrawer = () => {
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
+    const openTemplates = (data?: TemplatesOpenRequest) => {
+      onLeftPanelTabChange?.("templates", () => {
+        /* A fresh object per request → the view re-reads it each time. */
+        setTemplatesOpen({ ...data });
+        openDrawer();
+      });
+    };
     const openDesign = () => {
-      onLeftPanelTabChange?.("design");
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      onLeftPanelTabChange?.("design", openDrawer);
     };
 
     /* Clone 3519:19920 — the Pages panel's `Add redirect` opens Settings ON
@@ -452,25 +461,28 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
        on the switch, after the emit, so a listener inside it would miss the
        request. A fresh object per request → the tab re-navigates each time. */
     const openSettings = (data: SettingsOpenRequest) => {
-      setSettingsOpen({ screen: data.screen, repair: data.repair ?? null });
-      onLeftPanelTabChange?.("settings");
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      onLeftPanelTabChange?.("settings", () => {
+        setSettingsOpen({ screen: data.screen, repair: data.repair ?? null });
+        openDrawer();
+      });
     };
     /* The way back (3519:20096 `Back to <Page> SEO`): the same shape — the
        Pages panel is lazy and unmounted under the Settings fullpage, so the
        request waits here for it. */
     const openPageSettings = (data: PageSettingsOpenRequest) => {
-      setPagesOpen({ pageId: data.pageId, tab: data.tab });
-      onLeftPanelTabChange?.("pages");
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      onLeftPanelTabChange?.("pages", () => {
+        setPagesOpen({ pageId: data.pageId, tab: data.tab });
+        openDrawer();
+      });
     };
 
     /* ⌘K → a collection or record. The workspace reads its store, which
        outlives it, so the request is written there and the tab switched. */
     const openCms = (data: CmsOpenRequest) => {
-      cmsWorkspace.openRequest(data);
-      onLeftPanelTabChange?.("content");
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      onLeftPanelTabChange?.("content", () => {
+        cmsWorkspace.openRequest(data);
+        openDrawer();
+      });
     };
 
     composer.on(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
@@ -535,12 +547,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         }
         return;
       }
-      onLeftPanelTabChange?.(data.tab);
-      if (!isLeftPanelOpen) onLeftPanelToggle?.();
-      /* Clone 3724:43815 — the inspector's "Manage video" opens the Asset
-         LIBRARY (the fullpage), not the drawer; the file to select rides on
-         the engine's media selection the way the drawer's own door hands it. */
-      if (data.tab === "assets" && data.fullPage) setMediaFullPage(true);
+      onLeftPanelTabChange?.(data.tab, () => {
+        if (!isLeftPanelOpen) onLeftPanelToggle?.();
+        /* Clone 3724:43815 — the inspector's "Manage video" opens the Asset
+           LIBRARY (the fullpage), not the drawer; the file to select rides on
+           the engine's media selection the way the drawer's own door hands it. */
+        if (data.tab === "assets" && data.fullPage) setMediaFullPage(true);
+      });
     };
     composer.on("ui:switch-tab", handler);
     return () => {

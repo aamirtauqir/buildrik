@@ -39,6 +39,8 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { RecoveryBanner } from "./RecoveryBanner";
 import { useTabSwitchGuard } from "./hooks/useTabSwitchGuard";
+import { useViewerChrome } from "./hooks/useEditorRole";
+import { isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
 import { UnsavedTabSwitchDialog } from "./modals/UnsavedTabSwitchDialog";
 import { LoadErrorBanner, type LoadErrorKind } from "./LoadErrorBanner";
 import { IssuesPanel } from "./IssuesPanel";
@@ -158,20 +160,30 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const modals = useStudioModals();
   const blocks: BlockData[] = React.useMemo(() => getBlockDefinitions(), []);
 
-  /* B-1: ONE shell-owned dirty registry (shellDirtyRegistry.ts) that every
-     tab-switch surface routes through — the rail/ui:switch-tab
-     (`state.setLeftPanelTab`) and ⌘H/⇧A/the palette/deep links/UI_PANEL_OPEN
-     (`state.openLeftPanelToTab`) are wrapped below so a staged Settings,
-     Brand or CMS-record edit prompts instead of silently discarding. */
-  const { guard: guardTabSwitch, dialogProps: tabSwitchDialogProps } = useTabSwitchGuard();
-  const guardedSetLeftPanelTab = React.useCallback(
-    (tab: string) => guardTabSwitch(() => state.setLeftPanelTab(tab)),
-    [guardTabSwitch, state.setLeftPanelTab]
+  /* B-1: every left-panel tab-switch door gets these two guarded sinks, never
+     the raw `state.setLeftPanelTab` / `state.openLeftPanelToTab` — the rail,
+     ui:switch-tab and StudioPanels' open requests (setLeftPanelTab), and ⌘H,
+     ⇧A, the palette, UI_PANEL_OPEN and every onOpen* deep link
+     (openLeftPanelToTab). A switch that would unmount unsaved Settings or CMS
+     record work (shellDirtyRegistry) prompts first. The VIEWER gate stays in
+     the sinks themselves (useStudioState); a switch it refuses is not
+     prompted for. */
+  const viewerChrome = useViewerChrome();
+  const isTabAllowed = React.useCallback(
+    (tab: string) => isTabAllowedForViewer(tab as GroupedTabId, viewerChrome),
+    [viewerChrome],
   );
-  const guardedOpenLeftPanelToTab = React.useCallback(
-    (primaryTab: string, subTab?: string) => guardTabSwitch(() => state.openLeftPanelToTab(primaryTab, subTab)),
-    [guardTabSwitch, state.openLeftPanelToTab]
-  );
+  const {
+    setLeftPanelTab: guardedSetLeftPanelTab,
+    openLeftPanelToTab: guardedOpenLeftPanelToTab,
+    dialogProps: tabSwitchDialogProps,
+  } = useTabSwitchGuard({
+    leftPanelTab: state.leftPanelTab,
+    leftPanelSubTabs: state.leftPanelSubTabs,
+    setLeftPanelTab: state.setLeftPanelTab,
+    openLeftPanelToTab: state.openLeftPanelToTab,
+    isTabAllowed,
+  });
 
   // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).
   const [loadError, setLoadError] = React.useState<LoadErrorKind>(null);

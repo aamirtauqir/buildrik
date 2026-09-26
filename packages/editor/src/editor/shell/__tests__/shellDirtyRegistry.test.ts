@@ -1,19 +1,20 @@
 /**
  * B-1: shellDirtyRegistry is the one place every navigation guard reads to
  * know whether Settings, Brand or a CMS record has a staged-but-unsaved
- * edit.
+ * edit. Each surface owns (sets and clears) its own entry.
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { shellDirty, useShellDirty } from "../shellDirtyRegistry";
 
 describe("shellDirtyRegistry", () => {
-  beforeEach(() => {
-    shellDirty.reset();
+  afterEach(() => {
+    act(() => (["settings", "brand", "cms-record"] as const).forEach((d) => shellDirty.set(d, false)));
   });
 
   it("get() is false when nothing is registered dirty", () => {
     expect(shellDirty.get()).toBe(false);
+    expect(shellDirty.blocksTabSwitch()).toBe(false);
   });
 
   it("get() is true when any single domain is dirty", () => {
@@ -30,12 +31,14 @@ describe("shellDirtyRegistry", () => {
     expect(shellDirty.get()).toBe(true);
   });
 
-  it("reset() clears every domain", () => {
+  it("blocksTabSwitch() counts only surfaces a switch unmounts — not Brand's persisting staging", () => {
     shellDirty.set("brand", true);
+    expect(shellDirty.blocksTabSwitch()).toBe(false);
     shellDirty.set("settings", true);
-    shellDirty.reset();
-    expect(shellDirty.get()).toBe(false);
-    expect(shellDirty.getDomains()).toEqual({ settings: false, brand: false, "cms-record": false });
+    expect(shellDirty.blocksTabSwitch()).toBe(true);
+    shellDirty.set("settings", false);
+    shellDirty.set("cms-record", true);
+    expect(shellDirty.blocksTabSwitch()).toBe(true);
   });
 
   it("useShellDirty() re-renders subscribers on a domain change", () => {

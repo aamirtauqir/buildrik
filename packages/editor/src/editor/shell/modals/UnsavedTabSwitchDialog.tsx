@@ -1,7 +1,11 @@
 /**
  * UnsavedTabSwitchDialog — the shared confirm shown by `useTabSwitchGuard`
- * (B-1) whenever a tab switch would leave a dirty Settings screen, a staged
- * Brand edit, or an open CMS record with unsaved fields. Two answers only
+ * (B-1) whenever a tab switch would unmount a dirty Settings screen or an
+ * open CMS record with unsaved fields — both lose their edits when they
+ * unmount, so "Switching away will lose them" is literally true. Brand never
+ * raises it: its staged edits live in TokenRegistryProvider and are still
+ * staged after a switch (the exit guard and beforeunload count them). Two
+ * answers only
  * (no per-domain "Save and continue" — the registry doesn't know which
  * domain(s) are dirty or how to save them): Keep editing (safe answer, gets
  * focus) or Leave and lose changes (danger), same copy as the exit-to-

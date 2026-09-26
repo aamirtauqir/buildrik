@@ -19,13 +19,11 @@ import * as React from "react";
 
 export type DirtyDomain = "settings" | "brand" | "cms-record";
 
-const INITIAL: Record<DirtyDomain, boolean> = {
+let state: Record<DirtyDomain, boolean> = {
   settings: false,
   brand: false,
   "cms-record": false,
 };
-
-let state: Record<DirtyDomain, boolean> = { ...INITIAL };
 const listeners = new Set<() => void>();
 
 function emit(): void {
@@ -33,21 +31,19 @@ function emit(): void {
 }
 
 export const shellDirty = {
-  /** True when ANY registered domain is dirty. */
+  /** True when ANY registered domain is dirty — what leaving the editor
+   *  (exit, beforeunload) would lose. */
   get: (): boolean => state.settings || state.brand || state["cms-record"],
-  getDomains: (): Record<DirtyDomain, boolean> => state,
+  /** True when a left-panel tab switch would lose work: the surfaces a switch
+   *  UNMOUNTS (Settings' screen buffers, an open record's fields). Brand is
+   *  left out on purpose — its staged edits live in TokenRegistryProvider,
+   *  above the panels, and are still staged after a switch. */
+  blocksTabSwitch: (): boolean => state.settings || state["cms-record"],
+  /** Each producer owns its own entry: it sets it from its dirty state and
+   *  clears it when its surface unmounts or discards — never anyone else. */
   set: (domain: DirtyDomain, dirty: boolean): void => {
     if (state[domain] === dirty) return;
     state = { ...state, [domain]: dirty };
-    emit();
-  },
-  /** Confirmed-leave: every domain drops back to clean so the next switch
-   *  doesn't immediately re-prompt on the state a "Leave anyway" just
-   *  discarded. The panel that owned the edit is responsible for resetting
-   *  its own local form state when it next mounts — this registry only ever
-   *  tracked "should the shell block leaving", not the edit itself. */
-  reset: (): void => {
-    state = { ...INITIAL };
     emit();
   },
   subscribe: (l: () => void): (() => void) => {

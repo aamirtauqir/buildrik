@@ -29,9 +29,12 @@ describe("StudioPanels — the two open requests wait here for a lazy panel", ()
     expect(src).toContain("composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings)");
   });
 
-  it("each request switches the tab itself and opens the drawer", () => {
-    expect(src).toMatch(/setSettingsOpen\(\{ screen: data\.screen, repair: data\.repair \?\? null \}\);\s*onLeftPanelTabChange\?\.\("settings"\)/);
-    expect(src).toMatch(/setPagesOpen\(\{ pageId: data\.pageId, tab: data\.tab \}\);\s*onLeftPanelTabChange\?\.\("pages"\)/);
+  /* B-1 fix round 1: the request and the drawer ride the guarded switch's
+     onSwitched — a switch held (or refused) by the unsaved-changes confirm
+     must not hand a request to, or open the drawer on, the wrong tab. */
+  it("each request switches the tab itself and, once switched, hands the request down and opens the drawer", () => {
+    expect(src).toMatch(/onLeftPanelTabChange\?\.\("settings", \(\) => \{\s*setSettingsOpen\(\{ screen: data\.screen, repair: data\.repair \?\? null \}\);\s*openDrawer\(\);/);
+    expect(src).toMatch(/onLeftPanelTabChange\?\.\("pages", \(\) => \{\s*setPagesOpen\(\{ pageId: data\.pageId, tab: data\.tab \}\);\s*openDrawer\(\);/);
   });
 
   it("hands the requests down and drops each one when its tab is left", () => {
@@ -48,7 +51,7 @@ describe("StudioPanels — ui:cms-open (⌘K → a collection or a record)", () 
   });
 
   it("writes the request to the workspace store, then switches to rail CMS", () => {
-    expect(src).toMatch(/cmsWorkspace\.openRequest\(data\);\s*onLeftPanelTabChange\?\.\("content"\)/);
+    expect(src).toMatch(/onLeftPanelTabChange\?\.\("content", \(\) => \{\s*cmsWorkspace\.openRequest\(data\);\s*openDrawer\(\);/);
   });
 });
 
