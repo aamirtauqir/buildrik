@@ -57,7 +57,7 @@ function describeUndo(label: string): string {
   const composer = {
     on: (e: string, h: (d?: unknown) => void) => { (handlers[e] ??= []).push(h); },
     off: () => {},
-    history: { undo: vi.fn(), redo: vi.fn() },
+    history: { undo: vi.fn(), redo: vi.fn(), captureUndo: vi.fn(() => vi.fn()) },
   };
   renderHook(() => useHistoryFeedback(composer as never, addToast as never));
   handlers[EVENTS.HISTORY_UNDO]?.forEach((h) => h({ entry: { label } }));
@@ -117,7 +117,7 @@ describe("undo toasts say what was undone", () => {
     const composer = {
       on: (e: string, h: (d?: unknown) => void) => { (handlers[e] ??= []).push(h); },
       off: () => {},
-      history: { undo: vi.fn(), redo: vi.fn() },
+      history: { undo: vi.fn(), redo: vi.fn(), captureUndo: vi.fn(() => vi.fn()) },
     };
     renderHook(() => useHistoryFeedback(composer as never, addToast as never));
     handlers[EVENTS.HISTORY_REDO]?.forEach((h) => h({ entry: { label: "delete" } }));

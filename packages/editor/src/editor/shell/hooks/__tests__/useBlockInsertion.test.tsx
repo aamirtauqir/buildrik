@@ -94,6 +94,7 @@ describe("useBlockInsertion", () => {
 
     composer = {
       beginTransaction: vi.fn(),
+      history: { captureUndo: vi.fn(() => vi.fn()) },
       endTransaction: vi.fn(),
       emit: vi.fn(),
       elements: {

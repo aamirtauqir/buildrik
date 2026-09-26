@@ -144,7 +144,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
 
   // Done (6881:74045): back to Add, and the insert stays one Undo away.
   const done = () => {
-    addToast({ description: "Block added", action: { label: "Undo", onClick: () => composer.history.undo() } });
+    addToast({ description: "Block added", action: { label: "Undo", onClick: composer.history.captureUndo() } });
     onBack();
   };
 

@@ -47,7 +47,7 @@ function makeComposer(selected: string[] = []) {
   const composer = {
     elements: { getActivePage: () => ({ name: "Home", root: { id: "root" } }), getElement: (id: string) => byId[id] ?? null },
     selection: { getSelectedIds: () => selected, select },
-    history: { undo },
+    history: { undo, captureUndo: () => undo },
   } as unknown as Composer;
   return { composer, undo, select, insertFeatures };
 }

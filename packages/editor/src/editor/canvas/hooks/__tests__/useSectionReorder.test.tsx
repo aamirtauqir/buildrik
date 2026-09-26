@@ -98,6 +98,7 @@ describe("useSectionReorder", () => {
       on: vi.fn((evt: string, h: () => void) => handlers.set(evt, h)),
       off: vi.fn(),
       beginTransaction: vi.fn(),
+      history: { captureUndo: vi.fn(() => vi.fn()) },
       endTransaction: vi.fn(),
       rollbackTransaction: vi.fn(),
     };

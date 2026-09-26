@@ -176,14 +176,25 @@ export function useHistoryFeedback(
         description: `Redo: ${action}`,
         tone: "neutral",
         duration: isDestructive ? 4000 : 2500,
-        action: { label: "Undo", onClick: () => composer.history.undo() },
+        action: { label: "Undo", onClick: composer.history.captureUndo() },
       });
     };
 
     /* Board 814:7027's sixth variant. ⌘Z with an empty stack did nothing and
        said nothing — indistinguishable from an undo that failed. Grey, no
        reverse action: there is nothing to reverse. */
-    const handleNoop = (data: { direction: "undo" | "redo"; reason?: string }) => {
+    const handleNoop = (data: { direction: "undo" | "redo"; reason?: string; superseded?: string }) => {
+      /* A toast's Undo (history.captureUndo) is bound to the action it
+         announced; newer edits came after it, so it refused rather than
+         revert them. */
+      if (data.superseded !== undefined) {
+        addToast({
+          description: `Can't undo ${formatLabel(data.superseded).toLowerCase()} from here — newer edits came after it. Use ⌘Z to step back through them.`,
+          tone: "neutral",
+          duration: 4000,
+        });
+        return;
+      }
       /* "Nothing to undo" is false when the stack has entries and the LAST
          action is what cannot be undone — a binding, say. Undoing the earlier
          edit instead would be an action the user did not ask for, so the
@@ -253,7 +264,7 @@ export function useHistoryFeedback(
         description,
         tone: "info",
         duration: 5000,
-        action: { label: "Undo", onClick: () => composer.history.undo() },
+        action: { label: "Undo", onClick: composer.history.captureUndo() },
       });
     };
 

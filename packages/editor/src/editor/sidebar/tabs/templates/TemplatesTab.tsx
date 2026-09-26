@@ -369,7 +369,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           tone: "success",
           title: `${replacedName} replaced`,
           description: backupTakenRef.current ? "Backup saved in History › Saves." : `“${t.name}” applied.`,
-          action: { label: "Undo", onClick: () => composer?.history.undo() },
+          action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
         });
       } else {
         addToast({ description: `"${t.name}" applied successfully`, tone: "success" });

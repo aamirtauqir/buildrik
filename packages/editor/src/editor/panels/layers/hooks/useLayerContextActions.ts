@@ -127,7 +127,7 @@ export function useLayerContextActions(
           addToast({
             description: `${label} deleted`,
             tone: "info",
-            action: { label: "Undo", onClick: () => composer?.history.undo() },
+            action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
           });
           break;
         }
@@ -138,7 +138,7 @@ export function useLayerContextActions(
           actionsHook.groupLayers(ids, treeHook.layers);
           addToast({
             description: `Wrapped ${multi ? `${ids.length} elements` : name.charAt(0).toUpperCase() + name.slice(1)} in a group`,
-            action: { label: "Undo", onClick: () => composer?.history.undo() },
+            action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
           });
           break;
         }
