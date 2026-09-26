@@ -55,6 +55,7 @@ function makeComposer(existingNames: string[] = ["Home"], order: string[] = []) 
         ),
       },
       styles: { clear: vi.fn() },
+      history: { captureUndo: vi.fn(() => () => true) },
       versions: {
         autoCheckpoint: vi.fn(async (label: string) => {
           order.push(`checkpoint:${label}`);
