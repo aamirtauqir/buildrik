@@ -70,4 +70,44 @@ describe("A-5 — select-all destructive ops keep locked descendants", () => {
     c.commands.run("delete");
     expect(request).toHaveBeenCalledWith({ count: 2 });
   });
+
+  /* Review I-1: the first fix DESCENDED into a selected element holding a
+     locked descendant and deleted its other children instead — so an
+     explicit Delete on just the section removed the text beside the locked
+     image, with no toast (the toast counts the selected ids). An explicit
+     selection holding a locked descendant removes nothing and says so. */
+  it("an explicitly selected section with a locked child removes nothing, and says why", () => {
+    const { c, ids, skipped } = setup();
+    c.selection.clear();
+    c.selection.select(c.elements.getElement(ids.section)!);
+    skipped.mockClear();
+    c.commands.run("delete", { confirmed: true });
+    expect(c.elements.getElement(ids.section)).toBeTruthy();
+    expect(c.elements.getElement(ids.img)).toBeTruthy();
+    expect(c.elements.getElement(ids.text)).toBeTruthy();
+    expect(skipped).toHaveBeenCalled();
+  });
+
+  it("an explicit Cut of that section removes nothing and leaves the clipboard alone", () => {
+    const { c, ids, skipped } = setup();
+    c.clipboard = null;
+    c.selection.clear();
+    c.selection.select(c.elements.getElement(ids.section)!);
+    skipped.mockClear();
+    c.commands.run("cut");
+    expect(c.elements.getElement(ids.text)).toBeTruthy();
+    expect(c.clipboard).toBeNull();
+    expect(skipped).toHaveBeenCalled();
+  });
+
+  it("children of a locked container are not deleted one by one under ⌘A", () => {
+    const { c, ids } = setup();
+    c.elements.getElement(ids.img)!.setLocked(false);
+    c.elements.getElement(ids.section)!.setLocked(true);
+    c.selection.selectAll();
+    c.commands.run("delete", { confirmed: true });
+    expect(c.elements.getElement(ids.img)).toBeTruthy();
+    expect(c.elements.getElement(ids.text)).toBeTruthy();
+    expect(c.elements.getElement(ids.heading)).toBeFalsy();
+  });
 });
