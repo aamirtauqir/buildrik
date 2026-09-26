@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { Key, Plus, Copy, Check, Trash2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { writeClipboardText } from "@lib/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 const ADMIN_ONLY_TOKENS = "Only workspace admins can create API tokens.";
 import { useToast } from "@/components/dashboard/toast-provider";

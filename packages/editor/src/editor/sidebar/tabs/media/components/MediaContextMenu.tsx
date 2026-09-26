@@ -20,7 +20,7 @@ import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
 import type { LibraryItem } from "../data/mediaTypes";
 import { useMediaWriteAccess } from "../hooks/useMediaWriteAccess";
 import { Button, Tooltip } from "@/editor/chrome-ui";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 interface MediaContextMenuProps {
   x: number;

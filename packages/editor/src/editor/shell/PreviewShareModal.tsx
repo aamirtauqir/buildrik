@@ -24,7 +24,7 @@ import * as React from "react";
 import { Button, Modal, useToast } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface PreviewShareModalProps {
   open: boolean;

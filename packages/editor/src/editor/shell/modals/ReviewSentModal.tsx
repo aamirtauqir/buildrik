@@ -23,7 +23,7 @@
  */
 import * as React from "react";
 import { Button, ModalRoot, ModalContent, ModalTitle, Spinner, TYPE_BODY_CLASS, TYPE_HINT_CLASS } from "@/editor/chrome-ui";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export type ReviewSendState = "sending" | "sent" | "email-failed";
 

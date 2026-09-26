@@ -54,7 +54,7 @@ import "./header.css";
 
 /** Selected element minimal info */
 import type { SelectedElementInfo } from "@/shared/types";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { endUnloadGuardBypass, isUnloadGuardBypassed, navigateBypassingUnloadGuard } from "./unloadGuardBypass";
 export type { SelectedElementInfo };
 

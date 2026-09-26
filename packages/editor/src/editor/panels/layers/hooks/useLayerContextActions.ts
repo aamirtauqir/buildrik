@@ -16,7 +16,7 @@ import { findById } from "../data/layerUtils";
 import type { LayerAction } from "../types";
 import type { UseLayersStateReturn } from "./useLayersState";
 import { useToast } from "@/editor/chrome-ui";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface LayerContextActionOptions {
   /** Delete asked for N ≥ 2 elements — open the confirm (board 6887:78291). */
