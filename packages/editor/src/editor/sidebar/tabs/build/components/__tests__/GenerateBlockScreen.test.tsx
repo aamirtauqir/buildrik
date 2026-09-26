@@ -47,7 +47,7 @@ function makeComposer(selected: string[] = []) {
   const composer = {
     elements: { getActivePage: () => ({ name: "Home", root: { id: "root" } }), getElement: (id: string) => byId[id] ?? null },
     selection: { getSelectedIds: () => selected, select },
-    history: { undo },
+    history: { undo, captureUndo: vi.fn(() => undo) },
   } as unknown as Composer;
   return { composer, undo, select, insertFeatures };
 }
@@ -131,6 +131,24 @@ describe("GenerateBlockScreen", () => {
     const toast = (await screen.findByText("Block added")).closest("[data-testid^=toast-item-]") as HTMLElement;
     fireEvent.click(within(toast).getByRole("button", { name: "Undo" }));
     expect(undo).toHaveBeenCalledTimes(1);
+  });
+
+  /* Review (#3): the toast's Undo was captured on the Done click, so an edit
+     made between the insert and Done became what it undid. It is bound when
+     the insert lands. */
+  it("binds the toast's Undo to the insert when it lands, not when Done is clicked", async () => {
+    const { composer, insertFeatures } = makeComposer(["h1"]);
+    const capture = (composer as unknown as { history: { captureUndo: ReturnType<typeof vi.fn> } }).history.captureUndo;
+    const generate: GenerateFn = async () => {
+      insertFeatures();
+      return edit;
+    };
+    render(<GenerateBlockScreen composer={composer} onBack={vi.fn()} generate={generate} />);
+    fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "A features grid" } });
+    await act(async () => fireEvent.click(screen.getByTestId("generate-run")));
+    expect(capture).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId("generate-done"));
+    expect(capture).toHaveBeenCalledTimes(1);
   });
 
   const fail = async (kind: "not-configured" | "quota" | "other") => {

@@ -362,7 +362,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       state.selectionHook.clearSelection();
       addToast({
         description: `${subject} moved to ${target}`,
-        action: { label: "Undo", onClick: () => composer?.history.undo() },
+        action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
       });
     },
     [moveIds, otherPages, moveSubject, state.actionsHook, state.selectionHook, addToast, composer]
@@ -395,7 +395,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     /* Board 6881:71749 "3 elements deleted" + Undo. */
     addToast({
       description: `${elementsLabel(n)} deleted`,
-      action: { label: "Undo", onClick: () => composer.history.undo() },
+      action: { label: "Undo", onClick: composer.history.captureUndo() },
       duration: 8000,
     });
   }, [composer, selectedCount, state.selectionHook, addToast]);

@@ -150,7 +150,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         addToast({
           description: `${success.elementLabel} added`,
           tone: "success",
-          action: { label: "Undo", onClick: () => composer?.history.undo() },
+          action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
         });
       },
       [addToast, composer]

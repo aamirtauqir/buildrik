@@ -15,19 +15,42 @@ import type { Element } from "../elements/Element";
 export type ReorderDirection = "forward" | "backward" | "front" | "back";
 
 /**
- * A-5: drop locked elements and elements inside a component instance from a
- * destructive multi-selection op (delete/cut/nudge). Locking and instance
- * membership are read straight from the element (the single source of
- * truth — see ElementSerialization.isLocked/isComponentInstance), not from a
- * panel's own tracking set. Returns the survivors and whether anything was
- * skipped, so the caller can tell the user their selection shrank. Lives
- * here (not defaultCommands.ts, which imports FROM this module) so both
- * defaultCommands' delete/cut and nudgeSelected below can share it without
- * a circular import.
+ * A-5: the part of a selection a destructive op (delete/cut) may remove.
+ * Locking and instance membership are read straight from the element (the
+ * single source of truth — see ElementSerialization.isLocked /
+ * isComponentInstance), not from a panel's own tracking set.
+ *
+ * Takes the RAW selection (callers apply topMost() to what it keeps) and
+ * never substitutes anything for what was selected. An element goes only if
+ * it is not locked, not in a component instance, and removing it takes no
+ * locked element with it — no locked descendant (its subtree goes with it),
+ * and no locked ancestor that is itself in the selection (⌘A selected the
+ * locked container, so its contents stay with it). A lock covers only the
+ * element itself elsewhere in the editor, so a child picked on its own
+ * inside a locked container can still be deleted. ⌘A still removes the
+ * unlocked siblings of a locked image, while an explicit Delete on the
+ * section around it removes nothing — the first A-5 fix swapped in that
+ * section's other children and deleted them unasked (review I-1). `skipped`
+ * says the selection shrank.
+ * Lives here (not defaultCommands.ts, which imports FROM this module) so
+ * delete/cut and nudgeSelected below share it without a circular import.
  */
 export function dropLockedAndInstances(elements: Element[]): { kept: Element[]; skipped: boolean } {
-  const kept = elements.filter((el) => !el.isLocked() && !el.isComponentInstance());
+  const selected = new Set(elements.map((el) => el.getId()));
+  const kept = elements.filter(
+    (el) =>
+      !el.isLocked() && !el.isComponentInstance() && !hasLockedDescendant(el) && !hasSelectedLockedAncestor(el, selected),
+  );
   return { kept, skipped: kept.length !== elements.length };
+}
+
+function hasLockedDescendant(el: Element): boolean {
+  return el.getChildren().some((child) => child.isLocked() || hasLockedDescendant(child));
+}
+
+function hasSelectedLockedAncestor(el: Element, selected: Set<string>): boolean {
+  for (let p = el.getParent(); p; p = p.getParent()) if (p.isLocked() && selected.has(p.getId())) return true;
+  return false;
 }
 
 /**

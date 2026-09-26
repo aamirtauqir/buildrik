@@ -11,7 +11,6 @@ import { ToastActionPayload, ToastTone } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine/Composer";
 import type { Element } from "../../../engine/elements/Element";
 import { devLogger } from "../../../shared/utils/devLogger";
-import { getElementNameFromType } from "../utils/elementInfo";
 import {
   getNavigationTargets,
   getAllNavigableElements,
@@ -122,118 +121,30 @@ export function useCanvasKeyboard({
         return;
       }
 
-      // Handle delete with focus management and undo toast
+      /* Delete/Backspace run the ONE delete command, the same one the global
+         keybinding and ⌘K run. This handler used to carry its own copy: a
+         multi-delete that filtered locked ids but removed their unlocked
+         ancestors whole — ⌘A + Delete took a locked image with its section
+         (A-5, walked live: 11 → 3) — skipped the multi-delete confirm
+         (decision #17), a single delete with no lock check at all, and two
+         toasts whose Undo reverted whatever was newest. The command owns the
+         lock/instance guard and the confirm; useHistoryFeedback owns the
+         toast. What stays here is the focus hand-off after a single delete. */
       if (e.key === "Delete" || e.key === "Backspace") {
-        // Multi-select delete: remove all selected elements in a single transaction
-        if (selectedIds.length > 1) {
-          e.preventDefault();
-          e.stopPropagation();
+        const single = selectedIds.length <= 1 && selectedId ? composer.elements.getElement(selectedId) : null;
+        if (selectedIds.length <= 1 && (!single || composer.elements.getActivePage()?.root?.id === selectedId)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        devLogger.keyboard("delete", { count: Math.max(selectedIds.length, 1) });
 
-          // Get root ID to exclude it from deletion
-          const page = composer.elements.getActivePage();
-          const rootId = page?.root?.id;
-
-          // Take immutable snapshot, filter out root and locked elements
-          const idsToDelete = [...selectedIds]
-            .filter((id) => id !== rootId)
-            .filter((id) => {
-              const el = composer.elements.getElement(id);
-              // isComponentInstance was folded into isLocked until 2026-08-25.
-              // It is named here now because it is doing real work:
-              // `removeElement` does not prune `ComponentManager.instances`
-              // (only `detachInstance` does), so deleting an instance element
-              // leaves a stale map entry behind.
-              return el && !el.isLocked?.() && !el.isComponentInstance?.();
-            });
-
-          if (idsToDelete.length === 0) return;
-
-          devLogger.keyboard("delete-multi", { count: idsToDelete.length });
-
-          composer.beginTransaction("delete-element");
-          try {
-            idsToDelete.forEach((id) => {
-              composer.elements.removeElement(id);
-            });
-          } finally {
-            composer.endTransaction();
-          }
-
-          composer.selection.clear();
-          syncFromComposer(); // force React to re-read SSOT after mutation
-
-          if (addToast) {
-            addToast({
-              description: `Deleted ${idsToDelete.length} elements`,
-              tone: "info",
-              duration: 4000,
-              action: {
-                label: "Undo",
-                onClick: () => {
-                  composer.history.undo();
-                  syncFromComposer();
-                },
-              },
-            });
-          }
-
-          return;
+        const targets = single ? getNavigationTargets(single) : null;
+        composer.commands.run("delete");
+        if (single && targets && !composer.elements.getElement(single.getId())) {
+          const nextFocus = targets.next || targets.prev || targets.parent;
+          if (nextFocus) select(nextFocus);
+          else clear();
         }
-
-        // Single-select delete: preserve focus management and child count toast
-        if (!selectedId) return;
-        devLogger.keyboard("delete", { elementId: selectedId });
-
-        const element = composer.elements.getElement(selectedId);
-        if (!element) return;
-
-        const page = composer.elements.getActivePage();
-        const isRoot = page?.root?.id === selectedId;
-
-        if (!isRoot) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          const elementType = element.getType?.() || "element";
-          const elementName = getElementNameFromType(elementType);
-          const childCount = element.getChildren?.()?.length || 0;
-
-          const { next, prev, parent } = getNavigationTargets(element);
-          const nextFocus = next || prev || parent;
-
-          composer.beginTransaction("delete-element");
-          try {
-            composer.elements.removeElement(selectedId);
-            if (nextFocus) {
-              select(nextFocus);
-            } else {
-              clear();
-            }
-            syncFromComposer();
-
-            if (addToast) {
-              const message =
-                childCount > 0
-                  ? `${elementName} (${childCount} ${childCount === 1 ? "child" : "children"}) deleted`
-                  : `${elementName} deleted`;
-
-              addToast({
-                description: message,
-                tone: "info",
-                duration: 5000,
-                action: {
-                  label: "Undo",
-                  onClick: () => {
-                    composer.history.undo();
-                    syncFromComposer();
-                  },
-                },
-              });
-            }
-          } finally {
-            composer.endTransaction();
-          }
-        }
+        syncFromComposer();
         return;
       }
 

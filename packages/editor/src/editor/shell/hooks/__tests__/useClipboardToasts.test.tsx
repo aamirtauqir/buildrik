@@ -21,7 +21,7 @@ function fakeComposer() {
     composer: {
       on: (e: string, cb: (p?: unknown) => void) => { (handlers[e] ??= []).push(cb); },
       off: (e: string, cb: (p?: unknown) => void) => { handlers[e] = (handlers[e] ?? []).filter((h) => h !== cb); },
-      history: { undo: vi.fn() },
+      history: { undo: vi.fn(), captureUndo(this: { undo: () => void }) { return () => this.undo(); } },
     } as unknown as Composer,
     fire: (e: string, payload?: unknown) => (handlers[e] ?? []).forEach((h) => h(payload)),
     count: (e: string) => (handlers[e] ?? []).length,

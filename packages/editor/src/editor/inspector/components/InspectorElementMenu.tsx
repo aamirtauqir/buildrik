@@ -211,7 +211,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
       composer.endTransaction?.();
     }
     setIsOpen(false);
-    addToast({ description: "Styles reset", action: { label: "Undo", onClick: () => composer.history.undo() } });
+    addToast({ description: "Styles reset", action: { label: "Undo", onClick: composer.history.captureUndo() } });
   };
 
   const handleDelete = () => {
