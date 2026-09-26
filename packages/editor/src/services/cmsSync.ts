@@ -36,6 +36,49 @@ function client() {
 
 const iso = (d: Date | string): string => (typeof d === "string" ? d : d.toISOString());
 
+/* A field stored without a slug (verify seed: { id, name, type }) rendered
+   blank in every cell — the table reads data[field.slug]. Its id is the key
+   those rows were written under. */
+const withSlugs = (fields: unknown): CMSField[] =>
+  ((fields as CMSField[]) ?? []).map((f) => (f.slug ? f : { ...f, slug: f.id }));
+
+/** Server CMS rows as the /share draft carries them (`getShareDraftRows` →
+ *  `getPublishedCmsForBindings`): the collections a site's bindings name and
+ *  their published entries. */
+export interface CmsRows {
+  collections: ReadonlyArray<{
+    id: string; name: string; slug: string; displayField?: string | null; fields: unknown;
+    createdAt?: Date | string; updatedAt?: Date | string;
+  }>;
+  entries: ReadonlyArray<{
+    id: string; collectionId: string; data: unknown; status?: string;
+    createdAt?: Date | string; updatedAt: Date | string;
+  }>;
+}
+
+/**
+ * Server CMS rows in the engine's collection/record shapes — the mapping
+ * `hydrateCmsFromServer` writes to IndexedDB, for a scratch composer that
+ * must never read or write that store (`CollectionManager.loadSnapshot`).
+ */
+export function cmsFromRows(rows: CmsRows): { collections: CMSCollection[]; items: CMSContentItem[] } {
+  return {
+    collections: rows.collections.map((c) => ({
+      id: c.id, name: c.name, slug: c.slug,
+      displayField: c.displayField ?? undefined,
+      fields: withSlugs(c.fields),
+      createdAt: iso(c.createdAt ?? c.updatedAt ?? new Date(0)),
+      updatedAt: iso(c.updatedAt ?? new Date(0)),
+    })),
+    items: rows.entries.map((e) => ({
+      id: e.id, collectionId: e.collectionId,
+      data: (e.data as Record<string, unknown>) ?? {},
+      status: e.status === "PUBLISHED" ? "published" : "draft",
+      createdAt: iso(e.createdAt ?? e.updatedAt), updatedAt: iso(e.updatedAt),
+    })),
+  };
+}
+
 // ── E7 reliability (#5/#6, 2026-06-24): stop the silent drop ────────────────
 // The local IndexedDB write already happened when a sync fires, so a failed
 // server mirror must never throw into the engine. But the old "console.warn +
@@ -182,10 +225,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
           name: rc.name, slug: rc.slug,
           description: rc.description ?? undefined, icon: rc.icon ?? undefined,
           displayField: rc.displayField ?? undefined,
-          /* A field stored without a slug (verify seed: { id, name, type })
-             rendered blank in every cell — the table reads data[field.slug].
-             Its id is the key those rows were written under. */
-          fields: ((rc.fields as CMSField[]) ?? []).map((f) => (f.slug ? f : { ...f, slug: f.id })),
+          fields: withSlugs(rc.fields),
           pageSlugPattern: rc.pageSlugPattern ?? undefined,
           pageSeoTitle: rc.pageSeoTitle ?? undefined,
           pageSeoDescription: rc.pageSeoDescription ?? undefined,

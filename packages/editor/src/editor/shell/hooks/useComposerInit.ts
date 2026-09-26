@@ -33,8 +33,8 @@ import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
-import { isAuthSaveError, isForbiddenSaveError } from "./useSaveCallback";
-import { invalidateMyRole } from "@/services/RoleService";
+import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave } from "./useSaveCallback";
+import { getEditorViewMode } from "@shared/utils/editorViewMode";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -215,7 +215,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                warned failure into a silent loss. Measured: edit, save blocked,
                reload, edit gone, topbar green. */
             const unsaved = readUnsaved(siteId);
-            if (unsaved) {
+            /* In view mode (a member demoted mid-save lands here, C-9) the
+               edits cannot be saved, so they are not offered back — they stay
+               on this device for when the role returns. */
+            if (unsaved && getEditorViewMode().readOnlyView) {
+              addToastRef.current?.({
+                title: "Some work never reached the server",
+                description:
+                  "Your role no longer allows editing this site, so you're in view mode. The edits are kept in this browser — ask the owner, and they come back once you can edit again.",
+                tone: "warning",
+                duration: Infinity,
+              });
+              setSaveState({ status: "idle", error: undefined });
+            } else if (unsaved) {
               setSaveState({
                 status: "error",
                 error: "This site has edits that never reached the server.",
@@ -489,7 +501,14 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        tab. Close it there and the edit is gone. */
     let changeSeq = 0;
 
+    /* A read-only VIEW (?view=readonly — a VIEWER, or a member demoted
+       mid-session, see refuseForbiddenSave) never writes: an autosave from it
+       can only be refused, and each refusal repainted the save-failed banner.
+       Read once, like every other view-mode consumer — the mode is the URL. */
+    const readOnlyView = getEditorViewMode().readOnlyView;
+
     const handler = () => {
+      if (readOnlyView) return;
       /* Dev-only: four events share this handler and none of them proves a user
          edit — `project:changed` also fires on `page:activated`, i.e. merely
          looking at another page. Recording which one arrived, and when, is the
@@ -632,16 +651,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             if (isForbiddenSaveError(err)) {
-              /* A15-9: the refused edit existed only in this tab — keep it
-                 recoverable, exactly as the network branch does, and drop the
-                 cached role that let the chrome offer the edit at all. */
-              if (siteId) keepUnsaved(siteId, composer.exportProject());
-              invalidateMyRole();
-              addToast({
-                title: "You don't have access to save this site",
-                description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
-                tone: "warning",
-              });
+              refuseForbiddenSave({ siteId, composer, addToast, setIsDirty, setSaveState });
               return;
             }
             if (siteId) {

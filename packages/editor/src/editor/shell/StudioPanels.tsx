@@ -591,12 +591,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         description: `${elementLabel} deleted`,
         tone: "info",
         duration: 5000,
-        action: {
-          label: "Undo",
-          onClick: () => {
-            composer.history?.undo?.();
-          },
-        },
+        action: { label: "Undo", onClick: composer.history.captureUndo() },
       });
     },
     [composer, addToast]

@@ -290,7 +290,7 @@ export function useSectionReorder({
         }
         if (moved) addToastRef.current?.({
           description: toIndex > fromIndex ? "Moved down" : "Moved up",
-          action: { label: "Undo", onClick: () => composer.history.undo() },
+          action: { label: "Undo", onClick: composer.history.captureUndo() },
         });
       } catch {
         composer.rollbackTransaction();

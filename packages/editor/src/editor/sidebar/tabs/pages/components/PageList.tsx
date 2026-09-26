@@ -322,23 +322,6 @@ export const PageList: React.FC<Props> = ({
         <div className="bd-pg-drop-indicator" aria-hidden="true" />
       </div>
       )}
-      {/* FC-1 (fix-all 2026-09-25): a page-generating CMS collection produces
-          published pages that have no Page row here at all — this is the only
-          hint they exist. Read-only: it opens the collection's Dynamic pages
-          tab, where the pattern/template actually live, rather than pretending
-          to be a page row itself. */}
-      {!loadError && selectedIds.size === 0 && dynamicPagesCount > 0 && (
-        <Button
-          type="button"
-          variant="link"
-          size="xs"
-          className="tw:w-full tw:justify-start tw:px-3 tw:py-1.5 tw:text-[length:var(--bk-text-12)]"
-          data-testid="pages-dynamic-pages-row"
-          onClick={onOpenDynamicPages}
-        >
-          {`+${dynamicPagesCount} from collections`} {"›"}
-        </Button>
-      )}
       {/* Board 141:78: the band appears with ANY checkbox selection —
           it replaces the Add-page footer. */}
       {selectedIds.size >= 1 && (
@@ -356,6 +339,26 @@ export const PageList: React.FC<Props> = ({
           active the bottom band IS the bulk bar — otherwise "+  Add page". */}
       {selectedIds.size === 0 && (
         <div className="bd-pg-footer" data-testid="pages-footer">
+          {/* FC-1 (fix-all 2026-09-25): a page-generating CMS collection
+              produces published pages that have no Page row here at all — this
+              is the only hint they exist. Read-only: it opens the collection's
+              Dynamic pages tab, where the pattern/template live. It is part of
+              the footer band: the footer is absolutely positioned over the
+              shell's bottom edge, so as a sibling after the list it rendered
+              UNDER the footer — unreachable (X-6, measured y 870 vs footer
+              824–900). */}
+          {!loadError && dynamicPagesCount > 0 && (
+            <Button
+              type="button"
+              variant="link"
+              size="xs"
+              className="tw:w-full tw:justify-start tw:px-3 tw:py-1.5 tw:text-[length:var(--bk-text-12)]"
+              data-testid="pages-dynamic-pages-row"
+              onClick={onOpenDynamicPages}
+            >
+              {`+${dynamicPagesCount} from collections`} {"›"}
+            </Button>
+          )}
           {/* v3 4418:90494 legend over the Add band; a search puts its match
               count there instead (4418:92256). */}
           {!loadError && (

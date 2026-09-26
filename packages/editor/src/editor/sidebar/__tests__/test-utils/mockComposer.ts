@@ -137,7 +137,7 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
       if (idx >= 0) components.splice(idx, 1);
       emit(EVENTS.COMPONENT_LIST_UPDATED, { componentId: id });
     }),
-    instantiateComponent: vi.fn(async () => {}),
+    instantiateComponent: vi.fn(async () => "new-instance"),
     getInstancesOfComponent: vi.fn(() => []),
     snapshotComponent: vi.fn((id: string) => {
       const c = components.find((x) => x.id === id);
@@ -175,6 +175,8 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
     selection,
     commands,
     history: { undo: vi.fn(), redo: vi.fn() },
+    beginTransaction: vi.fn(),
+    endTransaction: vi.fn(),
     getProjectSettings: vi.fn(() => projectSettings),
     setProjectSettings: vi.fn((patch: Record<string, unknown>) => {
       projectSettings = { ...projectSettings, ...patch };

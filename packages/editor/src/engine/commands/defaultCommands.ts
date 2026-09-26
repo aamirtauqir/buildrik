@@ -96,11 +96,10 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         /* Pruned like cut: removing a parent already removes its children and
            the descendant's own removeElement then no-ops, but the history
            label would still count it. */
-        /* A-5: topMost runs first so a locked/instance ancestor already
-           absorbs its selected descendants — filtering afterward on the
-           pruned set is what keeps a locked container's children from being
-           deleted individually once the container itself is dropped. */
-        const { kept: selected, skipped } = dropLockedAndInstances(topMost(c.selection.getAllSelected()));
+        /* A-5: filter the RAW selection first (dropLockedAndInstances), then
+           prune — pruning first hid a locked image inside a selected section. */
+        const { kept, skipped } = dropLockedAndInstances(c.selection.getAllSelected());
+        const selected = topMost(kept);
         if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
         if (selected.length === 0) return;
         /* Decision #17: one element deletes at once (Undo follows); more than
@@ -202,7 +201,8 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       shortcut: "ctrl+x",
       requiresSelection: true,
       run: (c) => {
-        const { kept: selected, skipped } = dropLockedAndInstances(topMost(c.selection.getAllSelected()));
+        const { kept, skipped } = dropLockedAndInstances(c.selection.getAllSelected());
+        const selected = topMost(kept);
         if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
         if (selected.length === 0) return;
         const ids = selected.map((el) => el.getId());

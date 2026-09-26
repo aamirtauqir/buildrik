@@ -230,6 +230,38 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
   });
 
+  /* C-9: a member demoted mid-save is sent to view mode, where nothing can
+     be saved — offering "Restore my edits" there would put back edits that
+     can only be refused again. The record stays for when the role returns. */
+  it("in view mode, says the work is kept but does not offer to restore it", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
+    localStorage.setItem(
+      "bk-unsaved-v1-site-9",
+      JSON.stringify({ project: { pages: [{ id: "p" }], styles: [] }, at: "2026-09-26T00:00:00.000Z" }),
+    );
+    const before = window.location.href;
+    window.history.replaceState(null, "", "?view=readonly");
+    try {
+      const params = makeParams();
+      renderHook(() => useComposerInit(params));
+      await act(async () => {
+        mockComposer.emit("composer:ready");
+        await flushMicrotasks();
+      });
+      const toast = vi
+        .mocked(params.addToast!)
+        .mock.calls.map(([t]) => t)
+        .find((t) => /never reached the server/i.test(t.title ?? ""));
+      expect(toast).toBeTruthy();
+      expect(toast!.action).toBeUndefined();
+      expect(localStorage.getItem("bk-unsaved-v1-site-9")).not.toBeNull();
+    } finally {
+      window.history.replaceState(null, "", before);
+      localStorage.removeItem("bk-unsaved-v1-site-9");
+    }
+  });
+
   it("restores only when the user asks, and clears the record once it has", async () => {
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
     vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "server" }], styles: [] } as never);

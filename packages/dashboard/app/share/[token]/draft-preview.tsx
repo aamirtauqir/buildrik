@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { PageCrumb } from "@/components/reviews/signoff-snapshot";
-import type { RenderedPage } from "@buildrik/editor";
+import type { CmsRows, RenderedPage } from "@buildrik/editor";
 
 type Rows = {
   site: unknown;
   pages: unknown;
   siteColumns: unknown;
   siteFonts: ReadonlyArray<{ filename: string; url: string }>;
+  /** The published CMS entries the draft's bindings resolve from. */
+  cms: CmsRows;
 };
 type RenderState = { status: "rendering" } | { status: "ready"; pages: RenderedPage[] } | { status: "failed" };
 
@@ -59,8 +61,12 @@ export function DraftPreview({
   useEffect(() => {
     let cancelled = false;
     import("@buildrik/editor")
-      .then(({ projectDataFromRows, renderProjectPages }) =>
-        renderProjectPages(projectDataFromRows(rows.site, rows.pages, rows.siteColumns), rows.siteFonts),
+      .then(({ projectDataFromRows, renderProjectPages, cmsFromRows }) =>
+        renderProjectPages(
+          projectDataFromRows(rows.site, rows.pages, rows.siteColumns),
+          rows.siteFonts,
+          cmsFromRows(rows.cms),
+        ),
       )
       .then((pages) => {
         if (cancelled) return;

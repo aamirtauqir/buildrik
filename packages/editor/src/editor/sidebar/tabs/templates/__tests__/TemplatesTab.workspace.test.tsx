@@ -41,7 +41,7 @@ function makeComposer() {
       recordAppliedTemplate: vi.fn(),
       getElement: vi.fn(() => null),
     },
-    history: { undo: vi.fn() },
+    history: { undo: vi.fn(), captureUndo(this: { undo: () => void }) { return () => this.undo(); } },
     styles: { clear: vi.fn() },
     on: vi.fn(),
     off: vi.fn(),

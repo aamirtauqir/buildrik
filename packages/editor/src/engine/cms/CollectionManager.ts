@@ -45,6 +45,8 @@ export class CollectionManager extends EventEmitter {
   private projectId: string | null = null;
   private contentCache: Map<string, CMSContentItem[]> = new Map();
   private initialized = false;
+  /** Set by loadSnapshot: this store is exactly the snapshot, never IndexedDB. */
+  private snapshotOnly = false;
 
   // ============================================
   // Initialization
@@ -74,6 +76,20 @@ export class CollectionManager extends EventEmitter {
     }
 
     this.initialized = true;
+  }
+
+  /**
+   * Make this store exactly `collections` + `items`, in memory, for a scratch
+   * composer rendering a project it does not own (the /share draft). Nothing
+   * is written to IndexedDB, and nothing is read from it afterwards — that
+   * store is browser-global, and a visitor's own cache must never fill in a
+   * binding the snapshot does not carry. Items keep the order given.
+   */
+  loadSnapshot(collections: CMSCollection[], items: CMSContentItem[]): void {
+    this.snapshotOnly = true;
+    this.initialized = true;
+    this.collections = new Map(collections.map((c) => [c.id, c]));
+    this.contentCache = new Map(collections.map((c) => [c.id, items.filter((i) => i.collectionId === c.id)]));
   }
 
   isReady(): boolean {
@@ -374,6 +390,7 @@ export class CollectionManager extends EventEmitter {
   async getContentItems(collectionId: string): Promise<CMSContentItem[]> {
     const cached = this.contentCache.get(collectionId);
     if (cached) return cached;
+    if (this.snapshotOnly) return [];
 
     const items = await Storage.loadContentItems(collectionId);
     this.contentCache.set(collectionId, items);

@@ -33,6 +33,7 @@ function makeComposer(saved: Def[]) {
   };
   const composer = {
     on: vi.fn(), off: vi.fn(), emit: vi.fn(),
+    beginTransaction: vi.fn(), endTransaction: vi.fn(),
     components,
     selection: { getSelectedIds: () => [] },
     elements: { getActivePage: () => ({ id: "page-home", root: { id: "root" } }) },

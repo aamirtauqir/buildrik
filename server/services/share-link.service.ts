@@ -1,5 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { filterCmsBindings } from "@buildrik/shared/schemas/sites";
+import { getPublishedCmsForBindings } from "@/server/services/cms.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 // The link token IS the bearer credential for the draft it unlocks — a
@@ -282,10 +284,57 @@ export async function getShareDraftRows(siteId: string) {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;
     return visibility === undefined || visibility === "live";
   });
+  /* The bindings alone resolve nothing: the draft is rendered in a scratch
+     composer with no CMS store, so every bound element showed its last-saved
+     text — stale, then empty (dashboard verify pass 3). The render gets the
+     CMS data the bindings on the DELIVERED pages read, and resolves it with
+     the publish exporter's own CMSExportResolver. */
+  const cms = await getPublishedCmsForBindings(siteId, boundCmsFields(projectCmsBindings, pages));
   return {
     site: { name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion },
     pages,
     siteColumns: { name, ...columns },
     siteFonts: fontAssets,
+    cms,
   };
+}
+
+interface BlockNode {
+  id?: unknown;
+  children?: unknown;
+}
+
+/**
+ * Per collection, the field slugs the draft's bindings read — only bindings
+ * on elements of the DELIVERED pages (a collection bound on a hidden page is
+ * not sent, review I-2). A field binding reads its `fieldSlug`; a collection
+ * list reads the `{{<itemVar>.<field>}}` placeholders inside its own subtree
+ * (RepeaterRenderer's syntax).
+ */
+function boundCmsFields(stored: unknown, pages: ReadonlyArray<{ blocks: unknown }>): Map<string, Set<string>> {
+  const bindings = filterCmsBindings(stored);
+  const out = new Map<string, Set<string>>();
+  if (!bindings) return out;
+  const add = (collectionId: string, slug: string) => {
+    const set = out.get(collectionId) ?? new Set<string>();
+    set.add(slug);
+    out.set(collectionId, set);
+  };
+  const walk = (node: unknown): void => {
+    if (typeof node !== "object" || node === null) return;
+    const { id, children } = node as BlockNode;
+    if (typeof id === "string") {
+      for (const b of bindings.field?.[id] ?? []) add(b.collectionId, b.fieldSlug);
+      const list = bindings.collection?.[id];
+      if (list) {
+        const itemVar = (list.itemVar ?? "item").replace(/[^\w]/g, "");
+        const re = new RegExp(`\\{\\{\\s*${itemVar}\\.([\\w-]+)\\s*\\}\\}`, "g");
+        out.set(list.collectionId, out.get(list.collectionId) ?? new Set());
+        for (const m of JSON.stringify(node).matchAll(re)) add(list.collectionId, m[1]);
+      }
+    }
+    if (Array.isArray(children)) children.forEach(walk);
+  };
+  pages.forEach((p) => walk(p.blocks));
+  return out;
 }

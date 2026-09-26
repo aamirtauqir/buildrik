@@ -543,6 +543,30 @@ export class HistoryManager {
     return true;
   }
 
+  /**
+   * An undo bound to ONE action — the newest recorded one, now — for an
+   * affordance the person clicks later (a toast's "Undo"). Bare `undo()` pops
+   * whatever is newest at click time: delete an image, type a newer edit,
+   * click the delete toast's Undo, and the edit was reverted while the image
+   * stayed deleted (A-4, walked live). The returned function undoes only if
+   * the captured entry is still the newest; once history has moved past it
+   * (a newer edit, a ⌘Z, a redo) it refuses and emits HISTORY_NOOP with
+   * `superseded`, reverting nothing. Flushes first so the action being
+   * announced is its own entry, not coalesced into the next edit.
+   */
+  captureUndo(): () => boolean {
+    this.flushPending();
+    const target = this.undoStack.length > 1 ? this.undoStack[this.undoStack.length - 1] : undefined;
+    return () => {
+      this.flushPending();
+      if (!target || this.undoStack[this.undoStack.length - 1] !== target) {
+        this.composer.emit(EVENTS.HISTORY_NOOP, { direction: "undo", superseded: target?.label ?? "" });
+        return false;
+      }
+      return this.undo();
+    };
+  }
+
   // Undo/redo replaces the entire element tree via importProject. The
   // selection manager still references the previously-selected element ID,
   // which may no longer exist in the restored tree — leaving inspector,

@@ -49,7 +49,7 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
-import { exportPublishPages } from "./exportPublishPages";
+import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
 import { submitForReview } from "../../services/ReviewService";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
@@ -267,17 +267,27 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
    * chrome. The command reported success and the screen stayed put. They open
    * the overlay now, and toggle it closed if it is already up.
    */
+  const previewOpenRef = React.useRef(false);
+  previewOpenRef.current = previewHtml != null;
   React.useEffect(() => {
     if (!composer) return;
+    /* Building is async now — CMS bindings resolve as publish resolves them
+       (renderPreviewHtml) — so a toggle that lands while one is building
+       supersedes it instead of opening a stale preview. */
+    let run = 0;
     const handle = () => {
-      setPreviewHtml((current) => {
-        if (current != null) return null;
-        const raw = composer.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
-        return sanitizeHTMLForPreview(raw);
+      const mine = ++run;
+      if (previewOpenRef.current) {
+        setPreviewHtml(null);
+        return;
+      }
+      void renderPreviewHtml(composer).then((html) => {
+        if (mine === run) setPreviewHtml(sanitizeHTMLForPreview(html));
       });
     };
     composer.on(EVENTS.UI_TOGGLE_PREVIEW, handle);
     return () => {
+      run += 1;
       composer.off(EVENTS.UI_TOGGLE_PREVIEW, handle);
     };
   }, [composer]);

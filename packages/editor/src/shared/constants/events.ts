@@ -904,7 +904,13 @@ export interface EventPayloads {
   [EVENTS.HISTORY_REDO]: {
     entry: { timestamp: number; snapshot: import("../types").ProjectData; label?: string };
   };
-  [EVENTS.HISTORY_NOOP]: { direction: "undo" | "redo"; reason?: string };
+  [EVENTS.HISTORY_NOOP]: {
+    direction: "undo" | "redo";
+    reason?: string;
+    /** A captured undo (HistoryManager.captureUndo) refused: newer history
+     *  came after the action it was bound to — this is that action's label. */
+    superseded?: string;
+  };
   [EVENTS.HISTORY_UNRECORDED]: { label: string };
   [EVENTS.HISTORY_RECORDED]: { label?: string };
   [EVENTS.HISTORY_CLEARED]: void;

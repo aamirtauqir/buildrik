@@ -64,6 +64,16 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   const vercel = site ? await getActiveVercelConnection(site.workspaceId) : null;
   if (vercel) {
     checks.push({ label: VERCEL_CHECK_LABEL, status: "pass", detail: "This workspace is connected to Vercel." });
+  } else if (process.env.PUBLISH_ALLOW_SIMULATION === "true") {
+    /* The same explicit opt-in startPublish and the worker already honour
+       (never NODE_ENV): with no connection the publish runs the simulation.
+       Failing here left "Publish now" disabled, so the local loop the flag
+       exists for could not be reached from the editor (verify pass 3). */
+    checks.push({
+      label: VERCEL_CHECK_LABEL,
+      status: "warning",
+      detail: "Not connected — PUBLISH_ALLOW_SIMULATION is on, so this publish is simulated and nothing is deployed.",
+    });
   } else {
     checks.push({
       label: VERCEL_CHECK_LABEL,
@@ -151,6 +161,18 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
       });
     } else {
       checks.push({ label: "CMS templates", status: "pass", detail: "Every dynamic-page collection's template page exists." });
+    }
+    /* A bound template page is a blueprint: appendDynamicPagesToPublish
+       publishes the pages it generates, not the page itself — say so by name
+       before the publish, rather than letting the page vanish (Lv3 #7). */
+    if (templateBindings.templates.length > 0) {
+      checks.push({
+        label: "Template pages",
+        status: "warning",
+        detail: templateBindings.templates
+          .map((t) => `${t.pageName} is a template for ${t.collectionName} — not published.`)
+          .join(" "),
+      });
     }
   }
 

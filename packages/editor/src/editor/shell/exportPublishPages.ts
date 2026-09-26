@@ -1,7 +1,9 @@
 import { createComposer, type Composer } from "@/engine";
 import { ExportEngine } from "@/engine/export";
+import { CMSExportResolver } from "@/engine/cms/CMSExportResolver";
 import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import type { ProjectData } from "@/shared/types/project";
+import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 
 /** A page ready to publish: a path + its rendered HTML. Matches the server's
  *  publishPageSchema ({ path, html }). */
@@ -83,6 +85,11 @@ export async function renderProjectPages(
    *  them the export cannot write their @font-face. A file that fails to load
    *  is left out, and the export drops its family from the stacks. */
   siteFonts: ReadonlyArray<{ filename: string; url: string }> = [],
+  /** The CMS data the project's bindings resolve from (the /share draft's
+   *  published entries, `cmsFromRows`). Given, the scratch store is exactly
+   *  this — the export's CMSExportResolver resolves bindings as a publish
+   *  does. Omitted, bindings resolve from the browser's own CMS store. */
+  cms?: { collections: CMSCollection[]; items: CMSContentItem[] },
 ): Promise<RenderedPage[]> {
   const scratch = createComposer({
     container: document.createElement("div"),
@@ -91,6 +98,7 @@ export async function renderProjectPages(
   scratch.whenReady().catch(() => {});
   try {
     await Promise.all(siteFonts.map((f) => scratch.fonts.registerLibraryFont(f).catch(() => undefined)));
+    if (cms) scratch.cms.collections.loadSnapshot(cms.collections, cms.items);
     scratch.importProject(snapshot);
     const files = await exportPageFiles(scratch);
     const byId = new Map(snapshot.pages.map((p) => [p.id, p]));
@@ -103,4 +111,17 @@ export async function renderProjectPages(
   } finally {
     scratch.destroy();
   }
+}
+
+/**
+ * The in-editor Preview's HTML: `exportHTML()` with CMS bindings resolved the
+ * way the publish export resolves them (CMSExportResolver, static — text
+ * semantics, the shared allowlist). `exportHTML()` alone writes each element's
+ * STORED text, so a bound element previewed stale or blank while the canvas
+ * showed its record (dashboard verify pass 3, DV3-3).
+ */
+export async function renderPreviewHtml(composer: Composer): Promise<string> {
+  const raw = composer.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
+  // A resolve that throws previews the stored text, as before — never nothing.
+  return new CMSExportResolver(composer).resolve(raw, { mode: "static" }).catch(() => raw);
 }

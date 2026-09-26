@@ -7,7 +7,7 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const pageFindManyMock = vi.fn();
 const siteFindUniqueMock = vi.fn();
@@ -140,6 +140,21 @@ describe("pre-publish checks count what ships", () => {
     const { checks } = await runPrePublishChecks("s1");
     expect(status(checks, "CMS templates")).toBe("pass");
   });
+
+  /* Lv3 review #7: a bound template page is a blueprint and is no longer
+     published as a page of its own (appendDynamicPagesToPublish) — the
+     checks say so, by name, before the publish. */
+  it("names each template page that will not be published as a page", async () => {
+    pageFindManyMock.mockResolvedValue([
+      { id: "1", name: "Home", blocks: [{}], settings: null, slug: "home", isHomePage: true },
+      { id: "2", name: "Blog template", blocks: [{}], settings: null, slug: "blog-template", isHomePage: false },
+    ]);
+    cmsCollectionFindManyMock.mockResolvedValue([{ id: "c1", name: "Blog", pageTemplatePath: "blog-template.html" }]);
+    const { checks, ready } = await runPrePublishChecks("s1");
+    expect(status(checks, "Template pages")).toBe("warning");
+    expect(detail(checks, "Template pages")).toBe("Blog template is a template for Blog — not published.");
+    expect(ready).toBe(true);
+  });
 });
 
 /* B-14 / A02-9: Publish listed no content facts at all, so the Issues panel
@@ -174,6 +189,17 @@ describe("pre-publish content checks (shared detector)", () => {
     expect(result.ready).toBe(true);
   });
 
+  it("passes Links for root-relative internal paths (/, /about, /services)", async () => {
+    const nav = ["/", "/about", "/services"].map((href, i) => ({
+      id: `nav-${i}`, type: "link", tagName: "a", content: href, children: [], attributes: { href },
+    }));
+    pageFindManyMock.mockResolvedValue([
+      { id: "p1", name: "Home", blocks: { id: "root", type: "container", tagName: "div", children: nav }, settings: null },
+    ]);
+    const { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "Links")).toBe("pass");
+  });
+
   it("passes both rows when content is clean, and tolerates legacy array blocks", async () => {
     pageFindManyMock.mockResolvedValue([
       { id: "p1", name: "Home", blocks: [], settings: null },
@@ -182,5 +208,37 @@ describe("pre-publish content checks (shared detector)", () => {
     const { checks } = await runPrePublishChecks("s1");
     expect(status(checks, "Image alt text")).toBe("pass");
     expect(status(checks, "Links")).toBe("pass");
+  });
+});
+
+/* Lv3 (verify pass 3, Found #3): under PUBLISH_ALLOW_SIMULATION startPublish
+   and the worker skip the Vercel connection, and root CLAUDE.md says the flag
+   skips this check — but the check still FAILED with no connection, so the
+   editor's "Publish now" stayed disabled and the local simulation loop could
+   not be reached from the UI. Keyed on the flag, never on NODE_ENV. */
+describe("Vercel connected check — PUBLISH_ALLOW_SIMULATION", () => {
+  afterEach(() => vi.unstubAllEnvs());
+  const noConnection = async () => {
+    const { getActiveVercelConnection } = await import("@server/services/integrations.service");
+    vi.mocked(getActiveVercelConnection).mockResolvedValueOnce(null as never);
+    pageFindManyMock.mockResolvedValue([{ id: "1", name: "Home", blocks: [{}], settings: null, slug: "home", isHomePage: true }]);
+  };
+
+  it("does not fail the publish under the flag with no connection — it says it will simulate", async () => {
+    vi.stubEnv("PUBLISH_ALLOW_SIMULATION", "true");
+    await noConnection();
+    const { checks, ready } = await runPrePublishChecks("s1");
+    expect(status(checks, "Vercel connected")).toBe("warning");
+    expect(detail(checks, "Vercel connected")).toMatch(/simulat/i);
+    expect(ready).toBe(true);
+  });
+
+  it("still fails without the flag, whatever NODE_ENV says", async () => {
+    vi.stubEnv("PUBLISH_ALLOW_SIMULATION", "");
+    vi.stubEnv("NODE_ENV", "development");
+    await noConnection();
+    const { checks, ready } = await runPrePublishChecks("s1");
+    expect(status(checks, "Vercel connected")).toBe("fail");
+    expect(ready).toBe(false);
   });
 });

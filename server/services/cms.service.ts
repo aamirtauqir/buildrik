@@ -10,6 +10,7 @@ import type {
 import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
+import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -352,22 +353,29 @@ export interface StaleTemplateBindingsResult {
    *  "pass" row is noise for the near-all-sites-have-no-CMS-collection case). */
   hasPageGeneratingCollections: boolean;
   stale: { collectionId: string; collectionName: string; templatePath: string }[];
+  /** Existing template pages that leave the publish (appendDynamicPagesToPublish
+   *  drops them — they are blueprints). index.html is not listed: it stays. */
+  templates: { collectionName: string; pageName: string }[];
 }
 
 export async function findStaleTemplateBindings(
   siteId: string,
-  pages: { slug: string; isHomePage: boolean }[],
+  pages: { slug: string; isHomePage: boolean; name?: string }[],
 ): Promise<StaleTemplateBindingsResult> {
   const cols = await prisma.cmsCollection.findMany({
     where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
     select: { id: true, name: true, pageTemplatePath: true },
   });
-  if (cols.length === 0) return { hasPageGeneratingCollections: false, stale: [] };
-  const fileNames = new Set(pages.map((p) => (p.isHomePage ? "index.html" : `${p.slug}.html`)));
+  if (cols.length === 0) return { hasPageGeneratingCollections: false, stale: [], templates: [] };
+  const byFile = new Map(pages.map((p) => [p.isHomePage ? "index.html" : `${p.slug}.html`, p]));
   const stale = cols
-    .filter((c) => !fileNames.has(c.pageTemplatePath as string))
+    .filter((c) => !byFile.has(c.pageTemplatePath as string))
     .map((c) => ({ collectionId: c.id, collectionName: c.name, templatePath: c.pageTemplatePath as string }));
-  return { hasPageGeneratingCollections: true, stale };
+  const templates = cols.flatMap((c) => {
+    const page = c.pageTemplatePath === "index.html" ? undefined : byFile.get(c.pageTemplatePath as string);
+    return page ? [{ collectionName: c.name, pageName: page.name ?? page.slug }] : [];
+  });
+  return { hasPageGeneratingCollections: true, stale, templates };
 }
 
 export interface GeneratedPage {
@@ -504,12 +512,59 @@ export async function generateDynamicPages(
 }
 
 /**
+ * The CMS data a draft render needs to resolve a site's bindings, and nothing
+ * more — the read is for the /share/<token> draft, whose holder may be
+ * anonymous. Takes, per collection, the field slugs the delivered pages'
+ * bindings read (`fieldsByCollection`, from share-link.service); returns the
+ * collections of THIS site among them, their PUBLISHED entries only (a draft
+ * record never leaves the server) capped at CMS_COLLECTION_LIMIT_MAX each,
+ * and every entry's `data` — and each collection's field list — projected to
+ * those slugs plus the display field. An unbound field ("internal notes") is
+ * not sent (review I-2). Entries come newest-first, the editor store's order
+ * (CollectionStorage.loadContentItems), so "the first published record" a
+ * binding without an itemId previews is the record the canvas shows.
+ */
+export async function getPublishedCmsForBindings(siteId: string, fieldsByCollection: ReadonlyMap<string, ReadonlySet<string>>) {
+  if (fieldsByCollection.size === 0) return { collections: [], entries: [] };
+  const rows = await prisma.cmsCollection.findMany({
+    where: { siteId, id: { in: [...fieldsByCollection.keys()] } },
+    select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
+  });
+  const keep = (c: { id: string; displayField: string | null }) =>
+    new Set([...(fieldsByCollection.get(c.id) ?? []), ...(c.displayField ? [c.displayField] : [])]);
+  const collections = rows.map((c) => {
+    const slugs = keep(c);
+    const fields = Array.isArray(c.fields)
+      ? (c.fields as Array<{ id?: string; slug?: string }>).filter((f) => slugs.has(f.slug ?? f.id ?? ""))
+      : [];
+    return { ...c, fields };
+  });
+  const perCollection = await Promise.all(
+    rows.map(async (c) => {
+      const slugs = keep(c);
+      const found = await prisma.cmsEntry.findMany({
+        where: { collectionId: c.id, status: "PUBLISHED" },
+        orderBy: { updatedAt: "desc" },
+        take: CMS_COLLECTION_LIMIT_MAX,
+        select: { id: true, collectionId: true, data: true, status: true, createdAt: true, updatedAt: true },
+      });
+      return found.map((e) => {
+        const data = (e.data ?? {}) as Record<string, unknown>;
+        return { ...e, data: Object.fromEntries(Object.entries(data).filter(([k]) => slugs.has(k))) };
+      });
+    }),
+  );
+  return { collections, entries: perCollection.flat() };
+}
+
+/**
  * Publish-pipeline step: expand a publish page-set with the dynamic pages each
  * page-generating collection produces. SAFE NO-OP for the common case — a site
  * with no page-generating collection gets its pages back unchanged, so existing
  * publishes are untouched. For each collection that has both a slug pattern and a
  * pageTemplatePath present in the payload, it renders one page per entry from
- * that template and appends them. Called by startPublish before the job persists.
+ * that template and appends them, and the template page itself leaves the set
+ * (see below). Called by startPublish before the job persists.
  */
 export async function appendDynamicPagesToPublish(
   siteId: string,
@@ -520,7 +575,17 @@ export async function appendDynamicPagesToPublish(
     select: { id: true, pageTemplatePath: true },
   });
   if (cols.length === 0) return pages;
-  const result = [...pages];
+  /* A bound template page is a blueprint, not a page. The exporter writes a
+     binding to "the record on this page" as the `{fieldSlug}` token this
+     step fills per record (CMSExportResolver), so the template's own HTML is
+     full of placeholders — published as-is it shipped `<h1>{title}</h1>`
+     beside the pages it generated (A-17, walked live). It is replaced by what
+     it generates, even when that is nothing yet. The home page is the one
+     exception: dropping index.html would leave the site root empty. */
+  const templatePaths = new Set(
+    cols.map((c) => c.pageTemplatePath).filter((path): path is string => !!path && path !== "index.html"),
+  );
+  const result = pages.filter((p) => !templatePaths.has(p.path));
   for (const col of cols) {
     const template = pages.find((p) => p.path === col.pageTemplatePath);
     if (!template) {

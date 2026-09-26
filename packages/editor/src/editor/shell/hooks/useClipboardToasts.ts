@@ -84,7 +84,7 @@ export function useClipboardToasts(
         addToast({
           description:
             dupes.length > 1 ? `${dupes.length} elements duplicated` : `${only ? elementTypeLabel(only) : "Element"} duplicated`,
-          action: { label: "Undo", onClick: () => composer.history.undo() },
+          action: { label: "Undo", onClick: composer.history.captureUndo() },
         });
         dupes = [];
         dupeBurst = null;
