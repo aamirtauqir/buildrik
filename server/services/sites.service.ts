@@ -780,12 +780,14 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
     /* I-2: the page writes below go by id alone (upsert / update where {id}),
        and the caller's role was checked on THIS site only — a page id that
        already lives under another site would overwrite that site's page.
-       Refused here, inside the transaction, so nothing of the save lands. */
+       Refused here, inside the transaction, so nothing of the save lands.
+       Not a PermissionError: the router's FORBIDDEN is read by the editor as
+       a revoked role (view mode, "no access" copy), which this is not. */
     const foreignPage = await tx.page.findFirst({
       where: { id: { in: input.pages.map((p: { id: string }) => p.id) }, siteId: { not: input.siteId } },
       select: { id: true },
     });
-    if (foreignPage) throw new PermissionError("FORBIDDEN", "This save carries a page that belongs to another site.");
+    if (foreignPage) throw new Error("PAGE_NOT_IN_SITE");
 
     if (isFullSnapshot) {
       const existingPages = await tx.page.findMany({

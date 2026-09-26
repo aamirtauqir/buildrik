@@ -3,12 +3,13 @@
  * `page.update where {id}`), so an EDITOR of site A who sent site B's page
  * id in A's save overwrote B's page (the router only checks the role on A).
  * The save now refuses a page id that exists under another site, inside the
- * same CAS transaction — nothing of the save lands, B is untouched.
+ * same CAS transaction — nothing of the save lands, B is untouched. The
+ * refusal is PAGE_NOT_IN_SITE (router: BAD_REQUEST), not FORBIDDEN: the
+ * editor reads FORBIDDEN as a revoked role and drops the tab to view mode.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { saveProjectData } from "@/server/services/sites.service";
-import { PermissionError } from "@/server/services/permission.service";
 import {
   createTestUser,
   createTestWorkspace,
@@ -38,7 +39,7 @@ async function twoSites() {
 }
 
 describe("saveProjectData — a page id from another site (I-2)", () => {
-  it("full snapshot (upsert path): refused FORBIDDEN, B's page and A's save both unchanged", async () => {
+  it("full snapshot (upsert path): refused PAGE_NOT_IN_SITE, B's page and A's save both unchanged", async () => {
     const { siteA, pageA, siteB, pageB } = await twoSites();
     const before = await prisma.site.findUniqueOrThrow({ where: { id: siteA.id } });
 
@@ -50,7 +51,7 @@ describe("saveProjectData — a page id from another site (I-2)", () => {
           { id: pageB.id, blocks: ["PWNED"], name: "pwned", slug: "pwned", position: 1 },
         ],
       }),
-    ).rejects.toMatchObject({ name: "PermissionError", code: "FORBIDDEN" });
+    ).rejects.toThrow("PAGE_NOT_IN_SITE");
 
     const storedB = await prisma.page.findUniqueOrThrow({ where: { id: pageB.id } });
     expect(storedB.siteId).toBe(siteB.id);
@@ -64,7 +65,9 @@ describe("saveProjectData — a page id from another site (I-2)", () => {
   it("partial save (update path): refused, B's page unchanged", async () => {
     const { siteA, pageB } = await twoSites();
     const err = await saveProjectData({ siteId: siteA.id, pages: [{ id: pageB.id, blocks: ["PWNED"] }] }).catch((e: unknown) => e);
-    expect(err).toBeInstanceOf(PermissionError);
+    expect(err).toBeInstanceOf(Error);
+    expect((err as Error).message).toBe("PAGE_NOT_IN_SITE");
+    expect((err as Error).name).not.toBe("PermissionError");
     expect((await prisma.page.findUniqueOrThrow({ where: { id: pageB.id } })).blocks).toEqual(["B"]);
   });
 

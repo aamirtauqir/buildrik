@@ -123,12 +123,14 @@ describe("sites.getScheduledPublish — PermissionError translation (S-10)", () 
 });
 
 describe("sites.saveProject — a page of another site (I-2)", () => {
-  it("the service's PermissionError reaches the client as FORBIDDEN, not a 500", async () => {
+  /* Not FORBIDDEN: the editor reads FORBIDDEN as a revoked role and switches
+     the tab to view mode with "you don't have access" copy — untrue here. */
+  it("PAGE_NOT_IN_SITE reaches the client as BAD_REQUEST with a plain sentence", async () => {
     checkSiteRoleMock.mockResolvedValueOnce(undefined);
-    saveProjectFromEditorMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "belongs to another site"));
+    saveProjectFromEditorMock.mockRejectedValueOnce(new Error("PAGE_NOT_IN_SITE"));
     const caller = sitesRouter.createCaller(ctx() as never);
     await expect(
       caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    ).rejects.toMatchObject({ code: "BAD_REQUEST", message: expect.stringContaining("belongs to another site") });
   });
 });
