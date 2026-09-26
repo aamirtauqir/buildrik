@@ -1,6 +1,7 @@
 import DOMPurify from "isomorphic-dompurify";
 import { prisma } from "@/lib/prisma";
 import { parseCsvText } from "@/lib/csv";
+import { isDangerousUrl } from "@buildrik/shared/schemas/element-markup";
 import type { Prisma } from "@prisma/client";
 import type {
   UpsertCollectionInput,
@@ -29,10 +30,17 @@ export class CmsError extends Error {
  * Defense-in-depth at the write boundary (audit S-1 class: "some stores never
  * sanitized on the server"). Entry `data` is opaque JSON supplied by the
  * client; every string value is run through the same DOMPurify sanitizer
- * `lib/sanitize-blocks.ts` uses for page blocks — stripped to plain text
- * rather than trusted to stay inert because `generateDynamicPages` happens to
- * HTML-escape it at render time today. Applied by `upsertEntry`, so every
- * write path (manual save, CSV import, any future importer) shares it.
+ * `lib/sanitize-blocks.ts` uses for page blocks. Applied by `upsertEntry`, so
+ * every write path (manual save, CSV import, any future importer) shares it.
+ *
+ * This strips MARKUP only (tags/attributes an HTML parser would honor) — it
+ * does nothing about a plain-text value like `javascript:alert(1)` (no tags,
+ * nothing for DOMPurify to remove) that later lands in a URL-bearing
+ * attribute at template-substitution time. That is a different threat with a
+ * different fix location: the scheme check lives at the SUBSTITUTION SINK
+ * (`substituteOutsideScriptStyle`, below), which is where untrusted text
+ * meets an attribute an HTML parser will navigate/load — not here at write
+ * time, and not by guessing which fields are "URL fields" up front.
  */
 function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};
@@ -368,6 +376,53 @@ export async function resolveDynamicPages(
  * yield []. (The editor supplies templateHtml from the page bound to this
  * collection; the deploy of these files is verified at publish time.)
  */
+// URL-bearing attributes: a substituted value that lands here is navigated
+// or loaded by the browser, so entity-escaping it (which only defeats
+// breaking OUT of the attribute) is not enough — a value with no `<`, `>` or
+// `"` at all, like `javascript:alert(1)`, escapes to itself and still runs
+// when the attribute is clicked/loaded. Controller review round 1 (S-1
+// follow-up): reported live as `<a href="{fieldSlug}">` with a CSV-imported
+// `javascript:` value producing exactly that in the published page.
+const URL_ATTR_RE = /\b(href|src|srcset|action|formaction|poster|xlink:href)(\s*=\s*)(["'])((?:(?!\3)[\s\S])*)\3/gi;
+
+function subFieldTokens(segment: string, data: Record<string, unknown>): string {
+  return segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
+    const v = data[key];
+    return v == null ? "" : escapeHtml(String(v));
+  });
+}
+
+/**
+ * `{fieldSlug}` substitution for one script/style-free segment. Splits the
+ * segment further into URL-bearing-attribute-value spans and everything
+ * else: ordinary text/attributes get the plain entity-escaped substitution;
+ * a URL attribute's value is substituted the same way and then, as a WHOLE,
+ * run through the dangerous-scheme check `sanitize-blocks.ts` uses for block
+ * attributes — a resolved value that is `javascript:`/`vbscript:`/a
+ * non-image `data:` URL becomes empty rather than reaching the published
+ * HTML. Applied to every URL attribute in the segment, not only ones that
+ * contain a `{field}` token — a static template URL passes through
+ * unchanged (it can't match a dangerous scheme), so this costs nothing and
+ * doesn't depend on correctly guessing which attributes came from CMS data.
+ */
+function subSegment(segment: string, data: Record<string, unknown>): string {
+  let result = "";
+  let last = 0;
+  let m: RegExpExecArray | null;
+  URL_ATTR_RE.lastIndex = 0;
+  while ((m = URL_ATTR_RE.exec(segment))) {
+    const [whole, attrName, eq, quote, rawValue] = m;
+    result += subFieldTokens(segment.slice(last, m.index), data);
+    const resolvedValue = subFieldTokens(rawValue, data);
+    const safeValue = isDangerousUrl(resolvedValue) ? "" : resolvedValue;
+    result += `${attrName}${eq}${quote}${safeValue}${quote}`;
+    last = m.index + whole.length;
+    URL_ATTR_RE.lastIndex = last;
+  }
+  result += subFieldTokens(segment.slice(last), data);
+  return result;
+}
+
 // A17: substitution must not reach inside <script>/<style> — a field value
 // containing e.g. `{` could otherwise land inside inline JS/CSS unescaped
 // and unexpected (the surrounding markup is HTML-escaped by design;
@@ -382,17 +437,12 @@ function substituteOutsideScriptStyle(
   let result = "";
   let last = 0;
   let m: RegExpExecArray | null;
-  const sub = (segment: string) =>
-    segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-      const v = data[key];
-      return v == null ? "" : escapeHtml(String(v));
-    });
   while ((m = spanRe.exec(html))) {
-    result += sub(html.slice(last, m.index));
+    result += subSegment(html.slice(last, m.index), data);
     result += m[0]; // script/style span verbatim — never substituted
     last = spanRe.lastIndex;
   }
-  result += sub(html.slice(last));
+  result += subSegment(html.slice(last), data);
   return result;
 }
 

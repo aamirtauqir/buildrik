@@ -251,6 +251,68 @@ describe("generateDynamicPages", () => {
   });
 });
 
+describe("generateDynamicPages — dangerous-scheme sink defence (controller review round 1)", () => {
+  const TEMPLATE = '<html><head></head><body><a href="{link}">Go</a></body></html>';
+
+  it("neutralizes a javascript: value substituted into an href — the published HTML carries no javascript: href", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)" } }]);
+    const out = await generateDynamicPages("s1", "c1", TEMPLATE);
+    expect(out[0].content).not.toContain("javascript:");
+    expect(out[0].content).toContain('<a href="">Go</a>');
+  });
+
+  it("catches a scheme hidden behind control characters (java\\tscript:)", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "java\tscript:alert(1)" } }]);
+    const out = await generateDynamicPages("s1", "c1", TEMPLATE);
+    expect(out[0].content).not.toMatch(/href="[^"]*script:/i);
+  });
+
+  it("neutralizes vbscript: and a non-image data: URL the same way", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "vbscript:msgbox(1)" } }]);
+    const vb = await generateDynamicPages("s1", "c1", TEMPLATE);
+    expect(vb[0].content).toContain('href=""');
+
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e2", data: { link: "data:text/html,<script>alert(1)</script>" } }]);
+    const data = await generateDynamicPages("s1", "c1", TEMPLATE);
+    expect(data[0].content).toContain('href=""');
+  });
+
+  it("leaves a legitimate https value, and a same-site relative path, untouched", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "https://example.com/menu", n: "x" } }]);
+    const out = await generateDynamicPages("s1", "c1", TEMPLATE);
+    expect(out[0].content).toContain('href="https://example.com/menu"');
+  });
+
+  it("still allows a safe data:image URL (e.g. an inline-encoded image src)", async () => {
+    const imgTemplate = '<html><head></head><body><img src="{photo}"></body></html>';
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { photo: "data:image/png;base64,AAAA", n: "x" } }]);
+    const out = await generateDynamicPages("s1", "c1", imgTemplate);
+    expect(out[0].content).toContain('src="data:image/png;base64,AAAA"');
+  });
+
+  it("end to end: a javascript: value that entered through CSV import never reaches a published href", async () => {
+    // importCsvEntries → upsertEntry (write path) → generateDynamicPages (publish-time read + substitution sink).
+    colFindFirst.mockResolvedValue({ id: "c1", fields: [{ id: "f1", name: "Link", slug: "link" }] });
+    entCreate.mockResolvedValueOnce({ id: "e1" });
+    const importResult = await importCsvEntries("s1", "c1", "Link\njavascript:alert(1)", { link: "Link" });
+    expect(importResult.imported).toBe(1);
+    const storedData = entCreate.mock.calls[0][0].data.data as Record<string, unknown>;
+    // sanitizeEntryData (write-time) leaves plain text alone — no tags to strip.
+    expect(storedData.link).toBe("javascript:alert(1)");
+
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: storedData }]);
+    const pages = await generateDynamicPages("s1", "c1", TEMPLATE);
+    expect(pages[0].content).not.toContain("javascript:");
+  });
+});
+
 describe("appendDynamicPagesToPublish", () => {
   it("is a no-op when the site has no page-generating collection", async () => {
     colFindMany.mockResolvedValueOnce([]);
