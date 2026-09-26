@@ -38,6 +38,8 @@ import { hydrateUserTemplatesFromServer } from "@/services/templateSync";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { RecoveryBanner } from "./RecoveryBanner";
+import { useTabSwitchGuard } from "./hooks/useTabSwitchGuard";
+import { UnsavedTabSwitchDialog } from "./modals/UnsavedTabSwitchDialog";
 import { LoadErrorBanner, type LoadErrorKind } from "./LoadErrorBanner";
 import { IssuesPanel } from "./IssuesPanel";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -156,6 +158,21 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const modals = useStudioModals();
   const blocks: BlockData[] = React.useMemo(() => getBlockDefinitions(), []);
 
+  /* B-1: ONE shell-owned dirty registry (shellDirtyRegistry.ts) that every
+     tab-switch surface routes through — the rail/ui:switch-tab
+     (`state.setLeftPanelTab`) and ⌘H/⇧A/the palette/deep links/UI_PANEL_OPEN
+     (`state.openLeftPanelToTab`) are wrapped below so a staged Settings,
+     Brand or CMS-record edit prompts instead of silently discarding. */
+  const { guard: guardTabSwitch, dialogProps: tabSwitchDialogProps } = useTabSwitchGuard();
+  const guardedSetLeftPanelTab = React.useCallback(
+    (tab: string) => guardTabSwitch(() => state.setLeftPanelTab(tab)),
+    [guardTabSwitch, state.setLeftPanelTab]
+  );
+  const guardedOpenLeftPanelToTab = React.useCallback(
+    (primaryTab: string, subTab?: string) => guardTabSwitch(() => state.openLeftPanelToTab(primaryTab, subTab)),
+    [guardTabSwitch, state.openLeftPanelToTab]
+  );
+
   // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).
   const [loadError, setLoadError] = React.useState<LoadErrorKind>(null);
   /* Board 813:4870 — a mid-session 401 (manual save OR autosave) opens the
@@ -260,9 +277,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     modals,
     state: {
-      setLeftPanelTab: state.setLeftPanelTab,
+      setLeftPanelTab: guardedSetLeftPanelTab,
       setIsLeftPanelOpen: state.setIsLeftPanelOpen,
-      openLeftPanelToTab: state.openLeftPanelToTab,
+      openLeftPanelToTab: guardedOpenLeftPanelToTab,
       setShowSpacingIndicators: state.setShowSpacingIndicators,
       setShowBadges: state.setShowBadges,
       setShowGuides: state.setShowGuides,
@@ -409,13 +426,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     modals,
     saveProject,
-    openLeftPanelToTab: state.openLeftPanelToTab,
+    openLeftPanelToTab: guardedOpenLeftPanelToTab,
     /* FC-11: same door the site menu's "Site settings" row uses — both go
        straight to the Settings tab now, the way S and ⌘K already did. This
        used to round-trip through a `showProjectSettings` flag that
        StudioModals immediately converted back into this same call and
        cleared — a modal that never rendered a modal. */
-    openSiteSettings: () => state.openLeftPanelToTab("settings"),
+    openSiteSettings: () => guardedOpenLeftPanelToTab("settings"),
     // reviewsEnabled is `boolean | null` before the status resolves (see
     // ReviewStatus) — treat "unknown yet" the same as "on" (the hook's own
     // default), never as "off": the C shortcut should not go dead for the
@@ -612,14 +629,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
           // canvas selection itself, so no element context needs threading.
           onShowExporter={modals.openExporter}
-          onOpenProjectSettings={() => state.openLeftPanelToTab("settings")}
-          onOpenPublish={() => state.openLeftPanelToTab("publish")}
-          onOpenHistory={() => state.openLeftPanelToTab("history")}
-          onOpenPages={() => state.openLeftPanelToTab("pages")}
+          onOpenProjectSettings={() => guardedOpenLeftPanelToTab("settings")}
+          onOpenPublish={() => guardedOpenLeftPanelToTab("publish")}
+          onOpenHistory={() => guardedOpenLeftPanelToTab("history")}
+          onOpenPages={() => guardedOpenLeftPanelToTab("pages")}
           onCloseDrawer={() => state.setIsLeftPanelOpen(false)}
-          onOpenActivity={() => state.openLeftPanelToTab("activity")}
+          onOpenActivity={() => guardedOpenLeftPanelToTab("activity")}
           onOpenIssues={() => setIssuesOpen(true)}
-          onOpenReview={() => state.openLeftPanelToTab("review")}
+          onOpenReview={() => guardedOpenLeftPanelToTab("review")}
           onOpenConflict={() => setConflict((c) => (c ? { ...c, open: true } : c))}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
@@ -650,7 +667,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onLeftPanelToggle={() => state.setIsLeftPanelOpen((v) => !v)}
         leftPanelTab={state.leftPanelTab}
         leftPanelSubTab={state.leftPanelSubTabs[state.leftPanelTab]}
-        onLeftPanelTabChange={state.setLeftPanelTab}
+        onLeftPanelTabChange={guardedSetLeftPanelTab}
         onLeftPanelSubTabChange={(subTab) =>
           state.setLeftPanelSubTabs((prev) => ({ ...prev, [state.leftPanelTab]: subTab }))
         }
@@ -770,6 +787,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       {/* First-time onboarding checklist (gated to new users by the orchestrator). */}
       <OnboardingMount composer={composer} />
+
+      {/* B-1: the shared tab-switch guard's confirm — Settings/Brand/CMS
+          record dirty, caught before ⌘H, ⇧A, the palette, ui:switch-tab or
+          UI_PANEL_OPEN silently discards it. */}
+      <UnsavedTabSwitchDialog {...tabSwitchDialogProps} />
 
       {/* Stale-approval gate (contracts §1.5, S5.6 board 131:201): the site
           changed after the client approved it. The modal itemizes the changed

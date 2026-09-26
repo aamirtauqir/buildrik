@@ -42,6 +42,7 @@ import { RecordPreview } from "./RecordPreview";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { resolveUrl, slugify } from "./DynamicPagesPane";
 import type { CmsTab } from "./cmsWorkspaceStore";
+import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 
 export type OpenMediaLibrary = (
   allowedTypes: MediaAssetType[],
@@ -157,6 +158,17 @@ export function RecordSheet({
   const crumb = record ? title : "New record";
 
   const guard = (go: () => void) => (dirty ? setLeaveTo(() => go) : go());
+
+  // shellDirtyRegistry (B-1): this sheet already guards its OWN Cancel/Close
+  // via `guard` above, but a shell-level tab switch (⌘H, ⇧A, the palette,
+  // ui:switch-tab, UI_PANEL_OPEN) doesn't go through that — it just
+  // unmounts this sheet. Registering `dirty` here lets the shell's own
+  // switch guard catch that case too. Cleared on unmount so a closed sheet
+  // never leaves a stale block behind.
+  React.useEffect(() => {
+    shellDirty.set("cms-record", dirty);
+    return () => shellDirty.set("cms-record", false);
+  }, [dirty]);
 
   const save = async () => {
     setSaving(true);

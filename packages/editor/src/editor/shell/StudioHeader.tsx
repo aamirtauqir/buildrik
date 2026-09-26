@@ -49,6 +49,7 @@ import { SiteMenu } from "./SiteMenu";
 import { PermissionsHost } from "./PermissionsHost";
 import { TimeTravelHost } from "./TimeTravelHost";
 import { SaveFailedBanner } from "./SaveFailedBanner";
+import { shellDirty } from "./shellDirtyRegistry";
 import "./header.css";
 
 /** Selected element minimal info */
@@ -482,7 +483,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   const [brandDirty, setBrandDirty] = React.useState(false);
   React.useEffect(() => {
     if (!composer) return;
-    const onBrandDirty = (p?: { dirty?: boolean }) => setBrandDirty(Boolean(p?.dirty));
+    // Also registered into shellDirtyRegistry (B-1) so the shell-level
+    // tab-switch guard (⌘H, ⇧A, the palette, ui:switch-tab, UI_PANEL_OPEN)
+    // sees a staged Brand edit too, not just this header's own exit guard.
+    const onBrandDirty = (p?: { dirty?: boolean }) => {
+      const dirty = Boolean(p?.dirty);
+      setBrandDirty(dirty);
+      shellDirty.set("brand", dirty);
+    };
     composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
     /* Block body, not a shorthand: `off` is chainable and returns the composer,
        so an arrow shorthand hands React an instance where a destructor belongs. */
