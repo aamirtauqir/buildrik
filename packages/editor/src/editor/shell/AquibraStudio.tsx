@@ -416,7 +416,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
        StudioModals immediately converted back into this same call and
        cleared — a modal that never rendered a modal. */
     openSiteSettings: () => state.openLeftPanelToTab("settings"),
-    reviewsEnabled: reviewStatus.reviewsEnabled,
+    // reviewsEnabled is `boolean | null` before the status resolves (see
+    // ReviewStatus) — treat "unknown yet" the same as "on" (the hook's own
+    // default), never as "off": the C shortcut should not go dead for the
+    // brief window before the first status fetch lands.
+    reviewsEnabled: reviewStatus.reviewsEnabled ?? true,
   });
 
   /* ── The publish door (B4 — ONE confirm door, both entrances) ─────────────

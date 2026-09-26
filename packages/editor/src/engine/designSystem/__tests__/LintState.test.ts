@@ -84,7 +84,7 @@ describe("LintState — how many tokens are hiding their warnings", () => {
     const s = new LintState();
     s.suppress("color-accent");
     s.suppress("color-success");
-    expect(s.suppressedIds().sort()).toEqual(["color-accent", "color-success"]);
+    expect([...s.suppressedIds()].sort()).toEqual(["color-accent", "color-success"]);
     s.unsuppress("color-accent");
     expect(s.suppressedIds()).toEqual(["color-success"]);
   });
