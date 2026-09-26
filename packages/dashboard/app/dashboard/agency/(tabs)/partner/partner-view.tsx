@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Users, TrendingUp, Wallet, Copy, Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { writeClipboardText } from "@lib/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { StatCard, MetricValue, ProgressBar, DataTable, type Column } from "@/components/dashboard/primitives";

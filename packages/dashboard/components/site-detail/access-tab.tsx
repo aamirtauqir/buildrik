@@ -2,7 +2,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Copy, Eye, Trash2, Plus, Lock, Calendar, QrCode } from "lucide-react";
 import { shareUrl } from "@lib/utils";
-import { writeClipboardText } from "@lib/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, SectionCard, MetricValue, InputField } from "@/components/dashboard/primitives";
 

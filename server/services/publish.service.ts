@@ -7,6 +7,7 @@ import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
 import { publishApprovalBlock } from "@server/services/publish-approval";
 import { isFeatureEnabled } from "@server/services/feature-flag.service";
+import { getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
   createVercelDeployment,
   waitForDeploymentReady,
@@ -346,18 +347,23 @@ export async function startPublish(
     // way to ever produce an APPROVED review. Enforcing the gate there deadlocks
     // every non-owner publish forever. Only enforce approval when the layer is
     // actually on for this site's workspace.
-    const [workspace, member, agencyLayerOn] = await Promise.all([
+    const [workspace, agencyLayerOn] = await Promise.all([
       prisma.workspace.findUnique({
         where: { id: gateWorkspaceId },
         select: { editsRequireApproval: true },
       }),
-      prisma.workspaceMember.findUnique({
-        where: { userId_workspaceId: { userId, workspaceId: gateWorkspaceId } },
-        select: { role: true },
-      }),
       isFeatureEnabled(gateWorkspaceId, "agency_layer"),
     ]);
     if (workspace?.editsRequireApproval && agencyLayerOn) {
+      /* M-8: the exemption follows the caller's EFFECTIVE role on this site —
+         a site roleOverride caps the workspace role (PD-6), so a workspace
+         OWNER capped to EDITOR here is gated like one. The raw membership read
+         exempted them. A caller with no membership any more (a scheduled
+         publish whose creator left) is gated as EDITOR, as before. */
+      const role = await getEffectiveSiteRole(prisma, userId, siteId).catch((e: unknown) => {
+        if (e instanceof PermissionError) return "EDITOR" as const;
+        throw e;
+      });
       /* `revokedAt: null` is load-bearing. Revoking a round is the only way out
          of a review nobody can resolve — the submitter is refused a self-resolve
          by design, so on a one-seat workspace a PENDING round is otherwise
@@ -372,7 +378,7 @@ export async function startPublish(
       });
       const block = publishApprovalBlock({
         editsRequireApproval: true,
-        role: member?.role ?? "EDITOR",
+        role,
         latestReviewStatus: latestReview?.status ?? null,
         latestReviewResolvedAt: latestReview?.resolvedAt ?? null,
         siteLastEditedAt: site.lastEditedAt,

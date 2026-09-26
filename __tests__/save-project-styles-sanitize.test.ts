@@ -11,7 +11,7 @@ const siteUpdate = vi.fn();
 
 vi.mock("@/lib/prisma", () => {
   const tx = {
-    page: { findMany: vi.fn(async () => []), deleteMany: vi.fn(), upsert: vi.fn(), update: vi.fn() },
+    page: { findMany: vi.fn(async () => []), findFirst: vi.fn(async () => null), deleteMany: vi.fn(), upsert: vi.fn(), update: vi.fn() },
     formBlock: { deleteMany: vi.fn() },
     // A-2: the site-level write is the compare-and-swap updateMany.
     site: { updateMany: (...a: unknown[]) => siteUpdate(...a) },

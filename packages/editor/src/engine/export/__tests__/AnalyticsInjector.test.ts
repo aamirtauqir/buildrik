@@ -52,7 +52,7 @@ describe("generateAnalyticsScripts — Google Analytics 4", () => {
   });
 
   it("configures gtag with the measurement ID", () => {
-    expect(out).toContain("gtag('config', 'G-TEST1234'");
+    expect(out).toContain(`gtag('config', "G-TEST1234"`);
     expect(out).toContain("window.dataLayer = window.dataLayer || [];");
     expect(out).toContain("gtag('js', new Date());");
   });
@@ -72,7 +72,7 @@ describe("generateAnalyticsScripts — Facebook Pixel", () => {
   });
 
   it("initializes the pixel with the configured ID", () => {
-    expect(out).toContain("fbq('init', '123456789012345');");
+    expect(out).toContain(`fbq('init', "123456789012345");`);
   });
 
   it("tracks PageView", () => {
@@ -104,7 +104,7 @@ describe("generateAnalyticsScripts — Google Ads", () => {
     expect(out).toContain(
       '<script async src="https://www.googletagmanager.com/gtag/js?id=AW-99999999"></script>'
     );
-    expect(out).toContain("gtag('config', 'AW-99999999');");
+    expect(out).toContain(`gtag('config', "AW-99999999");`);
   });
 
   it("skips the Ads snippet when GA is already enabled (gtag dedupe)", () => {
@@ -132,7 +132,7 @@ describe("generateAnalyticsScripts — multiple providers", () => {
       facebookPixel: { enabled: true, pixelId: "123456789012345" },
     });
     expect(out).toContain("G-TEST1234");
-    expect(out).toContain("fbq('init', '123456789012345');");
+    expect(out).toContain(`fbq('init', "123456789012345");`);
     expect(out.indexOf("G-TEST1234")).toBeLessThan(out.indexOf("fbq('init'"));
     expect(out).toContain("</script>\n  <script>");
   });
@@ -200,5 +200,40 @@ describe("Google Tag Manager", () => {
     expect(isValidGTMContainerId("GTM-")).toBe(false);
     expect(isValidGTMContainerId("ABC1234")).toBe(false);
     expect(isValidGTMContainerId("")).toBe(false);
+  });
+});
+
+describe("generateAnalyticsScripts — ids cannot break out of the snippet (I-1b)", () => {
+  const BREAKOUT = "x');alert(1);//</script><script>alert(2)</script>\"";
+  const out = generateAnalyticsScripts({
+    googleAnalytics: { enabled: true, measurementId: BREAKOUT },
+    facebookPixel: { enabled: true, pixelId: BREAKOUT },
+    microsoftClarity: { enabled: true, projectId: BREAKOUT },
+    googleTagManager: { enabled: true, containerId: BREAKOUT },
+  });
+  const adsOnly = generateAnalyticsScripts({ googleAds: { enabled: true, conversionId: BREAKOUT } });
+
+  it("emits exactly the snippet's own <script> tags — an id closes none and opens none", () => {
+    for (const html of [out, adsOnly]) {
+      const opens = html.match(/<script\b/gi)?.length ?? 0;
+      const closes = html.match(/<\/script/gi)?.length ?? 0;
+      expect(opens).toBe(closes);
+      expect(html).not.toContain("<script>alert(2)");
+    }
+    // GA: loader + inline, Pixel: inline, Clarity: inline, GTM: inline.
+    expect(out.match(/<script\b/gi)).toHaveLength(5);
+  });
+
+  it("writes each id as a JSON string literal with < escaped, so it cannot end the JS string", () => {
+    const literal = JSON.stringify(BREAKOUT).replace(/</g, "\\u003c");
+    expect(out).toContain(`gtag('config', ${literal}`);
+    expect(out).toContain(`fbq('init', ${literal})`);
+    // The single quote that ended the old '${id}' literal is now inside a "…" one.
+    expect(out).not.toContain("'x');alert(1)");
+  });
+
+  it("percent-encodes the id where it lands in a URL attribute", () => {
+    expect(out).toContain(`gtag/js?id=${encodeURIComponent(BREAKOUT)}"`);
+    expect(out).toContain(`tr?id=${encodeURIComponent(BREAKOUT)}&`);
   });
 });

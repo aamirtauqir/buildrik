@@ -33,6 +33,101 @@ Local-built. Re-run `pnpm build` in `packages/dashboard` after any code change.
 No separate editor zip — editor module is bundled into the dashboard
 build via Next.js workspace transpilation.
 
+## Ordered deploy — audit-fix release (fix/audit-2026-09-25)
+
+This release carries schema changes, a data backfill and a code swap that
+must happen in this order. Skipping or reordering a step loses data or
+500s the site. Run from a checkout of the release commit, from the repo root.
+
+1. **Check the live env.** `pnpm run env:check:prod`. It pulls the live cPanel
+   env. Fix any new failure before going further. The six Stripe live-mode
+   rows have always failed.
+2. **Snapshot the DB and open an editors-quiet window.** Take a `pg_dump` of
+   the production database over the SSH tunnel (step 3), and keep it. From
+   here until the code swap in step 5, **nobody edits or publishes**. There
+   are two reasons:
+   - `20261003100000_form_block_site_scoped_identity` is not atomic with a
+     concurrent publish on the OLD code. The old worker still upserts
+     `form_blocks` by `id = blockId`. A publish that lands while the migration
+     merges duplicates and builds the `(siteId, blockId)` unique index can
+     re-insert a duplicate, which fails the index build, or write to a row
+     the merge then drops.
+   - `reid-duplicate-elements.mjs` (step 4) writes pages and styles without
+     the `lastEditedAt` CAS. An editor tab open during `--apply` can save its
+     pre-backfill copy over the result without a conflict.
+3. **Apply migrations: `prisma migrate deploy`.** The production host has no
+   node, and its `DATABASE_URL` is `localhost:5432` on the server. Open a
+   tunnel with `ssh -f -N -L 127.0.0.1:15432:127.0.0.1:5432 vortyoyz`. Both
+   sides need the explicit `127.0.0.1:`, or you get P1001. Read the URL from
+   `~/.cl.selector/node-selector.json` (`["apps/dashboard"]["env_vars"]["DATABASE_URL"]`)
+   and rewrite its port to 15432. Then run:
+   `DATABASE_URL=<tunnelled url> npx prisma migrate status --schema prisma/schema.prisma`,
+   then `… npx prisma migrate deploy --schema prisma/schema.prisma`.
+   - This branch adds five migrations, applied in this order:
+     1. `20261001100000_notification_site_id`
+     2. `20261001120000_form_block_after_submit`
+     3. `20261002100000_site_version_updated_at`
+     4. `20261003100000_form_block_site_scoped_identity` (merges duplicate form rows, then adds the unique index)
+     5. `20261003110000_site_project_cms_bindings`
+   - **Earlier `main` migrations may still be pending in production.** For
+     example, the `20260909020000` / `20260909021000` pair was recorded as
+     unapplied when the Blob store went live. Others are the
+     `20260914*` settings pair and the three `20260924*` migrations.
+     `migrate status` lists them. `migrate deploy` applies every pending one
+     in timestamp order, so they go in the same run. Read the list before
+     you confirm.
+   - **The new code 500s against a database that lacks `20261001120000` and
+     later.** Its Prisma client selects `FormBlock.successAction`,
+     `SiteVersion.updatedAt`, `Site.projectCmsBindings` and the other new
+     columns. Never deploy code before this step has succeeded.
+4. **Backfill duplicate element ids: `scripts/audit/reid-duplicate-elements.mjs`.**
+   This needs migration `20261003100000` already applied, because the
+   script's idempotency check reads the `(siteId, blockId)` key. Run it
+   through the same tunnel:
+   - Dry run first:
+     `DATABASE_URL=<tunnelled url> npx tsx --tsconfig packages/dashboard/tsconfig.json scripts/audit/reid-duplicate-elements.mjs --i-know-this-is-production`.
+     The tunnel URL is `127.0.0.1`, so the script's localhost guard cannot
+     tell production from a local database. The flag is only a statement of
+     intent, so check the URL yourself. Read the per-site counts. Every site should be a plausible count of
+     renamed ids, form-row copies and style-rule copies. A site logged
+     `FAILED` stops the release. Record the "already collapsed" pages. No
+     rewrite restores those; they need a restore from a version.
+   - Then add `--apply` to the same command. It runs one transaction per
+     site and exits non-zero if any site failed. Re-running the dry run
+     should find nothing, because the script is idempotent.
+   - **Why this must run before the code swap:** the new editor re-ids
+     colliding elements on load and saves the new ids. A form element that
+     gets re-id'd that way has no `form_blocks` row under its new id. Its
+     notify email, webhook, redirect, success message and spam setting then
+     read as defaults, and the next publish writes those defaults. The
+     backfill copies each row to the new id first.
+5. **Deploy the code.** Build on the Mac:
+   `npx prisma generate --schema prisma/schema.prisma` (`next build` does
+   not run it, and the client is bundled into the standalone output), then
+   `pnpm build` in `packages/dashboard`. Every `NEXT_PUBLIC_*` value must be
+   in the environment at build time, via `.env.production.local`. Setting
+   one on the server afterwards does nothing.
+   - Copy `.next/static` into `.next/standalone/packages/dashboard/.next/static`
+     and `public` into `.next/standalone/packages/dashboard/public`. Next
+     omits both.
+   - Run `rsync -az --delete --exclude stderr.log --exclude tmp/ .next/standalone/ vortyoyz:~/apps/dashboard/`
+     and then `ssh vortyoyz touch ~/apps/dashboard/tmp/restart.txt`. The
+     `--delete` is load-bearing: stale `node_modules` leftovers 500'd every
+     route for 12 days in September. Confirm that the served `/auth` HTML
+     carries the new `.next/BUILD_ID`, then run
+     `pnpm run smoke:prod -- --dashboard https://app.buildrick.io --editor https://app.buildrick.io`
+     (6/8 is healthy).
+   - The editors-quiet window ends here.
+6. **Sanitizer dry run on a local copy: `scripts/audit/sanitize-dry-run.mjs`.**
+   Restore the step-2 snapshot into a local database. The script refuses any
+   non-localhost `DATABASE_URL`, but the step-3 tunnel is `127.0.0.1` too,
+   so make sure the URL names the restored copy and not the tunnel. Then
+   run `DATABASE_URL=postgresql://localhost/<restored db> npx tsx --tsconfig packages/dashboard/tsconfig.json scripts/audit/sanitize-dry-run.mjs`.
+   A legitimate tag listed under `tag` means the allowlist in
+   `packages/shared/schemas/element-markup.ts` needs extending. The stored
+   content is sanitized on its next save or publish, so extend the allowlist
+   and ship that before users re-save. Judge `review-url-attr` rows by hand.
+
 ## Pre-deploy — DB + Resend
 
 ### 1. Postgres database

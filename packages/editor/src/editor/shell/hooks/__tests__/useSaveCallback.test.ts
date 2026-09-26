@@ -535,6 +535,40 @@ describe("useSaveCallback — an expired session is not a retryable save failure
     expect(description).toMatch(/sign in/i);
   });
 
+  /* I-2: the server refuses a save carrying a page that belongs to another
+     site with BAD_REQUEST (never FORBIDDEN — that reads as a revoked role
+     and drops the tab into view mode). The editor says what happened. */
+  it("a cross-site page refusal says so — no view-mode switch, no role copy", async () => {
+    const opts = makeOpts();
+    const roleInvalidationsBefore = invalidateMyRole.mock.calls.length;
+    opts.saveProject.mockRejectedValueOnce(
+      TRPCClientError.from({
+        error: {
+          message: "This save includes a page that belongs to another site, so it was not applied. Reload the site before editing.",
+          code: -32600,
+          data: { code: "BAD_REQUEST", httpStatus: 400, path: "sites.saveProject" },
+        },
+      }),
+    );
+    const { result } = renderHook(() =>
+      useSaveCallback({
+        composer: opts.composer,
+        addToast: opts.addToast,
+        setSaveState: opts.setSaveState,
+        setIsDirty: opts.setIsDirty,
+      }),
+    );
+    await act(async () => {
+      await result.current();
+      await flushMicrotasks();
+    });
+    expect(invalidateMyRole.mock.calls.length).toBe(roleInvalidationsBefore);
+    const toast = opts.addToast.mock.calls.at(-1)?.[0] as { title: string; description: string };
+    expect(toast.title).toBe("Save failed");
+    expect(toast.description).toMatch(/another site/i);
+    expect(toast.description).toMatch(/reload/i);
+  });
+
   it("a plain failure still gets Retry", async () => {
     const opts = makeOpts();
     opts.saveProject.mockRejectedValueOnce(new Error("boom"));

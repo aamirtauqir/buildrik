@@ -87,4 +87,14 @@ describe("POST /api/public/forms/[siteId]/[formBlockId] — Referer fallback", (
     const body = await res.text();
     expect(body).toContain("Thanks!");
   });
+
+  it("the inline message page escapes the stored message (shared escapeHtmlText)", async () => {
+    submitFormMock.mockResolvedValue({
+      id: "sub1", successAction: "MESSAGE", redirectUrl: null,
+      successMessage: `<img src=x onerror="alert('1')">&`,
+      returnUrl: null, refererUrl: null, siteOrigin: null,
+    });
+    const body = await (await POST(formPost("name=A"), ctx("s1", "f1"))).text();
+    expect(body).toContain("<p>&lt;img src=x onerror=&quot;alert(&#39;1&#39;)&quot;&gt;&amp;</p>");
+  });
 });

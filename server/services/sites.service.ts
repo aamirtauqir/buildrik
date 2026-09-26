@@ -12,6 +12,7 @@ import type {
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
+import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 
@@ -436,7 +437,9 @@ export async function duplicateSite(
           name: p.name,
           slug: p.slug,
           position: p.position,
-          blocks: (reid.pages[i].blocks ?? []) as Prisma.InputJsonValue,
+          // M-6: same write-boundary sanitizer as the save path — the source
+          // row may predate it, like projectStyles above.
+          blocks: sanitizeBlocks(reid.pages[i].blocks ?? []) as Prisma.InputJsonValue,
           isHomePage: p.isHomePage,
           seoTitle: p.seoTitle,
           seoDescription: p.seoDescription,
@@ -656,6 +659,38 @@ export async function bulkAction(
   }
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * I-1c: `projectSettings.analytics` with every injection-shaped id emptied
+ * (and that provider's `verifiedAt` dropped) — the ids are written into every
+ * published page's inline scripts, and `settings` is `z.unknown()` at the save
+ * boundary. Deliberately NOT the editor's strict per-provider formats: ids
+ * saved under the screen's older, looser rules must survive a save. A safe id
+ * is stored trimmed. Lenient: the rest of the settings, and the save, land.
+ */
+function withValidAnalyticsIds(settings: unknown): unknown {
+  if (!isPlainObject(settings) || !isPlainObject(settings.analytics)) return settings;
+  const analytics: Record<string, unknown> = { ...settings.analytics };
+  for (const provider of Object.keys(ANALYTICS_ID_FIELDS) as AnalyticsProvider[]) {
+    const block = analytics[provider];
+    if (!isPlainObject(block)) continue;
+    const field = ANALYTICS_ID_FIELDS[provider];
+    const id = block[field];
+    if (id === undefined || id === "") continue;
+    if (typeof id === "string" && ANALYTICS_ID_SAFE.test(id.trim())) {
+      if (id !== id.trim()) analytics[provider] = { ...block, [field]: id.trim() };
+      continue;
+    }
+    const emptied: Record<string, unknown> = { ...block, [field]: "" };
+    delete emptied.verifiedAt;
+    analytics[provider] = emptied;
+  }
+  return { ...settings, analytics };
+}
+
 /**
  * Phase -1: canonical project-data persistence path.
  *
@@ -686,6 +721,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // Site-level project artifacts. The style rules' selectors and media
   // queries are written raw into the published stylesheet — same boundary.
   sanitizeProjectStyles(input.styles);
+  const settings = withValidAnalyticsIds(input.settings);
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
   // past the size cap is not stored — the save and its pages still land, the
@@ -721,9 +757,9 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
             ? undefined
             : ((input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull),
         projectSettings:
-          input.settings === undefined
+          settings === undefined
             ? undefined
-            : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
+            : ((settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
         dsSchemaVersion: input.dsSchemaVersion,
         // Undefined (an editor build that predates the field) leaves the
         // stored bindings alone; the editor always sends its full map.
@@ -740,6 +776,18 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       if (!current || current.deletedAt) throw new Error("SITE_NOT_FOUND");
       throw new Error(`SAVE_CONFLICT:${current.lastEditedAt.toISOString()}`);
     }
+
+    /* I-2: the page writes below go by id alone (upsert / update where {id}),
+       and the caller's role was checked on THIS site only — a page id that
+       already lives under another site would overwrite that site's page.
+       Refused here, inside the transaction, so nothing of the save lands.
+       Not a PermissionError: the router's FORBIDDEN is read by the editor as
+       a revoked role (view mode, "no access" copy), which this is not. */
+    const foreignPage = await tx.page.findFirst({
+      where: { id: { in: input.pages.map((p: { id: string }) => p.id) }, siteId: { not: input.siteId } },
+      select: { id: true },
+    });
+    if (foreignPage) throw new Error("PAGE_NOT_IN_SITE");
 
     if (isFullSnapshot) {
       const existingPages = await tx.page.findMany({

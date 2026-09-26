@@ -13,7 +13,7 @@
 import { useEffect, useId, useState } from "react";
 import { Checkbox } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
-import { writeClipboardText } from "@lib/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, InputField, Pill } from "@/components/dashboard/primitives";
 import { IntegrationCard } from "@/components/settings/integration-card";

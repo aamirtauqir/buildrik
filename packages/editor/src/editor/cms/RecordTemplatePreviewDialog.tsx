@@ -1,7 +1,8 @@
 /**
  * RecordTemplatePreviewDialog — "Preview saved record" (7116:76427). Opens
  * the collection's template page rendered read-only with this record's
- * data, in an overlay (with "Open in new tab" for the full-width look).
+ * data, in an overlay (with "Open in new tab" for the full-width look —
+ * the same sandboxed iframe, in a blank tab).
  * No template page chosen yet → a clear message that links to the
  * Dynamic pages template picker instead of a dead preview.
  *
@@ -64,11 +65,27 @@ export function RecordTemplatePreviewDialog({
     };
   }, [composer, collection, record]);
 
+  /* I-1a: a blob: URL page runs with the app's origin (and its CSP allows
+     'unsafe-inline'), while the preview keeps the exported <head> unsanitized.
+     The new tab is an about:blank shell holding the page in the same
+     `sandbox=""` iframe the dialog uses — scripts never run and the frame's
+     origin is opaque. `noopener` would make window.open return null (nothing
+     to write into), so the opener link is cut by hand instead. */
   const openInNewTab = () => {
     if (state.kind !== "html") return;
-    const url = URL.createObjectURL(new Blob([state.html], { type: "text/html" }));
-    window.open(url, "_blank", "noopener");
-    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    const tab = window.open("about:blank", "_blank");
+    if (!tab) return;
+    tab.opener = null;
+    const doc = tab.document;
+    doc.title = `${collection.name} preview`;
+    const style = doc.createElement("style");
+    style.textContent = "html,body{margin:0;height:100%}iframe{display:block;border:0;width:100%;height:100%}";
+    doc.head.appendChild(style);
+    const frame = doc.createElement("iframe");
+    frame.setAttribute("sandbox", "");
+    frame.setAttribute("srcdoc", state.html);
+    frame.title = doc.title;
+    doc.body.appendChild(frame);
   };
 
   return (
