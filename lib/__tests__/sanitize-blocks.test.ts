@@ -460,6 +460,18 @@ describe("sanitizeGeneratedPageHtml", () => {
     expect(out).toContain('name="submit"');
   });
 
+  it("a substituted value that spells a span placeholder cannot restore a script into an attribute (SAFE_FOR_XML)", () => {
+    // Entity-escaped as substitution leaves it; the parser decodes it to the
+    // literal placeholder text, which serialization would write back raw.
+    const forged = "&lt;style&gt;/*BD_DYNPAGE_SPAN_0*/&lt;/style&gt;";
+    const html =
+      '<html><head><script>var q = "\\" onmouseover=alert(1) x=\\"";</script></head>' +
+      `<body><div title="${forged}">x</div><a href="javascript:alert(1)">y</a></body></html>`;
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out.match(/<script>/g)).toHaveLength(1);
+    expect(out).toContain("<div>x</div>");
+  });
+
   it("drops srcdoc (the shared FORBIDDEN_ATTRIBUTES) from a generated page", () => {
     const out = sanitizeGeneratedPageHtml('<html><body><iframe srcdoc="&lt;img src=x onerror=alert(1)&gt;" title="ok"></iframe>x</div></body></html>');
     expect(out).not.toMatch(/srcdoc/i);

@@ -298,6 +298,13 @@ export function sanitizeTemplateHtml(html: string): string {
 const SCRIPT_STYLE_SPAN_RE = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
 const SPAN_PLACEHOLDER = (i: number) => `<style>/*BD_DYNPAGE_SPAN_${i}*/</style>`;
 const SPAN_PLACEHOLDER_RE = /<style>\/\*BD_DYNPAGE_SPAN_(\d+)\*\/<\/style>/g;
+// The restore below is a plain string replace over the serialized output, and
+// serialization writes attribute values with `<` unescaped: a substituted
+// value that spells a placeholder (`&lt;style&gt;/*BD_DYNPAGE_SPAN_0*/…`) comes
+// out as the literal placeholder inside an attribute and would get a script
+// span restored into it. What stops that is DOMPurify's SAFE_FOR_XML (on by
+// default, and it runs before `forceKeepAttr`): it removes any attribute
+// whose value contains `</style`. Never turn it off for this pass.
 
 /**
  * Sanitize a fully-substituted CMS dynamic-page HTML document. Every
