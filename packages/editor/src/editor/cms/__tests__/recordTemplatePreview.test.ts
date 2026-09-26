@@ -62,4 +62,22 @@ describe("renderRecordTemplatePreview", () => {
     expect(out.ok).toBe(true);
     if (out.ok) expect(out.html).not.toMatch(/javascript:/i);
   });
+
+  it("x4 round 3: keeps the export's own <head> — the page stylesheet reaches the preview — and sanitizes only the body", async () => {
+    const head =
+      '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>{name}</title>' +
+      "<style>.hero{color:#1A56DB}</style></head><body>";
+    exportPublishPagesMock.mockResolvedValueOnce([
+      { path: "menu-item.html", html: `${head}<h1 class="hero">{name}</h1><a href="{link}">Go</a></body></html>` },
+    ]);
+    const record = { ...RECORD, data: { name: "Margherita & Basil", link: "javascript:alert(1)" } };
+    const out = await renderRecordTemplatePreview({} as never, MENU, record);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.html.startsWith(head)).toBe(true);
+    expect(out.html).toContain("<style>.hero{color:#1A56DB}</style>");
+    expect(out.html).toContain('<h1 class="hero">Margherita &amp; Basil</h1>');
+    expect(out.html).not.toMatch(/javascript:/i);
+    expect(out.html.endsWith("</body></html>")).toBe(true);
+  });
 });

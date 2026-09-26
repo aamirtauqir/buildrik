@@ -43,21 +43,22 @@ export async function renderRecordTemplatePreview(
   }
   const page = pages.find((p) => p.path === collection.pageTemplatePath);
   if (!page) return { ok: false, reason: "template-missing" };
-  const substituted = page.html.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
+  /* The export's own head — the inlined page stylesheet (exportPublishPages)
+     and SEO tags — came from the exporter, not from the record, and is kept
+     as it is: sanitizing the whole page in fragment mode returned the body
+     alone, so the preview rendered without any CSS. Only the body, where the
+     record's values land, is substituted and sanitized (`{field}` tokens in
+     the head, e.g. a bound <title>, are not visible in the preview). This is
+     the client-side twin of the server's substitution + sanitizeGeneratedPageHtml
+     (cms.service.ts — server-only, jsdom); the preview iframe stays
+     `sandbox=""` (RecordTemplatePreviewDialog.tsx). */
+  const bodyOpen = /<body\b[^>]*>/i.exec(page.html);
+  const bodyStart = bodyOpen ? bodyOpen.index + bodyOpen[0].length : 0;
+  const bodyEnd = bodyOpen ? page.html.lastIndexOf("</body>") : -1;
+  const end = bodyEnd >= bodyStart ? bodyEnd : page.html.length;
+  const body = page.html.slice(bodyStart, end).replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
     const v = record.data[key];
     return v === undefined || v === null ? "" : escapeHtml(String(v));
   });
-  /* Controller review round 2: this duplicates cms.service.ts's server-side
-     substitution (a different environment — server uses isomorphic-dompurify/
-     jsdom, this runs in the browser bundle and must not pull that in) and,
-     before this fix, had no scheme check at all — a `javascript:` value
-     substituted into `href="{field}"` above survives entity-escaping (it has
-     no `<`, `>` or `"`). The server pass runs a full parser-based sanitizer
-     over the whole page (`sanitizeGeneratedPageHtml`); this is a preview
-     rendered into a `sandbox=""` iframe (RecordTemplatePreviewDialog.tsx —
-     never removes that sandbox attribute), so the editor's own canonical
-     `sanitizeHTML` (browser DOMPurify) closing the same class of gap here is
-     sufficient defense-in-depth without needing the same srcset/style url()
-     hooks the server pass adds for the PUBLISHED page. */
-  return { ok: true, html: sanitizeHTML(substituted) };
+  return { ok: true, html: page.html.slice(0, bodyStart) + sanitizeHTML(body) + page.html.slice(end) };
 }
