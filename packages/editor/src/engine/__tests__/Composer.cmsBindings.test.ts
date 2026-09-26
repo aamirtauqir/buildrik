@@ -10,6 +10,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { EVENTS } from "../../shared/constants/events";
 import {
   installEngineBrowserStubs,
   removeEngineBrowserStubs,
@@ -63,6 +64,45 @@ describe("Composer — CMS bindings round-trip", () => {
     c.cms.bindings.unbindAll(el.getId());
     expect(c.elements.getElement(el.getId())!.toHTML()).toContain("&lt;img");
     expect(c.elements.getElement(el.getId())!.toHTML()).not.toContain("<img");
+  });
+
+  /* Lv3 #2: import() re-ran bind() per entry, whose applyBinding wrote the
+     resolved value through setContent -> markDirty -> PROJECT_CHANGED. Every
+     open of a site with a binding therefore dirtied the page and autosaved —
+     a VIEWER got a 403 "Couldn't save" banner on plain load — and when the
+     CMS store was not loaded yet the fallback "" overwrote the stored text.
+     Loading restores the map only; the canvas preview (useCMSPreview) shows
+     the bound value, and publish resolves it server-side. */
+  it("loading a project with bindings leaves it clean and its stored content intact", async () => {
+    const a = createTestComposer();
+    const page = a.elements.getActivePage() ?? a.elements.createPage("Home");
+    const el = a.elements.createElement("text", { content: "About" });
+    a.elements.addElement(el, page.root.id);
+    const snapshot = a.exportProject();
+    snapshot.cmsBindings = {
+      field: {
+        [el.getId()]: [
+          {
+            binding: { sourceId: "cms:col-1", path: "title", type: "variable" },
+            collectionId: "col-1", fieldSlug: "title", property: "content",
+          },
+        ],
+      },
+      collection: {},
+    } as never;
+
+    const b = createTestComposer();
+    const resolve = vi.spyOn(b.cms.bindings, "resolveBinding").mockResolvedValue("Verify Post 1");
+    const changed = vi.fn();
+    b.on(EVENTS.PROJECT_CHANGED, changed);
+    b.importProject(snapshot);
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(b.cms.bindings.getBindings(el.getId())).toHaveLength(1);
+    expect(b.isDirty()).toBe(false);
+    expect(changed).not.toHaveBeenCalled();
+    expect(resolve).not.toHaveBeenCalled();
+    expect(b.elements.getElement(el.getId())!.getContent()).toBe("About");
   });
 
   /* Ldata round 3 (I1): bindings reach import() from version restore, the
