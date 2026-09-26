@@ -134,9 +134,10 @@ export interface StudioPanelsProps {
    *  floating an absolute overlay on top of it. AquibraStudio owns the open
    *  state and builds the panel (it needs `composer.designSystem` +
    *  `requestBrandToken`, already in scope there); this just says where it
-   *  renders. */
+   *  renders. It is handed the back row's action (M-1: "‹ Inspector" leads
+   *  to the inspector, shown even if it was hidden). */
   issuesOpen?: boolean;
-  issuesPanel?: React.ReactNode;
+  renderIssuesPanel?: (onBack: () => void) => React.ReactNode;
   onCloseIssues?: () => void;
   /** FB-4: server flag for the agency review layer — see `TabRouter.reviewsEnabled`. */
   reviewsEnabled?: boolean | null;
@@ -220,7 +221,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   nextMove = null,
   onRequestPublish,
   issuesOpen = false,
-  issuesPanel,
+  renderIssuesPanel,
   onCloseIssues,
   reviewsEnabled,
 }) => {
@@ -434,7 +435,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* The inspector BODY (ProInspector) is on screen: its column is open and no
      mode (Issues · a column tab · AI) has replaced it. */
   const inspectorBodyShown =
-    !readOnlyView && inspectorOpen && !(issuesOpen && issuesPanel) && !rightColumnTab && !aiInInspector;
+    !readOnlyView && inspectorOpen && !(issuesOpen && renderIssuesPanel) && !rightColumnTab && !aiInInspector;
 
   /* I-1: UI_INSPECTOR_FOCUS_SECTION ("Bind to CMS field…", "Add
      interaction", ⌘K Jump to property) is heard by the inspector body. With a
@@ -839,8 +840,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           ) : null
         ) : (
         <LayoutShell.Inspector>
-          {issuesOpen && issuesPanel ? (
-            issuesPanel
+          {issuesOpen && renderIssuesPanel ? (
+            renderIssuesPanel(() => {
+              onCloseIssues?.();
+              setInspectorShown(true);
+            })
           ) : rightColumnTab ? (
             columnPanel
           ) : aiInInspector ? (
@@ -849,7 +853,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               isExpanded={false}
               onExpandToggle={() => {}}
               onClose={() => setAiInInspector(false)}
-              onBack={() => setAiInInspector(false)}
+              /* M-1: "‹ Inspector" leads to the inspector — shown even if it
+                 was hidden, where closing AI alone took the column with it. */
+              onBack={() => {
+                setAiInInspector(false);
+                setInspectorShown(true);
+              }}
             />
           ) : (
           <ProInspector

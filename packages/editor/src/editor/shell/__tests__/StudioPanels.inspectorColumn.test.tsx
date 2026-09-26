@@ -192,3 +192,46 @@ describe("StudioPanels — Hide inspector (GW-3 / M-2)", () => {
     expect(screen.queryByText("Inspector hidden")).toBeNull();
   });
 });
+
+/* M-1: "‹ Inspector" is a promise. With the inspector hidden it closed the
+   mode and the whole column went with it — no inspector. It now goes where it
+   says: the mode closes and the inspector shows. */
+describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
+  it("AI's back row shows the inspector even when it was hidden", () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
+    fireEvent.click(screen.getByRole("button", { name: "‹ Inspector" }));
+    expect(screen.queryByTestId("ai-tab")).toBeNull();
+    expect(screen.getByTestId("pro-inspector")).toBeTruthy();
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+
+  it("AI's ✕ leaves a hidden inspector hidden", () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("Issues' back row gets the same promise", () => {
+    const composer = makeComposer();
+    const onCloseIssues = vi.fn();
+    const { rerender } = render(
+      <Harness
+        composer={composer}
+        issuesOpen
+        onCloseIssues={onCloseIssues}
+        renderIssuesPanel={(onBack) => <button onClick={onBack}>Issues back</button>}
+      />,
+    );
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    fireEvent.click(screen.getByRole("button", { name: "Issues back" }));
+    expect(onCloseIssues).toHaveBeenCalled();
+    rerender(<Harness composer={composer} issuesOpen={false} onCloseIssues={onCloseIssues} />);
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+});
