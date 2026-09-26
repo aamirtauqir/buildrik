@@ -115,3 +115,12 @@ describe("CSS inside a <style> cannot close it", () => {
     expect(scripts(written.join("")).join()).not.toContain("alert");
   });
 });
+
+describe("single-file export class attribute", () => {
+  it("is escaped like the published writer's", () => {
+    const c = composer({ classes: ['x" onmouseover="alert(6)'] });
+    const html = new ExportEngine(c).generateHTML({ cssStyle: "embedded" });
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    expect(doc.querySelector("[onmouseover]")).toBeNull();
+  });
+});

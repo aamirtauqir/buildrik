@@ -416,7 +416,7 @@ export class ExportEngine {
     const newline = config.minify ? "" : "\n";
 
     // Build attributes
-    const attrParts: string[] = [`class="${className}"`];
+    const attrParts: string[] = [`class="${escapeHTML(className)}"`];
 
     /* Emit every attribute the element carries, the way the multi-page writer
        below already does. This was a five-name whitelist — alt, href, src,
