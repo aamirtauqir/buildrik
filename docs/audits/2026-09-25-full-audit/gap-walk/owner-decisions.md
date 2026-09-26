@@ -23,6 +23,8 @@ Today the canvas menu row opens the CMS workspace on its collection list. That v
 
 **Recommendation.** Point the row at the inspector's binding section for the selected element. It is size M with no server change, which is why it is also in the fix lane's list. It is logged here too because it depends on the owner picking the canonical binding home (inspector, not CMS).
 
+**Lane Lgw (2026-09-26).** Done as recommended: the row now selects the element and reveals Inspector › Content (the existing Source · Collection · Field picker) through `UI_INSPECTOR_FOCUS_SECTION`, the same door "Add interaction" uses. No new screen was built. If the owner wants the CMS workspace as the binding home instead, this is a one-line revert.
+
 ## OD-GW-3 · Should view mode have a command palette? (S–M)
 
 View mode refuses ⌘K by design (`StudioHeader.tsx:343`). Two things follow from that:

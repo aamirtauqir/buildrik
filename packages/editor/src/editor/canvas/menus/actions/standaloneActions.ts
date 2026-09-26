@@ -64,11 +64,12 @@ export const standaloneActions: ContextAction[] = [
     icon: "database",
     group: "standalone",
     isVisible: ({ element, isRoot }) => !isRoot && BINDABLE_TYPES.has(element.getType?.() ?? ""),
+    // Binding happens in the inspector's Content section (Source · Collection ·
+    // Field, board 4428:149540). This row opened the CMS workspace instead —
+    // a collection list over the canvas, no field picker (gap walk 93 #4).
     handler: ({ composer, element }) => {
-      // The CMS panel binds the CURRENT selection (Content › record › field);
-      // select first so the panel opens on the right element.
       composer.selection.select(element as never);
-      composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "content" });
+      composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" });
     },
   },
   {
