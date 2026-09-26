@@ -149,16 +149,22 @@ export interface StudioHeaderProps {
  * "Not sent" is drawn only where a send is the site's next act — an
  * approval workspace. Elsewhere, with no round, the control is still there:
  * board 4418:123573 draws a permanent Review door ("Review ›"), so the
- * no-round state is that door without a count (owner flag 2026-09-24).
+ * no-round state is that door without a count (owner flag 2026-09-24) —
+ * BUT ONLY where reviews are enabled for the site. TabRouter's "review"
+ * case returns null for every state when `!reviewsEnabled`
+ * (TabRouter.tsx:239), so a chip offered anyway opened a door onto a blank
+ * panel (A-8 round 2). Return null instead of a pill in that case — same
+ * "no door, not a disabled one" rule the Comments toggle already follows.
  */
 function reviewChip(
   status: ReviewStatus,
   openCount: number | null,
-): Omit<ReviewPill, "onClick"> {
+): Omit<ReviewPill, "onClick"> | null {
+  if (!status.reviewsEnabled) return null;
   const who = status.reviewerName;
   switch (status.state) {
     case "none":
-      return status.reviewsEnabled && status.editsRequireApproval
+      return status.editsRequireApproval
         ? { label: "Not sent", tone: "info", title: "Not sent for review yet" }
         : { label: "Review", tone: "neutral", title: "Open Review" };
     case "pending":
@@ -799,8 +805,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     );
   }, [publishedUrl, addToast]);
 
-  // F3: every review state opens the same door — the Review panel.
-  const review: ReviewPill = { ...reviewChip(reviewStatus, openCommentCount), onClick: onOpenReview };
+  // F3: every review state opens the same door — the Review panel. `null`
+  // (reviews disabled for this site) means no door at all — see reviewChip.
+  const reviewChipResult = reviewChip(reviewStatus, openCommentCount);
+  const review: ReviewPill | null = reviewChipResult ? { ...reviewChipResult, onClick: onOpenReview } : null;
 
   return (
     <div className="bk-header" ref={headerRef}>

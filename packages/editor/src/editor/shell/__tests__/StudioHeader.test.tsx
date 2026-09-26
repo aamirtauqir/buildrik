@@ -553,6 +553,21 @@ describe("StudioHeader", () => {
       fireEvent.click(door);
       expect(onOpenReview).toHaveBeenCalledTimes(1);
     });
+
+    /* A-8 round 2: with reviewsEnabled false, TabRouter renders `null` for
+       the "review" tab (TabRouter.tsx:239 `if (!reviewsEnabled) return
+       null;`) — the permanent "Review ›" door from the case above led
+       straight into a blank panel. There is nowhere for this door to open
+       to, so it must not render, same as the Comments toggle right above. */
+    it("A-8 round 2: reviewsEnabled false — no Review door at all (it would open a blank panel)", () => {
+      const onOpenReview = vi.fn();
+      render(
+        <StudioHeader
+          {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "none", editsRequireApproval: false, reviewsEnabled: false }) })}
+        />,
+      );
+      expect(screen.queryByTestId("topbar-review-pill")).toBeNull();
+    });
   });
 
   /* Rewritten 2026-08-23. These asserted that view mode REPLACED Publish with
