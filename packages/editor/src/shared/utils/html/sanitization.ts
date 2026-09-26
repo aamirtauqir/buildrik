@@ -18,7 +18,19 @@
  */
 
 import DOMPurify from "dompurify";
+import {
+  FORBIDDEN_ATTRIBUTES,
+  URL_ATTRIBUTES,
+  isDangerousUrl,
+  isSafeCssDeclaration,
+  isSafeElementId,
+  isValidAttributeName,
+  withSafeTargets,
+  srcsetUrls,
+  toAllowedElementTag,
+} from "@buildrik/shared/schemas/element-markup";
 import type { ElementData } from "../../types";
+import { generateId } from "../helpers/id";
 import {
   ALLOWED_URL_SCHEMES,
   ALLOWED_SRC_SCHEMES,
@@ -28,7 +40,6 @@ import {
 
 // Re-export config for convenience
 export {
-  DEFAULT_ALLOWED_TAGS,
   DEFAULT_ALLOWED_ATTRS,
   ALLOWED_URL_SCHEMES,
   ALLOWED_SRC_SCHEMES,
@@ -43,6 +54,9 @@ export {
  * Check if a URL is safe
  */
 export function isSafeUrl(url: string, allowedSchemes: Set<string> = ALLOWED_URL_SCHEMES): boolean {
+  // The scheme as a browser reads it (controls/whitespace inside it ignored),
+  // shared with the server sanitizer.
+  if (isDangerousUrl(url)) return false;
   const trimmed = url.trim().toLowerCase();
 
   // Check for dangerous patterns
@@ -67,33 +81,34 @@ export function isSafeUrl(url: string, allowedSchemes: Set<string> = ALLOWED_URL
 }
 
 /**
- * Check if an attribute value is safe
+ * Check if an attribute (name and value) is safe to emit.
+ *
+ * The name is emitted raw, so one that is not a plain attribute name
+ * ("x onerror=alert(1) y") is refused. `srcdoc` is refused outright: it is a
+ * whole document that runs in this origin. Every URL attribute in the shared
+ * list is scheme-checked, not only href/src/action (A19-1).
  */
 export function isSafeAttrValue(attr: string, value: string, _tag: string): boolean {
-  const lower = value.toLowerCase().trim();
+  if (!isValidAttributeName(attr)) return false;
+  const name = attr.toLowerCase();
+  if (FORBIDDEN_ATTRIBUTES.has(name)) return false;
 
-  // Check dangerous patterns
+  // Event handlers are always dangerous
+  if (name.startsWith("on")) return false;
+
+  const lower = value.toLowerCase().trim();
   for (const pattern of DANGEROUS_PATTERNS) {
     if (pattern.test(lower)) {
       return false;
     }
   }
 
-  // URL attributes need special validation. `src` additionally allows blob:,
-  // which is how a just-uploaded image is previewed before it reaches a server.
-  if (attr === "src") {
-    return isSafeUrl(value, ALLOWED_SRC_SCHEMES);
-  }
-  if (attr === "href" || attr === "action") {
-    return isSafeUrl(value);
-  }
-
-  // Event handlers are always dangerous
-  if (attr.startsWith("on")) {
-    return false;
-  }
-
-  return true;
+  if (!URL_ATTRIBUTES.has(name)) return true;
+  // Media sources additionally allow blob:, which is how a just-uploaded image
+  // is previewed before it reaches a server. Never on a navigable URL.
+  if (name === "srcset") return srcsetUrls(value).every((url) => isSafeUrl(url, ALLOWED_SRC_SCHEMES));
+  if (name === "src" || name === "poster") return isSafeUrl(value, ALLOWED_SRC_SCHEMES);
+  return isSafeUrl(value);
 }
 
 // =============================================================================
@@ -139,7 +154,11 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
     config.ALLOWED_TAGS = Array.from(allowedTags);
   }
 
-  return DOMPurify.sanitize(html, config) as unknown as string;
+  // `target` is kept (EDITOR_ADD_ATTR), so every link that has it also gets
+  // rel="noopener noreferrer" — the same rule the server applies.
+  return withSafeTargets(DOMPurify.sanitize(html, config), (clean) =>
+    DOMPurify.sanitize(clean, { ...config, RETURN_DOM_FRAGMENT: true })
+  );
 }
 
 /**
@@ -159,19 +178,52 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
  *
  * Only unsafe attributes go — the same `isSafeAttrValue` test the serializers
  * use, so nothing legitimate is lost.
+ *
+ * A `tagName` off the shared allowlist (or malformed, e.g.
+ * "img src=x onerror=… x") becomes "div": the tag is emitted raw into canvas
+ * markup, so it is as much an injection point as any attribute.
+ *
+ * An `id` that is not a plain word gets a fresh one (the node stays): ids are
+ * written into selectors (`.buildrick-<id>`, `[data-buildrick-id="<id>"]`).
+ * A style rule naming the old id could not pass the selector rule either.
  */
 export function sanitizeElementTreeContent(data: ElementData): void {
+  if (data.id !== undefined && !isSafeElementId(data.id)) data.id = generateId("el");
+  if (data.tagName) data.tagName = toAllowedElementTag(data.tagName);
   if (typeof data.content === "string" && data.content.length > 0) {
     data.content = sanitizeHTML(data.content);
   }
+  // Stored JSON of any shape reaches here (a component master is only
+  // z.record-checked on the server), so a wrong-typed field is dropped or
+  // skipped, never dereferenced.
+  if (data.attributes !== undefined && !isPlainRecord(data.attributes)) delete data.attributes;
   if (data.attributes) {
     for (const [name, value] of Object.entries(data.attributes)) {
-      if (!isSafeAttrValue(name, value, data.tagName ?? "")) {
+      if (typeof value !== "string" || !isSafeAttrValue(name, value, data.tagName ?? "")) {
         delete data.attributes[name];
       }
     }
   }
-  data.children?.forEach((child) => sanitizeElementTreeContent(child));
+  // Written into a published <style> by the export: nothing that could leave it.
+  dropUnsafeDeclarations(data.styles);
+  if (isPlainRecord(data.breakpointStyles)) {
+    for (const map of Object.values(data.breakpointStyles ?? {})) dropUnsafeDeclarations(map);
+  }
+  if (!Array.isArray(data.children)) return;
+  for (const child of data.children) {
+    if (isPlainRecord(child)) sanitizeElementTreeContent(child);
+  }
+}
+
+function dropUnsafeDeclarations(styles: Record<string, string> | undefined): void {
+  if (!isPlainRecord(styles) || !styles) return;
+  for (const [key, value] of Object.entries(styles)) {
+    if (!isSafeCssDeclaration(key, value)) delete styles[key];
+  }
+}
+
+function isPlainRecord(value: unknown): boolean {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**

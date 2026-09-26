@@ -8,11 +8,14 @@
  * @license BSD-3-Clause
  */
 import { prisma } from "@/lib/prisma";
+import { sanitizeVersionPayload } from "@/lib/sanitize-blocks";
 import type { CreateSiteVersionInput } from "@buildrik/shared/schemas/site-version";
 
 const MAX_VERSIONS_PER_SITE = 50;
 
 export async function createSiteVersion(input: CreateSiteVersionInput): Promise<{ versionId: string }> {
+  // A restore imports this snapshot straight into the canvas.
+  const payload = sanitizeVersionPayload(input.payload);
   const row = await prisma.siteVersion.upsert({
     where: { siteId_versionId: { siteId: input.siteId, versionId: input.versionId } },
     create: {
@@ -20,13 +23,13 @@ export async function createSiteVersion(input: CreateSiteVersionInput): Promise<
       versionId: input.versionId,
       name: input.name,
       isAuto: input.isAuto,
-      payload: input.payload as never,
+      payload: payload as never,
       createdBy: input.createdBy ?? null,
     },
     update: {
       name: input.name,
       isAuto: input.isAuto,
-      payload: input.payload as never,
+      payload: payload as never,
     },
   });
   await pruneSiteVersions(input.siteId);

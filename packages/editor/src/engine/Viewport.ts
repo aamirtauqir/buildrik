@@ -11,6 +11,7 @@ import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "../shared/constants/breakpoin
 import type { DeviceType, DeviceConfig } from "../shared/types";
 import { clamp } from "../shared/utils/helpers";
 import type { Composer } from "./Composer";
+import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 
 /**
  * Viewport manager for canvas display
@@ -170,7 +171,7 @@ export class Viewport {
         <style>
           * { box-sizing: border-box; }
           body { margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-          ${css || ""}
+          ${escapeStyleText(css || "")}
         </style>
       </head>
       <body>

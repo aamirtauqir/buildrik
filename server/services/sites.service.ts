@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { sanitizeBlocks } from "@/lib/sanitize-blocks";
+import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
 import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
@@ -633,6 +633,10 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // for every page — that's how we infer the editor sent a full project
   // snapshot, not a partial blocks update).
   const isFullSnapshot = input.pages.every((p: { position?: number }) => p.position !== undefined);
+
+  // Site-level project artifacts. The style rules' selectors and media
+  // queries are written raw into the published stylesheet — same boundary.
+  sanitizeProjectStyles(input.styles);
 
   await prisma.$transaction(async (tx) => {
     /* 61-conflict / A-2: optimistic concurrency as a compare-and-swap, FIRST in

@@ -69,7 +69,6 @@ export { escapeAttr, escapeHTML, unescapeHTML } from "./encoding";
 // =============================================================================
 
 export {
-  DEFAULT_ALLOWED_TAGS,
   DEFAULT_ALLOWED_ATTRS,
   ALLOWED_URL_SCHEMES,
   sanitizeHTML,

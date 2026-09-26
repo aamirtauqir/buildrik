@@ -8,6 +8,7 @@
  * @license BSD-3-Clause
  */
 import { prisma } from "@/lib/prisma";
+import { sanitizeComponentPayload } from "@/lib/sanitize-blocks";
 import type { UpsertSiteComponentInput } from "@buildrik/shared/schemas/site-component";
 import { siteScopeWhere } from "@/server/services/permission.service";
 
@@ -20,19 +21,21 @@ export async function upsertSiteComponent(
     const page = await prisma.page.findUnique({ where: { id: pageId }, select: { siteId: true } });
     if (!page || page.siteId !== input.siteId) throw new Error("PAGE_NOT_FOUND");
   }
+  // Masters are shared across the workspace and rendered on the canvas.
+  const payload = sanitizeComponentPayload(input.payload);
   const row = await prisma.siteComponent.upsert({
     where: { siteId_componentId: { siteId: input.siteId, componentId: input.componentId } },
     create: {
       siteId: input.siteId,
       componentId: input.componentId,
       name: input.name,
-      payload: input.payload as never,
+      payload: payload as never,
       pageId,
       createdBy: input.createdBy ?? null,
     },
     update: {
       name: input.name,
-      payload: input.payload as never,
+      payload: payload as never,
       pageId,
     },
   });

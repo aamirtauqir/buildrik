@@ -266,13 +266,9 @@ export async function syncInstance(
   try {
     const index = parent.getChildIndex(element);
 
-    // Fully delete the OLD instance subtree from the ElementManager registry —
-    // not just detach it from the tree. removeChild alone leaves every old
-    // clone Element registered, so each sync leaks the previous subtree
-    // (getAllElements / findByMediaSrc keep seeing stale nodes). removeElement
-    // both unlinks from the parent and deregisters the whole subtree.
-    composer.elements.removeElement(elementId);
-
+    // Build and mount the NEW tree before the old one goes: anything below can
+    // throw on a malformed master, and the catch below does not roll back — a
+    // failure used to leave the instance deleted from the canvas.
     const clonedData = cloneWithNewIds(component.masterTree);
 
     // F1a core fix: re-apply the instance's stored overrides onto the freshly
@@ -285,8 +281,16 @@ export async function syncInstance(
     const { applied, dropped, kept } = applyOverridesToTree(clonedData, instance.overrides);
     overridesDropped = dropped;
 
+    // Inserted at the old instance's index, so it lands just before it.
     const newElement = composer.elements.pasteElement(clonedData, parent, index, false);
     if (!newElement) throw new Error("Failed to re-instantiate during sync");
+
+    // Fully delete the OLD instance subtree from the ElementManager registry —
+    // not just detach it from the tree. removeChild alone leaves every old
+    // clone Element registered, so each sync leaks the previous subtree
+    // (getAllElements / findByMediaSrc keep seeing stale nodes). removeElement
+    // both unlinks from the parent and deregisters the whole subtree.
+    composer.elements.removeElement(elementId);
 
     const newInstance: ComponentInstance = {
       ...instance,
