@@ -182,8 +182,12 @@ export function RootView({
               reads to that gate as the line having been deleted. */}
           Collections turn a spreadsheet into pages — one page per row, updated when the data changes.
         </EmptyStateDesc>
-        {onCreateCollection ? (
-          <EmptyStateActions>
+        {/* A-17/A09-8: the zero state offered only Create a collection — the
+            Sources/Variables/Conditions doors this tab also owns had no way
+            in until the user first created a collection. All three routes
+            are wired regardless of collection count. */}
+        <EmptyStateActions>
+          {onCreateCollection ? (
             <Button
               color="light"
               size="xs"
@@ -193,8 +197,35 @@ export function RootView({
             >
               Create a collection
             </Button>
-          </EmptyStateActions>
-        ) : null}
+          ) : null}
+          <Button
+            color="light"
+            size="xs"
+            variant="link" className="tw:min-h-6 tw:font-normal"
+            data-testid="content-empty-sources"
+            onClick={onOpenSources}
+          >
+            Open Sources
+          </Button>
+          <Button
+            color="light"
+            size="xs"
+            variant="link" className="tw:min-h-6 tw:font-normal"
+            data-testid="content-empty-variables"
+            onClick={onOpenVariables}
+          >
+            Open Variables
+          </Button>
+          <Button
+            color="light"
+            size="xs"
+            variant="link" className="tw:min-h-6 tw:font-normal"
+            data-testid="content-empty-conditions"
+            onClick={onOpenConditions}
+          >
+            Open Conditions
+          </Button>
+        </EmptyStateActions>
       </EmptyState>
     );
   }

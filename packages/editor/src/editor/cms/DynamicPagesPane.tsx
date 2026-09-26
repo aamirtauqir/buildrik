@@ -58,7 +58,7 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
   const drafts = records.length - published.length;
   const urls = trimmed && unknown.length === 0 ? published.map((r) => resolveUrl(trimmed, r.data)) : [];
   const collide = urls.length !== new Set(urls).size;
-  const ready = Boolean(trimmed) && unknown.length === 0 && Boolean(template) && published.length > 0 && !collide;
+  const ready = Boolean(trimmed) && unknown.length === 0 && Boolean(templateName) && published.length > 0 && !collide;
   const dirty = trimmed !== (collection.pageSlugPattern ?? "") || template !== (collection.pageTemplatePath ?? "");
   const slugField = collection.fields.find((f) => f.slug === "slug") ?? collection.fields[0];
   const fix = unknown.length && slugField ? trimmed.replace(`{${unknown[0]}}`, `{${slugField.slug}}`) : null;
@@ -109,6 +109,14 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
     );
   } else if (!template) {
     status = <span className={WARN} data-testid="cms-dp-status">Choose a template page — without one, publishing emits none of these.</span>;
+  } else if (!templateName) {
+    /* A09-8/A-17: the saved template page can go missing (renamed or
+       deleted) without this pane's own state changing — `template` still
+       holds the old file name, so `ready` looked true while the publish
+       service would silently skip every record for this collection
+       (`appendDynamicPagesToPublish`'s `if (!template) continue`). Surface
+       the dangling reference instead of claiming Ready. */
+    status = <span className={WARN} data-testid="cms-dp-status">The saved template page is missing — choose one again, or publishing generates none of these.</span>;
   } else if (collide) {
     status = <span className={WARN} data-testid="cms-dp-status">Two records resolve to the same URL — add a field that differs, such as {"{slug}"}.</span>;
   } else {

@@ -25,6 +25,14 @@ describe("ContentTab", () => {
     expect(screen.getByRole("button", { name: "Create a collection" })).toBeInTheDocument();
   });
 
+  it("A-17/A09-8: the zero state also offers the Sources/Variables/Conditions doors it owns", async () => {
+    const { composer } = makeEngine();
+    render(<ContentTab composer={composer as never} onCreateCollection={vi.fn()} />);
+    await screen.findByTestId("content-empty");
+    fireEvent.click(screen.getByTestId("content-empty-sources"));
+    expect(await screen.findByRole("button", { name: "+ Connect a source" })).toBeInTheDocument();
+  });
+
   it("root lists collections with record counts and the Data rows", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     render(<ContentTab composer={composer as never} />);
