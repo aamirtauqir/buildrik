@@ -16,6 +16,10 @@ const src = readFileSync(
   resolve(dirname(fileURLToPath(import.meta.url)), "../StudioPanels.tsx"),
   "utf8"
 );
+const tabsConfigSrc = readFileSync(
+  resolve(dirname(fileURLToPath(import.meta.url)), "../../rail/tabsConfig.ts"),
+  "utf8"
+);
 
 describe("StudioPanels — the two open requests wait here for a lazy panel", () => {
   it("listens for ui:settings-open and ui:pages-open-settings, and unsubscribes", () => {
@@ -72,8 +76,11 @@ describe("StudioPanels — ui:switch-tab respects the VIEWER rail gate", () => {
     );
     // The rail's gate — same function, not a re-derived VIEWER_TABS.has(...) check.
     expect(src).toMatch(/if \(!isTabAllowedForViewer\(tab, viewerChrome\)\)/);
-    // Only ONE definition of the predicate exists in this file.
-    expect(src.match(/function isTabAllowedForViewer/g)).toHaveLength(1);
+    // Imported from the tab registry, not locally re-defined here.
+    expect(src).toContain('import { getTabMode, isTabAllowedForViewer, VIEWER_TABS } from "../rail/tabsConfig"');
+    expect(src).not.toMatch(/function isTabAllowedForViewer/);
+    // Exactly ONE canonical definition exists, in the tab registry.
+    expect(tabsConfigSrc.match(/export function isTabAllowedForViewer/g)).toHaveLength(1);
   });
 
   it("the effect re-subscribes when viewerChrome changes (so a mid-session role change re-gates it)", () => {
@@ -83,17 +90,22 @@ describe("StudioPanels — ui:switch-tab respects the VIEWER rail gate", () => {
 
 describe("isTabAllowedForViewer", () => {
   it("a non-viewer may open any tab", async () => {
-    const { isTabAllowedForViewer } = await import("../StudioPanels");
+    const { isTabAllowedForViewer } = await import("../../rail/tabsConfig");
     expect(isTabAllowedForViewer("add" as never, false)).toBe(true);
     expect(isTabAllowedForViewer("content" as never, false)).toBe(true);
   });
 
-  it("a viewer may only open layers/assets", async () => {
-    const { isTabAllowedForViewer } = await import("../StudioPanels");
+  it("a viewer may only open layers/assets/history/review/activity (FC-9)", async () => {
+    const { isTabAllowedForViewer } = await import("../../rail/tabsConfig");
     expect(isTabAllowedForViewer("layers" as never, true)).toBe(true);
     expect(isTabAllowedForViewer("assets" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("history" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("review" as never, true)).toBe(true);
+    expect(isTabAllowedForViewer("activity" as never, true)).toBe(true);
     expect(isTabAllowedForViewer("add" as never, true)).toBe(false);
     expect(isTabAllowedForViewer("content" as never, true)).toBe(false);
+    expect(isTabAllowedForViewer("design" as never, true)).toBe(false);
+    expect(isTabAllowedForViewer("settings" as never, true)).toBe(false);
     expect(isTabAllowedForViewer("ai" as never, true)).toBe(false);
   });
 });

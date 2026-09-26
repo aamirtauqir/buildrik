@@ -7,7 +7,17 @@
  */
 
 import { renderHook, act } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+/* Fix round 1 (Lfix): openLeftPanelToTab/setLeftPanelTab is the ONE sink
+   every tab-open door funnels into (rail, ui:switch-tab, UI_PANEL_OPEN /
+   ⌘K, deep links, topbar buttons) — mocked directly so the viewer-gating
+   tests below are deterministic instead of racing the real
+   fetchMyRole → network path. Defaults to false (non-viewer) so every
+   pre-existing test in this file keeps exercising the ungated setters. */
+const mockViewerChrome = vi.hoisted(() => vi.fn<() => boolean>(() => false));
+vi.mock("../useEditorRole", () => ({ useViewerChrome: () => mockViewerChrome() }));
+
 import { useStudioState, type OverlayState } from "../useStudioState";
 
 const PANEL_STATE_KEY = "buildrick-panel-state";
@@ -24,6 +34,7 @@ describe("useStudioState", () => {
 
   afterEach(() => {
     localStorage.clear();
+    mockViewerChrome.mockReturnValue(false);
   });
 
   // Defaults -------------------------------------------------------------------
@@ -117,7 +128,55 @@ describe("useStudioState", () => {
       expect(remount.result.current.overlays.showRulers).toBe(true);
       expect(remount.result.current.overlays.showGuides).toBe(false);
     });
+  });
 
+  // VIEWER gate at the sink (fix round 1) ---------------------------------------
+  describe("openLeftPanelToTab / setLeftPanelTab — the VIEWER gate every door funnels into", () => {
+    it("a non-viewer may open any tab", () => {
+      mockViewerChrome.mockReturnValue(false);
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.openLeftPanelToTab("design"));
+      expect(result.current.leftPanelTab).toBe("design");
+      act(() => result.current.setLeftPanelTab("settings"));
+      expect(result.current.leftPanelTab).toBe("settings");
+    });
+
+    it("a viewer's openLeftPanelToTab no-ops for a disallowed tab (Brand)", () => {
+      mockViewerChrome.mockReturnValue(true);
+      const { result } = renderHook(() => useStudioState());
+      expect(result.current.leftPanelTab).toBe("add"); // default
+      act(() => result.current.openLeftPanelToTab("design"));
+      expect(result.current.leftPanelTab).toBe("add"); // unchanged
+    });
+
+    it("a viewer's openLeftPanelToTab no-ops for Settings and Add too", () => {
+      mockViewerChrome.mockReturnValue(true);
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.openLeftPanelToTab("settings"));
+      expect(result.current.leftPanelTab).toBe("add");
+      act(() => result.current.setLeftPanelTab("content"));
+      expect(result.current.leftPanelTab).toBe("add");
+    });
+
+    it("a viewer CAN still open layers/assets/history/review/activity (FC-9)", () => {
+      mockViewerChrome.mockReturnValue(true);
+      const { result } = renderHook(() => useStudioState());
+      for (const tab of ["layers", "assets", "history", "review", "activity"]) {
+        act(() => result.current.openLeftPanelToTab(tab));
+        expect(result.current.leftPanelTab).toBe(tab);
+      }
+    });
+
+    it("does not flip isLeftPanelOpen for a viewer's blocked openLeftPanelToTab", () => {
+      mockViewerChrome.mockReturnValue(true);
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.setIsLeftPanelOpen(false));
+      act(() => result.current.openLeftPanelToTab("design"));
+      expect(result.current.isLeftPanelOpen).toBe(false);
+    });
+  });
+
+  describe("panel-state persistence", () => {
     /* A payload written before overlays existed must not read as all-false —
        showGuides defaults on. */
     it("falls back to defaults for a stored payload with no overlays key", () => {
