@@ -6,6 +6,7 @@
 
 import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
+import { writeClipboardText } from "@/shared/utils/clipboard";
 
 export const editSubmenu: ContextAction[] = [
   {
@@ -22,8 +23,7 @@ export const editSubmenu: ContextAction[] = [
       // menu silently did nothing (the two used separate clipboards).
       if (composer) composer.clipboard = data ? [data] : null;
       const text = JSON.stringify(data, null, 2);
-      navigator?.clipboard
-        ?.writeText(text)
+      writeClipboardText(text)
         .then(() => {
           addToast?.({
             description: "Copied to clipboard",
@@ -62,7 +62,7 @@ export const editSubmenu: ContextAction[] = [
     handler: ({ composer, element, addToast }) => {
       const data = element.getData?.();
       const text = JSON.stringify(data, null, 2);
-      navigator?.clipboard?.writeText(text).catch(() => {
+      writeClipboardText(text).catch(() => {
         addToast?.({
           description: "Failed to copy to clipboard",
           tone: "warning",

@@ -16,6 +16,7 @@ import { findById } from "../data/layerUtils";
 import type { LayerAction } from "../types";
 import type { UseLayersStateReturn } from "./useLayersState";
 import { useToast } from "@/editor/chrome-ui";
+import { writeClipboardText } from "@/shared/utils/clipboard";
 
 export interface LayerContextActionOptions {
   /** Delete asked for N ≥ 2 elements — open the confirm (board 6887:78291). */
@@ -59,9 +60,9 @@ export function useLayerContextActions(
           const url = new URL(window.location.href);
           url.searchParams.set("el", nodeId);
           if (pageId) url.searchParams.set("page", pageId);
-          navigator.clipboard.writeText(url.toString()).then(
+          writeClipboardText(url.toString()).then(
             () => addToast({ description: "Link copied — opens the editor with this element selected", tone: "success" }),
-            () => addToast({ description: "Couldn't copy the link", tone: "error" }),
+            () => addToast({ title: "Couldn't copy the link", description: url.toString(), tone: "error" }),
           );
           break;
         }

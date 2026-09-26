@@ -54,6 +54,7 @@ import "./header.css";
 
 /** Selected element minimal info */
 import type { SelectedElementInfo } from "@/shared/types";
+import { writeClipboardText } from "@/shared/utils/clipboard";
 export type { SelectedElementInfo };
 
 export interface StudioHeaderProps {
@@ -798,14 +799,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   const copyLiveUrl = React.useCallback(() => {
     if (!publishedUrl) return;
-    // navigator.clipboard is absent on insecure origins, and writeText can be
-    // refused. Either way the user hears about it rather than pressing again.
-    const done = navigator.clipboard?.writeText(publishedUrl);
-    if (!done) {
-      addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" });
-      return;
-    }
-    void done.then(
+    // A refused copy is reported rather than leaving the user pressing again.
+    void writeClipboardText(publishedUrl).then(
       () => addToast({ title: "Live URL copied", description: publishedUrl, tone: "success" }),
       () => addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" }),
     );

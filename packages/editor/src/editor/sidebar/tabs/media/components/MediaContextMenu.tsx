@@ -20,6 +20,7 @@ import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
 import type { LibraryItem } from "../data/mediaTypes";
 import { useMediaWriteAccess } from "../hooks/useMediaWriteAccess";
 import { Button, Tooltip } from "@/editor/chrome-ui";
+import { writeClipboardText } from "@/shared/utils/clipboard";
 
 interface MediaContextMenuProps {
   x: number;
@@ -223,11 +224,8 @@ export function MediaContextMenu({
             role="menuitem"
             className={ITEM}
             onClick={act(() => {
-              try {
-                navigator.clipboard.writeText(item.altText ?? "");
-              } catch {
-                /* clipboard API unavailable — silent no-op */
-              }
+              /* No toast host in this menu; a refused copy stays a no-op. */
+              void writeClipboardText(item.altText ?? "").catch(() => undefined);
             })}
           >
             Copy alt text

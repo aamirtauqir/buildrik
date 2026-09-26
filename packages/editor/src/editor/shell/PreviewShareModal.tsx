@@ -24,6 +24,7 @@ import * as React from "react";
 import { Button, Modal, useToast } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { writeClipboardText } from "@/shared/utils/clipboard";
 
 export interface PreviewShareModalProps {
   open: boolean;
@@ -121,7 +122,7 @@ export const PreviewShareModal: React.FC<PreviewShareModalProps> = ({ open, onOp
 
   const copy = React.useCallback(() => {
     if (!url) return;
-    navigator.clipboard.writeText(url).then(
+    writeClipboardText(url).then(
       () =>
         addToast({
           title: "Link copied",
