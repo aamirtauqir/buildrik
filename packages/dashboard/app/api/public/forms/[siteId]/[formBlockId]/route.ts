@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { submitForm, FormError } from "@server/services/form-submission.service";
 import { checkRateLimit } from "@server/services/rate-limiter";
 import { formSubmissionSchema } from "@buildrik/shared/schemas/forms";
-import { isDangerousUrl, isAbsoluteHttpUrl } from "@buildrik/shared/schemas/element-markup";
+import { escapeHtmlText, isDangerousUrl, isAbsoluteHttpUrl } from "@buildrik/shared/schemas/element-markup";
 import { clientIp } from "@lib/request-ip";
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
-}
 
 const FORM_SUBMIT_MAX = 10;
 const FORM_SUBMIT_WINDOW_MS = 60_000;
@@ -128,7 +124,7 @@ export async function POST(
       }
       const message = result.successMessage || "Thanks — your message was sent.";
       return new NextResponse(
-        `<!DOCTYPE html><meta charset="utf-8"><title>Thanks</title><p>${escapeHtml(message)}</p>`,
+        `<!DOCTYPE html><meta charset="utf-8"><title>Thanks</title><p>${escapeHtmlText(message)}</p>`,
         { status: 200, headers: { "content-type": "text/html; charset=utf-8" } },
       );
     }

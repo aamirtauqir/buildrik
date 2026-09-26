@@ -73,7 +73,7 @@ import {
   type RoundListRow,
   type ReviewComment,
 } from "../../../../services/ReviewService";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface ReviewTabProps {
   /** Opened from a History › Activity row: draw the "‹ Activity" row. */

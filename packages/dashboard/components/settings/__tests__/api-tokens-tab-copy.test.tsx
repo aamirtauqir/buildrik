@@ -9,7 +9,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 /* A plain function, not vi.fn: the spy's settled-result bookkeeping chains
    its own .then onto a rejected promise and reports it as unhandled. */
 const clip = vi.hoisted(() => ({ impl: (_text: string): Promise<void> => Promise.resolve(), calls: 0 }));
-vi.mock("@lib/clipboard", () => ({
+vi.mock("@buildrik/shared/browser/clipboard", () => ({
   writeClipboardText: (text: string) => {
     clip.calls += 1;
     return clip.impl(text);

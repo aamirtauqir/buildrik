@@ -9,7 +9,7 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, Modal, PageHeader, InputField, FilterTabs, SelectField } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
 import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
-import { writeClipboardText } from "@lib/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 type MediaType = "image" | "video" | "icon" | "font";
 

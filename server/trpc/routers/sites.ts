@@ -289,6 +289,13 @@ export const sitesRouter = router({
       try {
         return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined);
       } catch (e: unknown) {
+        /* I-2: a page id in the save belongs to another site. BAD_REQUEST, not
+           FORBIDDEN — the editor treats FORBIDDEN as a revoked role. */
+        if (e instanceof Error && e.message === "PAGE_NOT_IN_SITE")
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This save includes a page that belongs to another site, so it was not applied. Reload the site before editing.",
+          });
         if (e instanceof Error && e.message === "SITE_NOT_FOUND")
           throw new TRPCError({
             code: "NOT_FOUND",

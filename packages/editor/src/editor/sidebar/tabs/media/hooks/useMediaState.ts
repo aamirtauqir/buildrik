@@ -17,7 +17,7 @@ import { useUploadState } from "./useUploadState";
 import { useDiscoveryState } from "./useDiscoveryState";
 import { useServerStorageQuota } from "./useServerStorageQuota";
 import { endAssetPick, requestAssetPick, useAssetPick, type AssetPickRequest } from "../data/assetPick";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export function useMediaState(composer: Composer): MediaStateResult {
   const { addToast } = useToast();

@@ -20,7 +20,7 @@ import { useSession } from "next-auth/react";
 import { Plus, Search, CheckSquare, Folder } from "lucide-react";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
-import { writeClipboardText } from "@lib/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export default function ProjectsPage() {
   const { addToast } = useToast();

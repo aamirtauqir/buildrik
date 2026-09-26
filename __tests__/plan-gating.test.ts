@@ -6,6 +6,7 @@ const mockWorkspaceFindUnique = vi.fn();
 const mockWorkspaceMemberFindFirst = vi.fn();
 const mockShareLinkCount = vi.fn();
 const mockShareLinkCreate = vi.fn();
+const mockEffectiveRole = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -14,6 +15,12 @@ vi.mock("@/lib/prisma", () => ({
     workspaceMember: { findFirst: mockWorkspaceMemberFindFirst },
     shareLink: { count: mockShareLinkCount, create: mockShareLinkCreate },
   },
+}));
+
+// M-8: the allowEditors gate reads the caller's EFFECTIVE site role (PD-6
+// cap), not the raw workspace membership role.
+vi.mock("@/server/services/permission.service", () => ({
+  getEffectiveSiteRole: (...a: unknown[]) => mockEffectiveRole(...a),
 }));
 
 describe("Custom code plan gate", () => {
@@ -56,10 +63,11 @@ describe("Custom code plan gate", () => {
 });
 
 describe("Share link allowEditors gate", () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => { vi.clearAllMocks(); mockEffectiveRole.mockResolvedValue("ADMIN"); });
 
   it("allowEditors=false, member role=EDITOR → throws EDITORS_CANNOT_CREATE_LINKS", async () => {
     mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockEffectiveRole.mockResolvedValue("EDITOR");
     mockWorkspaceMemberFindFirst.mockResolvedValue({
       role: "EDITOR",
       workspace: { plan: "PRO", sharingSettings: { allowEditors: false } },
@@ -74,6 +82,7 @@ describe("Share link allowEditors gate", () => {
 
   it("allowEditors=true, member role=EDITOR → does NOT throw", async () => {
     mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockEffectiveRole.mockResolvedValue("EDITOR");
     mockWorkspaceMemberFindFirst.mockResolvedValue({
       role: "EDITOR",
       workspace: { plan: "PRO", sharingSettings: { allowEditors: true } },
@@ -100,6 +109,26 @@ describe("Share link allowEditors gate", () => {
     await expect(
       createShareLink("s1", { name: "Test" }, "user1")
     ).resolves.toBeDefined();
+  });
+
+  /* M-8: a workspace ADMIN whose role on THIS site is capped to EDITOR by a
+     site roleOverride (PD-6) is an editor here — the raw membership read let
+     them past allowEditors=false. */
+  it("allowEditors=false, workspace ADMIN capped to EDITOR on this site → throws EDITORS_CANNOT_CREATE_LINKS", async () => {
+    mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockWorkspaceMemberFindFirst.mockResolvedValue({
+      role: "ADMIN",
+      workspace: { plan: "PRO", sharingSettings: { allowEditors: false } },
+    });
+    mockEffectiveRole.mockResolvedValue("EDITOR");
+    mockShareLinkCount.mockResolvedValue(0);
+
+    const { createShareLink } = await import("@/server/services/share-link.service");
+    await expect(
+      createShareLink("s1", { name: "Test" }, "user1")
+    ).rejects.toThrow("EDITORS_CANNOT_CREATE_LINKS");
+    expect(mockEffectiveRole).toHaveBeenCalledWith(expect.anything(), "user1", "s1");
+    expect(mockShareLinkCreate).not.toHaveBeenCalled();
   });
 
   it("userId=undefined → no member check runs", async () => {
@@ -129,6 +158,7 @@ describe("Share link allowEditors gate", () => {
   // ROLE_RANK), so the gate must catch it too, not just the literal "EDITOR" role.
   it("allowEditors=false, member role=DESIGNER → throws EDITORS_CANNOT_CREATE_LINKS", async () => {
     mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockEffectiveRole.mockResolvedValue("DESIGNER");
     mockWorkspaceMemberFindFirst.mockResolvedValue({
       role: "DESIGNER",
       workspace: { plan: "PRO", sharingSettings: { allowEditors: false } },
@@ -143,7 +173,7 @@ describe("Share link allowEditors gate", () => {
 });
 
 describe("Share link requirePw + defaultExpiration policy (A-9)", () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => { vi.clearAllMocks(); mockEffectiveRole.mockResolvedValue("ADMIN"); });
 
   it("requirePw=true, no password on the request → throws PASSWORD_REQUIRED", async () => {
     mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });

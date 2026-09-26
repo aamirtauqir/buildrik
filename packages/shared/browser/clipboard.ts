@@ -1,13 +1,12 @@
 /**
- * The one way chrome copies text. `navigator.clipboard` exists only on secure
+ * The one way the dashboard and the editor copy text (M-5: each app carried
+ * its own identical copy until both moved here). `navigator.clipboard` exists only on secure
  * origins, so on an http LAN origin a bare `navigator.clipboard.writeText`
  * throws a TypeError before any promise exists — Layers ⋯ Copy link crashed
  * that way (gap walk 93 #5). This never throws synchronously: it uses the
  * async API when present, falls back to the legacy copy command (a transient
  * offscreen textarea) when not, and rejects when neither copied, so every
  * caller can tell the user.
- *
- * @license BSD-3-Clause
  */
 
 function legacyCopy(text: string): boolean {

@@ -7,7 +7,7 @@
 import React from "react";
 import { Copy, Check } from "lucide-react";
 import { useToast } from "./Toast";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 const BASE =
   "tw:inline-flex tw:items-center tw:gap-1 tw:border tw:border-transparent tw:rounded-sm tw:cursor-pointer " +

@@ -129,6 +129,11 @@ export type SaveProjectFn = () => Promise<SaveOutcome>;
 // alongside the hook so future contributors see all save-error mapping
 // in one place.
 function explainSaveError(rawMessage: string): string {
+  /* I-2: the server refused a page that belongs to another site (sites.saveProject
+     BAD_REQUEST); retrying the same snapshot cannot succeed. */
+  if (rawMessage.includes("belongs to another site")) {
+    return "This save included a page from another site and was refused. Reload the site before editing.";
+  }
   if (rawMessage.includes("network") || rawMessage.includes("fetch")) {
     return "Network error — check your internet connection and try again.";
   }

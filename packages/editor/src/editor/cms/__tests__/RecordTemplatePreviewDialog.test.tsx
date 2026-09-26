@@ -35,6 +35,31 @@ describe("RecordTemplatePreviewDialog", () => {
     expect(screen.getByTestId("cms-record-template-preview-open")).toBeEnabled();
   });
 
+  it("Open in new tab renders the page only inside a sandbox=\"\" iframe, never as a same-origin blob page (I-1a)", async () => {
+    const html = "<html><head><script>parent.stolen=1</script></head><body><h1>Margherita</h1></body></html>";
+    renderPreviewMock.mockResolvedValueOnce({ ok: true, html });
+    const tab = { document: document.implementation.createHTMLDocument(""), opener: {} as unknown };
+    const openSpy = vi.spyOn(window, "open").mockReturnValue(tab as unknown as Window);
+    const blobSpy = vi.spyOn(URL, "createObjectURL");
+    render(
+      <RecordTemplatePreviewDialog composer={{} as never} collection={MENU} record={RECORD} onClose={vi.fn()} onChooseTemplate={vi.fn()} />,
+    );
+    await screen.findByTestId("cms-record-template-preview-frame");
+    fireEvent.click(screen.getByTestId("cms-record-template-preview-open"));
+    expect(openSpy).toHaveBeenCalledWith("about:blank", "_blank");
+    expect(blobSpy).not.toHaveBeenCalled();
+    expect(tab.opener).toBeNull();
+    const frames = tab.document.querySelectorAll("iframe");
+    expect(frames).toHaveLength(1);
+    expect(frames[0].getAttribute("sandbox")).toBe("");
+    expect(frames[0].getAttribute("srcdoc")).toBe(html);
+    // The record's page never reaches the new tab's own (app-origin) document.
+    expect(tab.document.querySelector("script")).toBeNull();
+    expect(tab.document.querySelector("h1")).toBeNull();
+    openSpy.mockRestore();
+    blobSpy.mockRestore();
+  });
+
   it("offers Choose a template page when the collection has no template bound", async () => {
     renderPreviewMock.mockResolvedValueOnce({ ok: false, reason: "no-template" });
     const onChooseTemplate = vi.fn();

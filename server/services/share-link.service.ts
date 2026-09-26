@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { getEffectiveSiteRole } from "@/server/services/permission.service";
 import { filterCmsBindings, type CmsBindingsInput } from "@buildrik/shared/schemas/sites";
 import { getPublishedCmsForBindings } from "@/server/services/cms.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
@@ -66,8 +67,11 @@ export async function createShareLink(
     settings = member.workspace?.sharingSettings;
     // A-9: DESIGNER has the same site-edit rank as EDITOR (permission.service
     // ROLE_RANK) — the gate only checked "EDITOR" literally, so a DESIGNER
-    // bypassed it entirely.
-    if ((member.role === "EDITOR" || member.role === "DESIGNER") && settings?.allowEditors === false) {
+    // bypassed it entirely. M-8: the role is the EFFECTIVE one on this site —
+    // a site roleOverride caps the workspace role (PD-6), so a workspace ADMIN
+    // capped to EDITOR here is an editor for this gate.
+    const role = await getEffectiveSiteRole(prisma, userId, siteId);
+    if ((role === "EDITOR" || role === "DESIGNER") && settings?.allowEditors === false) {
       throw new Error("EDITORS_CANNOT_CREATE_LINKS");
     }
     plan = (member.workspace?.plan ?? "FREE") as PlanName;

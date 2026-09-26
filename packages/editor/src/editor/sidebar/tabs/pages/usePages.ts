@@ -25,7 +25,7 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { slugify } from "@shared/utils/helpers/string";
 import type { PageItem, PageStatus } from "./types";
 import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 /** A page's stored visibility → its panel status. Unset is "live" (what the
  *  deploy does with it). C4 #26: a "password" stored before Password pages

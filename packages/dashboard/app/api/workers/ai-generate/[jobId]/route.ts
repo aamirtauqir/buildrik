@@ -5,6 +5,7 @@ import { generatePage } from "@server/services/ai.service";
 import { rewriteImageSources, type ImagesPreference } from "@lib/ai/rewrite-image-sources";
 import { checkWorkerAuth } from "@/lib/cron-auth";
 import { withUniqueIds } from "@buildrik/shared/content/elementIds";
+import { sanitizeBlocks } from "@lib/sanitize-blocks";
 
 // AI site-generation worker. The dashboard creates an AIGenerationJob (QUEUED)
 // and polls it — but nothing processed the queue, so the "AI is building your
@@ -165,7 +166,9 @@ export async function POST(
         tone: safeTone,
       });
       const withImages = result.sections.map((s) => ({ ...s, html: rewriteImageSources(s.html, imagesPref) }));
-      generated.push({ name: pageName, blocks: sectionsToBlocks(withImages) });
+      // M-7: model HTML is stored as whole-section markup — the same
+      // write-boundary sanitizer a save runs (S-1), not the model's word.
+      generated.push({ name: pageName, blocks: sanitizeBlocks(sectionsToBlocks(withImages)) });
       await setPhase(jobId, "GENERATING_CONTENT", 10 + Math.round(((i + 1) / pages.length) * 70));
     }
 

@@ -19,7 +19,7 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "@/shared/constants/events";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
-import { writeClipboardText } from "@/shared/utils/clipboard";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface SendForReviewProps {
   composer: Composer | null;
