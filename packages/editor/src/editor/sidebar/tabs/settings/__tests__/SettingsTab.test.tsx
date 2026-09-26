@@ -255,7 +255,7 @@ describe("SettingsTab — the shell", () => {
       { id: "set-nav-custom-code", text: "Custom code" },
       { id: "set-nav-headers", text: "Headers" },
       { id: "set-nav-integrations", text: "Integrations" },
-      { id: "set-nav-webhooks", text: "Webhooks ↗" },
+      { id: "set-nav-webhooks", text: "Webhooks" },
       { id: "set-nav-members", text: "Members" },
       { id: "set-nav-billing", text: "Billing" },
     ]);

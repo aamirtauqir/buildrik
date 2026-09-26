@@ -105,7 +105,7 @@ export const SETTINGS_NAV: SettingsNavDef[] = [
   { id: "custom-code", title: "Custom code", subtitle: "Head, body, CSS injections", group: "advanced", kind: "screen" },
   { id: "headers", title: "Headers", subtitle: "CSP, HSTS, security policy", group: "advanced", kind: "screen" },
   { id: "integrations", title: "Integrations", subtitle: "Third-party OAuth", group: "advanced", kind: "screen" },
-  { id: "webhooks", title: "Webhooks ↗", subtitle: "Workspace event deliveries", group: "advanced", kind: "external" },
+  { id: "webhooks", title: "Webhooks", subtitle: "Workspace event deliveries", group: "advanced", kind: "external" },
   { id: "members", title: "Members", subtitle: "Seats and roles", group: "workspace", kind: "external" },
   { id: "billing", title: "Billing", subtitle: "Plan and invoices", group: "workspace", kind: "external" },
 ];
