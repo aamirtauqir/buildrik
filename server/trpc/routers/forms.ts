@@ -9,6 +9,7 @@ import {
   exportSubmissions,
   getFormBlockSettings,
   updateFormBlock,
+  getStoredNotifyEmail,
   FormError,
 } from "@/server/services/form-submission.service";
 import {
@@ -81,12 +82,9 @@ export const formsRouter = router({
       // bundle notifyEmail, would otherwise hit a FORBIDDEN for a no-op
       // write. "" and null both mean "unset".
       if (input.notifyEmail !== undefined) {
-        const existing = await ctx.prisma.formBlock.findUnique({
-          where: { id: input.blockId },
-          select: { notifyEmail: true },
-        });
+        const storedNotifyEmail = await getStoredNotifyEmail(input.siteId, input.blockId);
         const normalize = (v: string | null | undefined) => v || "";
-        if (normalize(existing?.notifyEmail) !== normalize(input.notifyEmail)) {
+        if (normalize(storedNotifyEmail) !== normalize(input.notifyEmail)) {
           await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
         }
       }

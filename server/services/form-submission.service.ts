@@ -279,6 +279,24 @@ export async function getFormBlockSettings(
 }
 
 /**
+ * The stored `notifyEmail` for a form block, scoped by siteId so a caller
+ * can't probe another site's block by id alone. Used by the router to decide
+ * whether an `updateBlock` write actually changes the notify address (the
+ * ADMIN gate only fires on a real diff) — routers never touch Prisma
+ * directly, so this is the one seam that check reads through.
+ */
+export async function getStoredNotifyEmail(
+  siteId: string,
+  blockId: string,
+): Promise<string | null> {
+  const row = await prisma.formBlock.findFirst({
+    where: { id: blockId, siteId },
+    select: { notifyEmail: true },
+  });
+  return row?.notifyEmail ?? null;
+}
+
+/**
  * Inspector AFTER SUBMIT / PROTECTION write. Upserts by the form element's
  * own id (the same id `wireForms` uses as the FormBlock id at publish time),
  * so a setting saved before the form is ever published still lands on the

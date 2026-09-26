@@ -13,6 +13,7 @@ import { TRPCError } from "@trpc/server";
 const svc = vi.hoisted(() => ({
   updateFormBlock: vi.fn(),
   getFormBlockSettings: vi.fn(),
+  getStoredNotifyEmail: vi.fn(),
   listFormBlocks: vi.fn(),
   listSubmissions: vi.fn(),
   updateSubmission: vi.fn(),
@@ -52,7 +53,7 @@ beforeEach(() => {
 
 describe("forms.updateBlock — notifyEmail ADMIN gate", () => {
   it("blurring notifyEmail unchanged (same as the stored row) does not require ADMIN", async () => {
-    prismaMock.formBlock.findUnique.mockResolvedValue({ notifyEmail: "team@example.com" });
+    svc.getStoredNotifyEmail.mockResolvedValue("team@example.com");
     await caller().updateBlock({ siteId: "s1", blockId: "f1", notifyEmail: "team@example.com" });
     // guardSiteRole is called once for the base EDITOR gate — never with "ADMIN".
     expect(guards.guardSiteRole).not.toHaveBeenCalledWith(prismaMock, "u1", "s1", "ADMIN");
@@ -60,14 +61,14 @@ describe("forms.updateBlock — notifyEmail ADMIN gate", () => {
   });
 
   it("treats an empty string the same as a null stored value — no ADMIN gate", async () => {
-    prismaMock.formBlock.findUnique.mockResolvedValue({ notifyEmail: null });
+    svc.getStoredNotifyEmail.mockResolvedValue(null);
     await caller().updateBlock({ siteId: "s1", blockId: "f1", notifyEmail: "" });
     expect(guards.guardSiteRole).not.toHaveBeenCalledWith(prismaMock, "u1", "s1", "ADMIN");
     expect(svc.updateFormBlock).toHaveBeenCalled();
   });
 
   it("an EDITOR actually changing notifyEmail is gated by ADMIN and refused", async () => {
-    prismaMock.formBlock.findUnique.mockResolvedValue({ notifyEmail: "team@example.com" });
+    svc.getStoredNotifyEmail.mockResolvedValue("team@example.com");
     guards.guardSiteRole.mockImplementation((_p, _u, _s, minRole) => {
       if (minRole === "ADMIN") throw new TRPCError({ code: "FORBIDDEN" });
       return Promise.resolve(undefined);
@@ -79,15 +80,22 @@ describe("forms.updateBlock — notifyEmail ADMIN gate", () => {
   });
 
   it("an ADMIN changing notifyEmail saves", async () => {
-    prismaMock.formBlock.findUnique.mockResolvedValue({ notifyEmail: "team@example.com" });
+    svc.getStoredNotifyEmail.mockResolvedValue("team@example.com");
     await caller().updateBlock({ siteId: "s1", blockId: "f1", notifyEmail: "new@example.com" });
     expect(guards.guardSiteRole).toHaveBeenCalledWith(prismaMock, "u1", "s1", "ADMIN");
     expect(svc.updateFormBlock).toHaveBeenCalled();
   });
 
   it("a brand-new row (no existing FormBlock) setting notifyEmail still requires ADMIN", async () => {
-    prismaMock.formBlock.findUnique.mockResolvedValue(null);
+    svc.getStoredNotifyEmail.mockResolvedValue(null);
     await caller().updateBlock({ siteId: "s1", blockId: "f1", notifyEmail: "new@example.com" });
     expect(guards.guardSiteRole).toHaveBeenCalledWith(prismaMock, "u1", "s1", "ADMIN");
+  });
+
+  it("reads the stored notifyEmail through the service, never through ctx.prisma directly (routers never touch Prisma)", async () => {
+    svc.getStoredNotifyEmail.mockResolvedValue("team@example.com");
+    await caller().updateBlock({ siteId: "s1", blockId: "f1", notifyEmail: "new@example.com" });
+    expect(svc.getStoredNotifyEmail).toHaveBeenCalledWith("s1", "f1");
+    expect(prismaMock.formBlock.findUnique).not.toHaveBeenCalled();
   });
 });
