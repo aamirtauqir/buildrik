@@ -31,6 +31,7 @@ vi.mock("../../engine/storage/VersionHistoryStorage", () => ({
   saveVersion: (...a: unknown[]) => saveVersion(...a),
 }));
 
+import { hasServerStamp, markStampMigrationDone, recordServerStamp, stampMigrationDue } from "../syncRetryQueue";
 import {
   mirrorVersionCreate,
   mirrorVersionDelete,
@@ -393,7 +394,8 @@ describe("X-1 — version names reconcile on the persisted server stamp", () => 
     expect(saveVersion).toHaveBeenCalledWith(expect.objectContaining({ id: "v1", name: "C" }));
   });
 
-  it("an unstamped cached version whose name differs keeps its name and is mirrored", async () => {
+  it("after the first pass, an unstamped cached version whose name differs keeps its name and is mirrored", async () => {
+    markStampMigrationDone("version:site-123");
     rename.mockResolvedValueOnce({ ok: true, updatedAt: T1 });
     list.mockResolvedValueOnce([row("Server", T0)]);
     loadVersions.mockResolvedValueOnce([v1("Mine")]);
@@ -401,6 +403,43 @@ describe("X-1 — version names reconcile on the persisted server stamp", () => 
     expect(saveVersion).not.toHaveBeenCalled();
     expect(changed).toBe(0);
     expect(rename).toHaveBeenCalledWith({ siteId: "site-123", versionId: "v1", name: "Mine" });
+  });
+
+  /* Fix round 2 (controller ruling): the first hydrate of a site after
+     deploy has no stamps. An unstamped name that differs then ADOPTS the
+     server's once (a teammate's rename this cache never saw), is stamped,
+     and is not pushed back. From the next load on, the stamp rules apply. */
+  it("first pass: an unstamped differing name adopts the server's, is stamped, and is not re-sent", async () => {
+    list.mockResolvedValueOnce([row("Teammate", T0)]);
+    loadVersions.mockResolvedValueOnce([v1("Old cached")]);
+    const changed = await hydrateVersionsFromServer();
+    expect(saveVersion).toHaveBeenCalledWith(expect.objectContaining({ id: "v1", name: "Teammate" }));
+    expect(changed).toBe(1);
+    expect(rename).not.toHaveBeenCalled();
+    expect(hasServerStamp("version:v1")).toBe(true);
+    expect(stampMigrationDue("version:site-123")).toBe(false);
+
+    // Second load, after a local (offline) rename: the local name is kept.
+    saveVersion.mockClear();
+    rename.mockRejectedValueOnce(new Error("offline"));
+    await mirrorVersionRename("v1", "Mine now");
+    const fresh = await reload();
+    rename.mockResolvedValueOnce({ ok: true, updatedAt: T1 });
+    list.mockResolvedValueOnce([row("Teammate", T0)]);
+    loadVersions.mockResolvedValueOnce([v1("Mine now")]);
+    await fresh.hydrateVersionsFromServer();
+    expect(saveVersion).not.toHaveBeenCalledWith(expect.objectContaining({ name: "Teammate" }));
+    expect(rename).toHaveBeenLastCalledWith({ siteId: "site-123", versionId: "v1", name: "Mine now" });
+  });
+
+  it("first pass stays due when a mirror in it failed", async () => {
+    // A stamped row renamed here, whose re-mirror fails during the first pass.
+    recordServerStamp("version:v1", T0, "A");
+    rename.mockRejectedValueOnce(new Error("offline"));
+    list.mockResolvedValueOnce([row("A", T0)]);
+    loadVersions.mockResolvedValueOnce([v1("B")]);
+    await hydrateVersionsFromServer();
+    expect(stampMigrationDue("version:site-123")).toBe(true);
   });
 
   it("a freshly hydrated version is stamped, so the next teammate rename reaches it", async () => {
