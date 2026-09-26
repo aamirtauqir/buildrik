@@ -11,6 +11,7 @@ import type {
 import { isAbsoluteHttpUrl } from "@buildrik/shared/schemas/element-markup";
 import { resolveSiteOrigins } from "@/lib/publish-urls";
 import { slugifyProjectName } from "@/lib/vercel";
+import type { DiscoveredForm, FormBlockWireSettings } from "@/lib/publish-forms";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
 
@@ -323,6 +324,57 @@ export async function updateFormBlock(input: UpdateFormBlockInput) {
     },
     update: data,
   });
+}
+
+/** Inspector settings a publish carries into the HTML it ships (honeypot on/
+ *  off, success message), keyed by the form element's id — republishing must
+ *  not silently turn the honeypot off or blank a custom message. */
+export async function getPublishedFormSettings(
+  siteId: string,
+): Promise<Record<string, FormBlockWireSettings>> {
+  const rows = await prisma.formBlock.findMany({
+    where: { siteId },
+    select: { id: true, spamProtection: true, successMessage: true },
+  });
+  return Object.fromEntries(
+    rows.map((b) => [b.id, { spamProtection: b.spamProtection, successMessage: b.successMessage }]),
+  );
+}
+
+/**
+ * Record the forms a publish wired: one row per form, created on first publish.
+ * Republishing must not clobber what the owner set in the dashboard (notify
+ * email, webhook, the name they gave it) — only the shape. Forms deleted from
+ * the site stop accepting submissions, but their rows and everything already
+ * submitted stay — the Submissions tab is a record, not a mirror of the
+ * current design. `deactivateMissing` is false whenever wiring could not run
+ * (`planFormWiring`), so an empty list never sweeps a site's live forms.
+ */
+export async function recordPublishedForms(
+  siteId: string,
+  forms: DiscoveredForm[],
+  deactivateMissing: boolean,
+): Promise<void> {
+  for (const form of forms) {
+    await prisma.formBlock.upsert({
+      where: { id: form.blockId },
+      create: {
+        id: form.blockId,
+        siteId,
+        blockId: form.blockId,
+        name: form.name,
+        fields: form.fields,
+        isActive: true,
+      },
+      update: { fields: form.fields, isActive: true },
+    });
+  }
+  if (deactivateMissing) {
+    await prisma.formBlock.updateMany({
+      where: { siteId, id: { notIn: forms.map((f) => f.blockId) } },
+      data: { isActive: false },
+    });
+  }
 }
 
 export async function exportSubmissions(
