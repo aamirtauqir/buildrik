@@ -320,8 +320,9 @@ describe("Sites Service", () => {
           { id: "p2", name: "About", slug: "about", position: 1, blocks: root("b"), isHomePage: false },
         ] as never)
         .mockResolvedValueOnce([{ id: "np1", slug: "home" }, { id: "np2", slug: "about" }] as never);
+      // As every real writer leaves it: id === blockId === element id, no pageId.
       vi.mocked(prisma.formBlock.findMany).mockResolvedValue([
-        { id: "f2", siteId: "s1", pageId: "p2", blockId: "form-1", name: "C", fields: [], submitButtonText: "Send",
+        { id: "form-1", siteId: "s1", pageId: null, blockId: "form-1", name: "C", fields: [], submitButtonText: "Send",
           successMessage: null, notifyEmail: null, webhookUrl: null, isActive: true },
       ] as never);
       vi.mocked(prisma.page.createMany).mockResolvedValue({ count: 2 } as never);
@@ -335,8 +336,10 @@ describe("Sites Service", () => {
       const aboutForm = pages[1].blocks.children[0].id;
       expect(pages[1].blocks.id).not.toBe("root");
       expect(aboutForm).not.toBe("form-1");
-      const form = vi.mocked(prisma.formBlock.createMany).mock.calls.at(-1)![0].data as Array<{ blockId: string }>;
-      expect(form[0].blockId).toBe(aboutForm);
+      // COPY, not move: Home's form keeps its row, About's renamed form gets one.
+      const form = vi.mocked(prisma.formBlock.createMany).mock.calls.at(-1)![0].data as Array<{ blockId: string; name: string }>;
+      expect(form.map((f) => f.blockId)).toEqual(["form-1", aboutForm]);
+      expect(form[1].name).toBe("C");
       const styleWrites = [
         vi.mocked(prisma.site.create).mock.calls.at(-1)![0].data.projectStyles,
         ...vi.mocked(prisma.site.update).mock.calls.map((c) => c[0].data.projectStyles),

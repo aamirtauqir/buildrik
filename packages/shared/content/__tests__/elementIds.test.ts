@@ -4,6 +4,7 @@ import {
   claimUniqueIds,
   copyIdKeyedRecord,
   copyIdKeyedStyles,
+  copiesForRenamedIds,
   reidSite,
   stableElementId,
   withUniqueIds,
@@ -105,9 +106,11 @@ describe("reidSite", () => {
     ];
     const styles = [{ id: "s", selector: '[data-buildrick-id="ai-hero-0"]', properties: {} }];
     const first = reidSite(pages, styles);
-    const newHero = first.renamedIn.get("p2")!.get("ai-hero-0")!;
-    expect(newHero).toBe(stableElementId("p2", "ai-hero-0", 0));
-    expect(first.renamedIn.get("p1")!.size).toBe(0);
+    const newHero = stableElementId("p2", "ai-hero-0", 0);
+    expect(first.renames).toEqual([
+      { from: "root", to: stableElementId("p2", "root", 0) },
+      { from: "ai-hero-0", to: newHero },
+    ]);
     expect((first.styles as Array<{ selector: string }>).map((r) => r.selector)).toEqual([
       '[data-buildrick-id="ai-hero-0"]',
       `[data-buildrick-id="${newHero}"]`,
@@ -115,6 +118,30 @@ describe("reidSite", () => {
     const second = reidSite(first.pages, first.styles);
     expect(second.renames).toEqual([]);
     expect(second.styles).toEqual(first.styles);
+  });
+});
+
+/* Round 2: FormBlock rows are keyed by the element id (FormBlock.id ===
+   blockId; no writer sets pageId), so a row belongs to EVERY page carrying
+   that id. Each renamed occurrence gets its own copy; the original stays. */
+describe("copiesForRenamedIds", () => {
+  it("one copy per new id of a row whose id or blockId was renamed", () => {
+    const rows = [
+      { id: "form-1", blockId: "form-1", pageId: null },
+      { id: "cuid-x", blockId: "form-2", pageId: null },
+      { id: "other", blockId: "other", pageId: null },
+    ];
+    const renames = [
+      { from: "form-1", to: "el-a" },
+      { from: "form-1", to: "el-b" },
+      { from: "form-2", to: "el-c" },
+    ];
+    const copies = copiesForRenamedIds(rows, renames);
+    expect(copies.map((c) => [c.row.id, c.to])).toEqual([
+      ["form-1", "el-a"],
+      ["form-1", "el-b"],
+      ["cuid-x", "el-c"],
+    ]);
   });
 });
 

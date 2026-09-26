@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
-import { blankPageRoot, reidSite } from "@buildrik/shared/content/elementIds";
+import { blankPageRoot, copiesForRenamedIds, reidSite } from "@buildrik/shared/content/elementIds";
 import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
@@ -398,7 +398,7 @@ export async function duplicateSite(
      editor loads as one tree. The copy is written with the editor's own
      deterministic re-id — keyed by the ORIGINAL page id, so the duplicate
      gets exactly the ids the editor gives the original on load — and what is
-     keyed by a renamed id (style rules, a form block) is carried along. */
+     keyed by a renamed id (style rules, form blocks) is copied along. */
   const reid = reidSite(originalPages, sanitizeProjectStyles(original.projectStyles));
 
   // Site + pages + form blocks must be copied atomically — a crash mid-copy
@@ -454,23 +454,31 @@ export async function duplicateSite(
         select: { id: true, slug: true },
       });
       const slugToNewPageId = new Map(newPages.map((p) => [p.slug, p.id]));
+      const copyForm = (f: (typeof originalForms)[number], blockId: string) => {
+        const slugForForm = f.pageId ? oldPageIdToSlug.get(f.pageId) : undefined;
+        const newPageId = slugForForm ? slugToNewPageId.get(slugForForm) ?? null : null;
+        return {
+          siteId: newSite.id,
+          pageId: newPageId,
+          blockId,
+          name: f.name,
+          fields: f.fields as Prisma.InputJsonValue,
+          submitButtonText: f.submitButtonText,
+          successMessage: f.successMessage,
+          notifyEmail: f.notifyEmail,
+          webhookUrl: f.webhookUrl,
+          isActive: f.isActive,
+        };
+      };
+      /* A form row is keyed by its element id (no writer sets pageId), so it
+         serves every page carrying that id. Each page whose copy of the
+         element was re-id'd gets its own COPY of the row; the original row
+         stays for the page that kept the id. */
       await tx.formBlock.createMany({
-        data: originalForms.map((f) => {
-          const slugForForm = f.pageId ? oldPageIdToSlug.get(f.pageId) : undefined;
-          const newPageId = slugForForm ? slugToNewPageId.get(slugForForm) ?? null : null;
-          return {
-            siteId: newSite.id,
-            pageId: newPageId,
-            blockId: (f.pageId ? reid.renamedIn.get(f.pageId)?.get(f.blockId) : undefined) ?? f.blockId,
-            name: f.name,
-            fields: f.fields as Prisma.InputJsonValue,
-            submitButtonText: f.submitButtonText,
-            successMessage: f.successMessage,
-            notifyEmail: f.notifyEmail,
-            webhookUrl: f.webhookUrl,
-            isActive: f.isActive,
-          };
-        }),
+        data: [
+          ...originalForms.map((f) => copyForm(f, f.blockId)),
+          ...copiesForRenamedIds(originalForms, reid.renames).map(({ row, to }) => copyForm(row, to)),
+        ],
       });
     }
 
