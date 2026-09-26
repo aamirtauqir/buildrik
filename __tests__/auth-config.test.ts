@@ -52,6 +52,13 @@ vi.mock("next-auth/jwt", () => ({
   decode: (...args: unknown[]) => mockDecode(...args),
 }));
 
+// The OAuth 2FA gate mints the same short-lived `2fa_temp` ticket the
+// password and magic-link paths hand to /auth/2fa.
+const mockGenerateToken = vi.fn();
+vi.mock("@/server/services/token.service", () => ({
+  generateToken: (...args: unknown[]) => mockGenerateToken(...args),
+}));
+
 import { authConfig } from "@/server/auth.config";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
@@ -555,5 +562,111 @@ describe("signIn callback — account-first identity resolution", () => {
 
     expect(result).toBe(true);
     expect(userObj.id).toBe("user-a");
+  });
+});
+
+// OAuth used to skip 2FA outright: password and magic-link logins stop at
+// /auth/2fa for a 2FA-enabled account, but a Google/GitHub login returned
+// `true` from signIn and got a session with no code asked. These pin the gate.
+describe("signIn callback — 2FA gate on OAuth logins", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockCookieGet.mockReturnValue(undefined); // public login unless a test says otherwise
+    mockGenerateToken.mockResolvedValue("temp-2fa-token");
+  });
+
+  const signInAs = (email: string, provider: "google" | "github", providerAccountId: string, userObj = { id: "temp", email } as any) =>
+    authConfig.callbacks!.signIn!({
+      user: userObj,
+      account: { provider, type: "oauth", providerAccountId } as any,
+      profile: provider === "google" ? ({ email, email_verified: true } as any) : ({ email } as any),
+      credentials: undefined as any,
+    } as any);
+
+  it("a linked provider login into a 2FA account stops at /auth/2fa — no session", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-2fa", user: { twoFactorEnabled: true } } as any);
+
+    const result = await signInAs("a@example.com", "google", "g-linked");
+
+    expect(result).toBe("/auth/2fa?token=temp-2fa-token");
+    expect(mockGenerateToken).toHaveBeenCalledWith("2fa_temp", "user-2fa", 5);
+  });
+
+  it("a linked provider login into an account WITHOUT 2FA still signs in directly", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-plain", user: { twoFactorEnabled: false } } as any);
+    const userObj = { id: "temp", email: "p@example.com" } as any;
+
+    const result = await signInAs("p@example.com", "google", "g-plain", userObj);
+
+    expect(result).toBe(true);
+    expect(userObj.id).toBe("user-plain");
+    expect(mockGenerateToken).not.toHaveBeenCalled();
+  });
+
+  it("an already signed-in user re-authorizing their OWN linked provider is not asked for a code", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-2fa", user: { twoFactorEnabled: true } } as any);
+    mockCookieGet.mockReturnValue({ value: "session-cookie" });
+    mockDecode.mockResolvedValue({ userId: "user-2fa" });
+
+    const result = await signInAs("a@example.com", "github", "gh-self");
+
+    expect(result).toBe(true);
+    expect(mockGenerateToken).not.toHaveBeenCalled();
+  });
+
+  it("an unlinked provider login into a verified 2FA account stops at /auth/2fa BEFORE linking or any write", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user-2fa",
+      email: "a@example.com",
+      passwordHash: null, // OAuth-only (another provider) — the oauth-conflict guard does not apply
+      emailVerified: new Date("2026-01-01"),
+      twoFactorEnabled: true,
+      accounts: [{ provider: "github" }],
+    } as any);
+
+    const result = await signInAs("a@example.com", "google", "g-new");
+
+    expect(result).toBe("/auth/2fa?token=temp-2fa-token");
+    expect(mockPrisma.account.upsert).not.toHaveBeenCalled();
+    expect(mockPrisma.user.update).not.toHaveBeenCalled();
+    expect(mockLogAuditEvent).not.toHaveBeenCalledWith("OAUTH_LOGIN", "success", expect.anything());
+  });
+
+  it("Settings → Connect provider (signed in as that same user) links without a code", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user-2fa",
+      email: "a@example.com",
+      passwordHash: "$2b$10$hash",
+      emailVerified: new Date("2026-01-01"),
+      twoFactorEnabled: true,
+      accounts: [],
+    } as any);
+    mockCookieGet.mockReturnValue({ value: "session-cookie" });
+    mockDecode.mockResolvedValue({ userId: "user-2fa" });
+
+    const result = await signInAs("a@example.com", "google", "g-connect");
+
+    expect(result).toBe(true);
+    expect(mockGenerateToken).not.toHaveBeenCalled();
+    expect(mockPrisma.account.upsert).toHaveBeenCalled();
+  });
+
+  it("the first OAuth login into a never-verified row is not gated (that path clears 2FA)", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user-unv",
+      email: "u@example.com",
+      passwordHash: "$2b$10$hash",
+      emailVerified: null,
+      twoFactorEnabled: true, // set by whoever pre-registered the address
+      accounts: [],
+    } as any);
+
+    const result = await signInAs("u@example.com", "google", "g-unv");
+
+    expect(result).toBe(true);
+    expect(mockGenerateToken).not.toHaveBeenCalled();
   });
 });
