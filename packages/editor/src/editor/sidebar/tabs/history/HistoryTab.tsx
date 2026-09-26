@@ -18,6 +18,7 @@ import { MoreHorizontal } from "lucide-react";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { SaveVersionFooter } from "../../../panels/version-history/SaveVersionFooter";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
@@ -101,6 +102,10 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const savesSettled = !savesLoading && !savesLoadError;
   const storageKey = `buildrick-history-view${siteId ? `-${siteId}` : ""}`;
   const { canUndo, clear } = useHistoryState(composer);
+  /* FC-9 (fix-all 2026-09-25): a viewer opens History read-only — browsing,
+     Time-Travel scrubbing and Compare stay; Restore, Save a version and
+     Clear undo history are write controls the server already refuses. */
+  const isViewer = useEditorRole() === "VIEWER";
 
   /* Stored preference, read once. The key predates M1 and every returning user
      has either "saves" or "changes" in it — "changes" is no longer a view, so
@@ -209,7 +214,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               </MenuItem>
               <MenuItem
                 danger
-                disabled={!canUndo}
+                disabled={!canUndo || isViewer}
+                title={isViewer ? "Viewers can't clear undo history — ask an editor" : undefined}
                 onClick={() => {
                   setMenuOpen(false);
                   setConfirmClear(true);
@@ -331,6 +337,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           <ActivityView
             composer={composer}
             searchQuery={searchQuery}
+            readOnly={isViewer}
           />
         )}
 
@@ -349,6 +356,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               composer={composer}
               searchQuery={searchQuery}
               onMatchCount={handleMatchCount}
+              readOnly={isViewer}
             />
           </>
         )}
@@ -392,7 +400,12 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         )}
         {/* Saves draws this footer inside its own list; Session (4418:73791)
             draws the same one under its rows. */}
-        {activeView === "session" && <SaveVersionFooter composer={composer} />}
+        {activeView === "session" && (
+          <SaveVersionFooter
+            composer={composer}
+            disabledReason={isViewer ? "Viewers can't save a version — ask an editor" : undefined}
+          />
+        )}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
       <ConfirmDialog

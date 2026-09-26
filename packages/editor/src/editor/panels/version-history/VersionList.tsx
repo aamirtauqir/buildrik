@@ -117,6 +117,9 @@ interface VersionRowProps {
   onDetails: () => void;
   /** Changes this version captured since the previous one. Absent = not known. */
   changeCount?: number;
+  /** FC-9 (fix-all 2026-09-25): a viewer keeps View details/Compare, loses
+   *  Restore/Delete. */
+  readOnly?: boolean;
 }
 
 export function VersionRow({
@@ -130,6 +133,7 @@ export function VersionRow({
   onCompare,
   onDetails,
   changeCount,
+  readOnly = false,
 }: VersionRowProps) {
   const rowRef = React.useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -247,7 +251,8 @@ export function VersionRow({
                   </MenuItem>
                   <MenuItem
                     className={ROW_MENU_ITEM}
-                    disabled={isRestoring}
+                    disabled={isRestoring || readOnly}
+                    title={readOnly ? "Viewers can't restore — ask an editor" : undefined}
                     aria-label={`Restore "${versionDisplayName(version)}"`}
                     onClick={() => {
                       setMenuOpen(false);
@@ -269,6 +274,8 @@ export function VersionRow({
                   <MenuItem
                     className={ROW_MENU_ITEM}
                     danger
+                    disabled={readOnly}
+                    title={readOnly ? "Viewers can't delete — ask an editor" : undefined}
                     aria-label={`Delete "${versionDisplayName(version)}"`}
                     onClick={() => {
                       setMenuOpen(false);
@@ -311,6 +318,8 @@ export interface VersionListProps {
   onDetails: (versionId: string) => void;
   /** version id -> changes captured. Ids absent mean "not known". */
   changeCounts?: Map<string, number>;
+  /** FC-9 (fix-all 2026-09-25): threaded to every row's Restore/Delete. */
+  readOnly?: boolean;
 }
 
 export function VersionList({
@@ -325,6 +334,7 @@ export function VersionList({
   onCompare,
   onDetails,
   changeCounts,
+  readOnly = false,
 }: VersionListProps) {
   const listWrapperRef = React.useRef<HTMLDivElement>(null);
   const [listHeight, setListHeight] = React.useState(0);
@@ -395,6 +405,7 @@ export function VersionList({
             onCompare={() => onCompare(v.id)}
             onDetails={() => onDetails(v.id)}
             changeCount={changeCounts?.get(v.id)}
+            readOnly={readOnly}
           />
         </div>
       );
@@ -410,6 +421,7 @@ export function VersionList({
       onDeleteCancel,
       onCompare,
       onDetails,
+      readOnly,
     ],
   );
 
