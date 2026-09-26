@@ -850,3 +850,40 @@ describe("SettingsTab — shell dirty registry entry", () => {
     expect(shellDirty.get()).toBe(false);
   });
 });
+
+/* B-1 fix round 2. The shell's tab-switch guard reads the registry the moment
+   Settings' own door runs onClose — Settings' own Discard / Save and
+   continue already answered the question, so by then its entry must be
+   clear, or the user is asked twice. And the shell's "Leave anyway" runs
+   Settings' registered discard: the screens write to the composer live, so
+   leaving without a rollback would keep the "lost" values for the next save. */
+describe("SettingsTab — its registry entry is honest at every door", () => {
+  async function editGeneral() {
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
+    fireEvent.change(screen.getByLabelText("Site name"), { target: { value: "x" } });
+    await waitFor(() => expect(shellDirty.get()).toBe(true));
+  }
+
+  it("Discard in Settings' own dialog clears the entry before leaving — the shell guard sees nothing", async () => {
+    let dirtyAtClose: boolean | null = null;
+    const onClose = vi.fn(() => (dirtyAtClose = shellDirty.get()));
+    renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    await editGeneral();
+    fireEvent.click(screen.getByTestId("set-back"));
+    fireEvent.click(screen.getByTestId("set-unsaved-discard"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(dirtyAtClose).toBe(false);
+  });
+
+  it("Save and continue clears the entry before leaving — the shell guard sees nothing", async () => {
+    let dirtyAtClose: boolean | null = null;
+    const onClose = vi.fn(() => (dirtyAtClose = shellDirty.get()));
+    renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    await editGeneral();
+    fireEvent.click(screen.getByTestId("set-back"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect(dirtyAtClose).toBe(false);
+  });
+});

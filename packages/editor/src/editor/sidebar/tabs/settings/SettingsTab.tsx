@@ -188,9 +188,16 @@ export const SettingsTab: React.FC<
   // ref, not the post-render state: screens push dirty via an effect, and a
   // click in the same gesture as an edit would otherwise read stale false.
   const screenIsDirtyRef = React.useRef(false);
-  React.useEffect(() => {
-    screenIsDirtyRef.current = screenIsDirty;
-  }, [screenIsDirty]);
+  /* The ONE writer of the dirty flag: state (renders the footer), the ref
+     (same-gesture click handlers) and this tab's shell-registry entry, all
+     synchronously. The registry must not lag an effect behind: Discard /
+     Save and continue clear it and leave in the same handler, and the
+     shell's tab-switch guard reads it as the leave lands (B-1). */
+  const markScreenDirty = React.useCallback((dirty: boolean) => {
+    setScreenIsDirty(dirty);
+    screenIsDirtyRef.current = dirty;
+    shellDirty.set("settings", dirty);
+  }, []);
 
   /* What the Unsaved settings dialog was raised for. Its Discard finishes
      that intent — the door out, or the screen that was clicked — after the
@@ -239,27 +246,20 @@ export const SettingsTab: React.FC<
      before every passive effect of the commit, so the reset always precedes
      the register, on mount and on a screen change alike. */
   React.useLayoutEffect(() => {
-    setScreenIsDirty(false);
+    markScreenDirty(false);
     setGuardOpen(false);
     setSaveError(null);
     setLoadState("ready");
     screenSaveHandlerRef.current = null;
     screenFlushHandlerRef.current = null;
     screenSnapshotRef.current = composer ? structuredClone(composer.getProjectSettings()) : null;
-  }, [currentScreen, composer]);
+  }, [currentScreen, composer, markScreenDirty]);
 
   /* This tab owns its entry in the shell dirty registry (B-1): the shell's
-     tab-switch guard, the exit guard and beforeunload all read it. Cleared
-     on unmount — leaving Settings discards its screen buffers, so a closed
-     Settings must never leave a stale block behind. */
-  React.useEffect(() => {
-    shellDirty.set("settings", screenIsDirty);
-  }, [screenIsDirty]);
+     tab-switch guard, the exit guard and beforeunload all read it (written
+     by markScreenDirty). Cleared on unmount so a closed Settings never
+     leaves a stale block behind. */
   React.useEffect(() => () => shellDirty.set("settings", false), []);
-
-  const handleScreenDirty = React.useCallback((dirty: boolean) => {
-    setScreenIsDirty(dirty);
-  }, []);
 
   /* A field reached through Search: once its screen has rendered (and, for a
      server-backed screen, loaded), scroll it into view and focus it. The id
@@ -402,12 +402,9 @@ export const SettingsTab: React.FC<
       composer.setProjectSettings(structuredClone(screenSnapshotRef.current));
     }
     setResetKey((k) => k + 1);
-    setScreenIsDirty(false);
+    markScreenDirty(false);
     setSaveError(null);
-    // Prime the ref synchronously — the effect that mirrors it has not run
-    // yet, and the intent below reads it.
-    screenIsDirtyRef.current = false;
-  }, [composer]);
+  }, [composer, markScreenDirty]);
 
   const handleDiscard = React.useCallback(() => {
     const pending = pendingRef.current;
@@ -438,8 +435,7 @@ export const SettingsTab: React.FC<
     const succeeded = () => {
       if (composer) screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
       setSaveError(null);
-      setScreenIsDirty(false);
-      screenIsDirtyRef.current = false;
+      markScreenDirty(false);
       if (then) then();
       /* 4418:165469 draws "Settings saved" as a toast (bottom-left, dark),
          not a centred dialog: title, the site's line, "Return to settings". */
@@ -491,7 +487,7 @@ export const SettingsTab: React.FC<
     }
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
-  }, [composer, current, currentScreen, saving, projectId, addToast, siteName]);
+  }, [composer, current, currentScreen, saving, projectId, addToast, siteName, markScreenDirty]);
 
   /* The guard's Save and continue (4418:165478): save, then finish whatever
      raised the guard. A failed save leaves the dialog down and the screen's
@@ -534,7 +530,7 @@ export const SettingsTab: React.FC<
     const common = {
       composer,
       projectId,
-      onDirtyChange: handleScreenDirty,
+      onDirtyChange: markScreenDirty,
       registerSaveHandler,
       registerFlushHandler,
       onLoadStateChange: setLoadState,
