@@ -210,7 +210,7 @@ export function Topbar({
            into it. `tw:@container` sets `container-type: inline-size`;
            SaveStatus's own `tw:@max-[1200px]:hidden` (its timestamp) keys
            off this ancestor. */
-        "tw:flex tw:items-center tw:gap-3 tw:h-14 tw:flex-none tw:@container " +
+        "tw:flex tw:items-center tw:gap-3 tw:h-[var(--bk-size-topbar)] tw:flex-none tw:@container " +
         "tw:px-3 tw:bg-white tw:border-b tw:border-[var(--bk-gray-100)] " +
         "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]"
       }
