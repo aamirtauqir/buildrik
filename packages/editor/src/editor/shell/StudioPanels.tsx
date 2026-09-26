@@ -34,7 +34,6 @@ import type { TemplatesOpenRequest } from "@/editor/sidebar/tabs/templates/Templ
 import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
 import { usePageCommands, usePageJumpList } from "../sidebar/tabs/pages/usePageCommands";
 import { cmsWorkspace, type CmsOpenRequest } from "@/editor/cms/cmsWorkspaceStore";
-import { shellDirty } from "./shellDirtyRegistry";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
@@ -322,17 +321,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
   const [mediaFullPage, setMediaFullPage] = React.useState(false);
 
-  /* Settings' unsaved-edit flag lives here because two children need it:
-     FullPageView mounts the SettingsTab that raises it, and LeftSidebar's
-     rail draws the dirty dot and guards the tab switch against it. Also
-     registered into shellDirtyRegistry (B-1) so the shell-level tab-switch
-     guard (⌘H, ⇧A, the palette, ui:switch-tab, UI_PANEL_OPEN — none of
-     which go through LeftSidebar's own safeTabChange) sees it too. */
-  const [settingsDirty, _setSettingsDirty] = React.useState(false);
-  const setSettingsDirty = React.useCallback((dirty: boolean) => {
-    _setSettingsDirty(dirty);
-    shellDirty.set("settings", dirty);
-  }, []);
   const [settingsOpen, setSettingsOpen] = React.useState<SettingsOpenRequest | null>(null);
   const [pagesOpen, setPagesOpen] = React.useState<PageSettingsOpenRequest | null>(null);
   /* `ui:browse-templates` — the New-page modal's name + "Add to site
@@ -706,8 +694,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onElementSelect={handleElementSelect}
             onBlockClick={handleBlockClick}
             canvasHoveredId={canvasHoveredId}
-            settingsDirty={settingsDirty}
-            onSettingsDirtyChange={setSettingsDirty}
             pagesOpen={pagesOpen}
             projectId={projectId}
             onOpenLibrary={handleOpenLibrary}
@@ -838,7 +824,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                menu's "Plugins" landed on the Settings root and looked like a
                dead door. */
             activeSubTab={leftPanelSubTab}
-            onSettingsDirtyChange={setSettingsDirty}
             settingsOpen={settingsOpen}
             projectId={projectId}
             onOpenImageEditor={onOpenImageEditor}

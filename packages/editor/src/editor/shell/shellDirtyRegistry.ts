@@ -2,8 +2,8 @@
  * shellDirtyRegistry — the ONE place every navigation guard reads to know
  * whether ANY shell-owned surface has a staged-but-unsaved edit (B-1).
  *
- * Settings (StudioPanels' settingsDirty), Brand (StudioHeader's
- * BRAND_DIRTY_CHANGED listener) and a CMS record sheet (RecordSheet) are
+ * Settings (SettingsTab), Brand (StudioHeader's BRAND_DIRTY_CHANGED
+ * listener) and a CMS record sheet (RecordSheet) are
  * three sibling surfaces with no common parent closer than AquibraStudio —
  * threading a boolean down through props and back up through callbacks for
  * three unrelated subtrees is exactly the coupling Composer-gateway rule 9

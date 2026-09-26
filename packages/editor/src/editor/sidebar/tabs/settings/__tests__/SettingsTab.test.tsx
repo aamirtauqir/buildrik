@@ -183,6 +183,7 @@ vi.mock("../screens/RedirectsScreen", () => ({
 }));
 
 import { SettingsTab } from "../SettingsTab";
+import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
 
 afterEach(() => {
@@ -830,5 +831,22 @@ describe("SettingsTab — Site-column fields below ADMIN", () => {
     const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
     expect(siteName.matches(":disabled")).toBe(false);
     expect(screen.queryByTestId("set-admin-only")).toBeNull();
+  });
+});
+
+/* B-1: Settings owns its entry in the shell dirty registry — the one source
+   the shell's tab-switch guard, the exit guard and beforeunload read. It is
+   cleared only when Settings actually unmounts (its buffers are gone then). */
+describe("SettingsTab — shell dirty registry entry", () => {
+  it("registers dirty while a screen has unsaved edits and clears it on unmount", async () => {
+    const composer = makeComposer();
+    const { unmount } = renderS(<SettingsTab composer={asComposer(composer)} />);
+    expect(shellDirty.get()).toBe(false);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
+    await waitFor(() => expect(shellDirty.get()).toBe(true));
+    unmount();
+    expect(shellDirty.get()).toBe(false);
   });
 });

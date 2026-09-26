@@ -63,6 +63,7 @@ import {
   OverviewScreen,
 } from "./index";
 import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
+import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { searchSettings } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
@@ -143,7 +144,7 @@ export const SettingsTab: React.FC<
      *  the Pages panel's URL-repair draft when there is one (3519:19920). */
     openRequest?: SettingsOpenRequest | null;
   }
-> = ({ composer, initialScreen, openRequest, onClose, userPlan, projectId: projectIdProp, onDirtyChange, onOpenDesignTab }) => {
+> = ({ composer, initialScreen, openRequest, onClose, userPlan, projectId: projectIdProp, onOpenDesignTab }) => {
   // The standalone shell (:5050/?siteId=) never threads projectId through
   // AquibraStudio → StudioPanels; the URL param is the same source
   // BuildrikSyncProvider loads from.
@@ -247,9 +248,14 @@ export const SettingsTab: React.FC<
     screenSnapshotRef.current = composer ? structuredClone(composer.getProjectSettings()) : null;
   }, [currentScreen, composer]);
 
+  /* This tab owns its entry in the shell dirty registry (B-1): the shell's
+     tab-switch guard, the exit guard and beforeunload all read it. Cleared
+     on unmount — leaving Settings discards its screen buffers, so a closed
+     Settings must never leave a stale block behind. */
   React.useEffect(() => {
-    onDirtyChange?.(screenIsDirty);
-  }, [screenIsDirty, onDirtyChange]);
+    shellDirty.set("settings", screenIsDirty);
+  }, [screenIsDirty]);
+  React.useEffect(() => () => shellDirty.set("settings", false), []);
 
   const handleScreenDirty = React.useCallback((dirty: boolean) => {
     setScreenIsDirty(dirty);
