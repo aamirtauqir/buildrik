@@ -106,6 +106,31 @@ describe("ai-generate worker", () => {
    * apart. Style still collapses — that is correct for a visual axis — but tone
    * now rides its own field.
    */
+  /* M-7: the model's HTML is stored as whole-section `content` (contentFormat
+     html) and published as markup — it goes through the same write-boundary
+     sanitizer as a save (S-1), never stored as the model wrote it. */
+  it("stores the generated sections sanitized — no script, no event handlers", async () => {
+    p.aIGenerationJob.findUnique.mockResolvedValue({
+      id: "j1", status: "QUEUED", workspaceId: "w1", userId: "u1",
+      businessType: "BUSINESS", selectedPages: ["landing"], description: "A bakery", metadata: {},
+    });
+    p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
+    p.site.findMany.mockResolvedValue([]);
+    txSiteCreate.mockResolvedValue({ id: "site-1" });
+    txPageCreateMany.mockResolvedValue({ count: 1 });
+    txJobUpdateMany.mockResolvedValue({ count: 1 });
+    genPage.mockResolvedValue({
+      sections: [{ type: "hero", html: '<h1 onclick="steal()">Fresh bread</h1><script>alert(1)</script><img src="x" onerror="alert(2)">' }],
+    });
+
+    const res = await POST(req("secret"), ctx);
+    expect(res.status).toBe(200);
+    const root = txPageCreateMany.mock.calls[0][0].data[0].blocks as { children: Array<{ content: string }> };
+    const html = root.children[0].content;
+    expect(html).toContain("Fresh bread");
+    expect(html).not.toMatch(/<script|onclick|onerror/i);
+  });
+
   /* X-A1 round 1: every generated page was rooted at "root" with sections
      ai-<type>-<i>, so a two-page site loaded in the editor as ONE tree. */
   it("writes element ids unique across the generated pages", async () => {
