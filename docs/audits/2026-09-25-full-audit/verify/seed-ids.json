@@ -1,0 +1,38 @@
+{
+  "users": {
+    "owner": "cmuhr2urx0000s9fr70dgxiba",
+    "admin": "cmuhr2ut60001s9fr3jxnkkaf",
+    "editor": "cmuhr2ut90002s9frwknwj4vf",
+    "viewer": "cmuhr2utb0003s9fr5dno8dfr",
+    "scoped": "cmuhr2utd0004s9frtnjtk0d3",
+    "designer": "cmuhr2utf0005s9frwfsxrfn5",
+    "outsider": "cmuhr2uth0006s9frmfg7ltsq",
+    "unverified": "cmuhr2utj0007s9frsddwxh33"
+  },
+  "workspaces": {
+    "verifyWs": "cmuhr2utm0008s9fr4glmc1pl",
+    "outsiderWs": "cmuhr2utr0009s9frdkhjt2ax",
+    "agencyWs": "cmuhr2utt000as9fr3ttpngyn"
+  },
+  "members": {
+    "admin": "cmuhr2uty000es9fr50ipcydd",
+    "editor": "cmuhr2uu0000gs9frwrqaczqm",
+    "viewer": "cmuhr2uu2000is9fr4h67e4vi",
+    "scoped": "cmuhr2uu6000ks9frset16i0y",
+    "designer": "cmuhr2uu8000ms9fria1fgdzx"
+  },
+  "sites": {
+    "s1": "cmuhr2uun000us9frk5tnb9we",
+    "s2": "cmuhr2uus000ws9frnk8mrk7s",
+    "s3": "cmuhr2uuy000ys9frl53jfnhl",
+    "s4": "cmuhr2uv20010s9frwwy77eky"
+  },
+  "cms": {
+    "collection": "cmuhr2uw0001is9frerlpmchf",
+    "entries": [
+      "cmuhr2uw7001ks9fr5vuimvgm",
+      "cmuhr2uw9001ms9fr5l4z1a9r",
+      "cmuhr2uwa001os9frcs62438p"
+    ]
+  }
+}

@@ -86,3 +86,11 @@ undefined/
 scratchpad_audit/
 packages/editor/.scratch/
 lib/__tests__/.live-pages.json
+
+# Phase 2 verify environment (audit-fix 2026-09-25): keep the seed/login
+# scripts and the seed-ids manifest, drop generated auth state, screenshots
+# and server logs — these are machine-local run artifacts, not source.
+docs/audits/2026-09-25-full-audit/verify/auth/
+docs/audits/2026-09-25-full-audit/verify/*.png
+docs/audits/2026-09-25-full-audit/verify/*.log
+docs/audits/2026-09-25-full-audit/verify/login-results.json
