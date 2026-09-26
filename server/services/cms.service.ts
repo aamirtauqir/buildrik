@@ -60,16 +60,21 @@ function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknow
  * the text comes back exactly as typed. Escaping belongs to the sink.
  *
  * Repeated until nothing changes: cutting a tag out of the middle of another
- * (`<<img …>img …>`) leaves text that is itself a tag.
+ * (`<<img …>img …>`) leaves text that is itself a tag. Capped at
+ * STRIP_MARKUP_MAX_ITERATIONS as defense-in-depth against a pathological
+ * input that never converges — real inputs stabilize in one or two passes.
  */
+const STRIP_MARKUP_MAX_ITERATIONS = 10;
+
 function stripMarkup(value: string): string {
   let text = value;
-  for (;;) {
+  for (let i = 0; i < STRIP_MARKUP_MAX_ITERATIONS; i++) {
     const fragment = DOMPurify.sanitize(text.replace(/&/g, "&amp;"), { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true });
     const next = fragment.textContent ?? "";
     if (next === text) return text;
     text = next;
   }
+  return text;
 }
 
 export async function listCollections(siteId: string) {

@@ -5,6 +5,23 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+// Lets one test (stripMarkup's iteration cap) override `.sanitize` with an
+// implementation that never converges; every other test leaves the override
+// unset and gets the real isomorphic-dompurify behavior (including its other
+// methods, e.g. `.addHook`, used by lib/sanitize-blocks.ts's own tests).
+let sanitizeOverride: ((...args: unknown[]) => unknown) | null = null;
+vi.mock("isomorphic-dompurify", async (importOriginal) => {
+  const actual = await importOriginal<{ default: object }>();
+  return {
+    default: new Proxy(actual.default, {
+      get(target, prop, receiver) {
+        if (prop === "sanitize" && sanitizeOverride) return sanitizeOverride;
+        return Reflect.get(target, prop, receiver);
+      },
+    }),
+  };
+});
+
 const colFindMany = vi.fn();
 const colFindFirst = vi.fn();
 const colFindUnique = vi.fn();
@@ -149,9 +166,27 @@ describe("entries cross-site guard", () => {
     const stored = (entCreate.mock.calls[0][0].data.data as { title: string }).title;
     expect(stored).not.toMatch(/<img/i);
   });
+
+  it("stripMarkup stops after a bounded number of passes instead of looping forever on an input that never converges", async () => {
+    let call = 0;
+    sanitizeOverride = () => {
+      call += 1;
+      // Never stabilizes: each pass returns different text, so an uncapped
+      // loop would run forever.
+      return { textContent: `x${call}` };
+    };
+    try {
+      colFindFirst.mockResolvedValueOnce({ id: "c1" });
+      entCreate.mockResolvedValueOnce({ id: "e1" });
+      await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: "irrelevant" } });
+      expect(call).toBeLessThanOrEqual(10);
+    } finally {
+      sanitizeOverride = null;
+    }
+  });
 });
 
-describe("CSV import (fix-all round, 2026-09-25)", () => {
+describe("CSV import", () => {
   const FIELDS = [
     { id: "f1", name: "Name", slug: "name" },
     { id: "f2", name: "Price", slug: "price" },

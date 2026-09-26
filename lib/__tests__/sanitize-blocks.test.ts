@@ -559,4 +559,10 @@ describe("sanitizeGeneratedPageHtml", () => {
     const out = sanitizeGeneratedPageHtml(html);
     expect(out).not.toMatch(/onclick/i);
   });
+
+  it("strips a dangerous URL in <object data=\"...\"> — data is a URL-bearing attribute, not just href/src", () => {
+    const html = '<html><body><object data="javascript:alert(1)"></object></body></html>';
+    const out = sanitizeGeneratedPageHtml(html);
+    expect(out).not.toMatch(/javascript:/i);
+  });
 });
