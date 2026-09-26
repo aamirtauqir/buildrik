@@ -5,9 +5,9 @@ All notable changes to this project will be documented in this file.
 ## Fix-all — Form after-submit / honeypot / notify email, Slider playback + controls — 2026-09-26
 
 ### Added
-- Form inspector "After submit" section: Action (Show message / Redirect), redirect URL (checked against `isDangerousUrl`), Send-to-email address, Spam protection toggle. Server-backed by new `forms.getBlock` / `forms.updateBlock`.
+- Form inspector "After submit" section: Action (Show message / Redirect), redirect URL (must be an absolute http(s) URL — `absoluteRedirectUrlSchema`, stricter than the general `isDangerousUrl` allowlist used for hrefs), Send-to-email address, Spam protection toggle. Server-backed by new `forms.getBlock` / `forms.updateBlock`.
 - Published forms: honeypot field (`_honeypot`) injected when spam protection is on, rejected silently server-side (already built); after-submit redirect honored by the public route; a same-page "show message" script swaps the form for its configured message.
-- Form notification email now goes to the block's own configured address (falls back to the workspace owner, same as before).
+- Form notification email now goes to the block's own configured address (inspector "Send to email") AND always copies the workspace owner, deduped case-insensitively when they're the same address.
 - Slider inspector "Playback" section: Autoplay + Interval, Arrows + Dots — written as `data-*` attributes on the slider element.
 - Carousel runtime for `.buildrick-slider` (autoplay, arrows, dots, respects `prefers-reduced-motion`) — shared behaviour between the canvas (`useSliderRuntime`, live DOM effect) and the published page (`lib/publish-sliders.ts`, the same logic inlined as a script), closing "slider exports as stacked slides with no behaviour."
 
