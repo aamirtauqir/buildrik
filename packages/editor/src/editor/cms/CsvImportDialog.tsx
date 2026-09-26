@@ -76,11 +76,11 @@ export function CsvImportDialog({
       return;
     }
     try {
-      const preview = (await client().cms.entries.importCsvPreview.mutate({
+      const preview = await client().cms.entries.importCsvPreview.mutate({
         siteId,
         collectionId: collection.id,
         csv,
-      })) as Preview;
+      });
       setStep({ kind: "map", csv, preview, mapping: preview.suggestedMapping });
     } catch (e) {
       setStep({ kind: "error", message: e instanceof Error ? e.message : "Couldn't read this file." });
@@ -101,12 +101,12 @@ export function CsvImportDialog({
       return;
     }
     try {
-      const result = (await client().cms.entries.importCsv.mutate({
+      const result = await client().cms.entries.importCsv.mutate({
         siteId,
         collectionId: collection.id,
         csv,
         columnMapping: mapping,
-      })) as ImportResult;
+      });
       if (result.imported > 0) {
         await hydrateCmsFromServer();
         onImported();

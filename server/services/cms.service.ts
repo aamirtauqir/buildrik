@@ -7,7 +7,7 @@ import type {
   UpsertCollectionInput,
   UpsertEntryInput,
 } from "@buildrik/shared/schemas/cms";
-import { CSV_IMPORT_MAX_ROWS } from "@buildrik/shared/schemas/cms";
+import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -167,6 +167,16 @@ function parseAndCapCsv(csv: string): { headers: string[]; dataRows: string[][] 
   if (dataRows.length === 0) throw new CmsError("BAD_REQUEST", "This file has a header row but no data.");
   if (dataRows.length > CSV_IMPORT_MAX_ROWS) {
     throw new CmsError("BAD_REQUEST", `This file has ${dataRows.length} rows — the limit is ${CSV_IMPORT_MAX_ROWS}.`);
+  }
+  if (headers.length > CSV_IMPORT_MAX_COLUMNS) {
+    throw new CmsError("BAD_REQUEST", `This file has ${headers.length} columns — the limit is ${CSV_IMPORT_MAX_COLUMNS}.`);
+  }
+  for (const row of dataRows) {
+    for (const cell of row) {
+      if (cell.length > CSV_IMPORT_MAX_CELL_LENGTH) {
+        throw new CmsError("BAD_REQUEST", `A cell is longer than ${CSV_IMPORT_MAX_CELL_LENGTH} characters — split this file up.`);
+      }
+    }
   }
   return { headers, dataRows };
 }

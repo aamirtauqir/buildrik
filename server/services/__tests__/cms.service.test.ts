@@ -161,6 +161,19 @@ describe("CSV import (fix-all round, 2026-09-25)", () => {
       const csv = ["Name", ...rows].join("\n");
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/limit is 500/);
     });
+
+    it("rejects a file over the column cap", async () => {
+      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      const headers = Array.from({ length: 101 }, (_, i) => `Col${i}`).join(",");
+      const csv = `${headers}\n${Array.from({ length: 101 }, () => "x").join(",")}`;
+      await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/limit is 100/);
+    });
+
+    it("rejects a file with a cell over the per-cell length cap", async () => {
+      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      const csv = `Name,Price\n${"a".repeat(5001)},12`;
+      await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
+    });
   });
 
   describe("importCsvEntries", () => {

@@ -66,6 +66,8 @@ export const deleteEntryInput = z.object({ siteId: z.string().min(1), id: z.stri
 // sanitization are enforced at one boundary regardless of client.
 export const CSV_IMPORT_MAX_BYTES = 300_000; // ~300KB of CSV text
 export const CSV_IMPORT_MAX_ROWS = 500; // data rows, header excluded
+export const CSV_IMPORT_MAX_COLUMNS = 100; // header cells — a pathological wide file shouldn't cost O(columns) per row for nothing a real collection needs
+export const CSV_IMPORT_MAX_CELL_LENGTH = 5_000; // characters per cell — big enough for a real field value, small enough that one cell can't eat the whole byte budget
 
 export const previewCsvEntriesInput = z.object({
   siteId: z.string().min(1),
