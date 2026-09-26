@@ -13,4 +13,14 @@ describe("DeleteWorkspaceModal — label association", () => {
     );
     expect(screen.getByLabelText(/type/i)).toBeInTheDocument();
   });
+
+  // Fix round 1: associating the label must not restyle it (controller ruling).
+  it("keeps the original body-sm, text-primary label", () => {
+    render(
+      <DeleteWorkspaceModal workspaceName="Acme Inc." onConfirm={vi.fn()} onClose={vi.fn()} deleting={false} />
+    );
+    const label = document.querySelector(`label[for="${screen.getByLabelText(/type/i).id}"]`) as HTMLElement;
+    expect(label.className).toBe("block text-body-sm font-medium mb-1");
+    expect(label.style.color).toBe("var(--color-text-primary)");
+  });
 });

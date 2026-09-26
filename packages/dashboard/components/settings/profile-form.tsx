@@ -70,6 +70,9 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
   const [bio, setBio] = useState(initialData?.bio ?? "");
   const [language, setLanguage] = useState(initialData?.language ?? "en");
   const [timezone, setTimezone] = useState(initialData?.timezone ?? "UTC");
+  const fullNameId = useId();
+  const displayNameId = useId();
+  const emailId = useId();
   const bioId = useId();
   const languageId = useId();
   const timezoneId = useId();
@@ -186,8 +189,11 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
+          <label htmlFor={fullNameId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            Full name
+          </label>
           <InputField
-            label="Full name"
+            id={fullNameId}
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
@@ -199,8 +205,11 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
         </div>
 
         <div>
+          <label htmlFor={displayNameId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            Display name
+          </label>
           <InputField
-            label="Display name"
+            id={displayNameId}
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
@@ -213,8 +222,11 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
       </div>
 
       <div>
+        <label htmlFor={emailId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+          Email
+        </label>
         <InputField
-          label="Email"
+          id={emailId}
           type="email"
           value={initialData?.email ?? ""}
           readOnly

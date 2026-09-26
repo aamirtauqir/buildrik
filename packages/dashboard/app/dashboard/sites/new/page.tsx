@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useId, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LayoutTemplate, Sparkles, FileText } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
@@ -41,6 +41,7 @@ function NewSitePageInner() {
 
   const [view, setView] = useState<View>(initialViewFor(searchParams.get("method")));
   const [siteName, setSiteName] = useState(searchParams.get("name") ?? "My New Site");
+  const siteNameId = useId();
 
   // AI wizard state
   const [businessType, setBusinessType] = useState<string | null>(null);
@@ -103,8 +104,9 @@ function NewSitePageInner() {
           Choose how you want to get started
         </p>
         <div className="mt-6 text-left">
+          <label htmlFor={siteNameId} className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>Site name</label>
           <InputField
-            label="Site name"
+            id={siteNameId}
             type="text"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}

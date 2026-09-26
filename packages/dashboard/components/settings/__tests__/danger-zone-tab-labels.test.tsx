@@ -17,4 +17,14 @@ describe("DangerZoneTab — label association", () => {
     expect(screen.getByLabelText("Reason (optional)")).toBeInTheDocument();
     expect(screen.getByLabelText(/to confirm/i)).toBeInTheDocument();
   });
+
+  // Fix round 1: associating the label must not restyle it (controller ruling).
+  it("the DELETE-confirm label keeps its original body, text-primary style", async () => {
+    const user = userEvent.setup();
+    render(<DangerZoneTab />);
+    await user.click(screen.getByText("I want to delete my account"));
+    const label = document.querySelector(`label[for="${screen.getByLabelText(/to confirm/i).id}"]`) as HTMLElement;
+    expect(label.className).toBe("block text-body font-medium mb-1");
+    expect(label.style.color).toBe("var(--color-text-primary)");
+  });
 });

@@ -40,6 +40,8 @@ function BrandingDialog({
   const [customDomain, setCustomDomain] = useState(initial.customDomain ?? "");
   const label = "text-body-sm font-semibold";
   const brandColorId = useId();
+  const logoUrlId = useId();
+  const customDomainId = useId();
   return (
     <Modal
       open={true}
@@ -66,10 +68,12 @@ function BrandingDialog({
           </div>
         </div>
         <div>
-          <InputField label="Logo URL" type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} wrapperClassName="mt-1 w-full" />
+          <label htmlFor={logoUrlId} className={label} style={{ color: "var(--color-text-secondary)" }}>Logo URL</label>
+          <InputField id={logoUrlId} type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} wrapperClassName="mt-1 w-full" />
         </div>
         <div>
-          <InputField label="Custom domain" type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} wrapperClassName="mt-1 w-full" />
+          <label htmlFor={customDomainId} className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
+          <InputField id={customDomainId} type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} wrapperClassName="mt-1 w-full" />
         </div>
         {/* The badge is decided by PLAN, not by this box: the publish worker sets
             `showBadge = plan === "FREE"` and `injectBadge` never reads the client

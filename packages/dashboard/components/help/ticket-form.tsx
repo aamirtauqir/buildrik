@@ -34,6 +34,7 @@ export function TicketForm() {
   const [subject, setSubject] = useState("");
   const [category, setCategory] = useState<SupportTicketInput["category"]>("GENERAL");
   const [description, setDescription] = useState("");
+  const subjectId = useId();
   const categoryId = useId();
   const descriptionId = useId();
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -179,8 +180,11 @@ export function TicketForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Subject */}
       <div>
+        <label htmlFor={subjectId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+          Subject
+        </label>
         <InputField
-          label="Subject"
+          id={subjectId}
           type="text"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}

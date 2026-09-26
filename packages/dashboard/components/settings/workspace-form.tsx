@@ -95,6 +95,7 @@ export function WorkspaceForm({
   const [accentColor, setAccentColor] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
   const [hexInput, setHexInput] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
   const [editsRequireApproval, setEditsRequireApproval] = useState(initialData?.editsRequireApproval ?? false);
+  const nameId = useId();
   const slugId = useId();
   const defaultLanguageId = useId();
   const timezoneId = useId();
@@ -174,8 +175,11 @@ export function WorkspaceForm({
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
+            <label htmlFor={nameId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              Workspace name
+            </label>
             <InputField
-              label="Workspace name"
+              id={nameId}
               type="text"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ArrowRight, Plus, Trash2, Download, Upload, Pencil } from "lucide-react";
 import { Button, StatCard, MetricValue, DataTable, Pill, InputField, type Column, SelectField } from "@/components/dashboard/primitives";
 
@@ -26,6 +26,8 @@ interface RedirectsTabProps {
 
 export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, onDelete, onImport, onExport, saving }: RedirectsTabProps) {
   const [fromPath, setFromPath] = useState("");
+  const fromId = useId();
+  const toId = useId();
   const [toUrl, setToUrl] = useState("");
   const [type, setType] = useState<"301" | "302">("301");
   // Editing an existing redirect reuses this same form (was Add/Delete only — a
@@ -145,11 +147,13 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
           ) : (
             <div className="flex flex-wrap items-end gap-2">
               <div className="flex-1 min-w-[140px]">
-                <InputField label="From" value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="font-mono" />
+                <label htmlFor={fromId} className="block text-body-sm font-medium text-[var(--color-text-muted)]">From</label>
+                <InputField id={fromId} value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
               <ArrowRight size={16} className="mb-2 text-neutral-400" />
               <div className="flex-1 min-w-[140px]">
-                <InputField label="To" value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="font-mono" />
+                <label htmlFor={toId} className="block text-body-sm font-medium text-[var(--color-text-muted)]">To</label>
+                <InputField id={toId} value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
               {/* Named: the two option values are the only text near it, so a
                   screen reader announced "combo box" with no idea it chose the

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Globe, Plus, LayoutGrid } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
@@ -43,6 +43,7 @@ export function UseTemplateModal(props: UseTemplateModalProps) {
   // the new-vs-existing chooser.
   const [step, setStep] = useState<Step>(fromSite ? "pick-template" : "choose");
   const [siteName, setSiteName] = useState(props.templateName ?? "");
+  const siteNameId = useId();
   // The chosen target site (from-template existing path) or the chosen template
   // (from-site path) — both feed the single confirm step.
   const [targetSite, setTargetSite] = useState<{ id: string; name: string } | null>(null);
@@ -181,8 +182,9 @@ export function UseTemplateModal(props: UseTemplateModalProps) {
       {/* Step: name the new site (from a template) */}
       {step === "new" && (
         <div>
+          <label htmlFor={siteNameId} className="mb-1.5 block text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Site name</label>
           <InputField
-            label="Site name"
+            id={siteNameId}
             autoFocus
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}

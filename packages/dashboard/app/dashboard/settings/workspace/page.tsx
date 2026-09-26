@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { WorkspaceForm } from "@/components/settings/workspace-form";
@@ -15,6 +15,7 @@ import { ErrorState } from "@/components/states";
 export default function WorkspaceSettingsPage() {
   const { addToast } = useToast();
   const [transferEmail, setTransferEmail] = useState("");
+  const transferEmailId = useId();
   const utils = trpc.useUtils();
   const wsQuery = trpc.account.workspace.get.useQuery();
   const pendingTransferQuery = trpc.account.workspace.transfer.pending.useQuery();
@@ -120,8 +121,11 @@ export default function WorkspaceSettingsPage() {
             }}
           >
             <div className="flex-1">
+              <label htmlFor={transferEmailId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+                New owner&apos;s email
+              </label>
               <InputField
-                label="New owner's email"
+                id={transferEmailId}
                 type="email"
                 value={transferEmail}
                 onChange={(e) => setTransferEmail(e.target.value)}

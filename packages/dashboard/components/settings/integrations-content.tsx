@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
@@ -194,6 +194,7 @@ export function IntegrationsContent() {
   const intQuery = trpc.account.integrations.list.useQuery();
 
   const [expandedProvider, setExpandedProvider] = useState<string | null>(null);
+  const fieldIdBase = useId();
   const [drafts, setDrafts] = useState<Record<string, Record<string, string>>>({});
 
   const addMutation = trpc.account.integrations.add.useMutation({
@@ -295,8 +296,11 @@ export function IntegrationsContent() {
               <div className="space-y-3">
                 {cfg.fields.map((f) => (
                   <div key={f.key}>
+                    <label htmlFor={`${fieldIdBase}-${cfg.provider}-${f.key}`} className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>
+                      {f.label}
+                    </label>
                     <InputField
-                      label={f.label}
+                      id={`${fieldIdBase}-${cfg.provider}-${f.key}`}
                       type="text"
                       value={draftValue(cfg.provider, f.key, existing)}
                       onChange={(e) => setDraft(cfg.provider, f.key, e.target.value)}

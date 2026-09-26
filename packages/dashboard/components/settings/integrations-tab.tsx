@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type InputHTMLAttributes, useId, useState } from "react";
 import { Pill, Button, InputField } from "@/components/dashboard/primitives";
 
 export const INTEGRATION_CONFIGS = [
@@ -101,6 +101,21 @@ function Toggle({
   );
 }
 
+/** A provider-config text field: the label keeps this panel's own
+ *  body-sm/primary style (InputField's built-in `label` is body/secondary),
+ *  associated to the input through a generated id. */
+function ConfigField({ label, ...props }: InputHTMLAttributes<HTMLInputElement> & { label: string; wrapperClassName?: string }) {
+  const id = useId();
+  return (
+    <>
+      <label htmlFor={id} className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        {label}
+      </label>
+      <InputField id={id} {...props} />
+    </>
+  );
+}
+
 function GoogleAnalyticsConfig({
   values,
   onChange,
@@ -111,7 +126,7 @@ function GoogleAnalyticsConfig({
   return (
     <div className="space-y-3">
       <div>
-        <InputField
+        <ConfigField
           label="Tracking ID"
           type="text"
           value={values["trackingId"] ?? ""}
@@ -154,7 +169,7 @@ function MailchimpConfig({
   return (
     <div className="space-y-3">
       <div>
-        <InputField
+        <ConfigField
           label="API Key"
           type="text"
           value={values["apiKey"] ?? ""}
@@ -164,7 +179,7 @@ function MailchimpConfig({
         />
       </div>
       <div>
-        <InputField
+        <ConfigField
           label="Audience ID"
           type="text"
           value={values["audienceId"] ?? ""}
@@ -209,7 +224,7 @@ function ZapierConfig({
   return (
     <div className="space-y-3">
       <div>
-        <InputField
+        <ConfigField
           label="Webhook URL"
           type="text"
           value={values["webhookUrl"] ?? ""}
@@ -257,7 +272,7 @@ function SlackConfig({
   return (
     <div className="space-y-3">
       <div>
-        <InputField
+        <ConfigField
           label="Webhook URL"
           type="text"
           value={values["webhookUrl"] ?? ""}
@@ -267,7 +282,7 @@ function SlackConfig({
         />
       </div>
       <div>
-        <InputField
+        <ConfigField
           label="Channel name"
           type="text"
           value={values["channelName"] ?? ""}

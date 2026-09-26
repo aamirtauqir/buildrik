@@ -32,4 +32,14 @@ describe("UseTemplateModal — label association", () => {
     await user.click(screen.getByText("A new site"));
     expect(screen.getByLabelText("Site name")).toBeInTheDocument();
   });
+
+  // Fix round 1: associating the label must not restyle it (controller ruling).
+  it("keeps the original body-sm, text-primary label", async () => {
+    const user = userEvent.setup();
+    render(<UseTemplateModal open templateId="tmpl-1" templateName="Bella Cucina" onClose={vi.fn()} />);
+    await user.click(screen.getByText("A new site"));
+    const label = document.querySelector(`label[for="${screen.getByLabelText("Site name").id}"]`) as HTMLElement;
+    expect(label.className).toBe("mb-1.5 block text-body-sm font-medium");
+    expect(label.style.color).toBe("var(--color-text-primary)");
+  });
 });
