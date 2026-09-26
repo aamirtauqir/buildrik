@@ -185,7 +185,7 @@ function thumbFor(item: LibraryItem, viewMode: "grid" | "list"): React.ReactNode
       <span
         style={{
           fontSize: viewMode === "list" ? 18 : 32,
-          fontWeight: 700,
+          fontWeight: 600,
           color: "var(--bk-ink)",
         }}
       >

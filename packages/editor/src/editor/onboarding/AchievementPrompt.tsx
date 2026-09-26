@@ -68,7 +68,7 @@ const HEAD = "tw:flex tw:items-start tw:gap-[14px]";
    in the board's direction: 20 was what shipped. */
 const BADGE =
   "tw:size-10 tw:flex-none tw:rounded-full tw:flex tw:items-center tw:justify-center " +
-  "tw:text-[length:var(--bk-text-16)] tw:font-bold tw:text-[var(--bk-accent-on)]";
+  "tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-accent-on)]";
 const HEAD_TEXT = "tw:flex tw:flex-col tw:gap-1 tw:flex-1 tw:min-w-0";
 /* 11/600/uppercase/0.88 tracking is the board's kicker on BOTH states, in
    `--bk-success-text` either way — it names the fact that a step landed, not

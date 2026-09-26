@@ -31,22 +31,18 @@ export function useCanvasContent({
   const { resolvedContent } = useCMSPreview({ composer, content });
 
   const displayContent = React.useMemo(() => {
-    // SSR guard — editor is browser-only; raw content is acceptable fallback
-    if (typeof DOMParser === "undefined") return content;
-
-    const page = composer?.elements.getActivePage();
-    const rootId = page?.root?.id;
-
     if (!content) {
+      const page = composer?.elements.getActivePage();
+      const rootId = page?.root?.id;
       // Minimal root wrapper — React overlay in Canvas.tsx handles the CTA UI
       return `<div data-buildrick-id="${rootId || ""}" class="bd-empty-canvas-root"></div>`;
     }
 
-    // Use resolvedContent (with CMS bindings applied) for DOM manipulation
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(resolvedContent, "text/html");
-
-    return doc.body.innerHTML;
+    // D-7: resolvedContent already IS the innerHTML markup (useCMSPreview
+    // either returns content verbatim or re-serializes doc.body.innerHTML
+    // after applying bindings) — re-parsing it here was a no-op DOMParser
+    // round trip on every render.
+    return resolvedContent;
   }, [composer, content, resolvedContent]);
 
   return { displayContent };

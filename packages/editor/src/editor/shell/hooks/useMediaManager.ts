@@ -47,6 +47,7 @@ export function useMediaManager(composer: Composer | null): UseMediaManagerResul
     };
 
     composer.media.on(MEDIA_EVENTS.MEDIA_ADDED, updateAssets);
+    composer.media.on(MEDIA_EVENTS.MEDIA_ADDED_BATCH, updateAssets);
     composer.media.on(MEDIA_EVENTS.MEDIA_DELETED, updateAssets);
     composer.media.on(MEDIA_EVENTS.MEDIA_UPDATED, updateAssets);
 
@@ -55,6 +56,7 @@ export function useMediaManager(composer: Composer | null): UseMediaManagerResul
 
     return () => {
       composer.media.off(MEDIA_EVENTS.MEDIA_ADDED, updateAssets);
+      composer.media.off(MEDIA_EVENTS.MEDIA_ADDED_BATCH, updateAssets);
       composer.media.off(MEDIA_EVENTS.MEDIA_DELETED, updateAssets);
       composer.media.off(MEDIA_EVENTS.MEDIA_UPDATED, updateAssets);
     };

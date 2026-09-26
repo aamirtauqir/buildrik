@@ -12,13 +12,22 @@ import type { ImageEditorContext } from "./hooks/useStudioModals";
 import { SaveTemplate } from "../../templates/SaveTemplate";
 import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
-import { ImageEditorModal, IconPickerModal } from "../media";
+import { IconPickerModal } from "../media";
 import { KeyboardCheatSheet } from "../canvas/controls/KeyboardCheatSheet";
 import { KeyboardLegend } from "../canvas/controls/KeyboardLegend";
 import { useToast } from "@/editor/chrome-ui";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
 import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModal";
+
+/* D-12: ImageEditorModal pulls in react-easy-crop, which only a handful of
+   sessions ever open (the media library's crop/edit flow). React.lazy keeps
+   it out of the shell's eagerly-loaded bundle; StudioModals already renders
+   it inside its own `showImageEditor &&` guard, so the Suspense fallback
+   only shows for the one frame it takes the chunk to fetch. */
+const ImageEditorModal = React.lazy(() =>
+  import("../media/ImageEditorModal").then((m) => ({ default: m.ImageEditorModal })),
+);
 
 // ============================================================================
 // TYPES
@@ -165,15 +174,17 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
           rejection is the dialog's own failure state (3695:45542, with
           Retry save), so no toast rides beside it. */}
       {showImageEditor && imageEditorContext && (
-        <ImageEditorModal
-          isOpen={showImageEditor}
-          onClose={onCloseImageEditor}
-          imageSrc={imageEditorContext.imageSrc}
-          fileName={imageEditorContext.fileName}
-          initialTab={imageEditorContext.initialTab}
-          onSave={imageEditorContext.onSave}
-          onDone={imageEditorContext.onDone}
-        />
+        <React.Suspense fallback={null}>
+          <ImageEditorModal
+            isOpen={showImageEditor}
+            onClose={onCloseImageEditor}
+            imageSrc={imageEditorContext.imageSrc}
+            fileName={imageEditorContext.fileName}
+            initialTab={imageEditorContext.initialTab}
+            onSave={imageEditorContext.onSave}
+            onDone={imageEditorContext.onDone}
+          />
+        </React.Suspense>
       )}
 
       {/* Icon Picker */}

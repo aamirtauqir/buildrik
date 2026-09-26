@@ -91,7 +91,7 @@ const STEP_LABEL_OFF = "tw:text-[var(--bk-ink-muted)]";
    a fixed 20px circle. `rounded-[999px]` rather than `rounded-full` because
    that is the number the board states; at this size the two render alike. */
 const STEP_DOT =
-  "tw:px-2 tw:py-0.5 tw:rounded-[999px] tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-bold tw:flex-none";
+  "tw:px-2 tw:py-0.5 tw:rounded-[999px] tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-semibold tw:flex-none";
 const STEP_DOT_ON = "tw:bg-[var(--bk-accent)] tw:text-white";
 /* The board marks a finished step with success green, not another blue. */
 const STEP_DOT_DONE = "tw:bg-[var(--bk-success)] tw:text-white";

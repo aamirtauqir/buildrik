@@ -138,10 +138,21 @@ export function useLayerTree(
       EVENTS.ELEMENT_DUPLICATED,
       EVENTS.ELEMENT_UPDATED,
     ] as const;
-    const handler = () => buildLayersFromEngine();
+    // D-9: coalesce rebuilds with rAF — a drag/edit storm fired all 7 events
+    // per tick with no coalescing, one full tree rebuild each. Same pattern
+    // as useCanvasSync.scheduleSync.
+    let pendingRaf: number | null = null;
+    const handler = () => {
+      if (pendingRaf != null) return;
+      pendingRaf = requestAnimationFrame(() => {
+        pendingRaf = null;
+        buildLayersFromEngine();
+      });
+    };
     events.forEach((e) => composer.on(e, handler));
     return () => {
       events.forEach((e) => composer.off(e, handler));
+      if (pendingRaf != null) cancelAnimationFrame(pendingRaf);
     };
   }, [composer, buildLayersFromEngine]);
 
@@ -185,6 +196,10 @@ export function useLayerTree(
     }
     if (ancestorIds.length > 0) {
       setExpandedIds((prev) => {
+        // D-9: bail out with the same Set when every ancestor is already
+        // expanded — this ran on every hover tick and re-rendered the whole
+        // layer tree + inspector even when nothing changed.
+        if (ancestorIds.every((id) => prev.has(id))) return prev;
         const next = new Set(prev);
         ancestorIds.forEach((id) => next.add(id));
         return next;

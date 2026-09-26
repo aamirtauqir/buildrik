@@ -5,7 +5,7 @@
  */
 
 import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
-import JSZip from "jszip";
+import type JSZip from "jszip";
 import type { ElementData, PageData } from "../../shared/types";
 import type { Composer } from "../Composer";
 import type { ExportResult, ExportedFile } from "../../shared/types/export";
@@ -72,7 +72,9 @@ export class ReactExporter {
     if (!result.success || !result.files) {
       throw new Error(result.error ?? "Export failed");
     }
-    const zip = new JSZip();
+    // D-12: lazy import — keeps jszip out of the first-load chunk.
+    const { default: JSZipCtor } = await import("jszip");
+    const zip: JSZip = new JSZipCtor();
 
     for (const file of result.files) {
       zip.file(file.name, file.content);

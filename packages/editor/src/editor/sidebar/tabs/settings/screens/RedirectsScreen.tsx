@@ -243,7 +243,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
      the prop each render must not reset a half-edited draft. */
   const repairRef = React.useRef(repair);
   repairRef.current = repair;
-  const repairKey = repair ? `${repair.pageId} ${repair.pageName} ${repair.from} ${repair.to}` : null;
+  const repairKey = repair ? `${repair.pageId}\u0000${repair.pageName}\u0000${repair.from}\u0000${repair.to}` : null;
   React.useEffect(() => {
     const door = repairRef.current;
     if (!repairKey || !door) return;

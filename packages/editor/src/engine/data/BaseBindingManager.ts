@@ -158,6 +158,15 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
   }
 
   /**
+   * True if any element has at least one binding. Cheap existence check for
+   * callers that want to skip resolution work entirely when there is nothing
+   * to resolve (e.g. useCMSPreview's no-bindings short-circuit).
+   */
+  hasAny(): boolean {
+    return this.bindings.size > 0;
+  }
+
+  /**
    * Export bindings for persistence.
    */
   export(): Record<string, T[]> {

@@ -15,7 +15,8 @@ export interface RightPanelProps extends React.HTMLAttributes<HTMLDivElement> {
 /* narrow/wide supply their own width value — Tailwind utilities of equal
    specificity have no className-order-to-cascade-order guarantee. */
 const WIDTH_CLASS: Record<"narrow" | "wide", string> = {
-  narrow: "tw:w-[300px]",
+  narrow: "tw:w-[var(--bk-size-panel-right)]",
+  // No --bk-size-* token for 360px exists yet (A10-11) — literal kept as-is.
   wide: "tw:w-[360px]",
 };
 
