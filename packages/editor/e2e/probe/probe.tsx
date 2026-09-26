@@ -3348,9 +3348,8 @@ const CASES: Record<string, () => React.ReactElement> = {
   },
   // "settings-webhooks" (board 640:3849) removed A-12/A01-6 — webhooks moved
   // from this pane's WebhooksScreen to the dashboard's Settings >
-  // Integrations, which this probe harness does not render. The board 640:
-  // 3849 / s7-settings-webhooks conformance entries are now stale history,
-  // not a live surface.
+  // Integrations, which this probe harness does not render. Board 640:3849
+  // is retired in boards.json and its s7-settings-webhooks recipe deleted.
   /* Board 639:3092 — the connected-domain state, in the S7 pane rather than
      the DNS drill-in `settings-domains-dns` measures. */
   "settings-domains": () => {

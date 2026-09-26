@@ -14,9 +14,9 @@
       "drift-open": 3,
       "unreachable": 46
     },
-    "retired": 24,
+    "retired": 25,
     "total": 632,
-    "active": 505
+    "active": 504
   },
   "activeFamilies": [
     "AI",
@@ -3745,10 +3745,10 @@
       "state": "Settings · Webhooks",
       "width": 1440,
       "height": 900,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
-      "recipe": "s7-settings-webhooks",
-      "verifiedNote": "conformed + measured 2026-09-08 (recipe s7-settings-webhooks): 14/14. A CARD INSIDE A CARD: .bd-set-webhook-card wrapped the endpoint rows in a bg-subtle wash the board does not draw. It was the ONE FAILING target on the surface (background-color #f3f4f6 vs #ffffff) AND it dropped three 11px --bk-ink-muted strings to 4.39:1 — flattening fixed the diff failure and all three contrast failures at once. COPY: card 'Webhooks' → 'Endpoint'. NOT BUILT: the RECENT DELIVERIES card.",
+      "recipe": null,
+      "verifiedNote": "RETIRED 2026-09-26 (audit A-12 remainder, lane L5b): webhooks are workspace-scoped and moved out of the editor to the dashboard's Settings > Integrations (WebhooksCard); the editor's Webhooks row is now an external link like Members/Billing. The WebhooksScreen this row measured is deleted, with its probe case and the s7-settings-webhooks recipe. Earlier history: conformed + measured 2026-09-08 (recipe s7-settings-webhooks): 14/14. A CARD INSIDE A CARD: .bd-set-webhook-card wrapped the endpoint rows in a bg-subtle wash the board does not draw. It was the ONE FAILING target on the surface (background-color #f3f4f6 vs #ffffff) AND it dropped three 11px --bk-ink-muted strings to 4.39:1 — flattening fixed the diff failure and all three contrast failures at once. COPY: card 'Webhooks' → 'Endpoint'. NOT BUILT: the RECENT DELIVERIES card.",
       "verified": "drift-fixed"
     },
     {
@@ -8378,6 +8378,6 @@
       "verifiedNote": "Clone S3 walk 2026-09-14 (unified editor, worktree on localhost:3001, scratch-ver seeded, migration settings_s3_redirects applied locally with migrate deploy, the walk's rows and slug history removed and the seed reset and re-run after). X-Frame-Options → DENY, Max age → 1 year: footer `Unsaved changes`, Save changes; Cancel → Unsaved settings. live-3397-34227-headers-unsaved."
     }
   ],
-  "coveredFloor": 185,
+  "coveredFloor": 184,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

@@ -1325,14 +1325,6 @@
     "contrastPairs": {},
     "nonTextPairs": {}
   },
-  "s7-settings-webhooks": {
-    "skipped": 0,
-    "compared": 14,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
   "s7-settings-redirects": {
     "skipped": 2,
     "compared": 9,
