@@ -237,7 +237,7 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
             />
           </div>
           {error ? (
-            <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-danger)]">{error}</div>
+            <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error)]">{error}</div>
           ) : saving ? (
             <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">Saving…</div>
           ) : null}
