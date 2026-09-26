@@ -45,9 +45,14 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   };
   const livePages = allPages.filter(isLive);
   const pageCount = livePages.length;
-  const emptyPages = livePages.filter(
-    (p) => Array.isArray(p.blocks) && p.blocks.length === 0
-  );
+  /* Empty = legacy `[]`, or an element root with no children. Real pages
+     store a root object, so the `[]` test alone never warned for one — and
+     new pages are written as an empty root (blankPageRoot), not `[]`. */
+  const emptyPages = livePages.filter((p) => {
+    if (Array.isArray(p.blocks)) return p.blocks.length === 0;
+    const root = asContentRoot(p.blocks);
+    return root !== undefined && !(Array.isArray(root.children) && root.children.length > 0);
+  });
 
   const checks: PrePublishChecksResult["checks"] = [];
 

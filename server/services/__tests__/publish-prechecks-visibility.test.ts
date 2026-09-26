@@ -90,6 +90,19 @@ describe("pre-publish checks count what ships", () => {
     expect(status(checks, "Empty pages")).toBe("warning");
   });
 
+  /* Lrt round 1: a real page stores an element ROOT, not an array, so the
+     [] test never warned for one — and new pages now store an empty root
+     object (blankPageRoot) instead of []. Both shapes are empty. */
+  it("warns about a page whose stored root has no children", async () => {
+    pageFindManyMock.mockResolvedValue([
+      { id: "1", name: "Home", blocks: { id: "root", type: "container", children: [{ id: "h", type: "heading" }] }, settings: null },
+      { id: "2", name: "New", blocks: { id: "el-x", type: "container", children: [] }, settings: null },
+    ]);
+    const { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "Empty pages")).toBe("warning");
+    expect(detail(checks, "Empty pages")).toContain("1 page has");
+  });
+
   it("fails when every page is non-live, rather than claiming pages are ready", async () => {
     pageFindManyMock.mockResolvedValue([
       { id: "1", name: "Home", blocks: [{}], settings: { visibility: "password" } },
