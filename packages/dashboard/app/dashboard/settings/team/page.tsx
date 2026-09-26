@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { Suspense, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
@@ -14,7 +14,7 @@ import { Button, MetricValue } from "@/components/dashboard/primitives";
 import { PageHeaderActions } from "@/components/dashboard/shell/page-actions";
 import { UserPlus } from "lucide-react";
 
-export default function TeamPage() {
+function TeamPageInner() {
   const { data: session } = useSession();
   const { addToast } = useToast();
   const searchParams = useSearchParams();
@@ -274,5 +274,15 @@ export default function TeamPage() {
         isLoading={inviteMutation.isPending}
       />
     </div>
+  );
+}
+
+export default function TeamPage() {
+  // useSearchParams (?invite=true from the command palette) needs a Suspense
+  // boundary to prerender — same shape as the billing page.
+  return (
+    <Suspense fallback={<div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />}>
+      <TeamPageInner />
+    </Suspense>
   );
 }
