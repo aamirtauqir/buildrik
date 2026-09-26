@@ -37,7 +37,7 @@ describe("Pages panel delete confirmations", () => {
   });
 
   it("tells the bulk case that one undo covers the whole batch", () => {
-    const bulk = messages.find((m) => m.includes("removed from this site"));
+    const bulk = messages.find((m) => m.includes("Inbound links"));
     expect(bulk).toMatch(/One undo/i);
   });
 });

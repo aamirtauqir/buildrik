@@ -220,6 +220,16 @@ describe("usePages commitRename", () => {
     expect(result.current.renamingPageId).toBeNull();
   });
 
+  /* v3 4418:94200: a Keep-URL rename reports the kept URL, with Undo. */
+  it("reports “Renamed to X · URL /slug kept” with Undo on a Keep-URL rename", () => {
+    const composer = createMockComposer({ pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")] });
+    const { result } = setup(composer);
+    act(() => result.current.commitRename("p2", "Our menu"));
+    const toast = lastToast();
+    expect(toast?.description).toMatch(/^Renamed to Our menu · URL \/.+ kept$/);
+    expect(toast?.action?.label).toBe("Undo");
+  });
+
   it("does not call updatePage for an empty/whitespace name but still exits rename mode", () => {
     const composer = createMockComposer({ pages: [pg("p1", "Home")] });
     const { result } = setup(composer);
@@ -273,7 +283,7 @@ describe("usePages deletePage", () => {
 
     expect(composer.elements.deletePage).toHaveBeenCalledWith("p2");
     const toast = lastToast();
-    expect(toast).toMatchObject({ description: '"About" deleted', tone: "info" });
+    expect(toast).toMatchObject({ description: "About deleted", tone: "info" });
     expect(toast?.action?.label).toBe("Undo");
 
     act(() => toast?.action?.onClick());
@@ -284,14 +294,17 @@ describe("usePages deletePage", () => {
 // ── duplicatePage ────────────────────────────────────────────────────────────
 
 describe("usePages duplicatePage", () => {
-  it("delegates to elements.duplicatePage without toasting on success", () => {
+  /* v3 4418:93381: "Menu duplicated · Menu copy · Open". */
+  it("delegates to elements.duplicatePage and reports the copy with an Open action", () => {
     const composer = createMockComposer({ pages: [pg("p1", "Home")] });
     const { result } = setup(composer);
 
     act(() => result.current.duplicatePage("p1"));
 
     expect(composer.elements.duplicatePage).toHaveBeenCalledWith("p1");
-    expect(addToastMock).not.toHaveBeenCalled();
+    const toast = lastToast();
+    expect(toast?.description).toBe("Home duplicated · Home Copy");
+    expect(toast?.action?.label).toBe("Open");
     expect(result.current.pages).toHaveLength(2);
     expect(result.current.pages[1].name).toBe("Home Copy");
   });
@@ -309,10 +322,24 @@ describe("usePages duplicatePage", () => {
   });
 });
 
+describe("usePages deletePages", () => {
+  /* v3 4418:96537 — one toast per action. */
+  it("deletes every page and reports once, naming them, with one Undo", () => {
+    const composer = createMockComposer({
+      pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu"), pg("p3", "Contact")],
+    });
+    const { result } = setup(composer);
+    act(() => result.current.deletePages(["p2", "p3"]));
+    expect(composer.elements.deletePage).toHaveBeenCalledTimes(2);
+    expect(addToastMock).toHaveBeenCalledTimes(1);
+    expect(lastToast()?.description).toBe("2 pages deleted · Menu, Contact");
+  });
+});
+
 // ── setHomepage ──────────────────────────────────────────────────────────────
 
 describe("usePages setHomepage", () => {
-  it("calls elements.setHomePage and toasts success for a normal page", () => {
+  it("calls elements.setHomePage and reports it with Undo (v3 4418:93657)", () => {
     const composer = createMockComposer({
       pages: [pg("p1", "Home", { isHome: true }), pg("p2", "About")],
     });
@@ -321,10 +348,9 @@ describe("usePages setHomepage", () => {
     act(() => result.current.setHomepage("p2"));
 
     expect(composer.elements.setHomePage).toHaveBeenCalledWith("p2");
-    expect(lastToast()).toMatchObject({
-      description: "Homepage updated. Your navigation menu may need updating manually.",
-      tone: "success",
-    });
+    const toast = lastToast();
+    expect(toast).toMatchObject({ description: "About is now the homepage", tone: "info" });
+    expect(toast?.action?.label).toBe("Undo");
   });
 });
 
@@ -360,7 +386,7 @@ describe("usePages copyPageLink", () => {
     expect(writeText).toHaveBeenCalledWith("https://example.com/home");
     await waitFor(() =>
       expect(lastToast()).toMatchObject({
-        description: "Link copied: https://example.com/home",
+        description: "Link copied · example.com/home",
         tone: "success",
       })
     );

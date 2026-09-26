@@ -22,6 +22,7 @@
  * @license BSD-3-Clause
  */
 
+import { listNames } from "@shared/utils/helpers/string";
 import * as React from "react";
 import { PanelFrame, Button, Menu, MenuItem, Modal, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
 import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
@@ -98,12 +99,6 @@ const FIX_TARGETS: Record<string, FixTarget> = {
 
 /** The board's row rhythm: label left, value right, one line. */
 const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-[3px]";
-
-/** "Home, Menu and Contact". */
-function listNames(names: string[]): string {
-  if (names.length <= 1) return names[0] ?? "";
-  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
-}
 
 /** Board 7045:77984 — the primary's tooltip: what it replaces and what ships. */
 export function publishTooltip(lastLiveVersion: number | null, pageNames: string[]): string {

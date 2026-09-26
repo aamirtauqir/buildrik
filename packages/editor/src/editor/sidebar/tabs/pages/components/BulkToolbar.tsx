@@ -7,33 +7,31 @@
  */
 
 import * as React from "react";
-import { useClickOutside } from "@/shared/hooks";
 import type { FolderItem } from "../types";
 import { Button } from "@/editor/chrome-ui";
+import { MovePagesDialog, TOP_LEVEL } from "./MovePagesDialog";
 
 interface Props {
   selectedCount: number;
+  /** The selected pages' names, for the Move dialog's line. */
+  selectedNames: string[];
   folders: FolderItem[];
   onDuplicate: () => void;
   onMoveToFolder: (folderId: string) => void;
   onRemoveFromFolders: () => void;
   onDelete: () => void;
-  onClear: () => void;
 }
 
 export const BulkToolbar: React.FC<Props> = ({
   selectedCount,
+  selectedNames,
   folders,
   onDuplicate,
   onMoveToFolder,
   onRemoveFromFolders,
   onDelete,
-  onClear,
 }) => {
-  const [folderPickerOpen, setFolderPickerOpen] = React.useState(false);
-  const pickerRef = React.useRef<HTMLDivElement>(null);
-
-  useClickOutside(pickerRef, () => setFolderPickerOpen(false), { enabled: folderPickerOpen });
+  const [moveOpen, setMoveOpen] = React.useState(false);
 
   return (
     <div
@@ -45,68 +43,24 @@ export const BulkToolbar: React.FC<Props> = ({
       <span className="bd-pg-bulk-count tabular">
         <b>{selectedCount}</b> selected
       </span>
-      {/* Board 141:120-123 order: the count, then Duplicate, Move to…, Delete,
-          left-aligned. The ✕ that follows is not on the board — it is the only
-          way back out of bulk mode with the mouse, so it stays. */}
+      {/* v3 4418:94471: the count, Duplicate, Move to…, Delete. No ✕ — the
+          header's "Done" (7069:78984) leaves select mode. */}
       <Button type="button" onClick={onDuplicate}>Duplicate</Button>
-      <div className="bd-pg-bulk-folder" ref={pickerRef}>
-        <Button
-          type="button"
-          onClick={() => setFolderPickerOpen((o) => !o)}
-          aria-expanded={folderPickerOpen}
-          aria-haspopup="menu"
-        >
-          Move to…
-        </Button>
-        {folderPickerOpen && (
-          <div className="bd-pg-bulk-menu" role="menu">
-            {folders.length === 0 ? (
-              <div className="bd-pg-bulk-menu-empty">No folders yet</div>
-            ) : (
-              folders.map((f) => (
-                <Button
-                  key={f.id}
-                  type="button"
-                  className="bd-pg-bulk-menu-item"
-                  role="menuitem"
-                  onClick={() => {
-                    onMoveToFolder(f.id);
-                    setFolderPickerOpen(false);
-                  }}
-                >
-                  {f.name}
-                </Button>
-              ))
-            )}
-            <div className="bd-pg-bulk-menu-sep" />
-            <Button
-              type="button"
-              className="bd-pg-bulk-menu-item"
-              role="menuitem"
-              onClick={() => {
-                onRemoveFromFolders();
-                setFolderPickerOpen(false);
-              }}
-            >
-              Remove from folder
-            </Button>
-          </div>
-        )}
-      </div>
-      <Button type="button" className="danger" onClick={onDelete}>Delete</Button>
-      <span className="bd-pg-bulk-spacer" />
-      <Button
-        type="button"
-        className="bd-pg-bulk-close"
-        onClick={onClear}
-        aria-label="Clear selection"
-        title="Clear selection"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
+      <Button type="button" data-testid="pages-bulk-move" onClick={() => setMoveOpen(true)}>
+        Move to…
       </Button>
+      <Button type="button" className="danger" onClick={onDelete}>Delete</Button>
+      <MovePagesDialog
+        open={moveOpen}
+        pageNames={selectedNames}
+        folders={folders}
+        onClose={() => setMoveOpen(false)}
+        onMove={(target) => {
+          setMoveOpen(false);
+          if (target === TOP_LEVEL) onRemoveFromFolders();
+          else onMoveToFolder(target);
+        }}
+      />
     </div>
   );
 };

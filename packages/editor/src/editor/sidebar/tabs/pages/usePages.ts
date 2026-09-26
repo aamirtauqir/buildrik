@@ -67,6 +67,8 @@ export interface UsePagesReturn {
   selectPage: (pageId: string) => void;
   duplicatePage: (pageId: string) => void;
   deletePage: (pageId: string) => void;
+  /** Bulk delete with one report (v3 4418:96537). Guards are the caller's. */
+  deletePages: (pageIds: string[]) => void;
   setHomepage: (pageId: string) => void;
   copyPageLink: (pageId: string) => void;
 
@@ -204,14 +206,26 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   const commitRename = React.useCallback(
     (pageId: string, name: string, updateUrl = false) => {
       const trimmed = name.trim();
+      const before = pages.find((p) => p.id === pageId);
       if (trimmed && composer) {
         // G2-076: "Update URL" moves the slug with the name (the engine keeps
         // the old one in slugHistory); "Keep URL" renames only.
         composer.elements.updatePage(pageId, updateUrl ? { name: trimmed, slug: slugify(trimmed) } : { name: trimmed });
+        /* v3 4418:94200 / 4418:91027: "Renamed to Our menu · URL /menu kept ·
+           Undo". Update URL says nothing here — it lands in Page settings
+           with the redirect offer instead. */
+        if (!updateUrl && before && before.name !== trimmed) {
+          addToast({
+            description: before.isHome ? `Renamed to ${trimmed}` : `Renamed to ${trimmed} · URL /${before.slug} kept`,
+            tone: "info",
+            duration: 8000,
+            action: { label: "Undo", onClick: () => composer.history?.undo?.() },
+          });
+        }
       }
       setRenamingPageId(null);
     },
-    [composer]
+    [composer, pages, addToast]
   );
 
   const cancelRename = React.useCallback(() => {
@@ -233,7 +247,16 @@ export function usePages(composer: Composer | null): UsePagesReturn {
             tone: "warning",
             duration: 3000,
           });
+          return;
         }
+        /* v3 4418:93381: "Menu duplicated · Menu copy · Open". */
+        const sourceName = pages.find((p) => p.id === pageId)?.name ?? "Page";
+        addToast({
+          description: `${sourceName} duplicated · ${copy.name}`,
+          tone: "info",
+          duration: 8000,
+          action: { label: "Open", onClick: () => composer.elements.setActivePage(copy.id) },
+        });
       } catch (err) {
         addToast({
           description: "Duplicate failed — page may have corrupt content.",
@@ -243,7 +266,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         console.error("[pages] duplicatePage failed", err);
       }
     },
-    [composer, addToast]
+    [composer, pages, addToast]
   );
 
   const deletePage = React.useCallback(
@@ -269,8 +292,9 @@ export function usePages(composer: Composer | null): UsePagesReturn {
 
       const name = page.name;
       composer.elements.deletePage(pageId);
+      /* v3 4418:90763: "Menu deleted · Undo" — the name bare, no quotes. */
       addToast({
-        description: `"${name}" deleted`,
+        description: `${name} deleted`,
         tone: "info",
         duration: 8000,
         action: {
@@ -284,6 +308,24 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     [composer, pages, addToast]
   );
 
+  /** v3 4418:96537 "one toast per action": a bulk delete reports once —
+   *  "3 pages deleted · Menu, Contact, About · Undo" — and one undo brings
+   *  them all back. The caller has already applied the home/last guards. */
+  const deletePages = React.useCallback(
+    (pageIds: string[]) => {
+      if (!composer || pageIds.length === 0) return;
+      const names = pageIds.map((id) => pages.find((p) => p.id === id)?.name).filter((n): n is string => !!n);
+      pageIds.forEach((id) => composer.elements.deletePage(id));
+      addToast({
+        description: `${pageIds.length} page${pageIds.length === 1 ? "" : "s"} deleted · ${names.join(", ")}`,
+        tone: "info",
+        duration: 8000,
+        action: { label: "Undo", onClick: () => composer.history?.undo?.() },
+      });
+    },
+    [composer, pages, addToast]
+  );
+
   const setHomepage = React.useCallback(
     (pageId: string) => {
       const page = pages.find((p) => p.id === pageId);
@@ -291,10 +333,12 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       if (!composer) return;
       try {
         composer.elements.setHomePage?.(pageId);
+        /* v3 4418:93657: "Menu is now the homepage · Undo". */
         addToast({
-          description: "Homepage updated. Your navigation menu may need updating manually.",
-          tone: "success",
-          duration: 4000,
+          description: `${page?.name ?? "This page"} is now the homepage`,
+          tone: "info",
+          duration: 8000,
+          action: { label: "Undo", onClick: () => composer.history?.undo?.() },
         });
       } catch (err) {
         addToast({
@@ -332,7 +376,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       }
 
       const url = `https://${domain}/${slug}`;
-      const successMsg = `Link copied: ${url}`;
+      /* v3 4418:93929: "Link copied · bellacucina.com/menu". */
+      const successMsg = `Link copied · ${domain}/${slug}`;
 
       // A8: a copy that cannot land (no clipboard on an insecure origin,
       // or refused) shows the URL so the user can copy it by hand.
@@ -387,6 +432,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     selectPage,
     duplicatePage,
     deletePage,
+    deletePages,
     setHomepage,
     copyPageLink,
     // Guards against deleting the final page. Semantically the "only" page is
