@@ -219,6 +219,11 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     /* Stored bindings and CMS entry values are data, not this session's
        input: off-allowlist properties (onclick, style, …) and dangerous
        src/href URLs never reach the element. */
+    /* Nothing resolved (no published record, an empty field, no fallback):
+       the element keeps its own content, exactly as the export
+       (CMSExportResolver) and the canvas preview (useCMSPreview) already do.
+       Writing "" here wiped the text on bind and nothing restored it (P-2). */
+    if (!value) return;
     if (!isSafeCmsBoundValue(binding.property, value)) return;
     const property = binding.property;
     const write = () => {
@@ -233,10 +238,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   }
 
   /**
-   * Get binding key for deduplication
+   * One binding per element property: a property shows one field, so binding
+   * it to another field replaces the old binding in the same undo step
+   * instead of stacking a second one that fights it on export.
    */
   protected getBindingKey(binding: CMSElementBinding): string {
-    return `${binding.property}:${binding.collectionId}:${binding.fieldSlug}`;
+    return binding.property;
   }
 
   /**

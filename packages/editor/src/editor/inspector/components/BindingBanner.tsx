@@ -81,7 +81,7 @@ export const BindingBanner: React.FC<BindingBannerProps> = ({
           // and `h-auto` beats flowbite's fixed `h-8` the same way it does
           // everywhere else in this family (min-h-6 is a different property).
           className="tw:h-auto tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-normal tw:text-[var(--bk-accent)]"
-          onClick={() => composer?.cms?.bindings?.unbindAll?.(elementId)}
+          onClick={() => composer?.cms?.bindings?.unbindAll?.(elementId, `Unbind ${label}`)}
         >
           Unbind
         </Button>

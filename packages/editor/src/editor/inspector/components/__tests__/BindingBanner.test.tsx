@@ -42,7 +42,8 @@ describe("binding banner", () => {
     const { composer, unbindAll } = makeComposer([{ collectionId: "c1", fieldSlug: "name" }]);
     render(<BindingBanner composer={composer} elementId="el-1" elementLabel="Text" />);
     fireEvent.click(screen.getByRole("button", { name: "Unbind" }));
-    expect(unbindAll).toHaveBeenCalledWith("el-1");
+    // P-2: a labelled unbind is one undo step, not an untracked change.
+    expect(unbindAll).toHaveBeenCalledWith("el-1", "Unbind Menu.name");
   });
 
   it("says nothing about an element that follows nothing", () => {
