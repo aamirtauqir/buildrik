@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getStripe } from "@/server/services/stripe.client";
+import { unpublishSite } from "@/server/services/publish.service";
 import type { UpdateWorkspaceInput } from "@buildrik/shared/schemas/account";
 
 /** Thrown when the user already has a workspace by this name (case-insensitive). */
@@ -161,6 +163,62 @@ export async function cancelWorkspaceDeletion(workspaceId: string) {
     where: { id: workspaceId },
     data: { deletionScheduledAt: null },
   });
+}
+
+/**
+ * Stripe cancel for a workspace about to be deleted. An already-cancelled or
+ * already-missing subscription counts as done (grandfathered rows carry a
+ * placeholder id Stripe 404s on). Anything else throws, so the caller keeps the
+ * workspace and retries next run: never delete while billing may still run.
+ */
+async function cancelStripeSubscription(stripeSubscriptionId: string): Promise<void> {
+  const stripe = getStripe();
+  try {
+    await stripe.subscriptions.cancel(stripeSubscriptionId);
+  } catch (e: unknown) {
+    if ((e as { code?: string })?.code === "resource_missing") return;
+    const current = await stripe.subscriptions.retrieve(stripeSubscriptionId).catch(() => null);
+    if (current?.status === "canceled") return;
+    throw e;
+  }
+}
+
+/**
+ * SA-04: carry out deletions whose 30-day grace period has passed. Order per
+ * workspace: cancel billing, take published sites offline, delete the row.
+ * Only the Workspace row is deleted — its relations cascade; User rows stay.
+ */
+export async function processDueWorkspaceDeletions(now: Date): Promise<{ deleted: number; skipped: number }> {
+  const due = await prisma.workspace.findMany({
+    where: { deletionScheduledAt: { lte: now } },
+    select: { id: true },
+  });
+  let deleted = 0;
+  let skipped = 0;
+  for (const ws of due) {
+    try {
+      const sub = await prisma.subscription.findUnique({
+        where: { workspaceId: ws.id },
+        select: { stripeSubscriptionId: true },
+      });
+      if (sub) await cancelStripeSubscription(sub.stripeSubscriptionId);
+    } catch (e) {
+      console.error(`[workspace-deletion] Stripe cancel failed for ${ws.id}; retrying next run:`, e instanceof Error ? e.message : e);
+      skipped++;
+      continue;
+    }
+    const published = await prisma.site.findMany({
+      where: { workspaceId: ws.id, OR: [{ status: "PUBLISHED" }, { publishedUrl: { not: null } }] },
+      select: { id: true },
+    });
+    for (const s of published) {
+      await unpublishSite(s.id).catch((e: unknown) =>
+        console.error(`[workspace-deletion] take-down failed for site ${s.id}:`, e instanceof Error ? e.message : e));
+    }
+    await prisma.workspace.delete({ where: { id: ws.id } });
+    deleted++;
+  }
+  return { deleted, skipped };
 }
 
 export async function updateSharingSettings(

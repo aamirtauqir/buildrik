@@ -39,14 +39,14 @@ export function DeleteWorkspaceModal({
       }
     >
       <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-        This action is permanent and cannot be undone. All sites, forms, members, and data in this workspace will be deleted.
+        Your workspace will be deleted 30 days from now. Until then you can cancel from the dashboard home page.
       </p>
 
       <div
         className="mt-4 rounded-lg p-3 text-body-sm"
         style={{ backgroundColor: "var(--color-error-subtle)", color: "var(--color-error)" }}
       >
-        If this workspace has an active subscription, it will be cancelled immediately.
+        On that date every site is taken offline, the subscription is cancelled, and all sites, forms, members and data are removed for good.
       </div>
 
       <div className="mt-4">
