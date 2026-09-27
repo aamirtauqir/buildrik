@@ -8,8 +8,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-
-const OPEN_OVERLAY = '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]';
+import { hasOpenEscapeSurface } from "@/shared/utils/openEscapeSurface";
 
 function isTyping(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -39,7 +38,7 @@ export function useColumnPanelEscape(active: boolean, onClose: () => void): void
     const release = claimEscape();
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || isTyping(e.target)) return;
-      if (document.querySelector(OPEN_OVERLAY)) return;
+      if (hasOpenEscapeSurface()) return;
       closeRef.current();
     };
     /* Capture: an open menu's own Escape handler removes it from the DOM

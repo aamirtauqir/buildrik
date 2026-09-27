@@ -15,6 +15,7 @@ import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { buildDefaultCommands } from "./defaultCommands";
 import { KeybindingManager } from "./KeybindingManager";
+import { hasOpenEscapeSurface } from "@/shared/utils/openEscapeSurface";
 
 /**
  * Roles whose ARIA pattern defines what the arrow keys do inside them. A global
@@ -35,12 +36,6 @@ const WIDGET_ROLES = [
 ]
   .map((role) => `[role="${role}"]`)
   .join(", ");
-
-/**
- * Open surfaces that take a bare Escape before the canvas selection does.
- */
-const ESCAPE_OWNERS =
-  '[role="menu"], [role="listbox"], [role="dialog"], [role="alertdialog"], [data-bk-escape-owner]';
 
 /**
  * Canvas commands whose shortcut a focused text field has a stronger claim on.
@@ -251,11 +246,12 @@ export class CommandCenter {
     // right-column panel that claims Escape (`data-bk-escape-owner`, set by
     // useColumnPanelEscape) — used to lose the selection along with itself:
     // Escape in the inspector ⋯ menu and in the AI column both deselected
-    // (P-6, measured live). DOM query, not an import — same contract as above.
+    // (P-6, measured live). Open popups only, never canvas content — see
+    // hasOpenEscapeSurface for the rule.
     if (
       commandId === "deselect" &&
       typeof document !== "undefined" &&
-      document.querySelector(ESCAPE_OWNERS)
+      (hasOpenEscapeSurface() || document.querySelector("[data-bk-escape-owner]"))
     ) {
       return false;
     }
