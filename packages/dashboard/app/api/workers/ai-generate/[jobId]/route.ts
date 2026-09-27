@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@lib/prisma";
 import { generatePage } from "@server/services/ai.service";
+import { generateUniqueSlug } from "@server/services/sites.service";
 import { rewriteImageSources, type ImagesPreference } from "@lib/ai/rewrite-image-sources";
 import { checkWorkerAuth } from "@/lib/cron-auth";
 import { withUniqueIds } from "@buildrik/shared/content/elementIds";
@@ -58,23 +59,6 @@ function sectionsToBlocks(sections: Array<{ type: string; html: string }>): Pris
       children: [],
     })),
   } as Prisma.InputJsonValue;
-}
-
-async function uniqueSlug(base: string): Promise<string> {
-  const root = slugify(base);
-  // Site.slug is GLOBALLY unique (not per-workspace), so the check must be
-  // global too — the old per-workspace findFirst could pass and then hit a
-  // P2002 on create. One query for all root-prefixed slugs instead of up to
-  // 50 sequential lookups.
-  const taken = new Set(
-    (await prisma.site.findMany({ where: { slug: { startsWith: root } }, select: { slug: true } })).map((s) => s.slug),
-  );
-  if (!taken.has(root)) return root;
-  for (let i = 1; i < 50; i++) {
-    const candidate = `${root}-${i}`;
-    if (!taken.has(candidate)) return candidate;
-  }
-  return `${root}-${Date.now().toString(36)}`;
 }
 
 class CancelledError extends Error {
@@ -151,7 +135,7 @@ export async function POST(
 
   try {
     // Structure phase: resolve the site shell (slug) before content runs.
-    const slug = await uniqueSlug(siteName);
+    const slug = await generateUniqueSlug(siteName);
 
     // Content phase: every AI call happens before any Site/Page write.
     await setPhase(jobId, "GENERATING_CONTENT", 10);

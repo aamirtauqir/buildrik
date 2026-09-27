@@ -28,8 +28,11 @@ function slugify(name: string): string {
     .replace(/-{2,}/g, "-");
 }
 
-async function generateUniqueSlug(name: string): Promise<string> {
-  const base = slugify(name);
+/** A globally unique Site slug for a new site. Every site-creation path uses
+ *  this one: it also skips slugs whose derived Vercel project another site is
+ *  pinned to. A name with no usable characters falls back to "site". */
+export async function generateUniqueSlug(name: string): Promise<string> {
+  const base = slugify(name) || "site";
   const candidates = [base, ...Array.from({ length: 10 }, (_, i) => `${base}-${i + 2}`)];
   // One query for all base-prefixed slugs instead of up to 10 sequential
   // findFirst lookups. A candidate is also unusable when another site is
