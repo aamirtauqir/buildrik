@@ -11,6 +11,7 @@ import {
   VALID_ELEMENT_TYPES,
   TYPE_TO_TAG_MAP,
 } from "../typeMapping";
+import { ELEMENT_RULES } from "../../nesting/rules";
 
 describe("getDefaultTagName", () => {
   it("maps known types to their default tag", () => {
@@ -63,6 +64,52 @@ describe("VALID_ELEMENT_TYPES", () => {
     expect(VALID_ELEMENT_TYPES.has("container")).toBe(true);
     expect(VALID_ELEMENT_TYPES.has("hero")).toBe(true);
     expect(VALID_ELEMENT_TYPES.has("not-a-type")).toBe(false);
+  });
+
+  /* Q2: it was a hand-kept copy ten members behind the union, so a block
+     marked `data-buildrick-type="video-embed"` was typed from its tag. */
+  it("accepts every ElementType the engine has rules for", () => {
+    const missing = Object.keys(ELEMENT_RULES).filter((t) => !VALID_ELEMENT_TYPES.has(t));
+    expect(missing).toEqual([]);
+  });
+
+  it.each(["video-embed", "map-embed", "checkbox", "radio", "switch", "label", "stack", "tabs", "accordion"])(
+    "honours a %s marker on a div",
+    (type) => {
+      expect(getElementTypeFromTag("div", type)).toBe(type);
+    }
+  );
+});
+
+describe("structural tags keep a real type", () => {
+  it("types <li> as a list item and <label> as a label, not a container", () => {
+    expect(getElementTypeFromTag("li")).toBe("list-item");
+    expect(getElementTypeFromTag("label")).toBe("label");
+    expect(getDefaultTagName("list-item")).toBe("li");
+    expect(getDefaultTagName("label")).toBe("label");
+  });
+
+  it("new wrapper types render as the div they always were", () => {
+    for (const t of ["stack", "tabs", "lottie", "video-embed", "map-embed", "social"]) {
+      expect(getDefaultTagName(t)).toBe("div");
+    }
+  });
+});
+
+/**
+ * The catalog's Checkbox, Radio and Switch are <label> wrappers typed as the
+ * control they wrap. The control's attributes belong on its <input>; on the
+ * label they would be published as `<label type="checkbox" role="switch">`.
+ */
+describe("getDefaultAttributes only applies to the type's own tag", () => {
+  it.each(["checkbox", "radio", "switch"])("gives a %s <label> wrapper nothing", (type) => {
+    expect(getDefaultAttributes(type, "label")).toEqual({});
+  });
+
+  it("still fills them in on the control itself, and when no tag is given", () => {
+    expect(getDefaultAttributes("checkbox", "input")).toEqual({ type: "checkbox" });
+    expect(getDefaultAttributes("switch", "INPUT")).toEqual({ type: "checkbox", role: "switch" });
+    expect(getDefaultAttributes("email")).toEqual({ type: "email" });
   });
 });
 

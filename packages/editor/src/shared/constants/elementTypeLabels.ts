@@ -53,6 +53,12 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   icon: "Icon",
   divider: "Divider",
   list: "List",
+  "list-item": "List item",
+  // Types whose capitalised id reads wrong ("Cta", "Video-embed", "Social")
+  cta: "CTA",
+  social: "Social icons",
+  "video-embed": "Video embed",
+  "map-embed": "Map embed",
 };
 
 /** The display label for an element type: the SSOT entry, else the type

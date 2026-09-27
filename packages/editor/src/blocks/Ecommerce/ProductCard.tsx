@@ -18,7 +18,7 @@ export const productCardBlockConfig: BlockBuildConfig = {
   category: "Ecommerce",
   elementType: "product-card",
   content: `
-<div data-product-card style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow:hidden;max-width:320px;transition:box-shadow 0.2s">
+<div data-product-card data-buildrick-type="product-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow:hidden;max-width:320px;transition:box-shadow 0.2s">
   <div style="position:relative;overflow:hidden">
     <img data-bind="image" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" alt="Product" style="width:100%;height:220px;object-fit:cover;transition:transform 0.3s"/>
     <span style="position:absolute;top:12px;right:12px;background:#10b981;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500">In Stock</span>
