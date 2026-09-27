@@ -169,7 +169,7 @@ const MEDIA_PROFILE: ElementProfile = {
   ],
 };
 
-/** Button / link / CTA — board 807:8567. Typography and Background lead;
+/** Button / link — board 807:8567. Typography and Background lead;
  *  Link sits low, after Animation. */
 const BUTTON_PROFILE: ElementProfile = {
   order: [
@@ -230,6 +230,7 @@ const PROFILES: Record<string, ElementProfile> = {
   text: TEXT_PROFILE,
   heading: TEXT_PROFILE,
   paragraph: TEXT_PROFILE,
+  label: TEXT_PROFILE,
 
   // Explicit flex/grid containers
   flex: FLEX_PROFILE,
@@ -250,7 +251,6 @@ const PROFILES: Record<string, ElementProfile> = {
   // Interactive / link-carrying
   button: BUTTON_PROFILE,
   link: BUTTON_PROFILE,
-  cta: BUTTON_PROFILE,
 
   // Form fields
   input: INPUT_PROFILE,
@@ -292,6 +292,17 @@ const PROFILES: Record<string, ElementProfile> = {
     order: CONTAINER_PROFILE.order.map((id) => (id === "content" ? "collection" : id)),
   },
   "product-detail": CONTAINER_PROFILE,
+
+  /* Interim: the types element-type refinement produces, until the Inspector
+     redesign gives each its own type block. `cta` is a section container, not
+     a button — BUTTON_PROFILE had no Layout / Flex / Grid for it. */
+  cta: CONTAINER_PROFILE,
+  stack: CONTAINER_PROFILE,
+  tabs: CONTAINER_PROFILE,
+  "list-item": CONTAINER_PROFILE,
+  checkbox: CONTAINER_PROFILE,
+  radio: CONTAINER_PROFILE,
+  switch: CONTAINER_PROFILE,
 };
 
 // ============================================================================
