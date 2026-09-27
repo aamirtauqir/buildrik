@@ -206,6 +206,37 @@ describe("Sites Service", () => {
     });
   });
 
+  /* I3: the encrypted published-site password is reversible (it is pushed to
+     Vercel), so it must never reach a client. Every mutation that returns the
+     Site row returns it redacted, like getSite. */
+  describe("site rows returned to clients are redacted", () => {
+    const row = { id: "s1", name: "Renamed", slug: "s", publishedPassword: "v1:ciphertext" };
+
+    it("renameSite", async () => {
+      vi.mocked(prisma.site.update).mockResolvedValue(row as any);
+      const result = await renameSite("s1", "Renamed");
+      expect(result).not.toHaveProperty("publishedPassword");
+      expect(result.hasPublishedPassword).toBe(true);
+      expect(result.name).toBe("Renamed");
+    });
+
+    it("archiveSite and unarchiveSite", async () => {
+      vi.mocked(prisma.site.update).mockResolvedValue(row as any);
+      expect(await archiveSite("s1")).not.toHaveProperty("publishedPassword");
+      expect(await unarchiveSite("s1")).not.toHaveProperty("publishedPassword");
+    });
+
+    it("createSite", async () => {
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.site.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([] as any);
+      vi.mocked(prisma.site.create).mockResolvedValue({ ...row, publishedPassword: null } as any);
+      const result = await createSite("ws_123", "user_1", { name: "X", method: "blank" });
+      expect(result).not.toHaveProperty("publishedPassword");
+      expect(result.hasPublishedPassword).toBe(false);
+    });
+  });
+
   describe("renameSite", () => {
     it("updates site name", async () => {
       vi.mocked(prisma.site.update).mockResolvedValue({

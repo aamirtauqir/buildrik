@@ -5,6 +5,7 @@ import { checkSiteRole, assertSiteAccess, getSiteWorkspace, PermissionError } fr
 import type { PlanName } from "@/lib/constants/plan-limits";
 import { getSettingsOverview, getSiteOverview, getLocales, getRedirectSuggestions } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
+import { redactSitePassword } from "@/server/services/sites.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
 import {
@@ -108,7 +109,7 @@ export const siteDetailRouter = router({
         }
         const { id, ...data } = input;
         try {
-          const result = await updateSiteSettings(id, data);
+          const result = redactSitePassword(await updateSiteSettings(id, data));
           const changedKeys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
           await recordForSite({
             siteId: id,

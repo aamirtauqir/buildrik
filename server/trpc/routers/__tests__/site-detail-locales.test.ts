@@ -83,11 +83,12 @@ describe("siteDetail.locales", () => {
 describe("siteDetail.settings.update — localeAutoRedirect", () => {
   it("forwards the flag to the settings service for an ADMIN", async () => {
     checkSiteRoleMock.mockResolvedValueOnce(undefined);
-    updateSiteSettingsMock.mockResolvedValueOnce({ id: "s1", localeAutoRedirect: true });
+    updateSiteSettingsMock.mockResolvedValueOnce({ id: "s1", localeAutoRedirect: true, publishedPassword: null });
 
     await expect(caller().settings.update({ id: "s1", localeAutoRedirect: true })).resolves.toEqual({
       id: "s1",
       localeAutoRedirect: true,
+      hasPublishedPassword: false,
     });
     expect(checkSiteRoleMock).toHaveBeenCalledWith(prisma, "u_1", "s1", "ADMIN");
     expect(updateSiteSettingsMock).toHaveBeenCalledWith("s1", { localeAutoRedirect: true });

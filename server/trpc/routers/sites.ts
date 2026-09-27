@@ -16,6 +16,7 @@ import {
   transferSite,
   saveProjectFromEditor,
   getProjectData,
+  redactSitePassword,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -567,7 +568,7 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      const result = await unpublishSite(input.siteId);
+      const result = redactSitePassword(await unpublishSite(input.siteId));
       await recordForSite({
         siteId: input.siteId,
         actorId: ctx.session.user!.id!,
@@ -759,7 +760,7 @@ export const sitesRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return moveSiteToFolder(input.siteId, input.folderId);
+        return redactSitePassword(await moveSiteToFolder(input.siteId, input.folderId));
       }),
   }),
 });

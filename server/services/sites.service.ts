@@ -246,10 +246,10 @@ export async function createSite(
       return created;
     });
 
-    return site;
+    return redactSitePassword(site);
   }
 
-  return prisma.$transaction(async (tx) => {
+  const site = await prisma.$transaction(async (tx) => {
     const created = await tx.site.create({
       data: {
         name: input.name,
@@ -277,6 +277,7 @@ export async function createSite(
 
     return created;
   });
+  return redactSitePassword(site);
 }
 
 export async function checkSlugAvailability(slug: string): Promise<boolean> {
@@ -349,21 +350,29 @@ export async function transferSite(
   return { success: true };
 }
 
+/** Every Site row returned to a client goes through this: the stored
+ *  published-site password is reversible ciphertext and never leaves the
+ *  server; the client gets a flag instead. */
+export function redactSitePassword<T extends { publishedPassword: string | null }>(
+  site: T,
+): Omit<T, "publishedPassword"> & { hasPublishedPassword: boolean } {
+  const { publishedPassword, ...rest } = site;
+  return { ...rest, hasPublishedPassword: Boolean(publishedPassword) };
+}
+
 export async function getSite(siteId: string) {
   const site = await prisma.site.findFirst({
     where: { id: siteId, deletedAt: null },
     include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
   });
-  if (!site) return null;
-  const { publishedPassword, ...rest } = site;
-  return { ...rest, hasPublishedPassword: Boolean(publishedPassword) };
+  return site ? redactSitePassword(site) : null;
 }
 
 export async function renameSite(siteId: string, name: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { name, lastEditedAt: new Date() },
-  });
+  }));
 }
 
 /**
@@ -531,7 +540,7 @@ export async function duplicateSite(
       });
     }
 
-    return newSite;
+    return redactSitePassword(newSite);
   });
 }
 
@@ -549,17 +558,17 @@ function copyCmsBindings(stored: Prisma.JsonValue, renames: IdRename[]): Prisma.
 }
 
 export async function archiveSite(siteId: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { status: "ARCHIVED" },
-  });
+  }));
 }
 
 export async function unarchiveSite(siteId: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { status: "DRAFT" },
-  });
+  }));
 }
 
 export async function deleteSite(siteId: string, confirmName: string) {
