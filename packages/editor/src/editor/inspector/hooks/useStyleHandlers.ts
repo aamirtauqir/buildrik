@@ -187,7 +187,7 @@ export function useStyleHandlers(
       if (!selectedElement?.id) return;
 
       const el = composer?.elements.getElement(selectedElement.id);
-      if (!el) return;
+      if (!el || el.isLocked?.()) return;
 
       // 1. Immediate local state update — live preview without waiting for debounce
       setStyles((prev) => {
@@ -215,7 +215,10 @@ export function useStyleHandlers(
       const writeOne = (id: string) => {
         // Re-read element inside the flush — avoids stale closure if element was replaced.
         const el = composer?.elements.getElement(id);
-        if (!el) return;
+        /* P-1: a locked element is read-only — the banner says so, and every
+           write the panel makes passes through here. A locked peer in an "All
+           like this" reach is skipped the same way. */
+        if (!el || el.isLocked?.()) return;
         const sel = `[data-buildrick-id="${id}"]`;
         if (currentPseudoState !== "normal" && composer?.styles) {
           const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
@@ -279,7 +282,7 @@ export function useStyleHandlers(
       if (!selectedElement?.id) return;
 
       const el = composer?.elements.getElement(selectedElement.id);
-      if (!el) return;
+      if (!el || el.isLocked?.()) return;
 
       // Trace batch style change for debugging
       devLogger.style("batch-change", {

@@ -657,21 +657,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     [composer]
   );
 
+  /* P-1: the Inspector ⋯ Delete is the shared `delete` command, like
+     Delete/Backspace and the canvas menu. It was a bare removeElement: it
+     deleted a locked element and ran outside a transaction. The command skips
+     locked elements (useClipboardToasts says so), wraps the removal in one
+     undo step, and useHistoryFeedback raises the "… deleted" + Undo toast. The
+     command acts on the selection, so the element being inspected is made the
+     selection first. */
   const handleDelete = React.useCallback(
     (id: string) => {
       if (!composer) return;
-      const element = composer.elements.getElement(id);
-      const elementType = element?.getType?.() || "element";
-      const elementLabel = elementType.charAt(0).toUpperCase() + elementType.slice(1);
-      composer.elements.removeElement(id);
-      addToast({
-        description: `${elementLabel} deleted`,
-        tone: "info",
-        duration: 5000,
-        action: { label: "Undo", onClick: composer.history.captureUndo() },
-      });
+      const ids = composer.selection.getSelectedIds();
+      if (ids.length !== 1 || ids[0] !== id) {
+        const element = composer.elements.getElement(id);
+        if (!element) return;
+        composer.selection.select(element);
+      }
+      composer.commands.run("delete");
     },
-    [composer, addToast]
+    [composer]
   );
 
   const handleRailTabChange = React.useCallback(
