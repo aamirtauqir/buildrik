@@ -188,6 +188,14 @@ export const sitesRouter = router({
           });
         throw e;
       }
+      await recordForSite({
+        siteId: input.id,
+        actorId: ctx.session.user!.id!,
+        action: "site.deleted",
+        targetType: "site",
+        targetId: input.id,
+        description: "Site deleted",
+      });
     }),
 
   bulk: protectedProcedure
@@ -210,7 +218,24 @@ export const sitesRouter = router({
         throw e;
       }
 
-      return bulkAction(workspaceId, input);
+      const result = await bulkAction(workspaceId, input);
+
+      if (input.action === "delete") {
+        await Promise.all(
+          result.succeeded.map((siteId: string) =>
+            recordForSite({
+              siteId,
+              actorId: ctx.session.user.id,
+              action: "site.deleted",
+              targetType: "site",
+              targetId: siteId,
+              description: "Site deleted",
+            })
+          )
+        );
+      }
+
+      return result;
     }),
 
   // P6 editor role plumbing — the chrome shows disabled-with-reason controls

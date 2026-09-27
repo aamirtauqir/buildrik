@@ -15,6 +15,7 @@ import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/sche
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
+import { unpublishSite } from "@/server/services/publish.service";
 
 function slugify(name: string): string {
   return name
@@ -538,6 +539,17 @@ export async function deleteSite(siteId: string, confirmName: string) {
     throw new Error("NAME_MISMATCH");
   }
 
+  // SA-07: take the live deployment down before soft-deleting. Best-effort —
+  // unpublishSite is already best-effort toward Vercel and flips the row to
+  // DRAFT, but a delete must still succeed even if that call throws.
+  if (site.status === "PUBLISHED") {
+    try {
+      await unpublishSite(siteId);
+    } catch (e: unknown) {
+      console.error(`[deleteSite] take-down failed for ${siteId}:`, e instanceof Error ? e.message : e);
+    }
+  }
+
   const now = new Date();
 
   await prisma.$transaction([
@@ -651,11 +663,40 @@ export async function bulkAction(
     // pipeline or the approval gate, so it reported success while the live site
     // was untouched. Publishing is per-site through the real pipeline.
     case "delete": {
-      const result = await prisma.site.updateMany({
+      // SA-07: same take-down + link/form deactivation as the single-site
+      // delete, applied per id. Best-effort — a take-down failure never blocks
+      // the soft-delete.
+      const targets = await prisma.site.findMany({
         where: { id: { in: siteIds }, workspaceId, deletedAt: null },
-        data: { deletedAt: new Date() },
+        select: { id: true, status: true },
       });
-      return { succeeded: siteIds.slice(0, result.count), failed: [] };
+      await Promise.all(
+        targets
+          .filter((s) => s.status === "PUBLISHED")
+          .map(async (s) => {
+            try {
+              await unpublishSite(s.id);
+            } catch (e: unknown) {
+              console.error(`[bulkAction:delete] take-down failed for ${s.id}:`, e instanceof Error ? e.message : e);
+            }
+          }),
+      );
+      const targetIds = targets.map((s) => s.id);
+      const [result] = await prisma.$transaction([
+        prisma.site.updateMany({
+          where: { id: { in: targetIds }, workspaceId, deletedAt: null },
+          data: { deletedAt: new Date() },
+        }),
+        prisma.shareLink.updateMany({
+          where: { siteId: { in: targetIds } },
+          data: { isActive: false },
+        }),
+        prisma.formBlock.updateMany({
+          where: { siteId: { in: targetIds } },
+          data: { isActive: false },
+        }),
+      ]);
+      return { succeeded: targetIds.slice(0, result.count), failed: [] };
     }
     default:
       throw new Error("INVALID_ACTION");
