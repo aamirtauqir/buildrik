@@ -300,15 +300,20 @@ export interface ProjectSettings {
   /** Custom code injection (head scripts, body scripts, global CSS) */
   customCode?: CustomCodeConfig;
   /**
-   * The site's locales as the Site row holds them, mirrored on load for the
-   * export engine (Clone 3397:32376 `Auto-redirect by browser`). Read-only
-   * here — the Localization screen writes the row through
-   * `siteDetail.settings.update`; nothing in the editor writes this slot.
+   * The site's locales as the Site row holds them, mirrored on load
+   * (Clone 3397:32376). Read-only here — the Localization screen writes the
+   * row through `siteDetail.settings.update`; nothing in the editor writes
+   * this slot.
    */
   localization?: {
     defaultLocale: string;
     enabledLocales: string[];
-    /** First visit on a default-locale page → `/<browser locale>/…` when enabled. */
+    /**
+     * SA-05: kept for the per-locale publish arc to reuse, but nothing
+     * reads it any more — the export used to redirect a visitor's first
+     * default-locale page to `/<browser locale>/…`, a page the publish
+     * pipeline has never generated (only the default locale ships).
+     */
     autoRedirect: boolean;
   };
   /**

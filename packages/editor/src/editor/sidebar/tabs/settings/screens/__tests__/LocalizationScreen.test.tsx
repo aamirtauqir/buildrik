@@ -1,9 +1,14 @@
 /**
  * LocalizationScreen tests — Clone 3397:32376 Localization: the amber strip,
- * the Default card (locale select + auto-redirect), the Locales table and
- * its pills, the two reads behind them (3397:33194 / 3397:33241), the
- * save-error banner (3397:33288), the save handler's write, the header's
- * `Add locale` and the two dialogs it opens.
+ * the Default card (locale select), the Locales table and its pills, the
+ * two reads behind them (3397:33194 / 3397:33241), the save-error banner
+ * (3397:33288), the save handler's write, the header's `Add locale` and the
+ * two dialogs it opens.
+ *
+ * SA-05: the auto-redirect toggle is gone from the UI (see the screen's own
+ * comment), but `localeAutoRedirect` still comes back from the load and
+ * still rides unchanged on every save/create write — these tests check that
+ * round trip without ever touching a toggle.
  *
  * @license BSD-3-Clause
  */
@@ -104,7 +109,6 @@ function HeaderHost(props: { render: (register: (node: React.ReactNode | null) =
 
 const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-default")).toBeInTheDocument());
 const defaultSelect = () => screen.getByTestId("set-loc-default") as HTMLSelectElement;
-const redirect = () => screen.getByTestId("set-loc-redirect");
 const row = (code: string) => screen.getByTestId(`set-loc-row-${code}`);
 
 describe("LocalizationScreen — the frame's strip and two cards", () => {
@@ -126,26 +130,22 @@ describe("LocalizationScreen — the frame's strip and two cards", () => {
     expect(screen.getByTestId("set-card-locales")).toHaveTextContent("Locales");
     expect(screen.getByLabelText("Default locale")).toBe(defaultSelect());
     expect(defaultSelect().id).toBe("default-locale");
-    expect(screen.getByRole("switch", { name: "Auto-redirect by browser" })).toBe(redirect());
-    expect(redirect().id).toBe("locale-auto-redirect");
   });
 
-  it("prefills the default, the enabled locales as `<Language> (<code>)` options, and the redirect", async () => {
+  it("prefills the default and the enabled locales as `<Language> (<code>)` options", async () => {
     setup();
     await loaded();
     expect(defaultSelect().value).toBe("en");
     expect(Array.from(defaultSelect().options).map((o) => o.text)).toEqual(["English (en)", "French (fr)", "Arabic (ar)"]);
-    expect(redirect()).toHaveAttribute("aria-checked", "true");
   });
 
-  it("falls back to a single English locale, redirect off, when the row is empty", async () => {
+  it("falls back to a single English locale when the row is empty", async () => {
     getMock.mockResolvedValue({});
     localesMock.mockResolvedValue({ total: 0, locales: [] });
     setup();
     await loaded();
     expect(defaultSelect().value).toBe("en");
     expect(defaultSelect().options).toHaveLength(1);
-    expect(redirect()).toHaveAttribute("aria-checked", "false");
   });
 
   it("draws the table's four columns and one row per enabled locale — path, pages and pill", async () => {
@@ -176,6 +176,13 @@ describe("LocalizationScreen — the frame's strip and two cards", () => {
     expect(screen.getByTestId("set-loc-row-status-en")).toHaveClass("tw:bg-[var(--bk-success-tint)]");
     expect(screen.getByTestId("set-loc-row-status-fr")).toHaveClass("tw:bg-[var(--bk-yellow-100)]");
     expect(screen.getByTestId("set-loc-row-status-ar")).toHaveClass("tw:bg-[var(--bk-bg-subtle)]");
+  });
+
+  it("renders no auto-redirect toggle — SA-05, per-locale publish doesn't exist yet", async () => {
+    setup();
+    await loaded();
+    expect(document.getElementById("locale-auto-redirect")).toBeNull();
+    expect(screen.queryByText("Auto-redirect by browser")).toBeNull();
   });
 
   it("shows the dashboard-only message with no projectId and reads nothing", () => {
@@ -239,17 +246,16 @@ describe("LocalizationScreen — edits, dirty and the save handler", () => {
     await loaded();
     expect(box.current).toBeNull();
     expect(onDirtyChange).toHaveBeenLastCalledWith(false);
-    fireEvent.click(redirect());
+    fireEvent.change(defaultSelect(), { target: { value: "fr" } });
     await waitFor(() => expect(box.current).not.toBeNull());
     expect(onDirtyChange).toHaveBeenLastCalledWith(true);
   });
 
-  it("the handler writes defaultLocale, enabledLocales and localeAutoRedirect, then re-reads the table", async () => {
+  it("the handler writes defaultLocale, enabledLocales and the stored localeAutoRedirect unchanged, then re-reads the table", async () => {
     const { box, register } = saveHandlerSpy();
     setup({ registerSaveHandler: register });
     await loaded();
     fireEvent.change(defaultSelect(), { target: { value: "fr" } });
-    fireEvent.click(redirect());
     await waitFor(() => expect(box.current).not.toBeNull());
     await act(async () => {
       await box.current!();
@@ -258,7 +264,7 @@ describe("LocalizationScreen — edits, dirty and the save handler", () => {
       id: "s1",
       defaultLocale: "fr",
       enabledLocales: ["en", "fr", "ar"],
-      localeAutoRedirect: false,
+      localeAutoRedirect: true,
     });
     expect(localesMock).toHaveBeenCalledTimes(2);
     await waitFor(() => expect(box.current).toBeNull());
@@ -332,7 +338,9 @@ describe("LocalizationScreen — the document language follows the default local
     const { box, register } = saveHandlerSpy();
     const { composer } = setup({ registerSaveHandler: register });
     await loaded();
-    fireEvent.click(redirect());
+    // Dirty the screen without touching the default locale (still "en",
+    // matching the composer's seo.language) — removing a non-default row.
+    fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
     await waitFor(() => expect(box.current).not.toBeNull());
     await act(async () => {
       await box.current!();
