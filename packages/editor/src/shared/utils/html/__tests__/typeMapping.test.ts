@@ -134,7 +134,6 @@ describe("form field types are real controls", () => {
     ["checkbox", "input", "checkbox"],
     ["radio", "input", "radio"],
     ["switch", "input", "checkbox"],
-    ["slider", "input", "range"],
     ["upload", "input", "file"],
     ["submit", "button", "submit"],
     ["select", "select", null],
@@ -157,7 +156,8 @@ describe("form field types are real controls", () => {
   });
 
   it("leaves types that really are divs alone", () => {
-    for (const t of ["container", "card", "spacer", "grid"]) {
+    // `slider` is the Carousel, a container of slides — not the range input.
+    for (const t of ["container", "card", "spacer", "grid", "slider"]) {
       expect(getDefaultTagName(t)).toBe("div");
       expect(getDefaultAttributes(t)).toEqual({});
     }

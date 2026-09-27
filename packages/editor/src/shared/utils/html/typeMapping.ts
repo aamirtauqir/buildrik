@@ -132,7 +132,11 @@ export const TYPE_TO_TAG_MAP: Record<string, string> = {
   audio: "audio",
   svg: "svg",
   gallery: "div",
-  slider: "input",
+  /* The Carousel — a container of slides. This said "input" (the range
+     control, which the catalog inserts as `input[type=range]`), so a stored
+     "div" deferred to it and every carousel rendered and published as a void
+     `<input type="range">` with its slides dropped. */
+  slider: "div",
   testimonials: "div",
   countdown: "div",
   progress: "div",
@@ -191,7 +195,6 @@ export const TYPE_TO_INPUT_TYPE: Record<string, string> = {
   checkbox: "checkbox",
   radio: "radio",
   switch: "checkbox",
-  slider: "range",
   upload: "file",
   submit: "submit",
 };
