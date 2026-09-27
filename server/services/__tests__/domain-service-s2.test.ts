@@ -16,7 +16,7 @@ import { promises as dnsPromises } from "dns";
 
 const { db, vercelConnection } = vi.hoisted(() => ({
   db: {
-    site: { findUnique: vi.fn() },
+    site: { findUnique: vi.fn(), update: vi.fn() },
     workspace: { findUnique: vi.fn() },
     domain: {
       count: vi.fn(),
@@ -92,6 +92,26 @@ describe("connectDomain — the Add-a-domain dialog", () => {
     expect(addDomainToVercelProject).toHaveBeenCalledWith(
       expect.objectContaining({ projectName: "buildrik-site-bella", domain: "bellacucina.com" }),
     );
+  });
+
+  /* C1: a domain is attached to the project the slug derives. If the slug then
+     changed before the first publish, the publish would derive a new project
+     and the domain would be left on the old one. Pin at connect time. */
+  it("pins the resolved project name on a never-pinned site when a domain is connected", async () => {
+    connectable();
+
+    await connectDomain("s1", { domain: "bellacucina.com" });
+
+    expect(db.site.update).toHaveBeenCalledWith({ where: { id: "s1" }, data: { vercelProjectName: "bella" } });
+  });
+
+  it("does not re-pin a site that already has a project name", async () => {
+    connectable();
+    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1", slug: "bella-new", vercelProjectName: "buildrik-site-bella", deletedAt: null });
+
+    await connectDomain("s1", { domain: "bellacucina.com" });
+
+    expect(db.site.update).not.toHaveBeenCalled();
   });
 
   it("stores kind, provider and Force HTTPS, and writes A + CNAME + TXT without a Vercel attachment", async () => {

@@ -16,9 +16,11 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     site: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
     slugHistory: { create: vi.fn(() => Promise.resolve()) },
+    publishBuildJob: { findFirst: vi.fn() },
   },
 }));
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { slugifyProjectName } from "@/lib/vercel";
 import { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-detail";
@@ -27,6 +29,7 @@ import { updateSiteSettings } from "@server/services/site-settings.service";
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(prisma.site.update).mockResolvedValue({ id: "s1" } as never);
+  vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue(null);
 });
 
 describe("slug validation", () => {
@@ -44,9 +47,36 @@ describe("updateSiteSettings — slug change", () => {
     vi.mocked(prisma.site.findFirst).mockResolvedValue({ id: "other" } as never);
     await expect(updateSiteSettings("s1", { slug: "taken" })).rejects.toThrow("SLUG_TAKEN");
     expect(prisma.site.findFirst).toHaveBeenCalledWith(expect.objectContaining({
-      where: { slug: "taken", id: { not: "s1" } },
+      where: {
+        id: { not: "s1" },
+        OR: [{ slug: "taken" }, { vercelProjectName: slugifyProjectName("taken") }],
+      },
     }));
     expect(prisma.site.update).not.toHaveBeenCalled();
+  });
+
+  /* C1: site A renamed old → new stays pinned to slugify("old"). If site B then
+     took slug "old", B's derived project name would be A's project — B's next
+     publish would overwrite A's live site. */
+  it("refuses a slug whose derived Vercel project another site is pinned to", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ slug: "b", vercelProjectName: null, deletedAt: null, status: "DRAFT", workspace: { plan: "PRO" } } as never);
+    vi.mocked(prisma.site.findFirst).mockImplementation((async (args: { where: { OR?: Array<Record<string, unknown>> } }) =>
+      args.where.OR?.some((c) => c.vercelProjectName === slugifyProjectName("old")) ? { id: "site-a" } : null) as never);
+    await expect(updateSiteSettings("s1", { slug: "old" })).rejects.toThrow("SLUG_TAKEN");
+    expect(prisma.site.update).not.toHaveBeenCalled();
+  });
+
+  it("maps a unique-slug race at write time (P2002 on slug) to SLUG_TAKEN", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ slug: "a", vercelProjectName: null, deletedAt: null, status: "DRAFT", workspace: { plan: "PRO" } } as never);
+    vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.site.update).mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed on the fields: (`slug`)", {
+        code: "P2002",
+        clientVersion: "5",
+        meta: { target: ["slug"] },
+      }),
+    );
+    await expect(updateSiteSettings("s1", { slug: "raced" })).rejects.toThrow("SLUG_TAKEN");
   });
 
   it("pins the old project name when a published site changes slug", async () => {

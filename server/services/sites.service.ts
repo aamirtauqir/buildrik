@@ -18,6 +18,7 @@ import { SITE_SETTINGS_COLUMNS } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { unpublishSite } from "@/server/services/publish.service";
+import { slugifyProjectName } from "@/lib/vercel";
 
 function slugify(name: string): string {
   return name
@@ -29,17 +30,24 @@ function slugify(name: string): string {
 
 async function generateUniqueSlug(name: string): Promise<string> {
   const base = slugify(name);
+  const candidates = [base, ...Array.from({ length: 10 }, (_, i) => `${base}-${i + 2}`)];
   // One query for all base-prefixed slugs instead of up to 10 sequential
-  // findFirst lookups.
-  const taken = new Set(
-    (await prisma.site.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } })).map((s) => s.slug),
+  // findFirst lookups. A candidate is also unusable when another site is
+  // pinned to the Vercel project it derives — it would deploy into that one.
+  const rows = await prisma.site.findMany({
+    where: {
+      OR: [
+        { slug: { startsWith: base } },
+        { vercelProjectName: { in: candidates.map(slugifyProjectName) } },
+      ],
+    },
+    select: { slug: true, vercelProjectName: true },
+  });
+  const taken = new Set(rows.map((s) => s.slug));
+  const pinned = new Set(rows.map((s) => s.vercelProjectName));
+  return (
+    candidates.find((c) => !taken.has(c) && !pinned.has(slugifyProjectName(c))) ?? `${base}-${Date.now()}`
   );
-  if (!taken.has(base)) return base;
-  for (let i = 2; i < 12; i++) {
-    const candidate = `${base}-${i}`;
-    if (!taken.has(candidate)) return candidate;
-  }
-  return `${base}-${Date.now()}`;
 }
 
 const SORT_MAP: Record<string, Record<string, string>> = {

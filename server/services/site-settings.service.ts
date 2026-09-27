@@ -208,7 +208,11 @@ export async function updateSiteSettings(
          sent the next publish into a brand-new project, leaving the old URL
          and its domains behind. Pin the name the live site is on first. */
       const taken = await prisma.site.findFirst({
-        where: { slug: data.slug, id: { not: siteId } },
+        where: {
+          id: { not: siteId },
+          // A site pinned to the project this slug derives would share it.
+          OR: [{ slug: data.slug }, { vercelProjectName: slugifyProjectName(data.slug) }],
+        },
         select: { id: true },
       });
       if (taken) throw new Error("SLUG_TAKEN");
@@ -273,11 +277,24 @@ export async function updateSiteSettings(
         where: { id: siteId },
         data: persistData,
       });
-    });
+    }).catch(rethrowSlugConflict);
   }
 
   return prisma.site.update({
     where: { id: siteId },
     data: persistData,
-  });
+  }).catch(rethrowSlugConflict);
+}
+
+/** The SLUG_TAKEN check above is read-then-write; a concurrent save that takes
+ *  the same slug in between surfaces here as the @unique index's P2002. */
+function rethrowSlugConflict(e: unknown): never {
+  if (
+    e instanceof Prisma.PrismaClientKnownRequestError &&
+    e.code === "P2002" &&
+    String(e.meta?.target ?? "").includes("slug")
+  ) {
+    throw new Error("SLUG_TAKEN");
+  }
+  throw e;
 }

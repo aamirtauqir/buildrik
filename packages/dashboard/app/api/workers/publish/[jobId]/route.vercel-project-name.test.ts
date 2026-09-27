@@ -129,6 +129,25 @@ describe("publish worker — pinned Vercel project (SA-06)", () => {
     expect(pinWrites()).toEqual([]);
   });
 
+  /* C1: the deploy is live by the time the pin is written. A failed pin (e.g.
+     the @unique index refusing a name another site holds) must not report
+     that live deploy as failed. */
+  it("still completes the publish when the pin write fails", async () => {
+    setup(null);
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
+    db.site.update.mockImplementation(async (args: { data: Record<string, unknown> }) => {
+      if ("vercelProjectName" in args.data) throw new Error("Unique constraint failed");
+      return {};
+    });
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const res = await run();
+
+    expect(res.status).toBe(200);
+    expect(errSpy).toHaveBeenCalledWith(expect.stringContaining("pin"), expect.anything());
+    errSpy.mockRestore();
+  });
+
   it("does not pin when the deploy fails", async () => {
     setup(null);
     db.$transaction.mockResolvedValue([]);

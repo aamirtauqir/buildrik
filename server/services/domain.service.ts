@@ -167,6 +167,13 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
   const existing = await prisma.domain.findFirst({ where: { domain } });
   if (existing) throw new Error("DOMAIN_IN_USE");
 
+  // The domain lives on this project from now on — pin it, so a slug change
+  // before the first publish can't move the site to a project without it.
+  const projectName = resolveVercelProjectName(site);
+  if (!site.vercelProjectName) {
+    await prisma.site.update({ where: { id: siteId }, data: { vercelProjectName: projectName } });
+  }
+
   const created = await prisma.domain.create({
     data: {
       siteId,
@@ -197,7 +204,7 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
       const result = await addDomainToVercelProject({
         token: conn.token,
         teamId: conn.teamId,
-        projectName: resolveVercelProjectName(site),
+        projectName,
         domain,
       });
       if (result.verification.length > 0) {

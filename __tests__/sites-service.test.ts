@@ -56,6 +56,7 @@ vi.mock("@/lib/prisma", () => {
 });
 
 import { prisma } from "@/lib/prisma";
+import { slugifyProjectName } from "@/lib/vercel";
 import {
   listSites,
   createSite,
@@ -162,6 +163,22 @@ describe("Sites Service", () => {
       const blocks = vi.mocked(prisma.page.create).mock.calls.at(-1)![0].data.blocks as { id: string };
       expect(Array.isArray(blocks)).toBe(false);
       expect(blocks.id).not.toBe("root");
+    });
+
+    /* C1: a slug whose derived Vercel project another site is pinned to
+       (that site renamed its slug after going live) would deploy into that
+       site's project and overwrite it. */
+    it("skips a slug candidate whose derived Vercel project name is pinned by another site", async () => {
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.site.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([
+        { slug: "renamed-away", vercelProjectName: slugifyProjectName("my-site") },
+      ] as any);
+      vi.mocked(prisma.site.create).mockResolvedValue({ id: "new-site", name: "My Site", slug: "x" } as any);
+
+      await createSite("ws_123", "user_1", { name: "My Site", method: "blank" });
+
+      expect(vi.mocked(prisma.site.create).mock.calls.at(-1)![0].data.slug).toBe("my-site-2");
     });
 
     it("throws when site limit reached", async () => {

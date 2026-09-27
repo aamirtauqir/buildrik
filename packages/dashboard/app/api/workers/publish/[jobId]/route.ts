@@ -402,9 +402,14 @@ async function runVercelDeployJob(
     data: { deploymentId: result.deploymentId },
   });
   // SA-06: pin the project this site now lives on, so a later slug change
-  // keeps deploying here instead of creating a new project.
+  // keeps deploying here instead of creating a new project. Best-effort: the
+  // deploy is already live, and a failed pin must not report it as failed.
   if (!site.vercelProjectName) {
-    await prisma.site.update({ where: { id: siteId }, data: { vercelProjectName: projectName } });
+    try {
+      await prisma.site.update({ where: { id: siteId }, data: { vercelProjectName: projectName } });
+    } catch (e: unknown) {
+      console.error(`[publish-worker] project pin failed for site ${siteId}:`, e instanceof Error ? e.message : e);
+    }
   }
   await setStep(jobId, 2);
 

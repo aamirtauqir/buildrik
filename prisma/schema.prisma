@@ -335,7 +335,7 @@ model Site {
   publishedUrl      String?
   // SA-06: the Vercel project this site deploys to, pinned at first deploy (or
   // at the first slug change of a published site). null = derive from slug.
-  vercelProjectName String?
+  vercelProjectName String?  @unique
   createdBy         String
   headCode          String?
   bodyCode          String?
