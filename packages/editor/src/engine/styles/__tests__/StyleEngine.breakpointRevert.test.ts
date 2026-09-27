@@ -58,3 +58,13 @@ describe("P-9b — removeBreakpointStyleProperty updates element.breakpointStyle
     expect(all).not.toContain("rgb(255, 0, 0)");
   });
 });
+
+describe("P-9b edge — reverting a property the element does not store", () => {
+  it("leaves the element's breakpointStyles untouched", () => {
+    const { c, id } = setup();
+    const before = c.elements.getElement(id)!.getData().breakpointStyles;
+    c.styles.removeBreakpointStyleProperty(id, "tablet", "margin");
+    c.styles.removeBreakpointStyleProperty(id, "desktop", "color");
+    expect(c.elements.getElement(id)!.getData().breakpointStyles).toEqual(before);
+  });
+});
