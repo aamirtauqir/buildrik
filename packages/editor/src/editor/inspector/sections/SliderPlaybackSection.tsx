@@ -15,6 +15,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 import { Section, type SectionTier } from "../shared/controls";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface SliderPlaybackSectionProps {
   elementId: string;
@@ -27,14 +28,6 @@ export interface SliderPlaybackSectionProps {
 const ROW = "tw:flex tw:items-center tw:gap-2 tw:min-h-8";
 const LABEL = "tw:w-[88px] tw:flex-none tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]";
 
-function runTxn(composer: Composer, label: string, fn: () => void) {
-  composer.beginTransaction?.(label);
-  try {
-    fn();
-  } finally {
-    composer.endTransaction?.();
-  }
-}
 
 const boolAttr = (el: { getAttribute: (n: string) => string | undefined }, name: string, fallback: boolean) => {
   const v = el.getAttribute(name);
@@ -73,8 +66,9 @@ export const SliderPlaybackSection: React.FC<SliderPlaybackSectionProps> = ({
 
   if (!composer || !slider) return null;
 
+  /* P-1: writeElement refuses a locked slider (and the shell says so). */
   const set = (name: string, value: string) =>
-    runTxn(composer, "slider-settings", () => slider.setAttribute(name, value));
+    writeElement(composer, slider, "slider-settings", () => slider.setAttribute(name, value));
 
   return (
     <Section title="Playback" icon="Play" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-slider-playback">

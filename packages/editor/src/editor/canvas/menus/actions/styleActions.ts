@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 
-import { runTransaction } from "../../../../shared/utils/helpers";
+import { pasteStyles } from "@/engine/commands/commandOperations";
 import type { ContextAction } from "../contextMenuRegistry";
 
 export const quickStyleSubmenu: ContextAction[] = [
@@ -27,12 +27,9 @@ export const quickStyleSubmenu: ContextAction[] = [
     shortcut: "Cmd+Alt+V",
     isEnabled: ({ composer }) =>
       Boolean(composer.styleClipboard && Object.keys(composer.styleClipboard).length),
+    /* P-10: the shared merge — this replaced the whole style map. */
     handler: ({ composer, element }) => {
-      if (!composer.styleClipboard) return;
-      const styles = composer.styleClipboard;
-      runTransaction(composer, "context-paste-styles", () => {
-        element.setStyles?.(styles);
-      });
+      pasteStyles(composer, element);
     },
   },
 ];

@@ -1161,7 +1161,7 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
        type attribute; healing the tag alone would publish a row of text boxes
        where the user placed an email field, a date picker and a submit button.
        Caller attributes still win — this only fills a gap. */
-    const defaultAttrs = getDefaultAttributes(element.type);
+    const defaultAttrs = getDefaultAttributes(element.type, tag);
     for (const [key, value] of Object.entries(defaultAttrs)) {
       if (element.attributes?.[key]) continue;
       attrParts.push(`${key}="${escapeHTML(String(value))}"`);

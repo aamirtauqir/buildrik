@@ -16,6 +16,8 @@ Headless document engine: element tree, history, selection, storage, export, mig
 - HTML sanitization is a single DOMPurify SSOT enforced at every boundary: serializer, HTML import, inline-edit paste. New HTML ingestion paths MUST route through it (XSS arc 2026-06-08).
 - Canvas-bound events are RAF-coalesced — emit once per frame, not per mutation.
 - Side-effect-free module level: managers lazy-init external resources.
+- **One lock gate for element writes**: `commands/commandOperations.ts` — `writeElement` (one undo step, refused when locked), `writableElements` (filters a batch), `canWrite` (id check at write time), `pasteStyles` (the one merge-paste for ⋯, canvas menu and ⌥⌘V). `writableElements` is not a pure filter: dropping a locked element emits `LOCKED_ELEMENTS_SKIPPED` (the "locked" toast), so to merely ask, read `isLocked()`. A new Inspector write path goes through these, never its own lock check.
+- **Element types are refined on load and paste, forward-only** (`migration/refineElementTypes.ts`, called beside the sanitizer in `importProject` and in `HTMLParser`). It upgrades a stored `container` (or parsed `label`) to a real type only when the markup proves it, keeps the rendered tag unchanged, and is idempotent; it never downgrades. `VALID_ELEMENT_TYPES` (`shared/utils/html/typeMapping.ts`) is read off `ELEMENT_RULES` (`shared/utils/nesting/rules.ts`), which TypeScript forces to cover the whole `ElementType` union: a new type goes in the union and its rules entry, never a hand-kept copy (the old one had fallen ten types behind).
 
 ## Pitfalls
 

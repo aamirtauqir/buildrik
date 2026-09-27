@@ -89,7 +89,8 @@ describe("BackgroundSection — gradient writes", () => {
     fireEvent.click(screen.getByRole("button", { name: "Linear" }));
     expect(onChange).toHaveBeenCalledWith(
       "background",
-      "linear-gradient(90deg, var(--bk-accent), var(--bk-success))"
+      // Literal stops, never chrome --bk-* tokens: this ships in exported HTML (P-3).
+      "linear-gradient(90deg, #1A56DB, #22c55e)"
     );
   });
 
@@ -99,7 +100,7 @@ describe("BackgroundSection — gradient writes", () => {
     fireEvent.click(screen.getByRole("button", { name: "Radial" }));
     expect(onChange).toHaveBeenCalledWith(
       "background",
-      "radial-gradient(circle, var(--bk-accent), var(--bk-success))"
+      "radial-gradient(circle, #1A56DB, #22c55e)"
     );
   });
 });
@@ -136,5 +137,60 @@ describe("BackgroundSection — advanced image disclosure", () => {
     renderBg({ advancedExpanded: false, onAdvancedToggle: vi.fn() });
     expect(screen.queryByRole("button", { name: /gradient/i })).toBeNull();
     expect(screen.getByRole("button", { name: "More settings" })).toBeInTheDocument();
+  });
+});
+
+/* X-1 (P1, P-11): switching the type left the old fill in place — a gradient
+   on `background` kept covering the new colour — and Fill read only
+   `background-color`, so a `background:` shorthand colour showed empty. Each
+   switch is one batch write, so it is one undo step. */
+describe("BackgroundSection — switching type replaces the old fill (X-1)", () => {
+  const GRADIENT = "linear-gradient(90deg, #111111, #eeeeee)";
+
+  it("Gradient → Color clears the gradient", () => {
+    const onBatchChange = vi.fn();
+    renderBg({ styles: { background: GRADIENT, "background-color": "#00ff00" }, onBatchChange });
+    fireEvent.click(screen.getByRole("button", { name: "color" }));
+    expect(onBatchChange).toHaveBeenCalledWith({ background: "" });
+    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("00ff00");
+  });
+
+  it("Image → Color clears the image", () => {
+    const onBatchChange = vi.fn();
+    renderBg({ styles: { "background-image": "url('https://a/b.png')" }, onBatchChange });
+    fireEvent.click(screen.getByRole("button", { name: "color" }));
+    expect(onBatchChange).toHaveBeenCalledWith({ "background-image": "" });
+  });
+
+  it("Image → Gradient replaces the image with a gradient in one write", () => {
+    const onBatchChange = vi.fn();
+    renderBg({ styles: { "background-image": "url('https://a/b.png')" }, onBatchChange });
+    fireEvent.click(screen.getByRole("button", { name: "gradient" }));
+    expect(onBatchChange).toHaveBeenCalledWith({
+      "background-image": "",
+      background: "linear-gradient(90deg, #1A56DB, #22c55e)",
+    });
+  });
+
+  it("Gradient → Image keeps the gradient until an image is chosen, then replaces it", () => {
+    const onBatchChange = vi.fn();
+    const { onChange } = renderBg({ styles: { background: GRADIENT }, onBatchChange });
+    fireEvent.click(screen.getByRole("button", { name: "image" }));
+    expect(onBatchChange).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByPlaceholderText("https://..."), { target: { value: "https://c/d.png" } });
+    expect(onBatchChange).toHaveBeenCalledWith({ background: "", "background-image": "url('https://c/d.png')" });
+    expect(onChange).not.toHaveBeenCalledWith("background-image", expect.anything());
+  });
+
+  it("Fill reads a `background:` shorthand colour", () => {
+    renderBg({ styles: { background: "#ff0000" } });
+    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("ff0000");
+  });
+
+  it("writing Fill over a `background:` shorthand clears the shorthand in the same write", () => {
+    const onBatchChange = vi.fn();
+    renderBg({ styles: { background: "#ff0000" }, onBatchChange });
+    fireEvent.change(screen.getByRole("textbox", { name: "Fill value" }), { target: { value: "00ff00" } });
+    expect(onBatchChange).toHaveBeenCalledWith({ background: "", "background-color": "#00ff00" });
   });
 });

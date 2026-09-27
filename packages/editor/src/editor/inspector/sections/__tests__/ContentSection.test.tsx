@@ -19,6 +19,12 @@ const MENU = {
   ],
 };
 
+const TEAM = {
+  id: "col-2",
+  name: "Team",
+  fields: [{ id: "f3", name: "Bio", slug: "bio", type: "text" }],
+};
+
 function makeComposer(type = "heading", collections = [MENU]) {
   const bindings: Array<Record<string, unknown>> = [];
   const listeners = new Map<string, Set<() => void>>();
@@ -83,5 +89,25 @@ describe("ContentSection", () => {
     fireEvent.click(screen.getByTestId("content-source-cms"));
     fireEvent.click(screen.getByTestId("content-create-collection"));
     expect(create).toHaveBeenCalled();
+  });
+
+  /* P-2 / X-10: changing Collection unbound the element before any field was
+     picked — a pick of nothing, recorded. The binding stays until a field of
+     the new collection is chosen, and that choice replaces it in one step. */
+  it("changing Collection does not unbind; the next Field pick replaces the binding", () => {
+    const composer = makeComposer("heading", [MENU, TEAM]);
+    render(<ContentSection elementId="e1" composer={composer as never} isOpen />);
+    fireEvent.click(screen.getByTestId("content-source-cms"));
+    fireEvent.change(screen.getByLabelText("Field"), { target: { value: "name" } });
+    composer.cms.bindings.bindToField.mockClear();
+
+    fireEvent.change(screen.getByLabelText("Collection"), { target: { value: "col-2" } });
+    expect(composer.cms.bindings.unbindAll).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Collection")).toHaveValue("col-2");
+    expect(screen.getByLabelText("Field")).toHaveValue("");
+
+    fireEvent.change(screen.getByLabelText("Field"), { target: { value: "bio" } });
+    expect(composer.cms.bindings.unbindAll).not.toHaveBeenCalled();
+    expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-2", undefined, "bio", "content", undefined, "Bind Bio");
   });
 });

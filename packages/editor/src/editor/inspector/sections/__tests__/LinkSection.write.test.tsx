@@ -106,6 +106,7 @@ describe("LinkSection — known-issue pins", () => {
   it("PIN: each valid keystroke opens its own transaction (no debounce/coalesce)", () => {
     const { composer, container } = renderLink();
     fireEvent.change(linkTypeSelect(container), { target: { value: "url" } });
+    composer.beginTransaction.mockClear(); // the type change is its own step (P-11a)
     const input = screen.getByPlaceholderText("https://example.com");
     fireEvent.change(input, { target: { value: "https://a.com" } });
     fireEvent.change(input, { target: { value: "https://ab.com" } });
@@ -115,5 +116,64 @@ describe("LinkSection — known-issue pins", () => {
       ([name]) => name === "link-change"
     );
     expect(linkTxns).toHaveLength(2);
+  });
+});
+
+/* P-11(a): a type change left the previous destination behind — Page with no
+   page picked kept the old external href, Email kept target=_blank and its
+   rel — and Same Window deleted a custom rel along with ours. */
+describe("LinkSection — changing the link type clears what no longer applies (P-11a)", () => {
+  const select = (container: HTMLElement, value: string) =>
+    Array.from(container.querySelectorAll("select")).find((s) =>
+      Array.from(s.options).some((o) => o.value === value)
+    ) as HTMLSelectElement;
+  const BLANK = { href: "https://x.com", target: "_blank", rel: "noopener noreferrer" };
+
+  it("URL → Page (no page picked yet) drops the old external href", () => {
+    const { el, container } = renderLink({ attrs: BLANK, pages: [{ id: "p1", name: "About" }] });
+    fireEvent.change(linkTypeSelect(container), { target: { value: "page" } });
+    expect(el.getAttribute("href")).toBeFalsy();
+  });
+
+  it("URL → Email drops the href, target and rel (they do not apply to mail)", () => {
+    const { el, container } = renderLink({ attrs: BLANK });
+    fireEvent.change(linkTypeSelect(container), { target: { value: "email" } });
+    expect(el.getAttribute("href")).toBeFalsy();
+    expect(el.getAttribute("target")).toBeFalsy();
+    expect(el.getAttribute("rel")).toBeFalsy();
+  });
+
+  it("the type change is one transaction", () => {
+    const { composer, container } = renderLink({ attrs: BLANK });
+    composer.beginTransaction.mockClear();
+    fireEvent.change(linkTypeSelect(container), { target: { value: "phone" } });
+    expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("Same Window removes only the rel tokens New Tab added; a custom rel stays", () => {
+    const { el, container } = renderLink({ attrs: { ...BLANK, rel: "nofollow noopener noreferrer" } });
+    fireEvent.change(select(container, "_blank"), { target: { value: "_self" } });
+    expect(el.getAttribute("target")).toBeFalsy();
+    expect(el.getAttribute("rel")).toBe("nofollow");
+  });
+
+  it("New Tab keeps a custom rel and adds noopener noreferrer", () => {
+    const { el, container } = renderLink({ attrs: { href: "https://x.com", rel: "nofollow" } });
+    fireEvent.change(select(container, "_blank"), { target: { value: "_blank" } });
+    expect(el.getAttribute("rel")).toBe("nofollow noopener noreferrer");
+  });
+});
+
+/* P-1 follow-up: the type select changed the UI before the lock gate ran, so
+   a locked link showed "Page" while its href was untouched. */
+describe("LinkSection — a locked element", () => {
+  it("a refused type change leaves the displayed type unchanged", () => {
+    const { el, composer, container } = renderLink({ attrs: { href: "https://x.com" } });
+    expect(linkTypeSelect(container).value).toBe("url");
+    (el as unknown as { isLocked: () => boolean }).isLocked = () => true;
+    fireEvent.change(linkTypeSelect(container), { target: { value: "none" } });
+    expect(el.removeAttribute).not.toHaveBeenCalledWith("href");
+    expect(composer.emit).toHaveBeenCalled();
+    expect(linkTypeSelect(container).value).toBe("url");
   });
 });

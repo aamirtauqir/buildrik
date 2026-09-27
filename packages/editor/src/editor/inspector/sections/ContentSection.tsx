@@ -18,6 +18,7 @@ import type { CMSCollection } from "@/shared/types/cms";
 import { EVENTS } from "@/shared/constants";
 import { Button } from "@/editor/chrome-ui";
 import { Section, SelectRow, type SectionTier } from "../shared/controls";
+import { canWrite } from "@/engine/commands/commandOperations";
 
 export interface ContentSectionProps {
   elementId: string;
@@ -71,9 +72,12 @@ export const ContentSection: React.FC<ContentSectionProps> = ({ elementId, compo
 
   const binding = composer?.cms?.bindings?.getBindings?.(elementId)?.[0] ?? null;
   const collections: CMSCollection[] = composer?.cms?.collections?.getAllCollections?.() ?? [];
-  const activeCollectionId = binding?.collectionId ?? (collectionId || collections[0]?.id || "");
+  /* The Collection pick is local until a Field is chosen: the binding stays
+     on its own collection meanwhile, and the Field pick replaces it. */
+  const activeCollectionId = collectionId || binding?.collectionId || collections[0]?.id || "";
   const collection = collections.find((c) => c.id === activeCollectionId) ?? null;
-  const field = binding ? collection?.fields.find((f) => f.slug === binding.fieldSlug) ?? null : null;
+  const boundHere = binding?.collectionId === activeCollectionId ? binding : null;
+  const field = boundHere ? collection?.fields.find((f) => f.slug === boundHere.fieldSlug) ?? null : null;
   const fromCms = Boolean(binding) || cmsChosen;
   const property = boundProperty(composer?.elements.getElement(elementId)?.getType?.());
 
@@ -86,13 +90,17 @@ export const ContentSection: React.FC<ContentSectionProps> = ({ elementId, compo
     };
   }, [binding, composer, tick]);
 
+  /* P-1: binding rewrites the element's content, so every bind / unbind here
+     passes the lock gate first (which says so when it refuses). */
+  const writable = () => (composer ? canWrite(composer, elementId) : false);
   const bindField = (slug: string) => {
     const f = collection?.fields.find((x) => x.slug === slug);
-    if (!composer || !collection || !f) return;
-    if (binding) composer.cms.bindings.unbindAll(elementId, `Unbind ${field?.name ?? binding.fieldSlug}`);
+    if (!composer || !collection || !f || !writable()) return;
+    // Replaces any binding on this property — one undo step (P-2).
     composer.cms.bindings.bindToField(elementId, collection.id, undefined, f.slug, property, undefined, `Bind ${f.name}`);
   };
   const toStatic = () => {
+    if (binding && !writable()) return;
     setCmsChosen(false);
     if (composer && binding) composer.cms.bindings.unbindAll(elementId, `Unbind ${field?.name ?? binding.fieldSlug}`);
   };
@@ -126,7 +134,6 @@ export const ContentSection: React.FC<ContentSectionProps> = ({ elementId, compo
             label="Collection"
             value={activeCollectionId}
             onChange={(id) => {
-              if (binding && composer) composer.cms.bindings.unbindAll(elementId, "Unbind field");
               setCollectionId(id);
               setCmsChosen(true);
             }}
@@ -134,12 +141,12 @@ export const ContentSection: React.FC<ContentSectionProps> = ({ elementId, compo
           />
           <SelectRow
             label="Field"
-            value={binding?.fieldSlug ?? ""}
+            value={boundHere?.fieldSlug ?? ""}
             placeholder="Choose a field…"
             onChange={bindField}
             options={collection.fields.map((f) => ({ value: f.slug, label: f.name }))}
           />
-          {binding ? (
+          {boundHere ? (
             <>
               <div className="bdi-row-ctrl" data-testid="content-preview">
                 <span className="bdi-lb">Preview</span>
@@ -151,7 +158,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({ elementId, compo
                 </div>
               </div>
               <p className={NOTE} data-testid="content-note">
-                Shows the record&apos;s {field?.name ?? binding.fieldSlug} on dynamic pages and in collection lists.
+                Shows the record&apos;s {field?.name ?? boundHere.fieldSlug} on dynamic pages and in collection lists.
               </p>
             </>
           ) : null}

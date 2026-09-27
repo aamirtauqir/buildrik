@@ -11,6 +11,7 @@ import { BlurSection, OpacitySection, ShadowSection } from "../EffectsBasicSecti
 import { InteractionsSection, type Interaction } from "../interactions";
 import { VisibilitySection } from "../VisibilitySection";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   /* Board 4428:142686 draws OPACITY, SHADOW, BLUR, INTERACTIONS — one
@@ -67,15 +68,11 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
       };
       const handleInteractionsChange = (interactions: Interaction[]) => {
         if (!ctx.composer) return;
-        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
-        if (!el) return;
-        ctx.composer.beginTransaction?.("interactions-change");
-        try {
+        /* P-1: the lock gate — refused (and said) when the element is locked. */
+        writeElement(ctx.composer, ctx.composer.elements.getElement(ctx.selectedElement.id), "interactions-change", (el) => {
           if (!el.setInteractions && IS_DEV_BUILD) console.warn(`[Inspector] setInteractions not implemented on element ${ctx.selectedElement.id}`);
           el.setInteractions?.(interactions);
-        } finally {
-          ctx.composer.endTransaction?.();
-        }
+        });
       };
       const handleInteractionPreview = (interaction: Interaction) => {
         const domEl = document.querySelector(
@@ -104,10 +101,8 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
         animation: import("../../../../shared/types/animations").AnimationConfig | null
       ) => {
         if (!ctx.composer) return;
-        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
-        if (!el) return;
-        ctx.composer.beginTransaction?.("animation-change");
-        try {
+        /* P-1: the lock gate — refused (and said) when the element is locked. */
+        writeElement(ctx.composer, ctx.composer.elements.getElement(ctx.selectedElement.id), "animation-change", (el) => {
           if (animation) {
             if (!el.setAnimation && IS_DEV_BUILD) console.warn(`[Inspector] setAnimation not implemented on element ${ctx.selectedElement.id}`);
             el.setAnimation?.(animation);
@@ -115,9 +110,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
             if (!el.clearAnimation && IS_DEV_BUILD) console.warn(`[Inspector] clearAnimation not implemented on element ${ctx.selectedElement.id}`);
             el.clearAnimation?.();
           }
-        } finally {
-          ctx.composer.endTransaction?.();
-        }
+        });
       };
       const handleAnimationPreview = () => {
         const domEl = document.querySelector(

@@ -9,6 +9,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { Button, TextInput } from "@/editor/chrome-ui";
+import { writeElement } from "@/engine/commands/commandOperations";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -67,9 +68,8 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
       newKey.startsWith("data-") || newKey.startsWith("aria-") ? newKey : `data-${newKey}`;
 
     if (composer) {
-      const el = composer.elements.getElement(elementId);
-      if (!el) return;
-      el.setAttribute?.(key, newValue);
+      /* P-1: the lock gate — refused (and said) on a locked element. */
+      if (!writeElement(composer, composer.elements.getElement(elementId), "data-attribute-add", (el) => el.setAttribute?.(key, newValue))) return;
       setNewKey("");
       setNewValue("");
     }

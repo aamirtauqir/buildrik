@@ -19,6 +19,7 @@ import type { Composer } from "../../../engine";
 import { BREAKPOINTS } from "../../../shared/constants/breakpoints";
 import { EVENTS } from "../../../shared/constants/events";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 /**
  * What this breakpoint overrides, read from the engine and kept current by the
@@ -83,16 +84,15 @@ export const BreakpointOverrides: React.FC<BreakpointOverridesProps> = ({
   /* Board 4418:113785 — "⚠ 6 tablet overrides · Revert all": one line that
      says how much this breakpoint changes and one control that drops the lot,
      above the per-property rows (G2-142). One transaction, one undo step. */
-  const revertAll = () => {
-    composer?.beginTransaction?.(`revert-all-${breakpoint}`);
-    try {
-      for (const [property] of overrides) {
-        composer?.styles?.removeBreakpointStyleProperty(elementId, breakpoint, property);
-      }
-    } finally {
-      composer?.endTransaction?.();
-    }
+  /* P-1: both reverts go through the lock gate — a locked element keeps its
+     overrides, and the shell says why. */
+  const revert = (label: string, properties: string[]) => {
+    if (!composer) return;
+    writeElement(composer, composer.elements.getElement(elementId), label, () => {
+      for (const property of properties) composer.styles.removeBreakpointStyleProperty(elementId, breakpoint, property);
+    });
   };
+  const revertAll = () => revert(`revert-all-${breakpoint}`, overrides.map(([property]) => property));
 
   return (
     <div className="tw:flex tw:flex-col" data-testid="breakpoint-overrides">
@@ -144,14 +144,7 @@ export const BreakpointOverrides: React.FC<BreakpointOverridesProps> = ({
                 className="tw:absolute tw:right-0.5 tw:top-1/2 tw:h-auto tw:min-h-0 tw:-translate-y-1/2 tw:border-transparent tw:bg-transparent tw:p-1 tw:text-[var(--bk-accent)]"
                 aria-label={`Revert ${humanise(property).toLowerCase()} to base`}
                 title={`Revert to base`}
-                onClick={() => {
-                  composer?.beginTransaction?.(`revert-${property}-${breakpoint}`);
-                  try {
-                    composer?.styles?.removeBreakpointStyleProperty(elementId, breakpoint, property);
-                  } finally {
-                    composer?.endTransaction?.();
-                  }
-                }}
+                onClick={() => revert(`revert-${property}-${breakpoint}`, [property])}
               >
                 <RotateCcw size={12} aria-hidden="true" />
               </Button>

@@ -23,6 +23,7 @@ import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { computeEffectiveStyles } from "../config/cssContext";
+import { writableElements } from "@/engine/commands/commandOperations";
 
 // ============================================================================
 // TYPES
@@ -144,6 +145,10 @@ export function useBatchStyleHandler(
   const handleBatchStyleChange = React.useCallback(
     (changes: Record<string, string>) => {
       if (!composer || selectedIds.length === 0) return;
+      /* P-1: locked members are skipped by the lock gate, which says so once;
+         the rest of the selection still takes the edit. */
+      const targets = writableElements(composer, selectedIds.map((id) => composer.elements.getElement(id)));
+      if (targets.length === 0) return;
 
       composer.beginTransaction?.("batch-multi-style");
       try {
@@ -152,9 +157,8 @@ export function useBatchStyleHandler(
             ? undefined
             : getBreakpointQuery(currentBreakpoint) ?? undefined;
 
-        selectedIds.forEach((id) => {
-          const el = composer.elements.getElement(id);
-          if (!el) return;
+        targets.forEach((el) => {
+          const id = el.getId();
 
           if (currentPseudoState !== "normal" && composer.styles) {
             // Pseudo-state: merge new values into the element's :state rule.
@@ -173,6 +177,7 @@ export function useBatchStyleHandler(
             composer.styles.setRule(selector, existing, {
               pseudo: `:${currentPseudoState}`,
               mediaQuery: mq,
+              replace: true,
             });
             return;
           }

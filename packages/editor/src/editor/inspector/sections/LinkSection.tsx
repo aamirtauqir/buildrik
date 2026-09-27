@@ -5,11 +5,12 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
+import type { Composer, Element } from "@/engine";
 import { EVENTS } from "../../../shared/constants";
 import type { PageData } from "../../../shared/types";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
 import { isUrl, isEmail, isPhoneNumber } from "../../../shared/utils/helpers/validation";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface LinkSectionProps {
   selectedElement: {
@@ -48,6 +49,10 @@ const LINK_TYPE_OPTIONS = [
   { value: "phone", label: "Phone" },
   { value: "anchor", label: "Anchor" },
 ];
+
+/** The rel tokens New Tab adds. Same Window takes back only these, so an
+ *  author's own rel (nofollow, sponsored, …) survives the round trip. */
+const TAB_REL = ["noopener", "noreferrer"];
 
 const TARGET_OPTIONS = [
   { value: "_self", label: "Same Window" },
@@ -143,56 +148,60 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     (href: string) => {
       if (!composer || !selectedElement?.id) return;
 
-      const el = composer.elements.getElement(selectedElement.id);
-      if (!el) return;
-
-      composer.beginTransaction?.("link-change");
-      try {
+      /* P-1: the lock gate — refused (and said) when the element is locked. */
+      writeElement(composer, composer.elements.getElement(selectedElement.id), "link-change", (el) => {
         if (href) {
           el.setAttribute?.("href", href);
         } else {
           el.removeAttribute?.("href");
         }
-      } finally {
-        composer.endTransaction?.();
-      }
+      });
     },
     [composer, selectedElement?.id]
   );
 
-  const updateTarget = React.useCallback(
-    (newTarget: string) => {
-      if (!composer || !selectedElement?.id) return;
+  const writeTarget = (el: Element, newTarget: string) => {
+    const own = (el.getAttribute?.("rel") || "").split(/\s+/).filter((t) => t && !TAB_REL.includes(t));
+    const rel = newTarget === "_blank" ? [...own, ...TAB_REL] : own;
+    if (newTarget === "_blank") el.setAttribute?.("target", newTarget);
+    else el.removeAttribute?.("target");
+    if (rel.length) el.setAttribute?.("rel", rel.join(" "));
+    else el.removeAttribute?.("rel");
+  };
 
-      const el = composer.elements.getElement(selectedElement.id);
-      if (!el) return;
+  const updateTarget = (newTarget: string) => {
+    if (!composer || !selectedElement?.id) return;
+    /* P-1: the lock gate — refused (and said) when the element is locked. */
+    const ran = writeElement(composer, composer.elements.getElement(selectedElement.id), "link-target-change", (el) =>
+      writeTarget(el, newTarget)
+    );
+    if (ran) setTarget(newTarget);
+  };
 
-      composer.beginTransaction?.("link-target-change");
-      try {
-        if (newTarget && newTarget !== "_self") {
-          el.setAttribute?.("target", newTarget);
-          if (newTarget === "_blank") {
-            el.setAttribute?.("rel", "noopener noreferrer");
-          }
-        } else {
-          el.removeAttribute?.("target");
-          el.removeAttribute?.("rel");
-        }
-      } finally {
-        composer.endTransaction?.();
-      }
-      setTarget(newTarget);
-    },
-    [composer, selectedElement?.id]
-  );
-
+  /* A type change replaces the destination (P-11a): the old href goes unless
+     the new type already holds a valid value here, and target/rel go when the
+     new type cannot open in a tab (none, email, phone). One transaction. */
   const handleLinkTypeChange = (type: string) => {
+    const el = selectedElement?.id ? composer?.elements.getElement(selectedElement.id) : null;
+    if (!composer || !el) return;
+    const href =
+      type === "page" && selectedPageId ? `#page:${selectedPageId}`
+      : type === "url" && /^https?:\/\//.test(externalUrl) ? externalUrl
+      : type === "email" && isEmail(emailAddress) ? `mailto:${emailAddress}`
+      : type === "phone" && isPhoneNumber(phoneNumber) ? `tel:${phoneNumber}`
+      : type === "anchor" && anchorId && !/\s/.test(anchorId) ? `#${anchorId}`
+      : "";
+    const noTab = type === "none" || type === "email" || type === "phone";
+    /* P-1: the lock gate — refused (and said) when the element is locked. */
+    const ran = writeElement(composer, el, "link-change", (target) => {
+      if (href) target.setAttribute?.("href", href);
+      else target.removeAttribute?.("href");
+      if (noTab) writeTarget(target, "_self");
+    });
+    /* The UI follows the write: a locked element keeps its displayed type. */
+    if (!ran) return;
     setLinkType(type as LinkType);
-
-    // Clear href when switching to 'none'
-    if (type === "none") {
-      updateHref("");
-    }
+    if (noTab) setTarget("_self");
   };
 
   const handlePageSelect = (pageId: string) => {

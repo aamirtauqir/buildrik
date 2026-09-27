@@ -11,6 +11,7 @@ import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
+import { canWrite } from "@/engine/commands/commandOperations";
 
 export interface CollectionListSectionProps {
   elementId: string;
@@ -41,7 +42,11 @@ export const CollectionListSection: React.FC<CollectionListSectionProps> = ({ el
   const options = composer.cms.collections.getAllCollections().map((c) => ({ value: c.id, label: c.name }));
 
   /* One undo step: binding retargets the template's starter placeholders. */
+  /* P-1: binding re-renders the list's children, so bind / unbind pass the
+     lock gate first (which says so when it refuses). */
+  const writable = () => canWrite(composer, elementId);
   const bind = (collectionId: string, limit: number | undefined) => {
+    if (!writable()) return;
     composer.beginTransaction?.("bind-collection-list");
     try {
       composer.cms.bindings.bindCollectionList(elementId, collectionId, { limit });
@@ -57,7 +62,7 @@ export const CollectionListSection: React.FC<CollectionListSectionProps> = ({ el
         value={binding?.collectionId ?? ""}
         options={options}
         placeholder="None"
-        onChange={(id) => (id ? bind(id, binding?.limit) : composer.cms.bindings.unbindCollection(elementId))}
+        onChange={(id) => (id ? bind(id, binding?.limit) : writable() && composer.cms.bindings.unbindCollection(elementId))}
       />
       {binding ? (
         <InputRow

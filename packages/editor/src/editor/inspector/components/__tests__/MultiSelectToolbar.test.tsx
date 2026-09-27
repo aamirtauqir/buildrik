@@ -199,12 +199,13 @@ describe("MultiSelectToolbar — board 4418:114523 context header (G2-140)", () 
     expect(composer.commands.run).not.toHaveBeenCalledWith("group");
   });
 
-  it("Delete on N > 1 confirms first (decision #17), then runs the delete command", () => {
+  it("Delete on N > 1 confirms first (decision #17), then runs the delete command confirmed", () => {
     const { composer } = renderWithMembers();
     fireEvent.click(screen.getByTestId("multiselect-delete"));
     expect(composer.commands.run).not.toHaveBeenCalledWith("delete");
     expect(screen.getByRole("dialog").textContent).toContain("Delete 3 elements?");
     fireEvent.click(screen.getByRole("button", { name: /^Delete 3 elements$/ }));
-    expect(composer.commands.run).toHaveBeenCalledWith("delete");
+    /* P-10: this modal is the confirm; unconfirmed, the command asked again. */
+    expect(composer.commands.run).toHaveBeenCalledWith("delete", { confirmed: true });
   });
 });

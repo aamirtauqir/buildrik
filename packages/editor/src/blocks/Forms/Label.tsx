@@ -13,7 +13,7 @@ export const labelBlockConfig: LabelBlockConfig = {
   id: "label",
   label: "Label",
   category: "Forms",
-  elementType: "text",
+  elementType: "label",
   icon: "/src/assets/icons/blocks/text.svg",
-  content: '<label style="font-weight:500">Label text</label>',
+  content: '<label data-buildrick-type="label" style="font-weight:500">Label text</label>',
 };

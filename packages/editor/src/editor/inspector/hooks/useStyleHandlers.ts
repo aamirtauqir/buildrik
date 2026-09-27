@@ -14,6 +14,7 @@
 
 import { useCallback, useState, useEffect, useRef } from "react";
 import type { Composer } from "../../../engine";
+import type { Element } from "@/engine/elements/Element";
 import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
 import { getDefaultStyles } from "../../../shared/constants/defaultStyles";
 import { EVENTS } from "../../../shared/constants";
@@ -22,6 +23,7 @@ import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { devLogger } from "../../../shared/utils/devLogger";
 import { computeEffectiveStyles } from "../config/cssContext";
+import { canWrite, writableElements } from "@/engine/commands/commandOperations";
 
 // ============================================================================
 // TYPES
@@ -86,22 +88,23 @@ export function useStyleHandlers(
   const [styles, setStyles] = useState<Record<string, string>>({});
   const [overriddenProperties, setOverriddenProperties] = useState<Set<string>>(new Set());
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingFlushRef = useRef<(() => void) | null>(null);
+  /** The debounced single write not yet committed, and the property it writes. */
+  const pendingFlushRef = useRef<{ property: string; run: () => void } | null>(null);
+
+  /** Commit the pending debounced write NOW. Any write that must not be
+   *  overtaken by it — another property, a batch, a selection change — calls
+   *  this first; dropping it lost the edit, deferring it let it land late. */
+  const flushPending = useCallback(() => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = null;
+    const pending = pendingFlushRef.current;
+    pendingFlushRef.current = null;
+    pending?.run();
+  }, []);
 
   // Flush any pending debounced style change when element/breakpoint/pseudoState changes.
   // Prior: cleanup silently dropped the last keystroke. Now we commit it first.
-  useEffect(() => {
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-        if (pendingFlushRef.current) {
-          pendingFlushRef.current();
-          pendingFlushRef.current = null;
-        }
-      }
-    };
-  }, [selectedElement?.id, currentBreakpoint, currentPseudoState]);
+  useEffect(() => flushPending, [selectedElement?.id, currentBreakpoint, currentPseudoState, flushPending]);
 
   // Load styles when element or breakpoint changes. Cascade (base → breakpoint
   // overlay → pseudo) is delegated to computeEffectiveStyles so there's ONE
@@ -186,8 +189,8 @@ export function useStyleHandlers(
     (property: string, value: string) => {
       if (!selectedElement?.id) return;
 
-      const el = composer?.elements.getElement(selectedElement.id);
-      if (!el) return;
+      /* P-1: a locked element is read-only; the lock gate refuses and says so. */
+      if (!composer || !canWrite(composer, selectedElement.id)) return;
 
       // 1. Immediate local state update — live preview without waiting for debounce
       setStyles((prev) => {
@@ -211,66 +214,80 @@ export function useStyleHandlers(
       // 2. Debounced engine mutation — batches rapid typing into one history entry.
       // Stores the flush closure in pendingFlushRef so the cleanup effect can
       // commit it when element/breakpoint/pseudo changes before the timer fires.
+      // Rapid writes to the SAME property coalesce (the pending one is
+      // superseded); a pending write to another property is committed first.
+      if (pendingFlushRef.current && pendingFlushRef.current.property !== property) flushPending();
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      const writeOne = (id: string) => {
-        // Re-read element inside the flush — avoids stale closure if element was replaced.
-        const el = composer?.elements.getElement(id);
-        if (!el) return;
+      const writeOne = (el: Element) => {
+        const id = el.getId();
         const sel = `[data-buildrick-id="${id}"]`;
-        if (currentPseudoState !== "normal" && composer?.styles) {
-          const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
-          const pseudoSelector = `${sel}:${currentPseudoState}`;
+        /* P-8: a device-hide flag (`--hide-tablet`) names its own device, so it
+           always goes on the base styles — the one place the canvas
+           (Canvas.css `[style*="--hide-<bp>: true"]`) and the export
+           (ExportEngine hideRulesFor) read it. Written into the tablet rule
+           while the canvas was on Tablet, it hid nothing anywhere. */
+        const baseOnly = property.startsWith("--hide-");
+        const bp = baseOnly ? "desktop" : currentBreakpoint;
+        const pseudo = baseOnly ? "normal" : currentPseudoState;
+        if (pseudo !== "normal" && composer?.styles) {
+          const mq = bp === "desktop" ? undefined : getBreakpointQuery(bp) ?? undefined;
+          const pseudoSelector = `${sel}:${pseudo}`;
           if (value === "" || value == null) {
             const existingRule = composer.styles.getRule(pseudoSelector, mq);
             if (existingRule) {
               const props = { ...existingRule.properties };
               delete props[property];
               composer.styles.setRule(sel, props, {
-                pseudo: `:${currentPseudoState}`,
+                pseudo: `:${pseudo}`,
                 mediaQuery: mq,
+                replace: true,
               });
             }
           } else {
             composer.styles.setRule(
               sel,
               { [property]: value },
-              { pseudo: `:${currentPseudoState}`, mediaQuery: mq }
+              { pseudo: `:${pseudo}`, mediaQuery: mq }
             );
           }
         } else if (value === "" || value == null) {
-          if (currentBreakpoint === "desktop") {
+          if (bp === "desktop") {
             el.removeStyle?.(property);
           } else if (composer?.styles) {
-            composer.styles.removeBreakpointStyleProperty(id, currentBreakpoint, property);
+            composer.styles.removeBreakpointStyleProperty(id, bp, property);
           }
         } else {
-          if (currentBreakpoint === "desktop") {
+          if (bp === "desktop") {
             el.setStyle?.(property, value);
           } else if (composer?.styles) {
-            composer.styles.setBreakpointStyle(id, currentBreakpoint, { [property]: value });
+            composer.styles.setBreakpointStyle(id, bp, { [property]: value });
           }
         }
       };
 
       const flush = () => {
         if (!composer?.elements.getElement(selectedElement.id)) return;
+        /* Re-read inside the flush — avoids a stale closure if an element was
+           replaced. P-1: a locked peer in an "All like this" reach is skipped
+           by the lock gate, which says so. */
+        const targets = writableElements(
+          composer,
+          [selectedElement.id, ...reachPeerIds].map((id) => composer.elements.getElement(id)),
+        );
+        if (targets.length === 0) return;
         /* One transaction around the selected element AND its reach, so a
            fan-out to twelve buttons is one undo step rather than twelve. */
-        composer?.beginTransaction?.("style-change");
+        composer.beginTransaction?.("style-change");
         try {
-          writeOne(selectedElement.id);
-          for (const peerId of reachPeerIds) writeOne(peerId);
+          for (const el of targets) writeOne(el);
         } finally {
           composer?.endTransaction?.();
         }
       };
-      pendingFlushRef.current = flush;
-      debounceTimerRef.current = setTimeout(() => {
-        flush();
-        pendingFlushRef.current = null;
-      }, 300);
+      pendingFlushRef.current = { property, run: flush };
+      debounceTimerRef.current = setTimeout(flushPending, 300);
     },
-    [selectedElement, composer, currentBreakpoint, currentPseudoState, reachPeerIds]
+    [selectedElement, composer, currentBreakpoint, currentPseudoState, reachPeerIds, flushPending]
   );
 
   // Batch style change handler
@@ -278,8 +295,14 @@ export function useStyleHandlers(
     (changes: Record<string, string>) => {
       if (!selectedElement?.id) return;
 
-      const el = composer?.elements.getElement(selectedElement.id);
+      if (!composer) return;
+      const [el] = writableElements(composer, [composer.elements.getElement(selectedElement.id)]);
       if (!el) return;
+
+      /* A pending single write (a gradient being dragged) would otherwise fire
+         AFTER this batch and undo it — the Fill switch to Color came back as
+         the gradient. Commit it first so the batch has the last word. */
+      flushPending();
 
       // Trace batch style change for debugging
       devLogger.style("batch-change", {
@@ -310,7 +333,7 @@ export function useStyleHandlers(
             }
           });
 
-          composer.styles.setRule(selector, existing, { pseudo: `:${currentPseudoState}`, mediaQuery: mq });
+          composer.styles.setRule(selector, existing, { pseudo: `:${currentPseudoState}`, mediaQuery: mq, replace: true });
           setStyles((prev) => {
             const merged = { ...prev };
             Object.entries(changes).forEach(([prop, val]) => {
@@ -363,7 +386,7 @@ export function useStyleHandlers(
         composer?.endTransaction?.();
       }
     },
-    [selectedElement, composer, currentBreakpoint, currentPseudoState]
+    [selectedElement, composer, currentBreakpoint, currentPseudoState, flushPending]
   );
 
   return {

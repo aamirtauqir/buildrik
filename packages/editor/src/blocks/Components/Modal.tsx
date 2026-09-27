@@ -160,6 +160,6 @@ export const modalBlockConfig: BlockBuildConfig = {
   id: "modal",
   label: "Modal / Dialog",
   category: "Components",
-  elementType: "container",
+  elementType: "button",
   build: buildModal,
 };

@@ -4,7 +4,6 @@
  * @license BSD-3-Clause
  */
 
-import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
@@ -104,10 +103,11 @@ export const editSubmenu: ContextAction[] = [
     icon: "copy",
     group: "Edit",
     shortcut: "Cmd+D",
-    handler: ({ composer, element }) => {
-      runTransaction(composer, "context-duplicate", () => {
-        composer.elements.duplicateElement(element.getId());
-      });
+    /* P-10: the shared `duplicate` command, like ⌘D and the Inspector ⋯ —
+       the WHOLE selection when the clicked element is part of it (see the
+       right-click selection rule in Canvas.tsx), pruned, clones selected. */
+    handler: ({ composer }) => {
+      composer.commands.run("duplicate");
     },
   },
   {

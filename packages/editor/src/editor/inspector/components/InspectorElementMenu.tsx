@@ -23,6 +23,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import { requestSaveAsComponent } from "@/editor/canvas/menus/actions/standaloneActions";
+import { pasteStyles, writeElement } from "@/engine/commands/commandOperations";
 import { Button, useToast } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
@@ -159,18 +160,11 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     closeOnEscape: true,
   });
 
-  // Reset clipboard feedback when the menu closes so the next open starts fresh.
+  /* P-10: the shared `duplicate` command — the same one ⌘D and the canvas
+     menu run (it acts on the selection, which is the inspected element, and
+     selects the clone). */
   const handleDuplicate = () => {
-    if (!composer) return;
-    composer.beginTransaction?.("duplicate-element");
-    try {
-      const clone = composer.elements.duplicateElement?.(selectedElementId);
-      if (clone) {
-        composer.selection?.select?.(clone);
-      }
-    } finally {
-      composer.endTransaction?.();
-    }
+    composer?.commands.run("duplicate");
     setIsOpen(false);
   };
 
@@ -185,16 +179,11 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     setIsOpen(false);
   };
 
+  /* P-10: the shared merge (pasteStyles) — was setStyles, which wiped every
+     property the copied element did not carry. */
   const handlePasteStyles = () => {
-    if (!composer?.styleClipboard) return;
-    const el = composer.elements.getElement(selectedElementId);
-    if (!el) return;
-    composer.beginTransaction?.("paste-styles");
-    try {
-      el.setStyles?.(composer.styleClipboard);
-    } finally {
-      composer.endTransaction?.();
-    }
+    const el = composer?.elements.getElement(selectedElementId);
+    if (composer && el) pasteStyles(composer, el);
     setIsOpen(false);
   };
 
@@ -202,15 +191,9 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
      capability is not lost (owner rule 2026-09-24). One transaction, so the
      toast's Undo takes it back in one step. */
   const handleResetStyles = () => {
-    const el = composer?.elements.getElement(selectedElementId);
-    if (!composer || !el) return;
-    composer.beginTransaction?.("reset-styles");
-    try {
-      el.setStyles?.({});
-    } finally {
-      composer.endTransaction?.();
-    }
     setIsOpen(false);
+    /* P-1: the lock gate — a locked element keeps its styles (and the shell says so). */
+    if (!composer || !writeElement(composer, composer.elements.getElement(selectedElementId), "reset-styles", (el) => el.setStyles?.({}))) return;
     addToast({ description: "Styles reset", action: { label: "Undo", onClick: composer.history.captureUndo() } });
   };
 

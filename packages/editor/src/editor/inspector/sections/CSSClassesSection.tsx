@@ -8,9 +8,9 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { devWarn } from "../../../shared/utils/devLogger";
-import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
 import { Button, TextInput } from "@/editor/chrome-ui";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface CSSClassesSectionProps {
   selectedElement: {
@@ -82,12 +82,8 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
     }
 
     if (!composer || !selectedElement?.id) return;
-    const el = composer.elements.getElement(selectedElement.id);
-    if (!el) return;
-
-    runTransaction(composer, "add-class", () => {
-      el.addClass?.(normalized);
-    });
+    /* P-1: the lock gate — refused (and said) when the element is locked. */
+    if (!writeElement(composer, composer.elements.getElement(selectedElement.id), "add-class", (el) => el.addClass?.(normalized))) return;
 
     setNewClass("");
     setShowSuggestions(false);
@@ -95,12 +91,8 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
 
   const removeClass = (className: string) => {
     if (!composer || !selectedElement?.id) return;
-    const el = composer.elements.getElement(selectedElement.id);
-    if (!el) return;
-
-    runTransaction(composer, "remove-class", () => {
-      el.removeClass?.(className);
-    });
+    /* P-1: the lock gate — refused (and said) when the element is locked. */
+    writeElement(composer, composer.elements.getElement(selectedElement.id), "remove-class", (el) => el.removeClass?.(className));
   };
 
   const suggestions = React.useMemo(() => {

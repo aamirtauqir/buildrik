@@ -49,3 +49,28 @@ describe("elementProfiles — warn-once fallback", () => {
     expect(relevant).toHaveLength(0);
   });
 });
+
+/* The type refinement on this branch produces these types. Until the
+   Inspector redesign gives them their own type blocks, text-like ones read as
+   text and the rest as containers — and none of them warns. */
+describe("elementProfiles — interim mapping for refined element types", () => {
+  it.each(["label", "stack", "tabs", "list-item", "checkbox", "radio", "switch", "cta"])(
+    "%s has an explicit profile (no fallback warning)",
+    (type) => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      getProfileFor(type);
+      expect(warn).not.toHaveBeenCalled();
+      expect(getUnknownElementTypes().has(type)).toBe(false);
+    },
+  );
+
+  it("label reads as text", () => {
+    expect(getProfileFor("label").order).toEqual(getProfileFor("text").order);
+  });
+
+  it("cta is a section container: it exposes Layout, Flex and Grid", () => {
+    const { order } = getProfileFor("cta");
+    expect(order).toEqual(expect.arrayContaining(["layout", "flex", "grid"]));
+    expect(order).toEqual(getProfileFor("container").order);
+  });
+});

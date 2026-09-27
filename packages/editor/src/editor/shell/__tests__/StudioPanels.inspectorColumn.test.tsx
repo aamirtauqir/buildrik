@@ -117,7 +117,8 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
     render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
     expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    expect(screen.queryByTestId("pro-inspector")).toBeNull();
+    /* P-7a: covered, not unmounted. */
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBe("true");
 
     act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
     await flushFrame();
@@ -285,5 +286,88 @@ describe("StudioPanels — a held focus request lapses (m-1)", () => {
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
     await flushFrame();
     expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("");
+  });
+});
+
+/* P-5: a full page (Brand from a token chip, the Asset library from "Manage
+   SVG", Settings) cleared the selection and never gave it back, so "Back to
+   canvas" landed on an empty inspector. The clear stays (A-6: no stale
+   highlight on a canvas nobody can see); the selection comes back on return. */
+describe("StudioPanels — a full page keeps the selection to give back (P-5)", () => {
+  function selectingComposer(ids: string[]) {
+    const base = makeComposer();
+    const live = new Map(ids.map((id) => [id, { id }]));
+    let selected: { id: string }[] = [];
+    const selection = {
+      getSelectedIds: () => selected.map((e) => e.id),
+      getAllSelected: () => selected,
+      clear: vi.fn(() => {
+        selected = [];
+      }),
+      select: vi.fn((el: { id: string } | null) => {
+        selected = el ? [el] : [];
+      }),
+      selectMultiple: vi.fn((els: { id: string }[]) => {
+        selected = els;
+      }),
+    };
+    return {
+      ...base,
+      selection,
+      live,
+      elements: { getElement: (id: string) => live.get(id) ?? null },
+    };
+  }
+
+  it("Brand clears the selection while open and restores it on the way back", () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} />);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "design" }));
+    expect(composer.selection.getSelectedIds()).toEqual([]);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    expect(composer.selection.getSelectedIds()).toEqual(["el-1"]);
+  });
+
+  it("a multi-selection comes back whole", () => {
+    const composer = selectingComposer(["a", "b"]);
+    composer.selection.selectMultiple([composer.live.get("a")!, composer.live.get("b")!]);
+    render(<Harness composer={composer as unknown as FakeComposer} />);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "settings" }));
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    expect(composer.selection.getSelectedIds()).toEqual(["a", "b"]);
+  });
+
+  it("an element deleted while the full page was open is not resurrected", () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} />);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "design" }));
+    composer.live.delete("el-1");
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    expect(composer.selection.getSelectedIds()).toEqual([]);
+  });
+});
+
+/* P-7a: the AI panel replaced ProInspector by unmounting it, so "‹ Inspector"
+   came back to a fresh one — tab Style, scroll 0, :hover back to Base. The
+   stub's revealed-section state stands in for all of that local state. */
+describe("StudioPanels — the AI round trip keeps the inspector's state (P-7a)", () => {
+  it("state held by the inspector survives AI open → ‹ Inspector", async () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "typography" }));
+    await flushFrame();
+    const before = screen.getByTestId("pro-inspector");
+    expect(before.getAttribute("data-revealed")).toBe("typography");
+
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
+    expect(screen.getByTestId("ai-tab")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "‹ Inspector" }));
+
+    const after = screen.getByTestId("pro-inspector");
+    expect(after).toBe(before);
+    expect(after.getAttribute("data-revealed")).toBe("typography");
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBeNull();
   });
 });

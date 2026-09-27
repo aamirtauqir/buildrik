@@ -125,7 +125,9 @@ describe("styleActions — copy-styles writes to composer.styleClipboard", () =>
     expect(result).toBe(true);
   });
 
-  it("paste-styles handler calls element.setStyles with the styles from composer.styleClipboard", () => {
+  /* P-10: paste MERGES key by key (the shared pasteStyles) — setStyles
+     replaced the whole map and wiped properties the source did not carry. */
+  it("paste-styles handler merges each style from composer.styleClipboard", () => {
     composer.styleClipboard = testStyles;
 
     const pasteAction = quickStyleSubmenu.find((a) => a.id === "paste-styles");
@@ -141,7 +143,8 @@ describe("styleActions — copy-styles writes to composer.styleClipboard", () =>
       isRoot: false,
     });
 
-    expect(element.setStyles).toHaveBeenCalledWith(testStyles);
+    expect(element.setStyles).not.toHaveBeenCalled();
+    expect(element.setStyle.mock.calls).toEqual(Object.entries(testStyles));
   });
 });
 
@@ -249,6 +252,6 @@ describe("styleActions — cross-path clipboard sharing (context menu copy → k
       isRoot: false,
     });
 
-    expect(targetElement.setStyles).toHaveBeenCalledWith(testStyles);
+    expect(targetElement.setStyle.mock.calls).toEqual(Object.entries(testStyles));
   });
 });

@@ -15,6 +15,7 @@ import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { buildDefaultCommands } from "./defaultCommands";
 import { KeybindingManager } from "./KeybindingManager";
+import { hasOpenEscapeSurface } from "@/shared/utils/openEscapeSurface";
 
 /**
  * Roles whose ARIA pattern defines what the arrow keys do inside them. A global
@@ -235,6 +236,22 @@ export class CommandCenter {
       commandId === "deselect" &&
       typeof document !== "undefined" &&
       document.querySelector('[data-bk-pick="true"]')
+    ) {
+      return false;
+    }
+
+    // Carve-out 0b: Escape closes the innermost surface, and the canvas
+    // selection is the OUTERMOST. This listener runs before every surface
+    // that registers later, so an open menu, listbox or dialog — or a
+    // right-column panel that claims Escape (`data-bk-escape-owner`, set by
+    // useColumnPanelEscape) — used to lose the selection along with itself:
+    // Escape in the inspector ⋯ menu and in the AI column both deselected
+    // (P-6, measured live). Open popups only, never canvas content — see
+    // hasOpenEscapeSurface for the rule.
+    if (
+      commandId === "deselect" &&
+      typeof document !== "undefined" &&
+      (hasOpenEscapeSurface() || document.querySelector("[data-bk-escape-owner]"))
     ) {
       return false;
     }
