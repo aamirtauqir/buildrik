@@ -339,10 +339,13 @@ export async function transferSite(
 }
 
 export async function getSite(siteId: string) {
-  return prisma.site.findFirst({
+  const site = await prisma.site.findFirst({
     where: { id: siteId, deletedAt: null },
     include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
   });
+  if (!site) return null;
+  const { publishedPassword, ...rest } = site;
+  return { ...rest, hasPublishedPassword: Boolean(publishedPassword) };
 }
 
 export async function renameSite(siteId: string, name: string) {
