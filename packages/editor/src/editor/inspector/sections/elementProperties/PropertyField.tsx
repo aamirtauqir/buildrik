@@ -21,16 +21,6 @@ const styles = {
     fontWeight: 500,
     minWidth: 70,
   } as React.CSSProperties,
-  checkboxWrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    cursor: "pointer",
-  } as React.CSSProperties,
-  checkboxText: {
-    fontSize: 12,
-    color: "var(--bk-ink)",
-  } as React.CSSProperties,
   nameWarning: {
     margin: "-6px 0 10px",
     fontSize: 11,
@@ -71,6 +61,7 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
   onChange,
   selectedElement,
 }) => {
+  const checkboxId = React.useId();
   // SELECT FIELD
   if (prop.type === "select") {
     return (
@@ -83,20 +74,20 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
     );
   }
 
-  // CHECKBOX FIELD
+  // CHECKBOX FIELD — the label names the property and is the box's
+  // accessible name; the state is the box itself (DD-22, P-11b). The loader
+  // hands a boolean attribute over as "true" (present) or "" (absent).
   if (prop.type === "checkbox") {
     return (
       <div style={styles.checkboxRow}>
-        <label style={styles.checkboxLabel}>{prop.label}</label>
-        <label style={styles.checkboxWrapper}>
-          <Checkbox
-            color="blue"
-            className="tw:bg-white"
-            checked={value === "true" || value === prop.id}
-            onChange={(e) => onChange(prop.id, e.target.checked ? "true" : "")}
-            style={{ width: 16, height: 16 }} />
-          <span style={styles.checkboxText}>{value ? "Enabled" : "Disabled"}</span>
-        </label>
+        <label htmlFor={checkboxId} style={styles.checkboxLabel}>{prop.label}</label>
+        <Checkbox
+          id={checkboxId}
+          color="blue"
+          className="tw:bg-white"
+          checked={value === "true"}
+          onChange={(e) => onChange(prop.id, e.target.checked ? "true" : "")}
+          style={{ width: 16, height: 16 }} />
       </div>
     );
   }
