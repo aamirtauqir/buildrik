@@ -9,8 +9,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { canWrite, writableElements, writeElement, pasteStyles } from "../commandOperations";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../Composer";
-import type { Element } from "../../elements/Element";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
 
 function makeComposer(styleClipboard: Record<string, string> | null = null) {
   return {

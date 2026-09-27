@@ -41,7 +41,7 @@ vi.mock("../../sections/VariantSection", () => ({ VariantSection: () => null }))
 vi.mock("../InspectorElementMenu", () => ({ InspectorElementMenu: () => null }));
 vi.mock("../DeleteConfirmModal", () => ({ DeleteConfirmModal: () => null }));
 
-import { ProInspector } from "../../ProInspector";
+import { ProInspector } from "@/editor/inspector/ProInspector";
 
 type Handler = (p: unknown) => void;
 

@@ -8,7 +8,7 @@
 
 import { parseGradient, serializeGradient, type CSSGradient } from "./gradientParser";
 import { rgbToHex } from "./colorConversionBasic";
-import { THEME } from "../../constants/defaultStyles";
+import { THEME } from "@/shared/constants/defaultStyles";
 
 /**
  * The stops a new gradient starts from. Literal colours, never chrome

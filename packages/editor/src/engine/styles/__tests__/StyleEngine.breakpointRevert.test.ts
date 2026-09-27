@@ -10,12 +10,12 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { ReactExporter } from "../../export/ReactExporter";
+import { ReactExporter } from "@/engine/export/ReactExporter";
 import {
   createTestComposer,
   installEngineBrowserStubs,
   removeEngineBrowserStubs,
-} from "../../__tests__/test-utils/realComposer";
+} from "@/engine/__tests__/test-utils/realComposer";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);

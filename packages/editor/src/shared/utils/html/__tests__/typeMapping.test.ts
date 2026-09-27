@@ -11,7 +11,7 @@ import {
   VALID_ELEMENT_TYPES,
   TYPE_TO_TAG_MAP,
 } from "../typeMapping";
-import { ELEMENT_RULES } from "../../nesting/rules";
+import { ELEMENT_RULES } from "@/shared/utils/nesting/rules";
 
 describe("getDefaultTagName", () => {
   it("maps known types to their default tag", () => {

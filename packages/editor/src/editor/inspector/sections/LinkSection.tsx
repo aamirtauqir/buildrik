@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import type { Composer, Element } from "../../../engine";
+import type { Composer, Element } from "@/engine";
 import { EVENTS } from "../../../shared/constants";
 import type { PageData } from "../../../shared/types";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
