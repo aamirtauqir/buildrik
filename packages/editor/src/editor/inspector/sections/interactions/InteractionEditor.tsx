@@ -77,20 +77,16 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
   onToggleEnabled,
   onPreview,
 }) => {
-  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  /* Seconds in the field, milliseconds stored. An emptied or non-numeric
+     field writes nothing — it used to store NaN — and a number outside the
+     field's range is clamped into it (P-11c). */
+  const writeTiming = (key: "duration" | "delay", raw: string, min: number, max: number) => {
+    const seconds = parseFloat(raw);
+    if (!Number.isFinite(seconds)) return;
     onUpdate(interaction.id, {
       animation: {
         ...interaction.animation,
-        duration: parseFloat(e.target.value) * 1000,
-      },
-    });
-  };
-
-  const handleDelayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate(interaction.id, {
-      animation: {
-        ...interaction.animation,
-        delay: parseFloat(e.target.value) * 1000,
+        [key]: Math.round(Math.min(max, Math.max(min, seconds)) * 1000),
       },
     });
   };
@@ -121,7 +117,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
           <TextInput
             type="number"
             value={interaction.animation.duration / 1000}
-            onChange={handleDurationChange}
+            onChange={(e) => writeTiming("duration", e.target.value, 0.1, 10)}
             min={0.1}
             max={10}
             step={0.1}
@@ -133,7 +129,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
           <TextInput
             type="number"
             value={interaction.animation.delay / 1000}
-            onChange={handleDelayChange}
+            onChange={(e) => writeTiming("delay", e.target.value, 0, 5)}
             min={0}
             max={5}
             step={0.1}

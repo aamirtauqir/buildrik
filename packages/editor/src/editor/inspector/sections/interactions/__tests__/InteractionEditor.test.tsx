@@ -122,3 +122,33 @@ describe("InteractionEditor — actions", () => {
     expect(onRemove).toHaveBeenCalledWith("i1");
   });
 });
+
+/* P-11(c): an emptied field wrote NaN into the interaction, and a negative
+   number was taken as-is. Empty / non-numeric writes nothing (the old value
+   stays); a number outside the field's range is clamped into it. */
+describe("InteractionEditor — timing validation (P-11c)", () => {
+  const written = (onUpdate: ReturnType<typeof vi.fn>) =>
+    onUpdate.mock.calls.map(([, patch]) => patch.animation);
+
+  it("an emptied Duration or Delay writes nothing", () => {
+    const { onUpdate } = setup();
+    const [duration, delay] = screen.getAllByRole("spinbutton");
+    fireEvent.change(duration, { target: { value: "" } });
+    fireEvent.change(delay, { target: { value: "" } });
+    expect(onUpdate).not.toHaveBeenCalled();
+  });
+
+  it("a negative Duration or Delay is clamped to the field's minimum", () => {
+    const { onUpdate } = setup();
+    const [duration, delay] = screen.getAllByRole("spinbutton");
+    fireEvent.change(duration, { target: { value: "-2" } });
+    fireEvent.change(delay, { target: { value: "-1" } });
+    const [d, l] = written(onUpdate);
+    expect(d.duration).toBe(100);
+    expect(l.delay).toBe(0);
+    written(onUpdate).forEach((a) => {
+      expect(Number.isFinite(a.duration)).toBe(true);
+      expect(Number.isFinite(a.delay)).toBe(true);
+    });
+  });
+});
