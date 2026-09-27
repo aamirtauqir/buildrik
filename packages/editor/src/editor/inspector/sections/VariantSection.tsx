@@ -66,7 +66,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
 
   /* P-1: a variant swap, reset or detach rewrites this instance — lock gate
      first (it says so when it refuses). */
-  const writable = () => writableElements(composer, [composer.elements.getElement(elementId)]).length > 0;
+  const writable = () => writableElements(composer, [composer.elements.getElement(instanceId)]).length > 0;
   const pickVariant = (variantId: string) => {
     setMenuOpen(false);
     if (!writable()) return;

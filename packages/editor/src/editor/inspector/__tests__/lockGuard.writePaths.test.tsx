@@ -14,7 +14,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi, type Mock } from "vitest";
 import { render, screen, fireEvent, cleanup, act, renderHook } from "@testing-library/react";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
@@ -44,12 +44,12 @@ afterEach(cleanup);
 
 let composer: Composer;
 let rootId: string;
-let skipped: ReturnType<typeof vi.fn>;
+let skipped: Mock<(payload?: unknown) => void>;
 
 beforeEach(() => {
   composer = createTestComposer();
   rootId = composer.elements.createPage("Home").root.id;
-  skipped = vi.fn();
+  skipped = vi.fn<(payload?: unknown) => void>();
   composer.on(EVENTS.LOCKED_ELEMENTS_SKIPPED, skipped);
 });
 
