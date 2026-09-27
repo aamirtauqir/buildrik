@@ -2,7 +2,7 @@
  * SA-01 — the Site columns are the only source of the settings they back, so
  * a duplicated site carries them over. It used to get them through the
  * projectSettings JSON copy, which saves no longer store. The copy keeps its
- * own name and slug, and never the source's site password.
+ * own name and slug, and never the source's site password or canonical URL.
  * Real Postgres, real service.
  */
 import { describe, it, expect, beforeEach } from "vitest";
@@ -21,7 +21,7 @@ beforeEach(async () => {
 });
 
 describe("duplicateSite — setting columns (SA-01)", () => {
-  it("the copy keeps the source's setting columns, not its name, slug or password", async () => {
+  it("the copy keeps the source's setting columns, not its name, slug, password or canonical URL", async () => {
     const user = await createTestUser();
     const workspace = await createTestWorkspace({ ownerId: user.id });
     await createTestWorkspaceMember({ userId: user.id, workspaceId: workspace.id, role: "OWNER" });
@@ -57,7 +57,9 @@ describe("duplicateSite — setting columns (SA-01)", () => {
       ogImage: "https://cdn.example.test/og.png",
       socialLinks: { twitter: "https://x.com/bella" },
       allowIndexing: false,
-      canonicalUrl: "https://bella.example.test",
+      // I2: the source's canonical URL names the source's own address; a copy
+      // inheriting it would tell search engines it is a duplicate of the source.
+      canonicalUrl: null,
       xFrameOptions: "DENY",
       hstsMaxAge: 31536000,
       defaultLocale: "fr",

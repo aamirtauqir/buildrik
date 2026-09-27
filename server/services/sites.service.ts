@@ -392,9 +392,10 @@ export async function setSiteThumbnail(userId: string, siteId: string, url: stri
   });
 }
 
-/** Setting columns a duplicate does not inherit: its own identity, and the
- *  site password (a copy starts ungated, like any new site). */
-const NOT_DUPLICATED = new Set<string>(["name", "slug", "publishedPassword"]);
+/** Setting columns a duplicate does not inherit: its own identity, the
+ *  site password (a copy starts ungated, like any new site), and the canonical
+ *  URL (the source's address — on the copy it would mark it a duplicate). */
+const NOT_DUPLICATED = new Set<string>(["name", "slug", "publishedPassword", "canonicalUrl"]);
 
 /**
  * SA-01: the source site's setting columns, for the copy's create. The columns
