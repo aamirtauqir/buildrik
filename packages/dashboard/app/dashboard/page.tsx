@@ -13,6 +13,7 @@ import { DunningBanner } from "@/components/dashboard/dunning-banner";
 import { DashboardChecklist } from "@/components/onboarding/dashboard-checklist";
 import { NeedsAttention } from "@/components/dashboard/needs-attention";
 import { ErrorState } from "@/components/states";
+import { useToast } from "@/components/dashboard/toast-provider";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -25,7 +26,12 @@ export default function DashboardPage() {
   const activity = trpc.dashboard.activity.useQuery({ filter: "all" });
   const wsData = trpc.account.workspace.get.useQuery();
   const pendingDeletion = trpc.account.dangerZone.pendingDeletion.useQuery();
-  const cancelWsDelete = trpc.account.workspace.cancelDelete.useMutation({ onSuccess: () => wsData.refetch() });
+  const { addToast } = useToast();
+  const cancelWsDelete = trpc.account.workspace.cancelDelete.useMutation({
+    onSuccess: () => wsData.refetch(),
+    onError: (err) => addToast("error", "Could not cancel the deletion", err.message),
+  });
+  const isWorkspaceOwner = !!wsData.data && wsData.data.ownerId === session?.user?.id;
   const cancelAcctDelete = trpc.account.dangerZone.cancelAccountDeletion.useMutation({ onSuccess: () => pendingDeletion.refetch() });
   const billingOverview = trpc.billing.overview.useQuery();
   const onboardingState = trpc.onboarding.getState.useQuery();
@@ -110,14 +116,20 @@ export default function DashboardPage() {
           <p className="text-body font-medium" style={{ color: "var(--color-error-text)" }}>
             Your workspace is scheduled for deletion on {new Date(wsData.data.deletionScheduledAt).toLocaleDateString()}.
           </p>
-          <button
-            onClick={() => cancelWsDelete.mutate()}
-            disabled={cancelWsDelete.isPending}
-            className="mt-2 text-body font-semibold underline"
-            style={{ color: "var(--color-primary)" }}
-          >
-            {cancelWsDelete.isPending ? "Cancelling..." : "Cancel Deletion"}
-          </button>
+          {isWorkspaceOwner ? (
+            <button
+              onClick={() => cancelWsDelete.mutate()}
+              disabled={cancelWsDelete.isPending}
+              className="mt-2 text-body font-semibold underline"
+              style={{ color: "var(--color-primary)" }}
+            >
+              {cancelWsDelete.isPending ? "Cancelling..." : "Cancel Deletion"}
+            </button>
+          ) : (
+            <p className="mt-2 text-body" style={{ color: "var(--color-error-text)" }}>
+              Only the owner can cancel it.
+            </p>
+          )}
         </div>
       )}
 

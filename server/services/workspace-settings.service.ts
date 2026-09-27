@@ -192,6 +192,7 @@ export async function processDueWorkspaceDeletions(now: Date): Promise<{ deleted
   const due = await prisma.workspace.findMany({
     where: { deletionScheduledAt: { lte: now } },
     select: { id: true },
+    orderBy: { deletionScheduledAt: "asc" },
   });
   let deleted = 0;
   let skipped = 0;
@@ -207,16 +208,25 @@ export async function processDueWorkspaceDeletions(now: Date): Promise<{ deleted
       skipped++;
       continue;
     }
-    const published = await prisma.site.findMany({
-      where: { workspaceId: ws.id, OR: [{ status: "PUBLISHED" }, { publishedUrl: { not: null } }] },
-      select: { id: true },
-    });
-    for (const s of published) {
-      await unpublishSite(s.id).catch((e: unknown) =>
-        console.error(`[workspace-deletion] take-down failed for site ${s.id}:`, e instanceof Error ? e.message : e));
+    try {
+      const published = await prisma.site.findMany({
+        where: { workspaceId: ws.id, OR: [{ status: "PUBLISHED" }, { publishedUrl: { not: null } }] },
+        select: { id: true },
+      });
+      for (const s of published) {
+        await unpublishSite(s.id).catch((e: unknown) =>
+          console.error(`[workspace-deletion] take-down failed for site ${s.id}:`, e instanceof Error ? e.message : e));
+      }
+      // Re-checks the date so a deletion the owner cancelled mid-run survives.
+      const { count } = await prisma.workspace.deleteMany({
+        where: { id: ws.id, deletionScheduledAt: { lte: now } },
+      });
+      if (count === 1) deleted++;
+      else skipped++;
+    } catch (e) {
+      console.error(`[workspace-deletion] delete failed for ${ws.id}:`, e instanceof Error ? e.message : e);
+      skipped++;
     }
-    await prisma.workspace.delete({ where: { id: ws.id } });
-    deleted++;
   }
   return { deleted, skipped };
 }

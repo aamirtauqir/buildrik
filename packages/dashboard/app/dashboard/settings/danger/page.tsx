@@ -90,7 +90,7 @@ export default function DangerZonePage() {
             </p>
             <p className="text-body-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
               {isWorkspaceOwner
-                ? "Permanently delete this workspace and all its data. This cannot be undone."
+                ? "Permanently delete this workspace and all its data. You can cancel within 30 days."
                 : "Only the workspace owner can delete this workspace."}
             </p>
           </div>

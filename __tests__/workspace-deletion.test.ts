@@ -14,7 +14,7 @@ const { cancel, retrieve, getStripe, unpublishSite } = vi.hoisted(() => {
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    workspace: { findMany: vi.fn(), delete: vi.fn() },
+    workspace: { findMany: vi.fn(), deleteMany: vi.fn() },
     subscription: { findUnique: vi.fn() },
     site: { findMany: vi.fn() },
     user: { delete: vi.fn(), deleteMany: vi.fn() },
@@ -38,7 +38,7 @@ beforeEach(() => {
   vi.mocked(prisma.workspace.findMany).mockResolvedValue([{ id: "w1" }] as never);
   vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null);
   vi.mocked(prisma.site.findMany).mockResolvedValue([] as never);
-  vi.mocked(prisma.workspace.delete).mockResolvedValue({ id: "w1" } as never);
+  vi.mocked(prisma.workspace.deleteMany).mockResolvedValue({ count: 1 } as never);
   process.env.CRON_SECRET = "test-secret";
 });
 
@@ -49,12 +49,12 @@ describe("processDueWorkspaceDeletions", () => {
     const res = await processDueWorkspaceDeletions(NOW);
     expect(cancel).toHaveBeenCalledWith("sub_1");
     expect(unpublishSite).toHaveBeenCalledWith("s1");
-    expect(prisma.workspace.delete).toHaveBeenCalledWith({ where: { id: "w1" } });
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { id: "w1", deletionScheduledAt: { lte: NOW } } });
     expect(cancel.mock.invocationCallOrder[0]).toBeLessThan(
-      vi.mocked(prisma.workspace.delete).mock.invocationCallOrder[0],
+      vi.mocked(prisma.workspace.deleteMany).mock.invocationCallOrder[0],
     );
     expect(unpublishSite.mock.invocationCallOrder[0]).toBeLessThan(
-      vi.mocked(prisma.workspace.delete).mock.invocationCallOrder[0],
+      vi.mocked(prisma.workspace.deleteMany).mock.invocationCallOrder[0],
     );
     expect(res).toEqual({ deleted: 1, skipped: 0 });
   });
@@ -64,7 +64,7 @@ describe("processDueWorkspaceDeletions", () => {
     cancel.mockRejectedValue(new Error("stripe down"));
     retrieve.mockRejectedValue(new Error("stripe down"));
     const res = await processDueWorkspaceDeletions(NOW);
-    expect(prisma.workspace.delete).not.toHaveBeenCalled();
+    expect(prisma.workspace.deleteMany).not.toHaveBeenCalled();
     expect(unpublishSite).not.toHaveBeenCalled();
     expect(res).toEqual({ deleted: 0, skipped: 1 });
   });
@@ -75,7 +75,7 @@ describe("processDueWorkspaceDeletions", () => {
       throw new Error("PAYMENTS_NOT_CONFIGURED");
     });
     const res = await processDueWorkspaceDeletions(NOW);
-    expect(prisma.workspace.delete).not.toHaveBeenCalled();
+    expect(prisma.workspace.deleteMany).not.toHaveBeenCalled();
     expect(res).toEqual({ deleted: 0, skipped: 1 });
   });
 
@@ -83,7 +83,7 @@ describe("processDueWorkspaceDeletions", () => {
     vi.mocked(prisma.subscription.findUnique).mockResolvedValue({ stripeSubscriptionId: "sub_gone" } as never);
     cancel.mockRejectedValue(Object.assign(new Error("No such subscription"), { code: "resource_missing" }));
     const res = await processDueWorkspaceDeletions(NOW);
-    expect(prisma.workspace.delete).toHaveBeenCalledWith({ where: { id: "w1" } });
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { id: "w1", deletionScheduledAt: { lte: NOW } } });
     expect(res).toEqual({ deleted: 1, skipped: 0 });
   });
 
@@ -93,7 +93,7 @@ describe("processDueWorkspaceDeletions", () => {
     retrieve.mockResolvedValue({ id: "sub_old", status: "canceled" });
     const res = await processDueWorkspaceDeletions(NOW);
     expect(retrieve).toHaveBeenCalledWith("sub_old");
-    expect(prisma.workspace.delete).toHaveBeenCalledWith({ where: { id: "w1" } });
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { id: "w1", deletionScheduledAt: { lte: NOW } } });
     expect(res).toEqual({ deleted: 1, skipped: 0 });
   });
 
@@ -102,14 +102,14 @@ describe("processDueWorkspaceDeletions", () => {
     cancel.mockRejectedValue(new Error("rate limited"));
     retrieve.mockResolvedValue({ id: "sub_1", status: "active" });
     const res = await processDueWorkspaceDeletions(NOW);
-    expect(prisma.workspace.delete).not.toHaveBeenCalled();
+    expect(prisma.workspace.deleteMany).not.toHaveBeenCalled();
     expect(res).toEqual({ deleted: 0, skipped: 1 });
   });
 
   it("no Subscription row: skips the Stripe step and deletes", async () => {
     const res = await processDueWorkspaceDeletions(NOW);
     expect(getStripe).not.toHaveBeenCalled();
-    expect(prisma.workspace.delete).toHaveBeenCalledWith({ where: { id: "w1" } });
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { id: "w1", deletionScheduledAt: { lte: NOW } } });
     expect(res).toEqual({ deleted: 1, skipped: 0 });
   });
 
@@ -128,9 +128,35 @@ describe("processDueWorkspaceDeletions", () => {
     cancel.mockRejectedValue(new Error("stripe down"));
     retrieve.mockRejectedValue(new Error("stripe down"));
     const res = await processDueWorkspaceDeletions(NOW);
-    expect(prisma.workspace.delete).toHaveBeenCalledTimes(1);
-    expect(prisma.workspace.delete).toHaveBeenCalledWith({ where: { id: "w2" } });
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledTimes(1);
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { id: "w2", deletionScheduledAt: { lte: NOW } } });
     expect(res).toEqual({ deleted: 1, skipped: 1 });
+  });
+
+  it("a failing delete for one workspace does not stop the others", async () => {
+    vi.mocked(prisma.workspace.findMany).mockResolvedValue([{ id: "w1" }, { id: "w2" }] as never);
+    vi.mocked(prisma.workspace.deleteMany).mockImplementation((async (args: { where: { id: string } }) => {
+      if (args.where.id === "w1") throw new Error("db down");
+      return { count: 1 };
+    }) as never);
+    const res = await processDueWorkspaceDeletions(NOW);
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { id: "w2", deletionScheduledAt: { lte: NOW } } });
+    expect(res).toEqual({ deleted: 1, skipped: 1 });
+  });
+
+  it("a failing site lookup for one workspace does not stop the others", async () => {
+    vi.mocked(prisma.workspace.findMany).mockResolvedValue([{ id: "w1" }, { id: "w2" }] as never);
+    vi.mocked(prisma.site.findMany).mockRejectedValueOnce(new Error("db down"));
+    const res = await processDueWorkspaceDeletions(NOW);
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledTimes(1);
+    expect(res).toEqual({ deleted: 1, skipped: 1 });
+  });
+
+  it("a deletion cancelled between selection and delete is not deleted", async () => {
+    vi.mocked(prisma.workspace.deleteMany).mockResolvedValue({ count: 0 } as never);
+    const res = await processDueWorkspaceDeletions(NOW);
+    expect(prisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { id: "w1", deletionScheduledAt: { lte: NOW } } });
+    expect(res).toEqual({ deleted: 0, skipped: 1 });
   });
 
   it("only selects workspaces whose date has passed", async () => {
@@ -138,6 +164,7 @@ describe("processDueWorkspaceDeletions", () => {
     await processDueWorkspaceDeletions(NOW);
     expect(prisma.workspace.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { deletionScheduledAt: { lte: NOW } },
+      orderBy: { deletionScheduledAt: "asc" },
     }));
   });
 
