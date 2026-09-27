@@ -124,14 +124,54 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
       el.style.transform = dx || dy ? `translate(${Math.round(dx)}px, ${Math.round(dy)}px)` : "";
     };
     place();
+    /* A beside panel is fixed to viewport coordinates measured from the
+       trigger, so scrolling the column (or anything else) moves the trigger
+       out from under it. Capture: scroll does not bubble. */
+    if (beside) window.addEventListener("scroll", place, true);
     /* The panel's own content can grow after it opened (the fill picker's
        "Edit Primary" step is 483 tall): re-place on every size change, or it
        ran 105px off the bottom (4428:142968). */
-    if (typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(place);
-    ro.observe(el);
-    return () => ro.disconnect();
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(place);
+    ro?.observe(el);
+    return () => {
+      if (beside) window.removeEventListener("scroll", place, true);
+      ro?.disconnect();
+    };
   }, [open, placement, children, beside, panelNode]);
+
+  const focusTrigger = React.useCallback(() => {
+    const trigger = wrap.current?.firstElementChild;
+    const target =
+      trigger instanceof HTMLElement && trigger.matches(FOCUSABLE)
+        ? trigger
+        : trigger?.querySelector<HTMLElement>(FOCUSABLE);
+    target?.focus();
+  }, []);
+
+  /* A beside panel is portalled away from its trigger, so Tab from the
+     trigger does not reach it: opening moves focus into it. Closing while
+     focus is still inside (a pick, not only Escape) hands it back to the
+     trigger — the panel unmounting would otherwise drop it on <body>. Focus
+     the user already moved elsewhere is left alone. */
+  React.useEffect(() => {
+    const el = panelNode;
+    if (!open || !beside || !el) return;
+    let focusInside = false;
+    const onFocusIn = () => {
+      focusInside = true;
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      focusInside = el.contains(e.relatedTarget as Node | null);
+    };
+    el.addEventListener("focusin", onFocusIn);
+    el.addEventListener("focusout", onFocusOut);
+    el.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+    return () => {
+      el.removeEventListener("focusin", onFocusIn);
+      el.removeEventListener("focusout", onFocusOut);
+      if (focusInside) focusTrigger();
+    };
+  }, [open, beside, panelNode, focusTrigger]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -152,13 +192,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
       e.preventDefault();
       const focusInside = !!panel.current?.contains(document.activeElement);
       onClose();
-      if (!focusInside) return;
-      const trigger = wrap.current?.firstElementChild;
-      const target =
-        trigger instanceof HTMLElement && trigger.matches(FOCUSABLE)
-          ? trigger
-          : trigger?.querySelector<HTMLElement>(FOCUSABLE);
-      target?.focus();
+      if (focusInside) focusTrigger();
     };
     document.addEventListener("pointerdown", onDown, true);
     document.addEventListener("keydown", onKey, true);
@@ -166,7 +200,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
       document.removeEventListener("pointerdown", onDown, true);
       document.removeEventListener("keydown", onKey, true);
     };
-  }, [open, onClose]);
+  }, [open, onClose, focusTrigger]);
 
   const body = beside ? (
     <div ref={panelRef} className={["tw:fixed", POPOVER_SURFACE_CLASS, className].filter(Boolean).join(" ")} role="dialog" aria-label={label}>
