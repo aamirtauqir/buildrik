@@ -60,7 +60,9 @@ import {
   SAVE_CONFLICT_EVENT,
   isSaveConflictPending,
   SITE_COLUMN_FIELDS,
+  siteColumnsLoaded,
 } from "../BuildrikSyncProvider";
+import { publishSite } from "../PublishService";
 
 /* saveProject refuses a site whose project never loaded — the guard that stops
    a failed load from overwriting the stored pages with the fallback. Save
@@ -628,7 +630,9 @@ describe("loadProject — column-backed settings come from the columns only (SA-
   });
 
   it("the JSON copy stays out when the columns could not be read at all", async () => {
-    mocks.siteDetailSettingsGetQuery.mockRejectedValueOnce(new Error("offline"));
+    mocks.siteDetailSettingsGetQuery
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockRejectedValueOnce(new Error("offline"));
     const project = await loadProject("s1");
     expect(project.settings?.seo?.metaTitle).toBeUndefined();
     expect(project.settings?.customCode?.headScripts).toBe("");
@@ -650,6 +654,53 @@ describe("loadProject — column-backed settings come from the columns only (SA-
     const edited = { ...loaded, settings: { ...loaded.settings, seo: { ...loaded.settings?.seo, metaTitle: "Typed" } } };
     await saveProject("s1", edited);
     expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({ id: "s1", metaTitle: "Typed" });
+  });
+});
+
+/* SA-01 fix round 1: with the columns the only source, a settings read that
+   fails leaves the <head> fields empty — so the read is retried once, and a
+   session that still has no columns may not publish what it renders. */
+describe("loadProject — a failed site-settings read (SA-01)", () => {
+  const REFUSAL = "Site settings didn't load. Reload the editor before publishing.";
+
+  beforeEach(() => {
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s9", name: "T", projectSettings: {} });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    mocks.siteDetailSettingsGetQuery.mockReset().mockResolvedValue(null);
+  });
+
+  it("a failed read and a failed retry leave the site degraded, and publish is refused", async () => {
+    mocks.siteDetailSettingsGetQuery
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockRejectedValueOnce(new Error("offline"));
+    await loadProject("s9");
+
+    expect(mocks.siteDetailSettingsGetQuery).toHaveBeenCalledTimes(2);
+    expect(siteColumnsLoaded("s9")).toBe(false);
+    await expect(publishSite("s9", [{ path: "index.html", html: "<html></html>" }])).rejects.toThrow(REFUSAL);
+  });
+
+  it("a failed read and a successful retry load the columns normally", async () => {
+    mocks.siteDetailSettingsGetQuery
+      .mockRejectedValueOnce(new Error("blip"))
+      .mockResolvedValueOnce({ name: "T", metaTitleTemplate: "{page_title} — T", plan: "PRO" });
+    const project = await loadProject("s9");
+
+    expect(mocks.siteDetailSettingsGetQuery).toHaveBeenCalledTimes(2);
+    expect(siteColumnsLoaded("s9")).toBe(true);
+    expect(project.settings?.seo?.metaTitleTemplate).toBe("{page_title} — T");
+    expect(getEditorPlanTier()).toBe("pro");
+  });
+
+  it("a later load that reads the columns clears the degraded state", async () => {
+    mocks.siteDetailSettingsGetQuery
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockRejectedValueOnce(new Error("offline"));
+    await loadProject("s9");
+    expect(siteColumnsLoaded("s9")).toBe(false);
+
+    await loadProject("s9");
+    expect(siteColumnsLoaded("s9")).toBe(true);
   });
 });
 

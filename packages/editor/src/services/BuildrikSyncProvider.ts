@@ -86,6 +86,17 @@ const MEDIA_PAGE_SIZE = 200;
    fallback project has a child, so it counts as content. */
 const _loadedSites = new Set<string>();
 
+/* SA-01: sites whose Site-column settings did not load this session (the read
+   failed twice). The columns are the only source of the column-backed
+   settings, so such a session renders pages without their title template,
+   icons, OG image or head/body code — publishing it is refused. */
+const _siteColumnsMissing = new Set<string>();
+
+/** Whether the open site's Site-column settings loaded. Publish reads it. */
+export function siteColumnsLoaded(siteId: string): boolean {
+  return !_siteColumnsMissing.has(siteId);
+}
+
 /* Sites the server says do not exist. A refused save is not the same story for
    these: "Reload to get the real site" is the right advice for a load that
    failed once, and a lie for a site that has been deleted — the reload returns
@@ -468,11 +479,21 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     const client = getClient();
     // P0.2b: pull Site columns alongside core site + pages so editor's view
     // of metaTitle/etc reflects what the dashboard saved.
+    // SA-01: retried once — a failed read leaves the column-backed settings empty.
+    const readSiteColumns = () => client.siteDetail.settings.get.query({ siteId });
+    let columnsLoaded = true;
     const [site, pages, settingsResult] = await Promise.all([
       client.sites.get.query({ id: siteId }),
       client.pages.list.query({ siteId }),
-      client.siteDetail.settings.get.query({ siteId }).catch(() => null),
+      readSiteColumns()
+        .catch(readSiteColumns)
+        .catch(() => {
+          columnsLoaded = false;
+          return null;
+        }),
     ]);
+    if (columnsLoaded) _siteColumnsMissing.delete(siteId);
+    else _siteColumnsMissing.add(siteId);
     const data = projectDataFromRows(site, pages, settingsResult);
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.

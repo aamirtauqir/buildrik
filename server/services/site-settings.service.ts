@@ -55,34 +55,42 @@ export function decryptPublishedPassword(stored: string | null): string | null {
   }
 }
 
+/**
+ * The Site columns the Settings screens own — what `getSiteSettings` reads and
+ * what a duplicated site carries over (minus its identity and password).
+ */
+export const SITE_SETTINGS_COLUMNS = {
+  name: true,
+  slug: true,
+  metaTitle: true,
+  metaDescription: true,
+  metaTitleTemplate: true,
+  ogImage: true,
+  canonicalUrl: true,
+  allowIndexing: true,
+  robotsTxt: true,
+  headCode: true,
+  bodyCode: true,
+  socialLinks: true,
+  publishedPassword: true,
+  touchIcon: true,
+  favicon: true,
+  cspPolicy: true,
+  hstsMaxAge: true,
+  xFrameOptions: true,
+  referrerPolicy: true,
+  permissionsPolicy: true,
+  defaultLocale: true,
+  enabledLocales: true,
+  localeAutoRedirect: true,
+} as const satisfies Prisma.SiteSelect;
+
 export async function getSiteSettings(siteId: string) {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
     select: {
       id: true,
-      name: true,
-      slug: true,
-      metaTitle: true,
-      metaDescription: true,
-      metaTitleTemplate: true,
-      ogImage: true,
-      canonicalUrl: true,
-      allowIndexing: true,
-      robotsTxt: true,
-      headCode: true,
-      bodyCode: true,
-      socialLinks: true,
-      publishedPassword: true,
-      touchIcon: true,
-      favicon: true,
-      cspPolicy: true,
-      hstsMaxAge: true,
-      xFrameOptions: true,
-      referrerPolicy: true,
-      permissionsPolicy: true,
-      defaultLocale: true,
-      enabledLocales: true,
-      localeAutoRedirect: true,
+      ...SITE_SETTINGS_COLUMNS,
       deletedAt: true,
       workspace: { select: { plan: true } },
     },

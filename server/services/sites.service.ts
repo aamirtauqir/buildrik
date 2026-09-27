@@ -14,6 +14,7 @@ import type {
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
 import { stripColumnBackedSettings } from "@/server/services/project-settings";
+import { SITE_SETTINGS_COLUMNS } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { unpublishSite } from "@/server/services/publish.service";
@@ -383,6 +384,25 @@ export async function setSiteThumbnail(userId: string, siteId: string, url: stri
   });
 }
 
+/** Setting columns a duplicate does not inherit: its own identity, and the
+ *  site password (a copy starts ungated, like any new site). */
+const NOT_DUPLICATED = new Set<string>(["name", "slug", "publishedPassword"]);
+
+/**
+ * SA-01: the source site's setting columns, for the copy's create. The columns
+ * are the only source of the settings they back — the copy used to inherit
+ * them through the projectSettings JSON, which saves no longer store. NULLs
+ * are left out (the column default is NULL, and Prisma takes no raw null for
+ * the Json `socialLinks`).
+ */
+function duplicatedSettingColumns(original: Record<string, unknown>): Partial<Prisma.SiteUncheckedCreateInput> {
+  return Object.fromEntries(
+    Object.keys(SITE_SETTINGS_COLUMNS)
+      .filter((key) => !NOT_DUPLICATED.has(key) && original[key] !== null)
+      .map((key) => [key, original[key]]),
+  );
+}
+
 export async function duplicateSite(
   siteId: string,
   workspaceId: string,
@@ -417,6 +437,7 @@ export async function duplicateSite(
   return prisma.$transaction(async (tx) => {
     const newSite = await tx.site.create({
       data: {
+        ...duplicatedSettingColumns(original),
         name: copyName,
         slug,
         status: "DRAFT",
