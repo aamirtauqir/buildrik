@@ -36,6 +36,7 @@ vi.mock("@/server/services/permission.service", () => ({
   },
 }));
 vi.mock("@/server/services/sites.service", () => ({
+  redactSitePassword: <T,>(site: T) => site,
   listSites: vi.fn(), getSite: vi.fn(), renameSite: vi.fn(), archiveSite: vi.fn(),
   unarchiveSite: vi.fn(), deleteSite: vi.fn(), bulkAction: vi.fn(),
   checkSlugAvailability: vi.fn(), transferSite: vi.fn(),

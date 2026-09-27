@@ -2,16 +2,19 @@
  * I3 — procedures that return a Site row the service did not redact (the
  * service lives on the other side of an import cycle, or in another domain)
  * redact it at the router with the same helper: `sites.unpublish`,
- * `sites.folders.moveSite` and `siteDetail.settings.update`.
+ * `sites.folders.moveSite`, `siteDetail.settings.update`, `templates.use` and
+ * `templates.applyToSite`.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { unpublishSite, moveSiteToFolder, updateSiteSettings } = vi.hoisted(() => ({
+const { unpublishSite, moveSiteToFolder, updateSiteSettings, useTemplate, applyTemplateToSite } = vi.hoisted(() => ({
   unpublishSite: vi.fn(),
   moveSiteToFolder: vi.fn(),
   updateSiteSettings: vi.fn(),
+  useTemplate: vi.fn(),
+  applyTemplateToSite: vi.fn(),
 }));
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
@@ -21,6 +24,13 @@ vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 vi.mock("@/server/services/permission.service", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/server/services/permission.service")>()),
   checkSiteRole: vi.fn(),
+  checkWorkspaceRole: vi.fn(),
+}));
+vi.mock("@/server/trpc/workspace-ctx", () => ({ resolveWorkspaceId: vi.fn().mockResolvedValue("ws_1") }));
+vi.mock("@/server/services/template.service", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/server/services/template.service")>()),
+  useTemplate,
+  applyTemplateToSite,
 }));
 vi.mock("@/server/services/activity-log.service", () => ({ recordForSite: vi.fn(), record: vi.fn() }));
 vi.mock("@/server/services/publish.service", async (importOriginal) => ({
@@ -38,6 +48,7 @@ vi.mock("@/server/services/site-settings.service", async (importOriginal) => ({
 
 import { sitesRouter } from "@/server/trpc/routers/sites";
 import { siteDetailRouter } from "@/server/trpc/routers/site-detail";
+import { templatesRouter } from "@/server/trpc/routers/templates";
 
 const ctx = { session: { user: { id: "u_1" } }, prisma: {} } as never;
 const ROW = { id: "s1", name: "Site", publishedPassword: "v1:ciphertext" };
@@ -46,6 +57,8 @@ beforeEach(() => {
   unpublishSite.mockReset().mockResolvedValue(ROW);
   moveSiteToFolder.mockReset().mockResolvedValue(ROW);
   updateSiteSettings.mockReset().mockResolvedValue(ROW);
+  useTemplate.mockReset().mockResolvedValue(ROW);
+  applyTemplateToSite.mockReset().mockResolvedValue(ROW);
 });
 
 describe("site rows returned by routers are redacted (I3)", () => {
@@ -63,6 +76,18 @@ describe("site rows returned by routers are redacted (I3)", () => {
 
   it("siteDetail.settings.update", async () => {
     const result = await siteDetailRouter.createCaller(ctx).settings.update({ id: "s1", name: "Site" });
+    expect(result).not.toHaveProperty("publishedPassword");
+    expect(result.hasPublishedPassword).toBe(true);
+  });
+
+  it("templates.use", async () => {
+    const result = await templatesRouter.createCaller(ctx).use({ templateId: "t1", siteName: "My Site" });
+    expect(result).not.toHaveProperty("publishedPassword");
+    expect(result.hasPublishedPassword).toBe(true);
+  });
+
+  it("templates.applyToSite", async () => {
+    const result = await templatesRouter.createCaller(ctx).applyToSite({ siteId: "s1", templateId: "t1" });
     expect(result).not.toHaveProperty("publishedPassword");
     expect(result.hasPublishedPassword).toBe(true);
   });
