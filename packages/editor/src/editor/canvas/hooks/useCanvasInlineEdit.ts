@@ -10,6 +10,7 @@ import type { Composer } from "../../../engine";
 import { getElementId } from "../../../shared/utils/dragDrop";
 import { sanitizeHTML } from "../../../shared/utils/html";
 import { EVENTS } from "../../../shared/constants";
+import { writableElements } from "@/engine/commands/commandOperations";
 
 export interface EditingState {
   id: string | null;
@@ -80,6 +81,10 @@ export function useCanvasInlineEdit({
         return false;
       }
 
+      /* P-1: a locked element's text is not editable — from a double-click or
+         the Inspector's "Edit text on canvas". The lock gate says so. */
+      if (composer && writableElements(composer, [composer.elements.getElement(id)]).length === 0) return false;
+
       const original = editableEl.innerHTML;
       const domRect = editableEl.getBoundingClientRect();
       const canvasRect = canvasRef.current?.getBoundingClientRect();
@@ -95,7 +100,7 @@ export function useCanvasInlineEdit({
       setEditing({ id, original, rect });
       return true;
     },
-    [canvasRef]
+    [canvasRef, composer]
   );
 
   // Handle double-click to start inline editing

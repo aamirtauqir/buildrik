@@ -16,6 +16,7 @@ import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "@/shared/constants/events";
 import { Button, Select } from "@/editor/chrome-ui";
 import { Section, type SectionTier } from "../shared/controls";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface FormFieldsSectionProps {
   elementId: string;
@@ -51,14 +52,6 @@ const fieldType = (el: Element) =>
 const fieldLabel = (el: Element, i: number) =>
   el.getAttribute("placeholder") || el.getAttribute("name") || el.getAttribute("aria-label") || `Field ${i + 1}`;
 
-function runTxn(composer: Composer, label: string, fn: () => void) {
-  composer.beginTransaction?.(label);
-  try {
-    fn();
-  } finally {
-    composer.endTransaction?.();
-  }
-}
 
 /** Swap an input for a textarea (or back), keeping name / placeholder / place. */
 function replaceField(composer: Composer, el: Element, type: string) {
@@ -92,12 +85,14 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
 
   const form = composer?.elements.getElement(elementId);
   if (!composer || !form) return null;
+  /* P-1: every write below goes through writeElement on the form, so a locked
+     form is refused (and the shell says so). */
   const fields = formFields(form);
 
   const setType = (el: Element, type: string) => {
     const was = fieldType(el);
     if (was === type) return;
-    runTxn(composer, "form-field-type", () => {
+    writeElement(composer, form, "form-field-type", () => {
       if (was === "textarea" || type === "textarea") replaceField(composer, el, type);
       else el.setAttribute("type", type);
     });
@@ -111,7 +106,7 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
     const parent = submit?.getParent() ?? form;
     const index = submit ? parent.getChildIndex(submit) : undefined;
     const n = fields.length + 1;
-    runTxn(composer, "form-field-add", () => {
+    writeElement(composer, form, "form-field-add", () => {
       const field = composer.elements.createElement("input", {
         attributes: { type: "text", name: `field-${n}`, placeholder: `Field ${n}` },
       });
@@ -124,7 +119,7 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
     setDragId(null);
     const parent = target.getParent();
     if (!moving || !parent || moving.getId() === target.getId()) return;
-    runTxn(composer, "form-field-move", () => {
+    writeElement(composer, form, "form-field-move", () => {
       composer.elements.moveElement(moving.getId(), parent.getId(), parent.getChildIndex(target));
     });
   };

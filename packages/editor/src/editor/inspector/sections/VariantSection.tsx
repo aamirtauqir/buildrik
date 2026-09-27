@@ -23,6 +23,7 @@ import type { ComponentDefinition } from "../../../shared/types/components";
 import { Button, ConfirmDialog, Menu, MenuItem, MenuSeparator, Popover, useToast } from "@/editor/chrome-ui";
 import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
 import { elementLocation } from "@/editor/canvas/utils/elementInfo";
+import { writableElements } from "@/engine/commands/commandOperations";
 
 interface VariantSectionProps {
   composer: Composer | null;
@@ -63,8 +64,12 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
   const hasVariants = properties.length > 0 && variants.length > 0;
   const current = variants.find((v) => v.id === info.currentVariant) ?? variants[0];
 
+  /* P-1: a variant swap, reset or detach rewrites this instance — lock gate
+     first (it says so when it refuses). */
+  const writable = () => writableElements(composer, [composer.elements.getElement(elementId)]).length > 0;
   const pickVariant = (variantId: string) => {
     setMenuOpen(false);
+    if (!writable()) return;
     composer.components?.updateInstanceVariant?.(instanceId, variantId);
     setInfo({ ...info, currentVariant: variantId });
   };
@@ -76,6 +81,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
 
   const detach = async () => {
     setConfirm(null);
+    if (!writable()) return;
     try {
       const ok = await composer.components.detachInstance(instanceId);
       if (ok) {
@@ -90,6 +96,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
 
   const reset = () => {
     setConfirm(null);
+    if (!writable()) return;
     void composer.components?.resetInstance?.(instanceId);
   };
 

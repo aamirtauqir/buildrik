@@ -47,8 +47,16 @@ export function useClipboardToasts(
     /* LOCKED_ELEMENTS_SKIPPED (delete,
        cut, nudge — A-5) had no listener anywhere, so a locked element quietly
        staying put looked identical to nothing having been selected at all. */
-    const lockedSkipped = () =>
-      addToast({ description: "Locked elements were skipped", tone: "info", duration: 2500 });
+    /* P-1: every Inspector write on a locked element raises it too, and a
+       field typed into writes per keystroke — one toast while it is up. */
+    const LOCKED_TOAST_MS = 2500;
+    let lockedShownAt = -Infinity;
+    const lockedSkipped = () => {
+      const now = Date.now();
+      if (now - lockedShownAt < LOCKED_TOAST_MS) return;
+      lockedShownAt = now;
+      addToast({ description: "Locked elements were skipped", tone: "info", duration: LOCKED_TOAST_MS });
+    };
 
     /* CLIPBOARD_PASTE is emitted by pasteElement, once PER element — so a
        three-element paste fired three toasts stacked on top of each other. The

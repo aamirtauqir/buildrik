@@ -10,6 +10,7 @@ import { EVENTS } from "../../../shared/constants";
 import type { PageData } from "../../../shared/types";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
 import { isUrl, isEmail, isPhoneNumber } from "../../../shared/utils/helpers/validation";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface LinkSectionProps {
   selectedElement: {
@@ -147,19 +148,14 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     (href: string) => {
       if (!composer || !selectedElement?.id) return;
 
-      const el = composer.elements.getElement(selectedElement.id);
-      if (!el) return;
-
-      composer.beginTransaction?.("link-change");
-      try {
+      /* P-1: the lock gate — refused (and said) when the element is locked. */
+      writeElement(composer, composer.elements.getElement(selectedElement.id), "link-change", (el) => {
         if (href) {
           el.setAttribute?.("href", href);
         } else {
           el.removeAttribute?.("href");
         }
-      } finally {
-        composer.endTransaction?.();
-      }
+      });
     },
     [composer, selectedElement?.id]
   );
@@ -174,15 +170,12 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   };
 
   const updateTarget = (newTarget: string) => {
-    const el = selectedElement?.id ? composer?.elements.getElement(selectedElement.id) : null;
-    if (!composer || !el) return;
-    composer.beginTransaction?.("link-target-change");
-    try {
-      writeTarget(el, newTarget);
-    } finally {
-      composer.endTransaction?.();
-    }
-    setTarget(newTarget);
+    if (!composer || !selectedElement?.id) return;
+    /* P-1: the lock gate — refused (and said) when the element is locked. */
+    const ran = writeElement(composer, composer.elements.getElement(selectedElement.id), "link-target-change", (el) =>
+      writeTarget(el, newTarget)
+    );
+    if (ran) setTarget(newTarget);
   };
 
   /* A type change replaces the destination (P-11a): the old href goes unless
@@ -200,15 +193,13 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
       : type === "anchor" && anchorId && !/\s/.test(anchorId) ? `#${anchorId}`
       : "";
     const noTab = type === "none" || type === "email" || type === "phone";
-    composer.beginTransaction?.("link-change");
-    try {
-      if (href) el.setAttribute?.("href", href);
-      else el.removeAttribute?.("href");
-      if (noTab) writeTarget(el, "_self");
-    } finally {
-      composer.endTransaction?.();
-    }
-    if (noTab) setTarget("_self");
+    /* P-1: the lock gate — refused (and said) when the element is locked. */
+    const ran = writeElement(composer, el, "link-change", (target) => {
+      if (href) target.setAttribute?.("href", href);
+      else target.removeAttribute?.("href");
+      if (noTab) writeTarget(target, "_self");
+    });
+    if (ran && noTab) setTarget("_self");
   };
 
   const handlePageSelect = (pageId: string) => {
