@@ -514,9 +514,29 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* A-6: a full-page surface hides the canvas selection but does not clear
      it — the command guard now refuses shortcuts on that surface, but the
      selection itself should not sit stale (highlighted on a canvas the user
-     cannot see) while a full page is open. */
+     cannot see) while a full page is open.
+     P-5: it is HELD, not dropped. Brand (a token chip), the Asset library
+     ("Manage SVG") and Settings are escalations from the element being
+     edited; "Back to canvas" gives the same selection back, and the
+     inspector — mounted throughout — keeps its tab and scroll for it. An
+     element deleted while the page was open is not brought back. */
+  const heldSelectionRef = React.useRef<string[] | null>(null);
   React.useEffect(() => {
-    if (effectiveFullPageMode) composer?.selection.clear();
+    if (!composer) return;
+    if (effectiveFullPageMode) {
+      const ids = composer.selection.getSelectedIds();
+      if (ids.length > 0) heldSelectionRef.current = ids;
+      composer.selection.clear();
+      return;
+    }
+    const held = heldSelectionRef.current;
+    heldSelectionRef.current = null;
+    if (!held || composer.selection.getSelectedIds().length > 0) return;
+    const alive = held
+      .map((id) => composer.elements.getElement(id))
+      .filter((el): el is NonNullable<typeof el> => !!el);
+    if (alive.length === 1) composer.selection.select(alive[0]);
+    else if (alive.length > 1) composer.selection.selectMultiple(alive);
   }, [effectiveFullPageMode, composer]);
 
   // Listen for panel open events from composer
