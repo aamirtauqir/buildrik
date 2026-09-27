@@ -13,6 +13,9 @@ const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]";
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  /** Writes several properties as one change (one undo step). Switching the
+   *  type replaces the old fill through it. */
+  onBatchChange?: (changes: Record<string, string>) => void;
   /** Opens media library for asset selection */
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
@@ -37,6 +40,7 @@ export interface BackgroundSectionProps {
 export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   styles,
   onChange,
+  onBatchChange,
   onOpenMediaLibrary,
   isOpen,
   onToggle,
@@ -56,6 +60,41 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   const gradientUI = bgType === "gradient" ? extractGradientUI(styles.background || styles["background-image"] || "") : null;
   const color1 = gradientUI?.color1 || DEFAULT_GRADIENT_STOPS.color1;
   const color2 = gradientUI?.color2 || DEFAULT_GRADIENT_STOPS.color2;
+
+  /* A plain colour can sit on the `background` shorthand (imports, templates).
+     Fill shows it, and a Fill write clears it: otherwise the shorthand keeps
+     painting over the new background-color. */
+  const shorthandColor = styles.background && !/gradient\(|url\(/.test(styles.background) ? styles.background : "";
+  const writeMany = (changes: Record<string, string>) => {
+    if (onBatchChange) onBatchChange(changes);
+    else Object.entries(changes).forEach(([property, value]) => onChange(property, value));
+  };
+  const writeFill = (value: string) => {
+    if (styles.background) writeMany({ background: "", "background-color": value });
+    else onChange("background-color", value);
+  };
+  const writeImage = (value: string) => {
+    if (value && styles.background) writeMany({ background: "", "background-image": value });
+    else onChange("background-image", value);
+  };
+
+  /* Switching the type replaces the old fill (X-1): a gradient left on
+     `background` kept covering a newly chosen colour. Image waits for an
+     image to be chosen (writeImage) before dropping a gradient. */
+  const chooseType = (type: "color" | "gradient" | "image") => {
+    setBgType(type);
+    if (type === bgType) return;
+    const hasImage = Boolean(styles["background-image"]);
+    const hasPaint = Boolean(styles.background) && !shorthandColor;
+    if (type === "color" && (hasImage || hasPaint)) {
+      writeMany({ ...(hasImage ? { "background-image": "" } : {}), ...(hasPaint ? { background: "" } : {}) });
+    } else if (type === "gradient") {
+      writeMany({
+        ...(hasImage ? { "background-image": "" } : {}),
+        background: composeGradient({ type: "linear", angle: 90, color1, color2 }),
+      });
+    }
+  };
 
   // Compute color preview from styles — mock shows a small swatch chip as the
   // collapsed-state indicator for Background.
@@ -78,7 +117,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       onClick={(e) => {
         e.stopPropagation();
         onOpenMediaLibrary(["image"], (asset) => {
-          onChange("background-image", `url(${asset.src})`);
+          writeImage(`url(${asset.src})`);
         });
       }}
       aria-label="Add background image"
@@ -110,7 +149,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           <Button
             key={type}
             type="button"
-            onClick={() => setBgType(type)}
+            onClick={() => chooseType(type)}
             className={`tw:capitalize ${bgType === type ? "on" : ""}`}
             aria-pressed={bgType === type}
           >
@@ -125,8 +164,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           <MixedValueIndicator prop="background-color" mixedKeys={mixedKeys} />
           <ColorInput
             label="Fill"
-            value={styles["background-color"] || ""}
-            onChange={(v) => onChange("background-color", v)}
+            value={styles["background-color"] || shorthandColor}
+            onChange={writeFill}
             composer={composer}
           />
         </div>
@@ -246,7 +285,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               <InputRow
                 label="Image URL"
                 value={styles["background-image"]?.replace(/url\(['"]?|['"]?\)/g, "") || ""}
-                onChange={(v) => onChange("background-image", v ? `url('${v}')` : "")}
+                onChange={(v) => writeImage(v ? `url('${v}')` : "")}
                 placeholder="https://..."
               />
             </div>
@@ -254,7 +293,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               <Button
                 onClick={() =>
                   onOpenMediaLibrary(["image"], (asset) => {
-                    onChange("background-image", `url('${asset.src}')`);
+                    writeImage(`url('${asset.src}')`);
                   })
                 }
                 className="tw:mb-3 tw:whitespace-nowrap tw:px-3 tw:py-2 tw:rounded-md tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-subtle)] tw:text-xs tw:font-semibold tw:text-[var(--bk-accent-text)]"

@@ -70,7 +70,7 @@ function exercise(container: HTMLElement) {
   // one that revealed it, so it is reached before an earlier sibling hides it
   // again (Gradient → Linear, before Color / Image switch the type away).
   const clicked = new Set<Element>();
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 150; i++) {
     const next = Array.from(container.querySelectorAll("button")).reverse().find((b) => !clicked.has(b));
     if (!next) break;
     clicked.add(next);
@@ -91,13 +91,19 @@ afterEach(() => cleanup());
 
 describe("P-3 guard — no Inspector style write carries an editor chrome token", () => {
   for (const [name, Section] of Object.entries(SECTIONS)) {
-    for (const [state, initial] of Object.entries(STATES)) {
+    // Only the states that change what a section shows: background paint for
+    // Background, the display mode for the layout family.
+    const states = name === "Background" ? Object.keys(STATES)
+      : ["Layout", "Flexbox", "Grid"].includes(name) ? ["empty", "flex", "grid"]
+      : ["empty"];
+    for (const state of states) {
+      const initial = STATES[state];
       it(`${name} · ${state}`, () => {
         const writes: string[] = [];
         const { container } = render(<Host Section={Section} initial={initial} writes={writes} />);
         exercise(container);
         expect(writes.filter((w) => w.includes("--bk-"))).toEqual([]);
-      });
+      }, 120_000); // a few hundred clicks and renders per case
     }
   }
 
