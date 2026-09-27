@@ -26,6 +26,7 @@ import type { Composer } from "../../../engine/Composer";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { displayNameFor } from "../../sidebar/tabs/media/data/mediaUtils";
 import { handleGenericAttributeChange, handleVideoSrcChange, runTxn } from "./elementProperties/handlers";
+import { writableElements } from "@/engine/commands/commandOperations";
 
 const KINDS: Record<string, { label: string; door: string; picker: MediaAssetType | null }> = {
   image: { label: "Image source", door: "Choose image", picker: "image" },
@@ -76,7 +77,8 @@ export function MediaSourceRow({ composer, selectedElement, onOpenMediaLibrary }
          layer's own name, else its type label. */
       const forLabel = getLayerName(el) ?? ELEMENT_TYPE_LABELS[selectedElement.type] ?? selectedElement.type;
       onOpenMediaLibrary([kind.picker], (chosen) => {
-        const target = composer.elements.getElement(selectedElement.id);
+        /* P-1: the lock gate — a locked element keeps its source. */
+        const [target] = writableElements(composer, [composer.elements.getElement(selectedElement.id)]);
         if (!target) return;
         /* A video keeps its <source> child in step, as the URL row did. */
         if (selectedElement.type === "video") runTxn(composer, "video-src-change", () => handleVideoSrcChange(target, chosen.src));

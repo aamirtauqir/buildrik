@@ -24,6 +24,7 @@ import {
 } from "./handlers";
 import { PropertyField } from "./PropertyField";
 import { Button, TextInput } from "@/editor/chrome-ui";
+import { writableElements } from "@/engine/commands/commandOperations";
 const styles = {
   dataAttributesSection: {
     marginTop: 16,
@@ -150,6 +151,9 @@ function IdClassRow({
     if (!composer || !el) return;
     const next = classDraft.split(/\s+/).map((c) => c.replace(/^\./, "")).filter(Boolean);
     if (next.join(" ") === classes) return;
+    /* P-1: the lock gate refuses a locked element (and says so); the draft
+       goes back to what the element carries. */
+    if (writableElements(composer, [el]).length === 0) return setClassDraft(classes);
     runTxn(composer, "element-classes-change", () => el.setClasses(next));
   };
   return (
@@ -249,7 +253,8 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
   // Handle attribute change
   const handleChange = (id: string, value: string) => {
     if (!composer || !selectedElement?.id) return;
-    const el = composer.elements.getElement(selectedElement.id);
+    /* P-1: the lock gate — a locked element is not written, and the shell says so. */
+    const [el] = writableElements(composer, [composer.elements.getElement(selectedElement.id)]);
     if (!el) return;
 
     // Special handling for columns count. Must return — without it, control
@@ -333,7 +338,8 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
   // Handle icon selection from picker
   const handleIconSelect = (icon: IconConfig) => {
     if (!composer || !selectedElement?.id) return;
-    const el = composer.elements.getElement(selectedElement.id);
+    /* P-1: the lock gate — a locked element is not written, and the shell says so. */
+    const [el] = writableElements(composer, [composer.elements.getElement(selectedElement.id)]);
     if (!el) return;
 
     runTxn(composer, "icon-change", () => {

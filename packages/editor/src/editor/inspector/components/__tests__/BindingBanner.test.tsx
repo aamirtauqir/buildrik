@@ -18,6 +18,9 @@ function makeComposer(bindings: { collectionId: string; fieldSlug: string }[]) {
   const composer = {
     on: vi.fn(),
     off: vi.fn(),
+    emit: vi.fn(),
+    /* P-1: Unbind passes the lock gate, which reads the element. */
+    elements: { getElement: () => ({ isLocked: () => false }) },
     cms: {
       bindings: { getBindings: () => bindings, unbindAll },
       collections: { getCollection: (id: string) => ({ name: id === "c1" ? "Menu" : id }) },

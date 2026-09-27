@@ -23,7 +23,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import { requestSaveAsComponent } from "@/editor/canvas/menus/actions/standaloneActions";
-import { pasteStyles } from "@/engine/commands/commandOperations";
+import { pasteStyles, writeElement } from "@/engine/commands/commandOperations";
 import { Button, useToast } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
@@ -191,15 +191,9 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
      capability is not lost (owner rule 2026-09-24). One transaction, so the
      toast's Undo takes it back in one step. */
   const handleResetStyles = () => {
-    const el = composer?.elements.getElement(selectedElementId);
-    if (!composer || !el) return;
-    composer.beginTransaction?.("reset-styles");
-    try {
-      el.setStyles?.({});
-    } finally {
-      composer.endTransaction?.();
-    }
     setIsOpen(false);
+    /* P-1: the lock gate — a locked element keeps its styles (and the shell says so). */
+    if (!composer || !writeElement(composer, composer.elements.getElement(selectedElementId), "reset-styles", (el) => el.setStyles?.({}))) return;
     addToast({ description: "Styles reset", action: { label: "Undo", onClick: composer.history.captureUndo() } });
   };
 

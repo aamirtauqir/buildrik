@@ -18,6 +18,7 @@ import type { CMSCollection } from "@/shared/types/cms";
 import { EVENTS } from "@/shared/constants";
 import { Button } from "@/editor/chrome-ui";
 import { Section, SelectRow, type SectionTier } from "../shared/controls";
+import { writableElements } from "@/engine/commands/commandOperations";
 
 export interface ContentSectionProps {
   elementId: string;
@@ -86,13 +87,17 @@ export const ContentSection: React.FC<ContentSectionProps> = ({ elementId, compo
     };
   }, [binding, composer, tick]);
 
+  /* P-1: binding rewrites the element's content, so every bind / unbind here
+     passes the lock gate first (which says so when it refuses). */
+  const writable = () => (composer ? writableElements(composer, [composer.elements.getElement(elementId)]).length > 0 : false);
   const bindField = (slug: string) => {
     const f = collection?.fields.find((x) => x.slug === slug);
-    if (!composer || !collection || !f) return;
+    if (!composer || !collection || !f || !writable()) return;
     if (binding) composer.cms.bindings.unbindAll(elementId, `Unbind ${field?.name ?? binding.fieldSlug}`);
     composer.cms.bindings.bindToField(elementId, collection.id, undefined, f.slug, property, undefined, `Bind ${f.name}`);
   };
   const toStatic = () => {
+    if (binding && !writable()) return;
     setCmsChosen(false);
     if (composer && binding) composer.cms.bindings.unbindAll(elementId, `Unbind ${field?.name ?? binding.fieldSlug}`);
   };
@@ -126,6 +131,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({ elementId, compo
             label="Collection"
             value={activeCollectionId}
             onChange={(id) => {
+              if (binding && !writable()) return;
               if (binding && composer) composer.cms.bindings.unbindAll(elementId, "Unbind field");
               setCollectionId(id);
               setCmsChosen(true);

@@ -16,6 +16,9 @@ function makeComposer(bound: { collectionId: string; limit?: number } | null = n
   const composer = {
     on: vi.fn(),
     off: vi.fn(),
+    emit: vi.fn(),
+    /* P-1: bind / unbind pass the lock gate, which reads the element. */
+    elements: { getElement: () => ({ isLocked: () => false }) },
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
     cms: {

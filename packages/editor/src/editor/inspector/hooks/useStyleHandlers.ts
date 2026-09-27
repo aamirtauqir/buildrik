@@ -14,6 +14,7 @@
 
 import { useCallback, useState, useEffect, useRef } from "react";
 import type { Composer } from "../../../engine";
+import type { Element } from "@/engine/elements/Element";
 import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
 import { getDefaultStyles } from "../../../shared/constants/defaultStyles";
 import { EVENTS } from "../../../shared/constants";
@@ -22,6 +23,7 @@ import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { devLogger } from "../../../shared/utils/devLogger";
 import { computeEffectiveStyles } from "../config/cssContext";
+import { writableElements } from "@/engine/commands/commandOperations";
 
 // ============================================================================
 // TYPES
@@ -186,8 +188,8 @@ export function useStyleHandlers(
     (property: string, value: string) => {
       if (!selectedElement?.id) return;
 
-      const el = composer?.elements.getElement(selectedElement.id);
-      if (!el || el.isLocked?.()) return;
+      /* P-1: a locked element is read-only; the lock gate refuses and says so. */
+      if (!composer || writableElements(composer, [composer.elements.getElement(selectedElement.id)]).length === 0) return;
 
       // 1. Immediate local state update — live preview without waiting for debounce
       setStyles((prev) => {
@@ -212,13 +214,8 @@ export function useStyleHandlers(
       // Stores the flush closure in pendingFlushRef so the cleanup effect can
       // commit it when element/breakpoint/pseudo changes before the timer fires.
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      const writeOne = (id: string) => {
-        // Re-read element inside the flush — avoids stale closure if element was replaced.
-        const el = composer?.elements.getElement(id);
-        /* P-1: a locked element is read-only — the banner says so, and every
-           write the panel makes passes through here. A locked peer in an "All
-           like this" reach is skipped the same way. */
-        if (!el || el.isLocked?.()) return;
+      const writeOne = (el: Element) => {
+        const id = el.getId();
         const sel = `[data-buildrick-id="${id}"]`;
         /* P-8: a device-hide flag (`--hide-tablet`) names its own device, so it
            always goes on the base styles — the one place the canvas
@@ -266,12 +263,19 @@ export function useStyleHandlers(
 
       const flush = () => {
         if (!composer?.elements.getElement(selectedElement.id)) return;
+        /* Re-read inside the flush — avoids a stale closure if an element was
+           replaced. P-1: a locked peer in an "All like this" reach is skipped
+           by the lock gate, which says so. */
+        const targets = writableElements(
+          composer,
+          [selectedElement.id, ...reachPeerIds].map((id) => composer.elements.getElement(id)),
+        );
+        if (targets.length === 0) return;
         /* One transaction around the selected element AND its reach, so a
            fan-out to twelve buttons is one undo step rather than twelve. */
-        composer?.beginTransaction?.("style-change");
+        composer.beginTransaction?.("style-change");
         try {
-          writeOne(selectedElement.id);
-          for (const peerId of reachPeerIds) writeOne(peerId);
+          for (const el of targets) writeOne(el);
         } finally {
           composer?.endTransaction?.();
         }
@@ -290,8 +294,9 @@ export function useStyleHandlers(
     (changes: Record<string, string>) => {
       if (!selectedElement?.id) return;
 
-      const el = composer?.elements.getElement(selectedElement.id);
-      if (!el || el.isLocked?.()) return;
+      if (!composer) return;
+      const [el] = writableElements(composer, [composer.elements.getElement(selectedElement.id)]);
+      if (!el) return;
 
       // Trace batch style change for debugging
       devLogger.style("batch-change", {

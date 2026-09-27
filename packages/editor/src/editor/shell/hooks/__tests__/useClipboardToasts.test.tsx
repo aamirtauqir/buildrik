@@ -125,6 +125,26 @@ describe("useClipboardToasts", () => {
     unmount();
     expect(count(EVENTS.LOCKED_ELEMENTS_SKIPPED)).toBe(0);
   });
+
+  /* P-1: every Inspector write on a locked element now raises this — a
+     field typed into fires once per keystroke. One toast while it is up. */
+  it("speaks once for a burst of skips, and again after the toast has gone", () => {
+    vi.useFakeTimers();
+    try {
+      const { composer, fire } = fakeComposer();
+      const addToast = vi.fn();
+      renderHook(() => useClipboardToasts(composer, addToast));
+      fire(EVENTS.LOCKED_ELEMENTS_SKIPPED);
+      fire(EVENTS.LOCKED_ELEMENTS_SKIPPED);
+      fire(EVENTS.LOCKED_ELEMENTS_SKIPPED);
+      expect(addToast).toHaveBeenCalledTimes(1);
+      vi.advanceTimersByTime(2600);
+      fire(EVENTS.LOCKED_ELEMENTS_SKIPPED);
+      expect(addToast).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
 
 const read = (p: string) =>

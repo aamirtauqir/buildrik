@@ -10,6 +10,7 @@ import { EVENTS } from "../../../shared/constants";
 import type { PageData } from "../../../shared/types";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
 import { isUrl, isEmail, isPhoneNumber } from "../../../shared/utils/helpers/validation";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface LinkSectionProps {
   selectedElement: {
@@ -143,19 +144,14 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     (href: string) => {
       if (!composer || !selectedElement?.id) return;
 
-      const el = composer.elements.getElement(selectedElement.id);
-      if (!el) return;
-
-      composer.beginTransaction?.("link-change");
-      try {
+      /* P-1: the lock gate — refused (and said) when the element is locked. */
+      writeElement(composer, composer.elements.getElement(selectedElement.id), "link-change", (el) => {
         if (href) {
           el.setAttribute?.("href", href);
         } else {
           el.removeAttribute?.("href");
         }
-      } finally {
-        composer.endTransaction?.();
-      }
+      });
     },
     [composer, selectedElement?.id]
   );
@@ -164,11 +160,8 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     (newTarget: string) => {
       if (!composer || !selectedElement?.id) return;
 
-      const el = composer.elements.getElement(selectedElement.id);
-      if (!el) return;
-
-      composer.beginTransaction?.("link-target-change");
-      try {
+      /* P-1: the lock gate — refused (and said) when the element is locked. */
+      const ran = writeElement(composer, composer.elements.getElement(selectedElement.id), "link-target-change", (el) => {
         if (newTarget && newTarget !== "_self") {
           el.setAttribute?.("target", newTarget);
           if (newTarget === "_blank") {
@@ -178,10 +171,8 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
           el.removeAttribute?.("target");
           el.removeAttribute?.("rel");
         }
-      } finally {
-        composer.endTransaction?.();
-      }
-      setTarget(newTarget);
+      });
+      if (ran) setTarget(newTarget);
     },
     [composer, selectedElement?.id]
   );
