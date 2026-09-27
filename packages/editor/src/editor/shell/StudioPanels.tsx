@@ -895,29 +895,43 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             })
           ) : rightColumnTab ? (
             columnPanel
-          ) : aiInInspector ? (
-            <AITab
-              composer={composer}
-              isExpanded={false}
-              onExpandToggle={() => {}}
-              onClose={() => setAiInInspector(false)}
-              /* M-1: "‹ Inspector" leads to the inspector — shown even if it
-                 was hidden, where closing AI alone took the column with it. */
-              onBack={() => {
-                setAiInInspector(false);
-                setInspectorShown(true);
-              }}
-            />
           ) : (
-          <ProInspector
-            composer={composer}
-            selectedElement={selectedElement}
-            currentBreakpoint={device}
-            onDelete={handleDelete}
-            onOpenMediaLibrary={onOpenMediaLibrary}
-            onOpenIconPicker={onOpenIconPicker}
-            onOpenCreateCollection={onOpenCreateCollection}
-          />
+          <>
+            {aiInInspector ? (
+              <AITab
+                composer={composer}
+                isExpanded={false}
+                onExpandToggle={() => {}}
+                onClose={() => setAiInInspector(false)}
+                /* M-1: "‹ Inspector" leads to the inspector — shown even if it
+                   was hidden, where closing AI alone took the column with it. */
+                onBack={() => {
+                  setAiInInspector(false);
+                  setInspectorShown(true);
+                }}
+              />
+            ) : null}
+            {/* P-7a: AI covers the inspector; it does not unmount it. The
+                round trip used to reset the tab to Style, the scroll to 0 and
+                a :hover state to Base. `invisible` keeps the layout box, so
+                the scroll offset survives, and takes it out of the tab order
+                and the accessibility tree. */}
+            <div
+              className={aiInInspector ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
+              aria-hidden={aiInInspector || undefined}
+              data-testid="inspector-body-host"
+            >
+              <ProInspector
+                composer={composer}
+                selectedElement={selectedElement}
+                currentBreakpoint={device}
+                onDelete={handleDelete}
+                onOpenMediaLibrary={onOpenMediaLibrary}
+                onOpenIconPicker={onOpenIconPicker}
+                onOpenCreateCollection={onOpenCreateCollection}
+              />
+            </div>
+          </>
           )}
         </LayoutShell.Inspector>
         )}

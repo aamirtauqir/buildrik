@@ -117,7 +117,8 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
     render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
     expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    expect(screen.queryByTestId("pro-inspector")).toBeNull();
+    /* P-7a: covered, not unmounted. */
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBe("true");
 
     act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
     await flushFrame();
@@ -345,5 +346,28 @@ describe("StudioPanels — a full page keeps the selection to give back (P-5)", 
     composer.live.delete("el-1");
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
     expect(composer.selection.getSelectedIds()).toEqual([]);
+  });
+});
+
+/* P-7a: the AI panel replaced ProInspector by unmounting it, so "‹ Inspector"
+   came back to a fresh one — tab Style, scroll 0, :hover back to Base. The
+   stub's revealed-section state stands in for all of that local state. */
+describe("StudioPanels — the AI round trip keeps the inspector's state (P-7a)", () => {
+  it("state held by the inspector survives AI open → ‹ Inspector", async () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "typography" }));
+    await flushFrame();
+    const before = screen.getByTestId("pro-inspector");
+    expect(before.getAttribute("data-revealed")).toBe("typography");
+
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
+    expect(screen.getByTestId("ai-tab")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "‹ Inspector" }));
+
+    const after = screen.getByTestId("pro-inspector");
+    expect(after).toBe(before);
+    expect(after.getAttribute("data-revealed")).toBe("typography");
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBeNull();
   });
 });
