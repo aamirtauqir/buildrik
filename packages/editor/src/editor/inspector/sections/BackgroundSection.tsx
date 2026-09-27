@@ -5,7 +5,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
-import { extractGradientUI, composeGradient, deriveBgType } from "../../../shared/utils/parsers/gradientHelpers";
+import { extractGradientUI, composeGradient, deriveBgType, DEFAULT_GRADIENT_STOPS } from "../../../shared/utils/parsers/gradientHelpers";
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { Button, TextInput } from "@/editor/chrome-ui";
 
@@ -54,6 +54,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   }, [styles.background, styles["background-image"]]);
 
   const gradientUI = bgType === "gradient" ? extractGradientUI(styles.background || styles["background-image"] || "") : null;
+  const color1 = gradientUI?.color1 || DEFAULT_GRADIENT_STOPS.color1;
+  const color2 = gradientUI?.color2 || DEFAULT_GRADIENT_STOPS.color2;
 
   // Compute color preview from styles — mock shows a small swatch chip as the
   // collapsed-state indicator for Background.
@@ -151,8 +153,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                     composeGradient({
                       type: "linear",
                       angle: gradientUI?.angle ?? 90,
-                      color1: gradientUI?.color1 || "var(--bk-accent)",
-                      color2: gradientUI?.color2 || "var(--bk-success)",
+                      color1,
+                      color2,
                     })
                   )
                 }
@@ -169,8 +171,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                     composeGradient({
                       type: "radial",
                       angle: gradientUI?.angle ?? 90,
-                      color1: gradientUI?.color1 || "var(--bk-accent)",
-                      color2: gradientUI?.color2 || "var(--bk-success)",
+                      color1,
+                      color2,
                     })
                   )
                 }
@@ -183,13 +185,13 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {/* Gradient Colors */}
           <ColorInput
             label="Color 1"
-            value={gradientUI?.color1 || "var(--bk-accent)"}
+            value={color1}
             onChange={(v) => {
               const result = composeGradient({
                 type: (gradientUI?.gradientType || "linear") as "linear" | "radial",
                 angle: gradientUI?.angle ?? 90,
                 color1: v,
-                color2: gradientUI?.color2 || "var(--bk-success)",
+                color2,
               });
               onChange("background", result);
             }}
@@ -197,12 +199,12 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           />
           <ColorInput
             label="Color 2"
-            value={gradientUI?.color2 || "#22c55e"}
+            value={color2}
             onChange={(v) => {
               const result = composeGradient({
                 type: (gradientUI?.gradientType || "linear") as "linear" | "radial",
                 angle: gradientUI?.angle ?? 90,
-                color1: gradientUI?.color1 || "var(--bk-accent)",
+                color1,
                 color2: v,
               });
               onChange("background", result);
@@ -223,8 +225,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   const result = composeGradient({
                     type: "linear",
                     angle: Number(e.target.value),
-                    color1: gradientUI?.color1 || "var(--bk-accent)",
-                    color2: gradientUI?.color2 || "var(--bk-success)",
+                    color1,
+                    color2,
                   });
                   onChange("background", result);
                 }}

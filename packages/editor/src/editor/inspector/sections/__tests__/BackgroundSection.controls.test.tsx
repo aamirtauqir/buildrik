@@ -89,7 +89,8 @@ describe("BackgroundSection — gradient writes", () => {
     fireEvent.click(screen.getByRole("button", { name: "Linear" }));
     expect(onChange).toHaveBeenCalledWith(
       "background",
-      "linear-gradient(90deg, var(--bk-accent), var(--bk-success))"
+      // Literal stops, never chrome --bk-* tokens: this ships in exported HTML (P-3).
+      "linear-gradient(90deg, #1A56DB, #22c55e)"
     );
   });
 
@@ -99,7 +100,7 @@ describe("BackgroundSection — gradient writes", () => {
     fireEvent.click(screen.getByRole("button", { name: "Radial" }));
     expect(onChange).toHaveBeenCalledWith(
       "background",
-      "radial-gradient(circle, var(--bk-accent), var(--bk-success))"
+      "radial-gradient(circle, #1A56DB, #22c55e)"
     );
   });
 });

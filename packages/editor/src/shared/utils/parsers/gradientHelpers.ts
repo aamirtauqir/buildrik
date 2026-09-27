@@ -8,6 +8,14 @@
 
 import { parseGradient, serializeGradient, type CSSGradient } from "./gradientParser";
 import { rgbToHex } from "./colorConversionBasic";
+import { THEME } from "../../constants/defaultStyles";
+
+/**
+ * The stops a new gradient starts from. Literal colours, never chrome
+ * `var(--bk-*)` tokens: this value is written into the customer's element and
+ * ships in their exported HTML, where `--bk-*` does not exist (P-3).
+ */
+export const DEFAULT_GRADIENT_STOPS = { color1: THEME.primary, color2: "#22c55e" } as const;
 
 export interface GradientUI {
   type: "color" | "gradient" | "image";
