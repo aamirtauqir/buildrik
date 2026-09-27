@@ -21,6 +21,11 @@ const REQUIRED: Record<string, RegExp> = {
   button: /<button[\s>]/i,
   input: /<input[\s>]/i,
   text: /<label[\s>]|<input[\s>]/i,
+  /* Q2: the Label, Checkbox and Radio blocks declare their real types now.
+     The choices are a label wrapping the control it names. */
+  label: /<label[\s>]/i,
+  checkbox: /<label[\s>][^]*<input[^>]*type="checkbox"/i,
+  radio: /<label[\s>][^]*<input[^>]*type="radio"/i,
 };
 
 const formBlocks = blockDefinitions.filter((b) => b.category === "Forms");

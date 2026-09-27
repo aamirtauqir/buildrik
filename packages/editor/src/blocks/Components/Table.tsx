@@ -8,7 +8,13 @@ import type { BlockBuildConfig, Composer } from "../types";
 import { BLOCK_COLORS } from "../blockPalette";
 
 /**
- * Build data table component
+ * Build data table component.
+ *
+ * The inserted subtree is a scroll wrapper (`div.table-wrapper`, a plain
+ * container) around the `<table>` itself, and it is the TABLE this returns
+ * for selection: that element is the table, typed `table`. Typing the wrapper
+ * `table` instead would make its stored "div" defer to the type's own tag
+ * (`Element.getTagName`) and publish a `<table>` inside a `<table>`.
  */
 function buildTable(composer: Composer, parentId: string, dropIndex?: number): string | undefined {
   const tableWrapper = composer.elements.createElement("container", {
@@ -25,7 +31,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
   composer.elements.addElement(tableWrapper, parentId, dropIndex);
   const wrapperId = tableWrapper.getId();
 
-  const table = composer.elements.createElement("container", {
+  const table = composer.elements.createElement("table", {
     tagName: "table",
     attributes: {
       class: "data-table",
@@ -203,13 +209,13 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     composer.elements.addElement(editText, editBtn.getId());
   });
 
-  return wrapperId;
+  return tableId;
 }
 
 export const tableBlockConfig: BlockBuildConfig = {
   id: "table",
   label: "Table",
   category: "Components",
-  elementType: "container",
+  elementType: "table",
   build: buildTable,
 };

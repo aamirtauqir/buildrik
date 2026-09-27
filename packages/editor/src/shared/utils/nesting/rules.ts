@@ -36,6 +36,11 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
     allowChildren: true,
     description: "Flexbox layout container",
   },
+  stack: {
+    categories: [ElementCategory.CONTAINER, ElementCategory.BLOCK, ElementCategory.FLOW],
+    allowChildren: true,
+    description: "Vertical flex stack of equally spaced children",
+  },
   card: {
     categories: [ElementCategory.CONTAINER, ElementCategory.BLOCK, ElementCategory.FLOW],
     allowChildren: true,
@@ -173,6 +178,25 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
     ],
     description: "Inline text element (span equivalent)",
   },
+  /* A form label. Phrasing content like text — and like the HTML element it
+     may wrap its own control, so it keeps children. */
+  label: {
+    categories: [ElementCategory.TEXT, ElementCategory.INLINE, ElementCategory.PHRASING],
+    allowChildren: true,
+    forbiddenChildren: [
+      "section",
+      "header",
+      "footer",
+      "nav",
+      "form",
+      "table",
+      "list",
+      "hero",
+      "features",
+      "cta",
+    ],
+    description: "Form label (label element)",
+  },
   heading: {
     categories: [
       ElementCategory.TEXT,
@@ -255,6 +279,9 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
       "link",
       "button",
       "input",
+      "checkbox",
+      "radio",
+      "switch",
       "textarea",
       "select",
       "form",
@@ -281,6 +308,9 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
       "button",
       "form",
       "input",
+      "checkbox",
+      "radio",
+      "switch",
       "textarea",
       "select",
       "table",
@@ -400,15 +430,23 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
     implicitRole: "listbox",
     description: "Dropdown select element",
   },
+  /* Not VOID: in this product a checkbox is the labelled wrapper the catalog
+     inserts (`<label><input type="checkbox"> text</label>`), exactly as `switch`
+     is, so it holds its own control and caption and the engine must not
+     hoist them out when they are reordered. */
   checkbox: {
-    categories: [ElementCategory.FORM, ElementCategory.INLINE, ElementCategory.PHRASING, ElementCategory.VOID],
+    categories: [ElementCategory.FORM, ElementCategory.INLINE, ElementCategory.PHRASING],
     allowChildren: false,
     recommendedParent: ["form"],
     implicitRole: "checkbox",
     description: "Checkbox input element",
   },
+  /* Not VOID: in this product a radio is the labelled wrapper the catalog
+     inserts (`<label><input type="radio"> text</label>`), exactly as `switch`
+     is, so it holds its own control and caption and the engine must not
+     hoist them out when they are reordered. */
   radio: {
-    categories: [ElementCategory.FORM, ElementCategory.INLINE, ElementCategory.PHRASING, ElementCategory.VOID],
+    categories: [ElementCategory.FORM, ElementCategory.INLINE, ElementCategory.PHRASING],
     allowChildren: false,
     recommendedParent: ["form"],
     implicitRole: "radio",
@@ -434,6 +472,14 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
     allowChildren: true,
     implicitRole: "list",
     description: "List element (ul/ol)",
+  },
+  /* Same placement as the generic container every <li> used to be typed as,
+     so re-typing one never changes where it may go. */
+  "list-item": {
+    categories: [ElementCategory.CONTAINER, ElementCategory.BLOCK, ElementCategory.FLOW],
+    allowChildren: true,
+    implicitRole: "listitem",
+    description: "List item (li element)",
   },
   table: {
     categories: [ElementCategory.CONTAINER, ElementCategory.BLOCK, ElementCategory.FLOW],
@@ -468,6 +514,11 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
     categories: [ElementCategory.CONTAINER, ElementCategory.BLOCK, ElementCategory.FLOW],
     allowChildren: true,
     description: "Accordion/FAQ component with collapsible sections",
+  },
+  tabs: {
+    categories: [ElementCategory.CONTAINER, ElementCategory.BLOCK, ElementCategory.FLOW],
+    allowChildren: true,
+    description: "Tabbed panels with a tab list",
   },
 
   // Ecommerce Elements

@@ -20,6 +20,7 @@ import type {
 } from "../shared/types";
 import { clamp, deepClone } from "../shared/utils/helpers";
 import { dropSessionMediaUrls, sanitizeElementTreeContent } from "../shared/utils/html";
+import { refineElementTypes } from "./migration/refineElementTypes";
 import { CanvasIndicators } from "./canvas/indicators";
 import { ResizeHandler } from "./canvas/ResizeHandler";
 import { CMSBindingManager } from "./cms/CMSBindingManager";
@@ -626,6 +627,8 @@ export class Composer extends EventEmitter {
         if (page.root) {
           sanitizeElementTreeContent(page.root);
           dropSessionMediaUrls(page.root, this.localMediaUrlRemap);
+          // Q2: saved `container`s whose markup proves a real type get it.
+          refineElementTypes(page.root);
         }
         renames.push(...this.elements.importPage(page));
       });

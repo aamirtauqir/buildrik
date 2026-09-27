@@ -16,5 +16,5 @@ export const lottieBlockConfig: LottieBlockConfig = {
   elementType: "lottie",
   icon: "/src/assets/icons/blocks/media/lotti.svg",
   content:
-    '<div class="lottie-container" data-lottie-src="" style="width:200px;height:200px;background:#f5f5f5;border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="color:#999">Lottie Animation</span></div>',
+    '<div class="lottie-container" data-buildrick-type="lottie" data-lottie-src="" style="width:200px;height:200px;background:#f5f5f5;border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="color:#999">Lottie Animation</span></div>',
 };

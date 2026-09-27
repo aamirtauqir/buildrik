@@ -23,7 +23,7 @@ export function buildProductGrid(
   dropIndex?: number
 ): string | undefined {
   // Create grid container with CMS binding
-  const grid = composer.elements.createElement("container", {
+  const grid = composer.elements.createElement("product-grid", {
     tagName: "div",
     attributes: {
       class: "product-grid",
