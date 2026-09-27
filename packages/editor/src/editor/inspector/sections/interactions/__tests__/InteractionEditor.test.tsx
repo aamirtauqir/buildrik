@@ -5,6 +5,7 @@
  * @license BSD-3-Clause
  */
 
+import * as React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { InteractionEditor } from "../InteractionEditor";
@@ -124,31 +125,88 @@ describe("InteractionEditor — actions", () => {
 });
 
 /* P-11(c): an emptied field wrote NaN into the interaction, and a negative
-   number was taken as-is. Empty / non-numeric writes nothing (the old value
-   stays); a number outside the field's range is clamped into it. */
+   number was taken as-is. The field is a draft while it has focus: a keystroke
+   writes only a finite value already inside the field's range, so typing
+   "0.5" can pass through "0" (below Duration's 0.1 minimum) without being
+   snapped to 0.1. On blur an out-of-range number is clamped and written; an
+   empty or non-numeric draft restores the stored value. Nothing ever stores
+   NaN or a negative. */
 describe("InteractionEditor — timing validation (P-11c)", () => {
   const written = (onUpdate: ReturnType<typeof vi.fn>) =>
     onUpdate.mock.calls.map(([, patch]) => patch.animation);
 
-  it("an emptied Duration or Delay writes nothing", () => {
-    const { onUpdate } = setup();
+  /** Feeds writes back in, like the real section does. */
+  function Host({ onUpdate }: { onUpdate: (id: string, patch: Partial<Interaction>) => void }) {
+    const [interaction, setInteraction] = React.useState(makeInteraction());
+    return (
+      <InteractionEditor
+        interaction={interaction}
+        onUpdate={(id, patch) => {
+          onUpdate(id, patch);
+          setInteraction((prev) => ({ ...prev, ...patch }));
+        }}
+        onRemove={vi.fn()}
+        onToggleEnabled={vi.fn()}
+      />
+    );
+  }
+
+  it("typing 0 on the way to 0.5 does not snap Duration to 0.1", () => {
+    const onUpdate = vi.fn();
+    render(<Host onUpdate={onUpdate} />);
+    const [duration] = screen.getAllByRole("spinbutton");
+    fireEvent.change(duration, { target: { value: "0" } });
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(duration).toHaveValue(0);
+    fireEvent.change(duration, { target: { value: "0.5" } });
+    expect(written(onUpdate)).toEqual([expect.objectContaining({ duration: 500 })]);
+    expect(duration).toHaveValue(0.5);
+  });
+
+  it("an emptied Duration or Delay writes nothing and restores the stored value on blur", () => {
+    const onUpdate = vi.fn();
+    render(<Host onUpdate={onUpdate} />);
     const [duration, delay] = screen.getAllByRole("spinbutton");
     fireEvent.change(duration, { target: { value: "" } });
     fireEvent.change(delay, { target: { value: "" } });
+    expect(duration).toHaveValue(null);
+    fireEvent.blur(duration);
+    fireEvent.blur(delay);
     expect(onUpdate).not.toHaveBeenCalled();
+    expect(duration).toHaveValue(1);
+    expect(delay).toHaveValue(0);
   });
 
-  it("a negative Duration or Delay is clamped to the field's minimum", () => {
-    const { onUpdate } = setup();
+  it("a negative Duration or Delay writes nothing while typing and is clamped on blur", () => {
+    const onUpdate = vi.fn();
+    render(<Host onUpdate={onUpdate} />);
     const [duration, delay] = screen.getAllByRole("spinbutton");
     fireEvent.change(duration, { target: { value: "-2" } });
     fireEvent.change(delay, { target: { value: "-1" } });
-    const [d, l] = written(onUpdate);
+    expect(onUpdate).not.toHaveBeenCalled();
+    fireEvent.blur(duration);
+    fireEvent.blur(delay);
+    // Delay was already 0, so its clamp has nothing to write.
+    const [d, ...rest] = written(onUpdate);
     expect(d.duration).toBe(100);
-    expect(l.delay).toBe(0);
+    expect(rest).toEqual([]);
     written(onUpdate).forEach((a) => {
       expect(Number.isFinite(a.duration)).toBe(true);
       expect(Number.isFinite(a.delay)).toBe(true);
+      expect(a.duration).toBeGreaterThanOrEqual(0);
+      expect(a.delay).toBeGreaterThanOrEqual(0);
     });
+    expect(duration).toHaveValue(0.1);
+    expect(delay).toHaveValue(0);
+  });
+
+  it("a Duration above the maximum is clamped on blur", () => {
+    const onUpdate = vi.fn();
+    render(<Host onUpdate={onUpdate} />);
+    const [duration] = screen.getAllByRole("spinbutton");
+    fireEvent.change(duration, { target: { value: "20" } });
+    expect(onUpdate).not.toHaveBeenCalled();
+    fireEvent.blur(duration);
+    expect(written(onUpdate)).toEqual([expect.objectContaining({ duration: 10000 })]);
   });
 });
