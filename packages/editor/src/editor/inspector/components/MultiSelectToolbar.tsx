@@ -330,7 +330,9 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
         onClose={() => setConfirmDelete(false)}
         onConfirm={() => {
           setConfirmDelete(false);
-          composer?.commands?.run("delete");
+          /* P-10: this modal IS the confirm — unconfirmed, the command asked
+             a second time. */
+          composer?.commands?.run("delete", { confirmed: true });
         }}
         elementLabel={`${selectedIds.length} elements`}
       />

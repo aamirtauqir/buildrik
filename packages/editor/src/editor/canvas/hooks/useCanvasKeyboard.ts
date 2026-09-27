@@ -17,6 +17,7 @@ import {
   moveElementPosition,
   reorderElement,
 } from "./keyboard/keyboardHelpers";
+import { pasteStyles } from "@/engine/commands/commandOperations";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -284,34 +285,24 @@ export function useCanvasKeyboard({
         case "v":
         case "V":
           if ((e.ctrlKey || e.metaKey) && e.altKey && composer.styleClipboard) {
-            // Cmd/Ctrl+Option+V: Paste styles only
+            // Cmd/Ctrl+Option+V: Paste styles only — the shared merge (P-10).
             e.preventDefault();
-            const stylesToPaste = composer.styleClipboard;
-            const styleKeys = Object.keys(stylesToPaste);
-
-            if (styleKeys.length > 0) {
-              composer.beginTransaction("paste-styles");
-              try {
-                styleKeys.forEach((key) => {
-                  element.setStyle?.(key, stylesToPaste[key]);
-                });
-                syncFromComposer();
-                if (addToast) {
-                  addToast({
-                    description: `${styleKeys.length} style${styleKeys.length === 1 ? "" : "s"} applied`,
-                    tone: "success",
-                    duration: 2000,
-                    action: {
-                      label: "Undo",
-                      onClick: () => {
-                        composer.history.undo();
-                        syncFromComposer();
-                      },
+            const applied = pasteStyles(composer, element);
+            if (applied > 0) {
+              syncFromComposer();
+              if (addToast) {
+                addToast({
+                  description: `${applied} style${applied === 1 ? "" : "s"} applied`,
+                  tone: "success",
+                  duration: 2000,
+                  action: {
+                    label: "Undo",
+                    onClick: () => {
+                      composer.history.undo();
+                      syncFromComposer();
                     },
-                  });
-                }
-              } finally {
-                composer.endTransaction();
+                  },
+                });
               }
             }
           }

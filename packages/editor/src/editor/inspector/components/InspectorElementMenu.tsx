@@ -23,6 +23,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import { requestSaveAsComponent } from "@/editor/canvas/menus/actions/standaloneActions";
+import { pasteStyles } from "@/engine/commands/commandOperations";
 import { Button, useToast } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
@@ -159,18 +160,11 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     closeOnEscape: true,
   });
 
-  // Reset clipboard feedback when the menu closes so the next open starts fresh.
+  /* P-10: the shared `duplicate` command — the same one ⌘D and the canvas
+     menu run (it acts on the selection, which is the inspected element, and
+     selects the clone). */
   const handleDuplicate = () => {
-    if (!composer) return;
-    composer.beginTransaction?.("duplicate-element");
-    try {
-      const clone = composer.elements.duplicateElement?.(selectedElementId);
-      if (clone) {
-        composer.selection?.select?.(clone);
-      }
-    } finally {
-      composer.endTransaction?.();
-    }
+    composer?.commands.run("duplicate");
     setIsOpen(false);
   };
 
@@ -185,16 +179,11 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     setIsOpen(false);
   };
 
+  /* P-10: the shared merge (pasteStyles) — was setStyles, which wiped every
+     property the copied element did not carry. */
   const handlePasteStyles = () => {
-    if (!composer?.styleClipboard) return;
-    const el = composer.elements.getElement(selectedElementId);
-    if (!el) return;
-    composer.beginTransaction?.("paste-styles");
-    try {
-      el.setStyles?.(composer.styleClipboard);
-    } finally {
-      composer.endTransaction?.();
-    }
+    const el = composer?.elements.getElement(selectedElementId);
+    if (composer && el) pasteStyles(composer, el);
     setIsOpen(false);
   };
 

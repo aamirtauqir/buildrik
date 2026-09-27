@@ -166,3 +166,32 @@ export function reorderElement(composer: Composer, direction: ReorderDirection):
     direction,
   });
 }
+
+/**
+ * P-10: paste `composer.styleClipboard` onto an element — the ONE paste-style
+ * implementation for the Inspector ⋯, the canvas Style › Paste and ⌥⌘V.
+ *
+ * Merges key by key: a property the copied element did not carry stays on the
+ * target. The ⋯ and canvas menu used `setStyles`, which replaced the whole
+ * style map and wiped those properties, while ⌥⌘V merged — three doors, two
+ * results. One transaction, so one undo takes the paste back. A locked
+ * element is left alone (P-1) and says so through LOCKED_ELEMENTS_SKIPPED.
+ *
+ * Returns how many properties were applied (0 when nothing was).
+ */
+export function pasteStyles(composer: Composer, element: Element): number {
+  const clipboard = composer.styleClipboard;
+  const keys = clipboard ? Object.keys(clipboard) : [];
+  if (!clipboard || keys.length === 0) return 0;
+  if (element.isLocked()) {
+    composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+    return 0;
+  }
+  composer.beginTransaction("paste-styles");
+  try {
+    for (const key of keys) element.setStyle(key, clipboard[key]);
+  } finally {
+    composer.endTransaction();
+  }
+  return keys.length;
+}
