@@ -241,7 +241,14 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
         loaded[prop.id] = el.getAttribute?.("value") || el.getContent?.() || "";
         return;
       }
-      loaded[prop.id] = el.getAttribute?.(prop.id) || "";
+      const raw = el.getAttribute?.(prop.id);
+      /* A boolean attribute is ON when present — HTML writes it empty
+         (`controls=""`) — and off when absent or "false" (P-11b). */
+      if (prop.type === "checkbox") {
+        loaded[prop.id] = raw !== undefined && raw !== null && raw !== "false" ? "true" : "";
+        return;
+      }
+      loaded[prop.id] = raw || "";
     });
     setAttrs(loaded);
   }, [selectedElement, composer, properties]);

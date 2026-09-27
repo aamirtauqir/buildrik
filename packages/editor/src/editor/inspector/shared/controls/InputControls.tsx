@@ -205,7 +205,11 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
     if (!isValidCSSNumber(inputValue) || inputValue === "-") {
       setInputValue(num);
       setIsInvalid(false);
-    } else if (inputValue !== "" && inputValue !== "-") {
+    } else if (inputValue === "") {
+      /* Emptied = clear the property (DD-19). It used to write nothing, so
+         the field showed blank over a value still applied (P-11d). */
+      if (num !== "") onChange("");
+    } else {
       commitValue(inputValue);
     }
   };

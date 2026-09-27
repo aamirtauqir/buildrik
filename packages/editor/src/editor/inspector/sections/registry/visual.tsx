@@ -21,6 +21,7 @@ export const VISUAL_SECTIONS: Record<string, AnySectionEntry> = {
     styleKeys: ["background", "background-color", "background-image", "background-size", "background-position", "background-repeat", "background-attachment", "background-blend-mode"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
+      onBatchChange: ctx.onBatchChange,
       onOpenMediaLibrary: ctx.onOpenMediaLibrary,
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
