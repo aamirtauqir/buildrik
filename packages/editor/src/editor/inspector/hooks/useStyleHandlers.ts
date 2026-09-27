@@ -23,7 +23,7 @@ import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { devLogger } from "../../../shared/utils/devLogger";
 import { computeEffectiveStyles } from "../config/cssContext";
-import { writableElements } from "@/engine/commands/commandOperations";
+import { canWrite, writableElements } from "@/engine/commands/commandOperations";
 
 // ============================================================================
 // TYPES
@@ -190,7 +190,7 @@ export function useStyleHandlers(
       if (!selectedElement?.id) return;
 
       /* P-1: a locked element is read-only; the lock gate refuses and says so. */
-      if (!composer || writableElements(composer, [composer.elements.getElement(selectedElement.id)]).length === 0) return;
+      if (!composer || !canWrite(composer, selectedElement.id)) return;
 
       // 1. Immediate local state update — live preview without waiting for debounce
       setStyles((prev) => {

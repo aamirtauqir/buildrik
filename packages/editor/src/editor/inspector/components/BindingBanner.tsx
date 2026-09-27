@@ -16,7 +16,7 @@ import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
-import { writableElements } from "@/engine/commands/commandOperations";
+import { canWrite } from "@/engine/commands/commandOperations";
 
 export interface BindingBannerProps {
   composer: Composer | null | undefined;
@@ -84,7 +84,7 @@ export const BindingBanner: React.FC<BindingBannerProps> = ({
           className="tw:h-auto tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-normal tw:text-[var(--bk-accent)]"
           onClick={() => {
             /* P-1: unbinding rewrites the element's content — lock gate first. */
-            if (!composer || writableElements(composer, [composer.elements.getElement(elementId)]).length === 0) return;
+            if (!composer || !canWrite(composer, elementId)) return;
             composer.cms?.bindings?.unbindAll?.(elementId, `Unbind ${label}`);
           }}
         >

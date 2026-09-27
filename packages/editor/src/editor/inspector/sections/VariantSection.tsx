@@ -23,7 +23,7 @@ import type { ComponentDefinition } from "../../../shared/types/components";
 import { Button, ConfirmDialog, Menu, MenuItem, MenuSeparator, Popover, useToast } from "@/editor/chrome-ui";
 import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
 import { elementLocation } from "@/editor/canvas/utils/elementInfo";
-import { writableElements } from "@/engine/commands/commandOperations";
+import { canWrite } from "@/engine/commands/commandOperations";
 
 interface VariantSectionProps {
   composer: Composer | null;
@@ -66,7 +66,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
 
   /* P-1: a variant swap, reset or detach rewrites this instance — lock gate
      first (it says so when it refuses). */
-  const writable = () => writableElements(composer, [composer.elements.getElement(instanceId)]).length > 0;
+  const writable = () => canWrite(composer, instanceId);
   const pickVariant = (variantId: string) => {
     setMenuOpen(false);
     if (!writable()) return;

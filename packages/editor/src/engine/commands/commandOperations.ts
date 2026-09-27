@@ -171,11 +171,15 @@ export function reorderElement(composer: Composer, direction: ReorderDirection):
  * P-1: the lock gate every Inspector write passes through (and pasteStyles).
  *
  * Returns the elements a write may change — locked ones dropped, missing ones
- * ignored — and emits LOCKED_ELEMENTS_SKIPPED once when it dropped any, the
- * same signal delete/cut/nudge raise, so the shell says so
- * (useClipboardToasts). A lock covers the element itself, as everywhere else
- * in the editor; the stricter removal rule (locked descendants, instances) is
+ * ignored. A lock covers the element itself, as everywhere else in the
+ * editor; the stricter removal rule (locked descendants, instances) is
  * dropLockedAndInstances above.
+ *
+ * SIDE EFFECT — not a pure filter: when it drops a locked element it emits
+ * LOCKED_ELEMENTS_SKIPPED (once per call), the same signal delete/cut/nudge
+ * raise, and the shell shows the "locked" toast (useClipboardToasts). Call it
+ * only where a write is actually being attempted; to merely ASK whether an
+ * element is locked, read `isLocked()`.
  */
 export function writableElements<T extends Element>(
   composer: Composer,
@@ -186,6 +190,17 @@ export function writableElements<T extends Element>(
   const kept = present.filter((el) => !el.isLocked?.());
   if (kept.length !== present.length) composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   return kept;
+}
+
+/**
+ * P-1: may a write change element `elementId` right now? Resolves the id and
+ * runs it through writableElements, so a LOCKED element also signals the skip
+ * (LOCKED_ELEMENTS_SKIPPED → the "locked" toast) — call it at the moment a
+ * write is attempted, not to decide what to render. A missing element is
+ * `false`, silently.
+ */
+export function canWrite(composer: Composer, elementId: string): boolean {
+  return writableElements(composer, [composer.elements.getElement(elementId)]).length > 0;
 }
 
 /**

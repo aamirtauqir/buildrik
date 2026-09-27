@@ -11,7 +11,7 @@ import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
-import { writableElements } from "@/engine/commands/commandOperations";
+import { canWrite } from "@/engine/commands/commandOperations";
 
 export interface CollectionListSectionProps {
   elementId: string;
@@ -44,7 +44,7 @@ export const CollectionListSection: React.FC<CollectionListSectionProps> = ({ el
   /* One undo step: binding retargets the template's starter placeholders. */
   /* P-1: binding re-renders the list's children, so bind / unbind pass the
      lock gate first (which says so when it refuses). */
-  const writable = () => writableElements(composer, [composer.elements.getElement(elementId)]).length > 0;
+  const writable = () => canWrite(composer, elementId);
   const bind = (collectionId: string, limit: number | undefined) => {
     if (!writable()) return;
     composer.beginTransaction?.("bind-collection-list");

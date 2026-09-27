@@ -24,7 +24,7 @@ import {
 } from "./handlers";
 import { PropertyField } from "./PropertyField";
 import { Button, TextInput } from "@/editor/chrome-ui";
-import { writableElements } from "@/engine/commands/commandOperations";
+import { canWrite, writableElements } from "@/engine/commands/commandOperations";
 const styles = {
   dataAttributesSection: {
     marginTop: 16,
@@ -153,7 +153,7 @@ function IdClassRow({
     if (next.join(" ") === classes) return;
     /* P-1: the lock gate refuses a locked element (and says so); the draft
        goes back to what the element carries. */
-    if (writableElements(composer, [el]).length === 0) return setClassDraft(classes);
+    if (!canWrite(composer, el.getId())) return setClassDraft(classes);
     runTxn(composer, "element-classes-change", () => el.setClasses(next));
   };
   return (

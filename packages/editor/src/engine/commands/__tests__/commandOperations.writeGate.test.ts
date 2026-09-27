@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { writableElements, writeElement, pasteStyles } from "../commandOperations";
+import { canWrite, writableElements, writeElement, pasteStyles } from "../commandOperations";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../Composer";
 import type { Element } from "../../elements/Element";
@@ -126,5 +126,30 @@ describe("pasteStyles", () => {
     expect(pasteStyles(asComposer(c), asEl(el))).toBe(0);
     expect(el.setStyle).not.toHaveBeenCalled();
     expect(skipped(c)).toBe(1);
+  });
+});
+
+describe("canWrite", () => {
+  const withElements = (els: Record<string, ReturnType<typeof makeEl>>) => {
+    const c = makeComposer();
+    return { c, composer: { ...c, elements: { getElement: (id: string) => els[id] ?? null } } as unknown as Composer };
+  };
+
+  it("an unlocked element may be written, silently", () => {
+    const { c, composer } = withElements({ a: makeEl(false) });
+    expect(canWrite(composer, "a")).toBe(true);
+    expect(skipped(c)).toBe(0);
+  });
+
+  it("a locked element may not, and the skip is signalled once", () => {
+    const { c, composer } = withElements({ a: makeEl(true) });
+    expect(canWrite(composer, "a")).toBe(false);
+    expect(skipped(c)).toBe(1);
+  });
+
+  it("a missing element may not, without the locked signal", () => {
+    const { c, composer } = withElements({});
+    expect(canWrite(composer, "nope")).toBe(false);
+    expect(skipped(c)).toBe(0);
   });
 });

@@ -18,7 +18,7 @@ import type { CMSCollection } from "@/shared/types/cms";
 import { EVENTS } from "@/shared/constants";
 import { Button } from "@/editor/chrome-ui";
 import { Section, SelectRow, type SectionTier } from "../shared/controls";
-import { writableElements } from "@/engine/commands/commandOperations";
+import { canWrite } from "@/engine/commands/commandOperations";
 
 export interface ContentSectionProps {
   elementId: string;
@@ -92,7 +92,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({ elementId, compo
 
   /* P-1: binding rewrites the element's content, so every bind / unbind here
      passes the lock gate first (which says so when it refuses). */
-  const writable = () => (composer ? writableElements(composer, [composer.elements.getElement(elementId)]).length > 0 : false);
+  const writable = () => (composer ? canWrite(composer, elementId) : false);
   const bindField = (slug: string) => {
     const f = collection?.fields.find((x) => x.slug === slug);
     if (!composer || !collection || !f || !writable()) return;
