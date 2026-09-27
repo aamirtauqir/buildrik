@@ -178,6 +178,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
           favicon: s.favicon,
           language: s.language,
           socialLinks: {
+            ...current.seo?.socialLinks,
             twitter: s.twitter,
             facebook: s.facebook,
             linkedin: s.linkedin,
