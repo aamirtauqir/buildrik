@@ -88,3 +88,56 @@ describe("SiteSettingsScreen — SA-08 flush preserves social links the screen d
     });
   });
 });
+
+/* T8: the composer's copy of the columns is what `loadProject` merged; when
+   that column read failed, `current.seo.socialLinks` is undefined and a spread
+   of it keeps nothing. The screen's own row read carries every platform. */
+describe("SiteSettingsScreen — flush keeps the Site row's social links when the composer has none", () => {
+  it("merges into the server-loaded row, not the composer's missing copy", async () => {
+    api.siteDetail.settings.get.query.mockResolvedValue({
+      name: "Row Name",
+      favicon: null,
+      defaultLocale: "en",
+      enabledLocales: ["en"],
+      socialLinks: {
+        twitter: "https://x.com/a",
+        facebook: "https://facebook.com/a",
+        linkedin: "https://linkedin.com/in/a",
+        instagram: "https://instagram.com/a",
+        youtube: "https://youtube.com/@a",
+        github: "https://github.com/a",
+      },
+    });
+    const composer = createMockComposer({ projectSettings: { seo: { siteName: "Row Name", language: "en" } } });
+    let flush: (() => void) | null = null;
+    render(
+      <SiteSettingsScreen
+        composer={composer}
+        projectId="s1"
+        registerFlushHandler={(h: (() => void) | null) => {
+          flush = h;
+        }}
+      />,
+      {
+        wrapper: ({ children }: { children: React.ReactNode }) => (
+          <SiteColumnsLockedContext.Provider value={false}>{children}</SiteColumnsLockedContext.Provider>
+        ),
+      },
+    );
+
+    const twitter = (await screen.findByLabelText("Twitter")) as HTMLInputElement;
+    fireEvent.change(twitter, { target: { value: "https://x.com/b" } });
+    await waitFor(() => expect(flush).toBeTypeOf("function"));
+    act(() => flush!());
+
+    const settings = composer.getProjectSettings() as { seo: { socialLinks: Record<string, string> } };
+    expect(settings.seo.socialLinks).toEqual({
+      twitter: "https://x.com/b",
+      facebook: "https://facebook.com/a",
+      linkedin: "https://linkedin.com/in/a",
+      instagram: "https://instagram.com/a",
+      youtube: "https://youtube.com/@a",
+      github: "https://github.com/a",
+    });
+  });
+});
