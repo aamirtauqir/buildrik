@@ -1,16 +1,13 @@
 /**
- * InspectorTabContent smoke tests — per-element-type section rendering.
- *
- * Verifies the profile-driven renderer actually reshapes per selection by
- * asserting that different element types produce different section orders
- * in the same tab. Each test mounts InspectorTabContent with a minimal
- * composer stub and a fixture element, then queries the rendered section
- * headers by title.
+ * InspectorTabContent — Inspector v4: one order per tab, presence by the
+ * type's capabilities (intersection for a multi-selection), and each
+ * section's display mode (open / summary / "+" row, DD-11) drawn by the
+ * frame the renderer hands the section.
  *
  * @license BSD-3-Clause
  */
 
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { InspectorTabContent } from "../InspectorTabContent";
 import type { UseAdvancedSettingsReturn } from "../../hooks/useAdvancedSettings";
@@ -91,196 +88,117 @@ const NO_OP_ADVANCED: UseAdvancedSettingsReturn = {
 };
 
 function renderTab(opts: {
-  tabId: "style" | "element" | "effects";
+  tabId: "style" | "behaviour" | "effects";
   elementType: string;
   cssContext?: Partial<CssContext>;
-  expanded?: Set<string>;
+  authored?: Record<string, string>;
+  choices?: Record<string, "open" | "closed">;
+  selectedTypes?: string[];
+  onSetChoices?: ReturnType<typeof vi.fn>;
 }) {
   const composer = makeComposer();
-  const cssContext = makeCssContext({
-    ...opts.cssContext,
-    elementType: opts.elementType,
-    inspectorContext: {
-      ...makeCssContext().inspectorContext,
-      ...opts.cssContext?.inspectorContext,
-      elementType: opts.elementType,
-    },
-  });
+  const cssContext = makeCssContext({ ...opts.cssContext, elementType: opts.elementType });
   return render(
     <InspectorTabContent
       tabId={opts.tabId}
       composer={composer as never}
       selectedElement={{ id: "el-1", type: opts.elementType }}
+      selectedIds={["el-1"]}
+      selectedTypes={opts.selectedTypes ?? [opts.elementType]}
       styles={{}}
+      authoredStyles={opts.authored ?? {}}
       onChange={vi.fn()}
       onBatchChange={vi.fn()}
       cssContext={cssContext}
       propertyStates={{}}
-      expandedSections={opts.expanded ?? new Set()}
-      onToggleSection={vi.fn()}
+      choices={opts.choices ?? {}}
+      onSetChoices={(opts.onSetChoices ?? vi.fn()) as never}
       advancedState={NO_OP_ADVANCED}
-      tier="pro"
-      showAll={false}
-      onShowAllChange={vi.fn()}
     />
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Smoke tests
-// ─────────────────────────────────────────────────────────────────────────────
+const sectionNames = () =>
+  screen.getAllByRole("button", { name: / section, (expanded|collapsed)$/ }).map((b) => b.getAttribute("aria-label")!.replace(/ section, .*/, ""));
 
-describe("InspectorTabContent — per-element-type reshaping", () => {
-  it("text element shows Typography before Size", () => {
-    renderTab({
-      tabId: "style",
-      elementType: "text",
-      cssContext: {
-        inspectorContext: {
-          elementType: "text",
-          display: "",
-          isTextLike: true,
-          isContainer: false,
-          isMedia: false,
-          isFlexContainer: false,
-          isGridContainer: false,
-        } as unknown as CssContext["inspectorContext"],
-      },
-    });
-    const text = screen.getByRole("button", { name: /Typography section/i });
-    const size = screen.getByRole("button", { name: /Size section/i });
-    // Typography appears before Size in DOM order — board 807:8342.
-    expect(
-      text.compareDocumentPosition(size) & Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
+describe("InspectorTabContent — one order per tab, presence by capability", () => {
+  it("heading · Style: the type block leads, then Typography, Size, Spacing, Fill, Border (board 1)", () => {
+    renderTab({ tabId: "style", elementType: "heading" });
+    expect(sectionNames()).toEqual(["Heading", "Typography", "Size", "Spacing", "Fill", "Border"]);
   });
 
-  it("image element's style tab shows Size as the first section", () => {
-    renderTab({
-      tabId: "style",
-      elementType: "image",
-      cssContext: {
-        isMedia: true,
-        inspectorContext: {
-          elementType: "image",
-          display: "",
-          isTextLike: false,
-          isContainer: false,
-          isMedia: true,
-          isFlexContainer: false,
-          isGridContainer: false,
-        } as unknown as CssContext["inspectorContext"],
-      },
-    });
-    // Image profile doesn't include Typography (it's not text-like).
-    expect(
-      screen.queryByRole("button", { name: /Typography section/i })
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Size section/i })).toBeInTheDocument();
+  it("image · Style: no Typography, no Text inside", () => {
+    renderTab({ tabId: "style", elementType: "image" });
+    expect(sectionNames()).toEqual(["Image", "Size", "Spacing", "Fill", "Border"]);
   });
 
-  it("flex container's style tab includes Flexbox before Size", () => {
-    renderTab({
-      tabId: "style",
-      elementType: "flex",
-      cssContext: {
-        display: "flex",
-        isFlexContainer: true,
-        inspectorContext: {
-          elementType: "flex",
-          display: "flex",
-          isTextLike: false,
-          isContainer: true,
-          isMedia: false,
-          isFlexContainer: true,
-          isGridContainer: false,
-        } as unknown as CssContext["inspectorContext"],
-      },
-    });
-    const flexbox = screen.getByRole("button", { name: /Flexbox section/i });
-    const size = screen.getByRole("button", { name: /Size section/i });
-    expect(
-      flexbox.compareDocumentPosition(size) & Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
+  it("a container set to flex gets the interim Flexbox section after Layout", () => {
+    renderTab({ tabId: "style", elementType: "container", cssContext: { display: "flex", isFlexContainer: true } });
+    expect(sectionNames().slice(0, 2)).toEqual(["Layout", "Flexbox"]);
   });
 
-  it("container without flex/grid does not render Flexbox section", () => {
-    renderTab({
-      tabId: "style",
-      elementType: "container",
-      cssContext: {
-        display: "block",
-        isFlexContainer: false,
-        isFlexItem: false,
-      },
-    });
-    // Flex is in the container profile's order but shouldRender filters it out.
-    expect(
-      screen.queryByRole("button", { name: /Flexbox section/i })
-    ).not.toBeInTheDocument();
-  });
-
-  it("container's Effects tab shows Opacity · Shadow · Blur · Interactions (animation folded in, G2-157); Visibility lives on Settings", () => {
-    /* Board 4428:142686 (Effects) draws OPACITY · SHADOW · BLUR ·
-       INTERACTIONS; board 4428:141642 (Settings) opens with VISIBILITY. */
+  it("Behaviour carries Interactions (Q1) and Visibility; Effects carries neither", () => {
     const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
-    expect(screen.getByRole("button", { name: /Opacity section/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Animation section/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Interactions section/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Visibility section/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Layout section/i })).not.toBeInTheDocument();
+    expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform & motion", "Advanced"]);
     unmount();
-    renderTab({ tabId: "element", elementType: "container" });
-    expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Opacity section/i })).not.toBeInTheDocument();
+    renderTab({ tabId: "behaviour", elementType: "container" });
+    expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions", "CSS classes", "Attributes"]);
   });
 
-  it("button shows Link (linkable)", () => {
-    renderTab({ tabId: "element", elementType: "button" });
-    expect(
-      screen.getByRole("button", { name: /Link section/i })
-    ).toBeInTheDocument();
+  it("an image shows no Link; a heading shows CMS binding, no Link", () => {
+    const { unmount } = renderTab({ tabId: "behaviour", elementType: "image" });
+    expect(sectionNames()).not.toContain("Link");
+    unmount();
+    renderTab({ tabId: "behaviour", elementType: "heading" });
+    expect(sectionNames()).toEqual(["CMS binding", "Visibility", "Interactions", "CSS classes", "Attributes"]);
   });
 
-  /* Board 4428:141642 draws LINK on a Section; export wraps a linked
-     container in a box-less <a> (ExportEngine.blockLink.test). */
-  it("container shows Link, between Visibility and Content", () => {
-    renderTab({ tabId: "element", elementType: "container" });
-    const names = screen
-      .getAllByRole("button", { name: /(Visibility|Link|Content) section/i })
-      .map((b) => b.getAttribute("aria-label") ?? b.textContent ?? "");
-    const at = (re: RegExp) => names.findIndex((n) => re.test(n));
-    expect(at(/Link/i)).toBeGreaterThan(at(/Visibility/i));
-    expect(at(/Content/i)).toBeGreaterThan(at(/Link/i));
+  it("a multi-selection shows only the sections every selected type has (DD-12)", () => {
+    renderTab({ tabId: "style", elementType: "heading", selectedTypes: ["heading", "image"] });
+    /* No shared type block, no Typography (the image has none). */
+    expect(sectionNames()).toEqual(["Size", "Spacing", "Fill", "Border"]);
   });
 
-  it("an image still does NOT show Link", () => {
-    renderTab({ tabId: "element", elementType: "image" });
-    expect(screen.queryByRole("button", { name: /Link section/i })).not.toBeInTheDocument();
+  it("an unknown stored type falls back to the container set without crashing", () => {
+    renderTab({ tabId: "style", elementType: "nonexistent-widget-xyz" });
+    expect(sectionNames()[0]).toBe("Layout");
+  });
+});
+
+describe("InspectorTabContent — display modes (DD-11)", () => {
+  it("Fill and Border arrive as '+' rows when the element carries no value", () => {
+    renderTab({ tabId: "style", elementType: "heading" });
+    expect(screen.getByTestId("inspector-add-fill")).toBeInTheDocument();
+    expect(screen.getByTestId("inspector-add-border")).toBeInTheDocument();
   });
 
-  /* G2-160: the dev-flag "All CSS" section is gone. */
-  it("renders no All CSS section", () => {
-    renderTab({ tabId: "element", elementType: "container" });
-    expect(screen.queryByRole("button", { name: /All CSS section/i })).not.toBeInTheDocument();
+  it("a valued section arrives open", () => {
+    renderTab({ tabId: "style", elementType: "heading", authored: { "background-color": "#ff0000" } });
+    expect(screen.queryByTestId("inspector-add-fill")).toBeNull();
+    expect(screen.getByRole("button", { name: "Fill section, expanded" })).toBeInTheDocument();
   });
 
-  it("css-classes is universal — every element type has it", () => {
-    for (const type of ["container", "text", "image", "button", "input"]) {
-      const { unmount } = renderTab({ tabId: "element", elementType: type });
-      expect(
-        screen.getByRole("button", { name: /^CSS classes section/i }),
-        `css-classes missing for ${type}`
-      ).toBeInTheDocument();
-      unmount();
-    }
+  it("the '+' records an open choice for this element type", () => {
+    const onSetChoices = vi.fn();
+    renderTab({ tabId: "style", elementType: "heading", onSetChoices });
+    fireEvent.click(screen.getByTestId("inspector-add-border"));
+    expect(onSetChoices).toHaveBeenCalledWith("heading", ["border"], "open");
   });
 
-  it("unknown element types fall back to container profile without crashing", () => {
-    expect(() => {
-      renderTab({ tabId: "style", elementType: "nonexistent-widget-xyz" });
-    }).not.toThrow();
-    // Container profile leads with Layout (board 32:2).
-    expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
+  it("Attributes and Effects › Advanced arrive closed with their one-line summary", () => {
+    renderTab({ tabId: "effects", elementType: "heading" });
+    expect(screen.getByTestId("inspector-summary-effects-advanced")).toHaveTextContent("Cursor: auto · Blend: normal");
+  });
+
+  it("a user's close wins over 'always'", () => {
+    renderTab({ tabId: "style", elementType: "heading", choices: { "heading:typography": "closed" } });
+    expect(screen.getByRole("button", { name: "Typography section, collapsed" })).toBeInTheDocument();
+  });
+
+  it("⌥-click on a header sets every section on the tab (DD-22)", () => {
+    const onSetChoices = vi.fn();
+    renderTab({ tabId: "style", elementType: "heading", onSetChoices });
+    fireEvent.click(screen.getByRole("button", { name: "Size section, expanded" }), { altKey: true });
+    expect(onSetChoices).toHaveBeenCalledWith("heading", ["type", "typography", "size", "spacing", "fill", "border"], "closed");
   });
 });

@@ -108,9 +108,9 @@ describe("auto-expand against the registry the inspector actually uses", () => {
     expect(render({ "overflow-x": "scroll" }, real).result.current.isExpanded("layout")).toBe(true);
   });
 
-  it("opens Background for background-blend-mode", () => {
+  it("opens Fill for background-blend-mode", () => {
     const { result } = render({ "background-blend-mode": "multiply" }, real);
-    expect(result.current.isExpanded("background")).toBe(true);
+    expect(result.current.isExpanded("fill")).toBe(true);
   });
 
   it("opens Size for min-width and Border for outline-width", () => {

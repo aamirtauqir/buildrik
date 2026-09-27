@@ -179,101 +179,29 @@
   padding: 0;
 }
 
-/* ── Section ──────────────────────────────────────────── */
+/* ── Section (Inspector v4, board 1) ─────────────────────
+   Header geometry, chevron-left and the 12px medium title are tw: utilities
+   in Section.tsx; this block only draws what a utility cannot: the rule
+   between sections. An open or summarised section starts with a hairline;
+   an empty "+" row does not (board 1: "Fill  +" / "Border  +"). */
 .bdi-sec {
-  border-bottom: 1px solid var(--bk-border);
+  border-top: 1px solid var(--bk-border);
 }
-.bdi-sec:last-child {
-  border-bottom: none;
-}
-.bdi-sec-h {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  /* PINNED, not derived from padding. Every profile board draws a shut
-     section's header row 28 tall (2069:20308..20317) and an open one's 20
-     (2069:20295, :20305), whatever the row contains — BACKGROUND measured 30
-     because its `+` action is 18px and the padding grew around it. */
-  height: var(--bk-size-row-dense);
-  padding: 0 var(--bk-space-16);
-  cursor: pointer;
-  user-select: none;
-  position: relative;
-  background: transparent;
-  border: none;
-  text-align: left;
-  /* The board declares ink-muted on the ROW and lets the label and chevron
-     inherit it; both were already muted here, but the row itself sat on the
-     panel's --bk-ink, so anything added to it would have arrived dark. */
-  color: var(--bk-ink-muted);
-}
-/* An OPEN section's header is tighter than a closed one's, on every profile
-   board: 807:8342's TYPOGRAPHY row is 20 tall (the 16px line plus 4 below it)
-   where its shut BACKGROUND / BORDER / EFFECTS rows are 28. The title belongs
-   to the rows under it once they are showing, and the 28 that shipped for both
-   put 8px of nothing between a heading and the field it heads. */
-.bdi-sec:not(.closed) > .bdi-sec-h {
-  height: 20px;
+.bdi-sec.empty {
+  border-top: none;
 }
 .bdi-sec-h:hover {
-  background: rgba(15, 23, 42, 0.02);
+  background: var(--bk-alpha-ink-06);
 }
-/* Figma 32-2: chevron sits at the RIGHT edge, muted. */
-.bdi-sec-h .bdi-chev {
-  display: inline-flex;
-  color: var(--bk-ink-muted);
-  transition: transform 120ms;
-  flex-shrink: 0;
-}
-.bdi-sec.closed .bdi-chev {
-  transform: rotate(-90deg);
-}
-/* Figma 32-2: uppercase, letter-spaced, muted section label (LAYOUT / SPACING …). */
-.bdi-sec-h .bdi-sec-name {
-  flex: 1;
-  font: 600 var(--bk-text-11)/16px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-  text-transform: uppercase;
-  /* 0.88px at 11px, which is what every profile board's section label carries
-     (`tracking-[0.88px]`). 0.06em resolved to 0.66. */
-  letter-spacing: 0.08em;
-}
-/* Collapsed-section value readout ("16px · solid", "fade-in 300ms").
-   `.bdi-sec-name` has taken `flex: 1` since it shipped and this never had a
-   rule at all, so the preview rendered at the panel's default 13px ink and sat
-   flush against the chevron. Every Section in the inspector draws it — 34 call
-   sites — which is why one missing rule was visible everywhere and traceable
-   nowhere. Muted, mono, and truncating, because it is a value not a label. */
-/* Empty ON PURPOSE — Section.tsx:102 styles this in `tw:` classes. */
-.bdi-sec-h .bdi-sec-preview {
-}
-
-.bdi-sec-h .bdi-ind {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink-soft);
-  background: var(--bk-bg-subtle);
-  padding: 1px 5px;
-  border-radius: 3px;
-  letter-spacing: -0.01em;
-}
-.bdi-sec-h .bdi-ind.link,
-.bdi-sec-h .bdi-ind.accent {
-  color: var(--bk-accent);
-  background: var(--bk-accent-tint);
-}
-.bdi-sec-h .bdi-ind.mixed {
-  color: var(--bk-warning);
-  background: rgba(217, 119, 6, 0.12);
-}
+/* An open section's own header action (Fill's add-layer "+"). */
 .bdi-sec-h .bdi-plus {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--bk-ink-muted);
-  border-radius: 3px;
+  border-radius: var(--bk-radius-sm);
   background: transparent;
   border: none;
   cursor: pointer;

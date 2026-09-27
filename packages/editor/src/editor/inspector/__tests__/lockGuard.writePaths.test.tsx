@@ -25,8 +25,9 @@ import {
   removeEngineBrowserStubs,
 } from "@/engine/__tests__/test-utils/realComposer";
 import { ToastProvider } from "@/editor/chrome-ui";
-import { ElementPropertiesSection } from "../sections/elementProperties";
-import { DataAttributeEditor } from "../sections/elementProperties/DataAttributeEditor";
+import { TypeBlockSection } from "../sections/typeBlock/TypeBlockSection";
+import { AttributesSection } from "../sections/attributes/AttributesSection";
+import { DataAttributeEditor } from "../sections/attributes/DataAttributeEditor";
 import { FormFieldsSection } from "../sections/FormFieldsSection";
 import { SliderPlaybackSection } from "../sections/SliderPlaybackSection";
 import { SlidesSection } from "../sections/SlidesSection";
@@ -62,23 +63,23 @@ function add(type: string, props: Record<string, unknown> = {}, parentId = rootI
 const lock = (el: Element) => el.setLocked(true);
 
 describe("P-1 — attribute writers refuse a locked element", () => {
-  it("ElementPropertiesSection: editing an attribute", () => {
+  it("Type block: editing a defining attribute", () => {
     const img = add("image", { attributes: { alt: "cat" } });
     lock(img);
-    render(<ElementPropertiesSection selectedElement={{ id: img.getId(), type: "image" }} composer={composer} isOpen />);
-    fireEvent.change(screen.getByPlaceholderText("Image description"), { target: { value: "a dog" } });
+    render(
+      <TypeBlockSection element={{ id: img.getId(), type: "image" }} targetIds={[img.getId()]} composer={composer} styles={{}} onChange={() => {}} onBatchChange={() => {}} isOpen onToggle={() => {}} />
+    );
+    fireEvent.change(screen.getByPlaceholderText("Describe the image"), { target: { value: "a dog" } });
     expect(img.getAttribute("alt")).toBe("cat");
     expect(skipped).toHaveBeenCalled();
   });
 
-  it("ElementPropertiesSection: committing ID & class", () => {
+  it("Attributes: editing the element ID", () => {
     const img = add("image");
     lock(img);
-    render(<ElementPropertiesSection selectedElement={{ id: img.getId(), type: "image" }} composer={composer} isOpen />);
-    const classes = screen.getByRole("textbox", { name: "Element classes" });
-    fireEvent.change(classes, { target: { value: "hero" } });
-    fireEvent.blur(classes);
-    expect(img.getClasses()).not.toContain("hero");
+    render(<AttributesSection element={{ id: img.getId(), type: "image" }} targetIds={[img.getId()]} composer={composer} isOpen onToggle={() => {}} />);
+    fireEvent.change(screen.getByPlaceholderText("element-id"), { target: { value: "hero" } });
+    expect(img.getAttribute("id")).toBeFalsy();
     expect(skipped).toHaveBeenCalled();
   });
 

@@ -44,13 +44,29 @@ const sectionCoverage: Record<string, SectionCoverage> = {
       "../typography/FontControls.tsx",
     ],
   },
-  background: { files: ["../BackgroundSection.tsx"] },
+  "text-inside": {
+    files: [
+      "../typography/index.tsx",
+      "../typography/TypographyControls.tsx",
+      "../typography/FontControls.tsx",
+    ],
+  },
+  type: {
+    files: [
+      "../typeBlock/bodies/layoutBodies.tsx",
+      "../flexbox/AlignmentSection.tsx",
+      "../flexbox/DirectionControls.tsx",
+      "../flexbox/GapControls.tsx",
+    ],
+  },
+  fill: { files: ["../BackgroundSection.tsx"] },
   border: {
     files: ["../BorderSection.tsx"],
     // Template-literal read: `border-${side}` for side in top/right/bottom/left.
     dynamicKeys: ["border-top", "border-right", "border-bottom", "border-left"],
   },
-  effects: { files: ["../EffectsSection.tsx"] },
+  "transform-motion": { files: ["../EffectsSection.tsx"] },
+  "effects-advanced": { files: ["../EffectsSection.tsx"] },
 };
 
 function readKeys(file: string): Set<string> {

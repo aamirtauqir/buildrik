@@ -1,0 +1,26 @@
+/**
+ * EditTextRow — the type block's "Edit text on canvas" asks the canvas to
+ * start its inline edit (G2-027); the text itself is never a textarea here.
+ *
+ * @license BSD-3-Clause
+ */
+import * as React from "react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import type { Composer } from "@/engine/Composer";
+import { EVENTS } from "@/shared/constants/events";
+import { EditTextRow } from "../EditTextRow";
+
+describe("EditTextRow", () => {
+  it("asks the canvas for the inline edit of this element", () => {
+    const composer = { emit: vi.fn() } as unknown as Composer;
+    render(<EditTextRow composer={composer} elementId="h1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit text on canvas" }));
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId: "h1" });
+  });
+
+  it("renders nothing without a composer", () => {
+    const { container } = render(<EditTextRow composer={null} elementId="h1" />);
+    expect(container.textContent).toBe("");
+  });
+});

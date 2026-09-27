@@ -8,9 +8,8 @@
  *   PROPERTIES band. No selection, no rows (registration lifetime, the same
  *   guard the Pages panel's rows use).
  * - the reveal: UI_INSPECTOR_FOCUS_SECTION `{ section, property? }` switches
- *   to the section's tab, reveals it (Beginner "Show all" when it is
- *   advanced, its More-settings block when the property lives there),
- *   expands it, scrolls the row into view, focuses its first control and
+ *   to the section's tab, opens it (and its More-settings block when the
+ *   property lives there), scrolls the row into view, focuses its first control and
  *   tints it for a second. The canvas menu's "Add interaction" door uses the
  *   same event without a property.
  *
@@ -21,7 +20,6 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { SECTION_REGISTRY, type SectionId, type TabId } from "../sections/registry";
 import { buildPropertyIndex } from "../config/propertyIndex";
-import { getProfileFor, isAdvancedIn } from "../config/elementProfiles";
 import type { UseAdvancedSettingsReturn } from "./useAdvancedSettings";
 
 export const PROPERTY_COMMAND_GROUP = "Properties";
@@ -72,10 +70,8 @@ export interface UsePropertyJumpOptions {
   selectedType: string | null;
   contentRef: React.RefObject<HTMLDivElement | null>;
   setActiveTab: (tab: TabId) => void;
-  tier: string;
-  setShowAll: (v: boolean) => void;
-  expandedSections: Set<string>;
-  toggleSection: (elementType: string, sectionId: SectionId) => void;
+  /** Open one section for this element type (records the user's choice). */
+  openSection: (elementType: string, sectionId: SectionId) => void;
   advancedState: Pick<UseAdvancedSettingsReturn, "expand">;
 }
 
@@ -109,16 +105,14 @@ export function usePropertyJump(o: UsePropertyJumpOptions): void {
       const entry = SECTION_REGISTRY[section];
       if (!entry) return;
       latest.current.setActiveTab(entry.tab);
-      /* Next frame: the tab switch has reset Show all (a tab change does).
-         The type is read then, not from this closure: a door that selects and
-         asks in one gesture reached a listener holding the previous
-         selection's type (M-6). */
+      /* Next frame: the type is read then, not from this closure: a door
+         that selects and asks in one gesture reached a listener holding the
+         previous selection's type (M-6). */
       requestAnimationFrame(() => {
         const s = latest.current;
         const type = s.selectedType;
         if (!type) return;
-        if (s.tier === "beginner" && isAdvancedIn(getProfileFor(type), section, entry.tier)) s.setShowAll(true);
-        if (!s.expandedSections.has(`${type}:${section}`)) s.toggleSection(type, section);
+        s.openSection(type, section);
         if (property && entry.advancedKey && entry.advancedProps?.includes(property)) s.advancedState.expand(entry.advancedKey);
         /* Two frames: the expanded body needs a render and a layout. */
         requestAnimationFrame(() => requestAnimationFrame(() => revealRow(latest.current.contentRef.current, section, property)));

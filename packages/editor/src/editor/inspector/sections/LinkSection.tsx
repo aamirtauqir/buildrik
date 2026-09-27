@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { LINKABLE_TYPES } from "@/shared/constants/elementCapabilities";
 import type { Composer, Element } from "@/engine";
 import { EVENTS } from "../../../shared/constants";
 import type { PageData } from "../../../shared/types";
@@ -59,16 +60,6 @@ const TARGET_OPTIONS = [
   { value: "_blank", label: "New Tab" },
 ];
 
-/**
- * Element types the Link section edits. Containers joined 2026-09-24 (board
- * 4428:141642 draws LINK on a Section): export wraps a linked container in a
- * box-less <a> and drops the link when the container holds its own
- * interactive content (ExportHelpers.blockLinkPlan).
- */
-export const LINKABLE_TYPES: ReadonlySet<string> = new Set([
-  "link", "button", "a", "cta",
-  "container", "section", "card",
-]);
 
 export const LinkSection: React.FC<LinkSectionProps> = ({
   selectedElement,

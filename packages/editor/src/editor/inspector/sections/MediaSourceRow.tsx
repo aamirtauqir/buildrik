@@ -25,7 +25,7 @@ import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine/Composer";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { displayNameFor } from "../../sidebar/tabs/media/data/mediaUtils";
-import { handleGenericAttributeChange, handleVideoSrcChange, runTxn } from "./elementProperties/handlers";
+import { handleGenericAttributeChange, handleVideoSrcChange, runTxn } from "./typeBlock/attributeWriter";
 import { writableElements } from "@/engine/commands/commandOperations";
 
 const KINDS: Record<string, { label: string; door: string; picker: MediaAssetType | null }> = {

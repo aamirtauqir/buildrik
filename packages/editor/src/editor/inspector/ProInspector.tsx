@@ -30,15 +30,12 @@ import { InspectorLoading } from "./components/InspectorLoading";
 import { BreakpointOverrides } from "./components/BreakpointOverrides";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
-import { useInspectorState, useStyleHandlers, useInspectorSections, useInspectorTier } from "./hooks";
+import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
 import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { usePropertyJump } from "./hooks/usePropertyJump";
-import { VariantSection } from "./sections/VariantSection";
-import { MediaSourceRow } from "./sections/MediaSourceRow";
-import { TextContentRow } from "./sections/TextContentRow";
 import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY } from "./sections/registry";
-import { deriveCssContext, getPropertyStates } from "./config/cssContext";
+import { computeEffectiveStyles, deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
 import { detectMixedValues } from "./shared/detectMixedValues";
 import type { Element } from "../../engine";
@@ -46,18 +43,13 @@ import { InspectorTabContent } from "./tabs/InspectorTabContent";
 import "./styles/inspector.css";
 import { Button, Tabs } from "@/editor/chrome-ui";
 
-/** Footer switch, board 4428:141170 / 141406 — the two tiers by name. */
-/** Equal-width underline tabs (board 4428:141170), merged over chrome-ui's
- *  pill tab via twMerge. */
+/** Three equal 100px tabs, 32 tall, the active one accent with a 2px
+ *  underline (board 1), merged over chrome-ui's pill tab via twMerge. */
 const INSPECTOR_TAB_CLASS =
-  "tw:flex-1 tw:h-9 tw:px-0 tw:rounded-none tw:text-[12px] tw:font-medium tw:bg-transparent " +
+  "tw:flex-1 tw:h-8 tw:px-0 tw:rounded-none tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:bg-transparent " +
   "tw:border-b-2 tw:border-transparent tw:hover:bg-transparent " +
+  "tw:aria-selected:font-medium tw:aria-selected:text-[var(--bk-accent-text)] " +
   "tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent tw:aria-selected:border-[var(--bk-accent)]";
-
-const TIER_TABS = [
-  { id: "beginner", label: "Beginner" },
-  { id: "pro", label: "Pro" },
-] as const;
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -180,21 +172,16 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [selectedElement?.id, composer, styles_state, currentBreakpoint]
   );
 
-  const { expandedSections, toggleSection, expandAll, collapseAll } = useInspectorSections({
-    selectedElement,
-    composer,
-    styles: styles_state,
-  });
+  const { choices, setChoices } = useInspectorSections();
 
-  /* Boards 4428:141170 / 141642 / 142686 — the strip. The tab survives a
-     selection change (the board's SET_VARIABLE is file-wide); Beginner's
-     "Show all" does not, it is a look, not a setting. */
+  /* The strip. A new element of the SAME type keeps the tab; a different
+     type starts on Style (DD-20) — its Behaviour tab holds other things. */
   const [activeTab, setActiveTab] = React.useState<TabId>("style");
-  const [tier, setTier] = useInspectorTier();
-  const [showAll, setShowAll] = React.useState(false);
+  const prevTypeRef = React.useRef(selectedElement?.type);
   React.useEffect(() => {
-    setShowAll(false);
-  }, [selectedElement?.id, activeTab]);
+    if (selectedElement?.type && selectedElement.type !== prevTypeRef.current) setActiveTab("style");
+    prevTypeRef.current = selectedElement?.type ?? prevTypeRef.current;
+  }, [selectedElement?.type]);
 
   const advancedPropsMap = React.useMemo(() => buildAdvancedPropsMapFromRegistry(), []);
   const advancedState = useAdvancedSettings({
@@ -239,6 +226,27 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       .map((id) => composer.elements.getElement(id))
       .filter((el): el is Element => !!el);
   }, [composer, selectedIds]);
+
+  /* The whole selection, primary first — a write lands on every one (DD-12). */
+  const targetIds = React.useMemo<readonly string[]>(() => {
+    const primary = selectedElement?.id;
+    if (!primary) return [];
+    return [primary, ...selectedIds.filter((id) => id !== primary)];
+  }, [selectedElement?.id, selectedIds]);
+  const selectedTypes = React.useMemo(
+    () => selectedElements.map((el) => el.getType?.() ?? "custom"),
+    [selectedElements]
+  );
+
+  /* The element's OWN values here — what "has a value" means for the "+"
+     rows (DD-11); `styles_state` also carries type defaults and computed
+     fallbacks, which would open Fill on every element. Re-read whenever the
+     panel's styles change. */
+  const authoredStyles = React.useMemo<Record<string, string>>(() => {
+    const el = selectedElement?.id ? composer?.elements?.getElement?.(selectedElement.id) : null;
+    return el && composer ? computeEffectiveStyles(el, composer, currentBreakpoint, currentPseudoState) : {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedElement?.id, composer, currentBreakpoint, currentPseudoState, styles_state]);
 
   const allStyleKeys = React.useMemo<readonly string[]>(() => {
     return Array.from(
@@ -320,10 +328,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     selectedType,
     contentRef,
     setActiveTab,
-    tier,
-    setShowAll,
-    expandedSections,
-    toggleSection,
+    openSection: (type, section) => setChoices(type, [section], "open"),
     advancedState,
   });
 
@@ -422,8 +427,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               }}
               onSelectParent={() => composer?.selection.selectParent()}
               onHideInspector={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
-              onExpandAll={expandAll}
-              onCollapseAll={collapseAll}
               /* v3 FC-3 (board 7048:77991): same seam as the header's ✦ chip
                  — one AI thread, three doors (chip, ⋯ row, canvas context menu). */
               onAIRequest={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
@@ -504,9 +507,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           elementId={selectedElement.id}
           elementLabel={elementLabel}
         />
-        {/* Board 160:2 — an instance says so above its styles, not in a
-            collapsed section under Animation. */}
-        <VariantSection composer={composer ?? null} elementId={selectedElement.id ?? null} />
         {/* Board 160:313 — a picked state is a different layer, and every write
             from here lands on it rather than on Base. The dropdown alone said
             which state was picked, not that the panel below it had changed
@@ -600,59 +600,29 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         aria-label="Element properties"
       >
         <div className="bdi-body">
-          {/* Clone 3721:45178 / 3724:43815 / 3724:44339 — a media element's
-              source is the first thing in its inspector, above SIZE. */}
-          {activeTab === "style" && (
-            <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
-          )}
-          {activeTab === "style" && <TextContentRow composer={composer} selectedElement={selectedElement} />}
           <InspectorErrorBoundary>
             <InspectorTabContent
               tabId={activeTab}
               composer={composer}
               selectedElement={selectedElement}
+              selectedIds={targetIds}
+              selectedTypes={selectedTypes}
               styles={styles_state}
+              authoredStyles={authoredStyles}
               onChange={handleStyleChange}
               onBatchChange={handleBatchStyleChange}
               cssContext={enrichedContext}
               propertyStates={propertyStates}
-              expandedSections={expandedSections}
-              onToggleSection={toggleSection}
+              choices={choices}
+              onSetChoices={setChoices}
               advancedState={advancedState}
               onOpenMediaLibrary={onOpenMediaLibrary}
               onOpenIconPicker={onOpenIconPicker}
               onOpenCreateCollection={onOpenCreateCollection}
-              /* Boards 4428:141642 / 142686: Settings and Effects draw every
-                 group (ADVANCED collapsed) — the Beginner fold and its footer
-                 belong to Style (4428:141170). */
-              tier={activeTab === "style" ? tier : "pro"}
-              showAll={showAll}
-              onShowAllChange={setShowAll}
             />
           </InspectorErrorBoundary>
         </div>
       </div>
-      )}
-      {/* Board 4428:141170's footer — Beginner / Pro, remembered per user
-          (decision #29). Below the scroll so it is reachable on every
-          profile, however long the column above it runs. */}
-      {!wholeSite && !agentRun.running && activeTab === "style" && (
-        <footer
-          /* Board 4428:141170: a 44-tall footer with the Beginner / Pro
-             segmented control at its left edge. */
-          className="tw:flex tw:items-center tw:h-[var(--bk-size-panel-footer)] tw:shrink-0 tw:border-t tw:border-[var(--bk-border)] tw:px-4"
-          data-testid="inspector-footer"
-        >
-          <Tabs
-            tabs={TIER_TABS}
-            value={tier}
-            onChange={(id) => setTier(id === "pro" ? "pro" : "beginner")}
-            label="Inspector tier"
-            data-testid="inspector-tier-toggle"
-            className="tw:p-0.5 tw:gap-0 tw:rounded-md tw:bg-[var(--bk-gray-100)]"
-            tabClassName="tw:h-6 tw:px-3 tw:text-[12px] tw:rounded tw:aria-selected:bg-[var(--bk-bg-card)] tw:aria-selected:text-[var(--bk-ink)] tw:aria-selected:hover:bg-[var(--bk-bg-card)]"
-          />
-        </footer>
       )}
     </div>
   );

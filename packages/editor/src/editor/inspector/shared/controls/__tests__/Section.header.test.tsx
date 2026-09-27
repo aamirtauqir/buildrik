@@ -34,11 +34,11 @@ describe("Section header", () => {
     expect(toggle.getAttribute("tabindex")).toBe("0");
   });
 
-  it("keeps the action button OUT of the toggle", () => {
+  it("keeps the action button OUT of the toggle (an open section's action)", () => {
     render(
       <Section
         title="Background"
-        isOpen={false}
+        isOpen
         action={<button type="button" className="bdi-plus" aria-label="Add background" />}
       >
         <div>content</div>

@@ -1,0 +1,22 @@
+{
+  "surface": "inspector-v4-21",
+  "board": "Inspector v4 · 21 · Nothing selected — Page panel (Figma 7995:204447)",
+  "url": "http://localhost:3110/edit/<site>",
+  "skeleton": "W1 skeleton (build plan 2026-09-28 §3). The board state is driven by `node scripts/conformance/inspector-v4-state.mjs 21` — run it with `load-inspector-v4-site.mjs --site <id> --no-load --board 21`. W4 adds the spec join and the targets.",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "inspector-empty"
+    }
+  ],
+  "targets": [
+    {
+      "name": "page-panel",
+      "testId": "inspector-empty"
+    }
+  ]
+}

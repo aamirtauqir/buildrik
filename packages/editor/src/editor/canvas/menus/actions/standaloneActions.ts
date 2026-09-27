@@ -8,14 +8,13 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ActionContext, ContextAction } from "../contextMenuRegistry";
 import { requestReplaceWithBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { BINDABLE_TYPES } from "@/shared/constants/elementCapabilities";
 
 /** Element types a block can stand in for — the section-shaped ones. */
 const SECTION_TYPES = new Set([
   "container", "section", "hero", "features", "header", "footer", "nav", "navbar",
   "cta", "card", "pricing", "columns", "grid", "flex",
 ]);
-/** Element types the CMS can feed a field into. */
-export const BINDABLE_TYPES: ReadonlySet<string> = new Set(["text", "heading", "paragraph", "image", "button", "link"]);
 
 /** Save the selection (or `element` alone) as a component — the canvas ⋯ and
  *  the inspector ⋯ open the same dialog. Bindings are extracted up-front so
@@ -64,12 +63,12 @@ export const standaloneActions: ContextAction[] = [
     icon: "database",
     group: "standalone",
     isVisible: ({ element, isRoot }) => !isRoot && BINDABLE_TYPES.has(element.getType?.() ?? ""),
-    // Binding happens in the inspector's Content section (Source · Collection ·
-    // Field, board 4428:149540). This row opened the CMS workspace instead —
-    // a collection list over the canvas, no field picker (gap walk 93 #4).
+    // Binding happens in the inspector's CMS binding section (Source ·
+    // Collection · Field). This row opened the CMS workspace instead — a
+    // collection list over the canvas, no field picker (gap walk 93 #4).
     handler: ({ composer, element }) => {
       composer.selection.select(element as never);
-      composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" });
+      composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "cms-binding" });
     },
   },
   {
