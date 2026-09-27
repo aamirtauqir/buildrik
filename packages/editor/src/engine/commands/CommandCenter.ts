@@ -37,6 +37,12 @@ const WIDGET_ROLES = [
   .join(", ");
 
 /**
+ * Open surfaces that take a bare Escape before the canvas selection does.
+ */
+const ESCAPE_OWNERS =
+  '[role="menu"], [role="listbox"], [role="dialog"], [role="alertdialog"], [data-bk-escape-owner]';
+
+/**
  * Canvas commands whose shortcut a focused text field has a stronger claim on.
  * Each of these is a chord the OS/browser already binds to text editing, so
  * when the caret is in a field the user means the text, not the canvas.
@@ -235,6 +241,21 @@ export class CommandCenter {
       commandId === "deselect" &&
       typeof document !== "undefined" &&
       document.querySelector('[data-bk-pick="true"]')
+    ) {
+      return false;
+    }
+
+    // Carve-out 0b: Escape closes the innermost surface, and the canvas
+    // selection is the OUTERMOST. This listener runs before every surface
+    // that registers later, so an open menu, listbox or dialog — or a
+    // right-column panel that claims Escape (`data-bk-escape-owner`, set by
+    // useColumnPanelEscape) — used to lose the selection along with itself:
+    // Escape in the inspector ⋯ menu and in the AI column both deselected
+    // (P-6, measured live). DOM query, not an import — same contract as above.
+    if (
+      commandId === "deselect" &&
+      typeof document !== "undefined" &&
+      document.querySelector(ESCAPE_OWNERS)
     ) {
       return false;
     }
