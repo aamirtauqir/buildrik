@@ -119,6 +119,7 @@ export const accountRouter = router({
         return await enable2FA(ctx.session.user.id);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "USER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
+        if (e instanceof Error && e.message === "TWO_FACTOR_ALREADY_ENABLED") throw new TRPCError({ code: "CONFLICT", message: "Two-factor is already on. Turn it off first to set up a new authenticator." });
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Couldn't start two-factor setup. Please try again." });
       }
     }),

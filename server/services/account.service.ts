@@ -336,8 +336,9 @@ export async function updatePreferences(userId: string, data: UpdatePreferencesI
 
 export async function enable2FA(userId: string) {
   const { authenticator } = await import("otplib");
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, twoFactorEnabled: true } });
   if (!user) throw new Error("USER_NOT_FOUND");
+  if (user.twoFactorEnabled) throw new Error("TWO_FACTOR_ALREADY_ENABLED");
 
   const secret = authenticator.generateSecret();
   const otpauth = authenticator.keyuri(user.email, "Buildrick", secret);

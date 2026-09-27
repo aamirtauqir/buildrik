@@ -212,6 +212,15 @@ describe("Account Service", () => {
     });
   });
 
+  describe("enable2FA", () => {
+    it("refuses when 2FA is already on and writes nothing (SA-03)", async () => {
+      const { enable2FA } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ email: "a@b.c", twoFactorEnabled: true } as never);
+      await expect(enable2FA("u1")).rejects.toThrow("TWO_FACTOR_ALREADY_ENABLED");
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+  });
+
   describe("getLoginHistory", () => {
     it("returns last 10 login attempts", async () => {
       const { getLoginHistory } = await import("@/server/services/account.service");
