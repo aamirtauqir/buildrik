@@ -149,3 +149,34 @@ describe("InputWithUnit — arrow nudge", () => {
     expect(onChange).toHaveBeenLastCalledWith("1px");
   });
 });
+
+/* P-11(d) / DD-19: emptying a field and leaving it showed a blank field while
+   the old value stayed applied on the canvas. Empty means "clear the
+   property"; the field and the element then agree. */
+describe("InputWithUnit — emptied field (P-11d)", () => {
+  it("empty + blur clears the property", () => {
+    const { onChange } = renderInput({ value: "10px" });
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenCalledWith("");
+  });
+
+  it("empty + Enter clears the property", () => {
+    const { onChange } = renderInput({ value: "10px" });
+    const input = screen.getByRole("textbox");
+    input.focus();
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenCalledWith("");
+  });
+
+  it("an already-empty field left empty writes nothing", () => {
+    const { onChange } = renderInput({ value: "" });
+    const input = screen.getByRole("textbox");
+    fireEvent.focus(input);
+    fireEvent.blur(input);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
