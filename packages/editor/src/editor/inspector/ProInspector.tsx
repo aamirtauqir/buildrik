@@ -206,7 +206,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
-  const previousElementIdRef = React.useRef<string | null>(null);
 
   const [pickActive, setPickActive] = React.useState(false);
 
@@ -259,40 +258,58 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [contextState, selectedElements, mixedKeys]
   );
 
-  // Scroll persistence per element
-  React.useEffect(() => {
-    const container = contentRef.current;
-    const prevId = previousElementIdRef.current;
-
-    if (prevId && container) {
-      scrollPositionsRef.current.set(prevId, container.scrollTop);
-    }
-    previousElementIdRef.current = selectedElement?.id ?? null;
-
-    if (selectedElement?.id && container) {
-      const savedPosition = scrollPositionsRef.current.get(selectedElement.id);
-      if (savedPosition !== undefined) {
-        requestAnimationFrame(() => {
-          container.scrollTop = savedPosition;
-        });
-      } else {
-        requestAnimationFrame(() => {
-          container.scrollTop = 0;
-        });
-      }
-    }
-  }, [selectedElement?.id]);
-
-  React.useEffect(() => {
+  /* Scroll persistence per element (P-7b). The scroll listener is the only
+     writer: it records the element whose body is on screen, and it is bound
+     in a LAYOUT effect so it is detached before the next element's body
+     renders into the same container. The old code also saved the previous
+     element's scrollTop in a passive effect after the switch — by then the
+     new body had clamped it, so every return landed on the other element's
+     clamp. A hidden column (full page: 0×0) is not a position either. */
+  React.useLayoutEffect(() => {
     const container = contentRef.current;
     if (!container || !selectedElement?.id) return;
-
+    const id = selectedElement.id;
     const handleScroll = () => {
-      scrollPositionsRef.current.set(selectedElement.id, container.scrollTop);
+      if (container.clientHeight === 0) return;
+      scrollPositionsRef.current.set(id, container.scrollTop);
     };
-
     container.addEventListener("scroll", handleScroll, { passive: true });
     return () => container.removeEventListener("scroll", handleScroll);
+  }, [selectedElement?.id]);
+
+  /* The restore. An element's sections are not all rendered by the next
+     frame — measured live, the body was still too short to hold the offset
+     and the browser clamped it to 0 — so it re-applies as the body grows,
+     until it holds, the user takes the wheel, or a second has passed. */
+  React.useEffect(() => {
+    const container = contentRef.current;
+    if (!selectedElement?.id || !container) return;
+    const target = scrollPositionsRef.current.get(selectedElement.id) ?? 0;
+    let settled = false;
+    const apply = () => {
+      if (settled) return;
+      container.scrollTop = target;
+      if (Math.abs(container.scrollTop - target) < 1) settled = true;
+    };
+    const settle = () => {
+      settled = true;
+    };
+    const frame = requestAnimationFrame(apply);
+    const ro = new ResizeObserver(apply);
+    const body = container.firstElementChild;
+    if (body) ro.observe(body);
+    const lapse = setTimeout(settle, 1000);
+    container.addEventListener("wheel", settle, { passive: true });
+    container.addEventListener("pointerdown", settle);
+    container.addEventListener("keydown", settle);
+    return () => {
+      cancelAnimationFrame(frame);
+      ro.disconnect();
+      clearTimeout(lapse);
+      container.removeEventListener("wheel", settle);
+      container.removeEventListener("pointerdown", settle);
+      container.removeEventListener("keydown", settle);
+    };
   }, [selectedElement?.id]);
 
   /* G2-146 — ⌘K "Jump to property" rows + the reveal behind them and behind
