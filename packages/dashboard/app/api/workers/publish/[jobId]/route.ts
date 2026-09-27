@@ -2,7 +2,7 @@ import { type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { deliverWebhook } from "@/server/services/webhook.service";
 import { prisma } from "@lib/prisma";
-import { slugifyProjectName, type VercelFile } from "@lib/vercel";
+import { resolveVercelProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
 import { buildDeployFiles } from "@lib/publish-files";
 import { planFormWiring } from "@lib/publish-forms";
@@ -278,6 +278,7 @@ async function runVercelDeployJob(
     where: { id: siteId },
     select: {
       slug: true,
+      vercelProjectName: true,
       name: true,
       publishedPassword: true,
       favicon: true,
@@ -328,7 +329,7 @@ async function runVercelDeployJob(
 
   // Named here rather than at the deploy call: the sitemap needs the origin
   // this deploy will land on, and that is derived from the project name.
-  const projectName = slugifyProjectName(site.slug);
+  const projectName = resolveVercelProjectName(site);
   const verifiedDomain = await prisma.domain.findFirst({
     where: { siteId, status: "VERIFIED" },
     select: { domain: true },
@@ -400,6 +401,11 @@ async function runVercelDeployJob(
     where: { id: jobId },
     data: { deploymentId: result.deploymentId },
   });
+  // SA-06: pin the project this site now lives on, so a later slug change
+  // keeps deploying here instead of creating a new project.
+  if (!site.vercelProjectName) {
+    await prisma.site.update({ where: { id: siteId }, data: { vercelProjectName: projectName } });
+  }
   await setStep(jobId, 2);
 
   // Step 3 — Verifying SSL: deployment already polled to READY by service.

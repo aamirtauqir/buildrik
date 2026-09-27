@@ -51,7 +51,7 @@ export const siteOverviewSchema = z.object({
 export const updateSiteSettingsSchema = z.object({
   id: z.string(),
   name: z.string().min(2).max(100).optional(),
-  slug: z.string().min(3).max(50).optional(),
+  slug: z.string().min(3).max(50).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and single dashes").optional(),
   // 2026-05-23: nullable() added on user-clearable fields so the editor
   // can send `null` to clear values (matches Prisma column nullability).
   // Prior `.optional()`-only shape rejected `null` and forced editor to

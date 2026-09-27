@@ -130,6 +130,8 @@ export const siteDetailRouter = router({
             });
           if (e instanceof Error && e.message === "DEFAULT_LOCALE_NOT_ENABLED")
             throw new TRPCError({ code: "BAD_REQUEST", message: "The default locale must be in the enabled locales list." });
+          if (e instanceof Error && e.message === "SLUG_TAKEN")
+            throw new TRPCError({ code: "CONFLICT", message: "Another site already uses that URL slug." });
           throw e;
         }
       }),

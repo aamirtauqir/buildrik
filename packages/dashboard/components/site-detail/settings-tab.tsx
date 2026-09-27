@@ -166,7 +166,6 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
     // no longer wipe the password.
     const data: Record<string, unknown> = {
       name,
-      slug,
       headCode,
       bodyCode,
       socialLinks: filteredSocial,
@@ -176,6 +175,9 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
       touchIcon: touchIconPreview?.startsWith("data:") ? site.touchIcon : touchIconPreview,
       favicon: faviconPreview?.startsWith("data:") ? site.favicon : faviconPreview,
     };
+    // Only on an explicit change: a slug that predates the current slug rule
+    // must not fail every unrelated save.
+    if (slug !== site.slug) data.slug = slug;
     if (!passwordEnabled) {
       if (site.hasPublishedPassword) data.publishedPassword = null; // explicit removal
     } else if (password) {
@@ -196,7 +198,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               onChange={(e) => setName(e.target.value)}
             />
           </Field>
-          <Field label="Slug" hint="Used in your site's URL.">
+          <Field label="Slug" hint="Used in your site's address. Changing it doesn't move your live site.">
             <InputField
               type="text"
               value={slug}

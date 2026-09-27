@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/encryption";
+import { slugifyProjectName } from "@/lib/vercel";
 
 /**
  * publishedPassword storage policy.
@@ -172,11 +173,14 @@ export async function updateSiteSettings(
      password set. Clearing one (null) stays free — nobody should be locked
      out of removing a gate they can no longer manage. */
   const wantsPublishedPassword = data.publishedPassword != null && data.publishedPassword !== "";
+  let pinnedProjectName: string | undefined;
   if (wantsCustomCode || wantsPublishedPassword || data.slug) {
     const current = await prisma.site.findUnique({
       where: { id: siteId },
       select: {
         slug: true,
+        vercelProjectName: true,
+        status: true,
         deletedAt: true,
         workspace: { select: { plan: true } },
       },
@@ -190,6 +194,20 @@ export async function updateSiteSettings(
     }
 
     if (data.slug && current && current.slug !== data.slug) {
+      /* SA-06: `Site.slug` is globally @unique, so a taken slug used to reach
+         the update and surface as a raw P2002 500. And the Vercel project was
+         derived from the slug on every deploy — renaming a live site's slug
+         sent the next publish into a brand-new project, leaving the old URL
+         and its domains behind. Pin the name the live site is on first. */
+      const taken = await prisma.site.findFirst({
+        where: { slug: data.slug, id: { not: siteId } },
+        select: { id: true },
+      });
+      if (taken) throw new Error("SLUG_TAKEN");
+      if (current.vercelProjectName == null && current.status === "PUBLISHED") {
+        pinnedProjectName = slugifyProjectName(current.slug);
+      }
+
       await prisma.slugHistory.create({
         data: {
           siteId,
@@ -209,6 +227,7 @@ export async function updateSiteSettings(
   // safe because the column is nullable in schema.prisma and the data has
   // already been validated by updateSiteSettingsSchema upstream.
   const persistData = { ...data } as Prisma.SiteUpdateInput;
+  if (pinnedProjectName) persistData.vercelProjectName = pinnedProjectName;
   if (data.publishedPassword !== undefined) {
     persistData.publishedPassword = data.publishedPassword === null
       ? null

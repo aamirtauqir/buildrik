@@ -105,6 +105,15 @@ export function slugifyProjectName(slug: string): string {
   return name.slice(0, 100);
 }
 
+/**
+ * The Vercel project a site deploys to: its pinned name when it has one, else
+ * derived from the slug. Pinning is what keeps a slug rename from moving a
+ * published site to a brand-new project.
+ */
+export function resolveVercelProjectName(site: { slug: string; vercelProjectName: string | null }): string {
+  return site.vercelProjectName ?? slugifyProjectName(site.slug);
+}
+
 function authHeaders(token: string): HeadersInit {
   return {
     Authorization: `Bearer ${token}`,
