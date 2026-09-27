@@ -736,6 +736,22 @@ export async function rollbackPublish(
   });
 }
 
+/** A deployment may still be serving: status alone misses an ARCHIVED or
+ *  billing-downgraded site whose Vercel deployment was never taken down. */
+export function hasLiveDeployment(site: { status: string; publishedUrl: string | null }): boolean {
+  return site.status === "PUBLISHED" || site.publishedUrl != null;
+}
+
+/** The site has had a Vercel project created for it at some point — true even
+ *  after an unpublish, which removes the deployment but keeps the project. */
+export async function hasEverDeployed(siteId: string): Promise<boolean> {
+  const job = await prisma.publishBuildJob.findFirst({
+    where: { siteId, status: "COMPLETED" },
+    select: { id: true },
+  });
+  return job != null;
+}
+
 export async function unpublishSite(siteId: string) {
   // Actually take the site down on Vercel — deleting the production deployment
   // removes it from the web (the project + custom domains stay attached, so a

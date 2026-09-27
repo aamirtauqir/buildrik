@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/server/services/stripe.client";
-import { unpublishSite } from "@/server/services/publish.service";
+import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
 import type { UpdateWorkspaceInput } from "@buildrik/shared/schemas/account";
 
 /** Thrown when the user already has a workspace by this name (case-insensitive). */
@@ -209,11 +209,11 @@ export async function processDueWorkspaceDeletions(now: Date): Promise<{ deleted
       continue;
     }
     try {
-      const published = await prisma.site.findMany({
-        where: { workspaceId: ws.id, OR: [{ status: "PUBLISHED" }, { publishedUrl: { not: null } }] },
-        select: { id: true },
+      const sites = await prisma.site.findMany({
+        where: { workspaceId: ws.id },
+        select: { id: true, status: true, publishedUrl: true },
       });
-      for (const s of published) {
+      for (const s of sites.filter(hasLiveDeployment)) {
         await unpublishSite(s.id).catch((e: unknown) =>
           console.error(`[workspace-deletion] take-down failed for site ${s.id}:`, e instanceof Error ? e.message : e));
       }

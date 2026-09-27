@@ -17,7 +17,7 @@ import { stripColumnBackedSettings } from "@/server/services/project-settings";
 import { SITE_SETTINGS_COLUMNS } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
-import { unpublishSite } from "@/server/services/publish.service";
+import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
 import { slugifyProjectName } from "@/lib/vercel";
 
 function slugify(name: string): string {
@@ -572,7 +572,7 @@ export async function deleteSite(siteId: string, confirmName: string) {
   // SA-07: take the live deployment down before soft-deleting. Best-effort —
   // unpublishSite is already best-effort toward Vercel and flips the row to
   // DRAFT, but a delete must still succeed even if that call throws.
-  if (site.status === "PUBLISHED") {
+  if (hasLiveDeployment(site)) {
     try {
       await unpublishSite(siteId);
     } catch (e: unknown) {
@@ -698,11 +698,11 @@ export async function bulkAction(
       // the soft-delete.
       const targets = await prisma.site.findMany({
         where: { id: { in: siteIds }, workspaceId, deletedAt: null },
-        select: { id: true, status: true },
+        select: { id: true, status: true, publishedUrl: true },
       });
       await Promise.all(
         targets
-          .filter((s) => s.status === "PUBLISHED")
+          .filter(hasLiveDeployment)
           .map(async (s) => {
             try {
               await unpublishSite(s.id);

@@ -21,7 +21,10 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 vi.mock("@/server/services/stripe.client", () => ({ getStripe }));
-vi.mock("@/server/services/publish.service", () => ({ unpublishSite }));
+vi.mock("@/server/services/publish.service", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/server/services/publish.service")>()),
+  unpublishSite,
+}));
 
 import { prisma } from "@/lib/prisma";
 import { processDueWorkspaceDeletions } from "@/server/services/workspace-settings.service";
@@ -45,7 +48,7 @@ beforeEach(() => {
 describe("processDueWorkspaceDeletions", () => {
   it("cancels Stripe, unpublishes, then deletes a due workspace", async () => {
     vi.mocked(prisma.subscription.findUnique).mockResolvedValue({ stripeSubscriptionId: "sub_1" } as never);
-    vi.mocked(prisma.site.findMany).mockResolvedValue([{ id: "s1" }] as never);
+    vi.mocked(prisma.site.findMany).mockResolvedValue([{ id: "s1", status: "PUBLISHED", publishedUrl: "https://s1.vercel.app" }] as never);
     const res = await processDueWorkspaceDeletions(NOW);
     expect(cancel).toHaveBeenCalledWith("sub_1");
     expect(unpublishSite).toHaveBeenCalledWith("s1");
@@ -113,8 +116,23 @@ describe("processDueWorkspaceDeletions", () => {
     expect(res).toEqual({ deleted: 1, skipped: 0 });
   });
 
+  /* I1: "live" = PUBLISHED or still carrying a publishedUrl — an ARCHIVED or
+     billing-downgraded site can still be serving on Vercel. */
+  it("takes down every site with a live deployment, whatever its status, and only those", async () => {
+    vi.mocked(prisma.site.findMany).mockResolvedValue([
+      { id: "archived-live", status: "ARCHIVED", publishedUrl: "https://a.vercel.app" },
+      { id: "published", status: "PUBLISHED", publishedUrl: null },
+      { id: "draft", status: "DRAFT", publishedUrl: null },
+    ] as never);
+    await processDueWorkspaceDeletions(NOW);
+    expect(unpublishSite.mock.calls.map(([id]) => id)).toEqual(["archived-live", "published"]);
+  });
+
   it("a failed take-down does not block the deletion", async () => {
-    vi.mocked(prisma.site.findMany).mockResolvedValue([{ id: "s1" }, { id: "s2" }] as never);
+    vi.mocked(prisma.site.findMany).mockResolvedValue([
+      { id: "s1", status: "PUBLISHED", publishedUrl: "https://s1.vercel.app" },
+      { id: "s2", status: "PUBLISHED", publishedUrl: "https://s2.vercel.app" },
+    ] as never);
     unpublishSite.mockRejectedValueOnce(new Error("vercel down"));
     const res = await processDueWorkspaceDeletions(NOW);
     expect(unpublishSite).toHaveBeenCalledWith("s2");
@@ -170,7 +188,7 @@ describe("processDueWorkspaceDeletions", () => {
 
   it("never deletes User rows", async () => {
     vi.mocked(prisma.subscription.findUnique).mockResolvedValue({ stripeSubscriptionId: "sub_1" } as never);
-    vi.mocked(prisma.site.findMany).mockResolvedValue([{ id: "s1" }] as never);
+    vi.mocked(prisma.site.findMany).mockResolvedValue([{ id: "s1", status: "PUBLISHED", publishedUrl: "https://s1.vercel.app" }] as never);
     await processDueWorkspaceDeletions(NOW);
     expect(prisma.user.delete).not.toHaveBeenCalled();
     expect(prisma.user.deleteMany).not.toHaveBeenCalled();

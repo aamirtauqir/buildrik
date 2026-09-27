@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/encryption";
 import { slugifyProjectName } from "@/lib/vercel";
+import { hasEverDeployed } from "@/server/services/publish.service";
 
 /**
  * publishedPassword storage policy.
@@ -188,7 +189,6 @@ export async function updateSiteSettings(
       select: {
         slug: true,
         vercelProjectName: true,
-        status: true,
         deletedAt: true,
         workspace: { select: { plan: true } },
       },
@@ -216,7 +216,7 @@ export async function updateSiteSettings(
         select: { id: true },
       });
       if (taken) throw new Error("SLUG_TAKEN");
-      if (current.vercelProjectName == null && current.status === "PUBLISHED") {
+      if (current.vercelProjectName == null && (await hasEverDeployed(siteId))) {
         pinnedProjectName = slugifyProjectName(current.slug);
       }
 

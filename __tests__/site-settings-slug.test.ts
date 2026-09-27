@@ -79,10 +79,26 @@ describe("updateSiteSettings — slug change", () => {
     await expect(updateSiteSettings("s1", { slug: "raced" })).rejects.toThrow("SLUG_TAKEN");
   });
 
-  it("pins the old project name when a published site changes slug", async () => {
+  it("pins the old project name when a deployed site changes slug", async () => {
     vi.mocked(prisma.site.findUnique).mockResolvedValue({ slug: "old", vercelProjectName: null, deletedAt: null, status: "PUBLISHED", workspace: { plan: "PRO" } } as never);
     vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue({ id: "job1" } as never);
     await updateSiteSettings("s1", { slug: "new" });
+    expect(prisma.site.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ slug: "new", vercelProjectName: slugifyProjectName("old") }),
+    }));
+  });
+
+  /* I1: status is not the test — an unpublished (DRAFT) or ARCHIVED site
+     still has its Vercel project and any domains on it. */
+  it("pins a DRAFT site that has a completed publish job", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ slug: "old", vercelProjectName: null, deletedAt: null, status: "DRAFT", workspace: { plan: "PRO" } } as never);
+    vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue({ id: "job1" } as never);
+    await updateSiteSettings("s1", { slug: "new" });
+    expect(prisma.publishBuildJob.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      where: { siteId: "s1", status: "COMPLETED" },
+    }));
     expect(prisma.site.update).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ slug: "new", vercelProjectName: slugifyProjectName("old") }),
     }));

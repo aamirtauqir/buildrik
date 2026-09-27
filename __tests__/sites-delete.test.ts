@@ -22,7 +22,8 @@ vi.mock("@/lib/prisma", () => {
   return { prisma: prismaMock };
 });
 
-vi.mock("@/server/services/publish.service", () => ({
+vi.mock("@/server/services/publish.service", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/server/services/publish.service")>()),
   unpublishSite: vi.fn(),
 }));
 
@@ -62,6 +63,35 @@ describe("SA-07: site delete takes the deployment down and is logged", () => {
     await deleteSite("s1", "A");
 
     expect(unpublishSite).not.toHaveBeenCalled();
+  });
+
+  /* I1: an ARCHIVED site keeps its deployment — archive never took it down —
+     so a publishedUrl means it is still live and must come down on delete. */
+  it("takes down an ARCHIVED site that still has a publishedUrl", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      id: "s1",
+      name: "A",
+      deletedAt: null,
+      status: "ARCHIVED",
+      publishedUrl: "https://a.vercel.app",
+    } as never);
+
+    await deleteSite("s1", "A");
+
+    expect(unpublishSite).toHaveBeenCalledWith("s1");
+  });
+
+  it("bulk delete takes down an ARCHIVED site that still has a publishedUrl", async () => {
+    vi.mocked(prisma.site.findMany).mockResolvedValue([
+      { id: "s1", status: "ARCHIVED", publishedUrl: "https://a.vercel.app" },
+      { id: "s2", status: "DRAFT", publishedUrl: null },
+    ] as never);
+    vi.mocked(prisma.site.updateMany).mockResolvedValue({ count: 2 } as never);
+
+    await bulkAction("ws_123", { action: "delete", siteIds: ["s1", "s2"] } as never);
+
+    expect(unpublishSite).toHaveBeenCalledWith("s1");
+    expect(unpublishSite).not.toHaveBeenCalledWith("s2");
   });
 
   it("still soft-deletes when the take-down throws", async () => {
