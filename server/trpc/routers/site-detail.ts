@@ -342,6 +342,11 @@ export const siteDetailRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "DOMAIN_IN_USE")
             throw new TRPCError({ code: "CONFLICT", message: "Domain already in use." });
+          if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "This site's address clashes with another site. Change its URL slug in Settings, then connect the domain.",
+            });
           if (e instanceof Error && e.message === "DOMAIN_LIMIT")
             throw new TRPCError({ code: "FORBIDDEN", message: "You've reached your plan's custom-domain limit. Upgrade to add more." });
           if (e instanceof Error && e.message === "SITE_NOT_FOUND")

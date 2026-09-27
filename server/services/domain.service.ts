@@ -1,5 +1,6 @@
 import dns from "node:dns/promises";
 import { createHash } from "node:crypto";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { addDomainToVercelProject, removeDomainFromVercelProject, resolveVercelProjectName } from "@/lib/vercel";
@@ -171,7 +172,19 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
   // before the first publish can't move the site to a project without it.
   const projectName = resolveVercelProjectName(site);
   if (!site.vercelProjectName) {
-    await prisma.site.update({ where: { id: siteId }, data: { vercelProjectName: projectName } });
+    try {
+      await prisma.site.update({ where: { id: siteId }, data: { vercelProjectName: projectName } });
+    } catch (e: unknown) {
+      // Another site is pinned to the name this slug derives (legacy slug reuse).
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === "P2002" &&
+        String(e.meta?.target ?? "").includes("vercelProjectName")
+      ) {
+        throw new Error("PROJECT_NAME_TAKEN");
+      }
+      throw e;
+    }
   }
 
   const created = await prisma.domain.create({

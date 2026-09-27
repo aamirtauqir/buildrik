@@ -13,6 +13,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { promises as dnsPromises } from "dns";
+import { Prisma } from "@prisma/client";
 
 const { db, vercelConnection } = vi.hoisted(() => ({
   db: {
@@ -103,6 +104,20 @@ describe("connectDomain — the Add-a-domain dialog", () => {
     await connectDomain("s1", { domain: "bellacucina.com" });
 
     expect(db.site.update).toHaveBeenCalledWith({ where: { id: "s1" }, data: { vercelProjectName: "bella" } });
+  });
+
+  it("maps a P2002 on vercelProjectName at the pin to PROJECT_NAME_TAKEN and creates no domain", async () => {
+    connectable();
+    db.site.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed on the fields: (`vercelProjectName`)", {
+        code: "P2002",
+        clientVersion: "5",
+        meta: { target: ["vercelProjectName"] },
+      }),
+    );
+
+    await expect(connectDomain("s1", { domain: "bellacucina.com" })).rejects.toThrow("PROJECT_NAME_TAKEN");
+    expect(db.domain.create).not.toHaveBeenCalled();
   });
 
   it("does not re-pin a site that already has a project name", async () => {
