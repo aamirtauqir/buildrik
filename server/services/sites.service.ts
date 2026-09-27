@@ -13,6 +13,7 @@ import type {
 } from "@buildrik/shared/schemas/sites";
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
+import { stripColumnBackedSettings } from "@/server/services/project-settings";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { unpublishSite } from "@/server/services/publish.service";
@@ -765,7 +766,8 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // Site-level project artifacts. The style rules' selectors and media
   // queries are written raw into the published stylesheet — same boundary.
   sanitizeProjectStyles(input.styles);
-  const settings = withValidAnalyticsIds(input.settings);
+  // SA-01: the column-backed keys live in their Site columns only.
+  const settings = stripColumnBackedSettings(withValidAnalyticsIds(input.settings));
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
   // past the size cap is not stored — the save and its pages still land, the

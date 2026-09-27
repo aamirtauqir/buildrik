@@ -16,6 +16,7 @@ import { dropSessionMediaUrls } from "@/shared/utils/html";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
 import { blankPageRoot } from "@buildrik/shared/content/elementIds";
+import { SITE_COLUMN_FIELDS, type SiteColumnField } from "@buildrik/shared/schemas/site-column-fields";
 
 /**
  * Shape of a page row returned by `pages.list`. Extended in Phase 1 to
@@ -240,25 +241,11 @@ function emptyToNull(value: string | null | undefined): string | null {
  * The Settings screens lock exactly these below ADMIN (M7 / PD-1);
  * `siteColumnFields.test.ts` pins this list to the function's reads, so a new
  * mirrored field cannot land without being locked, and project data (Author,
- * Twitter handle, Global CSS) is never locked by mistake.
+ * Twitter handle, Global CSS) is never locked by mistake. SA-01: the list
+ * lives in `@buildrik/shared` because the server strips the same fields from
+ * the stored projectSettings.
  */
-export const SITE_COLUMN_FIELDS = [
-  "seo.siteName",
-  "seo.favicon",
-  "seo.language",
-  "seo.metaTitle",
-  "seo.metaDescription",
-  "seo.metaTitleTemplate",
-  "seo.defaultOgImage",
-  "seo.allowIndexing",
-  "seo.robotsTxt",
-  "seo.touchIcon",
-  "seo.socialLinks",
-  "customCode.headScripts",
-  "customCode.bodyScripts",
-  "publishing.publishedPassword",
-] as const;
-export type SiteColumnField = (typeof SITE_COLUMN_FIELDS)[number];
+export { SITE_COLUMN_FIELDS, type SiteColumnField };
 
 export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const settings = projectData.settings;
@@ -301,9 +288,11 @@ export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSett
 }
 
 /**
- * Inverse of extractSiteColumnPatch: merge Site columns into editor's
- * projectSettings shape on load. Server is canonical for these fields,
- * so any value present on the Site row wins over projectSettings JSON.
+ * Inverse of extractSiteColumnPatch: Site columns into the editor's
+ * projectSettings shape on load. SA-01: the columns are the only source for
+ * SITE_COLUMN_FIELDS — a NULL column leaves the field empty, never the
+ * project JSON's copy (an edit the ADMIN-only mirror never sent, or a value
+ * the dashboard has since cleared).
  */
 function mergeSiteColumnsIntoSettings(
   baseSettings: ProjectData["settings"] | undefined,
@@ -314,24 +303,25 @@ function mergeSiteColumnsIntoSettings(
   const customCode = { ...(settings.customCode ?? { headScripts: "", bodyScripts: "", globalCss: "" }) };
   const publishing = { ...(settings.publishing ?? {}) };
 
-  if (siteCols.name != null) seo.siteName = siteCols.name;
-  if (siteCols.favicon != null) seo.favicon = siteCols.favicon;
-  if (siteCols.defaultLocale != null) seo.language = siteCols.defaultLocale;
-  if (siteCols.metaTitle != null) seo.metaTitle = siteCols.metaTitle;
-  if (siteCols.metaDescription != null) seo.metaDescription = siteCols.metaDescription;
-  if (siteCols.metaTitleTemplate != null) seo.metaTitleTemplate = siteCols.metaTitleTemplate;
-  if (siteCols.ogImage != null) seo.defaultOgImage = siteCols.ogImage;
-  if (siteCols.allowIndexing != null) seo.allowIndexing = siteCols.allowIndexing;
-  if (siteCols.robotsTxt != null) seo.robotsTxt = siteCols.robotsTxt;
-  if (siteCols.touchIcon != null) seo.touchIcon = siteCols.touchIcon;
-  if (siteCols.socialLinks != null) seo.socialLinks = siteCols.socialLinks as SiteSEO["socialLinks"];
-  if (siteCols.headCode != null) customCode.headScripts = siteCols.headCode;
-  if (siteCols.bodyCode != null) customCode.bodyScripts = siteCols.bodyCode;
-  // publishedPassword: server redacts the hash on read (returns null if redacted
-  // OR not set). We can't distinguish those here, so we never round-trip null —
-  // user must explicitly type a new value to change it. The hasPublishedPassword
-  // boolean (from server) is the authoritative "is a password set" indicator.
-  if (siteCols.publishedPassword) publishing.publishedPassword = siteCols.publishedPassword;
+  seo.siteName = siteCols.name;
+  seo.favicon = siteCols.favicon ?? undefined;
+  seo.language = siteCols.defaultLocale;
+  seo.metaTitle = siteCols.metaTitle ?? undefined;
+  seo.metaDescription = siteCols.metaDescription ?? undefined;
+  seo.metaTitleTemplate = siteCols.metaTitleTemplate ?? undefined;
+  seo.defaultOgImage = siteCols.ogImage ?? undefined;
+  seo.allowIndexing = siteCols.allowIndexing;
+  seo.robotsTxt = siteCols.robotsTxt ?? undefined;
+  seo.touchIcon = siteCols.touchIcon ?? undefined;
+  seo.socialLinks = (siteCols.socialLinks ?? undefined) as SiteSEO["socialLinks"];
+  // CustomCodeConfig's strings are required: an empty column reads as "".
+  customCode.headScripts = siteCols.headCode ?? "";
+  customCode.bodyScripts = siteCols.bodyCode ?? "";
+  // publishedPassword: the server redacts it on read (always null), so it is
+  // never loaded — the user types a new value to change it. The
+  // hasPublishedPassword boolean (from server) is the authoritative "is a
+  // password set" indicator.
+  publishing.publishedPassword = siteCols.publishedPassword || undefined;
 
   settings.seo = seo;
   settings.customCode = customCode;
@@ -412,9 +402,14 @@ export function projectDataFromRows(
   // as the base so non-mirrored settings (e.g. things only persisted in the
   // JSON blob) survive editor reload from dashboard.
   const baseSettings = siteRow.projectSettings as ProjectData["settings"] | undefined;
-  const mergedSettings = siteColumns
-    ? mergeSiteColumnsIntoSettings(baseSettings, siteColumns as SiteColumnSettings)
-    : baseSettings;
+  /* No columns (the read failed) still means no JSON copy: SA-01 keeps the
+     column-backed fields empty rather than loading a value that may be stale.
+     `Site.name` rides on the site row too (the /share rows carry it only
+     there) — the same column. */
+  const mergedSettings = mergeSiteColumnsIntoSettings(baseSettings, {
+    name: siteRow.name,
+    ...(siteColumns as SiteColumnSettings | null),
+  });
 
   return {
     version: "1.0",
