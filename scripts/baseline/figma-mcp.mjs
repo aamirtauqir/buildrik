@@ -39,7 +39,11 @@ import { execFileSync } from "node:child_process";
 
 const raw = execFileSync("security", ["find-generic-password", "-s", "Claude Code-credentials", "-w"], { encoding: "utf8" });
 const creds = JSON.parse(raw);
-const entry = Object.entries(creds.mcpOAuth || {}).find(([k]) => k.startsWith("plugin:figma:figma"));
+/* Several plugin:figma:figma|<hash> entries pile up (one per plugin config) and the
+   first is often expired → HTTP 401. Take the live one that expires last. */
+const entry = Object.entries(creds.mcpOAuth || {})
+  .filter(([k, v]) => k.startsWith("plugin:figma:figma") && (!v.expiresAt || v.expiresAt > Date.now()))
+  .sort((a, b) => (b[1].expiresAt ?? 0) - (a[1].expiresAt ?? 0))[0];
 if (!entry) { console.error("no figma oauth entry in keychain"); process.exit(2); }
 const token = entry[1].accessToken;
 
