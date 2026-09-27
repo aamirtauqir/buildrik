@@ -220,16 +220,24 @@ export function useStyleHandlers(
            like this" reach is skipped the same way. */
         if (!el || el.isLocked?.()) return;
         const sel = `[data-buildrick-id="${id}"]`;
-        if (currentPseudoState !== "normal" && composer?.styles) {
-          const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
-          const pseudoSelector = `${sel}:${currentPseudoState}`;
+        /* P-8: a device-hide flag (`--hide-tablet`) names its own device, so it
+           always goes on the base styles — the one place the canvas
+           (Canvas.css `[style*="--hide-<bp>: true"]`) and the export
+           (ExportEngine hideRulesFor) read it. Written into the tablet rule
+           while the canvas was on Tablet, it hid nothing anywhere. */
+        const baseOnly = property.startsWith("--hide-");
+        const bp = baseOnly ? "desktop" : currentBreakpoint;
+        const pseudo = baseOnly ? "normal" : currentPseudoState;
+        if (pseudo !== "normal" && composer?.styles) {
+          const mq = bp === "desktop" ? undefined : getBreakpointQuery(bp) ?? undefined;
+          const pseudoSelector = `${sel}:${pseudo}`;
           if (value === "" || value == null) {
             const existingRule = composer.styles.getRule(pseudoSelector, mq);
             if (existingRule) {
               const props = { ...existingRule.properties };
               delete props[property];
               composer.styles.setRule(sel, props, {
-                pseudo: `:${currentPseudoState}`,
+                pseudo: `:${pseudo}`,
                 mediaQuery: mq,
               });
             }
@@ -237,20 +245,20 @@ export function useStyleHandlers(
             composer.styles.setRule(
               sel,
               { [property]: value },
-              { pseudo: `:${currentPseudoState}`, mediaQuery: mq }
+              { pseudo: `:${pseudo}`, mediaQuery: mq }
             );
           }
         } else if (value === "" || value == null) {
-          if (currentBreakpoint === "desktop") {
+          if (bp === "desktop") {
             el.removeStyle?.(property);
           } else if (composer?.styles) {
-            composer.styles.removeBreakpointStyleProperty(id, currentBreakpoint, property);
+            composer.styles.removeBreakpointStyleProperty(id, bp, property);
           }
         } else {
-          if (currentBreakpoint === "desktop") {
+          if (bp === "desktop") {
             el.setStyle?.(property, value);
           } else if (composer?.styles) {
-            composer.styles.setBreakpointStyle(id, currentBreakpoint, { [property]: value });
+            composer.styles.setBreakpointStyle(id, bp, { [property]: value });
           }
         }
       };
