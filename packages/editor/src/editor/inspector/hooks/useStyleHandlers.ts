@@ -239,6 +239,7 @@ export function useStyleHandlers(
               composer.styles.setRule(sel, props, {
                 pseudo: `:${pseudo}`,
                 mediaQuery: mq,
+                replace: true,
               });
             }
           } else {
@@ -321,7 +322,7 @@ export function useStyleHandlers(
             }
           });
 
-          composer.styles.setRule(selector, existing, { pseudo: `:${currentPseudoState}`, mediaQuery: mq });
+          composer.styles.setRule(selector, existing, { pseudo: `:${currentPseudoState}`, mediaQuery: mq, replace: true });
           setStyles((prev) => {
             const merged = { ...prev };
             Object.entries(changes).forEach(([prop, val]) => {

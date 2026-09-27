@@ -66,7 +66,12 @@ export class StyleEngine {
   // ============================================
 
   /**
-   * Add or update a style rule
+   * Add or update a style rule.
+   *
+   * By default `properties` are MERGED into an existing rule. `replace: true`
+   * makes them the rule's whole property set — the only way to take a key out
+   * of a rule through this method (P-9: a reset under :hover wrote the rule
+   * without the key, the merge kept it, and the reset did nothing).
    */
   setRule(
     selector: string,
@@ -74,6 +79,7 @@ export class StyleEngine {
     options?: {
       mediaQuery?: string;
       pseudo?: string;
+      replace?: boolean;
     }
   ): StyleData {
     const fullSelector = options?.pseudo ? `${selector}${options.pseudo}` : selector;
@@ -83,7 +89,7 @@ export class StyleEngine {
 
     if (style) {
       // Update existing rule
-      style.properties = { ...style.properties, ...properties };
+      style.properties = options?.replace ? { ...properties } : { ...style.properties, ...properties };
     } else {
       // Create new rule
       style = {
@@ -272,6 +278,22 @@ export class StyleEngine {
       this.updateStylesheet();
       this.composer.emit(EVENTS.STYLE_CHANGED, style);
       this.composer.markDirty();
+    }
+
+    /* P-9: setBreakpointStyle writes the rule AND the element's own
+       breakpointStyles (serialisation; ReactExporter reads it). Removal only
+       emptied the rule, so a reverted override survived on the element and
+       shipped in the React export. */
+    const element = this.composer.elements.getElement(elementId);
+    const stored = element?.getData().breakpointStyles;
+    const current = stored?.[breakpoint];
+    if (element && stored && current && property in current) {
+      const rest = { ...current };
+      delete rest[property];
+      const next = { ...stored };
+      if (Object.keys(rest).length > 0) next[breakpoint] = rest;
+      else delete next[breakpoint];
+      element.setBreakpointStyles(next);
     }
   }
 

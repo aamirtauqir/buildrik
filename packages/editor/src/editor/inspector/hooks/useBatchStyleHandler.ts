@@ -173,6 +173,7 @@ export function useBatchStyleHandler(
             composer.styles.setRule(selector, existing, {
               pseudo: `:${currentPseudoState}`,
               mediaQuery: mq,
+              replace: true,
             });
             return;
           }
