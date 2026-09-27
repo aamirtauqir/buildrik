@@ -12,35 +12,39 @@ vi.mock("@/server/services/workspace-settings.service", async (importOriginal) =
 import { accountRouter } from "@server/trpc/routers/account";
 import { TRPCError } from "@trpc/server";
 
-function makeCtx(userId: string, ownerId: string) {
+/* I5: the router no longer reads the workspace itself — the owner check is the
+   service's, and ctx.prisma carries only what getWorkspaceCtx needs. */
+function makeCtx(userId: string) {
   return {
     session: { user: { id: userId } },
     prisma: {
       workspaceMember: {
         findFirst: vi.fn().mockResolvedValue({ workspaceId: "w1", role: "ADMIN", workspace: { plan: "PRO" } }),
       },
-      workspace: { findUnique: vi.fn().mockResolvedValue({ id: "w1", ownerId, name: "Acme" }) },
     },
   } as never;
 }
 
 beforeEach(() => {
-  cancelWorkspaceDeletion.mockReset().mockResolvedValue({ id: "w1", deletionScheduledAt: null });
+  cancelWorkspaceDeletion.mockReset().mockImplementation(async (_workspaceId: string, userId: string) => {
+    if (userId !== "owner-1") throw new Error("NOT_OWNER");
+    return { id: "w1", deletionScheduledAt: null };
+  });
 });
 
 describe("account.workspace.cancelDelete — owner only", () => {
-  it("rejects an admin who is not the owner with FORBIDDEN", async () => {
-    const caller = accountRouter.createCaller(makeCtx("admin-1", "owner-1"));
+  it("maps the service's NOT_OWNER to FORBIDDEN", async () => {
+    const caller = accountRouter.createCaller(makeCtx("admin-1"));
     const err = await caller.workspace.cancelDelete().catch((e: unknown) => e);
     expect(err).toBeInstanceOf(TRPCError);
     expect((err as TRPCError).code).toBe("FORBIDDEN");
     expect((err as TRPCError).message).toBe("Only the owner can cancel the deletion.");
-    expect(cancelWorkspaceDeletion).not.toHaveBeenCalled();
+    expect(cancelWorkspaceDeletion).toHaveBeenCalledWith("w1", "admin-1");
   });
 
   it("lets the owner cancel", async () => {
-    const caller = accountRouter.createCaller(makeCtx("owner-1", "owner-1"));
+    const caller = accountRouter.createCaller(makeCtx("owner-1"));
     await caller.workspace.cancelDelete();
-    expect(cancelWorkspaceDeletion).toHaveBeenCalledWith("w1");
+    expect(cancelWorkspaceDeletion).toHaveBeenCalledWith("w1", "owner-1");
   });
 });

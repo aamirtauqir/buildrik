@@ -229,9 +229,12 @@ export const accountRouter = router({
       }),
     cancelDelete: protectedProcedure.mutation(async ({ ctx }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
-      const ws = await ctx.prisma.workspace.findUnique({ where: { id: workspaceId } });
-      if (!ws || ws.ownerId !== ctx.session.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the owner can cancel the deletion." });
-      return cancelWorkspaceDeletion(workspaceId);
+      try {
+        return await cancelWorkspaceDeletion(workspaceId, ctx.session.user.id);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Only the owner can cancel the deletion." });
+        throw e;
+      }
     }),
     transfer: router({
       pending: protectedProcedure.query(async ({ ctx }) => {

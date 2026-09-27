@@ -14,7 +14,7 @@ const { cancel, retrieve, getStripe, unpublishSite } = vi.hoisted(() => {
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    workspace: { findMany: vi.fn(), deleteMany: vi.fn() },
+    workspace: { findMany: vi.fn(), deleteMany: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
     subscription: { findUnique: vi.fn() },
     site: { findMany: vi.fn() },
     user: { delete: vi.fn(), deleteMany: vi.fn() },
@@ -27,7 +27,7 @@ vi.mock("@/server/services/publish.service", async (importOriginal) => ({
 }));
 
 import { prisma } from "@/lib/prisma";
-import { processDueWorkspaceDeletions } from "@/server/services/workspace-settings.service";
+import { cancelWorkspaceDeletion, processDueWorkspaceDeletions } from "@/server/services/workspace-settings.service";
 import { GET } from "@/app/api/cron/workspace-deletion/route";
 
 const NOW = new Date("2026-10-30");
@@ -218,5 +218,26 @@ describe("workspace-deletion cron route", () => {
     const res = await GET(makeReq("Bearer test-secret"));
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ deleted: 1, skipped: 0 });
+  });
+});
+
+/* I5: the owner check lived in the router, reading ctx.prisma directly. */
+describe("cancelWorkspaceDeletion — owner only", () => {
+  it("throws NOT_OWNER for anyone but the owner and leaves the schedule alone", async () => {
+    vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ ownerId: "owner-1" } as never);
+    await expect(cancelWorkspaceDeletion("w1", "admin-1")).rejects.toThrow("NOT_OWNER");
+    expect(prisma.workspace.update).not.toHaveBeenCalled();
+  });
+
+  it("throws NOT_OWNER for a missing workspace", async () => {
+    vi.mocked(prisma.workspace.findUnique).mockResolvedValue(null);
+    await expect(cancelWorkspaceDeletion("w1", "owner-1")).rejects.toThrow("NOT_OWNER");
+  });
+
+  it("clears the schedule for the owner", async () => {
+    vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ ownerId: "owner-1" } as never);
+    vi.mocked(prisma.workspace.update).mockResolvedValue({ id: "w1", deletionScheduledAt: null } as never);
+    await cancelWorkspaceDeletion("w1", "owner-1");
+    expect(prisma.workspace.update).toHaveBeenCalledWith({ where: { id: "w1" }, data: { deletionScheduledAt: null } });
   });
 });

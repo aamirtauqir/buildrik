@@ -158,7 +158,9 @@ export async function deleteWorkspace(workspaceId: string) {
   return { scheduledAt };
 }
 
-export async function cancelWorkspaceDeletion(workspaceId: string) {
+export async function cancelWorkspaceDeletion(workspaceId: string, userId: string) {
+  const ws = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { ownerId: true } });
+  if (!ws || ws.ownerId !== userId) throw new Error("NOT_OWNER");
   return prisma.workspace.update({
     where: { id: workspaceId },
     data: { deletionScheduledAt: null },
