@@ -182,7 +182,6 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
      the new type already holds a valid value here, and target/rel go when the
      new type cannot open in a tab (none, email, phone). One transaction. */
   const handleLinkTypeChange = (type: string) => {
-    setLinkType(type as LinkType);
     const el = selectedElement?.id ? composer?.elements.getElement(selectedElement.id) : null;
     if (!composer || !el) return;
     const href =
@@ -199,7 +198,10 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
       else target.removeAttribute?.("href");
       if (noTab) writeTarget(target, "_self");
     });
-    if (ran && noTab) setTarget("_self");
+    /* The UI follows the write: a locked element keeps its displayed type. */
+    if (!ran) return;
+    setLinkType(type as LinkType);
+    if (noTab) setTarget("_self");
   };
 
   const handlePageSelect = (pageId: string) => {

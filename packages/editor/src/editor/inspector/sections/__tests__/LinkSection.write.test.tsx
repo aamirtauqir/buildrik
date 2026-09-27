@@ -163,3 +163,17 @@ describe("LinkSection — changing the link type clears what no longer applies (
     expect(el.getAttribute("rel")).toBe("nofollow noopener noreferrer");
   });
 });
+
+/* P-1 follow-up: the type select changed the UI before the lock gate ran, so
+   a locked link showed "Page" while its href was untouched. */
+describe("LinkSection — a locked element", () => {
+  it("a refused type change leaves the displayed type unchanged", () => {
+    const { el, composer, container } = renderLink({ attrs: { href: "https://x.com" } });
+    expect(linkTypeSelect(container).value).toBe("url");
+    (el as unknown as { isLocked: () => boolean }).isLocked = () => true;
+    fireEvent.change(linkTypeSelect(container), { target: { value: "none" } });
+    expect(el.removeAttribute).not.toHaveBeenCalledWith("href");
+    expect(composer.emit).toHaveBeenCalled();
+    expect(linkTypeSelect(container).value).toBe("url");
+  });
+});
