@@ -752,6 +752,19 @@ export async function hasEverDeployed(siteId: string): Promise<boolean> {
   return job != null;
 }
 
+/** Refuse to deploy an unpinned site into a project another site is pinned to
+ *  (a legacy slug reuse from before the checks on slug change) — the deploy
+ *  would replace that site's live one. The message reaches the user as-is. */
+export async function assertProjectNameFree(siteId: string, projectName: string): Promise<void> {
+  const other = await prisma.site.findFirst({
+    where: { vercelProjectName: projectName, id: { not: siteId } },
+    select: { id: true },
+  });
+  if (other) {
+    throw new Error("This site's address clashes with another site. Change its URL slug in Settings and publish again.");
+  }
+}
+
 export async function unpublishSite(siteId: string) {
   // Actually take the site down on Vercel — deleting the production deployment
   // removes it from the web (the project + custom domains stay attached, so a

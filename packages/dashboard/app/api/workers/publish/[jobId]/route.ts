@@ -11,7 +11,7 @@ import { wireSliders } from "@lib/publish-sliders";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
-import { runVercelDeploy, completePublish } from "@server/services/publish.service";
+import { assertProjectNameFree, runVercelDeploy, completePublish } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
 import { getWorkspaceAppScripts } from "@server/services/marketplace.service";
 import { checkWorkerAuth } from "@/lib/cron-auth";
@@ -330,6 +330,7 @@ async function runVercelDeployJob(
   // Named here rather than at the deploy call: the sitemap needs the origin
   // this deploy will land on, and that is derived from the project name.
   const projectName = resolveVercelProjectName(site);
+  if (!site.vercelProjectName) await assertProjectNameFree(siteId, projectName);
   const verifiedDomain = await prisma.domain.findFirst({
     where: { siteId, status: "VERIFIED" },
     select: { domain: true },

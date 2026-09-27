@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { NextRequest } from "next/server";
 
-const { db, runVercelDeploy } = vi.hoisted(() => ({
+const { db, runVercelDeploy, assertProjectNameFree } = vi.hoisted(() => ({
   db: {
     publishBuildJob: { findUnique: vi.fn(), update: vi.fn() },
     site: { findUnique: vi.fn(), update: vi.fn() },
@@ -21,6 +21,7 @@ const { db, runVercelDeploy } = vi.hoisted(() => ({
     $transaction: vi.fn(),
   },
   runVercelDeploy: vi.fn(),
+  assertProjectNameFree: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({ prisma: db }));
@@ -39,6 +40,7 @@ vi.mock("@/server/services/activity-log.service", () => ({ record: vi.fn(async (
 vi.mock("@/server/services/notification.trigger", () => ({ notifyWorkspaceOwner: vi.fn(async () => {}) }));
 vi.mock("@/server/services/publish.service", () => ({
   runVercelDeploy: (...a: unknown[]) => runVercelDeploy(...a),
+  assertProjectNameFree: (...a: unknown[]) => assertProjectNameFree(...a),
   completePublish: vi.fn(async () => {}),
 }));
 vi.mock("@/server/services/site-settings.service", () => ({ decryptPublishedPassword: () => null }));
@@ -105,6 +107,7 @@ beforeEach(() => {
       : Object.values(model).forEach((fn) => fn.mockReset()),
   );
   runVercelDeploy.mockReset();
+  assertProjectNameFree.mockReset().mockResolvedValue(undefined);
 });
 
 describe("publish worker — pinned Vercel project (SA-06)", () => {
@@ -146,6 +149,34 @@ describe("publish worker — pinned Vercel project (SA-06)", () => {
     expect(res.status).toBe(200);
     expect(errSpy).toHaveBeenCalledWith(expect.stringContaining("pin"), expect.anything());
     errSpy.mockRestore();
+  });
+
+  /* C1 residual: a legacy unpinned site whose derived project another site is
+     pinned to would deploy over that site. Refuse before deploying. */
+  it("fails an unpinned site whose project name another site holds, before deploying", async () => {
+    setup(null);
+    db.$transaction.mockResolvedValue([]);
+    assertProjectNameFree.mockRejectedValue(
+      new Error("This site's address clashes with another site. Change its URL slug in Settings and publish again."),
+    );
+
+    const res = await run();
+
+    expect(res.status).toBe(500);
+    expect(assertProjectNameFree).toHaveBeenCalledWith("s1", slugifyProjectName("renamed"));
+    expect(runVercelDeploy).not.toHaveBeenCalled();
+    expect(db.publishBuildJob.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: "FAILED", error: expect.stringContaining("clashes with another site") }),
+    }));
+  });
+
+  it("does not check a pinned site — its name is its own", async () => {
+    setup("buildrik-site-original");
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
+
+    await run();
+
+    expect(assertProjectNameFree).not.toHaveBeenCalled();
   });
 
   it("does not pin when the deploy fails", async () => {
