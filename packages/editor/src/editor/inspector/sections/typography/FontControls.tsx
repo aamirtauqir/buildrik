@@ -36,9 +36,11 @@ interface FontControlsProps {
   composer?: Composer | null;
   /** "page": the Page panel's subset — the text colour only. */
   variant?: "element" | "page";
+  /** What the element renders as where it sets nothing (the Page panel's text colour). */
+  inherited?: Readonly<Record<string, string>>;
 }
 
-export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, composer, variant = "element" }) => {
+export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, composer, variant = "element", inherited }) => {
   const colour = (
     <div className="tw:relative">
       <ColorInput
@@ -47,6 +49,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
         onChange={(v) => onChange("color", v)}
         composer={composer}
         property="color"
+        inheritedValue={inherited?.color}
       />
     </div>
   );

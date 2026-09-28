@@ -37,6 +37,8 @@ export interface TypographySectionProps {
   composer?: Composer | null;
   /** "page": the Page panel's subset (board 21). */
   variant?: "element" | "page";
+  /** What the element renders as where it sets nothing (Page panel: font, text colour). */
+  inherited?: Readonly<Record<string, string>>;
 }
 
 // ============================================================================
@@ -53,6 +55,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   isMultiSelect,
   composer,
   variant = "element",
+  inherited,
 }) => {
   const handleFontChange = React.useCallback((value: string) => onChange("font-family", value), [onChange]);
   const isPage = variant === "page";
@@ -60,7 +63,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   return (
     <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
       <div className="tw:relative">
-        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} />
+        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
       </div>
 
       <FontControls
@@ -69,6 +72,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
         isMultiSelect={isMultiSelect}
         composer={composer}
         variant={variant}
+        inherited={inherited}
       />
 
       {!isPage && advancedExpanded && (

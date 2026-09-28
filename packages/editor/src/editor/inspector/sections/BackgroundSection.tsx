@@ -153,7 +153,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           />
         </div>
       )}
-      {bgType === "color" && onAdvancedToggle && (
+      {/* The Page panel's Fill is the one Background row (board 21). */}
+      {bgType === "color" && onAdvancedToggle && variant !== "page" && (
         <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} advancedCount={2} />
       )}
       {/* Gradient Background */}

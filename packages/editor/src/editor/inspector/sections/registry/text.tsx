@@ -28,6 +28,9 @@ const adaptTypography = (ctx: SectionContext) => ({
   advancedExpanded: ctx.advancedExpanded,
   onAdvancedToggle: ctx.onAdvancedToggle,
   variant: ctx.variant,
+  /* The Page panel shows what the page renders where it sets nothing: its
+     font and text colour (board 21: "Inter", "Text / primary"). */
+  inherited: ctx.variant === "page" ? renderedValues(ctx.selectedElement.id, ctx.styles, ctx.composer) : undefined,
 });
 
 /**
@@ -54,25 +57,30 @@ const toHex = (value: string): string | null => {
   return rgb ? rgbToHex(rgb).toUpperCase() : null;
 };
 
+/** A palette step ("color-slate-700") rather than a role ("color-text-primary"). */
+const isRamp = (id: string) => /-\d+$/.test(id);
+
 /**
- * The site's first colour token whose value is `hex` — the saved tokens over
- * the seed, in Brand's order (several tokens can share a value; the first,
- * the seed's semantic names, wins). Null when none matches.
+ * The site's colour token whose value is `hex` — the saved tokens over the
+ * seed. Several tokens can share a value (#334155 is both Slate / 700 and
+ * Text / primary): a role name wins over a palette step, then Brand's order.
+ * Null when none matches.
  */
-function colourTokenFor(composer: Composer | null | undefined, hex: string): string | null {
+function colourTokenFor(composer: Composer | null | undefined, hex: string): DesignToken | null {
   const settings = composer?.getProjectSettings?.();
   const tokens = mergeProjectTokens((settings?.designTokens ?? []) as DesignToken[], settings?.designTokensSchemaVersion);
   const want = hex.toUpperCase();
-  return tokens.find((t) => t.category === "colors" && toHex(t.value) === want)?.id ?? null;
+  const hits = tokens.filter((t) => t.category === "colors" && toHex(t.value) === want);
+  return hits.find((t) => !isRamp(t.id)) ?? hits[0] ?? null;
 }
 
 /**
- * What the text inside an element renders as, for the summary keys it has no
- * value of its own for — a container usually carries none and inherits them
- * (board 17). Read off the canvas node; a colour that equals a Brand colour
- * token is named by it, else printed as hex.
+ * What an element renders as for the summary keys it has no value of its own
+ * for — a container or the page root usually carries none and inherits them
+ * (boards 17, 21). Read off the canvas node. A colour that equals a Brand
+ * colour token comes back as that token's var, else as hex.
  */
-function renderedText(elementId: string, own: Record<string, string>, composer: Composer | null | undefined): Record<string, string> {
+function renderedValues(elementId: string, own: Record<string, string>, composer: Composer | null | undefined): Record<string, string> {
   const node = getDOMElement(elementId);
   if (!node) return {};
   const cs = window.getComputedStyle(node);
@@ -82,8 +90,8 @@ function renderedText(elementId: string, own: Record<string, string>, composer: 
     const value = cs.getPropertyValue(key).trim();
     if (!value) continue;
     const hex = key === "color" ? toHex(value) : null;
-    const tokenId = hex ? colourTokenFor(composer, hex) : null;
-    out[key] = tokenId ? colourTokenLabel(tokenId) : (hex ?? value);
+    const token = hex ? colourTokenFor(composer, hex) : null;
+    out[key] = token?.cssVar ? `var(${token.cssVar})` : (hex ?? value);
   }
   return out;
 }
@@ -118,7 +126,7 @@ export const TEXT_SECTIONS: Record<string, AnySectionEntry> = {
     title: "Text inside",
     open: "closed",
     capability: (caps) => caps.typography === "inside",
-    summary: (ctx) => textSummary({ ...renderedText(ctx.selectedElement.id, ctx.styles, ctx.composer), ...ctx.styles }),
+    summary: (ctx) => textSummary({ ...renderedValues(ctx.selectedElement.id, ctx.styles, ctx.composer), ...ctx.styles }),
     Component: TypographySection,
     advancedKey: "text-inside",
     advancedProps: TYPOGRAPHY_ADVANCED,

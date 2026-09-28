@@ -77,17 +77,22 @@ export interface ColorInputProps {
   placeholder?: string;
   /** The CSS property it edits — read-only and the override dot come from the field context. */
   property?: string;
+  /** What the element renders as when it sets no value of its own (the Page
+   *  panel's Text colour, board 21: "Text / primary"). Shown, never written. */
+  inheritedValue?: string;
 }
 
 export const ColorInput: React.FC<ColorInputProps> = ({
   label,
-  value,
+  value: ownValue,
   onChange,
   composer,
   placeholder,
   property,
+  inheritedValue,
 }) => {
   const field = useInspectorField(property);
+  const value = ownValue || (field.mixed ? "" : (inheritedValue ?? ""));
   const [isOpen, setIsOpen] = React.useState(false);
 
   const { tokens: colorTokens } = useColorRegistry();

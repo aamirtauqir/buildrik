@@ -81,6 +81,39 @@ describe("PagePanel — board 21", () => {
     expect(within(type).queryByText("Weight")).toBeNull();
   });
 
+  it("shows what the page renders where it sets nothing: the text colour's token, the font's family", () => {
+    const composer = createTestComposer();
+    const page = composer.elements.createPage("Home");
+    composer.elements.setActivePage?.(page.id);
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", page.root.id);
+    node.style.color = "rgb(100, 116, 139)"; // #64748B — the seed's Secondary
+    node.style.fontFamily = "Inter, sans-serif";
+    document.body.appendChild(node);
+    try {
+      render(<PagePanel composer={composer} />, { wrapper: ToastProvider });
+      const type = screen.getByTestId("inspector-section-typography");
+      expect(within(type).getByTestId("inspector-token-name")).toHaveTextContent("Secondary");
+      expect(within(type).queryByDisplayValue(/000000/)).toBeNull();
+      expect(within(type).getByRole("button", { name: "Font family" })).toHaveTextContent("Inter");
+      expect(within(type).queryByText(/Select font/)).toBeNull();
+      // Nothing was written: the page still sets neither.
+      const root = composer.elements.getElement(page.root.id)!;
+      expect(root.getStyles().color).toBeUndefined();
+      expect(root.getStyles()["font-family"]).toBeUndefined();
+    } finally {
+      node.remove();
+    }
+  });
+
+  it("Fill is the one Background row — no More settings; Max width has no '0' placeholder", () => {
+    setup();
+    const fill = screen.getByTestId("inspector-section-fill");
+    expect(within(fill).queryByText(/More settings/)).toBeNull();
+    const maxWidth = within(screen.getByTestId("inspector-section-size")).getByRole("textbox", { name: /max width/i });
+    expect(maxWidth.getAttribute("placeholder") ?? "").toBe("");
+  });
+
   it("no tabs, no context row, no Link / CMS / Visibility / Interactions", () => {
     setup();
     expect(screen.queryByRole("tablist")).toBeNull();

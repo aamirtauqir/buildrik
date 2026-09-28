@@ -55,6 +55,9 @@ interface FontPickerProps {
   /** Source of the UPLOADED group — the FontManager's custom fonts, which the
    *  Composer registers from the media library's ADDED site fonts. */
   composer?: Composer | null;
+  /** The family the element renders in when it sets none (Page panel, board
+   *  21: "Inter"). Shown, never written. */
+  inheritedValue?: string;
 }
 
 /* Clone 3721:43423 — an uploaded font is "a separate uploaded source; it does
@@ -86,8 +89,9 @@ export function useUploadedFonts(composer: Composer | null | undefined): SystemF
   return fonts;
 }
 
-export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, composer }) => {
+export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChange, composer, inheritedValue }) => {
   const field = useInspectorField("font-family");
+  const value = ownValue || inheritedValue || "";
   const [showFontPicker, setShowFontPicker] = React.useState(false);
   const uploadedFonts = useUploadedFonts(composer);
 

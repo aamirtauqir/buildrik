@@ -314,6 +314,8 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
         <InputWithUnit
           label="Max width"
           property="max-width"
+          /* Unset reads empty, not a "0" that looks like a value (board 21). */
+          placeholder=""
           units={["px", "%", "rem", "vw"]}
           value={styles["max-width"] || ""}
           onChange={(v) => onChange("max-width", v)}
