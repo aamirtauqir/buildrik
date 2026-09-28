@@ -9,7 +9,7 @@
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import { loadGoogleFont, type GoogleFont } from "../../../../services/GoogleFontsService";
-import { FontPickerPanel, namesFont } from "./FontPickerDropdown";
+import { FontPickerPanel, namesFont, primaryFamily } from "./FontPickerDropdown";
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "../../shared/controls";
 import { EVENTS } from "@/shared/constants/events";
@@ -118,14 +118,13 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
     const systemFont = [...uploadedFonts, ...SYSTEM_FONTS].find((f) => f.value === value);
     if (systemFont) return systemFont.label;
 
-    // Extract font name from value
-    const match = value.match(/'([^']+)'/);
-    return match ? match[1] : value;
+    /* Board 1 reads "Inter", not the stack "Inter, sans-serif". */
+    return primaryFamily(value) || value;
   }, [value, uploadedFonts]);
 
   return (
-    /* Board 807:8342 reads "Family  [Inter Tight]" — one row, label left, the
-       same 88px column every other row uses. It used to stack a "Font Family"
+    /* Board 1 reads "Font  [Inter]" — one row, label left, the same column
+       every other row uses. It used to stack a "Font Family"
        caption above a full-bleed button, the only row in the section that did. */
     /* `.bdi-ddn` — the SHARED control frame, not a fourth hand-rolled one.
        807:8352 draws Family's box exactly like every other control on the
@@ -134,8 +133,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
        bottom margin that broke the board's contiguous 34-row rhythm — the only
        row in the panel that did either. The one style left inline is the
        preview typeface, which is the field's value and cannot be a class. */
-    <div className="bdi-row-ctrl tw:relative" data-testid={rowTestId("Family")}>
-      <label className="bdi-lb" data-testid={labelTestId("Family")}>Family</label>
+    <div className="bdi-row-ctrl tw:relative" data-testid={rowTestId("Font")}>
+      <label className="bdi-lb" data-testid={labelTestId("Font")}>Font</label>
       {/* Current Font Display / Toggle Button */}
       <Button
         onClick={() => setShowFontPicker(!showFontPicker)}
@@ -143,7 +142,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
         aria-expanded={showFontPicker}
         aria-controls="font-picker-listbox"
         aria-label="Font family"
-        data-testid={fieldTestId("Family")}
+        data-testid={fieldTestId("Font")}
         data-font-source={uploaded ? "uploaded" : undefined}
         className="bdi-ddn tw:justify-between tw:text-left"
         style={{ fontFamily: value || "inherit" }}

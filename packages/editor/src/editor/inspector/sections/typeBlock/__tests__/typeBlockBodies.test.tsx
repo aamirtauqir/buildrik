@@ -2,7 +2,8 @@
  * Type block — the W1 generic bodies: the defining rows each type carries
  * over from the old Advanced section, their write routing, and what the
  * redesign removed from them (R-DD-9: content textareas, Open In, Rel, link
- * Title). Lanes L2-A / L2-B / L2-C replace the bodies with the board layouts.
+ * Title). Lanes L2-A / L2-B / L2-C replace the bodies with the board layouts;
+ * the text and form families moved to textBodies.test / formBodies.test.
  *
  * @license BSD-3-Clause
  */
@@ -48,54 +49,6 @@ describe("type block frame", () => {
   it("renders nothing for a type whose block has no body yet (embeds, widgets)", () => {
     const { container } = setup("countdown");
     expect(container.innerHTML).toBe("");
-  });
-});
-
-describe("text family", () => {
-  it("Heading: Level writes the tag, and Edit text on canvas is the text door", () => {
-    const { el, container } = setup("heading");
-    fireEvent.change(selectWith(container, "h3"), { target: { value: "h3" } });
-    expect(el.setTagName).toHaveBeenCalledWith("h3");
-    expect(screen.getByTestId("inspector-edit-text-on-canvas")).toBeInTheDocument();
-  });
-
-  it.each(["heading", "text", "paragraph", "label", "link", "button"])("%s has no content textarea", (type) => {
-    const { container } = setup(type);
-    expect(container.querySelector("textarea")).toBeNull();
-  });
-
-  it.each(["link", "button"])("%s has no Open In / Rel / Title row (R-DD-9)", (type) => {
-    setup(type);
-    for (const label of [/open in/i, /^rel$/i, /^title$/i]) expect(screen.queryByText(label)).toBeNull();
-  });
-
-  it("Button: Type and Disabled", () => {
-    const { el, container } = setup("button");
-    fireEvent.change(selectWith(container, "submit"), { target: { value: "submit" } });
-    expect(el.setAttribute).toHaveBeenCalledWith("type", "submit");
-    expect(screen.getByRole("checkbox", { name: "Disabled" })).toBeInTheDocument();
-  });
-});
-
-describe("form fields", () => {
-  it("Input: board 14's six rows, in order", () => {
-    const { container } = setup("input");
-    const labels = Array.from(container.querySelectorAll("label")).map((l) => l.textContent?.trim());
-    expect(labels).toEqual(["Input type", "Name", "Placeholder", "Default", "Required", "Disabled"]);
-  });
-
-  it("changing the input type writes the type attribute in one transaction", () => {
-    const { el, composer, container } = setup("input");
-    fireEvent.change(selectWith(container, "email"), { target: { value: "email" } });
-    expect(el.setAttribute).toHaveBeenCalledWith("type", "email");
-    expect(composer.beginTransaction).toHaveBeenCalledWith("element-prop-change");
-  });
-
-  it("Select: newline-separated options rebuild the <option> markup", () => {
-    const { el } = setup("select");
-    const row = screen.getByText("Options (one per line)").closest(".bdi-row-ctrl") as HTMLElement;
-    fireEvent.change(row.querySelector("textarea") as HTMLTextAreaElement, { target: { value: "Red\nBlue" } });
-    expect(el.setContent).toHaveBeenCalledWith("<option>Red</option><option>Blue</option>");
   });
 });
 
