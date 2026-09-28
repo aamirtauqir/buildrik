@@ -5,6 +5,8 @@
  *   CheckRow   — a checkbox with its label BESIDE the box (X-8);
  *   CommitRow  — a labelled text field that writes on Enter / blur, once, and
  *                restores on Esc (Rel, a field's label, "Add class");
+ *   PickRow    — "On click  [Scroll to menu ▾]": a label and a select-shaped
+ *                value that opens the item's own edit screen (Interactions);
  *   ActionRow  — the right-aligned accent action ("+ New collection…",
  *                "Open record ›", "Unbind", "+ Add field");
  *   NoteRow    — the 11px muted line under a section ("Changing Link to…").
@@ -14,6 +16,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { ChevronDown } from "lucide-react";
 import { Button, Checkbox, TextField } from "@/editor/chrome-ui";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 
@@ -55,12 +58,15 @@ export interface CommitRowProps {
   testId?: string;
   /** Clear the field after a commit ("Add class"). */
   clearOnCommit?: boolean;
+  /** Offered as the browser's own completion list (a datalist). */
+  suggestions?: readonly string[];
   onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
 }
 
-export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, onPaste }: CommitRowProps) {
+export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste }: CommitRowProps) {
   const { readOnly } = useInspectorField();
   const id = React.useId();
+  const listId = `${id}-list`;
   const [draft, setDraft] = React.useState(value);
   React.useEffect(() => setDraft(value), [value]);
   const commit = () => {
@@ -78,6 +84,7 @@ export function CommitRow({ label, value, onCommit, placeholder, type, testId, c
           className="bdi-text"
           readOnly={readOnly}
           type={type}
+          list={suggestions?.length ? listId : undefined}
           value={draft}
           placeholder={placeholder}
           onChange={(e) => setDraft(e.target.value)}
@@ -92,7 +99,58 @@ export function CommitRow({ label, value, onCommit, placeholder, type, testId, c
             }
           }}
         />
+        {suggestions?.length ? (
+          <datalist id={listId}>
+            {suggestions.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
+        ) : null}
       </div>
+    </div>
+  );
+}
+
+export interface PickRowProps {
+  label: string;
+  value: string;
+  onOpen: () => void;
+  testId?: string;
+  /** Dimmed (a disabled interaction). */
+  muted?: boolean;
+}
+
+export function PickRow({ label, value, onOpen, testId, muted }: PickRowProps) {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      data-testid={testId}
+      className={
+        "bdi-row-ctrl tw:cursor-pointer tw:select-none tw:rounded-[4px] " +
+        "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]" +
+        (muted ? " tw:opacity-50" : "")
+      }
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+    >
+      <span className="bdi-lb">{label}</span>
+      <span className="bdi-row-content">
+        <span
+          className={
+            "tw:flex tw:h-6 tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:rounded-[4px] tw:border tw:border-[var(--bk-border)] " +
+            "tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+          }
+        >
+          <span className="tw:min-w-0 tw:flex-1 tw:truncate">{value}</span>
+          <ChevronDown size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+        </span>
+      </span>
     </div>
   );
 }

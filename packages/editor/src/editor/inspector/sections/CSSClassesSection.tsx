@@ -1,16 +1,24 @@
 /**
- * CSS Classes Section - Add/Remove CSS classes
- * SSOT: reads classes from composer.elements.getElement().getClasses() on each render.
- * No cached useState — always reflects live state.
+ * CSS Classes Section — Behaviour › CSS classes (board 2): the element's
+ * classes as chips ("hero-title ▾" — the chevron opens Remove class), then an
+ * "Add class" field. The field takes several at once: "card hero .wide" typed
+ * or pasted adds all three in one step (multi-class paste). Suggestions are
+ * the project's global classes.
+ *
+ * SSOT: reads classes from composer.elements.getElement().getClasses() and
+ * re-reads on element:updated, so undo / redo never leave it stale. Every
+ * write passes the lock gate (P-1).
+ *
  * @license BSD-3-Clause
  */
 
+import { ChevronDown } from "lucide-react";
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { devWarn } from "../../../shared/utils/devLogger";
-import { Section, type SectionTier } from "../shared/controls";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import type { Composer } from "@/engine";
+import { Button, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
 import { writeElement } from "@/engine/commands/commandOperations";
+import { Section, type SectionTier } from "../shared/controls";
+import { CommitRow } from "./behaviourRows";
 
 export interface CSSClassesSectionProps {
   selectedElement: {
@@ -26,6 +34,49 @@ export interface CSSClassesSectionProps {
   tier?: SectionTier;
 }
 
+/** "card, hero  .wide" → ["card", "hero", "wide"]. */
+function parseClassList(text: string): string[] {
+  return [...new Set(text.split(/[\s,]+/).map((t) => t.replace(/^\.+/, "")).filter(Boolean))];
+}
+
+function ClassChip({ name, onRemove }: { name: string; onRemove: () => void }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <Popover
+      open={open}
+      onClose={() => setOpen(false)}
+      label={`Class ${name}`}
+      trigger={
+        <Button
+          type="button"
+          color="ghost"
+          size="xs"
+          data-testid={`class-chip-${name}`}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+          className="tw:h-7 tw:gap-1.5 tw:rounded-[4px] tw:px-1.5 tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+        >
+          {name}
+          <ChevronDown size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+        </Button>
+      }
+    >
+      <Menu label={`Class ${name}`}>
+        <MenuItem
+          danger
+          onClick={() => {
+            setOpen(false);
+            onRemove();
+          }}
+        >
+          Remove class
+        </MenuItem>
+      </Menu>
+    </Popover>
+  );
+}
+
 export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
   selectedElement,
   composer,
@@ -33,13 +84,6 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
   onToggle,
   tier = "secondary",
 }) => {
-  const [newClass, setNewClass] = React.useState("");
-  const [showSuggestions, setShowSuggestions] = React.useState(false);
-  const [addingInline, setAddingInline] = React.useState(false);
-  const inlineInputRef = React.useRef<HTMLInputElement>(null);
-
-  // SSOT: seed from composer and re-read on element:updated events so
-  // undo/redo or external panels don't leave this view stale.
   const [classes, setClasses] = React.useState<string[]>([]);
 
   React.useEffect(() => {
@@ -59,34 +103,24 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
       if (!id || id === selectedElement.id) read();
     };
     composer.on?.("element:updated", handler);
-    return () => { composer.off?.("element:updated", handler); };
+    return () => {
+      composer.off?.("element:updated", handler);
+    };
   }, [composer, selectedElement?.id]);
 
-  // Global class suggestions from project stylesheet (H-06 / L-05 fix: no Tailwind)
   const globalClasses = React.useMemo<string[]>(() => {
-    const global = (
-      composer?.styles as { getGlobalClasses?: () => string[] } | null
-    )?.getGlobalClasses?.();
+    const global = (composer?.styles as { getGlobalClasses?: () => string[] } | null)?.getGlobalClasses?.();
     return global ?? [];
   }, [composer]);
 
-  const addClass = (className: string) => {
-    const normalized = className.trim();
-    if (!normalized) return;
-
-    if (classes.includes(normalized)) {
-      devWarn("CSSClasses", `Class "${normalized}" already applied`, {
-        elementId: selectedElement.id,
-      });
-      return;
-    }
-
-    if (!composer || !selectedElement?.id) return;
+  /** One step for however many were typed or pasted. */
+  const addClasses = (text: string) => {
+    const fresh = parseClassList(text).filter((c) => !classes.includes(c));
+    if (!fresh.length || !composer || !selectedElement?.id) return;
     /* P-1: the lock gate — refused (and said) when the element is locked. */
-    if (!writeElement(composer, composer.elements.getElement(selectedElement.id), "add-class", (el) => el.addClass?.(normalized))) return;
-
-    setNewClass("");
-    setShowSuggestions(false);
+    writeElement(composer, composer.elements.getElement(selectedElement.id), "add-class", (el) => {
+      for (const c of fresh) el.addClass?.(c);
+    });
   };
 
   const removeClass = (className: string) => {
@@ -95,108 +129,31 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
     writeElement(composer, composer.elements.getElement(selectedElement.id), "remove-class", (el) => el.removeClass?.(className));
   };
 
-  const suggestions = React.useMemo(() => {
-    if (!newClass) return [];
-    return globalClasses
-      .filter((c) => c.toLowerCase().includes(newClass.toLowerCase()) && !classes.includes(c))
-      .slice(0, 8);
-  }, [newClass, globalClasses, classes]);
-
-  const startInlineAdd = () => {
-    setAddingInline(true);
-    setShowSuggestions(true);
-    requestAnimationFrame(() => inlineInputRef.current?.focus());
-  };
-
-  const cancelInlineAdd = () => {
-    setNewClass("");
-    setAddingInline(false);
-    setShowSuggestions(false);
-  };
-
   return (
     <Section title="CSS classes" icon="Tag" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-css-classes">
-      <div className="bdi-chips" style={{ position: "relative" }}>
-        {classes.map((cls, i) => (
-          <span key={cls} className={`bdi-chip${i === 0 ? " pri" : ""}`}>
-            .{cls}
-            <Button
-              type="button"
-              className="bdi-chip-x"
-              onClick={() => removeClass(cls)}
-              aria-label={`Remove class ${cls}`}
-            >
-              ×
-            </Button>
-          </span>
-        ))}
-
-        {addingInline ? (
-          <span className="bdi-chip bdi-chip-input" role="presentation">
-            <span aria-hidden="true" style={{ opacity: 0.5 }}>.</span>
-            <TextInput
-              ref={inlineInputRef}
-              type="text"
-              value={newClass}
-              onChange={(e) => {
-                setNewClass(e.target.value);
-                setShowSuggestions(true);
-              }}
-              onBlur={() => setTimeout(() => {
-                if (newClass.trim()) addClass(newClass);
-                else cancelInlineAdd();
-              }, 120)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addClass(newClass);
-                  setAddingInline(false);
-                }
-                if (e.key === "Escape") {
-                  e.preventDefault();
-                  cancelInlineAdd();
-                }
-              }}
-              placeholder="class-name"
-              aria-label="Add CSS class"
-            />
-          </span>
-        ) : (
-          <Button
-            type="button"
-            className="bdi-chip bdi-chip-add"
-            onClick={startInlineAdd}
-            aria-label="Add class"
-            title="Add class"
-          >
-            +
-          </Button>
-        )}
-
-        {addingInline && showSuggestions && suggestions.length > 0 && (
-          <div
-            role="listbox"
-            aria-label="Class suggestions"
-            className="bdi-chip-suggest"
-          >
-            {suggestions.map((suggestion) => (
-              <Button
-                key={suggestion}
-                type="button"
-                role="option"
-                aria-selected={false}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  addClass(suggestion);
-                  setAddingInline(false);
-                }}
-              >
-                .{suggestion}
-              </Button>
-            ))}
-          </div>
-        )}
-      </div>
+      {classes.length ? (
+        <div className="tw:flex tw:flex-wrap tw:gap-2 tw:py-1" data-testid="class-chips">
+          {classes.map((cls) => (
+            <ClassChip key={cls} name={cls} onRemove={() => removeClass(cls)} />
+          ))}
+        </div>
+      ) : null}
+      <CommitRow
+        label="Add class"
+        value=""
+        placeholder="Add a class…"
+        clearOnCommit
+        testId="class-add"
+        suggestions={globalClasses.filter((c) => !classes.includes(c))}
+        onCommit={addClasses}
+        onPaste={(e) => {
+          const text = e.clipboardData.getData("text");
+          if (parseClassList(text).length < 2) return;
+          /* several at once: add them all now, one step */
+          e.preventDefault();
+          addClasses(text);
+        }}
+      />
     </Section>
   );
 };

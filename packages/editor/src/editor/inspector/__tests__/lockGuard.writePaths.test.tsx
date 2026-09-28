@@ -118,11 +118,12 @@ describe("P-1 — attribute writers refuse a locked element", () => {
     const box = add("container");
     lock(box);
     render(<CSSClassesSection selectedElement={{ id: box.getId(), type: "container" }} composer={composer} isOpen />);
-    fireEvent.click(screen.getByRole("button", { name: /add class/i }));
-    const input = screen.getByPlaceholderText("class-name");
+    const input = screen.getByLabelText("Add class");
     fireEvent.change(input, { target: { value: "hero" } });
     fireEvent.keyDown(input, { key: "Enter" });
+    fireEvent.paste(input, { clipboardData: { getData: () => "a b" } });
     expect(box.getClasses()).not.toContain("hero");
+    expect(box.getClasses()).not.toContain("a");
     expect(skipped).toHaveBeenCalled();
   });
 });
