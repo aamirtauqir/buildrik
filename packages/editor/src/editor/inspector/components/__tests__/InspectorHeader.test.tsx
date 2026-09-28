@@ -112,6 +112,16 @@ describe("InspectorHeader", () => {
     });
     mount({ selectedIds: [heading.getId(), ...more] });
     expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("3 selected · Headings");
-    expect(screen.getByRole("navigation", { name: "Element path" }).textContent).toBe("Home›Section›3 selected · Headings");
+    // Board 22: the path is the shared parent's ("Home › Hero"), not repeated
+    // as a last crumb, and the name row draws no type icon.
+    const nav = screen.getByRole("navigation", { name: "Element path" });
+    expect(nav.textContent).toBe("Home›Section");
+    expect(nav.querySelector('[aria-current="page"]')?.textContent).toBe("Section");
+    expect(screen.queryByTestId("inspector-type-icon")).toBeNull();
+  });
+
+  it("single: the name row draws the type icon", () => {
+    mount();
+    expect(screen.getByTestId("inspector-type-icon")).toBeInTheDocument();
   });
 });

@@ -6,7 +6,9 @@
  *   2. identity — type icon + editable name · ✦ AI (the panel's only AI door)
  *      · ⋯ (board 30) · ✕ "Hide inspector (⌘\)";
  *   3. status marks, only when true (◆ Component · ⌁ binding · 🔒 Locked).
- * Variants: `multi` ("3 selected · Headings", path = common parent).
+ * Variants: `multi` (board 22): the name row reads "3 selected · Headings"
+ * with no type icon, and the path is the shared parent's own ("Home › Hero"),
+ * ending on that parent — the selection is not repeated as a crumb.
  *
  * @license BSD-3-Clause
  */
@@ -33,21 +35,22 @@ export interface InspectorHeaderProps {
   locked: boolean;
 }
 
-/** Page crumb, then each ancestor below the page root, then the element. */
-function pathFor(composer: Composer, anchor: Element | null | undefined, last: string): BreadcrumbItem[] {
+/** Page crumb, then each ancestor below the page root down to `anchor`, then
+ *  `last` as the current crumb — or, without `last`, `anchor` is the current one. */
+function pathFor(composer: Composer, anchor: Element | null | undefined, last?: string): BreadcrumbItem[] {
   const page = composer.elements.getActivePage?.();
   const rootId = page?.root.id;
   const chain: Element[] = [];
   for (let p = anchor ?? null; p && p.getId() !== rootId; p = p.getParent?.() ?? null) chain.unshift(p);
-  return [
+  const crumbs: BreadcrumbItem[] = [
     { id: "page", label: page?.name ?? "Page", onSelect: () => composer.selection.clear() },
     ...chain.map((el) => ({
       id: el.getId(),
       label: getLayerName(el) ?? elementTypeLabel(el.getType()),
       onSelect: () => composer.selection.select(el as never),
     })),
-    { id: "current", label: last },
   ];
+  return last === undefined ? crumbs : [...crumbs, { id: "current", label: last }];
 }
 
 /** The deepest element that contains every one of `els`. */
@@ -77,7 +80,7 @@ export function InspectorHeader({ composer, element, selectedIds, binding, locke
       const types = new Set(els.map((e) => e.getType()));
       multiName = `${selectedIds.length} selected · ${types.size === 1 ? pluralType(element.type) : "Elements"}`;
       const parent = commonParent(els);
-      items = pathFor(composer, parent, multiName);
+      items = pathFor(composer, parent);
     } else {
       const el = composer.elements.getElement(element.id);
       items = pathFor(composer, el?.getParent?.() ?? null, getLayerName(el) ?? typeLabel);
@@ -89,9 +92,11 @@ export function InspectorHeader({ composer, element, selectedIds, binding, locke
       {items.length > 0 ? <Breadcrumb label="Element path" items={items} data-testid="inspector-breadcrumb" /> : null}
       <div className="tw:flex tw:items-center tw:gap-1">
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink-soft)]">
-          <span className="tw:inline-flex tw:shrink-0" aria-hidden="true">
-            <Icon size="sm" />
-          </span>
+          {multi ? null : (
+            <span className="tw:inline-flex tw:shrink-0" aria-hidden="true" data-testid="inspector-type-icon">
+              <Icon size="sm" />
+            </span>
+          )}
           <span className="tw:min-w-0 tw:truncate" title={multi ? multiName : undefined}>
             {multi ? (
               <span data-testid="inspector-element-name">{multiName}</span>
