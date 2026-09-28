@@ -386,3 +386,23 @@ Figma quota (200/day, 15/min, shared): W0 ≤ 72 calls on day 1 (36 design-conte
 **For the lanes (live walk, boards 1, 2, 3, 23, 30, 32)** — chassis matches (header 68 tall, panel 300, tabs 32/100, context row, section headers 32, ⋯ = board 30 rows, state menu = board 32 beside the column, locked line + read-only). Remaining differences: Heading block Level is a select, Text style row missing (L2-A); Typography body, Size Fixed/Fill/Hug rows, Spacing pairs + Gap (L2-C / L2-A); Text inside summary prints a raw `var(--…)` (L2-A); CSS classes / Interactions / CMS bodies (L2-D1); Attributes summary needs an `id` on the fixture heading; read-only selects are dimmed via `disabled` (L3-C).
 
 **Remaining W1 items not done**: `Tabs` panelId (W3 per plan); `insp/index.ts` / barrels untouched (nothing needed).
+
+### L2-A progress (2026-09-28, branch `feat/insp-l2a`)
+
+**Done** — `d02841e2d` (type blocks: Heading Level segmented → tag, one Undo, lock-refused; Text style binds `font-size` to a Brand font-size token via `typeStyleRows`, "Custom" unbinds to the resolved size; Button Edit text / Type segmented / Disabled; Input 6 rows; Checkbox/Radio/Switch write the inner `<input>` through the label's lock gate, Edit text on canvas edits the text child; `typeBlock/blockRows.tsx` = `CheckRow` box-then-label + `useElementRead`), `e42f2e27c` (Typography face Font · Font size · Line height · Weight · Colour · Align with `property=` on every row, rest behind More settings (9); page variant = Font + Text colour; Text inside summary with token names, never `var(--…)`, falling back to what the text renders as). Live (port 3121, site "Inspector v4 fixture · L2-A"): H1→H3 writes the canvas tag and one `history.undo()` restores it; Text style "Heading 3" writes `var(--buildrick-design-font-size-2xl)` and the canvas renders 24px; Checked by default lands on `i4-checkbox-1` (not the label), Undo clears it; Edit text on canvas opens inline edit on button, text and the checkbox's span.
+
+**Decisions the plan did not cover**
+- Board 1 draws Font size and Line height as two rows (not a pair) — built as the board.
+- Align = Left · Center · Right only (board); Justify is no longer on the face.
+- The font-size type-token chain button is removed; the type block's Text style is the one door for that binding (buttons / containers keep a plain Font size in Text inside).
+- Weight options read as their number ("600"), as the board.
+- A rendered colour in the Text inside summary is printed as hex; mapping it back to a token name by value is not done (two tokens can share a value).
+- Link and Label bodies = Text style + Edit text on canvas (no board; by analogy with Text).
+
+**Needs from the lead / other lanes**
+- `registry/type.tsx` (W1): add `"font-size"` to the type entry's `styleKeys`. Until then `TextStyleRow` reads the element's own font-size as a fallback (`textBodies.tsx`); drop the fallback with the change.
+- `config/sectionOrder.ts` (W1): board 17 draws Text inside LAST (after Border); `STYLE_ORDER` puts it after Typography.
+- `typeBlock/PropertyField.tsx` (unowned): its checkbox draws label-then-box; boards 5/9/10/14/15 draw box-then-label. Switch it to `blockRows.CheckRow` so L2-B's media/embed bodies and Attributes match.
+- L3-C (shared controls / `inspector.css`): row labels are right-aligned (board: left at x16); typography rows are 32 tall (board 28); segmented "on" state and number steppers differ from the board; ColorInput names a bound token "Text Primary" (board "Text / primary" — `colourTokenLabel` in `registry/text.tsx` has the board's format).
+- Canvas selection label reads "Label" for a checkbox (Q2 label on the canvas side).
+- Board 21 not walkable until L3-A's PagePanel renders the registry with `variant: "page"`.
