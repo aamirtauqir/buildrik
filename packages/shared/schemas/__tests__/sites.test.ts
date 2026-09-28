@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { editorSaveProjectSchema, saveProjectDataSchema } from "../sites";
+import { editorSaveProjectSchema, filterCmsBindings, saveProjectDataSchema } from "../sites";
 import { publishInputSchema } from "../publish";
 
 describe("saveProjectDataSchema", () => {
@@ -71,5 +71,27 @@ describe("expectedLastEditedAt is validated as an ISO datetime", () => {
     expect(() => editorSaveProjectSchema.parse({ ...base, expectedLastEditedAt: "yesterday" })).toThrow();
     expect(() => publishInputSchema.parse({ siteId: "s", expectedLastEditedAt: "yesterday" })).toThrow();
     expect(() => publishInputSchema.parse({ siteId: "s", expectedLastEditedAt: null })).not.toThrow();
+  });
+});
+
+describe("filterCmsBindings — a field binding's collection name", () => {
+  const binding = {
+    binding: { sourceId: "cms:c1", path: "title", type: "variable" },
+    collectionId: "c1",
+    fieldSlug: "title",
+    property: "content",
+  };
+
+  it("keeps collectionName (board 25 names a deleted collection by it)", () => {
+    const out = filterCmsBindings({ field: { e1: [{ ...binding, collectionName: "Specials" }] } });
+    expect(out?.field?.e1?.[0]).toMatchObject({ collectionName: "Specials" });
+  });
+
+  it("an old binding without one is still valid", () => {
+    expect(filterCmsBindings({ field: { e1: [binding] } })?.field?.e1).toHaveLength(1);
+  });
+
+  it("drops an entry whose collectionName is not a bounded string", () => {
+    expect(filterCmsBindings({ field: { e1: [{ ...binding, collectionName: "x".repeat(201) }] } })?.field?.e1).toBeUndefined();
   });
 });

@@ -220,7 +220,10 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
       {missing && !reconnecting ? (
         <>
           <NoteRow tone="error" testId="cms-source-missing">
-            Source missing — the collection this followed was deleted. Reconnect a source or keep the current text.
+            {binding?.collectionName
+              ? `Source missing — Collection “${binding.collectionName}” was deleted.`
+              : "Source missing — the collection this followed was deleted."}{" "}
+            Reconnect a source or keep the current text.
           </NoteRow>
           <ActionRow onClick={() => setReconnecting(true)} testId="cms-reconnect">
             Reconnect…

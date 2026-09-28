@@ -191,6 +191,21 @@ describe("CmsBindingSection — source missing (board 25)", () => {
     expect(screen.queryByTestId("cms-pickers")).toBeNull();
   });
 
+  it("names the deleted collection when the binding stored it (board 25)", () => {
+    const named = [{ ...GONE[0], collectionName: "Specials" }];
+    render(<CmsBindingSection elementId="e1" composer={makeComposer("heading", [MENU], named) as never} isOpen />);
+    expect(screen.getByTestId("cms-source-missing")).toHaveTextContent(
+      "Source missing — Collection “Specials” was deleted. Reconnect a source or keep the current text."
+    );
+  });
+
+  it("an old binding with no stored name keeps the generic line", () => {
+    render(<CmsBindingSection elementId="e1" composer={makeComposer("heading", [MENU], GONE) as never} isOpen />);
+    expect(screen.getByTestId("cms-source-missing")).toHaveTextContent(
+      "Source missing — the collection this followed was deleted. Reconnect a source or keep the current text."
+    );
+  });
+
   it("Reconnect… opens the pickers; a Field pick replaces the dead binding in one step", () => {
     const composer = makeComposer("heading", [MENU], GONE);
     render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);

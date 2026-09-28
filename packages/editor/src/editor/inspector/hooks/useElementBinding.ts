@@ -4,8 +4,9 @@
  * (board 25: the collection was deleted — "… · missing").
  *
  * The header's status chip reads it (R-DD-17; the BindingBanner is gone).
- * A deleted collection leaves nothing to name it by — the binding stores its
- * id only — so a missing source is labelled by its field alone.
+ * A deleted collection is named by the name the binding stored when it was
+ * made ("Specials.title"); an old binding that stored none is labelled by its
+ * field alone.
  *
  * @license BSD-3-Clause
  */
@@ -14,7 +15,8 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 
 export interface ElementBinding {
-  /** "Collection.field", or just "field" when the collection is gone. */
+  /** "Collection.field"; just "field" for a deleted collection whose binding
+   *  stored no name. */
   label: string;
   /** The bound collection no longer exists. */
   missing: boolean;
@@ -26,8 +28,9 @@ export function useElementBinding(composer: Composer | null | undefined, element
     const first = composer?.cms?.bindings?.getBindings?.(elementId)?.[0];
     if (!first) return null;
     const collection = composer?.cms?.collections?.getCollection?.(first.collectionId);
+    const name = collection?.name ?? first.collectionName;
     return {
-      label: collection ? `${collection.name}.${first.fieldSlug}` : first.fieldSlug,
+      label: name ? `${name}.${first.fieldSlug}` : first.fieldSlug,
       missing: !collection,
       collectionId: first.collectionId,
     };

@@ -33,6 +33,9 @@ import type { CollectionManager } from "./CollectionManager";
 export interface CMSElementBinding extends BindingWithData {
   /** Collection ID to bind from */
   collectionId: string;
+  /** The collection's name at bind time — survives its deletion, so a
+   *  missing source can still be named (board 25). Absent on old bindings. */
+  collectionName?: string;
   /** Specific content item ID, or 'context' for repeater context */
   itemId?: string;
   /** Field slug to bind */
@@ -116,6 +119,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     /** Makes the bind one undo step (the inspector passes it; loads don't). */
     historyLabel?: string
   ): void {
+    const collectionName = this.cmsManager.getCollection(collectionId)?.name;
     const binding: CMSElementBinding = {
       binding: {
         sourceId: `cms:${collectionId}`,
@@ -123,6 +127,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
         type: "variable",
       },
       collectionId,
+      ...(collectionName ? { collectionName } : {}),
       itemId,
       fieldSlug,
       property,
