@@ -29,25 +29,30 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({ label, onClick, ar
       type={onClick ? "button" : undefined}
       onClick={onClick}
       aria-label={ariaLabel ?? `Jump to token ${label} in Brand`}
+      title={label}
       className="bd-ds-binding-chip"
       style={{
         margin: 0,
         font: "inherit",
         cursor: onClick ? "pointer" : "default",
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
+        /* A block box, not inline-flex: an ellipsis only draws on a block
+           container. It shrinks to half the row at most, so a long token id
+           ("color-feedback-error") truncates instead of running over the
+           colour field beside it (board 27). */
+        display: "inline-block",
+        flex: "0 1 auto",
+        minWidth: 0,
         padding: "2px 8px",
         height: 20,
         borderRadius: 10,
         fontSize: 11,
         fontWeight: 500,
-        lineHeight: 1,
+        lineHeight: "14px",
         color: "var(--bk-success-text)",
         background: "var(--bk-success-tint)",
         border: "1px solid var(--bk-success)",
         whiteSpace: "nowrap",
-        maxWidth: "100%",
+        maxWidth: "50%",
         overflow: "hidden",
         textOverflow: "ellipsis",
       }}
