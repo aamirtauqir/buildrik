@@ -143,6 +143,35 @@ describe("migration 20261003130000 — settings backfill", () => {
     expect((await prisma.site.findUniqueOrThrow({ where: { id: listLinks.id } })).socialLinks).toBeNull();
   });
 
+  it("skips a socialLinks object with any non-string value", async () => {
+    const mixed = await createTestSite({
+      ...owner,
+      projectSettings: { seo: { socialLinks: { twitter: "https://x.com/bella", facebook: 42 } } },
+    });
+    const nested = await createTestSite({
+      ...owner,
+      projectSettings: { seo: { socialLinks: { twitter: { url: "https://x.com/bella" } } } },
+    });
+    const nulled = await createTestSite({
+      ...owner,
+      projectSettings: { seo: { socialLinks: { twitter: null } } },
+    });
+    const allStrings = await createTestSite({
+      ...owner,
+      projectSettings: { seo: { socialLinks: { twitter: "https://x.com/bella", facebook: "" } } },
+    });
+
+    await runBackfill();
+
+    for (const { id } of [mixed, nested, nulled]) {
+      expect((await prisma.site.findUniqueOrThrow({ where: { id } })).socialLinks).toBeNull();
+    }
+    expect((await prisma.site.findUniqueOrThrow({ where: { id: allStrings.id } })).socialLinks).toEqual({
+      twitter: "https://x.com/bella",
+      facebook: "",
+    });
+  });
+
   it("is a no-op on a second run", async () => {
     const site = await createTestSite({ ...owner, projectSettings: { seo: { metaTitle: "From JSON" } } });
     await runBackfill();

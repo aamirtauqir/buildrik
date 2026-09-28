@@ -78,8 +78,12 @@ WHERE "bodyCode" IS NULL
   AND jsonb_typeof("projectSettings" #> '{customCode,bodyScripts}') = 'string'
   AND btrim("projectSettings" #>> '{customCode,bodyScripts}') <> '';
 
--- "socialLinks" <- seo.socialLinks (an object only)
+-- "socialLinks" <- seo.socialLinks (an object whose every value is a string)
 UPDATE "sites"
 SET "socialLinks" = "projectSettings" #> '{seo,socialLinks}'
 WHERE "socialLinks" IS NULL
-  AND jsonb_typeof("projectSettings" #> '{seo,socialLinks}') = 'object';
+  AND jsonb_typeof("projectSettings" #> '{seo,socialLinks}') = 'object'
+  AND NOT EXISTS (
+    SELECT 1 FROM jsonb_each("projectSettings" #> '{seo,socialLinks}') e
+    WHERE jsonb_typeof(e.value) <> 'string'
+  );
