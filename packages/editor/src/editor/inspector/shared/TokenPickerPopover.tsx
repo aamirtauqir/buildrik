@@ -229,7 +229,6 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
           {/* Empty state — zero tokens */}
           {hasNoTokens && (
             <div className="tw:px-3 tw:py-5 tw:text-center">
-              <div className="tw:mb-1.5 tw:text-lg tw:opacity-40">🎨</div>
               <div className="tw:mb-1 tw:text-[11px] tw:text-[var(--bk-ink-soft)]">
                 No {tokenLabel} tokens yet
               </div>

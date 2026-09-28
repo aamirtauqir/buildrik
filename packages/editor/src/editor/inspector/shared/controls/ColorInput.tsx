@@ -20,6 +20,7 @@ import { useUpdateColorEverywhere } from "@/editor/design-system/ui/colors/useUp
 import { useDSModeOptional } from "../../../design-system/state/DSModeContext";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../engine";
 
 // ============================================================================
@@ -205,7 +206,9 @@ export const ColorInput: React.FC<ColorInputProps> = ({
               <Button
                 type="button"
                 variant="ghost"
-                className="bdi-sw"
+                /* p-0: flowbite's px-5 left an 18px swatch 0px of content,
+                   so its fill never painted and the checkerboard showed. */
+                className="bdi-sw tw:p-0"
                 aria-label={`Choose ${label} color`}
                 aria-expanded={isOpen}
                 aria-haspopup="dialog"
@@ -297,10 +300,8 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           }
         >
           <ColorFillPopover
-            label={label}
             tokens={tokenEntries}
             boundTokenId={boundToken?.id ?? null}
-            currentHex={swatchColor === "transparent" ? "" : swatchColor}
             onSelectToken={(cssVarRef) => {
               onChange(cssVarRef);
               setIsOpen(false);
@@ -316,7 +317,14 @@ export const ColorInput: React.FC<ColorInputProps> = ({
             }}
             usageOf={(id) => composer?.designSystem?.tokenUsage?.getUsage?.(id) ?? 0}
             showSearch={dsMode?.isPro ?? false}
-            onClose={() => setIsOpen(false)}
+            onOpenBrand={
+              composer
+                ? () => {
+                    setIsOpen(false);
+                    composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});
+                  }
+                : undefined
+            }
           />
         </Popover>
       </div>

@@ -436,3 +436,14 @@ Figma quota (200/day, 15/min, shared): W0 ≤ 72 calls on day 1 (36 design-conte
 - L2-D2 `ComponentRow.tsx`: now fits the column (the body inset was the overflow); it can use `SelectRow placeholder={null}` for Variant. L2-B `bodyRows.tsx` `ChoiceRow` can likewise become `SelectRow placeholder={null}`.
 - W1 `Breadcrumb` crumbs (16 tall) and ContextRow "Reset" (16 tall) are under 24.
 - L3-B edited `ColorInput.tsx` / `DSBindingChip.tsx` on their branch: both files are substantially rewritten here — expect a conflict; keep this lane's structure (swatch button · name · chevron, unlink on hover) and re-apply their popover props.
+
+### L3-B progress (2026-09-28, branch `feat/insp-l3b`)
+
+**Done** — `291434fa7` (ApplyStyleDialog board 31: Copies / Keeps / Skipped = locked + in-instance, Brand hint on text types, singular for one, 480 width, one transaction, "Applied to N H3 headings · Undo"), `d286dffbb` (ColorFillPopover board 33: "Brand colours" rows swatch · name · hex · Use, "Add colours in Brand" → Brand on Colours, selection given back on Back to canvas; ✎ edit-token + Pro search kept; RECENT / CUSTOM picker / Detach dropped; swatch checkerboard root cause = flowbite `px-5` on the 18px swatch → 0px fill, fixed with `tw:p-0` in ColorInput; DSBindingChip shrinks to ≤ 50% and ellipsises), `c90c94be3` (Text inside maps a rendered colour to its Brand token name). Live on port 3142, site "Inspector v4 fixture · L3-B" (`cmul1a8280002odrx0g2mfsj2`): boards 31, 33 walked; 30, 32 re-verified unchanged; 4, 17, 27 re-checked for the swatch / summary / chip.
+
+**For the lead**
+- `engine/commands/stylePeers.ts` (W1): board 31 says Keeps "layout", but `applyStyleToPeers` copies the WHOLE style map (width, margin, padding, position included). Filter the copied keys to typography / fill / border / effects so the dialog's copy is true (or change the copy).
+- Cross-lane edits made (minimal): `shared/controls/ColorInput.tsx` (L3-C: `tw:p-0` on the swatch; popover props), `sections/DSBindingChip.tsx` (L3-C: shrink + ellipsis), `sections/registry/text.tsx` (L2-A: token name in the summary).
+- L3-C: board 27 draws ONE control "■ Brand / primary ▾" — today the field (name squeezed to ~0) AND the green chip both carry the binding. Also the empty ColorInput placeholder "000000" is on the MUST-NOT list (Border › Color, board 32 walk).
+- L2-C: the Size token popover (`SizeSection.tsx`, TokenPickerPopover) opens `bottom-end` inside the column, not `beside` — can clip in the column's scroll box (P-4).
+- Dialog frame is chrome-ui Modal (24 padding, 32 buttons, dark toast); the board draws 16 / 28 / light toast — chrome-ui, not changed.
