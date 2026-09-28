@@ -1425,6 +1425,7 @@
               "type": "variable"
             },
             "collectionId": "@cms:menu",
+            "collectionName": "Menu",
             "itemId": "@cms:menu#0",
             "fieldSlug": "name",
             "property": "content",
@@ -1439,6 +1440,7 @@
               "type": "variable"
             },
             "collectionId": "@cms:specials",
+            "collectionName": "Specials",
             "itemId": "@cms:specials#0",
             "fieldSlug": "title",
             "property": "content",
