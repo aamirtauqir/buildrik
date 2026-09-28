@@ -28,7 +28,7 @@ beforeEach(() => {
 });
 
 describe("ColorInput · DSBindingChip integration", () => {
-  it("renders green token chip when value is a token var", () => {
+  it("a bound value shows the token's name inside the field — the one indicator (board 27)", () => {
     render(
       <ColorInput
         label="Color"
@@ -38,7 +38,9 @@ describe("ColorInput · DSBindingChip integration", () => {
       />
     );
     const chip = screen.getByRole("button", { name: /Jump to token color-primary/i });
-    expect(chip).toBeTruthy();
+    expect(chip).toHaveTextContent("Primary");
+    expect(screen.getByTestId("inspector-field-color")).toContainElement(chip);
+    expect(screen.queryByRole("textbox", { name: "Color value" })).toBeNull();
   });
 
   /* REWRITTEN 2026-09-08 with the change it covers. There is no off-DS chip
@@ -106,6 +108,6 @@ describe("ColorInput · DSBindingChip integration", () => {
       <ColorInput label="Color" value="var(--buildrick-design-color-primary)" onChange={() => {}} />
     );
     expect(screen.queryAllByRole("button", { name: /Jump to token/i }).length).toBe(0);
-    expect(container.querySelector('[aria-label^="Jump to token color-primary"]')).toBeTruthy();
+    expect(container.querySelector('[aria-label="Bound to token color-primary"]')).toHaveTextContent("Primary");
   });
 });

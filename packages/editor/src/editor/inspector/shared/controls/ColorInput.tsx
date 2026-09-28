@@ -7,10 +7,11 @@ import { Popover, Button, TextField } from "@/editor/chrome-ui";
  * @license BSD-3-Clause
  */
 
-import { Link2, Link2Off } from "lucide-react";
+import { ChevronDown, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useInspectorField } from "./InspectorFieldContext";
 import { FieldDot } from "./FieldDot";
+import { ErrorLine, useFieldError } from "./Section";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
@@ -45,6 +46,17 @@ const resolveVar = (cssVar: string): string => {
     .trim();
   return resolved || "#000000";
 };
+
+/** DD-19: the line an entry that is not a colour gets. */
+// @lint-hex-policy: copy — the example hex is text the user reads, not a colour.
+export const HEX_ERROR = "Use a hex like #1A56DB or pick a token.";
+
+/** A colour token as the boards name it: `color-text-primary` → "Text / primary". */
+export function colourTokenLabel(tokenId: string): string {
+  const [group, ...rest] = tokenId.replace(/^color-/, "").split("-");
+  const head = group.charAt(0).toUpperCase() + group.slice(1);
+  return rest.length ? `${head} / ${rest.join(" ")}` : head;
+}
 
 // Hex without "#" prefix — matches mock's "FFFFFF" display
 const stripHash = (val: string): string => (val.startsWith("#") ? val.slice(1) : val);
@@ -106,7 +118,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     : null;
 
   const swatchColor = isBound
-    ? resolveVar(value)
+    ? (boundToken?.value ?? resolveVar(value))
     : isValidHexColor(normalizeHex(value))
       ? normalizeHex(value)
       : isKeyword
@@ -144,20 +156,29 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     if (composer && tokenId) requestBrandToken(composer, tokenId);
   }, [composer, tokenId]);
 
-  /* ONLY when the value is bound. A chip carries the token's NAME, which the
-     field cannot show; the off-ds chip carried a warning mark next to a hex the
-     field already displays two centimetres to its left, and it cost the control
-     a fifth of its width — measured 127 against the 160 every profile board
-     fixes (807:8366 draws the swatch and the hex INSIDE one 160 frame and no
-     chip at all). Board 32:2 does draw a chip in this slot — 32:78, and it is
-     green, the bound state. Both boards agree once the chip means "bound". */
-  const chip =
-    isBound && tokenId ? (
-      <DSBindingChip
-        label={tokenId}
-        onClick={composer ? handleChipClick : undefined}
-      />
-    ) : null;
+  /* Typed hex: written as soon as it reads as a colour; an entry that never
+     does is flagged on Enter / blur (DD-19) and Esc puts the value back. */
+  const [hexText, setHexText] = React.useState(display);
+  const [invalid, setInvalid] = React.useState(false);
+  const errorId = useFieldError(invalid ? HEX_ERROR : null);
+  React.useEffect(() => {
+    setHexText(display);
+    setInvalid(false);
+  }, [display]);
+
+  const readHex = (raw: string): string | null => {
+    const v = raw.trim();
+    if (!v) return "";
+    if (/^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(v)) return `#${v}`;
+    if (isValidHexColor(v)) return v;
+    if (v === "transparent" || v === "inherit" || v === "currentColor") return v;
+    return null;
+  };
+
+  const tokenName = boundToken ? colourTokenLabel(boundToken.id) : tokenId ? colourTokenLabel(tokenId) : display;
+  const openPicker = () => {
+    if (!field.readOnly) setIsOpen((v) => !v);
+  };
 
   return (
     <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
@@ -174,77 +195,85 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           /* Board 4428:142922: the picker opens beside the inspector column. */
           beside=".layout-shell__inspector"
           trigger={
-            /* The row is a container, not a control: it holds the hex field
-               and one or two icon buttons, and wrapping those in
-               role="button" tabIndex={0} is what axe calls nested-interactive
-               — a button whose focusable children a screen reader cannot
-               announce or reach cleanly. The SWATCH is the control that opens
-               the picker, so it carries the button. */
-            <div className={`bdi-fill${isBound ? " bound" : ""}`} data-testid={fieldTestId(label)}>
+            /* The row is a container, not a control (axe nested-interactive):
+               the SWATCH is the button that opens the picker. Board 1: swatch,
+               the value (the token's name when bound), chevron. */
+            <div
+              className={`bdi-fill${invalid ? " invalid" : ""}${field.mixed ? " mixed" : ""}`}
+              data-testid={fieldTestId(label)}
+            >
               <Button
                 type="button"
+                variant="ghost"
                 className="bdi-sw"
                 aria-label={`Choose ${label} color`}
                 aria-expanded={isOpen}
-                disabled={field.readOnly}
-                onClick={() => setIsOpen((v) => !v)}
+                aria-haspopup="dialog"
+                aria-readonly={field.readOnly || undefined}
+                onClick={openPicker}
               >
-                <span className="bdi-sw-fill" style={{ background: swatchColor }} />
+                <span className="bdi-sw-fill" style={{ background: field.mixed ? "transparent" : swatchColor }} />
               </Button>
 
-              {isBound ? (
+              {isBound && !field.mixed ? (
                 <>
-                  <Link2 size={10} aria-hidden="true" style={{ color: "var(--bk-accent)", flexShrink: 0 }} />
-                  <span
-                    className="bdi-hx"
-                    style={{
-                      color: "var(--bk-accent)",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {display}
-                  </span>
-                  <Button
-                    type="button"
-                    className="bdi-eye"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      lastBoundRef.current = value;
-                      onChange(resolveVar(value));
-                    }}
-                    aria-label={`Unlink ${label} token`}
-                    title="Unlink token"
-                  >
-                    <Link2Off size={10} aria-hidden="true" />
-                  </Button>
+                  <DSBindingChip
+                    label={tokenName}
+                    ariaLabel={composer ? `Jump to token ${tokenId} in Brand` : `Bound to token ${tokenId}`}
+                    onClick={composer ? handleChipClick : undefined}
+                  />
+                  {field.readOnly ? null : (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="bdi-eye"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        lastBoundRef.current = value;
+                        onChange(resolveVar(value));
+                      }}
+                      aria-label={`Unlink ${label} token`}
+                      title="Unlink token"
+                    >
+                      <Link2Off size={12} aria-hidden="true" />
+                    </Button>
+                  )}
                 </>
               ) : (
                 <>
                   <TextField
                     type="text"
                     className="bdi-hx"
-                    value={display}
+                    value={field.mixed ? "" : hexText}
+                    readOnly={field.readOnly}
+                    aria-readonly={field.readOnly || undefined}
+                    aria-invalid={invalid}
+                    aria-describedby={invalid ? errorId : undefined}
                     onChange={(e) => {
-                      const v = e.target.value.trim();
-                      if (!v) onChange("");
-                      else if (/^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(v)) onChange(`#${v}`);
-                      else if (v.startsWith("#")) onChange(v);
-                      else if (v === "transparent" || v === "inherit" || v === "currentColor") onChange(v);
+                      if (field.readOnly) return;
+                      setHexText(e.target.value);
+                      setInvalid(false);
+                      const next = readHex(e.target.value);
+                      if (next !== null) onChange(next);
+                    }}
+                    onBlur={() => setInvalid(readHex(hexText) === null)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") setInvalid(readHex(hexText) === null);
+                      else if (e.key === "Escape") {
+                        setHexText(display);
+                        setInvalid(false);
+                      }
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    placeholder={placeholder ?? (isKeyword ? value : "000000")}
-                    aria-label={`${label} value`}
+                    placeholder={field.mixed ? "Mixed" : (placeholder ?? (isKeyword ? value : "None"))}
+                    aria-label={field.mixed ? `${label} value, mixed values` : `${label} value`}
                   />
-                  {/* The way back. The breakpoint-override row has carried a
-                      revert-to-base button and a line naming the base for a
-                      while; this path dropped a binding and offered neither,
-                      so the mechanism existed in the product and the token
-                      flow simply did not use it. */}
-                  {canRelink ? (
+                  {/* The way back to the token just dropped (only while the
+                      value is still the one the unlink produced). */}
+                  {canRelink && !field.readOnly ? (
                     <Button
                       type="button"
+                      variant="ghost"
                       className="bdi-eye"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -255,11 +284,15 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                       aria-label={`Relink ${label} to ${relinkName}`}
                       title={`Relink to ${relinkName}`}
                     >
-                      <Link2 size={10} aria-hidden="true" style={{ color: "var(--bk-accent)" }} />
+                      <Link2 size={12} aria-hidden="true" />
                     </Button>
                   ) : null}
                 </>
               )}
+              {/* Pointer shortcut to the picker the swatch opens. */}
+              <span className="bdi-c" aria-hidden="true" onClick={openPicker}>
+                <ChevronDown size={12} />
+              </span>
             </div>
           }
         >
@@ -286,8 +319,8 @@ export const ColorInput: React.FC<ColorInputProps> = ({
             onClose={() => setIsOpen(false)}
           />
         </Popover>
-        {chip}
       </div>
+      <ErrorLine id={errorId} message={invalid ? HEX_ERROR : null} />
     </div>
   );
 };

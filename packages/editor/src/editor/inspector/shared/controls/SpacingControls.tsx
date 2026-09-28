@@ -16,6 +16,7 @@ import { Link, Unlink } from "lucide-react";
 import * as React from "react";
 import { FieldDot } from "./FieldDot";
 import { useInspectorField } from "./InspectorFieldContext";
+import { unitWords } from "./InputControls";
 import { TextField, Button, TextInput, IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
@@ -43,12 +44,14 @@ const parseValue = (val: string): { num: string; unit: string; isKeyword: boolea
   return m ? { num: m[1], unit: m[2] || "px", isKeyword: false } : { num: val, unit: "", isKeyword: false };
 };
 
-const CELL = "tw:relative tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-7 tw:shrink-0";
+/* At least 28 wide, and as wide as its number: "56.2" (board 9) did not fit
+   a fixed 28. */
+const CELL = "tw:relative tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:min-w-7 tw:shrink-0";
 /* The number itself: Geist Mono 12, no frame until hovered / focused.
    TextField's base classes are not merged away, so the conflicting ones win
    by `!`, not by stylesheet order. */
 const AXIS_INPUT =
-  "tw:h-4! tw:w-7! tw:px-0! tw:py-0! tw:rounded-[2px]! tw:border-transparent! tw:bg-transparent! tw:text-center " +
+  "tw:h-4! tw:min-w-7! tw:max-w-14! tw:w-auto! tw:[field-sizing:content] tw:px-0! tw:py-0! tw:rounded-[2px]! tw:border-transparent! tw:bg-transparent! tw:text-center " +
   "tw:[font-family:var(--bk-font-mono)]! tw:text-[12px]! tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]! " +
   "tw:hover:border-[var(--bk-border)]! tw:focus:border-[var(--bk-accent)]! tw:focus:bg-[var(--bk-bg-panel)]! " +
   "tw:read-only:hover:border-transparent!";
@@ -83,11 +86,18 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
     if (composer && tokenId) requestBrandToken(composer, tokenId);
   }, [composer, tokenId]);
   const name = `${box === "margin" ? "Margin" : "Padding"} ${side}`;
+  /* §16: the name carries the unit ("Padding top in pixels"). */
+  const nameId = React.useId();
+  const suffixId = React.useId();
+  const suffix = field.mixed ? "mixed values" : local.isKeyword || local.num === "" ? "" : unitWords(local.unit || "px");
 
   return (
     <span className={CELL} data-testid={`inspector-spacing-${property}`}>
       {field.overrides.length > 0 || tokenId ? (
-        <span className="tw:absolute tw:right-full tw:top-1/2 tw:-translate-y-1/2 tw:inline-flex tw:items-center">
+        /* In front of the number, its 24px target reaching into the cell's
+           own blank edge — so the dot sits beside "32", clear of the ring's
+           "Padding" tag (board 26). */
+        <span className="tw:absolute tw:right-full tw:-mr-2 tw:top-1/2 tw:-translate-y-1/2 tw:inline-flex tw:items-center">
           <FieldDot field={field} />
           {tokenId ? (
             /* The box has no room for the token chip's name: a 24px marker
@@ -105,6 +115,14 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
           ) : null}
         </span>
       ) : null}
+      <span id={nameId} hidden>
+        {name}
+      </span>
+      {suffix ? (
+        <span id={suffixId} hidden>
+          {suffix}
+        </span>
+      ) : null}
       <TextField
         type="text"
         className={AXIS_INPUT}
@@ -112,12 +130,25 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
         disabled={disabled}
         readOnly={field.readOnly}
         aria-readonly={field.readOnly || undefined}
-        aria-label={field.mixed ? `${name}, mixed values` : name}
+        aria-labelledby={suffix ? `${nameId} ${suffixId}` : nameId}
         placeholder={field.mixed ? "Mixed" : "0"}
         onChange={(e) => {
           const next = e.target.value;
           setLocal({ num: next, unit: local.unit, isKeyword: /^[a-z]+$/i.test(next) });
           if (next === "" || /^-?[\d.]+$/.test(next) || next === "auto" || next === "inherit") commit(next);
+        }}
+        onKeyDown={(e) => {
+          /* §16: ↑/↓ step 1, Shift 10; Esc puts the value back. */
+          if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !field.readOnly && !local.isKeyword) {
+            const base = Number(local.num || 0);
+            if (!Number.isFinite(base)) return;
+            e.preventDefault();
+            const next = String(Math.round((base + (e.shiftKey ? 10 : 1) * (e.key === "ArrowUp" ? 1 : -1)) * 100) / 100);
+            setLocal({ num: next, unit: local.unit || "px", isKeyword: false });
+            commit(next);
+          } else if (e.key === "Escape") {
+            setLocal(parseValue(value));
+          }
         }}
         onBlur={() => setLocal(parseValue(value))}
       />
@@ -182,7 +213,9 @@ export const SpacingBox: React.FC<SpacingBoxProps> = ({
   disabledPadding,
   composer,
 }) => (
-  <div className="tw:px-4 tw:py-1" data-testid="inspector-spacing-box">
+  /* Board 1: the diagram 16 in from the column edge — the section body
+     already gives 12. */
+  <div className="tw:px-1 tw:py-1" data-testid="inspector-spacing-box">
     <Ring box="margin" label="Margin" values={margin} onChange={onMarginChange} disabled={disabledMargin} composer={composer} className="tw:bg-[var(--bk-bg-subtle)]">
       <Ring box="padding" label="Padding" values={padding} onChange={onPaddingChange} disabled={disabledPadding} composer={composer} className="tw:bg-[var(--bk-bg-panel)]">
         <div className="tw:flex tw:h-4 tw:items-center tw:justify-center" aria-hidden="true">

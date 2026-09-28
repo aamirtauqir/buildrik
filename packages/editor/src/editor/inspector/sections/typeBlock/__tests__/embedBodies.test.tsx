@@ -38,8 +38,8 @@ describe("Video embed — board 9", () => {
 
   it("Ratio defaults to 16:9, writes the ratio and clears the old fixed box in one Undo", () => {
     const { el, onBatchChange } = renderBlock(embed(), { styles: { "padding-bottom": "56.25%", height: "0" } });
-    expect(screen.getByRole("button", { name: "16:9" })).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(screen.getByRole("button", { name: "4:3" }));
+    expect(screen.getByRole("radio", { name: "16:9" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "4:3" }));
     expect(el().getAttribute("data-embed-ratio")).toBe("4:3");
     expect(onBatchChange).toHaveBeenCalledWith({ "padding-bottom": "", height: "" });
   });

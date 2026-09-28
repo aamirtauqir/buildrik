@@ -20,7 +20,7 @@ function renderFlex(styles: Record<string, string> = {}) {
 describe("FlexControls — board 16's rows", () => {
   it("draws Direction, the align grid with its label, Wrap and Gap without any disclosure", () => {
     renderFlex({ "justify-content": "center", "align-items": "center", gap: "16px" });
-    expect(screen.getByRole("button", { name: "Row" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("radio", { name: "Row" })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByRole("group", { name: "Align" }).querySelectorAll("button")).toHaveLength(9);
     expect(screen.getByTestId("inspector-flex-align-label")).toHaveTextContent("AlignCenter / Center");
     expect(screen.getByRole("checkbox", { name: "Wrap" })).not.toBeChecked();
@@ -41,7 +41,7 @@ describe("FlexControls — board 16's rows", () => {
 
   it("Column keeps a reversed order reversed", () => {
     const { onChange } = renderFlex({ "flex-direction": "row-reverse" });
-    fireEvent.click(screen.getByRole("button", { name: "Column" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Column" }));
     expect(onChange).toHaveBeenCalledWith("flex-direction", "column-reverse");
   });
 

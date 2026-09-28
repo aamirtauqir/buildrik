@@ -18,9 +18,9 @@ function renderLayout(styles: Record<string, string> = {}, extra: Partial<React.
 describe("LayoutSection — Display", () => {
   it("four segments incl. None, each writes display", () => {
     const { onChange } = renderLayout({ display: "block" });
-    for (const name of ["Block", "Flex", "Grid", "None"]) expect(screen.getByRole("button", { name })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Block" })).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(screen.getByRole("button", { name: "None" }));
+    for (const name of ["Block", "Flex", "Grid", "None"]) expect(screen.getByRole("radio", { name })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Block" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "None" }));
     expect(onChange).toHaveBeenCalledWith("display", "none");
   });
 
@@ -41,7 +41,7 @@ describe("LayoutSection — flex / grid inline (no Flexbox / Grid section)", () 
   it("Flex shows Direction and the align grid", () => {
     renderLayout({ display: "flex" });
     expect(screen.getByRole("group", { name: "Align" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Column" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Column" })).toBeInTheDocument();
   });
 
   it("Block shows neither", () => {

@@ -39,7 +39,7 @@ describe("FontControls — board 1's rows", () => {
 
   it("Align is Left · Center · Right", () => {
     renderFont({ "text-align": "center" });
-    expect(screen.getByRole("button", { name: "Center" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("radio", { name: "Center" })).toHaveAttribute("aria-checked", "true");
     expect(screen.queryByRole("button", { name: "Justify" })).toBeNull();
   });
 });
@@ -59,7 +59,7 @@ describe("FontControls — writes", () => {
     expect(onChange).toHaveBeenCalledWith("font-weight", "300");
     fireEvent.change(screen.getByRole("textbox", { name: "Colour value" }), { target: { value: "ff0000" } });
     expect(onChange).toHaveBeenCalledWith("color", "#ff0000");
-    fireEvent.click(screen.getByRole("button", { name: "Right" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Right" }));
     expect(onChange).toHaveBeenCalledWith("text-align", "right");
   });
 

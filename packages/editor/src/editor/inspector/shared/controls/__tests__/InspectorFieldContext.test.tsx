@@ -31,7 +31,9 @@ describe("InspectorFieldContext", () => {
     );
     expect(screen.getByLabelText("Name")).toHaveAttribute("readonly");
     expect(screen.getByLabelText("Name")).toHaveValue("hero");
-    expect(screen.getByLabelText("Loading")).toBeDisabled();
+    /* DD-18: read-only, not disabled — the select stays legible and focusable. */
+    expect(screen.getByLabelText("Loading")).not.toBeDisabled();
+    expect(screen.getByLabelText("Loading")).toHaveAttribute("aria-readonly", "true");
   });
 
   it("an overridden property gets an announced dot whose menu resets it", () => {

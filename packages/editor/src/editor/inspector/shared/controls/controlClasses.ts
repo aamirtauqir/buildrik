@@ -11,15 +11,18 @@
  * @license BSD-3-Clause
  */
 
-/** 44px label gutter + fluid control, matching `baseStyles.row`. */
-export const CONTROL_ROW = "tw:grid tw:grid-cols-[44px_1fr] tw:items-center tw:gap-1.5 tw:mb-1.5";
+/** The Inspector v4 property row (board 1): 108 label column, 8 gap, the
+ *  control; 28 tall — the same box `.bdi-row-ctrl` draws. */
+export const CONTROL_ROW = "tw:grid tw:grid-cols-[108px_minmax(0,1fr)] tw:items-center tw:gap-x-2 tw:min-h-7";
 
+/** Board 1 row label: 12/16, ink-muted, left. */
 export const CONTROL_LABEL =
-  "tw:flex tw:items-center tw:gap-1 tw:min-w-11 tw:flex-none tw:text-[11px] tw:font-medium " +
-  "tw:text-[var(--bk-ink-soft)] tw:tracking-[-0.005em] tw:[font-family:var(--bk-font-ui)]";
+  "tw:flex tw:items-center tw:gap-1 tw:min-w-0 tw:text-[12px] tw:leading-4 tw:font-normal " +
+  "tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-ui)]";
 
-/** A row of segmented buttons sharing the control column. */
-export const CONTROL_BTN_GROUP = "tw:flex tw:gap-0.5 tw:flex-1";
+/** A row of options sharing the control column — the segmented track. */
+export const CONTROL_BTN_GROUP =
+  "tw:flex tw:flex-1 tw:h-6 tw:p-0.5 tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)]";
 
 /**
  * Wrapper for a chrome-ui `TextInput`: same wrapper/leaf split as the Select
@@ -28,7 +31,7 @@ export const CONTROL_BTN_GROUP = "tw:flex tw:gap-0.5 tw:flex-1";
  */
 export const CONTROL_INPUT_WRAP =
   "tw:flex-1 tw:min-w-0 tw:[&_input]:h-6 tw:[&_input]:py-0 tw:[&_input]:px-2 " +
-  "tw:[&_input]:text-[11.5px] tw:[&_input]:font-medium tw:[&_input]:[font-family:var(--bk-font-ui)]";
+  "tw:[&_input]:text-[12px] tw:[&_input]:font-normal tw:[&_input]:[font-family:var(--bk-font-ui)]";
 
 /**
  * Wrapper for a chrome-ui `Select`: flowbite applies `className` to an outer
@@ -38,17 +41,18 @@ export const CONTROL_INPUT_WRAP =
  */
 export const CONTROL_SELECT_WRAP =
   "tw:flex-1 tw:min-w-0 tw:[&_select]:h-6 tw:[&_select]:py-0 tw:[&_select]:pl-2 " +
-  "tw:[&_select]:text-[11.5px] tw:[&_select]:font-medium tw:[&_select]:cursor-pointer " +
+  "tw:[&_select]:text-[12px] tw:[&_select]:font-normal tw:[&_select]:cursor-pointer " +
   "tw:[&_select]:[font-family:var(--bk-font-ui)]";
 
-/** Dense toggle button inside a control row — `baseStyles.compactBtn`. */
+/** One option of a `CONTROL_BTN_GROUP` track — board 1's segmented look:
+ *  the chosen one a white chip on a hairline with accent text. */
 export const compactBtnClass = (active: boolean): string =>
   [
-    "tw:flex-1 tw:h-[22px] tw:px-1 tw:py-0 tw:rounded-[3px] tw:border tw:text-[11px] tw:font-medium",
-    "tw:[font-family:var(--bk-font-ui)]",
+    "tw:flex-1 tw:h-5 tw:min-h-0 tw:px-1 tw:py-0 tw:rounded-[3px] tw:border tw:text-[12px] tw:leading-4",
+    "tw:[font-family:var(--bk-font-ui)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]",
     active
-      ? "tw:bg-[var(--bk-accent-tint)] tw:border-[var(--bk-alpha-accent-30)] tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"
-      : "tw:bg-[var(--bk-bg-subtle)] tw:border-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]",
+      ? "tw:bg-[var(--bk-bg-panel)] tw:border-[var(--bk-border)] tw:font-medium tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-[var(--bk-bg-panel)]"
+      : "tw:bg-transparent tw:border-transparent tw:font-normal tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:hover:text-[var(--bk-ink)]",
   ].join(" ");
 
 /** Sub-heading inside an open section ("Size Constraints", "Overflow"). */
