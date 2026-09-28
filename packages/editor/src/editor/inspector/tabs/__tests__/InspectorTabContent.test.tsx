@@ -132,9 +132,10 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
     expect(sectionNames()).toEqual(["Image", "Size", "Spacing", "Fill", "Border"]);
   });
 
-  it("a container set to flex gets the interim Flexbox section after Layout", () => {
+  it("a container set to flex gets no Flexbox section — Layout carries the flex controls (board 17)", () => {
     renderTab({ tabId: "style", elementType: "container", cssContext: { display: "flex", isFlexContainer: true } });
-    expect(sectionNames().slice(0, 2)).toEqual(["Layout", "Flexbox"]);
+    expect(sectionNames()[0]).toBe("Layout");
+    expect(sectionNames()).not.toContain("Flexbox");
   });
 
   it("Behaviour carries Interactions (Q1) and Visibility; Effects carries neither", () => {

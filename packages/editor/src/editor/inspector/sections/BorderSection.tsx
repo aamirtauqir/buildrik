@@ -102,6 +102,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
         <div style={{ position: "relative" }}>
           <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} />
           <InputWithUnit
+            property="border-radius"
             label="Radius"
             value={radii.tl}
             onChange={(v) => onChange("border-radius", v)}
@@ -116,6 +117,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="border-width" mixedKeys={mixedKeys} />
         <InputWithUnit
+          property="border-width"
           label="Width"
           value={styles["border-width"] || ""}
           onChange={(v) => onChange("border-width", v)}
@@ -127,6 +129,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="border-style" mixedKeys={mixedKeys} />
         <SelectRow
+          property="border-style"
           label="Style"
           value={styles["border-style"] || ""}
           onChange={(v) => onChange("border-style", v)}
@@ -148,6 +151,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="border-color" mixedKeys={mixedKeys} />
         <ColorInput
+          property="border-color"
           label="Color"
           value={styles["border-color"] || ""}
           onChange={(v) => onChange("border-color", v)}
@@ -219,6 +223,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             </div>
 
             <InputWithUnit
+              property="outline-width"
               label="Width"
               value={styles["outline-width"] || ""}
               onChange={(v) => onChange("outline-width", v)}
@@ -226,6 +231,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             />
 
             <SelectRow
+              property="outline-style"
               label="Style"
               value={styles["outline-style"] || ""}
               onChange={(v) => onChange("outline-style", v)}
@@ -238,6 +244,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             />
 
             <ColorInput
+              property="outline-color"
               label="Color"
               value={styles["outline-color"] || ""}
               onChange={(v) => onChange("outline-color", v)}
@@ -245,6 +252,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             />
 
             <InputWithUnit
+              property="outline-offset"
               label="Offset"
               value={styles["outline-offset"] || ""}
               onChange={(v) => onChange("outline-offset", v)}

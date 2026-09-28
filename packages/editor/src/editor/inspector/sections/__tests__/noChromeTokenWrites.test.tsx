@@ -17,13 +17,18 @@ import { describe, it, expect, afterEach } from "vitest";
 import { render, fireEvent, cleanup } from "@testing-library/react";
 import { BackgroundSection } from "../BackgroundSection";
 import { BorderSection } from "../BorderSection";
-import { EffectsSection } from "../EffectsSection";
-import { GridSection } from "../GridSection";
+import { EffectsAdvancedSection } from "../effects/EffectsAdvancedSection";
+import { FiltersSection } from "../effects/FiltersSection";
+import { OpacitySection } from "../effects/OpacitySection";
+import { ShadowSection } from "../effects/ShadowSection";
+import { TransformMotionSection } from "../effects/TransformMotionSection";
 import { SizeSection } from "../SizeSection";
 import { SpacingSection } from "../SpacingSection";
 import { VisibilitySection } from "../VisibilitySection";
-import { FlexboxSection } from "../flexbox";
 import { LayoutSection } from "../layout";
+import { FlexControls } from "../layout/FlexControls";
+import { GridControls } from "../layout/GridControls";
+import { ItemControls } from "../layout/ItemControls";
 import { TypographySection } from "../typography";
 
 type Write = (property: string, value: string) => void;
@@ -33,12 +38,18 @@ type SectionProps = { styles: Record<string, string>; onChange: Write; onBatchCh
 const SECTIONS: Record<string, React.FC<SectionProps>> = {
   Background: (p) => <BackgroundSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
   Border: (p) => <BorderSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
-  Effects: (p) => <EffectsSection {...p} isOpen />,
-  Grid: (p) => <GridSection {...p} isGridContainer isGridItem isOpen />,
-  Size: (p) => <SizeSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
-  Spacing: (p) => <SpacingSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
+  Opacity: (p) => <OpacitySection {...p} isOpen />,
+  Shadow: (p) => <ShadowSection {...p} isOpen />,
+  Filters: (p) => <FiltersSection {...p} isOpen />,
+  "Transform & motion": (p) => <TransformMotionSection {...p} isOpen />,
+  "Effects advanced": (p) => <EffectsAdvancedSection {...p} isOpen />,
+  Flex: (p) => <FlexControls {...p} />,
+  Grid: (p) => <GridControls {...p} />,
+  "Flex item": (p) => <ItemControls parent="flex" advanced {...p} />,
+  "Grid item": (p) => <ItemControls parent="grid" advanced {...p} />,
+  Size: (p) => <SizeSection {...p} parentLayout="flex" isOpen advancedExpanded onAdvancedToggle={() => {}} />,
+  Spacing: (p) => <SpacingSection {...p} isOpen />,
   Visibility: (p) => <VisibilitySection {...p} isOpen />,
-  Flexbox: (p) => <FlexboxSection {...p} isFlexItem isOpen />,
   Layout: (p) => <LayoutSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
   Typography: (p) => <TypographySection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
 };

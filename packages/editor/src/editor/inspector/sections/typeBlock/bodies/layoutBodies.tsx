@@ -1,11 +1,12 @@
 /**
- * Type-block bodies — layout primitives: Flex (+ stack) and Grid (+ columns)
- * (board 16). Lane L2-C replaces these with the board layout (`FlexControls`
- * / `GridControls`, "Align Center / Center" label).
+ * Type-block bodies — layout primitives: Flex (+ stack) and Grid (+ columns).
  *
- * W1 composes the controls the Flexbox section already had — Direction, the
- * alignment grid, Wrap, Gap — so the block is always visible (no tier, DD-5)
- * instead of arriving as a separate "Flexbox" section.
+ * Board 16: the Flex block is the flex controls themselves — Direction, the
+ * 3×3 align grid with its label, Wrap, Gap — always visible (DD-5), the same
+ * `FlexControls` Layout shows for a container set to Flex. Grid draws the
+ * same `GridControls` as a container set to Grid. The Columns type keeps its
+ * attribute-driven rows (column count / gap live on `data-columns` /
+ * `data-gap`, which its renderer reads).
  *
  * @license BSD-3-Clause
  */
@@ -13,8 +14,8 @@
 import * as React from "react";
 import type { TypeBlockBodyProps } from "../../../config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
-import { AlignmentSection, DirectionControls, GapControls } from "../../flexbox";
-import { ButtonGroup, InlineInput } from "../../../shared/controls";
+import { FlexControls } from "../../layout/FlexControls";
+import { GridControls } from "../../layout/GridControls";
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 
 const COLUMNS_ROWS: readonly PropertyConfig[] = [
@@ -38,35 +39,18 @@ const COLUMNS_ROWS: readonly PropertyConfig[] = [
   },
 ];
 
-const WRAP = [
-  { value: "nowrap", label: "No wrap" },
-  { value: "wrap", label: "Wrap" },
-];
-
-const Flex: React.FC<TypeBlockBodyProps> = ({ styles, onChange, onBatchChange, mixedKeys }) => (
-  <>
-    <DirectionControls currentDirection={styles["flex-direction"]} onChange={onChange} mixedKeys={mixedKeys} />
-    <AlignmentSection styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
-    <ButtonGroup label="Wrap" value={styles["flex-wrap"] || "nowrap"} onChange={(v) => onChange("flex-wrap", v)} options={WRAP} />
-    <GapControls styles={styles} onChange={onChange} onBatchChange={onBatchChange} disabled={() => false} mixedKeys={mixedKeys} />
-  </>
+const Flex: React.FC<TypeBlockBodyProps> = ({ styles, onChange, onBatchChange }) => (
+  <FlexControls styles={styles} onChange={onChange} onBatchChange={onBatchChange} />
 );
 
-const Grid: React.FC<TypeBlockBodyProps> = (p) => {
-  if (p.element.type === "columns") {
-    return <PropertyRows composer={p.composer} element={p.element} targetIds={p.targetIds} rows={COLUMNS_ROWS} />;
-  }
-  return (
-    <>
-      <InlineInput label="Columns" value={p.styles["grid-template-columns"] || ""} onChange={(v) => p.onChange("grid-template-columns", v)} placeholder="1fr 1fr 1fr" />
-      <InlineInput label="Rows" value={p.styles["grid-template-rows"] || ""} onChange={(v) => p.onChange("grid-template-rows", v)} placeholder="auto" />
-      <InlineInput label="Gap" value={p.styles.gap || ""} onChange={(v) => p.onChange("gap", v)} placeholder="0" />
-    </>
+const Grid: React.FC<TypeBlockBodyProps> = (p) =>
+  p.element.type === "columns" ? (
+    <PropertyRows composer={p.composer} element={p.element} targetIds={p.targetIds} rows={COLUMNS_ROWS} />
+  ) : (
+    <GridControls styles={p.styles} onChange={p.onChange} />
   );
-};
 
 export const LAYOUT_BODIES: Partial<Record<TypeBlockId, React.FC<TypeBlockBodyProps>>> = {
   flex: Flex,
   grid: Grid,
 };
-

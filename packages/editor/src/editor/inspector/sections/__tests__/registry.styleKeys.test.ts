@@ -16,27 +16,23 @@ interface SectionCoverage {
 }
 
 const sectionCoverage: Record<string, SectionCoverage> = {
-  size: { files: ["../SizeSection.tsx"] },
+  size: { files: ["../SizeSection.tsx", "../layout/ItemControls.tsx"] },
   layout: {
     files: [
       "../layout/index.tsx",
       "../layout/OverflowVisibilityControls.tsx",
       "../layout/PositionControls.tsx",
       "../layout/DisplayControls.tsx",
+      "../layout/FlexControls.tsx",
+      "../layout/GridControls.tsx",
+      "../layout/GapRow.tsx",
     ],
   },
-  spacing: { files: ["../SpacingSection.tsx"] },
-  flex: {
-    files: [
-      "../flexbox/index.tsx",
-      "../flexbox/AlignmentSection.tsx",
-      "../flexbox/DirectionControls.tsx",
-      "../flexbox/FlexItemControls.tsx",
-      "../flexbox/GapControls.tsx",
-      "../flexbox/controls.tsx",
-    ],
+  spacing: {
+    files: ["../SpacingSection.tsx"],
+    // Template-literal read: `${box}-${side}` for box in margin/padding.
+    dynamicKeys: ["margin-top", "margin-right", "margin-bottom", "margin-left", "padding-top", "padding-right", "padding-bottom", "padding-left"],
   },
-  grid: { files: ["../GridSection.tsx"] },
   typography: {
     files: [
       "../typography/index.tsx",
@@ -54,9 +50,9 @@ const sectionCoverage: Record<string, SectionCoverage> = {
   type: {
     files: [
       "../typeBlock/bodies/layoutBodies.tsx",
-      "../flexbox/AlignmentSection.tsx",
-      "../flexbox/DirectionControls.tsx",
-      "../flexbox/GapControls.tsx",
+      "../layout/FlexControls.tsx",
+      "../layout/GridControls.tsx",
+      "../layout/GapRow.tsx",
     ],
   },
   fill: { files: ["../BackgroundSection.tsx"] },
@@ -65,8 +61,11 @@ const sectionCoverage: Record<string, SectionCoverage> = {
     // Template-literal read: `border-${side}` for side in top/right/bottom/left.
     dynamicKeys: ["border-top", "border-right", "border-bottom", "border-left"],
   },
-  "transform-motion": { files: ["../EffectsSection.tsx"] },
-  "effects-advanced": { files: ["../EffectsSection.tsx"] },
+  opacity: { files: ["../effects/OpacitySection.tsx"] },
+  shadow: { files: ["../effects/ShadowSection.tsx"] },
+  filters: { files: ["../effects/FiltersSection.tsx"] },
+  "transform-motion": { files: ["../effects/TransformMotionSection.tsx"] },
+  "effects-advanced": { files: ["../effects/EffectsAdvancedSection.tsx"] },
 };
 
 function readKeys(file: string): Set<string> {

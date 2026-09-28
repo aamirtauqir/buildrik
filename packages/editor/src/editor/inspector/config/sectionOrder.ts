@@ -16,10 +16,6 @@ const STYLE_ORDER: readonly SectionId[] = [
   "component",
   "type",
   "layout",
-  /* Interim until lane L2-C folds these into Layout (a container set to
-     flex / grid) — the Flex and Grid type blocks already carry them. */
-  "flex",
-  "grid",
   "typography",
   "text-inside",
   "size",

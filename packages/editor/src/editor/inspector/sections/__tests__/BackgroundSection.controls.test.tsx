@@ -49,14 +49,14 @@ describe("BackgroundSection — bg type segmentation", () => {
 describe("BackgroundSection — color writes", () => {
   it("typing a hex into the color input writes background-color", () => {
     const { onChange } = renderBg();
-    const hexInput = screen.getByRole("textbox", { name: "Fill value" });
+    const hexInput = screen.getByRole("textbox", { name: "Colour value" });
     fireEvent.change(hexInput, { target: { value: "ff0000" } });
     expect(onChange).toHaveBeenCalledWith("background-color", "#ff0000");
   });
 
   it("shows the current background-color hex (without #) in the input", () => {
     renderBg({ styles: { "background-color": "#00ff00" } });
-    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("00ff00");
+    expect(screen.getByRole("textbox", { name: "Colour value" })).toHaveValue("00ff00");
   });
 });
 
@@ -152,7 +152,7 @@ describe("BackgroundSection — switching type replaces the old fill (X-1)", () 
     renderBg({ styles: { background: GRADIENT, "background-color": "#00ff00" }, onBatchChange });
     fireEvent.click(screen.getByRole("button", { name: "color" }));
     expect(onBatchChange).toHaveBeenCalledWith({ background: "" });
-    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("00ff00");
+    expect(screen.getByRole("textbox", { name: "Colour value" })).toHaveValue("00ff00");
   });
 
   it("Image → Color clears the image", () => {
@@ -184,13 +184,13 @@ describe("BackgroundSection — switching type replaces the old fill (X-1)", () 
 
   it("Fill reads a `background:` shorthand colour", () => {
     renderBg({ styles: { background: "#ff0000" } });
-    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("ff0000");
+    expect(screen.getByRole("textbox", { name: "Colour value" })).toHaveValue("ff0000");
   });
 
   it("writing Fill over a `background:` shorthand clears the shorthand in the same write", () => {
     const onBatchChange = vi.fn();
     renderBg({ styles: { background: "#ff0000" }, onBatchChange });
-    fireEvent.change(screen.getByRole("textbox", { name: "Fill value" }), { target: { value: "00ff00" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Colour value" }), { target: { value: "00ff00" } });
     expect(onBatchChange).toHaveBeenCalledWith({ background: "", "background-color": "#00ff00" });
   });
 });

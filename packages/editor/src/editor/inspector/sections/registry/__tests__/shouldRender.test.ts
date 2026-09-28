@@ -59,10 +59,9 @@ describe("SECTION_REGISTRY — capability gates", () => {
 });
 
 describe("SECTION_REGISTRY — runtime gates", () => {
-  it("the interim flex / grid sections render for a container set to flex / grid", () => {
-    expect(SECTION_REGISTRY.flex.shouldRender!(ctx({ cssContext: { isFlexContainer: true } }))).toBe(true);
-    expect(SECTION_REGISTRY.flex.shouldRender!(ctx({ cssContext: { isFlexContainer: false } }))).toBe(false);
-    expect(SECTION_REGISTRY.grid.shouldRender!(ctx({ cssContext: { isGridContainer: true } }))).toBe(true);
+  it("there are no Flexbox / Grid sections — Layout and the type blocks carry those controls", () => {
+    expect(Object.keys(SECTION_REGISTRY)).not.toContain("flex");
+    expect(Object.keys(SECTION_REGISTRY)).not.toContain("grid");
   });
 
   it("the component row renders only on an instance", () => {

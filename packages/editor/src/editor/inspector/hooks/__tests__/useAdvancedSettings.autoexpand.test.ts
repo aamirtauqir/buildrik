@@ -103,9 +103,13 @@ describe("auto-expand against the registry the inspector actually uses", () => {
     expect(result.current.isExpanded("typography")).toBe(true);
   });
 
-  it("opens Layout for z-index and overflow, which its advanced block draws", () => {
-    expect(render({ "z-index": "10" }, real).result.current.isExpanded("layout")).toBe(true);
+  it("opens Layout for overflow, which its advanced block draws — not for z-index, which sits with Position on the face (board 17)", () => {
     expect(render({ "overflow-x": "scroll" }, real).result.current.isExpanded("layout")).toBe(true);
+    expect(render({ "z-index": "10" }, real).result.current.isExpanded("layout")).toBe(false);
+  });
+
+  it("opens Size for a flex item's shrink / basis / order, behind its More settings", () => {
+    expect(render({ "flex-basis": "200px" }, real).result.current.isExpanded("size")).toBe(true);
   });
 
   it("opens Fill for background-blend-mode", () => {
