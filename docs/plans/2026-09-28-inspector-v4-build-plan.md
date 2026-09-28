@@ -368,3 +368,21 @@ Figma quota (200/day, 15/min, shared): W0 ≤ 72 calls on day 1 (36 design-conte
 3. **Types with no board → by analogy** with the nearest board; reported as NOT board-verified in the Phase 6 table.
 4. **Text style → bind `font-size`** to the Brand type-style token (recommended default; owner did not object).
 5. **Single landing, no feature flag** — all waves merge into `feat/inspector-v4`, one merge to `main`, rollback by revert.
+
+### W1 progress (2026-09-28, branch `feat/insp-w1`)
+
+**Done** — commits `d1d626121` (tabs, capabilities, sectionOrder, registry re-split, DD-11 frame, type block + Attributes, tier gone, conformance swap), `c7c2c6d41` (element-action registry, engine commands copy/paste/reset style + lock/unlock + ⌘\, stylePeers, ⋯ menu board 30, canvas rows, ApplyStyleDialog stub), `29fb725b9` (Breadcrumb, header, StatusMarks, StatusLine, ContextRow, field context + OverrideDot breakpoint kind, multi = same panel + MultiSelectBar stub, PagePanel stub, useSaveConflict stub; Scope/State/BreakpointOverrides/LockedBanner deleted), `e8c9e786f` (mustNot.test, state menu beside the column). tsc 0, verify:ds green at every commit.
+
+**Decisions the plan did not cover**
+- `flex` / `grid` stay as INTERIM sections (box.tsx) for a CONTAINER set to flex/grid, right after Layout; the Flex/Grid TYPES carry the controls in their type block. Flex-ITEM controls (grow/shrink/align-self) are not shown in W1 — L2-C decides their v4 home.
+- Widgets (countdown, progress) and accordion get `typography: "inside"` (closed Text inside) so text styling stays reachable; boards 11–13 do not draw it.
+- Embed / widget / audio / choice-less type blocks: W1 ships NO body where the old Advanced section had no rows (writing attributes nothing reads = OQ-2); the type block does not render for those types until L2-B.
+- Lock / unlock commands take `{ elementId }` so Layers rows and the canvas row act on their own element.
+- The state chip is a chrome-ui `Button` (Chip is a pill filter chip, label-only; the board draws radius 4 + chevron).
+- Disabled ⋯ rows show their reason as a second line (e.g. Paste style "Copy a style first").
+- `s3-1-pick-mode` recipe retired (its door, ⋯ Pick on canvas, is gone); board 301:2186 marked unreachable with the reason. `shell-state-6-comment-mode` lost its scope-pill / state-pill targets.
+- Old Inspector active rows were 20, not 21.
+
+**For the lanes (live walk, boards 1, 2, 3, 23, 30, 32)** — chassis matches (header 68 tall, panel 300, tabs 32/100, context row, section headers 32, ⋯ = board 30 rows, state menu = board 32 beside the column, locked line + read-only). Remaining differences: Heading block Level is a select, Text style row missing (L2-A); Typography body, Size Fixed/Fill/Hug rows, Spacing pairs + Gap (L2-C / L2-A); Text inside summary prints a raw `var(--…)` (L2-A); CSS classes / Interactions / CMS bodies (L2-D1); Attributes summary needs an `id` on the fixture heading; read-only selects are dimmed via `disabled` (L3-C).
+
+**Remaining W1 items not done**: `Tabs` panelId (W3 per plan); `insp/index.ts` / barrels untouched (nothing needed).
