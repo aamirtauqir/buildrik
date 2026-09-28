@@ -10,7 +10,7 @@
 import { adaptBaseStyleProps, adaptElementProps, defineSection, type AnySectionEntry, type SectionContext } from "./_shared";
 import { CSSClassesSection } from "../CSSClassesSection";
 import { LinkSection } from "../LinkSection";
-import { ContentSection } from "../ContentSection";
+import { CmsBindingSection } from "../CmsBindingSection";
 import { CollectionListSection } from "../CollectionListSection";
 import { FormFieldsSection } from "../FormFieldsSection";
 import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
@@ -145,7 +145,7 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
     capability: own("collection"),
     Component: CollectionListSection,
     styleKeys: [],
-    adaptProps: adaptElementProps,
+    adaptProps: (ctx) => ({ ...adaptElementProps(ctx), onOpenCreateCollection: ctx.onOpenCreateCollection }),
   }),
 
   link: defineSection({
@@ -168,7 +168,7 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
     title: "CMS binding",
     open: "open",
     capability: (caps) => caps.cmsBindable && !caps.isStructuralChild,
-    Component: ContentSection,
+    Component: CmsBindingSection,
     styleKeys: [],
     adaptProps: (ctx) => ({ ...adaptElementProps(ctx), onOpenCreateCollection: ctx.onOpenCreateCollection }),
   }),

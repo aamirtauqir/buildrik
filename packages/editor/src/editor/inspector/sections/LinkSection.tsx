@@ -1,16 +1,24 @@
 /**
- * LinkSection - Page/URL linking for interactive elements
- * Allows linking buttons/links to internal pages or external URLs
+ * LinkSection — Behaviour › Link (boards 6, 7, 18): Link to None / Page / URL /
+ * Email / Phone / Anchor, the destination, "Open in new tab", Rel, and the
+ * hint "Changing Link to clears the old destination".
+ *
+ * Rel lives here and nowhere else (R-DD-9 took it out of Advanced). A type
+ * change replaces the destination in one step (P-11a); New tab adds and takes
+ * back only its own rel tokens, so an author's rel survives. Every write goes
+ * through the lock gate (P-1).
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { LINKABLE_TYPES } from "@/shared/constants/elementCapabilities";
 import type { Composer, Element } from "@/engine";
-import { EVENTS } from "../../../shared/constants";
-import type { PageData } from "../../../shared/types";
+import { EVENTS } from "@/shared/constants";
+import type { PageData } from "@/shared/types";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
-import { isUrl, isEmail, isPhoneNumber } from "../../../shared/utils/helpers/validation";
+import { CheckRow, CommitRow, NoteRow } from "./behaviourRows";
+import { isEmail, isPhoneNumber } from "@/shared/utils/helpers/validation";
 import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface LinkSectionProps {
@@ -30,22 +38,15 @@ export interface LinkSectionProps {
 type LinkType = "none" | "page" | "url" | "email" | "phone" | "anchor";
 
 const ErrorText: React.FC<{ message: string }> = ({ message }) => (
-  <div style={{
-    marginTop: 4,
-    fontSize: 11,
-    color: "var(--bk-error, var(--bk-error))",
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-  }}>
-    <span aria-hidden>⚠</span> {message}
-  </div>
+  <p role="alert" className="tw:m-0 tw:pb-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]">
+    {message}
+  </p>
 );
 
+/* Board 6's "Link to" list. "None" is the select's empty choice. */
 const LINK_TYPE_OPTIONS = [
-  { value: "none", label: "None" },
   { value: "page", label: "Page" },
-  { value: "url", label: "External URL" },
+  { value: "url", label: "URL" },
   { value: "email", label: "Email" },
   { value: "phone", label: "Phone" },
   { value: "anchor", label: "Anchor" },
@@ -54,12 +55,6 @@ const LINK_TYPE_OPTIONS = [
 /** The rel tokens New Tab adds. Same Window takes back only these, so an
  *  author's own rel (nofollow, sponsored, …) survives the round trip. */
 const TAB_REL = ["noopener", "noreferrer"];
-
-const TARGET_OPTIONS = [
-  { value: "_self", label: "Same Window" },
-  { value: "_blank", label: "New Tab" },
-];
-
 
 export const LinkSection: React.FC<LinkSectionProps> = ({
   selectedElement,
@@ -82,6 +77,19 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   const [anchorError, setAnchorError] = React.useState(false);
 
   const isLinkable = LINKABLE_TYPES.has(selectedElement.type);
+  /* Rel is read off the element on render; an undo / redo re-renders it. */
+  const [, refresh] = React.useReducer((n: number) => n + 1, 0);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onUpdate = (payload: unknown) => {
+      const id = (payload as { getId?: () => string } | undefined)?.getId?.();
+      if (!id || id === selectedElement.id) refresh();
+    };
+    composer.on(EVENTS.ELEMENT_UPDATED, onUpdate);
+    return () => {
+      composer.off(EVENTS.ELEMENT_UPDATED, onUpdate);
+    };
+  }, [composer, selectedElement.id]);
 
   // Load pages from composer
   React.useEffect(() => {
@@ -240,109 +248,82 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     }
   };
 
+  const updateRel = (rel: string) => {
+    if (!composer || !selectedElement?.id) return;
+    const next = rel.trim().split(/\s+/).filter(Boolean).join(" ");
+    /* P-1: the lock gate. The Rel field is the one place rel is written by
+       hand (R-DD-9 moved it here from Advanced). */
+    writeElement(composer, composer.elements.getElement(selectedElement.id), "link-rel-change", (el) => {
+      if (next) el.setAttribute?.("rel", next);
+      else el.removeAttribute?.("rel");
+    });
+  };
+
   if (!isLinkable) return null;
 
-  const pageOptions = [
-    { value: "", label: "Select a page..." },
-    ...pages.map((page) => ({
-      value: page.id,
-      label: `${page.isHome ? "🏠 " : ""}${page.name}`,
-    })),
-  ];
+  const rel = composer?.elements.getElement(selectedElement.id)?.getAttribute?.("rel") || "";
+  const opensInTab = linkType === "page" || linkType === "url" || linkType === "anchor";
+  const pageOptions = pages.map((page) => ({ value: page.id, label: page.name }));
 
   return (
     <Section title="Link" icon="Link2" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-link">
-      {/* Board 4428:141642: "Link  [None ▾]". */}
+      {/* Boards 6, 7: Link to · Page / URL · Open in new tab · Rel · hint.
+          The select's empty choice IS "None". */}
       <SelectRow
-        label="Link"
-        value={linkType}
-        onChange={handleLinkTypeChange}
+        label="Link to"
+        value={linkType === "none" ? "" : linkType}
+        onChange={(v) => handleLinkTypeChange(v || "none")}
         options={LINK_TYPE_OPTIONS}
+        placeholder="None"
       />
 
       {linkType === "page" && (
-        <SelectRow
-          label="Target Page"
-          value={selectedPageId}
-          onChange={handlePageSelect}
-          options={pageOptions}
-        />
+        <SelectRow label="Page" value={selectedPageId} onChange={handlePageSelect} options={pageOptions} placeholder="Choose a page…" />
       )}
 
       {linkType === "url" && (
-        <div>
-          <InputRow
-            label="URL"
-            value={externalUrl}
-            onChange={handleUrlChange}
-            placeholder="https://example.com"
-          />
+        <>
+          <InputRow label="URL" value={externalUrl} onChange={handleUrlChange} placeholder="https://example.com" />
           {urlError && <ErrorText message="URL must start with http:// or https://" />}
-        </div>
+        </>
       )}
 
       {linkType === "email" && (
-        <div>
-          <InputRow
-            label="Email"
-            value={emailAddress}
-            onChange={handleEmailChange}
-            placeholder="hello@example.com"
-          />
+        <>
+          <InputRow label="Email" value={emailAddress} onChange={handleEmailChange} placeholder="hello@example.com" />
           {emailError && <ErrorText message="Enter a valid email address" />}
-        </div>
+        </>
       )}
 
       {linkType === "phone" && (
-        <div>
-          <InputRow
-            label="Phone"
-            value={phoneNumber}
-            onChange={handlePhoneChange}
-            placeholder="+1234567890"
-          />
+        <>
+          <InputRow label="Phone" value={phoneNumber} onChange={handlePhoneChange} placeholder="+1234567890" />
           {phoneError && <ErrorText message="Enter a valid phone number" />}
-        </div>
+        </>
       )}
 
       {linkType === "anchor" && (
-        <div>
-          <InputRow
-            label="Anchor ID"
-            value={anchorId}
-            onChange={handleAnchorChange}
-            placeholder="section-id"
-          />
+        <>
+          <InputRow label="Anchor ID" value={anchorId} onChange={handleAnchorChange} placeholder="section-id" />
           {anchorError && <ErrorText message="Anchor ID cannot contain spaces" />}
-        </div>
+        </>
       )}
 
-      {linkType !== "none" && linkType !== "email" && linkType !== "phone" && (
-        <SelectRow
-          label="Open In"
-          value={target}
-          onChange={updateTarget}
-          options={TARGET_OPTIONS}
-        />
+      {opensInTab && (
+        <>
+          <CheckRow
+            label="Open in new tab"
+            checked={target === "_blank"}
+            onChange={(on) => updateTarget(on ? "_blank" : "_self")}
+            testId="link-new-tab"
+          />
+          <CommitRow label="Rel" value={rel} onCommit={updateRel} placeholder="nofollow" testId="link-rel" />
+        </>
       )}
 
-      {linkType === "page" && selectedPageId && (
-        <div style={hintStyles}>
-          Links to internal page. Will navigate when clicked in preview mode.
-        </div>
-      )}
+      <NoteRow testId="link-hint">Changing Link to clears the old destination</NoteRow>
     </Section>
   );
-};
-
-const hintStyles: React.CSSProperties = {
-  marginTop: 8,
-  padding: "8px 12px",
-  background: "rgba(0, 115, 230, 0.1)",
-  borderRadius: 6,
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  lineHeight: 1.4,
 };
 
 export default LinkSection;

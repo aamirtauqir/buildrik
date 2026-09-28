@@ -35,7 +35,7 @@ import { LinkSection } from "../sections/LinkSection";
 import { CSSClassesSection } from "../sections/CSSClassesSection";
 import { CollectionListSection } from "../sections/CollectionListSection";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
-import { BindingBanner } from "../components/BindingBanner";
+import { CmsBindingSection } from "../sections/CmsBindingSection";
 import { InspectorElementMenu } from "../components/InspectorElementMenu";
 import { useBatchStyleHandler } from "../hooks/useBatchStyleHandler";
 
@@ -97,12 +97,20 @@ describe("P-1 — attribute writers refuse a locked element", () => {
   it("LinkSection: changing the link target", () => {
     const link = add("link", { attributes: { href: "https://a.com" } });
     lock(link);
-    const { container } = render(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
-    const targetSelect = [...container.querySelectorAll("select")].find((s) =>
-      [...s.options].some((o) => o.value === "_blank"),
-    )!;
-    fireEvent.change(targetSelect, { target: { value: "_blank" } });
+    render(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Open in new tab" }));
     expect(link.getAttribute("target")).toBeUndefined();
+    expect(skipped).toHaveBeenCalled();
+  });
+
+  it("LinkSection: editing Rel", () => {
+    const link = add("link", { attributes: { href: "https://a.com", rel: "nofollow" } });
+    lock(link);
+    render(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
+    const rel = screen.getByLabelText("Rel");
+    fireEvent.change(rel, { target: { value: "sponsored" } });
+    fireEvent.keyDown(rel, { key: "Enter" });
+    expect(link.getAttribute("rel")).toBe("nofollow");
     expect(skipped).toHaveBeenCalled();
   });
 
@@ -110,26 +118,30 @@ describe("P-1 — attribute writers refuse a locked element", () => {
     const box = add("container");
     lock(box);
     render(<CSSClassesSection selectedElement={{ id: box.getId(), type: "container" }} composer={composer} isOpen />);
-    fireEvent.click(screen.getByRole("button", { name: /add class/i }));
-    const input = screen.getByPlaceholderText("class-name");
+    const input = screen.getByLabelText("Add class");
     fireEvent.change(input, { target: { value: "hero" } });
     fireEvent.keyDown(input, { key: "Enter" });
+    fireEvent.paste(input, { clipboardData: { getData: () => "a b" } });
     expect(box.getClasses()).not.toContain("hero");
+    expect(box.getClasses()).not.toContain("a");
     expect(skipped).toHaveBeenCalled();
   });
 });
 
 describe("P-1 — structure writers refuse a locked form / slider", () => {
-  it("FormFieldsSection: changing a field's type and adding a field", () => {
+  it("FormFieldsSection: changing a field's type, Required, and adding a field", () => {
     const form = add("form");
     add("input", { attributes: { type: "text", name: "name", placeholder: "Name" } }, form.getId());
     lock(form);
     render(<FormFieldsSection elementId={form.getId()} composer={composer} isOpen />);
-    fireEvent.change(screen.getByRole("combobox", { name: "Name type" }), { target: { value: "email" } });
     fireEvent.click(screen.getByRole("button", { name: "+ Add field" }));
+    fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
+    fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "email" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Required" }));
     const fields = form.getChildren();
     expect(fields).toHaveLength(1);
     expect(fields[0].getAttribute("type")).toBe("text");
+    expect(fields[0].getAttribute("required")).toBeUndefined();
     expect(skipped).toHaveBeenCalled();
   });
 
@@ -224,6 +236,7 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
           off: vi.fn(),
           getAllCollections: vi.fn(() => [{ id: "menu", name: "Menu", slug: "menu", fields: [{ slug: "title", name: "Title" }] }]),
           getCollection: vi.fn(() => ({ id: "menu", name: "Menu", slug: "menu", fields: [{ slug: "title", name: "Title" }] })),
+          queryContent: vi.fn(() => Promise.resolve({ items: [], total: 0, hasMore: false })),
         },
       },
     } as unknown as Composer;
@@ -233,16 +246,16 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
   it("CollectionListSection: binding a list", () => {
     const { c, bindCollectionList, emit } = cmsComposer(true);
     render(<CollectionListSection elementId="list" composer={c} isOpen />);
-    fireEvent.change(screen.getByRole("combobox", { name: "Source" }), { target: { value: "menu" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Collection" }), { target: { value: "menu" } });
     expect(bindCollectionList).not.toHaveBeenCalled();
     expect(emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   });
 
-  it("BindingBanner: Unbind", () => {
+  it("CmsBindingSection: Unbind", () => {
     const { c, unbindAll } = cmsComposer(true);
-    render(<BindingBanner composer={c} elementId="list" elementLabel="Text" />);
+    render(<CmsBindingSection composer={c} elementId="list" isOpen />);
     const unbind = screen.queryByRole("button", { name: "Unbind" });
-    if (!unbind) throw new Error("banner did not render — fixture out of date");
+    if (!unbind) throw new Error("section did not render the bound state — fixture out of date");
     fireEvent.click(unbind);
     expect(unbindAll).not.toHaveBeenCalled();
   });
