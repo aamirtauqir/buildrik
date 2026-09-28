@@ -406,3 +406,11 @@ Figma quota (200/day, 15/min, shared): W0 ≤ 72 calls on day 1 (36 design-conte
 - L3-C (shared controls / `inspector.css`): row labels are right-aligned (board: left at x16); typography rows are 32 tall (board 28); segmented "on" state and number steppers differ from the board; ColorInput names a bound token "Text Primary" (board "Text / primary" — `colourTokenLabel` in `registry/text.tsx` has the board's format).
 - Canvas selection label reads "Label" for a checkbox (Q2 label on the canvas side).
 - Board 21 not walkable until L3-A's PagePanel renders the registry with `variant: "page"`.
+
+### L2-B progress (2026-09-28, branch `feat/insp-l2b`)
+
+**Done** — `854f64a9e` (parseEmbedUrl allowlist + embedFrameHTML in all three HTML writers; countdown / accordion runtimes on canvas + `lib/publish-widgets.ts` beside `wireSliders`; Accordion items carry `data-accordion-state`, Progress block gains a native `<progress>`), `671890d40` (SourceRow, media / embed / widget bodies, tests). tsc 0, related vitest green, verify:ds green.
+
+**Attribute contract** — video-embed: `data-embed-url`, `data-embed-ratio`, `data-embed-autoplay`, `data-embed-muted`, `data-embed-controls="false"`; map-embed: `data-embed-url`; lottie: `data-lottie-src`; countdown: `data-countdown-end` (`YYYY-MM-DDTHH:MM`, visitor-local), `data-countdown-done` (`hide` | absent), `data-countdown-message`; accordion: `data-allow-multiple`, item `data-accordion-state` (`open` | `closed`); progress: `value` / `max` on the descendant `<progress>`, `hidden` on the `.pb-circle` / `.pb-label` label.
+
+**For the lead** — (1) `packages/dashboard/next.config.mjs` frame-src allows only youtube-nocookie + player.vimeo: add `https://www.google.com https://lottie.host` or Map / Lottie frames are blocked on the canvas. (2) ExportEngine's publish writer drops an element's `class` ATTRIBUTE (Accordion, Modal, Stack, Switch, Table, Tabs, ProductGrid store classes there) — pre-existing, not fixed here; the accordion runtime finds its parts structurally. (3) Board 13 draws no Layout section; `accordion` is `container({typeBlock})` in capabilities (W1). (4) Row labels are right-aligned in a 95px column (shared `.bdi-row-ctrl`), boards draw 108px left-aligned; long accordion item labels wrap. (5) Fixture carries no L2-B attributes; the live walk set them through the Inspector.

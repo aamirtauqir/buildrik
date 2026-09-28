@@ -48,6 +48,7 @@ import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./interactionRuntime";
 import { isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
+import { embedFrameHTML } from "@/shared/utils/embed/embedFrameHTML";
 
 // ============================================================================
 // MULTI-PAGE EXPORT TYPES
@@ -461,9 +462,13 @@ export class ExportEngine {
       return `${indentStr}${openLink}<${tag}${attrStr} />${closeLink}${newline}`;
     }
 
-    // Build children content
+    // Build children content — an embed with a valid URL renders its iframe
+    // in place of its placeholder children (embedFrameHTML).
+    const embedFrame = embedFrameHTML(type, attrs);
     let childContent = "";
-    if (children.length > 0) {
+    if (embedFrame) {
+      childContent = embedFrame;
+    } else if (children.length > 0) {
       childContent =
         newline +
         children.map((child) => this.elementToHTML(child, config, indent + 1)).join("") +
@@ -1214,9 +1219,13 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
       return `${indentStr}${openLink}<${tag}${attrStr} />${closeLink}\n`;
     }
 
-    // Build children content
+    // Build children content — an embed with a valid URL renders its iframe
+    // in place of its placeholder children (embedFrameHTML).
+    const embedFrame = embedFrameHTML(element.type, element.attributes);
     let childContent = "";
-    if (children.length > 0) {
+    if (embedFrame) {
+      childContent = embedFrame;
+    } else if (children.length > 0) {
       childContent =
         "\n" +
         children.map((child) => this.renderPageElement(child, indent + 1)).join("") +

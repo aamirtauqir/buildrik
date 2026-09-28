@@ -69,7 +69,7 @@ describe("P-1 — attribute writers refuse a locked element", () => {
     render(
       <TypeBlockSection element={{ id: img.getId(), type: "image" }} targetIds={[img.getId()]} composer={composer} styles={{}} onChange={() => {}} onBatchChange={() => {}} isOpen onToggle={() => {}} />
     );
-    fireEvent.change(screen.getByPlaceholderText("Describe the image"), { target: { value: "a dog" } });
+    fireEvent.change(screen.getByPlaceholderText("Describe this image"), { target: { value: "a dog" } });
     expect(img.getAttribute("alt")).toBe("cat");
     expect(skipped).toHaveBeenCalled();
   });

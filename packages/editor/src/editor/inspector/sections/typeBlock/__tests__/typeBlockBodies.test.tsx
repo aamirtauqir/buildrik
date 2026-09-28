@@ -46,8 +46,8 @@ describe("type block frame", () => {
     expect(screen.queryByText("Container")).toBeNull();
   });
 
-  it("renders nothing for a type whose block has no body yet (embeds, widgets)", () => {
-    const { container } = setup("countdown");
+  it("renders nothing for a type with no defining settings (a plain container)", () => {
+    const { container } = setup("container");
     expect(container.innerHTML).toBe("");
   });
 });
