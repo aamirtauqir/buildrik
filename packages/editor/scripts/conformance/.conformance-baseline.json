@@ -1083,14 +1083,6 @@
     "skipped": 3,
     "compared": 21
   },
-  "ai-scoped": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 2,
-    "compared": 12
-  },
   "media-modal-picker": {
     "skipped": 0,
     "compared": 10,

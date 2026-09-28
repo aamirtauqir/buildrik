@@ -87,7 +87,7 @@ function scopeOf(selected: readonly Element[]): AIScope {
   if (selected.length > 1) return { kind: "multi", ids: selected.map((e) => e.getId()) };
   if (selected.length === 1) {
     const el = selected[0];
-    return { kind: "element", id: el.getId(), label: scopeLabel(el), name: runName(el) };
+    return { kind: "element", id: el.getId(), label: scopeLabel(el), title: ownName(el) ?? typeLabel(el.getType()), name: runName(el) };
   }
   return { kind: "page" };
 }

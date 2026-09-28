@@ -10,14 +10,14 @@
     "verifiedActive": {
       "match": 91,
       "driven": 13,
-      "drift-fixed": 347,
+      "drift-fixed": 346,
       "drift-open": 3,
       "unreachable": 45,
       "no": 36
     },
-    "retired": 45,
+    "retired": 46,
     "total": 668,
-    "active": 520
+    "active": 519
   },
   "activeFamilies": [
     "AI",
@@ -144,11 +144,11 @@
       "state": "scoped",
       "width": 360,
       "height": 776,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
-      "recipe": "ai-scoped",
-      "verifiedNote": "measured 2026-09-08 (recipe ai-scoped), previously driven: PROVENANCE, stated because it limits what this note can claim: the agent that wrote this recipe was killed by an infrastructure watchdog at its verification step and never filed a report, so there is no record of which properties drifted, who won a board-vs-code conflict, or what it chose not to conform. What IS verified is the measurement itself, re-run by the orchestrator after the crash: 8 targets, 12 compared, 11 pass, 0 fail, 0 targets missing. The recipe's own _note is the only account of its reasoning. Treat the adjudication as unreviewed and re-read the recipe before building on it.",
-      "verified": "drift-fixed"
+      "recipe": null,
+      "verifiedNote": "RETIRED 2026-09-28 (Inspector v4 W3 integration): superseded by Inspector v4 board 35 'AI column' (7995:210503) for the one-element idle state — no AI title row, no ✕, the scope as a plain 'Scope: Heading' line (ScopeChip variant=\"line\"). Its recipe `ai-scoped` measured the title row (`ai-header`) and the tinted band, neither of which that state draws any more, so the recipe and its spec are deleted; board 35's own recipe `inspector-v4-35` measures the state. The multi / page / run states keep the 4418:* band.",
+      "verified": "no"
     },
     {
       "nodeId": "171:2",
@@ -8883,6 +8883,6 @@
       "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
     }
   ],
-  "coveredFloor": 205,
+  "coveredFloor": 204,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

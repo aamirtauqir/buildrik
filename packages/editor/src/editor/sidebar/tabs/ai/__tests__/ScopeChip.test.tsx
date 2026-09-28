@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ScopeChip } from "../ScopeChip";
 import type { AIScope } from "../types";
 
-const hero: AIScope = { kind: "element", id: "el-1", label: "Hero section", name: "Hero" };
+const hero: AIScope = { kind: "element", id: "el-1", label: "Hero section", title: "Hero", name: "Hero" };
 
 describe("ScopeChip", () => {
   /* Board 170:2 words it "Scope: Hero section" — the word the boards use for
@@ -12,6 +12,15 @@ describe("ScopeChip", () => {
     render(<ScopeChip scope={hero} status="idle" />);
     expect(screen.getByText(/^Scope:/)).toBeInTheDocument();
     expect(screen.getByText("Hero section")).toBeInTheDocument();
+  });
+
+  /* Board 35 (Inspector v4 AI column) reads "Scope: Heading" — the element's
+     name alone; the 4418:* band keeps "Hero section". */
+  it("the line variant names the element alone, the band adds its kind", () => {
+    const { rerender } = render(<ScopeChip scope={hero} status="idle" variant="line" />);
+    expect(screen.getByTestId("ai-scope-text").textContent).toBe("Scope: Hero");
+    rerender(<ScopeChip scope={hero} status="idle" variant="band" />);
+    expect(screen.getByTestId("ai-scope-text").textContent).toBe("Scope: Hero section");
   });
 
   it.each<[AIScope, string]>([

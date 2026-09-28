@@ -72,6 +72,7 @@ describe("AI column — board 35", () => {
     expect(order.every((i) => i >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect(screen.getByPlaceholderText("What would you like to change?")).toBeTruthy();
+    expect(screen.getByTestId("ai-scope-text").textContent).toBe("Scope: Heading");
 
     expect(screen.queryByTestId("ai-header")).toBeNull();
     expect(screen.queryByRole("button", { name: "Close AI" })).toBeNull();

@@ -21,10 +21,12 @@ const LINE_TRIGGER =
   "tw:h-4 tw:w-full tw:justify-start tw:gap-1 tw:rounded-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-left tw:text-[13px] tw:leading-4 tw:font-medium tw:text-inherit tw:hover:bg-transparent tw:focus:ring-0 tw:disabled:opacity-100 tw:disabled:bg-transparent";
 const LINE = "tw:flex tw:items-center tw:gap-1 tw:text-[13px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-soft)]";
 
-function describeScope(scope: AIScope): string {
+function describeScope(scope: AIScope, line = false): string {
   switch (scope.kind) {
     case "element":
-      return scope.label;
+      /* Board 35's line: the element alone ("Heading"); the 4418:* band adds
+         its kind ("Heading text"). */
+      return line ? scope.title : scope.label;
     case "multi":
       return `${scope.ids.length} selected elements`;
     case "similar":
@@ -51,7 +53,7 @@ export const ScopeChip: React.FC<ScopeChipProps> = ({ scope, status, options, on
   const frame = line ? LINE : "bd-ai-scope";
   const text = (
     <span className={line ? undefined : "bd-ai-scope-text"} data-testid="ai-scope-text">
-      Scope: <span className={line ? undefined : "bd-ai-scope-target"}>{describeScope(scope)}</span>
+      Scope: <span className={line ? undefined : "bd-ai-scope-target"}>{describeScope(scope, line)}</span>
     </span>
   );
   const lockedLabel = locked ? "Scope locked while the run is live" : undefined;
@@ -80,7 +82,7 @@ export const ScopeChip: React.FC<ScopeChipProps> = ({ scope, status, options, on
             className={line ? LINE_TRIGGER : BAND_TRIGGER}
             aria-haspopup="menu"
             aria-expanded={open}
-            aria-label={lockedLabel ? `Scope: ${describeScope(scope)} — ${lockedLabel}` : `Scope: ${describeScope(scope)} — change`}
+            aria-label={lockedLabel ? `Scope: ${describeScope(scope, line)} — ${lockedLabel}` : `Scope: ${describeScope(scope, line)} — change`}
             title={lockedLabel}
             disabled={locked}
             data-testid="ai-scope-trigger"
