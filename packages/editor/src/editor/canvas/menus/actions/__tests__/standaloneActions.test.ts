@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { standaloneActions } from "../standaloneActions";
 import { EVENTS } from "../../../../../shared/constants/events";
 import type { ActionContext } from "../../contextMenuRegistry";
@@ -138,15 +138,18 @@ describe("standaloneActions", () => {
   });
 
   describe("lock / unlock", () => {
-    it("lock-element sets locked=true in a transaction", () => {
+    /* The shared lock commands (one transaction each, the same the Inspector
+       and Layers run) — on the right-clicked element. */
+    it("lock-element runs the lock command on this element", () => {
+      (composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands = { run: vi.fn() };
       action("lock-element").handler!(ctx);
-      expect(composer.beginTransaction).toHaveBeenCalledWith("lock-element");
-      expect(element.setLocked).toHaveBeenCalledWith(true);
+      expect((composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands.run).toHaveBeenCalledWith("lock-element", { elementId: element.getId() });
     });
 
-    it("unlock-element sets locked=false", () => {
+    it("unlock-element runs the unlock command on this element", () => {
+      (composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands = { run: vi.fn() };
       action("unlock-element").handler!(ctx);
-      expect(element.setLocked).toHaveBeenCalledWith(false);
+      expect((composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands.run).toHaveBeenCalledWith("unlock-element", { elementId: element.getId() });
     });
 
     it("visibility flips on lock state and hides on root", () => {

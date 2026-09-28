@@ -23,6 +23,7 @@ import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
+import { ApplyStyleDialog } from "./components/ApplyStyleDialog";
 import { ElementNameField } from "./components/ElementNameField";
 import { LockedBanner } from "./components/LockedBanner";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
@@ -31,7 +32,6 @@ import { BreakpointOverrides } from "./components/BreakpointOverrides";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
-import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { usePropertyJump } from "./hooks/usePropertyJump";
 import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY } from "./sections/registry";
@@ -62,7 +62,6 @@ export interface ProInspectorProps {
   } | null;
   composer?: Composer | null;
   currentBreakpoint?: DeviceType;
-  onDelete?: (id: string) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
     onSelect: (asset: MediaAsset) => void,
@@ -84,7 +83,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   selectedElement,
   composer,
   currentBreakpoint: currentBreakpointProp = "desktop",
-  onDelete,
   onOpenMediaLibrary,
   onOpenIconPicker,
   onOpenCreateCollection,
@@ -150,6 +148,17 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     };
   }, [composer]);
 
+  /* ⋯ "Apply style to all … on this page" asks for its confirm (DD-6b). */
+  const [applyStyleFor, setApplyStyleFor] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onRequest = (p: { elementId?: string }) => setApplyStyleFor(p?.elementId ?? null);
+    composer.on(EVENTS.UI_APPLY_STYLE_REQUESTED, onRequest);
+    return () => {
+      composer.off(EVENTS.UI_APPLY_STYLE_REQUESTED, onRequest);
+    };
+  }, [composer]);
+
   const {
     styles: styles_state,
     handleStyleChange,
@@ -193,12 +202,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
-
-  const [pickActive, setPickActive] = React.useState(false);
-
-  // Canvas signals pick completion/cancellation — clear pickActive so the
-  // header button leaves its pressed state without another click.
-  usePickModeReset(composer, setPickActive);
 
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
   const projectLoading = useProjectLoading(composer ?? null);
@@ -369,6 +372,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
 
   return (
     <div className="bdi-panel" data-testid="inspector-panel">
+      <ApplyStyleDialog
+        composer={composer}
+        elementId={applyStyleFor}
+        breakpoint={currentBreakpoint}
+        pseudo={currentPseudoState}
+        onClose={() => setApplyStyleFor(null)}
+      />
       {/* Live region for selection announcement */}
       <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
         {elementLabel} selected
@@ -412,26 +422,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               <Link size={10} aria-hidden="true" /> Bound
             </span>
           )}
-          {/* Decision #17: one element deletes at once, with the Undo toast the
-              shell's handler raises — a confirm is for N > 1 (the multi-select
-              header) and for component masters (the Components panel). */}
-          {onDelete && (
-            <InspectorElementMenu
-              composer={composer}
-              selectedElementId={selectedElement.id}
-              onRequestDelete={() => onDelete(selectedElement.id)}
-              onPick={() => {
-                const next = !pickActive;
-                setPickActive(next);
-                composer?.emit(next ? "inspector:pick-start" : "inspector:pick-cancel");
-              }}
-              onSelectParent={() => composer?.selection.selectParent()}
-              onHideInspector={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
-              /* v3 FC-3 (board 7048:77991): same seam as the header's ✦ chip
-                 — one AI thread, three doors (chip, ⋯ row, canvas context menu). */
-              onAIRequest={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
-            />
-          )}
+          {/* Board 30: the element-action registry's rows (Delete is the shared
+              `delete` command — the inspected element is the selection). */}
+          <InspectorElementMenu composer={composer} selectedElementId={selectedElement.id} />
         </div>
       </div>
       {/* Boards 4428:141170 / 141642 / 142686 — Style · Settings · Effects.

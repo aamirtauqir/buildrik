@@ -10,9 +10,9 @@
     "verifiedActive": {
       "match": 91,
       "driven": 13,
-      "drift-fixed": 348,
+      "drift-fixed": 347,
       "drift-open": 3,
-      "unreachable": 44,
+      "unreachable": 45,
       "no": 36
     },
     "retired": 45,
@@ -3005,9 +3005,9 @@
       "height": 900,
       "status": "active",
       "authority": "board",
-      "recipe": "s3-1-pick-mode",
-      "verifiedNote": "conformed + measured 2026-09-08 (recipe s3-1-pick-mode): 9 properties. Driven LIVE at :5050 — Insert → Container → click the inspector crosshair → wait on [data-bk-pick=\"true\"]. REAL BUG FIXED, the drift this row already recorded (partial-trigger-exists-cursor-not-on-body): CDP-measured, the frame and elements read `crosshair` but .buildrick-canvas read `default`, because canvasStyles sets an INLINE cursor:default that an inherited value cannot beat. Fixed and re-measured.",
-      "verified": "drift-fixed"
+      "recipe": null,
+      "verifiedNote": "recipe s3-1-pick-mode retired 2026-09-28: its door, the Inspector ⋯ \"Pick on canvas\", was removed by Inspector v4 (DD-8b, board 30). Pick mode is now opened only from CMS › conditions (ContentTab), which the recipe cannot reach. Prior verdict: drift-fixed; prior note: conformed + measured 2026-09-08 (recipe s3-1-pick-mode): 9 properties. Driven LIVE at :5050 — Insert → Container → click the inspector crosshair → wait on [data-bk-pick=\"true\"]. REAL BUG FIXED, the drift this row already recorded (partial-trigger-exists-cursor-not-on-body): CDP-measured, the frame and elements read `crosshair` but .buildrick-canvas read `default`, because canvasStyles sets an INLINE cursor:default that an inherited value cannot beat. Fixed and re-measured.",
+      "verified": "unreachable"
     },
     {
       "nodeId": "815:4518",
@@ -8883,6 +8883,6 @@
       "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
     }
   ],
-  "coveredFloor": 206,
+  "coveredFloor": 205,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

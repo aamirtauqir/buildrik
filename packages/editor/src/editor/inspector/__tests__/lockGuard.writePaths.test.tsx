@@ -166,15 +166,16 @@ describe("P-1 — style resets refuse a locked element", () => {
     expect(skipped).toHaveBeenCalled();
   });
 
-  it("InspectorElementMenu: Reset all styles", () => {
+  it("InspectorElementMenu: Reset style", () => {
     const h = add("heading", { content: "T" });
     h.setStyle("color", "rgb(1, 1, 1)");
     lock(h);
-    render(<InspectorElementMenu composer={composer} selectedElementId={h.getId()} onRequestDelete={() => {}} />, {
+    composer.selection.select(h);
+    render(<InspectorElementMenu composer={composer} selectedElementId={h.getId()} />, {
       wrapper: ToastProvider,
     });
     fireEvent.click(screen.getByRole("button", { name: /element actions/i }));
-    fireEvent.click(screen.getByText("Reset all styles"));
+    fireEvent.click(screen.getByText("Reset style"));
     expect(h.getStyles().color).toBe("rgb(1, 1, 1)");
     expect(skipped).toHaveBeenCalled();
   });

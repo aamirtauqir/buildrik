@@ -8,6 +8,7 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
 
 vi.mock("../InspectorEmptyState", () => ({ InspectorEmptyState: () => null }));
@@ -69,6 +70,7 @@ function mount(composer = makeComposer()) {
       composer={composer as never}
       currentBreakpoint="desktop"
     />,
+    { wrapper: ToastProvider },
   );
   return composer;
 }

@@ -187,6 +187,10 @@ export const EVENTS = {
      instance — this tells the shell so it can toast why the selection count
      shrank instead of doing nothing silently. */
   LOCKED_ELEMENTS_SKIPPED: "clipboard:locked-elements-skipped",
+  /** `copy-style` put the selected element's styles on the style clipboard — payload { count }. */
+  STYLES_COPIED: "clipboard:styles-copied",
+  /** `paste-style` merged the style clipboard onto the element — payload { count }. */
+  STYLES_PASTED: "clipboard:styles-pasted",
 
   // ============================================
   // Data Binding Events
@@ -360,6 +364,9 @@ export const EVENTS = {
    *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
    *  other way to reach a collapsed section. */
   UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
+  /** ⋯ "Apply style to all … on this page" asks the Inspector for its
+   *  confirm dialog (DD-6b, board 31) — payload { elementId }. */
+  UI_APPLY_STYLE_REQUESTED: "ui:apply-style-requested",
   /** A drawer asks the topbar field to search it — payload { placeholder } | null (board 4418:100087). */
   UI_SEARCH_CONTEXT: "ui:search-context",
   /** A full-canvas view names itself in the topbar's page crumb — payload

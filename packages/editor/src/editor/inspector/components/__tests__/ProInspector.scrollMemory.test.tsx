@@ -13,6 +13,7 @@
 import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, cleanup, act, fireEvent } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 /* Tallest scrollTop each element's body allows. */
 const MAX: Record<string, number> = { "el-1": 1000, "el-2": 40 };
@@ -100,7 +101,7 @@ describe("ProInspector — per-element scroll memory (P-7b)", () => {
     const view = (id: string) => (
       <ProInspector selectedElement={el(id)} composer={composer as never} currentBreakpoint="desktop" />
     );
-    const { container, rerender } = render(view("el-1"));
+    const { container, rerender } = render(view("el-1"), { wrapper: ToastProvider });
     const scroller = container.querySelector(".bdi-panel-scroll") as HTMLElement;
     /* jsdom lays nothing out; the column on screen is 780 tall. */
     Object.defineProperty(scroller, "clientHeight", { configurable: true, value: 780 });
@@ -123,7 +124,7 @@ describe("ProInspector — per-element scroll memory (P-7b)", () => {
     const view = (id: string) => (
       <ProInspector selectedElement={el(id)} composer={composer as never} currentBreakpoint="desktop" />
     );
-    const { container, rerender } = render(view("el-1"));
+    const { container, rerender } = render(view("el-1"), { wrapper: ToastProvider });
     const scroller = container.querySelector(".bdi-panel-scroll") as HTMLElement;
     Object.defineProperty(scroller, "clientHeight", { configurable: true, value: 780 });
     await frame();
@@ -168,7 +169,7 @@ describe("ProInspector — per-element scroll memory (P-7b)", () => {
       const view = (id: string) => (
         <ProInspector selectedElement={el(id)} composer={composer as never} currentBreakpoint="desktop" />
       );
-      const { container, rerender } = render(view("el-1"));
+      const { container, rerender } = render(view("el-1"), { wrapper: ToastProvider });
       const scroller = container.querySelector(".bdi-panel-scroll") as HTMLElement;
       Object.defineProperty(scroller, "clientHeight", { configurable: true, value: 780 });
       let max = 1000;

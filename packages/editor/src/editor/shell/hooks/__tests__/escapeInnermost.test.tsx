@@ -61,7 +61,7 @@ describe("P-6 · Escape closes only the innermost surface", () => {
     const composer = boot();
     render(
       <ToastProvider>
-        <InspectorElementMenu composer={composer as unknown as Composer} selectedElementId="el-1" onRequestDelete={() => {}} />
+        <InspectorElementMenu composer={composer as unknown as Composer} selectedElementId="el-1" />
       </ToastProvider>,
     );
     const trigger = screen.getByRole("button", { name: "Element actions" });

@@ -52,7 +52,7 @@ beforeEach(() => {
 });
 
 const openMenu = (elementId: string) => {
-  render(<InspectorElementMenu composer={composer} selectedElementId={elementId} onRequestDelete={() => {}} />, {
+  render(<InspectorElementMenu composer={composer} selectedElementId={elementId} />, {
     wrapper: ToastProvider,
   });
   fireEvent.click(screen.getByRole("button", { name: /element actions/i }));
@@ -70,10 +70,10 @@ describe("P-10a — Paste style merges from every door", () => {
     composer.styleClipboard = { color: "rgb(255, 0, 0)" };
   });
 
-  it("Inspector ⋯ Paste styles keeps the target's own properties", () => {
+  it("Inspector ⋯ Paste style keeps the target's own properties", () => {
     composer.selection.select(b);
     openMenu(b.getId());
-    fireEvent.click(screen.getByText("Paste styles"));
+    fireEvent.click(screen.getByText("Paste style"));
     expect(b.getStyles()).toMatchObject({ color: "rgb(255, 0, 0)", "font-size": "40px" });
   });
 

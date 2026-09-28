@@ -1,5 +1,5 @@
 /**
- * useCanvasContextMenu — T12 "Save as component" entry coverage.
+ * useCanvasContextMenu — T12 "Save as component…" entry coverage.
  *
  * The hook itself just delegates to `getContextMenuActions` (registry-based);
  * the entry lives in `standaloneActions.ts`. These tests run through the hook
@@ -97,7 +97,7 @@ function findAction(
 // ---------------------------------------------------------------------------
 
 describe("useCanvasContextMenu — Save as component (T12)", () => {
-  it("includes a 'Save as component' entry for a non-root element", () => {
+  it("includes a 'Save as component…' entry for a non-root element", () => {
     const el = buildMockElement("el-1");
     const composer = buildMockComposer({
       selectedIds: ["el-1"],
@@ -116,10 +116,10 @@ describe("useCanvasContextMenu — Save as component (T12)", () => {
     });
 
     const labels = collectLabels(result.current.menuData?.actions ?? []);
-    expect(labels).toContain("Save as component");
+    expect(labels).toContain("Save as component…");
   });
 
-  it("'Save as component' handler emits COMPONENT_SAVE_AS_REQUESTED with selectionIds + extractedBindings", () => {
+  it("'Save as component…' handler emits COMPONENT_SAVE_AS_REQUESTED with selectionIds + extractedBindings", () => {
     const el = buildMockElement("el-1", {
       color: "{{token.color.brand.primary}}",
     });
@@ -142,7 +142,7 @@ describe("useCanvasContextMenu — Save as component (T12)", () => {
 
     const action = findAction(
       result.current.menuData?.actions ?? [],
-      "Save as component",
+      "Save as component…",
     );
     expect(action).toBeDefined();
 
@@ -174,7 +174,7 @@ describe("useCanvasContextMenu — Save as component (T12)", () => {
 
     const action = findAction(
       result.current.menuData?.actions ?? [],
-      "Save as component",
+      "Save as component…",
     );
     expect(action).toBeDefined();
 

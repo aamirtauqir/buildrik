@@ -158,13 +158,13 @@ describe("one owner per keystroke", () => {
 
   it("the canvas hook no longer implements ⌘C/⌘V/⌘X/⌘D itself", () => {
     const hook = read("../../../canvas/hooks/useCanvasKeyboard.ts");
-    // The ⌥ variants have no command and stay; the plain-⌘ branches are gone.
+    // The ⌥ variants are the copy-style / paste-style commands now, too.
     expect(hook).not.toContain("// Cmd/Ctrl+C: Copy element");
     expect(hook).not.toContain("// Cmd/Ctrl+V: Paste element");
     expect(hook).not.toContain("cut-element");
     expect(hook).not.toContain("composer.elements.duplicateElement(selectedId)");
-    expect(hook).toContain("Copy styles only");
-    expect(hook).toContain("Paste styles only");
+    expect(hook).not.toContain("Copy styles only");
+    expect(hook).not.toContain("Paste styles only");
   });
 
   it("the commands no longer bind the arrow keys the canvas owns", () => {

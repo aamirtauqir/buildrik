@@ -597,16 +597,6 @@
     "contrastPairs": {},
     "nonTextPairs": {}
   },
-  "s3-1-pick-mode": {
-    "contrastFailures": 1,
-    "nonTextFailures": 0,
-    "contrastPairs": {
-      "p.tw:absolute.tw:right-0 | ⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ Mor | rgb(107, 114, 128) | rgb(17, 24, 39)": 3.67
-    },
-    "nonTextPairs": {},
-    "skipped": 4,
-    "compared": 9
-  },
   "s5-4-gate-pending": {
     "contrastFailures": 0,
     "nonTextFailures": 0,

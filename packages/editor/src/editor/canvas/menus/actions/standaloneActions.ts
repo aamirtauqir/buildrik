@@ -1,96 +1,41 @@
 /**
- * Standalone Actions
- * Actions that appear at the bottom of the context menu
+ * Standalone Actions — the rows that sit outside a submenu. The element rows
+ * are the element-action registry's (`fromElementAction`); Group / Ungroup are
+ * selection operations and stay here.
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../../../shared/constants/events";
 import { runTransaction } from "../../../../shared/utils/helpers";
-import type { ActionContext, ContextAction } from "../contextMenuRegistry";
-import { requestReplaceWithBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
-import { BINDABLE_TYPES } from "@/shared/constants/elementCapabilities";
+import type { ContextAction } from "../contextMenuRegistry";
+import { ELEMENT_ACTIONS, type ElementActionId } from "@/editor/shared/elementActions";
 
-/** Element types a block can stand in for — the section-shaped ones. */
-const SECTION_TYPES = new Set([
-  "container", "section", "hero", "features", "header", "footer", "nav", "navbar",
-  "cta", "card", "pricing", "columns", "grid", "flex",
-]);
-
-/** Save the selection (or `element` alone) as a component — the canvas ⋯ and
- *  the inspector ⋯ open the same dialog. Bindings are extracted up-front so
- *  the modal can count the DS pre-fills without re-walking the tree. */
-export function requestSaveAsComponent(composer: ActionContext["composer"], elementId: string): void {
-  const selectedIds = composer.selection?.getSelectedIds?.() ?? [];
-  const selectionIds = selectedIds.length > 0 ? selectedIds : [elementId];
-  const extractedBindings = composer.designSystem.tokenBindingResolver.resolveForElements(
-    selectionIds,
-    composer.elements.getAllElements(),
-  );
-  composer.emit(EVENTS.COMPONENT_SAVE_AS_REQUESTED, { selectionIds, extractedBindings });
+/**
+ * A canvas menu row for a registry action — same handler, same visibility,
+ * same enabled rule. `rowId` keeps the canvas menu's own row id where it
+ * predates the registry ("copy-styles", "lock-element").
+ */
+export function fromElementAction(id: ElementActionId, group: string, rowId: string = id): ContextAction {
+  const action = ELEMENT_ACTIONS[id];
+  return {
+    id: rowId,
+    /* Only the Inspector renders a computed label (apply-style-to-page). */
+    label: typeof action.label === "string" ? action.label : action.id,
+    icon: action.icon,
+    group,
+    shortcut: action.shortcut,
+    isVisible: action.isVisible,
+    isEnabled: action.isEnabled ? (ctx) => action.isEnabled!(ctx) === true : undefined,
+    handler: action.run,
+  };
 }
 
 export const standaloneActions: ContextAction[] = [
-  // ── v3 IA (docs/plans/2026-09-14-editor-v3-ia.md Q8): the features a designer
-  // looks for AT the element — board "Canvas · selected · Hero · ⋯ menu"
-  // (4428:43928) — instead of a rail hunt. Each row is a door to an existing
-  // surface, never a second implementation of it.
-  {
-    id: "replace-with-block",
-    label: "Replace with block…",
-    icon: "layout",
-    group: "standalone",
-    // Blocks are sections; offering to replace a heading with a hero is noise.
-    isVisible: ({ element, isRoot }) => !isRoot && SECTION_TYPES.has(element.getType?.() ?? ""),
-    handler: ({ composer, element }) => {
-      composer.selection.select(element as never);
-      composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });
-      requestReplaceWithBlock(composer, element.getId());
-    },
-  },
-  {
-    id: "improve-with-ai",
-    label: "Improve with AI",
-    icon: "sparkles",
-    group: "standalone",
-    // Same door the inspector's ✦ chip uses; hidden when the shell mounted the
-    // menu without an AI handler rather than showing a row that does nothing.
-    isVisible: ({ openAI }) => Boolean(openAI),
-    handler: ({ openAI }) => openAI?.(),
-  },
-  {
-    id: "bind-to-cms",
-    label: "Bind to CMS field…",
-    icon: "database",
-    group: "standalone",
-    isVisible: ({ element, isRoot }) => !isRoot && BINDABLE_TYPES.has(element.getType?.() ?? ""),
-    // Binding happens in the inspector's CMS binding section (Source ·
-    // Collection · Field). This row opened the CMS workspace instead — a
-    // collection list over the canvas, no field picker (gap walk 93 #4).
-    handler: ({ composer, element }) => {
-      composer.selection.select(element as never);
-      composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "cms-binding" });
-    },
-  },
-  {
-    id: "add-interaction",
-    label: "Add interaction",
-    icon: "zap",
-    group: "standalone",
-    isVisible: ({ isRoot }) => !isRoot,
-    handler: ({ composer, element }) => {
-      composer.selection.select(element as never);
-      composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "interactions" });
-    },
-  },
-  {
-    id: "save-as-component",
-    label: "Save as component",
-    icon: "package",
-    group: "standalone",
-    isVisible: ({ isRoot }) => !isRoot,
-    // Selection-aware: all multi-selected ids when present, else this element.
-    handler: ({ composer, element }) => requestSaveAsComponent(composer, element.getId()),
-  },
+  // v3 IA (Q8): doors to existing surfaces at the element, board 4428:43928.
+  fromElementAction("replace-with-block", "standalone"),
+  fromElementAction("improve-with-ai", "standalone"),
+  fromElementAction("bind-to-cms", "standalone"),
+  fromElementAction("add-interaction", "standalone"),
+  fromElementAction("save-as-component", "standalone"),
   // ── Group / Ungroup ──────────────────────────────────────────────────────────
   {
     id: "group-elements",
@@ -128,28 +73,6 @@ export const standaloneActions: ContextAction[] = [
     },
   },
   // ── Lock / Unlock ────────────────────────────────────────────────────────────
-  {
-    id: "lock-element",
-    label: "Lock",
-    icon: "lock",
-    group: "standalone",
-    isVisible: ({ element, isRoot }) => !isRoot && !element.isLocked(),
-    handler: ({ composer, element }) => {
-      runTransaction(composer, "lock-element", () => {
-        element.setLocked(true);
-      });
-    },
-  },
-  {
-    id: "unlock-element",
-    label: "Unlock",
-    icon: "unlock",
-    group: "standalone",
-    isVisible: ({ element, isRoot }) => !isRoot && element.isLocked(),
-    handler: ({ composer, element }) => {
-      runTransaction(composer, "unlock-element", () => {
-        element.setLocked(false);
-      });
-    },
-  },
+  fromElementAction("lock", "standalone", "lock-element"),
+  fromElementAction("unlock", "standalone", "unlock-element"),
 ];

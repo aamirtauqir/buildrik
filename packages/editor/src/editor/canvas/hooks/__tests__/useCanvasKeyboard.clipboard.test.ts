@@ -129,25 +129,14 @@ describe("useCanvasKeyboard — copy / cut", () => {
     expect((composer as unknown as { clipboard: unknown }).clipboard).toBeFalsy();
   });
 
-  it("Ctrl+Alt+C copies styles into styleClipboard", () => {
+  /* ⌥⌘C / ⌥⌘V are the copy-style / paste-style commands now (their toasts
+     are useClipboardToasts'); the canvas hook leaves them alone. */
+  it("leaves ⌥⌘C to the command registry", () => {
     const { composer } = makeComposer({ element: { getStyles: () => ({ color: "red" }) } });
     const { hook, addToast } = mount(composer);
     act(() => hook.result.current.handleKeyDown(key("c", { ctrlKey: true, altKey: true })));
-    expect((composer as unknown as { styleClipboard: unknown }).styleClipboard).toEqual({
-      color: "red",
-    });
-    expect(addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ description: "1 style copied" })
-    );
-  });
-
-  it("Ctrl+Alt+C warns when there are no styles to copy", () => {
-    const { composer } = makeComposer({ element: { getStyles: () => ({}) } });
-    const { hook, addToast } = mount(composer);
-    act(() => hook.result.current.handleKeyDown(key("c", { ctrlKey: true, altKey: true })));
-    expect(addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ description: "No styles to copy", tone: "warning" })
-    );
+    expect((composer as unknown as { styleClipboard: unknown }).styleClipboard).toBeFalsy();
+    expect(addToast).not.toHaveBeenCalled();
   });
 
   it("leaves ⌘X to the command registry", () => {
@@ -170,17 +159,12 @@ describe("useCanvasKeyboard — paste", () => {
     expect(composer.elements.pasteElement).not.toHaveBeenCalled();
   });
 
-  it("Ctrl+Alt+V applies each style from styleClipboard to the element", () => {
+  it("leaves ⌥⌘V to the command registry", () => {
     const setStyle = vi.fn();
-    const { composer, element } = makeComposer({
-      styleClipboard: { color: "blue", fontSize: "12px" },
-      element: { setStyle },
-    });
-    const { hook, addToast } = mount(composer);
+    const { composer } = makeComposer({ styleClipboard: { color: "blue" }, element: { setStyle } });
+    const { hook } = mount(composer);
     act(() => hook.result.current.handleKeyDown(key("v", { ctrlKey: true, altKey: true })));
-    expect((element.setStyle as ReturnType<typeof vi.fn>)).toHaveBeenCalledWith("color", "blue");
-    expect((element.setStyle as ReturnType<typeof vi.fn>)).toHaveBeenCalledWith("fontSize", "12px");
-    expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "success" }));
+    expect(setStyle).not.toHaveBeenCalled();
   });
 });
 

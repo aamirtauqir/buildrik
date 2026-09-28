@@ -42,7 +42,7 @@ const WIDGET_ROLES = [
  * Each of these is a chord the OS/browser already binds to text editing, so
  * when the caret is in a field the user means the text, not the canvas.
  */
-const TEXT_OWNED_COMMANDS = new Set(["select-all", "cut", "copy", "paste", "undo", "redo"]);
+const TEXT_OWNED_COMMANDS = new Set(["select-all", "cut", "copy", "paste", "undo", "redo", "copy-style", "paste-style"]);
 
 /**
  * Commands that CHANGE the document. In a read-only composer they must not run,
@@ -67,6 +67,7 @@ const UNIVERSAL_COMMANDS = new Set(["save"]);
 const MUTATING_COMMANDS = new Set([
   "delete", "duplicate", "cut", "paste", "undo", "redo", "save",
   "group", "ungroup",
+  "paste-style", "reset-style", "lock-element", "unlock-element",
   "bring-forward", "send-backward", "bring-to-front", "send-to-back",
   "move-up", "move-down", "nudge-up", "nudge-down", "nudge-left", "nudge-right",
 ]);
