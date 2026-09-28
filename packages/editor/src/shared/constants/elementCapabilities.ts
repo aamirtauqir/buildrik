@@ -145,7 +145,8 @@ export const ELEMENT_CAPABILITIES: Record<ElementType, ElementCapabilities> = {
   // reachable (closed) rather than dropping the capability.
   countdown: media("countdown", { typography: "inside" }),
   progress: media("progress", { typography: "inside" }),
-  accordion: container({ typeBlock: "accordion" }),
+  // Board 13 draws no Layout for the accordion: its items stack by markup.
+  accordion: container({ typeBlock: "accordion", layout: false }),
 
   // Layout primitives (board 16) — the type block carries the layout.
   flex: container({ typeBlock: "flex", layout: false }),

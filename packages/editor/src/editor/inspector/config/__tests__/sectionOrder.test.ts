@@ -59,6 +59,10 @@ describe("section order", () => {
     expect(titlesFor("style", "button")).toEqual(["button", "Size", "Spacing", "Fill", "Border", "Text inside"]);
   });
 
+  it("board 13 — Accordion · Style: no Layout; Text inside kept (owner answer 1)", () => {
+    expect(titlesFor("style", "accordion")).toEqual(["accordion", "Size", "Spacing", "Fill", "Border", "Text inside"]);
+  });
+
   it("board 16 — Flex · Style: the type block carries the layout", () => {
     expect(titlesFor("style", "flex", { isFlexContainer: true })).toEqual(["flex", "Size", "Spacing", "Fill", "Border", "Text inside"]);
   });
