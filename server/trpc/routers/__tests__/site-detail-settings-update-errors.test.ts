@@ -56,14 +56,14 @@ describe("siteDetail.settings.update — error mapping", () => {
     expect(recordForSite).not.toHaveBeenCalled();
   });
 
-  it("maps PROJECT_NAME_TAKEN to CONFLICT with the domain path's message", async () => {
+  it("maps PROJECT_NAME_TAKEN to CONFLICT with a slug-save message, not the domain path's", async () => {
     updateSiteSettings.mockRejectedValue(new Error("PROJECT_NAME_TAKEN"));
 
     await expect(
       caller().settings.update({ id: "s1", slug: "new-slug" })
     ).rejects.toMatchObject({
       code: "CONFLICT",
-      message: "This site's address clashes with another site. Change its URL slug in Settings, then connect the domain.",
+      message: "Another site already uses the address this slug would pin. Choose a different URL slug.",
     });
 
     expect(recordForSite).not.toHaveBeenCalled();

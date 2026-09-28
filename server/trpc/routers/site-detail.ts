@@ -137,7 +137,10 @@ export const siteDetailRouter = router({
           if (e instanceof Error && e.message === "SLUG_TAKEN")
             throw new TRPCError({ code: "CONFLICT", message: "Another site already uses that URL slug." });
           if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
-            throw new TRPCError({ code: "CONFLICT", message: PROJECT_NAME_TAKEN_MESSAGE });
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "Another site already uses the address this slug would pin. Choose a different URL slug.",
+            });
           throw e;
         }
       }),
