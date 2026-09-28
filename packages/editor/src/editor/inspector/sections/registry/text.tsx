@@ -17,6 +17,7 @@ import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
 import { mergeProjectTokens } from "@/editor/design-system/state/projectTokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 import type { Composer } from "@/engine";
+import { colourTokenLabel } from "../../shared/controls/ColorInput";
 
 const SUMMARY_KEYS = ["font-family", "font-size", "color"] as const;
 
@@ -32,16 +33,6 @@ const adaptTypography = (ctx: SectionContext) => ({
      font and text colour (board 21: "Inter", "Text / primary"). */
   inherited: ctx.variant === "page" ? renderedValues(ctx.selectedElement.id, ctx.styles, ctx.composer) : undefined,
 });
-
-/**
- * A Brand colour token by the name the board prints — `color-text-primary`
- * reads "Text / primary": the group, then the rest.
- */
-export function colourTokenLabel(tokenId: string): string {
-  const [group, ...rest] = tokenId.replace(/^color-/, "").split("-");
-  const head = group.charAt(0).toUpperCase() + group.slice(1);
-  return rest.length ? `${head} / ${rest.join(" ")}` : head;
-}
 
 /** A value as the summary shows it: a token var resolves to what it stands
  *  for (a size, a family), else stays the token's id; anything else as is. */

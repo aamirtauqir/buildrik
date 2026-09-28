@@ -10,7 +10,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { TypographySection } from "../index";
-import { colourTokenLabel, textSummary, TEXT_SECTIONS } from "../../registry/text";
+import { textSummary, TEXT_SECTIONS } from "../../registry/text";
+import { colourTokenLabel } from "../../../shared/controls/ColorInput";
 
 const labels = (c: HTMLElement) => Array.from(c.querySelectorAll(".bdi-lb")).map((l) => l.textContent?.trim());
 

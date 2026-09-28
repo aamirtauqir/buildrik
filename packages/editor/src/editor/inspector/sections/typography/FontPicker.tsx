@@ -97,6 +97,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
 
   // Handle font selection
   const handleFontSelect = (font: GoogleFont | SystemFont) => {
+    /* Read-only (DD-18): refused here, not by disabling the trigger. */
+    if (field.readOnly) return;
     const fontValue = "family" in font ? `'${font.family}', ${font.category}` : font.value;
 
     // Load Google Font if needed
@@ -148,12 +150,14 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
       </label>
       {/* Current Font Display / Toggle Button */}
       <Button
-        onClick={() => setShowFontPicker(!showFontPicker)}
+        onClick={() => {
+          if (!field.readOnly) setShowFontPicker(!showFontPicker);
+        }}
         aria-haspopup="listbox"
         aria-expanded={showFontPicker}
         aria-controls="font-picker-listbox"
         aria-label={field.mixed ? mixedName("Font family") : "Font family"}
-        disabled={field.readOnly}
+        aria-disabled={field.readOnly || undefined}
         data-testid={fieldTestId("Font")}
         data-font-source={uploaded ? "uploaded" : undefined}
         className="bdi-ddn tw:justify-between tw:text-left"

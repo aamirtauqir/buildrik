@@ -27,7 +27,12 @@ describe("EditTextRow", () => {
         <EditTextRow composer={composer} elementId="h1" />
       </InspectorFieldContext.Provider>,
     );
-    expect(screen.getByRole("button", { name: "Edit text on canvas" })).toBeDisabled();
+    // Read-only is not disabled (DD-18): legible and focusable, the click refused.
+    const button = screen.getByRole("button", { name: "Edit text on canvas" });
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(button);
+    expect(composer.emit).not.toHaveBeenCalled();
   });
 
   it("renders nothing without a composer", () => {

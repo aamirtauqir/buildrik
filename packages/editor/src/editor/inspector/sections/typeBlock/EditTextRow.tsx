@@ -21,7 +21,8 @@ interface EditTextRowProps {
 }
 
 export function EditTextRow({ composer, elementId }: EditTextRowProps) {
-  /* Read-only (locked, save conflict — DD-18): the door stays visible, shut. */
+  /* Read-only (locked, save conflict — DD-18): the door stays visible and
+     focusable, and the click is refused here — never `disabled`. */
   const { readOnly } = useInspectorField();
   if (!composer) return null;
   return (
@@ -31,8 +32,10 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
         size="xs"
         color="light"
         className="tw:h-6 tw:w-40 tw:justify-center tw:border-0 tw:bg-transparent tw:px-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"
-        disabled={readOnly}
-        onClick={() => composer.emit(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId })}
+        aria-disabled={readOnly || undefined}
+        onClick={() => {
+          if (!readOnly) composer.emit(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId });
+        }}
         data-testid="inspector-edit-text-on-canvas"
       >
         Edit text on canvas

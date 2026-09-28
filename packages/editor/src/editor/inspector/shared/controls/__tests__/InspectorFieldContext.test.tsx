@@ -66,6 +66,9 @@ describe("InspectorFieldContext", () => {
       </InspectorFieldContext.Provider>
     );
     expect(screen.getByRole("button", { name: "Overridden on :hover" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Font family" })).toBeDisabled();
+    const font = screen.getByRole("button", { name: "Font family" });
+    expect(font).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(font);
+    expect(screen.queryByRole("listbox")).toBeNull();
   });
 });
