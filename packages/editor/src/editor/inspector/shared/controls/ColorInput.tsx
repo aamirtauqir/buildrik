@@ -302,6 +302,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           <ColorFillPopover
             tokens={tokenEntries}
             boundTokenId={boundToken?.id ?? null}
+            currentHex={swatchColor === "transparent" ? "" : swatchColor}
             onSelectToken={(cssVarRef) => {
               onChange(cssVarRef);
               setIsOpen(false);

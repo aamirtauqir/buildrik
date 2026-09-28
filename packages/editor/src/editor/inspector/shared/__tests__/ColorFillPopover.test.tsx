@@ -25,6 +25,7 @@ function setup(over: Partial<React.ComponentProps<typeof ColorFillPopover>> = {}
     usageOf: vi.fn(() => 34),
     showSearch: false,
     onOpenBrand: vi.fn(),
+    currentHex: "",
     ...over,
   };
   render(<ColorFillPopover {...props} />);
@@ -38,8 +39,32 @@ describe("ColorFillPopover (board 33)", () => {
     expect(pop.textContent?.startsWith("Brand colours")).toBe(true);
     const rows = within(screen.getByRole("list", { name: "Brand colours" })).getAllByRole("listitem");
     expect(rows.map((r) => r.textContent)).toEqual(["Primary#1A56DBUse", "Text#374151Use", "Background#FFFFFFUse"]);
-    expect(pop.textContent?.endsWith("Add colours in Brand")).toBe(true);
-    expect(screen.queryByText(/Recent|Custom|Detach/)).toBeNull();
+    // Board 33's content stays on top; below it, the closed "Custom colour" section.
+    expect(pop.textContent?.endsWith("Add colours in BrandCustom colour")).toBe(true);
+    expect(screen.queryByText(/Recent|Detach/)).toBeNull();
+  });
+
+  it("Custom colour is closed at first; opened, its picker applies a raw colour", () => {
+    const p = setup({ currentHex: "#374151" });
+    const toggle = screen.getByRole("button", { name: "Custom colour" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByTestId("color-picker")).toBeNull();
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    const hex = screen.getByLabelText("Hex color value") as HTMLInputElement;
+    expect(hex.value.toUpperCase()).toBe("#374151");
+    fireEvent.change(hex, { target: { value: "#12ab56" } });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(p.onCustomValue).toHaveBeenCalledTimes(1);
+    expect(p.onCustomValue).toHaveBeenCalledWith("#12AB56");
+  });
+
+  it("Cancel in the custom picker closes the section without writing", () => {
+    const p = setup({ currentHex: "#374151" });
+    fireEvent.click(screen.getByRole("button", { name: "Custom colour" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByTestId("color-picker")).toBeNull();
+    expect(p.onCustomValue).not.toHaveBeenCalled();
   });
 
   it("Use <token> binds the token by its var", () => {

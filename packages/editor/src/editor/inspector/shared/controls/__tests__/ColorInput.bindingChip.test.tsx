@@ -111,3 +111,25 @@ describe("ColorInput · DSBindingChip integration", () => {
     expect(container.querySelector('[aria-label="Bound to token color-primary"]')).toHaveTextContent("Primary");
   });
 });
+
+describe("ColorInput · Custom colour (owner decision 2026-09-28)", () => {
+  it("picking a custom colour on a bound value writes the raw hex once — the token unlinks in one write", () => {
+    const onChange = vi.fn();
+    render(
+      <ColorInput
+        label="Color"
+        value="var(--buildrick-design-color-primary)"
+        onChange={onChange}
+        composer={fakeComposer}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Choose Color color" }));
+    fireEvent.click(screen.getByRole("button", { name: "Custom colour" }));
+    const hex = screen.getByLabelText("Hex color value") as HTMLInputElement;
+    expect(hex.value.toUpperCase()).toBe("#2D6DFF");
+    fireEvent.change(hex, { target: { value: "#112233" } });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith("#112233");
+  });
+});

@@ -5,8 +5,10 @@
  *
  * "Brand colours", one row per colour token — swatch, the token's name, its
  * hex, "Use" — then "Add colours in Brand", which opens Brand while the
- * selection is held (P-5). A custom colour is typed in the row's own hex
- * field; unlinking is the row's own button.
+ * selection is held (P-5). Below the board's content, a closed "Custom
+ * colour" section holds the visual picker (owner decision 2026-09-28): its
+ * Apply writes a raw colour, which unlinks a bound token in the same write
+ * (one Undo step). Recent colours and Detach are not part of it.
  *
  * Kept from the picker it replaces: ✎ on a row (shown on hover / focus) opens
  * Edit <token> with "Update everywhere (N×)" — the Brand token changes — and
@@ -16,7 +18,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ChevronLeft, ExternalLink, Pencil, Search as SearchIcon } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink, Pencil, Search as SearchIcon } from "lucide-react";
 import { Button, IconButton, TextInput } from "@/editor/chrome-ui";
 import { ColorPicker } from "@/editor/design-system/ui/colors/ColorPicker";
 import type { TokenEntry } from "./TokenPickerPopover";
@@ -36,7 +38,11 @@ export interface ColorFillPopoverProps {
   showSearch: boolean;
   /** "Add colours in Brand" — absent, the link is not drawn. */
   onOpenBrand?: () => void;
+  /** The colour on screen (resolved when bound) — where the custom picker starts. */
+  currentHex: string;
 }
+
+const HEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
 
 const TEXT_12 = "tw:text-[length:var(--bk-text-12)] tw:leading-4";
 const LINK =
@@ -54,9 +60,11 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
   usageOf,
   showSearch,
   onOpenBrand,
+  currentHex,
 }) => {
   const [query, setQuery] = React.useState("");
   const [editing, setEditing] = React.useState<TokenEntry | null>(null);
+  const [customOpen, setCustomOpen] = React.useState(false);
 
   if (editing) {
     const t = editing;
@@ -183,6 +191,30 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
           <ExternalLink size={12} aria-hidden className="tw:flex-none" />
         </Button>
       ) : null}
+
+      <div className="tw:mt-1 tw:border-t tw:border-[var(--bk-border)] tw:pt-1">
+        <Button
+          type="button"
+          variant="ghost"
+          aria-expanded={customOpen}
+          aria-controls="fill-custom-colour"
+          onClick={() => setCustomOpen((v) => !v)}
+          className={`tw:h-6 tw:w-full tw:justify-start tw:gap-1 tw:rounded tw:border-0 tw:bg-transparent tw:px-2 tw:py-0 ${TEXT_12} tw:font-medium tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
+        >
+          {customOpen ? <ChevronDown size={12} aria-hidden /> : <ChevronRight size={12} aria-hidden />}
+          Custom colour
+        </Button>
+        {customOpen ? (
+          <div id="fill-custom-colour" className="tw:-mx-3 tw:-mb-3" data-testid="fill-custom-picker">
+            <ColorPicker
+              initialHex={HEX.test(currentHex) ? currentHex : "#000000"}
+              onChange={() => {}}
+              onCancel={() => setCustomOpen(false)}
+              onSave={(hex) => onCustomValue(hex.toUpperCase())}
+            />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 };
