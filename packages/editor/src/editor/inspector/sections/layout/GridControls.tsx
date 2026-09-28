@@ -15,10 +15,7 @@
  */
 
 import * as React from "react";
-import { TextInput } from "@/editor/chrome-ui";
-import { AlignmentGrid, InputRow, MoreSettingsToggle, SelectRow } from "../../shared/controls";
-import { FieldDot } from "../../shared/controls/FieldDot";
-import { useInspectorField } from "../../shared/controls/InspectorFieldContext";
+import { AlignmentGrid, InputRow, InputWithUnit, MoreSettingsToggle, SelectRow } from "../../shared/controls";
 import { GapRow } from "./GapRow";
 
 export interface GridControlsProps {
@@ -53,35 +50,22 @@ const CONTENT_OPTIONS = [
   { value: "space-around", label: "Space around" },
 ];
 
-/** Board 17's "Columns [3]": a count, written as repeat(N, 1fr). */
+/** Board 17's "Columns [3]": the inspector's number field, a count written
+ *  as repeat(N, 1fr). A count under 1 or over 24 is not written. */
 function ColumnsRow({ value, onChange }: { value: string; onChange: (property: string, value: string) => void }) {
-  const field = useInspectorField("grid-template-columns");
-  const id = React.useId();
   return (
-    <div className="bdi-row-ctrl" data-testid="inspector-row-columns">
-      <label className="bdi-lb" htmlFor={id}>
-        Columns
-        <FieldDot field={field} />
-      </label>
-      <div className="bdi-row-content">
-        <TextInput
-          id={id}
-          type="number"
-          className="tw:w-full"
-          min={1}
-          max={24}
-          placeholder="1"
-          readOnly={field.readOnly}
-          value={value}
-          onChange={(e) => {
-            const v = e.target.value;
-            const n = Math.floor(Number(v));
-            if (v === "") onChange("grid-template-columns", "");
-            else if (Number.isFinite(n) && n >= 1 && n <= 24) onChange("grid-template-columns", `repeat(${n}, 1fr)`);
-          }}
-        />
-      </div>
-    </div>
+    <InputWithUnit
+      label="Columns"
+      property="grid-template-columns"
+      noUnit
+      placeholder="1"
+      value={value}
+      onChange={(v) => {
+        if (v === "") return onChange("grid-template-columns", "");
+        const n = Number(v);
+        if (Number.isInteger(n) && n >= 1 && n <= 24) onChange("grid-template-columns", `repeat(${n}, 1fr)`);
+      }}
+    />
   );
 }
 

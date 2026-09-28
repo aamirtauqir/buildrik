@@ -128,7 +128,12 @@ export interface InputWithUnitProps {
   /** The CSS property this row edits — the field context reads read-only,
    *  "Mixed" and its override dot by it (InspectorFieldContext). */
   property?: string;
+  /** A plain count (grid Columns, board 17): the number and its stepper, no
+   *  unit dropdown and no unit words in the name. */
+  noUnit?: boolean;
 }
+
+const NO_UNITS: readonly string[] = [""];
 
 /** Board 34. The one message every number field shows for an entry it cannot read. */
 export const NUMBER_ERROR = "Enter a valid number. Choose the unit separately.";
@@ -197,12 +202,14 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   label,
   value,
   onChange,
-  units = ["px", "%", "em", "rem", "vw", "vh", "auto"],
+  units: unitsProp = ["px", "%", "em", "rem", "vw", "vh", "auto"],
   placeholder = "0",
   ariaLabel,
   property,
+  noUnit = false,
 }) => {
   const field = useInspectorField(property);
+  const units = noUnit ? NO_UNITS : unitsProp;
   const { num, unit } = splitValue(value, units);
   const isKeyword = KEYWORDS.has(unit);
   const shown = isKeyword ? unit : num;
@@ -274,7 +281,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const nameId = React.useId();
   const suffixId = React.useId();
   const ownName = ariaLabel || !label;
-  const suffix = field.mixed ? "Mixed values" : isTokenVar(value) ? "" : unitWords(unit);
+  const suffix = field.mixed ? "Mixed values" : isTokenVar(value) || noUnit ? "" : unitWords(unit);
   const name = ariaLabel || label || placeholder;
 
   const control = (
@@ -321,6 +328,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
               <ChevronDown size={8} />
             </span>
           </span>
+          {noUnit ? null : (
           <span className="bdi-unit">
             <Select
               className="bdi-u"
@@ -338,6 +346,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
             </Select>
             <ChevronDown size={12} aria-hidden="true" className="bdi-c" />
           </span>
+          )}
         </>
       )}
     </div>

@@ -78,12 +78,15 @@ const ALIGN_CONTENT_OPTIONS = [
   { value: "space-around", label: "Space around" },
 ];
 
+/* Board 16: 32 × 28 cells, 4 apart. */
 const CELL =
-  "tw:size-6 tw:min-w-0 tw:p-0 tw:rounded-[4px] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] " +
+  "tw:w-8 tw:h-7 tw:min-w-0 tw:min-h-0 tw:p-0 tw:rounded-[4px] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] " +
   "tw:flex tw:items-center tw:justify-center tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0 " +
   "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const CELL_ON = "tw:bg-[var(--bk-accent)] tw:border-[var(--bk-accent)] tw:hover:bg-[var(--bk-accent)]";
-const ROW = "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:min-h-7";
+/* The section body already insets 12; board 16's align grid and Wrap sit
+   at 16, so the row adds 4 — not a second 12. */
+const ROW = "tw:flex tw:items-center tw:gap-2 tw:px-1 tw:min-h-7";
 const LABEL = "tw:w-[108px] tw:shrink-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /** The 3×3 grid + its words. Row: columns = justify, rows = align; column swaps. */
@@ -101,7 +104,7 @@ function AlignGrid({ styles, onBatchChange }: { styles: Record<string, string>; 
 
   return (
     <div className={`${ROW} tw:items-start tw:py-1`}>
-      <div role="group" aria-label="Align" className="tw:grid tw:grid-cols-[repeat(3,1.5rem)] tw:gap-[3px] tw:shrink-0">
+      <div role="group" aria-label="Align" className="tw:grid tw:grid-cols-[repeat(3,2rem)] tw:gap-1 tw:shrink-0">
         {[0, 1, 2].map((row) =>
           [0, 1, 2].map((col) => {
             const on = row === y && col === x;

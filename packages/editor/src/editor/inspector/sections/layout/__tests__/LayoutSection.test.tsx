@@ -34,7 +34,7 @@ describe("LayoutSection — Display", () => {
 describe("LayoutSection — flex / grid inline (no Flexbox / Grid section)", () => {
   it("Grid shows Columns + Gap", () => {
     renderLayout({ display: "grid", "grid-template-columns": "repeat(3, 1fr)" });
-    expect(screen.getByLabelText("Columns")).toHaveValue(3);
+    expect(screen.getByLabelText("Columns")).toHaveValue("3");
     expect(screen.getByLabelText("Gap")).toBeInTheDocument();
   });
 

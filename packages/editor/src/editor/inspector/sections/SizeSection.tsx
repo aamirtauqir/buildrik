@@ -86,6 +86,9 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
       open={isOpen}
       onClose={() => setIsOpen(false)}
       placement="bottom-end"
+      /* Beside the column over the canvas, like the colour popover (P-4):
+         inside the column's scroll box it could clip. */
+      beside=".layout-shell__inspector"
       label="Spacing tokens"
       trigger={
         <Button
@@ -252,8 +255,9 @@ function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
               />
             </div>
             {mode === "fixed" && !field.readOnly && (
-              /* Revealed on hover, left of the unit select. */
-              <div className="tw:absolute tw:right-11 tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]">
+              /* Revealed on hover, left of the stepper and the unit select —
+                 never over them (the field's number · stepper · unit). */
+              <div className="tw:absolute tw:right-[76px] tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]">
                 <ChainButton property={axis} value={value} onChange={onChange} />
               </div>
             )}
