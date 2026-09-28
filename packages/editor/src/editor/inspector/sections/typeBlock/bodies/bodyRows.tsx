@@ -1,8 +1,7 @@
 /**
  * Row pieces the media / embed / widget type blocks share (boards 8–13),
- * where the shared controls have no equivalent:
- *   ChoiceRow  — a labelled select with only real choices (no "Default"
- *                blank; board 11 When done, board 13 Open / Closed)
+ * where the shared controls have no equivalent (a select with only real
+ * choices is the shared SelectRow with `placeholder={null}`):
  *   Note       — the 11px hint line under a field ("Detected: YouTube",
  *                "Uses the visitor's time zone.", missing-alt hint)
  *   Warning    — the full-width tinted warning (board 9 autoplay + sound)
@@ -12,56 +11,7 @@
  */
 
 import * as React from "react";
-import { BK_SELECT_BARE_VALUE_THEME, Select } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
-import { fieldTestId, labelTestId, rowTestId } from "../../../shared/controls";
-import { useInspectorField } from "../../../shared/controls/InspectorFieldContext";
-
-export function ChoiceRow({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: readonly { value: string; label: string }[];
-  onChange: (value: string) => void;
-}) {
-  const id = React.useId();
-  const { readOnly } = useInspectorField();
-  return (
-    <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
-      <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={id}>
-        {label}
-      </label>
-      <div className="bdi-row-content">
-        <div className="bdi-ddn" data-testid={fieldTestId(label)}>
-          <Select
-            id={id}
-            disabled={readOnly}
-            aria-readonly={readOnly || undefined}
-            className="bdi-v"
-            theme={BK_SELECT_BARE_VALUE_THEME}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-          >
-            {options.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </Select>
-          <span className="bdi-c" aria-hidden="true">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function Note({ children, testId }: { children: React.ReactNode; testId?: string }) {
   return (

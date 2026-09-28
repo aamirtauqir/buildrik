@@ -25,9 +25,9 @@ import type { Element } from "@/engine/elements/Element";
 import type { TypeBlockBodyProps } from "../../../config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { InputRow } from "../../../shared/controls";
+import { InputRow, SelectRow } from "../../../shared/controls";
 import { runTxn, writeAttribute } from "../attributeWriter";
-import { ChoiceRow, Note, useElementVersion } from "./bodyRows";
+import { Note, useElementVersion } from "./bodyRows";
 import { CheckRow } from "../../../shared/controls/CheckRow";
 
 function useElement(p: TypeBlockBodyProps): Element | undefined {
@@ -75,7 +75,7 @@ const Countdown: React.FC<TypeBlockBodyProps> = (p) => {
     <>
       <InputRow label="Ends at" value={draft} placeholder="2026-12-31 23:59" onChange={setEndsAt} />
       <Note testId="inspector-countdown-zone">Uses the visitor&rsquo;s time zone.</Note>
-      <ChoiceRow label="When done" value={done} options={DONE_OPTIONS} onChange={(v) => write("data-countdown-done", v === "hide" ? "hide" : "")} />
+      <SelectRow label="When done" placeholder={null} value={done} options={DONE_OPTIONS} onChange={(v) => write("data-countdown-done", v === "hide" ? "hide" : "")} />
       {done === "message" && (
         <InputRow
           label="Message"
@@ -243,8 +243,9 @@ const Accordion: React.FC<TypeBlockBodyProps> = (p) => {
   return (
     <>
       {items.map((item, i) => (
-        <ChoiceRow
+        <SelectRow
           key={item.getId()}
+          placeholder={null}
           label={`${i + 1} · ${itemTitle(item) || "Item"}`}
           value={isItemOpen(item) ? "open" : "closed"}
           options={STATE_OPTIONS}

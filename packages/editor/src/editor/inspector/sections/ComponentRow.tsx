@@ -19,21 +19,18 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { ComponentDefinition } from "@/shared/types/components";
 import {
-  type CustomFlowbiteTheme,
   Button,
   ConfirmDialog,
   IconButton,
   Menu,
   MenuItem,
   Popover,
-  Select,
   useToast,
 } from "@/editor/chrome-ui";
 import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
 import { elementLocation } from "@/editor/canvas/utils/elementInfo";
 import { canWrite } from "@/engine/commands/commandOperations";
-import { Section } from "../shared/controls";
-import { labelTestId, rowTestId } from "../shared/controls/ControlRow";
+import { Section, SelectRow } from "../shared/controls";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 
 interface ComponentRowProps {
@@ -47,24 +44,8 @@ interface InstanceInfo {
   currentVariant: string | null;
 }
 
-/* Board 26: a 28 row — 108px muted label, 160px control. */
-const ROW = "tw:flex tw:h-7 tw:items-center tw:gap-2";
-const LABEL = "tw:w-[108px] tw:shrink-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-
-/* The board's 24px control: gray-50 field, 1px border, radius 4, 12px ink-soft. */
-const VARIANT_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
-  field: {
-    select: {
-      colors: {
-        gray:
-          "tw:border-[var(--bk-border)] tw:bg-[color:var(--bk-gray-50)] tw:text-[var(--bk-ink-soft)] " +
-          "tw:focus:border-[var(--bk-accent)] tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]",
-      },
-      withAddon: { off: "tw:rounded-[4px]" },
-      sizes: { md: "tw:h-6 tw:py-0 tw:pl-2 tw:pr-6 tw:text-[12px] tw:leading-4 tw:bg-[length:12px] tw:bg-[position:right_6px_center]" },
-    },
-  },
-};
+/* A component with no variants still reads its one choice (board 26). */
+const NO_VARIANTS = [{ value: "", label: "Default" }];
 
 const EDIT_MASTER =
   "tw:h-6 tw:w-40 tw:justify-start tw:gap-2 tw:rounded-[4px] tw:border-0 tw:bg-transparent tw:px-2 " +
@@ -76,7 +57,6 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
   const [confirm, setConfirm] = React.useState<"reset" | "detach" | null>(null);
   const { readOnly } = useInspectorField();
   const { addToast } = useToast();
-  const variantId = React.useId();
 
   React.useEffect(() => {
     const instance = composer && elementId ? composer.components?.getInstanceByElementId(elementId) : null;
@@ -132,28 +112,13 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
   return (
     <Section title="Component" defaultOpen>
       <div data-testid="component-row">
-        <div className={ROW} data-testid={rowTestId("Variant")}>
-          <label className={LABEL} data-testid={labelTestId("Variant")} htmlFor={variantId}>
-            Variant
-          </label>
-          <Select
-            id={variantId}
-            data-testid="component-variant"
-            className="tw:w-40 tw:shrink-0"
-            theme={VARIANT_SELECT_THEME}
-            disabled={readOnly}
-            aria-readonly={readOnly || undefined}
-            value={current?.id ?? ""}
-            onChange={(e) => pickVariant(e.target.value)}
-          >
-            {variants.length === 0 ? <option value="">Default</option> : null}
-            {variants.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name}
-              </option>
-            ))}
-          </Select>
-        </div>
+        <SelectRow
+          label="Variant"
+          placeholder={null}
+          value={current?.id ?? ""}
+          options={variants.length === 0 ? NO_VARIANTS : variants.map((v) => ({ value: v.id, label: v.name }))}
+          onChange={pickVariant}
+        />
         <div className="tw:flex tw:items-center tw:gap-1 tw:py-0.5">
           <Button
             color="light"

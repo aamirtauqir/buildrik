@@ -187,9 +187,15 @@ describe("ComponentRow — board 26", () => {
   });
 
   it.each(["locked", "conflict"] as const)("read-only (%s): variant and ⋯ writes are off, Edit master stays", (reason) => {
-    const composer = makeComposer({ component: withVariants(), instance: makeInstance() });
+    const updateInstanceVariant = vi.fn();
+    const composer = makeComposer({ component: withVariants(), instance: makeInstance(), updateInstanceVariant });
     renderRow(composer, readOnlyCtx(reason));
-    expect((screen.getByLabelText("Variant") as HTMLSelectElement).disabled).toBe(true);
+    // Read-only is not disabled (DD-18): legible, focusable, the change refused.
+    const select = screen.getByLabelText("Variant") as HTMLSelectElement;
+    expect(select.disabled).toBe(false);
+    expect(select.getAttribute("aria-readonly")).toBe("true");
+    fireEvent.change(select, { target: { value: select.options[select.options.length - 1].value } });
+    expect(updateInstanceVariant).not.toHaveBeenCalled();
     openMore();
     for (const name of ["Reset to master", "Detach instance…"]) {
       expect(screen.getByRole("menuitem", { name }).getAttribute("aria-disabled")).toBe("true");
