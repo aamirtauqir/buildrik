@@ -114,11 +114,10 @@ describe("ComponentRow — board 26", () => {
     expect(row.textContent).not.toMatch(/VARIANT|Detach this instance|Edit master ·/);
   });
 
-  it("no variants: the select reads Default and cannot change", () => {
+  it("no variants: the select reads Default, its only choice", () => {
     renderRow(makeComposer({ component: makeComponent(), instance: makeInstance() }));
     const select = screen.getByLabelText("Variant") as HTMLSelectElement;
-    expect(select.selectedOptions[0].textContent).toBe("Default");
-    expect(select.disabled).toBe(true);
+    expect([...select.options].map((o) => o.textContent)).toEqual(["Default"]);
   });
 
   it("variants: lists them, shows the current one, and swaps the variant", () => {

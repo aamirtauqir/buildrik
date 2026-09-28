@@ -13,6 +13,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { Composer } from "@/engine/Composer";
 import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
+import { computeStatesWithOverrides } from "../../config/pseudoOverrides";
 import { useFieldOverrides } from "../useFieldOverrides";
 
 beforeAll(installEngineBrowserStubs);
@@ -26,7 +27,7 @@ function heading(): { c: Composer; id: string } {
   return { c, id: el.getId() };
 }
 
-const sel = (id: string) => `[data-buildrik-id="${id}"]`;
+const sel = (id: string) => `[data-buildrick-id="${id}"]`;
 
 describe("useFieldOverrides — breakpoint (board 28)", () => {
   it("lists the Tablet layer's properties, counts them, and labels them 'Tablet'", () => {
@@ -53,9 +54,18 @@ describe("useFieldOverrides — breakpoint (board 28)", () => {
     act(() => result.current.resetOverride("width", "breakpoint"));
     expect(Object.keys(c.styles.getBreakpointStyle(id, "tablet"))).toEqual(["font-size"]);
     expect(result.current.counts.breakpoint).toBe(1);
+    c.history.flushPending?.();
     act(() => result.current.revertBreakpoint());
     expect(c.styles.getBreakpointStyle(id, "tablet")).toEqual({});
     expect(result.current.counts.breakpoint).toBe(0);
+
+    /* Undo puts the override back, and the count follows it. */
+    c.history.flushPending?.();
+    act(() => {
+      c.history.undo();
+    });
+    expect(Object.keys(c.styles.getBreakpointStyle(id, "tablet"))).toEqual(["font-size"]);
+    expect(result.current.counts.breakpoint).toBe(1);
   });
 
   it("is not reported while a :state is being edited — the fields show that state", () => {
@@ -71,6 +81,8 @@ describe("useFieldOverrides — pseudo (board 27)", () => {
   it("lists the :hover rule's properties at Desktop, labelled ':hover'", () => {
     const { c, id } = heading();
     c.styles.setRule(sel(id), { "background-color": "var(--brand-primary)" }, { pseudo: ":hover" });
+    /* The same rule the state menu's dots read — one selector convention. */
+    expect(computeStatesWithOverrides(id, c, "desktop").has("hover")).toBe(true);
     const { result } = renderHook(() => useFieldOverrides(c, id, "desktop", "hover"));
     expect(result.current.overrides.get("background-color")).toEqual(["pseudo"]);
     expect(result.current.counts.pseudo).toBe(1);
@@ -163,5 +175,19 @@ describe("useFieldOverrides — master (board 26)", () => {
     c.styles.setBreakpointStyle(instanceId, "tablet", { "padding-top": "16px" });
     const { result } = renderHook(() => useFieldOverrides(c, instanceId, "tablet"));
     expect(result.current.overrides.get("padding-top")).toEqual(["breakpoint", "master"]);
+  });
+});
+
+describe("useFieldOverrides — follows the state it is given", () => {
+  it("Base → :hover re-reads the rule (board 27: pick the state, the count appears)", () => {
+    const { c, id } = heading();
+    c.styles.setRule(sel(id), { "background-color": "red" }, { pseudo: ":hover" });
+    const { result, rerender } = renderHook(({ s }: { s: "normal" | "hover" }) => useFieldOverrides(c, id, "desktop", s), {
+      initialProps: { s: "normal" },
+    });
+    expect(result.current.counts.pseudo).toBe(0);
+    rerender({ s: "hover" });
+    expect(result.current.counts.pseudo).toBe(1);
+    expect(result.current.labels.pseudo).toBe(":hover");
   });
 });

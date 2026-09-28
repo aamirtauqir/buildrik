@@ -60,9 +60,12 @@ const REREAD_ON = [
   EVENTS.INSTANCE_SYNCED,
   EVENTS.INSTANCE_DETACHED,
   EVENTS.INSTANCE_VARIANT_CHANGED,
+  /* An undo / redo restores the style rules without a STYLE_CHANGED. */
+  EVENTS.HISTORY_UNDO,
+  EVENTS.HISTORY_REDO,
 ] as const;
 
-const selectorOf = (elementId: string) => `[data-buildrik-id="${elementId}"]`;
+const selectorOf = (elementId: string) => `[data-buildrick-id="${elementId}"]`;
 const mediaOf = (bp: BreakpointId) => (bp === "desktop" ? undefined : getBreakpointQuery(bp) ?? undefined);
 
 function readMaster(composer: Composer, elementId: string): Pick<Read, "master" | "masterName"> {
