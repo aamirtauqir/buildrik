@@ -13,8 +13,9 @@
  *
  *   # 1. create a NEW site "Inspector v4 fixture" through the dashboard and load it
  *   node scripts/conformance/load-inspector-v4-site.mjs --base http://localhost:3110
- *   # 2. reload the fixture into that same site (refuses any site not named
- *   #    "Inspector v4 fixture" — it overwrites the site's Home page)
+ *   #    (or name it: --name "Inspector v4 fixture · integration")
+ *   # 2. reload the fixture into that same site (refuses any site whose name
+ *   #    does not start with "Inspector v4 fixture" — it overwrites the Home page)
  *   node scripts/conformance/load-inspector-v4-site.mjs --site <id>
  *   # 3. walk boards: fresh editor page per board, run the snippet, print the result
  *   node scripts/conformance/load-inspector-v4-site.mjs --site <id> --no-load --check 1-29
@@ -23,6 +24,7 @@
  *
  * Flags: --base (default http://localhost:3110) · --email / --password (default
  * the local QA account qa@buildrik.local; BK_EMAIL / BK_PASSWORD override) ·
+ * --name (the site's name; must start with "Inspector v4 fixture") ·
  * --state <storageState path> (default $TMPDIR/insp-v4-auth.json, reused while
  * the session lives) · --headed.
  *
@@ -31,11 +33,15 @@
  * takes the path a user's edit takes and syncs to the server the usual way:
  *   1. CMS: `cms.collections.createCollection` + fields + records, records
  *      published (a binding previews PUBLISHED records only). useCmsSync
- *      mirrors each to the server. Re-running reuses a collection by slug.
+ *      mirrors each to the server. Re-running reuses a collection by slug —
+ *      only one THIS site owns: an unscoped row from another site shares the
+ *      browser store, and the server refuses its fields (the Menu collection
+ *      once loaded with none), so that slug gets a new, site-owned collection.
  *   2. Placeholders in the fixture are resolved: `@page:home` / `@root:home` →
  *      the site's own Home page and root ids (a save naming another site's page
  *      is refused, PAGE_NOT_IN_SITE); `@cms:<key>` → collection id;
- *      `@cms:<key>#N` → its N-th record id.
+ *      `@cms:<key>#N` → the record made from the fixture's N-th record (matched
+ *      by its display field, oldest first — the store lists newest first).
  *   3. `importProject` (sanitizer + type refinement run as on any load).
  *   4. Components: `components.createComponent` from the fixture element, then
  *      `adoptInstances` makes that element the first instance, then each
@@ -50,7 +56,7 @@
  *      missing any piece exits 1 with "LOAD INCOMPLETE".
  *
  * Never publishes. Never touches a site other than the one it created or the
- * one named by --site (and that one must be called "Inspector v4 fixture").
+ * one named by --site (and that one's name must start with "Inspector v4 fixture").
  *
  * WHAT THE FIXTURE CANNOT HOLD (stated, not faked):
  *   - media-library metadata (board 8 "2400 × 1600 · 428 KB", board 10
@@ -86,6 +92,25 @@ const EMAIL = arg("email", process.env.BK_EMAIL ?? "qa@buildrik.local");
 const PASSWORD = arg("password", process.env.BK_PASSWORD ?? "qa-test-1234");
 const STATE = arg("state", join(tmpdir(), "insp-v4-auth.json"));
 const fixture = JSON.parse(readFileSync(FIXTURE_PATH, "utf8"));
+/* The prefix is the guard: the loader overwrites the Home page of the site it
+   is pointed at, so it only ever touches a site named as a fixture. */
+const NAME = String(arg("name", fixture.site.name));
+if (!NAME.startsWith(fixture.site.name)) {
+  throw new Error(`--name must start with ${JSON.stringify(fixture.site.name)} (got ${JSON.stringify(NAME)})`);
+}
+
+/** Wait until React has hydrated the field: typing into the server-rendered
+ *  input before that lets the form submit natively (HTTP 400 on /auth). */
+async function waitHydrated(page, selector) {
+  await page.waitForFunction(
+    (sel) => {
+      const el = document.querySelector(sel);
+      return Boolean(el) && Object.keys(el).some((k) => k.startsWith("__reactProps"));
+    },
+    selector,
+    { timeout: 180_000 },
+  );
+}
 
 const browser = await chromium.launch({ headless: !has("headed"), args: ["--no-proxy-server"] });
 
@@ -111,6 +136,7 @@ async function authedContext() {
   await ctx.addCookies(consent);
   const page = await ctx.newPage();
   await page.goto(`${BASE}/auth`, { waitUntil: "domcontentloaded", timeout: 180_000 });
+  await waitHydrated(page, 'input[placeholder="Your Email"]');
   await page.getByPlaceholder("Your Email").fill(EMAIL);
   await page.getByPlaceholder("Your Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Log in" }).click();
@@ -124,7 +150,8 @@ async function authedContext() {
 async function createSite(ctx) {
   const page = await ctx.newPage();
   await page.goto(`${BASE}/dashboard/sites/new`, { waitUntil: "domcontentloaded", timeout: 180_000 });
-  await page.getByPlaceholder("My New Site").fill(fixture.site.name);
+  await waitHydrated(page, 'input[placeholder="My New Site"]');
+  await page.getByPlaceholder("My New Site").fill(NAME);
   await page.getByRole("button", { name: /Start from Scratch/ }).click();
   await page.waitForURL((u) => u.pathname.startsWith("/edit/"), { timeout: 180_000 });
   const id = new URL(page.url()).pathname.split("/")[2];
@@ -171,8 +198,8 @@ async function openEditor(ctx, siteId) {
 }
 
 /** Steps 1–6 of the header, inside the page. */
-async function loadFixture(page, fx) {
-  return page.evaluate(async (fx) => {
+async function loadFixture(page, fx, siteId) {
+  return page.evaluate(async ({ fx, siteId }) => {
     const c = window.__bkComposer;
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const cms = c.cms.collections;
@@ -182,7 +209,11 @@ async function loadFixture(page, fx) {
     /* 1. CMS */
     const created = {};
     for (const col of fx.cms.collections) {
-      let row = cms.getCollectionBySlug(col.slug) ?? (await cms.createCollection(col.name, col.slug));
+      /* Reuse only a row this site owns; an unscoped (siteId-less) row from
+         another site is visible here too, and the server refuses its writes. */
+      const bySlug = cms.getCollectionBySlug(col.slug);
+      const ours = bySlug && bySlug.siteId === siteId ? bySlug : null;
+      let row = ours ?? (await cms.createCollection(col.name, bySlug ? `${col.slug}-${siteId.slice(-6).toLowerCase()}` : col.slug));
       row = await cms.updateCollection(row.id, {
         fields: col.fields.map((f) => ({ id: `${col.key}-${f.slug}`, ...f })),
         displayField: col.displayField,
@@ -192,7 +223,18 @@ async function loadFixture(page, fx) {
       items = await cms.getContentItems(row.id);
       for (const it of items) if (it.status !== "published") await cms.updateContentItem(it.id, { status: "published" });
       subs[`@cms:${col.key}`] = row.id;
-      items.forEach((it, i) => { subs[`@cms:${col.key}#${i}`] = it.id; });
+      /* `#N` is the fixture's N-th record, whatever order the store lists in
+         (newest first): matched by display field, else oldest first. */
+      const oldestFirst = [...items].sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
+      const taken = new Set();
+      col.records.forEach((rec, i) => {
+        const match =
+          oldestFirst.find((it) => !taken.has(it.id) && it.data?.[col.displayField] === rec[col.displayField]) ??
+          oldestFirst.find((it) => !taken.has(it.id));
+        if (!match) return;
+        taken.add(match.id);
+        subs[`@cms:${col.key}#${i}`] = match.id;
+      });
       created[col.key] = { id: row.id, records: items.length };
     }
 
@@ -239,7 +281,7 @@ async function loadFixture(page, fx) {
     const saveResult = await saved;
     await sleep(2000); // the CMS/component mirrors are fire-and-forget
     return { homePageId: home.id, collections: created, components, saveError: saveResult === "saved" ? null : saveResult };
-  }, fx);
+  }, { fx, siteId });
 }
 
 /** What the server gave back, read off a freshly loaded editor. */
@@ -282,17 +324,17 @@ try {
   let siteId = arg("site");
   if (siteId) {
     const name = await siteName(ctx, siteId);
-    if (name !== fixture.site.name) {
-      throw new Error(`refusing site ${siteId}: it is called ${JSON.stringify(name)}, not ${JSON.stringify(fixture.site.name)}. The loader overwrites the Home page.`);
+    if (typeof name !== "string" || !name.startsWith(fixture.site.name)) {
+      throw new Error(`refusing site ${siteId}: it is called ${JSON.stringify(name)}, which does not start with ${JSON.stringify(fixture.site.name)}. The loader overwrites the Home page.`);
     }
   } else {
     siteId = await createSite(ctx);
-    console.log(`created site "${fixture.site.name}": ${siteId}`);
+    console.log(`created site "${NAME}": ${siteId}`);
   }
 
   if (!has("no-load")) {
     const { page, errors } = await openEditor(ctx, siteId);
-    const result = await loadFixture(page, fixture);
+    const result = await loadFixture(page, fixture, siteId);
     console.log("load:", JSON.stringify(result, null, 2));
     if (errors.length) console.log("page errors:", errors);
     await page.close();

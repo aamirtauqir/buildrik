@@ -122,6 +122,13 @@
                   "tagName": "h1",
                   "children": [],
                   "content": "Bella Cucina",
+                  "attributes": {
+                    "id": "hero-title",
+                    "data-section": "hero"
+                  },
+                  "classes": [
+                    "hero-title"
+                  ],
                   "styles": {
                     "font-size": "48px",
                     "font-weight": "700",
