@@ -319,7 +319,7 @@ export const authConfig: NextAuthConfig = {
           select: { workspaceId: true },
         });
         token.workspaceId = member?.workspaceId ?? null;
-        if (member) await recordWorkspaceUse(user.id, member.workspaceId);
+        if (member && user.id) await recordWorkspaceUse(user.id, member.workspaceId);
       }
       // Workspace switch — the client calls update({ workspaceId }). Validate it
       // is one of the user's ACTIVE memberships before trusting it, so the token
