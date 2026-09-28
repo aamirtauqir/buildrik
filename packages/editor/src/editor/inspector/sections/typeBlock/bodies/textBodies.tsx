@@ -61,16 +61,14 @@ function LevelRow(props: TypeBlockBodyProps) {
  * style binds `font-size` to that token's var() (owner answer 4). "Custom"
  * unbinds to the size the token stood for, so nothing on the canvas moves.
  */
-function TextStyleRow({ styles, onChange, composer, element }: TypeBlockBodyProps) {
+function TextStyleRow({ styles, onChange }: TypeBlockBodyProps) {
   const { tokens } = useTypeRegistry();
   const options = React.useMemo(
     () =>
       typeStyleRows(tokens).map((row) => ({ value: row.id, label: row.name })),
     [tokens],
   );
-  /* The type block's style slice carries the flex/grid keys; font-size is
-     read off the element until the registry entry lists it. */
-  const size = styles["font-size"] ?? composer?.elements.getElement(element.id)?.getStyles?.()["font-size"] ?? "";
+  const size = styles["font-size"] ?? "";
   const varName = extractVarName(size);
   const bound = varName ? cssVarToTokenId(varName) : null;
   const value = bound && options.some((o) => o.value === bound) ? bound : "";

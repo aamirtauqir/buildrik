@@ -19,8 +19,9 @@ export const TYPE_SECTIONS: Record<string, AnySectionEntry> = {
     open: "always",
     capability: (caps) => caps.typeBlock !== null && Boolean(TYPE_BLOCKS[caps.typeBlock]),
     Component: TypeBlockSection,
-    /* The Flex / Grid bodies read the flex and grid properties. */
-    styleKeys: ["display", "flex-direction", "flex-wrap", "justify-content", "align-items", "align-content", "gap", "row-gap", "column-gap", "grid-template-columns", "grid-template-rows", "grid-auto-flow", "justify-items"],
+    /* The Flex / Grid bodies read the flex and grid properties; the Text
+       style row reads font-size. */
+    styleKeys: ["font-size", "display", "flex-direction", "flex-wrap", "justify-content", "align-items", "align-content", "gap", "row-gap", "column-gap", "grid-template-columns", "grid-template-rows", "grid-auto-flow", "justify-items"],
     adaptProps: (ctx) => ({
       composer: ctx.composer,
       element: ctx.selectedElement,
