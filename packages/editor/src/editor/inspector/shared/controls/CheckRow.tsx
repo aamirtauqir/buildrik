@@ -34,7 +34,7 @@ export function CheckRow({ label, checked, onChange, property, testId }: CheckRo
     if (boxRef.current) boxRef.current.indeterminate = field.mixed;
   }, [field.mixed]);
   return (
-    <div className="tw:flex tw:min-h-6 tw:items-center tw:gap-2 tw:py-1" data-testid={testId ?? rowTestId(label)}>
+    <div className="tw:flex tw:min-h-6 tw:items-center tw:gap-2 tw:px-1 tw:py-1" data-testid={testId ?? rowTestId(label)}>
       <Checkbox
         ref={boxRef}
         id={id}

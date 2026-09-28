@@ -328,7 +328,7 @@
   border-color: var(--bk-accent);
   box-shadow: var(--bk-shadow-focus);
 }
-.bdi-fld input:focus,
+.bdi-fld :is(input, select):focus,
 .bdi-ddn select:focus,
 .bdi-fill input:focus {
   outline: none;
@@ -346,6 +346,25 @@
 .bdi-fill.mixed input::placeholder {
   color: var(--bk-ink-muted);
   font-style: italic;
+}
+
+/* A field a section draws itself (a flowbite TextInput straight in a row —
+   Grid's Columns) wears the same frame, so no row in the panel looks
+   different because of who built it. */
+.bdi-row-ctrl .bdi-row-content input:is([type="text"], [type="number"], :not([type])):not(.bdi-fld input, .bdi-fill input, .bdi-text, [data-testid="inspector-spacing-box"] input) {
+  height: 24px;
+  padding: 0 var(--bk-space-8);
+  background: var(--bk-gray-50);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-sm);
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-mono);
+  color: var(--bk-ink-soft);
+  box-shadow: none;
+}
+.bdi-row-ctrl .bdi-row-content input:is([type="text"], [type="number"], :not([type])):not(.bdi-fld input, .bdi-fill input, .bdi-text, [data-testid="inspector-spacing-box"] input):focus {
+  outline: none;
+  border-color: var(--bk-accent);
+  box-shadow: var(--bk-shadow-focus);
 }
 
 /* ── Number field: value · stepper · unit (board 1) ───── */
@@ -436,8 +455,13 @@
   opacity: 1;
   cursor: default;
 }
+/* A text action ("Edit text on canvas") stays text when refused: flowbite's
+   disabled fill must not turn a transparent button into a grey box. */
+.bdi-panel button[class~="tw:bg-transparent"]:disabled {
+  background-color: transparent;
+}
 .bdi-sec[data-readonly="locked"] > .bdi-sec-body :is(.bdi-fld, .bdi-ddn, .bdi-fill, .bdi-seg, .bdi-text, .bdi-pad, [data-testid="inspector-spacing-box"]),
-.bdi-sec[data-readonly="locked"] > .bdi-sec-body :is(button, select, input, textarea):not(.bdi-lb *, :is(.bdi-fld, .bdi-ddn, .bdi-fill, .bdi-seg, .bdi-pad, [data-testid="inspector-spacing-box"]) *) {
+.bdi-sec[data-readonly="locked"] > .bdi-sec-body :is(button, select, input, textarea):not(.bdi-lb, .bdi-lb *, .bdi-adv, :is(.bdi-fld, .bdi-ddn, .bdi-fill, .bdi-seg, .bdi-pad, [data-testid="inspector-spacing-box"]) *) {
   opacity: 0.45;
 }
 
@@ -563,19 +587,24 @@
   height: 24px;
   width: 100%;
 }
+/* Each option is a 24-tall target (WCAG 2.5.8) that DRAWS the board's 20
+   chip: it reaches over the track's 2px inset with a transparent 2px border,
+   the fill clipped inside it, the chosen chip's hairline an inset shadow. */
 .bdi-seg button,
 .bdi-row-ctrl .bdi-seg button {
-  height: 20px;
+  height: 24px;
   min-height: 0;
   min-width: 0;
+  margin: -2px 0;
   padding: 0;
   gap: 3px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 3px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 5px;
   box-shadow: none;
   font: 400 var(--bk-text-12) / 16px var(--bk-font-ui);
   color: var(--bk-ink-soft);
@@ -583,20 +612,24 @@
 }
 .bdi-seg button:hover {
   color: var(--bk-ink);
-  background: transparent;
+  background-color: transparent;
 }
 .bdi-seg button.on,
 .bdi-seg button.on:hover {
-  background: var(--bk-bg-panel);
-  border-color: var(--bk-border);
+  background-color: var(--bk-bg-panel);
+  box-shadow: inset 0 0 0 1px var(--bk-border);
   color: var(--bk-accent-text);
   font-weight: 500;
 }
 .bdi-seg button:focus {
   outline: none;
+}
+.bdi-seg button:not(.on):focus {
   box-shadow: none;
 }
-.bdi-seg button:focus-visible {
+.bdi-seg button:focus-visible,
+.bdi-seg button.on:focus-visible {
+  outline: none;
   box-shadow: var(--bk-shadow-focus);
 }
 
@@ -605,19 +638,45 @@
   gap: var(--bk-space-8);
   padding: 0 var(--bk-space-8);
 }
+/* The swatch is a 24 × 24 target (WCAG 2.5.8) drawing a 16 square: the
+   button overhangs the 16 slot by 4 on each side, the square is centred. */
 .bdi-fill .bdi-sw,
 .bdi-row-ctrl .bdi-fill .bdi-sw {
-  width: 16px;
-  height: 16px;
+  position: relative;
+  width: 24px;
+  height: 24px;
   min-height: 0;
+  margin: 0 -4px;
   padding: 0;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   border: none;
   border-radius: 3px;
-  box-shadow: inset 0 0 0 1px var(--bk-alpha-ink-08);
   cursor: pointer;
-  /* The checkerboard is the only honest "no colour". */
-  background-color: transparent;
+}
+.bdi-fill .bdi-sw:focus {
+  outline: none;
+  box-shadow: none;
+}
+.bdi-fill .bdi-sw:focus-visible {
+  box-shadow: var(--bk-shadow-focus);
+}
+/* The square: the colour over a checkerboard — the only honest "no colour". */
+.bdi-fill .bdi-sw-fill {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--bk-alpha-ink-08);
+}
+.bdi-fill .bdi-sw::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
   background-image:
     linear-gradient(45deg, var(--bk-alpha-ink-08) 25%, transparent 25%),
     linear-gradient(-45deg, var(--bk-alpha-ink-08) 25%, transparent 25%),
@@ -625,22 +684,9 @@
     linear-gradient(-45deg, transparent 75%, var(--bk-alpha-ink-08) 75%);
   background-size: 6px 6px;
   background-position: 0 0, 0 3px, 3px -3px, -3px 0;
-  /* 24px target around a 16px swatch (WCAG 2.5.8): the hit area grows, the
-     drawn square does not. */
-  position: relative;
-}
-.bdi-fill .bdi-sw::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-}
-.bdi-fill .bdi-sw:focus-visible {
-  box-shadow: var(--bk-shadow-focus);
 }
 .bdi-fill .bdi-sw-fill {
-  width: 100%;
-  height: 100%;
-  border-radius: 3px;
+  position: relative;
 }
 .bdi-fill .bdi-hx {
   flex: 1;
