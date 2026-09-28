@@ -8,8 +8,6 @@
  * (b) Duplicate: the Inspector ⋯ and the canvas menu each had their own
  *     duplicate; they now run the shared `duplicate` command (subtree pruning,
  *     whole multi-selection, clones selected).
- * (c) Multi-select Delete: the toolbar asked, then ran `delete` unconfirmed,
- *     so the command asked a second time.
  *
  * Driven against a real Composer.
  *
@@ -19,7 +17,6 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vites
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
-import { EVENTS } from "@/shared/constants/events";
 import {
   createTestComposer,
   installEngineBrowserStubs,
@@ -27,7 +24,6 @@ import {
 } from "@/engine/__tests__/test-utils/realComposer";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { InspectorElementMenu } from "../InspectorElementMenu";
-import { MultiSelectToolbar } from "../MultiSelectToolbar";
 import { quickStyleSubmenu } from "@/editor/canvas/menus/actions/styleActions";
 import { editSubmenu } from "@/editor/canvas/menus/actions/editActions";
 import type { ActionContext, ContextAction } from "@/editor/canvas/menus/contextMenuRegistry";
@@ -117,16 +113,3 @@ describe("P-10b — Duplicate runs the shared command", () => {
   });
 });
 
-describe("P-10c — multi-select Delete asks once", () => {
-  it("confirming the toolbar's modal deletes without a second confirm request", () => {
-    composer.selection.selectMultiple([a, b]);
-    const ask = vi.fn();
-    composer.on(EVENTS.UI_REQUEST_DELETE_SELECTION, ask);
-    render(<MultiSelectToolbar selectedIds={[a.getId(), b.getId()]} composer={composer} />, { wrapper: ToastProvider });
-    fireEvent.click(screen.getByTestId("multiselect-delete"));
-    fireEvent.click(screen.getByRole("button", { name: "Delete 2 elements" }));
-    expect(ask).not.toHaveBeenCalled();
-    expect(composer.elements.getElement(a.getId())).toBeFalsy();
-    expect(composer.elements.getElement(b.getId())).toBeFalsy();
-  });
-});

@@ -13,7 +13,8 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   h5: "Heading 5",
   h6: "Heading 6",
   // HTML block elements
-  p: "Paragraph",
+  // A paragraph is "Text" everywhere the boards name it (boards 4, 21).
+  p: "Text",
   div: "Container",
   span: "Text",
   section: "Section",
@@ -39,7 +40,7 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   li: "List Item",
   // Semantic type aliases used by the engine
   heading: "Heading",
-  paragraph: "Paragraph",
+  paragraph: "Text",
   container: "Container",
   text: "Text",
   image: "Image",

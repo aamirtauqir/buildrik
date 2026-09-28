@@ -12,7 +12,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useStyleHandlers } from "../useStyleHandlers";
-import { useBatchStyleHandler } from "../useBatchStyleHandler";
 import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 import {
   createTestComposer,
@@ -36,9 +35,8 @@ function setup(mediaQuery?: string) {
   );
   /* One object per test: the hook keys its load effect on selection identity. */
   const sel = { id, type: "heading" };
-  const ids = [id];
   const hoverRule = () => composer.styles.getRule(`[data-buildrick-id="${id}"]:hover`, mediaQuery)?.properties;
-  return { composer, sel, ids, hoverRule };
+  return { composer, sel, hoverRule };
 }
 
 function flushDebounce(fn: () => void) {
@@ -73,13 +71,6 @@ describe("P-9a — reset under :hover", () => {
     const { result } = renderHook(() => useStyleHandlers(sel, composer, "desktop", "hover"));
     act(() => result.current.handleBatchStyleChange({ color: "", "font-size": "12px" }));
     expect(hoverRule()).toEqual({ "font-size": "12px" });
-  });
-
-  it("multi-select reset removes the key from each :hover rule", () => {
-    const { composer, ids, hoverRule } = setup();
-    const { result } = renderHook(() => useBatchStyleHandler(composer, ids, "desktop", "hover"));
-    act(() => result.current.handleBatchStyleChange({ color: "" }));
-    expect(hoverRule()).toEqual({ "font-size": "40px" });
   });
 
   it("setting a value under :hover still keeps the rule's other keys", () => {

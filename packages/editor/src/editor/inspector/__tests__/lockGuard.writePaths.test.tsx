@@ -37,7 +37,7 @@ import { CollectionListSection } from "../sections/CollectionListSection";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
 import { CmsBindingSection } from "../sections/CmsBindingSection";
 import { InspectorElementMenu } from "../components/InspectorElementMenu";
-import { useBatchStyleHandler } from "../hooks/useBatchStyleHandler";
+import { useStyleHandlers } from "../hooks/useStyleHandlers";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -198,8 +198,11 @@ describe("P-1 — multi-select batch edits skip locked members and say so", () =
     const a = add("heading", { content: "A" });
     const b = add("heading", { content: "B" });
     lock(b);
-    const ids = [a.getId(), b.getId()];
-    const { result } = renderHook(() => useBatchStyleHandler(composer, ids, "desktop", "normal"));
+    /* The multi-select writer is the one panel's: the rest of the selection
+       rides along as extra targets (DD-12). */
+    const sel = { id: a.getId(), type: "heading" };
+    const extra = [b.getId()];
+    const { result } = renderHook(() => useStyleHandlers(sel, composer, "desktop", "normal", extra));
     act(() => result.current.handleBatchStyleChange({ color: "rgb(9, 9, 9)" }));
     expect(a.getStyles().color).toBe("rgb(9, 9, 9)");
     expect(b.getStyles().color).toBeUndefined();

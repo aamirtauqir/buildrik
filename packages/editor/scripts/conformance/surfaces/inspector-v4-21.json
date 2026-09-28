@@ -10,13 +10,13 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "inspector-empty"
+      "testId": "inspector-page-panel"
     }
   ],
   "targets": [
     {
       "name": "page-panel",
-      "testId": "inspector-empty"
+      "testId": "inspector-page-panel"
     }
   ]
 }

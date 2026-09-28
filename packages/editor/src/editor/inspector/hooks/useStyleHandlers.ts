@@ -109,9 +109,9 @@ export function useStyleHandlers(
 
   // Load styles when element or breakpoint changes. Cascade (base → breakpoint
   // overlay → pseudo) is delegated to computeEffectiveStyles so there's ONE
-  // source of truth for the layering logic — shared with useBatchStyleHandler
-  // and deriveCssContext. Only the default-style layer and the overriddenKeys
-  // indicator stay local to this hook.
+  // source of truth for the layering logic — shared with deriveCssContext.
+  // Only the default-style layer and the overriddenKeys indicator stay local
+  // to this hook.
   /* Re-read trigger for the computed fallback below. Bumped by any event that
      can repaint the selected element without changing what is selected. */
   const [bump, setBump] = useState(0);
@@ -297,8 +297,14 @@ export function useStyleHandlers(
       if (!selectedElement?.id || blocked) return;
 
       if (!composer) return;
-      const [el] = writableElements(composer, [composer.elements.getElement(selectedElement.id)]);
-      if (!el) return;
+      /* The whole selection, like a single edit (DD-12, board 22 "Edits apply
+         to all N"). P-1: locked members are skipped by the lock gate, which
+         says so. */
+      const targets = writableElements(
+        composer,
+        [selectedElement.id, ...extraTargetIds].map((id) => composer.elements.getElement(id)),
+      );
+      if (targets.length === 0) return;
 
       /* A pending single write (a gradient being dragged) would otherwise fire
          AFTER this batch and undo it — the Fill switch to Color came back as
@@ -313,81 +319,60 @@ export function useStyleHandlers(
         breakpoint: currentBreakpoint,
       });
 
-      composer?.beginTransaction?.("style-batch");
-      try {
-        // Pseudo-state batch changes
-        if (currentPseudoState !== "normal" && composer?.styles) {
-          const selector = `[data-buildrick-id="${selectedElement.id}"]`;
-          const pseudoSelector = `${selector}:${currentPseudoState}`;
-          const mq =
-            currentBreakpoint === "desktop"
-              ? undefined
-              : getBreakpointQuery(currentBreakpoint) ?? undefined;
-          const existingRule = composer.styles.getRule(pseudoSelector, mq);
+      const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
+      const writeOne = (el: Element) => {
+        const id = el.getId();
+        // Pseudo-state batch changes: each element's OWN rule.
+        if (currentPseudoState !== "normal" && composer.styles) {
+          const selector = `[data-buildrick-id="${id}"]`;
+          const existingRule = composer.styles.getRule(`${selector}:${currentPseudoState}`, mq);
           const existing = existingRule ? { ...existingRule.properties } : {};
-
           Object.entries(changes).forEach(([prop, val]) => {
-            if (val === "" || val == null) {
-              delete existing[prop];
-            } else {
-              existing[prop] = val;
-            }
+            if (val === "" || val == null) delete existing[prop];
+            else existing[prop] = val;
           });
-
           composer.styles.setRule(selector, existing, { pseudo: `:${currentPseudoState}`, mediaQuery: mq, replace: true });
-          setStyles((prev) => {
-            const merged = { ...prev };
-            Object.entries(changes).forEach(([prop, val]) => {
-              if (val === "" || val == null) delete merged[prop];
-              else merged[prop] = val;
-            });
-            return merged;
-          });
           return;
         }
 
-        const next: Record<string, string> = {};
         const toSet: Record<string, string> = {};
-
         Object.entries(changes).forEach(([prop, val]) => {
           if (val === "" || val == null) {
             if (currentBreakpoint === "desktop") {
               el.removeStyle?.(prop);
-            } else if (composer?.styles) {
-              composer.styles.removeBreakpointStyleProperty(
-                selectedElement.id,
-                currentBreakpoint,
-                prop
-              );
+            } else if (composer.styles) {
+              composer.styles.removeBreakpointStyleProperty(id, currentBreakpoint, prop);
             }
           } else {
             toSet[prop] = val;
-            next[prop] = val;
           }
         });
-
         if (Object.keys(toSet).length > 0) {
           if (currentBreakpoint === "desktop") {
-            Object.entries(toSet).forEach(([prop, val]) => {
-              el.setStyle?.(prop, val);
-            });
-          } else if (composer?.styles) {
-            composer.styles.setBreakpointStyle(selectedElement.id, currentBreakpoint, toSet);
+            Object.entries(toSet).forEach(([prop, val]) => el.setStyle?.(prop, val));
+          } else if (composer.styles) {
+            composer.styles.setBreakpointStyle(id, currentBreakpoint, toSet);
           }
         }
+      };
 
+      /* One transaction around the whole selection — one undo step. */
+      composer.beginTransaction?.("style-batch");
+      try {
+        for (const el of targets) writeOne(el);
         setStyles((prev) => {
-          const merged = { ...prev, ...next };
+          const merged = { ...prev };
           Object.entries(changes).forEach(([prop, val]) => {
             if (val === "" || val == null) delete merged[prop];
+            else merged[prop] = val;
           });
           return merged;
         });
       } finally {
-        composer?.endTransaction?.();
+        composer.endTransaction?.();
       }
     },
-    [selectedElement, composer, currentBreakpoint, currentPseudoState, blocked, flushPending]
+    [selectedElement, composer, currentBreakpoint, currentPseudoState, extraTargetIds, blocked, flushPending]
   );
 
   return {

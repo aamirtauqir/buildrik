@@ -22,12 +22,6 @@ import { render } from "@testing-library/react";
 // deps come from hooks/composer, which would require a real composer to
 // boot. Stub the components/hooks ProInspector imports that don't touch
 // the threading under test.
-vi.mock("../InspectorEmptyState", () => ({
-  InspectorEmptyState: () => null,
-}));
-vi.mock("../MultiSelectToolbar", () => ({
-  MultiSelectToolbar: () => null,
-}));
 vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
