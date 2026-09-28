@@ -128,16 +128,19 @@ describe("P-1 — attribute writers refuse a locked element", () => {
 });
 
 describe("P-1 — structure writers refuse a locked form / slider", () => {
-  it("FormFieldsSection: changing a field's type and adding a field", () => {
+  it("FormFieldsSection: changing a field's type, Required, and adding a field", () => {
     const form = add("form");
     add("input", { attributes: { type: "text", name: "name", placeholder: "Name" } }, form.getId());
     lock(form);
     render(<FormFieldsSection elementId={form.getId()} composer={composer} isOpen />);
-    fireEvent.change(screen.getByRole("combobox", { name: "Name type" }), { target: { value: "email" } });
     fireEvent.click(screen.getByRole("button", { name: "+ Add field" }));
+    fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
+    fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "email" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Required" }));
     const fields = form.getChildren();
     expect(fields).toHaveLength(1);
     expect(fields[0].getAttribute("type")).toBe("text");
+    expect(fields[0].getAttribute("required")).toBeUndefined();
     expect(skipped).toHaveBeenCalled();
   });
 

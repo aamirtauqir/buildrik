@@ -1,5 +1,9 @@
 /**
- * Form › AFTER SUBMIT + PROTECTION — board 4428:141878. The FIELDS rows
+ * Form › After submit — board 19: Then (Show message / Redirect), Message or
+ * Redirect to, Send to, and the note "Saved to your site straight away — not
+ * part of Undo. Changing Send to needs an admin." Spam protection (the
+ * honeypot switch) is kept under Send to; board 19 does not draw it, but it is
+ * a live setting and dropping it would drop a capability. The Fields rows
  * (`FormFieldsSection.tsx`) edit the form's own children; these rows edit the
  * form's server-side FormBlock row (`forms.getBlock` / `forms.updateBlock`) —
  * what happens once a visitor submits: show a message or redirect, who gets
@@ -32,8 +36,8 @@ import type { Composer } from "@/engine";
 import { getBuildrikClient } from "@/services/api-client";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Select, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
-import { Section, type SectionTier } from "../shared/controls";
+import { Section, SelectRow, type SectionTier } from "../shared/controls";
+import { CheckRow, CommitRow, NoteRow } from "./behaviourRows";
 
 export interface FormAfterSubmitSectionProps {
   elementId: string;
@@ -53,9 +57,6 @@ interface Settings {
 
 /** Validated together server-side — always travel together in one call. */
 const LINKED_FIELDS = new Set<keyof Settings>(["successAction", "redirectUrl"]);
-
-const ROW = "tw:flex tw:items-center tw:gap-2 tw:min-h-8";
-const LABEL = "tw:w-[88px] tw:flex-none tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]";
 
 function isForbidden(e: unknown): boolean {
   return e instanceof Error && (e as { data?: { code?: string } }).data?.code === "FORBIDDEN";
@@ -80,11 +81,10 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
   const [error, setError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
   const projectId = React.useMemo(() => getSiteIdFromUrl(), []);
-  // The text fields below are uncontrolled (`defaultValue` + commit-on-blur,
-  // so typing doesn't fight a re-render) — reverting `settings` alone
-  // wouldn't touch their DOM value, since `defaultValue` only applies on
-  // mount. Bumping this remounts them (`key`) so a revert is actually
-  // visible, not just true in state.
+  // A failed save reverts `settings`, but the optimistic update and the
+  // revert can land in one render — the text rows would see no change and
+  // keep the draft. Bumping this remounts them (`key`) so a revert is
+  // actually visible, not just true in state.
   const [revertToken, setRevertToken] = React.useState(0);
 
   const form = composer?.elements.getElement(elementId);
@@ -166,82 +166,54 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
   return (
     <Section title="After submit" icon="Send" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-form-after-submit">
       {!projectId ? (
-        <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">
-          Open this site from the dashboard to edit form settings.
-        </div>
+        <NoteRow>Open this site from the dashboard to edit form settings.</NoteRow>
       ) : !settings ? (
-        <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">
-          {error ?? "Loading…"}
-        </div>
+        <NoteRow tone={error ? "error" : "muted"}>{error ?? "Loading…"}</NoteRow>
       ) : (
         <>
-          <div className={ROW}>
-            <span className={LABEL}>Action</span>
-            <Select
-              sizing="sm"
-              className="tw:flex-1 tw:min-w-0"
-              aria-label="After-submit action"
-              value={settings.successAction}
-              onChange={(e) => save({ successAction: e.target.value as Settings["successAction"] })}
-            >
-              <option value="MESSAGE">Show message</option>
-              <option value="REDIRECT">Redirect</option>
-            </Select>
-          </div>
+          <SelectRow
+            label="Then"
+            /* "Show message" is the select's empty choice (SelectRow always draws one). */
+            value={settings.successAction === "MESSAGE" ? "" : settings.successAction}
+            onChange={(v) => save({ successAction: (v || "MESSAGE") as Settings["successAction"] })}
+            options={[{ value: "REDIRECT", label: "Redirect" }]}
+            placeholder="Show message"
+          />
           {settings.successAction === "MESSAGE" ? (
-            <div className={ROW}>
-              <span className={LABEL}>Message</span>
-              <TextInput
-                key={`message-${revertToken}`}
-                sizing="sm"
-                className="tw:flex-1 tw:min-w-0"
-                aria-label="Success message"
-                placeholder="Thanks — your message was sent."
-                defaultValue={settings.successMessage ?? ""}
-                onBlur={(e) => save({ successMessage: e.target.value })}
-              />
-            </div>
+            <CommitRow
+              key={`message-${revertToken}`}
+              label="Message"
+              placeholder="Thanks — your message was sent."
+              value={settings.successMessage ?? ""}
+              onCommit={(v) => save({ successMessage: v })}
+            />
           ) : (
-            <div className={ROW}>
-              <span className={LABEL}>Redirect to</span>
-              <TextInput
-                key={`redirect-${revertToken}`}
-                sizing="sm"
-                type="url"
-                className="tw:flex-1 tw:min-w-0"
-                aria-label="Redirect URL"
-                placeholder="https://example.com/thanks"
-                defaultValue={settings.redirectUrl ?? ""}
-                onBlur={(e) => save({ redirectUrl: e.target.value })}
-              />
-            </div>
+            <CommitRow
+              key={`redirect-${revertToken}`}
+              label="Redirect to"
+              type="url"
+              placeholder="https://example.com/thanks"
+              value={settings.redirectUrl ?? ""}
+              onCommit={(v) => save({ redirectUrl: v })}
+            />
           )}
-          <div className={ROW}>
-            <span className={LABEL}>Send to email</span>
-            <TextInput
-              key={`notify-email-${revertToken}`}
-              sizing="sm"
-              type="email"
-              className="tw:flex-1 tw:min-w-0"
-              aria-label="Notification email"
-              placeholder="you@company.com"
-              defaultValue={settings.notifyEmail ?? ""}
-              onBlur={(e) => save({ notifyEmail: e.target.value })}
-            />
-          </div>
-          <div className={ROW}>
-            <span className={LABEL} id="form-spam-protection-label">Spam protection</span>
-            <ToggleSwitch
-              checked={settings.spamProtection}
-              aria-labelledby="form-spam-protection-label"
-              onChange={(checked) => save({ spamProtection: checked })}
-            />
-          </div>
+          <CommitRow
+            key={`notify-email-${revertToken}`}
+            label="Send to"
+            type="email"
+            placeholder="you@company.com"
+            value={settings.notifyEmail ?? ""}
+            onCommit={(v) => save({ notifyEmail: v })}
+          />
+          <CheckRow label="Spam protection" checked={settings.spamProtection} onChange={(checked) => save({ spamProtection: checked })} />
           {error ? (
-            <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error)]">{error}</div>
+            <NoteRow tone="error">{error}</NoteRow>
           ) : saving ? (
-            <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">Saving…</div>
+            <NoteRow>Saving…</NoteRow>
           ) : null}
+          <NoteRow testId="form-after-submit-note">
+            Saved to your site straight away — not part of Undo. Changing Send to needs an admin.
+          </NoteRow>
         </>
       )}
     </Section>
