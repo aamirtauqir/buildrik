@@ -8,7 +8,7 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
-import { takePendingMaster } from "./openMasterRequest";
+import { takePendingMaster, type OpenMasterRequest } from "./openMasterRequest";
 import { deleteComponentWithUndo } from "./ComponentDetailScreen";
 import { useComponentList } from "./useComponentList";
 import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
@@ -157,33 +157,52 @@ export function useComponentsState({
     (component: ComponentDefinition) => {
       setDetailComponent(component);
       setSelectedId(component.id);
+      setReturnInstanceId(null);
     },
     [setSelectedId]
   );
+
+  /* §13: the instance an "Edit master ›" door was opened on — what the
+     master's "‹ Back to instance" gives back. A master reached from the list
+     has none. */
+  const [returnInstanceId, setReturnInstanceId] = React.useState<string | null>(null);
 
   // "Edit master ›" from an instance (openMasterRequest.ts): a request made
   // before this panel mounted is taken here; a mounted panel hears the event.
   React.useEffect(() => {
     if (!composer?.components) return;
-    const open = (componentId: string | undefined) => {
+    const open = (request: OpenMasterRequest | undefined) => {
       takePendingMaster(composer);
-      const c = componentId ? composer.components?.getComponent(componentId) : undefined;
+      const c = request ? composer.components?.getComponent(request.componentId) : undefined;
       if (c) {
         setDetailComponent(c);
         setSelectedId(c.id);
+        setReturnInstanceId(request?.instanceId ?? null);
       }
     };
     open(takePendingMaster(composer));
-    const onEvent = ({ componentId }: { componentId: string }) => open(componentId);
-    composer.on(EVENTS.UI_COMPONENTS_OPEN_MASTER, onEvent);
+    composer.on(EVENTS.UI_COMPONENTS_OPEN_MASTER, open);
     return () => {
-      composer.off(EVENTS.UI_COMPONENTS_OPEN_MASTER, onEvent);
+      composer.off(EVENTS.UI_COMPONENTS_OPEN_MASTER, open);
     };
   }, [composer, setSelectedId]);
 
   const handleBackFromDetail = React.useCallback(() => {
     setDetailComponent(null);
+    setReturnInstanceId(null);
   }, []);
+
+  const returnInstance = returnInstanceId ? composer?.elements.getElement(returnInstanceId) : undefined;
+  const backToInstance = React.useMemo(
+    () =>
+      returnInstance && composer
+        ? () => {
+            composer.selection.select(returnInstance);
+            handleBackFromDetail();
+          }
+        : undefined,
+    [returnInstance, composer, handleBackFromDetail],
+  );
 
   const handleDetailInsert = React.useCallback(() => {
     // Optionally navigate back after insert
@@ -225,6 +244,7 @@ export function useComponentsState({
     handleDuplicate,
     handleViewDetail,
     handleBackFromDetail,
+    backToInstance,
     handleDetailInsert,
     handleDetailDelete,
     // Dialog state (replaces native dialogs)

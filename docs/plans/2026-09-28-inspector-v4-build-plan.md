@@ -459,3 +459,17 @@ Figma quota (200/day, 15/min, shared): W0 ≤ 72 calls on day 1 (36 design-conte
 - Header (W1 `InspectorHeader`): multi breadcrumb repeats "3 selected · Headings" as its last crumb and draws a type icon (board 22: path "Home › Hero", no icon). PagePanel carries its own small header (page name, ✦ AI, ⋯ Page settings…, ✕) — fold into an InspectorHeader `page` variant if wanted.
 - CMS "record N of M": the Wave 2 "2 of 3" was the store's order, which is also the CMS Records table's row order (useContentPanel, unsorted). A creation-order fix read "3 of 3" live here (the loader made the records newest-first; ids and createdAt disagree), so it was reverted: on this site the preview reads "record 1 of 3". A stable record order is a CMS decision.
 - Fixture: the Menu collection loaded with `fields: []` again on this site, so CMS binding's Field reads "No fields fit here" (loader).
+
+### L3-D progress (2026-09-28, branch `feat/insp-l3d`)
+
+**Done** — `3fdc10457` (board 36 "Show inspector ⌘\" on the canvas, replaces the hide toast; CMS workspace "‹ Back to canvas" restores drawer tab + open state + selection; P-5 and CMS share `restoreSelection`), `2475ef882` (Edit master › carries its instance; master back row + Esc = "Back to instance", re-selects it), `2fb98a4be` (AI column = board 35 for one element, nothing asked; other AI states keep the 4418:* layout, prompt field never remounted). tsc 0, related vitest green (shell, ai, component-library, cms, inspector), verify:ds green.
+
+**Live (port 3144, site "Inspector v4 fixture · L3-D")** — board 36: button 1232,112 188×28, 13/500 gray-700, 1px border, r6, 20 from the canvas's right; board's top is 108 because its page-tab bar is 4px shorter (shell, not L3-D). ⌘\ toggles, the button shows the Inspector. Board 35: every part on the board's 12 grid (back 72, scope 112, box 140×144, suggestions 296/336/376, note 416). Doors walked (element · tab · scroll before → after): AI (heading · Style · 70 → same), Brand token chip (heading · Style · 80 → same, via Brand's own Back to canvas), Assets pick mode (image · Style · 60 → same, via Cancel), Edit master (banner · Style · 80 → same after selecting another element meanwhile), Open record (CMS heading · Behaviour → same), Open collection (collection list · Behaviour → same).
+
+**Not done / for the lead**
+- Scope reads "Heading text" (useAIScope's `scopeLabel` noun, pinned by the 4418:* AI boards); board 35 draws "Heading". Owner call; not changed.
+- Board 35 supersedes `170:17 AI · scoped` for the element-idle state (no AI title row, no ✕): the `ai-scoped` recipe's `ai-header` target will not render there — W4 should retire/re-point it.
+- Open record lands on the record sheet, which covers the workspace header: the way back is ✕ then "‹ Back to canvas" (two steps). One-step needs RecordSheet (not L3-D) to carry the back action.
+- Escape in the Assets pick mode deselects the canvas element instead of cancelling the pick (Cancel works).
+- Settings/SEO door not walkable here: its button is L3-A's PagePanel; the mechanism is P-5's (walked through Brand).
+- Out-of-list edits: `ComponentRow.tsx` (+test) passes the instance id (1 line); `ComponentsTab.tsx` passes `onBackToInstance`; `ai/Composer.tsx` gains `variant` + `placeholder`. `events.ts` doc for `UI_COMPONENTS_OPEN_MASTER` should now read `{ componentId, instanceId? }`.
