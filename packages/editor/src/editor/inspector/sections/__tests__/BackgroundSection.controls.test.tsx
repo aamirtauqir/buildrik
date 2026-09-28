@@ -194,3 +194,21 @@ describe("BackgroundSection — switching type replaces the old fill (X-1)", () 
     expect(onBatchChange).toHaveBeenCalledWith({ background: "", "background-color": "#00ff00" });
   });
 });
+
+describe("Fill — v4 labels (boards 1, 21, 27)", () => {
+  it("titles the section Fill and names the colour row Colour", () => {
+    renderBg();
+    expect(screen.getByRole("button", { name: "Fill section, expanded" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Colour value" })).toBeInTheDocument();
+  });
+
+  it("on the Page panel the row reads Background", () => {
+    renderBg({ variant: "page" });
+    expect(screen.getByRole("textbox", { name: "Background value" })).toBeInTheDocument();
+  });
+
+  it("has no header add-image action (the frame's + adds)", () => {
+    renderBg({ onOpenMediaLibrary: vi.fn() });
+    expect(screen.queryByRole("button", { name: "Add background image" })).not.toBeInTheDocument();
+  });
+});
