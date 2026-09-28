@@ -14,11 +14,11 @@
  * falls back to its `open` class) and whether several may be open at once
  * (`data-allow-multiple`: "true", or present with no value, allows it).
  *
- * Found STRUCTURALLY as well as by class, on purpose: the block keeps its
- * classes in the `class` attribute, which the publish writer drops (it emits
- * only the element's class list) — so on a published page an item is the
- * root's child, its header the first button (or first child), its panel the
- * last child. On the canvas, where "false"-valued attributes are not emitted,
+ * Found STRUCTURALLY as well as by class, on purpose: pages published before
+ * the writers merged a block's `class` attribute (2026-09-28) carry no
+ * accordion classes until re-published — so an item is also the root's
+ * child, its header the first button (or first child), its panel the last
+ * child. On the canvas, where "false"-valued attributes are not emitted,
  * the root is found by its `data-buildrick-type`.
  *
  * The runtime applies that state (panel height, `aria-expanded`) and, on a

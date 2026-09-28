@@ -57,7 +57,7 @@ function buildAccordion(
       attributes: {
         class: `accordion-item${index === 0 ? " open" : ""}`,
         /* Read by the accordion runtime and the Inspector's Open / Closed
-           row — the class attribute does not survive publishing. */
+           row — the state, not the presentational `open` class. */
         "data-accordion-state": index === 0 ? "open" : "closed",
       },
       styles: {

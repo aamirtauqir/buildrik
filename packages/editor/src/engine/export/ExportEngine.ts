@@ -47,7 +47,7 @@ import { SitemapGenerator } from "./SitemapGenerator";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./interactionRuntime";
-import { isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
+import { classTokens, isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
 import { embedFrameHTML } from "@/shared/utils/embed/embedFrameHTML";
 
 // ============================================================================
@@ -412,7 +412,9 @@ export class ExportEngine {
        joined them (:753); this one emitted only the generated per-element
        class, so a download dropped every class the Classes panel adds and the
        CSS written against those class names had nothing to match. */
-    const className = [`${config.cssPrefix}${id}`, ...(element.getClasses?.() ?? [])].join(" ");
+    /* …and a block's stored `class` attribute (Accordion, Tabs, …), merged
+       once each — skipped below so it is not emitted twice. */
+    const className = classTokens([`${config.cssPrefix}${id}`], element.getClasses?.(), attrs.class).join(" ");
     const indentStr = config.minify ? "" : "  ".repeat(indent);
     const newline = config.minify ? "" : "\n";
 
@@ -424,8 +426,8 @@ export class ExportEngine {
        target, id — so the HTML and ZIP exports silently dropped everything
        else the Element Properties inspector writes: rel, title, poster, value,
        placeholder, name, required, download, and every aria- / data- attribute an
-       element had. class and style come from their canonical fields above and
-       below, so a raw attribute mirroring them would double-emit. */
+       element had. class (merged into className above) and style come from
+       their canonical fields, so a raw attribute would double-emit. */
     // A linked section/container: the link goes on a wrapping <a> (see
     // blockLinkPlan for the strategy and the nested-link rule).
     const blockLink = blockLinkPlan(tag, attrs, children, readLiveNode);
@@ -1158,7 +1160,9 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
     //    so @media breakpoint overrides win by source order — see the cascade
     //    note on buildPublishBaseCss.
     attrParts.push(`data-buildrick-id="${escapeHTML(element.id)}"`);
-    const classNames = [`${this.config.cssPrefix}${element.id}`, ...(element.classes ?? [])].join(" ");
+    /* A block's classes live in `attributes.class` (Accordion, Tabs, Table, …);
+       skipping that attribute as a mirror of `classes` published them bare. */
+    const classNames = classTokens([`${this.config.cssPrefix}${element.id}`], element.classes, element.attributes?.class).join(" ");
     attrParts.push(`class="${escapeHTML(classNames)}"`);
 
     /* An <input> with no `type` is a text box. Twelve form types were missing
@@ -1179,8 +1183,8 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
 
     if (element.attributes) {
       for (const [key, value] of Object.entries(element.attributes)) {
-        // class/style/data-buildrick-id emitted above from their canonical
-        // fields — don't double-emit if a raw attribute mirrors them.
+        // class (merged into classNames above), style and data-buildrick-id
+        // are emitted from their canonical fields — don't double-emit.
         if (key === "class" || key === "style" || key === "data-buildrick-id") continue;
         // Internal page links carry the inspector's `#page:<id>` scheme — this
         // is the writer the PUBLISH path uses, so resolving it only in the
