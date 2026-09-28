@@ -38,7 +38,7 @@ vi.mock("../../tabs/InspectorTabContent", () => ({
     return <div ref={ref} data-testid="inspector-body" />;
   },
 }));
-vi.mock("../../sections/VariantSection", () => ({ VariantSection: () => null }));
+vi.mock("../../sections/ComponentRow", () => ({ ComponentRow: () => null }));
 vi.mock("../InspectorElementMenu", () => ({ InspectorElementMenu: () => null }));
 vi.mock("../DeleteConfirmModal", () => ({ DeleteConfirmModal: () => null }));
 
