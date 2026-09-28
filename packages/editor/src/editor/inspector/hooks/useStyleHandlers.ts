@@ -2,12 +2,11 @@
  * useStyleHandlers Hook
  * Manages style change handlers with breakpoint and pseudo-state awareness
  *
- * `reachPeerIds` is board 160:412's "All like this" mode, applied at the one
- * place every single-element inspector edit already passes through. The mode
- * used to be a one-shot in ScopeDropdown that copied this element's WHOLE
- * style map onto its peers; here only the property being edited moves, to the
- * same breakpoint and pseudo-state, inside the same transaction — so one ⌘Z
- * takes the whole fan-out back.
+ * `extraTargetIds` is the rest of a multi-selection (DD-12): every edit lands
+ * on the primary element AND those, only the property being edited, at the
+ * same breakpoint and pseudo-state, inside one transaction — so one ⌘Z takes
+ * the whole selection back. Locked members are skipped by the lock gate.
+ * `blocked` (a pending save conflict, Q4) refuses every write.
  *
  * @license BSD-3-Clause
  */
@@ -82,8 +81,10 @@ export function useStyleHandlers(
   composer: Composer | null | undefined,
   currentBreakpoint: BreakpointId,
   currentPseudoState: PseudoStateId,
-  /** Same-type peers each edit also lands on. Empty unless "All like this". */
-  reachPeerIds: string[] = []
+  /** The rest of the selection each edit also lands on (DD-12). */
+  extraTargetIds: readonly string[] = [],
+  /** Refuse every write (a save conflict is pending). */
+  blocked = false
 ): StyleHandlers {
   const [styles, setStyles] = useState<Record<string, string>>({});
   const [overriddenProperties, setOverriddenProperties] = useState<Set<string>>(new Set());
@@ -187,7 +188,7 @@ export function useStyleHandlers(
   // Immediate visual update + 300ms debounced history entry to prevent keystroke spam
   const handleStyleChange = useCallback(
     (property: string, value: string) => {
-      if (!selectedElement?.id) return;
+      if (!selectedElement?.id || blocked) return;
 
       /* P-1: a locked element is read-only; the lock gate refuses and says so. */
       if (!composer || !canWrite(composer, selectedElement.id)) return;
@@ -268,15 +269,15 @@ export function useStyleHandlers(
       const flush = () => {
         if (!composer?.elements.getElement(selectedElement.id)) return;
         /* Re-read inside the flush — avoids a stale closure if an element was
-           replaced. P-1: a locked peer in an "All like this" reach is skipped
-           by the lock gate, which says so. */
+           replaced. P-1: a locked member of the selection is skipped by the
+           lock gate, which says so. */
         const targets = writableElements(
           composer,
-          [selectedElement.id, ...reachPeerIds].map((id) => composer.elements.getElement(id)),
+          [selectedElement.id, ...extraTargetIds].map((id) => composer.elements.getElement(id)),
         );
         if (targets.length === 0) return;
-        /* One transaction around the selected element AND its reach, so a
-           fan-out to twelve buttons is one undo step rather than twelve. */
+        /* One transaction around the whole selection, so an edit to three
+           headings is one undo step rather than three. */
         composer.beginTransaction?.("style-change");
         try {
           for (const el of targets) writeOne(el);
@@ -287,13 +288,13 @@ export function useStyleHandlers(
       pendingFlushRef.current = { property, run: flush };
       debounceTimerRef.current = setTimeout(flushPending, 300);
     },
-    [selectedElement, composer, currentBreakpoint, currentPseudoState, reachPeerIds, flushPending]
+    [selectedElement, composer, currentBreakpoint, currentPseudoState, extraTargetIds, blocked, flushPending]
   );
 
   // Batch style change handler
   const handleBatchStyleChange = useCallback(
     (changes: Record<string, string>) => {
-      if (!selectedElement?.id) return;
+      if (!selectedElement?.id || blocked) return;
 
       if (!composer) return;
       const [el] = writableElements(composer, [composer.elements.getElement(selectedElement.id)]);
@@ -386,7 +387,7 @@ export function useStyleHandlers(
         composer?.endTransaction?.();
       }
     },
-    [selectedElement, composer, currentBreakpoint, currentPseudoState, flushPending]
+    [selectedElement, composer, currentBreakpoint, currentPseudoState, blocked, flushPending]
   );
 
   return {

@@ -15,7 +15,7 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
+import { useElementBinding } from "../hooks/useElementBinding";
 import { canWrite } from "@/engine/commands/commandOperations";
 
 export interface BindingBannerProps {
@@ -25,42 +25,12 @@ export interface BindingBannerProps {
   elementLabel: string;
 }
 
-/** The field an element follows, named the way the board names it. */
-export function useElementBinding(
-  composer: Composer | null | undefined,
-  elementId: string
-): string | null {
-  const read = React.useCallback((): string | null => {
-    const bindings = composer?.cms?.bindings?.getBindings?.(elementId) ?? [];
-    const first = bindings[0];
-    if (!first) return null;
-    const collection = composer?.cms?.collections?.getCollection?.(first.collectionId);
-    return `${collection?.name ?? first.collectionId}.${first.fieldSlug}`;
-  }, [composer, elementId]);
-
-  const [label, setLabel] = React.useState<string | null>(read);
-
-  React.useEffect(() => {
-    setLabel(read());
-    if (!composer) return;
-    const refresh = () => setLabel(read());
-    composer.on(EVENTS.BINDING_CREATED, refresh);
-    composer.on(EVENTS.BINDING_REMOVED, refresh);
-    return () => {
-      composer.off(EVENTS.BINDING_CREATED, refresh);
-      composer.off(EVENTS.BINDING_REMOVED, refresh);
-    };
-  }, [composer, read]);
-
-  return label;
-}
-
 export const BindingBanner: React.FC<BindingBannerProps> = ({
   composer,
   elementId,
   elementLabel,
 }) => {
-  const label = useElementBinding(composer, elementId);
+  const label = useElementBinding(composer, elementId)?.label;
   if (!label) return null;
 
   return (

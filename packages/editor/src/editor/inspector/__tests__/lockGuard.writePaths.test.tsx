@@ -34,7 +34,7 @@ import { SlidesSection } from "../sections/SlidesSection";
 import { LinkSection } from "../sections/LinkSection";
 import { CSSClassesSection } from "../sections/CSSClassesSection";
 import { CollectionListSection } from "../sections/CollectionListSection";
-import { BreakpointOverrides } from "../components/BreakpointOverrides";
+import { useFieldOverrides } from "../hooks/useFieldOverrides";
 import { BindingBanner } from "../components/BindingBanner";
 import { InspectorElementMenu } from "../components/InspectorElementMenu";
 import { useBatchStyleHandler } from "../hooks/useBatchStyleHandler";
@@ -156,12 +156,12 @@ describe("P-1 — structure writers refuse a locked form / slider", () => {
 });
 
 describe("P-1 — style resets refuse a locked element", () => {
-  it("BreakpointOverrides: Revert all", () => {
+  it("Context row: Revert (the breakpoint's overrides)", () => {
     const h = add("heading", { content: "T" });
     composer.styles.setBreakpointStyle(h.getId(), "tablet", { color: "rgb(1, 1, 1)" });
     lock(h);
-    render(<BreakpointOverrides composer={composer} elementId={h.getId()} breakpoint="tablet" />);
-    fireEvent.click(screen.getByTestId("breakpoint-overrides-revert-all"));
+    const { result } = renderHook(() => useFieldOverrides(composer, h.getId(), "tablet"));
+    act(() => result.current.revertBreakpoint());
     expect(composer.styles.getBreakpointStyle(h.getId(), "tablet")).toEqual({ color: "rgb(1, 1, 1)" });
     expect(skipped).toHaveBeenCalled();
   });

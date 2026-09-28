@@ -11,6 +11,7 @@
 
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
+import { useInspectorField } from "./InspectorFieldContext";
 import { TextField, Button, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { DSBindingChip } from "../../sections/DSBindingChip";
@@ -54,6 +55,8 @@ interface AxisInputProps {
 }
 
 const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, composer }) => {
+  /* Read-only (locked element, save conflict) keeps the value legible. */
+  const { readOnly } = useInspectorField();
   const [local, setLocal] = React.useState(() => parseValue(value));
 
   React.useEffect(() => {
@@ -92,6 +95,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, 
         className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
         value={display}
         disabled={disabled}
+        readOnly={readOnly}
         aria-label={`${side}`}
         onChange={(e) => {
           const next = e.target.value;

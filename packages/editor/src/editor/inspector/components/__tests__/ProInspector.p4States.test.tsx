@@ -1,6 +1,6 @@
 /**
- * ProInspector P4 states — AI agent takeover (board 160:512) and the
- * whole-site scope banner (board 189:2). Uses the same narrow mock harness
+ * ProInspector P4 states — AI agent takeover (board 160:512); the
+ * whole-site scope banner (board 189:2) is gone with the scope row (DD-6a). Uses the same narrow mock harness
  * as the createCollectionThreading test: heavy subtrees stubbed, the
  * states under test rendered for real.
  *
@@ -93,28 +93,12 @@ describe("ProInspector P4 states", () => {
     expect(screen.getByTestId("inspector-body")).toBeInTheDocument();
   });
 
-  it("selecting Whole site shows the banner and Open Brand routes to the Brand panel", () => {
-    const composer = mount();
-    fireEvent.click(screen.getByRole("button", { name: /Edit reach/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Whole site/ }));
-
-    expect(screen.getByTestId("inspector-whole-site")).toBeInTheDocument();
-    expect(screen.getByText("Editing the whole site — every page")).toBeInTheDocument();
-    expect(screen.queryByTestId("inspector-body")).toBeNull();
-
-    fireEvent.click(screen.getByRole("button", { name: "Open Brand" }));
-    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "design" });
-
-    // Back to the element restores the controls.
-    // (banner cleared — Open Brand keeps it until the user returns)
-  });
-
-  it("'Back to this element' leaves the whole-site banner", () => {
+  /* DD-6a/6b: the Applies-to scope and its Whole site takeover are gone —
+     the one reach beyond this element is ⋯ "Apply style to all …". */
+  it("offers no scope row: no Applies to, no Whole site", () => {
     mount();
-    fireEvent.click(screen.getByRole("button", { name: /Edit reach/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Whole site/ }));
-    fireEvent.click(screen.getByRole("button", { name: "Back to this element" }));
+    expect(screen.queryByText("Applies to")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Whole site|Edit reach/ })).toBeNull();
     expect(screen.queryByTestId("inspector-whole-site")).toBeNull();
-    expect(screen.getByTestId("inspector-body")).toBeInTheDocument();
   });
 });

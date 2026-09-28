@@ -9,6 +9,8 @@ import { isTokenVar, resolveTokenVar } from "../tokenBindingDetection";
 import { Info, X } from "lucide-react";
 import * as React from "react";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
+import { FieldDot } from "./FieldDot";
+import { useInspectorField } from "./InspectorFieldContext";
 import { TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Button, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 // ============================================================================
 // HELPERS
@@ -46,6 +48,9 @@ export interface InputRowProps {
   textarea?: boolean;
   isOverridden?: boolean;
   helperText?: string;
+  /** The CSS property this row edits — the field context reads read-only,
+   *  "Mixed" and its override dot by it (InspectorFieldContext). */
+  property?: string;
 }
 
 export const InputRow: React.FC<InputRowProps> = ({
@@ -57,7 +62,9 @@ export const InputRow: React.FC<InputRowProps> = ({
   textarea = false,
   isOverridden,
   helperText,
+  property,
 }) => {
+  const field = useInspectorField(property);
   /* The label sat next to the control with nothing joining them, so every row
      in the inspector had a visible label and no accessible name: a screen
      reader announced "edit text", and `getByLabelText` could not find the
@@ -68,6 +75,7 @@ export const InputRow: React.FC<InputRowProps> = ({
     <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={controlId}>
       {label}
       {isOverridden && <OverrideDot />}
+      <FieldDot field={field} />
       {helperText && <HelperIcon text={helperText} />}
     </label>
     <div className="bdi-row-content">
@@ -75,6 +83,7 @@ export const InputRow: React.FC<InputRowProps> = ({
         <Textarea
           id={controlId}
           className="bdi-text"
+          readOnly={field.readOnly}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
@@ -83,6 +92,7 @@ export const InputRow: React.FC<InputRowProps> = ({
         <TextField
           id={controlId}
           className="bdi-text"
+          readOnly={field.readOnly}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -122,6 +132,9 @@ export interface InputWithUnitProps {
    * beside them were both named.
    */
   ariaLabel?: string;
+  /** The CSS property this row edits — the field context reads read-only,
+   *  "Mixed" and its override dot by it (InspectorFieldContext). */
+  property?: string;
 }
 
 function isValidCSSNumber(val: string): boolean {
@@ -143,7 +156,9 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   helperText,
   fieldIcon,
   ariaLabel,
+  property,
 }) => {
+  const field = useInspectorField(property);
   const [isRowHovered, setIsRowHovered] = React.useState(false);
 
   const parseValue = (val: string): { num: string; unit: string } => {
@@ -245,7 +260,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
     }
   };
 
-  const hasValue = !disabled && value !== "" && value !== undefined;
+  const hasValue = !disabled && !field.readOnly && value !== "" && value !== undefined;
   const showReset = hasValue && isRowHovered && !isTokenVar(inputValue);
 
 
@@ -263,6 +278,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
         <label className="bdi-lb" data-testid={labelTestId(label)}>
           {label}
           {isOverridden && <OverrideDot />}
+          <FieldDot field={field} />
           {helperText && <HelperIcon text={helperText} />}
         </label>
       ) : null}
@@ -290,6 +306,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
             // so the "auto" class has to reach the input through `theme`,
             // not `className`.
             theme={{ field: { input: { base: isKeywordUnit ? "auto" : "" } } }}
+            readOnly={field.readOnly}
             disabled={disabled || (isKeywordUnit && !isTokenVar(inputValue))}
             aria-invalid={isInvalid}
             style={{
@@ -369,6 +386,9 @@ export interface SelectRowProps {
   isOverridden?: boolean;
   helperText?: string;
   placeholder?: string;
+  /** The CSS property this row edits — the field context reads read-only,
+   *  "Mixed" and its override dot by it (InspectorFieldContext). */
+  property?: string;
 }
 
 export const SelectRow: React.FC<SelectRowProps> = ({
@@ -379,7 +399,9 @@ export const SelectRow: React.FC<SelectRowProps> = ({
   isOverridden,
   helperText,
   placeholder = "Default",
+  property,
 }) => {
+  const field = useInspectorField(property);
   /* The label sat beside the <select> with nothing tying them together, so
      six selects in the inspector announced no name at all — a screen reader
      read the option list and never what it was choosing. */
@@ -389,12 +411,15 @@ export const SelectRow: React.FC<SelectRowProps> = ({
       <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={id}>
         {label}
         {isOverridden && <OverrideDot />}
+        <FieldDot field={field} />
         {helperText && <HelperIcon text={helperText} />}
       </label>
       <div className="bdi-row-content">
         <div className="bdi-ddn" data-testid={fieldTestId(label)}>
           <Select
             id={id}
+            disabled={field.readOnly}
+            aria-readonly={field.readOnly || undefined}
             className="bdi-v"
             theme={BK_SELECT_BARE_VALUE_THEME}
             value={value}

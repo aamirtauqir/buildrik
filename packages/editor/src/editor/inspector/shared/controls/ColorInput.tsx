@@ -9,6 +9,7 @@ import { Popover, Button, TextField } from "@/editor/chrome-ui";
 
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
+import { useInspectorField } from "./InspectorFieldContext";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
@@ -60,6 +61,8 @@ export interface ColorInputProps {
   /** Shown in the empty hex field — the batch panel passes "Mixed" when the
    *  selection disagrees (board 159:123). */
   placeholder?: string;
+  /** The CSS property it edits — read-only and the override dot come from the field context. */
+  property?: string;
 }
 
 export const ColorInput: React.FC<ColorInputProps> = ({
@@ -68,7 +71,9 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   onChange,
   composer,
   placeholder,
+  property,
 }) => {
+  const field = useInspectorField(property);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const { tokens: colorTokens } = useColorRegistry();
@@ -177,6 +182,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                 className="bdi-sw"
                 aria-label={`Choose ${label} color`}
                 aria-expanded={isOpen}
+                disabled={field.readOnly}
                 onClick={() => setIsOpen((v) => !v)}
               >
                 <span className="bdi-sw-fill" style={{ background: swatchColor }} />

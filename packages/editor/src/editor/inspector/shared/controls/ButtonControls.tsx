@@ -6,6 +6,8 @@
  */
 
 import * as React from "react";
+import { FieldDot } from "./FieldDot";
+import { useInspectorField } from "./InspectorFieldContext";
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 
@@ -23,9 +25,12 @@ export interface ButtonGroupProps {
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string; icon?: React.ReactNode | string }[];
+  /** The CSS property it edits — read-only and the override dot come from the field context. */
+  property?: string;
 }
 
-export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange, options }) => {
+export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange, options, property }) => {
+  const field = useInspectorField(property);
   const segment = (
     <div
       className="bdi-seg"
@@ -44,6 +49,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
              `check-anchors`'s template matcher. */
           data-testid={label ? segTestId(label, opt.value) : undefined}
           className={value === opt.value ? "on" : ""}
+          disabled={field.readOnly}
           onClick={() => onChange(opt.value)}
           title={opt.label}
           aria-label={opt.label}
@@ -65,7 +71,10 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
 
   return (
     <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
-      <label className="bdi-lb" data-testid={labelTestId(label)}>{label}</label>
+      <label className="bdi-lb" data-testid={labelTestId(label)}>
+        {label}
+        <FieldDot field={field} />
+      </label>
       <div className="bdi-row-content">{segment}</div>
     </div>
   );

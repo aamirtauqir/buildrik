@@ -1,47 +1,55 @@
 /**
- * Aquibra Pro Inspector Panel
- * Redesign: ported to .bdi-* namespace per /design-system/preview/comp-inspector.v1.html
- * Tokens: --bd-* only
+ * ProInspector — the right-column Inspector (v4 chassis, build plan §1).
+ *
+ * Composition, top to bottom:
+ *   header       — breadcrumb · icon + name · ✦ AI · ⋯ · ✕ · status marks
+ *   status line  — why the panel is read-only (locked / save conflict)
+ *   multi bar    — Align / Distribute / Group, when 2+ are selected (DD-12)
+ *   tabs         — Style · Behaviour · Effects (DD-1, Q1)
+ *   context row  — State / breakpoint, on Style and Effects only (R-DD-14)
+ *   tab panel    — the tab's sections in their fixed order (InspectorTabContent)
+ *
+ * Nothing selected, or the page root selected → the Page panel (DD-13).
+ * The field context (read-only, Mixed, override dots) is provided once here
+ * and read by the shared controls.
  *
  * @license BSD-3-Clause
  */
 
-import { Link } from "lucide-react";
 import * as React from "react";
-import { getElementIcon } from "@/editor/shared/elementIcons";
-import { BindingBanner, useElementBinding } from "./components/BindingBanner";
-import { ScopeDropdown } from "./components/ScopeDropdown";
-import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
-import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
-import type { Composer } from "../../engine";
-import { isValidBreakpoint } from "../../shared/constants/breakpoints";
-import { EVENTS } from "../../shared/constants/events";
-import type { TabId } from "./sections/registry";
-import type { DeviceType, PseudoStateId } from "../../shared/types";
-import type { BreakpointId } from "../../shared/types/breakpoints";
-import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
+import type { Composer, Element } from "@/engine";
+import { getBreakpointQuery, isValidBreakpoint, BREAKPOINTS } from "@/shared/constants/breakpoints";
+import { EVENTS } from "@/shared/constants/events";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
+import type { DeviceType, PseudoStateId } from "@/shared/types";
+import type { BreakpointId } from "@/shared/types/breakpoints";
+import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
+import { Tabs } from "@/editor/chrome-ui";
+import { writeElement } from "@/engine/commands/commandOperations";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
-import { InspectorElementMenu } from "./components/InspectorElementMenu";
+import { useSaveConflict } from "../shell/hooks/useSaveConflict";
 import { ApplyStyleDialog } from "./components/ApplyStyleDialog";
-import { ElementNameField } from "./components/ElementNameField";
-import { LockedBanner } from "./components/LockedBanner";
-import { InspectorEmptyState } from "./components/InspectorEmptyState";
-import { InspectorLoading } from "./components/InspectorLoading";
-import { BreakpointOverrides } from "./components/BreakpointOverrides";
+import { ContextRow } from "./components/ContextRow";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
-import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
+import { InspectorHeader } from "./components/InspectorHeader";
+import { InspectorLoading } from "./components/InspectorLoading";
+import { MultiSelectBar } from "./components/MultiSelectBar";
+import { PagePanel } from "./components/PagePanel";
+import { StatusLine } from "./components/StatusLine";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
+import { useElementBinding } from "./hooks/useElementBinding";
+import { useElementLocked } from "./hooks/useElementLocked";
+import { useFieldOverrides } from "./hooks/useFieldOverrides";
 import { usePropertyJump } from "./hooks/usePropertyJump";
-import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY } from "./sections/registry";
+import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY, type TabId } from "./sections/registry";
 import { computeEffectiveStyles, deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
 import { detectMixedValues } from "./shared/detectMixedValues";
-import type { Element } from "../../engine";
+import { InspectorFieldContext, type InspectorFieldContextValue } from "./shared/controls/InspectorFieldContext";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
 import "./styles/inspector.css";
-import { Button, Tabs } from "@/editor/chrome-ui";
 
 /** Three equal 100px tabs, 32 tall, the active one accent with a 2px
  *  underline (board 1), merged over chrome-ui's pill tab via twMerge. */
@@ -50,6 +58,8 @@ const INSPECTOR_TAB_CLASS =
   "tw:border-b-2 tw:border-transparent tw:hover:bg-transparent " +
   "tw:aria-selected:font-medium tw:aria-selected:text-[var(--bk-accent-text)] " +
   "tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent tw:aria-selected:border-[var(--bk-accent)]";
+
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -80,7 +90,7 @@ export interface ProInspectorProps {
 // ============================================================================
 
 export const ProInspector: React.FC<ProInspectorProps> = ({
-  selectedElement,
+  selectedElement: selectedProp,
   composer,
   currentBreakpoint: currentBreakpointProp = "desktop",
   onOpenMediaLibrary,
@@ -91,46 +101,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     ? currentBreakpointProp
     : "desktop";
 
-  const {
-    currentPseudoState,
-    setCurrentPseudoState,
-  } = useInspectorState(selectedElement);
+  /* The page root is the page, not an element: it gets the Page panel (DD-13). */
+  const rootId = composer?.elements?.getActivePage?.()?.root.id;
+  const selectedElement = selectedProp && selectedProp.id !== rootId ? selectedProp : null;
 
-  // Board 189:2 — "Whole site" scope shows the site-wide banner instead of
-  // per-element controls (site styles live in the Brand panel).
-  const [wholeSite, setWholeSite] = React.useState(false);
-  /* Board 160:412 draws a reach beyond this element as a STATE the panel is
-     in — a banner reading "Editing all 12 buttons — All like this" that stays
-     up while you work. It used to be a one-shot: picking "All like this"
-     copied every style off this element onto its peers and closed, which is a
-     different and much larger thing than the banner describes. A peer that had
-     its own padding, its own colour, its own size lost all three to an action
-     whose only warning was a count.
-
-     Now it is the mode the board draws: the edits you make from here go to the
-     peers as you make them, and nothing else about them is touched. */
-  const [reachAll, setReachAll] = React.useState(false);
-  React.useEffect(() => {
-    setWholeSite(false); // scope resets with the selection
-    setReachAll(false);
-  }, [selectedElement?.id]);
-
-  /* The peers the mode reaches, recomputed off the live element set. Same
-     filter ScopeDropdown counts with — one definition, so the banner's number
-     and the elements actually written can never disagree. */
-  const reachPeerIds = React.useMemo(() => {
-    if (!reachAll || !selectedElement?.id) return [];
-    try {
-      return (composer?.elements?.getAllElements?.() ?? [])
-        .filter(
-          (e) => e.getType?.() === selectedElement.type && e.getId?.() !== selectedElement.id
-        )
-        .map((e) => e.getId?.())
-        .filter((id): id is string => Boolean(id));
-    } catch {
-      return [];
-    }
-  }, [reachAll, composer, selectedElement?.id, selectedElement?.type]);
+  const { currentPseudoState, setCurrentPseudoState } = useInspectorState(selectedElement);
 
   // Board 160:512 — while the AI agent runs, the inspector hands over to a
   // status card; selection is kept and restored on return.
@@ -159,23 +134,31 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     };
   }, [composer]);
 
+  const { selectedIds } = useComposerSelection({ composer: composer ?? null });
+  const projectLoading = useProjectLoading(composer ?? null);
+
+  /* The whole selection, primary first — a write lands on every one (DD-12). */
+  const targetIds = React.useMemo<readonly string[]>(() => {
+    const primary = selectedElement?.id;
+    if (!primary) return [];
+    return [primary, ...selectedIds.filter((id) => id !== primary && id !== rootId)];
+  }, [selectedElement?.id, selectedIds, rootId]);
+  const extraTargetIds = React.useMemo(() => targetIds.slice(1), [targetIds]);
+
+  const locked = useElementLocked(composer, selectedElement?.id);
+  const conflict = useSaveConflict();
+  const binding = useElementBinding(composer, selectedElement?.id ?? "");
+
   const {
     styles: styles_state,
     handleStyleChange,
     handleBatchStyleChange,
     overriddenProperties,
-  } = useStyleHandlers(
-    selectedElement,
-    composer,
-    currentBreakpoint,
-    currentPseudoState,
-    reachPeerIds
-  );
+  } = useStyleHandlers(selectedElement, composer, currentBreakpoint, currentPseudoState, extraTargetIds, conflict.pending);
 
   // Pseudo-states with overrides — breakpoint-qualified so mobile/tablet
-  // pseudo rules light up the indicator pills at the active zoom level.
-  // Logic extracted for testability; see config/pseudoOverrides.ts.
-  const statesWithOverrides = React.useMemo<Set<PseudoStateId>>(
+  // pseudo rules light up at the active breakpoint (config/pseudoOverrides.ts).
+  const statesWithOverrides = React.useMemo(
     () => computeStatesWithOverrides(selectedElement?.id, composer, currentBreakpoint),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedElement?.id, composer, styles_state, currentBreakpoint]
@@ -200,82 +183,80 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     elementId: selectedElement?.id ?? null,
   });
   const contentRef = React.useRef<HTMLDivElement>(null);
-
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
-
-  const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
-  const projectLoading = useProjectLoading(composer ?? null);
-  const boundLabel = useElementBinding(composer, selectedElement?.id ?? "");
 
   const [contextState, setContextState] = React.useState(() =>
     deriveCssContext(selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState)
   );
   const propertyStates = getPropertyStates(contextState);
-
-  if (overriddenProperties) {
-    overriddenProperties.forEach((prop) => {
-      if (!propertyStates[prop]) propertyStates[prop] = {};
-      propertyStates[prop].isOverridden = true;
-    });
-  }
-
+  overriddenProperties?.forEach((prop) => {
+    if (!propertyStates[prop]) propertyStates[prop] = {};
+    propertyStates[prop].isOverridden = true;
+  });
   React.useEffect(() => {
     setContextState(deriveCssContext(selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState));
   }, [selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState]);
 
   const selectedElements = React.useMemo<readonly Element[]>(() => {
-    if (!composer || selectedIds.length === 0) return [];
-    return selectedIds
-      .map((id) => composer.elements.getElement(id))
-      .filter((el): el is Element => !!el);
-  }, [composer, selectedIds]);
-
-  /* The whole selection, primary first — a write lands on every one (DD-12). */
-  const targetIds = React.useMemo<readonly string[]>(() => {
-    const primary = selectedElement?.id;
-    if (!primary) return [];
-    return [primary, ...selectedIds.filter((id) => id !== primary)];
-  }, [selectedElement?.id, selectedIds]);
-  const selectedTypes = React.useMemo(
-    () => selectedElements.map((el) => el.getType?.() ?? "custom"),
-    [selectedElements]
-  );
+    if (!composer) return [];
+    return targetIds.map((id) => composer.elements.getElement(id)).filter((el): el is Element => !!el);
+  }, [composer, targetIds]);
+  const selectedTypes = React.useMemo(() => selectedElements.map((el) => el.getType?.() ?? "custom"), [selectedElements]);
 
   /* The element's OWN values here — what "has a value" means for the "+"
      rows (DD-11); `styles_state` also carries type defaults and computed
-     fallbacks, which would open Fill on every element. Re-read whenever the
-     panel's styles change. */
+     fallbacks, which would open Fill on every element. */
   const authoredStyles = React.useMemo<Record<string, string>>(() => {
     const el = selectedElement?.id ? composer?.elements?.getElement?.(selectedElement.id) : null;
     return el && composer ? computeEffectiveStyles(el, composer, currentBreakpoint, currentPseudoState) : {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedElement?.id, composer, currentBreakpoint, currentPseudoState, styles_state]);
 
-  const allStyleKeys = React.useMemo<readonly string[]>(() => {
-    return Array.from(
-      new Set(
-        Object.values(SECTION_REGISTRY).flatMap((entry) => entry.styleKeys as string[])
-      )
-    );
-  }, []);
-
-  const mixedKeys = React.useMemo(
-    () => detectMixedValues(selectedElements, allStyleKeys),
-    [selectedElements, allStyleKeys]
+  const allStyleKeys = React.useMemo<readonly string[]>(
+    () => Array.from(new Set(Object.values(SECTION_REGISTRY).flatMap((entry) => entry.styleKeys as string[]))),
+    []
   );
-
+  const mixedKeys = React.useMemo(() => detectMixedValues(selectedElements, allStyleKeys), [selectedElements, allStyleKeys]);
   const enrichedContext = React.useMemo(
     () => ({ ...contextState, selectedElements, mixedKeys }),
     [contextState, selectedElements, mixedKeys]
   );
 
+  /* Overrides + the context row's counts. */
+  const fieldOverrides = useFieldOverrides(composer, selectedElement?.id, currentBreakpoint);
+  const breakpointName = currentBreakpoint === "desktop" ? null : BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint;
+  const pseudoSelector = selectedElement ? `[data-buildrick-id="${selectedElement.id}"]` : "";
+  const pseudoMq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
+  const stateOverrideCount =
+    selectedElement && currentPseudoState !== "normal"
+      ? Object.keys(composer?.styles?.getRule?.(`${pseudoSelector}:${currentPseudoState}`, pseudoMq)?.properties ?? {}).length
+      : 0;
+  const resetState = () => {
+    if (!composer || !selectedElement || currentPseudoState === "normal") return;
+    /* P-9: replace, not merge, or the cleared keys survive. Lock gate first. */
+    writeElement(composer, composer.elements.getElement(selectedElement.id), `reset-${currentPseudoState}`, () => {
+      composer.styles.setRule(pseudoSelector, {}, { pseudo: `:${currentPseudoState}`, mediaQuery: pseudoMq, replace: true });
+    });
+  };
+
+  const readOnly = locked || conflict.pending;
+  const fieldContext = React.useMemo<InspectorFieldContextValue>(
+    () => ({
+      readOnly,
+      readOnlyReason: conflict.pending ? "conflict" : locked ? "locked" : null,
+      mixedKeys,
+      overrides: fieldOverrides.overrides,
+      overrideLabels: breakpointName ? { breakpoint: breakpointName } : {},
+      resetOverride: fieldOverrides.resetOverride,
+    }),
+    [readOnly, conflict.pending, locked, mixedKeys, fieldOverrides, breakpointName]
+  );
+
   /* Scroll persistence per element (P-7b). The scroll listener is the only
-     writer: it records the element whose body is on screen, and it is bound
-     in a LAYOUT effect so it is detached before the next element's body
-     renders into the same container. The old code also saved the previous
-     element's scrollTop in a passive effect after the switch — by then the
-     new body had clamped it, so every return landed on the other element's
-     clamp. A hidden column (full page: 0×0) is not a position either. */
+     writer: it records the element whose body is on screen, bound in a
+     LAYOUT effect so it is detached before the next element's body renders
+     into the same container. A hidden column (full page: 0×0) is not a
+     position. */
   React.useLayoutEffect(() => {
     const container = contentRef.current;
     if (!container || !selectedElement?.id) return;
@@ -288,10 +269,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return () => container.removeEventListener("scroll", handleScroll);
   }, [selectedElement?.id]);
 
-  /* The restore. An element's sections are not all rendered by the next
-     frame — measured live, the body was still too short to hold the offset
-     and the browser clamped it to 0 — so it re-applies as the body grows,
-     until it holds, the user takes the wheel, or a second has passed. */
+  /* The restore: re-applied as the body grows, until it holds, the user takes
+     the wheel, or a second has passed. */
   React.useEffect(() => {
     const container = contentRef.current;
     if (!selectedElement?.id || !container) return;
@@ -323,301 +302,106 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     };
   }, [selectedElement?.id]);
 
-  /* G2-146 — ⌘K "Jump to property" rows + the reveal behind them and behind
-     the canvas menu's "Add interaction" (UI_INSPECTOR_FOCUS_SECTION). */
-  const selectedType = selectedElement?.type ?? null;
+  /* G2-146 — ⌘K "Jump to property" rows + the reveal behind them, the canvas
+     menu's "Add interaction" and the header's binding chip. */
   usePropertyJump({
     composer,
-    selectedType,
+    selectedType: selectedElement?.type ?? null,
     contentRef,
     setActiveTab,
     openSection: (type, section) => setChoices(type, [section], "open"),
     advancedState,
   });
 
-  const ElementIcon = selectedElement
-    ? getElementIcon(selectedElement.type)
-    : getElementIcon("default");
-  const elementLabel = selectedElement?.type
-    ? (ELEMENT_TYPE_LABELS[selectedElement.type] ??
-      selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1))
-    : "Element";
-
-  // Multi-select short-circuit
-  const hasMultipleSelected = selectedIds.length > 1 || isMultiSelect;
-  if (hasMultipleSelected) {
-    return (
-      <div className="bdi-panel">
-        <MultiSelectToolbar
-          selectedIds={selectedIds}
-          composer={composer ?? null}
-          currentBreakpoint={currentBreakpoint}
-          currentPseudoState={currentPseudoState}
-        />
-      </div>
-    );
-  }
-
   /* Board 159:102 — while the site is still arriving there is nothing to
-     select, and "Select something on the canvas to edit it." over an empty
-     canvas reads as "your site is empty". */
-  if (projectLoading && !selectedElement) {
-    return <InspectorLoading />;
-  }
+     select; an empty canvas message would read as "your site is empty". */
+  if (projectLoading && !selectedElement) return <InspectorLoading />;
+  if (!selectedElement) return <PagePanel composer={composer} />;
 
-  if (!selectedElement) {
-    return <InspectorEmptyState composer={composer} />;
-  }
-
+  const showContextRow = activeTab !== "behaviour";
 
   return (
-    <div className="bdi-panel" data-testid="inspector-panel">
-      <ApplyStyleDialog
-        composer={composer}
-        elementId={applyStyleFor}
-        breakpoint={currentBreakpoint}
-        pseudo={currentPseudoState}
-        onClose={() => setApplyStyleFor(null)}
-      />
-      {/* Live region for selection announcement */}
-      <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
-        {elementLabel} selected
-      </div>
-      {/* Figma 32-2 header — clean `[icon] <Element>  ⋯`. The verbose "YOU ARE
-          EDITING / this container" banner and the tag.class DOM breadcrumb were
-          dropped from the primary view; pick-element + select-parent stay as
-          compact icons, binding + the ⋯ menu on the right. */}
-      <div className="bdi-ehdr" data-testid="inspector-header">
-        <div className="bdi-eic" aria-hidden="true">
-          <ElementIcon size="sm" />
-        </div>
-        <div className="bdi-ename">
-          {/* G2-139: the layer name (else the type), renamed in place. */}
-          <ElementNameField composer={composer} elementId={selectedElement.id} typeLabel={elementLabel} />
-        </div>
-        <div className="bdi-eact">
-          {/* Figma 920:4546 `btn/ai` — THE AI entry point. The rail omits `ai`
-              deliberately (tabsConfig RAIL_FIGMA); the 2026-08-05 Figma arc put
-              this chip on every inspector header instead, and it never shipped:
-              the conformance harness had no recipe for it, so nothing went red. */}
-          <Button
-            type="button"
-            className="tw:h-[22px] tw:px-[7px] tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent)] tw:whitespace-nowrap"
-            title="Ask AI about this element"
-            aria-label="Ask AI about this element"
-            data-testid="inspector-ai-chip"
-            onClick={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
-          >
-            ✦ AI
-          </Button>
-          {/* Board 160:105 — the header carries the fact, not just the way in.
-              A bound element used to be indistinguishable from a loose one
-              until someone opened the link popover. */}
-          {boundLabel && (
-            <span
-              className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-[6px] tw:border tw:border-[var(--bk-accent)] tw:px-[6px] tw:py-[2px] tw:text-[11px] tw:text-[var(--bk-accent)]"
-              title={`Bound to ${boundLabel}`}
-              data-testid="inspector-bound-chip"
-            >
-              <Link size={10} aria-hidden="true" /> Bound
-            </span>
-          )}
-          {/* Board 30: the element-action registry's rows (Delete is the shared
-              `delete` command — the inspected element is the selection). */}
-          <InspectorElementMenu composer={composer} selectedElementId={selectedElement.id} />
-        </div>
-      </div>
-      {/* Boards 4428:141170 / 141642 / 142686 — Style · Settings · Effects.
-          The sections each tab holds are the registry's `tab` tags; the strip
-          only picks which set the body renders. */}
-      {!wholeSite && !agentRun.running && (
-        <Tabs
-          tabs={INSPECTOR_TABS}
-          value={activeTab}
-          onChange={(id) => setActiveTab(id as TabId)}
-          label="Inspector tabs"
-          data-testid="inspector-tab-strip"
-          /* Board 4428:141170: three equal tabs, 36 tall, the active one
-             underlined in the accent — not left-packed tinted pills. */
-          className="tw:h-9 tw:p-0 tw:gap-0 tw:border-b tw:border-[var(--bk-border)]"
-          tabClassName={INSPECTOR_TAB_CLASS}
-        />
-      )}
-      {/* Board 4428:141170: "Applies to [This element ▾]" sits UNDER the tab
-          strip (it was a pill row above it). The state pill stays on the row
-          — pseudo-state editing has no other door. */}
-      <div className="bdi-bpr" data-testid="inspector-context-row">
-        <span className="bdi-bpr-label">Applies to</span>
-        <ScopeDropdown
+    <InspectorFieldContext.Provider value={fieldContext}>
+      <div className="bdi-panel" data-testid="inspector-panel" data-readonly={readOnly || undefined}>
+        <ApplyStyleDialog
           composer={composer}
-          selectedElement={{ id: selectedElement.id, type: selectedElement.type }}
-          reachAll={reachAll}
-          onReachAllChange={setReachAll}
-          onWholeSite={() => setWholeSite(true)}
-        />
-        <StateDropdown
-          current={currentPseudoState}
-          onChange={setCurrentPseudoState}
-          withOverrides={statesWithOverrides}
-        />
-      </div>
-      <LockedBanner composer={composer} elementId={selectedElement.id} />
-
-      {/* Every banner below annotates THE CONTROLS BELOW IT — which scope a
-          write lands on, which breakpoint it overrides, which instance it
-          follows. The two takeovers (whole-site, and an AI run) replace those
-          controls entirely, so a banner that outlives them describes nothing
-          and contradicts the takeover: measured 2026-08-31 with reach set to
-          "All like this", the panel showed "Editing all 4 paragraphs — All
-          like this" directly above "Editing the whole site — every page",
-          with zero controls between them. A banner does not outlive its
-          controls. */}
-      {!wholeSite && !agentRun.running && (
-        <>
-        {/* Board 160:412's banner: "Editing all 12 buttons — All like this", one
-            line, no exit control of its own. It counts the peers PLUS this
-            element, because that is what "all" means to the person reading it,
-            and it stays up for as long as the mode is on. The way out is the
-            same pill that turned it on — which now reads "All like this", so the
-            banner and the control agree about where you are. */}
-        {reachAll && (
-          // Board 160:510 ("Reach note") carries no left accent bar at all —
-          // the extra 2px `border-l-2` was never in the frame, and the
-          // banner's own inset is x16 in a 300-wide frame (px-4, not px-3).
-          <p
-            className="tw:m-0 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:pt-2.5 tw:pb-2 tw:text-[12px]/[18px] tw:font-normal tw:text-[var(--bk-warning-text)]"
-            role="status"
-            data-testid="reach-all-banner"
-          >
-            Editing all {reachPeerIds.length + 1} {selectedElement.type}
-            {reachPeerIds.length === 0 ? "" : "s"} — All like this
-          </p>
-        )}
-        {/* Board 160:105 — a bound element says what it follows, above the
-            controls that no longer decide anything. */}
-        <BindingBanner
-          composer={composer}
-          elementId={selectedElement.id}
-          elementLabel={elementLabel}
-        />
-        {/* Board 160:313 — a picked state is a different layer, and every write
-            from here lands on it rather than on Base. The dropdown alone said
-            which state was picked, not that the panel below it had changed
-            meaning. */}
-        {currentPseudoState !== "normal" && (
-          // Board 160:410 ("Pseudo note") is 11px regular at a 16px inset,
-          // sized to a 32-tall band (px-4 pt-2 pb-2) — this carried 12px at
-          // a 12px inset instead.
-          <p
-            className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px]/[16px] tw:font-normal tw:text-[var(--bk-accent)]"
-            data-testid="pseudo-state-banner"
-          >
-            Editing {pseudoStateLabel(currentPseudoState)} — not Base
-          </p>
-        )}
-        {/* Board 160:208 — what this breakpoint changes, and the way back. */}
-        <BreakpointOverrides
-          composer={composer}
-          elementId={selectedElement.id}
+          elementId={applyStyleFor}
           breakpoint={currentBreakpoint}
+          pseudo={currentPseudoState}
+          onClose={() => setApplyStyleFor(null)}
         />
-        </>
-      )}
-      {/* AI agent takeover (board 160:512) — the run replaces the controls;
-          the selection is kept and restored when the run ends. */}
-      {agentRun.running ? (
-        <div role="status" aria-live="polite" style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 8 }} data-testid="inspector-ai-run">
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" }}>AI</div>
-          <div style={{ fontSize: 13, color: "var(--bk-ink)" }}>{agentRun.summary || "Working…"}</div>
-          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
-            Your selection is kept and restored when you go back.
-          </div>
+        {/* Live region for the selection announcement. */}
+        <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
+          {elementTypeLabel(selectedElement.type)} selected
         </div>
-      ) : wholeSite ? (
-        /* Whole-site scope, board 189:2 — per-element controls step aside;
-           site-wide styles live in the Brand panel.
-
-           The board draws this takeover as THREE BANDS, not one padded block:
-           a warning-tint reach note (189:14, 36 tall, 12/18 in warning ink)
-           saying where the edits land, an accent-tint hint under it (189:102,
-           52 tall, 11/16) saying where those styles actually live, then a 44
-           tall action row (1698:6943) with two 28-tall buttons. What shipped
-           was a 16px-padded stack of a 13/600 ink heading, a 12px ink-muted
-           paragraph and two flowbite `xs` buttons at their own 32 — the same
-           three sentences with none of the banding that tells you the panel
-           has changed what it is pointed at. */
-        <div data-testid="inspector-whole-site">
-          <p
-            className="tw:m-0 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-[9px] tw:text-[12px]/[18px] tw:font-normal tw:text-[var(--bk-warning-text)]"
-            data-testid="whole-site-note"
-          >
-            Editing the whole site — every page
-          </p>
-          <p
-            className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px]/[16px] tw:font-normal tw:text-[var(--bk-accent-text)]"
-            data-testid="whole-site-hint"
-          >
-            Site-wide colours, fonts and spacing live in the Brand panel — change them once,
-            everywhere updates.
-          </p>
-          <div className="tw:flex tw:gap-2 tw:px-4 tw:py-2" data-testid="whole-site-actions">
-            {/* `size="xs"` carries flowbite's own `h-8`; `tw:h-7` is the same
-                twMerge group and is what reaches the board's 28. `px-2`, not
-                `px-3`: 1698:6944 is 88 wide around a 13px "Open Brand", and
-                13px Inter measures that label ~73 — so the board's inset is 8
-                a side, not 12. Both buttons were 8px wider than the frame. */}
-            <Button
-              size="xs"
-              data-testid="whole-site-open-brand"
-              className="tw:h-7 tw:rounded-md tw:px-2 tw:text-[13px] tw:font-medium"
-              onClick={() => composer?.emit("ui:switch-tab", { tab: "design" })}
-            >
-              Open Brand
-            </Button>
-            <Button
-              color="light"
-              size="xs"
-              data-testid="whole-site-back"
-              onClick={() => setWholeSite(false)}
-              className="tw:h-7 tw:rounded-md tw:px-2 tw:text-[13px] tw:font-medium tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-            >
-              Back to this element
-            </Button>
+        <InspectorHeader composer={composer} element={selectedElement} selectedIds={targetIds} binding={binding} locked={locked} />
+        <StatusLine composer={composer} elementId={selectedElement.id} locked={locked} conflict={conflict} />
+        {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}
+        {agentRun.running ? (
+          /* AI agent takeover (board 160:512) — the run replaces the
+             controls; the selection is kept and restored when it ends. */
+          <div role="status" aria-live="polite" className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-5" data-testid="inspector-ai-run">
+            <div className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">AI</div>
+            <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">{agentRun.summary || "Working…"}</div>
+            <div className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">Your selection is kept and restored when you go back.</div>
           </div>
-        </div>
-      ) : (
-      <div
-        ref={contentRef}
-        className="bdi-panel-scroll"
-        role="region"
-        aria-label="Element properties"
-      >
-        <div className="bdi-body">
-          <InspectorErrorBoundary>
-            <InspectorTabContent
-              tabId={activeTab}
-              composer={composer}
-              selectedElement={selectedElement}
-              selectedIds={targetIds}
-              selectedTypes={selectedTypes}
-              styles={styles_state}
-              authoredStyles={authoredStyles}
-              onChange={handleStyleChange}
-              onBatchChange={handleBatchStyleChange}
-              cssContext={enrichedContext}
-              propertyStates={propertyStates}
-              choices={choices}
-              onSetChoices={setChoices}
-              advancedState={advancedState}
-              onOpenMediaLibrary={onOpenMediaLibrary}
-              onOpenIconPicker={onOpenIconPicker}
-              onOpenCreateCollection={onOpenCreateCollection}
+        ) : (
+          <>
+            <Tabs
+              tabs={INSPECTOR_TABS}
+              value={activeTab}
+              onChange={(id) => setActiveTab(id as TabId)}
+              label="Inspector tabs"
+              data-testid="inspector-tab-strip"
+              className="tw:h-8 tw:p-0 tw:gap-0"
+              tabClassName={INSPECTOR_TAB_CLASS}
             />
-          </InspectorErrorBoundary>
-        </div>
+            {showContextRow ? (
+              <ContextRow
+                state={currentPseudoState}
+                onStateChange={(s: PseudoStateId) => setCurrentPseudoState(s)}
+                statesWithOverrides={statesWithOverrides}
+                stateOverrideCount={stateOverrideCount}
+                onResetState={resetState}
+                breakpointName={breakpointName}
+                breakpointOverrideCount={fieldOverrides.overrides.size}
+                onRevertBreakpoint={fieldOverrides.revertBreakpoint}
+              />
+            ) : null}
+            <div
+              ref={contentRef}
+              className="bdi-panel-scroll"
+              role="tabpanel"
+              aria-label={`${INSPECTOR_TABS.find((t) => t.id === activeTab)?.label ?? ""} properties`}
+            >
+              <div className="bdi-body">
+                <InspectorErrorBoundary>
+                  <InspectorTabContent
+                    tabId={activeTab}
+                    composer={composer}
+                    selectedElement={selectedElement}
+                    selectedIds={targetIds}
+                    selectedTypes={selectedTypes}
+                    styles={styles_state}
+                    authoredStyles={authoredStyles}
+                    onChange={handleStyleChange}
+                    onBatchChange={handleBatchStyleChange}
+                    cssContext={enrichedContext}
+                    propertyStates={propertyStates}
+                    choices={choices}
+                    onSetChoices={setChoices}
+                    advancedState={advancedState}
+                    onOpenMediaLibrary={onOpenMediaLibrary}
+                    onOpenIconPicker={onOpenIconPicker}
+                    onOpenCreateCollection={onOpenCreateCollection}
+                  />
+                </InspectorErrorBoundary>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-      )}
-    </div>
+    </InspectorFieldContext.Provider>
   );
 };
 
