@@ -32,6 +32,8 @@ import {
 } from "../sections/registry";
 import { sectionHasValue } from "../sections/registry";
 import { SectionFrameContext, type SectionFrame } from "../shared/controls/Section";
+import { InspectorFieldContext } from "../shared/controls/InspectorFieldContext";
+import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 
 // ============================================================================
@@ -106,6 +108,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     onOpenCreateCollection,
   } = props;
 
+  const field = React.useContext(InspectorFieldContext);
   const type = selectedElement.type;
   const caps = capabilitiesFor(type);
   const isMultiSelect = selectedIds.length > 1;
@@ -154,6 +157,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
           onAdvancedToggle: entry.advancedKey ? () => advancedState.toggle(advancedKey) : () => undefined,
         };
         const frame: SectionFrame = {
+          ...sectionOverrideMarks(field, entry.styleKeys as readonly string[]),
           sectionId: id,
           title: entry.frameTitle ? entry.frameTitle(baseCtx) : entry.title,
           displayMode,

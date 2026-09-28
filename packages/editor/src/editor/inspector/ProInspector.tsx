@@ -18,14 +18,13 @@
 
 import * as React from "react";
 import type { Composer, Element } from "@/engine";
-import { getBreakpointQuery, isValidBreakpoint, BREAKPOINTS } from "@/shared/constants/breakpoints";
+import { isValidBreakpoint, BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import type { DeviceType, PseudoStateId } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { Tabs } from "@/editor/chrome-ui";
-import { writeElement } from "@/engine/commands/commandOperations";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { useSaveConflict } from "../shell/hooks/useSaveConflict";
@@ -222,22 +221,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [contextState, selectedElements, mixedKeys]
   );
 
-  /* Overrides + the context row's counts. */
-  const fieldOverrides = useFieldOverrides(composer, selectedElement?.id, currentBreakpoint);
+  /* Overrides (breakpoint, :state, master) + the context row's counts. */
+  const fieldOverrides = useFieldOverrides(composer, selectedElement?.id, currentBreakpoint, currentPseudoState);
   const breakpointName = currentBreakpoint === "desktop" ? null : BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint;
-  const pseudoSelector = selectedElement ? `[data-buildrick-id="${selectedElement.id}"]` : "";
-  const pseudoMq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
-  const stateOverrideCount =
-    selectedElement && currentPseudoState !== "normal"
-      ? Object.keys(composer?.styles?.getRule?.(`${pseudoSelector}:${currentPseudoState}`, pseudoMq)?.properties ?? {}).length
-      : 0;
-  const resetState = () => {
-    if (!composer || !selectedElement || currentPseudoState === "normal") return;
-    /* P-9: replace, not merge, or the cleared keys survive. Lock gate first. */
-    writeElement(composer, composer.elements.getElement(selectedElement.id), `reset-${currentPseudoState}`, () => {
-      composer.styles.setRule(pseudoSelector, {}, { pseudo: `:${currentPseudoState}`, mediaQuery: pseudoMq, replace: true });
-    });
-  };
 
   const readOnly = locked || conflict.pending;
   const fieldContext = React.useMemo<InspectorFieldContextValue>(
@@ -246,10 +232,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       readOnlyReason: conflict.pending ? "conflict" : locked ? "locked" : null,
       mixedKeys,
       overrides: fieldOverrides.overrides,
-      overrideLabels: breakpointName ? { breakpoint: breakpointName } : {},
+      overrideLabels: fieldOverrides.labels,
       resetOverride: fieldOverrides.resetOverride,
     }),
-    [readOnly, conflict.pending, locked, mixedKeys, fieldOverrides, breakpointName]
+    [readOnly, conflict.pending, locked, mixedKeys, fieldOverrides]
   );
 
   /* Scroll persistence per element (P-7b). The scroll listener is the only
@@ -361,10 +347,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 state={currentPseudoState}
                 onStateChange={(s: PseudoStateId) => setCurrentPseudoState(s)}
                 statesWithOverrides={statesWithOverrides}
-                stateOverrideCount={stateOverrideCount}
-                onResetState={resetState}
+                stateOverrideCount={fieldOverrides.counts.pseudo}
+                onResetState={fieldOverrides.resetPseudo}
                 breakpointName={breakpointName}
-                breakpointOverrideCount={fieldOverrides.overrides.size}
+                breakpointOverrideCount={fieldOverrides.counts.breakpoint}
                 onRevertBreakpoint={fieldOverrides.revertBreakpoint}
               />
             ) : null}
