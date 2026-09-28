@@ -332,6 +332,10 @@ export async function syncCollectionDelete(id: string): Promise<void> {
 export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return;
+  /* A record made right after its collection must not reach the server
+     first: the server answers "Collection not found" and the record sits
+     queued until a reconnect. Wait for the collection's mirror in flight. */
+  await queue.settled(`collectionUpsert:${item.collectionId}`);
   await queue.run(
     `entryUpsert:${item.id}`,
     () =>
