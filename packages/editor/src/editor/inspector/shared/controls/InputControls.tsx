@@ -131,6 +131,9 @@ export interface InputWithUnitProps {
   /** A plain count (grid Columns, board 17): the number and its stepper, no
    *  unit dropdown and no unit words in the name. */
   noUnit?: boolean;
+  /** false: the row around this field already draws its override dot (Size's
+   *  Width / Height draw it beside their mode button). */
+  dot?: boolean;
 }
 
 const NO_UNITS: readonly string[] = [""];
@@ -207,6 +210,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   ariaLabel,
   property,
   noUnit = false,
+  dot = true,
 }) => {
   const field = useInspectorField(property);
   const units = noUnit ? NO_UNITS : unitsProp;
@@ -366,7 +370,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
         </label>
       ) : null}
       <div className="bdi-row-content">
-        {label ? null : <FieldDot field={field} />}
+        {label || !dot ? null : <FieldDot field={field} />}
         {ownName ? (
           <span id={nameId} hidden>
             {name}

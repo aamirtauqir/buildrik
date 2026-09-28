@@ -224,4 +224,13 @@ describe("InputWithUnit — field context", () => {
     );
     expect(screen.getByRole("button", { name: "Overridden on Tablet" })).toBeInTheDocument();
   });
+
+  it("dot={false}: a field whose row already draws the dot does not draw a second (board 28)", () => {
+    render(
+      <InspectorFieldContext.Provider value={ctx({ overrides: new Map([["width", ["breakpoint"] as const]]), overrideLabels: { breakpoint: "Tablet" } })}>
+        <InputWithUnit label="" ariaLabel="Width" value="10px" onChange={vi.fn()} property="width" dot={false} />
+      </InspectorFieldContext.Provider>,
+    );
+    expect(screen.queryByRole("button", { name: "Overridden on Tablet" })).toBeNull();
+  });
 });

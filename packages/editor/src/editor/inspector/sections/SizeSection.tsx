@@ -244,6 +244,7 @@ function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
                 label=""
                 ariaLabel={name}
                 property={axis}
+                dot={false}
                 units={["px", "%", "rem", "vw", "vh"]}
                 value={mode === "fixed" ? value : readout}
                 /* Fill's number is a readout: leaving it untouched must not
