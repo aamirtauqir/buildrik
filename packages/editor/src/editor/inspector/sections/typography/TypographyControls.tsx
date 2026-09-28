@@ -9,22 +9,20 @@
  */
 
 import * as React from "react";
-import { SelectRow, ButtonGroup, MixedValueIndicator, InputWithUnit } from "../../shared/controls";
+import { SelectRow, ButtonGroup, InputWithUnit } from "../../shared/controls";
 
 interface TextControlsProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
 }
 
 export const ADVANCED_TYPOGRAPHY_COUNT = 9;
 
-export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChange, mixedKeys }) => {
+export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChange }) => {
   return (
     <>
       <div className="tw:relative">
-        <MixedValueIndicator prop="text-transform" mixedKeys={mixedKeys} />
         <ButtonGroup
           label="Transform"
           value={styles["text-transform"] || ""}
@@ -40,7 +38,6 @@ export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChan
       </div>
 
       <div className="tw:relative">
-        <MixedValueIndicator prop="text-decoration" mixedKeys={mixedKeys} />
         <ButtonGroup
           label="Decoration"
           value={styles["text-decoration"] || ""}
@@ -56,7 +53,6 @@ export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChan
       </div>
 
       <div className="tw:relative">
-        <MixedValueIndicator prop="letter-spacing" mixedKeys={mixedKeys} />
         <InputWithUnit
           label="Letter"
           value={styles["letter-spacing"] || ""}
@@ -67,7 +63,6 @@ export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChan
       </div>
 
       <div className="tw:relative">
-        <MixedValueIndicator prop="word-spacing" mixedKeys={mixedKeys} />
         <InputWithUnit
           label="Word"
           value={styles["word-spacing"] || ""}
@@ -79,7 +74,6 @@ export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChan
 
       {/* Font Style */}
       <div className="tw:relative">
-        <MixedValueIndicator prop="font-style" mixedKeys={mixedKeys} />
         <ButtonGroup
           label="Style"
           value={styles["font-style"] || ""}

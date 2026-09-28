@@ -58,7 +58,7 @@ describe("SelectRow", () => {
         <SelectRow label="Display" value="block" onChange={vi.fn()} options={OPTIONS} property="display" />
       </InspectorFieldContext.Provider>,
     );
-    const select = screen.getByRole("combobox", { name: "Display, mixed values" });
+    const select = screen.getByRole("combobox", { name: "Display, Mixed values" });
     expect(select).toHaveValue("");
     expect(select.querySelector("option")?.textContent).toBe("Mixed");
   });

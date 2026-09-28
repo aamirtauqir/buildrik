@@ -22,7 +22,7 @@ import { BK_SELECT_BARE_VALUE_THEME, Button, Menu, MenuItem, Popover, Select } f
 import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { isTokenVar, resolveTokenVar } from "../shared/tokenBindingDetection";
-import { InputWithUnit, MixedValueIndicator, MoreSettingsToggle, Section } from "../shared/controls";
+import { InputWithUnit, MoreSettingsToggle, Section } from "../shared/controls";
 import { FieldDot } from "../shared/controls/FieldDot";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER } from "../shared/controls/controlClasses";
@@ -155,10 +155,9 @@ interface DimensionRowProps {
   /** Laid-out px on this axis, when the element is on the canvas. */
   measured: number | null;
   onChange: (value: string) => void;
-  mixedKeys?: ReadonlySet<string>;
 }
 
-function DimensionRow({ axis, value, measured, onChange, mixedKeys }: DimensionRowProps) {
+function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const field = useInspectorField(axis);
   const name = axis === "width" ? "Width" : "Height";
@@ -175,7 +174,6 @@ function DimensionRow({ axis, value, measured, onChange, mixedKeys }: DimensionR
 
   return (
     <div className={`${ROW} tw:relative`} data-testid={`inspector-size-${axis}`} data-mode={mode}>
-      <MixedValueIndicator prop={axis} mixedKeys={mixedKeys} />
       <span className="tw:inline-flex tw:items-center tw:min-w-0">
         <Popover
           open={menuOpen}
@@ -306,7 +304,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   onToggle,
   advancedExpanded = false,
   onAdvancedToggle,
-  mixedKeys,
 }) => {
   const measured = useRenderedSize(variant === "page" ? undefined : elementId);
   const hidden = (prop: string) => propertyStates[prop]?.hidden;
@@ -328,10 +325,10 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   return (
     <Section title="Size" isOpen={isOpen} onToggle={onToggle} id="inspector-section-size">
       {!hidden("width") && (
-        <DimensionRow axis="width" value={styles.width || ""} measured={measured?.width ?? null} onChange={(v) => onChange("width", v)} mixedKeys={mixedKeys} />
+        <DimensionRow axis="width" value={styles.width || ""} measured={measured?.width ?? null} onChange={(v) => onChange("width", v)} />
       )}
       {!hidden("height") && (
-        <DimensionRow axis="height" value={styles.height || ""} measured={measured?.height ?? null} onChange={(v) => onChange("height", v)} mixedKeys={mixedKeys} />
+        <DimensionRow axis="height" value={styles.height || ""} measured={measured?.height ?? null} onChange={(v) => onChange("height", v)} />
       )}
       {parentLayout && <ItemControls parent={parentLayout} styles={styles} onChange={onChange} advanced={advancedExpanded} />}
       {advancedExpanded &&

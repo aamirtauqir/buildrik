@@ -269,7 +269,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                     }}
                     onClick={(e) => e.stopPropagation()}
                     placeholder={field.mixed ? "Mixed" : (placeholder ?? (isKeyword ? value : "None"))}
-                    aria-label={field.mixed ? `${label} value, mixed values` : `${label} value`}
+                    aria-label={field.mixed ? `${label} value, Mixed values` : `${label} value`}
                   />
                   {/* The way back to the token just dropped (only while the
                       value is still the one the unlink produced). */}

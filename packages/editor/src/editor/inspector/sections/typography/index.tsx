@@ -13,7 +13,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
-import { Section, MoreSettingsToggle, MixedValueIndicator } from "../../shared/controls";
+import { Section, MoreSettingsToggle } from "../../shared/controls";
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
 import { ADVANCED_TYPOGRAPHY_COUNT, TypographyControls } from "./TypographyControls";
@@ -50,7 +50,6 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   onToggle,
   advancedExpanded = false,
   onAdvancedToggle,
-  mixedKeys,
   isMultiSelect,
   composer,
   variant = "element",
@@ -61,21 +60,19 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   return (
     <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
       <div className="tw:relative">
-        <MixedValueIndicator prop="font-family" mixedKeys={mixedKeys} />
         <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} />
       </div>
 
       <FontControls
         styles={styles}
         onChange={onChange}
-        mixedKeys={mixedKeys}
         isMultiSelect={isMultiSelect}
         composer={composer}
         variant={variant}
       />
 
       {!isPage && advancedExpanded && (
-        <TypographyControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} />
+        <TypographyControls styles={styles} onChange={onChange} isMultiSelect={isMultiSelect} />
       )}
 
       {!isPage && onAdvancedToggle && (

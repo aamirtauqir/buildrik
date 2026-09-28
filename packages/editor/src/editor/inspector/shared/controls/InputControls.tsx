@@ -17,7 +17,7 @@ import { ChevronDown, ChevronUp, Info } from "lucide-react";
 import * as React from "react";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { FieldDot } from "./FieldDot";
-import { useInspectorField } from "./InspectorFieldContext";
+import { useInspectorField, mixedName } from "./InspectorFieldContext";
 import { ErrorLine, useFieldError } from "./Section";
 import { TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 
@@ -87,6 +87,7 @@ export const InputRow: React.FC<InputRowProps> = ({
           className="bdi-text"
           readOnly={field.readOnly}
           aria-readonly={field.readOnly || undefined}
+          aria-label={field.mixed ? mixedName(label) : undefined}
           value={field.mixed ? "" : value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.mixed ? "Mixed" : placeholder}
@@ -97,6 +98,7 @@ export const InputRow: React.FC<InputRowProps> = ({
           className="bdi-text"
           readOnly={field.readOnly}
           aria-readonly={field.readOnly || undefined}
+          aria-label={field.mixed ? mixedName(label) : undefined}
           type={type}
           value={field.mixed ? "" : value}
           onChange={(e) => onChange(e.target.value)}
@@ -272,7 +274,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const nameId = React.useId();
   const suffixId = React.useId();
   const ownName = ariaLabel || !label;
-  const suffix = field.mixed ? "mixed values" : isTokenVar(value) ? "" : unitWords(unit);
+  const suffix = field.mixed ? "Mixed values" : isTokenVar(value) ? "" : unitWords(unit);
   const name = ariaLabel || label || placeholder;
 
   const control = (
@@ -422,7 +424,7 @@ export const SelectRow: React.FC<SelectRowProps> = ({
             /* Read-only is not disabled (DD-18): the value stays legible and
                focusable; a change is refused. */
             aria-readonly={field.readOnly || undefined}
-            aria-label={field.mixed ? `${label}, mixed values` : undefined}
+            aria-label={field.mixed ? mixedName(label) : undefined}
             className="bdi-v"
             theme={BK_SELECT_BARE_VALUE_THEME}
             value={field.mixed ? "" : value}

@@ -12,7 +12,7 @@
 
 import * as React from "react";
 import { FieldDot } from "./FieldDot";
-import { useInspectorField } from "./InspectorFieldContext";
+import { useInspectorField, mixedName } from "./InspectorFieldContext";
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 
@@ -36,7 +36,8 @@ const NEXT_KEYS: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLe
 export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange, options, property }) => {
   const field = useInspectorField(property);
   const refs = React.useRef<(HTMLButtonElement | null)[]>([]);
-  const chosen = options.findIndex((o) => o.value === value);
+  /* Mixed (board 22): no segment is chosen — none of them is what all show. */
+  const chosen = field.mixed ? -1 : options.findIndex((o) => o.value === value);
   /* The tab stop: the chosen option, or the first when none is chosen. */
   const stop = chosen < 0 ? 0 : chosen;
 
@@ -61,13 +62,13 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
     <div
       className="bdi-seg"
       role="radiogroup"
-      aria-label={label}
+      aria-label={field.mixed && label ? mixedName(label) : label}
       aria-readonly={field.readOnly || undefined}
       data-testid={label ? fieldTestId(label) : undefined}
       onKeyDown={onKeyDown}
     >
       {options.map((opt, i) => {
-        const on = opt.value === value;
+        const on = i === chosen;
         return (
           <Button
             key={opt.value}

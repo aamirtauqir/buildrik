@@ -13,7 +13,7 @@ import { FontPickerPanel, namesFont, primaryFamily } from "./FontPickerDropdown"
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "../../shared/controls";
 import { FieldDot } from "../../shared/controls/FieldDot";
-import { useInspectorField } from "../../shared/controls/InspectorFieldContext";
+import { useInspectorField, mixedName } from "../../shared/controls/InspectorFieldContext";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../engine";
 // ============================================================================
@@ -115,6 +115,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
 
   // Get current font name for display
   const currentFontName = React.useMemo(() => {
+    if (field.mixed) return "Mixed";
     if (!value) return "Select font...";
 
     // Check system + uploaded fonts
@@ -123,7 +124,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
 
     /* Board 1 reads "Inter", not the stack "Inter, sans-serif". */
     return primaryFamily(value) || value;
-  }, [value, uploadedFonts]);
+  }, [value, uploadedFonts, field.mixed]);
 
   return (
     /* Board 1 reads "Font  [Inter]" — one row, label left, the same column
@@ -147,14 +148,14 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
         aria-haspopup="listbox"
         aria-expanded={showFontPicker}
         aria-controls="font-picker-listbox"
-        aria-label="Font family"
+        aria-label={field.mixed ? mixedName("Font family") : "Font family"}
         disabled={field.readOnly}
         data-testid={fieldTestId("Font")}
         data-font-source={uploaded ? "uploaded" : undefined}
         className="bdi-ddn tw:justify-between tw:text-left"
-        style={{ fontFamily: value || "inherit" }}
+        style={{ fontFamily: field.mixed ? "inherit" : value || "inherit" }}
       >
-        <span>{currentFontName}</span>
+        <span className={field.mixed ? "tw:text-[var(--bk-ink-muted)]" : undefined}>{currentFontName}</span>
         {/* The field chevron every other select in the column draws. */}
         <ChevronDown size={12} aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />
       </Button>

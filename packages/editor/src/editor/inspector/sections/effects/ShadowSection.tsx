@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { InputRow, MixedValueIndicator, MoreSettingsToggle, Section, SelectRow } from "../../shared/controls";
+import { InputRow, MoreSettingsToggle, Section, SelectRow } from "../../shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
 import { composeShadow, extractInnerShadow, extractOuterShadow } from "./effectValues";
 
@@ -33,7 +33,7 @@ const INNER_PRESETS = [
 const withCustom = (options: { label: string; value: string }[], current: string) =>
   current && !options.some((o) => o.value === current) ? [...options, { label: "Custom", value: current }] : options;
 
-export const ShadowSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle, mixedKeys }) => {
+export const ShadowSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => {
   const [more, setMore] = React.useState(false);
   const outer = extractOuterShadow(styles["box-shadow"]);
   const inner = extractInnerShadow(styles["box-shadow"]);
@@ -42,7 +42,6 @@ export const ShadowSection: React.FC<BaseStyleSectionProps> = ({ styles, onChang
   return (
     <Section title="Shadow" isOpen={isOpen} onToggle={onToggle} id="inspector-section-shadow">
       <div className="tw:relative">
-        <MixedValueIndicator prop="box-shadow" mixedKeys={mixedKeys} />
         <SelectRow
           label="Outer"
           property="box-shadow"

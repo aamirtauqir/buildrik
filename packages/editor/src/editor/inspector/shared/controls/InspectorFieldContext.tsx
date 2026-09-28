@@ -52,6 +52,9 @@ export interface InspectorField {
 
 const NONE: readonly OverrideKind[] = [];
 
+/** The accessible name of a field the selection disagrees about (board 22). */
+export const mixedName = (label: string): string => `${label}, Mixed values`;
+
 export function useInspectorField(property?: string): InspectorField {
   const ctx = React.useContext(InspectorFieldContext);
   return {

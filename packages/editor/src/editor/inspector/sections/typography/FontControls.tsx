@@ -16,7 +16,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
-import { SelectRow, ButtonGroup, ColorInput, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
+import { SelectRow, ButtonGroup, ColorInput, InputWithUnit } from "../../shared/controls";
 
 /** Board 1 reads the weight as its number ("600"). */
 export const FONT_WEIGHTS = ["100", "200", "300", "400", "500", "600", "700", "800", "900"].map((v) => ({ value: v, label: v }));
@@ -31,7 +31,6 @@ const ALIGN_OPTIONS = [
 interface FontControlsProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
   /** Threaded so the colour's token chip can open Brand. */
   composer?: Composer | null;
@@ -39,10 +38,9 @@ interface FontControlsProps {
   variant?: "element" | "page";
 }
 
-export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mixedKeys, composer, variant = "element" }) => {
+export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, composer, variant = "element" }) => {
   const colour = (
     <div className="tw:relative">
-      <MixedValueIndicator prop="color" mixedKeys={mixedKeys} />
       <ColorInput
         label={variant === "page" ? "Text colour" : "Colour"}
         value={styles.color || ""}
@@ -57,7 +55,6 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
   return (
     <>
       <div className="tw:relative">
-        <MixedValueIndicator prop="font-size" mixedKeys={mixedKeys} />
         <InputWithUnit
           label="Font size"
           value={styles["font-size"] || "16px"}
@@ -68,7 +65,6 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       </div>
 
       <div className="tw:relative">
-        <MixedValueIndicator prop="line-height" mixedKeys={mixedKeys} />
         <InputWithUnit
           label="Line height"
           value={styles["line-height"] || ""}
@@ -81,7 +77,6 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       </div>
 
       <div className="tw:relative">
-        <MixedValueIndicator prop="font-weight" mixedKeys={mixedKeys} />
         <SelectRow
           label="Weight"
           value={styles["font-weight"] || ""}
@@ -94,7 +89,6 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       {colour}
 
       <div className="tw:relative">
-        <MixedValueIndicator prop="text-align" mixedKeys={mixedKeys} />
         <ButtonGroup
           label="Align"
           value={styles["text-align"] || ""}

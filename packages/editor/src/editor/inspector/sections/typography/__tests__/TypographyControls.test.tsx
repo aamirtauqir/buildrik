@@ -10,9 +10,9 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ADVANCED_TYPOGRAPHY_COUNT, TypographyControls } from "../TypographyControls";
 
-function renderTypo(styles: Record<string, string> = {}, mixedKeys?: ReadonlySet<string>) {
+function renderTypo(styles: Record<string, string> = {}) {
   const onChange = vi.fn();
-  const utils = render(<TypographyControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />);
+  const utils = render(<TypographyControls styles={styles} onChange={onChange} />);
   return { onChange, ...utils };
 }
 

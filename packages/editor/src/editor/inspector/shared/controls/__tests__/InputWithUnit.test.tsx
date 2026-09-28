@@ -211,7 +211,7 @@ describe("InputWithUnit — field context", () => {
         <InputWithUnit label="Width" value="10px" onChange={vi.fn()} property="width" />
       </InspectorFieldContext.Provider>,
     );
-    const input = screen.getByRole("textbox", { name: "Width mixed values" });
+    const input = screen.getByRole("textbox", { name: "Width Mixed values" });
     expect(input).toHaveValue("");
     expect(input).toHaveAttribute("placeholder", "Mixed");
   });

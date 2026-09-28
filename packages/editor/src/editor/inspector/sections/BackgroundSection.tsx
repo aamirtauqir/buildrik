@@ -10,7 +10,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { extractGradientUI, composeGradient, deriveBgType, DEFAULT_GRADIENT_STOPS } from "@/shared/utils/parsers/gradientHelpers";
-import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
+import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier } from "../shared/controls";
 import { Button, TextInput } from "@/editor/chrome-ui";
 
 const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]";
@@ -54,7 +54,6 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   tier = "primary",
   advancedExpanded = false,
   onAdvancedToggle,
-  mixedKeys,
   isMultiSelect,
   composer,
 }) => {
@@ -145,7 +144,6 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       {/* Color Background */}
       {bgType === "color" && (
         <div className="tw:relative">
-          <MixedValueIndicator prop="background-color" mixedKeys={mixedKeys} />
           <ColorInput
             label={variant === "page" ? "Background" : "Colour"}
             property="background-color"
@@ -266,9 +264,9 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
         <>
           <div className="tw:flex tw:items-end tw:gap-2 tw:mb-3">
             <div className="tw:relative tw:flex-1">
-              <MixedValueIndicator prop="background-image" mixedKeys={mixedKeys} />
               <InputRow
                 label="Image URL"
+                property="background-image"
                 value={styles["background-image"]?.replace(/url\(['"]?|['"]?\)/g, "") || ""}
                 onChange={(v) => writeImage(v ? `url('${v}')` : "")}
                 placeholder="https://..."
@@ -293,7 +291,6 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {advancedExpanded && (
             <>
               <div className="tw:relative">
-                <MixedValueIndicator prop="background-size" mixedKeys={mixedKeys} />
                 <SelectRow
                   property="background-size"
                   label="Size"
@@ -309,7 +306,6 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               </div>
 
               <div className="tw:relative">
-                <MixedValueIndicator prop="background-position" mixedKeys={mixedKeys} />
                 <SelectRow
                   property="background-position"
                   label="Position"
@@ -330,7 +326,6 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               </div>
 
               <div className="tw:relative">
-                <MixedValueIndicator prop="background-repeat" mixedKeys={mixedKeys} />
                 <SelectRow
                   property="background-repeat"
                   label="Repeat"

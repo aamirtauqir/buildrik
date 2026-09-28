@@ -46,7 +46,6 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   onToggle,
   advancedExpanded = false,
   onAdvancedToggle,
-  mixedKeys,
 }) => {
   const display = styles.display || "";
   return (
@@ -54,13 +53,13 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       <DisplayControls display={display} onChange={onChange} advanced={advancedExpanded} />
       {FLEX.has(display) && <FlexControls styles={styles} onChange={onChange} onBatchChange={onBatchChange} advanced={advancedExpanded} />}
       {GRID.has(display) && <GridControls styles={styles} onChange={onChange} advanced={advancedExpanded} />}
-      <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} mixedKeys={mixedKeys} />
+      <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} />
       {advancedExpanded && (
         <>
           <div className={SECTION_SUBTITLE}>Overflow</div>
-          <OverflowControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
+          <OverflowControls styles={styles} onChange={onChange} />
           <div className={SECTION_SUBTITLE}>Visibility & Float</div>
-          <VisibilityFloatControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
+          <VisibilityFloatControls styles={styles} onChange={onChange} />
         </>
       )}
       {onAdvancedToggle && <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} />}

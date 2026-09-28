@@ -7,7 +7,7 @@ import * as React from "react";
 import { TextInput } from "@/editor/chrome-ui";
 import { InputRow, SelectRow } from "../../shared/controls";
 import { CONTROL_INPUT_WRAP } from "../../shared/controls/controlClasses";
-import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import { MixedValueIndicator } from "../../shared/controls";
 import { CLUSTER_CAPTION, OFFSET_ANCHOR, OFFSET_PANEL } from "./classes";
 // ============================================================================
 // TYPES
@@ -20,7 +20,6 @@ export interface PositionControlsProps {
     string,
     { hidden?: boolean; disabled?: boolean; reason?: string; isOverridden?: boolean }
   >;
-  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -54,7 +53,6 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
   styles,
   onChange,
   propertyStates = {},
-  mixedKeys,
 }) => {
   const hasPosition = styles.position && styles.position !== "static";
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
@@ -63,7 +61,6 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
   return (
     <>
       <div className="tw:relative">
-        {mixedKeys?.has("position") && <MixedValueBadge compact />}
         <SelectRow
           label="Position"
           property="position"
@@ -81,7 +78,6 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
           disabled={disabled}
           reason={reason}
           propertyStates={propertyStates}
-          mixedKeys={mixedKeys}
         />
       )}
     </>
@@ -101,8 +97,9 @@ interface PositionOffsetControlsProps {
     string,
     { hidden?: boolean; disabled?: boolean; reason?: string; isOverridden?: boolean }
   >;
-  mixedKeys?: ReadonlySet<string>;
 }
+
+const OFFSET_KEYS = ["top", "right", "bottom", "left"] as const;
 
 const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
   styles,
@@ -110,14 +107,11 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
   disabled,
   reason,
   propertyStates = {},
-  mixedKeys,
 }) => {
   return (
     <div className={OFFSET_PANEL}>
       <div className={CLUSTER_CAPTION}>
-        {(mixedKeys?.has("top") || mixedKeys?.has("right") || mixedKeys?.has("bottom") || mixedKeys?.has("left")) && (
-          <MixedValueBadge compact />
-        )}
+        <MixedValueIndicator property={OFFSET_KEYS} />
         Position Offset
       </div>
       {/* Visual position box */}
@@ -171,14 +165,9 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
       </div>
       {/* Z-Index */}
       <div className="tw:mt-2">
-        {mixedKeys?.has("z-index") && (
-          <div className="tw:flex tw:items-center tw:mb-0.5">
-            <MixedValueBadge compact />
-            <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">Z-Index</span>
-          </div>
-        )}
         <InputRow
           label="Z-Index"
+          property="z-index"
           value={styles["z-index"] || ""}
           onChange={(v) => onChange("z-index", v)}
           type="number"

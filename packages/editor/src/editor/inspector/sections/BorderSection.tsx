@@ -11,12 +11,11 @@ import {
   SelectRow,
   ColorInput,
   InputWithUnit,
+  InputRow,
   CornerRadiusInput,
   MoreSettingsToggle,
   type SectionTier,
 } from "../shared/controls";
-import { InputField } from "../../../shared/forms/InputField";
-import { MixedValueIndicator } from "../shared/controls";
 import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
 
 export interface BorderSectionProps {
@@ -46,7 +45,6 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   tier = "secondary",
   advancedExpanded = false,
   onAdvancedToggle,
-  mixedKeys,
   isMultiSelect,
   composer,
 }) => {
@@ -90,7 +88,6 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
           More settings until the element has a border or split corners. */}
       {radiusSplit ? (
         <div style={{ position: "relative" }}>
-          <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} offsetLeft={56} />
           <CornerRadiusInput
             values={radii}
             onChange={handleRadius}
@@ -100,7 +97,6 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
         </div>
       ) : (
         <div style={{ position: "relative" }}>
-          <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} />
           <InputWithUnit
             property="border-radius"
             label="Radius"
@@ -115,7 +111,6 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
         <>
       {/* Border Width */}
       <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="border-width" mixedKeys={mixedKeys} />
         <InputWithUnit
           property="border-width"
           label="Width"
@@ -127,7 +122,6 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
       {/* Border Style */}
       <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="border-style" mixedKeys={mixedKeys} />
         <SelectRow
           property="border-style"
           label="Style"
@@ -149,7 +143,6 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
       {/* Border Color */}
       <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="border-color" mixedKeys={mixedKeys} />
         <ColorInput
           property="border-color"
           label="Color"
@@ -191,12 +184,11 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
             {(["top", "right", "bottom", "left"] as const).map((side) => (
               <div key={side} style={{ position: "relative" }}>
-                <MixedValueIndicator prop={`border-${side}`} mixedKeys={mixedKeys} />
-                <InputField
+                <InputRow
                   label={side.charAt(0).toUpperCase() + side.slice(1)}
-                  type="text"
+                  property={`border-${side}`}
                   value={styles[`border-${side}`] || ""}
-                  onChange={(e) => onChange(`border-${side}`, e.target.value)}
+                  onChange={(v) => onChange(`border-${side}`, v)}
                   placeholder="1px solid #ccc"
                 />
               </div>

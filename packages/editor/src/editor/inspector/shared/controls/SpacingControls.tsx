@@ -15,7 +15,7 @@
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
 import { FieldDot } from "./FieldDot";
-import { useInspectorField } from "./InspectorFieldContext";
+import { useInspectorField, mixedName } from "./InspectorFieldContext";
 import { unitWords } from "./InputControls";
 import { TextField, Button, TextInput, IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
@@ -89,7 +89,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
   /* §16: the name carries the unit ("Padding top in pixels"). */
   const nameId = React.useId();
   const suffixId = React.useId();
-  const suffix = field.mixed ? "mixed values" : local.isKeyword || local.num === "" ? "" : unitWords(local.unit || "px");
+  const suffix = field.mixed ? "Mixed values" : local.isKeyword || local.num === "" ? "" : unitWords(local.unit || "px");
 
   return (
     <span className={CELL} data-testid={`inspector-spacing-${property}`}>
@@ -274,25 +274,43 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
       )}
     </div>
     <div className="bdi-quad">
-      {(["tl", "tr", "bl", "br"] as const).map((corner) => {
-        const { num, unit } = parseValue(values[corner]);
-        return (
-          <div key={corner} className="bdi-num axis" data-axis={corner.toUpperCase()}>
-            <TextInput
-              type="text"
-              value={num}
-              onChange={(e) => {
-                const v = e.target.value;
-                if (v === "") onChange(corner, "");
-                else if (/^-?[\d.]+$/.test(v)) onChange(corner, `${v}px`);
-              }}
-              placeholder="0"
-              aria-label={`${corner} corner`}
-            />
-            {unit && <span className="bdi-u">{unit}</span>}
-          </div>
-        );
-      })}
+      {(["tl", "tr", "bl", "br"] as const).map((corner) => (
+        <CornerCell key={corner} corner={corner} value={values[corner]} onChange={(v) => onChange(corner, v)} />
+      ))}
     </div>
   </div>
 );
+
+const CORNER_PROPERTY = {
+  tl: "border-top-left-radius",
+  tr: "border-top-right-radius",
+  br: "border-bottom-right-radius",
+  bl: "border-bottom-left-radius",
+} as const;
+
+const CornerCell: React.FC<{ corner: keyof typeof CORNER_PROPERTY; value: string; onChange: (value: string) => void }> = ({
+  corner,
+  value,
+  onChange,
+}) => {
+  const field = useInspectorField(CORNER_PROPERTY[corner]);
+  const { num, unit } = parseValue(value);
+  return (
+    <div className="bdi-num axis" data-axis={corner.toUpperCase()}>
+      <TextInput
+        type="text"
+        value={field.mixed ? "" : num}
+        readOnly={field.readOnly}
+        onChange={(e) => {
+          if (field.readOnly) return;
+          const v = e.target.value;
+          if (v === "") onChange("");
+          else if (/^-?[\d.]+$/.test(v)) onChange(`${v}px`);
+        }}
+        placeholder={field.mixed ? "Mixed" : "0"}
+        aria-label={field.mixed ? mixedName(`${corner} corner`) : `${corner} corner`}
+      />
+      {unit && !field.mixed && <span className="bdi-u">{unit}</span>}
+    </div>
+  );
+};

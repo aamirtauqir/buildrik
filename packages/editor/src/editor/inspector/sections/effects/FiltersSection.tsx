@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { MixedValueIndicator, RangeSlider, Section } from "../../shared/controls";
+import { RangeSlider, Section } from "../../shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
 import { composeFilter, parseFunction } from "./effectValues";
 
@@ -19,14 +19,14 @@ const FILTERS = [
   { fn: "grayscale", label: "Grayscale", unit: "%", identity: "0%", min: 0, max: 100 },
 ] as const;
 
-export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle, mixedKeys }) => (
+export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => (
   <Section title="Filters" isOpen={isOpen} onToggle={onToggle} id="inspector-section-filters">
     <div className="tw:relative">
-      <MixedValueIndicator prop="filter" mixedKeys={mixedKeys} />
       {FILTERS.map((f) => (
         <RangeSlider
           key={f.fn}
           label={f.label}
+          property="filter"
           unit={f.unit}
           min={f.min}
           max={f.max}
