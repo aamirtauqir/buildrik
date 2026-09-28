@@ -169,6 +169,32 @@ describe("useFieldOverrides — master (board 26)", () => {
     expect(result.current.labels.master).toBeUndefined();
   });
 
+  it("per-field master reset takes the master's value back for that property only, one undo step", async () => {
+    const { c, instanceId } = await instance();
+    act(() => {
+      c.elements.getElement(instanceId)!.setStyle("padding-top", "32px");
+      c.elements.getElement(instanceId)!.setStyle("padding-bottom", "40px");
+    });
+    c.history.flushPending?.();
+    const { result } = renderHook(() => useFieldOverrides(c, instanceId, "desktop"));
+    act(() => result.current.resetOverride("padding-top", "master"));
+    expect(result.current.overrides.get("padding-top")).toBeUndefined();
+    expect(result.current.overrides.get("padding-bottom")).toEqual(["master"]);
+    expect(c.elements.getElement(instanceId)!.getStyles()["padding-top"]).toBeUndefined();
+    c.history.flushPending?.();
+    act(() => c.history.undo());
+    expect(c.elements.getElement(instanceId)!.getStyles()["padding-top"]).toBe("32px");
+  });
+
+  it("a locked instance refuses the master reset", async () => {
+    const { c, instanceId } = await instance();
+    act(() => c.elements.getElement(instanceId)!.setStyle("padding-top", "32px"));
+    c.elements.getElement(instanceId)!.setLocked(true);
+    const { result } = renderHook(() => useFieldOverrides(c, instanceId, "desktop"));
+    act(() => result.current.resetOverride("padding-top", "master"));
+    expect(result.current.overrides.get("padding-top")).toEqual(["master"]);
+  });
+
   it("a property can carry two kinds at once", async () => {
     const { c, instanceId } = await instance();
     act(() => c.elements.getElement(instanceId)!.setStyle("padding-top", "32px"));

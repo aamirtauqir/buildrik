@@ -172,11 +172,9 @@ export function useFieldOverrides(
     (property: string, kind: OverrideKind) => {
       if (kind === "breakpoint") dropBreakpoint(`revert-${property}-${breakpoint}`, [property]);
       else if (kind === "pseudo") rewritePseudo(`reset-${property}-${pseudoState}`, (p) => p !== property);
-      /* master: the engine has no per-property "take the master's value"
-         (ComponentManager only resets the whole instance), so a master dot
-         announces and offers no reset — see OverrideDot. */
+      else write(`reset-${property}-master`, (id) => composer?.components.resetInstanceOverride(id, "style", property));
     },
-    [dropBreakpoint, rewritePseudo, breakpoint, pseudoState],
+    [dropBreakpoint, rewritePseudo, write, composer, breakpoint, pseudoState],
   );
 
   const revertBreakpoint = React.useCallback(

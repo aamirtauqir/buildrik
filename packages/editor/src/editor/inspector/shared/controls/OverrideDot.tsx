@@ -3,11 +3,8 @@
  * (R-DD-14, boards 26–28). A real control, not decoration: a 24px target
  * announced as "Overridden on Tablet" / "Overridden on :hover" / "Overrides
  * master" (§16), opening a menu whose one row puts the value back ("Reset to
- * Desktop" / "Reset to Base").
- *
- * A master dot announces and offers no reset: the engine can only reset a
- * whole instance (ComponentManager.resetInstance, the component row's ⋯), not
- * one property, and a menu row that cannot do what it says is worse than none.
+ * Desktop" / "Reset to Base" / "Reset to master" — the last through
+ * ComponentManager.resetInstanceOverride, one property of the instance).
  *
  * `sectionOverrideMarks` gives a section frame its header dot and bottom note
  * from the same field context: "● Padding overrides master" (26), "●
@@ -36,11 +33,11 @@ const SAYS: Record<OverrideKind, (l: string) => string> = {
   master: () => "Overrides master",
 };
 
-/** The menu row per kind; null = the engine has no single-property reset. */
-const RESET: Record<OverrideKind, string | null> = {
+/** The menu row per kind. */
+const RESET: Record<OverrideKind, string> = {
   breakpoint: "Reset to Desktop",
   pseudo: "Reset to Base",
-  master: null,
+  master: "Reset to master",
 };
 
 const DOT = "tw:block tw:size-1.5 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-accent)]";
@@ -49,7 +46,7 @@ export function OverrideDot({ kind, label, onReset }: OverrideDotProps) {
   const [open, setOpen] = React.useState(false);
   const says = SAYS[kind](label);
   const resetLabel = RESET[kind];
-  const reset = resetLabel ? onReset : undefined;
+  const reset = onReset;
   const dot = (
     <IconButton
       label={says}

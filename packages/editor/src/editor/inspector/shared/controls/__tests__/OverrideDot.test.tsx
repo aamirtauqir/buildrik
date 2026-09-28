@@ -26,14 +26,14 @@ describe("OverrideDot", () => {
     expect(onReset).toHaveBeenCalledTimes(1);
   });
 
-  it("master: announced as 'Overrides master' and offers no reset the engine cannot do", () => {
+  it("master: announced as 'Overrides master'; its menu resets the field to the master", () => {
     const onReset = vi.fn();
     render(<OverrideDot kind="master" label="Reservation banner" onReset={onReset} />);
     const dot = screen.getByRole("button", { name: "Overrides master" });
-    expect(dot.getAttribute("aria-haspopup")).toBeNull();
+    expect(dot.getAttribute("aria-haspopup")).toBe("menu");
     fireEvent.click(dot);
-    expect(screen.queryByRole("menu")).toBeNull();
-    expect(onReset).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Reset to master" }));
+    expect(onReset).toHaveBeenCalled();
   });
 
   it("read-only (no onReset): announces, no menu", () => {
