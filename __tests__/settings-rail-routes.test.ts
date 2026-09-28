@@ -87,6 +87,14 @@ describe("settings sections", () => {
     expect(findSettingsSection("/dashboard/settings/team")?.label).toBe("Team");
   });
 
+  it("describes the danger zone as the 30-day deletion it is, not as permanent", () => {
+    // Deleting a workspace or account is scheduled 30 days out and can be
+    // cancelled until then; "Permanent, and not reversible" said the opposite.
+    expect(findSettingsSection("/dashboard/settings/danger")?.description).toBe(
+      "Delete within 30 days, cancel any time before"
+    );
+  });
+
   it("treats the index itself as the directory, not a section", () => {
     expect(findSettingsSection("/dashboard/settings")).toBeUndefined();
   });
