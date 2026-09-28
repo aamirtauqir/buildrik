@@ -13,3 +13,20 @@ describe("canvas selection label", () => {
     expect(getFriendlyName(document.createElement("p"))).toBe("Text");
   });
 });
+
+describe("canvas labels read the one label map (SSOT)", () => {
+  it("every type the shared map names reads the same on the canvas", async () => {
+    const { ELEMENT_TYPE_LABELS } = await import("@/shared/constants/elementTypeLabels");
+    for (const [type, label] of Object.entries(ELEMENT_TYPE_LABELS)) {
+      expect(getElementNameFromType(type), type).toBe(label);
+    }
+  });
+
+  it("a DOM node without a type reads its tag through the same map", () => {
+    expect(getFriendlyName(document.createElement("div"))).toBe("Container");
+    expect(getFriendlyName(document.createElement("iframe"))).toBe("Embed");
+    const typed = document.createElement("div");
+    typed.setAttribute("data-buildrick-type", "collection-list");
+    expect(getFriendlyName(typed)).toBe("Collection list");
+  });
+});

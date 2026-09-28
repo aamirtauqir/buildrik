@@ -352,7 +352,8 @@ export const EVENTS = {
   /** Add opens its Paste HTML dialog (held until the panel mounts). */
   UI_INSERT_OPEN_PASTE_HTML: "ui:insert-open-paste-html",
   /** "Edit master ›" on an instance: the Components panel opens that
-   *  master's screen. Payload `{ componentId }`. */
+   *  master's screen. Payload `{ componentId, instanceId? }` — with the
+   *  instance, the master's "‹ Back to instance" re-selects it (§13). */
   UI_COMPONENTS_OPEN_MASTER: "ui:components-open-master",
   /** A click on the empty grey around the page (not an element, not chrome):
    *  the canvas clears the selection and the shell closes the Layers drawer. */

@@ -3,7 +3,7 @@
  * Shared utilities for getting element names, types, and box model info
  * @license BSD-3-Clause
  */
-import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
+import { ELEMENT_TYPE_LABELS, elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 // Text elements that support inline editing
 export const TEXT_ELEMENT_TAGS = new Set([
@@ -39,84 +39,6 @@ export const TEXT_ELEMENT_TAGS = new Set([
   "address",
 ]);
 
-/** Element type to friendly name mapping - SINGLE SOURCE OF TRUTH */
-export const TYPE_NAME_MAP: Record<string, string> = {
-  container: "Container",
-  section: "Section",
-  row: "Row",
-  column: "Column",
-  heading: "Heading",
-  paragraph: "Text",
-  text: "Text",
-  image: "Image",
-  button: "Button",
-  link: "Link",
-  video: "Video",
-  form: "Form",
-  input: "Input",
-  div: "Div",
-  span: "Span",
-  nav: "Navigation",
-  header: "Header",
-  footer: "Footer",
-  main: "Main",
-  aside: "Sidebar",
-  article: "Article",
-};
-
-/** HTML tag to friendly name mapping */
-const TAG_NAME_MAP: Record<string, string> = {
-  div: "Div",
-  section: "Section",
-  article: "Article",
-  nav: "Navigation",
-  header: "Header",
-  footer: "Footer",
-  main: "Main",
-  aside: "Sidebar",
-  h1: "Heading 1",
-  h2: "Heading 2",
-  h3: "Heading 3",
-  h4: "Heading 4",
-  h5: "Heading 5",
-  h6: "Heading 6",
-  p: "Text",
-  span: "Span",
-  a: "Link",
-  img: "Image",
-  button: "Button",
-  input: "Input",
-  form: "Form",
-  ul: "List",
-  ol: "Ordered List",
-  li: "List Item",
-  table: "Table",
-  video: "Video",
-  iframe: "Embed",
-};
-
-/** Element type to icon mapping - SINGLE SOURCE OF TRUTH */
-export const TYPE_ICON_MAP: Record<string, string> = {
-  container: "□",
-  section: "▭",
-  row: "⫿",
-  column: "⫾",
-  heading: "H",
-  paragraph: "¶",
-  text: "T",
-  image: "🖼",
-  button: "⬜",
-  link: "🔗",
-  video: "▶",
-  form: "📋",
-  input: "⬜",
-  nav: "☰",
-  header: "▤",
-  footer: "▤",
-  div: "□",
-  span: "⟨⟩",
-};
-
 /**
  * Get friendly element name from HTML element
  */
@@ -125,15 +47,10 @@ export function getFriendlyName(element: HTMLElement): string {
   const customName = element.getAttribute("data-buildrick-name");
   if (customName) return customName;
 
-  // Check for type attribute
+  // Its type, else its tag — both named by the one label map.
   const type = element.getAttribute("data-buildrick-type");
-  if (type) {
-    return TYPE_NAME_MAP[type.toLowerCase()] || type;
-  }
-
-  // Fall back to tag name
-  const tagName = element.tagName.toLowerCase();
-  return TAG_NAME_MAP[tagName] || tagName.charAt(0).toUpperCase() + tagName.slice(1);
+  if (type) return elementTypeLabel(type.toLowerCase());
+  return elementTypeLabel(element.tagName.toLowerCase());
 }
 
 /**
@@ -141,15 +58,11 @@ export function getFriendlyName(element: HTMLElement): string {
  */
 export function getElementNameFromType(type: string, tagName?: string): string {
   const normalized = type.toLowerCase();
-  if (TYPE_NAME_MAP[normalized]) return TYPE_NAME_MAP[normalized];
   /* The element's own type label before its DOM tag — a collection list read
-     "Div" and an icon "Span" on the selection tag (L2-V3, 4428:151488). */
+     "Div" and an icon "Span" on the selection tag (L2-V3, 4428:151488). One
+     map for both: shared/constants/elementTypeLabels. */
   if (ELEMENT_TYPE_LABELS[normalized]) return ELEMENT_TYPE_LABELS[normalized];
-  if (tagName) {
-    const tagNormalized = tagName.toLowerCase();
-    return TAG_NAME_MAP[tagNormalized] || tagName.charAt(0).toUpperCase() + tagName.slice(1);
-  }
-  return type;
+  return elementTypeLabel(tagName ? tagName.toLowerCase() : normalized);
 }
 
 /**
@@ -159,13 +72,6 @@ export function getParentName(element: HTMLElement): string | null {
   const parent = element.parentElement?.closest("[data-buildrick-id]") as HTMLElement | null;
   if (!parent) return null;
   return getFriendlyName(parent);
-}
-
-/**
- * Get element type icon
- */
-export function getTypeIcon(type: string): string {
-  return TYPE_ICON_MAP[type.toLowerCase()] || "◇";
 }
 
 /** Box model spacing values */

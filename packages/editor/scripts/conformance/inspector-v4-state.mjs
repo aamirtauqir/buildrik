@@ -129,7 +129,9 @@ export const BOARDS = {
   32: { select: IDS.buttonHover, tab: "style", stateMenu: true, needs: ["W1"] },
   33: { select: IDS.button, tab: "style", colour: "Fill", needs: ["L3-B"] },
   // The image carries a fixed 640px width, so its Size row renders the unit input.
-  34: { select: IDS.image, tab: "style", fieldError: { field: "width", label: "Width", section: "Size", value: "abc" }, needs: ["L3-C"] },
+  /* Board 34 is the Heading, Size › Width: the number sits in the size row's
+     own field (`inspector-size-width` › `.bdi-fld`), typed "24.." as drawn. */
+  34: { select: IDS.heading, tab: "style", fieldError: { selector: '[data-testid="inspector-size-width"] .bdi-fld input', label: "Width", section: "Size", value: "24.." }, needs: [] },
   35: { select: IDS.heading, tab: "style", ai: true, needs: ["L3-D"] }, // "Scope: Heading" + return note
   36: { select: IDS.heading, tab: "style", hideInspector: true, needs: ["L3-D"] }, // Show inspector ⌘\ button
 };
@@ -267,6 +269,7 @@ const RUNNER = String.raw`async (spec) => {
   if (spec.fieldError) {
     const { field, label } = spec.fieldError;
     const find = () => {
+      if (spec.fieldError.selector) return { input: document.querySelector(spec.fieldError.selector), via: "v4" };
       const box = q("inspector-field-" + field);
       if (box) return { input: box.matches("input") ? box : box.querySelector("input"), via: "v4" };
       return { input: document.querySelector('[data-testid="inspector-panel"] input[aria-label="' + label + '"]'), via: "pre-v4" };

@@ -28,6 +28,7 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   a: "Link",
   img: "Image",
   video: "Video",
+  iframe: "Embed",
   // HTML form elements
   button: "Button",
   input: "Input",
