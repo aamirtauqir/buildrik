@@ -188,7 +188,7 @@ IA we choose. **Approval asked separately (D1).**
 
 | ID | Finding | Evidence | Current → Proposed | Affected | Risk | P | Decision | Conf |
 |---|---|---|---|---|---|---|---|---|
-| SA-01 | An EDITOR on FREE can publish custom `<script src>`, favicon, OG and meta through `sites.saveProject`. This bypasses ADMIN and Pro, because publish reads the JSON copy | `sites.service.ts:759-762`; `ExportEngine.ts:642,676`; `sanitizeHeadCode.ts` allows `<script src>` (code) | JSON stored verbatim → server strips column-backed keys from `projectSettings` (or rejects them below role/plan); publish reads **columns only** (one SoT) | server sites.service, ExportEngine, SEOInjector, BuildrikSyncProvider | high (security) | **P0** | MERGE (single SoT) | high |
+| SA-01 | Column-backed site settings (favicon, meta, OG, head/body code, socials, robots, password) had **two sources of truth**: `sites.saveProject` stored the editor's copy verbatim in `projectSettings`, and publish read that JSON copy, so an EDITOR's JSON-only edit could disagree with the ADMIN-owned column. **Reclassified 2026-09-28 from security to source-of-truth:** it is not a privilege escalation, because an EDITOR can already publish any HTML directly — `sites.publish` takes client-rendered `pages[].html` (any string under the size cap, `packages/shared/schemas/publish.ts:21-30`) behind an EDITOR site-role check (`server/trpc/routers/sites.ts:373`), and the publish worker does not sanitize page HTML. Seen live in the P0 walkthrough: the publish request body is the editor's own rendered HTML | `sites.service.ts:759-762`; `ExportEngine.ts:642,676`; `sanitizeHeadCode.ts` allows `<script src>` (code); `publish.ts:21-30`, `sites.ts:373` (code, live) | JSON stored verbatim → server strips column-backed keys from `projectSettings` (`stripColumnBackedSettings`, `SITE_COLUMN_FIELDS`); backfill migration `20261003130000_settings_p0_settings_backfill` copies JSON-only values into NULL columns first; the editor loads **columns only** (one SoT) | server sites.service, ExportEngine, SEOInjector, BuildrikSyncProvider | med (data consistency) | **P1** | MERGE (single SoT) — fixed in Phase A (`c7a3a95d7`, `10588ae8b`) | high |
 | SA-02 | `sites.get` returns `publishedPassword` ciphertext to every member, including VIEWER | `sites.service.ts:341-346` (no `select`) (code) | → explicit `select` / redact like `settings.get` | server | high | **P0** | KEEP feature, fix leak | high |
 | SA-03 | `twoFactor.enable` can rotate an active 2FA secret with no re-auth | `account.service.ts:337-362` (code) | → refuse when enabled, or require current code/password | Security page | high | **P0** | KEEP, fix | high |
 | SA-04 | Delete workspace: copy says "permanent… subscription cancelled immediately". The service only schedules +30d, and **no processor exists**, so it never deletes | `workspace-settings.service.ts:150-157`; no reader of `deletionScheduledAt` (verified grep) | → **PD-5**: build the processor + cancel subscription, or change copy to what happens | Danger zone, Home banner | high (trust) | **P0** | PRODUCT DECISION | high |
@@ -367,6 +367,30 @@ PD-1 … PD-8 are the approval questions (asked alongside this doc):
 Not verified (carried from 02-settings §7 plus this session): anything requiring a Publish (JSON-vs-column precedence at
 deploy, auto-redirect 404s, slug moving the Vercel project), non-OWNER roles live, FREE-plan locks live, SA-08 and SA-15 at
 runtime, dashboard settings pages at runtime, a11y live.
+
+## Phase A status (P0 fix arc, 2026-09-28)
+
+Branch `fix/settings-p0`, not pushed. SA-02…SA-08 fixed; SA-01 fixed as a P1 source-of-truth change (row above). Walkthrough
+evidence, suite results and the full deploy checklist: `docs/plans/2026-09-27-settings-p0-walkthrough.md`.
+
+| Commit | What |
+|---|---|
+| `b9bef1bb6` | SA-02 `sites.get` no longer returns the password ciphertext |
+| `93a35c597` | SA-03 2FA enable refuses while 2FA is on |
+| `3c8e85b33` | SA-08 General save keeps social links it does not show |
+| `408925cb5` | SA-05 no locale auto-redirect; toggle hidden |
+| `2c84f8683` | SA-06 slug validated + unique; Vercel project name pinned |
+| `769eea4c3` | SA-07 site delete takes the deployment down and is logged |
+| `fbb875fc4`, `9f674764d` | SA-04 workspace-deletion processor (cron), honest copy, owner-only cancel |
+| `c7a3a95d7`, `10588ae8b` | SA-01 columns are the one source of truth (backfill + strip JSON copy) |
+| `70927cf27` … `d91760e78` | Final-review wave: C1 (`vercelProjectName` @unique + every slug path skips pinned names), I1–I3, I5, T8 |
+
+Deploy order (production is cPanel; migrations are a founder step):
+1. On prod, `SELECT "vercelProjectName", count(*) FROM sites WHERE "vercelProjectName" IS NOT NULL GROUP BY 1 HAVING count(*)>1;` must return 0 rows.
+2. Take the prod before-count of JSON-only settings.
+3. `prisma migrate deploy` (`20261003120000`, `20261003130000`, `20261003140000`).
+4. Only then deploy the code.
+5. Add the cPanel cron `GET /api/cron/workspace-deletion` (daily, `Authorization: Bearer $CRON_SECRET`).
 
 ## GSTACK REVIEW REPORT
 
