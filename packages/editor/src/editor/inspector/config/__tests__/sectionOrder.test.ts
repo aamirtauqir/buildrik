@@ -56,15 +56,15 @@ describe("section order", () => {
   });
 
   it("board 5 — Button · Style: Text inside (owner answer 1), no Typography", () => {
-    expect(titlesFor("style", "button")).toEqual(["button", "Text inside", "Size", "Spacing", "Fill", "Border"]);
+    expect(titlesFor("style", "button")).toEqual(["button", "Size", "Spacing", "Fill", "Border", "Text inside"]);
   });
 
   it("board 16 — Flex · Style: the type block carries the layout", () => {
-    expect(titlesFor("style", "flex", { isFlexContainer: true })).toEqual(["flex", "Text inside", "Size", "Spacing", "Fill", "Border"]);
+    expect(titlesFor("style", "flex", { isFlexContainer: true })).toEqual(["flex", "Size", "Spacing", "Fill", "Border", "Text inside"]);
   });
 
-  it("board 17 — Container (grid) · Style", () => {
-    expect(titlesFor("style", "container", { isGridContainer: true })).toEqual(["Layout", "Text inside", "Size", "Spacing", "Fill", "Border"]);
+  it("board 17 — Container (grid) · Style: Text inside last, after Border", () => {
+    expect(titlesFor("style", "container", { isGridContainer: true })).toEqual(["Layout", "Size", "Spacing", "Fill", "Border", "Text inside"]);
   });
 
   it("board 18 — Section · Behaviour: Link, no CMS binding", () => {

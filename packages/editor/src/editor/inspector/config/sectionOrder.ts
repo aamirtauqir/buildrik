@@ -17,11 +17,12 @@ const STYLE_ORDER: readonly SectionId[] = [
   "type",
   "layout",
   "typography",
-  "text-inside",
   "size",
   "spacing",
   "fill",
   "border",
+  /* Board 17: the closed "Text inside" summary sits LAST, after Border. */
+  "text-inside",
 ];
 
 const BEHAVIOUR_ORDER: readonly SectionId[] = [
