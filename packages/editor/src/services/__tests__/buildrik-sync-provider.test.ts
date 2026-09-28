@@ -58,6 +58,8 @@ import {
   SaveConflictError,
   ProjectNotLoadedError,
   SAVE_CONFLICT_EVENT,
+  SAVE_CONFLICT_CLEARED_EVENT,
+  getPendingConflictToken,
   isSaveConflictPending,
 } from "../BuildrikSyncProvider";
 
@@ -543,6 +545,36 @@ describe("save-conflict parsing (61-conflict)", () => {
     await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
     await loadedSite("s1");
     expect(isSaveConflictPending()).toBe(false);
+  });
+
+  /* Inspector v4 board 29: the Inspector holds its read-only line while a
+     conflict is pending and drops it the moment the user resolves it. */
+  it("holds the conflict token and announces when the conflict clears", async () => {
+    const cleared = vi.fn();
+    window.addEventListener(SAVE_CONFLICT_CLEARED_EVENT, cleared);
+    try {
+      mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+      await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
+      expect(getPendingConflictToken()).toBe("2026-07-01T10:00:00.000Z");
+      expect(cleared).not.toHaveBeenCalled();
+
+      // Overwrite.
+      setBaselineLastEditedAt("2026-07-01T10:00:00.000Z");
+      expect(getPendingConflictToken()).toBeNull();
+      expect(cleared).toHaveBeenCalledTimes(1);
+
+      // Nothing pending → nothing announced.
+      setBaselineLastEditedAt(null);
+      expect(cleared).toHaveBeenCalledTimes(1);
+
+      // Reload latest.
+      mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T11:00:00.000Z"));
+      await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
+      await loadedSite("s1");
+      expect(cleared).toHaveBeenCalledTimes(2);
+    } finally {
+      window.removeEventListener(SAVE_CONFLICT_CLEARED_EVENT, cleared);
+    }
   });
 
   /* Review M1: a save queued behind a refused one carried the same stale

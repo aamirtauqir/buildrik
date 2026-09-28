@@ -1,13 +1,12 @@
 /**
- * Component row registry entry — created by W1, owned by lane L2-D2 (which
- * turns VariantSection into the compact ComponentRow, board 26). Above the
- * type block (DD-16), only on a component instance.
+ * Component row registry entry — board 26 (DD-16): above the type block,
+ * only on a component instance. Owned by lane L2-D2.
  *
  * @license BSD-3-Clause
  */
 
 import { defineSection, type AnySectionEntry } from "./_shared";
-import { VariantSection } from "../VariantSection";
+import { ComponentRow } from "../ComponentRow";
 
 export const COMPONENT_SECTIONS: Record<string, AnySectionEntry> = {
   component: defineSection({
@@ -15,7 +14,7 @@ export const COMPONENT_SECTIONS: Record<string, AnySectionEntry> = {
     title: "Component",
     open: "always",
     shouldRender: (ctx) => Boolean(ctx.composer?.components?.getInstanceByElementId?.(ctx.selectedElement.id)),
-    Component: VariantSection,
+    Component: ComponentRow,
     styleKeys: [],
     adaptProps: (ctx) => ({ composer: ctx.composer ?? null, elementId: ctx.selectedElement.id }),
   }),
