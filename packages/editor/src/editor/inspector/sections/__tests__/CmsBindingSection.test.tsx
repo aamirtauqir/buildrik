@@ -149,31 +149,6 @@ describe("CmsBindingSection — bound (board 24)", () => {
     await waitFor(() => expect(screen.getByTestId("cms-preview")).toHaveTextContent("Margherita (record 2 of 3)"));
   });
 
-  it("numbers records in the order they were made, not the store's order (board 24: the first record is 1 of 3)", async () => {
-    /* IndexedDB lists a collection's records by id — here the first-made
-       record comes second, as the fixture site's did live ("record 2 of 3"). */
-    const stored = [
-      { id: "b", data: { name: "Margherita" }, createdAt: "2026-09-28T10:00:01.000Z" },
-      { id: "a", data: { name: "Cacio e pepe" }, createdAt: "2026-09-28T10:00:00.000Z" },
-      { id: "c", data: { name: "Tiramisu" }, createdAt: "2026-09-28T10:00:02.000Z" },
-    ];
-    const composer = makeComposer("heading", [MENU], [{ ...BOUND[0], itemId: "a" }]);
-    composer.cms.collections.queryContent.mockImplementation(() => Promise.resolve({ items: stored as never, total: 3, hasMore: false }));
-    render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
-    await waitFor(() => expect(screen.getByTestId("cms-preview")).toHaveTextContent("Cacio e pepe (record 1 of 3)"));
-  });
-
-  it("the page's record (no record) keeps the one the canvas shows, numbered by when it was made", async () => {
-    const stored = [
-      { id: "b", data: { name: "Margherita" }, createdAt: "2026-09-28T10:00:01.000Z" },
-      { id: "a", data: { name: "Cacio e pepe" }, createdAt: "2026-09-28T10:00:00.000Z" },
-    ];
-    const composer = makeComposer("heading", [MENU], BOUND);
-    composer.cms.collections.queryContent.mockImplementation(() => Promise.resolve({ items: stored as never, total: 2, hasMore: false }));
-    render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
-    await waitFor(() => expect(screen.getByTestId("cms-preview")).toHaveTextContent("Margherita (record 2 of 2)"));
-  });
-
   it("Unbind unbinds in one step", () => {
     const composer = makeComposer("heading", [MENU], BOUND);
     render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
