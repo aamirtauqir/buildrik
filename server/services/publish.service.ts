@@ -14,6 +14,8 @@ import {
   pickPublicUrl,
   setProjectPasswordProtection,
   deleteVercelDeployment,
+  removeDomainFromVercelProject,
+  resolveVercelProjectName,
   VercelApiError,
   type VercelFile,
 } from "@/lib/vercel";
@@ -799,6 +801,73 @@ export async function unpublishSite(siteId: string) {
     where: { id: siteId },
     data: { status: "DRAFT", publishedUrl: null },
   });
+}
+
+function errorText(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
+/** Vercel answers a DELETE for a domain that is no longer on the project with
+ *  a 404, or with a 4xx whose code or message says "not found". */
+function isVercelNotFound(e: unknown): boolean {
+  if (!(e instanceof VercelApiError)) return false;
+  return e.status === 404 || /not[_ ]found/i.test(e.code) || /not found/i.test(e.message);
+}
+
+/**
+ * SA-04 (D6): take a site fully offline before its workspace is deleted, and
+ * REPORT whether that worked — unlike `unpublishSite`, which is best-effort for
+ * a user who only wants a draft. The workspace delete cascades away the Vercel
+ * token and the deployment ids, so anything left serving now is orphaned for
+ * good. Every COMPLETED deployment goes, not just the latest (a rollback leaves
+ * older ones reachable at their own URLs), and every custom domain is detached
+ * from the project. Already gone (404) counts as done, so a retry is safe.
+ */
+export async function takeDownSiteForDeletion(
+  siteId: string,
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { workspaceId: true, slug: true, vercelProjectName: true, domains: { select: { domain: true } } },
+  });
+  if (!site) return { ok: true };
+  const jobs = await prisma.publishBuildJob.findMany({
+    where: { siteId, status: "COMPLETED", deploymentId: { not: null } },
+    select: { deploymentId: true },
+  });
+  const deploymentIds = [...new Set(jobs.flatMap((j) => (j.deploymentId ? [j.deploymentId] : [])))];
+  if (deploymentIds.length === 0 && site.domains.length === 0) return { ok: true };
+
+  let conn;
+  try {
+    conn = await getActiveVercelConnection(site.workspaceId);
+  } catch (e) {
+    return { ok: false, reason: `Vercel connection unreadable: ${errorText(e)}` };
+  }
+  if (!conn) {
+    return deploymentIds.length > 0 ? { ok: false, reason: "no Vercel connection" } : { ok: true };
+  }
+
+  const failures: string[] = [];
+  for (const deploymentId of deploymentIds) {
+    try {
+      await deleteVercelDeployment({ token: conn.token, teamId: conn.teamId, deploymentId });
+    } catch (e) {
+      failures.push(`deployment ${deploymentId}: ${errorText(e)}`);
+    }
+  }
+  const projectName = resolveVercelProjectName(site);
+  for (const { domain } of site.domains) {
+    try {
+      await removeDomainFromVercelProject({ token: conn.token, teamId: conn.teamId, projectName, domain });
+    } catch (e) {
+      if (!isVercelNotFound(e)) failures.push(`domain ${domain}: ${errorText(e)}`);
+    }
+  }
+  if (failures.length > 0) return { ok: false, reason: failures.join("; ") };
+
+  await prisma.site.update({ where: { id: siteId }, data: { status: "DRAFT", publishedUrl: null } });
+  return { ok: true };
 }
 
 /**
