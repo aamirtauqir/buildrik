@@ -22,7 +22,8 @@ import type { Element } from "@/engine/elements/Element";
 import { writableElements } from "@/engine/commands/commandOperations";
 import { InputRow } from "../../../shared/controls";
 import { handleGenericAttributeChange, runTxn, writeAttribute } from "../attributeWriter";
-import { CheckRow, isAttrOn, useElementRead } from "../blockRows";
+import { isAttrOn, useElementRead } from "../blockRows";
+import { CheckRow } from "../../../shared/controls/CheckRow";
 import { EditTextRow } from "../EditTextRow";
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 

@@ -49,6 +49,13 @@ describe("boolean attribute checkboxes (P-11b)", () => {
     expect(screen.getByText("Required")).toBeInTheDocument();
   });
 
+  it("the box comes first, its label beside it (X-8) — the shared CheckRow", () => {
+    setup("input");
+    const box = screen.getByRole("checkbox", { name: "Read only" });
+    const row = screen.getByTestId("inspector-row-read-only");
+    expect(row.firstElementChild === box || row.firstElementChild?.contains(box)).toBe(true);
+  });
+
   it("clicking the label toggles its own checkbox", () => {
     const { el } = setup("input");
     fireEvent.click(screen.getByText("Required"));

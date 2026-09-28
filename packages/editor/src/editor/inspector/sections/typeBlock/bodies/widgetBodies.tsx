@@ -27,7 +27,8 @@ import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { writableElements } from "@/engine/commands/commandOperations";
 import { InputRow } from "../../../shared/controls";
 import { runTxn, writeAttribute } from "../attributeWriter";
-import { CheckRow, ChoiceRow, Note, useElementVersion } from "./bodyRows";
+import { ChoiceRow, Note, useElementVersion } from "./bodyRows";
+import { CheckRow } from "../../../shared/controls/CheckRow";
 
 function useElement(p: TypeBlockBodyProps): Element | undefined {
   useElementVersion(p.composer);

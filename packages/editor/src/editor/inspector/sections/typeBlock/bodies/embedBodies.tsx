@@ -27,7 +27,8 @@ import { EMBED_RATIOS, EMBED_URL_ATTR, embedRatio, isOnAttr } from "@/shared/uti
 import { parseEmbedUrl, type EmbedKind } from "@/shared/utils/embed/parseEmbedUrl";
 import { ButtonGroup, InputRow } from "../../../shared/controls";
 import { runTxn, writeAttribute } from "../attributeWriter";
-import { CheckRow, Note, Warning, useElementVersion } from "./bodyRows";
+import { Note, Warning, useElementVersion } from "./bodyRows";
+import { CheckRow } from "../../../shared/controls/CheckRow";
 
 const RATIO_OPTIONS = EMBED_RATIOS.map((r) => ({ value: r, label: r }));
 

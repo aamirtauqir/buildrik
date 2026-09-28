@@ -8,6 +8,10 @@
 export { ControlRow, CompactRow, StackedRow, SubTitle, rowTestId, fieldTestId, labelTestId } from "./ControlRow";
 export type { ControlRowProps, SubTitleProps } from "./ControlRow";
 
+// Boolean row (box first, label beside)
+export { CheckRow } from "./CheckRow";
+export type { CheckRowProps } from "./CheckRow";
+
 // Section wrapper
 export { Section } from "./Section";
 export type { SectionProps, SectionTier } from "./Section";

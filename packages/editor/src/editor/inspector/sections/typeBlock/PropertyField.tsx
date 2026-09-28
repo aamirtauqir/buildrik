@@ -7,7 +7,8 @@
 
 import * as React from "react";
 import { InputRow, SelectRow } from "../../shared/controls";
-import { Checkbox } from "@/editor/chrome-ui";
+import { CheckRow } from "../../shared/controls/CheckRow";
+import { isAttrOn } from "./blockRows";
 import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { writableElements } from "@/engine/commands/commandOperations";
@@ -22,18 +23,6 @@ import {
   writeAttribute,
 } from "./attributeWriter";
 const styles = {
-  checkboxRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 12,
-  } as React.CSSProperties,
-  checkboxLabel: {
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-    fontWeight: 500,
-    minWidth: 70,
-  } as React.CSSProperties,
   nameWarning: {
     margin: "-6px 0 10px",
     fontSize: 11,
@@ -83,7 +72,6 @@ const PropertyField: React.FC<PropertyFieldProps> = ({
   onChange,
   selectedElement,
 }) => {
-  const checkboxId = React.useId();
   // SELECT FIELD
   if (prop.type === "select") {
     return (
@@ -100,18 +88,7 @@ const PropertyField: React.FC<PropertyFieldProps> = ({
   // accessible name; the state is the box itself (DD-22, P-11b). The loader
   // hands a boolean attribute over as "true" (present) or "" (absent).
   if (prop.type === "checkbox") {
-    return (
-      <div style={styles.checkboxRow}>
-        <label htmlFor={checkboxId} style={styles.checkboxLabel}>{prop.label}</label>
-        <Checkbox
-          id={checkboxId}
-          color="blue"
-          className="tw:bg-white"
-          checked={value === "true"}
-          onChange={(e) => onChange(prop.id, e.target.checked ? "true" : "")}
-          style={{ width: 16, height: 16 }} />
-      </div>
-    );
+    return <CheckRow label={prop.label} checked={value === "true"} onChange={(on) => onChange(prop.id, on ? "true" : "")} />;
   }
 
   // TEXTAREA FIELD
@@ -169,9 +146,7 @@ function readRow(el: Element, type: string, prop: PropertyConfig): string {
   }
   if (prop.id === "value" && type === "textarea") return el.getAttribute?.("value") || el.getContent?.() || "";
   const raw = el.getAttribute?.(prop.id);
-  /* A boolean attribute is ON when present — HTML writes it empty
-     (`controls=""`) — and off when absent or "false" (P-11b). */
-  if (prop.type === "checkbox") return raw !== undefined && raw !== null && raw !== "false" ? "true" : "";
+  if (prop.type === "checkbox") return isAttrOn(raw) ? "true" : "";
   return raw || "";
 }
 

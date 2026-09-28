@@ -24,7 +24,8 @@ import { extractVarName, cssVarToTokenId, resolveTokenVar } from "../../../share
 import { useTypeRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { typeStyleRows } from "@/editor/design-system/ui/sections/TypographySection";
 import { runTxn, writeAttribute } from "../attributeWriter";
-import { CheckRow, isAttrOn, useElementRead } from "../blockRows";
+import { isAttrOn, useElementRead } from "../blockRows";
+import { CheckRow } from "../../../shared/controls/CheckRow";
 import { EditTextRow } from "../EditTextRow";
 
 const LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"].map((v) => ({ value: v, label: v.toUpperCase() }));

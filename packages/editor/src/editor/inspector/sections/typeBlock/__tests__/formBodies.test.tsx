@@ -63,7 +63,7 @@ describe("Input (board 14)", () => {
     const { el } = mock({ required: "" });
     expect(screen.getByRole("checkbox", { name: "Required" })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: "Disabled" })).not.toBeChecked();
-    expect(screen.getByTestId("inspector-check-required").textContent?.trim()).toBe("Required");
+    expect(screen.getByTestId("inspector-row-required").textContent?.trim()).toBe("Required");
     fireEvent.click(screen.getByText("Disabled"));
     expect(el.setAttribute).toHaveBeenCalledWith("disabled", "true");
   });

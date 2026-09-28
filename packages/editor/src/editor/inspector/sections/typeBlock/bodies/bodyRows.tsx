@@ -1,7 +1,6 @@
 /**
  * Row pieces the media / embed / widget type blocks share (boards 8–13),
  * where the shared controls have no equivalent:
- *   CheckRow   — box, then its label beside it (boards 9, 10, 12, 13)
  *   ChoiceRow  — a labelled select with only real choices (no "Default"
  *                blank; board 11 When done, board 13 Open / Closed)
  *   Note       — the 11px hint line under a field ("Detected: YouTube",
@@ -13,31 +12,10 @@
  */
 
 import * as React from "react";
-import { BK_SELECT_BARE_VALUE_THEME, Checkbox, Select } from "@/editor/chrome-ui";
+import { BK_SELECT_BARE_VALUE_THEME, Select } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { fieldTestId, labelTestId, rowTestId } from "../../../shared/controls";
 import { useInspectorField } from "../../../shared/controls/InspectorFieldContext";
-
-export function CheckRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: (on: boolean) => void }) {
-  const id = React.useId();
-  const { readOnly } = useInspectorField();
-  return (
-    <div className="tw:flex tw:items-center tw:gap-2 tw:py-1" data-testid={rowTestId(label)}>
-      <Checkbox
-        id={id}
-        color="blue"
-        className="tw:size-4 tw:bg-white"
-        checked={checked}
-        disabled={readOnly}
-        aria-readonly={readOnly || undefined}
-        onChange={(e) => onChange(e.target.checked)}
-      />
-      <label htmlFor={id} className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
-        {label}
-      </label>
-    </div>
-  );
-}
 
 export function ChoiceRow({
   label,

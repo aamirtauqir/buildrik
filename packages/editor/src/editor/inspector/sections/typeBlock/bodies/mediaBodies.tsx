@@ -29,7 +29,8 @@ import { ButtonGroup, InputRow, SelectRow } from "../../../shared/controls";
 import { SourceRow } from "../SourceRow";
 import { getCurrentIconConfig, handleIconSelectAction, handleVideoPosterChange, runTxn, writeAttribute } from "../attributeWriter";
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
-import { CheckRow, Note, Warning, useElementVersion } from "./bodyRows";
+import { Note, Warning, useElementVersion } from "./bodyRows";
+import { CheckRow } from "../../../shared/controls/CheckRow";
 
 const FIT_OPTIONS = [
   { value: "cover", label: "Cover" },

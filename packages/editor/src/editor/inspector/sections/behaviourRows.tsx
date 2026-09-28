@@ -2,7 +2,6 @@
  * Behaviour-tab row primitives (boards 6, 7, 19, 20, 24, 25) — the pieces the
  * Link, CMS binding, Collection, Form and CSS classes sections share and the
  * Style tab's shared controls do not have:
- *   CheckRow   — a checkbox with its label BESIDE the box (X-8);
  *   CommitRow  — a labelled text field that writes on Enter / blur, once, and
  *                restores on Esc (Rel, a field's label, "Add class");
  *   PickRow    — "On click  [Scroll to menu ▾]": a label and a select-shaped
@@ -17,36 +16,8 @@
  */
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
-import { Button, Checkbox, TextField } from "@/editor/chrome-ui";
+import { Button, TextField } from "@/editor/chrome-ui";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
-
-export interface CheckRowProps {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  testId?: string;
-}
-
-export function CheckRow({ label, checked, onChange, testId }: CheckRowProps) {
-  const { readOnly } = useInspectorField();
-  const id = React.useId();
-  return (
-    <div className="tw:flex tw:items-center tw:gap-2 tw:min-h-6 tw:py-1" data-testid={testId}>
-      <Checkbox
-        id={id}
-        checked={checked}
-        aria-readonly={readOnly || undefined}
-        onChange={(e) => {
-          if (!readOnly) onChange(e.target.checked);
-        }}
-        className="tw:size-4 tw:shrink-0"
-      />
-      <label htmlFor={id} className="tw:cursor-pointer tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
-        {label}
-      </label>
-    </div>
-  );
-}
 
 export interface CommitRowProps {
   label: string;

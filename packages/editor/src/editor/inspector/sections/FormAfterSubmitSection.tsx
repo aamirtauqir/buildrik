@@ -37,7 +37,8 @@ import { getBuildrikClient } from "@/services/api-client";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Section, SelectRow, type SectionTier } from "../shared/controls";
-import { CheckRow, CommitRow, NoteRow } from "./behaviourRows";
+import { CommitRow, NoteRow } from "./behaviourRows";
+import { CheckRow } from "../shared/controls/CheckRow";
 
 export interface FormAfterSubmitSectionProps {
   elementId: string;

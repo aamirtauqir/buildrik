@@ -164,7 +164,7 @@ describe("Button (board 5)", () => {
   it("Disabled: the box first, its label beside it, and the label is the box's name", () => {
     const { el } = mock("button");
     const box = screen.getByRole("checkbox", { name: "Disabled" });
-    const row = box.closest("[data-testid='inspector-check-disabled']") as HTMLElement;
+    const row = box.closest("[data-testid='inspector-row-disabled']") as HTMLElement;
     expect(row.firstElementChild?.contains(box) || row.firstElementChild === box).toBe(true);
     expect(row.textContent?.trim()).toBe("Disabled");
     fireEvent.click(screen.getByText("Disabled"));

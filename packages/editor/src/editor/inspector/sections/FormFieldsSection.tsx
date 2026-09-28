@@ -15,7 +15,8 @@ import { EVENTS } from "@/shared/constants/events";
 import { ChevronRight, GripVertical } from "lucide-react";
 import { Button } from "@/editor/chrome-ui";
 import { Section, SelectRow, type SectionTier } from "../shared/controls";
-import { ActionRow, CheckRow, CommitRow } from "./behaviourRows";
+import { ActionRow, CommitRow } from "./behaviourRows";
+import { CheckRow } from "../shared/controls/CheckRow";
 import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface FormFieldsSectionProps {

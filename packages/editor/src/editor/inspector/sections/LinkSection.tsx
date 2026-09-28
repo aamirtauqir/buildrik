@@ -17,7 +17,8 @@ import type { Composer, Element } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import type { PageData } from "@/shared/types";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
-import { CheckRow, CommitRow, NoteRow } from "./behaviourRows";
+import { CommitRow, NoteRow } from "./behaviourRows";
+import { CheckRow } from "../shared/controls/CheckRow";
 import { isEmail, isPhoneNumber } from "@/shared/utils/helpers/validation";
 import { writeElement } from "@/engine/commands/commandOperations";
 
