@@ -110,3 +110,70 @@ describe("jwt callback — session revocation gate", () => {
     expect(result.sv).toBe(7);
   });
 });
+
+/**
+ * Stale active workspace. `token.workspaceId` outlives its workspace when the
+ * deletion cron removes it (or the membership is removed), and every layer used
+ * to fall back differently: the switcher to the newest-joined membership, the
+ * server resolvers to an unordered `findFirst`. The switcher showed one
+ * workspace while the Delete-workspace modal targeted another. The jwt callback
+ * now repairs the claim to the ONE canonical pick login already uses.
+ */
+describe("jwt callback — stale active workspace repair", () => {
+  const CANONICAL_ORDER = [{ lastActiveAt: "desc" }, { joinedAt: "asc" }];
+
+  it("repairs a claim whose workspace is gone to the canonical pick", async () => {
+    userFindUnique.mockResolvedValue({ sessionVersion: 0, workspaceMembers: [] });
+    memberFindFirst.mockResolvedValue({ workspaceId: "ws-canonical" });
+
+    const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-deleted" } });
+
+    expect(result.workspaceId).toBe("ws-canonical");
+    expect(memberFindFirst).toHaveBeenCalledWith({
+      where: { userId: "u1", status: "ACTIVE" },
+      orderBy: CANONICAL_ORDER,
+      select: { workspaceId: true },
+    });
+  });
+
+  it("checks the claim inside the sessionVersion read, not a second query", async () => {
+    userFindUnique.mockResolvedValue({ sessionVersion: 0, workspaceMembers: [{ workspaceId: "ws-chosen" }] });
+
+    await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-chosen" } });
+
+    expect(userFindUnique).toHaveBeenCalledTimes(1);
+    expect(userFindUnique.mock.calls[0][0].select.workspaceMembers).toEqual({
+      where: { workspaceId: "ws-chosen", status: "ACTIVE" },
+      select: { workspaceId: true },
+      take: 1,
+    });
+  });
+
+  it("leaves a still-valid claim alone, even when it is not the canonical first pick", async () => {
+    userFindUnique.mockResolvedValue({ sessionVersion: 0, workspaceMembers: [{ workspaceId: "ws-chosen" }] });
+    memberFindFirst.mockResolvedValue({ workspaceId: "ws-other" });
+
+    const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-chosen" } });
+
+    expect(result.workspaceId).toBe("ws-chosen");
+    expect(memberFindFirst).not.toHaveBeenCalled();
+  });
+
+  it("sets the claim to null when the user has no ACTIVE membership left", async () => {
+    userFindUnique.mockResolvedValue({ sessionVersion: 0, workspaceMembers: [] });
+    memberFindFirst.mockResolvedValue(null);
+
+    const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-deleted" } });
+
+    expect(result).not.toBeNull();
+    expect(result.workspaceId).toBeNull();
+  });
+
+  it("fails open on a DB error without touching the claim", async () => {
+    userFindUnique.mockRejectedValue(new Error("connection refused"));
+
+    const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-chosen" } });
+
+    expect(result.workspaceId).toBe("ws-chosen");
+  });
+});

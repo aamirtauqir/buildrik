@@ -6,6 +6,7 @@ import { validateToken, invalidateToken } from "@server/services/token.service";
 import { encode } from "next-auth/jwt";
 import { logAuditEvent } from "@server/services/audit.service";
 import { recordDeviceAndAlert } from "@server/services/device-alert.service";
+import { DEFAULT_WORKSPACE_ORDER } from "@server/trpc/workspace-ctx";
 import { clientIp } from "@lib/request-ip";
 
 const createSessionSchema = z.object({
@@ -62,13 +63,13 @@ export async function POST(req: NextRequest) {
   // Mirror NextAuth jwt callback (server/auth.config.ts) — non-OAuth
   // flows bypass signIn → jwt; without this lookup, session.user.workspaceId
   // stays null and scopedProcedure rejects every editor tRPC call with 401.
-  // Same ordering as the jwt callback in server/auth.config.ts. Both used a bare
+  // The canonical DEFAULT_WORKSPACE_ORDER, shared with the jwt callback. Both used a bare
   // `findFirst`, so a user in more than one workspace was dropped into whichever
   // row Postgres happened to return — and the two paths could disagree with each
   // other. Prefer the workspace they last used.
   const member = await prisma.workspaceMember.findFirst({
     where: { userId: user.id, status: "ACTIVE" },
-    orderBy: [{ lastActiveAt: "desc" }, { joinedAt: "asc" }],
+    orderBy: DEFAULT_WORKSPACE_ORDER,
     select: { workspaceId: true },
   });
 

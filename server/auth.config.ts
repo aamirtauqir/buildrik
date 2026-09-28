@@ -6,6 +6,7 @@ import { decode } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
+import { DEFAULT_WORKSPACE_ORDER } from "@/server/trpc/workspace-ctx";
 
 // Type the GitHub
 // `userinfo.request` override's parameter from @auth/core's own types
@@ -313,7 +314,7 @@ export const authConfig: NextAuthConfig = {
         // sends multi-workspace users to the chooser anyway, this is the fallback.
         const member = await prisma.workspaceMember.findFirst({
           where: { userId: user.id, status: "ACTIVE" },
-          orderBy: [{ lastActiveAt: "desc" }, { joinedAt: "asc" }],
+          orderBy: DEFAULT_WORKSPACE_ORDER,
           select: { workspaceId: true },
         });
         token.workspaceId = member?.workspaceId ?? null;
@@ -354,16 +355,35 @@ export const authConfig: NextAuthConfig = {
       // everyone out AND still kill pre-deploy cookies the moment their owner
       // revokes anything. Blanket-grandfathering would have kept the exact hole
       // open for the full cookie lifetime.
+      //
+      // The same read checks the active-workspace claim. It goes stale when the
+      // deletion cron removes its workspace or the membership is removed, and
+      // then the switcher and the server fell back to DIFFERENT workspaces. A
+      // stale claim is repaired to the canonical pick; a valid one is kept.
       if (typeof token.userId === "string") {
         try {
+          const claimed = typeof token.workspaceId === "string" ? token.workspaceId : null;
           const current = await prisma.user.findUnique({
             where: { id: token.userId },
-            select: { sessionVersion: true },
+            select: {
+              sessionVersion: true,
+              workspaceMembers: claimed
+                ? { where: { workspaceId: claimed, status: "ACTIVE" }, select: { workspaceId: true }, take: 1 }
+                : false,
+            },
           });
           // User deleted → no session. Version moved on → this cookie predates a
           // revocation the user asked for.
           if (!current) return null;
           if (current.sessionVersion !== (typeof token.sv === "number" ? token.sv : 0)) return null;
+          if (!claimed || !current.workspaceMembers?.length) {
+            const member = await prisma.workspaceMember.findFirst({
+              where: { userId: token.userId, status: "ACTIVE" },
+              orderBy: DEFAULT_WORKSPACE_ORDER,
+              select: { workspaceId: true },
+            });
+            token.workspaceId = member?.workspaceId ?? null;
+          }
         } catch (e) {
           // Deliberately fail OPEN. This runs on every request, so failing
           // closed would turn a transient Postgres blip into a total auth

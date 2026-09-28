@@ -7,9 +7,8 @@
  *     against, regardless of which workspace the user "defaults to".
  *  2. session.user.workspaceId — populated at sign-in by the NextAuth jwt
  *     callback (see server/auth.config.ts), so no per-request DB hit.
- *  3. Legacy fallback: prisma.workspaceMember.findFirst — older sessions
- *     minted before the jwt callback started carrying workspaceId may not
- *     have it. Falls back to lookup for safety.
+ *  3. Fallback: the canonical DEFAULT_WORKSPACE_ORDER pick — for sessions
+ *     with no workspaceId, or one that is no longer an ACTIVE membership.
  *
  * Throws TRPCError NOT_FOUND when the user belongs to no workspace.
  *
@@ -17,6 +16,18 @@
  */
 
 import { TRPCError } from "@trpc/server";
+import type { Prisma } from "@prisma/client";
+
+/**
+ * The ONE default-workspace pick: most recently used ACTIVE membership, oldest
+ * join breaking ties. Login (server/auth.config.ts), the jwt stale-claim repair
+ * and every server fallback use it, so a stale session workspace can never send
+ * the client and the server to different workspaces.
+ */
+export const DEFAULT_WORKSPACE_ORDER: Prisma.WorkspaceMemberOrderByWithRelationInput[] = [
+  { lastActiveAt: "desc" },
+  { joinedAt: "asc" },
+];
 
 interface BearerContext {
   apiToken?: { workspaceId: string };
@@ -30,6 +41,7 @@ interface PrismaContext {
   workspaceMember: {
     findFirst: (args: {
       where: { userId: string; status: string; workspaceId?: string };
+      orderBy?: Prisma.WorkspaceMemberOrderByWithRelationInput[];
       select: { workspaceId: true };
     }) => Promise<{ workspaceId: string } | null>;
   };
@@ -65,6 +77,7 @@ export async function resolveWorkspaceId(ctx: WorkspaceCtx): Promise<string> {
   // Fall back to any ACTIVE membership; none left → access revoked.
   const member = await ctx.prisma.workspaceMember.findFirst({
     where: { userId, status: "ACTIVE" },
+    orderBy: DEFAULT_WORKSPACE_ORDER,
     select: { workspaceId: true },
   });
   if (!member) {
