@@ -156,4 +156,39 @@ describe("useStyleHandlers — extraTargetIds (the rest of a multi-selection, DD
       { pseudo: ":hover", mediaQuery: mq }
     );
   });
+  /* Board 22: "Edits apply to all 3." A batch edit — Spacing's linked sides,
+     the Fill kind switch — wrote the primary alone, so two of three headings
+     kept their old padding. */
+  it("a BATCH edit lands on every selected element, in one transaction", () => {
+    const composer = makeComposer();
+    const { result } = renderHook(() =>
+      useStyleHandlers(SEL, asComposer(composer), "desktop", "normal", ["el2", "el3"])
+    );
+    act(() => result.current.handleBatchStyleChange({ "padding-top": "24px", "padding-bottom": "24px", margin: "" }));
+    for (const id of ["el1", "el2", "el3"]) {
+      expect(composer._setStyle).toHaveBeenCalledWith(id, "padding-top", "24px");
+      expect(composer._setStyle).toHaveBeenCalledWith(id, "padding-bottom", "24px");
+      expect(composer._removeStyle).toHaveBeenCalledWith(id, "margin");
+    }
+    expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
+    expect(composer.endTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("a batch edit on Tablet and under :hover writes each peer's own override / rule", () => {
+    const composer = makeComposer();
+    const tablet = renderHook(() => useStyleHandlers(SEL, asComposer(composer), "tablet", "normal", ["el2"]));
+    act(() => tablet.result.current.handleBatchStyleChange({ padding: "8px" }));
+    expect(composer.styles.setBreakpointStyle).toHaveBeenCalledWith("el1", "tablet", { padding: "8px" });
+    expect(composer.styles.setBreakpointStyle).toHaveBeenCalledWith("el2", "tablet", { padding: "8px" });
+
+    const hover = renderHook(() => useStyleHandlers(SEL, asComposer(composer), "desktop", "hover", ["el2"]));
+    act(() => hover.result.current.handleBatchStyleChange({ color: "#0f0" }));
+    for (const id of ["el1", "el2"]) {
+      expect(composer.styles.setRule).toHaveBeenCalledWith(
+        `[data-buildrick-id="${id}"]`,
+        { color: "#0f0" },
+        { pseudo: ":hover", mediaQuery: undefined, replace: true }
+      );
+    }
+  });
 });
