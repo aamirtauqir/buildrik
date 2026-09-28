@@ -51,10 +51,6 @@ export const compactBtnClass = (active: boolean): string =>
       : "tw:bg-[var(--bk-bg-subtle)] tw:border-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]",
   ].join(" ");
 
-/** Collapsed-section value preview in the Section header ("flex · relative"). */
-export const SECTION_PREVIEW =
-  "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:[font-family:var(--bk-font-mono)]";
-
 /** Sub-heading inside an open section ("Size Constraints", "Overflow"). */
 export const SECTION_SUBTITLE =
   "tw:mt-0.5 tw:mb-1 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:tracking-[0.08em] " +

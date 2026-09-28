@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { composeTransform, composeFilter } from "../EffectsSection";
+import { composeFilter, composeShadow, composeTransform, extractInnerShadow, extractOuterShadow } from "../effectValues";
 
 describe("composeTransform", () => {
   it("merges a new function without dropping existing ones", () => {
@@ -47,5 +47,18 @@ describe("composeFilter", () => {
 
   it("drops identity filters", () => {
     expect(composeFilter("blur(4px)", "blur", "0px")).toBe("none");
+  });
+});
+
+describe("box-shadow layers", () => {
+  it("splits outer and inset layers without breaking rgba()", () => {
+    const v = "0 4px 12px rgba(0,0,0,0.08), inset 0 2px 4px rgba(0,0,0,0.1)";
+    expect(extractOuterShadow(v)).toBe("0 4px 12px rgba(0,0,0,0.08)");
+    expect(extractInnerShadow(v)).toBe("inset 0 2px 4px rgba(0,0,0,0.1)");
+  });
+
+  it("composes the two back, and none when both are empty", () => {
+    expect(composeShadow("0 1px 2px red", "inset 0 0 1px blue")).toBe("0 1px 2px red, inset 0 0 1px blue");
+    expect(composeShadow("", "")).toBe("none");
   });
 });

@@ -66,6 +66,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
         {mixedKeys?.has("position") && <MixedValueBadge compact />}
         <SelectRow
           label="Position"
+          property="position"
           value={styles.position || "static"}
           onChange={(v) => onChange("position", v)}
           options={POSITION_OPTIONS}

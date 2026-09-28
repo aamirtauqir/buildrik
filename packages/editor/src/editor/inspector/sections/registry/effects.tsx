@@ -1,21 +1,20 @@
 /**
  * Effects registry entries (board 3): Opacity, Shadow, Filters, Transform &
- * motion — each a "+" row until it carries a value — and Advanced, closed
- * with a summary ("Cursor: auto · Blend: normal").
- *
- * W1 points them at today's sections; lane L2-C splits "More effects" into
- * the new Filters / Transform & motion / Advanced bodies and merges the
- * shadow presets. Until then Transform & motion and Advanced both open the
- * existing "More effects" controls.
+ * motion — each a "+" row until the element carries a value — and Advanced,
+ * closed with a summary ("Cursor: auto · Blend: normal"). One section per
+ * CSS property family; no property is written by two of them.
  *
  * @license BSD-3-Clause
  */
 
 import { adaptBaseStyleProps, defineSection, type AnySectionEntry } from "./_shared";
-import { EffectsSection } from "../EffectsSection";
-import { BlurSection, OpacitySection, ShadowSection } from "../EffectsBasicSections";
+import { EffectsAdvancedSection } from "../effects/EffectsAdvancedSection";
+import { FiltersSection } from "../effects/FiltersSection";
+import { OpacitySection } from "../effects/OpacitySection";
+import { ShadowSection } from "../effects/ShadowSection";
+import { TransformMotionSection } from "../effects/TransformMotionSection";
 
-const MORE_EFFECTS_KEYS = ["box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"];
+const set = (v: string | undefined) => Boolean(v) && v !== "none";
 
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   opacity: defineSection({
@@ -31,6 +30,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
     tab: "effects",
     title: "Shadow",
     open: "valued",
+    hasValue: (ctx) => set(ctx.authoredStyles["box-shadow"]),
     Component: ShadowSection,
     styleKeys: ["box-shadow"],
     adaptProps: adaptBaseStyleProps,
@@ -40,7 +40,8 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
     tab: "effects",
     title: "Filters",
     open: "valued",
-    Component: BlurSection,
+    hasValue: (ctx) => set(ctx.authoredStyles.filter),
+    Component: FiltersSection,
     styleKeys: ["filter"],
     adaptProps: adaptBaseStyleProps,
   }),
@@ -50,9 +51,9 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
     title: "Transform & motion",
     open: "valued",
     hasValue: (ctx) =>
-      ["transform", "transition", "transition-property", "transition-duration"].some((k) => Boolean(ctx.authoredStyles[k])),
-    Component: EffectsSection,
-    styleKeys: MORE_EFFECTS_KEYS,
+      ["transform", "transition", "transition-property", "transition-duration"].some((k) => set(ctx.authoredStyles[k])),
+    Component: TransformMotionSection,
+    styleKeys: ["transform", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function"],
     adaptProps: adaptBaseStyleProps,
   }),
 
@@ -62,8 +63,8 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
     open: "closed",
     summary: (ctx) =>
       `Cursor: ${ctx.authoredStyles.cursor || "auto"} · Blend: ${ctx.authoredStyles["mix-blend-mode"] || "normal"}`,
-    Component: EffectsSection,
-    styleKeys: MORE_EFFECTS_KEYS,
+    Component: EffectsAdvancedSection,
+    styleKeys: ["cursor", "mix-blend-mode", "text-shadow", "will-change"],
     adaptProps: adaptBaseStyleProps,
   }),
 };

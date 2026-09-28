@@ -1,5 +1,9 @@
 /**
- * Background Section - Color, Image, Gradient
+ * Fill Section (registry id `fill`, boards 1, 21, 27) — colour, gradient or
+ * image behind the element. Empty = board 1's "Fill  +" row (the frame draws
+ * it); "+" opens the Colour row. The Colour / Gradient / Image choice waits
+ * behind More settings until a gradient or image is set. On the Page panel
+ * the row reads "Background" (board 21).
  */
 
 import * as React from "react";
@@ -11,6 +15,8 @@ import { Button, TextInput } from "@/editor/chrome-ui";
 
 const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]";
 export interface BackgroundSectionProps {
+  /** "page" names the colour row "Background" (board 21). */
+  variant?: "element" | "page";
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
   /** Writes several properties as one change (one undo step). Switching the
@@ -38,6 +44,7 @@ export interface BackgroundSectionProps {
 }
 
 export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
+  variant = "element",
   styles,
   onChange,
   onBatchChange,
@@ -108,37 +115,14 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
     />
   ) : undefined;
 
-  // "+" action in header — opens media library for image bg (falls through if
-  // handler not wired). Matches mock's "+ add background layer" affordance.
-  const addAction = onOpenMediaLibrary ? (
-    <Button
-      type="button"
-      className="bdi-plus"
-      onClick={(e) => {
-        e.stopPropagation();
-        onOpenMediaLibrary(["image"], (asset) => {
-          writeImage(`url(${asset.src})`);
-        });
-      }}
-      aria-label="Add background image"
-      title="Add background image"
-    >
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M12 5v14 M5 12h14" />
-      </svg>
-    </Button>
-  ) : undefined;
-
   return (
     <Section
-      title="Background"
-      icon="Palette"
+      title="Fill"
       preview={preview}
-      action={addAction}
       isOpen={isOpen}
       onToggle={onToggle}
       tier={tier}
-      id="inspector-section-background"
+      id="inspector-section-fill"
     >
       {/* Background Type Selector — segmented. Board 7056:78695 opens a
           colour background as the one Fill row; the Color / Gradient / Image
@@ -163,7 +147,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
         <div className="tw:relative">
           <MixedValueIndicator prop="background-color" mixedKeys={mixedKeys} />
           <ColorInput
-            label="Fill"
+            label={variant === "page" ? "Background" : "Colour"}
+            property="background-color"
             value={styles["background-color"] || shorthandColor}
             onChange={writeFill}
             composer={composer}
@@ -310,6 +295,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               <div className="tw:relative">
                 <MixedValueIndicator prop="background-size" mixedKeys={mixedKeys} />
                 <SelectRow
+                  property="background-size"
                   label="Size"
                   value={styles["background-size"] || ""}
                   onChange={(v) => onChange("background-size", v)}
@@ -325,6 +311,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               <div className="tw:relative">
                 <MixedValueIndicator prop="background-position" mixedKeys={mixedKeys} />
                 <SelectRow
+                  property="background-position"
                   label="Position"
                   value={styles["background-position"] || ""}
                   onChange={(v) => onChange("background-position", v)}
@@ -345,6 +332,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               <div className="tw:relative">
                 <MixedValueIndicator prop="background-repeat" mixedKeys={mixedKeys} />
                 <SelectRow
+                  property="background-repeat"
                   label="Repeat"
                   value={styles["background-repeat"] || ""}
                   onChange={(v) => onChange("background-repeat", v)}
@@ -358,6 +346,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               </div>
 
               <SelectRow
+                property="background-attachment"
                 label="Attachment"
                 value={styles["background-attachment"] || ""}
                 onChange={(v) => onChange("background-attachment", v)}
@@ -369,6 +358,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               />
 
               <SelectRow
+                property="background-blend-mode"
                 label="Blend Mode"
                 value={styles["background-blend-mode"] || ""}
                 onChange={(v) => onChange("background-blend-mode", v)}

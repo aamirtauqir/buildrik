@@ -57,8 +57,6 @@ export type SectionId =
   | "component"
   | "type"
   | "layout"
-  | "flex"
-  | "grid"
   | "typography"
   | "text-inside"
   | "size"

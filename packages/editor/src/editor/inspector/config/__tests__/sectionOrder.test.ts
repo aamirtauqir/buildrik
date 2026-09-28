@@ -64,7 +64,7 @@ describe("section order", () => {
   });
 
   it("board 17 — Container (grid) · Style", () => {
-    expect(titlesFor("style", "container", { isGridContainer: true })).toEqual(["Layout", "Grid", "Text inside", "Size", "Spacing", "Fill", "Border"]);
+    expect(titlesFor("style", "container", { isGridContainer: true })).toEqual(["Layout", "Text inside", "Size", "Spacing", "Fill", "Border"]);
   });
 
   it("board 18 — Section · Behaviour: Link, no CMS binding", () => {
