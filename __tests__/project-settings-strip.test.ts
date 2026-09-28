@@ -21,7 +21,7 @@ vi.mock("@/lib/prisma", () => {
 });
 
 import { saveProjectData } from "@/server/services/sites.service";
-import { stripColumnBackedSettings } from "@/server/services/project-settings";
+import { stripColumnBackedSettings } from "@/server/services/site-settings.service";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 
 describe("stripColumnBackedSettings", () => {

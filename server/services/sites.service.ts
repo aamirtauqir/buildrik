@@ -13,8 +13,7 @@ import type {
 } from "@buildrik/shared/schemas/sites";
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
-import { stripColumnBackedSettings } from "@/server/services/project-settings";
-import { SITE_SETTINGS_COLUMNS } from "@/server/services/site-settings.service";
+import { SITE_SETTINGS_COLUMNS, stripColumnBackedSettings } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
