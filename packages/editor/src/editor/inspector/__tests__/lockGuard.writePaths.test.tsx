@@ -35,7 +35,7 @@ import { LinkSection } from "../sections/LinkSection";
 import { CSSClassesSection } from "../sections/CSSClassesSection";
 import { CollectionListSection } from "../sections/CollectionListSection";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
-import { BindingBanner } from "../components/BindingBanner";
+import { CmsBindingSection } from "../sections/CmsBindingSection";
 import { InspectorElementMenu } from "../components/InspectorElementMenu";
 import { useBatchStyleHandler } from "../hooks/useBatchStyleHandler";
 
@@ -232,6 +232,7 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
           off: vi.fn(),
           getAllCollections: vi.fn(() => [{ id: "menu", name: "Menu", slug: "menu", fields: [{ slug: "title", name: "Title" }] }]),
           getCollection: vi.fn(() => ({ id: "menu", name: "Menu", slug: "menu", fields: [{ slug: "title", name: "Title" }] })),
+          queryContent: vi.fn(() => Promise.resolve({ items: [], total: 0, hasMore: false })),
         },
       },
     } as unknown as Composer;
@@ -241,16 +242,16 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
   it("CollectionListSection: binding a list", () => {
     const { c, bindCollectionList, emit } = cmsComposer(true);
     render(<CollectionListSection elementId="list" composer={c} isOpen />);
-    fireEvent.change(screen.getByRole("combobox", { name: "Source" }), { target: { value: "menu" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Collection" }), { target: { value: "menu" } });
     expect(bindCollectionList).not.toHaveBeenCalled();
     expect(emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   });
 
-  it("BindingBanner: Unbind", () => {
+  it("CmsBindingSection: Unbind", () => {
     const { c, unbindAll } = cmsComposer(true);
-    render(<BindingBanner composer={c} elementId="list" elementLabel="Text" />);
+    render(<CmsBindingSection composer={c} elementId="list" isOpen />);
     const unbind = screen.queryByRole("button", { name: "Unbind" });
-    if (!unbind) throw new Error("banner did not render — fixture out of date");
+    if (!unbind) throw new Error("section did not render the bound state — fixture out of date");
     fireEvent.click(unbind);
     expect(unbindAll).not.toHaveBeenCalled();
   });
