@@ -45,7 +45,7 @@ import { usePropertyJump } from "./hooks/usePropertyJump";
 import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY, type TabId } from "./sections/registry";
 import { computeEffectiveStyles, deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
-import { detectMixedValues } from "./shared/detectMixedValues";
+import { detectMixedValues, shownStylesAt } from "./shared/detectMixedValues";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "./shared/controls/InspectorFieldContext";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
 import "./styles/inspector.css";
@@ -215,7 +215,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     () => Array.from(new Set(Object.values(SECTION_REGISTRY).flatMap((entry) => entry.styleKeys as string[]))),
     []
   );
-  const mixedKeys = React.useMemo(() => detectMixedValues(selectedElements, allStyleKeys), [selectedElements, allStyleKeys]);
+  /* What each selected element SHOWS here, re-read after every edit (an edit
+     can make the selection agree). */
+  const mixedKeys = React.useMemo(
+    () => detectMixedValues(selectedElements, allStyleKeys, shownStylesAt(composer, currentBreakpoint, currentPseudoState)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedElements, allStyleKeys, composer, currentBreakpoint, currentPseudoState, styles_state]
+  );
   const enrichedContext = React.useMemo(
     () => ({ ...contextState, selectedElements, mixedKeys }),
     [contextState, selectedElements, mixedKeys]
