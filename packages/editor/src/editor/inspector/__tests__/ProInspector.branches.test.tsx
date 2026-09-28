@@ -130,4 +130,18 @@ describe("ProInspector — branch selection", () => {
     expect(screen.queryByTestId("multi-bar")).not.toBeInTheDocument();
     expect(screen.queryByTestId("page-panel")).not.toBeInTheDocument();
   });
+
+  it("the tab body is a tabpanel labelled by the active tab, which controls it (§16)", () => {
+    const composer = makeComposer([makeElement("a")]);
+    renderWithToast(
+      <ProInspector
+        selectedElement={{ id: "a", type: "box", tagName: "div" }}
+        composer={composer}
+      />
+    );
+    const tab = screen.getByRole("tab", { name: "Style" });
+    const panel = screen.getByRole("tabpanel", { name: "Style" });
+    expect(tab.getAttribute("aria-controls")).toBe(panel.id);
+    expect(panel.getAttribute("aria-labelledby")).toBe(tab.id);
+  });
 });

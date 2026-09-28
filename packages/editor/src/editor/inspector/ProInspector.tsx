@@ -344,6 +344,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               value={activeTab}
               onChange={(id) => setActiveTab(id as TabId)}
               label="Inspector tabs"
+              panelId="inspector-tabpanel"
               data-testid="inspector-tab-strip"
               className="tw:h-8 tw:p-0 tw:gap-0"
               tabClassName={INSPECTOR_TAB_CLASS}
@@ -364,7 +365,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               ref={contentRef}
               className="bdi-panel-scroll"
               role="tabpanel"
-              aria-label={`${INSPECTOR_TABS.find((t) => t.id === activeTab)?.label ?? ""} properties`}
+              id="inspector-tabpanel"
+              aria-labelledby={`inspector-tabpanel-tab-${activeTab}`}
             >
               <div className="bdi-body">
                 <InspectorErrorBoundary>
