@@ -80,23 +80,21 @@ describe("LinkSection — engine writes", () => {
     expect(el.setAttribute).toHaveBeenCalledWith("href", "#page:p1");
   });
 
-  it("switching to 'none' removes the href", () => {
+  it("switching to None removes the href", () => {
     const { el, container } = renderLink({ attrs: { href: "https://x.com" } });
-    fireEvent.change(linkTypeSelect(container), { target: { value: "none" } });
+    fireEvent.change(linkTypeSelect(container), { target: { value: "" } });
     expect(el.removeAttribute).toHaveBeenCalledWith("href");
   });
 
-  it("target=_blank writes target + rel; back to _self removes both", () => {
-    const { el, container } = renderLink({ attrs: { href: "https://x.com" } });
-    const targetSelect = Array.from(container.querySelectorAll("select")).find((s) =>
-      Array.from(s.options).some((o) => o.value === "_blank")
-    ) as HTMLSelectElement;
+  it("Open in new tab writes target + rel; unticked removes both", () => {
+    const { el } = renderLink({ attrs: { href: "https://x.com" } });
+    const box = screen.getByRole("checkbox", { name: "Open in new tab" });
 
-    fireEvent.change(targetSelect, { target: { value: "_blank" } });
+    fireEvent.click(box);
     expect(el.setAttribute).toHaveBeenCalledWith("target", "_blank");
     expect(el.setAttribute).toHaveBeenCalledWith("rel", "noopener noreferrer");
 
-    fireEvent.change(targetSelect, { target: { value: "_self" } });
+    fireEvent.click(box);
     expect(el.removeAttribute).toHaveBeenCalledWith("target");
     expect(el.removeAttribute).toHaveBeenCalledWith("rel");
   });
@@ -123,10 +121,7 @@ describe("LinkSection — known-issue pins", () => {
    page picked kept the old external href, Email kept target=_blank and its
    rel — and Same Window deleted a custom rel along with ours. */
 describe("LinkSection — changing the link type clears what no longer applies (P-11a)", () => {
-  const select = (container: HTMLElement, value: string) =>
-    Array.from(container.querySelectorAll("select")).find((s) =>
-      Array.from(s.options).some((o) => o.value === value)
-    ) as HTMLSelectElement;
+  const newTab = () => screen.getByRole("checkbox", { name: "Open in new tab" });
   const BLANK = { href: "https://x.com", target: "_blank", rel: "noopener noreferrer" };
 
   it("URL → Page (no page picked yet) drops the old external href", () => {
@@ -150,16 +145,16 @@ describe("LinkSection — changing the link type clears what no longer applies (
     expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
   });
 
-  it("Same Window removes only the rel tokens New Tab added; a custom rel stays", () => {
-    const { el, container } = renderLink({ attrs: { ...BLANK, rel: "nofollow noopener noreferrer" } });
-    fireEvent.change(select(container, "_blank"), { target: { value: "_self" } });
+  it("unticking new tab removes only the rel tokens it added; a custom rel stays", () => {
+    const { el } = renderLink({ attrs: { ...BLANK, rel: "nofollow noopener noreferrer" } });
+    fireEvent.click(newTab());
     expect(el.getAttribute("target")).toBeFalsy();
     expect(el.getAttribute("rel")).toBe("nofollow");
   });
 
-  it("New Tab keeps a custom rel and adds noopener noreferrer", () => {
-    const { el, container } = renderLink({ attrs: { href: "https://x.com", rel: "nofollow" } });
-    fireEvent.change(select(container, "_blank"), { target: { value: "_blank" } });
+  it("ticking new tab keeps a custom rel and adds noopener noreferrer", () => {
+    const { el } = renderLink({ attrs: { href: "https://x.com", rel: "nofollow" } });
+    fireEvent.click(newTab());
     expect(el.getAttribute("rel")).toBe("nofollow noopener noreferrer");
   });
 });
@@ -171,9 +166,58 @@ describe("LinkSection — a locked element", () => {
     const { el, composer, container } = renderLink({ attrs: { href: "https://x.com" } });
     expect(linkTypeSelect(container).value).toBe("url");
     (el as unknown as { isLocked: () => boolean }).isLocked = () => true;
-    fireEvent.change(linkTypeSelect(container), { target: { value: "none" } });
+    fireEvent.change(linkTypeSelect(container), { target: { value: "" } });
     expect(el.removeAttribute).not.toHaveBeenCalledWith("href");
     expect(composer.emit).toHaveBeenCalled();
     expect(linkTypeSelect(container).value).toBe("url");
+  });
+});
+
+/* Boards 6, 7: Rel is a field of the Link section — the only rel writer
+   (R-DD-9) — and the section always says what a type change does. */
+describe("LinkSection — Rel field and hint (boards 6, 7)", () => {
+  const rel = () => screen.getByLabelText("Rel") as HTMLInputElement;
+
+  it("shows the element's rel and writes an edit once, on Enter, as one step", () => {
+    const { el, composer } = renderLink({ attrs: { href: "https://x.com", rel: "noopener noreferrer" } });
+    expect(rel()).toHaveValue("noopener noreferrer");
+    composer.beginTransaction.mockClear();
+    fireEvent.change(rel(), { target: { value: "nofollow  sponsored" } });
+    expect(el.setAttribute).not.toHaveBeenCalledWith("rel", expect.anything());
+    fireEvent.keyDown(rel(), { key: "Enter" });
+    expect(el.getAttribute("rel")).toBe("nofollow sponsored");
+    expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
+    expect(composer.beginTransaction).toHaveBeenCalledWith("link-rel-change");
+  });
+
+  it("an emptied Rel removes the attribute; Esc restores without writing", () => {
+    const { el } = renderLink({ attrs: { href: "https://x.com", rel: "nofollow" } });
+    fireEvent.change(rel(), { target: { value: "sponsored" } });
+    fireEvent.keyDown(rel(), { key: "Escape" });
+    expect(rel()).toHaveValue("nofollow");
+    fireEvent.change(rel(), { target: { value: "" } });
+    fireEvent.blur(rel());
+    expect(el.removeAttribute).toHaveBeenCalledWith("rel");
+  });
+
+  it("Rel and Open in new tab apply to Page / URL / Anchor only", () => {
+    const { container } = renderLink({ attrs: { href: "mailto:a@b.co" } });
+    expect(screen.queryByLabelText("Rel")).toBeNull();
+    expect(screen.queryByRole("checkbox", { name: "Open in new tab" })).toBeNull();
+    fireEvent.change(linkTypeSelect(container), { target: { value: "anchor" } });
+    expect(screen.getByLabelText("Rel")).toBeTruthy();
+  });
+
+  it("says a type change clears the old destination", () => {
+    renderLink();
+    expect(screen.getByTestId("link-hint")).toHaveTextContent("Changing Link to clears the old destination");
+  });
+
+  it("a locked element's Rel is refused", () => {
+    const { el } = renderLink({ attrs: { href: "https://x.com", rel: "nofollow" } });
+    (el as unknown as { isLocked: () => boolean }).isLocked = () => true;
+    fireEvent.change(rel(), { target: { value: "sponsored" } });
+    fireEvent.keyDown(rel(), { key: "Enter" });
+    expect(el.getAttribute("rel")).toBe("nofollow");
   });
 });

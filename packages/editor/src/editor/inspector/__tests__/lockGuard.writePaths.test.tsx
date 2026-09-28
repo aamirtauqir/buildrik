@@ -97,12 +97,20 @@ describe("P-1 — attribute writers refuse a locked element", () => {
   it("LinkSection: changing the link target", () => {
     const link = add("link", { attributes: { href: "https://a.com" } });
     lock(link);
-    const { container } = render(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
-    const targetSelect = [...container.querySelectorAll("select")].find((s) =>
-      [...s.options].some((o) => o.value === "_blank"),
-    )!;
-    fireEvent.change(targetSelect, { target: { value: "_blank" } });
+    render(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Open in new tab" }));
     expect(link.getAttribute("target")).toBeUndefined();
+    expect(skipped).toHaveBeenCalled();
+  });
+
+  it("LinkSection: editing Rel", () => {
+    const link = add("link", { attributes: { href: "https://a.com", rel: "nofollow" } });
+    lock(link);
+    render(<LinkSection selectedElement={{ id: link.getId(), type: "link" }} composer={composer} isOpen />);
+    const rel = screen.getByLabelText("Rel");
+    fireEvent.change(rel, { target: { value: "sponsored" } });
+    fireEvent.keyDown(rel, { key: "Enter" });
+    expect(link.getAttribute("rel")).toBe("nofollow");
     expect(skipped).toHaveBeenCalled();
   });
 
