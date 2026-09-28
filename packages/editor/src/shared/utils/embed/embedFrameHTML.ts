@@ -40,7 +40,7 @@ export function embedRatio(value: string | undefined): EmbedRatio {
 }
 
 /** The parsed embed an element's attributes describe, or null. */
-export function embedFor(type: string | undefined, attrs: Record<string, string> | undefined): ParsedEmbed | null {
+function embedFor(type: string | undefined, attrs: Record<string, string> | undefined): ParsedEmbed | null {
   const spec = type ? EMBED_TYPES[type] : undefined;
   const url = spec ? attrs?.[spec.attr] : undefined;
   if (!spec || !url) return null;

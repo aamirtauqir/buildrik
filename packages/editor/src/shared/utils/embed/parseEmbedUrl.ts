@@ -34,14 +34,6 @@ export interface VideoEmbedOptions {
   controls?: boolean;
 }
 
-/** The iframe hosts this module can produce — for a frame-src CSP. */
-export const EMBED_FRAME_HOSTS = [
-  "https://www.youtube-nocookie.com",
-  "https://player.vimeo.com",
-  "https://www.google.com",
-  "https://lottie.host",
-] as const;
-
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
 const VIMEO_ID = /^\d{1,12}$/;
 const VIMEO_HASH = /^[0-9a-f]{6,20}$/i;
