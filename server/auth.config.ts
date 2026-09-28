@@ -6,6 +6,7 @@ import { decode } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
+import { recordWorkspaceUse } from "@/server/services/team.service";
 import { DEFAULT_WORKSPACE_ORDER } from "@/server/trpc/workspace-ctx";
 
 // Type the GitHub
@@ -318,6 +319,7 @@ export const authConfig: NextAuthConfig = {
           select: { workspaceId: true },
         });
         token.workspaceId = member?.workspaceId ?? null;
+        if (member) await recordWorkspaceUse(user.id, member.workspaceId);
       }
       // Workspace switch — the client calls update({ workspaceId }). Validate it
       // is one of the user's ACTIVE memberships before trusting it, so the token
@@ -333,7 +335,10 @@ export const authConfig: NextAuthConfig = {
           where: { userId: token.userId, workspaceId: targetId, status: "ACTIVE" },
           select: { workspaceId: true },
         });
-        if (valid) token.workspaceId = valid.workspaceId;
+        if (valid) {
+          token.workspaceId = valid.workspaceId;
+          await recordWorkspaceUse(token.userId, valid.workspaceId);
+        }
       }
 
       // ── Revocation gate ────────────────────────────────────────────────

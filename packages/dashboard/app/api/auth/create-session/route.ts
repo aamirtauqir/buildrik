@@ -7,6 +7,7 @@ import { encode } from "next-auth/jwt";
 import { logAuditEvent } from "@server/services/audit.service";
 import { recordDeviceAndAlert } from "@server/services/device-alert.service";
 import { DEFAULT_WORKSPACE_ORDER } from "@server/trpc/workspace-ctx";
+import { recordWorkspaceUse } from "@server/services/team.service";
 import { clientIp } from "@lib/request-ip";
 
 const createSessionSchema = z.object({
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
     orderBy: DEFAULT_WORKSPACE_ORDER,
     select: { workspaceId: true },
   });
+  if (member) await recordWorkspaceUse(user.id, member.workspaceId);
 
   // Create the Session row FIRST so its id can be baked into the JWT as `sid`.
   // The id is stable; hashing the JWT was not (NextAuth rotates the cookie), so
