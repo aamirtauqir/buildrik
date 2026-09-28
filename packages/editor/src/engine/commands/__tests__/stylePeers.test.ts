@@ -87,10 +87,70 @@ describe("applyStyleToPeers", () => {
   it("copies the breakpoint layer on a breakpoint", () => {
     const src = add("button");
     const peer = add("button");
-    c.styles.setBreakpointStyle(src.getId(), "tablet", { width: "50%" });
+    c.styles.setBreakpointStyle(src.getId(), "tablet", { color: "rgb(0, 0, 255)", width: "50%" });
     applyStyleToPeers(c, src, [peer], { breakpoint: "tablet", pseudo: "normal" });
-    expect(c.styles.getBreakpointStyle(peer.getId(), "tablet")).toEqual({ width: "50%" });
-    expect(c.elements.getElement(peer.getId())!.getStyles().width).toBeUndefined();
+    expect(c.styles.getBreakpointStyle(peer.getId(), "tablet")).toEqual({ color: "rgb(0, 0, 255)" });
+    expect(c.elements.getElement(peer.getId())!.getStyles().color).toBeUndefined();
+  });
+
+  it("copies typography, fill, border and effects only — keeps layout, size, spacing and position (board 31)", () => {
+    const src = add("heading");
+    const peer = add("heading");
+    const copied = {
+      "font-family": "Inter",
+      "font-size": "24px",
+      "font-weight": "600",
+      "line-height": "32px",
+      "letter-spacing": "1px",
+      color: "rgb(1, 2, 3)",
+      "text-align": "center",
+      "text-transform": "uppercase",
+      "background-color": "rgb(4, 5, 6)",
+      "background-image": "none",
+      "border-width": "1px",
+      "border-style": "solid",
+      "border-color": "rgb(7, 8, 9)",
+      "border-radius": "4px",
+      "outline-color": "rgb(7, 8, 9)",
+      opacity: "0.5",
+      "box-shadow": "0 1px 2px rgb(0, 0, 0)",
+      filter: "blur(2px)",
+      transform: "rotate(2deg)",
+      transition: "all 0.2s",
+      cursor: "pointer",
+      "mix-blend-mode": "multiply",
+      "text-shadow": "0 1px 0 rgb(0, 0, 0)",
+    };
+    const kept = {
+      display: "flex",
+      "flex-direction": "column",
+      gap: "8px",
+      "grid-template-columns": "1fr 1fr",
+      width: "640px",
+      height: "auto",
+      "max-width": "100%",
+      "padding-top": "12px",
+      margin: "4px",
+      position: "absolute",
+      top: "10px",
+      "z-index": "3",
+      overflow: "hidden",
+      "align-self": "center",
+    };
+    for (const [k, v] of Object.entries({ ...copied, ...kept })) src.setStyle(k, v);
+    peer.setStyle("width", "100px");
+    applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "normal" });
+    const got = c.elements.getElement(peer.getId())!.getStyles();
+    expect(got).toMatchObject(copied);
+    for (const k of Object.keys(kept)) if (k !== "width") expect(got[k], k).toBeUndefined();
+    expect(got.width).toBe("100px");
+  });
+
+  it("nothing to copy when the source has only layout styles", () => {
+    const src = add("button");
+    const peer = add("button");
+    src.setStyle("width", "50%");
+    expect(applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "normal" })).toBe(0);
   });
 
   it("does nothing when the source has no style here", () => {

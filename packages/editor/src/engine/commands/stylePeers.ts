@@ -8,9 +8,11 @@
  * Locked peers and peers inside a component instance are counted and left
  * out: a lock is a promise, and an instance's styles belong to its master.
  *
- * `applyStyleToPeers` — copies `source`'s style map AT ONE breakpoint and ONE
- * state onto each peer, merged key by key (the P-10 paste rule). Only styles:
- * never text, level, link, CMS binding, attributes, classes or interactions.
+ * `applyStyleToPeers` — copies `source`'s typography, fill, border and effects
+ * properties AT ONE breakpoint and ONE state onto each peer, merged key by key
+ * (the P-10 paste rule). What the dialog's Keeps row promises is left alone:
+ * layout, size, spacing and position, and never text, level, link, CMS
+ * binding, attributes, classes or interactions (board 31).
  * One transaction, so one Undo restores every peer.
  *
  * @license BSD-3-Clause
@@ -59,6 +61,21 @@ export interface ApplyStyleOptions {
   pseudo: PseudoStateId;
 }
 
+/* Board 31 "Copies: Typography, fill, border and effects". */
+const COPIED_EXACT = new Set([
+  "color", "line-height", "letter-spacing", "word-spacing", "white-space", "word-break", "vertical-align",
+  "opacity", "box-shadow", "filter", "backdrop-filter", "cursor", "mix-blend-mode", "will-change",
+]);
+const COPIED_PREFIXES = ["font-", "text-", "background", "border", "outline", "transform", "transition"];
+
+/** Is this CSS property one Apply-to-all copies? */
+function isCopiedStyleProperty(prop: string): boolean {
+  return COPIED_EXACT.has(prop) || COPIED_PREFIXES.some((p) => prop.startsWith(p));
+}
+
+const pickCopied = (styles: Record<string, string>): Record<string, string> =>
+  Object.fromEntries(Object.entries(styles).filter(([k]) => isCopiedStyleProperty(k)));
+
 const selectorFor = (id: string) => `[data-buildrik-id="${id}"]`;
 
 /** The source's style map at this breakpoint + state, as authored. */
@@ -78,7 +95,7 @@ export function applyStyleToPeers(
   peers: readonly Element[],
   options: ApplyStyleOptions,
 ): number {
-  const styles = styleAt(composer, source, options);
+  const styles = pickCopied(styleAt(composer, source, options));
   if (Object.keys(styles).length === 0) return 0;
   const targets = writableElements(composer, peers);
   if (targets.length === 0) return 0;
