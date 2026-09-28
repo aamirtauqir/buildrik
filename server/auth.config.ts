@@ -356,27 +356,31 @@ export const authConfig: NextAuthConfig = {
       // revokes anything. Blanket-grandfathering would have kept the exact hole
       // open for the full cookie lifetime.
       //
-      // The same read checks the active-workspace claim. It goes stale when the
+      // Alongside it, the active-workspace claim is checked. It goes stale when the
       // deletion cron removes its workspace or the membership is removed, and
       // then the switcher and the server fell back to DIFFERENT workspaces. A
       // stale claim is repaired to the canonical pick; a valid one is kept.
       if (typeof token.userId === "string") {
         try {
           const claimed = typeof token.workspaceId === "string" ? token.workspaceId : null;
-          const current = await prisma.user.findUnique({
-            where: { id: token.userId },
-            select: {
-              sessionVersion: true,
-              workspaceMembers: claimed
-                ? { where: { workspaceId: claimed, status: "ACTIVE" }, select: { workspaceId: true }, take: 1 }
-                : false,
-            },
-          });
+          // Two independent queries, issued concurrently rather than in sequence.
+          const [current, claimedMember] = await Promise.all([
+            prisma.user.findUnique({
+              where: { id: token.userId },
+              select: { sessionVersion: true },
+            }),
+            claimed
+              ? prisma.workspaceMember.findFirst({
+                  where: { userId: token.userId, workspaceId: claimed, status: "ACTIVE" },
+                  select: { workspaceId: true },
+                })
+              : null,
+          ]);
           // User deleted → no session. Version moved on → this cookie predates a
           // revocation the user asked for.
           if (!current) return null;
           if (current.sessionVersion !== (typeof token.sv === "number" ? token.sv : 0)) return null;
-          if (!claimed || !current.workspaceMembers?.length) {
+          if (!claimedMember) {
             const member = await prisma.workspaceMember.findFirst({
               where: { userId: token.userId, status: "ACTIVE" },
               orderBy: DEFAULT_WORKSPACE_ORDER,

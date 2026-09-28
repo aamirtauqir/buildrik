@@ -120,48 +120,80 @@ describe("jwt callback — session revocation gate", () => {
  * now repairs the claim to the ONE canonical pick login already uses.
  */
 describe("jwt callback — stale active workspace repair", () => {
-  const CANONICAL_ORDER = [{ lastActiveAt: "desc" }, { joinedAt: "asc" }];
+  const CANONICAL_ORDER = [{ lastActiveAt: { sort: "desc", nulls: "last" } }, { joinedAt: "asc" }, { id: "asc" }];
+  const CANONICAL_PICK_ARGS = {
+    where: { userId: "u1", status: "ACTIVE" },
+    orderBy: CANONICAL_ORDER,
+    select: { workspaceId: true },
+  };
+  const claimCheckArgs = (workspaceId: string) => ({
+    where: { userId: "u1", workspaceId, status: "ACTIVE" },
+    select: { workspaceId: true },
+  });
+
+  /** The claim check (has `where.workspaceId`) and the canonical pick (has
+   *  `orderBy`) are both `workspaceMember.findFirst`; answer each by shape. */
+  function memberships(claimValid: boolean, canonical: string | null) {
+    memberFindFirst.mockImplementation(async (args: { where: { workspaceId?: string } }) => {
+      if (args.where.workspaceId) return claimValid ? { workspaceId: args.where.workspaceId } : null;
+      return canonical ? { workspaceId: canonical } : null;
+    });
+  }
 
   it("repairs a claim whose workspace is gone to the canonical pick", async () => {
-    userFindUnique.mockResolvedValue({ sessionVersion: 0, workspaceMembers: [] });
-    memberFindFirst.mockResolvedValue({ workspaceId: "ws-canonical" });
+    userFindUnique.mockResolvedValue({ sessionVersion: 0 });
+    memberships(false, "ws-canonical");
 
     const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-deleted" } });
 
     expect(result.workspaceId).toBe("ws-canonical");
-    expect(memberFindFirst).toHaveBeenCalledWith({
-      where: { userId: "u1", status: "ACTIVE" },
-      orderBy: CANONICAL_ORDER,
-      select: { workspaceId: true },
-    });
+    expect(memberFindFirst).toHaveBeenCalledWith(claimCheckArgs("ws-deleted"));
+    expect(memberFindFirst).toHaveBeenLastCalledWith(CANONICAL_PICK_ARGS);
   });
 
-  it("checks the claim inside the sessionVersion read, not a second query", async () => {
-    userFindUnique.mockResolvedValue({ sessionVersion: 0, workspaceMembers: [{ workspaceId: "ws-chosen" }] });
+  /**
+   * Cost: this runs on every authenticated request. A nested relation select
+   * inside user.findUnique is two SEQUENTIAL statements without relationJoins,
+   * so the claim check is issued alongside the sessionVersion read instead.
+   */
+  it("issues the claim check concurrently with the sessionVersion read", async () => {
+    let resolveUser: (v: { sessionVersion: number }) => void = () => {};
+    userFindUnique.mockReturnValue(new Promise((r) => { resolveUser = r; }));
+    memberships(true, "ws-other");
 
-    await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-chosen" } });
+    const pending = jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-chosen" } });
+    await Promise.resolve();
 
-    expect(userFindUnique).toHaveBeenCalledTimes(1);
-    expect(userFindUnique.mock.calls[0][0].select.workspaceMembers).toEqual({
-      where: { workspaceId: "ws-chosen", status: "ACTIVE" },
-      select: { workspaceId: true },
-      take: 1,
-    });
+    expect(memberFindFirst).toHaveBeenCalledWith(claimCheckArgs("ws-chosen"));
+    resolveUser({ sessionVersion: 0 });
+    await pending;
+    expect(userFindUnique).toHaveBeenCalledWith({ where: { id: "u1" }, select: { sessionVersion: true } });
   });
 
   it("leaves a still-valid claim alone, even when it is not the canonical first pick", async () => {
-    userFindUnique.mockResolvedValue({ sessionVersion: 0, workspaceMembers: [{ workspaceId: "ws-chosen" }] });
-    memberFindFirst.mockResolvedValue({ workspaceId: "ws-other" });
+    userFindUnique.mockResolvedValue({ sessionVersion: 0 });
+    memberships(true, "ws-other");
 
     const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-chosen" } });
 
     expect(result.workspaceId).toBe("ws-chosen");
-    expect(memberFindFirst).not.toHaveBeenCalled();
+    expect(memberFindFirst).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips the claim check when there is no claim and takes the canonical pick", async () => {
+    userFindUnique.mockResolvedValue({ sessionVersion: 0 });
+    memberships(false, "ws-canonical");
+
+    const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: null } });
+
+    expect(result.workspaceId).toBe("ws-canonical");
+    expect(memberFindFirst).toHaveBeenCalledTimes(1);
+    expect(memberFindFirst).toHaveBeenCalledWith(CANONICAL_PICK_ARGS);
   });
 
   it("sets the claim to null when the user has no ACTIVE membership left", async () => {
-    userFindUnique.mockResolvedValue({ sessionVersion: 0, workspaceMembers: [] });
-    memberFindFirst.mockResolvedValue(null);
+    userFindUnique.mockResolvedValue({ sessionVersion: 0 });
+    memberships(false, null);
 
     const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-deleted" } });
 
@@ -169,11 +201,31 @@ describe("jwt callback — stale active workspace repair", () => {
     expect(result.workspaceId).toBeNull();
   });
 
+  it("still kills a revoked token before touching the claim", async () => {
+    userFindUnique.mockResolvedValue({ sessionVersion: 1 });
+    memberships(false, "ws-canonical");
+
+    const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-deleted" } });
+
+    expect(result).toBeNull();
+  });
+
   it("fails open on a DB error without touching the claim", async () => {
     userFindUnique.mockRejectedValue(new Error("connection refused"));
+    memberships(false, "ws-canonical");
 
     const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-chosen" } });
 
+    expect(result.workspaceId).toBe("ws-chosen");
+  });
+
+  it("fails open when the claim check itself throws", async () => {
+    userFindUnique.mockResolvedValue({ sessionVersion: 0 });
+    memberFindFirst.mockRejectedValue(new Error("connection refused"));
+
+    const result = await jwtCallback({ token: { userId: "u1", sv: 0, workspaceId: "ws-chosen" } });
+
+    expect(result).not.toBeNull();
     expect(result.workspaceId).toBe("ws-chosen");
   });
 });

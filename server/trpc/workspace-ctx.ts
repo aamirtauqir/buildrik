@@ -20,13 +20,16 @@ import type { Prisma } from "@prisma/client";
 
 /**
  * The ONE default-workspace pick: most recently used ACTIVE membership, oldest
- * join breaking ties. Login (server/auth.config.ts), the jwt stale-claim repair
- * and every server fallback use it, so a stale session workspace can never send
- * the client and the server to different workspaces.
+ * join breaking ties, id last so the pick is total. Login, the jwt stale-claim
+ * repair and every server fallback use it, so a stale session workspace can
+ * never send the client and the server to different workspaces. `nulls: "last"`
+ * because Postgres sorts NULL first under DESC — a never-used membership would
+ * otherwise outrank the one actually in use.
  */
 export const DEFAULT_WORKSPACE_ORDER: Prisma.WorkspaceMemberOrderByWithRelationInput[] = [
-  { lastActiveAt: "desc" },
+  { lastActiveAt: { sort: "desc", nulls: "last" } },
   { joinedAt: "asc" },
+  { id: "asc" },
 ];
 
 interface BearerContext {
