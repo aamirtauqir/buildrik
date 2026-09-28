@@ -14,6 +14,7 @@ import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "@/shared/constants/events";
 import { Button, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
 import { Section, type SectionTier } from "../shared/controls";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface SlidesSectionProps {
   elementId: string;
@@ -23,14 +24,6 @@ export interface SlidesSectionProps {
   tier?: SectionTier;
 }
 
-function runTxn(composer: Composer, label: string, fn: () => void) {
-  composer.beginTransaction?.(label);
-  try {
-    fn();
-  } finally {
-    composer.endTransaction?.();
-  }
-}
 
 /** "Slide 2 · Dining room" — the slide's first heading, else just its number. */
 function slideLabel(slide: Element, index: number): string {
@@ -93,10 +86,12 @@ export const SlidesSection: React.FC<SlidesSectionProps> = ({ elementId, compose
 
   const slider = composer?.elements.getElement(elementId);
   if (!composer || !slider) return null;
+  /* P-1: every write below goes through writeElement on the slider, so a
+     locked slider is refused (and the shell says so). */
   const slides = slider.getChildren();
 
   const addSlide = () =>
-    runTxn(composer, "slide-add", () => {
+    writeElement(composer, slider, "slide-add", () => {
       const last = slides[slides.length - 1];
       if (last) {
         composer.elements.duplicateElement(last.getId());
@@ -111,7 +106,7 @@ export const SlidesSection: React.FC<SlidesSectionProps> = ({ elementId, compose
     const id = dragId;
     setDragId(null);
     if (!id || id === target.getId()) return;
-    runTxn(composer, "slide-move", () => {
+    writeElement(composer, slider, "slide-move", () => {
       composer.elements.moveElement(id, slider.getId(), slider.getChildIndex(target));
     });
   };
@@ -147,8 +142,8 @@ export const SlidesSection: React.FC<SlidesSectionProps> = ({ elementId, compose
             <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]">{label}</span>
             <SlideMenu
               label={label}
-              onDuplicate={() => runTxn(composer, "slide-duplicate", () => composer.elements.duplicateElement(slide.getId()))}
-              onDelete={() => runTxn(composer, "slide-delete", () => composer.elements.removeElement(slide.getId()))}
+              onDuplicate={() => writeElement(composer, slider, "slide-duplicate", () => composer.elements.duplicateElement(slide.getId()))}
+              onDelete={() => writeElement(composer, slider, "slide-delete", () => composer.elements.removeElement(slide.getId()))}
             />
           </div>
         );

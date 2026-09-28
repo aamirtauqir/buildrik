@@ -179,101 +179,29 @@
   padding: 0;
 }
 
-/* ── Section ──────────────────────────────────────────── */
+/* ── Section (Inspector v4, board 1) ─────────────────────
+   Header geometry, chevron-left and the 12px medium title are tw: utilities
+   in Section.tsx; this block only draws what a utility cannot: the rule
+   between sections. An open or summarised section starts with a hairline;
+   an empty "+" row does not (board 1: "Fill  +" / "Border  +"). */
 .bdi-sec {
-  border-bottom: 1px solid var(--bk-border);
+  border-top: 1px solid var(--bk-border);
 }
-.bdi-sec:last-child {
-  border-bottom: none;
-}
-.bdi-sec-h {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  /* PINNED, not derived from padding. Every profile board draws a shut
-     section's header row 28 tall (2069:20308..20317) and an open one's 20
-     (2069:20295, :20305), whatever the row contains — BACKGROUND measured 30
-     because its `+` action is 18px and the padding grew around it. */
-  height: var(--bk-size-row-dense);
-  padding: 0 var(--bk-space-16);
-  cursor: pointer;
-  user-select: none;
-  position: relative;
-  background: transparent;
-  border: none;
-  text-align: left;
-  /* The board declares ink-muted on the ROW and lets the label and chevron
-     inherit it; both were already muted here, but the row itself sat on the
-     panel's --bk-ink, so anything added to it would have arrived dark. */
-  color: var(--bk-ink-muted);
-}
-/* An OPEN section's header is tighter than a closed one's, on every profile
-   board: 807:8342's TYPOGRAPHY row is 20 tall (the 16px line plus 4 below it)
-   where its shut BACKGROUND / BORDER / EFFECTS rows are 28. The title belongs
-   to the rows under it once they are showing, and the 28 that shipped for both
-   put 8px of nothing between a heading and the field it heads. */
-.bdi-sec:not(.closed) > .bdi-sec-h {
-  height: 20px;
+.bdi-sec.empty {
+  border-top: none;
 }
 .bdi-sec-h:hover {
-  background: rgba(15, 23, 42, 0.02);
+  background: var(--bk-alpha-ink-06);
 }
-/* Figma 32-2: chevron sits at the RIGHT edge, muted. */
-.bdi-sec-h .bdi-chev {
-  display: inline-flex;
-  color: var(--bk-ink-muted);
-  transition: transform 120ms;
-  flex-shrink: 0;
-}
-.bdi-sec.closed .bdi-chev {
-  transform: rotate(-90deg);
-}
-/* Figma 32-2: uppercase, letter-spaced, muted section label (LAYOUT / SPACING …). */
-.bdi-sec-h .bdi-sec-name {
-  flex: 1;
-  font: 600 var(--bk-text-11)/16px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-  text-transform: uppercase;
-  /* 0.88px at 11px, which is what every profile board's section label carries
-     (`tracking-[0.88px]`). 0.06em resolved to 0.66. */
-  letter-spacing: 0.08em;
-}
-/* Collapsed-section value readout ("16px · solid", "fade-in 300ms").
-   `.bdi-sec-name` has taken `flex: 1` since it shipped and this never had a
-   rule at all, so the preview rendered at the panel's default 13px ink and sat
-   flush against the chevron. Every Section in the inspector draws it — 34 call
-   sites — which is why one missing rule was visible everywhere and traceable
-   nowhere. Muted, mono, and truncating, because it is a value not a label. */
-/* Empty ON PURPOSE — Section.tsx:102 styles this in `tw:` classes. */
-.bdi-sec-h .bdi-sec-preview {
-}
-
-.bdi-sec-h .bdi-ind {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink-soft);
-  background: var(--bk-bg-subtle);
-  padding: 1px 5px;
-  border-radius: 3px;
-  letter-spacing: -0.01em;
-}
-.bdi-sec-h .bdi-ind.link,
-.bdi-sec-h .bdi-ind.accent {
-  color: var(--bk-accent);
-  background: var(--bk-accent-tint);
-}
-.bdi-sec-h .bdi-ind.mixed {
-  color: var(--bk-warning);
-  background: rgba(217, 119, 6, 0.12);
-}
+/* An open section's own header action (Fill's add-layer "+"). */
 .bdi-sec-h .bdi-plus {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--bk-ink-muted);
-  border-radius: 3px;
+  border-radius: var(--bk-radius-sm);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -283,23 +211,29 @@
   color: var(--bk-accent);
   background: var(--bk-accent-tint);
 }
-  /* 0 top / 8 bottom: an open section on the boards runs header(20) → rows(34
-     each) → 8 of air → the next header, which is why their last row is drawn
-     42 rather than 34. It was 2/10. */
+/* ── Section body + rows (Inspector v4, board 1) ─────────
+   Every board draws a property row the same way: 28 tall, 12 in from the
+   column edge, a 108 label column (12/16 ink-muted, LEFT-aligned), 8 of gap,
+   a 160 × 24 control. The section body carries the 12 inset (11 on the right:
+   the panel's left rule spends the first of the 300 pixels, and the control
+   keeps its 160); rows stack with no gap and no bottom padding — the next
+   section's hairline follows the last row directly. */
 .bdi-sec-body {
-  padding: 0 var(--bk-space-20) var(--bk-space-8) var(--bk-space-16);
+  padding: 0 11px 0 var(--bk-space-12);
   display: flex;
   flex-direction: column;
-  /* 0 between property rows — `.bdi-row-ctrl` now carries the board's own
-     34-tall box, air included. Anything in a section body that is NOT a
-     property row (sub-labels, preset grids) carries its own margin already —
-     `SubTitle` ships `marginTop: 6` — so nothing needs the container gap back.
-     Rows wrapped in a positioning div (`tw:relative`, for the mixed-value dot)
-     inherit the row's own 34 through the wrapper and stay in the same rhythm. */
   gap: 0;
 }
 .bdi-sec.closed .bdi-sec-body {
   display: none;
+}
+/* Board 34: the section's error band, under its last row, full width. */
+.bdi-sec-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--bk-space-8) var(--bk-space-16);
+  background: var(--bk-error-tint);
 }
 
 /* ── Sub-label inside section body ────────────────────── */
@@ -310,43 +244,38 @@
   text-transform: uppercase;
 }
 
-/* ── Row with text label (Figma 32-2: 88px right-aligned ink-soft label + control) ──
-   Node 32:2 geometry: 16px row pad + 88 label + 8 gap + 172 control = 300 (inspector).
-   Label is Inter Regular 12px, ink-soft (#485465), right-aligned to the control. */
+/* ── Property row ─────────────────────────────────────── */
 .bdi-row-ctrl {
   display: grid;
-  /* 95, and the odd number is the point. Every profile board and 159:123 fix
-     the CONTROL — left 120, width 160, so its right edge lands on 280 in a 300
-     frame — and state nothing at all about the label column's width; the label
-     is just a text node at left 16. The panel's own left rule (`.bdi-panel`,
-     boards 32:2 / 807:8521) spends the first of those 300 pixels, so a 96px
-     label column put the control at 121..280 — 159 wide. The pixel has to come
-     out of one of the two columns, and it comes out of the one no board
-     measures. Control: 120..280, 160. */
-  grid-template-columns: 95px 1fr;
+  grid-template-columns: 108px minmax(0, 1fr);
   align-items: center;
-  gap: 8px;
-  /* 34, not the 28 the control alone gives. Boards 807:8342/8412/8475/8521/
-     8567/8614 and 159:123 all draw a property row as a 34-tall block holding a
-     28-tall control — 3px of air above and below it — and stack those blocks
-     contiguously. The live rhythm was already 34 (28 + the section body's 6px
-     gap), so nothing on screen moves; what changes is that the ROW is the box
-     the boards measure, which is what lets a recipe join it. `.bdi-sec-body`
-     drops its gap to 0 in the same change, or the pitch would become 40. */
-  /* Board 4428:141170 (v3): a 32 row (--bk-size-row). */
+  column-gap: var(--bk-space-8);
+  min-height: var(--bk-size-row-dense);
+}
+/* A segmented row is 32 (board 1: Level, Align; board 16: Direction). With
+   more than four options the track takes the room (Level: label 64). */
+.bdi-row-ctrl.seg {
   min-height: var(--bk-size-row);
 }
-.bdi-row-ctrl button, .bdi-row-ctrl input, .bdi-row-ctrl select { height: var(--bk-size-row-dense); min-height: 0; }
-/* v3 right-aligns the label against its control. */
+.bdi-row-ctrl.seg.wide {
+  grid-template-columns: 64px minmax(0, 1fr);
+}
+/* An unlabelled field (a pair's half) takes the whole row. */
+.bdi-row-ctrl.bare {
+  grid-template-columns: minmax(0, 1fr);
+}
+.bdi-row-ctrl button, .bdi-row-ctrl input, .bdi-row-ctrl select { height: 24px; min-height: 0; }
 .bdi-row-ctrl .bdi-lb {
-  font: 400 12px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
   letter-spacing: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  text-align: right;
+  justify-content: flex-start;
+  text-align: left;
   gap: var(--bk-space-4);
+  min-width: 0;
+  white-space: nowrap;
 }
 .bdi-row-ctrl.disabled {
   opacity: 0.5;
@@ -358,93 +287,187 @@
   gap: var(--bk-space-4);
   min-width: 0;
 }
+/* The inline error line of a field drawn outside a section. */
+.bdi-row-ctrl > [data-testid="inspector-field-error"] {
+  grid-column: 1 / -1;
+  padding: var(--bk-space-4) 0;
+}
 
-/* ── Icon-first field (.bdi-fld — replaces .bdi-num) ──── */
-.bdi-fld {
+/* ── The control frame ────────────────────────────────────
+   One frame for every value control (number, select, colour, text): 24 tall,
+   gray-50 on a --bk-border hairline, radius 4, 12px ink-soft. One focus ring:
+   the accent edge + --bk-shadow-focus on the FRAME, never on the element
+   inside it (the flowbite field's own ring is switched off below). */
+.bdi-fld,
+.bdi-ddn,
+.bdi-fill,
+.bdi-text {
   display: flex;
   align-items: center;
-  height: var(--bk-size-row-dense);
   width: 100%;
-  /* v3 (board 4428:141170): a white field with a 1px --bk-border-input edge,
-     radius 6 — replacing the V1 board's gray-50/gray-100 frame. */
-  background: var(--bk-bg-card);
-  /* A RESTING EDGE, not a transparent placeholder revealed on hover. Every
-     control frame on boards 807:8342/8412/8475/8521/8567/8614 is drawn
-     `bg-[--flowbite/gray/50] border-[--flowbite/gray/100]` — the field has an
-     outline before you touch it. Transparent-until-hover meant a column of
-     values with no boxes around them, and the hover state then read as the
-     field APPEARING. */
-  border: 1px solid var(--bk-border-input);
-  border-radius: 6px;
-  overflow: hidden;
-  transition: background 120ms, border-color 120ms, box-shadow 120ms;
+  height: 24px;
+  min-width: 0;
+  background: var(--bk-gray-50);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-sm);
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+  transition: border-color 120ms, box-shadow 120ms;
   position: relative;
 }
-.bdi-fld:hover {
-  border-color: var(--bk-border);
+.bdi-fld:hover,
+.bdi-ddn:hover,
+.bdi-fill:hover,
+.bdi-text:hover {
+  border-color: var(--bk-border-medium);
 }
-.bdi-fld:focus-within {
-  background: var(--bk-bg-card, var(--bk-bg-card));
+.bdi-fld:focus-within,
+.bdi-ddn:focus-within,
+.bdi-fill:focus-within,
+.bdi-text:focus {
   border-color: var(--bk-accent);
   box-shadow: var(--bk-shadow-focus);
 }
-.bdi-fld.mixed {
-  background: rgba(217, 119, 6, 0.06);
-  border-color: rgba(217, 119, 6, 0.35);
+.bdi-fld :is(input, select):focus,
+.bdi-ddn select:focus,
+.bdi-fill input:focus {
+  outline: none;
+  box-shadow: none;
 }
-.bdi-fld.mixed input {
-  color: var(--bk-warning);
+/* Board 34: an entry the field cannot read — the red edge, no glow. */
+.bdi-fld.invalid,
+.bdi-fill.invalid,
+.bdi-fld.invalid:focus-within,
+.bdi-fill.invalid:focus-within {
+  border-color: var(--bk-error);
 }
-.bdi-fld.invalid {
-  border-color: var(--bk-error, var(--bk-error));
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
-}
-.bdi-fld .bdi-flb {
-  width: 22px;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* "Mixed" (DD-12) reads as a placeholder, never as a value. */
+.bdi-fld.mixed input::placeholder,
+.bdi-fill.mixed input::placeholder {
   color: var(--bk-ink-muted);
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
+  font-style: italic;
+}
+
+/* A field a section draws itself (a flowbite TextInput straight in a row —
+   Grid's Columns) wears the same frame, so no row in the panel looks
+   different because of who built it. */
+.bdi-row-ctrl .bdi-row-content input:is([type="text"], [type="number"], :not([type])):not(.bdi-fld input, .bdi-fill input, .bdi-text, [data-testid="inspector-spacing-box"] input) {
+  height: 24px;
+  padding: 0 var(--bk-space-8);
+  background: var(--bk-gray-50);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-sm);
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-mono);
+  color: var(--bk-ink-soft);
+  box-shadow: none;
+}
+.bdi-row-ctrl .bdi-row-content input:is([type="text"], [type="number"], :not([type])):not(.bdi-fld input, .bdi-fill input, .bdi-text, [data-testid="inspector-spacing-box"] input):focus {
+  outline: none;
+  border-color: var(--bk-accent);
+  box-shadow: var(--bk-shadow-focus);
+}
+
+/* ── Number field: value · stepper · unit (board 1) ───── */
+.bdi-fld {
+  padding-left: var(--bk-space-8);
+  overflow: hidden;
 }
 .bdi-fld input {
   flex: 1;
   min-width: 0;
-  padding: 0 var(--bk-space-4) 0 0;
+  padding: 0;
   background: transparent;
   border: none;
   outline: none;
-  /* v3: values in the data face, Geist Mono 12. */
-  font: 400 12px var(--bk-font-mono);
-  color: var(--bk-ink);
+  /* Values in the data face, Geist Mono 12. */
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-mono);
+  color: var(--bk-ink-soft);
   font-variant-numeric: tabular-nums;
 }
 .bdi-fld input.auto {
-  color: var(--bk-ink-muted);
-  font-style: italic;
+  font-family: var(--bk-font-ui);
 }
-.bdi-fld .bdi-u {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink-soft);
-  padding: 0 6px 0 0;
-  text-transform: lowercase;
-  letter-spacing: -0.02em;
+.bdi-fld .bdi-step {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 20px;
+  height: 22px;
+  color: var(--bk-ink-muted);
+}
+.bdi-fld .bdi-step > span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.bdi-fld .bdi-step > span:hover {
+  color: var(--bk-ink);
+}
+/* The unit dropdown: a 52 bg-subtle cell flush with the frame's right edge.
+   The real <select> covers the cell AND the frame's edge, so the target is
+   the full 24 tall; the chevron is drawn over it. */
+.bdi-fld .bdi-unit {
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 52px;
+  height: 22px;
+  background: var(--bk-bg-subtle);
+  border-radius: 0 3px 3px 0;
+}
+.bdi-fld .bdi-unit .bdi-u {
+  flex: 1;
+  min-width: 0;
+}
+.bdi-fld .bdi-unit select {
+  display: block;
+  width: 100%;
+  height: 24px;
+  margin: -1px 0;
+  padding: 0 22px 0 6px;
   background: transparent;
   border: none;
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+  appearance: none;
+  -webkit-appearance: none;
   cursor: pointer;
-  /* Unshrinkable: default `flex: 0 1 auto` clipped "px" at every panel width.
-     The numeric input beside it (flex:1, min-width:0) absorbs a tight row. */
-  flex-shrink: 0;
+}
+.bdi-fld .bdi-unit .bdi-c {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--bk-ink-muted);
+  pointer-events: none;
+}
+
+/* Read-only (DD-18). One look for every control, whoever built it:
+   - a save conflict (board 29) draws the controls as they are — a control
+     disabled for the conflict is not greyed either;
+   - a locked element (board 23) draws every control at 45%, labels and
+     section headers at full ink.
+   The change itself is refused by the controls and the lock gate. */
+.bdi-panel[data-readonly] :is(button, input, select, textarea):disabled {
+  opacity: 1;
+  cursor: default;
+}
+/* A text action ("Edit text on canvas") stays text when refused: flowbite's
+   disabled fill must not turn a transparent button into a grey box. */
+.bdi-panel button[class~="tw:bg-transparent"]:disabled {
+  background-color: transparent;
+}
+.bdi-sec[data-readonly="locked"] > .bdi-sec-body :is(.bdi-fld, .bdi-ddn, .bdi-fill, .bdi-seg, .bdi-text, .bdi-pad, [data-testid="inspector-spacing-box"]),
+.bdi-sec[data-readonly="locked"] > .bdi-sec-body :is(button, select, input, textarea):not(.bdi-lb, .bdi-lb *, .bdi-adv, :is(.bdi-fld, .bdi-ddn, .bdi-fill, .bdi-seg, .bdi-pad, [data-testid="inspector-spacing-box"]) *) {
+  opacity: 0.45;
 }
 
 /* ── Pair row (field | link | field) ──────────────────── */
 .bdi-pair {
   display: grid;
-  /* 80 | 8 | 72, off boards 807:8342 (Size 14 | 1.5, frames at x120 w80 and
-     x208 w72) and 807:8384/8386 (Padding, the same split). It was `1fr 14px
-     1fr`, which divides the 160 column evenly at 73/73 — the first number in
-     each of these pairs is the one that carries a unit and needs the room. */
   grid-template-columns: 80px 8px 1fr;
   align-items: center;
   gap: 0;
@@ -458,230 +481,79 @@
   align-self: center;
 }
 
-/* ── Dropdown trigger ─────────────────────────────────── */
+/* ── Select: value · chevron ──────────────────────────── */
+/* The <select> fills the frame (its target is the whole 24 × 160 box, the
+   edge included); the chevron is drawn over its right end. */
 .bdi-ddn {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-  /* The third of the three control frames, and it was the odd one out twice:
-     24 tall against the boards' 28, and bg-subtle over a transparent border
-     against their gray-50 over gray-100. A Display dropdown and the Size field
-     under it are the same 160x28 box on every profile board. */
-  height: var(--bk-size-row-dense);
-  padding: 0 6px 0 var(--bk-space-8);
-  /* v3: same white field, --bk-border-input edge, radius 6, 12px. */
-  background: var(--bk-bg-card);
-  border: 1px solid var(--bk-border-input);
-  border-radius: 6px;
-  font: 400 12px var(--bk-font-ui);
-  color: var(--bk-ink);
+  padding: 0;
   cursor: pointer;
-  transition: background 120ms, border-color 120ms;
-  width: 100%;
-}
-.bdi-ddn:hover {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-border);
-}
-.bdi-ddn:focus-within {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-accent);
-  box-shadow: var(--bk-shadow-focus);
 }
 .bdi-ddn .bdi-v {
   flex: 1;
   min-width: 0;
+}
+.bdi-ddn select {
+  display: block;
+  width: 100%;
+  height: 24px;
+  margin: -1px 0;
+  padding: 0 28px 0 var(--bk-space-8);
+  background: transparent;
+  border: none;
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: transparent;
-  border: none;
-  outline: none;
-  font: inherit;
-  color: inherit;
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
-  padding: 0;
 }
 .bdi-ddn .bdi-c {
-  color: var(--bk-ink-muted);
-  display: inline-flex;
-  flex-shrink: 0;
-}
-
-/* ── Preset tile (PresetGrids) ───────────────────────── */
-.bdi-qa {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 7px 0;
-  background: var(--bk-bg-subtle);
-  border: 1px solid transparent;
-  border-radius: 5px;
-  cursor: pointer;
-  color: var(--bk-ink-soft);
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-}
-.bdi-qa:hover {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-border);
-  color: var(--bk-ink);
-}
-.bdi-qa.on {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-  border-color: var(--bk-alpha-accent-30);
-}
-
-/* ── Webflow-style nested spacing box ──────────────── */
-.bdi-box {
-  position: relative;
-  padding: 18px var(--bk-space-4) 14px;
-  display: flex;
-  flex-direction: column;
-}
-.bdi-mbox {
-  position: relative;
-  border: 1px dashed var(--bk-border-medium);
-  border-radius: 4px;
-  padding: 18px 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(217, 119, 6, 0.04);
-  border-color: rgba(217, 119, 6, 0.35);
-}
-.bdi-pbox {
-  position: relative;
-  border: 1px dashed var(--bk-alpha-accent-30);
-  border-radius: 4px;
-  padding: 18px 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bk-accent-subtle);
-  margin: 2px;
-}
-.bdi-mbox > .bdi-tag,
-.bdi-pbox > .bdi-tag {
   position: absolute;
-  top: -1px;
-  left: 6px;
-  transform: translateY(-50%);
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  letter-spacing: 0.08em;
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  padding: 0 var(--bk-space-4);
-  /* `--bk-warning` on the card white is 3.51:1 at 11px — measured on the FLEX
-     profile run, where the MARGIN tag failed. `--bk-warning-text` is the token
-     the system ships for warning INK on a light fill and reads 8.0:1;
-     --bk-warning stays what it is, a fill. */
-  color: var(--bk-warning-text);
-  text-transform: uppercase;
-}
-.bdi-pbox > .bdi-tag {
-  color: var(--bk-accent);
-}
-.bdi-ax {
-  position: absolute;
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink);
-  font-variant-numeric: tabular-nums;
-  background: transparent;
-  border: 1px solid transparent;
-  padding: 1px var(--bk-space-4);
-  border-radius: 3px;
-  min-width: 26px;
-  max-width: 48px;
-  text-align: center;
-  cursor: text;
-  transition: background 120ms, border-color 120ms;
-  outline: none;
-}
-.bdi-ax:hover {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-border);
-}
-.bdi-ax:focus {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-accent);
-  box-shadow: var(--bk-shadow-focus);
-}
-.bdi-mbox .bdi-ax {
-  color: var(--bk-warning);
-}
-.bdi-pbox .bdi-ax {
-  color: var(--bk-accent);
-}
-.bdi-ax.muted {
-  color: var(--bk-ink-muted);
-}
-.bdi-ax.t {
-  top: -9px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bk-bg-card);
-}
-.bdi-ax.b {
-  bottom: -9px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bk-bg-card);
-}
-.bdi-ax.l {
-  left: 4px;
+  right: var(--bk-space-8);
   top: 50%;
   transform: translateY(-50%);
-}
-.bdi-ax.r {
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.bdi-center-rect {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border: 1px solid var(--bk-border-medium);
-  border-radius: 3px;
-  padding: 5px 14px;
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-soft);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--bk-ink-muted);
+  pointer-events: none;
 }
 
-/* ── 9-dot align pad ──────────────────────────────── */
+/* ── 3 × 3 align pad (board 16: 32 × 28 cells, gap 4) ─── */
 .bdi-pad {
-  width: 60px;
-  height: 60px;
   flex-shrink: 0;
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border);
-  border-radius: 5px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  padding: 6px;
+  grid-template-columns: repeat(3, 32px);
+  grid-auto-rows: 28px;
   gap: var(--bk-space-4);
 }
 .bdi-pad .bdi-d {
-  width: 5px;
-  height: 5px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-border-medium);
-  align-self: center;
-  justify-self: center;
-  cursor: pointer;
-  border: none;
+  width: 32px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.bdi-pad .bdi-d::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-ink-muted);
 }
 .bdi-pad .bdi-d:hover {
-  background: var(--bk-ink-soft);
+  background: var(--bk-bg-subtle);
 }
 .bdi-pad .bdi-d.on {
   background: var(--bk-accent);
-  box-shadow: 0 0 0 3px var(--bk-accent-tint);
+  border-color: var(--bk-accent);
+}
+.bdi-pad .bdi-d.on::after {
+  background: var(--bk-bg-panel);
 }
 .bdi-pad-meta {
   display: flex;
@@ -692,97 +564,119 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-ui);
 }
 .bdi-pad-kv .bdi-pk {
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--bk-ink-muted);
   min-width: 38px;
 }
 .bdi-pad-kv .bdi-pv {
-  color: var(--bk-ink);
-  font-weight: 600;
+  color: var(--bk-ink-soft);
 }
 
-/* ── Segmented (icon/text, compact) ───────────────── */
+/* ── Segmented (board 1 Level / Align, board 16 Direction) ──
+   A gray track, 2 inset; the chosen option a white chip on a hairline with
+   accent text at 500; the rest ink-soft 400. */
 .bdi-seg {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-auto-columns: minmax(0, 1fr);
   background: var(--bk-bg-subtle);
-  border-radius: 4px;
+  border-radius: var(--bk-radius-sm);
   padding: 2px;
-  /* Every control frame on the profile boards is 28 (807:8352, :8360, :8363,
-     :8370, :8373 …). A 24-tall segmented control in a column of 28-tall fields
-     was the one row that did not line up. */
-  height: var(--bk-size-row-dense);
+  height: 24px;
   width: 100%;
 }
-.bdi-seg button {
+/* Each option is a 24-tall target (WCAG 2.5.8) that DRAWS the board's 20
+   chip: it reaches over the track's 2px inset with a transparent 2px border,
+   the fill clipped inside it, the chosen chip's hairline an inset shadow. */
+.bdi-seg button,
+.bdi-row-ctrl .bdi-seg button {
+  height: 24px;
+  min-height: 0;
+  min-width: 0;
+  margin: -2px 0;
+  padding: 0;
+  gap: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  box-shadow: none;
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+  cursor: pointer;
+}
+.bdi-seg button:hover {
+  color: var(--bk-ink);
+  background-color: transparent;
+}
+.bdi-seg button.on,
+.bdi-seg button.on:hover {
+  background-color: var(--bk-bg-panel);
+  box-shadow: inset 0 0 0 1px var(--bk-border);
+  color: var(--bk-accent-text);
+  font-weight: 500;
+}
+.bdi-seg button:focus {
+  outline: none;
+}
+.bdi-seg button:not(.on):focus {
+  box-shadow: none;
+}
+.bdi-seg button:focus-visible,
+.bdi-seg button.on:focus-visible {
+  outline: none;
+  box-shadow: var(--bk-shadow-focus);
+}
+
+/* ── Colour: swatch · value · chevron (boards 1, 27) ───── */
+.bdi-fill {
+  gap: var(--bk-space-8);
+  padding: 0 var(--bk-space-8);
+}
+/* The swatch is a 24 × 24 target (WCAG 2.5.8) drawing a 16 square: the
+   button overhangs the 16 slot by 4 on each side, the square is centred. */
+.bdi-fill .bdi-sw,
+.bdi-row-ctrl .bdi-fill .bdi-sw {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  min-height: 0;
+  margin: 0 -4px;
+  padding: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
   border-radius: 3px;
   cursor: pointer;
-  /* MEASURED 2026-09-08 (inspector-single-selection run): --bk-ink-muted on
-     the track's --bk-bg-subtle is 4.39:1 at 11px, under the 4.5 floor —
-     "gradient" and "image" both failed. --bk-ink-soft on the same fill is
-     6.78:1. The selected segment is still unmistakable: it keeps --bk-ink at
-     600 on a white chip with a shadow. */
-  color: var(--bk-ink-soft);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  gap: 3px;
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  min-width: 0;
 }
-.bdi-seg button:hover {
-  color: var(--bk-ink);
+.bdi-fill .bdi-sw:focus {
+  outline: none;
+  box-shadow: none;
 }
-.bdi-seg button.on {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  color: var(--bk-ink);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+.bdi-fill .bdi-sw:focus-visible {
+  box-shadow: var(--bk-shadow-focus);
 }
-
-/* ── Fill / color row (Figma-style) ───────────────── */
-.bdi-fill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  /* 28, the same `--bk-size-row-dense` box `.bdi-fld` uses. Boards 159:123
-     (238:1418) and 807:8521 (807:8531) both draw the colour control at 28 —
-     it was 24, four short, and read as a smaller control than the numeric
-     field directly under it in the same panel. */
-  height: var(--bk-size-row-dense);
-  padding: 0 var(--bk-space-4) 0 2px;
-  /* Same frame as `.bdi-fld` above, for the same reason and off the same six
-     boards: gray-50 on a gray-100 hairline. It was `--bk-bg-subtle` with a
-     transparent border, one step darker than the numeric field sitting
-     directly under it in the same 160px column. */
-  background: var(--bk-gray-50);
-  border: 1px solid var(--bk-gray-100);
-  border-radius: 4px;
-  width: 100%;
-}
-.bdi-fill:hover {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-border);
-}
-.bdi-fill .bdi-sw {
-  width: 18px;
-  height: 18px;
+/* The square: the colour over a checkerboard — the only honest "no colour". */
+.bdi-fill .bdi-sw-fill {
+  width: 16px;
+  height: 16px;
   border-radius: 3px;
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
-  flex-shrink: 0;
-  /* The trigger is a flowbite Button, whose default blue fill painted through
-     a transparent swatch — an empty color read as cobalt. The checkerboard
-     below is the only honest "no color". */
-  background-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--bk-alpha-ink-08);
+}
+.bdi-fill .bdi-sw::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
   background-image:
     linear-gradient(45deg, var(--bk-alpha-ink-08) 25%, transparent 25%),
     linear-gradient(-45deg, var(--bk-alpha-ink-08) 25%, transparent 25%),
@@ -792,17 +686,15 @@
   background-position: 0 0, 0 3px, 3px -3px, -3px 0;
 }
 .bdi-fill .bdi-sw-fill {
-  width: 100%;
-  height: 100%;
-  border-radius: 3px;
+  position: relative;
 }
 .bdi-fill .bdi-hx {
   flex: 1;
   min-width: 0;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink);
+  padding: 0;
+  font: 400 var(--bk-text-12) / 16px var(--bk-font-mono);
+  color: var(--bk-ink-soft);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
   background: transparent;
   border: none;
   outline: none;
@@ -810,30 +702,56 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.bdi-fill .bdi-eye {
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
+/* Unlink / relink: only on hover or keyboard focus, a 24 target. */
+.bdi-fill .bdi-eye,
+.bdi-row-ctrl .bdi-fill .bdi-eye {
+  display: none;
+  width: 24px;
+  height: 24px;
+  min-height: 0;
+  margin: 0 -4px;
+  padding: 0;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   color: var(--bk-ink-muted);
-  cursor: pointer;
-  border-radius: 3px;
   background: transparent;
   border: none;
-  padding: 0;
-  flex-shrink: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.bdi-fill:hover .bdi-eye,
+.bdi-fill:focus-within .bdi-eye {
+  display: inline-flex;
+}
+.bdi-fill:hover .bdi-eye ~ .bdi-c,
+.bdi-fill:focus-within .bdi-eye ~ .bdi-c {
+  display: none;
 }
 .bdi-fill .bdi-eye:hover {
   color: var(--bk-ink);
-  background: rgba(15, 23, 42, 0.05);
 }
-.bdi-fill.bound {
-  background: var(--bk-accent-tint);
-  border-color: var(--bk-alpha-accent-30);
+.bdi-fill .bdi-c {
+  margin-left: auto;
+  flex: none;
+  display: inline-flex;
+  color: var(--bk-ink-muted);
+  cursor: pointer;
 }
-.bdi-fill.bound .bdi-hx {
-  color: var(--bk-accent);
+
+/* ── Text field ──────────────────────────────────────── */
+.bdi-text {
+  padding: 0 var(--bk-space-8);
+  outline: none;
+}
+.bdi-text.mono {
+  font-family: var(--bk-font-mono);
+}
+textarea.bdi-text {
+  height: auto;
+  min-height: 60px;
+  padding: 6px var(--bk-space-8);
+  resize: vertical;
 }
 
 /* ── Tiny switch (22×12) ──────────────────────────── */
@@ -875,99 +793,6 @@
   color: var(--bk-ink);
 }
 
-/* ── Chips ───────────────────────────────────────── */
-.bdi-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-}
-.bdi-chip {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink);
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border: 1px solid var(--bk-border);
-  padding: 1px var(--bk-space-4) 1px 6px;
-  border-radius: 3px;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  letter-spacing: -0.01em;
-}
-.bdi-chip.primary,
-.bdi-chip.pri {
-  color: var(--bk-accent);
-  background: var(--bk-accent-tint);
-  border-color: var(--bk-alpha-accent-30);
-}
-.bdi-chip .bdi-chip-x {
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-  font-size: 11px;
-  line-height: 1;
-  background: none;
-  border: none;
-  padding: 0;
-}
-.bdi-chip .bdi-chip-x:hover {
-  color: var(--bk-ink);
-}
-.bdi-chip-add {
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-  background: transparent;
-  border: 1px dashed var(--bk-border);
-  padding: 1px 5px;
-  border-radius: 3px;
-  cursor: pointer;
-}
-.bdi-chip-add:hover {
-  color: var(--bk-accent);
-  border-color: var(--bk-accent);
-}
-.bdi-chip-input {
-  padding: 1px var(--bk-space-4) 1px 6px;
-}
-.bdi-chip-input input {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink);
-  background: transparent;
-  border: none;
-  outline: none;
-  width: 8ch;
-  min-width: 6ch;
-  padding: 0;
-}
-.bdi-chip-suggest {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 20;
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border: 1px solid var(--bk-border);
-  border-radius: 4px;
-  padding: 2px;
-  min-width: 140px;
-  max-height: 180px;
-  overflow-y: auto;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
-}
-.bdi-chip-suggest button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: var(--bk-space-4) 6px;
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink);
-  background: transparent;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
-.bdi-chip-suggest button:hover {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-}
-
 /* ── Advanced disclosure ─────────────────────────── */
 .bdi-adv {
   display: inline-flex;
@@ -989,40 +814,6 @@
      chip, where --bk-ink-muted is 4.39:1 at 11px. */
   color: var(--bk-ink-soft);
   display: inline-flex;
-}
-
-/* ── Text input ─────────────────────────────────── */
-.bdi-text {
-  width: 100%;
-  padding: 0 var(--bk-space-8);
-  height: 24px;
-  background: var(--bk-bg-subtle);
-  border: 1px solid transparent;
-  border-radius: 4px;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink);
-  outline: none;
-  transition: background 120ms, border-color 120ms;
-}
-.bdi-text:hover {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-border);
-}
-.bdi-text:focus {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-accent);
-  box-shadow: var(--bk-shadow-focus);
-}
-.bdi-text.mono {
-  font-family: var(--bk-font-mono);
-  font-size: var(--bk-text-11);
-}
-textarea.bdi-text {
-  height: auto;
-  min-height: 60px;
-  padding: 6px var(--bk-space-8);
-  resize: vertical;
-  font-family: var(--bk-font-ui);
 }
 
 /* ── Utilities ──────────────────────────────────── */

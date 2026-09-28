@@ -33,6 +33,9 @@ export interface ComponentDetailScreenProps {
   composer: Composer | null;
   /** Navigate back to browse view */
   onBack: () => void;
+  /** §13: opened from an instance's "Edit master ›" — the back row returns
+   *  to that instance instead of the list. */
+  onBackToInstance?: () => void;
   /** Close the panel */
   onClose?: () => void;
   /** Callback when component is inserted */
@@ -95,6 +98,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   component,
   composer,
   onBack,
+  onBackToInstance,
   onClose,
   onInsert,
   onDuplicate,
@@ -116,6 +120,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const [showDetachAll, setShowDetachAll] = React.useState(false);
   const [renaming, setRenaming] = React.useState(false);
   const [draftName, setDraftName] = React.useState(component.name);
+  /* The back row's (and Escape's) one level up. */
+  const backOut = onBackToInstance ?? onBack;
 
   /* Flow-check (2026-09-25): Esc did nothing here — every sibling drill-in
      (Add's Generate/create sub-views) backs out one level on Esc; this screen
@@ -129,11 +135,11 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
       if (renaming || showDeleteConfirm || showUpdateConfirm || showDetachAll) return;
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
-      onBack();
+      backOut();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onBack, renaming, showDeleteConfirm, showUpdateConfirm, showDetachAll]);
+  }, [backOut, renaming, showDeleteConfirm, showUpdateConfirm, showDetachAll]);
 
   // Handle insert action — the shared insert (A-15), same words as Add.
   const handleInsert = async () => {
@@ -272,7 +278,11 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
   return (
     <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0" data-testid="component-master">
-      <PanelBackRow label="Saved components" onClick={onBack} data-testid="component-back-row" />
+      <PanelBackRow
+        label={onBackToInstance ? "Back to instance" : "Saved components"}
+        onClick={backOut}
+        data-testid="component-back-row"
+      />
       <div className="tw:flex tw:items-center tw:gap-2 tw:h-11 tw:px-4 tw:shrink-0">
         <span className="tw:flex-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Components</span>
         {onClose && (

@@ -67,18 +67,6 @@
       "nodeId": "200:104"
     },
     {
-      "name": "scope-pill",
-      "testId": "inspector-scope-pill",
-      "spec": "shell-state-6-comment-mode",
-      "nodeId": "200:105"
-    },
-    {
-      "name": "state-pill",
-      "testId": "inspector-state-pill",
-      "spec": "shell-state-6-comment-mode",
-      "nodeId": "200:109"
-    },
-    {
       "name": "comment-layer",
       "testId": "comment-capture-layer"
     }

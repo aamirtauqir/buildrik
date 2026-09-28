@@ -13,8 +13,8 @@ export const checkboxBlockConfig: CheckboxBlockConfig = {
   id: "checkbox",
   label: "Checkbox",
   category: "Forms",
-  elementType: "input",
+  elementType: "checkbox",
   icon: "/src/assets/icons/blocks/input.svg",
   content:
-    '<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" name="checkbox"/> Checkbox option</label>',
+    '<label data-buildrick-type="checkbox" style="display:flex;align-items:center;gap:8px"><input type="checkbox" name="checkbox"/> Checkbox option</label>',
 };

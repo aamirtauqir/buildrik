@@ -1,58 +1,56 @@
 /**
- * DSBindingChip — the bound-token chip beside an inspector value (spec §6.4).
+ * DSBindingChip — the one binding indicator: a bound value shows the token's
+ * name inside its field ("Text / primary", boards 1 and 27). Nothing else
+ * marks the binding — no tint, no link glyph, no second chip beside the field.
  *
- * Green, the token's id; a click opens Brand on that token (the consumer
- * supplies the handler — G3-156 deep link). Boards draw this chip only for
- * the bound state (32:78); the "preset" and "off-ds" states and the Beginner
- * "Bind to token" hint had no consumer and were deleted (G3-156 / IN-104).
+ * With a handler the name is a button that opens Brand on the token (G3-156,
+ * §13 "token chip → Brand"), focus-visible drawn with the Inspector's one
+ * focus ring (`--bk-shadow-focus`). Without one it is plain text.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DSBindingChipProps {
-  /** The bound token's id, e.g. "color-primary". */
+  /** What the field shows: the token's name. */
   label: string;
-  /** Opens Brand on the token. Omitted → a static span. */
+  /** Opens Brand on the token. Omitted → static text. */
   onClick?: () => void;
   /** Overrides the default accessible name. */
   ariaLabel?: string;
 }
 
+const NAME =
+  "tw:min-w-0 tw:flex-1 tw:truncate tw:text-left tw:text-[12px] tw:leading-4 tw:font-normal tw:text-[var(--bk-ink-soft)]";
+
 export const DSBindingChip: React.FC<DSBindingChipProps> = ({ label, onClick, ariaLabel }) => {
-  const Tag: "button" | "span" = onClick ? "button" : "span";
-  // Selective resets only — `all: "unset"` previously stripped the native
-  // focus indicator, defeating DD3 keyboard-a11y. The `bd-ds-binding-chip`
-  // className restores a `:focus-visible` outline via inspector.css.
+  const name = ariaLabel ?? `Jump to token ${label} in Brand`;
+  if (!onClick) {
+    return (
+      <span className={NAME} aria-label={name} data-testid="inspector-token-name">
+        {label}
+      </span>
+    );
+  }
   return (
-    <Tag
-      type={onClick ? "button" : undefined}
-      onClick={onClick}
-      aria-label={ariaLabel ?? `Jump to token ${label} in Brand`}
-      className="bd-ds-binding-chip"
-      style={{
-        margin: 0,
-        font: "inherit",
-        cursor: onClick ? "pointer" : "default",
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        padding: "2px 8px",
-        height: 20,
-        borderRadius: 10,
-        fontSize: 11,
-        fontWeight: 500,
-        lineHeight: 1,
-        color: "var(--bk-success-text)",
-        background: "var(--bk-success-tint)",
-        border: "1px solid var(--bk-success)",
-        whiteSpace: "nowrap",
-        maxWidth: "100%",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={(e: React.MouseEvent) => {
+        e.stopPropagation();
+        onClick();
       }}
+      aria-label={name}
+      title={name}
+      data-testid="inspector-token-name"
+      className={
+        `${NAME} tw:h-6 tw:min-h-0 tw:justify-start tw:rounded-[3px] tw:border-0 tw:bg-transparent tw:p-0 ` +
+        "tw:enabled:hover:bg-transparent tw:hover:text-[var(--bk-accent-text)] tw:focus:ring-0 " +
+        "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
+      }
     >
       {label}
-    </Tag>
+    </Button>
   );
 };

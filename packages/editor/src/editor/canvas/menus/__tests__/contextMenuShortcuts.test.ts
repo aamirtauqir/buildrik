@@ -71,9 +71,8 @@ const tooltipChords = TOOLTIP_FILES.flatMap((f) =>
 );
 
 /** Chords `useCanvasKeyboard` implements directly, with the branch that proves it. */
+/* ⌥⌘C / ⌥⌘V left this list for the copy-style / paste-style commands. */
 const CANVAS_CHORDS: Record<string, RegExp> = {
-  "ctrl+alt+c": /Cmd\/Ctrl\+Option\+C: Copy styles only/,
-  "ctrl+alt+v": /Cmd\/Ctrl\+Option\+V: Paste styles only/,
   arrowleft: /case "ArrowLeft":/,
   arrowright: /case "ArrowRight":/,
   arrowup: /case "ArrowUp":/,

@@ -1,5 +1,5 @@
 /**
- * Toasts for copy / cut / paste / duplicate.
+ * Toasts for copy / cut / paste / duplicate, and copy / paste style.
  *
  * These used to live inside `useCanvasKeyboard`, which implemented those four
  * shortcuts a second time — the command registry already owned them, listens
@@ -47,8 +47,16 @@ export function useClipboardToasts(
     /* LOCKED_ELEMENTS_SKIPPED (delete,
        cut, nudge — A-5) had no listener anywhere, so a locked element quietly
        staying put looked identical to nothing having been selected at all. */
-    const lockedSkipped = () =>
-      addToast({ description: "Locked elements were skipped", tone: "info", duration: 2500 });
+    /* P-1: every Inspector write on a locked element raises it too, and a
+       field typed into writes per keystroke — one toast while it is up. */
+    const LOCKED_TOAST_MS = 2500;
+    let lockedShownAt = -Infinity;
+    const lockedSkipped = () => {
+      const now = Date.now();
+      if (now - lockedShownAt < LOCKED_TOAST_MS) return;
+      lockedShownAt = now;
+      addToast({ description: "Locked elements were skipped", tone: "info", duration: LOCKED_TOAST_MS });
+    };
 
     /* CLIPBOARD_PASTE is emitted by pasteElement, once PER element — so a
        three-element paste fired three toasts stacked on top of each other. The
@@ -91,7 +99,27 @@ export function useClipboardToasts(
       }, 0);
     };
 
+    /* ⌥⌘C / ⌥⌘V and their menu rows — the copy-style / paste-style commands
+       (moved out of useCanvasKeyboard, which toasted only over the canvas). */
+    const stylesCopied = (e?: { count?: number }) => {
+      const n = e?.count ?? 0;
+      addToast(
+        n > 0
+          ? { description: `${plural(n, "1 style", "styles")} copied`, tone: "info", duration: 2000 }
+          : { description: "No styles to copy", tone: "warning", duration: 2000 }
+      );
+    };
+    const stylesPasted = (e?: { count?: number }) =>
+      addToast({
+        description: `${plural(e?.count ?? 0, "1 style", "styles")} applied`,
+        tone: "success",
+        duration: 2000,
+        action: { label: "Undo", onClick: composer.history.captureUndo() },
+      });
+
     composer.on(EVENTS.CLIPBOARD_COPY, copied);
+    composer.on(EVENTS.STYLES_COPIED, stylesCopied);
+    composer.on(EVENTS.STYLES_PASTED, stylesPasted);
     composer.on(EVENTS.CLIPBOARD_CUT, cut);
     composer.on(EVENTS.CLIPBOARD_PASTE, pasted);
     composer.on(EVENTS.ELEMENT_DUPLICATED, duplicated);
@@ -100,6 +128,8 @@ export function useClipboardToasts(
       if (burst) clearTimeout(burst);
       if (dupeBurst) clearTimeout(dupeBurst);
       composer.off(EVENTS.CLIPBOARD_COPY, copied);
+      composer.off(EVENTS.STYLES_COPIED, stylesCopied);
+      composer.off(EVENTS.STYLES_PASTED, stylesPasted);
       composer.off(EVENTS.CLIPBOARD_CUT, cut);
       composer.off(EVENTS.CLIPBOARD_PASTE, pasted);
       composer.off(EVENTS.ELEMENT_DUPLICATED, duplicated);

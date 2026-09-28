@@ -18,5 +18,9 @@ export const SECTION = `${SECTION_TYPE} tw:text-[var(--bk-gray-500)]`;
 /** Settings' "DANGER ZONE" head — its own colour, not a second colour class
  *  on SECTION (on a plain element the stylesheet order would decide). */
 export const SECTION_DANGER = `${SECTION_TYPE} tw:text-[var(--bk-error-text)]`;
+/** "‹ Back to canvas" — the workspace header's and the record sheet's (§13). */
+export const BACK =
+  "tw:-ml-2 tw:h-7 tw:border-0 tw:bg-transparent tw:px-2 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium " +
+  "tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0";
 /** The 28px compact button both tabs end on. */
 export const ACTION = "tw:h-7 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";

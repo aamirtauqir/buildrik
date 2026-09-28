@@ -119,7 +119,9 @@ export class KeybindingManager {
     if (e.shiftKey) parts.push("shift");
     if (e.altKey) parts.push("alt");
 
-    const key = e.key.toLowerCase();
+    /* ⌥ changes the character a letter types on a Mac (⌥⌘C reports "ç"),
+       so an ⌥ chord is read by the physical key. */
+    const key = e.altKey && /^Key[A-Z]$/.test(e.code ?? "") ? e.code.slice(3).toLowerCase() : e.key.toLowerCase();
     if (!["control", "shift", "alt", "meta"].includes(key)) {
       parts.push(key);
     }

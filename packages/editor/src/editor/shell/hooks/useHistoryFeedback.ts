@@ -64,6 +64,9 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   paste: "Pasted element",
   "paste-styles": "Pasted styles",
   "reset-styles": "Reset styles",
+  "apply-style-to-peers": "Applied style to similar elements",
+  "lock-element": "Locked element",
+  "unlock-element": "Unlocked element",
   // Move / order
   "move-element": "Moved element",
   "multi-element-move": "Moved elements",

@@ -13,7 +13,8 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   h5: "Heading 5",
   h6: "Heading 6",
   // HTML block elements
-  p: "Paragraph",
+  // A paragraph is "Text" everywhere the boards name it (boards 4, 21).
+  p: "Text",
   div: "Container",
   span: "Text",
   section: "Section",
@@ -27,6 +28,7 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   a: "Link",
   img: "Image",
   video: "Video",
+  iframe: "Embed",
   // HTML form elements
   button: "Button",
   input: "Input",
@@ -39,7 +41,7 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   li: "List Item",
   // Semantic type aliases used by the engine
   heading: "Heading",
-  paragraph: "Paragraph",
+  paragraph: "Text",
   container: "Container",
   text: "Text",
   image: "Image",
@@ -53,6 +55,12 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   icon: "Icon",
   divider: "Divider",
   list: "List",
+  "list-item": "List item",
+  // Types whose capitalised id reads wrong ("Cta", "Video-embed", "Social")
+  cta: "CTA",
+  social: "Social icons",
+  "video-embed": "Video embed",
+  "map-embed": "Map embed",
 };
 
 /** The display label for an element type: the SSOT entry, else the type

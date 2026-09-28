@@ -26,11 +26,11 @@ describe("CSSClassesSection — class list from composer", () => {
         composer={composer as never}
       />
     );
-    expect(screen.getByText(".font-bold")).toBeInTheDocument();
-    expect(screen.getByText(".text-center")).toBeInTheDocument();
+    expect(screen.getByTestId("class-chip-font-bold")).toHaveTextContent("font-bold");
+    expect(screen.getByTestId("class-chip-text-center")).toHaveTextContent("text-center");
   });
 
-  it("renders an add-chip when element has no classes", () => {
+  it("renders the Add class field and no chips when element has no classes", () => {
     const el = makeEl([]);
     const composer = makeComposer(el);
     render(
@@ -39,8 +39,8 @@ describe("CSSClassesSection — class list from composer", () => {
         composer={composer as never}
       />
     );
-    // No classes means no .chip text nodes, but the "+" add button must exist.
-    expect(screen.getByRole("button", { name: /add class/i })).toBeInTheDocument();
+    expect(screen.getByLabelText("Add class")).toHaveAttribute("placeholder", "Add a class…");
+    expect(screen.queryByTestId("class-chips")).toBeNull();
     expect(screen.queryByText(/no classes applied/i)).not.toBeInTheDocument();
   });
 });
@@ -72,9 +72,7 @@ describe("CSSClassesSection — Tab key does not add class", () => {
         composer={composer as never}
       />
     );
-    // Open inline input first — the add button is present but the input is hidden.
-    fireEvent.click(screen.getByRole("button", { name: /add class/i }));
-    const input = screen.getByPlaceholderText("class-name");
+    const input = screen.getByLabelText("Add class");
     fireEvent.change(input, { target: { value: "my-class" } });
     fireEvent.keyDown(input, { key: "Tab" });
     expect(addClassSpy).not.toHaveBeenCalled();

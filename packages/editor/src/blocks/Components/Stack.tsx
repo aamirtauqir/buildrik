@@ -11,7 +11,7 @@ import { BLOCK_COLORS } from "../blockPalette";
  * Build vertical stack container
  */
 function buildStack(composer: Composer, parentId: string, dropIndex?: number): string | undefined {
-  const stack = composer.elements.createElement("container", {
+  const stack = composer.elements.createElement("stack", {
     tagName: "div",
     attributes: {
       class: "stack",
@@ -62,6 +62,6 @@ export const stackBlockConfig: BlockBuildConfig = {
   id: "stack",
   label: "Stack (Vertical)",
   category: "Components",
-  elementType: "container",
+  elementType: "stack",
   build: buildStack,
 };

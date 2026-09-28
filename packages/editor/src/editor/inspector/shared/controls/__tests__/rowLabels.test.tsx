@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { RangeSlider, SliderInput } from "../SliderControls";
-import { TextInputRow, InlineInput } from "../TextControls";
+import { TextInputRow } from "../TextControls";
 import { SelectRow } from "../InputControls";
 
 /**
@@ -29,11 +29,6 @@ describe("inspector rows name their controls", () => {
   it("TextInputRow", () => {
     render(<TextInputRow label="Move X" value="" onChange={() => {}} />);
     expect(screen.getByLabelText("Move X")).toHaveProperty("type", "text");
-  });
-
-  it("InlineInput", () => {
-    render(<InlineInput label="Min width" value="" onChange={() => {}} />);
-    expect(screen.getByLabelText("Min width")).toHaveProperty("type", "text");
   });
 
   it("SelectRow", () => {

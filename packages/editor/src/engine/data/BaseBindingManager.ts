@@ -191,12 +191,19 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
    * for display, and a data-source update still re-applies.
    */
   import(data: Record<string, T[]>): void {
+    const previous = [...this.bindings.keys()];
     this.bindings.clear();
 
     for (const [elementId, bindings] of Object.entries(data)) {
       this.bindings.set(elementId, [...bindings]);
       bindings.forEach((binding) => this.composer.emit(EVENTS.BINDING_CREATED, { elementId, binding }));
     }
+    /* Undo of a bind restores through here. Without the removal event the
+       Inspector's binding banner kept saying "bound" over an element Undo had
+       just unbound. */
+    previous
+      .filter((elementId) => !this.bindings.has(elementId))
+      .forEach((elementId) => this.composer.emit(EVENTS.BINDING_REMOVED, { elementId }));
   }
 
   /**

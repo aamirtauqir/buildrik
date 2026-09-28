@@ -1,35 +1,55 @@
-import { isTokenVar, resolveTokenVar } from "../shared/tokenBindingDetection";
-import { Popover, Button, Select } from "@/editor/chrome-ui";
 /**
- * Size Section - Width, Height, Min/Max dimensions
- * CP3: W and H rows each have a hover-reveal chain button that opens a spacing
- * token picker. Selecting a spacing token stores var(--bk-space-16) on the
- * element — not "16px". The picker uses list layout (showSwatch=false).
+ * Size Section — Width and Height as Fixed · Fill · Hug (boards 1, 16, 17).
+ *
+ * Board 1 reads "Width · Fill  [640 px]" and "Height  [Hug · Auto]": the row
+ * label names the mode while the field holds a number, the field names it
+ * when there is no number to show. Fill prints what the element measures on
+ * the canvas; typing a number there makes it Fixed. The label is the mode
+ * menu (Fixed / Fill / Hug) in every mode.
+ *
+ * Size is the only writer of width / height / min- / max- (Layout's old Size
+ * row is gone, DD-9) and no longer carries object-fit (→ the Image block,
+ * board 8). While the parent is a flex or grid container it also holds the
+ * item controls (grow / span / align self — see `layout/ItemControls.tsx`).
+ * On the Page panel (board 21) it is the one "Max width" row.
+ *
+ * @license BSD-3-Clause
  */
 
-import { Link2, Link2Off } from "lucide-react";
+import { ChevronDown, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
+import { BK_SELECT_BARE_VALUE_THEME, Button, Menu, MenuItem, Popover, Select } from "@/editor/chrome-ui";
 import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
-import { ConstraintControl } from "./ConstraintControl";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
-import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
-import {
-  CHAIN_BOUND,
-  CHAIN_ROW,
-  CHAIN_SLOT,
-  CHAIN_TRIGGER,
-  CONTROL_SELECT_WRAP,
-  SECTION_PREVIEW,
-} from "../shared/controls/controlClasses";
-// ============================================================================
-// HELPERS
-// ============================================================================
-
+import { isTokenVar, resolveTokenVar } from "../shared/tokenBindingDetection";
+import { InputWithUnit, MoreSettingsToggle, Section } from "../shared/controls";
+import { FieldDot } from "../shared/controls/FieldDot";
+import { useInspectorField } from "../shared/controls/InspectorFieldContext";
+import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER } from "../shared/controls/controlClasses";
+import { ItemControls, type ParentLayout } from "./layout/ItemControls";
 
 // ============================================================================
-// CHAIN BUTTON
-// Chain button: hover-reveal (opacity 0→1 via CSS on parent hover).
-// Bound state: always visible in blue with unlink button.
+// FIXED · FILL · HUG
+// ============================================================================
+
+export type ConstraintType = "fixed" | "fill" | "hug";
+
+/** Which of Fixed · Fill · Hug a width/height value is. */
+export function constraintTypeOf(value: string): ConstraintType {
+  if (value === "100%" || value === "-webkit-fill-available") return "fill";
+  if (value === "auto" || value === "fit-content" || value === "max-content") return "hug";
+  return "fixed";
+}
+
+/** The value a mode writes. Fixed keeps a fixed value already there. */
+export function valueForConstraint(type: ConstraintType, current: string): string {
+  if (type === "fill") return "100%";
+  if (type === "hug") return "fit-content";
+  return current && constraintTypeOf(current) === "fixed" ? current : "200px";
+}
+
+// ============================================================================
+// SPACING-TOKEN CHAIN (Fixed mode) — binds width/height to a spacing token
 // ============================================================================
 
 interface ChainButtonProps {
@@ -41,17 +61,9 @@ interface ChainButtonProps {
 const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { tokens: spacingTokens } = useSpacingRegistry();
-  const tokenEntries = spacingTokens.map((t) => ({
-    id: t.id,
-    name: t.name,
-    value: t.value,
-    cssVar: t.cssVar,
-  }));
-
+  const tokenEntries = spacingTokens.map((t) => ({ id: t.id, name: t.name, value: t.value, cssVar: t.cssVar }));
   const isBound = isTokenVar(value);
-  const boundToken = isBound
-    ? tokenEntries.find((t) => value === `var(${t.cssVar})`)
-    : null;
+  const boundToken = isBound ? tokenEntries.find((t) => value === `var(${t.cssVar})`) : null;
 
   if (isBound) {
     return (
@@ -63,9 +75,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
         className={CHAIN_BOUND}
       >
         <Link2 size={10} aria-hidden="true" />
-        {boundToken?.name && (
-          <span className="tw:max-w-12 tw:overflow-hidden tw:text-ellipsis">{boundToken.name}</span>
-        )}
+        {boundToken?.name && <span className="tw:max-w-12 tw:overflow-hidden tw:text-ellipsis">{boundToken.name}</span>}
         <Link2Off size={9} aria-hidden="true" className="tw:opacity-70" />
       </Button>
     );
@@ -76,6 +86,9 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
       open={isOpen}
       onClose={() => setIsOpen(false)}
       placement="bottom-end"
+      /* Beside the column over the canvas, like the colour popover (P-4):
+         inside the column's scroll box it could clip. */
+      beside=".layout-shell__inspector"
       label="Spacing tokens"
       trigger={
         <Button
@@ -102,9 +115,159 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
   );
 };
 
-/** The W/H/min/max glyph inside a field — 600-weight, tiny. */
-const FIELD_GLYPH = "tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:[font-family:var(--bk-font-ui)]";
-const FIELD_GLYPH_SM = "tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:[font-family:var(--bk-font-ui)]";
+// ============================================================================
+// RENDERED SIZE — what "Fill" measures on the canvas
+// ============================================================================
+
+/** The element's laid-out size on the canvas (CSS px, before canvas zoom). */
+function useRenderedSize(elementId: string | undefined): { width: number; height: number } | null {
+  const [size, setSize] = React.useState<{ width: number; height: number } | null>(null);
+  React.useLayoutEffect(() => {
+    if (!elementId || typeof document === "undefined") return undefined;
+    const node = document.querySelector<HTMLElement>(`[data-buildrick-id="${elementId.replace(/["\\]/g, "\\$&")}"]`);
+    if (!node) {
+      setSize(null);
+      return undefined;
+    }
+    const read = () => (node.offsetWidth || node.offsetHeight ? setSize({ width: node.offsetWidth, height: node.offsetHeight }) : setSize(null));
+    read();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(read);
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [elementId]);
+  return size;
+}
+
+// ============================================================================
+// DIMENSION ROW
+// ============================================================================
+
+const MODE_LABEL: Record<ConstraintType, string> = { fixed: "Fixed", fill: "Fill", hug: "Hug" };
+const MODES: ConstraintType[] = ["fixed", "fill", "hug"];
+
+const ROW = "bdi-row-ctrl";
+const MODE_BUTTON =
+  "bdi-lb tw:h-6 tw:min-w-0 tw:justify-start tw:gap-1 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-normal " +
+  "tw:text-[var(--bk-ink-muted)] tw:hover:bg-transparent tw:hover:text-[var(--bk-ink-soft)] tw:focus:ring-0 " +
+  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
+interface DimensionRowProps {
+  axis: "width" | "height";
+  value: string;
+  /** Laid-out px on this axis, when the element is on the canvas. */
+  measured: number | null;
+  onChange: (value: string) => void;
+}
+
+function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const field = useInspectorField(axis);
+  const name = axis === "width" ? "Width" : "Height";
+  /* Unset reads as what a block does: fills its width, hugs its height. */
+  const mode: ConstraintType = value ? constraintTypeOf(value) : axis === "width" ? "fill" : "hug";
+  const setMode = (next: ConstraintType) => {
+    if (next === mode) return;
+    /* Fixed from Fill / Hug starts at what the element measures now. */
+    const current = next === "fixed" && mode !== "fixed" && measured ? `${measured}px` : value;
+    onChange(valueForConstraint(next, current));
+  };
+  const labelText = mode === "hug" ? name : `${name} · ${MODE_LABEL[mode]}`;
+  const readout = measured ? `${measured}px` : "100%";
+
+  return (
+    <div className={`${ROW} tw:relative`} data-testid={`inspector-size-${axis}`} data-mode={mode}>
+      <span className="tw:inline-flex tw:items-center tw:min-w-0">
+        <Popover
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          placement="bottom"
+          label={`${name} sizing`}
+          trigger={
+            <Button
+              size="xs"
+              color="light"
+              className={MODE_BUTTON}
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              aria-label={`${name} sizing: ${MODE_LABEL[mode]}`}
+              data-testid={`inspector-size-${axis}-mode`}
+              disabled={field.readOnly}
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              {labelText}
+            </Button>
+          }
+        >
+          <Menu label={`${name} sizing`}>
+            {MODES.map((m) => (
+              <MenuItem
+                key={m}
+                radio
+                selected={m === mode}
+                data-testid={`inspector-size-${axis}-mode-${m}`}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setMode(m);
+                }}
+              >
+                {MODE_LABEL[m]}
+              </MenuItem>
+            ))}
+          </Menu>
+        </Popover>
+        <FieldDot field={field} />
+      </span>
+      <div className="bdi-row-content">
+        {mode === "hug" ? (
+          <div className="bdi-ddn">
+            <Select
+              aria-label={`${name} sizing`}
+              className="bdi-v"
+              theme={BK_SELECT_BARE_VALUE_THEME}
+              disabled={field.readOnly}
+              value="hug"
+              onChange={(e) => setMode(e.target.value as ConstraintType)}
+            >
+              <option value="hug">Hug · Auto</option>
+              <option value="fill">Fill</option>
+              <option value="fixed">Fixed</option>
+            </Select>
+            <span className="bdi-c" aria-hidden="true">
+              <ChevronDown size={9} />
+            </span>
+          </div>
+        ) : (
+          <div className={CHAIN_ROW}>
+            <div className="tw:flex-1 tw:min-w-0">
+              <InputWithUnit
+                label=""
+                ariaLabel={name}
+                property={axis}
+                dot={false}
+                units={["px", "%", "rem", "vw", "vh"]}
+                value={mode === "fixed" ? value : readout}
+                /* Fill's number is a readout: leaving it untouched must not
+                   pin the element to its current size. */
+                onChange={(v) => {
+                  if (mode === "fill" && v === readout) return;
+                  onChange(v);
+                }}
+              />
+            </div>
+            {mode === "fixed" && !field.readOnly && (
+              /* Revealed on hover, left of the stepper and the unit select —
+                 never over them (the field's number · stepper · unit). */
+              <div className="tw:absolute tw:right-[76px] tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]">
+                <ChainButton property={axis} value={value} onChange={onChange} />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ============================================================================
 // SIZE SECTION
@@ -113,233 +276,79 @@ const FIELD_GLYPH_SM = "tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:[
 export interface SizeSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  propertyStates?: Record<
-    string,
-    { hidden?: boolean; disabled?: boolean; reason?: string; isOverridden?: boolean }
-  >;
+  /** The element on the canvas — Fill measures it. */
+  elementId?: string;
+  /** "page" = the Page panel's one Max width row (board 21). */
+  variant?: "element" | "page";
+  /** The parent is a flex / grid container: show the item controls. */
+  parentLayout?: ParentLayout | null;
+  propertyStates?: Record<string, { hidden?: boolean; disabled?: boolean; reason?: string }>;
   isOpen?: boolean;
   onToggle?: (open: boolean) => void;
-  tier?: SectionTier;
   advancedExpanded?: boolean;
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
 }
 
+const LIMITS = [
+  { property: "min-width", label: "Min width" },
+  { property: "max-width", label: "Max width" },
+  { property: "min-height", label: "Min height" },
+  { property: "max-height", label: "Max height" },
+] as const;
+
 export const SizeSection: React.FC<SizeSectionProps> = ({
   styles,
   onChange,
+  elementId,
+  variant = "element",
+  parentLayout = null,
   propertyStates = {},
   isOpen,
   onToggle,
-  tier = "secondary",
   advancedExpanded = false,
   onAdvancedToggle,
-  mixedKeys,
 }) => {
+  const measured = useRenderedSize(variant === "page" ? undefined : elementId);
   const hidden = (prop: string) => propertyStates[prop]?.hidden;
-  const disabled = (prop: string) => propertyStates[prop]?.disabled;
-  const reason = (prop: string) => propertyStates[prop]?.reason;
-  const w = styles.width || "";
-  const h = styles.height || "";
-  const sizePreview =
-    w || h ? (
-      <span className={SECTION_PREVIEW}>
-        {w || "auto"} × {h || "auto"}
-      </span>
-    ) : undefined;
+
+  if (variant === "page") {
+    return (
+      <Section title="Size" isOpen={isOpen} onToggle={onToggle} id="inspector-section-size">
+        <InputWithUnit
+          label="Max width"
+          property="max-width"
+          /* Unset reads empty, not a "0" that looks like a value (board 21). */
+          placeholder=""
+          units={["px", "%", "rem", "vw"]}
+          value={styles["max-width"] || ""}
+          onChange={(v) => onChange("max-width", v)}
+        />
+      </Section>
+    );
+  }
 
   return (
-    <Section
-      title="Size"
-      icon="Ruler"
-      isOpen={isOpen}
-      onToggle={onToggle}
-      preview={sizePreview}
-      tier={tier}
-      id="inspector-section-size"
-    >
-      {/* Board: Width / Height as Fixed · Fill · Hug, the value the profile
-          boards print ("Fill", "Hug"). Fixed mode keeps the unit input and its
-          design-token chain. */}
+    <Section title="Size" isOpen={isOpen} onToggle={onToggle} id="inspector-section-size">
       {!hidden("width") && (
-        <div className={CHAIN_ROW} role="group" aria-label="Width">
-          <MixedValueIndicator prop="width" mixedKeys={mixedKeys} />
-          <div className="tw:flex-1">
-            <ConstraintControl
-              label="Width"
-              value={styles.width || "auto"}
-              onChange={(v) => onChange("width", v)}
-              fixedInput={
-                <>
-                  <div className="tw:flex-1">
-                    <InputWithUnit
-                      label=""
-                      ariaLabel="Width"
-                      value={styles.width || ""}
-                      onChange={(v) => onChange("width", v)}
-                      disabled={disabled("width")}
-                      disabledReason={reason("width")}
-                      isOverridden={propertyStates["width"]?.isOverridden}
-                      fieldIcon={<span className={FIELD_GLYPH}>W</span>}
-                    />
-                  </div>
-                  {!disabled("width") && (
-                    <div className={CHAIN_SLOT}>
-                      <ChainButton property="width" value={styles.width || ""} onChange={(v) => onChange("width", v)} />
-                    </div>
-                  )}
-                </>
-              }
-            />
-          </div>
-        </div>
+        <DimensionRow axis="width" value={styles.width || ""} measured={measured?.width ?? null} onChange={(v) => onChange("width", v)} />
       )}
       {!hidden("height") && (
-        <div className={CHAIN_ROW} role="group" aria-label="Height">
-          <MixedValueIndicator prop="height" mixedKeys={mixedKeys} />
-          <div className="tw:flex-1">
-            <ConstraintControl
-              label="Height"
-              value={styles.height || "auto"}
-              onChange={(v) => onChange("height", v)}
-              fixedInput={
-                <>
-                  <div className="tw:flex-1">
-                    <InputWithUnit
-                      label=""
-                      ariaLabel="Height"
-                      value={styles.height || ""}
-                      onChange={(v) => onChange("height", v)}
-                      disabled={disabled("height")}
-                      disabledReason={reason("height")}
-                      isOverridden={propertyStates["height"]?.isOverridden}
-                      fieldIcon={<span className={FIELD_GLYPH}>H</span>}
-                    />
-                  </div>
-                  {!disabled("height") && (
-                    <div className={CHAIN_SLOT}>
-                      <ChainButton property="height" value={styles.height || ""} onChange={(v) => onChange("height", v)} />
-                    </div>
-                  )}
-                </>
-              }
-            />
-          </div>
-        </div>
+        <DimensionRow axis="height" value={styles.height || ""} measured={measured?.height ?? null} onChange={(v) => onChange("height", v)} />
       )}
-      {/* ─── Advanced: min/max pairs (behind More settings) ─── */}
-      {advancedExpanded && (
-        <>
-          {/* Min W | · | Max W */}
-          {(!hidden("min-width") || !hidden("max-width")) && (
-            <div className="bdi-pair" role="group" aria-label="Width constraints">
-              {!hidden("min-width") ? (
-                <div className="tw:relative">
-                  <MixedValueIndicator prop="min-width" mixedKeys={mixedKeys} />
-                  <InputWithUnit
-                    label=""
-                    ariaLabel="Min width"
-                    value={styles["min-width"] || ""}
-                    onChange={(v) => onChange("min-width", v)}
-                    disabled={disabled("min-width")}
-                    disabledReason={reason("min-width")}
-                    isOverridden={propertyStates["min-width"]?.isOverridden}
-                    fieldIcon={<span className={FIELD_GLYPH_SM}>min</span>}
-                  />
-                </div>
-              ) : <span />}
-              <span className="bdi-pair-sep" aria-hidden="true" />
-              {!hidden("max-width") ? (
-                <div className="tw:relative">
-                  <MixedValueIndicator prop="max-width" mixedKeys={mixedKeys} />
-                  <InputWithUnit
-                    label=""
-                    ariaLabel="Max width"
-                    value={styles["max-width"] || ""}
-                    onChange={(v) => onChange("max-width", v)}
-                    disabled={disabled("max-width")}
-                    disabledReason={reason("max-width")}
-                    isOverridden={propertyStates["max-width"]?.isOverridden}
-                    fieldIcon={<span className={FIELD_GLYPH_SM}>max</span>}
-                  />
-                </div>
-              ) : <span />}
-            </div>
-          )}
-
-          {/* Min H | · | Max H */}
-          {(!hidden("min-height") || !hidden("max-height")) && (
-            <div className="bdi-pair" role="group" aria-label="Height constraints">
-              {!hidden("min-height") ? (
-                <div className="tw:relative">
-                  <MixedValueIndicator prop="min-height" mixedKeys={mixedKeys} />
-                  <InputWithUnit
-                    label=""
-                    ariaLabel="Min height"
-                    value={styles["min-height"] || ""}
-                    onChange={(v) => onChange("min-height", v)}
-                    disabled={disabled("min-height")}
-                    disabledReason={reason("min-height")}
-                    isOverridden={propertyStates["min-height"]?.isOverridden}
-                    fieldIcon={<span className={FIELD_GLYPH_SM}>min</span>}
-                  />
-                </div>
-              ) : <span />}
-              <span className="bdi-pair-sep" aria-hidden="true" />
-              {!hidden("max-height") ? (
-                <div className="tw:relative">
-                  <MixedValueIndicator prop="max-height" mixedKeys={mixedKeys} />
-                  <InputWithUnit
-                    label=""
-                    ariaLabel="Max height"
-                    value={styles["max-height"] || ""}
-                    onChange={(v) => onChange("max-height", v)}
-                    disabled={disabled("max-height")}
-                    disabledReason={reason("max-height")}
-                    isOverridden={propertyStates["max-height"]?.isOverridden}
-                    fieldIcon={<span className={FIELD_GLYPH_SM}>max</span>}
-                  />
-                </div>
-              ) : <span />}
-            </div>
-          )}
-        </>
-      )}
-      {/* Object Fit (for images/videos) */}
-      {!hidden("object-fit") && (
-        <div
-          className={`tw:flex tw:items-center tw:gap-2 tw:mb-3 ${disabled("object-fit") ? "tw:opacity-50" : ""}`}
-          title={reason("object-fit")}
-        >
-          <label className="tw:min-w-[70px] tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]">Object Fit</label>
-          <div className={CONTROL_SELECT_WRAP}>
-          <Select
-            /* The <label> beside it names nothing: no htmlFor, no wrapping —
-               axe read this as an unnamed select (critical), and it is the one
-               control an image's inspector adds. */
-            aria-label="Object fit"
-            value={styles["object-fit"] || ""}
-            onChange={(e) => onChange("object-fit", e.target.value)}
-            disabled={disabled("object-fit")}
-          >
-            <option value="">Default</option>
-            <option value="fill">Fill</option>
-            <option value="contain">Contain</option>
-            <option value="cover">Cover</option>
-            <option value="none">None</option>
-            <option value="scale-down">Scale Down</option>
-          </Select>
-          </div>
-        </div>
-      )}
-      {onAdvancedToggle && (
-        <MoreSettingsToggle
-          isOpen={advancedExpanded}
-          onToggle={() => onAdvancedToggle()}
-          advancedCount={5}
-        />
-      )}
+      {parentLayout && <ItemControls parent={parentLayout} styles={styles} onChange={onChange} advanced={advancedExpanded} />}
+      {advancedExpanded &&
+        LIMITS.filter((l) => !hidden(l.property)).map((l) => (
+          <InputWithUnit
+            key={l.property}
+            label={l.label}
+            property={l.property}
+            value={styles[l.property] || ""}
+            onChange={(v) => onChange(l.property, v)}
+          />
+        ))}
+      {onAdvancedToggle && <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} />}
     </Section>
   );
 };

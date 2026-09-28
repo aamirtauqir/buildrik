@@ -80,6 +80,27 @@ export function isSafeUrl(url: string, allowedSchemes: Set<string> = ALLOWED_URL
   }
 }
 
+/** A class token: no whitespace, quotes, backticks, `=` or angle brackets. */
+const CLASS_TOKEN = /^[^\s"'`=<>]+$/;
+
+/**
+ * An element's class tokens, for every HTML writer (canvas, single-file
+ * export, publish): each source is a `classes` list or a raw `class`
+ * attribute string. Blocks (Accordion, Modal, Stack, Switch, Table, Tabs,
+ * ProductGrid) store their classes in `attributes.class`, the Classes panel in
+ * `classes` — both belong on the element. First occurrence wins the order;
+ * duplicates and anything that is not a plain token are dropped.
+ */
+export function classTokens(...sources: ReadonlyArray<string | readonly string[] | null | undefined>): string[] {
+  const out: string[] = [];
+  for (const source of sources) {
+    if (!source) continue;
+    const tokens = typeof source === "string" ? source.split(/\s+/) : source.flatMap((c) => c.split(/\s+/));
+    for (const t of tokens) if (t && CLASS_TOKEN.test(t) && !out.includes(t)) out.push(t);
+  }
+  return out;
+}
+
 /**
  * Check if an attribute (name and value) is safe to emit.
  *

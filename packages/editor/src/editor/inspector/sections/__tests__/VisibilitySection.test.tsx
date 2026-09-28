@@ -17,21 +17,17 @@ function renderVisibility(styles: Record<string, string> = {}, isOpen = true) {
 }
 
 describe("VisibilitySection — rendering", () => {
-  it("renders one toggle per breakpoint, all visible by default", () => {
+  it("renders one checkbox per breakpoint (board 2), all ticked by default", () => {
     renderVisibility();
     for (const bp of ["Desktop", "Tablet", "Mobile"]) {
-      const toggle = screen.getByRole("button", { name: `Visible on ${bp}` });
-      expect(toggle).toHaveAttribute("aria-pressed", "true");
+      expect(screen.getByRole("checkbox", { name: bp })).toBeChecked();
     }
   });
 
   it("reflects a hidden breakpoint from --hide-* styles", () => {
     renderVisibility({ "--hide-mobile": "true" });
-    expect(screen.getByRole("button", { name: "Hidden on Mobile" })).toHaveAttribute(
-      "aria-pressed",
-      "false"
-    );
-    expect(screen.getByRole("button", { name: "Visible on Desktop" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Mobile" })).not.toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Desktop" })).toBeInTheDocument();
   });
 
   it("shows a 'hidden on N' preview when any breakpoint is hidden", () => {
@@ -48,13 +44,13 @@ describe("VisibilitySection — rendering", () => {
 describe("VisibilitySection — writes", () => {
   it("hiding a visible breakpoint writes --hide-<bp>='true'", () => {
     const { onChange } = renderVisibility();
-    fireEvent.click(screen.getByRole("button", { name: "Visible on Desktop" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Desktop" }));
     expect(onChange).toHaveBeenCalledWith("--hide-desktop", "true");
   });
 
   it("showing a hidden breakpoint clears --hide-<bp>", () => {
     const { onChange } = renderVisibility({ "--hide-mobile": "true" });
-    fireEvent.click(screen.getByRole("button", { name: "Hidden on Mobile" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Mobile" }));
     expect(onChange).toHaveBeenCalledWith("--hide-mobile", "");
   });
 });

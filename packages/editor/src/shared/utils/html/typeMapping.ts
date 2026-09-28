@@ -6,56 +6,22 @@
  * @license BSD-3-Clause
  */
 
+import { ELEMENT_TYPES } from "../nesting/derived";
+
 // =============================================================================
 // AQUIBRA TYPE MAPPINGS
 // =============================================================================
 
 /**
- * Valid Aquibra element types
+ * Valid Aquibra element types — every member of `ElementType`, read off the
+ * nesting rules, which TypeScript already forces to cover the whole union.
+ *
+ * This was a hand-kept copy that had fallen ten members behind the union, so
+ * a block announcing itself with `data-buildrick-type="video-embed"` (or
+ * checkbox, radio, switch, accordion, the product types …) was ignored and
+ * typed from its tag instead — a `container`. Q2, 2026-09-27.
  */
-export const VALID_ELEMENT_TYPES = new Set([
-  "container",
-  "text",
-  "heading",
-  "paragraph",
-  "link",
-  "image",
-  "video",
-  "button",
-  "form",
-  "input",
-  "textarea",
-  "select",
-  "list",
-  "table",
-  "section",
-  "hero",
-  "features",
-  "cta",
-  "columns",
-  "grid",
-  "collection-list",
-  "flex",
-  "navbar",
-  "card",
-  "pricing",
-  "slider",
-  "testimonials",
-  "countdown",
-  "gallery",
-  "progress",
-  "social",
-  "icon",
-  "spacer",
-  "divider",
-  "header",
-  "footer",
-  "nav",
-  "custom",
-  "audio",
-  "svg",
-  "lottie",
-]);
+export const VALID_ELEMENT_TYPES: ReadonlySet<string> = new Set<string>(ELEMENT_TYPES);
 
 /**
  * Map HTML tags to Aquibra element types
@@ -73,6 +39,8 @@ export const TAG_TO_TYPE_MAP: Record<string, string> = {
   select: "select",
   ul: "list",
   ol: "list",
+  li: "list-item",
+  label: "label",
   table: "table",
   section: "section",
   div: "container",
@@ -106,6 +74,8 @@ export const TYPE_TO_TAG_MAP: Record<string, string> = {
   columns: "div",
   grid: "div",
   flex: "div",
+  stack: "div",
+  tabs: "div",
   card: "div",
   pricing: "div",
   social: "div",
@@ -113,6 +83,7 @@ export const TYPE_TO_TAG_MAP: Record<string, string> = {
   features: "section",
   cta: "section",
   text: "span",
+  label: "label",
   heading: "h2",
   paragraph: "p",
   link: "a",
@@ -161,7 +132,11 @@ export const TYPE_TO_TAG_MAP: Record<string, string> = {
   audio: "audio",
   svg: "svg",
   gallery: "div",
-  slider: "input",
+  /* The Carousel — a container of slides. This said "input" (the range
+     control, which the catalog inserts as `input[type=range]`), so a stored
+     "div" deferred to it and every carousel rendered and published as a void
+     `<input type="range">` with its slides dropped. */
+  slider: "div",
   testimonials: "div",
   countdown: "div",
   progress: "div",
@@ -177,6 +152,9 @@ export const CONTAINER_TYPES = new Set([
   "grid",
   "collection-list",
   "flex",
+  "stack",
+  "tabs",
+  "list-item",
   "card",
   "pricing",
   "social",
@@ -217,15 +195,23 @@ export const TYPE_TO_INPUT_TYPE: Record<string, string> = {
   checkbox: "checkbox",
   radio: "radio",
   switch: "checkbox",
-  slider: "range",
   upload: "file",
   submit: "submit",
 };
 
-/** Default attributes a newly created element needs to work as its type. */
-export function getDefaultAttributes(type: string): Record<string, string> {
+/**
+ * Default attributes a newly created element needs to work as its type.
+ *
+ * They belong to the type's own control. Pass the tag the element actually
+ * renders as and nothing is returned for any other tag: the catalog's
+ * Checkbox, Radio and Switch are `<label>` wrappers around their `<input>`, and
+ * a `<label type="checkbox" role="switch">` is not a control, it is noise the
+ * export would publish.
+ */
+export function getDefaultAttributes(type: string, tagName?: string): Record<string, string> {
   const inputType = TYPE_TO_INPUT_TYPE[type];
   if (!inputType) return {};
+  if (tagName && tagName.toLowerCase() !== getDefaultTagName(type)) return {};
   // A switch is a checkbox to the browser and a switch to assistive tech.
   return type === "switch" ? { type: inputType, role: "switch" } : { type: inputType };
 }

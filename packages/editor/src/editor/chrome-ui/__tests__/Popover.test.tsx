@@ -278,32 +278,6 @@ describe("Popover viewport clamp", () => {
     expect(el.style.transform).toBe("translate(0px, -92px)");
   });
 
-  /* Board 4428:142922: the inspector's colour picker sits beside the column. */
-  it("beside= places the panel left of that column, top-aligned with the trigger", () => {
-    const col = document.createElement("aside");
-    col.className = "col";
-    document.body.appendChild(col);
-    const rects: Record<string, Partial<DOMRect>> = {
-      col: { left: 1140, right: 1440, top: 56, bottom: 900 },
-    };
-    const orig = Element.prototype.getBoundingClientRect;
-    Element.prototype.getBoundingClientRect = function () {
-      const r = this.classList?.contains("col") ? rects.col : this.getAttribute?.("role") === "dialog"
-        ? { left: 1160, right: 1442, top: 530, bottom: 871, width: 282, height: 341 }
-        : { left: 1160, right: 1420, top: 490, bottom: 518, width: 260, height: 28 };
-      return { x: 0, y: 0, toJSON: () => ({}), ...r } as DOMRect;
-    };
-    try {
-      render(
-        <Popover open onClose={() => {}} trigger={<button>Fill</button>} label="Fill" beside=".col">
-          <div>tokens</div>
-        </Popover>,
-        { container: col },
-      );
-      expect(screen.getByRole("dialog").style.transform).toBe("translate(-311px, -40px)");
-    } finally {
-      Element.prototype.getBoundingClientRect = orig;
-      col.remove();
-    }
-  });
+  /* Board 4428:142922's `beside=` placement moved to Popover.beside.test.tsx
+     with P-4: the panel is portalled and placed with left/top, not nudged. */
 });

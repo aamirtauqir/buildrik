@@ -16,6 +16,7 @@ import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animatio
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
+import { ActionRow } from "../behaviourRows";
 // Re-export types for external use
 export type { Interaction, InteractionTrigger, InteractionsSectionProps };
 
@@ -23,18 +24,6 @@ export type { Interaction, InteractionTrigger, InteractionsSectionProps };
 export { InteractionItem } from "./InteractionItem";
 export { InteractionEditor } from "./InteractionEditor";
 export { AddInteractionPanel } from "./AddInteractionPanel";
-
-// ============================================================================
-// STYLES
-// ============================================================================
-
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: 4,
-  },
-};
 
 // ============================================================================
 // COMPONENT
@@ -147,7 +136,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
       tier={tier}
       id="inspector-section-interactions"
     >
-      <div style={styles.container}>
+      <div className="tw:flex tw:flex-col">
         {editing ? (
           <>
             {back(getTriggerInfo(editing.trigger).label, () => setEditingId(null))}
@@ -181,14 +170,9 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
             ))}
 
             {!showAddPanel ? (
-              <Button
-                onClick={() => setShowAddPanel(true)}
-                color="alternative"
-                size="xs"
-                className="tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[var(--bk-accent)] tw:hover:bg-transparent tw:hover:underline"
-              >
+              <ActionRow onClick={() => setShowAddPanel(true)} testId="interactions-add">
                 + Add interaction
-              </Button>
+              </ActionRow>
             ) : (
               <AddInteractionPanel
                 onAdd={addInteraction}

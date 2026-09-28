@@ -51,6 +51,13 @@ function makeComposer(els: ReturnType<typeof fakeElement>[]) {
       listeners.get(event)?.delete(fn);
     }),
     markDirty: vi.fn(),
+    /* The shared lock commands (editor/shared/elementActions.ts) — here a
+       stand-in that locks the named element, as the engine's does. */
+    commands: {
+      run: vi.fn((id: string, opts?: { elementId?: string }) => {
+        els.find((e) => e.getId() === opts?.elementId)?.setLocked(id === "lock-element");
+      }),
+    },
     elements: {
       getAllElements: () => els,
       getElement: (id: string) => els.find((e) => e.getId() === id),
@@ -82,12 +89,13 @@ describe("useLayerActions — names and locks live in element data", () => {
     expect(localStorage.getItem(getStorageKey(PAGE, "names"))).toBeNull();
   });
 
-  it("locking writes the element's lock and keeps nothing in localStorage", () => {
+  it("locking runs the shared lock command and keeps nothing in localStorage", () => {
     const a = fakeElement("a");
     const composer = makeComposer([a]);
     const { result } = renderHook(() => useLayerActions(composer as never, PAGE));
     act(() => result.current.hydrateFromStorage(PAGE));
     act(() => result.current.toggleLock("a", { stopPropagation() {} } as never));
+    expect(composer.commands.run).toHaveBeenCalledWith("lock-element", { elementId: "a" });
     expect(a.setLocked).toHaveBeenCalledWith(true);
     expect(localStorage.getItem(getStorageKey(PAGE, "locked"))).toBeNull();
   });
@@ -105,6 +113,7 @@ describe("useLayerActions — names and locks live in element data", () => {
 
     act(() => result.current.toggleLock("a", { stopPropagation() {} } as never));
 
+    expect(composer.commands.run).toHaveBeenCalledWith("unlock-element", { elementId: "a" });
     expect(a.setLocked).toHaveBeenCalledWith(false);
   });
 

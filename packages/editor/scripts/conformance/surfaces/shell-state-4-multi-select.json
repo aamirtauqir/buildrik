@@ -33,35 +33,41 @@
     },
     {
       "action": "waitFor",
-      "testId": "multiselect-count"
+      "testId": "inspector-multi-bar"
     },
     {
       "action": "hover",
       "testId": "topbar"
     }
   ],
-  "contrastScope": "[data-testid=\"multiselect-panel\"]",
+  "contrastScope": "[data-testid=\"inspector-multi-bar\"]",
   "targets": [
     {
       "name": "count",
-      "testId": "multiselect-count",
-      "spec": "shell-state-4-multi-select",
-      "nodeId": "66:203"
+      "testId": "inspector-element-name"
     },
     {
       "name": "align-label",
-      "testId": "multiselect-align-label"
+      "testId": "inspector-multi-align-label"
     },
     {
       "name": "ai-chip",
-      "testId": "multiselect-ai-chip"
+      "testId": "inspector-ai-chip"
     },
     {
       "name": "batch-hint",
-      "testId": "batch-style-hint"
+      "testId": "inspector-multi-note"
     }
   ],
   "_note": [
+    "2026-09-28 (Inspector v4, lane L3-A): the right column of this shell board is superseded by Inspector v4 board 22 (7995:204715).",
+    "MultiSelectToolbar and its multiselect-* / batch-style-hint anchors are deleted (DD-12: one panel + MultiSelectBar).",
+    "Targets re-pointed at their v4 successors: count -> the header's 'N selected · Types', align-label -> the bar's Align label,",
+    "ai-chip -> the header's ✦ AI, batch-hint -> 'Edits apply to all N. One Undo restores all N.'.",
+    "The count's spec join to 66:203 is dropped: that node draws the old toolbar's badge, which no longer exists; the v4 look is",
+    "board 22's recipe (inspector-v4-22). The rest of the shell (topbar, rail, canvas) is what this recipe still stands for.",
+    "",
+    "Previous note, kept for history:",
     "FULL-SHELL BOARD, measured live at 1440x900 — the board's own frame size.",
     "",
     "Per the brief: what is joined here is what this board is ABOUT (its state).",

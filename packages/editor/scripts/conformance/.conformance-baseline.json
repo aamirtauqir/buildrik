@@ -71,14 +71,6 @@
     "skipped": 0,
     "compared": 46
   },
-  "inspector-profile-container-fallback": {
-    "skipped": 2,
-    "compared": 34
-  },
-  "inspector-profile-media": {
-    "skipped": 5,
-    "compared": 42
-  },
   "components-library": {
     "skipped": 1,
     "compared": 38
@@ -562,14 +554,6 @@
     "contrastPairs": {},
     "nonTextPairs": {}
   },
-  "inspector-single-selection": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 0,
-    "compared": 33
-  },
   "history-published-restore-confirm": {
     "contrastFailures": 2,
     "nonTextFailures": 0,
@@ -612,16 +596,6 @@
     "nonTextFailures": 0,
     "contrastPairs": {},
     "nonTextPairs": {}
-  },
-  "s3-1-pick-mode": {
-    "contrastFailures": 1,
-    "nonTextFailures": 0,
-    "contrastPairs": {
-      "p.tw:absolute.tw:right-0 | ⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ Mor | rgb(107, 114, 128) | rgb(17, 24, 39)": 3.67
-    },
-    "nonTextPairs": {},
-    "skipped": 4,
-    "compared": 9
   },
   "s5-4-gate-pending": {
     "contrastFailures": 0,
@@ -827,10 +801,6 @@
     "skipped": 1,
     "compared": 13
   },
-  "inspector-no-selection": {
-    "skipped": 0,
-    "compared": 10
-  },
   "media-empty": {
     "skipped": 0,
     "compared": 50
@@ -850,10 +820,6 @@
   "media-loading": {
     "skipped": 0,
     "compared": 69
-  },
-  "inspector-multi-select": {
-    "skipped": 8,
-    "compared": 34
   },
   "content-variables": {
     "contrastFailures": 0,
@@ -914,10 +880,6 @@
     "skipped": 0,
     "compared": 59
   },
-  "inspector-profile-text": {
-    "skipped": 6,
-    "compared": 94
-  },
   "media-folder-scoped": {
     "skipped": 0,
     "compared": 52
@@ -938,10 +900,6 @@
     "skipped": 0,
     "compared": 57
   },
-  "inspector-profile-button": {
-    "skipped": 3,
-    "compared": 63
-  },
   "content-collection-setup": {
     "contrastFailures": 4,
     "nonTextFailures": 0,
@@ -951,22 +909,6 @@
     "nonTextPairs": {},
     "skipped": 4,
     "compared": 49
-  },
-  "inspector-profile-input": {
-    "skipped": 3,
-    "compared": 63
-  },
-  "inspector-profile-flex": {
-    "skipped": 5,
-    "compared": 60,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
-  "inspector-profile-grid": {
-    "skipped": 4,
-    "compared": 67
   },
   "media-bulk-delete-confirm": {
     "contrastFailures": 0,
@@ -991,26 +933,6 @@
     "nonTextPairs": {},
     "skipped": 0,
     "compared": 4
-  },
-  "inspector-reach-whole-site": {
-    "skipped": 4,
-    "compared": 35
-  },
-  "inspector-reach-all-like-this": {
-    "skipped": 0,
-    "compared": 35
-  },
-  "inspector-pseudo-state": {
-    "skipped": 1,
-    "compared": 31
-  },
-  "inspector-breakpoint-override": {
-    "skipped": 0,
-    "compared": 44,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
   },
   "media-drill-in-asset-detail": {
     "contrastFailures": 1,
@@ -1160,14 +1082,6 @@
   "pages-no-results": {
     "skipped": 3,
     "compared": 21
-  },
-  "ai-scoped": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 2,
-    "compared": 12
   },
   "media-modal-picker": {
     "skipped": 0,
@@ -1487,6 +1401,222 @@
   "s1-editor-assembled-1440-drawer-pinned": {
     "skipped": 4,
     "compared": 21,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-01": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-02": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-03": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-04": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-05": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-06": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-07": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-08": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-09": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-10": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-11": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-12": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-13": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-14": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-15": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-16": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-17": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-18": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-19": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-20": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-21": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-22": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-23": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-24": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-25": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-26": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-27": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-28": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-29": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-30": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-31": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-32": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-33": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-34": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-35": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-v4-36": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},

@@ -1,12 +1,13 @@
-import { ToastActionPayload, ToastTone } from "@/editor/chrome-ui";
 /**
  * Context Menu Registry
  * The element menu (right-click and the toolbar's ⋯ More): ordered groups,
- * a rule between each, submenus for Arrange / Style / Structure
+ * a rule between each, submenus for Arrange / Style / Structure. The element
+ * rows come from the ONE element-action registry (@/editor/shared/elementActions),
+ * so this menu, the Inspector ⋯ and the keyboard run the same handlers.
  * @license BSD-3-Clause
  */
 
-import type { Composer, Element } from "../../../engine";
+import type { AddToastFn, ElementActionContext } from "@/editor/shared/elementActions";
 import {
   editSubmenu,
   insertSubmenu,
@@ -15,22 +16,8 @@ import {
   standaloneActions,
 } from "./actions";
 
-/** Toast notification function signature */
-export type AddToastFn = (toast: {
-  description: string;
-  tone?: ToastTone;
-  duration?: number;
-  action?: ToastActionPayload;
-}) => void;
-
-export type ActionContext = {
-  composer: Composer;
-  element: Element;
-  isRoot: boolean;
-  openAI?: () => void;
-  /** Toast function for showing undo notifications */
-  addToast?: AddToastFn;
-};
+export type { AddToastFn };
+export type ActionContext = ElementActionContext;
 
 export type ContextAction = {
   id: string;

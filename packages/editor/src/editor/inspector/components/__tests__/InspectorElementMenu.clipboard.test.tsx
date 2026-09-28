@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * The inspector's Copy styles / Paste styles against the canvas's.
+ * The inspector's Copy style / Paste style against the canvas's.
  *
  * There were two style clipboards. The canvas keyboard (⌘⌥C/⌘⌥V) and the
  * right-click menu both wrote `composer.styleClipboard`; this menu kept its
@@ -44,13 +44,11 @@ beforeEach(() => {
   source.setStyle?.("color", "rgb(26, 86, 219)");
 });
 
+/* The ⋯ acts on the selection — the inspected element IS the selection. */
 const open = (elementId: string) => {
+  composer.selection.select(composer.elements.getElement(elementId)!);
   const view = render(
-    <InspectorElementMenu
-      composer={composer}
-      selectedElementId={elementId}
-      onRequestDelete={() => {}}
-    />,
+    <InspectorElementMenu composer={composer} selectedElementId={elementId} />,
     { wrapper: ToastProvider },
   );
   fireEvent.click(screen.getByRole("button", { name: /element actions|more/i }));
@@ -60,7 +58,7 @@ const open = (elementId: string) => {
 describe("InspectorElementMenu style clipboard", () => {
   it("writes the clipboard the canvas reads", () => {
     open(sourceId);
-    fireEvent.click(screen.getByText("Copy styles"));
+    fireEvent.click(screen.getByText("Copy style"));
     expect(composer.styleClipboard).toMatchObject({ color: "rgb(26, 86, 219)" });
   });
 
@@ -69,9 +67,9 @@ describe("InspectorElementMenu style clipboard", () => {
        from this menu's own earlier copy cannot masquerade as a pass. */
     composer.styleClipboard = { color: "rgb(1, 2, 3)" };
     open(targetId);
-    const paste = screen.getByText("Paste styles").closest("button");
+    const paste = screen.getByText("Paste style").closest("button");
     expect(paste).not.toBeDisabled();
-    fireEvent.click(screen.getByText("Paste styles"));
+    fireEvent.click(screen.getByText("Paste style"));
     expect(composer.elements.getElement(targetId)?.getStyles?.().color).toBe("rgb(1, 2, 3)");
   });
 
@@ -80,6 +78,6 @@ describe("InspectorElementMenu style clipboard", () => {
      copied anything. Per-composer state ends with the composer. */
   it("offers nothing to paste in a project where nothing has been copied", () => {
     open(targetId);
-    expect(screen.getByText("Paste styles").closest("button")).toBeDisabled();
+    expect(screen.getByText("Paste style").closest("button")).toBeDisabled();
   });
 });

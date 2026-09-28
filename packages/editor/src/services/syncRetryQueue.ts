@@ -57,6 +57,8 @@ export function totalPendingMirrors(): number {
 export class SyncRetryQueue {
   private queue = new Map<string, () => Promise<boolean>>();
   private subscribers = new Set<(info: SyncRetryInfo) => void>();
+  /** The op running per target — the next one for it waits (see `run`). */
+  private inFlight = new Map<string, Promise<boolean>>();
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -120,6 +122,34 @@ export class SyncRetryQueue {
    * different record's stale failure would read as this one failing.
    */
   async run(
+    key: string,
+    task: () => Promise<unknown>,
+    onWarn: (e: unknown) => void
+  ): Promise<boolean> {
+    /* One write per target in flight, in the order they were asked for. Two
+       upserts of one row racing (a collection's create and its first field
+       update, fired a tick apart) could land in either order — the older
+       payload last — or the second could lose the create race on a unique key
+       and sit queued with the newer data. The Inspector v4 fixture's Menu
+       collection loaded with `fields: []` exactly so. Different targets
+       still run side by side. */
+    const prev = this.inFlight.get(key);
+    const mine = (prev ?? Promise.resolve()).then(() => this.attempt(key, task, onWarn));
+    this.inFlight.set(key, mine);
+    try {
+      return await mine;
+    } finally {
+      if (this.inFlight.get(key) === mine) this.inFlight.delete(key);
+    }
+  }
+
+  /** Resolves once the op in flight for `key` (if any) has settled — a
+   *  record's mirror waits for its collection's (cmsSync). */
+  async settled(key: string): Promise<void> {
+    await this.inFlight.get(key);
+  }
+
+  private async attempt(
     key: string,
     task: () => Promise<unknown>,
     onWarn: (e: unknown) => void

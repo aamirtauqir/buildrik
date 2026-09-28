@@ -17,6 +17,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { BACK } from "./paneStyles";
 import { MoreHorizontal, TriangleAlert, X } from "lucide-react";
 import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
@@ -56,6 +57,9 @@ export interface RecordSheetProps {
   /** null → a new record. */
   record: CMSContentItem | null;
   onClose: () => void;
+  /** Opened from an element (§13 Open record ›): "‹ Back to canvas" leads the
+   *  sheet's header — it covers the workspace's own. Absent, not drawn. */
+  onBackToCanvas?: () => void;
   /** The sheet's own Records · Fields · Dynamic pages row leaves the sheet. */
   onOpenTab: (tab: CmsTab) => void;
   onSave: (data: Record<string, unknown>, published: boolean) => Promise<unknown>;
@@ -112,6 +116,7 @@ export function RecordSheet({
   collection,
   record,
   onClose,
+  onBackToCanvas,
   onOpenTab,
   onSave,
   onDelete,
@@ -358,6 +363,11 @@ export function RecordSheet({
     >
       <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-2 tw:px-8 tw:pb-3">
       <header className="tw:flex tw:h-11 tw:w-[280px] tw:flex-none tw:items-center tw:gap-2 tw:px-4">
+        {onBackToCanvas ? (
+          <Button color="light" size="xs" className={`${BACK} tw:flex-none`} data-testid="cms-sheet-back-to-canvas" onClick={() => guard(onBackToCanvas)}>
+            ‹ Back to canvas
+          </Button>
+        ) : null}
         <h3 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
           {title}
         </h3>

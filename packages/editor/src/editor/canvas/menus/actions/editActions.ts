@@ -4,9 +4,9 @@
  * @license BSD-3-Clause
  */
 
-import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
+import { fromElementAction } from "./standaloneActions";
 
 export const editSubmenu: ContextAction[] = [
   {
@@ -98,32 +98,9 @@ export const editSubmenu: ContextAction[] = [
       composer.commands.run("paste");
     },
   },
-  {
-    id: "duplicate",
-    label: "Duplicate",
-    icon: "copy",
-    group: "Edit",
-    shortcut: "Cmd+D",
-    handler: ({ composer, element }) => {
-      runTransaction(composer, "context-duplicate", () => {
-        composer.elements.duplicateElement(element.getId());
-      });
-    },
-  },
-  {
-    id: "delete",
-    label: "Delete",
-    icon: "trash-2",
-    group: "Edit",
-    shortcut: "Del",
-    isVisible: ({ isRoot }) => !isRoot,
-    /* G2-051 (CI-13): the engine's delete — the WHOLE selection when the
-       clicked element is part of it, one transaction, and decision #17's
-       confirm for N > 1. It removed only the clicked element and raised its
-       own toast; useHistoryFeedback now raises the one "… deleted" + Undo for
-       every delete door, in one tone. */
-    handler: ({ composer }) => {
-      composer.commands.run("delete");
-    },
-  },
+  /* P-10: the element-action registry's rows — the shared `duplicate` and
+     `delete` commands ⌘D / ⌫ and the Inspector ⋯ run (whole selection,
+     pruned, one transaction; decision #17's confirm for N > 1). */
+  fromElementAction("duplicate", "Edit"),
+  fromElementAction("delete", "Edit"),
 ];

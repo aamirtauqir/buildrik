@@ -10,8 +10,9 @@ import type { ElementData } from "../../types";
 import { camelToKebab } from "../helpers";
 import { escapeAttr } from "./encoding";
 import { toAllowedElementTag } from "@buildrik/shared/schemas/element-markup";
-import { isSafeAttrValue } from "./sanitization";
+import { classTokens, isSafeAttrValue } from "./sanitization";
 import { isSelfClosing } from "./tagCategories";
+import { embedFrameHTML } from "../embed/embedFrameHTML";
 
 // =============================================================================
 // GENERATION OPTIONS
@@ -72,18 +73,19 @@ export function buildAttributeString(
     parts.push(`id="${escapeAttr(data.attributes.id)}"`);
   }
 
-  // Classes
-  if (data.classes && data.classes.length > 0) {
-    parts.push(`class="${escapeAttr(data.classes.join(" "))}"`);
+  // Classes — the `classes` list and a stored `class` attribute, one attribute.
+  const classes = classTokens(data.classes, data.attributes?.class);
+  if (classes.length > 0) {
+    parts.push(`class="${escapeAttr(classes.join(" "))}"`);
   }
 
-  // Other attributes (except id, already handled). Drop anything unsafe by
+  // Other attributes (except id and class, already handled). Drop anything unsafe by
   // construction: on* handlers, dangerous values, and bad href/src/action
   // schemes never reach the serialized HTML, even if the ElementData bypassed
   // the import-time sanitizer.
   if (data.attributes) {
     Object.entries(data.attributes).forEach(([key, value]) => {
-      if (key === "id") return;
+      if (key === "id" || key === "class") return;
       if (!isSafeAttrValue(key, value, "")) return;
       if (value === "" || value === "true") {
         // Boolean attribute
@@ -137,10 +139,12 @@ export function elementDataToHTML(data: ElementData, options: HTMLGenerationOpti
     return `${indent}<${tag}${attrs}${closing}`;
   }
 
-  // Build children HTML
+  // Build children HTML — an embed with a valid URL renders its iframe in
+  // place of its placeholder children (embedFrameHTML).
   const childOptions = { ...options, indentLevel: indentLevel + 1 };
   const childrenHTML =
-    data.children?.map((child) => elementDataToHTML(child, childOptions)).join(newline) || "";
+    embedFrameHTML(data.type, data.attributes) ??
+    (data.children?.map((child) => elementDataToHTML(child, childOptions)).join(newline) || "");
 
   const hasChildren = childrenHTML.length > 0;
   const hasContent = content.length > 0;

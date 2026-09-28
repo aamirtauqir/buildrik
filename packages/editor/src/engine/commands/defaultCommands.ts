@@ -8,12 +8,12 @@
 
 import { EVENTS } from "../../shared/constants";
 import { stepZoom } from "../../shared/constants/canvas";
-import type { CommandData, ElementType } from "../../shared/types";
+import type { CommandData, CommandOptions, ElementType } from "../../shared/types";
 /* Explicit: without it `Element` in this file resolves to the DOM one. */
 import type { Element } from "../elements/Element";
 import { canNestElement } from "../../shared/utils/nesting";
 import type { Composer } from "../Composer";
-import { nudgeSelected, reorderElement, dropLockedAndInstances } from "./commandOperations";
+import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement } from "./commandOperations";
 
 /**
  * Build the full list of default commands.
@@ -39,6 +39,14 @@ function topMost(elements: Element[]): Element[] {
     }
     return true;
   });
+}
+
+/** `{ elementId }` when the caller names one, else the selection. */
+function lockTargets(c: Composer, options?: CommandOptions): Element[] {
+  const id = typeof options?.elementId === "string" ? options.elementId : null;
+  if (!id) return c.selection.getAllSelected();
+  const el = c.elements.getElement(id);
+  return el ? [el] : [];
 }
 
 export function buildDefaultCommands(composer: Composer): CommandData[] {
@@ -165,6 +173,79 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         // Re-select the duplicates so the next action targets them.
         if (clones.length === 1) c.selection.select(clones[0]);
         else if (clones.length > 1) c.selection.selectMultiple(clones);
+      },
+    },
+    // ============================================
+    // Element style + lock (Inspector v4 ⋯, board 30; the canvas menu and the
+    // keyboard run the same commands — editor/shared/elementActions.ts)
+    // ============================================
+    {
+      id: "copy-style",
+      label: "Copy style",
+      group: "Edit",
+      shortcut: "ctrl+alt+c",
+      requiresSelection: true,
+      run: (c) => {
+        const el = c.selection.getSelected();
+        if (!el) return 0;
+        /* A snapshot: later edits to the source must not change the clipboard. */
+        const styles = { ...(el.getStyles?.() ?? {}) };
+        const count = Object.keys(styles).length;
+        if (count > 0) c.styleClipboard = styles;
+        c.emit(EVENTS.STYLES_COPIED, { count });
+        return count;
+      },
+    },
+    {
+      id: "paste-style",
+      label: "Paste style",
+      group: "Edit",
+      shortcut: "ctrl+alt+v",
+      requiresSelection: true,
+      run: (c) => {
+        const el = c.selection.getSelected();
+        if (!el) return 0;
+        /* The one merge-paste (P-10), through the lock gate. */
+        const count = pasteStyles(c, el);
+        if (count > 0) c.emit(EVENTS.STYLES_PASTED, { count });
+        return count;
+      },
+    },
+    {
+      id: "reset-style",
+      label: "Reset style",
+      group: "Edit",
+      requiresSelection: true,
+      /* One transaction, so one Undo brings every style back; refused (and
+         said) on a locked element. */
+      run: (c) => writeElement(c, c.selection.getSelected(), "reset-styles", (el) => el.setStyles({})),
+    },
+    /* Lock / Unlock act on the selection, or on `{ elementId }` — a Layers
+       row toggles its own element, selected or not. One transaction each. */
+    {
+      id: "lock-element",
+      label: "Lock",
+      group: "Edit",
+      run: (c, options) => {
+        const els = lockTargets(c, options).filter((el) => !el.isLocked());
+        if (els.length === 0) return;
+        c.beginTransaction("lock-element");
+        for (const el of els) el.setLocked(true);
+        c.endTransaction();
+      },
+    },
+    {
+      /* Not through writeElement: the lock gate refuses a locked element,
+         and unlocking one is the point. */
+      id: "unlock-element",
+      label: "Unlock",
+      group: "Edit",
+      run: (c, options) => {
+        const els = lockTargets(c, options).filter((el) => el.isLocked());
+        if (els.length === 0) return;
+        c.beginTransaction("unlock-element");
+        for (const el of els) el.setLocked(false);
+        c.endTransaction();
       },
     },
     /* `getAllSelected()`, not `getSelected()`. Both of these read the PRIMARY
@@ -471,12 +552,12 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       run: () => composer.emit(EVENTS.UI_TOGGLE_EXPORTER),
     },
     {
-      /* The footer word bar's Inspector toggle lives here now (B12, G2-037),
-         beside the ✕ in the inspector header; both emit the one event the
-         shell acts on. No chord — nothing on the board prints one. */
+      /* The footer word bar's Inspector toggle, the inspector header's ✕ and
+         ⌘\ (Inspector v4 board 36) — one event the shell acts on. */
       id: "toggle-inspector",
       label: "Toggle inspector",
       group: "Panels",
+      shortcut: "ctrl+\\",
       run: () => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR),
     },
     {

@@ -22,6 +22,12 @@ const scriptSrc = isDev
 // shared VIDEO_EMBED_HOSTS constant. The learn schema documents that the two
 // must stay in sync; a test asserts it.
 const videoFrameSrc = "https://www.youtube-nocookie.com https://player.vimeo.com";
+// The editor canvas renders Map and Lottie embeds as iframes on the provider's
+// own embed host (editor parseEmbedUrl rebuilds every src): Google Maps on
+// www.google.com/maps/embed, LottieFiles on lottie.host/embed. YouTube / Vimeo
+// embeds already ride on videoFrameSrc. Exactly these two hosts, no wildcard —
+// editor-embed-csp.test.ts pins them.
+const editorEmbedFrameSrc = "https://www.google.com https://lottie.host";
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src ${scriptSrc}`,
@@ -53,7 +59,7 @@ const contentSecurityPolicy = [
      … connect-src" and fell back to the device-only path — measured
      2026-09-13, the first day the token existed in any env. */
   "connect-src 'self' data: blob: https://fonts.bunny.net https://vercel.com https://blob.vercel-storage.com https://*.blob.vercel-storage.com",
-  `frame-src 'self' ${videoFrameSrc}`,
+  `frame-src 'self' ${videoFrameSrc} ${editorEmbedFrameSrc}`,
 ].join("; ");
 
 const nextConfig = {

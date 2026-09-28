@@ -1,12 +1,10 @@
 /**
- * Form › FIELDS — board 4428:141878: one row per field (drag handle · label ·
- * type), "+ Add field" under them. The fields are the form's own input /
- * textarea / select children, edited in place: the type select rewrites the
- * input's `type` (or swaps the element for a textarea and back), and a drag
- * reorders the children.
- *
- * AFTER SUBMIT and PROTECTION (same board) need the form's server row to be
- * editable — logged in missing-features, not built here.
+ * Form › Fields — board 19: one row per field "⠿ Name · Text · Required ›",
+ * "+ Add field" under them. The fields are the form's own input / textarea /
+ * select children, edited in place. A drag reorders them; opening a row
+ * drills into it ("‹ Name" back row): Label, Type — which rewrites the
+ * input's `type` or swaps the element for a textarea and back — and
+ * Required. Every write goes through the lock gate on the form (P-1).
  *
  * @license BSD-3-Clause
  */
@@ -14,8 +12,12 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "@/shared/constants/events";
-import { Button, Select } from "@/editor/chrome-ui";
-import { Section, type SectionTier } from "../shared/controls";
+import { ChevronRight, GripVertical } from "lucide-react";
+import { Button } from "@/editor/chrome-ui";
+import { Section, SelectRow, type SectionTier } from "../shared/controls";
+import { ActionRow, CommitRow } from "./behaviourRows";
+import { CheckRow } from "../shared/controls/CheckRow";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export interface FormFieldsSectionProps {
   elementId: string;
@@ -26,7 +28,7 @@ export interface FormFieldsSectionProps {
 }
 
 const FIELD_TYPES = [
-  { value: "text", label: "Short text" },
+  { value: "text", label: "Text" },
   { value: "email", label: "Email" },
   { value: "tel", label: "Phone" },
   { value: "number", label: "Number" },
@@ -51,14 +53,14 @@ const fieldType = (el: Element) =>
 const fieldLabel = (el: Element, i: number) =>
   el.getAttribute("placeholder") || el.getAttribute("name") || el.getAttribute("aria-label") || `Field ${i + 1}`;
 
-function runTxn(composer: Composer, label: string, fn: () => void) {
-  composer.beginTransaction?.(label);
-  try {
-    fn();
-  } finally {
-    composer.endTransaction?.();
-  }
-}
+const typeLabel = (el: Element) => FIELD_TYPES.find((t) => t.value === fieldType(el))?.label ?? fieldType(el);
+
+const isRequired = (el: Element) => el.getAttribute("required") !== undefined;
+
+/** "Name · Text · Required" (board 19). */
+const fieldSummary = (el: Element, i: number) =>
+  [fieldLabel(el, i), typeLabel(el), isRequired(el) ? "Required" : null].filter(Boolean).join(" · ");
+
 
 /** Swap an input for a textarea (or back), keeping name / placeholder / place. */
 function replaceField(composer: Composer, el: Element, type: string) {
@@ -76,11 +78,16 @@ function replaceField(composer: Composer, el: Element, type: string) {
   composer.elements.addElement(next, parent.getId(), index);
 }
 
-const ROW = "tw:flex tw:items-center tw:gap-2 tw:h-8";
+/* Board 19: a 28-tall row, grip · summary · chevron, 6 apart. */
+const ROW =
+  "tw:flex tw:items-center tw:gap-1.5 tw:h-7 tw:px-2 tw:rounded-[4px] tw:cursor-pointer tw:select-none " +
+  "tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId, composer, isOpen, onToggle, tier = "tertiary" }) => {
   const [, refresh] = React.useReducer((n: number) => n + 1, 0);
   const [dragId, setDragId] = React.useState<string | null>(null);
+  const [openId, setOpenId] = React.useState<string | null>(null);
   React.useEffect(() => {
     if (!composer) return;
     const evts = [EVENTS.ELEMENT_UPDATED, EVENTS.ELEMENT_CREATED, EVENTS.ELEMENT_DELETED, EVENTS.ELEMENT_MOVED] as const;
@@ -89,19 +96,34 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
       for (const e of evts) composer.off(e, refresh);
     };
   }, [composer]);
+  React.useEffect(() => setOpenId(null), [elementId]);
 
   const form = composer?.elements.getElement(elementId);
   if (!composer || !form) return null;
+  /* P-1: every write below goes through writeElement on the form, so a locked
+     form is refused (and the shell says so). */
   const fields = formFields(form);
 
   const setType = (el: Element, type: string) => {
     const was = fieldType(el);
     if (was === type) return;
-    runTxn(composer, "form-field-type", () => {
+    writeElement(composer, form, "form-field-type", () => {
       if (was === "textarea" || type === "textarea") replaceField(composer, el, type);
       else el.setAttribute("type", type);
     });
   };
+
+  const setLabel = (el: Element, label: string) =>
+    writeElement(composer, form, "form-field-label", () => {
+      if (label.trim()) el.setAttribute("placeholder", label.trim());
+      else el.removeAttribute("placeholder");
+    });
+
+  const setRequired = (el: Element, required: boolean) =>
+    writeElement(composer, form, "form-field-required", () => {
+      if (required) el.setAttribute("required", "");
+      else el.removeAttribute("required");
+    });
 
   const addField = () => {
     const submit = form.getDescendants().find((el) => {
@@ -111,7 +133,7 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
     const parent = submit?.getParent() ?? form;
     const index = submit ? parent.getChildIndex(submit) : undefined;
     const n = fields.length + 1;
-    runTxn(composer, "form-field-add", () => {
+    writeElement(composer, form, "form-field-add", () => {
       const field = composer.elements.createElement("input", {
         attributes: { type: "text", name: `field-${n}`, placeholder: `Field ${n}` },
       });
@@ -124,59 +146,83 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
     setDragId(null);
     const parent = target.getParent();
     if (!moving || !parent || moving.getId() === target.getId()) return;
-    runTxn(composer, "form-field-move", () => {
+    writeElement(composer, form, "form-field-move", () => {
       composer.elements.moveElement(moving.getId(), parent.getId(), parent.getChildIndex(target));
     });
   };
 
+  /* A type swap replaces the element (new id): follow it by its place. */
+  const openIndex = fields.findIndex((el) => el.getId() === openId);
+  const open = openIndex >= 0 ? fields[openIndex] : null;
+
   return (
-    <Section title={`Fields · ${fields.length}`} icon="List" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-form-fields">
-      {fields.map((el, i) => (
-        <div
-          key={el.getId()}
-          className={ROW}
-          data-testid="form-field-row"
-          draggable
-          onDragStart={(e) => {
-            setDragId(el.getId());
-            e.dataTransfer.effectAllowed = "move";
-          }}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            dropOn(el);
-          }}
-        >
-          <span aria-hidden="true" className="tw:cursor-grab tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">
-            ⠿
-          </span>
-          <span className="tw:w-[72px] tw:flex-none tw:truncate tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]">
-            {fieldLabel(el, i)}
-          </span>
-          <Select
-            sizing="sm"
-            className="tw:flex-1 tw:min-w-0"
-            aria-label={`${fieldLabel(el, i)} type`}
-            value={fieldType(el)}
-            onChange={(e) => setType(el, e.target.value)}
+    <Section title="Fields" icon="List" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-form-fields">
+      {open ? (
+        <div className="tw:flex tw:flex-col" data-testid="form-field-editor">
+          <Button
+            type="button"
+            variant="link"
+            size="xs"
+            data-testid="form-field-back"
+            onClick={() => setOpenId(null)}
+            className="tw:self-start tw:h-7 tw:text-[12px] tw:font-medium"
           >
-            {FIELD_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
-            ))}
-          </Select>
+            ‹ {fieldLabel(open, openIndex)}
+          </Button>
+          <CommitRow label="Label" value={open.getAttribute("placeholder") ?? ""} onCommit={(v) => setLabel(open, v)} />
+          <SelectRow
+            label="Type"
+            /* "Text" is the select's empty choice (SelectRow always draws one). */
+            value={fieldType(open) === "text" ? "" : fieldType(open)}
+            onChange={(t) => {
+              setType(open, t || "text");
+              /* the swap re-creates the field at the same place */
+              const next = formFields(form)[openIndex];
+              if (next) setOpenId(next.getId());
+            }}
+            options={FIELD_TYPES.filter((t) => t.value !== "text")}
+            placeholder="Text"
+          />
+          <CheckRow label="Required" checked={isRequired(open)} onChange={(on) => setRequired(open, on)} testId="form-field-required" />
         </div>
-      ))}
-      <Button
-        type="button"
-        color="alternative"
-        size="xs"
-        onClick={addField}
-        className="tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[var(--bk-accent)] tw:hover:bg-transparent tw:hover:underline"
-      >
-        + Add field
-      </Button>
+      ) : (
+        <>
+          {fields.map((el, i) => (
+            <div
+              key={el.getId()}
+              role="button"
+              tabIndex={0}
+              className={ROW}
+              data-testid="form-field-row"
+              aria-label={`${fieldSummary(el, i)} — edit field`}
+              draggable
+              onClick={() => setOpenId(el.getId())}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setOpenId(el.getId());
+                }
+              }}
+              onDragStart={(e) => {
+                setDragId(el.getId());
+                e.dataTransfer.effectAllowed = "move";
+              }}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                dropOn(el);
+              }}
+            >
+              <GripVertical size={12} aria-hidden="true" className="tw:shrink-0 tw:cursor-grab tw:text-[var(--bk-ink-muted)]" />
+              <span className="tw:min-w-0 tw:flex-1 tw:truncate">{fieldSummary(el, i)}</span>
+              <ChevronRight size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+            </div>
+          ))}
+          <ActionRow onClick={addField} testId="form-add-field">
+            + Add field
+          </ActionRow>
+        </>
+      )}
     </Section>
   );
 };

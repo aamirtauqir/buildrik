@@ -28,40 +28,61 @@ function project(children: unknown[]) {
   return composer;
 }
 
-const input = (id: string, type: string, placeholder: string) =>
-  ({ id, type: "input", tagName: "input", attributes: { type, placeholder, name: id }, children: [] });
+const input = (id: string, type: string, placeholder: string, extra: Record<string, string> = {}) =>
+  ({ id, type: "input", tagName: "input", attributes: { type, placeholder, name: id, ...extra }, children: [] });
 
 describe("Form › FIELDS", () => {
   const make = () =>
     project([{ id: "f", type: "form", tagName: "form", children: [
-      input("name", "text", "Name"), input("email", "email", "Email"),
+      input("name", "text", "Name", { required: "" }), input("email", "email", "Email"),
       { id: "msg", type: "textarea", tagName: "textarea", attributes: { placeholder: "Message", name: "msg" }, children: [] },
       { id: "go", type: "button", tagName: "button", content: "Send", attributes: { type: "submit" }, children: [] },
     ] }]);
 
-  it("one row per field, typed Short text / Email / Long text; the submit button is not a field", () => {
+  it("one row per field, 'Label · Type · Required' (board 19); the submit button is not a field", () => {
     render(<FormFieldsSection elementId="f" composer={make()} isOpen />);
-    expect(screen.getAllByTestId("form-field-row")).toHaveLength(3);
-    expect(screen.getByText("Fields · 3")).toBeInTheDocument();
-    expect((screen.getByRole("combobox", { name: "Email type" }) as HTMLSelectElement).value).toBe("email");
-    expect((screen.getByRole("combobox", { name: "Message type" }) as HTMLSelectElement).value).toBe("textarea");
+    const rows = screen.getAllByTestId("form-field-row");
+    expect(rows.map((r) => r.textContent)).toEqual(["Name · Text · Required", "Email · Email", "Message · Long text"]);
+    expect(screen.getByText("Fields")).toBeInTheDocument();
   });
 
-  it("the type select rewrites the input, and swaps it for a textarea", () => {
+  it("opening a row drills in; the Type select rewrites the input, and swaps it for a textarea", () => {
     const composer = make();
     render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
-    act(() => { fireEvent.change(screen.getByRole("combobox", { name: "Name type" }), { target: { value: "tel" } }); });
+    fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
+    act(() => { fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "tel" } }); });
     expect(composer.elements.getElement("name")?.getAttribute("type")).toBe("tel");
-    act(() => { fireEvent.change(screen.getByRole("combobox", { name: "Email type" }), { target: { value: "textarea" } }); });
+    fireEvent.click(screen.getByTestId("form-field-back"));
+    fireEvent.click(screen.getAllByTestId("form-field-row")[1]);
+    act(() => { fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "textarea" } }); });
     const fields = formFields(composer.elements.getElement("f")!);
     expect(fields.map((el) => el.getTagName().toLowerCase())).toEqual(["input", "textarea", "textarea"]);
     expect(fields[1].getAttribute("placeholder")).toBe("Email");
+    /* the editor follows the swapped field */
+    expect(screen.getByRole("combobox", { name: "Type" })).toHaveValue("textarea");
+  });
+
+  it("Label and Required write the field, one undo step each", () => {
+    const composer = make();
+    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
+    fireEvent.click(screen.getAllByTestId("form-field-row")[1]);
+    const label = screen.getByLabelText("Label");
+    fireEvent.change(label, { target: { value: "Your email" } });
+    act(() => { fireEvent.keyDown(label, { key: "Enter" }); });
+    expect(composer.elements.getElement("email")?.getAttribute("placeholder")).toBe("Your email");
+    composer.history.flushPending?.();
+    act(() => { fireEvent.click(screen.getByRole("checkbox", { name: "Required" })); });
+    expect(composer.elements.getElement("email")?.getAttribute("required")).toBe("");
+    composer.history.flushPending?.();
+    act(() => { composer.history.undo(); });
+    expect(composer.elements.getElement("email")?.getAttribute("required")).toBeUndefined();
+    expect(composer.elements.getElement("email")?.getAttribute("placeholder")).toBe("Your email");
   });
 
   it("+ Add field adds an input before the submit button", () => {
     const composer = make();
     render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
-    act(() => { fireEvent.click(screen.getByRole("button", { name: "+ Add field" })); });
+    act(() => { fireEvent.click(screen.getByTestId("form-add-field")); });
     const kids = composer.elements.getElement("f")!.getChildren();
     expect(kids).toHaveLength(5);
     expect(kids[3].getTagName().toLowerCase()).toBe("input");

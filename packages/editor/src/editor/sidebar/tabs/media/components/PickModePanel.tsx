@@ -19,6 +19,7 @@
  */
 
 import * as React from "react";
+import { useColumnPanelEscape } from "@/editor/shell/hooks/useColumnPanelEscape";
 import { ChevronDown, Upload, X } from "lucide-react";
 import { Button, PanelFrame, TextField } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
@@ -67,6 +68,12 @@ export function PickModePanel({
   const [picked, setPicked] = React.useState<string | null>(null);
   const [filterOpen, setFilterOpen] = React.useState(searchQuery.trim() !== "");
   const [upload, setUpload] = React.useState<UploadPane | null>(null);
+
+  /* Pick mode owns Escape (§13): it cancels the pick and the canvas
+     selection behind the drawer stands — the engine's deselect stands down
+     while a surface claims the key. An open overlay inside (upload, menu)
+     and typing in the search keep their own Escape. */
+  useColumnPanelEscape(true, onCancel);
 
   // A new request is a new choice — the last field's card is not this one's.
   React.useEffect(() => setPicked(null), [request]);
