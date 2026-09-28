@@ -17,10 +17,18 @@ export default function DangerZonePage() {
   const { data: session } = useSession();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const utils = trpc.useUtils();
   const wsQuery = trpc.account.workspace.get.useQuery();
+  // Deletion is only SCHEDULED (30-day grace). Invalidate the query the Home
+  // banner reads, or the banner shows only after a reload.
   const wsDelete = trpc.account.workspace.delete.useMutation({
-    onSuccess: () => {
-      addToast("success", "Workspace deleted");
+    onSuccess: ({ scheduledAt }) => {
+      void utils.account.workspace.get.invalidate();
+      addToast(
+        "success",
+        "Workspace scheduled for deletion",
+        `It will be deleted on ${new Date(scheduledAt).toLocaleDateString()}. You can cancel from the home page.`,
+      );
       setShowDeleteModal(false);
       router.push("/dashboard");
       router.refresh();
@@ -34,7 +42,6 @@ export default function DangerZonePage() {
 
   // Synchronous export → download JSON. Replaces the old mutation that created a
   // job nobody processed while the UI claimed "you'll be notified when ready".
-  const utils = trpc.useUtils();
   const [isExporting, setIsExporting] = useState(false);
   const handleExport = async () => {
     setIsExporting(true);
