@@ -81,5 +81,3 @@ export const CHAIN_TRIGGER =
 export const CHAIN_BOUND =
   "tw:flex tw:items-center tw:gap-[3px] tw:flex-none tw:whitespace-nowrap tw:px-1 tw:py-0.5 " +
   "tw:rounded tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-subtle)] tw:text-[var(--bk-accent-text)] tw:text-[length:var(--bk-text-11)]";
-/** Absolute slot the chain button sits in, vertically centred in the field. */
-export const CHAIN_SLOT = "tw:absolute tw:right-1.5 tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]";
