@@ -14,6 +14,9 @@ import { cssVarToTokenId, extractVarName, resolveTokenVar } from "../../shared/t
 import { getDOMElement } from "@/engine/canvas/resize/utils";
 import { parseColor } from "@/shared/utils/parsers/colorParser";
 import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
+import { mergeProjectTokens } from "@/editor/design-system/state/projectTokens";
+import type { DesignToken } from "@/engine/designSystem/types";
+import type { Composer } from "@/engine";
 
 const SUMMARY_KEYS = ["font-family", "font-size", "color"] as const;
 
@@ -46,12 +49,30 @@ function shown(value: string | undefined): string | undefined {
   return resolveTokenVar(value) || cssVarToTokenId(varName) || value;
 }
 
+const toHex = (value: string): string | null => {
+  const rgb = parseColor(value);
+  return rgb ? rgbToHex(rgb).toUpperCase() : null;
+};
+
+/**
+ * The site's first colour token whose value is `hex` — the saved tokens over
+ * the seed, in Brand's order (several tokens can share a value; the first,
+ * the seed's semantic names, wins). Null when none matches.
+ */
+function colourTokenFor(composer: Composer | null | undefined, hex: string): string | null {
+  const settings = composer?.getProjectSettings?.();
+  const tokens = mergeProjectTokens((settings?.designTokens ?? []) as DesignToken[], settings?.designTokensSchemaVersion);
+  const want = hex.toUpperCase();
+  return tokens.find((t) => t.category === "colors" && toHex(t.value) === want)?.id ?? null;
+}
+
 /**
  * What the text inside an element renders as, for the summary keys it has no
  * value of its own for — a container usually carries none and inherits them
- * (board 17). Read off the canvas node; a colour comes back as hex.
+ * (board 17). Read off the canvas node; a colour that equals a Brand colour
+ * token is named by it, else printed as hex.
  */
-function renderedText(elementId: string, own: Record<string, string>): Record<string, string> {
+function renderedText(elementId: string, own: Record<string, string>, composer: Composer | null | undefined): Record<string, string> {
   const node = getDOMElement(elementId);
   if (!node) return {};
   const cs = window.getComputedStyle(node);
@@ -60,8 +81,9 @@ function renderedText(elementId: string, own: Record<string, string>): Record<st
     if (own[key]) continue;
     const value = cs.getPropertyValue(key).trim();
     if (!value) continue;
-    const rgb = key === "color" ? parseColor(value) : null;
-    out[key] = rgb ? rgbToHex(rgb) : value;
+    const hex = key === "color" ? toHex(value) : null;
+    const tokenId = hex ? colourTokenFor(composer, hex) : null;
+    out[key] = tokenId ? colourTokenLabel(tokenId) : (hex ?? value);
   }
   return out;
 }
@@ -96,7 +118,7 @@ export const TEXT_SECTIONS: Record<string, AnySectionEntry> = {
     title: "Text inside",
     open: "closed",
     capability: (caps) => caps.typography === "inside",
-    summary: (ctx) => textSummary({ ...renderedText(ctx.selectedElement.id, ctx.styles), ...ctx.styles }),
+    summary: (ctx) => textSummary({ ...renderedText(ctx.selectedElement.id, ctx.styles, ctx.composer), ...ctx.styles }),
     Component: TypographySection,
     advancedKey: "text-inside",
     advancedProps: TYPOGRAPHY_ADVANCED,

@@ -81,4 +81,25 @@ describe("Text inside summary (board 17)", () => {
     expect(summary).toBe("Inter · 16px · #111827");
     node.remove();
   });
+
+  it("a rendered colour that equals a Brand colour token is named by the token (the site's saved value wins)", () => {
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", "grid-2");
+    node.style.fontFamily = "Inter, sans-serif";
+    node.style.fontSize = "16px";
+    node.style.color = "rgb(51, 65, 85)";
+    document.body.appendChild(node);
+    const summarise = (designTokens: unknown[]) =>
+      TEXT_SECTIONS["text-inside"].summary!({
+        selectedElement: { id: "grid-2", type: "grid" },
+        styles: {},
+        composer: { getProjectSettings: () => ({ designTokens }) },
+      } as never);
+    expect(summarise([])).toBe("Inter · 16px · Text");
+    node.style.color = "rgb(17, 24, 39)";
+    expect(summarise([{ id: "color-text", name: "Text", value: "#111827", category: "colors", cssVar: "--buildrick-design-color-text", type: "color" }])).toBe(
+      "Inter · 16px · Text",
+    );
+    node.remove();
+  });
 });
