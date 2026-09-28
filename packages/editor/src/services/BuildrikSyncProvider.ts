@@ -16,7 +16,6 @@ import { dropSessionMediaUrls } from "@/shared/utils/html";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
 import { blankPageRoot } from "@buildrik/shared/content/elementIds";
-import { SITE_COLUMN_FIELDS, type SiteColumnField } from "@buildrik/shared/schemas/site-column-fields";
 
 /**
  * Shape of a page row returned by `pages.list`. Extended in Phase 1 to
@@ -247,8 +246,9 @@ function emptyToNull(value: string | null | undefined): string | null {
 }
 
 /**
- * The projectSettings fields extractSiteColumnPatch reads — each one is a Site
- * column the dashboard owns, mirrored from the editor only for an ADMIN (A-1).
+ * Reads exactly SITE_COLUMN_FIELDS (`@buildrik/shared/schemas/site-column-fields`)
+ * — each one is a Site column the dashboard owns, mirrored from the editor
+ * only for an ADMIN (A-1).
  * The Settings screens lock exactly these below ADMIN (M7 / PD-1);
  * `siteColumnFields.test.ts` pins this list to the function's reads, so a new
  * mirrored field cannot land without being locked, and project data (Author,
@@ -256,8 +256,6 @@ function emptyToNull(value: string | null | undefined): string | null {
  * lives in `@buildrik/shared` because the server strips the same fields from
  * the stored projectSettings.
  */
-export { SITE_COLUMN_FIELDS, type SiteColumnField };
-
 export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const settings = projectData.settings;
   if (!settings) return {};

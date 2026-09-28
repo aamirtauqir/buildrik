@@ -59,9 +59,9 @@ import {
   ProjectNotLoadedError,
   SAVE_CONFLICT_EVENT,
   isSaveConflictPending,
-  SITE_COLUMN_FIELDS,
   siteColumnsLoaded,
 } from "../BuildrikSyncProvider";
+import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import { publishSite } from "../PublishService";
 
 /* saveProject refuses a site whose project never loaded — the guard that stops

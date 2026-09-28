@@ -31,7 +31,7 @@ import {
   Textarea as ChromeTextarea,
   TextInput as ChromeTextInput,
 } from "@/editor/chrome-ui";
-import type { SiteColumnField } from "@/services/BuildrikSyncProvider";
+import type { SiteColumnField } from "@buildrik/shared/schemas/site-column-fields";
 /** Conformance anchor stem: a card/field is identified by its own title. */
 const slug = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
