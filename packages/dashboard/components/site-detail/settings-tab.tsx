@@ -198,7 +198,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               onChange={(e) => setName(e.target.value)}
             />
           </Field>
-          <Field label="Slug" hint="Used in your site's address. Changing it doesn't move your live site.">
+          <Field label="Slug" hint="Names your site's address the first time you publish. Changing it later doesn't move your live site.">
             <InputField
               type="text"
               value={slug}

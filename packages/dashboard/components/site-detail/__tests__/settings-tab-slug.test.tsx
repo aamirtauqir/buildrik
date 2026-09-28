@@ -53,6 +53,6 @@ describe("SettingsTab — slug only on change", () => {
 
   it("tells the user a slug change does not move the live site", () => {
     render(<SettingsTab site={site} onSave={vi.fn()} />);
-    expect(screen.getByText("Used in your site's address. Changing it doesn't move your live site.")).toBeTruthy();
+    expect(screen.getByText("Names your site's address the first time you publish. Changing it later doesn't move your live site.")).toBeTruthy();
   });
 });

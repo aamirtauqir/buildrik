@@ -91,7 +91,7 @@ describe("settings sections", () => {
     // Deleting a workspace or account is scheduled 30 days out and can be
     // cancelled until then; "Permanent, and not reversible" said the opposite.
     expect(findSettingsSection("/dashboard/settings/danger")?.description).toBe(
-      "Delete within 30 days, cancel any time before"
+      "Deletion happens 30 days later; cancel any time before"
     );
   });
 
