@@ -39,20 +39,35 @@ describe("ContextRow", () => {
     expect(p.onStateChange).toHaveBeenCalledWith("hover");
   });
 
-  it("a picked state says how many overrides it carries and resets them", () => {
+  it("board 27: a picked state's count sits on its own line — '1 :hover override · Reset'", () => {
     const p = props({ state: "hover", stateOverrideCount: 1 });
     render(<ContextRow {...p} />);
     expect(screen.getByTestId("inspector-state-chip")).toHaveTextContent("State: :hover");
-    expect(screen.getByTestId("inspector-state-overrides")).toHaveTextContent("1 :hover override");
+    const line = screen.getByTestId("inspector-state-overrides");
+    expect(line.textContent?.replace(/\s+/g, " ").trim()).toBe("1 :hover override · Reset");
+    /* Its own line: not in the chip row. */
+    expect(screen.getByTestId("inspector-context-chips").contains(line)).toBe(false);
     fireEvent.click(screen.getByTestId("inspector-state-reset"));
     expect(p.onResetState).toHaveBeenCalled();
   });
 
-  it("off Desktop: 'Tablet · 1 override' and Revert", () => {
+  it("board 28: the breakpoint is a chip 'Tablet · 1 override' beside State, and a separate 'Tablet · Revert' line", () => {
     const p = props({ breakpointName: "Tablet", breakpointOverrideCount: 1 });
     render(<ContextRow {...p} />);
-    expect(screen.getByTestId("inspector-bp-chip")).toHaveTextContent("Tablet · 1 override");
+    const chips = screen.getByTestId("inspector-context-chips");
+    const chip = screen.getByTestId("inspector-bp-chip");
+    expect(chips.contains(chip)).toBe(true);
+    expect(chip.textContent?.trim()).toBe("Tablet · 1 override");
+    const line = screen.getByTestId("inspector-bp-line");
+    expect(chips.contains(line)).toBe(false);
+    expect(line.textContent?.replace(/\s+/g, " ").trim()).toBe("Tablet · Revert");
     fireEvent.click(screen.getByTestId("inspector-bp-revert"));
     expect(p.onRevertBreakpoint).toHaveBeenCalled();
+  });
+
+  it("off Desktop with nothing overridden: the chip says the breakpoint, no Revert line", () => {
+    render(<ContextRow {...props({ breakpointName: "Tablet" })} />);
+    expect(screen.getByTestId("inspector-bp-chip").textContent?.trim()).toBe("Tablet");
+    expect(screen.queryByTestId("inspector-bp-line")).toBeNull();
   });
 });

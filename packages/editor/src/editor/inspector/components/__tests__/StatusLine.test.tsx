@@ -46,4 +46,16 @@ describe("StatusLine", () => {
     fireEvent.click(screen.getByTestId("inspector-resolve"));
     expect(resolve).toHaveBeenCalled();
   });
+
+  it("board 29: the conflict line is warning-tinted; the locked line is not", () => {
+    const { unmount } = render(<StatusLine composer={null} elementId="x" locked={false} conflict={{ pending: true, resolve: vi.fn() }} />);
+    let line = screen.getByTestId("inspector-status-line");
+    expect(line).toHaveAttribute("data-tone", "warning");
+    expect(line.className).toContain("--bk-warning-tint");
+    unmount();
+    render(<StatusLine composer={null} elementId="x" locked conflict={idle} />);
+    line = screen.getByTestId("inspector-status-line");
+    expect(line).toHaveAttribute("data-tone", "muted");
+    expect(line.className).not.toContain("--bk-warning-tint");
+  });
 });

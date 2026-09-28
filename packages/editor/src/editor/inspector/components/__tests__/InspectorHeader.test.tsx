@@ -83,6 +83,19 @@ describe("InspectorHeader", () => {
     expect(screen.getByTestId("inspector-bound-chip")).toHaveTextContent("Specials.title · missing");
   });
 
+  it("boards 24/25: the binding is a bordered chip with a ▾ — accent when bound, error-tinted when missing", () => {
+    const { unmount } = mount({ binding: { label: "Menu.name", missing: false, collectionId: "m" } });
+    let chip = screen.getByTestId("inspector-bound-chip");
+    expect(chip).toHaveAttribute("data-tone", "bound");
+    expect(chip.className).toContain("tw:border ");
+    expect(chip.querySelectorAll("svg")).toHaveLength(2);
+    unmount();
+    mount({ binding: { label: "Specials.title", missing: true, collectionId: "x" } });
+    chip = screen.getByTestId("inspector-bound-chip");
+    expect(chip).toHaveAttribute("data-tone", "missing");
+    expect(chip.className).toContain("--bk-error-tint");
+  });
+
   it("the binding chip opens Behaviour › CMS binding", () => {
     const focus = vi.fn();
     c.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);

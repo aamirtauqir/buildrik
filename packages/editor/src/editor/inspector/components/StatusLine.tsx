@@ -23,15 +23,29 @@ export interface StatusLineProps {
 const ACTION =
   "tw:h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:underline tw:hover:bg-transparent";
 
+const LINE = "tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-3 tw:py-1 tw:text-[11px] tw:leading-4";
+/* Board 29 tints the save-conflict line; the locked line (board 23) is plain. */
+const TONE = {
+  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
+  muted: "tw:text-[var(--bk-ink-muted)]",
+} as const;
+
 export function StatusLine({ composer, elementId, locked, conflict }: StatusLineProps) {
   const line = conflict.pending
-    ? { text: "This site changed elsewhere — resolve to keep editing", action: "Resolve", run: conflict.resolve, id: "inspector-resolve" }
+    ? {
+        text: "This site changed elsewhere — resolve to keep editing",
+        action: "Resolve",
+        run: conflict.resolve,
+        id: "inspector-resolve",
+        tone: "warning" as const,
+      }
     : locked
       ? {
           text: "Locked — unlock to edit",
           action: "Unlock",
           run: () => composer?.commands.run("unlock-element", { elementId }),
           id: "inspector-unlock",
+          tone: "muted" as const,
         }
       : null;
   if (!line) return null;
@@ -39,7 +53,8 @@ export function StatusLine({ composer, elementId, locked, conflict }: StatusLine
     <div
       role="status"
       data-testid="inspector-status-line"
-      className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-3 tw:py-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+      data-tone={line.tone}
+      className={`${LINE} ${TONE[line.tone]}`}
     >
       <span className="tw:min-w-0">{line.text}</span>
       <Button color="light" size="xs" data-testid={line.id} className={ACTION} onClick={() => void line.run()}>

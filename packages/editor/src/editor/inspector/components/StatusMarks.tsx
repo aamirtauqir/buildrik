@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 
-import { Diamond, Link2, Lock } from "lucide-react";
+import { ChevronDown, Diamond, Link2, Lock } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { Button } from "@/editor/chrome-ui";
@@ -41,16 +41,22 @@ export function StatusMarks({ composer, elementId, binding, locked }: StatusMark
           color="light"
           size="xs"
           data-testid="inspector-bound-chip"
+          data-tone={binding.missing ? "missing" : "bound"}
           title={binding.missing ? `Source missing — ${binding.label}` : `Bound to ${binding.label}`}
           onClick={() => composer?.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "cms-binding" })}
+          /* Boards 24/25: a bordered chip with ▾ — neutral frame + accent text
+             when bound, error border + tint when the source is gone. */
           className={
-            "tw:h-6 tw:gap-1 tw:rounded-[4px] tw:border-0 tw:bg-transparent tw:px-1 tw:text-[11px] tw:font-normal " +
-            (binding.missing ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-accent-text)]")
+            "tw:h-6 tw:gap-1 tw:rounded-[4px] tw:border tw:px-1.5 tw:text-[11px] tw:font-normal " +
+            (binding.missing
+              ? "tw:border-[var(--bk-error)] tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)] tw:hover:bg-[var(--bk-error-tint)]"
+              : "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-bg-subtle)]")
           }
         >
           <Link2 size={11} aria-hidden="true" />
           {binding.label}
           {binding.missing ? " · missing" : null}
+          <ChevronDown size={11} aria-hidden="true" />
         </Button>
       ) : null}
       {locked ? (
