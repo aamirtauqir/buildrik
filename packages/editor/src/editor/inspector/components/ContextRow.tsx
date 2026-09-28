@@ -55,6 +55,8 @@ export function ContextRow(p: ContextRowProps) {
         open={open}
         onClose={() => setOpen(false)}
         label="Edit styles for"
+        /* Board 32: the menu opens beside the column, over the canvas. */
+        beside=".layout-shell__inspector"
         trigger={
           <Button
             color="light"

@@ -1,12 +1,8 @@
 /**
- * useStyleHandlers — the "All like this" reach (board 160:412).
- *
- * This mode replaced a one-shot that copied the selected element's ENTIRE
- * style map onto every same-type peer the moment it was picked. The two are
- * easy to confuse from the outside — both end with peers changed — so the
- * difference is what these tests hold: only the property being edited moves,
- * it moves to the same breakpoint and pseudo-state as the source, and the
- * whole fan-out is one transaction so a single undo takes it back.
+ * useStyleHandlers — extraTargetIds, the rest of a multi-selection (DD-12;
+ * it was board 160:412's "All like this" reach, removed by DD-6a). Only the
+ * property being edited moves, to the same breakpoint and pseudo-state, and
+ * the whole selection is one transaction so a single undo takes it back.
  *
  * @license BSD-3-Clause
  */
@@ -56,8 +52,8 @@ function flush(fn: () => void) {
   vi.useRealTimers();
 }
 
-describe("useStyleHandlers — All like this", () => {
-  it("with no reach, an edit touches only the selected element", () => {
+describe("useStyleHandlers — extraTargetIds (the rest of a multi-selection, DD-12)", () => {
+  it("with no extra targets, an edit touches only the selected element", () => {
     const composer = makeComposer();
     const { result } = renderHook(() => useStyleHandlers(SEL, asComposer(composer), "desktop", "normal"));
     flush(() => {
@@ -67,7 +63,7 @@ describe("useStyleHandlers — All like this", () => {
     expect(calls).toEqual([["el1", "color", "#f00"]]);
   });
 
-  it("with a reach, the SAME property lands on every peer", () => {
+  it("with extra targets, the SAME property lands on every one", () => {
     const composer = makeComposer();
     const { result } = renderHook(() =>
       useStyleHandlers(SEL, asComposer(composer), "desktop", "normal", ["el2", "el3"])
@@ -111,7 +107,7 @@ describe("useStyleHandlers — All like this", () => {
     ]);
   });
 
-  it("the whole fan-out is one transaction, so one undo takes it back", () => {
+  it("the whole selection is one transaction, so one undo takes it back", () => {
     const composer = makeComposer();
     const { result } = renderHook(() =>
       useStyleHandlers(SEL, asComposer(composer), "desktop", "normal", ["el2", "el3", "el4"])
