@@ -26,6 +26,9 @@ vi.mock("@/lib/prisma", () => {
     workspaceMember: {
       findFirst: vi.fn(),
     },
+    workspace: {
+      findUnique: vi.fn().mockResolvedValue({ plan: "PRO" }),
+    },
     page: {
       create: vi.fn().mockResolvedValue({}),
       createMany: vi.fn(),

@@ -408,6 +408,9 @@ export async function setSiteThumbnail(userId: string, siteId: string, url: stri
  *  site password (a copy starts ungated, like any new site), and the canonical
  *  URL (the source's address — on the copy it would mark it a duplicate). */
 const NOT_DUPLICATED = new Set<string>(["name", "slug", "publishedPassword", "canonicalUrl"]);
+/** D2 (founder): custom code is a paid feature, so a copy into a FREE
+ *  workspace starts without it. */
+const NOT_DUPLICATED_INTO_FREE = new Set<string>([...NOT_DUPLICATED, "headCode", "bodyCode"]);
 
 /**
  * SA-01: the source site's setting columns, for the copy's create. The columns
@@ -416,10 +419,14 @@ const NOT_DUPLICATED = new Set<string>(["name", "slug", "publishedPassword", "ca
  * are left out (the column default is NULL, and Prisma takes no raw null for
  * the Json `socialLinks`).
  */
-function duplicatedSettingColumns(original: Record<string, unknown>): Partial<Prisma.SiteUncheckedCreateInput> {
+function duplicatedSettingColumns(
+  original: Record<string, unknown>,
+  destinationPlan: string,
+): Partial<Prisma.SiteUncheckedCreateInput> {
+  const skip = destinationPlan === "FREE" ? NOT_DUPLICATED_INTO_FREE : NOT_DUPLICATED;
   return Object.fromEntries(
     Object.keys(SITE_SETTINGS_COLUMNS)
-      .filter((key) => !NOT_DUPLICATED.has(key) && original[key] !== null)
+      .filter((key) => !skip.has(key) && original[key] !== null)
       .map((key) => [key, original[key]]),
   );
 }
@@ -433,6 +440,12 @@ export async function duplicateSite(
   if (!original || original.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   await assertSiteQuota(workspaceId, userId);
+
+  const destination = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { plan: true },
+  });
+  const destinationPlan = destination?.plan ?? "FREE";
 
   const copyName = `${original.name} (Copy)`;
   const slug = await generateUniqueSlug(copyName);
@@ -458,7 +471,7 @@ export async function duplicateSite(
   return prisma.$transaction(async (tx) => {
     const newSite = await tx.site.create({
       data: {
-        ...duplicatedSettingColumns(original),
+        ...duplicatedSettingColumns(original, destinationPlan),
         name: copyName,
         slug,
         status: "DRAFT",

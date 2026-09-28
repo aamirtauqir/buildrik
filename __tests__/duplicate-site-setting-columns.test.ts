@@ -23,6 +23,7 @@ vi.mock("@/lib/prisma", () => {
     page: { findMany: vi.fn() },
     formBlock: { findMany: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
+    workspace: { findUnique: vi.fn() },
     $transaction: vi.fn((fn: any) => fn(tx)),
   };
   return { prisma: prismaMock, __tx: tx };
@@ -77,6 +78,7 @@ describe("duplicateSite — setting-column inheritance (SA-01 I2)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "PRO" } } as never);
+    vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as never);
     vi.mocked(prisma.site.findFirst).mockResolvedValue(null); // slug is free
     vi.mocked(prisma.site.findMany).mockResolvedValue([]);
     vi.mocked(prisma.page.findMany).mockResolvedValueOnce([]).mockResolvedValueOnce([]);
@@ -132,5 +134,41 @@ describe("duplicateSite — setting-column inheritance (SA-01 I2)", () => {
     const result = await duplicateSite("s1", "ws1", "u1");
 
     expect(result).not.toHaveProperty("publishedPassword");
+  });
+
+  it("D2: a FREE destination workspace gets no custom code; everything else is still copied", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue(
+      baseOriginal({ bodyCode: "<script>2</script>" }) as never
+    );
+    vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "FREE" } as never);
+
+    await duplicateSite("s1", "ws-free", "u1");
+
+    expect(prisma.workspace.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "ws-free" } })
+    );
+    const createData = tx.create.mock.calls[0][0].data;
+    expect(createData).not.toHaveProperty("headCode");
+    expect(createData).not.toHaveProperty("bodyCode");
+    expect(createData.metaTitle).toBe("Bella Cucina — Home");
+    expect(createData.socialLinks).toEqual({ twitter: "https://x.com/a" });
+    expect(createData.favicon).toBe("https://x/fav.ico");
+  });
+
+  it("D2: a PRO or BUSINESS destination copies custom code as before", async () => {
+    for (const plan of ["PRO", "BUSINESS"]) {
+      tx.create.mockClear();
+      vi.mocked(prisma.page.findMany).mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue(
+        baseOriginal({ bodyCode: "<script>2</script>" }) as never
+      );
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan } as never);
+
+      await duplicateSite("s1", "ws-paid", "u1");
+
+      const createData = tx.create.mock.calls[0][0].data;
+      expect(createData.headCode).toBe("<script>1</script>");
+      expect(createData.bodyCode).toBe("<script>2</script>");
+    }
   });
 });

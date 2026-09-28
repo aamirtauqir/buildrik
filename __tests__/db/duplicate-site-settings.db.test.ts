@@ -23,7 +23,7 @@ beforeEach(async () => {
 describe("duplicateSite — setting columns (SA-01)", () => {
   it("the copy keeps the source's setting columns, not its name, slug, password or canonical URL", async () => {
     const user = await createTestUser();
-    const workspace = await createTestWorkspace({ ownerId: user.id });
+    const workspace = await createTestWorkspace({ ownerId: user.id, plan: "PRO" });
     await createTestWorkspaceMember({ userId: user.id, workspaceId: workspace.id, role: "OWNER" });
     const source = await createTestSite({
       workspaceId: workspace.id,
@@ -69,5 +69,24 @@ describe("duplicateSite — setting columns (SA-01)", () => {
       metaDescription: null,
     });
     expect(row.slug).not.toBe(source.slug);
+  });
+
+  it("D2: a copy into a FREE workspace drops custom code and keeps the rest", async () => {
+    const user = await createTestUser();
+    const workspace = await createTestWorkspace({ ownerId: user.id, plan: "FREE" });
+    await createTestWorkspaceMember({ userId: user.id, workspaceId: workspace.id, role: "OWNER" });
+    const source = await createTestSite({
+      workspaceId: workspace.id,
+      createdBy: user.id,
+      name: "Bella",
+      metaTitle: "Bella Cucina",
+      headCode: "<script>h()</script>",
+      bodyCode: "<script>b()</script>",
+    });
+
+    const copy = await duplicateSite(source.id, workspace.id, user.id);
+    const row = await prisma.site.findUniqueOrThrow({ where: { id: copy.id } });
+
+    expect(row).toMatchObject({ metaTitle: "Bella Cucina", headCode: null, bodyCode: null });
   });
 });
