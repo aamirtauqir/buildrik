@@ -18,5 +18,3 @@ export type { UseAdvancedSettingsOptions, UseAdvancedSettingsReturn } from "./us
 export { useInspectorSections } from "./useInspectorSections";
 export type { UseInspectorSectionsResult } from "./useInspectorSections";
 
-export { useBatchStyleHandler } from "./useBatchStyleHandler";
-export type { UseBatchStyleHandlerResult } from "./useBatchStyleHandler";

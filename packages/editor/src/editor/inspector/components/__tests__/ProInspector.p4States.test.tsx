@@ -11,8 +11,6 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
 
-vi.mock("../InspectorEmptyState", () => ({ InspectorEmptyState: () => null }));
-vi.mock("../MultiSelectToolbar", () => ({ MultiSelectToolbar: () => null }));
 vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

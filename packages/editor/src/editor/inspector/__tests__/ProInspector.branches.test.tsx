@@ -15,8 +15,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-vi.mock("../components/InspectorEmptyState", () => ({
-  InspectorEmptyState: () => <div data-testid="empty-state" />,
+vi.mock("../components/PagePanel", () => ({
+  PagePanel: () => <div data-testid="page-panel" />,
 }));
 vi.mock("../components/MultiSelectBar", () => ({
   MultiSelectBar: () => <div data-testid="multi-bar" />,
@@ -80,19 +80,19 @@ function makeComposer(
 }
 
 describe("ProInspector — branch selection", () => {
-  it("renders the empty state when no element is selected", () => {
+  it("renders the Page panel when no element is selected", () => {
     renderWithToast(<ProInspector selectedElement={null} composer={makeComposer([])} />);
-    expect(screen.getByTestId("empty-state")).toBeInTheDocument();
+    expect(screen.getByTestId("page-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("multi-toolbar")).not.toBeInTheDocument();
     expect(screen.queryByTestId("tab-content")).not.toBeInTheDocument();
   });
 
   /* Board 159:102 — "Select something on the canvas to edit it." is a lie
      while the canvas is still filling itself in. */
-  it("renders the loading skeleton, not the empty state, while the project loads", () => {
+  it("renders the loading skeleton, not the Page panel, while the project loads", () => {
     renderWithToast(<ProInspector selectedElement={null} composer={makeComposer([], true)} />);
     expect(screen.getByTestId("inspector-loading")).toBeInTheDocument();
-    expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("page-panel")).not.toBeInTheDocument();
   });
 
   it("2+ selected keeps the same panel — tabs and sections — and adds the multi bar (DD-12)", () => {
@@ -112,7 +112,7 @@ describe("ProInspector — branch selection", () => {
     const composer = makeComposer([makeElement("root")]) as unknown as { elements: Record<string, unknown> };
     composer.elements.getActivePage = () => ({ name: "Home", root: { id: "root" } });
     renderWithToast(<ProInspector selectedElement={{ id: "root", type: "container" }} composer={composer as never} />);
-    expect(screen.getByTestId("empty-state")).toBeInTheDocument();
+    expect(screen.getByTestId("page-panel")).toBeInTheDocument();
     expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
   });
 
@@ -128,6 +128,6 @@ describe("ProInspector — branch selection", () => {
     // Boards 4428:141170 / 141642 / 142686 — the strip is back (B11).
     expect(screen.getByRole("tablist", { name: "Inspector tabs" })).toBeInTheDocument();
     expect(screen.queryByTestId("multi-bar")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("page-panel")).not.toBeInTheDocument();
   });
 });

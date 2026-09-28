@@ -18,8 +18,6 @@ import { ToastProvider } from "@/editor/chrome-ui";
 /* Tallest scrollTop each element's body allows. */
 const MAX: Record<string, number> = { "el-1": 1000, "el-2": 40 };
 
-vi.mock("../InspectorEmptyState", () => ({ InspectorEmptyState: () => null }));
-vi.mock("../MultiSelectToolbar", () => ({ MultiSelectToolbar: () => null }));
 vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
