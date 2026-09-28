@@ -176,7 +176,8 @@ export function ActionRow({ children, onClick, testId, icon, disabled }: ActionR
         onClick={onClick}
         className="tw:h-6 tw:min-h-6 tw:w-[160px] tw:gap-2 tw:px-2 tw:text-[12px] tw:leading-4"
       >
-        <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-center">{children}</span>
+        {/* Board 24: an action with a trailing icon reads left ("Open record ↗"); a bare one is centred. */}
+        <span className={"tw:min-w-0 tw:flex-1 tw:truncate " + (icon ? "tw:text-left" : "tw:text-center")}>{children}</span>
         {icon}
       </Button>
     </div>
