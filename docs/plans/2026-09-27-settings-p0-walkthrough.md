@@ -162,11 +162,14 @@ COMMIT;
 
 ## 6. Deploy checklist (in this order)
 
-1. **On prod: the duplicate-pin check.** It must return **0 rows**, or the unique index migration fails:
+All SQL runs against prod over the SSH tunnel. `$PROD_DATABASE_URL` below is the tunnelled connection string.
+
+1. **Snapshot BEFORE migrate.** The backfill writes columns; this is the way back for them:
    ```sql
-   SELECT "vercelProjectName", count(*) FROM sites WHERE "vercelProjectName" IS NOT NULL GROUP BY 1 HAVING count(*)>1;
+   CREATE TABLE sites_projectsettings_bak_20261003 AS SELECT id, "projectSettings", "headCode", "bodyCode", "metaTitle", "metaDescription", "metaTitleTemplate", "ogImage", "favicon", "touchIcon", "robotsTxt", "socialLinks" FROM sites;
    ```
-2. **On prod: the JSON-only before-count.** These are the rows the backfill will fill, using the same filters as `20261003130000`. Keep the numbers:
+   Drop it (`DROP TABLE sites_projectsettings_bak_20261003;`) once SA-01 is verified in prod.
+2. **The JSON-only before-count (read-only).** These are the rows the backfill will fill, using the same filters as `20261003130000`. Keep the numbers:
    ```sql
    SELECT
      count(*) FILTER (WHERE "metaTitle" IS NULL AND jsonb_typeof("projectSettings" #> '{seo,metaTitle}')='string' AND btrim("projectSettings" #>> '{seo,metaTitle}')<>'') AS meta_title,
@@ -178,9 +181,20 @@ COMMIT;
      count(*) FILTER (WHERE "robotsTxt" IS NULL AND jsonb_typeof("projectSettings" #> '{seo,robotsTxt}')='string' AND btrim("projectSettings" #>> '{seo,robotsTxt}')<>'') AS robots_txt,
      count(*) FILTER (WHERE "headCode" IS NULL AND jsonb_typeof("projectSettings" #> '{customCode,headScripts}')='string' AND btrim("projectSettings" #>> '{customCode,headScripts}')<>'') AS head_code,
      count(*) FILTER (WHERE "bodyCode" IS NULL AND jsonb_typeof("projectSettings" #> '{customCode,bodyScripts}')='string' AND btrim("projectSettings" #>> '{customCode,bodyScripts}')<>'') AS body_code,
-     count(*) FILTER (WHERE "socialLinks" IS NULL AND jsonb_typeof("projectSettings" #> '{seo,socialLinks}')='object') AS social_links
+     count(*) FILTER (WHERE "socialLinks" IS NULL AND jsonb_typeof("projectSettings" #> '{seo,socialLinks}')='object' AND NOT EXISTS (SELECT 1 FROM jsonb_each("projectSettings" #> '{seo,socialLinks}') e WHERE jsonb_typeof(e.value) <> 'string')) AS social_links
    FROM sites;
    ```
-3. **Run `prisma migrate deploy`.** This applies the three migrations: `20261003120000_settings_p0_vercel_project_name`, `20261003130000_settings_p0_settings_backfill` and `20261003140000_settings_p0_vercel_project_name_unique`. Production uses the SSH tunnel.
-4. **Only then deploy the code.** An editor bundle that reads columns only, served before the backfill, loads JSON-only fields empty, and its next publish drops them.
-5. **Add the cPanel cron** `GET /api/cron/workspace-deletion`, daily, with the header `Authorization: Bearer $CRON_SECRET`. Without it, scheduled workspace deletions never run. It returns 401 without the bearer and `{"deleted":n,"skipped":m}` with it.
+3. **The backlog for the new cron (read-only).** The first `workspace-deletion` run deletes every workspace already past its date:
+   ```sql
+   SELECT count(*) FROM workspaces WHERE "deletionScheduledAt" <= now();
+   ```
+4. **Run `prisma migrate deploy`.** This applies the three migrations: `20261003120000_settings_p0_vercel_project_name`, `20261003130000_settings_p0_settings_backfill` and `20261003140000_settings_p0_vercel_project_name_unique`. No pre-check for duplicate `vercelProjectName` values is needed: the column does not exist in prod before the first migration and starts all-NULL, so the unique index has nothing to collide with.
+5. **Deploy the code.** Only after the migrations: an editor bundle that reads columns only, served before the backfill, loads JSON-only fields empty, and its next publish drops them.
+6. **Re-run the backfill once**, after the deploy and after old editor tabs have reloaded. An old tab still saves settings into the JSON only, so values written during the deploy window miss their column. The backfill is idempotent and only fills NULL columns:
+   ```bash
+   psql "$PROD_DATABASE_URL" -v ON_ERROR_STOP=1 -1 \
+     -f prisma/migrations/20261003130000_settings_p0_settings_backfill/migration.sql
+   ```
+   This runs the SQL directly; it does not touch `_prisma_migrations`.
+7. **Add the cPanel cron** `GET /api/cron/workspace-deletion`, daily, with the header `Authorization: Bearer $CRON_SECRET` (the line is in `docs/cpanel-deploy.md` Step C). Without it, scheduled workspace deletions never run. It returns 401 without the bearer and `{"deleted":n,"skipped":m}` with it.
+8. **This release is ROLL-FORWARD-ONLY once any slug change has pinned a Vercel project name.** After a code rollback, the old publish worker derives the project from the slug again, so a site whose slug changed publishes into a new Vercel project and leaves its live URL and domains on the old one. Fix forward instead of rolling back.
