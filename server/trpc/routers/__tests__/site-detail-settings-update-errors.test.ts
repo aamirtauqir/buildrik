@@ -56,6 +56,19 @@ describe("siteDetail.settings.update — error mapping", () => {
     expect(recordForSite).not.toHaveBeenCalled();
   });
 
+  it("maps PROJECT_NAME_TAKEN to CONFLICT with the domain path's message", async () => {
+    updateSiteSettings.mockRejectedValue(new Error("PROJECT_NAME_TAKEN"));
+
+    await expect(
+      caller().settings.update({ id: "s1", slug: "new-slug" })
+    ).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "This site's address clashes with another site. Change its URL slug in Settings, then connect the domain.",
+    });
+
+    expect(recordForSite).not.toHaveBeenCalled();
+  });
+
   it("maps CUSTOM_CODE_NOT_AVAILABLE to FORBIDDEN", async () => {
     updateSiteSettings.mockRejectedValue(new Error("CUSTOM_CODE_NOT_AVAILABLE"));
 

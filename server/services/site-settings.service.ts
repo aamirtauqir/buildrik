@@ -287,14 +287,14 @@ export async function updateSiteSettings(
 }
 
 /** The SLUG_TAKEN check above is read-then-write; a concurrent save that takes
- *  the same slug in between surfaces here as the @unique index's P2002. */
+ *  the same slug in between surfaces here as the @unique index's P2002. The
+ *  pin write can also collide on vercelProjectName, when another site is
+ *  already pinned to the old slug's project (legacy slug reuse). */
 function rethrowSlugConflict(e: unknown): never {
-  if (
-    e instanceof Prisma.PrismaClientKnownRequestError &&
-    e.code === "P2002" &&
-    String(e.meta?.target ?? "").includes("slug")
-  ) {
-    throw new Error("SLUG_TAKEN");
+  if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+    const target = String(e.meta?.target ?? "");
+    if (target.includes("vercelProjectName")) throw new Error("PROJECT_NAME_TAKEN");
+    if (target.includes("slug")) throw new Error("SLUG_TAKEN");
   }
   throw e;
 }

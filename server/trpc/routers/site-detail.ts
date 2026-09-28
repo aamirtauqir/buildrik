@@ -32,6 +32,9 @@ import {
   siteAnalyticsQuerySchema,
 } from "@buildrik/shared/schemas/site-detail";
 
+const PROJECT_NAME_TAKEN_MESSAGE =
+  "This site's address clashes with another site. Change its URL slug in Settings, then connect the domain.";
+
 export const siteDetailRouter = router({
   overview: protectedProcedure
     .input(z.object({ siteId: z.string() }))
@@ -133,6 +136,8 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "BAD_REQUEST", message: "The default locale must be in the enabled locales list." });
           if (e instanceof Error && e.message === "SLUG_TAKEN")
             throw new TRPCError({ code: "CONFLICT", message: "Another site already uses that URL slug." });
+          if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
+            throw new TRPCError({ code: "CONFLICT", message: PROJECT_NAME_TAKEN_MESSAGE });
           throw e;
         }
       }),
@@ -343,10 +348,7 @@ export const siteDetailRouter = router({
           if (e instanceof Error && e.message === "DOMAIN_IN_USE")
             throw new TRPCError({ code: "CONFLICT", message: "Domain already in use." });
           if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "This site's address clashes with another site. Change its URL slug in Settings, then connect the domain.",
-            });
+            throw new TRPCError({ code: "CONFLICT", message: PROJECT_NAME_TAKEN_MESSAGE });
           if (e instanceof Error && e.message === "DOMAIN_LIMIT")
             throw new TRPCError({ code: "FORBIDDEN", message: "You've reached your plan's custom-domain limit. Upgrade to add more." });
           if (e instanceof Error && e.message === "SITE_NOT_FOUND")

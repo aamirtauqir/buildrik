@@ -79,6 +79,23 @@ describe("updateSiteSettings — slug change", () => {
     await expect(updateSiteSettings("s1", { slug: "raced" })).rejects.toThrow("SLUG_TAKEN");
   });
 
+  /* The pin write can collide with another site already pinned to the old
+     slug's project (legacy slug reuse) — that is the vercelProjectName
+     unique index, not a slug conflict. */
+  it("maps a P2002 on vercelProjectName at the pin write to PROJECT_NAME_TAKEN", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ slug: "old", vercelProjectName: null, deletedAt: null, status: "PUBLISHED", workspace: { plan: "PRO" } } as never);
+    vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue({ id: "job1" } as never);
+    vi.mocked(prisma.site.update).mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed on the fields: (`vercelProjectName`)", {
+        code: "P2002",
+        clientVersion: "5",
+        meta: { target: ["vercelProjectName"] },
+      }),
+    );
+    await expect(updateSiteSettings("s1", { slug: "new" })).rejects.toThrow("PROJECT_NAME_TAKEN");
+  });
+
   it("pins the old project name when a deployed site changes slug", async () => {
     vi.mocked(prisma.site.findUnique).mockResolvedValue({ slug: "old", vercelProjectName: null, deletedAt: null, status: "PUBLISHED", workspace: { plan: "PRO" } } as never);
     vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
