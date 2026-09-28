@@ -657,6 +657,14 @@ button:hover > .bd-canvas-empty-cta__thumb {
   filter: grayscale(1);
 }
 
+/* An embed's <iframe> (embedFrameHTML) is a separate document: a click on it
+   never reaches the canvas, so the Video / Map embed could not be selected by
+   clicking it. On the canvas the frame is a picture of the embed; it plays on
+   the published page and in Preview. */
+.buildrick-canvas iframe[data-bk-embed] {
+  pointer-events: none;
+}
+
 /* Badges — board 817:4649: "Element type badges shown on hover. Blue chip
    labels: 'Section','Flex','Text','Image'." They used to sit on every element
    at once, in a dark chip with muted text (plus one orange one for images),
