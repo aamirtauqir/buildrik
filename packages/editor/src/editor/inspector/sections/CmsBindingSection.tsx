@@ -140,10 +140,16 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
       .queryContent({ collectionId: cid, status: "published", filter: {} })
       .then(({ items }) => {
         if (!live) return;
-        /* No record = "the record on this page": the canvas previews the first. */
-        const found = itemId && itemId !== "context" ? items.findIndex((i) => i.id === itemId) : 0;
-        const index = Math.max(found, 0);
-        const record = items[index] ?? null;
+        /* No record = "the record on this page": the canvas previews the
+           store's first. The number is the record's place in the order the
+           records were made — the store lists them by id, so its position
+           read "record 2 of 3" for the first record (board 24). */
+        const named = itemId && itemId !== "context" ? items.find((i) => i.id === itemId) : undefined;
+        const record = named ?? items[0] ?? null;
+        const madeOrder = [...items].sort(
+          (a, b) => String(a.createdAt ?? "").localeCompare(String(b.createdAt ?? "")) || a.id.localeCompare(b.id)
+        );
+        const index = Math.max(record ? madeOrder.indexOf(record) : 0, 0);
         const raw = record?.data[fieldSlug];
         setPreview({ value: raw === undefined || raw === null ? "" : String(raw), record, index, total: items.length });
       })
