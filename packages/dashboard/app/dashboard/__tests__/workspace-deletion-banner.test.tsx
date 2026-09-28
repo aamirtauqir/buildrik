@@ -9,7 +9,11 @@ import { render, screen, fireEvent } from "@testing-library/react";
 const { addToast, cancelMutate, state } = vi.hoisted(() => ({
   addToast: vi.fn(),
   cancelMutate: vi.fn(),
-  state: { ownerId: "owner-1", onError: undefined as undefined | ((err: { message: string }) => void) },
+  state: {
+    ownerId: "owner-1",
+    deletionScheduledAt: "2099-10-27T00:00:00.000Z",
+    onError: undefined as undefined | ((err: { message: string }) => void),
+  },
 }));
 
 vi.mock("next-auth/react", () => ({
@@ -32,7 +36,7 @@ vi.mock("@lib/trpc/client", () => {
       },
       account: {
         workspace: {
-          get: { useQuery: () => query({ id: "w1", ownerId: state.ownerId, deletionScheduledAt: "2026-10-27T00:00:00.000Z" }) },
+          get: { useQuery: () => query({ id: "w1", ownerId: state.ownerId, deletionScheduledAt: state.deletionScheduledAt }) },
           cancelDelete: {
             useMutation: (opts: { onError?: (err: { message: string }) => void }) => {
               state.onError = opts.onError;
@@ -60,6 +64,7 @@ beforeEach(() => {
   addToast.mockReset();
   cancelMutate.mockReset();
   state.onError = undefined;
+  state.deletionScheduledAt = "2099-10-27T00:00:00.000Z";
 });
 
 describe("Home — workspace deletion banner", () => {
@@ -85,5 +90,24 @@ describe("Home — workspace deletion banner", () => {
     render(<DashboardPage />);
     state.onError?.({ message: "Only the owner can cancel the deletion." });
     expect(addToast).toHaveBeenCalledWith("error", "Could not cancel the deletion", "Only the owner can cancel the deletion.");
+  });
+
+  /* SA-04 (RT8): past the date, the job keeps the workspace until every
+     published site is confirmed offline — a past date would read as a bug. */
+  it("past the date, says deletion is in progress instead of showing a past date", () => {
+    state.ownerId = "user-1";
+    state.deletionScheduledAt = "2026-01-01T00:00:00.000Z";
+    render(<DashboardPage />);
+    expect(screen.getByText("Deletion in progress. Some published sites are still being taken offline.")).toBeInTheDocument();
+    expect(screen.queryByText(/scheduled for deletion on/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancel Deletion" })).toBeInTheDocument();
+  });
+
+  it("past the date, a non-owner still gets no Cancel button", () => {
+    state.ownerId = "owner-1";
+    state.deletionScheduledAt = "2026-01-01T00:00:00.000Z";
+    render(<DashboardPage />);
+    expect(screen.getByText("Deletion in progress. Some published sites are still being taken offline.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Cancel Deletion" })).not.toBeInTheDocument();
   });
 });

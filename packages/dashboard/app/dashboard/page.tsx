@@ -114,7 +114,9 @@ export default function DashboardPage() {
       {wsData.data?.deletionScheduledAt && (
         <div className="mb-4 rounded-lg border p-4" style={{ backgroundColor: "var(--color-error-subtle)", borderColor: "var(--color-error)" }}>
           <p className="text-body font-medium" style={{ color: "var(--color-error-text)" }}>
-            Your workspace is scheduled for deletion on {new Date(wsData.data.deletionScheduledAt).toLocaleDateString()}.
+            {new Date(wsData.data.deletionScheduledAt).getTime() <= Date.now()
+              ? "Deletion in progress. Some published sites are still being taken offline."
+              : `Your workspace is scheduled for deletion on ${new Date(wsData.data.deletionScheduledAt).toLocaleDateString()}.`}
           </p>
           {isWorkspaceOwner ? (
             <button
