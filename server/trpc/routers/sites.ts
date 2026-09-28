@@ -56,6 +56,9 @@ import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
 
+const WORKSPACE_DELETION_SCHEDULED_MESSAGE =
+  "This workspace is scheduled for deletion. Cancel the deletion to publish.";
+
 export const sitesRouter = router({
   list: protectedProcedure
     .input(listSitesSchema)
@@ -407,6 +410,8 @@ export const sitesRouter = router({
             code: "CONFLICT",
             message: "A publish job is already in progress.",
           });
+        if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         // Sites deploy into the workspace's own Vercel account. The pre-publish
         // check already disables the button, but the editor and the API can still
         // reach here — they get a reason, not a 500.
@@ -519,6 +524,8 @@ export const sitesRouter = router({
         if (e instanceof ScheduledPublishError) {
           throw new TRPCError({ code: "BAD_REQUEST", message: e.message });
         }
+        if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         throw e;
       }
     }),
@@ -653,6 +660,8 @@ export const sitesRouter = router({
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: "That version can no longer be rolled back to." });
         if (msg === "ALREADY_PUBLISHING")
           throw new TRPCError({ code: "CONFLICT", message: "A publish is already in progress." });
+        if (msg === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         if (msg === "VERCEL_NOT_CONNECTED")
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Connect Vercel before rolling back." });
         throw e;

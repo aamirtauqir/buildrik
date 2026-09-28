@@ -37,12 +37,19 @@ export class ScheduledPublishError extends Error {
  * git history — restore it in the same commit that ships a server-side
  * renderer.
  */
-export async function schedulePublish(_input: {
+export async function schedulePublish(input: {
   siteId: string;
   workspaceId: string;
   userId: string;
   scheduledFor: Date;
 }): Promise<never> {
+  // SA-04 (D6): same refusal as startPublish — nothing new goes live in a
+  // workspace scheduled for deletion.
+  const site = await prisma.site.findUnique({
+    where: { id: input.siteId },
+    select: { workspace: { select: { deletionScheduledAt: true } } },
+  });
+  if (site?.workspace.deletionScheduledAt) throw new Error("WORKSPACE_DELETION_SCHEDULED");
   throw new ScheduledPublishError(
     "NO_RENDERER",
     "Scheduled publish isn't available yet — publish from the editor instead.",
@@ -96,5 +103,13 @@ export async function markScheduleFailed(id: string, error: string) {
   return prisma.scheduledPublish.update({
     where: { id },
     data: { status: "FAILED", startedAt: new Date(), error: error.slice(0, 500) },
+  });
+}
+
+/** SA-04 (D6): the sweep skipped it — its workspace is scheduled for deletion. */
+export async function markScheduleCancelled(id: string, reason: string) {
+  return prisma.scheduledPublish.update({
+    where: { id },
+    data: { status: "CANCELLED", error: reason },
   });
 }

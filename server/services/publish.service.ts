@@ -308,9 +308,19 @@ export async function startPublish(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { name: true, deletedAt: true, publishedUrl: true, workspaceId: true, lastEditedAt: true },
+    select: {
+      name: true,
+      deletedAt: true,
+      publishedUrl: true,
+      workspaceId: true,
+      lastEditedAt: true,
+      workspace: { select: { deletionScheduledAt: true } },
+    },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+  // SA-04 (D6): the deletion job takes down only what exists when it runs, so
+  // nothing new may go live in a workspace scheduled for deletion.
+  if (site.workspace.deletionScheduledAt) throw new Error("WORKSPACE_DELETION_SCHEDULED");
 
   /* C-3 freshness: the editor publishes the pages in ITS tab. If the site was
      saved by someone else after this tab last loaded or saved it, those pages
