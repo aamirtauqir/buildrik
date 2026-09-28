@@ -75,15 +75,15 @@ afterEach(() => cleanup());
 describe("CmsBindingSection — Source", () => {
   it("unbound: Source reads Static and nothing else is drawn (board 2)", () => {
     render(<CmsBindingSection elementId="e1" composer={makeComposer() as never} isOpen />);
-    expect(screen.getByRole("button", { name: "Static" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "From CMS" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("radio", { name: "Static" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: "From CMS" })).toHaveAttribute("aria-checked", "false");
     expect(screen.queryByTestId("cms-pickers")).toBeNull();
   });
 
   it("From CMS → Field binds the page's record (no record), one step, then previews record 1 of N (board 24)", async () => {
     const composer = makeComposer();
     render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
-    fireEvent.click(screen.getByRole("button", { name: "From CMS" }));
+    fireEvent.click(screen.getByRole("radio", { name: "From CMS" }));
     fireEvent.change(screen.getByLabelText("Field"), { target: { value: "name" } });
     expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-1", undefined, "name", "content", undefined, "Bind Name");
     await waitFor(() => expect(screen.getByTestId("cms-preview")).toHaveTextContent("Cacio e pepe (record 1 of 3)"));
@@ -93,9 +93,9 @@ describe("CmsBindingSection — Source", () => {
   it("Static on a bound element unbinds (one step)", () => {
     const composer = makeComposer("heading", [MENU], BOUND);
     render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
-    fireEvent.click(screen.getByRole("button", { name: "Static" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Static" }));
     expect(composer.cms.bindings.unbindAll).toHaveBeenCalledWith("e1", "Unbind Name");
-    expect(screen.getByRole("button", { name: "Static" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("radio", { name: "Static" })).toHaveAttribute("aria-checked", "true");
   });
 });
 
@@ -111,7 +111,7 @@ describe("CmsBindingSection — Field filtered by type", () => {
   it("an image is offered image fields and binds its source", () => {
     const composer = makeComposer("image");
     render(<CmsBindingSection elementId="img" composer={composer as never} isOpen />);
-    fireEvent.click(screen.getByRole("button", { name: "From CMS" }));
+    fireEvent.click(screen.getByRole("radio", { name: "From CMS" }));
     const options = Array.from((screen.getByLabelText("Field") as HTMLSelectElement).options).map((o) => o.value);
     expect(options).toEqual(["", "photo"]);
     fireEvent.change(screen.getByLabelText("Field"), { target: { value: "photo" } });
@@ -172,7 +172,7 @@ describe("CmsBindingSection — bound (board 24)", () => {
   it("with no collections: a note and the + New collection… door", () => {
     const create = vi.fn();
     render(<CmsBindingSection elementId="e1" composer={makeComposer("heading", []) as never} onOpenCreateCollection={create} isOpen />);
-    fireEvent.click(screen.getByRole("button", { name: "From CMS" }));
+    fireEvent.click(screen.getByRole("radio", { name: "From CMS" }));
     expect(screen.getByTestId("cms-no-collections")).toHaveTextContent("No collections yet.");
     fireEvent.click(screen.getByTestId("cms-new-collection"));
     expect(create).toHaveBeenCalled();
@@ -184,7 +184,7 @@ describe("CmsBindingSection — source missing (board 25)", () => {
 
   it("says the source is missing, with Reconnect… and Unbind, and no pickers", () => {
     render(<CmsBindingSection elementId="e1" composer={makeComposer("heading", [MENU], GONE) as never} isOpen />);
-    expect(screen.getByRole("button", { name: "From CMS" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("radio", { name: "From CMS" })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByTestId("cms-source-missing")).toHaveTextContent(/^Source missing — .*deleted\. Reconnect a source or keep the current text\.$/);
     expect(screen.getByTestId("cms-reconnect")).toHaveTextContent("Reconnect…");
     expect(screen.getByTestId("cms-unbind")).toBeTruthy();

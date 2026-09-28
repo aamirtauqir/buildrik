@@ -80,6 +80,6 @@ describe("SpacingSection — field context", () => {
 
   it("a mixed side says so instead of showing one element's value", () => {
     renderSpacing({ "padding-top": "32px" }, { mixedKeys: new Set(["padding-top"]) });
-    expect(screen.getByLabelText("Padding top, mixed values")).toHaveAttribute("placeholder", "Mixed");
+    expect(screen.getByRole("textbox", { name: "Padding top mixed values" })).toHaveAttribute("placeholder", "Mixed");
   });
 });

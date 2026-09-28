@@ -36,11 +36,11 @@ describe("TypographyControls — rows", () => {
 describe("TypographyControls — writes", () => {
   it("transform and decoration", () => {
     const { onChange } = renderTypo();
-    fireEvent.click(screen.getByRole("button", { name: "Upper" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Upper" }));
     expect(onChange).toHaveBeenCalledWith("text-transform", "uppercase");
-    fireEvent.click(screen.getByRole("button", { name: "Strike" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Strike" }));
     expect(onChange).toHaveBeenCalledWith("text-decoration", "line-through");
-    fireEvent.click(screen.getByRole("button", { name: "Over" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Over" }));
     expect(onChange).toHaveBeenCalledWith("text-decoration", "overline");
   });
 
@@ -54,9 +54,9 @@ describe("TypographyControls — writes", () => {
 
   it("clicking Italic / Normal writes font-style", () => {
     const { onChange } = renderTypo();
-    fireEvent.click(screen.getByRole("button", { name: "Italic" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Italic" }));
     expect(onChange).toHaveBeenCalledWith("font-style", "italic");
-    fireEvent.click(screen.getByRole("button", { name: "Normal" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Normal" }));
     expect(onChange).toHaveBeenCalledWith("font-style", "normal");
   });
 
@@ -78,9 +78,9 @@ describe("TypographyControls — writes", () => {
 });
 
 describe("TypographyControls — current values", () => {
-  it("marks the active font style and decoration aria-pressed", () => {
+  it("marks the active font style and decoration checked", () => {
     renderTypo({ "font-style": "italic", "text-decoration": "underline" });
-    expect(screen.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "Under" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("radio", { name: "Italic" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: "Under" })).toHaveAttribute("aria-checked", "true");
   });
 });

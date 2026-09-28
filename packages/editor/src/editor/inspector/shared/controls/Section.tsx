@@ -23,6 +23,7 @@
 import { ChevronDown, ChevronRight, Plus } from "lucide-react";
 import * as React from "react";
 import { IconButton } from "@/editor/chrome-ui";
+import { useInspectorField } from "./InspectorFieldContext";
 
 // ============================================================================
 // TYPES
@@ -56,6 +57,45 @@ export interface SectionFrame {
 }
 
 export const SectionFrameContext = React.createContext<SectionFrame | null>(null);
+
+// ============================================================================
+// FIELD ERRORS (board 34, DD-19)
+// ============================================================================
+
+/** Where a field reports the entry it could not read. */
+type FieldErrorSink = (id: string, message: string | null) => void;
+
+const FieldErrorContext = React.createContext<FieldErrorSink | null>(null);
+
+const ERROR_LINE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]";
+
+/**
+ * A field's error line. Inside a Section the line is drawn in the section's
+ * error band, under its last row (board 34), which is also the section's
+ * polite live region; outside one, `ErrorLine` draws it in place. Returns the
+ * id for the field's `aria-describedby`.
+ */
+export function useFieldError(message: string | null): string {
+  const id = React.useId();
+  const sink = React.useContext(FieldErrorContext);
+  React.useEffect(() => {
+    if (!sink) return;
+    sink(id, message);
+    return () => sink(id, null);
+  }, [sink, id, message]);
+  return id;
+}
+
+/** The error line for a field rendered outside any Section. */
+export function ErrorLine({ id, message }: { id: string; message: string | null }) {
+  const sink = React.useContext(FieldErrorContext);
+  if (sink || !message) return null;
+  return (
+    <p id={id} role="status" className={ERROR_LINE} data-testid="inspector-field-error">
+      {message}
+    </p>
+  );
+}
 
 export interface SectionProps {
   title: string;
@@ -98,7 +138,20 @@ export const Section: React.FC<SectionProps> = ({
   children,
 }) => {
   const frame = React.useContext(SectionFrameContext);
+  /* Why the panel is read-only, for the one CSS rule that draws it (board 23
+     dims a locked element's controls; board 29's conflict does not). */
+  const { readOnlyReason } = useInspectorField();
   const [internalIsOpen, setInternalIsOpen] = React.useState(defaultOpen);
+  const [errors, setErrors] = React.useState<ReadonlyMap<string, string>>(() => new Map());
+  const reportError = React.useCallback<FieldErrorSink>((fieldId, message) => {
+    setErrors((prev) => {
+      if ((prev.get(fieldId) ?? null) === message) return prev;
+      const next = new Map(prev);
+      if (message === null) next.delete(fieldId);
+      else next.set(fieldId, message);
+      return next;
+    });
+  }, []);
 
   const isControlled = controlledIsOpen !== undefined;
   const standaloneOpen = isControlled ? controlledIsOpen : internalIsOpen;
@@ -137,6 +190,7 @@ export const Section: React.FC<SectionProps> = ({
       id={id}
       data-testid={`inspector-section-${slug}`}
       data-display-mode={mode}
+      data-readonly={readOnlyReason ?? undefined}
     >
       {/* The row is a container; the toggle carries the button role and any
           action is its SIBLING, never its child (axe nested-interactive).
@@ -157,7 +211,13 @@ export const Section: React.FC<SectionProps> = ({
           aria-controls={contentId}
           aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
         >
-          <Chevron size={12} aria-hidden="true" className="bdi-chev tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+          {/* An empty "+" row has nothing to disclose: no chevron, the title
+              stays in the chevron's column (boards 1, 3). */}
+          {mode === "empty" ? (
+            <span aria-hidden="true" className="tw:w-3 tw:shrink-0" />
+          ) : (
+            <Chevron size={12} aria-hidden="true" className="bdi-chev tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+          )}
           <span className={NAME_CLASS} data-testid={`inspector-secname-${slug}`}>
             {title}
           </span>
@@ -185,12 +245,25 @@ export const Section: React.FC<SectionProps> = ({
       {isOpen && (
         <div id={contentId} className="bdi-sec-body">
           {/* A Section nested in this body is its own, unframed disclosure. */}
-          <SectionFrameContext.Provider value={null}>{children}</SectionFrameContext.Provider>
+          <SectionFrameContext.Provider value={null}>
+            <FieldErrorContext.Provider value={reportError}>{children}</FieldErrorContext.Provider>
+          </SectionFrameContext.Provider>
           {frame?.note ? (
             <p className="tw:m-0 tw:pt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-text)]">{frame.note}</p>
           ) : null}
         </div>
       )}
+      {/* Board 34: the band under the section's rows. Mounted while the
+          section is open so it is a live region before a message lands. */}
+      {isOpen ? (
+        <div aria-live="polite" className={errors.size ? "bdi-sec-errors" : undefined}>
+          {[...errors].map(([fieldId, message]) => (
+            <p key={fieldId} id={fieldId} className={ERROR_LINE} data-testid="inspector-field-error">
+              {message}
+            </p>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -39,8 +39,8 @@ describe("Image — board 8", () => {
 
   it("Fit writes object-fit through the style path", () => {
     const { onChange } = renderBlock(image, { styles: { "object-fit": "cover" } });
-    expect(screen.getByRole("button", { name: "Cover" })).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(screen.getByRole("button", { name: "Contain" }));
+    expect(screen.getByRole("radio", { name: "Cover" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "Contain" }));
     expect(onChange).toHaveBeenCalledWith("object-fit", "contain");
   });
 

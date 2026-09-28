@@ -1,35 +1,65 @@
 /**
- * SelectRow — bare-theme value select, compact UI font (fix round 1).
+ * SelectRow — the Inspector's select row (board 1: "Text style Heading / H3 ▾").
  *
  * @license BSD-3-Clause
  */
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+import * as React from "react";
 import { SelectRow } from "../InputControls";
+import { InspectorFieldContext, type InspectorFieldContextValue } from "../InspectorFieldContext";
 
-describe("SelectRow — value select compact font (fix round 1)", () => {
-  it("resolves an explicit 11px UI font-size on the real <select>, not flowbite's default text-sm", () => {
-    // Same class of regression as InputWithUnit's unit select (see that
-    // file's "fix round 1" block for the full mechanism): the ambient
-    // `.bdi-ddn .bdi-v` 11px/UI-font styling only reaches the actual
-    // <select> via inheritance from the outer `.bdi-ddn` div (where
-    // flowbite puts `className`), and flowbite's own directly-declared
-    // `text-sm` on the real <select> always wins over an inherited value.
-    // BK_SELECT_BARE_VALUE_THEME now sets an explicit `tw:text-[11px]`
-    // (and `--bk-font-ui` font-family) in the same `sizes.md` theme leaf
-    // so it wins the tailwind-merge conflict instead of relying on
-    // inheritance reaching an element that already has its own value.
+const OPTIONS = [
+  { value: "block", label: "Block" },
+  { value: "flex", label: "Flex" },
+];
+
+const ctx = (over: Partial<InspectorFieldContextValue>): InspectorFieldContextValue => ({
+  readOnly: false,
+  readOnlyReason: null,
+  mixedKeys: new Set(),
+  overrides: new Map(),
+  overrideLabels: {},
+  resetOverride: () => undefined,
+  ...over,
+});
+
+describe("SelectRow", () => {
+  it("is named by its label and offers a blank Default first", () => {
+    render(<SelectRow label="Display" value="block" onChange={vi.fn()} options={OPTIONS} />);
+    const select = screen.getByRole("combobox", { name: "Display" });
+    expect([...select.querySelectorAll("option")].map((o) => o.textContent)).toEqual(["Default", "Block", "Flex"]);
+  });
+
+  it("placeholder={null}: only the real choices, no blank option", () => {
+    render(<SelectRow label="When done" value="flex" onChange={vi.fn()} options={OPTIONS} placeholder={null} />);
+    const select = screen.getByRole("combobox", { name: "When done" });
+    expect([...select.querySelectorAll("option")].map((o) => o.textContent)).toEqual(["Block", "Flex"]);
+  });
+
+  it("read-only (DD-18): legible and not disabled; a change is refused", () => {
+    const onChange = vi.fn();
     render(
-      <SelectRow
-        label="Display"
-        value="block"
-        onChange={vi.fn()}
-        options={[{ value: "block", label: "Block" }]}
-      />
+      <InspectorFieldContext.Provider value={ctx({ readOnly: true, readOnlyReason: "locked" })}>
+        <SelectRow label="Display" value="block" onChange={onChange} options={OPTIONS} property="display" />
+      </InspectorFieldContext.Provider>,
     );
     const select = screen.getByRole("combobox");
-    expect(select.className).toMatch(/tw:text-\[11px\]/);
-    expect(select.className).not.toMatch(/\btext-sm\b/);
+    expect(select).not.toBeDisabled();
+    expect(select).toHaveAttribute("aria-readonly", "true");
+    fireEvent.change(select, { target: { value: "flex" } });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("mixed: reads Mixed, named as mixed", () => {
+    render(
+      <InspectorFieldContext.Provider value={ctx({ mixedKeys: new Set(["display"]) })}>
+        <SelectRow label="Display" value="block" onChange={vi.fn()} options={OPTIONS} property="display" />
+      </InspectorFieldContext.Provider>,
+    );
+    const select = screen.getByRole("combobox", { name: "Display, mixed values" });
+    expect(select).toHaveValue("");
+    expect(select.querySelector("option")?.textContent).toBe("Mixed");
   });
 });
