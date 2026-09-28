@@ -196,6 +196,32 @@ const STALE_QUEUED_AFTER_MS = 5 * 60 * 1000;
 // publish for the site forever.
 const STALE_BUILDING_AFTER_MS = 15 * 60 * 1000;
 
+function liveJobFilter(staleCutoff: Date, buildingCutoff: Date): Prisma.PublishBuildJobWhereInput[] {
+  return [
+    // startedAt gte cutoff = worker still plausibly alive. A BUILDING row
+    // with null startedAt can't match gte and is treated as stale.
+    { status: { in: ["BUILDING", "DEPLOYING"] }, startedAt: { gte: buildingCutoff } },
+    { status: "QUEUED", createdAt: { gte: staleCutoff } },
+  ];
+}
+
+/** SA-04 (D6): a job still running for any of the workspace's sites would land
+ *  a deployment after the deletion job's take-down. Stranded rows (past the
+ *  cutoffs above) do not count — nothing will ever finish them. */
+export async function hasPublishInFlight(workspaceId: string): Promise<boolean> {
+  const job = await prisma.publishBuildJob.findFirst({
+    where: {
+      site: { workspaceId },
+      OR: liveJobFilter(
+        new Date(Date.now() - STALE_QUEUED_AFTER_MS),
+        new Date(Date.now() - STALE_BUILDING_AFTER_MS),
+      ),
+    },
+    select: { id: true },
+  });
+  return job != null;
+}
+
 /**
  * Hand the job to the worker route. The route is long-running by design
  * (maxDuration=300 — the entire build runs inside the POST), so we cannot
@@ -272,15 +298,7 @@ export async function startPublish(
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
   const existing = await prisma.publishBuildJob.findFirst({
-    where: {
-      siteId,
-      OR: [
-        // startedAt gte cutoff = worker still plausibly alive. A BUILDING row
-        // with null startedAt can't match gte and is treated as stale.
-        { status: { in: ["BUILDING", "DEPLOYING"] }, startedAt: { gte: buildingCutoff } },
-        { status: "QUEUED", createdAt: { gte: staleCutoff } },
-      ],
-    },
+    where: { siteId, OR: liveJobFilter(staleCutoff, buildingCutoff) },
   });
   if (existing) {
     throw new Error("ALREADY_PUBLISHING");

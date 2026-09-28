@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/server/services/stripe.client";
-import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
+import { hasPublishInFlight, takeDownSiteForDeletion } from "@/server/services/publish.service";
 import type { UpdateWorkspaceInput } from "@buildrik/shared/schemas/account";
 
 /** Thrown when the user already has a workspace by this name (case-insensitive). */
@@ -151,10 +151,19 @@ export async function updateWorkspaceSettings(
 
 export async function deleteWorkspace(workspaceId: string) {
   const scheduledAt = new Date(Date.now() + 30 * 86400000);
-  await prisma.workspace.update({
-    where: { id: workspaceId },
-    data: { deletionScheduledAt: scheduledAt },
-  });
+  // SA-04 (D6): a pending scheduled publish would fire into a workspace being
+  // taken down. Close them with the schedule; startPublish refuses from here on.
+  const sites = await prisma.site.findMany({ where: { workspaceId }, select: { id: true } });
+  await prisma.$transaction([
+    prisma.workspace.update({
+      where: { id: workspaceId },
+      data: { deletionScheduledAt: scheduledAt },
+    }),
+    prisma.scheduledPublish.updateMany({
+      where: { status: "PENDING", OR: [{ workspaceId }, { siteId: { in: sites.map((s) => s.id) } }] },
+      data: { status: "CANCELLED", error: "WORKSPACE_DELETION_SCHEDULED" },
+    }),
+  ]);
   return { scheduledAt };
 }
 
@@ -185,20 +194,51 @@ async function cancelStripeSubscription(stripeSubscriptionId: string): Promise<v
   }
 }
 
+/** Why a due workspace was kept this run. `error` needs a human (the cron
+ *  answers 500); `in-flight` and `cancelled` resolve on their own. */
+export type WorkspaceDeletionSkip = {
+  workspaceId: string;
+  kind: "error" | "in-flight" | "cancelled";
+  reason: string;
+};
+
+function errorText(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
 /**
- * SA-04: carry out deletions whose 30-day grace period has passed. Order per
- * workspace: cancel billing, take published sites offline, delete the row.
- * Only the Workspace row is deleted — its relations cascade; User rows stay.
+ * SA-04 (D6): carry out deletions whose 30-day grace period has passed. Order
+ * per workspace: cancel billing, take every published site offline, delete the
+ * row. The delete cascades away the Vercel token and the deployment ids, so it
+ * runs only once every take-down reported ok — otherwise the workspace is kept
+ * and retried next run. Billing may already be cancelled by then; the workspace
+ * then sits on FREE until a later run finishes. Only the Workspace row is
+ * deleted — its relations cascade; User rows stay.
  */
-export async function processDueWorkspaceDeletions(now: Date): Promise<{ deleted: number; skipped: number }> {
+export async function processDueWorkspaceDeletions(
+  now: Date,
+): Promise<{ deleted: number; skipped: WorkspaceDeletionSkip[] }> {
   const due = await prisma.workspace.findMany({
     where: { deletionScheduledAt: { lte: now } },
     select: { id: true },
     orderBy: { deletionScheduledAt: "asc" },
   });
   let deleted = 0;
-  let skipped = 0;
+  const skipped: WorkspaceDeletionSkip[] = [];
+  const skip = (workspaceId: string, kind: WorkspaceDeletionSkip["kind"], reason: string) => {
+    if (kind === "error") console.error(`[workspace-deletion] kept ${workspaceId}; retrying next run: ${reason}`);
+    skipped.push({ workspaceId, kind, reason });
+  };
   for (const ws of due) {
+    try {
+      if (await hasPublishInFlight(ws.id)) {
+        skip(ws.id, "in-flight", "publish in flight");
+        continue;
+      }
+    } catch (e) {
+      skip(ws.id, "error", `publish-job check failed: ${errorText(e)}`);
+      continue;
+    }
     try {
       const sub = await prisma.subscription.findUnique({
         where: { workspaceId: ws.id },
@@ -206,28 +246,34 @@ export async function processDueWorkspaceDeletions(now: Date): Promise<{ deleted
       });
       if (sub) await cancelStripeSubscription(sub.stripeSubscriptionId);
     } catch (e) {
-      console.error(`[workspace-deletion] Stripe cancel failed for ${ws.id}; retrying next run:`, e instanceof Error ? e.message : e);
-      skipped++;
+      skip(ws.id, "error", `Stripe cancel failed: ${errorText(e)}`);
       continue;
     }
     try {
+      // Any COMPLETED deployment, whatever the site's status now (an earlier
+      // failed take-down leaves a DRAFT that still serves), soft-deleted sites
+      // included — the cascade removes them too.
       const sites = await prisma.site.findMany({
-        where: { workspaceId: ws.id },
-        select: { id: true, status: true, publishedUrl: true },
+        where: { workspaceId: ws.id, publishJobs: { some: { status: "COMPLETED", deploymentId: { not: null } } } },
+        select: { id: true },
       });
-      for (const s of sites.filter(hasLiveDeployment)) {
-        await unpublishSite(s.id).catch((e: unknown) =>
-          console.error(`[workspace-deletion] take-down failed for site ${s.id}:`, e instanceof Error ? e.message : e));
+      const failures: string[] = [];
+      for (const s of sites) {
+        const res = await takeDownSiteForDeletion(s.id);
+        if (!res.ok) failures.push(`site ${s.id}: ${res.reason}`);
+      }
+      if (failures.length > 0) {
+        skip(ws.id, "error", failures.join("; "));
+        continue;
       }
       // Re-checks the date so a deletion the owner cancelled mid-run survives.
       const { count } = await prisma.workspace.deleteMany({
         where: { id: ws.id, deletionScheduledAt: { lte: now } },
       });
       if (count === 1) deleted++;
-      else skipped++;
+      else skip(ws.id, "cancelled", "deletion cancelled");
     } catch (e) {
-      console.error(`[workspace-deletion] delete failed for ${ws.id}:`, e instanceof Error ? e.message : e);
-      skipped++;
+      skip(ws.id, "error", `take-down or delete failed: ${errorText(e)}`);
     }
   }
   return { deleted, skipped };

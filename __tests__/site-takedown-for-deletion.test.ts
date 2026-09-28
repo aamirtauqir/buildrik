@@ -22,12 +22,12 @@ vi.mock("@/lib/vercel", async (importOriginal) => ({
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     site: { findUnique: vi.fn(), update: vi.fn() },
-    publishBuildJob: { findMany: vi.fn() },
+    publishBuildJob: { findMany: vi.fn(), findFirst: vi.fn() },
   },
 }));
 
 import { prisma } from "@/lib/prisma";
-import { takeDownSiteForDeletion } from "@/server/services/publish.service";
+import { hasPublishInFlight, takeDownSiteForDeletion } from "@/server/services/publish.service";
 
 const SITE = {
   workspaceId: "w1",
@@ -115,5 +115,25 @@ describe("takeDownSiteForDeletion", () => {
     vi.mocked(prisma.site.findUnique).mockResolvedValue(null);
     await expect(takeDownSiteForDeletion("s1")).resolves.toEqual({ ok: true });
     expect(deleteDep).not.toHaveBeenCalled();
+  });
+});
+
+describe("hasPublishInFlight", () => {
+  it("looks for a live (not stranded) job on any of the workspace's sites", async () => {
+    vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue({ id: "j1" } as never);
+    await expect(hasPublishInFlight("w1")).resolves.toBe(true);
+    const where = vi.mocked(prisma.publishBuildJob.findFirst).mock.calls[0][0]?.where;
+    expect(where).toMatchObject({
+      site: { workspaceId: "w1" },
+      OR: [
+        { status: { in: ["BUILDING", "DEPLOYING"] }, startedAt: { gte: expect.any(Date) } },
+        { status: "QUEUED", createdAt: { gte: expect.any(Date) } },
+      ],
+    });
+  });
+
+  it("false when there is none", async () => {
+    vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue(null);
+    await expect(hasPublishInFlight("w1")).resolves.toBe(false);
   });
 });
