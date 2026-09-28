@@ -10,6 +10,7 @@ import { Popover, Button, TextField } from "@/editor/chrome-ui";
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useInspectorField } from "./InspectorFieldContext";
+import { FieldDot } from "./FieldDot";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
@@ -160,7 +161,10 @@ export const ColorInput: React.FC<ColorInputProps> = ({
 
   return (
     <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
-      <label className="bdi-lb" data-testid={labelTestId(label)}>{label}</label>
+      <label className="bdi-lb" data-testid={labelTestId(label)}>
+        {label}
+        <FieldDot field={field} />
+      </label>
       <div className="bdi-row-content">
         <Popover
           open={isOpen}

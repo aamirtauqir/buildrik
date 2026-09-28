@@ -8,6 +8,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { InputRow, SelectRow } from "../InputControls";
 import { ControlRow } from "../ControlRow";
+import { FontPicker } from "../../../sections/typography/FontPicker";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "../InspectorFieldContext";
 
 const ctx = (over: Partial<InspectorFieldContextValue> = {}): InspectorFieldContextValue => ({
@@ -52,5 +53,17 @@ describe("InspectorFieldContext", () => {
     fireEvent.click(dots[0]);
     fireEvent.click(screen.getByRole("menuitem", { name: "Reset to Desktop" }));
     expect(resetOverride).toHaveBeenCalledWith("width", "breakpoint");
+  });
+
+  it("the Font row (font-family) draws its dot and is not changeable while read-only", () => {
+    render(
+      <InspectorFieldContext.Provider
+        value={ctx({ readOnly: true, readOnlyReason: "locked", overrides: new Map([["font-family", ["pseudo"]]]), overrideLabels: { pseudo: ":hover" } })}
+      >
+        <FontPicker value="Inter, sans-serif" onChange={() => {}} />
+      </InspectorFieldContext.Provider>
+    );
+    expect(screen.getByRole("button", { name: "Overridden on :hover" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Font family" })).toBeDisabled();
   });
 });

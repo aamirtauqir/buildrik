@@ -12,6 +12,8 @@ import { loadGoogleFont, type GoogleFont } from "../../../../services/GoogleFont
 import { FontPickerPanel, namesFont, primaryFamily } from "./FontPickerDropdown";
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "../../shared/controls";
+import { FieldDot } from "../../shared/controls/FieldDot";
+import { useInspectorField } from "../../shared/controls/InspectorFieldContext";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../engine";
 // ============================================================================
@@ -85,6 +87,7 @@ export function useUploadedFonts(composer: Composer | null | undefined): SystemF
 }
 
 export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, composer }) => {
+  const field = useInspectorField("font-family");
   const [showFontPicker, setShowFontPicker] = React.useState(false);
   const uploadedFonts = useUploadedFonts(composer);
 
@@ -134,7 +137,10 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
        row in the panel that did either. The one style left inline is the
        preview typeface, which is the field's value and cannot be a class. */
     <div className="bdi-row-ctrl tw:relative" data-testid={rowTestId("Font")}>
-      <label className="bdi-lb" data-testid={labelTestId("Font")}>Font</label>
+      <label className="bdi-lb" data-testid={labelTestId("Font")}>
+        Font
+        <FieldDot field={field} />
+      </label>
       {/* Current Font Display / Toggle Button */}
       <Button
         onClick={() => setShowFontPicker(!showFontPicker)}
@@ -142,6 +148,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
         aria-expanded={showFontPicker}
         aria-controls="font-picker-listbox"
         aria-label="Font family"
+        disabled={field.readOnly}
         data-testid={fieldTestId("Font")}
         data-font-source={uploaded ? "uploaded" : undefined}
         className="bdi-ddn tw:justify-between tw:text-left"
