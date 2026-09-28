@@ -39,7 +39,6 @@
     "packages/editor/src/editor/inspector/shared/controls/ButtonControls.tsx",
     "packages/editor/src/editor/inspector/shared/controls/ControlRow.tsx",
     "packages/editor/src/editor/inspector/shared/controls/MixedValueIndicator.tsx",
-    "packages/editor/src/editor/inspector/shared/controls/PresetGrids.tsx",
     "packages/editor/src/editor/inspector/shared/controls/Section.tsx",
     "packages/editor/src/editor/inspector/shared/controls/TextControls.tsx",
     "packages/editor/src/editor/inspector/tabs/InspectorTabContent.tsx",

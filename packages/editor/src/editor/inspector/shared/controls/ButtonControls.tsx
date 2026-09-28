@@ -1,6 +1,6 @@
 /**
  * Button Group controls — ported to .bdi-seg per comp-inspector.v1.
- * ButtonGroup = full-row segmented control. CompactButtonGroup = dense variant.
+ * ButtonGroup = full-row segmented control.
  *
  * @license BSD-3-Clause
  */
@@ -75,63 +75,6 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
         {label}
         <FieldDot field={field} />
       </label>
-      <div className="bdi-row-content">{segment}</div>
-    </div>
-  );
-};
-
-// ============================================================================
-// COMPACT BUTTON GROUP (short inline variant)
-// ============================================================================
-
-export interface CompactButtonGroupProps {
-  label?: string;
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (value: string) => void;
-  labelWidth?: number;
-}
-
-export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
-  label,
-  value,
-  options,
-  onChange,
-}) => {
-  const segment = (
-    <div
-      className="bdi-seg"
-      style={{
-        gridAutoColumns: `repeat(${options.length}, 1fr)`,
-        height: 22,
-      }}
-    >
-      {options.map((opt) => (
-        <Button
-          key={opt.value}
-          type="button"
-          /* One anchor per segment, so a recipe can drive a real style write
-             (the breakpoint-override state has no other way in — it needs a
-             value CHANGED on a non-base breakpoint). Prefix-first for
-             `check-anchors`'s template matcher. */
-          data-testid={label ? segTestId(label, opt.value) : undefined}
-          className={value === opt.value ? "on" : ""}
-          onClick={() => onChange(opt.value)}
-          title={opt.label}
-          aria-label={opt.label}
-          aria-pressed={value === opt.value}
-        >
-          {opt.label}
-        </Button>
-      ))}
-    </div>
-  );
-
-  if (!label) return segment;
-
-  return (
-    <div className="bdi-row-ctrl">
-      <label className="bdi-lb">{label}</label>
       <div className="bdi-row-content">{segment}</div>
     </div>
   );

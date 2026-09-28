@@ -2,9 +2,9 @@
  * Threading regression for the Create Collection prop path.
  *
  * Guards: ProInspector forwards its `onOpenCreateCollection` prop into the
- * tab content, which hands it to Settings › CONTENT (the binding door moved
- * there from the header — G2-144). ContentSection's own test covers the
- * downstream hop (its Create collection button invokes the prop). This test covers the hop
+ * tab content, which hands it to Behaviour › CMS binding (the binding door
+ * moved there from the header — G2-144). CmsBindingSection's own test covers
+ * the downstream hop (its "+ New collection…" invokes the prop). This test covers the hop
  * above — a rename on either side, or accidentally dropping the prop
  * spread, would make the spy observed here fire with the wrong shape or
  * not at all.
