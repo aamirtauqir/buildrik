@@ -160,7 +160,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
             size="xs"
             data-testid="component-edit-master"
             className={EDIT_MASTER}
-            onClick={() => requestOpenMaster(composer, component.id)}
+            onClick={() => requestOpenMaster(composer, component.id, instanceId)}
           >
             <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-left">Edit master</span>
             <ExternalLink size={12} aria-hidden="true" className="tw:shrink-0" />

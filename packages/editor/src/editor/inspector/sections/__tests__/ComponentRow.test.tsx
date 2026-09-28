@@ -141,7 +141,7 @@ describe("ComponentRow — board 26", () => {
     renderRow(composer);
     fireEvent.click(screen.getByTestId("component-edit-master"));
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "components" });
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "comp-1" });
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "comp-1", instanceId: "el-1" });
   });
 
   it("⋯ holds exactly Reset to master and Detach instance…", () => {
@@ -195,6 +195,6 @@ describe("ComponentRow — board 26", () => {
       expect(screen.getByRole("menuitem", { name }).getAttribute("aria-disabled")).toBe("true");
     }
     fireEvent.click(screen.getByTestId("component-edit-master"));
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "comp-1" });
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "comp-1", instanceId: "el-1" });
   });
 });
