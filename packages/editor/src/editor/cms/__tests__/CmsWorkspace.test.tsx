@@ -179,6 +179,27 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
+  it("Open record: the sheet carries ‹ Back to canvas — one step closes it and goes back", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
+    cmsWorkspace.openCollection("col-1");
+    cmsWorkspace.openRecord("r1");
+    const onBack = vi.fn();
+    render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
+    const sheet = await screen.findByTestId("cms-sheet");
+    fireEvent.click(within(sheet).getByRole("button", { name: "‹ Back to canvas" }));
+    expect(onBack).toHaveBeenCalledTimes(1);
+    expect(cmsWorkspace.get().recordId).toBeNull();
+  });
+
+  it("the sheet has no back to the canvas on the rail's own visit", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
+    cmsWorkspace.openCollection("col-1");
+    cmsWorkspace.openRecord("r1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    const sheet = await screen.findByTestId("cms-sheet");
+    expect(within(sheet).queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+  });
+
   it("no back action without one (the rail's own visit)", async () => {
     const { composer } = makeEngine({ collections: [FULL], items: [] });
     cmsWorkspace.openCollection("col-1");

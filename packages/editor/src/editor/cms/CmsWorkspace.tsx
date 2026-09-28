@@ -26,6 +26,7 @@ import { AddFieldDialog } from "./AddFieldDialog";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
+import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
 
@@ -57,9 +58,6 @@ const TAB =
   "tw:aria-selected:border-[var(--bk-accent)] tw:aria-selected:text-[var(--bk-accent-text)]";
 
 /* A quiet 28-tall action at the header's start; a rule parts it from the title. */
-const BACK =
-  "tw:-ml-2 tw:h-7 tw:border-0 tw:bg-transparent tw:px-2 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium " +
-  "tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0";
 
 const TABS = [
   { id: "records", label: "Records" },
@@ -357,6 +355,17 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           collection={collection}
           record={sheetRecord}
           onClose={() => cmsWorkspace.openRecord(null)}
+          /* The sheet covers the workspace header: opened from an element
+             (Open record ›), its own back closes it and returns to the
+             canvas in one step (§13). */
+          onBackToCanvas={
+            onBackToCanvas
+              ? () => {
+                  cmsWorkspace.openRecord(null);
+                  onBackToCanvas();
+                }
+              : undefined
+          }
           onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
           onSave={(data, published) =>
             panel.saveRecord(collection.id, ws.recordId === "new" ? null : ws.recordId, data, published)
