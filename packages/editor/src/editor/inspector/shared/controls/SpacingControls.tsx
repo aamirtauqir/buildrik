@@ -49,7 +49,11 @@ const parseValue = (val: string): { num: string; unit: string; isKeyword: boolea
 const CELL = "tw:relative tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:min-w-7 tw:shrink-0";
 /* The number itself: Geist Mono 12, no frame until hovered / focused.
    TextField's base classes are not merged away, so the conflicting ones win
-   by `!`, not by stylesheet order. */
+   by `!`, not by stylesheet order.
+   TARGET-SIZE EXCEPTION (WCAG 2.5.8, owner call 2026-09-28): the box's
+   numbers stay 16 tall × ≥28 wide, as boards 1 / 16 / 21 / 26 draw them —
+   the nested margin / padding rings leave no room for 24px rows without
+   redrawing the box. Every side is also reachable by Tab and ↑ / ↓. */
 const AXIS_INPUT =
   "tw:h-4! tw:min-w-7! tw:max-w-14! tw:w-auto! tw:[field-sizing:content] tw:px-0! tw:py-0! tw:rounded-[2px]! tw:border-transparent! tw:bg-transparent! tw:text-center " +
   "tw:[font-family:var(--bk-font-mono)]! tw:text-[12px]! tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]! " +

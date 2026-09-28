@@ -32,8 +32,11 @@ export interface BreadcrumbProps {
   "data-testid"?: string;
 }
 
+/* Each crumb is a 24px target (WCAG 2.5.8) drawn as 16px text: 24 tall with
+   the extra 8 given back by a negative margin, at least 24 wide (the "…"
+   crumb centres in it), so the row keeps the board's 16px line. */
 const CRUMB =
-  "tw:min-w-0 tw:max-w-[120px] tw:truncate tw:border-0 tw:bg-transparent tw:p-0 tw:cursor-pointer " +
+  "tw:h-6 tw:-my-1 tw:min-w-6 tw:max-w-[120px] tw:truncate tw:border-0 tw:bg-transparent tw:p-0 tw:cursor-pointer " +
   "tw:[font-family:var(--bk-font-ui)] tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)] " +
   "tw:rounded-[2px] tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const CURRENT = "tw:shrink-0 tw:whitespace-nowrap tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";

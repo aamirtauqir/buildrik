@@ -41,8 +41,11 @@ export interface ContextRowProps {
 
 const CHIP =
   "tw:h-6 tw:gap-1.5 tw:rounded-[4px] tw:border-0 tw:px-1.5 tw:text-[12px] tw:font-normal tw:leading-4";
+/* A 24px target (WCAG 2.5.8) drawn as the board's 16px text link: the box is
+   24 tall and wide, the negative margin gives the extra 8 back to the line,
+   and nothing but the text paints. */
 const LINK =
-  "tw:h-4 tw:min-h-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)] " +
+  "tw:h-6 tw:min-h-0 tw:min-w-6 tw:-my-1 tw:justify-center tw:border-0 tw:bg-transparent tw:p-0 tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)] " +
   "tw:hover:bg-transparent tw:hover:text-[var(--bk-ink)] tw:hover:underline";
 const NOTE = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap";
 const LINE = "tw:flex tw:items-center tw:gap-1 tw:px-1.5";
