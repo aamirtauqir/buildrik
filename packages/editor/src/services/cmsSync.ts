@@ -166,19 +166,19 @@ export function onCmsSyncError(cb: (info: CmsSyncErrorInfo) => void): () => void
   return queue.onError(cb);
 }
 
-/** How many CMS changes are queued for retry (not yet on the server). */
+/** How many CMS changes are queued for retry (not yet on the server). Excludes
+ *  in-flight mirrors — use `cmsSyncBlocker` for the publish-gate count, which
+ *  includes both queued and in-flight work. */
 export function getCmsSyncPendingCount(): number {
   return queue.pendingCount();
 }
 
-/* Task 8 stand-in for the full Task 6 `cmsSyncBlocker` (still pending): refuse
-   publish only when there are queued retries OR the hydrate is in flight. The
-   in-flight check is conservative — an in-flight hydrate is usually quick and
-   almost always converges with what publish would fetch — but it stops publish
-   from running with a half-hydrated store, which was the bug this gate exists
-   to prevent. Replaced by the real blocker once Task 6 lands. */
+/* Publish-gate seam (Task 8). Refuse publish when there are queued retries OR
+   an in-flight mirror — an in-flight mirror has to count, or publish can hand
+   off a row that hasn't landed (P1-A audit 2026-09-30; the original
+   `pendingCount()`-only read let publish race a mirror call). */
 export function cmsSyncBlocker(): string | null {
-  const pending = getCmsSyncPendingCount();
+  const pending = queue.outstandingCount();
   if (pending > 0) {
     const noun = pending === 1 ? "change hasn't" : "changes haven't";
     return `${pending} CMS ${noun} reached the server yet. Retry the sync, then publish.`;
@@ -197,7 +197,7 @@ export async function fetchPublishSnapshot(
   siteId: string,
   collectionIds: string[]
 ): Promise<{ cms: CmsRows; siteFonts: ReadonlyArray<{ filename: string; url: string }> }> {
-  return (await client().cms.publishSnapshot.query({ siteId, collectionIds })) as {
+  return (await client().cms.publishSnapshot.mutate({ siteId, collectionIds })) as {
     cms: CmsRows;
     siteFonts: ReadonlyArray<{ filename: string; url: string }>;
   };

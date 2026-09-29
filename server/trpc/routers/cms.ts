@@ -148,7 +148,7 @@ export const cmsRouter = router({
   // What a publish renders CMS content from: the server's live, published rows
   // for the collections the project binds, plus the site fonts a scratch
   // render needs. EDITOR-gated like the publish it feeds.
-  publishSnapshot: protectedProcedure.input(publishSnapshotInput).query(async ({ ctx, input }) => {
+  publishSnapshot: protectedProcedure.input(publishSnapshotInput).mutation(async ({ ctx, input }) => {
     await requireWrite(ctx, input.siteId);
     const [cms, siteFonts] = await Promise.all([
       getPublishedCmsForCollections(input.siteId, input.collectionIds),
