@@ -21,7 +21,7 @@ import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 
 export class CmsError extends Error {
   constructor(
-    public code: "NOT_FOUND" | "BAD_REQUEST",
+    public code: "NOT_FOUND" | "BAD_REQUEST" | "CONFLICT" | "GONE",
     message: string,
   ) {
     super(message);
@@ -88,7 +88,7 @@ function stripMarkup(value: string): string {
 
 export async function listCollections(siteId: string) {
   const rows = await prisma.cmsCollection.findMany({
-    where: { siteId },
+    where: { siteId, deletedAt: null },
     orderBy: { name: "asc" },
     include: { _count: { select: { entries: true } } },
   });
@@ -112,8 +112,12 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
     // Upsert by the editor-supplied id (engine collection id = DB id, so the
     // first sync creates and later syncs update). Reject only a real cross-site
     // collision — a row with this id already owned by a DIFFERENT site.
-    const existing = await prisma.cmsCollection.findUnique({ where: { id: input.id }, select: { siteId: true } });
+    const existing = await prisma.cmsCollection.findUnique({
+      where: { id: input.id },
+      select: { siteId: true, deletedAt: true },
+    });
     if (existing && existing.siteId !== siteId) throw new CmsError("NOT_FOUND", "Collection not found");
+    if (existing?.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
     return prisma.cmsCollection.upsert({
       where: { id: input.id },
       create: { id: input.id, siteId, ...data },
@@ -124,16 +128,26 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
 }
 
 export async function deleteCollection(siteId: string, id: string): Promise<void> {
-  const owned = await prisma.cmsCollection.findFirst({ where: { id, siteId }, select: { id: true } });
+  const owned = await prisma.cmsCollection.findFirst({
+    where: { id, siteId, deletedAt: null },
+    select: { id: true, slug: true },
+  });
   if (!owned) throw new CmsError("NOT_FOUND", "Collection not found");
-  await prisma.cmsCollection.delete({ where: { id } });
+  const now = new Date();
+  await prisma.$transaction([
+    prisma.cmsEntry.updateMany({ where: { collectionId: id, deletedAt: null }, data: { deletedAt: now } }),
+    prisma.cmsCollection.update({
+      where: { id },
+      data: { deletedAt: now, slug: `${owned.slug}~deleted~${id}` },
+    }),
+  ]);
 }
 
 // Confirm the collection is in this site before any entry op — entries key on
 // collectionId alone, so this is the cross-site guard.
 async function assertCollectionInSite(siteId: string, collectionId: string): Promise<void> {
   const owned = await prisma.cmsCollection.findFirst({
-    where: { id: collectionId, siteId },
+    where: { id: collectionId, siteId, deletedAt: null },
     select: { id: true },
   });
   if (!owned) throw new CmsError("NOT_FOUND", "Collection not found");
@@ -141,7 +155,10 @@ async function assertCollectionInSite(siteId: string, collectionId: string): Pro
 
 export async function listEntries(siteId: string, collectionId: string) {
   await assertCollectionInSite(siteId, collectionId);
-  return prisma.cmsEntry.findMany({ where: { collectionId }, orderBy: { updatedAt: "desc" } });
+  return prisma.cmsEntry.findMany({
+    where: { collectionId, deletedAt: null },
+    orderBy: { updatedAt: "desc" },
+  });
 }
 
 export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
@@ -153,9 +170,10 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
   if (input.id) {
     const existing = await prisma.cmsEntry.findUnique({
       where: { id: input.id },
-      select: { collection: { select: { siteId: true } } },
+      select: { deletedAt: true, collection: { select: { siteId: true } } },
     });
     if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
+    if (existing?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
     return prisma.cmsEntry.upsert({
       where: { id: input.id },
       create: { id: input.id, collectionId: input.collectionId, ...data },
@@ -167,11 +185,11 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
 
 export async function deleteEntry(siteId: string, id: string): Promise<void> {
   const owned = await prisma.cmsEntry.findFirst({
-    where: { id, collection: { siteId } },
+    where: { id, deletedAt: null, collection: { siteId } },
     select: { id: true },
   });
   if (!owned) throw new CmsError("NOT_FOUND", "Entry not found");
-  await prisma.cmsEntry.delete({ where: { id } });
+  await prisma.cmsEntry.update({ where: { id }, data: { deletedAt: new Date() } });
 }
 
 // ── CSV import ────────────────────────────────────────────────────────────
@@ -186,7 +204,10 @@ interface CmsFieldShape {
 }
 
 async function loadCollectionFields(siteId: string, collectionId: string): Promise<CmsFieldShape[]> {
-  const col = await prisma.cmsCollection.findFirst({ where: { id: collectionId, siteId }, select: { fields: true } });
+  const col = await prisma.cmsCollection.findFirst({
+    where: { id: collectionId, siteId, deletedAt: null },
+    select: { fields: true },
+  });
   if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
   const fields = col.fields as unknown;
   if (!Array.isArray(fields)) return [];
@@ -363,7 +384,7 @@ export async function findStaleTemplateBindings(
   pages: { slug: string; isHomePage: boolean; name?: string }[],
 ): Promise<StaleTemplateBindingsResult> {
   const cols = await prisma.cmsCollection.findMany({
-    where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
+    where: { siteId, deletedAt: null, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
     select: { id: true, name: true, pageTemplatePath: true },
   });
   if (cols.length === 0) return { hasPageGeneratingCollections: false, stale: [], templates: [] };
@@ -395,13 +416,13 @@ export async function resolveDynamicPages(
   collectionId: string,
 ): Promise<DynamicPage[]> {
   const col = await prisma.cmsCollection.findFirst({
-    where: { id: collectionId, siteId },
+    where: { id: collectionId, siteId, deletedAt: null },
     select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true },
   });
   if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
   if (!col.pageSlugPattern) return [];
   const entries = await prisma.cmsEntry.findMany({
-    where: { collectionId, status: "PUBLISHED" },
+    where: { collectionId, status: "PUBLISHED", deletedAt: null },
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
@@ -481,13 +502,13 @@ export async function generateDynamicPages(
   templateHtml: string,
 ): Promise<GeneratedPage[]> {
   const col = await prisma.cmsCollection.findFirst({
-    where: { id: collectionId, siteId },
+    where: { id: collectionId, siteId, deletedAt: null },
     select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true },
   });
   if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
   if (!col.pageSlugPattern) return [];
   const entries = await prisma.cmsEntry.findMany({
-    where: { collectionId, status: "PUBLISHED" },
+    where: { collectionId, status: "PUBLISHED", deletedAt: null },
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
@@ -527,7 +548,7 @@ export async function generateDynamicPages(
 export async function getPublishedCmsForBindings(siteId: string, fieldsByCollection: ReadonlyMap<string, ReadonlySet<string>>) {
   if (fieldsByCollection.size === 0) return { collections: [], entries: [] };
   const rows = await prisma.cmsCollection.findMany({
-    where: { siteId, id: { in: [...fieldsByCollection.keys()] } },
+    where: { siteId, deletedAt: null, id: { in: [...fieldsByCollection.keys()] } },
     select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
   });
   const keep = (c: { id: string; displayField: string | null }) =>
@@ -543,7 +564,7 @@ export async function getPublishedCmsForBindings(siteId: string, fieldsByCollect
     rows.map(async (c) => {
       const slugs = keep(c);
       const found = await prisma.cmsEntry.findMany({
-        where: { collectionId: c.id, status: "PUBLISHED" },
+        where: { collectionId: c.id, status: "PUBLISHED", deletedAt: null },
         orderBy: { updatedAt: "desc" },
         take: CMS_COLLECTION_LIMIT_MAX,
         select: { id: true, collectionId: true, data: true, status: true, createdAt: true, updatedAt: true },
@@ -555,6 +576,27 @@ export async function getPublishedCmsForBindings(siteId: string, fieldsByCollect
     }),
   );
   return { collections, entries: perCollection.flat() };
+}
+
+/**
+ * The CMS rows a publish renders from: every field of the collections the
+ * project binds, and their live PUBLISHED entries, newest first (the editor
+ * store's order, so an itemId-less binding resolves the same record here as on
+ * the canvas). Unlike the share draft this is not projected — the caller is an
+ * EDITOR publishing the site, not an anonymous visitor.
+ */
+export async function getPublishedCmsForCollections(siteId: string, collectionIds: readonly string[]) {
+  if (collectionIds.length === 0) return { collections: [], entries: [] };
+  const collections = await prisma.cmsCollection.findMany({
+    where: { siteId, deletedAt: null, id: { in: [...collectionIds] } },
+    select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
+  });
+  const entries = await prisma.cmsEntry.findMany({
+    where: { collectionId: { in: collections.map((c) => c.id) }, status: "PUBLISHED", deletedAt: null },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, collectionId: true, data: true, status: true, createdAt: true, updatedAt: true },
+  });
+  return { collections, entries };
 }
 
 /**
@@ -571,7 +613,7 @@ export async function appendDynamicPagesToPublish(
   pages: Array<{ path: string; html: string }>,
 ): Promise<Array<{ path: string; html: string }>> {
   const cols = await prisma.cmsCollection.findMany({
-    where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
+    where: { siteId, deletedAt: null, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
     select: { id: true, pageTemplatePath: true },
   });
   if (cols.length === 0) return pages;

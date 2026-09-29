@@ -449,12 +449,14 @@ model CmsCollection {
   pageTemplatePath   String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  deletedAt          DateTime?
 
   site    Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
   entries CmsEntry[]
 
   @@unique([siteId, slug])
   @@index([siteId])
+  @@index([siteId, deletedAt])
   @@map("cms_collections")
 }
 
@@ -465,10 +467,12 @@ model CmsEntry {
   status       String   @default("DRAFT") // DRAFT | PUBLISHED
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
 
   collection CmsCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   @@index([collectionId, status])
+  @@index([collectionId, deletedAt])
   @@map("cms_entries")
 }
 
