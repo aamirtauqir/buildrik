@@ -37,8 +37,10 @@ describe("RecoveryBanner", () => {
 
   it("shows a recovery banner after a crash, with scope, and clears the sentinel", async () => {
     seedCrash();
-    /* Default serverEditedAt returns null, so no "server newer" check trips. */
-    renderBanner({ serverEditedAt: async () => null });
+    /* P0-F (audit 2026-09-30): server state known AND older than the local copy
+       is the only safe way to show the banner. Pass an old server clock so the
+       banner reveals. */
+    renderBanner({ serverEditedAt: async () => new Date(0).toISOString() });
     await waitFor(() => expect(screen.getByText(/recovered your work/i)).toBeInTheDocument());
     expect(screen.getByText(/3 pages/i)).toBeInTheDocument();
     // consuming the sentinel means a re-render / reload won't re-show it
@@ -47,7 +49,7 @@ describe("RecoveryBanner", () => {
 
   it("Keep changes dismisses the banner", async () => {
     seedCrash();
-    renderBanner({ serverEditedAt: async () => null });
+    renderBanner({ serverEditedAt: async () => new Date(0).toISOString() });
     await waitFor(() => screen.getByText(/recovered your work/i));
     fireEvent.click(screen.getByRole("button", { name: /keep changes/i }));
     expect(screen.queryByText(/recovered your work/i)).not.toBeInTheDocument();
@@ -57,11 +59,22 @@ describe("RecoveryBanner", () => {
     seedCrash();
     localStorage.setItem("buildrick-project", JSON.stringify({ project: {} }));
     const reload = vi.fn();
-    renderBanner({ reloadFn: reload, serverEditedAt: async () => null });
+    renderBanner({ reloadFn: reload, serverEditedAt: async () => new Date(0).toISOString() });
     await waitFor(() => screen.getByText(/recovered your work/i));
     fireEvent.click(screen.getByRole("button", { name: /discard/i }));
     expect(localStorage.getItem("buildrick-project")).toBeNull();
     expect(reload).toHaveBeenCalled();
+  });
+
+  it("stays hidden when the server state is unknown (P0-F safety inversion)", async () => {
+    /* Audit 2026-09-30: previous default flipped on null to `serverNewer=false`,
+       showing the banner on every network failure. Showing "Keep changes" then
+       silently keeps local work over a server we couldn't reach — the inverse
+       of the safe default. The banner must stay hidden until the server is
+       reachable. */
+    seedCrash();
+    renderBanner({ serverEditedAt: async () => null });
+    await waitFor(() => expect(screen.queryByRole("status", { name: /recovered work/i })).toBeNull());
   });
 
   it("stays hidden when the server holds newer work than the recovered copy (RT-10)", async () => {
