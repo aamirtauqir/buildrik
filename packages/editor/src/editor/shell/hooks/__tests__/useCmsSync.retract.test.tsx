@@ -18,6 +18,7 @@ let pending = 0;
 const retrySpy = vi.fn(() => Promise.resolve());
 
 vi.mock("../../../../services/cmsSync", () => ({
+  bindCmsEngine: () => () => {},
   hydrateCmsFromServer: () => Promise.resolve(),
   onCmsSyncError: (cb: (info: { pending: number }) => void) => {
     errCb = cb;
@@ -25,6 +26,7 @@ vi.mock("../../../../services/cmsSync", () => ({
       errCb = null;
     };
   },
+  onCmsConflict: () => () => {},
   getCmsSyncPendingCount: () => pending,
   retryCmsSync: () => retrySpy(),
   syncCollectionUpsert: vi.fn(),

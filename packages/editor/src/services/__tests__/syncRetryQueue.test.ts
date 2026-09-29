@@ -115,3 +115,26 @@ describe("totalPendingMirrors", () => {
     expect(totalPendingMirrors()).toBe(before);
   });
 });
+
+/* C0a (Task 6): publish waits on the CMS queue, so an in-flight mirror has
+   to count. And publish may want to wait for one specific mirror to finish —
+   `settled(key)` resolves when the latest run for that key is done. */
+describe("SyncRetryQueue — pending includes in-flight, settled awaits", () => {
+  it("counts an op as pending while it is in flight", async () => {
+    const q = new SyncRetryQueue();
+    let release!: () => void;
+    const p = q.run("k", () => new Promise<void>((r) => (release = r)), () => {});
+    expect(q.outstandingCount()).toBe(1);
+    release();
+    await p;
+    expect(q.outstandingCount()).toBe(0);
+  });
+
+  it("settled(key) resolves with the run's outcome", async () => {
+    const q = new SyncRetryQueue();
+    void q.run("ok", async () => {}, () => {});
+    void q.run("bad", async () => { throw new Error("x"); }, () => {});
+    await expect(q.settled("ok")).resolves.toBe(true);
+    await expect(q.settled("bad")).resolves.toBe(false);
+  });
+});

@@ -56,6 +56,7 @@ export function totalPendingMirrors(): number {
 
 export class SyncRetryQueue {
   private queue = new Map<string, () => Promise<boolean>>();
+  private inFlight = new Map<string, Promise<boolean>>();
   private subscribers = new Set<(info: SyncRetryInfo) => void>();
 
   constructor() {
@@ -75,6 +76,25 @@ export class SyncRetryQueue {
   /** How many changes are queued for retry (not yet on the server). */
   pendingCount(): number {
     return this.queue.size;
+  }
+
+  /** Total work this queue still owes the server — queued retries AND any
+   *  in-flight mirror that hasn't resolved yet. C0a (Task 6): publish blocks
+   *  on this; an in-flight mirror has to count, or publish can hand off a row
+   *  that hasn't landed. `publishService` consults this so an unsynced CMS
+   *  edit refuses to publish even when the network call returned 200 but the
+   *  state diff has not propagated. */
+  outstandingCount(): number {
+    return this.queue.size + this.inFlight.size;
+  }
+
+  /** Resolves true when the latest run for `key` reaches the server, false
+   *  when it failed and was queued. Returns true immediately if no run is
+   *  in flight and none is queued (publish is allowed to proceed). */
+  settled(key: string): Promise<boolean> {
+    const inflight = this.inFlight.get(key);
+    if (inflight) return inflight;
+    return Promise.resolve(!this.queue.has(key));
   }
 
   /** Whether a mirror for `key` is waiting to reach the server. Hydration
@@ -124,21 +144,31 @@ export class SyncRetryQueue {
     task: () => Promise<unknown>,
     onWarn: (e: unknown) => void
   ): Promise<boolean> {
+    const work = (async (): Promise<boolean> => {
+      try {
+        await task();
+        /* Notify only when this actually cleared something. Subscribers put a
+           permanent "not on the server" toast on screen; when the queue drains —
+           by this retry, or by the `online` handler replaying it with no UI
+           involved — nothing used to fire, so that toast stood forever asserting
+           a failure that had already been fixed. Firing on every first-time
+           success instead would be noise: nothing was pending, nothing changed. */
+        if (this.queue.delete(key)) this.notify();
+        return true;
+      } catch (e) {
+        onWarn(e);
+        this.queue.set(key, () => this.run(key, task, onWarn));
+        this.notify();
+        return false;
+      }
+    })();
+    this.inFlight.set(key, work);
     try {
-      await task();
-      /* Notify only when this actually cleared something. Subscribers put a
-         permanent "not on the server" toast on screen; when the queue drains —
-         by this retry, or by the `online` handler replaying it with no UI
-         involved — nothing used to fire, so that toast stood forever asserting
-         a failure that had already been fixed. Firing on every first-time
-         success instead would be noise: nothing was pending, nothing changed. */
-      if (this.queue.delete(key)) this.notify();
-      return true;
-    } catch (e) {
-      onWarn(e);
-      this.queue.set(key, () => this.run(key, task, onWarn));
-      this.notify();
-      return false;
+      return await work;
+    } finally {
+      /* Only delete if this is still the latest in-flight entry — a newer
+         run on the same key keeps its own promise tracked. */
+      if (this.inFlight.get(key) === work) this.inFlight.delete(key);
     }
   }
 
