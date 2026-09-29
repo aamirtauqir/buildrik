@@ -54,6 +54,9 @@ export const upsertEntryInput = z.object({
   expectedUpdatedAt: z.string().datetime().nullable().optional(),
   data: z.record(z.string(), z.unknown()).default({}),
   status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
+  // Internal flag: CSV import loops this; skipping the per-row touchCmsEdited
+  // makes the importer batch its site-bump into a single UPDATE.
+  _skipTouchCmsEdited: z.boolean().optional(),
 });
 export type UpsertEntryInput = z.infer<typeof upsertEntryInput>;
 

@@ -96,6 +96,30 @@ export async function listCollections(siteId: string) {
 }
 
 /**
+ * Mark the site as having unpublished CMS changes. Called after EVERY
+ * successful CMS mutation (collection upsert/delete, entry upsert/delete,
+ * CSV import). The publish-approval gate + the editor's publish state read
+ * this so a CMS-only edit invalidates stale approvals and shows "unpublished
+ * changes" in the editor — distinct from `lastEditedAt`, which the editor's
+ * own page writes bump.
+ *
+ * Fire-and-log on its own error: a successful CMS write has already
+ * committed, and an out-of-band bump failure must not roll the mutation
+ * back. The "unpublished changes" signal will still catch up on the next
+ * write.
+ */
+async function touchCmsEdited(siteId: string): Promise<void> {
+  try {
+    await prisma.site.update({
+      where: { id: siteId },
+      data: { cmsEditedAt: new Date() },
+    });
+  } catch (err) {
+    console.error("[cms] touchCmsEdited failed for site", siteId, err);
+  }
+}
+
+/**
  * Precondition guard: the caller's last-seen `updatedAt` must match what's in
  * the DB, or the row has been edited underneath them (CONFLICT — return the
  * current value so the client can show "someone else saved, reload?"). When
@@ -163,11 +187,16 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
         const fresh = await prisma.cmsCollection.findUnique({ where: { id: input.id }, select: { updatedAt: true } });
         throw new CmsError("CONFLICT", fresh?.updatedAt.toISOString() ?? new Date().toISOString());
       }
+      await touchCmsEdited(siteId);
       return prisma.cmsCollection.findUnique({ where: { id: input.id } });
     }
-    return prisma.cmsCollection.create({ data: { id: input.id, siteId, ...data } });
+    const created = await prisma.cmsCollection.create({ data: { id: input.id, siteId, ...data } });
+    await touchCmsEdited(siteId);
+    return created;
   }
-  return prisma.cmsCollection.create({ data: { siteId, ...data } });
+  const created = await prisma.cmsCollection.create({ data: { siteId, ...data } });
+  await touchCmsEdited(siteId);
+  return created;
 }
 
 export async function deleteCollection(siteId: string, id: string): Promise<void> {
@@ -184,6 +213,7 @@ export async function deleteCollection(siteId: string, id: string): Promise<void
       data: { deletedAt: now, slug: `${owned.slug}~deleted~${id}` },
     }),
   ]);
+  await touchCmsEdited(siteId);
 }
 
 // Confirm the collection is in this site before any entry op — entries key on
@@ -210,6 +240,9 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
     data: sanitizeEntryData(input.data) as unknown as Prisma.InputJsonValue,
     ...(input.status ? { status: input.status } : {}),
   };
+  // CSV import loops upsertEntry; skip the per-row bump and let the
+  // importer touch cmsEditedAt once at the end.
+  const bump = input._skipTouchCmsEdited !== true;
   if (input.id) {
     const existing = await prisma.cmsEntry.findUnique({
       where: { id: input.id },
@@ -234,11 +267,16 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
         const fresh = await prisma.cmsEntry.findUnique({ where: { id: input.id }, select: { updatedAt: true } });
         throw new CmsError("CONFLICT", fresh?.updatedAt.toISOString() ?? new Date().toISOString());
       }
+      if (bump) await touchCmsEdited(siteId);
       return prisma.cmsEntry.findUnique({ where: { id: input.id } });
     }
-    return prisma.cmsEntry.create({ data: { id: input.id, collectionId: input.collectionId, ...data } });
+    const created = await prisma.cmsEntry.create({ data: { id: input.id, collectionId: input.collectionId, ...data } });
+    if (bump) await touchCmsEdited(siteId);
+    return created;
   }
-  return prisma.cmsEntry.create({ data: { collectionId: input.collectionId, ...data } });
+  const created = await prisma.cmsEntry.create({ data: { collectionId: input.collectionId, ...data } });
+  if (bump) await touchCmsEdited(siteId);
+  return created;
 }
 
 export async function deleteEntry(siteId: string, id: string): Promise<void> {
@@ -248,6 +286,7 @@ export async function deleteEntry(siteId: string, id: string): Promise<void> {
   });
   if (!owned) throw new CmsError("NOT_FOUND", "Entry not found");
   await prisma.cmsEntry.update({ where: { id }, data: { deletedAt: new Date() } });
+  await touchCmsEdited(siteId);
 }
 
 // ── CSV import ────────────────────────────────────────────────────────────
@@ -379,12 +418,13 @@ export async function importCsvEntries(
       continue;
     }
     try {
-      await upsertEntry(siteId, { siteId, collectionId, data });
+      await upsertEntry(siteId, { siteId, collectionId, data, _skipTouchCmsEdited: true });
       imported += 1;
     } catch (e) {
       errors.push({ row: rowNumber, message: e instanceof Error ? e.message : "Could not be saved" });
     }
   }
+  if (imported > 0) await touchCmsEdited(siteId);
   return { imported, total: dataRows.length, errors };
 }
 

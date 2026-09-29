@@ -160,9 +160,20 @@ export interface SitePublishState {
    * over-report (a rename with no content change reads as "unpublished
    * changes"). It cannot under-report, which is the direction that matters — it
    * will never say "nothing to publish" over edits that are really there.
+   *
+   * Also: `cmsEditedAt` covers CMS-only writes (record create/edit/delete,
+   * collection edits) that the editor never sees — `editedAt` below is the
+   * later of the two, so a CMS-only edit counts as "unpublished changes"
+   * even though the page-write path never fired.
    */
   hasUnpublishedChanges: boolean | null;
   lastPublishedAt: string | null;
+  /**
+   * The stamp we compared against lastPublishedAt. Exposed so the Topbar can
+   * show "edited N min ago" without a second round-trip; equals
+   * max(lastEditedAt, cmsEditedAt), null when neither was ever set.
+   */
+  lastEditedAt: string | null;
 }
 
 /**
@@ -179,15 +190,25 @@ export async function fetchSitePublishState(siteId: string): Promise<SitePublish
     publishedUrl?: string | null;
     lastPublishedAt?: string | Date | null;
     lastEditedAt?: string | Date | null;
+    cmsEditedAt?: string | Date | null;
   };
   const publishedAt = site.lastPublishedAt ? new Date(site.lastPublishedAt) : null;
-  const editedAt = site.lastEditedAt ? new Date(site.lastEditedAt) : null;
+  const editedAtRaw = site.lastEditedAt ? new Date(site.lastEditedAt) : null;
+  const cmsEditedAt = site.cmsEditedAt ? new Date(site.cmsEditedAt) : null;
+  const editedAt = laterOf(editedAtRaw, cmsEditedAt);
   return {
     isPublished: site.status === "PUBLISHED" && !!site.publishedUrl,
     publishedUrl: site.publishedUrl ?? null,
     hasUnpublishedChanges: publishedAt && editedAt ? editedAt.getTime() > publishedAt.getTime() : null,
     lastPublishedAt: publishedAt ? publishedAt.toISOString() : null,
+    lastEditedAt: editedAt ? editedAt.toISOString() : null,
   };
+}
+
+function laterOf(a: Date | null, b: Date | null): Date | null {
+  if (!a) return b;
+  if (!b) return a;
+  return a.getTime() >= b.getTime() ? a : b;
 }
 
 /* ── P1 publish history + rollback ────────────────────────────────────────── */

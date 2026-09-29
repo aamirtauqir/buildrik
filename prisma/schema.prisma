@@ -330,6 +330,7 @@ model Site {
   pages             Int       @default(0)
   aiJobId           String?
   lastEditedAt      DateTime  @default(now())
+  cmsEditedAt       DateTime?
   lastPublishedAt   DateTime?
   lastPublishError  String?
   publishedUrl      String?
