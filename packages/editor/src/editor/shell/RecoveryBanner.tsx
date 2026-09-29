@@ -71,9 +71,14 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
   // re-render or reload won't re-surface the same crash.
   const [record] = React.useState(() => RecoveryManager.consumeLastCrash());
   const [dismissed, setDismissed] = React.useState(false);
-  /* `null` = still loading; `true` = server is newer → stay hidden; `false` =
-     either server is older or we couldn't tell (network error, no site id) → show. */
+  /* Three states: `null` = still loading; `true` = server is newer → stay hidden;
+     `false` = server is older → show. When `serverEditedAt()` returns null (no
+     site id OR network/auth failure), the server state is unknown. Showing the
+     banner then invites the user to keep local work over a server we couldn't
+     reach — the inverse of the safe default (P0-F audit 2026-09-30). Stay hidden
+     and re-check on the next mount / recovery trigger. */
   const [serverNewer, setServerNewer] = React.useState<boolean | null>(null);
+  const [serverKnown, setServerKnown] = React.useState<boolean | null>(null);
   React.useEffect(() => {
     if (!record) return;
     let cancelled = false;
@@ -83,8 +88,9 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
       if (at) {
         const serverMs = Date.parse(at);
         setServerNewer(Number.isFinite(serverMs) && serverMs > record.at);
+        setServerKnown(true);
       } else {
-        setServerNewer(false);
+        setServerKnown(false);
       }
     })();
     return () => {
@@ -93,7 +99,8 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
   }, [record, serverEditedAt]);
 
   if (!record || dismissed) return null;
-  if (serverNewer !== false) return null;
+  // Hide until we know the server's clock, and hide if the server is newer.
+  if (serverKnown !== true || serverNewer !== false) return null;
 
   const scope = typeof pageCount === "number" ? ` · ${pageCount} page${pageCount === 1 ? "" : "s"}` : "";
 

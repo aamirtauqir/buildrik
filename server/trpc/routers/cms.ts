@@ -17,9 +17,9 @@ import {
   previewCsvImport,
   importCsvEntries,
   getPublishedCmsForCollections,
-  CmsError,
 } from "@/server/services/cms.service";
 import { listSiteFontAssets } from "@/server/services/media.service";
+import { translateCms } from "./__internal__/translateCms";
 import {
   upsertCollectionInput,
   listCollectionsInput,
@@ -52,20 +52,6 @@ async function requireWrite(ctx: any, siteId: string): Promise<void> {
     if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
     throw e;
   }
-}
-
-function translateCms(e: unknown): never {
-  if (e instanceof CmsError) {
-    /* CmsError carries CONFLICT / GONE — not on tRPC's TRPCErrorCode union.
-       Translate the domain-known recoverable ones to BAD_REQUEST (the message
-       carries the reason — "changed somewhere else", "was deleted") and fall
-       back to INTERNAL_SERVER_ERROR for anything else we did not plan for. */
-    const code: TRPCError["code"] =
-      e.code === "CONFLICT" || e.code === "GONE" ? "BAD_REQUEST" :
-      e.code;
-    throw new TRPCError({ code, message: e.message });
-  }
-  throw e;
 }
 
 export const cmsRouter = router({

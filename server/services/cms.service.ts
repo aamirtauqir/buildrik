@@ -180,17 +180,22 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
         { id: input.id },
         input.expectedUpdatedAt,
       );
-      // Conditional update: WHERE updatedAt = expected — if another writer
-      // slipped in between assertFresh and here, count is 0 and we throw CONFLICT.
+      // Conditional update: WHERE updatedAt = expected AND deletedAt IS NULL — if
+      // another writer slipped in between assertFresh and here, or the row was
+      // tombstoned concurrently, count is 0 and we throw CONFLICT/GONE. Carrying
+      // `deletedAt: null` into the SQL is the P0-C fix — without it, an
+      // unconditional updateMany with `expected === null` would silently resurrect
+      // a soft-deleted row (audit 2026-09-30).
       const expected = input.expectedUpdatedAt ? new Date(input.expectedUpdatedAt) : null;
       const result = await prisma.cmsCollection.updateMany({
         where: expected
-          ? { id: input.id, updatedAt: expected }
-          : { id: input.id },
+          ? { id: input.id, updatedAt: expected, deletedAt: null }
+          : { id: input.id, deletedAt: null },
         data,
       });
       if (result.count === 0) {
-        const fresh = await prisma.cmsCollection.findUnique({ where: { id: input.id }, select: { updatedAt: true } });
+        const fresh = await prisma.cmsCollection.findUnique({ where: { id: input.id }, select: { updatedAt: true, deletedAt: true } });
+        if (fresh?.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
         throw new CmsError("CONFLICT", fresh?.updatedAt.toISOString() ?? new Date().toISOString());
       }
       await touchCmsEdited(siteId);
@@ -265,12 +270,13 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
       const expected = input.expectedUpdatedAt ? new Date(input.expectedUpdatedAt) : null;
       const result = await prisma.cmsEntry.updateMany({
         where: expected
-          ? { id: input.id, updatedAt: expected }
-          : { id: input.id },
+          ? { id: input.id, updatedAt: expected, deletedAt: null }
+          : { id: input.id, deletedAt: null },
         data,
       });
       if (result.count === 0) {
-        const fresh = await prisma.cmsEntry.findUnique({ where: { id: input.id }, select: { updatedAt: true } });
+        const fresh = await prisma.cmsEntry.findUnique({ where: { id: input.id }, select: { updatedAt: true, deletedAt: true } });
+        if (fresh?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
         throw new CmsError("CONFLICT", fresh?.updatedAt.toISOString() ?? new Date().toISOString());
       }
       if (bump) await touchCmsEdited(siteId);
