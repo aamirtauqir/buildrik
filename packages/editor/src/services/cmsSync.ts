@@ -155,7 +155,7 @@ async function mirror(
       outcome = kind;
     }
   }, onWarn);
-  if (outcome !== "ok") on[outcome]();
+  if (outcome !== "ok") (on[outcome] as () => void)();
   return reached && outcome === "ok";
 }
 
