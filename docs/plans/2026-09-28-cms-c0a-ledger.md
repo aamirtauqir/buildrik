@@ -140,3 +140,29 @@ c7ade43da feat(cms): stale writes surface as conflicts; deletes reach every devi
 12 commits, all C0a tasks landed. Migration deploy + 12-row live matrix
 are the only outstanding pieces.
 
+## Audit findings 2026-09-30 (post-compaction review)
+
+Read-only audit of 12 commits surfaced P0 issues that contradict plan invariants.
+Fix order ranked by severity:
+
+1. **P0-A — `CMS_CONFLICT:` / `CMS_GONE:` prefixes fabricated in tests, never produced at runtime.**
+   - `translateCms` (`server/trpc/routers/cms.ts:57-69`) maps CONFLICT/GONE → tRPC `BAD_REQUEST` with the bare `CmsError.message`.
+   - `cmsSync.classify()` branches on message prefix (`packages/editor/src/services/cmsSync.ts:113-118`); never matches because prefix never written.
+   - Runtime effect: stale upsert retries forever; delete replays against tombstoned row → resurrects it (the bug Task 1 shipped to fix).
+   - Test pattern (`__tests__/cmsSync.test.ts:641, :655`) fabricates the prefix inline — proves nothing about producer.
+   - **Fix:** either prepend `CMS_CONFLICT:` / `CMS_GONE:` in `translateCms`, OR change client to branch on `e.data.code`. Add router→mirror round-trip test.
+
+2. **P0-B — Plan Task 10 (truthful save) not landed.** `RecordSheet` has no `awaitServer` / `onSave` props. `git log 8e9a3ccb2..HEAD --name-only` returns zero matches for `RecordSheet*`. C0.12 done-condition (sheet stays open with "Saved on this device only…") untestable.
+
+3. **P0-C — Tombstone resurrection race.** `upsertCollection`/`upsertEntry` `updateMany` (`cms.service.ts:186-191, :266-271`) builds `where: expected ? { id, updatedAt: expected } : { id }`. When `expectedUpdatedAt: null`, falls through to unconditional branch — `findUnique`'s `deletedAt: null` guard is not carried into SQL. Concurrent delete + upsert resurrects the soft-delete.
+
+4. **P0-D — `cms.publishSnapshot` is `.query` not `.mutation`** despite being EDITOR-gated like every other EDITOR endpoint. Convention mismatch; intermediary cache risk.
+
+5. **P0-E — `deleteEntry` doesn't `touchCmsEdited`.** Published-record deletion leaves `cmsEditedAt` unchanged; recovery banner fold wrong.
+
+6. **P0-F — Recovery banner safety inversion.** `else { setServerNewer(false); }` on null/error (`RecoveryBanner.tsx:86-88`) means banner SHOWS on network failure — exactly when it's unsafe to keep local copy.
+
+P1 follow-ups: `cmsSyncBlocker` reads wrong count (`pendingCount` not `outstandingCount` — publish can fire while mirror in flight), `deleteEntry` has no transaction/idempotency, field-key rename never emits `CMS_CONTENT_DELETED` for the old key (canvas bound to renamed field keeps reading undefined).
+
+Full audit + 9 P1 + P2 + test coverage gaps in the audit hand-off. No code modified — read-only review per standing rule. Ledger updated, fixes queued for post-deploy arc.
+
