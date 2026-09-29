@@ -16,8 +16,10 @@ import {
   generateDynamicPages,
   previewCsvImport,
   importCsvEntries,
+  getPublishedCmsForCollections,
   CmsError,
 } from "@/server/services/cms.service";
+import { listSiteFontAssets } from "@/server/services/media.service";
 import {
   upsertCollectionInput,
   listCollectionsInput,
@@ -29,6 +31,7 @@ import {
   generateDynamicPagesInput,
   previewCsvEntriesInput,
   importCsvEntriesInput,
+  publishSnapshotInput,
 } from "@buildrik/shared/schemas/cms";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,5 +149,16 @@ export const cmsRouter = router({
         translateCms(e);
       }
     }),
+  }),
+  // What a publish renders CMS content from: the server's live, published rows
+  // for the collections the project binds, plus the site fonts a scratch
+  // render needs. EDITOR-gated like the publish it feeds.
+  publishSnapshot: protectedProcedure.input(publishSnapshotInput).query(async ({ ctx, input }) => {
+    await requireWrite(ctx, input.siteId);
+    const [cms, siteFonts] = await Promise.all([
+      getPublishedCmsForCollections(input.siteId, input.collectionIds),
+      listSiteFontAssets(input.siteId),
+    ]);
+    return { cms, siteFonts };
   }),
 });
