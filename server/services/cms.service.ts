@@ -146,6 +146,12 @@ async function assertFresh(
 }
 
 export async function upsertCollection(siteId: string, input: UpsertCollectionInput) {
+  /* The home page is index.html; a collection bound to it would emit
+     {field} tokens at the site root (BD-04). The picker (DynamicPagesPane)
+     hides it too — refuse here as a defence in depth. */
+  if (input.pageTemplatePath === "index.html") {
+    throw new CmsError("BAD_REQUEST", "The home page can't be a collection template. Pick another page.");
+  }
   const data = {
     name: input.name,
     slug: input.slug,

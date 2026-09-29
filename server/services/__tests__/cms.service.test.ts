@@ -136,6 +136,23 @@ describe("tombstones (deletedAt, not hard delete)", () => {
     await listCollections("s1");
     expect(mocks.colFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", deletedAt: null });
   });
+
+  it("upsertCollection refuses the home page (index.html) as a template", async () => {
+    mocks.colFindUnique.mockResolvedValueOnce(null);
+    await expect(
+      upsertCollection("s1", {
+        id: "c1",
+        siteId: "s1",
+        name: "B",
+        slug: "b",
+        fields: [],
+        pageSlugPattern: "/b/{slug}",
+        pageTemplatePath: "index.html",
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    expect(mocks.colCreate).not.toHaveBeenCalled();
+    expect(mocks.colUpsert).not.toHaveBeenCalled();
+  });
 });
 
 describe("entries cross-site guard", () => {
