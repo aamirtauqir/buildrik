@@ -4,7 +4,7 @@
  * and offers Keep / Discard-and-reload. No crash → nothing renders.
  */
 import * as React from "react";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RecoveryBanner } from "../RecoveryBanner";
 
@@ -17,7 +17,7 @@ function seedCrash(atMsAgo = 30_000) {
   );
 }
 
-function renderBanner(props = {}) {
+function renderBanner(props: Parameters<typeof RecoveryBanner>[0] = {}) {
   return render(
     <RecoveryBanner pageCount={3} {...props} />,
   );
@@ -35,29 +35,53 @@ describe("RecoveryBanner", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("shows a recovery banner after a crash, with scope, and clears the sentinel", () => {
+  it("shows a recovery banner after a crash, with scope, and clears the sentinel", async () => {
     seedCrash();
-    renderBanner();
-    expect(screen.getByText(/recovered your work/i)).toBeInTheDocument();
+    /* Default serverEditedAt returns null, so no "server newer" check trips. */
+    renderBanner({ serverEditedAt: async () => null });
+    await waitFor(() => expect(screen.getByText(/recovered your work/i)).toBeInTheDocument());
     expect(screen.getByText(/3 pages/i)).toBeInTheDocument();
     // consuming the sentinel means a re-render / reload won't re-show it
     expect(sessionStorage.getItem(SENTINEL)).toBeNull();
   });
 
-  it("Keep changes dismisses the banner", () => {
+  it("Keep changes dismisses the banner", async () => {
     seedCrash();
-    renderBanner();
+    renderBanner({ serverEditedAt: async () => null });
+    await waitFor(() => screen.getByText(/recovered your work/i));
     fireEvent.click(screen.getByRole("button", { name: /keep changes/i }));
     expect(screen.queryByText(/recovered your work/i)).not.toBeInTheDocument();
   });
 
-  it("Discard & reload clears the local draft and reloads", () => {
+  it("Discard & reload clears the local draft and reloads", async () => {
     seedCrash();
     localStorage.setItem("buildrick-project", JSON.stringify({ project: {} }));
     const reload = vi.fn();
-    renderBanner({ reloadFn: reload });
+    renderBanner({ reloadFn: reload, serverEditedAt: async () => null });
+    await waitFor(() => screen.getByText(/recovered your work/i));
     fireEvent.click(screen.getByRole("button", { name: /discard/i }));
     expect(localStorage.getItem("buildrick-project")).toBeNull();
     expect(reload).toHaveBeenCalled();
+  });
+
+  it("stays hidden when the server holds newer work than the recovered copy (RT-10)", async () => {
+    /* The crash happened at 10:00 UTC, but the server's last edit is 10:16 —
+       offering "Keep changes" would stomp on the server's work. */
+    sessionStorage.setItem(
+      SENTINEL,
+      JSON.stringify({ at: Date.parse("2026-09-28T10:00:00Z"), source: "error", reason: "boom" }),
+    );
+    renderBanner({ serverEditedAt: async () => "2026-09-28T10:16:00.000Z" });
+    await waitFor(() => expect(screen.queryByRole("status", { name: /recovered work/i })).toBeNull());
+  });
+
+  it("still shows when the recovered copy is newer than the server", async () => {
+    /* Sentinel is later than the server's last edit → local is the truth. */
+    sessionStorage.setItem(
+      SENTINEL,
+      JSON.stringify({ at: Date.parse("2026-09-28T10:20:00Z"), source: "error", reason: "boom" }),
+    );
+    renderBanner({ serverEditedAt: async () => "2026-09-28T10:16:00.000Z" });
+    expect(await screen.findByRole("status", { name: /recovered work/i })).toBeInTheDocument();
   });
 });
