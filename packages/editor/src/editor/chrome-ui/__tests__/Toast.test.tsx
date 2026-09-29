@@ -183,6 +183,32 @@ describe("Toast", () => {
     });
     expect(screen.queryByText("Deleted 3 pages")).toBeNull();
   });
+
+  it("renders a secondary action next to the primary one", () => {
+    const onPrimary = vi.fn();
+    const onSecondary = vi.fn();
+    let api!: ReturnType<typeof useToast>;
+    render(
+      <ToastProvider>
+        <Harness onReady={(a) => {
+          api = a;
+        }} />
+      </ToastProvider>,
+    );
+    act(() => {
+      api.addToast({
+        title: "Sync conflict",
+        description: "Another device changed this row.",
+        action: { label: "Use theirs", onClick: onPrimary },
+        secondaryAction: { label: "Keep mine", onClick: onSecondary },
+        duration: Infinity,
+      });
+    });
+    screen.getByRole("button", { name: "Use theirs" }).click();
+    screen.getByRole("button", { name: "Keep mine" }).click();
+    expect(onPrimary).toHaveBeenCalled();
+    expect(onSecondary).toHaveBeenCalled();
+  });
 });
 
 /* The toast catalogue (7574:194162): 5 s default unless persistent. */

@@ -17,7 +17,9 @@ import {
   syncEntryDelete,
   hydrateCmsFromServer,
   onCmsSyncError,
+  onCmsConflict,
   retryCmsSync,
+  bindCmsEngine,
 } from "../../../services/cmsSync";
 
 export function useCmsSync(
@@ -27,6 +29,11 @@ export function useCmsSync(
   React.useEffect(() => {
     if (!composer) return;
     const cm = composer.cms.collections;
+    /* C0a (Task 5): the cmsSync layer needs the manager to drop rows the
+       server no longer lists and to ask consumers to re-read after a hydrate
+       writes past it. Bind it for the lifetime of this composer; unbind on
+       cleanup so a hot-reloaded manager isn't left answering to a stale hook. */
+    bindCmsEngine(cm);
 
     /* Pull any server-side collections into local storage (cross-device), then
        make the manager re-read it: the hydrate writes to IndexedDB behind the
@@ -83,6 +90,33 @@ export function useCmsSync(
         })
       : undefined;
 
+    /* C0a (Task 5): a server conflict (someone else moved the row on since)
+       can't be resolved silently — the user has to choose whose copy wins.
+       Keep-mine forces the next upsert with no precondition (the local stamp
+       was forgotten by the sync layer on the way in), use-theirs rehydrates
+       the server's copy. Both side effects already fire before the toast
+       closes itself, so the buttons do not need to dismiss. */
+    const offConflict = addToast
+      ? onCmsConflict((c) => {
+          const what = c.kind === "collection" ? "Collection" : "Entry";
+          addToast({
+            title: `${what} changed elsewhere`,
+            description:
+              "Another device updated this row. Keep your changes, or replace them with the server's copy.",
+            tone: "warning",
+            duration: Infinity,
+            action: {
+              label: "Use theirs",
+              onClick: () => void c.useTheirs(),
+            },
+            secondaryAction: {
+              label: "Keep mine",
+              onClick: () => void c.keepMine(),
+            },
+          });
+        })
+      : undefined;
+
     const onColUpsert = (c: CMSCollection) => void syncCollectionUpsert(c);
     const onColDelete = (id: string) => void syncCollectionDelete(id);
     const onEntryUpsert = (it: CMSContentItem) => void syncEntryUpsert(it);
@@ -107,6 +141,8 @@ export function useCmsSync(
       cm.off(EVENTS.CMS_CONTENT_UNPUBLISHED, onEntryUpsert);
       cm.off(EVENTS.CMS_CONTENT_DELETED, onEntryDelete);
       unsubscribe?.();
+      offConflict?.();
+      bindCmsEngine(null);
     };
   }, [composer, addToast]);
 }

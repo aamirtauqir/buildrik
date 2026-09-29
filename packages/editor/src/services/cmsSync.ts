@@ -22,11 +22,13 @@ import {
   SyncRetryQueue,
   type SyncRetryInfo,
   registerPendingSource,
+  forgetServerStamp,
   hasServerStamp,
   markStampMigrationDone,
   recordServerStamp,
   sameContent,
   serverCopyWins,
+  serverStampOf,
   stampMigrationDue,
 } from "./syncRetryQueue";
 
@@ -89,6 +91,74 @@ export function cmsFromRows(rows: CmsRows): { collections: CMSCollection[]; item
 const queue = new SyncRetryQueue();
 registerPendingSource("cms", () => queue.pendingCount());
 
+/* C0a (Task 5): CONFLICT and GONE are answers, not failures. CONFLICT must
+   not loop forever against a row that has moved on since; GONE means the
+   server already removed the row, so retrying would resurrect it. Both are
+   routed out of the retry queue and handed to their own handler instead. */
+export interface CmsConflict {
+  kind: "collection" | "entry";
+  id: string;
+  /** Overwrite the server with this device's copy. */
+  keepMine(): Promise<void>;
+  /** Replace this device's copy with the server's. */
+  useTheirs(): Promise<void>;
+}
+const conflictListeners = new Set<(c: CmsConflict) => void>();
+export function onCmsConflict(cb: (c: CmsConflict) => void): () => void {
+  conflictListeners.add(cb);
+  return () => conflictListeners.delete(cb);
+}
+
+type Outcome = "ok" | "conflict" | "gone";
+function classify(e: unknown): Outcome | null {
+  const msg = e instanceof Error ? e.message : "";
+  if (msg.startsWith("CMS_CONFLICT:")) return "conflict";
+  if (msg.startsWith("CMS_GONE:")) return "gone";
+  return null;
+}
+
+/* The editor-shell hook passes the composer's CollectionManager once, via
+   bindCmsEngine. Hydrate uses it to remove rows the server no longer lists
+   without firing a delete mirror (forgetLocal emits a store refresh, not the
+   *_DELETED event the sync layer listens to). */
+type CmsEngine = Pick<
+  import("../engine/cms/CollectionManager").CollectionManager,
+  "forgetLocal" | "refreshFromStorage"
+>;
+let engine: CmsEngine | null = null;
+export function bindCmsEngine(cm: CmsEngine | null): void {
+  engine = cm;
+}
+
+/* `useTheirs` adds the row's key here before re-hydrating so the
+   server's copy wins unconditionally even when a stamp exists. */
+const forceServer = new Set<string>();
+
+/* Wrap a mirror task so CONFLICT and GONE leave the queue instead of being
+   retried forever. queue.run still drives the lifecycle — it tracks the
+   pending count, fires subscribers, and replays on reconnect — but for the
+   two outcomes that can never succeed on retry, the task succeeds from the
+   queue's view and the outcome is dispatched to the caller instead. */
+async function mirror(
+  key: string,
+  task: () => Promise<unknown>,
+  onWarn: (e: unknown) => void,
+  on: Record<"conflict" | "gone", () => void>,
+): Promise<boolean> {
+  let outcome: Outcome = "ok";
+  const reached = await queue.run(key, async () => {
+    try {
+      await task();
+    } catch (e) {
+      const kind = classify(e);
+      if (!kind) throw e;
+      outcome = kind;
+    }
+  }, onWarn);
+  if (outcome !== "ok") on[outcome]();
+  return reached && outcome === "ok";
+}
+
 export type CmsSyncErrorInfo = SyncRetryInfo;
 
 /** Subscribe to CMS sync failures. Returns an unsubscribe fn. */
@@ -99,6 +169,38 @@ export function onCmsSyncError(cb: (info: CmsSyncErrorInfo) => void): () => void
 /** How many CMS changes are queued for retry (not yet on the server). */
 export function getCmsSyncPendingCount(): number {
   return queue.pendingCount();
+}
+
+/* Task 8 stand-in for the full Task 6 `cmsSyncBlocker` (still pending): refuse
+   publish only when there are queued retries OR the hydrate is in flight. The
+   in-flight check is conservative — an in-flight hydrate is usually quick and
+   almost always converges with what publish would fetch — but it stops publish
+   from running with a half-hydrated store, which was the bug this gate exists
+   to prevent. Replaced by the real blocker once Task 6 lands. */
+export function cmsSyncBlocker(): string | null {
+  const pending = getCmsSyncPendingCount();
+  if (pending > 0) {
+    const noun = pending === 1 ? "change hasn't" : "changes haven't";
+    return `${pending} CMS ${noun} reached the server yet. Retry the sync, then publish.`;
+  }
+  if (getCmsHydrationStatus() === "loading") {
+    return "CMS is still syncing from the server. Retry once it finishes.";
+  }
+  return null;
+}
+
+/** The server's CMS rows a publish renders from (the collections the project
+ *  binds). The browser's store can hold rows another device deleted, edits
+ *  that never synced, or a rename the server never saw — publish has to read
+ *  what the SERVER says, not what THIS device last mirrored. */
+export async function fetchPublishSnapshot(
+  siteId: string,
+  collectionIds: string[]
+): Promise<{ cms: CmsRows; siteFonts: ReadonlyArray<{ filename: string; url: string }> }> {
+  return (await client().cms.publishSnapshot.query({ siteId, collectionIds })) as {
+    cms: CmsRows;
+    siteFonts: ReadonlyArray<{ filename: string; url: string }>;
+  };
 }
 
 /**
@@ -184,11 +286,6 @@ export async function hydrateCmsFromServer(): Promise<void> {
     }>;
     const migrationScope = `cms:${siteId}`;
     const firstPass = stampMigrationDue(migrationScope);
-    if (!remote.length) {
-      markStampMigrationDone(migrationScope);
-      setHydrationStatus("ready");
-      return;
-    }
     const localCollections = new Map((await Storage.loadCollections()).map((c) => [c.id, c]));
     /* A row passed over for a queued mirror was not reconciled, so the scope's
        one-time pass is not done — it re-runs on the next hydrate. */
@@ -234,14 +331,16 @@ export async function hydrateCmsFromServer(): Promise<void> {
         };
         // A queued upsert: the local change is newer and still on its way.
         if (!collectionQueued) {
-          if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
+          const colKey = `collection:${rc.id}`;
+          if (forceServer.has(colKey) || serverCopyWins(colKey, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
             await Storage.saveCollection(collection);
-            recordServerStamp(`collection:${rc.id}`, rc.updatedAt, collection.updatedAt);
+            recordServerStamp(colKey, rc.updatedAt, collection.updatedAt);
+            forceServer.delete(colKey);
           } else if (
-            localCollection && !hasServerStamp(`collection:${rc.id}`) &&
+            localCollection && !hasServerStamp(colKey) &&
             sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
           ) {
-            recordServerStamp(`collection:${rc.id}`, rc.updatedAt, localCollection.updatedAt);
+            recordServerStamp(colKey, rc.updatedAt, localCollection.updatedAt);
           }
         }
         const [entries, localEntriesList] = await Promise.all([
@@ -259,12 +358,13 @@ export async function hydrateCmsFromServer(): Promise<void> {
             }
             const localEntry = localEntries.get(e.id);
             const status = e.status === "PUBLISHED" ? "published" : "draft";
-            if (!serverCopyWins(`entry:${e.id}`, e.updatedAt, localEntry?.updatedAt, !!localEntry, firstPass)) {
+            const eKey = `entry:${e.id}`;
+            if (!(forceServer.has(eKey) || serverCopyWins(eKey, e.updatedAt, localEntry?.updatedAt, !!localEntry, firstPass))) {
               if (
-                localEntry && !hasServerStamp(`entry:${e.id}`) &&
+                localEntry && !hasServerStamp(eKey) &&
                 localEntry.status === status && sameContent(localEntry.data, e.data)
               ) {
-                recordServerStamp(`entry:${e.id}`, e.updatedAt, localEntry.updatedAt);
+                recordServerStamp(eKey, e.updatedAt, localEntry.updatedAt);
               }
               return;
             }
@@ -272,12 +372,48 @@ export async function hydrateCmsFromServer(): Promise<void> {
               id: e.id, collectionId: rc.id, data: e.data, status,
               createdAt: iso(e.createdAt), updatedAt: iso(e.updatedAt),
             });
-            recordServerStamp(`entry:${e.id}`, e.updatedAt, iso(e.updatedAt));
+            recordServerStamp(eKey, e.updatedAt, iso(e.updatedAt));
+            forceServer.delete(eKey);
           }),
         );
+
+        /* C0a (Task 5): entries the server no longer lists are deleted on
+           this device too, but only when the server ever confirmed them — an
+           unstamped row is a brand-new local edit still on its way. A queued
+           mirror (the local change hasn't reached the server yet) is left
+           alone; the matching `_Delete` op will resolve the row on the server
+           side. Goes via Storage directly: forgetLocal would emit
+           CMS_STORE_REFRESHED, which the sync layer does not subscribe to. */
+        const remoteEntryIds = new Set(entries.map((e) => e.id));
+        for (const le of localEntriesList) {
+          if (remoteEntryIds.has(le.id)) continue;
+          if (!hasServerStamp(`entry:${le.id}`) || hasQueuedMirror("entry", le.id)) continue;
+          await Storage.deleteContentItem(le.id);
+          forgetServerStamp(`entry:${le.id}`);
+        }
       }),
     );
+
+    /* Collections the server no longer lists — same rules as entries. Engine
+       path (forgetLocal) is preferred when bound so the in-memory cache clears
+       and CMS_STORE_REFRESHED fires; the unbound fallback goes through
+       Storage directly. */
+    const remoteIds = new Set(remote.map((r) => r.id));
+    for (const local of localCollections.values()) {
+      if (remoteIds.has(local.id) || local.siteId !== siteId) continue;
+      if (!hasServerStamp(`collection:${local.id}`) || hasQueuedMirror("collection", local.id)) continue;
+      if (engine) {
+        await engine.forgetLocal("collection", local.id);
+      } else {
+        await Storage.deleteCollection(local.id);
+      }
+      forgetServerStamp(`collection:${local.id}`);
+    }
     if (!skippedQueued) markStampMigrationDone(migrationScope);
+    /* Hydrate writes past the manager straight to IndexedDB. Ask the engine
+       to re-read so every consumer (Content panel, RecordsTable, binding
+       popover) sees the fresh rows in this session. */
+    await engine?.refreshFromStorage();
     setHydrationStatus("ready");
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -289,7 +425,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
 export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return;
-  await queue.run(
+  await mirror(
     `collectionUpsert:${c.id}`,
     () =>
       client().cms.collections.upsert.mutate({
@@ -305,13 +441,42 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
         pageSeoTitle: c.pageSeoTitle ?? null,
         pageSeoDescription: c.pageSeoDescription ?? null,
         pageTemplatePath: c.pageTemplatePath ?? null,
+        expectedUpdatedAt: serverStampOf(`collection:${c.id}`) ?? null,
       }).then((row) => {
         /* No row back is still a mirror that landed; reading updatedAt off
            undefined made it a "failure", queued and replayed forever. */
         if (row?.updatedAt) recordServerStamp(`collection:${c.id}`, row.updatedAt, c.updatedAt);
       }),
     // eslint-disable-next-line no-console
-    (e) => console.warn("[cms-sync] collection upsert failed (kept locally, queued)", e)
+    (e) => console.warn("[cms-sync] collection upsert failed (kept locally, queued)", e),
+    {
+      gone: () => {
+        forgetServerStamp(`collection:${c.id}`);
+        /* Engine path (forgetLocal) is preferred when bound so the in-memory
+           cache clears and CMS_STORE_REFRESHED fires; the unbound fallback
+           goes through Storage directly so this branch works in tests and
+           in editors that never bound a manager. */
+        if (engine) void engine.forgetLocal("collection", c.id);
+        else void Storage.deleteCollection(c.id);
+      },
+      conflict: () => {
+        for (const cb of conflictListeners) {
+          cb({
+            kind: "collection",
+            id: c.id,
+            keepMine: async () => {
+              forgetServerStamp(`collection:${c.id}`);
+              await syncCollectionUpsert(c);
+            },
+            useTheirs: async () => {
+              forgetServerStamp(`collection:${c.id}`);
+              await hydrateCmsFromServer();
+              await engine?.refreshFromStorage();
+            },
+          });
+        }
+      },
+    },
   );
 }
 
@@ -321,18 +486,25 @@ export async function syncCollectionDelete(id: string): Promise<void> {
   // A pending upsert for the same collection is now moot — deletion wins, so
   // drop it to avoid resurrecting a deleted collection on retry.
   queue.drop(`collectionUpsert:${id}`);
-  await queue.run(
+  await mirror(
     `collectionDelete:${id}`,
     () => client().cms.collections.delete.mutate({ siteId, id }),
     // eslint-disable-next-line no-console
-    (e) => console.warn("[cms-sync] collection delete failed (queued)", e)
+    (e) => console.warn("[cms-sync] collection delete failed (queued)", e),
+    {
+      /* Already gone is the goal of the delete — no resurrection on retry. */
+      gone: () => forgetServerStamp(`collection:${id}`),
+      /* The delete itself can't conflict against a newer version: the server's
+         delete is the newer version. Nothing to reconcile. */
+      conflict: () => {},
+    },
   );
 }
 
 export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return;
-  await queue.run(
+  await mirror(
     `entryUpsert:${item.id}`,
     () =>
       client().cms.entries.upsert.mutate({
@@ -341,13 +513,38 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
         collectionId: item.collectionId,
         data: item.data,
         status: item.status === "published" ? "PUBLISHED" : "DRAFT",
+        expectedUpdatedAt: serverStampOf(`entry:${item.id}`) ?? null,
       }).then((row) => {
         /* No row back is still a mirror that landed; reading updatedAt off
            undefined made it a "failure", queued and replayed forever. */
         if (row?.updatedAt) recordServerStamp(`entry:${item.id}`, row.updatedAt, item.updatedAt);
       }),
     // eslint-disable-next-line no-console
-    (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e)
+    (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e),
+    {
+      gone: () => {
+        forgetServerStamp(`entry:${item.id}`);
+        if (engine) void engine.forgetLocal("entry", item.id);
+        else void Storage.deleteContentItem(item.id);
+      },
+      conflict: () => {
+        for (const cb of conflictListeners) {
+          cb({
+            kind: "entry",
+            id: item.id,
+            keepMine: async () => {
+              forgetServerStamp(`entry:${item.id}`);
+              await syncEntryUpsert(item);
+            },
+            useTheirs: async () => {
+              forgetServerStamp(`entry:${item.id}`);
+              await hydrateCmsFromServer();
+              await engine?.refreshFromStorage();
+            },
+          });
+        }
+      },
+    },
   );
 }
 
@@ -355,10 +552,14 @@ export async function syncEntryDelete(id: string): Promise<void> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   queue.drop(`entryUpsert:${id}`);
-  await queue.run(
+  await mirror(
     `entryDelete:${id}`,
     () => client().cms.entries.delete.mutate({ siteId, id }),
     // eslint-disable-next-line no-console
-    (e) => console.warn("[cms-sync] entry delete failed (queued)", e)
+    (e) => console.warn("[cms-sync] entry delete failed (queued)", e),
+    {
+      gone: () => forgetServerStamp(`entry:${id}`),
+      conflict: () => {},
+    },
   );
 }

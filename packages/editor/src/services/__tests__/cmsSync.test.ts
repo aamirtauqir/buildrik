@@ -27,6 +27,9 @@ const loadCollections = vi.fn();
 const saveCollection = vi.fn();
 const saveContentItem = vi.fn();
 const loadContentItems = vi.fn(async (_collectionId: string): Promise<unknown[]> => []);
+const loadContentItem = vi.fn();
+const storageDeleteContentItem = vi.fn();
+const storageDeleteCollection = vi.fn();
 const storageAvailable = vi.fn(() => true);
 vi.mock("../../engine/cms/CollectionStorage", () => ({
   isStorageAvailable: () => storageAvailable(),
@@ -34,6 +37,9 @@ vi.mock("../../engine/cms/CollectionStorage", () => ({
   saveCollection: (...a: unknown[]) => saveCollection(...a),
   saveContentItem: (...a: unknown[]) => saveContentItem(...a),
   loadContentItems: (id: string) => loadContentItems(id),
+  loadContentItem: (...a: unknown[]) => loadContentItem(...a),
+  deleteContentItem: (...a: unknown[]) => storageDeleteContentItem(...a),
+  deleteCollection: (...a: unknown[]) => storageDeleteCollection(...a),
 }));
 
 import {
@@ -43,6 +49,7 @@ import {
   syncEntryDelete,
   hydrateCmsFromServer,
   onCmsSyncError,
+  onCmsConflict,
   retryCmsSync,
   getCmsSyncPendingCount,
 } from "../cmsSync";
@@ -50,11 +57,14 @@ import { recordServerStamp } from "../syncRetryQueue";
 
 beforeEach(() => {
   window.history.replaceState({}, "", "/edit/site-123");
-  [colUpsert, colDelete, entUpsert, entDelete, colListQuery, entListQuery, loadCollections, saveCollection, saveContentItem].forEach((m) =>
+  [colUpsert, colDelete, entUpsert, entDelete, colListQuery, entListQuery, loadCollections, saveCollection, saveContentItem, loadContentItem, storageDeleteContentItem, storageDeleteCollection].forEach((m) =>
     m.mockReset(),
   );
   storageAvailable.mockReset().mockReturnValue(true);
   loadContentItems.mockReset().mockResolvedValue([]);
+  loadContentItem.mockReset();
+  storageDeleteContentItem.mockReset().mockResolvedValue(undefined);
+  storageDeleteCollection.mockReset().mockResolvedValue(undefined);
   localStorage.removeItem("bk-sync-stamps-v1");
   localStorage.removeItem("bk-sync-stamp-migrations-v1");
   // The server answers an upsert with its row — updatedAt on ITS clock.
@@ -127,6 +137,7 @@ describe("cmsSync", () => {
       pageSeoTitle: null,
       pageSeoDescription: null,
       pageTemplatePath: null,
+      expectedUpdatedAt: null,
     });
   });
 });
@@ -603,5 +614,88 @@ describe("hydrateCmsFromServer · slugless stored fields", () => {
     await hydrateCmsFromServer();
     const saved = saveCollection.mock.calls[0][0] as { fields: Array<{ slug: string }> };
     expect(saved.fields.map((f) => f.slug)).toEqual(["title", "body"]);
+  });
+});
+
+/* Task 5 — stale writes surface as conflicts; deletes reach every device.
+   Mirrors send the last server stamp as a precondition; CONFLICT asks the user
+   instead of retrying forever; GONE and hydrate remove rows the server
+   tombstoned, so a stale tab can't republish them. */
+describe("C0a sync", () => {
+  it("sends the stamped server updatedAt as expectedUpdatedAt", async () => {
+    recordServerStamp("entry:e1", "2026-09-28T10:00:00.000Z", "L1");
+    await syncEntryUpsert({ id: "e1", collectionId: "c1", data: {}, status: "draft", createdAt: "L0", updatedAt: "L1" } as never);
+    expect(entUpsert).toHaveBeenCalledWith(expect.objectContaining({ expectedUpdatedAt: "2026-09-28T10:00:00.000Z" }));
+  });
+
+  it("a first create sends no precondition", async () => {
+    await syncEntryUpsert({ id: "new1", collectionId: "c1", data: {}, status: "draft", createdAt: "L0", updatedAt: "L0" } as never);
+    /* `null` is the wire shape — the server treats `undefined` and `null`
+       both as "skip precondition" (see cms.service.ts:assertFresh). */
+    expect(entUpsert.mock.calls.at(-1)?.[0].expectedUpdatedAt).toBeNull();
+  });
+
+  it("CONFLICT is not queued for retry; it is announced once", async () => {
+    const off = onCmsSyncError(() => {});
+    entUpsert.mockRejectedValueOnce(
+      Object.assign(new Error("CMS_CONFLICT:2026-09-28T11:00:00.000Z"), { data: { code: "CONFLICT" } }),
+    );
+    const seen: string[] = [];
+    const offConflict = onCmsConflict((c) => seen.push(c.id));
+    await syncEntryUpsert({ id: "e2", collectionId: "c1", data: {}, status: "draft", createdAt: "L0", updatedAt: "L1" } as never);
+    expect(seen).toEqual(["e2"]);
+    expect(getCmsSyncPendingCount()).toBe(0);
+    offConflict();
+    off();
+  });
+
+  it("GONE drops the op and forgets the row locally", async () => {
+    const off = onCmsSyncError(() => {});
+    entUpsert.mockRejectedValueOnce(
+      Object.assign(new Error("CMS_GONE:This record was deleted."), { data: { code: "NOT_FOUND" } }),
+    );
+    await syncEntryUpsert({ id: "e3", collectionId: "c1", data: {}, status: "draft", createdAt: "L0", updatedAt: "L1" } as never);
+    expect(getCmsSyncPendingCount()).toBe(0);
+    expect(storageDeleteContentItem).toHaveBeenCalledWith("e3");
+    off();
+  });
+
+  it("hydrate removes stamped local rows the server no longer lists", async () => {
+    const off = onCmsSyncError(() => {});
+    recordServerStamp("entry:old", "2026-09-01T00:00:00.000Z", "L");
+    colListQuery.mockResolvedValueOnce([
+      {
+        id: "c1", name: "B", slug: "b", description: null, icon: null, displayField: null, fields: [],
+        createdAt: "2026-09-01T00:00:00.000Z", updatedAt: "2026-09-01T00:00:00.000Z",
+        pageSlugPattern: null, pageSeoTitle: null, pageSeoDescription: null, pageTemplatePath: null,
+      },
+    ]);
+    loadCollections.mockResolvedValueOnce([]);
+    loadContentItems.mockResolvedValueOnce([
+      { id: "old", collectionId: "c1", data: {}, status: "draft", createdAt: "L", updatedAt: "L" },
+    ]);
+    entListQuery.mockResolvedValueOnce([]);
+    await hydrateCmsFromServer();
+    expect(storageDeleteContentItem).toHaveBeenCalledWith("old");
+    off();
+  });
+
+  it("hydrate keeps an unstamped local row (never reached the server)", async () => {
+    const off = onCmsSyncError(() => {});
+    colListQuery.mockResolvedValueOnce([
+      {
+        id: "c1", name: "B", slug: "b", description: null, icon: null, displayField: null, fields: [],
+        createdAt: "2026-09-01T00:00:00.000Z", updatedAt: "2026-09-01T00:00:00.000Z",
+        pageSlugPattern: null, pageSeoTitle: null, pageSeoDescription: null, pageTemplatePath: null,
+      },
+    ]);
+    loadCollections.mockResolvedValueOnce([]);
+    loadContentItems.mockResolvedValueOnce([
+      { id: "fresh", collectionId: "c1", data: {}, status: "draft", createdAt: "L", updatedAt: "L" },
+    ]);
+    entListQuery.mockResolvedValueOnce([]);
+    await hydrateCmsFromServer();
+    expect(storageDeleteContentItem).not.toHaveBeenCalledWith("fresh");
+    off();
   });
 });

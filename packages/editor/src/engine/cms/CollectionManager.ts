@@ -387,6 +387,27 @@ export class CollectionManager extends EventEmitter {
     return true;
   }
 
+  /* C0a (Task 5): drop a local row whose server copy is already gone, without
+     firing CMS_*_DELETED — the sync layer called us, and the matching
+     `_DELETED` listener would otherwise try to mirror a delete back to a row
+     the server no longer holds. Storage is rewritten first so the in-memory
+     cache is rebuilt from it; emits CMS_STORE_REFRESHED so any UI bound to
+     that signal (Content panel, RecordsTable, binding popover) re-reads. */
+  async forgetLocal(kind: "collection" | "entry", id: string): Promise<void> {
+    if (kind === "collection") {
+      await Storage.deleteCollection(id);
+      this.collections.delete(id);
+      this.contentCache.delete(id);
+    } else {
+      const existing = await Storage.loadContentItem(id);
+      if (existing) {
+        await Storage.deleteContentItem(id);
+        this.invalidateContentCache(existing.collectionId);
+      }
+    }
+    this.emit(EVENTS.CMS_STORE_REFRESHED);
+  }
+
   async getContentItem(id: string): Promise<CMSContentItem | null> {
     return Storage.loadContentItem(id);
   }

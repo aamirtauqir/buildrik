@@ -196,6 +196,25 @@ export function hasServerStamp(key: string): boolean {
   return key in readStamps();
 }
 
+/** The server updatedAt the server last confirmed for `key`, if any — the
+ *  precondition a write sends so a teammate's newer copy is refused, not
+ *  overwritten. */
+export function serverStampOf(key: string): string | undefined {
+  return readStamps()[key]?.server;
+}
+
+/** Forget `key`'s stamp — the row is gone, or the user chose to overwrite. */
+export function forgetServerStamp(key: string): void {
+  try {
+    const stamps = readStamps();
+    if (!(key in stamps)) return;
+    delete stamps[key];
+    localStorage.setItem(STAMP_STORAGE_KEY, JSON.stringify(stamps));
+  } catch {
+    // Storage unavailable: the next write simply goes without a precondition.
+  }
+}
+
 /**
  * Whether hydration may overwrite the local copy of `key` with the server's.
  * `firstPass` is the one-time pre-stamp pass (see `stampMigrationDue`): rows
