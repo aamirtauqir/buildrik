@@ -95,6 +95,32 @@ export async function listCollections(siteId: string) {
   return rows.map(({ _count, ...c }) => ({ ...c, entryCount: _count.entries }));
 }
 
+/**
+ * Precondition guard: the caller's last-seen `updatedAt` must match what's in
+ * the DB, or the row has been edited underneath them (CONFLICT — return the
+ * current value so the client can show "someone else saved, reload?"). When
+ * the caller didn't supply a precondition (`expectedUpdatedAt` undefined) the
+ * check is skipped — a deliberate opt-out, NOT a default. Skipping on null
+ * too: the editor's first-time save after a reset wipes the optimistic value.
+ */
+async function assertFresh(
+  table: "cmsCollection" | "cmsEntry",
+  where: Record<string, unknown>,
+  expectedUpdatedAt: string | null | undefined,
+): Promise<Date> {
+  if (expectedUpdatedAt === undefined) return new Date(0);
+  const row = await (prisma[table].findFirst as (args: unknown) => Promise<{ updatedAt: Date } | null>)({
+    where,
+    select: { updatedAt: true },
+  });
+  if (!row) throw new CmsError("NOT_FOUND", "Row not found");
+  const expected = expectedUpdatedAt === null ? null : new Date(expectedUpdatedAt);
+  if (expected && row.updatedAt.getTime() !== expected.getTime()) {
+    throw new CmsError("CONFLICT", row.updatedAt.toISOString());
+  }
+  return expected ?? row.updatedAt;
+}
+
 export async function upsertCollection(siteId: string, input: UpsertCollectionInput) {
   const data = {
     name: input.name,
@@ -118,11 +144,28 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
     });
     if (existing && existing.siteId !== siteId) throw new CmsError("NOT_FOUND", "Collection not found");
     if (existing?.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
-    return prisma.cmsCollection.upsert({
-      where: { id: input.id },
-      create: { id: input.id, siteId, ...data },
-      update: data,
-    });
+    if (existing) {
+      await assertFresh(
+        "cmsCollection",
+        { id: input.id },
+        input.expectedUpdatedAt,
+      );
+      // Conditional update: WHERE updatedAt = expected — if another writer
+      // slipped in between assertFresh and here, count is 0 and we throw CONFLICT.
+      const expected = input.expectedUpdatedAt ? new Date(input.expectedUpdatedAt) : null;
+      const result = await prisma.cmsCollection.updateMany({
+        where: expected
+          ? { id: input.id, updatedAt: expected }
+          : { id: input.id },
+        data,
+      });
+      if (result.count === 0) {
+        const fresh = await prisma.cmsCollection.findUnique({ where: { id: input.id }, select: { updatedAt: true } });
+        throw new CmsError("CONFLICT", fresh?.updatedAt.toISOString() ?? new Date().toISOString());
+      }
+      return prisma.cmsCollection.findUnique({ where: { id: input.id } });
+    }
+    return prisma.cmsCollection.create({ data: { id: input.id, siteId, ...data } });
   }
   return prisma.cmsCollection.create({ data: { siteId, ...data } });
 }
@@ -174,11 +217,26 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
     });
     if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
     if (existing?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
-    return prisma.cmsEntry.upsert({
-      where: { id: input.id },
-      create: { id: input.id, collectionId: input.collectionId, ...data },
-      update: data,
-    });
+    if (existing) {
+      await assertFresh(
+        "cmsEntry",
+        { id: input.id },
+        input.expectedUpdatedAt,
+      );
+      const expected = input.expectedUpdatedAt ? new Date(input.expectedUpdatedAt) : null;
+      const result = await prisma.cmsEntry.updateMany({
+        where: expected
+          ? { id: input.id, updatedAt: expected }
+          : { id: input.id },
+        data,
+      });
+      if (result.count === 0) {
+        const fresh = await prisma.cmsEntry.findUnique({ where: { id: input.id }, select: { updatedAt: true } });
+        throw new CmsError("CONFLICT", fresh?.updatedAt.toISOString() ?? new Date().toISOString());
+      }
+      return prisma.cmsEntry.findUnique({ where: { id: input.id } });
+    }
+    return prisma.cmsEntry.create({ data: { id: input.id, collectionId: input.collectionId, ...data } });
   }
   return prisma.cmsEntry.create({ data: { collectionId: input.collectionId, ...data } });
 }

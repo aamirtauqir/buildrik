@@ -87,12 +87,9 @@ describe("collections", () => {
 
   it("upsert with id creates-if-missing (engine id → DB id on first sync)", async () => {
     mocks.colFindUnique.mockResolvedValueOnce(null);
-    mocks.colUpsert.mockResolvedValueOnce({ id: "eng-1" });
+    mocks.colCreate.mockResolvedValueOnce({ id: "eng-1" });
     await upsertCollection("s1", { id: "eng-1", siteId: "s1", name: "Posts", slug: "posts", fields: [] });
-    expect(mocks.colUpsert.mock.calls[0][0]).toMatchObject({
-      where: { id: "eng-1" },
-      create: expect.objectContaining({ id: "eng-1", siteId: "s1" }),
-    });
+    expect(mocks.colCreate.mock.calls[0][0].data).toMatchObject({ id: "eng-1", siteId: "s1", name: "Posts", slug: "posts" });
   });
 });
 
