@@ -232,7 +232,9 @@ export class CollectionManager extends EventEmitter {
 
     /* A new key moves every record's value to it — records store data by
        key, so an unmigrated rename would orphan them all — and follows into
-       the two places the collection names a field by key. */
+       the two places the collection names a field by key. Each moved record
+       is emitted so the server mirror moves it too; before, only the local
+       copy moved (DM-02). */
     const renamed = updates.slug !== undefined && updates.slug !== previous.slug;
     const keyed: Partial<CMSCollection> = {};
     if (renamed) {
@@ -241,7 +243,9 @@ export class CollectionManager extends EventEmitter {
       for (const item of await Storage.loadContentItems(collectionId)) {
         if (!(from in item.data)) continue;
         const { [from]: value, ...rest } = item.data;
-        await Storage.saveContentItem({ ...item, data: { ...rest, [to]: value } });
+        const moved = { ...item, data: { ...rest, [to]: value }, updatedAt: new Date().toISOString() };
+        await Storage.saveContentItem(moved);
+        this.emit(EVENTS.CMS_CONTENT_UPDATED, moved);
       }
       this.invalidateContentCache(collectionId);
       if (collection.pageSlugPattern) keyed.pageSlugPattern = collection.pageSlugPattern.split(`{${from}}`).join(`{${to}}`);
