@@ -294,12 +294,14 @@ export async function transferSite(
 ) {
   const site = await prisma.site.findUnique({ where: { id: siteId } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
-  if (site.createdBy !== currentUserId) throw new Error("NOT_OWNER");
 
   const currentMember = await prisma.workspaceMember.findFirst({
     where: { userId: currentUserId, workspaceId: site.workspaceId },
-    select: { id: true, _count: { select: { sitePermissions: true } } },
+    select: { id: true, role: true, _count: { select: { sitePermissions: true } } },
   });
+  // Q-B5 (BE-8): the site's creator, or the workspace OWNER — who owns every
+  // site in it, and could not hand on one somebody else had created.
+  if (site.createdBy !== currentUserId && currentMember?.role !== "OWNER") throw new Error("NOT_OWNER");
   const newOwnerMember = await prisma.workspaceMember.findFirst({
     where: { userId: newOwnerId, workspaceId: site.workspaceId },
   });
