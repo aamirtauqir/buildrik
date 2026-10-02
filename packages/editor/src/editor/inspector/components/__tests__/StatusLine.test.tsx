@@ -57,7 +57,9 @@ describe("StatusLine", () => {
     line = screen.getByTestId("inspector-status-line");
     expect(line).toHaveAttribute("data-tone", "muted");
     expect(line.className).not.toContain("--bk-warning-tint");
-    /* Boards 23 / 29 inset the line's text 16px from the column edge. */
+    /* Boards 23 / 29 pad the line 6 · 16; the 24px action gives its extra 8 back. */
     expect(line.className).toContain("tw:px-4");
+    expect(line.className).toContain("tw:py-1.5");
+    expect(screen.getByTestId("inspector-unlock").className).toContain("tw:-my-1");
   });
 });

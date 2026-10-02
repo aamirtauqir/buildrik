@@ -48,7 +48,9 @@ const LINK =
   "tw:h-6 tw:min-h-0 tw:min-w-6 tw:-my-1 tw:justify-center tw:border-0 tw:bg-transparent tw:p-0 tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)] " +
   "tw:hover:bg-transparent tw:hover:text-[var(--bk-ink)] tw:hover:underline";
 const NOTE = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap";
-const LINE = "tw:flex tw:items-center tw:gap-1 tw:px-1.5";
+/* Boards 27 / 28: each line is its own note row under the chips, 8 · 16 —
+   the boards' one-line note padding (board 26 draws its note the same). */
+const LINE = "tw:flex tw:items-center tw:gap-1 tw:px-4 tw:py-2";
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
@@ -56,8 +58,10 @@ export function ContextRow(p: ContextRowProps) {
   const [open, setOpen] = React.useState(false);
   const base = p.state === "normal";
   return (
-    <div className="tw:flex tw:flex-col tw:gap-1 tw:px-3 tw:py-1" data-testid="inspector-context-row">
-      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2" data-testid="inspector-context-chips">
+    <div className="tw:flex tw:flex-col" data-testid="inspector-context-row">
+      {/* 28 tall like the boards' "Style context" row: their 20px chip in 4px
+          padding is a 24px target here, so the padding is 2. */}
+      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:px-3 tw:py-0.5" data-testid="inspector-context-chips">
         <Popover
           open={open}
           onClose={() => setOpen(false)}

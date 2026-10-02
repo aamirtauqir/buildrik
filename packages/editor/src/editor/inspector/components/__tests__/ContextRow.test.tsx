@@ -47,8 +47,12 @@ describe("ContextRow", () => {
     expect(screen.getByTestId("inspector-state-chip").className).toContain("--bk-accent-subtle");
     const line = screen.getByTestId("inspector-state-overrides");
     expect(line.textContent?.replace(/\s+/g, " ").trim()).toBe("1 :hover override · Reset");
-    /* Its own line: not in the chip row. */
+    /* Its own line: not in the chip row. Boards 27 / 28: chips 28 tall
+       (py 2 around the 24px chip), the note row 8 · 16. */
     expect(screen.getByTestId("inspector-context-chips").contains(line)).toBe(false);
+    expect(screen.getByTestId("inspector-context-chips").className).toContain("tw:py-0.5");
+    expect(line.className).toContain("tw:px-4");
+    expect(line.className).toContain("tw:py-2");
     fireEvent.click(screen.getByTestId("inspector-state-reset"));
     expect(p.onResetState).toHaveBeenCalled();
   });

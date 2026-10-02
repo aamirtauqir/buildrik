@@ -36,6 +36,7 @@ import { InspectorLoading } from "./components/InspectorLoading";
 import { MultiSelectBar } from "./components/MultiSelectBar";
 import { PagePanel } from "./components/PagePanel";
 import { StatusLine } from "./components/StatusLine";
+import { StatusMarks } from "./components/StatusMarks";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { useElementBinding } from "./hooks/useElementBinding";
@@ -326,7 +327,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
           {elementTypeLabel(selectedElement.type)} selected
         </div>
-        <InspectorHeader composer={composer} element={selectedElement} selectedIds={targetIds} binding={binding} locked={locked} />
+        <InspectorHeader composer={composer} element={selectedElement} selectedIds={targetIds} />
+        {targetIds.length > 1 ? null : (
+          <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding} locked={locked} />
+        )}
         <StatusLine composer={composer} elementId={selectedElement.id} locked={locked} conflict={conflict} />
         {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}
         {agentRun.running ? (

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * InspectorHeader — board 1's header: the element path (crumbs go there),
- * icon + name, ✦ AI, ⋯, ✕ hide (⌘\), and the status marks only when true.
+ * icon + name, ✦ AI, ⋯, ✕ hide (⌘\). The status marks are their own row.
  * Real Composer.
  *
  * @license BSD-3-Clause
@@ -42,8 +42,6 @@ const mount = (over: Partial<React.ComponentProps<typeof InspectorHeader>> = {})
         composer={c}
         element={{ id: heading.getId(), type: "heading" }}
         selectedIds={[heading.getId()]}
-        binding={null}
-        locked={false}
         {...over}
       />
     </ToastProvider>
@@ -76,34 +74,11 @@ describe("InspectorHeader", () => {
     expect(hide).toHaveBeenCalled();
   });
 
-  it("status marks appear only when true", () => {
-    const { unmount } = mount();
-    expect(screen.queryByTestId("inspector-status-marks")).toBeNull();
-    unmount();
-    mount({ locked: true, binding: { label: "Specials.title", missing: true, collectionId: "x" } });
-    expect(screen.getByTestId("inspector-mark-locked")).toHaveTextContent("Locked");
-    expect(screen.getByTestId("inspector-bound-chip")).toHaveTextContent("Specials.title · missing");
-  });
-
-  it("boards 24/25: the binding is a bordered chip with a ▾ — accent when bound, error-tinted when missing", () => {
-    const { unmount } = mount({ binding: { label: "Menu.name", missing: false, collectionId: "m" } });
-    let chip = screen.getByTestId("inspector-bound-chip");
-    expect(chip).toHaveAttribute("data-tone", "bound");
-    expect(chip.className).toContain("tw:border ");
-    expect(chip.querySelectorAll("svg")).toHaveLength(2);
-    unmount();
-    mount({ binding: { label: "Specials.title", missing: true, collectionId: "x" } });
-    chip = screen.getByTestId("inspector-bound-chip");
-    expect(chip).toHaveAttribute("data-tone", "missing");
-    expect(chip.className).toContain("--bk-error-tint");
-  });
-
-  it("the binding chip opens Behaviour › CMS binding", () => {
-    const focus = vi.fn();
-    c.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
-    mount({ binding: { label: "Menu.name", missing: false, collectionId: "m" } });
-    fireEvent.click(screen.getByTestId("inspector-bound-chip"));
-    expect(focus).toHaveBeenCalledWith({ section: "cms-binding" });
+  it("72 tall like the boards: the identity row is 28, and no status marks live inside it", () => {
+    mount();
+    const header = screen.getByTestId("inspector-header");
+    expect(screen.getByTestId("inspector-ai-chip").parentElement?.className).toContain("tw:min-h-7");
+    expect(header.querySelector('[data-testid="inspector-status-marks"]')).toBeNull();
   });
 
   it("multi: '3 selected · Headings', path to the common parent", () => {
