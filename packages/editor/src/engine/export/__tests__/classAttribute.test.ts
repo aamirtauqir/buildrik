@@ -91,5 +91,22 @@ describe("attributes.class in the HTML writers", () => {
     const id = el.getId();
     expect(classOf(composer.elements.toHTML(), id).tokens).toEqual(["ok"]);
     expect(classOf(await publishedBody(composer), id).tokens.slice(1)).toEqual(["ok"]);
+    const single = new ExportEngine(composer).generateHTML({ minify: false });
+    const tag = single.match(new RegExp(`<[a-z0-9]+[^>]*class="[^"]*${id}[^"]*"[^>]*>`))?.[0] ?? "";
+    expect((tag.match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/).slice(1)).toEqual(["ok"]);
+    expect(tag).not.toMatch(/<c>|onerror|a"b/);
+  });
+
+  it("single-file export: the Accordion keeps its block classes, a duplicate appears once", () => {
+    const composer = createTestComposer();
+    const page = composer.elements.createPage("Home");
+    const id = insertBlock(composer, getBlockById("accordion")!, page.root.id)!;
+    composer.elements.getElement(id)!.addClass("accordion");
+    const html = new ExportEngine(composer).generateHTML({ minify: false });
+    const tag = html.match(new RegExp(`<[a-z0-9]+[^>]*class="[^"]*${id}[^"]*"[^>]*>`))?.[0] ?? "";
+    const tokens = (tag.match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    expect(tokens.filter((t) => t === "accordion")).toHaveLength(1);
+    expect((tag.match(/\sclass=/g) ?? []).length).toBe(1);
+    expect(html).toMatch(/class="[^"]*\baccordion-header\b/);
   });
 });
