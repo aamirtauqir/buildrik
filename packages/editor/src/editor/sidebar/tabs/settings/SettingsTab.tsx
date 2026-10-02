@@ -736,7 +736,7 @@ export const SettingsTab: React.FC<
             Back to canvas
           </Button>
           <h2
-            className="tw:m-0 tw:mt-2.5 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:tracking-[-0.36px] tw:text-[var(--bk-ink)]"
+            className="tw:m-0 tw:mt-2.5 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:tracking-[-0.015em] tw:text-[var(--bk-ink)]"
             data-testid="set-title"
           >
             Settings
