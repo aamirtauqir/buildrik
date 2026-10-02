@@ -21,7 +21,7 @@ function mount(over: Partial<React.ComponentProps<typeof ConnectionVerifiedDialo
 describe("Clone 4256:26844 · Connection verified", () => {
   it("carries the frame's title, the receiving line and the just-now note, at the 640 table width", () => {
     mount();
-    expect(screen.getByTestId("set-an-verified-title")).toHaveTextContent("Connection verified");
+    expect(screen.getByTestId("set-an-verified-title")).toHaveTextContent("Data is arriving");
     expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(
       "G-4XQ2P7B1KD is receiving data. 1,284 events arrived in the last 24 hours.",
     );
@@ -31,10 +31,11 @@ describe("Clone 4256:26844 · Connection verified", () => {
     expect(screen.getByTestId("set-an-verified")).toHaveClass("tw:w-[var(--bk-size-dialog-lg)]");
   });
 
-  it("says the id is verified with nothing arrived yet when the count is zero", () => {
+  it("with nothing arrived yet says only the format is OK (SET-05) — never 'verified'", () => {
     mount({ events24h: 0 });
+    expect(screen.getByTestId("set-an-verified-title")).toHaveTextContent("Format OK · no events yet");
     expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(
-      /^G-4XQ2P7B1KD is verified\. No events have arrived yet\.$/,
+      /^G-4XQ2P7B1KD has the right format\. No events have arrived yet\.$/,
     );
   });
 
@@ -72,6 +73,6 @@ describe("connectionVerifiedLine / eventsPhrase — pure", () => {
 
   it("switches sentence on the count", () => {
     expect(connectionVerifiedLine("G-ABCD123456", 1)).toBe("G-ABCD123456 is receiving data. 1 event arrived in the last 24 hours.");
-    expect(connectionVerifiedLine("G-ABCD123456", 0)).toBe("G-ABCD123456 is verified. No events have arrived yet.");
+    expect(connectionVerifiedLine("G-ABCD123456", 0)).toBe("G-ABCD123456 has the right format. No events have arrived yet.");
   });
 });

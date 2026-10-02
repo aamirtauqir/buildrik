@@ -385,7 +385,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               onClick={verify}
               data-testid="set-an-ga-verify"
             >
-              Verify
+              {verifying ? "Checking…" : "Check data is arriving"}
             </Button>
           </div>
         </Row>
