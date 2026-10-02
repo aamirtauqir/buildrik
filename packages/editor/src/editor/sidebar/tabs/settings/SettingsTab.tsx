@@ -577,7 +577,8 @@ export const SettingsTab: React.FC<
       return <LockedScreen variant={required} {...LOCKED_COPY[screenId]} onUpgrade={openBilling} />;
     }
     const screenNode = (
-      <SiteColumnsLockedContext.Provider value={siteColumnsLocked}>{renderEditableScreen(screenId)}</SiteColumnsLockedContext.Provider>
+      /* A read-only screen says so once, in its notice (8134:212323) — not again under every field. */
+      <SiteColumnsLockedContext.Provider value={siteColumnsLocked && !readOnly}>{renderEditableScreen(screenId)}</SiteColumnsLockedContext.Provider>
     );
     if (!readOnly || !screenRules || !current) return screenNode;
     return (

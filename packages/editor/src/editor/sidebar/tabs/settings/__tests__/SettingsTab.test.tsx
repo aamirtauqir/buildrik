@@ -901,6 +901,8 @@ describe("SettingsTab — read-only below the screen's role", () => {
     const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
     expect(screen.getByTestId("set-readonly").textContent).toBe("Only admins can change General");
     expect(siteName.matches(":disabled")).toBe(true);
+    // Said once, in the notice — not again under each field (8134:212323).
+    expect(screen.queryByTestId("set-admin-only")).toBeNull();
     expect((screen.getByLabelText("Author") as HTMLInputElement).matches(":disabled")).toBe(true);
     expect(screen.queryByTestId("set-foot-save")).toBeNull();
   });
