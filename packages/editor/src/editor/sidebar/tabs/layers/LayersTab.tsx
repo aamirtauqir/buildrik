@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID, Tooltip } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID, Tooltip } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -73,6 +73,9 @@ const DIM_SCOPE_TIP =
   "Dimming fades a layer in the editor only — it still publishes. To hide it on the site, use Visibility in the inspector.";
 /* The footer's ⓘ: a 20 square ghost at the right edge of the 32 band. */
 const DIM_INFO_BTN = "tw:size-5 tw:min-h-0 tw:p-0 tw:text-[var(--bk-ink-muted)]";
+/* Select · Select all · Deselect all · Done — text actions in the 32 band,
+   12px so they sit one step above the 11px count they qualify. */
+const SELECT_BTN = "tw:min-h-0 tw:h-6 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:font-medium";
 
 /* Escape deselects, then closes the drawer (owner ruling 2026-09-24) — but a key meant for
    something else is not ours: a rename field or any other text field, an
@@ -126,6 +129,22 @@ export const LayersTab: React.FC<LayersTabProps> = ({
      Display settings…. The three used to sit as ⊞ ⊟ ⚙ glyphs on the toolbar
      row (audit G2-058: pattern, not capability). */
   const [menuOpen, setMenuOpen] = React.useState(false);
+  /* Selection mode (owner decision 2026-10-03, overriding v3 boards
+     4418:79139 / 4418:81300, which draw the row checkbox on every row at all
+     times). Off: no checkboxes, a row click selects that element. On: every
+     row carries its checkbox and a row click toggles it. The ticks ARE the
+     canvas selection — there is no second set — so the bulk actions that read
+     the selection (Delete ×N, Move to page, the context menu) work as they
+     did. Local UI state only; never persisted. */
+  const [selecting, setSelecting] = React.useState(false);
+  const exitSelecting = React.useCallback(() => {
+    setSelecting(false);
+    composer?.selection.clear();
+  }, [composer]);
+  /* A closed drawer is not a mode to come back to. */
+  React.useEffect(() => {
+    if (!isOpen) setSelecting(false);
+  }, [isOpen]);
   /* Raised by the tree boundary so the count footer, which is its sibling,
      can stand down with it. */
   const [treeFailed, setTreeFailed] = React.useState(false);
@@ -164,23 +183,30 @@ export const LayersTab: React.FC<LayersTabProps> = ({
     };
   }, [composer, isOpen]);
   React.useEffect(() => {
-    if (!onClose || menuOpen || !isOpen) return;
+    if ((!onClose && !selecting) || menuOpen || !isOpen) return;
     /* Two steps, as the prototype is wired: with something selected Escape
        deselects; with nothing selected it closes the drawer. */
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || !escapeIsOurs(e)) return;
+      /* Selection mode first: Escape leaves it (and clears the ticks) in one
+         step, without closing the drawer. */
+      if (selecting) {
+        e.stopPropagation();
+        exitSelecting();
+        return;
+      }
       const selection = composer?.selection;
       if (selection && (selection.getSelectedIds?.().length ?? 0) > 0) {
         selection.clear();
         return;
       }
-      onClose();
+      onClose?.();
     };
     /* Capture: the canvas's global shortcuts claim Escape (deselect) and
        mark it handled before a bubbling listener would ever see it. */
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [composer, onClose, menuOpen, isOpen]);
+  }, [composer, onClose, menuOpen, isOpen, selecting, exitSelecting]);
 
   const handleLayerHover = React.useCallback(
     (id: string | null) => {
@@ -262,6 +288,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               onLayerHover={handleLayerHover}
               canvasHoveredId={canvasHoveredId}
               search={search}
+              selecting={selecting}
               displaySettingsOpen={displaySettingsOpen}
               onDisplaySettingsToggle={() => setDisplaySettingsOpen((v) => !v)}
             />
@@ -278,25 +305,77 @@ export const LayersTab: React.FC<LayersTabProps> = ({
         <div className="bdc-lcount" data-testid="layers-count" aria-live="polite">
           {/* The span is the board's own second node (142:59 inside 142:58):
               the band carries the height, the run carries the type. */}
-          <span data-testid="layers-count-text">
+          <span data-testid="layers-count-text" className="tw:min-w-0 tw:truncate">
             {stats.matches !== null && search
               ? `${stats.matches} of ${stats.total} layers match “${search}”`
-              : stats.selected >= 2
-                ? `${stats.selected} selected of ${stats.total}`
-                : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+              : selecting && stats.selected > 0
+                ? `${stats.selected} selected`
+                : stats.selected >= 2
+                  ? `${stats.selected} selected of ${stats.total}`
+                  : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+          </span>
+          {/* Select (owner decision 2026-10-03): the door into selection mode,
+              beside the count it changes. In the mode: Select all while any
+              row is unticked, Deselect all while any is ticked (both when
+              some are), and Done to leave. */}
+          <span className="tw:ml-3 tw:flex tw:flex-none tw:items-center tw:gap-3">
+            {selecting ? (
+              <>
+                {stats.selected < (stats.matches !== null && search ? stats.matches : stats.total) && (
+                  <Button
+                    variant="link"
+                    size="xs"
+                    className={SELECT_BTN}
+                    data-testid="layers-select-all"
+                    onClick={() => composer?.emit("layers:select-all", {})}
+                  >
+                    Select all
+                  </Button>
+                )}
+                {stats.selected > 0 && (
+                  <Button
+                    variant="link"
+                    size="xs"
+                    className={SELECT_BTN}
+                    data-testid="layers-deselect-all"
+                    onClick={() => composer?.selection.clear()}
+                  >
+                    Deselect all
+                  </Button>
+                )}
+                <Button variant="link" size="xs" className={SELECT_BTN} data-testid="layers-select-done" onClick={exitSelecting}>
+                  Done
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="link"
+                size="xs"
+                className={SELECT_BTN}
+                data-testid="layers-select-mode"
+                onClick={() => setSelecting(true)}
+              >
+                Select
+              </Button>
+            )}
           </span>
           {/* 4418:79546 "ⓘ · dim scope": what the row eye does — the canvas
-              dims the element for you; the published site still shows it. */}
-          <span className="tw:ml-auto tw:flex">
-            <Tooltip content={DIM_SCOPE_TIP} placement="top" arrow={false} className="tw:max-w-60 tw:whitespace-normal">
-              <IconButton label="About dimmed layers" data-testid="layers-dim-info" className={DIM_INFO_BTN}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 16v-4M12 8h.01" />
-                </svg>
-              </IconButton>
-            </Tooltip>
-          </span>
+              dims the element for you; the published site still shows it.
+              Stood down in selection mode, where the band needs its width
+              for "N selected · Select all · Deselect all · Done" (measured
+              live: Done ended flush against it, 0px apart) and dimming is not the subject. */}
+          {!selecting && (
+            <span className="tw:ml-auto tw:flex">
+              <Tooltip content={DIM_SCOPE_TIP} placement="top" arrow={false} className="tw:max-w-60 tw:whitespace-normal">
+                <IconButton label="About dimmed layers" data-testid="layers-dim-info" className={DIM_INFO_BTN}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16v-4M12 8h.01" />
+                  </svg>
+                </IconButton>
+              </Tooltip>
+            </span>
+          )}
         </div>
       )}
     </PanelFrame>
