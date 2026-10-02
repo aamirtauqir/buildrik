@@ -50,7 +50,6 @@ export const FEATURED_APP = {
 };
 
 export const CATALOG_APPS: readonly CatalogApp[] = [
-  { id: "google-analytics", name: "Google Analytics", category: "Analytics", description: "Traffic, events and conversion tracking on every published site.", icon: "BarChart3", action: "Connect", color: "#EA8E1E" },
   { id: "commerce", name: "Commerce", category: "Commerce", description: "Products, carts and Stripe checkout — turn any site into a store.", icon: "ShoppingCart", action: "Install", color: "#7C5CF6" },
   { id: "mailchimp", name: "Mailchimp", category: "Marketing", description: "Sync form submissions straight into your email audiences.", icon: "Mail", action: "Connect", color: "#2D6DFF" },
   { id: "typeform", name: "Typeform", category: "Forms", description: "Embed conversational forms and pipe responses to Submissions.", icon: "FileText", action: "Install", color: "#0D94A6" },

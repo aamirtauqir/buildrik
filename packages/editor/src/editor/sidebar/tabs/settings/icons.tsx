@@ -1,7 +1,6 @@
 /**
- * Settings nav icons — one glyph per row of the Clone sidebar (3397:32011),
- * reused by the Overview's section cards (3397:32915) so a row looks the
- * same in both places.
+ * Settings nav icons — one glyph per sidebar row (Phase B IA), reused by the
+ * Overview's section cards so a row looks the same in both places.
  *
  * @license BSD-3-Clause
  */
@@ -11,16 +10,16 @@ import {
   ChartColumn,
   Code,
   CreditCard,
-  Download,
   FileText,
   Globe,
   Languages,
   LayoutGrid,
+  LockKeyhole,
   Pencil,
-  Puzzle,
   Search,
   Settings,
-  SlidersHorizontal,
+  ShieldCheck,
+  TriangleAlert,
   Users,
   Zap,
   type LucideIcon,
@@ -30,18 +29,18 @@ import type { SettingsNavId } from "./types";
 export const NAV_ICONS: Record<SettingsNavId, LucideIcon> = {
   overview: LayoutGrid,
   general: Settings,
-  branding: Pencil,
   localization: Languages,
+  branding: Pencil,
   seo: Search,
   domains: Globe,
   redirects: ArrowLeftRight,
-  export: Download,
+  access: LockKeyhole,
   analytics: ChartColumn,
   forms: FileText,
   "custom-code": Code,
-  headers: SlidersHorizontal,
-  integrations: Puzzle,
-  webhooks: Zap,
+  headers: ShieldCheck,
+  "danger-zone": TriangleAlert,
   members: Users,
   billing: CreditCard,
+  webhooks: Zap,
 };

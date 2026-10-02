@@ -17,9 +17,9 @@ describe("Account Components", () => {
     const mod = await import("@/components/settings/workspace-form");
     expect(mod.WorkspaceForm).toBeDefined();
   });
-  it("exports INTEGRATION_CONFIGS with 4 providers", async () => {
+  it("exports INTEGRATION_CONFIGS with 3 providers — no Google Analytics (PD-2)", async () => {
     const mod = await import("@/components/settings/integrations-tab");
-    expect(mod.INTEGRATION_CONFIGS).toHaveLength(4);
+    expect(mod.INTEGRATION_CONFIGS.map((c) => c.provider)).toEqual(["MAILCHIMP", "ZAPIER", "SLACK"]);
   });
   it("exports AICreditsTab component", async () => {
     const mod = await import("@/components/settings/ai-credits-tab");

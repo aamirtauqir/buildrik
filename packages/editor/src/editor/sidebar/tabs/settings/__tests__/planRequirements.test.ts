@@ -1,9 +1,9 @@
 /**
  * Every plan-gate key must name a real screen.
  *
- * `SCREEN_PLAN_REQUIREMENTS` is a `Record<string, …>`, so a key that matches no
- * screen id does not fail — the lookup returns `undefined` and the screen
- * renders ungated. `advanced: "pro"` sat there while the screen's id was
+ * `SCREEN_PLAN_REQUIREMENTS` was a `Record<string, …>`, so a key that matched no
+ * screen id did not fail — the lookup returned `undefined` and the screen
+ * rendered ungated (it is keyed by `SettingsScreenId` since Phase B). `advanced: "pro"` sat there while the screen's id was
  * `custom-code`, so board 1138:13436's Pro lock never fired: measured on a
  * starter plan, Integrations gated and Custom code rendered its editors with
  * no badge at all. Types cannot catch this; this test can.
@@ -28,8 +28,7 @@ describe("SCREEN_PLAN_REQUIREMENTS", () => {
     }
   });
 
-  it("still gates the two screens the boards draw locked", () => {
-    expect(SCREEN_PLAN_REQUIREMENTS["custom-code"]).toBe("pro");
-    expect(SCREEN_PLAN_REQUIREMENTS.integrations).toBe("pro");
+  it("gates Custom code and Access on Pro — and nothing else (PD-2 removed Integrations)", () => {
+    expect(SCREEN_PLAN_REQUIREMENTS).toEqual({ "custom-code": "pro", access: "pro" });
   });
 });

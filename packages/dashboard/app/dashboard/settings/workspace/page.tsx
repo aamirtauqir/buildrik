@@ -62,15 +62,12 @@ export default function WorkspaceSettingsPage() {
         initialData={{
           name: ws.name ?? undefined,
           slug: ws.slug ?? undefined,
-          defaultLanguage: ws.defaultLanguage ?? undefined,
-          timezone: ws.timezone ?? undefined,
           iconUrl: ws.iconUrl,
           accentColor: ws.accentColor ?? undefined,
           editsRequireApproval: ws.editsRequireApproval ?? false,
           defaultExpiration: ws.sharingSettings?.defaultExpiration ?? null,
           requirePw: ws.sharingSettings?.requirePw ?? false,
           allowEditors: ws.sharingSettings?.allowEditors ?? false,
-          notify: ws.sharingSettings?.notify ?? true,
         }}
         onSave={(data) => updateMutation.mutate(data)}
         onSaveSharing={(data) => sharingMutation.mutate(data)}

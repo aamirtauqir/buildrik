@@ -877,6 +877,17 @@ ${html}${interactionScript}
   }
 
   /**
+   * Apply project settings the server already holds — the Settings Save
+   * (Phase B, BE-3) wrote them through the settings mutations first. The
+   * editor sees them (SETTINGS_CHANGE), but they are not a document edit: no
+   * dirty flag and no PROJECT_CHANGED, so autosave does not send the project
+   * again (`sites.saveProject`) for a change that is already saved.
+   */
+  adoptSavedProjectSettings(settings: ProjectSettings): void {
+    this.applyProjectSettings(this.projectSettings, settings, { emitProjectChanged: false });
+  }
+
+  /**
    * Get current project settings
    */
   getProjectSettings(): ProjectSettings {

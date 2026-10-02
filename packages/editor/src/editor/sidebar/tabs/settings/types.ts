@@ -5,6 +5,7 @@
 
 import type * as React from "react";
 import type { Composer } from "../../../../engine";
+import type { ProjectSettings } from "@/shared/types/project";
 
 // ============================================
 // Types
@@ -13,19 +14,46 @@ import type { Composer } from "../../../../engine";
 export type PlanTier = "starter" | "pro" | "enterprise";
 
 /**
- * Every row the Clone sidebar draws (3397:32011), in one union so the nav,
- * the icon map, the Overview's rows and the search registry name the same
- * sixteen things. `overview` is the landing screen; `branding` and `export`
- * are doors (the Brand panel, the Export modal); `members` / `billing` open
- * the dashboard.
+ * Every row of the Settings sidebar (Phase B IA, proposal §25 / plan M0), in
+ * one union so the nav, the icon map, the Overview's rows and the search
+ * registry name the same things. `overview` is the landing screen; `branding`
+ * is a door (the Brand panel); `members` / `billing` / `webhooks` ("Integrations
+ * & webhooks") open the dashboard. Every other id is a screen in the pane
+ * (`SettingsScreenId`). `localization` is titled "Languages", `forms` "Form
+ * submissions", `headers` "Security headers" — the ids stayed so deep links
+ * and saved nav positions keep working.
  */
 export type SettingsNavId =
   | "overview"
-  | "general" | "branding" | "localization"
-  | "seo" | "domains" | "redirects" | "export"
+  | "general" | "localization" | "branding"
+  | "seo"
+  | "domains" | "redirects" | "access"
   | "analytics" | "forms"
-  | "custom-code" | "headers" | "integrations"
-  | "webhooks" | "members" | "billing";
+  | "custom-code" | "headers"
+  | "danger-zone"
+  | "members" | "billing" | "webhooks";
+
+/** The ids that render in the pane — what `?settings=<id>` and `ui:settings-open` may name. */
+export type SettingsScreenId = Exclude<SettingsNavId, "branding" | "members" | "billing" | "webhooks">;
+
+/** The workspace doors: each opens a door card in the pane (8139:217358) that leads to the dashboard. */
+export type SettingsWorkspaceDoorId = "members" | "billing" | "webhooks";
+
+/** Everything the pane can show: a screen, or a workspace door's card. */
+export type SettingsPaneId = SettingsScreenId | SettingsWorkspaceDoorId;
+
+/** How a screen saves (§27): `footer` = Save/Discard in the footer through the
+ *  settings mutations; `immediate` = each action applies as it happens, through
+ *  its own dialog — the footer only appears if something is still left to save. */
+export type SettingsSaveModel = "footer" | "immediate";
+
+/** What a screen's changes reach: the next publish, or the live site at once. */
+export type SettingsScope = "publish" | "live";
+
+/** A field's error, keyed by its `ProjectSettings` path (`seo.defaultOgImage`,
+ *  `analytics.googleAnalytics.measurementId`), or by the Site column name for a
+ *  column with no settings path (`slug`, `canonicalUrl`, `cspPolicy`). */
+export type SettingsFieldErrors = Readonly<Record<string, string>>;
 
 /** The Pages panel's URL-repair draft (Clone 3519:19920): the page whose
  *  slug just changed, and the move the redirect should cover. */
@@ -38,7 +66,7 @@ export interface RedirectRepair {
 
 /** `ui:settings-open` — open Settings on a screen; a repair draft may ride along. */
 export interface SettingsOpenRequest {
-  screen: SettingsNavId;
+  screen: SettingsScreenId;
   repair?: RedirectRepair | null;
 }
 
@@ -63,23 +91,26 @@ export interface ScreenProps {
   /**
    * Called by screens that own server-side persistence (Redirects/Headers/Localization
    * write to Site columns directly, not into composer state). Registered handler
-   * runs in place of `composer.saveProject()` when the central savebar fires.
+   * runs in place of the flush when the footer's Save fires. A handler that
+   * throws `SettingsSaveError` (as `updateSiteColumns` /
+   * `updateProjectSettings` in BuildrikSyncProvider do) gets the refused
+   * fields back as `fieldErrors`.
    * Pass `null` to clear (e.g. when screen becomes clean or unmounts).
    */
   registerSaveHandler?: (handler: (() => Promise<void>) | null) => void;
   /**
-   * Called by composer-backed screens (General / SEO / Analytics / Advanced)
-   * that hold edits in local state and flush to composer once on Save. Runs
-   * BEFORE `composer.saveProject()` so the typed values get persisted.
-   * Pass `null` to clear on unmount.
-   *
-   * Why: prior pattern wrote `composer.setProjectSettings()` per keystroke,
-   * which fanned out PROJECT_CHANGED across ~7 listeners (history,
-   * autosave, sync, inspector, page tabs, undo controls). The other 3
-   * screens silently lost typed values because their local `handleSave`
-   * was never wired. This contract fixes both cases with one path.
+   * Settings Phase B (BE-3): a composer-backed screen (General / SEO /
+   * Analytics / Custom code / the Redirects switch) holds its edits locally
+   * and registers a flush that RETURNS the complete `ProjectSettings` it wants
+   * saved — built from `composer.getProjectSettings()` plus its edits — and
+   * does NOT write the composer. On Save the shell diffs that against the
+   * composer: Site-column fields go to `siteDetail.settings.update`, the
+   * JSON-only keys to `siteDetail.projectSettings.update`, and only once the
+   * server has them does the composer adopt them (no autosave, no
+   * `sites.saveProject`). Return nothing when there is nothing to save; throw
+   * (with the field's sentence) to refuse the Save. Pass `null` to clear.
    */
-  registerFlushHandler?: (handler: (() => void) | null) => void;
+  registerFlushHandler?: (handler: (() => ProjectSettings | void) | null) => void;
   /** The screen's server read: the shell's footer and the screen's own card follow it. */
   onLoadStateChange?: (state: ScreenLoadState) => void;
   /**
@@ -99,13 +130,30 @@ export interface ScreenProps {
    */
   registerHeaderAction?: (node: React.ReactNode | null) => void;
   /**
-   * A screen with sub-views (Integrations › Browse all / Manage, Clone
-   * 3873:25643 / 3866:25629) renames the shell's header while one is up:
+   * A screen with sub-views renames the shell's header while one is up:
    * `title` is appended after the nav's `Group / Screen`, `subtitle`
    * replaces the nav's line. Pass `null` to return to the nav's own header;
    * the shell clears it on a screen change.
    */
   registerHeader?: (header: { title?: string; subtitle?: string } | null) => void;
+  /** This screen's save model (`SCREEN_SAVE_MODEL`). */
+  saveModel?: SettingsSaveModel;
+  /**
+   * The member's role is below `SCREEN_MIN_ROLE` for this screen: the shell
+   * shows the read-only banner, disables every native control inside the
+   * screen (a disabled fieldset), hides the header action and the footer. A
+   * screen hides anything else that acts — a link-styled door, a menu.
+   */
+  readOnly?: boolean;
+  /**
+   * The screen's own invalid fields, as the user types (`null` / `{}` when
+   * none). While any are reported, the footer's Save is disabled — Save is
+   * never pressed into a refusal the screen already knows about (§27).
+   */
+  registerFieldErrors?: (errors: SettingsFieldErrors | null) => void;
+  /** The fields the server refused on the last Save (SA-10). The screen
+   *  renders each under its field; the save-error banner says the rest. */
+  fieldErrors?: SettingsFieldErrors;
 }
 
 // ============================================
@@ -113,15 +161,10 @@ export interface ScreenProps {
 // ============================================
 
 /**
- * Keys MUST be screen ids from `SETTINGS_SCREENS` (SettingsTab.tsx). This is a
- * plain `Record<string, …>`, so a key that matches no screen fails silently:
- * `SCREEN_PLAN_REQUIREMENTS[screenId]` is simply `undefined` and the screen
- * renders ungated. That is what `advanced` did — no screen has ever had that
- * id; the screen is `custom-code`. Board 1138:13436 draws it Pro-locked, and
- * on a starter plan it rendered its editors with no badge and no gate while
- * Integrations (whose key does match) gated correctly.
+ * The plan a screen needs. Keyed by `SettingsScreenId`, so a key that names no
+ * screen fails to compile (`advanced` once gated nothing for months).
  */
-export const SCREEN_PLAN_REQUIREMENTS: Record<string, "pro" | "enterprise"> = {
+export const SCREEN_PLAN_REQUIREMENTS: Partial<Record<SettingsScreenId, "pro" | "enterprise">> = {
   "custom-code": "pro",
-  integrations: "pro",
+  access: "pro",
 };

@@ -26,13 +26,14 @@ describe("settings switches", () => {
 
   it("workspace settings: every switch carries all three", () => {
     const src = read("workspace-form.tsx");
-    expect((src.match(/role="switch"/g) ?? []).length).toBe(4);
-    expect((src.match(/aria-checked=\{/g) ?? []).length).toBe(4);
+    // Three since PD-8 (2026-10-02) removed "Activity summary emails" — no email was ever sent from it.
+    expect((src.match(/role="switch"/g) ?? []).length).toBe(3);
+    expect((src.match(/aria-checked=\{/g) ?? []).length).toBe(3);
     expect(
       (src.match(
-        /aria-label="(Edits need approval before publishing|Require password on shared links|Allow editors to share|Activity summary emails)"/g,
+        /aria-label="(Edits need approval before publishing|Require password on shared links|Allow editors to share)"/g,
       ) ?? []).length,
-    ).toBe(4);
+    ).toBe(3);
     // aria-pressed is for toggle BUTTONS; a switch reports aria-checked.
     expect(src).not.toMatch(/aria-pressed/);
   });

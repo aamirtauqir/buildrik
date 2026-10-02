@@ -4,7 +4,8 @@ import { TRPCError } from "@trpc/server";
 import { checkSiteRole, assertSiteAccess, getSiteWorkspace, PermissionError } from "@/server/services/permission.service";
 import type { PlanName } from "@/lib/constants/plan-limits";
 import { getSettingsOverview, getSiteOverview, getLocales, getRedirectSuggestions } from "@/server/services/site-detail.service";
-import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
+import { getSiteSettings, updateSiteSettings, updateProjectSettings } from "@/server/services/site-settings.service";
+import { updateProjectSettingsSchema } from "@buildrik/shared/schemas/project-settings";
 import { redactSitePassword } from "@/server/services/sites.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
@@ -146,6 +147,43 @@ export const siteDetailRouter = router({
       }),
   }),
 
+  // BE-2: the Settings Save's JSON half (analytics, global CSS, the 404
+  // suggester) — the values with no Site column. Role follows what the key
+  // controls: analytics + redirects are EDITOR (same as saving the project
+  // they used to ride in); global CSS is ADMIN + Pro like head/body code.
+  projectSettings: router({
+    update: protectedProcedure
+      .input(updateProjectSettingsSchema)
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, input.patch.customCode ? "ADMIN" : "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        try {
+          const result = await updateProjectSettings(input.siteId, input.patch);
+          const changedKeys = Object.keys(input.patch);
+          await recordForSite({
+            siteId: input.siteId,
+            actorId: ctx.session.user!.id!,
+            action: "site.settings.updated",
+            targetType: "site",
+            targetId: input.siteId,
+            description: `Updated ${changedKeys.length} setting${changedKeys.length === 1 ? "" : "s"}`,
+            metadata: { changedKeys },
+          });
+          return result;
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "CUSTOM_CODE_NOT_AVAILABLE")
+            throw new TRPCError({ code: "FORBIDDEN", message: "Custom code requires Pro or above" });
+          if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+            throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+          throw e;
+        }
+      }),
+  }),
+
   redirects: router({
     list: protectedProcedure
       .input(z.object({ siteId: z.string() }))
@@ -265,8 +303,15 @@ export const siteDetailRouter = router({
           if (e instanceof Error && e.message.startsWith("INVALID_CSV_ROW:"))
             throw new TRPCError({
               code: "BAD_REQUEST",
-              message: `Invalid redirect on line ${e.message.split(":")[1]} — expected "/from,to[,301|302]".`,
+              message: `Invalid redirect on line ${e.message.split(":")[1]} — expected "/from,to[,301|302]" with a path or http(s) URL as the target. Nothing was imported.`,
             });
+          if (e instanceof Error && e.message.startsWith("DUPLICATE_CSV_ROW:")) {
+            const [, line, ...from] = e.message.split(":");
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: `Line ${line}: a redirect from ${from.join(":")} already exists. Nothing was imported.`,
+            });
+          }
           throw e;
         }
       }),

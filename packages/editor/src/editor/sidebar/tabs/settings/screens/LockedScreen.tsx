@@ -12,6 +12,7 @@
 import * as React from "react";
 import { Badge, Button } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import type { SettingsScreenId } from "../types";
 
 /*
   "coming-soon" lived here with a waitlist CTA and no consumer. The only
@@ -28,16 +29,16 @@ const PLAN: Record<LockedVariant, { name: string; article: "a" | "an" }> = {
 };
 
 /** The feature name + body line per gated screen id (`SCREEN_PLAN_REQUIREMENTS`'s keys). */
-export const LOCKED_COPY: Record<string, { feature: string; body: string }> = {
+export const LOCKED_COPY: Partial<Record<SettingsScreenId, { feature: string; body: string }>> = {
   "custom-code": {
     feature: "Custom code",
     body:
       "Custom code injects your own <head> markup, end-of-<body> scripts and CSS into every published page — analytics, fonts, chat widgets. It ships on every publish.",
   },
-  integrations: {
-    feature: "Integrations",
+  access: {
+    feature: "Password protection",
     body:
-      "Integrations connect your published site to the services you already run — forms, payments, email and automation — without pasting code by hand.",
+      "A site password keeps the published site private: visitors see a password page until they enter it. Share links stay available on every plan.",
   },
 };
 

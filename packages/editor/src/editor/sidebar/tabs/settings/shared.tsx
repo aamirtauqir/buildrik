@@ -15,6 +15,7 @@
  *   <SwitchRow>               — toggle row with title/desc + switch
  *   <LoadCard>                — the loading / load-error card (3953:26363, 3953:26503)
  *   <SaveErrorBanner>         — the danger strip above the cards (3950:26309)
+ *   <ReadOnlyBanner>          — the role notice above a read-only screen (M2)
  *
  * Styling is `tw:` utilities on the element — no companion CSS, so a screen
  * cannot mount somewhere the stylesheet is not.
@@ -429,6 +430,22 @@ export const SaveErrorBanner: React.FC<{ message: string }> = ({ message }) => (
     data-testid="set-save-error"
   >
     {message}
+  </div>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ReadOnlyBanner — M2 (8134:212323): a screen above the
+// member's role. The shell renders it above the disabled screen.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/* 8134:212323: the accent tint, 16 in, 12 down, a 4 radius, 13/20 ink. */
+export const ReadOnlyBanner: React.FC<{ who: string; screen: string }> = ({ who, screen }) => (
+  <div
+    role="status"
+    className="tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+    data-testid="set-readonly"
+  >
+    {`Only ${who} can change ${screen}`}
   </div>
 );
 

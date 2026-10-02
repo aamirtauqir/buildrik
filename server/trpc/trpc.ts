@@ -88,6 +88,9 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       data: {
         ...shape.data,
         ...(Object.keys(causeData).length > 0 ? { cause: causeData } : {}),
+        // The same issues, structured: a client maps each refused input path
+        // to its own field (the editor's Settings save, SA-10).
+        ...(zod ? { zodIssues: zod.issues.map((i) => ({ path: i.path.join("."), message: i.message })) } : {}),
       },
     };
   },

@@ -1,52 +1,65 @@
 /**
- * SettingsTab — the Clone shell (3397:32011), every frame of the section
- * around whichever screen is open.
+ * SettingsTab — the Settings shell around whichever screen is open (Phase B
+ * IA, proposal §25 / plan M0; visuals stay the existing shell's until the M0
+ * boards land).
  *
  *   ┌ sidebar 256 ─────────┬ pane ─────────────────────────────────────────┐
- *   │ ‹ Back to canvas     │ Group / Screen          [Upgrade | Search]     │
- *   │ Settings             │ subtitle                                       │
- *   │ <site>               ├────────────────────────────────────────────────┤
- *   │                      │ body on the subtle ground — the screen's cards │
- *   │ ▸ Overview           │                                                │
- *   │ SITE SETUP …         ├────────────────────────────────────────────────┤
- *   │ WORKSPACE …          │ status                   Cancel  Save changes  │
+ *   │ ‹ Back to canvas     │ Group / Screen               [action | Upgrade]│
+ *   │ Settings        ⌕    │ <site> · all pages · applies on next publish   │
+ *   │ <site>               │ subtitle                                       │
+ *   │ ▸ Overview           ├────────────────────────────────────────────────┤
+ *   │ SITE · SEARCH & …    │ [read-only banner] the screen's cards          │
+ *   │ … DANGER ZONE        ├────────────────────────────────────────────────┤
+ *   │ ── Managed in        │ Discard  Save   status   (only when needed)    │
+ *   │    workspace ↗       │                                                │
+ *   │ Your role · Perms    │                                                │
  *   └──────────────────────┴────────────────────────────────────────────────┘
  *
- * The sidebar is always there — there is no root/section drill-in any more.
- * The shell owns: the footer and its four states (`All changes saved` ·
- * `Changes not saved` + `Retry save` · `Loading settings…` · `Settings could
- * not load`), the save path, the Settings saved dialog, the Unsaved settings
- * guard (Back to canvas / Cancel / Done / Escape / any nav click while
- * dirty), the plan gate's `Upgrade`, and the doors: Brand ↗ → the
- * Brand panel, Export → the Export modal, Members / Billing → the dashboard.
- * The screen owns its cards, its load card and its save-error banner
- * (`ScreenProps.onLoadStateChange` / `saveError`).
+ * The shell owns: the nav and its doors (Brand ↗ → the Brand panel; Members /
+ * Billing / Integrations & webhooks → the dashboard), the scope line, the
+ * read-only state (`SCREEN_MIN_ROLE`), the plan gate's `Upgrade`, the footer
+ * and its states, the save path (BE-3: the settings mutations, never
+ * `sites.saveProject`), the Saved toast, field errors, and the Unsaved
+ * settings guard (Back to canvas / Escape / any nav click while dirty). The
+ * screen owns its cards, its load card and its save-error banner.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { ArrowUpRight, ChevronLeft, Search as SearchIcon, X } from "lucide-react";
-import { Button, IconButton, Kbd, TextInput, useToast } from "@/editor/chrome-ui";
+import { ChevronLeft, Search as SearchIcon, X } from "lucide-react";
+import { Badge, Button, IconButton, Kbd, TextInput, useToast } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import {
   type SettingsTabProps,
   type PlanTier,
   type SettingsNavId,
   type SettingsNavDef,
-  type SettingsNavGroupId,
+  type SettingsFieldErrors,
+  type SettingsScreenId,
+  type SettingsPaneId,
   type ScreenLoadState,
   type SettingsOpenRequest,
   type RedirectRepair,
   SCREEN_PLAN_REQUIREMENTS,
   SETTINGS_NAV,
   SETTINGS_NAV_GROUPS,
+  SETTINGS_NAV_GROUP_ORDER,
+  SCREEN_MIN_ROLE,
+  SCREEN_SAVE_MODEL,
+  SCREEN_SCOPE,
+  scopeLine,
+  overviewScopeLine,
+  workspaceScopeLine,
   WORKSPACE_LINKS,
   SAVE_ERROR_MESSAGES,
+  isSettingsScreenId,
+  isSettingsPaneId,
   NAV_ICONS,
   SET_BTN,
   SET_HEAD_BTN,
   SET_EYEBROW,
+  ReadOnlyBanner,
   SiteColumnsLockedContext,
   SiteSettingsScreen,
   LockedScreen,
@@ -54,22 +67,30 @@ import {
   AnalyticsScreen,
   AdvancedScreen,
   SeoScreen,
-  IntegrationsScreen,
   RedirectsScreen,
   FormsScreen,
   HeadersScreen,
   LocalizationScreen,
   DomainsScreen,
   OverviewScreen,
+  AccessScreen,
+  DangerZoneScreen,
+  WorkspaceDoorScreen,
 } from "./index";
 import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { searchSettings } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
-import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
+import {
+  getEditorPlanTier,
+  getEditorWorkspaceName,
+  getSiteIdFromUrl,
+  planSettingsSave,
+  saveSiteSettings,
+  SettingsSaveError,
+} from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
-import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { roleAtLeast } from "@/services/RoleService";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 
@@ -81,39 +102,43 @@ import "./settings.css";
  *  Doors and dashboard links are not screens and never persist. */
 const SETTINGS_SCREENS = [
   { id: "overview", title: "Overview" },
-  ...SETTINGS_NAV.filter((n) => n.kind === "screen").map(({ id, title }) => ({ id, title })),
+  ...SETTINGS_NAV.flatMap((n) => (n.kind === "door" ? [] : [{ id: n.id, title: n.title }])),
 ];
 
-const GROUP_ORDER: SettingsNavGroupId[] = ["site-setup", "seo-publishing", "visitors", "advanced", "workspace"];
+/** "Only admins can change …" — who the read-only banner names. */
+const ROLE_NOUN = { VIEWER: "viewers", EDITOR: "editors", DESIGNER: "editors", ADMIN: "admins", OWNER: "the workspace owner" } as const;
 
-/* Screens whose actions apply as they happen — the frame draws them with no
-   Cancel / Save (3397:32206 Domains: `Actions apply immediately · nothing to
-   save here` · Done). */
-const IMMEDIATE_SCREENS = new Set<SettingsNavId>(["domains", "forms", "integrations"]);
+const PLAN_LABEL: Record<PlanTier, string> = { starter: "Free", pro: "Pro", enterprise: "Business" };
 
-
-function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
-  const required = SCREEN_PLAN_REQUIREMENTS[screenId];
+function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
+  const required = isSettingsScreenId(screenId) ? SCREEN_PLAN_REQUIREMENTS[screenId] : undefined;
   if (!required) return false;
   return required === "pro" ? userPlan === "starter" : userPlan !== "enterprise";
 }
 
 // ─── Row chrome ──────────────────────────────────────────────────────────────
 
-/* A sidebar row: 32 high, icon + label, on the accent tint when current.
-   `size="xs"` gives the Button its 32; everything else is replaced per
-   property through twMerge (padding, alignment, type). The <a> rows for
-   Members / Billing wear the same string — nothing in it needs a button. */
-/* 4418:127313 / 4418:127966: 36-tall rows (--bk-size-row-nav), 14px, a 20
-   icon slot 12 from the label (label at x60). The current row is semibold. */
+/* M0 (4418:144988, drawn on 8134:212121): 32-tall rows, 8 in, a 20 icon
+   slot 8 from a 12px label; the current row sits on the accent tint with a
+   14/600 accent label. `size="xs"` gives the Button its 32; everything else
+   is replaced per property through twMerge. */
 const NAV_ROW =
-  "tw:flex tw:h-[var(--bk-size-row-nav)] tw:w-full tw:items-center tw:justify-start tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
-  "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 " +
+  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-lg)] tw:border-0 " +
+  "tw:bg-transparent tw:px-2 tw:py-1.5 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:no-underline tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
-  "tw:bg-[var(--bk-accent-tint)] tw:font-semibold tw:text-[var(--bk-accent)] " +
+  "tw:bg-[var(--bk-accent-tint)] tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
+
+/* M0's pill — Billing's plan, a locked row's "Pro": 22 tall, accent hairline
+   on the accent tint, 11/500. */
+const NAV_PILL =
+  "tw:inline-flex tw:h-5.5 tw:shrink-0 tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:py-0 " +
+  "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:leading-4 tw:text-[var(--bk-accent)]";
+
+/* M0's group label: 24 tall, 8 in, 11px uppercase in ink. */
+const NAV_GROUP = "tw:flex tw:h-6 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:uppercase tw:leading-4 tw:text-[var(--bk-ink)]";
 
 const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
   /* 4418:127313 marks Overview with a dot, not a glyph. */
@@ -152,11 +177,14 @@ export const SettingsTab: React.FC<
   // Effective plan: explicit prop wins; otherwise the real workspace tier
   // captured at project load.
   const effectivePlan: PlanTier = userPlan ?? getEditorPlanTier();
-  const { currentScreen, navigateTo } = usePanelNavigation({
+  const { currentScreen: persistedScreen, navigateTo } = usePanelNavigation({
     storageKey: `settings-panel${projectId ? `-${projectId}` : ""}`,
     screens: SETTINGS_SCREENS,
     defaultScreen: "overview",
   });
+  /* A position saved before Phase B can name a screen that no longer exists
+     (`integrations`): it lands on the Overview. */
+  const currentScreen: SettingsPaneId = isSettingsPaneId(persistedScreen) ? persistedScreen : "overview";
 
   // The site name, read from the composer the way the topbar reads it.
   const [siteName, setSiteName] = React.useState("Untitled site");
@@ -205,21 +233,21 @@ export const SettingsTab: React.FC<
   type Pending = { kind: "leave" } | { kind: "nav"; id: SettingsNavId };
   const [guardOpen, setGuardOpen] = React.useState(false);
   const pendingRef = React.useRef<Pending | null>(null);
-  /* G3-097 · 6816:60270: Search is an inline sidebar filter. null = closed;
-     a string (possibly empty) = the field is open with that query. */
-  const [query, setQuery] = React.useState<string | null>(null);
+  /* G3-097 · 6816:60270: Search is an inline sidebar filter, always on screen (8134:212121). */
+  const [query, setQuery] = React.useState("");
   const [loadState, setLoadState] = React.useState<ScreenLoadState>("ready");
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
   const [resetKey, setResetKey] = React.useState(0);
   /* A Search result names a field; it is scrolled to once its screen is on. */
   const pendingFieldRef = React.useRef<string | null>(null);
-
-  // Snapshot composer.projectSettings on every screen mount so Discard can
-  // restore the user's pre-edit state. Composer-backed screens push edits
-  // live; without this the canvas and the footer would disagree after a
-  // discard. structuredClone — getProjectSettings() returns a reference.
-  const screenSnapshotRef = React.useRef<ProjectSettings | null>(null);
+  /* The screen's own invalid fields (they disable Save) and the fields the
+     server refused on the last Save (handed back to the screen). */
+  const [clientFieldErrors, setClientFieldErrors] = React.useState<SettingsFieldErrors | null>(null);
+  const [serverFieldErrors, setServerFieldErrors] = React.useState<SettingsFieldErrors | undefined>(undefined);
+  const registerFieldErrors = React.useCallback((errors: SettingsFieldErrors | null) => {
+    setClientFieldErrors(errors && Object.keys(errors).length > 0 ? errors : null);
+  }, []);
 
   // Server-side screens (Redirects/Headers/Localization) write via tRPC, not
   // composer state; they register their own save so the footer's Save runs
@@ -229,10 +257,10 @@ export const SettingsTab: React.FC<
     screenSaveHandlerRef.current = handler;
   }, []);
 
-  // Composer-backed screens flush their local edit buffer into composer right
-  // before saveProject() so PROJECT_CHANGED fires once per Save, not per key.
-  const screenFlushHandlerRef = React.useRef<(() => void) | null>(null);
-  const registerFlushHandler = React.useCallback((handler: (() => void) | null) => {
+  // Composer-backed screens hand their edits over on Save: the flush returns
+  // the ProjectSettings to save (ScreenProps.registerFlushHandler).
+  const screenFlushHandlerRef = React.useRef<(() => ProjectSettings | void) | null>(null);
+  const registerFlushHandler = React.useCallback((handler: (() => ProjectSettings | void) | null) => {
     screenFlushHandlerRef.current = handler;
   }, []);
 
@@ -250,10 +278,11 @@ export const SettingsTab: React.FC<
     setGuardOpen(false);
     setSaveError(null);
     setLoadState("ready");
+    setClientFieldErrors(null);
+    setServerFieldErrors(undefined);
     screenSaveHandlerRef.current = null;
     screenFlushHandlerRef.current = null;
-    screenSnapshotRef.current = composer ? structuredClone(composer.getProjectSettings()) : null;
-  }, [currentScreen, composer, markScreenDirty]);
+  }, [currentScreen, markScreenDirty]);
 
   /* This tab owns its entry in the shell dirty registry (B-1): the shell's
      tab-switch guard, the exit guard and beforeunload all read it (written
@@ -292,26 +321,14 @@ export const SettingsTab: React.FC<
         case "branding":
           onOpenDesignTab?.();
           return;
-        case "export":
-          /* The Export modal is the surface (plan: the row LEAVES Settings);
-             StudioHeader opens it beside its own Export button. */
-          composer?.emit(EVENTS.UI_OPEN_EXPORTER, undefined);
-          onClose?.();
-          return;
-        case "members":
-        case "billing":
-        case "webhooks":
-          /* The sidebar's rows are links; a Search result or an Overview
-             `Open ›` naming these takes the same door. Webhooks moved to the
-             dashboard's Settings > Integrations (A-12/A01-6) — workspace-
-             scoped, so it belongs beside Vercel/Slack/Zapier there. */
-          window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS[id]}`, "_blank", "noopener,noreferrer");
-          return;
         default:
+          /* Workspace rows (Members, Billing, Integrations & webhooks) open
+             their door card in the pane (8139:217358); its button leaves for
+             the dashboard. */
           navigateTo(id);
       }
     },
-    [composer, navigateTo, onClose, onOpenDesignTab],
+    [navigateTo, onOpenDesignTab],
   );
 
   const requestNav = React.useCallback(
@@ -336,14 +353,12 @@ export const SettingsTab: React.FC<
     leave();
   }, [leave]);
 
-  /* Deep links arrive by the name the DOOR uses, which is not always the name
-     the screen has: the site menu says "Plugins"; the screen is
-     "integrations". An id matching no screen is left alone rather than
+  /* `openLeftPanelToTab("settings", <id>)`. An id matching no screen (an old
+     link to the removed Integrations screen) is left alone rather than
      guessed at. */
   React.useEffect(() => {
     if (!initialScreen) return;
-    const target = initialScreen === "plugins" ? "integrations" : initialScreen;
-    if (SETTINGS_SCREENS.some((s) => s.id === target)) navigateTo(target);
+    if (isSettingsScreenId(initialScreen)) navigateTo(initialScreen);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialScreen]);
 
@@ -391,24 +406,20 @@ export const SettingsTab: React.FC<
     setGuardOpen(false);
   }, []);
 
-  /* Roll the screen back to its snapshot and remount it (a server screen
-     re-reads its row). The footer's Discard (4418:127966 save bar) stops
-     here; the guard's Discard then goes where the user was going. */
+  /* Drop the screen's edits by remounting it (it re-reads the composer, a
+     server screen its row). Edits live only in the screen until Save — the
+     flush hands them over then (BE-3) — so there is nothing in the composer
+     to roll back. The footer's Discard (4418:127966 save bar) stops here; the
+     guard's Discard then goes where the user was going. */
   const rollBack = React.useCallback(() => {
-    // Roll composer back to the snapshot taken when the screen mounted (or
-    // last saved). structuredClone on the way out so later composer
-    // mutations don't poison the snapshot we still hold.
-    if (composer && screenSnapshotRef.current) {
-      composer.setProjectSettings(structuredClone(screenSnapshotRef.current));
-    }
     setResetKey((k) => k + 1);
     markScreenDirty(false);
     setSaveError(null);
-  }, [composer, markScreenDirty]);
+    setServerFieldErrors(undefined);
+  }, [markScreenDirty]);
 
-  /* The shell's "Leave anyway" runs this: the screens write to the composer
-     live, so leaving without the rollback would keep the "lost" values in
-     project settings for the next save to persist. */
+  /* The shell's "Leave anyway" runs this too, so the registry entry clears
+     with the edits. */
   React.useEffect(() => {
     shellDirty.setDiscard("settings", rollBack);
     return () => shellDirty.setDiscard("settings", null);
@@ -430,6 +441,48 @@ export const SettingsTab: React.FC<
 
   const current = SETTINGS_NAV.find((n) => n.id === currentScreen);
   const isOverview = currentScreen === "overview";
+  const workspaceDoor =
+    currentScreen === "members" || currentScreen === "billing" || currentScreen === "webhooks" ? currentScreen : null;
+  /* A screen with its own rules — not the Overview, not a workspace door. */
+  const screenId =
+    currentScreen === "overview" || currentScreen === "members" || currentScreen === "billing" || currentScreen === "webhooks"
+      ? null
+      : currentScreen;
+  const screenRules = screenId
+    ? { minRole: SCREEN_MIN_ROLE[screenId], saveModel: SCREEN_SAVE_MODEL[screenId], scope: SCREEN_SCOPE[screenId] }
+    : null;
+  const workspaceName = getEditorWorkspaceName() ?? "Your workspace";
+
+  /* BE-3: what a composer-backed screen's Save does with the settings its
+     flush returned. With a site: the changed Site columns and JSON-only keys
+     go through the two settings mutations (never `sites.saveProject`), and
+     only once the server has them does the composer take them — as saved
+     state, so autosave sends nothing for them. A change no mutation covers yet
+     (SEO's Twitter handle until Lane 1) is handed to the composer as an edit,
+     so the project save still carries it. Without a site (the standalone
+     demo) the engine's own storage is the save. */
+  const persistSettings = React.useCallback(
+    async (next: ProjectSettings) => {
+      if (!composer) return;
+      if (!projectId) {
+        composer.setProjectSettings(next);
+        await composer.saveProject?.();
+        return;
+      }
+      const wasDirty = composer.isDirty?.() ?? true;
+      const plan = planSettingsSave(composer.getProjectSettings(), next);
+      await saveSiteSettings(projectId, plan);
+      if (plan.unrouted) {
+        composer.setProjectSettings(next);
+        return;
+      }
+      composer.adoptSavedProjectSettings(next);
+      /* A flush may touch the project metadata (General's name / author);
+         when nothing else was waiting, the document is as saved as it was. */
+      if (!wasDirty) composer.markSaved?.();
+    },
+    [composer, projectId],
+  );
 
   /* `then` runs after a save succeeds: the Saved toast after the footer's
      Save, the pending nav / exit after the guard's Save and continue. */
@@ -437,57 +490,40 @@ export const SettingsTab: React.FC<
     if (saving) return;
     const failed = (err: unknown) => {
       console.error("[settings] save failed", err);
-      setSaveError(SAVE_ERROR_MESSAGES[currentScreen as SettingsNavId] ??
+      setServerFieldErrors(err instanceof SettingsSaveError && Object.keys(err.fieldErrors).length > 0 ? err.fieldErrors : undefined);
+      setSaveError(SAVE_ERROR_MESSAGES[currentScreen] ??
         `Changes to ${current?.title ?? "settings"} were not saved. Your changes are still here. Review the values, then retry.`);
     };
     const succeeded = () => {
-      if (composer) screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
       setSaveError(null);
+      setServerFieldErrors(undefined);
       markScreenDirty(false);
       if (then) then();
-      /* 4418:165469 draws "Settings saved" as a toast (bottom-left, dark),
-         not a centred dialog: title, the site's line, "Return to settings". */
+      /* 4418:165469 / M19: a toast (bottom-left, dark), the change's scope and
+         the way to ship it. Publish opens the Publish panel — it does not
+         publish. */
       else
         addToast({
-          title: "Settings saved",
-          description: `${siteName ? `${siteName} · ` : ""}Configuration saved. Your canvas content is unchanged.`,
-          action: { label: "Return to settings", onClick: () => {} },
+          title: "Saved · applies on next publish",
+          description: "Your site settings are saved.",
+          action: { label: "Publish", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "publish" }) },
         });
     };
     const screenHandler = screenSaveHandlerRef.current;
     let run: Promise<void> | void;
     if (screenHandler) {
-      // Server-side screen owns persistence; composer.saveProject() would
-      // silently drop its fields.
+      // A screen that writes its own rows (Headers, Languages, the rules on
+      // Redirects) saves them itself.
       run = screenHandler();
     } else {
-      if (!composer) return;
-      // Flush the screen's local edits into composer once, then persist.
-      screenFlushHandlerRef.current?.();
-      /* The shipping editor persists through BuildrikSyncProvider, not through
-         `composer.saveProject()` — that one writes the engine's own storage,
-         and the server mirror (`siteDetail.settings.update`, where General /
-         SEO / Custom code actually live) only ran on the autosave tick seconds
-         later. Walked live 2026-09-14: an invalid OG image showed `Settings
-         saved` while the server answered 207 and kept the old value. With a
-         site id the save is the provider's, awaited here; the provider resolves
-         even when the mirror is refused and reports that as a window event
-         (so the page save is not undone by a settings 4xx), and here the
-         mirror IS the save — its failure is the 3950:26309 banner + Retry save. */
-      run = new Promise<void>((resolve, reject) => {
-        let mirrorError: string | null = null;
-        const onMirror = (e: Event) => {
-          mirrorError = (e as CustomEvent<{ message?: string }>).detail?.message ?? "Settings were not saved.";
-        };
-        window.addEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirror);
-        const snapshot = projectId ? composer.exportProject() : null;
-        const write = snapshot
-          ? syncSaveProject(projectId!, snapshot).then(() => composer.markSaved(snapshot))
-          : Promise.resolve(composer.saveProject?.());
-        write
-          .then(() => (mirrorError ? reject(new Error(mirrorError)) : resolve()), reject)
-          .finally(() => window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirror));
-      });
+      let next: ProjectSettings | void;
+      try {
+        next = screenFlushHandlerRef.current?.();
+      } catch (err) {
+        failed(err);
+        return;
+      }
+      run = next ? persistSettings(next) : undefined;
     }
     if (!run) {
       succeeded();
@@ -495,7 +531,7 @@ export const SettingsTab: React.FC<
     }
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
-  }, [composer, current, currentScreen, saving, projectId, addToast, siteName, markScreenDirty]);
+  }, [composer, current, currentScreen, saving, addToast, siteName, markScreenDirty, persistSettings]);
 
   /* The guard's Save and continue (4418:165478): save, then finish whatever
      raised the guard. A failed save leaves the dialog down and the screen's
@@ -523,18 +559,40 @@ export const SettingsTab: React.FC<
      server decides) the fields that edit them are read-only and say why; the
      rest of each screen is project data and stays editable. */
   const siteColumnsLocked = roleAtLeast(editorRole, "ADMIN") === false;
+  /* SA-21 / M2: below the screen's role the whole screen is read-only — the
+     banner says who can change it, every native control is disabled, and the
+     header action and the footer go. Unknown role (demo, failed lookup): not
+     read-only; the server decides. */
+  const readOnly = !!screenRules && !locked && roleAtLeast(editorRole, screenRules.minRole) === false;
 
   const renderScreen = (): React.ReactNode => {
-    if (isOverview) return <OverviewScreen projectId={projectId} onOpenScreen={requestNav} />;
-    if (locked) {
-      return <LockedScreen variant={SCREEN_PLAN_REQUIREMENTS[currentScreen]} {...LOCKED_COPY[currentScreen]} onUpgrade={openBilling} />;
+    if (workspaceDoor && current) {
+      return (
+        <WorkspaceDoorScreen door={workspaceDoor} title={current.title} workspaceName={workspaceName} onClose={() => requestNav("overview")} />
+      );
     }
+    if (!screenId) return <OverviewScreen projectId={projectId} siteName={siteName} onOpenScreen={requestNav} />;
+    const required = SCREEN_PLAN_REQUIREMENTS[screenId];
+    if (locked && required) {
+      return <LockedScreen variant={required} {...LOCKED_COPY[screenId]} onUpgrade={openBilling} />;
+    }
+    const screenNode = (
+      /* A read-only screen says so once, in its notice (8134:212323) — not again under every field. */
+      <SiteColumnsLockedContext.Provider value={siteColumnsLocked && !readOnly}>{renderEditableScreen(screenId)}</SiteColumnsLockedContext.Provider>
+    );
+    if (!readOnly || !screenRules || !current) return screenNode;
     return (
-      <SiteColumnsLockedContext.Provider value={siteColumnsLocked}>{renderEditableScreen()}</SiteColumnsLockedContext.Provider>
+      <>
+        <ReadOnlyBanner who={ROLE_NOUN[screenRules.minRole]} screen={current.title} />
+        {/* A disabled fieldset disables every native control inside it. */}
+        <fieldset disabled className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-6 tw:border-0 tw:p-0" data-testid="set-readonly-screen">
+          {screenNode}
+        </fieldset>
+      </>
     );
   };
 
-  const renderEditableScreen = (): React.ReactNode => {
+  const renderEditableScreen = (screenId: Exclude<SettingsScreenId, "overview">): React.ReactNode => {
     const common = {
       composer,
       projectId,
@@ -545,41 +603,50 @@ export const SettingsTab: React.FC<
       saveError,
       registerHeaderAction,
       registerHeader,
+      saveModel: SCREEN_SAVE_MODEL[screenId],
+      readOnly,
+      registerFieldErrors,
+      fieldErrors: serverFieldErrors,
     };
-    switch (currentScreen as SettingsNavId) {
+    switch (screenId) {
       case "general":
         return <SiteSettingsScreen {...common} />;
-      case "seo":
-        return <SeoScreen {...common} />;
-      case "analytics":
-        return <AnalyticsScreen {...common} />;
-      case "custom-code":
-        return <AdvancedScreen {...common} />;
-      case "integrations":
-        return <IntegrationsScreen {...common} />;
       case "localization":
         return <LocalizationScreen {...common} />;
-      case "redirects":
-        return <RedirectsScreen {...common} repair={repair} onRepairDone={clearRepair} />;
-      case "headers":
-        return <HeadersScreen {...common} />;
-      case "forms":
-        return <FormsScreen {...common} />;
+      case "seo":
+        return <SeoScreen {...common} />;
       case "domains":
         return <DomainsScreen {...common} />;
-      default:
-        return null;
+      case "redirects":
+        return <RedirectsScreen {...common} repair={repair} onRepairDone={clearRepair} />;
+      case "access":
+        return <AccessScreen {...common} />;
+      case "analytics":
+        return <AnalyticsScreen {...common} />;
+      case "forms":
+        return <FormsScreen {...common} />;
+      case "custom-code":
+        return <AdvancedScreen {...common} />;
+      case "headers":
+        return <HeadersScreen {...common} />;
+      case "danger-zone":
+        return <DangerZoneScreen {...common} />;
     }
   };
 
-  const headTitle =
-    isOverview || !current
-      ? "Settings overview"
-      : `${SETTINGS_NAV_GROUPS[current.group]} / ${current.title}${screenHeader?.title ? ` / ${screenHeader.title}` : ""}`;
-  const headSub = current ? (screenHeader?.subtitle ?? current.subtitle) : "";
+  /* 8134:212121: the screen's own title, a sub-view's after it, and the
+     scope line (M1) under it. */
+  const headTitle = isOverview || !current
+    ? "Overview"
+    : `${current.title.replace(/ ↗$/, "")}${screenHeader?.title ? ` / ${screenHeader.title}` : ""}`;
+  const headScope = screenRules
+    ? scopeLine(screenRules.scope, siteName)
+    : workspaceDoor
+      ? workspaceScopeLine(workspaceName)
+      : overviewScopeLine(siteName);
 
-  const immediate = IMMEDIATE_SCREENS.has(currentScreen as SettingsNavId);
-  const footStatus: { text: string; tone: "muted" | "danger" | "warning" } =
+  const immediate = screenRules?.saveModel === "immediate";
+  const footStatus: { text: string; tone: "muted" | "danger" } =
     loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
@@ -587,12 +654,17 @@ export const SettingsTab: React.FC<
         : saveError
           ? { text: "Not saved", tone: "danger" }
           : screenIsDirty
-            ? { text: "Unsaved changes", tone: "warning" }
+            ? { text: "Unsaved changes", tone: "muted" }
             : { text: "All changes saved", tone: "muted" };
+  /* The footer is there while something waits to be saved, a save failed, or
+     a footer screen's read is pending or failed — never on the Overview, a
+     locked or read-only screen. An immediate screen gets it only while it
+     still holds an edit (Redirects' 404 switch, until it applies at once). */
+  const showFooter =
+    !!screenRules && !locked && !readOnly && (!immediate || screenIsDirty || !!saveError);
   const FOOT_TONE = {
     muted: "tw:text-[var(--bk-ink-muted)]",
     danger: "tw:text-[var(--bk-error)]",
-    warning: "tw:text-[var(--bk-warning-text)]",
   } as const;
 
   // ─── Sidebar rows ─────────────────────────────────────────────────────
@@ -600,7 +672,7 @@ export const SettingsTab: React.FC<
   /* The filter: a screen matches on its own title / description / group, or
      through one of its fields — then the row lands on that field (the
      retired dialog's jump & focus). */
-  const trimmed = query?.trim() ?? "";
+  const trimmed = query.trim();
   const matchField = React.useMemo(() => {
     if (!trimmed) return null;
     const byScreen = new Map<string, string | null>();
@@ -615,27 +687,10 @@ export const SettingsTab: React.FC<
     pendingFieldRef.current = matchField?.get(id) ?? null;
     requestNav(id);
   };
-  const closeSearch = () => setQuery(null);
+  const clearSearch = () => setQuery("");
 
   const renderRow = (n: SettingsNavDef) => {
     const active = currentScreen === n.id;
-    if (n.kind === "external") {
-      return (
-        <a
-          key={n.id}
-          href={`${DASHBOARD_URL}${WORKSPACE_LINKS[n.id] ?? "/dashboard"}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={NAV_ROW}
-          data-testid={`set-nav-${n.id}`}
-        >
-          <NavRowIcon id={n.id} />
-          {/* "Members ↗" — the arrow rides the label, as on the board. */}
-          <span className="tw:min-w-0 tw:truncate">{n.title}</span>
-          <ArrowUpRight size={12} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
-        </a>
-      );
-    }
     const rowLocked = isScreenLocked(n.id, effectivePlan);
     return (
       <Button
@@ -649,107 +704,135 @@ export const SettingsTab: React.FC<
         data-testid={`set-nav-${n.id}`}
       >
         <NavRowIcon id={n.id} />
-        {/* No "Pro" pill on the row (not drawn): a locked screen says so
-            itself, with its header's Upgrade. */}
         <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-locked={rowLocked || undefined}>{n.title}</span>
+        {/* M0: a plan-locked row says so before it is opened; Billing carries the plan. */}
+        {rowLocked ? (
+          <span className={NAV_PILL} data-testid={`set-nav-pro-${n.id}`}>
+            Pro
+          </span>
+        ) : n.id === "billing" ? (
+          <span className={NAV_PILL} data-testid="set-nav-plan">
+            {PLAN_LABEL[effectivePlan]}
+          </span>
+        ) : null}
       </Button>
     );
   };
 
   return (
     <div className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]" data-testid="set-root">
-      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-      <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:overflow-y-auto tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
-        {/* 4418:127313 — the Brand workspace's head: back link centred on the
-            first line, 24px title (with the search door at its right), the
-            site name under it. */}
-        <div className="tw:flex tw:justify-center tw:pt-5">
+      {/* ── Sidebar (M0, 8134:212121) ───────────────────────────────────── */}
+      <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
+        <div className="tw:flex tw:shrink-0 tw:flex-col tw:px-4 tw:pt-3">
           <Button
             type="button"
-            variant="link"
-            className="tw:h-auto tw:min-h-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
+            variant="ghost"
+            size="xs"
+            className="tw:h-8 tw:w-54 tw:justify-center tw:gap-0.5 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]"
             onClick={requestLeave}
             data-testid="set-back"
           >
             <ChevronLeft size={12} aria-hidden />
             Back to canvas
           </Button>
-        </div>
-        <div className="tw:flex tw:flex-col tw:px-4 tw:pt-4">
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
-            <h2
-              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:text-[var(--bk-ink)]"
-              data-testid="set-title"
-            >
-              Settings
-            </h2>
-            {query === null ? (
-              <IconButton label="Search settings" onClick={() => setQuery("")} data-testid="set-search-icon" className="tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]">
-                <SearchIcon size={14} aria-hidden />
-              </IconButton>
-            ) : null}
-          </div>
-          <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-site">
+          <h2
+            className="tw:m-0 tw:mt-2.5 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:tracking-[-0.015em] tw:text-[var(--bk-ink)]"
+            data-testid="set-title"
+          >
+            Settings
+          </h2>
+          <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-site">
             {siteName}
           </div>
-          {query !== null ? (
-            <div className="tw:relative tw:mt-4" data-testid="set-search">
-              <TextInput
-                type="search"
-                autoFocus
-                icon={SearchIcon}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    closeSearch();
-                  }
-                }}
-                placeholder="Search settings"
-                aria-label="Search settings"
-                theme={{ field: { input: { base: "tw:pr-8 tw:[&::-webkit-search-cancel-button]:hidden" } } }}
-                data-testid="set-search-input"
-              />
+        </div>
+        <nav className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-3" aria-label="Settings sections">
+          {/* 8134:212121 / 6816:60270: the search field is always there, at the top of the nav. */}
+          <div className="tw:relative tw:mb-1 tw:shrink-0" data-testid="set-search">
+            <TextInput
+              type="search"
+              icon={trimmed ? SearchIcon : undefined}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  clearSearch();
+                  e.currentTarget.blur();
+                }
+              }}
+              placeholder="Search site settings"
+              aria-label="Search site settings"
+              theme={{
+                field: {
+                  input: {
+                    base: "tw:pr-8 tw:[&::-webkit-search-cancel-button]:hidden tw:rounded-[var(--bk-radius-sm)]! tw:placeholder:text-[var(--bk-ink)]",
+                    /* 36 tall, 12px — the theme's own `md` is 32 / 13. */
+                    sizes: { md: "tw:h-9 tw:py-0 tw:text-[length:var(--bk-text-12)]" },
+                    colors: {
+                      gray:
+                        "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:focus:border-[var(--bk-accent)] tw:focus:bg-[var(--bk-bg-panel)] tw:focus:ring-[var(--bk-accent)]",
+                    },
+                  },
+                },
+              }}
+              data-testid="set-search-input"
+            />
+            {trimmed ? (
               <IconButton
                 label="Clear search"
-                onClick={closeSearch}
-                className="tw:absolute tw:right-1 tw:top-1 tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]"
+                onClick={clearSearch}
+                className="tw:absolute tw:right-1.5 tw:top-1.5 tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]"
                 data-testid="set-search-clear"
               >
                 <X size={14} aria-hidden />
               </IconButton>
-            </div>
-          ) : null}
-        </div>
-        <nav className="tw:flex tw:flex-col tw:gap-px tw:px-4 tw:pb-4 tw:pt-4" aria-label="Settings sections">
+            ) : null}
+          </div>
           {matchField ? null : (
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
-            className={`${NAV_ROW}${isOverview ? ` ${NAV_ROW_ON}` : ""}`}
-            aria-current={isOverview ? "page" : undefined}
-            onClick={() => requestNav("overview")}
-            data-testid="set-nav-overview"
-          >
-            <NavRowIcon id="overview" />
-            <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
-          </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              className={`${NAV_ROW}${isOverview ? ` ${NAV_ROW_ON}` : ""}`}
+              aria-current={isOverview ? "page" : undefined}
+              onClick={() => requestNav("overview")}
+              data-testid="set-nav-overview"
+            >
+              <NavRowIcon id="overview" />
+              <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
+            </Button>
           )}
-          {GROUP_ORDER.map((group) => {
+          {SETTINGS_NAV_GROUP_ORDER.map((group) => {
             const rows = SETTINGS_NAV.filter((n) => n.group === group && (!matchField || matchField.has(n.id)));
             if (rows.length === 0) return null;
+            /* M0: the workspace doors sit apart, under a separator, as
+               "Managed in workspace settings ↗" — they are not this site's. */
+            if (group === "workspace") {
+              return (
+                <React.Fragment key={group}>
+                  <hr className="tw:my-0 tw:h-px tw:w-full tw:shrink-0 tw:border-0 tw:bg-[var(--bk-border)]" aria-hidden />
+                  <div
+                    className="tw:flex tw:h-10 tw:shrink-0 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
+                    data-testid={`set-nav-group-${group}`}
+                  >
+                    {`${SETTINGS_NAV_GROUPS[group]} ↗`}
+                  </div>
+                  {rows.map(renderRow)}
+                </React.Fragment>
+              );
+            }
             return (
               <React.Fragment key={group}>
-                <div className={`${SET_EYEBROW} tw:flex tw:h-7 tw:items-center tw:px-3`}>{SETTINGS_NAV_GROUPS[group]}</div>
+                <div className={`${NAV_GROUP} tw:shrink-0`} data-testid={`set-nav-group-${group}`}>
+                  {SETTINGS_NAV_GROUPS[group]}
+                </div>
                 {rows.map(renderRow)}
               </React.Fragment>
             );
           })}
           {matchField && matchField.size === 0 ? (
-            <p className="tw:m-0 tw:px-3 tw:py-2 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty">
+            <p className="tw:m-0 tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty">
               {`No settings match "${trimmed}"`}
             </p>
           ) : null}
@@ -759,7 +842,7 @@ export const SettingsTab: React.FC<
               type="button"
               variant="secondary"
               size="xs"
-              className="tw:mt-4 tw:h-auto tw:min-h-0 tw:w-full tw:items-start tw:justify-between tw:gap-2 tw:rounded-md tw:px-2.5 tw:py-2 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]"
+              className="tw:mt-4 tw:h-auto tw:min-h-0 tw:w-full tw:shrink-0 tw:items-start tw:justify-between tw:gap-2 tw:rounded-md tw:px-2.5 tw:py-2 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]"
               onClick={() => composer?.emit?.(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query: trimmed })}
               data-testid="set-search-everywhere"
             >
@@ -768,101 +851,101 @@ export const SettingsTab: React.FC<
             </Button>
           ) : null}
         </nav>
+        {/* S5 Q1: every role sees who they are and can open what that allows
+            (the Permissions dialog, PermissionsHost). Not on the M0 board —
+            an owner decision (2026-10-02) the board predates. */}
+        {editorRole ? (
+          <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:border-t tw:border-[var(--bk-border)] tw:px-6 tw:py-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-role">
+            <span>{`Your role: ${editorRole.charAt(0)}${editorRole.slice(1).toLowerCase()}`}</span>
+            <span aria-hidden>·</span>
+            <Button
+              type="button"
+              variant="link"
+              className="tw:h-auto tw:min-h-0 tw:px-0 tw:text-[length:var(--bk-text-11)] tw:leading-4"
+              onClick={() => composer?.emit(EVENTS.UI_OPEN_PERMISSIONS, undefined)}
+              data-testid="set-role-permissions"
+            >
+              Permissions
+            </Button>
+          </div>
+        ) : null}
       </aside>
 
       {/* ── Pane ────────────────────────────────────────────────────────── */}
       <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-        {/* 4418:128917: the Overview has no header band — a bare "Settings
-            overview" title on the pane's grey. Every other screen: a 112 white
-            band, title + subtitle left, the screen's action right (4418:127966),
-            with "Saves immediately" beside it where actions apply at once
-            (4418:127680). Search lives in the sidebar. */}
-        {isOverview ? (
-          <header className="tw:flex tw:shrink-0 tw:items-center tw:bg-[var(--bk-gray-50)] tw:px-10 tw:pt-6">
-            <h2
-              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-9 tw:text-[var(--bk-ink)]"
-              data-testid="set-head-title"
-            >
-              {headTitle}
-            </h2>
-          </header>
-        ) : (
-        <header className="tw:flex tw:h-28 tw:shrink-0 tw:items-center tw:justify-between tw:gap-3 tw:border-b tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-12">
+        {/* 8134:212121: a 112 white band — the screen's title (20/28) and the
+            scope line under it (M1); the screen's own action or the plan
+            gate's Upgrade at the right. */}
+        <header className="tw:flex tw:h-28 tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-12 tw:pt-6">
           <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
             <h2
-              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-9 tw:text-[var(--bk-ink)]"
+              className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
               data-testid="set-head-title"
             >
               {headTitle}
             </h2>
-            <p className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-head-sub">
-              {headSub}
+            <p className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-head-scope">
+              {headScope}
             </p>
+            {screenHeader?.subtitle ? (
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-head-sub">
+                {screenHeader.subtitle}
+              </p>
+            ) : null}
           </div>
-          {immediate && !locked ? (
-            <span className="tw:ml-auto tw:shrink-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="set-head-immediate">
-              Saves immediately
-            </span>
-          ) : null}
           {locked ? (
             <Button type="button" size="xs" className={SET_HEAD_BTN} onClick={openBilling} data-testid="set-head-upgrade">
               Upgrade
             </Button>
-          ) : (
+          ) : readOnly ? null : (
             headerAction
           )}
         </header>
-        )}
 
         <div
           key={resetKey}
-          className={`tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-6 tw:overflow-y-auto tw:bg-[var(--bk-gray-50)] ${
-            isOverview ? "tw:px-10 tw:pb-6 tw:pt-6" : "tw:px-12 tw:py-8"
-          }`}
+          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:bg-[var(--bk-gray-50)] tw:px-12 tw:py-6"
           data-testid="set-body"
         >
           {renderScreen()}
         </div>
 
-        {/* A locked screen has nothing to save and the frame (3397:32859)
-            draws no footer under it — its only action is the header's Upgrade. */}
-        {/* 4418:127313 draws no footer on a clean screen: the bar appears
-            while there is something to save, a save failed, or loading did —
-            and on the Overview, whose Done is its way out. */}
-        {/* The Overview (4418:128917) and the immediate screens (4418:127680)
-            draw no footer either — nothing there waits to be saved, and Back to
-            canvas is the way out. */}
-        {locked || isOverview || immediate || footStatus.text === "All changes saved" ? null : (
-        <footer className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4">
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
-            className={`${SET_BTN} tw:h-7 tw:px-3 tw:text-[var(--bk-ink-muted)]`}
-            disabled={!screenIsDirty && !saveError}
-            onClick={rollBack}
-            data-testid="set-foot-discard"
-          >
-            Discard
-          </Button>
-          <Button
-            type="button"
-            size="xs"
-            className={`${SET_BTN} tw:h-7 tw:px-3`}
-            disabled={loadState !== "ready" || saving}
-            onClick={() => handleSave()}
-            data-testid="set-foot-save"
-          >
-            {saveError ? "Retry save" : "Save"}
-          </Button>
-          <span
-            className={`tw:ml-2 tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
-            role="status"
-            data-testid="set-foot-status"
-          >
-            {footStatus.text}
-          </span>
-        </footer>
+        {/* 8134:212121 / 8134:212718: a footer screen always has its save bar —
+            status at the left, Discard and Save at the right, both disabled
+            while there is nothing to save. None on the Overview, a workspace
+            door, a locked or read-only screen; an immediate screen gets it
+            only while it still holds an edit. */}
+        {!showFooter ? null : (
+          <footer className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:justify-end tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4">
+            <span
+              className={`tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] ${FOOT_TONE[footStatus.tone]}`}
+              role="status"
+              data-testid="set-foot-status"
+            >
+              {footStatus.text}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              className={`${SET_BTN} tw:h-7 tw:px-3 tw:text-[var(--bk-gray-700)]`}
+              disabled={!screenIsDirty && !saveError}
+              onClick={rollBack}
+              data-testid="set-foot-discard"
+            >
+              Discard
+            </Button>
+            <Button
+              type="button"
+              size="xs"
+              className={`${SET_BTN} tw:h-7 tw:px-3`}
+              disabled={loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
+              onClick={() => handleSave()}
+              data-testid="set-foot-save"
+            >
+              {saveError ? "Retry save" : "Save"}
+            </Button>
+          </footer>
         )}
       </div>
 

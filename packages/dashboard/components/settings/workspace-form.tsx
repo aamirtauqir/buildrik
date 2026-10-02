@@ -10,23 +10,6 @@ import { SectionCard, Button, InputField, SelectField } from "@/components/dashb
 // a "var(--color-primary)" default failed validation on any unchanged save.
 const DEFAULT_ACCENT = "#1A56DB";
 
-const LANGUAGES = [
-  { value: "en", label: "English" },
-  { value: "es", label: "Spanish" },
-  { value: "fr", label: "French" },
-  { value: "de", label: "German" },
-  { value: "pt", label: "Portuguese" },
-];
-
-const TIMEZONES = [
-  { value: "UTC", label: "UTC" },
-  { value: "America/New_York", label: "Eastern Time (ET)" },
-  { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
-  { value: "Europe/London", label: "London (GMT)" },
-  { value: "Europe/Paris", label: "Paris (CET)" },
-  { value: "Asia/Tokyo", label: "Tokyo (JST)" },
-];
-
 const EXPIRY_OPTIONS = [
   { value: "", label: "No expiration" },
   { value: "24h", label: "24 hours" },
@@ -38,21 +21,16 @@ interface WorkspaceFormProps {
   initialData?: {
     name?: string;
     slug?: string;
-    defaultLanguage?: string;
-    timezone?: string;
     iconUrl?: string | null;
     accentColor?: string;
     editsRequireApproval?: boolean;
     defaultExpiration?: string | null;
     requirePw?: boolean;
     allowEditors?: boolean;
-    notify?: boolean;
   };
   onSave?: (data: {
     name: string;
     slug: string;
-    defaultLanguage: string;
-    timezone: string;
     iconUrl: string | null;
     accentColor: string;
     editsRequireApproval: boolean;
@@ -61,7 +39,6 @@ interface WorkspaceFormProps {
     defaultExpiration: string | null;
     requirePw: boolean;
     allowEditors: boolean;
-    notify: boolean;
   }) => void;
   onDeleteWorkspace?: () => void;
   saving?: boolean;
@@ -88,8 +65,6 @@ export function WorkspaceForm({
 }: WorkspaceFormProps) {
   const [name, setName] = useState(initialData?.name ?? "");
   const [slug, setSlug] = useState(initialData?.slug ?? "");
-  const [defaultLanguage, setDefaultLanguage] = useState(initialData?.defaultLanguage ?? "en");
-  const [timezone, setTimezone] = useState(initialData?.timezone ?? "UTC");
   const [iconUrl, setIconUrl] = useState<string | null>(initialData?.iconUrl ?? null);
   const [iconUploading, setIconUploading] = useState(false);
   const [accentColor, setAccentColor] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
@@ -97,8 +72,6 @@ export function WorkspaceForm({
   const [editsRequireApproval, setEditsRequireApproval] = useState(initialData?.editsRequireApproval ?? false);
   const nameId = useId();
   const slugId = useId();
-  const defaultLanguageId = useId();
-  const timezoneId = useId();
   const linkExpirationId = useId();
   const presignMutation = trpc.upload.presign.useMutation();
   const confirmMutation = trpc.upload.confirm.useMutation();
@@ -107,15 +80,12 @@ export function WorkspaceForm({
   );
   const [requirePw, setRequirePw] = useState(initialData?.requirePw ?? false);
   const [allowEditors, setAllowEditors] = useState(initialData?.allowEditors ?? false);
-  const [notify, setNotify] = useState(initialData?.notify ?? true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Guard against losing workspace edits on an accidental reload.
   const dirty =
     name !== (initialData?.name ?? "") ||
     slug !== (initialData?.slug ?? "") ||
-    defaultLanguage !== (initialData?.defaultLanguage ?? "en") ||
-    timezone !== (initialData?.timezone ?? "UTC") ||
     accentColor !== (initialData?.accentColor ?? DEFAULT_ACCENT) ||
     editsRequireApproval !== (initialData?.editsRequireApproval ?? false);
   useUnsavedChanges(dirty);
@@ -161,12 +131,12 @@ export function WorkspaceForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSave?.({ name, slug, defaultLanguage, timezone, iconUrl, accentColor, editsRequireApproval });
+    onSave?.({ name, slug, iconUrl, accentColor, editsRequireApproval });
   }
 
   function handleSharingSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSaveSharing?.({ defaultExpiration, requirePw, allowEditors, notify });
+    onSaveSharing?.({ defaultExpiration, requirePw, allowEditors });
   }
 
   return (
@@ -212,34 +182,6 @@ export function WorkspaceForm({
                 Preview: buildrik.io/{slug}
               </p>
             )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor={defaultLanguageId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-              Default language
-            </label>
-            <SelectField id={defaultLanguageId} value={defaultLanguage} onChange={(e) => setDefaultLanguage(e.target.value)}>
-              {LANGUAGES.map((l) => (
-                <option key={l.value} value={l.value}>
-                  {l.label}
-                </option>
-              ))}
-            </SelectField>
-          </div>
-
-          <div>
-            <label htmlFor={timezoneId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-              Timezone
-            </label>
-            <SelectField id={timezoneId} value={timezone} onChange={(e) => setTimezone(e.target.value)}>
-              {TIMEZONES.map((tz) => (
-                <option key={tz.value} value={tz.value}>
-                  {tz.label}
-                </option>
-              ))}
-            </SelectField>
           </div>
         </div>
 
@@ -432,30 +374,6 @@ export function WorkspaceForm({
             </button>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
-                Activity summary emails
-              </p>
-              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                Receive weekly summaries of workspace activity.
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={notify}
-              aria-label="Activity summary emails"
-              onClick={() => setNotify(!notify)}
-              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-              style={{ backgroundColor: notify ? "var(--color-primary)" : "var(--color-border-default)" }}
-            >
-              <span
-                className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
-                style={{ transform: notify ? "translateX(18px)" : "translateX(2px)" }}
-              />
-            </button>
-          </div>
         </div>
 
         <div className="flex justify-end">

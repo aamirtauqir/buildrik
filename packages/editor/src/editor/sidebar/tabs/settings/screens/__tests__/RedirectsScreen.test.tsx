@@ -254,7 +254,7 @@ describe("the suggester switch — projectSettings.redirects.suggestFrom404s, sa
     expect(screen.queryByTestId("set-rd-suggestion-0")).toBeNull();
   });
 
-  it("the flush handler writes the switch into projectSettings.redirects, keeping the rest, and the screen is clean after", async () => {
+  it("the flush returns the switch in projectSettings.redirects, keeping the rest, and the screen is clean once the shell adopts it", async () => {
     const registerFlushHandler = vi.fn();
     const onDirtyChange = vi.fn();
     const { composer } = setup({ registerFlushHandler, onDirtyChange, projectSettings: { seo: { metaTitle: "Bella" } } });
@@ -263,9 +263,12 @@ describe("the suggester switch — projectSettings.redirects.suggestFrom404s, sa
     fireEvent.click(screen.getByTestId("set-rd-suggest-toggle"));
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
 
-    const flush = registerFlushHandler.mock.calls.at(-1)?.[0] as () => void;
-    act(() => flush());
-    expect(composer.setProjectSettings).toHaveBeenCalledWith({ seo: { metaTitle: "Bella" }, redirects: { suggestFrom404s: false } });
+    const flush = registerFlushHandler.mock.calls.at(-1)?.[0] as () => unknown;
+    const saved = flush();
+    expect(saved).toEqual({ seo: { metaTitle: "Bella" }, redirects: { suggestFrom404s: false } });
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
+    // The shell adopts what landed on the server (composer.adoptSavedProjectSettings → SETTINGS_CHANGE).
+    act(() => composer.setProjectSettings(saved as Parameters<typeof composer.setProjectSettings>[0]));
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
     // a second flip after the save is dirty again
     fireEvent.click(screen.getByTestId("set-rd-suggest-toggle"));

@@ -39,7 +39,7 @@ import { sitesRouter } from "@/server/trpc/routers/sites";
 const ctx = { session: { user: { id: "u_1" } }, prisma: {} } as never;
 
 beforeEach(() => {
-  deleteSite.mockReset().mockResolvedValue(undefined);
+  deleteSite.mockReset().mockResolvedValue({ success: true, deactivatedFormBlockIds: ["f1"] });
   bulkAction.mockReset();
   recordForSite.mockReset();
 });
