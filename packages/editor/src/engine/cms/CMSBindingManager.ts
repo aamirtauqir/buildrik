@@ -33,6 +33,9 @@ import type { CollectionManager } from "./CollectionManager";
 export interface CMSElementBinding extends BindingWithData {
   /** Collection ID to bind from */
   collectionId: string;
+  /** The collection's name at bind time — survives its deletion, so a
+   *  missing source can still be named (board 25). Absent on old bindings. */
+  collectionName?: string;
   /** Specific content item ID, or 'context' for repeater context */
   itemId?: string;
   /** Field slug to bind */
@@ -116,6 +119,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     /** Makes the bind one undo step (the inspector passes it; loads don't). */
     historyLabel?: string
   ): void {
+    const collectionName = this.cmsManager.getCollection(collectionId)?.name;
     const binding: CMSElementBinding = {
       binding: {
         sourceId: `cms:${collectionId}`,
@@ -123,6 +127,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
         type: "variable",
       },
       collectionId,
+      ...(collectionName ? { collectionName } : {}),
       itemId,
       fieldSlug,
       property,
@@ -219,6 +224,11 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     /* Stored bindings and CMS entry values are data, not this session's
        input: off-allowlist properties (onclick, style, …) and dangerous
        src/href URLs never reach the element. */
+    /* Nothing resolved (no published record, an empty field, no fallback):
+       the element keeps its own content, exactly as the export
+       (CMSExportResolver) and the canvas preview (useCMSPreview) already do.
+       Writing "" here wiped the text on bind and nothing restored it (P-2). */
+    if (!value) return;
     if (!isSafeCmsBoundValue(binding.property, value)) return;
     const property = binding.property;
     const write = () => {
@@ -233,10 +243,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   }
 
   /**
-   * Get binding key for deduplication
+   * One binding per element property: a property shows one field, so binding
+   * it to another field replaces the old binding in the same undo step
+   * instead of stacking a second one that fights it on export.
    */
   protected getBindingKey(binding: CMSElementBinding): string {
-    return `${binding.property}:${binding.collectionId}:${binding.fieldSlug}`;
+    return binding.property;
   }
 
   /**

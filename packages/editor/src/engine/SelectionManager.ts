@@ -28,7 +28,10 @@ export class SelectionManager {
    * Select an element
    */
   select(element: Element | null): void {
-    if (this.selected === element) return;
+    /* P-12: a no-op only when nothing would change. Selecting the primary of a
+       multi-selection collapses it to that one element — it used to return
+       here and keep all of them selected. */
+    if (this.selected === element && this.multiSelected.size <= 1) return;
 
     const previous = this.selected;
     this.selected = element;
@@ -40,7 +43,7 @@ export class SelectionManager {
 
     this.composer.emit(EVENTS.ELEMENT_SELECTED, element);
 
-    if (previous) {
+    if (previous && previous !== element) {
       this.composer.emit(EVENTS.ELEMENT_DESELECTED, previous);
     }
   }

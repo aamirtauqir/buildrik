@@ -11,7 +11,7 @@ import { BLOCK_COLORS } from "../blockPalette";
  * Build tabbed interface component
  */
 function buildTabs(composer: Composer, parentId: string, dropIndex?: number): string | undefined {
-  const tabsWrapper = composer.elements.createElement("container", {
+  const tabsWrapper = composer.elements.createElement("tabs", {
     tagName: "div",
     attributes: {
       class: "tabs",
@@ -109,6 +109,6 @@ export const tabsBlockConfig: BlockBuildConfig = {
   id: "tabs",
   label: "Tabs",
   category: "Components",
-  elementType: "container",
+  elementType: "tabs",
   build: buildTabs,
 };

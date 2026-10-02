@@ -164,6 +164,51 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
   });
 });
 
+/* §13: opened from an element (Open record ›, Open collection ›), the header
+   leads with the way back to it. The shell decides whether there is one. */
+describe("CmsWorkspace · Back to canvas (§13)", () => {
+  it("leads the header with ‹ Back to canvas when the shell hands one", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
+    cmsWorkspace.openCollection("col-1");
+    const onBack = vi.fn();
+    render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
+    const back = await screen.findByRole("button", { name: "‹ Back to canvas" });
+    const header = screen.getByTestId("cms-ws-header");
+    expect(header.firstElementChild).toBe(back);
+    fireEvent.click(back);
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  it("Open record: the sheet carries ‹ Back to canvas — one step closes it and goes back", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
+    cmsWorkspace.openCollection("col-1");
+    cmsWorkspace.openRecord("r1");
+    const onBack = vi.fn();
+    render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
+    const sheet = await screen.findByTestId("cms-sheet");
+    fireEvent.click(within(sheet).getByRole("button", { name: "‹ Back to canvas" }));
+    expect(onBack).toHaveBeenCalledTimes(1);
+    expect(cmsWorkspace.get().recordId).toBeNull();
+  });
+
+  it("the sheet has no back to the canvas on the rail's own visit", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
+    cmsWorkspace.openCollection("col-1");
+    cmsWorkspace.openRecord("r1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    const sheet = await screen.findByTestId("cms-sheet");
+    expect(within(sheet).queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+  });
+
+  it("no back action without one (the rail's own visit)", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [] });
+    cmsWorkspace.openCollection("col-1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    await screen.findByTestId("cms-ws-header");
+    expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+  });
+});
+
 describe("CmsWorkspace · empty collection (4428:148905)", () => {
   it("offers Add record and Import JSON, with the hint column", async () => {
     const { composer } = makeEngine({ collections: [FULL], items: [] });

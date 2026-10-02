@@ -29,6 +29,10 @@ export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "o
    *  differently (the image editor's 112-wide grey chips, 3397:39917) keeps
    *  the roving-tabindex + arrow-key contract and restyles the buttons. */
   tabClassName?: string;
+  /** The id of the tabpanel these tabs control. Given, every tab carries
+   *  `aria-controls` and the id `${panelId}-tab-${tab.id}`, so the panel can
+   *  name itself with `aria-labelledby` (WAI-ARIA tabs pattern). */
+  panelId?: string;
 }
 
 /**
@@ -48,7 +52,7 @@ const TAB_CLASS =
   "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:hover:bg-transparent " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
-export function Tabs({ tabs, value, onChange, label = "Sections", className, tabClassName, ...rest }: TabsProps) {
+export function Tabs({ tabs, value, onChange, label = "Sections", className, tabClassName, panelId, ...rest }: TabsProps) {
   const enabled = tabs.filter((t) => !t.disabled);
   const nodes = React.useRef(new Map<string, HTMLButtonElement>());
 
@@ -99,6 +103,8 @@ export function Tabs({ tabs, value, onChange, label = "Sections", className, tab
           }}
           type="button"
           role="tab"
+          id={panelId ? `${panelId}-tab-${t.id}` : undefined}
+          aria-controls={panelId}
           className={tabClassName ? twMerge(TAB_CLASS, tabClassName) : TAB_CLASS}
           aria-selected={t.id === value}
           aria-disabled={t.disabled || undefined}

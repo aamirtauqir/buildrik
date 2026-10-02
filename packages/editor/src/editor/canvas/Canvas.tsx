@@ -45,6 +45,8 @@ import {
   useCanvasHover,
   useCanvasContent,
   useSliderRuntime,
+  useCountdownRuntime,
+  useAccordionRuntime,
   useCanvasContextMenu,
   useCursorSync,
   useSelectionBehavior,
@@ -502,6 +504,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // Slider PLAYBACK/CONTROLS (autoplay, arrows, dots) — same runtime the
     // published page gets; re-runs whenever the rendered DOM changes.
     useSliderRuntime({ canvasRef, content: displayContent });
+    // Countdown ticking and accordion Open / Closed (Inspector v4 boards 11,
+    // 13) — the runtimes the published page gets, on the same rule.
+    useCountdownRuntime({ canvasRef, content: displayContent });
+    useAccordionRuntime({ canvasRef, content: displayContent });
 
     // Memoize the inner-HTML prop object so its reference is stable across
     // renders when `displayContent` hasn't actually changed. Without this,

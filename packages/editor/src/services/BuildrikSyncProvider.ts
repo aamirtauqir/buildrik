@@ -64,6 +64,23 @@ export function isSaveConflictPending(): boolean {
   return _conflictToken !== null;
 }
 
+/** The server token the pending conflict was raised with, or null. The
+ *  Inspector's "Resolve" re-sends SAVE_CONFLICT_EVENT with it, which reopens
+ *  the conflict dialog the user dismissed (board 29). */
+export function getPendingConflictToken(): string | null {
+  return _conflictToken;
+}
+
+/** Dispatched on `window` when a pending conflict is resolved — Overwrite
+ *  adopted the server token, or a fresh load replaced the copy. */
+export const SAVE_CONFLICT_CLEARED_EVENT = "buildrik:save-conflict-cleared";
+
+function clearConflictToken(): void {
+  if (_conflictToken === null) return;
+  _conflictToken = null;
+  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_CLEARED_EVENT));
+}
+
 /* A-1 / PD-1: the Site-column values this editor last knew the server held —
    captured at load, advanced after each successful mirror. The mirror sends
    only what differs from it, so a dashboard edit to a field this editor never
@@ -133,7 +150,7 @@ export class SaveConflictError extends Error {
  *  save matches the server and wins. */
 export function setBaselineLastEditedAt(iso: string | null): void {
   _baselineLastEditedAt = iso;
-  _conflictToken = null;
+  clearConflictToken();
 }
 
 // Conflict signal — emitted on a window CustomEvent so BOTH manual save and
@@ -500,7 +517,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     // 61-conflict: record the load-time version as the save baseline.
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
-    _conflictToken = null;
+    clearConflictToken();
     _baselineSiteColumns = extractSiteColumnPatch(data);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.

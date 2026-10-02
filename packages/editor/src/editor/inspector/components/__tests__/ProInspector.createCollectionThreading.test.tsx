@@ -2,9 +2,9 @@
  * Threading regression for the Create Collection prop path.
  *
  * Guards: ProInspector forwards its `onOpenCreateCollection` prop into the
- * tab content, which hands it to Settings › CONTENT (the binding door moved
- * there from the header — G2-144). ContentSection's own test covers the
- * downstream hop (its Create collection button invokes the prop). This test covers the hop
+ * tab content, which hands it to Behaviour › CMS binding (the binding door
+ * moved there from the header — G2-144). CmsBindingSection's own test covers
+ * the downstream hop (its "+ New collection…" invokes the prop). This test covers the hop
  * above — a rename on either side, or accidentally dropping the prop
  * spread, would make the spy observed here fire with the wrong shape or
  * not at all.
@@ -22,12 +22,6 @@ import { render } from "@testing-library/react";
 // deps come from hooks/composer, which would require a real composer to
 // boot. Stub the components/hooks ProInspector imports that don't touch
 // the threading under test.
-vi.mock("../InspectorEmptyState", () => ({
-  InspectorEmptyState: () => null,
-}));
-vi.mock("../MultiSelectToolbar", () => ({
-  MultiSelectToolbar: () => null,
-}));
 vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -38,8 +32,8 @@ vi.mock("../../tabs/InspectorTabContent", () => ({
     return null;
   },
 }));
-vi.mock("../../sections/VariantSection", () => ({
-  VariantSection: () => null,
+vi.mock("../../sections/ComponentRow", () => ({
+  ComponentRow: () => null,
 }));
 vi.mock("../InspectorElementMenu", () => ({
   InspectorElementMenu: () => null,
@@ -51,7 +45,7 @@ vi.mock("../DeleteConfirmModal", () => ({
 import { ProInspector } from "../../ProInspector";
 import { ToastProvider } from "@/editor/chrome-ui";
 
-/* ProInspector mounts VariantSection, which reports a refused detach
+/* ProInspector mounts ComponentRow, which reports a refused detach
    rather than swallowing it — so it needs the toast context. AquibraStudio
    wraps the whole studio in one, so every real mount has it and only these
    tests rendered the subtree bare. */

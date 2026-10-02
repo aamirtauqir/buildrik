@@ -16,7 +16,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
-import { Section } from "../Section";
+import { Section, SectionFrameContext, type SectionFrame } from "../Section";
 
 describe("Section header", () => {
   it("is a container — the toggle inside it carries the button role", () => {
@@ -34,11 +34,11 @@ describe("Section header", () => {
     expect(toggle.getAttribute("tabindex")).toBe("0");
   });
 
-  it("keeps the action button OUT of the toggle", () => {
+  it("keeps the action button OUT of the toggle (an open section's action)", () => {
     render(
       <Section
         title="Background"
-        isOpen={false}
+        isOpen
         action={<button type="button" className="bdi-plus" aria-label="Add background" />}
       >
         <div>content</div>
@@ -92,5 +92,33 @@ describe("Section header", () => {
       "aria-expanded",
       "true",
     );
+  });
+
+  /* Boards 1 and 3: an empty "+" row has nothing to disclose — no chevron,
+     the title keeps the chevron's column. */
+  it("an empty \"+\" row draws no chevron; an open section does", () => {
+    const frame = (displayMode: SectionFrame["displayMode"]): SectionFrame => ({
+      sectionId: "fill",
+      title: "Fill",
+      displayMode,
+      onToggle: vi.fn(),
+    });
+    const { container, rerender } = render(
+      <SectionFrameContext.Provider value={frame("empty")}>
+        <Section title="Fill">
+          <div>content</div>
+        </Section>
+      </SectionFrameContext.Provider>,
+    );
+    expect(container.querySelector(".bdi-chev")).toBeNull();
+    expect(screen.getByRole("button", { name: "Add fill" })).toBeInTheDocument();
+    rerender(
+      <SectionFrameContext.Provider value={frame("open")}>
+        <Section title="Fill">
+          <div>content</div>
+        </Section>
+      </SectionFrameContext.Provider>,
+    );
+    expect(container.querySelector(".bdi-chev")).not.toBeNull();
   });
 });

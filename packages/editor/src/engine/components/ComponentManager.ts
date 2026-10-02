@@ -31,6 +31,7 @@ import {
   getInstancesOfComponent,
   detachInstance,
   resetInstance,
+  resetInstanceOverride,
   detachAllInstances,
   syncInstance,
   syncAllInstances,
@@ -601,6 +602,11 @@ export class ComponentManager {
   /** Board 160:2 — throw away this instance's own edits and take the master. */
   async resetInstance(elementId: string): Promise<boolean> {
     return (await resetInstance(this.composer, this.maps, elementId)).synced;
+  }
+
+  /** Board 26 — the override dot's reset: one property back to the master. */
+  resetInstanceOverride(elementId: string, type: OverrideType, property: string): boolean {
+    return resetInstanceOverride(this.composer, this.maps, elementId, type, property);
   }
 
   /** Dropped overrides are a whole-component concern — see updateComponentMaster. */

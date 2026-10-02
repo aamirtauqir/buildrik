@@ -1,0 +1,1506 @@
+{
+  "fixture": "inspector-v4-site",
+  "fixtureVersion": 1,
+  "site": {
+    "name": "Inspector v4 fixture"
+  },
+  "cms": {
+    "collections": [
+      {
+        "key": "menu",
+        "name": "Menu",
+        "slug": "menu",
+        "displayField": "name",
+        "fields": [
+          {
+            "name": "Name",
+            "slug": "name",
+            "type": "text",
+            "order": 0
+          },
+          {
+            "name": "Description",
+            "slug": "description",
+            "type": "text",
+            "order": 1
+          },
+          {
+            "name": "Price",
+            "slug": "price",
+            "type": "number",
+            "order": 2
+          }
+        ],
+        "records": [
+          {
+            "name": "Cacio e pepe",
+            "description": "Tonnarelli, pecorino, black pepper",
+            "price": 14
+          },
+          {
+            "name": "Margherita",
+            "description": "San Marzano, fior di latte, basil",
+            "price": 12
+          },
+          {
+            "name": "Tiramisù",
+            "description": "Mascarpone, espresso, cocoa",
+            "price": 8
+          }
+        ]
+      },
+      {
+        "key": "specials",
+        "name": "Specials",
+        "slug": "specials",
+        "displayField": "title",
+        "deleteAfterLoad": true,
+        "fields": [
+          {
+            "name": "Title",
+            "slug": "title",
+            "type": "text",
+            "order": 0
+          }
+        ],
+        "records": [
+          {
+            "title": "Truffle risotto"
+          }
+        ]
+      }
+    ]
+  },
+  "components": [
+    {
+      "key": "reservation-banner",
+      "name": "Reservation banner",
+      "element": "i4-banner",
+      "overrides": {
+        "padding-top": "48px",
+        "padding-bottom": "48px"
+      }
+    }
+  ],
+  "project": {
+    "version": "1.0.0",
+    "pages": [
+      {
+        "id": "@page:home",
+        "name": "Home",
+        "slug": "home",
+        "isHome": true,
+        "root": {
+          "id": "@root:home",
+          "type": "container",
+          "tagName": "div",
+          "classes": [
+            "buildrick-page-root"
+          ],
+          "children": [
+            {
+              "id": "i4-hero",
+              "type": "section",
+              "tagName": "section",
+              "classes": [
+                "section"
+              ],
+              "attributes": {},
+              "styles": {
+                "padding-top": "64px",
+                "padding-bottom": "64px",
+                "padding-left": "32px",
+                "padding-right": "32px"
+              },
+              "data": {
+                "layerName": "Hero"
+              },
+              "children": [
+                {
+                  "id": "i4-heading",
+                  "type": "heading",
+                  "tagName": "h3",
+                  "children": [],
+                  "content": "Bella Cucina",
+                  "attributes": {
+                    "id": "hero-title",
+                    "data-section": "hero"
+                  },
+                  "classes": [
+                    "hero-title"
+                  ],
+                  "styles": {
+                    "font-size": "var(--buildrick-design-font-size-2xl)",
+                    "font-weight": "600",
+                    "line-height": "40px",
+                    "text-align": "center",
+                    "color": "var(--buildrick-design-color-text)",
+                    "margin-bottom": "16px"
+                  },
+                  "data": {
+                    "layerName": "Heading",
+                    "interactions": [
+                      {
+                        "id": "ix-heading-click",
+                        "trigger": "click",
+                        "animation": {
+                          "preset": "fadeInUp",
+                          "duration": 300,
+                          "delay": 0,
+                          "easing": "easeOut",
+                          "target": "self",
+                          "reverse": false,
+                          "loop": 1
+                        },
+                        "enabled": true,
+                        "name": "Scroll to menu"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "id": "i4-text",
+                  "type": "paragraph",
+                  "tagName": "p",
+                  "children": [],
+                  "content": "Handmade pasta and wood-fired pizza in the heart of the old town.",
+                  "styles": {
+                    "font-size": "16px",
+                    "font-weight": "400",
+                    "line-height": "1.6",
+                    "color": "#333333",
+                    "margin-bottom": "12px"
+                  }
+                },
+                {
+                  "id": "i4-button",
+                  "type": "button",
+                  "tagName": "button",
+                  "children": [],
+                  "content": "Reserve a table",
+                  "classes": [
+                    "btn"
+                  ],
+                  "styles": {
+                    "font-size": "var(--buildrick-design-btn-font-size)",
+                    "font-weight": "var(--buildrick-design-btn-font-weight)",
+                    "height": "var(--buildrick-design-btn-height-md)",
+                    "padding-left": "var(--buildrick-design-btn-padding-x)",
+                    "padding-right": "var(--buildrick-design-btn-padding-x)",
+                    "background-color": "#1A56DB",
+                    "color": "#ffffff",
+                    "border-radius": "var(--buildrick-design-btn-radius)",
+                    "border": "none",
+                    "cursor": "pointer",
+                    "text-align": "center"
+                  },
+                  "attributes": {
+                    "href": "#page:@page:home",
+                    "target": "_blank",
+                    "rel": "noopener noreferrer"
+                  }
+                },
+                {
+                  "id": "i4-link",
+                  "type": "link",
+                  "tagName": "a",
+                  "children": [],
+                  "content": "View the full menu",
+                  "attributes": {
+                    "href": "https://bellacucina.example/menu",
+                    "target": "_blank",
+                    "rel": "noopener noreferrer"
+                  },
+                  "styles": {
+                    "font-size": "inherit",
+                    "color": "#1A56DB",
+                    "text-decoration": "underline",
+                    "cursor": "pointer"
+                  }
+                },
+                {
+                  "id": "i4-image",
+                  "type": "image",
+                  "tagName": "img",
+                  "children": [],
+                  "styles": {
+                    "height": "auto",
+                    "display": "block",
+                    "max-width": "100%",
+                    "border-radius": "0px",
+                    "width": "640px"
+                  },
+                  "attributes": {
+                    "alt": "",
+                    "src": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=2400&h=1600&fit=crop"
+                  }
+                },
+                {
+                  "id": "i4-video-embed",
+                  "type": "video-embed",
+                  "tagName": "div",
+                  "children": [
+                    {
+                      "id": "i4-video-embed-1",
+                      "type": "container",
+                      "tagName": "div",
+                      "children": [
+                        {
+                          "id": "i4-video-embed-2",
+                          "type": "container",
+                          "tagName": "div",
+                          "children": [
+                            {
+                              "id": "i4-video-embed-3",
+                              "type": "text",
+                              "tagName": "span",
+                              "content": "🎬",
+                              "children": []
+                            }
+                          ],
+                          "styles": {
+                            "font-size": "48px"
+                          }
+                        },
+                        {
+                          "id": "i4-video-embed-4",
+                          "type": "container",
+                          "tagName": "div",
+                          "children": [
+                            {
+                              "id": "i4-video-embed-5",
+                              "type": "text",
+                              "tagName": "span",
+                              "content": "Paste YouTube or Vimeo URL",
+                              "children": []
+                            }
+                          ],
+                          "styles": {
+                            "margin-top": "8px"
+                          }
+                        }
+                      ],
+                      "styles": {
+                        "position": "absolute",
+                        "top": "50%",
+                        "left": "50%",
+                        "transform": "translate(-50%,-50%)",
+                        "text-align": "center",
+                        "color": "#666"
+                      }
+                    }
+                  ],
+                  "classes": [
+                    "buildrick-video-embed"
+                  ],
+                  "styles": {
+                    "position": "relative",
+                    "padding-bottom": "56.25%",
+                    "height": "0",
+                    "overflow": "hidden",
+                    "border-radius": "12px",
+                    "background": "#1a1a2e",
+                    "display": "block"
+                  },
+                  "attributes": {
+                    "data-embed-url": "https://youtu.be/aqz-KE-bpKQ",
+                    "data-embed-ratio": "16:9",
+                    "data-embed-autoplay": "true"
+                  }
+                },
+                {
+                  "id": "i4-audio",
+                  "type": "audio",
+                  "tagName": "audio",
+                  "children": [],
+                  "attributes": {
+                    "controls": "",
+                    "src": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+                  }
+                },
+                {
+                  "id": "i4-countdown",
+                  "type": "countdown",
+                  "tagName": "div",
+                  "children": [
+                    {
+                      "id": "i4-countdown-1",
+                      "type": "container",
+                      "tagName": "div",
+                      "children": [
+                        {
+                          "id": "i4-countdown-2",
+                          "type": "heading",
+                          "tagName": "h4",
+                          "children": [],
+                          "content": "Launch in"
+                        },
+                        {
+                          "id": "i4-countdown-3",
+                          "type": "paragraph",
+                          "tagName": "p",
+                          "children": [],
+                          "content": "We are preparing something amazing."
+                        }
+                      ],
+                      "classes": [
+                        "buildrick-countdown-header"
+                      ]
+                    },
+                    {
+                      "id": "i4-countdown-4",
+                      "type": "container",
+                      "tagName": "div",
+                      "children": [
+                        {
+                          "id": "i4-countdown-5",
+                          "type": "container",
+                          "tagName": "div",
+                          "children": [
+                            {
+                              "id": "i4-countdown-6",
+                              "type": "text",
+                              "tagName": "span",
+                              "children": [],
+                              "content": "12",
+                              "classes": [
+                                "buildrick-countdown-value"
+                              ]
+                            },
+                            {
+                              "id": "i4-countdown-7",
+                              "type": "text",
+                              "tagName": "span",
+                              "children": [],
+                              "content": "Days",
+                              "classes": [
+                                "buildrick-countdown-label"
+                              ]
+                            }
+                          ],
+                          "classes": [
+                            "buildrick-countdown-unit"
+                          ]
+                        },
+                        {
+                          "id": "i4-countdown-8",
+                          "type": "container",
+                          "tagName": "div",
+                          "children": [
+                            {
+                              "id": "i4-countdown-9",
+                              "type": "text",
+                              "tagName": "span",
+                              "children": [],
+                              "content": "08",
+                              "classes": [
+                                "buildrick-countdown-value"
+                              ]
+                            },
+                            {
+                              "id": "i4-countdown-10",
+                              "type": "text",
+                              "tagName": "span",
+                              "children": [],
+                              "content": "Hours",
+                              "classes": [
+                                "buildrick-countdown-label"
+                              ]
+                            }
+                          ],
+                          "classes": [
+                            "buildrick-countdown-unit"
+                          ]
+                        },
+                        {
+                          "id": "i4-countdown-11",
+                          "type": "container",
+                          "tagName": "div",
+                          "children": [
+                            {
+                              "id": "i4-countdown-12",
+                              "type": "text",
+                              "tagName": "span",
+                              "children": [],
+                              "content": "45",
+                              "classes": [
+                                "buildrick-countdown-value"
+                              ]
+                            },
+                            {
+                              "id": "i4-countdown-13",
+                              "type": "text",
+                              "tagName": "span",
+                              "children": [],
+                              "content": "Minutes",
+                              "classes": [
+                                "buildrick-countdown-label"
+                              ]
+                            }
+                          ],
+                          "classes": [
+                            "buildrick-countdown-unit"
+                          ]
+                        },
+                        {
+                          "id": "i4-countdown-14",
+                          "type": "container",
+                          "tagName": "div",
+                          "children": [
+                            {
+                              "id": "i4-countdown-15",
+                              "type": "text",
+                              "tagName": "span",
+                              "children": [],
+                              "content": "20",
+                              "classes": [
+                                "buildrick-countdown-value"
+                              ]
+                            },
+                            {
+                              "id": "i4-countdown-16",
+                              "type": "text",
+                              "tagName": "span",
+                              "children": [],
+                              "content": "Seconds",
+                              "classes": [
+                                "buildrick-countdown-label"
+                              ]
+                            }
+                          ],
+                          "classes": [
+                            "buildrick-countdown-unit"
+                          ]
+                        }
+                      ],
+                      "classes": [
+                        "buildrick-countdown-grid"
+                      ]
+                    }
+                  ],
+                  "classes": [
+                    "buildrick-countdown"
+                  ],
+                  "styles": {
+                    "display": "block"
+                  },
+                  "attributes": {
+                    "data-countdown-end": "2026-12-31T23:59",
+                    "data-countdown-message": "We are open!"
+                  }
+                },
+                {
+                  "id": "i4-progress",
+                  "type": "progress",
+                  "tagName": "div",
+                  "children": [
+                    {
+                      "id": "i4-progress-1",
+                      "type": "heading",
+                      "tagName": "h1",
+                      "children": [],
+                      "content": "Your Progress",
+                      "classes": [
+                        "pb-title"
+                      ]
+                    },
+                    {
+                      "id": "i4-progress-2",
+                      "type": "container",
+                      "tagName": "div",
+                      "children": [
+                        {
+                          "id": "i4-progress-bar",
+                          "type": "container",
+                          "tagName": "progress",
+                          "classes": [
+                            "pb-bar"
+                          ],
+                          "attributes": {
+                            "value": "65",
+                            "max": "100"
+                          },
+                          "children": []
+                        },
+                        {
+                          "id": "i4-progress-3",
+                          "type": "container",
+                          "tagName": "div",
+                          "children": [
+                            {
+                              "id": "i4-progress-4",
+                              "type": "text",
+                              "tagName": "span",
+                              "content": "65%",
+                              "children": []
+                            }
+                          ],
+                          "classes": [
+                            "pb-circle"
+                          ]
+                        },
+                        {
+                          "id": "i4-progress-5",
+                          "type": "container",
+                          "tagName": "div",
+                          "children": [
+                            {
+                              "id": "i4-progress-6",
+                              "type": "heading",
+                              "tagName": "h2",
+                              "children": [],
+                              "content": "32 of 42 complete",
+                              "classes": [
+                                "pb-h2"
+                              ]
+                            },
+                            {
+                              "id": "i4-progress-7",
+                              "type": "paragraph",
+                              "tagName": "p",
+                              "children": [],
+                              "content": "Finish course to get certificate.",
+                              "classes": [
+                                "pb-p"
+                              ]
+                            }
+                          ],
+                          "classes": [
+                            "pb-text"
+                          ]
+                        }
+                      ],
+                      "classes": [
+                        "pb-progress"
+                      ]
+                    }
+                  ],
+                  "classes": [
+                    "pb-card"
+                  ],
+                  "styles": {
+                    "display": "block"
+                  }
+                },
+                {
+                  "id": "i4-accordion",
+                  "type": "accordion",
+                  "tagName": "div",
+                  "attributes": {
+                    "class": "accordion",
+                    "data-allow-multiple": "false"
+                  },
+                  "classes": [],
+                  "styles": {
+                    "width": "100%",
+                    "maxWidth": "640px"
+                  },
+                  "children": [
+                    {
+                      "id": "i4-accordion-1",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {
+                        "class": "accordion-item open"
+                      },
+                      "classes": [],
+                      "styles": {
+                        "border": "1px solid #E5E7EB",
+                        "borderRadius": "8px",
+                        "marginBottom": "8px",
+                        "overflow": "hidden"
+                      },
+                      "children": [
+                        {
+                          "id": "i4-accordion-2",
+                          "type": "button",
+                          "tagName": "button",
+                          "attributes": {
+                            "class": "accordion-header"
+                          },
+                          "classes": [],
+                          "styles": {
+                            "width": "100%",
+                            "display": "flex",
+                            "justifyContent": "space-between",
+                            "alignItems": "center",
+                            "padding": "16px 20px",
+                            "background": "#fff",
+                            "border": "none",
+                            "cursor": "pointer",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "textAlign": "left"
+                          },
+                          "children": [
+                            {
+                              "id": "i4-accordion-3",
+                              "type": "text",
+                              "tagName": "span",
+                              "attributes": {},
+                              "classes": [],
+                              "styles": {},
+                              "children": [],
+                              "draggable": true,
+                              "droppable": false,
+                              "content": "What is Aquibra?"
+                            }
+                          ],
+                          "draggable": true,
+                          "droppable": false
+                        },
+                        {
+                          "id": "i4-accordion-4",
+                          "type": "container",
+                          "tagName": "div",
+                          "attributes": {
+                            "class": "accordion-content"
+                          },
+                          "classes": [],
+                          "styles": {
+                            "maxHeight": "200px",
+                            "overflow": "hidden",
+                            "transition": "max-height 0.3s ease"
+                          },
+                          "children": [
+                            {
+                              "id": "i4-accordion-5",
+                              "type": "container",
+                              "tagName": "div",
+                              "attributes": {},
+                              "classes": [],
+                              "styles": {
+                                "padding": "0 20px 16px"
+                              },
+                              "children": [
+                                {
+                                  "id": "i4-accordion-6",
+                                  "type": "paragraph",
+                                  "tagName": "p",
+                                  "attributes": {},
+                                  "classes": [],
+                                  "styles": {
+                                    "margin": "0",
+                                    "color": "#4B5563",
+                                    "lineHeight": "1.6"
+                                  },
+                                  "children": [],
+                                  "draggable": true,
+                                  "droppable": false,
+                                  "content": "Aquibra is a professional visual web page builder that lets you create beautiful, responsive websites without writing code."
+                                }
+                              ],
+                              "draggable": true,
+                              "droppable": true
+                            }
+                          ],
+                          "draggable": true,
+                          "droppable": true
+                        }
+                      ],
+                      "draggable": true,
+                      "droppable": true
+                    },
+                    {
+                      "id": "i4-accordion-7",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {
+                        "class": "accordion-item"
+                      },
+                      "classes": [],
+                      "styles": {
+                        "border": "1px solid #E5E7EB",
+                        "borderRadius": "8px",
+                        "marginBottom": "8px",
+                        "overflow": "hidden"
+                      },
+                      "children": [
+                        {
+                          "id": "i4-accordion-8",
+                          "type": "button",
+                          "tagName": "button",
+                          "attributes": {
+                            "class": "accordion-header"
+                          },
+                          "classes": [],
+                          "styles": {
+                            "width": "100%",
+                            "display": "flex",
+                            "justifyContent": "space-between",
+                            "alignItems": "center",
+                            "padding": "16px 20px",
+                            "background": "#fff",
+                            "border": "none",
+                            "cursor": "pointer",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "textAlign": "left"
+                          },
+                          "children": [
+                            {
+                              "id": "i4-accordion-9",
+                              "type": "text",
+                              "tagName": "span",
+                              "attributes": {},
+                              "classes": [],
+                              "styles": {},
+                              "children": [],
+                              "draggable": true,
+                              "droppable": false,
+                              "content": "Is it free to use?"
+                            }
+                          ],
+                          "draggable": true,
+                          "droppable": false
+                        },
+                        {
+                          "id": "i4-accordion-10",
+                          "type": "container",
+                          "tagName": "div",
+                          "attributes": {
+                            "class": "accordion-content"
+                          },
+                          "classes": [],
+                          "styles": {
+                            "maxHeight": "0",
+                            "overflow": "hidden",
+                            "transition": "max-height 0.3s ease"
+                          },
+                          "children": [
+                            {
+                              "id": "i4-accordion-11",
+                              "type": "container",
+                              "tagName": "div",
+                              "attributes": {},
+                              "classes": [],
+                              "styles": {
+                                "padding": "0 20px 16px"
+                              },
+                              "children": [
+                                {
+                                  "id": "i4-accordion-12",
+                                  "type": "paragraph",
+                                  "tagName": "p",
+                                  "attributes": {},
+                                  "classes": [],
+                                  "styles": {
+                                    "margin": "0",
+                                    "color": "#4B5563",
+                                    "lineHeight": "1.6"
+                                  },
+                                  "children": [],
+                                  "draggable": true,
+                                  "droppable": false,
+                                  "content": "Yes! Aquibra offers a free tier with core features. Premium plans unlock advanced functionality and remove limitations."
+                                }
+                              ],
+                              "draggable": true,
+                              "droppable": true
+                            }
+                          ],
+                          "draggable": true,
+                          "droppable": true
+                        }
+                      ],
+                      "draggable": true,
+                      "droppable": true
+                    },
+                    {
+                      "id": "i4-accordion-13",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {
+                        "class": "accordion-item"
+                      },
+                      "classes": [],
+                      "styles": {
+                        "border": "1px solid #E5E7EB",
+                        "borderRadius": "8px",
+                        "marginBottom": "8px",
+                        "overflow": "hidden"
+                      },
+                      "children": [
+                        {
+                          "id": "i4-accordion-14",
+                          "type": "button",
+                          "tagName": "button",
+                          "attributes": {
+                            "class": "accordion-header"
+                          },
+                          "classes": [],
+                          "styles": {
+                            "width": "100%",
+                            "display": "flex",
+                            "justifyContent": "space-between",
+                            "alignItems": "center",
+                            "padding": "16px 20px",
+                            "background": "#fff",
+                            "border": "none",
+                            "cursor": "pointer",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "textAlign": "left"
+                          },
+                          "children": [
+                            {
+                              "id": "i4-accordion-15",
+                              "type": "text",
+                              "tagName": "span",
+                              "attributes": {},
+                              "classes": [],
+                              "styles": {},
+                              "children": [],
+                              "draggable": true,
+                              "droppable": false,
+                              "content": "Can I export my designs?"
+                            }
+                          ],
+                          "draggable": true,
+                          "droppable": false
+                        },
+                        {
+                          "id": "i4-accordion-16",
+                          "type": "container",
+                          "tagName": "div",
+                          "attributes": {
+                            "class": "accordion-content"
+                          },
+                          "classes": [],
+                          "styles": {
+                            "maxHeight": "0",
+                            "overflow": "hidden",
+                            "transition": "max-height 0.3s ease"
+                          },
+                          "children": [
+                            {
+                              "id": "i4-accordion-17",
+                              "type": "container",
+                              "tagName": "div",
+                              "attributes": {},
+                              "classes": [],
+                              "styles": {
+                                "padding": "0 20px 16px"
+                              },
+                              "children": [
+                                {
+                                  "id": "i4-accordion-18",
+                                  "type": "paragraph",
+                                  "tagName": "p",
+                                  "attributes": {},
+                                  "classes": [],
+                                  "styles": {
+                                    "margin": "0",
+                                    "color": "#4B5563",
+                                    "lineHeight": "1.6"
+                                  },
+                                  "children": [],
+                                  "draggable": true,
+                                  "droppable": false,
+                                  "content": "Absolutely! Export your designs as clean HTML/CSS code, or publish directly to your custom domain."
+                                }
+                              ],
+                              "draggable": true,
+                              "droppable": true
+                            }
+                          ],
+                          "draggable": true,
+                          "droppable": true
+                        }
+                      ],
+                      "draggable": true,
+                      "droppable": true
+                    }
+                  ],
+                  "draggable": true,
+                  "droppable": false
+                },
+                {
+                  "id": "i4-input",
+                  "type": "input",
+                  "tagName": "input",
+                  "children": [],
+                  "attributes": {
+                    "type": "text",
+                    "name": "guest-name",
+                    "placeholder": "Your name"
+                  },
+                  "styles": {
+                    "font-size": "var(--buildrick-design-label-font-size)",
+                    "height": "var(--buildrick-design-input-height)",
+                    "padding-left": "var(--buildrick-design-input-padding-x)",
+                    "padding-right": "var(--buildrick-design-input-padding-x)",
+                    "border": "1px solid var(--buildrick-design-input-border)",
+                    "border-radius": "var(--buildrick-design-input-radius)",
+                    "background-color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "i4-checkbox",
+                  "type": "checkbox",
+                  "tagName": "label",
+                  "children": [
+                    {
+                      "id": "i4-checkbox-1",
+                      "type": "input",
+                      "tagName": "input",
+                      "children": [],
+                      "attributes": {
+                        "type": "checkbox",
+                        "name": "specials-optin"
+                      }
+                    },
+                    {
+                      "id": "i4-checkbox-2",
+                      "type": "text",
+                      "tagName": "span",
+                      "content": " Send me the weekly specials",
+                      "children": []
+                    }
+                  ],
+                  "styles": {
+                    "display": "flex",
+                    "align-items": "center",
+                    "gap": "8px",
+                    "font-size": "14px",
+                    "font-weight": "500",
+                    "color": "#333333",
+                    "margin-bottom": "4px"
+                  }
+                },
+                {
+                  "id": "i4-flex",
+                  "type": "flex",
+                  "tagName": "div",
+                  "attributes": {},
+                  "classes": [],
+                  "styles": {
+                    "display": "flex",
+                    "gap": "16px",
+                    "align-items": "center"
+                  },
+                  "children": [
+                    {
+                      "id": "i4-flex-1",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {},
+                      "classes": [],
+                      "styles": {
+                        "background": "#e0e0e0",
+                        "padding": "20px",
+                        "border-radius": "8px"
+                      },
+                      "children": [],
+                      "draggable": true,
+                      "droppable": true,
+                      "content": "Flex Item 1"
+                    },
+                    {
+                      "id": "i4-flex-2",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {},
+                      "classes": [],
+                      "styles": {
+                        "background": "#e0e0e0",
+                        "padding": "20px",
+                        "border-radius": "8px"
+                      },
+                      "children": [],
+                      "draggable": true,
+                      "droppable": true,
+                      "content": "Flex Item 2"
+                    },
+                    {
+                      "id": "i4-flex-3",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {},
+                      "classes": [],
+                      "styles": {
+                        "background": "#e0e0e0",
+                        "padding": "20px",
+                        "border-radius": "8px"
+                      },
+                      "children": [],
+                      "draggable": true,
+                      "droppable": true,
+                      "content": "Flex Item 3"
+                    }
+                  ],
+                  "draggable": true,
+                  "droppable": true
+                },
+                {
+                  "id": "i4-grid",
+                  "type": "container",
+                  "tagName": "div",
+                  "attributes": {},
+                  "classes": [],
+                  "styles": {
+                    "display": "grid",
+                    "grid-template-columns": "repeat(3, 1fr)",
+                    "gap": "16px"
+                  },
+                  "children": [
+                    {
+                      "id": "i4-grid-1",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {},
+                      "classes": [],
+                      "styles": {
+                        "background": "#f0f0f0",
+                        "padding": "20px",
+                        "border-radius": "8px"
+                      },
+                      "children": [],
+                      "draggable": true,
+                      "droppable": true,
+                      "content": "Grid Item 1"
+                    },
+                    {
+                      "id": "i4-grid-2",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {},
+                      "classes": [],
+                      "styles": {
+                        "background": "#f0f0f0",
+                        "padding": "20px",
+                        "border-radius": "8px"
+                      },
+                      "children": [],
+                      "draggable": true,
+                      "droppable": true,
+                      "content": "Grid Item 2"
+                    },
+                    {
+                      "id": "i4-grid-3",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {},
+                      "classes": [],
+                      "styles": {
+                        "background": "#f0f0f0",
+                        "padding": "20px",
+                        "border-radius": "8px"
+                      },
+                      "children": [],
+                      "draggable": true,
+                      "droppable": true,
+                      "content": "Grid Item 3"
+                    }
+                  ],
+                  "draggable": true,
+                  "droppable": true
+                },
+                {
+                  "id": "i4-section",
+                  "type": "section",
+                  "tagName": "section",
+                  "attributes": {},
+                  "classes": [
+                    "section"
+                  ],
+                  "styles": {},
+                  "children": [
+                    {
+                      "id": "i4-section-1",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {},
+                      "classes": [
+                        "container"
+                      ],
+                      "styles": {},
+                      "children": [
+                        {
+                          "id": "i4-section-title",
+                          "type": "heading",
+                          "tagName": "h2",
+                          "children": [],
+                          "content": "Our story",
+                          "styles": {
+                            "font-size": "32px",
+                            "font-weight": "700",
+                            "line-height": "1.2",
+                            "margin-bottom": "16px"
+                          }
+                        }
+                      ],
+                      "draggable": true,
+                      "droppable": true
+                    }
+                  ],
+                  "draggable": true,
+                  "droppable": true
+                },
+                {
+                  "id": "i4-form",
+                  "type": "form",
+                  "tagName": "form",
+                  "children": [
+                    {
+                      "id": "i4-form-name",
+                      "type": "input",
+                      "tagName": "input",
+                      "children": [],
+                      "attributes": {
+                        "type": "text",
+                        "name": "name",
+                        "placeholder": "Name",
+                        "required": ""
+                      }
+                    },
+                    {
+                      "id": "i4-form-email",
+                      "type": "input",
+                      "tagName": "input",
+                      "children": [],
+                      "attributes": {
+                        "type": "email",
+                        "name": "email",
+                        "placeholder": "Email",
+                        "required": ""
+                      }
+                    },
+                    {
+                      "id": "i4-form-party",
+                      "type": "input",
+                      "tagName": "input",
+                      "children": [],
+                      "attributes": {
+                        "type": "number",
+                        "name": "party-size",
+                        "placeholder": "Party size"
+                      }
+                    },
+                    {
+                      "id": "i4-form-submit",
+                      "type": "button",
+                      "tagName": "button",
+                      "children": [],
+                      "content": "Book",
+                      "attributes": {
+                        "type": "submit"
+                      }
+                    }
+                  ],
+                  "styles": {
+                    "display": "flex",
+                    "flex-direction": "column",
+                    "gap": "16px"
+                  }
+                },
+                {
+                  "id": "i4-collection-list",
+                  "type": "collection-list",
+                  "tagName": "div",
+                  "attributes": {},
+                  "classes": [],
+                  "styles": {
+                    "display": "grid",
+                    "grid-template-columns": "repeat(3, 1fr)",
+                    "gap": "16px"
+                  },
+                  "children": [
+                    {
+                      "id": "i4-collection-list-1",
+                      "type": "container",
+                      "tagName": "div",
+                      "attributes": {},
+                      "classes": [],
+                      "styles": {
+                        "display": "flex",
+                        "flex-direction": "column",
+                        "gap": "8px",
+                        "background": "#f3f4f6",
+                        "padding": "16px",
+                        "border-radius": "8px"
+                      },
+                      "children": [
+                        {
+                          "id": "i4-collection-list-2",
+                          "type": "container",
+                          "tagName": "div",
+                          "attributes": {},
+                          "classes": [],
+                          "styles": {
+                            "height": "96px",
+                            "background": "#e5e7eb",
+                            "border-radius": "6px"
+                          },
+                          "children": [],
+                          "draggable": true,
+                          "droppable": true
+                        },
+                        {
+                          "id": "i4-collection-list-3",
+                          "type": "heading",
+                          "tagName": "h4",
+                          "attributes": {},
+                          "classes": [],
+                          "styles": {},
+                          "children": [],
+                          "draggable": true,
+                          "droppable": false,
+                          "content": "{{item.name}}"
+                        },
+                        {
+                          "id": "i4-collection-list-4",
+                          "type": "paragraph",
+                          "tagName": "p",
+                          "attributes": {},
+                          "classes": [],
+                          "styles": {},
+                          "children": [],
+                          "draggable": true,
+                          "droppable": false,
+                          "content": "{{item.description}}"
+                        }
+                      ],
+                      "draggable": true,
+                      "droppable": true
+                    }
+                  ],
+                  "draggable": true,
+                  "droppable": true
+                },
+                {
+                  "id": "i4-heading-cms",
+                  "type": "heading",
+                  "tagName": "h2",
+                  "children": [],
+                  "content": "Cacio e pepe",
+                  "styles": {
+                    "font-size": "32px",
+                    "font-weight": "700",
+                    "line-height": "1.2",
+                    "margin-bottom": "16px"
+                  }
+                },
+                {
+                  "id": "i4-heading-specials",
+                  "type": "heading",
+                  "tagName": "h2",
+                  "children": [],
+                  "content": "Truffle risotto",
+                  "styles": {
+                    "font-size": "32px",
+                    "font-weight": "700",
+                    "line-height": "1.2",
+                    "margin-bottom": "16px"
+                  }
+                },
+                {
+                  "id": "i4-banner",
+                  "type": "container",
+                  "tagName": "div",
+                  "classes": [],
+                  "attributes": {},
+                  "styles": {
+                    "padding-top": "24px",
+                    "padding-bottom": "24px",
+                    "padding-left": "32px",
+                    "padding-right": "32px"
+                  },
+                  "children": [
+                    {
+                      "id": "i4-banner-title",
+                      "type": "heading",
+                      "tagName": "h2",
+                      "children": [],
+                      "content": "Book your table tonight",
+                      "styles": {
+                        "font-size": "32px",
+                        "font-weight": "700",
+                        "line-height": "1.2",
+                        "margin-bottom": "16px"
+                      }
+                    },
+                    {
+                      "id": "i4-banner-cta",
+                      "type": "button",
+                      "tagName": "button",
+                      "children": [],
+                      "content": "Reserve",
+                      "attributes": {
+                        "type": "button"
+                      }
+                    }
+                  ],
+                  "data": {
+                    "layerName": "Reservation banner"
+                  }
+                },
+                {
+                  "id": "i4-button-hover",
+                  "type": "button",
+                  "tagName": "button",
+                  "children": [],
+                  "content": "Book now",
+                  "classes": [
+                    "btn"
+                  ],
+                  "styles": {
+                    "font-size": "var(--buildrick-design-btn-font-size)",
+                    "font-weight": "var(--buildrick-design-btn-font-weight)",
+                    "height": "var(--buildrick-design-btn-height-md)",
+                    "padding-left": "var(--buildrick-design-btn-padding-x)",
+                    "padding-right": "var(--buildrick-design-btn-padding-x)",
+                    "background-color": "#1A56DB",
+                    "color": "#ffffff",
+                    "border-radius": "var(--buildrick-design-btn-radius)",
+                    "border": "none",
+                    "cursor": "pointer",
+                    "text-align": "center"
+                  }
+                },
+                {
+                  "id": "i4-heading-tablet",
+                  "type": "heading",
+                  "tagName": "h2",
+                  "children": [],
+                  "content": "Tonight's specials",
+                  "styles": {
+                    "font-size": "32px",
+                    "font-weight": "700",
+                    "line-height": "1.2",
+                    "width": "640px"
+                  },
+                  "breakpointStyles": {
+                    "tablet": {
+                      "width": "100%"
+                    }
+                  }
+                },
+                {
+                  "id": "i4-h3-1",
+                  "type": "heading",
+                  "tagName": "h3",
+                  "children": [],
+                  "content": "Antipasti",
+                  "styles": {
+                    "font-size": "24px",
+                    "font-weight": "600",
+                    "line-height": "40px",
+                    "width": "640px",
+                    "margin-bottom": "16px"
+                  }
+                },
+                {
+                  "id": "i4-h3-2",
+                  "type": "heading",
+                  "tagName": "h3",
+                  "children": [],
+                  "content": "Primi",
+                  "styles": {
+                    "font-size": "28px",
+                    "font-weight": "600",
+                    "line-height": "40px",
+                    "width": "560px",
+                    "margin-bottom": "16px"
+                  }
+                },
+                {
+                  "id": "i4-h3-3",
+                  "type": "heading",
+                  "tagName": "h3",
+                  "children": [],
+                  "content": "Dolci",
+                  "styles": {
+                    "font-size": "20px",
+                    "font-weight": "600",
+                    "line-height": "40px",
+                    "width": "480px",
+                    "margin-bottom": "16px"
+                  }
+                },
+                {
+                  "id": "i4-heading-locked",
+                  "type": "heading",
+                  "tagName": "h2",
+                  "children": [],
+                  "content": "Opening hours",
+                  "styles": {
+                    "font-size": "32px",
+                    "font-weight": "700",
+                    "line-height": "1.2",
+                    "margin-bottom": "16px"
+                  },
+                  "locked": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "styles": [
+      {
+        "id": "i4-style-button-hover",
+        "selector": "[data-buildrick-id=\"i4-button-hover\"]:hover",
+        "properties": {
+          "background-color": "var(--buildrick-design-color-primary)"
+        },
+        "pseudo": ":hover"
+      },
+      {
+        "id": "i4-style-heading-tablet",
+        "selector": "[data-buildrick-id=\"i4-heading-tablet\"]",
+        "properties": {
+          "width": "100%"
+        },
+        "mediaQuery": "(max-width: 1023px)"
+      }
+    ],
+    "assets": [],
+    "cmsBindings": {
+      "field": {
+        "i4-heading-cms": [
+          {
+            "binding": {
+              "sourceId": "cms:@cms:menu",
+              "path": "@cms:menu#0.name",
+              "type": "variable"
+            },
+            "collectionId": "@cms:menu",
+            "collectionName": "Menu",
+            "itemId": "@cms:menu#0",
+            "fieldSlug": "name",
+            "property": "content",
+            "fallback": "Cacio e pepe"
+          }
+        ],
+        "i4-heading-specials": [
+          {
+            "binding": {
+              "sourceId": "cms:@cms:specials",
+              "path": "@cms:specials#0.title",
+              "type": "variable"
+            },
+            "collectionId": "@cms:specials",
+            "collectionName": "Specials",
+            "itemId": "@cms:specials#0",
+            "fieldSlug": "title",
+            "property": "content",
+            "fallback": "Truffle risotto"
+          }
+        ]
+      },
+      "collection": {
+        "i4-collection-list": {
+          "elementId": "i4-collection-list",
+          "collectionId": "@cms:menu",
+          "itemVar": "item",
+          "indexVar": "index",
+          "limit": 6,
+          "status": "published",
+          "repeat": "children"
+        }
+      }
+    }
+  }
+}

@@ -67,7 +67,8 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({ composer, elemen
   if (!pos || !element) return null;
   const type = getElementNameFromType(element.getType?.() || "element", element.getTagName?.()?.toLowerCase());
   const layerName = getLayerName(element);
-  const name = layerName ? `${type} · ${layerName}` : type;
+  /* A layer name that only repeats the type reads once (board 1: "Heading"). */
+  const name = layerName && layerName !== type ? `${type} · ${layerName}` : type;
 
   return (
     <div

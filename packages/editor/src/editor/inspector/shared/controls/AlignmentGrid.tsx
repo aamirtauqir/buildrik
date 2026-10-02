@@ -40,6 +40,7 @@ export const AlignmentGrid: React.FC<AlignmentGridProps> = ({
           <Button
             key={i}
             type="button"
+            variant="ghost"
             className={`bdi-d${isActive ? " on" : ""}`}
             onClick={() => {
               onChange("justify-items", pos.ji);

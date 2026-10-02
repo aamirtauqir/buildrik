@@ -30,6 +30,7 @@ export class ElementCRUD {
    * Create a new element
    */
   createElement(type: ElementData["type"], options?: Partial<ElementData>): Element {
+    const defaultAttributes = getDefaultAttributes(type, options?.tagName ?? getDefaultTagName(type));
     const data: ElementData = {
       id: generateId("el"),
       type,
@@ -37,7 +38,7 @@ export class ElementCRUD {
       /* An <input> with no `type` is a text box, so an email field without one
          is a text box wearing an email label — and a submit button that never
          submits. Caller-supplied attributes still win. */
-      attributes: { ...getDefaultAttributes(type), ...(options?.attributes ?? {}) },
+      attributes: { ...defaultAttributes, ...(options?.attributes ?? {}) },
       classes: [],
       styles: {},
       children: [],
@@ -45,7 +46,7 @@ export class ElementCRUD {
       droppable: CONTAINER_TYPES.has(type),
       ...options,
       ...(options?.attributes
-        ? { attributes: { ...getDefaultAttributes(type), ...options.attributes } }
+        ? { attributes: { ...defaultAttributes, ...options.attributes } }
         : {}),
     };
 

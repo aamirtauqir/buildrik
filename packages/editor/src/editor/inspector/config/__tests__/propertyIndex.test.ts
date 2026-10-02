@@ -1,6 +1,6 @@
 /**
  * G2-146 (owner 2026-09-25): ⌘K "Jump to property" rows come from the
- * inspector's own section registry + the element's profile — no hand list.
+ * inspector's own section registry + the type's capabilities — no hand list.
  *
  * @license BSD-3-Clause
  */
@@ -23,10 +23,11 @@ describe("buildPropertyIndex", () => {
     );
   });
 
-  it("every section of the profile has a row, titled from the registry", () => {
+  it("every section the type can show has a row, titled from the registry", () => {
     const rows = buildPropertyIndex("container");
     for (const r of rows.filter((x) => !x.property)) expect(r.label).toBe(SECTION_REGISTRY[r.section].title);
-    expect(rows.some((r) => r.label === "Interactions" && r.tab === "effects")).toBe(true);
+    /* Q1: Interactions lives on Behaviour now. */
+    expect(rows.some((r) => r.label === "Interactions" && r.tab === "behaviour")).toBe(true);
   });
 
   it("labels are unique and carry no custom properties", () => {
@@ -35,8 +36,9 @@ describe("buildPropertyIndex", () => {
     expect(labels.some((l) => l.startsWith("-"))).toBe(false);
   });
 
-  it("follows the element's profile — a Collection list offers Collection, not Content", () => {
+  it("follows the type's capabilities — a Collection list offers Collection, not CMS binding", () => {
     expect(find("collection-list", "Collection")).toHaveLength(1);
-    expect(find("collection-list", "Content")).toHaveLength(0);
+    expect(find("collection-list", "CMS binding")).toHaveLength(0);
+    expect(find("heading", "CMS binding")).toHaveLength(1);
   });
 });

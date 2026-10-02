@@ -62,15 +62,15 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
   it("loads the block's settings and shows the message field for the MESSAGE action", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     expect(api.forms.getBlock.query).toHaveBeenCalledWith({ siteId: "s1", blockId: "f" });
-    await waitFor(() => expect(screen.getByLabelText("Success message")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByLabelText("Message")).toBeInTheDocument());
   });
 
   it("I1: switching to Redirect with no URL yet does NOT save a call the schema would reject", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("After-submit action"));
+    await waitFor(() => screen.getByLabelText("Then"));
 
-    fireEvent.change(screen.getByLabelText("After-submit action"), { target: { value: "REDIRECT" } });
-    await waitFor(() => expect(screen.getByLabelText("Redirect URL")).toBeInTheDocument());
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    await waitFor(() => expect(screen.getByLabelText("Redirect to")).toBeInTheDocument());
     // No network call yet — the row would be `REDIRECT` with no target, which
     // the server schema refuses. Sending it anyway (and the UI just showing
     // REDIRECT as if it saved) was exactly I1's silent-failure bug.
@@ -79,12 +79,12 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
 
   it("I1: typing the URL then blurring sends successAction + redirectUrl bundled in one call", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("After-submit action"));
-    fireEvent.change(screen.getByLabelText("After-submit action"), { target: { value: "REDIRECT" } });
-    await waitFor(() => screen.getByLabelText("Redirect URL"));
+    await waitFor(() => screen.getByLabelText("Then"));
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    await waitFor(() => screen.getByLabelText("Redirect to"));
 
-    fireEvent.change(screen.getByLabelText("Redirect URL"), { target: { value: "https://example.com/thanks" } });
-    fireEvent.blur(screen.getByLabelText("Redirect URL"));
+    fireEvent.change(screen.getByLabelText("Redirect to"), { target: { value: "https://example.com/thanks" } });
+    fireEvent.blur(screen.getByLabelText("Redirect to"));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
         siteId: "s1",
@@ -100,9 +100,9 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
       ...defaults, successAction: "REDIRECT", redirectUrl: "https://example.com/thanks",
     });
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("Redirect URL"));
+    await waitFor(() => screen.getByLabelText("Redirect to"));
 
-    fireEvent.change(screen.getByLabelText("After-submit action"), { target: { value: "MESSAGE" } });
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "" } });
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({ successAction: "MESSAGE", redirectUrl: "https://example.com/thanks" }),
     ));
@@ -110,12 +110,12 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
 
   it("blurring a field without changing it saves nothing", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("Notification email"));
+    await waitFor(() => screen.getByLabelText("Send to"));
     // Tabbing through the field — focus then blur, no typing — must not
     // trigger a write. An EDITOR would otherwise hit a FORBIDDEN for the
     // notify-email field having never touched it.
-    fireEvent.blur(screen.getByLabelText("Notification email"));
-    fireEvent.blur(screen.getByLabelText("Success message"));
+    fireEvent.blur(screen.getByLabelText("Send to"));
+    fireEvent.blur(screen.getByLabelText("Message"));
     await new Promise((r) => setTimeout(r, 0));
     expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
     expect(screen.queryByText(/Only workspace Admins/)).not.toBeInTheDocument();
@@ -123,18 +123,28 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
 
   it("saves the notify email on blur", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("Notification email"));
-    fireEvent.change(screen.getByLabelText("Notification email"), { target: { value: "me@example.com" } });
-    fireEvent.blur(screen.getByLabelText("Notification email"));
+    await waitFor(() => screen.getByLabelText("Send to"));
+    fireEvent.change(screen.getByLabelText("Send to"), { target: { value: "me@example.com" } });
+    fireEvent.blur(screen.getByLabelText("Send to"));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({ notifyEmail: "me@example.com" }),
     ));
   });
 
+  it("board 19: Then · Message · Send to, then the note", async () => {
+    const { container } = render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    expect((screen.getByLabelText("Then") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Show message");
+    const text = container.textContent ?? "";
+    const at = ["Then", "Message", "Send to", "Saved to your site straight away — not part of Undo. Changing Send to needs an admin."].map((t) => text.indexOf(t));
+    expect(at.every((i) => i >= 0)).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
+  });
+
   it("toggles spam protection", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByRole("switch"));
-    fireEvent.click(screen.getByRole("switch"));
+    await waitFor(() => screen.getByRole("checkbox", { name: "Spam protection" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Spam protection" }));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({ spamProtection: false }),
     ));
@@ -142,7 +152,7 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
 
   it("M6: the spam protection toggle has an accessible name", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => expect(screen.getByRole("switch", { name: "Spam protection" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "Spam protection" })).toBeInTheDocument());
   });
 
   it("I4: a non-admin's notify-email edit is reverted and explained on FORBIDDEN", async () => {
@@ -150,14 +160,14 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
       Object.assign(new Error("FORBIDDEN"), { data: { code: "FORBIDDEN" } }),
     );
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("Notification email"));
+    await waitFor(() => screen.getByLabelText("Send to"));
 
-    fireEvent.change(screen.getByLabelText("Notification email"), { target: { value: "me@example.com" } });
-    fireEvent.blur(screen.getByLabelText("Notification email"));
+    fireEvent.change(screen.getByLabelText("Send to"), { target: { value: "me@example.com" } });
+    fireEvent.blur(screen.getByLabelText("Send to"));
 
     await waitFor(() => expect(screen.getByText(/Only workspace Admins/)).toBeInTheDocument());
     // Reverted — the field no longer shows the edit that was never actually saved.
-    expect((screen.getByLabelText("Notification email") as HTMLInputElement).value).toBe("");
+    expect((screen.getByLabelText("Send to") as HTMLInputElement).value).toBe("");
   });
 
   it("I4: other fields stay editable after a notify-email FORBIDDEN — the gate is per-field", async () => {
@@ -165,13 +175,13 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
       Object.assign(new Error("FORBIDDEN"), { data: { code: "FORBIDDEN" } }),
     );
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("Notification email"));
-    fireEvent.change(screen.getByLabelText("Notification email"), { target: { value: "me@example.com" } });
-    fireEvent.blur(screen.getByLabelText("Notification email"));
+    await waitFor(() => screen.getByLabelText("Send to"));
+    fireEvent.change(screen.getByLabelText("Send to"), { target: { value: "me@example.com" } });
+    fireEvent.blur(screen.getByLabelText("Send to"));
     await waitFor(() => expect(screen.getByText(/Only workspace Admins/)).toBeInTheDocument());
 
     api.forms.updateBlock.mutate.mockResolvedValue({});
-    fireEvent.click(screen.getByRole("switch", { name: "Spam protection" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Spam protection" }));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenLastCalledWith(
       expect.objectContaining({ spamProtection: false }),
     ));

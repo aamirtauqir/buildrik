@@ -1,65 +1,54 @@
 /**
  * Section Registry — single source of truth for inspector sections.
  *
- * This file is the public surface. External consumers
- * (`editor/inspector/...`) import types, helpers, and the composed
- * `SECTION_REGISTRY` from this path. Per-property-family files
- * (`./layout`, `./typography`, `./visual`, `./element`, `./effects`)
- * own their section definitions; this index aggregates them.
+ * This file is the public surface: types, helpers and the composed
+ * `SECTION_REGISTRY`. The entries live in one file per Inspector v4 lane
+ * (build plan §1.2), so parallel lanes never edit the same registry file:
+ *   - `_shared.tsx`    — types, defineSection, adapters (W1)
+ *   - `type.tsx`       — the type block (W1)
+ *   - `component.tsx`  — the component row (W1 → L2-D2)
+ *   - `text.tsx`       — Typography, Text inside (L2-A)
+ *   - `box.tsx`        — Layout, Size, Spacing, Fill, Border (L2-C)
+ *   - `effects.tsx`    — the Effects tab (L2-C)
+ *   - `behaviour.tsx`  — the Behaviour tab (L2-D1)
  *
- * Registry structure:
- *   - `_shared.tsx`      — types, defineSection, adaptBaseStyleProps
- *   - `layout.tsx`       — layout, size, spacing, flex, grid
- *   - `typography.tsx`   — typography
- *   - `visual.tsx`       — background, border (incl. corner radius)
- *   - `element.tsx`      — link, content, element-properties, css-classes
- *   - `effects.tsx`      — effects, animation, interactions, visibility
- *
- * Maps every section id to a typed entry that bundles the component, a
- * shared-context adapter, an optional visibility predicate, and an optional
- * "advanced disclosure" group key. The profile-driven `InspectorTabContent`
- * renderer iterates a profile's ordered section list and calls
- * `entry.render(ctx)` — no direct prop spread, no `any`, no per-tab
- * duplication.
- *
- * Design reference:
- *   ~/.gstack/projects/aamirtauqir-buildrik/shahg-main-design-20260412-033637.md
- *   (sections "Recommended Approach" and "Section Adapter Inventory")
+ * WHERE a section renders is `config/sectionOrder.ts` (one order per tab);
+ * WHETHER it renders is its `capability` (the element's type) and
+ * `shouldRender` (its runtime state).
  *
  * @license BSD-3-Clause
  */
 
-import type { AnySectionEntry, SectionId } from "./_shared";
-import { ELEMENT_SECTIONS } from "./element";
+import type { AnySectionEntry, SectionId, ShouldRenderContext } from "./_shared";
+import { BEHAVIOUR_SECTIONS } from "./behaviour";
+import { BOX_SECTIONS } from "./box";
+import { COMPONENT_SECTIONS } from "./component";
 import { EFFECTS_SECTIONS } from "./effects";
-import { LAYOUT_SECTIONS } from "./layout";
-import { TYPOGRAPHY_SECTIONS } from "./typography";
-import { VISUAL_SECTIONS } from "./visual";
+import { TEXT_SECTIONS } from "./text";
+import { TYPE_SECTIONS } from "./type";
 
-// Re-export the shared types + factory so consumers see no API change.
 export type {
   AnySectionEntry,
   BaseStyleSectionProps,
   SectionContext,
   SectionEntry,
   SectionId,
+  SectionOpen,
   ShouldRenderContext,
   TabId,
 } from "./_shared";
-export { adaptBaseStyleProps, defineSection, EMPTY_MIXED_KEYS, INSPECTOR_TABS } from "./_shared";
+export { adaptBaseStyleProps, adaptElementProps, defineSection, EMPTY_MIXED_KEYS, INSPECTOR_TABS } from "./_shared";
 
 // ============================================================================
-// THE REGISTRY — composed from per-family fragments
+// THE REGISTRY — composed from per-lane fragments
 // ============================================================================
 
 export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
-  // Style tab
-  ...LAYOUT_SECTIONS,
-  ...TYPOGRAPHY_SECTIONS,
-  ...VISUAL_SECTIONS,
-  // Element tab
-  ...ELEMENT_SECTIONS,
-  // Effects tab
+  ...COMPONENT_SECTIONS,
+  ...TYPE_SECTIONS,
+  ...TEXT_SECTIONS,
+  ...BOX_SECTIONS,
+  ...BEHAVIOUR_SECTIONS,
   ...EFFECTS_SECTIONS,
 } as Record<SectionId, AnySectionEntry>;
 
@@ -86,28 +75,27 @@ export const ALL_REGISTRY_SECTION_IDS = Object.keys(SECTION_REGISTRY) as Section
 export const SECTION_REGISTRY_LIST: (AnySectionEntry & { id: SectionId })[] =
   ALL_REGISTRY_SECTION_IDS.map((id) => SECTION_REGISTRY[id] as AnySectionEntry & { id: SectionId });
 
+/** Values that mean "nothing set" for the has-a-value test. */
+const UNSET = new Set(["", "none", "normal", "auto", "initial", "unset", "0", "0px", "transparent", "rgba(0, 0, 0, 0)"]);
+
 /**
- * Does this section say anything about THIS element — i.e. does the element
- * declare a value for any property the section owns?
- *
- * This is the rule every profile board's footer counts ("2 of 12 sections
- * apply", "4 of 13" on the flex board, where the four opened are exactly
- * Layout / Flexbox / Size / Spacing). It is also what decides which sections
- * open on first sight, so the panel opens on the element's own styling rather
- * than on a fixed count of whatever happens to sit at the top of the profile.
- *
- * Sections that own no CSS (element properties, classes, link) never apply by
- * this rule — the boards draw them collapsed, which is the same answer.
+ * Does this section say anything about THIS element — does the element carry
+ * one of its own values (not a type default, not a computed fallback) for a
+ * property the section owns? Decides "open" vs the "+" row for a `valued`
+ * section (DD-11). Sections that own no CSS never apply by this rule.
  */
-export function sectionApplies(
-  id: SectionId,
-  styles: Record<string, string>
-): boolean {
+function sectionApplies(id: SectionId, authored: Record<string, string>): boolean {
   const keys = SECTION_REGISTRY[id]?.styleKeys ?? [];
   return keys.some((k) => {
-    const v = styles[k];
-    return v !== undefined && v !== "";
+    const v = authored[k];
+    return v !== undefined && !UNSET.has(String(v).trim());
   });
+}
+
+/** An entry's own `hasValue`, else `sectionApplies` over its style keys. */
+export function sectionHasValue(id: SectionId, ctx: ShouldRenderContext): boolean {
+  const entry = SECTION_REGISTRY[id];
+  return entry.hasValue ? entry.hasValue(ctx) : sectionApplies(id, ctx.authoredStyles);
 }
 
 /**

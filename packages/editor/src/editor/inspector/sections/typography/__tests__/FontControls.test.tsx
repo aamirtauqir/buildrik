@@ -1,7 +1,7 @@
 /**
- * FontControls — font-size / weight / line-height / decoration / style
- * rendering and writes. Token chain buttons (CP5) render in bound/unbound
- * states via the type registry fallback (no provider needed).
+ * FontControls — the Typography face under Font (boards 1, 4): Font size,
+ * Line height, Weight, Colour, Align, each writing its own property; and the
+ * Page panel's subset (board 21), the text colour alone.
  *
  * @license BSD-3-Clause
  */
@@ -10,92 +10,72 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { FontControls } from "../FontControls";
 
-function renderFont(styles: Record<string, string> = {}) {
+function renderFont(styles: Record<string, string> = {}, variant?: "element" | "page") {
   const onChange = vi.fn();
-  const utils = render(<FontControls styles={styles} onChange={onChange} />);
+  const utils = render(<FontControls styles={styles} onChange={onChange} variant={variant} />);
   return { onChange, ...utils };
 }
 
-const findSelectWithOption = (container: HTMLElement, optionValue: string) =>
-  Array.from(container.querySelectorAll("select")).find((s) =>
-    Array.from(s.options).some((o) => o.value === optionValue)
-  );
+const labels = (c: HTMLElement) => Array.from(c.querySelectorAll(".bdi-lb")).map((l) => l.textContent?.trim());
+const field = (label: string) => (screen.getByTestId(`inspector-row-${label.toLowerCase().replace(/ /g, "-")}`).querySelector("input") as HTMLInputElement);
 
-describe("FontControls — current values render", () => {
-  it("shows the font-size numeric part", () => {
-    const { container } = renderFont({ "font-size": "18px" });
-    const sizeInput = container.querySelector(".bdi-fld input") as HTMLInputElement;
-    expect(sizeInput).toHaveValue("18");
-  });
-
-  it("defaults font-size display to 16 when unset", () => {
+describe("FontControls — board 1's rows", () => {
+  it("Font size, Line height, Weight, Colour, Align — in that order, nothing else", () => {
     const { container } = renderFont();
-    const sizeInput = container.querySelector(".bdi-fld input") as HTMLInputElement;
-    expect(sizeInput).toHaveValue("16");
+    expect(labels(container)).toEqual(["Font size", "Line height", "Weight", "Colour", "Align"]);
   });
 
-  it("shows the current font-weight in the Weight select", () => {
-    const { container } = renderFont({ "font-weight": "700" });
-    const weightSelect = findSelectWithOption(container, "700") as HTMLSelectElement;
-    expect(weightSelect.value).toBe("700");
+  it("shows the size's number, 16 when unset", () => {
+    renderFont({ "font-size": "32px" });
+    expect(field("Font size")).toHaveValue("32");
   });
 
-  it("marks the active text-decoration button as pressed", () => {
-    renderFont({ "text-decoration": "underline" });
-    expect(screen.getByRole("button", { name: "Under" })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
-    expect(screen.getByRole("button", { name: "Strike" })).toHaveAttribute(
-      "aria-pressed",
-      "false"
-    );
+  it("the weight reads as its number, like the board", () => {
+    renderFont({ "font-weight": "600" });
+    const select = screen.getByLabelText("Weight") as HTMLSelectElement;
+    expect(select.value).toBe("600");
+    expect(select.selectedOptions[0].textContent).toBe("600");
+  });
+
+  it("Align is Left · Center · Right", () => {
+    renderFont({ "text-align": "center" });
+    expect(screen.getByRole("radio", { name: "Center" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.queryByRole("button", { name: "Justify" })).toBeNull();
   });
 });
 
-describe("FontControls — engine writes", () => {
-  it("editing size writes font-size with unit", () => {
-    const { onChange, container } = renderFont({ "font-size": "16px" });
-    const sizeInput = container.querySelector(".bdi-fld input") as HTMLInputElement;
-    fireEvent.change(sizeInput, { target: { value: "20" } });
+describe("FontControls — writes", () => {
+  it("font size writes with its unit; line height keeps px", () => {
+    const { onChange } = renderFont({ "font-size": "16px", "line-height": "24px" });
+    fireEvent.change(field("Font size"), { target: { value: "20" } });
     expect(onChange).toHaveBeenCalledWith("font-size", "20px");
+    fireEvent.change(field("Line height"), { target: { value: "28" } });
+    expect(onChange).toHaveBeenCalledWith("line-height", "28px");
   });
 
-  it("changing weight writes font-weight", () => {
-    const { onChange, container } = renderFont();
-    const weightSelect = findSelectWithOption(container, "700") as HTMLSelectElement;
-    fireEvent.change(weightSelect, { target: { value: "700" } });
-    expect(onChange).toHaveBeenCalledWith("font-weight", "700");
-  });
-
-  it("clicking a decoration button writes text-decoration", () => {
+  it("weight, colour and align write their properties", () => {
     const { onChange } = renderFont();
-    fireEvent.click(screen.getByRole("button", { name: "Under" }));
-    expect(onChange).toHaveBeenCalledWith("text-decoration", "underline");
+    fireEvent.change(screen.getByLabelText("Weight"), { target: { value: "300" } });
+    expect(onChange).toHaveBeenCalledWith("font-weight", "300");
+    fireEvent.change(screen.getByRole("textbox", { name: "Colour value" }), { target: { value: "ff0000" } });
+    expect(onChange).toHaveBeenCalledWith("color", "#ff0000");
+    fireEvent.click(screen.getByRole("radio", { name: "Right" }));
+    expect(onChange).toHaveBeenCalledWith("text-align", "right");
   });
 
-  /* Font style sits behind More settings now (board 807:8342 draws no Style
-     row) — TypographyControls.test.tsx covers it. */
+  it("a size bound to a type style shows the size it resolves to — no chain button here", () => {
+    document.documentElement.style.setProperty("--buildrick-design-font-size-2xl", "24px");
+    renderFont({ "font-size": "var(--buildrick-design-font-size-2xl)" });
+    expect(field("Font size").value).not.toContain("var(");
+    expect(screen.queryByRole("button", { name: /type token/ })).toBeNull();
+  });
 });
 
-describe("FontControls — type token chain buttons (CP5)", () => {
-  it("renders unbound chain buttons for font-size and line-height", () => {
-    renderFont();
-    expect(
-      screen.getByRole("button", { name: "Link font-size to type token" })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Link line-height to type token" })
-    ).toBeInTheDocument();
-  });
-
-  it("renders the unlink button when font-size is bound to a type token", () => {
-    renderFont({ "font-size": "var(--buildrick-design-type-body)" });
-    expect(
-      screen.getByRole("button", { name: "Unlink font-size type token" })
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: "Link font-size to type token" })
-    ).not.toBeInTheDocument();
+describe("FontControls — Page panel (board 21)", () => {
+  it("only the text colour, labelled Text colour", () => {
+    const { container, onChange } = renderFont({}, "page");
+    expect(labels(container)).toEqual(["Text colour"]);
+    fireEvent.change(screen.getByRole("textbox", { name: "Text colour value" }), { target: { value: "333333" } });
+    expect(onChange).toHaveBeenCalledWith("color", "#333333");
   });
 });

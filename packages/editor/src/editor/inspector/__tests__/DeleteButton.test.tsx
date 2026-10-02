@@ -1,44 +1,38 @@
+/**
+ * Inspector ⋯ — Delete is the last row, alone under its rule, drawn as the
+ * danger row, with its key (board 30: "Delete ⌫").
+ *
+ * @license BSD-3-Clause
+ */
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { ProInspector } from "../ProInspector";
+import { InspectorElementMenu } from "../components/InspectorElementMenu";
 import { ToastProvider } from "@/editor/chrome-ui";
 
-/* ProInspector mounts VariantSection, which reports a refused detach
-   rather than swallowing it — so it needs the toast context. AquibraStudio
-   wraps the whole studio in one, so every real mount has it and only these
-   tests rendered the subtree bare. */
-const renderWithToast = (ui: React.ReactNode) => render(<ToastProvider>{ui}</ToastProvider>);
+export const makeMenuComposer = () => {
+  const el = { getId: () => "abc12345678", getType: () => "container", getTagName: () => "div", isLocked: () => false };
+  return {
+    elements: { getElement: vi.fn(() => el), getActivePage: () => undefined },
+    commands: { run: vi.fn(() => true) },
+    styleClipboard: null,
+    history: { captureUndo: () => () => {} },
+    emit: vi.fn(),
+  };
+};
 
-
-const makeComposer = () => ({
-  elements: { getElement: vi.fn(() => null) },
-  selection: {
-    getSelected: vi.fn(() => null),
-    getAllSelected: vi.fn(() => []),
-    select: vi.fn(),
-    clear: vi.fn(),
-  },
-  styles: null,
-  history: { canUndo: vi.fn(() => false), canRedo: vi.fn(() => false) },
-  on: vi.fn(),
-  off: vi.fn(),
-  emit: vi.fn(),
-  isProjectLoading: () => false,
-});
-
-const el = { id: "abc12345678", type: "container" };
-
-describe("Element actions overflow menu — delete entry", () => {
-  it("exposes a Delete menu item with an SVG icon (not emoji)", () => {
-    renderWithToast(
-      <ProInspector selectedElement={el} composer={makeComposer() as never} onDelete={vi.fn()} />
+describe("Inspector ⋯ — the Delete row", () => {
+  it("is the last row, after a rule, danger, with its shortcut", () => {
+    render(
+      <ToastProvider>
+        <InspectorElementMenu composer={makeMenuComposer() as never} selectedElementId="abc12345678" />
+      </ToastProvider>
     );
-
-    // The standalone delete button was replaced by a three-dot overflow menu.
-    // Open the menu and assert the Delete option is present.
     fireEvent.click(screen.getByRole("button", { name: /element actions/i }));
-    const deleteItem = screen.getByRole("menuitem", { name: /^delete$/i });
-    expect(deleteItem.querySelector("svg")).not.toBeNull();
-    expect(deleteItem.textContent?.trim()).not.toBe("🗑️");
+    const items = screen.getAllByRole("menuitem");
+    const del = items[items.length - 1];
+    expect(del).toHaveAccessibleName(/^Delete/);
+    expect(del.className).toMatch(/text-red-700/);
+    expect(del.previousElementSibling).toHaveAttribute("role", "separator");
+    expect(del.textContent).toMatch(/Del|⌫/);
   });
 });

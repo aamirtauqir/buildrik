@@ -1,313 +1,85 @@
 /**
- * useInspectorSections — manages section expand/collapse state keyed by
- * `${elementType}:${sectionId}`. Each element type remembers which sections
- * the user had open last time they edited that type. expandAll / collapseAll
- * act on the currently selected element's profile only, so customizing one
- * element type never touches collapse state for another.
+ * useInspectorSections — the user's open / closed choice per section, per
+ * element type (Inspector v4, DD-11).
  *
- * Migration from the pre-Phase-6 flat key (`buildrick-inspector-sections`) runs
- * once per session at module load time: the old Set is cloned across every
- * known element type so users don't lose their prior preferences.
+ * A section's display mode is decided by `resolveDisplayMode`: the user's
+ * choice for `${elementType}:${sectionId}` when there is one, else how the
+ * registry says the section arrives (`always` / `open` → open, `closed` →
+ * summary, `valued` → open when the element carries a value, else the "+"
+ * row). The choice is remembered per element type, so closing Typography on
+ * one heading closes it on every heading.
+ *
+ * Stored under `buildrick-inspector-sections-v3`. The v2 set, the legacy flat
+ * key and the Beginner/Pro tier key are deleted on first load — the section
+ * ids changed, so there is nothing to migrate.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { ALL_PROFILE_ELEMENT_TYPES, getProfileFor } from "../config/elementProfiles";
-import { SECTION_REGISTRY } from "../sections/registry";
-import {
-  ALL_REGISTRY_SECTION_IDS,
-  sectionApplies,
-  type SectionId,
-} from "../sections/registry";
+import type { SectionOpen } from "../sections/registry";
+import type { SectionDisplayMode } from "../shared/controls/Section";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Constants
-// ─────────────────────────────────────────────────────────────────────────────
+export const SECTION_PREFS_KEY = "buildrick-inspector-sections-v3";
+const RETIRED_KEYS = ["buildrick-inspector-sections-v2", "buildrick-inspector-sections", "buildrick-inspector-tier"];
 
+export type SectionChoice = "open" | "closed";
 
-/** Legacy localStorage key (pre-Phase-6 flat section set). */
-const LEGACY_PREFS_KEY = "buildrick-inspector-sections";
-/** Current localStorage key — entries are `${elementType}:${sectionId}`. */
-const PREFS_KEY = "buildrick-inspector-sections-v2";
+export function resolveDisplayMode(
+  open: SectionOpen,
+  hasValue: boolean,
+  choice: SectionChoice | undefined,
+): SectionDisplayMode {
+  if (choice === "open") return "open";
+  if (choice === "closed") return "summary";
+  if (open === "always" || open === "open") return "open";
+  if (open === "closed") return "summary";
+  return hasValue ? "open" : "empty";
+}
 
-/** Total section count across all inspector tabs — used for collapse/expand progress. */
-export const TOTAL_SECTIONS = ALL_REGISTRY_SECTION_IDS.length;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Legacy migration (runs once per module load)
-// ─────────────────────────────────────────────────────────────────────────────
-
-let legacyMigrated = false;
-
-/**
- * Migrate the old flat `Set<sectionId>` to the new `${type}:${id}` format.
- * Runs at most once per session. Idempotent: does nothing if the v2 key
- * already exists or if the legacy key is absent.
- *
- * Seeding strategy: clone the user's old preferences across every known
- * element type. Users who had `typography` collapsed previously will find
- * `typography` collapsed on heading / text / button / etc. alike — a
- * generous default that preserves their intent without requiring them to
- * re-customize per type.
- */
-function migrateLegacyState(): void {
-  if (legacyMigrated) return;
-  legacyMigrated = true;
-  if (typeof window === "undefined") return;
-
+function load(): Record<string, SectionChoice> {
+  if (typeof window === "undefined") return {};
   try {
-    // If the v2 store already exists, never re-migrate.
-    if (localStorage.getItem(PREFS_KEY)) return;
-    const legacyRaw = localStorage.getItem(LEGACY_PREFS_KEY);
-    if (!legacyRaw) return;
-
-    const legacyIds = JSON.parse(legacyRaw) as string[];
-    if (!Array.isArray(legacyIds) || legacyIds.length === 0) {
-      localStorage.removeItem(LEGACY_PREFS_KEY);
-      return;
+    for (const key of RETIRED_KEYS) localStorage.removeItem(key);
+    const raw = localStorage.getItem(SECTION_PREFS_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    const out: Record<string, SectionChoice> = {};
+    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+      if (v === "open" || v === "closed") out[k] = v;
     }
-
-    const seeded = new Set<string>();
-    for (const elementType of ALL_PROFILE_ELEMENT_TYPES) {
-      for (const sectionId of legacyIds) {
-        seeded.add(`${elementType}:${sectionId}`);
-      }
-    }
-
-    localStorage.setItem(PREFS_KEY, JSON.stringify(Array.from(seeded)));
-    localStorage.removeItem(LEGACY_PREFS_KEY);
+    return out;
   } catch {
-    // Ignore storage errors — migration is best-effort.
+    return {};
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface UseInspectorSectionsOptions {
-  selectedElement: { id: string; type: string } | null;
-  composer?: Composer | null;
-  /** The selected element's own declared styles — decides which sections open
-   *  on first sight (see `getDefaultExpandedKeysForType`). */
-  styles?: Record<string, string>;
+function save(choices: Record<string, SectionChoice>): void {
+  try {
+    localStorage.setItem(SECTION_PREFS_KEY, JSON.stringify(choices));
+  } catch {
+    // Storage full or blocked — the choice still holds for this session.
+  }
 }
 
 export interface UseInspectorSectionsResult {
-  /** Set of `${elementType}:${sectionId}` strings for currently expanded sections. */
-  expandedSections: Set<string>;
-  /** Count of expanded sections across ALL element types. */
-  expandedCount: number;
-  /** Collapse every section in the currently selected element's profile. */
-  collapseAll: () => void;
-  /** Expand every section in the currently selected element's profile. */
-  expandAll: () => void;
-  /** Toggle a single section for the currently selected element type. */
-  toggleSection: (elementType: string, sectionId: SectionId | "variants") => void;
+  /** `${elementType}:${sectionId}` → the user's choice. */
+  choices: Readonly<Record<string, SectionChoice>>;
+  /** Record one choice for one or several sections (⌥-click, DD-22) of an element type. */
+  setChoices: (elementType: string, sectionIds: readonly string[], choice: SectionChoice) => void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Hook
-// ─────────────────────────────────────────────────────────────────────────────
+export function useInspectorSections(): UseInspectorSectionsResult {
+  const [choices, setState] = React.useState<Record<string, SectionChoice>>(load);
 
-/** Keys of the non-Style sections (Settings / Effects) in a profile. */
-const DRAWN_SHUT = new Set<string>(["element-properties", "blur", "effects", "css-classes"]);
-
-function openTabKeysForType(elementType: string): string[] {
-  return getProfileFor(elementType)
-    .order.filter((id) => {
-      const tab = SECTION_REGISTRY[id]?.tab;
-      /* ADVANCED (4428:141642), BLUR and MORE EFFECTS (4428:142686) stay shut, as
-         drawn; CSS CLASSES too — the board carries classes in ADVANCED's "ID & class". */
-      return Boolean(tab && tab !== "style") && !DRAWN_SHUT.has(id);
-    })
-    .map((id) => `${elementType}:${id}`);
-}
-
-export function useInspectorSections({
-  selectedElement,
-  composer,
-  styles,
-}: UseInspectorSectionsOptions): UseInspectorSectionsResult {
-  // Run the legacy migration on first hook mount. Uses useEffect (not useMemo)
-  // because it writes to localStorage — a side effect that shouldn't run
-  // during render (breaks React StrictMode/concurrent render). Guarded by
-  // the module-level flag so it fires at most once per session.
-  React.useEffect(() => {
-    migrateLegacyState();
+  const setChoices = React.useCallback((elementType: string, sectionIds: readonly string[], choice: SectionChoice) => {
+    setState((prev) => {
+      const next = { ...prev };
+      for (const id of sectionIds) next[`${elementType}:${id}`] = choice;
+      save(next);
+      return next;
+    });
   }, []);
 
-  // ── Persist helpers ───────────────────────────────────────────────────────
-  const loadUserPreferences = React.useCallback((): Set<string> | null => {
-    if (typeof window === "undefined") return null;
-    try {
-      const saved = localStorage.getItem(PREFS_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return new Set(parsed);
-      }
-    } catch {
-      // Ignore parse errors
-    }
-    return null;
-  }, []);
-
-  const saveUserPreferences = React.useCallback((sections: Set<string>) => {
-    if (typeof window === "undefined") return;
-    try {
-      localStorage.setItem(PREFS_KEY, JSON.stringify(Array.from(sections)));
-    } catch {
-      // Ignore storage errors
-    }
-  }, []);
-
-  // ── Smart defaults: open what applies ────────────────────────────────────
-  // The sections that open are the ones carrying a value on this element —
-  // the rule every profile board's footer counts ("4 of 13 sections apply" on
-  // the flex board, where Layout / Flexbox / Size / Spacing are exactly the
-  // four drawn open). It replaced "the first two in profile order", which
-  // opened Size on a text element and showed an empty body.
-  //
-  // An element with nothing set opens nothing, and the footer says "0 of 12
-  // sections apply" — which is the truth, and is what the boards draw for an
-  // element whose sections all sit collapsed.
-  const getDefaultExpandedKeysForType = React.useCallback(
-    (elementType: string): string[] => {
-      const { order } = getProfileFor(elementType);
-      const applying = styles ? order.filter((id) => sectionApplies(id, styles)) : [];
-      // Note: VariantSection for component instances is rendered directly
-      // by ProInspector outside the registry pipeline (autoExpandSection
-      // === "variants" drives its open state), so we don't need to seed a
-      // variants key here.
-      return applying.map((sectionId) => `${elementType}:${sectionId}`);
-    },
-    [styles]
-  );
-
-  // ── State ─────────────────────────────────────────────────────────────────
-  const [expandedSections, setExpandedSections] = React.useState<Set<string>>(() => {
-    const userPrefs = loadUserPreferences();
-    if (userPrefs && userPrefs.size > 0) return userPrefs;
-    const initialType = selectedElement?.type || "container";
-    return new Set([...getDefaultExpandedKeysForType(initialType), ...openTabKeysForType(initialType)]);
-  });
-
-  // Tracks element types the user has never touched. On first selection of
-  // a type, seed defaults from the profile. Once the user toggles anything
-  // for a type, we stop seeding for that type.
-  const customizedTypesRef = React.useRef<Set<string>>(new Set());
-
-  /* Settings and Effects open their sections by default (boards 4428:141642 /
-     142686 draw those tabs expanded — a short list whose point is the
-     controls). Merged separately from the Style seeding above, which waits
-     for the element's styles to arrive. */
-  React.useEffect(() => {
-    const type = selectedElement?.type;
-    if (!type || customizedTypesRef.current.has(type)) return;
-    const keys = openTabKeysForType(type);
-    setExpandedSections((prev) => {
-      if (keys.every((k) => prev.has(k))) return prev;
-      const next = new Set(prev);
-      for (const k of keys) next.add(k);
-      return next;
-    });
-  }, [selectedElement?.type]);
-
-  // Seed defaults when a new element type is first selected.
-  React.useEffect(() => {
-    const type = selectedElement?.type;
-    if (!type) return;
-    if (customizedTypesRef.current.has(type)) return;
-
-    // If the user already has any keys for this type in storage (from
-    // migration or a prior session), don't overwrite them.
-    // Seeding runs on the first sight of a TYPE, and the element's styles are
-    // not always there yet on that render — the inspector computes them one
-    // pass behind the selection. Seeding an empty answer used to stick: the
-    // type was marked seeded with one section open, and the real styles that
-    // arrived a moment later never reopened anything. An empty answer now
-    // seeds nothing, so the next render with real styles still can.
-    const keys = getDefaultExpandedKeysForType(type);
-    if (keys.length === 0) return;
-
-    setExpandedSections((prev) => {
-      const openTab = new Set(openTabKeysForType(type));
-      const hasAnyForType = Array.from(prev).some((k) => k.startsWith(`${type}:`) && !openTab.has(k));
-      if (hasAnyForType) return prev;
-
-      const next = new Set(prev);
-      for (const key of keys) {
-        next.add(key);
-      }
-      return next;
-    });
-  }, [selectedElement?.type, getDefaultExpandedKeysForType]);
-
-  // ── Controls ──────────────────────────────────────────────────────────────
-
-  /** Build the `${type}:${id}` keys for every section in the currently
-   *  selected element's profile. Used by expandAll / collapseAll to scope
-   *  their action to the active element type only. */
-  const keysForCurrentElement = React.useCallback((): string[] => {
-    const type = selectedElement?.type;
-    if (!type) return [];
-    return getProfileFor(type).order.map((id) => `${type}:${id}`);
-  }, [selectedElement?.type]);
-
-  const collapseAll = React.useCallback(() => {
-    const targetKeys = keysForCurrentElement();
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      for (const key of targetKeys) next.delete(key);
-      const type = selectedElement?.type;
-      if (type) customizedTypesRef.current.add(type);
-      saveUserPreferences(next);
-      return next;
-    });
-  }, [keysForCurrentElement, saveUserPreferences, selectedElement?.type]);
-
-  const expandAll = React.useCallback(() => {
-    const targetKeys = keysForCurrentElement();
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      for (const key of targetKeys) next.add(key);
-      const type = selectedElement?.type;
-      if (type) customizedTypesRef.current.add(type);
-      saveUserPreferences(next);
-      return next;
-    });
-  }, [keysForCurrentElement, saveUserPreferences, selectedElement?.type]);
-
-  const toggleSection = React.useCallback(
-    (elementType: string, sectionId: SectionId | "variants") => {
-      const key = `${elementType}:${sectionId}`;
-      setExpandedSections((prev) => {
-        const next = new Set(prev);
-        if (next.has(key)) {
-          next.delete(key);
-        } else {
-          next.add(key);
-        }
-        customizedTypesRef.current.add(elementType);
-        // Persist inside the updater so we always write the freshest set.
-        try {
-          localStorage.setItem(PREFS_KEY, JSON.stringify(Array.from(next)));
-        } catch {
-          // Ignore storage errors
-        }
-        return next;
-      });
-    },
-    []
-  );
-
-  return {
-    expandedSections,
-    expandedCount: expandedSections.size,
-    collapseAll,
-    expandAll,
-    toggleSection,
-  };
+  return { choices, setChoices };
 }

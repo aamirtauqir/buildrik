@@ -24,7 +24,7 @@ describe("defineSection — style slicing via pickKeys", () => {
       return null;
     };
     const entry = defineSection({
-      tab: "style", title: "Test",
+      tab: "style", title: "Test", open: "always",
       Component: Probe,
       adaptProps: (ctx) => ({ styles: ctx.styles }),
       styleKeys: ["width", "height"],
@@ -42,7 +42,7 @@ describe("defineSection — style slicing via pickKeys", () => {
       return null;
     };
     const entry = defineSection({
-      tab: "style", title: "Test",
+      tab: "style", title: "Test", open: "always",
       Component: Probe,
       adaptProps: (ctx) => ({ styles: ctx.styles }),
       styleKeys: ["width", "margin-top"],
@@ -59,7 +59,7 @@ describe("defineSection — style slicing via pickKeys", () => {
     };
     const full = { width: "10px", color: "red" };
     const entry = defineSection({
-      tab: "style", title: "Test",
+      tab: "style", title: "Test", open: "always",
       Component: Probe,
       adaptProps: (ctx) => ({ styles: ctx.styles }),
       styleKeys: [],
@@ -68,18 +68,25 @@ describe("defineSection — style slicing via pickKeys", () => {
     expect(received[0]).toBe(full);
   });
 
-  it("exposes styleKeys + shouldRender on the erased entry", () => {
+  it("exposes the v4 metadata (open rule, capability, summary, predicates) on the erased entry", () => {
     const Probe = () => null;
     const shouldRender = () => true;
+    const capability = () => true;
+    const summary = () => "Cursor: auto";
     const entry = defineSection({
-      tab: "style", title: "Test",
+      tab: "effects", title: "Test", open: "closed",
       Component: Probe,
       adaptProps: () => ({}),
       styleKeys: ["opacity"],
       shouldRender,
+      capability,
+      summary,
     });
     expect(entry.styleKeys).toEqual(["opacity"]);
+    expect(entry.open).toBe("closed");
     expect(entry.shouldRender).toBe(shouldRender);
+    expect(entry.capability).toBe(capability);
+    expect(entry.summary).toBe(summary);
     expect(typeof entry.render).toBe("function");
   });
 });

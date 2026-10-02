@@ -19,7 +19,7 @@ import { InspectorElementMenu } from "../InspectorElementMenu";
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
 
-describe("InspectorElementMenu — Reset all styles", () => {
+describe("InspectorElementMenu — Reset style", () => {
   it("clears the element's styles in one undo step and offers Undo", () => {
     const composer = createTestComposer();
     const page = composer.elements.createPage("Home");
@@ -30,13 +30,14 @@ describe("InspectorElementMenu — Reset all styles", () => {
     /* History coalesces within 500ms; flush so setup is its own step. */
     composer.history?.flushPending?.();
 
+    composer.selection.select(el);
     render(
       <ToastProvider>
-        <InspectorElementMenu composer={composer} selectedElementId={el.getId()} onRequestDelete={() => {}} />
+        <InspectorElementMenu composer={composer} selectedElementId={el.getId()} />
       </ToastProvider>,
     );
     fireEvent.click(screen.getByTestId("inspector-element-menu"));
-    fireEvent.click(screen.getByTestId("inspector-menu-reset-styles"));
+    fireEvent.click(screen.getByTestId("inspector-menu-reset-style"));
     expect(Object.keys(el.getStyles?.() ?? {})).toHaveLength(0);
     composer.history?.flushPending?.();
 

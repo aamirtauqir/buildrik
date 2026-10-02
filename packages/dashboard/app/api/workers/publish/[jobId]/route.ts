@@ -8,6 +8,7 @@ import { buildDeployFiles } from "@lib/publish-files";
 import { planFormWiring } from "@lib/publish-forms";
 import { getPublishedFormSettings, recordPublishedForms } from "@server/services/form-submission.service";
 import { wireSliders } from "@lib/publish-sliders";
+import { wireWidgetRuntimes } from "@lib/publish-widgets";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
@@ -355,7 +356,9 @@ async function runVercelDeployJob(
   // Slider/Carousel runtime (autoplay/interval, arrows/dots) — the block
   // exported as stacked slides with no behaviour; inject the runtime only on
   // pages that actually have one.
-  const slidedPages = wiredPages.map((page) => ({ ...page, html: wireSliders(page.html) }));
+  // Countdown ticking + accordion Open/Closed (Inspector v4 boards 11, 13):
+  // same rule — only on pages that have the widget.
+  const slidedPages = wiredPages.map((page) => ({ ...page, html: wireWidgetRuntimes(wireSliders(page.html)) }));
 
   const files: VercelFile[] = buildDeployFiles({
     siteId,

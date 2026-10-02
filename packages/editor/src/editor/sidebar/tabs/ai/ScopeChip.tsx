@@ -10,12 +10,23 @@ export interface ScopeChipProps {
    *  it, or with one option, the band is a plain line. */
   options?: () => AIScope[];
   onChoose?: (scope: AIScope) => void;
+  /** Board 35 (Inspector v4 AI column) draws the scope as a plain 13/500
+   *  ink-soft line on the column's gutter, not the 4418:* tinted band. */
+  variant?: "band" | "line";
 }
 
-function describeScope(scope: AIScope): string {
+const BAND_TRIGGER =
+  "tw:h-4 tw:w-full tw:justify-start tw:gap-1 tw:rounded-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-left tw:text-[11px] tw:leading-4 tw:font-normal tw:text-inherit tw:hover:bg-transparent tw:focus:ring-0 tw:disabled:opacity-100 tw:disabled:bg-transparent";
+const LINE_TRIGGER =
+  "tw:h-4 tw:w-full tw:justify-start tw:gap-1 tw:rounded-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-left tw:text-[13px] tw:leading-4 tw:font-medium tw:text-inherit tw:hover:bg-transparent tw:focus:ring-0 tw:disabled:opacity-100 tw:disabled:bg-transparent";
+const LINE = "tw:flex tw:items-center tw:gap-1 tw:text-[13px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-soft)]";
+
+function describeScope(scope: AIScope, line = false): string {
   switch (scope.kind) {
     case "element":
-      return scope.label;
+      /* Board 35's line: the element alone ("Heading"); the 4418:* band adds
+         its kind ("Heading text"). */
+      return line ? scope.title : scope.label;
     case "multi":
       return `${scope.ids.length} selected elements`;
     case "similar":
@@ -34,27 +45,29 @@ const sameScope = (a: AIScope, b: AIScope) => a.kind === b.kind;
    — what the run is allowed to touch, in the run's own words. No board draws
    a lock glyph on it (4418:104577 is mid-run); a live run still freezes the
    scope, and the band says so to assistive tech and on hover. */
-export const ScopeChip: React.FC<ScopeChipProps> = ({ scope, status, options, onChoose }) => {
+export const ScopeChip: React.FC<ScopeChipProps> = ({ scope, status, options, onChoose, variant = "band" }) => {
   const [open, setOpen] = React.useState(false);
   const [list, setList] = React.useState<AIScope[]>([]);
   const locked = status === "locked";
+  const line = variant === "line";
+  const frame = line ? LINE : "bd-ai-scope";
   const text = (
-    <span className="bd-ai-scope-text" data-testid="ai-scope-text">
-      Scope: <span className="bd-ai-scope-target">{describeScope(scope)}</span>
+    <span className={line ? undefined : "bd-ai-scope-text"} data-testid="ai-scope-text">
+      Scope: <span className={line ? undefined : "bd-ai-scope-target"}>{describeScope(scope, line)}</span>
     </span>
   );
   const lockedLabel = locked ? "Scope locked while the run is live" : undefined;
 
   if (!options || !onChoose) {
     return (
-      <div className="bd-ai-scope" role="status" aria-live="polite" aria-label={lockedLabel} title={lockedLabel} data-testid="ai-scope">
+      <div className={frame} role="status" aria-live="polite" aria-label={lockedLabel} title={lockedLabel} data-testid="ai-scope">
         {text}
       </div>
     );
   }
 
   return (
-    <div className="bd-ai-scope" role="status" aria-live="polite" data-testid="ai-scope">
+    <div className={frame} role="status" aria-live="polite" data-testid="ai-scope">
       <Popover
         open={open}
         onClose={() => setOpen(false)}
@@ -66,10 +79,10 @@ export const ScopeChip: React.FC<ScopeChipProps> = ({ scope, status, options, on
             type="button"
             variant="ghost"
             size="xs"
-            className="tw:h-4 tw:w-full tw:justify-start tw:gap-1 tw:rounded-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-left tw:text-[11px] tw:leading-4 tw:font-normal tw:text-inherit tw:hover:bg-transparent tw:focus:ring-0 tw:disabled:opacity-100 tw:disabled:bg-transparent"
+            className={line ? LINE_TRIGGER : BAND_TRIGGER}
             aria-haspopup="menu"
             aria-expanded={open}
-            aria-label={lockedLabel ? `Scope: ${describeScope(scope)} — ${lockedLabel}` : `Scope: ${describeScope(scope)} — change`}
+            aria-label={lockedLabel ? `Scope: ${describeScope(scope, line)} — ${lockedLabel}` : `Scope: ${describeScope(scope, line)} — change`}
             title={lockedLabel}
             disabled={locked}
             data-testid="ai-scope-trigger"
@@ -79,7 +92,9 @@ export const ScopeChip: React.FC<ScopeChipProps> = ({ scope, status, options, on
             }}
           >
             {text}
-            {locked ? null : <ChevronDown size={12} aria-hidden="true" className="tw:ml-auto tw:opacity-70" />}
+            {/* Board 35 draws the line with no chevron; the trigger's name
+                still says it changes ("Scope: … — change"). */}
+            {locked || line ? null : <ChevronDown size={12} aria-hidden="true" className="tw:ml-auto tw:opacity-70" />}
           </Button>
         }
       >

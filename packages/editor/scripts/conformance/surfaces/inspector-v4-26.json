@@ -1,0 +1,22 @@
+{
+  "surface": "inspector-v4-26",
+  "board": "Inspector v4 · 26 · Component instance · S (Figma 7995:206087)",
+  "url": "http://localhost:3110/edit/<site>",
+  "skeleton": "W1 skeleton (build plan 2026-09-28 §3). The board state is driven by `node scripts/conformance/inspector-v4-state.mjs 26` — run it with `load-inspector-v4-site.mjs --site <id> --no-load --board 26`. W4 adds the spec join and the targets.",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "inspector-panel"
+    }
+  ],
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel"
+    }
+  ]
+}

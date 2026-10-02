@@ -11,7 +11,7 @@ import { BLOCK_COLORS } from "../blockPalette";
  * Build toggle switch component
  */
 function buildSwitch(composer: Composer, parentId: string, dropIndex?: number): string | undefined {
-  const wrapper = composer.elements.createElement("container", {
+  const wrapper = composer.elements.createElement("switch", {
     tagName: "label",
     attributes: {
       class: "switch-wrapper",
@@ -98,6 +98,6 @@ export const switchBlockConfig: BlockBuildConfig = {
   id: "switch",
   label: "Switch / Toggle",
   category: "Components",
-  elementType: "container",
+  elementType: "switch",
   build: buildSwitch,
 };

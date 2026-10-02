@@ -54,4 +54,26 @@ describe("SelectionLabel — the board's accent tag", () => {
     expect(screen.getByTestId("canvas-selection-tag")).toHaveTextContent("Section · Hero");
     canvas.remove();
   });
+
+  it("a layer name that only repeats the type reads once (board 1: Heading, not Heading · Heading)", () => {
+    const canvas = document.createElement("div");
+    const el = document.createElement("h1");
+    el.setAttribute("data-buildrick-id", "h");
+    canvas.appendChild(el);
+    document.body.appendChild(canvas);
+    const composer = {
+      elements: {
+        getElement: () => ({
+          getType: () => "heading",
+          getTagName: () => "H1",
+          getCustomData: (k: string) => (k === "layerName" ? "Heading" : undefined),
+        }),
+      },
+      on: () => {},
+      off: () => {},
+    };
+    render(<SelectionLabel composer={composer as never} elementId="h" canvasRef={{ current: canvas }} />);
+    expect(screen.getByTestId("canvas-selection-tag").textContent).toBe("Heading");
+    canvas.remove();
+  });
 });

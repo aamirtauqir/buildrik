@@ -1,352 +1,110 @@
 /**
- * InspectorElementMenu — three-dot overflow menu for element actions.
+ * InspectorElementMenu — the header's ⋯ (Inspector v4, board 30).
  *
- * Groups Duplicate / Copy styles / Paste styles / Delete under a single
- * affordance in the inspector header. Replaces the old absolutely-positioned
- * delete button so the corner isn't competing with the binding popover for
- * Copy styles / Paste styles read and write `composer.styleClipboard`, the
- * same slot the canvas keyboard (⌘⌥C / ⌘⌥V) and the right-click menu use.
- * This menu kept its own module-level clipboard until 2026-08-22, which meant
- * two controls with the same name and icon shared nothing: copying here left
- * ⌘⌥V with nothing to paste, and a module-level `let` also outlived the
- * project, so a freshly opened site offered a paste from the previous one.
+ * Exactly the rows of `INSPECTOR_MENU` from the one element-action registry
+ * (`editor/shared/elementActions.ts`): Duplicate ⌘D · Copy style ⌥⌘C · Paste
+ * style ⌥⌘V · Apply style to all {kind} on this page (N) · Reset style — Save
+ * as component… · Lock — Delete ⌫. The same handlers the canvas menu and the
+ * keyboard run. Nothing else lives here any more: AI is the header's ✦ chip,
+ * picking is the canvas, the parent is a breadcrumb crumb, hiding is the
+ * header's ✕ / ⌘\, and ⌥-click on a section header opens or closes them all.
  *
- * The menu uses a simple click-outside handler rather than a full Popover
- * primitive to keep the dependency surface small and avoid coupling header
- * chrome to the popover infrastructure.
+ * chrome-ui Popover + Menu: Esc closes and returns focus to ⋯, ↑/↓/Home/End
+ * move between rows (P-6, §16).
  *
  * @license BSD-3-Clause
  */
 
-import { ChevronsDownUp, ChevronsUpDown, Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, Package, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { useClickOutside } from "../../../shared/hooks/useClickOutside";
-import { requestSaveAsComponent } from "@/editor/canvas/menus/actions/standaloneActions";
-import { Button, useToast } from "@/editor/chrome-ui";
-// ============================================================================
-// TYPES
-// ============================================================================
+import type { Composer } from "@/engine";
+import { IconButton, Menu, MenuItem, MenuSeparator, Popover, useToast } from "@/editor/chrome-ui";
+import { formatShortcutHint, isMac } from "@/editor/canvas/menus/MenuItem";
+import {
+  actionLabel,
+  ELEMENT_ACTIONS,
+  INSPECTOR_MENU,
+  type ElementActionContext,
+} from "@/editor/shared/elementActions";
 
 export interface InspectorElementMenuProps {
   composer: Composer | null | undefined;
   selectedElementId: string;
-  /** Called after the user confirms delete (triggers existing delete flow). */
-  onRequestDelete: () => void;
-  /* Board 4428:141170's header is `[icon] Name · ✦ AI · ⋯` — the pick,
-     select-parent and hide-inspector icons it carried moved in here (G2-139). */
-  onPick?: () => void;
-  onSelectParent?: () => void;
-  onHideInspector?: () => void;
-  /** G2-146: open / close every section of this tab. */
-  onExpandAll?: () => void;
-  onCollapseAll?: () => void;
-  /** v3 FC-3 (board 7048:77991): "Improve with AI" — opens the SAME
-   *  right-column AI thread as the header's ✦ chip and the canvas context
-   *  menu's row (all three call the identical `ui:switch-tab` seam). */
-  onAIRequest?: () => void;
 }
 
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  onClick: () => void;
-  danger?: boolean;
-  disabled?: boolean;
-}
+const ROW = "tw:!h-auto tw:!min-h-8 tw:!py-1.5 tw:!text-[12px] tw:!leading-4";
 
-// ============================================================================
-// STYLES
-// ============================================================================
-
-const styles = {
-  root: {
-    position: "relative" as const,
-    display: "flex",
-  },
-  trigger: {
-    width: 28,
-    height: 28,
-    padding: 0,
-    background: "transparent",
-    border: "1px solid transparent",
-    borderRadius: 6,
-    color: "var(--bk-ink-muted)",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "background 0.15s, color 0.15s, border-color 0.15s",
-  },
-  triggerHover: {
-    background: "var(--bk-border)",
-    color: "var(--bk-ink)",
-    borderColor: "var(--bk-border)",
-  },
-  menu: {
-    position: "absolute" as const,
-    top: 32,
-    right: 0,
-    minWidth: 180,
-    background: "var(--bk-bg-subtle)",
-    border: "1px solid var(--bk-border)",
-    borderRadius: 8,
-    boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-    padding: 4,
-    zIndex: 100,
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: 1,
-  },
-  item: (danger: boolean, disabled: boolean): React.CSSProperties => ({
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "8px 10px",
-    background: "transparent",
-    border: "none",
-    borderRadius: 4,
-    color: disabled
-      ? "var(--bk-ink-muted)"
-      : danger
-        ? "var(--bk-error)"
-        : "var(--bk-ink)",
-    fontSize: 12,
-    fontWeight: 500,
-    cursor: disabled ? "not-allowed" : "pointer",
-    textAlign: "left" as const,
-    width: "100%",
-    opacity: disabled ? 0.5 : 1,
-    transition: "background 0.12s",
-  }),
-  divider: {
-    height: 1,
-    background: "var(--bk-border)",
-    margin: "4px 0",
-  },
-};
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
-
-export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
-  composer,
-  selectedElementId,
-  onRequestDelete,
-  onPick,
-  onSelectParent,
-  onHideInspector,
-  onExpandAll,
-  onCollapseAll,
-  onAIRequest,
-}) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({ composer, selectedElementId }) => {
+  const [open, setOpen] = React.useState(false);
   const { addToast } = useToast();
-  const [isTriggerHovered, setIsTriggerHovered] = React.useState(false);
-  const [hoveredItem, setHoveredItem] = React.useState<string | null>(null);
-  const menuRef = React.useRef<HTMLDivElement | null>(null);
-  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const close = React.useCallback(() => setOpen(false), []);
 
-  // Close on outside click and on Escape — standard menu semantics.
-  // excludeRefs memoized so the hook's effect doesn't re-attach each render.
-  const closeMenu = React.useCallback(() => setIsOpen(false), []);
-  const excludeTrigger = React.useMemo(() => [triggerRef], []);
-  useClickOutside(menuRef, closeMenu, {
-    enabled: isOpen,
-    excludeRefs: excludeTrigger,
-    closeOnEscape: true,
-  });
+  const element = composer?.elements.getElement(selectedElementId) ?? null;
+  const rootId = composer?.elements.getActivePage?.()?.root.id;
+  const ctx: ElementActionContext | null =
+    composer && element ? { composer, element, isRoot: element.getId() === rootId, addToast } : null;
 
-  // Reset clipboard feedback when the menu closes so the next open starts fresh.
-  const handleDuplicate = () => {
-    if (!composer) return;
-    composer.beginTransaction?.("duplicate-element");
-    try {
-      const clone = composer.elements.duplicateElement?.(selectedElementId);
-      if (clone) {
-        composer.selection?.select?.(clone);
+  /* Rules only between visible rows, never doubled or trailing. */
+  const rows: React.ReactNode[] = [];
+  if (open && ctx) {
+    let pendingRule = false;
+    for (const id of INSPECTOR_MENU) {
+      if (id === "---") {
+        pendingRule = rows.length > 0;
+        continue;
       }
-    } finally {
-      composer.endTransaction?.();
+      const action = ELEMENT_ACTIONS[id];
+      if (action.isVisible && !action.isVisible(ctx)) continue;
+      if (pendingRule) rows.push(<MenuSeparator key={`rule-${rows.length}`} />);
+      pendingRule = false;
+      const enabled = action.isEnabled ? action.isEnabled(ctx) : true;
+      rows.push(
+        <MenuItem
+          key={id}
+          data-testid={`inspector-menu-${id}`}
+          danger={action.danger}
+          disabled={enabled !== true}
+          title={enabled === true ? undefined : enabled}
+          kbd={action.shortcut ? formatShortcutHint(action.shortcut, isMac()) : undefined}
+          className={ROW}
+          onClick={() => {
+            close();
+            action.run(ctx);
+          }}
+        >
+          <span className="tw:block tw:whitespace-normal">{actionLabel(action, ctx)}</span>
+          {enabled === true ? null : (
+            <span className="tw:block tw:text-[11px] tw:text-[var(--bk-ink-muted)]">{enabled}</span>
+          )}
+        </MenuItem>
+      );
     }
-    setIsOpen(false);
-  };
-
-  const handleCopyStyles = () => {
-    if (!composer) return;
-    const el = composer.elements.getElement(selectedElementId);
-    if (!el) return;
-    // Clone the styles object so subsequent edits to the source element
-    // don't mutate the clipboard snapshot.
-    const snapshot = el.getStyles?.() ?? {};
-    composer.styleClipboard = { ...snapshot };
-    setIsOpen(false);
-  };
-
-  const handlePasteStyles = () => {
-    if (!composer?.styleClipboard) return;
-    const el = composer.elements.getElement(selectedElementId);
-    if (!el) return;
-    composer.beginTransaction?.("paste-styles");
-    try {
-      el.setStyles?.(composer.styleClipboard);
-    } finally {
-      composer.endTransaction?.();
-    }
-    setIsOpen(false);
-  };
-
-  /* "Reset all styles" left the canvas menu with G2-054; it lives here so the
-     capability is not lost (owner rule 2026-09-24). One transaction, so the
-     toast's Undo takes it back in one step. */
-  const handleResetStyles = () => {
-    const el = composer?.elements.getElement(selectedElementId);
-    if (!composer || !el) return;
-    composer.beginTransaction?.("reset-styles");
-    try {
-      el.setStyles?.({});
-    } finally {
-      composer.endTransaction?.();
-    }
-    setIsOpen(false);
-    addToast({ description: "Styles reset", action: { label: "Undo", onClick: composer.history.captureUndo() } });
-  };
-
-  const handleDelete = () => {
-    onRequestDelete();
-    setIsOpen(false);
-  };
-
-  /* 4418:142143 / 6918:73322: the element ⋯ menu is missing "Save as
-     component" — the canvas ⋯ and the inspector ⋯ open the same dialog via
-     the shared `requestSaveAsComponent` helper (standaloneActions.ts). */
-  const handleSaveAsComponent = () => {
-    if (!composer) return;
-    requestSaveAsComponent(composer, selectedElementId);
-    setIsOpen(false);
-  };
-
-  const run = (fn: () => void) => () => {
-    fn();
-    setIsOpen(false);
-  };
-  const hasParent = Boolean(composer?.elements.getElement(selectedElementId)?.getParent?.());
-  const navItems: MenuItem[] = [
-    ...(onAIRequest
-      ? [{ id: "ai", label: "Improve with AI", icon: <Sparkles size={14} aria-hidden="true" />, onClick: run(onAIRequest) }]
-      : []),
-    ...(onPick
-      ? [{ id: "pick", label: "Pick on canvas", icon: <Crosshair size={14} aria-hidden="true" />, onClick: run(onPick) }]
-      : []),
-    ...(onSelectParent
-      ? [{ id: "select-parent", label: "Select parent", icon: <CornerLeftUp size={14} aria-hidden="true" />, onClick: run(onSelectParent), disabled: !hasParent }]
-      : []),
-    ...(onHideInspector
-      ? [{ id: "hide-inspector", label: "Hide inspector", icon: <PanelRightClose size={14} aria-hidden="true" />, onClick: run(onHideInspector) }]
-      : []),
-    ...(onExpandAll
-      ? [{ id: "expand-all", label: "Expand all sections", icon: <ChevronsUpDown size={14} aria-hidden="true" />, onClick: run(onExpandAll) }]
-      : []),
-    ...(onCollapseAll
-      ? [{ id: "collapse-all", label: "Collapse all sections", icon: <ChevronsDownUp size={14} aria-hidden="true" />, onClick: run(onCollapseAll) }]
-      : []),
-  ];
-
-  const items: MenuItem[] = [
-    ...navItems,
-    {
-      id: "duplicate",
-      label: "Duplicate",
-      icon: <CopyPlus size={14} aria-hidden="true" />,
-      onClick: handleDuplicate,
-    },
-    {
-      id: "copy-styles",
-      label: "Copy styles",
-      icon: <Copy size={14} aria-hidden="true" />,
-      onClick: handleCopyStyles,
-    },
-    {
-      id: "paste-styles",
-      label: "Paste styles",
-      icon: <ClipboardPaste size={14} aria-hidden="true" />,
-      onClick: handlePasteStyles,
-      disabled: !composer?.styleClipboard,
-    },
-    {
-      id: "reset-styles",
-      label: "Reset all styles",
-      icon: <RotateCcw size={14} aria-hidden="true" />,
-      onClick: handleResetStyles,
-    },
-    {
-      id: "save-as-component",
-      label: "Save as component",
-      icon: <Package size={14} aria-hidden="true" />,
-      onClick: handleSaveAsComponent,
-    },
-    {
-      id: "delete",
-      label: "Delete",
-      icon: <Trash2 size={14} aria-hidden="true" />,
-      onClick: handleDelete,
-      danger: true,
-    },
-  ];
+  }
 
   return (
-    <div style={styles.root}>
-      <Button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setIsOpen((v) => !v)}
-        onMouseEnter={() => setIsTriggerHovered(true)}
-        onMouseLeave={() => setIsTriggerHovered(false)}
-        aria-label="Element actions"
-        data-testid="inspector-element-menu"
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
-        title="Element actions"
-        style={{
-          ...styles.trigger,
-          ...(isTriggerHovered || isOpen ? styles.triggerHover : {}),
-        }}
-      >
-        <MoreHorizontal size={16} aria-hidden="true" />
-      </Button>
-      {isOpen && (
-        <div ref={menuRef} role="menu" style={styles.menu}>
-          {items.map((item, index) => (
-            <React.Fragment key={item.id}>
-              {(index === items.length - 1 || (navItems.length > 0 && index === navItems.length)) && <div style={styles.divider} />}
-              <Button
-                type="button"
-                role="menuitem"
-                data-testid={`inspector-menu-${item.id}`}
-                onClick={item.onClick}
-                onMouseEnter={() => setHoveredItem(item.id)}
-                onMouseLeave={() => setHoveredItem(null)}
-                disabled={item.disabled}
-                style={{
-                  ...styles.item(!!item.danger, !!item.disabled),
-                  background:
-                    hoveredItem === item.id && !item.disabled
-                      ? item.danger
-                        ? "rgba(239,68,68,0.12)"
-                        : "var(--bk-border)"
-                      : "transparent",
-                }}
-              >
-                {item.icon}
-                {item.label}
-              </Button>
-            </React.Fragment>
-          ))}
-        </div>
-      )}
-    </div>
+    <Popover
+      open={open}
+      onClose={close}
+      placement="bottom-end"
+      label="Element actions"
+      className="tw:w-60 tw:p-1"
+      trigger={
+        <IconButton
+          label="Element actions"
+          size="sm"
+          data-testid="inspector-element-menu"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <MoreHorizontal size={16} aria-hidden="true" />
+        </IconButton>
+      }
+    >
+      <Menu label="Element actions" className="tw:min-w-0">
+        {rows}
+      </Menu>
+    </Popover>
   );
 };
 

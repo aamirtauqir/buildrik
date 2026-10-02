@@ -18,7 +18,7 @@ import { deepClone } from "../../shared/utils/helpers";
 import { canNestElement } from "../../shared/utils/nesting";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
-import { applyOverridesToTree, ComponentInstanceUtils } from "./ComponentInstance";
+import { applyOverridesToTree, ComponentInstanceUtils, resolveNodeByElementPath } from "./ComponentInstance";
 import {
   findInstanceContainingElement,
   getElementPathWithinInstance,
@@ -155,6 +155,59 @@ export function recordInstanceOverride(
     property,
     value,
   });
+}
+
+/**
+ * Drop ONE recorded override and put the master's value back on that element
+ * (board 26: the override dot's "Reset to master"). The instance's other edits
+ * stay — `resetInstance` is the whole-instance reset.
+ *
+ * The master's value is written first (a style write re-records an override,
+ * with the master's value) and the op is dropped after, so what is left is the
+ * instance's remaining edits only. A property the master never set is removed.
+ * Returns false when the element is not in a live instance or the property
+ * carries no override of that type. Callers own the lock gate + transaction.
+ */
+export function resetInstanceOverride(
+  composer: Composer,
+  maps: InstanceMaps,
+  elementId: string,
+  type: OverrideType,
+  property: string
+): boolean {
+  const instance = findInstanceContainingElement(composer, maps.instances, elementId);
+  if (!instance || instance.isDetached) return false;
+  const element = composer.elements.getElement(elementId);
+  if (!element) return false;
+
+  const elementPath = getElementPathWithinInstance(composer, elementId, instance);
+  const path = `#/${elementPath}${elementPath ? "/" : ""}${type}/${property}`;
+  if (!instance.overrides.some((op) => op.path === path)) return false;
+
+  const component = maps.components.get(instance.componentId);
+  const master = component ? resolveNodeByElementPath(component.masterTree, elementPath) : null;
+  if (type === "style") {
+    const value = master?.styles?.[property];
+    if (value === undefined) element.removeStyle(property);
+    else element.setStyle(property, value);
+  } else if (type === "attribute") {
+    const value = master?.attributes?.[property];
+    if (value === undefined) element.removeAttribute(property);
+    else element.setAttribute(property, value);
+  } else if (type === "content") {
+    element.setContent(master?.content ?? "");
+  } else {
+    return false;
+  }
+
+  /* Re-read: the style / attribute write above re-recorded the path. */
+  const current = maps.instances.get(instance.elementId) ?? instance;
+  const updated: ComponentInstance = { ...current, overrides: current.overrides.filter((op) => op.path !== path) };
+  maps.instances.set(instance.elementId, updated);
+  composer.elements.getElement(instance.elementId)?.setData("componentInstance", updated);
+  composer.emit(EVENTS.INSTANCE_OVERRIDE, { instanceId: instance.elementId, elementId, type, property, reset: true });
+  composer.emit(EVENTS.ELEMENT_UPDATED, element);
+  return true;
 }
 
 /**

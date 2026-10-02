@@ -134,7 +134,7 @@ const KeyboardHint: React.FC<KeyboardHintProps> = ({ shortcut }) => {
 };
 
 // Utility to detect Mac
-function isMac(): boolean {
+export function isMac(): boolean {
   if (typeof navigator === "undefined") return false;
   return /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 }
