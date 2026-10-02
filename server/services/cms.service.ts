@@ -246,7 +246,16 @@ export async function listEntries(siteId: string, collectionId: string) {
 }
 
 export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
-  await assertCollectionInSite(siteId, input.collectionId);
+  /* A write into a DELETED collection is GONE, not NOT_FOUND: the client
+     drops a GONE row, while NOT_FOUND is just a failure it retries forever —
+     a permanent "didn't sync" notice and a blocked publish on the device that
+     still held the collection (C0a live run, 2026-10-02). */
+  const collection = await prisma.cmsCollection.findFirst({
+    where: { id: input.collectionId, siteId },
+    select: { deletedAt: true },
+  });
+  if (!collection) throw new CmsError("NOT_FOUND", "Collection not found");
+  if (collection.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
   const data = {
     data: sanitizeEntryData(input.data) as unknown as Prisma.InputJsonValue,
     ...(input.status ? { status: input.status } : {}),
