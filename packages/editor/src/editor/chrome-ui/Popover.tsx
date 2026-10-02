@@ -216,6 +216,21 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
        and focus fell to <body> — QA, integration 5e0d47902, Layers ⋯. Focus
        that is somewhere else entirely is left where it is. */
     const onKey = (e: KeyboardEvent) => {
+      /* Tab out of a portalled MENU (one tab stop, WAI-ARIA menu button):
+         close it and let Tab carry on from the trigger. The panel sits at the
+         end of <body>, so the browser's own Tab left it open and wrapped focus
+         to the top of the page ("‹ Exit") — QA 2026-10-02, Inspector ⋯.
+         Focus moves before the default action runs, so Tab / Shift+Tab land
+         on the control after / before the trigger. A dialog-style panel
+         (the colour popover) keeps Tab for its own fields. */
+      if (e.key === "Tab" && portalled) {
+        const active = document.activeElement;
+        if (active && panel.current?.contains(active) && active.closest('[role="menu"]')) {
+          focusTrigger();
+          onClose();
+        }
+        return;
+      }
       if (e.key !== "Escape") return;
       /* This Escape is spent closing the panel: a host that closes on Escape
          (the Asset library) checks defaultPrevented and stays open. */
@@ -230,7 +245,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
       document.removeEventListener("pointerdown", onDown, true);
       document.removeEventListener("keydown", onKey, true);
     };
-  }, [open, onClose, focusTrigger]);
+  }, [open, onClose, focusTrigger, portalled]);
 
   const body = portalled ? (
     <div ref={panelRef} className={["tw:fixed", POPOVER_SURFACE_CLASS, className].filter(Boolean).join(" ")} role="dialog" aria-label={label}>

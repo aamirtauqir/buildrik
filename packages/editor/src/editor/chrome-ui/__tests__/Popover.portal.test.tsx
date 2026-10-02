@@ -11,7 +11,7 @@
 import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { Popover } from "../index";
+import { Menu, MenuItem, Popover } from "../index";
 
 const orig = Element.prototype.getBoundingClientRect;
 afterEach(() => {
@@ -85,5 +85,41 @@ describe("Popover portal", () => {
     );
     const item = await screen.findByRole("button", { name: "Duplicate" });
     expect(document.activeElement).toBe(item);
+  });
+
+  // Regression (QA 2026-10-02): Tab inside the portalled ⋯ menu left it open
+  // and wrapped focus to the top of the page — the panel is at the end of <body>.
+  it("Tab out of a portalled menu closes it and hands focus to the trigger for Tab to carry on", async () => {
+    const col = mountColumn();
+    const onClose = vi.fn();
+    render(
+      <Popover open onClose={onClose} trigger={<button>⋯</button>} label="Element actions" placement="bottom-end" portal>
+        <Menu label="Element actions">
+          <MenuItem>Duplicate</MenuItem>
+          <MenuItem>Lock</MenuItem>
+        </Menu>
+      </Popover>,
+      { container: col },
+    );
+    const item = await screen.findByRole("menuitem", { name: "Duplicate" });
+    expect(document.activeElement).toBe(item);
+    fireEvent.keyDown(item, { key: "Tab" });
+    expect(onClose).toHaveBeenCalled();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "⋯" }));
+  });
+
+  it("Tab inside a portalled panel that is not a menu stays a field-to-field move", async () => {
+    const col = mountColumn();
+    const onClose = vi.fn();
+    render(
+      <Popover open onClose={onClose} trigger={<button>swatch</button>} label="Colour" placement="bottom-end" portal>
+        <button>Use</button>
+        <input aria-label="Search" />
+      </Popover>,
+      { container: col },
+    );
+    const use = await screen.findByRole("button", { name: "Use" });
+    fireEvent.keyDown(use, { key: "Tab" });
+    expect(onClose).not.toHaveBeenCalled();
   });
 });
