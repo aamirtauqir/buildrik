@@ -13,7 +13,11 @@ import { fetchMyRole, roleAtLeast } from "./RoleService";
 import { resumeKeepingUnsaved } from "./unsavedRecovery";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { dropSessionMediaUrls } from "@/shared/utils/html";
-import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
+import type { PageMeta, PageSettings, ProjectData, ProjectSettings, SiteSEO, SlugChange } from "@/shared/types/project";
+import type { ProjectSettingsPatch } from "@buildrik/shared/schemas/project-settings";
+import type { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-detail";
+import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
+import type { z } from "zod";
 import type { ElementData } from "@/shared/types/element";
 import { blankPageRoot } from "@buildrik/shared/content/elementIds";
 
@@ -273,8 +277,7 @@ function emptyToNull(value: string | null | undefined): string | null {
  * lives in `@buildrik/shared` because the server strips the same fields from
  * the stored projectSettings.
  */
-export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
-  const settings = projectData.settings;
+export function extractSiteColumnPatch(settings: ProjectSettings | undefined): SiteColumnSettings {
   if (!settings) return {};
   const seo = settings.seo;
   const customCode = settings.customCode;
@@ -311,6 +314,162 @@ export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSett
   if (customCode?.bodyScripts !== undefined) patch.bodyCode = customCode.bodyScripts;
   if (publishing?.publishedPassword !== undefined) patch.publishedPassword = publishing.publishedPassword;
   return patch;
+}
+
+// ─── Settings Save (Phase B, BE-3) ──────────────────────────────────────────
+// The Settings footer's Save writes through the two settings mutations, never
+// `sites.saveProject`: Site-column fields → `siteDetail.settings.update`, the
+// JSON-only keys (analytics, global CSS, the 404 switch) →
+// `siteDetail.projectSettings.update`. A refusal names its fields.
+
+/** What a Settings screen may send to `siteDetail.settings.update` (its id aside). */
+export type SiteColumnPatch = Omit<z.input<typeof updateSiteSettingsSchema>, "id">;
+
+/** The Settings path each mirrored Site column is edited at — `extractSiteColumnPatch`
+ *  read the other way — so a refused column names the screen's own field. */
+const COLUMN_SETTING_PATHS: Readonly<Record<string, string>> = {
+  name: "seo.siteName",
+  favicon: "seo.favicon",
+  defaultLocale: "seo.language",
+  metaTitle: "seo.metaTitle",
+  metaDescription: "seo.metaDescription",
+  metaTitleTemplate: "seo.metaTitleTemplate",
+  ogImage: "seo.defaultOgImage",
+  allowIndexing: "seo.allowIndexing",
+  robotsTxt: "seo.robotsTxt",
+  touchIcon: "seo.touchIcon",
+  socialLinks: "seo.socialLinks",
+  headCode: "customCode.headScripts",
+  bodyCode: "customCode.bodyScripts",
+  publishedPassword: "publishing.publishedPassword",
+};
+
+/**
+ * A Settings save the server refused. `fieldErrors` is keyed by the field's
+ * `ProjectSettings` path (`seo.defaultOgImage`,
+ * `analytics.googleAnalytics.measurementId`), or by the Site column's name for
+ * a column with no settings path (`slug`, `canonicalUrl`, `cspPolicy`).
+ */
+export class SettingsSaveError extends Error {
+  constructor(
+    message: string,
+    public readonly fieldErrors: Readonly<Record<string, string>> = {},
+  ) {
+    super(message);
+    this.name = "SettingsSaveError";
+  }
+}
+
+/** The tRPC error's `data.zodIssues` (server errorFormatter), each path re-keyed by `toField`. */
+function refusedFields(err: unknown, toField: (serverPath: string) => string): Record<string, string> {
+  const issues = (err as { data?: { zodIssues?: unknown } } | null)?.data?.zodIssues;
+  const fields: Record<string, string> = {};
+  if (!Array.isArray(issues)) return fields;
+  for (const issue of issues) {
+    const { path, message } = (issue ?? {}) as { path?: unknown; message?: unknown };
+    if (typeof path === "string" && typeof message === "string") fields[toField(path)] ??= message;
+  }
+  return fields;
+}
+
+function asSettingsSaveError(err: unknown, toField: (serverPath: string) => string): SettingsSaveError {
+  if (err instanceof SettingsSaveError) return err;
+  return new SettingsSaveError(err instanceof Error ? err.message : String(err), refusedFields(err, toField));
+}
+
+const columnField = (serverPath: string) => {
+  const [column, ...rest] = serverPath.split(".");
+  return [COLUMN_SETTING_PATHS[column] ?? column, ...rest].join(".");
+};
+const projectSettingsField = (serverPath: string) => serverPath.replace(/^patch\./, "");
+
+/** `siteDetail.settings.update` (ADMIN). Refusals throw `SettingsSaveError` with the refused fields. */
+export async function updateSiteColumns(siteId: string, patch: SiteColumnPatch) {
+  try {
+    return await getClient().siteDetail.settings.update.mutate({ id: siteId, ...patch });
+  } catch (err) {
+    throw asSettingsSaveError(err, columnField);
+  }
+}
+
+/** `siteDetail.projectSettings.update` (EDITOR; ADMIN + Pro for global CSS). Refusals throw `SettingsSaveError`. */
+export async function updateProjectSettings(siteId: string, patch: ProjectSettingsPatch) {
+  try {
+    return await getClient().siteDetail.projectSettings.update.mutate({ siteId, patch });
+  } catch (err) {
+    throw asSettingsSaveError(err, projectSettingsField);
+  }
+}
+
+/** What one Settings Save sends, from the composer's settings before and the screen's after. */
+export interface SettingsSavePlan {
+  /** Mirrored Site columns whose value changed. */
+  columns: SiteColumnSettings;
+  /** JSON-only keys that changed, or null. */
+  projectSettings: ProjectSettingsPatch | null;
+  /**
+   * Some other changed key has no settings mutation yet (SEO's Twitter handle,
+   * until Lane 1 merges it into Social profiles). The caller must let the
+   * project save carry it rather than drop it.
+   */
+  unrouted: boolean;
+}
+
+const sameValue = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
+/** `settings` without the keys a settings mutation writes — what is left for the project save. */
+function unroutedSettings(settings: ProjectSettings): Record<string, unknown> {
+  const rest: Record<string, unknown> = structuredClone({ ...settings, analytics: undefined, redirects: undefined });
+  for (const field of [...SITE_COLUMN_FIELDS, "customCode.globalCss"]) {
+    const [section, key] = field.split(".");
+    const block = rest[section];
+    if (isRecord(block)) delete block[key];
+  }
+  return rest;
+}
+
+export function planSettingsSave(before: ProjectSettings, next: ProjectSettings): SettingsSavePlan {
+  const patch: ProjectSettingsPatch = {};
+  if (next.analytics && !sameValue(before.analytics, next.analytics)) patch.analytics = next.analytics;
+  if (!sameValue(before.customCode?.globalCss, next.customCode?.globalCss)) {
+    patch.customCode = { globalCss: next.customCode?.globalCss ?? "" };
+  }
+  if (next.redirects && !sameValue(before.redirects, next.redirects)) patch.redirects = next.redirects;
+  return {
+    columns: diffSiteColumns(extractSiteColumnPatch(next), extractSiteColumnPatch(before)),
+    projectSettings: Object.keys(patch).length > 0 ? patch : null,
+    unrouted: !sameValue(unroutedSettings(before), unroutedSettings(next)),
+  };
+}
+
+/**
+ * Run one Settings Save's plan: both mutations at once. Either refusal fails
+ * the save with every refused field named; the half that landed is repeated on
+ * the retry (both writes are idempotent). Only a fully landed save advances
+ * the autosave mirror's baseline — so the next autosave neither re-sends these
+ * columns nor, after a partial failure, sends the old values back over them.
+ */
+export async function saveSiteSettings(
+  siteId: string,
+  plan: SettingsSavePlan,
+): Promise<{ legacyAnalyticsIds: readonly string[] }> {
+  const hasColumns = Object.keys(plan.columns).length > 0;
+  const [columns, json] = await Promise.allSettled([
+    hasColumns ? updateSiteColumns(siteId, plan.columns) : Promise.resolve(null),
+    plan.projectSettings ? updateProjectSettings(siteId, plan.projectSettings) : Promise.resolve(null),
+  ]);
+  const refused = [columns, json].flatMap((r) =>
+    r.status === "rejected" ? [asSettingsSaveError(r.reason, (path) => path)] : [],
+  );
+  if (refused.length > 0) {
+    throw new SettingsSaveError(
+      refused.map((e) => e.message).join(" "),
+      Object.assign({}, ...refused.map((e) => e.fieldErrors)),
+    );
+  }
+  if (hasColumns) _baselineSiteColumns = { ..._baselineSiteColumns, ...plan.columns };
+  return { legacyAnalyticsIds: json.status === "fulfilled" && json.value ? json.value.warnings.legacyAnalyticsIds : [] };
 }
 
 /**
@@ -518,7 +677,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
     clearConflictToken();
-    _baselineSiteColumns = extractSiteColumnPatch(data);
+    _baselineSiteColumns = extractSiteColumnPatch(data.settings);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
@@ -617,7 +776,7 @@ async function saveProjectNow(
   // Advance the baseline so the editor's own next save isn't seen as a conflict.
   _baselineLastEditedAt = new Date(result.savedAt).toISOString();
 
-  const changed = diffSiteColumns(extractSiteColumnPatch(persisted), _baselineSiteColumns);
+  const changed = diffSiteColumns(extractSiteColumnPatch(persisted.settings), _baselineSiteColumns);
   if (Object.keys(changed).length > 0 && roleAtLeast(await fetchMyRole(), "ADMIN") !== false) {
     /* Awaited on its own: a refused mirror is its own, smaller sentence — the
        pages are already on the server and the chip is about them. */
