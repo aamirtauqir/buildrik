@@ -28,7 +28,7 @@ import { ExportEngine } from "../../../engine/export";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL as dashboardUrlFromEnv } from "@/shared/utils/runtimeEnv";
 import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";
-import { exportPublishPages } from "../exportPublishPages";
+import { exportPublishPages, PublishBlockedError } from "../exportPublishPages";
 import { captureAndUploadThumbnail } from "../captureThumbnail";
 
 export interface UseExportHandlersOptions {
@@ -108,10 +108,13 @@ export function useExportHandlers({
         void captureAndUploadThumbnail(siteId, pages[0].html);
         await publishJob.publish(siteId, pages, { acknowledgeStale });
       } catch (err) {
+        /* 8139:218055 — a CMS blocker is "Publish blocked", toned neutral:
+           the publish never started, and the sentence names the way out. */
+        const blocked = err instanceof PublishBlockedError;
         addToast({
-          title: "Publish failed",
+          title: blocked ? "Publish blocked" : "Publish failed",
           description: err instanceof Error ? err.message : "Could not start publish.",
-          tone: "error",
+          tone: blocked ? "neutral" : "error",
         });
       }
     },
