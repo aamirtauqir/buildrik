@@ -645,7 +645,7 @@ export const SettingsTab: React.FC<
       : overviewScopeLine(siteName);
 
   const immediate = screenRules?.saveModel === "immediate";
-  const footStatus: { text: string; tone: "muted" | "danger" | "warning" } =
+  const footStatus: { text: string; tone: "muted" | "danger" } =
     loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
@@ -653,7 +653,7 @@ export const SettingsTab: React.FC<
         : saveError
           ? { text: "Not saved", tone: "danger" }
           : screenIsDirty
-            ? { text: "Unsaved changes", tone: "warning" }
+            ? { text: "Unsaved changes", tone: "muted" }
             : { text: "All changes saved", tone: "muted" };
   /* The footer is there while something waits to be saved, a save failed, or
      a footer screen's read is pending or failed — never on the Overview, a
@@ -664,7 +664,6 @@ export const SettingsTab: React.FC<
   const FOOT_TONE = {
     muted: "tw:text-[var(--bk-ink-muted)]",
     danger: "tw:text-[var(--bk-error)]",
-    warning: "tw:text-[var(--bk-warning-text)]",
   } as const;
 
   // ─── Sidebar rows ─────────────────────────────────────────────────────
@@ -766,9 +765,9 @@ export const SettingsTab: React.FC<
               theme={{
                 field: {
                   input: {
-                    base:
-                      "tw:h-9 tw:pr-8 tw:[&::-webkit-search-cancel-button]:hidden tw:rounded-[var(--bk-radius-sm)]! tw:text-[length:var(--bk-text-12)] " +
-                      "tw:placeholder:text-[var(--bk-ink)]",
+                    base: "tw:pr-8 tw:[&::-webkit-search-cancel-button]:hidden tw:rounded-[var(--bk-radius-sm)]! tw:placeholder:text-[var(--bk-ink)]",
+                    /* 36 tall, 12px — the theme's own `md` is 32 / 13. */
+                    sizes: { md: "tw:h-9 tw:py-0 tw:text-[length:var(--bk-text-12)]" },
                     colors: {
                       gray:
                         "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:focus:border-[var(--bk-accent)] tw:focus:bg-[var(--bk-bg-panel)] tw:focus:ring-[var(--bk-accent)]",
