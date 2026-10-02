@@ -16,17 +16,32 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 let errCb: ((info: { pending: number }) => void) | null = null;
 let pending = 0;
 const retrySpy = vi.fn(() => Promise.resolve());
+let conflictCb: ((c: { kind: string; id: string; keepMine: () => Promise<void>; useTheirs: () => Promise<void> }) => void) | null = null;
+let goneCb: ((g: { kind: string; id: string; message: string }) => void) | null = null;
+const flushSpy = vi.fn(() => Promise.resolve());
 
 vi.mock("../../../../services/cmsSync", () => ({
   bindCmsEngine: () => () => {},
   hydrateCmsFromServer: () => Promise.resolve(),
+  flushCmsOutbox: () => flushSpy(),
+  onCmsGone: (cb: typeof goneCb) => {
+    goneCb = cb;
+    return () => {
+      goneCb = null;
+    };
+  },
   onCmsSyncError: (cb: (info: { pending: number }) => void) => {
     errCb = cb;
     return () => {
       errCb = null;
     };
   },
-  onCmsConflict: () => () => {},
+  onCmsConflict: (cb: typeof conflictCb) => {
+    conflictCb = cb;
+    return () => {
+      conflictCb = null;
+    };
+  },
   getCmsSyncPendingCount: () => pending,
   retryCmsSync: () => retrySpy(),
   syncCollectionUpsert: vi.fn(),
@@ -50,8 +65,9 @@ function stubComposer() {
 }
 
 describe("useCmsSync — the failure notice retracts", () => {
-  let added: Array<{ id: string; action?: { onClick: () => void } }>;
-  let addToast: (input: { action?: { onClick: () => void } }) => string;
+  type Btn = { onClick: () => void };
+  let added: Array<{ id: string; action?: Btn; secondaryAction?: Btn; description?: string; tone?: string }>;
+  let addToast: (input: { action?: Btn; secondaryAction?: Btn; description?: string; tone?: string }) => string;
 
   beforeEach(() => {
     errCb = null;
@@ -62,7 +78,7 @@ describe("useCmsSync — the failure notice retracts", () => {
     let seq = 0;
     addToast = (input) => {
       const id = `t${++seq}`;
-      added.push({ id, action: input.action });
+      added.push({ id, ...input });
       return id;
     };
   });
@@ -104,5 +120,30 @@ describe("useCmsSync — the failure notice retracts", () => {
     errCb?.({ pending: 0 });
     expect(dismissed).toEqual(["t1"]);
     expect(added).toHaveLength(1);
+  });
+
+  it("replays the outbox on open (C0.5)", () => {
+    flushSpy.mockClear();
+    renderHook(() => useCmsSync(stubComposer(), addToast as never));
+    expect(flushSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["Keep mine", "secondaryAction", "keepMine"],
+    ["Use theirs", "action", "useTheirs"],
+  ] as const)("the conflict toast comes down when %s is pressed", (_label, button, choice) => {
+    renderHook(() => useCmsSync(stubComposer(), addToast as never));
+    const c = { kind: "entry", id: "e1", keepMine: vi.fn(() => Promise.resolve()), useTheirs: vi.fn(() => Promise.resolve()) };
+    conflictCb?.(c);
+    expect(added).toHaveLength(1);
+    added[0][button]?.onClick();
+    expect(dismissed).toEqual([added[0].id]);
+    expect(c[choice]).toHaveBeenCalledTimes(1);
+  });
+
+  it("an edit to a row deleted elsewhere is announced in the server's words", () => {
+    renderHook(() => useCmsSync(stubComposer(), addToast as never));
+    goneCb?.({ kind: "entry", id: "e1", message: "This record was deleted." });
+    expect(added).toEqual([expect.objectContaining({ tone: "warning", description: "This record was deleted." })]);
   });
 });

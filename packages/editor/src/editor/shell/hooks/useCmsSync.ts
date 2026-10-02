@@ -16,8 +16,10 @@ import {
   syncEntryUpsert,
   syncEntryDelete,
   hydrateCmsFromServer,
+  flushCmsOutbox,
   onCmsSyncError,
   onCmsConflict,
+  onCmsGone,
   retryCmsSync,
   bindCmsEngine,
   consumeDirectSync,
@@ -40,8 +42,13 @@ export function useCmsSync(
        make the manager re-read it: the hydrate writes to IndexedDB behind the
        manager's back, and the manager loads that store exactly once. Without
        the refresh, a device opening this site for the first time saw an empty
-       CMS all session while the rows sat in its own IndexedDB. */
-    void hydrateCmsFromServer().then(() => cm.refreshFromStorage());
+       CMS all session while the rows sat in its own IndexedDB.
+       C0.5: first replay what an earlier load left in the outbox, so a change
+       that never reached the server goes up before the server's copy is
+       read (hydration also leaves any row still in the outbox alone). */
+    void flushCmsOutbox()
+      .then(() => hydrateCmsFromServer())
+      .then(() => cm.refreshFromStorage());
 
     // #5/#6 (2026-06-24): CMS server-sync failures used to be logged + dropped
     // silently — the user thought their content was saved everywhere. Surface a
@@ -95,12 +102,13 @@ export function useCmsSync(
        can't be resolved silently — the user has to choose whose copy wins.
        Keep-mine forces the next upsert with no precondition (the local stamp
        was forgotten by the sync layer on the way in), use-theirs rehydrates
-       the server's copy. Both side effects already fire before the toast
-       closes itself, so the buttons do not need to dismiss. */
+       the server's copy. The toast is `duration: Infinity`, so each button
+       takes it down itself — it stayed up after either choice (C0.3 live,
+       2026-10-02). */
     const offConflict = addToast
       ? onCmsConflict((c) => {
           const what = c.kind === "collection" ? "Collection" : "Entry";
-          addToast({
+          const id = addToast({
             title: `${what} changed elsewhere`,
             description:
               "Another device updated this row. Keep your changes, or replace them with the server's copy.",
@@ -108,13 +116,27 @@ export function useCmsSync(
             duration: Infinity,
             action: {
               label: "Use theirs",
-              onClick: () => void c.useTheirs(),
+              onClick: () => {
+                dismissToast(id);
+                void c.useTheirs();
+              },
             },
             secondaryAction: {
               label: "Keep mine",
-              onClick: () => void c.keepMine(),
+              onClick: () => {
+                dismissToast(id);
+                void c.keepMine();
+              },
             },
           });
+        })
+      : undefined;
+
+    /* An edit to a row another device deleted is dropped with the row; say
+       so, in the server's own words, instead of letting it vanish. */
+    const offGone = addToast
+      ? onCmsGone((g) => {
+          addToast({ tone: "warning", description: g.message });
         })
       : undefined;
 
@@ -155,6 +177,7 @@ export function useCmsSync(
       cm.off(EVENTS.CMS_CONTENT_DELETED, onEntryDelete);
       unsubscribe?.();
       offConflict?.();
+      offGone?.();
       bindCmsEngine(null);
     };
   }, [composer, addToast]);
