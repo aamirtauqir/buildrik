@@ -140,6 +140,8 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   onLoadStateChange,
   registerRetryLoad,
   saveError,
+  registerFieldErrors,
+  fieldErrors,
 }) => {
   const { value: stored, isDirty, markDirty } = useSettingsScreen(
     composer,
@@ -214,6 +216,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const clarityError = validateProviderId("microsoftClarity", clarityId);
   /** The first malformed id's sentence — while one stands, Save is refused. */
   const firstError = gaError ?? gtmError ?? pixelError ?? clarityError;
+  /* What the field shows: its own shape check first, else what the server
+     refused on the last Save (ScreenProps.fieldErrors, keyed by settings path). */
+  const shown = (own: string | null, path: string) => own ?? fieldErrors?.[`analytics.${path}`] ?? null;
+  const gaShown = shown(gaError, "googleAnalytics.measurementId");
+  const gtmShown = shown(gtmError, "googleTagManager.containerId");
+  const pixelShown = shown(pixelError, "facebookPixel.pixelId");
+  const clarityShown = shown(clarityError, "microsoftClarity.projectId");
 
   /* Verify (4256:26844): the id's shape, then the tracker's status read
      again, then `verifiedAt` into the draft — the next Save carries it. A
@@ -251,6 +260,18 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     registerSaveHandler(() => Promise.reject(new Error(firstError)));
     return () => registerSaveHandler(null);
   }, [registerSaveHandler, firstError]);
+
+  /* §27: the shell disables Save while any id is malformed. */
+  React.useEffect(() => {
+    if (!registerFieldErrors) return;
+    const errors: Record<string, string> = {};
+    if (gaError) errors["analytics.googleAnalytics.measurementId"] = gaError;
+    if (gtmError) errors["analytics.googleTagManager.containerId"] = gtmError;
+    if (pixelError) errors["analytics.facebookPixel.pixelId"] = pixelError;
+    if (clarityError) errors["analytics.microsoftClarity.projectId"] = clarityError;
+    registerFieldErrors(Object.keys(errors).length > 0 ? errors : null);
+  }, [registerFieldErrors, gaError, gtmError, pixelError, clarityError]);
+  React.useEffect(() => () => registerFieldErrors?.(null), [registerFieldErrors]);
 
   // On Save the shell calls this and saves what it returns (ScreenProps.registerFlushHandler). The
   // other providers' `verifiedAt` ride through from the stored config.
@@ -331,13 +352,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               placeholder="G-XXXXXXXXXX"
-              aria-describedby={gaError ? "ga-error" : undefined}
-              aria-invalid={gaError !== null}
+              aria-describedby={gaShown ? "ga-error" : undefined}
+              aria-invalid={gaShown !== null}
               data-testid="set-an-ga-id"
             />
-            {gaError && (
+            {gaShown && (
               <div id="ga-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-ga-error">
-                {gaError}
+                {gaShown}
               </div>
             )}
           </div>
@@ -402,13 +423,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               placeholder="GTM-XXXXXXX"
-              aria-describedby={gtmError ? "gtm-error" : undefined}
-              aria-invalid={gtmError !== null}
+              aria-describedby={gtmShown ? "gtm-error" : undefined}
+              aria-invalid={gtmShown !== null}
               data-testid="set-an-gtm-id"
             />
-            {gtmError && (
+            {gtmShown && (
               <div id="gtm-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-gtm-error">
-                {gtmError}
+                {gtmShown}
               </div>
             )}
           </div>
@@ -442,13 +463,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               placeholder="1234567890123456"
-              aria-describedby={pixelError ? "pixel-error" : undefined}
-              aria-invalid={pixelError !== null}
+              aria-describedby={pixelShown ? "pixel-error" : undefined}
+              aria-invalid={pixelShown !== null}
               data-testid="set-an-pixel-id"
             />
-            {pixelError && (
+            {pixelShown && (
               <div id="pixel-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-pixel-error">
-                {pixelError}
+                {pixelShown}
               </div>
             )}
           </div>
@@ -482,13 +503,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               placeholder="abcdefghij"
-              aria-describedby={clarityError ? "clarity-error" : undefined}
-              aria-invalid={clarityError !== null}
+              aria-describedby={clarityShown ? "clarity-error" : undefined}
+              aria-invalid={clarityShown !== null}
               data-testid="set-an-clarity-id"
             />
-            {clarityError && (
+            {clarityShown && (
               <div id="clarity-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-clarity-error">
-                {clarityError}
+                {clarityShown}
               </div>
             )}
           </div>

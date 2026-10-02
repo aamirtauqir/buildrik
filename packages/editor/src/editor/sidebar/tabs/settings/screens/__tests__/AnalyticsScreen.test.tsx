@@ -58,10 +58,12 @@ function setup(opts: {
   projectId?: string | null;
   onDirtyChange?: (d: boolean) => void;
   registerSaveHandler?: (h: (() => Promise<void>) | null) => void;
-  registerFlushHandler?: (h: (() => void) | null) => void;
+  registerFlushHandler?: (h: (() => unknown) | null) => void;
   onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
   saveError?: string | null;
   settings?: Record<string, unknown>;
+  registerFieldErrors?: (errors: Readonly<Record<string, string>> | null) => void;
+  fieldErrors?: Readonly<Record<string, string>>;
 } = {}) {
   const composer = createMockComposer({ projectSettings: opts.settings ?? {} });
   const utils = render(
@@ -73,6 +75,8 @@ function setup(opts: {
       registerFlushHandler={opts.registerFlushHandler}
       onLoadStateChange={opts.onLoadStateChange}
       saveError={opts.saveError}
+      registerFieldErrors={opts.registerFieldErrors}
+      fieldErrors={opts.fieldErrors}
     />,
   );
   return { composer, ...utils };
@@ -538,5 +542,28 @@ describe("AnalyticsScreen — dirty wiring + flush handler", () => {
     });
     await waitFor(() => expect(gaInput().value).toBe("G-EXTERNAL00"));
     expect(gaSwitch()).toHaveAttribute("aria-checked", "false");
+  });
+});
+
+/* Settings Phase B (§27, SA-10): the shell disables Save while the screen
+   reports an invalid field, and hands back the fields the server refused. */
+describe("AnalyticsScreen — field errors", () => {
+  it("reports a malformed id to the shell (Save disabled there) and clears it once the id is right", async () => {
+    const registerFieldErrors = vi.fn();
+    setup({ registerFieldErrors });
+    await loaded();
+    fireEvent.change(pixelInput(), { target: { value: "12345678" } });
+    expect(registerFieldErrors).toHaveBeenLastCalledWith({
+      "analytics.facebookPixel.pixelId": expect.stringContaining("Your Pixel ID should be 15 or 16 digits"),
+    });
+    fireEvent.change(pixelInput(), { target: { value: "123456789012345" } });
+    expect(registerFieldErrors).toHaveBeenLastCalledWith(null);
+  });
+
+  it("shows the server's refusal under the field it names", async () => {
+    setup({ fieldErrors: { "analytics.googleAnalytics.measurementId": "Use only letters, numbers, - and _." } });
+    await loaded();
+    expect(gaInput()).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByText("Use only letters, numbers, - and _.")).toBeInTheDocument();
   });
 });
