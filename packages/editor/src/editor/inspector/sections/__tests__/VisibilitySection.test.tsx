@@ -7,6 +7,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { VisibilitySection } from "../VisibilitySection";
+import { InspectorFieldContext } from "../../shared/controls/InspectorFieldContext";
 
 function renderVisibility(styles: Record<string, string> = {}, isOpen = true) {
   const onChange = vi.fn();
@@ -52,5 +53,31 @@ describe("VisibilitySection — writes", () => {
     const { onChange } = renderVisibility({ "--hide-mobile": "true" });
     fireEvent.click(screen.getByRole("checkbox", { name: "Mobile" }));
     expect(onChange).toHaveBeenCalledWith("--hide-mobile", "");
+  });
+});
+
+/* QA 2026-10-02: on a locked element the boxes refused the click but the
+   labels still offered it (pointer). Read-only, not disabled (§1.7): the box
+   keeps its value legible, says aria-readonly, and nothing invites a click. */
+describe("VisibilitySection — locked", () => {
+  it("reads as read-only: aria-readonly, not disabled, no pointer on the labels, a click writes nothing", () => {
+    const onChange = vi.fn();
+    render(
+      <InspectorFieldContext.Provider
+        value={{ readOnly: true, readOnlyReason: "locked", mixedKeys: new Set(), overrides: new Map(), overrideLabels: {}, resetOverride: () => undefined }}
+      >
+        <VisibilitySection styles={{}} onChange={onChange} isOpen />
+      </InspectorFieldContext.Provider>,
+    );
+    for (const bp of ["Desktop", "Tablet", "Mobile"]) {
+      const box = screen.getByRole("checkbox", { name: bp });
+      expect(box).toHaveAttribute("aria-readonly", "true");
+      expect(box).not.toBeDisabled();
+      const label = screen.getByText(bp, { selector: "label" });
+      expect(label.className).not.toMatch(/cursor-pointer/);
+      fireEvent.click(label);
+      expect(box).toBeChecked();
+    }
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

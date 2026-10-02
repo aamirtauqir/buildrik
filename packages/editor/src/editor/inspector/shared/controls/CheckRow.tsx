@@ -47,7 +47,10 @@ export function CheckRow({ label, checked, onChange, property, testId }: CheckRo
         }}
         className="tw:size-4 tw:shrink-0 tw:bg-[var(--bk-bg-panel)]"
       />
-      <label htmlFor={id} className="tw:cursor-pointer tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+      <label
+        htmlFor={id}
+        className={`${field.readOnly ? "tw:cursor-default" : "tw:cursor-pointer"} tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]`}
+      >
         {label}
       </label>
       <FieldDot field={field} />

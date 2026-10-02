@@ -65,7 +65,12 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
                 }}
                 className="tw:size-4 tw:shrink-0"
               />
-              <label htmlFor={id} className="tw:cursor-pointer tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+              {/* Read-only keeps the label from offering a click it refuses:
+                  a pointer over a locked box read as editable (QA 2026-10-02). */}
+              <label
+                htmlFor={id}
+                className={`${readOnly ? "tw:cursor-default" : "tw:cursor-pointer"} tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]`}
+              >
                 {bp.label}
               </label>
             </span>
