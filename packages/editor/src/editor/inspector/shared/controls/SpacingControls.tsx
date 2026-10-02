@@ -78,10 +78,12 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
     setLocal(parseValue(value));
   }, [value]);
 
+  /* A typed or stepped number keeps the side's own unit: a video embed's
+     `padding-bottom: 56.25%` stepped up is 57.25%, never 57.25px. */
   const commit = (raw: string) => {
     if (raw === "") onChange("");
     else if (raw === "auto" || raw === "inherit") onChange(raw);
-    else if (/^-?[\d.]+$/.test(raw)) onChange(`${raw}px`);
+    else if (/^-?[\d.]+$/.test(raw)) onChange(`${raw}${local.isKeyword ? "px" : local.unit || "px"}`);
   };
 
   const tokenId = isTokenVar(value) ? cssVarToTokenId(extractVarName(value) ?? "") : null;
