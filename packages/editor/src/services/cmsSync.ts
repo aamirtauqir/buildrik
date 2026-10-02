@@ -166,9 +166,12 @@ function outboxKeys(siteId: string): string[] {
 
 /** Every CMS change for this site not yet on the server: queued, in flight,
  *  or persisted by an earlier page load and not yet replayed. */
-function outstandingCmsChanges(): number {
+function outstandingCmsKeys(): Set<string> {
   const siteId = getSiteIdFromUrl();
-  return new Set([...queue.outstandingKeys(), ...(siteId ? outboxKeys(siteId) : [])]).size;
+  return new Set([...queue.outstandingKeys(), ...(siteId ? outboxKeys(siteId) : [])]);
+}
+function outstandingCmsChanges(): number {
+  return outstandingCmsKeys().size;
 }
 
 registerPendingSource("cms", outstandingCmsChanges);
@@ -334,10 +337,23 @@ export function consumeDirectSync(kind: "entry" | "collection", id: string): boo
    off a row that hasn't landed (P1-A audit 2026-09-30; the original
    `pendingCount()`-only read let publish race a mirror call). */
 export function cmsSyncBlocker(): string | null {
-  const pending = outstandingCmsChanges();
-  if (pending > 0) {
-    const noun = pending === 1 ? "change hasn't" : "changes haven't";
-    return `${pending} CMS ${noun} reached the server yet. Retry the sync, then publish.`;
+  const keys = outstandingCmsKeys();
+  if (keys.size > 0) {
+    /* A conflicted change is outstanding too (it stays in the outbox), but
+       "Retry the sync" cannot settle it — the user's choice does. Named
+       apart (QA 2026-10-02). */
+    const waiting = [...keys].filter((k) => conflicted.has(k)).length;
+    const unsent = keys.size - waiting;
+    const parts: string[] = [];
+    if (unsent > 0) {
+      const noun = unsent === 1 ? "change hasn't" : "changes haven't";
+      parts.push(`${unsent} CMS ${noun} reached the server yet. Retry the sync, then publish.`);
+    }
+    if (waiting > 0) {
+      const noun = waiting === 1 ? "change is" : "changes are";
+      parts.push(`${waiting} CMS ${noun} waiting for you to choose Keep mine or Use theirs.`);
+    }
+    return parts.join(" ");
   }
   if (getCmsHydrationStatus() === "loading") {
     return "CMS is still syncing from the server. Retry once it finishes.";

@@ -336,6 +336,25 @@ describe("CMS conflict — pending until a choice is made", () => {
   });
 });
 
+/* QA 2026-10-02: a publish blocked by an open conflict said "Retry the
+   sync, then publish." — a retry cannot settle a conflict, the choice does. */
+describe("publish gate — names the conflict case", () => {
+  it("a conflict alone asks for the choice; with an unsent change too, both are named", async () => {
+    const { recordServerStamp, syncEntryUpsert, cmsSyncBlocker } = await pageLoad();
+    recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    entUpsert.mockRejectedValueOnce(conflict());
+    await syncEntryUpsert(item("e1"));
+    expect(cmsSyncBlocker()).toBe("1 CMS change is waiting for you to choose Keep mine or Use theirs.");
+
+    entUpsert.mockRejectedValueOnce(offline());
+    await syncEntryUpsert(item("e2"));
+    expect(cmsSyncBlocker()).toBe(
+      "1 CMS change hasn't reached the server yet. Retry the sync, then publish. " +
+        "1 CMS change is waiting for you to choose Keep mine or Use theirs.",
+    );
+  });
+});
+
 describe("CMS outbox — storage unavailable", () => {
   it("a throwing localStorage degrades to the in-memory queue and never throws", async () => {
     const { syncEntryUpsert, retryCmsSync, getCmsSyncPendingCount, cmsSyncBlocker, flushCmsOutbox } = await pageLoad();

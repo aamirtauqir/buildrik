@@ -133,10 +133,19 @@ export function useCmsSync(
       : undefined;
 
     /* An edit to a row another device deleted is dropped with the row; say
-       so, in the server's own words, instead of letting it vanish. */
+       so, in the server's own words, instead of letting it vanish. The title
+       names what is gone — the server's sentence alone was a title-less
+       toast (QA 2026-10-02). An entry written into a deleted COLLECTION is
+       answered "This collection was deleted.", so the title follows the
+       sentence, not the row's kind. No board draws this toast. */
     const offGone = addToast
       ? onCmsGone((g) => {
-          addToast({ tone: "warning", description: g.message });
+          const collectionGone = g.kind === "collection" || /collection/i.test(g.message);
+          addToast({
+            tone: "warning",
+            title: collectionGone ? "Collection deleted" : "Record deleted",
+            description: `${g.message} Your change to it wasn't saved.`,
+          });
         })
       : undefined;
 

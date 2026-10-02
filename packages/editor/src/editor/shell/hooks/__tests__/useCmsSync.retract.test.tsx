@@ -141,9 +141,18 @@ describe("useCmsSync — the failure notice retracts", () => {
     expect(c[choice]).toHaveBeenCalledTimes(1);
   });
 
-  it("an edit to a row deleted elsewhere is announced in the server's words", () => {
+  /* QA 2026-10-02: the GONE toast had no title — a lone grey sentence. It
+     names what is gone, then the server's sentence and what became of the
+     edit (it was dropped with the row). */
+  it.each([
+    ["entry", "This record was deleted.", "Record deleted"],
+    ["collection", "This collection was deleted.", "Collection deleted"],
+    ["entry", "This collection was deleted.", "Collection deleted"],
+  ] as const)("a %s edit answered %j is announced as %j", (kind, message, title) => {
     renderHook(() => useCmsSync(stubComposer(), addToast as never));
-    goneCb?.({ kind: "entry", id: "e1", message: "This record was deleted." });
-    expect(added).toEqual([expect.objectContaining({ tone: "warning", description: "This record was deleted." })]);
+    goneCb?.({ kind, id: "e1", message });
+    expect(added).toEqual([
+      expect.objectContaining({ tone: "warning", title, description: `${message} Your change to it wasn't saved.` }),
+    ]);
   });
 });
