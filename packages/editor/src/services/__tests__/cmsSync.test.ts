@@ -717,3 +717,38 @@ describe("C0a sync", () => {
     off();
   });
 });
+
+/* Live run 2026-10-02: two tabs deleting the same record left the second tab
+   with a delete the server answers NOT_FOUND — queued forever, a permanent
+   "didn't sync" notice, and publish blocked on it. A delete of a row the
+   server doesn't have has reached its goal. */
+describe("a delete the server no longer has is done, not queued", () => {
+  const notFound = () => Object.assign(new Error("Entry not found"), { data: { code: "NOT_FOUND" } });
+
+  it("entry delete answered NOT_FOUND leaves nothing queued", async () => {
+    const off = onCmsSyncError(() => {});
+    entDelete.mockRejectedValueOnce(notFound());
+    await syncEntryDelete("already-gone");
+    expect(getCmsSyncPendingCount()).toBe(0);
+    off();
+  });
+
+  it("collection delete answered NOT_FOUND leaves nothing queued", async () => {
+    const off = onCmsSyncError(() => {});
+    colDelete.mockRejectedValueOnce(Object.assign(new Error("Collection not found"), { data: { code: "NOT_FOUND" } }));
+    await syncCollectionDelete("already-gone-col");
+    expect(getCmsSyncPendingCount()).toBe(0);
+    off();
+  });
+
+  it("a delete that failed for any other reason is still queued for retry", async () => {
+    const off = onCmsSyncError(() => {});
+    entDelete.mockRejectedValueOnce(new Error("network down"));
+    await syncEntryDelete("offline-del");
+    expect(getCmsSyncPendingCount()).toBe(1);
+    entDelete.mockResolvedValueOnce({ ok: true });
+    await retryCmsSync();
+    expect(getCmsSyncPendingCount()).toBe(0);
+    off();
+  });
+});

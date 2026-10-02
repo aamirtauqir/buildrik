@@ -159,6 +159,19 @@ async function mirror(
   return reached && outcome === "ok";
 }
 
+/* A delete the server answers NOT_FOUND has reached its goal: another device
+   deleted the row first, or it never reached the server (made and deleted
+   while offline). Retried as a failure it stayed queued for the session — a
+   permanent "didn't sync" notice and a publish blocked on "1 CMS change
+   hasn't reached the server" (two tabs deleting one record, live 2026-10-02).
+   Re-thrown as GONE so `mirror` resolves it like any other already-gone row. */
+function deleteAlreadyDone(e: unknown): never {
+  if ((e as { data?: { code?: string } } | null)?.data?.code === "NOT_FOUND") {
+    throw new Error(`CMS_GONE:${e instanceof Error ? e.message : "not found"}`);
+  }
+  throw e;
+}
+
 export type CmsSyncErrorInfo = SyncRetryInfo;
 
 /** Subscribe to CMS sync failures. Returns an unsubscribe fn. */
@@ -505,7 +518,7 @@ export async function syncCollectionDelete(id: string): Promise<void> {
   queue.drop(`collectionUpsert:${id}`);
   await mirror(
     `collectionDelete:${id}`,
-    () => client().cms.collections.delete.mutate({ siteId, id }),
+    () => client().cms.collections.delete.mutate({ siteId, id }).catch(deleteAlreadyDone),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] collection delete failed (queued)", e),
     {
@@ -575,7 +588,7 @@ export async function syncEntryDelete(id: string): Promise<void> {
   queue.drop(`entryUpsert:${id}`);
   await mirror(
     `entryDelete:${id}`,
-    () => client().cms.entries.delete.mutate({ siteId, id }),
+    () => client().cms.entries.delete.mutate({ siteId, id }).catch(deleteAlreadyDone),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry delete failed (queued)", e),
     {
