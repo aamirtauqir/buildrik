@@ -21,7 +21,7 @@ import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 
 export class CmsError extends Error {
   constructor(
-    public code: "NOT_FOUND" | "BAD_REQUEST",
+    public code: "NOT_FOUND" | "BAD_REQUEST" | "CONFLICT" | "GONE",
     message: string,
   ) {
     super(message);
@@ -88,14 +88,70 @@ function stripMarkup(value: string): string {
 
 export async function listCollections(siteId: string) {
   const rows = await prisma.cmsCollection.findMany({
-    where: { siteId },
+    where: { siteId, deletedAt: null },
     orderBy: { name: "asc" },
     include: { _count: { select: { entries: true } } },
   });
   return rows.map(({ _count, ...c }) => ({ ...c, entryCount: _count.entries }));
 }
 
+/**
+ * Mark the site as having unpublished CMS changes. Called after EVERY
+ * successful CMS mutation (collection upsert/delete, entry upsert/delete,
+ * CSV import). The publish-approval gate + the editor's publish state read
+ * this so a CMS-only edit invalidates stale approvals and shows "unpublished
+ * changes" in the editor — distinct from `lastEditedAt`, which the editor's
+ * own page writes bump.
+ *
+ * Fire-and-log on its own error: a successful CMS write has already
+ * committed, and an out-of-band bump failure must not roll the mutation
+ * back. The "unpublished changes" signal will still catch up on the next
+ * write.
+ */
+async function touchCmsEdited(siteId: string): Promise<void> {
+  try {
+    await prisma.site.update({
+      where: { id: siteId },
+      data: { cmsEditedAt: new Date() },
+    });
+  } catch (err) {
+    console.error("[cms] touchCmsEdited failed for site", siteId, err);
+  }
+}
+
+/**
+ * Precondition guard: the caller's last-seen `updatedAt` must match what's in
+ * the DB, or the row has been edited underneath them (CONFLICT — return the
+ * current value so the client can show "someone else saved, reload?"). When
+ * the caller didn't supply a precondition (`expectedUpdatedAt` undefined) the
+ * check is skipped — a deliberate opt-out, NOT a default. Skipping on null
+ * too: the editor's first-time save after a reset wipes the optimistic value.
+ */
+async function assertFresh(
+  table: "cmsCollection" | "cmsEntry",
+  where: Record<string, unknown>,
+  expectedUpdatedAt: string | null | undefined,
+): Promise<Date> {
+  if (expectedUpdatedAt === undefined) return new Date(0);
+  const row = await (prisma[table].findFirst as (args: unknown) => Promise<{ updatedAt: Date } | null>)({
+    where,
+    select: { updatedAt: true },
+  });
+  if (!row) throw new CmsError("NOT_FOUND", "Row not found");
+  const expected = expectedUpdatedAt === null ? null : new Date(expectedUpdatedAt);
+  if (expected && row.updatedAt.getTime() !== expected.getTime()) {
+    throw new CmsError("CONFLICT", row.updatedAt.toISOString());
+  }
+  return expected ?? row.updatedAt;
+}
+
 export async function upsertCollection(siteId: string, input: UpsertCollectionInput) {
+  /* The home page is index.html; a collection bound to it would emit
+     {field} tokens at the site root (BD-04). The picker (DynamicPagesPane)
+     hides it too — refuse here as a defence in depth. */
+  if (input.pageTemplatePath === "index.html") {
+    throw new CmsError("BAD_REQUEST", "The home page can't be a collection template. Pick another page.");
+  }
   const data = {
     name: input.name,
     slug: input.slug,
@@ -112,28 +168,70 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
     // Upsert by the editor-supplied id (engine collection id = DB id, so the
     // first sync creates and later syncs update). Reject only a real cross-site
     // collision — a row with this id already owned by a DIFFERENT site.
-    const existing = await prisma.cmsCollection.findUnique({ where: { id: input.id }, select: { siteId: true } });
-    if (existing && existing.siteId !== siteId) throw new CmsError("NOT_FOUND", "Collection not found");
-    return prisma.cmsCollection.upsert({
+    const existing = await prisma.cmsCollection.findUnique({
       where: { id: input.id },
-      create: { id: input.id, siteId, ...data },
-      update: data,
+      select: { siteId: true, deletedAt: true },
     });
+    if (existing && existing.siteId !== siteId) throw new CmsError("NOT_FOUND", "Collection not found");
+    if (existing?.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
+    if (existing) {
+      await assertFresh(
+        "cmsCollection",
+        { id: input.id },
+        input.expectedUpdatedAt,
+      );
+      // Conditional update: WHERE updatedAt = expected AND deletedAt IS NULL — if
+      // another writer slipped in between assertFresh and here, or the row was
+      // tombstoned concurrently, count is 0 and we throw CONFLICT/GONE. Carrying
+      // `deletedAt: null` into the SQL is the P0-C fix — without it, an
+      // unconditional updateMany with `expected === null` would silently resurrect
+      // a soft-deleted row (audit 2026-09-30).
+      const expected = input.expectedUpdatedAt ? new Date(input.expectedUpdatedAt) : null;
+      const result = await prisma.cmsCollection.updateMany({
+        where: expected
+          ? { id: input.id, updatedAt: expected, deletedAt: null }
+          : { id: input.id, deletedAt: null },
+        data,
+      });
+      if (result.count === 0) {
+        const fresh = await prisma.cmsCollection.findUnique({ where: { id: input.id }, select: { updatedAt: true, deletedAt: true } });
+        if (fresh?.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
+        throw new CmsError("CONFLICT", fresh?.updatedAt.toISOString() ?? new Date().toISOString());
+      }
+      await touchCmsEdited(siteId);
+      return prisma.cmsCollection.findUnique({ where: { id: input.id } });
+    }
+    const created = await prisma.cmsCollection.create({ data: { id: input.id, siteId, ...data } });
+    await touchCmsEdited(siteId);
+    return created;
   }
-  return prisma.cmsCollection.create({ data: { siteId, ...data } });
+  const created = await prisma.cmsCollection.create({ data: { siteId, ...data } });
+  await touchCmsEdited(siteId);
+  return created;
 }
 
 export async function deleteCollection(siteId: string, id: string): Promise<void> {
-  const owned = await prisma.cmsCollection.findFirst({ where: { id, siteId }, select: { id: true } });
+  const owned = await prisma.cmsCollection.findFirst({
+    where: { id, siteId, deletedAt: null },
+    select: { id: true, slug: true },
+  });
   if (!owned) throw new CmsError("NOT_FOUND", "Collection not found");
-  await prisma.cmsCollection.delete({ where: { id } });
+  const now = new Date();
+  await prisma.$transaction([
+    prisma.cmsEntry.updateMany({ where: { collectionId: id, deletedAt: null }, data: { deletedAt: now } }),
+    prisma.cmsCollection.update({
+      where: { id },
+      data: { deletedAt: now, slug: `${owned.slug}~deleted~${id}` },
+    }),
+  ]);
+  await touchCmsEdited(siteId);
 }
 
 // Confirm the collection is in this site before any entry op — entries key on
 // collectionId alone, so this is the cross-site guard.
 async function assertCollectionInSite(siteId: string, collectionId: string): Promise<void> {
   const owned = await prisma.cmsCollection.findFirst({
-    where: { id: collectionId, siteId },
+    where: { id: collectionId, siteId, deletedAt: null },
     select: { id: true },
   });
   if (!owned) throw new CmsError("NOT_FOUND", "Collection not found");
@@ -141,37 +239,75 @@ async function assertCollectionInSite(siteId: string, collectionId: string): Pro
 
 export async function listEntries(siteId: string, collectionId: string) {
   await assertCollectionInSite(siteId, collectionId);
-  return prisma.cmsEntry.findMany({ where: { collectionId }, orderBy: { updatedAt: "desc" } });
+  return prisma.cmsEntry.findMany({
+    where: { collectionId, deletedAt: null },
+    orderBy: { updatedAt: "desc" },
+  });
 }
 
 export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
-  await assertCollectionInSite(siteId, input.collectionId);
+  /* A write into a DELETED collection is GONE, not NOT_FOUND: the client
+     drops a GONE row, while NOT_FOUND is just a failure it retries forever —
+     a permanent "didn't sync" notice and a blocked publish on the device that
+     still held the collection (C0a live run, 2026-10-02). */
+  const collection = await prisma.cmsCollection.findFirst({
+    where: { id: input.collectionId, siteId },
+    select: { deletedAt: true },
+  });
+  if (!collection) throw new CmsError("NOT_FOUND", "Collection not found");
+  if (collection.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
   const data = {
     data: sanitizeEntryData(input.data) as unknown as Prisma.InputJsonValue,
     ...(input.status ? { status: input.status } : {}),
   };
+  // CSV import loops upsertEntry; skip the per-row bump and let the
+  // importer touch cmsEditedAt once at the end.
+  const bump = input._skipTouchCmsEdited !== true;
   if (input.id) {
     const existing = await prisma.cmsEntry.findUnique({
       where: { id: input.id },
-      select: { collection: { select: { siteId: true } } },
+      select: { deletedAt: true, collection: { select: { siteId: true } } },
     });
     if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
-    return prisma.cmsEntry.upsert({
-      where: { id: input.id },
-      create: { id: input.id, collectionId: input.collectionId, ...data },
-      update: data,
-    });
+    if (existing?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
+    if (existing) {
+      await assertFresh(
+        "cmsEntry",
+        { id: input.id },
+        input.expectedUpdatedAt,
+      );
+      const expected = input.expectedUpdatedAt ? new Date(input.expectedUpdatedAt) : null;
+      const result = await prisma.cmsEntry.updateMany({
+        where: expected
+          ? { id: input.id, updatedAt: expected, deletedAt: null }
+          : { id: input.id, deletedAt: null },
+        data,
+      });
+      if (result.count === 0) {
+        const fresh = await prisma.cmsEntry.findUnique({ where: { id: input.id }, select: { updatedAt: true, deletedAt: true } });
+        if (fresh?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
+        throw new CmsError("CONFLICT", fresh?.updatedAt.toISOString() ?? new Date().toISOString());
+      }
+      if (bump) await touchCmsEdited(siteId);
+      return prisma.cmsEntry.findUnique({ where: { id: input.id } });
+    }
+    const created = await prisma.cmsEntry.create({ data: { id: input.id, collectionId: input.collectionId, ...data } });
+    if (bump) await touchCmsEdited(siteId);
+    return created;
   }
-  return prisma.cmsEntry.create({ data: { collectionId: input.collectionId, ...data } });
+  const created = await prisma.cmsEntry.create({ data: { collectionId: input.collectionId, ...data } });
+  if (bump) await touchCmsEdited(siteId);
+  return created;
 }
 
 export async function deleteEntry(siteId: string, id: string): Promise<void> {
   const owned = await prisma.cmsEntry.findFirst({
-    where: { id, collection: { siteId } },
+    where: { id, deletedAt: null, collection: { siteId } },
     select: { id: true },
   });
   if (!owned) throw new CmsError("NOT_FOUND", "Entry not found");
-  await prisma.cmsEntry.delete({ where: { id } });
+  await prisma.cmsEntry.update({ where: { id }, data: { deletedAt: new Date() } });
+  await touchCmsEdited(siteId);
 }
 
 // ── CSV import ────────────────────────────────────────────────────────────
@@ -186,7 +322,10 @@ interface CmsFieldShape {
 }
 
 async function loadCollectionFields(siteId: string, collectionId: string): Promise<CmsFieldShape[]> {
-  const col = await prisma.cmsCollection.findFirst({ where: { id: collectionId, siteId }, select: { fields: true } });
+  const col = await prisma.cmsCollection.findFirst({
+    where: { id: collectionId, siteId, deletedAt: null },
+    select: { fields: true },
+  });
   if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
   const fields = col.fields as unknown;
   if (!Array.isArray(fields)) return [];
@@ -300,12 +439,13 @@ export async function importCsvEntries(
       continue;
     }
     try {
-      await upsertEntry(siteId, { siteId, collectionId, data });
+      await upsertEntry(siteId, { siteId, collectionId, data, _skipTouchCmsEdited: true });
       imported += 1;
     } catch (e) {
       errors.push({ row: rowNumber, message: e instanceof Error ? e.message : "Could not be saved" });
     }
   }
+  if (imported > 0) await touchCmsEdited(siteId);
   return { imported, total: dataRows.length, errors };
 }
 
@@ -363,7 +503,7 @@ export async function findStaleTemplateBindings(
   pages: { slug: string; isHomePage: boolean; name?: string }[],
 ): Promise<StaleTemplateBindingsResult> {
   const cols = await prisma.cmsCollection.findMany({
-    where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
+    where: { siteId, deletedAt: null, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
     select: { id: true, name: true, pageTemplatePath: true },
   });
   if (cols.length === 0) return { hasPageGeneratingCollections: false, stale: [], templates: [] };
@@ -395,13 +535,13 @@ export async function resolveDynamicPages(
   collectionId: string,
 ): Promise<DynamicPage[]> {
   const col = await prisma.cmsCollection.findFirst({
-    where: { id: collectionId, siteId },
+    where: { id: collectionId, siteId, deletedAt: null },
     select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true },
   });
   if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
   if (!col.pageSlugPattern) return [];
   const entries = await prisma.cmsEntry.findMany({
-    where: { collectionId, status: "PUBLISHED" },
+    where: { collectionId, status: "PUBLISHED", deletedAt: null },
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
@@ -481,13 +621,13 @@ export async function generateDynamicPages(
   templateHtml: string,
 ): Promise<GeneratedPage[]> {
   const col = await prisma.cmsCollection.findFirst({
-    where: { id: collectionId, siteId },
+    where: { id: collectionId, siteId, deletedAt: null },
     select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true },
   });
   if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
   if (!col.pageSlugPattern) return [];
   const entries = await prisma.cmsEntry.findMany({
-    where: { collectionId, status: "PUBLISHED" },
+    where: { collectionId, status: "PUBLISHED", deletedAt: null },
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
@@ -527,7 +667,7 @@ export async function generateDynamicPages(
 export async function getPublishedCmsForBindings(siteId: string, fieldsByCollection: ReadonlyMap<string, ReadonlySet<string>>) {
   if (fieldsByCollection.size === 0) return { collections: [], entries: [] };
   const rows = await prisma.cmsCollection.findMany({
-    where: { siteId, id: { in: [...fieldsByCollection.keys()] } },
+    where: { siteId, deletedAt: null, id: { in: [...fieldsByCollection.keys()] } },
     select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
   });
   const keep = (c: { id: string; displayField: string | null }) =>
@@ -543,7 +683,7 @@ export async function getPublishedCmsForBindings(siteId: string, fieldsByCollect
     rows.map(async (c) => {
       const slugs = keep(c);
       const found = await prisma.cmsEntry.findMany({
-        where: { collectionId: c.id, status: "PUBLISHED" },
+        where: { collectionId: c.id, status: "PUBLISHED", deletedAt: null },
         orderBy: { updatedAt: "desc" },
         take: CMS_COLLECTION_LIMIT_MAX,
         select: { id: true, collectionId: true, data: true, status: true, createdAt: true, updatedAt: true },
@@ -555,6 +695,27 @@ export async function getPublishedCmsForBindings(siteId: string, fieldsByCollect
     }),
   );
   return { collections, entries: perCollection.flat() };
+}
+
+/**
+ * The CMS rows a publish renders from: every field of the collections the
+ * project binds, and their live PUBLISHED entries, newest first (the editor
+ * store's order, so an itemId-less binding resolves the same record here as on
+ * the canvas). Unlike the share draft this is not projected — the caller is an
+ * EDITOR publishing the site, not an anonymous visitor.
+ */
+export async function getPublishedCmsForCollections(siteId: string, collectionIds: readonly string[]) {
+  if (collectionIds.length === 0) return { collections: [], entries: [] };
+  const collections = await prisma.cmsCollection.findMany({
+    where: { siteId, deletedAt: null, id: { in: [...collectionIds] } },
+    select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
+  });
+  const entries = await prisma.cmsEntry.findMany({
+    where: { collectionId: { in: collections.map((c) => c.id) }, status: "PUBLISHED", deletedAt: null },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, collectionId: true, data: true, status: true, createdAt: true, updatedAt: true },
+  });
+  return { collections, entries };
 }
 
 /**
@@ -571,7 +732,7 @@ export async function appendDynamicPagesToPublish(
   pages: Array<{ path: string; html: string }>,
 ): Promise<Array<{ path: string; html: string }>> {
   const cols = await prisma.cmsCollection.findMany({
-    where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
+    where: { siteId, deletedAt: null, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
     select: { id: true, pageTemplatePath: true },
   });
   if (cols.length === 0) return pages;

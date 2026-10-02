@@ -5,7 +5,7 @@ import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@build
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
-import { publishApprovalBlock } from "@server/services/publish-approval";
+import { publishApprovalBlock, latestEditAt } from "@server/services/publish-approval";
 import { isFeatureEnabled } from "@server/services/feature-flag.service";
 import { getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
@@ -332,6 +332,7 @@ export async function startPublish(
       publishedUrl: true,
       workspaceId: true,
       lastEditedAt: true,
+      cmsEditedAt: true,
       workspace: { select: { deletionScheduledAt: true } },
     },
   });
@@ -411,7 +412,12 @@ export async function startPublish(
         role,
         latestReviewStatus: latestReview?.status ?? null,
         latestReviewResolvedAt: latestReview?.resolvedAt ?? null,
-        siteLastEditedAt: site.lastEditedAt,
+        // Cms-only edits (record create/edit/delete, collection edits) bump
+        // cmsEditedAt — not lastEditedAt. Treat the later of the two as the
+        // "what was last edited" signal so a CMS-only edit can also stale
+        // an approval. Freshness on the previous line keeps using raw
+        // lastEditedAt (CRDT side, distinct signal).
+        siteLastEditedAt: latestEditAt(site),
         acknowledgeStale,
       });
       // Distinct errors, one per gate state the board draws (S5.4): nobody

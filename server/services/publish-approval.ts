@@ -106,3 +106,26 @@ export function publishApprovalBlock(input: ApprovalGateInput): PublishApprovalB
 export function isPublishBlockedByApproval(input: ApprovalGateInput): boolean {
   return publishApprovalBlock(input) !== null;
 }
+
+/**
+ * The site's most recent content edit, considering BOTH the editor's
+ * lastEditedAt AND the CMS-only cmsEditedAt (CMS writes that the editor
+ * doesn't touch — record creates/edits/deletes, collection edits — bump
+ * this without touching lastEditedAt). Used by the approval gate so a
+ * CMS-only edit invalidates a stale approval the same way a page edit does.
+ *
+ * A null on both sides means the site has never been edited; the gate
+ * treats that as "not stale" (no edit happened).
+ *
+ * Note: the Freshness-for-CRDT side (publish.service.ts, client-review)
+ * still uses raw `site.lastEditedAt`, NOT this helper — freshness is a
+ * distinct signal owned by the page-write path.
+ */
+export function latestEditAt(site: { lastEditedAt?: Date | null; cmsEditedAt?: Date | null }): Date | null {
+  const a = site.lastEditedAt ?? null;
+  const b = site.cmsEditedAt ?? null;
+  if (!a && !b) return null;
+  if (!a) return b;
+  if (!b) return a;
+  return a.getTime() >= b.getTime() ? a : b;
+}

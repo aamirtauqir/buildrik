@@ -13,6 +13,32 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import { CmsWorkspace } from "../CmsWorkspace";
 import { cmsWorkspace } from "../cmsWorkspaceStore";
 import { makeEngine } from "./fakeCmsEngine";
+
+/* P0-B audit 2026-09-30 — `panel.saveRecord` now awaits the server mirror so
+   the sheet can close on success and stay open with the "Saved on this device
+   only…" state on a queued mirror. The default here is "reached" (the test's
+   happy path); the queued branch in its own test sets it to false. */
+const syncMock = vi.fn(async (..._args: unknown[]) => true);
+vi.mock("@/services/cmsSync", async () => {
+  const m = await vi.importActual<typeof import("@/services/cmsSync")>("@/services/cmsSync");
+  return {
+    ...m,
+    syncEntryUpsert: (...args: Parameters<typeof m.syncEntryUpsert>) => syncMock(...args),
+    syncCollectionUpsert: vi.fn(async () => true),
+    syncEntryDelete: vi.fn(async () => true),
+    syncCollectionDelete: vi.fn(async () => true),
+    consumeDirectSync: vi.fn(() => false),
+    bindCmsEngine: vi.fn(),
+    hydrateCmsFromServer: vi.fn(async () => undefined),
+    onCmsSyncError: () => () => undefined,
+    onCmsConflict: () => () => undefined,
+    retryCmsSync: vi.fn(async () => undefined),
+    getCmsHydrationStatus: () => "ready",
+    onCmsHydrationChange: () => () => undefined,
+    cmsSyncBlocker: () => null,
+    getCmsSyncPendingCount: () => 0,
+  };
+});
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 
 const MENU = {
@@ -94,6 +120,24 @@ describe("RecordSheet", () => {
     await waitFor(() =>
       expect(composer.cms.collections.createContentItem).toHaveBeenCalledWith("col-1", expect.objectContaining({ name: "Diavola" })),
     );
+  });
+
+  /* P0-B audit 2026-09-30 — a queued mirror (server offline, no signal) must
+     keep the sheet open and tell the user the save landed locally and the
+     next online tick will replay it. The sheet's footer state is the only
+     truthful surface; closing it on a queued save hides the change and
+     misleads the user about CMS reach. */
+  it("stays open with the local-only state when the mirror does not reach the server", async () => {
+    syncMock.mockImplementationOnce(async () => false);
+    mount();
+    await openRow();
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    await waitFor(() =>
+      expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent(/Saved on this device only/i),
+    );
+    expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
   });
 
   it("says which required fields keep a record from publishing (5940:148412)", async () => {

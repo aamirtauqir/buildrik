@@ -184,6 +184,7 @@ describe("fetchSitePublishState", () => {
       publishedUrl: "https://x.vercel.app",
       hasUnpublishedChanges: null,
       lastPublishedAt: null,
+      lastEditedAt: null,
     });
   });
 
@@ -195,6 +196,7 @@ describe("fetchSitePublishState", () => {
       publishedUrl: null,
       hasUnpublishedChanges: null,
       lastPublishedAt: null,
+      lastEditedAt: null,
     });
   });
 
@@ -207,6 +209,7 @@ describe("fetchSitePublishState", () => {
       publishedUrl: "https://old.vercel.app",
       hasUnpublishedChanges: null,
       lastPublishedAt: null,
+      lastEditedAt: null,
     });
   });
 

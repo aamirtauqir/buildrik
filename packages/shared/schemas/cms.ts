@@ -19,6 +19,7 @@ const cmsField = z
 export const upsertCollectionInput = z.object({
   id: z.string().optional(),
   siteId: z.string().min(1),
+  expectedUpdatedAt: z.string().datetime().nullable().optional(),
   name: z.string().min(1).max(100),
   slug: z.string().min(1).max(100),
   description: z.string().nullable().optional(),
@@ -50,8 +51,12 @@ export const upsertEntryInput = z.object({
   id: z.string().optional(),
   siteId: z.string().min(1),
   collectionId: z.string().min(1),
+  expectedUpdatedAt: z.string().datetime().nullable().optional(),
   data: z.record(z.string(), z.unknown()).default({}),
   status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
+  // Internal flag: CSV import loops this; skipping the per-row touchCmsEdited
+  // makes the importer batch its site-bump into a single UPDATE.
+  _skipTouchCmsEdited: z.boolean().optional(),
 });
 export type UpsertEntryInput = z.infer<typeof upsertEntryInput>;
 
@@ -85,3 +90,13 @@ export const importCsvEntriesInput = z.object({
   columnMapping: z.record(z.string(), z.string().min(1)),
 });
 export type ImportCsvEntriesInput = z.infer<typeof importCsvEntriesInput>;
+
+// C0.1 server half: the publish worker asks the server for the live CMS rows
+// (and site fonts) it should render against, instead of trusting whatever the
+// editor exported. The collectionIds are the collections the project's
+// current CMS bindings point at.
+export const publishSnapshotInput = z.object({
+  siteId: z.string().min(1),
+  collectionIds: z.array(z.string().min(1)).max(500),
+});
+export type PublishSnapshotInput = z.infer<typeof publishSnapshotInput>;

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getEffectiveSiteRole } from "@/server/services/permission.service";
 import { filterCmsBindings, type CmsBindingsInput } from "@buildrik/shared/schemas/sites";
 import { getPublishedCmsForBindings } from "@/server/services/cms.service";
+import { listSiteFontAssets } from "@/server/services/media.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 // The link token IS the bearer credential for the draft it unlocks — a
@@ -278,11 +279,7 @@ export async function getShareDraftRows(siteId: string) {
      same set the editor's Composer registers from the media library. Without
      them the scratch render cannot write their @font-face, and the preview
      named e.g. 'Inter Var' while loading nothing (2026-09-24). */
-  const fontAssets = await prisma.mediaAsset.findMany({
-    where: { siteId, type: "font", userMetadata: { path: ["siteFont"], equals: true } },
-    select: { filename: true, url: true },
-    orderBy: { createdAt: "asc" },
-  });
+  const fontAssets = await listSiteFontAssets(siteId);
   const { sitePages, name, publishedUrl, projectStyles, projectSettings, projectCmsBindings, dsSchemaVersion, ...columns } = site;
   const pages = sitePages.filter((p) => {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;

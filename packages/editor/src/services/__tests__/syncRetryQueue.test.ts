@@ -116,6 +116,30 @@ describe("totalPendingMirrors", () => {
   });
 });
 
+/* C0a (Task 6): publish waits on the CMS queue, so an in-flight mirror has
+   to count. And publish may want to wait for one specific mirror to finish —
+   `settled(key)` resolves when the latest run for that key is done. */
+describe("SyncRetryQueue — pending includes in-flight, settled awaits", () => {
+  it("counts an op as pending while it is in flight", async () => {
+    const q = new SyncRetryQueue();
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const p = q.run("k", () => gate, () => {});
+    expect(q.outstandingCount()).toBe(1);
+    release();
+    await p;
+    expect(q.outstandingCount()).toBe(0);
+  });
+
+  it("settled(key) resolves with the run's outcome", async () => {
+    const q = new SyncRetryQueue();
+    void q.run("ok", async () => {}, () => {});
+    void q.run("bad", async () => { throw new Error("x"); }, () => {});
+    await expect(q.settled("ok")).resolves.toBe(true);
+    await expect(q.settled("bad")).resolves.toBe(false);
+  });
+});
+
 /* The Inspector v4 fixture's Menu collection loaded with no fields: its
    create and its field update were two upserts of the same row in flight at
    once, the create landed last (or the update lost a create race on the
@@ -172,6 +196,6 @@ describe("SyncRetryQueue — one target, one write in flight, in order", () => {
     const waited = q.settled("col:1").then(() => done);
     first.resolve();
     expect(await waited).toBe(true);
-    await expect(q.settled("nothing")).resolves.toBeUndefined();
+    await expect(q.settled("nothing")).resolves.toBe(true);
   });
 });

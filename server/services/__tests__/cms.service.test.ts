@@ -5,34 +5,38 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const colFindMany = vi.fn();
-const colFindFirst = vi.fn();
-const colFindUnique = vi.fn();
-const colCreate = vi.fn();
-const colUpsert = vi.fn();
-const colDelete = vi.fn();
-const entFindMany = vi.fn();
-const entFindFirst = vi.fn();
-const entFindUnique = vi.fn();
-const entCreate = vi.fn();
-const entUpsert = vi.fn();
+const mocks = vi.hoisted(() => {
+  const fn = () => vi.fn();
+  const dollar = vi.fn((ops: unknown[]) => Promise.all(ops));
+  return {
+    colFindMany: fn(), colFindFirst: fn(), colFindUnique: fn(), colCreate: fn(),
+    colUpsert: fn(), colUpdate: fn(), colDelete: fn(),
+    entFindMany: fn(), entFindFirst: fn(), entFindUnique: fn(), entCreate: fn(),
+    entUpsert: fn(), entUpdate: fn(), entUpdateMany: fn(),
+    dollar,
+  };
+});
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    $transaction: mocks.dollar,
     cmsCollection: {
-      findMany: (...a: unknown[]) => colFindMany(...a),
-      findFirst: (...a: unknown[]) => colFindFirst(...a),
-      findUnique: (...a: unknown[]) => colFindUnique(...a),
-      create: (...a: unknown[]) => colCreate(...a),
-      upsert: (...a: unknown[]) => colUpsert(...a),
-      delete: (...a: unknown[]) => colDelete(...a),
+      findMany: (...a: unknown[]) => mocks.colFindMany(...a),
+      findFirst: (...a: unknown[]) => mocks.colFindFirst(...a),
+      findUnique: (...a: unknown[]) => mocks.colFindUnique(...a),
+      create: (...a: unknown[]) => mocks.colCreate(...a),
+      upsert: (...a: unknown[]) => mocks.colUpsert(...a),
+      update: (...a: unknown[]) => mocks.colUpdate(...a),
+      delete: (...a: unknown[]) => mocks.colDelete(...a),
     },
     cmsEntry: {
-      findMany: (...a: unknown[]) => entFindMany(...a),
-      findFirst: (...a: unknown[]) => entFindFirst(...a),
-      findUnique: (...a: unknown[]) => entFindUnique(...a),
-      create: (...a: unknown[]) => entCreate(...a),
-      upsert: (...a: unknown[]) => entUpsert(...a),
+      findMany: (...a: unknown[]) => mocks.entFindMany(...a),
+      findFirst: (...a: unknown[]) => mocks.entFindFirst(...a),
+      findUnique: (...a: unknown[]) => mocks.entFindUnique(...a),
+      create: (...a: unknown[]) => mocks.entCreate(...a),
+      upsert: (...a: unknown[]) => mocks.entUpsert(...a),
+      update: (...a: unknown[]) => mocks.entUpdate(...a),
+      updateMany: (...a: unknown[]) => mocks.entUpdateMany(...a),
     },
   },
 }));
@@ -40,6 +44,8 @@ vi.mock("@/lib/prisma", () => ({
 import {
   listCollections,
   upsertCollection,
+  deleteCollection,
+  deleteEntry,
   listEntries,
   upsertEntry,
   resolveDynamicPages,
@@ -52,101 +58,160 @@ import {
 } from "@server/services/cms.service";
 
 beforeEach(() => {
-  [colFindMany, colFindFirst, colFindUnique, colCreate, colUpsert, colDelete, entFindMany, entFindFirst, entFindUnique, entCreate, entUpsert].forEach(
+  [mocks.colFindMany, mocks.colFindFirst, mocks.colFindUnique, mocks.colCreate, mocks.colUpsert, mocks.colUpdate, mocks.colDelete, mocks.entFindMany, mocks.entFindFirst, mocks.entFindUnique, mocks.entCreate, mocks.entUpsert, mocks.entUpdate, mocks.entUpdateMany, mocks.dollar].forEach(
     (m) => m.mockReset(),
   );
 });
 
 describe("collections", () => {
   it("list flattens _count.entries into entryCount, scoped to the site", async () => {
-    colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Posts", _count: { entries: 4 } }]);
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Posts", _count: { entries: 4 } }]);
     const out = await listCollections("s1");
     expect(out[0]).toMatchObject({ id: "c1", entryCount: 4 });
-    expect(colFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1" });
+    expect(mocks.colFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", deletedAt: null });
   });
 
   it("upsert creates when no id", async () => {
-    colCreate.mockResolvedValueOnce({ id: "c2" });
+    mocks.colCreate.mockResolvedValueOnce({ id: "c2" });
     await upsertCollection("s1", { siteId: "s1", name: "Posts", slug: "posts", fields: [] });
-    expect(colCreate.mock.calls[0][0].data).toMatchObject({ siteId: "s1", name: "Posts", slug: "posts" });
+    expect(mocks.colCreate.mock.calls[0][0].data).toMatchObject({ siteId: "s1", name: "Posts", slug: "posts" });
   });
 
   it("upsert with id refuses a collection already owned by another site (no write)", async () => {
-    colFindUnique.mockResolvedValueOnce({ siteId: "other-site" });
+    mocks.colFindUnique.mockResolvedValueOnce({ siteId: "other-site", deletedAt: null });
     await expect(
       upsertCollection("s1", { id: "x", siteId: "s1", name: "x", slug: "x", fields: [] }),
     ).rejects.toBeInstanceOf(CmsError);
-    expect(colUpsert).not.toHaveBeenCalled();
+    expect(mocks.colUpsert).not.toHaveBeenCalled();
   });
 
   it("upsert with id creates-if-missing (engine id → DB id on first sync)", async () => {
-    colFindUnique.mockResolvedValueOnce(null);
-    colUpsert.mockResolvedValueOnce({ id: "eng-1" });
+    mocks.colFindUnique.mockResolvedValueOnce(null);
+    mocks.colCreate.mockResolvedValueOnce({ id: "eng-1" });
     await upsertCollection("s1", { id: "eng-1", siteId: "s1", name: "Posts", slug: "posts", fields: [] });
-    expect(colUpsert.mock.calls[0][0]).toMatchObject({
-      where: { id: "eng-1" },
-      create: expect.objectContaining({ id: "eng-1", siteId: "s1" }),
+    expect(mocks.colCreate.mock.calls[0][0].data).toMatchObject({ id: "eng-1", siteId: "s1", name: "Posts", slug: "posts" });
+  });
+});
+
+describe("tombstones (deletedAt, not hard delete)", () => {
+  it("deleteCollection: sets deletedAt + slug rewrite in one transaction, and tombstones its entries", async () => {
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1", slug: "blog" });
+    mocks.entUpdateMany.mockResolvedValueOnce({ count: 2 });
+    mocks.colUpdate.mockResolvedValueOnce({ id: "c1" });
+    await deleteCollection("s1", "c1");
+    expect(mocks.colUpdate.mock.calls[0][0]).toMatchObject({
+      where: { id: "c1" },
+      data: expect.objectContaining({ slug: expect.stringMatching(/^blog~deleted~c1$/) }),
     });
+    expect(mocks.dollar).toHaveBeenCalledOnce();
+  });
+
+  it("deleteEntry: sets deletedAt on the entry, never deletes the row", async () => {
+    mocks.entFindFirst.mockResolvedValueOnce({ id: "e1" });
+    mocks.entUpdate.mockResolvedValueOnce({ id: "e1" });
+    await deleteEntry("s1", "e1");
+    expect(mocks.entUpdate.mock.calls[0][0]).toMatchObject({ where: { id: "e1" } });
+    expect(mocks.entUpdate.mock.calls[0][0].data.deletedAt).toBeInstanceOf(Date);
+  });
+
+  it("upsertCollection refuses a tombstoned id with GONE", async () => {
+    mocks.colFindUnique.mockResolvedValueOnce({ siteId: "s1", deletedAt: new Date() });
+    await expect(
+      upsertCollection("s1", { id: "c1", siteId: "s1", name: "Blog", slug: "blog", fields: [] }),
+    ).rejects.toMatchObject({ code: "GONE" });
+    expect(mocks.colUpsert).not.toHaveBeenCalled();
+  });
+
+  it("upsertEntry refuses a tombstoned id with GONE", async () => {
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    mocks.entFindUnique.mockResolvedValueOnce({ deletedAt: new Date(), collection: { siteId: "s1" } });
+    await expect(
+      upsertEntry("s1", { id: "e1", siteId: "s1", collectionId: "c1", data: { title: "x" } }),
+    ).rejects.toMatchObject({ code: "GONE" });
+    expect(mocks.entUpsert).not.toHaveBeenCalled();
+  });
+
+  it("listCollections filters out tombstoned collections", async () => {
+    mocks.colFindMany.mockResolvedValueOnce([]);
+    await listCollections("s1");
+    expect(mocks.colFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", deletedAt: null });
+  });
+
+  it("upsertCollection refuses the home page (index.html) as a template", async () => {
+    mocks.colFindUnique.mockResolvedValueOnce(null);
+    await expect(
+      upsertCollection("s1", {
+        id: "c1",
+        siteId: "s1",
+        name: "B",
+        slug: "b",
+        fields: [],
+        pageSlugPattern: "/b/{slug}",
+        pageTemplatePath: "index.html",
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    expect(mocks.colCreate).not.toHaveBeenCalled();
+    expect(mocks.colUpsert).not.toHaveBeenCalled();
   });
 });
 
 describe("entries cross-site guard", () => {
   it("listEntries refuses a collection not in the site", async () => {
-    colFindFirst.mockResolvedValueOnce(null);
+    mocks.colFindFirst.mockResolvedValueOnce(null);
     await expect(listEntries("s1", "other-col")).rejects.toBeInstanceOf(CmsError);
-    expect(entFindMany).not.toHaveBeenCalled();
+    expect(mocks.entFindMany).not.toHaveBeenCalled();
   });
 
   it("upsertEntry creates after confirming the collection is in the site", async () => {
-    colFindFirst.mockResolvedValueOnce({ id: "c1" }); // assertCollectionInSite
-    entCreate.mockResolvedValueOnce({ id: "e1" });
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" }); // assertCollectionInSite
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: "Hi" } });
-    expect(entCreate.mock.calls[0][0].data).toMatchObject({ collectionId: "c1" });
+    expect(mocks.entCreate.mock.calls[0][0].data).toMatchObject({ collectionId: "c1" });
   });
 
   it("upsertEntry with id refuses an entry already under another site", async () => {
-    colFindFirst.mockResolvedValueOnce({ id: "c1" }); // target collection in site
-    entFindUnique.mockResolvedValueOnce({ collection: { siteId: "other-site" } });
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" }); // target collection in site
+    mocks.entFindUnique.mockResolvedValueOnce({ deletedAt: null, collection: { siteId: "other-site" } });
     await expect(
       upsertEntry("s1", { id: "e-x", siteId: "s1", collectionId: "c1", data: {} }),
     ).rejects.toBeInstanceOf(CmsError);
-    expect(entUpsert).not.toHaveBeenCalled();
+    expect(mocks.entUpsert).not.toHaveBeenCalled();
   });
 
   it("upsertEntry strips markup out of string field values before writing (audit S-1 class)", async () => {
-    colFindFirst.mockResolvedValueOnce({ id: "c1" });
-    entCreate.mockResolvedValueOnce({ id: "e1" });
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
     await upsertEntry("s1", {
       siteId: "s1",
       collectionId: "c1",
       data: { title: '<script>alert(1)</script>Hi', price: 12, ok: true },
     });
-    expect(entCreate.mock.calls[0][0].data.data).toEqual({ title: "Hi", price: 12, ok: true });
+    expect(mocks.entCreate.mock.calls[0][0].data.data).toEqual({ title: "Hi", price: 12, ok: true });
   });
 
   it("x4: stores text as typed — no entity encoding, stable across saves, escaped once at the page sink", async () => {
     const typed = { title: "Tom & Jerry <3", quote: 'Say "hi" > bye', literal: "AT&amp;T", math: "5 < 10", arrow: "a -> b" };
-    colFindFirst.mockResolvedValue({ id: "c1" });
-    entCreate.mockResolvedValue({ id: "e1" });
+    mocks.colFindFirst.mockResolvedValue({ id: "c1" });
+    mocks.entCreate.mockResolvedValue({ id: "e1" });
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: typed });
-    const first = entCreate.mock.calls[0][0].data.data as Record<string, unknown>;
+    const first = mocks.entCreate.mock.calls[0][0].data.data as Record<string, unknown>;
     expect(first).toEqual(typed);
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: first }); // a second save of what came back
-    expect(entCreate.mock.calls[1][0].data.data).toEqual(typed);
-    colFindFirst.mockReset();
+    expect(mocks.entCreate.mock.calls[1][0].data.data).toEqual(typed);
+    mocks.colFindFirst.mockReset();
 
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/x", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: first }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/x", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: first }]);
     const page = await generateDynamicPages("s1", "c1", "<html><head></head><body><h1>{title}</h1></body></html>");
     expect(page[0].content).toContain("<h1>Tom &amp; Jerry &lt;3</h1>");
   });
 
   it("x4: stored text never re-forms markup when a tag is cut out of the middle of one", async () => {
-    colFindFirst.mockResolvedValueOnce({ id: "c1" });
-    entCreate.mockResolvedValueOnce({ id: "e1" });
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
     const nested = "<<img src=x onerror=alert(1)>img src=x onerror=alert(1)>";
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: nested } });
-    const stored = (entCreate.mock.calls[0][0].data.data as { title: string }).title;
+    const stored = (mocks.entCreate.mock.calls[0][0].data.data as { title: string }).title;
     expect(stored).not.toMatch(/<img/i);
   });
 
@@ -155,10 +220,10 @@ describe("entries cross-site guard", () => {
     // markup after N passes by re-wrapping the tag N times over.
     let payload = "<img src=x onerror=alert(1)>";
     for (let i = 0; i < 10; i++) payload = payload.replace(/</g, "<<i>");
-    colFindFirst.mockResolvedValueOnce({ id: "c1" });
-    entCreate.mockResolvedValueOnce({ id: "e1" });
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: payload } });
-    const stored = (entCreate.mock.calls[0][0].data.data as { title: string }).title;
+    const stored = (mocks.entCreate.mock.calls[0][0].data.data as { title: string }).title;
     expect(stored).not.toMatch(/<img/i);
   });
 });
@@ -171,7 +236,7 @@ describe("CSV import", () => {
 
   describe("previewCsvImport", () => {
     it("parses headers + sample rows and suggests a mapping by slug/name (case-insensitive)", async () => {
-      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      mocks.colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
       const csv = "Name,Price\nMargherita,12\nDiavola,14";
       const out = await previewCsvImport("s1", "c1", csv);
       expect(out.headers).toEqual(["Name", "Price"]);
@@ -184,37 +249,37 @@ describe("CSV import", () => {
     });
 
     it("throws NOT_FOUND for a collection outside the site", async () => {
-      colFindFirst.mockResolvedValueOnce(null);
+      mocks.colFindFirst.mockResolvedValueOnce(null);
       await expect(previewCsvImport("s1", "nope", "a\n1")).rejects.toBeInstanceOf(CmsError);
     });
 
     it("rejects a file with a header row but no data", async () => {
-      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      mocks.colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
       await expect(previewCsvImport("s1", "c1", "Name,Price")).rejects.toThrow(/no data/);
     });
 
     it("rejects a file over the row cap", async () => {
-      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      mocks.colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
       const rows = Array.from({ length: 501 }, (_, i) => `Item ${i}`);
       const csv = ["Name", ...rows].join("\n");
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/limit is 500/);
     });
 
     it("rejects a file over the column cap", async () => {
-      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      mocks.colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
       const headers = Array.from({ length: 101 }, (_, i) => `Col${i}`).join(",");
       const csv = `${headers}\n${Array.from({ length: 101 }, () => "x").join(",")}`;
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/limit is 100/);
     });
 
     it("rejects a file with a cell over the per-cell length cap", async () => {
-      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      mocks.colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
       const csv = `Name,Price\n${"a".repeat(5001)},12`;
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
     });
 
     it("rejects a file whose HEADER cell is over the per-cell length cap, not only data cells", async () => {
-      colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
+      mocks.colFindFirst.mockResolvedValueOnce({ fields: FIELDS });
       const csv = `${"a".repeat(5001)},Price\nMargherita,12`;
       await expect(previewCsvImport("s1", "c1", csv)).rejects.toThrow(/longer than 5000 characters/);
     });
@@ -222,18 +287,18 @@ describe("CSV import", () => {
 
   describe("importCsvEntries", () => {
     it("creates one entry per row through upsertEntry, mapped by the given column mapping", async () => {
-      colFindFirst.mockResolvedValue({ id: "c1" });
-      entCreate.mockResolvedValue({ id: "e1" });
+      mocks.colFindFirst.mockResolvedValue({ id: "c1" });
+      mocks.entCreate.mockResolvedValue({ id: "e1" });
       const csv = "Name,Price\nMargherita,12\nDiavola,14";
       const out = await importCsvEntries("s1", "c1", csv, { name: "Name", price: "Price" });
       expect(out).toEqual({ imported: 2, total: 2, errors: [] });
-      expect(entCreate).toHaveBeenCalledTimes(2);
-      expect(entCreate.mock.calls[0][0].data).toMatchObject({ collectionId: "c1", data: { name: "Margherita", price: "12" } });
+      expect(mocks.entCreate).toHaveBeenCalledTimes(2);
+      expect(mocks.entCreate.mock.calls[0][0].data).toMatchObject({ collectionId: "c1", data: { name: "Margherita", price: "12" } });
     });
 
     it("reports a row with no mapped value as a per-row error without failing the rest", async () => {
-      colFindFirst.mockResolvedValue({ id: "c1" });
-      entCreate.mockResolvedValue({ id: "e1" });
+      mocks.colFindFirst.mockResolvedValue({ id: "c1" });
+      mocks.entCreate.mockResolvedValue({ id: "e1" });
       const csv = "Name,Price\nMargherita,12\n,";
       const out = await importCsvEntries("s1", "c1", csv, { name: "Name", price: "Price" });
       expect(out.imported).toBe(1);
@@ -242,36 +307,36 @@ describe("CSV import", () => {
     });
 
     it("skips a mapping whose header the file doesn't have", async () => {
-      colFindFirst.mockResolvedValue({ id: "c1" });
-      entCreate.mockResolvedValue({ id: "e1" });
+      mocks.colFindFirst.mockResolvedValue({ id: "c1" });
+      mocks.entCreate.mockResolvedValue({ id: "e1" });
       const csv = "Name\nMargherita";
       const out = await importCsvEntries("s1", "c1", csv, { name: "Name", price: "Price (not in file)" });
       expect(out.imported).toBe(1);
-      expect(entCreate.mock.calls[0][0].data.data).toEqual({ name: "Margherita" });
+      expect(mocks.entCreate.mock.calls[0][0].data.data).toEqual({ name: "Margherita" });
     });
 
     it("throws NOT_FOUND up front for a collection outside the site, before writing anything", async () => {
-      colFindFirst.mockResolvedValueOnce(null);
+      mocks.colFindFirst.mockResolvedValueOnce(null);
       await expect(importCsvEntries("s1", "nope", "a\n1", {})).rejects.toBeInstanceOf(CmsError);
-      expect(entCreate).not.toHaveBeenCalled();
+      expect(mocks.entCreate).not.toHaveBeenCalled();
     });
   });
 });
 
 describe("resolveDynamicPages", () => {
   it("returns [] for a collection that doesn't generate pages", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: null, pageSeoTitle: null, pageSeoDescription: null });
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: null, pageSeoTitle: null, pageSeoDescription: null });
     await expect(resolveDynamicPages("s1", "c1")).resolves.toEqual([]);
-    expect(entFindMany).not.toHaveBeenCalled();
+    expect(mocks.entFindMany).not.toHaveBeenCalled();
   });
 
   it("resolves slug (slugified) + pattern SEO per published entry", async () => {
-    colFindFirst.mockResolvedValueOnce({
+    mocks.colFindFirst.mockResolvedValueOnce({
       pageSlugPattern: "/blog/{title}",
       pageSeoTitle: "{title} — Acme Blog",
       pageSeoDescription: "Read about {title}.",
     });
-    entFindMany.mockResolvedValueOnce([
+    mocks.entFindMany.mockResolvedValueOnce([
       { id: "e1", data: { title: "Hello World" } },
       { id: "e2", data: { title: "Ship It!" } },
     ]);
@@ -281,19 +346,19 @@ describe("resolveDynamicPages", () => {
       { entryId: "e2", slug: "/blog/ship-it", seoTitle: "Ship It! — Acme Blog", seoDescription: "Read about Ship It!." },
     ]);
     // only PUBLISHED entries are turned into pages
-    expect(entFindMany.mock.calls[0][0].where).toMatchObject({ collectionId: "c1", status: "PUBLISHED" });
+    expect(mocks.entFindMany.mock.calls[0][0].where).toMatchObject({ collectionId: "c1", status: "PUBLISHED", deletedAt: null });
   });
 
   it("throws NOT_FOUND for a collection outside the site", async () => {
-    colFindFirst.mockResolvedValueOnce(null);
+    mocks.colFindFirst.mockResolvedValueOnce(null);
     await expect(resolveDynamicPages("s1", "nope")).rejects.toBeInstanceOf(CmsError);
   });
 });
 
 describe("generateDynamicPages", () => {
   it("renders one HTML file per published entry, substituting + escaping + injecting SEO at the slug", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: "desc {title}" });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello & World" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: "desc {title}" });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello & World" } }]);
     const out = await generateDynamicPages("s1", "c1", "<html><head></head><body><h1>{title}</h1></body></html>");
     expect(out).toHaveLength(1);
     expect(out[0].path).toBe("blog/hello-world/index.html");
@@ -303,7 +368,7 @@ describe("generateDynamicPages", () => {
   });
 
   it("returns [] for a non-page collection", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: null });
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: null });
     await expect(generateDynamicPages("s1", "c1", "<html></html>")).resolves.toEqual([]);
   });
 });
@@ -312,59 +377,59 @@ describe("generateDynamicPages — dangerous-scheme sink defence", () => {
   const TEMPLATE = '<html><head></head><body><a href="{link}">Go</a></body></html>';
 
   it("neutralizes a javascript: value substituted into an href — the published HTML carries no javascript: href", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)" } }]);
     const out = await generateDynamicPages("s1", "c1", TEMPLATE);
     expect(out[0].content).not.toContain("javascript:");
     expect(out[0].content).toContain("<a>Go</a>"); // the attribute is removed, the link text kept
   });
 
   it("catches a scheme hidden behind control characters (java\\tscript:)", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "java\tscript:alert(1)" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "java\tscript:alert(1)" } }]);
     const out = await generateDynamicPages("s1", "c1", TEMPLATE);
     expect(out[0].content).not.toMatch(/href="[^"]*script:/i);
   });
 
   it("neutralizes vbscript: and a non-image data: URL the same way", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "vbscript:msgbox(1)" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "vbscript:msgbox(1)" } }]);
     const vb = await generateDynamicPages("s1", "c1", TEMPLATE);
     expect(vb[0].content).toContain("<a>Go</a>");
 
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e2", data: { link: "data:text/html,<script>alert(1)</script>" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e2", data: { link: "data:text/html,<script>alert(1)</script>" } }]);
     const data = await generateDynamicPages("s1", "c1", TEMPLATE);
     expect(data[0].content).toContain("<a>Go</a>");
   });
 
   it("leaves a legitimate https value, and a same-site relative path, untouched", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "https://example.com/menu", n: "x" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "https://example.com/menu", n: "x" } }]);
     const out = await generateDynamicPages("s1", "c1", TEMPLATE);
     expect(out[0].content).toContain('href="https://example.com/menu"');
   });
 
   it("still allows a safe data:image URL (e.g. an inline-encoded image src)", async () => {
     const imgTemplate = '<html><head></head><body><img src="{photo}"></body></html>';
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { photo: "data:image/png;base64,AAAA", n: "x" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { photo: "data:image/png;base64,AAAA", n: "x" } }]);
     const out = await generateDynamicPages("s1", "c1", imgTemplate);
     expect(out[0].content).toContain('src="data:image/png;base64,AAAA"');
   });
 
   it("end to end: a javascript: value that entered through CSV import never reaches a published href", async () => {
     // importCsvEntries → upsertEntry (write path) → generateDynamicPages (publish-time read + substitution sink).
-    colFindFirst.mockResolvedValue({ id: "c1", fields: [{ id: "f1", name: "Link", slug: "link" }] });
-    entCreate.mockResolvedValueOnce({ id: "e1" });
+    mocks.colFindFirst.mockResolvedValue({ id: "c1", fields: [{ id: "f1", name: "Link", slug: "link" }] });
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
     const importResult = await importCsvEntries("s1", "c1", "Link\njavascript:alert(1)", { link: "Link" });
     expect(importResult.imported).toBe(1);
-    const storedData = entCreate.mock.calls[0][0].data.data as Record<string, unknown>;
+    const storedData = mocks.entCreate.mock.calls[0][0].data.data as Record<string, unknown>;
     // sanitizeEntryData (write-time) leaves plain text alone — no tags to strip.
     expect(storedData.link).toBe("javascript:alert(1)");
 
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: storedData }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{link}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: storedData }]);
     const pages = await generateDynamicPages("s1", "c1", TEMPLATE);
     expect(pages[0].content).not.toContain("javascript:");
   });
@@ -373,16 +438,16 @@ describe("generateDynamicPages — dangerous-scheme sink defence", () => {
 describe("generateDynamicPages — the four live bypass shapes of the earlier regex detector", () => {
   it("bypass 1 — unquoted href attribute", async () => {
     const template = '<html><head></head><body><a href={link}>Go</a></body></html>';
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
     const out = await generateDynamicPages("s1", "c1", template);
     expect(out[0].content).not.toMatch(/javascript:/i);
   });
 
   it("bypass 2 — a dangerous URL in a later (non-first) srcset candidate", async () => {
     const template = '<html><head></head><body><img srcset="{safe} 1x, {unsafe} 2x"></body></html>';
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { safe: "/safe.jpg", unsafe: "javascript:alert(1)", n: "x" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { safe: "/safe.jpg", unsafe: "javascript:alert(1)", n: "x" } }]);
     const out = await generateDynamicPages("s1", "c1", template);
     expect(out[0].content).not.toMatch(/javascript:/i);
     expect(out[0].content).toContain("/safe.jpg"); // the safe candidate survives — the whole attribute isn't blanked
@@ -390,16 +455,16 @@ describe("generateDynamicPages — the four live bypass shapes of the earlier re
 
   it("bypass 3 — style attribute background: url() with a dangerous scheme", async () => {
     const template = '<html><head></head><body><div style="background:url({link})">x</div></body></html>';
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
     const out = await generateDynamicPages("s1", "c1", template);
     expect(out[0].content).not.toMatch(/javascript:/i);
   });
 
   it("bypass 4 — uppercase HREF attribute name", async () => {
     const template = '<html><head></head><body><a HREF="{link}">Go</a></body></html>';
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{n}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { link: "javascript:alert(1)", n: "x" } }]);
     const out = await generateDynamicPages("s1", "c1", template);
     expect(out[0].content).not.toMatch(/javascript:/i);
   });
@@ -430,8 +495,8 @@ describe("generateDynamicPages — legitimate template markup survives the parse
     "<footer>&copy; 2026</footer></body></html>";
 
   it("clean, non-dangerous data leaves every real-world element/attribute shape untouched", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{title}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Welcome" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{title}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Welcome" } }]);
     const html = (await generateDynamicPages("s1", "c1", CLEAN_TEMPLATE))[0].content;
 
     expect(html.startsWith("<!DOCTYPE html>")).toBe(true);
@@ -454,16 +519,16 @@ describe("generateDynamicPages — legitimate template markup survives the parse
 
 describe("appendDynamicPagesToPublish", () => {
   it("is a no-op when the site has no page-generating collection", async () => {
-    colFindMany.mockResolvedValueOnce([]);
+    mocks.colFindMany.mockResolvedValueOnce([]);
     const pages = [{ path: "index.html", html: "<html></html>" }];
     await expect(appendDynamicPagesToPublish("s1", pages)).resolves.toBe(pages);
   });
 
   it("appends one generated page per entry, rendered from the matching template", async () => {
-    colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "blog/_t/index.html" }]);
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "blog/_t/index.html" }]);
     // generateDynamicPages internals:
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello World" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello World" } }]);
     const pages = [
       { path: "index.html", html: "<html></html>" },
       { path: "blog/_t/index.html", html: "<html><head></head><body>{title}</body></html>" },
@@ -479,9 +544,9 @@ describe("appendDynamicPagesToPublish", () => {
   });
 
   it("drops the template page even when the collection has no published entry yet", async () => {
-    colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "about.html" }]);
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([]);
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "about.html" }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([]);
     const pages = [
       { path: "index.html", html: "<html></html>" },
       { path: "about.html", html: "<html><body><h1>{title}</h1></body></html>" },
@@ -491,16 +556,16 @@ describe("appendDynamicPagesToPublish", () => {
   });
 
   it("keeps a home page used as a template — the site root cannot be dropped", async () => {
-    colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "index.html" }]);
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: null, pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "A" } }]);
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "index.html" }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: null, pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "A" } }]);
     const pages = [{ path: "index.html", html: "<html><head></head><body>{title}</body></html>" }];
     const out = await appendDynamicPagesToPublish("s1", pages);
     expect(out.map((p) => p.path)).toEqual(["index.html", "blog/a/index.html"]);
   });
 
   it("A-17: skips (never throws) and logs when the bound template page is not in this publish", async () => {
-    colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "missing.html" }]);
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "missing.html" }]);
     const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const pages = [{ path: "index.html", html: "<html></html>" }];
     await expect(appendDynamicPagesToPublish("s1", pages)).resolves.toEqual(pages);
@@ -511,8 +576,8 @@ describe("appendDynamicPagesToPublish", () => {
 
 describe("generateDynamicPages — A-17 title dedupe + script/style-safe substitution", () => {
   it("removes the template's own <title> and meta description before injecting the generated ones", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
     const template =
       '<html><head><title>Old Title</title><meta name="description" content="old desc"></head><body>{title}</body></html>';
     const out = await generateDynamicPages("s1", "c1", template);
@@ -524,8 +589,8 @@ describe("generateDynamicPages — A-17 title dedupe + script/style-safe substit
   });
 
   it("does not substitute {placeholder}-shaped text inside <script> or <style>", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
     const template =
       "<html><head></head><body><h1>{title}</h1>" +
       "<style>.x { content: '{title}'; }</style>" +
@@ -542,8 +607,8 @@ describe("generateDynamicPages — A-17 title dedupe + script/style-safe substit
      verbatim, before the real closing tag. Injection must land at the real
      </head>, not inside the <style> block. */
   it("injects SEO tags before the REAL </head>, not one embedded in template CSS", async () => {
-    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
-    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
     const template =
       '<html><head><style>.x::before{content:"</head>"}</style></head>' +
       "<body><h1>{title}</h1></body></html>";
@@ -557,7 +622,7 @@ describe("generateDynamicPages — A-17 title dedupe + script/style-safe substit
 
 describe("findStaleTemplateBindings (A-17)", () => {
   it("reports hasPageGeneratingCollections: false when the site has no page-generating collection", async () => {
-    colFindMany.mockResolvedValueOnce([]);
+    mocks.colFindMany.mockResolvedValueOnce([]);
     await expect(findStaleTemplateBindings("s1", [{ slug: "home", isHomePage: true }])).resolves.toEqual({
       hasPageGeneratingCollections: false,
       stale: [],
@@ -566,7 +631,7 @@ describe("findStaleTemplateBindings (A-17)", () => {
   });
 
   it("flags a collection whose template page filename matches no current page", async () => {
-    colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Blog", pageTemplatePath: "deleted-page.html" }]);
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Blog", pageTemplatePath: "deleted-page.html" }]);
     const out = await findStaleTemplateBindings("s1", [
       { slug: "home", isHomePage: true },
       { slug: "about", isHomePage: false },
@@ -579,7 +644,7 @@ describe("findStaleTemplateBindings (A-17)", () => {
   });
 
   it("does not flag a collection whose template page still exists (slug.html, or index.html for home)", async () => {
-    colFindMany.mockResolvedValueOnce([
+    mocks.colFindMany.mockResolvedValueOnce([
       { id: "c1", name: "Blog", pageTemplatePath: "about.html" },
       { id: "c2", name: "Landing", pageTemplatePath: "index.html" },
     ]);

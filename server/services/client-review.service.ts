@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
+import { latestEditAt } from "@/server/services/publish-approval";
 
 /**
  * Client sign-off — the token-authenticated half of the review loop, and the
@@ -151,6 +152,7 @@ async function requireLiveReview(token: string) {
           name: true,
           workspaceId: true,
           lastEditedAt: true,
+          cmsEditedAt: true,
           // The agency's name leads the client page ("<agency> is asking for
           // your feedback"), not the site name — the client hired the agency.
           workspace: { select: { name: true } },
@@ -219,8 +221,8 @@ export async function getReviewByToken(token: string) {
     editedSinceApproval:
       review.status === "APPROVED" &&
       review.resolvedAt !== null &&
-      review.site.lastEditedAt !== null &&
-      review.site.lastEditedAt.getTime() > review.resolvedAt.getTime(),
+      latestEditAt(review.site) !== null &&
+      (latestEditAt(review.site) as Date).getTime() > review.resolvedAt.getTime(),
   };
 }
 

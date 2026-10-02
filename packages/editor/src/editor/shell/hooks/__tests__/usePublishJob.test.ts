@@ -67,7 +67,7 @@ describe("usePublishJob", () => {
     mockGetSiteId.mockReturnValue(null);
     mockPublishSite.mockResolvedValue({ jobId: "job-1" });
     mockCancel.mockResolvedValue(undefined);
-    mockFetchSiteState.mockResolvedValue({ isPublished: false, publishedUrl: null, hasUnpublishedChanges: null, lastPublishedAt: null });
+    mockFetchSiteState.mockResolvedValue({ isPublished: false, publishedUrl: null, hasUnpublishedChanges: null, lastPublishedAt: null, lastEditedAt: null });
   });
 
   afterEach(() => {
@@ -424,6 +424,7 @@ describe("usePublishJob", () => {
         publishedUrl: "https://live.example.com",
         hasUnpublishedChanges: null,
         lastPublishedAt: null,
+        lastEditedAt: null,
       });
 
       const { result } = renderHook(() => usePublishJob());
@@ -437,7 +438,7 @@ describe("usePublishJob", () => {
 
     it("stays idle when the site is not published", async () => {
       mockGetSiteId.mockReturnValue("site-9");
-      mockFetchSiteState.mockResolvedValue({ isPublished: false, publishedUrl: null, hasUnpublishedChanges: null, lastPublishedAt: null });
+      mockFetchSiteState.mockResolvedValue({ isPublished: false, publishedUrl: null, hasUnpublishedChanges: null, lastPublishedAt: null, lastEditedAt: null });
 
       const { result } = renderHook(() => usePublishJob());
       await flushMicrotasks();
@@ -473,6 +474,7 @@ describe("usePublishJob", () => {
         publishedUrl: "https://live.example.com",
         hasUnpublishedChanges: null,
         lastPublishedAt: null,
+        lastEditedAt: null,
       });
       mockFetchStatus.mockResolvedValueOnce(statusOf("QUEUED"));
 
@@ -723,6 +725,7 @@ describe("unpublished() — the server took the site down, the hook stops saying
       publishedUrl: "https://live.example.com",
       hasUnpublishedChanges: null,
       lastPublishedAt: null,
+      lastEditedAt: null,
     });
     const { result } = renderHook(() => usePublishJob());
     await flushMicrotasks();

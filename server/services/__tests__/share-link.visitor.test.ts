@@ -175,11 +175,11 @@ describe("getShareDraftRows", () => {
     const rows = await getShareDraftRows("s1");
 
     const colWhere = vi.mocked(prisma.cmsCollection.findMany).mock.calls.at(-1)![0]!.where;
-    expect(colWhere).toEqual({ siteId: "s1", id: { in: ["notes", "posts"] } }); // "secret" (hidden page) absent
+    expect(colWhere).toEqual({ siteId: "s1", deletedAt: null, id: { in: ["notes", "posts"] } }); // "secret" (hidden page) absent; tombstones hidden (C0a Tasks 1-3)
     const entryCalls = vi.mocked(prisma.cmsEntry.findMany).mock.calls.map(([a]) => a!);
     expect(entryCalls.map((a) => a.where)).toEqual([
-      { collectionId: "notes", status: "PUBLISHED" },
-      { collectionId: "posts", status: "PUBLISHED" },
+      { collectionId: "notes", status: "PUBLISHED", deletedAt: null },
+      { collectionId: "posts", status: "PUBLISHED", deletedAt: null },
     ]);
     expect(entryCalls.every((a) => a.take === CMS_COLLECTION_LIMIT_MAX)).toBe(true);
     expect(entryCalls.every((a) => JSON.stringify(a.orderBy) === JSON.stringify({ updatedAt: "desc" }))).toBe(true);

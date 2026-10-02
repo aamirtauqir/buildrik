@@ -367,9 +367,15 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
               : undefined
           }
           onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
-          onSave={(data, published) =>
-            panel.saveRecord(collection.id, ws.recordId === "new" ? null : ws.recordId, data, published)
-          }
+          onSave={async (data, published) => {
+            const { reached } = await panel.saveRecord(
+              collection.id,
+              ws.recordId === "new" ? null : ws.recordId,
+              data,
+              published,
+            );
+            return reached;
+          }}
           onDelete={async (r) => {
             await panel.deleteRecord(r.id);
             await loadRecords(collection.id);

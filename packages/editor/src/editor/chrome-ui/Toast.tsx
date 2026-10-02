@@ -81,6 +81,9 @@ export interface ToastInput {
   title?: string;
   description: string;
   action?: ToastActionPayload;
+  /* C0a (Task 5): a second action button rendered next to `action`. The CMS
+     sync layer uses it for a "Keep mine" / "Use theirs" pair on a conflict. */
+  secondaryAction?: ToastActionPayload;
   /** ms; Infinity persists until dismissed. Default 5000; Undo toasts ≥ 8000. */
   duration?: number;
 }
@@ -274,7 +277,7 @@ function ToastItem({
   index: number;
   onDismiss: (id: string) => void;
 }) {
-  const { id, tone = "info", title, description, action, duration } = toast;
+  const { id, tone = "info", title, description, action, secondaryAction, duration } = toast;
 
   // A13-14: hover/focus pauses the auto-dismiss timer — a user mid-read (or
   // mid-Undo-click) should not have the toast vanish under their cursor.
@@ -325,6 +328,11 @@ function ToastItem({
       {action.label}
     </Button>
   ) : null;
+  const secondaryActionButton = secondaryAction ? (
+    <Button color="alternative" size="xs" onClick={secondaryAction.onClick} className={LINK_BTN_CLASS}>
+      {secondaryAction.label}
+    </Button>
+  ) : null;
   /* Library Toast `Close:B` (IconButton 24, icon/x). The catalogue shows it
      off on transients, but dismissing early is something users can do today,
      so it stays on every toast (owner rule 2026-09-24: parity never silently
@@ -367,7 +375,12 @@ function ToastItem({
                 row only — the body runs the card's full width under it. */}
             <span className="tw:pr-7 tw:text-[13px] tw:font-semibold">{title}</span>
             <span data-testid={`toast-body-${index}`} className="tw:whitespace-pre-line">{description}</span>
-            {actionButton ? <div className="tw:flex tw:gap-2 tw:-ml-2">{actionButton}</div> : null}
+            {actionButton || secondaryActionButton ? (
+              <div className="tw:flex tw:gap-2 tw:-ml-2">
+                {actionButton}
+                {secondaryActionButton}
+              </div>
+            ) : null}
           </div>
           <span className="tw:absolute tw:top-3.5 tw:right-3">{closeButton}</span>
         </>

@@ -89,8 +89,13 @@ const DEFAULT_EXPORT_FILES = [
 ];
 
 function makeOpts() {
+  /* Task 8 — exportPublishPages now reads composer.exportProject() to
+     discover cmsBindings and pick between the legacy export path and
+     the server-snapshot path. Empty bindings → legacy path, which is
+     what these fixtures exercise. */
   const composer = {
     getProjectSettings: vi.fn(() => ({ seo: { siteName: "my-cool-site" } })),
+    exportProject: vi.fn(() => ({ cmsBindings: undefined })),
   } as unknown as UseExportHandlersOptions["composer"];
   const addToast = vi.fn().mockReturnValue("toast-id");
   const setExportLoading = vi.fn();

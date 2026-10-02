@@ -79,6 +79,31 @@ export class SyncRetryQueue {
     return this.queue.size;
   }
 
+  /** Total work this queue still owes the server — queued retries AND any
+   *  in-flight mirror that hasn't resolved yet. C0a (Task 6): publish blocks
+   *  on this; an in-flight mirror has to count, or publish can hand off a row
+   *  that hasn't landed. `publishService` consults this so an unsynced CMS
+   *  edit refuses to publish even when the network call returned 200 but the
+   *  state diff has not propagated. */
+  outstandingCount(): number {
+    return this.outstandingKeys().length;
+  }
+
+  /** The targets behind `outstandingCount` — a key both queued and in flight
+   *  (a retry running) is one change, not two. */
+  outstandingKeys(): string[] {
+    return [...new Set([...this.queue.keys(), ...this.inFlight.keys()])];
+  }
+
+  /** Resolves true when the latest run for `key` reaches the server, false
+   *  when it failed and was queued. Returns true immediately if no run is
+   *  in flight and none is queued (publish is allowed to proceed). */
+  settled(key: string): Promise<boolean> {
+    const inflight = this.inFlight.get(key);
+    if (inflight) return inflight;
+    return Promise.resolve(!this.queue.has(key));
+  }
+
   /** Whether a mirror for `key` is waiting to reach the server. Hydration
    *  reads it so a newer server copy never overwrites a local change that
    *  simply has not landed yet (C-4). */
@@ -139,14 +164,10 @@ export class SyncRetryQueue {
     try {
       return await mine;
     } finally {
+      /* Only delete if this is still the latest in-flight entry — a newer
+         run on the same key keeps its own promise tracked. */
       if (this.inFlight.get(key) === mine) this.inFlight.delete(key);
     }
-  }
-
-  /** Resolves once the op in flight for `key` (if any) has settled — a
-   *  record's mirror waits for its collection's (cmsSync). */
-  async settled(key: string): Promise<void> {
-    await this.inFlight.get(key);
   }
 
   private async attempt(
@@ -224,6 +245,25 @@ export function recordServerStamp(key: string, server: Date | string, local: str
 /** Whether the server has ever confirmed this browser's copy of `key`. */
 export function hasServerStamp(key: string): boolean {
   return key in readStamps();
+}
+
+/** The server updatedAt the server last confirmed for `key`, if any — the
+ *  precondition a write sends so a teammate's newer copy is refused, not
+ *  overwritten. */
+export function serverStampOf(key: string): string | undefined {
+  return readStamps()[key]?.server;
+}
+
+/** Forget `key`'s stamp — the row is gone, or the user chose to overwrite. */
+export function forgetServerStamp(key: string): void {
+  try {
+    const stamps = readStamps();
+    if (!(key in stamps)) return;
+    delete stamps[key];
+    localStorage.setItem(STAMP_STORAGE_KEY, JSON.stringify(stamps));
+  } catch {
+    // Storage unavailable: the next write simply goes without a precondition.
+  }
 }
 
 /**
