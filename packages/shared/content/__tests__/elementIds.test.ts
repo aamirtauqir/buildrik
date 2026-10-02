@@ -5,6 +5,7 @@ import {
   copyIdKeyedRecord,
   copyIdKeyedStyles,
   copiesForRenamedIds,
+  newPageRoot,
   reidSite,
   stableElementId,
   withUniqueIds,
@@ -74,6 +75,23 @@ describe("blankPageRoot", () => {
   it("differs per page", () => {
     expect(blankPageRoot("a").id).not.toBe(blankPageRoot("b").id);
     expect(blankPageRoot("a").children).toEqual([]);
+  });
+
+  it("carries no style — a never-saved page loaded as one is not rebound", () => {
+    expect("styles" in blankPageRoot("a")).toBe(false);
+  });
+});
+
+describe("newPageRoot", () => {
+  it("is the blank root with its background bound to the page-background token", () => {
+    expect(newPageRoot("a")).toEqual({
+      ...blankPageRoot("a"),
+      styles: { "background-color": "var(--buildrick-design-color-page-background)" },
+    });
+  });
+
+  it("hands each page its own styles object", () => {
+    expect(newPageRoot("a").styles).not.toBe(newPageRoot("b").styles);
   });
 });
 

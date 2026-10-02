@@ -124,6 +124,31 @@ export function blankPageRoot(pageKey: string) {
   };
 }
 
+/**
+ * The site token a NEW page's root paints its background with, so the Page
+ * panel's Fill reads "Page / background" (board 21, owner decision
+ * 2026-10-02). The site seed carries it as `transparent` — the background
+ * every page root had before it existed — so binding it changes no pixel, and
+ * a site whose saved tokens predate it resolves the var to nothing, the same
+ * transparent. Only creation binds it: a page loaded from storage, including
+ * a never-saved `[]` page given `blankPageRoot` on load, stays unbound, so an
+ * existing site publishes exactly what it did.
+ */
+export const PAGE_BACKGROUND_TOKEN = {
+  id: "color-page-background",
+  cssVar: "--buildrick-design-color-page-background",
+} as const;
+
+/** A new page root's own styles: its background bound to the token above. */
+export function newPageRootStyles(): Record<string, string> {
+  return { "background-color": `var(${PAGE_BACKGROUND_TOKEN.cssVar})` };
+}
+
+/** The root a page is CREATED with (new site, new page). */
+export function newPageRoot(pageKey: string) {
+  return { ...blankPageRoot(pageKey), styles: newPageRootStyles() };
+}
+
 const ID_SELECTOR = /\[data-buildrick-id="([^"]+)"\]/g;
 
 /**

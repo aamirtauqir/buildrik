@@ -14,7 +14,7 @@ import { join } from "node:path";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import { ExportEngine } from "@/engine/export/ExportEngine";
-import { PAGE_BACKGROUND_TOKEN } from "@/shared/constants/defaultStyles";
+import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
 import { colourTokenLabel } from "@/editor/inspector/shared/controls/ColorInput";
 import { DEFAULT_TOKENS } from "../constants";
 import { mergeProjectTokens } from "../state/projectTokens";
