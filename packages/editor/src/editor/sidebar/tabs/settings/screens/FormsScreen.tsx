@@ -1,23 +1,40 @@
 /**
- * FormsScreen — submissions inbox.
- * Picks a form block, lists submissions paginated, lets admin
- * mark read/spam/archived or delete.
+ * FormsScreen — VISITORS › Form submissions (8136:216977 inbox; states
+ * 4418:130583 loading … 4418:131093 inbox-empty; delete 4418:131840).
  *
- * Server-side rows (Prisma FormBlock + FormSubmission); reads via
- * tRPC formsRouter (forms.listBlocks / forms.listSubmissions / etc.).
+ * One inbox for every form on the site (`Submissions · All Forms`): FORM ·
+ * FROM · RECEIVED · STATUS, a red `Delete` (asks first — a submission is a
+ * visitor's own data and the delete has no undo) and `Configure in Inspector
+ * ›`, which leaves Settings with that form selected on its page (the form is
+ * configured on the element — Q-B1 / S4 Q1: no "Add form" here). The FROM
+ * cell opens the submission's fields (marking it read), with Mark spam /
+ * Archive. `Export CSV` above the notice downloads every form's submissions
+ * (`forms.exportSubmissions`). Rows come from `forms.listBlocks` +
+ * `forms.listSubmissions` (inbox: not spam, not archived), 20 a page.
+ *
+ * A FormBlock row is created when a page with a Form is PUBLISHED: the
+ * publish worker points every action-less <form> at
+ * /api/public/forms/<siteId>/<elementId> and upserts the row under that id
+ * (lib/publish-forms.ts) — so `blockId` IS the form element's id, and that
+ * is what Configure selects.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { Field, Screen, Section, Select } from "../shared";
+import { LoadCard, SET_BTN, SET_CARD, SCREEN_EMPTY, Screen, SaveErrorBanner, pillClass, type PillTone } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { EVENTS } from "@/shared/constants/events";
+import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { Button, ConfirmDialog } from "@/editor/chrome-ui";
 
 interface FormBlockRow {
   id: string;
+  /** The form element's id on its page (the published endpoint's key). */
+  blockId: string;
+  pageId: string | null;
   name: string;
   isActive: boolean;
   _count: { submissions: number };
@@ -44,6 +61,7 @@ interface SubmissionsPage {
 }
 
 const PER_PAGE = 20;
+const CARD_LINE = "What visitors sent through your forms.";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
@@ -51,186 +69,179 @@ function getClient() {
   return _client;
 }
 
-type Filter = "inbox" | "unread" | "spam" | "archived";
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** `2 Jul, 19:41` — the board's received stamp, local time. */
+export function receivedAt(iso: string | Date): string {
+  const d = typeof iso === "string" ? new Date(iso) : iso;
+  if (Number.isNaN(d.getTime())) return "—";
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${d.getDate()} ${MONTHS[d.getMonth()]}, ${hh}:${mm}`;
+}
 
-export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** FROM: the first field that holds an email address, else the submission's summary. */
+export function fromOf(data: Record<string, unknown>): string {
+  const email = Object.values(data).find((v) => typeof v === "string" && EMAIL.test(v.trim()));
+  return typeof email === "string" ? email.trim() : summarize(data);
+}
+
+const STATUS: (s: SubmissionRow) => { label: string; tone: PillTone } = (s) =>
+  s.isSpam ? { label: "Spam", tone: "error" } : s.isRead ? { label: "Read", tone: "success" } : { label: "New", tone: "neutral" };
+
+export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirtyChange, onLoadStateChange }) => {
   const [forms, setForms] = React.useState<FormBlockRow[]>([]);
-  const [selectedFormId, setSelectedFormId] = React.useState<string>("");
-  const [formsLoading, setFormsLoading] = React.useState(true);
-  const [formsError, setFormsError] = React.useState<string | null>(null);
+  const [formsState, setFormsState] = React.useState<"loading" | "ready" | "error">(projectId ? "loading" : "ready");
+  const [attempt, setAttempt] = React.useState(0);
 
-  const [filter, setFilter] = React.useState<Filter>("inbox");
   const [page, setPage] = React.useState(1);
   const [submissions, setSubmissions] = React.useState<SubmissionsPage | null>(null);
   const [subsLoading, setSubsLoading] = React.useState(false);
   const [subsError, setSubsError] = React.useState<string | null>(null);
+  const [actionError, setActionError] = React.useState<string | null>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
-  // A submission is a visitor's own data and the delete is a server mutation
-  // with no undo, so the row button opens this instead of firing it.
   const [pendingDelete, setPendingDelete] = React.useState<SubmissionRow | null>(null);
   const [exporting, setExporting] = React.useState(false);
 
-  // Reset form selection when the site changes — keeping a stale formBlockId
-  // from the previous site sends `{ siteId: new, formBlockId: oldSiteForm }`
-  // and silently returns an empty inbox.
   React.useEffect(() => {
-    setSelectedFormId("");
-  }, [projectId]);
+    onDirtyChange?.(false);
+  }, [onDirtyChange]);
 
-  // Initial form-blocks load.
+  const reportRef = React.useRef(onLoadStateChange);
+  reportRef.current = onLoadStateChange;
+
+  // The forms, once per site (and per Try again).
   React.useEffect(() => {
     if (!projectId) {
       setForms([]);
-      setFormsLoading(false);
+      setFormsState("ready");
       return;
     }
-    setFormsLoading(true);
-    setFormsError(null);
+    let stale = false;
+    setFormsState("loading");
+    reportRef.current?.("loading");
     getClient()
       .forms.listBlocks.query({ siteId: projectId })
       .then((list) => {
-        const rows = list as FormBlockRow[];
-        setForms(rows);
-        // Reconcile selection: pick first form when nothing is selected, OR when
-        // the previous selection isn't valid for this site (post-projectId reset).
-        if (rows.length > 0) {
-          setSelectedFormId((prev) =>
-            prev && rows.some((r) => r.id === prev) ? prev : rows[0].id,
-          );
-        }
+        if (stale) return;
+        setForms(list as FormBlockRow[]);
+        setFormsState("ready");
+        reportRef.current?.("ready");
       })
-      .catch((e) => setFormsError(e instanceof Error ? e.message : "Failed to load forms."))
-      .finally(() => setFormsLoading(false));
-  }, [projectId]);
+      .catch(() => {
+        if (stale) return;
+        setFormsState("error");
+        reportRef.current?.("error");
+      });
+    return () => {
+      stale = true;
+    };
+  }, [projectId, attempt]);
 
-  // Submissions load whenever form/filter/page changes.
   const loadSubs = React.useCallback(async () => {
-    if (!projectId || !selectedFormId) {
+    if (!projectId || formsState !== "ready" || forms.length === 0) {
       setSubmissions(null);
       return;
     }
     setSubsLoading(true);
     setSubsError(null);
     try {
-      const page1 = await getClient().forms.listSubmissions.query({
+      const result = await getClient().forms.listSubmissions.query({
         siteId: projectId,
-        formBlockId: selectedFormId,
         page,
         perPage: PER_PAGE,
-        ...(filter === "unread" ? { isRead: false, isArchived: false, isSpam: false } : {}),
-        ...(filter === "spam" ? { isSpam: true } : {}),
-        ...(filter === "archived" ? { isArchived: true } : {}),
-        ...(filter === "inbox" ? { isArchived: false, isSpam: false } : {}),
+        isArchived: false,
+        isSpam: false,
       });
-      setSubmissions(page1 as SubmissionsPage);
+      setSubmissions(result as SubmissionsPage);
     } catch (e) {
       setSubsError(e instanceof Error ? e.message : "Failed to load submissions.");
     } finally {
       setSubsLoading(false);
     }
-  }, [projectId, selectedFormId, filter, page]);
+  }, [projectId, formsState, forms.length, page]);
 
   React.useEffect(() => {
     void loadSubs();
   }, [loadSubs]);
 
-  // When form/filter changes, reset to page 1.
-  React.useEffect(() => {
-    setPage(1);
-    setExpandedId(null);
-  }, [selectedFormId, filter]);
-
-  const handleUpdate = async (id: string, patch: { isRead?: boolean; isSpam?: boolean; isArchived?: boolean }) => {
+  const update = async (id: string, patch: { isRead?: boolean; isSpam?: boolean; isArchived?: boolean }) => {
+    setActionError(null);
     try {
       await getClient().forms.updateSubmission.mutate({ id, ...patch });
-      // Filtering is server-side — patching a row in place leaves stale entries in
-      // the list (e.g. an "unread" tab still shows a row that was just marked read,
-      // a "spam" toggle keeps the row visible in the inbox until next refresh).
-      // Refetch keeps the visible set honest with the current filter.
       await loadSubs();
     } catch (e) {
-      setSubsError(e instanceof Error ? e.message : "Failed to update submission.");
+      setActionError(e instanceof Error ? e.message : "Failed to update submission.");
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const remove = async (id: string) => {
+    setActionError(null);
     try {
       await getClient().forms.deleteSubmission.mutate({ id });
-      // After deleting the last row of the current page, page index can exceed
-      // the new totalPages. Step back one page in that case so the user lands
-      // somewhere with content. Otherwise refetch the current page.
-      const remainingTotal = Math.max(0, (submissions?.total ?? 0) - 1);
-      const newTotalPages = Math.max(1, Math.ceil(remainingTotal / PER_PAGE));
-      if (page > newTotalPages) {
-        setPage(newTotalPages);
-      } else {
-        await loadSubs();
-      }
+      // The last row of a later page: step back so the user lands on content.
+      const remaining = Math.max(0, (submissions?.total ?? 0) - 1);
+      const lastPage = Math.max(1, Math.ceil(remaining / PER_PAGE));
+      if (page > lastPage) setPage(lastPage);
+      else await loadSubs();
     } catch (e) {
-      setSubsError(e instanceof Error ? e.message : "Failed to delete submission.");
+      setActionError(e instanceof Error ? e.message : "Failed to delete submission.");
     }
   };
 
-  // #22 S-tier wire (2026-06-24): the server `forms.exportSubmissions` query
-  // existed but no UI called it. Pull the CSV for the selected form (full
-  // dataset, not the current page) and trigger a browser download.
-  const handleExport = async () => {
+  const exportCsv = async () => {
     if (!projectId) return;
-    setSubsError(null);
+    setActionError(null);
     setExporting(true);
     try {
-      const csv = await getClient().forms.exportSubmissions.query({
-        siteId: projectId,
-        formBlockId: selectedFormId || undefined,
-        format: "csv",
-      });
+      const csv = await getClient().forms.exportSubmissions.query({ siteId: projectId, format: "csv" });
       if (!csv) {
-        setSubsError("No submissions to export.");
+        setActionError("No submissions to export.");
         return;
       }
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
       const a = document.createElement("a");
-      const formName = forms.find((f) => f.id === selectedFormId)?.name ?? "submissions";
       a.href = url;
-      a.download = `${formName.replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}-submissions.csv`;
-      document.body.appendChild(a);
+      a.download = "form-submissions.csv";
       a.click();
-      a.remove();
       URL.revokeObjectURL(url);
     } catch (e) {
-      setSubsError(e instanceof Error ? e.message : "Failed to export submissions.");
+      setActionError(e instanceof Error ? e.message : "Failed to export submissions.");
     } finally {
       setExporting(false);
     }
   };
 
+  /* Configure in Inspector ›: the form's page, then the element, then a panel
+     that shows the canvas — Settings is full-page, so leaving it is the move. */
+  const configure = (form: FormBlockRow | undefined) => {
+    if (!composer || !form) return;
+    const outcome = locateComment(composer, { pageId: form.pageId, targetSelector: form.blockId });
+    if (outcome === "gone") {
+      setActionError(`${form.name} is no longer on its page. Publish again to refresh this list.`);
+      return;
+    }
+    composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "layers" });
+  };
+
   if (!projectId) {
     return (
       <Screen>
-        <Section title="Forms">
-          <div className={EMPTY}>Open this site from the dashboard to manage forms.</div>
-        </Section>
+        <div className={SCREEN_EMPTY}>Open this site from the dashboard to manage forms.</div>
       </Screen>
     );
   }
 
-  if (formsLoading) {
+  if (formsState !== "ready") {
     return (
       <Screen>
-        <Section title="Forms">
-          <div className={EMPTY}>Loading forms…</div>
-        </Section>
-      </Screen>
-    );
-  }
-
-  if (formsError) {
-    return (
-      <Screen>
-        <Section title="Forms">
-          <div role="alert" className={ERROR_BOX}>{formsError}</div>
-        </Section>
+        <LoadCard
+          title="Form submissions"
+          line={CARD_LINE}
+          state={formsState}
+          errorLine="Couldn't load your forms. Check your connection, then try again."
+          onRetry={() => setAttempt((n) => n + 1)}
+        />
       </Screen>
     );
   }
@@ -238,120 +249,128 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
   if (forms.length === 0) {
     return (
       <Screen>
-        {/* A FormBlock row is created when a page with a Form is PUBLISHED:
-            the publish worker points every action-less <form> at
-            /api/public/forms/<siteId>/<elementId> and upserts the row under
-            that id (lib/publish-forms.ts, a10f19233). Before that first
-            publish there is nothing to list — the copy says so. */}
-        <Section
-          title="Forms"
-          desc="Publish a page with a Form block and its submissions arrive here."
-        >
-          <div className={EMPTY}>No forms yet.</div>
-        </Section>
+        {/* No FormBlock row exists before the first publish — see the header. */}
+        <section className={CARD} data-testid="set-forms-empty">
+          <h3 className={TITLE}>Submissions · All Forms</h3>
+          <p className={MUTED_13}>Publish a page with a Form block and its submissions arrive here.</p>
+          <div className={SCREEN_EMPTY}>No forms yet.</div>
+        </section>
       </Screen>
     );
   }
 
+  const formById = new Map(forms.map((f) => [f.id, f]));
   const totalPages = submissions ? Math.max(1, Math.ceil(submissions.total / PER_PAGE)) : 1;
+  const rows = submissions?.data ?? [];
 
   return (
     <Screen>
-      <Section title="Form" desc="Select a form to view its submissions inbox.">
-        <Field label="Form">
-          <Select value={selectedFormId} onChange={(e) => setSelectedFormId(e.target.value)}>
-            {forms.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.name} ({f._count.submissions})
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <div className={FILTER_ROW} role="tablist" aria-label="Submission filter">
-          {(["inbox", "unread", "spam", "archived"] as const).map((f) => (
-            <Button
-              key={f}
-              type="button"
-              size="xs"
-              color={filter === f ? undefined : "light"}
-              role="tab"
-              aria-selected={filter === f}
-              onClick={() => setFilter(f)}
-              className={CHIP}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </Button>
-          ))}
-        </div>
-      </Section>
+      {actionError ? <SaveErrorBanner message={actionError} /> : null}
+      <div className="tw:flex tw:h-8 tw:items-center">
+        <Button
+          type="button"
+          size="xs"
+          variant="ghost"
+          className={GHOST}
+          onClick={() => void exportCsv()}
+          disabled={exporting || subsLoading || !submissions || submissions.total === 0}
+          data-testid="set-forms-export"
+        >
+          {exporting ? "Exporting…" : "Export CSV"}
+        </Button>
+      </div>
+      <div className={NOTICE} role="note" data-testid="set-forms-notice">
+        Submissions are live records. Restoring a draft does not change this inbox.
+      </div>
 
-      {/* Board 640:3463 heads this card SUBMISSIONS, flat. The count is the
-          product's own and is left standing; the ANCHOR is pinned so it does
-          not change with the rows. */}
-      <Section
-        title={`Submissions${submissions ? ` (${submissions.total})` : ""}`}
-        anchor="submissions"
-      >
-        <div className="tw:flex tw:justify-end tw:mb-2">
-          <Button
-            color="light"
-            size="xs"
-            type="button"
-            onClick={handleExport}
-            disabled={exporting || subsLoading || !submissions || submissions.total === 0} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-          >
-            {exporting ? "Exporting…" : "Export CSV"}
-          </Button>
-        </div>
-        {subsLoading && <div className={EMPTY}>Loading…</div>}
-        {!subsLoading && subsError && (
-          /* F11 — the error used to be a dead end: it named the failure and
-             offered nothing, so a transient network blip cost the user the
-             whole screen. `loadSubs` is already a stable useCallback, so the
-             retry is the same call that failed, with the form and filter it
-             was made under still selected. */
-          <div role="alert" className={ERROR_BOX}>
+      <section className={CARD} data-testid="set-card-submissions">
+        <h3 className={TITLE}>Submissions · All Forms</h3>
+        {subsLoading ? <div className={SCREEN_EMPTY}>Loading…</div> : null}
+        {!subsLoading && subsError ? (
+          <div role="alert" className={`${SCREEN_EMPTY} tw:flex tw:items-center tw:gap-3`}>
             <span>{subsError}</span>
-            <Button
-              size="xs"
-              color="light"
-              onClick={() => { void loadSubs(); }}
-              className="tw:ml-3 tw:border-transparent tw:bg-transparent tw:underline"
-              data-testid="subs-error-retry"
-            >
+            <Button type="button" size="xs" variant="ghost" className={GHOST} onClick={() => void loadSubs()} data-testid="subs-error-retry">
               Retry
             </Button>
           </div>
-        )}
-        {!subsLoading && !subsError && submissions && submissions.data.length === 0 && (
-          <div className={EMPTY}>No submissions in {filter}.</div>
-        )}
-        {!subsLoading && submissions && submissions.data.length > 0 && (
-          <ul className={LIST}>
-            {submissions.data.map((s) => {
-              const isExpanded = expandedId === s.id;
+        ) : null}
+        {!subsLoading && !subsError && submissions && rows.length === 0 ? (
+          <div className={SCREEN_EMPTY} data-testid="set-forms-inbox-empty">
+            No submissions yet. They appear here as visitors send your forms.
+          </div>
+        ) : null}
+        {!subsLoading && rows.length > 0 ? (
+          <div role="table" aria-label="Form submissions" className="tw:w-full" data-testid="set-forms-table">
+            <div role="row" className={HEAD}>
+              <span role="columnheader">Form</span>
+              <span role="columnheader">From</span>
+              <span role="columnheader">Received</span>
+              <span role="columnheader">Status</span>
+              <span role="columnheader">Actions</span>
+              <span role="columnheader">Configuration</span>
+            </div>
+            {rows.map((s) => {
+              const form = formById.get(s.formBlockId);
+              const status = STATUS(s);
+              const open = expandedId === s.id;
               return (
-                <li key={s.id} className={`${ROW} ${s.isRead ? "tw:border-l-[var(--bk-gray-300)]" : "tw:border-l-blue-700"}`}>
-                  <Button
-                    type="button"
-                    color="light"
-                    onClick={() => {
-                      setExpandedId(isExpanded ? null : s.id);
-                      if (!s.isRead) void handleUpdate(s.id, { isRead: true });
-                    }}
-                    className={ROW_BTN}
-                    aria-expanded={isExpanded}
-                  >
-                    <div className={SUMMARY_ROW}>
-                      <span className={`${SUBJECT} ${s.isRead ? "tw:text-[var(--bk-ink-soft)] tw:font-medium" : "tw:text-[var(--bk-ink)] tw:font-semibold"}`}>
-                        {summarize(s.data)}
+                <div key={s.id} role="rowgroup" data-testid={`set-forms-row-${s.id}`}>
+                  <div role="row" className={ROW}>
+                    <span role="cell" className="tw:truncate">
+                      {form?.name ?? s.formBlock?.name ?? "Form"}
+                    </span>
+                    <span role="cell" className="tw:min-w-0">
+                      <Button
+                        type="button"
+                        size="xs"
+                        variant="ghost"
+                        className={FROM_BTN}
+                        aria-expanded={open}
+                        onClick={() => {
+                          setExpandedId(open ? null : s.id);
+                          if (!s.isRead) void update(s.id, { isRead: true });
+                        }}
+                        data-testid={`set-forms-open-${s.id}`}
+                      >
+                        <span className="tw:truncate">{fromOf(s.data)}</span>
+                      </Button>
+                    </span>
+                    <span role="cell" className="tw:text-[var(--bk-ink-soft)]">
+                      {receivedAt(s.createdAt)}
+                    </span>
+                    <span role="cell">
+                      <span className={pillClass(status.tone)} data-testid={`set-forms-status-${s.id}`}>
+                        {status.label}
                       </span>
-                      <span className={MONO_MICRO}>{formatTime(s.createdAt)}</span>
-                    </div>
-                    {s.sourceUrl && <div className={SOURCE}>{s.sourceUrl}</div>}
-                  </Button>
-                  {isExpanded && (
-                    <div className={DETAIL}>
+                    </span>
+                    <span role="cell" className="tw:flex tw:justify-end">
+                      <Button
+                        type="button"
+                        size="xs"
+                        variant="danger"
+                        className={DELETE_BTN}
+                        onClick={() => setPendingDelete(s)}
+                        data-testid={`set-forms-delete-${s.id}`}
+                      >
+                        Delete
+                      </Button>
+                    </span>
+                    <span role="cell">
+                      <Button
+                        type="button"
+                        size="xs"
+                        variant="ghost"
+                        className={CONFIGURE}
+                        disabled={!form || !composer}
+                        onClick={() => configure(form)}
+                        data-testid={`set-forms-configure-${s.id}`}
+                      >
+                        Configure in Inspector ›
+                      </Button>
+                    </span>
+                  </div>
+                  {open ? (
+                    <div className={DETAIL} data-testid={`set-forms-detail-${s.id}`}>
                       <dl className={DL}>
                         {Object.entries(s.data).map(([k, v]) => (
                           <React.Fragment key={k}>
@@ -360,64 +379,50 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                           </React.Fragment>
                         ))}
                       </dl>
-                      <div className={ACTIONS}>
-                        {!s.isSpam && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
-                            Mark spam
-                          </Button>
-                        )}
-                        {s.isSpam && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
-                            Not spam
-                          </Button>
-                        )}
-                        {!s.isArchived && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
-                            Archive
-                          </Button>
-                        )}
-                        {s.isArchived && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
-                            Unarchive
-                          </Button>
-                        )}
-                        <Button color="light" size="xs" type="button" onClick={() => setPendingDelete(s)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
-                          Delete
+                      {s.sourceUrl ? <div className={MUTED_12}>Sent from {s.sourceUrl}</div> : null}
+                      <div className="tw:flex tw:gap-1">
+                        <Button type="button" size="xs" variant="ghost" className={GHOST} onClick={() => void update(s.id, { isSpam: true })}>
+                          Mark spam
+                        </Button>
+                        <Button type="button" size="xs" variant="ghost" className={GHOST} onClick={() => void update(s.id, { isArchived: true })}>
+                          Archive
                         </Button>
                       </div>
                     </div>
-                  )}
-                </li>
+                  ) : null}
+                </div>
               );
             })}
-          </ul>
-        )}
-        {submissions && submissions.total > PER_PAGE && (
-          <div className={PAGINATION}>
+          </div>
+        ) : null}
+        {submissions && submissions.total > PER_PAGE ? (
+          <div className="tw:flex tw:items-center tw:justify-center tw:gap-2">
             <Button
-              color="light"
-              size="xs"
               type="button"
+              size="xs"
+              variant="ghost"
+              className={GHOST}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || subsLoading} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+              disabled={page <= 1 || subsLoading}
             >
               ← Prev
             </Button>
-            <span className={PAGE_LABEL}>
+            <span className={MUTED_12}>
               Page {page} of {totalPages}
             </span>
             <Button
-              color="light"
-              size="xs"
               type="button"
+              size="xs"
+              variant="ghost"
+              className={GHOST}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages || subsLoading} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+              disabled={page >= totalPages || subsLoading}
             >
               Next →
             </Button>
           </div>
-        )}
-      </Section>
+        ) : null}
+      </section>
 
       <ConfirmDialog
         open={pendingDelete !== null}
@@ -425,7 +430,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
         onConfirm={() => {
           const target = pendingDelete;
           setPendingDelete(null);
-          if (target) void handleDelete(target.id);
+          if (target) void remove(target.id);
         }}
         title="Delete this submission?"
         message={
@@ -449,46 +454,32 @@ function summarize(data: Record<string, unknown>): string {
   return firstEntry ? String(firstEntry).slice(0, 80) : "(empty)";
 }
 
-function formatTime(iso: string | Date): string {
-  const d = typeof iso === "string" ? new Date(iso) : iso;
-  if (isNaN(d.getTime())) return "—";
-  const now = Date.now();
-  const diff = now - d.getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d`;
-  return d.toLocaleDateString();
-}
-
-/* `filterChipStyles` and `rowStyles` were aliases of their own base with no
-   difference at all — a read/unread and active/idle distinction that existed in
-   the names and nowhere in the values. Both states are real class ternaries
-   now, so the difference is in the pixels rather than only the identifier. */
-const EMPTY =
-  "tw:px-3.5 tw:py-3 tw:text-xs tw:text-[var(--bk-ink-muted)] tw:bg-[var(--bk-gray-50)] tw:border tw:border-dashed tw:border-[var(--bk-gray-300)] tw:rounded-md";
-const ERROR_BOX =
-  "tw:mt-1 tw:px-2.5 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:[font-family:var(--bk-font-ui)] " +
-  "tw:text-[var(--bk-error)] tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:rounded-md";
-const FILTER_ROW = "tw:flex tw:gap-1 tw:mt-2 tw:flex-wrap";
-const CHIP = "tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-medium tw:rounded-full";
-const LIST = "tw:list-none tw:p-0 tw:m-0 tw:flex tw:flex-col tw:gap-1";
-const ROW = "tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-gray-300)] tw:rounded-md tw:overflow-hidden tw:border-l-[3px]";
-const ROW_BTN =
-  "tw:block tw:w-full tw:px-2.5 tw:py-2 tw:text-left tw:bg-transparent tw:border-0 tw:cursor-pointer tw:font-inherit";
-const SUMMARY_ROW = "tw:flex tw:justify-between tw:items-center tw:gap-2";
-const SUBJECT = "tw:text-xs tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
-const MONO_MICRO = "tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)] tw:flex-none";
-const SOURCE =
-  "tw:mt-0.5 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
-const DETAIL = "tw:px-2.5 tw:pt-2 tw:pb-2.5 tw:border-t tw:border-[var(--bk-gray-300)] tw:bg-white";
-const DL = "tw:grid tw:[grid-template-columns:minmax(80px,25%)_1fr] tw:gap-x-2 tw:gap-y-1 tw:m-0 tw:p-0";
-const DT =
-  "tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)] tw:pt-0.5";
-const DD = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink)] tw:break-words";
-const ACTIONS = "tw:flex tw:gap-1 tw:mt-2.5 tw:flex-wrap";
-const PAGINATION = "tw:flex tw:items-center tw:justify-center tw:gap-2 tw:mt-2.5";
-const PAGE_LABEL = "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+/* 8136:216977: the card — 24 in, 16 between rows, title 16/600. */
+const CARD = `${SET_CARD} tw:flex tw:flex-col tw:gap-4 tw:p-6`;
+const TITLE =
+  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
+const MUTED_13 = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const MUTED_12 = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* The info notice: accent tint, 16/12 in, a 4 radius, 13/20 ink. */
+const NOTICE =
+  "tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const GHOST = `${SET_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
+/* FORM 136 · FROM 228 · RECEIVED 144 · STATUS 84 · ACTIONS 80 · CONFIGURATION 188, 12 apart. */
+const COLS = "tw:grid tw:grid-cols-[136px_228px_144px_84px_80px_188px] tw:items-center tw:gap-x-3";
+const HEAD =
+  `${COLS} tw:border-b tw:border-[var(--bk-border)] tw:pb-1 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase ` +
+  "tw:leading-4 tw:tracking-[0.08em] tw:text-[var(--bk-ink-muted)]";
+const ROW = `${COLS} tw:py-1.5 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]`;
+const FROM_BTN =
+  "tw:h-auto tw:max-w-full tw:justify-start tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal " +
+  "tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline tw:focus:ring-0 " +
+  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const DELETE_BTN = `${SET_BTN} tw:w-20`;
+const CONFIGURE =
+  "tw:h-auto tw:justify-start tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 " +
+  "tw:text-[var(--bk-accent)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline tw:focus:ring-0 " +
+  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const DETAIL = "tw:mb-2 tw:flex tw:flex-col tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:p-3";
+const DL = "tw:m-0 tw:grid tw:grid-cols-[minmax(80px,25%)_1fr] tw:gap-x-2 tw:gap-y-1 tw:p-0";
+const DT = "tw:text-[length:var(--bk-text-11)] tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
+const DD = "tw:m-0 tw:break-words tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink)]";
