@@ -61,7 +61,10 @@ import {
   SAVE_CONFLICT_CLEARED_EVENT,
   getPendingConflictToken,
   isSaveConflictPending,
+  siteColumnsLoaded,
 } from "../BuildrikSyncProvider";
+import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
+import { publishSite } from "../PublishService";
 
 /* saveProject refuses a site whose project never loaded — the guard that stops
    a failed load from overwriting the stored pages with the fallback. Save
@@ -612,6 +615,127 @@ function withSettings(settings: ProjectData["settings"]): ProjectData {
   return { version: "1.0", pages: [], styles: [], assets: [], settings };
 }
 
+/* SA-01: the Site columns are the only source for the fields they back. The
+   project JSON's copy is what the editor used to save verbatim — an EDITOR's
+   edit that the ADMIN-only mirror never sent, or a value the dashboard has
+   since cleared — so a NULL column must not let it back in on load. */
+describe("loadProject — column-backed settings come from the columns only (SA-01)", () => {
+  const STALE_JSON = {
+    seo: {
+      siteName: "old", favicon: "old", language: "old", metaTitle: "old", metaDescription: "old",
+      metaTitleTemplate: "old", defaultOgImage: "old", allowIndexing: false, robotsTxt: "old",
+      touchIcon: "old", socialLinks: { twitter: "old" }, twitterHandle: "@kept",
+    },
+    customCode: { headScripts: "old", bodyScripts: "old", globalCss: ".kept{}" },
+    publishing: { publishedPassword: "old", provider: "vercel" },
+  };
+
+  beforeEach(() => {
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "T", projectSettings: STALE_JSON });
+    mocks.pagesListQuery.mockResolvedValue([]);
+  });
+
+  it("a NULL metaTitle column leaves seo.metaTitle undefined, not the JSON value", async () => {
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({ name: "T", metaTitle: null, plan: "FREE" });
+    const project = await loadProject("s1");
+    expect(project.settings?.seo?.metaTitle).toBeUndefined();
+  });
+
+  it("no field of SITE_COLUMN_FIELDS keeps its JSON value; project-only fields do", async () => {
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({
+      name: "T", favicon: null, defaultLocale: "en", metaTitle: null, metaDescription: null,
+      metaTitleTemplate: null, ogImage: null, allowIndexing: true, robotsTxt: null, touchIcon: null,
+      socialLinks: null, headCode: null, bodyCode: null, publishedPassword: null, plan: "FREE",
+    });
+    const project = await loadProject("s1");
+    const settings = project.settings as unknown as Record<string, Record<string, unknown>>;
+    for (const field of SITE_COLUMN_FIELDS) {
+      const [section, key] = field.split(".");
+      expect(settings[section]?.[key], field).not.toEqual(
+        (STALE_JSON as unknown as Record<string, Record<string, unknown>>)[section][key],
+      );
+    }
+    expect(project.settings?.seo).toMatchObject({ siteName: "T", language: "en", allowIndexing: true, twitterHandle: "@kept" });
+    // CustomCodeConfig's strings are required — an empty column reads as "".
+    expect(project.settings?.customCode).toEqual({ headScripts: "", bodyScripts: "", globalCss: ".kept{}" });
+    expect(project.settings?.publishing).toEqual({ provider: "vercel" });
+  });
+
+  it("the JSON copy stays out when the columns could not be read at all", async () => {
+    mocks.siteDetailSettingsGetQuery
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockRejectedValueOnce(new Error("offline"));
+    const project = await loadProject("s1");
+    expect(project.settings?.seo?.metaTitle).toBeUndefined();
+    expect(project.settings?.customCode?.headScripts).toBe("");
+    expect(project.settings?.seo?.twitterHandle).toBe("@kept");
+  });
+
+  it("a NULL column loaded over a JSON value is not a change: the next save mirrors nothing", async () => {
+    mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
+    mocks.siteDetailSettingsUpdateMutate.mockClear();
+    setBaselineLastEditedAt(null);
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({
+      name: "T", defaultLocale: "en", metaTitle: null, headCode: null, allowIndexing: true, plan: "PRO",
+    });
+    const loaded = await loadProject("s1");
+
+    await saveProject("s1", loaded);
+    expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
+
+    const edited = { ...loaded, settings: { ...loaded.settings, seo: { ...loaded.settings?.seo, metaTitle: "Typed" } } };
+    await saveProject("s1", edited);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({ id: "s1", metaTitle: "Typed" });
+  });
+});
+
+/* SA-01 fix round 1: with the columns the only source, a settings read that
+   fails leaves the <head> fields empty — so the read is retried once, and a
+   session that still has no columns may not publish what it renders. */
+describe("loadProject — a failed site-settings read (SA-01)", () => {
+  const REFUSAL = "Site settings didn't load. Reload the editor before publishing.";
+
+  beforeEach(() => {
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s9", name: "T", projectSettings: {} });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    mocks.siteDetailSettingsGetQuery.mockReset().mockResolvedValue(null);
+  });
+
+  it("a failed read and a failed retry leave the site degraded, and publish is refused", async () => {
+    mocks.siteDetailSettingsGetQuery
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockRejectedValueOnce(new Error("offline"));
+    await loadProject("s9");
+
+    expect(mocks.siteDetailSettingsGetQuery).toHaveBeenCalledTimes(2);
+    expect(siteColumnsLoaded("s9")).toBe(false);
+    await expect(publishSite("s9", [{ path: "index.html", html: "<html></html>" }])).rejects.toThrow(REFUSAL);
+  });
+
+  it("a failed read and a successful retry load the columns normally", async () => {
+    mocks.siteDetailSettingsGetQuery
+      .mockRejectedValueOnce(new Error("blip"))
+      .mockResolvedValueOnce({ name: "T", metaTitleTemplate: "{page_title} — T", plan: "PRO" });
+    const project = await loadProject("s9");
+
+    expect(mocks.siteDetailSettingsGetQuery).toHaveBeenCalledTimes(2);
+    expect(siteColumnsLoaded("s9")).toBe(true);
+    expect(project.settings?.seo?.metaTitleTemplate).toBe("{page_title} — T");
+    expect(getEditorPlanTier()).toBe("pro");
+  });
+
+  it("a later load that reads the columns clears the degraded state", async () => {
+    mocks.siteDetailSettingsGetQuery
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockRejectedValueOnce(new Error("offline"));
+    await loadProject("s9");
+    expect(siteColumnsLoaded("s9")).toBe(false);
+
+    await loadProject("s9");
+    expect(siteColumnsLoaded("s9")).toBe(true);
+  });
+});
+
 describe("saveProject dual-save routing (P0.2b)", () => {
   beforeEach(async () => {
     await loadedSite("s1");
@@ -637,7 +761,8 @@ describe("saveProject dual-save routing (P0.2b)", () => {
       metaTitle: "My Title",
       metaDescription: "Desc",
       headCode: "<script>h()</script>",
-      bodyCode: "",
+      // SA-01: the load read the (empty) columns, so the baseline already
+      // holds bodyCode "" — an unchanged empty field is not sent.
     });
     expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(1);
   });

@@ -8,7 +8,7 @@
  */
 
 import { createBuildrikApiClient } from "./api-client";
-import { settledBaselineLastEditedAt, raiseSaveConflict } from "./BuildrikSyncProvider";
+import { settledBaselineLastEditedAt, raiseSaveConflict, siteColumnsLoaded } from "./BuildrikSyncProvider";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 import type { ComparePage } from "../shared/utils/html";
@@ -69,6 +69,10 @@ export async function publishSite(
   // publish so the server gate can still block.
   // C-3: the pages are this tab's; the server refuses them if the site moved
   // on since this tab last loaded or saved it.
+  // SA-01: without the Site columns the rendered pages carry an empty <head>.
+  if (!siteColumnsLoaded(siteId)) {
+    throw new Error("Site settings didn't load. Reload the editor before publishing.");
+  }
   const expectedLastEditedAt = await settledBaselineLastEditedAt();
   try {
     const result = await getClient().sites.publish.mutate(

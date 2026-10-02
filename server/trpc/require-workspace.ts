@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_WORKSPACE_ORDER } from "@/server/trpc/workspace-ctx";
 
 export interface SessionCtx {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -8,7 +9,7 @@ export interface SessionCtx {
 
 /** Resolve the actor's workspace, scoping every op to a membership they hold —
  *  the IDOR guard. Honors the session's active workspace (set on switch) when
- *  it's a valid ACTIVE membership, else falls back to the first membership.
+ *  it's a valid ACTIVE membership, else falls back to DEFAULT_WORKSPACE_ORDER.
  *
  *  NOTE: features.ts and account.ts each still carry their own copy of this;
  *  they predate this module. New routers should import from here, and those two
@@ -20,10 +21,11 @@ export async function requireWorkspace(ctx: SessionCtx): Promise<string> {
   const member =
     (await prisma.workspaceMember.findFirst({
       where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId, status: "ACTIVE" },
+      ...(activeId ? {} : { orderBy: DEFAULT_WORKSPACE_ORDER }),
       select: { workspaceId: true },
     })) ??
     (activeId
-      ? await prisma.workspaceMember.findFirst({ where: { userId, status: "ACTIVE" }, select: { workspaceId: true } })
+      ? await prisma.workspaceMember.findFirst({ where: { userId, status: "ACTIVE" }, orderBy: DEFAULT_WORKSPACE_ORDER, select: { workspaceId: true } })
       : null);
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return member.workspaceId;

@@ -105,9 +105,9 @@ describe("exportPublishPages — the stylesheet has to travel", () => {
   });
 });
 
-/* Clone 3397:32376 — Settings → Localization `Auto-redirect by browser` rides
-   on every published page's head; off, nothing is emitted. */
-describe("exportPublishPages — the locale auto-redirect snippet", () => {
+/* SA-05: per-locale pages don't publish yet, so nothing may redirect a
+   visitor to one — regardless of the stored `autoRedirect` flag. */
+describe("exportPublishPages — no locale auto-redirect", () => {
   const withLocalization = (autoRedirect: boolean) => {
     const composer = composerWithSlug("about");
     composer.setProjectSettings({
@@ -117,10 +117,9 @@ describe("exportPublishPages — the locale auto-redirect snippet", () => {
     return composer;
   };
 
-  it("emits it on every page when the setting is on", async () => {
+  it("emits nothing even when the stored setting is on", async () => {
     const pages = await exportPublishPages(withLocalization(true));
-    for (const p of pages) expect(p.html).toContain('sessionStorage.getItem("brk-locale-redirect")');
-    expect(pages[0].html).toContain('var langs=["fr"]');
+    for (const p of pages) expect(p.html).not.toContain("brk-locale-redirect");
   });
 
   it("emits nothing when it is off", async () => {

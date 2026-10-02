@@ -1,8 +1,9 @@
 import dns from "node:dns/promises";
 import { createHash } from "node:crypto";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import { addDomainToVercelProject, removeDomainFromVercelProject, slugifyProjectName } from "@/lib/vercel";
+import { addDomainToVercelProject, removeDomainFromVercelProject, resolveVercelProjectName } from "@/lib/vercel";
 import { getActiveVercelConnection } from "@server/services/integrations.service";
 import { siteScopeWhere } from "@/server/services/permission.service";
 import { domainNameSchema, type DomainAvailability, type DomainKind, DNS_TARGETS } from "@buildrik/shared/schemas/site-detail";
@@ -152,7 +153,7 @@ export interface ConnectDomainOptions {
 
 export async function connectDomain(siteId: string, input: ConnectDomainOptions) {
   const { domain } = input;
-  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, slug: true, deletedAt: true } });
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, slug: true, vercelProjectName: true, deletedAt: true } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
@@ -166,6 +167,25 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
 
   const existing = await prisma.domain.findFirst({ where: { domain } });
   if (existing) throw new Error("DOMAIN_IN_USE");
+
+  // The domain lives on this project from now on — pin it, so a slug change
+  // before the first publish can't move the site to a project without it.
+  const projectName = resolveVercelProjectName(site);
+  if (!site.vercelProjectName) {
+    try {
+      await prisma.site.update({ where: { id: siteId }, data: { vercelProjectName: projectName } });
+    } catch (e: unknown) {
+      // Another site is pinned to the name this slug derives (legacy slug reuse).
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === "P2002" &&
+        String(e.meta?.target ?? "").includes("vercelProjectName")
+      ) {
+        throw new Error("PROJECT_NAME_TAKEN");
+      }
+      throw e;
+    }
+  }
 
   const created = await prisma.domain.create({
     data: {
@@ -197,7 +217,7 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
       const result = await addDomainToVercelProject({
         token: conn.token,
         teamId: conn.teamId,
-        projectName: slugifyProjectName(site.slug),
+        projectName,
         domain,
       });
       if (result.verification.length > 0) {
@@ -237,7 +257,7 @@ export async function removeDomain(id: string) {
   // must not block the user from removing the domain locally.
   const domain = await prisma.domain.findUnique({
     where: { id },
-    select: { domain: true, site: { select: { slug: true, workspaceId: true } } },
+    select: { domain: true, site: { select: { slug: true, vercelProjectName: true, workspaceId: true } } },
   });
   if (domain?.site) {
     try {
@@ -246,7 +266,7 @@ export async function removeDomain(id: string) {
         await removeDomainFromVercelProject({
           token: conn.token,
           teamId: conn.teamId,
-          projectName: slugifyProjectName(domain.site.slug),
+          projectName: resolveVercelProjectName(domain.site),
           domain: domain.domain,
         });
       }

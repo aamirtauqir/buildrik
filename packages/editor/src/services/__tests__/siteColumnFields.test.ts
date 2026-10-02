@@ -9,7 +9,8 @@
  */
 import { describe, it, expect } from "vitest";
 import type { ProjectData } from "@shared/types";
-import { SITE_COLUMN_FIELDS, extractSiteColumnPatch } from "../BuildrikSyncProvider";
+import { extractSiteColumnPatch } from "../BuildrikSyncProvider";
+import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 
 const project = (settings: ProjectData["settings"]): ProjectData => ({
   version: "1",

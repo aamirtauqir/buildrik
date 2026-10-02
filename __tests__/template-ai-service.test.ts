@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     template: { findMany: vi.fn(), findUnique: vi.fn(), findFirst: vi.fn(), count: vi.fn(), update: vi.fn() },
-    site: { create: vi.fn(), count: vi.fn(), findFirst: vi.fn() },
+    site: { create: vi.fn(), count: vi.fn(), findFirst: vi.fn(), findMany: vi.fn().mockResolvedValue([]) },
     page: { createMany: vi.fn() },
     aIGenerationJob: { create: vi.fn(), findFirst: vi.fn(), update: vi.fn(), count: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },

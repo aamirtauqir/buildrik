@@ -221,6 +221,13 @@ describe("Publish Service", () => {
   });
 
   describe("startPublish", () => {
+    beforeEach(() => {
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        deletedAt: null, workspaceId: "ws1", publishedUrl: null, name: "S",
+        workspace: { deletionScheduledAt: null },
+      } as never);
+    });
+
     it("creates a job and updates site status", async () => {
       vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.publishBuildJob.create).mockResolvedValue({
@@ -303,6 +310,7 @@ describe("Publish Service", () => {
       queueOneJob();
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         deletedAt: null, workspaceId: "ws1", publishedUrl: null, name: "S",
+        workspace: { deletionScheduledAt: null },
       } as never);
 
       await expect(startPublish("s1", "ws1", "user1")).rejects.toThrow("WORKER_DISPATCH_FAILED");

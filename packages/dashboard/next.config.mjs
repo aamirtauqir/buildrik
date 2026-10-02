@@ -86,7 +86,7 @@ const nextConfig = {
   // localhost, so opened from a phone or another machine on the LAN the page
   // never hydrates and the login form falls back to a native GET. Private
   // ranges only; production (`next start`) ignores this key.
-  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.local"],
+  allowedDevOrigins: ["127.0.0.1", "192.168.*.*", "10.*.*.*", "*.local"],
   transpilePackages: ["@buildrik/editor"],
   compiler: { emotion: true },
   // Legacy ?siteId= bookmark forwarding on dashboard origin only.

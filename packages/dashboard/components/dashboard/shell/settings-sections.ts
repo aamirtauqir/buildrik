@@ -61,7 +61,7 @@ export const SETTINGS_GROUPS: { label: string; items: SettingsSection[] }[] = [
       // which is one of the two things behind this card — the page also deletes
       // your account and exports your data — and it made the destination read
       // "Delete workspace" three times: the H1, the card title, the button.
-      { label: "Delete workspace or account", description: "Permanent, and not reversible", href: "/dashboard/settings/danger", icon: Trash2 },
+      { label: "Delete workspace or account", description: "Deletion happens 30 days later; cancel any time before", href: "/dashboard/settings/danger", icon: Trash2 },
     ],
   },
 ];

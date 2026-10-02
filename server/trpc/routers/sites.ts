@@ -16,6 +16,7 @@ import {
   transferSite,
   saveProjectFromEditor,
   getProjectData,
+  redactSitePassword,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -54,6 +55,9 @@ import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publish
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
+
+const WORKSPACE_DELETION_SCHEDULED_MESSAGE =
+  "This workspace is scheduled for deletion. Cancel the deletion to publish.";
 
 export const sitesRouter = router({
   list: protectedProcedure
@@ -188,6 +192,14 @@ export const sitesRouter = router({
           });
         throw e;
       }
+      await recordForSite({
+        siteId: input.id,
+        actorId: ctx.session.user!.id!,
+        action: "site.deleted",
+        targetType: "site",
+        targetId: input.id,
+        description: "Site deleted",
+      });
     }),
 
   bulk: protectedProcedure
@@ -210,7 +222,24 @@ export const sitesRouter = router({
         throw e;
       }
 
-      return bulkAction(workspaceId, input);
+      const result = await bulkAction(workspaceId, input);
+
+      if (input.action === "delete") {
+        await Promise.all(
+          result.succeeded.map((siteId: string) =>
+            recordForSite({
+              siteId,
+              actorId: ctx.session.user.id,
+              action: "site.deleted",
+              targetType: "site",
+              targetId: siteId,
+              description: "Site deleted",
+            })
+          )
+        );
+      }
+
+      return result;
     }),
 
   // P6 editor role plumbing — the chrome shows disabled-with-reason controls
@@ -381,6 +410,8 @@ export const sitesRouter = router({
             code: "CONFLICT",
             message: "A publish job is already in progress.",
           });
+        if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         // Sites deploy into the workspace's own Vercel account. The pre-publish
         // check already disables the button, but the editor and the API can still
         // reach here — they get a reason, not a 500.
@@ -493,6 +524,8 @@ export const sitesRouter = router({
         if (e instanceof ScheduledPublishError) {
           throw new TRPCError({ code: "BAD_REQUEST", message: e.message });
         }
+        if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         throw e;
       }
     }),
@@ -542,7 +575,7 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      const result = await unpublishSite(input.siteId);
+      const result = redactSitePassword(await unpublishSite(input.siteId));
       await recordForSite({
         siteId: input.siteId,
         actorId: ctx.session.user!.id!,
@@ -627,6 +660,8 @@ export const sitesRouter = router({
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: "That version can no longer be rolled back to." });
         if (msg === "ALREADY_PUBLISHING")
           throw new TRPCError({ code: "CONFLICT", message: "A publish is already in progress." });
+        if (msg === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         if (msg === "VERCEL_NOT_CONNECTED")
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Connect Vercel before rolling back." });
         throw e;
@@ -734,7 +769,7 @@ export const sitesRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return moveSiteToFolder(input.siteId, input.folderId);
+        return redactSitePassword(await moveSiteToFolder(input.siteId, input.folderId));
       }),
   }),
 });

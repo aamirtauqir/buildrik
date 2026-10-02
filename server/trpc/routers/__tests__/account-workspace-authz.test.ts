@@ -96,10 +96,10 @@ describe("account.workspace authz (F3)", () => {
     expect(updateSharingSettingsMock).not.toHaveBeenCalled();
   });
 
-  it("cancelDelete: non-admin is blocked, cancel service never runs", async () => {
-    checkWorkspaceRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN"));
+  it("cancelDelete: the service's owner check refuses a non-owner with FORBIDDEN", async () => {
+    cancelWorkspaceDeletionMock.mockRejectedValueOnce(new Error("NOT_OWNER"));
     const caller = accountRouter.createCaller(makeCtx() as never);
-    await expect(caller.workspace.cancelDelete()).rejects.toThrow();
-    expect(cancelWorkspaceDeletionMock).not.toHaveBeenCalled();
+    await expect(caller.workspace.cancelDelete()).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(cancelWorkspaceDeletionMock).toHaveBeenCalledWith("ws_1", "u_1");
   });
 });

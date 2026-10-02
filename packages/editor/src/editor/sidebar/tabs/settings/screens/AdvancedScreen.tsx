@@ -21,7 +21,7 @@ import { validateHtml, type HtmlValidationResult } from "@/shared/utils/validate
 import { validateCss, type CssValidationResult } from "@/shared/utils/validateCss";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
-import type { SiteColumnField } from "@/services/BuildrikSyncProvider";
+import type { SiteColumnField } from "@buildrik/shared/schemas/site-column-fields";
 import { LoadCard, SET_ROW_LABEL, SaveErrorBanner, Screen, Section, SiteColumnGate, Textarea } from "../shared";
 import type { ScreenProps } from "../types";
 

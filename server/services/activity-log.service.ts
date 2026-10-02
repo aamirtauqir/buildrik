@@ -8,6 +8,7 @@ export type ActivityAction =
   | "site.publish_failed"
   | "site.unpublished"
   | "site.rolled_back"
+  | "site.deleted"
   | "site.share_link.created"
   | "site.share_link.revoked"
   | "site.domain.connected"
@@ -148,6 +149,7 @@ const ACTION_SUMMARY: Partial<Record<ActivityAction, string>> = {
   "site.publish_failed": "A publish failed",
   "site.unpublished": "Unpublished the site",
   "site.rolled_back": "Rolled back to an earlier version",
+  "site.deleted": "Site deleted",
   "site.share_link.created": "Created a share link",
   "site.share_link.revoked": "Revoked a share link",
   "site.domain.connected": "Connected a domain",

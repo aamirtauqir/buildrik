@@ -2,6 +2,9 @@ import bcrypt from "bcryptjs";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/encryption";
+import { slugifyProjectName } from "@/lib/vercel";
+import { hasEverDeployed } from "@/server/services/publish.service";
+import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 
 /**
  * publishedPassword storage policy.
@@ -54,34 +57,63 @@ export function decryptPublishedPassword(stored: string | null): string | null {
   }
 }
 
+/**
+ * The Site columns the Settings screens own — what `getSiteSettings` reads and
+ * what a duplicated site carries over (minus its identity and password).
+ */
+export const SITE_SETTINGS_COLUMNS = {
+  name: true,
+  slug: true,
+  metaTitle: true,
+  metaDescription: true,
+  metaTitleTemplate: true,
+  ogImage: true,
+  canonicalUrl: true,
+  allowIndexing: true,
+  robotsTxt: true,
+  headCode: true,
+  bodyCode: true,
+  socialLinks: true,
+  publishedPassword: true,
+  touchIcon: true,
+  favicon: true,
+  cspPolicy: true,
+  hstsMaxAge: true,
+  xFrameOptions: true,
+  referrerPolicy: true,
+  permissionsPolicy: true,
+  defaultLocale: true,
+  enabledLocales: true,
+  localeAutoRedirect: true,
+} as const satisfies Prisma.SiteSelect;
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * SA-01: `projectSettings` without the keys that belong to Site columns. The
+ * editor saves its settings verbatim, and a second copy of a column in the JSON
+ * is one that can disagree with it. Returns a deep copy; non-objects pass
+ * through unchanged.
+ */
+export function stripColumnBackedSettings(settings: unknown): unknown {
+  if (!isPlainObject(settings)) return settings;
+  const out = structuredClone(settings);
+  for (const field of SITE_COLUMN_FIELDS) {
+    const [section, key] = field.split(".");
+    const block = out[section];
+    if (isPlainObject(block)) delete block[key];
+  }
+  return out;
+}
+
 export async function getSiteSettings(siteId: string) {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
     select: {
       id: true,
-      name: true,
-      slug: true,
-      metaTitle: true,
-      metaDescription: true,
-      metaTitleTemplate: true,
-      ogImage: true,
-      canonicalUrl: true,
-      allowIndexing: true,
-      robotsTxt: true,
-      headCode: true,
-      bodyCode: true,
-      socialLinks: true,
-      publishedPassword: true,
-      touchIcon: true,
-      favicon: true,
-      cspPolicy: true,
-      hstsMaxAge: true,
-      xFrameOptions: true,
-      referrerPolicy: true,
-      permissionsPolicy: true,
-      defaultLocale: true,
-      enabledLocales: true,
-      localeAutoRedirect: true,
+      ...SITE_SETTINGS_COLUMNS,
       deletedAt: true,
       workspace: { select: { plan: true } },
     },
@@ -172,11 +204,13 @@ export async function updateSiteSettings(
      password set. Clearing one (null) stays free — nobody should be locked
      out of removing a gate they can no longer manage. */
   const wantsPublishedPassword = data.publishedPassword != null && data.publishedPassword !== "";
+  let pinnedProjectName: string | undefined;
   if (wantsCustomCode || wantsPublishedPassword || data.slug) {
     const current = await prisma.site.findUnique({
       where: { id: siteId },
       select: {
         slug: true,
+        vercelProjectName: true,
         deletedAt: true,
         workspace: { select: { plan: true } },
       },
@@ -190,6 +224,24 @@ export async function updateSiteSettings(
     }
 
     if (data.slug && current && current.slug !== data.slug) {
+      /* SA-06: `Site.slug` is globally @unique, so a taken slug used to reach
+         the update and surface as a raw P2002 500. And the Vercel project was
+         derived from the slug on every deploy — renaming a live site's slug
+         sent the next publish into a brand-new project, leaving the old URL
+         and its domains behind. Pin the name the live site is on first. */
+      const taken = await prisma.site.findFirst({
+        where: {
+          id: { not: siteId },
+          // A site pinned to the project this slug derives would share it.
+          OR: [{ slug: data.slug }, { vercelProjectName: slugifyProjectName(data.slug) }],
+        },
+        select: { id: true },
+      });
+      if (taken) throw new Error("SLUG_TAKEN");
+      if (current.vercelProjectName == null && (await hasEverDeployed(siteId))) {
+        pinnedProjectName = slugifyProjectName(current.slug);
+      }
+
       await prisma.slugHistory.create({
         data: {
           siteId,
@@ -209,6 +261,7 @@ export async function updateSiteSettings(
   // safe because the column is nullable in schema.prisma and the data has
   // already been validated by updateSiteSettingsSchema upstream.
   const persistData = { ...data } as Prisma.SiteUpdateInput;
+  if (pinnedProjectName) persistData.vercelProjectName = pinnedProjectName;
   if (data.publishedPassword !== undefined) {
     persistData.publishedPassword = data.publishedPassword === null
       ? null
@@ -246,11 +299,24 @@ export async function updateSiteSettings(
         where: { id: siteId },
         data: persistData,
       });
-    });
+    }).catch(rethrowSlugConflict);
   }
 
   return prisma.site.update({
     where: { id: siteId },
     data: persistData,
-  });
+  }).catch(rethrowSlugConflict);
+}
+
+/** The SLUG_TAKEN check above is read-then-write; a concurrent save that takes
+ *  the same slug in between surfaces here as the @unique index's P2002. The
+ *  pin write can also collide on vercelProjectName, when another site is
+ *  already pinned to the old slug's project (legacy slug reuse). */
+function rethrowSlugConflict(e: unknown): never {
+  if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+    const target = String(e.meta?.target ?? "");
+    if (target.includes("vercelProjectName")) throw new Error("PROJECT_NAME_TAKEN");
+    if (target.includes("slug")) throw new Error("SLUG_TAKEN");
+  }
+  throw e;
 }

@@ -13,6 +13,7 @@ const create = vi.fn();
 const findFirst = vi.fn();
 const update = vi.fn();
 const findMany = vi.fn();
+const siteFindUnique = vi.fn();
 
 vi.mock("@lib/prisma", () => ({
   prisma: {
@@ -22,6 +23,7 @@ vi.mock("@lib/prisma", () => ({
       update: (...a: unknown[]) => update(...a),
       findMany: (...a: unknown[]) => findMany(...a),
     },
+    site: { findUnique: (...a: unknown[]) => siteFindUnique(...a) },
   },
 }));
 
@@ -29,6 +31,7 @@ const {
   schedulePublish,
   cancelScheduledPublish,
   dueSchedules,
+  markScheduleCancelled,
   ScheduledPublishError,
 } = await import("../scheduled-publish.service");
 
@@ -40,6 +43,7 @@ beforeEach(() => {
   findFirst.mockReset();
   update.mockReset();
   findMany.mockReset();
+  siteFindUnique.mockReset().mockResolvedValue({ workspace: { deletionScheduledAt: null } });
 });
 
 /**
@@ -57,6 +61,26 @@ describe("schedulePublish — refuses until a renderer exists (A-16 / PD-18)", (
       code: "NO_RENDERER",
     });
     expect(create).not.toHaveBeenCalled();
+  });
+});
+
+describe("schedulePublish — workspace scheduled for deletion (SA-04 / D6)", () => {
+  it("refuses with WORKSPACE_DELETION_SCHEDULED before anything else", async () => {
+    siteFindUnique.mockResolvedValue({ workspace: { deletionScheduledAt: new Date("2026-10-27") } });
+    await expect(schedulePublish({ ...base, scheduledFor: inMinutes(60) })).rejects.toThrow("WORKSPACE_DELETION_SCHEDULED");
+    expect(siteFindUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "s1" } }));
+    expect(create).not.toHaveBeenCalled();
+  });
+});
+
+describe("markScheduleCancelled", () => {
+  it("records CANCELLED with the reason, never deleting the row", async () => {
+    update.mockResolvedValue({});
+    await markScheduleCancelled("sp1", "WORKSPACE_DELETION_SCHEDULED");
+    expect(update).toHaveBeenCalledWith({
+      where: { id: "sp1" },
+      data: { status: "CANCELLED", error: "WORKSPACE_DELETION_SCHEDULED" },
+    });
   });
 });
 

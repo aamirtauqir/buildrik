@@ -102,6 +102,17 @@ const MEDIA_PAGE_SIZE = 200;
    fallback project has a child, so it counts as content. */
 const _loadedSites = new Set<string>();
 
+/* SA-01: sites whose Site-column settings did not load this session (the read
+   failed twice). The columns are the only source of the column-backed
+   settings, so such a session renders pages without their title template,
+   icons, OG image or head/body code — publishing it is refused. */
+const _siteColumnsMissing = new Set<string>();
+
+/** Whether the open site's Site-column settings loaded. Publish reads it. */
+export function siteColumnsLoaded(siteId: string): boolean {
+  return !_siteColumnsMissing.has(siteId);
+}
+
 /* Sites the server says do not exist. A refused save is not the same story for
    these: "Reload to get the real site" is the right advice for a load that
    failed once, and a lie for a site that has been deleted — the reload returns
@@ -252,31 +263,16 @@ function emptyToNull(value: string | null | undefined): string | null {
 }
 
 /**
- * The projectSettings fields extractSiteColumnPatch reads — each one is a Site
- * column the dashboard owns, mirrored from the editor only for an ADMIN (A-1).
+ * Reads exactly SITE_COLUMN_FIELDS (`@buildrik/shared/schemas/site-column-fields`)
+ * — each one is a Site column the dashboard owns, mirrored from the editor
+ * only for an ADMIN (A-1).
  * The Settings screens lock exactly these below ADMIN (M7 / PD-1);
  * `siteColumnFields.test.ts` pins this list to the function's reads, so a new
  * mirrored field cannot land without being locked, and project data (Author,
- * Twitter handle, Global CSS) is never locked by mistake.
+ * Twitter handle, Global CSS) is never locked by mistake. SA-01: the list
+ * lives in `@buildrik/shared` because the server strips the same fields from
+ * the stored projectSettings.
  */
-export const SITE_COLUMN_FIELDS = [
-  "seo.siteName",
-  "seo.favicon",
-  "seo.language",
-  "seo.metaTitle",
-  "seo.metaDescription",
-  "seo.metaTitleTemplate",
-  "seo.defaultOgImage",
-  "seo.allowIndexing",
-  "seo.robotsTxt",
-  "seo.touchIcon",
-  "seo.socialLinks",
-  "customCode.headScripts",
-  "customCode.bodyScripts",
-  "publishing.publishedPassword",
-] as const;
-export type SiteColumnField = (typeof SITE_COLUMN_FIELDS)[number];
-
 export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const settings = projectData.settings;
   if (!settings) return {};
@@ -318,9 +314,11 @@ export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSett
 }
 
 /**
- * Inverse of extractSiteColumnPatch: merge Site columns into editor's
- * projectSettings shape on load. Server is canonical for these fields,
- * so any value present on the Site row wins over projectSettings JSON.
+ * Inverse of extractSiteColumnPatch: Site columns into the editor's
+ * projectSettings shape on load. SA-01: the columns are the only source for
+ * SITE_COLUMN_FIELDS — a NULL column leaves the field empty, never the
+ * project JSON's copy (an edit the ADMIN-only mirror never sent, or a value
+ * the dashboard has since cleared).
  */
 function mergeSiteColumnsIntoSettings(
   baseSettings: ProjectData["settings"] | undefined,
@@ -331,24 +329,25 @@ function mergeSiteColumnsIntoSettings(
   const customCode = { ...(settings.customCode ?? { headScripts: "", bodyScripts: "", globalCss: "" }) };
   const publishing = { ...(settings.publishing ?? {}) };
 
-  if (siteCols.name != null) seo.siteName = siteCols.name;
-  if (siteCols.favicon != null) seo.favicon = siteCols.favicon;
-  if (siteCols.defaultLocale != null) seo.language = siteCols.defaultLocale;
-  if (siteCols.metaTitle != null) seo.metaTitle = siteCols.metaTitle;
-  if (siteCols.metaDescription != null) seo.metaDescription = siteCols.metaDescription;
-  if (siteCols.metaTitleTemplate != null) seo.metaTitleTemplate = siteCols.metaTitleTemplate;
-  if (siteCols.ogImage != null) seo.defaultOgImage = siteCols.ogImage;
-  if (siteCols.allowIndexing != null) seo.allowIndexing = siteCols.allowIndexing;
-  if (siteCols.robotsTxt != null) seo.robotsTxt = siteCols.robotsTxt;
-  if (siteCols.touchIcon != null) seo.touchIcon = siteCols.touchIcon;
-  if (siteCols.socialLinks != null) seo.socialLinks = siteCols.socialLinks as SiteSEO["socialLinks"];
-  if (siteCols.headCode != null) customCode.headScripts = siteCols.headCode;
-  if (siteCols.bodyCode != null) customCode.bodyScripts = siteCols.bodyCode;
-  // publishedPassword: server redacts the hash on read (returns null if redacted
-  // OR not set). We can't distinguish those here, so we never round-trip null —
-  // user must explicitly type a new value to change it. The hasPublishedPassword
-  // boolean (from server) is the authoritative "is a password set" indicator.
-  if (siteCols.publishedPassword) publishing.publishedPassword = siteCols.publishedPassword;
+  seo.siteName = siteCols.name;
+  seo.favicon = siteCols.favicon ?? undefined;
+  seo.language = siteCols.defaultLocale;
+  seo.metaTitle = siteCols.metaTitle ?? undefined;
+  seo.metaDescription = siteCols.metaDescription ?? undefined;
+  seo.metaTitleTemplate = siteCols.metaTitleTemplate ?? undefined;
+  seo.defaultOgImage = siteCols.ogImage ?? undefined;
+  seo.allowIndexing = siteCols.allowIndexing;
+  seo.robotsTxt = siteCols.robotsTxt ?? undefined;
+  seo.touchIcon = siteCols.touchIcon ?? undefined;
+  seo.socialLinks = (siteCols.socialLinks ?? undefined) as SiteSEO["socialLinks"];
+  // CustomCodeConfig's strings are required: an empty column reads as "".
+  customCode.headScripts = siteCols.headCode ?? "";
+  customCode.bodyScripts = siteCols.bodyCode ?? "";
+  // publishedPassword: the server redacts it on read (always null), so it is
+  // never loaded — the user types a new value to change it. The
+  // hasPublishedPassword boolean (from server) is the authoritative "is a
+  // password set" indicator.
+  publishing.publishedPassword = siteCols.publishedPassword || undefined;
 
   settings.seo = seo;
   settings.customCode = customCode;
@@ -429,9 +428,14 @@ export function projectDataFromRows(
   // as the base so non-mirrored settings (e.g. things only persisted in the
   // JSON blob) survive editor reload from dashboard.
   const baseSettings = siteRow.projectSettings as ProjectData["settings"] | undefined;
-  const mergedSettings = siteColumns
-    ? mergeSiteColumnsIntoSettings(baseSettings, siteColumns as SiteColumnSettings)
-    : baseSettings;
+  /* No columns (the read failed) still means no JSON copy: SA-01 keeps the
+     column-backed fields empty rather than loading a value that may be stale.
+     `Site.name` rides on the site row too (the /share rows carry it only
+     there) — the same column. */
+  const mergedSettings = mergeSiteColumnsIntoSettings(baseSettings, {
+    name: siteRow.name,
+    ...(siteColumns as SiteColumnSettings | null),
+  });
 
   return {
     version: "1.0",
@@ -490,11 +494,21 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     const client = getClient();
     // P0.2b: pull Site columns alongside core site + pages so editor's view
     // of metaTitle/etc reflects what the dashboard saved.
+    // SA-01: retried once — a failed read leaves the column-backed settings empty.
+    const readSiteColumns = () => client.siteDetail.settings.get.query({ siteId });
+    let columnsLoaded = true;
     const [site, pages, settingsResult] = await Promise.all([
       client.sites.get.query({ id: siteId }),
       client.pages.list.query({ siteId }),
-      client.siteDetail.settings.get.query({ siteId }).catch(() => null),
+      readSiteColumns()
+        .catch(readSiteColumns)
+        .catch(() => {
+          columnsLoaded = false;
+          return null;
+        }),
     ]);
+    if (columnsLoaded) _siteColumnsMissing.delete(siteId);
+    else _siteColumnsMissing.add(siteId);
     const data = projectDataFromRows(site, pages, settingsResult);
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.

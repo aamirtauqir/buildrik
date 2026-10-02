@@ -11,6 +11,7 @@ import { type NextRequest } from "next/server";
 import { startPublish } from "@server/services/publish.service";
 import {
   dueSchedules,
+  markScheduleCancelled,
   markScheduleFailed,
   markScheduleStarted,
 } from "@server/services/scheduled-publish.service";
@@ -26,6 +27,7 @@ export async function GET(req: NextRequest) {
   const due = await dueSchedules(new Date());
   let started = 0;
   let failed = 0;
+  let skipped = 0;
 
   for (const s of due) {
     try {
@@ -41,12 +43,17 @@ export async function GET(req: NextRequest) {
          RECORDED on the row rather than only logged, so the panel can say what
          happened instead of the schedule appearing to have silently vanished. */
       const message = e instanceof Error ? e.message : "Scheduled publish failed";
+      if (message === "WORKSPACE_DELETION_SCHEDULED") {
+        await markScheduleCancelled(s.id, message);
+        skipped += 1;
+        continue;
+      }
       await markScheduleFailed(s.id, message);
       failed += 1;
       console.error(`[scheduled-publish] schedule=${s.id} site=${s.siteId} failed: ${message}`);
     }
   }
 
-  console.log(`[scheduled-publish] due=${due.length} started=${started} failed=${failed}`);
-  return Response.json({ due: due.length, started, failed });
+  console.log(`[scheduled-publish] due=${due.length} started=${started} failed=${failed} skipped=${skipped}`);
+  return Response.json({ due: due.length, started, failed, skipped });
 }

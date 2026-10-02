@@ -28,20 +28,20 @@ import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } 
 import { listIntegrations, addIntegration, removeIntegration, updateIntegration, sendIntegrationTestEvent } from "@/server/services/integrations.service";
 import { updateProfileSchema, changePasswordSchema, setPasswordSchema, changeEmailSchema, updateWorkspaceSchema, createWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
 import { type PlanName } from "@/lib/constants/plan-limits";
+import { DEFAULT_WORKSPACE_ORDER } from "@/server/trpc/workspace-ctx";
 
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
   if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
   const userId = ctx.session.user.id;
   // Honor the active workspace from the session (set on switch), but only if it
   // is still one of the user's ACTIVE memberships — never trust it blindly.
-  // Fall back to the first membership for single-workspace users / stale tokens.
+  // Fall back to the canonical default pick for missing / stale tokens.
   const activeId = ctx.session.user.workspaceId as string | null | undefined;
-  const member = await ctx.prisma.workspaceMember.findFirst({
-    where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId, status: "ACTIVE" },
-    include: { workspace: { select: { plan: true } } },
-  }) ?? (activeId
-    ? await ctx.prisma.workspaceMember.findFirst({ where: { userId, status: "ACTIVE" }, include: { workspace: { select: { plan: true } } } })
-    : null);
+  const include = { workspace: { select: { plan: true } } };
+  const member = (activeId
+    ? await ctx.prisma.workspaceMember.findFirst({ where: { userId, workspaceId: activeId, status: "ACTIVE" }, include })
+    : null)
+    ?? await ctx.prisma.workspaceMember.findFirst({ where: { userId, status: "ACTIVE" }, orderBy: DEFAULT_WORKSPACE_ORDER, include });
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return { workspaceId: member.workspaceId, plan: member.workspace.plan as PlanName };
 }
@@ -119,6 +119,7 @@ export const accountRouter = router({
         return await enable2FA(ctx.session.user.id);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "USER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
+        if (e instanceof Error && e.message === "TWO_FACTOR_ALREADY_ENABLED") throw new TRPCError({ code: "CONFLICT", message: "Two-factor is already on. Turn it off first to set up a new authenticator." });
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Couldn't start two-factor setup. Please try again." });
       }
     }),
@@ -228,8 +229,12 @@ export const accountRouter = router({
       }),
     cancelDelete: protectedProcedure.mutation(async ({ ctx }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
-      await requireWorkspaceAdmin(ctx, workspaceId);
-      return cancelWorkspaceDeletion(workspaceId);
+      try {
+        return await cancelWorkspaceDeletion(workspaceId, ctx.session.user.id);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Only the owner can cancel the deletion." });
+        throw e;
+      }
     }),
     transfer: router({
       pending: protectedProcedure.query(async ({ ctx }) => {

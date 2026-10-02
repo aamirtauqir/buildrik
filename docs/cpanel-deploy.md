@@ -274,7 +274,7 @@ curl -I https://app.buildrick.io/api/trpc/auth.checkEmail
 # → 405 Method Not Allowed (GET on POST-only route) is OK
 ```
 
-## Step C — Cron jobs (18 routes)
+## Step C — Cron jobs (19 routes)
 
 `vercel.json` at the repo root is the source of truth for the schedule
 column — this list is generated from it (C-2). `$CRON_SECRET` is a shell
@@ -292,13 +292,13 @@ the line in:
 1. **Edit the raw crontab over SSH/terminal** — `crontab -e` opens the same
    file the UI edits, but as a plain text file, where a bare `VAR=value`
    line on its own row is valid. Add the `CRON_SECRET=` line first, then
-   the 18 entries below it (still fine to review/re-add the individual
+   the 19 entries below it (still fine to review/re-add the individual
    lines through the cPanel UI afterwards — it renders whatever's in the
    file, it just can't add that first line itself).
 2. **No SSH access** — inline the secret in each cron entry's Command field
    instead of relying on the shared variable, e.g. `curl -fsS -H
    "Authorization: Bearer <the actual value>" https://...`. Every one of
-   the 18 entries needs the value substituted individually this way; there
+   the 19 entries needs the value substituted individually this way; there
    is no shared-variable shortcut through the UI alone.
 
 The commands below use `$CRON_SECRET` assuming route 1 (`crontab -e`):
@@ -321,19 +321,21 @@ CRON_SECRET=<the same value as the app's CRON_SECRET env var>
 30   2 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ip-anonymization
 0    4 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/workspace-transfer-expiry
 0    11 * * *  curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/account-deletion
+0    10 * * *  curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/workspace-deletion
 30   * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/publish-job-cleanup
 15   * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ai-job-cleanup
 0    3 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ephemeral-purge
 ```
 
 **Before enabling these on a live account**, read them backlog-first, not
-trigger-first — `account-deletion`, `billing-downgrade`,
-`soft-delete-purge` and `form-submission-purge` will process whatever has
-built up since launch the first time they run. Inspect the backlog
-read-only before wiring the crontab: e.g. `SELECT count(*) FROM
-account_deletion_reqs WHERE "scheduledAt" <= now()` (and the equivalent
-selection query each route's own where-clause uses) over the SSH tunnel,
-for each of those four. `scheduled-publish` is safe to schedule but
+trigger-first — `account-deletion`, `workspace-deletion`,
+`billing-downgrade`, `soft-delete-purge` and `form-submission-purge` will
+process whatever has built up since launch the first time they run. Inspect
+the backlog read-only before wiring the crontab: e.g. `SELECT count(*) FROM
+account_deletion_reqs WHERE "scheduledAt" <= now()`, and for
+`workspace-deletion` `SELECT count(*) FROM workspaces WHERE
+"deletionScheduledAt" <= now();` (and the equivalent selection query each
+route's own where-clause uses) over the SSH tunnel, for each of those five. `scheduled-publish` is safe to schedule but
 currently pointless — `schedulePublish` refuses every call with
 `NO_RENDERER` until a server-side renderer exists (A-16), so the cron will
 find nothing due.

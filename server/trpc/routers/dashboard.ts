@@ -2,6 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { requireAgencyLayer } from "@/server/trpc/guards";
+import { DEFAULT_WORKSPACE_ORDER } from "@/server/trpc/workspace-ctx";
 import type { PrismaClient } from "@prisma/client";
 
 interface WorkspaceCtx {
@@ -25,15 +26,16 @@ async function getWorkspaceMember(ctx: WorkspaceCtx) {
   if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
   const userId = ctx.session.user.id;
   // Honor the session's active workspace (set on switch) when it's a valid
-  // ACTIVE membership; else fall back to the first membership.
+  // ACTIVE membership; else fall back to DEFAULT_WORKSPACE_ORDER.
   const activeId = ctx.session.user.workspaceId as string | null | undefined;
   const member =
     (await ctx.prisma.workspaceMember.findFirst({
       where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId, status: "ACTIVE" },
+      ...(activeId ? {} : { orderBy: DEFAULT_WORKSPACE_ORDER }),
       select: { workspaceId: true, role: true },
     })) ??
     (activeId
-      ? await ctx.prisma.workspaceMember.findFirst({ where: { userId, status: "ACTIVE" }, select: { workspaceId: true, role: true } })
+      ? await ctx.prisma.workspaceMember.findFirst({ where: { userId, status: "ACTIVE" }, orderBy: DEFAULT_WORKSPACE_ORDER, select: { workspaceId: true, role: true } })
       : null);
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return member;
