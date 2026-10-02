@@ -31,6 +31,8 @@ const EASINGS = [
   { value: "cubic-bezier(0.4, 0, 0.2, 1)", label: "Smooth" },
 ];
 
+/* Unset fields read empty: a grey "0.3s" read as a transition that is not
+   there (DD-12 — no value-shaped placeholders, as Size's Min / Max). */
 export const TransformMotionSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => {
   const t = styles.transform;
   const setT = (fn: string, arg: string) => onChange("transform", composeTransform(t, fn, arg));
@@ -40,14 +42,14 @@ export const TransformMotionSection: React.FC<BaseStyleSectionProps> = ({ styles
         <RangeSlider label="Scale" property="transform" unit="%" min={0} max={200} value={parseFloat(parseFunction(t, "scale", "1")) * 100} onChange={(v) => setT("scale", `${v / 100}`)} />
       </div>
       <RangeSlider label="Rotate" property="transform" unit="°" min={-180} max={180} value={parseFloat(parseFunction(t, "rotate", "0deg"))} onChange={(v) => setT("rotate", `${v}deg`)} />
-      <TextInputRow label="Move X" property="transform" placeholder="0px" value={parseFunction(t, "translateX", "")} onChange={(v) => setT("translateX", v)} />
-      <TextInputRow label="Move Y" property="transform" placeholder="0px" value={parseFunction(t, "translateY", "")} onChange={(v) => setT("translateY", v)} />
+      <TextInputRow label="Move X" property="transform" placeholder="" value={parseFunction(t, "translateX", "")} onChange={(v) => setT("translateX", v)} />
+      <TextInputRow label="Move Y" property="transform" placeholder="" value={parseFunction(t, "translateY", "")} onChange={(v) => setT("translateY", v)} />
       <RangeSlider label="Skew" property="transform" unit="°" min={-45} max={45} value={parseFloat(parseFunction(t, "skew", "0deg"))} onChange={(v) => setT("skew", `${v}deg`)} />
 
       <SubSectionTitle>Transition</SubSectionTitle>
       <SelectRow label="Animate" property="transition-property" value={styles["transition-property"] || ""} options={TRANSITION_PROPERTIES} onChange={(v) => onChange("transition-property", v)} />
-      <TextInputRow label="Duration" property="transition-duration" placeholder="0.3s" value={styles["transition-duration"] || ""} onChange={(v) => onChange("transition-duration", v)} />
-      <TextInputRow label="Delay" property="transition-delay" placeholder="0s" value={styles["transition-delay"] || ""} onChange={(v) => onChange("transition-delay", v)} />
+      <TextInputRow label="Duration" property="transition-duration" placeholder="" value={styles["transition-duration"] || ""} onChange={(v) => onChange("transition-duration", v)} />
+      <TextInputRow label="Delay" property="transition-delay" placeholder="" value={styles["transition-delay"] || ""} onChange={(v) => onChange("transition-delay", v)} />
       <SelectRow label="Easing" property="transition-timing-function" value={styles["transition-timing-function"] || ""} options={EASINGS} onChange={(v) => onChange("transition-timing-function", v)} />
     </Section>
   );

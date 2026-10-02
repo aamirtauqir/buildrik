@@ -75,6 +75,18 @@ describe("Transform & motion", () => {
     fireEvent.change(screen.getByLabelText("Animate"), { target: { value: "opacity" } });
     expect(p.onChange).toHaveBeenLastCalledWith("transition-property", "opacity");
   });
+
+  /* QA 2026-10-02: unset Move X / Move Y / Duration / Delay showed "0px",
+     "0.3s", "0s" in grey — read as values (a 0.3s transition that is not
+     there). Same rule as Size's unset Min / Max (DD-12): unset reads empty. */
+  it("unset move and transition fields read empty, not value-shaped", () => {
+    render(<TransformMotionSection {...props()} />);
+    for (const label of ["Move X", "Move Y", "Duration", "Delay"]) {
+      const input = screen.getByLabelText(label) as HTMLInputElement;
+      expect(input).toHaveValue("");
+      expect(input.placeholder).toBe("");
+    }
+  });
 });
 
 describe("Advanced", () => {
