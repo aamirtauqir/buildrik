@@ -303,8 +303,15 @@ export const siteDetailRouter = router({
           if (e instanceof Error && e.message.startsWith("INVALID_CSV_ROW:"))
             throw new TRPCError({
               code: "BAD_REQUEST",
-              message: `Invalid redirect on line ${e.message.split(":")[1]} — expected "/from,to[,301|302]".`,
+              message: `Invalid redirect on line ${e.message.split(":")[1]} — expected "/from,to[,301|302]" with a path or http(s) URL as the target. Nothing was imported.`,
             });
+          if (e instanceof Error && e.message.startsWith("DUPLICATE_CSV_ROW:")) {
+            const [, line, ...from] = e.message.split(":");
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: `Line ${line}: a redirect from ${from.join(":")} already exists. Nothing was imported.`,
+            });
+          }
           throw e;
         }
       }),
