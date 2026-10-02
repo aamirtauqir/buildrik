@@ -303,6 +303,39 @@ describe("CMS outbox — conflicts are never silently overwritten", () => {
   });
 });
 
+/* The record sheet and the publish gate need to tell a CONFLICT (the server
+   answered: someone else changed it) from a save that never got an answer
+   (QA 2026-10-02). */
+describe("CMS conflict — pending until a choice is made", () => {
+  it("a conflicted entry is pending; Keep mine that lands clears it", async () => {
+    const { recordServerStamp, syncEntryUpsert, onCmsConflict, isCmsConflictPending } = await pageLoad();
+    recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    let choice: { keepMine(): Promise<void> } | null = null;
+    onCmsConflict((c) => (choice = c));
+    entUpsert.mockRejectedValueOnce(conflict());
+    await expect(syncEntryUpsert(item("e1"))).resolves.toBe(false);
+    expect(isCmsConflictPending("entry", "e1")).toBe(true);
+    await choice!.keepMine();
+    expect(isCmsConflictPending("entry", "e1")).toBe(false);
+  });
+
+  it("Use theirs clears it; a save that never got an answer is not a conflict", async () => {
+    const { recordServerStamp, syncEntryUpsert, onCmsConflict, isCmsConflictPending } = await pageLoad();
+    recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    let choice: { useTheirs(): Promise<void> } | null = null;
+    onCmsConflict((c) => (choice = c));
+    entUpsert.mockRejectedValueOnce(conflict());
+    await syncEntryUpsert(item("e1"));
+    colListQuery.mockResolvedValueOnce([]);
+    await choice!.useTheirs();
+    expect(isCmsConflictPending("entry", "e1")).toBe(false);
+
+    entUpsert.mockRejectedValueOnce(offline());
+    await expect(syncEntryUpsert(item("e2"))).resolves.toBe(false);
+    expect(isCmsConflictPending("entry", "e2")).toBe(false);
+  });
+});
+
 describe("CMS outbox — storage unavailable", () => {
   it("a throwing localStorage degrades to the in-memory queue and never throws", async () => {
     const { syncEntryUpsert, retryCmsSync, getCmsSyncPendingCount, cmsSyncBlocker, flushCmsOutbox } = await pageLoad();

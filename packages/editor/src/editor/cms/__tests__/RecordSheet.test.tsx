@@ -19,11 +19,13 @@ import { makeEngine } from "./fakeCmsEngine";
    only…" state on a queued mirror. The default here is "reached" (the test's
    happy path); the queued branch in its own test sets it to false. */
 const syncMock = vi.fn(async (..._args: unknown[]) => true);
+const conflictMock = vi.fn((..._args: unknown[]) => false);
 vi.mock("@/services/cmsSync", async () => {
   const m = await vi.importActual<typeof import("@/services/cmsSync")>("@/services/cmsSync");
   return {
     ...m,
     syncEntryUpsert: (...args: Parameters<typeof m.syncEntryUpsert>) => syncMock(...args),
+    isCmsConflictPending: (...args: unknown[]) => conflictMock(...args),
     syncCollectionUpsert: vi.fn(async () => true),
     syncEntryDelete: vi.fn(async () => true),
     syncCollectionDelete: vi.fn(async () => true),
@@ -138,6 +140,28 @@ describe("RecordSheet", () => {
     );
     expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
     expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+  });
+
+  /* QA 2026-10-02 (CMS ledger, "Conflict copy"): a save the server refused
+     because another device changed the record said "The server is offline —
+     the change will sync when you reconnect.", which is false: the server
+     answered, and no reconnect will settle it. No board draws this state; the
+     copy names what happened and the choice the toast offers. */
+  it("a conflicted save says someone else changed the record, not that the server is offline", async () => {
+    syncMock.mockImplementationOnce(async () => false);
+    conflictMock.mockImplementationOnce(() => true);
+    mount();
+    await openRow();
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    await waitFor(() =>
+      expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent(
+        "Someone else changed this record. Choose Keep mine or Use theirs.",
+      ),
+    );
+    expect(screen.getByTestId("cms-sheet-state")).not.toHaveTextContent(/offline/i);
+    expect(conflictMock).toHaveBeenCalledWith("entry", "r1");
+    expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
   });
 
   it("says which required fields keep a record from publishing (5940:148412)", async () => {

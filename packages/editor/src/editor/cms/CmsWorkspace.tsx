@@ -368,13 +368,13 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           }
           onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
           onSave={async (data, published) => {
-            const { reached } = await panel.saveRecord(
+            const { reached, conflict } = await panel.saveRecord(
               collection.id,
               ws.recordId === "new" ? null : ws.recordId,
               data,
               published,
             );
-            return reached;
+            return reached ? true : conflict ? "conflict" : false;
           }}
           onDelete={async (r) => {
             await panel.deleteRecord(r.id);

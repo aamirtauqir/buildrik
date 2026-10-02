@@ -62,11 +62,12 @@ export interface RecordSheetProps {
   onBackToCanvas?: () => void;
   /** The sheet's own Records · Fields · Dynamic pages row leaves the sheet. */
   onOpenTab: (tab: CmsTab) => void;
-  /** Resolve when the save has either reached the server (true) or been
-   *  queued for retry (false). The sheet stays open with the
-   *  "Saved on this device only" state when false — closing on a queued save
-   *  was hiding the queued mirror from the user. */
-  onSave: (data: Record<string, unknown>, published: boolean) => Promise<boolean>;
+  /** Resolve when the save has either reached the server (true), been
+   *  queued for retry (false), or been refused because another device changed
+   *  the record ("conflict" — the toast offers Keep mine / Use theirs). The
+   *  sheet stays open on the last two — closing on a queued save was hiding
+   *  the queued mirror from the user. */
+  onSave: (data: Record<string, unknown>, published: boolean) => Promise<boolean | "conflict">;
   onDelete: (record: CMSContentItem) => Promise<void>;
   /** Undo for an instant delete: writes the record back. */
   onRestore: (record: CMSContentItem) => Promise<void>;
@@ -203,7 +204,7 @@ export function RecordSheet({
     setSaveError(null);
     try {
       const reached = await onSave(form, published);
-      if (reached) {
+      if (reached === true) {
         /* 6561:54690 — the collection rides in the title; the body says what
            the save reached and what it did not yet. */
         addToast({
@@ -212,6 +213,12 @@ export function RecordSheet({
           description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
         });
         onClose();
+      } else if (reached === "conflict") {
+        /* The server answered: another device changed this record since this
+           copy was read. "The server is offline" was false here, and no
+           reconnect settles it — the choice does. No board draws this state
+           (CMS ledger, 2026-10-02): copy in the sheet's own voice. */
+        setSaveError("Someone else changed this record. Choose Keep mine or Use theirs.");
       } else {
         /* P0-B audit 2026-09-30 — a queued mirror (network down or the server
            refused this stamp) must not silently close the sheet. The local

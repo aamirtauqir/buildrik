@@ -209,6 +209,15 @@ function announceGone(kind: CmsGone["kind"], id: string, e: unknown): void {
   for (const cb of goneListeners) cb({ kind, id, message });
 }
 
+/* Upserts whose last answer was CONFLICT: the server holds a newer copy and
+   the change waits for Keep mine / Use theirs. A queued op that never got an
+   answer is NOT one — the record sheet and the publish gate say different
+   things about the two (QA 2026-10-02). Keyed like the outbox. */
+const conflicted = new Set<string>();
+export function isCmsConflictPending(kind: "collection" | "entry", id: string): boolean {
+  return conflicted.has(`${kind}Upsert:${id}`);
+}
+
 type Outcome = "ok" | "conflict" | "gone";
 function classify(e: unknown): Outcome | null {
   const msg = e instanceof Error ? e.message : "";
@@ -263,6 +272,8 @@ async function mirror(
       answer = e;
     }
     last = outcome;
+    if (outcome === "conflict") conflicted.add(body.key);
+    else conflicted.delete(body.key);
     if (outcome !== "conflict") outboxRemove(siteId, body.key, seq);
     if (outcome === "ok") return;
     try {
@@ -638,6 +649,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
 async function takeServerCopy(siteId: string, kind: "collection" | "entry", id: string): Promise<void> {
   forgetServerStamp(`${kind}:${id}`);
   outboxRemove(siteId, `${kind}Upsert:${id}`);
+  conflicted.delete(`${kind}Upsert:${id}`);
   forceServer.add(`${kind}:${id}`);
   await hydrateCmsFromServer();
   await engine?.refreshFromStorage();

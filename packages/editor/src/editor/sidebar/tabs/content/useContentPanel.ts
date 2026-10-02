@@ -16,6 +16,7 @@ import type { SiteVariable } from "@/shared/types/project";
 import type { ConditionBinding, ConditionExpression, DataSource } from "@/shared/types/data";
 import {
   consumeDirectSync,
+  isCmsConflictPending,
   markDirectSync,
   syncEntryUpsert,
 } from "@/services/cmsSync";
@@ -53,7 +54,7 @@ export interface UseContentPanelReturn {
     recordId: string | null,
     data: Record<string, unknown>,
     published: boolean,
-  ) => Promise<{ item: CMSContentItem | null; reached: boolean }>;
+  ) => Promise<{ item: CMSContentItem | null; reached: boolean; conflict: boolean }>;
   deleteRecord: (recordId: string) => Promise<void>;
   addField: (collectionId: string, field: Omit<CMSField, "id" | "order">) => Promise<void>;
   deleteField: (collectionId: string, fieldId: string) => Promise<void>;
@@ -214,8 +215,8 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
       recordId: string | null,
       data: Record<string, unknown>,
       published: boolean,
-    ): Promise<{ item: CMSContentItem | null; reached: boolean }> => {
-      if (!composer) return { item: null, reached: true };
+    ): Promise<{ item: CMSContentItem | null; reached: boolean; conflict: boolean }> => {
+      if (!composer) return { item: null, reached: true, conflict: false };
       const status = published ? ("published" as const) : ("draft" as const);
       /* P0-B audit 2026-09-30: the sheet's save needs to know whether the
          mirror landed on the server, so it fires the sync DIRECTLY for a
@@ -249,7 +250,10 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
       }
       await loadRecords(collectionId);
       reload();
-      return { item, reached };
+      /* Not reached because the server refused this copy (another device
+         changed the record) — a different sentence from "not reached yet". */
+      const conflict = !reached && item !== null && isCmsConflictPending("entry", item.id);
+      return { item, reached, conflict };
     },
     [composer, loadRecords, reload],
   );
