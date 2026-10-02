@@ -9,7 +9,14 @@
  */
 
 import type { WorkspaceRole } from "@/services/RoleService";
-import type { SettingsNavId, SettingsSaveModel, SettingsScope, SettingsScreenId } from "./types";
+import type {
+  SettingsNavId,
+  SettingsPaneId,
+  SettingsSaveModel,
+  SettingsScope,
+  SettingsScreenId,
+  SettingsWorkspaceDoorId,
+} from "./types";
 
 /**
  * The locales the product knows. One list for every place a locale is
@@ -107,12 +114,13 @@ interface SettingsNavRow {
 
 /**
  * `screen` renders in the pane · `door` leaves for another editor surface
- * (the Brand panel) · `external` opens the dashboard in a new tab
- * (`WORKSPACE_LINKS`).
+ * (the Brand panel) · `workspace` opens a door card in the pane that leads to
+ * the dashboard's workspace settings (8139:217358, `WORKSPACE_LINKS`).
  */
 export type SettingsNavDef =
   | (SettingsNavRow & { kind: "screen"; id: Exclude<SettingsScreenId, "overview"> })
-  | (SettingsNavRow & { kind: "door" | "external"; id: Exclude<SettingsNavId, SettingsScreenId> });
+  | (SettingsNavRow & { kind: "workspace"; id: SettingsWorkspaceDoorId })
+  | (SettingsNavRow & { kind: "door"; id: "branding" });
 
 /** Sidebar order within each group. */
 export const SETTINGS_NAV: SettingsNavDef[] = [
@@ -128,9 +136,9 @@ export const SETTINGS_NAV: SettingsNavDef[] = [
   { id: "custom-code", title: "Custom code", subtitle: "Head, body and CSS injections.", group: "advanced", kind: "screen" },
   { id: "headers", title: "Security headers", subtitle: "CSP, HSTS and security policy.", group: "advanced", kind: "screen" },
   { id: "danger-zone", title: "Danger zone", subtitle: "Archive, transfer or delete this site.", group: "danger-zone", kind: "screen" },
-  { id: "members", title: "Members", subtitle: "Seats and roles", group: "workspace", kind: "external" },
-  { id: "billing", title: "Billing", subtitle: "Plan and invoices", group: "workspace", kind: "external" },
-  { id: "webhooks", title: "Integrations & webhooks", subtitle: "Apps, Vercel and webhook deliveries", group: "workspace", kind: "external" },
+  { id: "members", title: "Members", subtitle: "Seats and roles", group: "workspace", kind: "workspace" },
+  { id: "billing", title: "Billing", subtitle: "Plan and invoices", group: "workspace", kind: "workspace" },
+  { id: "webhooks", title: "Integrations & webhooks", subtitle: "Apps, Vercel and webhook deliveries", group: "workspace", kind: "workspace" },
 ];
 
 /** The ids that render in the pane, in sidebar order — what a deep link may name. */
@@ -141,6 +149,12 @@ export const SETTINGS_SCREEN_IDS: readonly SettingsScreenId[] = [
 
 export function isSettingsScreenId(id: string): id is SettingsScreenId {
   return (SETTINGS_SCREEN_IDS as readonly string[]).includes(id);
+}
+
+const WORKSPACE_DOOR_IDS: readonly SettingsWorkspaceDoorId[] = ["members", "billing", "webhooks"];
+
+export function isSettingsPaneId(id: string): id is SettingsPaneId {
+  return isSettingsScreenId(id) || (WORKSPACE_DOOR_IDS as readonly string[]).includes(id);
 }
 
 /**
@@ -200,9 +214,31 @@ export const SCREEN_SCOPE: Record<Exclude<SettingsScreenId, "overview">, Setting
   "danger-zone": "live",
 };
 
-export const SCOPE_LINE: Record<SettingsScope, string> = {
-  publish: "all pages · applies on next publish",
-  live: "live immediately · no publish needed",
+/** M1 (8134:212121 / 8134:212529): the next-publish line names the site; the live one does not. */
+export function scopeLine(scope: SettingsScope, siteName: string): string {
+  return scope === "publish" ? `${siteName} · all pages · applies on next publish` : "Live immediately · no publish needed";
+}
+
+/** 8137:216346: the Overview's own line. */
+export const overviewScopeLine = (siteName: string) => `${siteName} · site lifecycle · changes apply immediately`;
+
+/** 8139:217358: a workspace door's line. */
+export const workspaceScopeLine = (workspaceName: string) => `${workspaceName} · all sites · managed in workspace settings`;
+
+/** The door card's two sentences per workspace row (8139:217358's shape). */
+export const WORKSPACE_DOOR_COPY: Record<SettingsWorkspaceDoorId, { what: string; managed: string }> = {
+  members: {
+    what: "Invite people and choose their roles across your workspace.",
+    managed: "Members are managed in workspace settings.",
+  },
+  billing: {
+    what: "See your plan, invoices and payment method.",
+    managed: "Billing is managed in workspace settings.",
+  },
+  webhooks: {
+    what: "Connect apps and manage webhooks for your workspace.",
+    managed: "These connections are managed in workspace settings.",
+  },
 };
 
 /** 3950:26309 / 3951:26319 / 3951:26607 — the banner a screen draws when

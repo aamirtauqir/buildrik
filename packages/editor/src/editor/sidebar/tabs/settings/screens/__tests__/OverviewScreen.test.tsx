@@ -9,12 +9,13 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent, within } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent, within, waitFor } from "@testing-library/react";
 import * as React from "react";
 
 const query = vi.fn();
+const unarchive = vi.fn();
 vi.mock("@/services/api-client", () => ({
-  getBuildrikClient: () => ({ siteDetail: { settingsOverview: { query } } }),
+  getBuildrikClient: () => ({ siteDetail: { settingsOverview: { query } }, sites: { unarchive: { mutate: unarchive } } }),
 }));
 
 import { OverviewScreen, summaryLine } from "../OverviewScreen";
@@ -60,7 +61,10 @@ const empty: SettingsOverview = {
   attention: [],
 };
 
-beforeEach(() => query.mockReset());
+beforeEach(() => {
+  query.mockReset();
+  unarchive.mockReset();
+});
 afterEach(cleanup);
 
 const deferred = <T,>() => {
@@ -77,7 +81,7 @@ describe("OverviewScreen — load states", () => {
   it("shows the OVERVIEW load card while the query is in flight", async () => {
     const pending = deferred<SettingsOverview>();
     query.mockReturnValue(pending.promise);
-    render(<OverviewScreen projectId="site-1" onOpenScreen={vi.fn()} />);
+    render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={vi.fn()} />);
     expect(query).toHaveBeenCalledWith({ siteId: "site-1" });
     expect(screen.getByTestId("set-load-card").getAttribute("data-state")).toBe("loading");
     expect(screen.getByTestId("set-load-title").textContent).toBe("Overview");
@@ -89,7 +93,7 @@ describe("OverviewScreen — load states", () => {
   it("a failed query is the load-error card, and Try again asks the server again", async () => {
     const first = deferred<SettingsOverview>();
     query.mockReturnValueOnce(first.promise);
-    render(<OverviewScreen projectId="site-1" onOpenScreen={vi.fn()} />);
+    render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={vi.fn()} />);
     first.reject(new Error("No procedure found on path siteDetail.settingsOverview"));
     const retry = await screen.findByTestId("set-load-retry");
     expect(screen.getByText("Couldn't load the overview. Check your connection, then try again.")).toBeTruthy();
@@ -100,7 +104,7 @@ describe("OverviewScreen — load states", () => {
   });
 
   it("no project id is the load-error card, not a request", () => {
-    render(<OverviewScreen projectId={null} onOpenScreen={vi.fn()} />);
+    render(<OverviewScreen siteName="Bella Cucina" projectId={null} onOpenScreen={vi.fn()} />);
     expect(query).not.toHaveBeenCalled();
     expect(screen.getByTestId("set-load-card").getAttribute("data-state")).toBe("error");
   });
@@ -110,7 +114,7 @@ describe("OverviewScreen — the frame", () => {
   it("draws NEEDS ATTENTION with one row per item, each `Open ›` opening its section", async () => {
     query.mockResolvedValue(full);
     const onOpenScreen = vi.fn();
-    render(<OverviewScreen projectId="site-1" onOpenScreen={onOpenScreen} />);
+    render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={onOpenScreen} />);
     const card = await screen.findByTestId("set-ov-attention");
     expect(within(card).getByText("Needs attention")).toBeTruthy();
     expect(within(card).getByText("3")).toBeTruthy();
@@ -122,7 +126,7 @@ describe("OverviewScreen — the frame", () => {
 
   it("hides the attention card when nothing needs it", async () => {
     query.mockResolvedValue(empty);
-    render(<OverviewScreen projectId="site-1" onOpenScreen={vi.fn()} />);
+    render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={vi.fn()} />);
     await screen.findByTestId("set-ov-group-site");
     expect(screen.queryByTestId("set-ov-attention")).toBeNull();
   });
@@ -130,7 +134,7 @@ describe("OverviewScreen — the frame", () => {
   it("lays the §25 groups out in two columns with a row per section and its summary", async () => {
     query.mockResolvedValue(full);
     const onOpenScreen = vi.fn();
-    render(<OverviewScreen projectId="site-1" onOpenScreen={onOpenScreen} />);
+    render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={onOpenScreen} />);
     await screen.findByTestId("set-ov-group-site");
     const groups = Array.from(document.querySelectorAll('[data-testid^="set-ov-group-"]')).map((el) =>
       el.getAttribute("data-testid"),
@@ -175,12 +179,9 @@ describe("OverviewScreen — the frame", () => {
     fireEvent.click(screen.getByTestId("set-ov-row-seo"));
     expect(onOpenScreen).toHaveBeenCalledWith("seo");
 
-    // Members / Billing leave for the dashboard in a new tab.
-    const members = screen.getByTestId("set-ov-row-members");
-    expect(members.tagName).toBe("A");
-    expect(members.getAttribute("href")).toContain("/dashboard/settings/team");
-    expect(members.getAttribute("target")).toBe("_blank");
-    expect(screen.getByTestId("set-ov-row-billing").getAttribute("href")).toContain("/dashboard/settings/billing");
+    // Workspace rows open their door card in the pane (8139:217358), like the sidebar's.
+    fireEvent.click(screen.getByTestId("set-ov-row-members"));
+    expect(onOpenScreen).toHaveBeenCalledWith("members");
   });
 
   it("an empty site reads honestly on every line", () => {
@@ -203,30 +204,33 @@ describe("OverviewScreen — the frame", () => {
   });
 });
 
-describe("OverviewScreen — the site's state (plan #10 / M3)", () => {
-  it("says an archived site is hidden but still live, and opens the Danger zone", async () => {
-    query.mockResolvedValue({ ...empty, site: { ...empty.site, archived: true } });
-    const onOpenScreen = vi.fn();
-    render(<OverviewScreen projectId="site-1" onOpenScreen={onOpenScreen} />);
+describe("OverviewScreen — the site's state (8137:216346 / M3)", () => {
+  it("says an archived site is still live, and Unarchive unarchives it and re-reads", async () => {
+    query.mockResolvedValueOnce({ ...empty, site: { ...empty.site, archived: true } }).mockResolvedValueOnce(empty);
+    unarchive.mockResolvedValue({});
+    render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={vi.fn()} />);
     const state = await screen.findByTestId("set-ov-state");
-    expect(state.textContent).toContain("This site is archived: it is hidden from the Sites list, and the live site stays up.");
-    fireEvent.click(screen.getByTestId("set-ov-state-open"));
-    expect(onOpenScreen).toHaveBeenCalledWith("danger-zone");
+    expect(state.textContent).toContain("Bella Cucina is archived. The live site stays up.");
     expect(summaryLine("danger-zone", { ...empty, site: { ...empty.site, archived: true } })).toBe("Archived · hidden from the Sites list");
+    fireEvent.click(screen.getByTestId("set-ov-unarchive"));
+    expect(unarchive).toHaveBeenCalledWith({ id: "site-1" });
+    await waitFor(() => expect(screen.queryByTestId("set-ov-state")).toBeNull());
+    expect(query).toHaveBeenCalledTimes(2);
   });
 
   it("names the day the workspace is deleted", async () => {
     query.mockResolvedValue({ ...empty, site: { ...empty.site, workspaceDeletionAt: "2026-11-01T00:00:00.000Z" } });
-    render(<OverviewScreen projectId="site-1" onOpenScreen={vi.fn()} />);
-    expect((await screen.findByTestId("set-ov-state")).textContent).toContain(
-      "This workspace is scheduled for deletion on 1 November 2026. This site is deleted with it.",
+    render(<OverviewScreen siteName="New site" projectId="site-1" onOpenScreen={vi.fn()} />);
+    expect((await screen.findByTestId("set-ov-workspace-deletion")).textContent).toContain(
+      "New site's workspace is pending deletion. It permanently deletes on 1 Nov 2026, with every site in it.",
     );
   });
 
   it("draws no state strip for an ordinary site", async () => {
     query.mockResolvedValue(empty);
-    render(<OverviewScreen projectId="site-1" onOpenScreen={vi.fn()} />);
+    render(<OverviewScreen siteName="New site" projectId="site-1" onOpenScreen={vi.fn()} />);
     await screen.findByTestId("set-ov-group-site");
     expect(screen.queryByTestId("set-ov-state")).toBeNull();
+    expect(screen.queryByTestId("set-ov-workspace-deletion")).toBeNull();
   });
 });

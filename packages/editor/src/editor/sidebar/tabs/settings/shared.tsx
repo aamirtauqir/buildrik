@@ -434,13 +434,18 @@ export const SaveErrorBanner: React.FC<{ message: string }> = ({ message }) => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ReadOnlyBanner — plan M2 (board not drawn yet): a screen above the
+// ReadOnlyBanner — M2 (8134:212323): a screen above the
 // member's role. The shell renders it above the disabled screen.
 // ─────────────────────────────────────────────────────────────────────────────
 
+/* 8134:212323: the accent tint, 16 in, 12 down, a 4 radius, 13/20 ink. */
 export const ReadOnlyBanner: React.FC<{ who: string; screen: string }> = ({ who, screen }) => (
-  <div role="status" className={SCREEN_INFO} data-testid="set-readonly">
-    {`Only ${who} can change ${screen}. You can see the current values here.`}
+  <div
+    role="status"
+    className="tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+    data-testid="set-readonly"
+  >
+    {`Only ${who} can change ${screen}`}
   </div>
 );
 

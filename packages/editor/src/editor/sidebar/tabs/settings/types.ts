@@ -36,6 +36,12 @@ export type SettingsNavId =
 /** The ids that render in the pane — what `?settings=<id>` and `ui:settings-open` may name. */
 export type SettingsScreenId = Exclude<SettingsNavId, "branding" | "members" | "billing" | "webhooks">;
 
+/** The workspace doors: each opens a door card in the pane (8139:217358) that leads to the dashboard. */
+export type SettingsWorkspaceDoorId = "members" | "billing" | "webhooks";
+
+/** Everything the pane can show: a screen, or a workspace door's card. */
+export type SettingsPaneId = SettingsScreenId | SettingsWorkspaceDoorId;
+
 /** How a screen saves (§27): `footer` = Save/Discard in the footer through the
  *  settings mutations; `immediate` = each action applies as it happens, through
  *  its own dialog — the footer only appears if something is still left to save. */

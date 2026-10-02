@@ -16,15 +16,14 @@
  */
 
 import * as React from "react";
-import { ArrowUpRight, ChevronRight, TriangleAlert } from "lucide-react";
+import { ChevronRight, TriangleAlert } from "lucide-react";
 import { Button } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { LoadCard, SET_CARD, SET_EYEBROW, SET_RESTORE_STRIP, Screen } from "../shared";
+import { LoadCard, SET_BTN, SET_CARD, SET_EYEBROW, Screen } from "../shared";
 import {
   SETTINGS_NAV,
   SETTINGS_NAV_GROUPS,
-  WORKSPACE_LINKS,
   type SettingsNavDef,
   type SettingsNavGroupId,
 } from "../constants";
@@ -150,19 +149,11 @@ const ROW_CLASS =
   "tw:bg-transparent tw:px-4 tw:py-1.5 tw:text-left tw:font-normal tw:no-underline tw:text-[var(--bk-ink)] " +
   "tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
-const RowBody: React.FC<{ nav: SettingsNavDef; line: string; attention: boolean; external?: boolean }> = ({
-  nav,
-  line,
-  attention,
-  external,
-}) => {
+const RowBody: React.FC<{ nav: SettingsNavDef; line: string; attention: boolean }> = ({ nav, line, attention }) => {
   return (
     <>
       <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-        <span className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">
-          {nav.title}
-          {external ? <ArrowUpRight size={12} className="tw:ml-1 tw:inline tw:align-[-1px]" aria-hidden /> : null}
-        </span>
+        <span className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">{nav.title}</span>
         <span
           className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]"
           data-testid={`set-ov-row-line-${nav.id}`}
@@ -177,27 +168,31 @@ const RowBody: React.FC<{ nav: SettingsNavDef; line: string; attention: boolean;
           aria-label="Needs attention"
         />
       ) : null}
-      {external ? (
-        <ArrowUpRight size={14} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
-      ) : (
-        <ChevronRight size={14} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
-      )}
+      <ChevronRight size={14} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
     </>
   );
 };
 
 export interface OverviewScreenProps {
   projectId?: string | null;
+  /** The site's name as the editor has it — the state strip's subject. */
+  siteName: string;
   /** A row's `›` / an attention row's `Open ›` — the same nav the sidebar makes. */
   onOpenScreen: (id: SettingsNavId) => void;
 }
+
+/* 8137:216346: 16 in, 12 down, a 4 radius, 13/20 ink; the action under the line. */
+const STATE_NOTICE =
+  "tw:flex tw:flex-col tw:items-start tw:gap-2 tw:rounded-[var(--bk-radius-sm)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 const LOAD_TITLE = "Overview";
 const LOAD_LINE = "Where every setting stands.";
 const LOAD_ERROR = "Couldn't load the overview. Check your connection, then try again.";
 
-export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpenScreen }) => {
+export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, siteName, onOpenScreen }) => {
   const [data, setData] = React.useState<SettingsOverview | null>(null);
+  const [unarchiving, setUnarchiving] = React.useState(false);
+  const [unarchiveError, setUnarchiveError] = React.useState<string | null>(null);
   const [failed, setFailed] = React.useState(false);
   const [attempt, setAttempt] = React.useState(0);
 
@@ -240,26 +235,35 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpe
 
   const workspaceDeletion = data.site.workspaceDeletionAt ? new Date(data.site.workspaceDeletionAt) : null;
 
+  const unarchive = () => {
+    if (!projectId) return;
+    setUnarchiving(true);
+    setUnarchiveError(null);
+    getBuildrikClient(DASHBOARD_URL)
+      .sites.unarchive.mutate({ id: projectId })
+      .then(() => setAttempt((n) => n + 1))
+      .catch((e: unknown) => setUnarchiveError(e instanceof Error ? e.message : "Couldn't unarchive the site."))
+      .finally(() => setUnarchiving(false));
+  };
+
   return (
     <Screen>
-      {data.site.archived || workspaceDeletion ? (
-        <section className={`${SET_RESTORE_STRIP} tw:flex tw:items-center tw:gap-3`} aria-label="Site state" data-testid="set-ov-state">
-          <span className="tw:min-w-0 tw:flex-1">
-            {workspaceDeletion
-              ? `This workspace is scheduled for deletion on ${workspaceDeletion.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}. This site is deleted with it.`
-              : "This site is archived: it is hidden from the Sites list, and the live site stays up."}
-          </span>
-          {data.site.archived && !workspaceDeletion ? (
-            <Button
-              type="button"
-              variant="link"
-              className="tw:shrink-0 tw:text-[length:var(--bk-text-12)] tw:font-medium"
-              onClick={() => onOpenScreen("danger-zone")}
-              data-testid="set-ov-state-open"
-            >
-              Danger zone ›
-            </Button>
-          ) : null}
+      {/* 8137:216346 (M3): an archived site says so, with Unarchive. */}
+      {data.site.archived ? (
+        <section className={`${STATE_NOTICE} tw:bg-[var(--bk-accent-tint)]`} aria-label="Site state" data-testid="set-ov-state">
+          <p className="tw:m-0">{`${siteName} is archived. The live site stays up.`}</p>
+          <Button type="button" size="xs" className={`${SET_BTN} tw:h-7 tw:px-3`} disabled={unarchiving} onClick={unarchive} data-testid="set-ov-unarchive">
+            Unarchive
+          </Button>
+          {unarchiveError ? <p className="tw:m-0 tw:text-[var(--bk-error)]" role="alert">{unarchiveError}</p> : null}
+        </section>
+      ) : null}
+      {/* The workspace's own deletion (PD-5) — 8137:216089's strip, said of the workspace. */}
+      {workspaceDeletion ? (
+        <section className={`${STATE_NOTICE} tw:bg-[var(--bk-warning-tint)]`} aria-label="Workspace state" data-testid="set-ov-workspace-deletion">
+          <p className="tw:m-0">
+            {`${data.site.name}'s workspace is pending deletion. It permanently deletes on ${workspaceDeletion.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}, with every site in it.`}
+          </p>
         </section>
       ) : null}
       {data.attention.length ? (
@@ -325,18 +329,7 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpe
             <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0">
               {SETTINGS_NAV.filter((n) => n.group === group).map((nav) => (
                 <li key={nav.id}>
-                  {nav.kind === "external" ? (
-                    <a
-                      href={`${DASHBOARD_URL}${WORKSPACE_LINKS[nav.id] ?? "/dashboard"}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={ROW_CLASS}
-                      data-testid={`set-ov-row-${nav.id}`}
-                    >
-                      <RowBody nav={nav} line={summaryLine(nav.id, data)} attention={attentionFor(nav.id)} external />
-                    </a>
-                  ) : (
-                    <Button
+                  <Button
                       type="button"
                       variant="ghost"
                       className={ROW_CLASS}
@@ -345,7 +338,6 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpe
                     >
                       <RowBody nav={nav} line={summaryLine(nav.id, data)} attention={attentionFor(nav.id)} />
                     </Button>
-                  )}
                 </li>
               ))}
             </ul>
