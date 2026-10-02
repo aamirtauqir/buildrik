@@ -73,6 +73,9 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
   const property = `${box}-${side}`;
   const field = useInspectorField(property);
   const [local, setLocal] = React.useState(() => parseValue(value));
+  /* Typed numbers are written live, so Escape has to write back what the side
+     held at focus — resetting the text alone left the typed padding on. */
+  const atFocusRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     setLocal(parseValue(value));
@@ -154,8 +157,17 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
             setLocal({ num: next, unit: local.unit || "px", isKeyword: false });
             commit(next);
           } else if (e.key === "Escape") {
-            setLocal(parseValue(value));
+            const before = atFocusRef.current;
+            if (before !== null && before !== value && !field.readOnly) {
+              onChange(before);
+              setLocal(parseValue(before));
+            } else {
+              setLocal(parseValue(value));
+            }
           }
+        }}
+        onFocus={() => {
+          atFocusRef.current = value;
         }}
         onBlur={() => {
           setLocal(parseValue(value));

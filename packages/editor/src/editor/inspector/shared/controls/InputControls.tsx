@@ -142,6 +142,10 @@ export interface InputWithUnitProps {
   /** false: the row around this field already draws its override dot (Size's
    *  Width / Height draw it beside their mode button). */
   dot?: boolean;
+  /** Escape after a live edit puts back what was there at focus. Default:
+   *  write the value the field held then. Size's Fill field shows a readout,
+   *  not the value, so it puts back its own. */
+  onRevert?: (atFocus: string) => void;
 }
 
 const NO_UNITS: readonly string[] = [""];
@@ -219,9 +223,14 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   property,
   noUnit = false,
   dot = true,
+  onRevert,
 }) => {
   const field = useInspectorField(property);
   const units = noUnit ? NO_UNITS : unitsProp;
+  /* A plain number is written as it is typed, so by Escape the element
+     already carries it: restoring the text alone left 48px on a heading the
+     user had backed out of (board 34 / L3-C: Escape restores). */
+  const atFocusRef = React.useRef<string | null>(null);
   const { num, unit } = splitValue(value, units);
   const isKeyword = KEYWORDS.has(unit);
   const shown = isKeyword ? unit : num;
@@ -246,6 +255,10 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
      entry stays so it can be corrected, the element keeps its old value. */
   const commit = () => {
     if (field.readOnly || (field.mixed && text === "")) return;
+    /* Untouched is not an entry. A token-bound size shows the number it
+       resolves to, so reading that back on blur wrote "24px" over the token —
+       which is also what undid an Escape the moment focus left. */
+    if (text === shown && !invalid) return;
     const next = parseEntry(text, units, unit);
     if (next === null) {
       setInvalid(true);
@@ -274,6 +287,11 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
       step((e.shiftKey ? 10 : 1) * (e.key === "ArrowUp" ? 1 : -1));
     } else if (e.key === "Escape") {
       e.preventDefault();
+      const before = atFocusRef.current;
+      if (before !== null && before !== value && !field.readOnly) {
+        if (onRevert) onRevert(before);
+        else onChange(before);
+      }
       restore();
     } else if (e.key === "Enter") {
       commit();
@@ -315,6 +333,9 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
             const unitNow = KEYWORDS.has(unit) ? (units.find((u) => !KEYWORDS.has(u)) ?? "px") : unit;
             onChange(`${next.trim()}${unitNow}`);
           }
+        }}
+        onFocus={() => {
+          atFocusRef.current = value;
         }}
         onBlur={() => {
           commit();

@@ -188,6 +188,9 @@ function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
     const current = next === "fixed" && mode !== "fixed" && measured ? `${measured}px` : value;
     onChange(valueForConstraint(next, current));
   };
+  /* What the property held when the field took focus: Escape after typing
+     into Fill puts Fill back, not the readout as a Fixed width. */
+  const atFocusRef = React.useRef(value);
   const labelText = mode === "hug" ? name : `${name} · ${MODE_LABEL[mode]}`;
   const readout = measured ? `${measured}px` : "100%";
 
@@ -255,7 +258,12 @@ function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
           </div>
         ) : (
           <div className={CHAIN_ROW}>
-            <div className="tw:flex-1 tw:min-w-0">
+            <div
+              className="tw:flex-1 tw:min-w-0"
+              onFocusCapture={() => {
+                atFocusRef.current = value;
+              }}
+            >
               <InputWithUnit
                 label=""
                 ariaLabel={name}
@@ -269,6 +277,7 @@ function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
                   if (mode === "fill" && v === readout) return;
                   onChange(v);
                 }}
+                onRevert={() => onChange(atFocusRef.current)}
               />
             </div>
             {mode === "fixed" && !field.readOnly && (
