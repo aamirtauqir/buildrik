@@ -818,10 +818,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         pageName={crumbCtx ?? pageName}
         onOpenPages={viewMode.readOnlyView ? undefined : onOpenPages}
         onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
-        /* Board 4418:123573's shell search is the ⌘K door. View mode has no
-           palette (above), so it draws no door to one (gap walk 93 #7;
-           a viewer palette is OD-GW-3). */
-        onOpenSearch={composer && !viewMode.readOnlyView ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
         contextSearch={
           searchCtx && composer
             ? {

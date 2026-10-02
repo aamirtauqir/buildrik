@@ -17,6 +17,9 @@ export interface LayersPanelProps {
   canvasHoveredId?: string | null;
   /** Controlled search value lifted to LayersTab (prototype panel-h shape). */
   search?: string;
+  /** Selection mode (LayersTab's Select / Done): rows show their checkbox
+   *  and a row click toggles it. Off = no checkboxes. */
+  selecting?: boolean;
   /** Lifted display-settings popover open state. */
   displaySettingsOpen?: boolean;
   /** Lifted display-settings popover toggle callback. */

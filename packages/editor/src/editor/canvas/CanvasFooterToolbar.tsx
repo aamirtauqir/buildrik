@@ -118,16 +118,21 @@ const EDIT_BTN =
   "tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)]";
 
 /**
- * The floating bar — board 5936:44788 / 4428:44164: one 44-tall row inset 16
- * from the canvas edges: ↶ ↷ · View ▾ · 100% ▾ on the left, the selection
- * readout ("Section · Hero · 680 × 250") at the right end. Breakpoints live in
- * View ▸ Breakpoint; shortcuts in Help. `min-w-0` + a truncating readout keep
- * it inside the canvas column when the column is narrow.
+ * The docked bar — one 44-tall row: ↶ ↷ · View ▾ · 100% ▾ on the left, the
+ * selection readout ("Section · Hero · 680 × 250") at the right end.
+ * Breakpoints live in View ▸ Breakpoint; shortcuts in Help. `min-w-0` + a
+ * truncating readout keep it inside the canvas column when the column is
+ * narrow.
+ *
+ * OWNER OVERRIDE 2026-10-03 (boards 5936:44788 / 4428:44164 drew a floating
+ * card inset 16 from the canvas edges, rounded, with a drag shadow): the bar
+ * is docked flush to the canvas column's bottom edge at full width — no
+ * radius, no shadow, no side border. The hairline on top and the fill come
+ * from its container (`footerToolbarContainerStyles`), which spans the column.
  */
 const BAR =
-  "tw:flex tw:items-center tw:justify-start tw:gap-1 tw:h-[var(--bk-size-header)] tw:px-3 tw:rounded-lg " +
-  "tw:border tw:border-[var(--bk-gray-200)] tw:bg-white tw:[box-shadow:var(--bk-shadow-drag)] " +
-  "tw:whitespace-nowrap tw:w-full tw:max-w-full tw:min-w-0";
+  "tw:flex tw:items-center tw:justify-start tw:gap-1 tw:h-[var(--bk-size-header)] tw:px-3 " +
+  "tw:bg-white tw:whitespace-nowrap tw:w-full tw:max-w-full tw:min-w-0";
 const GROUP = "tw:flex tw:items-center tw:gap-1";
 
 // ============================================
