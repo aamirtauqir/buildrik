@@ -1,7 +1,8 @@
 /**
  * RecordSheet — a record's editor, laid wide over the records table
  * (4428:144760; new record 6749:59940; required-missing 5940:148412; save
- * failed 5940:148777; discard guard 6879:67190; record ⋯ 7103:76270).
+ * failed 5940:148777; discard guard 6879:67190; record ⋯ 7103:76270;
+ * conflict 8139:217560; record / collection deleted 8139:217711 · 8139:217890).
  *
  * The fields pair up two to a row in the collection's own order; long text
  * and media take a row of their own. Image fields open the Assets pick mode
@@ -44,6 +45,7 @@ import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { resolveUrl, slugify } from "./DynamicPagesPane";
 import type { CmsTab } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
+import { claimCmsConflict, isCmsConflictPending, type CmsConflict } from "@/services/cmsSync";
 
 export type OpenMediaLibrary = (
   allowedTypes: MediaAssetType[],
@@ -72,6 +74,10 @@ export interface RecordSheetProps {
   /** Undo for an instant delete: writes the record back. */
   onRestore: (record: CMSContentItem) => Promise<void>;
   onOpenMediaLibrary?: OpenMediaLibrary;
+  /** Another device deleted this record (or its collection) and the server
+   *  refused the edit (8139:217711 / 8139:217890): the sheet stays to say the
+   *  change wasn't saved, and can only be closed. */
+  gone?: boolean;
 }
 
 const LABEL = "tw:block tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
@@ -82,9 +88,13 @@ const CONTROL =
   "tw:[&_input]:h-8 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[6px] " +
   "tw:[&_select]:h-8 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[13px] tw:[&_select]:rounded-[6px]";
 const SMALL_BTN = "tw:h-7 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
+/* 8139:217692 — the conflict choice: 32 tall, 12 inline, 13/20 medium. */
+const CHOICE_BTN = "tw:h-8 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
 const NAV_TAB =
   "tw:h-7 tw:min-h-0 tw:rounded-none tw:border-0 tw:border-b-2 tw:border-transparent tw:bg-transparent tw:px-2.5 tw:py-0 tw:text-[13px] " +
   "tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)] tw:focus:ring-0";
+
+const OFFLINE = "Saved on this device only. The server is offline — the change will sync when you reconnect.";
 
 const WIDE: ReadonlySet<CMSField["type"]> = new Set(["textarea", "richtext", "image", "file"]);
 
@@ -127,6 +137,7 @@ export function RecordSheet({
   onDelete,
   onRestore,
   onOpenMediaLibrary,
+  gone = false,
 }: RecordSheetProps) {
   const { addToast } = useToast();
   const initial = React.useMemo(
@@ -176,7 +187,29 @@ export function RecordSheet({
   const title = record ? recordTitle(collection, record) : `New ${singular}`;
   const crumb = record ? title : "New record";
 
-  const guard = (go: () => void) => (dirty ? setLeaveTo(() => go) : go());
+  /* A deleted record has nothing left to discard: its edit is already lost. */
+  const guard = (go: () => void) => (dirty && !gone ? setLeaveTo(() => go) : go());
+
+  /* 8139:217560 — a save the server refused because another device changed
+     the record waits here for Keep mine / Use theirs, not in the shell's
+     toast. Closing the sheet with the choice still open hands it back to the
+     toast (claimCmsConflict's release). */
+  const [conflict, setConflict] = React.useState<CmsConflict | null>(null);
+  const [resolving, setResolving] = React.useState(false);
+  const conflictRef = React.useRef<CmsConflict | null>(null);
+  const recordId = record?.id ?? null;
+  React.useEffect(() => {
+    if (!recordId) return;
+    const release = claimCmsConflict("entry", recordId, (c) => {
+      conflictRef.current = c;
+      setConflict(c);
+    });
+    return () => release(conflictRef.current);
+  }, [recordId]);
+  const settleConflict = () => {
+    conflictRef.current = null;
+    setConflict(null);
+  };
 
   // shellDirtyRegistry (B-1): this sheet already guards its OWN Cancel/Close
   // via `guard` above, but a shell-level tab switch (⌘H, ⇧A, the palette,
@@ -199,34 +232,59 @@ export function RecordSheet({
     return () => shellDirty.setDiscard("cms-record", null);
   }, [initial, initialPublished]);
 
+  /* 6561:54690 — the collection rides in the title; the body says what the
+     save reached and what it did not yet. */
+  const closeSaved = () => {
+    addToast({
+      tone: "success",
+      title: `Record saved · ${collection.name}`,
+      description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
+    });
+    onClose();
+  };
+
+  /* Keep mine re-sends this device's copy; it can conflict again (the claim
+     then holds the new choice), land, or queue. Use theirs replaces this
+     device's copy with the server's, so the sheet's edits are gone with it. */
+  const choose = async (choice: "keepMine" | "useTheirs") => {
+    const c = conflict;
+    if (!c) return;
+    setResolving(true);
+    try {
+      if (choice === "useTheirs") {
+        await c.useTheirs();
+        settleConflict();
+        onClose();
+        return;
+      }
+      const landed = await c.keepMine();
+      if (isCmsConflictPending("entry", c.id)) return;
+      settleConflict();
+      if (landed) closeSaved();
+      else setSaveError(OFFLINE);
+    } finally {
+      setResolving(false);
+    }
+  };
+
   const save = async () => {
     setSaving(true);
     setSaveError(null);
     try {
       const reached = await onSave(form, published);
       if (reached === true) {
-        /* 6561:54690 — the collection rides in the title; the body says what
-           the save reached and what it did not yet. */
-        addToast({
-          tone: "success",
-          title: `Record saved · ${collection.name}`,
-          description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
-        });
-        onClose();
-      } else if (reached === "conflict") {
-        /* The server answered: another device changed this record since this
-           copy was read. "The server is offline" was false here, and no
-           reconnect settles it — the choice does. No board draws this state
-           (CMS ledger, 2026-10-02): copy in the sheet's own voice. */
-        setSaveError("Someone else changed this record. Choose Keep mine or Use theirs.");
-      } else {
-        /* P0-B audit 2026-09-30 — a queued mirror (network down or the server
-           refused this stamp) must not silently close the sheet. The local
-           write already happened; the change is on this device, the next
-           online tick replays it. The sheet's own footer carries the state
-           so the user knows what to expect (and that the toast on the right
-           isn't lying about "live in the CMS"). */
-        setSaveError("Saved on this device only. The server is offline — the change will sync when you reconnect.");
+        closeSaved();
+      } else if (reached !== "conflict") {
+        /* "conflict": the server answered that another device changed this
+           record; the claim above already holds the choice and the footer
+           says so (8139:217560).
+           Otherwise (P0-B audit 2026-09-30) a queued mirror (network down or
+           the server refused this stamp) must not silently close the sheet.
+           The local write already happened; the change is on this device,
+           the next online tick replays it. The sheet's own footer carries
+           the state so the user knows what to expect (and that the toast on
+           the right isn't lying about "live in the CMS"). */
+        setSaveError(OFFLINE);
       }
     } catch (e) {
       /* A published record is validated against the collection's rules
@@ -241,6 +299,8 @@ export function RecordSheet({
       setSaving(false);
     }
   };
+
+  const blocked = gone || conflict !== null;
 
   const ownsPage = Boolean(record && collection.pageSlugPattern && record.status === "published");
   const remove = async () => {
@@ -486,7 +546,49 @@ export function RecordSheet({
         </Button>
       </div>
 
+      {conflict && !gone ? (
+        /* 8139:217690 — the choice sits on the footer's rule, warning tint,
+           8px wider than the form on each side. */
+        <div
+          className="tw:-mx-2 tw:-mb-2 tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3"
+          role="alert"
+          data-testid="cms-sheet-conflict"
+        >
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            Someone else changed this record. Choose Keep mine or Use theirs.
+          </p>
+          <div className="tw:flex tw:h-8 tw:items-center tw:gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              className={CHOICE_BTN}
+              disabled={resolving}
+              data-testid="cms-sheet-keep-mine"
+              onClick={() => void choose("keepMine")}
+            >
+              Keep mine
+            </Button>
+            <Button size="sm" className={CHOICE_BTN} disabled={resolving} data-testid="cms-sheet-use-theirs" onClick={() => void choose("useTheirs")}>
+              Use theirs
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <footer className="tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:pt-2">
+        {blocked ? (
+          /* 8139:217560 / 8139:217711 — nothing here can publish until the
+             conflict is chosen or the sheet is left; the switch steps aside. */
+          <div className="tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4" data-testid="cms-sheet-eligibility">
+            <span
+              className={`tw:size-1.5 tw:rounded-full ${gone ? "tw:bg-[var(--bk-gray-500)]" : "tw:bg-[var(--bk-warning)]"}`}
+              aria-hidden="true"
+            />
+            <span className="tw:flex-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-gray-500)]">
+              {gone ? "This item is no longer available" : "Resolve the conflict before publishing"}
+            </span>
+          </div>
+        ) : (
         <div className="tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4" data-testid="cms-sheet-eligibility">
           <span
             className={`tw:size-1.5 tw:rounded-full ${!record && !dirty ? "tw:bg-[var(--bk-ink-muted)]" : missing.length ? "tw:bg-[var(--bk-warning)]" : "tw:bg-[var(--bk-success)]"}`}
@@ -510,18 +612,23 @@ export function RecordSheet({
             onChange={setPublished}
           />
         </div>
+        )}
         <div className="tw:flex tw:items-center tw:gap-2">
           <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
             <span
-              className={`tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
-              role={saveError ? "alert" : undefined}
+              className={`tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError && !blocked ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
+              role={saveError && !blocked ? "alert" : undefined}
               data-testid="cms-sheet-state"
             >
-              {saveError ??
-                (dirty ? "Unsaved changes on this record" : record ? "No unsaved changes on this record" : "New record · nothing saved yet")}
+              {gone
+                ? "Your change to it wasn't saved."
+                : conflict
+                  ? "Your changes are waiting for a conflict choice."
+                  : saveError ??
+                    (dirty ? "Unsaved changes on this record" : record ? "No unsaved changes on this record" : "New record · nothing saved yet")}
             </span>
             {/* 6749:59940 — a new record says what Save needs and what it does. */}
-            {!record && !saveError ? (
+            {!record && !saveError && !blocked ? (
               <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="cms-sheet-new-hint">
                 {nameMissing ? `Enter a ${nameField?.name ?? "name"} before saving. ` : ""}Save record creates this {singular} with every
                 field above. Publishing the site makes it live.
@@ -531,8 +638,8 @@ export function RecordSheet({
           <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel" onClick={() => guard(onClose)}>
             Cancel
           </Button>
-          <Button size="xs" className={SMALL_BTN} disabled={(!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
-            {saveError ? "Retry save" : "Save record"}
+          <Button size="xs" className={SMALL_BTN} disabled={blocked || (!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
+            {saveError && !blocked ? "Retry save" : "Save record"}
           </Button>
         </div>
       </footer>

@@ -269,7 +269,7 @@ describe("CMS outbox — conflicts are never silently overwritten", () => {
   it("Keep mine sends without a precondition and clears the outbox", async () => {
     const { recordServerStamp, syncEntryUpsert, onCmsConflict } = await pageLoad();
     recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
-    let choice: { keepMine(): Promise<void> } | null = null;
+    let choice: { keepMine(): Promise<unknown> } | null = null;
     onCmsConflict((c) => (choice = c));
     entUpsert.mockRejectedValueOnce(conflict());
     await syncEntryUpsert(item("e1"));
@@ -310,7 +310,7 @@ describe("CMS conflict — pending until a choice is made", () => {
   it("a conflicted entry is pending; Keep mine that lands clears it", async () => {
     const { recordServerStamp, syncEntryUpsert, onCmsConflict, isCmsConflictPending } = await pageLoad();
     recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
-    let choice: { keepMine(): Promise<void> } | null = null;
+    let choice: { keepMine(): Promise<unknown> } | null = null;
     onCmsConflict((c) => (choice = c));
     entUpsert.mockRejectedValueOnce(conflict());
     await expect(syncEntryUpsert(item("e1"))).resolves.toBe(false);
@@ -333,6 +333,35 @@ describe("CMS conflict — pending until a choice is made", () => {
     entUpsert.mockRejectedValueOnce(offline());
     await expect(syncEntryUpsert(item("e2"))).resolves.toBe(false);
     expect(isCmsConflictPending("entry", "e2")).toBe(false);
+  });
+});
+
+/* 8139:217560 — the record sheet offers the choice itself, so a claimed
+   row's conflict skips the shell's toast; released unresolved, it goes back. */
+describe("CMS conflict — a claimed row", () => {
+  it("goes to the claimant, not the listeners; an unresolved release hands it back", async () => {
+    const { recordServerStamp, syncEntryUpsert, onCmsConflict, claimCmsConflict } = await pageLoad();
+    recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    const toast = vi.fn();
+    onCmsConflict(toast);
+    const sheet = vi.fn();
+    const release = claimCmsConflict("entry", "e1", sheet);
+    entUpsert.mockRejectedValueOnce(conflict());
+    await syncEntryUpsert(item("e1"));
+    expect(sheet).toHaveBeenCalledTimes(1);
+    expect(toast).not.toHaveBeenCalled();
+    release(sheet.mock.calls[0][0]);
+    expect(toast).toHaveBeenCalledWith(sheet.mock.calls[0][0]);
+  });
+
+  it("Keep mine reports whether it landed", async () => {
+    const { recordServerStamp, syncEntryUpsert, claimCmsConflict } = await pageLoad();
+    recordServerStamp("entry:e1", "2026-10-01T00:00:00.000Z", "L0");
+    let choice: { keepMine(): Promise<boolean> } | null = null;
+    claimCmsConflict("entry", "e1", (c) => (choice = c));
+    entUpsert.mockRejectedValueOnce(conflict());
+    await syncEntryUpsert(item("e1"));
+    await expect(choice!.keepMine()).resolves.toBe(true);
   });
 });
 

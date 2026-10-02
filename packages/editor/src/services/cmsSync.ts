@@ -186,8 +186,8 @@ registerPendingSource("cms", outstandingCmsChanges);
 export interface CmsConflict {
   kind: "collection" | "entry";
   id: string;
-  /** Overwrite the server with this device's copy. */
-  keepMine(): Promise<void>;
+  /** Overwrite the server with this device's copy; true when it landed. */
+  keepMine(): Promise<boolean>;
   /** Replace this device's copy with the server's. */
   useTheirs(): Promise<void>;
 }
@@ -195,6 +195,30 @@ const conflictListeners = new Set<(c: CmsConflict) => void>();
 export function onCmsConflict(cb: (c: CmsConflict) => void): () => void {
   conflictListeners.add(cb);
   return () => conflictListeners.delete(cb);
+}
+
+/* A surface showing the row (the record sheet, board 8139:217560) offers the
+   choice itself, so its conflict goes to it and not to the shell's toast —
+   two sets of Keep mine / Use theirs for one row could undo each other. The
+   release hands a still-unresolved conflict back to the listeners, so
+   closing the sheet never strands the choice. */
+const conflictClaims = new Map<string, (c: CmsConflict) => void>();
+export function claimCmsConflict(
+  kind: CmsConflict["kind"],
+  id: string,
+  cb: (c: CmsConflict) => void,
+): (unresolved?: CmsConflict | null) => void {
+  const key = `${kind}:${id}`;
+  conflictClaims.set(key, cb);
+  return (unresolved) => {
+    if (conflictClaims.get(key) === cb) conflictClaims.delete(key);
+    if (unresolved && isCmsConflictPending(kind, id)) raiseConflict(unresolved);
+  };
+}
+function raiseConflict(c: CmsConflict): void {
+  const claim = conflictClaims.get(`${c.kind}:${c.id}`);
+  if (claim) return claim(c);
+  for (const cb of conflictListeners) cb(c);
 }
 
 /* An edit to a row another device deleted is dropped on GONE — the row leaves
@@ -644,19 +668,16 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
         else void Storage.deleteCollection(c.id);
         announceGone("collection", c.id, e);
       },
-      conflict: () => {
-        for (const cb of conflictListeners) {
-          cb({
-            kind: "collection",
-            id: c.id,
-            keepMine: async () => {
-              forgetServerStamp(`collection:${c.id}`);
-              await syncCollectionUpsert(c);
-            },
-            useTheirs: () => takeServerCopy(siteId, "collection", c.id),
-          });
-        }
-      },
+      conflict: () =>
+        raiseConflict({
+          kind: "collection",
+          id: c.id,
+          keepMine: async () => {
+            forgetServerStamp(`collection:${c.id}`);
+            return syncCollectionUpsert(c);
+          },
+          useTheirs: () => takeServerCopy(siteId, "collection", c.id),
+        }),
     },
   );
 }
@@ -729,19 +750,16 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
         else void Storage.deleteContentItem(item.id);
         announceGone("entry", item.id, e);
       },
-      conflict: () => {
-        for (const cb of conflictListeners) {
-          cb({
-            kind: "entry",
-            id: item.id,
-            keepMine: async () => {
-              forgetServerStamp(`entry:${item.id}`);
-              await syncEntryUpsert(item);
-            },
-            useTheirs: () => takeServerCopy(siteId, "entry", item.id),
-          });
-        }
-      },
+      conflict: () =>
+        raiseConflict({
+          kind: "entry",
+          id: item.id,
+          keepMine: async () => {
+            forgetServerStamp(`entry:${item.id}`);
+            return syncEntryUpsert(item);
+          },
+          useTheirs: () => takeServerCopy(siteId, "entry", item.id),
+        }),
     },
   );
 }
