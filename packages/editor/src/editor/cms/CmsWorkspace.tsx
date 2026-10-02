@@ -15,7 +15,7 @@ import * as React from "react";
 import { MoreHorizontal, Table2 } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
-import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs, useToast } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelSearch, Popover, Tabs, useToast } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
 import { DynamicPagesPane } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
@@ -97,20 +97,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     if (collection) void loadRecords(collection.id);
   }, [collection?.id, loadRecords]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* 6819:59209 — while a collection is open the topbar field searches it
-     ("Search Menu items…"), the way Add's drawer takes the field over. */
+  /* 6819:59209 had the topbar field search an open collection ("Search Menu
+     items…"); owner decision 2026-10-03 moves it under the tab row, over the
+     records it filters. Leaving the collection drops the query, as handing
+     the topbar field back used to. */
   const collectionName = collection?.name ?? null;
   React.useEffect(() => {
-    if (!composer || !collectionName) return;
-    const onQuery = (p: { query?: string } | undefined) => setQuery(p?.query ?? "");
-    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
-    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: `Search ${collectionName}…` });
-    return () => {
-      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
-      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
-      setQuery("");
-    };
-  }, [composer, collectionName]);
+    setQuery("");
+  }, [collectionName]);
 
   /* 4428:140486 — while the workspace covers the canvas the topbar crumb
      reads "<site> › CMS", not the page behind it. */
@@ -317,6 +311,15 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           </Popover>
         </div>
         {importer.status}
+        {ws.tab === "records" && !isEmpty ? (
+          <PanelSearch
+            placeholder={`Search ${collection.name}…`}
+            value={query}
+            onChange={setQuery}
+            className="tw:max-w-[352px]"
+            data-testid="cms-ws-search"
+          />
+        ) : null}
         <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col">{body}</div>
       </section>
       {addingField ? (

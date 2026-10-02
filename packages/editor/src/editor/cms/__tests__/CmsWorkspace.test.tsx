@@ -121,24 +121,25 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     expect(names().map((n) => n?.slice(0, 4))).toEqual(["Marg", "Diav", "Capr"]);
   });
 
-  it("takes over the topbar search while a collection is open, and filters on it", async () => {
+  /* Owner decision 2026-10-03 (6819:59209 had the topbar field search the
+     open collection): the field sits over the records it filters. */
+  it("searches an open collection from its own field over the records", async () => {
     const { composer } = makeEngine({
       collections: [FULL],
       items: [rec("a", { name: "Margherita" }), rec("b", { name: "Marinara" }), rec("c", { name: "Caprese" })],
     });
-    const contexts: unknown[] = [];
-    composer.on(EVENTS.UI_SEARCH_CONTEXT, (c) => contexts.push(c));
+    const emitted: unknown[] = [];
+    composer.on("ui:search-context" as never, (c: unknown) => emitted.push(c));
     cmsWorkspace.openCollection("col-1");
-    const { unmount } = render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-row-a");
-    expect(contexts).toContainEqual({ placeholder: "Search Menu items…" });
-    composer.emit(EVENTS.UI_SEARCH_QUERY, { query: "mar" });
+    const field = screen.getByPlaceholderText("Search Menu items…");
+    fireEvent.change(field, { target: { value: "mar" } });
     await waitFor(() => expect(screen.queryByTestId("cms-row-c")).toBeNull());
     expect(screen.getByTestId("cms-row-a")).toBeInTheDocument();
-    composer.emit(EVENTS.UI_SEARCH_QUERY, { query: "sushi" });
+    fireEvent.change(field, { target: { value: "sushi" } });
     expect(await screen.findByTestId("cms-no-results")).toHaveTextContent("“sushi”");
-    unmount();
-    expect(contexts[contexts.length - 1]).toBeNull();
+    expect(emitted).toHaveLength(0);
   });
 
   it("pages past PAGE_SIZE records", async () => {

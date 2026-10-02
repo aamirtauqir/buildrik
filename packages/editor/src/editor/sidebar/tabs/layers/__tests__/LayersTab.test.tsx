@@ -9,9 +9,9 @@ import type { Composer } from "../../../../../engine";
 
 // Mock deep dependencies before importing LayersTab
 vi.mock("@/editor/panels/layers/index", () => ({
-  LayersPanel: () => {
+  LayersPanel: (props: { search?: string }) => {
     const React = require("react");
-    return React.createElement("div", { "data-testid": "layers-panel-mock" });
+    return React.createElement("div", { "data-testid": "layers-panel-mock", "data-search": props.search ?? "" });
   },
 }));
 
@@ -61,22 +61,38 @@ describe("LayersTab — header ⋯ menu", () => {
   const composer = () =>
     ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), isProjectLoading: () => false }) as unknown as Composer;
 
-  it("4418:81300 — no search band in the drawer (the topbar field is the filter), no ⊞ ⊟ ⚙ glyphs", () => {
+  it("no ⊞ ⊟ ⚙ glyphs on a toolbar row", () => {
     render(<LayersTab composer={null} />);
-    expect(screen.queryByLabelText("Search layers")).toBeNull();
     expect(screen.queryByTestId("layers-toolbar")).toBeNull();
     expect(screen.queryByLabelText("Expand all layers")).toBeNull();
     expect(screen.queryByLabelText("Layer display settings")).toBeNull();
   });
 
-  it("owns the topbar field (\"Search layers…\") while open, and gives it back when closed", () => {
+  /* Owner decision 2026-10-03 (board 4418:81300 had the topbar field filter
+     Layers): the filter is the panel's own field, under the header. */
+  it("filters from its own field under the header, and a closed drawer drops the query", () => {
     const c = composer();
     const { rerender } = render(<LayersTab composer={c} isOpen />);
-    expect(c.emit).toHaveBeenCalledWith(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search layers…" });
-    expect(c.on).toHaveBeenCalledWith(EVENTS.UI_SEARCH_QUERY, expect.any(Function));
-    // A closed drawer stays mounted (width 0) — the field must still come back.
+    const field = screen.getByPlaceholderText("Search layers…");
+    const header = screen.getByText("Layers").closest("header, [class*=header], div") as HTMLElement;
+    expect(header.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.change(field, { target: { value: "hero" } });
+    expect(screen.getByTestId("layers-panel-mock").getAttribute("data-search")).toBe("hero");
+    expect(c.emit).not.toHaveBeenCalledWith("ui:search-context", expect.anything());
     rerender(<LayersTab composer={c} isOpen={false} />);
-    expect(c.emit).toHaveBeenLastCalledWith(EVENTS.UI_SEARCH_CONTEXT, null);
+    expect(screen.getByTestId("layers-panel-mock").getAttribute("data-search")).toBe("");
+  });
+
+  it("Escape in the field clears it first, then closes the drawer", () => {
+    const onClose = vi.fn();
+    render(<LayersTab composer={null} onClose={onClose} />);
+    const field = screen.getByPlaceholderText("Search layers…") as HTMLInputElement;
+    fireEvent.change(field, { target: { value: "hero" } });
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(field.value).toBe("");
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("Escape closes the drawer — but not from a text field or with a menu open", () => {

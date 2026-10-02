@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID, Tooltip } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, PanelSearch, Popover, Tooltip, isPanelSearchInput } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -90,8 +90,8 @@ function escapeIsOurs(e: KeyboardEvent): boolean {
   if (document.querySelector('[data-bk-pick="true"]')) return false;
   const t = e.target instanceof HTMLElement ? e.target : null;
   if (!t || t === document.body) return true;
-  /* The topbar Layers filter: the first Escape empties it, the next closes. */
-  if (t.id === TOPBAR_CONTEXT_SEARCH_ID) return !(t instanceof HTMLInputElement && t.value);
+  /* The panel's own filter: the first Escape empties it, the next closes. */
+  if (isPanelSearchInput(t)) return !t.value;
   if (t.closest("input, textarea, select, [contenteditable='true']")) return false;
   return !t.closest("#layout-canvas");
 }
@@ -169,19 +169,12 @@ export const LayersTab: React.FC<LayersTabProps> = ({
     };
   }, [composer]);
 
-  /* The filter lives in the topbar field (board 4418:81300): announce the
-     scope while mounted, take the query back on LAYERS_SEARCH. */
+  /* The filter sits under the header (owner decision 2026-10-03; board
+     4418:81300 put it in the topbar field). A closed drawer stays mounted and
+     drops the query, as handing the topbar field back used to. */
   React.useEffect(() => {
-    if (!composer || !isOpen) return;
-    const onQuery = ({ query }: { query: string }) => setSearch(query);
-    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
-    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: LAYERS_SEARCH_PLACEHOLDER });
-    return () => {
-      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
-      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
-      setSearch("");
-    };
-  }, [composer, isOpen]);
+    if (!isOpen) setSearch("");
+  }, [isOpen]);
   React.useEffect(() => {
     if ((!onClose && !selecting) || menuOpen || !isOpen) return;
     /* Two steps, as the prototype is wired: with something selected Escape
@@ -270,8 +263,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           </Popover>
         }
       />
-      {/* No search band: v3 board 4418:81300 puts the filter in the topbar
-          field, which reads "Search layers…" while this drawer is open. */}
+      <PanelSearch placeholder={LAYERS_SEARCH_PLACEHOLDER} value={search} onChange={setSearch} data-testid="layers-search" />
       <div className="bdc-pbody bdc-pbody-scroll">
         {/* `composer` alone is not "ready": useComposerInit sets it
             synchronously in the effect body, before the site fetch even

@@ -15,7 +15,7 @@
 
 import { PasteHtmlModal } from "./PasteHtmlModal";
 import * as React from "react";
-import { Button, IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, PanelFrame, PanelSearch, Popover } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
 import { useBuildTab } from "./hooks/useBuildTab";
@@ -171,23 +171,18 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     });
   };
 
-  /* The topbar field searches this panel while it is open (4418:100087). */
-  /* Held in a ref: setSearchQuery changes identity with every query, and
-     re-running this effect would release and re-claim the field mid-typing. */
+  /* The search field sits under the header (owner decision 2026-10-03 —
+     board 4418:100087 had the topbar field take it over while Add was open).
+     A closed drawer keeps this tab mounted; closing it drops the query, as
+     handing the topbar field back used to. */
+  const searchRef = React.useRef<HTMLInputElement>(null);
   const setSearchQueryRef = React.useRef(tab.setSearchQuery);
   setSearchQueryRef.current = tab.setSearchQuery;
+  const isOpenRef = React.useRef(isOpen);
+  isOpenRef.current = isOpen;
   React.useEffect(() => {
-    /* A closed drawer keeps this tab mounted — the topbar field must not keep
-       reading "Search elements…" with nothing on screen to search. */
-    if (!composer || !isOpen) return;
-    const onQuery = ({ query }: { query: string }) => setSearchQueryRef.current(query);
-    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
-    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search elements…" });
-    return () => {
-      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
-      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
-    };
-  }, [composer, isOpen]);
+    if (!isOpen) setSearchQueryRef.current("");
+  }, [isOpen]);
 
   // Search focus shortcuts: "/" (typing-context-safe) and ⌘F. G2-105: ⌘F is
   // taken only while focus is in this panel or its search field — anywhere
@@ -195,12 +190,15 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const panelRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      /* The field only answered while the drawer was open (the topbar had no
+         field otherwise); a closed drawer's field is still mounted. */
+      if (!isOpenRef.current) return;
       const isCmdF = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "f";
       if (e.key !== "/" && !isCmdF) return;
       const target = e.target as HTMLElement | null;
       if (!target) return;
       if (isCmdF) {
-        const inPanel = panelRef.current?.contains(target) || target.id === TOPBAR_CONTEXT_SEARCH_ID;
+        const inPanel = panelRef.current?.contains(target) || target === searchRef.current;
         if (!inPanel) return;
       } else {
         const tag = target.tagName;
@@ -208,7 +206,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
         if (inTypingContext) return;
       }
-      const input = document.getElementById(TOPBAR_CONTEXT_SEARCH_ID) as HTMLInputElement | null;
+      const input = searchRef.current;
       if (!input) return;
       e.preventDefault();
       input.focus();
@@ -270,6 +268,14 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             </Menu>
           </Popover>
         }
+      />
+      <PanelSearch
+        ref={searchRef}
+        placeholder="Search elements…"
+        value={tab.searchQuery}
+        onChange={tab.setSearchQuery}
+        shortcut="⌘F"
+        data-testid="add-search"
       />
 
       <div className="bld-content" ref={panelRef}>
