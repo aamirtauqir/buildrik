@@ -433,13 +433,13 @@ describe("webhooks — last delivery", () => {
 
 describe("billing and members", () => {
   it("reports a yearly subscription as its monthly equivalent", async () => {
-    setup({ ...emptySite, workspace: { plan: "PRO", subscription: { plan: "PRO", price: 27600, interval: "YEARLY" } } });
+    setup({ ...emptySite, workspace: { plan: "PRO", deletionScheduledAt: null, subscription: { plan: "PRO", price: 27600, interval: "YEARLY" } } });
     const overview = await getSettingsOverview("s1");
     expect(overview.billing).toEqual({ plan: "PRO", priceMonthly: 23 });
   });
 
   it("reads Stripe's own interval spelling", async () => {
-    setup({ ...emptySite, workspace: { plan: "BUSINESS", subscription: { plan: "BUSINESS", price: 7900, interval: "month" } } });
+    setup({ ...emptySite, workspace: { plan: "BUSINESS", deletionScheduledAt: null, subscription: { plan: "BUSINESS", price: 7900, interval: "month" } } });
     const overview = await getSettingsOverview("s1");
     expect(overview.billing).toEqual({ plan: "BUSINESS", priceMonthly: 79 });
     expect(overview.members.seats).toBe(25);
@@ -447,19 +447,19 @@ describe("billing and members", () => {
 
   it("ignores a subscription row for a plan the workspace no longer has", async () => {
     // customer.subscription.deleted leaves the row (CANCELLED, plan PRO) and drops the workspace to FREE.
-    setup({ ...emptySite, workspace: { plan: "FREE", subscription: { plan: "PRO", price: 2900, interval: "MONTHLY" } } });
+    setup({ ...emptySite, workspace: { plan: "FREE", deletionScheduledAt: null, subscription: { plan: "PRO", price: 2900, interval: "MONTHLY" } } });
     const overview = await getSettingsOverview("s1");
     expect(overview.billing).toEqual({ plan: "FREE", priceMonthly: 0 });
   });
 
   it("falls back to the plan's list price on an interval it cannot read", async () => {
-    setup({ ...emptySite, workspace: { plan: "PRO", subscription: { plan: "PRO", price: 2900, interval: "weekly" } } });
+    setup({ ...emptySite, workspace: { plan: "PRO", deletionScheduledAt: null, subscription: { plan: "PRO", price: 2900, interval: "weekly" } } });
     const overview = await getSettingsOverview("s1");
     expect(overview.billing.priceMonthly).toBe(29);
   });
 
   it("treats an unknown plan string as FREE", async () => {
-    setup({ ...emptySite, workspace: { plan: "STARTER", subscription: null } });
+    setup({ ...emptySite, workspace: { plan: "STARTER", deletionScheduledAt: null, subscription: null } });
     const overview = await getSettingsOverview("s1");
     expect(overview.site.plan).toBe("FREE");
     expect(overview.members.seats).toBe(1);
