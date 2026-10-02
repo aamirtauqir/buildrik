@@ -173,6 +173,23 @@ export function getCmsSyncPendingCount(): number {
   return queue.pendingCount();
 }
 
+/* P0-B audit 2026-09-30 — the sheet's save needs to know whether the mirror
+   landed on the server so it can close on success or stay open with
+   "Saved on this device only…" when the network is down. The event-driven
+   mirror in `useCmsSync` is fire-and-forget (no return signal), so the sheet
+   calls the mirror directly and the event handler skips an entry whose id is
+   on the in-flight direct-sync list. Without the skip the sheet's call and the
+   event-driven call would both POST; both succeed against the same stamp, but
+   it's two round-trips for one save and one of them lights up the
+   conflict-listener path with stale `keepMine`/`useTheirs` affordances. */
+const directSync = new Set<string>();
+export function markDirectSync(kind: "entry" | "collection", id: string): void {
+  directSync.add(`${kind}:${id}`);
+}
+export function consumeDirectSync(kind: "entry" | "collection", id: string): boolean {
+  return directSync.delete(`${kind}:${id}`);
+}
+
 /* Publish-gate seam (Task 8). Refuse publish when there are queued retries OR
    an in-flight mirror — an in-flight mirror has to count, or publish can hand
    off a row that hasn't landed (P1-A audit 2026-09-30; the original
@@ -422,10 +439,10 @@ export async function hydrateCmsFromServer(): Promise<void> {
   }
 }
 
-export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
+export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
   const siteId = getSiteIdFromUrl();
-  if (!siteId) return;
-  await mirror(
+  if (!siteId) return true;
+  return mirror(
     `collectionUpsert:${c.id}`,
     () =>
       client().cms.collections.upsert.mutate({
@@ -501,10 +518,10 @@ export async function syncCollectionDelete(id: string): Promise<void> {
   );
 }
 
-export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
+export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
   const siteId = getSiteIdFromUrl();
-  if (!siteId) return;
-  await mirror(
+  if (!siteId) return true;
+  return mirror(
     `entryUpsert:${item.id}`,
     () =>
       client().cms.entries.upsert.mutate({

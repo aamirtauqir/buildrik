@@ -15,10 +15,23 @@ import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms
 import type { SiteVariable } from "@/shared/types/project";
 import type { ConditionBinding, ConditionExpression, DataSource } from "@/shared/types/data";
 import {
+  markDirectSync,
+  syncEntryUpsert,
+} from "@/services/cmsSync";
+import {
   SITE_VARS_SOURCE_ID,
   loadLegacySiteVariables,
   variablesToSourceData,
 } from "./contentPanelUtils";
+
+/* Fire-and-await the entry mirror so the sheet's save can branch on
+   `reached`. The `markDirectSync` flag is consumed by the event-driven mirror
+   in `useCmsSync` (see `cmsSync.consumeDirectSync`), so this is the only POST
+   the save produces. */
+async function syncEntryUpsertDirect(item: CMSContentItem): Promise<boolean> {
+  markDirectSync("entry", item.id);
+  return syncEntryUpsert(item);
+}
 
 export type ContentView =
   | { kind: "root" }
@@ -48,7 +61,7 @@ export interface UseContentPanelReturn {
     recordId: string | null,
     data: Record<string, unknown>,
     published: boolean,
-  ) => Promise<CMSContentItem | null>;
+  ) => Promise<{ item: CMSContentItem | null; reached: boolean }>;
   deleteRecord: (recordId: string) => Promise<void>;
   addField: (collectionId: string, field: Omit<CMSField, "id" | "order">) => Promise<void>;
   deleteField: (collectionId: string, fieldId: string) => Promise<void>;
@@ -209,8 +222,8 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
       recordId: string | null,
       data: Record<string, unknown>,
       published: boolean,
-    ) => {
-      if (!composer) return null;
+    ): Promise<{ item: CMSContentItem | null; reached: boolean }> => {
+      if (!composer) return { item: null, reached: true };
       const status = published ? ("published" as const) : ("draft" as const);
       let item: CMSContentItem | null;
       if (recordId) {
@@ -221,9 +234,16 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
           item = await composer.cms.collections.updateContentItem(item.id, { status });
         }
       }
+      /* P0-B audit 2026-09-30: the sheet's save needs to know whether the
+         mirror landed on the server. Fire the sync DIRECTLY so we get a
+         reach signal, and mark `directSync` so the event-driven mirror in
+         `useCmsSync` skips its own POST for this id (two identical upserts
+         is a wasted round-trip plus a flicker on the conflict-listener
+         affordances). */
+      const reached = item ? await syncEntryUpsertDirect(item) : true;
       await loadRecords(collectionId);
       reload();
-      return item;
+      return { item, reached };
     },
     [composer, loadRecords, reload],
   );

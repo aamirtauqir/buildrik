@@ -20,6 +20,7 @@ import {
   onCmsConflict,
   retryCmsSync,
   bindCmsEngine,
+  consumeDirectSync,
 } from "../../../services/cmsSync";
 
 export function useCmsSync(
@@ -117,10 +118,22 @@ export function useCmsSync(
         })
       : undefined;
 
-    const onColUpsert = (c: CMSCollection) => void syncCollectionUpsert(c);
-    const onColDelete = (id: string) => void syncCollectionDelete(id);
-    const onEntryUpsert = (it: CMSContentItem) => void syncEntryUpsert(it);
-    const onEntryDelete = (id: string) => void syncEntryDelete(id);
+    const onColUpsert = (c: CMSCollection) => {
+      if (consumeDirectSync("collection", c.id)) return;
+      void syncCollectionUpsert(c);
+    };
+    const onColDelete = (id: string) => {
+      if (consumeDirectSync("collection", id)) return;
+      void syncCollectionDelete(id);
+    };
+    const onEntryUpsert = (it: CMSContentItem) => {
+      if (consumeDirectSync("entry", it.id)) return;
+      void syncEntryUpsert(it);
+    };
+    const onEntryDelete = (id: string) => {
+      if (consumeDirectSync("entry", id)) return;
+      void syncEntryDelete(id);
+    };
 
     cm.on(EVENTS.CMS_COLLECTION_CREATED, onColUpsert);
     cm.on(EVENTS.CMS_COLLECTION_UPDATED, onColUpsert);

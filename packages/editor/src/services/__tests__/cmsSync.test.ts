@@ -88,11 +88,11 @@ describe("cmsSync", () => {
     expect(entUpsert).toHaveBeenLastCalledWith(expect.objectContaining({ id: "e2", status: "DRAFT" }));
   });
 
-  it("swallows a failed sync (best-effort) — never throws into the engine", async () => {
+  it("swallows a failed sync (best-effort) — never throws, reports it queued", async () => {
     colUpsert.mockRejectedValueOnce(new Error("network down"));
     await expect(
       syncCollectionUpsert({ id: "c1", name: "X", slug: "x", fields: [], createdAt: "", updatedAt: "" } as never),
-    ).resolves.toBeUndefined();
+    ).resolves.toBe(false);
   });
 
   it("no-ops when not on an /edit/<siteId> URL", async () => {

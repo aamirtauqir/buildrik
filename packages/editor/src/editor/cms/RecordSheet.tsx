@@ -58,7 +58,11 @@ export interface RecordSheetProps {
   onClose: () => void;
   /** The sheet's own Records · Fields · Dynamic pages row leaves the sheet. */
   onOpenTab: (tab: CmsTab) => void;
-  onSave: (data: Record<string, unknown>, published: boolean) => Promise<unknown>;
+  /** Resolve when the save has either reached the server (true) or been
+   *  queued for retry (false). The sheet stays open with the
+   *  "Saved on this device only" state when false — closing on a queued save
+   *  was hiding the queued mirror from the user. */
+  onSave: (data: Record<string, unknown>, published: boolean) => Promise<boolean>;
   onDelete: (record: CMSContentItem) => Promise<void>;
   /** Undo for an instant delete: writes the record back. */
   onRestore: (record: CMSContentItem) => Promise<void>;
@@ -143,11 +147,20 @@ export function RecordSheet({
   const [typedDelete, setTypedDelete] = React.useState(false);
   const [templatePreviewOpen, setTemplatePreviewOpen] = React.useState(false);
 
+  const lastRecordId = React.useRef<string | null>(record?.id ?? "new");
   React.useEffect(() => {
+    /* Reset the form when the row being edited changes (or a new sheet opens);
+       the saveError resets too — the new sheet has nothing to recover from.
+       Re-renders that come back with the same record id (engine reload after
+       `saveRecord` builds a new `record` object with the same id) must NOT
+       wipe a queued-mirror message the user is still looking at. */
+    const currentId = record?.id ?? "new";
+    if (currentId === lastRecordId.current) return;
+    lastRecordId.current = currentId;
     setForm(initial);
     setPublished(initialPublished);
     setSaveError(null);
-  }, [initial, initialPublished]);
+  }, [initial, initialPublished, record]);
 
   const dirty =
     published !== initialPublished ||
@@ -184,15 +197,25 @@ export function RecordSheet({
     setSaving(true);
     setSaveError(null);
     try {
-      await onSave(form, published);
-      /* 6561:54690 — the collection rides in the title; the body says what
-         the save reached and what it did not yet. */
-      addToast({
-        tone: "success",
-        title: `Record saved · ${collection.name}`,
-        description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
-      });
-      onClose();
+      const reached = await onSave(form, published);
+      if (reached) {
+        /* 6561:54690 — the collection rides in the title; the body says what
+           the save reached and what it did not yet. */
+        addToast({
+          tone: "success",
+          title: `Record saved · ${collection.name}`,
+          description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
+        });
+        onClose();
+      } else {
+        /* P0-B audit 2026-09-30 — a queued mirror (network down or the server
+           refused this stamp) must not silently close the sheet. The local
+           write already happened; the change is on this device, the next
+           online tick replays it. The sheet's own footer carries the state
+           so the user knows what to expect (and that the toast on the right
+           isn't lying about "live in the CMS"). */
+        setSaveError("Saved on this device only. The server is offline — the change will sync when you reconnect.");
+      }
     } catch (e) {
       /* A published record is validated against the collection's rules
          (CollectionManager.updateContentItem); anything else is the save
