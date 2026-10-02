@@ -11,7 +11,7 @@ import type {
   SaveProjectDataInput,
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
-import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
+import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS, SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
 import { SITE_SETTINGS_COLUMNS, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
@@ -606,6 +606,13 @@ export async function deleteSite(siteId: string, confirmName: string) {
   }
 
   const now = new Date();
+  /* BE-6: the forms this delete switches off, so a restore switches back on
+     exactly these — not ones the owner had already turned off. The router
+     records them on the `site.deleted` activity entry. */
+  const activeForms = await prisma.formBlock.findMany({
+    where: { siteId, isActive: true },
+    select: { id: true },
+  });
 
   await prisma.$transaction([
     prisma.site.update({
@@ -622,7 +629,70 @@ export async function deleteSite(siteId: string, confirmName: string) {
     }),
   ]);
 
-  return { success: true };
+  return { success: true, deactivatedFormBlockIds: activeForms.map((f) => f.id) };
+}
+
+const RESTORE_WINDOW_MS = SITE_RESTORE_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+
+/**
+ * BE-6 / PD-6: the workspace's sites deleted inside the restore window, newest
+ * first, with the moment each one is purged. `scope` is the caller's
+ * site-scope filter (`siteScopeWhere`), so a member scoped to specific sites
+ * sees only theirs.
+ */
+export async function listDeletedSites(workspaceId: string, scope: Prisma.SiteWhereInput) {
+  const rows = await prisma.site.findMany({
+    where: { ...scope, workspaceId, deletedAt: { gte: new Date(Date.now() - RESTORE_WINDOW_MS) } },
+    select: { id: true, name: true, slug: true, deletedAt: true },
+    orderBy: { deletedAt: "desc" },
+  });
+  return rows.flatMap(({ deletedAt, ...site }) =>
+    deletedAt ? [{ ...site, deletedAt, purgeAt: new Date(deletedAt.getTime() + RESTORE_WINDOW_MS) }] : [],
+  );
+}
+
+/** The form ids a `site.deleted` entry recorded (`metadata.formBlockIds`). */
+function recordedFormBlockIds(metadata: Prisma.JsonValue | undefined): string[] {
+  if (!isPlainObject(metadata) || !Array.isArray(metadata.formBlockIds)) return [];
+  return metadata.formBlockIds.filter((id): id is string => typeof id === "string");
+}
+
+/**
+ * BE-6 / PD-6 / Q-B8: bring a deleted site back inside the restore window. It
+ * returns as a DRAFT (the delete took the deployment down; nothing is
+ * republished), its forms come back on — the ones the delete switched off, as
+ * recorded on its `site.deleted` entry — and its share links stay revoked: they
+ * were revoked for safety, and the owner makes new ones. A restored site takes
+ * a slot again, so the plan's site limit applies.
+ */
+export async function restoreSite(siteId: string, userId: string) {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { deletedAt: true, workspaceId: true },
+  });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (!site.deletedAt) throw new Error("SITE_NOT_DELETED");
+  if (site.deletedAt.getTime() < Date.now() - RESTORE_WINDOW_MS) throw new Error("RESTORE_WINDOW_PASSED");
+  await assertSiteQuota(site.workspaceId, userId);
+
+  const deletion = await prisma.activityLog.findFirst({
+    where: { workspaceId: site.workspaceId, siteId, action: "site.deleted" },
+    orderBy: { createdAt: "desc" },
+    select: { metadata: true },
+  });
+  const formBlockIds = recordedFormBlockIds(deletion?.metadata);
+
+  const [restored, forms] = await prisma.$transaction([
+    prisma.site.update({
+      where: { id: siteId },
+      data: { deletedAt: null, status: "DRAFT" },
+    }),
+    prisma.formBlock.updateMany({
+      where: { siteId, id: { in: formBlockIds } },
+      data: { isActive: true },
+    }),
+  ]);
+  return { site: redactSitePassword(restored), reactivatedFormBlockIds: formBlockIds, reactivatedForms: forms.count };
 }
 
 /**
@@ -737,6 +807,13 @@ export async function bulkAction(
           }),
       );
       const targetIds = targets.map((s) => s.id);
+      // BE-6: per site, the forms this delete switches off (see deleteSite).
+      const activeForms = await prisma.formBlock.findMany({
+        where: { siteId: { in: targetIds }, isActive: true },
+        select: { id: true, siteId: true },
+      });
+      const deactivatedFormBlockIds: Record<string, string[]> = {};
+      for (const form of activeForms) (deactivatedFormBlockIds[form.siteId] ??= []).push(form.id);
       const [result] = await prisma.$transaction([
         prisma.site.updateMany({
           where: { id: { in: targetIds }, workspaceId, deletedAt: null },
@@ -751,7 +828,7 @@ export async function bulkAction(
           data: { isActive: false },
         }),
       ]);
-      return { succeeded: targetIds.slice(0, result.count), failed: [] };
+      return { succeeded: targetIds.slice(0, result.count), failed: [], deactivatedFormBlockIds };
     }
     default:
       throw new Error("INVALID_ACTION");
