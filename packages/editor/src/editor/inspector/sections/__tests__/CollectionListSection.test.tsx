@@ -57,8 +57,18 @@ describe("CollectionListSection", () => {
   it("the Show field caps the count on the bound collection", () => {
     const { composer, bindCollectionList } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
-    fireEvent.change(screen.getByRole("spinbutton", { name: "Show items" }), { target: { value: "3" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Show items" }), { target: { value: "3" } });
     expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 3 });
+  });
+
+  /* Board 20 draws Show items as a number field with a stepper and no unit. */
+  it("Show items is a number field: ↑ steps the count, no unit dropdown", () => {
+    const { composer, bindCollectionList } = makeComposer({ collectionId: "menu", limit: 6 });
+    renderSection(composer);
+    const field = screen.getByRole("textbox", { name: "Show items" });
+    fireEvent.keyDown(field, { key: "ArrowUp" });
+    expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 7 });
+    expect(screen.queryByRole("combobox", { name: "Show items unit" })).toBeNull();
   });
 
   /* Ldata I2a: the stored binding's limit is bounded (cmsBindingsSchema);
@@ -66,7 +76,7 @@ describe("CollectionListSection", () => {
   it("the Show field clamps an oversized count to the stored maximum", () => {
     const { composer, bindCollectionList } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
-    fireEvent.change(screen.getByRole("spinbutton", { name: "Show items" }), { target: { value: "999999" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Show items" }), { target: { value: "999999" } });
     expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 10_000 });
   });
 
@@ -101,7 +111,7 @@ describe("CollectionListSection", () => {
 
   it("unbound: no Show items, no Open collection", () => {
     renderSection(makeComposer().composer);
-    expect(screen.queryByRole("spinbutton", { name: "Show items" })).toBeNull();
+    expect(screen.queryByRole("textbox", { name: "Show items" })).toBeNull();
     expect(screen.queryByTestId("collection-open")).toBeNull();
   });
 });

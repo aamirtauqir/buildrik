@@ -11,7 +11,7 @@ import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { ExternalLink } from "lucide-react";
-import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
+import { Section, SelectRow, InputWithUnit, type SectionTier } from "../shared/controls";
 import { ActionRow } from "./behaviourRows";
 import { canWrite } from "@/engine/commands/commandOperations";
 
@@ -75,9 +75,10 @@ export const CollectionListSection: React.FC<CollectionListSectionProps> = ({ el
       ) : null}
       {binding ? (
         <>
-          <InputRow
+          {/* Board 20: a number field with a stepper, no unit. */}
+          <InputWithUnit
             label="Show items"
-            type="number"
+            noUnit
             placeholder="All"
             value={binding.limit ? String(binding.limit) : ""}
             onChange={(v) => {
