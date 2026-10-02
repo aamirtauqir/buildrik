@@ -250,7 +250,8 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         />
       </div>
 
-      {/* Letter / Word — the board's two spacing numbers, in its words. */}
+      {/* Keep related spacing values together, with visible labels. */}
+      <div className="bdi-type-spacing-pair" role="group" aria-label="Letter and word spacing">
       <div className="tw:relative">
         <MixedValueIndicator prop="letter-spacing" mixedKeys={mixedKeys} />
         <InputWithUnit
@@ -268,6 +269,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
           onChange={(v) => onChange("word-spacing", v)}
           units={["px", "em", "normal"]}
         />
+      </div>
       </div>
 
       </>

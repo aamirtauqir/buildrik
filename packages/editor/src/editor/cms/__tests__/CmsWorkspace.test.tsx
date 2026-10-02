@@ -72,8 +72,12 @@ describe("CmsWorkspace · root (4428:140486)", () => {
 
   it("invites the first collection when there are none (6881:79324)", async () => {
     const { composer } = makeEngine();
-    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
-    expect(await screen.findByTestId("cms-ws-empty")).toHaveTextContent("Create your first collection");
+    const onCreate = vi.fn();
+    render(<ToastProvider><CmsWorkspace composer={composer as never} onCreateCollection={onCreate} /></ToastProvider>);
+    const empty = await screen.findByTestId("cms-ws-empty");
+    expect(empty).toHaveTextContent("Create your first collection");
+    fireEvent.click(within(empty).getByRole("button", { name: "+ New collection" }));
+    expect(onCreate).toHaveBeenCalledOnce();
   });
 });
 

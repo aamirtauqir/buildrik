@@ -1162,3 +1162,21 @@ textarea.bdi-text {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
+
+/* Paired typography spacing controls: labels above compact values. */
+.bdi-type-spacing-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--bk-space-8);
+}
+.bdi-type-spacing-pair .bdi-row-ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--bk-space-4);
+}
+.bdi-type-spacing-pair .bdi-row-ctrl .bdi-lb {
+  justify-content: flex-start;
+  width: auto;
+  text-align: left;
+}

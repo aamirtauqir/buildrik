@@ -6,8 +6,8 @@
  * The CMS drawer stays on the left and chooses the collection
  * (`cmsWorkspaceStore`); this pane shows it: a 56 header (name · count ·
  * primary action), a 40 tab row (Records · Fields · ⋯), then the tab's body.
- * States that have nothing to show full-width keep a right column in the
- * inspector's slot with a one-line hint, as the boards draw it.
+ * The root empty state uses the workspace for guidance and its create action.
+ * Collection views keep contextual hints in the inspector slot.
  *
  * @license BSD-3-Clause
  */
@@ -130,20 +130,27 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
               {plural(panel.collections.length, "collection")} · {plural(records, "record")}
             </span>
             <span className="tw:flex-1" />
-            {onCreateCollection ? (
+            {onCreateCollection && panel.collections.length > 0 ? (
               <Button size="xs" className={PRIMARY} data-testid="cms-ws-new-collection" onClick={onCreateCollection}>
                 + New collection
               </Button>
             ) : null}
           </header>
+          <div className="tw:flex tw:flex-1 tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:p-6 tw:text-center" data-testid={panel.collections.length === 0 ? "cms-ws-empty" : "cms-ws-hint"}>
+            <Table2 size={24} className="tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
+            <h3 className="tw:m-0 tw:text-[16px] tw:font-semibold tw:text-[var(--bk-ink)]">
+              {panel.collections.length === 0 ? "Create your first collection" : "Select a collection"}
+            </h3>
+            <p className="tw:m-0 tw:max-w-sm tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+              {panel.collections.length === 0 ? "Add a collection to manage content and use it across your pages." : "Open a collection from the sidebar to see its records and fields."}
+            </p>
+            {panel.collections.length === 0 && onCreateCollection && (
+              <Button size="xs" className={PRIMARY} onClick={onCreateCollection} data-testid="cms-ws-empty-create">
+                + New collection
+              </Button>
+            )}
+          </div>
         </section>
-        {/* 6881:79324 — with no collections the invitation takes the hint
-            column; the pane stays empty. */}
-        {panel.collections.length === 0 ? (
-          <HintColumn title="Create your first collection" hint="It opens here once created." testId="cms-ws-empty" />
-        ) : (
-          <HintColumn title="Select a collection" hint="Open a collection to see its details here." testId="cms-ws-hint" />
-        )}
       </div>
     );
   }

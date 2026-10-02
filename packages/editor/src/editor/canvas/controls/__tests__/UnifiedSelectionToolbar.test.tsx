@@ -72,9 +72,10 @@ describe("UnifiedSelectionToolbar", () => {
     expect(screen.getByTestId("selection-toolbar-more").className).toContain("tw:bg-[var(--bk-accent)]");
   });
 
-  it("carries the board's caption row under the pill", () => {
+  it("keeps action names on buttons without a duplicate caption", () => {
     setup();
-    expect(screen.getByTestId("selection-toolbar-caption")).toHaveTextContent("⧉ Duplicate ⌘D · 🗑 Delete ⌫ · ⋯ More");
+    expect(screen.queryByTestId("selection-toolbar-caption")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Duplicate (⌘D)" })).toBeInTheDocument();
   });
 
   /* Flow-check finding (2026-09-25): a wide (page-width) selection anchored

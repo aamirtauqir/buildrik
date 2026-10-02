@@ -377,7 +377,9 @@
   text-align: center;
   padding: var(--bk-space-24);
   background: transparent;
-  animation: bd-fade-in 0.4s ease-out;
+  box-sizing: border-box;
+  overflow: auto;
+  /* Keep counter-scaled chrome inside the fitted page. */
   /* Board 297:2008 expresses the 12 between the sentence and the buttons as a
      GAP on the block, not as a margin under the sentence. Same picture, and
      only one of the two can be measured. */
@@ -409,7 +411,10 @@
 
 /* The three template cards — swatch over name — at the board's 12 gap. */
 .bd-canvas-empty-cta__cards {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  max-width: 468px;
   gap: var(--bk-space-12);
   margin: var(--bk-space-4) 0;
   padding: 0;
@@ -419,7 +424,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-4);
-  width: 148px;
+  width: 100%;
   height: 75px;
   padding: var(--bk-space-8);
   box-sizing: border-box;
@@ -457,11 +462,13 @@ button:hover > .bd-canvas-empty-cta__thumb {
    scale and no token for it; 12 is the step the board's own grid rounds to. */
 .bd-canvas-empty-cta__actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
   align-items: center;
   gap: var(--bk-space-12);
 }
-/* Four actions on one line inside a fitted page card (board 4428:44164);
-   a button label never breaks across two lines. */
+/* Wrap whole actions inside a fitted page; keep each label together. */
 .bd-canvas-empty-cta__actions > button {
   flex-shrink: 0;
   white-space: nowrap;

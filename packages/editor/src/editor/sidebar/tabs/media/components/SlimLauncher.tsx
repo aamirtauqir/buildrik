@@ -6,10 +6,10 @@
  * fullpage manager.
  *
  * ORDER IS THE DESIGN (v3 board 4418:59771). Header ("Assets · N", ⋯,
- * close), Manage assets ›, Filter ▾, grid, spacer, Upload + caret. Search is
+ * close), Upload + caret, Manage assets ›, Filter ▾ and grid. Search is
  * the topbar field while this drawer is open (MediaTab claims it).
  *
- * WHAT THE FOOTER KEPT. `UploadZone` is still mounted above Upload because
+ * UPLOAD CONTROLS. `UploadZone` is still mounted above Upload because
  * it owns the file input, the drag-and-drop target, the quota bar and the
  * persistent failed-upload list with retry — none of which the board's mock
  * shows and all of which are real behaviour. Upload drives its input.
@@ -160,7 +160,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
     onClose,
   } = props;
 
-  // The footer's Upload link drives UploadZone's file input rather than
+  // The Upload action drives UploadZone's file input rather than
   // duplicating one: two inputs would mean two accept-lists to keep in step.
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
   /* Audit G3-064: a viewer sees Upload and Delete disabled with the reason
@@ -265,6 +265,107 @@ export function SlimLauncher(props: SlimLauncherProps) {
         }
       />
 
+      <div className="sl-upload-actions" data-testid="media-footer-region" hidden={props.selectionMode}>
+        {/* Strip first: the board puts the failure above the footer links
+            (145:195 sits between the spacer and 145:192), because the thing
+            that went wrong outranks the thing you might do next. */}
+        <UploadZone
+          compact
+          inputRef={uploadInputRef}
+          storage={props.storage}
+          onUpload={(files) => void uploadFromDrawer(files)}
+          onRetryUpload={props.onRetryUpload}
+          onReplacementPicked={(original, file) => setReplacement({ original, file })}
+          onOptimize={props.onOpenLibrary ? () => props.onOpenLibrary?.() : undefined}
+          uploadQueue={props.uploadQueue}
+          failedUploads={props.failedUploads}
+          disabled={props.storage.used >= props.storage.total}
+          viewOnlyReason={write.reason("upload")}
+        />
+        {/* Board 4418:59771 — one dark Upload button and its caret. The caret
+            opens ADD FROM · Stock photos · Icons · Fonts (7077:79204); those
+            three were a row of links under Upload (G3-020). The accepted
+            kinds and the engine's limits (`MEDIA_SIZE_LIMITS_LABEL`) moved
+            from a caption line onto Upload's tooltip. When storage is full
+            the foot goes to bg-subtle (board 145:294). */}
+        <div
+          className={`tw:flex tw:items-center tw:gap-1 tw:px-4 tw:py-2 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
+          data-testid="media-footer"
+        >
+            {/* Board 7077:79219 — the limits are a dark tooltip above Upload,
+                flush with its left edge (was a native title). */}
+            <Tooltip
+              content={write.canWrite ? `Images, videos and fonts · ${MEDIA_SIZE_LIMITS_LABEL}` : write.reason("upload")}
+              placement="top-start"
+              arrow={false}
+              className="tw:rounded-sm tw:text-[11px] tw:font-normal tw:leading-4"
+              theme={{ target: "tw:min-w-0 tw:flex-1" }}
+            >
+            <Button
+              type="button"
+              size="xs"
+              className={`tw:h-7 tw:w-full tw:min-w-0 tw:gap-1.5 tw:rounded-md tw:border-0 tw:bg-[var(--bk-gray-900)] tw:text-[13px] tw:font-medium tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] ${write.canWrite ? "" : "tw:opacity-55"}`}
+              data-testid="media-upload-action"
+              aria-disabled={write.canWrite ? undefined : "true"}
+              disabled={write.canWrite && props.storage.used >= props.storage.total}
+              onClick={write.canWrite ? () => uploadInputRef.current?.click() : undefined}
+            >
+              <span className="tw:flex tw:items-center tw:gap-1.5">
+                <Upload size={14} aria-hidden="true" />
+                Upload
+              </span>
+            </Button>
+            </Tooltip>
+          <Popover
+            open={addFromOpen}
+            onClose={() => setAddFromOpen(false)}
+            placement="bottom-end"
+            label="Add from"
+            trigger={
+              <IconButton
+                label="Add from"
+                aria-haspopup="menu"
+                aria-expanded={addFromOpen}
+                data-testid="media-add-from"
+                className="tw:h-7 tw:w-7 tw:rounded-md tw:bg-[var(--bk-gray-900)] tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] tw:enabled:hover:text-white"
+                onClick={() => setAddFromOpen((v) => !v)}
+              >
+                <ChevronDown size={14} aria-hidden="true" />
+              </IconButton>
+            }
+          >
+            <Menu label="Add from" className={DRAWER_MENU}>
+              <DrawerMenuHeading>ADD FROM</DrawerMenuHeading>
+              <MenuItem
+                icon={<Cloud size={13} aria-hidden="true" />}
+                data-testid="media-stock-action"
+                onClick={() => { setAddFromOpen(false); onOpenStock(); }}
+              >
+                Stock photos
+              </MenuItem>
+              {props.onOpenIconPicker ? (
+                <MenuItem
+                  icon={<Shapes size={13} aria-hidden="true" />}
+                  data-testid="media-icons-action"
+                  onClick={() => { setAddFromOpen(false); props.onOpenIconPicker?.(); }}
+                >
+                  Icons
+                </MenuItem>
+              ) : null}
+              {/* The Site fonts dialog (3686:42317), mounted once in the shell
+                  and opened by the composer event every door emits. */}
+              <MenuItem
+                icon={<span className="tw:text-[11px] tw:font-semibold tw:leading-none">Aa</span>}
+                data-testid="media-fonts-action"
+                onClick={() => { setAddFromOpen(false); props.composer.emit("ui:site-fonts", {}); }}
+              >
+                Fonts
+              </MenuItem>
+            </Menu>
+          </Popover>
+        </div>
+      </div>
+
       {/* Board 4418:59771 — `Manage assets ›`, a full-width quiet button under
           the header: the drawer's one door to the full-page library. */}
       {props.onOpenLibrary ? (
@@ -273,7 +374,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             size="xs"
             variant="secondary"
-            className="tw:h-10 tw:w-full tw:gap-1 tw:rounded-lg tw:border-transparent tw:bg-[var(--bk-gray-50)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]"
+            className="tw:h-8 tw:w-full tw:justify-between tw:gap-1 tw:rounded-lg tw:border-transparent tw:bg-[var(--bk-gray-50)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]"
             data-testid="media-manage-assets"
             onClick={() => props.onOpenLibrary?.()}
           >
@@ -474,7 +575,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 harness could not see it — only the band's own height was
                 joined. Measured 2026-09-08. */}
             <p className="tw:m-0 tw:text-[var(--bk-error-text)]">Couldn&apos;t load your media.</p>
-            <p className="tw:mx-0 tw:mb-0 tw:mt-2.5 tw:flex tw:justify-center tw:gap-10">
+            <p className="tw:mx-0 tw:mb-0 tw:mt-2.5 tw:flex tw:gap-3">
               <Button
                 type="button"
                 color="light"
@@ -531,21 +632,9 @@ export function SlimLauncher(props: SlimLauncherProps) {
             is the honest signal for an empty library.
           */
           counts.all === 0 ? (
-            /* Board 145:406: one muted line, then accent text links — no filled
-               CTA.
-
-               The board drew Upload here, and it is gone: on the empty screen
-               the drop zone sits directly below saying "Drag files or click to
-               browse", and the footer carries Upload as well, so the same act
-               had THREE affordances stacked in one column. The board describes
-               this block, not the composition around it, and the footer is
-               where Upload lives (the same move that put Stock there).
-
-               Stock stays, because it is the one action the drop zone cannot
-               perform — and it is worded the way the footer words it. */
-            <div className="sl-empty tw:h-35 tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-empty">
+            <div className="sl-empty tw:px-4 tw:py-4 tw:text-left tw:text-[13px] tw:leading-5" data-testid="media-empty">
               <p className="tw:m-0 tw:text-[var(--bk-ink-muted)]">No images or files yet.</p>
-              <p className="tw:mx-0 tw:mb-0 tw:mt-2.5 tw:flex tw:justify-center tw:gap-10">
+              <p className="tw:mx-0 tw:mb-0 tw:mt-2.5 tw:flex tw:gap-3">
                 <Button
                   type="button"
                   color="light"
@@ -782,106 +871,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
           </Button>
         </div>
       ) : null}
-      <div className="sl-upload-footer" data-testid="media-footer-region" hidden={props.selectionMode}>
-        {/* Strip first: the board puts the failure above the footer links
-            (145:195 sits between the spacer and 145:192), because the thing
-            that went wrong outranks the thing you might do next. */}
-        <UploadZone
-          compact
-          inputRef={uploadInputRef}
-          storage={props.storage}
-          onUpload={(files) => void uploadFromDrawer(files)}
-          onRetryUpload={props.onRetryUpload}
-          onReplacementPicked={(original, file) => setReplacement({ original, file })}
-          onOptimize={props.onOpenLibrary ? () => props.onOpenLibrary?.() : undefined}
-          uploadQueue={props.uploadQueue}
-          failedUploads={props.failedUploads}
-          disabled={props.storage.used >= props.storage.total}
-          viewOnlyReason={write.reason("upload")}
-        />
-        {/* Board 4418:59771 — one dark Upload button and its caret. The caret
-            opens ADD FROM · Stock photos · Icons · Fonts (7077:79204); those
-            three were a row of links under Upload (G3-020). The accepted
-            kinds and the engine's limits (`MEDIA_SIZE_LIMITS_LABEL`) moved
-            from a caption line onto Upload's tooltip. When storage is full
-            the foot goes to bg-subtle (board 145:294). */}
-        <div
-          className={`tw:flex tw:items-center tw:gap-1 tw:px-4 tw:pt-2 tw:pb-10 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
-          data-testid="media-footer"
-        >
-            {/* Board 7077:79219 — the limits are a dark tooltip above Upload,
-                flush with its left edge (was a native title). */}
-            <Tooltip
-              content={write.canWrite ? `Images, videos and fonts · ${MEDIA_SIZE_LIMITS_LABEL}` : write.reason("upload")}
-              placement="top-start"
-              arrow={false}
-              className="tw:rounded-sm tw:text-[11px] tw:font-normal tw:leading-4"
-              theme={{ target: "tw:min-w-0 tw:flex-1" }}
-            >
-            <Button
-              type="button"
-              size="xs"
-              className={`tw:h-7 tw:w-full tw:min-w-0 tw:gap-1.5 tw:rounded-md tw:border-0 tw:bg-[var(--bk-gray-900)] tw:text-[13px] tw:font-medium tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] ${write.canWrite ? "" : "tw:opacity-55"}`}
-              data-testid="media-upload-action"
-              aria-disabled={write.canWrite ? undefined : "true"}
-              disabled={write.canWrite && props.storage.used >= props.storage.total}
-              onClick={write.canWrite ? () => uploadInputRef.current?.click() : undefined}
-            >
-              <span className="tw:flex tw:items-center tw:gap-1.5">
-                <Upload size={14} aria-hidden="true" />
-                Upload
-              </span>
-            </Button>
-            </Tooltip>
-          <Popover
-            open={addFromOpen}
-            onClose={() => setAddFromOpen(false)}
-            placement="top-end"
-            label="Add from"
-            trigger={
-              <IconButton
-                label="Add from"
-                aria-haspopup="menu"
-                aria-expanded={addFromOpen}
-                data-testid="media-add-from"
-                className="tw:h-7 tw:w-7 tw:rounded-md tw:bg-[var(--bk-gray-900)] tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] tw:enabled:hover:text-white"
-                onClick={() => setAddFromOpen((v) => !v)}
-              >
-                <ChevronDown size={14} aria-hidden="true" />
-              </IconButton>
-            }
-          >
-            <Menu label="Add from" className={DRAWER_MENU}>
-              <DrawerMenuHeading>ADD FROM</DrawerMenuHeading>
-              <MenuItem
-                icon={<Cloud size={13} aria-hidden="true" />}
-                data-testid="media-stock-action"
-                onClick={() => { setAddFromOpen(false); onOpenStock(); }}
-              >
-                Stock photos
-              </MenuItem>
-              {props.onOpenIconPicker ? (
-                <MenuItem
-                  icon={<Shapes size={13} aria-hidden="true" />}
-                  data-testid="media-icons-action"
-                  onClick={() => { setAddFromOpen(false); props.onOpenIconPicker?.(); }}
-                >
-                  Icons
-                </MenuItem>
-              ) : null}
-              {/* The Site fonts dialog (3686:42317), mounted once in the shell
-                  and opened by the composer event every door emits. */}
-              <MenuItem
-                icon={<span className="tw:text-[11px] tw:font-semibold tw:leading-none">Aa</span>}
-                data-testid="media-fonts-action"
-                onClick={() => { setAddFromOpen(false); props.composer.emit("ui:site-fonts", {}); }}
-              >
-                Fonts
-              </MenuItem>
-            </Menu>
-          </Popover>
-        </div>
-      </div>
       {replacement ? (
         <ReplacementUploadModal
           open

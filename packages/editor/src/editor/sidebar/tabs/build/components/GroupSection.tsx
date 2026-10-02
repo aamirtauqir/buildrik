@@ -442,7 +442,18 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
     {isOpen && isElementRowGroup(group.id) && elements && (
-      <ElementRows
+      group.id === "elements" ? Array.from(new Set(elements.map((el) => el.catId))).map((catId, index) => {
+        const rows = elements.filter((el) => el.catId === catId);
+        return (
+          <details key={catId} open={index === 0} data-testid={`insert-category-${catId}`}>
+            <summary className="tw:cursor-pointer tw:px-4 tw:py-2 tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]">
+              {rows[0].catName} <span className="tw:ml-1 tw:text-[var(--bk-ink-muted)]">{rows.length}</span>
+            </summary>
+            <ElementRows group="elements" elements={rows} favs={favs} onToggleFav={onToggleFav}
+              onDragStart={onDragStart} onElClick={onElClick} insertPath={insertPath ?? null} />
+          </details>
+        );
+      }) : <ElementRows
         group={group.id}
         elements={elements}
         favs={favs}

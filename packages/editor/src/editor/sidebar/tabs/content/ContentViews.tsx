@@ -158,22 +158,10 @@ export function RootView({
 }) {
   if (collections.length === 0 && sourcesCount === 0 && variablesCount === 0 && conditionsCount === 0) {
     return (
-      /*
-        Board 149:7 draws this block composed, not with the default slots:
-        the copy is 13/20 over 272, and the call to action is ACCENT TEXT.
-        EmptyState's shared body class is 12px and its `action` slot takes a
-        filled Button, so the defaults gave a 12px line under a solid blue
-        CTA. The Button doc on the same page is explicit — primary is the ONE
-        filled accent button per screen — and an empty panel inviting you in
-        is not where that one gets spent. Media's empty state (145:406) draws
-        its two calls to action the same way.
-      */
+      /* Keep the empty-state routes readable within the narrow drawer. */
       <EmptyState
-        /* 149:46 — a 160-tall block at the TOP of the panel, not a column that
-           fills it. `flex-1` centred the two lines in whatever height the
-           drawer had (~768 live), which put the invitation halfway down an
-           otherwise blank panel and ~300px below where the board draws it. */
-        className="tw:h-40"
+        align="start"
+        size="sm"
         data-testid="content-empty"
       >
         <EmptyStateDesc className="tw:max-w-[272px] tw:text-[13px] tw:leading-5" data-testid="content-empty-desc">
@@ -186,12 +174,12 @@ export function RootView({
             Sources/Variables/Conditions doors this tab also owns had no way
             in until the user first created a collection. All three routes
             are wired regardless of collection count. */}
-        <EmptyStateActions>
+        <EmptyStateActions className="tw:w-full tw:flex-col">
           {onCreateCollection ? (
             <Button
               color="light"
               size="xs"
-              variant="link" className="tw:min-h-6 tw:font-normal"
+              variant="link" className="tw:h-8 tw:w-full tw:justify-start tw:px-0 tw:font-normal"
               data-testid="content-empty-cta"
               onClick={onCreateCollection}
             >
@@ -201,7 +189,7 @@ export function RootView({
           <Button
             color="light"
             size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
+            variant="link" className="tw:h-8 tw:w-full tw:justify-start tw:px-0 tw:font-normal"
             data-testid="content-empty-sources"
             onClick={onOpenSources}
           >
@@ -210,7 +198,7 @@ export function RootView({
           <Button
             color="light"
             size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
+            variant="link" className="tw:h-8 tw:w-full tw:justify-start tw:px-0 tw:font-normal"
             data-testid="content-empty-variables"
             onClick={onOpenVariables}
           >
@@ -219,7 +207,7 @@ export function RootView({
           <Button
             color="light"
             size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
+            variant="link" className="tw:h-8 tw:w-full tw:justify-start tw:px-0 tw:font-normal"
             data-testid="content-empty-conditions"
             onClick={onOpenConditions}
           >
