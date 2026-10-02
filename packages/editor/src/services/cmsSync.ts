@@ -89,7 +89,89 @@ export function cmsFromRows(rows: CmsRows): { collections: CMSCollection[]; item
 // target), notifies subscribers so the editor surfaces a retryable toast, and
 // auto-retries on reconnect ('online'). Still never throws.
 const queue = new SyncRetryQueue();
-registerPendingSource("cms", () => queue.pendingCount());
+
+/* C0.5 — the persisted outbox. The queue above is a Map of closures in memory,
+   so a mirror still queued or in flight when the tab reloaded was lost: the
+   edit stayed in this browser's IndexedDB, the server kept the old value,
+   nothing re-sent it and publish read 0 pending (live, 2026-10-02). Every
+   mirror is now written here BEFORE its request — the payload, not a closure,
+   per site so one site's outbox never replays into another — and removed only
+   once the server confirmed it or answered GONE. A CONFLICT stays: the edit
+   is still not on the server, and the replay re-asks the question (with its
+   precondition, so it never overwrites). Latest-wins per target, in place, so
+   a collection keeps its slot ahead of the entries made after it. `seq` stops
+   an older request's success from clearing a newer payload for the same row.
+   Storage unavailable → every helper is a no-op and the in-memory queue alone
+   carries the session, as before. */
+const OUTBOX_KEY = "bk-cms-outbox-v1";
+
+type OutboxBody =
+  | { key: string; op: "collectionUpsert"; collection: CMSCollection }
+  | { key: string; op: "entryUpsert"; item: CMSContentItem }
+  | { key: string; op: "collectionDelete" | "entryDelete"; id: string };
+type OutboxOp = OutboxBody & { seq: string };
+
+/* Collections before their entries; deletes after the writes they supersede. */
+const REPLAY_ORDER = ["collectionUpsert", "entryUpsert", "entryDelete", "collectionDelete"] as const;
+
+function readOutbox(): Record<string, OutboxOp[]> {
+  try {
+    const raw = localStorage.getItem(OUTBOX_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as Record<string, OutboxOp[]>)
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeOutbox(box: Record<string, OutboxOp[]>): void {
+  try {
+    localStorage.setItem(OUTBOX_KEY, JSON.stringify(box));
+  } catch {
+    // Private mode / quota: the in-memory queue still retries this session.
+  }
+}
+
+let outboxSeq = 0;
+function outboxPut(siteId: string, body: OutboxBody): string {
+  const seq = `${Date.now()}-${++outboxSeq}`;
+  const box = readOutbox();
+  const ops = box[siteId] ?? [];
+  const at = ops.findIndex((o) => o.key === body.key);
+  if (at >= 0) ops[at] = { ...body, seq };
+  else ops.push({ ...body, seq });
+  box[siteId] = ops;
+  writeOutbox(box);
+  return seq;
+}
+
+/** Drop `key` — only the payload `seq` wrote, when given. */
+function outboxRemove(siteId: string, key: string, seq?: string): void {
+  const box = readOutbox();
+  const ops = box[siteId];
+  if (!ops) return;
+  const left = ops.filter((o) => o.key !== key || (seq !== undefined && o.seq !== seq));
+  if (left.length === ops.length) return;
+  if (left.length > 0) box[siteId] = left;
+  else delete box[siteId];
+  writeOutbox(box);
+}
+
+function outboxKeys(siteId: string): string[] {
+  const ops = readOutbox()[siteId];
+  return Array.isArray(ops) ? ops.map((o) => o.key) : [];
+}
+
+/** Every CMS change for this site not yet on the server: queued, in flight,
+ *  or persisted by an earlier page load and not yet replayed. */
+function outstandingCmsChanges(): number {
+  const siteId = getSiteIdFromUrl();
+  return new Set([...queue.outstandingKeys(), ...(siteId ? outboxKeys(siteId) : [])]).size;
+}
+
+registerPendingSource("cms", outstandingCmsChanges);
 
 /* C0a (Task 5): CONFLICT and GONE are answers, not failures. CONFLICT must
    not loop forever against a row that has moved on since; GONE means the
@@ -107,6 +189,24 @@ const conflictListeners = new Set<(c: CmsConflict) => void>();
 export function onCmsConflict(cb: (c: CmsConflict) => void): () => void {
   conflictListeners.add(cb);
   return () => conflictListeners.delete(cb);
+}
+
+/* An edit to a row another device deleted is dropped on GONE — the row leaves
+   this device too. Without a notice the user's edit just vanished (C0.4 live,
+   2026-10-02); `message` is the server's own sentence. */
+export interface CmsGone {
+  kind: "collection" | "entry";
+  id: string;
+  message: string;
+}
+const goneListeners = new Set<(g: CmsGone) => void>();
+export function onCmsGone(cb: (g: CmsGone) => void): () => void {
+  goneListeners.add(cb);
+  return () => goneListeners.delete(cb);
+}
+function announceGone(kind: CmsGone["kind"], id: string, e: unknown): void {
+  const message = (e instanceof Error ? e.message : "").replace(/^CMS_GONE:/, "");
+  for (const cb of goneListeners) cb({ kind, id, message });
 }
 
 type Outcome = "ok" | "conflict" | "gone";
@@ -140,23 +240,38 @@ const forceServer = new Set<string>();
    two outcomes that can never succeed on retry, the task succeeds from the
    queue's view and the outcome is dispatched to the caller instead. */
 async function mirror(
-  key: string,
+  siteId: string,
+  body: OutboxBody,
   task: () => Promise<unknown>,
   onWarn: (e: unknown) => void,
-  on: Record<"conflict" | "gone", () => void>,
+  on: Record<"conflict" | "gone", (e: unknown) => void>,
 ): Promise<boolean> {
-  let outcome: Outcome = "ok";
-  const reached = await queue.run(key, async () => {
+  const seq = outboxPut(siteId, body);
+  let last: Outcome = "ok";
+  /* Settled inside the task, not after `run` returns: a queued op that a
+     reconnect or "Retry now" replays later lands here too, and must leave the
+     outbox (or raise its conflict) exactly like a first-try answer. */
+  const reached = await queue.run(body.key, async () => {
+    let outcome: Outcome = "ok";
+    let answer: unknown;
     try {
       await task();
     } catch (e) {
       const kind = classify(e);
       if (!kind) throw e;
       outcome = kind;
+      answer = e;
+    }
+    last = outcome;
+    if (outcome !== "conflict") outboxRemove(siteId, body.key, seq);
+    if (outcome === "ok") return;
+    try {
+      on[outcome](answer);
+    } catch {
+      // A listener throwing must not turn an answered op into a queued retry.
     }
   }, onWarn);
-  if (outcome !== "ok") (on[outcome] as () => void)();
-  return reached && outcome === "ok";
+  return reached && last === "ok";
 }
 
 /* A delete the server answers NOT_FOUND has reached its goal: another device
@@ -208,7 +323,7 @@ export function consumeDirectSync(kind: "entry" | "collection", id: string): boo
    off a row that hasn't landed (P1-A audit 2026-09-30; the original
    `pendingCount()`-only read let publish race a mirror call). */
 export function cmsSyncBlocker(): string | null {
-  const pending = queue.outstandingCount();
+  const pending = outstandingCmsChanges();
   if (pending > 0) {
     const noun = pending === 1 ? "change hasn't" : "changes haven't";
     return `${pending} CMS ${noun} reached the server yet. Retry the sync, then publish.`;
@@ -295,8 +410,15 @@ export async function retryCmsHydration(): Promise<void> {
   await hydrateCmsFromServer();
 }
 
-function hasQueuedMirror(kind: "collection" | "entry", id: string): boolean {
-  return queue.isPending(`${kind}Upsert:${id}`) || queue.isPending(`${kind}Delete:${id}`);
+/* A row whose local change is still owed to the server — queued here, or in
+   the outbox (in flight, conflicted, or left by an earlier page load) — is
+   newer than anything the server holds; hydration leaves it alone. */
+function isHeld(siteId: string, key: string): boolean {
+  return queue.isPending(key) || outboxKeys(siteId).includes(key);
+}
+
+function hasQueuedMirror(siteId: string, kind: "collection" | "entry", id: string): boolean {
+  return isHeld(siteId, `${kind}Upsert:${id}`) || isHeld(siteId, `${kind}Delete:${id}`);
 }
 
 export async function hydrateCmsFromServer(): Promise<void> {
@@ -335,11 +457,11 @@ export async function hydrateCmsFromServer(): Promise<void> {
         /* A queued DELETE: the collection is going away here — nothing of it
            is written. A queued UPSERT only protects the collection row
            itself; its entries are separate rows and still reconcile below. */
-        if (queue.isPending(`collectionDelete:${rc.id}`)) {
+        if (isHeld(siteId, `collectionDelete:${rc.id}`)) {
           markSkipped();
           return;
         }
-        const collectionQueued = queue.isPending(`collectionUpsert:${rc.id}`);
+        const collectionQueued = isHeld(siteId, `collectionUpsert:${rc.id}`);
         if (collectionQueued) markSkipped();
         const localCollection = localCollections.get(rc.id);
         const collection: CMSCollection = {
@@ -382,7 +504,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
         const localEntries = new Map(localEntriesList.map((i) => [i.id, i]));
         await Promise.all(
           entries.map(async (e) => {
-            if (hasQueuedMirror("entry", e.id)) {
+            if (hasQueuedMirror(siteId, "entry", e.id)) {
               markSkipped();
               return;
             }
@@ -417,7 +539,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
         const remoteEntryIds = new Set(entries.map((e) => e.id));
         for (const le of localEntriesList) {
           if (remoteEntryIds.has(le.id)) continue;
-          if (!hasServerStamp(`entry:${le.id}`) || hasQueuedMirror("entry", le.id)) continue;
+          if (!hasServerStamp(`entry:${le.id}`) || hasQueuedMirror(siteId, "entry", le.id)) continue;
           await Storage.deleteContentItem(le.id);
           forgetServerStamp(`entry:${le.id}`);
         }
@@ -431,7 +553,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
     const remoteIds = new Set(remote.map((r) => r.id));
     for (const local of localCollections.values()) {
       if (remoteIds.has(local.id) || local.siteId !== siteId) continue;
-      if (!hasServerStamp(`collection:${local.id}`) || hasQueuedMirror("collection", local.id)) continue;
+      if (!hasServerStamp(`collection:${local.id}`) || hasQueuedMirror(siteId, "collection", local.id)) continue;
       if (engine) {
         await engine.forgetLocal("collection", local.id);
       } else {
@@ -455,8 +577,10 @@ export async function hydrateCmsFromServer(): Promise<void> {
 export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return true;
+  const key = `collectionUpsert:${c.id}`;
   return mirror(
-    `collectionUpsert:${c.id}`,
+    siteId,
+    { key, op: "collectionUpsert", collection: c },
     () =>
       client().cms.collections.upsert.mutate({
         id: c.id,
@@ -480,7 +604,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] collection upsert failed (kept locally, queued)", e),
     {
-      gone: () => {
+      gone: (e) => {
         forgetServerStamp(`collection:${c.id}`);
         /* Engine path (forgetLocal) is preferred when bound so the in-memory
            cache clears and CMS_STORE_REFRESHED fires; the unbound fallback
@@ -488,6 +612,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
            in editors that never bound a manager. */
         if (engine) void engine.forgetLocal("collection", c.id);
         else void Storage.deleteCollection(c.id);
+        announceGone("collection", c.id, e);
       },
       conflict: () => {
         for (const cb of conflictListeners) {
@@ -498,16 +623,24 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
               forgetServerStamp(`collection:${c.id}`);
               await syncCollectionUpsert(c);
             },
-            useTheirs: async () => {
-              forgetServerStamp(`collection:${c.id}`);
-              await hydrateCmsFromServer();
-              await engine?.refreshFromStorage();
-            },
+            useTheirs: () => takeServerCopy(siteId, "collection", c.id),
           });
         }
       },
     },
   );
+}
+
+/* "Use theirs": the conflicted write leaves the outbox (it will never be
+   sent), and the next hydrate writes the server's row over this device's
+   unconditionally — without `forceServer` an unstamped local row is kept, so
+   the button did nothing. */
+async function takeServerCopy(siteId: string, kind: "collection" | "entry", id: string): Promise<void> {
+  forgetServerStamp(`${kind}:${id}`);
+  outboxRemove(siteId, `${kind}Upsert:${id}`);
+  forceServer.add(`${kind}:${id}`);
+  await hydrateCmsFromServer();
+  await engine?.refreshFromStorage();
 }
 
 export async function syncCollectionDelete(id: string): Promise<void> {
@@ -516,8 +649,10 @@ export async function syncCollectionDelete(id: string): Promise<void> {
   // A pending upsert for the same collection is now moot — deletion wins, so
   // drop it to avoid resurrecting a deleted collection on retry.
   queue.drop(`collectionUpsert:${id}`);
+  outboxRemove(siteId, `collectionUpsert:${id}`);
   await mirror(
-    `collectionDelete:${id}`,
+    siteId,
+    { key: `collectionDelete:${id}`, op: "collectionDelete", id },
     () => client().cms.collections.delete.mutate({ siteId, id }).catch(deleteAlreadyDone),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] collection delete failed (queued)", e),
@@ -539,7 +674,8 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
      queued until a reconnect. Wait for the collection's mirror in flight. */
   await queue.settled(`collectionUpsert:${item.collectionId}`);
   return mirror(
-    `entryUpsert:${item.id}`,
+    siteId,
+    { key: `entryUpsert:${item.id}`, op: "entryUpsert", item },
     () =>
       client().cms.entries.upsert.mutate({
         id: item.id,
@@ -556,10 +692,11 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e),
     {
-      gone: () => {
+      gone: (e) => {
         forgetServerStamp(`entry:${item.id}`);
         if (engine) void engine.forgetLocal("entry", item.id);
         else void Storage.deleteContentItem(item.id);
+        announceGone("entry", item.id, e);
       },
       conflict: () => {
         for (const cb of conflictListeners) {
@@ -570,11 +707,7 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
               forgetServerStamp(`entry:${item.id}`);
               await syncEntryUpsert(item);
             },
-            useTheirs: async () => {
-              forgetServerStamp(`entry:${item.id}`);
-              await hydrateCmsFromServer();
-              await engine?.refreshFromStorage();
-            },
+            useTheirs: () => takeServerCopy(siteId, "entry", item.id),
           });
         }
       },
@@ -586,8 +719,10 @@ export async function syncEntryDelete(id: string): Promise<void> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   queue.drop(`entryUpsert:${id}`);
+  outboxRemove(siteId, `entryUpsert:${id}`);
   await mirror(
-    `entryDelete:${id}`,
+    siteId,
+    { key: `entryDelete:${id}`, op: "entryDelete", id },
     () => client().cms.entries.delete.mutate({ siteId, id }).catch(deleteAlreadyDone),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry delete failed (queued)", e),
@@ -596,4 +731,46 @@ export async function syncEntryDelete(id: string): Promise<void> {
       conflict: () => {},
     },
   );
+}
+
+/* One replay per site per page load at a time — React's dev double-mount runs
+   the editor-open effect twice. */
+const flushing = new Map<string, Promise<void>>();
+
+/**
+ * Replay what an earlier page load wrote to the outbox and never saw land —
+ * this site's ops only, collections before their entries. Run on editor open,
+ * before hydration, so the server has this device's edits before it is asked
+ * for its copy. A replay that fails again is queued like any mirror (and stays
+ * in the outbox); a CONFLICT raises the usual Keep mine / Use theirs choice.
+ * Never throws.
+ */
+export function flushCmsOutbox(): Promise<void> {
+  const siteId = getSiteIdFromUrl();
+  if (!siteId) return Promise.resolve();
+  const running = flushing.get(siteId);
+  if (running) return running;
+  const run = (async () => {
+    const ops = readOutbox()[siteId];
+    if (!Array.isArray(ops)) return;
+    for (const phase of REPLAY_ORDER) {
+      await Promise.all(
+        ops.filter((o) => o.op === phase).map((o) => {
+          switch (o.op) {
+            case "collectionUpsert": return syncCollectionUpsert(o.collection);
+            case "entryUpsert": return syncEntryUpsert(o.item);
+            case "entryDelete": return syncEntryDelete(o.id);
+            case "collectionDelete": return syncCollectionDelete(o.id);
+          }
+        }),
+      );
+    }
+  })()
+    .catch((e) => {
+      // eslint-disable-next-line no-console
+      console.warn("[cms-sync] outbox replay failed", e);
+    })
+    .finally(() => flushing.delete(siteId));
+  flushing.set(siteId, run);
+  return run;
 }

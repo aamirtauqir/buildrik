@@ -67,6 +67,7 @@ beforeEach(() => {
   storageDeleteCollection.mockReset().mockResolvedValue(undefined);
   localStorage.removeItem("bk-sync-stamps-v1");
   localStorage.removeItem("bk-sync-stamp-migrations-v1");
+  localStorage.removeItem("bk-cms-outbox-v1");
   // The server answers an upsert with its row — updatedAt on ITS clock.
   [colUpsert, entUpsert].forEach((m) => m.mockResolvedValue({ updatedAt: new Date(0) }));
 });

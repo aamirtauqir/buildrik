@@ -86,7 +86,13 @@ export class SyncRetryQueue {
    *  edit refuses to publish even when the network call returned 200 but the
    *  state diff has not propagated. */
   outstandingCount(): number {
-    return this.queue.size + this.inFlight.size;
+    return this.outstandingKeys().length;
+  }
+
+  /** The targets behind `outstandingCount` — a key both queued and in flight
+   *  (a retry running) is one change, not two. */
+  outstandingKeys(): string[] {
+    return [...new Set([...this.queue.keys(), ...this.inFlight.keys()])];
   }
 
   /** Resolves true when the latest run for `key` reaches the server, false
