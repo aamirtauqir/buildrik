@@ -143,15 +143,15 @@ describe("Topbar", () => {
     expect(onPreview).not.toHaveBeenCalled();
   });
 
-  /* Board 4418:123573: Preview is a bordered TEXT button; the shell search
-     field opens ⌘K; unread is a count badge. */
-  it("draws Preview as text, the search field, and the unread count", () => {
-    const onOpenSearch = vi.fn();
-    render(<Topbar siteName="x" save="saved" tools={{ onPreview: vi.fn() }} onOpenSearch={onOpenSearch} unreadCount={3} />);
+  /* Board 4418:123573: Preview is a bordered TEXT button; unread is a count
+     badge. The board's resting "Search pages, layers, assets…" ⌘K button is
+     gone (owner decision 2026-10-03) — ⌘K itself opens the palette. */
+  it("draws Preview as text and the unread count, and no ⌘K search button", () => {
+    render(<Topbar siteName="x" save="saved" tools={{ onPreview: vi.fn() }} unreadCount={3} />);
     expect(screen.getByTestId("topbar-preview")).toHaveTextContent("Preview");
-    fireEvent.click(screen.getByTestId("topbar-search"));
-    expect(onOpenSearch).toHaveBeenCalled();
     expect(screen.getByTestId("topbar-unread-badge")).toHaveTextContent("3");
+    expect(screen.queryByTestId("topbar-search")).toBeNull();
+    expect(screen.queryByText(/Search pages, layers/)).toBeNull();
   });
 
   it("Comments carries aria-pressed from the container's mirrored state", () => {
@@ -231,7 +231,7 @@ describe("Topbar — contextual search", () => {
     const { render, screen, fireEvent } = await import("@testing-library/react");
     const { Topbar } = await import("../Topbar");
     const onChange = vi.fn();
-    render(<Topbar siteName="S" onOpenSearch={vi.fn()} contextSearch={{ placeholder: "Search elements…", value: "", onChange }} />);
+    render(<Topbar siteName="S" contextSearch={{ placeholder: "Search elements…", value: "", onChange }} />);
     const input = screen.getByPlaceholderText("Search elements…");
     fireEvent.change(input, { target: { value: "but" } });
     expect(onChange).toHaveBeenCalledWith("but");

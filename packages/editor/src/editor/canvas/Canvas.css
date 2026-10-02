@@ -794,6 +794,7 @@ button:hover > .bd-canvas-empty-cta__thumb {
 .bd-canvas-scroll {
   flex: 1;
   min-width: 0;
+  min-height: 0; /* the wrapper is a column now — the docked footer sits under this */
   display: flex;
   align-items: center;
   justify-content: safe center;
