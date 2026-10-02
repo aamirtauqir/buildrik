@@ -279,9 +279,10 @@ describe("Sites Service", () => {
         id: "s1",
         name: "My Site",
       } as any);
+      vi.mocked(prisma.formBlock.findMany).mockResolvedValue([] as any);
       const result = await deleteSite("s1", "My Site");
       expect(prisma.$transaction).toHaveBeenCalled();
-      expect(result).toEqual({ success: true });
+      expect(result).toEqual({ success: true, deactivatedFormBlockIds: [] });
     });
 
     it("throws when name does not match", async () => {

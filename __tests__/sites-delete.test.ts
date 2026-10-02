@@ -12,6 +12,7 @@ vi.mock("@/lib/prisma", () => {
       updateMany: vi.fn(),
     },
     formBlock: {
+      findMany: vi.fn(),
       updateMany: vi.fn(),
     },
   };
@@ -37,6 +38,7 @@ describe("SA-07: site delete takes the deployment down and is logged", () => {
     vi.mocked(prisma.site.updateMany).mockResolvedValue({ count: 0 } as never);
     vi.mocked(prisma.shareLink.updateMany).mockResolvedValue({ count: 0 } as never);
     vi.mocked(prisma.formBlock.updateMany).mockResolvedValue({ count: 0 } as never);
+    vi.mocked(prisma.formBlock.findMany).mockResolvedValue([] as never);
   });
 
   it("unpublishes a published site before soft-deleting (SA-07)", async () => {
@@ -103,7 +105,7 @@ describe("SA-07: site delete takes the deployment down and is logged", () => {
     } as never);
     vi.mocked(unpublishSite).mockRejectedValue(new Error("vercel down"));
 
-    await expect(deleteSite("s1", "A")).resolves.toEqual({ success: true });
+    await expect(deleteSite("s1", "A")).resolves.toEqual({ success: true, deactivatedFormBlockIds: [] });
     expect(prisma.$transaction).toHaveBeenCalled();
   });
 
@@ -145,5 +147,35 @@ describe("SA-07: site delete takes the deployment down and is logged", () => {
     expect(result.succeeded).toEqual(["s1"]);
     expect(prisma.shareLink.updateMany).toHaveBeenCalled();
     expect(prisma.formBlock.updateMany).toHaveBeenCalled();
+  });
+
+  /* BE-6: a restore switches back on exactly the forms the delete switched off,
+     so the delete reports them — only the ACTIVE ones (an owner-disabled form
+     stays off after a restore). */
+  it("reports the forms it switched off — only the ones that were active", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", name: "A", status: "DRAFT", publishedUrl: null } as never);
+    vi.mocked(prisma.formBlock.findMany).mockResolvedValue([{ id: "f1" }, { id: "f2" }] as never);
+    vi.mocked(prisma.site.update).mockResolvedValue({} as never);
+
+    const result = await deleteSite("s1", "A");
+
+    expect(prisma.formBlock.findMany).toHaveBeenCalledWith({ where: { siteId: "s1", isActive: true }, select: { id: true } });
+    expect(result).toEqual({ success: true, deactivatedFormBlockIds: ["f1", "f2"] });
+  });
+
+  it("bulk delete reports the switched-off forms per site", async () => {
+    vi.mocked(prisma.site.findMany).mockResolvedValue([
+      { id: "s1", status: "DRAFT", publishedUrl: null },
+      { id: "s2", status: "DRAFT", publishedUrl: null },
+    ] as never);
+    vi.mocked(prisma.site.updateMany).mockResolvedValue({ count: 2 } as never);
+    vi.mocked(prisma.formBlock.findMany).mockResolvedValue([
+      { id: "f1", siteId: "s1" },
+      { id: "f3", siteId: "s1" },
+    ] as never);
+
+    const result = await bulkAction("ws1", { action: "delete", siteIds: ["s1", "s2"] });
+
+    expect(result).toMatchObject({ succeeded: ["s1", "s2"], deactivatedFormBlockIds: { s1: ["f1", "f3"] } });
   });
 });

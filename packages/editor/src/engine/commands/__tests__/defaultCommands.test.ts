@@ -540,12 +540,19 @@ describe("one registry — ids are unique, the merged canvas rows are here", () 
       ["cms-records", EVENTS.CMS_MANAGE_RECORDS, {}],
       ["save-template", EVENTS.TEMPLATE_SAVE_REQUESTED, {}],
       ["open-analytics", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "analytics" }],
-      ["open-integrations", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "integrations" }],
     ] as const) {
       composer.emit.mockClear();
       run(id);
       expect(composer.emit, id).toHaveBeenCalledWith(event, payload);
     }
+  });
+
+  /* PD-2 (Settings Phase B): the editor's Integrations stub is gone, and so is
+     its ⌘K door — integrations live in the dashboard's Settings. */
+  it("has no integrations command", () => {
+    const commands = buildDefaultCommands(composer as unknown as Composer);
+    expect(commands.map((c) => c.id)).not.toContain("open-integrations");
+    expect(commands.some((c) => c.keywords?.includes("integrations"))).toBe(false);
   });
 
   /* A-7: "export" is a door (kind: "door" in SETTINGS_SCREENS), not a

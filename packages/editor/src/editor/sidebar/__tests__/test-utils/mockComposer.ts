@@ -188,6 +188,7 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
     saveProject: vi.fn(async () => {}),
     getProjectMetadata: vi.fn(() => opts.projectMetadata ?? { domain: null }),
     updateProjectMetadata: vi.fn(),
+    mergeProjectMetadata: vi.fn(),
     getState: vi.fn(() => ({ gridSize: 10, snapToGrid: false })),
     setGridSize: vi.fn(),
     setSnapToGrid: vi.fn(),

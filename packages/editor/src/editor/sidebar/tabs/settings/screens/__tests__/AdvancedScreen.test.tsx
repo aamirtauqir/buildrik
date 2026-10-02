@@ -295,9 +295,9 @@ describe("AdvancedScreen — dirty wiring + flush handler", () => {
     expect(registerFlushHandler).toHaveBeenLastCalledWith(null);
   });
 
-  it("flush writes the typed head/body/css buffers into composer customCode", () => {
-    let flush: (() => void) | null = null;
-    const registerFlushHandler = vi.fn((h: (() => void) | null) => {
+  it("flush returns the typed head/body/css buffers as customCode, without writing the composer", () => {
+    let flush: (() => unknown) | null = null;
+    const registerFlushHandler = vi.fn((h: (() => unknown) | null) => {
       flush = h;
     });
     const { composer } = setup({ registerFlushHandler });
@@ -307,10 +307,7 @@ describe("AdvancedScreen — dirty wiring + flush handler", () => {
     fireEvent.change(cssBox(), { target: { value: ".c { top: 0; }" } });
 
     expect(flush).toBeTypeOf("function");
-    act(() => flush!());
-
-    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
-    const settings = composer.getProjectSettings() as {
+    const settings = flush!() as {
       customCode: { headScripts: string; bodyScripts: string; globalCss: string };
     };
     expect(settings.customCode).toEqual({
@@ -318,6 +315,7 @@ describe("AdvancedScreen — dirty wiring + flush handler", () => {
       bodyScripts: "<script>b()</script>",
       globalCss: ".c { top: 0; }",
     });
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 });
 

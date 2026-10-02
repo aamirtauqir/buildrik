@@ -6,9 +6,10 @@
  * Head and body come from the Site row on open (3953:49260 loading,
  * 3953:49386 load-error) — those two columns are what the publish worker
  * injects; the CSS lives in the project JSON and the client export engine
- * injects it. Edits stay here until Save: the flush writes
- * `projectSettings.customCode`, and the sync provider's dual-save map carries
- * head and body on to `Site.headCode` / `Site.bodyCode`. A refused save shows
+ * injects it. Edits stay here until Save: the flush hands
+ * `projectSettings.customCode` to the shell, which writes head and body to
+ * `Site.headCode` / `Site.bodyCode` and the CSS through
+ * `siteDetail.projectSettings.update`. A refused save shows
  * the banner (3951:26607). On a FREE plan the shell mounts `LockedScreen`
  * instead (3397:32859).
  *
@@ -212,7 +213,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
     { onLoadStateChange, registerRetryLoad }
   );
 
-  // Flush local buffer → composer on Save (see SettingsTab).
+  // On Save the shell calls this and saves what it returns (ScreenProps.registerFlushHandler).
   const stateRef = React.useRef({ headCode, bodyCode, cssCode });
   stateRef.current = { headCode, bodyCode, cssCode };
   React.useEffect(() => {
@@ -220,14 +221,14 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
     registerFlushHandler(() => {
       const current = composer.getProjectSettings();
       const s = stateRef.current;
-      composer.setProjectSettings({
+      return {
         ...current,
         customCode: {
           headScripts: s.headCode,
           bodyScripts: s.bodyCode,
           globalCss: s.cssCode,
         },
-      });
+      };
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);

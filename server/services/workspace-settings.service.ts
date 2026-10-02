@@ -281,7 +281,7 @@ export async function processDueWorkspaceDeletions(
 
 export async function updateSharingSettings(
   workspaceId: string,
-  data: { defaultExpiration?: string | null; requirePw?: boolean; allowEditors?: boolean; notify?: boolean },
+  data: { defaultExpiration?: string | null; requirePw?: boolean; allowEditors?: boolean },
 ) {
   return prisma.wSSharingSettings.upsert({
     where: { workspaceId },

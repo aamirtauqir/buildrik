@@ -135,10 +135,10 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     if (!composer || !registerFlushHandler) return;
     registerFlushHandler(() => {
       const current = composer.getProjectSettings();
-      composer.setProjectSettings({
+      return {
         ...current,
         redirects: { ...current.redirects, suggestFrom404s: suggestRef.current },
-      });
+      };
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);

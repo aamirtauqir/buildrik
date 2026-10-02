@@ -729,12 +729,5 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
          itself emits, opening the modal directly. */
       run: () => composer.emit(EVENTS.UI_OPEN_EXPORTER, undefined),
     },
-    {
-      id: "open-integrations",
-      label: "Open integrations",
-      group: "Navigation",
-      keywords: ["integrations", "api", "connect", "third-party"],
-      run: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "integrations" }),
-    },
   ];
 }

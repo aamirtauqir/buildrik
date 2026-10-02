@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { assertSiteAccess, checkSiteRole, checkWorkspaceRole, getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
+import { assertSiteAccess, checkSiteRole, checkWorkspaceRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import {
   listSites,
   createSite,
@@ -11,6 +11,8 @@ import {
   archiveSite,
   unarchiveSite,
   deleteSite,
+  listDeletedSites,
+  restoreSite,
   bulkAction,
   checkSlugAvailability,
   transferSite,
@@ -41,6 +43,8 @@ import {
   createSiteSchema,
   bulkActionSchema,
   transferSiteSchema,
+  restoreSiteSchema,
+  SITE_RESTORE_WINDOW_DAYS,
   checkSlugSchema,
   getProjectDataSchema,
   editorSaveProjectSchema,
@@ -107,11 +111,13 @@ export const sitesRouter = router({
       }
     }),
 
+  // PD-4 (BE-5): the site's name is a Site setting, and Site settings are
+  // ADMIN everywhere (`siteDetail.settings.update` writes `name` at ADMIN too).
   rename: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(2).max(100) }))
     .mutation(async ({ ctx, input }) => {
       try {
-        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
@@ -182,8 +188,9 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
+      let deleted: Awaited<ReturnType<typeof deleteSite>>;
       try {
-        await deleteSite(input.id, input.confirmName);
+        deleted = await deleteSite(input.id, input.confirmName);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NAME_MISMATCH")
           throw new TRPCError({
@@ -199,7 +206,53 @@ export const sitesRouter = router({
         targetType: "site",
         targetId: input.id,
         description: "Site deleted",
+        // BE-6: what `sites.restore` switches back on.
+        metadata: { formBlockIds: deleted.deactivatedFormBlockIds },
       });
+    }),
+
+  // BE-6 / PD-6: the workspace's sites deleted inside the restore window (the
+  // Sites list's "Recently deleted"). Scoped like the Sites list itself.
+  listDeleted: protectedProcedure.query(async ({ ctx }) => {
+    const workspaceId = await getWorkspaceId(ctx);
+    const scope = await siteScopeWhere(ctx.prisma, ctx.session.user.id, workspaceId);
+    return listDeletedSites(workspaceId, scope);
+  }),
+
+  // BE-6 / Q-B8: same gate as delete (OWNER). No republish: the site comes
+  // back as a draft, its forms on, its share links still revoked.
+  restore: protectedProcedure
+    .input(restoreSiteSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "OWNER");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        const result = await restoreSite(input.id, ctx.session.user.id);
+        await recordForSite({
+          siteId: input.id,
+          actorId: ctx.session.user.id,
+          action: "site.restored",
+          targetType: "site",
+          targetId: input.id,
+          description: "Site restored",
+          metadata: { formBlockIds: result.reactivatedFormBlockIds },
+        });
+        return result;
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        if (e instanceof Error && e.message === "SITE_NOT_DELETED")
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This site is not deleted." });
+        if (e instanceof Error && e.message === "RESTORE_WINDOW_PASSED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: `This site was deleted more than ${SITE_RESTORE_WINDOW_DAYS} days ago and can no longer be restored.` });
+        if (e instanceof Error && e.message === "SITE_LIMIT")
+          throw new TRPCError({ code: "FORBIDDEN", message: SITE_LIMIT_MESSAGE });
+        throw e;
+      }
     }),
 
   bulk: protectedProcedure
@@ -234,6 +287,7 @@ export const sitesRouter = router({
               targetType: "site",
               targetId: siteId,
               description: "Site deleted",
+              metadata: { formBlockIds: ("deactivatedFormBlockIds" in result ? result.deactivatedFormBlockIds?.[siteId] : undefined) ?? [] },
             })
           )
         );

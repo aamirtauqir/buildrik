@@ -48,8 +48,8 @@ const settingsWithFullSocialLinks = () => ({
 
 function setup() {
   const composer = createMockComposer({ projectSettings: settingsWithFullSocialLinks() });
-  let flush: (() => void) | null = null;
-  const registerFlushHandler = vi.fn((h: (() => void) | null) => {
+  let flush: (() => unknown) | null = null;
+  const registerFlushHandler = vi.fn((h: (() => unknown) | null) => {
     flush = h;
   });
   render(
@@ -69,15 +69,16 @@ function setup() {
 
 describe("SiteSettingsScreen — SA-08 flush preserves social links the screen does not show", () => {
   it("keeps instagram/youtube/github when Twitter is edited and the screen flushes", async () => {
-    const { composer, getFlush } = setup();
+    const { getFlush } = setup();
 
     const twitter = screen.getByLabelText("Twitter") as HTMLInputElement;
     fireEvent.change(twitter, { target: { value: "https://x.com/b" } });
 
     await waitFor(() => expect(getFlush()).toBeTypeOf("function"));
-    act(() => getFlush()!());
-
-    const settings = composer.getProjectSettings() as ReturnType<typeof settingsWithFullSocialLinks>;
+    let settings!: ReturnType<typeof settingsWithFullSocialLinks>;
+    act(() => {
+      settings = getFlush()!() as ReturnType<typeof settingsWithFullSocialLinks>;
+    });
     expect(settings.seo.socialLinks).toEqual({
       twitter: "https://x.com/b",
       facebook: "",
@@ -109,12 +110,12 @@ describe("SiteSettingsScreen — flush keeps the Site row's social links when th
       },
     });
     const composer = createMockComposer({ projectSettings: { seo: { siteName: "Row Name", language: "en" } } });
-    let flush: (() => void) | null = null;
+    let flush: (() => unknown) | null = null;
     render(
       <SiteSettingsScreen
         composer={composer}
         projectId="s1"
-        registerFlushHandler={(h: (() => void) | null) => {
+        registerFlushHandler={(h: (() => unknown) | null) => {
           flush = h;
         }}
       />,
@@ -128,9 +129,10 @@ describe("SiteSettingsScreen — flush keeps the Site row's social links when th
     const twitter = (await screen.findByLabelText("Twitter")) as HTMLInputElement;
     fireEvent.change(twitter, { target: { value: "https://x.com/b" } });
     await waitFor(() => expect(flush).toBeTypeOf("function"));
-    act(() => flush!());
-
-    const settings = composer.getProjectSettings() as { seo: { socialLinks: Record<string, string> } };
+    let settings!: { seo: { socialLinks: Record<string, string> } };
+    act(() => {
+      settings = flush!() as { seo: { socialLinks: Record<string, string> } };
+    });
     expect(settings.seo.socialLinks).toEqual({
       twitter: "https://x.com/b",
       facebook: "https://facebook.com/a",

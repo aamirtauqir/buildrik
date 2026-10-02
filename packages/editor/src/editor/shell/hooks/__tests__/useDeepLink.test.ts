@@ -95,3 +95,48 @@ describe("useDeepLink", () => {
     expect(c.selection.select).toHaveBeenCalledOnce();
   });
 });
+
+/* Settings Phase B (BE-11): `?settings=<screen>` — the dashboard's read-only
+   site tabs link here ("Edit in Site settings ›"). */
+describe("useDeepLink — ?settings=<screen>", () => {
+  const opened = (c: ReturnType<typeof fakeComposer>) => {
+    const seen: unknown[] = [];
+    c.on(EVENTS.UI_SETTINGS_OPEN, (p) => seen.push(p));
+    return seen;
+  };
+
+  it("opens Settings on the named screen once the project has loaded", () => {
+    setUrl("?settings=domains");
+    const c = fakeComposer();
+    const seen = opened(c);
+    renderHook(() => useDeepLink(c as never));
+    act(() => c.emit(EVENTS.PROJECT_LOADED, { importing: true }));
+    expect(seen).toEqual([]);
+    act(() => c.emit(EVENTS.PROJECT_LOADED, { pages: [] }));
+    expect(seen).toEqual([{ screen: "domains" }]);
+    act(() => c.emit(EVENTS.PROJECT_LOADED, { pages: [] }));
+    expect(seen).toHaveLength(1);
+  });
+
+  it("opens nothing for an id that names no screen — or a door, or the removed Integrations", () => {
+    for (const id of ["integrations", "members", "branding", "nope", ""]) {
+      setUrl(`?settings=${id}`);
+      const c = fakeComposer();
+      const seen = opened(c);
+      renderHook(() => useDeepLink(c as never));
+      act(() => c.emit(EVENTS.PROJECT_LOADED, { pages: [] }));
+      expect(seen, id).toEqual([]);
+    }
+  });
+
+  it("rides along with an element link", () => {
+    setUrl("?settings=seo&el=el-1");
+    const c = fakeComposer();
+    const seen = opened(c);
+    renderHook(() => useDeepLink(c as never));
+    act(() => c.emit(EVENTS.PROJECT_LOADED, { pages: [] }));
+    act(() => vi.advanceTimersByTime(100));
+    expect(seen).toEqual([{ screen: "seo" }]);
+    expect(c.selection.select).toHaveBeenCalledOnce();
+  });
+});

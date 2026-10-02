@@ -6,9 +6,9 @@
  * Per-page titles, descriptions and social images live in Page settings and
  * override these; the strip at the top says so. Values come from the Site
  * row on open (3953:26646 loading, 3953:26785 load-error); edits stay here
- * until Save, when the flush writes `projectSettings.seo.*` and the sync
- * provider's dual-save map carries `metaTitle` / `metaDescription` /
- * `ogImage` / `allowIndexing` / `robotsTxt` on to the Site columns. A refused
+ * until Save, when the flush hands `projectSettings.seo.*` to the shell, which
+ * writes `metaTitle` / `metaDescription` / `ogImage` / `allowIndexing` /
+ * `robotsTxt` to the Site columns (`siteDetail.settings.update`). A refused
  * save shows the banner (3951:26319).
  *
  * @license BSD-3-Clause
@@ -164,7 +164,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     { onLoadStateChange, registerRetryLoad }
   );
 
-  // Flush local buffer → composer once on Save click (see SettingsTab).
+  // On Save the shell calls this and saves what it returns (ScreenProps.registerFlushHandler).
   const stateRef = React.useRef({ metaTitle, metaDescription, twitterHandle, defaultOgImage, allowIndexing, robotsTxt });
   stateRef.current = { metaTitle, metaDescription, twitterHandle, defaultOgImage, allowIndexing, robotsTxt };
   React.useEffect(() => {
@@ -172,7 +172,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     registerFlushHandler(() => {
       const current = composer.getProjectSettings();
       const s = stateRef.current;
-      composer.setProjectSettings({
+      return {
         ...current,
         seo: {
           ...current.seo,
@@ -183,7 +183,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           allowIndexing: s.allowIndexing,
           robotsTxt: s.robotsTxt,
         },
-      });
+      };
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);

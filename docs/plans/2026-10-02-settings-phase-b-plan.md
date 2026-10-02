@@ -406,3 +406,97 @@ QA owns only `docs/plans/settings-phase-b-walk/**` and `packages/editor/scripts/
 - **All remaining questions — every recommendation accepted:** Q-B1 Form submissions stays in Settings, no "Form settings"; Q-B2 fix the sidebar once in the nav component; Q-B4 Archive hides from the Sites list only, the live site stays up; Q-B5 the workspace OWNER may transfer a site as well as its creator; Q-B6 removing a locale keeps its translations, confirm only when translations exist; Q-B8 restore reactivates forms, share links stay revoked; Q-B9 support all six social keys; S4 Q1 no "Add form" in Settings; S4 Q4 `cleanUrls` is a separate ticket, verified on one published site first; S5 Q1 Permissions link for every role from the Settings sidebar foot; S5 Q2 closed (page-settings SEO already built); S5 Q3 build the Branding fallback card.
 
 **Order:** `fix/editor-known-bugs` lands first → Lane 0 (alone) → Lanes 1 + 2 in parallel with the QA agent.
+
+---
+
+## Lane 0 delivered (2026-10-03, branch `feat/settings-b-lane0`)
+
+Backend BE-1…BE-11 and the shell are built, tested and walked live (port 3220, QA workspace). Zero migrations.
+Shell visuals follow the boards: M0 nav `4418:144988` (on `8134:212121`), M1 `8134:212121` / `8134:212529`, M2
+`8134:212323`, M19 `8134:212718` (copy), workspace door `8139:217358`, sidebar search `6816:60270`, Overview archived
+`8137:216346` (header + notice).
+
+### Contract for Lanes 1 and 2
+
+**Screen props (`types.ts` `ScreenProps`)**
+- `registerFlushHandler(() => ProjectSettings | void)` — **changed**: the flush RETURNS the full `ProjectSettings` to
+  save (`{ ...composer.getProjectSettings(), <your edits> }`) and must NOT write the composer. The shell diffs it against
+  the composer and saves Site columns through `siteDetail.settings.update` and JSON-only keys through
+  `siteDetail.projectSettings.update`; the composer adopts the values only after the server has them
+  (`Composer.adoptSavedProjectSettings` — no dirty flag, no autosave, no `sites.saveProject`). Throw to refuse the Save.
+  A changed key no mutation covers (SEO's `seo.twitterHandle` today) is handed to the composer as an edit instead, so the
+  project save still carries it — Lane 1 removes that case by merging the handle into `socialLinks.twitter` (BE-4 accepts
+  `@handle` and stores the x.com link).
+- `registerSaveHandler` — unchanged; a handler that throws `SettingsSaveError` gets its refused fields back as `fieldErrors`.
+- `saveModel: "footer" | "immediate"` — the screen's model (`SCREEN_SAVE_MODEL`).
+- `readOnly: boolean` — the member is below `SCREEN_MIN_ROLE`. The shell already shows the M2 notice, disables every native
+  control (a disabled `<fieldset>`), hides the header action and the save bar, and turns off the per-field
+  `SiteColumnGate` hints; hide anything else that acts (links, menus).
+- `registerFieldErrors(errors | null)` — report the screen's own invalid fields (keyed by settings path); while any are
+  reported the footer's Save is disabled.
+- `fieldErrors` — the fields the server refused on the last Save, keyed by `ProjectSettings` path
+  (`seo.defaultOgImage`, `seo.socialLinks.instagram`, `analytics.googleAnalytics.measurementId`, `customCode.globalCss`)
+  or by Site column name where there is no settings path (`slug`, `canonicalUrl`, `cspPolicy`, …). Render under the field.
+  `AnalyticsScreen` is wired as the reference.
+
+**Tables (`constants.ts`)** — `SETTINGS_NAV`, `SETTINGS_NAV_GROUPS`, `SETTINGS_NAV_GROUP_ORDER`, `SCREEN_MIN_ROLE`
+(general/localization/seo/domains/access/custom-code/headers ADMIN · redirects/analytics/forms EDITOR · danger-zone OWNER),
+`SCREEN_SAVE_MODEL` (domains/redirects/forms/danger-zone immediate, the rest footer), `SCREEN_SCOPE`, `scopeLine`,
+`SAVE_ERROR_MESSAGES`, `WORKSPACE_LINKS`, `WORKSPACE_DOOR_COPY`, `isSettingsScreenId`, `isSettingsPaneId`.
+`types.ts` `SCREEN_PLAN_REQUIREMENTS` = `{ "custom-code": "pro", access: "pro" }`; `LockedScreen` `LOCKED_COPY.access`.
+
+**Client helpers (`services/BuildrikSyncProvider.ts`)** — `updateSiteColumns(siteId, patch)`,
+`updateProjectSettings(siteId, patch)` (use it for an immediate JSON write, e.g. Redirects' 404 switch, then
+`composer.adoptSavedProjectSettings({ ...composer.getProjectSettings(), redirects: result.saved.redirects })`),
+`saveSiteSettings(siteId, plan)`, `planSettingsSave(before, next)`, `SettingsSaveError` (`fieldErrors`),
+`SiteColumnPatch`, `getEditorWorkspaceName()`.
+
+**Server** — `siteDetail.projectSettings.update({ siteId, patch })` (`packages/shared/schemas/project-settings.ts`:
+`projectSettingsPatchSchema`, `legacyAnalyticsIds`); `sites.listDeleted()` → `{ id, name, slug, deletedAt, purgeAt }[]`;
+`sites.restore({ id })` (OWNER) → `{ site, reactivatedFormBlockIds, reactivatedForms }`; `SITE_RESTORE_WINDOW_DAYS`;
+`sites.rename` is ADMIN; `sites.transfer` allows the creator or the workspace OWNER (router gate still OWNER);
+`siteDetail.redirects.import_csv` → `{ created }`, refusals name the line (`BAD_REQUEST` invalid row, `CONFLICT` duplicate),
+nothing imported; `updateSiteSettingsSchema` takes https-or-site-path icons/OG/canonical (`""` clears) and the six
+`SOCIAL_NETWORKS`; `settingsOverview` drops `integrations`, adds `access { passwordSet, shareLinks }`,
+`site.archived`, `site.workspaceDeletionAt`; `settings.get` adds `workspaceName`; every tRPC Zod refusal carries
+`data.zodIssues: [{ path, message }]`.
+
+**Deep link** — `/edit/<siteId>?settings=<id>` with `id` ∈ `overview · general · localization · seo · domains ·
+redirects · access · analytics · forms · custom-code · headers · danger-zone` (`useDeepLink`). Doors and removed ids open
+nothing. The dashboard's "Edit in Site settings ›" links use these.
+
+**Search anchors your screens must set** (`id` on the control, or the `Field` label slug): General `site-name`,
+`favicon-url`, `touch-icon`, `site-author`, `site-slug` · Languages `default-locale`, `locales` · SEO `seo-meta-title`,
+`seo-meta-description`, `seo-og`, `social-twitter|facebook|linkedin|instagram|youtube|github`, `seo-allow-indexing`,
+`seo-canonical`, `seo-robots` · Domains `dom-domain`, `dom-primary`, `dom-force-https`, `dom-dns-records` · Redirects
+`rd-rules`, `rd-suggest-from-404s`, `rd-import-csv`, `rd-export-csv` · Access `access-password`, `access-share-links` ·
+Danger zone `danger-archive`, `danger-transfer`, `danger-delete`.
+
+**Stubs to fill (Lane 2):** `screens/AccessScreen.tsx` (boards `8136:216089`–`8136:216758`),
+`screens/DangerZoneScreen.tsx` (`8137:216600`–`8137:218168`).
+
+**Frozen after merge (no lane edits; requests go to the coordinator):** `SettingsTab.tsx`, `constants.ts`, `types.ts`,
+`shared.tsx`, `searchIndex.ts`, `icons.tsx`, `hooks/**`, `components/UnsavedSettingsDialog.tsx`, `screens/index.ts`,
+`screens/LockedScreen.tsx`, `screens/OverviewScreen.tsx`, `screens/WorkspaceDoorScreen.tsx`,
+`editor/shell/hooks/useDeepLink.ts`, `engine/commands/defaultCommands.ts`, `services/BuildrikSyncProvider.ts`,
+`engine/Composer.ts` (`adoptSavedProjectSettings`), `packages/shared/schemas/{project-settings,site-detail,sites}.ts`,
+`server/**` touched here.
+
+### Found against the plan
+- §0 "`sites.transfer` = OWNER **and** creator": the BE-8 change alone leaves a non-OWNER creator unable to transfer —
+  the router's OWNER gate decides first. Kept (Danger zone is OWNER, PD-3).
+- General's **Author** is persisted by no path (`saveProjectFromEditor` ignores `metadata`; load never reads it). It lives
+  only in the session. Lane 1 needs a home for it (a column or a JSON-only key).
+- The dashboard GA card (BE-9) and workspace language/timezone/notify (BE-10) UI were removed here, although §5 lists
+  `integrations-tab.tsx` / `workspace-form.tsx` under Lane 1 — the BE rows named them. Lane 1 only walks #48/#49.
+- `IntegrationsScreen` removal left `INTEGRATION_CATALOG` unread; it is deleted (`packages/shared/schemas/integrations.ts`).
+  `chrome-ui/IntegrationRow` now has no product consumer (library component, kept).
+- The workspace-door board (`8139:217358`) makes Members / Billing / Integrations & webhooks open an in-pane card, not a
+  new tab as the plan's "↗ door" rows said.
+- Overview boards `8137:216346` / `8137:216089` draw six plain group cards; the shell keeps the summary-row cards of
+  `4418:128917` below the new header and archived notice. "Pending deletion" of the *site* cannot be shown: a deleted
+  site does not open in the editor; the strip is drawn for the *workspace's* scheduled deletion instead.
+- M19's light toast card: the copy is built; the chrome-ui `Toast` (shared by the whole editor) still renders its dark
+  style at the top.
+- Dev DB drift (not Lane 0): `prisma migrate status` reports `20261004130000_site_cms_edited_at` unapplied (the column
+  exists) and an unknown `20260915130000_settings_s4_forms_webhooks` applied.

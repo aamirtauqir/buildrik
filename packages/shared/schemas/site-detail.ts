@@ -48,6 +48,89 @@ export const siteOverviewSchema = z.object({
   })),
 });
 
+/**
+ * BE-4: an icon, an OG image or a canonical address is an `https:` URL or a
+ * path on the site (`/favicon.png`, never `//host`). These are written into
+ * every published page's `<head>`; a `javascript:` or `data:` value was
+ * accepted until 2026-10-02 (`ogImage` was a bare `.url()`, the rest any string).
+ */
+function isSiteAssetUrl(value: string): boolean {
+  if (value.startsWith("/")) return !value.startsWith("//");
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+const SITE_ASSET_URL_MESSAGE = "Use an https:// address or a path on this site (/image.png).";
+
+/** The column form: "" (how a cleared text field arrives) is stored as null. */
+const nullableSiteAssetUrl = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .refine((value) => value === "" || isSiteAssetUrl(value), { message: SITE_ASSET_URL_MESSAGE })
+    .transform((value) => (value === "" ? null : value))
+    .nullable()
+    .optional();
+
+/**
+ * The social networks a site links to (Q-B9): every key the editor or the
+ * dashboard has ever written, so no stored link is orphaned.
+ */
+export const SOCIAL_NETWORKS = ["twitter", "facebook", "linkedin", "instagram", "youtube", "github"] as const;
+export type SocialNetwork = (typeof SOCIAL_NETWORKS)[number];
+
+/** `@handle` or a bare handle — what SEO's old "Twitter handle" field held. */
+const TWITTER_HANDLE = /^@?([A-Za-z0-9_]{1,15})$/;
+
+const socialLinkSchema = (network: SocialNetwork) =>
+  z
+    .string()
+    .trim()
+    .max(2048)
+    .transform((value) => {
+      const handle = network === "twitter" ? TWITTER_HANDLE.exec(value) : null;
+      return handle ? `https://x.com/${handle[1]}` : value;
+    })
+    .refine(
+      (value) => {
+        if (value === "") return true;
+        try {
+          return new URL(value).protocol === "https:";
+        } catch {
+          return false;
+        }
+      },
+      { message: network === "twitter" ? "Use an https:// link or an @handle." : "Use an https:// link." },
+    );
+
+/**
+ * `Site.socialLinks`: the six networks, each an https link (Twitter also takes
+ * a handle, stored as its x.com link). An empty value means "no link" and is
+ * dropped, so a cleared field leaves no key behind. Unknown keys are refused.
+ */
+export const socialLinksSchema = z
+  .object({
+    twitter: socialLinkSchema("twitter").optional(),
+    facebook: socialLinkSchema("facebook").optional(),
+    linkedin: socialLinkSchema("linkedin").optional(),
+    instagram: socialLinkSchema("instagram").optional(),
+    youtube: socialLinkSchema("youtube").optional(),
+    github: socialLinkSchema("github").optional(),
+  })
+  .strict()
+  .transform((links) => {
+    const kept: Partial<Record<SocialNetwork, string>> = {};
+    for (const network of SOCIAL_NETWORKS) {
+      const link = links[network];
+      if (link) kept[network] = link;
+    }
+    return kept;
+  });
+
 export const updateSiteSettingsSchema = z.object({
   id: z.string(),
   name: z.string().min(2).max(100).optional(),
@@ -60,17 +143,17 @@ export const updateSiteSettingsSchema = z.object({
   metaTitle: z.string().max(60).nullable().optional(),
   metaDescription: z.string().max(160).nullable().optional(),
   metaTitleTemplate: z.string().nullable().optional(),
-  ogImage: z.string().url().nullable().optional(),
+  ogImage: nullableSiteAssetUrl(2048),
   // Technical SEO (d5)
-  canonicalUrl: z.string().max(255).nullable().optional(),
+  canonicalUrl: nullableSiteAssetUrl(255),
   allowIndexing: z.boolean().optional(),
   robotsTxt: z.string().max(4096).nullable().optional(),
   headCode: z.string().max(10240).nullable().optional(),
   bodyCode: z.string().max(10240).nullable().optional(),
-  socialLinks: z.record(z.string()).nullable().optional(),
+  socialLinks: socialLinksSchema.nullable().optional(),
   publishedPassword: z.string().nullable().optional(),
-  touchIcon: z.string().nullable().optional(),
-  favicon: z.string().nullable().optional(),
+  touchIcon: nullableSiteAssetUrl(2048),
+  favicon: nullableSiteAssetUrl(2048),
   cspPolicy: z.string().max(4096).nullable().optional(),
   hstsMaxAge: z.number().int().min(0).max(63072000).nullable().optional(),
   xFrameOptions: z.enum(["DENY", "SAMEORIGIN"]).nullable().optional(),
@@ -256,7 +339,15 @@ export const siteAnalyticsQuerySchema = z.object({
  * "Indexing allowed · robots.txt set") is built by the editor from these facts.
  */
 export const settingsOverviewSchema = z.object({
-  site: z.object({ name: z.string(), defaultLocale: z.string(), plan: z.enum(["FREE", "PRO", "BUSINESS"]) }),
+  site: z.object({
+    name: z.string(),
+    defaultLocale: z.string(),
+    plan: z.enum(["FREE", "PRO", "BUSINESS"]),
+    /** Archived: hidden from the Sites list, the live site stays up (Q-B4). */
+    archived: z.boolean(),
+    /** ISO date the workspace is deleted on, when its deletion is scheduled (PD-5). */
+    workspaceDeletionAt: z.string().datetime().nullable(),
+  }),
   general: z.object({ siteName: z.string(), language: z.string() }),            // "English (en-US)" label built client-side from defaultLocale
   localization: z.object({ locales: z.number(), notStarted: z.array(z.string()) }),
   seo: z.object({ allowIndexing: z.boolean(), robotsTxtSet: z.boolean() }),
@@ -266,7 +357,7 @@ export const settingsOverviewSchema = z.object({
   forms: z.object({ forms: z.number(), submissions: z.number() }),
   customCode: z.object({ head: z.boolean(), body: z.boolean(), css: z.boolean() }),
   headers: z.object({ csp: z.boolean(), hsts: z.boolean() }),
-  integrations: z.object({ connected: z.number(), available: z.number() }),
+  access: z.object({ passwordSet: z.boolean(), shareLinks: z.number() }),           // active share links
   webhooks: z.object({ endpoints: z.number(), lastDelivery: z.enum(["ok", "failed"]).nullable() }),
   members: z.object({ used: z.number(), seats: z.number() }),
   billing: z.object({ plan: z.string(), priceMonthly: z.number() }),

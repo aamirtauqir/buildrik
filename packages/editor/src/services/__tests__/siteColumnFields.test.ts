@@ -8,17 +8,8 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { ProjectData } from "@shared/types";
 import { extractSiteColumnPatch } from "../BuildrikSyncProvider";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
-
-const project = (settings: ProjectData["settings"]): ProjectData => ({
-  version: "1",
-  pages: [],
-  styles: [],
-  assets: [],
-  settings,
-});
 
 describe("SITE_COLUMN_FIELDS ↔ extractSiteColumnPatch", () => {
   it("the fields extractSiteColumnPatch reads are exactly SITE_COLUMN_FIELDS", () => {
@@ -37,13 +28,13 @@ describe("SITE_COLUMN_FIELDS ↔ extractSiteColumnPatch", () => {
       {},
       { get: (_t, key) => (typeof key === "string" ? section(key) : undefined) },
     );
-    extractSiteColumnPatch(project(settings));
+    extractSiteColumnPatch(settings);
     expect([...reads].sort()).toEqual([...SITE_COLUMN_FIELDS].sort());
   });
 
   it.each(SITE_COLUMN_FIELDS)("%s, set alone, reaches the patch", (field) => {
     const [sectionKey, key] = field.split(".");
-    const patch = extractSiteColumnPatch(project({ [sectionKey]: { [key]: "probe-value" } }));
+    const patch = extractSiteColumnPatch({ [sectionKey]: { [key]: "probe-value" } });
     expect(Object.keys(patch).length).toBe(1);
   });
 

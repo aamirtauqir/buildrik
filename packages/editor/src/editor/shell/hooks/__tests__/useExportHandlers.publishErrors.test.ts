@@ -60,6 +60,14 @@ vi.mock("../usePublishJob", () => {
   };
 });
 
+/* 8139:218055 — the CMS publish gate throws before any request. */
+const exportPagesMock = vi.fn();
+vi.mock("../../exportPublishPages", async (orig) => ({
+  ...(await orig<typeof import("../../exportPublishPages")>()),
+  exportPublishPages: (...a: unknown[]) => exportPagesMock(...a),
+}));
+
+import { PublishBlockedError } from "../../exportPublishPages";
 import {
   useExportHandlers,
   type UseExportHandlersOptions,
@@ -265,5 +273,26 @@ describe("useExportHandlers — approval gates are the modal's, not a toast (boa
     });
     expect(opts.addToast).not.toHaveBeenCalled();
     expect(dismissBlock).not.toHaveBeenCalled();
+  });
+});
+
+describe("useExportHandlers — a CMS-blocked publish (8139:218055)", () => {
+  it("is 'Publish blocked', toned neutral, in the gate's own sentence; any other throw stays 'Publish failed'", async () => {
+    const opts = makeOpts();
+    const { result } = renderHook(() => useExportHandlers(opts));
+    const sentence = "1 CMS change is waiting for you to choose Keep mine or Use theirs.";
+    exportPagesMock.mockRejectedValueOnce(new PublishBlockedError(sentence));
+    await act(async () => {
+      result.current.handleVercelPublish();
+      await flushMicrotasks();
+    });
+    expect(opts.addToast).toHaveBeenLastCalledWith({ title: "Publish blocked", description: sentence, tone: "neutral" });
+
+    exportPagesMock.mockRejectedValueOnce(new Error("boom"));
+    await act(async () => {
+      result.current.handleVercelPublish();
+      await flushMicrotasks();
+    });
+    expect(opts.addToast).toHaveBeenLastCalledWith({ title: "Publish failed", description: "boom", tone: "error" });
   });
 });

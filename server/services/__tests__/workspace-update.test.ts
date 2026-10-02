@@ -56,7 +56,7 @@ describe("updateWorkspaceSettings (duplicate-name guard)", () => {
   });
 
   it("skips the clash check entirely when name isn't part of the patch", async () => {
-    const res = await updateWorkspaceSettings("ws_1", { timezone: "UTC" }, "u1");
+    const res = await updateWorkspaceSettings("ws_1", { accentColor: "#1A56DB" }, "u1");
     expect(memberFindFirst).not.toHaveBeenCalled();
     expect(res).toEqual({ id: "ws_1", name: "Acme" });
   });

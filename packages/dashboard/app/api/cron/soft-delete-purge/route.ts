@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkCronAuth } from "@/lib/cron-auth";
+import { SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
   const denied = checkCronAuth(req);
   if (denied) return denied;
 
-  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const cutoff = new Date(Date.now() - SITE_RESTORE_WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
   const { count } = await prisma.site.deleteMany({
     where: { deletedAt: { not: null, lt: cutoff } },

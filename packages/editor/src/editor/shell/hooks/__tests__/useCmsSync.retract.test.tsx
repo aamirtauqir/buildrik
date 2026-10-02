@@ -143,7 +143,8 @@ describe("useCmsSync — the failure notice retracts", () => {
 
   /* QA 2026-10-02: the GONE toast had no title — a lone grey sentence. It
      names what is gone, then the server's sentence and what became of the
-     edit (it was dropped with the row). */
+     edit (it was dropped with the row). Boards 8139:217711 / 8139:217890
+     draw it with no tone dot (neutral, was warning). */
   it.each([
     ["entry", "This record was deleted.", "Record deleted"],
     ["collection", "This collection was deleted.", "Collection deleted"],
@@ -152,7 +153,7 @@ describe("useCmsSync — the failure notice retracts", () => {
     renderHook(() => useCmsSync(stubComposer(), addToast as never));
     goneCb?.({ kind, id: "e1", message });
     expect(added).toEqual([
-      expect.objectContaining({ tone: "warning", title, description: `${message} Your change to it wasn't saved.` }),
+      expect.objectContaining({ tone: "neutral", title, description: `${message} Your change to it wasn't saved.` }),
     ]);
   });
 });

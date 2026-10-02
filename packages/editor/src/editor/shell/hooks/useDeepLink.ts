@@ -3,6 +3,10 @@
  * selected. The consuming half of the Layers menu's "Copy link"
  * (board 1082:4527); without this the copied URL is decoration.
  *
+ * `?settings=<screen>` (Settings Phase B, BE-11) opens Settings on that
+ * screen — the dashboard's read-only site tabs link here ("Edit in Site
+ * settings ›"). An id that names no screen opens nothing.
+ *
  * One shot, on the PROJECT_LOADED that carries real data — `importProject`
  * emits the event twice and the `importing: true` half fires before the tree
  * exists (the same trap OnboardingMount documents). The page is activated
@@ -17,6 +21,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
+import { isSettingsScreenId } from "@/editor/sidebar/tabs/settings/constants";
 
 /** The link `useDeepLink` consumes: this editor's URL with the element (and
  *  its page — the registry only holds the active page) riding along. No
@@ -37,6 +42,10 @@ export function useDeepLink(composer: Composer | null): void {
       if (doneRef.current) return;
       if ((payload as { importing?: boolean } | undefined)?.importing) return;
       const params = new URLSearchParams(window.location.search);
+      const settingsScreen = params.get("settings");
+      if (settingsScreen !== null && isSettingsScreenId(settingsScreen)) {
+        composer.emit(EVENTS.UI_SETTINGS_OPEN, { screen: settingsScreen });
+      }
       const elId = params.get("el");
       if (!elId) { doneRef.current = true; return; }
       doneRef.current = true;
