@@ -43,8 +43,9 @@ export const setPasswordSchema = z.object({
 export const updateWorkspaceSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   slug: z.string().min(3).max(30).regex(URL_SLUG, "Must be a DNS-friendly slug").optional(),
-  defaultLanguage: z.string().regex(BCP47_LANG, "Must be a BCP-47 language tag").optional(),
-  timezone: z.string().regex(IANA_TZ, "Must be an IANA timezone").optional(),
+  // PD-8 (BE-10): no defaultLanguage / timezone — nothing ever read them (a
+  // site's language is its own, in editor Settings › Languages). The columns
+  // stay until a separate migration drops them.
   iconUrl: z.string().url().nullable().optional(),
   accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color").optional(),
   // m-approval: workspace-wide gate — edits go through review before publish.
@@ -60,7 +61,7 @@ export const workspaceSharingSettingsSchema = z.object({
   defaultExpiration: z.string().nullable().optional(),
   requirePw: z.boolean().optional(),
   allowEditors: z.boolean().optional(),
-  notify: z.boolean().optional(),
+  // PD-8: no `notify` — no summary email was ever sent from it.
 });
 
 /**
