@@ -203,6 +203,11 @@ const styles = {
     width: "100%",
     display: "flex",
     flex: 1,
+    /* Under the 36px page-tab bar, `height: 100%` resolved to the whole
+       column and min-height:auto kept it there — the canvas ran 36px past the
+       viewport's bottom. Invisible while the footer toolbar floated 56 up;
+       docked to the bottom edge (owner decision 2026-10-03) it was cut off. */
+    minHeight: 0,
     position: "relative" as const,
     zIndex: 1,
   } as React.CSSProperties,

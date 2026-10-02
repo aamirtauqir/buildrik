@@ -23,6 +23,10 @@ export const wrapperStyles: React.CSSProperties = {
   flex: 1,
   background: "var(--bk-bg-subtle)",
   display: "flex",
+  /* A column so the docked footer toolbar sits in flow under the scroll
+     viewport instead of over it (owner decision 2026-10-03). */
+  flexDirection: "column",
+  minHeight: 0,
   overflow: "hidden",
   padding: 24,
   position: "relative",
@@ -137,16 +141,24 @@ export function getMarqueeStyles(marquee: {
   };
 }
 
-/* Board 5936:44788 / 4428:44164: the bar is inset 16 from the canvas's
-   sides and sits 56 above its bottom edge (768 x 44 at x16 y744 of 800). */
+/* The footer toolbar's dock. Boards 5936:44788 / 4428:44164 floated the bar
+   inset 16 from the canvas's sides and 56 above its bottom edge, over the
+   page; OWNER OVERRIDE 2026-10-03 docks it: an in-flow, full-width strip at
+   the bottom of the canvas wrapper (a flex column — see `wrapperStyles`), so
+   the scroll viewport ends where the bar begins and the last part of the page
+   can always be scrolled into view. The negative inline/bottom margins cancel
+   the wrapper's 24px padding so the strip runs edge to edge and flush to the
+   column's bottom. */
 export const footerToolbarContainerStyles: React.CSSProperties = {
-  position: "absolute",
-  bottom: "calc(var(--bk-space-48) + var(--bk-space-8))",
-  left: "var(--bk-space-16)",
-  right: "var(--bk-space-16)",
+  flex: "none",
+  margin: "var(--bk-space-24) calc(-1 * var(--bk-space-24)) calc(-1 * var(--bk-space-24))",
+  paddingRight: "var(--bk-space-8)",
   display: "flex",
   alignItems: "center",
   gap: "var(--bk-space-8)",
+  background: "var(--bk-bg-card)",
+  borderTop: "1px solid var(--bk-gray-200)",
+  position: "relative",
   zIndex: Z_LAYERS.floatingToolbar,
   pointerEvents: "auto",
 };

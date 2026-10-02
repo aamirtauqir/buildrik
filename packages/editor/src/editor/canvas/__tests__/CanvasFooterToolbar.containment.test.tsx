@@ -36,6 +36,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { render as rtlRender, screen } from "@testing-library/react";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
+import { footerToolbarContainerStyles, wrapperStyles } from "../canvasStyles";
 
 const ALL_OFF = { guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false };
 
@@ -114,6 +115,34 @@ describe("canvas toolbar containment", () => {
     const fill = [...bar.classList].filter((c) => /^tw:bg-/.test(c));
     expect(fill, "the bar declares no background at all").not.toHaveLength(0);
     expect(fill.join(" ")).not.toMatch(/transparent|surface-3/);
+  });
+});
+
+/* Owner decision 2026-10-03 (overrides boards 5936:44788 / 4428:44164, which
+   floated the bar 56 above the canvas bottom, inset 16, rounded + shadowed):
+   the bar is docked — in flow at the bottom of the canvas wrapper, full width,
+   flush to the bottom edge — so it never covers the page. */
+describe("canvas toolbar dock", () => {
+  it("sits in flow under the scroll viewport, not absolutely over it", () => {
+    expect(wrapperStyles.flexDirection).toBe("column");
+    expect(footerToolbarContainerStyles.position).not.toBe("absolute");
+    expect(footerToolbarContainerStyles.bottom).toBeUndefined();
+    expect(footerToolbarContainerStyles.flex).toBe("none");
+  });
+
+  it("cancels the wrapper's 24px padding so it runs edge to edge and flush to the bottom", () => {
+    expect(wrapperStyles.padding).toBe(24);
+    expect(footerToolbarContainerStyles.margin).toBe(
+      "var(--bk-space-24) calc(-1 * var(--bk-space-24)) calc(-1 * var(--bk-space-24))",
+    );
+  });
+
+  it("is a strip, not a floating card: no radius, no shadow, no side border", () => {
+    const bar = pill();
+    const cls = [...bar.classList];
+    expect(cls.some((c) => /^tw:rounded/.test(c))).toBe(false);
+    expect(cls.some((c) => /shadow/.test(c))).toBe(false);
+    expect(cls).not.toContain("tw:border");
   });
 });
 
