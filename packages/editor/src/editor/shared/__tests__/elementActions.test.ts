@@ -48,7 +48,7 @@ describe("INSPECTOR_MENU — board 30, nothing else", () => {
       "Duplicate",
       "Copy style",
       "Paste style",
-      "Apply style to all H3 headings on this page (2)",
+      "Apply style to all H3 headings",
       "Reset style",
       "---",
       "Save as component…",
@@ -56,6 +56,10 @@ describe("INSPECTOR_MENU — board 30, nothing else", () => {
       "---",
       "Delete",
     ]);
+  });
+
+  it("Apply style to all … carries its count as the board's muted sub-line", () => {
+    expect(ELEMENT_ACTIONS["apply-style-to-page"].detail!(ctxFor(h3))).toBe("on this page (2)");
   });
 
   it("carries the board's keys and a danger Delete", () => {

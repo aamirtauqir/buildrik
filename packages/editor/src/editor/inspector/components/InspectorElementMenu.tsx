@@ -32,7 +32,7 @@ export interface InspectorElementMenuProps {
   selectedElementId: string;
 }
 
-const ROW = "tw:!h-auto tw:!min-h-8 tw:!py-1.5 tw:!text-[12px] tw:!leading-4";
+const ROW = "tw:!h-auto tw:!min-h-8 tw:!px-2.5 tw:!py-1.5 tw:!text-[12px] tw:!leading-4";
 
 export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({ composer, selectedElementId }) => {
   const [open, setOpen] = React.useState(false);
@@ -73,6 +73,9 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({ comp
           }}
         >
           <span className="tw:block tw:whitespace-normal">{actionLabel(action, ctx)}</span>
+          {action.detail ? (
+            <span className="tw:block tw:text-[12px] tw:text-[var(--bk-ink-muted)]">{action.detail(ctx)}</span>
+          ) : null}
           {enabled === true ? null : (
             <span className="tw:block tw:text-[11px] tw:text-[var(--bk-ink-muted)]">{enabled}</span>
           )}
@@ -86,8 +89,11 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({ comp
       open={open}
       onClose={close}
       placement="bottom-end"
+      /* Board 30: 320 wide, right edge on the ⋯, reaching over the canvas —
+         wider than the 300px column, so it mounts in the overlay root. */
+      portal
       label="Element actions"
-      className="tw:w-60 tw:p-1"
+      className="tw:w-80 tw:px-2 tw:py-1"
       trigger={
         <IconButton
           label="Element actions"
