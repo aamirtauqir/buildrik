@@ -169,12 +169,17 @@ describe("PageTabBar", () => {
     });
   });
 
-  /* Board 4418:123573 draws no "+" on the strip; Add page is the Pages
-     panel's door (decision #19). */
-  it("draws no add button", () => {
-    const { composer } = makeComposer(TWO_PAGES);
+  /* Owner override 2026-10-03 (board 4418:123573 drew no "+"): a trailing
+     "Add page" button opens the Pages panel through UI_PANEL_OPEN — it does
+     not create a page itself (Add page still lives in that panel). */
+  it("the + button opens the Pages panel and creates nothing", () => {
+    const { composer, elements } = makeComposer(TWO_PAGES);
     renderBar(composer);
-    expect(screen.queryByRole("button", { name: "Add new page" })).toBeNull();
+    const add = screen.getByRole("button", { name: "Add page" });
+    expect(add).toHaveAttribute("title", "Add page");
+    fireEvent.click(add);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
+    expect(elements.createPage).not.toHaveBeenCalled();
   });
 
 });
