@@ -52,7 +52,7 @@ const hostOf = (url: string | null | undefined): string | null => {
 const refusal = (e: unknown, fallback: string) => (e instanceof Error && e.message ? e.message : fallback);
 
 /** Where a deleted site can be brought back from (the dashboard's Sites list). */
-export const RECENTLY_DELETED_PATH = "/dashboard?view=deleted";
+export const RECENTLY_DELETED_PATH = "/dashboard/projects?status=deleted";
 
 /* 8137:216600: a card per action — 24 in, the title 16/600, then a row of the
    line (13 muted) and its text button, 24 apart. */
