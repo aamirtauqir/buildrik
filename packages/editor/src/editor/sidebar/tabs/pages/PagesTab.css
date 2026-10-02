@@ -623,22 +623,11 @@
   outline-offset: 2px;
 }
 
-.bd-pg-onepage-add {
-  min-height: 20px; /* stated: the line box was all that held the hit floor */
-  border: none;
-  background: transparent;
-  padding: 0;
-  font: 400 13px/20px var(--bk-font-ui);
-  color: var(--bk-accent-text);
-  box-shadow: none;
-}
-
 /* Board 141:162 — the one-page note under the single row: a 120-tall band,
    13/20 type, its two lines at y32 and y60 on a 232px column (141:163 /
-   141:164 are both w-232 inside a 280 panel = 24px gutters).
-
-   `stretch` gives the "+ Add page" link the full 232 the board draws instead
-   of the width of its own words. */
+   141:164 are both w-232 inside a 280 panel = 24px gutters). The note's own
+   "+ Add page" (141:164) is not built — owner call 2026-10-03, the footer
+   carries the one Add page. */
 .bd-pg-onepage {
   display: flex;
   flex-direction: column;

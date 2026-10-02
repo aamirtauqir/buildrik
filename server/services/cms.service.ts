@@ -10,7 +10,7 @@ import type {
 import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
-import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
+import { CMS_COLLECTION_LIMIT_MAX, filterCmsBindings } from "@buildrik/shared/schemas/sites";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -518,6 +518,103 @@ export async function findStaleTemplateBindings(
   return { hasPageGeneratingCollections: true, stale, templates };
 }
 
+/** A bound element that publishes with no value from its record (C0.7). */
+export interface EmptyBinding {
+  pageName: string;
+  /** The Layers name, or the element type. */
+  element: string;
+  collectionName: string;
+  fieldSlug: string;
+  /** What publishes instead — absent means nothing. */
+  fallback?: string;
+}
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+interface BoundNode {
+  id?: string;
+  type?: string;
+  data?: { layerName?: unknown } | null;
+  children?: BoundNode[];
+}
+
+/**
+ * Bound elements on the pages that ship whose record gives them no value —
+ * null when the site binds no element at all —
+ * what CMSExportResolver writes as the binding's fallback, or as nothing
+ * (BD-03). Read by `runPrePublishChecks` so the user sees the list before the
+ * publish, not on the live site.
+ *
+ * Mirrors the export's resolution over the server's PUBLISHED rows — the rows
+ * the publish renders from (C0.1): a binding with a record id reads that
+ * record; one without reads the newest published record, except where the
+ * record is filled per record and so cannot be judged once — on its
+ * collection's template page, and inside a Collection list of the same
+ * collection ("current item", C0.8).
+ */
+export async function findEmptyBindings(
+  siteId: string,
+  pages: { name: string; slug: string; isHomePage: boolean; blocks: unknown }[],
+  rawBindings: unknown,
+): Promise<EmptyBinding[] | null> {
+  const bindings = filterCmsBindings(rawBindings);
+  const fieldMap = bindings?.field ?? {};
+  if (Object.keys(fieldMap).length === 0) return null;
+  const lists = new Map(
+    Object.entries(bindings?.collection ?? {})
+      .filter(([, b]) => b.repeat === "children")
+      .map(([id, b]) => [id, b.collectionId]),
+  );
+  const collectionIds = [...new Set(Object.values(fieldMap).flatMap((list) => list.map((b) => b.collectionId)))];
+  const [collections, entries] = await Promise.all([
+    prisma.cmsCollection.findMany({
+      where: { siteId, deletedAt: null, id: { in: collectionIds } },
+      select: { id: true, name: true, pageTemplatePath: true },
+    }),
+    prisma.cmsEntry.findMany({
+      where: { collectionId: { in: collectionIds }, status: "PUBLISHED", deletedAt: null },
+      orderBy: { updatedAt: "desc" },
+      select: { id: true, collectionId: true, data: true },
+    }),
+  ]);
+  const collectionById = new Map(collections.map((c) => [c.id, c]));
+  const valueOf = (collectionId: string, itemId: string | undefined, fieldSlug: string): string => {
+    const record = itemId
+      ? entries.find((e) => e.id === itemId && e.collectionId === collectionId)
+      : entries.find((e) => e.collectionId === collectionId);
+    const v = ((record?.data ?? {}) as Record<string, unknown>)[fieldSlug];
+    return v === undefined || v === null ? "" : String(v);
+  };
+
+  const found: EmptyBinding[] = [];
+  for (const page of pages) {
+    const file = page.isHomePage ? "index.html" : `${(page.slug ?? "").replace(/^\/+/, "")}.html`;
+    const walk = (node: BoundNode | undefined, listCollection: string | undefined) => {
+      if (!node || typeof node !== "object") return;
+      const id = typeof node.id === "string" ? node.id : "";
+      for (const b of fieldMap[id] ?? []) {
+        const onPageRecord = !b.itemId || b.itemId === "context";
+        const collection = collectionById.get(b.collectionId);
+        if (onPageRecord && listCollection === b.collectionId) continue;
+        if (onPageRecord && collection?.pageTemplatePath === file) continue;
+        if (valueOf(b.collectionId, onPageRecord ? undefined : b.itemId, b.fieldSlug)) continue;
+        const layerName = node.data?.layerName;
+        found.push({
+          pageName: page.name,
+          element: typeof layerName === "string" && layerName ? layerName : capitalize(node.type ?? "element"),
+          collectionName: collection?.name ?? b.collectionName ?? "a deleted collection",
+          fieldSlug: b.fieldSlug,
+          ...(b.fallback ? { fallback: b.fallback } : {}),
+        });
+      }
+      const inner = lists.get(id) ?? listCollection;
+      for (const child of Array.isArray(node.children) ? node.children : []) walk(child, inner);
+    };
+    walk(page.blocks as BoundNode, undefined);
+  }
+  return found;
+}
+
 export interface GeneratedPage {
   path: string;
   content: string;
@@ -706,9 +803,13 @@ export async function getPublishedCmsForBindings(siteId: string, fieldsByCollect
  */
 export async function getPublishedCmsForCollections(siteId: string, collectionIds: readonly string[]) {
   if (collectionIds.length === 0) return { collections: [], entries: [] };
+  /* pageTemplatePath too: the export writes a template page's "record on
+     this page" binding as the `{field}` token the worker fills per record
+     only when it knows the page IS the template. Without it every record page
+     published the newest record's values. */
   const collections = await prisma.cmsCollection.findMany({
     where: { siteId, deletedAt: null, id: { in: [...collectionIds] } },
-    select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
+    select: { id: true, name: true, slug: true, displayField: true, fields: true, pageTemplatePath: true, createdAt: true, updatedAt: true },
   });
   const entries = await prisma.cmsEntry.findMany({
     where: { collectionId: { in: collections.map((c) => c.id) }, status: "PUBLISHED", deletedAt: null },

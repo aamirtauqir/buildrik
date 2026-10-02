@@ -69,6 +69,14 @@ export interface MultiPageExportOptions {
   cmsMode?: CMSExportMode;
   /** Template syntax for 'template' mode */
   cmsSyntax?: "handlebars" | "liquid";
+  /** Internal page links as root-absolute paths (`/about.html`) instead of
+   *  file-relative ones (`about.html`). The publish payload needs them: a
+   *  collection's record pages are generated at `<slug>/index.html`
+   *  (cms.service `generateDynamicPages`) from the template page's HTML, and
+   *  a relative link there resolves to `<slug>/about.html`, a 404 (BD-02).
+   *  The ZIP keeps relative links — it is opened from disk, where `/` is the
+   *  filesystem root, and holds no record pages. */
+  rootAbsoluteHrefs?: boolean;
 }
 
 /**
@@ -212,6 +220,8 @@ export class ExportEngine {
    * scheme. Built per export because it depends on the page set being written.
    */
   private pageHrefs = new Map<string, string>();
+  /** "/" while a publish export runs (`rootAbsoluteHrefs`), "" otherwise. */
+  private pageHrefPrefix = "";
 
   constructor(composer: Composer, config?: Partial<ExportConfig>) {
     this.composer = composer;
@@ -268,6 +278,7 @@ export class ExportEngine {
     this.buildPageHrefs(
       this.composer.elements.exportPages?.() ?? this.composer.elements.getAllPages?.() ?? []
     );
+    this.pageHrefPrefix = "";
     const page = this.composer.elements.getActivePage?.();
     if (!page) return this.wrapInDocument("", cfg);
 
@@ -838,6 +849,7 @@ export class ExportEngine {
     };
 
     this.buildPageHrefs(pages);
+    this.pageHrefPrefix = options.rootAbsoluteHrefs ? "/" : "";
 
     // Export each page
     for (const page of pages) {
@@ -924,7 +936,7 @@ export class ExportEngine {
 
   private resolveHref(href: string): string {
     if (!href.startsWith("#page:")) return href;
-    return this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html";
+    return this.pageHrefPrefix + (this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html");
   }
 
   private exportPageToHtml(page: PageData, css: string): string {

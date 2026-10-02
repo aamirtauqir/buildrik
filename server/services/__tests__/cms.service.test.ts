@@ -52,6 +52,7 @@ import {
   generateDynamicPages,
   appendDynamicPagesToPublish,
   findStaleTemplateBindings,
+  findEmptyBindings,
   previewCsvImport,
   importCsvEntries,
   CmsError,
@@ -658,5 +659,79 @@ describe("findStaleTemplateBindings (A-17)", () => {
       stale: [],
       templates: [{ collectionName: "Blog", pageName: "about" }],
     });
+  });
+});
+
+/* C0.7 / BD-03: an empty binding publishes its fallback or nothing; the
+   pre-publish check names each one (page + element) before it ships. */
+describe("findEmptyBindings (C0.7)", () => {
+  const b = (collectionId: string, fieldSlug: string, extra: Record<string, unknown> = {}) => ({
+    binding: { sourceId: `cms:${collectionId}`, path: fieldSlug, type: "variable" },
+    collectionId,
+    fieldSlug,
+    property: "content",
+    ...extra,
+  });
+  const page = (name: string, slug: string, children: unknown[], isHomePage = false) => ({
+    name, slug, isHomePage, blocks: { id: `root-${slug}`, type: "container", children },
+  });
+  const heading = (id: string, layerName?: string) => ({ id, type: "heading", ...(layerName ? { data: { layerName } } : {}) });
+
+  it("is null for a site that binds nothing (no row at all)", async () => {
+    await expect(findEmptyBindings("s1", [page("Home", "home", [], true)], { collection: {} })).resolves.toBeNull();
+    expect(mocks.colFindMany).not.toHaveBeenCalled();
+  });
+
+  it("lists a heading whose only record was unpublished, with its fallback", async () => {
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Posts", pageTemplatePath: null }]);
+    mocks.entFindMany.mockResolvedValueOnce([]); // the only record is a DRAFT now
+    const out = await findEmptyBindings(
+      "s1",
+      [page("Home", "home", [heading("h1", "Hero title")], true)],
+      { field: { h1: [b("c1", "title", { fallback: "Coming soon" })] } },
+    );
+    expect(out).toEqual([
+      { pageName: "Home", element: "Hero title", collectionName: "Posts", fieldSlug: "title", fallback: "Coming soon" },
+    ]);
+    // Published, non-deleted rows only — what the publish renders from.
+    expect(mocks.entFindMany.mock.calls[0][0].where).toMatchObject({ status: "PUBLISHED", deletedAt: null });
+  });
+
+  it("passes a binding whose record has a value, and checks a pinned record by id", async () => {
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Posts", pageTemplatePath: null }]);
+    mocks.entFindMany.mockResolvedValueOnce([
+      { id: "e2", collectionId: "c1", data: { title: "Newest" } },
+      { id: "e1", collectionId: "c1", data: { title: "" } },
+    ]);
+    const out = await findEmptyBindings(
+      "s1",
+      [page("Home", "home", [heading("h1"), heading("h2")], true)],
+      { field: { h1: [b("c1", "title")], h2: [b("c1", "title", { itemId: "e1" })] } },
+    );
+    expect(out).toEqual([{ pageName: "Home", element: "Heading", collectionName: "Posts", fieldSlug: "title" }]);
+  });
+
+  it("skips per-record bindings: a list child of the same collection, and the collection's template page", async () => {
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Posts", pageTemplatePath: "post.html" }]);
+    mocks.entFindMany.mockResolvedValueOnce([]);
+    const out = await findEmptyBindings(
+      "s1",
+      [
+        page("Home", "home", [{ id: "list", type: "container", children: [heading("t")] }], true),
+        page("Post", "post", [heading("p")]),
+      ],
+      {
+        field: { t: [b("c1", "title")], p: [b("c1", "title")] },
+        collection: { list: { elementId: "list", collectionId: "c1", itemVar: "item", repeat: "children" } },
+      },
+    );
+    expect(out).toEqual([]);
+  });
+
+  it("ignores bindings on elements not on a page that ships", async () => {
+    mocks.colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Posts", pageTemplatePath: null }]);
+    mocks.entFindMany.mockResolvedValueOnce([]);
+    const out = await findEmptyBindings("s1", [page("Home", "home", [], true)], { field: { gone: [b("c1", "title")] } });
+    expect(out).toEqual([]);
   });
 });

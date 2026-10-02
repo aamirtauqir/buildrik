@@ -1,0 +1,3 @@
+record PUBLISHED (DB PUBLISHED): {"label":"CMS bindings","status":"pass","detail":"Every bound element has a value."}
+record DRAFT (DB DRAFT): {"label":"CMS bindings","status":"warning","detail":"1 bound element has no value: Home › Heading (ZZ C0b solo · title, publishes empty)."}
+record PUBLISHED (DB PUBLISHED): {"label":"CMS bindings","status":"pass","detail":"Every bound element has a value."}

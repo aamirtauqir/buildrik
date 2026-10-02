@@ -63,6 +63,19 @@ describe("ExportEngine — internal page links", () => {
     expect(out.get("pricing.html")).toContain('href="index.html"');
   });
 
+  /* C0.6: publish asks for root-absolute links — a record page generated at
+     `<slug>/index.html` must still reach `/pricing.html`. The ZIP (opened
+     from disk) keeps the relative form above. */
+  it("writes root-absolute hrefs when asked (the publish payload)", async () => {
+    const { files } = await new ExportEngine(makeComposer(pages)).exportAllPages({
+      format: "html",
+      rootAbsoluteHrefs: true,
+    });
+    const out = new Map(files.map((f) => [f.name, f.content]));
+    expect(out.get("index.html")).toContain('href="/pricing.html"');
+    expect(out.get("pricing.html")).toContain('href="/index.html"');
+  });
+
   it("never ships the raw scheme", async () => {
     const out = await exportFiles(pages);
 

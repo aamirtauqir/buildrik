@@ -5,9 +5,44 @@
  */
 
 import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
+import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
-import type { CMSCollectionBinding } from "./CMSBindingManager";
+import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
+
+/**
+ * Set on an element inside a Collection list whose field bindings were filled
+ * from the list's CURRENT record (C0.8), valued with that collection's id. The
+ * page-wide binding pass that runs after the list expands (CMSExportResolver,
+ * useCMSPreview) skips those bindings — it would write one record into every
+ * copy — and the export strips the marker.
+ */
+export const CURRENT_ITEM_ATTR = "data-cms-current-item";
+
+/** Does `binding` follow "the record on this page / in this list" rather than
+ *  a pinned record? */
+export function followsContextRecord(binding: Pick<CMSElementBinding, "itemId">): boolean {
+  return !binding.itemId || binding.itemId === "context";
+}
+
+/**
+ * Write a resolved binding value into a rendered element: text semantics for
+ * `content`, the attribute otherwise. An empty value writes nothing there —
+ * "" for text and alt/title, no attribute for src/href (an empty URL
+ * re-requests the page). Values come from CMS entries and property names from
+ * stored bindings, so only the shared allowlist and safe URLs land.
+ */
+export function writeBoundValue(el: Element, property: string, value: string): void {
+  if (!value) {
+    if (property === "content") el.textContent = "";
+    else if (property === "src" || property === "href") el.removeAttribute(property);
+    else if (property === "alt" || property === "title") el.setAttribute(property, "");
+    return;
+  }
+  if (!isSafeCmsBoundValue(property, value)) return;
+  if (property === "content") el.textContent = value;
+  else el.setAttribute(property, value);
+}
 
 /** Canvas keeps the template editable: record 0 renders INTO the real
  *  children (ids intact, so selection and overlays still find them), later
@@ -119,6 +154,7 @@ export class RepeaterRenderer {
       const nodes = intoTemplate ? templates : pristine.map((t) => t.cloneNode(true) as HTMLElement);
       for (const node of nodes) {
         this.applyContext(node, context, binding, null);
+        this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas);
         if (intoTemplate) continue;
         if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
         else this.clearUnresolved(node, binding.itemVar || "item");
@@ -126,6 +162,44 @@ export class RepeaterRenderer {
       }
     });
     if (!canvas) templates.forEach((t) => t.remove());
+  }
+
+  /**
+   * "Current item" (C0.8, BD-01): a field binding with no pinned record on an
+   * element in this list's copy, bound to the list's own collection, reads
+   * THIS copy's record. Resolved page-wide instead, every copy showed the
+   * same record. An element inside a nested list belongs to that list.
+   * The canvas keeps an element's own text when the record has no value
+   * (as the page-wide preview does); the export writes the fallback, or
+   * nothing (C0.7).
+   */
+  private applyCurrentItem(
+    node: HTMLElement,
+    listEl: HTMLElement,
+    item: CMSContentItem,
+    collectionId: string,
+    canvas: boolean,
+  ): void {
+    const bindings = this.composer.cms.bindings;
+    const isList = (el: Element) => bindings.getCollectionBinding?.(el.getAttribute("data-buildrick-id") ?? "")?.repeat === "children";
+    const candidates = [node, ...Array.from(node.querySelectorAll<HTMLElement>("[data-buildrick-id]"))];
+    for (const el of candidates) {
+      const own = (bindings.getBindings?.(el.getAttribute("data-buildrick-id") ?? "") ?? []).filter((b) => b.collectionId === collectionId && followsContextRecord(b));
+      if (own.length === 0) continue;
+      let nested = false;
+      for (let up = el.parentElement; up && up !== listEl; up = up.parentElement) {
+        if (isList(up)) nested = true;
+      }
+      if (nested) continue;
+      for (const b of own) {
+        const raw = item.data[b.fieldSlug];
+        const value = raw === undefined || raw === null || raw === "" ? b.fallback || "" : String(raw);
+        if (canvas && !value) continue;
+        writeBoundValue(el, b.property, value);
+      }
+      el.setAttribute(CURRENT_ITEM_ATTR, collectionId);
+      if (canvas) el.setAttribute("data-cms-bound", "true");
+    }
   }
 
   /** A published page never shows `{{item.x}}` for a field the record does

@@ -13,6 +13,7 @@ const pageFindManyMock = vi.fn();
 const siteFindUniqueMock = vi.fn();
 const domainFindFirstMock = vi.fn();
 const cmsCollectionFindManyMock = vi.fn();
+const cmsEntryFindManyMock = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -31,6 +32,8 @@ vi.mock("@/lib/prisma", () => ({
     // A-17: runPrePublishChecks' CMS-templates check reads this via
     // cms.service's findStaleTemplateBindings.
     cmsCollection: { findMany: (...a: unknown[]) => cmsCollectionFindManyMock(...a) },
+    // C0.7: the empty-bindings check reads published entries.
+    cmsEntry: { findMany: (...a: unknown[]) => cmsEntryFindManyMock(...a) },
 
     $transaction: vi.fn(),
   },
@@ -61,6 +64,7 @@ beforeEach(() => {
   });
   domainFindFirstMock.mockReset().mockResolvedValue(null);
   cmsCollectionFindManyMock.mockReset().mockResolvedValue([]);
+  cmsEntryFindManyMock.mockReset().mockResolvedValue([]);
 });
 
 describe("pre-publish checks count what ships", () => {
@@ -240,5 +244,40 @@ describe("Vercel connected check — PUBLISH_ALLOW_SIMULATION", () => {
     const { checks, ready } = await runPrePublishChecks("s1");
     expect(status(checks, "Vercel connected")).toBe("fail");
     expect(ready).toBe(false);
+  });
+});
+
+/* C0.7: an empty binding publishes its fallback or nothing — the checks name
+   it (page + element) before the publish. */
+describe("pre-publish lists bound elements with no value", () => {
+  const bound = {
+    field: {
+      h1: [{ binding: { sourceId: "cms:c1", path: "title", type: "variable" }, collectionId: "c1", fieldSlug: "title", property: "content", fallback: "Soon" }],
+    },
+  };
+
+  it("warns with the page and the element when the only record is unpublished", async () => {
+    siteFindUniqueMock.mockResolvedValue({ metaTitleTemplate: "x", deletedAt: null, workspaceId: "ws1", projectCmsBindings: bound });
+    pageFindManyMock.mockResolvedValue([
+      { id: "1", name: "Home", slug: "home", isHomePage: true, settings: null, blocks: { id: "r", type: "container", children: [{ id: "h1", type: "heading" }] } },
+    ]);
+    cmsCollectionFindManyMock.mockResolvedValue([{ id: "c1", name: "Posts", pageTemplatePath: null }]);
+    const { checks, ready } = await runPrePublishChecks("s1");
+    expect(status(checks, "CMS bindings")).toBe("warning");
+    expect(detail(checks, "CMS bindings")).toBe('1 bound element has no value: Home › Heading (Posts · title, shows "Soon").');
+    expect(ready).toBe(true); // a warning, never a block
+  });
+
+  it("passes once the record has a value, and has no row for a site without bindings", async () => {
+    siteFindUniqueMock.mockResolvedValue({ metaTitleTemplate: "x", deletedAt: null, workspaceId: "ws1", projectCmsBindings: bound });
+    pageFindManyMock.mockResolvedValue([
+      { id: "1", name: "Home", slug: "home", isHomePage: true, settings: null, blocks: { id: "r", type: "container", children: [{ id: "h1", type: "heading" }] } },
+    ]);
+    cmsCollectionFindManyMock.mockResolvedValue([{ id: "c1", name: "Posts", pageTemplatePath: null }]);
+    cmsEntryFindManyMock.mockResolvedValue([{ id: "e1", collectionId: "c1", data: { title: "Hello" } }]);
+    expect(status((await runPrePublishChecks("s1")).checks, "CMS bindings")).toBe("pass");
+
+    siteFindUniqueMock.mockResolvedValue({ metaTitleTemplate: "x", deletedAt: null, workspaceId: "ws1", projectCmsBindings: null });
+    expect(status((await runPrePublishChecks("s1")).checks, "CMS bindings")).toBeUndefined();
   });
 });
