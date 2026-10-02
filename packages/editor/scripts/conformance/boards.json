@@ -8698,7 +8698,7 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-23",
       "verified": "drift-fixed",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-23 measured + diffed (all joined properties PASS). drift-fixed. Locked line inset 12 → 16 (f6ad65d7f); 45% locked dim per board (contrast pairs baselined). Status mark row sits inside the header padding, ~18px higher than the board's separate row. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border are an owner question; board sample data not conformed."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-23 measured + diffed (all joined properties PASS). drift-fixed. Header 72, 🔒 mark its own row under it, status line 6·16 (28 tall), tabs at y180 = board. Left: the 🔒 row is 32 tall (8·16, the note padding boards 26/27/28 draw) where this board alone draws 24 (6/2·16), so tabs and sections sit 8px lower than this board."
     },
     {
       "nodeId": "7995:205467",
@@ -8711,8 +8711,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-24",
-      "verified": "drift-open",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-24 measured + diffed (all joined properties PASS). drift-open. Header status chip 'Menu.name' sits inside the header padding, 16px higher than the board's separate 'Header status' row (tabs 8px higher). CMS binding body (Source, Collection, Field 'name · Text', preview 'record 1 of 3', Open record, Unbind, hint) matches. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border are an owner question; board sample data not conformed."
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-24 measured + diffed (all joined properties PASS). drift-fixed. Binding chip its own 4·12 row between header and tabs (was inside the header padding, 16px high): chip 1153,132 28 tall, 12px, gray-50 no stroke; tabs y164 and first section y196 = board."
     },
     {
       "nodeId": "7995:205787",
@@ -8725,8 +8725,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-25",
-      "verified": "drift-open",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-25 measured + diffed (all joined properties PASS). drift-open. Same header status-row position as board 24 (16px higher). Missing-source error box, Reconnect…/Unbind match. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border are an owner question; board sample data not conformed."
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-25 measured + diffed (all joined properties PASS). drift-fixed. Same row as 24: missing chip 28 tall, error border + tint, tabs y164 = board."
     },
     {
       "nodeId": "7995:206087",
@@ -8739,8 +8739,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-26",
-      "verified": "drift-open",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-26 measured + diffed (all joined properties PASS). drift-open. Status mark row ~20px higher than the board's separate note row; live also renders Layout and closed Text inside for the banner (a container — capability-driven; board 26 draws neither). Component row, override dot on padding, '● Padding overrides master' match. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border are an owner question; board sample data not conformed."
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-26 measured + diffed (all joined properties PASS). drift-fixed. Component mark its own 8·16 note row (text y136), tabs y160, first section rule y220 vs board 219. Layout and Text inside no longer render on the instance root (shown again only if the instance overrides one of their properties); reachable through Edit master / Detach. Left: identity glyph is the component icon, board draws ◆; the board's muted '··· Reset to master · Detach instance…' hint line is not drawn (those rows live in the ⋯ menu)."
     },
     {
       "nodeId": "7995:206390",
@@ -8754,7 +8754,7 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-27",
       "verified": "drift-fixed",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-27 measured + diffed (all joined properties PASS). drift-fixed. :hover state chip filled accent-tint, board accent-subtle (f6ad65d7f). '1 :hover override · Reset', Fill Colour dot + note match; token reads 'Primary' (seed name; owner question on 'Brand / primary'). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border are an owner question; board sample data not conformed."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-27 measured + diffed (all joined properties PASS). drift-fixed. Header 72 + 28 chip row + '1 :hover override · Reset' as its own 8·16 note row: tabs y128, first section rule y220 vs board 219 (was 208)."
     },
     {
       "nodeId": "7995:207832",
@@ -8767,8 +8767,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-28",
-      "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-28 measured + diffed (all joined properties PASS). match. 'Tablet · 1 override' chip + 'Tablet · Revert' line, Size header dot + '● Overridden on Tablet'. Live also draws the dot on the Width row (boards 26/27 draw per-field dots, 28 per-header — boards disagree). The chip has no chevron. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border are an owner question; board sample data not conformed."
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-28 measured + diffed (all joined properties PASS). drift-fixed. Header 72 + 28 chip row + 'Tablet · Revert' as its own 8·16 note row: tabs y128, first section rule y220 vs board 219 (was 208). Per-field vs per-header override dot difference unchanged (boards disagree)."
     },
     {
       "nodeId": "7995:208198",
@@ -8782,7 +8782,7 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-29",
       "verified": "drift-fixed",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-29 measured + diffed (all joined properties PASS). drift-fixed. Conflict line inset 12 → 16 (f6ad65d7f). Raised through the real save path; ConflictModal opens first, Escape leaves the board's state (line + Resolve, controls read-only, not dimmed). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border are an owner question; board sample data not conformed."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-29 measured + diffed (all joined properties PASS). drift-fixed. Status line 6·16: 44 tall on two lines like the board's band (128–172), tabs y172 and first section y232 = board (after Escape on the ConflictModal)."
     },
     {
       "nodeId": "7995:208555",
@@ -8795,8 +8795,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-30",
-      "verified": "drift-open",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-30 measured + diffed (all joined properties PASS). drift-open. Rows, rules, shortcuts, Delete danger match board 30. Menu is 240 wide inside the column; the board draws 320 overflowing over the canvas. Widening clips it at the column edge (the popover is not portaled) — not fixed. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border are an owner question; board sample data not conformed."
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-30 measured + diffed (all joined properties PASS). drift-fixed. Menu 320 wide, portaled through chrome-ui Popover portal (overlay root, fixed), right edge on the ⋯ (x1080–1400), over the canvas, no clip; 'on this page (N)' on a muted second line. Left: menu top 118 (4px under the ⋯, the anchored-popover gap) vs board 136."
     },
     {
       "nodeId": "7995:209026",
