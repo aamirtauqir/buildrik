@@ -4,8 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
-import { RepeaterRenderer } from "./RepeaterRenderer";
+import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, writeBoundValue } from "./RepeaterRenderer";
 import type { Composer } from "../Composer";
 
 export type CMSExportMode = "static" | "template" | "none";
@@ -91,15 +90,22 @@ export class CMSExportResolver {
       if (!elementId) return;
 
       const bindings = this.composer.cms.bindings.getBindings(elementId);
+      const currentItemOf = el.getAttribute(CURRENT_ITEM_ATTR);
       bindings.forEach((binding) => {
-        const onPageRecord = !binding.itemId || binding.itemId === "context";
+        const onPageRecord = followsContextRecord(binding);
+        /* Already filled from its list copy's own record (C0.8). */
+        if (onPageRecord && currentItemOf === binding.collectionId) return;
         if (onPageRecord && pageFile && this.composer.cms.collections?.getCollection?.(binding.collectionId)?.pageTemplatePath === pageFile) {
-          this.applyValue(el as HTMLElement, binding.property, `{${binding.fieldSlug}}`);
+          writeBoundValue(el, binding.property, `{${binding.fieldSlug}}`);
           return;
         }
         const promise = this.composer.cms.bindings.resolveBinding(binding).then((value) => {
-          if (!value) return;
-          this.applyValue(el as HTMLElement, binding.property, value);
+          /* resolveBinding already answers the fallback when the record or
+             its field has no value. Nothing at all (no fallback either) is
+             written as nothing: keeping the element's stored text shipped
+             the canvas sample — or a record since unpublished or deleted —
+             to the live site (BD-03). runPrePublishChecks lists these. */
+          writeBoundValue(el, binding.property, value);
         });
         promises.push(promise);
       });
@@ -114,6 +120,7 @@ export class CMSExportResolver {
     elements.forEach((el) => {
       el.removeAttribute("data-buildrick-selected");
       el.removeAttribute("data-cms-bound");
+      el.removeAttribute(CURRENT_ITEM_ATTR);
     });
 
     return serialize(doc, html);
@@ -137,7 +144,7 @@ export class CMSExportResolver {
       const bindings = this.composer.cms.bindings.getBindings(elementId);
       bindings.forEach((binding) => {
         const templateVar = this.createTemplateVar(binding.collectionId, binding.fieldSlug, syntax);
-        this.applyValue(el as HTMLElement, binding.property, templateVar);
+        writeBoundValue(el, binding.property, templateVar);
       });
 
       // Handle collection bindings (repeaters)
@@ -156,18 +163,6 @@ export class CMSExportResolver {
     });
 
     return serialize(doc, html);
-  }
-
-  /**
-   * Apply value to element based on property type
-   */
-  private applyValue(el: HTMLElement, property: string, value: string): void {
-    /* `property` comes from stored bindings and `value` from CMS entries —
-       neither from this session. Anything off the shared allowlist, or a
-       dangerous src/href URL, is not written (stored-XSS sink). */
-    if (!isSafeCmsBoundValue(property, value)) return;
-    if (property === "content") el.textContent = value;
-    else el.setAttribute(property, value);
   }
 
   /**

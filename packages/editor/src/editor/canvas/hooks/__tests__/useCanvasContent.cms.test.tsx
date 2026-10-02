@@ -199,4 +199,28 @@ describe("useCanvasContent — CMS binding resolution", () => {
       expect(result.current.displayContent).toContain("data-cms-repeater-clone");
     });
   });
+
+  /* C0.8: a list child bound "From CMS" to the list's collection shows each
+     copy's own record — the page-wide pass used to write one record into
+     every copy. */
+  it("a list child's binding shows each copy's own record", async () => {
+    const now = "2026-01-01T00:00:00.000Z";
+    const rec = (id: string, name: string): CMSContentItem =>
+      ({ id, collectionId: "menu", data: { name }, status: "published", createdAt: now, updatedAt: now });
+    const { composer, resolveBinding } = makeComposer(
+      { t: [{ elementId: "t", property: "content", collectionId: "menu", fieldSlug: "name" } as Binding] },
+      "First record only",
+      [{ elementId: "list", collectionId: "menu", itemVar: "item", status: "published", repeat: "children" }],
+      [rec("a", "Margherita"), rec("b", "Diavola"), rec("c", "Quattro")],
+    );
+    const content =
+      "<div data-buildrick-id='root-1'><div data-buildrick-id='list'><p data-buildrick-id='t'>Margherita</p></div></div>";
+    const { result } = renderHook(() => useCanvasContent({ composer, content }));
+    await waitFor(() => {
+      const titles = [...result.current.displayContent.matchAll(/data-buildrick-id="t"[^>]*>([^<]*)</g)].map((m) => m[1]);
+      expect(titles).toEqual(["Margherita", "Diavola", "Quattro"]);
+    });
+    expect(result.current.displayContent).not.toContain("First record only");
+    expect(resolveBinding).not.toHaveBeenCalled();
+  });
 });

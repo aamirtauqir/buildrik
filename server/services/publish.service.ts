@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
 import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
-import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
+import { appendDynamicPagesToPublish, findEmptyBindings, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
 import { publishApprovalBlock, latestEditAt } from "@server/services/publish-approval";
 import { isFeatureEnabled } from "@server/services/feature-flag.service";
@@ -20,6 +20,8 @@ import {
   type VercelFile,
 } from "@/lib/vercel";
 
+const CMS_EMPTY_BINDINGS_LABEL = "CMS bindings";
+
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
   const [allPages, site, domain] = await Promise.all([
     /* Every page WITH its visibility, because these checks describe the
@@ -35,7 +37,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     }),
     prisma.site.findUnique({
       where: { id: siteId },
-      select: { metaTitleTemplate: true, favicon: true, touchIcon: true, deletedAt: true, workspaceId: true },
+      select: { metaTitleTemplate: true, favicon: true, touchIcon: true, deletedAt: true, workspaceId: true, projectCmsBindings: true },
     }),
     prisma.domain.findFirst({
       where: { siteId, status: "VERIFIED" },
@@ -177,6 +179,28 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
           .join(" "),
       });
     }
+  }
+
+  /* C0.7: a bound element whose record has no value publishes its fallback,
+     or nothing — named here, page and element, before it ships. No row for a
+     site without bindings. */
+  const empty = await findEmptyBindings(
+    siteId,
+    livePages.map((p) => ({ name: p.name, slug: p.slug, isHomePage: p.isHomePage, blocks: asContentRoot(p.blocks) })),
+    site?.projectCmsBindings,
+  );
+  if (empty) {
+    checks.push(
+      empty.length > 0
+        ? {
+            label: CMS_EMPTY_BINDINGS_LABEL,
+            status: "warning",
+            detail: `${empty.length} bound element${empty.length > 1 ? "s have" : " has"} no value: ${empty
+              .map((e) => `${e.pageName} › ${e.element} (${e.collectionName} · ${e.fieldSlug}${e.fallback ? `, shows "${e.fallback}"` : ", publishes empty"})`)
+              .join("; ")}.`,
+          }
+        : { label: CMS_EMPTY_BINDINGS_LABEL, status: "pass", detail: "Every bound element has a value." },
+    );
   }
 
   const hasFail = checks.some((c) => c.status === "fail");

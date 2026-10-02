@@ -56,6 +56,32 @@ describe("exportPublishPages", () => {
     expect(pages.map((p) => p.path).sort()).toEqual(["about.html", "index.html"]);
   });
 
+  /* BD-02 / C0.6: a collection's record pages are generated at
+     `<slug>/index.html` from the template page's HTML, so a relative
+     `href="about.html"` there resolved to `<slug>/about.html` — every nav
+     link on a record page 404'd. The publish payload links pages from the
+     site root. */
+  it("links pages root-absolute, so a record page in a subdirectory resolves them", async () => {
+    const composer = new Composer({} as never);
+    composer.importProject({
+      pages: [
+        { id: "home", name: "Home", slug: "", isHome: true,
+          root: { id: "r1", type: "container" as const, tagName: "div", children: [
+            { id: "l1", type: "link" as const, tagName: "a", content: "About", attributes: { href: "#page:about" }, children: [] },
+          ] } },
+        { id: "about", name: "About", slug: "about",
+          root: { id: "r2", type: "container" as const, tagName: "div", children: [
+            { id: "l2", type: "link" as const, tagName: "a", content: "Home", attributes: { href: "#page:home" }, children: [] },
+          ] } },
+      ],
+    } as never);
+    const pages = await exportPublishPages(composer);
+    const byPath = new Map(pages.map((p) => [p.path, p.html]));
+    expect(byPath.get("index.html")).toContain('href="/about.html"');
+    expect(byPath.get("about.html")).toContain('href="/index.html"');
+    for (const html of byPath.values()) expect(html).not.toMatch(/href="(?:about|index)\.html"/);
+  });
+
   it("ships html for each page, not empty documents", async () => {
     const pages = await exportPublishPages(composerWithSlug("about"));
     for (const p of pages) expect(p.html).toContain("<html");
@@ -204,6 +230,41 @@ describe("exportPublishPages — server-snapshot CMS", () => {
     expect(fetchPublishSnapshot).toHaveBeenCalledWith("site-1", ["col-1"]);
     expect(pages[0].html).toContain("SERVER");
     expect(pages[0].html).not.toContain("LOCAL");
+  });
+
+  /* Found walking C0.6 live: the snapshot carried no pageTemplatePath, so the
+     template page's "record on this page" heading resolved to the newest
+     record instead of the `{title}` token — every generated record page
+     shipped the same title. */
+  it("keeps the template page's per-record token (the snapshot names the template)", async () => {
+    fetchPublishSnapshot.mockResolvedValue({
+      cms: {
+        collections: [{
+          id: "col-1", name: "Blog", slug: "blog", displayField: null, pageTemplatePath: "post.html",
+          fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", order: 0 }],
+          createdAt: "2026-09-28T00:00:00.000Z", updatedAt: "2026-09-28T00:00:00.000Z",
+        }],
+        entries: [{ id: "rec-server", collectionId: "col-1", data: { title: "SERVER" }, status: "PUBLISHED", updatedAt: "2026-09-28T00:00:00.000Z" }],
+      },
+      siteFonts: [],
+    });
+    const composer = new Composer({} as never);
+    composer.importProject({
+      pages: [
+        { id: "home", name: "Home", slug: "", isHome: true, root: { id: "r1", type: "container" as const, tagName: "div", children: [] } },
+        { id: "post", name: "Post", slug: "post",
+          root: { id: "r2", type: "container" as const, tagName: "div", children: [
+            { id: "h-bound", type: "text" as const, tagName: "h1", content: "Placeholder", styles: {} },
+          ] } },
+      ],
+      styles: [], assets: [],
+      cmsBindings: { field: { "h-bound": [{ binding: { sourceId: "cms:col-1", path: "title", type: "variable" }, collectionId: "col-1", fieldSlug: "title", property: "content" }] } },
+    } as never);
+
+    const post = (await exportPublishPages(composer)).find((p) => p.path === "post.html");
+
+    expect(post?.html).toMatch(/<h1[^>]*>\{title\}<\/h1>/);
+    expect(post?.html).not.toContain("SERVER");
   });
 
   it("refuses to publish while CMS changes are unsynced", async () => {

@@ -50,6 +50,8 @@ const withSlugs = (fields: unknown): CMSField[] =>
 export interface CmsRows {
   collections: ReadonlyArray<{
     id: string; name: string; slug: string; displayField?: string | null; fields: unknown;
+    /** The collection's template page (publish snapshot only). */
+    pageTemplatePath?: string | null;
     createdAt?: Date | string; updatedAt?: Date | string;
   }>;
   entries: ReadonlyArray<{
@@ -69,6 +71,7 @@ export function cmsFromRows(rows: CmsRows): { collections: CMSCollection[]; item
       id: c.id, name: c.name, slug: c.slug,
       displayField: c.displayField ?? undefined,
       fields: withSlugs(c.fields),
+      ...(c.pageTemplatePath ? { pageTemplatePath: c.pageTemplatePath } : {}),
       createdAt: iso(c.createdAt ?? c.updatedAt ?? new Date(0)),
       updatedAt: iso(c.updatedAt ?? new Date(0)),
     })),
