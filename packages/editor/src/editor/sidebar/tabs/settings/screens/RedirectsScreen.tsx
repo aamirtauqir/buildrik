@@ -1,47 +1,44 @@
 /**
- * Redirects — Clone 3397:32517 (`SEO & publishing / Redirects`): the site's
- * redirect rules and the 404 suggester.
+ * Redirects — PUBLISHING / Redirects (8136:214826 csv-actions, 8136:215047
+ * import, 8136:215307 import-error, 8136:215568 import-success, 8136:215838
+ * deleted-undo; states from 4418:128227 / 4418:130172 loading / 4418:130272
+ * empty / 4418:130372 load-error / 4418:133735 save-error).
  *
- * The rows and the suggestions come from `redirects.list` + `redirects
- * .suggestions` on open, one load (3397:33479 loading, 3397:33573
- * load-error with Try again). Card **Redirects**: the table `FROM PATH · TO
- * URL · TYPE` with an `Edit` per row → 4254:75747; none → the card's own
- * line + `Add redirect` (3397:33526). `Add redirect` in the shell's header
- * (`registerHeaderAction`) opens 4254:75736. Every row action lands on the
- * server as it is confirmed — create / update / delete through the dialog,
- * which keeps a refusal inline — and re-lists. Card **404 suggester**:
- * `Suggest redirects from 404s` is `projectSettings.redirects
- * .suggestFrom404s`, the ONE thing the footer saves (composer-backed, the
- * flush handler); under it one row per suggestion — an old page slug with no
- * rule, the source being the page slug history, hence `renamed <d MMM>` —
- * with `Accept` (a 301 at once, the row leaves); off → the rows hide; none →
- * the empty line. A refused Accept shows the banner (3951:26730).
+ * Everything here applies as it happens (`immediate`): the rules and the
+ * suggestions come from `redirects.list` + `redirects.suggestions` on open.
+ * The header carries `Import CSV` · `Export CSV` · `Add redirect`
+ * (`registerHeaderAction`). Card **Redirect rules**: FROM · TO · TYPE and
+ * `Edit · Delete` per row — Edit opens RedirectDialog (update / delete inside
+ * it), Delete removes the rule at once and the toast offers `Undo`, which
+ * creates the same rule again. Import is all-or-nothing on the server
+ * (RedirectCsvDialog → `redirects.import_csv`; the toast says how many were
+ * created); Export downloads `redirects.export_csv`. Card **404 suggester**:
+ * `Suggest redirects from 404s` writes `projectSettings.redirects
+ * .suggestFrom404s` at once (`siteDetail.projectSettings.update`, SA-16) and
+ * the composer adopts the saved value; under it one row per suggestion — an
+ * old page slug with no rule, `renamed <d MMM>` — with `Accept` (a 301 at
+ * once). A refused action shows the banner.
  *
  * The Pages door: the shell passes `repair` after a slug change was saved in
- * Page settings, and the URL repair draft (3519:19920) sits above the
- * Redirects card until it is saved (3519:20096 — the rule joins the table,
- * `Back to <Page> SEO` returns through `ui:pages-open-settings`) or
- * cancelled; `onRepairDone` tells the shell either way.
+ * Page settings, and the URL repair draft (3519:19920) sits above the rules
+ * until it is saved (3519:20096 — the rule joins the table, `Back to <Page>
+ * SEO` returns through `ui:pages-open-settings`) or cancelled;
+ * `onRepairDone` tells the shell either way.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, ToggleSwitch } from "@/editor/chrome-ui";
+import { Button, ToggleSwitch, useToast } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
+import { updateProjectSettings } from "@/services/BuildrikSyncProvider";
 import {
   LoadCard,
   SET_BTN,
-  SET_HEAD_BTN,
-  SET_RESTORE_STRIP,
   SET_ROW,
-  SET_ROW_BTN,
   SET_ROW_LABEL,
-  SET_TABLE,
-  SET_TD,
-  SET_TH,
   SaveErrorBanner,
   Screen,
   Section,
@@ -49,6 +46,7 @@ import {
 import { SAVE_ERROR_MESSAGES } from "../constants";
 import { useServerLoad } from "../hooks/useServerLoad";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
+import { RedirectCsvDialog } from "../components/RedirectCsvDialog";
 import type { RedirectRepair, ScreenProps } from "../types";
 import { RedirectDialog, type RedirectDraft } from "../components/RedirectDialog";
 import { RedirectRepairCard } from "../components/RedirectRepairCard";
@@ -100,13 +98,37 @@ const MUTED = "tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk
    border or fill; the link recipe (no box, hover underline) in ink. */
 const ACCEPT_BTN = "tw:text-[var(--bk-ink)]";
 
+/* 8136:214826's header actions: three 32-high buttons, 122 wide, in an 8 gap —
+   two text buttons and the accent primary. */
+const HEAD_BTN = `${SET_BTN} tw:w-30.5`;
+const HEAD_GHOST = `${HEAD_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
+
+/* The rules table (8136:214826): FROM 320 · TO 400 · TYPE 100 · actions 184,
+   12 apart; an 11px caps header row 28 high, rows 40 high, no rules between. */
+const RULES_GRID = "tw:grid tw:grid-cols-[320px_400px_100px_184px] tw:items-center tw:gap-x-3";
+const RULES_HEAD = `${RULES_GRID} tw:h-7 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-5 tw:text-[var(--bk-ink-muted)]`;
+const RULES_ROW = `${RULES_GRID} tw:h-10 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]`;
+/* `Edit · Delete` — accent text, 13, no box. */
+const RULE_ACTION =
+  "tw:h-auto tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-accent)] " +
+  "tw:enabled:hover:bg-transparent tw:enabled:hover:underline tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
+/** A browser download of `text` as `name`. */
+function download(name: string, text: string) {
+  const url = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
 export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
   composer,
   projectId,
   onDirtyChange,
-  registerFlushHandler,
   onLoadStateChange,
   registerRetryLoad,
   registerHeaderAction,
@@ -116,32 +138,38 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
 }) => {
   const siteName = composer?.getProjectMetadata?.()?.name ?? "";
 
-  // ── The suggester switch: the one thing the footer saves ──
+  const { addToast } = useToast();
+
+  // ── The suggester switch: applies at once (SA-16) ──
   const { value: suggestSaved } = useSettingsScreen(composer, (s) => s.redirects?.suggestFrom404s ?? true, true);
   const [suggest, setSuggest] = React.useState(suggestSaved);
+  const [suggestBusy, setSuggestBusy] = React.useState(false);
   React.useEffect(() => setSuggest(suggestSaved), [suggestSaved]);
 
-  /* Dirty is the local switch against the composer's value: a Save flushes
-     the switch in, the composer's value follows, and the next flip is dirty
-     again — where a one-way `markDirty` would stay stuck after the first Save. */
-  const dirty = suggest !== suggestSaved;
+  // Nothing here waits for the footer's Save.
   React.useEffect(() => {
-    onDirtyChange?.(dirty);
-  }, [dirty, onDirtyChange]);
+    onDirtyChange?.(false);
+  }, [onDirtyChange]);
 
-  const suggestRef = React.useRef(suggest);
-  suggestRef.current = suggest;
-  React.useEffect(() => {
-    if (!composer || !registerFlushHandler) return;
-    registerFlushHandler(() => {
-      const current = composer.getProjectSettings();
-      return {
-        ...current,
-        redirects: { ...current.redirects, suggestFrom404s: suggestRef.current },
-      };
-    });
-    return () => registerFlushHandler(null);
-  }, [composer, registerFlushHandler]);
+  const toggleSuggest = async (next: boolean) => {
+    setSuggest(next);
+    if (!projectId) return;
+    setSuggestBusy(true);
+    setActionFailed(false);
+    try {
+      await updateProjectSettings(projectId, { redirects: { suggestFrom404s: next } });
+      // The server has it: the composer adopts it (no dirty flag, no autosave).
+      if (composer) {
+        const current = composer.getProjectSettings();
+        composer.adoptSavedProjectSettings({ ...current, redirects: { ...current.redirects, suggestFrom404s: next } });
+      }
+    } catch {
+      setSuggest(!next);
+      setActionFailed(true);
+    } finally {
+      setSuggestBusy(false);
+    }
+  };
 
   // ── The server rows ──
   const [rows, setRows] = React.useState<RedirectRow[]>([]);
@@ -189,21 +217,106 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
   const ready = load.state === "ready";
   const hasRows = rows.length > 0;
 
-  // The header's `Add redirect` (3397:32517) — the shell renders it. On the
-  // empty card the button is the card's own, so the header carries none.
+  const [csvOpen, setCsvOpen] = React.useState(false);
+  const [exporting, setExporting] = React.useState(false);
+
+  const exportCsv = React.useCallback(async () => {
+    if (!projectId) return;
+    setExporting(true);
+    setActionFailed(false);
+    try {
+      const { csv } = await getBuildrikClient(DASHBOARD_URL).siteDetail.redirects.export_csv.query({ siteId: projectId });
+      download("redirects.csv", csv);
+    } catch {
+      setActionFailed(true);
+    } finally {
+      setExporting(false);
+    }
+  }, [projectId]);
+
+  // 8136:214826 — `Import CSV` · `Export CSV` · `Add redirect`; the shell
+  // renders them. On the empty card `Add redirect` is the card's own.
   React.useEffect(() => {
     if (!registerHeaderAction) return;
-    if (!ready || !hasRows) {
+    if (!ready) {
       registerHeaderAction(null);
       return;
     }
     registerHeaderAction(
-      <Button type="button" size="xs" className={SET_HEAD_BTN} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
-        Add redirect
-      </Button>,
+      <div className="tw:flex tw:items-center tw:gap-2">
+        <Button type="button" size="xs" variant="ghost" className={HEAD_GHOST} id="rd-import-csv" onClick={() => setCsvOpen(true)} data-testid="set-rd-import">
+          Import CSV
+        </Button>
+        <Button
+          type="button"
+          size="xs"
+          variant="ghost"
+          className={HEAD_GHOST}
+          id="rd-export-csv"
+          disabled={!hasRows || exporting}
+          onClick={() => void exportCsv()}
+          data-testid="set-rd-export"
+        >
+          {exporting ? "Exporting…" : "Export CSV"}
+        </Button>
+        {hasRows ? (
+          <Button type="button" size="xs" className={HEAD_BTN} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
+            Add redirect
+          </Button>
+        ) : null}
+      </div>,
     );
     return () => registerHeaderAction(null);
-  }, [registerHeaderAction, ready, hasRows]);
+  }, [registerHeaderAction, ready, hasRows, exporting, exportCsv]);
+
+  const importCsv = async (csv: string) => {
+    if (!projectId) return;
+    const { created } = await api().import_csv.mutate({ siteId: projectId, csv });
+    setCsvOpen(false);
+    addToast({
+      title: `Created ${created}`,
+      description: `${created} redirect ${created === 1 ? "rule was" : "rules were"} imported.`,
+    });
+    await relist();
+  };
+
+  // Delete at once; the toast's Undo creates the same rule again (8136:215838).
+  const deleteRow = async (row: RedirectRow) => {
+    if (!projectId) return;
+    setActionFailed(false);
+    try {
+      await api().delete.mutate({ id: row.id });
+    } catch {
+      setActionFailed(true);
+      return;
+    }
+    setRows((current) => current.filter((r) => r.id !== row.id));
+    addToast({
+      title: `Redirect ${row.fromPath} → ${row.toUrl} deleted`,
+      description: "You can undo this deletion.",
+      action: {
+        label: "Undo",
+        onClick: () => {
+          void (async () => {
+            try {
+              await api().create.mutate({
+                siteId: projectId,
+                fromPath: row.fromPath,
+                toUrl: row.toUrl,
+                type: asType(row.type),
+                matchQuery: row.matchQuery,
+                notes: row.notes ?? undefined,
+              });
+            } catch {
+              setActionFailed(true);
+            }
+            await relist();
+          })();
+        },
+      },
+    });
+    await relist();
+  };
 
   // ── The dialog's three writes: resolve = close + re-list, reject = inline in the dialog ──
   const submitDialog = async (draft: RedirectDraft) => {
@@ -304,10 +417,6 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     <Screen>
       {banner ? <SaveErrorBanner message={banner} /> : null}
 
-      <div className={SET_RESTORE_STRIP} data-testid="set-rd-restore">
-        Restoring a site version leaves this configuration unchanged.
-      </div>
-
       {repairCard ? (
         <RedirectRepairCard
           pageName={repairCard.pageName}
@@ -321,59 +430,61 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         />
       ) : null}
 
-      <Section title="Redirects">
+      <Section title="Redirect rules">
         {!hasRows ? (
           <div className="tw:flex tw:flex-col tw:items-start tw:gap-3" data-testid="set-rd-empty">
-            <div className={LINE}>No redirects yet. Add one to send an old URL to a new one.</div>
+            <div className={LINE}>No redirects yet. Add one to send an old URL to a new one, or import a CSV.</div>
             <Button type="button" size="xs" className={SET_BTN} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
               Add redirect
             </Button>
           </div>
         ) : (
-          <table className={SET_TABLE} id="rd-rules" aria-label="Redirects" data-testid="set-rd-table">
-            <thead>
-              <tr>
-                <th scope="col" className={`${SET_TH} tw:w-58`}>
-                  From path
-                </th>
-                <th scope="col" className={`${SET_TH} tw:w-98`}>
-                  To URL
-                </th>
-                <th scope="col" className={`${SET_TH} tw:w-23`}>
-                  Type
-                </th>
-                <th scope="col" className={`${SET_TH} tw:pr-0`}>
-                  <span className="tw:sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id} data-testid={`set-rd-row-${row.id}`}>
-                  <td className={`${SET_TD} tw:truncate`} title={row.fromPath}>
-                    {row.fromPath}
-                  </td>
-                  <td className={`${SET_TD} tw:truncate tw:text-[var(--bk-ink-soft)]`} title={row.toUrl}>
-                    {row.toUrl}
-                  </td>
-                  <td className={`${SET_TD} tw:text-[var(--bk-ink-soft)]`}>{row.type}</td>
-                  <td className={`${SET_TD} tw:pr-0`}>
-                    <Button
-                      type="button"
-                      size="xs"
-                      variant="secondary"
-                      className={SET_ROW_BTN}
-                      onClick={() => setDialog({ mode: "edit", row })}
-                      aria-label={`Edit redirect from ${row.fromPath}`}
-                      data-testid={`set-rd-edit-${row.id}`}
-                    >
-                      Edit
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div role="table" id="rd-rules" aria-label="Redirect rules" data-testid="set-rd-table">
+            <div role="row" className={RULES_HEAD}>
+              <span role="columnheader">From</span>
+              <span role="columnheader">To</span>
+              <span role="columnheader">Type</span>
+              <span role="columnheader">
+                <span className="tw:sr-only">Actions</span>
+              </span>
+            </div>
+            {rows.map((row) => (
+              <div role="row" key={row.id} className={RULES_ROW} data-testid={`set-rd-row-${row.id}`}>
+                <span role="cell" className="tw:truncate" title={row.fromPath}>
+                  {row.fromPath}
+                </span>
+                <span role="cell" className="tw:truncate" title={row.toUrl}>
+                  {row.toUrl}
+                </span>
+                <span role="cell">{row.type}</span>
+                <span role="cell" className="tw:flex tw:items-center tw:gap-1 tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-accent)]">
+                  <Button
+                    type="button"
+                    size="xs"
+                    variant="ghost"
+                    className={RULE_ACTION}
+                    onClick={() => setDialog({ mode: "edit", row })}
+                    aria-label={`Edit redirect from ${row.fromPath}`}
+                    data-testid={`set-rd-edit-${row.id}`}
+                  >
+                    Edit
+                  </Button>
+                  <span aria-hidden="true">·</span>
+                  <Button
+                    type="button"
+                    size="xs"
+                    variant="ghost"
+                    className={RULE_ACTION}
+                    onClick={() => void deleteRow(row)}
+                    aria-label={`Delete redirect from ${row.fromPath}`}
+                    data-testid={`set-rd-delete-${row.id}`}
+                  >
+                    Delete
+                  </Button>
+                </span>
+              </div>
+            ))}
+          </div>
         )}
       </Section>
 
@@ -385,7 +496,8 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
           <ToggleSwitch
             id="rd-suggest-from-404s"
             checked={suggest}
-            onChange={setSuggest}
+            onChange={(next) => void toggleSuggest(next)}
+            disabled={suggestBusy}
             aria-labelledby="rd-suggest-from-404s-label"
             sizing="md"
             data-testid="set-rd-suggest-toggle"
@@ -429,6 +541,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         onDelete={dialog?.mode === "edit" ? deleteFromDialog : undefined}
         onCancel={() => setDialog(null)}
       />
+      <RedirectCsvDialog open={csvOpen} onImport={importCsv} onCancel={() => setCsvOpen(false)} />
     </Screen>
   );
 };
