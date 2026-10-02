@@ -57,5 +57,7 @@ describe("StatusLine", () => {
     line = screen.getByTestId("inspector-status-line");
     expect(line).toHaveAttribute("data-tone", "muted");
     expect(line.className).not.toContain("--bk-warning-tint");
+    /* Boards 23 / 29 inset the line's text 16px from the column edge. */
+    expect(line.className).toContain("tw:px-4");
   });
 });

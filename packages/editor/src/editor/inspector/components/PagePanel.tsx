@@ -232,7 +232,7 @@ function PageHeader({ composer, pageName, pageId }: { composer: Composer; pageNa
         </span>
         <Button
           type="button"
-          className="tw:h-6 tw:shrink-0 tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap"
+          className="tw:h-6 tw:w-10 tw:shrink-0 tw:justify-center tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap"
           title="Ask AI about this page"
           aria-label="Ask AI about this page"
           data-testid="inspector-ai-chip"

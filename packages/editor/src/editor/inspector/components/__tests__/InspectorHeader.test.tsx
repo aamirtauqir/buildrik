@@ -69,6 +69,8 @@ describe("InspectorHeader", () => {
     c.on(EVENTS.UI_TOGGLE_INSPECTOR, hide);
     mount();
     expect(screen.getByTestId("inspector-ai-chip")).toHaveTextContent("✦ AI");
+    /* Every board draws the chip 40 wide. */
+    expect(screen.getByTestId("inspector-ai-chip").className).toContain("tw:w-10");
     expect(screen.getByTestId("inspector-element-menu")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Hide inspector (⌘\\)" }));
     expect(hide).toHaveBeenCalled();

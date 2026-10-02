@@ -72,7 +72,7 @@ export function ContextRow(p: ContextRowProps) {
               aria-haspopup="menu"
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
-              className={`${CHIP} ${base ? "tw:bg-transparent tw:text-[var(--bk-ink-soft)]" : "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"}`}
+              className={`${CHIP} ${base ? "tw:bg-transparent tw:text-[var(--bk-ink-soft)]" : "tw:bg-[var(--bk-accent-subtle)] tw:text-[var(--bk-accent-text)]"}`}
             >
               State: {pseudoStateLabel(p.state)}
               <ChevronDown size={12} aria-hidden="true" />

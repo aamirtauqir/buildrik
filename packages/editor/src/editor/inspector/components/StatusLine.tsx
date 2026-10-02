@@ -23,8 +23,8 @@ export interface StatusLineProps {
 const ACTION =
   "tw:h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:underline tw:hover:bg-transparent";
 
-const LINE = "tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-3 tw:py-1 tw:text-[11px] tw:leading-4";
-/* Board 29 tints the save-conflict line; the locked line (board 23) is plain. */
+const LINE = "tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-4 tw:py-1 tw:text-[11px] tw:leading-4";
+/* Boards 23 / 29 inset the line 16px. Board 29 tints the save-conflict line; the locked line (board 23) is plain. */
 const TONE = {
   warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
   muted: "tw:text-[var(--bk-ink-muted)]",

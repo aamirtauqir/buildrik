@@ -43,6 +43,8 @@ describe("ContextRow", () => {
     const p = props({ state: "hover", stateOverrideCount: 1 });
     render(<ContextRow {...p} />);
     expect(screen.getByTestId("inspector-state-chip")).toHaveTextContent("State: :hover");
+    /* Board 27 fills a picked state's chip with the accent-subtle tint (#E1EFFE). */
+    expect(screen.getByTestId("inspector-state-chip").className).toContain("--bk-accent-subtle");
     const line = screen.getByTestId("inspector-state-overrides");
     expect(line.textContent?.replace(/\s+/g, " ").trim()).toBe("1 :hover override · Reset");
     /* Its own line: not in the chip row. */
