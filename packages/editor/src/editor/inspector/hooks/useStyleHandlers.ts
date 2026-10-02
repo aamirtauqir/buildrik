@@ -40,6 +40,9 @@ export interface StyleHandlers {
   handleBatchStyleChange: (changes: Record<string, string>) => void;
   /** Set of properties overridden in the current breakpoint */
   overriddenProperties: Set<string>;
+  /** Run a discrete action (a segment, a select choice, a toggle, Reset /
+   *  Revert) as its OWN undo step, written now. See the hook body. */
+  runDiscrete: (action: () => void) => void;
 }
 
 // ============================================================================
@@ -102,6 +105,25 @@ export function useStyleHandlers(
     pendingFlushRef.current = null;
     pending?.run();
   }, []);
+
+  /* Typing and scrubbing coalesce: the 300 ms debounce here and the engine's
+     ~500 ms history window turn a run of keystrokes into one undo step. A
+     discrete action must not ride along — Align then Reset 0.4 s later undid
+     as ONE step, and a Reset fired inside the debounce was even overtaken by
+     the Align it followed (QA 2026-10-02). So a discrete action commits
+     what is pending first (in order, as its own step), writes at once, and
+     closes its own step before anything else can join it (engine/AGENTS.md:
+     `history.flushPending()`). */
+  const runDiscrete = useCallback(
+    (action: () => void) => {
+      flushPending();
+      composer?.history?.flushPending?.();
+      action();
+      flushPending();
+      composer?.history?.flushPending?.();
+    },
+    [composer, flushPending],
+  );
 
   // Flush any pending debounced style change when element/breakpoint/pseudoState changes.
   // Prior: cleanup silently dropped the last keystroke. Now we commit it first.
@@ -380,5 +402,6 @@ export function useStyleHandlers(
     handleStyleChange,
     handleBatchStyleChange,
     overriddenProperties,
+    runDiscrete,
   };
 }

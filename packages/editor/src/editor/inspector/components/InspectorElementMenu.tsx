@@ -20,6 +20,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { IconButton, Menu, MenuItem, MenuSeparator, Popover, useToast } from "@/editor/chrome-ui";
 import { formatShortcutHint, isMac } from "@/editor/canvas/menus/MenuItem";
+import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import {
   actionLabel,
   ELEMENT_ACTIONS,
@@ -37,6 +38,7 @@ const ROW = "tw:!h-auto tw:!min-h-8 tw:!px-2.5 tw:!py-1.5 tw:!text-[12px] tw:!le
 export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({ composer, selectedElementId }) => {
   const [open, setOpen] = React.useState(false);
   const { addToast } = useToast();
+  const { discrete: runDiscrete } = useInspectorField();
   const close = React.useCallback(() => setOpen(false), []);
 
   const element = composer?.elements.getElement(selectedElementId) ?? null;
@@ -69,7 +71,9 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({ comp
           className={ROW}
           onClick={() => {
             close();
-            action.run(ctx);
+            /* Its own undo step, after any edit still pending (Reset style
+               right after Align used to undo with it — or be overtaken by it). */
+            runDiscrete(() => action.run(ctx));
           }}
         >
           <span className="tw:block tw:whitespace-normal">{actionLabel(action, ctx)}</span>

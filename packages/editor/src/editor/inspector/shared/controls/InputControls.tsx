@@ -481,7 +481,8 @@ export const SelectRow: React.FC<SelectRowProps> = ({
             theme={BK_SELECT_BARE_VALUE_THEME}
             value={field.mixed ? "" : value}
             onChange={(e) => {
-              if (!field.readOnly) onChange(e.target.value);
+              const next = e.target.value;
+              if (!field.readOnly) field.discrete(() => onChange(next));
             }}
           >
             {field.mixed ? (

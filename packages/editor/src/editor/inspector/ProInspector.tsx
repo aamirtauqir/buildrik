@@ -154,6 +154,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     handleStyleChange,
     handleBatchStyleChange,
     overriddenProperties,
+    runDiscrete,
   } = useStyleHandlers(selectedElement, composer, currentBreakpoint, currentPseudoState, extraTargetIds, conflict.pending);
 
   // Pseudo-states with overrides — breakpoint-qualified so mobile/tablet
@@ -240,9 +241,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       mixedKeys,
       overrides: fieldOverrides.overrides,
       overrideLabels: fieldOverrides.labels,
-      resetOverride: fieldOverrides.resetOverride,
+      resetOverride: (property, kind) => runDiscrete(() => fieldOverrides.resetOverride(property, kind)),
+      runDiscrete,
     }),
-    [readOnly, conflict.pending, locked, mixedKeys, fieldOverrides]
+    [readOnly, conflict.pending, locked, mixedKeys, fieldOverrides, runDiscrete]
   );
 
   /* Scroll persistence per element (P-7b). The scroll listener is the only
@@ -359,10 +361,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 onStateChange={(s: PseudoStateId) => setCurrentPseudoState(s)}
                 statesWithOverrides={statesWithOverrides}
                 stateOverrideCount={fieldOverrides.counts.pseudo}
-                onResetState={fieldOverrides.resetPseudo}
+                onResetState={() => runDiscrete(fieldOverrides.resetPseudo)}
                 breakpointName={breakpointName}
                 breakpointOverrideCount={fieldOverrides.counts.breakpoint}
-                onRevertBreakpoint={fieldOverrides.revertBreakpoint}
+                onRevertBreakpoint={() => runDiscrete(fieldOverrides.revertBreakpoint)}
               />
             ) : null}
             <div

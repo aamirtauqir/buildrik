@@ -186,7 +186,7 @@ function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
     if (next === mode) return;
     /* Fixed from Fill / Hug starts at what the element measures now. */
     const current = next === "fixed" && mode !== "fixed" && measured ? `${measured}px` : value;
-    onChange(valueForConstraint(next, current));
+    field.discrete(() => onChange(valueForConstraint(next, current)));
   };
   /* What the property held when the field took focus: Escape after typing
      into Fill puts Fill back, not the readout as a Fixed width. */

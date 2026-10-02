@@ -35,7 +35,7 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
   onToggle,
   tier = "tertiary",
 }) => {
-  const { readOnly } = useInspectorField();
+  const { readOnly, discrete } = useInspectorField();
   const isVisible = (breakpointId: string): boolean => elementStyles[`--hide-${breakpointId}`] !== "true";
   const hiddenCount = VISIBILITY_BREAKPOINTS.filter((bp) => !isVisible(bp.id)).length;
 
@@ -61,7 +61,7 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
                 checked={shown}
                 aria-readonly={readOnly || undefined}
                 onChange={() => {
-                  if (!readOnly) onChange(`--hide-${bp.id}`, shown ? "true" : "");
+                  if (!readOnly) discrete(() => onChange(`--hide-${bp.id}`, shown ? "true" : ""));
                 }}
                 className="tw:size-4 tw:shrink-0"
               />

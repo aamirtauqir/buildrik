@@ -26,6 +26,9 @@ export interface InspectorFieldContextValue {
   /** "Tablet", ":hover" — what an override dot names. */
   overrideLabels: Readonly<Partial<Record<OverrideKind, string>>>;
   resetOverride: (property: string, kind: OverrideKind) => void;
+  /** Run a discrete action (segment, select choice, toggle, Reset) as its own
+   *  undo step — `useStyleHandlers.runDiscrete`. Absent: just run it. */
+  runDiscrete?: (action: () => void) => void;
 }
 
 const EMPTY: InspectorFieldContextValue = {
@@ -36,6 +39,8 @@ const EMPTY: InspectorFieldContextValue = {
   overrideLabels: {},
   resetOverride: () => undefined,
 };
+
+const runNow = (action: () => void) => action();
 
 export const InspectorFieldContext = React.createContext<InspectorFieldContextValue>(EMPTY);
 
@@ -57,6 +62,10 @@ export interface InspectorField {
   overrides: readonly OverrideKind[];
   overrideLabels: InspectorFieldContextValue["overrideLabels"];
   resetOverride: (kind: OverrideKind) => void;
+  /** A click-once control (segment, select, checkbox) wraps its write in this,
+   *  so it is its own undo step rather than merged with the edit before or
+   *  after it. Typing does not: keystrokes are meant to coalesce. */
+  discrete: (action: () => void) => void;
 }
 
 const NONE: readonly OverrideKind[] = [];
@@ -78,5 +87,6 @@ export function useInspectorField(property?: string): InspectorField {
     resetOverride: (kind) => {
       if (property) ctx.resetOverride(property, kind);
     },
+    discrete: ctx.runDiscrete ?? runNow,
   };
 }

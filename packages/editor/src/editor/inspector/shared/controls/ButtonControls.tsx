@@ -43,7 +43,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
 
   const choose = (index: number) => {
     refs.current[index]?.focus();
-    if (!field.readOnly) onChange(options[index].value);
+    if (!field.readOnly) field.discrete(() => onChange(options[index].value));
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -84,7 +84,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
             aria-checked={on}
             tabIndex={i === stop ? 0 : -1}
             onClick={() => {
-              if (!field.readOnly) onChange(opt.value);
+              if (!field.readOnly) field.discrete(() => onChange(opt.value));
             }}
             title={opt.label}
             aria-label={opt.label}

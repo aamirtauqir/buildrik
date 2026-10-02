@@ -43,7 +43,8 @@ export function CheckRow({ label, checked, onChange, property, testId }: CheckRo
         aria-checked={field.mixed ? "mixed" : undefined}
         aria-readonly={field.readOnly || undefined}
         onChange={(e) => {
-          if (!field.readOnly) onChange(e.target.checked);
+          const next = e.target.checked;
+          if (!field.readOnly) field.discrete(() => onChange(next));
         }}
         className="tw:size-4 tw:shrink-0 tw:bg-[var(--bk-bg-panel)]"
       />
