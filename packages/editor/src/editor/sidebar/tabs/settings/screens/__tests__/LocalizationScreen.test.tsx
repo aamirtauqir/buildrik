@@ -1,36 +1,30 @@
 /**
- * LocalizationScreen tests — Clone 3397:32376 Localization: the amber strip,
- * the Default card (locale select), the Locales table and its pills, the
- * two reads behind them (3397:33194 / 3397:33241), the save-error banner
- * (3397:33288), the save handler's write, the header's `Add locale` and the
- * two dialogs it opens.
- *
- * SA-05: the auto-redirect toggle is gone from the UI (see the screen's own
- * comment), but `localeAutoRedirect` still comes back from the load and
- * still rides unchanged on every save/create write — these tests check that
- * round trip without ever touching a toggle.
+ * LocalizationScreen — Phase B Languages: 8135:214023 (default) and
+ * 8135:214262 (remove-locale confirm). Default locale is a footer field;
+ * Add / Remove write the enabled list at once (SA-16) and never carry the
+ * staged default; Remove asks first only when translations exist (Q-B6);
+ * SA-05's auto-redirect value is never sent.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor, within, act } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import * as React from "react";
 import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 
 const { api } = vi.hoisted(() => ({
   api: {
     siteDetail: {
-      settings: {
-        get: { query: vi.fn() },
-        update: { mutate: vi.fn() },
-      },
+      settings: { get: { query: vi.fn() }, update: { mutate: vi.fn() } },
       locales: { query: vi.fn() },
     },
   },
 }));
 
-vi.mock("@/services/api-client", () => ({
-  getBuildrikClient: () => api,
+vi.mock("@/services/api-client", () => ({ getBuildrikClient: () => api }));
+vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/BuildrikSyncProvider")>()),
+  updateSiteColumns: (id: string, patch: Record<string, unknown>) => api.siteDetail.settings.update.mutate({ id, ...patch }),
 }));
 
 import { LocalizationScreen } from "../LocalizationScreen";
@@ -54,389 +48,185 @@ beforeEach(() => {
   updateMock.mockReset().mockResolvedValue({});
   localesMock.mockReset().mockResolvedValue(summary());
 });
-
 afterEach(() => cleanup());
 
-interface SetupOpts {
-  projectId?: string | null;
-  composer?: ReturnType<typeof createMockComposer> | null;
-  onDirtyChange?: (d: boolean) => void;
-  registerSaveHandler?: (h: (() => Promise<void>) | null) => void;
-  registerHeaderAction?: (node: React.ReactNode | null) => void;
-  onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
-  saveError?: string | null;
-}
-
-function setup(opts: SetupOpts = {}) {
-  const composer =
-    opts.composer === undefined
-      ? createMockComposer({ projectSettings: { seo: { language: "en", siteName: "Acme" } }, projectMetadata: { name: "Bella Cucina" } })
-      : opts.composer;
-  const utils = render(
+function setup(opts: { projectId?: string | null; saveError?: string | null; readOnly?: boolean } = {}) {
+  const composer = Object.assign(
+    createMockComposer({ projectSettings: { seo: { language: "en", siteName: "Acme" } }, projectMetadata: { name: "Bella Cucina" } }),
+    { adoptSavedProjectSettings: vi.fn() },
+  );
+  const props = { onDirtyChange: vi.fn(), registerSaveHandler: vi.fn(), onLoadStateChange: vi.fn() };
+  render(
     <LocalizationScreen
       composer={composer}
       projectId={opts.projectId === undefined ? "s1" : opts.projectId}
-      onDirtyChange={opts.onDirtyChange}
-      registerSaveHandler={opts.registerSaveHandler}
-      registerHeaderAction={opts.registerHeaderAction}
-      onLoadStateChange={opts.onLoadStateChange}
       saveError={opts.saveError}
+      readOnly={opts.readOnly}
+      {...props}
     />,
   );
-  return { composer, ...utils };
+  return { composer, props };
 }
 
-/** Holds the latest handler the screen registered — what the shell's Save runs. */
-function saveHandlerSpy() {
-  const box: { current: (() => Promise<void>) | null } = { current: null };
-  const register = vi.fn((h: (() => Promise<void>) | null) => {
-    box.current = h;
-  });
-  return { box, register };
-}
+const loaded = () => waitFor(() => expect(screen.getByTestId("set-loc-table")).toBeInTheDocument());
+const lastSave = (fn: { mock: { calls: unknown[][] } }) => fn.mock.calls[fn.mock.calls.length - 1]?.[0] as (() => Promise<void>) | null;
 
-/** Renders whatever the screen hands the header slot, the way the shell will. */
-function HeaderHost(props: { render: (register: (node: React.ReactNode | null) => void) => React.ReactNode }) {
-  const [node, setNode] = React.useState<React.ReactNode>(null);
-  const register = React.useCallback((next: React.ReactNode | null) => setNode(next), []);
-  return (
-    <>
-      <div data-testid="header-slot">{node}</div>
-      {props.render(register)}
-    </>
-  );
-}
-
-const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-default")).toBeInTheDocument());
-const defaultSelect = () => screen.getByTestId("set-loc-default") as HTMLSelectElement;
-const row = (code: string) => screen.getByTestId(`set-loc-row-${code}`);
-
-describe("LocalizationScreen — the frame's strip and two cards", () => {
-  it("reads both the Site row and the locales summary, then draws the strip, Default and Locales", async () => {
+describe("Languages · 8135:214023", () => {
+  it("draws Default locale and Locales: Saves immediately, Add locale, LOCALE · TRANSLATED PAGES rows", async () => {
     setup();
     await loaded();
     expect(getMock).toHaveBeenCalledWith({ siteId: "s1" });
     expect(localesMock).toHaveBeenCalledWith({ siteId: "s1" });
-    expect(screen.getByTestId("set-loc-restore")).toHaveTextContent(
-      "Restoring a site version leaves this configuration unchanged.",
-    );
-    // C-7 (PD-39 overridden): the UI stays, but says plainly that publish
-    // ships the default locale only — the table tracks translation
-    // progress, not live per-language routes.
-    expect(screen.getByTestId("set-loc-publish-note")).toHaveTextContent(
-      "Per-language pages publish in a later release.",
-    );
-    expect(screen.getByTestId("set-card-default")).toHaveTextContent("Default");
-    expect(screen.getByTestId("set-card-locales")).toHaveTextContent("Locales");
-    expect(screen.getByLabelText("Default locale")).toBe(defaultSelect());
-    expect(defaultSelect().id).toBe("default-locale");
-  });
-
-  it("prefills the default and the enabled locales as `<Language> (<code>)` options", async () => {
-    setup();
-    await loaded();
-    expect(defaultSelect().value).toBe("en");
-    expect(Array.from(defaultSelect().options).map((o) => o.text)).toEqual(["English (en)", "French (fr)", "Arabic (ar)"]);
-  });
-
-  it("falls back to a single English locale when the row is empty", async () => {
-    getMock.mockResolvedValue({});
-    localesMock.mockResolvedValue({ total: 0, locales: [] });
-    setup();
-    await loaded();
-    expect(defaultSelect().value).toBe("en");
-    expect(defaultSelect().options).toHaveLength(1);
-  });
-
-  it("draws the table's four columns and one row per enabled locale — path, pages and pill", async () => {
-    setup();
-    await loaded();
-    const table = screen.getByTestId("set-loc-table");
-    expect(table.id).toBe("locales");
-    expect(within(table).getAllByRole("columnheader").slice(0, 4).map((th) => th.textContent)).toEqual([
-      "Locale",
-      "Path",
-      "Pages translated",
-      "Status",
-    ]);
-    expect(row("en")).toHaveTextContent("English");
-    expect(row("en")).toHaveTextContent("/");
-    expect(screen.getByTestId("set-loc-row-pages-en")).toHaveTextContent("6 of 6");
-    expect(screen.getByTestId("set-loc-row-status-en")).toHaveTextContent("Live");
-    expect(row("fr")).toHaveTextContent("/fr");
+    expect(screen.getByTestId("set-card-title-default-locale")).toHaveTextContent("Default locale");
+    expect(screen.getByText("Save the default locale with Save below.")).toBeInTheDocument();
+    expect(screen.getByTestId("set-card-title-locales")).toHaveTextContent("Locales");
+    expect(screen.getByText("Saves immediately")).toBeInTheDocument();
+    expect(screen.getByTestId("set-loc-add")).toHaveTextContent("Add locale");
+    expect(screen.getByText("Locale")).toBeInTheDocument();
+    expect(screen.getByText("Translated pages")).toBeInTheDocument();
+    expect(screen.getByTestId("set-loc-row-open-fr")).toHaveTextContent("French (fr)");
     expect(screen.getByTestId("set-loc-row-pages-fr")).toHaveTextContent("4 of 6");
-    expect(screen.getByTestId("set-loc-row-status-fr")).toHaveTextContent("Pending");
-    expect(screen.getByTestId("set-loc-row-pages-ar")).toHaveTextContent("0 of 6");
-    expect(screen.getByTestId("set-loc-row-status-ar")).toHaveTextContent("Not started");
+    expect(screen.getByTestId("set-loc-row-default-en")).toHaveTextContent("Default");
+    expect(screen.queryByTestId("set-loc-row-remove-en")).toBeNull();
+    expect(screen.getByTestId("set-loc-row-remove-fr")).toHaveTextContent("Remove");
+    expect(screen.queryByText(/Auto-redirect/i)).toBeNull();
+    expect(screen.queryByTestId("set-loc-restore")).toBeNull();
   });
 
-  it("tones the pills green / amber / grey", async () => {
+  it("the default select lists the enabled locales as `<Language> (<code>)`", async () => {
     setup();
     await loaded();
-    expect(screen.getByTestId("set-loc-row-status-en")).toHaveClass("tw:bg-[var(--bk-success-tint)]");
-    expect(screen.getByTestId("set-loc-row-status-fr")).toHaveClass("tw:bg-[var(--bk-yellow-100)]");
-    expect(screen.getByTestId("set-loc-row-status-ar")).toHaveClass("tw:bg-[var(--bk-bg-subtle)]");
-  });
-
-  it("renders no auto-redirect toggle — SA-05, per-locale publish doesn't exist yet", async () => {
-    setup();
-    await loaded();
-    expect(document.getElementById("locale-auto-redirect")).toBeNull();
-    expect(screen.queryByText("Auto-redirect by browser")).toBeNull();
+    const options = Array.from((screen.getByTestId("set-loc-default") as HTMLSelectElement).options).map((o) => o.textContent);
+    expect(options).toEqual(["English (en)", "French (fr)", "Arabic (ar)"]);
   });
 
   it("shows the dashboard-only message with no projectId and reads nothing", () => {
     setup({ projectId: null });
-    expect(screen.getByText(/Open this site from the dashboard to manage locales/i)).toBeInTheDocument();
+    expect(screen.getByText("Open this site from the dashboard to manage locales.")).toBeInTheDocument();
     expect(getMock).not.toHaveBeenCalled();
-    expect(localesMock).not.toHaveBeenCalled();
-  });
-});
-
-describe("LocalizationScreen — the server states", () => {
-  it("draws the loading card with the brief's eyebrow and line, and reports loading", () => {
-    getMock.mockReturnValue(new Promise(() => {}));
-    const onLoadStateChange = vi.fn();
-    setup({ onLoadStateChange });
-    const card = screen.getByTestId("set-load-card");
-    expect(card).toHaveAttribute("data-state", "loading");
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Localization");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("Default locale, enabled locales and translation progress.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
-    expect(onLoadStateChange).toHaveBeenCalledWith("loading");
-    expect(screen.queryByTestId("set-card-default")).toBeNull();
   });
 
-  it("a failed locales read is the load-error card with Try again, which re-runs both reads", async () => {
-    localesMock.mockRejectedValueOnce(new Error("boom"));
-    const onLoadStateChange = vi.fn();
-    setup({ onLoadStateChange });
-    await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"));
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent(
-      "Couldn't load your locales. Check your connection, then try again.",
-    );
-    expect(onLoadStateChange).toHaveBeenCalledWith("error");
+  it("a failed read is the load-error card with Try again", async () => {
+    localesMock.mockRejectedValueOnce(new Error("network"));
+    setup();
+    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Languages");
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();
-    expect(getMock).toHaveBeenCalledTimes(2);
-    expect(localesMock).toHaveBeenCalledTimes(2);
-    expect(onLoadStateChange).toHaveBeenLastCalledWith("ready");
   });
 
-  it("a failed settings read is the same load-error", async () => {
-    getMock.mockRejectedValueOnce(new Error("boom"));
-    setup();
-    await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"));
-  });
-
-  it("draws the shell's save-error banner above the strip", async () => {
-    setup({ saveError: "Localization settings were not saved. Your changes are still here. Review the values, then retry." });
+  it("read-only hides Add locale and Remove", async () => {
+    setup({ readOnly: true });
     await loaded();
-    const banner = screen.getByTestId("set-save-error");
-    expect(banner).toHaveTextContent("Localization settings were not saved.");
-    expect(banner.compareDocumentPosition(screen.getByTestId("set-loc-restore")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByTestId("set-loc-add")).toBeNull();
+    expect(screen.queryByTestId("set-loc-row-remove-fr")).toBeNull();
   });
 });
 
-describe("LocalizationScreen — edits, dirty and the save handler", () => {
-  it("registers no save handler while clean, one once something changed, and reports dirty", async () => {
-    const { box, register } = saveHandlerSpy();
-    const onDirtyChange = vi.fn();
-    setup({ registerSaveHandler: register, onDirtyChange });
+describe("Languages — the default locale is a footer field", () => {
+  it("picking one stages it: dirty, and Save writes only defaultLocale, then adopts seo.language as saved", async () => {
+    const { composer, props } = setup();
     await loaded();
-    expect(box.current).toBeNull();
-    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
-    fireEvent.change(defaultSelect(), { target: { value: "fr" } });
-    await waitFor(() => expect(box.current).not.toBeNull());
-    expect(onDirtyChange).toHaveBeenLastCalledWith(true);
+    expect(lastSave(props.registerSaveHandler)).toBeNull();
+    fireEvent.change(screen.getByTestId("set-loc-default"), { target: { value: "fr" } });
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
+    const save = lastSave(props.registerSaveHandler)!;
+    await act(async () => { await save(); });
+    expect(updateMock).toHaveBeenCalledWith({ id: "s1", defaultLocale: "fr" });
+    expect(composer.adoptSavedProjectSettings).toHaveBeenCalledWith(expect.objectContaining({ seo: expect.objectContaining({ language: "fr" }) }));
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(false);
   });
 
-  it("the handler writes defaultLocale, enabledLocales and the stored localeAutoRedirect unchanged, then re-reads the table", async () => {
-    const { box, register } = saveHandlerSpy();
-    setup({ registerSaveHandler: register });
+  it("a refused Save rejects and keeps the staged value", async () => {
+    updateMock.mockRejectedValueOnce(new Error("nope"));
+    const { props } = setup();
     await loaded();
-    fireEvent.change(defaultSelect(), { target: { value: "fr" } });
-    await waitFor(() => expect(box.current).not.toBeNull());
-    await act(async () => {
-      await box.current!();
-    });
-    expect(updateMock).toHaveBeenCalledWith({
-      id: "s1",
-      defaultLocale: "fr",
-      enabledLocales: ["en", "fr", "ar"],
-      localeAutoRedirect: true,
-    });
-    expect(localesMock).toHaveBeenCalledTimes(2);
-    await waitFor(() => expect(box.current).toBeNull());
+    fireEvent.change(screen.getByTestId("set-loc-default"), { target: { value: "ar" } });
+    await expect(lastSave(props.registerSaveHandler)!()).rejects.toThrow("nope");
+    expect((screen.getByTestId("set-loc-default") as HTMLSelectElement).value).toBe("ar");
   });
+});
 
-  it("the handler rejects when the write is refused, and the edits stay", async () => {
-    updateMock.mockRejectedValueOnce(new Error("BAD_REQUEST"));
-    const { box, register } = saveHandlerSpy();
-    setup({ registerSaveHandler: register });
-    await loaded();
-    fireEvent.change(defaultSelect(), { target: { value: "ar" } });
-    await waitFor(() => expect(box.current).not.toBeNull());
-    await expect(box.current!()).rejects.toThrow("BAD_REQUEST");
-    expect(defaultSelect().value).toBe("ar");
-    expect(box.current).not.toBeNull();
-  });
-
-  it("a changed default moves the `/` path before Save", async () => {
+describe("Languages — locales save immediately", () => {
+  it("Remove of a locale with no translations writes the list at once, without the staged default", async () => {
     setup();
     await loaded();
-    fireEvent.change(defaultSelect(), { target: { value: "fr" } });
-    expect(row("fr")).toHaveTextContent("/");
-    expect(row("en")).toHaveTextContent("/en");
-  });
-
-  it("Remove sits on non-default rows only, hides the row, and the next Save omits the code", async () => {
-    const { box, register } = saveHandlerSpy();
-    setup({ registerSaveHandler: register });
-    await loaded();
-    expect(screen.queryByTestId("set-loc-row-remove-en")).toBeNull();
+    fireEvent.change(screen.getByTestId("set-loc-default"), { target: { value: "fr" } });
     fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
-    expect(screen.queryByTestId("set-loc-row-ar")).toBeNull();
-    expect(Array.from(defaultSelect().options).map((o) => o.value)).toEqual(["en", "fr"]);
-    await waitFor(() => expect(box.current).not.toBeNull());
-    await act(async () => {
-      await box.current!();
-    });
-    expect(updateMock).toHaveBeenCalledWith(expect.objectContaining({ enabledLocales: ["en", "fr"] }));
+    await waitFor(() => expect(updateMock).toHaveBeenCalledWith({ id: "s1", enabledLocales: ["en", "fr"] }));
+    expect(screen.queryByTestId("set-loc-remove-confirm")).toBeNull();
+    await waitFor(() => expect(screen.queryByTestId("set-loc-row-ar")).toBeNull());
+    expect(localesMock).toHaveBeenCalledTimes(2);
   });
 
-  it("Remove is disabled when only the default would remain", async () => {
-    getMock.mockResolvedValue({ defaultLocale: "en", enabledLocales: ["en", "fr"] });
+  it("8135:214262: a locale with translations asks first, says they are kept, and Cancel writes nothing", async () => {
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-loc-row-remove-fr"));
-    expect(screen.queryByTestId("set-loc-row-fr")).toBeNull();
-    expect(screen.queryByTestId("set-loc-row-remove-en")).toBeNull();
-  });
-});
-
-/* The exported document's language comes from the project's SEO block, which
-   no screen wrote — so every head shipped `<html lang="en">` however the
-   site's default locale was set, while the og:locale two lines below it told
-   the truth. */
-describe("LocalizationScreen — the document language follows the default locale", () => {
-  it("writes the chosen locale into the project's SEO language on save, keeping the rest", async () => {
-    const { box, register } = saveHandlerSpy();
-    const { composer } = setup({ registerSaveHandler: register });
-    await loaded();
-    fireEvent.change(defaultSelect(), { target: { value: "fr" } });
-    await waitFor(() => expect(box.current).not.toBeNull());
-    await act(async () => {
-      await box.current!();
-    });
-    expect(composer!.setProjectSettings).toHaveBeenCalledWith(
-      expect.objectContaining({ seo: expect.objectContaining({ language: "fr", siteName: "Acme" }) }),
+    expect(screen.getByTestId("set-loc-remove-title")).toHaveTextContent("Remove French?");
+    expect(screen.getByTestId("set-loc-remove-body")).toHaveTextContent(
+      "4 of 6 pages have French translations. They are kept and come back if you add French again.",
     );
+    expect(screen.getByTestId("set-loc-remove-ok")).toHaveTextContent("Remove French");
+    fireEvent.click(screen.getByTestId("set-loc-remove-cancel"));
+    expect(updateMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("set-loc-row-remove-fr"));
+    fireEvent.click(screen.getByTestId("set-loc-remove-ok"));
+    await waitFor(() => expect(updateMock).toHaveBeenCalledWith({ id: "s1", enabledLocales: ["en", "ar"] }));
   });
 
-  it("leaves the composer alone when the language already matches", async () => {
-    const { box, register } = saveHandlerSpy();
-    const { composer } = setup({ registerSaveHandler: register });
+  it("removing the staged default puts the select back on the saved one", async () => {
+    setup();
     await loaded();
-    // Dirty the screen without touching the default locale (still "en",
-    // matching the composer's seo.language) — removing a non-default row.
+    fireEvent.change(screen.getByTestId("set-loc-default"), { target: { value: "ar" } });
     fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
-    await waitFor(() => expect(box.current).not.toBeNull());
-    await act(async () => {
-      await box.current!();
-    });
-    expect(updateMock).toHaveBeenCalled();
-    expect(composer!.setProjectSettings).not.toHaveBeenCalled();
-  });
-});
-
-describe("LocalizationScreen — the header's Add locale and the dialogs", () => {
-  function setupWithHeader() {
-    const composer = createMockComposer({ projectSettings: { seo: {} }, projectMetadata: { name: "Bella Cucina" } });
-    render(
-      <HeaderHost
-        render={(register) => (
-          <LocalizationScreen composer={composer} projectId="s1" registerHeaderAction={register} />
-        )}
-      />,
-    );
-  }
-
-  it("hands the shell `Add locale` once the rows are here — not while loading", async () => {
-    getMock.mockReturnValue(new Promise(() => {}));
-    setupWithHeader();
-    expect(screen.queryByTestId("set-loc-add")).toBeNull();
+    await waitFor(() => expect((screen.getByTestId("set-loc-default") as HTMLSelectElement).value).toBe("en"));
   });
 
-  it("Add locale opens the dialog scoped to the site, listing only the locales not yet enabled", async () => {
-    setupWithHeader();
+  it("a refused Remove says so on the card", async () => {
+    updateMock.mockRejectedValueOnce(new Error("Server said no"));
+    setup();
     await loaded();
-    const add = await screen.findByTestId("set-loc-add");
-    expect(within(screen.getByTestId("header-slot")).getByTestId("set-loc-add")).toBe(add);
-    expect(add).toHaveTextContent("Add locale");
-    expect(add).toHaveClass("tw:h-9");
-    fireEvent.click(add);
-    expect(screen.getByTestId("set-loc-dialog")).toBeInTheDocument();
-    expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent("Bella Cucina · Localization");
-    const options = Array.from((screen.getByTestId("set-loc-language") as HTMLSelectElement).options).map((o) => o.value);
-    expect(options).not.toContain("en");
-    expect(options).not.toContain("fr");
-    expect(options).not.toContain("ar");
-    expect(options).toContain("es");
+    fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
+    expect(await screen.findByTestId("set-loc-action-error")).toHaveTextContent("Arabic was not removed: Server said no");
+    expect(screen.getByTestId("set-loc-row-ar")).toBeInTheDocument();
   });
 
-  it("Create locale writes at once — the enabled list plus the code, the default when asked — closes, and re-reads", async () => {
-    setupWithHeader();
+  it("Add locale writes at once — the list plus the code, the default only when asked — and closes", async () => {
+    setup();
     await loaded();
-    fireEvent.click(await screen.findByTestId("set-loc-add"));
+    fireEvent.click(screen.getByTestId("set-loc-add"));
+    expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent("Bella Cucina · Languages");
     fireEvent.change(screen.getByTestId("set-loc-language"), { target: { value: "de" } });
+    fireEvent.click(screen.getByTestId("set-loc-create"));
+    await waitFor(() => expect(updateMock).toHaveBeenCalledWith({ id: "s1", enabledLocales: ["en", "fr", "ar", "de"] }));
+    await waitFor(() => expect(screen.queryByTestId("set-loc-dialog")).toBeNull());
+
+    fireEvent.click(screen.getByTestId("set-loc-add"));
+    fireEvent.change(screen.getByTestId("set-loc-language"), { target: { value: "es" } });
     fireEvent.click(screen.getByTestId("set-loc-set-default"));
     fireEvent.click(screen.getByTestId("set-loc-create"));
     await waitFor(() =>
-      expect(updateMock).toHaveBeenCalledWith({
-        id: "s1",
-        defaultLocale: "de",
-        enabledLocales: ["en", "fr", "ar", "de"],
-        localeAutoRedirect: true,
-      }),
+      expect(updateMock).toHaveBeenLastCalledWith({ id: "s1", enabledLocales: ["en", "fr", "ar", "de", "es"], defaultLocale: "es" }),
     );
-    await waitFor(() => expect(screen.queryByTestId("set-loc-dialog")).toBeNull());
-    await waitFor(() => expect(getMock).toHaveBeenCalledTimes(2));
-    expect(localesMock).toHaveBeenCalledTimes(2);
   });
 
   it("a refused Create stays in the dialog with its error line", async () => {
     updateMock.mockRejectedValueOnce(new Error("The default locale must be in the enabled locales list."));
-    setupWithHeader();
+    setup();
     await loaded();
-    fireEvent.click(await screen.findByTestId("set-loc-add"));
+    fireEvent.click(screen.getByTestId("set-loc-add"));
     fireEvent.click(screen.getByTestId("set-loc-create"));
     expect(await screen.findByTestId("set-loc-error")).toHaveTextContent("The default locale must be in the enabled locales list.");
-    expect(screen.getByTestId("set-loc-dialog")).toBeInTheDocument();
-    expect(getMock).toHaveBeenCalledTimes(1);
   });
 
-  it("a row opens the Translation checklist for that locale; Back closes it", async () => {
-    setupWithHeader();
+  it("a locale's name opens its Translation checklist", async () => {
+    setup();
     await loaded();
-    fireEvent.click(row("ar"));
-    expect(screen.getByTestId("set-loc-check")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("set-loc-row-open-ar"));
     expect(screen.getByTestId("set-loc-check-title")).toHaveTextContent("Arabic · Translation checklist");
-    expect(screen.getByTestId("set-loc-check-meta")).toHaveTextContent("Bella Cucina · /ar · Draft · 0 of 6 pages");
-    expect(screen.getByTestId("set-loc-check-line")).toHaveTextContent(
-      "Right-to-left locale. Begin with Home, then Menu, Contact, About, Reservations and Privacy.",
-    );
     fireEvent.click(screen.getByTestId("set-loc-check-back"));
     expect(screen.queryByTestId("set-loc-check")).toBeNull();
-  });
-
-  it("the locale name is the row's keyboard door, and Remove does not open the checklist", async () => {
-    setupWithHeader();
-    await loaded();
-    fireEvent.click(screen.getByTestId("set-loc-row-remove-fr"));
-    expect(screen.queryByTestId("set-loc-check")).toBeNull();
-    fireEvent.click(screen.getByTestId("set-loc-row-open-en"));
-    expect(screen.getByTestId("set-loc-check-title")).toHaveTextContent("English · Translation checklist");
-    expect(screen.getByTestId("set-loc-check-meta")).toHaveTextContent("Bella Cucina · / · Live · 6 of 6 pages");
   });
 });
