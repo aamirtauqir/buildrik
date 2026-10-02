@@ -111,11 +111,13 @@ export const sitesRouter = router({
       }
     }),
 
+  // PD-4 (BE-5): the site's name is a Site setting, and Site settings are
+  // ADMIN everywhere (`siteDetail.settings.update` writes `name` at ADMIN too).
   rename: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(2).max(100) }))
     .mutation(async ({ ctx, input }) => {
       try {
-        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
