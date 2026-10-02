@@ -15,6 +15,7 @@ import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms
 import type { SiteVariable } from "@/shared/types/project";
 import type { ConditionBinding, ConditionExpression, DataSource } from "@/shared/types/data";
 import {
+  consumeDirectSync,
   markDirectSync,
   syncEntryUpsert,
 } from "@/services/cmsSync";
@@ -23,15 +24,6 @@ import {
   loadLegacySiteVariables,
   variablesToSourceData,
 } from "./contentPanelUtils";
-
-/* Fire-and-await the entry mirror so the sheet's save can branch on
-   `reached`. The `markDirectSync` flag is consumed by the event-driven mirror
-   in `useCmsSync` (see `cmsSync.consumeDirectSync`), so this is the only POST
-   the save produces. */
-async function syncEntryUpsertDirect(item: CMSContentItem): Promise<boolean> {
-  markDirectSync("entry", item.id);
-  return syncEntryUpsert(item);
-}
 
 export type ContentView =
   | { kind: "root" }
@@ -225,22 +217,36 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     ): Promise<{ item: CMSContentItem | null; reached: boolean }> => {
       if (!composer) return { item: null, reached: true };
       const status = published ? ("published" as const) : ("draft" as const);
-      let item: CMSContentItem | null;
-      if (recordId) {
-        item = await composer.cms.collections.updateContentItem(recordId, { data, status });
-      } else {
-        item = await composer.cms.collections.createContentItem(collectionId, data);
-        if (item && status !== "draft") {
-          item = await composer.cms.collections.updateContentItem(item.id, { status });
-        }
-      }
       /* P0-B audit 2026-09-30: the sheet's save needs to know whether the
-         mirror landed on the server. Fire the sync DIRECTLY so we get a
-         reach signal, and mark `directSync` so the event-driven mirror in
-         `useCmsSync` skips its own POST for this id (two identical upserts
-         is a wasted round-trip plus a flicker on the conflict-listener
-         affordances). */
-      const reached = item ? await syncEntryUpsertDirect(item) : true;
+         mirror landed on the server, so it fires the sync DIRECTLY for a
+         reach signal, and `markDirectSync` makes the event-driven mirror in
+         `useCmsSync` skip its own POST for this id. The mark has to be set
+         BEFORE the engine write: updateContentItem emits its event while it
+         runs, so a mark set afterwards was never seen — every save POSTed
+         twice (two "changed elsewhere" toasts on a conflict, C0.3 live
+         2026-10-02) and the unconsumed mark then swallowed the NEXT mirror
+         for this record. A new record's id only exists after the create, so
+         its create mirror is the event's; the mark covers the publish step. */
+      let item: CMSContentItem | null = null;
+      let reached = true;
+      if (recordId) markDirectSync("entry", recordId);
+      try {
+        if (recordId) {
+          item = await composer.cms.collections.updateContentItem(recordId, { data, status });
+        } else {
+          item = await composer.cms.collections.createContentItem(collectionId, data);
+          if (item && status !== "draft") {
+            markDirectSync("entry", item.id);
+            item = await composer.cms.collections.updateContentItem(item.id, { status });
+          }
+        }
+        if (item) reached = await syncEntryUpsert(item);
+      } finally {
+        /* A write that threw (validation) never emitted — drop the mark so it
+           can't swallow a later, unrelated mirror. */
+        if (recordId) consumeDirectSync("entry", recordId);
+        if (item) consumeDirectSync("entry", item.id);
+      }
       await loadRecords(collectionId);
       reload();
       return { item, reached };
