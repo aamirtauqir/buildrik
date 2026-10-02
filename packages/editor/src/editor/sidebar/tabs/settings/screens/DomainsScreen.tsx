@@ -1,24 +1,29 @@
 /**
- * Domains — Clone 3397:32206 (`SEO & publishing / Domains`): the site's
- * custom domains and the DNS behind each one.
+ * Domains — PUBLISHING / Domains (8136:214348 several, 8136:214574
+ * set-primary-confirm; states from 4418:127680 / 4418:129084 loading /
+ * 4418:129186 empty / 4418:129290 load-error / 4418:129393 save-error).
  *
  * Nothing on this screen is saved by the footer — every action lands on the
- * server as it is confirmed, so the screen is never dirty and the shell's
- * footer reads `Actions apply immediately · nothing to save here` · Done.
- * The rows come from `domains.list` on open (3397:32985 loading, 3397:33085
- * load-error with Try again); none → the one empty card (3397:33034), and
- * right after a remove that card carries `<domain> removed…` (3455:15509).
- * Per domain, primary first: a **Custom domain** card — the name, its
- * status pill, `Force HTTPS` (writes `domains.update` at once) and
- * `Remove <domain>…` (3397:34402 confirm → `domains.remove`) — and a **DNS
- * records** card whose pills are `DnsRecord.verified` and whose `Check DNS`
- * runs `domains.check`, the real resolver. `Add domain` sits in the shell's
- * header (`registerHeaderAction`) and opens 3737:43669, which connects and
- * re-lists. A refused remove, toggle or check shows the banner (3397:33134)
- * over the cards, which stay as the server has them.
+ * server as it is confirmed, so the screen is never dirty (scope line "Live
+ * immediately"). The rows come from `domains.list` on open; none → the one
+ * empty card, and right after a remove that card carries `<domain> removed…`.
  *
- * Connect, remove and the toggle are ADMIN actions: a non-admin sees them
- * DISABLED with the reason attached, never hidden; the server enforces.
+ * The list (8136:214348): one card per domain, primary first — the name, the
+ * PRIMARY badge on the primary, its connection line (`Connected · SSL
+ * active`), `Set as primary` on every other domain (→ 8136:214574 →
+ * `domains.setPrimary`, ADMIN, verified domains only) and `Manage DNS`; under
+ * the cards `Add a domain` (→ AddDomainDialog → `domains.connect`).
+ *
+ * `Manage DNS` opens the domain's own view (the header reads `Domains /
+ * <domain>`): the Custom domain card — status, `Force HTTPS` (writes
+ * `domains.update` at once), `Remove <domain>…` (→ RemoveDomainDialog →
+ * `domains.remove`) — and the DNS records card, whose `Check DNS` runs
+ * `domains.check`. A refused remove, toggle or check shows the banner over
+ * the cards, which stay as the server has them.
+ *
+ * Connect, remove, set-primary and the toggle are ADMIN actions: a non-admin
+ * sees them DISABLED with the reason attached, never hidden; the server
+ * enforces.
  *
  * @license BSD-3-Clause
  */
@@ -31,9 +36,7 @@ import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
   LoadCard,
-  SCREEN_INFO,
   SET_BTN,
-  SET_HEAD_BTN,
   SET_TABLE,
   SET_TD,
   SET_TH,
@@ -41,7 +44,6 @@ import {
   type PillTone,
   SET_CARD,
   SET_EYEBROW,
-  SET_RESTORE_STRIP,
   SET_ROW,
   SET_ROW_LABEL,
   SaveErrorBanner,
@@ -53,6 +55,8 @@ import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 import { AddDomainDialog, type AddDomainSubmission } from "../components/AddDomainDialog";
 import { RemoveDomainDialog } from "../components/RemoveDomainDialog";
+import { SetPrimaryDomainDialog } from "../components/SetPrimaryDomainDialog";
+
 export interface DnsRecordRow {
   type: string;
   host: string;
@@ -66,6 +70,8 @@ export interface DomainRow {
   domain: string;
   /** PENDING | VERIFIED | FAILED */
   status: string;
+  /** PENDING | ACTIVE — the certificate, issued once the domain points here. */
+  sslStatus: string;
   isPrimary: boolean;
   /** PRIMARY | REDIRECT | SUBDOMAIN */
   kind: string;
@@ -76,8 +82,9 @@ export interface DomainRow {
 
 const CARD_LINE = "Point your own domain at this site. DNS changes happen at your domain registrar.";
 const ADMIN_REASON = "Only an admin can change the domain";
+const VERIFY_FIRST = "Verify this domain before making it primary";
 
-type Busy = { kind: "https" | "check" | "remove"; id: string } | null;
+type Busy = { kind: "https" | "check" | "remove" | "primary"; id: string } | null;
 
 const primaryFirst = (rows: DomainRow[]): DomainRow[] =>
   [...rows].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
@@ -85,6 +92,17 @@ const primaryFirst = (rows: DomainRow[]): DomainRow[] =>
 /** `dom-domain`, `dom-domain-1`, … — the first domain's controls carry the
  *  bare ids the search registry points at; the rest stay unique. */
 const nth = (stem: string, i: number) => (i === 0 ? stem : `${stem}-${i}`);
+
+/** 8136:214348's line under each name: where the domain is, and its certificate. */
+export function connectionLine(row: Pick<DomainRow, "status" | "sslStatus">): string {
+  if (row.status === "VERIFIED") return `Connected · ${row.sslStatus === "ACTIVE" ? "SSL active" : "SSL pending"}`;
+  if (row.status === "FAILED") return "DNS not found · check your records";
+  return "Waiting for DNS · not connected yet";
+}
+
+/** The server's sentence for a refused set-primary, else ours. */
+const refusal = (e: unknown) =>
+  e instanceof Error && e.message ? e.message : "The primary domain was not changed. Try again.";
 
 // ─── Status pill ─────────────────────────────────────────────────────────────
 
@@ -98,9 +116,21 @@ const StatusPill: React.FC<{ status: string; "data-testid"?: string }> = ({ stat
   );
 };
 
-// ─── Row chrome ──────────────────────────────────────────────────────────────
+// ─── Chrome ──────────────────────────────────────────────────────────────────
 
 const LINE = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
+
+/* 8136:214348: a card per domain — 24 in, 16 between the name and its row. */
+const DOMAIN_CARD = `${SET_CARD} tw:flex tw:flex-col tw:gap-4 tw:p-6`;
+const DOMAIN_NAME =
+  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
+const DOMAIN_LINE = "tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+/* The board's PRIMARY badge: the accent on its tint, not a status tone. */
+const PRIMARY_BADGE =
+  "tw:inline-flex tw:h-5.5 tw:shrink-0 tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] " +
+  "tw:px-2 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:text-[var(--bk-accent)]";
+/* The row's actions are text buttons — ink 13/500, no box (8136:214538). */
+const ROW_ACTION = `${SET_BTN} tw:shrink-0 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
@@ -110,12 +140,13 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
   onDirtyChange,
   onLoadStateChange,
   registerRetryLoad,
-  registerHeaderAction,
+  registerHeader,
   saveError,
+  readOnly,
 }) => {
   const role = useEditorRole();
   // null role = unknown → don't gate in chrome; the server still enforces.
-  const canManage = roleAtLeast(role, "ADMIN") !== false;
+  const canManage = !readOnly && roleAtLeast(role, "ADMIN") !== false;
   const siteName = composer?.getProjectMetadata?.()?.name ?? "";
 
   const [rows, setRows] = React.useState<DomainRow[]>([]);
@@ -123,7 +154,11 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
   const [actionFailed, setActionFailed] = React.useState(false);
   const [addOpen, setAddOpen] = React.useState(false);
   const [removeTarget, setRemoveTarget] = React.useState<DomainRow | null>(null);
-  /** The domain a remove just took away — 3455:15509, gone on the next visit. */
+  const [primaryTarget, setPrimaryTarget] = React.useState<DomainRow | null>(null);
+  const [primaryError, setPrimaryError] = React.useState<string | null>(null);
+  /** The domain whose `Manage DNS` view is open; null = the list. */
+  const [managingId, setManagingId] = React.useState<string | null>(null);
+  /** The domain a remove just took away — gone on the next visit. */
   const [removedDomain, setRemovedDomain] = React.useState<string | null>(null);
 
   // Nothing here waits for Save: the footer has no Save to enable.
@@ -152,32 +187,14 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
     }
   }, [projectId, load.retry]);
 
-  const ready = load.state === "ready";
-  const hasRows = rows.length > 0;
+  const managing = managingId ? rows.find((r) => r.id === managingId) ?? null : null;
 
-  // The header's `Add domain` (3397:32206) — the shell renders it. On the
-  // empty card the button is the card's own, so the header carries none.
+  // The Manage DNS view names its domain in the shell's header.
   React.useEffect(() => {
-    if (!registerHeaderAction) return;
-    if (!ready || !hasRows) {
-      registerHeaderAction(null);
-      return;
-    }
-    registerHeaderAction(
-      <Button
-        type="button"
-        size="xs"
-        className={SET_HEAD_BTN}
-        disabled={!canManage}
-        title={canManage ? undefined : ADMIN_REASON}
-        onClick={() => setAddOpen(true)}
-        data-testid="set-dom-add"
-      >
-        Add domain
-      </Button>,
-    );
-    return () => registerHeaderAction(null);
-  }, [registerHeaderAction, ready, hasRows, canManage]);
+    if (!registerHeader) return;
+    registerHeader(managing ? { title: managing.domain } : null);
+  }, [registerHeader, managing?.domain]);
+  React.useEffect(() => () => registerHeader?.(null), [registerHeader]);
 
   const setForceHttps = async (row: DomainRow, next: boolean) => {
     setBusy({ kind: "https", id: row.id });
@@ -214,11 +231,28 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
     try {
       await api().remove.mutate({ id: target.id });
       setRemoveTarget(null);
+      setManagingId(null);
       setRemovedDomain(target.domain);
       await relist();
     } catch {
       setRemoveTarget(null);
       setActionFailed(true);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const setPrimary = async () => {
+    const target = primaryTarget;
+    if (!target || !projectId) return;
+    setBusy({ kind: "primary", id: target.id });
+    setPrimaryError(null);
+    try {
+      await api().setPrimary.mutate({ id: target.id, siteId: projectId });
+      setPrimaryTarget(null);
+      await relist();
+    } catch (e) {
+      setPrimaryError(refusal(e));
     } finally {
       setBusy(null);
     }
@@ -259,156 +293,22 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
   }
 
   const banner = saveError ?? (actionFailed ? SAVE_ERROR_MESSAGES.domains : null);
+  const addButton = (
+    <Button
+      type="button"
+      size="xs"
+      className={`${SET_BTN} tw:w-fit`}
+      disabled={!canManage}
+      title={canManage ? undefined : ADMIN_REASON}
+      onClick={() => setAddOpen(true)}
+      data-testid="set-dom-add"
+    >
+      Add a domain
+    </Button>
+  );
 
-  return (
-    <Screen>
-      {banner ? <SaveErrorBanner message={banner} /> : null}
-
-      <div className={SCREEN_INFO} data-testid="set-dom-strip">
-        Domain actions apply as soon as you confirm them. There is nothing to save on this screen.
-      </div>
-      <div className={SET_RESTORE_STRIP} data-testid="set-dom-restore">
-        Restoring a site version leaves this configuration unchanged.
-      </div>
-
-      {!hasRows ? (
-        <section className={`${SET_CARD} tw:flex tw:flex-col tw:items-start tw:gap-2 tw:p-4`} data-testid="set-dom-empty">
-          <div className={SET_EYEBROW}>Custom domain</div>
-          <div className={LINE}>{CARD_LINE}</div>
-          {removedDomain ? (
-            <div className={LINE} role="status" data-testid="set-dom-removed">
-              {removedDomain} removed. This site is still available at its buildrick.app address.
-            </div>
-          ) : (
-            <div className={LINE}>No custom domain. Using the free buildrick.app address until you connect one.</div>
-          )}
-          <Button
-            type="button"
-            size="xs"
-            className={`${SET_BTN} tw:mt-1`}
-            disabled={!canManage}
-            title={canManage ? undefined : ADMIN_REASON}
-            onClick={() => setAddOpen(true)}
-            data-testid="set-dom-add"
-          >
-            Add domain
-          </Button>
-        </section>
-      ) : null}
-
-      {rows.map((row, i) => (
-        <React.Fragment key={row.id}>
-          <div data-testid={`set-dom-card-${row.id}`}>
-            <Section title="Custom domain" anchor={nth("custom-domain", i)}>
-              <div className={SET_ROW}>
-                <span id={`${nth("dom-domain", i)}-label`} className={SET_ROW_LABEL}>
-                  Domain
-                </span>
-                <TextInput
-                  id={nth("dom-domain", i)}
-                  type="text"
-                  value={row.domain}
-                  readOnly
-                  aria-labelledby={`${nth("dom-domain", i)}-label`}
-                  className="tw:min-w-0 tw:flex-1"
-                />
-              </div>
-              <div className={SET_ROW}>
-                <span className={SET_ROW_LABEL}>Status</span>
-                <StatusPill status={row.status} data-testid={`set-dom-status-${row.id}`} />
-              </div>
-              <div className={SET_ROW}>
-                <span id={`${nth("dom-force-https", i)}-label`} className={SET_ROW_LABEL}>
-                  Force HTTPS
-                </span>
-                <ToggleSwitch
-                  id={nth("dom-force-https", i)}
-                  checked={row.forceHttps}
-                  onChange={(next) => void setForceHttps(row, next)}
-                  disabled={!canManage || isBusy("https", row.id)}
-                  title={canManage ? undefined : ADMIN_REASON}
-                  aria-labelledby={`${nth("dom-force-https", i)}-label`}
-                  sizing="md"
-                  data-testid={`set-dom-https-${row.id}`}
-                />
-              </div>
-              <div className="tw:col-span-full">
-                <Button
-                  type="button"
-                  size="xs"
-                  variant="danger"
-                  className={SET_BTN}
-                  disabled={!canManage}
-                  title={canManage ? undefined : ADMIN_REASON}
-                  onClick={() => setRemoveTarget(row)}
-                  data-testid={`set-dom-remove-${row.id}`}
-                >
-                  Remove {row.domain}…
-                </Button>
-              </div>
-            </Section>
-          </div>
-
-          <div data-testid={`set-dom-dns-${row.id}`}>
-            <Section title="DNS records" anchor={nth("dns-records", i)}>
-              <table className={SET_TABLE} id={nth("dom-dns-records", i)} aria-label={`DNS records for ${row.domain}`}>
-                <thead>
-                  <tr>
-                    <th scope="col" className={`${SET_TH} tw:w-14`}>
-                      Type
-                    </th>
-                    <th scope="col" className={`${SET_TH} tw:w-26`}>
-                      Name
-                    </th>
-                    <th scope="col" className={`${SET_TH} tw:w-62`}>
-                      Value
-                    </th>
-                    <th scope="col" className={`${SET_TH} tw:pr-0`}>
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {row.dnsRecords.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} className={`${SET_TD} tw:text-[var(--bk-ink-muted)]`}>
-                        No DNS records for this domain.
-                      </td>
-                    </tr>
-                  ) : (
-                    row.dnsRecords.map((rec, j) => (
-                      <tr key={`${rec.type}-${rec.host}-${j}`} data-testid={`set-dom-dns-row-${row.id}-${j}`}>
-                        <td className={SET_TD}>{rec.type}</td>
-                        <td className={`${SET_TD} tw:truncate`}>{rec.host}</td>
-                        <td className={`${SET_TD} tw:truncate tw:text-[var(--bk-ink-soft)]`} title={rec.value}>
-                          {rec.value}
-                        </td>
-                        <td className={`${SET_TD} tw:pr-0`}>
-                          <StatusPill status={rec.verified ? "VERIFIED" : "PENDING"} data-testid={`set-dom-dns-state-${row.id}-${j}`} />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-              <div className="tw:col-span-full">
-                <Button
-                  type="button"
-                  size="xs"
-                  variant="secondary"
-                  className={SET_BTN}
-                  disabled={isBusy("check", row.id)}
-                  onClick={() => void checkDns(row)}
-                  data-testid={`set-dom-check-${row.id}`}
-                >
-                  {isBusy("check", row.id) ? "Checking…" : "Check DNS"}
-                </Button>
-              </div>
-            </Section>
-          </div>
-        </React.Fragment>
-      ))}
-
+  const dialogs = (
+    <>
       <AddDomainDialog
         open={addOpen}
         siteName={siteName}
@@ -423,6 +323,223 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
         onCancel={() => setRemoveTarget(null)}
         onRemove={() => void removeDomain()}
       />
+      <SetPrimaryDomainDialog
+        domain={primaryTarget?.domain ?? null}
+        busy={primaryTarget !== null && isBusy("primary", primaryTarget.id)}
+        error={primaryError}
+        onCancel={() => {
+          setPrimaryTarget(null);
+          setPrimaryError(null);
+        }}
+        onConfirm={() => void setPrimary()}
+      />
+    </>
+  );
+
+  // ── Manage DNS: one domain's settings and records ──
+  if (managing) {
+    const i = rows.indexOf(managing);
+    const row = managing;
+    return (
+      <Screen>
+        {banner ? <SaveErrorBanner message={banner} /> : null}
+        <Button
+          type="button"
+          size="xs"
+          variant="ghost"
+          className={`${ROW_ACTION} tw:w-fit tw:px-0`}
+          onClick={() => setManagingId(null)}
+          data-testid="set-dom-back"
+        >
+          ‹ All domains
+        </Button>
+
+        <div data-testid={`set-dom-card-${row.id}`}>
+          <Section title="Custom domain" anchor={nth("custom-domain", i)}>
+            <div className={SET_ROW}>
+              <span id={`${nth("dom-domain", i)}-label`} className={SET_ROW_LABEL}>
+                Domain
+              </span>
+              <TextInput
+                id={nth("dom-domain", i)}
+                type="text"
+                value={row.domain}
+                readOnly
+                aria-labelledby={`${nth("dom-domain", i)}-label`}
+                className="tw:min-w-0 tw:flex-1"
+              />
+            </div>
+            <div className={SET_ROW}>
+              <span className={SET_ROW_LABEL}>Status</span>
+              <StatusPill status={row.status} data-testid={`set-dom-status-${row.id}`} />
+            </div>
+            <div className={SET_ROW}>
+              <span id={`${nth("dom-force-https", i)}-label`} className={SET_ROW_LABEL}>
+                Force HTTPS
+              </span>
+              <ToggleSwitch
+                id={nth("dom-force-https", i)}
+                checked={row.forceHttps}
+                onChange={(next) => void setForceHttps(row, next)}
+                disabled={!canManage || isBusy("https", row.id)}
+                title={canManage ? undefined : ADMIN_REASON}
+                aria-labelledby={`${nth("dom-force-https", i)}-label`}
+                sizing="md"
+                data-testid={`set-dom-https-${row.id}`}
+              />
+            </div>
+            <div className="tw:col-span-full">
+              <Button
+                type="button"
+                size="xs"
+                variant="danger"
+                className={SET_BTN}
+                disabled={!canManage}
+                title={canManage ? undefined : ADMIN_REASON}
+                onClick={() => setRemoveTarget(row)}
+                data-testid={`set-dom-remove-${row.id}`}
+              >
+                Remove {row.domain}…
+              </Button>
+            </div>
+          </Section>
+        </div>
+
+        <div data-testid={`set-dom-dns-${row.id}`}>
+          <Section title="DNS records" anchor={nth("dns-records", i)}>
+            <table className={SET_TABLE} id={nth("dom-dns-records", i)} aria-label={`DNS records for ${row.domain}`}>
+              <thead>
+                <tr>
+                  <th scope="col" className={`${SET_TH} tw:w-14`}>
+                    Type
+                  </th>
+                  <th scope="col" className={`${SET_TH} tw:w-26`}>
+                    Name
+                  </th>
+                  <th scope="col" className={`${SET_TH} tw:w-62`}>
+                    Value
+                  </th>
+                  <th scope="col" className={`${SET_TH} tw:pr-0`}>
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {row.dnsRecords.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className={`${SET_TD} tw:text-[var(--bk-ink-muted)]`}>
+                      No DNS records for this domain.
+                    </td>
+                  </tr>
+                ) : (
+                  row.dnsRecords.map((rec, j) => (
+                    <tr key={`${rec.type}-${rec.host}-${j}`} data-testid={`set-dom-dns-row-${row.id}-${j}`}>
+                      <td className={SET_TD}>{rec.type}</td>
+                      <td className={`${SET_TD} tw:truncate`}>{rec.host}</td>
+                      <td className={`${SET_TD} tw:truncate tw:text-[var(--bk-ink-soft)]`} title={rec.value}>
+                        {rec.value}
+                      </td>
+                      <td className={`${SET_TD} tw:pr-0`}>
+                        <StatusPill status={rec.verified ? "VERIFIED" : "PENDING"} data-testid={`set-dom-dns-state-${row.id}-${j}`} />
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+            <div className="tw:col-span-full">
+              <Button
+                type="button"
+                size="xs"
+                variant="secondary"
+                className={SET_BTN}
+                disabled={isBusy("check", row.id)}
+                onClick={() => void checkDns(row)}
+                data-testid={`set-dom-check-${row.id}`}
+              >
+                {isBusy("check", row.id) ? "Checking…" : "Check DNS"}
+              </Button>
+            </div>
+          </Section>
+        </div>
+        {dialogs}
+      </Screen>
+    );
+  }
+
+  // ── The list (8136:214348) ──
+  return (
+    <Screen>
+      {banner ? <SaveErrorBanner message={banner} /> : null}
+
+      {rows.length === 0 ? (
+        <section className={`${SET_CARD} tw:flex tw:flex-col tw:items-start tw:gap-2 tw:p-4`} data-testid="set-dom-empty">
+          <div className={SET_EYEBROW}>Custom domain</div>
+          <div className={LINE}>{CARD_LINE}</div>
+          {removedDomain ? (
+            <div className={LINE} role="status" data-testid="set-dom-removed">
+              {removedDomain} removed. This site is still available at its buildrick.app address.
+            </div>
+          ) : (
+            <div className={LINE}>No custom domain. Using the free buildrick.app address until you connect one.</div>
+          )}
+          <div className="tw:mt-1">{addButton}</div>
+        </section>
+      ) : (
+        <>
+          {removedDomain ? (
+            <div className={LINE} role="status" data-testid="set-dom-removed">
+              {removedDomain} removed.
+            </div>
+          ) : null}
+          {rows.map((row, i) => (
+            <section key={row.id} className={DOMAIN_CARD} data-testid={`set-dom-item-${row.id}`}>
+              <h3 className={DOMAIN_NAME} id={i === 0 ? "dom-domain" : undefined}>
+                {row.domain}
+              </h3>
+              <div className="tw:flex tw:min-h-8 tw:items-center tw:gap-4">
+                {row.isPrimary ? (
+                  <span className={PRIMARY_BADGE} id={i === 0 ? "dom-primary" : undefined} data-testid={`set-dom-primary-${row.id}`}>
+                    Primary
+                  </span>
+                ) : null}
+                <span className={DOMAIN_LINE} data-testid={`set-dom-line-${row.id}`}>
+                  {connectionLine(row)}
+                </span>
+                {row.isPrimary ? null : (
+                  <Button
+                    type="button"
+                    size="xs"
+                    variant="ghost"
+                    className={ROW_ACTION}
+                    disabled={!canManage || row.status !== "VERIFIED"}
+                    title={!canManage ? ADMIN_REASON : row.status !== "VERIFIED" ? VERIFY_FIRST : undefined}
+                    onClick={() => {
+                      setPrimaryError(null);
+                      setPrimaryTarget(row);
+                    }}
+                    data-testid={`set-dom-make-primary-${row.id}`}
+                  >
+                    Set as primary
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  size="xs"
+                  variant="ghost"
+                  className={ROW_ACTION}
+                  onClick={() => setManagingId(row.id)}
+                  data-testid={`set-dom-manage-${row.id}`}
+                >
+                  Manage DNS
+                </Button>
+              </div>
+            </section>
+          ))}
+          {addButton}
+        </>
+      )}
+      {dialogs}
     </Screen>
   );
 };
