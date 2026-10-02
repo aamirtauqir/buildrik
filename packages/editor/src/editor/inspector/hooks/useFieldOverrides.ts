@@ -68,15 +68,23 @@ const REREAD_ON = [
 const selectorOf = (elementId: string) => `[data-buildrick-id="${elementId}"]`;
 const mediaOf = (bp: BreakpointId) => (bp === "desktop" ? undefined : getBreakpointQuery(bp) ?? undefined);
 
-function readMaster(composer: Composer, elementId: string): Pick<Read, "master" | "masterName"> {
+/** The properties an element inside a (live) component instance sets over its
+ *  master — the variant's styles are the master's, not an override. */
+export function masterOverrideProps(composer: Composer, elementId: string): string[] {
   const components = composer.components;
   const instance = components?.findInstanceContainingElement?.(elementId);
-  if (!instance || instance.isDetached) return { master: [], masterName: null };
+  if (!instance || instance.isDetached) return [];
   const all = components.getOverridesForElement(elementId);
   const variant = components.getVariantStylesForElement(elementId) ?? {};
+  return Object.keys(all).filter((p) => !(p in variant) || variant[p] !== all[p]);
+}
+
+function readMaster(composer: Composer, elementId: string): Pick<Read, "master" | "masterName"> {
+  const instance = composer.components?.findInstanceContainingElement?.(elementId);
+  if (!instance || instance.isDetached) return { master: [], masterName: null };
   return {
-    master: Object.keys(all).filter((p) => !(p in variant) || variant[p] !== all[p]),
-    masterName: components.getComponent(instance.componentId)?.name ?? null,
+    master: masterOverrideProps(composer, elementId),
+    masterName: composer.components.getComponent(instance.componentId)?.name ?? null,
   };
 }
 

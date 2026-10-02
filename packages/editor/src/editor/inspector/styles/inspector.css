@@ -341,11 +341,11 @@
 .bdi-fill.invalid:focus-within {
   border-color: var(--bk-error);
 }
-/* "Mixed" (DD-12) reads as a placeholder, never as a value. */
+/* "Mixed" (DD-12) reads as a placeholder, never as a value: muted ink,
+   upright as board 22 draws it. */
 .bdi-fld.mixed input::placeholder,
 .bdi-fill.mixed input::placeholder {
   color: var(--bk-ink-muted);
-  font-style: italic;
 }
 
 /* A field a section draws itself (a flowbite TextInput straight in a row —

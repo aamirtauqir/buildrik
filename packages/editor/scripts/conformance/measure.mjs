@@ -27,11 +27,15 @@ const SURFACES = join(HERE, "surfaces");
 const OUT_DIR = join(HERE, "measured");
 
 const args = process.argv.slice(2);
-const USAGE = "usage: measure.mjs <surface-id> [--url <base>] [--update-baseline] | --all | --list";
+const USAGE =
+  "usage: measure.mjs <surface-id> [--url <base>] [--storage-state <file>] [--eval <expr>] [--update-baseline] | --all | --list";
 const cli = parseArgs(args, {
   script: "measure",
   usage: USAGE,
-  flags: { "--all": "bool", "--list": "bool", "--update-baseline": "bool", "--url": "value" },
+  flags: {
+    "--all": "bool", "--list": "bool", "--update-baseline": "bool", "--url": "value",
+    "--storage-state": "value", "--eval": "value",
+  },
 });
 if (cli.has("--list")) {
   for (const f of readdirSync(SURFACES)) console.log(f.replace(/\.json$/, ""));
@@ -56,6 +60,25 @@ if (!existsSync(recipePath)) {
 }
 const recipe = JSON.parse(readFileSync(recipePath, "utf8"));
 const baseUrl = cli.get("--url") ?? recipe.url ?? "http://localhost:5050/";
+/*
+ * Dashboard-hosted surfaces (`/edit/<site>`, the Inspector v4 family) need a
+ * signed-in session and a real site, which no recipe can carry: the site id is
+ * per database and the session is per run. `--url` names the site,
+ * `--storage-state` is a Playwright storage file from a login (the one
+ * `load-inspector-v4-site.mjs --state` writes), and `--eval` is the board's
+ * state snippet (`inspector-v4-state.mjs N`), run once the editor has booted
+ * and before the recipe's own steps. A URL still holding the `<site>`
+ * placeholder was never pointed at a site — refuse it rather than measure the
+ * 404 page.
+ */
+if (baseUrl.includes("<site>")) {
+  console.error(
+    `[measure] surface "${surfaceId}" measures ${baseUrl}\n` +
+    `          cause: the recipe names no site — "<site>" is a placeholder.\n` +
+    `          fix:   --url <dashboard>/edit/<site id> --storage-state <login state> --eval "<state snippet>"`,
+  );
+  process.exit(3);
+}
 
 /**
  * The server a URL expects, named so a connection refusal is actionable.
@@ -84,7 +107,10 @@ try {
   console.error(`[measure] ${err.message}`);
   process.exit(3);
 }
-const page = await browser.newPage({ viewport: recipe.viewport ?? { width: 1440, height: 900 } });
+const viewport = recipe.viewport ?? { width: 1440, height: 900 };
+const page = cli.get("--storage-state")
+  ? await (await browser.newContext({ viewport, storageState: cli.get("--storage-state") })).newPage()
+  : await browser.newPage({ viewport });
 // domcontentloaded + the recipe's own waitFor steps — networkidle is flaky
 // under load (vite dev serves hundreds of modules) and never settles on
 // pages that poll.
@@ -174,6 +200,38 @@ try {
   console.error(`[measure] ${err.message}`);
   await browser.close();
   process.exit(3);
+}
+
+/* The board's state, driven through the editor (see --eval above). A snippet
+   that reports an unreached step measured some other state: MISSING. */
+if (cli.get("--eval")) {
+  let state;
+  try {
+    if (/\/auth/.test(new URL(page.url()).pathname)) throw new Error(`landed on ${page.url()} — the session is not signed in`);
+    await page.waitForSelector(".buildrick-canvas", { state: "attached", timeout: 180000 });
+    await page.waitForTimeout(5000);
+    /* Same preconditions load-inspector-v4-site.mjs sets: the agentation dev
+       overlay answers reads over the inspector column, and the "Project
+       loaded" toast sits over the canvas foot — no board draws either. */
+    await page.evaluate(() => {
+      document.querySelectorAll("[data-agentation],[id*='agentation' i],[class*='agentation' i]").forEach((n) => n.remove());
+      document.querySelectorAll('[aria-label="Dismiss notification"], [data-testid="insert-first-use-tip-ok"]').forEach((b) => b.click());
+    });
+    state = await page.evaluate(cli.get("--eval"));
+  } catch (err) {
+    state = { error: err.message.split("\n")[0] };
+  }
+  const unreached = (state?.steps ?? []).filter((s) => !s.ok).map((s) => s.step);
+  if (!state || state.error || unreached.length || state.selectionOk === false) {
+    console.error(
+      `[measure] surface "${surfaceId}": --eval did not reach the board's state. Nothing was measured.\n` +
+      `          ${JSON.stringify(state?.error ? { error: state.error } : { unreached, selectionOk: state?.selectionOk })}`,
+    );
+    await browser.close();
+    invalidateMeasured(surfaceId, "--eval did not reach the board's state");
+    process.exit(3);
+  }
+  console.log(`[measure] state: ${JSON.stringify({ board: state.board, selected: state.selected, inspector: state.inspector })}`);
 }
 
 for (const step of recipe.steps ?? []) {

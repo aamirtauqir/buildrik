@@ -10,6 +10,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import {
   ButtonGroup,
   ColorInput,
@@ -130,5 +132,16 @@ describe("Mixed — shared controls", () => {
     fireEvent.focus(input);
     fireEvent.blur(input);
     expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+/* Board 22 draws "Mixed" upright in the muted ink; the placeholder rule
+   lives in inspector.css (jsdom cannot compute it from the component). */
+describe("Mixed placeholder style", () => {
+  it("is muted and upright — no italic", () => {
+    const css = readFileSync(path.resolve(__dirname, "../../../styles/inspector.css"), "utf8");
+    const rule = /\.bdi-fld\.mixed input::placeholder[^{]*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(rule).toContain("var(--bk-ink-muted)");
+    expect(rule).not.toMatch(/font-style/);
   });
 });

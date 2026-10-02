@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
-import { blankPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
+import { newPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
 import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
@@ -272,7 +272,7 @@ export async function createSite(
         position: 0,
         // X-A1: its own root (id unique per page), not [] — every [] page
         // used to load with one shared "root".
-        blocks: blankPageRoot(`${created.id}:home`),
+        blocks: newPageRoot(`${created.id}:home`),
         isHomePage: true,
       },
     });

@@ -5,7 +5,8 @@
  *      (the Layers-click path);
  *   2. identity — type icon + editable name · ✦ AI (the panel's only AI door)
  *      · ⋯ (board 30) · ✕ "Hide inspector (⌘\)";
- *   3. status marks, only when true (◆ Component · ⌁ binding · 🔒 Locked).
+ * 72 tall like every board: the identity row is 28 (the boards' 28px action
+ * boxes). The status marks are their own row below it (StatusMarks).
  * Variants: `multi` (board 22): the name row reads "3 selected · Headings"
  * with no type icon, and the path is the shared parent's own ("Home › Hero"),
  * ending on that parent — the selection is not repeated as a crumb.
@@ -23,16 +24,12 @@ import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { EVENTS } from "@/shared/constants/events";
 import { ElementNameField } from "./ElementNameField";
 import { InspectorElementMenu } from "./InspectorElementMenu";
-import { StatusMarks } from "./StatusMarks";
-import type { ElementBinding } from "../hooks/useElementBinding";
 
 export interface InspectorHeaderProps {
   composer: Composer | null | undefined;
   element: { id: string; type: string };
   /** Every selected id (primary first); more than one = the multi variant. */
   selectedIds: readonly string[];
-  binding: ElementBinding | null;
-  locked: boolean;
 }
 
 /** Page crumb, then each ancestor below the page root down to `anchor`, then
@@ -67,7 +64,7 @@ function commonParent(els: Element[]): Element | null {
 
 const pluralType = (type: string) => `${elementTypeLabel(type)}s`;
 
-export function InspectorHeader({ composer, element, selectedIds, binding, locked }: InspectorHeaderProps) {
+export function InspectorHeader({ composer, element, selectedIds }: InspectorHeaderProps) {
   const multi = selectedIds.length > 1;
   const typeLabel = elementTypeLabel(element.type);
   const Icon = getElementIcon(element.type);
@@ -90,7 +87,7 @@ export function InspectorHeader({ composer, element, selectedIds, binding, locke
   return (
     <div className="tw:flex tw:flex-col tw:gap-1 tw:p-3" data-testid="inspector-header">
       {items.length > 0 ? <Breadcrumb label="Element path" items={items} data-testid="inspector-breadcrumb" /> : null}
-      <div className="tw:flex tw:items-center tw:gap-1">
+      <div className="tw:flex tw:min-h-7 tw:items-center tw:gap-1">
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink-soft)]">
           {multi ? null : (
             <span className="tw:inline-flex tw:shrink-0" aria-hidden="true" data-testid="inspector-type-icon">
@@ -107,7 +104,7 @@ export function InspectorHeader({ composer, element, selectedIds, binding, locke
         </div>
         <Button
           type="button"
-          className="tw:h-6 tw:shrink-0 tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap"
+          className="tw:h-6 tw:w-10 tw:shrink-0 tw:justify-center tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap"
           title="Ask AI about this element"
           aria-label="Ask AI about this element"
           data-testid="inspector-ai-chip"
@@ -125,7 +122,6 @@ export function InspectorHeader({ composer, element, selectedIds, binding, locke
           <X size={16} aria-hidden="true" />
         </IconButton>
       </div>
-      {multi ? null : <StatusMarks composer={composer} elementId={element.id} binding={binding} locked={locked} />}
     </div>
   );
 }

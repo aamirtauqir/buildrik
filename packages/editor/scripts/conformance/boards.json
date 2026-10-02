@@ -8,12 +8,12 @@
     "activeFamilies": 36,
     "designAhead": 41,
     "verifiedActive": {
-      "match": 91,
+      "match": 117,
       "driven": 13,
-      "drift-fixed": 346,
-      "drift-open": 3,
-      "unreachable": 45,
-      "no": 36
+      "drift-fixed": 331,
+      "drift-open": 7,
+      "unreachable": 51,
+      "no": 0
     },
     "retired": 46,
     "total": 668,
@@ -8389,8 +8389,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-01",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-01 measured + diffed (all joined properties PASS). match. Heading Level/Text style/Edit text, Typography face, Size Fill/Hug, SpacingBox, Fill +/Border + as drawn. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7993:198958",
@@ -8403,8 +8403,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-02",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-02 measured + diffed (all joined properties PASS). match. CMS binding · Visibility · Interactions · CSS classes · Attributes summary; no context row. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7993:199242",
@@ -8417,8 +8417,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-03",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-03 measured + diffed (all joined properties PASS). match. Opacity/Shadow/Filters/Transform & motion '+' rows, Advanced summary 'Cursor: auto · Blend: normal'. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:199188",
@@ -8431,8 +8431,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-04",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-04 measured + diffed (all joined properties PASS). match (shape). Text block + Typography. Align shows no active option when the text has no text-align (board sample has Center); paragraph type icon is the list glyph, board draws T. Colour reads 'Text': token names follow the seed by owner decision 2026-10-02 ('Text / primary' is board sample data). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:199522",
@@ -8445,8 +8445,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-05",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-05 measured + diffed (all joined properties PASS). match. Button: Edit text, Type segmented, Disabled box-then-label; Fill/Border open because the fixture button carries a fill and radius; closed Text inside per owner answer OQ-1(a). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:199820",
@@ -8459,8 +8459,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-06",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-06 measured + diffed (all joined properties PASS). match. Link to/Page/Open in new tab/Rel/hint, then the Behaviour set. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:200137",
@@ -8473,8 +8473,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-07",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-07 measured + diffed (all joined properties PASS). match. URL variant with Rel. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:200452",
@@ -8487,8 +8487,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-08",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-08 measured + diffed (all joined properties PASS). match (shape). Image source row, Replace, Alt + hint, Fit, Loading. Not reachable: '2400 × 1600 · 428 KB' (remote URL, no media-library metadata). Fit shows no active option when object-fit is unset. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:200767",
@@ -8501,8 +8501,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-09",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-09 measured + diffed (all joined properties PASS). match. Video URL, 'Detected: YouTube', Ratio, Autoplay/Muted/Show controls, autoplay-without-muted warning. W4 fixed the spacing box writing px onto padding-bottom 56.25%. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:201080",
@@ -8515,8 +8515,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-10",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-10 measured + diffed (all joined properties PASS). match. Audio source row + Choose audio, Show controls/Loop/Autoplay. Duration/size not reachable (remote URL). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:201380",
@@ -8529,8 +8529,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-11",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-11 measured + diffed (all joined properties PASS). match. Ends at, time-zone hint, When done, Message; closed Text inside (W1 decision). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:201678",
@@ -8543,8 +8543,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-12",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-12 measured + diffed (all joined properties PASS). drift-fixed. Value/Maximum were plain text inputs; now number fields with stepper, no unit (W4 commit 8c1419931). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:201971",
@@ -8557,8 +8557,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-13",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-13 measured + diffed (all joined properties PASS). match. Item rows Open/Closed, Allow several open. Long item labels clip without ellipsis. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:202274",
@@ -8571,8 +8571,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-14",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-14 measured + diffed (all joined properties PASS). match. Input type/Name/Placeholder/Default/Required/Disabled; Fill/Border open from fixture data. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:202583",
@@ -8585,8 +8585,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-15",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-15 measured + diffed (all joined properties PASS). match. Checkbox header, Edit text, Name, Checked by default, Required. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:202877",
@@ -8599,8 +8599,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-16",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-16 measured + diffed (all joined properties PASS). match. Direction, 3x3 align + readout, Wrap, Gap. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:203208",
@@ -8613,8 +8613,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-17",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-17 measured + diffed (all joined properties PASS). match. Display Block/Flex/Grid/None, Columns, Gap, Position, Text inside last. Position row carries an info icon the board does not draw. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:203523",
@@ -8627,8 +8627,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-18",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-18 measured + diffed (all joined properties PASS). match. Link present, no CMS binding. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:203829",
@@ -8641,8 +8641,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-19",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-19 measured + diffed (all joined properties PASS). match. Fields rows + Add field, Then/Message/Send to, note. Live also draws a 'Spam protection' checkbox (code contract — FormAfterSubmitSection's setting; behaviour follows code). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:204147",
@@ -8655,8 +8655,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-20",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-20 measured + diffed (all joined properties PASS). drift-fixed. Show items was a plain text input; now a number field with stepper (8c1419931). Collection, + New collection…, Open collection as drawn. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:204447",
@@ -8669,8 +8669,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-21",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-21 measured + diffed (all joined properties PASS). match. Page panel: Home · Page header, Fill/Size/Typography/Spacing, SEO & social…, 'Your place here is kept', no tabs. Background reads 'transparent' on this fixture site (its root is imported, so it predates the token); a NEW site reads 'Page / background' (owner decision 2026-10-02: seed token color-page-background, value transparent, new page roots bound to it — live on port 3190). Text colour reads 'Text': token names follow the seed by owner decision 2026-10-02 ('Text / primary' is board sample data). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:204715",
@@ -8683,8 +8683,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-22",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-22 measured + diffed (all joined properties PASS). drift-fixed. 'Mixed' placeholder was italic; board draws it upright (335a3867f). Header, Align ×6 / Distribute ×2 / Group, note, Mixed values as drawn. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:205108",
@@ -8697,8 +8697,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-23",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-23 measured + diffed (all joined properties PASS). drift-fixed. Header 72, 🔒 mark its own row under it, status line 6·16 (28 tall), tabs at y180 = board. Left: the 🔒 row is 32 tall (8·16, the note padding boards 26/27/28 draw) where this board alone draws 24 (6/2·16), so tabs and sections sit 8px lower than this board."
     },
     {
       "nodeId": "7995:205467",
@@ -8711,8 +8711,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-24",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-24 measured + diffed (all joined properties PASS). drift-fixed. Binding chip its own 4·12 row between header and tabs (was inside the header padding, 16px high): chip 1153,132 28 tall, 12px, gray-50 no stroke; tabs y164 and first section y196 = board."
     },
     {
       "nodeId": "7995:205787",
@@ -8725,8 +8725,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-25",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-25 measured + diffed (all joined properties PASS). drift-fixed. Same row as 24: missing chip 28 tall, error border + tint, tabs y164 = board."
     },
     {
       "nodeId": "7995:206087",
@@ -8739,8 +8739,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-26",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-26 measured + diffed (all joined properties PASS). drift-fixed. Component mark its own 8·16 note row (text y136), tabs y160, first section rule y220 vs board 219. Layout and Text inside no longer render on the instance root (shown again only if the instance overrides one of their properties); reachable through Edit master / Detach. Left: identity glyph is the component icon, board draws ◆; the board's muted '··· Reset to master · Detach instance…' hint line is not drawn (those rows live in the ⋯ menu)."
     },
     {
       "nodeId": "7995:206390",
@@ -8753,8 +8753,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-27",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-27 measured + diffed (all joined properties PASS). drift-fixed. Header 72 + 28 chip row + '1 :hover override · Reset' as its own 8·16 note row: tabs y128, first section rule y220 vs board 219 (was 208). Token names follow the seed ('Primary', 'Text') by owner decision 2026-10-02."
     },
     {
       "nodeId": "7995:207832",
@@ -8767,8 +8767,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-28",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-28 measured + diffed (all joined properties PASS). drift-fixed. Header 72 + 28 chip row + 'Tablet · Revert' as its own 8·16 note row: tabs y128, first section rule y220 vs board 219 (was 208). Per-field vs per-header override dot difference unchanged (boards disagree)."
     },
     {
       "nodeId": "7995:208198",
@@ -8781,8 +8781,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-29",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-29 measured + diffed (all joined properties PASS). drift-fixed. Status line 6·16: 44 tall on two lines like the board's band (128–172), tabs y172 and first section y232 = board (after Escape on the ConflictModal)."
     },
     {
       "nodeId": "7995:208555",
@@ -8795,8 +8795,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-30",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "drift-fixed",
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-30 measured + diffed (all joined properties PASS). drift-fixed. Menu 320 wide, portaled through chrome-ui Popover portal (overlay root, fixed), right edge on the ⋯ (x1080–1400), over the canvas, no clip; 'on this page (N)' on a muted second line. Left: menu top 118 (4px under the ⋯, the anchored-popover gap) vs board 136."
     },
     {
       "nodeId": "7995:209026",
@@ -8809,8 +8809,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-31",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-31 measured + diffed (all joined properties PASS). match. 'Apply this style to 3 H3 headings on Home?', Copies/Keeps, Brand hint, Cancel/Apply to 3, toast 'Applied to 3 H3 headings · Undo'. Skipped row absent because no peer is locked (fixture). Dialog frame is chrome-ui Modal (24 padding). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:209399",
@@ -8823,8 +8823,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-32",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-32 measured + diffed (all joined properties PASS). match. 'Edit styles for' Base/:hover/:focus/:active/:disabled beside the column; dot on :hover (fixture override). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:209771",
@@ -8837,8 +8837,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-33",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-33 measured + diffed (all joined properties PASS). match. Brand colours rows swatch · name · hex · Use, 'Add colours in Brand', closed Custom colour (lead decision). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:210146",
@@ -8851,8 +8851,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-34",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-34 measured + diffed (all joined properties PASS). match. Width '24..' + Enter → red edge + 'Enter a valid number. Choose the unit separately.' band under Size. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:210503",
@@ -8865,8 +8865,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-35",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-35 measured + diffed (all joined properties PASS). match. ‹ Inspector, 'Scope: Heading', prompt, 3 suggestions, return note. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:210717",
@@ -8879,8 +8879,8 @@
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
       "recipe": "inspector-v4-36",
-      "verified": "no",
-      "verifiedNote": "section 7992:198576; acceptance = docs/plans/2026-09-27-inspector-figma-board-spec.md; old Inspector family rows are superseded once v4 is implemented"
+      "verified": "match",
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-36 measured + diffed (all joined properties PASS). match. Canvas full width, 'Show inspector ⌘\\' 4px lower than the board (shell page-tab bar); ⌘\\ toggles live. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     }
   ],
   "coveredFloor": 204,

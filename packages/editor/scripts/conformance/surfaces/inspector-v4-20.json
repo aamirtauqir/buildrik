@@ -2,7 +2,7 @@
   "surface": "inspector-v4-20",
   "board": "Inspector v4 · 20 · Collection list · B (Figma 7995:204147)",
   "url": "http://localhost:3110/edit/<site>",
-  "skeleton": "W1 skeleton (build plan 2026-09-28 §3). The board state is driven by `node scripts/conformance/inspector-v4-state.mjs 20` — run it with `load-inspector-v4-site.mjs --site <id> --no-load --board 20`. W4 adds the spec join and the targets.",
+  "run": "Dashboard-hosted, signed in: load the W0 fixture with load-inspector-v4-site.mjs, then `node scripts/conformance/measure.mjs inspector-v4-20 --url <dashboard>/edit/<site> --storage-state <login state> --eval \"$(node scripts/conformance/inspector-v4-state.mjs 20)\"` and `diff.mjs inspector-v4-20`. W4 (2026-10-02) joined the targets below to specs/inspector-v4-20.json; the board-vs-live screenshot walk is the acceptance (build plan §4.3), this recipe is the regression net.",
   "viewport": {
     "width": 1440,
     "height": 900
@@ -13,10 +13,68 @@
       "testId": "inspector-panel"
     }
   ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
   "targets": [
     {
       "name": "panel",
-      "testId": "inspector-panel"
+      "testId": "inspector-panel",
+      "spec": "inspector-v4-20",
+      "nodeId": "7995:204315",
+      "skipProps": {
+        "height": "Board column is 812 tall because the board draws a 32px status footer under the editor body; the shipped shell has no footer, so the column runs to the viewport bottom (844). Shell layout, not the Inspector."
+      }
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header",
+      "spec": "inspector-v4-20",
+      "nodeId": "I7995:204316;7992:198579",
+      "skipProps": {
+        "width": "The column is 300 wide including its 1px left rule; content frames inside it measure 299. The board's 300-wide inner frames draw no rule."
+      }
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-v4-20",
+      "nodeId": "I7995:204316;7992:198583",
+      "skipProps": {
+        "gap": "Fixed-height chip (24px) centring a one-line label: the board's 2px vertical padding and 4px icon gap are drawn by the box height and the single text run (✦ AI), not by padding. Height, width and colours are compared.",
+        "padding-top": "Fixed-height chip (24px) centring a one-line label: the board's 2px vertical padding and 4px icon gap are drawn by the box height and the single text run (✦ AI), not by padding. Height, width and colours are compared.",
+        "padding-bottom": "Fixed-height chip (24px) centring a one-line label: the board's 2px vertical padding and 4px icon gap are drawn by the box height and the single text run (✦ AI), not by padding. Height, width and colours are compared."
+      }
+    },
+    {
+      "name": "tab-strip",
+      "testId": "inspector-tab-strip",
+      "spec": "inspector-v4-20",
+      "nodeId": "7995:204330",
+      "skipProps": {
+        "width": "The column is 300 wide including its 1px left rule; content frames inside it measure 299. The board's 300-wide inner frames draw no rule."
+      }
+    },
+    {
+      "name": "label-collection",
+      "testId": "inspector-label-collection",
+      "spec": "inspector-v4-20",
+      "nodeId": "I8026:208287;8036:209876"
+    },
+    {
+      "name": "field-collection",
+      "testId": "inspector-field-collection",
+      "spec": "inspector-v4-20",
+      "nodeId": "I8026:208287;8036:209877",
+      "skipProps": {
+        "gap": "The testid sits on the chrome-ui control's outer wrapper; the 8px inset and the 8px icon gap live on the inner <select>/<input> flowbite renders, so the wrapper measures 0. Height, width, fill, border and radius are compared.",
+        "padding-left": "The testid sits on the chrome-ui control's outer wrapper; the 8px inset and the 8px icon gap live on the inner <select>/<input> flowbite renders, so the wrapper measures 0. Height, width, fill, border and radius are compared.",
+        "padding-right": "The testid sits on the chrome-ui control's outer wrapper; the 8px inset and the 8px icon gap live on the inner <select>/<input> flowbite renders, so the wrapper measures 0. Height, width, fill, border and radius are compared."
+      }
+    },
+    {
+      "name": "label-show-items",
+      "testId": "inspector-label-show-items",
+      "spec": "inspector-v4-20",
+      "nodeId": "I8031:206565;8036:209737"
     }
   ]
 }

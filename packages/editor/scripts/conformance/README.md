@@ -62,6 +62,21 @@ pnpm run conformance:diff <surface>
 `--update-baseline` on either `measure` or `diff` re-records a ratchet after a
 deliberate change.
 
+Dashboard-hosted surfaces (the `inspector-v4-*` recipes, URL `/edit/<site>`)
+need a signed-in session and a site: load the fixture with
+`load-inspector-v4-site.mjs --base <dashboard> --state <file>` (it prints the
+site id and writes the login state), then
+
+```bash
+node scripts/conformance/measure.mjs inspector-v4-07 \
+  --url http://localhost:3160/edit/<site id> --storage-state <file> \
+  --eval "$(node scripts/conformance/inspector-v4-state.mjs 7)"
+```
+
+`--eval` drives the board's state after the editor boots; a snippet that
+reports an unreached step exits 3 without measuring. A recipe URL still
+holding `<site>` is refused (exit 3).
+
 ## Rules the harness encodes (learned 2026-07-20 week, six defects)
 
 1. **Every `var(--token)` must resolve.** Undefined CSS vars fail silently;

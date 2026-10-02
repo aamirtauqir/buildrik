@@ -70,6 +70,14 @@ describe("Progress — board 12", () => {
     expect(composer.elements.getElement("bar")!.getAttribute("max")).toBe("100");
   });
 
+  it("Value / Maximum are number fields (board 12): ↑ steps, no unit dropdown", () => {
+    const { composer } = renderBlock(progress);
+    fireEvent.keyDown(screen.getByLabelText("Value"), { key: "ArrowUp" });
+    expect(composer.elements.getElement("bar")!.getAttribute("value")).toBe("94");
+    expect(screen.queryByRole("combobox", { name: "Value unit" })).toBeNull();
+    expect(screen.queryByRole("combobox", { name: "Maximum unit" })).toBeNull();
+  });
+
   it("Show label hides / shows the label", () => {
     const { composer } = renderBlock(progress);
     const box = screen.getByRole("checkbox", { name: "Show label" });

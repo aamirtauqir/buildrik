@@ -25,7 +25,7 @@ import type { Element } from "@/engine/elements/Element";
 import type { TypeBlockBodyProps } from "../../../config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { InputRow, SelectRow } from "../../../shared/controls";
+import { InputRow, InputWithUnit, SelectRow } from "../../../shared/controls";
 import { runTxn, writeAttribute } from "../attributeWriter";
 import { Note, useElementVersion } from "./bodyRows";
 import { CheckRow } from "../../../shared/controls/CheckRow";
@@ -172,8 +172,9 @@ const Progress: React.FC<TypeBlockBodyProps> = (p) => {
   };
   return (
     <>
-      <InputRow label="Value" type="number" value={value} placeholder="0" onChange={setValue} />
-      <InputRow label="Maximum" type="number" value={max} placeholder="100" onChange={setMax} />
+      {/* Board 12 draws both as number fields with a stepper and no unit. */}
+      <InputWithUnit label="Value" noUnit value={value} placeholder="0" onChange={setValue} />
+      <InputWithUnit label="Maximum" noUnit value={max} placeholder="100" onChange={setMax} />
       <CheckRow label="Show label" checked={showLabel} onChange={(on) => run((c, t) => writeLabelShown(c, t, on))} />
     </>
   );

@@ -59,6 +59,8 @@ export type ElementActionId =
 export interface ElementAction {
   id: ElementActionId;
   label: string | ((ctx: ElementActionContext) => string);
+  /** A muted second line under the label (board 30: "on this page (6)"). */
+  detail?: (ctx: ElementActionContext) => string;
   /** MenuIcon name (canvas menu). */
   icon: string;
   shortcut?: string;
@@ -132,8 +134,8 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
   "apply-style-to-page": {
     id: "apply-style-to-page",
     /* DD-6b: one explicit action with a count, instead of a reach mode. */
-    label: ({ composer, element }) =>
-      `Apply style to all ${peerKindLabel(element)} on this page (${findStylePeers(composer, element).peers.length})`,
+    label: ({ element }) => `Apply style to all ${peerKindLabel(element)}`,
+    detail: ({ composer, element }) => `on this page (${findStylePeers(composer, element).peers.length})`,
     icon: "palette",
     isVisible: notRoot,
     isEnabled: ({ composer, element }) =>

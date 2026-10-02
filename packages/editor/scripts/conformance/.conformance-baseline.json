@@ -1410,216 +1410,303 @@
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 93
   },
   "inspector-v4-02": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 15
   },
   "inspector-v4-03": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 23
   },
   "inspector-v4-04": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 89
   },
   "inspector-v4-05": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 30
   },
   "inspector-v4-06": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 36
   },
   "inspector-v4-07": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 31
   },
   "inspector-v4-08": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 41
   },
   "inspector-v4-09": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 31
   },
   "inspector-v4-10": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 21
   },
   "inspector-v4-11": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 41
   },
   "inspector-v4-12": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 31
   },
   "inspector-v4-13": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 21
   },
   "inspector-v4-14": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 46
   },
   "inspector-v4-15": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 30
   },
   "inspector-v4-16": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 36
   },
   "inspector-v4-17": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 56
   },
   "inspector-v4-18": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 21
   },
   "inspector-v4-19": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 21
   },
   "inspector-v4-20": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 26
   },
   "inspector-v4-21": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 50
   },
   "inspector-v4-22": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 94
   },
   "inspector-v4-23": {
-    "contrastFailures": 0,
+    "contrastFailures": 12,
     "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | H1 | rgb(75, 85, 99) | rgb(243, 244, 246)": 2.06,
+      "button.tw:relative.tw:flex | H2 | rgb(26, 86, 219) | rgb(255, 255, 255)": 2.1,
+      "button.tw:relative.tw:flex | H3 | rgb(75, 85, 99) | rgb(243, 244, 246)": 2.06,
+      "button.tw:relative.tw:flex | H4 | rgb(75, 85, 99) | rgb(243, 244, 246)": 2.06,
+      "button.tw:relative.tw:flex | H5 | rgb(75, 85, 99) | rgb(243, 244, 246)": 2.06,
+      "button.tw:relative.tw:flex | H6 | rgb(75, 85, 99) | rgb(243, 244, 246)": 2.06,
+      "button.tw:relative.tw:flex | Left | rgb(75, 85, 99) | rgb(243, 244, 246)": 2.06,
+      "button.tw:relative.tw:flex | Center | rgb(75, 85, 99) | rgb(243, 244, 246)": 2.06,
+      "button.tw:relative.tw:flex | Right | rgb(75, 85, 99) | rgb(243, 244, 246)": 2.06,
+      "span.tw:absolute.tw:left-0 | Margin | rgb(108, 112, 121) | rgb(243, 244, 246)": 1.79,
+      "span.tw:absolute.tw:left-0 | Padding | rgb(108, 112, 121) | rgb(255, 255, 255)": 1.85,
+      "button.tw:relative.tw:flex | Link sides | rgb(75, 85, 99) | rgb(255, 255, 255)": 2.12
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 100
   },
   "inspector-v4-24": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 36
   },
   "inspector-v4-25": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 16
   },
   "inspector-v4-26": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 31
   },
   "inspector-v4-27": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 37
   },
   "inspector-v4-28": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 94
   },
   "inspector-v4-29": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 100
   },
   "inspector-v4-30": {
-    "contrastFailures": 0,
+    "contrastFailures": 1,
     "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
+    "contrastPairs": {
+      "span.tw:ml-auto.tw:text-[var(--bk-ink-muted)] | ⌘D | rgb(108, 112, 121) | rgb(235, 245, 255)": 4.5
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 94
   },
   "inspector-v4-31": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 94
   },
   "inspector-v4-32": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 34
   },
   "inspector-v4-33": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 34
   },
   "inspector-v4-34": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 94
   },
   "inspector-v4-35": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 2
   },
   "inspector-v4-36": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
-    "nonTextPairs": {}
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 10
   }
 }

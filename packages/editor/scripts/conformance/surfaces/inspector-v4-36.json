@@ -2,7 +2,7 @@
   "surface": "inspector-v4-36",
   "board": "Inspector v4 · 36 · Inspector hidden (Figma 7995:210717)",
   "url": "http://localhost:3110/edit/<site>",
-  "skeleton": "W1 skeleton (build plan 2026-09-28 §3). The board state is driven by `node scripts/conformance/inspector-v4-state.mjs 36` — run it with `load-inspector-v4-site.mjs --site <id> --no-load --board 36`. W4 adds the spec join and the targets.",
+  "run": "Dashboard-hosted, signed in: load the W0 fixture with load-inspector-v4-site.mjs, then `node scripts/conformance/measure.mjs inspector-v4-36 --url <dashboard>/edit/<site> --storage-state <login state> --eval \"$(node scripts/conformance/inspector-v4-state.mjs 36)\"` and `diff.mjs inspector-v4-36`. W4 (2026-10-02) joined the targets below to specs/inspector-v4-36.json; the board-vs-live screenshot walk is the acceptance (build plan §4.3), this recipe is the regression net.",
   "viewport": {
     "width": 1440,
     "height": 900
@@ -10,13 +10,16 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "canvas"
+      "testId": "show-inspector"
     }
   ],
+  "contrastScope": "[data-testid=\"show-inspector\"]",
   "targets": [
     {
-      "name": "canvas",
-      "testId": "canvas"
+      "name": "show-inspector",
+      "testId": "show-inspector",
+      "spec": "inspector-v4-36",
+      "nodeId": "7995:210885"
     }
   ]
 }

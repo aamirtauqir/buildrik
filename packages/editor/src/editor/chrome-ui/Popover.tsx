@@ -5,9 +5,10 @@
  * relatively-positioned wrapper. That keeps it in DOM order for screen readers
  * and keyboard users, which a portal breaks unless you re-create the
  * relationship by hand — and the surfaces that need to escape a clipping
- * ancestor already have Portal. The one exception is `beside`, whose panel
- * sits outside the trigger's column by definition and so goes through Portal
- * (see the prop).
+ * ancestor already have Portal. The exceptions are `beside`, whose panel
+ * sits outside the trigger's column by definition, and `portal`, whose panel
+ * is wider than the column it opens from — both go through Portal (see the
+ * props).
  *
  * Closes on Escape and on pointer-down outside. Menu adds the roving-focus
  * arrow-key contract that turns a list of buttons into one tab stop.
@@ -61,6 +62,12 @@ export interface PopoverProps {
    *  column it was clipped by the column's own scroll container, so the whole
    *  picker was invisible over the canvas (P-4). */
   beside?: string;
+  /** Mount the panel in the overlay root with fixed coordinates computed from
+   *  the trigger and `placement` — for a panel wider than the column its
+   *  trigger sits in. The inspector's ⋯ menu is 320 wide over the canvas
+   *  (board 30); anchored inside the 300px column it was clipped at the
+   *  column's edge. */
+  portal?: boolean;
 }
 
 /** Keep this much clear of every viewport edge when nudging back into view. */
@@ -68,7 +75,8 @@ const VIEWPORT_MARGIN = 8;
 
 const FOCUSABLE = 'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block, beside }: PopoverProps) {
+export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block, beside, portal }: PopoverProps) {
+  const portalled = Boolean(beside) || Boolean(portal);
   const wrap = React.useRef<HTMLSpanElement | null>(null);
   const panel = React.useRef<HTMLDivElement | null>(null);
   /* A portalled panel mounts a commit after `open` flips (Portal resolves its
@@ -113,6 +121,28 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
         el.style.top = `${Math.round(top)}px`;
         return;
       }
+      if (portal) {
+        const anchor = wrap.current?.getBoundingClientRect();
+        if (!anchor) return;
+        const r = el.getBoundingClientRect();
+        /* The anchored placements, in viewport coordinates: the same 4px gap
+           and the same edge alignment PLACEMENT_CLASS gives an inline panel. */
+        const end = placement.endsWith("-end");
+        let left: number;
+        let top: number;
+        if (placement.startsWith("right")) {
+          left = anchor.right + 4;
+          top = end ? anchor.bottom - r.height : anchor.top;
+        } else {
+          left = end ? anchor.right - r.width : anchor.left;
+          top = placement.startsWith("top") ? anchor.top - 4 - r.height : anchor.bottom + 4;
+        }
+        left = Math.min(Math.max(left, VIEWPORT_MARGIN), Math.max(VIEWPORT_MARGIN, vw - VIEWPORT_MARGIN - r.width));
+        top = Math.min(Math.max(top, VIEWPORT_MARGIN), Math.max(VIEWPORT_MARGIN, vh - VIEWPORT_MARGIN - r.height));
+        el.style.left = `${Math.round(left)}px`;
+        el.style.top = `${Math.round(top)}px`;
+        return;
+      }
       el.style.transform = "";
       const r = el.getBoundingClientRect();
       let dx = 0;
@@ -124,20 +154,20 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
       el.style.transform = dx || dy ? `translate(${Math.round(dx)}px, ${Math.round(dy)}px)` : "";
     };
     place();
-    /* A beside panel is fixed to viewport coordinates measured from the
+    /* A portalled panel is fixed to viewport coordinates measured from the
        trigger, so scrolling the column (or anything else) moves the trigger
        out from under it. Capture: scroll does not bubble. */
-    if (beside) window.addEventListener("scroll", place, true);
+    if (portalled) window.addEventListener("scroll", place, true);
     /* The panel's own content can grow after it opened (the fill picker's
        "Edit Primary" step is 483 tall): re-place on every size change, or it
        ran 105px off the bottom (4428:142968). */
     const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(place);
     ro?.observe(el);
     return () => {
-      if (beside) window.removeEventListener("scroll", place, true);
+      if (portalled) window.removeEventListener("scroll", place, true);
       ro?.disconnect();
     };
-  }, [open, placement, children, beside, panelNode]);
+  }, [open, placement, children, beside, portal, portalled, panelNode]);
 
   const focusTrigger = React.useCallback(() => {
     const trigger = wrap.current?.firstElementChild;
@@ -148,14 +178,14 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
     target?.focus();
   }, []);
 
-  /* A beside panel is portalled away from its trigger, so Tab from the
+  /* A portalled panel is away from its trigger, so Tab from the
      trigger does not reach it: opening moves focus into it. Closing while
      focus is still inside (a pick, not only Escape) hands it back to the
      trigger — the panel unmounting would otherwise drop it on <body>. Focus
      the user already moved elsewhere is left alone. */
   React.useEffect(() => {
     const el = panelNode;
-    if (!open || !beside || !el) return;
+    if (!open || !portalled || !el) return;
     let focusInside = false;
     const onFocusIn = () => {
       focusInside = true;
@@ -171,7 +201,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
       el.removeEventListener("focusout", onFocusOut);
       if (focusInside) focusTrigger();
     };
-  }, [open, beside, panelNode, focusTrigger]);
+  }, [open, portalled, panelNode, focusTrigger]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -202,7 +232,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
     };
   }, [open, onClose, focusTrigger]);
 
-  const body = beside ? (
+  const body = portalled ? (
     <div ref={panelRef} className={["tw:fixed", POPOVER_SURFACE_CLASS, className].filter(Boolean).join(" ")} role="dialog" aria-label={label}>
       {children}
     </div>
@@ -215,7 +245,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
   return (
     <span className={ANCHOR_CLASS[block ? "block" : "inline"]} ref={wrap}>
       {trigger}
-      {open ? (beside ? <Portal>{body}</Portal> : body) : null}
+      {open ? (portalled ? <Portal>{body}</Portal> : body) : null}
     </span>
   );
 }

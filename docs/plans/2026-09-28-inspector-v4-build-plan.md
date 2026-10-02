@@ -483,3 +483,107 @@ Figma quota (200/day, 15/min, shared): W0 ≤ 72 calls on day 1 (36 design-conte
 **Fixture loader** — Menu loaded with `fields: []` because SyncRetryQueue ran the collection's create and its field update concurrently: the second create died on the (siteId, slug) unique key and sat in a queue that replays only on `online`. Fixed in the queue (one write per row in flight, in order; records wait for their collection). Fresh site "Inspector v4 fixture · W3 integration" `cmulbo956000gwxzyb8vpxs11` (port 3150): board 24's Field lists `name · Text`.
 
 **Left for the owner** — "More settings" rows under Typography / Size / Fill / Border (boards draw none); Page panel Fill shows the root's own `transparent` (board "Page / background" is a token the seed does not have); a rendered #334155 reads "Text" (the site CSS uses `color-text`; the board's "Text / primary" is a second token with the same value); Brand-token names in fixture data ("Text / primary", "Brand / primary") vs the seed ("Text", "Primary").
+
+### W4 — conformance + Phase 6 validation (2026-10-02, branch `feat/insp-w4` off main `b21bdabfe`)
+
+**Done** — `8c1419931` (Progress Value/Maximum + Collection Show items = number fields, boards 12/20), `335a3867f` ("Mixed" upright, board 22), `12e956265` (spacing box keeps a side's unit — a video embed's `padding-bottom: 56.25%` stepped up had become `57.25px`), `f6ad65d7f` (✦ AI chip 40 wide on every board, picked-state chip `--bk-accent-subtle` board 27, status line 16px inset boards 23/29), `f35dee226` (`measure.mjs --storage-state / --eval`: dashboard recipes are measurable; `<site>` refused), `098ad42dc` (36 specs extracted from the W0 cache, spec joins on all 36 recipes, baseline). `ai-scoped` retirement verified, not redone (recipe gone, floor 204 = 204 recipes; no `--update-floor`).
+
+**How it was checked** — dev server port 3160 from this worktree, fixture site "Inspector v4 fixture · W4" `cmuqofnnk0002x4w7mz2jgcwp` (load read-back complete). Local DB lacks the staged `20261004100000_cms_tombstones_cms_edited_at` migration (not deployed, per rule), so the worktree's Prisma client was generated from the pre-stage schema (`57bd8a743^`) — no DB change. Every board: state snippet → 1440×900 screenshot → side by side with `raw-figma/inspector-v4/NN.png` by eye; then `measure.mjs` + `diff.mjs`: **36/36 PASS, 1,659 properties compared, 0 fail**; box-model-only refusals carry a written reason in each recipe. Behaviour re-run live by W4: Heading H3→H2 writes the tag, one Undo restores; ⌘\ hides and shows; a locked heading refuses a Level write (`data-readonly=locked`); Apply to all → "Apply to 3" → toast "Applied to 3 H3 headings · Undo"; multi-select padding-top 31 lands on all 3 H3s, one Undo clears all 3; spacing % ↑ → 57.25%, Undo → 56.25%.
+
+**Control counts (DD budget)** — counted in the live Style tab body, one per editable property (a segmented group = 1, each SpacingBox side = 1, "+" rows = 1; unit dropdowns, section toggles and More settings excluded): **Heading 25 / ≤ 25** (raw interactive elements in the tab body: 43); **Input 29 / ≤ 30** with the fixture's input carrying a fill and border (Fill and Border open — on the board they are "+" rows, which would make it ~24; raw: 42).
+
+#### Board table (W4 walk)
+
+| # | Board | Verdict | Differences left |
+|---|---|---|---|
+| 1 | Heading · S | match | — |
+| 2 | Heading · B | match | — |
+| 3 | Heading · E | match | — |
+| 4 | Text · S | match (shape) | Align shows no active option when unset (sample has Center); text icon is the list glyph |
+| 5 | Button · S | match | closed Text inside per OQ-1(a) |
+| 6 | Button · B | match | — |
+| 7 | Link · B | match | — |
+| 8 | Image · S | match (shape) | file size/dimensions not reachable (remote URL); Fit unset shows no active option |
+| 9 | Video embed · S | match | — (spacing % fix) |
+| 10 | Audio · S | match | duration/size not reachable |
+| 11 | Countdown · S | match | — |
+| 12 | Progress · S | drift-fixed | — |
+| 13 | Accordion · S | match | long item labels clip without ellipsis |
+| 14 | Input · S | match | — |
+| 15 | Checkbox · S | match | — |
+| 16 | Flex · S | match | — |
+| 17 | Container (grid) · S | match | Position row has an info icon |
+| 18 | Section · B | match | — |
+| 19 | Form · B | match | extra "Spam protection" row (code contract) |
+| 20 | Collection list · B | drift-fixed | — |
+| 21 | Page panel | match | Background "transparent" (owner question) |
+| 22 | Multi-select | drift-fixed | — |
+| 23 | Locked | drift-fixed | status mark row ~18px higher (inside the header padding) |
+| 24 | CMS-bound · B | **drift-open** | header status chip 16px higher than the board's separate row |
+| 25 | CMS missing · B | **drift-open** | same as 24 |
+| 26 | Component instance · S | **drift-open** | status row ~20px higher; Layout + Text inside rendered for the container (board draws neither) |
+| 27 | Button :hover · S | drift-fixed | token name "Primary" (owner question) |
+| 28 | Heading on Tablet · S | match | dot also on the Width row (boards disagree: 26/27 per field, 28 per header); bp chip has no chevron |
+| 29 | Save conflict | drift-fixed | ConflictModal opens first; board state after Escape |
+| 30 | ⋯ menu | **drift-open** | menu 240 wide inside the column; board 320 over the canvas — widening clips at the column edge (popover not portaled) |
+| 31 | Apply-to-all dialog | match | Skipped row absent (no locked peer in fixture); Modal frame 24 padding |
+| 32 | State menu | match | — |
+| 33 | Colour / token popover | match | — |
+| 34 | Field error | match | — |
+| 35 | AI column | match | — |
+| 36 | Inspector hidden | match | button 4px lower (shell) |
+
+Shared, every element board: header 68 vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; "More settings" rows (owner). Walked: 36 of 36.
+
+#### Phase 6 result table
+
+IMPLEMENTED = code on main; FUNCTIONALLY VERIFIED = unit/RTL tests green (§4.1); RUNTIME VERIFIED = seen working in the running app (W4 unless a lane is named); NOT VERIFIED = not observed.
+
+| Item | Status | Evidence |
+|---|---|---|
+| Tabs Style · Behaviour · Effects, one order per tab, capabilities (DD-1/4/15) | RUNTIME VERIFIED | W4 walk boards 1–20; `sectionOrder`/`elementCapabilities` tests |
+| Open / summary / "+" rule (DD-11) | RUNTIME VERIFIED | boards 1, 3, 17 (summaries, "+" rows) |
+| DD-20 tab reset on type change | FUNCTIONALLY VERIFIED | ProInspector tests; not re-walked by W4 |
+| Header: breadcrumb, icon + name, ✦ AI, ⋯, ✕ | RUNTIME VERIFIED | all boards; ancestor-crumb select not re-run by W4 (W1 test) |
+| Status marks (component / CMS / locked) | RUNTIME VERIFIED (position drift-open) | boards 23–26 |
+| Context row: state chip + menu, breakpoint chip, Reset / Revert | RUNTIME VERIFIED | boards 27, 28, 32; Reset/Revert click W1/L2-D2 tests, not re-clicked by W4 |
+| Override dots (breakpoint / :hover / master) + notes | RUNTIME VERIFIED | boards 26, 27, 28; per-field reset menu FUNCTIONALLY VERIFIED only |
+| Read-only: locked | RUNTIME VERIFIED | board 23 + refused Level write |
+| Read-only: save conflict, Resolve | RUNTIME VERIFIED | board 29 via the real save path; Resolve → ConflictModal by L2-D2 live; Reload/Overwrite clearing the line NOT VERIFIED by W4 |
+| Element-action registry + ⋯ (board 30), ⌥⌘C/⌥⌘V, ⌘D, ⌫ | RUNTIME VERIFIED (menu rows) | board 30; shortcuts FUNCTIONALLY VERIFIED (`styleCommands`, `elementActions` tests), not pressed live by W4 |
+| ⌘\ toggle + Show inspector (board 36) | RUNTIME VERIFIED | W4 live toggle |
+| Apply style to all (DD-6b, board 31) | RUNTIME VERIFIED | W4: Apply to 3 + toast; one-Undo revert L3-B live |
+| Type blocks: heading, text, button, input, checkbox, image, video-embed, audio, countdown, progress, accordion, flex, grid container | RUNTIME VERIFIED | boards 1, 4, 5, 8–17; Heading Level write + Undo by W4 |
+| Q5 runtimes (countdown, accordion, embed iframe) on canvas + publish | FUNCTIONALLY VERIFIED | L2-B tests + canvas walk; published output NOT VERIFIED (never publish on the QA workspace) |
+| Behaviour: Link (Rel, hint), CMS binding, missing source, Collection list, Form, Visibility, Interactions, CSS classes, Attributes | RUNTIME VERIFIED (render) | boards 2, 6, 7, 18–20, 24, 25; writes FUNCTIONALLY VERIFIED |
+| Effects sections | RUNTIME VERIFIED (empty state) | board 3; an opened, valued Effects section NOT walked |
+| Multi-select (DD-12): same panel, bar, Mixed, one Undo | RUNTIME VERIFIED | board 22 + W4 padding-top ×3 / one Undo |
+| Page panel (DD-13) | RUNTIME VERIFIED | board 21; SEO & social return by L3-A live |
+| Validation (board 34), a11y names/radiogroup/tabpanel | RUNTIME VERIFIED (board 34) | a11y FUNCTIONALLY VERIFIED (L3-C tests, e2e target-size by L3-C); no screen-reader pass |
+| Colour / token popover (board 33) | RUNTIME VERIFIED | board 33 |
+| AI column (board 35) + §13 escalation doors | RUNTIME VERIFIED (board 35) | doors walked by L3-D; NOT re-walked by W4 |
+| Control budgets | RUNTIME VERIFIED | Heading 25 ≤ 25, Input 29 ≤ 30 |
+
+**Types with no board — NOT board-verified** (built by analogy, OQ-3): link · Style, native video, svg/icon, map-embed, lottie, textarea, select, radio, switch, label, grid/columns type, stack, tabs, list-item, slider, table, card, navbar, cta, spacer, divider, gallery.
+
+**NOT verified by W4** — published output of any kind (no Publish on the QA workspace); undo of Apply-to-all and Resolve/Reload/Overwrite paths (lane evidence only); keyboard shortcuts ⌥⌘C/⌥⌘V/⌘D/⌫ pressed live; Map / Lottie frames on the canvas (CSP — since walked, owner decision 4 below); mobile breakpoint states; Effects sections with values; the 22 no-board types above; screen-reader output.
+
+**Open — owner** — closed by the owner decisions below (2026-10-02); none remain open from this list.
+
+#### Owner decisions 2026-10-02 (branch `feat/insp-owner-decisions`, live on port 3190)
+
+1. **Owner decision 2026-10-02 — "More settings" rows: KEEP, collapsed by default.** Already the behaviour — `useAdvancedSettings` starts every group closed and opens one only when the selected element carries a value for one of that section's `advancedProps` (or a search matches); no code change. Live: a new Heading and a new Container each show their "More settings" toggles with `aria-expanded="false"`. NOT verified: Flex / Fill / Border toggles on an element that has values for their advanced props (those open by design).
+2. **Owner decision 2026-10-02 — Page panel Fill reads "Page / background".** Site seed gains `color-page-background` ("Page background", surface, value `transparent`, no dark value; `design.css` baseline declares the same). A page root is bound to `var(--buildrick-design-color-page-background)` only when it is CREATED: `newPageRoot` (server `sites.create` Home page, `page.service` new page) and `PageManager.createPage` (editor). `blankPageRoot` is unchanged, so a never-saved `[]` page loaded by `BuildrikSyncProvider` stays unbound. `PAGE_BACKGROUND_TOKEN` lives in `packages/shared/content/elementIds.ts`; the token is excluded from contrast lint (a surface; `transparent` has no ratio). Live: a site created through `sites.create` stores the bound root and its Page panel reads "Page / background"; the W4 fixture site (existing) measured before/after the change — root `rgba(0, 0, 0, 0)`, canvas `rgb(255, 255, 255)` both times, canvas-region pixel diff confined to the hero photo's box (image decode), every background pixel identical; its Page panel still reads "transparent". Unit: seed, label, baseline, merge into an old token set, contrast lint, new-root binding, loaded page not rebound and published CSS without the var. NOT verified: AI-generated sites (`ai-generate` worker builds its own root — unbound); a dark-mode site live; the chip clips "Page / backgrour…" at the 1440 column width (DSBindingChip ≤ 50%, L3-B) — follow-up.
+3. **Owner decision 2026-10-02 — token names follow the seed** ("Text", "Primary"; board "Text / primary", "Brand / primary" are sample data). No product change. The fixture (`e2e/fixtures/inspector-v4-site.json`) names no token, and the recipes compare geometry/colour, not these strings (the board text lists in `specs/` are only read by the advisory copy check), so nothing disagreed; `boards.json` notes for boards 04, 21, 27 now say names follow the seed by owner decision.
+4. **Owner decision 2026-10-02 — CSP allows Google Maps and Lottie frames.** Already on main (`c0bee5386`, 2026-09-28): `frame-src` adds exactly `https://www.google.com https://lottie.host`, pinned by `__tests__/editor-embed-csp.test.ts`; `parseEmbedUrl` only ever builds `https://www.google.com/maps/embed?…`, `https://www.google.com/maps?…&output=embed` and `https://lottie.host/embed/<id>/<file>`. Live: a Map (`…/maps/place/Eiffel+Tower`) renders tiles in the canvas (Google redirects to `www.google.com/maps/embed?origin=mfe&pb=…`, same host) and a Lottie frame loads `lottie.host/embed/…`; zero `securitypolicyviolation` events, no CSP console line. Published sites: no default CSP exists — `lib/publish-files.ts` emits `Content-Security-Policy` only from the site's own `cspPolicy` setting (null by default), so nothing blocks published Maps/Lottie; a user-authored policy is the user's. NOT verified: a real Lottie animation playing (the test id is not a real file — lottie.host answered AccessDenied inside the frame).
+5. **Owner decision 2026-10-02 — ExportEngine MERGES the `class` attribute.** Already on main (`caaf63d60`, 2026-09-28): `classTokens` (shared/utils/html/sanitization.ts) merges `classes` then `attributes.class`, de-duplicated, plain tokens only, in all three writers (canvas `toHTML`, single-file `generateHTML`, publish `renderPageElement`); S-1 escaping kept. Added: single-file writer drops a quote/angle-bracket token, Accordion block class also in `classes` emitted once. Live: editor ZIP export (`onExportHTML` → `downloadZip`, the publish writer) of an Accordion with `classes ["faq-block","my-acc"]` + `attributes.class "accordion faq-block"` → `class="buildrik-el-… faq-block my-acc accordion"`; preview `exportHTML` the same minus the generated class. Not published (QA workspace rule).
+
+**Recorded, not fixed** — header status-mark row placement (boards 23–26; boards disagree on its padding); ⋯ menu width 320 needs the popover out of the column's clip (portal); Layout / Text inside on a component-instance container (board 26); per-field vs per-header override dots (boards 26/27 vs 28); unset Align / Fit show no active segment; accordion item labels clip without ellipsis; text type icon. Harness note: the agentation dev toolbar (bottom-right) overlaps the column in dev screenshots — removed in the walk script, it is not product.
+
+### W5 — the four drift-open boards (2026-10-02, branch `feat/insp-w5` off main `80bb40d0d`)
+
+**Done** — `66a35650f` (chrome-ui Popover `portal`: overlay root, fixed coordinates from the trigger + placement), `a18b43781` (board 30: ⋯ menu 320 wide over the canvas through it; "on this page (N)" a muted sub-line via `ElementAction.detail`), `b50ffcc2f` (boards 23–29: StatusMarks its own row between header and tabs — 4·12 around the binding chip, 8·16 around a text mark; chip 28 tall / 12px / gray-50 bound; header 72; context chips row 28 and the override lines their own 8·16 note rows; status line 6·16), `915ce858b` (board 26: an instance root draws no Layout / Text inside unless it already overrides one of their properties — `shownOnInstanceRoot`, `masterOverrideProps`).
+
+**Padding decisions** — the boards pad the status row three ways (23: 6/2·16 · 24 + 25: 4·12 · 26: 8·16). The chip row takes 24/25's (two boards); a text mark takes 8·16, the one-line note padding boards 26, 27 and 28 all draw — board 23 alone draws its 🔒 note 24 tall, so 23's tabs sit 8px under its board. Header: 31 of 34 boards draw a 28px identity row (72 header); boards 1–3 draw 24 (68) and now sit 4px lower at the tabs, sections unchanged. The boards' active-tab underline is 4px above the tab's bottom (a 24px label+gap+bar group centred in 32) — compare tab tops, not underlines.
+
+**Verified** — port 3180, site "Inspector v4 fixture · W5" `cmuqtkgkq0008yy3ue1emwah9`; boards 23–30 board PNG vs live 1440×900 + bounding boxes; 36/36 recipes PASS, 1,659 properties. Board 30's menu top is 118 (4px under ⋯) vs the board's 136 — left as the anchored-popover gap.

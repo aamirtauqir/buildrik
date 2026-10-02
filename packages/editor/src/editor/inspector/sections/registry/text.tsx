@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 
-import { adaptBaseStyleProps, defineSection, type AnySectionEntry, type SectionContext } from "./_shared";
+import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry, type SectionContext } from "./_shared";
 import { TypographySection } from "../typography";
 import { primaryFamily } from "../typography/FontPickerDropdown";
 import { cssVarToTokenId, extractVarName, resolveTokenVar } from "../../shared/tokenBindingDetection";
@@ -117,6 +117,7 @@ export const TEXT_SECTIONS: Record<string, AnySectionEntry> = {
     title: "Text inside",
     open: "closed",
     capability: (caps) => caps.typography === "inside",
+    shouldRender: (ctx) => shownOnInstanceRoot(ctx, TYPOGRAPHY_KEYS),
     summary: (ctx) => textSummary({ ...renderedValues(ctx.selectedElement.id, ctx.styles, ctx.composer), ...ctx.styles }),
     Component: TypographySection,
     advancedKey: "text-inside",

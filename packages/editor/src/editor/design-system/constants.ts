@@ -64,6 +64,23 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     darkValue: "#0F172A",
   },
   {
+    /* What a new page's root is bound to (PageManager.createPage), so the
+       Page panel's Fill reads "Page / background" (board 21). `transparent`
+       is the root's background before the token existed — binding it moves
+       no pixel. No darkValue: a dark site keeps whatever is behind the root,
+       as it always has. Literals like every seed row (the baseline-parity
+       gate reads this file as text); the test pins them to
+       PAGE_BACKGROUND_TOKEN. */
+    id: "color-page-background",
+    name: "Page background",
+    value: "transparent",
+    category: "colors",
+    cssVar: "--buildrick-design-color-page-background",
+    type: "color",
+    group: "surface",
+    description: "Page root background",
+  },
+  {
     id: "color-text",
     name: "Text",
     value: "#334155",
