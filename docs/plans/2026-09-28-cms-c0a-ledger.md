@@ -326,3 +326,110 @@ P1 follow-ups: `cmsSyncBlocker` reads wrong count (`pendingCount` not `outstandi
 
 Full audit + 9 P1 + P2 + test coverage gaps in the audit hand-off. No code modified — read-only review per standing rule. Ledger updated, fixes queued for post-deploy arc.
 
+
+## C0b verification (C0.6, C0.7, C0.8) — 2026-10-03
+
+Worktree `~/Desktop/buildrik-worktrees/cms-c0b` @ `feat/cms-c0b` (from main
+`fd067d913`). Dashboard dev server from this worktree on `:3230` (clean
+`.next`, `NEXT_PUBLIC_FEATURE_PUBLISH=true` on the command line), headless
+Playwright, `qa@buildrik.local`, site `cmugopwzg005nnvjysp00b3pf`. Evidence:
+`docs/plans/cms-c0b-evidence/`.
+
+**No real publish ran.** Every context aborted `sites.publish` /
+`sites.rollback` at the network and kept the request body — that body IS the
+publish writer's output (`exportPublishPages`, server CMS snapshot).
+`publish_build_jobs` for the site = **0** after the run.
+
+### Step 0 — what main already had
+
+| Item | Finding on main `fd067d913` |
+|---|---|
+| C0.6 | **NOT DONE.** `ExportEngine.resolveHref` returned the bare file name (`about.html`) for every writer; record pages are written at `<slug>/index.html` (`generateDynamicPages`), so their links resolved to `<slug>/about.html`. |
+| C0.7 | **NOT DONE.** `CMSExportResolver.resolveStatic`: `if (!value) return;` kept the stored text. No pre-publish check for empty bindings. (A binding WITH a fallback already shipped the fallback — `resolveBinding` returns it.) |
+| C0.8 | **NOT DONE.** `RepeaterRenderer.expandChildren` replaced only `{{item.*}}` tokens; the page-wide field-binding pass then wrote one record (`resolveBinding`, first published) into every copy — canvas (`useCMSPreview`) and export alike. Inspector v4 binds through `CmsBindingSection` (`itemId` undefined); `ContentSection.tsx` no longer exists. |
+
+### Commits
+
+| Item | SHA | Subject |
+|---|---|---|
+| C0.6 | `2fd1ec78e` | fix(export): publish links pages root-absolute so record pages resolve them |
+| C0.7 | `58b7b434d` | fix(cms): an empty binding publishes its fallback or nothing; pre-publish names it |
+| C0.8 | `a8b9fbdea` | fix(cms): a list child's binding reads each copy's own record |
+| found live | `5c722c554` | fix(cms): the publish snapshot names each collection's template page |
+
+Design notes:
+- C0.6: root-absolute only for the **publish writer** (`exportAllPages({ rootAbsoluteHrefs: true })`
+  from `exportPublishPages`/`renderProjectPages`). `/about.html` matches what the
+  deploy serves today (`.html` files, no `cleanUrls`). The ZIP and the
+  single-file export keep relative links: they are opened from disk (where `/`
+  is the filesystem root) and contain no record pages.
+- C0.7: empty → `""` for text and alt/title, attribute dropped for src/href. The
+  pre-publish row is server-side (`findEmptyBindings` in `cms.service.ts`,
+  registered in `runPrePublishChecks`) over the same published rows the publish
+  renders from; it skips per-record bindings (template page, list child of the
+  same collection). Warning, never a block; no row for a site without bindings.
+- C0.8: "current item" = a binding with no pinned record (or `"context"`) on an
+  element inside a Collection list bound to the SAME collection; the nearest
+  list owns it. A pinned record stays that record in every copy.
+
+### Live results
+
+| # | Status | Evidence |
+|---|---|---|
+| Setup | — | Seeded through `cms.*.upsert`: `ZZ C0b` (`zzc0b-coll`; Alpha/Beta/Gamma C0b, PUBLISHED; `pageSlugPattern {slug}`, template **Page 3**) and `ZZ C0b solo` (`zzc0b-solo`, one record). Structure via the composer: Page 3 = two internal links (`#page:` About / Home) + a heading; Page 4 = a Collection list (`zzc0b-coll`) with a card + heading; Home = a heading. **The two headings under test were bound through the Inspector** (Behaviour → CMS binding → From CMS → collection → Field `title`; `bind-*.png`). |
+| C0.8 canvas | **RUNTIME VERIFIED** | Page 4 canvas DOM, the list heading's 3 copies: `["Gamma C0b","Beta C0b","Alpha C0b"]` (`c0.8-canvas-list.png`, `c0.8-c0.6-run.txt`). |
+| C0.8 publish | **RUNTIME VERIFIED** | Aborted `sites.publish` body, `page-4.html`: the same element's 3 copies read `["Gamma C0b","Beta C0b","Alpha C0b"]` (`c0.8-aborted-publish-payload.json`). |
+| C0.6 | **RUNTIME VERIFIED** (deploy file tree, not a deploy) | Payload `page-3.html` links: `["/about.html","/index.html"]`. The record pages were rendered from that payload by the server's own `appendDynamicPagesToPublish` (read-only script, local DB) into the deploy's file tree — `index.html, about.html, page-4.html, alpha/index.html, beta/index.html, gamma/index.html` — served statically: every link on each record page → **200**; a browser click on `/alpha/` "Go to About C0b" lands on `/about.html` (200). The old relative form from `/alpha/` → `/alpha/about.html` **404** (`c0.6-record-page-links.txt`, `c0.6-*.png`). |
+| C0.6 · found | **fixed `5c722c554`** | The first tree had **"Gamma C0b" on all three record pages**: `cms.publishSnapshot` carried no `pageTemplatePath`, so the template page's on-page-record heading resolved to the newest record instead of the `{title}` token. After the fix: alpha/beta/gamma show "Alpha C0b"/"Beta C0b"/"Gamma C0b". |
+| C0.7 publish | **RUNTIME VERIFIED** | Only `ZZ C0b solo` record set DRAFT (DB `DRAFT`). Payload `index.html`: the Inspector-bound heading is `<h2 …></h2>` — neither the stored text nor the withdrawn record's title. With a fallback set on that binding, the payload heading is `Coming soon C0b` (`c0.7-aborted-publish-payload.json`, `c0.7-fallback-aborted-publish-payload.json`). |
+| C0.7 pre-publish | **RUNTIME VERIFIED** | Publish panel → Pre-publish checks shows **CMS bindings** (amber) — server row: `1 bound element has no value: Home › Heading (ZZ C0b solo · title, publishes empty).`; with the fallback: `… shows "Coming soon C0b"`. Control: record PUBLISHED → `pass` "Every bound element has a value."; DRAFT → warning; PUBLISHED → pass (`c0.7-prepublish-control.txt`, `c0.7-publish-step0.png`). |
+
+### NOT verified
+
+- A real deploy / `curl` of a deployed record page — the file tree was rendered
+  by the server's own function and served locally, not deployed.
+- The ledger's "heading shows the **fallback**" via UI: **no Inspector control
+  sets a fallback** today; the fallback pass set it on the Inspector-made binding
+  through the composer API.
+- The canvas side of an empty binding: the canvas keeps the element's stored
+  text — and that text is whatever the binding last wrote (`applyBinding`
+  writes the resolved value into the element), so after unpublishing it still
+  shows the old record title / the fallback. §5b.5's dimmed "Empty · Title" is
+  not built.
+- The Inspector's preview line for a list child still reads "record 1 of N"
+  (first record) — the "Current item" picker context (§5b.2) is not built; only
+  the resolution is.
+- The single-file export and ZIP were not walked live (unit-covered: relative
+  links unchanged).
+
+Test-site residue: collections `ZZ C0b` + `ZZ C0b solo` (record left
+PUBLISHED); Page 3 = template for `ZZ C0b` (two links + a bound heading); Page 4
+gained a Collection list; Home gained a bound heading.
+
+### Gates (HEAD `5c722c554`)
+
+| Gate | Result |
+|---|---|
+| Editor tsc (`packages/editor`, `npx tsc --noEmit`) | exit 0 |
+| Dashboard tsc (`npx tsc --noEmit -p packages/dashboard`) | exit 0 |
+| Editor vitest, **full** (`packages/editor`, `npx vitest run`, alone) | 1242 files, 12375 passed, 22 todo, exit 0. (An earlier full run before `5c722c554` had 1 failure: the known-flaky `cms.service` stripMarkup 27 s timeout — 60/60 alone.) |
+| Root vitest (`npx vitest run`, alone) | 1384 files, 13606 passed, 3 skipped, 22 todo, exit 0 |
+| `pnpm run verify:ds` (`packages/editor`) | exit 0 |
+
+Every new unit test was run against the pre-fix source (fix reverted from a
+saved patch, test run, patch re-applied) and failed there: C0.6 2/2, C0.7 2/3
+(the fallback case already passed on main — `resolveBinding` returned it),
+C0.8 export 1 + canvas 2, snapshot 1. Rewritten in the C0.7 commit:
+`projectDataFromRows.test.ts` "keeps the stored text for a binding the rows
+cannot resolve" → "writes nothing …, never the stored text".
+
+### Server files touched (merge note for Settings Lane 0)
+
+- `server/services/publish.service.ts` — `runPrePublishChecks` only: one import
+  name, `projectCmsBindings` added to its site `select`, one
+  `CMS_EMPTY_BINDINGS_LABEL` const, and one self-contained block before
+  `hasFail` that pushes the "CMS bindings" row.
+- `server/services/cms.service.ts` — new `findEmptyBindings`; `pageTemplatePath`
+  added to `getPublishedCmsForCollections`' select.
+- Tests: `server/services/__tests__/cms.service.test.ts`,
+  `server/services/__tests__/publish-prechecks-visibility.test.ts`.
