@@ -8432,7 +8432,7 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-04",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-04 measured + diffed (all joined properties PASS). match (shape). Text block + Typography. Align shows no active option when the text has no text-align (board sample has Center); paragraph type icon is the list glyph, board draws T. Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-04 measured + diffed (all joined properties PASS). match (shape). Text block + Typography. Align shows no active option when the text has no text-align (board sample has Center); paragraph type icon is the list glyph, board draws T. Colour reads 'Text': token names follow the seed by owner decision 2026-10-02 ('Text / primary' is board sample data). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:199522",
@@ -8670,7 +8670,7 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-21",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-21 measured + diffed (all joined properties PASS). match. Page panel: Home · Page header, Fill/Size/Typography/Spacing, SEO & social…, 'Your place here is kept', no tabs. Background reads 'transparent' (board 'Page / background' token — owner question). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-21 measured + diffed (all joined properties PASS). match. Page panel: Home · Page header, Fill/Size/Typography/Spacing, SEO & social…, 'Your place here is kept', no tabs. Background reads 'transparent' on this fixture site (its root is imported, so it predates the token); a NEW site reads 'Page / background' (owner decision 2026-10-02: seed token color-page-background, value transparent, new page roots bound to it — live on port 3190). Text colour reads 'Text': token names follow the seed by owner decision 2026-10-02 ('Text / primary' is board sample data). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:204715",
@@ -8754,7 +8754,7 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-27",
       "verified": "drift-fixed",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-27 measured + diffed (all joined properties PASS). drift-fixed. :hover state chip filled accent-tint, board accent-subtle (f6ad65d7f). '1 :hover override · Reset', Fill Colour dot + note match; token reads 'Primary' (seed name; owner question on 'Brand / primary'). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-27 measured + diffed (all joined properties PASS). drift-fixed. :hover state chip filled accent-tint, board accent-subtle (f6ad65d7f). '1 :hover override · Reset', Fill Colour dot + note match; token reads 'Primary' — token names follow the seed by owner decision 2026-10-02 ('Brand / primary' is board sample data). Shared, not judged per board: header 68 tall vs 72 and context row 32 vs 28 (24px targets) — sections start at the same y; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
     },
     {
       "nodeId": "7995:207832",
