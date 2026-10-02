@@ -16,6 +16,7 @@ import {
   ButtonGroup,
   ColorInput,
   CornerRadiusInput,
+  SpacingBox,
   InputRow,
   InputWithUnit,
   MixedValueIndicator,
@@ -132,6 +133,82 @@ describe("Mixed — shared controls", () => {
     fireEvent.focus(input);
     fireEvent.blur(input);
     expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+/* Regression (QA 2026-10-02): a write lands on the whole selection, but the
+   selection — and so "Mixed" — is re-read only when the debounced engine write
+   commits. Until then a Mixed field was pinned to "" and each keystroke
+   replaced the last: "36" typed into Font size wrote 6px on all three H3s.
+   The parent here updates its value at once (as useStyleHandlers does) while
+   the context keeps saying Mixed — the lag, held open. */
+describe("typing into a Mixed field", () => {
+  const typeInto = (input: HTMLElement, text: string) => {
+    for (const ch of text) fireEvent.change(input, { target: { value: (input as HTMLInputElement).value + ch } });
+  };
+  function Live({ render: r, initial }: { initial: string; render: (v: string, set: (v: string) => void) => React.ReactNode }) {
+    const [v, setV] = React.useState(initial);
+    return <>{r(v, setV)}</>;
+  }
+
+  it("number: every keystroke lands; after blur the field reads Mixed again while the selection disagrees", () => {
+    const onChange = vi.fn();
+    inMixed(
+      ["font-size"],
+      <Live initial="24px" render={(v, set) => <InputWithUnit label="Font size" value={v} onChange={(n) => { onChange(n); set(n); }} property="font-size" />} />
+    );
+    const input = screen.getByRole("textbox", { name: /Font size/ });
+    typeInto(input, "36");
+    expect(input).toHaveValue("36");
+    expect(onChange).toHaveBeenLastCalledWith("36px");
+    fireEvent.blur(input);
+    expect(input).toHaveValue("");
+    expect(input).toHaveAttribute("placeholder", "Mixed");
+  });
+
+  it("colour: a six-digit hex can be typed at all", () => {
+    const onChange = vi.fn();
+    inMixed(["color"], <ColorInput label="Colour" value="#111111" onChange={onChange} property="color" />);
+    const field = screen.getByRole("textbox", { name: /Colour value/ });
+    typeInto(field, "1a2b3c");
+    expect(field).toHaveValue("1a2b3c");
+    expect(onChange).toHaveBeenLastCalledWith(expect.stringMatching(/^#1a2b3c$/i));
+  });
+
+  it("spacing side: \"16\" writes 16px, not 6px", () => {
+    const onPadding = vi.fn();
+    const sides = { top: "", right: "", bottom: "", left: "" };
+    inMixed(
+      ["padding-top"],
+      <Live
+        initial="8px"
+        render={(v, set) => (
+          <SpacingBox
+            margin={sides}
+            padding={{ ...sides, top: v }}
+            onMarginChange={vi.fn()}
+            onPaddingChange={(_side, n) => {
+              onPadding(n);
+              set(n);
+            }}
+          />
+        )}
+      />
+    );
+    const input = screen.getByRole("textbox", { name: /Padding top/ });
+    typeInto(input, "16");
+    expect(onPadding).toHaveBeenLastCalledWith("16px");
+  });
+
+  it("text row: the typed text accumulates", () => {
+    const onChange = vi.fn();
+    inMixed(
+      ["background-image"],
+      <Live initial="url(a.png)" render={(v, set) => <InputRow label="Image" value={v} onChange={(n) => { onChange(n); set(n); }} property="background-image" />} />
+    );
+    const input = screen.getByRole("textbox", { name: /Image/ });
+    typeInto(input, "none");
+    expect(onChange).toHaveBeenLastCalledWith("none");
   });
 });
 

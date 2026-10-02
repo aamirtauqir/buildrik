@@ -86,8 +86,10 @@ export const SliderInput: React.FC<SliderInputProps> = ({
             step={step}
             onChange={(e) => {
               const n = Number(e.target.value);
+              field.startTyping();
               if (e.target.value !== "" && Number.isFinite(n)) onChange(Math.min(max, Math.max(min, n)));
             }}
+            onBlur={field.stopTyping}
           />
         ) : (
           <span

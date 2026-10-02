@@ -89,7 +89,11 @@ export const InputRow: React.FC<InputRowProps> = ({
           aria-readonly={field.readOnly || undefined}
           aria-label={field.mixed ? mixedName(label) : undefined}
           value={field.mixed ? "" : value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            field.startTyping();
+            onChange(e.target.value);
+          }}
+          onBlur={field.stopTyping}
           placeholder={field.mixed ? "Mixed" : placeholder}
         />
       ) : (
@@ -101,7 +105,11 @@ export const InputRow: React.FC<InputRowProps> = ({
           aria-label={field.mixed ? mixedName(label) : undefined}
           type={type}
           value={field.mixed ? "" : value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            field.startTyping();
+            onChange(e.target.value);
+          }}
+          onBlur={field.stopTyping}
           placeholder={field.mixed ? "Mixed" : placeholder}
         />
       )}
@@ -298,6 +306,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
         value={field.mixed ? "" : text}
         onChange={(e) => {
           const next = e.target.value;
+          field.startTyping();
           setText(next);
           if (invalid) setInvalid(false);
           /* A plain number is written as it is typed (live on the canvas);
@@ -307,7 +316,10 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
             onChange(`${next.trim()}${unitNow}`);
           }
         }}
-        onBlur={commit}
+        onBlur={() => {
+          commit();
+          field.stopTyping();
+        }}
         onKeyDown={onKeyDown}
         placeholder={field.mixed ? "Mixed" : placeholder}
         id={inputId}

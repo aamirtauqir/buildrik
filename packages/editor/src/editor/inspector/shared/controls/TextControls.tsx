@@ -48,8 +48,11 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
           aria-label={field.mixed ? mixedName(label) : undefined}
           value={field.mixed ? "" : value}
           onChange={(e) => {
-            if (!field.readOnly) onChange(e.target.value);
+            if (field.readOnly) return;
+            field.startTyping();
+            onChange(e.target.value);
           }}
+          onBlur={field.stopTyping}
           placeholder={field.mixed ? "Mixed" : placeholder}
         />
       </div>

@@ -140,6 +140,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
         placeholder={field.mixed ? "Mixed" : "0"}
         onChange={(e) => {
           const next = e.target.value;
+          field.startTyping();
           setLocal({ num: next, unit: local.unit, isKeyword: /^[a-z]+$/i.test(next) });
           if (next === "" || /^-?[\d.]+$/.test(next) || next === "auto" || next === "inherit") commit(next);
         }}
@@ -156,7 +157,10 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
             setLocal(parseValue(value));
           }
         }}
-        onBlur={() => setLocal(parseValue(value))}
+        onBlur={() => {
+          setLocal(parseValue(value));
+          field.stopTyping();
+        }}
       />
     </span>
   );
@@ -310,9 +314,11 @@ const CornerCell: React.FC<{ corner: keyof typeof CORNER_PROPERTY; value: string
         onChange={(e) => {
           if (field.readOnly) return;
           const v = e.target.value;
+          field.startTyping();
           if (v === "") onChange("");
           else if (/^-?[\d.]+$/.test(v)) onChange(`${v}px`);
         }}
+        onBlur={field.stopTyping}
         placeholder={field.mixed ? "Mixed" : "0"}
         aria-label={field.mixed ? mixedName(`${corner} corner`) : `${corner} corner`}
       />

@@ -42,8 +42,17 @@ export const InspectorFieldContext = React.createContext<InspectorFieldContextVa
 export interface InspectorField {
   readOnly: boolean;
   readOnlyReason: InspectorFieldContextValue["readOnlyReason"];
-  /** The selection disagrees about this property. */
+  /** The selection disagrees about this property — and the user has not
+   *  started typing in this field (see `startTyping`). */
   mixed: boolean;
+  /** Call on every keystroke: from the first one until `stopTyping` (blur) the
+   *  field shows what is typed instead of "Mixed". A write lands on the whole
+   *  selection, but the selection is only re-read when the debounced engine
+   *  write commits (300 ms) — until then the field stayed pinned to "" and each
+   *  keystroke replaced the last: "36" typed into Font size wrote 6px on all
+   *  three headings. */
+  startTyping: () => void;
+  stopTyping: () => void;
   /** What overrides this property here (empty when nothing does). */
   overrides: readonly OverrideKind[];
   overrideLabels: InspectorFieldContextValue["overrideLabels"];
@@ -57,10 +66,13 @@ export const mixedName = (label: string): string => `${label}, Mixed values`;
 
 export function useInspectorField(property?: string): InspectorField {
   const ctx = React.useContext(InspectorFieldContext);
+  const [typing, setTyping] = React.useState(false);
   return {
     readOnly: ctx.readOnly,
     readOnlyReason: ctx.readOnlyReason,
-    mixed: property ? ctx.mixedKeys.has(property) : false,
+    mixed: property ? ctx.mixedKeys.has(property) && !typing : false,
+    startTyping: () => setTyping(true),
+    stopTyping: () => setTyping(false),
     overrides: property ? ctx.overrides.get(property) ?? NONE : NONE,
     overrideLabels: ctx.overrideLabels,
     resetOverride: (kind) => {

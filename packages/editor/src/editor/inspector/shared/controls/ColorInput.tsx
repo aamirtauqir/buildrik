@@ -259,12 +259,16 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                     aria-describedby={invalid ? errorId : undefined}
                     onChange={(e) => {
                       if (field.readOnly) return;
+                      field.startTyping();
                       setHexText(e.target.value);
                       setInvalid(false);
                       const next = readHex(e.target.value);
                       if (next !== null) onChange(next);
                     }}
-                    onBlur={() => setInvalid(readHex(hexText) === null)}
+                    onBlur={() => {
+                      setInvalid(readHex(hexText) === null);
+                      field.stopTyping();
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") setInvalid(readHex(hexText) === null);
                       else if (e.key === "Escape") {
