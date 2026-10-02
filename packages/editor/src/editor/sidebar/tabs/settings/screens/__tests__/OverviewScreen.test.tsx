@@ -1,5 +1,5 @@
 /**
- * OverviewScreen — Clone 3397:32915.
+ * OverviewScreen — 4418:128917, regrouped to the Phase B IA (§25).
  *
  * The screen reads `siteDetail.settingsOverview` and composes every row's
  * one-line summary from it; the sample data here is the SHAPE of the frame
@@ -21,7 +21,7 @@ import { OverviewScreen, summaryLine } from "../OverviewScreen";
 import type { SettingsOverview } from "@buildrik/shared/schemas/site-detail";
 
 const full: SettingsOverview = {
-  site: { name: "Bella Cucina", defaultLocale: "en-US", plan: "PRO" },
+  site: { name: "Bella Cucina", defaultLocale: "en-US", plan: "PRO", archived: false, workspaceDeletionAt: null },
   general: { siteName: "Bella Cucina", language: "en-US" },
   localization: { locales: 3, notStarted: ["ar"] },
   seo: { allowIndexing: true, robotsTxtSet: true },
@@ -31,7 +31,7 @@ const full: SettingsOverview = {
   forms: { forms: 3, submissions: 38 },
   customCode: { head: true, body: true, css: true },
   headers: { csp: true, hsts: true },
-  integrations: { connected: 2, available: 16 },
+  access: { passwordSet: true, shareLinks: 2 },
   webhooks: { endpoints: 1, lastDelivery: "failed" },
   members: { used: 3, seats: 5 },
   billing: { plan: "PRO", priceMonthly: 24 },
@@ -43,7 +43,7 @@ const full: SettingsOverview = {
 };
 
 const empty: SettingsOverview = {
-  site: { name: "New site", defaultLocale: "en", plan: "FREE" },
+  site: { name: "New site", defaultLocale: "en", plan: "FREE", archived: false, workspaceDeletionAt: null },
   general: { siteName: "New site", language: "en" },
   localization: { locales: 1, notStarted: [] },
   seo: { allowIndexing: false, robotsTxtSet: false },
@@ -53,7 +53,7 @@ const empty: SettingsOverview = {
   forms: { forms: 0, submissions: 0 },
   customCode: { head: false, body: false, css: false },
   headers: { csp: false, hsts: false },
-  integrations: { connected: 0, available: 16 },
+  access: { passwordSet: false, shareLinks: 0 },
   webhooks: { endpoints: 0, lastDelivery: null },
   members: { used: 1, seats: 1 },
   billing: { plan: "FREE", priceMonthly: 0 },
@@ -83,7 +83,7 @@ describe("OverviewScreen — load states", () => {
     expect(screen.getByTestId("set-load-title").textContent).toBe("Overview");
     expect(screen.getByTestId("set-load-line").textContent).toBe("Where every setting stands.");
     pending.resolve(full);
-    await screen.findByTestId("set-ov-group-site-setup");
+    await screen.findByTestId("set-ov-group-site");
   });
 
   it("a failed query is the load-error card, and Try again asks the server again", async () => {
@@ -96,7 +96,7 @@ describe("OverviewScreen — load states", () => {
     query.mockResolvedValueOnce(full);
     fireEvent.click(retry);
     expect(query).toHaveBeenCalledTimes(2);
-    expect(await screen.findByTestId("set-ov-group-site-setup")).toBeTruthy();
+    expect(await screen.findByTestId("set-ov-group-site")).toBeTruthy();
   });
 
   it("no project id is the load-error card, not a request", () => {
@@ -123,24 +123,26 @@ describe("OverviewScreen — the frame", () => {
   it("hides the attention card when nothing needs it", async () => {
     query.mockResolvedValue(empty);
     render(<OverviewScreen projectId="site-1" onOpenScreen={vi.fn()} />);
-    await screen.findByTestId("set-ov-group-site-setup");
+    await screen.findByTestId("set-ov-group-site");
     expect(screen.queryByTestId("set-ov-attention")).toBeNull();
   });
 
-  it("lays the five groups out in 4418:128917's two columns with a row per section and its summary", async () => {
+  it("lays the §25 groups out in two columns with a row per section and its summary", async () => {
     query.mockResolvedValue(full);
     const onOpenScreen = vi.fn();
     render(<OverviewScreen projectId="site-1" onOpenScreen={onOpenScreen} />);
-    await screen.findByTestId("set-ov-group-site-setup");
+    await screen.findByTestId("set-ov-group-site");
     const groups = Array.from(document.querySelectorAll('[data-testid^="set-ov-group-"]')).map((el) =>
       el.getAttribute("data-testid"),
     );
-    // Left column: Site setup, SEO & publishing; right: Visitors, Advanced, Workspace.
+    // Left column: Site, Search & sharing, Publishing; right: Visitors, Advanced, Danger zone, workspace doors.
     expect(groups).toEqual([
-      "set-ov-group-site-setup",
-      "set-ov-group-seo-publishing",
+      "set-ov-group-site",
+      "set-ov-group-search-sharing",
+      "set-ov-group-publishing",
       "set-ov-group-visitors",
       "set-ov-group-advanced",
+      "set-ov-group-danger-zone",
       "set-ov-group-workspace",
     ]);
     const line = (id: string) => screen.getByTestId(`set-ov-row-line-${id}`).textContent;
@@ -152,10 +154,12 @@ describe("OverviewScreen — the frame", () => {
     expect(line("seo")).toBe("Indexing allowed · robots.txt set");
     expect(line("domains")).toBe("bellacucina.com · 1 DNS pending");
     expect(line("redirects")).toBe("3 rules · 2 suggestions");
-    expect(line("export")).toBe("HTML, ZIP or React");
+    expect(line("access")).toBe("Password on · 2 share links");
     expect(line("custom-code")).toBe("Head, body and CSS set");
     expect(line("headers")).toBe("CSP and HSTS on");
-    expect(line("integrations")).toBe("2 connected · 16 available");
+    expect(line("danger-zone")).toBe("Archive, transfer or delete");
+    expect(screen.queryByTestId("set-ov-row-export")).toBeNull();
+    expect(screen.queryByTestId("set-ov-row-integrations")).toBeNull();
     expect(line("webhooks")).toBe("1 endpoint · last delivery failed");
     expect(line("members")).toBe("3 of 5 seats used");
     expect(line("billing")).toBe("Pro · $24 / month");
@@ -189,11 +193,40 @@ describe("OverviewScreen — the frame", () => {
     expect(summaryLine("forms", empty)).toBe("0 forms · 0 submissions");
     expect(summaryLine("custom-code", empty)).toBe("None set");
     expect(summaryLine("headers", empty)).toBe("Defaults");
-    expect(summaryLine("webhooks", empty)).toBe("No endpoints");
+    expect(summaryLine("webhooks", empty)).toBe("No webhook endpoints");
+    expect(summaryLine("access", empty)).toBe("No password · 0 share links");
     expect(summaryLine("members", empty)).toBe("1 of 1 seats used");
     expect(summaryLine("billing", empty)).toBe("Free · $0 / month");
     expect(summaryLine("domains", { ...empty, domains: { primary: "a.com", pendingDns: 0 } })).toBe("a.com · DNS verified");
     expect(summaryLine("custom-code", { ...empty, customCode: { head: true, body: false, css: true } })).toBe("Head and CSS set");
     expect(summaryLine("webhooks", { ...empty, webhooks: { endpoints: 2, lastDelivery: null } })).toBe("2 endpoints · no deliveries yet");
+  });
+});
+
+describe("OverviewScreen — the site's state (plan #10 / M3)", () => {
+  it("says an archived site is hidden but still live, and opens the Danger zone", async () => {
+    query.mockResolvedValue({ ...empty, site: { ...empty.site, archived: true } });
+    const onOpenScreen = vi.fn();
+    render(<OverviewScreen projectId="site-1" onOpenScreen={onOpenScreen} />);
+    const state = await screen.findByTestId("set-ov-state");
+    expect(state.textContent).toContain("This site is archived: it is hidden from the Sites list, and the live site stays up.");
+    fireEvent.click(screen.getByTestId("set-ov-state-open"));
+    expect(onOpenScreen).toHaveBeenCalledWith("danger-zone");
+    expect(summaryLine("danger-zone", { ...empty, site: { ...empty.site, archived: true } })).toBe("Archived · hidden from the Sites list");
+  });
+
+  it("names the day the workspace is deleted", async () => {
+    query.mockResolvedValue({ ...empty, site: { ...empty.site, workspaceDeletionAt: "2026-11-01T00:00:00.000Z" } });
+    render(<OverviewScreen projectId="site-1" onOpenScreen={vi.fn()} />);
+    expect((await screen.findByTestId("set-ov-state")).textContent).toContain(
+      "This workspace is scheduled for deletion on 1 November 2026. This site is deleted with it.",
+    );
+  });
+
+  it("draws no state strip for an ordinary site", async () => {
+    query.mockResolvedValue(empty);
+    render(<OverviewScreen projectId="site-1" onOpenScreen={vi.fn()} />);
+    await screen.findByTestId("set-ov-group-site");
+    expect(screen.queryByTestId("set-ov-state")).toBeNull();
   });
 });

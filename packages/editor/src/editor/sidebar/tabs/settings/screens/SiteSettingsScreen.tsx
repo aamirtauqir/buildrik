@@ -173,10 +173,10 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     { onLoadStateChange, registerRetryLoad }
   );
 
-  // Register flush handler — SettingsTab.handleSave invokes this BEFORE
-  // composer.saveProject(). Pulls latest local state from refs so the
-  // closure stays single — re-registering per keystroke would defeat the
-  // fan-out reduction this whole refactor exists for.
+  // Register flush handler — SettingsTab.handleSave calls it on Save and saves
+  // what it returns (ScreenProps.registerFlushHandler). Pulls latest local
+  // state from refs so the closure stays single — re-registering per keystroke
+  // would defeat the fan-out reduction this whole refactor exists for.
   const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin, author });
   stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin, author };
   React.useEffect(() => {
@@ -184,7 +184,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     registerFlushHandler(() => {
       const current = composer.getProjectSettings();
       const s = stateRef.current;
-      composer.setProjectSettings({
+      const next = {
         ...current,
         seo: {
           ...current.seo,
@@ -198,7 +198,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             linkedin: s.linkedin,
           },
         },
-      });
+      };
       /* The site name is the project's name too: the sidebar, the topbar and
          the Settings saved dialog read `getProjectMetadata().name`, which was
          loaded from the Site row and would keep the old name until a reload
@@ -209,6 +209,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
       if ((name && name !== meta?.name) || author !== (meta?.author ?? "")) {
         composer.updateProjectMetadata?.({ ...(name ? { name } : {}), author });
       }
+      return next;
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);

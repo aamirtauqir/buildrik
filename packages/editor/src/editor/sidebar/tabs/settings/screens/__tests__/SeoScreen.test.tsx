@@ -279,9 +279,9 @@ describe("SeoScreen — flush handler contract", () => {
     expect(registerFlushHandler).toHaveBeenLastCalledWith(null);
   });
 
-  it("flush writes the six SEO keys into composer, preserving sibling seo keys", async () => {
-    let flush: (() => void) | null = null;
-    const registerFlushHandler = vi.fn((h: (() => void) | null) => { flush = h; });
+  it("flush returns the six SEO keys, preserving sibling seo keys, without writing the composer", async () => {
+    let flush: (() => unknown) | null = null;
+    const registerFlushHandler = vi.fn((h: (() => unknown) | null) => { flush = h; });
     getMock.mockResolvedValue({ ...serverRow(), robotsTxt: "Disallow: /x" });
     const { composer } = setup({ registerFlushHandler });
     await loaded();
@@ -292,10 +292,8 @@ describe("SeoScreen — flush handler contract", () => {
     fireEvent.change(ogImage(), { target: { value: "https://acme.test/flushed.png" } });
     fireEvent.click(indexing());
 
-    act(() => flush!());
-
-    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
-    const settings = composer.getProjectSettings() as { seo: Record<string, unknown> };
+    const settings = flush!() as { seo: Record<string, unknown> };
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
     expect(settings.seo).toMatchObject({
       metaTitle: "Flushed title",
       metaDescription: "Flushed description",

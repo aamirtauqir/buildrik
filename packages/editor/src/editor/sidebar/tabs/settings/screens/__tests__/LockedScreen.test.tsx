@@ -33,10 +33,10 @@ describe("LockedScreen — the frame's card", () => {
     expect(screen.getByRole("button", { name: /upgrade to pro plan/i })).toBe(screen.getByTestId("set-locked-upgrade"));
   });
 
-  it("is generic — Integrations gets its own subject and body", () => {
-    render(<LockedScreen variant="pro" {...LOCKED_COPY.integrations} />);
-    expect(screen.getByRole("heading", { name: "Integrations is a Pro feature" })).toBeInTheDocument();
-    expect(screen.getByTestId("set-locked")).toHaveTextContent(/connect your published site/i);
+  it("is generic — Access gets its own subject and body", () => {
+    render(<LockedScreen variant="pro" {...LOCKED_COPY.access} />);
+    expect(screen.getByRole("heading", { name: "Password protection is a Pro feature" })).toBeInTheDocument();
+    expect(screen.getByTestId("set-locked")).toHaveTextContent(/keeps the published site private/i);
   });
 
   it("enterprise variant names Enterprise in the title, pill and CTA", () => {

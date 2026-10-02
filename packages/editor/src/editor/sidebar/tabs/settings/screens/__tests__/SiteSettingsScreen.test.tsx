@@ -2,8 +2,8 @@
  * SiteSettingsScreen tests — Clone 3397:32011 General: the two cards and
  * their fields, the server read behind them (3953:26363 loading, 3953:26503
  * load-error + Try again), the save-error banner (3950:26309), dirty wiring
- * and the flush-handler contract (registerFlushHandler →
- * composer.setProjectSettings).
+ * and the flush-handler contract (registerFlushHandler returns the settings
+ * the shell saves; the screen never writes the composer's settings).
  *
  * The site-name / favicon / language columns reach `Site.*` through the sync
  * provider's dual-save map — covered in
@@ -344,9 +344,9 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     expect(registerFlushHandler).toHaveBeenLastCalledWith(null);
   });
 
-  it("flush pushes the typed identity + social values into composer.setProjectSettings, preserving sibling seo keys", async () => {
-    let flush: (() => void) | null = null;
-    const registerFlushHandler = vi.fn((h: (() => void) | null) => {
+  it("flush returns the typed identity + social values, preserving sibling seo keys, without writing the composer", async () => {
+    let flush: (() => unknown) | null = null;
+    const registerFlushHandler = vi.fn((h: (() => unknown) | null) => {
       flush = h;
     });
     const { composer } = setup({ registerFlushHandler });
@@ -356,14 +356,15 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     fireEvent.change(twitter(), { target: { value: "https://twitter.com/flushed" } });
 
     expect(flush).toBeTypeOf("function");
-    act(() => flush!());
-
-    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
-    const settings = composer.getProjectSettings() as ReturnType<typeof baseSettings>;
+    let settings!: ReturnType<typeof baseSettings>;
+    act(() => {
+      settings = flush!() as ReturnType<typeof baseSettings>;
+    });
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
     expect(settings.seo.siteName).toBe("Flushed Name");
     expect(settings.seo.socialLinks.twitter).toBe("https://twitter.com/flushed");
-    // Untouched fields carry the SERVER's values into the composer — that is
-    // the copy the dual-save map then sends back to Site.*.
+    // Untouched fields carry the SERVER's values — the shell's diff against the
+    // composer then sends only what changed to Site.*.
     expect(settings.seo.favicon).toBe("https://acme.test/favicon.ico");
     expect(settings.seo.language).toBe("fr");
     expect(settings.seo.socialLinks.facebook).toBe("https://facebook.com/acme");
@@ -375,8 +376,8 @@ describe("SiteSettingsScreen — flush handler contract", () => {
      2026-09-24) in the empty cell beside Site Language, and reaches the
      project metadata on the flush. */
   it("Author sits in Site Identity and flushes to the project metadata; no Canvas card", async () => {
-    let flush: (() => void) | null = null;
-    const registerFlushHandler = vi.fn((h: (() => void) | null) => {
+    let flush: (() => unknown) | null = null;
+    const registerFlushHandler = vi.fn((h: (() => unknown) | null) => {
       flush = h;
     });
     const { composer } = setup({ registerFlushHandler });

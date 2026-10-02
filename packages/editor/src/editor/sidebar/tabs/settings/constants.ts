@@ -8,7 +8,8 @@
  * deep-links + Topbar export) and the local flags had zero consumers.
  */
 
-import type { SettingsNavId } from "./types";
+import type { WorkspaceRole } from "@/services/RoleService";
+import type { SettingsNavId, SettingsSaveModel, SettingsScope, SettingsScreenId } from "./types";
 
 /**
  * The locales the product knows. One list for every place a locale is
@@ -60,77 +61,172 @@ export function localeLabel(code: string): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Nav — the Clone sidebar (3397:32011) and the Overview's cards (3397:32915)
-// draw the same sixteen rows; this is the one list both read.
+// Nav — Settings Phase B (proposal §25, plan M0): the sidebar and the
+// Overview's cards draw the same rows; this is the one list both read.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type SettingsNavGroupId = "site-setup" | "seo-publishing" | "visitors" | "advanced" | "workspace";
+export type SettingsNavGroupId =
+  | "site"
+  | "search-sharing"
+  | "publishing"
+  | "visitors"
+  | "advanced"
+  | "danger-zone"
+  | "workspace";
 
-/** Sentence case — the pane header reads `Site setup / General`; the sidebar
- *  and the Overview's cards set it uppercase themselves. */
+/** Sentence case — the pane header reads `Site / General`; the sidebar and the
+ *  Overview's cards set it uppercase themselves. `workspace` is the footer
+ *  group under the separator: rows that leave for the dashboard. */
 export const SETTINGS_NAV_GROUPS: Record<SettingsNavGroupId, string> = {
-  "site-setup": "Site setup",
-  "seo-publishing": "SEO & publishing",
+  site: "Site",
+  "search-sharing": "Search & sharing",
+  publishing: "Publishing",
   visitors: "Visitors",
   advanced: "Advanced",
-  workspace: "Workspace",
+  "danger-zone": "Danger zone",
+  workspace: "Managed in workspace settings",
 };
 
-export interface SettingsNavDef {
-  id: SettingsNavId;
+/** Sidebar order, top to bottom. */
+export const SETTINGS_NAV_GROUP_ORDER: readonly SettingsNavGroupId[] = [
+  "site",
+  "search-sharing",
+  "publishing",
+  "visitors",
+  "advanced",
+  "danger-zone",
+  "workspace",
+];
+
+interface SettingsNavRow {
   title: string;
   /** The pane header's second line (screens) or the Overview's static summary (doors). */
   subtitle: string;
   group: SettingsNavGroupId;
-  /**
-   * `screen` renders in the pane · `door` leaves for another surface (the
-   * Brand panel, the Export modal) · `external` opens the dashboard in a new
-   * tab (`WORKSPACE_LINKS`).
-   */
-  kind: "screen" | "door" | "external";
 }
 
-/** Sidebar order — the group order the frame draws. The Overview lays the
- *  same groups out as cards in its own order (see OverviewScreen). */
+/**
+ * `screen` renders in the pane · `door` leaves for another editor surface
+ * (the Brand panel) · `external` opens the dashboard in a new tab
+ * (`WORKSPACE_LINKS`).
+ */
+export type SettingsNavDef =
+  | (SettingsNavRow & { kind: "screen"; id: Exclude<SettingsScreenId, "overview"> })
+  | (SettingsNavRow & { kind: "door" | "external"; id: Exclude<SettingsNavId, SettingsScreenId> });
+
+/** Sidebar order within each group. */
 export const SETTINGS_NAV: SettingsNavDef[] = [
-  { id: "general", title: "General", subtitle: "Manage your site identity, language and social profiles.", group: "site-setup", kind: "screen" },
-  { id: "branding", title: "Brand ↗", subtitle: "Colours, fonts, spacing and presets", group: "site-setup", kind: "door" },
-  { id: "localization", title: "Localization", subtitle: "Locale claim and preview", group: "site-setup", kind: "screen" },
-  { id: "seo", title: "SEO defaults", subtitle: "Search & social preview", group: "seo-publishing", kind: "screen" },
-  { id: "domains", title: "Domains", subtitle: "Custom domain + DNS", group: "seo-publishing", kind: "screen" },
-  { id: "redirects", title: "Redirects", subtitle: "301 / 302 + 404 suggester", group: "seo-publishing", kind: "screen" },
-  { id: "export", title: "Export…", subtitle: "HTML, ZIP or React", group: "seo-publishing", kind: "door" },
-  { id: "analytics", title: "Analytics", subtitle: "Google Analytics, Meta Pixel, Clarity, Tag Manager", group: "visitors", kind: "screen" },
-  { id: "forms", title: "Forms", subtitle: "Submissions inbox + config", group: "visitors", kind: "screen" },
-  { id: "custom-code", title: "Custom code", subtitle: "Head, body, CSS injections", group: "advanced", kind: "screen" },
-  { id: "headers", title: "Headers", subtitle: "CSP, HSTS, security policy", group: "advanced", kind: "screen" },
-  { id: "integrations", title: "Integrations", subtitle: "Third-party OAuth", group: "advanced", kind: "screen" },
-  { id: "webhooks", title: "Webhooks", subtitle: "Workspace event deliveries", group: "advanced", kind: "external" },
+  { id: "general", title: "General", subtitle: "The site's name, icons and author.", group: "site", kind: "screen" },
+  { id: "localization", title: "Languages", subtitle: "Default language and the languages the site is published in.", group: "site", kind: "screen" },
+  { id: "branding", title: "Brand ↗", subtitle: "Colours, fonts, spacing and presets", group: "site", kind: "door" },
+  { id: "seo", title: "SEO", subtitle: "Search defaults, social profiles and indexing.", group: "search-sharing", kind: "screen" },
+  { id: "domains", title: "Domains", subtitle: "Custom domains, the primary address and DNS.", group: "publishing", kind: "screen" },
+  { id: "redirects", title: "Redirects", subtitle: "301 / 302 rules and 404 suggestions.", group: "publishing", kind: "screen" },
+  { id: "access", title: "Access", subtitle: "Password protection and share links.", group: "publishing", kind: "screen" },
+  { id: "analytics", title: "Analytics", subtitle: "Google Analytics, Tag Manager, Meta Pixel, Clarity.", group: "visitors", kind: "screen" },
+  { id: "forms", title: "Form submissions", subtitle: "What visitors sent through your forms.", group: "visitors", kind: "screen" },
+  { id: "custom-code", title: "Custom code", subtitle: "Head, body and CSS injections.", group: "advanced", kind: "screen" },
+  { id: "headers", title: "Security headers", subtitle: "CSP, HSTS and security policy.", group: "advanced", kind: "screen" },
+  { id: "danger-zone", title: "Danger zone", subtitle: "Archive, transfer or delete this site.", group: "danger-zone", kind: "screen" },
   { id: "members", title: "Members", subtitle: "Seats and roles", group: "workspace", kind: "external" },
   { id: "billing", title: "Billing", subtitle: "Plan and invoices", group: "workspace", kind: "external" },
+  { id: "webhooks", title: "Integrations & webhooks", subtitle: "Apps, Vercel and webhook deliveries", group: "workspace", kind: "external" },
 ];
 
+/** The ids that render in the pane, in sidebar order — what a deep link may name. */
+export const SETTINGS_SCREEN_IDS: readonly SettingsScreenId[] = [
+  "overview",
+  ...SETTINGS_NAV.flatMap((n) => (n.kind === "screen" ? [n.id] : [])),
+];
+
+export function isSettingsScreenId(id: string): id is SettingsScreenId {
+  return (SETTINGS_SCREEN_IDS as readonly string[]).includes(id);
+}
+
 /**
- * Workspace deep-links — dashboard pages, opened in a new tab. Only links to
- * pages that actually exist ship here (Members under /dashboard/settings/team,
- * Billing under /dashboard/settings/billing); linking to a 404 silently is
- * worse than not linking at all. Billing is also where every `Upgrade` goes.
+ * The role a screen needs to CHANGE anything on it (SA-21, plan M2). Below it
+ * the screen still opens — read-only, with a banner saying who can change it.
+ * Mirrors the server: Site columns (General, Languages, SEO, Access, Custom
+ * code, Security headers) and domains are ADMIN; redirects, analytics and form
+ * submissions are EDITOR; the Danger zone is the OWNER's (PD-3). The Overview
+ * changes nothing and needs no row.
  */
+export const SCREEN_MIN_ROLE: Record<Exclude<SettingsScreenId, "overview">, WorkspaceRole> = {
+  general: "ADMIN",
+  localization: "ADMIN",
+  seo: "ADMIN",
+  domains: "ADMIN",
+  redirects: "EDITOR",
+  access: "ADMIN",
+  analytics: "EDITOR",
+  forms: "EDITOR",
+  "custom-code": "ADMIN",
+  headers: "ADMIN",
+  "danger-zone": "OWNER",
+};
+
+/**
+ * §27: fields save from the footer through the settings mutations; objects
+ * (domains, redirects, submissions, the Danger zone's actions) apply at once
+ * through their own dialogs. Languages is `footer` — its default locale is a
+ * field; its locales table applies immediately inside it.
+ */
+export const SCREEN_SAVE_MODEL: Record<Exclude<SettingsScreenId, "overview">, SettingsSaveModel> = {
+  general: "footer",
+  localization: "footer",
+  seo: "footer",
+  domains: "immediate",
+  redirects: "immediate",
+  access: "footer",
+  analytics: "footer",
+  forms: "immediate",
+  "custom-code": "footer",
+  headers: "footer",
+  "danger-zone": "immediate",
+};
+
+/** The scope line under each screen's title (plan M1). */
+export const SCREEN_SCOPE: Record<Exclude<SettingsScreenId, "overview">, SettingsScope> = {
+  general: "publish",
+  localization: "publish",
+  seo: "publish",
+  domains: "live",
+  redirects: "publish",
+  access: "publish",
+  analytics: "publish",
+  forms: "live",
+  "custom-code": "publish",
+  headers: "publish",
+  "danger-zone": "live",
+};
+
+export const SCOPE_LINE: Record<SettingsScope, string> = {
+  publish: "all pages · applies on next publish",
+  live: "live immediately · no publish needed",
+};
+
 /** 3950:26309 / 3951:26319 / 3951:26607 — the banner a screen draws when
  *  its Save fails; the shell sets it after a refused Save, Domains and
- *  Redirects after a refused row action. Other screens get the same
- *  sentence with their own name in it. */
+ *  Redirects after a refused row action. Screens without a row get the same
+ *  sentence with their own title in it. */
 export const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
   general: "Site settings were not saved. Your changes are still here. Review the values, then retry.",
-  seo: "SEO defaults were not saved. Your changes are still here. Review the values, then retry.",
+  seo: "SEO settings were not saved. Your changes are still here. Review the values, then retry.",
   "custom-code": "Custom code was not saved. Your changes are still here. Review the values, then retry.",
   domains: "Domain changes were not saved. Your changes are still here. Review the values, then retry.",
   analytics: "Analytics settings were not saved. Your changes are still here. Review the values, then retry.",
-  localization: "Localization settings were not saved. Your changes are still here. Review the values, then retry.",
+  localization: "Language settings were not saved. Your changes are still here. Review the values, then retry.",
   redirects: "Redirect changes were not saved. Your changes are still here. Review the values, then retry.",
-  headers: "Header changes were not saved. Your changes are still here. Review the values, then retry.",
+  headers: "Security headers were not saved. Your changes are still here. Review the values, then retry.",
+  access: "Access settings were not saved. Your changes are still here. Review the values, then retry.",
 };
 
+/**
+ * Workspace doors — dashboard pages, opened in a new tab. Only pages that
+ * exist ship here; Billing is also where every `Upgrade` goes. "Integrations &
+ * webhooks" is the dashboard's Settings › Integrations, where webhooks moved
+ * (A-12) beside Vercel and the apps.
+ */
 export const WORKSPACE_LINKS: Partial<Record<SettingsNavId, string>> = {
   members: "/dashboard/settings/team",
   billing: "/dashboard/settings/billing",

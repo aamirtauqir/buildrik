@@ -252,7 +252,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     return () => registerSaveHandler(null);
   }, [registerSaveHandler, firstError]);
 
-  // Flush local buffer → composer once on Save click (see SettingsTab). The
+  // On Save the shell calls this and saves what it returns (ScreenProps.registerFlushHandler). The
   // other providers' `verifiedAt` ride through from the stored config.
   const stateRef = React.useRef({ gaId, gaEnabled, gaVerifiedAt, gtmId, gtmEnabled, pixelId, pixelEnabled, clarityId, clarityEnabled, cookieConsent, firstError });
   stateRef.current = { gaId, gaEnabled, gaVerifiedAt, gtmId, gtmEnabled, pixelId, pixelEnabled, clarityId, clarityEnabled, cookieConsent, firstError };
@@ -262,7 +262,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
       const s = stateRef.current;
       if (s.firstError) throw new Error(s.firstError);
       const current = composer.getProjectSettings();
-      composer.setProjectSettings({
+      return {
         ...current,
         analytics: {
           ...current.analytics,
@@ -276,7 +276,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
           microsoftClarity: { ...current.analytics?.microsoftClarity, enabled: s.clarityEnabled && !!s.clarityId, projectId: s.clarityId },
           cookieConsent: { enabled: s.cookieConsent },
         },
-      });
+      };
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);

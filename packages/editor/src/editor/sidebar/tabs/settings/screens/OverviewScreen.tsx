@@ -1,10 +1,13 @@
 /**
- * OverviewScreen — Clone 3397:32915, the landing screen of Settings.
+ * OverviewScreen — 4418:128917, the landing screen of Settings, regrouped to
+ * the Phase B IA (§25).
  *
- * A NEEDS ATTENTION card (hidden when nothing needs it) and one card per nav
- * group, each row being the section's icon, its title, a one-line summary
- * composed from `siteDetail.settingsOverview`, and `›` (or `↗` for the two
- * dashboard rows). A row click is the same navigation the sidebar makes.
+ * The site's state first when it is not the ordinary one (archived; its
+ * workspace scheduled for deletion — plan #10 / M3), a NEEDS ATTENTION card
+ * (hidden when nothing needs it), then one card per nav group, each row being
+ * the section's title, a one-line summary composed from
+ * `siteDetail.settingsOverview`, and `›` (or `↗` for the dashboard rows). A row
+ * click is the same navigation the sidebar makes.
  *
  * The pane header (`Settings` · `<site> · everything on this page…` · the
  * Search field) and the footer (`Pick a section…` · `Done`) are the shell's.
@@ -17,7 +20,7 @@ import { ArrowUpRight, ChevronRight, TriangleAlert } from "lucide-react";
 import { Button } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { LoadCard, SET_CARD, SET_EYEBROW, Screen } from "../shared";
+import { LoadCard, SET_CARD, SET_EYEBROW, SET_RESTORE_STRIP, Screen } from "../shared";
 import {
   SETTINGS_NAV,
   SETTINGS_NAV_GROUPS,
@@ -102,6 +105,8 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
     }
     case "forms":
       return `${plural(o.forms.forms, "form")} · ${plural(o.forms.submissions, "submission")}`;
+    case "access":
+      return `${o.access.passwordSet ? "Password on" : "No password"} · ${plural(o.access.shareLinks, "share link")}`;
     case "custom-code": {
       const set = [o.customCode.head && "Head", o.customCode.body && "body", o.customCode.css && "CSS"].filter(
         (s): s is string => Boolean(s),
@@ -112,8 +117,10 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
       const on = [o.headers.csp && "CSP", o.headers.hsts && "HSTS"].filter((s): s is string => Boolean(s));
       return on.length ? `${joinNames(on)} on` : "Defaults";
     }
+    case "danger-zone":
+      return o.site.archived ? "Archived · hidden from the Sites list" : "Archive, transfer or delete";
     case "webhooks": {
-      if (!o.webhooks.endpoints) return "No endpoints";
+      if (!o.webhooks.endpoints) return "No webhook endpoints";
       const last =
         o.webhooks.lastDelivery === null
           ? "no deliveries yet"
@@ -131,10 +138,10 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
-/** 4418:128917's two columns — the frame's card order, not the sidebar's. */
+/** Two columns, each in sidebar order: what is set up, then what is run. */
 const OVERVIEW_COLUMNS: SettingsNavGroupId[][] = [
-  ["site-setup", "seo-publishing"],
-  ["visitors", "advanced", "workspace"],
+  ["site", "search-sharing", "publishing"],
+  ["visitors", "advanced", "danger-zone", "workspace"],
 ];
 
 /* 4418:128917: a 52 row, 16 in — two 14/20 lines and the › at the far right. */
@@ -231,8 +238,30 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpe
   const attentionFor = (id: SettingsNavId) => data.attention.some((a) => a.section === id);
   const isNavId = (s: string): s is SettingsNavId => SETTINGS_NAV.some((n) => n.id === s);
 
+  const workspaceDeletion = data.site.workspaceDeletionAt ? new Date(data.site.workspaceDeletionAt) : null;
+
   return (
     <Screen>
+      {data.site.archived || workspaceDeletion ? (
+        <section className={`${SET_RESTORE_STRIP} tw:flex tw:items-center tw:gap-3`} aria-label="Site state" data-testid="set-ov-state">
+          <span className="tw:min-w-0 tw:flex-1">
+            {workspaceDeletion
+              ? `This workspace is scheduled for deletion on ${workspaceDeletion.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}. This site is deleted with it.`
+              : "This site is archived: it is hidden from the Sites list, and the live site stays up."}
+          </span>
+          {data.site.archived && !workspaceDeletion ? (
+            <Button
+              type="button"
+              variant="link"
+              className="tw:shrink-0 tw:text-[length:var(--bk-text-12)] tw:font-medium"
+              onClick={() => onOpenScreen("danger-zone")}
+              data-testid="set-ov-state-open"
+            >
+              Danger zone ›
+            </Button>
+          ) : null}
+        </section>
+      ) : null}
       {data.attention.length ? (
         <section
           className="tw:flex tw:flex-col tw:gap-2 tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] tw:p-3"

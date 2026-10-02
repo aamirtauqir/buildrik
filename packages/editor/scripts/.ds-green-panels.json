@@ -87,9 +87,10 @@
     "packages/editor/src/editor/sidebar/tabs/pages/page-settings/UnsavedWarningModal.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/SettingsTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/icons.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/AccessScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/AdvancedScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/AnalyticsScreen.tsx",
-    "packages/editor/src/editor/sidebar/tabs/settings/screens/IntegrationsScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/DangerZoneScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/LockedScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/SeoScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/SiteSettingsScreen.tsx",
@@ -108,7 +109,7 @@
   ],
   "lastDriftAudit": "2026-05-18",
   "driftedRemoved": {
-    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) \u2014 folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame. +6 stale 2026-09-24: deleted by the code-gap run \u2014 LayerSelectionBanner (B10), TemplatePreviewModal/TemplateDetail/TemplatePagination (C4 #24, C5 G2 templates), ChatMessage/ChatThread (L2, #23). +1 stale 2026-09-25: inspector/renderer/featureFlags.ts deleted with the unused schema/renderer pipeline (L2 ef385a55a, G2-154). +2 stale 2026-09-25: sidebar layers LayerContextMenu (afc3efc3f, G3-006 dead branch) and media TypePills (0626b078c, Filter \u25be replaces the pills). +1 stale: history TimeTravelScrubber (2e5406c4d, P0 rebuild as the v3 canvas band). +5 stale 2026-09-28: Inspector v4 lane L2-C folded the Flexbox and Grid sections into Layout / the Flex and Grid type blocks (layout/FlexControls, layout/GridControls, both added here).",
+    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) \u2014 folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame. +6 stale 2026-09-24: deleted by the code-gap run \u2014 LayerSelectionBanner (B10), TemplatePreviewModal/TemplateDetail/TemplatePagination (C4 #24, C5 G2 templates), ChatMessage/ChatThread (L2, #23). +1 stale 2026-09-25: inspector/renderer/featureFlags.ts deleted with the unused schema/renderer pipeline (L2 ef385a55a, G2-154). +2 stale 2026-09-25: sidebar layers LayerContextMenu (afc3efc3f, G3-006 dead branch) and media TypePills (0626b078c, Filter \u25be replaces the pills). +1 stale: history TimeTravelScrubber (2e5406c4d, P0 rebuild as the v3 canvas band). +5 stale 2026-09-28: Inspector v4 lane L2-C folded the Flexbox and Grid sections into Layout / the Flex and Grid type blocks (layout/FlexControls, layout/GridControls, both added here). +1 stale 2026-10-02: settings/screens/IntegrationsScreen.tsx deleted (Settings Phase B, PD-2 \u2014 the editor Integrations stub is gone).",
     "stale": [
       "packages/editor/src/shared/ui/SemanticBadge.tsx",
       "packages/editor/src/shared/ui/HelpTooltip.tsx",
@@ -140,7 +141,8 @@
       "packages/editor/src/editor/inspector/sections/flexbox/AlignmentSection.tsx",
       "packages/editor/src/editor/inspector/sections/flexbox/FlexItemControls.tsx",
       "packages/editor/src/editor/inspector/sections/flexbox/icons.tsx",
-      "packages/editor/src/editor/inspector/sections/flexbox/index.tsx"
+      "packages/editor/src/editor/inspector/sections/flexbox/index.tsx",
+      "packages/editor/src/editor/sidebar/tabs/settings/screens/IntegrationsScreen.tsx"
     ],
     "drifted": [
       "packages/editor/src/editor/sidebar/tabs/component-library/CreateComponentModal.tsx",
