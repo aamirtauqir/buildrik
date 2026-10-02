@@ -5,6 +5,12 @@ import { encrypt, decrypt } from "@/lib/encryption";
 import { slugifyProjectName } from "@/lib/vercel";
 import { hasEverDeployed } from "@/server/services/publish.service";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
+import {
+  PROJECT_SETTINGS_KEY_SCHEMAS,
+  PROJECT_SETTINGS_KEYS,
+  legacyAnalyticsIds,
+  type ProjectSettingsPatch,
+} from "@buildrik/shared/schemas/project-settings";
 
 /**
  * publishedPassword storage policy.
@@ -106,6 +112,71 @@ export function stripColumnBackedSettings(settings: unknown): unknown {
     if (isPlainObject(block)) delete block[key];
   }
   return out;
+}
+
+/**
+ * BE-1 at the autosave boundary (`saveProjectData`): `projectSettings` arrives
+ * as `z.unknown()`, so each JSON-only key is checked against its schema here.
+ * A key that passes is stored in its parsed form; one that fails keeps the
+ * value already stored (or stays absent), never a half-valid copy — an
+ * autosave is not where a settings refusal can be shown to anyone.
+ */
+export function keepValidJsonOnlySettings(incoming: unknown, stored: unknown): unknown {
+  if (!isPlainObject(incoming)) return incoming;
+  const out: Record<string, unknown> = { ...incoming };
+  const previous = isPlainObject(stored) ? stored : {};
+  for (const key of PROJECT_SETTINGS_KEYS) {
+    if (out[key] === undefined) continue;
+    const parsed = PROJECT_SETTINGS_KEY_SCHEMAS[key].safeParse(out[key]);
+    if (parsed.success) out[key] = parsed.data;
+    else if (previous[key] !== undefined) out[key] = previous[key];
+    else delete out[key];
+  }
+  return out;
+}
+
+/**
+ * `siteDetail.projectSettings.update` (BE-2): the Settings Save's JSON half.
+ * The patch is already `projectSettingsPatchSchema`-valid. `analytics` and
+ * `redirects` replace their stored blocks; `customCode` is merged, because the
+ * patch only carries `globalCss`. `lastEditedAt` is left alone: it is the page
+ * save's conflict token, and a settings write is not a page edit.
+ *
+ * Returns the stored value of every patched key (what the editor adopts) and
+ * the analytics ids that are safe but miss their provider's strict format.
+ */
+export async function updateProjectSettings(siteId: string, patch: ProjectSettingsPatch) {
+  return prisma.$transaction(async (tx) => {
+    // Read-modify-write of one JSON column: serialize against a concurrent
+    // settings save. Physical table name per `@@map("sites")`.
+    await tx.$executeRaw(Prisma.sql`SELECT id FROM "sites" WHERE id = ${siteId} FOR UPDATE`);
+    const site = await tx.site.findUnique({
+      where: { id: siteId },
+      select: { projectSettings: true, deletedAt: true, workspace: { select: { plan: true } } },
+    });
+    if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+    // Same gate as head/body code (`updateSiteSettings`): content, not presence.
+    if (patch.customCode && patch.customCode.globalCss.trim() !== "" && (site.workspace?.plan ?? "FREE") === "FREE") {
+      throw new Error("CUSTOM_CODE_NOT_AVAILABLE");
+    }
+
+    const stored = isPlainObject(site.projectSettings) ? site.projectSettings : {};
+    const next: Record<string, unknown> = { ...stored };
+    const saved: Partial<Record<keyof ProjectSettingsPatch, unknown>> = {};
+    for (const key of PROJECT_SETTINGS_KEYS) {
+      const value = patch[key];
+      if (value === undefined) continue;
+      const previous = stored[key];
+      next[key] = key === "customCode" && isPlainObject(previous) ? { ...previous, ...value } : value;
+      saved[key] = next[key];
+    }
+
+    await tx.site.update({
+      where: { id: siteId },
+      data: { projectSettings: next as Prisma.InputJsonValue },
+    });
+    return { saved, warnings: { legacyAnalyticsIds: legacyAnalyticsIds(patch.analytics) } };
+  });
 }
 
 export async function getSiteSettings(siteId: string) {

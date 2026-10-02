@@ -101,3 +101,23 @@ describe("saveProjectData — analytics ids (I-1c)", () => {
     expect(stored.analytics).toEqual({ googleAnalytics: { enabled: true, measurementId: "" } });
   });
 });
+
+describe("saveProjectData — the JSON-only keys keep a valid copy (Settings Phase B, BE-1)", () => {
+  it("a key that fails projectSettingsSchema keeps the stored value; the rest of the save lands", async () => {
+    siteFindUnique.mockResolvedValue({
+      id: "s_1",
+      deletedAt: null,
+      projectSettings: { customCode: { globalCss: "body{}" }, redirects: { suggestFrom404s: false } },
+    });
+    const stored = await storedSettings({
+      customCode: { globalCss: "x".repeat(10241) },
+      redirects: { suggestFrom404s: "on" },
+      seo: { titleTemplate: "%s" },
+    });
+    expect(stored).toEqual({
+      customCode: { globalCss: "body{}" },
+      redirects: { suggestFrom404s: false },
+      seo: { titleTemplate: "%s" },
+    });
+  });
+});

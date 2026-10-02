@@ -13,7 +13,7 @@ import type {
 } from "@buildrik/shared/schemas/sites";
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
-import { SITE_SETTINGS_COLUMNS, stripColumnBackedSettings } from "@/server/services/site-settings.service";
+import { SITE_SETTINGS_COLUMNS, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
@@ -807,7 +807,7 @@ function withValidAnalyticsIds(settings: unknown): unknown {
 export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
-    select: { deletedAt: true },
+    select: { deletedAt: true, projectSettings: true },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
@@ -820,8 +820,11 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // Site-level project artifacts. The style rules' selectors and media
   // queries are written raw into the published stylesheet — same boundary.
   sanitizeProjectStyles(input.styles);
-  // SA-01: the column-backed keys live in their Site columns only.
-  const settings = stripColumnBackedSettings(withValidAnalyticsIds(input.settings));
+  // SA-01: the column-backed keys live in their Site columns only. BE-1: a
+  // JSON-only key that fails its schema keeps the stored value.
+  const settings = stripColumnBackedSettings(
+    keepValidJsonOnlySettings(withValidAnalyticsIds(input.settings), site.projectSettings),
+  );
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
   // past the size cap is not stored — the save and its pages still land, the
