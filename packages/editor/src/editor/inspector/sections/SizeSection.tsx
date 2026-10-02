@@ -344,6 +344,9 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
             key={l.property}
             label={l.label}
             property={l.property}
+            /* Unset reads empty: a grey "0" under Max height read as a 0px cap
+               on an image that has none (DD-12, no value-shaped placeholders). */
+            placeholder=""
             value={styles[l.property] || ""}
             onChange={(v) => onChange(l.property, v)}
           />

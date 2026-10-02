@@ -99,6 +99,18 @@ describe("SizeSection — what moved in and out", () => {
     expect(onChange).toHaveBeenCalledWith("max-width", "960px");
   });
 
+  // Regression: an Image with no max-height showed "Max height [0] px" — a
+  // grey placeholder the eye reads as a 0px cap (QA 2026-10-02, board 8).
+  it("unset min / max read empty, not a value-shaped 0", () => {
+    renderSize({ styles: { "max-width": "100%" }, advancedExpanded: true, onAdvancedToggle: vi.fn() });
+    for (const label of ["Min width", "Min height", "Max height"]) {
+      const input = screen.getByLabelText(label) as HTMLInputElement;
+      expect(input).toHaveValue("");
+      expect(input.placeholder).toBe("");
+    }
+    expect(screen.getByLabelText("Max width")).toHaveValue("100");
+  });
+
   it("under a flex parent it carries Grow and Align self", () => {
     renderSize({ parentLayout: "flex" });
     expect(screen.getByLabelText("Grow")).toBeInTheDocument();
