@@ -56,6 +56,32 @@ describe("exportPublishPages", () => {
     expect(pages.map((p) => p.path).sort()).toEqual(["about.html", "index.html"]);
   });
 
+  /* BD-02 / C0.6: a collection's record pages are generated at
+     `<slug>/index.html` from the template page's HTML, so a relative
+     `href="about.html"` there resolved to `<slug>/about.html` — every nav
+     link on a record page 404'd. The publish payload links pages from the
+     site root. */
+  it("links pages root-absolute, so a record page in a subdirectory resolves them", async () => {
+    const composer = new Composer({} as never);
+    composer.importProject({
+      pages: [
+        { id: "home", name: "Home", slug: "", isHome: true,
+          root: { id: "r1", type: "container" as const, tagName: "div", children: [
+            { id: "l1", type: "link" as const, tagName: "a", content: "About", attributes: { href: "#page:about" }, children: [] },
+          ] } },
+        { id: "about", name: "About", slug: "about",
+          root: { id: "r2", type: "container" as const, tagName: "div", children: [
+            { id: "l2", type: "link" as const, tagName: "a", content: "Home", attributes: { href: "#page:home" }, children: [] },
+          ] } },
+      ],
+    } as never);
+    const pages = await exportPublishPages(composer);
+    const byPath = new Map(pages.map((p) => [p.path, p.html]));
+    expect(byPath.get("index.html")).toContain('href="/about.html"');
+    expect(byPath.get("about.html")).toContain('href="/index.html"');
+    for (const html of byPath.values()) expect(html).not.toMatch(/href="(?:about|index)\.html"/);
+  });
+
   it("ships html for each page, not empty documents", async () => {
     const pages = await exportPublishPages(composerWithSlug("about"));
     for (const p of pages) expect(p.html).toContain("<html");

@@ -43,7 +43,7 @@ export function inlinePublishStylesheet(
 }
 
 async function exportPageFiles(composer: Composer) {
-  return (await new ExportEngine(composer).exportAllPages({ format: "html", minify: true })).files;
+  return (await new ExportEngine(composer).exportAllPages({ format: "html", minify: true, rootAbsoluteHrefs: true })).files;
 }
 
 /** Collection ids the project's bindings read — field bindings and lists. */
