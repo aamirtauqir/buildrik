@@ -26,6 +26,23 @@ describe("DSBindingChip", () => {
     expect(span?.getAttribute("tabindex")).toBeNull();
   });
 
+  // Regression: the Page panel chip cut "Page / background" to "Page / backgrour"
+  // at 1440 with no ellipsis — text-overflow is inert on the flex Button itself.
+  it("a long name ellipsises inside its own block span and shows in full on hover", () => {
+    const { getByRole } = render(<DSBindingChip label="Page / background" onClick={() => {}} />);
+    const btn = getByRole("button");
+    expect(btn.getAttribute("title")).toBe("Page / background");
+    const inner = btn.querySelector("span");
+    expect(inner).toHaveTextContent("Page / background");
+    expect(inner?.className).toContain("tw:truncate");
+    expect(inner?.className).toContain("tw:min-w-0");
+  });
+
+  it("the static name also carries the full name as its title", () => {
+    const { container } = render(<DSBindingChip label="Page / background" />);
+    expect(container.querySelector("span")?.getAttribute("title")).toBe("Page / background");
+  });
+
   it("ariaLabel overrides the default accessible name", () => {
     const { getByLabelText } = render(<DSBindingChip label="Primary" onClick={() => {}} ariaLabel="Custom label" />);
     expect(getByLabelText("Custom label")).toBeTruthy();

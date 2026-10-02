@@ -7,6 +7,11 @@
  * §13 "token chip → Brand"), focus-visible drawn with the Inspector's one
  * focus ring (`--bk-shadow-focus`). Without one it is plain text.
  *
+ * A name longer than the field ends in an ellipsis ("Page / backgro…",
+ * board 21) and the full name is the hover title. The ellipsis needs its own
+ * block-level span: the flowbite Button is a flex box, and `text-overflow`
+ * does nothing on a flex container's text — the name was cut mid-letter.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
@@ -28,7 +33,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({ label, onClick, ar
   const name = ariaLabel ?? `Jump to token ${label} in Brand`;
   if (!onClick) {
     return (
-      <span className={NAME} aria-label={name} data-testid="inspector-token-name">
+      <span className={NAME} aria-label={name} title={label} data-testid="inspector-token-name">
         {label}
       </span>
     );
@@ -42,7 +47,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({ label, onClick, ar
         onClick();
       }}
       aria-label={name}
-      title={name}
+      title={label}
       data-testid="inspector-token-name"
       className={
         `${NAME} tw:h-6 tw:min-h-0 tw:justify-start tw:rounded-[3px] tw:border-0 tw:bg-transparent tw:p-0 ` +
@@ -50,7 +55,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({ label, onClick, ar
         "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
       }
     >
-      {label}
+      <span className="tw:min-w-0 tw:truncate">{label}</span>
     </Button>
   );
 };
