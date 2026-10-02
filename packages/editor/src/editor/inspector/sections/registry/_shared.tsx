@@ -17,6 +17,7 @@ import type {
 import type { CssContext, PropertyState } from "../../config/cssContext";
 import type { SectionDisplayMode } from "../../shared/controls/Section";
 import type { ElementCapabilities } from "@/shared/constants/elementCapabilities";
+import { masterOverrideProps } from "../../hooks/useFieldOverrides";
 
 // ============================================================================
 // PICK KEYS HELPER — slices ctx.styles to only the keys a section reads,
@@ -159,6 +160,18 @@ export type ShouldRenderContext = Omit<
   SectionContext,
   "isOpen" | "onToggle" | "advancedExpanded" | "onAdvancedToggle" | "displayMode"
 >;
+
+/**
+ * Board 26: a component instance's own root draws no Layout and no Text
+ * inside — its structure and its text are the master's (Edit master ›, or
+ * Detach instance…). A section the instance already overrides still shows,
+ * so an override on one of `keys` is never out of reach.
+ */
+export function shownOnInstanceRoot(ctx: ShouldRenderContext, keys: readonly string[]): boolean {
+  const id = ctx.selectedElement.id;
+  if (!ctx.composer?.components?.getInstanceByElementId?.(id)) return true;
+  return masterOverrideProps(ctx.composer, id).some((p) => keys.includes(p));
+}
 
 // ============================================================================
 // ENTRY TYPES

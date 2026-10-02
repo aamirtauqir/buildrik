@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 
-import { adaptBaseStyleProps, defineSection, type AnySectionEntry } from "./_shared";
+import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry } from "./_shared";
 import { LayoutSection } from "../layout";
 import { SizeSection } from "../SizeSection";
 import { SpacingSection } from "../SpacingSection";
@@ -20,6 +20,25 @@ import { BorderSection } from "../BorderSection";
 const FLEX_KEYS = ["flex-direction", "flex-wrap", "justify-content", "align-items", "align-content"];
 const GRID_KEYS = ["grid-template-columns", "grid-template-rows", "grid-auto-flow", "justify-items"];
 const GAP_KEYS = ["gap", "row-gap", "column-gap"];
+const LAYOUT_KEYS = [
+  "display",
+  "position",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "z-index",
+  "overflow",
+  "overflow-x",
+  "overflow-y",
+  "box-sizing",
+  "float",
+  "clear",
+  "visibility",
+  ...FLEX_KEYS,
+  ...GRID_KEYS,
+  ...GAP_KEYS,
+];
 const ITEM_KEYS = ["flex-grow", "flex-shrink", "flex-basis", "order", "align-self", "justify-self", "grid-column", "grid-row"];
 
 export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
@@ -28,28 +47,11 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
     title: "Layout",
     open: "always",
     capability: (caps) => caps.layout,
+    shouldRender: (ctx) => shownOnInstanceRoot(ctx, LAYOUT_KEYS),
     Component: LayoutSection,
     advancedKey: "layout",
     advancedProps: ["overflow", "overflow-x", "overflow-y", "box-sizing", "float", "clear", "visibility"],
-    styleKeys: [
-      "display",
-      "position",
-      "top",
-      "right",
-      "bottom",
-      "left",
-      "z-index",
-      "overflow",
-      "overflow-x",
-      "overflow-y",
-      "box-sizing",
-      "float",
-      "clear",
-      "visibility",
-      ...FLEX_KEYS,
-      ...GRID_KEYS,
-      ...GAP_KEYS,
-    ],
+    styleKeys: LAYOUT_KEYS,
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
