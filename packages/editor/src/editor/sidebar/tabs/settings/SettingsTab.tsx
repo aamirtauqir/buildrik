@@ -813,7 +813,7 @@ export const SettingsTab: React.FC<
                 <React.Fragment key={group}>
                   <hr className="tw:my-0 tw:h-px tw:w-full tw:shrink-0 tw:border-0 tw:bg-[var(--bk-border)]" aria-hidden />
                   <div
-                    className="tw:flex tw:h-10 tw:shrink-0 tw:items-center tw:pl-2 tw:text-[10px] tw:leading-4 tw:text-[var(--bk-ink)]"
+                    className="tw:flex tw:h-10 tw:shrink-0 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
                     data-testid={`set-nav-group-${group}`}
                   >
                     {`${SETTINGS_NAV_GROUPS[group]} ↗`}
