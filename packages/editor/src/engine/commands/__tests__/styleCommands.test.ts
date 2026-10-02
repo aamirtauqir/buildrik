@@ -100,3 +100,29 @@ describe("toggle-inspector", () => {
     expect(toggled).toHaveBeenCalled();
   });
 });
+
+/* QA 2026-10-02: ⌘D on a locked heading made a locked copy — a new element
+   the user could not edit until they unlocked it too. A lock guards THAT
+   element's writes (commandOperations' lock gate); duplicating writes nothing
+   to it, and the registry's Duplicate carries no lock rule. The copy is a
+   fresh, editable element; the original stays locked. */
+describe("duplicate of a locked element", () => {
+  it("makes an editable copy, keeps the original locked, one Undo removes it", () => {
+    c.selection.select(a);
+    c.commands.run("lock-element");
+    c.history.flushPending();
+    expect(a.isLocked()).toBe(true);
+    const before = c.elements.getActivePage()!.root.children?.length ?? 0;
+
+    c.commands.run("duplicate");
+    c.history.flushPending();
+    const copy = c.selection.getSelected()!;
+    expect(copy.getId()).not.toBe(a.getId());
+    expect(copy.isLocked()).toBe(false);
+    expect(c.elements.getElement(a.getId())!.isLocked()).toBe(true);
+
+    c.history.undo();
+    expect(c.elements.getElement(copy.getId())).toBeFalsy();
+    expect(c.elements.getActivePage()!.root.children?.length ?? 0).toBe(before);
+  });
+});

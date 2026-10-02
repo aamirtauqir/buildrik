@@ -169,6 +169,11 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         const clones = ids
           .map((id) => c.elements.duplicateElement(id))
           .filter((el): el is NonNullable<typeof el> => Boolean(el));
+        /* A lock guards that element's writes; the copy is a new element, so it
+           arrives editable. Copying the flag gave a locked copy nobody asked
+           for (QA 2026-10-02). Only the duplicated element itself — a locked
+           child inside it keeps its own lock, as it does in the original. */
+        for (const clone of clones) if (clone.isLocked()) clone.setLocked(false);
         c.endTransaction();
         // Re-select the duplicates so the next action targets them.
         if (clones.length === 1) c.selection.select(clones[0]);
