@@ -803,9 +803,13 @@ export async function getPublishedCmsForBindings(siteId: string, fieldsByCollect
  */
 export async function getPublishedCmsForCollections(siteId: string, collectionIds: readonly string[]) {
   if (collectionIds.length === 0) return { collections: [], entries: [] };
+  /* pageTemplatePath too: the export writes a template page's "record on
+     this page" binding as the `{field}` token the worker fills per record
+     only when it knows the page IS the template. Without it every record page
+     published the newest record's values. */
   const collections = await prisma.cmsCollection.findMany({
     where: { siteId, deletedAt: null, id: { in: [...collectionIds] } },
-    select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
+    select: { id: true, name: true, slug: true, displayField: true, fields: true, pageTemplatePath: true, createdAt: true, updatedAt: true },
   });
   const entries = await prisma.cmsEntry.findMany({
     where: { collectionId: { in: collections.map((c) => c.id) }, status: "PUBLISHED", deletedAt: null },

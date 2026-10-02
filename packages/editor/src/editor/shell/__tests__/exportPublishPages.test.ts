@@ -232,6 +232,41 @@ describe("exportPublishPages — server-snapshot CMS", () => {
     expect(pages[0].html).not.toContain("LOCAL");
   });
 
+  /* Found walking C0.6 live: the snapshot carried no pageTemplatePath, so the
+     template page's "record on this page" heading resolved to the newest
+     record instead of the `{title}` token — every generated record page
+     shipped the same title. */
+  it("keeps the template page's per-record token (the snapshot names the template)", async () => {
+    fetchPublishSnapshot.mockResolvedValue({
+      cms: {
+        collections: [{
+          id: "col-1", name: "Blog", slug: "blog", displayField: null, pageTemplatePath: "post.html",
+          fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", order: 0 }],
+          createdAt: "2026-09-28T00:00:00.000Z", updatedAt: "2026-09-28T00:00:00.000Z",
+        }],
+        entries: [{ id: "rec-server", collectionId: "col-1", data: { title: "SERVER" }, status: "PUBLISHED", updatedAt: "2026-09-28T00:00:00.000Z" }],
+      },
+      siteFonts: [],
+    });
+    const composer = new Composer({} as never);
+    composer.importProject({
+      pages: [
+        { id: "home", name: "Home", slug: "", isHome: true, root: { id: "r1", type: "container" as const, tagName: "div", children: [] } },
+        { id: "post", name: "Post", slug: "post",
+          root: { id: "r2", type: "container" as const, tagName: "div", children: [
+            { id: "h-bound", type: "text" as const, tagName: "h1", content: "Placeholder", styles: {} },
+          ] } },
+      ],
+      styles: [], assets: [],
+      cmsBindings: { field: { "h-bound": [{ binding: { sourceId: "cms:col-1", path: "title", type: "variable" }, collectionId: "col-1", fieldSlug: "title", property: "content" }] } },
+    } as never);
+
+    const post = (await exportPublishPages(composer)).find((p) => p.path === "post.html");
+
+    expect(post?.html).toMatch(/<h1[^>]*>\{title\}<\/h1>/);
+    expect(post?.html).not.toContain("SERVER");
+  });
+
   it("refuses to publish while CMS changes are unsynced", async () => {
     cmsSyncBlocker.mockReturnValueOnce("1 CMS change hasn't reached the server yet. Retry the sync, then publish.");
     await expect(exportPublishPages(composerWithBoundHeading())).rejects.toThrow(/reached the server/);
