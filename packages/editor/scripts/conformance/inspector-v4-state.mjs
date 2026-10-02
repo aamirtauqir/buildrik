@@ -89,7 +89,7 @@ export const IDS = {
  *   select: id | [ids] | null (null = clear selection → Page panel)
  *   tab: "style" | "behaviour" | "effects"
  *   breakpoint: "tablet" · state: "hover" · menu: true · applyDialog: true
- *   stateMenu: true · colour: "<field label>" · fieldError: { field, value }
+ *   stateMenu: true · colour: { section, field } · fieldError: { field, value }
  *   ai: true · hideInspector: true · conflict: true
  *   needs: lanes that must land before the board's state is fully reachable
  *     (the build plan's lane ids). "W1" = `// needs W1` in the task wording.
@@ -127,7 +127,9 @@ export const BOARDS = {
   30: { select: IDS.h3[0], tab: "style", menu: true, needs: ["W1"] }, // v4 ⋯ rows
   31: { select: IDS.h3[0], tab: "style", menu: true, applyDialog: true, needs: ["W1", "L3-B"] },
   32: { select: IDS.buttonHover, tab: "style", stateMenu: true, needs: ["W1"] },
-  33: { select: IDS.button, tab: "style", colour: "Fill", needs: ["L3-B"] },
+  /* Board 33: the colour popover, opened from the button's Fill › Colour row
+     (the button carries a fill, so Fill is open; its row label is "Colour"). */
+  33: { select: IDS.button, tab: "style", colour: { section: "fill", field: "Colour" }, needs: [] },
   // The image carries a fixed 640px width, so its Size row renders the unit input.
   /* Board 34 is the Heading, Size › Width: the number sits in the size row's
      own field (`inspector-size-width` › `.bdi-fld`), typed "24.." as drawn. */
@@ -249,20 +251,24 @@ const RUNNER = String.raw`async (spec) => {
     }
   }
 
-  /* 7. Colour popover (board 33): the swatch of the named colour row. */
+  /* 7. Colour popover (board 33): the swatch of a colour row INSIDE a named
+     section. Two sections carry a "Colour" row (Typography, Fill), so the row
+     is looked up in its section — a page-wide "inspector-field-colour" is
+     ambiguous. A section with no value draws a "+" header and no rows: open it
+     by its header first. */
   if (spec.colour) {
-    const slug = spec.colour.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-    let field = q("inspector-field-" + slug);
-    if (!field) {
-      /* A closed section hides its rows — open the section by its header. */
-      const header = [...document.querySelectorAll('[data-testid="inspector-panel"] [aria-expanded="false"]')]
-        .find((b) => /^(Fill|Background)\b/.test(b.textContent.trim()));
-      if (header) { header.click(); await sleep(400); }
-      field = q("inspector-field-" + slug);
+    const { section, field } = spec.colour;
+    const slug = field.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    let box = q("inspector-section-" + section);
+    if (box && box.getAttribute("data-display-mode") !== "open") {
+      box.querySelector('[role="button"][aria-expanded]')?.click();
+      await sleep(400);
+      box = q("inspector-section-" + section);
     }
-    const sw = field?.querySelector("button");
-    if (!sw) note("colour:" + spec.colour, false, "pre-v4", "no " + spec.colour + " colour row");
-    else { sw.click(); await sleep(500); note("colour:" + spec.colour, sw.getAttribute("aria-expanded") === "true", "pre-v4"); }
+    const sw = box?.querySelector('[data-testid="inspector-field-' + slug + '"] button');
+    if (!box) note("colour:" + section, false, "v4", "no " + section + " section");
+    else if (!sw) note("colour:" + section, false, "v4", "no " + field + " row in " + section + " (" + box.getAttribute("data-display-mode") + ")");
+    else { sw.click(); await sleep(500); note("colour:" + section + "/" + field, sw.getAttribute("aria-expanded") === "true", "v4"); }
   }
 
   /* 8. Field error (board 34): type an invalid value, commit with Enter. */

@@ -119,7 +119,7 @@
                 {
                   "id": "i4-heading",
                   "type": "heading",
-                  "tagName": "h1",
+                  "tagName": "h3",
                   "children": [],
                   "content": "Bella Cucina",
                   "attributes": {
@@ -130,13 +130,32 @@
                     "hero-title"
                   ],
                   "styles": {
-                    "font-size": "48px",
-                    "font-weight": "700",
-                    "line-height": "1.2",
+                    "font-size": "var(--buildrick-design-font-size-2xl)",
+                    "font-weight": "600",
+                    "line-height": "40px",
+                    "text-align": "center",
+                    "color": "var(--buildrick-design-color-text)",
                     "margin-bottom": "16px"
                   },
                   "data": {
-                    "layerName": "Heading"
+                    "layerName": "Heading",
+                    "interactions": [
+                      {
+                        "id": "ix-heading-click",
+                        "trigger": "click",
+                        "animation": {
+                          "preset": "fadeInUp",
+                          "duration": 300,
+                          "delay": 0,
+                          "easing": "easeOut",
+                          "target": "self",
+                          "reverse": false,
+                          "loop": 1
+                        },
+                        "enabled": true,
+                        "name": "Scroll to menu"
+                      }
+                    ]
                   }
                 },
                 {
@@ -174,6 +193,11 @@
                     "border": "none",
                     "cursor": "pointer",
                     "text-align": "center"
+                  },
+                  "attributes": {
+                    "href": "#page:@page:home",
+                    "target": "_blank",
+                    "rel": "noopener noreferrer"
                   }
                 },
                 {
@@ -277,6 +301,11 @@
                     "border-radius": "12px",
                     "background": "#1a1a2e",
                     "display": "block"
+                  },
+                  "attributes": {
+                    "data-embed-url": "https://youtu.be/aqz-KE-bpKQ",
+                    "data-embed-ratio": "16:9",
+                    "data-embed-autoplay": "true"
                   }
                 },
                 {
@@ -454,6 +483,10 @@
                   ],
                   "styles": {
                     "display": "block"
+                  },
+                  "attributes": {
+                    "data-countdown-end": "2026-12-31T23:59",
+                    "data-countdown-message": "We are open!"
                   }
                 },
                 {
@@ -477,6 +510,19 @@
                       "tagName": "div",
                       "children": [
                         {
+                          "id": "i4-progress-bar",
+                          "type": "container",
+                          "tagName": "progress",
+                          "classes": [
+                            "pb-bar"
+                          ],
+                          "attributes": {
+                            "value": "65",
+                            "max": "100"
+                          },
+                          "children": []
+                        },
+                        {
                           "id": "i4-progress-3",
                           "type": "container",
                           "tagName": "div",
@@ -485,7 +531,7 @@
                               "id": "i4-progress-4",
                               "type": "text",
                               "tagName": "span",
-                              "content": "93%",
+                              "content": "65%",
                               "children": []
                             }
                           ],
@@ -1089,10 +1135,7 @@
                     }
                   ],
                   "draggable": true,
-                  "droppable": true,
-                  "data": {
-                    "layerName": "Our story"
-                  }
+                  "droppable": true
                 },
                 {
                   "id": "i4-form",
@@ -1258,14 +1301,10 @@
                   "classes": [],
                   "attributes": {},
                   "styles": {
-                    "display": "flex",
-                    "align-items": "center",
-                    "justify-content": "space-between",
                     "padding-top": "24px",
                     "padding-bottom": "24px",
                     "padding-left": "32px",
-                    "padding-right": "32px",
-                    "background": "#f3f4f6"
+                    "padding-right": "32px"
                   },
                   "children": [
                     {
@@ -1345,8 +1384,9 @@
                   "content": "Antipasti",
                   "styles": {
                     "font-size": "24px",
-                    "font-weight": "700",
-                    "line-height": "1.2",
+                    "font-weight": "600",
+                    "line-height": "40px",
+                    "width": "640px",
                     "margin-bottom": "16px"
                   }
                 },
@@ -1357,9 +1397,10 @@
                   "children": [],
                   "content": "Primi",
                   "styles": {
-                    "font-size": "24px",
-                    "font-weight": "700",
-                    "line-height": "1.2",
+                    "font-size": "28px",
+                    "font-weight": "600",
+                    "line-height": "40px",
+                    "width": "560px",
                     "margin-bottom": "16px"
                   }
                 },
@@ -1370,9 +1411,10 @@
                   "children": [],
                   "content": "Dolci",
                   "styles": {
-                    "font-size": "24px",
-                    "font-weight": "700",
-                    "line-height": "1.2",
+                    "font-size": "20px",
+                    "font-weight": "600",
+                    "line-height": "40px",
+                    "width": "480px",
                     "margin-bottom": "16px"
                   }
                 },
@@ -1454,7 +1496,7 @@
           "collectionId": "@cms:menu",
           "itemVar": "item",
           "indexVar": "index",
-          "limit": 3,
+          "limit": 6,
           "status": "published",
           "repeat": "children"
         }
