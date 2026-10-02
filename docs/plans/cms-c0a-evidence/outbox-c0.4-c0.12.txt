@@ -1,0 +1,7 @@
+13:20:10.066 C0.12 sheet open: true msg: ["Saved on this device only. The server is offline — the change will sync when you reconnect."] 'Record saved' toasts: 0 outbox keys: ["entryUpsert:zzc0a2-alpha"]
+13:20:15.323 C0.12 after online DB: Alpha offline-outbox 7165 expected Alpha offline-outbox 7165 outbox: {}
+13:20:18.848 C0.4 created Delta probe 6233 id muqzqca2-5fbg7c5
+13:20:35.487 C0.4 DB after B delete: Delta probe 6233|2026-10-02 13:20:32.884|2026-10-02 13:20:32.883
+13:20:38.602 C0.4 C sheet open: false C toast 'was deleted': ["This record was deleted."] C rows with Delta: 0 C outbox: {}
+13:20:38.754 C0.4 DB after C stale save: Delta probe 6233|2026-10-02 13:20:32.884|2026-10-02 13:20:32.883 unchanged: true rows with id: 1
+13:20:47.728 C0.4 A after reload rows with Delta: 0

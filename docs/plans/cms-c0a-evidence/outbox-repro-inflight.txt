@@ -1,0 +1,6 @@
+13:15:44.853 DB before: Beta outbox-queued 61124|2026-10-02 13:14:44.629
+13:15:48.744 v2 held requests: 1 outbox: {"cmugopwzg005nnvjysp00b3pf":[{"key":"entryUpsert:zzc0a2-beta","op":"entryUpsert","item":{"id":"zzc0a2-beta","collectionId":"zzc0a-coll2","data":{"name":"Beta outbox-inflight 44856","description":"beta-desc-c0a"},"status":"published","createdAt":"2026-10-02T11:03:57.182Z","updatedAt":"2026-10-02T13:15:47.241Z"},"seq":"1790946947242-1"}]}
+13:15:48.750 dialog: beforeunload 
+13:15:58.536 v2 after reload outbox: {}
+13:15:58.583 v2 after reload DB: Beta outbox-inflight 44856|2026-10-02 13:15:50.685 expected Beta outbox-inflight 44856
+13:15:58.583 total entries.upsert requests seen: 2

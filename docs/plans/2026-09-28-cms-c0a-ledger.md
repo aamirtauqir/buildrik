@@ -125,13 +125,15 @@ Fixed (each has a unit test that fails on the old code):
 Recorded, not fixed:
 
 - **Queued mirrors don't survive a reload** (C0.5 above). Needs the
-  persisted outbox. Larger than a spot fix.
+  persisted outbox. Larger than a spot fix. **Fixed `bedcb02ec` — see
+  "Outbox re-verification" below.**
 - **Conflict copy:** on a CONFLICT the sheet also says "The server is
   offline — the change will sync when you reconnect.", which is false. On-screen
   copy, so it belongs to the board.
 - **Conflict toast stays up** after Keep mine / Use theirs (`duration:
-  Infinity`, actions don't dismiss).
-- **Stale-tab edit vanishes silently** on GONE (C0.4): no toast.
+  Infinity`, actions don't dismiss). **Fixed `7dabb45f6`.**
+- **Stale-tab edit vanishes silently** on GONE (C0.4): no toast. **Fixed
+  `7dabb45f6`.**
 - **Topbar "Publish changes" on every open** of a published site
   (`useComposerInit.ts:255`), outside CMS.
 
@@ -159,6 +161,77 @@ timeouts under load. Run on its own it is green.
 Test-site residue: About carries a Collection list bound to `zzc0a-coll2`;
 Home has one Divider more than at the start (from the C0.10/C0.11 page
 saves). `ZZ C0a` (`muqukdt2-0n4akck`) and `ZZ C0a v2` remain.
+
+## Outbox re-verification (2026-10-02, second pass)
+
+Owner decision 2026-10-02: build the persisted outbox, re-verify live, then
+merge. `main` @ `afd2533e5` merged in first (`5ed30b330`, no conflicts).
+
+Commits: `bedcb02ec` (outbox in `cmsSync.ts` + `outstandingKeys` on the
+queue; "Use theirs" now writes the server copy; GONE announced),
+`7dabb45f6` (`useCmsSync`: replay the outbox before hydration; conflict toast
+dismisses on either choice; GONE toast).
+
+What it does: every CMS mirror (collection/entry upsert/delete; a field-key
+rename is per-entry upserts) is written to `localStorage["bk-cms-outbox-v1"]`
+as `{ [siteId]: [{ key, op, payload, seq }] }` **before** the request,
+latest-wins in place per target, a delete supersedes the pending upsert.
+It leaves only on a confirmed write or GONE (a retry that lands later clears
+it too; `seq` stops an older request's success clearing a newer payload).
+A CONFLICT stays (replayed with its precondition, re-asking Keep mine / Use
+theirs). `flushCmsOutbox()` runs on editor open before hydration, this site
+only, collections → entries → entry deletes → collection deletes. Hydration
+skips any row in the outbox. `cmsSyncBlocker()` and `totalPendingMirrors()`
+count queued ∪ in-flight ∪ persisted. Storage throwing → no-ops; the
+in-memory queue carries the session as before.
+
+Same setup as the first pass (`:3170`, clean `.next`, headless Playwright,
+`qa@buildrik.local`, site `cmugopwzg005nnvjysp00b3pf`, collection
+`ZZ C0a v2`). Every context aborted `sites.publish` at the network layer;
+`publish_build_jobs` for the site = **0** after the run. Logs + screenshots:
+`docs/plans/cms-c0a-evidence/outbox-*`.
+
+| # | Status | Evidence |
+|---|---|---|
+| Outbox · queued at reload (the 2026-10-02 data-loss repro) | **RUNTIME VERIFIED** | `cms.entries.upsert` aborted at the network (server unreachable); Beta → "Beta outbox-queued 77436", Save. Outbox holds `entryUpsert:zzc0a2-beta` with that payload; DB still old. Reload, beforeunload prompt accepted. After reload (still unreachable): replay attempted and failed, outbox still holds it, DB still old; Publish → "Publish anyway" → "Publish now" → toast **"Publish failed · 1 CMS change hasn't reached the server yet. Retry the sync, then publish."**, 0 `sites.publish` requests, 0 jobs. Route lifted, reload: outbox `{}`, DB = "Beta outbox-queued 77436" (`outbox-repro-queued.txt`, `outbox-1-saved-queued.png`, `outbox-2-publish-refused.png`, `outbox-3-after-replay.png`). |
+| Outbox · in flight at reload | **RUNTIME VERIFIED** | Upsert request held unanswered; Save; reload (prompt accepted). Next load replayed it: DB = "Beta outbox-inflight 44856", outbox `{}`. 2 upserts total (the held one + the replay) (`outbox-repro-inflight.txt`). |
+| C0.1b (re-run) | **RUNTIME VERIFIED** — refusal half | Covered by the queued repro above: the CMS blocker refuses publish with the mirror pending, now also after a reload. The offline half (Publish `aria-disabled` while offline) was not re-run. |
+| C0.3 (re-run, both choices) | **RUNTIME VERIFIED** | Keep mine: B saved → DB = B; A saved → **1** upsert, **1** "changed elsewhere" toast, DB still B, A's outbox holds the edit; Keep mine → toast gone, DB = A's value, outbox `{}`. Use theirs (first live run of it): same set-up → Use theirs → toast gone, DB stays B's, A's table/sheet shows B's value, outbox `{}` (`outbox-c0.3-*.png`, `outbox-c0.3-*.txt`). Before `bedcb02ec` Use theirs could not work: the code forgot the stamp and re-hydrated, and an unstamped local row is kept. |
+| C0.4 (re-run) | **RUNTIME VERIFIED** | A created "Delta probe 6233"; C opened it (stale); B deleted it → DB `deletedAt` set. C saved an edit → C's sheet closed, the row left C's table, toast **"This record was deleted."**, C's outbox `{}`; DB row byte-identical, one row with that id. A reloaded → no Delta (`outbox-c0.4-C-stale-save.png`, `outbox-c0.4-c0.12.txt`). |
+| C0.5 (re-run) | **RUNTIME VERIFIED** | Superseded by the two outbox rows above (queued AND in flight at reload both reach the server). |
+| C0.12 (re-run) | **RUNTIME VERIFIED** | Offline (`setOffline`), Alpha edited, Save: sheet stays open, "Saved on this device only. The server is offline — the change will sync when you reconnect.", 0 "Record saved" toasts, outbox holds `entryUpsert:zzc0a2-alpha`. Online → 5 s later DB = "Alpha offline-outbox 7165", outbox `{}` (`outbox-c0.12-offline-save.png`). |
+
+Not CMS code, seen during the run: the worktree's pre-publish readiness call
+(`sites.prePublishChecks`) answers 207 with an error part ("Couldn't load the
+readiness checks") — this worktree has no `ENCRYPTION_KEY`/Vercel env. It did
+not block reaching the CMS gate.
+
+### Still open (not fixed here)
+
+- **Conflict copy:** on a CONFLICT the sheet says "Saved on this device only.
+  The server is offline — the change will sync when you reconnect." — false
+  for a conflict. On-screen copy: needs a board decision.
+- **GONE toast copy** is the server's sentence ("This record was deleted." /
+  "This collection was deleted."), no title. Worth a board pass.
+- **A conflicted edit blocks publish** until Keep mine / Use theirs is chosen
+  (it counts as "1 CMS change hasn't reached the server"), and "Retry the
+  sync" in that sentence does not resolve a conflict. Truthful, but the copy
+  could name the conflict — board decision.
+- **Topbar "Publish changes" on every open** (`useComposerInit.ts:255`),
+  outside CMS — untouched.
+- Leave/exit guards now also count in-flight and persisted CMS ops
+  (`totalPendingMirrors`), so leaving mid-save prompts.
+
+### Gates (second pass)
+
+| Gate | Result |
+|---|---|
+| Editor tsc (`packages/editor`) | exit 0 |
+| Dashboard tsc (`-p packages/dashboard`) | exit 0 |
+| Editor vitest (`src/services src/editor/cms src/editor/shell src/editor/sidebar/tabs/content src/engine/cms`) | 151 files, 1677 passed, 3 todo (incl. 17 new outbox tests, 4 new `useCmsSync` tests) |
+| Root `npx vitest run server __tests__` (alone) | 1364 files: 1363 passed, **1 failed** — `packages/editor/src/blocks/__tests__/blockRegistry.realTypes.test.ts`, 106 byte-for-byte markup cases. Not CMS: the page root now carries `style="background-color: var(--buildrik-design-color-PAGE)"` from main's `6109ae85f` ("new pages are created bound to 'Page / background'"), and the pre-fix baseline `__fixtures__/catalogBlockHtml.baseline.json` was not updated with it. Arrives with the main merge; fails identically in `packages/editor` alone. 13335 tests passed, 3 skipped, 22 todo. |
+| `pnpm run verify:ds` (packages/editor) | exit 0 |
+| DB tier | not run (setup runs `prisma migrate deploy` on `buildrik_test`) |
 
 ## Auto-mode classifier block (2026-09-30)
 

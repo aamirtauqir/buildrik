@@ -1,0 +1,5 @@
+13:19:00.919 Use theirs DB after B: Beta B-Use theirs 8649
+13:19:03.604 Use theirs A upserts for one save: 1 conflict toasts: 1 DB: Beta B-Use theirs 8649 A outbox: {"cmugopwzg005nnvjysp00b3pf":[{"key":"entryUpsert:zzc0a2-beta","op":"entryUpsert","item":{"id":"zzc0a2-beta","collectionId":"zzc0a-coll2","data":{"name":"Beta A-Use theirs 8649","description":"beta-desc-c0a"},"status":"published","createdAt":"2026-10-02T11:03:57.182Z","updatedAt":"2026-10-02T13:19:00.994Z"},"seq":"1790947140996-1"}]}
+13:19:03.627 Use theirs A sheet message: ["Saved on this device only. The server is offline — the change will sync when you reconnect."]
+13:19:06.797 Use theirs after click: conflict toasts: 0 DB: Beta B-Use theirs 8649 A outbox: {}
+13:19:06.803 Use theirs A visible Beta texts: ["Beta B-Use theirs 8649","Beta B-Use theirs 8649","Beta B-Use theirs 8649"] expected Beta B-Use theirs 8649
