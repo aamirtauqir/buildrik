@@ -134,16 +134,18 @@ describe("projectDataFromRows → renderProjectPages", () => {
   });
 
   /* A binding whose collection is not in the rows (deleted since) resolves to
-     nothing and keeps the stored text — the snapshot is the whole store, the
-     visitor's own browser CMS cache is never read. */
-  it("keeps the stored text for a binding the rows cannot resolve", async () => {
+     nothing — the snapshot is the whole store, the visitor's own browser CMS
+     cache is never read. C0.7 / BD-03: nothing is written as nothing; the
+     stored text is the canvas sample, or content since withdrawn. */
+  it("writes nothing for a binding the rows cannot resolve, never the stored text", async () => {
     const cmsBindings = {
       field: { h: [{ binding: { sourceId: "cms:gone", path: "title", type: "variable" }, collectionId: "gone", fieldSlug: "title", property: "content" }] },
     };
     const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "Stored") };
     const project = projectDataFromRows({ name: "Bella", projectCmsBindings: cmsBindings }, [page], null);
     const [out] = await renderProjectPages(project, [], cmsFromRows({ collections: [], entries: [] }));
-    expect(out.html).toContain("Stored");
+    expect(out.html).not.toContain("Stored");
+    expect(out.html).toMatch(/data-buildrick-id="h"[^>]*><\/h2>/);
   });
 
   /* SA-01 manual check, as a test: a site whose title template (and default

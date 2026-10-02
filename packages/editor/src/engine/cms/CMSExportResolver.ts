@@ -98,8 +98,13 @@ export class CMSExportResolver {
           return;
         }
         const promise = this.composer.cms.bindings.resolveBinding(binding).then((value) => {
-          if (!value) return;
-          this.applyValue(el as HTMLElement, binding.property, value);
+          /* resolveBinding already answers the fallback when the record or
+             its field has no value. Nothing at all (no fallback either) is
+             written as nothing: keeping the element's stored text shipped
+             the canvas sample — or a record since unpublished or deleted —
+             to the live site (BD-03). runPrePublishChecks lists these. */
+          if (!value) this.clearValue(el as HTMLElement, binding.property);
+          else this.applyValue(el as HTMLElement, binding.property, value);
         });
         promises.push(promise);
       });
@@ -168,6 +173,17 @@ export class CMSExportResolver {
     if (!isSafeCmsBoundValue(property, value)) return;
     if (property === "content") el.textContent = value;
     else el.setAttribute(property, value);
+  }
+
+  /**
+   * The empty form of a bound property. A URL slot loses its attribute — an
+   * empty `src`/`href` re-requests the page itself; text and alt/title
+   * become "".
+   */
+  private clearValue(el: HTMLElement, property: string): void {
+    if (property === "content") el.textContent = "";
+    else if (property === "src" || property === "href") el.removeAttribute(property);
+    else if (property === "alt" || property === "title") el.setAttribute(property, "");
   }
 
   /**
