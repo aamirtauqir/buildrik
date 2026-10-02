@@ -71,7 +71,94 @@ Each row gets a final status of **RUNTIME VERIFIED** / **PARTIALLY
 VERIFIED** / **NOT VERIFIED** with the reason. Anything NOT VERIFIED is
 listed explicitly here.
 
-- (none yet)
+Live run 2026-10-02, HEAD `e6d06900c` → fixes up to the commit that adds
+this section. Dashboard dev server from this worktree on `:3170` (clean
+`.next`), with `NEXT_PUBLIC_FEATURE_PUBLISH=true` added on the command line —
+this worktree's `.env.local` lacks it, and without it the shipping Publish
+button is flag-disabled, so no publish row could reach the gate at all.
+Headless Playwright, separate browser contexts A/B/C, all logged in as
+`qa@buildrik.local`. Evidence: `docs/plans/cms-c0a-evidence/`
+(`post-*` = re-run after the fixes below). DB reads via `psql` on the local
+`buildrik` DB.
+
+**No real publish ran.** Every context aborted any `sites.publish` request at
+the network layer (`context.route`); the worktree env has no `ENCRYPTION_KEY`
+or Vercel creds either. `publish_build_jobs` for the site = 0 after the run.
+
+Test site `cmugopwzg005nnvjysp00b3pf`. The ledger's `ZZ C0a` did not exist;
+it was seeded through `cms.collections/entries.upsert` (fields `name`,
+`description`, later `title`), and a Collection list on **About** was bound to
+it through the inspector (Behaviour → Collection). After C0.4b tombstoned it,
+`ZZ C0a v2` (`zzc0a-coll2`) was seeded the same way and the list rebound, for
+the post-fix re-runs.
+
+| # | Final status | Evidence |
+|---|---|---|
+| C0.1 | **PARTIALLY VERIFIED** | B deleted Beta (DB `deletedAt` set); A, not reloaded, still rendered Beta on its canvas; A's Publish → "Publish anyway" → "Publish now" called `cms.publishSnapshot` (response: Alpha only) and the payload it sent to `sites.publish` (captured, then aborted) has `about.html` with `alpha-desc-c0a` and **no** `beta-desc-c0a` (`c0.1-aborted-publish-payload.json`, `post-c0.1-aborted-publish-payload.json`). NOT verified: the deployed page — no deploy ran, so the ledger's `curl` of the live Blog page was not done. |
+| C0.1b | **RUNTIME VERIFIED** | Offline: Topbar Publish `aria-disabled=true`, tooltip "Can't publish while offline" (the ledger's "click Publish while offline" cannot happen — the button refuses first). Online with the mirror still refused (route-aborted `cms.entries.upsert`): Publish → both dialogs → toast "Publish failed · 1 CMS change hasn't reached the server yet. Retry the sync, then publish."; 0 `sites.publish` requests, 0 jobs (`post-c0.1b-offline-publish.png`). |
+| C0.2 | **RUNTIME VERIFIED** | Fields → `title` → Key `headline` + Enter. DB after: both rows have `headline` ("Alpha title"/"Beta title"), neither has `title`; server field slugs `name,description,headline` (`c0.2-after-rename.png`). Key renamed was `title`→`headline` (the list's template uses `name`). |
+| C0.3 | **RUNTIME VERIFIED** (after fix `4c1217b8e`) | A and B on Alpha; B saved → DB = B's value; A saved → toast "Entry changed elsewhere" with Use theirs / Keep mine; DB still B's value; Keep mine → DB = A's value (`c0.3-A-conflict-postfix.png`). Before the fix every save sent **2** upserts and A showed **2** conflict toasts. "Use theirs" was not clicked. |
+| C0.4 | **RUNTIME VERIFIED** | B deleted Alpha → DB `deletedAt` set; A reloaded → no Alpha row; C (stale, sheet open) saved an edit → its sheet closed and Alpha left its table; DB row byte-identical before/after, one row with that id. Note: C gets no message saying why its edit vanished. |
+| C0.4b | **RUNTIME VERIFIED** | Settings → Delete collection (typed DELETE): collection slug → `zz-c0a~deleted~zzc0a-coll1`, both entries tombstoned. New collection "ZZ C0a" → new row `slug=zz-c0a`, no 4xx/5xx on any `cms.*` call (`c0.4b-after-recreate.png`). |
+| C0.5 | **PARTIALLY VERIFIED** | As written (≈Slow 3G via CDP, save, reload 0.7 s later): DB has the edit (`post-c0.5-after-reload.png`) — the request had already left. NOT covered: a mirror still *queued* at reload. That edit is lost from the server: after accepting the beforeunload prompt, IndexedDB holds "Beta queued-then-reload…" and the DB keeps the old value 15 s later, nothing replays it, and the publish gate reads 0 pending. The persisted outbox (`bk-cms-outbox-v1`) was never built — `609226bd2` added `outstandingCount`/`settled` only. |
+| C0.9 | **RUNTIME VERIFIED** | Dynamic pages template options: About, Page 3, Page 4 — no Home (`c0.9-template-list.png`). Server: `cms.collections.upsert` with `pageTemplatePath: "index.html"` → 400 "The home page can't be a collection template." |
+| C0.10 | **PARTIALLY VERIFIED** | Publish simulated by setting `status/publishedUrl/lastPublishedAt` in SQL (restored after). A UI record save moved `cmsEditedAt` past `lastPublishedAt` and left `lastEditedAt` alone; a page edit after it saved (`lastEditedAt` bumped) with **no** conflict dialog. NOT verified: the Topbar label as a signal — it reads "Publish changes" on every open of a published site, before any edit, because `useComposerInit.ts:255` sets `lastSavedAt = Date.now()` on load and `useLifecycle` prefers it over the server stamps. |
+| C0.11 | **RUNTIME VERIFIED** | `Promise.reject(new Error("x"))` in the page, page edit saved (200), reload → no `[role=status][aria-label="Recovered work"]`, no "Recovered" text (`c0.11-after-reload.png`). No positive control was run. |
+| C0.12 | **RUNTIME VERIFIED** | Offline save: sheet stays open, "Saved on this device only. The server is offline — the change will sync when you reconnect."; no "Record saved" toast (`post-c0.12-offline-save-sheet.png`). |
+| P0-B | **RUNTIME VERIFIED** | Same run: after reconnecting, DB row = "Alpha offline-edit" (the sheet's value). |
+
+### Defects found in this run
+
+Fixed (each has a unit test that fails on the old code):
+
+1. `4c1217b8e` — a sheet save POSTed twice and left a stale direct-sync mark
+   (`useContentPanel.saveRecord` marked after `updateContentItem` had
+   already emitted). The leftover mark swallowed the next engine-driven
+   mirror for that record.
+2. `97cbd25c4` — a delete the server answers NOT_FOUND (two tabs deleting one
+   record; a record made and deleted offline) was queued for the session:
+   permanent "didn't sync" toast, publish blocked. Re-run live: gone.
+3. `4d3e290cf` — an entry write into a deleted collection answered NOT_FOUND
+   (retried forever) instead of GONE. Wire after restart:
+   `400 CMS_GONE:This collection was deleted.`
+
+Recorded, not fixed:
+
+- **Queued mirrors don't survive a reload** (C0.5 above). Needs the
+  persisted outbox. Larger than a spot fix.
+- **Conflict copy:** on a CONFLICT the sheet also says "The server is
+  offline — the change will sync when you reconnect.", which is false. On-screen
+  copy, so it belongs to the board.
+- **Conflict toast stays up** after Keep mine / Use theirs (`duration:
+  Infinity`, actions don't dismiss).
+- **Stale-tab edit vanishes silently** on GONE (C0.4): no toast.
+- **Topbar "Publish changes" on every open** of a published site
+  (`useComposerInit.ts:255`), outside CMS.
+
+### Gates after the fixes (2026-10-02)
+
+| Gate | Result |
+|---|---|
+| Editor tsc (`packages/editor`, `npx tsc --noEmit`) | exit 0 |
+| Dashboard tsc (`npx tsc --noEmit -p packages/dashboard`) | exit 0 |
+| Editor vitest (services, engine/cms, editor/cms, shell, sidebar content + publish, chrome-ui) | 205 files, 2030 passed, 3 todo |
+| Server + `__tests__` (excl. db) | 1358 files, 13395 passed, 3 skipped, 22 todo |
+| DB tier / verify:ds | not run in this pass |
+
+A first server run done in parallel with the editor suite hit 15s test
+timeouts under load. Run on its own it is green.
+
+### NOT verified
+
+- A real deploy and the deployed HTML (C0.1).
+- The Topbar's unpublished-changes label as a CMS signal (C0.10).
+- "Use theirs" on a conflict (C0.3).
+- `pnpm test:db` was not run in this pass (its setup runs
+  `prisma migrate deploy` on `buildrik_test`).
+
+Test-site residue: About carries a Collection list bound to `zzc0a-coll2`;
+Home has one Divider more than at the start (from the C0.10/C0.11 page
+saves). `ZZ C0a` (`muqukdt2-0n4akck`) and `ZZ C0a v2` remain.
 
 ## Auto-mode classifier block (2026-09-30)
 
