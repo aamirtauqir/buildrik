@@ -11,6 +11,23 @@ const TEAM_ACTIONS = [
   "MEMBER_ROLE_CHANGED",
 ];
 
+/**
+ * D7: stamps the member's last-used workspace — the column
+ * DEFAULT_WORKSPACE_ORDER picks by. Called on sign-in and on a workspace
+ * switch, never per request. Best-effort: a failed stamp is logged and never
+ * fails the sign-in or switch that triggered it.
+ */
+export async function recordWorkspaceUse(userId: string, workspaceId: string): Promise<void> {
+  try {
+    await prisma.workspaceMember.updateMany({
+      where: { userId, workspaceId },
+      data: { lastActiveAt: new Date() },
+    });
+  } catch (e) {
+    console.error("[team] lastActiveAt stamp failed", e);
+  }
+}
+
 export async function getTeamStats(workspaceId: string) {
   const [total, active, pending, workspace] = await Promise.all([
     prisma.workspaceMember.count({ where: { workspaceId } }),

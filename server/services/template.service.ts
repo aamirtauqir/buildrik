@@ -4,6 +4,7 @@ import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import { withUniqueIds } from "@buildrik/shared/content/elementIds";
 import type { ListTemplatesInput } from "@buildrik/shared/schemas/templates";
 import { assertSiteQuota } from "@/server/services/site-quota";
+import { generateUniqueSlug } from "@/server/services/sites.service";
 
 const SORT_MAP: Record<string, Record<string, string>> = {
   popular: { usageCount: "desc" },
@@ -17,24 +18,6 @@ function slugify(name: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .replace(/-{2,}/g, "-");
-}
-
-async function generateUniqueSlug(
-  name: string,
-  workspaceId: string
-): Promise<string> {
-  const base = slugify(name);
-  let candidate = base;
-
-  for (let i = 0; i < 10; i++) {
-    const existing = await prisma.site.findFirst({
-      where: { slug: candidate, workspaceId },
-    });
-    if (!existing) return candidate;
-    candidate = `${base}-${i + 2}`;
-  }
-
-  return `${base}-${Date.now()}`;
 }
 
 export async function listTemplates(input: ListTemplatesInput, workspaceId?: string) {
@@ -154,7 +137,7 @@ export async function useTemplate(
     throw new Error("TEMPLATE_NOT_FOUND");
   }
 
-  const slug = await generateUniqueSlug(siteName, workspaceId);
+  const slug = await generateUniqueSlug(siteName);
   const templatePageCount = ((template.pages ?? []) as unknown[]).length;
 
   const site = await prisma.site.create({

@@ -30,6 +30,7 @@ vi.mock("@server/services/ai.service", () => ({
 }));
 
 import { prisma } from "@lib/prisma";
+import { slugifyProjectName } from "@/lib/vercel";
 import { generatePage } from "@server/services/ai.service";
 import { POST } from "@/app/api/workers/ai-generate/[jobId]/route";
 
@@ -57,6 +58,26 @@ describe("ai-generate worker", () => {
   it("401 on wrong secret", async () => {
     const res = await POST(req("nope"), ctx);
     expect(res.status).toBe(401);
+  });
+
+  /* C1 residual: the worker's own slug generator checked slugs only, so an AI
+     site could derive a Vercel project another site is pinned to. */
+  it("skips a slug whose derived Vercel project name another site is pinned to", async () => {
+    p.aIGenerationJob.findUnique.mockResolvedValue({
+      id: "j1", status: "QUEUED", workspaceId: "w1", userId: "u1",
+      businessType: "BUSINESS", selectedPages: ["landing"], description: "A bakery", metadata: { name: "Bakery" },
+    });
+    p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
+    p.site.findMany.mockResolvedValue([{ slug: "renamed-away", vercelProjectName: slugifyProjectName("bakery") }]);
+    txSiteCreate.mockResolvedValue({ id: "site-1" });
+    txPageCreateMany.mockResolvedValue({ count: 1 });
+    txJobUpdateMany.mockResolvedValue({ count: 1 });
+    genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
+
+    const res = await POST(req("secret"), ctx);
+
+    expect(res.status).toBe(200);
+    expect(txSiteCreate.mock.calls[0][0].data.slug).toBe("bakery-2");
   });
 
   it("happy path: generates pages, creates site+pages in one transaction, marks COMPLETED", async () => {

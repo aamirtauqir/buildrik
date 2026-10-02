@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import { TextInput } from "@/editor/chrome-ui";
+import { useInspectorField, mixedName } from "./InspectorFieldContext";
 // ============================================================================
 // SLIDER INPUT
 // ============================================================================
@@ -22,6 +23,8 @@ export interface SliderInputProps {
   /** Renders an editable number field instead of the printed value, named
    *  by this label (Effects OPACITY, board 4428:142686, draws [100]). */
   fieldLabel?: string;
+  /** The CSS property it edits — "Mixed" and read-only come from the field context. */
+  property?: string;
 }
 
 const sliderStyle: React.CSSProperties = {
@@ -42,7 +45,9 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   step = 1,
   unit = "",
   fieldLabel,
+  property,
 }) => {
+  const field = useInspectorField(property);
   /* The row printed its label and never tied it to the control, so every
      slider in the inspector announced itself as an unnamed "slider" — 8 of
      them, measured in the running editor. `htmlFor` also makes the visible
@@ -56,7 +61,12 @@ export const SliderInput: React.FC<SliderInputProps> = ({
           id={id}
           type="range"
           value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
+          aria-label={field.mixed ? mixedName(label) : undefined}
+          aria-valuetext={field.mixed ? "Mixed" : undefined}
+          aria-readonly={field.readOnly || undefined}
+          onChange={(e) => {
+            if (!field.readOnly) onChange(Number(e.target.value));
+          }}
           min={min}
           max={max}
           step={step}
@@ -65,10 +75,12 @@ export const SliderInput: React.FC<SliderInputProps> = ({
         {fieldLabel ? (
           <TextInput
             type="number"
-            aria-label={fieldLabel}
+            aria-label={field.mixed ? mixedName(fieldLabel) : fieldLabel}
             className="tw:w-14 tw:flex-none"
             sizing="sm"
-            value={value}
+            readOnly={field.readOnly}
+            placeholder={field.mixed ? "Mixed" : undefined}
+            value={field.mixed ? "" : value}
             min={min}
             max={max}
             step={step}
@@ -87,8 +99,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
               fontVariantNumeric: "tabular-nums",
             }}
           >
-            {value}
-            {unit}
+            {field.mixed ? "Mixed" : `${value}${unit}`}
           </span>
         )}
       </div>
@@ -110,6 +121,8 @@ export interface RangeSliderProps {
   unit?: string;
   labelWidth?: number;
   valueWidth?: number;
+  /** The CSS property it edits — "Mixed" and read-only come from the field context. */
+  property?: string;
 }
 
 export const RangeSlider: React.FC<RangeSliderProps> = ({
@@ -120,7 +133,9 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   max = 100,
   step = 1,
   unit = "",
+  property,
 }) => {
+  const field = useInspectorField(property);
   /* The row printed its label and never tied it to the control, so every
      slider in the inspector announced itself as an unnamed "slider" — 8 of
      them, measured in the running editor. `htmlFor` also makes the visible
@@ -134,7 +149,12 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
           id={id}
           type="range"
           value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
+          aria-label={field.mixed ? mixedName(label) : undefined}
+          aria-valuetext={field.mixed ? "Mixed" : undefined}
+          aria-readonly={field.readOnly || undefined}
+          onChange={(e) => {
+            if (!field.readOnly) onChange(Number(e.target.value));
+          }}
           min={min}
           max={max}
           step={step}
@@ -149,8 +169,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
             fontVariantNumeric: "tabular-nums",
           }}
         >
-          {value}
-          {unit}
+          {field.mixed ? "Mixed" : `${value}${unit}`}
         </span>
       </div>
     </div>

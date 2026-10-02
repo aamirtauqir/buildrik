@@ -5,6 +5,7 @@ import { checkSiteRole, assertSiteAccess, getSiteWorkspace, PermissionError } fr
 import type { PlanName } from "@/lib/constants/plan-limits";
 import { getSettingsOverview, getSiteOverview, getLocales, getRedirectSuggestions } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
+import { redactSitePassword } from "@/server/services/sites.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
 import {
@@ -30,6 +31,9 @@ import {
   createShareLinkSchema,
   siteAnalyticsQuerySchema,
 } from "@buildrik/shared/schemas/site-detail";
+
+const PROJECT_NAME_TAKEN_MESSAGE =
+  "This site's address clashes with another site. Change its URL slug in Settings, then connect the domain.";
 
 export const siteDetailRouter = router({
   overview: protectedProcedure
@@ -108,7 +112,7 @@ export const siteDetailRouter = router({
         }
         const { id, ...data } = input;
         try {
-          const result = await updateSiteSettings(id, data);
+          const result = redactSitePassword(await updateSiteSettings(id, data));
           const changedKeys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
           await recordForSite({
             siteId: id,
@@ -130,6 +134,13 @@ export const siteDetailRouter = router({
             });
           if (e instanceof Error && e.message === "DEFAULT_LOCALE_NOT_ENABLED")
             throw new TRPCError({ code: "BAD_REQUEST", message: "The default locale must be in the enabled locales list." });
+          if (e instanceof Error && e.message === "SLUG_TAKEN")
+            throw new TRPCError({ code: "CONFLICT", message: "Another site already uses that URL slug." });
+          if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "Another site already uses the address this slug would pin. Choose a different URL slug.",
+            });
           throw e;
         }
       }),
@@ -339,6 +350,8 @@ export const siteDetailRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "DOMAIN_IN_USE")
             throw new TRPCError({ code: "CONFLICT", message: "Domain already in use." });
+          if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
+            throw new TRPCError({ code: "CONFLICT", message: PROJECT_NAME_TAKEN_MESSAGE });
           if (e instanceof Error && e.message === "DOMAIN_LIMIT")
             throw new TRPCError({ code: "FORBIDDEN", message: "You've reached your plan's custom-domain limit. Upgrade to add more." });
           if (e instanceof Error && e.message === "SITE_NOT_FOUND")

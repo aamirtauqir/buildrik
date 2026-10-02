@@ -125,8 +125,6 @@ export const CHROME_CHORDS: ChromeChord[] = [
      (defaultCommands.ts, "Clipboard & History"). The shell hook owns ⌘Z. */
   { id: "edit-undo", group: "Edit", keys: "ctrl+z", description: "Undo" },
   { id: "edit-redo", group: "Edit", keys: "ctrl+shift+z / ctrl+y", description: "Redo" },
-  { id: "edit-copy-styles", group: "Edit", keys: "ctrl+alt+c", description: "Copy styles only" },
-  { id: "edit-paste-styles", group: "Edit", keys: "ctrl+alt+v", description: "Paste styles" },
   { id: "edit-move-10", group: "Edit", keys: "shift+Arrows", description: "Move element 10px" },
   { id: "edit-move-1", group: "Edit", keys: "ctrl+Arrows", description: "Move element 1px" },
   { id: "edit-reorder", group: "Edit", keys: "alt+arrowup / alt+arrowdown", description: "Reorder up / down in DOM" },

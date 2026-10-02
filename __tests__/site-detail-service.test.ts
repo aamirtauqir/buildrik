@@ -137,7 +137,7 @@ describe("Site Detail Service", () => {
 
     it("connectDomain creates domain with DNS records", async () => {
       const { connectDomain } = await import("@/server/services/domain.service");
-      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1" } as any);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1", slug: "s1", vercelProjectName: null } as any);
       vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as any);
       vi.mocked(prisma.domain.count).mockResolvedValue(0);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);

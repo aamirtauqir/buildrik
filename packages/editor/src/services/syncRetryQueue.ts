@@ -56,8 +56,9 @@ export function totalPendingMirrors(): number {
 
 export class SyncRetryQueue {
   private queue = new Map<string, () => Promise<boolean>>();
-  private inFlight = new Map<string, Promise<boolean>>();
   private subscribers = new Set<(info: SyncRetryInfo) => void>();
+  /** The op running per target — the next one for it waits (see `run`). */
+  private inFlight = new Map<string, Promise<boolean>>();
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -144,31 +145,45 @@ export class SyncRetryQueue {
     task: () => Promise<unknown>,
     onWarn: (e: unknown) => void
   ): Promise<boolean> {
-    const work = (async (): Promise<boolean> => {
-      try {
-        await task();
-        /* Notify only when this actually cleared something. Subscribers put a
-           permanent "not on the server" toast on screen; when the queue drains —
-           by this retry, or by the `online` handler replaying it with no UI
-           involved — nothing used to fire, so that toast stood forever asserting
-           a failure that had already been fixed. Firing on every first-time
-           success instead would be noise: nothing was pending, nothing changed. */
-        if (this.queue.delete(key)) this.notify();
-        return true;
-      } catch (e) {
-        onWarn(e);
-        this.queue.set(key, () => this.run(key, task, onWarn));
-        this.notify();
-        return false;
-      }
-    })();
-    this.inFlight.set(key, work);
+    /* One write per target in flight, in the order they were asked for. Two
+       upserts of one row racing (a collection's create and its first field
+       update, fired a tick apart) could land in either order — the older
+       payload last — or the second could lose the create race on a unique key
+       and sit queued with the newer data. The Inspector v4 fixture's Menu
+       collection loaded with `fields: []` exactly so. Different targets
+       still run side by side. */
+    const prev = this.inFlight.get(key);
+    const mine = (prev ?? Promise.resolve()).then(() => this.attempt(key, task, onWarn));
+    this.inFlight.set(key, mine);
     try {
-      return await work;
+      return await mine;
     } finally {
       /* Only delete if this is still the latest in-flight entry — a newer
          run on the same key keeps its own promise tracked. */
-      if (this.inFlight.get(key) === work) this.inFlight.delete(key);
+      if (this.inFlight.get(key) === mine) this.inFlight.delete(key);
+    }
+  }
+
+  private async attempt(
+    key: string,
+    task: () => Promise<unknown>,
+    onWarn: (e: unknown) => void
+  ): Promise<boolean> {
+    try {
+      await task();
+      /* Notify only when this actually cleared something. Subscribers put a
+         permanent "not on the server" toast on screen; when the queue drains —
+         by this retry, or by the `online` handler replaying it with no UI
+         involved — nothing used to fire, so that toast stood forever asserting
+         a failure that had already been fixed. Firing on every first-time
+         success instead would be noise: nothing was pending, nothing changed. */
+      if (this.queue.delete(key)) this.notify();
+      return true;
+    } catch (e) {
+      onWarn(e);
+      this.queue.set(key, () => this.run(key, task, onWarn));
+      this.notify();
+      return false;
     }
   }
 

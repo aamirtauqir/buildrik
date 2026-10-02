@@ -6,6 +6,8 @@
  */
 
 import * as React from "react";
+import { FieldDot } from "./FieldDot";
+import { useInspectorField } from "./InspectorFieldContext";
 
 /**
  * Stable anchor for one property row, derived from the label the row shows.
@@ -47,6 +49,8 @@ export interface ControlRowProps {
   children: React.ReactNode;
   className?: string;
   variant?: "default" | "stacked" | "compact";
+  /** The CSS property the row edits — its override dot comes from the field context. */
+  property?: string;
 }
 
 const LABEL_WIDTHS = {
@@ -64,7 +68,9 @@ export const ControlRow: React.FC<ControlRowProps> = ({
   icon,
   children,
   variant = "default",
+  property,
 }) => {
+  const field = useInspectorField(property);
   const titleText = disabled && disabledReason ? disabledReason : tooltip;
 
   if (variant === "stacked") {
@@ -114,6 +120,7 @@ export const ControlRow: React.FC<ControlRowProps> = ({
       <label className="bdi-lb" data-testid={labelTestId(label)}>
         {icon}
         {label}
+        <FieldDot field={field} />
       </label>
       <div className="bdi-row-content">{children}</div>
     </div>

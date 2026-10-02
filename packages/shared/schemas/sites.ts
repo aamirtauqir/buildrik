@@ -189,6 +189,9 @@ const cmsFieldBindingSchema = z
       type: z.string().max(32),
     }),
     collectionId: z.string().max(200),
+    /** The collection's name when the binding was made — what a "source
+     *  missing" line names once the collection is deleted (board 25). */
+    collectionName: z.string().max(200).optional(),
     itemId: z.string().max(200).optional(),
     fieldSlug: z.string().max(200),
     property: z.enum(CMS_BINDABLE_PROPERTIES),

@@ -14,11 +14,21 @@ export interface ComposerProps {
    *  105548) show the field alone while a run is on screen; Enter still
    *  sends whenever nothing is streaming. Default: not while streaming. */
   showPlan?: boolean;
+  /** Board 35 (Inspector v4 AI column): the field alone, a 144-tall subtle
+   *  box on the column's own 16 gutter. `band` is the 4418:* layout. */
+  variant?: "band" | "column";
+  placeholder?: string;
 }
 
+/* Board 35's prompt box (7995:210676): bg-subtle, no edge, 12 in, 12/16. */
+const COLUMN_FIELD =
+  "tw:block tw:h-36 tw:w-full tw:resize-none tw:rounded-none tw:border-0 tw:bg-[var(--bk-bg-subtle)] tw:p-3 " +
+  "tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-ink-soft)] tw:focus:ring-0";
+
 export const Composer: React.FC<ComposerProps> = ({
-  onSubmit, streaming, quotaLabel, showPlan = !streaming,
+  onSubmit, streaming, quotaLabel, showPlan = !streaming, variant = "band", placeholder = "Ask AI to change something…",
 }) => {
+  const column = variant === "column";
   const [text, setText] = React.useState("");
   const trimmed = text.trim();
 
@@ -35,12 +45,12 @@ export const Composer: React.FC<ComposerProps> = ({
      own under it, on the left. It used to sit inside the field as a 22-tall
      chip. */
   return (
-    <div className="bd-ai-composer" data-testid="ai-prompt">
-      <div className="bd-ai-composer-field">
+    <div className={column ? "tw:relative" : "bd-ai-composer"} data-testid="ai-prompt">
+      <div className={column ? "tw:relative" : "bd-ai-composer-field"}>
         <Textarea
-          className="bd-ai-composer-input"
+          className={column ? COLUMN_FIELD : "bd-ai-composer-input"}
           data-testid="ai-prompt-input"
-          placeholder="Ask AI to change something…"
+          placeholder={placeholder}
           aria-label="Prompt"
           value={text}
           onChange={(e) => setText(e.target.value)}

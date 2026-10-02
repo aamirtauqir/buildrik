@@ -1,93 +1,71 @@
 /**
- * LayoutSection (index) — collapsed preview string + advanced disclosure of the
- * Overflow / Visibility groups behind the MoreSettingsToggle.
+ * LayoutSection — board 17: Display Block · Flex · Grid · None, the flex or
+ * grid controls inline, Position. No Width / Height here (DD-9).
  *
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { LayoutSection } from "../index";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { LayoutSection } from "..";
 
-type Props = React.ComponentProps<typeof LayoutSection>;
-
-function renderLayout(props: Partial<Props> = {}) {
+function renderLayout(styles: Record<string, string> = {}, extra: Partial<React.ComponentProps<typeof LayoutSection>> = {}) {
   const onChange = vi.fn();
-  const utils = render(
-    <LayoutSection styles={{}} onChange={onChange} isOpen={true} {...props} />
-  );
-  return { onChange, ...utils };
+  render(<LayoutSection styles={styles} onChange={onChange} onBatchChange={vi.fn()} isOpen {...extra} />);
+  return { onChange };
 }
 
-describe("LayoutSection — collapsed preview", () => {
-  it("combines display and a non-static position", () => {
-    renderLayout({ isOpen: false, styles: { display: "flex", position: "absolute" } });
-    expect(screen.getByText("flex · absolute")).toBeInTheDocument();
+describe("LayoutSection — Display", () => {
+  it("four segments incl. None, each writes display", () => {
+    const { onChange } = renderLayout({ display: "block" });
+    for (const name of ["Block", "Flex", "Grid", "None"]) expect(screen.getByRole("radio", { name })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Block" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "None" }));
+    expect(onChange).toHaveBeenCalledWith("display", "none");
   });
 
-  it("omits a static position from the preview", () => {
-    renderLayout({ isOpen: false, styles: { display: "block", position: "static" } });
-    expect(screen.getByText("block")).toBeInTheDocument();
-    expect(screen.queryByText(/static/)).not.toBeInTheDocument();
+  it("the inline modes sit behind More settings, and show while one is set", () => {
+    const { onChange } = renderLayout({ display: "block" }, { advancedExpanded: true, onAdvancedToggle: vi.fn() });
+    fireEvent.change(screen.getByLabelText("Inline"), { target: { value: "inline-flex" } });
+    expect(onChange).toHaveBeenCalledWith("display", "inline-flex");
   });
 });
 
-describe("LayoutSection — advanced disclosure", () => {
-  it("hides Position / Overflow / Visibility groups until advancedExpanded", () => {
-    renderLayout({ onAdvancedToggle: vi.fn() });
-    expect(screen.queryByText("Position")).not.toBeInTheDocument();
-    expect(screen.queryByText("Overflow")).not.toBeInTheDocument();
-    expect(screen.queryByText("Visibility & Float")).not.toBeInTheDocument();
+describe("LayoutSection — flex / grid inline (no Flexbox / Grid section)", () => {
+  it("Grid shows Columns + Gap", () => {
+    renderLayout({ display: "grid", "grid-template-columns": "repeat(3, 1fr)" });
+    expect(screen.getByLabelText("Columns")).toHaveValue("3");
+    expect(screen.getByLabelText("Gap")).toBeInTheDocument();
   });
 
-  /* Board 7058:78647: expanded, the block is the Position row; Overflow and
-     Visibility & Float wait behind their own "Overflow & visibility" toggle. */
-  it("expanded shows Position; Overflow + Visibility & Float one click further", () => {
-    renderLayout({ advancedExpanded: true, onAdvancedToggle: vi.fn() });
-    expect(screen.getByRole("combobox", { name: /Position/ })).toBeInTheDocument();
-    expect(screen.queryByText("Visibility & Float")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Overflow & visibility" }));
-    expect(screen.getByText("Overflow")).toBeInTheDocument();
-    expect(screen.getByText("Visibility & Float")).toBeInTheDocument();
+  it("Flex shows Direction and the align grid", () => {
+    renderLayout({ display: "flex" });
+    expect(screen.getByRole("group", { name: "Align" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Column" })).toBeInTheDocument();
   });
 
-  it("renders the toggle only when onAdvancedToggle is supplied and fires it", () => {
-    const onAdvancedToggle = vi.fn();
-    renderLayout({ onAdvancedToggle });
-    const toggle = screen.getByRole("button", { name: "Position, overflow & visibility" });
-    fireEvent.click(toggle);
-    expect(onAdvancedToggle).toHaveBeenCalled();
+  it("Block shows neither", () => {
+    renderLayout({ display: "block" });
+    expect(screen.queryByLabelText("Columns")).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Align" })).not.toBeInTheDocument();
+  });
+});
+
+describe("LayoutSection — Position, and no size", () => {
+  it("Position is on the face", () => {
+    const { onChange } = renderLayout();
+    fireEvent.change(screen.getByRole("combobox", { name: /^Position/ }), { target: { value: "relative" } });
+    expect(onChange).toHaveBeenCalledWith("position", "relative");
   });
 
-  it("omits the toggle entirely when onAdvancedToggle is absent", () => {
+  it("does not write width / height (Size owns them)", () => {
     renderLayout();
-    expect(
-      screen.queryByRole("button", { name: "Position, overflow & visibility" })
-    ).not.toBeInTheDocument();
-  });
-});
-
-/* Board 4428:141170: LAYOUT carries Display and a "Size  Fill · Hug" row —
-   width and height sizing modes. Exact numbers stay in the Size section. */
-describe("LayoutSection — Size row", () => {
-  it("reads width/height as Fill · Hug and writes the chosen mode", () => {
-    const { onChange } = renderLayout({ styles: { width: "100%", height: "fit-content" } });
-    const w = screen.getByRole("combobox", { name: "Width sizing" }) as HTMLSelectElement;
-    const h = screen.getByRole("combobox", { name: "Height sizing" }) as HTMLSelectElement;
-    expect(w.value).toBe("fill");
-    expect(h.value).toBe("hug");
-    fireEvent.change(w, { target: { value: "hug" } });
-    expect(onChange).toHaveBeenCalledWith("width", "fit-content");
-    fireEvent.change(h, { target: { value: "fill" } });
-    expect(onChange).toHaveBeenCalledWith("height", "100%");
+    expect(screen.queryByRole("group", { name: "Size" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Width sizing")).not.toBeInTheDocument();
   });
 
-  it("a fixed size reads as its value and Fixed keeps it", () => {
-    const { onChange } = renderLayout({ styles: { width: "320px" } });
-    const w = screen.getByRole("combobox", { name: "Width sizing" }) as HTMLSelectElement;
-    expect(w.value).toBe("fixed");
-    expect(w.selectedOptions[0].textContent).toBe("320px");
-    fireEvent.change(w, { target: { value: "fixed" } });
-    expect(onChange).not.toHaveBeenCalledWith("width", "200px");
+  it("overflow and visibility wait behind More settings", () => {
+    renderLayout({}, { onAdvancedToggle: vi.fn() });
+    expect(screen.queryByText("Overflow")).not.toBeInTheDocument();
   });
 });

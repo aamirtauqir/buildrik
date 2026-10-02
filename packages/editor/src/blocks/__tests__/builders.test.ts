@@ -314,16 +314,20 @@ describe("switchBlockConfig.build", () => {
 });
 
 describe("tableBlockConfig.build", () => {
-  it("builds wrapper > table > (thead: 4 headers) + (tbody: 3 rows x 4 cells) and returns wrapper id", () => {
+  it("builds wrapper > table > (thead: 4 headers) + (tbody: 3 rows x 4 cells) and returns the table's id", () => {
     const h = makeTreeComposer();
     const id = tableBlockConfig.build!(h.composer, PARENT);
     const wrapper = h.roots[0].el;
 
-    expect(id).toBe(wrapper.id);
     expect(wrapper.attributes.class).toBe("table-wrapper");
     expect(wrapper.children).toHaveLength(1);
 
+    /* Q2: the selection after insert is the <table> itself, typed `table`;
+       the scroll wrapper around it stays a plain container. */
     const table = wrapper.children[0];
+    expect(id).toBe(table.id);
+    expect(table.type).toBe("table");
+    expect(wrapper.type).toBe("container");
     expect(table.tagName).toBe("table");
     expect(table.children.map((c) => c.tagName)).toEqual(["thead", "tbody"]);
 

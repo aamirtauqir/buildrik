@@ -8,6 +8,10 @@
 export { ControlRow, CompactRow, StackedRow, SubTitle, rowTestId, fieldTestId, labelTestId } from "./ControlRow";
 export type { ControlRowProps, SubTitleProps } from "./ControlRow";
 
+// Boolean row (box first, label beside)
+export { CheckRow } from "./CheckRow";
+export type { CheckRowProps } from "./CheckRow";
+
 // Section wrapper
 export { Section } from "./Section";
 export type { SectionProps, SectionTier } from "./Section";
@@ -17,8 +21,8 @@ export { InputRow, InputWithUnit, SelectRow } from "./InputControls";
 export type { InputRowProps, InputWithUnitProps, SelectRowProps } from "./InputControls";
 
 // Button controls
-export { ButtonGroup, CompactButtonGroup } from "./ButtonControls";
-export type { ButtonGroupProps, CompactButtonGroupProps } from "./ButtonControls";
+export { ButtonGroup } from "./ButtonControls";
+export type { ButtonGroupProps } from "./ButtonControls";
 
 // Color input
 export { ColorInput } from "./ColorInput";
@@ -32,26 +36,17 @@ export type { SliderInputProps, RangeSliderProps } from "./SliderControls";
 export { SpacingBox, CornerRadiusInput } from "./SpacingControls";
 export type { SpacingBoxProps, CornerRadiusInputProps } from "./SpacingControls";
 
-// Linked gap input (flex + grid)
-export { LinkedGapInput } from "./LinkedGapInput";
-export type { LinkedGapInputProps } from "./LinkedGapInput";
-
 // Alignment grid
 export { AlignmentGrid } from "./AlignmentGrid";
 export type { AlignmentGridProps } from "./AlignmentGrid";
 
 // Text controls
-export { TextInputRow, InlineInput, SectionLabel, SubSectionTitle } from "./TextControls";
+export { TextInputRow, SectionLabel, SubSectionTitle } from "./TextControls";
 export type {
   TextInputRowProps,
-  InlineInputProps,
   SectionLabelProps,
   SubSectionTitleProps,
 } from "./TextControls";
-
-// Preset grids
-export { TemplateButtonGrid, PresetButtonGrid } from "./PresetGrids";
-export type { TemplateButtonGridProps, PresetButtonGridProps } from "./PresetGrids";
 
 // Progressive disclosure toggle
 export { MoreSettingsToggle } from "./MoreSettingsToggle";

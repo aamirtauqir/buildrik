@@ -68,7 +68,7 @@ function parseCanonicalOverridePath(
 }
 
 /** Walk a tree by an elementPath ("children[0].children[1]") to the target node. */
-function resolveNodeByElementPath(tree: ElementData, elementPath: string): ElementData | null {
+export function resolveNodeByElementPath(tree: ElementData, elementPath: string): ElementData | null {
   if (!elementPath) return tree;
   let node: ElementData = tree;
   for (const seg of elementPath.split(".")) {

@@ -5,24 +5,13 @@
  * @license BSD-3-Clause
  */
 
-// Element Profiles — rewritten in Phase 6 restructure. The old
-// essentials/defaultOpenGroups concept is gone; profiles now declare
-// per-tab section order for the contextual InspectorTabContent renderer.
-export {
-  getProfileFor,
-  ALL_PROFILE_ELEMENT_TYPES,
-  PROFILE_MAP,
-} from "./elementProfiles";
-export type { ElementProfile } from "./elementProfiles";
+// Section order — one list per tab (Inspector v4); presence is the type's
+// capabilities (@/shared/constants/elementCapabilities).
+export { SECTION_ORDER } from "./sectionOrder";
 
 // CSS Context
 export { deriveCssContext, getPropertyStates } from "./cssContext";
 export type { CssContext } from "./cssContext";
-
-// SectionId and the canonical section list now live in
-// `sections/registry.tsx` — see `ALL_REGISTRY_SECTION_IDS` and `SectionId`
-// exports there. The old `ALL_SECTION_IDS` const here was removed during
-// the Phase 6 restructure because it duplicated registry state and drifted.
 
 // Context Evaluator (dead exports purged in Commit B)
 export {

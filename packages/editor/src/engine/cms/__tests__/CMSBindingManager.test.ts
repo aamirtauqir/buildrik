@@ -114,6 +114,18 @@ describe("CMSBindingManager — field bindings", () => {
     expect(el.setTrait).not.toHaveBeenCalled();
   });
 
+  it("stores the collection's name at bind time, and export → import keeps it (board 25)", async () => {
+    const { cms, collection, item } = await setupWithContent();
+    const { composer } = makeComposer({ "el-1": makeElementStub() });
+    const manager = new CMSBindingManager(composer, cms);
+    manager.bindToField("el-1", collection.id, item.id, "title", "content");
+    expect(manager.getBindings("el-1")[0].collectionName).toBe("Posts");
+
+    const other = new CMSBindingManager(makeComposer({ "el-1": makeElementStub() }).composer, cms);
+    other.import(manager.export());
+    expect(other.getBindings("el-1")[0].collectionName).toBe("Posts");
+  });
+
   it("builds a context path when no itemId is given", async () => {
     const { cms, collection } = await setupWithContent();
     const { composer } = makeComposer();

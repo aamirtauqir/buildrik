@@ -24,9 +24,11 @@ describe("ColorInput — value rendering", () => {
     expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("ff0000");
   });
 
-  it("shows an empty field for an empty value", () => {
+  it("shows an empty field for an empty value, reading None — never a fake hex", () => {
     renderColor("");
-    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("");
+    const field = screen.getByRole("textbox", { name: "Fill value" });
+    expect(field).toHaveValue("");
+    expect(field).toHaveAttribute("placeholder", "None");
   });
 });
 
@@ -126,5 +128,24 @@ describe("ColorInput — bound token unlink", () => {
   it("shows no relink offer on a value that was never bound", () => {
     renderColor("#ff0000");
     expect(screen.queryByRole("button", { name: /^Relink/ })).toBeNull();
+  });
+});
+
+/* DD-19: an entry that is not a colour is flagged on Enter / blur, the value
+   is kept, Esc puts the field back. */
+describe("ColorInput — hex message", () => {
+  it("flags an unreadable entry with the hex message, writes nothing, Esc restores", async () => {
+    const { HEX_ERROR } = await import("../ColorInput");
+    const { onChange } = renderColor("#ff0000");
+    const field = screen.getByRole("textbox", { name: "Fill value" });
+    fireEvent.change(field, { target: { value: "zzz" } });
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(field).toHaveAttribute("aria-invalid", "true");
+    expect(document.getElementById(field.getAttribute("aria-describedby") ?? "")).toHaveTextContent(HEX_ERROR);
+    expect(HEX_ERROR).toMatch(/^Use a hex like #1A56DB or pick a token\.$/); // @lint-hex-policy: copy under test
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(field).toHaveValue("ff0000");
+    expect(field).toHaveAttribute("aria-invalid", "false");
   });
 });

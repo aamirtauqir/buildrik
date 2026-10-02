@@ -1,49 +1,73 @@
 /**
- * SECTION_REGISTRY shouldRender predicates — the per-family visibility gates
- * (flex/grid container-or-item, link element types,
- * text-like typography).
+ * SECTION_REGISTRY presence — v4: `capability` reads what the TYPE is (the
+ * one table, @/shared/constants/elementCapabilities); `shouldRender` reads
+ * runtime state (a flex container, a component instance).
  *
  * @license BSD-3-Clause
  */
 
 import { describe, it, expect } from "vitest";
 import { SECTION_REGISTRY, type ShouldRenderContext } from "../index";
+import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 
 const ctx = (partial: unknown) => partial as ShouldRenderContext;
+const has = (id: keyof typeof SECTION_REGISTRY, type: string) => SECTION_REGISTRY[id].capability?.(capabilitiesFor(type)) ?? true;
 
-describe("SECTION_REGISTRY — shouldRender gates", () => {
-  it("flex renders for a flex container OR a flex item, else hides", () => {
-    const gate = SECTION_REGISTRY.flex.shouldRender!;
-    expect(gate(ctx({ cssContext: { isFlexContainer: true, isFlexItem: false } }))).toBe(true);
-    expect(gate(ctx({ cssContext: { isFlexContainer: false, isFlexItem: true } }))).toBe(true);
-    expect(gate(ctx({ cssContext: { isFlexContainer: false, isFlexItem: false } }))).toBe(false);
+describe("SECTION_REGISTRY — capability gates", () => {
+  it("link: linkable types only (boards 6, 7, 18)", () => {
+    for (const t of ["link", "button", "section", "container", "card", "cta"]) expect(has("link", t), t).toBe(true);
+    for (const t of ["image", "heading", "form", "list-item"]) expect(has("link", t), t).toBe(false);
   });
 
-  it("grid renders for a grid container OR a grid item, else hides", () => {
-    const gate = SECTION_REGISTRY.grid.shouldRender!;
-    expect(gate(ctx({ cssContext: { isGridContainer: true, isGridItem: false } }))).toBe(true);
-    expect(gate(ctx({ cssContext: { isGridContainer: false, isGridItem: true } }))).toBe(true);
-    expect(gate(ctx({ cssContext: { isGridContainer: false, isGridItem: false } }))).toBe(false);
+  it("cms-binding: bindable types only — never on a Section or a container (R-2, board 18)", () => {
+    for (const t of ["heading", "text", "paragraph", "image", "button", "link"]) expect(has("cms-binding", t), t).toBe(true);
+    for (const t of ["section", "video", "icon", "divider", "container"]) expect(has("cms-binding", t), t).toBe(false);
   });
 
-  it("link renders only for linkable element types", () => {
-    const gate = SECTION_REGISTRY.link.shouldRender!;
-    expect(gate(ctx({ selectedElement: { type: "link" } }))).toBe(true);
-    expect(gate(ctx({ selectedElement: { type: "button" } }))).toBe(true);
-    expect(gate(ctx({ selectedElement: { type: "section" } }))).toBe(true); // board 4428:141642
-    expect(gate(ctx({ selectedElement: { type: "image" } }))).toBe(false);
+  it("typography opens on text; containers, buttons and fields get Text inside; media neither", () => {
+    expect(has("typography", "heading")).toBe(true);
+    expect(has("text-inside", "heading")).toBe(false);
+    for (const t of ["section", "button", "input", "checkbox"]) {
+      expect(has("typography", t), t).toBe(false);
+      expect(has("text-inside", t), t).toBe(true);
+    }
+    for (const t of ["image", "video-embed", "divider"]) {
+      expect(has("typography", t), t).toBe(false);
+      expect(has("text-inside", t), t).toBe(false);
+    }
   });
 
-  /* Board 7056:78382: a Section carries TYPOGRAPHY too — the type its text
-     inherits. Images and other leaves still do not. */
-  it("typography renders for text-like elements and containers", () => {
-    const gate = SECTION_REGISTRY.typography.shouldRender!;
-    expect(gate(ctx({ cssContext: { inspectorContext: { isTextLike: true } } }))).toBe(true);
-    expect(gate(ctx({ selectedElement: { type: "section" }, cssContext: { inspectorContext: { isTextLike: false } } }))).toBe(true);
-    expect(gate(ctx({ selectedElement: { type: "image" }, cssContext: { inspectorContext: { isTextLike: false } } }))).toBe(false);
+  it("layout: containers, not the Flex / Grid types (their type block carries it)", () => {
+    expect(has("layout", "container")).toBe(true);
+    expect(has("layout", "flex")).toBe(false);
+    expect(has("layout", "heading")).toBe(false);
   });
 
-  it("universal sections (css-classes) declare no gate", () => {
-    expect(SECTION_REGISTRY["css-classes"].shouldRender).toBeUndefined();
+  it("the type's own Behaviour sections come from its capabilities", () => {
+    expect(has("form-fields", "form")).toBe(true);
+    expect(has("form-fields", "container")).toBe(false);
+    expect(has("collection", "collection-list")).toBe(true);
+    expect(has("slides", "slider")).toBe(true);
+  });
+
+  it("universal sections declare no gate", () => {
+    for (const id of ["size", "spacing", "fill", "border", "visibility", "interactions", "css-classes", "attributes", "opacity"] as const) {
+      expect(SECTION_REGISTRY[id].capability, id).toBeUndefined();
+      expect(SECTION_REGISTRY[id].shouldRender, id).toBeUndefined();
+    }
+  });
+});
+
+describe("SECTION_REGISTRY — runtime gates", () => {
+  it("there are no Flexbox / Grid sections — Layout and the type blocks carry those controls", () => {
+    expect(Object.keys(SECTION_REGISTRY)).not.toContain("flex");
+    expect(Object.keys(SECTION_REGISTRY)).not.toContain("grid");
+  });
+
+  it("the component row renders only on an instance", () => {
+    const gate = SECTION_REGISTRY.component.shouldRender!;
+    const composer = (instance: unknown) => ({ components: { getInstanceByElementId: () => instance } });
+    expect(gate(ctx({ composer: composer({ elementId: "e" }), selectedElement: { id: "e" } }))).toBe(true);
+    expect(gate(ctx({ composer: composer(null), selectedElement: { id: "e" } }))).toBe(false);
   });
 });

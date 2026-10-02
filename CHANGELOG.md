@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0.0] Inspector groundwork — lock, context, types, export — 2026-09-27
+
+Fixes the defects the 2026-09-27 Inspector audit found underneath the redesign (Phase 3 of the Inspector plan). Every item has a regression test that failed before the fix; most were also checked in the running editor.
+
+### Fixed — edits that went to the wrong place or were lost
+- A locked element can no longer be changed from the Inspector: styles, text, link, classes, attributes, CMS binding, component variant, form fields, slides, and inline text edit on the canvas all refuse it and say so once. ⋯ Delete on a locked element now skips it, and every Delete runs through the same command and Undo.
+- Binding text to a CMS field no longer wipes the element's text when the collection has no published records; Unbind is one Undo step and keeps what you see. Changing the collection no longer unbinds before you pick a field.
+- Gradients write real colours instead of editor-only `--bk-*` tokens, so they render on the published site. Switching Background from Gradient to Color replaces the gradient instead of hiding the colour under it.
+- Hiding an element on Tablet or Mobile now hides it there on the canvas and in the export, whichever breakpoint you were editing on.
+- Resetting a value under `:hover` removes it; breakpoint "Revert all" also clears the data the React export reads.
+- Paste style merges the same way from the Inspector ⋯, the canvas menu and ⌥⌘V; Duplicate from the Inspector and canvas menu uses the shared command; deleting a multi-selection asks once.
+- Changing a link's type clears the old destination and a target/rel that no longer applies, keeping a custom `rel`. Checkbox attributes stored as empty strings read as on, and each checkbox is labelled with its property name. Interaction duration and delay never store an empty, NaN or negative value, and can be typed normally. Emptying a number field clears the property.
+- A late debounced style write can no longer undo a change made right after it.
+
+### Fixed — keeping your place
+- The colour and token picker opens beside the Inspector, over the canvas, instead of being clipped invisible; it follows scroll and takes keyboard focus.
+- The canvas right-click menu and its submenus draw above the Inspector and can be clicked.
+- Esc closes only the innermost menu or panel, and still deselects when no editor popup is open, including on pages whose own content uses dialog or menu roles.
+- Opening Brand, Assets or Settings and coming back returns the same selection, tab and scroll; so does the AI panel, which also keeps the `:hover` state. The Inspector remembers each element's scroll position.
+- Clicking the primary element of a multi-selection selects just that element.
+
+### Fixed — element types and export
+- Blocks inserted from Add keep their real type (Checkbox, Radio, Switch, Label, Spacer, Stack, Card, Table, Tabs, Lottie, Video embed, Map embed, Navbar, CTA, Social icons, list items) instead of arriving as a generic Container. Saved projects are upgraded on load only where the stored markup proves the type, and render and publish byte-for-byte as before.
+- The Carousel renders and exports its slides instead of an empty `<input>`; carousels already saved are repaired the same way.
+
+### Deploy
+- **No rollback past this release once projects have been saved on it.** The load-time type upgrade is written back on the next save, and earlier code publishes an upgraded checkbox or switch label with the wrong attributes. Roll forward instead.
+- No database migration and no new environment variables.
+
 ## [0.5.0.0] Audit fix — security, data integrity, broken flows — 2026-09-26
 
 Fixes the 2026-09-25 full audit: all six security P0s, 50 of 75 findings fully (18 more guarded, with follow-up plans), and 55 more bugs caught by walking the running app. Status of every finding, what was and was not verified in the browser, and the owner decision list: `docs/audits/2026-09-25-full-audit/92-fix-report.md`.

@@ -26,6 +26,7 @@ import { AddFieldDialog } from "./AddFieldDialog";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
+import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
 
@@ -35,6 +36,9 @@ export interface CmsWorkspaceProps {
   onCreateCollection?: () => void;
   /** The Assets pick mode, for a record's image field (G3-081). */
   onOpenMediaLibrary?: OpenMediaLibrary;
+  /** §13: the workspace was opened from an element (the inspector's Open
+   *  record › / Open collection ›); the shell gives that element back. */
+  onBackToCanvas?: () => void;
 }
 
 const HEADER =
@@ -52,6 +56,8 @@ const TAB =
   "tw:h-10 tw:rounded-none tw:px-2.5 tw:font-medium tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:border-b-2 tw:border-transparent " +
   "tw:hover:bg-transparent tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent " +
   "tw:aria-selected:border-[var(--bk-accent)] tw:aria-selected:text-[var(--bk-accent-text)]";
+
+/* A quiet 28-tall action at the header's start; a rule parts it from the title. */
 
 const TABS = [
   { id: "records", label: "Records" },
@@ -75,7 +81,7 @@ function plural(n: number, one: string, many = `${one}s`): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
-export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary }: CmsWorkspaceProps) {
+export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary, onBackToCanvas }: CmsWorkspaceProps) {
   const panel = useContentPanel(composer);
   const { addToast } = useToast();
   const ws = useCmsWorkspace();
@@ -117,6 +123,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
   }, [composer]);
 
   const importer = useImportRecords(composer, collection);
+  const back = onBackToCanvas ? (
+    <>
+      <Button color="light" size="xs" className={BACK} data-testid="cms-ws-back-to-canvas" onClick={onBackToCanvas}>
+        ‹ Back to canvas
+      </Button>
+      <span className="tw:h-5 tw:w-px tw:bg-[var(--bk-border)]" aria-hidden="true" />
+    </>
+  ) : null;
 
   if (!collection) {
     const records = Object.values(panel.recordCounts).reduce((a, b) => a + b, 0);
@@ -125,6 +139,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace">
         <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-subtle)]">
           <header className={HEADER} data-testid="cms-ws-header">
+            {back}
             <h2 className={TITLE}>CMS · {siteName}</h2>
             <span className={META} data-testid="cms-ws-meta">
               {plural(panel.collections.length, "collection")} · {plural(records, "record")}
@@ -237,6 +252,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
     <div className="tw:relative tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace">
       <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]">
         <header className={HEADER} data-testid="cms-ws-header">
+          {back}
           <h2 className={TITLE} data-testid="cms-ws-title">{collection.name}</h2>
           <span className={META} data-testid="cms-ws-meta">
             · {ws.tab === "fields" ? plural(collection.fields.length, "field") : plural(count, "record")}
@@ -339,6 +355,17 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
           collection={collection}
           record={sheetRecord}
           onClose={() => cmsWorkspace.openRecord(null)}
+          /* The sheet covers the workspace header: opened from an element
+             (Open record ›), its own back closes it and returns to the
+             canvas in one step (§13). */
+          onBackToCanvas={
+            onBackToCanvas
+              ? () => {
+                  cmsWorkspace.openRecord(null);
+                  onBackToCanvas();
+                }
+              : undefined
+          }
           onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
           onSave={async (data, published) => {
             const { reached } = await panel.saveRecord(

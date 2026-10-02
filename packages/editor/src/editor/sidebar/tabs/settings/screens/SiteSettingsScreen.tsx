@@ -62,6 +62,15 @@ function socialLink(links: unknown, key: "twitter" | "facebook" | "linkedin"): s
   return typeof value === "string" ? value : "";
 }
 
+/** Every string-valued platform on the row's `socialLinks`, including those
+ *  the screen has no field for; undefined when the row has no object. */
+function socialLinksOf(links: unknown): Record<string, string> | undefined {
+  if (typeof links !== "object" || links === null) return undefined;
+  return Object.fromEntries(
+    Object.entries(links).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+  );
+}
+
 /* `Site.name` is `z.string().min(2).max(100)` on the server — a one-letter
    name is refused by the whole settings mutation, and an empty one cannot be
    sent at all (the column is required; the sync provider skips it). Said
@@ -120,6 +129,10 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   /* null = no Site row read (the standalone demo), so nothing to check
      against; the server enforces `defaultLocale ∈ enabledLocales` either way. */
   const [enabledLocales, setEnabledLocales] = React.useState<string[] | null>(null);
+  /* The row's social links, for the flush: the composer's copy is undefined
+     when `loadProject`'s column read failed, and merging into that drops the
+     platforms this screen has no field for. */
+  const rowSocialLinksRef = React.useRef<Record<string, string> | undefined>(undefined);
 
   const isDirty = identity.isDirty || social.isDirty;
 
@@ -152,6 +165,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
       setFavicon(row.favicon ?? "");
       setLanguage(row.defaultLocale ?? "en");
       setEnabledLocales(row.enabledLocales ?? null);
+      rowSocialLinksRef.current = socialLinksOf(row.socialLinks);
       setTwitter(socialLink(row.socialLinks, "twitter"));
       setFacebook(socialLink(row.socialLinks, "facebook"));
       setLinkedin(socialLink(row.socialLinks, "linkedin"));
@@ -178,6 +192,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
           favicon: s.favicon,
           language: s.language,
           socialLinks: {
+            ...(rowSocialLinksRef.current ?? current.seo?.socialLinks),
             twitter: s.twitter,
             facebook: s.facebook,
             linkedin: s.linkedin,

@@ -24,7 +24,7 @@ function makeComposer() {
   return { composer, registered };
 }
 
-function setup(selectedType: string | null, tier = "pro") {
+function setup(selectedType: string | null) {
   const { composer, registered } = makeComposer();
   const container = document.createElement("div");
   container.innerHTML =
@@ -37,10 +37,7 @@ function setup(selectedType: string | null, tier = "pro") {
     selectedType,
     contentRef: { current: container },
     setActiveTab: vi.fn(),
-    tier,
-    setShowAll: vi.fn(),
-    expandedSections: new Set<string>(),
-    toggleSection: vi.fn(),
+    openSection: vi.fn(),
     advancedState: { expand: vi.fn() },
   };
   const hook = renderHook((p: typeof opts) => usePropertyJump(p), { initialProps: opts });
@@ -78,11 +75,11 @@ describe("usePropertyJump — the ⌘K rows", () => {
 });
 
 describe("usePropertyJump — the reveal", () => {
-  it("running a row opens its tab, expands the section, focuses the row's control and tints it for a second", () => {
+  it("running a row opens its tab, opens the section, focuses the row's control and tints it for a second", () => {
     const { registered, opts, container } = setup("container");
     [...registered.values()].find((c) => c.label === "Padding · Style › Spacing")!.run();
     expect(opts.setActiveTab).toHaveBeenCalledWith("style");
-    expect(opts.toggleSection).toHaveBeenCalledWith("container", "spacing");
+    expect(opts.openSection).toHaveBeenCalledWith("container", "spacing");
     const input = container.querySelector<HTMLInputElement>('[data-t="padding"]')!;
     expect(document.activeElement).toBe(input);
     const row = input.closest(".bdi-row-ctrl")!;
@@ -91,17 +88,10 @@ describe("usePropertyJump — the reveal", () => {
     expect(row.hasAttribute("data-bk-reveal")).toBe(false);
   });
 
-  it("a Beginner jump into an advanced section turns Show all on", () => {
-    const { composer, opts } = setup("container", "beginner");
-    composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "size", property: "width" });
-    expect(opts.setShowAll).toHaveBeenCalledWith(true);
-  });
-
-  it("an already-open section is not toggled shut", () => {
-    const { composer, opts, hook } = setup("container");
-    hook.rerender({ ...opts, expandedSections: new Set(["container:spacing"]) });
+  it("jumping into an already-open section keeps it open and lands on the row", () => {
+    const { composer, opts } = setup("container");
     composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "spacing", property: "margin" });
-    expect(opts.toggleSection).not.toHaveBeenCalled();
+    expect(opts.openSection).toHaveBeenCalledWith("container", "spacing");
     expect((document.activeElement as HTMLElement).dataset.t).toBe("margin");
   });
 });
@@ -111,16 +101,16 @@ describe("usePropertyJump — the reveal", () => {
    closure still held the PREVIOUS selection's type — the section was toggled
    under the wrong element key. The deferred half reads the current one. */
 describe("usePropertyJump — the reveal follows the current selection", () => {
-  it("expands the section for the type selected when the frame runs", () => {
+  it("opens the section for the type selected when the frame runs", () => {
     const frames: FrameRequestCallback[] = [];
     vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
       frames.push(cb);
       return frames.length;
     });
     const { composer, opts, hook } = setup("container");
-    composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" });
+    composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "cms-binding" });
     hook.rerender({ ...opts, selectedType: "heading" });
     frames.shift()!(0);
-    expect(opts.toggleSection).toHaveBeenCalledWith("heading", "content");
+    expect(opts.openSection).toHaveBeenCalledWith("heading", "cms-binding");
   });
 });

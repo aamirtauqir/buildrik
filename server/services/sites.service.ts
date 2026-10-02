@@ -13,8 +13,11 @@ import type {
 } from "@buildrik/shared/schemas/sites";
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
+import { SITE_SETTINGS_COLUMNS, stripColumnBackedSettings } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
+import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
+import { slugifyProjectName } from "@/lib/vercel";
 
 function slugify(name: string): string {
   return name
@@ -24,19 +27,29 @@ function slugify(name: string): string {
     .replace(/-{2,}/g, "-");
 }
 
-async function generateUniqueSlug(name: string): Promise<string> {
-  const base = slugify(name);
+/** A globally unique Site slug for a new site. Every site-creation path uses
+ *  this one: it also skips slugs whose derived Vercel project another site is
+ *  pinned to. A name with no usable characters falls back to "site". */
+export async function generateUniqueSlug(name: string): Promise<string> {
+  const base = slugify(name) || "site";
+  const candidates = [base, ...Array.from({ length: 10 }, (_, i) => `${base}-${i + 2}`)];
   // One query for all base-prefixed slugs instead of up to 10 sequential
-  // findFirst lookups.
-  const taken = new Set(
-    (await prisma.site.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } })).map((s) => s.slug),
+  // findFirst lookups. A candidate is also unusable when another site is
+  // pinned to the Vercel project it derives — it would deploy into that one.
+  const rows = await prisma.site.findMany({
+    where: {
+      OR: [
+        { slug: { startsWith: base } },
+        { vercelProjectName: { in: candidates.map(slugifyProjectName) } },
+      ],
+    },
+    select: { slug: true, vercelProjectName: true },
+  });
+  const taken = new Set(rows.map((s) => s.slug));
+  const pinned = new Set(rows.map((s) => s.vercelProjectName));
+  return (
+    candidates.find((c) => !taken.has(c) && !pinned.has(slugifyProjectName(c))) ?? `${base}-${Date.now()}`
   );
-  if (!taken.has(base)) return base;
-  for (let i = 2; i < 12; i++) {
-    const candidate = `${base}-${i}`;
-    if (!taken.has(candidate)) return candidate;
-  }
-  return `${base}-${Date.now()}`;
 }
 
 const SORT_MAP: Record<string, Record<string, string>> = {
@@ -235,10 +248,10 @@ export async function createSite(
       return created;
     });
 
-    return site;
+    return redactSitePassword(site);
   }
 
-  return prisma.$transaction(async (tx) => {
+  const site = await prisma.$transaction(async (tx) => {
     const created = await tx.site.create({
       data: {
         name: input.name,
@@ -266,6 +279,7 @@ export async function createSite(
 
     return created;
   });
+  return redactSitePassword(site);
 }
 
 export async function checkSlugAvailability(slug: string): Promise<boolean> {
@@ -338,18 +352,29 @@ export async function transferSite(
   return { success: true };
 }
 
+/** Every Site row returned to a client goes through this: the stored
+ *  published-site password is reversible ciphertext and never leaves the
+ *  server; the client gets a flag instead. */
+export function redactSitePassword<T extends { publishedPassword: string | null }>(
+  site: T,
+): Omit<T, "publishedPassword"> & { hasPublishedPassword: boolean } {
+  const { publishedPassword, ...rest } = site;
+  return { ...rest, hasPublishedPassword: Boolean(publishedPassword) };
+}
+
 export async function getSite(siteId: string) {
-  return prisma.site.findFirst({
+  const site = await prisma.site.findFirst({
     where: { id: siteId, deletedAt: null },
     include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
   });
+  return site ? redactSitePassword(site) : null;
 }
 
 export async function renameSite(siteId: string, name: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { name, lastEditedAt: new Date() },
-  });
+  }));
 }
 
 /**
@@ -378,6 +403,33 @@ export async function setSiteThumbnail(userId: string, siteId: string, url: stri
   });
 }
 
+/** Setting columns a duplicate does not inherit: its own identity, the
+ *  site password (a copy starts ungated, like any new site), and the canonical
+ *  URL (the source's address — on the copy it would mark it a duplicate). */
+const NOT_DUPLICATED = new Set<string>(["name", "slug", "publishedPassword", "canonicalUrl"]);
+/** D2 (founder): custom code is a paid feature, so a copy into a FREE
+ *  workspace starts without it. */
+const NOT_DUPLICATED_INTO_FREE = new Set<string>([...NOT_DUPLICATED, "headCode", "bodyCode"]);
+
+/**
+ * SA-01: the source site's setting columns, for the copy's create. The columns
+ * are the only source of the settings they back — the copy used to inherit
+ * them through the projectSettings JSON, which saves no longer store. NULLs
+ * are left out (the column default is NULL, and Prisma takes no raw null for
+ * the Json `socialLinks`).
+ */
+function duplicatedSettingColumns(
+  original: Record<string, unknown>,
+  destinationPlan: string,
+): Partial<Prisma.SiteUncheckedCreateInput> {
+  const skip = destinationPlan === "FREE" ? NOT_DUPLICATED_INTO_FREE : NOT_DUPLICATED;
+  return Object.fromEntries(
+    Object.keys(SITE_SETTINGS_COLUMNS)
+      .filter((key) => !skip.has(key) && original[key] !== null)
+      .map((key) => [key, original[key]]),
+  );
+}
+
 export async function duplicateSite(
   siteId: string,
   workspaceId: string,
@@ -387,6 +439,12 @@ export async function duplicateSite(
   if (!original || original.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   await assertSiteQuota(workspaceId, userId);
+
+  const destination = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { plan: true },
+  });
+  const destinationPlan = destination?.plan ?? "FREE";
 
   const copyName = `${original.name} (Copy)`;
   const slug = await generateUniqueSlug(copyName);
@@ -412,6 +470,7 @@ export async function duplicateSite(
   return prisma.$transaction(async (tx) => {
     const newSite = await tx.site.create({
       data: {
+        ...duplicatedSettingColumns(original, destinationPlan),
         name: copyName,
         slug,
         status: "DRAFT",
@@ -496,7 +555,7 @@ export async function duplicateSite(
       });
     }
 
-    return newSite;
+    return redactSitePassword(newSite);
   });
 }
 
@@ -514,17 +573,17 @@ function copyCmsBindings(stored: Prisma.JsonValue, renames: IdRename[]): Prisma.
 }
 
 export async function archiveSite(siteId: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { status: "ARCHIVED" },
-  });
+  }));
 }
 
 export async function unarchiveSite(siteId: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { status: "DRAFT" },
-  });
+  }));
 }
 
 export async function deleteSite(siteId: string, confirmName: string) {
@@ -533,6 +592,17 @@ export async function deleteSite(siteId: string, confirmName: string) {
 
   if (site.name !== confirmName) {
     throw new Error("NAME_MISMATCH");
+  }
+
+  // SA-07: take the live deployment down before soft-deleting. Best-effort —
+  // unpublishSite is already best-effort toward Vercel and flips the row to
+  // DRAFT, but a delete must still succeed even if that call throws.
+  if (hasLiveDeployment(site)) {
+    try {
+      await unpublishSite(siteId);
+    } catch (e: unknown) {
+      console.error(`[deleteSite] take-down failed for ${siteId}:`, e instanceof Error ? e.message : e);
+    }
   }
 
   const now = new Date();
@@ -648,11 +718,40 @@ export async function bulkAction(
     // pipeline or the approval gate, so it reported success while the live site
     // was untouched. Publishing is per-site through the real pipeline.
     case "delete": {
-      const result = await prisma.site.updateMany({
+      // SA-07: same take-down + link/form deactivation as the single-site
+      // delete, applied per id. Best-effort — a take-down failure never blocks
+      // the soft-delete.
+      const targets = await prisma.site.findMany({
         where: { id: { in: siteIds }, workspaceId, deletedAt: null },
-        data: { deletedAt: new Date() },
+        select: { id: true, status: true, publishedUrl: true },
       });
-      return { succeeded: siteIds.slice(0, result.count), failed: [] };
+      await Promise.all(
+        targets
+          .filter(hasLiveDeployment)
+          .map(async (s) => {
+            try {
+              await unpublishSite(s.id);
+            } catch (e: unknown) {
+              console.error(`[bulkAction:delete] take-down failed for ${s.id}:`, e instanceof Error ? e.message : e);
+            }
+          }),
+      );
+      const targetIds = targets.map((s) => s.id);
+      const [result] = await prisma.$transaction([
+        prisma.site.updateMany({
+          where: { id: { in: targetIds }, workspaceId, deletedAt: null },
+          data: { deletedAt: new Date() },
+        }),
+        prisma.shareLink.updateMany({
+          where: { siteId: { in: targetIds } },
+          data: { isActive: false },
+        }),
+        prisma.formBlock.updateMany({
+          where: { siteId: { in: targetIds } },
+          data: { isActive: false },
+        }),
+      ]);
+      return { succeeded: targetIds.slice(0, result.count), failed: [] };
     }
     default:
       throw new Error("INVALID_ACTION");
@@ -721,7 +820,8 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // Site-level project artifacts. The style rules' selectors and media
   // queries are written raw into the published stylesheet — same boundary.
   sanitizeProjectStyles(input.styles);
-  const settings = withValidAnalyticsIds(input.settings);
+  // SA-01: the column-backed keys live in their Site columns only.
+  const settings = stripColumnBackedSettings(withValidAnalyticsIds(input.settings));
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
   // past the size cap is not stored — the save and its pages still land, the

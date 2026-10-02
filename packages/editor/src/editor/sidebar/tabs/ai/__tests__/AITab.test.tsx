@@ -255,11 +255,19 @@ describe("AITab — scope + composer wiring", () => {
     expect(container.querySelector("textarea")!.value).toBe("make the hero warmer");
   });
 
-  it("puts a ✕ on the back row that closes the panel (board 4418:106919)", () => {
+  /* Board 4418:106919 is the failed run. Before anything is asked on one
+     element the column is board 35's, which draws no ✕ (AITab.board35.test). */
+  it("puts a ✕ on the back row that closes the panel (board 4418:106919)", async () => {
     const onClose = vi.fn();
-    renderWithToast(
+    const { container } = renderWithToast(
       <AITab composer={makeElementScopedComposer()} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={onClose} onBack={vi.fn()} />,
     );
+    const ta = container.querySelector("textarea")!;
+    fireEvent.change(ta, { target: { value: "make the hero warmer" } });
+    fireEvent.keyDown(ta, { key: "Enter" });
+    await act(async () => {
+      lastSubscribe.onError?.({ message: "Stream failed", data: { code: "INTERNAL_SERVER_ERROR" } });
+    });
     fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
     expect(onClose).toHaveBeenCalled();
   });

@@ -107,6 +107,7 @@ export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
 export { HintTooltip, type HintTooltipProps, type HintTooltipPlacement } from "./HintTooltip";
 export { Slider, type SliderProps } from "./Slider";
 export { Tabs, type TabsProps, type Tab } from "./Tabs";
+export { Breadcrumb, type BreadcrumbProps, type BreadcrumbItem } from "./Breadcrumb";
 export { Toolbar, ToolbarSpacer, type ToolbarProps } from "./Toolbar";
 export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";
 export { OverlayMount, type OverlayMountProps } from "./OverlayMount";

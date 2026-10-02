@@ -15,5 +15,5 @@ export const spacerBlockConfig: SpacerBlockConfig = {
   category: "Basic",
   elementType: "spacer",
   icon: "/src/assets/icons/blocks/basic/spacer.svg",
-  content: '<div style="height:40px"></div>',
+  content: '<div data-buildrick-type="spacer" style="height:40px"></div>',
 };

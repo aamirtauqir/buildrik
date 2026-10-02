@@ -20,6 +20,13 @@ vi.mock("../../sidebar/TabRouter", () => ({
   TabRouter: ({ activeTab }: { activeTab: string }) => <div data-testid={`column-tab-${activeTab}`} />,
 }));
 vi.mock("../PageTabBar", () => ({ PageTabBar: () => null }));
+vi.mock("@/editor/cms/CmsWorkspace", () => ({
+  default: ({ onBackToCanvas }: { onBackToCanvas?: () => void }) => (
+    <div data-testid="cms-workspace">
+      {onBackToCanvas ? <button onClick={onBackToCanvas}>‹ Back to canvas</button> : null}
+    </div>
+  ),
+}));
 vi.mock("../../media/components/SiteFontsModal", () => ({ SiteFontsModal: () => null }));
 vi.mock("@/editor/design-system", () => {
   const Pass = ({ children }: { children: React.ReactNode }) => <>{children}</>;
@@ -78,8 +85,38 @@ function makeComposer() {
 }
 type FakeComposer = ReturnType<typeof makeComposer>;
 
-function Harness({ composer, leftPanelTab, ...rest }: { composer: FakeComposer } & Omit<Partial<StudioPanelsProps>, "composer">) {
-  const [open, setOpen] = React.useState(true);
+function selectingComposer(ids: string[]) {
+  const base = makeComposer();
+  const live = new Map(ids.map((id) => [id, { id }]));
+  let selected: { id: string }[] = [];
+  const selection = {
+    getSelectedIds: () => selected.map((e) => e.id),
+    getAllSelected: () => selected,
+    clear: vi.fn(() => {
+      selected = [];
+    }),
+    select: vi.fn((el: { id: string } | null) => {
+      selected = el ? [el] : [];
+    }),
+    selectMultiple: vi.fn((els: { id: string }[]) => {
+      selected = els;
+    }),
+  };
+  return {
+    ...base,
+    selection,
+    live,
+    elements: { getElement: (id: string) => live.get(id) ?? null },
+  };
+}
+
+function Harness({
+  composer,
+  leftPanelTab,
+  initialOpen = true,
+  ...rest
+}: { composer: FakeComposer; initialOpen?: boolean } & Omit<Partial<StudioPanelsProps>, "composer">) {
+  const [open, setOpen] = React.useState(initialOpen);
   /* The initial tab; afterwards the harness owns it, like AquibraStudio. */
   const [tab, setTab] = React.useState(leftPanelTab ?? "add");
   return (
@@ -117,7 +154,8 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
     render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
     expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    expect(screen.queryByTestId("pro-inspector")).toBeNull();
+    /* P-7a: covered, not unmounted. */
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBe("true");
 
     act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
     await flushFrame();
@@ -164,15 +202,52 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
 });
 
 
-describe("StudioPanels — Hide inspector (GW-3 / M-2)", () => {
-  it("hiding the visible inspector raises a toast whose Show brings it back", async () => {
+/* Board 36 (Inspector v4 · Inspector hidden): the canvas runs full width and
+   carries its own way back — "Show inspector ⌘\" at its top right. That
+   button replaced the "Inspector hidden · Show" toast (GW-3 / M-2), which was
+   the way back only while no board drew one. */
+describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
+  const showButton = () => screen.queryByRole("button", { name: "Show inspector" });
+
+  it("hiding the inspector puts Show inspector ⌘\\ on the canvas; it brings the inspector back", () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    expect(showButton()).toBeNull();
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    const button = showButton()!;
+    expect(button.textContent).toContain("Show inspector");
+    expect(button.textContent).toContain("⌘\\");
+    expect(button.getAttribute("aria-keyshortcuts")).toBe("Meta+\\");
+    /* On the canvas, not in the (hidden) column. */
+    expect(inspectorColumn().contains(button)).toBe(false);
+    fireEvent.click(button);
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(showButton()).toBeNull();
+  });
+
+  it("no toast any more — the button is the way back", () => {
     const composer = makeComposer();
     render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
-    expect(screen.getByText("Inspector hidden")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Show" }));
+    expect(screen.queryByText("Inspector hidden")).toBeNull();
+  });
+
+  it("⌘\\ (the toggle event) takes the button away again", () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    expect(showButton()).toBeNull();
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+
+  it("not drawn while a mode fills the column (AI) — the column is open", () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
+    expect(showButton()).toBeNull();
   });
 
   it("the hidden state does not survive a remount (no persistence)", () => {
@@ -182,15 +257,7 @@ describe("StudioPanels — Hide inspector (GW-3 / M-2)", () => {
     unmount();
     render(<Harness composer={makeComposer()} />);
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
-  });
-
-  it("no toast when a mode covers the inspector — nothing on screen changed", () => {
-    const composer = makeComposer();
-    render(<Harness composer={composer} />);
-    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
-    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    expect(screen.queryByText("Inspector hidden")).toBeNull();
+    expect(showButton()).toBeNull();
   });
 });
 
@@ -285,5 +352,120 @@ describe("StudioPanels — a held focus request lapses (m-1)", () => {
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
     await flushFrame();
     expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("");
+  });
+});
+
+/* P-5: a full page (Brand from a token chip, the Asset library from "Manage
+   SVG", Settings) cleared the selection and never gave it back, so "Back to
+   canvas" landed on an empty inspector. The clear stays (A-6: no stale
+   highlight on a canvas nobody can see); the selection comes back on return. */
+describe("StudioPanels — a full page keeps the selection to give back (P-5)", () => {
+  it("Brand clears the selection while open and restores it on the way back", () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} />);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "design" }));
+    expect(composer.selection.getSelectedIds()).toEqual([]);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    expect(composer.selection.getSelectedIds()).toEqual(["el-1"]);
+  });
+
+  it("a multi-selection comes back whole", () => {
+    const composer = selectingComposer(["a", "b"]);
+    composer.selection.selectMultiple([composer.live.get("a")!, composer.live.get("b")!]);
+    render(<Harness composer={composer as unknown as FakeComposer} />);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "settings" }));
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    expect(composer.selection.getSelectedIds()).toEqual(["a", "b"]);
+  });
+
+  it("an element deleted while the full page was open is not resurrected", () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} />);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "design" }));
+    composer.live.delete("el-1");
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    expect(composer.selection.getSelectedIds()).toEqual([]);
+  });
+});
+
+/* P-7a: the AI panel replaced ProInspector by unmounting it, so "‹ Inspector"
+   came back to a fresh one — tab Style, scroll 0, :hover back to Base. The
+   stub's revealed-section state stands in for all of that local state. */
+describe("StudioPanels — the AI round trip keeps the inspector's state (P-7a)", () => {
+  it("state held by the inspector survives AI open → ‹ Inspector", async () => {
+    const composer = makeComposer();
+    render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "typography" }));
+    await flushFrame();
+    const before = screen.getByTestId("pro-inspector");
+    expect(before.getAttribute("data-revealed")).toBe("typography");
+
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
+    expect(screen.getByTestId("ai-tab")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "‹ Inspector" }));
+
+    const after = screen.getByTestId("pro-inspector");
+    expect(after).toBe(before);
+    expect(after.getAttribute("data-revealed")).toBe("typography");
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBeNull();
+  });
+});
+
+/* §13 "Open record ›" / "Open collection ›": the CMS workspace replaces the
+   canvas and the inspector. It had no way back to where the door was opened —
+   leaving meant the rail, and the drawer landed on the CMS list. "‹ Back to
+   canvas" gives back the drawer tab, the drawer's open state and the
+   selection; the inspector, mounted throughout, keeps its tab and scroll. */
+describe("StudioPanels — the CMS workspace returns to the bound element (§13)", () => {
+  it("Back to canvas restores the drawer tab and re-selects the element", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: "col-1", recordId: "rec-1" }));
+    expect(await screen.findByTestId("cms-workspace")).toBeTruthy();
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    /* Anything may happen to the selection while the workspace is up. */
+    act(() => composer.selection.clear());
+
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+
+    expect(screen.queryByTestId("cms-workspace")).toBeNull();
+    expect(composer.selection.getSelectedIds()).toEqual(["el-1"]);
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+
+  it("a drawer that was closed before the door is closed again", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" initialOpen={false} />);
+    act(() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: "col-1" }));
+    await screen.findByTestId("cms-workspace");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    expect(screen.queryByTestId("cms-workspace")).toBeNull();
+    expect(screen.getByTestId("layout-shell").className).not.toContain("layout-shell--drawer-open");
+    expect(composer.selection.getSelectedIds()).toEqual(["el-1"]);
+  });
+
+  it("no Back to canvas when the workspace was opened with nothing selected (rail, ⌘K)", async () => {
+    const composer = selectingComposer([]);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: "col-1" }));
+    await screen.findByTestId("cms-workspace");
+    expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+  });
+
+  it("leaving the workspace another way drops the return", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: "col-1" }));
+    await screen.findByTestId("cms-workspace");
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }));
+    act(() => composer.selection.clear());
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "content" }));
+    await screen.findByTestId("cms-workspace");
+    expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
   });
 });

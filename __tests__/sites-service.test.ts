@@ -26,6 +26,9 @@ vi.mock("@/lib/prisma", () => {
     workspaceMember: {
       findFirst: vi.fn(),
     },
+    workspace: {
+      findUnique: vi.fn().mockResolvedValue({ plan: "PRO" }),
+    },
     page: {
       create: vi.fn().mockResolvedValue({}),
       createMany: vi.fn(),
@@ -56,6 +59,7 @@ vi.mock("@/lib/prisma", () => {
 });
 
 import { prisma } from "@/lib/prisma";
+import { slugifyProjectName } from "@/lib/vercel";
 import {
   listSites,
   createSite,
@@ -164,6 +168,22 @@ describe("Sites Service", () => {
       expect(blocks.id).not.toBe("root");
     });
 
+    /* C1: a slug whose derived Vercel project another site is pinned to
+       (that site renamed its slug after going live) would deploy into that
+       site's project and overwrite it. */
+    it("skips a slug candidate whose derived Vercel project name is pinned by another site", async () => {
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.site.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([
+        { slug: "renamed-away", vercelProjectName: slugifyProjectName("my-site") },
+      ] as any);
+      vi.mocked(prisma.site.create).mockResolvedValue({ id: "new-site", name: "My Site", slug: "x" } as any);
+
+      await createSite("ws_123", "user_1", { name: "My Site", method: "blank" });
+
+      expect(vi.mocked(prisma.site.create).mock.calls.at(-1)![0].data.slug).toBe("my-site-2");
+    });
+
     it("throws when site limit reached", async () => {
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
         workspace: { plan: "FREE" },
@@ -186,6 +206,37 @@ describe("Sites Service", () => {
       } as any);
       const site = await getSite("s1");
       expect(site?.id).toBe("s1");
+    });
+  });
+
+  /* I3: the encrypted published-site password is reversible (it is pushed to
+     Vercel), so it must never reach a client. Every mutation that returns the
+     Site row returns it redacted, like getSite. */
+  describe("site rows returned to clients are redacted", () => {
+    const row = { id: "s1", name: "Renamed", slug: "s", publishedPassword: "v1:ciphertext" };
+
+    it("renameSite", async () => {
+      vi.mocked(prisma.site.update).mockResolvedValue(row as any);
+      const result = await renameSite("s1", "Renamed");
+      expect(result).not.toHaveProperty("publishedPassword");
+      expect(result.hasPublishedPassword).toBe(true);
+      expect(result.name).toBe("Renamed");
+    });
+
+    it("archiveSite and unarchiveSite", async () => {
+      vi.mocked(prisma.site.update).mockResolvedValue(row as any);
+      expect(await archiveSite("s1")).not.toHaveProperty("publishedPassword");
+      expect(await unarchiveSite("s1")).not.toHaveProperty("publishedPassword");
+    });
+
+    it("createSite", async () => {
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.site.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([] as any);
+      vi.mocked(prisma.site.create).mockResolvedValue({ ...row, publishedPassword: null } as any);
+      const result = await createSite("ws_123", "user_1", { name: "X", method: "blank" });
+      expect(result).not.toHaveProperty("publishedPassword");
+      expect(result.hasPublishedPassword).toBe(false);
     });
   });
 

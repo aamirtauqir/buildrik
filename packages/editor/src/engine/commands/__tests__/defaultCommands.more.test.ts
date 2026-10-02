@@ -84,13 +84,13 @@ describe("remaining UI toggles", () => {
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_EXPORTER);
   });
 
-  /* B12 (G2-037): the footer word bar's Inspector toggle moved to a ⌘K row.
-     QA on integration 5e0d47902 found no such row. */
-  it("toggle-inspector is a Panels row that emits ui:toggle:inspector, with no chord", () => {
+  /* B12 (G2-037): the footer word bar's Inspector toggle moved to a ⌘K row;
+     Inspector v4 (board 36) gives it ⌘\. */
+  it("toggle-inspector is a Panels row that emits ui:toggle:inspector, on ⌘\\", () => {
     const cmd = buildDefaultCommands(composer as unknown as Composer).find((c) => c.id === "toggle-inspector");
     expect(cmd?.label).toBe("Toggle inspector");
     expect(cmd?.group).toBe("Panels");
-    expect(cmd?.shortcut).toBeUndefined();
+    expect(cmd?.shortcut).toBe("ctrl+\\");
     run("toggle-inspector");
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_INSPECTOR);
   });

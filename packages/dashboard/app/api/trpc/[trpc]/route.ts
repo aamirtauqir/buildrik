@@ -25,13 +25,24 @@ const ALLOWED_ORIGINS = new Set(
   ].filter(Boolean)
 );
 
+// Dev only: opening the dashboard as 127.0.0.1, the dev server's LAN URL or a
+// worktree port 403'd every login against the one NEXT_PUBLIC_APP_URL
+// spelling. Production keeps the allowlist authoritative — Origin==Host alone
+// would also pass a DNS-rebound attacker domain.
+function isSameOrigin(origin: string, req: Request): boolean {
+  if (process.env.NODE_ENV === "production") return false;
+  const host = req.headers.get("host");
+  if (!host || !URL.canParse(origin)) return false;
+  return new URL(origin).host === host;
+}
+
 function isAllowedOrigin(req: Request): boolean {
   if (req.method !== "POST") return true;
   const origin = req.headers.get("origin");
   if (!origin) {
     return req.headers.has("authorization");
   }
-  return ALLOWED_ORIGINS.has(origin);
+  return ALLOWED_ORIGINS.has(origin) || isSameOrigin(origin, req);
 }
 
 function corsHeaders(req: Request): Record<string, string> {

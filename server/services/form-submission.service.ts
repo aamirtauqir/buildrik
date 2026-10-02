@@ -10,7 +10,7 @@ import type {
 } from "@buildrik/shared/schemas/forms";
 import { isAbsoluteHttpUrl } from "@buildrik/shared/schemas/element-markup";
 import { resolveSiteOrigins } from "@/lib/publish-urls";
-import { slugifyProjectName } from "@/lib/vercel";
+import { resolveVercelProjectName } from "@/lib/vercel";
 import type { DiscoveredForm, FormBlockWireSettings } from "@/lib/publish-forms";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
@@ -96,7 +96,7 @@ export async function submitForm(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { workspaceId: true, name: true, deletedAt: true, canonicalUrl: true, slug: true },
+    select: { workspaceId: true, name: true, deletedAt: true, canonicalUrl: true, slug: true, vercelProjectName: true },
   });
   if (!site || site.deletedAt) throw new FormError("NOT_FOUND", "FORM_NOT_FOUND");
 
@@ -186,7 +186,7 @@ export async function submitForm(
   const origins = resolveSiteOrigins({
     canonicalUrl: site.canonicalUrl,
     verifiedDomain: verifiedDomain?.domain ?? null,
-    vercelProjectName: site.slug ? slugifyProjectName(site.slug) : null,
+    vercelProjectName: site.slug ? resolveVercelProjectName(site) : null,
   });
 
   return {

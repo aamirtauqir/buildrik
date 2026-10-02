@@ -142,6 +142,24 @@ describe("cmsSync", () => {
   });
 });
 
+describe("cmsSync — a record waits for its collection's mirror", () => {
+  it("an entry created right after its collection goes up only once the collection has landed", async () => {
+    let landCollection!: () => void;
+    colUpsert.mockImplementationOnce(() => new Promise((r) => (landCollection = () => r({ updatedAt: new Date().toISOString() }))));
+    entUpsert.mockResolvedValue({ updatedAt: new Date().toISOString() });
+    const col = { id: "col-new", name: "Menu", slug: "menu", fields: [], createdAt: "", updatedAt: "" } as never;
+    const item = { id: "e1", collectionId: "col-new", data: { name: "Cacio e pepe" }, status: "published", createdAt: "", updatedAt: "" } as never;
+    const c = syncCollectionUpsert(col);
+    const e = syncEntryUpsert(item);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(entUpsert).not.toHaveBeenCalled();
+    landCollection();
+    await Promise.all([c, e]);
+    expect(entUpsert).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
   const drain = async () => {
     // Flush any leftover queued ops from prior tests with succeeding mutates,

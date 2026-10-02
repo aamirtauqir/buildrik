@@ -27,7 +27,7 @@ export interface CssContext {
   selectedElements: readonly Element[];
   /**
    * CSS property keys with differing values across selectedElements.
-   * Sections show a MixedValueBadge for any key in this set.
+   * The shared controls draw "Mixed" for any key in this set (field context).
    */
   mixedKeys: ReadonlySet<string>;
 }

@@ -118,11 +118,11 @@ describe("LinkSection validation gates href writes", () => {
   });
 });
 
-/* Board 4428:141642 draws the row as "Link  [None ▾]". */
+/* Board 6 (Inspector v4) draws the row as "Link to  [Page ▾]". */
 describe("LinkSection — board row copy", () => {
-  it("labels the type row Link and the empty choice None", () => {
+  it("labels the type row Link to, with None · Page · URL · Email · Phone · Anchor", () => {
     renderLinkSection();
-    const select = screen.getByRole("combobox", { name: "Link" }) as HTMLSelectElement;
-    expect(Array.from(select.options).map((o) => o.textContent)).toContain("None");
+    const select = screen.getByRole("combobox", { name: "Link to" }) as HTMLSelectElement;
+    expect(Array.from(select.options).map((o) => o.textContent)).toEqual(["None", "Page", "URL", "Email", "Phone", "Anchor"]);
   });
 });

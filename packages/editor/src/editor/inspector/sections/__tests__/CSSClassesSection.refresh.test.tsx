@@ -25,7 +25,7 @@ describe("CSSClassesSection refreshes on composer update", () => {
         isOpen={true}
       />
     );
-    expect(queryByText(".btn-primary")).toBeNull();
+    expect(queryByText("btn-primary")).toBeNull();
 
     // External mutation (simulating undo/redo or another panel)
     act(() => {
@@ -33,6 +33,6 @@ describe("CSSClassesSection refreshes on composer update", () => {
       listeners.get("element:updated")?.(el);
     });
 
-    expect(queryByText(".btn-primary")).toBeTruthy();
+    expect(queryByText("btn-primary")).toBeTruthy();
   });
 });

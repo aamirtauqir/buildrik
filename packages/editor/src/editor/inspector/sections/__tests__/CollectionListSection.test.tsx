@@ -1,7 +1,7 @@
 /**
- * G3-079 — the Collection list's binding door (Settings › COLLECTION):
- * pick a collection (binds the list to repeat its children), cap the count,
- * or pick None (unbinds).
+ * Behaviour › Collection (board 20; G3-079): pick a collection (binds the
+ * list to repeat its children), "+ New collection…", cap the count with Show
+ * items, Open collection ›, or pick None (unbinds).
  *
  * @license BSD-3-Clause
  */
@@ -16,6 +16,9 @@ function makeComposer(bound: { collectionId: string; limit?: number } | null = n
   const composer = {
     on: vi.fn(),
     off: vi.fn(),
+    emit: vi.fn(),
+    /* P-1: bind / unbind pass the lock gate, which reads the element. */
+    elements: { getElement: () => ({ isLocked: () => false }) },
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
     cms: {
@@ -34,27 +37,27 @@ function makeComposer(bound: { collectionId: string; limit?: number } | null = n
   return { composer, bindCollectionList, unbindCollection };
 }
 
-const renderSection = (composer: Composer) =>
-  render(<CollectionListSection elementId="list" composer={composer} isOpen />);
+const renderSection = (composer: Composer, onOpenCreateCollection?: () => void) =>
+  render(<CollectionListSection elementId="list" composer={composer} onOpenCreateCollection={onOpenCreateCollection} isOpen />);
 
 describe("CollectionListSection", () => {
   it("lists None + every collection", () => {
     renderSection(makeComposer().composer);
-    const select = screen.getByRole("combobox", { name: "Source" });
+    const select = screen.getByRole("combobox", { name: "Collection" });
     expect([...(select as HTMLSelectElement).options].map((o) => o.textContent)).toEqual(["None", "Menu items"]);
   });
 
   it("picking a collection binds the list to it", () => {
     const { composer, bindCollectionList } = makeComposer();
     renderSection(composer);
-    fireEvent.change(screen.getByRole("combobox", { name: "Source" }), { target: { value: "menu" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Collection" }), { target: { value: "menu" } });
     expect(bindCollectionList).toHaveBeenCalledWith("list", "menu", { limit: undefined });
   });
 
   it("the Show field caps the count on the bound collection", () => {
     const { composer, bindCollectionList } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
-    fireEvent.change(screen.getByRole("spinbutton", { name: "Show" }), { target: { value: "3" } });
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Show items" }), { target: { value: "3" } });
     expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 3 });
   });
 
@@ -63,14 +66,42 @@ describe("CollectionListSection", () => {
   it("the Show field clamps an oversized count to the stored maximum", () => {
     const { composer, bindCollectionList } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
-    fireEvent.change(screen.getByRole("spinbutton", { name: "Show" }), { target: { value: "999999" } });
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Show items" }), { target: { value: "999999" } });
     expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 10_000 });
   });
 
   it("None unbinds", () => {
     const { composer, unbindCollection } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
-    fireEvent.change(screen.getByRole("combobox", { name: "Source" }), { target: { value: "" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Collection" }), { target: { value: "" } });
     expect(unbindCollection).toHaveBeenCalledWith("list");
+  });
+
+  it("+ New collection… is offered bound or not, and opens the create door", () => {
+    const create = vi.fn();
+    renderSection(makeComposer().composer, create);
+    fireEvent.click(screen.getByTestId("collection-new"));
+    expect(create).toHaveBeenCalled();
+  });
+
+  it("board 20 order: Collection · + New collection… · Show items · Open collection", () => {
+    const { container } = renderSection(makeComposer({ collectionId: "menu", limit: 6 }).composer, vi.fn());
+    const text = container.textContent ?? "";
+    const at = ["Collection", "+ New collection…", "Show items", "Open collection"].map((t) => text.indexOf(t));
+    expect(at.every((i) => i >= 0)).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
+  });
+
+  it("Open collection › opens the CMS on the bound collection's table", () => {
+    const { composer } = makeComposer({ collectionId: "menu" });
+    renderSection(composer);
+    fireEvent.click(screen.getByTestId("collection-open"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "menu" });
+  });
+
+  it("unbound: no Show items, no Open collection", () => {
+    renderSection(makeComposer().composer);
+    expect(screen.queryByRole("spinbutton", { name: "Show items" })).toBeNull();
+    expect(screen.queryByTestId("collection-open")).toBeNull();
   });
 });

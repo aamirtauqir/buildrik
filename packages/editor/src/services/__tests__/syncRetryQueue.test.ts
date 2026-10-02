@@ -123,7 +123,8 @@ describe("SyncRetryQueue — pending includes in-flight, settled awaits", () => 
   it("counts an op as pending while it is in flight", async () => {
     const q = new SyncRetryQueue();
     let release!: () => void;
-    const p = q.run("k", () => new Promise<void>((r) => (release = r)), () => {});
+    const gate = new Promise<void>((r) => (release = r));
+    const p = q.run("k", () => gate, () => {});
     expect(q.outstandingCount()).toBe(1);
     release();
     await p;
@@ -136,5 +137,65 @@ describe("SyncRetryQueue — pending includes in-flight, settled awaits", () => 
     void q.run("bad", async () => { throw new Error("x"); }, () => {});
     await expect(q.settled("ok")).resolves.toBe(true);
     await expect(q.settled("bad")).resolves.toBe(false);
+  });
+});
+
+/* The Inspector v4 fixture's Menu collection loaded with no fields: its
+   create and its field update were two upserts of the same row in flight at
+   once, the create landed last (or the update lost a create race on the
+   unique slug and sat in the queue), and the server kept `fields: []`. */
+describe("SyncRetryQueue — one target, one write in flight, in order", () => {
+  const deferred = () => {
+    let resolve!: () => void;
+    const promise = new Promise<void>((r) => (resolve = r));
+    return { promise, resolve };
+  };
+
+  it("a second op for the same target starts only after the first settles", async () => {
+    const q = new SyncRetryQueue();
+    const order: string[] = [];
+    const first = deferred();
+    const a = q.run("col:1", async () => { order.push("create:start"); await first.promise; order.push("create:end"); }, () => {});
+    const b = q.run("col:1", async () => { order.push("update"); }, () => {});
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(order).toEqual(["create:start"]);
+    first.resolve();
+    await Promise.all([a, b]);
+    expect(order).toEqual(["create:start", "create:end", "update"]);
+  });
+
+  it("different targets still run side by side", async () => {
+    const q = new SyncRetryQueue();
+    const order: string[] = [];
+    const first = deferred();
+    const a = q.run("col:1", async () => { order.push("a"); await first.promise; }, () => {});
+    const b = q.run("col:2", async () => { order.push("b"); }, () => {});
+    await b;
+    expect(order).toEqual(["a", "b"]);
+    first.resolve();
+    await a;
+  });
+
+  it("a failed first op does not block the next one for the same target", async () => {
+    const q = new SyncRetryQueue();
+    const a = q.run("col:1", async () => { throw new Error("down"); }, () => {});
+    const task = vi.fn(async () => undefined);
+    const b = q.run("col:1", task, () => {});
+    expect(await a).toBe(false);
+    expect(await b).toBe(true);
+    expect(task).toHaveBeenCalledTimes(1);
+    expect(q.pendingCount()).toBe(0);
+  });
+
+  it("settled(key) resolves once the target's in-flight op is done", async () => {
+    const q = new SyncRetryQueue();
+    const first = deferred();
+    let done = false;
+    void q.run("col:1", async () => { await first.promise; done = true; }, () => {});
+    const waited = q.settled("col:1").then(() => done);
+    first.resolve();
+    expect(await waited).toBe(true);
+    await expect(q.settled("nothing")).resolves.toBe(true);
   });
 });

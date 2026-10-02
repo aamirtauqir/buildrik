@@ -139,6 +139,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         component={state.detailComponent}
         composer={composer}
         onBack={state.handleBackFromDetail}
+        onBackToInstance={state.backToInstance}
         onClose={onClose}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}

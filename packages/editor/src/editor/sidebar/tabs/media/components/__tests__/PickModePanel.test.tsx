@@ -149,3 +149,21 @@ describe("G3-061 · ↑ Upload / From URL open the upload modal for the same pic
     expect(screen.getByTestId("upload-modal")).toHaveAttribute("data-pane", "url");
   });
 });
+
+describe("pick mode owns Escape (§13 Assets door)", () => {
+  it("Escape cancels the pick and claims the key, so the canvas selection stands", async () => {
+    const { hasOpenEscapeSurface } = await import("@/shared/utils/openEscapeSurface");
+    const props = mount();
+    // The engine's deselect stands down while a surface claims Escape.
+    expect(hasOpenEscapeSurface() || document.body.hasAttribute("data-bk-escape-owner")).toBe(true);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(props.onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("Escape while typing in the search does not cancel the pick", () => {
+    const props = mount({ elementId: "el", label: "Menu preview" }, { searchQuery: "menu" });
+    const search = screen.getByLabelText("Search images");
+    fireEvent.keyDown(search, { key: "Escape" });
+    expect(props.onCancel).not.toHaveBeenCalled();
+  });
+});

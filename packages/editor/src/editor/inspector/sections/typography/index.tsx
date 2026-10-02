@@ -1,11 +1,11 @@
 /**
- * Typography Section - Font, Size, Weight, Color, Alignment
- * AQUI-032: Google Fonts Integration
- *
- * Refactored from TypographySection.tsx into modular sub-components:
- * - FontPicker: Font family dropdown with Google Fonts
- * - FontControls: Weight, style, decoration, spacing
- * - TypographyControls: Alignment, transform, color, white-space
+ * Typography — Font, Font size, Line height, Weight, Colour, Align (boards 1,
+ * 4), the rest behind More settings. The same body serves:
+ *   - "Typography", open, on text types;
+ *   - "Text inside", closed with a one-line summary, on containers, buttons,
+ *     form fields and widgets (board 17, owner answer 1) — the registry names
+ *     the section and draws the summary;
+ *   - the Page panel's subset (board 21): Font and Text colour only.
  *
  * @module editor/inspector/sections/typography
  * @license BSD-3-Clause
@@ -13,11 +13,10 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
-import { Section, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../../shared/controls";
+import { Section, MoreSettingsToggle } from "../../shared/controls";
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
-import { primaryFamily } from "./FontPickerDropdown";
-import { TypographyControls } from "./TypographyControls";
+import { ADVANCED_TYPOGRAPHY_COUNT, TypographyControls } from "./TypographyControls";
 
 // ============================================================================
 // TYPES
@@ -26,23 +25,20 @@ import { TypographyControls } from "./TypographyControls";
 export interface TypographySectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  /** Controlled open state for auto-expand functionality */
+  /** Controlled open state (standalone use; in the panel the frame decides). */
   isOpen?: boolean;
-  /** Called when the section header is toggled */
   onToggle?: (open: boolean) => void;
-  /** Visual weight tier — threaded from the registry-driven renderer. */
-  tier?: SectionTier;
-  /** Whether advanced settings (color, align, transform, white-space, word-break) are expanded */
+  /** Whether the More settings rows are shown. */
   advancedExpanded?: boolean;
-  /** Called when the More settings toggle is clicked */
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
-  /** Threaded so the colour chip can jump to the Design panel. */
+  /** Threaded so the colour's token chip can open Brand. */
   composer?: Composer | null;
-  /** A container's type, inherited by the text inside it (board 7056:78382):
-   *  Family + Size · line height; the rest behind More settings. */
-  inherited?: boolean;
+  /** "page": the Page panel's subset (board 21). */
+  variant?: "element" | "page";
+  /** What the element renders as where it sets nothing (Page panel: font, text colour). */
+  inherited?: Readonly<Record<string, string>>;
 }
 
 // ============================================================================
@@ -54,80 +50,37 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   onChange,
   isOpen,
   onToggle,
-  tier = "primary",
   advancedExpanded = false,
   onAdvancedToggle,
-  mixedKeys,
   isMultiSelect,
   composer,
-  inherited = false,
+  variant = "element",
+  inherited,
 }) => {
-  // Handle font-family changes from FontPicker
-  const handleFontChange = React.useCallback(
-    (value: string) => {
-      onChange("font-family", value);
-    },
-    [onChange]
-  );
-
-  // Collapsed preview: "Inter · 14" so users can scan the current font without
-  // expanding. Trim quotes and fallback stacks so only the primary face shows.
-  const primaryFont = primaryFamily(styles["font-family"] || "");
-  const fontSize = styles["font-size"] || "";
-  const typographyPreview =
-    primaryFont || fontSize ? (
-      <span
-        style={{
-          fontSize: 11,
-          color: "var(--bk-ink-muted)",
-          fontFamily: "var(--bk-font-mono)",
-          whiteSpace: "nowrap",
-          maxWidth: 140,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {primaryFont || "—"}
-        {fontSize ? ` · ${fontSize}` : ""}
-      </span>
-    ) : undefined;
+  const handleFontChange = React.useCallback((value: string) => onChange("font-family", value), [onChange]);
+  const isPage = variant === "page";
 
   return (
-    <Section
-      title="Typography"
-      icon="Type"
-      isOpen={isOpen}
-      onToggle={onToggle}
-      preview={typographyPreview}
-      tier={tier}
-      id="inspector-section-typography"
-    >
-      {/* Family — board 807:8342's first row. */}
-      <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="font-family" mixedKeys={mixedKeys} />
-        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} />
+    <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
+      <div className="tw:relative">
+        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
       </div>
 
-      {/* Font Size, Weight, Line Height, Letter Spacing, Decoration, Style */}
       <FontControls
         styles={styles}
         onChange={onChange}
-        mixedKeys={mixedKeys}
         isMultiSelect={isMultiSelect}
         composer={composer}
-        sizeOnly={inherited && !advancedExpanded}
+        variant={variant}
+        inherited={inherited}
       />
 
-      {/* ─── Advanced: Color, Alignment, Transform, White Space, Word Break ─── */}
-      {advancedExpanded && <TypographyControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} />}
+      {!isPage && advancedExpanded && (
+        <TypographyControls styles={styles} onChange={onChange} isMultiSelect={isMultiSelect} />
+      )}
 
-      {/* Progressive disclosure toggle */}
-      {onAdvancedToggle && (
-        <MoreSettingsToggle
-          isOpen={advancedExpanded}
-          onToggle={() => onAdvancedToggle()}
-          advancedCount={inherited ? 11 : 5}
-        />
+      {!isPage && onAdvancedToggle && (
+        <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} advancedCount={ADVANCED_TYPOGRAPHY_COUNT} />
       )}
     </Section>
   );
@@ -139,7 +92,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
 
 export { FontPicker, SYSTEM_FONTS, useUploadedFonts, openSiteFonts, type SystemFont } from "./FontPicker";
 export { FontControls, FONT_WEIGHTS } from "./FontControls";
-export { TypographyControls } from "./TypographyControls";
+export { TypographyControls, ADVANCED_TYPOGRAPHY_COUNT } from "./TypographyControls";
 export {
   FontSearchInput,
   CategoryTabs,

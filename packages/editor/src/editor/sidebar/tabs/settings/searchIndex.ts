@@ -101,7 +101,6 @@ const SECTIONS: SectionDef[] = [
     group: SITE_SETUP,
     fields: [
       ["Default locale", "Default", "default-locale"],
-      ["Auto-redirect by browser", "Default", "locale-auto-redirect"],
       ["Locales", "Path, pages translated and status", "locales"],
     ],
   },

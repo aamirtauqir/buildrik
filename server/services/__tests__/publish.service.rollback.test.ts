@@ -128,7 +128,7 @@ describe("rollbackPublish", () => {
     jobFindFirst.mockResolvedValueOnce({ id: "j1", status: "COMPLETED", log: { pages: [{ path: "/", html: "<h1>v1</h1>" }] } });
     jobFindFirst.mockResolvedValue(null); // startPublish's active-job precheck → none
     jobUpdateMany.mockResolvedValue({ count: 0 });
-    siteFindUnique.mockResolvedValue({ name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws1", lastEditedAt: new Date() });
+    siteFindUnique.mockResolvedValue({ name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws1", lastEditedAt: new Date(), workspace: { deletionScheduledAt: null } });
     jobCreate.mockResolvedValue({ id: "jNew" });
     siteUpdate.mockResolvedValue({});
     await rollbackPublish("ws1", "s1", "j1", "u1");
@@ -139,5 +139,32 @@ describe("rollbackPublish", () => {
     // the approval gate was NOT consulted (bypassed for a rollback)
     expect(wsFindUnique).not.toHaveBeenCalled();
     expect(reviewFindFirst).not.toHaveBeenCalled();
+  });
+});
+
+/* SA-04 (D6): the deletion job only takes down what exists when it runs, so
+   nothing new may go live once a workspace is scheduled for deletion. */
+describe("publishing into a workspace scheduled for deletion", () => {
+  const pendingSite = {
+    name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws1", lastEditedAt: new Date(),
+    workspace: { deletionScheduledAt: new Date("2026-10-27") },
+  };
+
+  it("startPublish refuses with WORKSPACE_DELETION_SCHEDULED and creates no job", async () => {
+    jobFindFirst.mockResolvedValue(null);
+    jobUpdateMany.mockResolvedValue({ count: 0 });
+    siteFindUnique.mockResolvedValue(pendingSite);
+    const { startPublish } = await import("@server/services/publish.service");
+    await expect(startPublish("s1", "ws1", "u1", [{ path: "/", html: "x" }] as never)).rejects.toThrow("WORKSPACE_DELETION_SCHEDULED");
+    expect(jobCreate).not.toHaveBeenCalled();
+  });
+
+  it("rollbackPublish refuses too", async () => {
+    jobFindFirst.mockResolvedValueOnce({ id: "j1", status: "COMPLETED", log: { pages: [{ path: "/", html: "v1" }] } });
+    jobFindFirst.mockResolvedValue(null);
+    jobUpdateMany.mockResolvedValue({ count: 0 });
+    siteFindUnique.mockResolvedValue(pendingSite);
+    await expect(rollbackPublish("ws1", "s1", "j1", "u1")).rejects.toThrow("WORKSPACE_DELETION_SCHEDULED");
+    expect(jobCreate).not.toHaveBeenCalled();
   });
 });

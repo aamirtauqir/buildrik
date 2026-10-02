@@ -1,7 +1,14 @@
 /**
  * Localization — Clone 3397:32376 (`Site setup / Localization`): the
- * default locale and its auto-redirect in one card, the enabled locales and
- * their translation progress in a table below, `Add locale` in the header.
+ * default locale in the Default card, the enabled locales and their
+ * translation progress in a table below, `Add locale` in the header.
+ *
+ * SA-05: the card's `Auto-redirect by browser` toggle is hidden — the
+ * export sent every visitor's first request to `/<locale>/…` pages the
+ * publish pipeline has never generated (only the default locale ships).
+ * The stored `localeAutoRedirect` value is left alone (read on load, sent
+ * back unchanged on save) for the per-locale publish arc to reuse; only the
+ * control and the export-time read of it are gone.
  *
  * Two reads on open, one load state (3397:33194 loading, 3397:33241
  * load-error with Try again): `siteDetail.settings.get` for the default /
@@ -22,7 +29,7 @@
  */
 
 import * as React from "react";
-import { Button, ToggleSwitch } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { devError } from "@/shared/utils/devLogger";
@@ -280,22 +287,6 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
               </option>
             ))}
           </Select>
-        </div>
-        <div className={SET_ROW}>
-          <span id="locale-auto-redirect-label" className={SET_ROW_LABEL}>
-            Auto-redirect by browser
-          </span>
-          <ToggleSwitch
-            id="locale-auto-redirect"
-            checked={localeAutoRedirect}
-            onChange={(next) => {
-              setLocaleAutoRedirect(next);
-              setDirty(true);
-            }}
-            aria-labelledby="locale-auto-redirect-label"
-            sizing="md"
-            data-testid="set-loc-redirect"
-          />
         </div>
       </Section>
 
