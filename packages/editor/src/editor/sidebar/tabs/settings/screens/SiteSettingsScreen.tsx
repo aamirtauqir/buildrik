@@ -200,14 +200,17 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         },
       };
       /* The site name is the project's name too: the sidebar, the topbar and
-         the Settings saved dialog read `getProjectMetadata().name`, which was
+         the Settings saved toast read `getProjectMetadata().name`, which was
          loaded from the Site row and would keep the old name until a reload
-         after the mirror wrote `Site.name` (walked live 2026-09-14). */
+         (walked live 2026-09-14). Merged without dirtying the document: the
+         name is saved as the `Site.name` column, and dirtying here sent a
+         `sites.saveProject` after every General save (BE-3, walked live
+         2026-10-03). */
       const name = s.siteName.trim();
       const meta = composer.getProjectMetadata?.();
       const author = s.author.trim();
       if ((name && name !== meta?.name) || author !== (meta?.author ?? "")) {
-        composer.updateProjectMetadata?.({ ...(name ? { name } : {}), author });
+        composer.mergeProjectMetadata?.({ ...(name ? { name } : {}), author });
       }
       return next;
     });

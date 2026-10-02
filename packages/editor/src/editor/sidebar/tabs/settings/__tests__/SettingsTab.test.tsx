@@ -252,6 +252,7 @@ const makeComposer = (saveProject: () => Promise<void> = () => Promise.resolve()
   isDirty: () => false,
   getProjectMetadata: () => ({ name: "Bella Cucina" }),
   updateProjectMetadata: vi.fn(),
+  mergeProjectMetadata: vi.fn(),
   saveProject: vi.fn(saveProject),
   exportProject: () => ({ pages: [] }),
   markSaved: vi.fn(),

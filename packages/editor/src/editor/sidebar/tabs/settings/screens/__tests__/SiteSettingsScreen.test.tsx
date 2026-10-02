@@ -386,7 +386,9 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     expect(ids).toEqual(["site-name", "favicon-url", "site-language", "site-author"]);
     fireEvent.change(screen.getByLabelText("Author"), { target: { value: "Bella Cucina team" } });
     act(() => flush!());
-    expect(composer.updateProjectMetadata).toHaveBeenCalledWith(expect.objectContaining({ author: "Bella Cucina team" }));
+    // Merged, not an edit: the save that follows must not schedule an autosave.
+    expect(composer.mergeProjectMetadata).toHaveBeenCalledWith(expect.objectContaining({ author: "Bella Cucina team" }));
+    expect(composer.updateProjectMetadata).not.toHaveBeenCalled();
     expect(screen.queryByRole("spinbutton", { name: /Grid size/ })).toBeNull();
     expect(screen.queryByTestId("set-card-canvas")).toBeNull();
   });
