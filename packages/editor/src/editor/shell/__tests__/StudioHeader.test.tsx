@@ -600,19 +600,23 @@ describe("StudioHeader", () => {
       render(<StudioHeader {...makeProps()} />);
       expect(screen.getByRole("button", { name: /^Publish/ })).toBeTruthy();
     });
-    /* Gap walk 93 #7: the shell search is the ⌘K door, and view mode has no
-       palette (OD-GW-3 keeps it that way for now) — the field did nothing. */
+    /* The topbar's resting ⌘K search button was removed (owner decision
+       2026-10-03, overriding board 4418:123573) — in view mode it was already
+       withheld (gap walk 93 #7); now the ordinary editor draws none either. */
     const searchComposer = () => ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Home" }) } });
 
-    it("draws no ⌘K search field, since view mode has no palette", () => {
+    it("draws no ⌘K search button in view mode", () => {
       render(<StudioHeader {...makeProps({ composer: searchComposer() as never })} />);
       expect(screen.queryByTestId("topbar-search")).toBeNull();
     });
 
-    it("keeps the ⌘K search field in the ordinary editor", () => {
+    it("draws no ⌘K search button in the ordinary editor either — ⌘K is the door", () => {
       setViewMode({ readOnlyView: false });
       render(<StudioHeader {...makeProps({ composer: searchComposer() as never })} />);
-      expect(screen.getByTestId("topbar-search")).toBeTruthy();
+      expect(screen.queryByTestId("topbar-search")).toBeNull();
+      expect(screen.queryByText(/Search pages, layers, assets…/)).toBeNull();
+      fireEvent.keyDown(document, { key: "k", metaKey: true });
+      expect(screen.getByTestId("command-palette")).toBeTruthy();
     });
   });
 

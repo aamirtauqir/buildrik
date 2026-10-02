@@ -62,8 +62,10 @@ const EXIT_BTN_CLASS =
   "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[13px] tw:font-medium " +
   "tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
 
-/* Board 4418:123573: the shell search, 320×36, placeholder + ⌘K. It is the
-   ⌘K door — a button drawn as a field (the palette owns the typing). */
+/* The contextual search field, 320×36 (board 4418:100087): shown only while a
+   drawer owns search. Board 4418:123573's resting ⌘K search button was removed
+   on OWNER DECISION 2026-10-03 — ⌘K / Ctrl+K (StudioHeader's own keydown
+   listener) is the palette's door; the button only duplicated it. */
 const SEARCH_CLASS =
   "tw:flex tw:flex-none tw:items-center tw:gap-2 tw:h-9 tw:w-[320px] tw:px-3 tw:rounded-md tw:border tw:border-[var(--bk-border-input)] " +
   "tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:cursor-text tw:hover:border-[var(--bk-ink-muted)] " +
@@ -142,8 +144,6 @@ export interface TopbarProps {
   review?: ReviewPill | null;
   /** The daily-loop cluster: Quick preview · Comments. */
   tools?: TopbarTools | null;
-  /** The shell search field (⌘K). Omit and no field is drawn. */
-  onOpenSearch?: () => void;
   /** Board 4418:100087: while a drawer owns search (Add → "Search elements…"),
    *  the field is a real input that filters that drawer instead of ⌘K. */
   contextSearch?: { placeholder: string; value: string; onChange: (value: string) => void } | null;
@@ -194,7 +194,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 export function Topbar({
   siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, ctaLabel, ctaHint, action, menu, onOpenSearch, contextSearch,
+  publishBlockedReason, ctaLabel, ctaHint, action, menu, contextSearch,
 }: TopbarProps) {
   return (
     <header
@@ -316,12 +316,6 @@ export function Topbar({
             <kbd className={SEARCH_KBD}>⌘F</kbd>
           )}
         </label>
-      ) : onOpenSearch ? (
-        <button type="button" className={SEARCH_CLASS} onClick={onOpenSearch} data-testid="topbar-search">
-          <SearchGlyph />
-          <span className="tw:truncate">Search pages, layers, assets…</span>
-          <kbd className={SEARCH_KBD}>⌘K</kbd>
-        </button>
       ) : null}
 
       {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
