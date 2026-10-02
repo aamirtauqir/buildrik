@@ -3,6 +3,7 @@
  * @license BSD-3-Clause
  */
 
+import { PAGE_BACKGROUND_TOKEN } from "@/shared/constants/defaultStyles";
 import type { DesignToken, StylePreset } from "./types";
 /**
  * V3 theme unification: cssVar fields below will be renamed from --buildrick-design-* to
@@ -62,6 +63,21 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     group: "surface",
     description: "Page background",
     darkValue: "#0F172A",
+  },
+  {
+    /* What a new page's root is bound to (PageManager.createPage), so the
+       Page panel's Fill reads "Page / background" (board 21). `transparent`
+       is the root's background before the token existed — binding it moves
+       no pixel. No darkValue: a dark site keeps whatever is behind the root,
+       as it always has. */
+    id: PAGE_BACKGROUND_TOKEN.id,
+    name: "Page background",
+    value: "transparent",
+    category: "colors",
+    cssVar: PAGE_BACKGROUND_TOKEN.cssVar,
+    type: "color",
+    group: "surface",
+    description: "Page root background",
   },
   {
     id: "color-text",

@@ -28,6 +28,19 @@ export const THEME = {
 };
 
 /**
+ * The site token a new page's root paints its background with — the Page
+ * panel's Fill reads it as "Page / background" (board 21, owner decision
+ * 2026-10-02). Its seed value is `transparent`, the background every page
+ * root had before the token existed, so binding it changes no pixel; a site
+ * whose saved tokens predate it resolves the var to nothing, which is the
+ * same transparent. Pages created before the token stay unbound.
+ */
+export const PAGE_BACKGROUND_TOKEN = {
+  id: "color-page-background",
+  cssVar: "--buildrick-design-color-page-background",
+} as const;
+
+/**
  * Default styles per element type
  * Keys are element types (heading, paragraph, button, etc.)
  * or specific tag names (h1, h2, h3, etc.)

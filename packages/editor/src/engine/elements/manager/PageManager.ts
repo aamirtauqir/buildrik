@@ -21,6 +21,7 @@
  */
 
 import { EVENTS } from "../../../shared/constants";
+import { PAGE_BACKGROUND_TOKEN } from "@/shared/constants/defaultStyles";
 import { claimUniqueIds, type IdRename } from "@buildrik/shared/content/elementIds";
 import type { PageData, SlugChange } from "../../../shared/types";
 import { generateId, slugify } from "../../../shared/utils/helpers";
@@ -74,6 +75,7 @@ export class PageManager {
         type: "container",
         tagName: "div",
         classes: ["buildrick-page-root"],
+        styles: { "background-color": `var(${PAGE_BACKGROUND_TOKEN.cssVar})` },
         children: [],
       },
       updatedAt: now,

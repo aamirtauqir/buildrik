@@ -40,8 +40,9 @@ describe("TokensSection — mode-driven token filter (carried over)", () => {
     const { container } = render(wrap(<TokensSection openKind="color" />, "pro"));
     const ids = tokenIds(container);
     expect(ids).toEqual(expect.arrayContaining(["color-action", "color-brand-500", "color-primary"]));
-    /* 18 since `color-warning` joined the seed (founder call G4, 2026-09-02). */
-    expect(ids).toHaveLength(18);
+    /* 18 since `color-warning` joined the seed (founder call G4, 2026-09-02);
+       19 with `color-page-background` (owner decision 2026-10-02). */
+    expect(ids).toHaveLength(19);
   });
 
   it("a Beginner page emptied by the filter blames the mode", () => {
