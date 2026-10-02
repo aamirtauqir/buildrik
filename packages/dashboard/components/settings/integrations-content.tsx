@@ -158,7 +158,7 @@ export function IntegrationsContent() {
 
   const connected = (intQuery.data ?? []).map((item) => ({
     id: item.id,
-    provider: item.provider as "GOOGLE_ANALYTICS" | "MAILCHIMP" | "ZAPIER" | "SLACK",
+    provider: item.provider as "MAILCHIMP" | "ZAPIER" | "SLACK",
     config: (item.config ?? {}) as Record<string, string>,
   }));
 

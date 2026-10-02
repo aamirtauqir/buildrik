@@ -112,8 +112,6 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
       const on = [o.headers.csp && "CSP", o.headers.hsts && "HSTS"].filter((s): s is string => Boolean(s));
       return on.length ? `${joinNames(on)} on` : "Defaults";
     }
-    case "integrations":
-      return `${o.integrations.connected} connected · ${o.integrations.available} available`;
     case "webhooks": {
       if (!o.webhooks.endpoints) return "No endpoints";
       const last =

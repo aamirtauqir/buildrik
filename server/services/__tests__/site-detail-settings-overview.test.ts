@@ -12,7 +12,6 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { settingsOverviewSchema } from "@buildrik/shared/schemas/site-detail";
-import { INTEGRATION_CATALOG } from "@buildrik/shared/schemas/integrations";
 
 const { db } = vi.hoisted(() => ({
   db: {
@@ -24,7 +23,7 @@ const { db } = vi.hoisted(() => ({
     siteAnalytics: { count: vi.fn() },
     formBlock: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
-    workspaceIntegration: { count: vi.fn() },
+    shareLink: { count: vi.fn() },
     workspaceWebhook: { findUnique: vi.fn() },
     workspaceMember: { count: vi.fn() },
   },
@@ -46,8 +45,11 @@ type Site = {
   cspPolicy: string | null;
   hstsMaxAge: number | null;
   projectSettings: unknown;
+  status: string;
+  publishedPassword: string | null;
   workspace: {
     plan: string;
+    deletionScheduledAt: Date | null;
     subscription: { plan: string; price: number; interval: string } | null;
   };
 };
@@ -64,7 +66,7 @@ type Rows = {
   analyticsDays?: number;
   forms?: number;
   submissions?: number;
-  connected?: number;
+  shareLinks?: number;
   webhook?: { deliveries: Delivery[] } | null;
   members?: number;
 };
@@ -81,7 +83,9 @@ const emptySite: Site = {
   cspPolicy: null,
   hstsMaxAge: null,
   projectSettings: null,
-  workspace: { plan: "FREE", subscription: null },
+  status: "DRAFT",
+  publishedPassword: null,
+  workspace: { plan: "FREE", deletionScheduledAt: null, subscription: null },
 };
 
 /** The seed's shape: what `seed-settings-clone.ts` puts under the scratch site. */
@@ -102,7 +106,8 @@ const seededSite: Site = {
     },
     customCode: { headScripts: "", bodyScripts: "", globalCss: "body { margin: 0 }" },
   },
-  workspace: { plan: "PRO", subscription: { plan: "PRO", price: 2900, interval: "MONTHLY" } },
+  publishedPassword: "v1:ciphertext",
+  workspace: { plan: "PRO", deletionScheduledAt: null, subscription: { plan: "PRO", price: 2900, interval: "MONTHLY" } },
 };
 
 /** A page row as the overview selects it; `translations` and `slugHistory` default to none. */
@@ -132,7 +137,7 @@ const seededRows: Rows = {
   analyticsDays: 7,
   forms: 3,
   submissions: 38,
-  connected: 2,
+  shareLinks: 2,
   webhook: {
     deliveries: [
       { status: "FAILED", event: "site.publish", httpStatus: 502, error: "502 Bad Gateway", createdAt: new Date(new Date().getFullYear(), 6, 1) },
@@ -150,7 +155,7 @@ function setup(site: Site, rows: Rows = {}) {
   db.siteAnalytics.count.mockResolvedValue(rows.analyticsDays ?? 0);
   db.formBlock.count.mockResolvedValue(rows.forms ?? 0);
   db.formSubmission.count.mockResolvedValue(rows.submissions ?? 0);
-  db.workspaceIntegration.count.mockResolvedValue(rows.connected ?? 0);
+  db.shareLink.count.mockResolvedValue(rows.shareLinks ?? 0);
   db.workspaceWebhook.findUnique.mockResolvedValue(rows.webhook ?? null);
   db.workspaceMember.count.mockResolvedValue(rows.members ?? 0);
 }
@@ -169,7 +174,7 @@ describe("getSettingsOverview — the seeded site", () => {
 
     expect(settingsOverviewSchema.safeParse(overview).success).toBe(true);
     expect(overview).toEqual({
-      site: { name: "Bella Cucina", defaultLocale: "en", plan: "PRO" },
+      site: { name: "Bella Cucina", defaultLocale: "en", plan: "PRO", archived: false, workspaceDeletionAt: null },
       general: { siteName: "Bella Cucina", language: "en" },
       localization: { locales: 2, notStarted: ["ar"] },
       seo: { allowIndexing: true, robotsTxtSet: true },
@@ -179,7 +184,7 @@ describe("getSettingsOverview — the seeded site", () => {
       forms: { forms: 3, submissions: 38 },
       customCode: { head: true, body: true, css: true },
       headers: { csp: true, hsts: true },
-      integrations: { connected: 2, available: INTEGRATION_CATALOG.length },
+      access: { passwordSet: true, shareLinks: 2 },
       webhooks: { endpoints: 1, lastDelivery: "failed" },
       members: { used: 3, seats: 5 },
       billing: { plan: "PRO", priceMonthly: 29 },
@@ -214,7 +219,7 @@ describe("getSettingsOverview — the seeded site", () => {
     for (const model of [
       db.page.findMany, db.domain.findFirst, db.dnsRecord.findMany, db.redirect.findMany,
       db.siteAnalytics.count, db.formBlock.count, db.formSubmission.count,
-      db.workspaceIntegration.count, db.workspaceWebhook.findUnique, db.workspaceMember.count,
+      db.shareLink.count, db.workspaceWebhook.findUnique, db.workspaceMember.count,
     ]) expect(model).toHaveBeenCalledTimes(1);
     // One page read serves both the translation count and the suggester (S3).
     expect(db.page.findMany).toHaveBeenCalledWith({
@@ -234,7 +239,7 @@ describe("getSettingsOverview — the empty site", () => {
 
     expect(settingsOverviewSchema.safeParse(overview).success).toBe(true);
     expect(overview).toEqual({
-      site: { name: "scratch-ver", defaultLocale: "en", plan: "FREE" },
+      site: { name: "scratch-ver", defaultLocale: "en", plan: "FREE", archived: false, workspaceDeletionAt: null },
       general: { siteName: "scratch-ver", language: "en" },
       localization: { locales: 1, notStarted: [] },
       seo: { allowIndexing: true, robotsTxtSet: false },
@@ -244,7 +249,7 @@ describe("getSettingsOverview — the empty site", () => {
       forms: { forms: 0, submissions: 0 },
       customCode: { head: false, body: false, css: false },
       headers: { csp: false, hsts: false },
-      integrations: { connected: 0, available: INTEGRATION_CATALOG.length },
+      access: { passwordSet: false, shareLinks: 0 },
       webhooks: { endpoints: 0, lastDelivery: null },
       members: { used: 0, seats: 1 },
       billing: { plan: "FREE", priceMonthly: 0 },
@@ -255,6 +260,30 @@ describe("getSettingsOverview — the empty site", () => {
   it("throws SITE_NOT_FOUND for an unknown site", async () => {
     db.site.findUnique.mockResolvedValue(null);
     await expect(getSettingsOverview("nope")).rejects.toThrow("SITE_NOT_FOUND");
+  });
+});
+
+describe("site state and Access (Phase B)", () => {
+  it("says the site is archived and when its workspace is deleted", async () => {
+    const when = new Date("2026-11-01T00:00:00.000Z");
+    setup({ ...emptySite, status: "ARCHIVED", workspace: { ...emptySite.workspace, deletionScheduledAt: when } });
+    const overview = await getSettingsOverview("s1");
+    expect(settingsOverviewSchema.safeParse(overview).success).toBe(true);
+    expect(overview.site).toMatchObject({ archived: true, workspaceDeletionAt: "2026-11-01T00:00:00.000Z" });
+  });
+
+  it("counts only live share links: active and not expired", async () => {
+    setup(emptySite, { shareLinks: 1 });
+    await getSettingsOverview("s1");
+    expect(db.shareLink.count).toHaveBeenCalledWith({
+      where: { siteId: "s1", isActive: true, OR: [{ expiresAt: null }, { expiresAt: { gt: expect.any(Date) } }] },
+    });
+  });
+
+  it("no longer reports integrations (PD-2: the editor's Integrations screen is gone)", async () => {
+    setup(emptySite);
+    const overview = await getSettingsOverview("s1");
+    expect(overview).not.toHaveProperty("integrations");
   });
 });
 

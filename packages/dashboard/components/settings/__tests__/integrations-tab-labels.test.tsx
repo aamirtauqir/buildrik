@@ -7,11 +7,11 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { IntegrationsTab } from "../integrations-tab";
 
+/* PD-2 (2026-10-02): no Google Analytics card — its Tracking ID was read by nothing. */
 const FIELDS: [number, string[]][] = [
-  [0, ["Tracking ID"]],
-  [1, ["API Key", "Audience ID"]],
-  [2, ["Webhook URL"]],
-  [3, ["Webhook URL", "Channel name"]],
+  [0, ["API Key", "Audience ID"]],
+  [1, ["Webhook URL"]],
+  [2, ["Webhook URL", "Channel name"]],
 ];
 
 describe("IntegrationsTab — label association", () => {

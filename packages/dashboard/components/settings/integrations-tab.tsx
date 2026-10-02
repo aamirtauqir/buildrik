@@ -5,13 +5,6 @@ import { Pill, Button, InputField } from "@/components/dashboard/primitives";
 
 export const INTEGRATION_CONFIGS = [
   {
-    provider: "GOOGLE_ANALYTICS" as const,
-    name: "Google Analytics",
-    description: "Track site visitors",
-    icon: "BarChart3",
-    fields: [{ key: "trackingId", label: "Tracking ID", placeholder: "G-XXXXXXXXXX" }],
-  },
-  {
     provider: "MAILCHIMP" as const,
     name: "Mailchimp",
     description: "Sync form submissions",
@@ -113,49 +106,6 @@ function ConfigField({ label, ...props }: InputHTMLAttributes<HTMLInputElement> 
       </label>
       <InputField id={id} {...props} />
     </>
-  );
-}
-
-function GoogleAnalyticsConfig({
-  values,
-  onChange,
-}: {
-  values: Record<string, string>;
-  onChange: (key: string, value: string) => void;
-}) {
-  return (
-    <div className="space-y-3">
-      <div>
-        <ConfigField
-          label="Tracking ID"
-          type="text"
-          value={values["trackingId"] ?? ""}
-          onChange={(e) => onChange("trackingId", e.target.value)}
-          placeholder="G-XXXXXXXXXX"
-          wrapperClassName="w-full"
-        />
-      </div>
-      <div className="flex items-center justify-between">
-        <p className="text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
-          Apply to all sites
-        </p>
-        <Toggle
-          label="Apply to all sites"
-          checked={values["applyToAll"] === "true"}
-          onChange={(v) => onChange("applyToAll", String(v))}
-        />
-      </div>
-      <div className="flex items-center justify-between">
-        <p className="text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
-          Anonymize IP
-        </p>
-        <Toggle
-          label="Anonymize IP"
-          checked={values["anonymizeIp"] === "true"}
-          onChange={(v) => onChange("anonymizeIp", String(v))}
-        />
-      </div>
-    </div>
   );
 }
 
@@ -322,8 +272,6 @@ function ProviderConfigFields({
   onTestEvent?: () => void;
 }) {
   switch (provider) {
-    case "GOOGLE_ANALYTICS":
-      return <GoogleAnalyticsConfig values={values} onChange={onChange} />;
     case "MAILCHIMP":
       return <MailchimpConfig values={values} onChange={onChange} />;
     case "ZAPIER":

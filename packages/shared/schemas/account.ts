@@ -72,7 +72,9 @@ export const workspaceSharingSettingsSchema = z.object({
  * find — silent duplicates that orphaned the OAuth flow.
  */
 export const addIntegrationSchema = z.object({
-  provider: z.enum(["GOOGLE_ANALYTICS", "MAILCHIMP", "ZAPIER", "SLACK"]),
+  // PD-2: no GOOGLE_ANALYTICS — that card stored a Tracking ID nothing read;
+  // a site's analytics live in its editor Settings › Analytics.
+  provider: z.enum(["MAILCHIMP", "ZAPIER", "SLACK"]),
   config: z.record(z.unknown()),
 });
 

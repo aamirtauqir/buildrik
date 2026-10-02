@@ -339,7 +339,15 @@ export const siteAnalyticsQuerySchema = z.object({
  * "Indexing allowed · robots.txt set") is built by the editor from these facts.
  */
 export const settingsOverviewSchema = z.object({
-  site: z.object({ name: z.string(), defaultLocale: z.string(), plan: z.enum(["FREE", "PRO", "BUSINESS"]) }),
+  site: z.object({
+    name: z.string(),
+    defaultLocale: z.string(),
+    plan: z.enum(["FREE", "PRO", "BUSINESS"]),
+    /** Archived: hidden from the Sites list, the live site stays up (Q-B4). */
+    archived: z.boolean(),
+    /** ISO date the workspace is deleted on, when its deletion is scheduled (PD-5). */
+    workspaceDeletionAt: z.string().datetime().nullable(),
+  }),
   general: z.object({ siteName: z.string(), language: z.string() }),            // "English (en-US)" label built client-side from defaultLocale
   localization: z.object({ locales: z.number(), notStarted: z.array(z.string()) }),
   seo: z.object({ allowIndexing: z.boolean(), robotsTxtSet: z.boolean() }),
@@ -349,7 +357,7 @@ export const settingsOverviewSchema = z.object({
   forms: z.object({ forms: z.number(), submissions: z.number() }),
   customCode: z.object({ head: z.boolean(), body: z.boolean(), css: z.boolean() }),
   headers: z.object({ csp: z.boolean(), hsts: z.boolean() }),
-  integrations: z.object({ connected: z.number(), available: z.number() }),
+  access: z.object({ passwordSet: z.boolean(), shareLinks: z.number() }),           // active share links
   webhooks: z.object({ endpoints: z.number(), lastDelivery: z.enum(["ok", "failed"]).nullable() }),
   members: z.object({ used: z.number(), seats: z.number() }),
   billing: z.object({ plan: z.string(), priceMonthly: z.number() }),
