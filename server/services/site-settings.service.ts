@@ -186,7 +186,7 @@ export async function getSiteSettings(siteId: string) {
       id: true,
       ...SITE_SETTINGS_COLUMNS,
       deletedAt: true,
-      workspace: { select: { plan: true } },
+      workspace: { select: { plan: true, name: true } },
     },
   });
 
@@ -226,6 +226,9 @@ export async function getSiteSettings(siteId: string) {
     publishedPassword: null, // typed as String? on schema; null = not set or redacted
     hasPublishedPassword: !!publishedPassword,
     plan: workspace.plan,
+    /* The editor's workspace doors (Members, Billing, Integrations &
+       webhooks) name the workspace they lead to (8139:217358). */
+    workspaceName: workspace.name,
     pageSeo,
   };
 }

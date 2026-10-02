@@ -541,6 +541,13 @@ export function getEditorPlanTier(): EditorPlanTier {
   return _editorPlanTier;
 }
 
+let _editorWorkspaceName: string | null = null;
+
+/** The open site's workspace name, for the Settings workspace doors. Null before load or in the demo. */
+export function getEditorWorkspaceName(): string | null {
+  return _editorWorkspaceName;
+}
+
 /** Duplicate a site (`sites.duplicate`, EDITOR). Throws the server's message
  *  on refusal — e.g. the plan's site limit — so the caller can say it. */
 export async function duplicateSite(siteId: string): Promise<{ id: string; name: string }> {
@@ -672,6 +679,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.
     _editorPlanTier = mapDashboardPlan((settingsResult as { plan?: unknown } | null)?.plan);
+    _editorWorkspaceName = settingsResult?.workspaceName ?? null;
 
     // 61-conflict: record the load-time version as the save baseline.
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
