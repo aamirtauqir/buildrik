@@ -63,3 +63,19 @@ describe("SelectRow", () => {
     expect(select.querySelector("option")?.textContent).toBe("Mixed");
   });
 });
+
+/* QA 2026-10-02, board 13: an Accordion item row "3 · Can I export my
+   designs?" was cut mid-word under its select with no ellipsis — the text sat
+   straight in the flex label, where text-overflow does nothing. It now sits
+   in its own truncating span, and the full label is the hover title. */
+describe("SelectRow — a long label", () => {
+  it("ellipsises in its own span and carries the full label as its title", () => {
+    const long = "3 · Can I export my designs?";
+    render(<SelectRow label={long} value="block" onChange={vi.fn()} options={OPTIONS} placeholder={null} />);
+    const text = screen.getByText(long);
+    expect(text.tagName).toBe("SPAN");
+    expect(text.className).toMatch(/tw:truncate/);
+    expect(text).toHaveAttribute("title", long);
+    expect(screen.getByRole("combobox", { name: long })).toBeInTheDocument();
+  });
+});

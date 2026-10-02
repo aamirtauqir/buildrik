@@ -458,7 +458,13 @@ export const SelectRow: React.FC<SelectRowProps> = ({
   return (
     <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
       <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={id}>
-        {label}
+        {/* Its own block span, so a label longer than the column ends in an
+            ellipsis instead of being cut under the select ("3 · Can I export
+            my d", board 13); the label is a flex box, where text-overflow
+            does nothing. The full label is the hover title. */}
+        <span className="tw:min-w-0 tw:truncate" title={label}>
+          {label}
+        </span>
         {isOverridden && <OverrideDot />}
         <FieldDot field={field} />
         {helperText && <HelperIcon text={helperText} />}
