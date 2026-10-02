@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SizeSection, constraintTypeOf, valueForConstraint } from "../SizeSection";
 
@@ -61,6 +61,30 @@ describe("SizeSection — board 1's readouts", () => {
     expect(onChange).not.toHaveBeenCalled();
     fireEvent.change(input, { target: { value: "480" } });
     expect(onChange).toHaveBeenCalledWith("width", "480px");
+  });
+
+  // Regression: the canvas re-creates the node on the first selection after
+  // load; the readout stayed on the detached node, Fill read "100 %" and a
+  // typed 700 was written as 700% (QA 2026-10-02).
+  it("follows the canvas node when it is replaced, so Fill keeps its px readout", async () => {
+    const make = (w: number) => {
+      const n = document.createElement("div");
+      n.setAttribute("data-buildrick-id", "el-1");
+      Object.defineProperty(n, "offsetWidth", { get: () => (n.isConnected ? w : 0) });
+      return n;
+    };
+    const first = make(640);
+    document.body.appendChild(first);
+    const { onChange } = renderSize({ elementId: "el-1" });
+    const second = make(920);
+    await act(async () => {
+      first.replaceWith(second);
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    const input = within(row("width")).getByLabelText("Width");
+    expect(input).toHaveValue("920");
+    fireEvent.change(input, { target: { value: "700" } });
+    expect(onChange).toHaveBeenCalledWith("width", "700px");
   });
 
   it("a fixed width reads Width · Fixed with its value", () => {

@@ -124,17 +124,33 @@ function useRenderedSize(elementId: string | undefined): { width: number; height
   const [size, setSize] = React.useState<{ width: number; height: number } | null>(null);
   React.useLayoutEffect(() => {
     if (!elementId || typeof document === "undefined") return undefined;
-    const node = document.querySelector<HTMLElement>(`[data-buildrick-id="${elementId.replace(/["\\]/g, "\\$&")}"]`);
-    if (!node) {
-      setSize(null);
-      return undefined;
-    }
-    const read = () => (node.offsetWidth || node.offsetHeight ? setSize({ width: node.offsetWidth, height: node.offsetHeight }) : setSize(null));
-    read();
-    if (typeof ResizeObserver === "undefined") return undefined;
-    const ro = new ResizeObserver(read);
-    ro.observe(node);
-    return () => ro.disconnect();
+    const selector = `[data-buildrick-id="${elementId.replace(/["\\]/g, "\\$&")}"]`;
+    let node: HTMLElement | null = null;
+    const read = () =>
+      node && (node.offsetWidth || node.offsetHeight) ? setSize({ width: node.offsetWidth, height: node.offsetHeight }) : setSize(null);
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(read);
+    const attach = () => {
+      if (node) ro?.unobserve(node);
+      node = document.querySelector<HTMLElement>(selector);
+      if (node) ro?.observe(node);
+      read();
+    };
+    attach();
+    /* The canvas re-creates an element's node when it re-renders — the first
+       selection after load does. A ResizeObserver on the old, detached node
+       never fires again, so Fill read "100 %" and a width typed there was
+       written in % ("700" → 700%). Follow the node to its replacement. */
+    const mo =
+      typeof MutationObserver === "undefined"
+        ? null
+        : new MutationObserver(() => {
+            if (!node?.isConnected) attach();
+          });
+    mo?.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      ro?.disconnect();
+      mo?.disconnect();
+    };
   }, [elementId]);
   return size;
 }
