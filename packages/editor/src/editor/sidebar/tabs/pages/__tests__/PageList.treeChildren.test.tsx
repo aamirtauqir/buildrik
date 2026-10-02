@@ -88,6 +88,12 @@ describe("the Pages tree owns treeitems only", () => {
     expect(treeChildRoles()).toEqual(["treeitem"]);
   });
 
+  it("offers one Add page control when the site has one page", () => {
+    renderList([page("p1", "Home")]);
+    expect(screen.getByTestId("pages-onepage-text")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /add (new )?page/i })).toHaveLength(1);
+  });
+
   it("has no tree at all when a search matches nothing", () => {
     renderList([page("p1", "Home"), page("p2", "About")], "zzzz");
     expect(screen.getByTestId("pages-no-results")).toBeInTheDocument();

@@ -300,19 +300,13 @@ export const PageList: React.FC<Props> = ({
               ))}
             </div>
             {/* Board 141:124: with exactly one page the list carries the
-                one-page note + a centered Add link under the row. */}
+                one-page note under the row. The board also draws a second
+                "+ Add page" in the note (141:164); owner call 2026-10-03: two
+                Add page controls in one panel confuse, the footer's is the
+                one that stays. */}
             {!search && pages.length === 1 && (
               <div className="bd-pg-onepage" data-testid="pages-onepage">
                 <p data-testid="pages-onepage-text">This site has one page.</p>
-                <Button
-                  color="light"
-                  size="xs"
-                  className="bd-pg-onepage-add"
-                  data-testid="pages-onepage-add"
-                  onClick={onAddPage}
-                >
-                  + Add page
-                </Button>
               </div>
             )}
           </>
