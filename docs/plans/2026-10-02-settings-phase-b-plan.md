@@ -396,3 +396,13 @@ QA owns only `docs/plans/settings-phase-b-walk/**` and `packages/editor/scripts/
   `docs/design-jobs/CLONE-SETTINGS/shots/`, v3 shots are not cached.
 - Locale removal behaviour (Q-B6), `cleanUrls` (R3), whether every shell exit already uses the one unsaved dialog (#4, commits `7e3c52719`/`bf13d8d07`) — read, not run.
 - Whether `sites.archive` should also unpublish (Q-B4) — no product rule found.
+
+---
+
+## Owner decisions (2026-10-02)
+
+- **Missing boards (Q-B3):** build per screen as its board lands. Design starts with M0 (nav component `4418:144988`); screens that already have an exact or old board start right after Lane 0.
+- **Dashboard (Q-B7):** no Figma boards — build to DESIGN.md (Flowbite, Inter, `#1A56DB`) and approve by live screenshot.
+- **All remaining questions — every recommendation accepted:** Q-B1 Form submissions stays in Settings, no "Form settings"; Q-B2 fix the sidebar once in the nav component; Q-B4 Archive hides from the Sites list only, the live site stays up; Q-B5 the workspace OWNER may transfer a site as well as its creator; Q-B6 removing a locale keeps its translations, confirm only when translations exist; Q-B8 restore reactivates forms, share links stay revoked; Q-B9 support all six social keys; S4 Q1 no "Add form" in Settings; S4 Q4 `cleanUrls` is a separate ticket, verified on one published site first; S5 Q1 Permissions link for every role from the Settings sidebar foot; S5 Q2 closed (page-settings SEO already built); S5 Q3 build the Branding fallback card.
+
+**Order:** `fix/editor-known-bugs` lands first → Lane 0 (alone) → Lanes 1 + 2 in parallel with the QA agent.
