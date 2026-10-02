@@ -64,7 +64,7 @@ function stubComposer(opts: { failUpdate?: boolean } = {}) {
         getAllCollections: () => [],
         getContentItems: () => Promise.resolve([]),
         updateContentItem: vi.fn(async (id: string, u: { data: Record<string, unknown> }) => {
-          if (opts.failUpdate) throw new CMSValidationError([]);
+          if (opts.failUpdate) throw new CMSValidationError({});
           const it = item(id, u.data);
           emit(EVENTS.CMS_CONTENT_UPDATED, it);
           return it;
