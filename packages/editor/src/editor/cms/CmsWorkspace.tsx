@@ -29,6 +29,8 @@ import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
 import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
+import { onCmsGone } from "@/services/cmsSync";
+import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 
 export interface CmsWorkspaceProps {
   composer: Composer | null;
@@ -85,7 +87,23 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const panel = useContentPanel(composer);
   const { addToast } = useToast();
   const ws = useCmsWorkspace();
-  const collection = ws.collectionId ? panel.collections.find((c) => c.id === ws.collectionId) ?? null : null;
+  /* 8139:217711 / 8139:217890 — an edit the server refused because another
+     device deleted the record (or its collection) drops the row here too.
+     The open sheet stays over what it showed, to say the change wasn't
+     saved, until it is closed; the workspace behind keeps that snapshot. */
+  const [gone, setGone] = React.useState<{ collection: CMSCollection; record: CMSContentItem } | null>(null);
+  const shown = React.useRef<{ collection: CMSCollection; record: CMSContentItem } | null>(null);
+  React.useEffect(
+    () =>
+      onCmsGone((g) => {
+        const s = shown.current;
+        if (!s) return;
+        if (g.kind === "entry" ? g.id === s.record.id : g.id === s.collection.id) setGone(s);
+      }),
+    [],
+  );
+  const live = ws.collectionId ? panel.collections.find((c) => c.id === ws.collectionId) ?? null : null;
+  const collection = gone && gone.collection.id === ws.collectionId ? live ?? gone.collection : live;
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [csvImportOpen, setCsvImportOpen] = React.useState(false);
   const [addingField, setAddingField] = React.useState(false);
@@ -164,7 +182,10 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   }
 
   const count = panel.records.length;
-  const sheetRecord = ws.recordId && ws.recordId !== "new" ? panel.records.find((r) => r.id === ws.recordId) ?? null : null;
+  const goneRecord = gone && gone.record.id === ws.recordId ? gone.record : null;
+  const sheetRecord =
+    ws.recordId && ws.recordId !== "new" ? panel.records.find((r) => r.id === ws.recordId) ?? goneRecord : null;
+  shown.current = sheetRecord ? { collection, record: sheetRecord } : null;
   const isEmpty = ws.tab === "records" && count === 0;
   const primary =
     ws.tab === "records" ? (
@@ -354,7 +375,11 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           composer={composer}
           collection={collection}
           record={sheetRecord}
-          onClose={() => cmsWorkspace.openRecord(null)}
+          gone={goneRecord !== null}
+          onClose={() => {
+            setGone(null);
+            cmsWorkspace.openRecord(null);
+          }}
           /* The sheet covers the workspace header: opened from an element
              (Open record ›), its own back closes it and returns to the
              canvas in one step (§13). */
