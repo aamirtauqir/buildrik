@@ -13,6 +13,9 @@
  * active`), `Set as primary` on every other domain (→ 8136:214574 →
  * `domains.setPrimary`, ADMIN, verified domains only) and `Manage DNS`; under
  * the cards `Add a domain` (→ AddDomainDialog → `domains.connect`).
+ * 8136:214348 draws only `Set as primary` on a non-primary card; `Manage DNS`
+ * stays there too by owner decision (2026-10-04) — it is the only way to a
+ * non-primary domain's records, Force HTTPS and Remove.
  *
  * `Manage DNS` opens the domain's own view (the header reads `Domains /
  * <domain>`): the Custom domain card — status, `Force HTTPS` (writes
