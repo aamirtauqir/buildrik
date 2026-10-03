@@ -618,6 +618,25 @@ describe("StudioHeader", () => {
       fireEvent.keyDown(document, { key: "k", metaKey: true });
       expect(screen.getByTestId("command-palette")).toBeTruthy();
     });
+
+    /* Owner decision 2026-10-03: no drawer can put its search in the topbar
+       any more — the old "ui:search-context" claim draws nothing. */
+    it("draws no search field when a drawer announces a search scope", () => {
+      setViewMode({ readOnlyView: false });
+      const handlers = new Map<string, Set<(p: unknown) => void>>();
+      const composer = {
+        ...searchComposer(),
+        on: (e: string, h: (p: unknown) => void) => {
+          if (!handlers.has(e)) handlers.set(e, new Set());
+          handlers.get(e)!.add(h);
+        },
+        off: (e: string, h: (p: unknown) => void) => handlers.get(e)?.delete(h),
+      };
+      render(<StudioHeader {...makeProps({ composer: composer as never })} />);
+      act(() => handlers.get("ui:search-context")?.forEach((h) => h({ placeholder: "Search elements…" })));
+      expect(within(screen.getByRole("banner")).queryByRole("textbox")).toBeNull();
+      expect(screen.queryByPlaceholderText("Search elements…")).toBeNull();
+    });
   });
 
   describe("⌘K command palette", () => {

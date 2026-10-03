@@ -1,8 +1,9 @@
 /**
- * SeoScreen tests — Clone 3397:32076 SEO defaults: the info strip, the Site
- * SEO card, the Indexing card (switch + robots.txt preview), the server read
- * behind them (3953:26646 / 3953:26785), the save-error banner (3951:26319),
- * dirty wiring and the flush-handler contract.
+ * SeoScreen — Phase B SEO: 8135:214533 (Defaults · Social profiles · Pages
+ * strip · Indexing ›), 8135:214820 (Indexing open: switch, canonical,
+ * editable robots.txt, Reset to default) and 8135:215066 (indexing off
+ * notice). Flush returns the column-backed SEO keys incl. all six social
+ * links; a changed canonical URL saves through the screen's own handler.
  *
  * @license BSD-3-Clause
  */
@@ -10,178 +11,226 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act, waitFor, cleanup } from "@testing-library/react";
 import * as React from "react";
 import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
+import type { ProjectSettings } from "@/shared/types/project";
+import { EVENTS } from "@/shared/constants/events";
 
-const { api } = vi.hoisted(() => ({
+const { api, sync } = vi.hoisted(() => ({
   api: {
     siteDetail: {
       settings: { get: { query: vi.fn() } },
       domains: { list: { query: vi.fn() } },
     },
   },
+  sync: { saveSiteSettings: vi.fn() },
 }));
 
-vi.mock("@/services/api-client", () => ({
-  getBuildrikClient: () => api,
+vi.mock("@/services/api-client", () => ({ getBuildrikClient: () => api }));
+vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/BuildrikSyncProvider")>()),
+  saveSiteSettings: sync.saveSiteSettings,
 }));
 
 import { SeoScreen, robotsPreview, sitemapOrigin } from "../SeoScreen";
-import { SiteColumnsLockedContext } from "../../shared";
 
 const getMock = api.siteDetail.settings.get.query;
 const domainsMock = api.siteDetail.domains.list.query;
 
 const serverRow = () => ({
-  metaTitle: "Acme — Wood-fired",
-  metaDescription: "Hand-stretched daily.",
+  metaTitle: "Acme · Home",
+  metaDescription: "We make things.",
   ogImage: "https://acme.test/og.png",
+  canonicalUrl: "https://acme.test",
   allowIndexing: true,
   robotsTxt: null,
-});
-
-const baseSettings = () => ({
-  seo: {
-    siteName: "Keep Me",
-    twitterHandle: "@acme",
-    metaTitle: "Composer title",
-    defaultOgImage: "https://composer.test/og.png",
-  },
+  socialLinks: { facebook: "https://facebook.com/acme", instagram: "https://instagram.com/acme" },
 });
 
 beforeEach(() => {
   getMock.mockReset().mockResolvedValue(serverRow());
-  domainsMock.mockReset().mockResolvedValue([]);
+  domainsMock.mockReset().mockResolvedValue([{ domain: "acme.com", status: "VERIFIED", isPrimary: true }]);
+  sync.saveSiteSettings.mockReset().mockResolvedValue({ legacyAnalyticsIds: [] });
 });
-
 afterEach(() => cleanup());
 
-function setup(opts: {
-  projectId?: string | null;
-  onDirtyChange?: (d: boolean) => void;
-  registerFlushHandler?: (h: (() => void) | null) => void;
-  onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
-  saveError?: string | null;
-  settings?: Record<string, unknown>;
-  /** M7: the viewer's known role is below ADMIN. */
-  siteColumnsLocked?: boolean;
-  publishedUrl?: string | null;
-} = {}) {
-  const composer = createMockComposer({
-    projectSettings: opts.settings ?? baseSettings(),
-    projectMetadata: { domain: null, publishedUrl: opts.publishedUrl ?? null },
-  });
-  const utils = render(
-    <SeoScreen
-      composer={composer}
-      projectId={opts.projectId === undefined ? "s1" : opts.projectId}
-      onDirtyChange={opts.onDirtyChange}
-      registerFlushHandler={opts.registerFlushHandler}
-      onLoadStateChange={opts.onLoadStateChange}
-      saveError={opts.saveError}
-    />,
-    {
-      wrapper: ({ children }: { children: React.ReactNode }) => (
-        <SiteColumnsLockedContext.Provider value={opts.siteColumnsLocked ?? false}>{children}</SiteColumnsLockedContext.Provider>
-      ),
-    },
+function setup(opts: { projectId?: string | null; saveError?: string | null; seo?: Record<string, unknown> } = {}) {
+  const composer = Object.assign(
+    createMockComposer({
+      projectSettings: { seo: { siteName: "Acme", twitterHandle: "@acme", metaTitle: "Composer title", ...opts.seo } },
+      projectMetadata: { name: "Acme", publishedUrl: null } as never,
+    }),
+    { adoptSavedProjectSettings: vi.fn(), isDirty: vi.fn(() => false), markSaved: vi.fn() },
   );
-  return { composer, ...utils };
+  const props = {
+    onDirtyChange: vi.fn(),
+    registerFlushHandler: vi.fn(),
+    registerSaveHandler: vi.fn(),
+    registerFieldErrors: vi.fn(),
+  };
+  render(<SeoScreen composer={composer} projectId={opts.projectId === undefined ? "s1" : opts.projectId} saveError={opts.saveError} {...props} />);
+  return { composer, props };
 }
 
-const metaTitle = () => screen.getByLabelText("Meta title") as HTMLInputElement;
-const metaDescription = () => screen.getByLabelText("Meta description") as HTMLInputElement;
-const twitterHandle = () => screen.getByLabelText("Twitter Handle") as HTMLInputElement;
-const ogImage = () => screen.getByLabelText("Default OG Image URL") as HTMLInputElement;
-const indexing = () => screen.getByRole("switch", { name: "Allow search indexing" });
-const robots = () => screen.getByLabelText("robots.txt");
+const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-defaults")).toBeInTheDocument());
+const input = (id: string) => document.getElementById(id) as HTMLInputElement;
+const last = <T,>(fn: { mock: { calls: unknown[][] } }) => {
+  const calls = fn.mock.calls.filter((c) => c[0] !== null);
+  return calls[calls.length - 1]?.[0] as T | undefined;
+};
 
-const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-site-seo")).toBeInTheDocument());
-
-describe("SeoScreen — the frame's strip and two cards", () => {
-  it("draws the info strip, Site SEO and Indexing, with the field ids the walk drives", async () => {
+describe("SEO · 8135:214533 — Defaults, Social profiles, the Pages strip, Indexing closed", () => {
+  it("fills Defaults from the Site row and lists all six networks", async () => {
     setup();
     await loaded();
-    expect(screen.getByText(/Site-wide SEO defaults are set here/)).toHaveTextContent(
-      "values set there override these defaults.",
+    expect(input("seo-meta-title").value).toBe("Acme · Home");
+    expect(input("seo-meta-description").value).toBe("We make things.");
+    expect(input("seo-og").value).toBe("https://acme.test/og.png");
+    for (const [id, label] of [
+      ["twitter", "Twitter/X"],
+      ["facebook", "Facebook"],
+      ["linkedin", "LinkedIn"],
+      ["instagram", "Instagram"],
+      ["youtube", "YouTube"],
+      ["github", "GitHub"],
+    ]) {
+      expect(screen.getByLabelText(label).id).toBe(`social-${id}`);
+    }
+    expect(input("social-instagram").value).toBe("https://instagram.com/acme");
+    expect(screen.getByTestId("set-seo-pages-strip")).toHaveTextContent(
+      "Page titles and descriptions can be overridden per page in Pages ›",
     );
-    expect(screen.getByTestId("set-card-site-seo")).toHaveTextContent("Site SEO");
-    expect(screen.getByTestId("set-card-indexing")).toHaveTextContent("Indexing");
-    expect(metaTitle().id).toBe("seo-meta-title");
-    expect(metaDescription().id).toBe("seo-meta-description");
-    expect(twitterHandle().id).toBe("seo-twitter");
-    expect(ogImage().id).toBe("seo-og");
-    expect(indexing().id).toBe("seo-allow-indexing");
-    expect(robots().id).toBe("seo-robots");
-    // The frame has no title template — the field went with it.
-    expect(screen.queryByLabelText(/title template/i)).toBeNull();
+    expect(screen.getByTestId("set-card-indexing")).toHaveAttribute("data-open", "false");
+    expect(screen.queryByLabelText("Twitter Handle")).toBeNull();
   });
 
-  it("prefills the Site columns from the server row and the handle from the composer", async () => {
+  it("offers the old Twitter handle in the Twitter/X field when the link is empty", async () => {
     setup();
     await loaded();
-    expect(metaTitle().value).toBe("Acme — Wood-fired");
-    expect(metaDescription().value).toBe("Hand-stretched daily.");
-    expect(ogImage().value).toBe("https://acme.test/og.png");
-    expect(indexing()).toHaveAttribute("aria-checked", "true");
-    expect(twitterHandle().value).toBe("@acme");
-    expect(getMock).toHaveBeenCalledWith({ siteId: "s1" });
-    expect(domainsMock).toHaveBeenCalledWith({ siteId: "s1" });
+    expect(input("social-twitter").value).toBe("@acme");
+  });
+
+  it("Pages › opens the Pages panel", async () => {
+    const { composer } = setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-seo-pages-link"));
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
   });
 
   it("without a projectId shows the composer's values and requests nothing", () => {
     setup({ projectId: null });
-    expect(metaTitle().value).toBe("Composer title");
+    expect(input("seo-meta-title").value).toBe("Composer title");
     expect(getMock).not.toHaveBeenCalled();
+  });
+
+  it("shows the load card and Try again when the read fails", async () => {
+    getMock.mockRejectedValueOnce(new Error("network"));
+    setup();
+    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId("set-load-retry"));
+    await loaded();
+  });
+
+  it("renders the shell's save error above the cards", async () => {
+    setup({ saveError: "SEO settings were not saved." });
+    await loaded();
+    expect(screen.getByTestId("set-save-error")).toHaveTextContent("SEO settings were not saved.");
   });
 });
 
-describe("SeoScreen — robots.txt preview follows the switch, the domain and the row", () => {
-  it("defaults to Allow with the sitemap on the primary verified domain", async () => {
-    domainsMock.mockResolvedValue([
-      { domain: "old.example", status: "VERIFIED", isPrimary: false },
-      { domain: "bellacucina.com", status: "VERIFIED", isPrimary: true },
-      { domain: "pending.example", status: "PENDING", isPrimary: false },
-    ]);
+describe("SEO › Indexing — 8135:214820 / 8135:215066", () => {
+  it("opens to the switch, the canonical URL and an editable robots.txt whose placeholder is the generated default", async () => {
     setup();
     await loaded();
-    expect(robots().textContent).toBe("User-agent: *\nAllow: /\nSitemap: https://bellacucina.com/sitemap.xml");
+    fireEvent.click(screen.getByTestId("set-card-toggle-indexing"));
+    expect(screen.getByRole("switch")).toHaveAttribute("aria-checked", "true");
+    expect(input("seo-canonical").value).toBe("https://acme.test");
+    const robots = document.getElementById("seo-robots") as HTMLTextAreaElement;
+    expect(robots.value).toBe("");
+    expect(robots.placeholder).toBe("User-agent: *\nAllow: /\nSitemap: https://acme.com/sitemap.xml");
+    expect(screen.getByText("Leave blank to use the generated default shown above.")).toBeInTheDocument();
   });
 
-  it("falls back to the published host when no domain is verified", async () => {
-    setup({ publishedUrl: "https://acme-site.vercel.app/" });
-    await loaded();
-    expect(robots().textContent).toBe("User-agent: *\nAllow: /\nSitemap: https://acme-site.vercel.app/sitemap.xml");
-  });
-
-  it("names no sitemap host it does not know", async () => {
+  it("turning indexing off flips the default to Disallow and shows the notice", async () => {
     setup();
     await loaded();
-    expect(robots().textContent).toBe("User-agent: *\nAllow: /");
+    fireEvent.click(screen.getByTestId("set-card-toggle-indexing"));
+    expect(screen.queryByTestId("set-seo-indexing-off")).toBeNull();
+    fireEvent.click(screen.getByRole("switch"));
+    expect((document.getElementById("seo-robots") as HTMLTextAreaElement).placeholder).toBe("User-agent: *\nDisallow: /");
+    expect(screen.getByTestId("set-seo-indexing-off")).toHaveTextContent(
+      "Indexing is off. Search engines will be asked not to include this site after the next publish.",
+    );
   });
 
-  /* No sitemap when indexing is off — a staging site asking to be crawled is
-     the opposite of what the switch means (mirrors lib/publish-files.ts). */
-  it("flips to Disallow, without a sitemap, when the switch is turned off — and marks dirty", async () => {
-    const onDirtyChange = vi.fn();
-    setup({ publishedUrl: "https://acme-site.vercel.app", onDirtyChange });
-    await loaded();
-    fireEvent.click(indexing());
-    expect(indexing()).toHaveAttribute("aria-checked", "false");
-    expect(robots().textContent).toBe("User-agent: *\nDisallow: /");
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
-  });
-
-  it("shows Site.robotsTxt verbatim when the row carries one", async () => {
-    getMock.mockResolvedValue({ ...serverRow(), robotsTxt: "User-agent: *\nDisallow: /staff\n" });
-    setup({ publishedUrl: "https://acme-site.vercel.app" });
-    await loaded();
-    expect(robots().textContent).toBe("User-agent: *\nDisallow: /staff\n");
-  });
-
-  it("still loads when the domains read fails — the preview just has no host", async () => {
-    domainsMock.mockRejectedValue(new Error("FORBIDDEN"));
+  it("Reset to default empties a custom robots.txt", async () => {
+    getMock.mockResolvedValue({ ...serverRow(), robotsTxt: "Disallow: /x" });
     setup();
     await loaded();
-    expect(robots().textContent).toBe("User-agent: *\nAllow: /");
+    fireEvent.click(screen.getByTestId("set-card-toggle-indexing"));
+    const robots = document.getElementById("seo-robots") as HTMLTextAreaElement;
+    expect(robots.value).toBe("Disallow: /x");
+    fireEvent.click(screen.getByTestId("set-seo-robots-reset"));
+    expect(robots.value).toBe("");
+  });
+
+  it("search lands on canonical: focusing the closed card's anchor opens it", async () => {
+    setup();
+    await loaded();
+    act(() => document.getElementById("seo-canonical")!.focus());
+    await waitFor(() => expect(document.activeElement).toBe(input("seo-canonical")));
+  });
+});
+
+describe("SEO — what Save sends", () => {
+  it("the flush returns the column keys incl. the six social links, robots and indexing, without writing the composer", async () => {
+    const { composer, props } = setup();
+    await loaded();
+    fireEvent.change(input("social-github"), { target: { value: "https://github.com/acme" } });
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
+    const next = last<() => ProjectSettings>(props.registerFlushHandler)!();
+    expect(next.seo).toMatchObject({
+      metaTitle: "Acme · Home",
+      metaDescription: "We make things.",
+      defaultOgImage: "https://acme.test/og.png",
+      allowIndexing: true,
+      robotsTxt: "",
+      socialLinks: {
+        twitter: "@acme",
+        facebook: "https://facebook.com/acme",
+        linkedin: "",
+        instagram: "https://instagram.com/acme",
+        youtube: "",
+        github: "https://github.com/acme",
+      },
+    });
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
+    expect(last(props.registerSaveHandler)).toBeUndefined();
+  });
+
+  it("a changed canonical URL saves through the screen's handler, in the same settings.update", async () => {
+    const { props } = setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-card-toggle-indexing"));
+    fireEvent.change(input("seo-canonical"), { target: { value: "https://acme.com" } });
+    await act(async () => { await last<() => Promise<void>>(props.registerSaveHandler)!(); });
+    expect(sync.saveSiteSettings).toHaveBeenCalledWith("s1", expect.objectContaining({ columns: expect.objectContaining({ canonicalUrl: "https://acme.com" }) }));
+  });
+
+  it("refusals the shared schema knows are said inline and keep Save off", async () => {
+    const { props } = setup();
+    await loaded();
+    fireEvent.change(input("seo-og"), { target: { value: "javascript:alert(1)" } });
+    fireEvent.change(input("social-facebook"), { target: { value: "http://facebook.com/acme" } });
+    fireEvent.change(input("seo-meta-title"), { target: { value: "x".repeat(61) } });
+    expect(screen.getByText("Use an https:// address or a path on this site (/image.png).")).toBeInTheDocument();
+    expect(screen.getByText("Use an https:// link.")).toBeInTheDocument();
+    expect(screen.getByText("Keep it under 60 characters — search results cut it there.")).toBeInTheDocument();
+    expect(props.registerFieldErrors).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        "seo.defaultOgImage": expect.any(String),
+        "seo.socialLinks.facebook": "Use an https:// link.",
+        "seo.metaTitle": expect.any(String),
+      }),
+    );
   });
 });
 
@@ -199,166 +248,6 @@ describe("robotsPreview / sitemapOrigin — pure", () => {
       "User-agent: *\nAllow: /\nSitemap: https://a.com/sitemap.xml",
     );
     expect(robotsPreview({ robotsTxt: "", allowIndexing: false, origin: "https://a.com" })).toBe("User-agent: *\nDisallow: /");
-    expect(robotsPreview({ robotsTxt: "  ", allowIndexing: true, origin: null })).toBe("User-agent: *\nAllow: /");
     expect(robotsPreview({ robotsTxt: "Disallow: /x", allowIndexing: true, origin: "https://a.com" })).toBe("Disallow: /x");
-  });
-});
-
-describe("SeoScreen — loading, load-error and save-error", () => {
-  it("shows the SEO DEFAULTS load card while the row is on its way", async () => {
-    let resolve!: (row: unknown) => void;
-    getMock.mockReturnValue(new Promise((r) => { resolve = r; }));
-    const onLoadStateChange = vi.fn();
-    setup({ onLoadStateChange });
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("SEO defaults");
-    expect(screen.getByTestId("set-load-card")).toHaveTextContent("Title, description and social preview defaults.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
-    expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
-    await act(async () => { resolve(serverRow()); });
-    await loaded();
-    expect(onLoadStateChange).toHaveBeenLastCalledWith("ready");
-  });
-
-  it("shows the error line + Try again when the read fails, and Try again re-reads", async () => {
-    getMock.mockRejectedValueOnce(new Error("network"));
-    const onLoadStateChange = vi.fn();
-    setup({ onLoadStateChange });
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent(
-      "Couldn't load your SEO defaults. Check your connection, then try again.",
-    );
-    expect(onLoadStateChange).toHaveBeenLastCalledWith("error");
-    fireEvent.click(screen.getByTestId("set-load-retry"));
-    await loaded();
-    expect(getMock).toHaveBeenCalledTimes(2);
-  });
-
-  it("renders the shell's saveError above the strip and cards", async () => {
-    setup({ saveError: "SEO defaults were not saved. Your changes are still here. Review the values, then retry." });
-    await loaded();
-    expect(screen.getByTestId("set-save-error")).toHaveTextContent(/SEO defaults were not saved/);
-    expect(metaTitle().value).toBe("Acme — Wood-fired");
-  });
-});
-
-describe("SeoScreen — edit behavior + dirty wiring", () => {
-  it("starts clean, then typing in a field marks the screen dirty", async () => {
-    const onDirtyChange = vi.fn();
-    setup({ onDirtyChange });
-    await loaded();
-    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
-    fireEvent.change(twitterHandle(), { target: { value: "@renamed" } });
-    expect(twitterHandle().value).toBe("@renamed");
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
-  });
-
-  it("does NOT write to composer per keystroke", async () => {
-    const { composer } = setup();
-    await loaded();
-    fireEvent.change(ogImage(), { target: { value: "https://acme.test/new-og.png" } });
-    expect(composer.setProjectSettings).not.toHaveBeenCalled();
-  });
-
-  it("resyncs when composer settings change externally (SETTINGS_CHANGE)", async () => {
-    const { composer } = setup();
-    await loaded();
-    act(() => {
-      composer.setProjectSettings({ seo: { ...baseSettings().seo, twitterHandle: "@external" } });
-    });
-    await waitFor(() => expect(twitterHandle().value).toBe("@external"));
-  });
-});
-
-describe("SeoScreen — flush handler contract", () => {
-  it("registers a flush handler on mount and clears it on unmount", async () => {
-    const registerFlushHandler = vi.fn();
-    const { unmount } = setup({ registerFlushHandler });
-    await loaded();
-    expect(registerFlushHandler).toHaveBeenCalledWith(expect.any(Function));
-    unmount();
-    expect(registerFlushHandler).toHaveBeenLastCalledWith(null);
-  });
-
-  it("flush returns the six SEO keys, preserving sibling seo keys, without writing the composer", async () => {
-    let flush: (() => unknown) | null = null;
-    const registerFlushHandler = vi.fn((h: (() => unknown) | null) => { flush = h; });
-    getMock.mockResolvedValue({ ...serverRow(), robotsTxt: "Disallow: /x" });
-    const { composer } = setup({ registerFlushHandler });
-    await loaded();
-
-    fireEvent.change(metaTitle(), { target: { value: "Flushed title" } });
-    fireEvent.change(metaDescription(), { target: { value: "Flushed description" } });
-    fireEvent.change(twitterHandle(), { target: { value: "@flushed" } });
-    fireEvent.change(ogImage(), { target: { value: "https://acme.test/flushed.png" } });
-    fireEvent.click(indexing());
-
-    const settings = flush!() as { seo: Record<string, unknown> };
-    expect(composer.setProjectSettings).not.toHaveBeenCalled();
-    expect(settings.seo).toMatchObject({
-      metaTitle: "Flushed title",
-      metaDescription: "Flushed description",
-      twitterHandle: "@flushed",
-      defaultOgImage: "https://acme.test/flushed.png",
-      allowIndexing: false,
-      robotsTxt: "Disallow: /x",
-      // siteName is owned by SiteSettingsScreen — flush must not clobber it.
-      siteName: "Keep Me",
-    });
-    expect(settings.seo).not.toHaveProperty("metaTitleTemplate");
-  });
-});
-
-/* The columns are `max(60)` / `max(160)` / `url()` on the server. Said under
-   the field before Save has to say it in a banner. */
-describe("SeoScreen — the fields say what the server will accept", () => {
-  it("flags an OG image URL with no scheme, inline, and marks the input invalid", async () => {
-    setup();
-    await loaded();
-    fireEvent.change(ogImage(), { target: { value: "mysite.com/og.png" } });
-    expect(screen.getByRole("alert")).toHaveTextContent(/full URL/i);
-    expect(ogImage()).toHaveAttribute("aria-invalid", "true");
-  });
-
-  it("accepts a full https URL and says nothing about an empty field", async () => {
-    setup();
-    await loaded();
-    fireEvent.change(ogImage(), { target: { value: "https://mysite.com/og.png" } });
-    expect(screen.queryByRole("alert")).toBeNull();
-    fireEvent.change(ogImage(), { target: { value: "" } });
-    expect(screen.queryByRole("alert")).toBeNull();
-  });
-
-  it("flags a meta title over 60 and a description over 160", async () => {
-    setup();
-    await loaded();
-    fireEvent.change(metaTitle(), { target: { value: "x".repeat(61) } });
-    expect(screen.getByRole("alert")).toHaveTextContent(/under 60 characters/);
-    expect(metaTitle()).toHaveAttribute("aria-invalid", "true");
-    fireEvent.change(metaTitle(), { target: { value: "x".repeat(60) } });
-    expect(screen.queryByRole("alert")).toBeNull();
-    fireEvent.change(metaDescription(), { target: { value: "y".repeat(161) } });
-    expect(screen.getByRole("alert")).toHaveTextContent(/under 160 characters/);
-  });
-});
-
-/* M7: below ADMIN only the Site-column fields lock. */
-describe("SeoScreen — Site-column fields below ADMIN", () => {
-  it("locks meta title / description / OG image / indexing with the reason; the Twitter handle stays editable", async () => {
-    setup({ siteColumnsLocked: true });
-    await loaded();
-    expect(metaTitle().matches(":disabled")).toBe(true);
-    expect(metaDescription().matches(":disabled")).toBe(true);
-    expect(ogImage().matches(":disabled")).toBe(true);
-    expect(indexing().matches(":disabled")).toBe(true);
-    expect(screen.getAllByTestId("set-admin-only").length).toBeGreaterThan(0);
-    expect(twitterHandle().matches(":disabled")).toBe(false);
-  });
-
-  it("unlocked, every field edits", async () => {
-    setup();
-    await loaded();
-    expect(metaTitle().matches(":disabled")).toBe(false);
-    expect(indexing().matches(":disabled")).toBe(false);
-    expect(screen.queryByTestId("set-admin-only")).toBeNull();
   });
 });

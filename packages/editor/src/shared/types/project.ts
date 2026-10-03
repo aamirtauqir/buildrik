@@ -387,6 +387,8 @@ export interface SiteSEO {
   twitterHandle?: string;
   /** Favicon URL */
   favicon?: string;
+  /** The site's author (General). Project JSON only — no Site column carries it. */
+  author?: string;
   /** [Site column] Apple touch icon URL */
   touchIcon?: string;
   /** Default language (e.g., "en") */
@@ -400,6 +402,9 @@ export interface SiteSEO {
     twitter?: string;
     facebook?: string;
     linkedin?: string;
+    instagram?: string;
+    youtube?: string;
+    github?: string;
   };
 }
 

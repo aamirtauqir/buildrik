@@ -2,7 +2,7 @@
  * TranslationChecklistDialog — Clone 3737:44869 "<Language> · Translation
  * checklist" (640).
  *
- * Opened from a row of the Localization screen's Locales table. `<site> ·
+ * Opened from a row of the Languages screen's Locales table. `<site> ·
  * /<code> · Draft · <n> of <total> pages` (`Live` once the locale is LIVE),
  * then one line: `Right-to-left locale. ` for the RTL set, and the pending
  * pages in site order — `Begin with Home, then Menu, Contact and Privacy.` —

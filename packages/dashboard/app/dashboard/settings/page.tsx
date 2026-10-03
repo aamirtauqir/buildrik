@@ -39,9 +39,16 @@ export default function SettingsIndexPage() {
         if (items.length === 0) return null;
         return (
           <section key={group.label}>
-            <h2 className="mb-3 text-eyebrow font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
-              {group.label}
-            </h2>
+            <div className="mb-3 flex items-baseline gap-2">
+              <h2 className="text-eyebrow font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
+                {group.label}
+              </h2>
+              {group.note ? (
+                <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
+                  · {group.note}
+                </span>
+              ) : null}
+            </div>
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {items.map((item) => (
                 <SettingsCard key={item.href} entry={item} />

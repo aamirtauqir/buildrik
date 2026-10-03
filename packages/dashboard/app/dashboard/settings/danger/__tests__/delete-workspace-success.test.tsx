@@ -31,6 +31,11 @@ vi.mock("@lib/trpc/client", () => {
       account: {
         workspace: {
           get: { useQuery: () => query({ id: "w1", name: "Acme", ownerId: "owner-1" }) },
+          transfer: {
+            pending: { useQuery: () => query(null) },
+            initiate: { useMutation: mutation },
+            cancel: { useMutation: mutation },
+          },
           delete: {
             useMutation: (opts: { onSuccess?: (data: { scheduledAt: Date }) => void }) => {
               state.onSuccess = opts.onSuccess;

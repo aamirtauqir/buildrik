@@ -225,16 +225,13 @@ describe("Shell frames", () => {
   });
 });
 
-/* Board 4418:100087: while a drawer owns search the field is a real input. */
-describe("Topbar — contextual search", () => {
-  it("renders an input with the drawer's placeholder and reports typing", async () => {
-    const { render, screen, fireEvent } = await import("@testing-library/react");
+/* Owner decision 2026-10-03: the topbar carries no search field in any state —
+   the drawer-owned field (board 4418:100087) moved into each panel. */
+describe("Topbar — no search field", () => {
+  it("renders no text input at all", async () => {
+    const { render } = await import("@testing-library/react");
     const { Topbar } = await import("../Topbar");
-    const onChange = vi.fn();
-    render(<Topbar siteName="S" contextSearch={{ placeholder: "Search elements…", value: "", onChange }} />);
-    const input = screen.getByPlaceholderText("Search elements…");
-    fireEvent.change(input, { target: { value: "but" } });
-    expect(onChange).toHaveBeenCalledWith("but");
-    expect(screen.queryByText("Search pages, layers, assets…")).toBeNull();
+    const { container } = render(<Topbar siteName="S" save="saved" tools={{ onPreview: vi.fn() }} />);
+    expect(container.querySelector("input")).toBeNull();
   });
 });

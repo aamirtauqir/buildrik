@@ -35,7 +35,7 @@ describe("Clone 3737:44855 · Add locale", () => {
     mount();
     expect(screen.getByTestId("set-loc-dialog")).toHaveClass("tw:w-[var(--bk-size-dialog-lg)]");
     expect(screen.getByTestId("set-loc-dialog-title")).toHaveTextContent("Add locale");
-    expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent("Bella Cucina · Localization");
+    expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent("Bella Cucina · Languages");
     expect(screen.getByTestId("set-loc-draft-note")).toHaveTextContent(
       "Starts as a draft. Translate every required page before this locale can be published.",
     );
@@ -147,7 +147,7 @@ describe("Clone 3737:44855 · Add locale", () => {
 
   it("drops the site prefix when no site name is known, and renders nothing while closed", () => {
     mount({ siteName: "" });
-    expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent(/^Localization$/);
+    expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent(/^Languages$/);
     mount({ open: false });
     expect(screen.getAllByTestId("set-loc-dialog")).toHaveLength(1);
   });
