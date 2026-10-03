@@ -1,11 +1,11 @@
 /**
- * DomainsScreen tests — Clone 3397:32206 Domains: the two strips, a Custom
- * domain + DNS records card pair per domain (primary first), the actions
- * that land on the server as they are confirmed (Force HTTPS → update, Check
- * DNS → check, Remove → 3397:34402 → remove → 3455:15509), the header's Add
- * domain → 3737:43669 → connect → re-list, the empty card (3397:33034), the
- * load states (3397:32985 / 3397:33085) and the banner a refused action
- * leaves (3397:33134). Never dirty.
+ * DomainsScreen tests — 8136:214348 (several) / 8136:214574 (set-primary
+ * confirm): one card per domain, primary first, with its PRIMARY badge and
+ * connection line; `Set as primary` → confirm → `domains.setPrimary` → re-list;
+ * `Manage DNS` → the domain's own view (Custom domain + DNS records cards:
+ * Force HTTPS → update, Check DNS → check, Remove → confirm → remove); `Add a
+ * domain` under the cards → AddDomainDialog → connect → re-list; the empty
+ * card, the load states and the banner a refused action leaves. Never dirty.
  *
  * @license BSD-3-Clause
  */
@@ -24,6 +24,7 @@ const { api } = vi.hoisted(() => ({
         update: { mutate: vi.fn() },
         check: { mutate: vi.fn() },
         remove: { mutate: vi.fn() },
+        setPrimary: { mutate: vi.fn() },
       },
     },
   },
@@ -43,6 +44,7 @@ const bella = (over: Partial<DomainRow> = {}): DomainRow => ({
   id: "dom1",
   domain: "bellacucina.com",
   status: "VERIFIED",
+  sslStatus: "ACTIVE",
   isPrimary: true,
   kind: "PRIMARY",
   forceHttps: true,
@@ -59,6 +61,7 @@ const shop = (): DomainRow => ({
   id: "dom2",
   domain: "shop.bellacucina.com",
   status: "PENDING",
+  sslStatus: "PENDING",
   isPrimary: false,
   kind: "SUBDOMAIN",
   forceHttps: false,
@@ -75,6 +78,7 @@ beforeEach(() => {
   );
   d.check.mutate.mockReset().mockResolvedValue(bella());
   d.remove.mutate.mockReset().mockResolvedValue({ ok: true });
+  d.setPrimary.mutate.mockReset().mockResolvedValue(bella());
 });
 
 afterEach(() => cleanup());
@@ -84,8 +88,9 @@ function setup(
     projectId?: string | null;
     onDirtyChange?: (d: boolean) => void;
     onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
-    registerHeaderAction?: (node: React.ReactNode | null) => void;
+    registerHeader?: (h: { title?: string } | null) => void;
     saveError?: string | null;
+    readOnly?: boolean;
   } = {},
 ) {
   const composer = createMockComposer({ projectMetadata: { domain: null, name: "Bella Cucina" } });
@@ -95,34 +100,59 @@ function setup(
       projectId={opts.projectId === undefined ? "s1" : opts.projectId}
       onDirtyChange={opts.onDirtyChange}
       onLoadStateChange={opts.onLoadStateChange}
-      registerHeaderAction={opts.registerHeaderAction}
+      registerHeader={opts.registerHeader}
       saveError={opts.saveError}
+      readOnly={opts.readOnly}
     />,
   );
   return { composer, ...utils };
 }
 
-const loaded = () => waitFor(() => expect(screen.getByTestId("set-dom-strip")).toBeInTheDocument());
+const loaded = () => waitFor(() => expect(screen.getByTestId("set-dom-add")).toBeInTheDocument());
 const httpsToggle = (id = "dom1") => screen.getByTestId(`set-dom-https-${id}`);
 
-/** The node the screen hands the shell's header slot, mounted where a test can click it. */
-function mountHeader(register: ReturnType<typeof vi.fn>) {
-  const node: React.ReactNode = register.mock.calls.at(-1)?.[0];
-  return render(<div data-testid="header-slot">{node}</div>);
+/** Load, then open a domain's Manage DNS view. */
+async function manage(id = "dom1") {
+  await loaded();
+  fireEvent.click(screen.getByTestId(`set-dom-manage-${id}`));
+  await waitFor(() => expect(screen.getByTestId(`set-dom-card-${id}`)).toBeInTheDocument());
 }
 
-describe("DomainsScreen — 3397:32206, the strips and one card pair per domain", () => {
-  it("draws the info strip, the amber restore strip, the Custom domain card and the DNS records card", async () => {
+describe("DomainsScreen — 8136:214348, one card per domain", () => {
+  it("lists the domains primary first: name, PRIMARY badge, connection line, Set as primary on the others, Manage DNS on each", async () => {
+    d.list.query.mockResolvedValue([{ ...shop(), status: "VERIFIED", sslStatus: "ACTIVE" }, bella()]);
     setup();
     await loaded();
-    expect(screen.getByTestId("set-dom-strip")).toHaveTextContent(
-      "Domain actions apply as soon as you confirm them. There is nothing to save on this screen.",
-    );
-    expect(screen.getByTestId("set-dom-restore")).toHaveTextContent(
-      "Restoring a site version leaves this configuration unchanged.",
-    );
-    expect(screen.getByTestId("set-dom-restore")).toHaveClass("tw:bg-[var(--bk-warning-tint)]");
+    const items = screen.getAllByTestId(/^set-dom-item-/);
+    expect(items.map((c) => c.getAttribute("data-testid"))).toEqual(["set-dom-item-dom1", "set-dom-item-dom2"]);
+    expect(items[0]).toHaveTextContent("bellacucina.com");
+    expect(screen.getByTestId("set-dom-primary-dom1")).toHaveTextContent("Primary");
+    expect(screen.getByTestId("set-dom-primary-dom1").id).toBe("dom-primary");
+    expect(screen.queryByTestId("set-dom-primary-dom2")).toBeNull();
+    expect(screen.getByTestId("set-dom-line-dom1")).toHaveTextContent("Connected · SSL active");
+    expect(screen.queryByTestId("set-dom-make-primary-dom1")).toBeNull();
+    expect(screen.getByTestId("set-dom-make-primary-dom2")).toHaveTextContent("Set as primary");
+    expect(screen.getByTestId("set-dom-manage-dom1")).toHaveTextContent("Manage DNS");
+    expect(screen.getByTestId("set-dom-manage-dom2")).toHaveTextContent("Manage DNS");
+    expect(screen.getByTestId("set-dom-add")).toHaveTextContent("Add a domain");
+    expect(screen.queryByTestId("set-dom-card-dom1")).toBeNull();
+    expect(d.list.query).toHaveBeenCalledWith({ siteId: "s1" });
+  });
 
+  it("says where a domain that is not connected stands, and keeps Set as primary off until it is verified", async () => {
+    d.list.query.mockResolvedValue([bella(), shop()]);
+    setup();
+    await loaded();
+    expect(screen.getByTestId("set-dom-line-dom2")).toHaveTextContent("Waiting for DNS · not connected yet");
+    expect(screen.getByTestId("set-dom-make-primary-dom2")).toBeDisabled();
+    expect(screen.getByTestId("set-dom-make-primary-dom2")).toHaveAttribute("title", "Verify this domain before making it primary");
+  });
+
+  it("Manage DNS opens the domain's view: the Custom domain and DNS records cards, the header naming the domain", async () => {
+    const registerHeader = vi.fn();
+    setup({ registerHeader });
+    await manage();
+    expect(registerHeader).toHaveBeenLastCalledWith({ title: "bellacucina.com" });
     const card = screen.getByTestId("set-dom-card-dom1");
     expect(within(card).getByTestId("set-card-custom-domain")).toHaveTextContent("Custom domain");
     expect(within(card).getByLabelText("Domain")).toHaveValue("bellacucina.com");
@@ -132,67 +162,97 @@ describe("DomainsScreen — 3397:32206, the strips and one card pair per domain"
     expect(screen.getByTestId("set-dom-status-dom1")).toHaveClass("tw:bg-[var(--bk-success-tint)]");
     expect(httpsToggle()).toHaveAttribute("aria-checked", "true");
     expect(httpsToggle().id).toBe("dom-force-https");
-    expect(screen.getByRole("switch", { name: "Force HTTPS" })).toBe(httpsToggle());
     expect(screen.getByTestId("set-dom-remove-dom1")).toHaveTextContent("Remove bellacucina.com…");
 
     const dns = screen.getByTestId("set-dom-dns-dom1");
-    expect(within(dns).getByTestId("set-card-dns-records")).toHaveTextContent("DNS records");
     expect(within(dns).getByRole("table").id).toBe("dom-dns-records");
     expect(within(dns).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Type", "Name", "Value", "Status"]);
-    const row0 = screen.getByTestId("set-dom-dns-row-dom1-0");
-    expect(row0).toHaveTextContent("A");
-    expect(row0).toHaveTextContent("@");
-    expect(row0).toHaveTextContent("76.76.21.21");
-    /* The pill is the element carrying the tone. */
-    expect(within(row0).getByText("VERIFIED").closest("[data-status]")).toHaveClass("tw:bg-[var(--bk-success-tint)]");
     const row2 = screen.getByTestId("set-dom-dns-row-dom1-2");
     expect(row2).toHaveTextContent("_buildrick");
     expect(within(row2).getByText("PENDING").closest("[data-status]")).toHaveClass("tw:bg-[var(--bk-yellow-100)]");
-    expect(screen.getByTestId("set-dom-check-dom1")).toHaveTextContent("Check DNS");
-    expect(d.list.query).toHaveBeenCalledWith({ siteId: "s1" });
+
+    fireEvent.click(screen.getByTestId("set-dom-back"));
+    expect(screen.getByTestId("set-dom-item-dom1")).toBeInTheDocument();
+    expect(registerHeader).toHaveBeenLastCalledWith(null);
   });
 
-  it("lists several domains primary first, one card pair each, and only the first carries the bare search ids", async () => {
+  it("a second domain's view carries the numbered ids", async () => {
     d.list.query.mockResolvedValue([shop(), bella()]);
     setup();
-    await loaded();
-    const cards = screen.getAllByTestId(/^set-dom-card-/);
-    expect(cards.map((c) => c.getAttribute("data-testid"))).toEqual(["set-dom-card-dom1", "set-dom-card-dom2"]);
-    expect(screen.getByTestId("set-card-custom-domain")).toBeInTheDocument();
+    await manage("dom2");
     expect(screen.getByTestId("set-card-custom-domain-1")).toBeInTheDocument();
-    expect(screen.getByTestId("set-card-dns-records-1")).toBeInTheDocument();
-    expect(screen.getByTestId("set-dom-status-dom2")).toHaveTextContent("PENDING");
-    expect(httpsToggle("dom2")).toHaveAttribute("aria-checked", "false");
     expect(httpsToggle("dom2").id).toBe("dom-force-https-1");
-    expect(screen.getByTestId("set-dom-dns-row-dom2-0")).toHaveTextContent("shop");
   });
 
   it("is never dirty — reports onDirtyChange(false) and nothing else", async () => {
     const onDirtyChange = vi.fn();
     setup({ onDirtyChange });
-    await loaded();
+    await manage();
     fireEvent.click(httpsToggle());
     await waitFor(() => expect(d.update.mutate).toHaveBeenCalled());
     expect(onDirtyChange).toHaveBeenCalledWith(false);
     expect(onDirtyChange).not.toHaveBeenCalledWith(true);
   });
 
-  it("registers the header's Add domain once the rows are on screen, and clears it on unmount", async () => {
-    const registerHeaderAction = vi.fn();
-    const { unmount } = setup({ registerHeaderAction });
+  it("read-only disables Add a domain and Set as primary", async () => {
+    d.list.query.mockResolvedValue([bella(), { ...shop(), status: "VERIFIED" }]);
+    setup({ readOnly: true });
     await loaded();
-    await waitFor(() => expect(registerHeaderAction.mock.calls.at(-1)?.[0]).not.toBeNull());
-    mountHeader(registerHeaderAction);
-    expect(screen.getByTestId("set-dom-add")).toHaveTextContent("Add domain");
-    unmount();
-    expect(registerHeaderAction).toHaveBeenLastCalledWith(null);
+    expect(screen.getByTestId("set-dom-add")).toBeDisabled();
+    expect(screen.getByTestId("set-dom-make-primary-dom2")).toBeDisabled();
   });
 });
+
+describe("DomainsScreen — Set as primary → 8136:214574", () => {
+  it("names the domain in the confirm; Cancel changes nothing", async () => {
+    d.list.query.mockResolvedValue([bella(), { ...shop(), status: "VERIFIED" }]);
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-dom-make-primary-dom2"));
+    expect(screen.getByTestId("set-dom-primary-title")).toHaveTextContent("Set shop.bellacucina.com as primary?");
+    expect(screen.getByTestId("set-dom-primary-body")).toHaveTextContent(
+      "shop.bellacucina.com becomes the address visitors land on. This change is live immediately; no publish is needed.",
+    );
+    fireEvent.click(screen.getByTestId("set-dom-primary-cancel"));
+    expect(screen.queryByTestId("set-dom-primary-confirm")).toBeNull();
+    expect(d.setPrimary.mutate).not.toHaveBeenCalled();
+  });
+
+  it("confirm runs domains.setPrimary and the badge moves with the re-list", async () => {
+    d.list.query.mockResolvedValue([bella(), { ...shop(), status: "VERIFIED" }]);
+    d.setPrimary.mutate.mockImplementation(async () => {
+      d.list.query.mockResolvedValue([{ ...shop(), status: "VERIFIED", isPrimary: true }, bella({ isPrimary: false })]);
+      return {};
+    });
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-dom-make-primary-dom2"));
+    fireEvent.click(screen.getByTestId("set-dom-primary-ok"));
+    await waitFor(() => expect(d.setPrimary.mutate).toHaveBeenCalledWith({ id: "dom2", siteId: "s1" }));
+    await waitFor(() => expect(screen.getByTestId("set-dom-primary-dom2")).toBeInTheDocument());
+    expect(screen.queryByTestId("set-dom-primary-dom1")).toBeNull();
+    expect(screen.queryByTestId("set-dom-primary-confirm")).toBeNull();
+  });
+
+  it("a refusal stays in the dialog with the server's sentence", async () => {
+    d.list.query.mockResolvedValue([bella(), { ...shop(), status: "VERIFIED" }]);
+    d.setPrimary.mutate.mockRejectedValue(new Error("Verify this domain before making it primary."));
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-dom-make-primary-dom2"));
+    fireEvent.click(screen.getByTestId("set-dom-primary-ok"));
+    await waitFor(() =>
+      expect(screen.getByTestId("set-dom-primary-error")).toHaveTextContent("Verify this domain before making it primary."),
+    );
+    expect(screen.getByTestId("set-dom-primary-confirm")).toBeInTheDocument();
+  });
+});
+
 
 describe("DomainsScreen — actions land as they are confirmed", () => {
   it("Force HTTPS writes domains.update at once and shows the row the server returns", async () => {
     setup();
-    await loaded();
+    await manage();
     fireEvent.click(httpsToggle());
     await waitFor(() => expect(d.update.mutate).toHaveBeenCalledWith({ id: "dom1", forceHttps: false }));
     await waitFor(() => expect(httpsToggle()).toHaveAttribute("aria-checked", "false"));
@@ -202,7 +262,7 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
   it("a refused toggle shows the banner and leaves the switch as the server has it", async () => {
     d.update.mutate.mockRejectedValue(new Error("FORBIDDEN"));
     setup();
-    await loaded();
+    await manage();
     fireEvent.click(httpsToggle());
     await waitFor(() => expect(screen.getByTestId("set-save-error")).toHaveTextContent(SAVE_ERROR_MESSAGES.domains!));
     expect(httpsToggle()).toHaveAttribute("aria-checked", "true");
@@ -215,7 +275,7 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
       return bella();
     });
     setup();
-    await loaded();
+    await manage();
     fireEvent.click(screen.getByTestId("set-dom-check-dom1"));
     expect(screen.getByTestId("set-dom-check-dom1")).toHaveTextContent("Checking…");
     expect(screen.getByTestId("set-dom-check-dom1")).toBeDisabled();
@@ -230,7 +290,7 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
   it("a check that fails shows the banner and keeps the previous pills", async () => {
     d.check.mutate.mockRejectedValue(new Error("network"));
     setup();
-    await loaded();
+    await manage();
     fireEvent.click(screen.getByTestId("set-dom-check-dom1"));
     await waitFor(() => expect(screen.getByTestId("set-save-error")).toBeInTheDocument());
     expect(within(screen.getByTestId("set-dom-dns-row-dom1-2")).getByText("PENDING")).toBeInTheDocument();
@@ -240,7 +300,7 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
   it("the next action that succeeds takes the banner down", async () => {
     d.update.mutate.mockRejectedValueOnce(new Error("FORBIDDEN"));
     setup();
-    await loaded();
+    await manage();
     fireEvent.click(httpsToggle());
     await waitFor(() => expect(screen.getByTestId("set-save-error")).toBeInTheDocument());
     fireEvent.click(httpsToggle());
@@ -248,17 +308,17 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
     expect(screen.queryByTestId("set-save-error")).toBeNull();
   });
 
-  it("renders the shell's saveError above the strips too", async () => {
+  it("renders the shell's saveError above the cards", async () => {
     setup({ saveError: "Domain changes were not saved. Your changes are still here. Review the values, then retry." });
     await loaded();
     expect(screen.getByTestId("set-save-error")).toHaveTextContent(/Domain changes were not saved/);
   });
 });
 
-describe("DomainsScreen — Remove → 3397:34402 → 3455:15509", () => {
+describe("DomainsScreen — Manage DNS › Remove → confirm → removed", () => {
   it("Remove opens the confirm with the domain in its title and body; Cancel removes nothing", async () => {
     setup();
-    await loaded();
+    await manage();
     fireEvent.click(screen.getByTestId("set-dom-remove-dom1"));
     const dialog = screen.getByTestId("set-dom-confirm");
     expect(within(dialog).getByTestId("set-dom-confirm-title")).toHaveTextContent("Remove bellacucina.com?");
@@ -276,9 +336,8 @@ describe("DomainsScreen — Remove → 3397:34402 → 3455:15509", () => {
       d.list.query.mockResolvedValue([]);
       return { ok: true };
     });
-    const registerHeaderAction = vi.fn();
-    setup({ registerHeaderAction });
-    await loaded();
+    setup();
+    await manage();
     fireEvent.click(screen.getByTestId("set-dom-remove-dom1"));
     fireEvent.click(screen.getByTestId("set-dom-confirm-remove"));
     await waitFor(() => expect(d.remove.mutate).toHaveBeenCalledWith({ id: "dom1" }));
@@ -288,15 +347,13 @@ describe("DomainsScreen — Remove → 3397:34402 → 3455:15509", () => {
       "bellacucina.com removed. This site is still available at its buildrick.app address.",
     );
     expect(screen.queryByTestId("set-dom-card-dom1")).toBeNull();
-    /* The header's Add domain steps aside for the empty card's own. */
-    expect(registerHeaderAction).toHaveBeenLastCalledWith(null);
     expect(screen.getByTestId("set-dom-add")).toBeInTheDocument();
   });
 
   it("a refused remove closes the confirm and shows the banner over the untouched card", async () => {
     d.remove.mutate.mockRejectedValue(new Error("FORBIDDEN"));
     setup();
-    await loaded();
+    await manage();
     fireEvent.click(screen.getByTestId("set-dom-remove-dom1"));
     fireEvent.click(screen.getByTestId("set-dom-confirm-remove"));
     await waitFor(() => expect(screen.getByTestId("set-save-error")).toBeInTheDocument());
@@ -306,18 +363,16 @@ describe("DomainsScreen — Remove → 3397:34402 → 3455:15509", () => {
 });
 
 describe("DomainsScreen — empty (3397:33034), loading (3397:32985), load-error (3397:33085)", () => {
-  it("with no domains draws the one CUSTOM DOMAIN card with its Add domain, and registers no header action", async () => {
+  it("with no domains draws the one CUSTOM DOMAIN card with its Add a domain", async () => {
     d.list.query.mockResolvedValue([]);
-    const registerHeaderAction = vi.fn();
-    setup({ registerHeaderAction });
+    setup();
     await loaded();
     const empty = screen.getByTestId("set-dom-empty");
     expect(empty).toHaveTextContent("Custom domain");
     expect(empty).toHaveTextContent("Point your own domain at this site. DNS changes happen at your domain registrar.");
     expect(empty).toHaveTextContent("No custom domain. Using the free buildrick.app address until you connect one.");
     expect(screen.queryByTestId("set-dom-removed")).toBeNull();
-    expect(within(empty).getByTestId("set-dom-add")).toHaveClass("tw:h-8");
-    expect(registerHeaderAction).not.toHaveBeenCalledWith(expect.objectContaining({ type: expect.anything() }));
+    expect(within(empty).getByTestId("set-dom-add")).toHaveTextContent("Add a domain");
     fireEvent.click(within(empty).getByTestId("set-dom-add"));
     expect(screen.getByTestId("set-dom-dialog")).toBeInTheDocument();
   });
@@ -359,16 +414,13 @@ describe("DomainsScreen — empty (3397:33034), loading (3397:32985), load-error
   });
 });
 
-describe("DomainsScreen — Add domain → 3737:43669 → connect → re-list", () => {
+describe("DomainsScreen — Add a domain → 3737:43669 → connect → re-list", () => {
   beforeEach(() => vi.useFakeTimers({ shouldAdvanceTime: true }));
   afterEach(() => vi.useRealTimers());
 
-  it("the header's Add domain opens the dialog; a valid, available name connects with the site id and the form's choices, then the new row is listed", async () => {
-    const registerHeaderAction = vi.fn();
-    setup({ registerHeaderAction });
+  it("Add a domain opens the dialog; a valid, available name connects with the site id and the form's choices, then the new row is listed", async () => {
+    setup();
     await loaded();
-    await waitFor(() => expect(registerHeaderAction.mock.calls.at(-1)?.[0]).not.toBeNull());
-    mountHeader(registerHeaderAction);
     fireEvent.click(screen.getByTestId("set-dom-add"));
     const dialog = screen.getByTestId("set-dom-dialog");
     expect(within(dialog).getByTestId("set-dom-dialog-scope")).toHaveTextContent("Bella Cucina · Domains");
@@ -397,17 +449,14 @@ describe("DomainsScreen — Add domain → 3737:43669 → connect → re-list", 
       }),
     );
     await waitFor(() => expect(screen.queryByTestId("set-dom-dialog")).toBeNull());
-    await waitFor(() => expect(screen.getByTestId("set-dom-status-dom9")).toHaveTextContent("PENDING"));
+    await waitFor(() => expect(screen.getByTestId("set-dom-line-dom9")).toHaveTextContent("Waiting for DNS"));
     expect(d.list.query).toHaveBeenCalledTimes(2);
   });
 
   it("a refused connect keeps the dialog open with the server's reason under the form", async () => {
     d.connect.mutate.mockRejectedValue(new Error("Domain already in use."));
-    const registerHeaderAction = vi.fn();
-    setup({ registerHeaderAction });
+    setup();
     await loaded();
-    await waitFor(() => expect(registerHeaderAction.mock.calls.at(-1)?.[0]).not.toBeNull());
-    mountHeader(registerHeaderAction);
     fireEvent.click(screen.getByTestId("set-dom-add"));
     fireEvent.change(screen.getByTestId("set-dom-name"), { target: { value: "taken.example" } });
     await act(async () => { await vi.advanceTimersByTimeAsync(300); });

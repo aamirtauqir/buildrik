@@ -187,6 +187,10 @@ export const EVENTS = {
      instance — this tells the shell so it can toast why the selection count
      shrank instead of doing nothing silently. */
   LOCKED_ELEMENTS_SKIPPED: "clipboard:locked-elements-skipped",
+  /** `copy-style` put the selected element's styles on the style clipboard — payload { count }. */
+  STYLES_COPIED: "clipboard:styles-copied",
+  /** `paste-style` merged the style clipboard onto the element — payload { count }. */
+  STYLES_PASTED: "clipboard:styles-pasted",
 
   // ============================================
   // Data Binding Events
@@ -348,7 +352,8 @@ export const EVENTS = {
   /** Add opens its Paste HTML dialog (held until the panel mounts). */
   UI_INSERT_OPEN_PASTE_HTML: "ui:insert-open-paste-html",
   /** "Edit master ›" on an instance: the Components panel opens that
-   *  master's screen. Payload `{ componentId }`. */
+   *  master's screen. Payload `{ componentId, instanceId? }` — with the
+   *  instance, the master's "‹ Back to instance" re-selects it (§13). */
   UI_COMPONENTS_OPEN_MASTER: "ui:components-open-master",
   /** A click on the empty grey around the page (not an element, not chrome):
    *  the canvas clears the selection and the shell closes the Layers drawer. */
@@ -360,14 +365,13 @@ export const EVENTS = {
    *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
    *  other way to reach a collapsed section. */
   UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
-  /** A drawer asks the topbar field to search it — payload { placeholder } | null (board 4418:100087). */
-  UI_SEARCH_CONTEXT: "ui:search-context",
+  /** ⋯ "Apply style to all … on this page" asks the Inspector for its
+   *  confirm dialog (DD-6b, board 31) — payload { elementId }. */
+  UI_APPLY_STYLE_REQUESTED: "ui:apply-style-requested",
   /** A full-canvas view names itself in the topbar's page crumb — payload
    *  { label } | null ("<site> › CMS" while the CMS workspace is open,
    *  4428:140486); null gives the crumb back to the active page. */
   UI_CRUMB_CONTEXT: "ui:crumb-context",
-  /** The topbar field's query while a drawer owns it — payload { query }. */
-  UI_SEARCH_QUERY: "ui:search-query",
   /** Start inline text editing on the canvas — payload { elementId } (G2-027). */
   UI_INLINE_EDIT_REQUEST: "ui:inline-edit-request",
   /** Toggle the one keyboard sheet (StudioModals). `?` and ⌘/ flip the same
@@ -975,10 +979,7 @@ export interface EventPayloads {
   [EVENTS.UI_OPEN_PERMISSIONS]: void;
   [EVENTS.UI_TIME_TRAVEL_TOGGLE]: void;
   [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
-  /** `query` pre-fills the field (a drawer re-announcing its live query). */
-  [EVENTS.UI_SEARCH_CONTEXT]: { placeholder: string; query?: string } | null;
   [EVENTS.UI_CRUMB_CONTEXT]: { label: string } | null;
-  [EVENTS.UI_SEARCH_QUERY]: { query: string };
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.BRAND_CHECKS_RUN]: void;

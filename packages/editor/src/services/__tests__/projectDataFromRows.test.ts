@@ -134,15 +134,51 @@ describe("projectDataFromRows → renderProjectPages", () => {
   });
 
   /* A binding whose collection is not in the rows (deleted since) resolves to
-     nothing and keeps the stored text — the snapshot is the whole store, the
-     visitor's own browser CMS cache is never read. */
-  it("keeps the stored text for a binding the rows cannot resolve", async () => {
+     nothing — the snapshot is the whole store, the visitor's own browser CMS
+     cache is never read. C0.7 / BD-03: nothing is written as nothing; the
+     stored text is the canvas sample, or content since withdrawn. */
+  it("writes nothing for a binding the rows cannot resolve, never the stored text", async () => {
     const cmsBindings = {
       field: { h: [{ binding: { sourceId: "cms:gone", path: "title", type: "variable" }, collectionId: "gone", fieldSlug: "title", property: "content" }] },
     };
     const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "Stored") };
     const project = projectDataFromRows({ name: "Bella", projectCmsBindings: cmsBindings }, [page], null);
     const [out] = await renderProjectPages(project, [], cmsFromRows({ collections: [], entries: [] }));
-    expect(out.html).toContain("Stored");
+    expect(out.html).not.toContain("Stored");
+    expect(out.html).toMatch(/data-buildrick-id="h"[^>]*><\/h2>/);
+  });
+
+  /* SA-01 manual check, as a test: a site whose title template (and default
+     OG image) only ever reached the project JSON. The editor now reads these
+     from the columns alone, so the migration's backfill is what keeps the
+     exported <title> as it was — the post-backfill row renders it unchanged. */
+  it("exports a JSON-only title template once the backfill has copied it to its column", async () => {
+    const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "Hi") };
+    const projectSettings = {
+      seo: { metaTitleTemplate: "{page_title} — Bella", defaultOgImage: "https://cdn.example.test/og.png" },
+    };
+    const render = async (columns: Record<string, unknown>) =>
+      (await renderProjectPages(projectDataFromRows({ name: "Bella", projectSettings }, [page], columns)))[0].html;
+
+    const before = await render({ name: "Bella", metaTitleTemplate: null, ogImage: null });
+    expect(before).toContain("<title>Home</title>");
+
+    const after = await render({
+      name: "Bella",
+      metaTitleTemplate: "{page_title} — Bella",
+      ogImage: "https://cdn.example.test/og.png",
+    });
+    expect(after).toContain("<title>Home — Bella</title>");
+    expect(after).toContain('content="https://cdn.example.test/og.png"');
+  });
+
+  /* The /share rows carry Site.name on the site row, not among the columns;
+     it is the same column, so it still names the site once the JSON copy of
+     seo.siteName is no longer read. */
+  it("takes seo.siteName from the site row's name when the columns do not carry it", () => {
+    const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "Hi") };
+    const rows = { name: "Bella", projectSettings: { seo: { siteName: "Stale JSON name" } } };
+    expect(projectDataFromRows(rows, [page], { defaultLocale: "en" }).settings?.seo?.siteName).toBe("Bella");
+    expect(projectDataFromRows(rows, [page], null).settings?.seo?.siteName).toBe("Bella");
   });
 });

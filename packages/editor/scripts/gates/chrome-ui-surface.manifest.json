@@ -15,6 +15,9 @@
     "Breakpoint": "local",
     "BreakpointSwitcher": "local",
     "BreakpointSwitcherProps": "local",
+    "Breadcrumb": "local",
+    "BreadcrumbItem": "local",
+    "BreadcrumbProps": "local",
     "Button": "wrapper",
     "ButtonProps": "wrapper",
     "ButtonVariant": "wrapper",
@@ -187,7 +190,6 @@
     "ToolbarSpacer": "local",
     "Tooltip": "local",
     "TooltipProps": "local",
-    "TOPBAR_CONTEXT_SEARCH_ID": "local",
     "Topbar": "local",
     "TopbarProps": "local",
     "TopbarTools": "local",
@@ -206,6 +208,10 @@
     "plural": "local",
     "toneFor": "local",
     "useFocusTrap": "local",
-    "useToast": "local"
+    "useToast": "local",
+    "PANEL_SEARCH_ATTR": "local",
+    "PanelSearch": "local",
+    "PanelSearchProps": "local",
+    "isPanelSearchInput": "local"
   }
 }

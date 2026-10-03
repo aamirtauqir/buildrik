@@ -1,15 +1,13 @@
 /**
- * RedirectsScreen tests — Clone 3397:32517 Redirects: the amber strip, the
- * Redirects table with an Edit per row → 4254:75747, the header's Add
- * redirect → 4254:75736 → create → re-list, the empty card (3397:33526),
- * the 404 suggester (the composer-backed switch the footer saves, the rows
- * with Accept → a 301 at once), the load states (3397:33479 / 3397:33573),
- * the banner a refused Accept leaves (3951:26730), and the Pages door's URL
- * repair draft → saved (3519:19920 → 3519:20096).
- *
- * The tRPC api client is lazily created inside the screen (module-level
- * singleton), so we mock `@/services/api-client` to return a stable fake
- * whose nested query/mutate fns we reconfigure per test.
+ * RedirectsScreen tests — 8136:214826 csv-actions: the header's Import CSV ·
+ * Export CSV · Add redirect, the Redirect rules table FROM · TO · TYPE with
+ * `Edit · Delete` per row (Delete at once → the toast's Undo, 8136:215838),
+ * Import → RedirectCsvDialog → `import_csv` → "Created N" (8136:215568), a
+ * refused file inline (8136:215307), Export → `export_csv`; the empty card,
+ * the 404 suggester (the switch applies at once through
+ * `siteDetail.projectSettings.update`; Accept → a 301 at once), the load
+ * states, the banner a refused action leaves, and the Pages door's URL repair
+ * draft → saved (3519:19920 → 3519:20096).
  *
  * @license BSD-3-Clause
  */
@@ -28,13 +26,22 @@ const { api } = vi.hoisted(() => ({
         create: { mutate: vi.fn() },
         update: { mutate: vi.fn() },
         delete: { mutate: vi.fn() },
+        import_csv: { mutate: vi.fn() },
+        export_csv: { query: vi.fn() },
       },
     },
   },
 }));
 
+const { addToast, updateProjectSettings } = vi.hoisted(() => ({ addToast: vi.fn(), updateProjectSettings: vi.fn() }));
+
 vi.mock("@/services/api-client", () => ({
   getBuildrikClient: () => api,
+}));
+vi.mock("@/services/BuildrikSyncProvider", () => ({ updateProjectSettings }));
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
+  useToast: () => ({ addToast, removeToast: vi.fn() }),
 }));
 
 import { RedirectsScreen, renamedDay, type RedirectRow } from "../RedirectsScreen";
@@ -64,6 +71,10 @@ beforeEach(() => {
   r.create.mutate.mockReset().mockImplementation(async (input: Omit<RedirectRow, "id" | "createdAt">) => row("r9", input.fromPath, input.toUrl, input));
   r.update.mutate.mockReset().mockResolvedValue(SEEDED[0]);
   r.delete.mutate.mockReset().mockResolvedValue({ ok: true });
+  r.import_csv.mutate.mockReset().mockResolvedValue({ created: 12 });
+  r.export_csv.query.mockReset().mockResolvedValue({ csv: "from,to,type\n/a,/b,301" });
+  addToast.mockReset();
+  updateProjectSettings.mockReset().mockResolvedValue({ saved: { redirects: { suggestFrom404s: false } }, warnings: {} });
 });
 
 afterEach(() => cleanup());
@@ -73,7 +84,6 @@ interface SetupOpts {
   projectSettings?: Record<string, unknown>;
   onDirtyChange?: (d: boolean) => void;
   onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
-  registerFlushHandler?: (h: (() => void) | null) => void;
   registerHeaderAction?: (node: React.ReactNode | null) => void;
   saveError?: string | null;
   repair?: { pageId: string; pageName: string; from: string; to: string } | null;
@@ -90,7 +100,6 @@ function setup(opts: SetupOpts = {}) {
     projectId: opts.projectId === undefined ? "s1" : opts.projectId,
     onDirtyChange: opts.onDirtyChange,
     onLoadStateChange: opts.onLoadStateChange,
-    registerFlushHandler: opts.registerFlushHandler,
     registerHeaderAction: opts.registerHeaderAction,
     saveError: opts.saveError,
     repair: opts.repair,
@@ -100,7 +109,7 @@ function setup(opts: SetupOpts = {}) {
   return { composer, props, ...utils };
 }
 
-const loaded = () => waitFor(() => expect(screen.getByTestId("set-rd-restore")).toBeInTheDocument());
+const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-redirect-rules")).toBeInTheDocument());
 const cell = (id: string) => within(screen.getByTestId(`set-rd-row-${id}`)).getAllByRole("cell").map((c) => c.textContent);
 const dialog = () => screen.getByTestId("set-rd-dialog");
 
@@ -159,21 +168,17 @@ describe("RedirectsScreen — gating + the load states (3397:33479 / 3397:33573)
   });
 });
 
-describe("Clone 3397:32517 — the strip, the Redirects card, the 404 suggester", () => {
-  it("draws the amber strip, the table FROM PATH · TO URL · TYPE with an Edit per row, and the suggester", async () => {
+describe("8136:214826 — the Redirect rules card and the 404 suggester", () => {
+  it("draws the table FROM · TO · TYPE with Edit · Delete per row, and the suggester", async () => {
     setup();
     await loaded();
-    expect(screen.getByTestId("set-rd-restore")).toHaveTextContent("Restoring a site version leaves this configuration unchanged.");
-
-    expect(screen.getByTestId("set-card-redirects")).toBeInTheDocument();
-    expect(screen.getByTestId("set-card-title-redirects")).toHaveTextContent("Redirects");
+    expect(screen.queryByTestId("set-rd-restore")).toBeNull();
+    expect(screen.getByTestId("set-card-title-redirect-rules")).toHaveTextContent("Redirect rules");
     const table = screen.getByTestId("set-rd-table");
     expect(table).toHaveAttribute("id", "rd-rules");
-    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["From path", "To URL", "Type", "Actions"]);
-    expect(cell("r1")).toEqual(["/menu-old", "/menu", "301", "Edit"]);
-    expect(cell("r2")).toEqual(["/book", "/reservations", "301", "Edit"]);
-    expect(cell("r3")).toEqual(["/promo-eid", "https://bellacucina.com/offers", "302", "Edit"]);
-    expect(screen.getByTestId("set-rd-edit-r1")).toHaveClass("tw:h-7");
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["From", "To", "Type", "Actions"]);
+    expect(cell("r1")).toEqual(["/menu-old", "/menu", "301", "Edit·Delete"]);
+    expect(cell("r3")).toEqual(["/promo-eid", "https://bellacucina.com/offers", "302", "Edit·Delete"]);
     expect(screen.queryByTestId("set-rd-empty")).toBeNull();
 
     expect(screen.getByTestId("set-card-title-404-suggester")).toHaveTextContent("404 suggester");
@@ -183,24 +188,28 @@ describe("Clone 3397:32517 — the strip, the Redirects card, the 404 suggester"
     expect(toggle).toHaveAttribute("aria-checked", "true");
     expect(screen.getByTestId("set-rd-suggestion-0")).toHaveTextContent("/pizza-menu → /menu renamed 12 Sep");
     expect(screen.getByTestId("set-rd-suggestion-1")).toHaveTextContent("/contact-us → /contact renamed 3 Aug");
-    expect(screen.getByTestId("set-rd-accept-0")).toHaveTextContent("Accept");
-    expect(screen.queryByTestId("set-rd-suggest-empty")).toBeNull();
     expect(screen.queryByTestId("set-save-error")).toBeNull();
   });
 
-  it("no redirects → the card's own line and Add redirect (3397:33526), and the header carries none", async () => {
+  it("no redirects → the card's own line and Add redirect; the header keeps Import, Export is off", async () => {
     r.list.query.mockResolvedValue([]);
     const registerHeaderAction = vi.fn();
     setup({ registerHeaderAction });
     await loaded();
     const empty = screen.getByTestId("set-rd-empty");
-    expect(empty).toHaveTextContent("No redirects yet. Add one to send an old URL to a new one.");
-    expect(within(empty).getByTestId("set-rd-add")).toHaveTextContent("Add redirect");
+    expect(empty).toHaveTextContent("No redirects yet. Add one to send an old URL to a new one, or import a CSV.");
     expect(screen.queryByTestId("set-rd-table")).toBeNull();
-    expect(registerHeaderAction).toHaveBeenLastCalledWith(null);
-
     fireEvent.click(within(empty).getByTestId("set-rd-add"));
     expect(dialog()).toHaveAttribute("data-mode", "add");
+    cleanup();
+    r.list.query.mockResolvedValue([]);
+    setup({ registerHeaderAction });
+    await loaded();
+    mountHeader(registerHeaderAction);
+    const slot = screen.getByTestId("header-slot");
+    expect(within(slot).getByTestId("set-rd-import")).toBeEnabled();
+    expect(within(slot).getByTestId("set-rd-export")).toBeDisabled();
+    expect(within(slot).queryByTestId("set-rd-add")).toBeNull();
   });
 
   it("no suggestions → the empty line", async () => {
@@ -208,18 +217,6 @@ describe("Clone 3397:32517 — the strip, the Redirects card, the 404 suggester"
     setup();
     await loaded();
     expect(screen.getByTestId("set-rd-suggest-empty")).toHaveTextContent("No suggestions — every renamed page already has a redirect.");
-    expect(screen.queryByTestId("set-rd-suggestion-0")).toBeNull();
-  });
-
-  it("the toggle off hides the rows (and the empty line); on brings them back", async () => {
-    setup();
-    await loaded();
-    fireEvent.click(screen.getByTestId("set-rd-suggest-toggle"));
-    expect(screen.getByTestId("set-rd-suggest-toggle")).toHaveAttribute("aria-checked", "false");
-    expect(screen.queryByTestId("set-rd-suggestion-0")).toBeNull();
-    expect(screen.queryByTestId("set-rd-suggest-empty")).toBeNull();
-    fireEvent.click(screen.getByTestId("set-rd-suggest-toggle"));
-    expect(screen.getByTestId("set-rd-suggestion-0")).toBeInTheDocument();
   });
 
   it("renamedDay is `d MMM`, locale-free, and null for junk", () => {
@@ -235,16 +232,30 @@ describe("Clone 3397:32517 — the strip, the Redirects card, the 404 suggester"
   });
 });
 
-describe("the suggester switch — projectSettings.redirects.suggestFrom404s, saved by the shell", () => {
-  it("reads the composer's value (absent = on) and reports dirty only once the switch differs from it", async () => {
+describe("the suggester switch — applies at once (SA-16)", () => {
+  it("is never dirty; flipping writes projectSettings.redirects through the settings mutation and the composer adopts it", async () => {
     const onDirtyChange = vi.fn();
-    setup({ onDirtyChange });
+    const { composer } = setup({ onDirtyChange, projectSettings: { seo: { metaTitle: "Bella" } } });
+    const adopt = vi.fn();
+    Object.assign(composer, { adoptSavedProjectSettings: adopt });
     await loaded();
-    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
     fireEvent.click(screen.getByTestId("set-rd-suggest-toggle"));
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
+    expect(screen.getByTestId("set-rd-suggest-toggle")).toHaveAttribute("aria-checked", "false");
+    expect(screen.queryByTestId("set-rd-suggestion-0")).toBeNull();
+    await waitFor(() => expect(updateProjectSettings).toHaveBeenCalledWith("s1", { redirects: { suggestFrom404s: false } }));
+    await waitFor(() =>
+      expect(adopt).toHaveBeenCalledWith({ seo: { metaTitle: "Bella" }, redirects: { suggestFrom404s: false } }),
+    );
+    expect(onDirtyChange).not.toHaveBeenCalledWith(true);
+  });
+
+  it("a refused write flips the switch back and shows the banner", async () => {
+    updateProjectSettings.mockRejectedValue(new Error("FORBIDDEN"));
+    setup();
+    await loaded();
     fireEvent.click(screen.getByTestId("set-rd-suggest-toggle"));
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
+    await waitFor(() => expect(screen.getByTestId("set-save-error")).toHaveTextContent(SAVE_ERROR_MESSAGES.redirects!));
+    expect(screen.getByTestId("set-rd-suggest-toggle")).toHaveAttribute("aria-checked", "true");
   });
 
   it("starts off when the composer says off", async () => {
@@ -253,41 +264,159 @@ describe("the suggester switch — projectSettings.redirects.suggestFrom404s, sa
     expect(screen.getByTestId("set-rd-suggest-toggle")).toHaveAttribute("aria-checked", "false");
     expect(screen.queryByTestId("set-rd-suggestion-0")).toBeNull();
   });
+});
 
-  it("the flush handler writes the switch into projectSettings.redirects, keeping the rest, and the screen is clean after", async () => {
-    const registerFlushHandler = vi.fn();
-    const onDirtyChange = vi.fn();
-    const { composer } = setup({ registerFlushHandler, onDirtyChange, projectSettings: { seo: { metaTitle: "Bella" } } });
+describe("Delete → the undo toast (8136:215838)", () => {
+  it("deletes at once, the row leaves, and the toast names the rule with Undo", async () => {
+    setup();
     await loaded();
-    expect(registerFlushHandler).toHaveBeenCalledWith(expect.any(Function));
-    fireEvent.click(screen.getByTestId("set-rd-suggest-toggle"));
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
-
-    const flush = registerFlushHandler.mock.calls.at(-1)?.[0] as () => void;
-    act(() => flush());
-    expect(composer.setProjectSettings).toHaveBeenCalledWith({ seo: { metaTitle: "Bella" }, redirects: { suggestFrom404s: false } });
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
-    // a second flip after the save is dirty again
-    fireEvent.click(screen.getByTestId("set-rd-suggest-toggle"));
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
+    r.list.query.mockResolvedValue(SEEDED.filter((x) => x.id !== "r1"));
+    fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
+    await waitFor(() => expect(r.delete.mutate).toHaveBeenCalledWith({ id: "r1" }));
+    await waitFor(() => expect(screen.queryByTestId("set-rd-row-r1")).toBeNull());
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Redirect /menu-old → /menu deleted",
+        description: "You can undo this deletion.",
+        action: expect.objectContaining({ label: "Undo" }),
+      }),
+    );
   });
 
-  it("clears the flush handler on unmount", async () => {
-    const registerFlushHandler = vi.fn();
-    const { unmount } = setup({ registerFlushHandler });
+  it("Undo creates the same rule again and re-lists", async () => {
+    setup();
     await loaded();
-    unmount();
-    expect(registerFlushHandler).toHaveBeenLastCalledWith(null);
+    fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
+    await waitFor(() => expect(addToast).toHaveBeenCalled());
+    r.list.query.mockResolvedValue(SEEDED);
+    await act(async () => addToast.mock.calls[0][0].action.onClick());
+    await waitFor(() =>
+      expect(r.create.mutate).toHaveBeenCalledWith({
+        siteId: "s1",
+        fromPath: "/menu-old",
+        toUrl: "/menu",
+        type: "301",
+        matchQuery: true,
+        notes: "Old menu page retired in March — keep printed QR links working.",
+      }),
+    );
+    await waitFor(() => expect(screen.getByTestId("set-rd-row-r1")).toBeInTheDocument());
+  });
+
+  it("a refused delete shows the banner and keeps the row, with no toast", async () => {
+    r.delete.mutate.mockRejectedValue(new Error("FORBIDDEN"));
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-rd-delete-r2"));
+    await waitFor(() => expect(screen.getByTestId("set-save-error")).toBeInTheDocument());
+    expect(screen.getByTestId("set-rd-row-r2")).toBeInTheDocument();
+    expect(addToast).not.toHaveBeenCalled();
+  });
+});
+
+describe("CSV — Import (8136:215047 / 215307 / 215568) and Export", () => {
+  const file = (text: string, name = "redirects.csv") => new File([text], name, { type: "text/csv" });
+
+  async function openImport() {
+    const registerHeaderAction = vi.fn();
+    setup({ registerHeaderAction });
+    await loaded();
+    mountHeader(registerHeaderAction);
+    fireEvent.click(within(screen.getByTestId("header-slot")).getByTestId("set-rd-import"));
+    expect(screen.getByTestId("set-rd-csv")).toBeInTheDocument();
+  }
+
+  it("the dialog asks for a file; Import stays off until one is chosen", async () => {
+    await openImport();
+    expect(screen.getByTestId("set-rd-csv")).toHaveTextContent("Choose a CSV file with up to 1000 rows.");
+    expect(screen.getByTestId("set-rd-csv")).toHaveTextContent("Format: /from,to[,301|302]");
+    expect(screen.getByTestId("set-rd-csv-choose")).toHaveTextContent("Choose CSV file");
+    expect(screen.getByTestId("set-rd-csv-import")).toBeDisabled();
+  });
+
+  it("imports the file (header added when the file has none), closes, toasts Created N and re-lists", async () => {
+    await openImport();
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("/a,/b\n/c,/d,302")] } });
+    expect(screen.getByTestId("set-rd-csv-choose")).toHaveTextContent("redirects.csv");
+    fireEvent.click(screen.getByTestId("set-rd-csv-import"));
+    await waitFor(() => expect(r.import_csv.mutate).toHaveBeenCalledWith({ siteId: "s1", csv: "from,to,type\n/a,/b\n/c,/d,302" }));
+    await waitFor(() => expect(screen.queryByTestId("set-rd-csv")).toBeNull());
+    expect(addToast).toHaveBeenCalledWith({ title: "Created 12", description: "12 redirect rules were imported." });
+    expect(r.list.query).toHaveBeenCalledTimes(2);
+  });
+
+  /** A tRPC refusal as the client sees it: the server's sentence and its 4xx. */
+  const refusal = (message: string) => Object.assign(new Error(message), { data: { code: "BAD_REQUEST", httpStatus: 400 } });
+
+  it("a refused file stays open with the server's line and reason in red, and nothing re-lists (8136:215307)", async () => {
+    r.import_csv.mutate.mockRejectedValue(refusal("Line 4: Destination is required — nothing imported"));
+    await openImport();
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/a,/b\n/c,/d\n/x,")] } });
+    fireEvent.click(screen.getByTestId("set-rd-csv-import"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toHaveTextContent("Line 4: Destination is required — nothing imported"));
+    expect(screen.getByTestId("set-rd-csv")).toBeInTheDocument();
+    expect(r.list.query).toHaveBeenCalledTimes(1);
+  });
+
+  it("after a refusal Import CSV stays off until another file is chosen", async () => {
+    r.import_csv.mutate.mockRejectedValue(refusal("Line 2: Destination is required — nothing imported"));
+    await openImport();
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/x,")] } });
+    fireEvent.click(screen.getByTestId("set-rd-csv-import"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toBeInTheDocument());
+    expect((screen.getByTestId("set-rd-csv-import") as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/x,/y")] } });
+    expect(screen.queryByTestId("set-rd-csv-error")).toBeNull();
+    expect((screen.getByTestId("set-rd-csv-import") as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("a failure that is not a refusal (no answer) leaves Import CSV on to retry", async () => {
+    r.import_csv.mutate.mockRejectedValue(new Error("Failed to fetch"));
+    await openImport();
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/x,/y")] } });
+    fireEvent.click(screen.getByTestId("set-rd-csv-import"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toBeInTheDocument());
+    expect((screen.getByTestId("set-rd-csv-import") as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("a headerless file's refusal names the line in the person's file, not the line after the added header", async () => {
+    // QA walk 2026-10-03: the dialog puts `from,to,type` in front of a file that starts with a rule,
+    // so the server's "line 3" is line 2 of what the person chose.
+    r.import_csv.mutate.mockRejectedValue(refusal("Line 3: Destination must be a path or an http(s) URL — nothing imported"));
+    await openImport();
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("/a,/b\n/c,javascript:alert(1)")] } });
+    fireEvent.click(screen.getByTestId("set-rd-csv-import"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toHaveTextContent("Line 2: Destination must be a path or an http(s) URL — nothing imported"));
+    expect(r.import_csv.mutate.mock.calls[0][0].csv).toBe("from,to,type\n/a,/b\n/c,javascript:alert(1)");
+  });
+
+  it("Export downloads export_csv as redirects.csv", async () => {
+    const createObjectURL = vi.fn(() => "blob:x");
+    const revokeObjectURL = vi.fn();
+    Object.assign(URL, { createObjectURL, revokeObjectURL });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    const registerHeaderAction = vi.fn();
+    setup({ registerHeaderAction });
+    await loaded();
+    mountHeader(registerHeaderAction);
+    fireEvent.click(within(screen.getByTestId("header-slot")).getByTestId("set-rd-export"));
+    await waitFor(() => expect(r.export_csv.query).toHaveBeenCalledWith({ siteId: "s1" }));
+    await waitFor(() => expect(click).toHaveBeenCalled());
+    expect(createObjectURL).toHaveBeenCalled();
+    click.mockRestore();
   });
 });
 
 describe("the header's Add redirect → 4254:75736 → redirects.create → re-list", () => {
-  it("registers Add redirect once loaded with rows, and clears it on unmount", async () => {
+  it("registers Import CSV · Export CSV · Add redirect once loaded with rows, and clears them on unmount", async () => {
     const registerHeaderAction = vi.fn();
     const { unmount } = setup({ registerHeaderAction });
     await loaded();
     mountHeader(registerHeaderAction);
-    expect(screen.getByTestId("set-rd-add")).toHaveTextContent("Add redirect");
+    const slot = screen.getByTestId("header-slot");
+    expect(within(slot).getAllByRole("button").map((b) => b.textContent)).toEqual(["Import CSV", "Export CSV", "Add redirect"]);
+    expect(within(slot).getByTestId("set-rd-import")).toHaveAttribute("id", "rd-import-csv");
+    expect(within(slot).getByTestId("set-rd-export")).toHaveAttribute("id", "rd-export-csv");
     unmount();
     expect(registerHeaderAction).toHaveBeenLastCalledWith(null);
   });
@@ -423,7 +552,7 @@ describe("Accept — a 301 at once, the row leaves; a refusal is the banner (395
 describe("the Pages door — URL repair draft (3519:19920) → saved (3519:20096)", () => {
   const door = { pageId: "p-about", pageName: "About", from: "about", to: "about-us" };
 
-  it("draws the draft above the Redirects card with the slugs as paths, and nothing when there is no door", async () => {
+  it("draws the draft above the Redirect rules card with the slugs as paths, and nothing when there is no door", async () => {
     setup();
     await loaded();
     expect(screen.queryByTestId("set-rd-repair")).toBeNull();
@@ -436,7 +565,7 @@ describe("the Pages door — URL repair draft (3519:19920) → saved (3519:20096
     expect(screen.getByTestId("set-rd-repair-line")).toHaveTextContent("Bella Cucina · URL change /about → /about-us");
     expect((screen.getByTestId("set-rd-repair-from") as HTMLInputElement).value).toBe("/about");
     expect((screen.getByTestId("set-rd-repair-to") as HTMLInputElement).value).toBe("/about-us");
-    const card = screen.getByTestId("set-card-redirects");
+    const card = screen.getByTestId("set-card-redirect-rules");
     expect(draft.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 

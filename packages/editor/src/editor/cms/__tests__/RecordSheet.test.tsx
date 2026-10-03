@@ -13,6 +13,48 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import { CmsWorkspace } from "../CmsWorkspace";
 import { cmsWorkspace } from "../cmsWorkspaceStore";
 import { makeEngine } from "./fakeCmsEngine";
+
+/* P0-B audit 2026-09-30 — `panel.saveRecord` now awaits the server mirror so
+   the sheet can close on success and stay open with the "Saved on this device
+   only…" state on a queued mirror. The default here is "reached" (the test's
+   happy path); the queued branch in its own test sets it to false. */
+const syncMock = vi.fn(async (..._args: unknown[]) => true);
+const conflictMock = vi.fn((..._args: unknown[]) => false);
+/* The sheet claims its record's conflict (8139:217560) and listens for a
+   GONE answer (8139:217711 / 8139:217890); the tests raise both by hand. */
+type Choice = { kind: "entry"; id: string; keepMine: ReturnType<typeof vi.fn>; useTheirs: ReturnType<typeof vi.fn> };
+let claimed: ((c: Choice) => void) | null = null;
+const releaseMock = vi.fn();
+let goneCb: ((g: { kind: "entry" | "collection"; id: string; message: string }) => void) | null = null;
+vi.mock("@/services/cmsSync", async () => {
+  const m = await vi.importActual<typeof import("@/services/cmsSync")>("@/services/cmsSync");
+  return {
+    ...m,
+    syncEntryUpsert: (...args: Parameters<typeof m.syncEntryUpsert>) => syncMock(...args),
+    isCmsConflictPending: (...args: unknown[]) => conflictMock(...args),
+    syncCollectionUpsert: vi.fn(async () => true),
+    syncEntryDelete: vi.fn(async () => true),
+    syncCollectionDelete: vi.fn(async () => true),
+    consumeDirectSync: vi.fn(() => false),
+    bindCmsEngine: vi.fn(),
+    hydrateCmsFromServer: vi.fn(async () => undefined),
+    onCmsSyncError: () => () => undefined,
+    onCmsConflict: () => () => undefined,
+    claimCmsConflict: (_kind: string, _id: string, cb: (c: Choice) => void) => {
+      claimed = cb;
+      return releaseMock;
+    },
+    onCmsGone: (cb: typeof goneCb) => {
+      goneCb = cb;
+      return () => undefined;
+    },
+    retryCmsSync: vi.fn(async () => undefined),
+    getCmsHydrationStatus: () => "ready",
+    onCmsHydrationChange: () => () => undefined,
+    cmsSyncBlocker: () => null,
+    getCmsSyncPendingCount: () => 0,
+  };
+});
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 
 const MENU = {
@@ -55,6 +97,8 @@ const openRow = async (id = "r1") => {
 };
 
 beforeEach(() => {
+  conflictMock.mockReset();
+  conflictMock.mockImplementation(() => false);
   localStorage.clear();
   cmsWorkspace.reset();
 });
@@ -94,6 +138,124 @@ describe("RecordSheet", () => {
     await waitFor(() =>
       expect(composer.cms.collections.createContentItem).toHaveBeenCalledWith("col-1", expect.objectContaining({ name: "Diavola" })),
     );
+  });
+
+  /* P0-B audit 2026-09-30 — a queued mirror (server offline, no signal) must
+     keep the sheet open and tell the user the save landed locally and the
+     next online tick will replay it. The sheet's footer state is the only
+     truthful surface; closing it on a queued save hides the change and
+     misleads the user about CMS reach. */
+  it("stays open with the local-only state when the mirror does not reach the server", async () => {
+    syncMock.mockImplementationOnce(async () => false);
+    mount();
+    await openRow();
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    await waitFor(() =>
+      expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent(/Saved on this device only/i),
+    );
+    expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+  });
+
+  /* 8139:217560 — a save the server refused because another device changed
+     the record holds the choice in the sheet: the sentence and Keep mine /
+     Use theirs on a warning tint over the footer, the footer waiting on the
+     choice, Save record disabled (it read "Retry save" before the board). */
+  const conflictOnSave = () => {
+    const choice: Choice = {
+      kind: "entry",
+      id: "r1",
+      keepMine: vi.fn(async () => true),
+      useTheirs: vi.fn(async () => undefined),
+    };
+    syncMock.mockImplementationOnce(async () => {
+      claimed?.(choice);
+      return false;
+    });
+    conflictMock.mockImplementation(() => true);
+    return choice;
+  };
+  const saveAnEdit = async (price = "$13") => {
+    await openRow();
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: price } });
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+  };
+
+  it("a conflicted save offers Keep mine / Use theirs in the sheet and waits on the choice (8139:217560)", async () => {
+    conflictOnSave();
+    mount();
+    await saveAnEdit();
+    const banner = await screen.findByTestId("cms-sheet-conflict");
+    expect(banner).toHaveTextContent("Someone else changed this record. Choose Keep mine or Use theirs.");
+    expect(screen.getByTestId("cms-sheet-keep-mine")).toHaveTextContent("Keep mine");
+    expect(screen.getByTestId("cms-sheet-use-theirs")).toHaveTextContent("Use theirs");
+    expect(screen.getByTestId("cms-sheet-eligibility")).toHaveTextContent("Resolve the conflict before publishing");
+    expect(screen.queryByTestId("cms-sheet-published")).toBeNull();
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Your changes are waiting for a conflict choice.");
+    expect(screen.getByTestId("cms-sheet-state")).not.toHaveTextContent(/offline/i);
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Save record");
+    expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
+    expect(screen.getByTestId("cms-sheet-cancel")).toBeEnabled();
+    conflictMock.mockReset();
+    conflictMock.mockImplementation(() => false);
+  });
+
+  it("Use theirs takes the server's copy and closes; Keep mine that lands closes saved", async () => {
+    let choice = conflictOnSave();
+    mount();
+    await saveAnEdit();
+    fireEvent.click(await screen.findByTestId("cms-sheet-use-theirs"));
+    await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
+    expect(choice.useTheirs).toHaveBeenCalledTimes(1);
+    expect(choice.keepMine).not.toHaveBeenCalled();
+
+    choice = conflictOnSave();
+    await saveAnEdit("$14");
+    conflictMock.mockImplementation(() => false);
+    fireEvent.click(await screen.findByTestId("cms-sheet-keep-mine"));
+    await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
+    expect(choice.keepMine).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText("Record saved · Menu items")).toBeInTheDocument();
+  });
+
+  it("closing with the choice still open hands it back (to the toast)", async () => {
+    const choice = conflictOnSave();
+    mount();
+    await saveAnEdit();
+    await screen.findByTestId("cms-sheet-conflict");
+    releaseMock.mockClear();
+    fireEvent.click(screen.getByTestId("cms-sheet-close"));
+    await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
+    expect(releaseMock).toHaveBeenCalledWith(choice);
+    conflictMock.mockImplementation(() => false);
+  });
+
+  /* 8139:217711 / 8139:217890 — an edit to a record (or into a collection)
+     another device deleted: the row leaves this device, the sheet stays to
+     say the change wasn't saved, and Cancel just closes it. */
+  it.each([
+    ["entry", "r1", "This record was deleted."],
+    ["collection", "col-1", "This collection was deleted."],
+  ] as const)("a %s deleted elsewhere leaves the sheet saying the change wasn't saved", async (kind, id, message) => {
+    const { composer } = mount();
+    syncMock.mockImplementationOnce(async () => {
+      if (kind === "entry") await composer.cms.collections.deleteContentItem("r1");
+      else await composer.cms.collections.deleteCollection("col-1");
+      goneCb?.({ kind: "entry" === kind ? "entry" : "collection", id, message });
+      return false;
+    });
+    await saveAnEdit();
+    await waitFor(() =>
+      expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Your change to it wasn't saved."),
+    );
+    expect(screen.getByTestId("cms-sheet-eligibility")).toHaveTextContent("This item is no longer available");
+    expect(screen.getByTestId("cms-sheet-state")).not.toHaveTextContent(/offline/i);
+    expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Save record");
+    fireEvent.click(screen.getByTestId("cms-sheet-cancel"));
+    await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
+    expect(screen.queryByTestId("cms-discard")).toBeNull();
   });
 
   it("says which required fields keep a record from publishing (5940:148412)", async () => {

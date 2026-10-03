@@ -104,7 +104,7 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
-        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site", vercelProjectName: null,
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
@@ -121,12 +121,31 @@ describe("Form Submission Service", () => {
       expect(other.returnUrl).toBeNull();
     });
 
+    /* SA-06: after a slug change the live site stays on its pinned project, so
+       its `<project>.vercel.app` origin is the pinned one, not the new slug's. */
+    it("trusts a returnUrl on the site's pinned Vercel project origin", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: null, slug: "renamed", vercelProjectName: "buildrik-site-original",
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub2p" } as any);
+
+      const result = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://buildrik-site-original.vercel.app/contact" }, "1.2.3.4",
+      );
+      expect(result.returnUrl).toBe("https://buildrik-site-original.vercel.app/contact");
+    });
+
     it("validates the Referer fallback against the same site origins, never trusting it raw", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
-        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site", vercelProjectName: null,
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
@@ -148,7 +167,7 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
-        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site",
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site", vercelProjectName: null,
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);

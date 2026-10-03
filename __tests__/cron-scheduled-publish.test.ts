@@ -16,6 +16,7 @@ const startPublishMock = vi.fn();
 const dueSchedulesMock = vi.fn();
 const markScheduleStartedMock = vi.fn();
 const markScheduleFailedMock = vi.fn();
+const markScheduleCancelledMock = vi.fn();
 
 vi.mock("@server/services/publish.service", () => ({
   startPublish: (...a: unknown[]) => startPublishMock(...a),
@@ -24,6 +25,7 @@ vi.mock("@server/services/scheduled-publish.service", () => ({
   dueSchedules: (...a: unknown[]) => dueSchedulesMock(...a),
   markScheduleStarted: (...a: unknown[]) => markScheduleStartedMock(...a),
   markScheduleFailed: (...a: unknown[]) => markScheduleFailedMock(...a),
+  markScheduleCancelled: (...a: unknown[]) => markScheduleCancelledMock(...a),
 }));
 
 import { GET } from "@/app/api/cron/scheduled-publish/route";
@@ -50,11 +52,11 @@ describe("scheduled-publish cron", () => {
     expect(res.status).toBe(401);
   });
 
-  it("no due schedules → { due: 0, started: 0, failed: 0 }, never calls startPublish", async () => {
+  it("no due schedules → { due: 0, started: 0, failed: 0, skipped: 0 }, never calls startPublish", async () => {
     dueSchedulesMock.mockResolvedValueOnce([]);
     const res = await GET(makeReq("Bearer test-secret"));
     expect(res.status).toBe(200);
-    await expect(res.json()).resolves.toEqual({ due: 0, started: 0, failed: 0 });
+    await expect(res.json()).resolves.toEqual({ due: 0, started: 0, failed: 0, skipped: 0 });
     expect(startPublishMock).not.toHaveBeenCalled();
   });
 
@@ -62,7 +64,7 @@ describe("scheduled-publish cron", () => {
     dueSchedulesMock.mockResolvedValueOnce([{ id: "sp1", siteId: "s1", workspaceId: "ws1", createdBy: "u1" }]);
     startPublishMock.mockResolvedValueOnce({ id: "job1" });
     const res = await GET(makeReq("Bearer test-secret"));
-    await expect(res.json()).resolves.toEqual({ due: 1, started: 1, failed: 0 });
+    await expect(res.json()).resolves.toEqual({ due: 1, started: 1, failed: 0, skipped: 0 });
     expect(startPublishMock).toHaveBeenCalledWith("s1", "ws1", "u1");
     expect(markScheduleStartedMock).toHaveBeenCalledWith("sp1", "job1");
   });
@@ -76,8 +78,19 @@ describe("scheduled-publish cron", () => {
       .mockRejectedValueOnce(new Error("NO_RENDERER"))
       .mockResolvedValueOnce({ id: "job2" });
     const res = await GET(makeReq("Bearer test-secret"));
-    await expect(res.json()).resolves.toEqual({ due: 2, started: 1, failed: 1 });
+    await expect(res.json()).resolves.toEqual({ due: 2, started: 1, failed: 1, skipped: 0 });
     expect(markScheduleFailedMock).toHaveBeenCalledWith("sp1", "NO_RENDERER");
     expect(markScheduleStartedMock).toHaveBeenCalledWith("sp2", "job2");
+  });
+
+  /* SA-04 (D6): a schedule in a workspace scheduled for deletion is skipped
+     and closed as CANCELLED — it is not a publish failure. */
+  it("skips a schedule whose workspace is scheduled for deletion, recording it CANCELLED", async () => {
+    dueSchedulesMock.mockResolvedValueOnce([{ id: "sp1", siteId: "s1", workspaceId: "ws1", createdBy: "u1" }]);
+    startPublishMock.mockRejectedValueOnce(new Error("WORKSPACE_DELETION_SCHEDULED"));
+    const res = await GET(makeReq("Bearer test-secret"));
+    await expect(res.json()).resolves.toEqual({ due: 1, started: 0, failed: 0, skipped: 1 });
+    expect(markScheduleCancelledMock).toHaveBeenCalledWith("sp1", "WORKSPACE_DELETION_SCHEDULED");
+    expect(markScheduleFailedMock).not.toHaveBeenCalled();
   });
 });

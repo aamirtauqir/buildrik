@@ -57,6 +57,8 @@ export function totalPendingMirrors(): number {
 export class SyncRetryQueue {
   private queue = new Map<string, () => Promise<boolean>>();
   private subscribers = new Set<(info: SyncRetryInfo) => void>();
+  /** The op running per target — the next one for it waits (see `run`). */
+  private inFlight = new Map<string, Promise<boolean>>();
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -75,6 +77,31 @@ export class SyncRetryQueue {
   /** How many changes are queued for retry (not yet on the server). */
   pendingCount(): number {
     return this.queue.size;
+  }
+
+  /** Total work this queue still owes the server — queued retries AND any
+   *  in-flight mirror that hasn't resolved yet. C0a (Task 6): publish blocks
+   *  on this; an in-flight mirror has to count, or publish can hand off a row
+   *  that hasn't landed. `publishService` consults this so an unsynced CMS
+   *  edit refuses to publish even when the network call returned 200 but the
+   *  state diff has not propagated. */
+  outstandingCount(): number {
+    return this.outstandingKeys().length;
+  }
+
+  /** The targets behind `outstandingCount` — a key both queued and in flight
+   *  (a retry running) is one change, not two. */
+  outstandingKeys(): string[] {
+    return [...new Set([...this.queue.keys(), ...this.inFlight.keys()])];
+  }
+
+  /** Resolves true when the latest run for `key` reaches the server, false
+   *  when it failed and was queued. Returns true immediately if no run is
+   *  in flight and none is queued (publish is allowed to proceed). */
+  settled(key: string): Promise<boolean> {
+    const inflight = this.inFlight.get(key);
+    if (inflight) return inflight;
+    return Promise.resolve(!this.queue.has(key));
   }
 
   /** Whether a mirror for `key` is waiting to reach the server. Hydration
@@ -120,6 +147,30 @@ export class SyncRetryQueue {
    * different record's stale failure would read as this one failing.
    */
   async run(
+    key: string,
+    task: () => Promise<unknown>,
+    onWarn: (e: unknown) => void
+  ): Promise<boolean> {
+    /* One write per target in flight, in the order they were asked for. Two
+       upserts of one row racing (a collection's create and its first field
+       update, fired a tick apart) could land in either order — the older
+       payload last — or the second could lose the create race on a unique key
+       and sit queued with the newer data. The Inspector v4 fixture's Menu
+       collection loaded with `fields: []` exactly so. Different targets
+       still run side by side. */
+    const prev = this.inFlight.get(key);
+    const mine = (prev ?? Promise.resolve()).then(() => this.attempt(key, task, onWarn));
+    this.inFlight.set(key, mine);
+    try {
+      return await mine;
+    } finally {
+      /* Only delete if this is still the latest in-flight entry — a newer
+         run on the same key keeps its own promise tracked. */
+      if (this.inFlight.get(key) === mine) this.inFlight.delete(key);
+    }
+  }
+
+  private async attempt(
     key: string,
     task: () => Promise<unknown>,
     onWarn: (e: unknown) => void
@@ -194,6 +245,25 @@ export function recordServerStamp(key: string, server: Date | string, local: str
 /** Whether the server has ever confirmed this browser's copy of `key`. */
 export function hasServerStamp(key: string): boolean {
   return key in readStamps();
+}
+
+/** The server updatedAt the server last confirmed for `key`, if any — the
+ *  precondition a write sends so a teammate's newer copy is refused, not
+ *  overwritten. */
+export function serverStampOf(key: string): string | undefined {
+  return readStamps()[key]?.server;
+}
+
+/** Forget `key`'s stamp — the row is gone, or the user chose to overwrite. */
+export function forgetServerStamp(key: string): void {
+  try {
+    const stamps = readStamps();
+    if (!(key in stamps)) return;
+    delete stamps[key];
+    localStorage.setItem(STAMP_STORAGE_KEY, JSON.stringify(stamps));
+  } catch {
+    // Storage unavailable: the next write simply goes without a precondition.
+  }
 }
 
 /**

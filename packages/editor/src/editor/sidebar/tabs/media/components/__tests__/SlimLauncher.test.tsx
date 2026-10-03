@@ -102,10 +102,14 @@ describe("SlimLauncher — §10 default 280px experience", () => {
     expect(screen.getAllByRole("menuitem").map((b) => b.textContent?.trim())).toEqual(["Stock photos", "Icons", "AaFonts"]);
   });
 
-  it("no search box in the drawer — the topbar field searches (4418:59771)", () => {
-    render(<SlimLauncher {...baseProps()} />);
-    expect(screen.queryByTestId("media-search")).toBeNull();
-    expect(screen.queryByRole("textbox")).toBeNull();
+  /* Owner decision 2026-10-03 (board 4418:59771 drew no search box and had
+     the topbar field read "Search all N assets…"): the drawer owns it now. */
+  it("its own 'Search all N assets…' field under the header drives the library search", () => {
+    const onSearchChange = vi.fn();
+    render(<SlimLauncher {...baseProps()} onSearchChange={onSearchChange} />);
+    const field = screen.getByRole("textbox", { name: /^Search all \d+ assets…$/ });
+    fireEvent.change(field, { target: { value: "pasta" } });
+    expect(onSearchChange).toHaveBeenCalledWith("pasta");
   });
 
   it("renders 3-col asset grid (AssetGrid component) when libraryItems present", () => {

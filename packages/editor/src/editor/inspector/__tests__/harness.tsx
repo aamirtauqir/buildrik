@@ -54,7 +54,9 @@ export function makeMockElement(opts: MockElementOptions = {}) {
     removeStyle: vi.fn((prop: string) => {
       delete styles[prop];
     }),
-    getAttribute: vi.fn((name: string) => attrs.get(name) ?? ""),
+    // Absent → undefined, as Element.getAttribute: a boolean attribute is
+    // present-and-empty (`controls=""`), which "" for absent would hide.
+    getAttribute: vi.fn((name: string): string | undefined => attrs.get(name)),
     setAttribute: vi.fn((name: string, value: string) => {
       attrs.set(name, value);
     }),

@@ -1,0 +1,106 @@
+/**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
+ * DataAttributeEditor - Custom data-* attribute editor
+ * @license BSD-3-Clause
+ */
+
+import * as React from "react";
+import type { Composer } from "../../../../engine";
+import { Button, TextInput } from "@/editor/chrome-ui";
+import { writeElement } from "@/engine/commands/commandOperations";
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface DataAttributeEditorProps {
+  elementId: string;
+  composer?: Composer | null;
+}
+
+// ============================================================================
+// STYLES
+// ============================================================================
+
+const styles = {
+  input: {
+    flex: 1,
+    padding: "8px 10px",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border-medium)",
+    borderRadius: 6,
+    color: "var(--bk-ink)",
+    fontSize: 12,
+    outline: "none",
+  } as React.CSSProperties,
+  addButton: {
+    padding: "8px 16px",
+    background: "var(--bk-accent)",
+    border: "none",
+    borderRadius: 6,
+    color: "var(--bk-accent-on)",
+    fontSize: 12,
+    fontWeight: 600,
+    cursor: "pointer",
+  } as React.CSSProperties,
+  hint: {
+    fontSize: 12,
+    color: "var(--bk-ink-soft)",
+  } as React.CSSProperties,
+};
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
+export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
+  elementId,
+  composer,
+}) => {
+  const [newKey, setNewKey] = React.useState("");
+  const [newValue, setNewValue] = React.useState("");
+
+  const addAttribute = () => {
+    if (!newKey.trim()) return;
+
+    const key =
+      newKey.startsWith("data-") || newKey.startsWith("aria-") ? newKey : `data-${newKey}`;
+
+    if (composer) {
+      /* P-1: the lock gate — refused (and said) on a locked element. */
+      if (!writeElement(composer, composer.elements.getElement(elementId), "data-attribute-add", (el) => el.setAttribute?.(key, newValue))) return;
+      setNewKey("");
+      setNewValue("");
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+        <TextInput
+          type="text"
+          value={newKey}
+          onChange={(e) => setNewKey(e.target.value)}
+          placeholder="data-*"
+          style={styles.input}
+        />
+        <TextInput
+          type="text"
+          value={newValue}
+          onChange={(e) => setNewValue(e.target.value)}
+          placeholder="value"
+          style={styles.input}
+        />
+        {/* The row's only action was a bare "+" — announced as "plus" with no
+            hint of what it adds, on a panel that also adds classes and ids. */}
+        <Button aria-label="Add attribute" onClick={addAttribute} style={styles.addButton}>
+          +
+        </Button>
+      </div>
+      <div style={styles.hint}>Add custom data-* or aria-* attributes</div>
+    </div>
+  );
+};
+
+export default DataAttributeEditor;

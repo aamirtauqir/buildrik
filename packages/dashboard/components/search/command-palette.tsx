@@ -36,16 +36,18 @@ interface ResultItem {
   scope: string;
 }
 
-const SETTINGS_ITEMS: ResultItem[] = [
+/* Phase B §25 (#47) regrouped the settings directory: Plans folded into Plan &
+   billing and AI credits into Usage & credits — neither is a card any more, so
+   neither is an entry here; "plans" / "pricing" still find Plan & billing
+   through the Moved aliases. */
+export const SETTINGS_ITEMS: ResultItem[] = [
   { id: "s-workspace", label: "Workspace", description: "Workspace settings & branding", href: "/dashboard/settings/workspace", scope: "settings" },
   { id: "s-team", label: "Team", description: "Members & invites", href: "/dashboard/settings/team", scope: "settings" },
   { id: "s-domains", label: "Domains", description: "Custom domains", href: "/dashboard/settings/domains", scope: "settings" },
   { id: "s-integrations", label: "Integrations", description: "Connected services", href: "/dashboard/settings/integrations", scope: "settings" },
-  { id: "s-ai", label: "AI & Credits", description: "AI usage and credits", href: "/dashboard/settings/ai", scope: "settings" },
   { id: "s-tokens", label: "API Tokens", description: "Tokens for scripting & CI", href: "/dashboard/settings/api-tokens", scope: "settings" },
-  { id: "s-plans", label: "Plans", description: "Plan & upgrades", href: "/dashboard/settings/plans", scope: "settings" },
-  { id: "s-billing", label: "Billing", description: "Invoices & payment", href: "/dashboard/settings/billing", scope: "settings" },
-  { id: "s-usage", label: "Usage", description: "Limits & quotas", href: "/dashboard/settings/usage", scope: "settings" },
+  { id: "s-billing", label: "Plan & billing", description: "Your plan, invoices & payment method", href: "/dashboard/settings/billing", scope: "settings" },
+  { id: "s-usage", label: "Usage & credits", description: "Bandwidth, storage & AI credits", href: "/dashboard/settings/usage", scope: "settings" },
   { id: "s-profile", label: "Profile", description: "Edit your profile", href: "/dashboard/settings/profile", scope: "settings" },
   { id: "s-account", label: "Account", description: "Account preferences", href: "/dashboard/settings/account", scope: "settings" },
   { id: "s-security", label: "Security", description: "Password & 2FA", href: "/dashboard/settings/security", scope: "settings" },
@@ -79,7 +81,7 @@ const MOVED_ITEMS: MovedItem[] = [
   { id: "m-comments", label: "Comments", description: "Moved → Agency › Reviews", href: "/dashboard/agency/reviews", scope: "moved", aliases: ["comments", "review comments"], agencyOnly: true },
   { id: "m-shared-theme", label: "Shared theme", description: "Moved → Agency › Shared theme", href: "/dashboard/agency/theme", scope: "moved", aliases: ["shared theme", "design system", "theme", "tokens", "ds"], agencyOnly: true },
   { id: "m-team", label: "Team", description: "Moved → Settings › Team", href: "/dashboard/settings/team", scope: "moved", aliases: ["team", "members", "invite"] },
-  { id: "m-plans", label: "Plans", description: "Moved → Settings › Plans", href: "/dashboard/settings/plans", scope: "moved", aliases: ["plans", "pricing", "upgrade"] },
+  { id: "m-plans", label: "Plans", description: "Moved → Settings › Plan & billing", href: "/dashboard/settings/billing", scope: "moved", aliases: ["plans", "pricing", "upgrade"] },
   { id: "m-billing", label: "Billing", description: "Moved → Settings › Billing", href: "/dashboard/settings/billing", scope: "moved", aliases: ["billing", "invoices", "payment"] },
   { id: "m-usage", label: "Usage", description: "Moved → Settings › Usage", href: "/dashboard/settings/usage", scope: "moved", aliases: ["usage", "limits", "quota"] },
   { id: "m-domains", label: "Domains", description: "Moved → Settings › Domains", href: "/dashboard/settings/domains", scope: "moved", aliases: ["domains", "dns", "custom domain"] },

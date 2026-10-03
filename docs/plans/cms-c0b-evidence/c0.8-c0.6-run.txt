@@ -1,0 +1,9 @@
+C0.8 canvas list headings: ["Gamma C0b","Beta C0b","Alpha C0b"]
+c0.8 publish btn: Publish anyway aria-disabled: null
+blocked publish requests: 1
+C0.8 published page-4 headings: ["Gamma C0b","Beta C0b","Alpha C0b"]
+C0.6 page-3 hrefs: ["/about.html","/index.html"]
+C0.7 home solo heading: "Solo title C0b"
+paths: index.html,about.html,page-3.html,page-4.html
+checks: [{"label":"CMS templates","status":"pass","detail":"Every dynamic-page collection's template page exists."},{"label":"CMS bindings","status":"pass","detail":"Every bound element has a value."}]
+errors []

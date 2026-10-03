@@ -16,5 +16,5 @@ export const navbarBlockConfig: NavbarBlockConfig = {
   category: "Sections",
   elementType: "navbar",
   content:
-    '<nav style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,0.1)"><div style="font-weight:bold;font-size:20px">Logo</div><div style="display:flex;gap:24px"><a href="#" style="text-decoration:none;color:#333">Home</a><a href="#" style="text-decoration:none;color:#333">About</a><a href="#" style="text-decoration:none;color:#333">Services</a><a href="#" style="text-decoration:none;color:#333">Contact</a></div></nav>',
+    '<nav data-buildrick-type="navbar" style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,0.1)"><div style="font-weight:bold;font-size:20px">Logo</div><div style="display:flex;gap:24px"><a href="#" style="text-decoration:none;color:#333">Home</a><a href="#" style="text-decoration:none;color:#333">About</a><a href="#" style="text-decoration:none;color:#333">Services</a><a href="#" style="text-decoration:none;color:#333">Contact</a></div></nav>',
 };

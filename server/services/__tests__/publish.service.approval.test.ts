@@ -62,7 +62,7 @@ import { startPublish } from "@server/services/publish.service";
 function baseHappyMocks() {
   jobFindFirst.mockResolvedValue(null); // no active job
   jobUpdateMany.mockResolvedValue({ count: 0 }); // no stranded rows
-  siteFindUnique.mockResolvedValue({ name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws-1" });
+  siteFindUnique.mockResolvedValue({ name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws-1", workspace: { deletionScheduledAt: null } });
   reviewFindFirst.mockResolvedValue(null); // no review submitted
 }
 
@@ -102,6 +102,7 @@ describe("startPublish · approval gate enforcement", () => {
     // Site lives in ws-1, which DOES require approval.
     siteFindUnique.mockResolvedValue({
       name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws-1", lastEditedAt: null,
+      workspace: { deletionScheduledAt: null },
     });
     // Caller's session resolves to their own ws-2, which does NOT.
     workspaceFindUnique.mockImplementation((args: { where: { id: string } }) =>
@@ -303,6 +304,7 @@ describe("startPublish · approval gate enforcement", () => {
     baseHappyMocks();
     siteFindUnique.mockResolvedValue({
       name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws-1", lastEditedAt: null,
+      workspace: { deletionScheduledAt: null },
     });
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
     effectiveRole.mockResolvedValue("EDITOR");

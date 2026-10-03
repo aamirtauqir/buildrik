@@ -12,6 +12,7 @@ import { CreateSiteModal } from "@/components/sites/create-site-modal";
 import { RenameModal } from "@/components/sites/rename-modal";
 import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
 import { TransferModal } from "@/components/sites/transfer-modal";
+import { RecentlyDeleted, type DeletedSiteRow } from "@/components/sites/recently-deleted";
 import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
 import { Button, InputField, Modal, PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
@@ -53,7 +54,7 @@ export default function ProjectsPage() {
     const param = new URLSearchParams(window.location.search).get("status");
     if (!param) return;
     const upper = param.toUpperCase();
-    if (upper === "PUBLISHED" || upper === "DRAFT" || upper === "ARCHIVED") setStatus(upper);
+    if (upper === "PUBLISHED" || upper === "DRAFT" || upper === "ARCHIVED" || upper === "DELETED") setStatus(upper);
   }, []);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const lastSelectedIdRef = useRef<string | null>(null);
@@ -117,11 +118,14 @@ export default function ProjectsPage() {
 
   const debouncedSearch = useDebouncedValue(search, 250);
 
+  // "Recently deleted" (PD-6) is its own list, not a Site status.
+  const deletedView = status === "DELETED";
+
   // Queries
   const sitesQuery = trpc.sites.list.useQuery({
     page,
     perPage: 12,
-    status: status as "PUBLISHED" | "DRAFT" | "ARCHIVED" | undefined,
+    status: deletedView ? undefined : (status as "PUBLISHED" | "DRAFT" | "ARCHIVED" | undefined),
     sort: sort as
       | "lastEdited"
       | "name"
@@ -143,6 +147,21 @@ export default function ProjectsPage() {
 
   // Real archived count for the Archived tab badge (was hardcoded 0).
   const archivedQuery = trpc.sites.list.useQuery({ page: 1, perPage: 1, status: "ARCHIVED" as const });
+
+  // The sites inside the 30-day restore window, and Restore (OWNER).
+  const deletedQuery = trpc.sites.listDeleted.useQuery();
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const restoreMutation = trpc.sites.restore.useMutation({
+    onMutate: ({ id }) => setRestoringId(id),
+    onSuccess: (_result, { id }) => {
+      deletedQuery.refetch();
+      sitesQuery.refetch();
+      const name = deletedQuery.data?.find((r) => r.id === id)?.name ?? "The site";
+      addToast("success", "Site restored", `${name} is back as a draft. Publish it to put it live again.`);
+    },
+    onError: (err) => addToast("error", "Couldn't restore site", err.message),
+    onSettled: () => setRestoringId(null),
+  });
 
   const foldersQuery = trpc.sites.folders.list.useQuery();
 
@@ -175,8 +194,9 @@ export default function ProjectsPage() {
   const deleteMutation = trpc.sites.delete.useMutation({
     onSuccess: () => {
       sitesQuery.refetch();
+      deletedQuery.refetch();
       setDeleteTarget(null);
-      addToast("success", "Site deleted");
+      addToast("success", "Site deleted", "You can restore it from Recently deleted for 30 days.");
     },
     onError: (err) => addToast("error", "Failed to delete", err.message),
   });
@@ -527,6 +547,7 @@ export default function ProjectsPage() {
           status={status}
           onStatusChange={(val) => { setStatus(val); setPage(1); }}
           archivedCount={archivedQuery.data?.total ?? 0}
+          deletedCount={deletedQuery.data?.length ?? 0}
           sort={sort}
           onSortChange={(val) => {
             setSort(val);
@@ -546,8 +567,29 @@ export default function ProjectsPage() {
         />
       </div>
 
+      {deletedView && (
+        <div className="mt-6">
+          {deletedQuery.isLoading ? (
+            <LoadingSkeleton rows={3} variant="card" />
+          ) : deletedQuery.isError ? (
+            <ErrorState
+              title="Couldn't load recently deleted sites"
+              description="Something went wrong on our end."
+              onRetry={() => deletedQuery.refetch()}
+            />
+          ) : (
+            <RecentlyDeleted
+              rows={(deletedQuery.data ?? []) as DeletedSiteRow[]}
+              canRestore={health.data?.role === "OWNER"}
+              restoringId={restoringId}
+              onRestore={(row) => restoreMutation.mutate({ id: row.id })}
+            />
+          )}
+        </div>
+      )}
+
       {/* Loading */}
-      {sitesQuery.isLoading && (
+      {!deletedView && sitesQuery.isLoading && (
         <div className="mt-6">
           <LoadingSkeleton rows={6} variant="card" />
         </div>
@@ -555,7 +597,7 @@ export default function ProjectsPage() {
 
       {/* Error — was falling through to the "No sites yet" empty state, which
           mislead users into "create your first site" when the query had failed. */}
-      {!sitesQuery.isLoading && sitesQuery.isError && (
+      {!deletedView && !sitesQuery.isLoading && sitesQuery.isError && (
         <div className="mt-6">
           <ErrorState
             title="Couldn't load your sites"
@@ -566,7 +608,7 @@ export default function ProjectsPage() {
       )}
 
       {/* Filtered-empty: a folder or filter combination matched nothing */}
-      {!sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && hasActiveFilters && (
+      {!deletedView && !sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && hasActiveFilters && (
         <div className="mt-6">
           <StateEmpty
             icon={<Search className="h-7 w-7" />}
@@ -578,7 +620,7 @@ export default function ProjectsPage() {
       )}
 
       {/* True-empty: the workspace has no sites at all */}
-      {!sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && !hasActiveFilters && (
+      {!deletedView && !sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && !hasActiveFilters && (
         <div
           className="mt-8 flex flex-col items-center rounded-lg border-2 border-dashed py-16 text-center"
           style={{ borderColor: "var(--color-border-default)" }}
@@ -602,7 +644,7 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      {!sitesQuery.isLoading && sites.length > 0 && (
+      {!deletedView && !sitesQuery.isLoading && sites.length > 0 && (
         <div className="mt-6">
           {viewMode === "grid" ? (
             <SiteGrid
@@ -627,7 +669,7 @@ export default function ProjectsPage() {
       )}
 
       {/* Pagination */}
-      {sitesQuery.data && sitesQuery.data.totalPages > 1 && (
+      {!deletedView && sitesQuery.data && sitesQuery.data.totalPages > 1 && (
         <div className="flex items-center justify-between mt-6">
           <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
             Page {page} of {sitesQuery.data.totalPages} ({sitesQuery.data.total} sites)

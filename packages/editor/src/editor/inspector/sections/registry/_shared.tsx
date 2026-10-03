@@ -1,15 +1,8 @@
 /**
  * Section Registry — shared infrastructure (types, factory, helpers).
  *
- * Per-family files (layout/typography/visual/element/effects) import everything
- * here. The aggregator at ./index re-exports these symbols so external
- * consumers (`from "../sections/registry"`) see no API change.
- *
- * Splitting note (E-009 / Phase B1): the original 666-line registry.tsx was
- * split into per-property-family files for navigability. The plan called this
- * "per element family" but the actual axis was always property-family
- * (layout vs typography vs visual etc.) — sections are organized around the
- * CSS concern they edit, not the element type they apply to.
+ * The per-owner files (type, component, text, box, effects, behaviour — one
+ * Inspector v4 lane each) import everything here; ./index aggregates them.
  *
  * @license BSD-3-Clause
  */
@@ -22,7 +15,9 @@ import type {
   MediaAssetType,
 } from "../../../../shared/types/media";
 import type { CssContext, PropertyState } from "../../config/cssContext";
-import type { SectionTier } from "../../shared/controls";
+import type { SectionDisplayMode } from "../../shared/controls/Section";
+import type { ElementCapabilities } from "@/shared/constants/elementCapabilities";
+import { masterOverrideProps } from "../../hooks/useFieldOverrides";
 
 // ============================================================================
 // PICK KEYS HELPER — slices ctx.styles to only the keys a section reads,
@@ -44,50 +39,59 @@ function pickKeys<T extends Record<string, unknown>>(
 // TAB & SECTION IDS
 // ============================================================================
 
-/** Three tabs — concept axis, not CSS-category axis. Boards 4428:141170
- *  (Style), 4428:141642 (Settings — the `element` id, kept for the profile
- *  and test fixtures that already spell it) and 4428:142686 (Effects). */
-export type TabId = "style" | "element" | "effects";
+/** Inspector v4 tabs (DD-1, DD-4, Q1): Style · Behaviour · Effects. */
+export type TabId = "style" | "behaviour" | "effects";
 
-/** The strip's labels, in board order. `element` reads "Settings" on screen. */
+/** The strip's labels, in board order (boards 1, 2, 3). */
 export const INSPECTOR_TABS: readonly { id: TabId; label: string }[] = [
   { id: "style", label: "Style" },
-  { id: "element", label: "Settings" },
+  { id: "behaviour", label: "Behaviour" },
   { id: "effects", label: "Effects" },
 ];
 
 /**
- * The complete set of section ids that can appear in any inspector tab.
- * Every id must have a matching entry in SECTION_REGISTRY. Profile configs
- * in `elementProfiles.ts` use this union to declare per-tab section order.
+ * Every section that can appear on a tab. Each has one registry entry; the
+ * order they render in is `config/sectionOrder.ts` (one list per tab).
  */
 export type SectionId =
-  // Style tab
+  // Style — define → shape → paint (DD-15)
+  | "component"
+  | "type"
   | "layout"
+  | "typography"
+  | "text-inside"
   | "size"
   | "spacing"
-  | "flex"
-  | "grid"
-  | "typography"
-  | "background"
+  | "fill"
   | "border"
-  // Element tab
-  | "link"
-  | "content"
-  | "collection"
+  // Behaviour
   | "form-fields"
   | "form-settings"
   | "slides"
   | "slider-settings"
-  | "element-properties"
+  | "collection"
+  | "link"
+  | "cms-binding"
+  | "visibility"
+  | "interactions"
   | "css-classes"
-  // Effects tab
+  | "attributes"
+  // Effects
   | "opacity"
   | "shadow"
-  | "blur"
-  | "effects"
-  | "interactions"
-  | "visibility";
+  | "filters"
+  | "transform-motion"
+  | "effects-advanced";
+
+/**
+ * How a section arrives (DD-11), before the user opens or closes it:
+ *   always — open (type block, Size, Spacing);
+ *   open   — open (the Behaviour tab's primaries);
+ *   valued — open when the element carries a value for it, else the one-row
+ *            "+" header (Fill, Border, the Effects rows);
+ *   closed — shut, with a one-line summary (Attributes, Text inside, Advanced).
+ */
+export type SectionOpen = "always" | "open" | "valued" | "closed";
 
 // ============================================================================
 // CONTEXT SHAPES
@@ -102,20 +106,25 @@ export type SectionId =
 export interface SectionContext {
   composer: Composer | null | undefined;
   selectedElement: { id: string; type: string; tagName?: string };
+  /** Every selected id, primary first (DD-12). One entry when single. */
+  selectedIds: readonly string[];
+  /** "page" when the Page panel renders the section (DD-13). */
+  variant: "element" | "page";
   styles: Record<string, string>;
+  /** The element's OWN values at this breakpoint + state — no type defaults,
+   *  no computed fallback. What "has a value" is measured against. */
+  authoredStyles: Record<string, string>;
   onChange: (property: string, value: string) => void;
   onBatchChange: (changes: Record<string, string>) => void;
   cssContext: CssContext;
   propertyStates: Record<string, PropertyState>;
-  // `currentPseudoState` was specced into the context during the design phase
-  // as "plumbed for future consumers" but the CEO review (A2) found nothing
-  // reads it — pseudo-state is already baked into `styles` by the style
-  // handler hook upstream, so no section adapter needs it. Removed to keep
-  // the context honest.
-  /** Current controlled open state for this section — always a concrete boolean. */
+  /** What the type is (shared/constants/elementCapabilities). */
+  caps: ElementCapabilities;
+  /** Open when the frame shows the body (displayMode "open"). */
   isOpen: boolean;
-  /** Toggle this section's open state in the parent's expanded-sections map. */
+  /** Toggle this section's open state for this element type. */
   onToggle: () => void;
+  displayMode: SectionDisplayMode;
   /** Advanced-disclosure substate lifted from useAdvancedSettings. */
   advancedExpanded: boolean;
   /** Toggle this section's advanced-disclosure state. */
@@ -128,41 +137,41 @@ export interface SectionContext {
     current: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
   ) => void;
-  /** Settings › CONTENT's "Create collection" door (no collections yet). */
+  /** CMS binding's "Create collection" door (no collections yet). */
   onOpenCreateCollection?: () => void;
   tabId: TabId;
-  /**
-   * Visual weight tier computed over VISIBLE sections (post shouldRender
-   * filter). Renderer sets this to "primary" for the first visible section,
-   * "secondary" for indices 1-2, "tertiary" for 3+.
-   */
-  tier: SectionTier;
-  /**
-   * Sprint 2 / Wave 2 — section-level multi-select support.
-   * Sections render a MixedValueBadge for any style key in this set.
-   * Defaults to empty set when single-select (see `defineSection` —
-   * existing test fixtures don't need to pass these).
-   */
+  /** Style keys whose values differ across the selection (DD-12). */
   mixedKeys?: ReadonlySet<string>;
-  /** True when 2+ elements are selected. Sections use this to gate badge rendering. */
+  /** True when 2+ elements are selected. */
   isMultiSelect?: boolean;
 }
 
 /**
  * Defaults applied when context is built without multi-select plumbing (e.g.,
- * existing tests constructed SectionContext literals before Wave 2). Keeps
- * `mixedKeys` and `isMultiSelect` backwards-compatible.
+ * test fixtures that construct SectionContext literals).
  */
 export const EMPTY_MIXED_KEYS: ReadonlySet<string> = new Set<string>();
 
 /**
- * Reduced context for `shouldRender` — excludes position/state-derived fields
- * because filtering runs BEFORE position, open-state, and tier are known.
+ * Reduced context for presence / value / summary predicates — excludes the
+ * fields that depend on the section's own open state.
  */
 export type ShouldRenderContext = Omit<
   SectionContext,
-  "isOpen" | "onToggle" | "advancedExpanded" | "onAdvancedToggle" | "tier"
+  "isOpen" | "onToggle" | "advancedExpanded" | "onAdvancedToggle" | "displayMode"
 >;
+
+/**
+ * Board 26: a component instance's own root draws no Layout and no Text
+ * inside — its structure and its text are the master's (Edit master ›, or
+ * Detach instance…). A section the instance already overrides still shows,
+ * so an override on one of `keys` is never out of reach.
+ */
+export function shownOnInstanceRoot(ctx: ShouldRenderContext, keys: readonly string[]): boolean {
+  const id = ctx.selectedElement.id;
+  if (!ctx.composer?.components?.getInstanceByElementId?.(id)) return true;
+  return masterOverrideProps(ctx.composer, id).some((p) => keys.includes(p));
+}
 
 // ============================================================================
 // ENTRY TYPES
@@ -177,18 +186,26 @@ export type ShouldRenderContext = Omit<
 export interface SectionEntry<P extends object = object> {
   Component: React.ComponentType<P>;
   adaptProps: (ctx: SectionContext) => P;
-  /** Which strip tab renders this section (boards 4428:141170 / 141642 / 142686). */
+  /** Which tab renders this section. */
   tab: TabId;
-  /** The section's heading — what ⌘K "Jump to property" prints (G2-146). */
+  /** The section's header — the frame draws it, ⌘K "Jump to property" prints it. */
   title: string;
-  /**
-   * `"advanced"` tags a section the Beginner tier hides behind "Show all
-   * (N more)" (board 4428:141170; decision #29). Untagged sections take the
-   * positional primary / secondary / tertiary weight the renderer computes.
-   */
-  tier?: "advanced";
-  /** Pre-render predicate. Runs BEFORE position/tier computation. */
+  /** A header that depends on the element (the type block reads "Heading"). */
+  frameTitle?: (ctx: ShouldRenderContext) => string;
+  /** How it arrives (DD-11). */
+  open: SectionOpen;
+  /** Presence by what the type IS. Default: always present. */
+  capability?: (caps: ElementCapabilities) => boolean;
+  /** Presence by runtime state (an instance, a flex container). Runs after `capability`. */
   shouldRender?: (ctx: ShouldRenderContext) => boolean;
+  /** Does the element carry a value here? Default: any own value in `styleKeys`. */
+  hasValue?: (ctx: ShouldRenderContext) => boolean;
+  /** One-line summary while closed ("Cursor: auto · Blend: normal"). */
+  summary?: (ctx: ShouldRenderContext) => string | null;
+  /** What the "+" of an empty section adds, beyond opening it. */
+  onAdd?: (ctx: SectionContext) => void;
+  /** Also renders in the Page panel (DD-13), with `ctx.variant === "page"`. */
+  page?: boolean;
   /**
    * Opaque key into the advanced-disclosure state map. When set, the renderer
    * threads `advancedState.isExpanded(key) / .toggle(key)` into the adapter
@@ -197,33 +214,22 @@ export interface SectionEntry<P extends object = object> {
    */
   advancedKey?: string;
   /**
-   * The CSS properties this section's ADVANCED block actually renders.
-   *
-   * This used to be derived from the registry by prefix — `advancedKey: "layout"`
-   * meant "every propertiesRegistry id starting layout. and tiered advanced".
-   * The two drifted, because a section's advanced block is not organised by
-   * registry prefix: Layout's renders Position, Overflow and Visibility, and
-   * Typography's renders font-style / text-indent / vertical-align, which the
-   * registry does not list at all. So the auto-expand asked one source of truth
-   * about a set owned by another, and groups stayed shut on values the user had
-   * just set. Measured live: a heading with font-style italic showed
-   * "More settings 5", collapsed.
-   *
-   * Raw kebab CSS names, the same spelling the style map uses — no dotted ids,
-   * no camelCase, nothing to convert.
+   * The CSS properties this section's ADVANCED block actually renders —
+   * declared by the section, not derived from a registry prefix (groups stayed
+   * shut on values the user had just set when the two drifted). Raw kebab CSS
+   * names, the same spelling the style map uses.
    */
   advancedProps?: readonly string[];
   /**
    * CSS property keys this section reads from ctx.styles. The adapter will
    * receive only these keys (via pickKeys), so a single-property edit only
    * triggers re-render of sections that actually care about that property.
-   * Sections that don't read ctx.styles (animation, interactions, link, etc.)
-   * should declare an empty array.
+   * Sections that don't read ctx.styles (interactions, link, etc.) declare
+   * an empty array.
    *
    * MUST be exhaustive — every `styles["foo"]` / `styles.foo` read in the
    * section's source files must appear here. The invariant is enforced by
-   * `sections/__tests__/registry.styleKeys.test.ts`, which greps section
-   * files and asserts every read key is declared. Under-declaring slices
+   * `sections/__tests__/registry.styleKeys.test.ts`. Under-declaring slices
    * away real values and silently blanks controls.
    */
   styleKeys: readonly string[];
@@ -238,17 +244,18 @@ export interface SectionEntry<P extends object = object> {
  */
 export interface AnySectionEntry {
   render: (ctx: SectionContext) => React.ReactElement | null;
-  shouldRender?: (ctx: ShouldRenderContext) => boolean;
-  /** Strip tab this section belongs to — mirrors SectionEntry.tab. */
   tab: TabId;
-  /** Heading — mirrors SectionEntry.title. */
   title: string;
-  /** ADVANCED tag — mirrors SectionEntry.tier. */
-  tier?: "advanced";
+  frameTitle?: (ctx: ShouldRenderContext) => string;
+  open: SectionOpen;
+  capability?: (caps: ElementCapabilities) => boolean;
+  shouldRender?: (ctx: ShouldRenderContext) => boolean;
+  hasValue?: (ctx: ShouldRenderContext) => boolean;
+  summary?: (ctx: ShouldRenderContext) => string | null;
+  onAdd?: (ctx: SectionContext) => void;
+  page?: boolean;
   advancedKey?: string;
-  /** CSS properties this section's advanced block renders. See SectionEntry. */
   advancedProps?: readonly string[];
-  /** CSS property keys this section reads — mirrors SectionEntry.styleKeys. */
   styleKeys: readonly string[];
   /** Section id — set by the registry loop for test / introspection helpers. */
   id?: string;
@@ -263,52 +270,40 @@ export interface AnySectionEntry {
 export function defineSection<P extends object>(
   entry: SectionEntry<P>
 ): AnySectionEntry {
+  const { Component, adaptProps, ...meta } = entry;
   return {
+    ...meta,
     render: (ctx) => {
-      const Component = entry.Component;
       // Slice ctx.styles to only the keys this section cares about so that
       // an edit to an unrelated property doesn't force a re-render here.
       const slicedCtx: SectionContext =
         entry.styleKeys.length > 0
           ? { ...ctx, styles: pickKeys(ctx.styles, entry.styleKeys) as Record<string, string> }
           : ctx;
-      const props = entry.adaptProps(slicedCtx);
+      const props = adaptProps(slicedCtx);
       return <Component {...props} />;
     },
-    shouldRender: entry.shouldRender,
-    tab: entry.tab,
-    title: entry.title,
-    tier: entry.tier,
-    advancedKey: entry.advancedKey,
-    advancedProps: entry.advancedProps,
-    styleKeys: entry.styleKeys,
   };
 }
 
 // ============================================================================
-// SHARED ADAPTER HELPERS — two base shapes cover ~9 of the 17 sections. The
-// other 8 need bespoke adapters because their props are genuinely unique
-// (flex pulls isFlexItem, animation wires live composer data, etc.).
+// SHARED ADAPTER HELPERS
 // ============================================================================
 
 /**
- * Base props shape for style-tab sections (layout, size, spacing, typography,
- * border, effects, visibility): styles + onChange + open/tier/advanced +
- * Wave 2 multi-select awareness.
+ * Base props shape for style sections: styles + onChange + open state +
+ * multi-select awareness.
  */
 export interface BaseStyleSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
   isOpen?: boolean;
   onToggle?: (open: boolean) => void;
-  tier?: SectionTier;
-  /** Style keys with differing values across selected elements (Wave 2). */
+  /** Style keys with differing values across selected elements. */
   mixedKeys?: ReadonlySet<string>;
-  /** True when 2+ elements selected (Wave 2). */
+  /** True when 2+ elements selected. */
   isMultiSelect?: boolean;
-  /** Lets a section's binding chips jump to the Design panel — see ColorInput
-   *  and SpacingControls, whose chips were static everywhere because no call
-   *  site ever passed this down. */
+  /** Lets a section's binding chips jump to the Design panel. */
   composer?: Composer | null;
 }
 
@@ -318,9 +313,23 @@ export function adaptBaseStyleProps(ctx: SectionContext): BaseStyleSectionProps 
     onChange: ctx.onChange,
     isOpen: ctx.isOpen,
     onToggle: ctx.onToggle,
-    tier: ctx.tier,
     mixedKeys: ctx.mixedKeys ?? EMPTY_MIXED_KEYS,
     composer: ctx.composer,
     isMultiSelect: ctx.isMultiSelect ?? false,
+  };
+}
+
+/** Props every non-style section (Behaviour) takes from the frame. */
+export function adaptElementProps(ctx: SectionContext): {
+  elementId: string;
+  composer: Composer | null;
+  isOpen: boolean;
+  onToggle: () => void;
+} {
+  return {
+    elementId: ctx.selectedElement.id,
+    composer: ctx.composer ?? null,
+    isOpen: ctx.isOpen,
+    onToggle: ctx.onToggle,
   };
 }

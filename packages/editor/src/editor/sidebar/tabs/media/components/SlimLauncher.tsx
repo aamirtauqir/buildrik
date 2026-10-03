@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, SkeletonBlock, Tooltip } from "@/editor/chrome-ui";
+import { PanelFrame, PanelSearch, Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, SkeletonBlock, Tooltip } from "@/editor/chrome-ui";
 import { Upload, Cloud, Shapes, Folder, ChevronDown, ChevronRight } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { MediaAsset, UploadResult } from "@shared/types/media";
@@ -214,6 +214,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
     return result;
   }, [props.libraryItems, activeTypes, searchQuery]);
 
+  const assetTotal = props.serverPage?.total ?? props.libraryItems.length;
   return (
     <PanelFrame
       /* Board 144:2 gives the panel a --flowbite/gray/100 (`var(--bk-gray-100)`) edge, which
@@ -230,7 +231,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           "widen this drawer". The ⋯ carries "Select assets…" (G3-011) — the
           visible door to bulk select; right-click on a card still enters it. */}
       <PanelFrame.Header
-        title={`Assets · ${props.serverPage?.total ?? props.libraryItems.length}`}
+        title={`Assets · ${assetTotal}`}
         onClose={onClose}
         actions={
           <Popover
@@ -263,6 +264,16 @@ export function SlimLauncher(props: SlimLauncherProps) {
             </Menu>
           </Popover>
         }
+      />
+
+      {/* The library search, under the header (owner decision 2026-10-03 —
+          board 4418:59771 drew no search box here and had the topbar field
+          read "Search all N assets…" instead). */}
+      <PanelSearch
+        placeholder={`Search all ${assetTotal} assets…`}
+        value={searchQuery}
+        onChange={onSearchChange}
+        data-testid="media-search"
       />
 
       {/* Board 4418:59771 — `Manage assets ›`, a full-width quiet button under

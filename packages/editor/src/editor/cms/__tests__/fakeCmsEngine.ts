@@ -117,7 +117,10 @@ export function makeEngine(opts?: {
           items = items.map((i) => (i.id === id ? { ...i, ...updates } : i));
           return Promise.resolve(items.find((i) => i.id === id) ?? null);
         }),
-        deleteContentItem: vi.fn(() => Promise.resolve(true)),
+        deleteContentItem: vi.fn((id: string) => {
+          items = items.filter((i) => i.id !== id);
+          return Promise.resolve(true);
+        }),
         addField: vi.fn(() => Promise.resolve(null)),
         deleteField: vi.fn(() => Promise.resolve(true)),
         /* Mutates the array the getters read from, so a save is observable the

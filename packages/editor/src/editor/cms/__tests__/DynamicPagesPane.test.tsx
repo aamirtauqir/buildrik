@@ -87,4 +87,11 @@ describe("DynamicPagesPane", () => {
     );
     expect(screen.getByTestId("cms-dp-status")).not.toHaveTextContent("Ready");
   });
+
+  it("never offers the home page (index.html) as a template", () => {
+    mount(MENU, [rec("a", "Margherita")]);
+    const opts = [...screen.getByTestId("cms-dp-template").querySelectorAll("option")].map((o) => o.textContent ?? "");
+    expect(opts).not.toContain("Home");
+    expect(opts).toContain("Menu item");
+  });
 });

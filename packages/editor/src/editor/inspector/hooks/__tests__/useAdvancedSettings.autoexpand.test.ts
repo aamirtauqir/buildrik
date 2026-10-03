@@ -83,6 +83,47 @@ describe("advanced group auto-expand", () => {
   });
 });
 
+/* Regression (QA 2026-10-02): the open set only ever grew. Selecting an Image
+   (max-width 100%) opened Size, and every element selected after it showed
+   Size open; selecting a Heading first left the Image's Size closed. The
+   inspector hands the hook the new id one render BEFORE the new styles. */
+describe("a new selection starts closed and opens for its own values", () => {
+  type P = { id: string; styles: Record<string, string> };
+  const mount = (initial: P) =>
+    renderHook(({ id, styles }: P) => useAdvancedSettings({ advancedPropsMap: MAP, styles, elementId: id }), {
+      initialProps: initial,
+    });
+
+  it("closes the previous element's group when the next element has no value for it", () => {
+    const image = { "max-height": "300px" };
+    const { result, rerender } = mount({ id: "image", styles: image });
+    expect(result.current.isExpanded("size")).toBe(true);
+
+    rerender({ id: "heading", styles: image }); // new id, stale styles
+    expect(result.current.isExpanded("size")).toBe(false);
+    rerender({ id: "heading", styles: { "font-size": "24px" } });
+    expect(result.current.isExpanded("size")).toBe(false);
+  });
+
+  it("opens the next element's group even when the first one had none", () => {
+    const heading = { "font-size": "24px" };
+    const { result, rerender } = mount({ id: "heading", styles: heading });
+    expect(result.current.isExpanded("size")).toBe(false);
+
+    rerender({ id: "image", styles: heading }); // stale: must not spend the one-shot
+    rerender({ id: "image", styles: { "max-height": "300px" } });
+    expect(result.current.isExpanded("size")).toBe(true);
+  });
+
+  it("does not open the new element's groups from the old element's styles", () => {
+    const image = { "max-height": "300px" };
+    const { result, rerender } = mount({ id: "heading", styles: { "font-size": "24px" } });
+    rerender({ id: "image", styles: image });
+    rerender({ id: "text", styles: image }); // text selected; image's map still current
+    expect(result.current.isExpanded("size")).toBe(false);
+  });
+});
+
 /* Against the REAL map the inspector builds. A hardcoded map cannot see the
    defect that mattered most — the sections and the property list disagreeing —
    because the test supplies both sides itself. */
@@ -103,14 +144,18 @@ describe("auto-expand against the registry the inspector actually uses", () => {
     expect(result.current.isExpanded("typography")).toBe(true);
   });
 
-  it("opens Layout for z-index and overflow, which its advanced block draws", () => {
-    expect(render({ "z-index": "10" }, real).result.current.isExpanded("layout")).toBe(true);
+  it("opens Layout for overflow, which its advanced block draws — not for z-index, which sits with Position on the face (board 17)", () => {
     expect(render({ "overflow-x": "scroll" }, real).result.current.isExpanded("layout")).toBe(true);
+    expect(render({ "z-index": "10" }, real).result.current.isExpanded("layout")).toBe(false);
   });
 
-  it("opens Background for background-blend-mode", () => {
+  it("opens Size for a flex item's shrink / basis / order, behind its More settings", () => {
+    expect(render({ "flex-basis": "200px" }, real).result.current.isExpanded("size")).toBe(true);
+  });
+
+  it("opens Fill for background-blend-mode", () => {
     const { result } = render({ "background-blend-mode": "multiply" }, real);
-    expect(result.current.isExpanded("background")).toBe(true);
+    expect(result.current.isExpanded("fill")).toBe(true);
   });
 
   it("opens Size for min-width and Border for outline-width", () => {

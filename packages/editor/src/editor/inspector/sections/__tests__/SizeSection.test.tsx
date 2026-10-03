@@ -1,161 +1,165 @@
 /**
- * SizeSection — value rendering, engine writes, hidden/disabled gates,
- * advanced (min/max) disclosure.
+ * SizeSection — Width / Height as Fixed · Fill · Hug with readouts (board 1:
+ * "Width · Fill [640 px]", "Height [Hug · Auto]"), no object-fit (→ Image
+ * block), the item controls under a flex / grid parent, and the Page panel's
+ * one Max width row (board 21).
  *
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent, within } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { SizeSection } from "../SizeSection";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { SizeSection, constraintTypeOf, valueForConstraint } from "../SizeSection";
 
 function renderSize(props: Partial<React.ComponentProps<typeof SizeSection>> = {}) {
   const onChange = vi.fn();
-  const utils = render(
-    <SizeSection styles={{}} onChange={onChange} isOpen={true} {...props} />
-  );
-  return { onChange, ...utils };
+  render(<SizeSection styles={{}} onChange={onChange} isOpen {...props} />);
+  return { onChange };
 }
 
-describe("SizeSection — current values render", () => {
-  it("shows width/height numeric parts in the W/H inputs", () => {
-    renderSize({ styles: { width: "100px", height: "50px" } });
-    const w = within(screen.getByRole("group", { name: "Width" })).getAllByRole("textbox");
-    const h = within(screen.getByRole("group", { name: "Height" })).getAllByRole("textbox");
-    expect(w[0]).toHaveValue("100");
-    expect(h[0]).toHaveValue("50");
-  });
+const row = (axis: "width" | "height") => screen.getByTestId(`inspector-size-${axis}`);
 
-  /* Board 807:8412 prints "Fill" and "Hug" against Width and Height — the
-     constraint is the row, and the numeric field only belongs to Fixed. */
-  it("a filled width reads as Fill, with no number to edit", () => {
-    renderSize({ styles: { width: "100%" } });
-    const row = within(screen.getByRole("group", { name: "Width" }));
-    expect(row.getByRole("button", { name: /Fill/ })).toBeInTheDocument();
-    expect(row.queryAllByRole("textbox")).toHaveLength(0);
-  });
+afterEach(() => {
+  document.body.querySelectorAll("[data-buildrick-id]").forEach((n) => n.remove());
+});
 
-  it("renders a collapsed preview 'W × H' when either dimension is set", () => {
-    renderSize({ styles: { width: "100px", height: "50px" }, isOpen: false });
-    expect(screen.getByText("100px × 50px")).toBeInTheDocument();
-  });
-
-  it("preview falls back to 'auto' for the unset dimension", () => {
-    renderSize({ styles: { width: "100px" }, isOpen: false });
-    expect(screen.getByText("100px × auto")).toBeInTheDocument();
+describe("constraint helpers", () => {
+  it("reads and writes the three modes", () => {
+    expect(constraintTypeOf("100%")).toBe("fill");
+    expect(constraintTypeOf("fit-content")).toBe("hug");
+    expect(constraintTypeOf("auto")).toBe("hug");
+    expect(constraintTypeOf("320px")).toBe("fixed");
+    expect(valueForConstraint("fill", "320px")).toBe("100%");
+    expect(valueForConstraint("hug", "320px")).toBe("fit-content");
+    expect(valueForConstraint("fixed", "320px")).toBe("320px");
+    expect(valueForConstraint("fixed", "100%")).toBe("200px");
   });
 });
 
-describe("SizeSection — engine writes", () => {
-  it("editing the W input writes width with the current unit", () => {
-    const { onChange } = renderSize({ styles: { width: "100px" } });
-    const [wInput] = within(screen.getByRole("group", { name: "Width" })).getAllByRole("textbox");
-    fireEvent.change(wInput, { target: { value: "200" } });
-    expect(onChange).toHaveBeenCalledWith("width", "200px");
+describe("SizeSection — board 1's readouts", () => {
+  it("unset: Width · Fill with the measured px, Height reads Hug · Auto", () => {
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", "el-1");
+    Object.defineProperty(node, "offsetWidth", { value: 640 });
+    Object.defineProperty(node, "offsetHeight", { value: 40 });
+    document.body.appendChild(node);
+    renderSize({ elementId: "el-1" });
+    expect(within(row("width")).getByRole("button", { name: "Width sizing: Fill" })).toHaveTextContent("Width · Fill");
+    expect(within(row("width")).getByLabelText("Width")).toHaveValue("640");
+    expect(within(row("height")).getByRole("button", { name: "Height sizing: Hug" })).toHaveTextContent(/^Height$/);
+    expect(within(row("height")).getByLabelText("Height sizing", { selector: "select" })).toHaveDisplayValue("Hug · Auto");
   });
 
-  it("editing the H input writes height", () => {
-    const { onChange } = renderSize({ styles: { height: "40px" } });
-    const [hInput] = within(screen.getByRole("group", { name: "Height" })).getAllByRole("textbox");
-    fireEvent.change(hInput, { target: { value: "80" } });
-    expect(onChange).toHaveBeenCalledWith("height", "80px");
+  it("Fill's number is a readout: leaving it untouched writes nothing, typing makes it Fixed", () => {
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", "el-1");
+    Object.defineProperty(node, "offsetWidth", { value: 640 });
+    document.body.appendChild(node);
+    const { onChange } = renderSize({ elementId: "el-1", styles: { width: "100%" } });
+    const input = within(row("width")).getByLabelText("Width");
+    fireEvent.blur(input);
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.change(input, { target: { value: "480" } });
+    expect(onChange).toHaveBeenCalledWith("width", "480px");
   });
 
-  it("Fill writes the full-width value", () => {
-    const { onChange } = renderSize({ styles: { width: "100px" } });
-    const row = within(screen.getByRole("group", { name: "Width" }));
-    fireEvent.click(row.getByRole("button", { name: /Fill/ }));
+  // Regression: the canvas re-creates the node on the first selection after
+  // load; the readout stayed on the detached node, Fill read "100 %" and a
+  // typed 700 was written as 700% (QA 2026-10-02).
+  it("follows the canvas node when it is replaced, so Fill keeps its px readout", async () => {
+    const make = (w: number) => {
+      const n = document.createElement("div");
+      n.setAttribute("data-buildrick-id", "el-1");
+      Object.defineProperty(n, "offsetWidth", { get: () => (n.isConnected ? w : 0) });
+      return n;
+    };
+    const first = make(640);
+    document.body.appendChild(first);
+    const { onChange } = renderSize({ elementId: "el-1" });
+    const second = make(920);
+    await act(async () => {
+      first.replaceWith(second);
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    const input = within(row("width")).getByLabelText("Width");
+    expect(input).toHaveValue("920");
+    fireEvent.change(input, { target: { value: "700" } });
+    expect(onChange).toHaveBeenCalledWith("width", "700px");
+  });
+
+  it("a fixed width reads Width · Fixed with its value", () => {
+    renderSize({ styles: { width: "320px" } });
+    expect(within(row("width")).getByRole("button", { name: "Width sizing: Fixed" })).toBeInTheDocument();
+    expect(within(row("width")).getByLabelText("Width")).toHaveValue("320");
+  });
+
+  it("the mode menu switches Fixed · Fill · Hug", () => {
+    const { onChange } = renderSize({ styles: { width: "320px" } });
+    fireEvent.click(within(row("width")).getByRole("button", { name: "Width sizing: Fixed" }));
+    fireEvent.click(screen.getByTestId("inspector-size-width-mode-fill"));
     expect(onChange).toHaveBeenCalledWith("width", "100%");
   });
 
-  it("object-fit select writes object-fit", () => {
-    const { onChange, container } = renderSize();
-    const selects = Array.from(container.querySelectorAll("select"));
-    const objectFit = selects.find((s) =>
-      Array.from(s.options).some((o) => o.value === "cover")
-    );
-    expect(objectFit).toBeTruthy();
-    fireEvent.change(objectFit as HTMLSelectElement, { target: { value: "cover" } });
-    expect(onChange).toHaveBeenCalledWith("object-fit", "cover");
+  it("the Hug select switches the height to Fixed at the measured size", () => {
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", "el-1");
+    Object.defineProperty(node, "offsetHeight", { value: 48 });
+    document.body.appendChild(node);
+    const { onChange } = renderSize({ elementId: "el-1" });
+    fireEvent.change(within(row("height")).getByLabelText("Height sizing", { selector: "select" }), { target: { value: "fixed" } });
+    expect(onChange).toHaveBeenCalledWith("height", "48px");
   });
 });
 
-describe("SizeSection — propertyStates gates", () => {
-  it("hides the W/H rows when width+height are hidden", () => {
-    renderSize({
-      propertyStates: {
-        width: { hidden: true },
-        height: { hidden: true },
-      },
-    });
-    expect(screen.queryByRole("group", { name: "Width" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("group", { name: "Height" })).not.toBeInTheDocument();
+describe("SizeSection — what moved in and out", () => {
+  it("has no object-fit (the Image block owns it)", () => {
+    renderSize({ styles: { "object-fit": "cover" }, advancedExpanded: true, onAdvancedToggle: vi.fn() });
+    expect(screen.queryByLabelText(/object fit/i)).not.toBeInTheDocument();
   });
 
-  it("disables the W input and suppresses its token chain button when width is disabled", () => {
-    renderSize({
-      styles: { width: "100px", height: "40px" },
-      propertyStates: { width: { disabled: true, reason: "Inline elements ignore width/height" } },
-    });
-    const [wInput] = within(screen.getByRole("group", { name: "Width" })).getAllByRole("textbox");
-    expect(wInput).toBeDisabled();
-    expect(
-      screen.queryByRole("button", { name: "Link width to spacing token" })
-    ).not.toBeInTheDocument();
-    // Height stays enabled with its chain button.
-    expect(
-      screen.getByRole("button", { name: "Link height to spacing token" })
-    ).toBeInTheDocument();
+  it("min / max wait behind More settings", () => {
+    const { onChange } = renderSize({ advancedExpanded: true, onAdvancedToggle: vi.fn() });
+    fireEvent.change(screen.getByLabelText("Max width"), { target: { value: "960" } });
+    expect(onChange).toHaveBeenCalledWith("max-width", "960px");
   });
 
-  it("hides object-fit when propertyStates marks it hidden", () => {
-    const { container } = renderSize({
-      propertyStates: { "object-fit": { hidden: true } },
-    });
-    const selects = Array.from(container.querySelectorAll("select"));
-    const objectFit = selects.find((s) =>
-      Array.from(s.options).some((o) => o.value === "cover")
-    );
-    expect(objectFit).toBeUndefined();
-  });
-});
-
-describe("SizeSection — advanced (min/max) disclosure", () => {
-  it("hides min/max groups until advancedExpanded and shows a count of 5 on the toggle", () => {
-    const onAdvancedToggle = vi.fn();
-    renderSize({ onAdvancedToggle });
-    expect(screen.queryByRole("group", { name: "Width constraints" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("group", { name: "Height constraints" })).not.toBeInTheDocument();
-
-    const toggle = screen.getByRole("button", { name: "More settings" });
-    expect(toggle).toHaveAttribute("aria-expanded", "false");
-    expect(within(toggle).getByText("5")).toBeInTheDocument();
-
-    fireEvent.click(toggle);
-    expect(onAdvancedToggle).toHaveBeenCalledTimes(1);
+  // Regression: an Image with no max-height showed "Max height [0] px" — a
+  // grey placeholder the eye reads as a 0px cap (QA 2026-10-02, board 8).
+  it("unset min / max read empty, not a value-shaped 0", () => {
+    renderSize({ styles: { "max-width": "100%" }, advancedExpanded: true, onAdvancedToggle: vi.fn() });
+    for (const label of ["Min width", "Min height", "Max height"]) {
+      const input = screen.getByLabelText(label) as HTMLInputElement;
+      expect(input).toHaveValue("");
+      expect(input.placeholder).toBe("");
+    }
+    expect(screen.getByLabelText("Max width")).toHaveValue("100");
   });
 
-  it("shows min/max inputs when advancedExpanded and writes min-width on edit", () => {
-    const { onChange } = renderSize({
-      advancedExpanded: true,
-      onAdvancedToggle: vi.fn(),
-      styles: { "min-width": "10px" },
-    });
-    const widthConstraints = screen.getByRole("group", { name: "Width constraints" });
-    const [minW] = within(widthConstraints).getAllByRole("textbox");
-    expect(minW).toHaveValue("10");
-    fireEvent.change(minW, { target: { value: "20" } });
-    expect(onChange).toHaveBeenCalledWith("min-width", "20px");
-    // Expanded toggle relabels to "Less".
-    expect(screen.getByRole("button", { name: "Less" })).toHaveAttribute(
-      "aria-expanded",
-      "true"
-    );
+  it("under a flex parent it carries Grow and Align self", () => {
+    renderSize({ parentLayout: "flex" });
+    expect(screen.getByLabelText("Grow")).toBeInTheDocument();
+    expect(screen.getByLabelText("Align self")).toBeInTheDocument();
   });
 
-  it("does not render the toggle at all when onAdvancedToggle is not wired", () => {
+  it("with no flex / grid parent, no item controls", () => {
     renderSize();
-    // onAdvancedToggle omitted → no MoreSettingsToggle
-    expect(screen.queryByRole("button", { name: "More settings" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Grow")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Column span")).not.toBeInTheDocument();
+  });
+
+  it("hidden width / height rows stay hidden", () => {
+    renderSize({ propertyStates: { width: { hidden: true }, height: { hidden: true } } });
+    expect(screen.queryByTestId("inspector-size-width")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("inspector-size-height")).not.toBeInTheDocument();
+  });
+});
+
+describe("SizeSection — Page panel (board 21)", () => {
+  it("is the one Max width row", () => {
+    const { onChange } = renderSize({ variant: "page", styles: { "max-width": "1200px" } });
+    expect(screen.queryByTestId("inspector-size-width")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Max width")).toHaveValue("1200");
+    fireEvent.change(screen.getByLabelText("Max width"), { target: { value: "1280" } });
+    expect(onChange).toHaveBeenCalledWith("max-width", "1280px");
   });
 });

@@ -20,6 +20,7 @@ import type {
 } from "../shared/types";
 import { clamp, deepClone } from "../shared/utils/helpers";
 import { dropSessionMediaUrls, sanitizeElementTreeContent } from "../shared/utils/html";
+import { refineElementTypes } from "./migration/refineElementTypes";
 import { CanvasIndicators } from "./canvas/indicators";
 import { ResizeHandler } from "./canvas/ResizeHandler";
 import { CMSBindingManager } from "./cms/CMSBindingManager";
@@ -626,6 +627,8 @@ export class Composer extends EventEmitter {
         if (page.root) {
           sanitizeElementTreeContent(page.root);
           dropSessionMediaUrls(page.root, this.localMediaUrlRemap);
+          // Q2: saved `container`s whose markup proves a real type get it.
+          refineElementTypes(page.root);
         }
         renames.push(...this.elements.importPage(page));
       });
@@ -871,6 +874,17 @@ ${html}${interactionScript}
     const prev = this.projectSettings;
     this.markDirty(); // Mark dirty BEFORE applyProjectSettings emits PROJECT_CHANGED
     this.applyProjectSettings(prev, settings);
+  }
+
+  /**
+   * Apply project settings the server already holds — the Settings Save
+   * (Phase B, BE-3) wrote them through the settings mutations first. The
+   * editor sees them (SETTINGS_CHANGE), but they are not a document edit: no
+   * dirty flag and no PROJECT_CHANGED, so autosave does not send the project
+   * again (`sites.saveProject`) for a change that is already saved.
+   */
+  adoptSavedProjectSettings(settings: ProjectSettings): void {
+    this.applyProjectSettings(this.projectSettings, settings, { emitProjectChanged: false });
   }
 
   /**

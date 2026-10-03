@@ -45,6 +45,9 @@ export interface LayerTreeItemProps {
   onContextMenu: (e: React.MouseEvent, id: string) => void;
   getVisibleLayerIds: () => string[];
   displayPrefs: LayerDisplayPrefs;
+  /** Selection mode (LayersTab's Select): the row shows its checkbox and a
+   *  click or Enter/Space toggles it. Off (default): no checkbox. */
+  selecting?: boolean;
 }
 
 export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
@@ -79,6 +82,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     onContextMenu,
     getVisibleLayerIds,
     displayPrefs,
+    selecting = false,
   } = props;
   const isSelected = selectedIds.has(layer.id);
   const isExpanded = expandedIds.has(layer.id);
@@ -164,7 +168,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     }
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      onSelect(layer.id, {});
+      onSelect(layer.id, selecting ? { meta: true } : {});
     } else if (e.key === "F2") {
       e.preventDefault();
       if (!isLocked && !readOnly) {
@@ -223,7 +227,8 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         onDragLeave={onDragLeave}
         onDrop={(e) => onDrop(e, layer.id)}
         onClick={(e) => {
-          onSelect(layer.id, { shift: e.shiftKey, meta: e.metaKey || e.ctrlKey });
+          /* Selection mode: a row click toggles its tick (the meta-click). */
+          onSelect(layer.id, { shift: e.shiftKey, meta: selecting || e.metaKey || e.ctrlKey });
         }}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -238,20 +243,24 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         }}
         onKeyDown={handleKeyDown}
       >
-        {/* v3 boards 4418:79139 / 4418:81300: a 16px checkbox in the row's left
-            gutter — the ⇧/⌘-click multi-select, made visible. Ticking adds or
-            removes this row from the selection without touching the others.
-            A lone selection is the tinted row, not a tick (4418:81300 draws
-            Hero selected with its box empty). */}
-        <span className="tw:absolute tw:left-1 tw:top-1/2 tw:flex tw:-translate-y-1/2" onClick={(e) => e.stopPropagation()}>
-          <Checkbox
-            aria-label={`Select ${displayName}`}
-            data-testid={`layer-check-${layer.id}`}
-            checked={isSelected && selectedIds.size >= 2}
-            onChange={() => onSelect(layer.id, { meta: true })}
-            className="tw:size-4 tw:cursor-pointer tw:rounded tw:border-[1.5px] tw:border-[var(--bk-gray-300)] tw:bg-[var(--bk-bg-panel)]"
-          />
-        </span>
+        {/* v3 boards 4418:79139 / 4418:81300 draw a 16px checkbox in every
+            row's left gutter — the ⇧/⌘-click multi-select, made visible.
+            OWNER OVERRIDE 2026-10-03: it is drawn only in selection mode
+            (LayersTab's Select). The gutter stays either way, so rows do not
+            shift when the mode toggles. In the mode a tick is simply "in the
+            selection" — a lone selected row is ticked too, so the ticks and
+            the footer's "N selected" always agree. */}
+        {selecting && (
+          <span className="tw:absolute tw:left-1 tw:top-1/2 tw:flex tw:-translate-y-1/2" onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              aria-label={`Select ${displayName}`}
+              data-testid={`layer-check-${layer.id}`}
+              checked={isSelected}
+              onChange={() => onSelect(layer.id, { meta: true })}
+              className="tw:size-4 tw:cursor-pointer tw:rounded tw:border-[1.5px] tw:border-[var(--bk-gray-300)] tw:bg-[var(--bk-bg-panel)]"
+            />
+          </span>
+        )}
         <Button
           type="button"
           className="bdc-lr-chev"

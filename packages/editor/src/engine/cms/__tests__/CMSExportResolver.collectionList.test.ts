@@ -8,6 +8,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CMSExportResolver } from "../CMSExportResolver";
+import { RepeaterRenderer } from "../RepeaterRenderer";
 import { CMSBindingManager } from "../CMSBindingManager";
 import { CollectionManager } from "../CollectionManager";
 import * as Storage from "../CollectionStorage";
@@ -58,5 +59,51 @@ describe("Collection list in export", () => {
     const html = await resolver.resolve(PAGE, { mode: "template", syntax: "handlebars" });
     expect(html).toContain(`<div data-buildrick-id="list"><!--#each ${menuId} as |item|--><div data-buildrick-id="card">`);
     expect(html).toContain("</div><!--/each--></div>");
+  });
+});
+
+/* C0.8 / BD-01: a list child bound through the Inspector ("From CMS", no
+   pinned record) to the list's own collection reads the CURRENT record of
+   each copy. Resolved page-wide it wrote the first record into every copy. */
+describe("a list child's binding resolves per copy (current item)", () => {
+  const BOUND =
+    '<div data-buildrick-id="list"><div data-buildrick-id="card"><h3 data-buildrick-id="t">Margherita</h3></div></div>';
+
+  async function bound() {
+    const ctx = await setup();
+    const composer = (ctx.resolver as unknown as { composer: Composer }).composer;
+    composer.cms.bindings.bindToField("t", ctx.menuId, undefined, "name", "content");
+    return { ...ctx, composer };
+  }
+
+  it("publish: each copy shows its own record", async () => {
+    const { resolver } = await bound();
+    const html = await resolver.resolve(BOUND, { mode: "static" });
+    const titles = [...html.matchAll(/<h3 data-buildrick-id="t">([^<]*)<\/h3>/g)].map((m) => m[1]);
+    expect(titles.sort()).toEqual(["Margherita", "Quattro"]);
+    expect(html).not.toContain("data-cms-current-item");
+  });
+
+  it("canvas: each copy shows its own record", async () => {
+    const { composer } = await bound();
+    const doc = new DOMParser().parseFromString(BOUND, "text/html");
+    await new RepeaterRenderer(composer).expandCollectionLists(doc, { canvas: true });
+    const titles = Array.from(doc.querySelectorAll('[data-buildrick-id="t"]')).map((el) => el.textContent);
+    // The canvas shows drafts too.
+    expect(titles.sort()).toEqual(["Margherita", "Quattro", "Unfinished"]);
+  });
+
+  it("a binding to a pinned record stays that record in every copy", async () => {
+    const { resolver, composer, menuId } = await setup().then(async (ctx) => ({
+      ...ctx,
+      composer: (ctx.resolver as unknown as { composer: Composer }).composer,
+    }));
+    const pinned = (await composer.cms.collections.queryContent({ collectionId: menuId, status: "published" })).items.find(
+      (i) => i.data.name === "Quattro",
+    )!;
+    composer.cms.bindings.bindToField("t", menuId, pinned.id, "name", "content");
+    const html = await resolver.resolve(BOUND, { mode: "static" });
+    const titles = [...html.matchAll(/<h3 data-buildrick-id="t">([^<]*)<\/h3>/g)].map((m) => m[1]);
+    expect(titles).toEqual(["Quattro", "Quattro"]);
   });
 });

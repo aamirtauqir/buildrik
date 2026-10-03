@@ -92,3 +92,27 @@ describe("Tabs — the WAI-ARIA contract the pill must not cost", () => {
     expect(onChange).toHaveBeenCalledWith("c");
   });
 });
+
+describe("Tabs — panelId (tabpanel wiring)", () => {
+  it("each tab controls the panel and carries the id the panel is labelled by", () => {
+    render(
+      <Tabs
+        tabs={[{ id: "style", label: "Style" }, { id: "effects", label: "Effects" }]}
+        value="style"
+        onChange={() => {}}
+        panelId="insp-panel"
+      />,
+    );
+    const style = screen.getByRole("tab", { name: "Style" });
+    expect(style).toHaveAttribute("aria-controls", "insp-panel");
+    expect(style.id).toBe("insp-panel-tab-style");
+  });
+
+  it("without panelId nothing changes", () => {
+    render(<Tabs tabs={[{ id: "a", label: "A" }]} value="a" onChange={() => {}} />);
+    const tab = screen.getByRole("tab", { name: "A" });
+    expect(tab).not.toHaveAttribute("aria-controls");
+    expect(tab.id).toBe("");
+  });
+});
+

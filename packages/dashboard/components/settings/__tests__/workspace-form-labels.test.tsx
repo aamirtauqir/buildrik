@@ -13,11 +13,18 @@ import { WorkspaceForm } from "../workspace-form";
 describe("WorkspaceForm — label association", () => {
   it("each field is reachable via getByLabelText", () => {
     render(<WorkspaceForm initialData={{ name: "Acme", slug: "acme" }} onSave={vi.fn()} onSaveSharing={vi.fn()} />);
-    for (const name of ["Workspace name", "Workspace URL", "Default language", "Timezone", "Link expiration"]) {
+    for (const name of ["Workspace name", "Workspace URL", "Link expiration"]) {
       const control = screen.getByLabelText(name);
       const label = document.querySelector(`label[for="${control.id}"]`) as HTMLElement;
       expect(label.className, name).toBe("block text-body font-medium mb-1");
       expect(label.style.color, name).toBe("var(--color-text-primary)");
     }
+  });
+
+  it("has no Default language or Timezone field (PD-8 — nothing read them)", () => {
+    render(<WorkspaceForm initialData={{ name: "Acme", slug: "acme" }} onSave={vi.fn()} onSaveSharing={vi.fn()} />);
+    expect(screen.queryByLabelText("Default language")).toBeNull();
+    expect(screen.queryByLabelText("Timezone")).toBeNull();
+    expect(screen.queryByRole("switch", { name: "Activity summary emails" })).toBeNull();
   });
 });

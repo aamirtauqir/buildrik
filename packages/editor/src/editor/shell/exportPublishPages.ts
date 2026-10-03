@@ -4,6 +4,8 @@ import { CMSExportResolver } from "@/engine/cms/CMSExportResolver";
 import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import type { ProjectData } from "@/shared/types/project";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { cmsFromRows, cmsSyncBlocker, fetchPublishSnapshot } from "@/services/cmsSync";
 
 /** A page ready to publish: a path + its rendered HTML. Matches the server's
  *  publishPageSchema ({ path, html }). */
@@ -41,21 +43,51 @@ export function inlinePublishStylesheet(
 }
 
 async function exportPageFiles(composer: Composer) {
-  return (await new ExportEngine(composer).exportAllPages({ format: "html", minify: true })).files;
+  return (await new ExportEngine(composer).exportAllPages({ format: "html", minify: true, rootAbsoluteHrefs: true })).files;
 }
 
-export async function exportPublishPages(composer: Composer): Promise<PublishPage[]> {
-  const files = await exportPageFiles(composer);
-  /* The multi-page export writes ONE styles.css and links it from every page,
-     and the publish payload carries pages only (`pages: [{ path, html }]`), so
-     that file never reached the deployment — the worker uploads the page HTML
-     plus robots.txt and nothing else. Every published page linked a stylesheet
-     that 404s, and the exported markup carries CLASSES rather than style
-     attributes, so the site shipped with browser defaults.
+/** Collection ids the project's bindings read — field bindings and lists. */
+function boundCollectionIds(project: ProjectData): string[] {
+  const ids = new Set<string>();
+  for (const list of Object.values(project.cmsBindings?.field ?? {})) {
+    for (const b of list) ids.add(b.collectionId);
+  }
+  for (const b of Object.values(project.cmsBindings?.collection ?? {})) {
+    ids.add(b.collectionId);
+  }
+  return [...ids];
+}
 
-     Inlining it needs no new transport: schema, server and worker unchanged.
-     Pages are capped at 2MB each and the stylesheet is a few KB. */
-  return inlinePublishStylesheet(files);
+/** Publish refused before any request: CMS changes are not on the server
+ *  yet (or wait on a conflict choice). Board 8139:218055 titles it "Publish
+ *  blocked" — nothing failed, the publish never started. */
+export class PublishBlockedError extends Error {}
+
+export async function exportPublishPages(composer: Composer): Promise<PublishPage[]> {
+  const siteId = getSiteIdFromUrl();
+  const project = composer.exportProject();
+  const collectionIds = boundCollectionIds(project);
+  /* The standalone demo has no server; a site with no bindings has nothing
+     the server could correct. Everything else publishes the SERVER's CMS rows:
+     this browser's store can hold rows another device deleted, edits that
+     never synced, or a rename the server never saw (DM-01). */
+  if (!siteId || collectionIds.length === 0) {
+    const files = await exportPageFiles(composer);
+    /* The multi-page export writes ONE styles.css and links it from every page,
+       and the publish payload carries pages only (`pages: [{ path, html }]`), so
+       that file never reached the deployment — the worker uploads the page HTML
+       plus robots.txt and nothing else. Every published page linked a stylesheet
+       that 404s, and the exported markup carries CLASSES rather than style
+       attributes, so the site shipped with browser defaults.
+
+       Inlining it needs no new transport: schema, server and worker unchanged.
+       Pages are capped at 2MB each and the stylesheet is a few KB. */
+    return inlinePublishStylesheet(files);
+  }
+  const blocker = cmsSyncBlocker();
+  if (blocker) throw new PublishBlockedError(blocker);
+  const { cms, siteFonts } = await fetchPublishSnapshot(siteId, collectionIds);
+  return renderProjectPages(project, siteFonts, cmsFromRows(cms));
 }
 
 /** A rendered page plus the page it came from — its NAME for a page menu and

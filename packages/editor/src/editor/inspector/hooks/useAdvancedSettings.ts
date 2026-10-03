@@ -79,10 +79,19 @@ export function useAdvancedSettings(
     () => new Set(defaultExpanded)
   );
 
-  // Track which element IDs we've already auto-expanded for. Running once per
-  // element ID means a user collapse sticks for the rest of that selection —
-  // but re-selecting the element (or selecting a different one) re-computes.
-  const autoExpandedIdsRef = React.useRef<Set<string>>(new Set());
+  /* Which element the groups belong to. A NEW selection starts every group
+     closed again, then opens the ones its own values call for (owner decision
+     2026-10-02: "More settings" collapsed by default). The set used to only
+     ever grow: an Image (max-width 100%) opened Size's More settings and every
+     element selected after it showed Size open too, while selecting a Heading
+     first and the Image second left the Image's closed.
+     `staleStylesRef` is the style map that was current when the selection
+     changed — the previous element's, until useStyleHandlers re-reads (its
+     effect runs before this one, its state lands a render later). Scanning
+     that map would open the old element's groups on the new one. */
+  const seenIdRef = React.useRef<string | null>(null);
+  const staleStylesRef = React.useRef<Record<string, string> | null>(null);
+  const autoExpandedForRef = React.useRef<string | null>(null);
 
   // Auto-expand groups when search matches their advanced props
   React.useEffect(() => {
@@ -104,10 +113,19 @@ export function useAdvancedSettings(
     }
   }, [searchQuery, advancedPropsMap]);
 
-  // Auto-expand groups whose advanced props already have non-empty values. Runs
-  // once per element ID change so user collapses aren't overridden on every render.
+  // Auto-expand groups whose advanced props already have non-empty values —
+  // once per selected element, so a user collapse sticks for that selection.
   React.useEffect(() => {
     if (!elementId || !advancedPropsMap || !styles) return;
+    if (seenIdRef.current !== elementId) {
+      const switching = seenIdRef.current !== null;
+      seenIdRef.current = elementId;
+      staleStylesRef.current = switching ? styles : null;
+      autoExpandedForRef.current = null;
+      if (switching) setExpandedGroups(new Set());
+    }
+    if (autoExpandedForRef.current === elementId) return;
+    if (styles === staleStylesRef.current) return;
     /* Wait for the styles to arrive before spending the one-shot. `styles` is
        `{}` on the first render after a selection — useStyleHandlers fills it in
        an effect that runs later — and `{}` is truthy, so this used to mark the
@@ -116,8 +134,7 @@ export function useAdvancedSettings(
        is why the casing bug below sat unnoticed: the second defect hid the
        first. */
     if (Object.keys(styles).length === 0) return;
-    if (autoExpandedIdsRef.current.has(elementId)) return;
-    autoExpandedIdsRef.current.add(elementId);
+    autoExpandedForRef.current = elementId;
 
     const groupsToExpand: string[] = [];
     for (const [groupId, props] of Object.entries(advancedPropsMap)) {

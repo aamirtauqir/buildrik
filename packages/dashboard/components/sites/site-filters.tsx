@@ -18,6 +18,9 @@ export const STATUS_FILTER_OPTIONS = [
   { value: "PUBLISHED", label: "Published" },
   { value: "DRAFT", label: "Draft" },
   { value: "ARCHIVED", label: "Archived" },
+  /* Settings Phase B (PD-6): not a Site status — the sites deleted inside the
+     30-day restore window (`sites.listDeleted`), shown with Restore. */
+  { value: "DELETED", label: "Recently deleted" },
 ] as const;
 
 const DATE_RANGE_OPTIONS = [
@@ -49,6 +52,7 @@ interface SiteFiltersProps {
   hasTraffic: "none" | "1-100" | "100-1000" | "1000+" | undefined;
   onHasTrafficChange: (v: "none" | "1-100" | "100-1000" | "1000+" | undefined) => void;
   archivedCount?: number;
+  deletedCount?: number;
   /** Rendered at the head of the filter row. The search box used to sit on its
    *  own row above this one, which gave Sites four stacked control rows before
    *  any content (header actions, folder cards, search, filters). One strip. */
@@ -65,6 +69,7 @@ export function SiteFilters({
   hasCustomDomain, onHasCustomDomainChange,
   hasTraffic, onHasTrafficChange,
   archivedCount,
+  deletedCount,
   search,
 }: SiteFiltersProps) {
   const [sortOpen, setSortOpen] = useState(false);
@@ -90,6 +95,8 @@ export function SiteFilters({
             <ChipButton key={opt.value} active={status === opt.value} onClick={() => onStatusChange(status === opt.value ? undefined : opt.value)}>
               {opt.value === "ARCHIVED" && archivedCount !== undefined ? (
                 <>{opt.label} · <MetricValue>{archivedCount}</MetricValue></>
+              ) : opt.value === "DELETED" && deletedCount !== undefined ? (
+                <>{opt.label} · <MetricValue>{deletedCount}</MetricValue></>
               ) : (
                 opt.label
               )}

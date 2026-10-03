@@ -140,8 +140,10 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   onLoadStateChange,
   registerRetryLoad,
   saveError,
+  registerFieldErrors,
+  fieldErrors,
 }) => {
-  const { value: stored, isDirty, markDirty } = useSettingsScreen(
+  const { value: stored } = useSettingsScreen(
     composer,
     (s) => ({
       gaId: s.analytics?.googleAnalytics?.measurementId ?? "",
@@ -174,6 +176,19 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const [verified, setVerified] = React.useState<{ id: string; events24h: number } | null>(null);
   const gaInputRef = React.useRef<HTMLInputElement>(null);
 
+  /* Dirty is a difference from what is stored, so a field typed back to its
+     saved value is clean again (after Save the composer adopts the values,
+     SETTINGS_CHANGE re-reads `stored`). */
+  const isDirty =
+    gaId !== stored.gaId ||
+    gaEnabled !== stored.gaEnabled ||
+    gaVerifiedAt !== stored.gaVerifiedAt ||
+    gtmId !== stored.gtmId ||
+    gtmEnabled !== stored.gtmEnabled ||
+    pixelId !== stored.pixelId ||
+    pixelEnabled !== stored.pixelEnabled ||
+    clarityId !== stored.clarityId ||
+    clarityEnabled !== stored.clarityEnabled;
   React.useEffect(() => {
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
@@ -214,6 +229,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const clarityError = validateProviderId("microsoftClarity", clarityId);
   /** The first malformed id's sentence — while one stands, Save is refused. */
   const firstError = gaError ?? gtmError ?? pixelError ?? clarityError;
+  /* What the field shows: its own shape check first, else what the server
+     refused on the last Save (ScreenProps.fieldErrors, keyed by settings path). */
+  const shown = (own: string | null, path: string) => own ?? fieldErrors?.[`analytics.${path}`] ?? null;
+  const gaShown = shown(gaError, "googleAnalytics.measurementId");
+  const gtmShown = shown(gtmError, "googleTagManager.containerId");
+  const pixelShown = shown(pixelError, "facebookPixel.pixelId");
+  const clarityShown = shown(clarityError, "microsoftClarity.projectId");
 
   /* Verify (4256:26844): the id's shape, then the tracker's status read
      again, then `verifiedAt` into the draft — the next Save carries it. A
@@ -230,7 +252,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
       const next = projectId ? await getBuildrikClient(DASHBOARD_URL).siteDetail.analyticsStatus.query({ siteId: projectId }) : status;
       setStatus(next);
       setGaVerifiedAt(new Date().toISOString());
-      markDirty();
       setVerified({ id: gaId, events24h: next?.events24h ?? 0 });
     } catch (error: unknown) {
       devError("settings", `analytics status re-read failed for site ${projectId}`, error);
@@ -252,7 +273,19 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     return () => registerSaveHandler(null);
   }, [registerSaveHandler, firstError]);
 
-  // Flush local buffer → composer once on Save click (see SettingsTab). The
+  /* §27: the shell disables Save while any id is malformed. */
+  React.useEffect(() => {
+    if (!registerFieldErrors) return;
+    const errors: Record<string, string> = {};
+    if (gaError) errors["analytics.googleAnalytics.measurementId"] = gaError;
+    if (gtmError) errors["analytics.googleTagManager.containerId"] = gtmError;
+    if (pixelError) errors["analytics.facebookPixel.pixelId"] = pixelError;
+    if (clarityError) errors["analytics.microsoftClarity.projectId"] = clarityError;
+    registerFieldErrors(Object.keys(errors).length > 0 ? errors : null);
+  }, [registerFieldErrors, gaError, gtmError, pixelError, clarityError]);
+  React.useEffect(() => () => registerFieldErrors?.(null), [registerFieldErrors]);
+
+  // On Save the shell calls this and saves what it returns (ScreenProps.registerFlushHandler). The
   // other providers' `verifiedAt` ride through from the stored config.
   const stateRef = React.useRef({ gaId, gaEnabled, gaVerifiedAt, gtmId, gtmEnabled, pixelId, pixelEnabled, clarityId, clarityEnabled, cookieConsent, firstError });
   stateRef.current = { gaId, gaEnabled, gaVerifiedAt, gtmId, gtmEnabled, pixelId, pixelEnabled, clarityId, clarityEnabled, cookieConsent, firstError };
@@ -262,7 +295,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
       const s = stateRef.current;
       if (s.firstError) throw new Error(s.firstError);
       const current = composer.getProjectSettings();
-      composer.setProjectSettings({
+      return {
         ...current,
         analytics: {
           ...current.analytics,
@@ -276,7 +309,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
           microsoftClarity: { ...current.analytics?.microsoftClarity, enabled: s.clarityEnabled && !!s.clarityId, projectId: s.clarityId },
           cookieConsent: { enabled: s.cookieConsent },
         },
-      });
+      };
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);
@@ -309,7 +342,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               checked={gaEnabled}
               onChange={(next) => {
                 setGaEnabled(next);
-                markDirty();
               }}
               aria-labelledby="enable-google-analytics-label"
               sizing="md"
@@ -328,16 +360,15 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 setGaId(e.target.value.toUpperCase());
                 // A different id is a different connection: its verification goes with it.
                 setGaVerifiedAt(undefined);
-                markDirty();
               }}
               placeholder="G-XXXXXXXXXX"
-              aria-describedby={gaError ? "ga-error" : undefined}
-              aria-invalid={gaError !== null}
+              aria-describedby={gaShown ? "ga-error" : undefined}
+              aria-invalid={gaShown !== null}
               data-testid="set-an-ga-id"
             />
-            {gaError && (
+            {gaShown && (
               <div id="ga-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-ga-error">
-                {gaError}
+                {gaShown}
               </div>
             )}
           </div>
@@ -364,7 +395,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               onClick={verify}
               data-testid="set-an-ga-verify"
             >
-              Verify
+              {verifying ? "Checking…" : "Check data is arriving"}
             </Button>
           </div>
         </Row>
@@ -383,7 +414,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               checked={gtmEnabled}
               onChange={(next) => {
                 setGtmEnabled(next);
-                markDirty();
               }}
               aria-labelledby="enable-google-tag-manager-label"
               sizing="md"
@@ -399,16 +429,15 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               value={gtmId}
               onChange={(e) => {
                 setGtmId(e.target.value.toUpperCase().trim());
-                markDirty();
               }}
               placeholder="GTM-XXXXXXX"
-              aria-describedby={gtmError ? "gtm-error" : undefined}
-              aria-invalid={gtmError !== null}
+              aria-describedby={gtmShown ? "gtm-error" : undefined}
+              aria-invalid={gtmShown !== null}
               data-testid="set-an-gtm-id"
             />
-            {gtmError && (
+            {gtmShown && (
               <div id="gtm-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-gtm-error">
-                {gtmError}
+                {gtmShown}
               </div>
             )}
           </div>
@@ -423,7 +452,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               checked={pixelEnabled}
               onChange={(next) => {
                 setPixelEnabled(next);
-                markDirty();
               }}
               aria-labelledby="enable-meta-pixel-label"
               sizing="md"
@@ -439,16 +467,15 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               value={pixelId}
               onChange={(e) => {
                 setPixelId(e.target.value.replace(/\D/g, ""));
-                markDirty();
               }}
               placeholder="1234567890123456"
-              aria-describedby={pixelError ? "pixel-error" : undefined}
-              aria-invalid={pixelError !== null}
+              aria-describedby={pixelShown ? "pixel-error" : undefined}
+              aria-invalid={pixelShown !== null}
               data-testid="set-an-pixel-id"
             />
-            {pixelError && (
+            {pixelShown && (
               <div id="pixel-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-pixel-error">
-                {pixelError}
+                {pixelShown}
               </div>
             )}
           </div>
@@ -463,7 +490,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               checked={clarityEnabled}
               onChange={(next) => {
                 setClarityEnabled(next);
-                markDirty();
               }}
               aria-labelledby="enable-microsoft-clarity-label"
               sizing="md"
@@ -479,16 +505,15 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               value={clarityId}
               onChange={(e) => {
                 setClarityId(e.target.value.trim());
-                markDirty();
               }}
               placeholder="abcdefghij"
-              aria-describedby={clarityError ? "clarity-error" : undefined}
-              aria-invalid={clarityError !== null}
+              aria-describedby={clarityShown ? "clarity-error" : undefined}
+              aria-invalid={clarityShown !== null}
               data-testid="set-an-clarity-id"
             />
-            {clarityError && (
+            {clarityShown && (
               <div id="clarity-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-clarity-error">
-                {clarityError}
+                {clarityShown}
               </div>
             )}
           </div>

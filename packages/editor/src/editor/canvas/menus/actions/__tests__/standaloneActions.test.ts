@@ -4,8 +4,8 @@
  * @license BSD-3-Clause
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
-import { BINDABLE_TYPES, standaloneActions } from "../standaloneActions";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { standaloneActions } from "../standaloneActions";
 import { EVENTS } from "../../../../../shared/constants/events";
 import type { ActionContext } from "../../contextMenuRegistry";
 import {
@@ -17,7 +17,7 @@ import {
   type ElementStub,
 } from "../../../__tests__/testHarness";
 import type { Element } from "../../../../../engine";
-import { getProfileFor } from "@/editor/inspector/config/elementProfiles";
+import { BINDABLE_TYPES, capabilitiesFor } from "@/shared/constants/elementCapabilities";
 
 function action(id: string) {
   const found = standaloneActions.find((a) => a.id === id);
@@ -48,19 +48,19 @@ describe("standaloneActions", () => {
      so the row selects the element and reveals that section, the same way
      "Add interaction" reveals Interactions. */
   describe("bind-to-cms", () => {
-    it("reveals the element's Content binding section instead of opening the CMS workspace", () => {
+    it("reveals the element's CMS binding section instead of opening the CMS workspace", () => {
       const heading = makeElementStub({ id: "h-1", type: "heading", parent });
       action("bind-to-cms").handler!({ ...ctx, element: heading as unknown as Element });
       expect(composer.selection.select).toHaveBeenCalledWith(heading);
-      expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" });
+      expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "cms-binding" });
       expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "content" });
     });
 
-    it("is offered only on types whose inspector profile carries the Content section", () => {
+    it("is offered only on types whose capabilities carry the CMS binding section", () => {
       for (const type of BINDABLE_TYPES) {
         const el = makeElementStub({ id: `x-${type}`, type, parent });
         expect(action("bind-to-cms").isVisible!({ ...ctx, element: el as unknown as Element })).toBe(true);
-        expect(getProfileFor(type).order).toContain("content");
+        expect(capabilitiesFor(type).cmsBindable).toBe(true);
       }
     });
   });
@@ -138,15 +138,18 @@ describe("standaloneActions", () => {
   });
 
   describe("lock / unlock", () => {
-    it("lock-element sets locked=true in a transaction", () => {
+    /* The shared lock commands (one transaction each, the same the Inspector
+       and Layers run) — on the right-clicked element. */
+    it("lock-element runs the lock command on this element", () => {
+      (composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands = { run: vi.fn() };
       action("lock-element").handler!(ctx);
-      expect(composer.beginTransaction).toHaveBeenCalledWith("lock-element");
-      expect(element.setLocked).toHaveBeenCalledWith(true);
+      expect((composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands.run).toHaveBeenCalledWith("lock-element", { elementId: element.getId() });
     });
 
-    it("unlock-element sets locked=false", () => {
+    it("unlock-element runs the unlock command on this element", () => {
+      (composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands = { run: vi.fn() };
       action("unlock-element").handler!(ctx);
-      expect(element.setLocked).toHaveBeenCalledWith(false);
+      expect((composer as unknown as { commands: { run: ReturnType<typeof vi.fn> } }).commands.run).toHaveBeenCalledWith("unlock-element", { elementId: element.getId() });
     });
 
     it("visibility flips on lock state and hides on root", () => {

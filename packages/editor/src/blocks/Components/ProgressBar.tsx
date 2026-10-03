@@ -13,6 +13,9 @@ export const progressBlockConfig = {
     '<div class="pb-card" data-buildrick-type="progress">' +
     '<h1 class="pb-title">Your Progress</h1>' +
     '<div class="pb-progress">' +
+    /* The bar the Inspector's Value / Maximum drive (board 12); pb-circle is
+       its label ("Show label"). */
+    '<progress class="pb-bar" value="93" max="100"></progress>' +
     '<div class="pb-circle">93%</div>' +
     '<div class="pb-text">' +
     '<h2 class="pb-h2">32 of 42 complete</h2>' +

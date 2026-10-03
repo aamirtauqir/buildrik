@@ -17,6 +17,7 @@ import {
   type MockComponentDef,
 } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 import { useComponentsState } from "../useComponentsState";
+import { requestOpenMaster } from "../openMasterRequest";
 
 const asMock = (fn: unknown): Mock => fn as Mock;
 
@@ -310,5 +311,63 @@ describe("useComponentsState — insert / instantiate", () => {
       message: "Couldn't add component. Try again.",
       variant: "error",
     });
+  });
+});
+
+/* §13 "Edit master ›": the door is on an instance, in the inspector. The
+   master's screen offers "‹ Back to instance", which re-selects that instance
+   (the Inspector, mounted throughout, shows it again) and leaves the screen. */
+describe("useComponentsState — Edit master › returns to the instance (§13)", () => {
+  function doorSetup() {
+    const instance = { getId: () => "inst-1" };
+    const select = vi.fn();
+    const composer = createMockComposer({
+      components: FIXTURES.map((c) => ({ ...c })),
+    });
+    const c = composer as unknown as {
+      selection: { select: Mock };
+      elements: { getElement: Mock };
+    };
+    c.selection.select = select;
+    c.elements.getElement = vi.fn((id: string) => (id === "inst-1" ? instance : null));
+    return { composer, instance, select };
+  }
+
+  it("a door opened on an instance offers Back to instance; it re-selects and leaves the master", () => {
+    const { composer, instance, select } = doorSetup();
+    requestOpenMaster(composer, "c1", "inst-1");
+    const { result } = renderHook(() => useComponentsState({ composer }));
+    expect(result.current.detailComponent?.id).toBe("c1");
+    expect(result.current.backToInstance).toBeTypeOf("function");
+
+    act(() => result.current.backToInstance!());
+
+    expect(select).toHaveBeenCalledWith(instance);
+    expect(result.current.detailComponent).toBeNull();
+    expect(result.current.backToInstance).toBeUndefined();
+  });
+
+  it("the event reaches an already-mounted panel with the instance too", () => {
+    const { composer, select, instance } = doorSetup();
+    const { result } = renderHook(() => useComponentsState({ composer }));
+    act(() => requestOpenMaster(composer, "c2", "inst-1"));
+    expect(result.current.detailComponent?.id).toBe("c2");
+    act(() => result.current.backToInstance!());
+    expect(select).toHaveBeenCalledWith(instance);
+  });
+
+  it("a master opened from the list has no instance to go back to", () => {
+    const { composer } = doorSetup();
+    const { result } = renderHook(() => useComponentsState({ composer }));
+    act(() => result.current.handleViewDetail(result.current.components[0]));
+    expect(result.current.backToInstance).toBeUndefined();
+  });
+
+  it("an instance deleted meanwhile is not offered", () => {
+    const { composer } = doorSetup();
+    requestOpenMaster(composer, "c1", "inst-1");
+    (composer as unknown as { elements: { getElement: Mock } }).elements.getElement = vi.fn(() => null);
+    const { result } = renderHook(() => useComponentsState({ composer }));
+    expect(result.current.backToInstance).toBeUndefined();
   });
 });

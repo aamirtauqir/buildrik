@@ -1,6 +1,6 @@
 /**
  * PositionControls — position-mode buttons, offset inputs gated on a non-static
- * position, z-index row, disabled/reason plumbing, and Mixed badges.
+ * position, z-index row, disabled/reason plumbing, and Mixed from the field context.
  *
  * @license BSD-3-Clause
  */
@@ -8,6 +8,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { PositionControls } from "../PositionControls";
+import { InspectorFieldContext, type InspectorFieldContextValue } from "../../../shared/controls/InspectorFieldContext";
 
 type Props = React.ComponentProps<typeof PositionControls>;
 
@@ -73,14 +74,31 @@ describe("PositionControls — offsets + z-index", () => {
   });
 });
 
-describe("PositionControls — multi-select mixed badges", () => {
-  it("shows a Mixed badge when position differs across selection", () => {
-    renderPos({ styles: { position: "absolute" }, mixedKeys: new Set(["position"]) });
-    expect(screen.getAllByLabelText("Mixed value").length).toBeGreaterThan(0);
+describe("PositionControls — Mixed across a multi-selection (field context)", () => {
+  const mixed = (keys: string[]): InspectorFieldContextValue => ({
+    readOnly: false,
+    readOnlyReason: null,
+    mixedKeys: new Set(keys),
+    overrides: new Map(),
+    overrideLabels: {},
+    resetOverride: () => undefined,
   });
 
-  it("shows a Mixed badge for a differing offset key", () => {
-    renderPos({ styles: { position: "absolute" }, mixedKeys: new Set(["left"]) });
-    expect(screen.getAllByLabelText("Mixed value").length).toBeGreaterThan(0);
+  it("the Position select reads Mixed when position differs", () => {
+    render(
+      <InspectorFieldContext.Provider value={mixed(["position"])}>
+        <PositionControls styles={{ position: "absolute" }} onChange={vi.fn()} />
+      </InspectorFieldContext.Provider>,
+    );
+    expect(screen.getByRole("combobox", { name: "Position, Mixed values" })).toBeInTheDocument();
+  });
+
+  it("a differing offset marks the offset group Mixed", () => {
+    render(
+      <InspectorFieldContext.Provider value={mixed(["left"])}>
+        <PositionControls styles={{ position: "absolute" }} onChange={vi.fn()} />
+      </InspectorFieldContext.Provider>,
+    );
+    expect(screen.getByText("Mixed")).toBeInTheDocument();
   });
 });

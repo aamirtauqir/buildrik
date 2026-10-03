@@ -1,0 +1,33 @@
+{
+  "surface": "inspector-v4-35",
+  "board": "Inspector v4 · 35 · AI column (Figma 7995:210503)",
+  "url": "http://localhost:3110/edit/<site>",
+  "run": "Dashboard-hosted, signed in: load the W0 fixture with load-inspector-v4-site.mjs, then `node scripts/conformance/measure.mjs inspector-v4-35 --url <dashboard>/edit/<site> --storage-state <login state> --eval \"$(node scripts/conformance/inspector-v4-state.mjs 35)\"` and `diff.mjs inspector-v4-35`. W4 (2026-10-02) joined the targets below to specs/inspector-v4-35.json; the board-vs-live screenshot walk is the acceptance (build plan §4.3), this recipe is the regression net.",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "ai-panel"
+    }
+  ],
+  "contrastScope": "[data-testid=\"ai-panel\"]",
+  "targets": [
+    {
+      "name": "ai-back",
+      "testId": "ai-back-row",
+      "spec": "inspector-v4-35",
+      "nodeId": "7995:210672",
+      "skipProps": {
+        "gap": "The back row is a full-width 28px chrome-ui Button; its inset, icon gap and hover radius live on the inner label, so the outer box measures 0. Position and size match the board's 12px grid (L3-D walk, re-walked W4).",
+        "padding-left": "The back row is a full-width 28px chrome-ui Button; its inset, icon gap and hover radius live on the inner label, so the outer box measures 0. Position and size match the board's 12px grid (L3-D walk, re-walked W4).",
+        "padding-right": "The back row is a full-width 28px chrome-ui Button; its inset, icon gap and hover radius live on the inner label, so the outer box measures 0. Position and size match the board's 12px grid (L3-D walk, re-walked W4).",
+        "padding-top": "The back row is a full-width 28px chrome-ui Button; its inset, icon gap and hover radius live on the inner label, so the outer box measures 0. Position and size match the board's 12px grid (L3-D walk, re-walked W4).",
+        "padding-bottom": "The back row is a full-width 28px chrome-ui Button; its inset, icon gap and hover radius live on the inner label, so the outer box measures 0. Position and size match the board's 12px grid (L3-D walk, re-walked W4).",
+        "border-radius": "The back row is a full-width 28px chrome-ui Button; its inset, icon gap and hover radius live on the inner label, so the outer box measures 0. Position and size match the board's 12px grid (L3-D walk, re-walked W4)."
+      }
+    }
+  ]
+}

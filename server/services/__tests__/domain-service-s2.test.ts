@@ -13,10 +13,11 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { promises as dnsPromises } from "dns";
+import { Prisma } from "@prisma/client";
 
 const { db, vercelConnection } = vi.hoisted(() => ({
   db: {
-    site: { findUnique: vi.fn() },
+    site: { findUnique: vi.fn(), update: vi.fn() },
     workspace: { findUnique: vi.fn() },
     domain: {
       count: vi.fn(),
@@ -38,9 +39,11 @@ vi.mock("@server/services/integrations.service", () => ({
 vi.mock("@/lib/vercel", () => ({
   addDomainToVercelProject: vi.fn(),
   removeDomainFromVercelProject: vi.fn(),
-  slugifyProjectName: (s: string) => s,
+  resolveVercelProjectName: (site: { slug: string; vercelProjectName: string | null }) =>
+    site.vercelProjectName ?? site.slug,
 }));
 
+import { addDomainToVercelProject } from "@/lib/vercel";
 import {
   connectDomain,
   checkDomainAvailability,
@@ -67,7 +70,7 @@ describe("dnsVerificationToken", () => {
 
 describe("connectDomain — the Add-a-domain dialog", () => {
   function connectable() {
-    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1", slug: "bella", deletedAt: null });
+    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1", slug: "bella", vercelProjectName: null, deletedAt: null });
     db.workspace.findUnique.mockResolvedValue({ plan: "PRO" });
     db.domain.count.mockResolvedValue(0);
     db.domain.findFirst.mockResolvedValue(null);
@@ -75,6 +78,56 @@ describe("connectDomain — the Add-a-domain dialog", () => {
     db.dnsRecord.createMany.mockResolvedValue({ count: 3 });
     db.domain.findUniqueOrThrow.mockImplementation(async () => ({ id: "dom1", dnsRecords: [{ type: "A" }] }));
   }
+
+  /* SA-06: a site whose slug changed after it went live keeps deploying to its
+     pinned project — the domain has to attach to that one, not to a project
+     derived from the new slug that holds no deployment. */
+  it("attaches the domain to the site's pinned Vercel project, not one derived from the slug", async () => {
+    connectable();
+    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1", slug: "bella-new", vercelProjectName: "buildrik-site-bella", deletedAt: null });
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    vi.mocked(addDomainToVercelProject).mockResolvedValue({ verified: false, verification: [] } as never);
+
+    await connectDomain("s1", { domain: "bellacucina.com" });
+
+    expect(addDomainToVercelProject).toHaveBeenCalledWith(
+      expect.objectContaining({ projectName: "buildrik-site-bella", domain: "bellacucina.com" }),
+    );
+  });
+
+  /* C1: a domain is attached to the project the slug derives. If the slug then
+     changed before the first publish, the publish would derive a new project
+     and the domain would be left on the old one. Pin at connect time. */
+  it("pins the resolved project name on a never-pinned site when a domain is connected", async () => {
+    connectable();
+
+    await connectDomain("s1", { domain: "bellacucina.com" });
+
+    expect(db.site.update).toHaveBeenCalledWith({ where: { id: "s1" }, data: { vercelProjectName: "bella" } });
+  });
+
+  it("maps a P2002 on vercelProjectName at the pin to PROJECT_NAME_TAKEN and creates no domain", async () => {
+    connectable();
+    db.site.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed on the fields: (`vercelProjectName`)", {
+        code: "P2002",
+        clientVersion: "5",
+        meta: { target: ["vercelProjectName"] },
+      }),
+    );
+
+    await expect(connectDomain("s1", { domain: "bellacucina.com" })).rejects.toThrow("PROJECT_NAME_TAKEN");
+    expect(db.domain.create).not.toHaveBeenCalled();
+  });
+
+  it("does not re-pin a site that already has a project name", async () => {
+    connectable();
+    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1", slug: "bella-new", vercelProjectName: "buildrik-site-bella", deletedAt: null });
+
+    await connectDomain("s1", { domain: "bellacucina.com" });
+
+    expect(db.site.update).not.toHaveBeenCalled();
+  });
 
   it("stores kind, provider and Force HTTPS, and writes A + CNAME + TXT without a Vercel attachment", async () => {
     connectable();

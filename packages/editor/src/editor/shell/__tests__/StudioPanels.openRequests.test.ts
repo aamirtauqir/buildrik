@@ -51,7 +51,9 @@ describe("StudioPanels — ui:cms-open (⌘K → a collection or a record)", () 
   });
 
   it("writes the request to the workspace store, then switches to rail CMS", () => {
-    expect(src).toMatch(/onLeftPanelTabChange\?\.\("content", \(\) => \{\s*cmsWorkspace\.openRequest\(data\);\s*openDrawer\(\);/);
+    /* §13: a door on an element also records where to return to (the
+       rendered behaviour is StudioPanels.inspectorColumn.test's). */
+    expect(src).toMatch(/onLeftPanelTabChange\?\.\("content", \(\) => \{\s*cmsWorkspace\.openRequest\(data\);\s*if \(from\) setCmsReturn\(from\);\s*openDrawer\(\);/);
   });
 });
 

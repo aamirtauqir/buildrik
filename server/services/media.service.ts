@@ -36,6 +36,16 @@ export async function assertMediaWrite(userId: string, siteId: string | null | u
   if (siteId) await checkSiteRole(prisma, userId, siteId, "EDITOR");
 }
 
+/** The site's ADDED fonts (Site fonts dialog — `userMetadata.siteFont`), the
+ *  set the editor's Composer registers from its media library. */
+export async function listSiteFontAssets(siteId: string): Promise<Array<{ filename: string; url: string }>> {
+  return prisma.mediaAsset.findMany({
+    where: { siteId, type: "font", userMetadata: { path: ["siteFont"], equals: true } },
+    select: { filename: true, url: true },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
 async function getUserPlan(userId: string): Promise<PlanName> {
   const member = await prisma.workspaceMember.findFirst({
     where: { userId, status: "ACTIVE" },

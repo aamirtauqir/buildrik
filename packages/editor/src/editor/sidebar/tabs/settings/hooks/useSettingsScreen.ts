@@ -1,7 +1,9 @@
 /**
  * useSettingsScreen — shared hook for Settings sub-screens
  *
- * Centralizes: composer load on mount, EVENTS subscription, dirty-state tracking.
+ * Centralizes: composer load on mount and the EVENTS subscription. Dirty is
+ * each screen's own difference from `value` (a field typed back to its saved
+ * value is clean), so the hook keeps no dirty flag.
  * Replaces the copy-pasted loadSettings + useEffect pattern in every screen.
  * @license BSD-3-Clause
  */
@@ -14,14 +16,6 @@ import type { ProjectSettings } from "../../../../../shared/types/project";
 export interface UseSettingsScreenResult<T> {
   /** Current value selected from ProjectSettings */
   value: T;
-  /** True if user has made changes not yet saved */
-  isDirty: boolean;
-  /** Call on any field change to mark form dirty */
-  markDirty: () => void;
-  /** Call after successful save to clear dirty state */
-  markClean: () => void;
-  /** Manually reload value from composer (rarely needed) */
-  reload: () => void;
 }
 
 export function useSettingsScreen<T>(
@@ -30,7 +24,6 @@ export function useSettingsScreen<T>(
   defaultValue: T
 ): UseSettingsScreenResult<T> {
   const [value, setValue] = useState<T>(defaultValue);
-  const [isDirty, setIsDirty] = useState(false);
 
   // Callers pass an inline `selector` arrow function. If we put `selector` in
   // `reload`'s useCallback deps, every parent render busts the memo, the
@@ -44,9 +37,6 @@ export function useSettingsScreen<T>(
   const reload = useCallback(() => {
     if (!composer) return;
     setValue(selectorRef.current(composer.getProjectSettings()));
-    // NOTE: intentionally does NOT reset isDirty.
-    // Only handleSave (via markClean) should reset dirty state.
-    // If SETTINGS_CHANGE fires while user has unsaved edits, we preserve their work.
   }, [composer]);
 
   useEffect(() => {
@@ -59,8 +49,5 @@ export function useSettingsScreen<T>(
     };
   }, [composer, reload]);
 
-  const markDirty = useCallback(() => setIsDirty(true), []);
-  const markClean = useCallback(() => setIsDirty(false), []);
-
-  return { value, isDirty, markDirty, markClean, reload };
+  return { value };
 }

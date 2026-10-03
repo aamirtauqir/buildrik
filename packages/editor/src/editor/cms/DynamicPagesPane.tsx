@@ -47,7 +47,13 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
     if (!composer) return [];
     const all = composer.elements.getAllPages();
     const names = pageFileNames(all);
-    return all.map((p) => ({ file: names.get(p.id) ?? "index.html", name: p.name }));
+    /* The home page is index.html — a collection that binds its template to it
+       would emit {field} tokens at the site root (BD-04). Exclude it here so
+       the picker can never offer the home, matching the server's BAD_REQUEST
+       guard in upsertCollection(). */
+    return all
+      .map((p) => ({ file: names.get(p.id) ?? "index.html", name: p.name }))
+      .filter((p) => p.file !== "index.html");
   }, [composer]);
   const templateName = pages.find((p) => p.file === template)?.name ?? "";
 

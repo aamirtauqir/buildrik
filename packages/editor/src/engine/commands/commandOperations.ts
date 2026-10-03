@@ -166,3 +166,83 @@ export function reorderElement(composer: Composer, direction: ReorderDirection):
     direction,
   });
 }
+
+/**
+ * P-1: the lock gate every Inspector write passes through (and pasteStyles).
+ *
+ * Returns the elements a write may change — locked ones dropped, missing ones
+ * ignored. A lock covers the element itself, as everywhere else in the
+ * editor; the stricter removal rule (locked descendants, instances) is
+ * dropLockedAndInstances above.
+ *
+ * SIDE EFFECT — not a pure filter: when it drops a locked element it emits
+ * LOCKED_ELEMENTS_SKIPPED (once per call), the same signal delete/cut/nudge
+ * raise, and the shell shows the "locked" toast (useClipboardToasts). Call it
+ * only where a write is actually being attempted; to merely ASK whether an
+ * element is locked, read `isLocked()`.
+ */
+export function writableElements<T extends Element>(
+  composer: Composer,
+  elements: ReadonlyArray<T | null | undefined>,
+): T[] {
+  const present = elements.filter((el): el is T => Boolean(el));
+  /* `?.`: several suites hand the panel partial element doubles. */
+  const kept = present.filter((el) => !el.isLocked?.());
+  if (kept.length !== present.length) composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+  return kept;
+}
+
+/**
+ * P-1: may a write change element `elementId` right now? Resolves the id and
+ * runs it through writableElements, so a LOCKED element also signals the skip
+ * (LOCKED_ELEMENTS_SKIPPED → the "locked" toast) — call it at the moment a
+ * write is attempted, not to decide what to render. A missing element is
+ * `false`, silently.
+ */
+export function canWrite(composer: Composer, elementId: string): boolean {
+  return writableElements(composer, [composer.elements.getElement(elementId)]).length > 0;
+}
+
+/**
+ * P-1: run one Inspector write on `element` as one undo step — or refuse it
+ * when the element is locked (writableElements says so). Returns whether the
+ * write ran, so a caller can keep its local view in step.
+ */
+export function writeElement<T extends Element>(
+  composer: Composer,
+  element: T | null | undefined,
+  label: string,
+  write: (element: T) => void,
+): boolean {
+  const [el] = writableElements(composer, [element]);
+  if (!el) return false;
+  composer.beginTransaction?.(label);
+  try {
+    write(el);
+  } finally {
+    composer.endTransaction?.();
+  }
+  return true;
+}
+
+/**
+ * P-10: paste `composer.styleClipboard` onto an element — the ONE paste-style
+ * implementation for the Inspector ⋯, the canvas Style › Paste and ⌥⌘V.
+ *
+ * Merges key by key: a property the copied element did not carry stays on the
+ * target. The ⋯ and canvas menu used `setStyles`, which replaced the whole
+ * style map and wiped those properties, while ⌥⌘V merged — three doors, two
+ * results. One transaction, so one undo takes the paste back. A locked
+ * element is refused (P-1).
+ *
+ * Returns how many properties were applied (0 when nothing was).
+ */
+export function pasteStyles(composer: Composer, element: Element): number {
+  const clipboard = composer.styleClipboard;
+  const keys = clipboard ? Object.keys(clipboard) : [];
+  if (!clipboard || keys.length === 0) return 0;
+  const ran = writeElement(composer, element, "paste-styles", (el) => {
+    for (const key of keys) el.setStyle(key, clipboard[key]);
+  });
+  return ran ? keys.length : 0;
+}

@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
 import { listTemplates, getTemplate, useTemplate, cloneSiteAsTemplate, applyTemplateToSite, TemplateError } from "@/server/services/template.service";
 import { createGenerationJob, getJobStatus, cancelJob } from "@/server/services/ai-generation.service";
+import { redactSitePassword } from "@/server/services/sites.service";
 import { listTemplatesSchema, generateSiteSchema, applyTemplateToSiteSchema } from "@buildrik/shared/schemas/templates";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { checkSiteRole, checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
@@ -55,7 +56,7 @@ export const templatesRouter = router({
         throw e;
       }
       try {
-        return await useTemplate(workspaceId, ctx.session.user.id, input.templateId, input.siteName);
+        return redactSitePassword(await useTemplate(workspaceId, ctx.session.user.id, input.templateId, input.siteName));
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "SITE_LIMIT")
           throw new TRPCError({ code: "FORBIDDEN", message: SITE_LIMIT_MESSAGE });
@@ -80,7 +81,7 @@ export const templatesRouter = router({
         throw e;
       }
       try {
-        return await applyTemplateToSite(workspaceId, ctx.session.user.id, input.siteId, input.templateId);
+        return redactSitePassword(await applyTemplateToSite(workspaceId, ctx.session.user.id, input.siteId, input.templateId));
       } catch (e: unknown) {
         if (e instanceof TemplateError && e.code === "SITE_NOT_FOUND")
           throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });

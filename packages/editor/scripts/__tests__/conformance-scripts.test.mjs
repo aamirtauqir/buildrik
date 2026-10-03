@@ -640,6 +640,21 @@ describe('diff.mjs — refuses a measured file the last run failed to write', ()
   });
 });
 
+// ── measure.mjs · a dashboard recipe names no site ─────────────────────────
+
+describe('measure.mjs — a recipe URL still holding <site> is refused', () => {
+  // The Inspector v4 recipes measure /edit/<site> on the dashboard: the site id
+  // is per database, so it arrives on the command line (--url, with
+  // --storage-state and the board's --eval). Run bare, the old behaviour opened
+  // the literal placeholder URL and measured whatever page answered.
+  it('exits 3 (MISSING) before launching a browser, naming the flags', () => {
+    const r = run(resolve(HERE, '..', '..'), 'measure.mjs', ['inspector-v4-01']);
+    expect(r.code).toBe(3);
+    expect(r.out).toMatch(/"<site>" is a placeholder/);
+    expect(r.out).toMatch(/--storage-state/);
+  });
+});
+
 // ── every harness script must parse ────────────────────────────────────────
 
 describe('the harness itself is syntactically valid', () => {

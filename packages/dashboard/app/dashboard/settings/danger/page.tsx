@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { DangerZoneTab } from "@/components/settings/danger-zone-tab";
 import { DeleteWorkspaceModal } from "@/components/settings/delete-workspace-modal";
+import { SectionCard, Button, InputField } from "@/components/dashboard/primitives";
 
-/** Danger zone (IA v2 D6): two clearly-labeled scopes — the workspace
+/** Danger zone (IA v2 D6; Phase B §25 adds Transfer ownership): two clearly-labeled scopes — the workspace
  *  (delete workspace) and your account (export data / delete account). The
  *  settings layout owns the section header. */
 export default function DangerZonePage() {
@@ -17,10 +18,18 @@ export default function DangerZonePage() {
   const { data: session } = useSession();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const utils = trpc.useUtils();
   const wsQuery = trpc.account.workspace.get.useQuery();
+  // Deletion is only SCHEDULED (30-day grace). Invalidate the query the Home
+  // banner reads, or the banner shows only after a reload.
   const wsDelete = trpc.account.workspace.delete.useMutation({
-    onSuccess: () => {
-      addToast("success", "Workspace deleted");
+    onSuccess: ({ scheduledAt }) => {
+      void utils.account.workspace.get.invalidate();
+      addToast(
+        "success",
+        "Workspace scheduled for deletion",
+        `It will be deleted on ${new Date(scheduledAt).toLocaleDateString()}. You can cancel from the home page.`,
+      );
       setShowDeleteModal(false);
       router.push("/dashboard");
       router.refresh();
@@ -34,7 +43,6 @@ export default function DangerZonePage() {
 
   // Synchronous export → download JSON. Replaces the old mutation that created a
   // job nobody processed while the UI claimed "you'll be notified when ready".
-  const utils = trpc.useUtils();
   const [isExporting, setIsExporting] = useState(false);
   const handleExport = async () => {
     setIsExporting(true);
@@ -80,6 +88,9 @@ export default function DangerZonePage() {
         <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>
           Destructive actions scoped to this workspace.
         </p>
+        <div className="mb-4">
+          <TransferOwnershipCard />
+        </div>
         <div
           className="rounded-lg border p-4 flex items-center justify-between"
           style={{ borderColor: "var(--color-error)" }}
@@ -90,7 +101,7 @@ export default function DangerZonePage() {
             </p>
             <p className="text-body-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
               {isWorkspaceOwner
-                ? "Permanently delete this workspace and all its data. This cannot be undone."
+                ? "Permanently delete this workspace and all its data. You can cancel within 30 days."
                 : "Only the workspace owner can delete this workspace."}
             </p>
           </div>
@@ -145,5 +156,91 @@ export default function DangerZonePage() {
         />
       )}
     </div>
+  );
+}
+
+/** Transfer ownership (moved here from Workspace & branding, Phase B §25): hand
+ *  the workspace to another person by email; they become owner on accepting. */
+function TransferOwnershipCard() {
+  const { addToast } = useToast();
+  const [transferEmail, setTransferEmail] = useState("");
+  const transferEmailId = useId();
+  const pendingTransferQuery = trpc.account.workspace.transfer.pending.useQuery();
+
+  const initiateTransferMutation = trpc.account.workspace.transfer.initiate.useMutation({
+    onSuccess: () => {
+      setTransferEmail("");
+      pendingTransferQuery.refetch();
+      addToast("success", "Transfer invitation sent — the new owner must accept it by email");
+    },
+    onError: (err) => addToast("error", "Couldn't start transfer", err.message),
+  });
+
+  const cancelTransferMutation = trpc.account.workspace.transfer.cancel.useMutation({
+    onSuccess: () => { pendingTransferQuery.refetch(); addToast("success", "Transfer cancelled"); },
+    onError: (err) => addToast("error", "Couldn't cancel transfer", err.message),
+  });
+
+  return (
+    <SectionCard title="Transfer ownership">
+      <p className="text-body-sm mb-3" style={{ color: "var(--color-text-secondary)" }}>
+        Hand this workspace to another person. They&apos;ll get an email invitation and become the owner once they accept; you stay on as a member.
+      </p>
+
+      {pendingTransferQuery.data ? (
+        <div
+          className="rounded-lg border p-4 flex items-center justify-between"
+          style={{ borderColor: "var(--color-border-default)" }}
+        >
+          <div>
+            <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+              Transfer pending to {pendingTransferQuery.data.toEmail}
+            </p>
+            <p className="text-body-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+              Waiting for them to accept the email invitation.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => cancelTransferMutation.mutate()}
+            disabled={cancelTransferMutation.isPending}
+          >
+            {cancelTransferMutation.isPending ? "Cancelling…" : "Cancel transfer"}
+          </Button>
+        </div>
+      ) : (
+        <form
+          className="flex items-end gap-2 max-w-md"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const email = transferEmail.trim().toLowerCase();
+            if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+              addToast("error", "Enter a valid email address");
+              return;
+            }
+            initiateTransferMutation.mutate({ toEmail: email });
+          }}
+        >
+          <div className="flex-1">
+            <label htmlFor={transferEmailId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              New owner&apos;s email
+            </label>
+            <InputField
+              id={transferEmailId}
+              type="email"
+              value={transferEmail}
+              onChange={(e) => setTransferEmail(e.target.value)}
+              required
+              placeholder="owner@example.com"
+            />
+          </div>
+          <Button type="submit" disabled={initiateTransferMutation.isPending} className="whitespace-nowrap">
+            {initiateTransferMutation.isPending ? "Sending…" : "Transfer"}
+          </Button>
+        </form>
+      )}
+    </SectionCard>
   );
 }

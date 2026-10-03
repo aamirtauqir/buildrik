@@ -29,6 +29,7 @@ vi.mock("@/services/api-client", () => ({
 }));
 
 import { AdvancedScreen } from "../AdvancedScreen";
+import { EVENTS } from "@/shared/constants/events";
 import { SiteColumnsLockedContext } from "../../shared";
 
 const getMock = api.siteDetail.settings.get.query;
@@ -48,6 +49,7 @@ function setup(opts: {
   registerFlushHandler?: (h: (() => void) | null) => void;
   onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
   saveError?: string | null;
+  fieldErrors?: Record<string, string>;
   settings?: Record<string, unknown>;
   /** M7: the viewer's known role is below ADMIN. */
   siteColumnsLocked?: boolean;
@@ -61,6 +63,7 @@ function setup(opts: {
       registerFlushHandler={opts.registerFlushHandler}
       onLoadStateChange={opts.onLoadStateChange}
       saveError={opts.saveError}
+      fieldErrors={opts.fieldErrors}
     />,
     {
       wrapper: ({ children }: { children: React.ReactNode }) => (
@@ -295,9 +298,9 @@ describe("AdvancedScreen — dirty wiring + flush handler", () => {
     expect(registerFlushHandler).toHaveBeenLastCalledWith(null);
   });
 
-  it("flush writes the typed head/body/css buffers into composer customCode", () => {
-    let flush: (() => void) | null = null;
-    const registerFlushHandler = vi.fn((h: (() => void) | null) => {
+  it("flush returns the typed head/body/css buffers as customCode, without writing the composer", () => {
+    let flush: (() => unknown) | null = null;
+    const registerFlushHandler = vi.fn((h: (() => unknown) | null) => {
       flush = h;
     });
     const { composer } = setup({ registerFlushHandler });
@@ -307,10 +310,7 @@ describe("AdvancedScreen — dirty wiring + flush handler", () => {
     fireEvent.change(cssBox(), { target: { value: ".c { top: 0; }" } });
 
     expect(flush).toBeTypeOf("function");
-    act(() => flush!());
-
-    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
-    const settings = composer.getProjectSettings() as {
+    const settings = flush!() as {
       customCode: { headScripts: string; bodyScripts: string; globalCss: string };
     };
     expect(settings.customCode).toEqual({
@@ -318,6 +318,7 @@ describe("AdvancedScreen — dirty wiring + flush handler", () => {
       bodyScripts: "<script>b()</script>",
       globalCss: ".c { top: 0; }",
     });
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 });
 
@@ -331,5 +332,20 @@ describe("AdvancedScreen — Site-column fields below ADMIN", () => {
     expect(bodyBox().matches(":disabled")).toBe(true);
     expect(screen.getAllByTestId("set-admin-only").length).toBe(2);
     expect(cssBox().matches(":disabled")).toBe(false);
+  });
+});
+
+describe("AdvancedScreen — 4418:128108 Brand door and server refusals", () => {
+  it("Reusable classes in Brand › opens the Brand panel", () => {
+    const { composer } = setup();
+    fireEvent.click(screen.getByTestId("set-code-brand-link"));
+    expect(screen.getByTestId("set-code-brand-link")).toHaveTextContent("Reusable classes in Brand ›");
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "design" });
+  });
+
+  it("says a refused field under its well", () => {
+    setup({ fieldErrors: { "customCode.globalCss": "Keep it under 10240 characters." } });
+    expect(screen.getByText("Keep it under 10240 characters.")).toBeInTheDocument();
+    expect(screen.getByLabelText("Global CSS")).toHaveAttribute("aria-invalid", "true");
   });
 });

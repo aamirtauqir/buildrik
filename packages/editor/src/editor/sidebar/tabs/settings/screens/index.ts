@@ -8,7 +8,6 @@
 
 export { SiteSettingsScreen } from "./SiteSettingsScreen";
 export { AnalyticsScreen } from "./AnalyticsScreen";
-export { IntegrationsScreen } from "./IntegrationsScreen";
 export { AdvancedScreen } from "./AdvancedScreen";
 export { LockedScreen, LOCKED_COPY } from "./LockedScreen";
 export { SeoScreen } from "./SeoScreen";
@@ -18,3 +17,6 @@ export { HeadersScreen } from "./HeadersScreen";
 export { LocalizationScreen } from "./LocalizationScreen";
 export { DomainsScreen } from "./DomainsScreen";
 export { OverviewScreen } from "./OverviewScreen";
+export { AccessScreen } from "./AccessScreen";
+export { DangerZoneScreen } from "./DangerZoneScreen";
+export { WorkspaceDoorScreen } from "./WorkspaceDoorScreen";

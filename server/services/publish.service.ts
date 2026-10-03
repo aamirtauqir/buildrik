@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
 import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
-import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
+import { appendDynamicPagesToPublish, findEmptyBindings, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
-import { publishApprovalBlock } from "@server/services/publish-approval";
+import { publishApprovalBlock, latestEditAt } from "@server/services/publish-approval";
 import { isFeatureEnabled } from "@server/services/feature-flag.service";
 import { getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
@@ -14,9 +14,13 @@ import {
   pickPublicUrl,
   setProjectPasswordProtection,
   deleteVercelDeployment,
+  removeDomainFromVercelProject,
+  resolveVercelProjectName,
   VercelApiError,
   type VercelFile,
 } from "@/lib/vercel";
+
+const CMS_EMPTY_BINDINGS_LABEL = "CMS bindings";
 
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
   const [allPages, site, domain] = await Promise.all([
@@ -33,7 +37,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     }),
     prisma.site.findUnique({
       where: { id: siteId },
-      select: { metaTitleTemplate: true, favicon: true, touchIcon: true, deletedAt: true, workspaceId: true },
+      select: { metaTitleTemplate: true, favicon: true, touchIcon: true, deletedAt: true, workspaceId: true, projectCmsBindings: true },
     }),
     prisma.domain.findFirst({
       where: { siteId, status: "VERIFIED" },
@@ -177,6 +181,28 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     }
   }
 
+  /* C0.7: a bound element whose record has no value publishes its fallback,
+     or nothing — named here, page and element, before it ships. No row for a
+     site without bindings. */
+  const empty = await findEmptyBindings(
+    siteId,
+    livePages.map((p) => ({ name: p.name, slug: p.slug, isHomePage: p.isHomePage, blocks: asContentRoot(p.blocks) })),
+    site?.projectCmsBindings,
+  );
+  if (empty) {
+    checks.push(
+      empty.length > 0
+        ? {
+            label: CMS_EMPTY_BINDINGS_LABEL,
+            status: "warning",
+            detail: `${empty.length} bound element${empty.length > 1 ? "s have" : " has"} no value: ${empty
+              .map((e) => `${e.pageName} › ${e.element} (${e.collectionName} · ${e.fieldSlug}${e.fallback ? `, shows "${e.fallback}"` : ", publishes empty"})`)
+              .join("; ")}.`,
+          }
+        : { label: CMS_EMPTY_BINDINGS_LABEL, status: "pass", detail: "Every bound element has a value." },
+    );
+  }
+
   const hasFail = checks.some((c) => c.status === "fail");
   return { ready: !hasFail, checks };
 }
@@ -193,6 +219,32 @@ const STALE_QUEUED_AFTER_MS = 5 * 60 * 1000;
 // partial unique index publish_build_jobs_active_unique blocks every future
 // publish for the site forever.
 const STALE_BUILDING_AFTER_MS = 15 * 60 * 1000;
+
+function liveJobFilter(staleCutoff: Date, buildingCutoff: Date): Prisma.PublishBuildJobWhereInput[] {
+  return [
+    // startedAt gte cutoff = worker still plausibly alive. A BUILDING row
+    // with null startedAt can't match gte and is treated as stale.
+    { status: { in: ["BUILDING", "DEPLOYING"] }, startedAt: { gte: buildingCutoff } },
+    { status: "QUEUED", createdAt: { gte: staleCutoff } },
+  ];
+}
+
+/** SA-04 (D6): a job still running for any of the workspace's sites would land
+ *  a deployment after the deletion job's take-down. Stranded rows (past the
+ *  cutoffs above) do not count — nothing will ever finish them. */
+export async function hasPublishInFlight(workspaceId: string): Promise<boolean> {
+  const job = await prisma.publishBuildJob.findFirst({
+    where: {
+      site: { workspaceId },
+      OR: liveJobFilter(
+        new Date(Date.now() - STALE_QUEUED_AFTER_MS),
+        new Date(Date.now() - STALE_BUILDING_AFTER_MS),
+      ),
+    },
+    select: { id: true },
+  });
+  return job != null;
+}
 
 /**
  * Hand the job to the worker route. The route is long-running by design
@@ -270,15 +322,7 @@ export async function startPublish(
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
   const existing = await prisma.publishBuildJob.findFirst({
-    where: {
-      siteId,
-      OR: [
-        // startedAt gte cutoff = worker still plausibly alive. A BUILDING row
-        // with null startedAt can't match gte and is treated as stale.
-        { status: { in: ["BUILDING", "DEPLOYING"] }, startedAt: { gte: buildingCutoff } },
-        { status: "QUEUED", createdAt: { gte: staleCutoff } },
-      ],
-    },
+    where: { siteId, OR: liveJobFilter(staleCutoff, buildingCutoff) },
   });
   if (existing) {
     throw new Error("ALREADY_PUBLISHING");
@@ -306,9 +350,20 @@ export async function startPublish(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { name: true, deletedAt: true, publishedUrl: true, workspaceId: true, lastEditedAt: true },
+    select: {
+      name: true,
+      deletedAt: true,
+      publishedUrl: true,
+      workspaceId: true,
+      lastEditedAt: true,
+      cmsEditedAt: true,
+      workspace: { select: { deletionScheduledAt: true } },
+    },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+  // SA-04 (D6): the deletion job takes down only what exists when it runs, so
+  // nothing new may go live in a workspace scheduled for deletion.
+  if (site.workspace.deletionScheduledAt) throw new Error("WORKSPACE_DELETION_SCHEDULED");
 
   /* C-3 freshness: the editor publishes the pages in ITS tab. If the site was
      saved by someone else after this tab last loaded or saved it, those pages
@@ -381,7 +436,12 @@ export async function startPublish(
         role,
         latestReviewStatus: latestReview?.status ?? null,
         latestReviewResolvedAt: latestReview?.resolvedAt ?? null,
-        siteLastEditedAt: site.lastEditedAt,
+        // Cms-only edits (record create/edit/delete, collection edits) bump
+        // cmsEditedAt — not lastEditedAt. Treat the later of the two as the
+        // "what was last edited" signal so a CMS-only edit can also stale
+        // an approval. Freshness on the previous line keeps using raw
+        // lastEditedAt (CRDT side, distinct signal).
+        siteLastEditedAt: latestEditAt(site),
         acknowledgeStale,
       });
       // Distinct errors, one per gate state the board draws (S5.4): nobody
@@ -736,6 +796,35 @@ export async function rollbackPublish(
   });
 }
 
+/** A deployment may still be serving: status alone misses an ARCHIVED or
+ *  billing-downgraded site whose Vercel deployment was never taken down. */
+export function hasLiveDeployment(site: { status: string; publishedUrl: string | null }): boolean {
+  return site.status === "PUBLISHED" || site.publishedUrl != null;
+}
+
+/** The site has had a Vercel project created for it at some point — true even
+ *  after an unpublish, which removes the deployment but keeps the project. */
+export async function hasEverDeployed(siteId: string): Promise<boolean> {
+  const job = await prisma.publishBuildJob.findFirst({
+    where: { siteId, status: "COMPLETED" },
+    select: { id: true },
+  });
+  return job != null;
+}
+
+/** Refuse to deploy an unpinned site into a project another site is pinned to
+ *  (a legacy slug reuse from before the checks on slug change) — the deploy
+ *  would replace that site's live one. The message reaches the user as-is. */
+export async function assertProjectNameFree(siteId: string, projectName: string): Promise<void> {
+  const other = await prisma.site.findFirst({
+    where: { vercelProjectName: projectName, id: { not: siteId } },
+    select: { id: true },
+  });
+  if (other) {
+    throw new Error("This site's address clashes with another site. Change its URL slug in Settings and publish again.");
+  }
+}
+
 export async function unpublishSite(siteId: string) {
   // Actually take the site down on Vercel — deleting the production deployment
   // removes it from the web (the project + custom domains stay attached, so a
@@ -770,6 +859,73 @@ export async function unpublishSite(siteId: string) {
     where: { id: siteId },
     data: { status: "DRAFT", publishedUrl: null },
   });
+}
+
+function errorText(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
+/** Vercel answers a DELETE for a domain that is no longer on the project with
+ *  a 404, or with a 4xx whose code or message says "not found". */
+function isVercelNotFound(e: unknown): boolean {
+  if (!(e instanceof VercelApiError)) return false;
+  return e.status === 404 || /not[_ ]found/i.test(e.code) || /not found/i.test(e.message);
+}
+
+/**
+ * SA-04 (D6): take a site fully offline before its workspace is deleted, and
+ * REPORT whether that worked — unlike `unpublishSite`, which is best-effort for
+ * a user who only wants a draft. The workspace delete cascades away the Vercel
+ * token and the deployment ids, so anything left serving now is orphaned for
+ * good. Every COMPLETED deployment goes, not just the latest (a rollback leaves
+ * older ones reachable at their own URLs), and every custom domain is detached
+ * from the project. Already gone (404) counts as done, so a retry is safe.
+ */
+export async function takeDownSiteForDeletion(
+  siteId: string,
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { workspaceId: true, slug: true, vercelProjectName: true, domains: { select: { domain: true } } },
+  });
+  if (!site) return { ok: true };
+  const jobs = await prisma.publishBuildJob.findMany({
+    where: { siteId, status: "COMPLETED", deploymentId: { not: null } },
+    select: { deploymentId: true },
+  });
+  const deploymentIds = [...new Set(jobs.flatMap((j) => (j.deploymentId ? [j.deploymentId] : [])))];
+  if (deploymentIds.length === 0 && site.domains.length === 0) return { ok: true };
+
+  let conn;
+  try {
+    conn = await getActiveVercelConnection(site.workspaceId);
+  } catch (e) {
+    return { ok: false, reason: `Vercel connection unreadable: ${errorText(e)}` };
+  }
+  if (!conn) {
+    return deploymentIds.length > 0 ? { ok: false, reason: "no Vercel connection" } : { ok: true };
+  }
+
+  const failures: string[] = [];
+  for (const deploymentId of deploymentIds) {
+    try {
+      await deleteVercelDeployment({ token: conn.token, teamId: conn.teamId, deploymentId });
+    } catch (e) {
+      failures.push(`deployment ${deploymentId}: ${errorText(e)}`);
+    }
+  }
+  const projectName = resolveVercelProjectName(site);
+  for (const { domain } of site.domains) {
+    try {
+      await removeDomainFromVercelProject({ token: conn.token, teamId: conn.teamId, projectName, domain });
+    } catch (e) {
+      if (!isVercelNotFound(e)) failures.push(`domain ${domain}: ${errorText(e)}`);
+    }
+  }
+  if (failures.length > 0) return { ok: false, reason: failures.join("; ") };
+
+  await prisma.site.update({ where: { id: siteId }, data: { status: "DRAFT", publishedUrl: null } });
+  return { ok: true };
 }
 
 /**

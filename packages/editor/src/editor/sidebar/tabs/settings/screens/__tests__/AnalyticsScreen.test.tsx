@@ -58,10 +58,12 @@ function setup(opts: {
   projectId?: string | null;
   onDirtyChange?: (d: boolean) => void;
   registerSaveHandler?: (h: (() => Promise<void>) | null) => void;
-  registerFlushHandler?: (h: (() => void) | null) => void;
+  registerFlushHandler?: (h: (() => unknown) | null) => void;
   onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
   saveError?: string | null;
   settings?: Record<string, unknown>;
+  registerFieldErrors?: (errors: Readonly<Record<string, string>> | null) => void;
+  fieldErrors?: Readonly<Record<string, string>>;
 } = {}) {
   const composer = createMockComposer({ projectSettings: opts.settings ?? {} });
   const utils = render(
@@ -73,6 +75,8 @@ function setup(opts: {
       registerFlushHandler={opts.registerFlushHandler}
       onLoadStateChange={opts.onLoadStateChange}
       saveError={opts.saveError}
+      registerFieldErrors={opts.registerFieldErrors}
+      fieldErrors={opts.fieldErrors}
     />,
   );
   return { composer, ...utils };
@@ -103,7 +107,7 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
     expect(ga.getByTestId("set-field-label-google-analytics-id")).toHaveTextContent("Google Analytics ID");
     expect(ga.getByTestId("set-field-label-connection-status")).toHaveTextContent("Connection status");
     expect(ga.getByTestId("set-field-label-last-received-data")).toHaveTextContent("Last received data");
-    expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Verify");
+    expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Check data is arriving");
 
     expect(screen.getByTestId("set-field-label-gtm-container-id")).toHaveTextContent("GTM Container ID");
     expect(screen.getByTestId("set-field-label-pixel-id")).toHaveTextContent("Pixel ID");
@@ -270,7 +274,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
   });
 
   it("the stamp is flushed on the next Save", async () => {
-    let flush: (() => void) | null = null;
+    let flush: (() => unknown) | null = null;
     const { composer } = setup({
       registerFlushHandler: (h) => { flush = h; },
       settings: gaSettings({ verifiedAt: undefined }),
@@ -278,9 +282,9 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     await loaded();
     fireEvent.click(verify());
     await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
-    act(() => flush!());
-    const settings = composer.getProjectSettings() as { analytics: { googleAnalytics: { verifiedAt?: string } } };
+    const settings = flush!() as { analytics: { googleAnalytics: { verifiedAt?: string } } };
     expect(settings.analytics.googleAnalytics.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 
   it("says verified with nothing arrived when the re-read counts zero", async () => {
@@ -289,7 +293,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     await loaded();
     fireEvent.click(verify());
     await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(/^G-4XQ2P7B1KD is verified\. No events have arrived yet\.$/);
+    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(/^G-4XQ2P7B1KD has the right format\. No events have arrived yet\.$/);
     expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NO DATA YET");
   });
 
@@ -326,7 +330,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     fireEvent.click(verify());
     await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
     expect(statusMock).not.toHaveBeenCalled();
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent("is verified. No events have arrived yet.");
+    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent("has the right format. No events have arrived yet.");
   });
 });
 
@@ -447,16 +451,17 @@ describe("AnalyticsScreen — validation (3397:34148)", () => {
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
   });
 
-  it("the flush throws the sentence too and writes nothing while an id is malformed", async () => {
-    let flush: (() => void) | null = null;
+  it("the flush throws the sentence too and returns nothing while an id is malformed", async () => {
+    let flush: (() => unknown) | null = null;
     const { composer } = setup({ registerFlushHandler: (h) => { flush = h; } });
     await loaded();
     fireEvent.change(pixelInput(), { target: { value: "12345678" } });
     expect(() => flush!()).toThrow("Your Pixel ID should be 15 or 16 digits");
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
     fireEvent.change(pixelInput(), { target: { value: "123456789012345" } });
-    act(() => flush!());
-    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
+    expect(flush!()).toMatchObject({ analytics: { facebookPixel: { pixelId: "123456789012345" } } });
+    // The shell saves what the flush returns; the screen never writes the composer.
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 });
 
@@ -481,9 +486,9 @@ describe("AnalyticsScreen — dirty wiring + flush handler", () => {
     expect(registerFlushHandler).toHaveBeenLastCalledWith(null);
   });
 
-  it("flush writes the config once; enabled is ANDed with a non-empty id; verifiedAt rides along", async () => {
-    let flush: (() => void) | null = null;
-    const registerFlushHandler = vi.fn((h: (() => void) | null) => {
+  it("flush returns the config (the composer is not written); enabled is ANDed with a non-empty id; verifiedAt rides along", async () => {
+    let flush: (() => unknown) | null = null;
+    const registerFlushHandler = vi.fn((h: (() => unknown) | null) => {
       flush = h;
     });
     const { composer } = setup({
@@ -501,10 +506,7 @@ describe("AnalyticsScreen — dirty wiring + flush handler", () => {
     fireEvent.click(pixelSwitch());
 
     expect(flush).toBeTypeOf("function");
-    act(() => flush!());
-
-    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
-    const settings = composer.getProjectSettings() as {
+    const settings = flush!() as {
       analytics: {
         googleAnalytics: { enabled: boolean; measurementId: string; verifiedAt?: string };
         googleTagManager: { enabled: boolean; containerId: string; verifiedAt?: string };
@@ -517,18 +519,18 @@ describe("AnalyticsScreen — dirty wiring + flush handler", () => {
     expect(settings.analytics.facebookPixel).toEqual({ enabled: false, pixelId: "" });
     // No switch any more: the stored preference (default true) is kept as is.
     expect(settings.analytics.cookieConsent).toEqual({ enabled: true });
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 
   it("an edited Measurement ID is flushed without a verifiedAt", async () => {
-    let flush: (() => void) | null = null;
-    const { composer } = setup({
+    let flush: (() => unknown) | null = null;
+    setup({
       registerFlushHandler: (h) => { flush = h; },
       settings: gaSettings(),
     });
     await loaded();
     fireEvent.change(gaInput(), { target: { value: "G-ABCD123456" } });
-    act(() => flush!());
-    const settings = composer.getProjectSettings() as { analytics: { googleAnalytics: Record<string, unknown> } };
+    const settings = flush!() as { analytics: { googleAnalytics: Record<string, unknown> } };
     expect(settings.analytics.googleAnalytics).toEqual({ enabled: true, measurementId: "G-ABCD123456" });
   });
 
@@ -540,5 +542,28 @@ describe("AnalyticsScreen — dirty wiring + flush handler", () => {
     });
     await waitFor(() => expect(gaInput().value).toBe("G-EXTERNAL00"));
     expect(gaSwitch()).toHaveAttribute("aria-checked", "false");
+  });
+});
+
+/* Settings Phase B (§27, SA-10): the shell disables Save while the screen
+   reports an invalid field, and hands back the fields the server refused. */
+describe("AnalyticsScreen — field errors", () => {
+  it("reports a malformed id to the shell (Save disabled there) and clears it once the id is right", async () => {
+    const registerFieldErrors = vi.fn();
+    setup({ registerFieldErrors });
+    await loaded();
+    fireEvent.change(pixelInput(), { target: { value: "12345678" } });
+    expect(registerFieldErrors).toHaveBeenLastCalledWith({
+      "analytics.facebookPixel.pixelId": expect.stringContaining("Your Pixel ID should be 15 or 16 digits"),
+    });
+    fireEvent.change(pixelInput(), { target: { value: "123456789012345" } });
+    expect(registerFieldErrors).toHaveBeenLastCalledWith(null);
+  });
+
+  it("shows the server's refusal under the field it names", async () => {
+    setup({ fieldErrors: { "analytics.googleAnalytics.measurementId": "Use only letters, numbers, - and _." } });
+    await loaded();
+    expect(gaInput()).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByText("Use only letters, numbers, - and _.")).toBeInTheDocument();
   });
 });

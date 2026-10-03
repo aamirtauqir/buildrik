@@ -232,7 +232,9 @@ export class CollectionManager extends EventEmitter {
 
     /* A new key moves every record's value to it — records store data by
        key, so an unmigrated rename would orphan them all — and follows into
-       the two places the collection names a field by key. */
+       the two places the collection names a field by key. Each moved record
+       is emitted so the server mirror moves it too; before, only the local
+       copy moved (DM-02). */
     const renamed = updates.slug !== undefined && updates.slug !== previous.slug;
     const keyed: Partial<CMSCollection> = {};
     if (renamed) {
@@ -241,7 +243,9 @@ export class CollectionManager extends EventEmitter {
       for (const item of await Storage.loadContentItems(collectionId)) {
         if (!(from in item.data)) continue;
         const { [from]: value, ...rest } = item.data;
-        await Storage.saveContentItem({ ...item, data: { ...rest, [to]: value } });
+        const moved = { ...item, data: { ...rest, [to]: value }, updatedAt: new Date().toISOString() };
+        await Storage.saveContentItem(moved);
+        this.emit(EVENTS.CMS_CONTENT_UPDATED, moved);
       }
       this.invalidateContentCache(collectionId);
       if (collection.pageSlugPattern) keyed.pageSlugPattern = collection.pageSlugPattern.split(`{${from}}`).join(`{${to}}`);
@@ -381,6 +385,27 @@ export class CollectionManager extends EventEmitter {
     this.emit(EVENTS.CMS_CONTENT_DELETED, id, existing.collectionId);
 
     return true;
+  }
+
+  /* C0a (Task 5): drop a local row whose server copy is already gone, without
+     firing CMS_*_DELETED — the sync layer called us, and the matching
+     `_DELETED` listener would otherwise try to mirror a delete back to a row
+     the server no longer holds. Storage is rewritten first so the in-memory
+     cache is rebuilt from it; emits CMS_STORE_REFRESHED so any UI bound to
+     that signal (Content panel, RecordsTable, binding popover) re-reads. */
+  async forgetLocal(kind: "collection" | "entry", id: string): Promise<void> {
+    if (kind === "collection") {
+      await Storage.deleteCollection(id);
+      this.collections.delete(id);
+      this.contentCache.delete(id);
+    } else {
+      const existing = await Storage.loadContentItem(id);
+      if (existing) {
+        await Storage.deleteContentItem(id);
+        this.invalidateContentCache(existing.collectionId);
+      }
+    }
+    this.emit(EVENTS.CMS_STORE_REFRESHED);
   }
 
   async getContentItem(id: string): Promise<CMSContentItem | null> {

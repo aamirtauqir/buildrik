@@ -70,6 +70,51 @@ const styles = {
 // COMPONENT
 // ============================================================================
 
+/**
+ * Seconds in the field, milliseconds stored (P-11c). While focused the field
+ * holds a draft: a keystroke writes only a finite value already in range, so
+ * "0.5" can pass through "0" without being clamped to Duration's 0.1. Blur
+ * settles the draft — an out-of-range number is clamped and written, an empty
+ * or non-numeric one restores the stored value. NaN and negatives never reach
+ * the interaction.
+ */
+const TimingInput: React.FC<{
+  storedMs: number;
+  min: number;
+  max: number;
+  onCommit: (ms: number) => void;
+}> = ({ storedMs, min, max, onCommit }) => {
+  const [draft, setDraft] = React.useState<string | null>(null);
+
+  const handleChange = (raw: string) => {
+    setDraft(raw);
+    const seconds = parseFloat(raw);
+    if (Number.isFinite(seconds) && seconds >= min && seconds <= max) onCommit(Math.round(seconds * 1000));
+  };
+
+  const handleBlur = () => {
+    if (draft === null) return;
+    setDraft(null);
+    const seconds = parseFloat(draft);
+    if (!Number.isFinite(seconds)) return;
+    const ms = Math.round(Math.min(max, Math.max(min, seconds)) * 1000);
+    if (ms !== storedMs) onCommit(ms);
+  };
+
+  return (
+    <TextInput
+      type="number"
+      value={draft ?? storedMs / 1000}
+      onChange={(e) => handleChange(e.target.value)}
+      onBlur={handleBlur}
+      min={min}
+      max={max}
+      step={0.1}
+      style={styles.input}
+    />
+  );
+};
+
 export const InteractionEditor: React.FC<InteractionEditorProps> = ({
   interaction,
   onUpdate,
@@ -77,22 +122,8 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
   onToggleEnabled,
   onPreview,
 }) => {
-  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate(interaction.id, {
-      animation: {
-        ...interaction.animation,
-        duration: parseFloat(e.target.value) * 1000,
-      },
-    });
-  };
-
-  const handleDelayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate(interaction.id, {
-      animation: {
-        ...interaction.animation,
-        delay: parseFloat(e.target.value) * 1000,
-      },
-    });
+  const writeTiming = (key: "duration" | "delay", ms: number) => {
+    onUpdate(interaction.id, { animation: { ...interaction.animation, [key]: ms } });
   };
 
   const handleAnimationTypeChange = (value: string) => {
@@ -118,26 +149,20 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.inputRow}>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Duration</label>
-          <TextInput
-            type="number"
-            value={interaction.animation.duration / 1000}
-            onChange={handleDurationChange}
+          <TimingInput
+            storedMs={interaction.animation.duration}
             min={0.1}
             max={10}
-            step={0.1}
-            style={styles.input}
+            onCommit={(ms) => writeTiming("duration", ms)}
           />
         </div>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Delay</label>
-          <TextInput
-            type="number"
-            value={interaction.animation.delay / 1000}
-            onChange={handleDelayChange}
+          <TimingInput
+            storedMs={interaction.animation.delay}
             min={0}
             max={5}
-            step={0.1}
-            style={styles.input}
+            onCommit={(ms) => writeTiming("delay", ms)}
           />
         </div>
       </div>

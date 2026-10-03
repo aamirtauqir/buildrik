@@ -1,33 +1,33 @@
 /**
- * Spacing Controls — nested Webflow box (margin + padding) + CornerRadiusInput.
- * Ported to .bdi-box / .bdi-mbox / .bdi-pbox / .bdi-ax per comp-inspector.html v2.
+ * Spacing Controls — the SpacingBox (margin outside, padding inside) and
+ * CornerRadiusInput.
  *
- * SpacingBox replaces the old FourSideInput quad grid: both margin and padding
- * render in a single nested visualization with axis inputs at the dashed-box
- * edges (top/right/bottom/left).
+ * SpacingBox, board 1: a grey margin box holding a white padding box, each
+ * with its label top-left and its four numbers on the edges (top centred,
+ * left / right beside the inner box, bottom centred), the content chip in the
+ * middle. Every number is an input named "Padding top" etc. and carries its
+ * CSS property, so the field context draws read-only, "Mixed" and the
+ * override dot (board 26: "● 32" on Padding top) — never the section.
  *
  * @license BSD-3-Clause
  */
 
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
-import { TextField, Button, TextInput } from "@/editor/chrome-ui";
+import { FieldDot } from "./FieldDot";
+import { useInspectorField, mixedName } from "./InspectorFieldContext";
+import { unitWords } from "./InputControls";
+import { TextField, Button, TextInput, IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
-import { DSBindingChip } from "../../sections/DSBindingChip";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import { isTokenVar, extractVarName, cssVarToTokenId, resolveTokenVar } from "../tokenBindingDetection";
+
 // ============================================================================
-// AXIS INPUT — absolutely positioned input inside a box edge
+// AXIS INPUT — one side's number
 // ============================================================================
 
 type Side = "top" | "right" | "bottom" | "left";
-
-const SIDE_POS: Record<Side, string> = {
-  top: "t",
-  right: "r",
-  bottom: "b",
-  left: "l",
-};
+type Box = "margin" | "padding";
 
 const parseValue = (val: string): { num: string; unit: string; isKeyword: boolean } => {
   if (!val) return { num: "", unit: "", isKeyword: false };
@@ -44,89 +44,186 @@ const parseValue = (val: string): { num: string; unit: string; isKeyword: boolea
   return m ? { num: m[1], unit: m[2] || "px", isKeyword: false } : { num: val, unit: "", isKeyword: false };
 };
 
+/* At least 28 wide, and as wide as its number: "56.2" (board 9) did not fit
+   a fixed 28. */
+const CELL = "tw:relative tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:min-w-7 tw:shrink-0";
+/* The number itself: Geist Mono 12, no frame until hovered / focused.
+   TextField's base classes are not merged away, so the conflicting ones win
+   by `!`, not by stylesheet order.
+   TARGET-SIZE EXCEPTION (WCAG 2.5.8, owner call 2026-09-28): the box's
+   numbers stay 16 tall × ≥28 wide, as boards 1 / 16 / 21 / 26 draw them —
+   the nested margin / padding rings leave no room for 24px rows without
+   redrawing the box. Every side is also reachable by Tab and ↑ / ↓. */
+const AXIS_INPUT =
+  "tw:h-4! tw:min-w-7! tw:max-w-14! tw:w-auto! tw:[field-sizing:content] tw:px-0! tw:py-0! tw:rounded-[2px]! tw:border-transparent! tw:bg-transparent! tw:text-center " +
+  "tw:[font-family:var(--bk-font-mono)]! tw:text-[12px]! tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]! " +
+  "tw:hover:border-[var(--bk-border)]! tw:focus:border-[var(--bk-accent)]! tw:focus:bg-[var(--bk-bg-panel)]! " +
+  "tw:read-only:hover:border-transparent!";
+
 interface AxisInputProps {
+  box: Box;
   side: Side;
   value: string;
   onChange: (value: string) => void;
-  accent?: "margin" | "padding";
   disabled?: boolean;
   composer?: Composer | null;
 }
 
-const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, composer }) => {
+const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disabled, composer }) => {
+  const property = `${box}-${side}`;
+  const field = useInspectorField(property);
   const [local, setLocal] = React.useState(() => parseValue(value));
+  /* Typed numbers are written live, so Escape has to write back what the side
+     held at focus — resetting the text alone left the typed padding on. */
+  const atFocusRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     setLocal(parseValue(value));
   }, [value]);
 
+  /* A typed or stepped number keeps the side's own unit: a video embed's
+     `padding-bottom: 56.25%` stepped up is 57.25%, never 57.25px. */
   const commit = (raw: string) => {
-    if (raw === "") {
-      onChange("");
-      return;
-    }
-    if (raw === "auto" || raw === "inherit") {
-      onChange(raw);
-      return;
-    }
-    if (/^-?[\d.]+$/.test(raw)) {
-      onChange(`${raw}px`);
-    }
+    if (raw === "") onChange("");
+    else if (raw === "auto" || raw === "inherit") onChange(raw);
+    else if (/^-?[\d.]+$/.test(raw)) onChange(`${raw}${local.isKeyword ? "px" : local.unit || "px"}`);
   };
 
-  const display = local.isKeyword ? local.num : local.num;
-
-  const tokenId = isTokenVar(value)
-    ? cssVarToTokenId(extractVarName(value) ?? "")
-    : null;
-
+  const tokenId = isTokenVar(value) ? cssVarToTokenId(extractVarName(value) ?? "") : null;
   const handleChipClick = React.useCallback(() => {
     /* G3-156: open Brand ON the token, not its landing page. */
     if (composer && tokenId) requestBrandToken(composer, tokenId);
   }, [composer, tokenId]);
+  const name = `${box === "margin" ? "Margin" : "Padding"} ${side}`;
+  /* §16: the name carries the unit ("Padding top in pixels"). */
+  const nameId = React.useId();
+  const suffixId = React.useId();
+  const suffix = field.mixed ? "Mixed values" : local.isKeyword || local.num === "" ? "" : unitWords(local.unit || "px");
 
   return (
-    <>
+    <span className={CELL} data-testid={`inspector-spacing-${property}`}>
+      {field.overrides.length > 0 || tokenId ? (
+        /* In front of the number, its 24px target reaching into the cell's
+           own blank edge — so the dot sits beside "32", clear of the ring's
+           "Padding" tag (board 26). */
+        <span className="tw:absolute tw:right-full tw:-mr-2 tw:top-1/2 tw:-translate-y-1/2 tw:inline-flex tw:items-center">
+          <FieldDot field={field} />
+          {tokenId ? (
+            /* The box has no room for the token chip's name: a 24px marker
+               carries it (and its jump to Brand) instead. */
+            <IconButton
+              label={composer ? `Jump to token ${tokenId} in Brand` : `Bound to token ${tokenId}`}
+              title={tokenId}
+              size="sm"
+              data-testid={`inspector-spacing-token-${property}`}
+              className="tw:size-6 tw:shrink-0"
+              onClick={composer ? handleChipClick : undefined}
+            >
+              <span aria-hidden="true" className="tw:block tw:size-1.5 tw:rotate-45 tw:bg-[var(--bk-success)]" />
+            </IconButton>
+          ) : null}
+        </span>
+      ) : null}
+      <span id={nameId} hidden>
+        {name}
+      </span>
+      {suffix ? (
+        <span id={suffixId} hidden>
+          {suffix}
+        </span>
+      ) : null}
       <TextField
         type="text"
-        className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
-        value={display}
+        className={AXIS_INPUT}
+        value={field.mixed ? "" : local.num}
         disabled={disabled}
-        aria-label={`${side}`}
+        readOnly={field.readOnly}
+        aria-readonly={field.readOnly || undefined}
+        aria-labelledby={suffix ? `${nameId} ${suffixId}` : nameId}
+        placeholder={field.mixed ? "Mixed" : "0"}
         onChange={(e) => {
           const next = e.target.value;
+          field.startTyping();
           setLocal({ num: next, unit: local.unit, isKeyword: /^[a-z]+$/i.test(next) });
-          if (next === "" || /^-?[\d.]+$/.test(next) || next === "auto" || next === "inherit") {
+          if (next === "" || /^-?[\d.]+$/.test(next) || next === "auto" || next === "inherit") commit(next);
+        }}
+        onKeyDown={(e) => {
+          /* §16: ↑/↓ step 1, Shift 10; Esc puts the value back. */
+          if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !field.readOnly && !local.isKeyword) {
+            const base = Number(local.num || 0);
+            if (!Number.isFinite(base)) return;
+            e.preventDefault();
+            const next = String(Math.round((base + (e.shiftKey ? 10 : 1) * (e.key === "ArrowUp" ? 1 : -1)) * 100) / 100);
+            setLocal({ num: next, unit: local.unit || "px", isKeyword: false });
             commit(next);
+          } else if (e.key === "Escape") {
+            const before = atFocusRef.current;
+            if (before !== null && before !== value && !field.readOnly) {
+              onChange(before);
+              setLocal(parseValue(before));
+            } else {
+              setLocal(parseValue(value));
+            }
           }
         }}
-        onBlur={() => {
-          if (display !== local.num) setLocal(parseValue(value));
+        onFocus={() => {
+          atFocusRef.current = value;
         }}
-        placeholder="0"
+        onBlur={() => {
+          setLocal(parseValue(value));
+          field.stopTyping();
+        }}
       />
-      {tokenId ? (
-        <DSBindingChip
-            label={tokenId}
-          onClick={composer ? handleChipClick : undefined}
-        />
-      ) : null}
-    </>
+    </span>
   );
 };
 
 // ============================================================================
-// SPACING BOX — margin + padding nested dashed boxes
+// SPACING BOX
 // ============================================================================
 
+type Sides = { top: string; right: string; bottom: string; left: string };
+
 export interface SpacingBoxProps {
-  margin: { top: string; right: string; bottom: string; left: string };
-  padding: { top: string; right: string; bottom: string; left: string };
+  margin: Sides;
+  padding: Sides;
   onMarginChange: (side: Side, value: string) => void;
   onPaddingChange: (side: Side, value: string) => void;
   disabledMargin?: Partial<Record<Side, boolean | undefined>>;
   disabledPadding?: Partial<Record<Side, boolean | undefined>>;
   composer?: Composer | null;
+}
+
+const BOX_TAG = "tw:absolute tw:left-0 tw:top-0 tw:[font-family:var(--bk-font-mono)] tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+
+/** One ring: its label, top number, [left · inner · right], bottom number. */
+function Ring(p: {
+  box: Box;
+  label: string;
+  values: Sides;
+  onChange: (side: Side, value: string) => void;
+  disabled?: Partial<Record<Side, boolean | undefined>>;
+  composer?: Composer | null;
+  className: string;
+  children: React.ReactNode;
+}) {
+  const axis = (side: Side) => (
+    <AxisInput box={p.box} side={side} value={p.values[side]} onChange={(v) => p.onChange(side, v)} disabled={p.disabled?.[side]} composer={p.composer} />
+  );
+  return (
+    <div className={`tw:flex tw:flex-col tw:items-stretch tw:gap-[2px] tw:px-2 tw:py-1 tw:border tw:border-[var(--bk-border)] ${p.className}`} data-testid={`inspector-spacing-${p.box}`}>
+      <div className="tw:relative tw:flex tw:h-4 tw:justify-center">
+        <span className={BOX_TAG}>{p.label}</span>
+        {axis("top")}
+      </div>
+      <div className="tw:flex tw:items-center tw:gap-1">
+        {axis("left")}
+        <div className="tw:flex-1 tw:min-w-0">{p.children}</div>
+        {axis("right")}
+      </div>
+      <div className="tw:flex tw:h-4 tw:justify-center">{axis("bottom")}</div>
+    </div>
+  );
 }
 
 export const SpacingBox: React.FC<SpacingBoxProps> = ({
@@ -138,23 +235,16 @@ export const SpacingBox: React.FC<SpacingBoxProps> = ({
   disabledPadding,
   composer,
 }) => (
-  <div className="bdi-box">
-    <div className="bdi-mbox">
-      <span className="bdi-tag">Margin</span>
-      <AxisInput side="top" value={margin.top} onChange={(v) => onMarginChange("top", v)} accent="margin" disabled={disabledMargin?.top} composer={composer} />
-      <AxisInput side="right" value={margin.right} onChange={(v) => onMarginChange("right", v)} accent="margin" disabled={disabledMargin?.right} composer={composer} />
-      <AxisInput side="bottom" value={margin.bottom} onChange={(v) => onMarginChange("bottom", v)} accent="margin" disabled={disabledMargin?.bottom} composer={composer} />
-      <AxisInput side="left" value={margin.left} onChange={(v) => onMarginChange("left", v)} accent="margin" disabled={disabledMargin?.left} composer={composer} />
-
-      <div className="bdi-pbox">
-        <span className="bdi-tag">Padding</span>
-        <AxisInput side="top" value={padding.top} onChange={(v) => onPaddingChange("top", v)} accent="padding" disabled={disabledPadding?.top} composer={composer} />
-        <AxisInput side="right" value={padding.right} onChange={(v) => onPaddingChange("right", v)} accent="padding" disabled={disabledPadding?.right} composer={composer} />
-        <AxisInput side="bottom" value={padding.bottom} onChange={(v) => onPaddingChange("bottom", v)} accent="padding" disabled={disabledPadding?.bottom} composer={composer} />
-        <AxisInput side="left" value={padding.left} onChange={(v) => onPaddingChange("left", v)} accent="padding" disabled={disabledPadding?.left} composer={composer} />
-        <div className="bdi-center-rect">Content</div>
-      </div>
-    </div>
+  /* Board 1: the diagram 16 in from the column edge — the section body
+     already gives 12. */
+  <div className="tw:px-1 tw:py-1" data-testid="inspector-spacing-box">
+    <Ring box="margin" label="Margin" values={margin} onChange={onMarginChange} disabled={disabledMargin} composer={composer} className="tw:bg-[var(--bk-bg-subtle)]">
+      <Ring box="padding" label="Padding" values={padding} onChange={onPaddingChange} disabled={disabledPadding} composer={composer} className="tw:bg-[var(--bk-bg-panel)]">
+        <div className="tw:flex tw:h-4 tw:items-center tw:justify-center" aria-hidden="true">
+          <span className="tw:block tw:h-3 tw:w-10 tw:rounded-[2px] tw:bg-[var(--bk-bg-subtle)]" />
+        </div>
+      </Ring>
+    </Ring>
   </div>
 );
 
@@ -206,25 +296,45 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
       )}
     </div>
     <div className="bdi-quad">
-      {(["tl", "tr", "bl", "br"] as const).map((corner) => {
-        const { num, unit } = parseValue(values[corner]);
-        return (
-          <div key={corner} className="bdi-num axis" data-axis={corner.toUpperCase()}>
-            <TextInput
-              type="text"
-              value={num}
-              onChange={(e) => {
-                const v = e.target.value;
-                if (v === "") onChange(corner, "");
-                else if (/^-?[\d.]+$/.test(v)) onChange(corner, `${v}px`);
-              }}
-              placeholder="0"
-              aria-label={`${corner} corner`}
-            />
-            {unit && <span className="bdi-u">{unit}</span>}
-          </div>
-        );
-      })}
+      {(["tl", "tr", "bl", "br"] as const).map((corner) => (
+        <CornerCell key={corner} corner={corner} value={values[corner]} onChange={(v) => onChange(corner, v)} />
+      ))}
     </div>
   </div>
 );
+
+const CORNER_PROPERTY = {
+  tl: "border-top-left-radius",
+  tr: "border-top-right-radius",
+  br: "border-bottom-right-radius",
+  bl: "border-bottom-left-radius",
+} as const;
+
+const CornerCell: React.FC<{ corner: keyof typeof CORNER_PROPERTY; value: string; onChange: (value: string) => void }> = ({
+  corner,
+  value,
+  onChange,
+}) => {
+  const field = useInspectorField(CORNER_PROPERTY[corner]);
+  const { num, unit } = parseValue(value);
+  return (
+    <div className="bdi-num axis" data-axis={corner.toUpperCase()}>
+      <TextInput
+        type="text"
+        value={field.mixed ? "" : num}
+        readOnly={field.readOnly}
+        onChange={(e) => {
+          if (field.readOnly) return;
+          const v = e.target.value;
+          field.startTyping();
+          if (v === "") onChange("");
+          else if (/^-?[\d.]+$/.test(v)) onChange(`${v}px`);
+        }}
+        onBlur={field.stopTyping}
+        placeholder={field.mixed ? "Mixed" : "0"}
+        aria-label={field.mixed ? mixedName(`${corner} corner`) : `${corner} corner`}
+      />
+      {unit && !field.mixed && <span className="bdi-u">{unit}</span>}
+    </div>
+  );
+};

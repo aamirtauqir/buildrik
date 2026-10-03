@@ -1,5 +1,5 @@
 /**
- * Headers — Clone 3397:32602 (`Advanced / Headers`): the amber restore strip,
+ * Security headers — 4418:128374 (Clone 3397:32602): the amber restore strip,
  * then one card per response header the published site sends — Content
  * Security Policy (a mono well beside its side label), X-Frame-Options and
  * Referrer-Policy (a `Policy` select each) and HSTS (`Enable HSTS` with a
@@ -9,8 +9,9 @@
  *
  * The five columns come off the Site row on open (3397:33335 loading,
  * 3397:33383 load-error with Try again). Edits stay here until Save, when
- * the screen's own handler writes `settings.update` — it rejects on failure,
- * and the shell's banner (3397:33431) sits over the strip. HSTS is stored as
+ * the screen's own handler writes `settings.update` through `updateSiteColumns`
+ * — a refusal throws `SettingsSaveError`, the shell's banner (3397:33431) sits
+ * over the strip and each refused column is said under its control. HSTS is stored as
  * seconds in `hstsMaxAge`: the toggle off writes null; a stored value the
  * Max age list does not carry is shown as `<n> seconds`, never snapped to
  * the nearest preset.
@@ -20,13 +21,13 @@
 
 import * as React from "react";
 import { ToggleSwitch } from "@/editor/chrome-ui";
-import { getBuildrikClient } from "@/services/api-client";
-import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { updateSiteColumns } from "@/services/BuildrikSyncProvider";
 import type { UpdateSiteSettingsInput } from "@buildrik/shared/schemas/site-detail";
 import {
   Input,
   LoadCard,
   SCREEN_EMPTY,
+  SCREEN_FIELD_ERROR,
   SET_RESTORE_STRIP,
   SET_ROW_LABEL,
   SaveErrorBanner,
@@ -105,6 +106,14 @@ const Row: React.FC<{
 
 const CONTROL = "tw:min-w-0 tw:flex-1";
 
+/** A column the server refused on the last Save, under its row at the control's column. */
+const FieldError: React.FC<{ message?: string }> = ({ message }) =>
+  message ? (
+    <div role="alert" className={`${SCREEN_FIELD_ERROR} tw:col-span-full tw:pl-49`}>
+      {message}
+    </div>
+  ) : null;
+
 export const HeadersScreen: React.FC<ScreenProps> = ({
   projectId,
   onDirtyChange,
@@ -112,6 +121,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
   onLoadStateChange,
   registerRetryLoad,
   saveError,
+  fieldErrors,
 }) => {
   const [csp, setCsp] = React.useState("");
   const [xFrame, setXFrame] = React.useState<XFrameOptions | "">("");
@@ -121,7 +131,8 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
      HSTS back on returns to what was chosen rather than to the default. */
   const [hstsMaxAge, setHstsMaxAge] = React.useState(HSTS_DEFAULT_MAX_AGE);
   const [permissions, setPermissions] = React.useState("");
-  const [dirty, setDirty] = React.useState(false);
+  /* The columns as the server holds them — dirty is a difference from them. */
+  const [saved, setSaved] = React.useState<string | null>(null);
 
   const load = useServerLoad<HeadersRow>(
     projectId,
@@ -133,10 +144,30 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       setHstsEnabled(row.hstsMaxAge != null);
       setHstsMaxAge(row.hstsMaxAge ?? HSTS_DEFAULT_MAX_AGE);
       setPermissions(row.permissionsPolicy ?? "");
-      setDirty(false);
+      setSaved(
+        JSON.stringify({
+          cspPolicy: row.cspPolicy?.trim() || null,
+          hstsMaxAge: row.hstsMaxAge ?? null,
+          xFrameOptions: X_FRAME_OPTIONS.find((v) => v === row.xFrameOptions) ?? null,
+          referrerPolicy: REFERRER_POLICIES.find((v) => v === row.referrerPolicy) ?? null,
+          permissionsPolicy: row.permissionsPolicy?.trim() || null,
+        }),
+      );
     },
     { onLoadStateChange, registerRetryLoad }
   );
+
+  const patch = React.useMemo(
+    () => ({
+      cspPolicy: csp.trim() || null,
+      hstsMaxAge: hstsEnabled ? hstsMaxAge : null,
+      xFrameOptions: xFrame || null,
+      referrerPolicy: referrer || null,
+      permissionsPolicy: permissions.trim() || null,
+    }),
+    [csp, hstsEnabled, hstsMaxAge, xFrame, referrer, permissions],
+  );
+  const dirty = saved !== null && JSON.stringify(patch) !== saved;
 
   React.useEffect(() => {
     onDirtyChange?.(dirty);
@@ -145,16 +176,9 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
   const handleSave = React.useCallback(async () => {
     if (!projectId) return;
     // Rejects on failure — the shell's Save keeps the banner and Retry save up.
-    await getBuildrikClient(DASHBOARD_URL).siteDetail.settings.update.mutate({
-      id: projectId,
-      cspPolicy: csp.trim() || null,
-      hstsMaxAge: hstsEnabled ? hstsMaxAge : null,
-      xFrameOptions: xFrame || null,
-      referrerPolicy: referrer || null,
-      permissionsPolicy: permissions.trim() || null,
-    });
-    setDirty(false);
-  }, [projectId, csp, hstsEnabled, hstsMaxAge, xFrame, referrer, permissions]);
+    await updateSiteColumns(projectId, patch);
+    setSaved(JSON.stringify(patch));
+  }, [projectId, patch]);
 
   // The shell's Save changes runs this instead of composer.saveProject(),
   // which omits the header columns. Registered only while there is something
@@ -168,7 +192,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
   if (!projectId) {
     return (
       <Screen>
-        <Section title="Headers">
+        <Section title="Security headers">
           <div className={SCREEN_EMPTY}>Open this site from the dashboard to manage headers.</div>
         </Section>
       </Screen>
@@ -179,7 +203,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <LoadCard
-          title="Headers"
+          title="Security headers"
           line="CSP, X-Frame-Options, Referrer-Policy and HSTS."
           state={load.state}
           errorLine="Couldn't load your headers. Check your connection, then try again."
@@ -212,7 +236,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
               value={csp}
               onChange={(e) => {
                 setCsp(e.target.value);
-                setDirty(true);
               }}
               placeholder="default-src 'self'"
               spellCheck={false}
@@ -221,6 +244,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             />
           </div>
         </Row>
+        <FieldError message={fieldErrors?.cspPolicy} />
       </Section>
 
       <Section title="X-Frame-Options">
@@ -231,7 +255,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             value={xFrame}
             onChange={(e) => {
               setXFrame(X_FRAME_OPTIONS.find((v) => v === e.target.value) ?? "");
-              setDirty(true);
             }}
             data-testid="set-hd-xfo"
           >
@@ -253,7 +276,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             value={referrer}
             onChange={(e) => {
               setReferrer(REFERRER_POLICIES.find((v) => v === e.target.value) ?? "");
-              setDirty(true);
             }}
             data-testid="set-hd-referrer"
           >
@@ -274,7 +296,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             checked={hstsEnabled}
             onChange={(next) => {
               setHstsEnabled(next);
-              setDirty(true);
             }}
             aria-labelledby="enable-hsts-label"
             sizing="md"
@@ -289,7 +310,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             disabled={!hstsEnabled}
             onChange={(e) => {
               setHstsMaxAge(Number(e.target.value));
-              setDirty(true);
             }}
             data-testid="set-hd-hsts-max"
           >
@@ -300,6 +320,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             ))}
           </Select>
         </Row>
+        <FieldError message={fieldErrors?.hstsMaxAge} />
       </Section>
 
       {/* Not on 3397:32602 — kept because the Site column exists and nothing
@@ -315,7 +336,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
               value={permissions}
               onChange={(e) => {
                 setPermissions(e.target.value);
-                setDirty(true);
               }}
               placeholder="camera=(), microphone=()"
               spellCheck={false}
@@ -323,6 +343,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             />
           </div>
         </Row>
+        <FieldError message={fieldErrors?.permissionsPolicy} />
       </Section>
     </Screen>
   );

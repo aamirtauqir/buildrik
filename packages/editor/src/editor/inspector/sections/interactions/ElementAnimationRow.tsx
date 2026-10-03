@@ -13,6 +13,7 @@ import * as React from "react";
 import type { AnimationConfig, AnimationTrigger } from "@/shared/types/animations";
 import { AnimationEditor } from "@/editor/animation/AnimationEditor";
 import { Button } from "@/editor/chrome-ui";
+import { PickRow } from "../behaviourRows";
 
 const TRIGGER_LABEL: Record<AnimationTrigger, string> = {
   load: "On page load",
@@ -29,11 +30,6 @@ function presetLabel(type: string): string {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-const ROW =
-  "tw:flex tw:items-center tw:gap-2 tw:h-8 tw:cursor-pointer tw:select-none " +
-  "tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)] tw:rounded-[var(--bk-radius-sm)] " +
-  "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
-
 export interface ElementAnimationRowProps {
   animation: AnimationConfig;
   /** Opens the animation's edit screen (the section drills in). */
@@ -42,23 +38,12 @@ export interface ElementAnimationRowProps {
 
 export function ElementAnimationRow({ animation, onOpen }: ElementAnimationRowProps) {
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      data-testid="element-animation-row"
-      className={ROW}
-      onClick={onOpen}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onOpen();
-        }
-      }}
-    >
-      <span className="tw:flex-1 tw:min-w-0 tw:truncate">{animationTriggerLabel(animation)}</span>
-      <span className="tw:text-[var(--bk-ink-muted)] tw:truncate">{presetLabel(animation.type)}</span>
-      <span aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">›</span>
-    </div>
+    <PickRow
+      testId="element-animation-row"
+      label={animationTriggerLabel(animation)}
+      value={presetLabel(animation.type)}
+      onOpen={onOpen}
+    />
   );
 }
 

@@ -58,7 +58,6 @@ const input = (over: Partial<UseLifecycleInput> = {}): UseLifecycleInput => ({
   composer: null,
   addToast: vi.fn(() => "id"),
   isDirty: false,
-  lastSavedAt: null,
   offline: false,
   errorCount: 0,
   publishedUrl: null,
@@ -239,6 +238,52 @@ describe("useLifecycle — one derivation", () => {
     expect(result.current.nextMove).toBeNull();
     rerender(input({ publishedUrl: "https://x.test", serverHasUnpublishedChanges: false, isDirty: true }));
     expect(result.current.nextMove?.label).toBe("Publish changes");
+  });
+
+  /* QA 2026-10-02: every published site opened on "Publish changes". The
+     load seeds the save clock with the load time ("Saved · just now"), and
+     the hook compared THAT against lastPublishedAt — a load is not an edit.
+     The session now counts its own edits (page or CMS); until one happens the
+     server's answer (max(lastEditedAt, cmsEditedAt) vs lastPublishedAt) holds. */
+  it("a freshly opened, unedited published site is up to date; a page edit, saved, still waits to ship", async () => {
+    fetchReviewStatus.mockResolvedValue(status({ reviewsEnabled: false, editsRequireApproval: false }));
+    const live = { publishedUrl: "https://x.test", serverHasUnpublishedChanges: false, lastPublishedAt: new Date(Date.now() - 60_000).toISOString() };
+    const { result, rerender } = renderHook((p: UseLifecycleInput) => useLifecycle(p), { initialProps: input(live) });
+    await settle();
+    expect(result.current.nextMove).toBeNull();
+    rerender(input({ ...live, isDirty: true }));
+    expect(result.current.nextMove?.label).toBe("Publish changes");
+    rerender(input({ ...live, isDirty: false }));
+    expect(result.current.nextMove?.label).toBe("Publish changes");
+  });
+
+  it("a CMS edit this session waits to ship too; a hydrate (store refresh) does not", async () => {
+    fetchReviewStatus.mockResolvedValue(status({ reviewsEnabled: false, editsRequireApproval: false }));
+    const cms = makeComposer();
+    const composer = { ...makeComposer(), cms: { collections: cms } };
+    const live = {
+      composer: composer as never,
+      publishedUrl: "https://x.test",
+      serverHasUnpublishedChanges: false,
+      lastPublishedAt: new Date(Date.now() - 60_000).toISOString(),
+    };
+    const { result } = renderHook((p: UseLifecycleInput) => useLifecycle(p), { initialProps: input(live) });
+    await settle();
+    act(() => cms.emit(EVENTS.CMS_STORE_REFRESHED));
+    expect(result.current.nextMove).toBeNull();
+    act(() => cms.emit(EVENTS.CMS_CONTENT_UPDATED, { id: "r1" }));
+    expect(result.current.nextMove?.label).toBe("Publish changes");
+  });
+
+  it("a publish that lands after the session's edits reads up to date again", async () => {
+    fetchReviewStatus.mockResolvedValue(status({ reviewsEnabled: false, editsRequireApproval: false }));
+    const before = { publishedUrl: "https://x.test", serverHasUnpublishedChanges: false, lastPublishedAt: new Date(Date.now() - 60_000).toISOString() };
+    const { result, rerender } = renderHook((p: UseLifecycleInput) => useLifecycle(p), { initialProps: input({ ...before, isDirty: true }) });
+    await settle();
+    rerender(input({ ...before, isDirty: false }));
+    expect(result.current.nextMove?.label).toBe("Publish changes");
+    rerender(input({ ...before, lastPublishedAt: new Date(Date.now() + 1000).toISOString() }));
+    expect(result.current.nextMove).toBeNull();
   });
 });
 

@@ -9,9 +9,11 @@
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import { loadGoogleFont, type GoogleFont } from "../../../../services/GoogleFontsService";
-import { FontPickerPanel, namesFont } from "./FontPickerDropdown";
+import { FontPickerPanel, namesFont, primaryFamily } from "./FontPickerDropdown";
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "../../shared/controls";
+import { FieldDot } from "../../shared/controls/FieldDot";
+import { useInspectorField, mixedName } from "../../shared/controls/InspectorFieldContext";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../engine";
 // ============================================================================
@@ -53,6 +55,9 @@ interface FontPickerProps {
   /** Source of the UPLOADED group — the FontManager's custom fonts, which the
    *  Composer registers from the media library's ADDED site fonts. */
   composer?: Composer | null;
+  /** The family the element renders in when it sets none (Page panel, board
+   *  21: "Inter"). Shown, never written. */
+  inheritedValue?: string;
 }
 
 /* Clone 3721:43423 — an uploaded font is "a separate uploaded source; it does
@@ -84,12 +89,16 @@ export function useUploadedFonts(composer: Composer | null | undefined): SystemF
   return fonts;
 }
 
-export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, composer }) => {
+export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChange, composer, inheritedValue }) => {
+  const field = useInspectorField("font-family");
+  const value = ownValue || inheritedValue || "";
   const [showFontPicker, setShowFontPicker] = React.useState(false);
   const uploadedFonts = useUploadedFonts(composer);
 
   // Handle font selection
   const handleFontSelect = (font: GoogleFont | SystemFont) => {
+    /* Read-only (DD-18): refused here, not by disabling the trigger. */
+    if (field.readOnly) return;
     const fontValue = "family" in font ? `'${font.family}', ${font.category}` : font.value;
 
     // Load Google Font if needed
@@ -112,20 +121,20 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
 
   // Get current font name for display
   const currentFontName = React.useMemo(() => {
+    if (field.mixed) return "Mixed";
     if (!value) return "Select font...";
 
     // Check system + uploaded fonts
     const systemFont = [...uploadedFonts, ...SYSTEM_FONTS].find((f) => f.value === value);
     if (systemFont) return systemFont.label;
 
-    // Extract font name from value
-    const match = value.match(/'([^']+)'/);
-    return match ? match[1] : value;
-  }, [value, uploadedFonts]);
+    /* Board 1 reads "Inter", not the stack "Inter, sans-serif". */
+    return primaryFamily(value) || value;
+  }, [value, uploadedFonts, field.mixed]);
 
   return (
-    /* Board 807:8342 reads "Family  [Inter Tight]" — one row, label left, the
-       same 88px column every other row uses. It used to stack a "Font Family"
+    /* Board 1 reads "Font  [Inter]" — one row, label left, the same column
+       every other row uses. It used to stack a "Font Family"
        caption above a full-bleed button, the only row in the section that did. */
     /* `.bdi-ddn` — the SHARED control frame, not a fourth hand-rolled one.
        807:8352 draws Family's box exactly like every other control on the
@@ -134,21 +143,27 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
        bottom margin that broke the board's contiguous 34-row rhythm — the only
        row in the panel that did either. The one style left inline is the
        preview typeface, which is the field's value and cannot be a class. */
-    <div className="bdi-row-ctrl tw:relative" data-testid={rowTestId("Family")}>
-      <label className="bdi-lb" data-testid={labelTestId("Family")}>Family</label>
+    <div className="bdi-row-ctrl tw:relative" data-testid={rowTestId("Font")}>
+      <label className="bdi-lb" data-testid={labelTestId("Font")}>
+        Font
+        <FieldDot field={field} />
+      </label>
       {/* Current Font Display / Toggle Button */}
       <Button
-        onClick={() => setShowFontPicker(!showFontPicker)}
+        onClick={() => {
+          if (!field.readOnly) setShowFontPicker(!showFontPicker);
+        }}
         aria-haspopup="listbox"
         aria-expanded={showFontPicker}
         aria-controls="font-picker-listbox"
-        aria-label="Font family"
-        data-testid={fieldTestId("Family")}
+        aria-label={field.mixed ? mixedName("Font family") : "Font family"}
+        aria-disabled={field.readOnly || undefined}
+        data-testid={fieldTestId("Font")}
         data-font-source={uploaded ? "uploaded" : undefined}
         className="bdi-ddn tw:justify-between tw:text-left"
-        style={{ fontFamily: value || "inherit" }}
+        style={{ fontFamily: field.mixed ? "inherit" : value || "inherit" }}
       >
-        <span>{currentFontName}</span>
+        <span className={field.mixed ? "tw:text-[var(--bk-ink-muted)]" : undefined}>{currentFontName}</span>
         {/* The field chevron every other select in the column draws. */}
         <ChevronDown size={12} aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />
       </Button>

@@ -1,8 +1,8 @@
 /**
  * AddLocaleDialog — Clone 3737:44855 "Add locale" (640).
  *
- * Opened from the Localization header's `Add locale`. `Add locale` ·
- * `<site> · Localization` · a `Language` select of the locales not yet
+ * Opened from the Languages screen's Locales card `Add locale`. `Add locale` ·
+ * `<site> · Languages` · a `Language` select of the locales not yet
  * enabled, each `<Language> — <Native> · <code>` · `Locale code`, read-only,
  * with `URL prefix /<code>` at its right · a `Set as default locale` row
  * with its toggle (`Visitors without a matching language land here.`) ·
@@ -113,7 +113,7 @@ export function AddLocaleDialog({ open, siteName, enabledLocales, onClose, onCre
         </h2>
         <ModalBody>
           <p className={LIBRARY_MODAL_BODY} data-testid="set-loc-dialog-scope">
-            {siteName ? `${siteName} · ` : ""}Localization
+            {siteName ? `${siteName} · ` : ""}Languages
           </p>
 
           <Label htmlFor="set-loc-language" className={LABEL}>

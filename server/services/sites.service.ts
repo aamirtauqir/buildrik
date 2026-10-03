@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
-import { blankPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
+import { newPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
 import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
@@ -11,10 +11,13 @@ import type {
   SaveProjectDataInput,
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
-import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
+import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS, SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
+import { SITE_SETTINGS_COLUMNS, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
+import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
+import { slugifyProjectName } from "@/lib/vercel";
 
 function slugify(name: string): string {
   return name
@@ -24,19 +27,29 @@ function slugify(name: string): string {
     .replace(/-{2,}/g, "-");
 }
 
-async function generateUniqueSlug(name: string): Promise<string> {
-  const base = slugify(name);
+/** A globally unique Site slug for a new site. Every site-creation path uses
+ *  this one: it also skips slugs whose derived Vercel project another site is
+ *  pinned to. A name with no usable characters falls back to "site". */
+export async function generateUniqueSlug(name: string): Promise<string> {
+  const base = slugify(name) || "site";
+  const candidates = [base, ...Array.from({ length: 10 }, (_, i) => `${base}-${i + 2}`)];
   // One query for all base-prefixed slugs instead of up to 10 sequential
-  // findFirst lookups.
-  const taken = new Set(
-    (await prisma.site.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } })).map((s) => s.slug),
+  // findFirst lookups. A candidate is also unusable when another site is
+  // pinned to the Vercel project it derives — it would deploy into that one.
+  const rows = await prisma.site.findMany({
+    where: {
+      OR: [
+        { slug: { startsWith: base } },
+        { vercelProjectName: { in: candidates.map(slugifyProjectName) } },
+      ],
+    },
+    select: { slug: true, vercelProjectName: true },
+  });
+  const taken = new Set(rows.map((s) => s.slug));
+  const pinned = new Set(rows.map((s) => s.vercelProjectName));
+  return (
+    candidates.find((c) => !taken.has(c) && !pinned.has(slugifyProjectName(c))) ?? `${base}-${Date.now()}`
   );
-  if (!taken.has(base)) return base;
-  for (let i = 2; i < 12; i++) {
-    const candidate = `${base}-${i}`;
-    if (!taken.has(candidate)) return candidate;
-  }
-  return `${base}-${Date.now()}`;
 }
 
 const SORT_MAP: Record<string, Record<string, string>> = {
@@ -235,10 +248,10 @@ export async function createSite(
       return created;
     });
 
-    return site;
+    return redactSitePassword(site);
   }
 
-  return prisma.$transaction(async (tx) => {
+  const site = await prisma.$transaction(async (tx) => {
     const created = await tx.site.create({
       data: {
         name: input.name,
@@ -259,18 +272,41 @@ export async function createSite(
         position: 0,
         // X-A1: its own root (id unique per page), not [] — every [] page
         // used to load with one shared "root".
-        blocks: blankPageRoot(`${created.id}:home`),
+        blocks: newPageRoot(`${created.id}:home`),
         isHomePage: true,
       },
     });
 
     return created;
   });
+  return redactSitePassword(site);
 }
 
 export async function checkSlugAvailability(slug: string): Promise<boolean> {
   const existing = await prisma.site.findFirst({ where: { slug } });
   return !existing;
+}
+
+/* Q-B5 (BE-8): the ONE transfer rule — the router gates nothing else. The
+   caller must reach the site at all (an active member of its workspace, within
+   their site scope — getEffectiveSiteRole), and then be its creator or the
+   OWNER (effective role, so a site override still caps). Everyone else, an
+   ADMIN who did not create it included, is refused. */
+async function mayTransfer(createdBy: string | null, userId: string, siteId: string): Promise<boolean> {
+  let callerRole: string;
+  try {
+    callerRole = await getEffectiveSiteRole(prisma, userId, siteId);
+  } catch (e) {
+    if (e instanceof PermissionError) return false;
+    throw e;
+  }
+  return createdBy === userId || callerRole === "OWNER";
+}
+
+/** Whether `transferSite` would let this user transfer the site — what the editor's Danger zone enables Transfer on. */
+export async function canTransferSite(siteId: string, userId: string): Promise<boolean> {
+  const site = await prisma.site.findFirst({ where: { id: siteId, deletedAt: null }, select: { createdBy: true } });
+  return !!site && (await mayTransfer(site.createdBy, userId, siteId));
 }
 
 export async function transferSite(
@@ -280,11 +316,12 @@ export async function transferSite(
 ) {
   const site = await prisma.site.findUnique({ where: { id: siteId } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
-  if (site.createdBy !== currentUserId) throw new Error("NOT_OWNER");
+
+  if (!(await mayTransfer(site.createdBy, currentUserId, siteId))) throw new Error("NOT_OWNER");
 
   const currentMember = await prisma.workspaceMember.findFirst({
     where: { userId: currentUserId, workspaceId: site.workspaceId },
-    select: { id: true, _count: { select: { sitePermissions: true } } },
+    select: { id: true, role: true, _count: { select: { sitePermissions: true } } },
   });
   const newOwnerMember = await prisma.workspaceMember.findFirst({
     where: { userId: newOwnerId, workspaceId: site.workspaceId },
@@ -338,18 +375,29 @@ export async function transferSite(
   return { success: true };
 }
 
+/** Every Site row returned to a client goes through this: the stored
+ *  published-site password is reversible ciphertext and never leaves the
+ *  server; the client gets a flag instead. */
+export function redactSitePassword<T extends { publishedPassword: string | null }>(
+  site: T,
+): Omit<T, "publishedPassword"> & { hasPublishedPassword: boolean } {
+  const { publishedPassword, ...rest } = site;
+  return { ...rest, hasPublishedPassword: Boolean(publishedPassword) };
+}
+
 export async function getSite(siteId: string) {
-  return prisma.site.findFirst({
+  const site = await prisma.site.findFirst({
     where: { id: siteId, deletedAt: null },
     include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
   });
+  return site ? redactSitePassword(site) : null;
 }
 
 export async function renameSite(siteId: string, name: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { name, lastEditedAt: new Date() },
-  });
+  }));
 }
 
 /**
@@ -378,6 +426,33 @@ export async function setSiteThumbnail(userId: string, siteId: string, url: stri
   });
 }
 
+/** Setting columns a duplicate does not inherit: its own identity, the
+ *  site password (a copy starts ungated, like any new site), and the canonical
+ *  URL (the source's address — on the copy it would mark it a duplicate). */
+const NOT_DUPLICATED = new Set<string>(["name", "slug", "publishedPassword", "canonicalUrl"]);
+/** D2 (founder): custom code is a paid feature, so a copy into a FREE
+ *  workspace starts without it. */
+const NOT_DUPLICATED_INTO_FREE = new Set<string>([...NOT_DUPLICATED, "headCode", "bodyCode"]);
+
+/**
+ * SA-01: the source site's setting columns, for the copy's create. The columns
+ * are the only source of the settings they back — the copy used to inherit
+ * them through the projectSettings JSON, which saves no longer store. NULLs
+ * are left out (the column default is NULL, and Prisma takes no raw null for
+ * the Json `socialLinks`).
+ */
+function duplicatedSettingColumns(
+  original: Record<string, unknown>,
+  destinationPlan: string,
+): Partial<Prisma.SiteUncheckedCreateInput> {
+  const skip = destinationPlan === "FREE" ? NOT_DUPLICATED_INTO_FREE : NOT_DUPLICATED;
+  return Object.fromEntries(
+    Object.keys(SITE_SETTINGS_COLUMNS)
+      .filter((key) => !skip.has(key) && original[key] !== null)
+      .map((key) => [key, original[key]]),
+  );
+}
+
 export async function duplicateSite(
   siteId: string,
   workspaceId: string,
@@ -387,6 +462,12 @@ export async function duplicateSite(
   if (!original || original.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   await assertSiteQuota(workspaceId, userId);
+
+  const destination = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { plan: true },
+  });
+  const destinationPlan = destination?.plan ?? "FREE";
 
   const copyName = `${original.name} (Copy)`;
   const slug = await generateUniqueSlug(copyName);
@@ -412,6 +493,7 @@ export async function duplicateSite(
   return prisma.$transaction(async (tx) => {
     const newSite = await tx.site.create({
       data: {
+        ...duplicatedSettingColumns(original, destinationPlan),
         name: copyName,
         slug,
         status: "DRAFT",
@@ -496,7 +578,7 @@ export async function duplicateSite(
       });
     }
 
-    return newSite;
+    return redactSitePassword(newSite);
   });
 }
 
@@ -514,17 +596,17 @@ function copyCmsBindings(stored: Prisma.JsonValue, renames: IdRename[]): Prisma.
 }
 
 export async function archiveSite(siteId: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { status: "ARCHIVED" },
-  });
+  }));
 }
 
 export async function unarchiveSite(siteId: string) {
-  return prisma.site.update({
+  return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
     data: { status: "DRAFT" },
-  });
+  }));
 }
 
 export async function deleteSite(siteId: string, confirmName: string) {
@@ -535,7 +617,25 @@ export async function deleteSite(siteId: string, confirmName: string) {
     throw new Error("NAME_MISMATCH");
   }
 
+  // SA-07: take the live deployment down before soft-deleting. Best-effort —
+  // unpublishSite is already best-effort toward Vercel and flips the row to
+  // DRAFT, but a delete must still succeed even if that call throws.
+  if (hasLiveDeployment(site)) {
+    try {
+      await unpublishSite(siteId);
+    } catch (e: unknown) {
+      console.error(`[deleteSite] take-down failed for ${siteId}:`, e instanceof Error ? e.message : e);
+    }
+  }
+
   const now = new Date();
+  /* BE-6: the forms this delete switches off, so a restore switches back on
+     exactly these — not ones the owner had already turned off. The router
+     records them on the `site.deleted` activity entry. */
+  const activeForms = await prisma.formBlock.findMany({
+    where: { siteId, isActive: true },
+    select: { id: true },
+  });
 
   await prisma.$transaction([
     prisma.site.update({
@@ -552,7 +652,70 @@ export async function deleteSite(siteId: string, confirmName: string) {
     }),
   ]);
 
-  return { success: true };
+  return { success: true, deactivatedFormBlockIds: activeForms.map((f) => f.id) };
+}
+
+const RESTORE_WINDOW_MS = SITE_RESTORE_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+
+/**
+ * BE-6 / PD-6: the workspace's sites deleted inside the restore window, newest
+ * first, with the moment each one is purged. `scope` is the caller's
+ * site-scope filter (`siteScopeWhere`), so a member scoped to specific sites
+ * sees only theirs.
+ */
+export async function listDeletedSites(workspaceId: string, scope: Prisma.SiteWhereInput) {
+  const rows = await prisma.site.findMany({
+    where: { ...scope, workspaceId, deletedAt: { gte: new Date(Date.now() - RESTORE_WINDOW_MS) } },
+    select: { id: true, name: true, slug: true, deletedAt: true },
+    orderBy: { deletedAt: "desc" },
+  });
+  return rows.flatMap(({ deletedAt, ...site }) =>
+    deletedAt ? [{ ...site, deletedAt, purgeAt: new Date(deletedAt.getTime() + RESTORE_WINDOW_MS) }] : [],
+  );
+}
+
+/** The form ids a `site.deleted` entry recorded (`metadata.formBlockIds`). */
+function recordedFormBlockIds(metadata: Prisma.JsonValue | undefined): string[] {
+  if (!isPlainObject(metadata) || !Array.isArray(metadata.formBlockIds)) return [];
+  return metadata.formBlockIds.filter((id): id is string => typeof id === "string");
+}
+
+/**
+ * BE-6 / PD-6 / Q-B8: bring a deleted site back inside the restore window. It
+ * returns as a DRAFT (the delete took the deployment down; nothing is
+ * republished), its forms come back on — the ones the delete switched off, as
+ * recorded on its `site.deleted` entry — and its share links stay revoked: they
+ * were revoked for safety, and the owner makes new ones. A restored site takes
+ * a slot again, so the plan's site limit applies.
+ */
+export async function restoreSite(siteId: string, userId: string) {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { deletedAt: true, workspaceId: true },
+  });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (!site.deletedAt) throw new Error("SITE_NOT_DELETED");
+  if (site.deletedAt.getTime() < Date.now() - RESTORE_WINDOW_MS) throw new Error("RESTORE_WINDOW_PASSED");
+  await assertSiteQuota(site.workspaceId, userId);
+
+  const deletion = await prisma.activityLog.findFirst({
+    where: { workspaceId: site.workspaceId, siteId, action: "site.deleted" },
+    orderBy: { createdAt: "desc" },
+    select: { metadata: true },
+  });
+  const formBlockIds = recordedFormBlockIds(deletion?.metadata);
+
+  const [restored, forms] = await prisma.$transaction([
+    prisma.site.update({
+      where: { id: siteId },
+      data: { deletedAt: null, status: "DRAFT" },
+    }),
+    prisma.formBlock.updateMany({
+      where: { siteId, id: { in: formBlockIds } },
+      data: { isActive: true },
+    }),
+  ]);
+  return { site: redactSitePassword(restored), reactivatedFormBlockIds: formBlockIds, reactivatedForms: forms.count };
 }
 
 /**
@@ -648,11 +811,47 @@ export async function bulkAction(
     // pipeline or the approval gate, so it reported success while the live site
     // was untouched. Publishing is per-site through the real pipeline.
     case "delete": {
-      const result = await prisma.site.updateMany({
+      // SA-07: same take-down + link/form deactivation as the single-site
+      // delete, applied per id. Best-effort — a take-down failure never blocks
+      // the soft-delete.
+      const targets = await prisma.site.findMany({
         where: { id: { in: siteIds }, workspaceId, deletedAt: null },
-        data: { deletedAt: new Date() },
+        select: { id: true, status: true, publishedUrl: true },
       });
-      return { succeeded: siteIds.slice(0, result.count), failed: [] };
+      await Promise.all(
+        targets
+          .filter(hasLiveDeployment)
+          .map(async (s) => {
+            try {
+              await unpublishSite(s.id);
+            } catch (e: unknown) {
+              console.error(`[bulkAction:delete] take-down failed for ${s.id}:`, e instanceof Error ? e.message : e);
+            }
+          }),
+      );
+      const targetIds = targets.map((s) => s.id);
+      // BE-6: per site, the forms this delete switches off (see deleteSite).
+      const activeForms = await prisma.formBlock.findMany({
+        where: { siteId: { in: targetIds }, isActive: true },
+        select: { id: true, siteId: true },
+      });
+      const deactivatedFormBlockIds: Record<string, string[]> = {};
+      for (const form of activeForms) (deactivatedFormBlockIds[form.siteId] ??= []).push(form.id);
+      const [result] = await prisma.$transaction([
+        prisma.site.updateMany({
+          where: { id: { in: targetIds }, workspaceId, deletedAt: null },
+          data: { deletedAt: new Date() },
+        }),
+        prisma.shareLink.updateMany({
+          where: { siteId: { in: targetIds } },
+          data: { isActive: false },
+        }),
+        prisma.formBlock.updateMany({
+          where: { siteId: { in: targetIds } },
+          data: { isActive: false },
+        }),
+      ]);
+      return { succeeded: targetIds.slice(0, result.count), failed: [], deactivatedFormBlockIds };
     }
     default:
       throw new Error("INVALID_ACTION");
@@ -708,7 +907,7 @@ function withValidAnalyticsIds(settings: unknown): unknown {
 export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
-    select: { deletedAt: true },
+    select: { deletedAt: true, projectSettings: true },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
@@ -721,7 +920,11 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // Site-level project artifacts. The style rules' selectors and media
   // queries are written raw into the published stylesheet — same boundary.
   sanitizeProjectStyles(input.styles);
-  const settings = withValidAnalyticsIds(input.settings);
+  // SA-01: the column-backed keys live in their Site columns only. BE-1: a
+  // JSON-only key that fails its schema keeps the stored value.
+  const settings = stripColumnBackedSettings(
+    keepValidJsonOnlySettings(withValidAnalyticsIds(input.settings), site.projectSettings),
+  );
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
   // past the size cap is not stored — the save and its pages still land, the

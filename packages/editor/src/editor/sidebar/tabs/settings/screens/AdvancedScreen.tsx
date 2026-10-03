@@ -6,9 +6,10 @@
  * Head and body come from the Site row on open (3953:49260 loading,
  * 3953:49386 load-error) — those two columns are what the publish worker
  * injects; the CSS lives in the project JSON and the client export engine
- * injects it. Edits stay here until Save: the flush writes
- * `projectSettings.customCode`, and the sync provider's dual-save map carries
- * head and body on to `Site.headCode` / `Site.bodyCode`. A refused save shows
+ * injects it. Edits stay here until Save: the flush hands
+ * `projectSettings.customCode` to the shell, which writes head and body to
+ * `Site.headCode` / `Site.bodyCode` and the CSS through
+ * `siteDetail.projectSettings.update`. A refused save shows
  * the banner (3951:26607). On a FREE plan the shell mounts `LockedScreen`
  * instead (3397:32859).
  *
@@ -16,13 +17,15 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 import type { CustomCodeConfig } from "@/shared/types/project";
 import { validateHtml, type HtmlValidationResult } from "@/shared/utils/validateHtml";
 import { validateCss, type CssValidationResult } from "@/shared/utils/validateCss";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
-import type { SiteColumnField } from "@/services/BuildrikSyncProvider";
-import { LoadCard, SET_ROW_LABEL, SaveErrorBanner, Screen, Section, SiteColumnGate, Textarea } from "../shared";
+import type { SiteColumnField } from "@buildrik/shared/schemas/site-column-fields";
+import { LoadCard, SCREEN_FIELD_ERROR, SET_ROW_LABEL, SaveErrorBanner, Screen, Section, SiteColumnGate, Textarea } from "../shared";
 import type { ScreenProps } from "../types";
 
 const DEFAULT_CUSTOM_CODE: CustomCodeConfig = {
@@ -84,6 +87,12 @@ const HtmlFeedback: React.FC<{ id: string; result: HtmlValidationResult | null }
  * `styles`), mono 12, the frame's row. `col-span-full` keeps the row whole
  * should the card lay its children out as a grid.
  */
+/* 4418:128108 `Reusable classes in Brand ›`: ghost, 32 tall, 13/500 ink, at the well's column. */
+const BRAND_LINK =
+  "tw:col-span-full tw:ml-6 tw:h-8 tw:w-fit tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:bg-transparent tw:px-3 " +
+  "tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
 const CodeCard: React.FC<{
   title: string;
   anchor?: string;
@@ -97,8 +106,12 @@ const CodeCard: React.FC<{
    *  has none: it is project data an EDITOR can always change. */
   siteColumn?: SiteColumnField;
   onChange: (next: string) => void;
+  /** The server's refusal of this field on the last Save (ScreenProps.fieldErrors). */
+  error?: string;
+  /** Under the row, at the card's edge — 4418:128108's `Reusable classes in Brand ›`. */
+  footer?: React.ReactNode;
   children?: React.ReactNode;
-}> = ({ title, anchor, side, id, label, value, placeholder, describedBy, siteColumn, onChange, children }) => {
+}> = ({ title, anchor, side, id, label, value, placeholder, describedBy, siteColumn, onChange, error, footer, children }) => {
   const well = (
     <Textarea
       id={id}
@@ -106,6 +119,7 @@ const CodeCard: React.FC<{
       onChange={(e) => onChange(e.target.value)}
       aria-label={label}
       aria-describedby={describedBy}
+      aria-invalid={error ? true : undefined}
       placeholder={placeholder}
       spellCheck={false}
       className="tw:w-130 tw:min-h-9 tw:resize-y tw:border-[var(--bk-border-medium)] tw:px-3 tw:py-2.5 tw:[field-sizing:content] tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
@@ -123,7 +137,13 @@ const CodeCard: React.FC<{
           {siteColumn ? <SiteColumnGate field={siteColumn}>{well}</SiteColumnGate> : well}
         </div>
         {children ? <div className="tw:pl-49">{children}</div> : null}
+        {error ? (
+          <div role="alert" className={`${SCREEN_FIELD_ERROR} tw:pl-49`}>
+            {error}
+          </div>
+        ) : null}
       </div>
+      {footer}
     </Section>
   );
 };
@@ -136,6 +156,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
   onLoadStateChange,
   registerRetryLoad,
   saveError,
+  fieldErrors,
 }) => {
   const { value: savedCode } = useSettingsScreen(
     composer,
@@ -153,7 +174,10 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
      than in the field above. */
   const [bodyValidation, setBodyValidation] = React.useState<HtmlValidationResult | null>(null);
   const [cssValidation, setCssValidation] = React.useState<CssValidationResult | null>(null);
-  const [isDirty, setIsDirty] = React.useState(false);
+  /* Head and body as the Site row holds them (CSS is the composer's,
+     `savedCode`) — dirty is a difference from what is saved. */
+  const [savedRow, setSavedRow] = React.useState({ head: savedCode.headScripts, body: savedCode.bodyScripts });
+  const isDirty = headCode !== savedRow.head || bodyCode !== savedRow.body || cssCode !== savedCode.globalCss;
 
   // Debounced validation for head code
   React.useEffect(() => {
@@ -193,7 +217,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
     setHeadCode(savedCode.headScripts);
     setBodyCode(savedCode.bodyScripts);
     setCssCode(savedCode.globalCss);
-    setIsDirty(false);
+    setSavedRow({ head: savedCode.headScripts, body: savedCode.bodyScripts });
   }, [savedCode]);
 
   React.useEffect(() => {
@@ -208,11 +232,12 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
     (row) => {
       setHeadCode(row.headCode ?? "");
       setBodyCode(row.bodyCode ?? "");
+      setSavedRow({ head: row.headCode ?? "", body: row.bodyCode ?? "" });
     },
     { onLoadStateChange, registerRetryLoad }
   );
 
-  // Flush local buffer → composer on Save (see SettingsTab).
+  // On Save the shell calls this and saves what it returns (ScreenProps.registerFlushHandler).
   const stateRef = React.useRef({ headCode, bodyCode, cssCode });
   stateRef.current = { headCode, bodyCode, cssCode };
   React.useEffect(() => {
@@ -220,14 +245,14 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
     registerFlushHandler(() => {
       const current = composer.getProjectSettings();
       const s = stateRef.current;
-      composer.setProjectSettings({
+      return {
         ...current,
         customCode: {
           headScripts: s.headCode,
           bodyScripts: s.bodyCode,
           globalCss: s.cssCode,
         },
-      });
+      };
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);
@@ -256,10 +281,10 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
         id="code-head"
         label="Head scripts"
         siteColumn="customCode.headScripts"
+        error={fieldErrors?.["customCode.headScripts"]}
         value={headCode}
         onChange={(next) => {
           setHeadCode(next);
-          setIsDirty(true);
         }}
         describedBy={headValidation ? "head-validation-feedback" : undefined}
         /* `<script src>`, never `<script>…</script>`: the export sanitizer
@@ -277,10 +302,10 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
         id="code-body"
         label="Body scripts"
         siteColumn="customCode.bodyScripts"
+        error={fieldErrors?.["customCode.bodyScripts"]}
         value={bodyCode}
         onChange={(next) => {
           setBodyCode(next);
-          setIsDirty(true);
         }}
         describedBy={bodyValidation ? "body-validation-feedback" : undefined}
         placeholder={'<script src="https://…/widget.js"></script>'}
@@ -293,10 +318,28 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
         side="styles"
         id="code-css"
         label="Global CSS"
+        error={fieldErrors?.["customCode.globalCss"]}
+        footer={
+          /* 4418:128108: reusable classes belong to the Brand panel, not this
+             well. Navigation, so it stays live when the screen is read-only
+             (an anchor escapes the shell's disabled fieldset). */
+          <Button
+            href="#brand"
+            size="xs"
+            variant="ghost"
+            className={BRAND_LINK}
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "design" });
+            }}
+            data-testid="set-code-brand-link"
+          >
+            Reusable classes in Brand ›
+          </Button>
+        }
         value={cssCode}
         onChange={(next) => {
           setCssCode(next);
-          setIsDirty(true);
         }}
         describedBy={cssValidation ? "css-validation-feedback" : undefined}
         placeholder={"/* Custom CSS */\n.my-class { color: red; }"}

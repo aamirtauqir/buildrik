@@ -46,6 +46,18 @@ const STATE_LINK =
   "tw:h-[22px] tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent)] tw:focus:ring-0";
 /* The scoped-run note under "Plan changes" (6881:63246 …, 11/16 muted). */
 const SCOPE_NOTE = "tw:m-0 tw:px-4 tw:pb-3 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* Board 35 (Inspector v4 · AI column, 7995:210503): the column opened on one
+   element, before anything is asked — 16 gutter, 12 between parts; the back
+   link and the suggestions are 28-tall panel actions, 13/500 gray-700. */
+const COLUMN_BACK =
+  "tw:h-7 tw:w-full tw:rounded-md tw:border-0 tw:bg-transparent tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium " +
+  "tw:text-[var(--bk-gray-700)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0";
+const COLUMN_ACTION =
+  "tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-3 tw:py-1 " +
+  "tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-gray-700)] tw:focus:ring-0";
+const COLUMN_NOTE = "tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/** Board 35's three, for an element: each is a prompt on that element. */
+const ELEMENT_SUGGESTIONS = ["Make it more concise", "Try a warmer tone", "Suggest a headline"] as const;
 const CONFIRM_SUFFIX = " Changes to page settings or publishing need a separate confirmation.";
 import { DEFAULT_MODEL, type AIModel } from "./types";
 import "./AITab.css";
@@ -188,6 +200,12 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
     </Button>
   );
 
+  /* Board 35: the column (reached from the Inspector) on one element with
+     nothing asked yet. Everything else — page scope, a run, its end states —
+     keeps the 4418:* layout. Only classes and optional rows change between
+     the two, so the prompt field is never remounted under a typed prompt. */
+  const column35 = !!onBack && agent.phase === "idle" && scope.kind === "element" && !failedKind && !residue;
+
   const retry = () => {
     const again = lastPrompt.current;
     agent.reset();
@@ -195,10 +213,11 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
   };
 
   return (
-    <PanelFrame className="bd-ai-tab" data-testid="ai-panel">
+    <PanelFrame className={column35 ? "bd-ai-tab tw:gap-3 tw:p-4" : "bd-ai-tab"} data-testid="ai-panel">
       {/* Every AI board opens with "‹ Inspector" and a plain "AI" title — the
           panel lives in the inspector column, not beside it. The old header
-          carried a subtitle ("Chat with AI to edit your page") no board has. */}
+          carried a subtitle ("Chat with AI to edit your page") no board has.
+          Board 35 draws the back link alone, centred, with no title and no ✕. */}
       {onBack ? (
         /* shrink-0: these two rows carry fixed heights now, and a flex child
            in an overflowing column is compressible by default. */
@@ -208,13 +227,21 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
               other way round, which read as a header with a stray link
               floating above it. */}
           <div
-            className="tw:flex tw:h-9 tw:items-center tw:border-b tw:border-[var(--bk-gray-100)]"
+            className={
+              column35
+                ? "tw:flex tw:h-7 tw:items-center"
+                : "tw:flex tw:h-9 tw:items-center tw:border-b tw:border-[var(--bk-gray-100)]"
+            }
             data-testid="ai-back-row"
           >
             <Button
               color="light"
               size="xs"
-              className="tw:h-full tw:border-transparent tw:bg-transparent tw:px-4 tw:py-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
+              className={
+                column35
+                  ? COLUMN_BACK
+                  : "tw:h-full tw:border-transparent tw:bg-transparent tw:px-4 tw:py-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
+              }
               onClick={onBack}
               aria-label="Back to Inspector"
               data-testid="ai-back-label"
@@ -222,16 +249,20 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
               ‹ Inspector
             </Button>
             {/* Board 4418:106919: ✕ at the back row's right closes the panel. */}
-            <IconButton size="sm" label="Close AI" className="tw:ml-auto tw:mr-4 tw:text-[var(--bk-ink-muted)]" onClick={onClose}>
-              <X size={16} aria-hidden="true" />
-            </IconButton>
+            {column35 ? null : (
+              <IconButton size="sm" label="Close AI" className="tw:ml-auto tw:mr-4 tw:text-[var(--bk-ink-muted)]" onClick={onClose}>
+                <X size={16} aria-hidden="true" />
+              </IconButton>
+            )}
           </div>
-          <div
-            className="tw:flex tw:h-11 tw:items-center tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
-            data-testid="ai-header"
-          >
-            AI
-          </div>
+          {column35 ? null : (
+            <div
+              className="tw:flex tw:h-11 tw:items-center tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
+              data-testid="ai-header"
+            >
+              AI
+            </div>
+          )}
         </div>
       ) : (
         <PanelFrame.Header
@@ -244,7 +275,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           title, with whatever the run is doing below them — the composer used
           to sit at the bottom, chat-style, under states that had replaced the
           thread entirely. */}
-      <ScopeChip scope={scope} status={status} options={options} onChoose={choose} />
+      <ScopeChip scope={scope} status={status} options={options} onChoose={choose} variant={column35 ? "line" : "band"} />
       {/* Board 4418:106796 draws no composer: nothing here will run. */}
       {failedKind === "not-configured" ? null : (
         <div ref={promptRef}>
@@ -252,8 +283,10 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             key={composerKey}
             onSubmit={submit}
             streaming={live}
-            showPlan={agent.phase === "idle" && !failedKind}
+            showPlan={agent.phase === "idle" && !failedKind && !column35}
             quotaLabel={(quota && quotaLeftLabel(quota)) || undefined}
+            variant={column35 ? "column" : "band"}
+            placeholder={column35 ? "What would you like to change?" : undefined}
           />
         </div>
       )}
@@ -322,6 +355,19 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
         <div data-testid="ai-residue">
           <p className={SCOPE_NOTE}>{RESIDUE_NOTE}</p>
           <p className="tw:m-0 tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">{residue}</p>
+        </div>
+      ) : column35 ? (
+        /* Board 35: three suggestions on the element, then the promise the
+           round trip keeps (P-7a — the Inspector stays mounted under AI). */
+        <div className="tw:flex tw:flex-col tw:gap-3" data-testid="ai-suggestions">
+          {ELEMENT_SUGGESTIONS.map((p) => (
+            <Button key={p} color="light" size="xs" className={COLUMN_ACTION} onClick={() => submit(p)}>
+              {p}
+            </Button>
+          ))}
+          <p className={COLUMN_NOTE} data-testid="ai-return-note">
+            Returning keeps your Inspector tab, scroll and state.
+          </p>
         </div>
       ) : agent.phase === "idle" && scope.kind !== "page" ? (
         <p className={SCOPE_NOTE} data-testid="ai-scope-note">

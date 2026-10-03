@@ -13,60 +13,63 @@ export type SettingsSection = {
  *  the design's directory of cards; the layout reads it back to title a sub-page
  *  and point its back link home. Add a section here and both follow.
  *
+ *  Grouped per Settings Phase B §25 (#47): WORKSPACE · CONNECTIONS · BILLING ·
+ *  PERSONAL ("Only affects you") · DANGER ZONE. Security moved to Personal (it
+ *  is your sign-in, not the workspace's), Transfer ownership to Danger zone,
+ *  Plans folded into Plan & billing and AI credits into Usage & credits.
+ *
  *  The design also draws an "Add-ons" card. This app has no route for it, so it
  *  is absent rather than shipped as a dead link. */
-export const SETTINGS_GROUPS: { label: string; items: SettingsSection[] }[] = [
+export const SETTINGS_GROUPS: { label: string; note?: string; items: SettingsSection[] }[] = [
   {
     label: "Workspace",
     items: [
-      { label: "Workspace & branding", description: "Name, URL, logo & accent color", href: "/dashboard/settings/workspace", icon: Building2 },
-      { label: "Security", description: "2FA, active sessions & sign-in", href: "/dashboard/settings/security", icon: Shield },
-      { label: "Notifications", description: "Emails, digests & alerts", href: "/dashboard/settings/notifications", icon: Bell },
+      { label: "General & branding", description: "Name, URL, logo & accent color", href: "/dashboard/settings/workspace", icon: Building2 },
       { label: "Team", description: "Members, roles & seats", href: "/dashboard/settings/team", icon: Users },
     ],
   },
   {
-    label: "Plan & billing",
+    label: "Connections",
     items: [
-      { label: "Plans", description: "Compare & change your plan", href: "/dashboard/settings/plans", icon: Gauge },
-      { label: "Usage & AI credits", description: "Bandwidth, storage & credits", href: "/dashboard/settings/usage", icon: Activity },
-      { label: "Billing", description: "Invoices & payment method", href: "/dashboard/settings/billing", icon: CreditCard },
+      { label: "Apps & integrations", description: "Vercel, webhooks & external tools", href: "/dashboard/settings/integrations", icon: LayoutGrid },
+      { label: "Domains", description: "Every site's connected domains & DNS", href: "/dashboard/settings/domains", icon: Globe },
+      { label: "Workspace API tokens", description: "Tokens for scripts & integrations", href: "/dashboard/settings/api-tokens", icon: KeyRound },
     ],
   },
   {
-    label: "Sites & clients",
+    label: "Billing",
     items: [
-      { label: "Domains", description: "Connected domains & DNS", href: "/dashboard/settings/domains", icon: Globe },
-      { label: "Apps & Integrations", description: "Connect external tools", href: "/dashboard/settings/integrations", icon: LayoutGrid },
-    ],
-  },
-  {
-    label: "Developer",
-    items: [
-      { label: "API tokens", description: "Personal access tokens", href: "/dashboard/settings/api-tokens", icon: KeyRound },
-      { label: "AI & credits", description: "Model provider & credit usage", href: "/dashboard/settings/ai", icon: Sparkles },
+      { label: "Plan & billing", description: "Your plan, invoices & payment method", href: "/dashboard/settings/billing", icon: CreditCard },
+      { label: "Usage & credits", description: "Bandwidth, storage & AI credits", href: "/dashboard/settings/usage", icon: Activity },
     ],
   },
   {
     label: "Personal",
+    note: "Only affects you",
     items: [
-      { label: "Account", description: "Email, password & sessions", href: "/dashboard/settings/account", icon: User },
       { label: "Profile", description: "Your name and avatar", href: "/dashboard/settings/profile", icon: UserCircle },
+      { label: "Account & sign-in", description: "Email, password & connected logins", href: "/dashboard/settings/account", icon: User },
+      { label: "Security", description: "2FA & active sessions", href: "/dashboard/settings/security", icon: Shield },
+      { label: "Notifications", description: "Emails, digests & alerts", href: "/dashboard/settings/notifications", icon: Bell },
     ],
   },
   {
     label: "Danger zone",
     items: [
-      // Named for both halves of the page it opens. It was "Delete workspace",
-      // which is one of the two things behind this card — the page also deletes
-      // your account and exports your data — and it made the destination read
-      // "Delete workspace" three times: the H1, the card title, the button.
-      { label: "Delete workspace or account", description: "Permanent, and not reversible", href: "/dashboard/settings/danger", icon: Trash2 },
+      { label: "Transfer or delete", description: "Transfer ownership; deletion happens 30 days later, cancel any time before", href: "/dashboard/settings/danger", icon: Trash2 },
     ],
   },
 ];
 
-export const SETTINGS_SECTIONS: SettingsSection[] = SETTINGS_GROUPS.flatMap((g) => g.items);
+/** Routes that still exist but are not cards of their own: Plans is the
+ *  comparison Plan & billing opens (and the sidebar's upgrade link), AI credits
+ *  now sit inside Usage & credits. Listed so a deep link is still titled. */
+const SETTINGS_SUB_PAGES: SettingsSection[] = [
+  { label: "Plans", description: "Compare & change your plan", href: "/dashboard/settings/plans", icon: Gauge },
+  { label: "AI credits", description: "Model provider & credit usage", href: "/dashboard/settings/ai", icon: Sparkles },
+];
+
+export const SETTINGS_SECTIONS: SettingsSection[] = [...SETTINGS_GROUPS.flatMap((g) => g.items), ...SETTINGS_SUB_PAGES];
 
 /** The sections that live under /dashboard/settings. Every entry is a settings
  *  route now that the agency cross-links (Reviews, Partner) have moved out to the

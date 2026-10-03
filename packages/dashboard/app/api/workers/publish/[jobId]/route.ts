@@ -2,16 +2,17 @@ import { type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { deliverWebhook } from "@/server/services/webhook.service";
 import { prisma } from "@lib/prisma";
-import { slugifyProjectName, type VercelFile } from "@lib/vercel";
+import { resolveVercelProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
 import { buildDeployFiles } from "@lib/publish-files";
 import { planFormWiring } from "@lib/publish-forms";
 import { getPublishedFormSettings, recordPublishedForms } from "@server/services/form-submission.service";
 import { wireSliders } from "@lib/publish-sliders";
+import { wireWidgetRuntimes } from "@lib/publish-widgets";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
-import { runVercelDeploy, completePublish } from "@server/services/publish.service";
+import { assertProjectNameFree, runVercelDeploy, completePublish } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
 import { getWorkspaceAppScripts } from "@server/services/marketplace.service";
 import { checkWorkerAuth } from "@/lib/cron-auth";
@@ -278,6 +279,7 @@ async function runVercelDeployJob(
     where: { id: siteId },
     select: {
       slug: true,
+      vercelProjectName: true,
       name: true,
       publishedPassword: true,
       favicon: true,
@@ -328,7 +330,8 @@ async function runVercelDeployJob(
 
   // Named here rather than at the deploy call: the sitemap needs the origin
   // this deploy will land on, and that is derived from the project name.
-  const projectName = slugifyProjectName(site.slug);
+  const projectName = resolveVercelProjectName(site);
+  if (!site.vercelProjectName) await assertProjectNameFree(siteId, projectName);
   const verifiedDomain = await prisma.domain.findFirst({
     where: { siteId, status: "VERIFIED" },
     select: { domain: true },
@@ -353,7 +356,9 @@ async function runVercelDeployJob(
   // Slider/Carousel runtime (autoplay/interval, arrows/dots) — the block
   // exported as stacked slides with no behaviour; inject the runtime only on
   // pages that actually have one.
-  const slidedPages = wiredPages.map((page) => ({ ...page, html: wireSliders(page.html) }));
+  // Countdown ticking + accordion Open/Closed (Inspector v4 boards 11, 13):
+  // same rule — only on pages that have the widget.
+  const slidedPages = wiredPages.map((page) => ({ ...page, html: wireWidgetRuntimes(wireSliders(page.html)) }));
 
   const files: VercelFile[] = buildDeployFiles({
     siteId,
@@ -400,6 +405,16 @@ async function runVercelDeployJob(
     where: { id: jobId },
     data: { deploymentId: result.deploymentId },
   });
+  // SA-06: pin the project this site now lives on, so a later slug change
+  // keeps deploying here instead of creating a new project. Best-effort: the
+  // deploy is already live, and a failed pin must not report it as failed.
+  if (!site.vercelProjectName) {
+    try {
+      await prisma.site.update({ where: { id: siteId }, data: { vercelProjectName: projectName } });
+    } catch (e: unknown) {
+      console.error(`[publish-worker] project pin failed for site ${siteId}:`, e instanceof Error ? e.message : e);
+    }
+  }
   await setStep(jobId, 2);
 
   // Step 3 — Verifying SSL: deployment already polled to READY by service.

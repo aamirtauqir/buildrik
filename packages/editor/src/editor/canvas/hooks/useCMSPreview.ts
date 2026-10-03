@@ -8,7 +8,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { devError } from "../../../shared/utils/devLogger";
 import { EVENTS } from "@/shared/constants/events";
-import { RepeaterRenderer } from "@/engine/cms/RepeaterRenderer";
+import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer } from "@/engine/cms/RepeaterRenderer";
 import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 
 interface UseCMSPreviewOptions {
@@ -72,8 +72,11 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
           const bindings = composer.cms.bindings.getBindings(elementId);
           if (bindings.length === 0) return;
 
-          // Resolve each binding
+          // Resolve each binding — except those a Collection list copy
+          // already filled from its own record (C0.8).
+          const currentItemOf = el.getAttribute(CURRENT_ITEM_ATTR);
           bindings.forEach((binding) => {
+            if (followsContextRecord(binding) && currentItemOf === binding.collectionId) return;
             const promise = composer.cms.bindings.resolveBinding(binding).then((value) => {
               if (!value) return;
 

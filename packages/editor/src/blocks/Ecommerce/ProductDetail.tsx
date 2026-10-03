@@ -18,7 +18,7 @@ export const productDetailBlockConfig: BlockBuildConfig = {
   category: "Ecommerce",
   elementType: "product-detail",
   content: `
-<article data-product-detail style="display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:1200px;margin:0 auto;padding:40px">
+<article data-product-detail data-buildrick-type="product-detail" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:1200px;margin:0 auto;padding:40px">
   <div style="aspect-ratio:1;overflow:hidden;border-radius:16px;background:#f3f4f6">
     <img data-bind="image" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600" alt="Product" style="width:100%;height:100%;object-fit:cover"/>
   </div>

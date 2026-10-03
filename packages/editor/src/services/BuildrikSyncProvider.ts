@@ -13,7 +13,11 @@ import { fetchMyRole, roleAtLeast } from "./RoleService";
 import { resumeKeepingUnsaved } from "./unsavedRecovery";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { dropSessionMediaUrls } from "@/shared/utils/html";
-import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
+import type { PageMeta, PageSettings, ProjectData, ProjectSettings, SiteSEO, SlugChange } from "@/shared/types/project";
+import type { ProjectSettingsPatch } from "@buildrik/shared/schemas/project-settings";
+import type { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-detail";
+import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
+import type { z } from "zod";
 import type { ElementData } from "@/shared/types/element";
 import { blankPageRoot } from "@buildrik/shared/content/elementIds";
 
@@ -64,6 +68,23 @@ export function isSaveConflictPending(): boolean {
   return _conflictToken !== null;
 }
 
+/** The server token the pending conflict was raised with, or null. The
+ *  Inspector's "Resolve" re-sends SAVE_CONFLICT_EVENT with it, which reopens
+ *  the conflict dialog the user dismissed (board 29). */
+export function getPendingConflictToken(): string | null {
+  return _conflictToken;
+}
+
+/** Dispatched on `window` when a pending conflict is resolved — Overwrite
+ *  adopted the server token, or a fresh load replaced the copy. */
+export const SAVE_CONFLICT_CLEARED_EVENT = "buildrik:save-conflict-cleared";
+
+function clearConflictToken(): void {
+  if (_conflictToken === null) return;
+  _conflictToken = null;
+  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_CLEARED_EVENT));
+}
+
 /* A-1 / PD-1: the Site-column values this editor last knew the server held —
    captured at load, advanced after each successful mirror. The mirror sends
    only what differs from it, so a dashboard edit to a field this editor never
@@ -84,6 +105,17 @@ const MEDIA_PAGE_SIZE = 200;
    "Page 1". `initBuildrikSync`'s empty-project guard does not cover this: the
    fallback project has a child, so it counts as content. */
 const _loadedSites = new Set<string>();
+
+/* SA-01: sites whose Site-column settings did not load this session (the read
+   failed twice). The columns are the only source of the column-backed
+   settings, so such a session renders pages without their title template,
+   icons, OG image or head/body code — publishing it is refused. */
+const _siteColumnsMissing = new Set<string>();
+
+/** Whether the open site's Site-column settings loaded. Publish reads it. */
+export function siteColumnsLoaded(siteId: string): boolean {
+  return !_siteColumnsMissing.has(siteId);
+}
 
 /* Sites the server says do not exist. A refused save is not the same story for
    these: "Reload to get the real site" is the right advice for a load that
@@ -122,7 +154,7 @@ export class SaveConflictError extends Error {
  *  save matches the server and wins. */
 export function setBaselineLastEditedAt(iso: string | null): void {
   _baselineLastEditedAt = iso;
-  _conflictToken = null;
+  clearConflictToken();
 }
 
 // Conflict signal — emitted on a window CustomEvent so BOTH manual save and
@@ -235,33 +267,17 @@ function emptyToNull(value: string | null | undefined): string | null {
 }
 
 /**
- * The projectSettings fields extractSiteColumnPatch reads — each one is a Site
- * column the dashboard owns, mirrored from the editor only for an ADMIN (A-1).
+ * Reads exactly SITE_COLUMN_FIELDS (`@buildrik/shared/schemas/site-column-fields`)
+ * — each one is a Site column the dashboard owns, mirrored from the editor
+ * only for an ADMIN (A-1).
  * The Settings screens lock exactly these below ADMIN (M7 / PD-1);
  * `siteColumnFields.test.ts` pins this list to the function's reads, so a new
  * mirrored field cannot land without being locked, and project data (Author,
- * Twitter handle, Global CSS) is never locked by mistake.
+ * Twitter handle, Global CSS) is never locked by mistake. SA-01: the list
+ * lives in `@buildrik/shared` because the server strips the same fields from
+ * the stored projectSettings.
  */
-export const SITE_COLUMN_FIELDS = [
-  "seo.siteName",
-  "seo.favicon",
-  "seo.language",
-  "seo.metaTitle",
-  "seo.metaDescription",
-  "seo.metaTitleTemplate",
-  "seo.defaultOgImage",
-  "seo.allowIndexing",
-  "seo.robotsTxt",
-  "seo.touchIcon",
-  "seo.socialLinks",
-  "customCode.headScripts",
-  "customCode.bodyScripts",
-  "publishing.publishedPassword",
-] as const;
-export type SiteColumnField = (typeof SITE_COLUMN_FIELDS)[number];
-
-export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
-  const settings = projectData.settings;
+export function extractSiteColumnPatch(settings: ProjectSettings | undefined): SiteColumnSettings {
   if (!settings) return {};
   const seo = settings.seo;
   const customCode = settings.customCode;
@@ -300,10 +316,200 @@ export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSett
   return patch;
 }
 
+// ─── Settings Save (Phase B, BE-3) ──────────────────────────────────────────
+// The Settings footer's Save writes through the two settings mutations, never
+// `sites.saveProject`: Site-column fields → `siteDetail.settings.update`, the
+// JSON-only keys (analytics, global CSS, the 404 switch, General's Author) →
+// `siteDetail.projectSettings.update`. A refusal names its fields.
+
+/** What a Settings screen may send to `siteDetail.settings.update` (its id aside). */
+export type SiteColumnPatch = Omit<z.input<typeof updateSiteSettingsSchema>, "id">;
+
+/** The Settings path each mirrored Site column is edited at — `extractSiteColumnPatch`
+ *  read the other way — so a refused column names the screen's own field. */
+const COLUMN_SETTING_PATHS: Readonly<Record<string, string>> = {
+  name: "seo.siteName",
+  favicon: "seo.favicon",
+  defaultLocale: "seo.language",
+  metaTitle: "seo.metaTitle",
+  metaDescription: "seo.metaDescription",
+  metaTitleTemplate: "seo.metaTitleTemplate",
+  ogImage: "seo.defaultOgImage",
+  allowIndexing: "seo.allowIndexing",
+  robotsTxt: "seo.robotsTxt",
+  touchIcon: "seo.touchIcon",
+  socialLinks: "seo.socialLinks",
+  headCode: "customCode.headScripts",
+  bodyCode: "customCode.bodyScripts",
+  publishedPassword: "publishing.publishedPassword",
+};
+
 /**
- * Inverse of extractSiteColumnPatch: merge Site columns into editor's
- * projectSettings shape on load. Server is canonical for these fields,
- * so any value present on the Site row wins over projectSettings JSON.
+ * A Settings save the server refused. `fieldErrors` is keyed by the field's
+ * `ProjectSettings` path (`seo.defaultOgImage`,
+ * `analytics.googleAnalytics.measurementId`), or by the Site column's name for
+ * a column with no settings path (`slug`, `canonicalUrl`, `cspPolicy`).
+ */
+export class SettingsSaveError extends Error {
+  constructor(
+    message: string,
+    public readonly fieldErrors: Readonly<Record<string, string>> = {},
+  ) {
+    super(message);
+    this.name = "SettingsSaveError";
+  }
+}
+
+/**
+ * A Settings save the user called off before anything was sent — General's
+ * slug confirm answered Cancel. The shell keeps the edits and the screen as
+ * they were: no "Not saved", no banner, no toast.
+ */
+export class SettingsSaveCancelled extends Error {
+  constructor() {
+    super("The save was cancelled.");
+    this.name = "SettingsSaveCancelled";
+  }
+}
+
+/** The tRPC error's `data.zodIssues` (server errorFormatter), each path re-keyed by `toField`. */
+function refusedFields(err: unknown, toField: (serverPath: string) => string): Record<string, string> {
+  const issues = (err as { data?: { zodIssues?: unknown } } | null)?.data?.zodIssues;
+  const fields: Record<string, string> = {};
+  if (!Array.isArray(issues)) return fields;
+  for (const issue of issues) {
+    const { path, message } = (issue ?? {}) as { path?: unknown; message?: unknown };
+    if (typeof path === "string" && typeof message === "string") fields[toField(path)] ??= message;
+  }
+  return fields;
+}
+
+function asSettingsSaveError(err: unknown, toField: (serverPath: string) => string): SettingsSaveError {
+  if (err instanceof SettingsSaveError) return err;
+  return new SettingsSaveError(err instanceof Error ? err.message : String(err), refusedFields(err, toField));
+}
+
+const columnField = (serverPath: string) => {
+  const [column, ...rest] = serverPath.split(".");
+  return [COLUMN_SETTING_PATHS[column] ?? column, ...rest].join(".");
+};
+const projectSettingsField = (serverPath: string) => serverPath.replace(/^patch\./, "");
+
+/** `siteDetail.settings.update` (ADMIN). Refusals throw `SettingsSaveError` with the refused fields. */
+export async function updateSiteColumns(siteId: string, patch: SiteColumnPatch) {
+  try {
+    return await getClient().siteDetail.settings.update.mutate({ id: siteId, ...patch });
+  } catch (err) {
+    const refused = asSettingsSaveError(err, columnField);
+    /* SLUG_TAKEN / PROJECT_NAME_TAKEN come back as a CONFLICT with no field
+       path; when the save carried a slug, the slug is the field refused. */
+    const code = (err as { data?: { code?: unknown } } | null)?.data?.code;
+    if (code === "CONFLICT" && patch.slug !== undefined && Object.keys(refused.fieldErrors).length === 0) {
+      throw new SettingsSaveError(refused.message, { slug: refused.message });
+    }
+    throw refused;
+  }
+}
+
+/** `siteDetail.projectSettings.update` (EDITOR; ADMIN + Pro for global CSS). Refusals throw `SettingsSaveError`. */
+export async function updateProjectSettings(siteId: string, patch: ProjectSettingsPatch) {
+  try {
+    return await getClient().siteDetail.projectSettings.update.mutate({ siteId, patch });
+  } catch (err) {
+    throw asSettingsSaveError(err, projectSettingsField);
+  }
+}
+
+/** What one Settings Save sends, from the composer's settings before and the screen's after. */
+export interface SettingsSavePlan {
+  /** Mirrored Site columns whose value changed — plus any column with no
+   *  settings path a screen's flush adds (`slug`, `canonicalUrl`). */
+  columns: SiteColumnPatch;
+  /** JSON-only keys that changed, or null. */
+  projectSettings: ProjectSettingsPatch | null;
+  /**
+   * Some other changed key has no settings mutation yet (SEO's Twitter handle,
+   * until Lane 1 merges it into Social profiles). The caller must let the
+   * project save carry it rather than drop it.
+   */
+  unrouted: boolean;
+}
+
+const sameValue = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
+/** `settings` without the keys a settings mutation writes — what is left for the project save. */
+function unroutedSettings(settings: ProjectSettings): Record<string, unknown> {
+  const rest: Record<string, unknown> = structuredClone({ ...settings, analytics: undefined, redirects: undefined });
+  for (const field of [...SITE_COLUMN_FIELDS, "customCode.globalCss", "seo.author"]) {
+    const [section, key] = field.split(".");
+    const block = rest[section];
+    if (isRecord(block)) delete block[key];
+  }
+  return rest;
+}
+
+export function planSettingsSave(before: ProjectSettings, next: ProjectSettings): SettingsSavePlan {
+  const patch: ProjectSettingsPatch = {};
+  if (next.analytics && !sameValue(before.analytics, next.analytics)) patch.analytics = next.analytics;
+  if (!sameValue(before.customCode?.globalCss, next.customCode?.globalCss)) {
+    patch.customCode = { globalCss: next.customCode?.globalCss ?? "" };
+  }
+  if (next.redirects && !sameValue(before.redirects, next.redirects)) patch.redirects = next.redirects;
+  if (!sameValue(before.seo?.author, next.seo?.author)) patch.seo = { author: next.seo?.author ?? "" };
+  /* `before` is the composer's settings, read from the Site row: a NULL
+     column is left `undefined` there (and dropped from its patch), so an
+     empty field (null) over a key `before` lacks is no change — General sent
+     `favicon: null, touchIcon: null` on every Save of a site that had
+     neither. */
+  const beforeColumns = extractSiteColumnPatch(before);
+  const columns = Object.fromEntries(
+    Object.entries(diffSiteColumns(extractSiteColumnPatch(next), beforeColumns)).filter(
+      ([key, value]) => !(value === null && beforeColumns[key as keyof SiteColumnSettings] === undefined),
+    ),
+  ) as SiteColumnSettings;
+  return {
+    columns,
+    projectSettings: Object.keys(patch).length > 0 ? patch : null,
+    unrouted: !sameValue(unroutedSettings(before), unroutedSettings(next)),
+  };
+}
+
+/**
+ * Run one Settings Save's plan: both mutations at once. Either refusal fails
+ * the save with every refused field named; the half that landed is repeated on
+ * the retry (both writes are idempotent). Only a fully landed save advances
+ * the autosave mirror's baseline — so the next autosave neither re-sends these
+ * columns nor, after a partial failure, sends the old values back over them.
+ */
+export async function saveSiteSettings(
+  siteId: string,
+  plan: SettingsSavePlan,
+): Promise<{ legacyAnalyticsIds: readonly string[] }> {
+  const hasColumns = Object.keys(plan.columns).length > 0;
+  const [columns, json] = await Promise.allSettled([
+    hasColumns ? updateSiteColumns(siteId, plan.columns) : Promise.resolve(null),
+    plan.projectSettings ? updateProjectSettings(siteId, plan.projectSettings) : Promise.resolve(null),
+  ]);
+  const refused = [columns, json].flatMap((r) =>
+    r.status === "rejected" ? [asSettingsSaveError(r.reason, (path) => path)] : [],
+  );
+  if (refused.length > 0) {
+    throw new SettingsSaveError(
+      refused.map((e) => e.message).join(" "),
+      Object.assign({}, ...refused.map((e) => e.fieldErrors)),
+    );
+  }
+  if (hasColumns) _baselineSiteColumns = { ..._baselineSiteColumns, ...plan.columns };
+  return { legacyAnalyticsIds: json.status === "fulfilled" && json.value ? json.value.warnings.legacyAnalyticsIds : [] };
+}
+
+/**
+ * Inverse of extractSiteColumnPatch: Site columns into the editor's
+ * projectSettings shape on load. SA-01: the columns are the only source for
+ * SITE_COLUMN_FIELDS — a NULL column leaves the field empty, never the
+ * project JSON's copy (an edit the ADMIN-only mirror never sent, or a value
+ * the dashboard has since cleared).
  */
 function mergeSiteColumnsIntoSettings(
   baseSettings: ProjectData["settings"] | undefined,
@@ -314,24 +520,25 @@ function mergeSiteColumnsIntoSettings(
   const customCode = { ...(settings.customCode ?? { headScripts: "", bodyScripts: "", globalCss: "" }) };
   const publishing = { ...(settings.publishing ?? {}) };
 
-  if (siteCols.name != null) seo.siteName = siteCols.name;
-  if (siteCols.favicon != null) seo.favicon = siteCols.favicon;
-  if (siteCols.defaultLocale != null) seo.language = siteCols.defaultLocale;
-  if (siteCols.metaTitle != null) seo.metaTitle = siteCols.metaTitle;
-  if (siteCols.metaDescription != null) seo.metaDescription = siteCols.metaDescription;
-  if (siteCols.metaTitleTemplate != null) seo.metaTitleTemplate = siteCols.metaTitleTemplate;
-  if (siteCols.ogImage != null) seo.defaultOgImage = siteCols.ogImage;
-  if (siteCols.allowIndexing != null) seo.allowIndexing = siteCols.allowIndexing;
-  if (siteCols.robotsTxt != null) seo.robotsTxt = siteCols.robotsTxt;
-  if (siteCols.touchIcon != null) seo.touchIcon = siteCols.touchIcon;
-  if (siteCols.socialLinks != null) seo.socialLinks = siteCols.socialLinks as SiteSEO["socialLinks"];
-  if (siteCols.headCode != null) customCode.headScripts = siteCols.headCode;
-  if (siteCols.bodyCode != null) customCode.bodyScripts = siteCols.bodyCode;
-  // publishedPassword: server redacts the hash on read (returns null if redacted
-  // OR not set). We can't distinguish those here, so we never round-trip null —
-  // user must explicitly type a new value to change it. The hasPublishedPassword
-  // boolean (from server) is the authoritative "is a password set" indicator.
-  if (siteCols.publishedPassword) publishing.publishedPassword = siteCols.publishedPassword;
+  seo.siteName = siteCols.name;
+  seo.favicon = siteCols.favicon ?? undefined;
+  seo.language = siteCols.defaultLocale;
+  seo.metaTitle = siteCols.metaTitle ?? undefined;
+  seo.metaDescription = siteCols.metaDescription ?? undefined;
+  seo.metaTitleTemplate = siteCols.metaTitleTemplate ?? undefined;
+  seo.defaultOgImage = siteCols.ogImage ?? undefined;
+  seo.allowIndexing = siteCols.allowIndexing;
+  seo.robotsTxt = siteCols.robotsTxt ?? undefined;
+  seo.touchIcon = siteCols.touchIcon ?? undefined;
+  seo.socialLinks = (siteCols.socialLinks ?? undefined) as SiteSEO["socialLinks"];
+  // CustomCodeConfig's strings are required: an empty column reads as "".
+  customCode.headScripts = siteCols.headCode ?? "";
+  customCode.bodyScripts = siteCols.bodyCode ?? "";
+  // publishedPassword: the server redacts it on read (always null), so it is
+  // never loaded — the user types a new value to change it. The
+  // hasPublishedPassword boolean (from server) is the authoritative "is a
+  // password set" indicator.
+  publishing.publishedPassword = siteCols.publishedPassword || undefined;
 
   settings.seo = seo;
   settings.customCode = customCode;
@@ -364,6 +571,13 @@ function mapDashboardPlan(plan: unknown): EditorPlanTier {
 /** Plan tier for the open site. Valid after loadProject resolves. */
 export function getEditorPlanTier(): EditorPlanTier {
   return _editorPlanTier;
+}
+
+let _editorWorkspaceName: string | null = null;
+
+/** The open site's workspace name, for the Settings workspace doors. Null before load or in the demo. */
+export function getEditorWorkspaceName(): string | null {
+  return _editorWorkspaceName;
 }
 
 /** Duplicate a site (`sites.duplicate`, EDITOR). Throws the server's message
@@ -412,9 +626,14 @@ export function projectDataFromRows(
   // as the base so non-mirrored settings (e.g. things only persisted in the
   // JSON blob) survive editor reload from dashboard.
   const baseSettings = siteRow.projectSettings as ProjectData["settings"] | undefined;
-  const mergedSettings = siteColumns
-    ? mergeSiteColumnsIntoSettings(baseSettings, siteColumns as SiteColumnSettings)
-    : baseSettings;
+  /* No columns (the read failed) still means no JSON copy: SA-01 keeps the
+     column-backed fields empty rather than loading a value that may be stale.
+     `Site.name` rides on the site row too (the /share rows carry it only
+     there) — the same column. */
+  const mergedSettings = mergeSiteColumnsIntoSettings(baseSettings, {
+    name: siteRow.name,
+    ...(siteColumns as SiteColumnSettings | null),
+  });
 
   return {
     version: "1.0",
@@ -473,21 +692,32 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     const client = getClient();
     // P0.2b: pull Site columns alongside core site + pages so editor's view
     // of metaTitle/etc reflects what the dashboard saved.
+    // SA-01: retried once — a failed read leaves the column-backed settings empty.
+    const readSiteColumns = () => client.siteDetail.settings.get.query({ siteId });
+    let columnsLoaded = true;
     const [site, pages, settingsResult] = await Promise.all([
       client.sites.get.query({ id: siteId }),
       client.pages.list.query({ siteId }),
-      client.siteDetail.settings.get.query({ siteId }).catch(() => null),
+      readSiteColumns()
+        .catch(readSiteColumns)
+        .catch(() => {
+          columnsLoaded = false;
+          return null;
+        }),
     ]);
+    if (columnsLoaded) _siteColumnsMissing.delete(siteId);
+    else _siteColumnsMissing.add(siteId);
     const data = projectDataFromRows(site, pages, settingsResult);
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.
     _editorPlanTier = mapDashboardPlan((settingsResult as { plan?: unknown } | null)?.plan);
+    _editorWorkspaceName = settingsResult?.workspaceName ?? null;
 
     // 61-conflict: record the load-time version as the save baseline.
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
-    _conflictToken = null;
-    _baselineSiteColumns = extractSiteColumnPatch(data);
+    clearConflictToken();
+    _baselineSiteColumns = extractSiteColumnPatch(data.settings);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
@@ -586,7 +816,7 @@ async function saveProjectNow(
   // Advance the baseline so the editor's own next save isn't seen as a conflict.
   _baselineLastEditedAt = new Date(result.savedAt).toISOString();
 
-  const changed = diffSiteColumns(extractSiteColumnPatch(persisted), _baselineSiteColumns);
+  const changed = diffSiteColumns(extractSiteColumnPatch(persisted.settings), _baselineSiteColumns);
   if (Object.keys(changed).length > 0 && roleAtLeast(await fetchMyRole(), "ADMIN") !== false) {
     /* Awaited on its own: a refused mirror is its own, smaller sentence — the
        pages are already on the server and the chip is about them. */

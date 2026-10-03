@@ -133,3 +133,23 @@ describe("FontPicker — Clone 3721:43084, the picker's offer", () => {
     expect(within(list).getByRole("button", { name: "Manage site fonts" })).toBeInTheDocument();
   });
 });
+
+describe("FontPicker — read-only (DD-18)", () => {
+  it("stays legible and focusable, and refuses to open or change", async () => {
+    const { InspectorFieldContext } = await import("../../../shared/controls/InspectorFieldContext");
+    const onChange = vi.fn();
+    render(
+      <InspectorFieldContext.Provider
+        value={{ readOnly: true, readOnlyReason: "locked", mixedKeys: new Set(), overrides: new Map(), overrideLabels: {}, resetOverride: () => undefined }}
+      >
+        <FontPicker value="'Inter', sans-serif" onChange={onChange} />
+      </InspectorFieldContext.Provider>,
+    );
+    const trigger = screen.getByRole("button", { name: "Font family" });
+    expect(trigger).not.toBeDisabled();
+    expect(trigger).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(trigger);
+    expect(screen.queryByRole("listbox", { name: "Font family selection" })).toBeNull();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});

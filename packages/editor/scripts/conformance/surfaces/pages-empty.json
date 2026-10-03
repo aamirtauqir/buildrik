@@ -61,12 +61,6 @@
       "nodeId": "141:163"
     },
     {
-      "name": "onepage-add",
-      "testId": "pages-onepage-add",
-      "spec": "pages-empty",
-      "nodeId": "141:164"
-    },
-    {
       "name": "add-page",
       "testId": "pages-add-page",
       "spec": "pages-empty",

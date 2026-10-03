@@ -2,9 +2,9 @@
  * Locked screen — the plan gate, Clone 3397:32859 (`Custom code` on a FREE
  * plan): one card — the plan pill, `<Feature> is a Pro feature`, what the
  * feature does, `Upgrade to Pro` → the dashboard's billing page. The shell
- * mounts it in place of any screen `SCREEN_PLAN_REQUIREMENTS` gates, so the
- * feature name and the body line come in as props (`LOCKED_COPY` carries the
- * two gated screens').
+ * mounts it in place of any screen `SCREEN_PLAN_REQUIREMENTS` gates that does
+ * not draw its own lock (`SCREENS_WITH_OWN_PLAN_LOCK` — Access does), so the
+ * feature name and the body line come in as props (`LOCKED_COPY`).
  *
  * @license BSD-3-Clause
  */
@@ -12,6 +12,7 @@
 import * as React from "react";
 import { Badge, Button } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import type { SettingsScreenId } from "../types";
 
 /*
   "coming-soon" lived here with a waitlist CTA and no consumer. The only
@@ -28,16 +29,11 @@ const PLAN: Record<LockedVariant, { name: string; article: "a" | "an" }> = {
 };
 
 /** The feature name + body line per gated screen id (`SCREEN_PLAN_REQUIREMENTS`'s keys). */
-export const LOCKED_COPY: Record<string, { feature: string; body: string }> = {
+export const LOCKED_COPY: Partial<Record<SettingsScreenId, { feature: string; body: string }>> = {
   "custom-code": {
     feature: "Custom code",
     body:
       "Custom code injects your own <head> markup, end-of-<body> scripts and CSS into every published page — analytics, fonts, chat widgets. It ships on every publish.",
-  },
-  integrations: {
-    feature: "Integrations",
-    body:
-      "Integrations connect your published site to the services you already run — forms, payments, email and automation — without pasting code by hand.",
   },
 };
 

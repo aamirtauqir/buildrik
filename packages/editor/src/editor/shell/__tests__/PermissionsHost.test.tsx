@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 /**
- * The owner's Permissions dialog (5905:44701), its delete-site confirm
+ * The owner's Permissions dialog (5905:44701), its delete-site confirm (M17:
+ * 8137:217905 → 8137:218168)
  * (5890:44728 / 5891:44701) and the screen the editor closes on (6881:86093).
  */
 import { describe, it, expect, afterEach, vi } from "vitest";
@@ -60,11 +61,17 @@ describe("PermissionsHost", () => {
     render(<PermissionsHost composer={c as never} siteId="s1" siteName="Bella Cucina" />);
     c.fire(EVENTS.UI_OPEN_PERMISSIONS);
     fireEvent.click(screen.getByTestId("permissions-delete-site"));
-    expect(screen.getByText("Delete Bella Cucina?")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Delete Bella Cucina?" })).toBeInTheDocument();
+    expect(screen.getByTestId("delete-site-line")).toHaveTextContent(
+      "This takes the site offline now. You can restore it from Recently deleted for 30 days.",
+    );
     const confirm = screen.getByTestId("delete-site-confirm");
+    // 8137:217905 → 8137:218168: the first press asks for DELETE, it does not delete.
+    fireEvent.click(confirm);
+    expect(deleteSite).not.toHaveBeenCalled();
     expect(confirm).toBeDisabled();
-    fireEvent.change(screen.getByPlaceholderText("Click to type DELETE"), { target: { value: "DELETE" } });
-    expect(screen.getByTestId("delete-site-armed")).toHaveTextContent("Confirmed — Delete site is enabled");
+    fireEvent.change(screen.getByLabelText("Type DELETE to confirm"), { target: { value: "DELETE" } });
+    expect(confirm).toBeEnabled();
     fireEvent.click(confirm);
     await waitFor(() => expect(deleteSite).toHaveBeenCalledWith("s1", "Bella Cucina"));
     expect(await screen.findByTestId("site-deleted")).toHaveTextContent("Bella Cucina deleted");
@@ -76,7 +83,8 @@ describe("PermissionsHost", () => {
     render(<PermissionsHost composer={c as never} siteId="s1" siteName="Bella Cucina" />);
     c.fire(EVENTS.UI_OPEN_PERMISSIONS);
     fireEvent.click(screen.getByTestId("permissions-delete-site"));
-    fireEvent.change(screen.getByPlaceholderText("Click to type DELETE"), { target: { value: "DELETE" } });
+    fireEvent.click(screen.getByTestId("delete-site-confirm"));
+    fireEvent.change(screen.getByLabelText("Type DELETE to confirm"), { target: { value: "DELETE" } });
     fireEvent.click(screen.getByTestId("delete-site-confirm"));
     expect(await screen.findByRole("alert")).toHaveTextContent("Site name does not match.");
     expect(screen.queryByTestId("site-deleted")).toBeNull();

@@ -251,7 +251,9 @@ export function useLayerActions(
     pendingLockRef.current = null;
     const el = document.querySelector(`[data-buildrick-id="${pending.id}"]`) as HTMLElement | null;
     if (el) el.setAttribute("data-locked", String(pending.locked));
-    composer?.elements.getElement(pending.id)?.setLocked(pending.locked);
+    /* The shared lock command — one undo step, the transaction name the
+       canvas menu and the Inspector use (editor/shared/elementActions.ts). */
+    composer?.commands.run(pending.locked ? "lock-element" : "unlock-element", { elementId: pending.id });
   }, [lockedIds, composer]);
 
   const startEditing = React.useCallback(

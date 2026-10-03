@@ -55,6 +55,8 @@ describe("CmsWorkspace · root (4428:140486)", () => {
     const { unmount } = render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-workspace");
     expect(crumbs).toEqual([{ label: "CMS" }]);
+    // It covers the canvas column: toasts take the window corner (8139:217711).
+    expect(screen.getByTestId("cms-workspace")).toHaveAttribute("data-bk-full-page");
     unmount();
     expect(crumbs).toEqual([{ label: "CMS" }, null]);
   });
@@ -121,24 +123,25 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     expect(names().map((n) => n?.slice(0, 4))).toEqual(["Marg", "Diav", "Capr"]);
   });
 
-  it("takes over the topbar search while a collection is open, and filters on it", async () => {
+  /* Owner decision 2026-10-03 (6819:59209 had the topbar field search the
+     open collection): the field sits over the records it filters. */
+  it("searches an open collection from its own field over the records", async () => {
     const { composer } = makeEngine({
       collections: [FULL],
       items: [rec("a", { name: "Margherita" }), rec("b", { name: "Marinara" }), rec("c", { name: "Caprese" })],
     });
-    const contexts: unknown[] = [];
-    composer.on(EVENTS.UI_SEARCH_CONTEXT, (c) => contexts.push(c));
+    const emitted: unknown[] = [];
+    composer.on("ui:search-context" as never, (c: unknown) => emitted.push(c));
     cmsWorkspace.openCollection("col-1");
-    const { unmount } = render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-row-a");
-    expect(contexts).toContainEqual({ placeholder: "Search Menu items…" });
-    composer.emit(EVENTS.UI_SEARCH_QUERY, { query: "mar" });
+    const field = screen.getByPlaceholderText("Search Menu items…");
+    fireEvent.change(field, { target: { value: "mar" } });
     await waitFor(() => expect(screen.queryByTestId("cms-row-c")).toBeNull());
     expect(screen.getByTestId("cms-row-a")).toBeInTheDocument();
-    composer.emit(EVENTS.UI_SEARCH_QUERY, { query: "sushi" });
+    fireEvent.change(field, { target: { value: "sushi" } });
     expect(await screen.findByTestId("cms-no-results")).toHaveTextContent("“sushi”");
-    unmount();
-    expect(contexts[contexts.length - 1]).toBeNull();
+    expect(emitted).toHaveLength(0);
   });
 
   it("pages past PAGE_SIZE records", async () => {
@@ -161,6 +164,51 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     cmsWorkspace.openRecord(null);
     fireEvent.click(screen.getByTestId("cms-ws-add-record"));
     expect(cmsWorkspace.get().recordId).toBe("new");
+  });
+});
+
+/* §13: opened from an element (Open record ›, Open collection ›), the header
+   leads with the way back to it. The shell decides whether there is one. */
+describe("CmsWorkspace · Back to canvas (§13)", () => {
+  it("leads the header with ‹ Back to canvas when the shell hands one", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
+    cmsWorkspace.openCollection("col-1");
+    const onBack = vi.fn();
+    render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
+    const back = await screen.findByRole("button", { name: "‹ Back to canvas" });
+    const header = screen.getByTestId("cms-ws-header");
+    expect(header.firstElementChild).toBe(back);
+    fireEvent.click(back);
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  it("Open record: the sheet carries ‹ Back to canvas — one step closes it and goes back", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
+    cmsWorkspace.openCollection("col-1");
+    cmsWorkspace.openRecord("r1");
+    const onBack = vi.fn();
+    render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
+    const sheet = await screen.findByTestId("cms-sheet");
+    fireEvent.click(within(sheet).getByRole("button", { name: "‹ Back to canvas" }));
+    expect(onBack).toHaveBeenCalledTimes(1);
+    expect(cmsWorkspace.get().recordId).toBeNull();
+  });
+
+  it("the sheet has no back to the canvas on the rail's own visit", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
+    cmsWorkspace.openCollection("col-1");
+    cmsWorkspace.openRecord("r1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    const sheet = await screen.findByTestId("cms-sheet");
+    expect(within(sheet).queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+  });
+
+  it("no back action without one (the rail's own visit)", async () => {
+    const { composer } = makeEngine({ collections: [FULL], items: [] });
+    cmsWorkspace.openCollection("col-1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    await screen.findByTestId("cms-ws-header");
+    expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
   });
 });
 

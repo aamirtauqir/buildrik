@@ -48,6 +48,17 @@ export const bulkActionSchema = z.object({
   siteIds: z.array(z.string()).min(1).max(25),
 });
 
+/**
+ * How long a deleted site can be restored (PD-6) — the soft-delete purge cron
+ * removes it after this. One number for the cron, the list and the copy.
+ */
+export const SITE_RESTORE_WINDOW_DAYS = 30;
+
+/** `sites.restore` (BE-6): undo a soft delete inside the restore window. */
+export const restoreSiteSchema = z.object({
+  id: z.string(),
+});
+
 export const transferSiteSchema = z.object({
   siteId: z.string(),
   newOwnerId: z.string(),
@@ -189,6 +200,9 @@ const cmsFieldBindingSchema = z
       type: z.string().max(32),
     }),
     collectionId: z.string().max(200),
+    /** The collection's name when the binding was made — what a "source
+     *  missing" line names once the collection is deleted (board 25). */
+    collectionName: z.string().max(200).optional(),
     itemId: z.string().max(200).optional(),
     fieldSlug: z.string().max(200),
     property: z.enum(CMS_BINDABLE_PROPERTIES),

@@ -6,9 +6,23 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, vi } from "vitest";
 import { Composer } from "../../../engine";
 import { exportPublishPages } from "../exportPublishPages";
+
+/* Task 8 — publish renders CMS content from the server, not this browser.
+   The browser's IndexedDB can hold rows another device deleted, edits that
+   never synced, or a rename the server never saw (DM-01). The standalone
+   demo has no server and existing fixtures run without one, so these tests
+   mock getSiteIdFromUrl, cmsSyncBlocker and fetchPublishSnapshot to drive
+   the server-snapshot path explicitly. */
+const fetchPublishSnapshot = vi.fn();
+const cmsSyncBlocker = vi.fn(() => null as string | null);
+vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
+vi.mock("@/services/cmsSync", async () => {
+  const actual = await vi.importActual<typeof import("@/services/cmsSync")>("@/services/cmsSync");
+  return { ...actual, fetchPublishSnapshot: (...a: unknown[]) => fetchPublishSnapshot(...a), cmsSyncBlocker: () => cmsSyncBlocker() };
+});
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({
@@ -40,6 +54,32 @@ describe("exportPublishPages", () => {
   it("never sends a path with a leading slash", async () => {
     const pages = await exportPublishPages(composerWithSlug("/about"));
     expect(pages.map((p) => p.path).sort()).toEqual(["about.html", "index.html"]);
+  });
+
+  /* BD-02 / C0.6: a collection's record pages are generated at
+     `<slug>/index.html` from the template page's HTML, so a relative
+     `href="about.html"` there resolved to `<slug>/about.html` — every nav
+     link on a record page 404'd. The publish payload links pages from the
+     site root. */
+  it("links pages root-absolute, so a record page in a subdirectory resolves them", async () => {
+    const composer = new Composer({} as never);
+    composer.importProject({
+      pages: [
+        { id: "home", name: "Home", slug: "", isHome: true,
+          root: { id: "r1", type: "container" as const, tagName: "div", children: [
+            { id: "l1", type: "link" as const, tagName: "a", content: "About", attributes: { href: "#page:about" }, children: [] },
+          ] } },
+        { id: "about", name: "About", slug: "about",
+          root: { id: "r2", type: "container" as const, tagName: "div", children: [
+            { id: "l2", type: "link" as const, tagName: "a", content: "Home", attributes: { href: "#page:home" }, children: [] },
+          ] } },
+      ],
+    } as never);
+    const pages = await exportPublishPages(composer);
+    const byPath = new Map(pages.map((p) => [p.path, p.html]));
+    expect(byPath.get("index.html")).toContain('href="/about.html"');
+    expect(byPath.get("about.html")).toContain('href="/index.html"');
+    for (const html of byPath.values()) expect(html).not.toMatch(/href="(?:about|index)\.html"/);
   });
 
   it("ships html for each page, not empty documents", async () => {
@@ -105,9 +145,9 @@ describe("exportPublishPages — the stylesheet has to travel", () => {
   });
 });
 
-/* Clone 3397:32376 — Settings → Localization `Auto-redirect by browser` rides
-   on every published page's head; off, nothing is emitted. */
-describe("exportPublishPages — the locale auto-redirect snippet", () => {
+/* SA-05: per-locale pages don't publish yet, so nothing may redirect a
+   visitor to one — regardless of the stored `autoRedirect` flag. */
+describe("exportPublishPages — no locale auto-redirect", () => {
   const withLocalization = (autoRedirect: boolean) => {
     const composer = composerWithSlug("about");
     composer.setProjectSettings({
@@ -117,14 +157,130 @@ describe("exportPublishPages — the locale auto-redirect snippet", () => {
     return composer;
   };
 
-  it("emits it on every page when the setting is on", async () => {
+  it("emits nothing even when the stored setting is on", async () => {
     const pages = await exportPublishPages(withLocalization(true));
-    for (const p of pages) expect(p.html).toContain('sessionStorage.getItem("brk-locale-redirect")');
-    expect(pages[0].html).toContain('var langs=["fr"]');
+    for (const p of pages) expect(p.html).not.toContain("brk-locale-redirect");
   });
 
   it("emits nothing when it is off", async () => {
     const pages = await exportPublishPages(withLocalization(false));
     for (const p of pages) expect(p.html).not.toContain("brk-locale-redirect");
+  });
+});
+
+/* Task 8 — publish renders CMS content from the server, not this browser. */
+describe("exportPublishPages — server-snapshot CMS", () => {
+  beforeEach(() => {
+    fetchPublishSnapshot.mockReset();
+    cmsSyncBlocker.mockReset();
+    cmsSyncBlocker.mockReturnValue(null);
+  });
+
+  /** A composer whose heading binds to `col-1.title` — local store holds
+   *  "LOCAL", server holds "SERVER". Publish must read the server. */
+  function composerWithBoundHeading() {
+    const composer = new Composer({} as never);
+    /* Seed the BROWSER store with a record titled "LOCAL" — what a publish
+       that read the local IndexedDB would emit. The server snapshot will
+       hold "SERVER" instead. */
+    composer.cms.collections.loadSnapshot(
+      [{ id: "col-1", name: "Blog", slug: "blog", fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", order: 0 }], createdAt: "2026-09-28T00:00:00.000Z", updatedAt: "2026-09-28T00:00:00.000Z" }],
+      [{ id: "rec-local", collectionId: "col-1", data: { title: "LOCAL" }, status: "published", createdAt: "2026-09-28T00:00:00.000Z", updatedAt: "2026-09-28T00:00:00.000Z" }],
+    );
+    composer.importProject({
+      pages: [
+        { id: "home", name: "Home", slug: "", isHome: true,
+          root: { id: "r1", type: "container" as const, tagName: "div", children: [
+            { id: "h-bound", type: "text" as const, tagName: "h1", content: "Placeholder", styles: {} },
+          ] },
+        },
+      ],
+      styles: [], assets: [],
+      cmsBindings: {
+        field: {
+          "h-bound": [
+            {
+              binding: { sourceId: "cms:col-1", path: "title", type: "variable" },
+              collectionId: "col-1",
+              fieldSlug: "title",
+              property: "content",
+            },
+          ],
+        },
+      },
+    } as never);
+    return composer;
+  }
+
+  it("renders bound CMS from the server snapshot, not the browser store", async () => {
+    fetchPublishSnapshot.mockResolvedValue({
+      cms: {
+        collections: [{
+          id: "col-1", name: "Blog", slug: "blog", displayField: null,
+          fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", order: 0 }],
+          createdAt: "2026-09-28T00:00:00.000Z", updatedAt: "2026-09-28T00:00:00.000Z",
+        }],
+        entries: [{ id: "rec-server", collectionId: "col-1", data: { title: "SERVER" }, status: "PUBLISHED", updatedAt: "2026-09-28T00:00:00.000Z" }],
+      },
+      siteFonts: [],
+    });
+
+    const pages = await exportPublishPages(composerWithBoundHeading());
+
+    expect(fetchPublishSnapshot).toHaveBeenCalledWith("site-1", ["col-1"]);
+    expect(pages[0].html).toContain("SERVER");
+    expect(pages[0].html).not.toContain("LOCAL");
+  });
+
+  /* Found walking C0.6 live: the snapshot carried no pageTemplatePath, so the
+     template page's "record on this page" heading resolved to the newest
+     record instead of the `{title}` token — every generated record page
+     shipped the same title. */
+  it("keeps the template page's per-record token (the snapshot names the template)", async () => {
+    fetchPublishSnapshot.mockResolvedValue({
+      cms: {
+        collections: [{
+          id: "col-1", name: "Blog", slug: "blog", displayField: null, pageTemplatePath: "post.html",
+          fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", order: 0 }],
+          createdAt: "2026-09-28T00:00:00.000Z", updatedAt: "2026-09-28T00:00:00.000Z",
+        }],
+        entries: [{ id: "rec-server", collectionId: "col-1", data: { title: "SERVER" }, status: "PUBLISHED", updatedAt: "2026-09-28T00:00:00.000Z" }],
+      },
+      siteFonts: [],
+    });
+    const composer = new Composer({} as never);
+    composer.importProject({
+      pages: [
+        { id: "home", name: "Home", slug: "", isHome: true, root: { id: "r1", type: "container" as const, tagName: "div", children: [] } },
+        { id: "post", name: "Post", slug: "post",
+          root: { id: "r2", type: "container" as const, tagName: "div", children: [
+            { id: "h-bound", type: "text" as const, tagName: "h1", content: "Placeholder", styles: {} },
+          ] } },
+      ],
+      styles: [], assets: [],
+      cmsBindings: { field: { "h-bound": [{ binding: { sourceId: "cms:col-1", path: "title", type: "variable" }, collectionId: "col-1", fieldSlug: "title", property: "content" }] } },
+    } as never);
+
+    const post = (await exportPublishPages(composer)).find((p) => p.path === "post.html");
+
+    expect(post?.html).toMatch(/<h1[^>]*>\{title\}<\/h1>/);
+    expect(post?.html).not.toContain("SERVER");
+  });
+
+  it("refuses to publish while CMS changes are unsynced", async () => {
+    cmsSyncBlocker.mockReturnValueOnce("1 CMS change hasn't reached the server yet. Retry the sync, then publish.");
+    await expect(exportPublishPages(composerWithBoundHeading())).rejects.toThrow(/reached the server/);
+    expect(fetchPublishSnapshot).not.toHaveBeenCalled();
+  });
+
+  it("a site with no CMS bindings publishes without a snapshot call", async () => {
+    /* The plain fixture has no cmsBindings and no /edit/<siteId> URL —
+       getSiteIdFromUrl is mocked to "site-1" for this file, but
+       composerWithSlug's project has no bindings, so collectionIds is
+       empty and the snapshot is skipped. */
+    fetchPublishSnapshot.mockClear();
+    const pages = await exportPublishPages(composerWithSlug("about"));
+    expect(fetchPublishSnapshot).not.toHaveBeenCalled();
+    expect(pages.length).toBeGreaterThan(0);
   });
 });

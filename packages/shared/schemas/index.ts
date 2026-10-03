@@ -22,6 +22,5 @@ export * from "./comments";
 export * from "./cms";
 export * from "./theme";
 export * from "./marketplace";
-export * from "./integrations";
 export * from "./element-markup";
 export * from "./analytics-ids";

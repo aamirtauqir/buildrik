@@ -10,6 +10,7 @@ import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ContextAction, ActionContext } from "./contextMenuRegistry";
 import { MenuItem } from "./MenuItem";
 import { SubmenuItem } from "./SubmenuItem";
+import { Portal } from "@/editor/chrome-ui";
 
 interface ElementContextMenuProps {
   x: number;
@@ -21,7 +22,25 @@ interface ElementContextMenuProps {
 
 const MENU_WIDTH = 200;
 
-export const ElementContextMenu: React.FC<ElementContextMenuProps> = ({
+/**
+ * The menu floats in the chrome overlay root (#bk-overlay-root), not where the
+ * canvas renders it. Inside the canvas it sat under a `position: relative;
+ * z-index: 1` wrapper — a stacking context — so its z-index only ranked it
+ * within layer 1, and the Inspector column (z-index 20) painted over every row
+ * of the menu and its submenus that crossed it. Opened near the canvas's right
+ * edge, "Style › Paste styles" hit-tested as an Inspector row. The submenus
+ * render inside this panel, so they come along.
+ *
+ * The Portal renders the panel only once the root exists, so the panel's own
+ * mount effect still gets a node to focus.
+ */
+export const ElementContextMenu: React.FC<ElementContextMenuProps> = (props) => (
+  <Portal>
+    <ContextMenuPanel {...props} />
+  </Portal>
+);
+
+const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
   x,
   y,
   actions,

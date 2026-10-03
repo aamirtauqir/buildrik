@@ -1,0 +1,17 @@
+13:16:17.434 DB before: Beta outbox-inflight 44856|2026-10-02 13:15:50.685
+13:16:19.763 abort http://localhost:3170/api/trpc/cms.entries.upsert?batch=1
+13:16:22.267 outbox after save: {"cmugopwzg005nnvjysp00b3pf":[{"key":"entryUpsert:zzc0a2-beta","op":"entryUpsert","item":{"id":"zzc0a2-beta","collectionId":"zzc0a-coll2","data":{"name":"Beta outbox-queued 77436","description":"beta-desc-c0a"},"status":"published","createdAt":"2026-10-02T11:03:57.182Z","updatedAt":"2026-10-02T13:16:19.723Z"},"seq":"1790946979724-1"}]}
+13:16:22.315 DB after save: Beta outbox-inflight 44856|2026-10-02 13:15:50.685
+13:16:22.393 dialog: beforeunload 
+13:16:23.671 abort http://localhost:3170/api/trpc/cms.entries.upsert?batch=1
+13:16:31.856 after reload#1 outbox: {"cmugopwzg005nnvjysp00b3pf":[{"key":"entryUpsert:zzc0a2-beta","op":"entryUpsert","item":{"id":"zzc0a2-beta","collectionId":"zzc0a-coll2","data":{"name":"Beta outbox-queued 77436","description":"beta-desc-c0a"},"status":"published","createdAt":"2026-10-02T11:03:57.182Z","updatedAt":"2026-10-02T13:16:19.723Z"},"seq":"1790946983589-1"}]}
+13:16:31.905 after reload#1 DB: Beta outbox-inflight 44856|2026-10-02 13:15:50.685
+13:16:31.963 click topbar Publish anyway
+13:16:33.605 click dialog Publish anyway
+13:16:35.361 click dialog Publish now
+13:16:39.485 toasts: ["Couldn't load the readiness checks.Retry","Some content changes didn't sync1 CMS change is saved on this device but not yet on the server. Retry now, or leave it — a reconnect replays the queue.Retry nowPublish failed1 CMS change hasn't reached the server yet. Retry the sync, then publish."]
+13:16:39.604 publish jobs before/after: 0 0
+13:16:39.606 dialog: beforeunload 
+13:16:49.198 after reload#2 (reachable) outbox: {}
+13:16:49.247 after reload#2 DB: Beta outbox-queued 77436|2026-10-02 13:16:41.24 expected Beta outbox-queued 77436
+13:16:49.334 total entries.upsert requests seen: 3

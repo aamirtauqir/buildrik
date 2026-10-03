@@ -29,42 +29,14 @@ describe("useSettingsScreen", () => {
     expect(result.current.value).toBe("Test Site");
   });
 
-  it("isDirty starts false", () => {
+  it("re-reads the value when SETTINGS_CHANGE fires (a Save the composer adopted)", () => {
     const composer = makeComposer();
     const { result } = renderHook(() =>
       useSettingsScreen(composer as never, (s) => s.seo?.siteName ?? "", "")
     );
-    expect(result.current.isDirty).toBe(false);
-  });
-
-  it("markDirty sets isDirty to true", () => {
-    const composer = makeComposer();
-    const { result } = renderHook(() =>
-      useSettingsScreen(composer as never, (s) => s.seo?.siteName ?? "", "")
-    );
-    act(() => result.current.markDirty());
-    expect(result.current.isDirty).toBe(true);
-  });
-
-  it("markClean sets isDirty to false", () => {
-    const composer = makeComposer();
-    const { result } = renderHook(() =>
-      useSettingsScreen(composer as never, (s) => s.seo?.siteName ?? "", "")
-    );
-    act(() => result.current.markDirty());
-    act(() => result.current.markClean());
-    expect(result.current.isDirty).toBe(false);
-  });
-
-  it("does NOT reset isDirty when SETTINGS_CHANGE event fires", () => {
-    const composer = makeComposer();
-    const { result } = renderHook(() =>
-      useSettingsScreen(composer as never, (s) => s.seo?.siteName ?? "", "")
-    );
-    act(() => result.current.markDirty());
+    composer.getProjectSettings.mockReturnValue({ seo: { siteName: "Renamed" } });
     act(() => composer._emit("settings:change"));
-    // isDirty should still be true — reload does not reset it
-    expect(result.current.isDirty).toBe(true);
+    expect(result.current.value).toBe("Renamed");
   });
 
   it("returns defaultValue when composer is null", () => {

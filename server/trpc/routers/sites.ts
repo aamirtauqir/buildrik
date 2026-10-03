@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { assertSiteAccess, checkSiteRole, checkWorkspaceRole, getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
+import { assertSiteAccess, checkSiteRole, checkWorkspaceRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import {
   listSites,
   createSite,
@@ -11,11 +11,15 @@ import {
   archiveSite,
   unarchiveSite,
   deleteSite,
+  listDeletedSites,
+  restoreSite,
   bulkAction,
   checkSlugAvailability,
   transferSite,
+  canTransferSite,
   saveProjectFromEditor,
   getProjectData,
+  redactSitePassword,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -40,6 +44,8 @@ import {
   createSiteSchema,
   bulkActionSchema,
   transferSiteSchema,
+  restoreSiteSchema,
+  SITE_RESTORE_WINDOW_DAYS,
   checkSlugSchema,
   getProjectDataSchema,
   editorSaveProjectSchema,
@@ -54,6 +60,9 @@ import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publish
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
+
+const WORKSPACE_DELETION_SCHEDULED_MESSAGE =
+  "This workspace is scheduled for deletion. Cancel the deletion to publish.";
 
 export const sitesRouter = router({
   list: protectedProcedure
@@ -103,11 +112,13 @@ export const sitesRouter = router({
       }
     }),
 
+  // PD-4 (BE-5): the site's name is a Site setting, and Site settings are
+  // ADMIN everywhere (`siteDetail.settings.update` writes `name` at ADMIN too).
   rename: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(2).max(100) }))
     .mutation(async ({ ctx, input }) => {
       try {
-        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
@@ -178,14 +189,69 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
+      let deleted: Awaited<ReturnType<typeof deleteSite>>;
       try {
-        await deleteSite(input.id, input.confirmName);
+        deleted = await deleteSite(input.id, input.confirmName);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NAME_MISMATCH")
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Site name does not match.",
           });
+        throw e;
+      }
+      await recordForSite({
+        siteId: input.id,
+        actorId: ctx.session.user!.id!,
+        action: "site.deleted",
+        targetType: "site",
+        targetId: input.id,
+        description: "Site deleted",
+        // BE-6: what `sites.restore` switches back on.
+        metadata: { formBlockIds: deleted.deactivatedFormBlockIds },
+      });
+    }),
+
+  // BE-6 / PD-6: the workspace's sites deleted inside the restore window (the
+  // Sites list's "Recently deleted"). Scoped like the Sites list itself.
+  listDeleted: protectedProcedure.query(async ({ ctx }) => {
+    const workspaceId = await getWorkspaceId(ctx);
+    const scope = await siteScopeWhere(ctx.prisma, ctx.session.user.id, workspaceId);
+    return listDeletedSites(workspaceId, scope);
+  }),
+
+  // BE-6 / Q-B8: same gate as delete (OWNER). No republish: the site comes
+  // back as a draft, its forms on, its share links still revoked.
+  restore: protectedProcedure
+    .input(restoreSiteSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "OWNER");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        const result = await restoreSite(input.id, ctx.session.user.id);
+        await recordForSite({
+          siteId: input.id,
+          actorId: ctx.session.user.id,
+          action: "site.restored",
+          targetType: "site",
+          targetId: input.id,
+          description: "Site restored",
+          metadata: { formBlockIds: result.reactivatedFormBlockIds },
+        });
+        return result;
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        if (e instanceof Error && e.message === "SITE_NOT_DELETED")
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This site is not deleted." });
+        if (e instanceof Error && e.message === "RESTORE_WINDOW_PASSED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: `This site was deleted more than ${SITE_RESTORE_WINDOW_DAYS} days ago and can no longer be restored.` });
+        if (e instanceof Error && e.message === "SITE_LIMIT")
+          throw new TRPCError({ code: "FORBIDDEN", message: SITE_LIMIT_MESSAGE });
         throw e;
       }
     }),
@@ -210,7 +276,25 @@ export const sitesRouter = router({
         throw e;
       }
 
-      return bulkAction(workspaceId, input);
+      const result = await bulkAction(workspaceId, input);
+
+      if (input.action === "delete") {
+        await Promise.all(
+          result.succeeded.map((siteId: string) =>
+            recordForSite({
+              siteId,
+              actorId: ctx.session.user.id,
+              action: "site.deleted",
+              targetType: "site",
+              targetId: siteId,
+              description: "Site deleted",
+              metadata: { formBlockIds: ("deactivatedFormBlockIds" in result ? result.deactivatedFormBlockIds?.[siteId] : undefined) ?? [] },
+            })
+          )
+        );
+      }
+
+      return result;
     }),
 
   // P6 editor role plumbing — the chrome shows disabled-with-reason controls
@@ -227,7 +311,10 @@ export const sitesRouter = router({
          an enabled control the server then refused. One resolver now answers
          both. It also drops two direct Prisma reads out of a router. */
       try {
-        return { role: await getEffectiveSiteRole(ctx.prisma, ctx.session.user.id, input.siteId) };
+        const role = await getEffectiveSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
+        /* Q-B5: the Danger zone enables Transfer for the site's creator as
+           well as the OWNER — transferSite's own rule, asked the same way. */
+        return { role, canTransfer: await canTransferSite(input.siteId, ctx.session.user.id) };
       } catch (e) {
         if (e instanceof PermissionError) {
           throw new TRPCError({
@@ -245,15 +332,12 @@ export const sitesRouter = router({
       available: await checkSlugAvailability(input.slug),
     })),
 
+  // Q-B5: who may transfer (the site's creator or the workspace OWNER) is
+  // decided in transferSite alone — an OWNER gate here refused the creator
+  // before the service's rule could run.
   transfer: protectedProcedure
     .input(transferSiteSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "OWNER");
-      } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
-        throw e;
-      }
       try {
         return await transferSite(
           input.siteId,
@@ -264,7 +348,7 @@ export const sitesRouter = router({
         if (e instanceof Error && e.message === "NOT_OWNER")
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only the site owner can transfer.",
+            message: "Only the workspace owner or the site's creator can transfer this site.",
           });
         if (e instanceof Error && e.message === "MEMBER_NOT_FOUND")
           throw new TRPCError({
@@ -381,6 +465,8 @@ export const sitesRouter = router({
             code: "CONFLICT",
             message: "A publish job is already in progress.",
           });
+        if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         // Sites deploy into the workspace's own Vercel account. The pre-publish
         // check already disables the button, but the editor and the API can still
         // reach here — they get a reason, not a 500.
@@ -493,6 +579,8 @@ export const sitesRouter = router({
         if (e instanceof ScheduledPublishError) {
           throw new TRPCError({ code: "BAD_REQUEST", message: e.message });
         }
+        if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         throw e;
       }
     }),
@@ -542,7 +630,7 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      const result = await unpublishSite(input.siteId);
+      const result = redactSitePassword(await unpublishSite(input.siteId));
       await recordForSite({
         siteId: input.siteId,
         actorId: ctx.session.user!.id!,
@@ -627,6 +715,8 @@ export const sitesRouter = router({
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: "That version can no longer be rolled back to." });
         if (msg === "ALREADY_PUBLISHING")
           throw new TRPCError({ code: "CONFLICT", message: "A publish is already in progress." });
+        if (msg === "WORKSPACE_DELETION_SCHEDULED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         if (msg === "VERCEL_NOT_CONNECTED")
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Connect Vercel before rolling back." });
         throw e;
@@ -734,7 +824,7 @@ export const sitesRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return moveSiteToFolder(input.siteId, input.folderId);
+        return redactSitePassword(await moveSiteToFolder(input.siteId, input.folderId));
       }),
   }),
 });

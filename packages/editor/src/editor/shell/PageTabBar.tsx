@@ -15,6 +15,8 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
 import { useDirtyPages } from "../shared/useDirtyPages";
+import { IconButton } from "@/editor/chrome-ui";
+import { Plus } from "lucide-react";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -72,8 +74,11 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
 
   return (
     <div className={BAR}>
-      {/* Board 4418:123573: the tabs only (no ⌂ glyph, no "+" — Add page
-          lives in the Pages panel, decision #19). */}
+      {/* Board 4418:123573 drew the tabs only (no ⌂ glyph, no "+" — decision
+          #19). OWNER OVERRIDE 2026-10-03: a trailing "+" is back. It does not
+          create a page itself — Add page still lives in the Pages panel; the
+          "+" opens that panel through UI_PANEL_OPEN, the same sink the rail
+          and ⌘K "Open Pages" use. Board to be updated. */}
       <div className={ROW}>
         {/* Tab list with keyboard navigation */}
         <div
@@ -118,6 +123,15 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
             </div>
           ))}
         </div>
+        <IconButton
+          label="Add page"
+          size="sm"
+          className={ADD}
+          data-testid="page-tab-add"
+          onClick={() => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" })}
+        >
+          <Plus size={14} aria-hidden="true" />
+        </IconButton>
       </div>
     </div>
   );
@@ -139,5 +153,6 @@ const TAB_RESTING = "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-
 const TAB_ACTIVE = "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)]";
 /** inline-block is required for overflow+ellipsis to trigger on a span. */
 const TAB_NAME = "tw:inline-block tw:max-w-30 tw:overflow-hidden tw:text-ellipsis tw:align-middle";
+const ADD = "tw:flex-none";
 const DIRTY_DOT = "tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]";
 export default PageTabBar;

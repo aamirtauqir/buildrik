@@ -5,8 +5,13 @@
  * @license BSD-3-Clause
  */
 
-import { describe, it, expect } from "vitest";
-import { detectMixedValues } from "../detectMixedValues";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { detectMixedValues, shownStylesAt } from "../detectMixedValues";
+import {
+  createTestComposer,
+  installEngineBrowserStubs,
+  removeEngineBrowserStubs,
+} from "@/engine/__tests__/test-utils/realComposer";
 
 const el = (styles: Record<string, string>) => ({ getStyles: () => styles });
 
@@ -52,4 +57,48 @@ describe("detectMixedValues", () => {
     );
     expect(result.has("gap")).toBe(true);
   });
+
+  it("reads through the given reader when one is passed", () => {
+    const a = { getStyles: () => ({}), shown: { color: "red" } };
+    const b = { getStyles: () => ({}), shown: { color: "blue" } };
+    expect(detectMixedValues([a, b], ["color"], (e) => e.shown).has("color")).toBe(true);
+  });
 });
+
+/* Board 22: three headings — an H1 and two H3s — read "Font size · Mixed"
+   although none carries a font-size of its own: their TYPE defaults differ.
+   Comparing own styles only called them equal. */
+describe("shownStylesAt — what each selected element shows at this breakpoint + state", () => {
+  beforeAll(installEngineBrowserStubs);
+  afterAll(removeEngineBrowserStubs);
+
+  function headings(...tags: string[]) {
+    const composer = createTestComposer();
+    const root = composer.elements.createPage("Home").root.id;
+    const els = tags.map((tagName) => {
+      const h = composer.elements.createElement("heading" as never, { tagName, content: tagName } as never);
+      composer.elements.addElement(h, root);
+      for (const k of Object.keys(h.getStyles())) h.removeStyle(k);
+      return h;
+    });
+    return { composer, els };
+  }
+
+  it("type defaults count: an H1 and an H3 with no font-size of their own are Mixed", () => {
+    const { composer, els } = headings("h1", "h3", "h3");
+    expect(detectMixedValues(els, ["font-size"], shownStylesAt(composer, "desktop", "normal")).has("font-size")).toBe(true);
+  });
+
+  it("three H3s agree", () => {
+    const { composer, els } = headings("h3", "h3", "h3");
+    expect(detectMixedValues(els, ["font-size"], shownStylesAt(composer, "desktop", "normal")).size).toBe(0);
+  });
+
+  it("an own value wins over the default, and a Tablet override counts on Tablet only", () => {
+    const { composer, els } = headings("h3", "h3");
+    composer.styles.setBreakpointStyle(els[1].getId(), "tablet", { "font-size": "18px" });
+    expect(detectMixedValues(els, ["font-size"], shownStylesAt(composer, "desktop", "normal")).size).toBe(0);
+    expect(detectMixedValues(els, ["font-size"], shownStylesAt(composer, "tablet", "normal")).has("font-size")).toBe(true);
+  });
+});
+

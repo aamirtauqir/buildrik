@@ -43,11 +43,9 @@ import { useEditorRole } from "./useEditorRole";
 export interface UseLifecycleInput {
   composer: Composer | null;
   addToast: (input: ToastInput) => string;
-  /** Unsaved work counts as "waiting to ship" on its own. */
+  /** Unsaved work counts as "waiting to ship" on its own — and its rising
+   *  edge is this session's page-edit clock (see `sessionEditAt`). */
   isDirty: boolean;
-  /** This session's save clock — preferred over the server's snapshot, which
-   *  was taken at mount and cannot see an edit made since. */
-  lastSavedAt: number | null | undefined;
   /** Browser offline OR dashboard sync disconnected. */
   offline: boolean;
   /** Blocking issues on the site. */
@@ -82,11 +80,22 @@ export interface Lifecycle {
 
 const LIVE_ROUND: ReadonlySet<ReviewPillState> = new Set(["pending", "opened-not-acted"]);
 
+/** The collection manager's write events — a CMS edit made in this session. */
+const CMS_EDITS = [
+  EVENTS.CMS_COLLECTION_CREATED,
+  EVENTS.CMS_COLLECTION_UPDATED,
+  EVENTS.CMS_COLLECTION_DELETED,
+  EVENTS.CMS_CONTENT_CREATED,
+  EVENTS.CMS_CONTENT_UPDATED,
+  EVENTS.CMS_CONTENT_DELETED,
+  EVENTS.CMS_CONTENT_PUBLISHED,
+  EVENTS.CMS_CONTENT_UNPUBLISHED,
+] as const;
+
 export function useLifecycle({
   composer,
   addToast,
   isDirty,
-  lastSavedAt,
   offline,
   errorCount,
   publishedUrl,
@@ -188,14 +197,35 @@ export function useLifecycle({
     }
   }, [reviewStatus.state, reviewStatus.reviewerName, addToast]);
 
-  /* "Anything waiting to ship?" prefers THIS session's save clock over the
-     server's snapshot. Unsaved work counts on its own — it is by definition
-     not live. */
+  /* "Anything waiting to ship?" The server's snapshot (taken at mount:
+     max(lastEditedAt, cmsEditedAt) vs lastPublishedAt) answers until THIS
+     session edits; from then on the session's own edit clock is compared
+     with lastPublishedAt, which moves when a publish lands.
+
+     It used to be the save clock — but the load seeds that with the load
+     time ("Saved · just now", useComposerInit), so every published site
+     opened on "Publish changes" before anyone touched it (QA 2026-10-02).
+     A load is not an edit. Page edits are the rising edge of `isDirty`; CMS
+     edits are the collection manager's write events (not its store refresh,
+     which is a hydrate). Unsaved work counts on its own. */
+  const [sessionEditAt, setSessionEditAt] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    if (isDirty) setSessionEditAt(Date.now());
+  }, [isDirty]);
+  React.useEffect(() => {
+    const cms = composer?.cms?.collections;
+    if (typeof cms?.on !== "function") return;
+    const edited = () => setSessionEditAt(Date.now());
+    for (const e of CMS_EDITS) cms.on(e, edited);
+    return () => {
+      for (const e of CMS_EDITS) cms.off(e, edited);
+    };
+  }, [composer]);
   const publishedAtMs = lastPublishedAt ? Date.parse(lastPublishedAt) : null;
   const hasUnpublishedChanges =
     isDirty ||
-    (lastSavedAt != null && publishedAtMs != null
-      ? lastSavedAt > publishedAtMs
+    (sessionEditAt != null && publishedAtMs != null
+      ? sessionEditAt > publishedAtMs
       : serverHasUnpublishedChanges);
 
   const input = React.useMemo(

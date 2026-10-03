@@ -253,69 +253,12 @@ export function useCanvasKeyboard({
            a second time; the toasts they carried now come from
            `useClipboardToasts`, which listens to the events those commands
            emit, so they fire wherever the shortcut is pressed rather than only
-           over the canvas. The ⌥ variants below have no command and stay. */
+           over the canvas. */
 
-        case "c":
-        case "C":
-          if ((e.ctrlKey || e.metaKey) && e.altKey) {
-            // Cmd/Ctrl+Option+C: Copy styles only
-            e.preventDefault();
-            const styles = element.getStyles?.();
-            if (styles && Object.keys(styles).length > 0) {
-              composer.styleClipboard = { ...styles };
-              if (addToast) {
-                const styleCount = Object.keys(styles).length;
-                addToast({
-                  description: `${styleCount} style${styleCount === 1 ? "" : "s"} copied`,
-                  tone: "info",
-                  duration: 2000,
-                });
-              }
-            } else if (addToast) {
-              addToast({
-                description: "No styles to copy",
-                tone: "warning",
-                duration: 2000,
-              });
-            }
-          }
-          break;
-
-        case "v":
-        case "V":
-          if ((e.ctrlKey || e.metaKey) && e.altKey && composer.styleClipboard) {
-            // Cmd/Ctrl+Option+V: Paste styles only
-            e.preventDefault();
-            const stylesToPaste = composer.styleClipboard;
-            const styleKeys = Object.keys(stylesToPaste);
-
-            if (styleKeys.length > 0) {
-              composer.beginTransaction("paste-styles");
-              try {
-                styleKeys.forEach((key) => {
-                  element.setStyle?.(key, stylesToPaste[key]);
-                });
-                syncFromComposer();
-                if (addToast) {
-                  addToast({
-                    description: `${styleKeys.length} style${styleKeys.length === 1 ? "" : "s"} applied`,
-                    tone: "success",
-                    duration: 2000,
-                    action: {
-                      label: "Undo",
-                      onClick: () => {
-                        composer.history.undo();
-                        syncFromComposer();
-                      },
-                    },
-                  });
-                }
-              } finally {
-                composer.endTransaction();
-              }
-            }
-          }
-          break;
+        /* ⌥⌘C / ⌥⌘V are the `copy-style` / `paste-style` commands now — the
+           same handlers the Inspector ⋯ and the canvas menu run
+           (editor/shared/elementActions.ts); their toasts come from
+           useClipboardToasts. */
 
       }
     },

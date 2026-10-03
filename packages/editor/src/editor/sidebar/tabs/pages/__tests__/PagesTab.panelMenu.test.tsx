@@ -15,7 +15,6 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
-import { EVENTS } from "@/shared/constants/events";
 import { createMockComposer, pg, type MockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 import PagesTab from "../PagesTab";
 
@@ -85,10 +84,12 @@ describe("PagesTab — header ⋯ menu", () => {
     expect((composer.elements.getAllPages as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(before);
   });
 
-  it("hands the topbar field a Pages scope instead of drawing a keycap or search band", () => {
+  /* Owner decision 2026-10-03 (v3 4418:92256 had the topbar field read
+     "Search pages…"): the filter is the panel's own field, under the header. */
+  it("draws its own Search pages field under the header — no keycap, nothing claimed in the topbar", () => {
     const composer = mount();
     expect(screen.queryByTestId("pages-open-palette")).toBeNull();
-    expect(screen.queryByLabelText("Search pages")).toBeNull();
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search pages…" });
+    expect(screen.getByPlaceholderText("Search pages…")).toBeTruthy();
+    expect(composer.emit).not.toHaveBeenCalledWith("ui:search-context", expect.anything());
   });
 });

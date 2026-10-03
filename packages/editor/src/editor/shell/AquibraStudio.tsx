@@ -444,7 +444,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     addToast,
     isDirty: state.isDirty,
-    lastSavedAt: state.saveState.lastSavedAt,
     // "offline" is the browser being offline OR the dashboard sync being
     // disconnected — the same rule the save pill uses.
     offline: isOffline || state.syncStatus === "offline",

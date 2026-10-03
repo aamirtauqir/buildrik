@@ -15,7 +15,7 @@ import * as React from "react";
 import { MoreHorizontal, Table2 } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
-import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs, useToast } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelSearch, Popover, Tabs, useToast } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
 import { DynamicPagesPane } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
@@ -26,8 +26,11 @@ import { AddFieldDialog } from "./AddFieldDialog";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
+import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
+import { onCmsGone } from "@/services/cmsSync";
+import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 
 export interface CmsWorkspaceProps {
   composer: Composer | null;
@@ -35,6 +38,9 @@ export interface CmsWorkspaceProps {
   onCreateCollection?: () => void;
   /** The Assets pick mode, for a record's image field (G3-081). */
   onOpenMediaLibrary?: OpenMediaLibrary;
+  /** §13: the workspace was opened from an element (the inspector's Open
+   *  record › / Open collection ›); the shell gives that element back. */
+  onBackToCanvas?: () => void;
 }
 
 const HEADER =
@@ -52,6 +58,8 @@ const TAB =
   "tw:h-10 tw:rounded-none tw:px-2.5 tw:font-medium tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:border-b-2 tw:border-transparent " +
   "tw:hover:bg-transparent tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent " +
   "tw:aria-selected:border-[var(--bk-accent)] tw:aria-selected:text-[var(--bk-accent-text)]";
+
+/* A quiet 28-tall action at the header's start; a rule parts it from the title. */
 
 const TABS = [
   { id: "records", label: "Records" },
@@ -75,11 +83,27 @@ function plural(n: number, one: string, many = `${one}s`): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
-export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary }: CmsWorkspaceProps) {
+export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary, onBackToCanvas }: CmsWorkspaceProps) {
   const panel = useContentPanel(composer);
   const { addToast } = useToast();
   const ws = useCmsWorkspace();
-  const collection = ws.collectionId ? panel.collections.find((c) => c.id === ws.collectionId) ?? null : null;
+  /* 8139:217711 / 8139:217890 — an edit the server refused because another
+     device deleted the record (or its collection) drops the row here too.
+     The open sheet stays over what it showed, to say the change wasn't
+     saved, until it is closed; the workspace behind keeps that snapshot. */
+  const [gone, setGone] = React.useState<{ collection: CMSCollection; record: CMSContentItem } | null>(null);
+  const shown = React.useRef<{ collection: CMSCollection; record: CMSContentItem } | null>(null);
+  React.useEffect(
+    () =>
+      onCmsGone((g) => {
+        const s = shown.current;
+        if (!s) return;
+        if (g.kind === "entry" ? g.id === s.record.id : g.id === s.collection.id) setGone(s);
+      }),
+    [],
+  );
+  const live = ws.collectionId ? panel.collections.find((c) => c.id === ws.collectionId) ?? null : null;
+  const collection = gone && gone.collection.id === ws.collectionId ? live ?? gone.collection : live;
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [csvImportOpen, setCsvImportOpen] = React.useState(false);
   const [addingField, setAddingField] = React.useState(false);
@@ -91,20 +115,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
     if (collection) void loadRecords(collection.id);
   }, [collection?.id, loadRecords]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* 6819:59209 — while a collection is open the topbar field searches it
-     ("Search Menu items…"), the way Add's drawer takes the field over. */
+  /* 6819:59209 had the topbar field search an open collection ("Search Menu
+     items…"); owner decision 2026-10-03 moves it under the tab row, over the
+     records it filters. Leaving the collection drops the query, as handing
+     the topbar field back used to. */
   const collectionName = collection?.name ?? null;
   React.useEffect(() => {
-    if (!composer || !collectionName) return;
-    const onQuery = (p: { query?: string } | undefined) => setQuery(p?.query ?? "");
-    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
-    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: `Search ${collectionName}…` });
-    return () => {
-      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
-      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
-      setQuery("");
-    };
-  }, [composer, collectionName]);
+    setQuery("");
+  }, [collectionName]);
 
   /* 4428:140486 — while the workspace covers the canvas the topbar crumb
      reads "<site> › CMS", not the page behind it. */
@@ -117,14 +135,24 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
   }, [composer]);
 
   const importer = useImportRecords(composer, collection);
+  const back = onBackToCanvas ? (
+    <>
+      <Button color="light" size="xs" className={BACK} data-testid="cms-ws-back-to-canvas" onClick={onBackToCanvas}>
+        ‹ Back to canvas
+      </Button>
+      <span className="tw:h-5 tw:w-px tw:bg-[var(--bk-border)]" aria-hidden="true" />
+    </>
+  ) : null;
 
   if (!collection) {
     const records = Object.values(panel.recordCounts).reduce((a, b) => a + b, 0);
     const siteName = composer?.getProjectMetadata?.()?.name || "Untitled site";
     return (
-      <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace">
+      /* data-bk-full-page: this view covers the canvas column, so toasts take the window corner (8139:217711). */
+      <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
         <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-subtle)]">
           <header className={HEADER} data-testid="cms-ws-header">
+            {back}
             <h2 className={TITLE}>CMS · {siteName}</h2>
             <span className={META} data-testid="cms-ws-meta">
               {plural(panel.collections.length, "collection")} · {plural(records, "record")}
@@ -149,7 +177,10 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
   }
 
   const count = panel.records.length;
-  const sheetRecord = ws.recordId && ws.recordId !== "new" ? panel.records.find((r) => r.id === ws.recordId) ?? null : null;
+  const goneRecord = gone && gone.record.id === ws.recordId ? gone.record : null;
+  const sheetRecord =
+    ws.recordId && ws.recordId !== "new" ? panel.records.find((r) => r.id === ws.recordId) ?? goneRecord : null;
+  shown.current = sheetRecord ? { collection, record: sheetRecord } : null;
   const isEmpty = ws.tab === "records" && count === 0;
   const primary =
     ws.tab === "records" ? (
@@ -234,9 +265,11 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
           : null;
 
   return (
-    <div className="tw:relative tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace">
+    /* data-bk-full-page: this view covers the canvas column, so toasts take the window corner (8139:217711). */
+    <div className="tw:relative tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
       <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]">
         <header className={HEADER} data-testid="cms-ws-header">
+          {back}
           <h2 className={TITLE} data-testid="cms-ws-title">{collection.name}</h2>
           <span className={META} data-testid="cms-ws-meta">
             · {ws.tab === "fields" ? plural(collection.fields.length, "field") : plural(count, "record")}
@@ -301,6 +334,15 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
           </Popover>
         </div>
         {importer.status}
+        {ws.tab === "records" && !isEmpty ? (
+          <PanelSearch
+            placeholder={`Search ${collection.name}…`}
+            value={query}
+            onChange={setQuery}
+            className="tw:max-w-[352px]"
+            data-testid="cms-ws-search"
+          />
+        ) : null}
         <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col">{body}</div>
       </section>
       {addingField ? (
@@ -338,11 +380,32 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
           composer={composer}
           collection={collection}
           record={sheetRecord}
-          onClose={() => cmsWorkspace.openRecord(null)}
-          onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
-          onSave={(data, published) =>
-            panel.saveRecord(collection.id, ws.recordId === "new" ? null : ws.recordId, data, published)
+          gone={goneRecord !== null}
+          onClose={() => {
+            setGone(null);
+            cmsWorkspace.openRecord(null);
+          }}
+          /* The sheet covers the workspace header: opened from an element
+             (Open record ›), its own back closes it and returns to the
+             canvas in one step (§13). */
+          onBackToCanvas={
+            onBackToCanvas
+              ? () => {
+                  cmsWorkspace.openRecord(null);
+                  onBackToCanvas();
+                }
+              : undefined
           }
+          onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
+          onSave={async (data, published) => {
+            const { reached, conflict } = await panel.saveRecord(
+              collection.id,
+              ws.recordId === "new" ? null : ws.recordId,
+              data,
+              published,
+            );
+            return reached ? true : conflict ? "conflict" : false;
+          }}
           onDelete={async (r) => {
             await panel.deleteRecord(r.id);
             await loadRecords(collection.id);

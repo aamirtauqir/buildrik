@@ -36,6 +36,7 @@ vi.mock("@/server/services/permission.service", () => ({
   },
 }));
 vi.mock("@/server/services/sites.service", () => ({
+  redactSitePassword: <T,>(site: T) => site,
   listSites: vi.fn(), getSite: vi.fn(), renameSite: vi.fn(), archiveSite: vi.fn(),
   unarchiveSite: vi.fn(), deleteSite: vi.fn(), bulkAction: vi.fn(),
   checkSlugAvailability: vi.fn(), transferSite: vi.fn(),
@@ -70,7 +71,8 @@ vi.mock("@buildrik/shared/schemas/sites", () => {
   return {
     listSitesSchema: any, createSiteSchema: any, bulkActionSchema: any,
     transferSiteSchema: any, checkSlugSchema: any,
-    getProjectDataSchema: any, editorSaveProjectSchema: any,
+    getProjectDataSchema: any, editorSaveProjectSchema: any, restoreSiteSchema: any,
+    SITE_RESTORE_WINDOW_DAYS: 30,
   };
 });
 vi.mock("@buildrik/shared/schemas/templates", () => {

@@ -2,6 +2,15 @@ import bcrypt from "bcryptjs";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/encryption";
+import { slugifyProjectName } from "@/lib/vercel";
+import { hasEverDeployed } from "@/server/services/publish.service";
+import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
+import {
+  PROJECT_SETTINGS_KEY_SCHEMAS,
+  PROJECT_SETTINGS_KEYS,
+  legacyAnalyticsIds,
+  type ProjectSettingsPatch,
+} from "@buildrik/shared/schemas/project-settings";
 
 /**
  * publishedPassword storage policy.
@@ -54,36 +63,136 @@ export function decryptPublishedPassword(stored: string | null): string | null {
   }
 }
 
+/**
+ * The Site columns the Settings screens own — what `getSiteSettings` reads and
+ * what a duplicated site carries over (minus its identity and password).
+ */
+export const SITE_SETTINGS_COLUMNS = {
+  name: true,
+  slug: true,
+  metaTitle: true,
+  metaDescription: true,
+  metaTitleTemplate: true,
+  ogImage: true,
+  canonicalUrl: true,
+  allowIndexing: true,
+  robotsTxt: true,
+  headCode: true,
+  bodyCode: true,
+  socialLinks: true,
+  publishedPassword: true,
+  touchIcon: true,
+  favicon: true,
+  cspPolicy: true,
+  hstsMaxAge: true,
+  xFrameOptions: true,
+  referrerPolicy: true,
+  permissionsPolicy: true,
+  defaultLocale: true,
+  enabledLocales: true,
+  localeAutoRedirect: true,
+} as const satisfies Prisma.SiteSelect;
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * SA-01: `projectSettings` without the keys that belong to Site columns. The
+ * editor saves its settings verbatim, and a second copy of a column in the JSON
+ * is one that can disagree with it. Returns a deep copy; non-objects pass
+ * through unchanged.
+ */
+export function stripColumnBackedSettings(settings: unknown): unknown {
+  if (!isPlainObject(settings)) return settings;
+  const out = structuredClone(settings);
+  for (const field of SITE_COLUMN_FIELDS) {
+    const [section, key] = field.split(".");
+    const block = out[section];
+    if (isPlainObject(block)) delete block[key];
+  }
+  return out;
+}
+
+/**
+ * BE-1 at the autosave boundary (`saveProjectData`): `projectSettings` arrives
+ * as `z.unknown()`, so each JSON-only key is checked against its schema here.
+ * A key that passes is stored in its parsed form; one that fails keeps the
+ * value already stored (or stays absent), never a half-valid copy — an
+ * autosave is not where a settings refusal can be shown to anyone.
+ */
+export function keepValidJsonOnlySettings(incoming: unknown, stored: unknown): unknown {
+  if (!isPlainObject(incoming)) return incoming;
+  const out: Record<string, unknown> = { ...incoming };
+  const previous = isPlainObject(stored) ? stored : {};
+  for (const key of PROJECT_SETTINGS_KEYS) {
+    if (out[key] === undefined) continue;
+    const parsed = PROJECT_SETTINGS_KEY_SCHEMAS[key].safeParse(out[key]);
+    if (parsed.success) out[key] = parsed.data;
+    else if (previous[key] !== undefined) out[key] = previous[key];
+    else delete out[key];
+  }
+  return out;
+}
+
+/**
+ * `siteDetail.projectSettings.update` (BE-2): the Settings Save's JSON half.
+ * The patch is already `projectSettingsPatchSchema`-valid. `analytics` and
+ * `redirects` replace their stored blocks; `customCode` and `seo` are merged,
+ * because the patch only carries `globalCss` / `author`. `lastEditedAt` is left alone: it is the page
+ * save's conflict token, and a settings write is not a page edit.
+ *
+ * Returns the stored value of every patched key (what the editor adopts) and
+ * the analytics ids that are safe but miss their provider's strict format.
+ */
+export async function updateProjectSettings(siteId: string, patch: ProjectSettingsPatch) {
+  return prisma.$transaction(async (tx) => {
+    // Read-modify-write of one JSON column: serialize against a concurrent
+    // settings save. Physical table name per `@@map("sites")`.
+    await tx.$executeRaw(Prisma.sql`SELECT id FROM "sites" WHERE id = ${siteId} FOR UPDATE`);
+    const site = await tx.site.findUnique({
+      where: { id: siteId },
+      select: { projectSettings: true, deletedAt: true, workspace: { select: { plan: true } } },
+    });
+    if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+    // Same gate as head/body code (`updateSiteSettings`): content, not presence.
+    if (patch.customCode && patch.customCode.globalCss.trim() !== "" && (site.workspace?.plan ?? "FREE") === "FREE") {
+      throw new Error("CUSTOM_CODE_NOT_AVAILABLE");
+    }
+
+    const stored = isPlainObject(site.projectSettings) ? site.projectSettings : {};
+    const next: Record<string, unknown> = { ...stored };
+    const saved: Partial<Record<keyof ProjectSettingsPatch, unknown>> = {};
+    for (const key of PROJECT_SETTINGS_KEYS) {
+      const value = patch[key];
+      if (value === undefined) continue;
+      const previous = stored[key];
+      next[key] = key === "customCode" && isPlainObject(previous) ? { ...previous, ...value } : value;
+      saved[key] = next[key];
+    }
+    /* `seo` holds column-backed fields too (stripped on write) and the old
+       Twitter handle: the patch's author is merged in, never a replacement. */
+    if (patch.seo) {
+      next.seo = { ...(isPlainObject(stored.seo) ? stored.seo : {}), ...patch.seo };
+      saved.seo = next.seo;
+    }
+
+    await tx.site.update({
+      where: { id: siteId },
+      data: { projectSettings: next as Prisma.InputJsonValue },
+    });
+    return { saved, warnings: { legacyAnalyticsIds: legacyAnalyticsIds(patch.analytics) } };
+  });
+}
+
 export async function getSiteSettings(siteId: string) {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
     select: {
       id: true,
-      name: true,
-      slug: true,
-      metaTitle: true,
-      metaDescription: true,
-      metaTitleTemplate: true,
-      ogImage: true,
-      canonicalUrl: true,
-      allowIndexing: true,
-      robotsTxt: true,
-      headCode: true,
-      bodyCode: true,
-      socialLinks: true,
-      publishedPassword: true,
-      touchIcon: true,
-      favicon: true,
-      cspPolicy: true,
-      hstsMaxAge: true,
-      xFrameOptions: true,
-      referrerPolicy: true,
-      permissionsPolicy: true,
-      defaultLocale: true,
-      enabledLocales: true,
-      localeAutoRedirect: true,
+      ...SITE_SETTINGS_COLUMNS,
       deletedAt: true,
-      workspace: { select: { plan: true } },
+      workspace: { select: { plan: true, name: true } },
     },
   });
 
@@ -123,6 +232,9 @@ export async function getSiteSettings(siteId: string) {
     publishedPassword: null, // typed as String? on schema; null = not set or redacted
     hasPublishedPassword: !!publishedPassword,
     plan: workspace.plan,
+    /* The editor's workspace doors (Members, Billing, Integrations &
+       webhooks) name the workspace they lead to (8139:217358). */
+    workspaceName: workspace.name,
     pageSeo,
   };
 }
@@ -172,11 +284,13 @@ export async function updateSiteSettings(
      password set. Clearing one (null) stays free — nobody should be locked
      out of removing a gate they can no longer manage. */
   const wantsPublishedPassword = data.publishedPassword != null && data.publishedPassword !== "";
+  let pinnedProjectName: string | undefined;
   if (wantsCustomCode || wantsPublishedPassword || data.slug) {
     const current = await prisma.site.findUnique({
       where: { id: siteId },
       select: {
         slug: true,
+        vercelProjectName: true,
         deletedAt: true,
         workspace: { select: { plan: true } },
       },
@@ -190,6 +304,24 @@ export async function updateSiteSettings(
     }
 
     if (data.slug && current && current.slug !== data.slug) {
+      /* SA-06: `Site.slug` is globally @unique, so a taken slug used to reach
+         the update and surface as a raw P2002 500. And the Vercel project was
+         derived from the slug on every deploy — renaming a live site's slug
+         sent the next publish into a brand-new project, leaving the old URL
+         and its domains behind. Pin the name the live site is on first. */
+      const taken = await prisma.site.findFirst({
+        where: {
+          id: { not: siteId },
+          // A site pinned to the project this slug derives would share it.
+          OR: [{ slug: data.slug }, { vercelProjectName: slugifyProjectName(data.slug) }],
+        },
+        select: { id: true },
+      });
+      if (taken) throw new Error("SLUG_TAKEN");
+      if (current.vercelProjectName == null && (await hasEverDeployed(siteId))) {
+        pinnedProjectName = slugifyProjectName(current.slug);
+      }
+
       await prisma.slugHistory.create({
         data: {
           siteId,
@@ -209,6 +341,7 @@ export async function updateSiteSettings(
   // safe because the column is nullable in schema.prisma and the data has
   // already been validated by updateSiteSettingsSchema upstream.
   const persistData = { ...data } as Prisma.SiteUpdateInput;
+  if (pinnedProjectName) persistData.vercelProjectName = pinnedProjectName;
   if (data.publishedPassword !== undefined) {
     persistData.publishedPassword = data.publishedPassword === null
       ? null
@@ -246,11 +379,24 @@ export async function updateSiteSettings(
         where: { id: siteId },
         data: persistData,
       });
-    });
+    }).catch(rethrowSlugConflict);
   }
 
   return prisma.site.update({
     where: { id: siteId },
     data: persistData,
-  });
+  }).catch(rethrowSlugConflict);
+}
+
+/** The SLUG_TAKEN check above is read-then-write; a concurrent save that takes
+ *  the same slug in between surfaces here as the @unique index's P2002. The
+ *  pin write can also collide on vercelProjectName, when another site is
+ *  already pinned to the old slug's project (legacy slug reuse). */
+function rethrowSlugConflict(e: unknown): never {
+  if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+    const target = String(e.meta?.target ?? "");
+    if (target.includes("vercelProjectName")) throw new Error("PROJECT_NAME_TAKEN");
+    if (target.includes("slug")) throw new Error("SLUG_TAKEN");
+  }
+  throw e;
 }

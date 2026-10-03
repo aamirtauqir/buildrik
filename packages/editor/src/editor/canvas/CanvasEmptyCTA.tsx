@@ -147,5 +147,5 @@ const TEXT_ACTION =
 /* A card is a column: thumbnail over name, the whole thing a button.
    `h-auto` unseats flowbite's h-10 so the thumbnail sets the height. */
 const CARD =
-  "tw:h-auto tw:min-h-0 tw:w-[148px] tw:flex-col tw:items-start tw:gap-1.5 tw:p-0 tw:rounded-md " +
+  "tw:h-auto tw:min-h-0 tw:w-full tw:min-w-0 tw:flex-col tw:items-start tw:gap-1.5 tw:p-0 tw:rounded-md " +
   "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)]";

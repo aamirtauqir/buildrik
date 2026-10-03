@@ -1,71 +1,53 @@
 /**
- * General — Clone 3397:32011 (`Site setup / General`): the site's identity
- * (name, favicon, language) and its social profiles, in two cards.
+ * General — 8135:212718 (default) · 8135:212966 (Advanced open) ·
+ * 8135:213221 (slug taken) · 8135:213477 (slug format) · 8135:213733 (slug
+ * confirm): the site's identity in one card — name, author, favicon and touch
+ * icon (upload + preview), the favicon URL, and a link to Languages for the
+ * site language — and a collapsed `Advanced` card holding the URL slug.
  *
- * Values come from the Site row on open (3953:26363 loading, 3953:26503
- * load-error with Try again). Edits stay in this screen until Save: the
- * flush writes them to `projectSettings.seo.*`, and the sync provider's
- * dual-save map carries `siteName` / `favicon` / `language` on to
- * `Site.name` / `Site.favicon` / `Site.defaultLocale` (the publish path reads
- * `Site.favicon`; before S1 the editor's favicon never reached a published
- * site). A refused save shows the banner (3950:26309) over the untouched
- * fields.
+ * Values come from the Site row on open (`siteDetail.settings.get`; load card
+ * while it reads, Try again when it fails). Edits stay here until Save:
+ *  - name / favicon / touch icon go out through the flush the shell saves
+ *    (`seo.siteName` / `seo.favicon` / `seo.touchIcon` → the Site columns);
+ *  - Author has no Site column: it is `seo.author` in the project JSON, saved
+ *    by `siteDetail.projectSettings.update` in the same Save (never the
+ *    autosave's `sites.saveProject`);
+ *  - a changed slug has no settings path at all: the flush asks first
+ *    (SlugChangeDialog), then hands the shell the slug as an extra column, so
+ *    one `siteDetail.settings.update` carries it with every other change.
+ *    Cancel calls the save off (`SettingsSaveCancelled`, no banner); while the
+ *    slug is malformed or taken the footer says "Fix the site URL before
+ *    saving".
+ *
+ * Social profiles moved to SEO (Phase B §1 row 20); the language select moved
+ * to Languages (row 11).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen, Section, Select } from "../shared";
-import { useSettingsScreen } from "../hooks/useSettingsScreen";
+import { Button, TextInput } from "@/editor/chrome-ui";
+import type { ProjectSettings } from "@/shared/types/project";
+import { getBuildrikClient } from "@/services/api-client";
+import { SettingsSaveCancelled } from "@/services/BuildrikSyncProvider";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen } from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
-import { SITE_LOCALES, localeLabel } from "../constants";
-import type { ScreenProps } from "../types";
-
-interface IdentitySettings {
-  siteName: string;
-  favicon: string;
-  language: string;
-}
-
-interface SocialSettings {
-  twitter: string;
-  facebook: string;
-  linkedin: string;
-}
-
-const DEFAULT_IDENTITY: IdentitySettings = {
-  siteName: "",
-  favicon: "",
-  language: "en",
-};
-
-const DEFAULT_SOCIAL: SocialSettings = {
-  twitter: "",
-  facebook: "",
-  linkedin: "",
-};
+import { localeLabel } from "../constants";
+import { SettingsCard } from "../components/SettingsCard";
+import { SlugChangeDialog } from "../components/SlugChangeDialog";
+import type { ScreenProps, SettingsFlushResult } from "../types";
 
 /** The columns this screen reads off `siteDetail.settings.get`. */
 interface GeneralRow {
   name?: string | null;
+  slug?: string | null;
   favicon?: string | null;
+  touchIcon?: string | null;
   defaultLocale?: string | null;
-  /** `Site.defaultLocale` must be one of these or the server refuses the save. */
-  enabledLocales?: string[] | null;
-  /** A Json column — whatever the dashboard stored; only string values are links. */
-  socialLinks?: unknown;
 }
 
-function socialLink(links: unknown, key: "twitter" | "facebook" | "linkedin"): string {
-  if (typeof links !== "object" || links === null) return "";
-  const value: unknown = (links as Record<string, unknown>)[key];
-  return typeof value === "string" ? value : "";
-}
-
-/* `Site.name` is `z.string().min(2).max(100)` on the server — a one-letter
-   name is refused by the whole settings mutation, and an empty one cannot be
-   sent at all (the column is required; the sync provider skips it). Said
-   here, under the field, before Save has to say it in a banner. */
+/* `Site.name` is `z.string().min(2).max(100)` on the server. */
 const SITE_NAME_MIN = 2;
 const SITE_NAME_MAX = 100;
 function siteNameError(value: string): string | null {
@@ -76,134 +58,326 @@ function siteNameError(value: string): string | null {
   return null;
 }
 
+/* `updateSiteSettingsSchema.slug`: 3–50, `/^[a-z0-9]+(?:-[a-z0-9]+)*$/`. */
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+export const SLUG_FORMAT_ERROR = "Use only lowercase letters, numbers and hyphens.";
+export const SLUG_TAKEN_ERROR = "This site URL is already taken. Choose another.";
+/** 8135:213221 / 8135:213477: the footer's status while the slug blocks Save. */
+const SLUG_FOOTER_MESSAGE = "Fix the site URL before saving";
+function slugError(value: string): string | null {
+  if (!SLUG_PATTERN.test(value)) return SLUG_FORMAT_ERROR;
+  if (value.length < 3 || value.length > 50) return "Use 3 to 50 characters.";
+  return null;
+}
+
+/** The live site's host (`bella-cucina.vercel.app`), or null before the first publish. */
+function liveHostOf(publishedUrl: string | null | undefined): string | null {
+  if (!publishedUrl) return null;
+  try {
+    return new URL(publishedUrl).host;
+  } catch {
+    return null;
+  }
+}
+
+/** `trpc.upload.presign` → PUT → `upload.confirm`, as the dashboard's Settings tab uploads icons. */
+async function uploadSiteIcon(siteId: string, file: File, context: "favicon" | "touch_icon"): Promise<string> {
+  const client = getBuildrikClient(DASHBOARD_URL);
+  const { fileId, uploadUrl } = await client.upload.presign.mutate({
+    fileName: file.name,
+    fileType: file.type,
+    context,
+    siteId,
+  });
+  const res = await fetch(new URL(uploadUrl, DASHBOARD_URL || window.location.origin).toString(), {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file,
+    credentials: "include",
+  });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(body?.error ?? "The upload did not go through.");
+  }
+  return (await client.upload.confirm.mutate({ fileId })).cdnUrl;
+}
+
+const ICON_LABEL = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]";
+const ICON_HINT = "tw:text-[length:var(--bk-text-11)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+/* 8135:212925 `Button · Upload favicon`: ghost, 32 tall, 12 in, 13/500;
+   8134:212323 draws it disabled as grey text, no fill. */
+const UPLOAD_BTN =
+  "tw:h-8 tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:bg-transparent tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium " +
+  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:disabled:bg-transparent tw:disabled:text-[var(--bk-gray-400)] " +
+  "tw:focus:ring-0 tw:focus:shadow-none " +
+  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const FIELD_ROW = "tw:grid tw:grid-cols-2 tw:gap-x-6 tw:gap-y-4";
+
+function initialsOf(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  return ((words[0]?.[0] ?? "") + (words[1]?.[0] ?? words[0]?.[1] ?? "")).toUpperCase();
+}
+
+interface IconUploadProps {
+  id: string;
+  label: string;
+  hint: string;
+  button: string;
+  accept: string;
+  value: string;
+  initials: string;
+  busy: boolean;
+  /** Read-only (role below ADMIN): the upload stays in view, disabled (8134:212323). */
+  readOnly?: boolean;
+  onPick(file: File): void;
+}
+
+/** 8135:212920 `Favicon` / 8135:212935 `Touch icon`: label, a 40 preview tile, the upload button, the format hint. */
+function IconUpload({ id, label, hint, button, accept, value, initials, busy, readOnly, onPick }: IconUploadProps) {
+  const fileRef = React.useRef<HTMLInputElement>(null);
+  return (
+    <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2" data-testid={`set-field-${id}`}>
+      <p className={ICON_LABEL}>{label}</p>
+      <div className="tw:flex tw:h-10 tw:items-center tw:gap-3">
+        <div
+          className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:bg-[var(--bk-accent-tint)]"
+          data-testid={`set-${id}-preview`}
+        >
+          {value ? (
+            <img src={value} alt="" className="tw:size-full tw:object-contain" />
+          ) : (
+            <span className="tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-accent)]">
+              {initials}
+            </span>
+          )}
+        </div>
+        <Button
+          id={id}
+          type="button"
+          size="xs"
+          variant="ghost"
+          className={UPLOAD_BTN}
+          disabled={busy || readOnly}
+          onClick={() => fileRef.current?.click()}
+          data-testid={`set-${id}-upload`}
+        >
+          {busy ? "Uploading…" : button}
+        </Button>
+        <span className={ICON_HINT}>{hint}</span>
+        <TextInput
+          ref={fileRef}
+          type="file"
+          accept={accept}
+          className="tw:hidden"
+          tabIndex={-1}
+          data-testid={`set-${id}-file`}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            if (file) onPick(file);
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   composer,
   projectId,
   onDirtyChange,
   registerFlushHandler,
+  registerFieldErrors,
+  registerFooterMessage,
+  onOpenScreen,
   onLoadStateChange,
   registerRetryLoad,
   saveError,
+  fieldErrors,
+  readOnly,
 }) => {
-  const identity = useSettingsScreen(
-    composer,
-    (s) => ({
-      siteName: s.seo?.siteName ?? "",
-      favicon: s.seo?.favicon ?? "",
-      language: s.seo?.language ?? "en",
-    }),
-    DEFAULT_IDENTITY
-  );
+  /* The composer's copy first — all the standalone demo (no site) has —
+     then the Site row replaces it once read. */
+  const seo = composer?.getProjectSettings().seo;
+  const [siteName, setSiteName] = React.useState(seo?.siteName ?? "");
+  const [author, setAuthor] = React.useState(seo?.author ?? composer?.getProjectMetadata?.()?.author ?? "");
+  const [favicon, setFavicon] = React.useState(seo?.favicon ?? "");
+  const [touchIcon, setTouchIcon] = React.useState(seo?.touchIcon ?? "");
+  const [language, setLanguage] = React.useState(seo?.language ?? "en");
+  const [slug, setSlug] = React.useState("");
+  /* The slug the server holds — a Save is only a slug change against this. */
+  const [savedSlug, setSavedSlug] = React.useState("");
+  const [advancedOpen, setAdvancedOpen] = React.useState(false);
+  const [uploading, setUploading] = React.useState<"favicon" | "touch-icon" | null>(null);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  /* The slug the server refused as taken — Save stays off until it changes (8135:213221). */
+  const [refused, setRefused] = React.useState<{ slug: string; message: string } | null>(null);
+  const [slugConfirm, setSlugConfirm] = React.useState<{ from: string; to: string } | null>(null);
+  const confirmRef = React.useRef<((ok: boolean) => void) | null>(null);
 
-  const social = useSettingsScreen(
-    composer,
-    (s) => ({
-      twitter: s.seo?.socialLinks?.twitter ?? "",
-      facebook: s.seo?.socialLinks?.facebook ?? "",
-      linkedin: s.seo?.socialLinks?.linkedin ?? "",
-    }),
-    DEFAULT_SOCIAL
-  );
+  /* What the server holds — dirty is a difference from it, so typing a value
+     back to the saved one is clean again. */
+  const [saved, setSaved] = React.useState(() => ({
+    siteName: seo?.siteName ?? "",
+    author: seo?.author ?? composer?.getProjectMetadata?.()?.author ?? "",
+    favicon: seo?.favicon ?? "",
+    touchIcon: seo?.touchIcon ?? "",
+  }));
 
-  const [siteName, setSiteName] = React.useState(identity.value.siteName);
-  const [favicon, setFavicon] = React.useState(identity.value.favicon);
-  const [language, setLanguage] = React.useState(identity.value.language);
-  const [twitter, setTwitter] = React.useState(social.value.twitter);
-  const [facebook, setFacebook] = React.useState(social.value.facebook);
-  const [linkedin, setLinkedin] = React.useState(social.value.linkedin);
-  /* 4418:127313 draws Site Identity as name · favicon · language. Author is
-     the project metadata's, not the Site row's (read once on mount, written on
-     the flush); owner ruling 2026-09-24 keeps it, in the empty cell beside
-     Site Language so the card is the board's height. No Canvas card: grid
-     lives in the canvas View menu. */
-  const [author, setAuthor] = React.useState(() => composer?.getProjectMetadata?.()?.author ?? "");
-  /* null = no Site row read (the standalone demo), so nothing to check
-     against; the server enforces `defaultLocale ∈ enabledLocales` either way. */
-  const [enabledLocales, setEnabledLocales] = React.useState<string[] | null>(null);
-
-  const isDirty = identity.isDirty || social.isDirty;
-
-  // Notify central savebar when dirty state changes
-  React.useEffect(() => {
-    onDirtyChange?.(isDirty);
-  }, [isDirty, onDirtyChange]);
-
-  // Sync local state when composer reloads (preserves user's unsaved edits)
-  React.useEffect(() => {
-    setSiteName(identity.value.siteName);
-    setFavicon(identity.value.favicon);
-    setLanguage(identity.value.language);
-  }, [identity.value.siteName, identity.value.favicon, identity.value.language]);
-
-  React.useEffect(() => {
-    setTwitter(social.value.twitter);
-    setFacebook(social.value.facebook);
-    setLinkedin(social.value.linkedin);
-  }, [social.value.twitter, social.value.facebook, social.value.linkedin]);
-
-  // The Site row, as it is now. The composer's copy of these columns is the
-  // one `loadProject` merged when the editor opened; the frame wants the row
-  // at the moment the screen opens, and wants a failed read to be a state.
   const load = useServerLoad<GeneralRow>(
     projectId,
     (client, siteId) => client.siteDetail.settings.get.query({ siteId }),
     (row) => {
       setSiteName(row.name ?? "");
       setFavicon(row.favicon ?? "");
+      setTouchIcon(row.touchIcon ?? "");
+      setSaved((v) => ({ ...v, siteName: row.name ?? "", favicon: row.favicon ?? "", touchIcon: row.touchIcon ?? "" }));
       setLanguage(row.defaultLocale ?? "en");
-      setEnabledLocales(row.enabledLocales ?? null);
-      setTwitter(socialLink(row.socialLinks, "twitter"));
-      setFacebook(socialLink(row.socialLinks, "facebook"));
-      setLinkedin(socialLink(row.socialLinks, "linkedin"));
+      setSlug(row.slug ?? "");
+      setSavedSlug(row.slug ?? "");
     },
-    { onLoadStateChange, registerRetryLoad }
+    { onLoadStateChange, registerRetryLoad },
   );
 
-  // Register flush handler — SettingsTab.handleSave invokes this BEFORE
-  // composer.saveProject(). Pulls latest local state from refs so the
-  // closure stays single — re-registering per keystroke would defeat the
-  // fan-out reduction this whole refactor exists for.
-  const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin, author });
-  stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin, author };
+  const nameError = siteNameError(siteName);
+  const slugFormatError = slug !== savedSlug ? slugError(slug) : null;
+  const slugRefused = refused && slug === refused.slug ? refused.message : null;
+  const slugMessage = slugFormatError ?? slugRefused;
+  const slugChanged = !!projectId && slug !== savedSlug && !slugFormatError;
+
+  const dirty =
+    siteName !== saved.siteName ||
+    author.trim() !== saved.author.trim() ||
+    favicon !== saved.favicon ||
+    touchIcon !== saved.touchIcon ||
+    slug !== savedSlug;
   React.useEffect(() => {
-    if (!composer || !registerFlushHandler) return;
-    registerFlushHandler(() => {
-      const current = composer.getProjectSettings();
-      const s = stateRef.current;
-      composer.setProjectSettings({
-        ...current,
-        seo: {
-          ...current.seo,
-          siteName: s.siteName,
-          favicon: s.favicon,
-          language: s.language,
-          socialLinks: {
-            twitter: s.twitter,
-            facebook: s.facebook,
-            linkedin: s.linkedin,
-          },
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+
+  /* The screen's own refusals disable Save (§27) — keyed as the server keys them. */
+  React.useEffect(() => {
+    if (!registerFieldErrors) return;
+    const errors: Record<string, string> = {};
+    if (load.state === "ready" && nameError) errors["seo.siteName"] = nameError;
+    const slugProblem = slugFormatError ?? slugRefused;
+    if (slugProblem) errors.slug = slugProblem;
+    registerFieldErrors(errors);
+    return () => registerFieldErrors(null);
+  }, [registerFieldErrors, load.state, nameError, slugFormatError, slugRefused]);
+
+  /* While the slug blocks Save, the footer says what to fix (8135:213221 / 213477). */
+  const slugBlocks = !!(slugFormatError ?? slugRefused);
+  React.useEffect(() => {
+    if (!registerFooterMessage) return;
+    registerFooterMessage(slugBlocks ? SLUG_FOOTER_MESSAGE : null);
+    return () => registerFooterMessage(null);
+  }, [registerFooterMessage, slugBlocks]);
+
+  /* A slug the server refused (taken) comes back on the field and keeps Save
+     off until it changes (8135:213221); the card it lives in opens. */
+  const slugRef = React.useRef({ slug, savedSlug, slugChanged });
+  slugRef.current = { slug, savedSlug, slugChanged };
+  React.useEffect(() => {
+    const message = fieldErrors?.slug;
+    if (!message) return;
+    setAdvancedOpen(true);
+    setRefused({ slug: slugRef.current.slug, message: /already uses/i.test(message) ? SLUG_TAKEN_ERROR : message });
+  }, [fieldErrors?.slug]);
+
+  const stateRef = React.useRef({ siteName, author, favicon, touchIcon });
+  stateRef.current = { siteName, author, favicon, touchIcon };
+
+  /** The settings this screen wants saved: the composer's, plus its edits. */
+  const buildNext = React.useCallback((): ProjectSettings | void => {
+    if (!composer) return;
+    const current = composer.getProjectSettings();
+    const s = stateRef.current;
+    /* The site name is the project's name too: the topbar and the Settings
+       header read `getProjectMetadata().name`. Merged without dirtying the
+       document — the name is saved as the `Site.name` column. */
+    const name = s.siteName.trim();
+    if (name && name !== composer.getProjectMetadata?.()?.name) composer.mergeProjectMetadata?.({ name });
+    return {
+      ...current,
+      seo: {
+        ...current.seo,
+        siteName: s.siteName,
+        favicon: s.favicon,
+        touchIcon: s.touchIcon,
+        author: s.author.trim(),
+      },
+    };
+  }, [composer]);
+
+  /* Save: the settings, and — when the slug changed — a confirm first
+     (SlugChangeDialog), then the slug riding in the same `settings.update`.
+     Cancel calls the save off: nothing is sent and nothing reads as failed. */
+  /* After the server has them, the sent values are the saved ones. */
+  const markSaved = React.useCallback(() => {
+    const st = stateRef.current;
+    setSaved({ siteName: st.siteName, author: st.author.trim(), favicon: st.favicon, touchIcon: st.touchIcon });
+  }, []);
+
+  const flush = React.useCallback((): SettingsFlushResult | Promise<SettingsFlushResult> => {
+    const { slug: to, savedSlug: from, slugChanged: changed } = slugRef.current;
+    if (!changed) {
+      const settings = buildNext();
+      return settings ? { settings, onSaved: markSaved } : undefined;
+    }
+    return new Promise<boolean>((resolve) => {
+      confirmRef.current = resolve;
+      setSlugConfirm({ from, to });
+    }).then((ok): SettingsFlushResult => {
+      if (!ok) throw new SettingsSaveCancelled();
+      const settings = buildNext();
+      if (!settings) return;
+      return {
+        settings,
+        columns: { slug: to },
+        onSaved: () => {
+          setSavedSlug(to);
+          markSaved();
         },
-      });
-      /* The site name is the project's name too: the sidebar, the topbar and
-         the Settings saved dialog read `getProjectMetadata().name`, which was
-         loaded from the Site row and would keep the old name until a reload
-         after the mirror wrote `Site.name` (walked live 2026-09-14). */
-      const name = s.siteName.trim();
-      const meta = composer.getProjectMetadata?.();
-      const author = s.author.trim();
-      if ((name && name !== meta?.name) || author !== (meta?.author ?? "")) {
-        composer.updateProjectMetadata?.({ ...(name ? { name } : {}), author });
-      }
+      };
     });
+  }, [buildNext, markSaved]);
+
+  React.useEffect(() => {
+    if (!registerFlushHandler) return;
+    registerFlushHandler(flush);
     return () => registerFlushHandler(null);
-  }, [composer, registerFlushHandler]);
+  }, [registerFlushHandler, flush]);
+
+  const answerConfirm = (ok: boolean) => {
+    setSlugConfirm(null);
+    confirmRef.current?.(ok);
+    confirmRef.current = null;
+  };
+
+  const pickIcon = async (file: File, which: "favicon" | "touch-icon") => {
+    if (!projectId) return;
+    setUploadError(null);
+    setUploading(which);
+    try {
+      const url = await uploadSiteIcon(projectId, file, which === "favicon" ? "favicon" : "touch_icon");
+      if (which === "favicon") setFavicon(url);
+      else setTouchIcon(url);
+    } catch (err) {
+      setUploadError(
+        `Couldn't upload the ${which === "favicon" ? "favicon" : "touch icon"}: ${err instanceof Error ? err.message : "please try again."}`,
+      );
+    } finally {
+      setUploading(null);
+    }
+  };
 
   if (load.state !== "ready") {
     return (
       <Screen>
         <LoadCard
-          title="Site Identity"
-          line="Site name, favicon, language and social profiles."
+          title="Site identity"
+          line="Site name, author, favicon and touch icon."
           state={load.state}
           errorLine="Couldn't load your site settings. Check your connection, then try again."
           onRetry={load.retry}
@@ -212,110 +386,155 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     );
   }
 
-  const nameError = siteNameError(siteName);
-  /* A row whose locale the list does not carry still has to show — and keep —
-     its own value; otherwise the select would silently fall to the first
-     option and the next Save would change the site's language. */
-  const languageOptions = SITE_LOCALES.some((l) => l.code === language)
-    ? SITE_LOCALES
-    : [{ code: language, label: localeLabel(language) }, ...SITE_LOCALES];
-  /* `Site.defaultLocale` must be one of the site's enabled locales — the
-     server refuses the whole settings mirror otherwise
-     (`DEFAULT_LOCALE_NOT_ENABLED`), and Localization is where a locale is
-     enabled. Said under the select, before Save has to say it in a banner. */
-  const languageError =
-    enabledLocales && !enabledLocales.includes(language)
-      ? `${localeLabel(language)} is not enabled for this site yet — add it under Localization first, or the save will be refused.`
-      : null;
+  const initials = initialsOf(siteName);
+  const liveHost = liveHostOf(composer?.getProjectMetadata?.()?.publishedUrl);
+  const faviconError = fieldErrors?.["seo.favicon"];
+  const onlySlugRefused = !!fieldErrors?.slug && Object.keys(fieldErrors).length === 1;
+  const touchIconError = fieldErrors?.["seo.touchIcon"];
 
   return (
     <Screen>
-      {saveError ? <SaveErrorBanner message={saveError} /> : null}
+      {/* 8135:213221: a taken slug is said on its field and in the footer, not in a banner. */}
+      {saveError && !onlySlugRefused ? <SaveErrorBanner message={saveError} /> : null}
 
-      <Section title="Site Identity">
-        <Field label="Site name" htmlFor="site-name" siteColumn="seo.siteName">
-          <Input
-            id="site-name"
-            type="text"
-            value={siteName}
-            aria-invalid={nameError ? true : undefined}
-            onChange={(e) => { setSiteName(e.target.value); identity.markDirty(); }}
+      <SettingsCard title="Site identity">
+        <div className={FIELD_ROW}>
+          <Field label="Site name" htmlFor="site-name" siteColumn="seo.siteName">
+            <Input
+              id="site-name"
+              type="text"
+              value={siteName}
+              aria-invalid={nameError ? true : undefined}
+              onChange={(e) => {
+                setSiteName(e.target.value);
+              }}
+            />
+            {nameError && (
+              <div role="alert" className={SCREEN_FIELD_ERROR}>
+                {nameError}
+              </div>
+            )}
+          </Field>
+          <Field label="Author" htmlFor="site-author">
+            <Input
+              id="site-author"
+              type="text"
+              value={author}
+              onChange={(e) => {
+                setAuthor(e.target.value);
+              }}
+              placeholder="Who this site belongs to"
+            />
+          </Field>
+        </div>
+
+        <div className={FIELD_ROW}>
+          <IconUpload
+            id="favicon"
+            label="Favicon"
+            hint="ICO, PNG or SVG"
+            button="Upload favicon"
+            accept="image/x-icon,image/png,image/svg+xml,.ico"
+            value={favicon}
+            initials={initials}
+            busy={uploading === "favicon"}
+            readOnly={readOnly}
+            onPick={(file) => void pickIcon(file, "favicon")}
           />
-          {nameError && (
-            <div role="alert" className={SCREEN_FIELD_ERROR}>
-              {nameError}
-            </div>
-          )}
-        </Field>
-        <Field label="Favicon URL" htmlFor="favicon-url" siteColumn="seo.favicon">
+          <IconUpload
+            id="touch-icon"
+            label="Touch icon"
+            hint="PNG · 180×180 recommended"
+            button="Upload touch icon"
+            accept="image/png"
+            value={touchIcon}
+            initials={initials}
+            busy={uploading === "touch-icon"}
+            readOnly={readOnly}
+            onPick={(file) => void pickIcon(file, "touch-icon")}
+          />
+        </div>
+        {uploadError || touchIconError ? (
+          <div role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-icon-error">
+            {uploadError ?? touchIconError}
+          </div>
+        ) : null}
+
+        <Field label="Favicon URL" htmlFor="favicon-url" siteColumn="seo.favicon" span="full">
           <Input
             id="favicon-url"
             type="text"
             value={favicon}
-            onChange={(e) => { setFavicon(e.target.value); identity.markDirty(); }}
+            aria-invalid={faviconError ? true : undefined}
+            onChange={(e) => {
+              setFavicon(e.target.value);
+            }}
             placeholder="https://example.com/favicon.ico"
           />
-        </Field>
-        <Field label="Site Language" htmlFor="site-language" siteColumn="seo.language">
-          <Select
-            id="site-language"
-            value={language}
-            aria-invalid={languageError ? true : undefined}
-            onChange={(e) => { setLanguage(e.target.value); identity.markDirty(); }}
-          >
-            {languageOptions.map((l) => (
-              <option key={l.code} value={l.code}>
-                {l.label} ({l.code})
-              </option>
-            ))}
-          </Select>
-          {languageError && (
+          {faviconError && (
             <div role="alert" className={SCREEN_FIELD_ERROR}>
-              {languageError}
+              {faviconError}
             </div>
           )}
         </Field>
-        <Field label="Author" htmlFor="site-author">
+
+        {/* Navigation, so it stays — and works — on the read-only screen
+            (8134:212323): an anchor, which the shell's disabled fieldset
+            does not disable. */}
+        <Button
+          href="#localization"
+          variant="link"
+          className="tw:min-h-5 tw:w-fit tw:font-medium"
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault();
+            onOpenScreen?.("localization");
+          }}
+          data-testid="set-general-language"
+        >
+          {`${localeLabel(language)} (${language}) · Manage in Languages ›`}
+        </Button>
+      </SettingsCard>
+
+      <SettingsCard title="Advanced" open={advancedOpen} onToggle={setAdvancedOpen} anchors={["site-slug"]}>
+        <Field label="Site URL slug" htmlFor="site-slug" span="full">
           <Input
-            id="site-author"
+            id="site-slug"
             type="text"
-            value={author}
-            onChange={(e) => { setAuthor(e.target.value); identity.markDirty(); }}
-            placeholder="Who this site belongs to"
+            value={slug}
+            aria-invalid={slugMessage ? true : undefined}
+            onChange={(e) => {
+              setSlug(e.target.value);
+            }}
           />
         </Field>
-      </Section>
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+          Use lowercase letters, numbers and hyphens.
+        </p>
+        <p
+          className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+          data-testid="set-general-default-url"
+        >
+          {liveHost
+            ? `Current default URL · ${liveHost}`
+            : "Current default URL · not published yet — your first publish takes it from this slug"}
+        </p>
+        {slugMessage ? (
+          <p
+            role="alert"
+            className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-red-700)]"
+            data-testid="set-general-slug-error"
+          >
+            {slugMessage}
+          </p>
+        ) : null}
+      </SettingsCard>
 
-      <Section title="Social Links">
-        <Field label="Twitter" htmlFor="social-twitter" siteColumn="seo.socialLinks">
-          <Input
-            id="social-twitter"
-            type="url"
-            value={twitter}
-            onChange={(e) => { setTwitter(e.target.value); social.markDirty(); }}
-            placeholder="https://twitter.com/…"
-          />
-        </Field>
-        <Field label="Facebook" htmlFor="social-facebook" siteColumn="seo.socialLinks">
-          <Input
-            id="social-facebook"
-            type="url"
-            value={facebook}
-            onChange={(e) => { setFacebook(e.target.value); social.markDirty(); }}
-            placeholder="https://facebook.com/…"
-          />
-        </Field>
-        <Field label="LinkedIn" htmlFor="social-linkedin" siteColumn="seo.socialLinks">
-          <Input
-            id="social-linkedin"
-            type="url"
-            value={linkedin}
-            onChange={(e) => { setLinkedin(e.target.value); social.markDirty(); }}
-            placeholder="https://linkedin.com/company/…"
-          />
-        </Field>
-      </Section>
-
+      <SlugChangeDialog
+        change={slugConfirm}
+        liveHost={liveHost}
+        onCancel={() => answerConfirm(false)}
+        onConfirm={() => answerConfirm(true)}
+      />
     </Screen>
   );
 };

@@ -25,6 +25,7 @@ import {
   MenuItem,
   MenuSeparator,
   PanelFrame,
+  PanelSearch,
   Popover,
 } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
@@ -120,21 +121,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   /* Every Add-page door asks for the New-page modal (decision #19). */
   const requestNewPage = React.useCallback(() => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), [composer]);
 
-  /* v3 4418:92256: the filter is the topbar field, which reads "Search
-     pages…" while this drawer is mounted — the drawer's own search band is
-     gone, as it went from Layers (4418:81300). */
+  /* The filter sits under the header (owner decision 2026-10-03; v3
+     4418:92256 put it in the topbar field, "Search pages…"). A closed drawer
+     stays mounted and drops the query, as handing the topbar field back did. */
   const [search, setSearch] = React.useState("");
   React.useEffect(() => {
-    if (!composer || !isOpen) return;
-    const onQuery = ({ query }: { query: string }) => setSearch(query);
-    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
-    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search pages…" });
-    return () => {
-      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
-      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
-      setSearch("");
-    };
-  }, [composer, isOpen]);
+    if (!isOpen) setSearch("");
+  }, [isOpen]);
 
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
@@ -408,6 +401,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           </>
         }
       />
+      {/* Only over the page list it filters — the listings and structure
+          views take no query, and a dead field over them would be a lie. */}
+      {(p.loadError || view === "pages") && (
+        <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
+      )}
       {/* Board 141:165 keeps the search band and the Add-page footer either
           side of the error, so the error is a BODY state inside PageList — not
           a replacement for the whole panel body. */}

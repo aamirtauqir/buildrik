@@ -7,7 +7,6 @@ import type {
   SettingsOverview,
   SiteOverview,
 } from "@buildrik/shared/schemas/site-detail";
-import { INTEGRATION_CATALOG } from "@buildrik/shared/schemas/integrations";
 
 const filled = (v: unknown) => typeof v === "string" && v.trim().length > 0;
 
@@ -210,9 +209,12 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
       cspPolicy: true,
       hstsMaxAge: true,
       projectSettings: true,
+      status: true,
+      publishedPassword: true,
       workspace: {
         select: {
           plan: true,
+          deletionScheduledAt: true,
           subscription: { select: { plan: true, price: true, interval: true } },
         },
       },
@@ -232,7 +234,7 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     analyticsDays,
     forms,
     submissions,
-    connected,
+    shareLinks,
     webhook,
     members,
   ] = await Promise.all([
@@ -247,7 +249,9 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     prisma.siteAnalytics.count({ where: { siteId, date: { gte: sevenDaysAgo } } }),
     prisma.formBlock.count({ where: { siteId } }),
     prisma.formSubmission.count({ where: { siteId } }),
-    prisma.workspaceIntegration.count({ where: { workspaceId, isActive: true } }),
+    prisma.shareLink.count({
+      where: { siteId, isActive: true, OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+    }),
     prisma.workspaceWebhook.findUnique({
       where: { workspaceId },
       select: {
@@ -333,7 +337,13 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
   }
 
   return {
-    site: { name: site.name, defaultLocale: site.defaultLocale, plan },
+    site: {
+      name: site.name,
+      defaultLocale: site.defaultLocale,
+      plan,
+      archived: site.status === "ARCHIVED",
+      workspaceDeletionAt: site.workspace.deletionScheduledAt?.toISOString() ?? null,
+    },
     general: { siteName: site.name, language: site.defaultLocale },
     localization: { locales: site.enabledLocales.length, notStarted },
     seo: { allowIndexing: site.allowIndexing, robotsTxtSet: filled(site.robotsTxt) },
@@ -343,7 +353,7 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     forms: { forms, submissions },
     customCode: { head: filled(site.headCode), body: filled(site.bodyCode), css: filled(customCode.globalCss) },
     headers: { csp: filled(site.cspPolicy), hsts: (site.hstsMaxAge ?? 0) > 0 },
-    integrations: { connected, available: INTEGRATION_CATALOG.length },
+    access: { passwordSet: Boolean(site.publishedPassword), shareLinks },
     webhooks: { endpoints: webhook ? 1 : 0, lastDelivery: lastDeliveryStatus },
     members: { used: members, seats: Number(limits.teamMembers) },
     billing: { plan, priceMonthly },

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { csvCell } from "@/lib/utils";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
+import { createRedirectSchema } from "@buildrik/shared/schemas/site-detail";
 
 const IMPORT_MAX_ROWS = 1000;
 
@@ -64,36 +65,61 @@ export async function deleteRedirect(id: string) {
   return prisma.redirect.delete({ where: { id } });
 }
 
-export async function importRedirects(siteId: string, csv: string, plan: PlanName) {
+/**
+ * BE-7: a CSV of `from,to[,301|302]` rows under a header line. Every row goes
+ * through `createRedirectSchema` — the same rule as the Add-redirect dialog, so
+ * a `javascript:` target or a bare `new-page` (which fails the whole publish
+ * in `vercel.json`) is refused here too — and a `from` that already has a rule,
+ * on the site or earlier in the file, is refused as a duplicate. All or
+ * nothing: the first bad line throws (1-based, the header is line 1) and no
+ * row is written.
+ *
+ * @throws INVALID_CSV_ROW:<line> · DUPLICATE_CSV_ROW:<line>:<fromPath> · CSV_TOO_LARGE · REDIRECT_LIMIT
+ */
+/** 8136:215307: why a CSV row was refused, as the dialog says it ("Destination is required"). */
+function csvRowRefusal(fromPath: string, toUrl: string, field: PropertyKey | undefined): string {
+  if (field === "fromPath") return fromPath ? "Source must be a path starting with /" : "Source path is required";
+  if (field === "toUrl") return toUrl.trim() ? "Destination must be a path or an http(s) URL" : "Destination is required";
+  if (field === "type") return "Type must be 301 or 302";
+  return "This row is not a redirect";
+}
+
+export async function importRedirects(siteId: string, csv: string, plan: PlanName): Promise<{ created: number }> {
   const lines = csv.trim().split(/\r?\n/);
-  const rows = lines.slice(1).filter((l) => l.trim());
+  const rows = lines
+    .slice(1)
+    .map((text, idx) => ({ text, line: idx + 2 }))
+    .filter((row) => row.text.trim());
   if (rows.length > IMPORT_MAX_ROWS) throw new Error("CSV_TOO_LARGE");
 
-  // The naive split previously shipped whatever the file contained straight
-  // to createMany — a short row produced undefined fromPath/toUrl and the
-  // NOT NULL constraint aborted mid-batch. Validate every row up front and
-  // report the first bad line (1-based, +1 for the header).
-  const data = rows.map((row, idx) => {
-    // Accept both bare and quoted cells (our own export quotes per RFC 4180).
-    const unquote = (s: string) =>
-      s.startsWith('"') && s.endsWith('"') && s.length >= 2
-        ? s.slice(1, -1).replace(/""/g, '"')
-        : s;
-    const parts = row.split(",").map((s) => unquote(s.trim()));
-    const [fromPath, toUrl] = parts;
-    if (!fromPath || !fromPath.startsWith("/") || !toUrl) {
-      throw new Error(`INVALID_CSV_ROW:${idx + 2}`);
+  // Accept both bare and quoted cells (our own export quotes per RFC 4180).
+  const unquote = (cell: string) =>
+    cell.startsWith('"') && cell.endsWith('"') && cell.length >= 2 ? cell.slice(1, -1).replace(/""/g, '"') : cell;
+
+  const data = rows.map(({ text, line }) => {
+    const [fromPath = "", toUrl = "", type = "301"] = text.split(",").map((cell) => unquote(cell.trim()));
+    const parsed = createRedirectSchema.safeParse({ siteId, fromPath, toUrl, type: type || "301" });
+    if (!parsed.success) {
+      throw new Error(`INVALID_CSV_ROW:${line}:${csvRowRefusal(fromPath, toUrl, parsed.error.issues[0]?.path[0])}`);
     }
-    return { siteId, fromPath, toUrl, type: parts[2] === "302" ? "302" : "301" };
+    const { fromPath: from, toUrl: to, type: kind } = parsed.data;
+    return { line, data: { siteId, fromPath: from, toUrl: to, type: kind } };
   });
 
-  const limit = PLAN_LIMITS[plan].urlRedirects as number;
-  if (limit !== -1) {
-    const existing = await prisma.redirect.count({ where: { siteId } });
-    if (existing + data.length > limit) throw new Error("REDIRECT_LIMIT");
-  }
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.redirect.findMany({ where: { siteId }, select: { fromPath: true } });
+    const taken = new Set(existing.map((r) => r.fromPath));
+    for (const row of data) {
+      if (taken.has(row.data.fromPath)) throw new Error(`DUPLICATE_CSV_ROW:${row.line}:${row.data.fromPath}`);
+      taken.add(row.data.fromPath);
+    }
 
-  return prisma.redirect.createMany({ data });
+    const limit = PLAN_LIMITS[plan].urlRedirects as number;
+    if (limit !== -1 && existing.length + data.length > limit) throw new Error("REDIRECT_LIMIT");
+
+    const { count } = await tx.redirect.createMany({ data: data.map((row) => row.data) });
+    return { created: count };
+  });
 }
 
 export async function exportRedirects(siteId: string): Promise<string> {

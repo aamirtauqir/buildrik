@@ -1,10 +1,13 @@
 /**
- * OverviewScreen — Clone 3397:32915, the landing screen of Settings.
+ * OverviewScreen — the landing screen of Settings, drawn to the Phase B
+ * Overview boards 8137:216346 / 8137:216089 (IA §25).
  *
- * A NEEDS ATTENTION card (hidden when nothing needs it) and one card per nav
- * group, each row being the section's icon, its title, a one-line summary
- * composed from `siteDetail.settingsOverview`, and `›` (or `↗` for the two
- * dashboard rows). A row click is the same navigation the sidebar makes.
+ * The site's state first when it is not the ordinary one (archived; its
+ * workspace scheduled for deletion — plan #10 / M3), a NEEDS ATTENTION card
+ * (hidden when nothing needs it), then one card per nav group (8137:216346):
+ * the group's title over a line naming its screens. Each name opens its screen
+ * — the same navigation the sidebar makes — and carries that screen's one-line
+ * summary, composed from `siteDetail.settingsOverview`, as its description.
  *
  * The pane header (`Settings` · `<site> · everything on this page…` · the
  * Search field) and the footer (`Pick a section…` · `Done`) are the shell's.
@@ -13,16 +16,15 @@
  */
 
 import * as React from "react";
-import { ArrowUpRight, ChevronRight, TriangleAlert } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { Button } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { LoadCard, SET_CARD, SET_EYEBROW, Screen } from "../shared";
+import { LoadCard, SET_BTN, SET_CARD, Screen } from "../shared";
 import {
   SETTINGS_NAV,
+  SETTINGS_NAV_GROUP_ORDER,
   SETTINGS_NAV_GROUPS,
-  WORKSPACE_LINKS,
-  type SettingsNavDef,
   type SettingsNavGroupId,
 } from "../constants";
 import type { SettingsNavId } from "../types";
@@ -102,6 +104,8 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
     }
     case "forms":
       return `${plural(o.forms.forms, "form")} · ${plural(o.forms.submissions, "submission")}`;
+    case "access":
+      return `${o.access.passwordSet ? "Password on" : "No password"} · ${plural(o.access.shareLinks, "share link")}`;
     case "custom-code": {
       const set = [o.customCode.head && "Head", o.customCode.body && "body", o.customCode.css && "CSS"].filter(
         (s): s is string => Boolean(s),
@@ -112,10 +116,10 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
       const on = [o.headers.csp && "CSP", o.headers.hsts && "HSTS"].filter((s): s is string => Boolean(s));
       return on.length ? `${joinNames(on)} on` : "Defaults";
     }
-    case "integrations":
-      return `${o.integrations.connected} connected · ${o.integrations.available} available`;
+    case "danger-zone":
+      return o.site.archived ? "Archived · hidden from the Sites list" : "Archive, transfer or delete";
     case "webhooks": {
-      if (!o.webhooks.endpoints) return "No endpoints";
+      if (!o.webhooks.endpoints) return "No webhook endpoints";
       const last =
         o.webhooks.lastDelivery === null
           ? "no deliveries yet"
@@ -133,66 +137,45 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
-/** 4418:128917's two columns — the frame's card order, not the sidebar's. */
-const OVERVIEW_COLUMNS: SettingsNavGroupId[][] = [
-  ["site-setup", "seo-publishing"],
-  ["visitors", "advanced", "workspace"],
-];
+/* 8137:216346 / 8137:216089 "Overview group cards": two 536 cards a row, 16
+   apart, in sidebar order. Each is a 16/24 title over a 13/20 muted line naming
+   the group's screens; each name opens its screen. The workspace doors close
+   the grid as a seventh card of the same shape (the board stops at six). */
+const CARD_TITLES: Partial<Record<SettingsNavGroupId, string>> = { workspace: "Workspace" };
 
-/* 4418:128917: a 52 row, 16 in — two 14/20 lines and the › at the far right. */
-const ROW_CLASS =
-  "tw:flex tw:h-13 tw:w-full tw:items-center tw:justify-start tw:gap-3 tw:rounded-[var(--bk-radius-sm)] tw:border-0 " +
-  "tw:bg-transparent tw:px-4 tw:py-1.5 tw:text-left tw:font-normal tw:no-underline tw:text-[var(--bk-ink)] " +
-  "tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+/* The board's line for Danger zone names the screen's actions, not a screen. */
+const LINE_OVERRIDES: Partial<Record<SettingsNavId, string>> = { "danger-zone": "Archive · Transfer · Delete site" };
 
-const RowBody: React.FC<{ nav: SettingsNavDef; line: string; attention: boolean; external?: boolean }> = ({
-  nav,
-  line,
-  attention,
-  external,
-}) => {
-  return (
-    <>
-      <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-        <span className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">
-          {nav.title}
-          {external ? <ArrowUpRight size={12} className="tw:ml-1 tw:inline tw:align-[-1px]" aria-hidden /> : null}
-        </span>
-        <span
-          className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]"
-          data-testid={`set-ov-row-line-${nav.id}`}
-        >
-          {line}
-        </span>
-      </span>
-      {attention ? (
-        <span
-          className="tw:size-1.5 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-warning)]"
-          role="img"
-          aria-label="Needs attention"
-        />
-      ) : null}
-      {external ? (
-        <ArrowUpRight size={14} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
-      ) : (
-        <ChevronRight size={14} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
-      )}
-    </>
-  );
-};
+const CARD_TITLE =
+  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
+
+/* An inline name in the card's line: 13/20 muted, no box — the flowbite link
+   Button's height, padding and accent colour replaced per property. */
+const LINE_LINK =
+  "tw:inline tw:h-auto tw:min-h-0 tw:rounded-[var(--bk-radius-sm)] tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 " +
+  "tw:text-[var(--bk-ink-muted)] tw:no-underline tw:hover:text-[var(--bk-accent)] tw:hover:underline " +
+  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 export interface OverviewScreenProps {
   projectId?: string | null;
+  /** The site's name as the editor has it — the state strip's subject. */
+  siteName: string;
   /** A row's `›` / an attention row's `Open ›` — the same nav the sidebar makes. */
   onOpenScreen: (id: SettingsNavId) => void;
 }
+
+/* 8137:216346: 16 in, 12 down, a 4 radius, 13/20 ink; the action under the line. */
+const STATE_NOTICE =
+  "tw:flex tw:flex-col tw:items-start tw:gap-2 tw:rounded-[var(--bk-radius-sm)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 const LOAD_TITLE = "Overview";
 const LOAD_LINE = "Where every setting stands.";
 const LOAD_ERROR = "Couldn't load the overview. Check your connection, then try again.";
 
-export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpenScreen }) => {
+export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, siteName, onOpenScreen }) => {
   const [data, setData] = React.useState<SettingsOverview | null>(null);
+  const [unarchiving, setUnarchiving] = React.useState(false);
+  const [unarchiveError, setUnarchiveError] = React.useState<string | null>(null);
   const [failed, setFailed] = React.useState(false);
   const [attempt, setAttempt] = React.useState(0);
 
@@ -233,8 +216,39 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpe
   const attentionFor = (id: SettingsNavId) => data.attention.some((a) => a.section === id);
   const isNavId = (s: string): s is SettingsNavId => SETTINGS_NAV.some((n) => n.id === s);
 
+  const workspaceDeletion = data.site.workspaceDeletionAt ? new Date(data.site.workspaceDeletionAt) : null;
+
+  const unarchive = () => {
+    if (!projectId) return;
+    setUnarchiving(true);
+    setUnarchiveError(null);
+    getBuildrikClient(DASHBOARD_URL)
+      .sites.unarchive.mutate({ id: projectId })
+      .then(() => setAttempt((n) => n + 1))
+      .catch((e: unknown) => setUnarchiveError(e instanceof Error ? e.message : "Couldn't unarchive the site."))
+      .finally(() => setUnarchiving(false));
+  };
+
   return (
     <Screen>
+      {/* 8137:216346 (M3): an archived site says so, with Unarchive. */}
+      {data.site.archived ? (
+        <section className={`${STATE_NOTICE} tw:bg-[var(--bk-accent-tint)]`} aria-label="Site state" data-testid="set-ov-state">
+          <p className="tw:m-0">{`${siteName} is archived. The live site stays up.`}</p>
+          <Button type="button" size="xs" className={`${SET_BTN} tw:h-7 tw:px-3`} disabled={unarchiving} onClick={unarchive} data-testid="set-ov-unarchive">
+            Unarchive
+          </Button>
+          {unarchiveError ? <p className="tw:m-0 tw:text-[var(--bk-error)]" role="alert">{unarchiveError}</p> : null}
+        </section>
+      ) : null}
+      {/* The workspace's own deletion (PD-5) — 8137:216089's strip, said of the workspace. */}
+      {workspaceDeletion ? (
+        <section className={`${STATE_NOTICE} tw:bg-[var(--bk-warning-tint)]`} aria-label="Workspace state" data-testid="set-ov-workspace-deletion">
+          <p className="tw:m-0">
+            {`${data.site.name}'s workspace is pending deletion. It permanently deletes on ${workspaceDeletion.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}, with every site in it.`}
+          </p>
+        </section>
+      ) : null}
       {data.attention.length ? (
         <section
           className="tw:flex tw:flex-col tw:gap-2 tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] tw:p-3"
@@ -284,48 +298,46 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpe
         </section>
       ) : null}
 
-      <div className="tw:flex tw:items-start tw:gap-8">
-        {OVERVIEW_COLUMNS.map((column) => (
-        <div key={column[0]} className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-6">
-        {column.map((group) => (
-          <section
-            key={group}
-            className={`${SET_CARD} tw:flex tw:flex-col tw:gap-2 tw:px-6 tw:py-5`}
-            aria-label={SETTINGS_NAV_GROUPS[group]}
-            data-testid={`set-ov-group-${group}`}
-          >
-            <h3 className={`${SET_EYEBROW} tw:m-0`}>{SETTINGS_NAV_GROUPS[group]}</h3>
-            <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0">
-              {SETTINGS_NAV.filter((n) => n.group === group).map((nav) => (
-                <li key={nav.id}>
-                  {nav.kind === "external" ? (
-                    <a
-                      href={`${DASHBOARD_URL}${WORKSPACE_LINKS[nav.id] ?? "/dashboard"}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={ROW_CLASS}
-                      data-testid={`set-ov-row-${nav.id}`}
-                    >
-                      <RowBody nav={nav} line={summaryLine(nav.id, data)} attention={attentionFor(nav.id)} external />
-                    </a>
-                  ) : (
+      <div className="tw:grid tw:grid-cols-2 tw:gap-4" data-testid="set-ov-groups">
+        {SETTINGS_NAV_GROUP_ORDER.map((group) => {
+          const navs = SETTINGS_NAV.filter((n) => n.group === group);
+          return (
+            <section
+              key={group}
+              className={`${SET_CARD} tw:flex tw:min-w-0 tw:flex-col tw:gap-2 tw:p-6 tw:[box-shadow:var(--bk-shadow-raised)]`}
+              aria-label={CARD_TITLES[group] ?? SETTINGS_NAV_GROUPS[group]}
+              data-testid={`set-ov-group-${group}`}
+            >
+              <h3 className={CARD_TITLE}>{CARD_TITLES[group] ?? SETTINGS_NAV_GROUPS[group]}</h3>
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid={`set-ov-line-${group}`}>
+                {navs.map((nav, i) => (
+                  <React.Fragment key={nav.id}>
+                    {i > 0 ? <span aria-hidden>{" · "}</span> : null}
                     <Button
                       type="button"
-                      variant="ghost"
-                      className={ROW_CLASS}
+                      variant="link"
+                      className={LINE_LINK}
+                      title={summaryLine(nav.id, data)}
+                      aria-description={summaryLine(nav.id, data)}
                       onClick={() => onOpenScreen(nav.id)}
                       data-testid={`set-ov-row-${nav.id}`}
                     >
-                      <RowBody nav={nav} line={summaryLine(nav.id, data)} attention={attentionFor(nav.id)} />
+                      {LINE_OVERRIDES[nav.id] ?? nav.title}
                     </Button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-        </div>
-        ))}
+                    {attentionFor(nav.id) ? (
+                      <span
+                        className="tw:ml-1 tw:inline-block tw:size-1.5 tw:rounded-full tw:bg-[var(--bk-warning)] tw:align-middle"
+                        role="img"
+                        aria-label="Needs attention"
+                        data-testid={`set-ov-dot-${nav.id}`}
+                      />
+                    ) : null}
+                  </React.Fragment>
+                ))}
+              </p>
+            </section>
+          );
+        })}
       </div>
     </Screen>
   );

@@ -1,0 +1,13 @@
+== /alpha/index.html h2: Alpha C0b | title: 
+  href=/about.html -> http://localhost:3231/about.html HTTP 200
+  href=/index.html -> http://localhost:3231/index.html HTTP 200
+== /beta/index.html h2: Beta C0b | title: 
+  href=/about.html -> http://localhost:3231/about.html HTTP 200
+  href=/index.html -> http://localhost:3231/index.html HTTP 200
+== /gamma/index.html h2: Gamma C0b | title: 
+  href=/about.html -> http://localhost:3231/about.html HTTP 200
+  href=/index.html -> http://localhost:3231/index.html HTTP 200
+-- the pre-fix relative form from /alpha/index.html:
+  about.html -> http://localhost:3231/alpha/about.html HTTP 404
+/alpha/ click "Go to About C0b" -> http://localhost:3231/about.html HTTP 200
+/gamma/ click "Go to Home C0b" -> http://localhost:3231/index.html HTTP 200

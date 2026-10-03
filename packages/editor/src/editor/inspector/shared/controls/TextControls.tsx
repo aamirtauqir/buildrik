@@ -1,5 +1,5 @@
 /**
- * Text Controls — TextInputRow, InlineInput, SectionLabel, SubSectionTitle.
+ * Text Controls — TextInputRow, SectionLabel, SubSectionTitle.
  * Ported to .bdi-text + .bdi-row-ctrl + .bdi-sub-label.
  *
  * @license BSD-3-Clause
@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import { TextField } from "@/editor/chrome-ui";
+import { useInspectorField, mixedName } from "./InspectorFieldContext";
 
 // ============================================================================
 // TEXT INPUT ROW
@@ -18,6 +19,8 @@ export interface TextInputRowProps {
   onChange: (value: string) => void;
   placeholder?: string;
   labelWidth?: number;
+  /** The CSS property it edits — "Mixed" and read-only come from the field context. */
+  property?: string;
 }
 
 export const TextInputRow: React.FC<TextInputRowProps> = ({
@@ -25,7 +28,9 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
   value,
   onChange,
   placeholder = "0px",
+  property,
 }) => {
+  const field = useInspectorField(property);
   /* Same gap as the sliders: a printed label that was never tied to the
      field, so the only accessible name these rows had was their placeholder —
      the custom box-shadow row announced itself as "0 4px 6px rgba(0,0,0,0.1)". */
@@ -38,48 +43,17 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
           id={id}
           type="text"
           className="bdi-text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-        />
-      </div>
-    </div>
-  );
-};
-
-// ============================================================================
-// INLINE INPUT (same as TextInputRow — kept for API parity)
-// ============================================================================
-
-export interface InlineInputProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  labelWidth?: number;
-}
-
-export const InlineInput: React.FC<InlineInputProps> = ({
-  label,
-  value,
-  onChange,
-  placeholder = "auto",
-}) => {
-  /* Same gap as the sliders: a printed label that was never tied to the
-     field, so the only accessible name these rows had was their placeholder —
-     the custom box-shadow row announced itself as "0 4px 6px rgba(0,0,0,0.1)". */
-  const id = React.useId();
-  return (
-    <div className="bdi-row-ctrl">
-      <label className="bdi-lb" htmlFor={id}>{label}</label>
-      <div className="bdi-row-content">
-        <TextField
-          id={id}
-          type="text"
-          className="bdi-text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
+          readOnly={field.readOnly}
+          aria-readonly={field.readOnly || undefined}
+          aria-label={field.mixed ? mixedName(label) : undefined}
+          value={field.mixed ? "" : value}
+          onChange={(e) => {
+            if (field.readOnly) return;
+            field.startTyping();
+            onChange(e.target.value);
+          }}
+          onBlur={field.stopTyping}
+          placeholder={field.mixed ? "Mixed" : placeholder}
         />
       </div>
     </div>

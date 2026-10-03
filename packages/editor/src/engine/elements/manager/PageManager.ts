@@ -21,7 +21,7 @@
  */
 
 import { EVENTS } from "../../../shared/constants";
-import { claimUniqueIds, type IdRename } from "@buildrik/shared/content/elementIds";
+import { claimUniqueIds, newPageRootStyles, type IdRename } from "@buildrik/shared/content/elementIds";
 import type { PageData, SlugChange } from "../../../shared/types";
 import { generateId, slugify } from "../../../shared/utils/helpers";
 import type { ElementManagerContext } from "./types";
@@ -74,6 +74,7 @@ export class PageManager {
         type: "container",
         tagName: "div",
         classes: ["buildrick-page-root"],
+        styles: newPageRootStyles(),
         children: [],
       },
       updatedAt: now,

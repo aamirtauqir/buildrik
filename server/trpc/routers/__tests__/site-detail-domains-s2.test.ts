@@ -88,6 +88,18 @@ describe("siteDetail.domains.connect", () => {
     });
   });
 
+  /* C1 residual: the connect-time project pin can collide with another site's
+     pin (legacy slug reuse). Say so, instead of a raw 500. */
+  it("maps PROJECT_NAME_TAKEN to CONFLICT with a message that says what to do", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    connectDomainMock.mockRejectedValueOnce(new Error("PROJECT_NAME_TAKEN"));
+
+    await expect(caller().domains.connect({ siteId: "s1", domain: "bellacucina.com" })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "This site's address clashes with another site. Change its URL slug in Settings, then connect the domain.",
+    });
+  });
+
   it("rejects a kind the schema does not know before touching access", async () => {
     await expect(
       caller().domains.connect({ siteId: "s1", domain: "bellacucina.com", kind: "ALIAS" } as never),

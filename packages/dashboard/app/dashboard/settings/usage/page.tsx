@@ -4,6 +4,7 @@ import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { SectionCard, MetricValue, ProgressBar, Pill } from "@/components/dashboard/primitives";
 import { PageHeaderActions } from "@/components/dashboard/shell/page-actions";
+import { AICreditsTab } from "@/components/settings/ai-credits-tab";
 
 type UsageMetric = { key: string; label: string; used: number; limit: number; unit: string; estimated?: boolean };
 
@@ -60,6 +61,10 @@ export default function UsagePage() {
           </SectionCard>
         </>
       ) : null}
+
+      {/* Phase B §25: AI credits are part of Usage & credits (they had their
+          own card, "AI & credits"); /dashboard/settings/ai still serves them alone. */}
+      <AICreditsSection />
     </div>
   );
 }
@@ -127,5 +132,29 @@ function BandwidthChart({ data }: { data: { day: string; count: number }[] }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function AICreditsSection() {
+  const creditsQuery = trpc.account.aiCredits.useQuery();
+  return (
+    <section id="ai-credits" className="mt-8">
+      <h2 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>
+        AI credits
+      </h2>
+      {creditsQuery.isLoading ? (
+        <LoadingSkeleton rows={2} variant="card" />
+      ) : !creditsQuery.data ? (
+        <ErrorState title="Couldn't load AI credits" onRetry={() => creditsQuery.refetch()} />
+      ) : (
+        <AICreditsTab
+          used={creditsQuery.data.used}
+          limit={creditsQuery.data.limit}
+          history={creditsQuery.data.history}
+          dailyPromptsUsed={creditsQuery.data.dailyPromptsUsed}
+          dailyPromptsLimit={creditsQuery.data.dailyPromptsLimit}
+        />
+      )}
+    </section>
   );
 }

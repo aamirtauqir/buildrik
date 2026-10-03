@@ -1,0 +1,97 @@
+{
+  "surface": "inspector-v4-05",
+  "board": "Inspector v4 · 05 · Button · S (Figma 7995:199522)",
+  "url": "http://localhost:3110/edit/<site>",
+  "run": "Dashboard-hosted, signed in: load the W0 fixture with load-inspector-v4-site.mjs, then `node scripts/conformance/measure.mjs inspector-v4-05 --url <dashboard>/edit/<site> --storage-state <login state> --eval \"$(node scripts/conformance/inspector-v4-state.mjs 5)\"` and `diff.mjs inspector-v4-05`. W4 (2026-10-02) joined the targets below to specs/inspector-v4-05.json; the board-vs-live screenshot walk is the acceptance (build plan §4.3), this recipe is the regression net.",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "inspector-panel"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-v4-05",
+      "nodeId": "7995:199690",
+      "skipProps": {
+        "height": "Board column is 812 tall because the board draws a 32px status footer under the editor body; the shipped shell has no footer, so the column runs to the viewport bottom (844). Shell layout, not the Inspector."
+      }
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header",
+      "spec": "inspector-v4-05",
+      "nodeId": "I7995:199691;7992:198579",
+      "skipProps": {
+        "width": "The column is 300 wide including its 1px left rule; content frames inside it measure 299. The board's 300-wide inner frames draw no rule."
+      }
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-v4-05",
+      "nodeId": "I7995:199691;7992:198583",
+      "skipProps": {
+        "gap": "Fixed-height chip (24px) centring a one-line label: the board's 2px vertical padding and 4px icon gap are drawn by the box height and the single text run (✦ AI), not by padding. Height, width and colours are compared.",
+        "padding-top": "Fixed-height chip (24px) centring a one-line label: the board's 2px vertical padding and 4px icon gap are drawn by the box height and the single text run (✦ AI), not by padding. Height, width and colours are compared.",
+        "padding-bottom": "Fixed-height chip (24px) centring a one-line label: the board's 2px vertical padding and 4px icon gap are drawn by the box height and the single text run (✦ AI), not by padding. Height, width and colours are compared."
+      }
+    },
+    {
+      "name": "tab-strip",
+      "testId": "inspector-tab-strip",
+      "spec": "inspector-v4-05",
+      "nodeId": "7995:199705",
+      "skipProps": {
+        "width": "The column is 300 wide including its 1px left rule; content frames inside it measure 299. The board's 300-wide inner frames draw no rule."
+      }
+    },
+    {
+      "name": "state-chip",
+      "testId": "inspector-state-chip",
+      "spec": "inspector-v4-05",
+      "nodeId": "7995:199719",
+      "skipProps": {
+        "padding-top": "24px pointer target (build plan §16, L3-C): the chip is 24 tall with its label centred; the board draws 20 with 2px padding. Same label position.",
+        "padding-bottom": "24px pointer target (build plan §16, L3-C): the chip is 24 tall with its label centred; the board draws 20 with 2px padding. Same label position."
+      }
+    },
+    {
+      "name": "empty-border",
+      "testId": "inspector-sechead-border",
+      "spec": "inspector-v4-05",
+      "nodeId": "8040:209855",
+      "skipProps": {
+        "width": "The column is 300 wide including its 1px left rule; content frames inside it measure 299. The board's 300-wide inner frames draw no rule."
+      }
+    },
+    {
+      "name": "empty-fill",
+      "testId": "inspector-sechead-fill",
+      "spec": "inspector-v4-05",
+      "nodeId": "8040:209831",
+      "skipProps": {
+        "width": "The column is 300 wide including its 1px left rule; content frames inside it measure 299. The board's 300-wide inner frames draw no rule."
+      }
+    },
+    {
+      "name": "segment-type",
+      "testId": "inspector-field-type",
+      "spec": "inspector-v4-05",
+      "nodeId": "8026:206603"
+    },
+    {
+      "name": "edit-text",
+      "testId": "inspector-edit-text-on-canvas",
+      "spec": "inspector-v4-05",
+      "nodeId": "8025:206634"
+    }
+  ]
+}

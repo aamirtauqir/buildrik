@@ -171,6 +171,55 @@ describe("only published records reach the exported page", () => {
   });
 });
 
+/* C0.7 / BD-03: a binding with nothing to show ships its fallback, or
+   nothing — never the element's stored text. That text is the canvas sample,
+   or the value of a record that has since been unpublished or deleted. */
+describe("an empty binding never ships the stored text", () => {
+  async function setup(fallback?: string) {
+    const cms = new CollectionManager();
+    const composer = {
+      data: { on: vi.fn(), off: vi.fn() },
+      markDirty: vi.fn(),
+      emit: vi.fn(),
+      elements: { getElement: () => null },
+    } as unknown as Composer;
+    const bindings = new CMSBindingManager(composer, cms);
+    (composer as unknown as { cms: unknown }).cms = { bindings };
+    const collection = await cms.createCollection("Posts");
+    const record = (await cms.createContentItem(collection.id, { title: "Was published" }))!;
+    return { cms, bindings, collection, record, composer };
+  }
+  const STALE = '<h1 data-buildrick-id="h1">Stale sample</h1><img data-buildrick-id="img" src="/old.png" alt="old">';
+
+  beforeEach(() => {
+    (Storage as typeof Storage & { __reset: () => void }).__reset();
+  });
+
+  it("writes the fallback when the only record is unpublished", async () => {
+    const { bindings, collection, composer } = await setup();
+    bindings.bindToField("h1", collection.id, undefined, "title", "content", "Coming soon");
+    const html = await new CMSExportResolver(composer).resolve(STALE, { mode: "static" });
+    expect(html).toContain(">Coming soon</h1>");
+    expect(html).not.toContain("Stale sample");
+  });
+
+  it("writes nothing when there is no fallback either", async () => {
+    const { bindings, collection, record, composer } = await setup();
+    bindings.bindToField("h1", collection.id, record.id, "title", "content");
+    const html = await new CMSExportResolver(composer).resolve(STALE, { mode: "static" });
+    expect(html).toContain('<h1 data-buildrick-id="h1"></h1>');
+  });
+
+  it("drops an empty src rather than shipping the old image", async () => {
+    const { bindings, collection, composer } = await setup();
+    bindings.bindToField("img", collection.id, undefined, "cover", "src");
+    bindings.bindToField("img", collection.id, undefined, "caption", "alt");
+    const html = await new CMSExportResolver(composer).resolve(STALE, { mode: "static" });
+    expect(html).not.toContain("/old.png");
+    expect(html).toContain('alt=""');
+  });
+});
+
 /* Ldata round 2: the published page is the XSS sink — `property` comes from
    stored bindings and the value from CMS entries, neither from this session. */
 describe("static resolution writes only allowlisted, safe values", () => {

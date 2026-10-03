@@ -86,6 +86,7 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
 }) => {
   const [zoom, setZoom] = React.useState<(typeof ZOOMS)[number]["value"]>("0.5");
   const [pageName, setPageName] = React.useState<string>("");
+  const [pageIsEmpty, setPageIsEmpty] = React.useState(false);
   const [doc, setDoc] = React.useState<string>("");
   const frameRef = React.useRef<HTMLIFrameElement | null>(null);
   const stagedCSS = React.useMemo(() => stagedTokensCSS(tokens, mode), [tokens, mode]);
@@ -98,6 +99,9 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
     let timer: number | null = null;
     const rebuild = () => {
       setPageName(composer.elements?.getActivePage?.()?.name ?? "");
+      const rootId = composer.elements?.getActivePage?.()?.root?.id;
+      const root = rootId ? composer.elements?.getElement?.(rootId) : null;
+      setPageIsEmpty(!!root && root.getChildren().length === 0);
       setDoc(buildDocument(composer));
     };
     const schedule = () => {
@@ -152,7 +156,7 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
         {/* 7315:80955 draws the zoom as bare text with a caret ("50% ▾"), not
             a boxed field: the bare theme strips flowbite's border, fill and
             arrow image, and the caret is drawn beside it. */}
-        <span className="tw:relative tw:inline-flex tw:items-center">
+        {!pageIsEmpty && <span className="tw:relative tw:inline-flex tw:items-center">
           <Select
             sizing="sm"
             aria-label="Preview zoom"
@@ -176,9 +180,16 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
           >
             ▾
           </span>
-        </span>
+        </span>}
       </header>
-      <div className="tw:flex tw:justify-center tw:px-4 tw:pb-2">
+      {pageIsEmpty ? (
+        <div className="tw:flex tw:flex-col tw:gap-3 tw:px-4 tw:pb-4" data-testid="brand-live-preview-empty">
+          {controls}
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+            This page is empty. Add content to the canvas to preview your brand changes.
+          </p>
+        </div>
+      ) : <div className="tw:flex tw:justify-center tw:px-4 tw:pb-2">
         <div
           className="tw:relative tw:overflow-hidden tw:rounded-[var(--bk-radius-sm)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-gray-50)]"
           style={{ width: FRAME_W, height: FRAME_H }}
@@ -212,7 +223,7 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
             />
           )}
         </div>
-      </div>
+      </div>}
     </section>
   );
 };

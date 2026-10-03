@@ -19,6 +19,7 @@ import { parseHTML, parseInlineStyles } from "../../../shared/utils/parsers";
 import type { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
 import { resolvePlacement } from "./placement";
+import { refineElementTypes } from "@/engine/migration/refineElementTypes";
 
 /**
  * Manages HTML parsing and import operations
@@ -190,7 +191,12 @@ export class HTMLParser {
 
     fragment.childNodes.forEach((node) => {
       if (node.nodeType === Node.ELEMENT_NODE) {
-        result.push(this.domElementToElementData(node as HTMLElement));
+        const data = this.domElementToElementData(node as HTMLElement);
+        /* The same proofs a saved project is upgraded by on load, so a pasted
+           `<label><input type="checkbox">…</label>` is a checkbox the moment
+           it lands, not only after the next reload. */
+        refineElementTypes(data);
+        result.push(data);
         done += 1;
         onSection?.(sectionLabel(node as HTMLElement), done, total);
       } else if (

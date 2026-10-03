@@ -4,7 +4,9 @@ import { TRPCError } from "@trpc/server";
 import { checkSiteRole, assertSiteAccess, getSiteWorkspace, PermissionError } from "@/server/services/permission.service";
 import type { PlanName } from "@/lib/constants/plan-limits";
 import { getSettingsOverview, getSiteOverview, getLocales, getRedirectSuggestions } from "@/server/services/site-detail.service";
-import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
+import { getSiteSettings, updateSiteSettings, updateProjectSettings } from "@/server/services/site-settings.service";
+import { updateProjectSettingsSchema } from "@buildrik/shared/schemas/project-settings";
+import { redactSitePassword } from "@/server/services/sites.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
 import {
@@ -30,6 +32,9 @@ import {
   createShareLinkSchema,
   siteAnalyticsQuerySchema,
 } from "@buildrik/shared/schemas/site-detail";
+
+const PROJECT_NAME_TAKEN_MESSAGE =
+  "This site's address clashes with another site. Change its URL slug in Settings, then connect the domain.";
 
 export const siteDetailRouter = router({
   overview: protectedProcedure
@@ -108,7 +113,7 @@ export const siteDetailRouter = router({
         }
         const { id, ...data } = input;
         try {
-          const result = await updateSiteSettings(id, data);
+          const result = redactSitePassword(await updateSiteSettings(id, data));
           const changedKeys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
           await recordForSite({
             siteId: id,
@@ -130,6 +135,51 @@ export const siteDetailRouter = router({
             });
           if (e instanceof Error && e.message === "DEFAULT_LOCALE_NOT_ENABLED")
             throw new TRPCError({ code: "BAD_REQUEST", message: "The default locale must be in the enabled locales list." });
+          if (e instanceof Error && e.message === "SLUG_TAKEN")
+            throw new TRPCError({ code: "CONFLICT", message: "Another site already uses that URL slug." });
+          if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "Another site already uses the address this slug would pin. Choose a different URL slug.",
+            });
+          throw e;
+        }
+      }),
+  }),
+
+  // BE-2: the Settings Save's JSON half (analytics, global CSS, the 404
+  // suggester, General's Author) — the values with no Site column. Role follows
+  // what the key controls: analytics, redirects and seo.author are EDITOR (same
+  // as saving the project they used to ride in); global CSS is ADMIN + Pro like
+  // head/body code.
+  projectSettings: router({
+    update: protectedProcedure
+      .input(updateProjectSettingsSchema)
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, input.patch.customCode ? "ADMIN" : "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        try {
+          const result = await updateProjectSettings(input.siteId, input.patch);
+          const changedKeys = Object.keys(input.patch);
+          await recordForSite({
+            siteId: input.siteId,
+            actorId: ctx.session.user!.id!,
+            action: "site.settings.updated",
+            targetType: "site",
+            targetId: input.siteId,
+            description: `Updated ${changedKeys.length} setting${changedKeys.length === 1 ? "" : "s"}`,
+            metadata: { changedKeys },
+          });
+          return result;
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "CUSTOM_CODE_NOT_AVAILABLE")
+            throw new TRPCError({ code: "FORBIDDEN", message: "Custom code requires Pro or above" });
+          if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+            throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
           throw e;
         }
       }),
@@ -251,11 +301,18 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "FORBIDDEN", message: "Redirect limit exceeded." });
           if (e instanceof Error && e.message === "CSV_TOO_LARGE")
             throw new TRPCError({ code: "BAD_REQUEST", message: "CSV exceeds 1000 rows." });
-          if (e instanceof Error && e.message.startsWith("INVALID_CSV_ROW:"))
+          /* 8136:215307: "Line 4: Destination is required — nothing imported". */
+          if (e instanceof Error && e.message.startsWith("INVALID_CSV_ROW:")) {
+            const [, line, ...reason] = e.message.split(":");
+            throw new TRPCError({ code: "BAD_REQUEST", message: `Line ${line}: ${reason.join(":")} — nothing imported` });
+          }
+          if (e instanceof Error && e.message.startsWith("DUPLICATE_CSV_ROW:")) {
+            const [, line, ...from] = e.message.split(":");
             throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: `Invalid redirect on line ${e.message.split(":")[1]} — expected "/from,to[,301|302]".`,
+              code: "CONFLICT",
+              message: `Line ${line}: a redirect from ${from.join(":")} already exists — nothing imported`,
             });
+          }
           throw e;
         }
       }),
@@ -339,6 +396,8 @@ export const siteDetailRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "DOMAIN_IN_USE")
             throw new TRPCError({ code: "CONFLICT", message: "Domain already in use." });
+          if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
+            throw new TRPCError({ code: "CONFLICT", message: PROJECT_NAME_TAKEN_MESSAGE });
           if (e instanceof Error && e.message === "DOMAIN_LIMIT")
             throw new TRPCError({ code: "FORBIDDEN", message: "You've reached your plan's custom-domain limit. Upgrade to add more." });
           if (e instanceof Error && e.message === "SITE_NOT_FOUND")

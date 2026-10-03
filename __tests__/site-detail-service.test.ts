@@ -15,6 +15,7 @@ vi.mock("@/lib/prisma", () => ({
     shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
     analyticsEvent: { findMany: vi.fn(), groupBy: vi.fn(), count: vi.fn() },
     dnsRecord: { createMany: vi.fn() },
+    $transaction: vi.fn(),
   },
 }));
 
@@ -107,10 +108,11 @@ describe("Site Detail Service", () => {
 
     it("importRedirects round-trips its own quoted export format", async () => {
       const { importRedirects } = await import("@/server/services/redirect.service");
-      vi.mocked(prisma.redirect.count).mockResolvedValue(0);
+      vi.mocked(prisma.$transaction).mockImplementation(async (fn: any) => fn(prisma));
+      vi.mocked(prisma.redirect.findMany).mockResolvedValue([]);
       vi.mocked(prisma.redirect.createMany).mockResolvedValue({ count: 1 } as any);
       const csv = 'from,to,type\n"/old","https://x.com","302"';
-      await importRedirects("s1", csv, "FREE");
+      await expect(importRedirects("s1", csv, "FREE")).resolves.toEqual({ created: 1 });
       const data = vi.mocked(prisma.redirect.createMany).mock.calls[0][0]!.data;
       expect(data).toEqual([{ siteId: "s1", fromPath: "/old", toUrl: "https://x.com", type: "302" }]);
     });
@@ -137,7 +139,7 @@ describe("Site Detail Service", () => {
 
     it("connectDomain creates domain with DNS records", async () => {
       const { connectDomain } = await import("@/server/services/domain.service");
-      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1" } as any);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1", slug: "s1", vercelProjectName: null } as any);
       vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as any);
       vi.mocked(prisma.domain.count).mockResolvedValue(0);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);

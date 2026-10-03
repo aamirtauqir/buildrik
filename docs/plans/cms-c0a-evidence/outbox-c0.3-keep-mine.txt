@@ -1,0 +1,20 @@
+13:17:48.824 Keep mine DB after B: Beta B-Keep mine 6620
+13:17:51.496 Keep mine A upserts for one save: 1 conflict toasts: 1 DB: Beta B-Keep mine 6620 A outbox: {"cmugopwzg005nnvjysp00b3pf":[{"key":"entryUpsert:zzc0a2-beta","op":"entryUpsert","item":{"id":"zzc0a2-beta","collectionId":"zzc0a-coll2","data":{"name":"Beta A-Keep mine 6620","description":"beta-desc-c0a"},"status":"published","createdAt":"2026-10-02T11:03:57.182Z","updatedAt":"2026-10-02T13:17:48.898Z"},"seq":"1790947068899-1"}]}
+13:17:51.521 Keep mine A sheet message: ["Saved on this device only. The server is offline — the change will sync when you reconnect."]
+13:17:54.710 Keep mine after click: conflict toasts: 0 DB: Beta A-Keep mine 6620 A outbox: {}
+13:17:54.717 Keep mine A visible Beta texts: ["Beta A-Keep mine 6620","Beta A-Keep mine 6620","Beta A-Keep mine 6620"] expected Beta A-Keep mine 6620
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.fill: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('#cms-field-name')[22m
+
+    at round (/private/tmp/claude-501/-Users-shahg-Desktop-pencil-buildrik-packages-editor/efcd568a-31ce-48ec-862b-20a9e7baaa9e/scratchpad/ob/c03.mjs:13:11)
+    at /private/tmp/claude-501/-Users-shahg-Desktop-pencil-buildrik-packages-editor/efcd568a-31ce-48ec-862b-20a9e7baaa9e/scratchpad/ob/c03.mjs:30:7 {
+  log: [ "  - waiting for locator('#cms-field-name')" ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.13.0

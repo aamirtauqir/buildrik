@@ -1,14 +1,16 @@
 /**
- * Visibility Section — per-breakpoint show/hide, as board 4428:141642's
- * "Show on [Desktop][Tablet][Mobile]" chip row.
+ * Visibility Section — Behaviour › Visibility (board 2): one checkbox per
+ * breakpoint, "Desktop · Tablet · Mobile", ticked = shown there. Unticking
+ * writes `--hide-<bp>: true`; ticking clears it.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { BREAKPOINTS as SHARED_BREAKPOINTS } from "../../../shared/constants/breakpoints";
+import { BREAKPOINTS as SHARED_BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { Section, type SectionTier } from "../shared/controls/Section";
-import { Button } from "@/editor/chrome-ui";
+import { useInspectorField } from "../shared/controls/InspectorFieldContext";
+import { Checkbox } from "@/editor/chrome-ui";
 
 export interface VisibilitySectionProps {
   styles: Record<string, string>;
@@ -33,18 +35,9 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
   onToggle,
   tier = "tertiary",
 }) => {
-  const getVisibility = (breakpointId: string): boolean => {
-    const hideKey = `--hide-${breakpointId}`;
-    return elementStyles[hideKey] !== "true";
-  };
-
-  const toggleVisibility = (breakpointId: string) => {
-    const hideKey = `--hide-${breakpointId}`;
-    const isCurrentlyVisible = getVisibility(breakpointId);
-    onChange(hideKey, isCurrentlyVisible ? "true" : "");
-  };
-
-  const hiddenCount = VISIBILITY_BREAKPOINTS.filter((bp) => !getVisibility(bp.id)).length;
+  const { readOnly, discrete } = useInspectorField();
+  const isVisible = (breakpointId: string): boolean => elementStyles[`--hide-${breakpointId}`] !== "true";
+  const hiddenCount = VISIBILITY_BREAKPOINTS.filter((bp) => !isVisible(bp.id)).length;
 
   return (
     <Section
@@ -54,53 +47,35 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
       onToggle={onToggle}
       tier={tier}
       id="inspector-section-visibility"
-      preview={
-        hiddenCount > 0 ? (
-          <span
-            style={{
-              font: "500 11px var(--bk-font-mono)",
-              color: "var(--bk-warning)",
-              background: "rgba(217, 119, 6, 0.12)",
-              padding: "1px 5px",
-              borderRadius: 3,
-            }}
-          >
-            hidden on {hiddenCount}
-          </span>
-        ) : undefined
-      }
+      preview={hiddenCount > 0 ? `hidden on ${hiddenCount}` : undefined}
     >
-      {/* Board 4428:141642: one "Show on" row of three chips — shown chips
-          filled in the accent tint, hidden ones outlined. Was three switch
-          rows. */}
-      <div className="bdi-row-ctrl" data-testid="visibility-show-on">
-        <span className="bdi-lb">Show on</span>
-        <div className="bdi-row-content">
-          {VISIBILITY_BREAKPOINTS.map((bp) => {
-            const isVisible = getVisibility(bp.id);
-            return (
-              <Button
-                key={bp.id}
-                type="button"
-                size="xs"
-                color="light"
-                data-testid={`visibility-chip-${bp.id}`}
-                className={
-                  "tw:h-6 tw:px-1.5 tw:rounded-md tw:text-[12px] tw:font-normal tw:whitespace-nowrap " +
-                  (isVisible
-                    ? "tw:border-transparent tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
-                    : "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink-muted)]")
-                }
-                onClick={() => toggleVisibility(bp.id)}
-                aria-label={`${isVisible ? "Visible" : "Hidden"} on ${bp.label}`}
-                aria-pressed={isVisible}
-                title={isVisible ? `Hide on ${bp.label}` : `Show on ${bp.label}`}
+      <div className="tw:flex tw:items-center tw:gap-1 tw:py-2" data-testid="visibility-show-on" role="group" aria-label="Show on">
+        {VISIBILITY_BREAKPOINTS.map((bp) => {
+          const shown = isVisible(bp.id);
+          const id = `visibility-${bp.id}`;
+          return (
+            <span key={bp.id} className="tw:flex tw:items-center tw:gap-1 tw:w-[84px]">
+              <Checkbox
+                id={id}
+                data-testid={`visibility-check-${bp.id}`}
+                checked={shown}
+                aria-readonly={readOnly || undefined}
+                onChange={() => {
+                  if (!readOnly) discrete(() => onChange(`--hide-${bp.id}`, shown ? "true" : ""));
+                }}
+                className="tw:size-4 tw:shrink-0"
+              />
+              {/* Read-only keeps the label from offering a click it refuses:
+                  a pointer over a locked box read as editable (QA 2026-10-02). */}
+              <label
+                htmlFor={id}
+                className={`${readOnly ? "tw:cursor-default" : "tw:cursor-pointer"} tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]`}
               >
                 {bp.label}
-              </Button>
-            );
-          })}
-        </div>
+              </label>
+            </span>
+          );
+        })}
       </div>
     </Section>
   );

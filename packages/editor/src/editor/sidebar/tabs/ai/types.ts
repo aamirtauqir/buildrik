@@ -7,9 +7,11 @@ export { DEFAULT_MODEL, type AIModel } from "@buildrik/shared/schemas/ai";
  *  other kind is a planned run over a pool of elements — the selection
  *  (`multi`), the elements of the selected one's type on this page
  *  (`similar`, board 6891:73760), the page, or every page (`site`, 6891:73974).
- *  `name` is what the run's copy calls the element ("restores Hero"). */
+ *  `label` is what the 4418:* band shows ("Hero section"), `title` the
+ *  element alone (board 35 "Heading"), `name` what the run's copy calls
+ *  it ("restores Hero"). */
 export type AIScope =
-  | { kind: "element"; id: string; label: string; name: string }
+  | { kind: "element"; id: string; label: string; title: string; name: string }
   | { kind: "multi"; ids: string[] }
   | { kind: "similar"; ids: string[]; noun: string }
   | { kind: "page" }

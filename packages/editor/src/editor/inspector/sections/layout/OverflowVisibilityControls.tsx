@@ -11,7 +11,7 @@ import {
   CONTROL_SELECT_WRAP,
   compactBtnClass,
 } from "../../shared/controls/controlClasses";
-import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import { MixedValueIndicator } from "../../shared/controls";
 import { Button, Select } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
@@ -20,7 +20,6 @@ import { Button, Select } from "@/editor/chrome-ui";
 export interface OverflowVisibilityControlsProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -48,13 +47,12 @@ const CLEAR_OPTIONS = ["none", "left", "right", "both"] as const;
 export const OverflowControls: React.FC<OverflowVisibilityControlsProps> = ({
   styles,
   onChange,
-  mixedKeys,
 }) => {
   return (
     <>
       {/* Main overflow control */}
       <div className={CONTROL_ROW}>
-        {mixedKeys?.has("overflow") && <MixedValueBadge compact />}
+        <MixedValueIndicator property="overflow" />
         <div className={CONTROL_BTN_GROUP}>
           {OVERFLOW_OPTIONS.map((option) => (
             <Button
@@ -75,7 +73,7 @@ export const OverflowControls: React.FC<OverflowVisibilityControlsProps> = ({
       <OverflowXYControls styles={styles} onChange={onChange} />
       {/* Box sizing */}
       <div className={CONTROL_ROW}>
-        {mixedKeys?.has("box-sizing") && <MixedValueBadge compact />}
+        <MixedValueIndicator property="box-sizing" />
         <div className={CONTROL_BTN_GROUP}>
           {BOX_SIZING_OPTIONS.map((option) => (
             <Button
@@ -146,13 +144,12 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({ styles, onChang
 export const VisibilityFloatControls: React.FC<OverflowVisibilityControlsProps> = ({
   styles,
   onChange,
-  mixedKeys,
 }) => {
   return (
     <>
       {/* Visibility */}
       <div className={CONTROL_ROW}>
-        {mixedKeys?.has("visibility") && <MixedValueBadge compact />}
+        <MixedValueIndicator property="visibility" />
         <label className={CONTROL_LABEL}>Visible</label>
         <div className={CONTROL_BTN_GROUP}>
           {VISIBILITY_OPTIONS.map((val) => (
@@ -169,7 +166,7 @@ export const VisibilityFloatControls: React.FC<OverflowVisibilityControlsProps> 
       </div>
       {/* Float */}
       <div className={CONTROL_ROW}>
-        {mixedKeys?.has("float") && <MixedValueBadge compact />}
+        <MixedValueIndicator property="float" />
         <label className={CONTROL_LABEL}>Float</label>
         <div className={CONTROL_BTN_GROUP}>
           {FLOAT_OPTIONS.map((val) => (
@@ -186,7 +183,7 @@ export const VisibilityFloatControls: React.FC<OverflowVisibilityControlsProps> 
       </div>
       {/* Clear */}
       <div className={CONTROL_ROW}>
-        {mixedKeys?.has("clear") && <MixedValueBadge compact />}
+        <MixedValueIndicator property="clear" />
         <label className={CONTROL_LABEL}>Clear</label>
         <div className={CONTROL_BTN_GROUP}>
           {CLEAR_OPTIONS.map((val) => (

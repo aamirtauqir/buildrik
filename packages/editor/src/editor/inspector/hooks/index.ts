@@ -15,14 +15,6 @@ export type { StyleHandlers } from "./useStyleHandlers";
 export { useAdvancedSettings } from "./useAdvancedSettings";
 export type { UseAdvancedSettingsOptions, UseAdvancedSettingsReturn } from "./useAdvancedSettings";
 
-export { useInspectorSections, TOTAL_SECTIONS } from "./useInspectorSections";
-export type {
-  UseInspectorSectionsOptions,
-  UseInspectorSectionsResult,
-} from "./useInspectorSections";
+export { useInspectorSections } from "./useInspectorSections";
+export type { UseInspectorSectionsResult } from "./useInspectorSections";
 
-export { useBatchStyleHandler } from "./useBatchStyleHandler";
-export type { UseBatchStyleHandlerResult } from "./useBatchStyleHandler";
-
-export { useInspectorTier } from "./useInspectorTier";
-export type { InspectorTier } from "./useInspectorTier";

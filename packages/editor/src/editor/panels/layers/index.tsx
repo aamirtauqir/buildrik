@@ -18,7 +18,7 @@ import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
 import { itemMatches } from "./hooks/useLayerSearch";
-import { findById as findLayer, getDisplayName } from "./data/layerUtils";
+import { findById as findLayer, flattenTree, getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
 import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
@@ -32,6 +32,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   onLayerHover,
   canvasHoveredId,
   search,
+  selecting = false,
   displaySettingsOpen,
   onDisplaySettingsToggle,
 }) => {
@@ -433,6 +434,25 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     return flat;
   }, [treeFiltered, state.searchHook.isSearching, state.search, state.actionsHook.customNames]);
 
+  /* LayersTab's "Select all" (selection mode): every row the list is
+     showing — the matches while a filter is on, otherwise the whole tree
+     (collapsed branches included; dimmed rows only while they are listed). */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onSelectAll = () => {
+      const listed = state.searchHook.isSearching ? filteredLayers : flattenTree(state.layers);
+      const els = listed
+        .filter((l) => state.displayPrefs.showDimmed || !state.hiddenIds.has(l.id))
+        .map((l) => composer.elements.getElement(l.id))
+        .filter((el): el is NonNullable<typeof el> => !!el);
+      composer.selection.selectMultiple(els);
+    };
+    composer.on("layers:select-all", onSelectAll);
+    return () => {
+      composer.off("layers:select-all", onSelectAll);
+    };
+  }, [composer, filteredLayers, state.layers, state.searchHook.isSearching, state.displayPrefs.showDimmed, state.hiddenIds]);
+
   return (
     <div className="bdc-layers-panel tw:relative">
       {displaySettingsOpen && (
@@ -531,6 +551,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             onContextMenu={state.openContextMenu}
             getVisibleLayerIds={state.getVisibleLayerIds}
             displayPrefs={state.displayPrefs}
+            selecting={selecting}
           />
         ))}
         {dropFeedback && (

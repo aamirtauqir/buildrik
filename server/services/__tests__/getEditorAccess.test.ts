@@ -28,7 +28,7 @@ vi.mock("@/server/services/permission.service", () => ({
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 vi.mock("@/server/services/email.service", () => ({ sendSiteTransferredEmail: vi.fn() }));
 vi.mock("@/lib/constants/plan-limits", () => ({ PLAN_LIMITS: {} }));
-vi.mock("@buildrik/shared/schemas/sites", () => ({}));
+vi.mock("@buildrik/shared/schemas/sites", () => ({ SITE_RESTORE_WINDOW_DAYS: 30 }));
 
 import { getEditorAccess } from "@server/services/sites.service";
 

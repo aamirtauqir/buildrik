@@ -110,8 +110,10 @@
 /* The page root is excluded: an empty PAGE is board 65:2's job — one
    sentence and two routes into the product — not a 60px dashed box telling
    someone to drop blocks into a canvas they have not started. Empty
-   containers the user placed themselves still get the affordance. */
-[data-buildrick-type="container"]:not(.buildrick-page-root):empty,
+   containers the user placed themselves still get the affordance. A
+   `<progress>` (the Progress widget's bar) is empty by nature — it is a
+   drawn control, not a box waiting for blocks. */
+[data-buildrick-type="container"]:not(.buildrick-page-root):not(progress):empty,
 [data-buildrick-type="columns"]:empty {
   min-height: 60px;
   background: var(--bk-bg-subtle);
@@ -122,7 +124,7 @@
   justify-content: center;
 }
 
-[data-buildrick-type="container"]:not(.buildrick-page-root):empty::after,
+[data-buildrick-type="container"]:not(.buildrick-page-root):not(progress):empty::after,
 [data-buildrick-type="columns"]:empty::after {
   /* Names a route that exists. The "Quick Add above ↑" this used to point at
      was a floating bar that no screen ever mounted — deleted with this edit;
@@ -152,7 +154,7 @@
    here" hint are build-time affordances — they tell you where to put something,
    which is not a thing the person holding a review link can do. Founder call,
    2026-08-23: the client sees what Figma's view mode shows, not the editor. */
-.bk-read-only-view [data-buildrick-type="container"]:not(.buildrick-page-root):empty::after,
+.bk-read-only-view [data-buildrick-type="container"]:not(.buildrick-page-root):not(progress):empty::after,
 .bk-read-only-view [data-buildrick-type="columns"]:empty::after {
   content: "";
   padding: 0;
@@ -378,6 +380,9 @@
   padding: var(--bk-space-24);
   background: transparent;
   animation: bd-fade-in 0.4s ease-out;
+  box-sizing: border-box;
+  overflow: auto;
+  /* Keep counter-scaled chrome inside the fitted page. */
   /* Board 297:2008 expresses the 12 between the sentence and the buttons as a
      GAP on the block, not as a margin under the sentence. Same picture, and
      only one of the two can be measured. */
@@ -409,7 +414,10 @@
 
 /* The three template cards — swatch over name — at the board's 12 gap. */
 .bd-canvas-empty-cta__cards {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  max-width: 468px;
   gap: var(--bk-space-12);
   margin: var(--bk-space-4) 0;
   padding: 0;
@@ -419,7 +427,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-4);
-  width: 148px;
+  width: 100%;
   height: 75px;
   padding: var(--bk-space-8);
   box-sizing: border-box;
@@ -457,11 +465,13 @@ button:hover > .bd-canvas-empty-cta__thumb {
    scale and no token for it; 12 is the step the board's own grid rounds to. */
 .bd-canvas-empty-cta__actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
   align-items: center;
   gap: var(--bk-space-12);
 }
-/* Four actions on one line inside a fitted page card (board 4428:44164);
-   a button label never breaks across two lines. */
+/* Wrap whole actions inside a fitted page; keep each label together. */
 .bd-canvas-empty-cta__actions > button {
   flex-shrink: 0;
   white-space: nowrap;
@@ -657,6 +667,14 @@ button:hover > .bd-canvas-empty-cta__thumb {
   filter: grayscale(1);
 }
 
+/* An embed's <iframe> (embedFrameHTML) is a separate document: a click on it
+   never reaches the canvas, so the Video / Map embed could not be selected by
+   clicking it. On the canvas the frame is a picture of the embed; it plays on
+   the published page and in Preview. */
+.buildrick-canvas iframe[data-bk-embed] {
+  pointer-events: none;
+}
+
 /* Badges — board 817:4649: "Element type badges shown on hover. Blue chip
    labels: 'Section','Flex','Text','Image'." They used to sit on every element
    at once, in a dark chip with muted text (plus one orange one for images),
@@ -784,6 +802,7 @@ button:hover > .bd-canvas-empty-cta__thumb {
 .bd-canvas-scroll {
   flex: 1;
   min-width: 0;
+  min-height: 0; /* the wrapper is a column now — the docked footer sits under this */
   display: flex;
   align-items: center;
   justify-content: safe center;

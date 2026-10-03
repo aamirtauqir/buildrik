@@ -19,7 +19,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode, isColumnTabOpen, isInspectorColumnOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
-import { useToast } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
@@ -150,6 +150,31 @@ export interface StudioPanelsProps {
 /** How long a section-focus request waits for the inspector body (m-1). */
 const PENDING_FOCUS_MS = 500;
 
+/** Gives a held selection back after an escalation (P-5, §13). An element
+ *  deleted meanwhile is not brought back. */
+function restoreSelection(composer: Composer, ids: readonly string[]): void {
+  const alive = ids
+    .map((id) => composer.elements.getElement(id))
+    .filter((el): el is NonNullable<typeof el> => !!el);
+  if (alive.length === 1) composer.selection.select(alive[0]);
+  else if (alive.length > 1) composer.selection.selectMultiple(alive);
+}
+
+/** Where "‹ Back to canvas" in the CMS workspace returns to (§13 Open record
+ *  / Open collection): the drawer as it was, and the element the door was on. */
+interface CmsReturn {
+  tab: string;
+  drawerOpen: boolean;
+  ids: string[];
+}
+
+/* Board 36 (7995:210885): a 188 × 28 panel action, 20 in from the canvas's
+   top right, label and shortcut centred, 13/500 gray-700. */
+const SHOW_INSPECTOR =
+  "tw:absolute tw:top-5 tw:right-5 tw:z-[var(--bk-z-chrome)] tw:h-7 tw:w-[188px] tw:gap-1.5 tw:rounded-md " +
+  "tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 " +
+  "tw:font-medium tw:text-[var(--bk-gray-700)] tw:focus:ring-0";
+
 const styles = {
   container: {
     flex: 1,
@@ -178,6 +203,11 @@ const styles = {
     width: "100%",
     display: "flex",
     flex: 1,
+    /* Under the 36px page-tab bar, `height: 100%` resolved to the whole
+       column and min-height:auto kept it there — the canvas ran 36px past the
+       viewport's bottom. Invisible while the footer toolbar floated 56 up;
+       docked to the bottom edge (owner decision 2026-10-03) it was cut off. */
+    minHeight: 0,
     position: "relative" as const,
     zIndex: 1,
   } as React.CSSProperties,
@@ -301,26 +331,14 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      no-selection board is still the default state — collapsing it
      automatically was tried before and rendered that board off-viewport.
      Session-only (gap walk 93 #3): persisted, a reload left the inspector
-     hidden with no visible way back, and no board draws a "Show inspector"
-     control. The hide answers with a toast whose action is that way back;
-     ⌘K "Toggle inspector" stays the other door. */
+     hidden with no visible way back. Board 36 draws that way back now — the
+     canvas's own "Show inspector ⌘\" (below) — so the hide no longer answers
+     with a toast; ⌘\ and ⌘K "Toggle inspector" are the other doors. */
   const [inspectorShown, setInspectorShown] = React.useState<boolean>(true);
-  const inspectorShownRef = React.useRef(inspectorShown);
+  const toggleInspector = React.useCallback(() => setInspectorShown((v) => !v), []);
   /* What the inspector column shows this render (assigned below, once known):
-     read by the toggle's toast and the section-focus route. */
+     read by the section-focus route. */
   const columnRef = React.useRef({ bodyShown: false, blocked: false, rightColumnTab: false });
-  inspectorShownRef.current = inspectorShown;
-  const toggleInspector = React.useCallback(() => {
-    const next = !inspectorShownRef.current;
-    setInspectorShown(next);
-    /* M-2: with a mode over the inspector (⌘K Toggle inspector while AI is
-       up) nothing on screen changes, so there is nothing to announce. */
-    if (!next && columnRef.current.bodyShown)
-      addToast({
-        description: "Inspector hidden",
-        action: { label: "Show", onClick: () => setInspectorShown(true) },
-      });
-  }, [addToast]);
   /* The toggle's doors are the inspector's own ✕ and the ⌘K row
      (`toggle-inspector`, commands registry) — both emit this event (G2-037:
      the footer word bar's Inspector toggle had no home on the board). */
@@ -427,6 +445,23 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
   const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
+  const [cmsReturn, setCmsReturn] = React.useState<CmsReturn | null>(null);
+  /* Leaving the workspace any other way (the rail, a closed drawer) ends the
+     visit: the return is not offered to a later, unrelated one. */
+  const cmsWasOpen = React.useRef(cmsWorkspaceOpen);
+  React.useEffect(() => {
+    if (cmsWasOpen.current && !cmsWorkspaceOpen) setCmsReturn(null);
+    cmsWasOpen.current = cmsWorkspaceOpen;
+  }, [cmsWorkspaceOpen]);
+  const backToCanvas = React.useCallback(() => {
+    const back = cmsReturn;
+    if (!back || !composer) return;
+    setCmsReturn(null);
+    onLeftPanelTabChange?.(back.tab, () => {
+      if (!back.drawerOpen) onLeftPanelToggle?.();
+      restoreSelection(composer, back.ids);
+    });
+  }, [cmsReturn, composer, onLeftPanelTabChange, onLeftPanelToggle]);
   const inspectorOpen = isInspectorColumnOpen({
     readOnlyView,
     viewerChrome,
@@ -435,6 +470,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     inspectorShown,
     columnModeOpen: rightColumnTab || issuesOpen || aiInInspector,
   });
+  /* Board 36's "Show inspector ⌘\": only when the user hid the inspector and
+     nothing else fills or replaces its column. */
+  const showInspectorDoor =
+    !readOnlyView && !inspectorShown && !inspectorOpen && !effectiveFullPageMode && !cmsWorkspaceOpen;
   /* The inspector BODY (ProInspector) is on screen: its column is open and no
      mode (Issues · a column tab · AI) has replaced it. */
   const inspectorBodyShown =
@@ -514,9 +553,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* A-6: a full-page surface hides the canvas selection but does not clear
      it — the command guard now refuses shortcuts on that surface, but the
      selection itself should not sit stale (highlighted on a canvas the user
-     cannot see) while a full page is open. */
+     cannot see) while a full page is open.
+     P-5: it is HELD, not dropped. Brand (a token chip), the Asset library
+     ("Manage SVG") and Settings are escalations from the element being
+     edited; "Back to canvas" gives the same selection back, and the
+     inspector — mounted throughout — keeps its tab and scroll for it. An
+     element deleted while the page was open is not brought back. */
+  const heldSelectionRef = React.useRef<string[] | null>(null);
   React.useEffect(() => {
-    if (effectiveFullPageMode) composer?.selection.clear();
+    if (!composer) return;
+    if (effectiveFullPageMode) {
+      const ids = composer.selection.getSelectedIds();
+      if (ids.length > 0) heldSelectionRef.current = ids;
+      composer.selection.clear();
+      return;
+    }
+    const held = heldSelectionRef.current;
+    heldSelectionRef.current = null;
+    if (!held || composer.selection.getSelectedIds().length > 0) return;
+    restoreSelection(composer, held);
   }, [effectiveFullPageMode, composer]);
 
   // Listen for panel open events from composer
@@ -562,9 +617,17 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
     /* ⌘K → a collection or record. The workspace reads its store, which
        outlives it, so the request is written there and the tab switched. */
+    /* §13: a door on an element (the inspector's Open record ›, Open
+       collection ›) remembers where it was opened, so the workspace can offer
+       "‹ Back to canvas". A request with nothing selected (⌘K) has no element
+       to return to; one made from inside the workspace keeps the first. */
     const openCms = (data: CmsOpenRequest) => {
+      const ids = composer.selection.getSelectedIds();
+      const from: CmsReturn | null =
+        ids.length > 0 && !cmsWorkspaceOpen ? { tab: activeTabId, drawerOpen: isLeftPanelOpen, ids } : null;
       onLeftPanelTabChange?.("content", () => {
         cmsWorkspace.openRequest(data);
+        if (from) setCmsReturn(from);
         openDrawer();
       });
     };
@@ -581,7 +644,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings);
       composer.off(EVENTS.UI_CMS_OPEN, openCms);
     };
-  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
+  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle, activeTabId, cmsWorkspaceOpen]);
 
   /* A request is one visit's: leaving the tab drops it, so the next plain
      visit does not land on that screen again. */
@@ -655,23 +718,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       }
     },
     [composer]
-  );
-
-  const handleDelete = React.useCallback(
-    (id: string) => {
-      if (!composer) return;
-      const element = composer.elements.getElement(id);
-      const elementType = element?.getType?.() || "element";
-      const elementLabel = elementType.charAt(0).toUpperCase() + elementType.slice(1);
-      composer.elements.removeElement(id);
-      addToast({
-        description: `${elementLabel} deleted`,
-        tone: "info",
-        duration: 5000,
-        action: { label: "Undo", onClick: composer.history.captureUndo() },
-      });
-    },
-    [composer, addToast]
   );
 
   const handleRailTabChange = React.useCallback(
@@ -839,6 +885,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               canUndo={canUndo}
               canRedo={canRedo}
             />
+            {/* Board 36: with the inspector hidden the canvas runs full width
+                and carries the way back at its top right. */}
+            {showInspectorDoor ? (
+              <Button
+                color="light"
+                size="xs"
+                className={SHOW_INSPECTOR}
+                aria-label="Show inspector"
+                aria-keyshortcuts={"Meta+\\"}
+                title={"Show inspector (⌘\\)"}
+                data-testid="show-inspector"
+                onClick={() => setInspectorShown(true)}
+              >
+                Show inspector
+                <kbd className="tw:font-[inherit]" aria-hidden="true">
+                  {"⌘\\"}
+                </kbd>
+              </Button>
+            ) : null}
           </div>
           {/* FC-7 takeover shape 2 of 3 (see FullPageRouter.tsx's "THE THREE
               TAKEOVER SHAPES" contract): an in-place region over the canvas,
@@ -847,7 +912,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           {cmsWorkspaceOpen ? (
             <div className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:bg-[var(--bk-bg-panel)]" data-testid="cms-workspace-host">
               <React.Suspense fallback={null}>
-                <CmsWorkspace composer={composer} onCreateCollection={onOpenCreateCollection} onOpenMediaLibrary={pickForCms} />
+                <CmsWorkspace
+                  composer={composer}
+                  onCreateCollection={onOpenCreateCollection}
+                  onOpenMediaLibrary={pickForCms}
+                  onBackToCanvas={cmsReturn ? backToCanvas : undefined}
+                />
               </React.Suspense>
             </div>
           ) : null}
@@ -875,29 +945,42 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             })
           ) : rightColumnTab ? (
             columnPanel
-          ) : aiInInspector ? (
-            <AITab
-              composer={composer}
-              isExpanded={false}
-              onExpandToggle={() => {}}
-              onClose={() => setAiInInspector(false)}
-              /* M-1: "‹ Inspector" leads to the inspector — shown even if it
-                 was hidden, where closing AI alone took the column with it. */
-              onBack={() => {
-                setAiInInspector(false);
-                setInspectorShown(true);
-              }}
-            />
           ) : (
-          <ProInspector
-            composer={composer}
-            selectedElement={selectedElement}
-            currentBreakpoint={device}
-            onDelete={handleDelete}
-            onOpenMediaLibrary={onOpenMediaLibrary}
-            onOpenIconPicker={onOpenIconPicker}
-            onOpenCreateCollection={onOpenCreateCollection}
-          />
+          <>
+            {aiInInspector ? (
+              <AITab
+                composer={composer}
+                isExpanded={false}
+                onExpandToggle={() => {}}
+                onClose={() => setAiInInspector(false)}
+                /* M-1: "‹ Inspector" leads to the inspector — shown even if it
+                   was hidden, where closing AI alone took the column with it. */
+                onBack={() => {
+                  setAiInInspector(false);
+                  setInspectorShown(true);
+                }}
+              />
+            ) : null}
+            {/* P-7a: AI covers the inspector; it does not unmount it. The
+                round trip used to reset the tab to Style, the scroll to 0 and
+                a :hover state to Base. `invisible` keeps the layout box, so
+                the scroll offset survives, and takes it out of the tab order
+                and the accessibility tree. */}
+            <div
+              className={aiInInspector ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
+              aria-hidden={aiInInspector || undefined}
+              data-testid="inspector-body-host"
+            >
+              <ProInspector
+                composer={composer}
+                selectedElement={selectedElement}
+                currentBreakpoint={device}
+                onOpenMediaLibrary={onOpenMediaLibrary}
+                onOpenIconPicker={onOpenIconPicker}
+                onOpenCreateCollection={onOpenCreateCollection}
+              />
+            </div>
+          </>
           )}
         </LayoutShell.Inspector>
         )}
