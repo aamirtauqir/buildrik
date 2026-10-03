@@ -134,9 +134,10 @@ describe("AccessScreen — Share links and the load states", () => {
     expect(link).toHaveAttribute("target", "_blank");
     expect(link.id).toBe("access-share-links");
     cleanup();
+    // Navigation: it stays on the read-only screen.
     setup({ readOnly: true });
     await loaded();
-    expect(screen.queryByTestId("set-access-share-links")).toBeNull();
+    expect(screen.getByTestId("set-access-share-links").tagName).toBe("A");
   });
 
   it("a failed read is the load-error card with Try again", async () => {

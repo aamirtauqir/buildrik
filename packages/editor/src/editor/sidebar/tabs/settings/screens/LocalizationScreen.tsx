@@ -271,11 +271,10 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
           <p className="tw:m-0 tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink-muted)]">
             Saves immediately
           </p>
-          {readOnly ? null : (
-            <Button size="xs" className={ADD_BTN} onClick={() => setAddOpen(true)} data-testid="set-loc-add">
-              Add locale
-            </Button>
-          )}
+          {/* A write: disabled, not hidden, on the read-only screen. */}
+          <Button size="xs" className={ADD_BTN} disabled={readOnly} onClick={() => setAddOpen(true)} data-testid="set-loc-add">
+            Add locale
+          </Button>
         </div>
         {actionError ? (
           <div role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-loc-action-error">
@@ -312,11 +311,11 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
                     <span className="tw:text-[var(--bk-accent)]" data-testid={`set-loc-row-default-${row.code}`}>
                       Default
                     </span>
-                  ) : readOnly ? null : (
+                  ) : (
                     <Button
                       variant="link"
                       className="tw:min-h-5"
-                      disabled={busy || enabledLocales.length <= 1}
+                      disabled={readOnly || busy || enabledLocales.length <= 1}
                       onClick={() => askRemove(row)}
                       data-testid={`set-loc-row-remove-${row.code}`}
                     >

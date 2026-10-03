@@ -55,7 +55,6 @@ export const AccessScreen: React.FC<ScreenProps> = ({
   registerFieldErrors,
   fieldErrors,
   saveError,
-  readOnly,
   planLocked,
   onUpgrade,
 }) => {
@@ -111,7 +110,8 @@ export const AccessScreen: React.FC<ScreenProps> = ({
   const shareLinks = (
     <section className={CARD} data-testid="set-card-share-links">
       <h3 className={TITLE}>Share links</h3>
-      {readOnly || !projectId ? null : (
+      {/* Navigation: it stays on the read-only screen. */}
+      {!projectId ? null : (
         <a
           id="access-share-links"
           className={DOOR_LINK}

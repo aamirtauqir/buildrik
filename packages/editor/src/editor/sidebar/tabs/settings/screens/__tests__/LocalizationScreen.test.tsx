@@ -125,11 +125,11 @@ describe("Languages · 8135:214023", () => {
     expect(note.className).not.toMatch(/tw:bg-|tw:border/);
   });
 
-  it("read-only hides Add locale and Remove", async () => {
+  it("read-only draws Add locale and Remove disabled (writes stay in view)", async () => {
     setup({ readOnly: true });
     await loaded();
-    expect(screen.queryByTestId("set-loc-add")).toBeNull();
-    expect(screen.queryByTestId("set-loc-row-remove-fr")).toBeNull();
+    expect((screen.getByTestId("set-loc-add") as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByTestId("set-loc-row-remove-fr") as HTMLButtonElement).disabled).toBe(true);
   });
 });
 

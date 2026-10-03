@@ -431,7 +431,9 @@ Shell visuals follow the boards: M0 nav `4418:144988` (on `8134:212121`), M1 `81
 - `saveModel: "footer" | "immediate"` — the screen's model (`SCREEN_SAVE_MODEL`).
 - `readOnly: boolean` — the member is below `SCREEN_MIN_ROLE`. The shell already shows the M2 notice, disables every native
   control (a disabled `<fieldset>`), hides the header action and the save bar, and turns off the per-field
-  `SiteColumnGate` hints; hide anything else that acts (links, menus).
+  `SiteColumnGate` hints; hide anything else that acts (links, menus). **Narrowed by the owner 2026-10-04
+  (`8134:212323`):** navigation stays visible and live (an anchor escapes the disabled fieldset); writes stay visible,
+  disabled. The Danger zone renders its own notice and disables per action (a creator ADMIN keeps Transfer).
 - `registerFieldErrors(errors | null)` — report the screen's own invalid fields (keyed by settings path); while any are
   reported the footer's Save is disabled.
 - `fieldErrors` — the fields the server refused on the last Save, keyed by `ProjectSettings` path

@@ -104,10 +104,12 @@ async function uploadSiteIcon(siteId: string, file: File, context: "favicon" | "
 
 const ICON_LABEL = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]";
 const ICON_HINT = "tw:text-[length:var(--bk-text-11)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
-/* 8135:212925 `Button · Upload favicon`: ghost, 32 tall, 12 in, 13/500. */
+/* 8135:212925 `Button · Upload favicon`: ghost, 32 tall, 12 in, 13/500;
+   8134:212323 draws it disabled as grey text, no fill. */
 const UPLOAD_BTN =
   "tw:h-8 tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:bg-transparent tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium " +
-  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0 tw:focus:shadow-none " +
+  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:disabled:bg-transparent tw:disabled:text-[var(--bk-gray-400)] " +
+  "tw:focus:ring-0 tw:focus:shadow-none " +
   "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const FIELD_ROW = "tw:grid tw:grid-cols-2 tw:gap-x-6 tw:gap-y-4";
 
@@ -125,7 +127,7 @@ interface IconUploadProps {
   value: string;
   initials: string;
   busy: boolean;
-  /** Read-only (role below ADMIN): the preview and hint stay, the upload goes. */
+  /** Read-only (role below ADMIN): the upload stays in view, disabled (8134:212323). */
   readOnly?: boolean;
   onPick(file: File): void;
 }
@@ -149,20 +151,18 @@ function IconUpload({ id, label, hint, button, accept, value, initials, busy, re
             </span>
           )}
         </div>
-        {readOnly ? null : (
-          <Button
-            id={id}
-            type="button"
-            size="xs"
-            variant="ghost"
-            className={UPLOAD_BTN}
-            disabled={busy}
-            onClick={() => fileRef.current?.click()}
-            data-testid={`set-${id}-upload`}
-          >
-            {busy ? "Uploading…" : button}
-          </Button>
-        )}
+        <Button
+          id={id}
+          type="button"
+          size="xs"
+          variant="ghost"
+          className={UPLOAD_BTN}
+          disabled={busy || readOnly}
+          onClick={() => fileRef.current?.click()}
+          data-testid={`set-${id}-upload`}
+        >
+          {busy ? "Uploading…" : button}
+        </Button>
         <span className={ICON_HINT}>{hint}</span>
         <TextInput
           ref={fileRef}
@@ -448,21 +448,21 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
           )}
         </Field>
 
-        {readOnly ? (
-          <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
-            {`${localeLabel(language)} (${language})`}
-          </p>
-        ) : (
-          <Button
-            type="button"
-            variant="link"
-            className="tw:min-h-5 tw:w-fit tw:font-medium"
-            onClick={() => onOpenScreen?.("localization")}
-            data-testid="set-general-language"
-          >
-            {`${localeLabel(language)} (${language}) · Manage in Languages ›`}
-          </Button>
-        )}
+        {/* Navigation, so it stays — and works — on the read-only screen
+            (8134:212323): an anchor, which the shell's disabled fieldset
+            does not disable. */}
+        <Button
+          href="#localization"
+          variant="link"
+          className="tw:min-h-5 tw:w-fit tw:font-medium"
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault();
+            onOpenScreen?.("localization");
+          }}
+          data-testid="set-general-language"
+        >
+          {`${localeLabel(language)} (${language}) · Manage in Languages ›`}
+        </Button>
       </SettingsCard>
 
       <SettingsCard title="Advanced" open={advancedOpen} onToggle={setAdvancedOpen} anchors={["site-slug"]}>

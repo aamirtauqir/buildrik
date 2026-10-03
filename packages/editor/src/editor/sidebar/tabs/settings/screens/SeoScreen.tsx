@@ -130,7 +130,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
   registerRetryLoad,
   saveError,
   fieldErrors,
-  readOnly,
 }) => {
   const seo = composer?.getProjectSettings().seo;
   const legacyHandle = seo?.twitterHandle ?? "";
@@ -331,19 +330,20 @@ export const SeoScreen: React.FC<ScreenProps> = ({
       {open.defaults ? (
         <div className={`${NOTICE} tw:bg-[var(--bk-accent-tint)]`} data-testid="set-seo-pages-strip">
           Page titles and descriptions can be overridden per page in{" "}
-          {readOnly ? (
-            "Pages ›"
-          ) : (
-            <Button
-              type="button"
-              variant="link"
-              className="tw:inline-flex tw:min-h-5 tw:align-baseline tw:text-[var(--bk-ink)]"
-              onClick={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" })}
-              data-testid="set-seo-pages-link"
-            >
-              Pages ›
-            </Button>
-          )}
+          {/* Navigation stays live on the read-only screen: an anchor, which
+              the shell's disabled fieldset does not disable. */}
+          <Button
+            href="#pages"
+            variant="link"
+            className="tw:inline-flex tw:min-h-5 tw:align-baseline tw:text-[var(--bk-ink)]"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
+            }}
+            data-testid="set-seo-pages-link"
+          >
+            Pages ›
+          </Button>
         </div>
       ) : null}
 

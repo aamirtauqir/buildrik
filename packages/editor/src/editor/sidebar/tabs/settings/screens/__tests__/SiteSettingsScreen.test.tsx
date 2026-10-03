@@ -86,8 +86,11 @@ function setup(opts: { projectId?: string | null; saveError?: string | null; sit
       {...props}
     />,
     {
+      /* Read-only: the shell wraps the screen in a disabled fieldset. */
       wrapper: ({ children }: { children: React.ReactNode }) => (
-        <SiteColumnsLockedContext.Provider value={opts.siteColumnsLocked ?? false}>{children}</SiteColumnsLockedContext.Provider>
+        <SiteColumnsLockedContext.Provider value={opts.siteColumnsLocked ?? false}>
+          {opts.readOnly ? <fieldset disabled>{children}</fieldset> : children}
+        </SiteColumnsLockedContext.Provider>
       ),
     },
   );
@@ -166,13 +169,18 @@ describe("General · 8135:212718 — Site identity from the Site row", () => {
 });
 
 describe("General — read-only (role below ADMIN)", () => {
-  it("drops the upload buttons and the Languages link; the values stay readable", async () => {
-    setup({ readOnly: true });
+  /* 8134:212323 (owner, 2026-10-04): navigation stays and works; writes are drawn disabled. */
+  it("keeps the uploads in view, disabled, and the Languages link live", async () => {
+    const { props } = setup({ readOnly: true });
     await loaded();
-    expect(screen.queryByTestId("set-favicon-upload")).toBeNull();
-    expect(screen.queryByTestId("set-touch-icon-upload")).toBeNull();
-    expect(screen.queryByTestId("set-general-language")).toBeNull();
-    expect(screen.getByText("French (fr)")).toBeInTheDocument();
+    expect(screen.getByTestId("set-favicon-upload").matches(":disabled")).toBe(true);
+    expect(screen.getByTestId("set-touch-icon-upload").matches(":disabled")).toBe(true);
+    const link = screen.getByTestId("set-general-language");
+    expect(link.tagName).toBe("A");
+    expect(link.matches(":disabled")).toBe(false);
+    expect(link).toHaveTextContent("French (fr) · Manage in Languages ›");
+    fireEvent.click(link);
+    expect(props.onOpenScreen).toHaveBeenCalledWith("localization");
   });
 });
 

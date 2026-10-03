@@ -161,8 +161,11 @@ export interface ScreenProps {
   /**
    * The member's role is below `SCREEN_MIN_ROLE` for this screen: the shell
    * shows the read-only banner, disables every native control inside the
-   * screen (a disabled fieldset), hides the header action and the footer. A
-   * screen hides anything else that acts — a link-styled door, a menu.
+   * screen (a disabled fieldset), hides the header action and the footer.
+   * Owner rule (2026-10-04, 8134:212323): navigation stays visible and live —
+   * render a door as an anchor (`Button href`), which the fieldset does not
+   * disable; a write stays visible, disabled — never hidden. The Danger zone
+   * draws its own notice and disables per action (Transfer has its own rule).
    */
   readOnly?: boolean;
   /**

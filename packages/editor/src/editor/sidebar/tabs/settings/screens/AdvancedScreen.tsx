@@ -157,7 +157,6 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
   registerRetryLoad,
   saveError,
   fieldErrors,
-  readOnly,
 }) => {
   const { value: savedCode } = useSettingsScreen(
     composer,
@@ -319,13 +318,18 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
         label="Global CSS"
         error={fieldErrors?.["customCode.globalCss"]}
         footer={
-          readOnly ? undefined : /* 4418:128108: reusable classes belong to the Brand panel, not this well. */
+          /* 4418:128108: reusable classes belong to the Brand panel, not this
+             well. Navigation, so it stays live when the screen is read-only
+             (an anchor escapes the shell's disabled fieldset). */
           <Button
-            type="button"
+            href="#brand"
             size="xs"
             variant="ghost"
             className={BRAND_LINK}
-            onClick={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "design" })}
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "design" });
+            }}
             data-testid="set-code-brand-link"
           >
             Reusable classes in Brand ›
