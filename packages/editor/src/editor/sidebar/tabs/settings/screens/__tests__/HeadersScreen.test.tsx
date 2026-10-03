@@ -27,6 +27,11 @@ const { api } = vi.hoisted(() => ({
 vi.mock("@/services/api-client", () => ({
   getBuildrikClient: () => api,
 }));
+/* The screen saves through the Lane 0 helper; its client is this one. */
+vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/BuildrikSyncProvider")>()),
+  updateSiteColumns: (id: string, patch: Record<string, unknown>) => api.siteDetail.settings.update.mutate({ id, ...patch }),
+}));
 
 import { HeadersScreen } from "../HeadersScreen";
 
@@ -55,6 +60,7 @@ interface SetupOpts {
   registerSaveHandler?: (h: (() => Promise<void>) | null) => void;
   onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
   saveError?: string | null;
+  fieldErrors?: Record<string, string>;
 }
 
 function setup(opts: SetupOpts = {}) {
@@ -65,6 +71,7 @@ function setup(opts: SetupOpts = {}) {
       registerSaveHandler={opts.registerSaveHandler}
       onLoadStateChange={opts.onLoadStateChange}
       saveError={opts.saveError}
+      fieldErrors={opts.fieldErrors}
     />,
   );
 }
@@ -231,7 +238,7 @@ describe("HeadersScreen — the server states", () => {
     setup({ onLoadStateChange });
     const card = screen.getByTestId("set-load-card");
     expect(card).toHaveAttribute("data-state", "loading");
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Headers");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Security headers");
     expect(screen.getByTestId("set-load-line")).toHaveTextContent("CSP, X-Frame-Options, Referrer-Policy and HSTS.");
     expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
     expect(onLoadStateChange).toHaveBeenCalledWith("loading");
@@ -355,5 +362,14 @@ describe("HeadersScreen — edits, dirty and the save handler", () => {
     expect(csp().value).toBe("default-src 'none'");
     expect(onDirtyChange).toHaveBeenLastCalledWith(true);
     expect(box.current).not.toBeNull();
+  });
+});
+
+describe("HeadersScreen — refused columns are said under their control", () => {
+  it("renders the server's cspPolicy and permissionsPolicy refusals", async () => {
+    setup({ fieldErrors: { cspPolicy: "Too long.", permissionsPolicy: "Bad value." } });
+    await loaded();
+    expect(screen.getByText("Too long.")).toBeInTheDocument();
+    expect(screen.getByText("Bad value.")).toBeInTheDocument();
   });
 });
