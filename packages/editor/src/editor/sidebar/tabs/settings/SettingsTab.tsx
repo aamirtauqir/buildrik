@@ -618,8 +618,9 @@ export const SettingsTab: React.FC<
     return (
       <>
         <ReadOnlyBanner who={ROLE_NOUN[screenRules.minRole]} screen={current.title} message={READ_ONLY_NOTICE[screenId]} />
-        {/* A disabled fieldset disables every native control inside it. */}
-        <fieldset disabled className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-6 tw:border-0 tw:p-0" data-testid="set-readonly-screen">
+        {/* A disabled fieldset disables every native control inside it; its
+            cards sit 16 apart, as on the editable screen (set-body's gap). */}
+        <fieldset disabled className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0" data-testid="set-readonly-screen">
           {screenNode}
         </fieldset>
       </>
