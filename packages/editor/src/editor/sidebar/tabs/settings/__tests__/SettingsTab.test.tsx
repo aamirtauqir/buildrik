@@ -63,18 +63,8 @@ vi.mock("../hooks/useSettingsScreen", () => ({
           return defaultValue;
         }
       })();
-      const [value, setValue] = React.useState(initialValue);
-      const [isDirty, setIsDirty] = React.useState(false);
-      return {
-        value,
-        isDirty,
-        setValue: (v: unknown) => {
-          setValue(v);
-          setIsDirty(true);
-        },
-        markDirty: () => setIsDirty(true),
-        markClean: () => setIsDirty(false),
-      };
+      const [value] = React.useState(initialValue);
+      return { value };
     },
   ),
 }));

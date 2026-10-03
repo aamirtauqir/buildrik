@@ -143,7 +143,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   registerFieldErrors,
   fieldErrors,
 }) => {
-  const { value: stored, isDirty, markDirty } = useSettingsScreen(
+  const { value: stored } = useSettingsScreen(
     composer,
     (s) => ({
       gaId: s.analytics?.googleAnalytics?.measurementId ?? "",
@@ -176,6 +176,19 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const [verified, setVerified] = React.useState<{ id: string; events24h: number } | null>(null);
   const gaInputRef = React.useRef<HTMLInputElement>(null);
 
+  /* Dirty is a difference from what is stored, so a field typed back to its
+     saved value is clean again (after Save the composer adopts the values,
+     SETTINGS_CHANGE re-reads `stored`). */
+  const isDirty =
+    gaId !== stored.gaId ||
+    gaEnabled !== stored.gaEnabled ||
+    gaVerifiedAt !== stored.gaVerifiedAt ||
+    gtmId !== stored.gtmId ||
+    gtmEnabled !== stored.gtmEnabled ||
+    pixelId !== stored.pixelId ||
+    pixelEnabled !== stored.pixelEnabled ||
+    clarityId !== stored.clarityId ||
+    clarityEnabled !== stored.clarityEnabled;
   React.useEffect(() => {
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
@@ -239,7 +252,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
       const next = projectId ? await getBuildrikClient(DASHBOARD_URL).siteDetail.analyticsStatus.query({ siteId: projectId }) : status;
       setStatus(next);
       setGaVerifiedAt(new Date().toISOString());
-      markDirty();
       setVerified({ id: gaId, events24h: next?.events24h ?? 0 });
     } catch (error: unknown) {
       devError("settings", `analytics status re-read failed for site ${projectId}`, error);
@@ -330,7 +342,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               checked={gaEnabled}
               onChange={(next) => {
                 setGaEnabled(next);
-                markDirty();
               }}
               aria-labelledby="enable-google-analytics-label"
               sizing="md"
@@ -349,7 +360,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 setGaId(e.target.value.toUpperCase());
                 // A different id is a different connection: its verification goes with it.
                 setGaVerifiedAt(undefined);
-                markDirty();
               }}
               placeholder="G-XXXXXXXXXX"
               aria-describedby={gaShown ? "ga-error" : undefined}
@@ -404,7 +414,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               checked={gtmEnabled}
               onChange={(next) => {
                 setGtmEnabled(next);
-                markDirty();
               }}
               aria-labelledby="enable-google-tag-manager-label"
               sizing="md"
@@ -420,7 +429,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               value={gtmId}
               onChange={(e) => {
                 setGtmId(e.target.value.toUpperCase().trim());
-                markDirty();
               }}
               placeholder="GTM-XXXXXXX"
               aria-describedby={gtmShown ? "gtm-error" : undefined}
@@ -444,7 +452,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               checked={pixelEnabled}
               onChange={(next) => {
                 setPixelEnabled(next);
-                markDirty();
               }}
               aria-labelledby="enable-meta-pixel-label"
               sizing="md"
@@ -460,7 +467,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               value={pixelId}
               onChange={(e) => {
                 setPixelId(e.target.value.replace(/\D/g, ""));
-                markDirty();
               }}
               placeholder="1234567890123456"
               aria-describedby={pixelShown ? "pixel-error" : undefined}
@@ -484,7 +490,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               checked={clarityEnabled}
               onChange={(next) => {
                 setClarityEnabled(next);
-                markDirty();
               }}
               aria-labelledby="enable-microsoft-clarity-label"
               sizing="md"
@@ -500,7 +505,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               value={clarityId}
               onChange={(e) => {
                 setClarityId(e.target.value.trim());
-                markDirty();
               }}
               placeholder="abcdefghij"
               aria-describedby={clarityShown ? "clarity-error" : undefined}

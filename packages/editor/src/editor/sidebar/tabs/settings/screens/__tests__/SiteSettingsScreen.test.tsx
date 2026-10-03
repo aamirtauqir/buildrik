@@ -184,6 +184,22 @@ describe("General — read-only (role below ADMIN)", () => {
   });
 });
 
+describe("General — dirty is a difference from the saved values", () => {
+  it("typing a field back to its saved value is clean again; a Save makes the sent values the saved ones", async () => {
+    const { props } = setup();
+    await loaded();
+    fireEvent.change(input("site-name"), { target: { value: "Acme Two" } });
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
+    fireEvent.change(input("site-name"), { target: { value: "Acme Site" } });
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(false);
+    fireEvent.change(input("site-author"), { target: { value: "Grace" } });
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
+    const flush = lastHandler<() => SettingsFlush>(props.registerFlushHandler)!();
+    act(() => flush.onSaved?.());
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(false);
+  });
+});
+
 describe("General — edits and the flush", () => {
   it("an edit reports dirty; the name is checked inline and reported to the shell", async () => {
     const { props } = setup();
@@ -199,7 +215,7 @@ describe("General — edits and the flush", () => {
     await loaded();
     fireEvent.change(input("site-name"), { target: { value: "Acme Two" } });
     fireEvent.change(input("site-author"), { target: { value: "  Grace  " } });
-    const next = lastHandler<() => ProjectSettings>(props.registerFlushHandler)!();
+    const next = lastHandler<() => SettingsFlush>(props.registerFlushHandler)!().settings;
     expect(next.seo).toMatchObject({
       siteName: "Acme Two",
       favicon: "https://acme.test/favicon.ico",
@@ -326,7 +342,7 @@ describe("General — icon upload", () => {
     expect(api.upload.presign.mutate).toHaveBeenCalledWith({ fileName: "touch.png", fileType: "image/png", context: "touch_icon", siteId: "s1" });
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/upload/f1"), expect.objectContaining({ method: "PUT" }));
     expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
-    const next = lastHandler<() => ProjectSettings>(props.registerFlushHandler)!();
+    const next = lastHandler<() => SettingsFlush>(props.registerFlushHandler)!().settings;
     expect(next.seo?.touchIcon).toBe("https://blob.test/touch.png");
     vi.unstubAllGlobals();
   });

@@ -174,7 +174,10 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
      than in the field above. */
   const [bodyValidation, setBodyValidation] = React.useState<HtmlValidationResult | null>(null);
   const [cssValidation, setCssValidation] = React.useState<CssValidationResult | null>(null);
-  const [isDirty, setIsDirty] = React.useState(false);
+  /* Head and body as the Site row holds them (CSS is the composer's,
+     `savedCode`) — dirty is a difference from what is saved. */
+  const [savedRow, setSavedRow] = React.useState({ head: savedCode.headScripts, body: savedCode.bodyScripts });
+  const isDirty = headCode !== savedRow.head || bodyCode !== savedRow.body || cssCode !== savedCode.globalCss;
 
   // Debounced validation for head code
   React.useEffect(() => {
@@ -214,7 +217,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
     setHeadCode(savedCode.headScripts);
     setBodyCode(savedCode.bodyScripts);
     setCssCode(savedCode.globalCss);
-    setIsDirty(false);
+    setSavedRow({ head: savedCode.headScripts, body: savedCode.bodyScripts });
   }, [savedCode]);
 
   React.useEffect(() => {
@@ -229,6 +232,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
     (row) => {
       setHeadCode(row.headCode ?? "");
       setBodyCode(row.bodyCode ?? "");
+      setSavedRow({ head: row.headCode ?? "", body: row.bodyCode ?? "" });
     },
     { onLoadStateChange, registerRetryLoad }
   );
@@ -281,7 +285,6 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
         value={headCode}
         onChange={(next) => {
           setHeadCode(next);
-          setIsDirty(true);
         }}
         describedBy={headValidation ? "head-validation-feedback" : undefined}
         /* `<script src>`, never `<script>…</script>`: the export sanitizer
@@ -303,7 +306,6 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
         value={bodyCode}
         onChange={(next) => {
           setBodyCode(next);
-          setIsDirty(true);
         }}
         describedBy={bodyValidation ? "body-validation-feedback" : undefined}
         placeholder={'<script src="https://…/widget.js"></script>'}
@@ -338,7 +340,6 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
         value={cssCode}
         onChange={(next) => {
           setCssCode(next);
-          setIsDirty(true);
         }}
         describedBy={cssValidation ? "css-validation-feedback" : undefined}
         placeholder={"/* Custom CSS */\n.my-class { color: red; }"}

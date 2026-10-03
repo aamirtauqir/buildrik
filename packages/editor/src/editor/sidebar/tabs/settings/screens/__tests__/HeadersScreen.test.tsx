@@ -373,3 +373,21 @@ describe("HeadersScreen — refused columns are said under their control", () =>
     expect(screen.getByText("Bad value.")).toBeInTheDocument();
   });
 });
+
+describe("HeadersScreen — dirty is a difference from the Site row", () => {
+  it("typing a value back to the saved one is clean again; after Save the sent values are the saved ones", async () => {
+    const onDirtyChange = vi.fn();
+    const { box, register } = saveHandlerSpy();
+    setup({ onDirtyChange, registerSaveHandler: register });
+    await loaded();
+    const saved = csp().value;
+    fireEvent.change(csp(), { target: { value: "default-src 'none'" } });
+    expect(onDirtyChange).toHaveBeenLastCalledWith(true);
+    fireEvent.change(csp(), { target: { value: saved } });
+    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
+    expect(box.current).toBeNull();
+    fireEvent.change(csp(), { target: { value: "default-src 'none'" } });
+    await act(() => box.current!());
+    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
+  });
+});

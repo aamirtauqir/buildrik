@@ -131,7 +131,8 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
      HSTS back on returns to what was chosen rather than to the default. */
   const [hstsMaxAge, setHstsMaxAge] = React.useState(HSTS_DEFAULT_MAX_AGE);
   const [permissions, setPermissions] = React.useState("");
-  const [dirty, setDirty] = React.useState(false);
+  /* The columns as the server holds them — dirty is a difference from them. */
+  const [saved, setSaved] = React.useState<string | null>(null);
 
   const load = useServerLoad<HeadersRow>(
     projectId,
@@ -143,10 +144,30 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       setHstsEnabled(row.hstsMaxAge != null);
       setHstsMaxAge(row.hstsMaxAge ?? HSTS_DEFAULT_MAX_AGE);
       setPermissions(row.permissionsPolicy ?? "");
-      setDirty(false);
+      setSaved(
+        JSON.stringify({
+          cspPolicy: row.cspPolicy?.trim() || null,
+          hstsMaxAge: row.hstsMaxAge ?? null,
+          xFrameOptions: X_FRAME_OPTIONS.find((v) => v === row.xFrameOptions) ?? null,
+          referrerPolicy: REFERRER_POLICIES.find((v) => v === row.referrerPolicy) ?? null,
+          permissionsPolicy: row.permissionsPolicy?.trim() || null,
+        }),
+      );
     },
     { onLoadStateChange, registerRetryLoad }
   );
+
+  const patch = React.useMemo(
+    () => ({
+      cspPolicy: csp.trim() || null,
+      hstsMaxAge: hstsEnabled ? hstsMaxAge : null,
+      xFrameOptions: xFrame || null,
+      referrerPolicy: referrer || null,
+      permissionsPolicy: permissions.trim() || null,
+    }),
+    [csp, hstsEnabled, hstsMaxAge, xFrame, referrer, permissions],
+  );
+  const dirty = saved !== null && JSON.stringify(patch) !== saved;
 
   React.useEffect(() => {
     onDirtyChange?.(dirty);
@@ -155,15 +176,9 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
   const handleSave = React.useCallback(async () => {
     if (!projectId) return;
     // Rejects on failure — the shell's Save keeps the banner and Retry save up.
-    await updateSiteColumns(projectId, {
-      cspPolicy: csp.trim() || null,
-      hstsMaxAge: hstsEnabled ? hstsMaxAge : null,
-      xFrameOptions: xFrame || null,
-      referrerPolicy: referrer || null,
-      permissionsPolicy: permissions.trim() || null,
-    });
-    setDirty(false);
-  }, [projectId, csp, hstsEnabled, hstsMaxAge, xFrame, referrer, permissions]);
+    await updateSiteColumns(projectId, patch);
+    setSaved(JSON.stringify(patch));
+  }, [projectId, patch]);
 
   // The shell's Save changes runs this instead of composer.saveProject(),
   // which omits the header columns. Registered only while there is something
@@ -221,7 +236,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
               value={csp}
               onChange={(e) => {
                 setCsp(e.target.value);
-                setDirty(true);
               }}
               placeholder="default-src 'self'"
               spellCheck={false}
@@ -241,7 +255,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             value={xFrame}
             onChange={(e) => {
               setXFrame(X_FRAME_OPTIONS.find((v) => v === e.target.value) ?? "");
-              setDirty(true);
             }}
             data-testid="set-hd-xfo"
           >
@@ -263,7 +276,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             value={referrer}
             onChange={(e) => {
               setReferrer(REFERRER_POLICIES.find((v) => v === e.target.value) ?? "");
-              setDirty(true);
             }}
             data-testid="set-hd-referrer"
           >
@@ -284,7 +296,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             checked={hstsEnabled}
             onChange={(next) => {
               setHstsEnabled(next);
-              setDirty(true);
             }}
             aria-labelledby="enable-hsts-label"
             sizing="md"
@@ -299,7 +310,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             disabled={!hstsEnabled}
             onChange={(e) => {
               setHstsMaxAge(Number(e.target.value));
-              setDirty(true);
             }}
             data-testid="set-hd-hsts-max"
           >
@@ -326,7 +336,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
               value={permissions}
               onChange={(e) => {
                 setPermissions(e.target.value);
-                setDirty(true);
               }}
               placeholder="camera=(), microphone=()"
               spellCheck={false}

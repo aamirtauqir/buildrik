@@ -215,7 +215,14 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   const [slugConfirm, setSlugConfirm] = React.useState<{ from: string; to: string } | null>(null);
   const confirmRef = React.useRef<((ok: boolean) => void) | null>(null);
 
-  const edit = React.useCallback(() => onDirtyChange?.(true), [onDirtyChange]);
+  /* What the server holds — dirty is a difference from it, so typing a value
+     back to the saved one is clean again. */
+  const [saved, setSaved] = React.useState(() => ({
+    siteName: seo?.siteName ?? "",
+    author: seo?.author ?? composer?.getProjectMetadata?.()?.author ?? "",
+    favicon: seo?.favicon ?? "",
+    touchIcon: seo?.touchIcon ?? "",
+  }));
 
   const load = useServerLoad<GeneralRow>(
     projectId,
@@ -224,6 +231,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
       setSiteName(row.name ?? "");
       setFavicon(row.favicon ?? "");
       setTouchIcon(row.touchIcon ?? "");
+      setSaved((v) => ({ ...v, siteName: row.name ?? "", favicon: row.favicon ?? "", touchIcon: row.touchIcon ?? "" }));
       setLanguage(row.defaultLocale ?? "en");
       setSlug(row.slug ?? "");
       setSavedSlug(row.slug ?? "");
@@ -236,6 +244,16 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   const slugRefused = refused && slug === refused.slug ? refused.message : null;
   const slugMessage = slugFormatError ?? slugRefused;
   const slugChanged = !!projectId && slug !== savedSlug && !slugFormatError;
+
+  const dirty =
+    siteName !== saved.siteName ||
+    author.trim() !== saved.author.trim() ||
+    favicon !== saved.favicon ||
+    touchIcon !== saved.touchIcon ||
+    slug !== savedSlug;
+  React.useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
 
   /* The screen's own refusals disable Save (§27) — keyed as the server keys them. */
   React.useEffect(() => {
@@ -295,9 +313,18 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   /* Save: the settings, and — when the slug changed — a confirm first
      (SlugChangeDialog), then the slug riding in the same `settings.update`.
      Cancel calls the save off: nothing is sent and nothing reads as failed. */
+  /* After the server has them, the sent values are the saved ones. */
+  const markSaved = React.useCallback(() => {
+    const st = stateRef.current;
+    setSaved({ siteName: st.siteName, author: st.author.trim(), favicon: st.favicon, touchIcon: st.touchIcon });
+  }, []);
+
   const flush = React.useCallback((): SettingsFlushResult | Promise<SettingsFlushResult> => {
     const { slug: to, savedSlug: from, slugChanged: changed } = slugRef.current;
-    if (!changed) return buildNext();
+    if (!changed) {
+      const settings = buildNext();
+      return settings ? { settings, onSaved: markSaved } : undefined;
+    }
     return new Promise<boolean>((resolve) => {
       confirmRef.current = resolve;
       setSlugConfirm({ from, to });
@@ -305,9 +332,16 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
       if (!ok) throw new SettingsSaveCancelled();
       const settings = buildNext();
       if (!settings) return;
-      return { settings, columns: { slug: to }, onSaved: () => setSavedSlug(to) };
+      return {
+        settings,
+        columns: { slug: to },
+        onSaved: () => {
+          setSavedSlug(to);
+          markSaved();
+        },
+      };
     });
-  }, [buildNext]);
+  }, [buildNext, markSaved]);
 
   React.useEffect(() => {
     if (!registerFlushHandler) return;
@@ -329,7 +363,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
       const url = await uploadSiteIcon(projectId, file, which === "favicon" ? "favicon" : "touch_icon");
       if (which === "favicon") setFavicon(url);
       else setTouchIcon(url);
-      edit();
     } catch (err) {
       setUploadError(
         `Couldn't upload the ${which === "favicon" ? "favicon" : "touch icon"}: ${err instanceof Error ? err.message : "please try again."}`,
@@ -374,7 +407,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
               aria-invalid={nameError ? true : undefined}
               onChange={(e) => {
                 setSiteName(e.target.value);
-                edit();
               }}
             />
             {nameError && (
@@ -390,7 +422,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
               value={author}
               onChange={(e) => {
                 setAuthor(e.target.value);
-                edit();
               }}
               placeholder="Who this site belongs to"
             />
@@ -437,7 +468,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             aria-invalid={faviconError ? true : undefined}
             onChange={(e) => {
               setFavicon(e.target.value);
-              edit();
             }}
             placeholder="https://example.com/favicon.ico"
           />
@@ -474,7 +504,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             aria-invalid={slugMessage ? true : undefined}
             onChange={(e) => {
               setSlug(e.target.value);
-              edit();
             }}
           />
         </Field>

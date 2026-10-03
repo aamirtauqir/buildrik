@@ -144,7 +144,21 @@ export const SeoScreen: React.FC<ScreenProps> = ({
   const [origin, setOrigin] = React.useState<string | null>(null);
   const [open, setOpen] = React.useState({ defaults: true, social: true, indexing: false });
 
-  const edit = React.useCallback(() => onDirtyChange?.(true), [onDirtyChange]);
+  /* The values the server holds — dirty is a difference from them, so typing
+     a field back to its saved value is clean again. (Canonical has its own
+     `savedCanonical`.) */
+  const snapshot = (v: { metaTitle: string; metaDescription: string; ogImage: string; social: SocialProfiles; allowIndexing: boolean; robotsTxt: string }) =>
+    JSON.stringify([v.metaTitle, v.metaDescription, v.ogImage, v.social, v.allowIndexing, v.robotsTxt]);
+  const [saved, setSaved] = React.useState(() =>
+    snapshot({
+      metaTitle: seo?.metaTitle ?? "",
+      metaDescription: seo?.metaDescription ?? "",
+      ogImage: seo?.defaultOgImage ?? "",
+      social: socialProfilesOf(seo?.socialLinks, legacyHandle),
+      allowIndexing: seo?.allowIndexing ?? true,
+      robotsTxt: seo?.robotsTxt ?? "",
+    }),
+  );
 
   const load = useServerLoad<{ row: SeoRow; domains: DomainRow[] }>(
     projectId,
@@ -164,10 +178,28 @@ export const SeoScreen: React.FC<ScreenProps> = ({
       setRobotsTxt(row.robotsTxt ?? "");
       setCanonical(row.canonicalUrl ?? "");
       setSavedCanonical(row.canonicalUrl ?? "");
+      setSaved(
+        snapshot({
+          metaTitle: row.metaTitle ?? "",
+          metaDescription: row.metaDescription ?? "",
+          ogImage: row.ogImage ?? "",
+          social: socialProfilesOf(row.socialLinks, legacyHandle),
+          allowIndexing: row.allowIndexing ?? true,
+          robotsTxt: row.robotsTxt ?? "",
+        }),
+      );
       setOrigin(sitemapOrigin(domains, composer?.getProjectMetadata().publishedUrl));
     },
     { onLoadStateChange, registerRetryLoad },
   );
+
+  const current = snapshot({ metaTitle, metaDescription, ogImage, social, allowIndexing, robotsTxt });
+  const dirty = current !== saved || canonical.trim() !== savedCanonical.trim();
+  React.useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+  const currentRef = React.useRef(current);
+  currentRef.current = current;
 
   const errors = {
     metaTitle: columnError("metaTitle", metaTitle),
@@ -224,9 +256,18 @@ export const SeoScreen: React.FC<ScreenProps> = ({
         robotsTxt: s.robotsTxt,
       },
     };
+    const sent = currentRef.current;
+    const markSaved = () => setSaved(sent);
     const canonicalUrl = s.canonical.trim();
-    if (!projectId || canonicalUrl === s.savedCanonical.trim()) return settings;
-    return { settings, columns: { canonicalUrl: canonicalUrl || null }, onSaved: () => setSavedCanonical(canonicalUrl) };
+    if (!projectId || canonicalUrl === s.savedCanonical.trim()) return { settings, onSaved: markSaved };
+    return {
+      settings,
+      columns: { canonicalUrl: canonicalUrl || null },
+      onSaved: () => {
+        setSavedCanonical(canonicalUrl);
+        markSaved();
+      },
+    };
   }, [composer, projectId]);
 
   React.useEffect(() => {
@@ -279,7 +320,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
               aria-invalid={titleError ? true : undefined}
               onChange={(e) => {
                 setMetaTitle(e.target.value);
-                edit();
               }}
             />
             {titleError ? <div role="alert" className={SCREEN_FIELD_ERROR}>{titleError}</div> : null}
@@ -292,7 +332,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
               aria-invalid={descriptionError ? true : undefined}
               onChange={(e) => {
                 setMetaDescription(e.target.value);
-                edit();
               }}
             />
             {descriptionError ? <div role="alert" className={SCREEN_FIELD_ERROR}>{descriptionError}</div> : null}
@@ -306,7 +345,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
               placeholder="https://example.com/og-image.jpg"
               onChange={(e) => {
                 setOgImage(e.target.value);
-                edit();
               }}
             />
             {ogError ? <div role="alert" className={SCREEN_FIELD_ERROR}>{ogError}</div> : null}
@@ -321,7 +359,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
         onToggle={toggle("social")}
         onChange={(network, value) => {
           setSocial((s) => ({ ...s, [network]: value }));
-          edit();
         }}
       />
 
@@ -366,7 +403,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
               checked={allowIndexing}
               onChange={(next) => {
                 setAllowIndexing(next);
-                edit();
               }}
               aria-labelledby="seo-allow-indexing-label"
               sizing="md"
@@ -382,7 +418,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
             placeholder="https://example.com"
             onChange={(e) => {
               setCanonical(e.target.value);
-              edit();
             }}
           />
           {canonicalError ? <div role="alert" className={SCREEN_FIELD_ERROR}>{canonicalError}</div> : null}
@@ -406,7 +441,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
               className="tw:h-22 tw:resize-y tw:rounded-[var(--bk-radius-sm)] tw:border-[var(--bk-border)] tw:bg-[var(--bk-gray-50)] tw:px-3 tw:py-2"
               onChange={(e) => {
                 setRobotsTxt(e.target.value);
-                edit();
               }}
             />
           </SiteColumnGate>
@@ -421,7 +455,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
             disabled={robotsTxt === ""}
             onClick={() => {
               setRobotsTxt("");
-              edit();
             }}
             data-testid="set-seo-robots-reset"
           >

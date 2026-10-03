@@ -188,13 +188,25 @@ describe("SEO › Indexing — 8135:214820 / 8135:215066", () => {
   });
 });
 
+describe("SEO — dirty is a difference from the saved values", () => {
+  it("typing a field back to its saved value is clean again", async () => {
+    const { props } = setup();
+    await loaded();
+    const before = input("social-github").value;
+    fireEvent.change(input("social-github"), { target: { value: "https://github.com/acme" } });
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
+    fireEvent.change(input("social-github"), { target: { value: before } });
+    expect(props.onDirtyChange).toHaveBeenLastCalledWith(false);
+  });
+});
+
 describe("SEO — what Save sends", () => {
   it("the flush returns the column keys incl. the six social links, robots and indexing, without writing the composer", async () => {
     const { composer, props } = setup();
     await loaded();
     fireEvent.change(input("social-github"), { target: { value: "https://github.com/acme" } });
     expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
-    const next = last<() => ProjectSettings>(props.registerFlushHandler)!();
+    const next = last<() => SettingsFlush>(props.registerFlushHandler)!().settings;
     expect(next.seo).toMatchObject({
       metaTitle: "Acme · Home",
       metaDescription: "We make things.",
