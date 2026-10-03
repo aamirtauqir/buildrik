@@ -29,6 +29,7 @@ import { EVENTS } from "@/shared/constants/events";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getBuildrikClient } from "@/services/api-client";
 import {
+  SettingsSaveCancelled,
   SettingsSaveError,
   planSettingsSave,
   saveSiteSettings,
@@ -322,7 +323,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         confirmRef.current = resolve;
         setSlugConfirm({ from, to });
       });
-      if (!ok) throw new SettingsSaveError("The site URL change was cancelled. Nothing was saved.");
+      if (!ok) throw new SettingsSaveCancelled();
       const next = buildNext();
       if (!next) return;
       try {

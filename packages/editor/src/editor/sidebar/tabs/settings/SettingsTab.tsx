@@ -87,6 +87,7 @@ import {
   getSiteIdFromUrl,
   planSettingsSave,
   saveSiteSettings,
+  SettingsSaveCancelled,
   SettingsSaveError,
 } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -489,6 +490,14 @@ export const SettingsTab: React.FC<
   const handleSave = React.useCallback((then?: () => void) => {
     if (saving) return;
     const failed = (err: unknown) => {
+      /* Called off by the user (General's slug confirm → Cancel): nothing was
+         sent, so nothing failed — the edits stay, unsaved, with no banner. A
+         guard that raised the save closes; the user stays here. */
+      if (err instanceof SettingsSaveCancelled) {
+        pendingRef.current = null;
+        setGuardOpen(false);
+        return;
+      }
       console.error("[settings] save failed", err);
       setServerFieldErrors(err instanceof SettingsSaveError && Object.keys(err.fieldErrors).length > 0 ? err.fieldErrors : undefined);
       setSaveError(SAVE_ERROR_MESSAGES[currentScreen] ??

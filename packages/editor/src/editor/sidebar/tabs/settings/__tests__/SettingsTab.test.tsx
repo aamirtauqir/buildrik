@@ -110,6 +110,8 @@ vi.mock("../components/UnsavedSettingsDialog", () => ({
 /* A screen that exercises the shell's load-state and save-error contract
    without a server: SEO stands in. */
 const seoFlushes = vi.hoisted(() => [] as string[]);
+/* What the fake SEO's "register save handler" button registers — set per test. */
+const fakeSeo = vi.hoisted(() => ({ save: null as null | (() => Promise<void>) }));
 vi.mock("../screens/SeoScreen", () => ({
   SeoScreen: ({
     composer,
@@ -120,9 +122,11 @@ vi.mock("../screens/SeoScreen", () => ({
     registerFlushHandler,
     registerHeader,
     registerFieldErrors,
+    registerSaveHandler,
     fieldErrors,
   }: {
     composer?: { getProjectSettings?: () => Record<string, unknown> } | null;
+    registerSaveHandler?: (handler: (() => Promise<void>) | null) => void;
     onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
     onDirtyChange?: (d: boolean) => void;
     saveError?: string | null;
@@ -156,6 +160,9 @@ vi.mock("../screens/SeoScreen", () => ({
           onDirtyChange?.(true);
         }}
       />
+      <button type="button" onClick={() => registerSaveHandler?.(() => fakeSeo.save!())}>
+        register save handler
+      </button>
       <button type="button" onClick={() => registerFieldErrors?.({ "seo.metaTitle": "Too long" })}>
         report invalid
       </button>
@@ -226,7 +233,7 @@ vi.mock("../screens/RedirectsScreen", () => ({
 
 import { SettingsTab } from "../SettingsTab";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
-import { SettingsSaveError } from "@/services/BuildrikSyncProvider";
+import { SettingsSaveCancelled, SettingsSaveError } from "@/services/BuildrikSyncProvider";
 
 afterEach(() => {
   cleanup();
@@ -671,6 +678,36 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     expect(sync.saveSiteSettings).toHaveBeenCalledWith("site-1", { columns: {}, projectSettings: null, unrouted: true });
     expect(composer.setProjectSettings).toHaveBeenCalledWith({ seo: { siteName: "Test Site", twitterHandle: "@bella" } });
     expect(composer.adoptSavedProjectSettings).not.toHaveBeenCalled();
+  });
+
+  it("a save the screen calls off (SettingsSaveCancelled) is no failure: no banner, no toast, the edits stay", async () => {
+    const composer = makeComposer();
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    fakeSeo.save = () => Promise.reject(new SettingsSaveCancelled());
+    renderS(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
+    await openSeoAndEdit();
+    fireEvent.click(screen.getByText("register save handler"));
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await waitFor(() => expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(false));
+    expect(footStatus()).toBe("Unsaved changes");
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save");
+    expect(screen.queryByTestId("set-save-error")).toBeNull();
+    expect(screen.queryByText("Saved · applies on next publish")).toBeNull();
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("a cancelled Save and continue closes the guard and stays on the screen, still unsaved", async () => {
+    fakeSeo.save = () => Promise.reject(new SettingsSaveCancelled());
+    renderS(<SettingsTab composer={asComposer(makeComposer())} projectId="site-1" />);
+    await openSeoAndEdit();
+    fireEvent.click(screen.getByText("register save handler"));
+    fireEvent.click(screen.getByTestId("set-nav-domains"));
+    fireEvent.click(await screen.findByTestId("set-unsaved-save"));
+    await waitFor(() => expect(screen.queryByTestId("set-unsaved")).toBeNull());
+    expect(headTitle()).toBe("SEO");
+    expect(footStatus()).toBe("Unsaved changes");
+    expect(screen.queryByTestId("set-save-error")).toBeNull();
   });
 
   it("the screen's own invalid fields disable Save until they are fixed (§27)", async () => {

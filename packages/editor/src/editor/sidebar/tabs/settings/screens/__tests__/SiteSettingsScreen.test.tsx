@@ -32,7 +32,7 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
 
 import { SiteSettingsScreen, SLUG_FORMAT_ERROR, SLUG_TAKEN_ERROR } from "../SiteSettingsScreen";
 import { SiteColumnsLockedContext } from "../../shared";
-import { SettingsSaveError } from "@/services/BuildrikSyncProvider";
+import { SettingsSaveCancelled, SettingsSaveError } from "@/services/BuildrikSyncProvider";
 
 const getMock = api.siteDetail.settings.get.query;
 
@@ -256,7 +256,8 @@ describe("General › Advanced — 8135:212966 / 213477 / 213221 / 213733", () =
     act(() => { done = save(); });
     await waitFor(() => expect(screen.getByTestId("set-slug-confirm")).toBeInTheDocument());
     fireEvent.click(screen.getByTestId("set-slug-confirm-cancel"));
-    await expect(done).rejects.toBeInstanceOf(SettingsSaveError);
+    /* A cancel, not a failure: the shell shows no "not saved" banner for it. */
+    await expect(done).rejects.toBeInstanceOf(SettingsSaveCancelled);
     expect(sync.saveSiteSettings).not.toHaveBeenCalled();
   });
 

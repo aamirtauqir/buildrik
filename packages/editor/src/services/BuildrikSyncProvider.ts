@@ -360,6 +360,18 @@ export class SettingsSaveError extends Error {
   }
 }
 
+/**
+ * A Settings save the user called off before anything was sent — General's
+ * slug confirm answered Cancel. The shell keeps the edits and the screen as
+ * they were: no "Not saved", no banner, no toast.
+ */
+export class SettingsSaveCancelled extends Error {
+  constructor() {
+    super("The save was cancelled.");
+    this.name = "SettingsSaveCancelled";
+  }
+}
+
 /** The tRPC error's `data.zodIssues` (server errorFormatter), each path re-keyed by `toField`. */
 function refusedFields(err: unknown, toField: (serverPath: string) => string): Record<string, string> {
   const issues = (err as { data?: { zodIssues?: unknown } } | null)?.data?.zodIssues;
