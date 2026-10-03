@@ -20,9 +20,9 @@ describe("Sites Components", () => {
       expect(values).toContain("created");
     });
 
-    it("exports STATUS_FILTER_OPTIONS with 3 statuses", async () => {
+    it("exports the three statuses plus Recently deleted (PD-6)", async () => {
       const mod = await import("@/components/sites/site-filters");
-      expect(mod.STATUS_FILTER_OPTIONS).toHaveLength(3);
+      expect(mod.STATUS_FILTER_OPTIONS.map((o: { value: string }) => o.value)).toEqual(["PUBLISHED", "DRAFT", "ARCHIVED", "DELETED"]);
     });
   });
 
