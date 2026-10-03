@@ -48,6 +48,12 @@ describe("siteDetail.projectSettings.update — role per key", () => {
     expect(checkSiteRole).toHaveBeenCalledWith({}, "u_1", "s1", "EDITOR");
   });
 
+  it("General's Author (seo.author) needs EDITOR, as it did riding in the project save", async () => {
+    await caller().projectSettings.update({ siteId: "s1", patch: { seo: { author: "Elena" } } });
+    expect(checkSiteRole).toHaveBeenCalledWith({}, "u_1", "s1", "EDITOR");
+    expect(updateProjectSettings).toHaveBeenCalledWith("s1", { seo: { author: "Elena" } });
+  });
+
   it("global CSS needs ADMIN, and an EDITOR is refused before the service runs", async () => {
     checkSiteRole.mockImplementation(async (_db, _u, _s, min) => {
       if (min === "ADMIN") throw new PermissionError("FORBIDDEN", "Insufficient permissions");

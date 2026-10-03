@@ -81,6 +81,16 @@ describe("planSettingsSave", () => {
     });
   });
 
+  it("routes General's Author (seo.author) as a JSON-only key — never left for the project save", () => {
+    const before = { seo: { siteName: "Bella", author: "Ada", twitterHandle: "@a" } };
+    expect(planSettingsSave(before, { seo: { ...before.seo, author: "Grace" } })).toEqual({
+      columns: {},
+      projectSettings: { seo: { author: "Grace" } },
+      unrouted: false,
+    });
+    expect(planSettingsSave(before, before).projectSettings).toBeNull();
+  });
+
   it("says when a change has no settings mutation yet (SEO's Twitter handle)", () => {
     const before = { seo: { twitterHandle: "@a" } };
     expect(planSettingsSave(before, { seo: { twitterHandle: "@b" } })).toEqual({ columns: {}, projectSettings: null, unrouted: true });

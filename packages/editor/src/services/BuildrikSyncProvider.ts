@@ -319,7 +319,7 @@ export function extractSiteColumnPatch(settings: ProjectSettings | undefined): S
 // ─── Settings Save (Phase B, BE-3) ──────────────────────────────────────────
 // The Settings footer's Save writes through the two settings mutations, never
 // `sites.saveProject`: Site-column fields → `siteDetail.settings.update`, the
-// JSON-only keys (analytics, global CSS, the 404 switch) →
+// JSON-only keys (analytics, global CSS, the 404 switch, General's Author) →
 // `siteDetail.projectSettings.update`. A refusal names its fields.
 
 /** What a Settings screen may send to `siteDetail.settings.update` (its id aside). */
@@ -441,7 +441,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> => typeof va
 /** `settings` without the keys a settings mutation writes — what is left for the project save. */
 function unroutedSettings(settings: ProjectSettings): Record<string, unknown> {
   const rest: Record<string, unknown> = structuredClone({ ...settings, analytics: undefined, redirects: undefined });
-  for (const field of [...SITE_COLUMN_FIELDS, "customCode.globalCss"]) {
+  for (const field of [...SITE_COLUMN_FIELDS, "customCode.globalCss", "seo.author"]) {
     const [section, key] = field.split(".");
     const block = rest[section];
     if (isRecord(block)) delete block[key];
@@ -456,6 +456,7 @@ export function planSettingsSave(before: ProjectSettings, next: ProjectSettings)
     patch.customCode = { globalCss: next.customCode?.globalCss ?? "" };
   }
   if (next.redirects && !sameValue(before.redirects, next.redirects)) patch.redirects = next.redirects;
+  if (!sameValue(before.seo?.author, next.seo?.author)) patch.seo = { author: next.seo?.author ?? "" };
   return {
     columns: diffSiteColumns(extractSiteColumnPatch(next), extractSiteColumnPatch(before)),
     projectSettings: Object.keys(patch).length > 0 ? patch : null,

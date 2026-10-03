@@ -138,8 +138,8 @@ export function keepValidJsonOnlySettings(incoming: unknown, stored: unknown): u
 /**
  * `siteDetail.projectSettings.update` (BE-2): the Settings Save's JSON half.
  * The patch is already `projectSettingsPatchSchema`-valid. `analytics` and
- * `redirects` replace their stored blocks; `customCode` is merged, because the
- * patch only carries `globalCss`. `lastEditedAt` is left alone: it is the page
+ * `redirects` replace their stored blocks; `customCode` and `seo` are merged,
+ * because the patch only carries `globalCss` / `author`. `lastEditedAt` is left alone: it is the page
  * save's conflict token, and a settings write is not a page edit.
  *
  * Returns the stored value of every patched key (what the editor adopts) and
@@ -169,6 +169,12 @@ export async function updateProjectSettings(siteId: string, patch: ProjectSettin
       const previous = stored[key];
       next[key] = key === "customCode" && isPlainObject(previous) ? { ...previous, ...value } : value;
       saved[key] = next[key];
+    }
+    /* `seo` holds column-backed fields too (stripped on write) and the old
+       Twitter handle: the patch's author is merged in, never a replacement. */
+    if (patch.seo) {
+      next.seo = { ...(isPlainObject(stored.seo) ? stored.seo : {}), ...patch.seo };
+      saved.seo = next.seo;
     }
 
     await tx.site.update({

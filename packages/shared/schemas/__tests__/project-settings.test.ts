@@ -24,10 +24,11 @@ describe("projectSettingsPatchSchema (BE-1)", () => {
     expect(projectSettingsPatchSchema.parse(patch)).toEqual(patch);
   });
 
-  it("refuses any other top-level key — this path writes analytics, global CSS and the 404 switch only", () => {
-    const seo = projectSettingsPatchSchema.safeParse({ seo: { metaTitle: "x" } });
+  it("refuses any other key — this path writes analytics, global CSS, the 404 switch and seo.author only", () => {
+    const seo = projectSettingsPatchSchema.safeParse({ seo: { author: "Ada", metaTitle: "x" } });
     expect(seo.success).toBe(false);
-    expect(seo.error?.issues[0]).toMatchObject({ code: "unrecognized_keys", keys: ["seo"] });
+    expect(seo.error?.issues[0]).toMatchObject({ code: "unrecognized_keys", keys: ["metaTitle"], path: ["seo"] });
+    expect(projectSettingsPatchSchema.safeParse({ menus: [] }).success).toBe(false);
     expect(projectSettingsPatchSchema.safeParse({ designTokens: [] }).success).toBe(false);
     expect(projectSettingsPatchSchema.safeParse({}).success).toBe(false);
   });
@@ -45,6 +46,12 @@ describe("projectSettingsPatchSchema (BE-1)", () => {
     expect(projectSettingsPatchSchema.safeParse({ analytics }).success).toBe(true);
     expect(legacyAnalyticsIds(analytics)).toEqual(["googleTagManager"]);
     expect(legacyAnalyticsIds({ googleAnalytics: { enabled: false, measurementId: "" } })).toEqual([]);
+  });
+
+  it("takes General's Author as seo.author, trimmed and capped like the site name", () => {
+    expect(projectSettingsPatchSchema.parse({ seo: { author: "  Elena Rossi " } })).toEqual({ seo: { author: "Elena Rossi" } });
+    expect(projectSettingsPatchSchema.safeParse({ seo: { author: "" } }).success).toBe(true);
+    expect(issuePaths(projectSettingsPatchSchema.safeParse({ seo: { author: "a".repeat(101) } }))).toEqual(["seo.author"]);
   });
 
   it("caps global CSS at the head/body limit", () => {

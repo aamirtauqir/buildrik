@@ -9,9 +9,9 @@
  * while it reads, Try again when it fails). Edits stay here until Save:
  *  - name / favicon / touch icon go out through the flush the shell saves
  *    (`seo.siteName` / `seo.favicon` / `seo.touchIcon` → the Site columns);
- *  - Author has no Site column: it is `seo.author` in the project JSON, which
- *    no settings mutation covers, so the shell hands it to the composer and
- *    the project save carries it (ScreenProps.registerFlushHandler);
+ *  - Author has no Site column: it is `seo.author` in the project JSON, saved
+ *    by `siteDetail.projectSettings.update` in the same Save (never the
+ *    autosave's `sites.saveProject`);
  *  - a changed slug has no settings path at all: the flush asks first
  *    (SlugChangeDialog), then hands the shell the slug as an extra column, so
  *    one `siteDetail.settings.update` carries it with every other change.

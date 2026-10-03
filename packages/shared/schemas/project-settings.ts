@@ -9,9 +9,9 @@ import {
 /**
  * The JSON-only site settings (Settings Phase B, BE-1): the values in
  * `Site.projectSettings` that have no Site column (§26) — analytics, the global
- * CSS well and the Redirects screen's 404-suggester switch. Everything else a
- * Settings screen edits is a column (`site-column-fields.ts`) and goes through
- * `siteDetail.settings.update`.
+ * CSS well, the Redirects screen's 404-suggester switch and General's Author
+ * (`seo.author`). Everything else a Settings screen edits is a column
+ * (`site-column-fields.ts`) and goes through `siteDetail.settings.update`.
  *
  * One schema, three readers: the editor's Settings save builds its patch to it,
  * `siteDetail.projectSettings.update` validates that patch, and the autosave
@@ -57,7 +57,23 @@ export const redirectsSettingsSchema = z.object({
   suggestFrom404s: z.boolean(),
 });
 
-/** One sub-schema per JSON-only top-level key — the keys a patch may carry. */
+/** Same cap as the site name (`Site.name`). */
+export const SITE_AUTHOR_MAX_LENGTH = 100;
+
+/**
+ * The JSON-only members of `seo` — today only General's Author. The rest of
+ * `seo` is Site columns (or the retired Twitter handle), so this block is
+ * MERGED into the stored `seo`, never a replacement, and it is not one of the
+ * `PROJECT_SETTINGS_KEY_SCHEMAS`: the autosave boundary must not run the whole
+ * stored `seo` through a one-member schema.
+ */
+export const seoSettingsSchema = z
+  .object({
+    author: z.string().trim().max(SITE_AUTHOR_MAX_LENGTH, { message: `Keep it under ${SITE_AUTHOR_MAX_LENGTH} characters.` }),
+  })
+  .strict();
+
+/** One sub-schema per JSON-only top-level key that a patch replaces whole. */
 export const PROJECT_SETTINGS_KEY_SCHEMAS = {
   analytics: analyticsSettingsSchema,
   customCode: customCodeSettingsSchema,
@@ -69,13 +85,15 @@ export const PROJECT_SETTINGS_KEYS = Object.keys(PROJECT_SETTINGS_KEY_SCHEMAS) a
 
 /**
  * A Settings save's JSON half. Strict at the top: this mutation writes the
- * three JSON-only keys and nothing else — not `seo`, not `designTokens`.
+ * JSON-only keys and nothing else — `seo` only as `seo.author`, never a
+ * column-backed SEO field, and not `designTokens`.
  */
 export const projectSettingsPatchSchema = z
   .object({
     analytics: analyticsSettingsSchema.optional(),
     customCode: customCodeSettingsSchema.optional(),
     redirects: redirectsSettingsSchema.optional(),
+    seo: seoSettingsSchema.optional(),
   })
   .strict()
   .refine((patch) => Object.keys(patch).length > 0, { message: "Nothing to save." });

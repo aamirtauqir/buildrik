@@ -148,9 +148,10 @@ export const siteDetailRouter = router({
   }),
 
   // BE-2: the Settings Save's JSON half (analytics, global CSS, the 404
-  // suggester) — the values with no Site column. Role follows what the key
-  // controls: analytics + redirects are EDITOR (same as saving the project
-  // they used to ride in); global CSS is ADMIN + Pro like head/body code.
+  // suggester, General's Author) — the values with no Site column. Role follows
+  // what the key controls: analytics, redirects and seo.author are EDITOR (same
+  // as saving the project they used to ride in); global CSS is ADMIN + Pro like
+  // head/body code.
   projectSettings: router({
     update: protectedProcedure
       .input(updateProjectSettingsSchema)

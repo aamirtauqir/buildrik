@@ -57,6 +57,17 @@ describe("updateProjectSettings (BE-2)", () => {
     });
   });
 
+  it("merges seo.author into the stored seo — the old Twitter handle and anything else there stay", async () => {
+    tx.site.findUnique.mockResolvedValue({
+      projectSettings: { ...stored, seo: { twitterHandle: "@bella", author: "Old" } },
+      deletedAt: null,
+      workspace: { plan: "FREE" },
+    });
+    const result = await updateProjectSettings("s1", { seo: { author: "Elena Rossi" } });
+    expect((written().projectSettings as Record<string, unknown>).seo).toEqual({ twitterHandle: "@bella", author: "Elena Rossi" });
+    expect(result.saved).toEqual({ seo: { twitterHandle: "@bella", author: "Elena Rossi" } });
+  });
+
   it("refuses non-empty global CSS on FREE, and lets FREE clear it", async () => {
     tx.site.findUnique.mockResolvedValue({ projectSettings: stored, deletedAt: null, workspace: { plan: "FREE" } });
     await expect(updateProjectSettings("s1", { customCode: { globalCss: "h1{}" } })).rejects.toThrow("CUSTOM_CODE_NOT_AVAILABLE");
