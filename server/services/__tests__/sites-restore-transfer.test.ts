@@ -20,7 +20,7 @@ const { db, assertSiteQuota } = vi.hoisted(() => {
     formBlock: { updateMany: vi.fn() },
     shareLink: { updateMany: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
-    sitePermission: { upsert: vi.fn() },
+    sitePermission: { upsert: vi.fn(), findUnique: vi.fn() },
     user: { findUnique: vi.fn() },
     $transaction: vi.fn(async (ops: unknown[]) => Promise.all(ops)),
   };
@@ -113,6 +113,7 @@ describe("transferSite (BE-8, Q-B5)", () => {
   beforeEach(() => {
     db.site.findUnique.mockResolvedValue(site);
     db.user.findUnique.mockResolvedValue(null);
+    db.sitePermission.findUnique.mockResolvedValue(null);
   });
 
   function members(caller: { role: string } | null) {
@@ -136,6 +137,27 @@ describe("transferSite (BE-8, Q-B5)", () => {
   it("an ADMIN who did not create it may not", async () => {
     members({ role: "ADMIN" });
     await expect(transferSite("s1", "new-owner", "an-admin")).rejects.toThrow("NOT_OWNER");
+    expect(db.site.update).not.toHaveBeenCalled();
+  });
+
+  it("the creator who is not the OWNER may — the service is the one check (no router OWNER gate)", async () => {
+    members({ role: "ADMIN" });
+    await expect(transferSite("s1", "new-owner", "creator")).resolves.toEqual({ success: true });
+    expect(db.site.update).toHaveBeenCalledWith({ where: { id: "s1" }, data: { createdBy: "new-owner" } });
+  });
+
+  it("a creator who is no longer an active member of the workspace may not", async () => {
+    members(null);
+    await expect(transferSite("s1", "new-owner", "creator")).rejects.toThrow("NOT_OWNER");
+    expect(db.site.update).not.toHaveBeenCalled();
+  });
+
+  it("a creator scoped away from this site may not", async () => {
+    db.workspaceMember.findFirst.mockImplementation(async ({ where }) =>
+      where.userId === "new-owner" ? { id: "m-new" } : { id: "m-caller", role: "EDITOR", _count: { sitePermissions: 2 } },
+    );
+    db.sitePermission.findUnique.mockResolvedValue(null);
+    await expect(transferSite("s1", "new-owner", "creator")).rejects.toThrow("NOT_OWNER");
     expect(db.site.update).not.toHaveBeenCalled();
   });
 });

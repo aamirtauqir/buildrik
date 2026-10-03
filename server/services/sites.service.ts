@@ -295,13 +295,24 @@ export async function transferSite(
   const site = await prisma.site.findUnique({ where: { id: siteId } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
+  /* Q-B5 (BE-8): the ONE transfer check — the router gates nothing else.
+     The caller must reach the site at all (an active member of its workspace,
+     within their site scope — getEffectiveSiteRole), and then be its creator
+     or the OWNER (effective role, so a site override still caps). Everyone
+     else, an ADMIN who did not create it included, is refused. */
+  let callerRole: string;
+  try {
+    callerRole = await getEffectiveSiteRole(prisma, currentUserId, siteId);
+  } catch (e) {
+    if (e instanceof PermissionError) throw new Error("NOT_OWNER");
+    throw e;
+  }
+  if (site.createdBy !== currentUserId && callerRole !== "OWNER") throw new Error("NOT_OWNER");
+
   const currentMember = await prisma.workspaceMember.findFirst({
     where: { userId: currentUserId, workspaceId: site.workspaceId },
     select: { id: true, role: true, _count: { select: { sitePermissions: true } } },
   });
-  // Q-B5 (BE-8): the site's creator, or the workspace OWNER — who owns every
-  // site in it, and could not hand on one somebody else had created.
-  if (site.createdBy !== currentUserId && currentMember?.role !== "OWNER") throw new Error("NOT_OWNER");
   const newOwnerMember = await prisma.workspaceMember.findFirst({
     where: { userId: newOwnerId, workspaceId: site.workspaceId },
   });

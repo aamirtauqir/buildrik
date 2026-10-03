@@ -328,15 +328,12 @@ export const sitesRouter = router({
       available: await checkSlugAvailability(input.slug),
     })),
 
+  // Q-B5: who may transfer (the site's creator or the workspace OWNER) is
+  // decided in transferSite alone — an OWNER gate here refused the creator
+  // before the service's rule could run.
   transfer: protectedProcedure
     .input(transferSiteSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "OWNER");
-      } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
-        throw e;
-      }
       try {
         return await transferSite(
           input.siteId,
@@ -347,7 +344,7 @@ export const sitesRouter = router({
         if (e instanceof Error && e.message === "NOT_OWNER")
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only the site owner can transfer.",
+            message: "Only the workspace owner or the site's creator can transfer this site.",
           });
         if (e instanceof Error && e.message === "MEMBER_NOT_FOUND")
           throw new TRPCError({
