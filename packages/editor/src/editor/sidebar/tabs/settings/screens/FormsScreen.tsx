@@ -472,12 +472,12 @@ const HEAD =
 const ROW = `${COLS} tw:py-1.5 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]`;
 const FROM_BTN =
   "tw:h-auto tw:max-w-full tw:justify-start tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal " +
-  "tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline tw:focus:ring-0 " +
+  "tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)] tw:enabled:hover:underline tw:focus:ring-0 " +
   "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const DELETE_BTN = `${SET_BTN} tw:w-20`;
 const CONFIGURE =
   "tw:h-auto tw:justify-start tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 " +
-  "tw:text-[var(--bk-accent)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline tw:focus:ring-0 " +
+  "tw:text-[var(--bk-accent)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:underline tw:focus:ring-0 " +
   "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const DETAIL = "tw:mb-2 tw:flex tw:flex-col tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:p-3";
 const DL = "tw:m-0 tw:grid tw:grid-cols-[minmax(80px,25%)_1fr] tw:gap-x-2 tw:gap-y-1 tw:p-0";

@@ -34,9 +34,14 @@ export function DomainsTab({ siteId, domains }: { siteId: string; domains: Domai
             No custom domain. The site uses its free buildrick.app address.
           </p>
         ) : (
-          <ul className="divide-y" style={{ borderColor: "var(--color-border-default)" }}>
+          <ul className="divide-y">
             {rows.map((d) => (
-              <li key={d.id} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0" data-testid={`domains-summary-${d.id}`}>
+              <li
+                key={d.id}
+                className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0"
+                style={{ borderColor: "var(--color-border-default)" }}
+                data-testid={`domains-summary-${d.id}`}
+              >
                 <span className="min-w-0 flex-1 truncate text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                   {d.domain}
                 </span>

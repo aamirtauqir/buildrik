@@ -62,7 +62,7 @@ export function SummaryCard({
 }) {
   return (
     <SectionCard title={title} actions={<EditInSiteSettings siteId={siteId} screen={screen} />}>
-      <dl className="divide-y" style={{ borderColor: "var(--color-border-default)" }}>
+      <dl className="divide-y">
         {children}
       </dl>
     </SectionCard>

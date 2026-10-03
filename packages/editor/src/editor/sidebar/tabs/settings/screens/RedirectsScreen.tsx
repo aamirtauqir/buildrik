@@ -101,7 +101,9 @@ const ACCEPT_BTN = "tw:text-[var(--bk-ink)]";
 /* 8136:214826's header actions: three 32-high buttons, 122 wide, in an 8 gap —
    two text buttons and the accent primary. */
 const HEAD_BTN = `${SET_BTN} tw:w-30.5`;
-const HEAD_GHOST = `${HEAD_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
+const HEAD_GHOST =
+  `${HEAD_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] ` +
+  "tw:disabled:bg-transparent tw:disabled:text-[var(--bk-gray-400)]";
 
 /* The rules table (8136:214826): FROM 320 · TO 400 · TYPE 100 · actions 184,
    12 apart; an 11px caps header row 28 high, rows 40 high, no rules between. */
@@ -111,7 +113,7 @@ const RULES_ROW = `${RULES_GRID} tw:h-10 tw:text-[length:var(--bk-text-13)] tw:l
 /* `Edit · Delete` — accent text, 13, no box. */
 const RULE_ACTION =
   "tw:h-auto tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-accent)] " +
-  "tw:enabled:hover:bg-transparent tw:enabled:hover:underline tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+  "tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:underline tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 /** A browser download of `text` as `name`. */
 function download(name: string, text: string) {
