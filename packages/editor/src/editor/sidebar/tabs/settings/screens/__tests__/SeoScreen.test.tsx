@@ -116,6 +116,13 @@ describe("SEO · 8135:214533 — Defaults, Social profiles, the Pages strip, Ind
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
   });
 
+  it("Pages › sits inline in the strip's sentence (8135:214533 draws one line)", async () => {
+    // QA walk 2026-10-03: the link Button's block flex box broke "Pages ›" onto its own line (strip 64px tall vs 44).
+    setup();
+    await loaded();
+    expect(screen.getByTestId("set-seo-pages-link").className).toMatch(/(^|\s)tw:inline-flex(\s|$)/);
+  });
+
   it("without a projectId shows the composer's values and requests nothing", () => {
     setup({ projectId: null });
     expect(input("seo-meta-title").value).toBe("Composer title");

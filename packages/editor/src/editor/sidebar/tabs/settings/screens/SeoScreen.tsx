@@ -337,7 +337,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
             <Button
               type="button"
               variant="link"
-              className="tw:min-h-5 tw:align-baseline tw:text-[var(--bk-ink)]"
+              className="tw:inline-flex tw:min-h-5 tw:align-baseline tw:text-[var(--bk-ink)]"
               onClick={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" })}
               data-testid="set-seo-pages-link"
             >
