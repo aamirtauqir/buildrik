@@ -1,6 +1,7 @@
 /**
- * searchIndex — the static registry behind the sidebar's "Search site
- * settings" filter (6816:60270).
+ * searchIndex — the static registry behind the sidebar's Search Mode
+ * (owner 2026-10-04; was the always-on "Search site settings" filter of
+ * 6816:60270).
  *
  * One entry per nav row (every destination but the Overview) and one per
  * labelled FIELD on a screen, in sidebar order with each section followed by
