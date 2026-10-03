@@ -1,13 +1,13 @@
 /**
- * OverviewScreen — 4418:128917, the landing screen of Settings, regrouped to
- * the Phase B IA (§25).
+ * OverviewScreen — the landing screen of Settings, drawn to the Phase B
+ * Overview boards 8137:216346 / 8137:216089 (IA §25).
  *
  * The site's state first when it is not the ordinary one (archived; its
  * workspace scheduled for deletion — plan #10 / M3), a NEEDS ATTENTION card
- * (hidden when nothing needs it), then one card per nav group, each row being
- * the section's title, a one-line summary composed from
- * `siteDetail.settingsOverview`, and `›` (or `↗` for the dashboard rows). A row
- * click is the same navigation the sidebar makes.
+ * (hidden when nothing needs it), then one card per nav group (8137:216346):
+ * the group's title over a line naming its screens. Each name opens its screen
+ * — the same navigation the sidebar makes — and carries that screen's one-line
+ * summary, composed from `siteDetail.settingsOverview`, as its description.
  *
  * The pane header (`Settings` · `<site> · everything on this page…` · the
  * Search field) and the footer (`Pick a section…` · `Done`) are the shell's.
@@ -16,15 +16,15 @@
  */
 
 import * as React from "react";
-import { ChevronRight, TriangleAlert } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { Button } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { LoadCard, SET_BTN, SET_CARD, SET_EYEBROW, Screen } from "../shared";
+import { LoadCard, SET_BTN, SET_CARD, Screen } from "../shared";
 import {
   SETTINGS_NAV,
+  SETTINGS_NAV_GROUP_ORDER,
   SETTINGS_NAV_GROUPS,
-  type SettingsNavDef,
   type SettingsNavGroupId,
 } from "../constants";
 import type { SettingsNavId } from "../types";
@@ -137,41 +137,24 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
-/** Two columns, each in sidebar order: what is set up, then what is run. */
-const OVERVIEW_COLUMNS: SettingsNavGroupId[][] = [
-  ["site", "search-sharing", "publishing"],
-  ["visitors", "advanced", "danger-zone", "workspace"],
-];
+/* 8137:216346 / 8137:216089 "Overview group cards": two 536 cards a row, 16
+   apart, in sidebar order. Each is a 16/24 title over a 13/20 muted line naming
+   the group's screens; each name opens its screen. The workspace doors close
+   the grid as a seventh card of the same shape (the board stops at six). */
+const CARD_TITLES: Partial<Record<SettingsNavGroupId, string>> = { workspace: "Workspace" };
 
-/* 4418:128917: a 52 row, 16 in — two 14/20 lines and the › at the far right. */
-const ROW_CLASS =
-  "tw:flex tw:h-13 tw:w-full tw:items-center tw:justify-start tw:gap-3 tw:rounded-[var(--bk-radius-sm)] tw:border-0 " +
-  "tw:bg-transparent tw:px-4 tw:py-1.5 tw:text-left tw:font-normal tw:no-underline tw:text-[var(--bk-ink)] " +
-  "tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+/* The board's line for Danger zone names the screen's actions, not a screen. */
+const LINE_OVERRIDES: Partial<Record<SettingsNavId, string>> = { "danger-zone": "Archive · Transfer · Delete site" };
 
-const RowBody: React.FC<{ nav: SettingsNavDef; line: string; attention: boolean }> = ({ nav, line, attention }) => {
-  return (
-    <>
-      <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-        <span className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">{nav.title}</span>
-        <span
-          className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]"
-          data-testid={`set-ov-row-line-${nav.id}`}
-        >
-          {line}
-        </span>
-      </span>
-      {attention ? (
-        <span
-          className="tw:size-1.5 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-warning)]"
-          role="img"
-          aria-label="Needs attention"
-        />
-      ) : null}
-      <ChevronRight size={14} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
-    </>
-  );
-};
+const CARD_TITLE =
+  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
+
+/* An inline name in the card's line: 13/20 muted, no box — the flowbite link
+   Button's height, padding and accent colour replaced per property. */
+const LINE_LINK =
+  "tw:inline tw:h-auto tw:min-h-0 tw:rounded-[var(--bk-radius-sm)] tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 " +
+  "tw:text-[var(--bk-ink-muted)] tw:no-underline tw:hover:text-[var(--bk-accent)] tw:hover:underline " +
+  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 export interface OverviewScreenProps {
   projectId?: string | null;
@@ -315,36 +298,46 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, siteN
         </section>
       ) : null}
 
-      <div className="tw:flex tw:items-start tw:gap-8">
-        {OVERVIEW_COLUMNS.map((column) => (
-        <div key={column[0]} className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-6">
-        {column.map((group) => (
-          <section
-            key={group}
-            className={`${SET_CARD} tw:flex tw:flex-col tw:gap-2 tw:px-6 tw:py-5`}
-            aria-label={SETTINGS_NAV_GROUPS[group]}
-            data-testid={`set-ov-group-${group}`}
-          >
-            <h3 className={`${SET_EYEBROW} tw:m-0`}>{SETTINGS_NAV_GROUPS[group]}</h3>
-            <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0">
-              {SETTINGS_NAV.filter((n) => n.group === group).map((nav) => (
-                <li key={nav.id}>
-                  <Button
+      <div className="tw:grid tw:grid-cols-2 tw:gap-4" data-testid="set-ov-groups">
+        {SETTINGS_NAV_GROUP_ORDER.map((group) => {
+          const navs = SETTINGS_NAV.filter((n) => n.group === group);
+          return (
+            <section
+              key={group}
+              className={`${SET_CARD} tw:flex tw:min-w-0 tw:flex-col tw:gap-2 tw:p-6 tw:[box-shadow:var(--bk-shadow-raised)]`}
+              aria-label={CARD_TITLES[group] ?? SETTINGS_NAV_GROUPS[group]}
+              data-testid={`set-ov-group-${group}`}
+            >
+              <h3 className={CARD_TITLE}>{CARD_TITLES[group] ?? SETTINGS_NAV_GROUPS[group]}</h3>
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid={`set-ov-line-${group}`}>
+                {navs.map((nav, i) => (
+                  <React.Fragment key={nav.id}>
+                    {i > 0 ? <span aria-hidden>{" · "}</span> : null}
+                    <Button
                       type="button"
-                      variant="ghost"
-                      className={ROW_CLASS}
+                      variant="link"
+                      className={LINE_LINK}
+                      title={summaryLine(nav.id, data)}
+                      aria-description={summaryLine(nav.id, data)}
                       onClick={() => onOpenScreen(nav.id)}
                       data-testid={`set-ov-row-${nav.id}`}
                     >
-                      <RowBody nav={nav} line={summaryLine(nav.id, data)} attention={attentionFor(nav.id)} />
+                      {LINE_OVERRIDES[nav.id] ?? nav.title}
                     </Button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-        </div>
-        ))}
+                    {attentionFor(nav.id) ? (
+                      <span
+                        className="tw:ml-1 tw:inline-block tw:size-1.5 tw:rounded-full tw:bg-[var(--bk-warning)] tw:align-middle"
+                        role="img"
+                        aria-label="Needs attention"
+                        data-testid={`set-ov-dot-${nav.id}`}
+                      />
+                    ) : null}
+                  </React.Fragment>
+                ))}
+              </p>
+            </section>
+          );
+        })}
       </div>
     </Screen>
   );
