@@ -365,3 +365,11 @@ These are prefixed **DNS-M** so they do not collide with Phase B's M1–M19 or t
 | **Total** | **≈ 45 agent-hours** (plus design time for DNS-M1–M12, not counted) |
 
 The path is strictly sequential, D0 → D-A → D-B → D-C → D-E, so the critical path is about 43 h. D-C can start on the dialogs against mocked props once the boards land, while D-B finishes.
+
+---
+
+## Owner decisions (2026-10-04)
+
+All eight recommendations above are accepted. **The DNS CRUD lanes are paused** until the owner provides the two QA test domains (one on Vercel nameservers, one on external DNS) and approves the integration's `domain` Read/Write permission upgrade; the D0 spike needs both.
+
+The current-state bugs this plan found (Vercel 409 treated as verified, apex instructions for subdomains, the `_buildrick` TXT required although Vercel does not need it, SSL never set active, the cron duplicating the service's DNS checks) are fixed now, ahead of the lanes.

@@ -414,3 +414,11 @@ These numbers are prefixed **SEO-M** so they do not collide with the Settings Ph
 | **Total** | **≈ 68 agent-hours** (plus design time for SEO-M1–M12, not counted) |
 
 With S-B ∥ S-E and S-C ∥ S-D, the critical path is S-A → S-B → S-C → S-F, about 42 h of wall-clock agent time once the boards exist.
+
+---
+
+## Owner decisions (2026-10-04)
+
+All eleven recommendations above are accepted (Q1 build the analyzer in-house — `yoastseo` is GPL-3.0; Q2 English readability first, language-neutral checks for every language; Q3 land `cleanUrls` before the SEO publish lane; Q4 pages inherit the site's default title/description; Q5 LocalBusiness without map coordinates; Q6 explicit per-page schema type; Q7 SEO dot per page in Pages; Q8 SEO never blocks publish; Q9 focus keyphrase in the default language only; Q10 canonical defaults to the verified primary domain, never `*.vercel.app`; Q11 sitemap exclusion editable from the page and the Sitemap card, one value).
+
+The current-state bugs this plan found (default title/description fallback, missing canonical with a verified domain, editor preview URL vs the served `.html`) are fixed now, ahead of the lanes, without boards. The lanes themselves wait for the SEO-M1…M12 boards.
