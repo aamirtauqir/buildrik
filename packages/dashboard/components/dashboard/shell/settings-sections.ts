@@ -56,7 +56,7 @@ export const SETTINGS_GROUPS: { label: string; note?: string; items: SettingsSec
   {
     label: "Danger zone",
     items: [
-      { label: "Transfer or delete", description: "Hand the workspace over, or delete it or your account", href: "/dashboard/settings/danger", icon: Trash2 },
+      { label: "Transfer or delete", description: "Transfer ownership; deletion happens 30 days later, cancel any time before", href: "/dashboard/settings/danger", icon: Trash2 },
     ],
   },
 ];
