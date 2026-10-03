@@ -19,7 +19,7 @@ import { SettingsCard } from "./SettingsCard";
 
 export type SocialProfiles = Record<SocialNetwork, string>;
 
-export const SOCIAL_LABELS: Record<SocialNetwork, string> = {
+const SOCIAL_LABELS: Record<SocialNetwork, string> = {
   twitter: "Twitter/X",
   facebook: "Facebook",
   linkedin: "LinkedIn",

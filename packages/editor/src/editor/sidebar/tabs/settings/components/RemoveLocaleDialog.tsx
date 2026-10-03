@@ -28,7 +28,7 @@ export interface RemoveLocaleDialogProps {
   onRemove(): void;
 }
 
-export function removeLocaleBody(name: string, translated: number, total: number): string {
+function removeLocaleBody(name: string, translated: number, total: number): string {
   const pages = translated === 1 ? "page has" : "pages have";
   return `${translated} of ${total} ${pages} ${name} translations. They are kept and come back if you add ${name} again.`;
 }

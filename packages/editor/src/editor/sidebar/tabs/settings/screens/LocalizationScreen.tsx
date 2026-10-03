@@ -55,11 +55,6 @@ const COLS = ["tw:w-90", "tw:w-105", "tw:min-w-0 tw:flex-1"] as const;
 const ROW = "tw:flex tw:items-center tw:gap-3";
 const HEAD = `${ROW} tw:h-7 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-5 tw:text-[var(--bk-ink-muted)]`;
 const BODY_ROW = `${ROW} tw:h-10 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]`;
-/* The locale name and Remove: text in a button, accent for the action. */
-const TEXT_BTN =
-  "tw:h-5 tw:w-fit tw:justify-start tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:bg-transparent tw:p-0 " +
-  "tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:enabled:hover:bg-transparent tw:enabled:hover:underline " +
-  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 /* 8135:214240 `Button · Add locale`: primary, 32 tall, 12 in, 13/500. */
 const ADD_BTN =
   "tw:h-8 tw:shrink-0 tw:rounded-[var(--bk-radius-md)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium " +
@@ -297,9 +292,8 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
               <div key={row.code} role="row" className={BODY_ROW} data-testid={`set-loc-row-${row.code}`}>
                 <span role="cell" className={COLS[0]}>
                   <Button
-                    size="xs"
-                    variant="ghost"
-                    className={`${TEXT_BTN} tw:text-[var(--bk-ink)]`}
+                    variant="link"
+                    className="tw:min-h-5 tw:text-[var(--bk-ink)]"
                     onClick={() => setChecklist(row)}
                     data-testid={`set-loc-row-open-${row.code}`}
                   >
@@ -316,9 +310,8 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
                     </span>
                   ) : readOnly ? null : (
                     <Button
-                      size="xs"
-                      variant="ghost"
-                      className={`${TEXT_BTN} tw:text-[var(--bk-accent)]`}
+                      variant="link"
+                      className="tw:min-h-5"
                       disabled={busy || enabledLocales.length <= 1}
                       onClick={() => askRemove(row)}
                       data-testid={`set-loc-row-remove-${row.code}`}

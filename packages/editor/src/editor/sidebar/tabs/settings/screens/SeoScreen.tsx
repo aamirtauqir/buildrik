@@ -115,10 +115,6 @@ function socialProfilesOf(links: unknown, legacyHandle: string): SocialProfiles 
 /* 8135:214808 `Notice · info` / 8135:215066 indexing-off: 16 × 12 in, a 4
    radius, 13/20 ink — accent tint for the info strip, warning tint for off. */
 const NOTICE = "tw:rounded-[var(--bk-radius-sm)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
-const INLINE_LINK =
-  "tw:inline-flex tw:h-5 tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:bg-transparent tw:p-0 tw:align-baseline " +
-  "tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent " +
-  "tw:enabled:hover:underline tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 /* 8135:214820 `Reset to default`: ghost, 32 tall, 12 in, 13/500. */
 const GHOST_BTN =
   "tw:h-8 tw:shrink-0 tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:bg-transparent tw:px-3 tw:text-[length:var(--bk-text-13)] " +
@@ -352,9 +348,8 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           ) : (
             <Button
               type="button"
-              size="xs"
-              variant="ghost"
-              className={INLINE_LINK}
+              variant="link"
+              className="tw:min-h-5 tw:align-baseline tw:text-[var(--bk-ink)]"
               onClick={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" })}
               data-testid="set-seo-pages-link"
             >

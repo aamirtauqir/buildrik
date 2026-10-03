@@ -31,7 +31,7 @@ export interface SlugChangeDialogProps {
   onConfirm(): void;
 }
 
-export function slugChangeBody(from: string, to: string, liveHost: string | null): string {
+function slugChangeBody(from: string, to: string, liveHost: string | null): string {
   return liveHost
     ? `${from} → ${to}. Your live address stays ${liveHost}; custom domains are not affected.`
     : `${from} → ${to}. Your first publish takes the site's address from it; custom domains are not affected.`;

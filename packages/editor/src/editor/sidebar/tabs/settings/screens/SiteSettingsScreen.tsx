@@ -54,7 +54,7 @@ interface GeneralRow {
 /* `Site.name` is `z.string().min(2).max(100)` on the server. */
 const SITE_NAME_MIN = 2;
 const SITE_NAME_MAX = 100;
-export function siteNameError(value: string): string | null {
+function siteNameError(value: string): string | null {
   const length = value.trim().length;
   if (length === 0) return "Give the site a name — it is what the browser tab and search results show.";
   if (length < SITE_NAME_MIN) return `Needs at least ${SITE_NAME_MIN} characters.`;
@@ -66,7 +66,7 @@ export function siteNameError(value: string): string | null {
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const SLUG_FORMAT_ERROR = "Use only lowercase letters, numbers and hyphens.";
 export const SLUG_TAKEN_ERROR = "This site URL is already taken. Choose another.";
-export function slugError(value: string): string | null {
+function slugError(value: string): string | null {
   if (!SLUG_PATTERN.test(value)) return SLUG_FORMAT_ERROR;
   if (value.length < 3 || value.length > 50) return "Use 3 to 50 characters.";
   return null;
@@ -137,11 +137,6 @@ const UPLOAD_BTN =
   "tw:h-8 tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:bg-transparent tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium " +
   "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0 tw:focus:shadow-none " +
   "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
-/* 8135:212955: the language row, an accent text link. */
-const LINK_BTN =
-  "tw:h-5 tw:w-fit tw:justify-start tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:bg-transparent tw:p-0 " +
-  "tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-accent)] tw:enabled:hover:bg-transparent " +
-  "tw:enabled:hover:underline tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const FIELD_ROW = "tw:grid tw:grid-cols-2 tw:gap-x-6 tw:gap-y-4";
 
 function initialsOf(name: string): string {
@@ -485,9 +480,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         ) : (
           <Button
             type="button"
-            size="xs"
-            variant="ghost"
-            className={LINK_BTN}
+            variant="link"
+            className="tw:min-h-5 tw:w-fit tw:font-medium"
             onClick={() => composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: "localization" })}
             data-testid="set-general-language"
           >
