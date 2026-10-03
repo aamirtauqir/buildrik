@@ -190,7 +190,6 @@
     "ToolbarSpacer": "local",
     "Tooltip": "local",
     "TooltipProps": "local",
-    "TOPBAR_CONTEXT_SEARCH_ID": "local",
     "Topbar": "local",
     "TopbarProps": "local",
     "TopbarTools": "local",
@@ -209,6 +208,10 @@
     "plural": "local",
     "toneFor": "local",
     "useFocusTrap": "local",
-    "useToast": "local"
+    "useToast": "local",
+    "PANEL_SEARCH_ATTR": "local",
+    "PanelSearch": "local",
+    "PanelSearchProps": "local",
+    "isPanelSearchInput": "local"
   }
 }

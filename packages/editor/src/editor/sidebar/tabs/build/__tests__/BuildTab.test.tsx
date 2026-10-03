@@ -280,9 +280,10 @@ describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)"
   });
 });
 
-/* Board 4418:100087: no search box in the drawer — the topbar field reads
-   "Search elements…" while Add is open and its query filters this panel. */
-describe("BuildTab — search through the topbar field", () => {
+/* Owner decision 2026-10-03 (board 4418:100087 had the topbar field read
+   "Search elements…" while Add was open): the field is the panel's own,
+   under the header, and drives the same results / no-results states. */
+describe("BuildTab — search in its own field", () => {
   const emitterComposer = () => {
     const handlers = new Map<string, Set<(p: unknown) => void>>();
     const emitted: Array<[string, unknown]> = [];
@@ -300,14 +301,41 @@ describe("BuildTab — search through the topbar field", () => {
     return { composer: composer as unknown as BuildTabProps["composer"], emitted };
   };
 
-  it("draws no search box or purpose line, and claims the topbar field", () => {
+  it("draws its own search field under the header, no purpose line, and claims nothing in the topbar", () => {
     const { composer, emitted } = emitterComposer();
-    const { container, unmount } = renderTab({ composer });
-    expect(container.querySelector("input[type='search'], #bld-search-input")).toBeNull();
+    const { unmount } = renderTab({ composer });
+    const field = screen.getByPlaceholderText("Search elements…");
+    expect(field.getAttribute("aria-label")).toBe("Search elements…");
+    expect(screen.getByText("⌘F")).toBeTruthy();
     expect(screen.queryByText(/Click a row to add it/)).toBeNull();
-    expect(emitted).toContainEqual(["ui:search-context", { placeholder: "Search elements…" }]);
     unmount();
-    expect(emitted[emitted.length - 1]).toEqual(["ui:search-context", null]);
+    expect(emitted.some(([e]) => e === "ui:search-context")).toBe(false);
+  });
+
+  it("/ focuses the field from outside a text box; ⌘F only from inside the panel", () => {
+    renderTab();
+    const field = screen.getByPlaceholderText("Search elements…");
+    fireEvent.keyDown(document.body, { key: "/" });
+    expect(document.activeElement).toBe(field);
+    field.blur();
+    fireEvent.keyDown(document.body, { key: "f", metaKey: true });
+    expect(document.activeElement).not.toBe(field);
+    fireEvent.keyDown(screen.getByTestId("insert-el-Heading"), { key: "f", metaKey: true });
+    expect(document.activeElement).toBe(field);
+  });
+
+  it("a closed drawer answers no shortcut and drops its query", () => {
+    const { rerender } = renderTab({ isOpen: true });
+    const field = screen.getByPlaceholderText("Search elements…") as HTMLInputElement;
+    fireEvent.change(field, { target: { value: "button" } });
+    rerender(
+      <ToastProvider>
+        <BuildTab composer={null} onBlockClick={vi.fn()} isOpen={false} />
+      </ToastProvider>,
+    );
+    expect((screen.getByPlaceholderText("Search elements…") as HTMLInputElement).value).toBe("");
+    fireEvent.keyDown(document.body, { key: "/" });
+    expect(document.activeElement).not.toBe(screen.getByPlaceholderText("Search elements…"));
   });
 
   /* Board 7063:78846: "Paste HTML…  ⌘⇧V". The chord reaches an open panel
@@ -346,13 +374,14 @@ describe("BuildTab — search through the topbar field", () => {
     expect(emitted).toContainEqual(["ui:insert-drag", { label: null }]);
   });
 
-  it("a topbar query swaps the groups for the flat results (138:53) and the no-results state", async () => {
+  it("a query swaps the groups for the flat results (138:53) and the no-results state", async () => {
     const { composer } = emitterComposer();
     renderTab({ composer });
-    act(() => composer!.emit("ui:search-query" as never, { query: "button" } as never));
+    const field = screen.getByPlaceholderText("Search elements…");
+    fireEvent.change(field, { target: { value: "button" } });
     await waitFor(() => expect(screen.getByTestId("insert-search-results")).toBeTruthy());
     expect(screen.getAllByText("Button").length).toBeGreaterThan(0);
-    act(() => composer!.emit("ui:search-query" as never, { query: "zzznotablock" } as never));
+    fireEvent.change(field, { target: { value: "zzznotablock" } });
     await waitFor(() => expect(screen.getByText("Nothing matches ‘zzznotablock’.")).toBeTruthy());
   });
 });
@@ -473,23 +502,3 @@ describe("BuildTab — BLOCKS to board 4428:140817", () => {
   });
 });
 
-describe("BuildTab — the topbar claim is stable while typing", () => {
-  it("claims the field once, however many queries arrive", () => {
-    const handlers = new Map<string, Set<(p: unknown) => void>>();
-    const emitted: string[] = [];
-    const composer = {
-      on: (e: string, h: (p: unknown) => void) => {
-        if (!handlers.has(e)) handlers.set(e, new Set());
-        handlers.get(e)!.add(h);
-      },
-      off: (e: string, h: (p: unknown) => void) => handlers.get(e)?.delete(h),
-      emit: (e: string, p: unknown) => {
-        emitted.push(e);
-        handlers.get(e)?.forEach((h) => h(p));
-      },
-    } as unknown as BuildTabProps["composer"];
-    renderTab({ composer });
-    for (const q of ["b", "bu", "but", ""]) act(() => composer!.emit("ui:search-query" as never, { query: q } as never));
-    expect(emitted.filter((e) => e === "ui:search-context")).toHaveLength(1);
-  });
-});

@@ -62,16 +62,10 @@ const EXIT_BTN_CLASS =
   "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[13px] tw:font-medium " +
   "tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
 
-/* The contextual search field, 320×36 (board 4418:100087): shown only while a
-   drawer owns search. Board 4418:123573's resting ⌘K search button was removed
-   on OWNER DECISION 2026-10-03 — ⌘K / Ctrl+K (StudioHeader's own keydown
-   listener) is the palette's door; the button only duplicated it. */
-const SEARCH_CLASS =
-  "tw:flex tw:flex-none tw:items-center tw:gap-2 tw:h-9 tw:w-[320px] tw:px-3 tw:rounded-md tw:border tw:border-[var(--bk-border-input)] " +
-  "tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:cursor-text tw:hover:border-[var(--bk-ink-muted)] " +
-  "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
-const SEARCH_KBD =
-  "tw:ml-auto tw:rounded tw:border tw:border-[var(--bk-border)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* The topbar carries no search field in any state (OWNER DECISIONS
+   2026-10-03): the resting ⌘K button went first — ⌘K / Ctrl+K is the
+   palette's door — and then the drawer-owned field (board 4418:100087 and its
+   siblings), which moved into each panel as chrome-ui's PanelSearch. */
 /* Board 4418:123573: Preview is a 76×32 bordered TEXT button, not an eye. */
 const PREVIEW_BTN_CLASS =
   "tw:h-8 tw:w-[76px] tw:px-0 tw:text-[13px] tw:font-medium tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
@@ -144,9 +138,6 @@ export interface TopbarProps {
   review?: ReviewPill | null;
   /** The daily-loop cluster: Quick preview · Comments. */
   tools?: TopbarTools | null;
-  /** Board 4418:100087: while a drawer owns search (Add → "Search elements…"),
-   *  the field is a real input that filters that drawer instead of ⌘K. */
-  contextSearch?: { placeholder: string; value: string; onChange: (value: string) => void } | null;
   presence?: PresenceProps | null;
   unreadCount?: number;
   onOpenNotifications?: () => void;
@@ -194,7 +185,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 export function Topbar({
   siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, ctaLabel, ctaHint, action, menu, contextSearch,
+  publishBlockedReason, ctaLabel, ctaHint, action, menu,
 }: TopbarProps) {
   return (
     <header
@@ -280,44 +271,6 @@ export function Topbar({
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {contextSearch ? (
-        <label className={`${SEARCH_CLASS} tw:text-[var(--bk-ink)] tw:focus-within:[box-shadow:var(--bk-shadow-focus)]`} data-testid="topbar-search">
-          <SearchGlyph />
-          <input
-            id={TOPBAR_CONTEXT_SEARCH_ID}
-            type="text"
-            className="tw:min-w-0 tw:flex-1 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-ink)] tw:outline-none tw:placeholder:text-[var(--bk-ink-muted)] tw:focus:ring-0 tw:focus:[box-shadow:none]"
-            /* The field (the label) draws the focus ring; a11y.css's unlayered
-               `*:focus-visible` outline outranks any layered utility, so the
-               inner box's own ring is switched off here. */
-            style={{ outline: "none" }}
-            placeholder={contextSearch.placeholder}
-            aria-label={contextSearch.placeholder}
-            value={contextSearch.value}
-            onChange={(e) => contextSearch.onChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape" && contextSearch.value) {
-                e.stopPropagation();
-                contextSearch.onChange("");
-              }
-            }}
-            data-testid="topbar-context-search"
-          />
-          {contextSearch.value ? (
-            <button
-              type="button"
-              aria-label="Clear search"
-              className="tw:border-0 tw:bg-transparent tw:p-0 tw:text-[var(--bk-ink-muted)] tw:cursor-pointer"
-              onClick={() => contextSearch.onChange("")}
-            >
-              ✕
-            </button>
-          ) : (
-            <kbd className={SEARCH_KBD}>⌘F</kbd>
-          )}
-        </label>
-      ) : null}
-
       {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
 
 
@@ -492,18 +445,6 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
 
 /* Inline 24px glyphs matching the Figma icon components 681:4338 / 681:4343.
    Eye/Comment/Spinner: Figma nodes pending T1 (as-built ledger pattern). */
-/** The topbar field's input id while a drawer owns search — ⌘F / "/" focus it. */
-export const TOPBAR_CONTEXT_SEARCH_ID = "topbar-context-search";
-
-function SearchGlyph() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-  );
-}
-
 function CommentIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

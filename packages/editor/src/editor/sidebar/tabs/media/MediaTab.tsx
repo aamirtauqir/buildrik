@@ -9,7 +9,6 @@ import * as React from "react";
 import type { ImageEditorOptions } from "../../../shell/hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
 import { PanelFrame, useToast } from "@/editor/chrome-ui";
-import { EVENTS } from "@shared/constants/events";
 import type { Composer } from "../../../../engine/Composer";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
@@ -70,45 +69,9 @@ function MediaTabWithComposer({
   onOpenImageEditor,
   onOpenLibrary,
   initialStockQuery,
-  isOpen = true,
-}: Omit<MediaTabProps, "composer"> & { composer: Composer; isOpen?: boolean }) {
+}: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
   const state = useMediaState(composer);
 
-  /* Board 4418:59771: the drawer draws no search box — the topbar field reads
-     "Search all N assets…" while Assets is open and drives the library search.
-     The context carries the current query, so re-announcing (the count moved,
-     or the search was set from here — Clear search, a selection request's
-     prefill) shows the drawer's real query instead of wiping the field. */
-  const assetTotal = state.serverPage?.total ?? state.libraryItems.length;
-  const setLibrarySearchRef = React.useRef(state.setLibrarySearch);
-  setLibrarySearchRef.current = state.setLibrarySearch;
-  const fromTopbarRef = React.useRef("");
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const onQuery = ({ query }: { query: string }) => {
-      fromTopbarRef.current = query;
-      setLibrarySearchRef.current(query);
-    };
-    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
-    return () => {
-      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
-      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
-    };
-  }, [composer, isOpen]);
-  const announcedRef = React.useRef<{ total: number; query: string } | null>(null);
-  React.useEffect(() => {
-    if (!isOpen) {
-      announcedRef.current = null;
-      return;
-    }
-    const query = state.librarySearch;
-    const last = announcedRef.current;
-    const unchanged = last && last.total === assetTotal;
-    announcedRef.current = { total: assetTotal, query };
-    if (unchanged && (last.query === query || fromTopbarRef.current === query)) return;
-    fromTopbarRef.current = query;
-    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: `Search all ${assetTotal} assets…`, query });
-  }, [composer, isOpen, assetTotal, state.librarySearch]);
   const { addToast } = useToast();
   const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
   const write = useMediaWriteAccess();
