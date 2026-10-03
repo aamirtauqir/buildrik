@@ -8391,7 +8391,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-01",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-01 measured + diffed (all joined properties PASS). match. Heading Level/Text style/Edit text, Typography face, Size Fill/Hug, SpacingBox, Fill +/Border + as drawn. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall (W5) where this board draws 68, so tabs, context row and sections sit 4px lower (rule under the context row 188 vs 184); context row 28 as drawn; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-01 measured + diffed (all joined properties PASS). match. Heading Level/Text style/Edit text, Typography face, Size Fill/Hug, SpacingBox, Fill +/Border + as drawn. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall (W5) where this board draws 68, so tabs, context row and sections sit 4px lower (rule under the context row 188 vs 184); context row 28 as drawn; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-3, DD-15, R-DD-9, DD-9b, DD-11"
     },
     {
       "nodeId": "7993:198958",
@@ -8405,7 +8406,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-02",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-02 measured + diffed (all joined properties PASS). match. CMS binding · Visibility · Interactions · CSS classes · Attributes summary; no context row. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall (W5) where this board draws 68, so tabs and sections sit 4px lower; Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-02 measured + diffed (all joined properties PASS). match. CMS binding · Visibility · Interactions · CSS classes · Attributes summary; no context row. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall (W5) where this board draws 68, so tabs and sections sit 4px lower; Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "Q1, DD-10, DD-9"
     },
     {
       "nodeId": "7993:199242",
@@ -8419,7 +8421,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-03",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-03 measured + diffed (all joined properties PASS). match. Opacity/Shadow/Filters/Transform & motion '+' rows, Advanced summary 'Cursor: auto · Blend: normal'. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall (W5) where this board draws 68, so tabs, context row and sections sit 4px lower (rule under the context row 188 vs 184); context row 28 as drawn; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-03 measured + diffed (all joined properties PASS). match. Opacity/Shadow/Filters/Transform & motion '+' rows, Advanced summary 'Cursor: auto · Blend: normal'. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall (W5) where this board draws 68, so tabs, context row and sections sit 4px lower (rule under the context row 188 vs 184); context row 28 as drawn; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "Q1, DD-9"
     },
     {
       "nodeId": "7995:199188",
@@ -8433,7 +8436,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-04",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-04 measured + diffed (all joined properties PASS). match (shape). Text block + Typography. Align shows no active option when the text has no text-align (board sample has Center); paragraph type icon is the list glyph, board draws T. Colour reads 'Text': token names follow the seed by owner decision 2026-10-02 ('Text / primary' is board sample data). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-04 measured + diffed (all joined properties PASS). match (shape). Text block + Typography. Align shows no active option when the text has no text-align (board sample has Center); paragraph type icon is the list glyph, board draws T. Colour reads 'Text': token names follow the seed by owner decision 2026-10-02 ('Text / primary' is board sample data). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-3, R-DD-9"
     },
     {
       "nodeId": "7995:199522",
@@ -8447,7 +8451,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-05",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-05 measured + diffed (all joined properties PASS). match. Button: Edit text, Type segmented, Disabled box-then-label; Fill/Border open because the fixture button carries a fill and radius; closed Text inside per owner answer OQ-1(a). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-05 measured + diffed (all joined properties PASS). match. Button: Edit text, Type segmented, Disabled box-then-label; Fill/Border open because the fixture button carries a fill and radius; closed Text inside per owner answer OQ-1(a). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-3, X-8"
     },
     {
       "nodeId": "7995:199820",
@@ -8461,7 +8466,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-06",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-06 measured + diffed (all joined properties PASS). match. Link to/Page/Open in new tab/Rel/hint, then the Behaviour set. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-06 measured + diffed (all joined properties PASS). match. Link to/Page/Open in new tab/Rel/hint, then the Behaviour set. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "R-DD-9, X-3"
     },
     {
       "nodeId": "7995:200137",
@@ -8475,7 +8481,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-07",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-07 measured + diffed (all joined properties PASS). match. URL variant with Rel. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-07 measured + diffed (all joined properties PASS). match. URL variant with Rel. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "R-DD-9"
     },
     {
       "nodeId": "7995:200452",
@@ -8489,7 +8496,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-08",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-08 measured + diffed (all joined properties PASS). match (shape). Image source row, Replace, Alt + hint, Fit, Loading. Not reachable: '2400 × 1600 · 428 KB' (remote URL, no media-library metadata). Fit shows no active option when object-fit is unset. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-08 measured + diffed (all joined properties PASS). match (shape). Image source row, Replace, Alt + hint, Fit, Loading. Not reachable: '2400 × 1600 · 428 KB' (remote URL, no media-library metadata). Fit shows no active option when object-fit is unset. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-3"
     },
     {
       "nodeId": "7995:200767",
@@ -8503,7 +8511,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-09",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-09 measured + diffed (all joined properties PASS). match. Video URL, 'Detected: YouTube', Ratio, Autoplay/Muted/Show controls, autoplay-without-muted warning. W4 fixed the spacing box writing px onto padding-bottom 56.25%. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-09 measured + diffed (all joined properties PASS). match. Video URL, 'Detected: YouTube', Ratio, Autoplay/Muted/Show controls, autoplay-without-muted warning. W4 fixed the spacing box writing px onto padding-bottom 56.25%. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "Q5, X-9"
     },
     {
       "nodeId": "7995:201080",
@@ -8517,7 +8526,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-10",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-10 measured + diffed (all joined properties PASS). match. Audio source row + Choose audio, Show controls/Loop/Autoplay. Duration/size not reachable (remote URL). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-10 measured + diffed (all joined properties PASS). match. Audio source row + Choose audio, Show controls/Loop/Autoplay. Duration/size not reachable (remote URL). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "Q5"
     },
     {
       "nodeId": "7995:201380",
@@ -8531,7 +8541,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-11",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-11 measured + diffed (all joined properties PASS). match. Ends at, time-zone hint, When done, Message; closed Text inside (W1 decision). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-11 measured + diffed (all joined properties PASS). match. Ends at, time-zone hint, When done, Message; closed Text inside (W1 decision). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "Q5"
     },
     {
       "nodeId": "7995:201678",
@@ -8545,7 +8556,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-12",
       "verified": "drift-fixed",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-12 measured + diffed (all joined properties PASS). drift-fixed. Value/Maximum were plain text inputs; now number fields with stepper, no unit (W4 commit 8c1419931). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-12 measured + diffed (all joined properties PASS). drift-fixed. Value/Maximum were plain text inputs; now number fields with stepper, no unit (W4 commit 8c1419931). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "Q5"
     },
     {
       "nodeId": "7995:201971",
@@ -8559,7 +8571,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-13",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-13 measured + diffed (all joined properties PASS). match. Item rows Open/Closed, Allow several open. Long item labels clip without ellipsis. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-13 measured + diffed (all joined properties PASS). match. Item rows Open/Closed, Allow several open. Long item labels clip without ellipsis. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "Q5"
     },
     {
       "nodeId": "7995:202274",
@@ -8573,7 +8586,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-14",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-14 measured + diffed (all joined properties PASS). match. Input type/Name/Placeholder/Default/Required/Disabled; Fill/Border open from fixture data. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-14 measured + diffed (all joined properties PASS). match. Input type/Name/Placeholder/Default/Required/Disabled; Fill/Border open from fixture data. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-3, X-8"
     },
     {
       "nodeId": "7995:202583",
@@ -8587,7 +8601,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-15",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-15 measured + diffed (all joined properties PASS). match. Checkbox header, Edit text, Name, Checked by default, Required. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-15 measured + diffed (all joined properties PASS). match. Checkbox header, Edit text, Name, Checked by default, Required. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "Q2, P-13"
     },
     {
       "nodeId": "7995:202877",
@@ -8601,7 +8616,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-16",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-16 measured + diffed (all joined properties PASS). match. Direction, 3x3 align + readout, Wrap, Gap. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-16 measured + diffed (all joined properties PASS). match. Direction, 3x3 align + readout, Wrap, Gap. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-5, DD-9"
     },
     {
       "nodeId": "7995:203208",
@@ -8615,7 +8631,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-17",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-17 measured + diffed (all joined properties PASS). match. Display Block/Flex/Grid/None, Columns, Gap, Position, Text inside last. Position row carries an info icon the board does not draw. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-17 measured + diffed (all joined properties PASS). match. Display Block/Flex/Grid/None, Columns, Gap, Position, Text inside last. Position row carries an info icon the board does not draw. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "R-DD-9, DD-10"
     },
     {
       "nodeId": "7995:203523",
@@ -8629,7 +8646,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-18",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-18 measured + diffed (all joined properties PASS). match. Link present, no CMS binding. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-18 measured + diffed (all joined properties PASS). match. Link present, no CMS binding. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-10"
     },
     {
       "nodeId": "7995:203829",
@@ -8643,7 +8661,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-19",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-19 measured + diffed (all joined properties PASS). match. Fields rows + Add field, Then/Message/Send to, note. Live also draws a 'Spam protection' checkbox (code contract — FormAfterSubmitSection's setting; behaviour follows code). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-19 measured + diffed (all joined properties PASS). match. Fields rows + Add field, Then/Message/Send to, note. Live also draws a 'Spam protection' checkbox (code contract — FormAfterSubmitSection's setting; behaviour follows code). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-15, C-5"
     },
     {
       "nodeId": "7995:204147",
@@ -8657,7 +8676,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-20",
       "verified": "drift-fixed",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-20 measured + diffed (all joined properties PASS). drift-fixed. Show items was a plain text input; now a number field with stepper (8c1419931). Collection, + New collection…, Open collection as drawn. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-20 measured + diffed (all joined properties PASS). drift-fixed. Show items was a plain text input; now a number field with stepper (8c1419931). Collection, + New collection…, Open collection as drawn. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 tall as drawn (W5); Behaviour has no context row; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "§17.D"
     },
     {
       "nodeId": "7995:204447",
@@ -8671,7 +8691,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-21",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-21 measured + diffed (all joined properties PASS). match. Page panel: Home · Page header, Fill/Size/Typography/Spacing, SEO & social…, 'Your place here is kept', no tabs. Background reads 'transparent' on this fixture site (its root is imported, so it predates the token); a NEW site reads 'Page / background' (owner decision 2026-10-02: seed token color-page-background, value transparent, new page roots bound to it — live on port 3190). Text colour reads 'Text': token names follow the seed by owner decision 2026-10-02 ('Text / primary' is board sample data). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): the Page panel header is 68 tall vs the board's 72 (no tabs, no context row), so Fill starts 4px higher and the rows line up again by Size (rules 246/335 vs 248/336); the 'Page / background' chip now ellipsises as drawn ('Page / backgro…', full name on hover) instead of clipping mid-letter; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-21 measured + diffed (all joined properties PASS). match. Page panel: Home · Page header, Fill/Size/Typography/Spacing, SEO & social…, 'Your place here is kept', no tabs. Background reads 'transparent' on this fixture site (its root is imported, so it predates the token); a NEW site reads 'Page / background' (owner decision 2026-10-02: seed token color-page-background, value transparent, new page roots bound to it — live on port 3190). Text colour reads 'Text': token names follow the seed by owner decision 2026-10-02 ('Text / primary' is board sample data). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): the Page panel header is 68 tall vs the board's 72 (no tabs, no context row), so Fill starts 4px higher and the rows line up again by Size (rules 246/335 vs 248/336); the 'Page / background' chip now ellipsises as drawn ('Page / backgro…', full name on hover) instead of clipping mid-letter; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-13, P-5"
     },
     {
       "nodeId": "7995:204715",
@@ -8685,7 +8706,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-22",
       "verified": "drift-fixed",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-22 measured + diffed (all joined properties PASS). drift-fixed. 'Mixed' placeholder was italic; board draws it upright (335a3867f). Header, Align ×6 / Distribute ×2 / Group, note, Mixed values as drawn. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-22 measured + diffed (all joined properties PASS). drift-fixed. 'Mixed' placeholder was italic; board draws it upright (335a3867f). Header, Align ×6 / Distribute ×2 / Group, note, Mixed values as drawn. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-12"
     },
     {
       "nodeId": "7995:205108",
@@ -8699,7 +8721,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-23",
       "verified": "drift-fixed",
-      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-23 measured + diffed (all joined properties PASS). drift-fixed. Header 72, 🔒 mark its own row under it, status line 6·16 (28 tall), tabs at y180 = board. Left: the 🔒 row is 32 tall (8·16, the note padding boards 26/27/28 draw) where this board alone draws 24 (6/2·16), so tabs and sections sit 8px lower than this board."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-23 measured + diffed (all joined properties PASS). drift-fixed. Header 72, 🔒 mark its own row under it, status line 6·16 (28 tall), tabs at y180 = board. Left: the 🔒 row is 32 tall (8·16, the note padding boards 26/27/28 draw) where this board alone draws 24 (6/2·16), so tabs and sections sit 8px lower than this board.",
+      "decisions": "DD-18, P-1"
     },
     {
       "nodeId": "7995:205467",
@@ -8713,7 +8736,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-24",
       "verified": "drift-fixed",
-      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-24 measured + diffed (all joined properties PASS). drift-fixed. Binding chip its own 4·12 row between header and tabs (was inside the header padding, 16px high): chip 1153,132 28 tall, 12px, gray-50 no stroke; tabs y164 and first section y196 = board."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-24 measured + diffed (all joined properties PASS). drift-fixed. Binding chip its own 4·12 row between header and tabs (was inside the header padding, 16px high): chip 1153,132 28 tall, 12px, gray-50 no stroke; tabs y164 and first section y196 = board.",
+      "decisions": "R-DD-17, P-2"
     },
     {
       "nodeId": "7995:205787",
@@ -8727,7 +8751,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-25",
       "verified": "drift-fixed",
-      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-25 measured + diffed (all joined properties PASS). drift-fixed. Same row as 24: missing chip 28 tall, error border + tint, tabs y164 = board."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-25 measured + diffed (all joined properties PASS). drift-fixed. Same row as 24: missing chip 28 tall, error border + tint, tabs y164 = board.",
+      "decisions": "R-DD-17"
     },
     {
       "nodeId": "7995:206087",
@@ -8741,7 +8766,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-26",
       "verified": "drift-fixed",
-      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-26 measured + diffed (all joined properties PASS). drift-fixed. Component mark its own 8·16 note row (text y136), tabs y160, first section rule y220 vs board 219. Layout and Text inside no longer render on the instance root (shown again only if the instance overrides one of their properties); reachable through Edit master / Detach. Left: identity glyph is the component icon, board draws ◆; the board's muted '··· Reset to master · Detach instance…' hint line is not drawn (those rows live in the ⋯ menu)."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-26 measured + diffed (all joined properties PASS). drift-fixed. Component mark its own 8·16 note row (text y136), tabs y160, first section rule y220 vs board 219. Layout and Text inside no longer render on the instance root (shown again only if the instance overrides one of their properties); reachable through Edit master / Detach. Left: identity glyph is the component icon, board draws ◆; the board's muted '··· Reset to master · Detach instance…' hint line is not drawn (those rows live in the ⋯ menu).",
+      "decisions": "DD-16, R-DD-14"
     },
     {
       "nodeId": "7995:206390",
@@ -8755,7 +8781,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-27",
       "verified": "drift-fixed",
-      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-27 measured + diffed (all joined properties PASS). drift-fixed. Header 72 + 28 chip row + '1 :hover override · Reset' as its own 8·16 note row: tabs y128, first section rule y220 vs board 219 (was 208). Token names follow the seed ('Primary', 'Text') by owner decision 2026-10-02."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-27 measured + diffed (all joined properties PASS). drift-fixed. Header 72 + 28 chip row + '1 :hover override · Reset' as its own 8·16 note row: tabs y128, first section rule y220 vs board 219 (was 208). Token names follow the seed ('Primary', 'Text') by owner decision 2026-10-02.",
+      "decisions": "R-DD-14"
     },
     {
       "nodeId": "7995:207832",
@@ -8769,7 +8796,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-28",
       "verified": "drift-fixed",
-      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-28 measured + diffed (all joined properties PASS). drift-fixed. Header 72 + 28 chip row + 'Tablet · Revert' as its own 8·16 note row: tabs y128, first section rule y220 vs board 219 (was 208). Per-field vs per-header override dot difference unchanged (boards disagree)."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-28 measured + diffed (all joined properties PASS). drift-fixed. Header 72 + 28 chip row + 'Tablet · Revert' as its own 8·16 note row: tabs y128, first section rule y220 vs board 219 (was 208). Per-field vs per-header override dot difference unchanged (boards disagree).",
+      "decisions": "R-DD-14"
     },
     {
       "nodeId": "7995:208198",
@@ -8783,7 +8811,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-29",
       "verified": "drift-fixed",
-      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-29 measured + diffed (all joined properties PASS). drift-fixed. Status line 6·16: 44 tall on two lines like the board's band (128–172), tabs y172 and first section y232 = board (after Escape on the ConflictModal)."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-29 measured + diffed (all joined properties PASS). drift-fixed. Status line 6·16: 44 tall on two lines like the board's band (128–172), tabs y172 and first section y232 = board (after Escape on the ConflictModal).",
+      "decisions": "Q4"
     },
     {
       "nodeId": "7995:208555",
@@ -8797,7 +8826,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-30",
       "verified": "drift-fixed",
-      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-30 measured + diffed (all joined properties PASS). drift-fixed. Menu 320 wide, portaled through chrome-ui Popover portal (overlay root, fixed), right edge on the ⋯ (x1080–1400), over the canvas, no clip; 'on this page (N)' on a muted second line. Left: menu top 118 (4px under the ⋯, the anchored-popover gap) vs board 136."
+      "verifiedNote": "W5 2026-10-02: board PNG vs live 1440x900 by eye + getBoundingClientRect (port 3180, fixture 'Inspector v4 fixture · W5' cmuqtkgkq0008yy3ue1emwah9), recipe inspector-v4-30 measured + diffed (all joined properties PASS). drift-fixed. Menu 320 wide, portaled through chrome-ui Popover portal (overlay root, fixed), right edge on the ⋯ (x1080–1400), over the canvas, no clip; 'on this page (N)' on a muted second line. Left: menu top 118 (4px under the ⋯, the anchored-popover gap) vs board 136.",
+      "decisions": "R-DD-8, DD-6b"
     },
     {
       "nodeId": "7995:209026",
@@ -8811,7 +8841,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-31",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-31 measured + diffed (all joined properties PASS). match. 'Apply this style to 3 H3 headings on Home?', Copies/Keeps, Brand hint, Cancel/Apply to 3, toast 'Applied to 3 H3 headings · Undo'. Skipped row absent because no peer is locked (fixture). Dialog frame is chrome-ui Modal (24 padding). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-31 measured + diffed (all joined properties PASS). match. 'Apply this style to 3 H3 headings on Home?', Copies/Keeps, Brand hint, Cancel/Apply to 3, toast 'Applied to 3 H3 headings · Undo'. Skipped row absent because no peer is locked (fixture). Dialog frame is chrome-ui Modal (24 padding). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-6b"
     },
     {
       "nodeId": "7995:209399",
@@ -8825,7 +8856,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-32",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-32 measured + diffed (all joined properties PASS). match. 'Edit styles for' Base/:hover/:focus/:active/:disabled beside the column; dot on :hover (fixture override). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-32 measured + diffed (all joined properties PASS). match. 'Edit styles for' Base/:hover/:focus/:active/:disabled beside the column; dot on :hover (fixture override). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "R-DD-14"
     },
     {
       "nodeId": "7995:209771",
@@ -8839,7 +8871,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-33",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-33 measured + diffed (all joined properties PASS). match. Brand colours rows swatch · name · hex · Use, 'Add colours in Brand', closed Custom colour (lead decision). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-33 measured + diffed (all joined properties PASS). match. Brand colours rows swatch · name · hex · Use, 'Add colours in Brand', closed Custom colour (lead decision). Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "P-4"
     },
     {
       "nodeId": "7995:210146",
@@ -8853,7 +8886,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-34",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-34 measured + diffed (all joined properties PASS). match. Width '24..' + Enter → red edge + 'Enter a valid number. Choose the unit separately.' band under Size. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-34 measured + diffed (all joined properties PASS). match. Width '24..' + Enter → red edge + 'Enter a valid number. Choose the unit separately.' band under Size. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): header 72 and context row 28 as drawn (W5; e.g. board 22's rule under the context row at 312 on both); 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-19"
     },
     {
       "nodeId": "7995:210503",
@@ -8867,7 +8901,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-35",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-35 measured + diffed (all joined properties PASS). match. ‹ Inspector, 'Scope: Heading', prompt, 3 suggestions, return note. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): no Inspector header or context row on this board (AI column replaces it), nothing shared to compare; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-35 measured + diffed (all joined properties PASS). match. ‹ Inspector, 'Scope: Heading', prompt, 3 suggestions, return note. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): no Inspector header or context row on this board (AI column replaces it), nothing shared to compare; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "DD-7, P-6, P-7"
     },
     {
       "nodeId": "7995:210717",
@@ -8881,7 +8916,8 @@
       "page": "4418:45431",
       "recipe": "inspector-v4-36",
       "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-36 measured + diffed (all joined properties PASS). match. Canvas full width, 'Show inspector ⌘\\' 4px lower than the board (shell page-tab bar); ⌘\\ toggles live. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): no Inspector header or context row on this board (Inspector hidden), nothing shared to compare; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed."
+      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-36 measured + diffed (all joined properties PASS). match. Canvas full width, 'Show inspector ⌘\\' 4px lower than the board (shell page-tab bar); ⌘\\ toggles live. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): no Inspector header or context row on this board (Inspector hidden), nothing shared to compare; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "decisions": "R-DD-8"
     },
     {
       "nodeId": "4418:128908",
