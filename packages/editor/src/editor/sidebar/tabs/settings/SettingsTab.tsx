@@ -44,6 +44,7 @@ import {
   type SettingsOpenRequest,
   type RedirectRepair,
   SCREEN_PLAN_REQUIREMENTS,
+  SCREENS_WITH_OWN_PLAN_LOCK,
   SETTINGS_NAV,
   SETTINGS_NAV_GROUPS,
   SETTINGS_NAV_GROUP_ORDER,
@@ -583,6 +584,9 @@ export const SettingsTab: React.FC<
   // ─── Pane content ─────────────────────────────────────────────────────
 
   const locked = !isOverview && isScreenLocked(currentScreen, effectivePlan);
+  /* 8136:216758: Access draws its own lock (the password card) and keeps Share
+     links — no centred LockedScreen, no header Upgrade. */
+  const ownsLock = locked && isSettingsScreenId(currentScreen) && SCREENS_WITH_OWN_PLAN_LOCK.has(currentScreen);
   const editorRole = useEditorRole();
   /* PD-1 (M7): Site columns are the dashboard's, mirrored from the editor only
      for an ADMIN. Below ADMIN (a KNOWN role — unknown stays editable, the
@@ -603,7 +607,7 @@ export const SettingsTab: React.FC<
     }
     if (!screenId) return <OverviewScreen projectId={projectId} siteName={siteName} onOpenScreen={requestNav} />;
     const required = SCREEN_PLAN_REQUIREMENTS[screenId];
-    if (locked && required) {
+    if (locked && required && !ownsLock) {
       return <LockedScreen variant={required} {...LOCKED_COPY[screenId]} onUpgrade={openBilling} />;
     }
     const screenNode = (
@@ -638,6 +642,8 @@ export const SettingsTab: React.FC<
       registerFieldErrors,
       registerFooterMessage: setFooterMessage,
       onOpenScreen: requestNav,
+      planLocked: locked,
+      onUpgrade: openBilling,
       fieldErrors: serverFieldErrors,
     };
     switch (screenId) {
@@ -927,11 +933,11 @@ export const SettingsTab: React.FC<
               </p>
             ) : null}
           </div>
-          {locked ? (
+          {locked && !ownsLock ? (
             <Button type="button" size="xs" className={SET_HEAD_BTN} onClick={openBilling} data-testid="set-head-upgrade">
               Upgrade
             </Button>
-          ) : readOnly ? null : (
+          ) : readOnly || locked ? null : (
             headerAction
           )}
         </header>

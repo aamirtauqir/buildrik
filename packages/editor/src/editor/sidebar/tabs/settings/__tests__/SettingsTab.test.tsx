@@ -431,6 +431,19 @@ describe("SettingsTab — the shell", () => {
     expect(screen.queryByText(/Custom code is a Pro feature/)).toBeNull();
   });
 
+  it("Access below Pro draws its own lock (8136:216758): Share links stays, no centred LockedScreen, no header Upgrade, no footer", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} userPlan="starter" />);
+    fireEvent.click(screen.getByTestId("set-nav-access"));
+    await waitFor(() => expect(headTitle()).toBe("Access"));
+    expect(screen.queryByTestId("set-locked")).toBeNull();
+    expect(screen.queryByTestId("set-head-upgrade")).toBeNull();
+    expect(screen.getByTestId("set-access-upgrade")).toHaveTextContent("Upgrade to Pro");
+    expect(screen.getByTestId("set-card-share-links")).toBeTruthy();
+    expect(screen.queryByTestId("set-foot-save")).toBeNull();
+    // The nav row still says Pro before it is opened.
+    expect(screen.getByTestId("set-nav-pro-access").textContent).toBe("Pro");
+  });
+
   it("deep-links to a screen; the removed Integrations (and any id that names no screen) stays on the Overview", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} userPlan="enterprise" initialScreen="access" />);
     await waitFor(() => expect(headTitle()).toBe("Access"));

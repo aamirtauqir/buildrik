@@ -147,3 +147,22 @@ describe("AccessScreen — Share links and the load states", () => {
     await loaded();
   });
 });
+
+describe("AccessScreen — below Pro (8136:216758): the screen draws its own lock", () => {
+  it("locks the password card — Pro, what it does, Upgrade to Pro — and keeps Share links", () => {
+    const onUpgrade = vi.fn();
+    const { registerSaveHandler } = setup({ planLocked: true, onUpgrade });
+    const card = screen.getByTestId("set-card-password-protection");
+    expect(card).toHaveTextContent("Password protection");
+    expect(screen.getByTestId("set-access-pro")).toHaveTextContent("Pro");
+    expect(card).toHaveTextContent("Protect your published site with a password.");
+    expect(card).toHaveTextContent("Upgrade to Pro to control who can view your site.");
+    // No switch, no password field: nothing here saves.
+    expect(screen.queryByTestId("set-access-toggle")).toBeNull();
+    expect(screen.queryByTestId("set-access-password")).toBeNull();
+    expect(registerSaveHandler.mock.calls.every((c) => c[0] === null)).toBe(true);
+    fireEvent.click(screen.getByTestId("set-access-upgrade"));
+    expect(onUpgrade).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("set-access-share-links")).toHaveTextContent("Manage share links ↗");
+  });
+});

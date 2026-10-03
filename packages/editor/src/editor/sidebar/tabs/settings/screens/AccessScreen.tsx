@@ -1,7 +1,12 @@
 /**
  * AccessScreen — PUBLISHING › Access (plan row #31; boards 8136:216089
- * password-set, 8136:216319 password-off, 8136:216535 set-password;
- * 8136:216758 pro-locked is the shell's LockedScreen).
+ * password-set, 8136:216319 password-off, 8136:216535 set-password,
+ * 8136:216758 pro-locked).
+ *
+ * Below Pro the shell mounts this screen with `planLocked`
+ * (`SCREENS_WITH_OWN_PLAN_LOCK`) rather than its centred LockedScreen: only
+ * the password card is the plan's — it says so, with `Upgrade to Pro` — and
+ * Share links stays, since every plan has them.
  *
  * Card **Password protection · Pro**: the switch, then — on, with a password
  * stored — "A password is set", a `New password` field that changes it and
@@ -51,6 +56,8 @@ export const AccessScreen: React.FC<ScreenProps> = ({
   fieldErrors,
   saveError,
   readOnly,
+  planLocked,
+  onUpgrade,
 }) => {
   const [hasPassword, setHasPassword] = React.useState(false);
   const [enabled, setEnabled] = React.useState(false);
@@ -100,6 +107,49 @@ export const AccessScreen: React.FC<ScreenProps> = ({
     });
     return () => registerSaveHandler(null);
   }, [dirty, projectId, registerSaveHandler]);
+
+  const shareLinks = (
+    <section className={CARD} data-testid="set-card-share-links">
+      <h3 className={TITLE}>Share links</h3>
+      {readOnly || !projectId ? null : (
+        <a
+          id="access-share-links"
+          className={DOOR_LINK}
+          href={`${DASHBOARD_URL}/dashboard/sites/${projectId}/access`}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="set-access-share-links"
+        >
+          Manage share links ↗
+        </a>
+      )}
+    </section>
+  );
+
+  /* 8136:216758: the password card locked — what it is, the plan line, Upgrade
+     to Pro — and Share links as on every plan. Nothing here waits on the read. */
+  if (planLocked) {
+    return (
+      <Screen>
+        <section className={CARD} data-testid="set-card-password-protection">
+          <h3 className={TITLE}>Password protection</h3>
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 tw:text-[var(--bk-accent)]" data-testid="set-access-pro">
+            Pro
+          </p>
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">
+            Protect your published site with a password.
+          </p>
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+            Upgrade to Pro to control who can view your site.
+          </p>
+          <Button type="button" size="xs" className={`${SET_BTN} tw:h-8 tw:px-3`} onClick={onUpgrade} data-testid="set-access-upgrade">
+            Upgrade to Pro
+          </Button>
+        </section>
+        {shareLinks}
+      </Screen>
+    );
+  }
 
   if (load.state !== "ready") {
     return (
@@ -191,21 +241,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
         <p className={NOTE_12}>Applies on next publish</p>
       </section>
 
-      <section className={CARD} data-testid="set-card-share-links">
-        <h3 className={TITLE}>Share links</h3>
-        {readOnly || !projectId ? null : (
-          <a
-            id="access-share-links"
-            className={DOOR_LINK}
-            href={`${DASHBOARD_URL}/dashboard/sites/${projectId}/access`}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-testid="set-access-share-links"
-          >
-            Manage share links ↗
-          </a>
-        )}
-      </section>
+      {shareLinks}
     </Screen>
   );
 };

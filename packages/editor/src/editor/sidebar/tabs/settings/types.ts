@@ -180,6 +180,15 @@ export interface ScreenProps {
    */
   registerFooterMessage?: (message: string | null) => void;
   /**
+   * The workspace's plan is below this screen's (`SCREEN_PLAN_REQUIREMENTS`)
+   * and the screen draws its own lock (`SCREENS_WITH_OWN_PLAN_LOCK`): it shows
+   * the gated part locked, with `onUpgrade` as its call to action, and keeps
+   * the rest. Nothing on it saves.
+   */
+  planLocked?: boolean;
+  /** The plan gate's Upgrade — the dashboard's billing page. */
+  onUpgrade?: () => void;
+  /**
    * Open another Settings screen ("Manage in Languages ›") the way a nav click
    * does: through the Unsaved settings guard while this screen holds edits.
    * Never emit `ui:settings-open` from inside Settings — that lands on the
@@ -203,3 +212,11 @@ export const SCREEN_PLAN_REQUIREMENTS: Partial<Record<SettingsScreenId, "pro" | 
   "custom-code": "pro",
   access: "pro",
 };
+
+/**
+ * Gated screens that draw their own plan lock instead of the shell's centred
+ * `LockedScreen`: only part of them is the plan's. Access (8136:216758) locks
+ * its Password protection card and keeps Share links, which every plan has.
+ * The shell mounts them with `planLocked` and no header Upgrade or footer.
+ */
+export const SCREENS_WITH_OWN_PLAN_LOCK: ReadonlySet<SettingsScreenId> = new Set<SettingsScreenId>(["access"]);

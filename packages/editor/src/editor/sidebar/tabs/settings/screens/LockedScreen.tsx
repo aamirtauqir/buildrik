@@ -2,9 +2,9 @@
  * Locked screen — the plan gate, Clone 3397:32859 (`Custom code` on a FREE
  * plan): one card — the plan pill, `<Feature> is a Pro feature`, what the
  * feature does, `Upgrade to Pro` → the dashboard's billing page. The shell
- * mounts it in place of any screen `SCREEN_PLAN_REQUIREMENTS` gates, so the
- * feature name and the body line come in as props (`LOCKED_COPY` carries the
- * two gated screens').
+ * mounts it in place of any screen `SCREEN_PLAN_REQUIREMENTS` gates that does
+ * not draw its own lock (`SCREENS_WITH_OWN_PLAN_LOCK` — Access does), so the
+ * feature name and the body line come in as props (`LOCKED_COPY`).
  *
  * @license BSD-3-Clause
  */
@@ -34,11 +34,6 @@ export const LOCKED_COPY: Partial<Record<SettingsScreenId, { feature: string; bo
     feature: "Custom code",
     body:
       "Custom code injects your own <head> markup, end-of-<body> scripts and CSS into every published page — analytics, fonts, chat widgets. It ships on every publish.",
-  },
-  access: {
-    feature: "Password protection",
-    body:
-      "A site password keeps the published site private: visitors see a password page until they enter it. Share links stay available on every plan.",
   },
 };
 
