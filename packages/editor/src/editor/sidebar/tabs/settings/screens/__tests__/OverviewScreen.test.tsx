@@ -1,7 +1,7 @@
 /**
- * OverviewScreen — 4418:128917, regrouped to the Phase B IA (§25).
+ * OverviewScreen — the Phase B Overview boards 8137:216346 / 8137:216089.
  *
- * The screen reads `siteDetail.settingsOverview` and composes every row's
+ * The screen reads `siteDetail.settingsOverview` and composes every screen's
  * one-line summary from it; the sample data here is the SHAPE of the frame
  * ("Bella Cucina", "3 locales · Arabic not started"), not a fixture the
  * product ships.
@@ -131,7 +131,7 @@ describe("OverviewScreen — the frame", () => {
     expect(screen.queryByTestId("set-ov-attention")).toBeNull();
   });
 
-  it("lays the §25 groups out in two columns with a row per section and its summary", async () => {
+  it("draws one card per nav group (8137:216346): the title over a line naming its screens", async () => {
     query.mockResolvedValue(full);
     const onOpenScreen = vi.fn();
     render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={onOpenScreen} />);
@@ -139,7 +139,7 @@ describe("OverviewScreen — the frame", () => {
     const groups = Array.from(document.querySelectorAll('[data-testid^="set-ov-group-"]')).map((el) =>
       el.getAttribute("data-testid"),
     );
-    // Left column: Site, Search & sharing, Publishing; right: Visitors, Advanced, Danger zone, workspace doors.
+    // Sidebar order, two a row; the workspace doors close the grid.
     expect(groups).toEqual([
       "set-ov-group-site",
       "set-ov-group-search-sharing",
@@ -149,39 +149,57 @@ describe("OverviewScreen — the frame", () => {
       "set-ov-group-danger-zone",
       "set-ov-group-workspace",
     ]);
-    const line = (id: string) => screen.getByTestId(`set-ov-row-line-${id}`).textContent;
-    expect(line("general")).toBe("Bella Cucina · English (en-US)");
-    expect(line("branding")).toBe("Colours, fonts, spacing and presets");
-    expect(line("localization")).toBe("3 locales · Arabic not started");
-    expect(line("analytics")).toBe("GA4 receiving data");
-    expect(line("forms")).toBe("3 forms · 38 submissions");
-    expect(line("seo")).toBe("Indexing allowed · robots.txt set");
-    expect(line("domains")).toBe("bellacucina.com · 1 DNS pending");
-    expect(line("redirects")).toBe("3 rules · 2 suggestions");
-    expect(line("access")).toBe("Password on · 2 share links");
-    expect(line("custom-code")).toBe("Head, body and CSS set");
-    expect(line("headers")).toBe("CSP and HSTS on");
-    expect(line("danger-zone")).toBe("Archive, transfer or delete");
+    const card = (g: string) => screen.getByTestId(`set-ov-group-${g}`);
+    const line = (g: string) => screen.getByTestId(`set-ov-line-${g}`).textContent;
+    expect(within(card("site")).getByRole("heading").textContent).toBe("Site");
+    expect(line("site")).toBe("General · Languages · Brand ↗");
+    expect(within(card("search-sharing")).getByRole("heading").textContent).toBe("Search & sharing");
+    expect(line("search-sharing")).toBe("SEO");
+    expect(line("publishing")).toBe("Domains · Redirects · Access");
+    expect(line("visitors")).toBe("Analytics · Form submissions");
+    expect(line("advanced")).toBe("Custom code · Security headers");
+    expect(line("danger-zone")).toBe("Archive · Transfer · Delete site");
+    expect(within(card("workspace")).getByRole("heading").textContent).toBe("Workspace");
+    expect(line("workspace")).toBe("Members · Billing · Integrations & webhooks");
     expect(screen.queryByTestId("set-ov-row-export")).toBeNull();
     expect(screen.queryByTestId("set-ov-row-integrations")).toBeNull();
-    expect(line("webhooks")).toBe("1 endpoint · last delivery failed");
-    expect(line("members")).toBe("3 of 5 seats used");
-    expect(line("billing")).toBe("Pro · $24 / month");
 
-    // The amber dot sits on the rows the attention list names.
-    const dot = (id: string) => within(screen.getByTestId(`set-ov-row-${id}`)).queryByRole("img", { name: "Needs attention" });
-    expect(dot("localization")).not.toBeNull();
-    expect(dot("domains")).not.toBeNull();
-    expect(dot("webhooks")).not.toBeNull();
-    expect(dot("general")).toBeNull();
+    // Each name carries its screen's summary as its description.
+    const summary = (id: string) => screen.getByTestId(`set-ov-row-${id}`).getAttribute("title");
+    expect(summary("general")).toBe("Bella Cucina · English (en-US)");
+    expect(summary("domains")).toBe("bellacucina.com · 1 DNS pending");
+    expect(summary("access")).toBe("Password on · 2 share links");
+    expect(summary("billing")).toBe("Pro · $24 / month");
+    expect(screen.getByTestId("set-ov-row-forms").getAttribute("aria-description")).toBe("3 forms · 38 submissions");
 
-    // A row click is the same nav the sidebar makes.
+    // The amber dot follows the names the attention list points at.
+    expect(screen.queryByTestId("set-ov-dot-localization")).not.toBeNull();
+    expect(screen.queryByTestId("set-ov-dot-domains")).not.toBeNull();
+    expect(screen.queryByTestId("set-ov-dot-webhooks")).not.toBeNull();
+    expect(screen.queryByTestId("set-ov-dot-general")).toBeNull();
+
+    // A name click is the same nav the sidebar makes — screens, the Brand door, workspace doors.
     fireEvent.click(screen.getByTestId("set-ov-row-seo"));
-    expect(onOpenScreen).toHaveBeenCalledWith("seo");
-
-    // Workspace rows open their door card in the pane (8139:217358), like the sidebar's.
+    expect(onOpenScreen).toHaveBeenLastCalledWith("seo");
+    fireEvent.click(screen.getByTestId("set-ov-row-branding"));
+    expect(onOpenScreen).toHaveBeenLastCalledWith("branding");
+    fireEvent.click(screen.getByTestId("set-ov-row-danger-zone"));
+    expect(onOpenScreen).toHaveBeenLastCalledWith("danger-zone");
     fireEvent.click(screen.getByTestId("set-ov-row-members"));
-    expect(onOpenScreen).toHaveBeenCalledWith("members");
+    expect(onOpenScreen).toHaveBeenLastCalledWith("members");
+  });
+
+  it("names the summary lines in the frame's words", () => {
+    expect(summaryLine("localization", full)).toBe("3 locales · Arabic not started");
+    expect(summaryLine("analytics", full)).toBe("GA4 receiving data");
+    expect(summaryLine("seo", full)).toBe("Indexing allowed · robots.txt set");
+    expect(summaryLine("redirects", full)).toBe("3 rules · 2 suggestions");
+    expect(summaryLine("custom-code", full)).toBe("Head, body and CSS set");
+    expect(summaryLine("headers", full)).toBe("CSP and HSTS on");
+    expect(summaryLine("danger-zone", full)).toBe("Archive, transfer or delete");
+    expect(summaryLine("branding", full)).toBe("Colours, fonts, spacing and presets");
+    expect(summaryLine("webhooks", full)).toBe("1 endpoint · last delivery failed");
+    expect(summaryLine("members", full)).toBe("3 of 5 seats used");
   });
 
   it("an empty site reads honestly on every line", () => {
