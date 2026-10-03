@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { PALETTE_HREFS } from "@/components/search/command-palette";
+import { PALETTE_HREFS, SETTINGS_ITEMS } from "@/components/search/command-palette";
+import { SETTINGS_GROUPS } from "@/components/dashboard/shell/settings-sections";
 import { NAV_GROUPS } from "@/components/dashboard/shell/nav";
 
 /**
@@ -92,5 +93,25 @@ describe("command palette — IA v2 route contract", () => {
     for (const href of navHrefs) {
       expect(PALETTE_HREFS.includes(href), `palette missing nav dest ${href}`).toBe(true);
     }
+  });
+});
+
+describe("command palette — Settings entries follow the regrouped directory (Phase B §25)", () => {
+  const cards = SETTINGS_GROUPS.flatMap((g) => g.items);
+
+  it("every Settings entry opens a card of the directory — no AI & Credits, no Plans", () => {
+    const cardHrefs = new Set(cards.map((c) => c.href));
+    for (const item of SETTINGS_ITEMS) {
+      expect(cardHrefs.has(item.href), `${item.label} → ${item.href} is not a settings card`).toBe(true);
+    }
+    expect(SETTINGS_ITEMS.map((i) => i.label)).not.toContain("AI & Credits");
+    expect(SETTINGS_ITEMS.map((i) => i.label)).not.toContain("Plans");
+  });
+
+  it("the folded-in homes carry the directory's own names", () => {
+    const byHref = (href: string) => SETTINGS_ITEMS.find((i) => i.href === href)?.label;
+    const card = (href: string) => cards.find((c) => c.href === href)?.label;
+    expect(byHref("/dashboard/settings/billing")).toBe(card("/dashboard/settings/billing"));
+    expect(byHref("/dashboard/settings/usage")).toBe(card("/dashboard/settings/usage"));
   });
 });
