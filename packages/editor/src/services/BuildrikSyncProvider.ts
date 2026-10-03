@@ -457,8 +457,19 @@ export function planSettingsSave(before: ProjectSettings, next: ProjectSettings)
   }
   if (next.redirects && !sameValue(before.redirects, next.redirects)) patch.redirects = next.redirects;
   if (!sameValue(before.seo?.author, next.seo?.author)) patch.seo = { author: next.seo?.author ?? "" };
+  /* `before` is the composer's settings, read from the Site row: a NULL
+     column is left `undefined` there (and dropped from its patch), so an
+     empty field (null) over a key `before` lacks is no change — General sent
+     `favicon: null, touchIcon: null` on every Save of a site that had
+     neither. */
+  const beforeColumns = extractSiteColumnPatch(before);
+  const columns = Object.fromEntries(
+    Object.entries(diffSiteColumns(extractSiteColumnPatch(next), beforeColumns)).filter(
+      ([key, value]) => !(value === null && beforeColumns[key as keyof SiteColumnSettings] === undefined),
+    ),
+  ) as SiteColumnSettings;
   return {
-    columns: diffSiteColumns(extractSiteColumnPatch(next), extractSiteColumnPatch(before)),
+    columns,
     projectSettings: Object.keys(patch).length > 0 ? patch : null,
     unrouted: !sameValue(unroutedSettings(before), unroutedSettings(next)),
   };

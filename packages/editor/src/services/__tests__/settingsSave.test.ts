@@ -72,13 +72,24 @@ describe("planSettingsSave", () => {
       customCode: { ...before.customCode, globalCss: "b{}" },
     };
     expect(planSettingsSave(before, next)).toEqual({
-      columns: { metaTitle: "New", ogImage: null },
+      // ogImage: "" over a column that was already null is no change.
+      columns: { metaTitle: "New" },
       projectSettings: {
         analytics: { googleAnalytics: { enabled: true, measurementId: "G-ABCD123456" } },
         customCode: { globalCss: "b{}" },
       },
       unrouted: false,
     });
+  });
+
+  it("sends no favicon / touch icon when both were null and stay empty; a real clear is still sent", () => {
+    // A site that never had either: load leaves them undefined; General's flush writes "".
+    const before = { seo: { siteName: "Bella" } };
+    const next = { seo: { siteName: "Bella", favicon: "", touchIcon: "", author: "" } };
+    expect(planSettingsSave(before, next).columns).toEqual({});
+    // A favicon that was set and is now cleared goes out as null.
+    const had = { seo: { siteName: "Bella", favicon: "https://x.com/f.ico" } };
+    expect(planSettingsSave(had, { seo: { siteName: "Bella", favicon: "" } }).columns).toEqual({ favicon: null });
   });
 
   it("routes General's Author (seo.author) as a JSON-only key — never left for the project save", () => {
