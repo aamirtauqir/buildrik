@@ -148,7 +148,8 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     const records = Object.values(panel.recordCounts).reduce((a, b) => a + b, 0);
     const siteName = composer?.getProjectMetadata?.()?.name || "Untitled site";
     return (
-      <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace">
+      /* data-bk-full-page: this view covers the canvas column, so toasts take the window corner (8139:217711). */
+      <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
         <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-subtle)]">
           <header className={HEADER} data-testid="cms-ws-header">
             {back}
@@ -264,7 +265,8 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           : null;
 
   return (
-    <div className="tw:relative tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace">
+    /* data-bk-full-page: this view covers the canvas column, so toasts take the window corner (8139:217711). */
+    <div className="tw:relative tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
       <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]">
         <header className={HEADER} data-testid="cms-ws-header">
           {back}

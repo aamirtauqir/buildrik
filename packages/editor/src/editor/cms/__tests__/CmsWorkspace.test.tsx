@@ -55,6 +55,8 @@ describe("CmsWorkspace · root (4428:140486)", () => {
     const { unmount } = render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-workspace");
     expect(crumbs).toEqual([{ label: "CMS" }]);
+    // It covers the canvas column: toasts take the window corner (8139:217711).
+    expect(screen.getByTestId("cms-workspace")).toHaveAttribute("data-bk-full-page");
     unmount();
     expect(crumbs).toEqual([{ label: "CMS" }, null]);
   });

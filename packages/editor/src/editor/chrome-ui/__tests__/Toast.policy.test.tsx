@@ -207,6 +207,27 @@ describe("Toast policy — anchor and surface", () => {
     anchor.remove();
   });
 
+  /* 8139:217711 / 8139:217890: the CMS workspace covers a full-width canvas
+     column instead of squeezing it; anchored to it, "Record deleted" sat 16px
+     off a canvas nobody could see (right 16 / bottom 61 live). */
+  it("takes the window corner while a full-page view covers a wide canvas column", () => {
+    const anchor = document.createElement("div");
+    anchor.setAttribute("data-bk-toast-anchor", "");
+    anchor.getBoundingClientRect = rect(340, 92, 1100, 808);
+    const cms = document.createElement("div");
+    cms.setAttribute("data-bk-full-page", "");
+    document.body.append(anchor, cms);
+    mount();
+    act(() => {
+      api.addToast({ tone: "neutral", title: "Record deleted", description: "This record was deleted. Your change to it wasn't saved." });
+    });
+    const viewport = screen.getByTestId("toast-viewport");
+    expect(viewport.style.right).toBe("48px");
+    expect(viewport.style.bottom).toBe("48px");
+    anchor.remove();
+    cms.remove();
+  });
+
   it.each(["neutral", "info", "success", "warning", "error"] as const)(
     "%s renders on the boards' 460 white card with a 1px border, r8",
     (tone) => {

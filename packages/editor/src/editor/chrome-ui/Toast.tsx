@@ -219,8 +219,13 @@ type Anchor = { right: number; bottom: number };
  *  bottom. Full-page views (Settings, CMS, Brand) squeeze the column to a
  *  sliver without unmounting it — measured 2026-10-03 in full-page Settings,
  *  its right edge at x=48, which threw the card off the left of the screen —
- *  so "non-zero" is not the test; "can hold the card" is. */
+ *  so "non-zero" is not the test; "can hold the card" is. The CMS workspace
+ *  does not squeeze it at all: it covers a full-width column, and the card
+ *  sat 16px off a canvas nobody could see (measured 2026-10-04 at right 16 /
+ *  bottom 61, where 8139:217711 draws 48 / 48). A view that covers the
+ *  canvas says so with `data-bk-full-page`. */
 function measureAnchor(): Anchor {
+  if (document.querySelector("[data-bk-full-page]")) return VIEWPORT_ANCHOR;
   const el = document.querySelector("[data-bk-toast-anchor]");
   const r = el?.getBoundingClientRect();
   if (!el || !r || r.width < TOAST_WIDTH + 2 * CANVAS_GAP || !r.height) return VIEWPORT_ANCHOR;
