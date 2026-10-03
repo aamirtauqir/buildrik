@@ -25,7 +25,7 @@ import {
 const WORD = "DELETE";
 
 /** M17: what the delete takes down, and how long it can come back. */
-export function deleteSiteLine(liveAddress: string | null | undefined): string {
+function deleteSiteLine(liveAddress: string | null | undefined): string {
   const restore = "You can restore it from Recently deleted for 30 days.";
   return liveAddress ? `This unpublishes ${liveAddress} now. ${restore}` : `This takes the site offline now. ${restore}`;
 }

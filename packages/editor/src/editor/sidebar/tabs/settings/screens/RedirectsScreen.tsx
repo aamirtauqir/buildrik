@@ -110,10 +110,7 @@ const HEAD_GHOST =
 const RULES_GRID = "tw:grid tw:grid-cols-[320px_400px_100px_184px] tw:items-center tw:gap-x-3";
 const RULES_HEAD = `${RULES_GRID} tw:h-7 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-5 tw:text-[var(--bk-ink-muted)]`;
 const RULES_ROW = `${RULES_GRID} tw:h-10 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]`;
-/* `Edit · Delete` — accent text, 13, no box. */
-const RULE_ACTION =
-  "tw:h-auto tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-accent)] " +
-  "tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:underline tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+/* `Edit · Delete` — the link Button as it comes: accent text, 13, no box. */
 
 /** A browser download of `text` as `name`. */
 function download(name: string, text: string) {
@@ -463,8 +460,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
                   <Button
                     type="button"
                     size="xs"
-                    variant="ghost"
-                    className={RULE_ACTION}
+                    variant="link"
                     onClick={() => setDialog({ mode: "edit", row })}
                     aria-label={`Edit redirect from ${row.fromPath}`}
                     data-testid={`set-rd-edit-${row.id}`}
@@ -475,8 +471,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
                   <Button
                     type="button"
                     size="xs"
-                    variant="ghost"
-                    className={RULE_ACTION}
+                    variant="link"
                     onClick={() => void deleteRow(row)}
                     aria-label={`Delete redirect from ${row.fromPath}`}
                     data-testid={`set-rd-delete-${row.id}`}

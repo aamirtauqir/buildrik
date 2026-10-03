@@ -39,7 +39,7 @@ export function connectionVerifiedLine(id: string, events24h: number): string {
 }
 
 /** The dialog's title: what the check could establish. */
-export const connectionCheckTitle = (events24h: number) => (events24h > 0 ? "Data is arriving" : "Format OK · no events yet");
+const connectionCheckTitle = (events24h: number) => (events24h > 0 ? "Data is arriving" : "Format OK · no events yet");
 
 export interface ConnectionVerifiedDialogProps {
   open: boolean;

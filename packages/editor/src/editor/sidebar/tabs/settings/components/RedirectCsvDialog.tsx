@@ -26,7 +26,7 @@ import {
 import { SET_BTN } from "../shared";
 
 /** The server skips line 1 as a header; a file whose first line is already a rule gets one. */
-export function withCsvHeader(text: string): string {
+function withCsvHeader(text: string): string {
   const first = text.replace(/^﻿/, "").trimStart();
   const firstCell = first.split(/\r?\n/, 1)[0]?.split(",")[0]?.replace(/^"|"$/g, "").trim() ?? "";
   return firstCell.startsWith("/") ? `from,to,type\n${first}` : first;

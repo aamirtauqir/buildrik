@@ -94,7 +94,7 @@ const primaryFirst = (rows: DomainRow[]): DomainRow[] =>
 const nth = (stem: string, i: number) => (i === 0 ? stem : `${stem}-${i}`);
 
 /** 8136:214348's line under each name: where the domain is, and its certificate. */
-export function connectionLine(row: Pick<DomainRow, "status" | "sslStatus">): string {
+function connectionLine(row: Pick<DomainRow, "status" | "sslStatus">): string {
   if (row.status === "VERIFIED") return `Connected · ${row.sslStatus === "ACTIVE" ? "SSL active" : "SSL pending"}`;
   if (row.status === "FAILED") return "DNS not found · check your records";
   return "Waiting for DNS · not connected yet";
