@@ -26,10 +26,16 @@ import {
 import { SET_BTN } from "../shared";
 
 /** The server skips line 1 as a header; a file whose first line is already a rule gets one. */
-function withCsvHeader(text: string): string {
+function withCsvHeader(text: string): { csv: string; added: boolean } {
   const first = text.replace(/^﻿/, "").trimStart();
   const firstCell = first.split(/\r?\n/, 1)[0]?.split(",")[0]?.replace(/^"|"$/g, "").trim() ?? "";
-  return firstCell.startsWith("/") ? `from,to,type\n${first}` : first;
+  return firstCell.startsWith("/") ? { csv: `from,to,type\n${first}`, added: true } : { csv: first, added: false };
+}
+
+/** The server numbers lines of the CSV it received; with a header put in
+    front, that is one more than the line in the person's own file. */
+function toFileLines(message: string, added: boolean): string {
+  return added ? message.replace(/\bline (\d+)/gi, (m, n: string) => m.replace(n, String(Number(n) - 1))) : message;
 }
 
 export interface RedirectCsvDialogProps {
@@ -58,10 +64,11 @@ export function RedirectCsvDialog({ open, onImport, onCancel }: RedirectCsvDialo
     if (!file || busy) return;
     setBusy(true);
     setError(null);
+    const { csv, added } = withCsvHeader(await file.text());
     try {
-      await onImport(withCsvHeader(await file.text()));
+      await onImport(csv);
     } catch (e) {
-      setError(e instanceof Error && e.message ? e.message : "The file could not be imported. Nothing was imported.");
+      setError(e instanceof Error && e.message ? toFileLines(e.message, added) : "The file could not be imported. Nothing was imported.");
     } finally {
       setBusy(false);
     }

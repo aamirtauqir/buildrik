@@ -356,6 +356,17 @@ describe("CSV — Import (8136:215047 / 215307 / 215568) and Export", () => {
     expect(r.list.query).toHaveBeenCalledTimes(1);
   });
 
+  it("a headerless file's refusal names the line in the person's file, not the line after the added header", async () => {
+    // QA walk 2026-10-03: the dialog puts `from,to,type` in front of a file that starts with a rule,
+    // so the server's "line 3" is line 2 of what the person chose.
+    r.import_csv.mutate.mockRejectedValue(new Error('Invalid redirect on line 3 — expected "/from,to[,301|302]". Nothing was imported.'));
+    await openImport();
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("/a,/b\n/c,javascript:alert(1)")] } });
+    fireEvent.click(screen.getByTestId("set-rd-csv-import"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toHaveTextContent("Invalid redirect on line 2 —"));
+    expect(r.import_csv.mutate.mock.calls[0][0].csv).toBe("from,to,type\n/a,/b\n/c,javascript:alert(1)");
+  });
+
   it("Export downloads export_csv as redirects.csv", async () => {
     const createObjectURL = vi.fn(() => "blob:x");
     const revokeObjectURL = vi.fn();
