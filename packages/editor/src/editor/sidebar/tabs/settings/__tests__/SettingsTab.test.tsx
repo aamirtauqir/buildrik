@@ -581,6 +581,26 @@ describe("SettingsTab — Unsaved settings", () => {
     expect(composer.saveProject).toHaveBeenCalledTimes(1);
   });
 
+  it("a screen's own link to another screen (General › Manage in Languages) is guarded like a nav click", async () => {
+    const composer = makeComposer();
+    renderS(<SettingsTab composer={asComposer(composer)} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-general-language"));
+    expect(await screen.findByTestId("set-unsaved")).toBeTruthy();
+    expect(headTitle()).toBe("General");
+    fireEvent.click(screen.getByTestId("set-unsaved-discard"));
+    await waitFor(() => expect(headTitle()).toBe("Languages"));
+    expect(composer.emit).not.toHaveBeenCalledWith("ui:settings-open", expect.anything());
+  });
+
+  it("the same link on a clean screen goes straight there", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    fireEvent.click(await screen.findByTestId("set-general-language"));
+    await waitFor(() => expect(headTitle()).toBe("Languages"));
+    expect(screen.queryByTestId("set-unsaved")).toBeNull();
+  });
+
   it("a door while dirty is guarded too", async () => {
     const onOpenDesignTab = vi.fn();
     renderS(<SettingsTab composer={asComposer(makeComposer())} onOpenDesignTab={onOpenDesignTab} />);

@@ -27,7 +27,6 @@
 
 import * as React from "react";
 import { Button, TextInput } from "@/editor/chrome-ui";
-import { EVENTS } from "@/shared/constants/events";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getBuildrikClient } from "@/services/api-client";
 import { SettingsSaveCancelled } from "@/services/BuildrikSyncProvider";
@@ -190,6 +189,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   registerFlushHandler,
   registerFieldErrors,
   registerFooterMessage,
+  onOpenScreen,
   onLoadStateChange,
   registerRetryLoad,
   saveError,
@@ -457,7 +457,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             type="button"
             variant="link"
             className="tw:min-h-5 tw:w-fit tw:font-medium"
-            onClick={() => composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: "localization" })}
+            onClick={() => onOpenScreen?.("localization")}
             data-testid="set-general-language"
           >
             {`${localeLabel(language)} (${language}) · Manage in Languages ›`}

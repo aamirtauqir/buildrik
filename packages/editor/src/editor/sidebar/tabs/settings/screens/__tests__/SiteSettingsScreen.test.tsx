@@ -73,6 +73,7 @@ function setup(opts: { projectId?: string | null; saveError?: string | null; sit
     registerSaveHandler: vi.fn() as Handler<() => Promise<void>>,
     registerFieldErrors: vi.fn(),
     registerFooterMessage: vi.fn(),
+    onOpenScreen: vi.fn(),
     onLoadStateChange: vi.fn(),
     registerRetryLoad: vi.fn(),
   };
@@ -125,11 +126,12 @@ describe("General · 8135:212718 — Site identity from the Site row", () => {
     expect(screen.getByTestId("set-touch-icon-preview")).toHaveTextContent("AS");
   });
 
-  it("the Languages link opens Settings on Languages", async () => {
-    const { composer } = setup();
+  it("the Languages link asks the shell to open Languages (guarded like a nav click), never ui:settings-open", async () => {
+    const { composer, props } = setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-general-language"));
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SETTINGS_OPEN, { screen: "localization" });
+    expect(props.onOpenScreen).toHaveBeenCalledWith("localization");
+    expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_SETTINGS_OPEN, expect.anything());
   });
 
   it("without a projectId shows the composer's values and makes no request", () => {

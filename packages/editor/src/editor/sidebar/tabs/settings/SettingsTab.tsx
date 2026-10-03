@@ -637,6 +637,7 @@ export const SettingsTab: React.FC<
       readOnly,
       registerFieldErrors,
       registerFooterMessage: setFooterMessage,
+      onOpenScreen: requestNav,
       fieldErrors: serverFieldErrors,
     };
     switch (screenId) {

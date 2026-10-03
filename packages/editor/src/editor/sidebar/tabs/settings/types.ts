@@ -179,6 +179,13 @@ export interface ScreenProps {
    * (8135:213221 draws it after the server refused the slug).
    */
   registerFooterMessage?: (message: string | null) => void;
+  /**
+   * Open another Settings screen ("Manage in Languages ›") the way a nav click
+   * does: through the Unsaved settings guard while this screen holds edits.
+   * Never emit `ui:settings-open` from inside Settings — that lands on the
+   * screen and skips the guard.
+   */
+  onOpenScreen?: (id: SettingsNavId) => void;
   /** The fields the server refused on the last Save (SA-10). The screen
    *  renders each under its field; the save-error banner says the rest. */
   fieldErrors?: SettingsFieldErrors;
