@@ -9328,8 +9328,8 @@
       "status": "active",
       "authority": "board:settings-phase-b",
       "recipe": "",
-      "verified": "drift-open",
-      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). Archived a throwaway site from Danger zone: Overview shows 'Toast QA scratch is archived. The live site stays up.' + Unarchive (worked: status back to DRAFT). Drift: below it the summary-row group cards of 4418:128917 plus a NEEDS ATTENTION card, not the board's six plain group cards — the settings-overview lane is rebuilding OverviewScreen (not edited here). E-ov-archived."
+      "verified": "drift-fixed",
+      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). Archived a throwaway site from Danger zone: Overview shows 'Toast QA scratch is archived. The live site stays up.' + Unarchive (worked: status back to DRAFT). Drift: below it the summary-row group cards of 4418:128917 plus a NEEDS ATTENTION card, not the board's six plain group cards — the settings-overview lane is rebuilding OverviewScreen (not edited here). E-ov-archived. UPDATE 2026-10-04: the group cards this walk saw as old were rebuilt to this board in ed73579da (settings-overview lane, port 3310, 1440x900): two cards per row 536 wide with a 16 gap, 24 padding, radius 12, titles 16/24 600, lines 13/20 muted with the board's copy word for word; all 15 screen names open their screen; archived notice + Unarchive checked live. Owner calls 2026-10-04: summary values as each name's tooltip; a seventh Workspace card kept (board to gain it). Not re-walked by QA after the rebuild."
     },
     {
       "nodeId": "8137:216600",
