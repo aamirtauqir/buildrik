@@ -724,8 +724,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        drive, and comment pinning needs the pointer. */
     return (
       /* data-bk-toast-anchor / -floor: toasts sit 16px in from this column's
-         left and 16px above the footer toolbar (board 5940:148012) —
-         chrome-ui/Toast measures both. */
+         right and 16px above the footer toolbar (owner decision 2026-10-03,
+         Settings / CMS toast boards) — chrome-ui/Toast measures both. */
       <div
         ref={wrapperRef}
         tabIndex={0}
