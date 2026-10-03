@@ -16,6 +16,7 @@ import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 import { isPlaceholderSlug } from "../utils/seoScore";
+import { resolvePageDescription, resolvePageTitle } from "@/engine/export/SEOInjector";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -67,6 +68,12 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
   const siteName = composer?.getProjectMetadata?.()?.name;
   const domain = s.domain ?? "yoursite.com";
   const range = titleRange(s.seoTitle);
+  /* The preview shows what ships: the exporter's own precedence, so a page
+     with no title or description of its own previews the site defaults it
+     inherits (owner decision Q4), not an empty slot. */
+  const siteSeo = composer?.getProjectSettings?.()?.seo;
+  const previewTitle = resolvePageTitle(page, { metaTitle: s.seoTitle }, undefined, siteSeo);
+  const previewDesc = resolvePageDescription({ metaDescription: s.seoDesc }, undefined, siteSeo);
   const [aiBusy, setAiBusy] = React.useState(false);
 
   /* The redirect offer (Clone 3519:19920's door). `page.slug` is the SAVED
@@ -335,15 +342,16 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
         <div className={`tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
           {s.domain ?? "yoursite.com"} › {page.slug?.replace(/^\//, "") || page.id}
         </div>
-        <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`}>
-          {s.seoTitle || page.name}
+        <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`} data-testid="seo-preview-title">
+          {previewTitle}
         </div>
         <div
           className={`tw:text-[length:var(--bk-text-13)] tw:leading-snug ${UI} ${
-            s.seoDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)] tw:italic"
+            previewDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)] tw:italic"
           }`}
+          data-testid="seo-preview-desc"
         >
-          {s.seoDesc || "No description — add one below to improve ranking"}
+          {previewDesc || "No description — add one below to improve ranking"}
         </div>
       </div>
       {/* ── 2. SEO SCORE ────────────────────────────────────────────────── */}

@@ -32,13 +32,33 @@ export interface SEOInjectorOptions {
  * typed over it. One precedence, both paths.
  */
 export function resolvePageTitle(
-  page: PageData,
+  page: Pick<PageData, "name">,
   pageSEO?: PageSEO,
   pageSettings?: { title?: string },
   siteSEO?: SiteSEO
 ): string {
-  const own = pageSEO?.metaTitle || pageSettings?.title || page.name || "Untitled";
-  return applyTitleTemplate(own, siteSEO);
+  const own = pageSEO?.metaTitle || pageSettings?.title;
+  if (own) return applyTitleTemplate(own, siteSEO);
+  /* A page with no title of its own inherits the site's default title
+     (Settings › SEO › Defaults — owner decision Q4, 2026-10-04). That value is
+     already a whole title, so the template does not wrap it a second time.
+     Without one, the page name stands in, as before. */
+  const siteDefault = siteSEO?.metaTitle?.trim();
+  if (siteDefault) return siteDefault;
+  return applyTitleTemplate(page.name || "Untitled", siteSEO);
+}
+
+/**
+ * The description a page ships with: its own, else the site's default from
+ * Settings › SEO › Defaults (owner decision Q4). A page without one used to
+ * ship no description at all while the Defaults card held one.
+ */
+export function resolvePageDescription(
+  pageSEO?: PageSEO,
+  pageSettings?: { description?: string },
+  siteSEO?: SiteSEO
+): string {
+  return pageSEO?.metaDescription || pageSettings?.description || siteSEO?.metaDescription?.trim() || "";
 }
 
 /**
@@ -121,7 +141,7 @@ export class SEOInjector {
     const title =
       overrides?.title?.trim() || resolvePageTitle(page, pageSEO, pageSettings, siteSEO);
     const description =
-      overrides?.description?.trim() || this.getDescription(pageSEO, pageSettings);
+      overrides?.description?.trim() || resolvePageDescription(pageSEO, pageSettings, siteSEO);
     const ogImage = pageSEO?.ogImage || siteSEO?.defaultOgImage || "";
     const ogTitle = pageSEO?.ogTitle || title;
     const ogDescription = pageSEO?.ogDescription || description;
@@ -242,10 +262,6 @@ export class SEOInjector {
        six, so an Instagram, YouTube or GitHub profile never reached a page. */
     return SOCIAL_NETWORKS.map((network) => (links[network] ?? "").trim())
       .filter((v) => /^https?:\/\//i.test(v));
-  }
-
-  private getDescription(pageSEO?: PageSEO, pageSettings?: { description?: string }): string {
-    return pageSEO?.metaDescription || pageSettings?.description || "";
   }
 
   private getPageUrl(page: PageData): string {

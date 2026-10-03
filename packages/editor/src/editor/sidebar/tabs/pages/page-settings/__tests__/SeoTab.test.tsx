@@ -365,3 +365,30 @@ describe("SeoTab — the redirect offer after a saved slug change", () => {
     expect(screen.getByTestId(OFFER)).toHaveTextContent("from /contact to /contact-us");
   });
 });
+
+// ── Google preview: site defaults (owner decision Q4) ────────────────────────
+
+describe("SeoTab Google preview — inherited site defaults", () => {
+  const composerWithDefaults = {
+    getProjectMetadata: () => ({ name: "Acme" }),
+    getProjectSettings: () => ({ seo: { metaTitle: "Acme Bakery — fresh bread daily", metaDescription: "Sourdough baked every morning." } }),
+  } as unknown as Composer;
+
+  it("a page with no title/description previews the site defaults it will ship with", () => {
+    render(<SeoTab s={makeSettings()} page={makePage({ name: "About", slug: "about" })} composer={composerWithDefaults} />);
+    expect(screen.getByTestId("seo-preview-title").textContent).toBe("Acme Bakery — fresh bread daily");
+    expect(screen.getByTestId("seo-preview-desc").textContent).toBe("Sourdough baked every morning.");
+  });
+
+  it("the page's own values win in the preview", () => {
+    render(
+      <SeoTab
+        s={makeSettings({ seoTitle: "Our story", seoDesc: "Three generations." })}
+        page={makePage({ name: "About", slug: "about" })}
+        composer={composerWithDefaults}
+      />,
+    );
+    expect(screen.getByTestId("seo-preview-title").textContent).toBe("Our story");
+    expect(screen.getByTestId("seo-preview-desc").textContent).toBe("Three generations.");
+  });
+});
