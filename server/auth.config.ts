@@ -33,7 +33,17 @@ async function currentSessionUserId(): Promise<string | null> {
     const raw = (await cookies()).get(cookieName)?.value;
     if (!raw) return null;
     const decoded = await decode({ token: raw, secret: process.env.NEXTAUTH_SECRET!, salt: cookieName });
-    return typeof decoded?.userId === "string" ? decoded.userId : null;
+    if (typeof decoded?.userId !== "string") return null;
+    // A cookie the user already revoked (password reset, "sign out everywhere")
+    // still decodes. It must not count as signed in here: being signed in skips
+    // the OAuth 2FA step, so a revoked cookie plus the provider would be a login
+    // with no code. Same version check the jwt callback applies on every request.
+    const current = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { sessionVersion: true },
+    });
+    const sv = typeof decoded.sv === "number" ? decoded.sv : 0;
+    return current && current.sessionVersion === sv ? decoded.userId : null;
   } catch {
     return null;
   }

@@ -21,6 +21,9 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       upsert: vi.fn(),
     },
+    workspaceMember: {
+      findFirst: vi.fn(),
+    },
     $transaction: vi.fn(async (cb: (tx: typeof txClient) => Promise<unknown>) => cb(txClient)),
   },
 }));
@@ -38,6 +41,10 @@ vi.mock("@/server/services/audit.service", () => ({
 // Mock createWorkspaceForUser (called inside transaction in signIn callback)
 vi.mock("@/server/services/auth.service", () => ({
   createWorkspaceForUser: vi.fn().mockResolvedValue({ workspaceId: "ws-123" }),
+}));
+
+vi.mock("@/server/services/team.service", () => ({
+  recordWorkspaceUse: vi.fn(),
 }));
 
 // currentSessionUserId() reads the session cookie via next/headers + next-auth/jwt
@@ -65,6 +72,19 @@ import { logAuditEvent } from "@/server/services/audit.service";
 
 const mockPrisma = vi.mocked(prisma);
 const mockLogAuditEvent = vi.mocked(logAuditEvent);
+
+/** Simulates a session cookie for `userId` whose `sv` claim is `cookieVersion`,
+ *  against a user row now at `currentVersion`. Equal versions = a live session;
+ *  unequal = a cookie the user revoked. Lookups by email return `emailRow`. */
+function sessionCookieFor(
+  userId: string,
+  { cookieVersion = 0, currentVersion = 0, emailRow = null as unknown } = {},
+) {
+  mockCookieGet.mockReturnValue({ value: "session-cookie" });
+  mockDecode.mockResolvedValue({ userId, sv: cookieVersion });
+  mockPrisma.user.findUnique.mockImplementation((async (args: { where: { id?: string; email?: string } }) =>
+    args.where.id === userId ? { sessionVersion: currentVersion } : args.where.email ? emailRow : null) as any);
+}
 
 describe("OAuth signIn callback", () => {
   beforeEach(() => {
@@ -528,8 +548,7 @@ describe("signIn callback — account-first identity resolution", () => {
   // onto that other user — it must refuse.
   it("refuses when an already signed-in user connects a provider account linked to a DIFFERENT user", async () => {
     mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-other" } as any);
-    mockCookieGet.mockReturnValue({ value: "session-cookie" });
-    mockDecode.mockResolvedValue({ userId: "user-self" });
+    sessionCookieFor("user-self");
 
     const signInCallback = authConfig.callbacks!.signIn!;
     const userObj = { id: "temp", email: "self@example.com" } as any;
@@ -571,6 +590,7 @@ describe("signIn callback — account-first identity resolution", () => {
 describe("signIn callback — 2FA gate on OAuth logins", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockPrisma.user.findUnique.mockReset();
     mockCookieGet.mockReturnValue(undefined); // public login unless a test says otherwise
     mockGenerateToken.mockResolvedValue("temp-2fa-token");
   });
@@ -605,8 +625,7 @@ describe("signIn callback — 2FA gate on OAuth logins", () => {
 
   it("an already signed-in user re-authorizing their OWN linked provider is not asked for a code", async () => {
     mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-2fa", user: { twoFactorEnabled: true } } as any);
-    mockCookieGet.mockReturnValue({ value: "session-cookie" });
-    mockDecode.mockResolvedValue({ userId: "user-2fa" });
+    sessionCookieFor("user-2fa");
 
     const result = await signInAs("a@example.com", "github", "gh-self");
 
@@ -635,16 +654,16 @@ describe("signIn callback — 2FA gate on OAuth logins", () => {
 
   it("Settings → Connect provider (signed in as that same user) links without a code", async () => {
     mockPrisma.account.findUnique.mockResolvedValue(null);
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: "user-2fa",
-      email: "a@example.com",
-      passwordHash: "$2b$10$hash",
-      emailVerified: new Date("2026-01-01"),
-      twoFactorEnabled: true,
-      accounts: [],
-    } as any);
-    mockCookieGet.mockReturnValue({ value: "session-cookie" });
-    mockDecode.mockResolvedValue({ userId: "user-2fa" });
+    sessionCookieFor("user-2fa", {
+      emailRow: {
+        id: "user-2fa",
+        email: "a@example.com",
+        passwordHash: "$2b$10$hash",
+        emailVerified: new Date("2026-01-01"),
+        twoFactorEnabled: true,
+        accounts: [],
+      },
+    });
 
     const result = await signInAs("a@example.com", "google", "g-connect");
 
@@ -668,5 +687,120 @@ describe("signIn callback — 2FA gate on OAuth logins", () => {
 
     expect(result).toBe(true);
     expect(mockGenerateToken).not.toHaveBeenCalled();
+  });
+
+  // Being signed in skips the code (Connect provider / re-authorize). A cookie
+  // the user already revoked still DECODES, so it must not count as signed in —
+  // otherwise a stolen, revoked cookie plus the provider is a login with no code.
+  it("a revoked session cookie does not skip the code on the linked-provider path", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-2fa", user: { twoFactorEnabled: true } } as any);
+    sessionCookieFor("user-2fa", { cookieVersion: 0, currentVersion: 1 });
+
+    const result = await signInAs("a@example.com", "google", "g-linked");
+
+    expect(result).toBe("/auth/2fa?token=temp-2fa-token");
+    expect(mockGenerateToken).toHaveBeenCalledWith("2fa_temp", "user-2fa", 5);
+  });
+
+  it("a revoked session cookie does not count as a self-link on the verified-email path", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue(null);
+    sessionCookieFor("user-2fa", {
+      cookieVersion: 2,
+      currentVersion: 3,
+      emailRow: {
+        id: "user-2fa",
+        email: "a@example.com",
+        passwordHash: null,
+        emailVerified: new Date("2026-01-01"),
+        twoFactorEnabled: true,
+        accounts: [{ provider: "google" }],
+      },
+    });
+
+    const result = await signInAs("a@example.com", "github", "gh-new");
+
+    expect(result).toBe("/auth/2fa?token=temp-2fa-token");
+    expect(mockPrisma.account.upsert).not.toHaveBeenCalled();
+  });
+
+  it("a session cookie for a deleted user does not skip the code", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-2fa", user: { twoFactorEnabled: true } } as any);
+    mockCookieGet.mockReturnValue({ value: "session-cookie" });
+    mockDecode.mockResolvedValue({ userId: "user-2fa", sv: 0 });
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+
+    expect(await signInAs("a@example.com", "github", "gh-linked")).toBe("/auth/2fa?token=temp-2fa-token");
+  });
+
+  // Account linking: GitHub reporting the verified address of a 2FA account
+  // that signed up with Google (no password, so no oauth-conflict stop).
+  it("linking GitHub into an existing 2FA account by email asks for the code and links nothing", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user-2fa",
+      email: "a@example.com",
+      passwordHash: null,
+      emailVerified: new Date("2026-01-01"),
+      twoFactorEnabled: true,
+      accounts: [{ provider: "google" }],
+    } as any);
+    const userObj = { id: "temp", email: "a@example.com" } as any;
+
+    const result = await signInAs("a@example.com", "github", "gh-link", userObj);
+
+    expect(result).toBe("/auth/2fa?token=temp-2fa-token");
+    expect(userObj.id).toBe("temp"); // no DB identity attached for jwt to mint from
+    expect(mockPrisma.account.upsert).not.toHaveBeenCalled();
+    expect(mockPrisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it("a password account with 2FA still gets the oauth-conflict stop, not a code prompt", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user-2fa",
+      email: "a@example.com",
+      passwordHash: "$2b$10$hash",
+      emailVerified: new Date("2026-01-01"),
+      twoFactorEnabled: true,
+      accounts: [],
+    } as any);
+
+    expect(await signInAs("a@example.com", "google", "g-pw")).toBe("/auth/oauth-conflict?email=a%40example.com");
+    expect(mockGenerateToken).not.toHaveBeenCalled();
+  });
+});
+
+// There is no "2FA passed" claim to forge: a 2FA account never gets a token
+// from NextAuth until /api/auth/create-session mints one after verify2FA. What
+// the client CAN send is `update(data)` → jwt({ trigger: "update", session }).
+// That path must not let a client move the token's identity or plant claims.
+describe("jwt callback — client update() cannot change identity", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPrisma.user.findUnique.mockReset().mockResolvedValue({ sessionVersion: 0 } as any);
+    mockPrisma.workspaceMember.findFirst.mockReset().mockResolvedValue(null);
+  });
+
+  it("ignores userId / sv / 2FA-looking fields sent through update()", async () => {
+    const token = await authConfig.callbacks!.jwt!({
+      token: { userId: "user-a", sv: 0, workspaceId: null },
+      trigger: "update",
+      session: { userId: "user-b", sv: 9, twoFactorVerified: true, mfa: true },
+    } as any);
+
+    expect(token).toMatchObject({ userId: "user-a", sv: 0 });
+    expect(token).not.toHaveProperty("twoFactorVerified");
+    expect(token).not.toHaveProperty("mfa");
+  });
+
+  it("an update() with no token identity mints nothing", async () => {
+    const token = await authConfig.callbacks!.jwt!({
+      token: {},
+      trigger: "update",
+      session: { userId: "user-b", workspaceId: "w-b" },
+    } as any);
+
+    expect(token).not.toHaveProperty("userId");
+    expect(mockPrisma.workspaceMember.findFirst).not.toHaveBeenCalled();
   });
 });
