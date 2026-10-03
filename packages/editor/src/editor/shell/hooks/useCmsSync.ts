@@ -137,12 +137,13 @@ export function useCmsSync(
        names what is gone — the server's sentence alone was a title-less
        toast (QA 2026-10-02). An entry written into a deleted COLLECTION is
        answered "This collection was deleted.", so the title follows the
-       sentence, not the row's kind. No board draws this toast. */
+       sentence, not the row's kind. Boards 8139:217711 / 8139:217890 draw it
+       with no tone dot. */
     const offGone = addToast
       ? onCmsGone((g) => {
           const collectionGone = g.kind === "collection" || /collection/i.test(g.message);
           addToast({
-            tone: "warning",
+            tone: "neutral",
             title: collectionGone ? "Collection deleted" : "Record deleted",
             description: `${g.message} Your change to it wasn't saved.`,
           });

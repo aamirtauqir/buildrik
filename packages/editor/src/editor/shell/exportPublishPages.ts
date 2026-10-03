@@ -58,6 +58,11 @@ function boundCollectionIds(project: ProjectData): string[] {
   return [...ids];
 }
 
+/** Publish refused before any request: CMS changes are not on the server
+ *  yet (or wait on a conflict choice). Board 8139:218055 titles it "Publish
+ *  blocked" — nothing failed, the publish never started. */
+export class PublishBlockedError extends Error {}
+
 export async function exportPublishPages(composer: Composer): Promise<PublishPage[]> {
   const siteId = getSiteIdFromUrl();
   const project = composer.exportProject();
@@ -80,7 +85,7 @@ export async function exportPublishPages(composer: Composer): Promise<PublishPag
     return inlinePublishStylesheet(files);
   }
   const blocker = cmsSyncBlocker();
-  if (blocker) throw new Error(blocker);
+  if (blocker) throw new PublishBlockedError(blocker);
   const { cms, siteFonts } = await fetchPublishSnapshot(siteId, collectionIds);
   return renderProjectPages(project, siteFonts, cmsFromRows(cms));
 }
