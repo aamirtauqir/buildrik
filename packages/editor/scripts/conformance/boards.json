@@ -8964,8 +8964,8 @@
       "status": "active",
       "authority": "board:settings-phase-b",
       "recipe": "",
-      "verified": "drift-open",
-      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). Driven as EDITOR (qa-viewer flipped VIEWER→EDITOR via one DB update, reverted to VIEWER). Notice 'Only admins can change General' 1088×44 at y136 bg #EBF5FF, every control disabled, no footer — as drawn. Drift: the board keeps 'English (en) · Manage in Languages ›' as a link and the greyed 'Upload favicon' / 'Upload touch icon' labels; live shows plain 'English (en)' and hides both upload labels (Lane 0 contract 'hide anything else that acts'). Board vs contract — owner call. RO-editor-general."
+      "verified": "drift-fixed",
+      "verifiedNote": "Drift walk 2026-10-04 (fix/settings-drift-open, port 3320, QA workspace, throwaway L0 walk 744 / E2E Blank Full (Copy), 1440x900, cached board PNG vs live screenshot + getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad drift/live/). Owner rule 2026-10-04 (navigation visible and live, writes visible and disabled) in 11f26e47d. As EDITOR: notice 1088×44 at y136; 'English (en) · Manage in Languages ›' is an <a>, not disabled, #1A56DB, lands on Languages; 'Upload favicon' / 'Upload touch icon' drawn disabled #9CA3AF on no fill, as the board; Site identity y196, Advanced y542 (gap 16). item1-general-readonly."
     },
     {
       "nodeId": "8134:212529",
@@ -9076,8 +9076,8 @@
       "status": "active",
       "authority": "board:settings-phase-b",
       "recipe": "",
-      "verified": "drift-open",
-      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). Default locale card (select 1038×32) + Locales card 'Saves immediately', Add locale 90×32 #1A56DB, LOCALE / TRANSLATED PAGES columns, Default / Remove. Add fr + it persisted without Save (DB enabledLocales [en,fr,it], reload); changing the default only dirties the footer (DB unchanged until Save). Drift: a yellow notice 'Per-language pages publish in a later release…' sits above Default locale (+68px), not on the board; the default-locale select is white while inputs are #F9FAFB. B-lang-three."
+      "verified": "drift-fixed",
+      "verifiedNote": "Drift walk 2026-10-04 (fix/settings-drift-open, port 3320, QA workspace, throwaway L0 walk 744 / E2E Blank Full (Copy), 1440x900, cached board PNG vs live screenshot + getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad drift/live/). Owner kept the 'Per-language pages publish in a later release…' sentence (true); 5e1d3fd8e made it one muted 12/20 line (#6C7079, no fill), not the yellow strip. Default locale card y172 vs the board's 136: +36 (was +68). The note itself is the only remaining delta, by owner decision. item2-languages."
     },
     {
       "nodeId": "8135:214262",
@@ -9146,8 +9146,8 @@
       "status": "active",
       "authority": "board:settings-phase-b",
       "recipe": "",
-      "verified": "drift-open",
-      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). Two seeded VERIFIED domains: cards 1088×122 (board 118), PRIMARY badge on the primary, 'Connected · SSL active', Set as primary on the other, Add a domain below. Drift: the secondary card also carries 'Manage DNS' (board draws only Set as primary). Minor. C-dom-several."
+      "verified": "drift-fixed",
+      "verifiedNote": "Drift walk 2026-10-04 (fix/settings-drift-open, port 3320, QA workspace, throwaway L0 walk 744 / E2E Blank Full (Copy), 1440x900, cached board PNG vs live screenshot + getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad drift/live/). Owner decision 2026-10-04: 'Manage DNS' stays on non-primary cards (only door to that domain's DNS records, Force HTTPS, Remove); recorded in DomainsScreen's header comment (74e7e3b36). No code change; the remaining delta is that owner call."
     },
     {
       "nodeId": "8136:214574",
@@ -9202,8 +9202,8 @@
       "status": "active",
       "authority": "board:settings-phase-b",
       "recipe": "",
-      "verified": "drift-open",
-      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). Bad CSV (javascript: target) refused, nothing imported (DB count unchanged). Fixed 896d8bec9: for a headerless file the line was one too high (bad row on line 2 reported as 3) — live now 'line 2'. Still open: the sentence is generic ('Invalid redirect on line N — expected … Nothing was imported.') where the board names the reason ('Destination is required'); Import CSV stays enabled after the refusal (board disabled). C-rd-import-error, K-rd-import-error-fixed."
+      "verified": "drift-fixed",
+      "verifiedNote": "Drift walk 2026-10-04 (fix/settings-drift-open, port 3320, QA workspace, throwaway L0 walk 744 / E2E Blank Full (Copy), 1440x900, cached board PNG vs live screenshot + getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad drift/live/). 1e9509a17: 'Line 4: Destination is required — nothing imported' (server names the row's reason; still all-or-nothing), red #C81E1E; Import CSV 95×32 disabled after the refusal (board disabled), re-armed by choosing another file; redirects count unchanged (0). item4-import-error."
     },
     {
       "nodeId": "8136:215568",
@@ -9356,8 +9356,8 @@
       "status": "active",
       "authority": "board:settings-phase-b",
       "recipe": "",
-      "verified": "drift-open",
-      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). As EDITOR and as ADMIN: notice 'Only the workspace owner can archive or delete this site. Only the workspace owner or site creator can transfer it.' 1088×44, all three actions disabled, no footer. Drift: card gap 26 in this state vs 16 for the owner (board ~17). Defect (recorded, not fixed): an ADMIN who CREATED the site also gets the whole screen read-only, though sites.transfer allows the creator (verified by API) and the notice tells them they can. RO-editor-danger-zone, RO-admin-creator-danger-zone."
+      "verified": "drift-fixed",
+      "verifiedNote": "Drift walk 2026-10-04 (fix/settings-drift-open, port 3320, QA workspace, throwaway L0 walk 744 / E2E Blank Full (Copy), 1440x900, cached board PNG vs live screenshot + getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad drift/live/). 9b64cb912 + 390732cc8: card gap 16 (cards y196/334/472, h122; board ~17). Notice per viewer — non-creator ADMIN: the board's sentence, all three disabled #9CA3AF; creator ADMIN (createdBy flipped to qa-viewer, reverted): 'Only the workspace owner can archive or delete this site. You created it, so you can transfer it.', Transfer enabled, the dialog lists members other than the site's owner and a real transfer to Viewer Fixture landed (createdBy reverted after); OWNER: no notice, all enabled. qa-viewer ended VIEWER. item6-admin-noncreator / item6-admin-creator."
     },
     {
       "nodeId": "8137:217085",
@@ -9468,8 +9468,8 @@
       "status": "active",
       "authority": "board:settings-phase-b",
       "recipe": "",
-      "verified": "drift-open",
-      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). Mocked CMS_GONE on save: the sheet shows '• This item is no longer available' + 'Your change to it wasn't saved.' as drawn, but no 'Record deleted' toast appeared (polled 6s; DOM has no toast). Not a Settings lane file — reported. I-cms-gone."
+      "verified": "drift-fixed",
+      "verifiedNote": "Drift walk 2026-10-04 (fix/settings-drift-open, port 3320, QA workspace, throwaway L0 walk 744 / E2E Blank Full (Copy), 1440x900, cached board PNG vs live screenshot + getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad drift/live/). The toast always fired (the QA walk's own t3 screenshot shows it; its last DOM read came after the 5s transient expired). 49b93d92a fixes where: the CMS workspace covered a 1100px canvas column, so the card anchored at right 16 / bottom 61; with data-bk-full-page it sits at x932 y770, 460×82, 48 from right and bottom (board 932/769). Mocked CMS_GONE, no server row changed. item7-after-gone."
     },
     {
       "nodeId": "8139:217890",
@@ -9482,8 +9482,8 @@
       "status": "active",
       "authority": "board:settings-phase-b",
       "recipe": "",
-      "verified": "drift-open",
-      "verifiedNote": "QA walk 2026-10-03 (qa/settings-phase-b, port 3300, QA workspace, throwaway sites L0 walk 744 / Toast QA scratch / scratch-ver, 1440x900, board PNG via get_screenshot vs live screenshot, getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad, ledger docs/plans/settings-phase-b-walk/README.md). Mocked CMS_GONE 'This collection was deleted.': inline state as drawn, no 'Collection deleted' toast. Same cause as 8139:217711. I-cms-colgone."
+      "verified": "drift-fixed",
+      "verifiedNote": "Drift walk 2026-10-04 (fix/settings-drift-open, port 3320, QA workspace, throwaway L0 walk 744 / E2E Blank Full (Copy), 1440x900, cached board PNG vs live screenshot + getBoundingClientRect/getComputedStyle; screenshots in the session scratchpad drift/live/). As 8139:217711: 'Collection deleted / This collection was deleted. Your change to it wasn't saved.' at 48 / 48 from the window corner (49b93d92a), on screen 5.0s. Mocked CMS_GONE, no server row changed."
     },
     {
       "nodeId": "8139:218055",
