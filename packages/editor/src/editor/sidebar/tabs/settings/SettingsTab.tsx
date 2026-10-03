@@ -209,6 +209,8 @@ export const SettingsTab: React.FC<
   React.useEffect(() => setHeaderAction(null), [currentScreen]);
   /* A sub-view's header (`… / Browse all` · its own line) — see ScreenProps.registerHeader. */
   const [screenHeader, setScreenHeader] = React.useState<{ title?: string; subtitle?: string } | null>(null);
+  /* The screen's own footer sentence — see ScreenProps.registerFooterMessage. */
+  const [footerMessage, setFooterMessage] = React.useState<string | null>(null);
   const registerHeader = React.useCallback((header: { title?: string; subtitle?: string } | null) => setScreenHeader(header), []);
   React.useEffect(() => setScreenHeader(null), [currentScreen]);
 
@@ -281,6 +283,7 @@ export const SettingsTab: React.FC<
     setLoadState("ready");
     setClientFieldErrors(null);
     setServerFieldErrors(undefined);
+    setFooterMessage(null);
     screenSaveHandlerRef.current = null;
     screenFlushHandlerRef.current = null;
   }, [currentScreen, markScreenDirty]);
@@ -615,6 +618,7 @@ export const SettingsTab: React.FC<
       saveModel: SCREEN_SAVE_MODEL[screenId],
       readOnly,
       registerFieldErrors,
+      registerFooterMessage: setFooterMessage,
       fieldErrors: serverFieldErrors,
     };
     switch (screenId) {
@@ -662,9 +666,11 @@ export const SettingsTab: React.FC<
         ? { text: "Settings could not load", tone: "danger" }
         : saveError
           ? { text: "Not saved", tone: "danger" }
-          : screenIsDirty
-            ? { text: "Unsaved changes", tone: "muted" }
-            : { text: "All changes saved", tone: "muted" };
+          : footerMessage
+            ? { text: footerMessage, tone: "muted" }
+            : screenIsDirty
+              ? { text: "Unsaved changes", tone: "muted" }
+              : { text: "All changes saved", tone: "muted" };
   /* The footer is there while something waits to be saved, a save failed, or
      a footer screen's read is pending or failed — never on the Overview, a
      locked or read-only screen. An immediate screen gets it only while it

@@ -123,8 +123,10 @@ vi.mock("../screens/SeoScreen", () => ({
     registerHeader,
     registerFieldErrors,
     registerSaveHandler,
+    registerFooterMessage,
     fieldErrors,
   }: {
+    registerFooterMessage?: (message: string | null) => void;
     composer?: { getProjectSettings?: () => Record<string, unknown> } | null;
     registerSaveHandler?: (handler: (() => Promise<void>) | null) => void;
     onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
@@ -160,6 +162,12 @@ vi.mock("../screens/SeoScreen", () => ({
           onDirtyChange?.(true);
         }}
       />
+      <button type="button" onClick={() => registerFooterMessage?.("Fix the thing before saving")}>
+        footer message
+      </button>
+      <button type="button" onClick={() => registerFooterMessage?.(null)}>
+        no footer message
+      </button>
       <button type="button" onClick={() => registerSaveHandler?.(() => fakeSeo.save!())}>
         register save handler
       </button>
@@ -708,6 +716,23 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     expect(headTitle()).toBe("SEO");
     expect(footStatus()).toBe("Unsaved changes");
     expect(screen.queryByTestId("set-save-error")).toBeNull();
+  });
+
+  it("a screen's footer message (8135:213221) replaces Unsaved changes, muted, until it is withdrawn or the screen changes", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} projectId="site-1" />);
+    await openSeoAndEdit();
+    fireEvent.click(screen.getByText("footer message"));
+    expect(footStatus()).toBe("Fix the thing before saving");
+    expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-ink-muted)");
+    fireEvent.click(screen.getByText("no footer message"));
+    expect(footStatus()).toBe("Unsaved changes");
+    fireEvent.click(screen.getByText("footer message"));
+    fireEvent.click(screen.getByTestId("set-nav-domains"));
+    fireEvent.click(await screen.findByTestId("set-unsaved-discard"));
+    await waitFor(() => expect(headTitle()).toBe("Domains"));
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO"));
+    expect(footStatus()).toBe("All changes saved");
   });
 
   it("the screen's own invalid fields disable Save until they are fixed (§27)", async () => {

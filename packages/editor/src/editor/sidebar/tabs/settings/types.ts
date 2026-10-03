@@ -151,6 +151,14 @@ export interface ScreenProps {
    * never pressed into a refusal the screen already knows about (§27).
    */
   registerFieldErrors?: (errors: SettingsFieldErrors | null) => void;
+  /**
+   * A sentence for the footer's status, in place of "Unsaved changes" — what
+   * the screen needs before Save can go ("Fix the site URL before saving",
+   * 8135:213221 / 8135:213477). `null` returns the footer to its own status;
+   * the shell clears it on a screen change. Loading, load and save failures
+   * still take precedence.
+   */
+  registerFooterMessage?: (message: string | null) => void;
   /** The fields the server refused on the last Save (SA-10). The screen
    *  renders each under its field; the save-error banner says the rest. */
   fieldErrors?: SettingsFieldErrors;

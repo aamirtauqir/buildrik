@@ -71,6 +71,7 @@ function setup(opts: { projectId?: string | null; saveError?: string | null; sit
     registerFlushHandler: vi.fn() as Handler<() => ProjectSettings | void>,
     registerSaveHandler: vi.fn() as Handler<() => Promise<void>>,
     registerFieldErrors: vi.fn(),
+    registerFooterMessage: vi.fn(),
     onLoadStateChange: vi.fn(),
     registerRetryLoad: vi.fn(),
   };
@@ -227,6 +228,10 @@ describe("General › Advanced — 8135:212966 / 213477 / 213221 / 213733", () =
     expect(screen.getByTestId("set-general-slug-error")).toHaveTextContent(SLUG_FORMAT_ERROR);
     expect(props.registerFieldErrors).toHaveBeenLastCalledWith({ slug: SLUG_FORMAT_ERROR });
     expect(lastHandler(props.registerSaveHandler)).toBeUndefined();
+    // 8135:213477: the footer says what blocks Save — and stops once it is fixed.
+    expect(props.registerFooterMessage).toHaveBeenLastCalledWith("Fix the site URL before saving");
+    fireEvent.change(input("site-slug"), { target: { value: "bella-cucina" } });
+    expect(props.registerFooterMessage).toHaveBeenLastCalledWith(null);
   });
 
   it("a valid change saves through the screen's own handler: confirm names old → new, then one save carries the slug", async () => {

@@ -67,6 +67,8 @@ function siteNameError(value: string): string | null {
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const SLUG_FORMAT_ERROR = "Use only lowercase letters, numbers and hyphens.";
 export const SLUG_TAKEN_ERROR = "This site URL is already taken. Choose another.";
+/** 8135:213221 / 8135:213477: the footer's status while the slug blocks Save. */
+export const SLUG_FOOTER_MESSAGE = "Fix the site URL before saving";
 function slugError(value: string): string | null {
   if (!SLUG_PATTERN.test(value)) return SLUG_FORMAT_ERROR;
   if (value.length < 3 || value.length > 50) return "Use 3 to 50 characters.";
@@ -218,6 +220,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   registerFlushHandler,
   registerSaveHandler,
   registerFieldErrors,
+  registerFooterMessage,
   onLoadStateChange,
   registerRetryLoad,
   saveError,
@@ -275,6 +278,14 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     registerFieldErrors(errors);
     return () => registerFieldErrors(null);
   }, [registerFieldErrors, load.state, nameError, slugFormatError, slugRefused]);
+
+  /* While the slug blocks Save, the footer says what to fix (8135:213221 / 213477). */
+  const slugBlocks = !!(slugFormatError ?? slugRefused);
+  React.useEffect(() => {
+    if (!registerFooterMessage) return;
+    registerFooterMessage(slugBlocks ? SLUG_FOOTER_MESSAGE : null);
+    return () => registerFooterMessage(null);
+  }, [registerFooterMessage, slugBlocks]);
 
   /* A refused slug opens the card it lives in. */
   React.useEffect(() => {
