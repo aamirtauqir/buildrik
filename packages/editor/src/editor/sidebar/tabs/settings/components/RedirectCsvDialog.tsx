@@ -6,8 +6,11 @@
  * reaching the real `<input type=file>`); the chosen file's name replaces the prompt
  * and arms `Import CSV`. The import is all-or-nothing on the server
  * (`redirects.import_csv`, BE-7): a refused file leaves the dialog open with
- * the server's sentence — it names the line — in the error red, and nothing
- * imported. The server reads the first line as the header, so a file that
+ * the server's sentence — the line and why ("Line 4: Destination is
+ * required — nothing imported") — in the error red, and nothing imported.
+ * After a refusal `Import CSV` stays off until another file is chosen (the
+ * same file would be refused again); a failure that is not a refusal (the
+ * network) leaves it on to retry. The server reads the first line as the header, so a file that
  * starts straight with a rule gets the header put in front of it here rather
  * than losing its first rule.
  *
@@ -38,6 +41,12 @@ function toFileLines(message: string, added: boolean): string {
   return added ? message.replace(/\bline (\d+)/gi, (m, n: string) => m.replace(n, String(Number(n) - 1))) : message;
 }
 
+/** The server answered and refused the file (a 4xx), as opposed to never answering. */
+function isRefusal(e: unknown): boolean {
+  const status = (e as { data?: { httpStatus?: unknown } | null } | null)?.data?.httpStatus;
+  return typeof status === "number" && status >= 400 && status < 500;
+}
+
 export interface RedirectCsvDialogProps {
   open: boolean;
   /** Sends the CSV; resolves with the rows created, rejects with the server's sentence. */
@@ -52,11 +61,14 @@ export function RedirectCsvDialog({ open, onImport, onCancel }: RedirectCsvDialo
   const [file, setFile] = React.useState<File | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  /* The file the server refused — Import stays off until it changes (8136:215307). */
+  const [refused, setRefused] = React.useState(false);
 
   React.useEffect(() => {
     if (open) return;
     setFile(null);
     setError(null);
+    setRefused(false);
     setBusy(false);
   }, [open]);
 
@@ -69,6 +81,7 @@ export function RedirectCsvDialog({ open, onImport, onCancel }: RedirectCsvDialo
       await onImport(csv);
     } catch (e) {
       setError(e instanceof Error && e.message ? toFileLines(e.message, added) : "The file could not be imported. Nothing was imported.");
+      setRefused(isRefusal(e));
     } finally {
       setBusy(false);
     }
@@ -88,6 +101,7 @@ export function RedirectCsvDialog({ open, onImport, onCancel }: RedirectCsvDialo
             onChange={(e) => {
               setFile(e.target.files?.[0] ?? null);
               setError(null);
+              setRefused(false);
               e.target.value = "";
             }}
             data-testid="set-rd-csv-input"
@@ -124,7 +138,7 @@ export function RedirectCsvDialog({ open, onImport, onCancel }: RedirectCsvDialo
           <Button
             size="xs"
             className={LIBRARY_MODAL_BTN_PRIMARY}
-            disabled={!file || busy}
+            disabled={!file || busy || refused}
             aria-busy={busy || undefined}
             onClick={() => void run()}
             data-testid="set-rd-csv-import"

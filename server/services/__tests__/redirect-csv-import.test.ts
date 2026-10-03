@@ -43,13 +43,15 @@ describe("importRedirects (BE-7)", () => {
   });
 
   it.each([
-    ["a javascript: target", "/ok,/fine\n/x,javascript:alert(1)", 3],
-    ["a bare page name (fails the publish in vercel.json)", "/x,new-page", 2],
-    ["a protocol-relative target", "/x,//evil.example", 2],
-    ["a from that is not a path", "x,/y", 2],
-    ["an unknown type", "/x,/y,307", 2],
-  ])("refuses %s with its line, and writes nothing", async (_label, rows, line) => {
-    await expect(importRedirects("s1", `${HEADER}\n${rows}`, "PRO")).rejects.toThrow(`INVALID_CSV_ROW:${line}`);
+    ["a javascript: target", "/ok,/fine\n/x,javascript:alert(1)", 3, "Destination must be a path or an http(s) URL"],
+    ["a bare page name (fails the publish in vercel.json)", "/x,new-page", 2, "Destination must be a path or an http(s) URL"],
+    ["a protocol-relative target", "/x,//evil.example", 2, "Destination must be a path or an http(s) URL"],
+    ["a from that is not a path", "x,/y", 2, "Source must be a path starting with /"],
+    ["an unknown type", "/x,/y,307", 2, "Type must be 301 or 302"],
+    ["a missing destination (8136:215307)", "/a,/b\n/c,/d\n/x,", 4, "Destination is required"],
+    ["a missing source", ",/y", 2, "Source path is required"],
+  ])("refuses %s with its line and reason, and writes nothing", async (_label, rows, line, reason) => {
+    await expect(importRedirects("s1", `${HEADER}\n${rows}`, "PRO")).rejects.toThrow(`INVALID_CSV_ROW:${line}:${reason}`);
     expect(db.redirect.createMany).not.toHaveBeenCalled();
   });
 

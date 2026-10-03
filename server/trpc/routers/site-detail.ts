@@ -301,16 +301,16 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "FORBIDDEN", message: "Redirect limit exceeded." });
           if (e instanceof Error && e.message === "CSV_TOO_LARGE")
             throw new TRPCError({ code: "BAD_REQUEST", message: "CSV exceeds 1000 rows." });
-          if (e instanceof Error && e.message.startsWith("INVALID_CSV_ROW:"))
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: `Invalid redirect on line ${e.message.split(":")[1]} — expected "/from,to[,301|302]" with a path or http(s) URL as the target. Nothing was imported.`,
-            });
+          /* 8136:215307: "Line 4: Destination is required — nothing imported". */
+          if (e instanceof Error && e.message.startsWith("INVALID_CSV_ROW:")) {
+            const [, line, ...reason] = e.message.split(":");
+            throw new TRPCError({ code: "BAD_REQUEST", message: `Line ${line}: ${reason.join(":")} — nothing imported` });
+          }
           if (e instanceof Error && e.message.startsWith("DUPLICATE_CSV_ROW:")) {
             const [, line, ...from] = e.message.split(":");
             throw new TRPCError({
               code: "CONFLICT",
-              message: `Line ${line}: a redirect from ${from.join(":")} already exists. Nothing was imported.`,
+              message: `Line ${line}: a redirect from ${from.join(":")} already exists — nothing imported`,
             });
           }
           throw e;

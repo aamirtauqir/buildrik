@@ -76,6 +76,14 @@ export async function deleteRedirect(id: string) {
  *
  * @throws INVALID_CSV_ROW:<line> · DUPLICATE_CSV_ROW:<line>:<fromPath> · CSV_TOO_LARGE · REDIRECT_LIMIT
  */
+/** 8136:215307: why a CSV row was refused, as the dialog says it ("Destination is required"). */
+function csvRowRefusal(fromPath: string, toUrl: string, field: PropertyKey | undefined): string {
+  if (field === "fromPath") return fromPath ? "Source must be a path starting with /" : "Source path is required";
+  if (field === "toUrl") return toUrl.trim() ? "Destination must be a path or an http(s) URL" : "Destination is required";
+  if (field === "type") return "Type must be 301 or 302";
+  return "This row is not a redirect";
+}
+
 export async function importRedirects(siteId: string, csv: string, plan: PlanName): Promise<{ created: number }> {
   const lines = csv.trim().split(/\r?\n/);
   const rows = lines
@@ -91,7 +99,9 @@ export async function importRedirects(siteId: string, csv: string, plan: PlanNam
   const data = rows.map(({ text, line }) => {
     const [fromPath = "", toUrl = "", type = "301"] = text.split(",").map((cell) => unquote(cell.trim()));
     const parsed = createRedirectSchema.safeParse({ siteId, fromPath, toUrl, type: type || "301" });
-    if (!parsed.success) throw new Error(`INVALID_CSV_ROW:${line}`);
+    if (!parsed.success) {
+      throw new Error(`INVALID_CSV_ROW:${line}:${csvRowRefusal(fromPath, toUrl, parsed.error.issues[0]?.path[0])}`);
+    }
     const { fromPath: from, toUrl: to, type: kind } = parsed.data;
     return { line, data: { siteId, fromPath: from, toUrl: to, type: kind } };
   });

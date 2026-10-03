@@ -345,25 +345,48 @@ describe("CSV — Import (8136:215047 / 215307 / 215568) and Export", () => {
     expect(r.list.query).toHaveBeenCalledTimes(2);
   });
 
-  it("a refused file stays open with the server's line in red, and nothing re-lists", async () => {
-    r.import_csv.mutate.mockRejectedValue(new Error('Invalid redirect on line 4 — expected "/from,to[,301|302]". Nothing was imported.'));
+  /** A tRPC refusal as the client sees it: the server's sentence and its 4xx. */
+  const refusal = (message: string) => Object.assign(new Error(message), { data: { code: "BAD_REQUEST", httpStatus: 400 } });
+
+  it("a refused file stays open with the server's line and reason in red, and nothing re-lists (8136:215307)", async () => {
+    r.import_csv.mutate.mockRejectedValue(refusal("Line 4: Destination is required — nothing imported"));
     await openImport();
-    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/a,javascript:alert(1)")] } });
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/a,/b\n/c,/d\n/x,")] } });
     fireEvent.click(screen.getByTestId("set-rd-csv-import"));
-    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toHaveTextContent("Invalid redirect on line 4"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toHaveTextContent("Line 4: Destination is required — nothing imported"));
     expect(screen.getByTestId("set-rd-csv")).toBeInTheDocument();
-    expect(r.import_csv.mutate.mock.calls[0][0].csv).toBe("from,to\n/a,javascript:alert(1)");
     expect(r.list.query).toHaveBeenCalledTimes(1);
+  });
+
+  it("after a refusal Import CSV stays off until another file is chosen", async () => {
+    r.import_csv.mutate.mockRejectedValue(refusal("Line 2: Destination is required — nothing imported"));
+    await openImport();
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/x,")] } });
+    fireEvent.click(screen.getByTestId("set-rd-csv-import"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toBeInTheDocument());
+    expect((screen.getByTestId("set-rd-csv-import") as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/x,/y")] } });
+    expect(screen.queryByTestId("set-rd-csv-error")).toBeNull();
+    expect((screen.getByTestId("set-rd-csv-import") as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("a failure that is not a refusal (no answer) leaves Import CSV on to retry", async () => {
+    r.import_csv.mutate.mockRejectedValue(new Error("Failed to fetch"));
+    await openImport();
+    fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("from,to\n/x,/y")] } });
+    fireEvent.click(screen.getByTestId("set-rd-csv-import"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toBeInTheDocument());
+    expect((screen.getByTestId("set-rd-csv-import") as HTMLButtonElement).disabled).toBe(false);
   });
 
   it("a headerless file's refusal names the line in the person's file, not the line after the added header", async () => {
     // QA walk 2026-10-03: the dialog puts `from,to,type` in front of a file that starts with a rule,
     // so the server's "line 3" is line 2 of what the person chose.
-    r.import_csv.mutate.mockRejectedValue(new Error('Invalid redirect on line 3 — expected "/from,to[,301|302]". Nothing was imported.'));
+    r.import_csv.mutate.mockRejectedValue(refusal("Line 3: Destination must be a path or an http(s) URL — nothing imported"));
     await openImport();
     fireEvent.change(screen.getByTestId("set-rd-csv-input"), { target: { files: [file("/a,/b\n/c,javascript:alert(1)")] } });
     fireEvent.click(screen.getByTestId("set-rd-csv-import"));
-    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toHaveTextContent("Invalid redirect on line 2 —"));
+    await waitFor(() => expect(screen.getByTestId("set-rd-csv-error")).toHaveTextContent("Line 2: Destination must be a path or an http(s) URL — nothing imported"));
     expect(r.import_csv.mutate.mock.calls[0][0].csv).toBe("from,to,type\n/a,/b\n/c,javascript:alert(1)");
   });
 
