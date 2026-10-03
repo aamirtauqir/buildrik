@@ -287,6 +287,28 @@ export async function checkSlugAvailability(slug: string): Promise<boolean> {
   return !existing;
 }
 
+/* Q-B5 (BE-8): the ONE transfer rule — the router gates nothing else. The
+   caller must reach the site at all (an active member of its workspace, within
+   their site scope — getEffectiveSiteRole), and then be its creator or the
+   OWNER (effective role, so a site override still caps). Everyone else, an
+   ADMIN who did not create it included, is refused. */
+async function mayTransfer(createdBy: string | null, userId: string, siteId: string): Promise<boolean> {
+  let callerRole: string;
+  try {
+    callerRole = await getEffectiveSiteRole(prisma, userId, siteId);
+  } catch (e) {
+    if (e instanceof PermissionError) return false;
+    throw e;
+  }
+  return createdBy === userId || callerRole === "OWNER";
+}
+
+/** Whether `transferSite` would let this user transfer the site — what the editor's Danger zone enables Transfer on. */
+export async function canTransferSite(siteId: string, userId: string): Promise<boolean> {
+  const site = await prisma.site.findFirst({ where: { id: siteId, deletedAt: null }, select: { createdBy: true } });
+  return !!site && (await mayTransfer(site.createdBy, userId, siteId));
+}
+
 export async function transferSite(
   siteId: string,
   newOwnerId: string,
@@ -295,19 +317,7 @@ export async function transferSite(
   const site = await prisma.site.findUnique({ where: { id: siteId } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
-  /* Q-B5 (BE-8): the ONE transfer check — the router gates nothing else.
-     The caller must reach the site at all (an active member of its workspace,
-     within their site scope — getEffectiveSiteRole), and then be its creator
-     or the OWNER (effective role, so a site override still caps). Everyone
-     else, an ADMIN who did not create it included, is refused. */
-  let callerRole: string;
-  try {
-    callerRole = await getEffectiveSiteRole(prisma, currentUserId, siteId);
-  } catch (e) {
-    if (e instanceof PermissionError) throw new Error("NOT_OWNER");
-    throw e;
-  }
-  if (site.createdBy !== currentUserId && callerRole !== "OWNER") throw new Error("NOT_OWNER");
+  if (!(await mayTransfer(site.createdBy, currentUserId, siteId))) throw new Error("NOT_OWNER");
 
   const currentMember = await prisma.workspaceMember.findFirst({
     where: { userId: currentUserId, workspaceId: site.workspaceId },

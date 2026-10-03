@@ -52,7 +52,6 @@ import {
   SCREEN_SAVE_MODEL,
   SCREEN_SCOPE,
   scopeLine,
-  READ_ONLY_NOTICE,
   workspaceScopeLine,
   WORKSPACE_LINKS,
   SAVE_ERROR_MESSAGES,
@@ -614,10 +613,13 @@ export const SettingsTab: React.FC<
       /* A read-only screen says so once, in its notice (8134:212323) — not again under every field. */
       <SiteColumnsLockedContext.Provider value={siteColumnsLocked && !readOnly}>{renderEditableScreen(screenId)}</SiteColumnsLockedContext.Provider>
     );
-    if (!readOnly || !screenRules || !current) return screenNode;
+    /* The Danger zone's actions do not share one rule — its creator may
+       transfer (Q-B5) — so it draws its own notice and disables each action
+       itself (8137:216834). */
+    if (!readOnly || !screenRules || !current || screenId === "danger-zone") return screenNode;
     return (
       <>
-        <ReadOnlyBanner who={ROLE_NOUN[screenRules.minRole]} screen={current.title} message={READ_ONLY_NOTICE[screenId]} />
+        <ReadOnlyBanner who={ROLE_NOUN[screenRules.minRole]} screen={current.title} />
         {/* A disabled fieldset disables every native control inside it; its
             cards sit 16 apart, as on the editable screen (set-body's gap). */}
         <fieldset disabled className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0" data-testid="set-readonly-screen">

@@ -15,6 +15,7 @@ const { api, addToast, deleteSite } = vi.hoisted(() => ({
   api: {
     sites: {
       get: { query: vi.fn() },
+      myRole: { query: vi.fn() },
       archive: { mutate: vi.fn() },
       unarchive: { mutate: vi.fn() },
       transfer: { mutate: vi.fn() },
@@ -33,12 +34,13 @@ vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   useToast: () => ({ addToast, removeToast: vi.fn() }),
 }));
 
-import { DangerZoneScreen, RECENTLY_DELETED_PATH } from "../DangerZoneScreen";
+import { DANGER_READ_ONLY_NOTICE, DangerZoneScreen, RECENTLY_DELETED_PATH } from "../DangerZoneScreen";
 
 const assign = vi.fn();
 
 beforeEach(() => {
   api.sites.get.query.mockReset().mockResolvedValue({ status: "PUBLISHED", publishedUrl: "https://bella.vercel.app" });
+  api.sites.myRole.query.mockReset().mockResolvedValue({ role: "OWNER", canTransfer: true });
   api.siteDetail.domains.list.query.mockReset().mockResolvedValue([{ domain: "bellacucina.com", isPrimary: true, status: "VERIFIED" }]);
   api.sites.archive.mutate.mockReset().mockResolvedValue({});
   api.sites.unarchive.mutate.mockReset().mockResolvedValue({});
@@ -58,9 +60,9 @@ beforeEach(() => {
 });
 afterEach(() => cleanup());
 
-function setup() {
+function setup(readOnly = false) {
   const composer = createMockComposer({ projectMetadata: { domain: null, name: "Bella Cucina" } });
-  render(<DangerZoneScreen composer={composer} projectId="s1" />);
+  render(<DangerZoneScreen composer={composer} projectId="s1" readOnly={readOnly} />);
 }
 const loaded = () => waitFor(() => expect(screen.getByTestId("set-danger-archive")).toBeInTheDocument());
 
@@ -161,5 +163,88 @@ describe("Delete — 8137:217905 → 8137:218168", () => {
     fireEvent.click(screen.getByTestId("delete-site-confirm"));
     await waitFor(() => expect(deleteSite).toHaveBeenCalledWith("s1", "Bella Cucina"));
     await waitFor(() => expect(assign).toHaveBeenCalledWith(expect.stringMatching(new RegExp(`${RECENTLY_DELETED_PATH.replace("?", "\\?")}$`))));
+  });
+});
+
+/* PD-3 + Q-B5: below OWNER the screen is read-only except Transfer, which the
+   site's creator keeps when they are an ADMIN (they can list the members). */
+describe("Read-only below OWNER — 8137:216834", () => {
+  const disabled = (id: string) => (screen.getByTestId(id) as HTMLButtonElement).disabled;
+
+  it("OWNER: every action enabled, no notice", async () => {
+    api.sites.myRole.query.mockResolvedValue({ role: "OWNER", canTransfer: true });
+    setup(false);
+    await loaded();
+    expect(screen.queryByTestId("set-readonly")).toBeNull();
+    expect(disabled("set-danger-archive-btn")).toBe(false);
+    expect(disabled("set-danger-transfer-btn")).toBe(false);
+    expect(disabled("set-danger-delete-btn")).toBe(false);
+  });
+
+  it("an ADMIN who created the site: Transfer enabled and works, Archive and Delete disabled", async () => {
+    api.sites.myRole.query.mockResolvedValue({ role: "ADMIN", canTransfer: true });
+    setup(true);
+    await loaded();
+    expect(screen.getByTestId("set-readonly").textContent).toBe(DANGER_READ_ONLY_NOTICE.transferOnly);
+    expect(disabled("set-danger-archive-btn")).toBe(true);
+    expect(disabled("set-danger-delete-btn")).toBe(true);
+    expect(disabled("set-danger-transfer-btn")).toBe(false);
+    fireEvent.click(screen.getByTestId("set-danger-transfer-btn"));
+    await waitFor(() => expect(api.team.list.query).toHaveBeenCalled());
+  });
+
+  it("after a creator ADMIN transfers, Transfer turns off and the notice is the non-creator's", async () => {
+    api.sites.get.query.mockResolvedValue({ status: "DRAFT", publishedUrl: null, createdBy: "u-me" });
+    api.sites.myRole.query.mockResolvedValue({ role: "ADMIN", canTransfer: true });
+    setup(true);
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-danger-transfer-btn"));
+    const select = await screen.findByTestId("set-danger-transfer-member");
+    await waitFor(() => expect(screen.getByRole("option", { name: /Maria Chen/ })).toBeInTheDocument());
+    fireEvent.change(select, { target: { value: "u-maria" } });
+    fireEvent.change(screen.getByTestId("set-danger-transfer-typed"), { target: { value: "Bella Cucina" } });
+    fireEvent.click(screen.getByTestId("set-danger-transfer-confirm"));
+    await waitFor(() => expect(api.sites.transfer.mutate).toHaveBeenCalledWith({ siteId: "s1", newOwnerId: "u-maria" }));
+    await waitFor(() => expect(disabled("set-danger-transfer-btn")).toBe(true));
+    expect(screen.getByTestId("set-readonly").textContent).toBe(DANGER_READ_ONLY_NOTICE.all);
+  });
+
+  it("never offers the site's current owner as the new owner (a creator ADMIN is not offered themselves)", async () => {
+    api.sites.get.query.mockResolvedValue({ status: "DRAFT", publishedUrl: null, createdBy: "u-sam" });
+    api.sites.myRole.query.mockResolvedValue({ role: "ADMIN", canTransfer: true });
+    setup(true);
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-danger-transfer-btn"));
+    await waitFor(() => expect(screen.getByRole("option", { name: /Maria Chen/ })).toBeInTheDocument());
+    expect(screen.queryByRole("option", { name: /Sam Lee/ })).toBeNull();
+  });
+
+  it("an ADMIN who did not create it: every action disabled, the board's notice", async () => {
+    api.sites.myRole.query.mockResolvedValue({ role: "ADMIN", canTransfer: false });
+    setup(true);
+    await loaded();
+    expect(screen.getByTestId("set-readonly").textContent).toBe(DANGER_READ_ONLY_NOTICE.all);
+    expect(DANGER_READ_ONLY_NOTICE.all).toBe(
+      "Only the workspace owner can archive or delete this site. Only the workspace owner or site creator can transfer it.",
+    );
+    expect(disabled("set-danger-archive-btn")).toBe(true);
+    expect(disabled("set-danger-transfer-btn")).toBe(true);
+    expect(disabled("set-danger-delete-btn")).toBe(true);
+  });
+
+  it("an EDITOR who created it: all disabled (the member list is ADMIN), and the notice says so", async () => {
+    api.sites.myRole.query.mockResolvedValue({ role: "EDITOR", canTransfer: true });
+    setup(true);
+    await loaded();
+    expect(screen.getByTestId("set-readonly").textContent).toBe(DANGER_READ_ONLY_NOTICE.creatorBelowAdmin);
+    expect(disabled("set-danger-transfer-btn")).toBe(true);
+  });
+
+  it("the role lookup failing reads as not allowed", async () => {
+    api.sites.myRole.query.mockRejectedValue(new Error("down"));
+    setup(true);
+    await loaded();
+    expect(disabled("set-danger-transfer-btn")).toBe(true);
+    expect(screen.getByTestId("set-readonly").textContent).toBe(DANGER_READ_ONLY_NOTICE.all);
   });
 });

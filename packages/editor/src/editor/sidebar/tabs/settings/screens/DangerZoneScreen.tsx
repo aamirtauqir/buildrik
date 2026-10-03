@@ -14,9 +14,12 @@
  *    the live address it unpublishes. The editor then leaves for the
  *    dashboard's Recently deleted, where the site can be restored for 30 days.
  *
- * Every action applies at once (`immediate`). Below OWNER the shell shows the
- * read-only notice and disables the buttons. Field anchors: `danger-archive`,
- * `danger-transfer`, `danger-delete`.
+ * Every action applies at once (`immediate`). Below OWNER (`readOnly`) the
+ * screen draws its own read-only notice and disables Archive and Delete
+ * (PD-3); Transfer stays enabled for an ADMIN who may transfer — the site's
+ * creator (`sites.myRole` → `canTransfer`, `transferSite`'s rule). The shell
+ * does not wrap this screen in its disabled fieldset, so one button can stay
+ * on. Field anchors: `danger-archive`, `danger-transfer`, `danger-delete`.
  *
  * @license BSD-3-Clause
  */
@@ -27,7 +30,8 @@ import { getBuildrikClient } from "@/services/api-client";
 import { deleteSite } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { DeleteSiteModal } from "@/editor/shell/modals/DeleteSiteModal";
-import { LoadCard, SET_BTN, SET_CARD, SaveErrorBanner, Screen } from "../shared";
+import { roleAtLeast } from "@/services/RoleService";
+import { LoadCard, ReadOnlyBanner, SET_BTN, SET_CARD, SaveErrorBanner, Screen } from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 import { ArchiveSiteDialog } from "../components/ArchiveSiteDialog";
@@ -37,7 +41,24 @@ interface SiteLifecycle {
   archived: boolean;
   /** The address a delete takes offline, or null when nothing is live. */
   liveAddress: string | null;
+  /** Who owns the site now (`Site.createdBy`) — never a transfer target. */
+  createdBy: string | null;
+  /** `transferSite` would allow the viewer (the site's creator, or the OWNER). */
+  canTransfer: boolean;
+  /** The viewer may transfer from here: `transferSite` allows them and they can list the members (ADMIN+). */
+  transferAllowed: boolean;
 }
+
+/* 8137:216834: the read-only notice, true for the viewer it is shown to. */
+export const DANGER_READ_ONLY_NOTICE = {
+  /** Transfer is off too. */
+  all: "Only the workspace owner can archive or delete this site. Only the workspace owner or site creator can transfer it.",
+  /** A creator below ADMIN: the server would allow it, but this screen cannot list the members (`team.list` is ADMIN). */
+  creatorBelowAdmin:
+    "Only the workspace owner can archive or delete this site. Only the workspace owner or an admin who created it can transfer it.",
+  /** An ADMIN who created the site keeps Transfer. */
+  transferOnly: "Only the workspace owner can archive or delete this site. You created it, so you can transfer it.",
+} as const;
 
 const hostOf = (url: string | null | undefined): string | null => {
   if (!url) return null;
@@ -87,10 +108,11 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
   onLoadStateChange,
   registerRetryLoad,
   saveError,
+  readOnly,
 }) => {
   const { addToast } = useToast();
   const siteName = composer?.getProjectMetadata?.()?.name ?? "";
-  const [site, setSite] = React.useState<SiteLifecycle>({ archived: false, liveAddress: null });
+  const [site, setSite] = React.useState<SiteLifecycle>({ archived: false, liveAddress: null, createdBy: null, canTransfer: false, transferAllowed: false });
   const [dialog, setDialog] = React.useState<"archive" | "transfer" | "delete" | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [archiveError, setArchiveError] = React.useState<string | null>(null);
@@ -104,13 +126,20 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
   const load = useServerLoad<SiteLifecycle>(
     projectId,
     async (client, siteId) => {
-      const [row, domains] = await Promise.all([
+      const [row, domains, mine] = await Promise.all([
         client.sites.get.query({ id: siteId }),
         client.siteDetail.domains.list.query({ siteId }).catch(() => []),
+        client.sites.myRole.query({ siteId }).catch(() => null),
       ]);
       const live = row.status === "PUBLISHED" || row.publishedUrl != null;
       const primary = domains.find((d) => d.isPrimary && d.status === "VERIFIED")?.domain ?? null;
-      return { archived: row.status === "ARCHIVED", liveAddress: live ? primary ?? hostOf(row.publishedUrl) : null };
+      return {
+        archived: row.status === "ARCHIVED",
+        liveAddress: live ? primary ?? hostOf(row.publishedUrl) : null,
+        createdBy: row.createdBy ?? null,
+        canTransfer: !!mine?.canTransfer,
+        transferAllowed: !!mine?.canTransfer && roleAtLeast(mine.role, "ADMIN") === true,
+      };
     },
     setSite,
     { onLoadStateChange, registerRetryLoad },
@@ -156,7 +185,9 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
       const page = await client().team.list.query({ page: 1, perPage: 50 });
       setMembers(
         page.data
-          .filter((m) => m.role === "ADMIN" || m.role === "EDITOR")
+          /* Not the current owner: a creator ADMIN transferring would
+             otherwise be offered themselves. */
+          .filter((m) => (m.role === "ADMIN" || m.role === "EDITOR") && m.userId !== site.createdBy)
           .map((m) => ({ userId: m.userId, fullName: m.fullName ?? m.email ?? "Member", role: m.role })),
       );
     } catch {
@@ -167,6 +198,14 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
   const transfer = async (member: TransferMember) => {
     if (!projectId) return;
     await client().sites.transfer.mutate({ siteId: projectId, newOwnerId: member.userId });
+    /* The viewer is no longer the creator: below OWNER that was their only
+       right to transfer, so Transfer and the notice follow at once. */
+    setSite((s) => ({
+      ...s,
+      createdBy: member.userId,
+      canTransfer: readOnly ? false : s.canTransfer,
+      transferAllowed: readOnly ? false : s.transferAllowed,
+    }));
     setDialog(null);
     addToast({ title: "Site transferred", description: `${siteName} now belongs to ${member.fullName}.` });
   };
@@ -203,9 +242,20 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
   }
 
   const banner = saveError ?? actionFailed;
+  /* PD-3: Archive and Delete are the OWNER's. Transfer follows Q-B5. */
+  const ownerActionsOff = !!readOnly;
+  const transferOff = !!readOnly && !site.transferAllowed;
+  const notice = !readOnly
+    ? null
+    : site.transferAllowed
+      ? DANGER_READ_ONLY_NOTICE.transferOnly
+      : site.canTransfer
+        ? DANGER_READ_ONLY_NOTICE.creatorBelowAdmin
+        : DANGER_READ_ONLY_NOTICE.all;
 
   return (
     <Screen>
+      {notice ? <ReadOnlyBanner who="the workspace owner" screen="Danger zone" message={notice} /> : null}
       {banner ? <SaveErrorBanner message={banner} /> : null}
 
       <ActionCard
@@ -224,7 +274,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
             variant="ghost"
             className={ACTION}
             id="danger-archive"
-            disabled={busy}
+            disabled={busy || ownerActionsOff}
             onClick={() => void unarchive()}
             data-testid="set-danger-unarchive-btn"
           >
@@ -237,6 +287,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
             variant="ghost"
             className={ACTION}
             id="danger-archive"
+            disabled={ownerActionsOff}
             onClick={() => {
               setArchiveError(null);
               setDialog("archive");
@@ -259,6 +310,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
           variant="ghost"
           className={ACTION}
           id="danger-transfer"
+          disabled={transferOff}
           onClick={() => void openTransfer()}
           data-testid="set-danger-transfer-btn"
         >
@@ -281,6 +333,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
           variant="ghost"
           className={ACTION_DANGER}
           id="danger-delete"
+          disabled={ownerActionsOff}
           onClick={() => setDialog("delete")}
           data-testid="set-danger-delete-btn"
         >

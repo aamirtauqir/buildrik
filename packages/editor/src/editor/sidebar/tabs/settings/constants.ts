@@ -222,15 +222,6 @@ export function scopeLine(scope: SettingsScope, siteName: string): string {
   return "Live immediately · no publish needed";
 }
 
-/**
- * The read-only notice's sentence where "Only <role> can change <screen>"
- * would be wrong (M2). The Danger zone's actions do not share one rule — the
- * creator may transfer (Q-B5) — so it says each (8137:216834).
- */
-export const READ_ONLY_NOTICE: Partial<Record<Exclude<SettingsScreenId, "overview">, string>> = {
-  "danger-zone": "Only the workspace owner can archive or delete this site. Only the workspace owner or site creator can transfer it.",
-};
-
 /** 8139:217358: a workspace door's line. */
 export const workspaceScopeLine = (workspaceName: string) => `${workspaceName} · all sites · managed in workspace settings`;
 

@@ -1078,10 +1078,10 @@ describe("SettingsTab — read-only below the screen's role", () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-danger-zone"));
     await waitFor(() => expect(headTitle()).toBe("Danger zone"));
-    // 8137:216834: the Danger zone's own sentence — transfer has its own rule (Q-B5).
-    expect(screen.getByTestId("set-readonly").textContent).toBe(
-      "Only the workspace owner can archive or delete this site. Only the workspace owner or site creator can transfer it.",
-    );
+    // 8137:216834: transfer has its own rule (Q-B5), so the Danger zone draws
+    // its own notice and disables each action itself — no shell fieldset.
+    expect(screen.queryByTestId("set-readonly-screen")).toBeNull();
+    expect(screen.queryByTestId("set-foot-save")).toBeNull();
     // 8137:216600 / 216834: the lifecycle scope line, not "Live immediately".
     expect(screen.getByTestId("set-head-scope").textContent).toBe("Bella Cucina · site lifecycle · changes apply immediately");
   });

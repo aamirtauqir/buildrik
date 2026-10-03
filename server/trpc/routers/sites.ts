@@ -16,6 +16,7 @@ import {
   bulkAction,
   checkSlugAvailability,
   transferSite,
+  canTransferSite,
   saveProjectFromEditor,
   getProjectData,
   redactSitePassword,
@@ -310,7 +311,10 @@ export const sitesRouter = router({
          an enabled control the server then refused. One resolver now answers
          both. It also drops two direct Prisma reads out of a router. */
       try {
-        return { role: await getEffectiveSiteRole(ctx.prisma, ctx.session.user.id, input.siteId) };
+        const role = await getEffectiveSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
+        /* Q-B5: the Danger zone enables Transfer for the site's creator as
+           well as the OWNER — transferSite's own rule, asked the same way. */
+        return { role, canTransfer: await canTransferSite(input.siteId, ctx.session.user.id) };
       } catch (e) {
         if (e instanceof PermissionError) {
           throw new TRPCError({
