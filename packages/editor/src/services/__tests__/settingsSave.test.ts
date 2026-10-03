@@ -151,6 +151,22 @@ describe("saveSiteSettings", () => {
       fieldErrors: { cspPolicy: "Too long" },
     });
   });
+
+  it("a CONFLICT with no field path names the slug when the save carried one (SLUG_TAKEN)", async () => {
+    const conflict = () => Object.assign(new Error("Another site already uses that URL slug."), { data: { code: "CONFLICT" } });
+    m.settingsUpdate.mockRejectedValueOnce(conflict());
+    await expect(updateSiteColumns("s1", { slug: "taken", name: "Acme" })).rejects.toMatchObject({
+      fieldErrors: { slug: "Another site already uses that URL slug." },
+    });
+    // Without a slug in the save it names nothing.
+    m.settingsUpdate.mockRejectedValueOnce(conflict());
+    await expect(updateSiteColumns("s1", { name: "Acme" })).rejects.toMatchObject({ fieldErrors: {} });
+  });
+
+  it("an extra column (slug / canonicalUrl) in a plan reaches settings.update with the rest", async () => {
+    await saveSiteSettings("s1", { columns: { name: "Acme", slug: "acme-two", canonicalUrl: null }, projectSettings: null, unrouted: false });
+    expect(m.settingsUpdate).toHaveBeenCalledWith({ id: "s1", name: "Acme", slug: "acme-two", canonicalUrl: null });
+  });
 });
 
 /* The mirror inside autosave (`saveProject`) sends the columns that differ from

@@ -10,8 +10,8 @@
  *  - the flush hands the shell `seo.metaTitle` / `metaDescription` /
  *    `defaultOgImage` / `socialLinks` / `allowIndexing` / `robotsTxt` — Site
  *    columns, written by `siteDetail.settings.update`;
- *  - a changed canonical URL has no settings path, so while one is pending the
- *    screen saves itself (`saveSettingsWithColumns`), canonical riding along.
+ *  - a changed canonical URL has no settings path, so the flush hands it to
+ *    the shell as an extra column — the same `settings.update` carries it.
  *
  * Social profiles carry all six networks (Q-B9); the old JSON-only Twitter
  * handle is offered in the Twitter/X field when that link is empty, and the
@@ -32,7 +32,7 @@ import type { ProjectSettings } from "@/shared/types/project";
 import { SOCIAL_NETWORKS, updateSiteSettingsSchema, type SocialNetwork } from "@buildrik/shared/schemas/site-detail";
 import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen, SiteColumnGate, Textarea } from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
-import type { ScreenProps } from "../types";
+import type { ScreenProps, SettingsFlushResult } from "../types";
 import { SettingsCard } from "../components/SettingsCard";
 import {
   SocialProfilesCard,
@@ -40,7 +40,6 @@ import {
   socialLinkError,
   type SocialProfiles,
 } from "../components/SocialProfilesCard";
-import { saveSettingsWithColumns } from "./SiteSettingsScreen";
 
 /** What this screen reads off `siteDetail.settings.get`. */
 interface SeoRow {
@@ -126,7 +125,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
   projectId,
   onDirtyChange,
   registerFlushHandler,
-  registerSaveHandler,
   registerFieldErrors,
   onLoadStateChange,
   registerRetryLoad,
@@ -208,14 +206,14 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     }));
   }, [fieldErrors]);
 
-  const stateRef = React.useRef({ metaTitle, metaDescription, ogImage, social, allowIndexing, robotsTxt });
-  stateRef.current = { metaTitle, metaDescription, ogImage, social, allowIndexing, robotsTxt };
+  const stateRef = React.useRef({ metaTitle, metaDescription, ogImage, social, allowIndexing, robotsTxt, canonical, savedCanonical });
+  stateRef.current = { metaTitle, metaDescription, ogImage, social, allowIndexing, robotsTxt, canonical, savedCanonical };
 
-  const buildNext = React.useCallback((): ProjectSettings | void => {
+  const flush = React.useCallback((): SettingsFlushResult => {
     if (!composer) return;
     const current = composer.getProjectSettings();
     const s = stateRef.current;
-    return {
+    const settings: ProjectSettings = {
       ...current,
       seo: {
         ...current.seo,
@@ -227,26 +225,16 @@ export const SeoScreen: React.FC<ScreenProps> = ({
         robotsTxt: s.robotsTxt,
       },
     };
-  }, [composer]);
+    const canonicalUrl = s.canonical.trim();
+    if (!projectId || canonicalUrl === s.savedCanonical.trim()) return settings;
+    return { settings, columns: { canonicalUrl: canonicalUrl || null }, onSaved: () => setSavedCanonical(canonicalUrl) };
+  }, [composer, projectId]);
 
   React.useEffect(() => {
     if (!registerFlushHandler) return;
-    registerFlushHandler(buildNext);
+    registerFlushHandler(flush);
     return () => registerFlushHandler(null);
-  }, [registerFlushHandler, buildNext]);
-
-  const canonicalChanged = !!projectId && canonical.trim() !== savedCanonical.trim() && !errors.canonical;
-  React.useEffect(() => {
-    if (!registerSaveHandler || !canonicalChanged || !composer || !projectId) return;
-    const value = canonical.trim();
-    registerSaveHandler(async () => {
-      const next = buildNext();
-      if (!next) return;
-      await saveSettingsWithColumns(composer, projectId, next, { canonicalUrl: value || null });
-      setSavedCanonical(value);
-    });
-    return () => registerSaveHandler(null);
-  }, [registerSaveHandler, canonicalChanged, composer, projectId, canonical, buildNext]);
+  }, [registerFlushHandler, flush]);
 
   if (load.state !== "ready") {
     return (

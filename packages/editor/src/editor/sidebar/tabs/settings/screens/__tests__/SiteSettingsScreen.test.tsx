@@ -32,7 +32,8 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
 
 import { SiteSettingsScreen, SLUG_FORMAT_ERROR, SLUG_TAKEN_ERROR } from "../SiteSettingsScreen";
 import { SiteColumnsLockedContext } from "../../shared";
-import { SettingsSaveCancelled, SettingsSaveError } from "@/services/BuildrikSyncProvider";
+import { SettingsSaveCancelled } from "@/services/BuildrikSyncProvider";
+import type { SettingsFlush, SettingsFlushResult } from "../../types";
 
 const getMock = api.siteDetail.settings.get.query;
 
@@ -68,7 +69,7 @@ function setup(opts: { projectId?: string | null; saveError?: string | null; sit
   });
   const props = {
     onDirtyChange: vi.fn(),
-    registerFlushHandler: vi.fn() as Handler<() => ProjectSettings | void>,
+    registerFlushHandler: vi.fn() as Handler<() => SettingsFlushResult | Promise<SettingsFlushResult>>,
     registerSaveHandler: vi.fn() as Handler<() => Promise<void>>,
     registerFieldErrors: vi.fn(),
     registerFooterMessage: vi.fn(),
@@ -234,52 +235,64 @@ describe("General › Advanced — 8135:212966 / 213477 / 213221 / 213733", () =
     expect(props.registerFooterMessage).toHaveBeenLastCalledWith(null);
   });
 
-  it("a valid change saves through the screen's own handler: confirm names old → new, then one save carries the slug", async () => {
+  it("a valid change: the flush asks first (old → new), then hands the shell the slug as an extra column", async () => {
     const { composer, props } = setup();
     await loaded();
     openAdvanced();
     fireEvent.change(input("site-slug"), { target: { value: "acme-two" } });
-    const save = lastHandler<() => Promise<void>>(props.registerSaveHandler)!;
-    let done!: Promise<void>;
-    act(() => { done = save(); });
+    // No second save path: the one flush carries the slug (Lane 1 request 3).
+    expect(lastHandler(props.registerSaveHandler)).toBeUndefined();
+    const flush = lastHandler<() => Promise<SettingsFlush>>(props.registerFlushHandler)!;
+    let done!: Promise<SettingsFlush>;
+    act(() => { done = flush(); });
     await waitFor(() => expect(screen.getByTestId("set-slug-confirm")).toBeInTheDocument());
     expect(screen.getByTestId("set-slug-confirm-title")).toHaveTextContent("Change the site URL?");
     expect(screen.getByTestId("set-slug-confirm-body")).toHaveTextContent("acme-site → acme-two.");
     fireEvent.click(screen.getByTestId("set-slug-confirm-ok"));
-    await act(async () => { await done; });
-    expect(sync.saveSiteSettings).toHaveBeenCalledWith("s1", expect.objectContaining({ columns: expect.objectContaining({ slug: "acme-two" }) }));
-    expect(composer.adoptSavedProjectSettings).toHaveBeenCalled();
+    const result = await done;
+    expect(result.columns).toEqual({ slug: "acme-two" });
+    expect(result.settings.seo).toMatchObject({ siteName: "Acme Site", author: "Ada" });
+    // The screen sends nothing itself and writes nothing to the composer.
+    expect(sync.saveSiteSettings).not.toHaveBeenCalled();
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
+    // Once the shell reports it saved, the slug is the saved one: no second confirm.
+    act(() => result.onSaved?.());
+    expect(lastHandler<() => unknown>(props.registerFlushHandler)!()).not.toBeInstanceOf(Promise);
   });
 
-  it("Cancel saves nothing", async () => {
+  it("Cancel calls the save off (SettingsSaveCancelled — no banner) and sends nothing", async () => {
     const { props } = setup();
     await loaded();
     openAdvanced();
     fireEvent.change(input("site-slug"), { target: { value: "acme-two" } });
-    const save = lastHandler<() => Promise<void>>(props.registerSaveHandler)!;
-    let done!: Promise<void>;
-    act(() => { done = save(); });
+    const flush = lastHandler<() => Promise<SettingsFlush>>(props.registerFlushHandler)!;
+    let done!: Promise<SettingsFlush>;
+    act(() => { done = flush(); });
     await waitFor(() => expect(screen.getByTestId("set-slug-confirm")).toBeInTheDocument());
     fireEvent.click(screen.getByTestId("set-slug-confirm-cancel"));
-    /* A cancel, not a failure: the shell shows no "not saved" banner for it. */
     await expect(done).rejects.toBeInstanceOf(SettingsSaveCancelled);
     expect(sync.saveSiteSettings).not.toHaveBeenCalled();
   });
 
-  it("a taken slug comes back on the field, and Save stays off until it changes", async () => {
-    sync.saveSiteSettings.mockRejectedValueOnce(new SettingsSaveError("Another site already uses that URL slug."));
-    const { props } = setup();
+  it("a taken slug the shell hands back comes back on the field, no banner, and Save stays off until it changes", async () => {
+    const { composer, props, rerender } = setup();
     await loaded();
     openAdvanced();
     fireEvent.change(input("site-slug"), { target: { value: "taken-one" } });
-    const save = lastHandler<() => Promise<void>>(props.registerSaveHandler)!;
-    let done!: Promise<void>;
-    act(() => { done = save(); });
-    await waitFor(() => expect(screen.getByTestId("set-slug-confirm")).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId("set-slug-confirm-ok"));
-    await expect(done).rejects.toMatchObject({ fieldErrors: { slug: SLUG_TAKEN_ERROR } });
+    rerender(
+      <SiteSettingsScreen
+        composer={composer}
+        projectId="s1"
+        saveError="Site settings were not saved. Your changes are still here. Review the values, then retry."
+        fieldErrors={{ slug: "Another site already uses that URL slug." }}
+        {...props}
+      />,
+    );
     await waitFor(() => expect(screen.getByTestId("set-general-slug-error")).toHaveTextContent(SLUG_TAKEN_ERROR));
     expect(props.registerFieldErrors).toHaveBeenLastCalledWith({ slug: SLUG_TAKEN_ERROR });
+    expect(props.registerFooterMessage).toHaveBeenLastCalledWith("Fix the site URL before saving");
+    // 8135:213221 draws the refusal on the field and in the footer — no banner.
+    expect(screen.queryByText(/were not saved/)).toBeNull();
     fireEvent.change(input("site-slug"), { target: { value: "taken-two" } });
     expect(screen.queryByTestId("set-general-slug-error")).toBeNull();
   });

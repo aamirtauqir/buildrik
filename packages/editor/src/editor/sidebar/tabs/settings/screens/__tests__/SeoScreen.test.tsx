@@ -3,7 +3,7 @@
  * strip · Indexing ›), 8135:214820 (Indexing open: switch, canonical,
  * editable robots.txt, Reset to default) and 8135:215066 (indexing off
  * notice). Flush returns the column-backed SEO keys incl. all six social
- * links; a changed canonical URL saves through the screen's own handler.
+ * links; a changed canonical URL rides in the same flush as an extra column.
  *
  * @license BSD-3-Clause
  */
@@ -31,6 +31,7 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
 }));
 
 import { SeoScreen, robotsPreview, sitemapOrigin } from "../SeoScreen";
+import type { SettingsFlush } from "../../types";
 
 const getMock = api.siteDetail.settings.get.query;
 const domainsMock = api.siteDetail.domains.list.query;
@@ -206,13 +207,29 @@ describe("SEO — what Save sends", () => {
     expect(last(props.registerSaveHandler)).toBeUndefined();
   });
 
-  it("a changed canonical URL saves through the screen's handler, in the same settings.update", async () => {
-    const { props } = setup();
+  it("a changed canonical URL rides in the one flush as an extra column — no second save", async () => {
+    const { composer, props } = setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-card-toggle-indexing"));
     fireEvent.change(input("seo-canonical"), { target: { value: "https://acme.com" } });
-    await act(async () => { await last<() => Promise<void>>(props.registerSaveHandler)!(); });
-    expect(sync.saveSiteSettings).toHaveBeenCalledWith("s1", expect.objectContaining({ columns: expect.objectContaining({ canonicalUrl: "https://acme.com" }) }));
+    expect(last(props.registerSaveHandler)).toBeUndefined();
+    const result = last<() => SettingsFlush>(props.registerFlushHandler)!();
+    expect(result.columns).toEqual({ canonicalUrl: "https://acme.com" });
+    expect(result.settings.seo).toMatchObject({ metaTitle: "Acme · Home" });
+    expect(sync.saveSiteSettings).not.toHaveBeenCalled();
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
+    // Saved: the canonical is the saved one, so the next flush carries no column.
+    act(() => result.onSaved?.());
+    expect(last<() => SettingsFlush>(props.registerFlushHandler)!()).not.toHaveProperty("columns");
+  });
+
+  it("clearing the canonical URL sends null", async () => {
+    getMock.mockResolvedValueOnce({ ...serverRow(), canonicalUrl: "https://old.com" });
+    const { props } = setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-card-toggle-indexing"));
+    fireEvent.change(input("seo-canonical"), { target: { value: "" } });
+    expect(last<() => SettingsFlush>(props.registerFlushHandler)!().columns).toEqual({ canonicalUrl: null });
   });
 
   it("refusals the shared schema knows are said inline and keep Save off", async () => {

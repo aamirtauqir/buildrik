@@ -36,6 +36,8 @@ import {
   type SettingsNavId,
   type SettingsNavDef,
   type SettingsFieldErrors,
+  type SettingsFlush,
+  type SettingsFlushResult,
   type SettingsScreenId,
   type SettingsPaneId,
   type ScreenLoadState,
@@ -110,6 +112,11 @@ const SETTINGS_SCREENS = [
 const ROLE_NOUN = { VIEWER: "viewers", EDITOR: "editors", DESIGNER: "editors", ADMIN: "admins", OWNER: "the workspace owner" } as const;
 
 const PLAN_LABEL: Record<PlanTier, string> = { starter: "Free", pro: "Pro", enterprise: "Business" };
+
+/** A flush's result as one shape: plain settings are a flush with no extra columns. */
+function asFlush(result: ProjectSettings | SettingsFlush): SettingsFlush {
+  return "settings" in result ? result : { settings: result };
+}
 
 function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
   const required = isSettingsScreenId(screenId) ? SCREEN_PLAN_REQUIREMENTS[screenId] : undefined;
@@ -262,8 +269,9 @@ export const SettingsTab: React.FC<
 
   // Composer-backed screens hand their edits over on Save: the flush returns
   // the ProjectSettings to save (ScreenProps.registerFlushHandler).
-  const screenFlushHandlerRef = React.useRef<(() => ProjectSettings | void) | null>(null);
-  const registerFlushHandler = React.useCallback((handler: (() => ProjectSettings | void) | null) => {
+  type FlushHandler = () => SettingsFlushResult | Promise<SettingsFlushResult>;
+  const screenFlushHandlerRef = React.useRef<FlushHandler | null>(null);
+  const registerFlushHandler = React.useCallback((handler: FlushHandler | null) => {
     screenFlushHandlerRef.current = handler;
   }, []);
 
@@ -466,24 +474,28 @@ export const SettingsTab: React.FC<
      so the project save still carries it. Without a site (the standalone
      demo) the engine's own storage is the save. */
   const persistSettings = React.useCallback(
-    async (next: ProjectSettings) => {
+    async (flush: SettingsFlush) => {
       if (!composer) return;
+      const next = flush.settings;
       if (!projectId) {
         composer.setProjectSettings(next);
         await composer.saveProject?.();
+        flush.onSaved?.();
         return;
       }
       const wasDirty = composer.isDirty?.() ?? true;
       const plan = planSettingsSave(composer.getProjectSettings(), next);
-      await saveSiteSettings(projectId, plan);
-      if (plan.unrouted) {
-        composer.setProjectSettings(next);
-        return;
+      /* Columns with no settings path (General's slug, SEO's canonical URL)
+         ride in the same `settings.update` as the settings' own. */
+      await saveSiteSettings(projectId, { ...plan, columns: { ...plan.columns, ...flush.columns } });
+      if (plan.unrouted) composer.setProjectSettings(next);
+      else {
+        composer.adoptSavedProjectSettings(next);
+        /* A flush may touch the project metadata (General's name / author);
+           when nothing else was waiting, the document is as saved as it was. */
+        if (!wasDirty) composer.markSaved?.();
       }
-      composer.adoptSavedProjectSettings(next);
-      /* A flush may touch the project metadata (General's name / author);
-         when nothing else was waiting, the document is as saved as it was. */
-      if (!wasDirty) composer.markSaved?.();
+      flush.onSaved?.();
     },
     [composer, projectId],
   );
@@ -528,14 +540,20 @@ export const SettingsTab: React.FC<
       // Redirects) saves them itself.
       run = screenHandler();
     } else {
-      let next: ProjectSettings | void;
+      let result: SettingsFlushResult | Promise<SettingsFlushResult>;
       try {
-        next = screenFlushHandlerRef.current?.();
+        result = screenFlushHandlerRef.current?.();
       } catch (err) {
         failed(err);
         return;
       }
-      run = next ? persistSettings(next) : undefined;
+      /* A flush may ask first (General's slug confirm) — then it is a promise. */
+      run =
+        result instanceof Promise
+          ? result.then((r) => (r ? persistSettings(asFlush(r)) : undefined))
+          : result
+            ? persistSettings(asFlush(result))
+            : undefined;
     }
     if (!run) {
       succeeded();
@@ -664,10 +682,10 @@ export const SettingsTab: React.FC<
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
         ? { text: "Settings could not load", tone: "danger" }
-        : saveError
-          ? { text: "Not saved", tone: "danger" }
-          : footerMessage
-            ? { text: footerMessage, tone: "muted" }
+        : footerMessage
+          ? { text: footerMessage, tone: "muted" }
+          : saveError
+            ? { text: "Not saved", tone: "danger" }
             : screenIsDirty
               ? { text: "Unsaved changes", tone: "muted" }
               : { text: "All changes saved", tone: "muted" };
@@ -958,7 +976,7 @@ export const SettingsTab: React.FC<
               onClick={() => handleSave()}
               data-testid="set-foot-save"
             >
-              {saveError ? "Retry save" : "Save"}
+              {saveError && !footerMessage ? "Retry save" : "Save"}
             </Button>
           </footer>
         )}

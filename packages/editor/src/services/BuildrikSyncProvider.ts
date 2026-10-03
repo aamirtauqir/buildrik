@@ -400,7 +400,14 @@ export async function updateSiteColumns(siteId: string, patch: SiteColumnPatch) 
   try {
     return await getClient().siteDetail.settings.update.mutate({ id: siteId, ...patch });
   } catch (err) {
-    throw asSettingsSaveError(err, columnField);
+    const refused = asSettingsSaveError(err, columnField);
+    /* SLUG_TAKEN / PROJECT_NAME_TAKEN come back as a CONFLICT with no field
+       path; when the save carried a slug, the slug is the field refused. */
+    const code = (err as { data?: { code?: unknown } } | null)?.data?.code;
+    if (code === "CONFLICT" && patch.slug !== undefined && Object.keys(refused.fieldErrors).length === 0) {
+      throw new SettingsSaveError(refused.message, { slug: refused.message });
+    }
+    throw refused;
   }
 }
 
@@ -415,8 +422,9 @@ export async function updateProjectSettings(siteId: string, patch: ProjectSettin
 
 /** What one Settings Save sends, from the composer's settings before and the screen's after. */
 export interface SettingsSavePlan {
-  /** Mirrored Site columns whose value changed. */
-  columns: SiteColumnSettings;
+  /** Mirrored Site columns whose value changed — plus any column with no
+   *  settings path a screen's flush adds (`slug`, `canonicalUrl`). */
+  columns: SiteColumnPatch;
   /** JSON-only keys that changed, or null. */
   projectSettings: ProjectSettingsPatch | null;
   /**

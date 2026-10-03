@@ -6,6 +6,7 @@
 import type * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { ProjectSettings } from "@/shared/types/project";
+import type { SiteColumnPatch } from "@/services/BuildrikSyncProvider";
 
 // ============================================
 // Types
@@ -79,6 +80,21 @@ export interface SettingsTabProps {
   projectId?: string | null;
 }
 
+/**
+ * A flush that carries more than the settings: Site columns no
+ * `ProjectSettings` path names (`slug`, `canonicalUrl`) — they ride in the same
+ * `siteDetail.settings.update` as the settings' own columns — and what the
+ * screen does once the server has them (General moves its saved slug).
+ */
+export interface SettingsFlush {
+  settings: ProjectSettings;
+  columns?: SiteColumnPatch;
+  onSaved?: () => void;
+}
+
+/** What a flush returns: the settings, the settings with extra columns, or nothing to save. */
+export type SettingsFlushResult = ProjectSettings | SettingsFlush | void;
+
 /** The screen's server read, as the shell's footer reports it. */
 export type ScreenLoadState = "loading" | "ready" | "error";
 
@@ -108,9 +124,12 @@ export interface ScreenProps {
    * JSON-only keys to `siteDetail.projectSettings.update`, and only once the
    * server has them does the composer adopt them (no autosave, no
    * `sites.saveProject`). Return nothing when there is nothing to save; throw
-   * (with the field's sentence) to refuse the Save. Pass `null` to clear.
+   * (with the field's sentence) to refuse the Save, or `SettingsSaveCancelled`
+   * when the user called it off (no banner). Return a `SettingsFlush` to send
+   * Site columns with no settings path in the same save; the flush may be
+   * async (a confirm first). Pass `null` to clear.
    */
-  registerFlushHandler?: (handler: (() => ProjectSettings | void) | null) => void;
+  registerFlushHandler?: (handler: (() => SettingsFlushResult | Promise<SettingsFlushResult>) | null) => void;
   /** The screen's server read: the shell's footer and the screen's own card follow it. */
   onLoadStateChange?: (state: ScreenLoadState) => void;
   /**
@@ -155,8 +174,9 @@ export interface ScreenProps {
    * A sentence for the footer's status, in place of "Unsaved changes" — what
    * the screen needs before Save can go ("Fix the site URL before saving",
    * 8135:213221 / 8135:213477). `null` returns the footer to its own status;
-   * the shell clears it on a screen change. Loading, load and save failures
-   * still take precedence.
+   * the shell clears it on a screen change. Loading and a failed load still
+   * take precedence; a failed save does not — the message names what to fix
+   * (8135:213221 draws it after the server refused the slug).
    */
   registerFooterMessage?: (message: string | null) => void;
   /** The fields the server refused on the last Save (SA-10). The screen

@@ -111,7 +111,13 @@ vi.mock("../components/UnsavedSettingsDialog", () => ({
    without a server: SEO stands in. */
 const seoFlushes = vi.hoisted(() => [] as string[]);
 /* What the fake SEO's "register save handler" button registers — set per test. */
-const fakeSeo = vi.hoisted(() => ({ save: null as null | (() => Promise<void>) }));
+const fakeSeo = vi.hoisted(() => ({
+  save: null as null | (() => Promise<void>),
+  /* When set, the flush returns a SettingsFlush — extra columns + onSaved — and
+     waits on `gate` first when there is one (General's confirm). */
+  extra: null as null | { columns: Record<string, unknown>; onSaved?: () => void; gate?: Promise<boolean> },
+  Cancelled: null as null | (new () => Error),
+}));
 vi.mock("../screens/SeoScreen", () => ({
   SeoScreen: ({
     composer,
@@ -133,7 +139,7 @@ vi.mock("../screens/SeoScreen", () => ({
     onDirtyChange?: (d: boolean) => void;
     saveError?: string | null;
     registerHeaderAction?: (node: React.ReactNode | null) => void;
-    registerFlushHandler?: (handler: (() => Record<string, unknown> | void) | null) => void;
+    registerFlushHandler?: (handler: (() => unknown) | null) => void;
     registerHeader?: (header: { title?: string; subtitle?: string } | null) => void;
     registerFieldErrors?: (errors: Record<string, string> | null) => void;
     fieldErrors?: Record<string, string>;
@@ -146,7 +152,16 @@ vi.mock("../screens/SeoScreen", () => ({
         seoFlushes.push("flushed");
         const current = composer?.getProjectSettings?.() ?? {};
         const seo = (current.seo ?? {}) as Record<string, unknown>;
-        return { ...current, seo: { ...seo, ...typed.current } };
+        const settings = { ...current, seo: { ...seo, ...typed.current } };
+        const extra = fakeSeo.extra;
+        if (!extra) return settings;
+        const flush = { settings, columns: extra.columns, onSaved: extra.onSaved };
+        return extra.gate
+          ? extra.gate.then((ok) => {
+              if (!ok) throw new (fakeSeo.Cancelled!)();
+              return flush;
+            })
+          : flush;
       });
       return () => registerFlushHandler?.(null);
     }, [registerFlushHandler, composer]);
@@ -686,6 +701,46 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     expect(sync.saveSiteSettings).toHaveBeenCalledWith("site-1", { columns: {}, projectSettings: null, unrouted: true });
     expect(composer.setProjectSettings).toHaveBeenCalledWith({ seo: { siteName: "Test Site", twitterHandle: "@bella" } });
     expect(composer.adoptSavedProjectSettings).not.toHaveBeenCalled();
+  });
+
+  it("a flush's extra columns (slug / canonicalUrl) ride in the same save; onSaved runs once the server has them", async () => {
+    const composer = makeComposer();
+    const onSaved = vi.fn();
+    fakeSeo.extra = { columns: { slug: "bella-two" }, onSaved };
+    renderS(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
+    await openSeoAndEdit();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await screen.findByText("Saved · applies on next publish");
+    expect(sync.saveSiteSettings).toHaveBeenCalledTimes(1);
+    expect(sync.saveSiteSettings).toHaveBeenCalledWith("site-1", {
+      columns: { metaTitle: "x", slug: "bella-two" },
+      projectSettings: null,
+      unrouted: false,
+    });
+    expect(composer.adoptSavedProjectSettings).toHaveBeenCalledWith({ seo: { siteName: "Test Site", metaTitle: "x" } });
+    expect(onSaved).toHaveBeenCalledTimes(1);
+    fakeSeo.extra = null;
+  });
+
+  it("an async flush (a confirm first): the save waits for it; called off, nothing is sent and nothing reads as failed", async () => {
+    let answer!: (ok: boolean) => void;
+    fakeSeo.Cancelled = SettingsSaveCancelled;
+    fakeSeo.extra = { columns: { slug: "bella-two" }, gate: new Promise<boolean>((r) => (answer = r)) };
+    renderS(<SettingsTab composer={asComposer(makeComposer())} projectId="site-1" />);
+    await openSeoAndEdit();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    expect(sync.saveSiteSettings).not.toHaveBeenCalled();
+    await act(async () => answer(false));
+    await waitFor(() => expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(false));
+    expect(sync.saveSiteSettings).not.toHaveBeenCalled();
+    expect(footStatus()).toBe("Unsaved changes");
+    expect(screen.queryByTestId("set-save-error")).toBeNull();
+    // Confirmed this time: the save goes, slug and all.
+    fakeSeo.extra = { columns: { slug: "bella-two" }, gate: Promise.resolve(true) };
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await screen.findByText("Saved · applies on next publish");
+    expect(sync.saveSiteSettings).toHaveBeenCalledWith("site-1", expect.objectContaining({ columns: { metaTitle: "x", slug: "bella-two" } }));
+    fakeSeo.extra = null;
   });
 
   it("a save the screen calls off (SettingsSaveCancelled) is no failure: no banner, no toast, the edits stay", async () => {

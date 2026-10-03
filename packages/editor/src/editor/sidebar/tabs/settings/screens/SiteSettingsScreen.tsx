@@ -12,9 +12,12 @@
  *  - Author has no Site column: it is `seo.author` in the project JSON, which
  *    no settings mutation covers, so the shell hands it to the composer and
  *    the project save carries it (ScreenProps.registerFlushHandler);
- *  - a changed slug has no settings path at all, so while one is pending the
- *    screen registers its own Save: confirm (SlugChangeDialog), then one
- *    `siteDetail.settings.update` carrying the slug with every other change.
+ *  - a changed slug has no settings path at all: the flush asks first
+ *    (SlugChangeDialog), then hands the shell the slug as an extra column, so
+ *    one `siteDetail.settings.update` carries it with every other change.
+ *    Cancel calls the save off (`SettingsSaveCancelled`, no banner); while the
+ *    slug is malformed or taken the footer says "Fix the site URL before
+ *    saving".
  *
  * Social profiles moved to SEO (Phase B §1 row 20); the language select moved
  * to Languages (row 11).
@@ -24,24 +27,17 @@
 
 import * as React from "react";
 import { Button, TextInput } from "@/editor/chrome-ui";
-import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getBuildrikClient } from "@/services/api-client";
-import {
-  SettingsSaveCancelled,
-  SettingsSaveError,
-  planSettingsSave,
-  saveSiteSettings,
-  type SiteColumnPatch,
-} from "@/services/BuildrikSyncProvider";
+import { SettingsSaveCancelled } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen } from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
 import { localeLabel } from "../constants";
 import { SettingsCard } from "../components/SettingsCard";
 import { SlugChangeDialog } from "../components/SlugChangeDialog";
-import type { ScreenProps } from "../types";
+import type { ScreenProps, SettingsFlushResult } from "../types";
 
 /** The columns this screen reads off `siteDetail.settings.get`. */
 interface GeneralRow {
@@ -73,32 +69,6 @@ function slugError(value: string): string | null {
   if (!SLUG_PATTERN.test(value)) return SLUG_FORMAT_ERROR;
   if (value.length < 3 || value.length > 50) return "Use 3 to 50 characters.";
   return null;
-}
-
-/**
- * One Settings save that also carries Site columns no settings path names
- * (`slug`, `canonicalUrl`): the same plan the shell's flush save runs
- * (`planSettingsSave` → `saveSiteSettings`), with the extra columns in the one
- * `settings.update`. The composer adopts `next` once the server has it — or,
- * when a changed key no mutation covers (Author), takes it as an edit so the
- * project save carries it, exactly as the shell does for a flush.
- */
-export async function saveSettingsWithColumns(
-  composer: Composer,
-  siteId: string,
-  next: ProjectSettings,
-  extraColumns: SiteColumnPatch,
-): Promise<void> {
-  const wasDirty = composer.isDirty?.() ?? true;
-  const plan = planSettingsSave(composer.getProjectSettings(), next);
-  const columns: SiteColumnPatch = { ...plan.columns, ...extraColumns };
-  await saveSiteSettings(siteId, { ...plan, columns });
-  if (plan.unrouted) {
-    composer.setProjectSettings(next);
-    return;
-  }
-  composer.adoptSavedProjectSettings(next);
-  if (!wasDirty) composer.markSaved?.();
 }
 
 /** The live site's host (`bella-cucina.vercel.app`), or null before the first publish. */
@@ -218,7 +188,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   projectId,
   onDirtyChange,
   registerFlushHandler,
-  registerSaveHandler,
   registerFieldErrors,
   registerFooterMessage,
   onLoadStateChange,
@@ -287,9 +256,15 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     return () => registerFooterMessage(null);
   }, [registerFooterMessage, slugBlocks]);
 
-  /* A refused slug opens the card it lives in. */
+  /* A slug the server refused (taken) comes back on the field and keeps Save
+     off until it changes (8135:213221); the card it lives in opens. */
+  const slugRef = React.useRef({ slug, savedSlug, slugChanged });
+  slugRef.current = { slug, savedSlug, slugChanged };
   React.useEffect(() => {
-    if (fieldErrors?.slug) setAdvancedOpen(true);
+    const message = fieldErrors?.slug;
+    if (!message) return;
+    setAdvancedOpen(true);
+    setRefused({ slug: slugRef.current.slug, message: /already uses/i.test(message) ? SLUG_TAKEN_ERROR : message });
   }, [fieldErrors?.slug]);
 
   const stateRef = React.useRef({ siteName, author, favicon, touchIcon });
@@ -317,42 +292,28 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     };
   }, [composer]);
 
+  /* Save: the settings, and — when the slug changed — a confirm first
+     (SlugChangeDialog), then the slug riding in the same `settings.update`.
+     Cancel calls the save off: nothing is sent and nothing reads as failed. */
+  const flush = React.useCallback((): SettingsFlushResult | Promise<SettingsFlushResult> => {
+    const { slug: to, savedSlug: from, slugChanged: changed } = slugRef.current;
+    if (!changed) return buildNext();
+    return new Promise<boolean>((resolve) => {
+      confirmRef.current = resolve;
+      setSlugConfirm({ from, to });
+    }).then((ok): SettingsFlushResult => {
+      if (!ok) throw new SettingsSaveCancelled();
+      const settings = buildNext();
+      if (!settings) return;
+      return { settings, columns: { slug: to }, onSaved: () => setSavedSlug(to) };
+    });
+  }, [buildNext]);
+
   React.useEffect(() => {
     if (!registerFlushHandler) return;
-    registerFlushHandler(buildNext);
+    registerFlushHandler(flush);
     return () => registerFlushHandler(null);
-  }, [registerFlushHandler, buildNext]);
-
-  /* While a valid slug change is pending, Save is this: confirm, then one
-     save with the slug riding along. Cancel leaves everything unsaved. */
-  React.useEffect(() => {
-    if (!registerSaveHandler || !slugChanged || !composer || !projectId) return;
-    const from = savedSlug;
-    const to = slug;
-    registerSaveHandler(async () => {
-      const ok = await new Promise<boolean>((resolve) => {
-        confirmRef.current = resolve;
-        setSlugConfirm({ from, to });
-      });
-      if (!ok) throw new SettingsSaveCancelled();
-      const next = buildNext();
-      if (!next) return;
-      try {
-        await saveSettingsWithColumns(composer, projectId, next, { slug: to });
-      } catch (err) {
-        /* SLUG_TAKEN / PROJECT_NAME_TAKEN come back as CONFLICTs with no
-           field path ("Another site already uses …"); name the field. */
-        if (err instanceof SettingsSaveError && err.fieldErrors.slug) setRefused({ slug: to, message: err.fieldErrors.slug });
-        if (err instanceof SettingsSaveError && !err.fieldErrors.slug && /already uses/i.test(err.message)) {
-          setRefused({ slug: to, message: SLUG_TAKEN_ERROR });
-          throw new SettingsSaveError(err.message, { ...err.fieldErrors, slug: SLUG_TAKEN_ERROR });
-        }
-        throw err;
-      }
-      setSavedSlug(to);
-    });
-    return () => registerSaveHandler(null);
-  }, [registerSaveHandler, slugChanged, composer, projectId, savedSlug, slug, buildNext]);
+  }, [registerFlushHandler, flush]);
 
   const answerConfirm = (ok: boolean) => {
     setSlugConfirm(null);
@@ -395,11 +356,13 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   const initials = initialsOf(siteName);
   const liveHost = liveHostOf(composer?.getProjectMetadata?.()?.publishedUrl);
   const faviconError = fieldErrors?.["seo.favicon"];
+  const onlySlugRefused = !!fieldErrors?.slug && Object.keys(fieldErrors).length === 1;
   const touchIconError = fieldErrors?.["seo.touchIcon"];
 
   return (
     <Screen>
-      {saveError ? <SaveErrorBanner message={saveError} /> : null}
+      {/* 8135:213221: a taken slug is said on its field and in the footer, not in a banner. */}
+      {saveError && !onlySlugRefused ? <SaveErrorBanner message={saveError} /> : null}
 
       <SettingsCard title="Site identity">
         <div className={FIELD_ROW}>
