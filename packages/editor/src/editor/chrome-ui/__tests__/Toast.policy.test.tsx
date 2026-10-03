@@ -293,3 +293,95 @@ describe("Toast policy — the context value is stable", () => {
     expect(onRender).toHaveBeenCalledTimes(1);
   });
 });
+
+/* Owner call 2026-10-04: an error toast stays on screen until the user deals
+   with it — ✕, or its action. Every other tone keeps its timing, an explicit
+   `duration` still wins, and hover/focus pause is unchanged. */
+describe("Toast policy — error toasts stay until closed", () => {
+  it("an error toast is still there after a minute, and data-persistent says so", () => {
+    vi.useFakeTimers();
+    mount();
+    act(() => {
+      api.addToast({ tone: "error", description: "Publish failed" });
+    });
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(screen.getByText("Publish failed")).toBeTruthy();
+    expect(cards()[0].dataset.persistent).toBe("true");
+  });
+
+  it("✕ closes it", () => {
+    mount();
+    act(() => {
+      api.addToast({ tone: "error", description: "Publish failed" });
+    });
+    act(() => {
+      screen.getByRole("button", { name: "Dismiss notification" }).click();
+    });
+    expect(screen.queryByText("Publish failed")).toBeNull();
+  });
+
+  it("running its action closes it (primary and secondary), after the action ran", () => {
+    mount();
+    const retry = vi.fn();
+    const details = vi.fn();
+    act(() => {
+      api.addToast({ tone: "error", description: "Save failed", action: { label: "Retry", onClick: retry } });
+    });
+    act(() => {
+      screen.getByRole("button", { name: "Retry" }).click();
+    });
+    expect(retry).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Save failed")).toBeNull();
+    act(() => {
+      api.addToast({ tone: "error", title: "Sync failed", description: "Sync failed body", action: { label: "Retry", onClick: retry }, secondaryAction: { label: "Details", onClick: details } });
+    });
+    act(() => {
+      screen.getByRole("button", { name: "Details" }).click();
+    });
+    expect(details).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Sync failed body")).toBeNull();
+  });
+
+  it("an explicit duration on an error toast is honoured", () => {
+    vi.useFakeTimers();
+    mount();
+    act(() => {
+      api.addToast({ tone: "error", description: "Brief error", duration: 3000 });
+    });
+    act(() => {
+      vi.advanceTimersByTime(3001);
+    });
+    expect(screen.queryByText("Brief error")).toBeNull();
+  });
+
+  it.each(["success", "info", "warning", "neutral"] as const)("a %s toast still leaves after 5 s", (tone) => {
+    vi.useFakeTimers();
+    mount();
+    act(() => {
+      api.addToast({ tone, description: `${tone} note` });
+    });
+    act(() => {
+      vi.advanceTimersByTime(4999);
+    });
+    expect(screen.getByText(`${tone} note`)).toBeTruthy();
+    act(() => {
+      vi.advanceTimersByTime(2);
+    });
+    expect(screen.queryByText(`${tone} note`)).toBeNull();
+  });
+
+  it("a non-error toast's action does not close it early (its timer still does)", () => {
+    mount();
+    const onClick = vi.fn();
+    act(() => {
+      api.addToast({ tone: "success", description: "Saved", action: { label: "Publish", onClick } });
+    });
+    act(() => {
+      screen.getByRole("button", { name: "Publish" }).click();
+    });
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Saved")).toBeTruthy();
+  });
+});

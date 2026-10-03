@@ -17,7 +17,10 @@
  *     above the transient in the bottom-anchored column;
  *   - a toast that offers Undo lingers at least 8 s (decision #17 — a user who
  *     expected a confirm sees the element vanish, and 5 s is not enough to
- *     read, decide and reach the button); everything else defaults to 5 s.
+ *     read, decide and reach the button); everything else defaults to 5 s;
+ *   - an ERROR toast does not time out (owner call 2026-10-04): it stays until
+ *     it is closed with ✕ or its action runs. An explicit `duration` from the
+ *     caller still wins.
  *
  * THE ANCHOR is the bottom-RIGHT (owner decision 2026-10-03: the boards win
  * over the 5940:148012 bottom-left anchor and the 7574:194162 dark catalogue).
@@ -93,7 +96,7 @@ export interface ToastInput {
   /* C0a (Task 5): a second action button rendered next to `action`. The CMS
      sync layer uses it for a "Keep mine" / "Use theirs" pair on a conflict. */
   secondaryAction?: ToastActionPayload;
-  /** ms; Infinity persists until dismissed. Default 5000; Undo toasts ≥ 8000. */
+  /** ms; Infinity persists until dismissed. Default 5000 (error: Infinity); Undo toasts ≥ 8000. */
   duration?: number;
 }
 
@@ -122,7 +125,7 @@ function offersUndo(input: ToastInput): boolean {
 }
 
 function resolveDuration(input: ToastInput): number {
-  const asked = input.duration ?? TOAST_DEFAULT_DURATION;
+  const asked = input.duration ?? (input.tone === "error" ? Infinity : TOAST_DEFAULT_DURATION);
   return offersUndo(input) ? Math.max(asked, TOAST_UNDO_MIN_DURATION) : asked;
 }
 
@@ -349,17 +352,23 @@ function ToastItem({
   };
 
   const persistent = isPersistent(toast);
+  /* An error toast stays until it is dealt with — its action running is that
+     (owner call 2026-10-04), so the action takes it down after it runs. */
+  const run = (payload: ToastActionPayload) => () => {
+    payload.onClick();
+    if (tone === "error") onDismiss(id);
+  };
   const dotClass = TONE_DOT_CLASS[tone];
   const dot = dotClass ? (
     <span data-testid="toast-tone" aria-hidden="true" className={`tw:block tw:flex-none tw:size-2 tw:rounded-full ${dotClass}`} />
   ) : null;
   const actionButton = action ? (
-    <Button color="alternative" size="xs" onClick={action.onClick} className={LINK_BTN_CLASS}>
+    <Button color="alternative" size="xs" onClick={run(action)} className={LINK_BTN_CLASS}>
       {action.label}
     </Button>
   ) : null;
   const secondaryActionButton = secondaryAction ? (
-    <Button color="alternative" size="xs" onClick={secondaryAction.onClick} className={LINK_BTN_CLASS}>
+    <Button color="alternative" size="xs" onClick={run(secondaryAction)} className={LINK_BTN_CLASS}>
       {secondaryAction.label}
     </Button>
   ) : null;
