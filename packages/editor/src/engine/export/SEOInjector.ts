@@ -9,6 +9,7 @@
 import type { PageSEO, SiteSEO, PageData } from "../../shared/types";
 import { slugify } from "../../shared/utils/helpers/string";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
+import { SOCIAL_NETWORKS } from "@buildrik/shared/schemas/site-detail";
 
 // ============================================================================
 // TYPES
@@ -199,8 +200,8 @@ export class SEOInjector {
       tags.push(`<script type="application/ld+json">${jsonLd}</script>`);
     }
 
-    /* Settings → Site Settings → Social Links writes three URLs into project
-       settings and, until now, NOTHING anywhere read them: not this injector,
+    /* Settings → SEO → Social profiles (six networks) — they once sat in
+       project settings while NOTHING anywhere read them: not this injector,
        not the canvas, not the publish path. Filled in, they left the editor
        and reached no page. `sameAs` on an Organization is what a site-wide
        social profile means to a search engine, so that is what they emit. */
@@ -237,8 +238,9 @@ export class SEOInjector {
   private socialProfiles(siteSEO?: SiteSEO): string[] {
     const links = siteSEO?.socialLinks;
     if (!links) return [];
-    return [links.twitter, links.facebook, links.linkedin]
-      .map((v) => (v ?? "").trim())
+    /* Every network the Settings screen offers (Q-B9): it read three of the
+       six, so an Instagram, YouTube or GitHub profile never reached a page. */
+    return SOCIAL_NETWORKS.map((network) => (links[network] ?? "").trim())
       .filter((v) => /^https?:\/\//i.test(v));
   }
 
