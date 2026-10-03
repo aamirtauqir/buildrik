@@ -1,10 +1,14 @@
 /**
- * ConnectionVerifiedDialog — Clone 4256:26844 "Connection verified" (640).
+ * ConnectionVerifiedDialog — Clone 4256:26844 "Connection verified" (640),
+ * retitled per plan row #34 / SET-05: the check proves the id's FORMAT and
+ * reads the tracker's count — it cannot prove a connection, so with no events
+ * the dialog says "Format OK · no events yet" rather than "verified".
  *
- * Opened by the Analytics screen's Verify once the Measurement ID's shape
- * passed and the tracker's status was read again. The line says what that
- * read found — `<id> is receiving data. 1,284 events arrived in the last 24
- * hours.` or `<id> is verified. No events have arrived yet.` — and the note
+ * Opened by the Analytics screen's "Check data is arriving" once the
+ * Measurement ID's shape passed and the tracker's status was read again. The
+ * line says what that read found — `<id> is receiving data. 1,284 events
+ * arrived in the last 24 hours.` or `<id> has the right format. No events have
+ * arrived yet.` — and the note
  * that the check was just now. One door, `Back to analytics`, which takes
  * focus; Escape and the scrim are the same door.
  *
@@ -31,8 +35,11 @@ export function eventsPhrase(n: number): string {
 export function connectionVerifiedLine(id: string, events24h: number): string {
   return events24h > 0
     ? `${id} is receiving data. ${eventsPhrase(events24h)} arrived in the last 24 hours.`
-    : `${id} is verified. No events have arrived yet.`;
+    : `${id} has the right format. No events have arrived yet.`;
 }
+
+/** The dialog's title: what the check could establish. */
+const connectionCheckTitle = (events24h: number) => (events24h > 0 ? "Data is arriving" : "Format OK · no events yet");
 
 export interface ConnectionVerifiedDialogProps {
   open: boolean;
@@ -47,9 +54,9 @@ export interface ConnectionVerifiedDialogProps {
 export function ConnectionVerifiedDialog({ open, id, events24h, onBack }: ConnectionVerifiedDialogProps) {
   return (
     <ModalRoot open={open} onClose={onBack}>
-      <ModalContent size="table" srTitle="Connection verified" data-testid="set-an-verified">
+      <ModalContent size="table" srTitle={connectionCheckTitle(events24h)} data-testid="set-an-verified">
         <h2 className={LIBRARY_MODAL_TITLE} data-testid="set-an-verified-title">
-          Connection verified
+          {connectionCheckTitle(events24h)}
         </h2>
         <ModalBody className="tw:flex tw:flex-col tw:gap-2">
           <p className={LIBRARY_MODAL_BODY} data-testid="set-an-verified-line">

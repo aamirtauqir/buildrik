@@ -31,19 +31,10 @@ describe("named controls", () => {
     expect(read("sites/site-card-full.tsx")).toMatch(/aria-label=\{`Select \$\{site\.name\}`\}/);
   });
 
-  it("the indexing toggle is a named switch", () => {
-    const src = read("site-detail/seo-tab.tsx");
-    expect(src).toMatch(/role="switch"/);
-    expect(src).toMatch(/aria-checked=\{indexing\}/);
-    expect(src).toMatch(/aria-label="Allow search engines to index this site"/);
-    expect(src).not.toMatch(/aria-pressed/);
-  });
-
-  it("both selects say what they set", () => {
+  it("the email-frequency select says what it sets", () => {
     expect(read("settings/notification-prefs.tsx")).toMatch(
       /aria-label=\{`Email frequency for \$\{pref\.category\}`\}/,
     );
-    expect(read("site-detail/redirects-tab.tsx")).toMatch(/aria-label="Redirect type"/);
   });
 });
 

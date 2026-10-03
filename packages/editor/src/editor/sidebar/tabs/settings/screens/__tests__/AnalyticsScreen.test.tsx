@@ -107,7 +107,7 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
     expect(ga.getByTestId("set-field-label-google-analytics-id")).toHaveTextContent("Google Analytics ID");
     expect(ga.getByTestId("set-field-label-connection-status")).toHaveTextContent("Connection status");
     expect(ga.getByTestId("set-field-label-last-received-data")).toHaveTextContent("Last received data");
-    expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Verify");
+    expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Check data is arriving");
 
     expect(screen.getByTestId("set-field-label-gtm-container-id")).toHaveTextContent("GTM Container ID");
     expect(screen.getByTestId("set-field-label-pixel-id")).toHaveTextContent("Pixel ID");
@@ -293,7 +293,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     await loaded();
     fireEvent.click(verify());
     await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(/^G-4XQ2P7B1KD is verified\. No events have arrived yet\.$/);
+    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(/^G-4XQ2P7B1KD has the right format\. No events have arrived yet\.$/);
     expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NO DATA YET");
   });
 
@@ -330,7 +330,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     fireEvent.click(verify());
     await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
     expect(statusMock).not.toHaveBeenCalled();
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent("is verified. No events have arrived yet.");
+    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent("has the right format. No events have arrived yet.");
   });
 });
 

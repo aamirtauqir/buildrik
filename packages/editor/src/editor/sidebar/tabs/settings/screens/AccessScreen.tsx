@@ -1,25 +1,211 @@
 /**
- * AccessScreen — PUBLISHING › Access (plan row #31, board M13 — not drawn yet).
+ * AccessScreen — PUBLISHING › Access (plan row #31; boards 8136:216089
+ * password-set, 8136:216319 password-off, 8136:216535 set-password;
+ * 8136:216758 pro-locked is the shell's LockedScreen).
  *
- * Lane 0 stub: registered in the nav (Pro-gated, ADMIN, footer save) so the
- * shell, search and deep links know it. Lane 2 fills it: the site password
- * (set / change / remove, moved from the dashboard Settings tab; never shows
- * the stored value — `hasPublishedPassword`) and the "Manage share links ↗"
- * door. Field anchors: `access-password`, `access-share-links`.
+ * Card **Password protection · Pro**: the switch, then — on, with a password
+ * stored — "A password is set", a `New password` field that changes it and
+ * `Remove`; on, with none — the `Password` field; switched off over a stored
+ * one — "Password protection will be off after the next publish." The stored
+ * value is never read back (the server redacts it; `settings.get` says only
+ * `hasPublishedPassword`). Save is the footer's: a save handler writes
+ * `publishedPassword` through `siteDetail.settings.update` (ADMIN, Pro) —
+ * the new value, or `null` to remove — and the screen re-reads the flag.
+ * Turning the switch on without a password is refused before Save
+ * (`registerFieldErrors`). Card **Share links**: "Manage share links ↗" opens
+ * the dashboard's Sharing tab. Field anchors: `access-password`,
+ * `access-share-links`.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Screen, Section } from "../shared";
+import { Button, ToggleSwitch } from "@/editor/chrome-ui";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { updateSiteColumns } from "@/services/BuildrikSyncProvider";
+import { Input, LoadCard, SET_BTN, SET_CARD, SET_ROW_LABEL, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen } from "../shared";
+import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 
-export const AccessScreen: React.FC<ScreenProps> = () => (
-  <Screen>
-    <Section title="Password protection" desc="Keep the published site private behind a password. Applies on the next publish.">
-      <p className="tw:col-span-full tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-        The site password moves here from the dashboard in this release.
-      </p>
-    </Section>
-  </Screen>
-);
+/** The settings path the password's refusals are keyed by (BuildrikSyncProvider's column map). */
+const PASSWORD_PATH = "publishing.publishedPassword";
+const NEED_PASSWORD = "Enter a password to turn protection on";
+
+/* 8136:216089: the card — 24 in, 16 between its rows, title 16/600. */
+const CARD = `${SET_CARD} tw:flex tw:flex-col tw:items-start tw:gap-4 tw:p-6`;
+const TITLE =
+  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
+const NOTE_12 = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const LABEL_11 = "tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]";
+const DOOR_LINK =
+  "tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-accent)] tw:no-underline tw:hover:underline " +
+  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:outline-none";
+
+export const AccessScreen: React.FC<ScreenProps> = ({
+  projectId,
+  onDirtyChange,
+  onLoadStateChange,
+  registerRetryLoad,
+  registerSaveHandler,
+  registerFieldErrors,
+  fieldErrors,
+  saveError,
+  readOnly,
+}) => {
+  const [hasPassword, setHasPassword] = React.useState(false);
+  const [enabled, setEnabled] = React.useState(false);
+  const [password, setPassword] = React.useState("");
+
+  const load = useServerLoad<{ hasPublishedPassword?: boolean }>(
+    projectId,
+    (client, siteId) => client.siteDetail.settings.get.query({ siteId }),
+    (row) => {
+      const set = !!row.hasPublishedPassword;
+      setHasPassword(set);
+      setEnabled(set);
+      setPassword("");
+    },
+    { onLoadStateChange, registerRetryLoad },
+  );
+
+  const dirty = enabled !== hasPassword || (enabled && password.length > 0);
+  const invalid = enabled && !hasPassword && password.trim() === "";
+
+  React.useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+
+  React.useEffect(() => {
+    registerFieldErrors?.(invalid ? { [PASSWORD_PATH]: NEED_PASSWORD } : null);
+  }, [invalid, registerFieldErrors]);
+  React.useEffect(() => () => registerFieldErrors?.(null), [registerFieldErrors]);
+
+  /* Save: the new value, or null to remove — only on an explicit change, so a
+     save never clears a password nobody touched. */
+  const stateRef = React.useRef({ enabled, password, hasPassword });
+  stateRef.current = { enabled, password, hasPassword };
+  React.useEffect(() => {
+    if (!registerSaveHandler) return;
+    if (!dirty || !projectId) {
+      registerSaveHandler(null);
+      return;
+    }
+    registerSaveHandler(async () => {
+      const s = stateRef.current;
+      const publishedPassword = s.enabled ? s.password : null;
+      await updateSiteColumns(projectId, { publishedPassword });
+      setHasPassword(publishedPassword !== null);
+      setEnabled(publishedPassword !== null);
+      setPassword("");
+    });
+    return () => registerSaveHandler(null);
+  }, [dirty, projectId, registerSaveHandler]);
+
+  if (load.state !== "ready") {
+    return (
+      <Screen>
+        <LoadCard
+          title="Password protection"
+          line="Keep the published site private behind a password."
+          state={load.state}
+          errorLine="Couldn't load your access settings. Check your connection, then try again."
+          onRetry={load.retry}
+        />
+      </Screen>
+    );
+  }
+
+  const fieldError = fieldErrors?.[PASSWORD_PATH];
+
+  return (
+    <Screen>
+      {saveError ? <SaveErrorBanner message={saveError} /> : null}
+
+      <section className={CARD} data-testid="set-card-password-protection">
+        <h3 className={TITLE}>Password protection · Pro</h3>
+        <div className="tw:flex tw:min-h-8 tw:items-center tw:gap-4">
+          <span id="access-password-toggle-label" className={SET_ROW_LABEL}>
+            Password protection
+          </span>
+          <ToggleSwitch
+            checked={enabled}
+            onChange={(next) => {
+              setEnabled(next);
+              if (!next) setPassword("");
+            }}
+            aria-labelledby="access-password-toggle-label"
+            sizing="md"
+            data-testid="set-access-toggle"
+          />
+        </div>
+
+        {enabled && hasPassword ? (
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]" data-testid="set-access-is-set">
+            A password is set
+          </p>
+        ) : null}
+
+        {enabled ? (
+          <div className="tw:flex tw:w-full tw:flex-col tw:gap-1" data-testid="set-field-access-password">
+            <label htmlFor="access-password" className={LABEL_11}>
+              {hasPassword ? "New password" : "Password"}
+            </label>
+            <Input
+              id="access-password"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={hasPassword ? "Enter a new password to change it" : "Enter a password"}
+              aria-invalid={fieldError ? true : undefined}
+              data-testid="set-access-password"
+            />
+            {fieldError ? <span className={SCREEN_FIELD_ERROR}>{fieldError}</span> : null}
+          </div>
+        ) : null}
+
+        {enabled && hasPassword ? (
+          <Button
+            type="button"
+            size="xs"
+            variant="ghost"
+            className={`${SET_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`}
+            onClick={() => {
+              setEnabled(false);
+              setPassword("");
+            }}
+            data-testid="set-access-remove"
+          >
+            Remove
+          </Button>
+        ) : null}
+
+        {!enabled ? (
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-access-off">
+            {hasPassword
+              ? "Password protection will be off after the next publish."
+              : "Anyone with the address can view the published site."}
+          </p>
+        ) : null}
+
+        <p className={NOTE_12}>Applies on next publish</p>
+      </section>
+
+      <section className={CARD} data-testid="set-card-share-links">
+        <h3 className={TITLE}>Share links</h3>
+        {readOnly || !projectId ? null : (
+          <a
+            id="access-share-links"
+            className={DOOR_LINK}
+            href={`${DASHBOARD_URL}/dashboard/sites/${projectId}/access`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="set-access-share-links"
+          >
+            Manage share links ↗
+          </a>
+        )}
+      </section>
+    </Screen>
+  );
+};
