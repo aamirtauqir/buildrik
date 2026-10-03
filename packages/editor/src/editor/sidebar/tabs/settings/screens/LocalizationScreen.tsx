@@ -31,7 +31,6 @@ import {
   SaveErrorBanner,
   SCREEN_EMPTY,
   SCREEN_FIELD_ERROR,
-  SET_RESTORE_STRIP,
   Screen,
   Select,
 } from "../shared";
@@ -231,10 +230,15 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
       {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
       {/* C-7 (PD-39): the publish pipeline emits the default locale only. Not
-          on 8135:214023; kept because it is what publishing does today. */}
-      <div className={SET_RESTORE_STRIP} data-testid="set-loc-publish-note">
+          on 8135:214023; kept because it is true (owner, 2026-10-04) — as one
+          muted 12/20 line, this screen's note style, not a yellow strip, so
+          the cards sit 36px below the board's place instead of 68. */}
+      <p
+        className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+        data-testid="set-loc-publish-note"
+      >
         Per-language pages publish in a later release. Today, publishing ships the default locale only — the rows below track translation progress, not live routes.
-      </div>
+      </p>
 
       <SettingsCard title="Default locale">
         <Field label="Default locale" htmlFor="default-locale" span="full">

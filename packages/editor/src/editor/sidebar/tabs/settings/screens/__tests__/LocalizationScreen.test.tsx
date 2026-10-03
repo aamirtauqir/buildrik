@@ -115,6 +115,16 @@ describe("Languages · 8135:214023", () => {
     await loaded();
   });
 
+  it("says per-language pages publish later in one muted line, not a strip (owner, 2026-10-04)", async () => {
+    setup();
+    await loaded();
+    const note = screen.getByTestId("set-loc-publish-note");
+    expect(note.tagName).toBe("P");
+    expect(note).toHaveTextContent("Per-language pages publish in a later release.");
+    expect(note.className).toContain("tw:text-[var(--bk-ink-muted)]");
+    expect(note.className).not.toMatch(/tw:bg-|tw:border/);
+  });
+
   it("read-only hides Add locale and Remove", async () => {
     setup({ readOnly: true });
     await loaded();
