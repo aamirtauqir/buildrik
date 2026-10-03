@@ -190,11 +190,12 @@ describe("Toast policy — anchor and surface", () => {
     anchor.remove();
   });
 
-  /* Full-page views collapse the column to 0 width: the boards' 48px. */
-  it("falls back to 48px from the window's right and bottom when the column is collapsed", () => {
+  /* Full-page views squeeze the column to a sliver without unmounting it
+     (measured live in Settings: right edge at x=48): the boards' 48px. */
+  it.each([0, 32])("falls back to 48px from the window's right and bottom when the column is %ipx wide", (w) => {
     const anchor = document.createElement("div");
     anchor.setAttribute("data-bk-toast-anchor", "");
-    anchor.getBoundingClientRect = rect(340, 90, 0, 780);
+    anchor.getBoundingClientRect = rect(16, 90, w, 780);
     document.body.appendChild(anchor);
     mount();
     act(() => {

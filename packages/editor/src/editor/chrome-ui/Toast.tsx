@@ -214,12 +214,16 @@ type Anchor = { right: number; bottom: number };
 
 /** In the canvas: 16px in from the canvas column's right edge
  *  (`data-bk-toast-anchor`) and 16px above its footer toolbar
- *  (`data-bk-toast-floor`, else the column's bottom). Without a visible
- *  column: the boards' 48px from the window's right and bottom. */
+ *  (`data-bk-toast-floor`, else the column's bottom). Without a column wide
+ *  enough to hold the card: the boards' 48px from the window's right and
+ *  bottom. Full-page views (Settings, CMS, Brand) squeeze the column to a
+ *  sliver without unmounting it — measured 2026-10-03 in full-page Settings,
+ *  its right edge at x=48, which threw the card off the left of the screen —
+ *  so "non-zero" is not the test; "can hold the card" is. */
 function measureAnchor(): Anchor {
   const el = document.querySelector("[data-bk-toast-anchor]");
   const r = el?.getBoundingClientRect();
-  if (!el || !r || !r.width || !r.height) return VIEWPORT_ANCHOR;
+  if (!el || !r || r.width < TOAST_WIDTH + 2 * CANVAS_GAP || !r.height) return VIEWPORT_ANCHOR;
   const floor = el.querySelector("[data-bk-toast-floor]")?.getBoundingClientRect();
   const top = floor && floor.height ? floor.top : r.bottom;
   return {
@@ -229,6 +233,8 @@ function measureAnchor(): Anchor {
 }
 
 const CANVAS_GAP = 16;
+/** The boards' card width; the `tw:w-[460px]` on ToastItem. */
+const TOAST_WIDTH = 460;
 /** Boards 8134:212718 et al.: the card's right edge sits 48px from the window's. */
 const VIEWPORT_ANCHOR: Anchor = { right: 48, bottom: 48 };
 
@@ -244,8 +250,11 @@ function ToastViewport() {
     };
   }, []);
 
-  /* Measured while something is showing: the drawer opening or the window
-     resizing moves the canvas column, and the toast moves with it. */
+  /* Measured while something is showing: the drawer opening, the window
+     resizing, or a full-page view handing back to the canvas (a toast's own
+     action can do that — Settings' "Publish" opens the Publish panel) moves
+     the canvas column, and the toast moves with it. The body does not resize
+     when the column does, so the column is observed too. */
   const showing = toasts.length > 0;
   React.useLayoutEffect(() => {
     if (!showing) return;
@@ -254,6 +263,8 @@ function ToastViewport() {
     window.addEventListener("resize", update);
     const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
     ro?.observe(document.body);
+    const column = document.querySelector("[data-bk-toast-anchor]");
+    if (column) ro?.observe(column);
     return () => {
       window.removeEventListener("resize", update);
       ro?.disconnect();
