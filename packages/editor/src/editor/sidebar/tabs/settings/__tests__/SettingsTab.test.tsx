@@ -499,6 +499,34 @@ describe("SettingsTab — doors", () => {
   });
 });
 
+describe("SettingsTab — Back to canvas is a link (owner 2026-10-04)", () => {
+  afterEach(() => window.history.replaceState(null, "", "/"));
+
+  it("is an anchor to the editor's canvas URL — this URL without ?settings=", () => {
+    window.history.replaceState(null, "", "/edit/site-1?settings=access");
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    const back = screen.getByRole("link", { name: /Back to canvas/ });
+    expect(back).toBe(screen.getByTestId("set-back"));
+    expect(back.tagName).toBe("A");
+    expect(back.getAttribute("href")).toBe("/edit/site-1");
+    expect(back.textContent).toContain("Back to canvas");
+  });
+
+  it("a plain click stays in the page and closes Settings; ⌘ / Ctrl-click is left to the browser", () => {
+    window.history.replaceState(null, "", "/edit/site-1?settings=general&page=p1");
+    const onClose = vi.fn();
+    renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    const back = screen.getByTestId("set-back");
+    expect(back.getAttribute("href")).toBe("/edit/site-1?page=p1");
+    expect(fireEvent.click(back)).toBe(false); // default prevented
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(fireEvent.click(back, { metaKey: true })).toBe(true);
+    expect(fireEvent.click(back, { ctrlKey: true })).toBe(true);
+    expect(fireEvent.click(back, { shiftKey: true })).toBe(true);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
 // ─── The guard ────────────────────────────────────────────────────────────
 
 describe("SettingsTab — Unsaved settings", () => {

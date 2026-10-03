@@ -777,6 +777,14 @@ export const SettingsTab: React.FC<
 
   // ─── Sidebar rows ─────────────────────────────────────────────────────
 
+  /* Back to canvas's href: this editor's own URL without the Settings deep
+     link (`/edit/<siteId>?settings=…` → `/edit/<siteId>`). */
+  const canvasHref = (() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("settings");
+    return `${url.pathname}${url.search}${url.hash}`;
+  })();
+
   /* Search Mode's results: screens and their fields, in the index's order. */
   const trimmed = query.trim();
   const results = React.useMemo(() => (trimmed ? searchSettings(trimmed) : []), [trimmed]);
@@ -931,12 +939,21 @@ export const SettingsTab: React.FC<
         ) : (
           <>
             <div className="tw:flex tw:shrink-0 tw:flex-col tw:px-4 tw:pt-3">
+              {/* OWNER OVERRIDE 2026-10-04 (M0 4418:144988 / 8134:212121 draw a
+                  quiet button; to update): a real link to the canvas, styled as
+                  the text link. A plain click stays in the page and goes
+                  through the Unsaved guard; ⌘/Ctrl/Shift-click and middle-click
+                  are the browser's — the canvas in a new tab or window. */}
               <Button
-                type="button"
-                variant="ghost"
+                href={canvasHref}
+                variant="link"
                 size="xs"
-                className="tw:h-8 tw:w-54 tw:justify-center tw:gap-0.5 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]"
-                onClick={requestLeave}
+                className="tw:h-8 tw:w-54 tw:justify-center tw:gap-0.5 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:no-underline tw:hover:underline"
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                  e.preventDefault();
+                  requestLeave();
+                }}
                 data-testid="set-back"
               >
                 <ChevronLeft size={12} aria-hidden />
