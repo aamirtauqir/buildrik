@@ -157,6 +157,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
   registerRetryLoad,
   saveError,
   fieldErrors,
+  readOnly,
 }) => {
   const { value: savedCode } = useSettingsScreen(
     composer,
@@ -318,7 +319,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
         label="Global CSS"
         error={fieldErrors?.["customCode.globalCss"]}
         footer={
-          /* 4418:128108: reusable classes belong to the Brand panel, not this well. */
+          readOnly ? undefined : /* 4418:128108: reusable classes belong to the Brand panel, not this well. */
           <Button
             type="button"
             size="xs"

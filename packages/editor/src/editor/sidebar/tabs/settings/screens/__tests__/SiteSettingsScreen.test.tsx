@@ -56,7 +56,7 @@ afterEach(() => cleanup());
 
 type Handler<T> = ((h: T | null) => void) & { mock: { calls: unknown[][] } };
 
-function setup(opts: { projectId?: string | null; saveError?: string | null; siteColumnsLocked?: boolean; publishedUrl?: string } = {}) {
+function setup(opts: { projectId?: string | null; saveError?: string | null; siteColumnsLocked?: boolean; publishedUrl?: string; readOnly?: boolean } = {}) {
   const composer = createMockComposer({
     projectSettings: baseSettings(),
     projectMetadata: { name: "Acme Site", publishedUrl: opts.publishedUrl ?? null } as never,
@@ -79,6 +79,7 @@ function setup(opts: { projectId?: string | null; saveError?: string | null; sit
       composer={extra}
       projectId={opts.projectId === undefined ? "s1" : opts.projectId}
       saveError={opts.saveError}
+      readOnly={opts.readOnly}
       {...props}
     />,
     {
@@ -157,6 +158,17 @@ describe("General · 8135:212718 — Site identity from the Site row", () => {
     expect(input("site-name").matches(":disabled")).toBe(true);
     expect(input("favicon-url").matches(":disabled")).toBe(true);
     expect(input("site-author").matches(":disabled")).toBe(false);
+  });
+});
+
+describe("General — read-only (role below ADMIN)", () => {
+  it("drops the upload buttons and the Languages link; the values stay readable", async () => {
+    setup({ readOnly: true });
+    await loaded();
+    expect(screen.queryByTestId("set-favicon-upload")).toBeNull();
+    expect(screen.queryByTestId("set-touch-icon-upload")).toBeNull();
+    expect(screen.queryByTestId("set-general-language")).toBeNull();
+    expect(screen.getByText("French (fr)")).toBeInTheDocument();
   });
 });
 

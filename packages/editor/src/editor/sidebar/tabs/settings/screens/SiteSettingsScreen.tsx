@@ -158,11 +158,13 @@ interface IconUploadProps {
   value: string;
   initials: string;
   busy: boolean;
+  /** Read-only (role below ADMIN): the preview and hint stay, the upload goes. */
+  readOnly?: boolean;
   onPick(file: File): void;
 }
 
 /** 8135:212920 `Favicon` / 8135:212935 `Touch icon`: label, a 40 preview tile, the upload button, the format hint. */
-function IconUpload({ id, label, hint, button, accept, value, initials, busy, onPick }: IconUploadProps) {
+function IconUpload({ id, label, hint, button, accept, value, initials, busy, readOnly, onPick }: IconUploadProps) {
   const fileRef = React.useRef<HTMLInputElement>(null);
   return (
     <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2" data-testid={`set-field-${id}`}>
@@ -180,18 +182,20 @@ function IconUpload({ id, label, hint, button, accept, value, initials, busy, on
             </span>
           )}
         </div>
-        <Button
-          id={id}
-          type="button"
-          size="xs"
-          variant="ghost"
-          className={UPLOAD_BTN}
-          disabled={busy}
-          onClick={() => fileRef.current?.click()}
-          data-testid={`set-${id}-upload`}
-        >
-          {busy ? "Uploading…" : button}
-        </Button>
+        {readOnly ? null : (
+          <Button
+            id={id}
+            type="button"
+            size="xs"
+            variant="ghost"
+            className={UPLOAD_BTN}
+            disabled={busy}
+            onClick={() => fileRef.current?.click()}
+            data-testid={`set-${id}-upload`}
+          >
+            {busy ? "Uploading…" : button}
+          </Button>
+        )}
         <span className={ICON_HINT}>{hint}</span>
         <TextInput
           ref={fileRef}
@@ -222,6 +226,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   registerRetryLoad,
   saveError,
   fieldErrors,
+  readOnly,
 }) => {
   /* The composer's copy first — all the standalone demo (no site) has —
      then the Site row replaces it once read. */
@@ -432,6 +437,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             value={favicon}
             initials={initials}
             busy={uploading === "favicon"}
+            readOnly={readOnly}
             onPick={(file) => void pickIcon(file, "favicon")}
           />
           <IconUpload
@@ -443,6 +449,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             value={touchIcon}
             initials={initials}
             busy={uploading === "touch-icon"}
+            readOnly={readOnly}
             onPick={(file) => void pickIcon(file, "touch-icon")}
           />
         </div>
@@ -471,16 +478,22 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
           )}
         </Field>
 
-        <Button
-          type="button"
-          size="xs"
-          variant="ghost"
-          className={LINK_BTN}
-          onClick={() => composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: "localization" })}
-          data-testid="set-general-language"
-        >
-          {`${localeLabel(language)} (${language}) · Manage in Languages ›`}
-        </Button>
+        {readOnly ? (
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
+            {`${localeLabel(language)} (${language})`}
+          </p>
+        ) : (
+          <Button
+            type="button"
+            size="xs"
+            variant="ghost"
+            className={LINK_BTN}
+            onClick={() => composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: "localization" })}
+            data-testid="set-general-language"
+          >
+            {`${localeLabel(language)} (${language}) · Manage in Languages ›`}
+          </Button>
+        )}
       </SettingsCard>
 
       <SettingsCard title="Advanced" open={advancedOpen} onToggle={setAdvancedOpen} anchors={["site-slug"]}>

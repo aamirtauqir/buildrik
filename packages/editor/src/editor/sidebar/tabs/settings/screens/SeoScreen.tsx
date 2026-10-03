@@ -136,6 +136,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
   registerRetryLoad,
   saveError,
   fieldErrors,
+  readOnly,
 }) => {
   const seo = composer?.getProjectSettings().seo;
   const legacyHandle = seo?.twitterHandle ?? "";
@@ -346,16 +347,20 @@ export const SeoScreen: React.FC<ScreenProps> = ({
       {open.defaults ? (
         <div className={`${NOTICE} tw:bg-[var(--bk-accent-tint)]`} data-testid="set-seo-pages-strip">
           Page titles and descriptions can be overridden per page in{" "}
-          <Button
-            type="button"
-            size="xs"
-            variant="ghost"
-            className={INLINE_LINK}
-            onClick={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" })}
-            data-testid="set-seo-pages-link"
-          >
-            Pages ›
-          </Button>
+          {readOnly ? (
+            "Pages ›"
+          ) : (
+            <Button
+              type="button"
+              size="xs"
+              variant="ghost"
+              className={INLINE_LINK}
+              onClick={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" })}
+              data-testid="set-seo-pages-link"
+            >
+              Pages ›
+            </Button>
+          )}
         </div>
       ) : null}
 
