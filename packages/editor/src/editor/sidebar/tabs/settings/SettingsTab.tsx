@@ -52,7 +52,7 @@ import {
   SCREEN_SAVE_MODEL,
   SCREEN_SCOPE,
   scopeLine,
-  overviewScopeLine,
+  READ_ONLY_NOTICE,
   workspaceScopeLine,
   WORKSPACE_LINKS,
   SAVE_ERROR_MESSAGES,
@@ -617,7 +617,7 @@ export const SettingsTab: React.FC<
     if (!readOnly || !screenRules || !current) return screenNode;
     return (
       <>
-        <ReadOnlyBanner who={ROLE_NOUN[screenRules.minRole]} screen={current.title} />
+        <ReadOnlyBanner who={ROLE_NOUN[screenRules.minRole]} screen={current.title} message={READ_ONLY_NOTICE[screenId]} />
         {/* A disabled fieldset disables every native control inside it. */}
         <fieldset disabled className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-6 tw:border-0 tw:p-0" data-testid="set-readonly-screen">
           {screenNode}
@@ -681,7 +681,7 @@ export const SettingsTab: React.FC<
     ? scopeLine(screenRules.scope, siteName)
     : workspaceDoor
       ? workspaceScopeLine(workspaceName)
-      : overviewScopeLine(siteName);
+      : scopeLine("lifecycle", siteName);
 
   const immediate = screenRules?.saveModel === "immediate";
   const footStatus: { text: string; tone: "muted" | "danger" } =

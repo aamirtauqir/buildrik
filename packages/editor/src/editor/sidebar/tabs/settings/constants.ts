@@ -211,16 +211,25 @@ export const SCREEN_SCOPE: Record<Exclude<SettingsScreenId, "overview">, Setting
   forms: "live",
   "custom-code": "publish",
   headers: "publish",
-  "danger-zone": "live",
+  "danger-zone": "lifecycle",
 };
 
-/** M1 (8134:212121 / 8134:212529): the next-publish line names the site; the live one does not. */
+/** M1 (8134:212121 / 8134:212529): the next-publish line names the site; the live one does not;
+ *  the lifecycle line is the Overview's and the Danger zone's (8137:216346 / 8137:216600). */
 export function scopeLine(scope: SettingsScope, siteName: string): string {
-  return scope === "publish" ? `${siteName} · all pages · applies on next publish` : "Live immediately · no publish needed";
+  if (scope === "publish") return `${siteName} · all pages · applies on next publish`;
+  if (scope === "lifecycle") return `${siteName} · site lifecycle · changes apply immediately`;
+  return "Live immediately · no publish needed";
 }
 
-/** 8137:216346: the Overview's own line. */
-export const overviewScopeLine = (siteName: string) => `${siteName} · site lifecycle · changes apply immediately`;
+/**
+ * The read-only notice's sentence where "Only <role> can change <screen>"
+ * would be wrong (M2). The Danger zone's actions do not share one rule — the
+ * creator may transfer (Q-B5) — so it says each (8137:216834).
+ */
+export const READ_ONLY_NOTICE: Partial<Record<Exclude<SettingsScreenId, "overview">, string>> = {
+  "danger-zone": "Only the workspace owner can archive or delete this site. Only the workspace owner or site creator can transfer it.",
+};
 
 /** 8139:217358: a workspace door's line. */
 export const workspaceScopeLine = (workspaceName: string) => `${workspaceName} · all sites · managed in workspace settings`;

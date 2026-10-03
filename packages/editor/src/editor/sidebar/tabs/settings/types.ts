@@ -48,8 +48,9 @@ export type SettingsPaneId = SettingsScreenId | SettingsWorkspaceDoorId;
  *  its own dialog — the footer only appears if something is still left to save. */
 export type SettingsSaveModel = "footer" | "immediate";
 
-/** What a screen's changes reach: the next publish, or the live site at once. */
-export type SettingsScope = "publish" | "live";
+/** What a screen's changes reach: the next publish, the live site at once, or
+ *  the site itself (archive / transfer / delete — the Danger zone). */
+export type SettingsScope = "publish" | "live" | "lifecycle";
 
 /** A field's error, keyed by its `ProjectSettings` path (`seo.defaultOgImage`,
  *  `analytics.googleAnalytics.measurementId`), or by the Site column name for a

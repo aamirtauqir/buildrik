@@ -439,13 +439,13 @@ export const SaveErrorBanner: React.FC<{ message: string }> = ({ message }) => (
 // ─────────────────────────────────────────────────────────────────────────────
 
 /* 8134:212323: the accent tint, 16 in, 12 down, a 4 radius, 13/20 ink. */
-export const ReadOnlyBanner: React.FC<{ who: string; screen: string }> = ({ who, screen }) => (
+export const ReadOnlyBanner: React.FC<{ who: string; screen: string; message?: string }> = ({ who, screen, message }) => (
   <div
     role="status"
     className="tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
     data-testid="set-readonly"
   >
-    {`Only ${who} can change ${screen}`}
+    {message ?? `Only ${who} can change ${screen}`}
   </div>
 );
 
