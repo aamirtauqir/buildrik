@@ -115,8 +115,25 @@ export async function checkDomainDns(domainId: string, siteId: string) {
   let data: { status: string; sslStatus?: string };
 
   if (!conn) {
-    const { any, all } = await resolveRecords(domain.dnsRecords, apexOf(domain.domain));
-    data = { status: all ? "VERIFIED" : any ? "PENDING" : "FAILED" };
+    /* A row written while the workspace had Vercel carries no `_buildrick`
+       TXT (Q6), nor does a legacy one; judged on A + CNAME alone it would
+       turn VERIFIED with no ownership proof. Give it its TXT first. */
+    let records = domain.dnsRecords;
+    if (!records.some(isOwnershipTxt)) {
+      const ownership = expectedDnsRecords({
+        domain: domain.domain,
+        apex: apexOf(domain.domain),
+        ownershipToken: dnsVerificationToken(domainId),
+      }).filter(isOwnershipTxt);
+      records = [
+        ...records,
+        ...(await Promise.all(ownership.map((r) => prisma.dnsRecord.create({ data: { domainId, ...r } })))),
+      ];
+    }
+    const { any, all } = await resolveRecords(records, apexOf(domain.domain));
+    const status = all ? "VERIFIED" : any ? "PENDING" : "FAILED";
+    // SSL is never ACTIVE on a domain that is not VERIFIED.
+    data = status === "VERIFIED" ? { status } : { status, sslStatus: "PENDING" };
   } else {
     const projectName = resolveVercelProjectName(domain.site);
     let vercel: { project: Awaited<ReturnType<typeof getVercelProjectDomain>>; config: VercelDomainConfig | null } | null = null;

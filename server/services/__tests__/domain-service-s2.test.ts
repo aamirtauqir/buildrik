@@ -28,7 +28,7 @@ const { db, vercelConnection } = vi.hoisted(() => ({
       update: vi.fn(),
       findMany: vi.fn(),
     },
-    dnsRecord: { createMany: vi.fn(), update: vi.fn(), deleteMany: vi.fn(), findMany: vi.fn() },
+    dnsRecord: { createMany: vi.fn(), create: vi.fn(), update: vi.fn(), deleteMany: vi.fn(), findMany: vi.fn() },
   },
   vercelConnection: vi.fn(),
 }));
@@ -382,6 +382,42 @@ describe("checkDomainDns — TXT", () => {
     vi.spyOn(dnsPromises, "resolveTxt").mockRejectedValue(Object.assign(new Error("ENODATA"), { code: "ENODATA" }));
 
     expect((await checkDomainDns("dom1", "s1"))?.status).toBe("PENDING");
+  });
+
+  /* QA 2026-10-05: rows written while the workspace had Vercel carry no
+     `_buildrick` TXT (Q6). Disconnect Vercel and the resolver path judged
+     A + CNAME alone — pointing DNS at Vercel made the domain VERIFIED with
+     no ownership proof at all. Without Vercel the TXT is required, so a row
+     that lacks one gets it, and stays unverified until it answers. */
+  it("without Vercel, a row with no _buildrick TXT gets one and is not VERIFIED on A + CNAME alone", async () => {
+    const row = records(true);
+    db.domain.findUnique.mockResolvedValue({ ...row, dnsRecords: row.dnsRecords.filter((r) => r.type !== "TXT") });
+    db.dnsRecord.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: "r-new", verified: false, ...data }));
+    db.domain.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: "dom1", ...data }));
+    vi.spyOn(dnsPromises, "resolve4").mockResolvedValue(["76.76.21.21"]);
+    vi.spyOn(dnsPromises, "resolveCname").mockResolvedValue(["cname.vercel-dns.com"]);
+    vi.spyOn(dnsPromises, "resolveTxt").mockRejectedValue(Object.assign(new Error("ENODATA"), { code: "ENODATA" }));
+
+    const result = await checkDomainDns("dom1", "s1");
+
+    expect(db.dnsRecord.create).toHaveBeenCalledWith({
+      data: { domainId: "dom1", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1") },
+    });
+    expect(result?.status).toBe("PENDING");
+  });
+
+  /* QA 2026-10-05: SSL ACTIVE only while VERIFIED. A row Vercel once made
+     VERIFIED + ACTIVE kept "ACTIVE" after the resolver path failed it. */
+  it("without Vercel, a domain that is not VERIFIED has its SSL set back to PENDING", async () => {
+    db.domain.findUnique.mockResolvedValue({ ...records(false), status: "VERIFIED", sslStatus: "ACTIVE" });
+    db.domain.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: "dom1", ...data }));
+    vi.spyOn(dnsPromises, "resolve4").mockRejectedValue(Object.assign(new Error("ENOTFOUND"), { code: "ENOTFOUND" }));
+    vi.spyOn(dnsPromises, "resolveCname").mockRejectedValue(Object.assign(new Error("ENOTFOUND"), { code: "ENOTFOUND" }));
+    vi.spyOn(dnsPromises, "resolveTxt").mockRejectedValue(Object.assign(new Error("ENOTFOUND"), { code: "ENOTFOUND" }));
+
+    const result = await checkDomainDns("dom1", "s1");
+
+    expect(result).toEqual(expect.objectContaining({ status: "FAILED", sslStatus: "PENDING" }));
   });
 
   it("writes nothing for a domain that belongs to another site", async () => {
