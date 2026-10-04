@@ -105,11 +105,12 @@ export function RecordsTable({ collection, records, query, onOpenRecord }: Recor
           collection.fields.some((f) => cellText(f, r.data[f.slug]).toLowerCase().includes(q)),
         )
       : records;
-    if (!sort) return matched;
+    const sortField = sort ? collection.fields.find((f) => f.slug === sort.key) : undefined;
+    if (!sort || (sort.key !== "__updated" && !sortField)) return matched;
     const read = (r: CMSContentItem): string | number => {
-      if (sort.key === "__updated") return Date.parse(r.updatedAt) || 0;
+      if (sort.key === "__updated" || !sortField) return Date.parse(r.updatedAt) || 0;
       const v = r.data[sort.key];
-      return typeof v === "number" ? v : cellText(collection.fields.find((f) => f.slug === sort.key)!, v).toLowerCase();
+      return typeof v === "number" ? v : cellText(sortField, v).toLowerCase();
     };
     const dir = sort.dir === "asc" ? 1 : -1;
     return [...matched].sort((a, b) => {

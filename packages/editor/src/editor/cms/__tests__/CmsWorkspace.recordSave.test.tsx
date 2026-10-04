@@ -7,7 +7,7 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import type { CMSCollection } from "@/shared/types/cms";
 import { ToastProvider } from "@/editor/chrome-ui";
 
@@ -79,5 +79,24 @@ describe("a new record's Retry save (CMS-01)", () => {
     const { composer } = makeEngine({ collections: [COL] });
     await openNewAndSave(composer);
     expect(screen.getByTestId("cms-sheet-state").textContent).toBe("Another record already uses the Slug “x”.");
+  });
+});
+
+describe("switching collections with a sorted table (UI-01)", () => {
+  it("does not carry the sort into a collection without that field", async () => {
+    const A = { ...COL, id: "col-a", name: "A", fields: [...COL.fields, { id: "p", name: "Price", slug: "price", type: "number", order: 1 }] } as unknown as CMSCollection;
+    const B = { ...COL, id: "col-b", name: "B" } as unknown as CMSCollection;
+    const items = [
+      { id: "a1", collectionId: "col-a", data: { name: "x", price: 2 }, status: "draft" as const, createdAt: "", updatedAt: "" },
+      { id: "a2", collectionId: "col-a", data: { name: "y", price: 1 }, status: "draft" as const, createdAt: "", updatedAt: "" },
+      { id: "b1", collectionId: "col-b", data: { name: "z" }, status: "draft" as const, createdAt: "", updatedAt: "" },
+      { id: "b2", collectionId: "col-b", data: { name: "w" }, status: "draft" as const, createdAt: "", updatedAt: "" },
+    ];
+    const { composer } = makeEngine({ collections: [A, B], items });
+    cmsWorkspace.openCollection("col-a");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    fireEvent.click(await screen.findByTestId("cms-th-price"));
+    act(() => cmsWorkspace.openCollection("col-b"));
+    expect(await screen.findByTestId("cms-row-b1")).toBeInTheDocument();
   });
 });

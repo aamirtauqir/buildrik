@@ -243,6 +243,10 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       </div>
     ) : (
       <RecordsTable
+        /* UI-01: a sort (and page) belongs to its collection. Kept across a
+           switch, a sort on a field the next collection lacks crashed the
+           table. */
+        key={collection.id}
         collection={collection}
         records={panel.records}
         query={query}
