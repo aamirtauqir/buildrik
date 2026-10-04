@@ -100,3 +100,17 @@ describe("switching collections with a sorted table (UI-01)", () => {
     expect(await screen.findByTestId("cms-row-b1")).toBeInTheDocument();
   });
 });
+
+describe("a collection with no fields (UI-08)", () => {
+  it("offers a field first and never saves an empty record", async () => {
+    const EMPTY = { ...COL, fields: [] } as unknown as CMSCollection;
+    const { composer } = makeEngine({ collections: [EMPTY] });
+    cmsWorkspace.openCollection("col-1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    expect(await screen.findByTestId("cms-ws-no-fields")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-ws-add-record")).toBeDisabled();
+    act(() => cmsWorkspace.openRecord("new"));
+    expect(await screen.findByTestId("cms-sheet-save")).toBeDisabled();
+    expect(screen.getByTestId("cms-sheet-state").textContent).toMatch(/Add a field/);
+  });
+});

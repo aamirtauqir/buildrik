@@ -185,6 +185,9 @@ export function RecordSheet({
     published !== initialPublished ||
     collection.fields.some((f) => JSON.stringify(form[f.slug] ?? "") !== JSON.stringify(initial[f.slug] ?? ""));
   const missing = collection.fields.filter((f) => f.validation?.required && isEmpty(form[f.slug]));
+  /* UI-08: a collection with no fields has nothing to store — Save made an
+     empty record. */
+  const noFields = collection.fields.length === 0;
   const singular = collection.name.replace(/s$/, "");
   const title = record ? recordTitle(collection, record) : `New ${singular}`;
   const crumb = record ? title : "New record";
@@ -649,7 +652,13 @@ export function RecordSheet({
                 : conflict
                   ? "Your changes are waiting for a conflict choice."
                   : saveError ??
-                    (dirty ? "Unsaved changes on this record" : record ? "No unsaved changes on this record" : "New record · nothing saved yet")}
+                    (noFields
+                      ? "Add a field to this collection before saving a record."
+                      : dirty
+                        ? "Unsaved changes on this record"
+                        : record
+                          ? "No unsaved changes on this record"
+                          : "New record · nothing saved yet")}
             </span>
             {/* 6749:59940 — a new record says what Save needs and what it does. */}
             {!record && !saveError && !blocked ? (
@@ -662,7 +671,7 @@ export function RecordSheet({
           <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel" onClick={() => guard(onClose)}>
             Cancel
           </Button>
-          <Button size="xs" className={SMALL_BTN} disabled={blocked || (!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
+          <Button size="xs" className={SMALL_BTN} disabled={blocked || noFields || (!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
             {saveError && !blocked ? "Retry save" : "Save record"}
           </Button>
         </div>

@@ -192,7 +192,13 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const isEmpty = ws.tab === "records" && count === 0;
   const primary =
     ws.tab === "records" ? (
-      <Button size="xs" className={PRIMARY} data-testid="cms-ws-add-record" onClick={() => cmsWorkspace.openRecord("new")}>
+      <Button
+        size="xs"
+        className={PRIMARY}
+        data-testid="cms-ws-add-record"
+        disabled={collection.fields.length === 0}
+        onClick={() => cmsWorkspace.openRecord("new")}
+      >
         + Add record
       </Button>
     ) : ws.tab === "fields" ? (
@@ -218,7 +224,30 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   };
 
   let body: React.ReactNode;
-  if (ws.tab === "records") {
+  if (ws.tab === "records" && isEmpty && collection.fields.length === 0) {
+    /* UI-08 (§7 "Empty: no fields"): a record of a collection with no fields
+       is an empty record — the way in is a field first. */
+    body = (
+      <div className="tw:flex tw:flex-col tw:items-center tw:pt-[132px] tw:text-center" data-testid="cms-ws-no-fields">
+        <Table2 size={20} className="tw:text-[var(--bk-ink-soft)]" aria-hidden="true" />
+        <p className="tw:m-0 tw:mt-3 tw:text-[16px] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]">No fields yet</p>
+        <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Add a field to start.</p>
+        <div className="tw:mt-3 tw:flex tw:gap-2">
+          <Button
+            size="xs"
+            className={`${PRIMARY} tw:h-8`}
+            data-testid="cms-ws-empty-add-field"
+            onClick={() => {
+              cmsWorkspace.setTab("fields");
+              setAddingField(true);
+            }}
+          >
+            Add field
+          </Button>
+        </div>
+      </div>
+    );
+  } else if (ws.tab === "records") {
     body = isEmpty ? (
       /* 4428:148905 — an empty collection offers both ways in. */
       <div className="tw:flex tw:flex-col tw:items-center tw:pt-[132px] tw:text-center" data-testid="cms-ws-no-records">
