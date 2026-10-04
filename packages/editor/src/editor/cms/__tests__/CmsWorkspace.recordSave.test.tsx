@@ -114,3 +114,26 @@ describe("a collection with no fields (UI-08)", () => {
     expect(screen.getByTestId("cms-sheet-state").textContent).toMatch(/Add a field/);
   });
 });
+
+describe("an empty number is empty, not 0", () => {
+  it("a new record's required Price starts empty and blocks eligibility; clearing it stores nothing", async () => {
+    sync.reached = true;
+    const PRICED = {
+      ...COL,
+      fields: [...COL.fields, { id: "p", name: "Price", slug: "price", type: "number", order: 1, validation: { required: true } }],
+    } as unknown as CMSCollection;
+    const { composer } = makeEngine({ collections: [PRICED] });
+    cmsWorkspace.openCollection("col-1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
+    const price = (await screen.findByLabelText(/Price/)) as HTMLInputElement;
+    expect(price.value).toBe("");
+    fireEvent.change(screen.getByLabelText(/Name/), { target: { value: "Tea" } });
+    expect(screen.getByTestId("cms-sheet-eligibility").textContent).toMatch(/Price is required/);
+    fireEvent.change(price, { target: { value: "3" } });
+    fireEvent.change(price, { target: { value: "" } });
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    await waitFor(() => expect(composer.cms.collections.createContentItem).toHaveBeenCalled());
+    expect(composer.cms.collections.createContentItem.mock.calls[0][1].price).toBeUndefined();
+  });
+});

@@ -106,7 +106,7 @@ describe("fieldDefault", () => {
   });
   it("types defaults: boolean false, number 0, multiselect [], text empty", () => {
     expect(fieldDefault(field({ type: "boolean" }))).toBe(false);
-    expect(fieldDefault(field({ type: "number" }))).toBe(0);
+    expect(fieldDefault(field({ type: "number" }))).toBeUndefined();
     expect(fieldDefault(field({ type: "multiselect" }))).toEqual([]);
     expect(fieldDefault(field({ type: "text" }))).toBe("");
   });

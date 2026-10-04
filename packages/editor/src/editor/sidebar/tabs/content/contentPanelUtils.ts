@@ -105,8 +105,10 @@ export function fieldDefault(field: CMSField): unknown {
   switch (field.type) {
     case "boolean":
       return false;
+    /* Empty, not 0: a 0 default made a required Price look filled, and
+       "no price" publish as $0. */
     case "number":
-      return 0;
+      return undefined;
     case "multiselect":
       return [];
     default:

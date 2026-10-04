@@ -452,7 +452,9 @@ export function RecordSheet({
           className={CONTROL}
           placeholder={autoSlug && f.slug === "slug" ? "auto from name" : f.placeholder}
           value={v === undefined || v === null ? "" : String(v)}
-          onChange={(e) => set(f.slug, f.type === "number" && e.target.value !== "" ? Number(e.target.value) : e.target.value)}
+          onChange={(e) =>
+            set(f.slug, f.type === "number" ? (e.target.value === "" ? undefined : Number(e.target.value)) : e.target.value)
+          }
         />
       );
     }
