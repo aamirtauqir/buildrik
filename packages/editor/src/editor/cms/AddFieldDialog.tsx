@@ -16,7 +16,7 @@
 import * as React from "react";
 import type { CMSCollection, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { Button, Chip, Modal, Select, TextInput } from "@/editor/chrome-ui";
-import { FIELD_TYPES, FIELD_TYPE_LABEL } from "./fieldTypes";
+import { FIELD_TYPES, FIELD_TYPE_LABEL, fieldKeyError, fieldKeyFrom, freeKey } from "./fieldTypes";
 
 const ROW = "tw:grid tw:grid-cols-[88px_1fr] tw:items-center tw:gap-2";
 const ROW_LABEL = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
@@ -27,17 +27,6 @@ const TYPE_ROW =
   "tw:h-11 tw:w-full tw:justify-start tw:rounded-[6px] tw:border-0 tw:bg-transparent tw:px-3 tw:text-[13px] tw:font-medium " +
   "tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0";
 
-const slugify = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const KEY_RE = /^[a-z][a-z0-9_-]*$/;
-
-/** The first free key from a base: "name" → "name-2" → "name-3"… */
-function freeKey(base: string, taken: Set<string>): string {
-  const root = base || "field";
-  if (!taken.has(root)) return root;
-  let n = 2;
-  while (taken.has(`${root}-${n}`)) n++;
-  return `${root}-${n}`;
-}
 
 export function AddFieldDialog({
   collection,
@@ -62,8 +51,10 @@ export function AddFieldDialog({
   const taken = React.useMemo(() => new Set(collection.fields.map((f) => f.slug)), [collection.fields]);
   const nextName = name.trim();
   /* The key follows the name until it is edited by hand. */
-  const nextKey = (key ?? slugify(nextName)).trim();
-  const keyError = nextKey && !KEY_RE.test(nextKey) ? "Keys start with a letter: lowercase letters, digits, - and _." : null;
+  const nextKey = (key ?? fieldKeyFrom(nextName)).trim();
+  /* The clash has its own dialog (4418:164225); format and reserved names
+     read under the key. */
+  const keyError = nextKey ? fieldKeyError(nextKey, new Set()) : null;
   const label = type ? FIELD_TYPE_LABEL[type] ?? type : "";
 
   const save = async () => {
@@ -88,7 +79,7 @@ export function AddFieldDialog({
   };
 
   if (clash) {
-    const suggestion = freeKey(slugify(nextName) === clash ? clash : slugify(nextName) || clash, taken);
+    const suggestion = freeKey(fieldKeyFrom(nextName) === clash ? clash : fieldKeyFrom(nextName) || clash, taken);
     return (
       <Modal
         open

@@ -124,7 +124,10 @@ export class CollectionManager extends EventEmitter {
   async createCollection(
     name: string,
     slug?: string,
-    description?: string
+    description?: string,
+    /** The schema it starts with — one write (one server mirror) for the
+       New collection modal, not a create plus one update per field. */
+    init: Partial<Pick<CMSCollection, "fields" | "displayField" | "pageSlugPattern">> = {}
   ): Promise<CMSCollection> {
     await this.ensureInitialized();
 
@@ -134,7 +137,9 @@ export class CollectionManager extends EventEmitter {
       name,
       slug: slug || this.slugify(name),
       description,
-      fields: [],
+      fields: init.fields ?? [],
+      ...(init.displayField ? { displayField: init.displayField } : {}),
+      ...(init.pageSlugPattern ? { pageSlugPattern: init.pageSlugPattern } : {}),
       createdAt: now,
       updatedAt: now,
     };
