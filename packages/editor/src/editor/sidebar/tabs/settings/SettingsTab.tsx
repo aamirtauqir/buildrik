@@ -919,7 +919,7 @@ export const SettingsTab: React.FC<
                   Type to find a setting, an option or a feature.
                 </p>
               ) : results.length === 0 ? (
-                <p className="tw:m-0 tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty" role="status">
+                <p className="tw:m-0 tw:break-words tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty" role="status">
                   {`No settings match "${trimmed}"`}
                 </p>
               ) : null}

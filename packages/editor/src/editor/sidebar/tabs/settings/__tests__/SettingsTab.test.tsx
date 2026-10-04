@@ -1031,6 +1031,16 @@ describe("SettingsTab — Search Mode (owner 2026-10-04, overrides 6816:60270 / 
     expect(options()).toEqual([]);
   });
 
+  /* QA 2026-10-05 (live, 1440×732): an unbroken query ran the no-match line
+     out of the 256 sidebar and into the pane. jsdom has no layout; the wrap
+     is the contract. */
+  it("the no-match line wraps a query with no spaces inside the sidebar", () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    openSearch();
+    fireEvent.change(input(), { target: { value: "x".repeat(120) } });
+    expect(screen.getByTestId("set-search-empty").className).toContain("tw:break-words");
+  });
+
   it("Escape closes Search Mode — from the field or the ✕ — never Settings", () => {
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
