@@ -396,3 +396,30 @@ describe("RecordSheet · new record (6749:59940)", () => {
     expect(screen.getByLabelText("Slug")).toHaveValue("special");
   });
 });
+
+/* UI-02: a door that moves the workspace store — the drawer's collection
+   rows, ⌘K's jump, another row — closed a dirty sheet without the discard
+   question. Every move now goes through the store's guard. */
+describe("RecordSheet · every door out asks first (UI-02)", () => {
+  it("a drawer collection click / ⌘K jump with unsaved edits asks, and only Discard moves", async () => {
+    mount();
+    await openRow();
+    fireEvent.change(screen.getByLabelText(/^Name/), { target: { value: "Changed" } });
+    act(() => cmsWorkspace.openCollection("col-2"));
+    expect(await screen.findByText("Discard record changes?")).toBeInTheDocument();
+    expect(cmsWorkspace.get()).toMatchObject({ collectionId: "col-1", recordId: "r1" });
+    fireEvent.click(screen.getByTestId("cms-discard-keep"));
+    expect(cmsWorkspace.get().recordId).toBe("r1");
+    act(() => cmsWorkspace.openRequest({ collectionId: "col-1", recordId: "r2" }));
+    fireEvent.click(await screen.findByTestId("cms-discard-confirm"));
+    expect(cmsWorkspace.get()).toMatchObject({ collectionId: "col-1", recordId: "r2" });
+  });
+
+  it("a clean sheet moves at once", async () => {
+    mount();
+    await openRow();
+    act(() => cmsWorkspace.openCollection("col-2"));
+    expect(cmsWorkspace.get()).toMatchObject({ collectionId: "col-2", recordId: null });
+    expect(screen.queryByText("Discard record changes?")).toBeNull();
+  });
+});

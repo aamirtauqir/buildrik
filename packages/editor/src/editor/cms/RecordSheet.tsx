@@ -43,7 +43,7 @@ import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { resolveUrl, slugify } from "./DynamicPagesPane";
-import type { CmsTab } from "./cmsWorkspaceStore";
+import { cmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { claimCmsConflict, isCmsConflictPending, type CmsConflict } from "@/services/cmsSync";
 
@@ -189,8 +189,28 @@ export function RecordSheet({
   const title = record ? recordTitle(collection, record) : `New ${singular}`;
   const crumb = record ? title : "New record";
 
+  /* Leaving on purpose (saved, discarded, deleted, the server's copy taken)
+     must not meet the workspace's leave guard below. */
+  const leaving$ = React.useRef(false);
+  const leave = (go: () => void) => {
+    leaving$.current = true;
+    go();
+  };
   /* A deleted record has nothing left to discard: its edit is already lost. */
-  const guard = (go: () => void) => (dirty && !gone ? setLeaveTo(() => go) : go());
+  const guard = (go: () => void) => (dirty && !gone ? setLeaveTo(() => go) : leave(go));
+  /* UI-02: every other door out of this record — a drawer collection row, ⌘K,
+     a table row, a tab — moves the workspace store, which asks here first. */
+  const stillDirty = React.useRef(false);
+  stillDirty.current = dirty && !gone;
+  React.useEffect(
+    () =>
+      cmsWorkspace.setLeaveGuard((go) => {
+        if (leaving$.current || !stillDirty.current) return false;
+        setLeaveTo(() => go);
+        return true;
+      }),
+    [],
+  );
 
   /* 8139:217560 — a save the server refused because another device changed
      the record waits here for Keep mine / Use theirs, not in the shell's
@@ -242,7 +262,7 @@ export function RecordSheet({
       title: `Record saved · ${collection.name}`,
       description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
     });
-    onClose();
+    leave(onClose);
   };
 
   /* Keep mine re-sends this device's copy; it can conflict again (the claim
@@ -256,7 +276,7 @@ export function RecordSheet({
       if (choice === "useTheirs") {
         await c.useTheirs();
         settleConflict();
-        onClose();
+        leave(onClose);
         return;
       }
       const landed = await c.keepMine();
@@ -315,7 +335,7 @@ export function RecordSheet({
       return;
     }
     await onDelete(record);
-    onClose();
+    leave(onClose);
     /* 6881:70387 — "<name> deleted · <collection>", what went, what Undo does. */
     addToast({
       tone: "success",
@@ -667,7 +687,7 @@ export function RecordSheet({
               onClick={() => {
                 const go = leaveTo;
                 setLeaveTo(null);
-                go?.();
+                if (go) leave(go);
               }}
               data-testid="cms-discard-confirm"
             >
@@ -688,7 +708,7 @@ export function RecordSheet({
           onConfirm={async () => {
             await onDelete(record);
             setTypedDelete(false);
-            onClose();
+            leave(onClose);
             addToast({ tone: "success", title: `${title} deleted · ${collection.name}`, description: "The record and its generated page are gone." });
           }}
           name={title}
