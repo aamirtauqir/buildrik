@@ -26,6 +26,7 @@ const { db, vercelConnection } = vi.hoisted(() => ({
       findUniqueOrThrow: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      findMany: vi.fn(),
     },
     dnsRecord: { createMany: vi.fn(), update: vi.fn(), deleteMany: vi.fn(), findMany: vi.fn() },
   },
@@ -53,6 +54,7 @@ import {
   updateDomain,
   checkDomainDns,
   dnsVerificationToken,
+  verifyPendingDomains,
 } from "@server/services/domain.service";
 
 beforeEach(() => {
@@ -598,5 +600,50 @@ describe("connectDomain — status at attach (Q7)", () => {
     await connectDomain("s1", { domain: "bellacucina.com" });
 
     expect(db.domain.update).toHaveBeenCalledWith({ where: { id: "dom1" }, data: { status: "VERIFIED", sslStatus: "ACTIVE" } });
+  });
+});
+
+/* The cron's job, through the SAME checkDomainDns as "Check DNS". */
+describe("verifyPendingDomains — the dns-verify cron", () => {
+  it("re-checks not-yet-Connected-with-SSL domains, oldest first, capped, through checkDomainDns", async () => {
+    db.domain.findMany.mockResolvedValue([
+      { id: "dom1", siteId: "s1" },
+      { id: "dom2", siteId: "s2" },
+    ]);
+    db.domain.findUnique.mockImplementation(async ({ where }: { where: { id: string } }) => ({
+      id: where.id,
+      siteId: where.id === "dom1" ? "s1" : "s2",
+      domain: `${where.id}.example.com`,
+      site: { workspaceId: "ws1", slug: "bella", vercelProjectName: null },
+      dnsRecords: [],
+    }));
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    vi.mocked(getVercelProjectDomain).mockResolvedValue({ name: "x", apexName: "example.com", verified: true, verification: [] });
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({ misconfigured: false, recommendedIPv4: null, recommendedCNAME: null });
+    db.dnsRecord.findMany.mockResolvedValue([]);
+    vi.spyOn(dnsPromises, "resolveCname").mockResolvedValue(["cname.vercel-dns.com"]);
+    db.domain.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: "x", ...data }));
+
+    await expect(verifyPendingDomains(20)).resolves.toEqual({ checked: 2, verified: 2 });
+
+    expect(db.domain.findMany).toHaveBeenCalledWith({
+      where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }] },
+      orderBy: [{ lastCheckedAt: { sort: "asc", nulls: "first" } }],
+      take: 20,
+      select: { id: true, siteId: true },
+    });
+    expect(getVercelProjectDomain).toHaveBeenCalledTimes(2);
+  });
+
+  it("one domain's failure does not stop the run", async () => {
+    db.domain.findMany.mockResolvedValue([
+      { id: "dom1", siteId: "s1" },
+      { id: "dom2", siteId: "s2" },
+    ]);
+    db.domain.findUnique.mockRejectedValueOnce(new Error("db hiccup")).mockResolvedValueOnce(null);
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(verifyPendingDomains()).resolves.toEqual({ checked: 2, verified: 0 });
+    expect(db.domain.findUnique).toHaveBeenCalledTimes(2);
   });
 });

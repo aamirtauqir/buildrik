@@ -417,3 +417,30 @@ export async function setPrimaryDomain(id: string, siteId: string) {
     await tx.domain.update({ where: { id }, data: { isPrimary: true } });
   });
 }
+
+/**
+ * The dns-verify cron's whole job: re-check the domains that are not yet
+ * Connected with SSL, oldest check first, through `checkDomainDns` — the same
+ * function "Check DNS" runs. The cron route used to carry its own copy of the
+ * node:dns match (and its own VERIFIED rule), which is how the two drifted.
+ * Capped per run (Vercel's domain endpoints are rate limited); one domain's
+ * failure is logged and does not stop the rest.
+ */
+export async function verifyPendingDomains(limit = 20): Promise<{ checked: number; verified: number }> {
+  const due = await prisma.domain.findMany({
+    where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }] },
+    orderBy: [{ lastCheckedAt: { sort: "asc", nulls: "first" } }],
+    take: limit,
+    select: { id: true, siteId: true },
+  });
+  let verified = 0;
+  for (const d of due) {
+    try {
+      const result = await checkDomainDns(d.id, d.siteId);
+      if (result?.status === "VERIFIED") verified++;
+    } catch (err) {
+      console.error(`[domain] scheduled DNS check failed for domain ${d.id}:`, err);
+    }
+  }
+  return { checked: due.length, verified };
+}
