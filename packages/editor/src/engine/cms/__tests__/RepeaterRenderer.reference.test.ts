@@ -64,3 +64,21 @@ describe("{{item.<reference>…}} in a Collection list", () => {
     expect([...d.querySelectorAll("p")].map((p) => p.textContent)).toContain("Two by Bo (Host)");
   });
 });
+
+describe("{{item.url}} (BD-12)", () => {
+  it("is each record's own page, root-absolute, from the collection's URL pattern", async () => {
+    const composer = { data: { on: vi.fn(), off: vi.fn() }, markDirty: vi.fn(), emit: vi.fn(), elements: { getElement: () => null } } as unknown as Composer;
+    const collections = new CollectionManager();
+    const bindings = new CMSBindingManager(composer, collections);
+    (composer as unknown as { cms: unknown }).cms = { collections, bindings };
+    const c = await collections.createCollection("Menu", "menu", undefined, {
+      fields: [{ id: "n", name: "Name", slug: "name", type: "text", order: 0 }, { id: "s", name: "Slug", slug: "slug", type: "slug", order: 1 }],
+      pageSlugPattern: "/menu/{slug}",
+    });
+    await collections.createContentItem(c.id, { name: "Margherita", slug: "margherita" }, { status: "published" });
+    bindings.bindCollection("list", c.id, { repeat: "children" });
+    const d = new DOMParser().parseFromString('<div data-buildrick-id="list"><a data-buildrick-id="a" href="{{item.url}}">{{item.name}}</a></div>', "text/html");
+    await new RepeaterRenderer(composer).expandCollectionLists(d);
+    expect(d.querySelector("a")!.getAttribute("href")).toBe("/menu/margherita/");
+  });
+});

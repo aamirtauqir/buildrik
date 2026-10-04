@@ -6,7 +6,7 @@
 
 import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { CMS_COLLECTION_LIMIT_MAX, isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
-import { cmsRecordLabel, cmsTextOf } from "@buildrik/shared/schemas/cms";
+import { cmsRecordLabel, cmsRecordPath, cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
 import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
@@ -372,6 +372,14 @@ export class RepeaterRenderer {
       }
       return sub ? "" : cmsTextOf(item.data[field]);
     };
+    /* BD-12: `{{item.url}}` is the record's own page — the collection's URL
+       pattern through the server's slug rule, root-absolute (the record page
+       is written at <path>/index.html). Nothing when the collection makes no
+       pages. `url` is a reserved key, so no field shadows it. */
+    const pattern = this.composer.cms.collections?.getCollection?.(binding.collectionId)?.pageSlugPattern;
+    const recordPath = pattern ? cmsRecordPath(pattern, item.data) : "";
+    const itemUrl = recordPath ? `/${recordPath}/` : "";
+    const urlPattern = new RegExp(`\\{\\{\\s*${binding.itemVar || "item"}\\.url\\s*\\}\\}`, "g");
     const pathPattern = new RegExp(`\\{\\{\\s*${binding.itemVar || "item"}\\.([\\w-]+)\\.([\\w-]+)\\s*\\}\\}`, "g");
     const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(binding.collectionId)?.fields);
     const itemVar = binding.itemVar || "item";
@@ -395,6 +403,13 @@ export class RepeaterRenderer {
       // Replace index variable (numeric — safe literal)
       const indexPattern = new RegExp(`\\{\\{\\s*${indexVar}\\s*\\}\\}`, "g");
       text = text.replace(indexPattern, () => String(index));
+
+      if (!("url" in item.data)) {
+        text = text.replace(urlPattern, () => {
+          injectedValue = true;
+          return escapeHtmlText(itemUrl);
+        });
+      }
 
       // A path through a Reference field (`{{item.author.name}}`).
       text = text.replace(pathPattern, (_m, field: string, sub: string) => {
@@ -450,6 +465,11 @@ export class RepeaterRenderer {
           modified = true;
         }
 
+        if (!("url" in item.data) && urlPattern.test(value)) {
+          value = value.replace(urlPattern, () => itemUrl);
+          modified = true;
+        }
+        urlPattern.lastIndex = 0;
         if (pathPattern.test(value)) {
           value = value.replace(pathPattern, (_m, field: string, sub: string) => valueOf(field, sub));
           modified = true;
