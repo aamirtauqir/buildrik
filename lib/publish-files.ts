@@ -18,8 +18,9 @@ import {
   injectSeoTags,
   injectBadge,
 } from "@lib/publish-html";
-import { buildSitemapXml, resolveSiteOrigin, withSitemapDirective } from "@lib/publish-urls";
+import { resolveSiteOrigin, withSitemapDirective } from "@lib/publish-urls";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
+import { buildSitemapXml } from "@buildrik/shared/seo/sitemap";
 
 export interface DeployPage {
   path: string;

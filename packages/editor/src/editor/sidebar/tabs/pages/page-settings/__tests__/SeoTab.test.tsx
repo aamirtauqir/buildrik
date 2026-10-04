@@ -392,3 +392,47 @@ describe("SeoTab Google preview — inherited site defaults", () => {
     expect(screen.getByTestId("seo-preview-desc").textContent).toBe("Three generations.");
   });
 });
+
+// ── Google preview: the URL the deploy serves ────────────────────────────────
+
+describe("SeoTab Google preview — served URL", () => {
+  const composerWithPages = (pages: Array<{ id: string; slug: string; isHome?: boolean }>) =>
+    ({
+      getProjectMetadata: () => ({ name: "Acme" }),
+      getProjectSettings: () => ({}),
+      elements: { getAllPages: () => pages },
+    }) as unknown as Composer;
+  const pages = [
+    { id: "home", slug: "home", isHome: true },
+    { id: "p1", slug: "about" },
+  ];
+
+  it("shows /<slug>.html — the file the export writes — not /<slug>", () => {
+    render(
+      <SeoTab s={makeSettings({ slug: "about", domain: "bellacucina.com" })} page={makePage({ id: "p1", slug: "about" })} composer={composerWithPages(pages)} />,
+    );
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/about.html");
+  });
+
+  it("the home page previews as the bare origin", () => {
+    render(
+      <SeoTab
+        s={makeSettings({ slug: "home", domain: "bellacucina.com" })}
+        page={makePage({ id: "home", slug: "home", isHome: true })}
+        composer={composerWithPages(pages)}
+      />,
+    );
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/");
+  });
+
+  it("follows the drafted slug, numbered on a clash exactly as the export numbers it", () => {
+    render(
+      <SeoTab
+        s={makeSettings({ slug: "menu", domain: "bellacucina.com" })}
+        page={makePage({ id: "p1", slug: "about" })}
+        composer={composerWithPages([pages[0], { id: "p0", slug: "menu" }, pages[1]])}
+      />,
+    );
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2.html");
+  });
+});

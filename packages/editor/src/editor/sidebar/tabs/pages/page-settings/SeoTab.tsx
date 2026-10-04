@@ -17,6 +17,8 @@ import type { UsePageSettingsReturn } from "./usePageSettings";
 import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 import { isPlaceholderSlug } from "../utils/seoScore";
 import { resolvePageDescription, resolvePageTitle } from "@/engine/export/SEOInjector";
+import { pageFileNames } from "@/engine/export/ExportEngine";
+import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -31,7 +33,7 @@ interface Props {
 }
 
 /** The public path a page answers on. The home page is `/` whatever its slug
- *  says (SitemapGenerator, the exporter), so a home-page slug edit moves no URL. */
+ *  says (the exporter), so a home-page slug edit moves no URL. */
 function publicPath(page: PageItem, slug: string): string {
   return page.isHome ? "/" : `/${slug}`;
 }
@@ -74,6 +76,15 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
   const siteSeo = composer?.getProjectSettings?.()?.seo;
   const previewTitle = resolvePageTitle(page, { metaTitle: s.seoTitle }, undefined, siteSeo);
   const previewDesc = resolvePageDescription({ metaDescription: s.seoDesc }, undefined, siteSeo);
+  /* The URL the deploy serves for this page: the file the export writes for it
+     (`about.html`, numbered on a slug clash, index.html for home) through the
+     same builder as the canonical and sitemap. It read `/<slug>` while the
+     deploy served `/<slug>.html` (no cleanUrls yet). */
+  const sitePages = composer?.elements?.getAllPages?.() ?? [];
+  const withThis = sitePages.some((p) => p.id === page.id) ? sitePages : [...sitePages, page];
+  const servedFile =
+    pageFileNames(withThis.map((p) => (p.id === page.id ? { ...p, slug: s.slug } : p))).get(page.id) ?? "index.html";
+  const previewUrl = (pageCanonicalUrl(domain, servedFile) ?? "").replace(/^https?:\/\//, "");
   const [aiBusy, setAiBusy] = React.useState(false);
 
   /* The redirect offer (Clone 3519:19920's door). `page.slug` is the SAVED
@@ -339,8 +350,8 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       </div>
       {/* Google preview — prototype .gpreview */}
       <div className={`tw:p-3.5 ${CARD}`}>
-        <div className={`tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
-          {s.domain ?? "yoursite.com"} › {page.slug?.replace(/^\//, "") || page.id}
+        <div className={`tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`} data-testid="seo-preview-url">
+          {previewUrl}
         </div>
         <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`} data-testid="seo-preview-title">
           {previewTitle}
