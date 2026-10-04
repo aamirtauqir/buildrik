@@ -70,6 +70,12 @@ export interface CMSCollectionBinding {
   repeat?: "self" | "children";
 }
 
+/** The part of an element a binding copy walks. */
+interface TreeNode {
+  getId(): string;
+  getChildren(): TreeNode[];
+}
+
 /** An element whose whole content is one `{{item.<field>}}` placeholder. */
 const ITEM_PLACEHOLDER = /^\s*\{\{\s*item\.([\w-]+)\s*\}\}\s*$/;
 
@@ -106,6 +112,54 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     this.cmsManager.on("content:created", () => this.reapplyAll());
     this.cmsManager.on("content:updated", () => this.reapplyAll());
     this.cmsManager.on("content:deleted", () => this.reapplyAll());
+
+    /* BD-22 / BD-06: a binding lives as long as its element, and a copy of
+       the element carries a copy of it. Bindings sit in this map, keyed by
+       element id, so neither happened: a deleted element's binding stayed
+       (counted as "Used by", locking the field), and a duplicate showed the
+       bound text but was bound to nothing. */
+    this.composer.on?.(EVENTS.ELEMENT_DELETED, (payload: unknown) => {
+      const el = payload as { getId?: () => string; id?: string } | null;
+      const id = el?.getId?.() ?? el?.id;
+      if (id) this.forgetBoundElement(id);
+    });
+    this.composer.on?.(EVENTS.ELEMENT_DUPLICATED, (payload: unknown) => {
+      const { original, clone } = (payload ?? {}) as { original?: TreeNode; clone?: TreeNode };
+      if (original && clone) this.copyTree(original, clone);
+    });
+    this.composer.on?.(EVENTS.PROJECT_CHANGED, (payload: unknown) => {
+      if ((payload as { type?: string } | null)?.type === "page:deleted") this.pruneMissing();
+    });
+  }
+
+  /** An element's field AND list bindings, gone with it. */
+  private forgetBoundElement(elementId: string): void {
+    this.forgetElement(elementId);
+    if (this.collectionBindings.delete(elementId)) this.composer.emit(EVENTS.CMS_COLLECTION_UNBOUND, { elementId });
+  }
+
+  /** Bindings whose element no longer exists anywhere (a deleted page). */
+  private pruneMissing(): void {
+    const ids = new Set([...Object.keys(this.export()), ...this.collectionBindings.keys()]);
+    for (const id of ids) if (!this.composer.elements.getElement(id)) this.forgetBoundElement(id);
+  }
+
+  /**
+   * A copied element tree (duplicate element or page) gets the source tree's
+   * bindings, position by position — the copy has the same shape and new ids.
+   */
+  copyTree(from: TreeNode, to: TreeNode): void {
+    const fromId = from.getId();
+    const toId = to.getId();
+    this.copyElement(fromId, toId);
+    const list = this.collectionBindings.get(fromId);
+    if (list) {
+      this.collectionBindings.set(toId, { ...list, elementId: toId });
+      this.composer.emit(EVENTS.CMS_COLLECTION_BOUND, { elementId: toId, collectionId: list.collectionId });
+    }
+    const a = from.getChildren();
+    const b = to.getChildren();
+    for (let i = 0; i < Math.min(a.length, b.length); i++) this.copyTree(a[i], b[i]);
   }
 
   /**
