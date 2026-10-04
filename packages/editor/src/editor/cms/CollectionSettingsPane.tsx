@@ -57,7 +57,20 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
   const referencedBy = (composer?.cms.collections.getAllCollections() ?? [])
     .filter((c) => c.id !== collection.id)
     .flatMap((c) => c.fields.filter((f) => f.type === "reference" && f.referenceCollection === collection.id).map((f) => `${c.name} › ${f.name}`));
-  const consequence = `Deleting removes ${plural(records.length, "record")}${pages ? ` and ${plural(pages, "generated page")}` : ""}.`;
+  /* CMS-06: the elements bound to this collection (a field binding or a
+     Collection list). Deleting unbinds them — each keeps what it shows now —
+     instead of leaving them bound to nothing (a raw id in the banner, the
+     canvas still showing deleted records). */
+  const boundElements = new Set<string>();
+  if (composer) {
+    for (const [elementId, list] of Object.entries(composer.cms.bindings.export())) {
+      if (list.some((b) => b.collectionId === collection.id)) boundElements.add(elementId);
+    }
+    for (const b of composer.cms.bindings.getAllCollectionBindings()) if (b.collectionId === collection.id) boundElements.add(b.elementId);
+  }
+  const consequence =
+    `Deleting removes ${plural(records.length, "record")}${pages ? ` and ${plural(pages, "generated page")}` : ""}` +
+    (boundElements.size ? `, and unbinds ${plural(boundElements.size, "element")} — each keeps what it shows now.` : ".");
 
   const rename = async () => {
     if (!composer || error || !dirty) return;
@@ -72,10 +85,15 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
 
   const remove = async () => {
     if (!composer) return;
+    const bindings = composer.cms.bindings;
+    for (const elementId of boundElements) {
+      for (const b of bindings.getBindings(elementId)) if (b.collectionId === collection.id) bindings.unbind(elementId, b.property);
+      if (bindings.getCollectionBinding(elementId)?.collectionId === collection.id) bindings.unbindCollection(elementId);
+    }
     await composer.cms.collections.deleteCollection(collection.id);
     setConfirmDelete(false);
     cmsWorkspace.openCollection(null);
-    addToast({ tone: "success", title: `“${collection.name}” deleted`, description: consequence.replace("Deleting removes", "Removed") });
+    addToast({ tone: "success", title: `“${collection.name}” deleted`, description: consequence.replace("Deleting removes", "Removed").replace("and unbinds", "and unbound") });
   };
 
   return (

@@ -93,6 +93,10 @@ export function makeEngine(opts?: {
       bindings: {
         export: () => opts?.bindings ?? {},
         getAllCollectionBindings: () => opts?.collectionBindings ?? [],
+        getBindings: (id: string) => opts?.bindings?.[id] ?? [],
+        getCollectionBinding: (id: string) => opts?.collectionBindings?.find((b) => b.elementId === id) ?? null,
+        unbind: vi.fn(),
+        unbindCollection: vi.fn(),
       },
       collections: {
         on: vi.fn(),
