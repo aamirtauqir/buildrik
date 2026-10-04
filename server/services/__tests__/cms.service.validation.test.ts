@@ -155,3 +155,14 @@ describe("unique-constraint answers (DM-07)", () => {
     expect(mocks.colUpdateMany).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("record pages fill rich text as markup (PD-1)", () => {
+  it("a {body} token on the template takes the record's allow-listed markup; a text token stays escaped", async () => {
+    const { generateDynamicPages } = await import("@server/services/cms.service");
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{slug}", pageSeoTitle: null, pageSeoDescription: null, fields: FIELDS });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { slug: "a", name: "<b>Tom</b>", body: "<p>Hi <strong>there</strong><script>x</script></p>" } }]);
+    const [page] = await generateDynamicPages("s1", "c1", "<html><head></head><body><h1>{name}</h1><div>{body}</div></body></html>");
+    expect(page.content).toContain("<div><p>Hi <strong>there</strong></p></div>");
+    expect(page.content).toContain("<h1>&lt;b&gt;Tom&lt;/b&gt;</h1>");
+  });
+});

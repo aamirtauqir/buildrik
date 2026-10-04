@@ -42,6 +42,7 @@ import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
+import { RichTextField } from "./RichTextField";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { applyCmsPattern, cmsSlugField, cmsSlugify, cmsValueError } from "@buildrik/shared/schemas/cms";
 import { cmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
@@ -424,7 +425,9 @@ export function RecordSheet({
       );
     }
     let input: React.ReactNode;
-    if (f.type === "textarea" || f.type === "richtext") {
+    if (f.type === "richtext") {
+      input = <RichTextField id={id} labelId={`${id}-label`} value={typeof v === "string" ? v : ""} onChange={(html) => set(f.slug, html)} />;
+    } else if (f.type === "textarea") {
       input = (
         <Textarea
           id={id}

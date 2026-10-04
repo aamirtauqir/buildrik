@@ -23,6 +23,7 @@ import type { CMSContentItem, CMSFieldType } from "../../shared/types/cms";
 import { filterCmsBindings, isSafeCmsBoundValue, type CmsBindableProperty } from "@buildrik/shared/schemas/sites";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { cmsTextOf } from "@buildrik/shared/schemas/cms";
+import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
@@ -221,10 +222,13 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     if (!value) return;
     if (!isSafeCmsBoundValue(binding.property, value)) return;
     const property = binding.property;
+    const richtext =
+      this.cmsManager.getCollection(binding.collectionId)?.fields.find((f) => f.slug === binding.fieldSlug)?.type === "richtext";
     const write = () => {
       // Text semantics, as publish (textContent): the value is escaped, or
-      // toHTML would emit a CMS entry's markup raw into the canvas.
-      if (property === "content") element.setContent(escapeHtmlText(value));
+      // toHTML would emit a CMS entry's markup raw into the canvas. A rich
+      // text field is markup by design — cut to the shared allow-list.
+      if (property === "content") element.setContent(richtext ? sanitizeRichtext(value) : escapeHtmlText(value));
       else element.setTrait(property, value);
     };
     const history = this.composer.history;

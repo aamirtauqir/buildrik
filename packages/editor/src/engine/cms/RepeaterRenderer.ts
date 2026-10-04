@@ -7,6 +7,7 @@
 import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 import { cmsTextOf } from "@buildrik/shared/schemas/cms";
+import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
 import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
@@ -33,7 +34,7 @@ export function followsContextRecord(binding: Pick<CMSElementBinding, "itemId">)
  * re-requests the page). Values come from CMS entries and property names from
  * stored bindings, so only the shared allowlist and safe URLs land.
  */
-export function writeBoundValue(el: Element, property: string, value: string): void {
+export function writeBoundValue(el: Element, property: string, value: string, richtext = false): void {
   if (!value) {
     if (property === "content") el.textContent = "";
     else if (property === "src" || property === "href") el.removeAttribute(property);
@@ -41,8 +42,16 @@ export function writeBoundValue(el: Element, property: string, value: string): v
     return;
   }
   if (!isSafeCmsBoundValue(property, value)) return;
-  if (property === "content") el.textContent = value;
+  /* A rich text field fills an element with its markup, cut to the shared
+     allow-list — as text it showed its own tags. */
+  if (property === "content" && richtext) el.innerHTML = sanitizeRichtext(value);
+  else if (property === "content") el.textContent = value;
   else el.setAttribute(property, value);
+}
+
+/** The keys of a collection's rich text fields. */
+export function richtextKeys(fields: ReadonlyArray<{ slug: string; type: string }> | undefined): ReadonlySet<string> {
+  return new Set((fields ?? []).filter((f) => f.type === "richtext").map((f) => f.slug));
 }
 
 /** Canvas keeps the template editable: record 0 renders INTO the real
@@ -182,6 +191,7 @@ export class RepeaterRenderer {
     canvas: boolean,
   ): void {
     const bindings = this.composer.cms.bindings;
+    const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(collectionId)?.fields);
     const isList = (el: Element) => bindings.getCollectionBinding?.(el.getAttribute("data-buildrick-id") ?? "")?.repeat === "children";
     const candidates = [node, ...Array.from(node.querySelectorAll<HTMLElement>("[data-buildrick-id]"))];
     for (const el of candidates) {
@@ -195,7 +205,7 @@ export class RepeaterRenderer {
       for (const b of own) {
         const value = cmsTextOf(item.data[b.fieldSlug]) || b.fallback || "";
         if (canvas && !value) continue;
-        writeBoundValue(el, b.property, value);
+        writeBoundValue(el, b.property, value, rich.has(b.fieldSlug));
       }
       el.setAttribute(CURRENT_ITEM_ATTR, collectionId);
       if (canvas) el.setAttribute("data-cms-bound", "true");
@@ -316,6 +326,7 @@ export class RepeaterRenderer {
     cloneId: string | null
   ): void {
     const { item, index } = context;
+    const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(binding.collectionId)?.fields);
     const itemVar = binding.itemVar || "item";
     const indexVar = binding.indexVar || "index";
 
@@ -346,7 +357,9 @@ export class RepeaterRenderer {
         const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
         text = text.replace(fieldPattern, () => {
           injectedValue = true;
-          return escapeHtmlText(cmsTextOf(value));
+          /* Rich text lands as its allow-listed markup; anything else as
+             escaped text. */
+          return rich.has(fieldName) ? sanitizeRichtext(cmsTextOf(value)) : escapeHtmlText(cmsTextOf(value));
         });
       });
 

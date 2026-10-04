@@ -29,6 +29,7 @@ import {
   srcsetUrls,
   toAllowedElementTag,
 } from "@buildrik/shared/schemas/element-markup";
+import { CMS_RICHTEXT_PURIFY, stripDangerousRichtextLinks } from "@buildrik/shared/schemas/cms";
 import type { ElementData } from "../../types";
 import { generateId } from "../helpers/id";
 import {
@@ -142,6 +143,20 @@ export function isSafeAttrValue(attr: string, value: string, _tag: string): bool
  * these are the named exceptions DOMPurify does not allow out of the box.
  */
 const EDITOR_ADD_ATTR = ["target", "data-buildrick-id", "data-buildrick-type"];
+
+/**
+ * A CMS rich text value cut to the shared allow-list (PD-1 = build) — the
+ * same list the server sanitizes a stored value to (cms.service), so the
+ * record editor, the canvas and the published page all hold one markup.
+ */
+export function sanitizeRichtext(html: string): string {
+  const clean = DOMPurify.sanitize(html, {
+    ...CMS_RICHTEXT_PURIFY,
+    ALLOWED_TAGS: [...CMS_RICHTEXT_PURIFY.ALLOWED_TAGS],
+    ALLOWED_ATTR: [...CMS_RICHTEXT_PURIFY.ALLOWED_ATTR],
+  });
+  return stripDangerousRichtextLinks(String(clean));
+}
 
 /**
  * Sanitize an HTML string, removing dangerous elements and attributes while

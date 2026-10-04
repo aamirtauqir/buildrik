@@ -8,7 +8,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { devError } from "../../../shared/utils/devLogger";
 import { EVENTS } from "@/shared/constants/events";
-import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer } from "@/engine/cms/RepeaterRenderer";
+import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys, writeBoundValue } from "@/engine/cms/RepeaterRenderer";
 import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 
 interface UseCMSPreviewOptions {
@@ -83,10 +83,9 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
               /* Rendered into the app origin (Canvas innerHTML): stored
                  property names and CMS entry values are data — only the
                  shared allowlist, and never a dangerous src/href URL. */
-              const property = binding.property;
-              if (!isSafeCmsBoundValue(property, value)) return;
-              if (property === "content") el.textContent = value;
-              else el.setAttribute(property, value);
+              if (!isSafeCmsBoundValue(binding.property, value)) return;
+              const rich = richtextKeys(composer.cms.collections?.getCollection?.(binding.collectionId)?.fields);
+              writeBoundValue(el, binding.property, value, rich.has(binding.fieldSlug));
 
               // Add visual indicator that this element has CMS binding
               el.setAttribute("data-cms-bound", "true");

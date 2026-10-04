@@ -765,6 +765,8 @@ export async function resolveDynamicPages(
 function substituteOutsideScriptStyle(
   html: string,
   data: Record<string, unknown>,
+  /** Rich text fields: substituted as their allow-listed markup (PD-1). */
+  richtext: ReadonlySet<string> = new Set(),
 ): string {
   const spanRe = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
   let result = "";
@@ -772,7 +774,7 @@ function substituteOutsideScriptStyle(
   let m: RegExpExecArray | null;
   const sub = (segment: string) =>
     segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-      return escapeHtmlText(cmsTextOf(data[key]));
+      return richtext.has(key) ? sanitizeRichtext(cmsTextOf(data[key])) : escapeHtmlText(cmsTextOf(data[key]));
     });
   while ((m = spanRe.exec(html))) {
     result += sub(html.slice(last, m.index));
@@ -801,7 +803,7 @@ export async function generateDynamicPages(
 ): Promise<GeneratedPage[]> {
   const col = await prisma.cmsCollection.findFirst({
     where: { id: collectionId, siteId, deletedAt: null },
-    select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true },
+    select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true, fields: true },
   });
   if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
   if (!col.pageSlugPattern) return [];
@@ -810,13 +812,14 @@ export async function generateDynamicPages(
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
+  const richtext = new Set(fieldRules(col.fields).filter((f) => f.type === "richtext").map((f) => f.slug));
   const cleanedTemplate = stripExistingSeoTags(templateHtml);
   return entries.map((e) => {
     const data = (e.data as Record<string, unknown>) ?? {};
     const slug = applyCmsPattern(col.pageSlugPattern as string, data, true);
     const seoTitle = col.pageSeoTitle ? applyCmsPattern(col.pageSeoTitle, data, false) : "";
     const seoDescription = col.pageSeoDescription ? applyCmsPattern(col.pageSeoDescription, data, false) : "";
-    let html = substituteOutsideScriptStyle(cleanedTemplate, data);
+    let html = substituteOutsideScriptStyle(cleanedTemplate, data, richtext);
     const seoTags =
       `<title>${escapeHtmlText(seoTitle)}</title>` +
       (seoDescription ? `<meta name="description" content="${escapeHtmlText(seoDescription)}">` : "");

@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, writeBoundValue } from "./RepeaterRenderer";
+import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys, writeBoundValue } from "./RepeaterRenderer";
 import type { Composer } from "../Composer";
 
 export type CMSExportMode = "static" | "template" | "none";
@@ -105,7 +105,8 @@ export class CMSExportResolver {
              written as nothing: keeping the element's stored text shipped
              the canvas sample — or a record since unpublished or deleted —
              to the live site (BD-03). runPrePublishChecks lists these. */
-          writeBoundValue(el, binding.property, value);
+          const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(binding.collectionId)?.fields);
+          writeBoundValue(el, binding.property, value, rich.has(binding.fieldSlug));
         });
         promises.push(promise);
       });
