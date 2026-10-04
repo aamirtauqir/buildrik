@@ -57,3 +57,17 @@ describe("CMS_INVALID", () => {
     off();
   });
 });
+
+describe("the server's sanitized copy comes back (DM-10)", () => {
+  it("keeps what the server stored, not what was sent", async () => {
+    entUpsert.mockResolvedValueOnce({ updatedAt: new Date(1), data: { name: "Hi", body: "<p>ok</p>" } });
+    await syncEntryUpsert({ id: "e9", collectionId: "c1", data: { name: "<b>Hi</b>", body: "<p>ok</p><script>x</script>" }, status: "draft", createdAt: "", updatedAt: "L" } as never);
+    expect(saveContentItem).toHaveBeenCalledWith(expect.objectContaining({ id: "e9", data: { name: "Hi", body: "<p>ok</p>" }, updatedAt: "L" }));
+  });
+
+  it("writes nothing when the server stored exactly what was sent", async () => {
+    entUpsert.mockResolvedValueOnce({ updatedAt: new Date(1), data: { name: "Hi" } });
+    await syncEntryUpsert({ id: "e10", collectionId: "c1", data: { name: "Hi" }, status: "draft", createdAt: "", updatedAt: "L" } as never);
+    expect(saveContentItem).not.toHaveBeenCalled();
+  });
+});

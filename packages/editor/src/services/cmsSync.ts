@@ -800,10 +800,19 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
         data: item.data,
         status: item.status === "published" ? "PUBLISHED" : "DRAFT",
         expectedUpdatedAt: serverStampOf(`entry:${item.id}`) ?? null,
-      }).then((row) => {
+      }).then(async (row) => {
         /* No row back is still a mirror that landed; reading updatedAt off
            undefined made it a "failure", queued and replayed forever. */
         if (row?.updatedAt) recordServerStamp(`entry:${item.id}`, row.updatedAt, item.updatedAt);
+        /* DM-10: the server stores what it sanitized (markup stripped, rich
+           text cut to the allow-list). This device keeps that, not what it
+           sent — otherwise the canvas and a later save carried markup the
+           server never held, and the next hydrate looked like a remote edit. */
+        const stored = row?.data as Record<string, unknown> | undefined;
+        if (stored && !sameContent(stored, item.data)) {
+          await Storage.saveContentItem({ ...item, data: stored });
+          await engine?.refreshFromStorage();
+        }
       }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e),
