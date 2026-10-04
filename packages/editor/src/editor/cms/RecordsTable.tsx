@@ -93,7 +93,7 @@ export function RecordsTable({ collection, records, query, onOpenRecord }: Recor
   const extra = React.useMemo(
     () =>
       collection.fields
-        .filter((f) => f !== nameField && f.slug !== "slug" && !SHEET_ONLY.has(f.type))
+        .filter((f) => f !== nameField && f.slug !== "slug" && f.type !== "slug" && !SHEET_ONLY.has(f.type))
         .slice(0, MAX_EXTRA_COLUMNS),
     [collection, nameField],
   );

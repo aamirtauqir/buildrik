@@ -18,21 +18,13 @@ import type { Composer } from "@/engine";
 import { pageFileNames } from "@/engine/export";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
+import { applyCmsPattern, cmsPatternError, cmsSlugField } from "@buildrik/shared/schemas/cms";
 import { ACTION, CONTROL, CONTROL_W, LABEL, NOTE, PANE, SECTION, WARN } from "./paneStyles";
 
 export interface DynamicPagesPaneProps {
   composer: Composer | null;
   collection: CMSCollection;
   records: CMSContentItem[];
-}
-
-/** The publish service's slug rule (`applyPattern` in cms.service.ts), for
- *  the preview list only — the server resolves the real URLs. */
-export function slugify(s: string): string {
-  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-export function resolveUrl(pattern: string, data: Record<string, unknown>): string {
-  return pattern.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => slugify(data[key] == null ? "" : String(data[key])));
 }
 
 export function DynamicPagesPane({ composer, collection, records }: DynamicPagesPaneProps) {
@@ -62,15 +54,19 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
   const unknown = keys.filter((k) => !collection.fields.some((f) => f.slug === k));
   const published = records.filter((r) => r.status === "published");
   const drafts = records.length - published.length;
-  const urls = trimmed && unknown.length === 0 ? published.map((r) => resolveUrl(trimmed, r.data)) : [];
+  /* DM-18: the pattern is a real path (the server refuses one that isn't);
+     unknown fields keep their own board line (4418:164278). */
+  const patternProblem = trimmed && unknown.length === 0 ? cmsPatternError(trimmed, collection.fields) : null;
+  /* The server's own slug rule (shared applyCmsPattern), for the preview. */
+  const urls = trimmed && unknown.length === 0 && !patternProblem ? published.map((r) => applyCmsPattern(trimmed, r.data, true)) : [];
   const collide = urls.length !== new Set(urls).size;
-  const ready = Boolean(trimmed) && unknown.length === 0 && Boolean(templateName) && published.length > 0 && !collide;
+  const ready = Boolean(trimmed) && unknown.length === 0 && !patternProblem && Boolean(templateName) && published.length > 0 && !collide;
   const dirty = trimmed !== (collection.pageSlugPattern ?? "") || template !== (collection.pageTemplatePath ?? "");
-  const slugField = collection.fields.find((f) => f.slug === "slug") ?? collection.fields[0];
+  const slugField = cmsSlugField(collection.fields) ?? collection.fields[0];
   const fix = unknown.length && slugField ? trimmed.replace(`{${unknown[0]}}`, `{${slugField.slug}}`) : null;
 
   const save = async () => {
-    if (!composer || unknown.length) return;
+    if (!composer || unknown.length || patternProblem) return;
     setSaving(true);
     try {
       /* Empty clears the binding rather than storing "" — a collection with
@@ -105,6 +101,8 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
         ) : null}
       </span>
     );
+  } else if (patternProblem) {
+    status = <span className={WARN} data-testid="cms-dp-status">{trimmed} cannot be saved: {patternProblem}</span>;
   } else if (published.length === 0) {
     status = (
       <span className={WARN} data-testid="cms-dp-status">
@@ -186,7 +184,7 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
         <Button
           size="xs"
           className={ACTION}
-          disabled={!(dirty || ready) || saving || unknown.length > 0}
+          disabled={!(dirty || ready) || saving || unknown.length > 0 || Boolean(patternProblem)}
           data-testid="cms-dp-save"
           onClick={() => void save()}
         >

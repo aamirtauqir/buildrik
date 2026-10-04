@@ -11,7 +11,7 @@
 import * as React from "react";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { Button } from "@/editor/chrome-ui";
-import { resolveUrl } from "./DynamicPagesPane";
+import { applyCmsPattern } from "@buildrik/shared/schemas/cms";
 
 const text = (v: unknown) => (v === undefined || v === null ? "" : String(v));
 const firstOf = (fields: CMSField[], types: CMSField["type"][], skip: string[] = []) =>
@@ -38,7 +38,7 @@ export function RecordPreview({
   const body = firstOf(fields, ["textarea", "richtext"]);
   const src = image ? text(form[image.slug]) : "";
   const metaValue = meta ? text(form[meta.slug]) : "";
-  const url = collection.pageSlugPattern ? resolveUrl(collection.pageSlugPattern, form) : null;
+  const url = collection.pageSlugPattern ? applyCmsPattern(collection.pageSlugPattern, form, true) : null;
   const live = record?.status === "published";
 
   return (

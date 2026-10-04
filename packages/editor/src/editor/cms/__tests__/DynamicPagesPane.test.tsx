@@ -70,6 +70,16 @@ describe("DynamicPagesPane", () => {
     expect(screen.getByTestId("cms-dp-pattern")).toHaveValue("/menu/{slug}");
   });
 
+  it("refuses a pattern that isn't a path, or names no field (DM-18)", () => {
+    mount(MENU, [rec("a", "Margherita")]);
+    fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/all" } });
+    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("/menu/all cannot be saved: A URL pattern needs a field");
+    expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
+    fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu?x={slug}" } });
+    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("letters, numbers, -, _, / and {field} only");
+    expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
+  });
+
   it("says drafts generate nothing (4418:89287)", () => {
     mount({ ...MENU, pageSlugPattern: "/menu/{slug}" } as CMSCollection, [rec("a", "Margherita", "draft")]);
     expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("1 record, none published.");

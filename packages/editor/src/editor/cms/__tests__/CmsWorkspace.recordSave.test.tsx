@@ -137,3 +137,28 @@ describe("an empty number is empty, not 0", () => {
     expect(composer.cms.collections.createContentItem.mock.calls[0][1].price).toBeUndefined();
   });
 });
+
+describe("slug is a real field type (CMS-09)", () => {
+  const SLUGGED = {
+    ...COL,
+    fields: [...COL.fields, { id: "s", name: "Permalink", slug: "permalink", type: "slug", order: 1 }],
+  } as unknown as CMSCollection;
+
+  it("a slug-type field (any key) follows the name on a new record", async () => {
+    const { composer } = makeEngine({ collections: [SLUGGED] });
+    cmsWorkspace.openCollection("col-1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
+    fireEvent.change(await screen.findByLabelText(/Name/), { target: { value: "Hello World" } });
+    expect((screen.getByLabelText(/Permalink/) as HTMLInputElement).value).toBe("hello-world");
+  });
+
+  it("says when a slug isn't one, as the server would", async () => {
+    const { composer } = makeEngine({ collections: [SLUGGED] });
+    cmsWorkspace.openCollection("col-1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
+    fireEvent.change(await screen.findByLabelText(/Permalink/), { target: { value: "Not A Slug" } });
+    expect(screen.getByTestId("cms-field-error-permalink").textContent).toMatch(/lowercase letters, numbers and single hyphens/);
+  });
+});

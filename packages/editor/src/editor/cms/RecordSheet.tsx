@@ -42,7 +42,7 @@ import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
-import { resolveUrl, slugify } from "./DynamicPagesPane";
+import { applyCmsPattern, cmsSlugField, cmsSlugify, cmsValueError } from "@buildrik/shared/schemas/cms";
 import { cmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { claimCmsConflict, isCmsConflictPending, type CmsConflict } from "@/services/cmsSync";
@@ -351,16 +351,19 @@ export function RecordSheet({
   /* 6749:59940 — a new record's slug follows its name ("auto from name")
      until someone types into the slug field itself. */
   const nameSlug = collection.displayField ?? "name";
-  const autoSlug = !record && collection.fields.some((f) => f.slug === "slug") && collection.fields.some((f) => f.slug === nameSlug);
+  /* The slug is a real field type (CMS-09); a collection from before the
+     type keeps a field keyed `slug`. */
+  const slugKey = cmsSlugField(collection.fields)?.slug ?? null;
+  const autoSlug = !record && slugKey !== null && collection.fields.some((f) => f.slug === nameSlug);
   const [slugTouched, setSlugTouched] = React.useState(false);
   const nameField = collection.fields.find((f) => f.slug === nameSlug);
   const nameMissing = Boolean(nameField) && isEmpty(form[nameSlug]);
   const set = (slug: string, v: unknown) => {
-    if (slug === "slug") setSlugTouched(true);
+    if (slug === slugKey) setSlugTouched(true);
     setForm((p) => ({
       ...p,
       [slug]: v,
-      ...(autoSlug && !slugTouched && slug === nameSlug ? { slug: slugify(String(v ?? "")) } : {}),
+      ...(autoSlug && slugKey && !slugTouched && slug === nameSlug ? { [slugKey]: cmsSlugify(String(v ?? "")) } : {}),
     }));
   };
 
@@ -373,10 +376,16 @@ export function RecordSheet({
         {f.validation?.required ? " *" : ""}
       </label>
     );
-    const err =
-      f.validation?.required && isEmpty(v) && (published || saveError) ? (
-        <span className={ERROR} data-testid={`cms-field-error-${f.slug}`}>{f.name} is required to publish</span>
-      ) : null;
+    /* Per-field rules run live (§10c) — the shared validator, so the sheet
+       says what the server would refuse: a slug's format, a number, a URL… */
+    const problem = isEmpty(v)
+      ? f.validation?.required && (published || saveError)
+        ? `${f.name} is required to publish`
+        : null
+      : cmsValueError(f, v);
+    const err = problem ? (
+      <span className={ERROR} data-testid={`cms-field-error-${f.slug}`}>{problem}</span>
+    ) : null;
     if (f.type === "image") {
       const src = typeof v === "string" ? v : "";
       return (
@@ -450,7 +459,7 @@ export function RecordSheet({
           type={type}
           sizing="sm"
           className={CONTROL}
-          placeholder={autoSlug && f.slug === "slug" ? "auto from name" : f.placeholder}
+          placeholder={autoSlug && f.slug === slugKey ? "auto from name" : f.placeholder}
           value={v === undefined || v === null ? "" : String(v)}
           onChange={(e) =>
             set(f.slug, f.type === "number" ? (e.target.value === "" ? undefined : Number(e.target.value)) : e.target.value)
@@ -723,7 +732,7 @@ export function RecordSheet({
             addToast({ tone: "success", title: `${title} deleted · ${collection.name}`, description: "The record and its generated page are gone." });
           }}
           name={title}
-          consequence={`Deleting removes this record and its generated page ${resolveUrl(collection.pageSlugPattern ?? "", record.data)}.`}
+          consequence={`Deleting removes this record and its generated page ${applyCmsPattern(collection.pageSlugPattern ?? "", record.data, true)}.`}
           confirmLabel="Delete record"
           testId="cms-delete-record"
         />
