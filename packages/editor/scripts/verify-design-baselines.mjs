@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Verify design.css baseline values match DEFAULT_TOKENS in constants.ts.
+ * Verify design.css baseline values match DEFAULT_TOKENS in engine/designSystem/defaultTokens.ts.
  * Fails if any --buildrick-design-X CSS value differs from JS value.
  *
  * Run: node packages/editor/scripts/verify-design-baselines.mjs
@@ -36,7 +36,7 @@ for (const line of css.split("\n")) {
 
 // Parse constants.ts DEFAULT_TOKENS. Each DesignToken object contains cssVar + value.
 const ts = fs.readFileSync(
-  path.join(root, "src/editor/design-system/constants.ts"),
+  path.join(root, "src/engine/designSystem/defaultTokens.ts"),
   "utf8"
 );
 const tsValues = {};

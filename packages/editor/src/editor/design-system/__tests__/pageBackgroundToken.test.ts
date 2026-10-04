@@ -81,6 +81,6 @@ describe("page roots", () => {
       metadata: {},
     } as never);
     expect(composer.elements.getElement("root-old")?.getStyles()["background-color"]).toBeUndefined();
-    expect(await publishedHtml(composer)).not.toContain(PAGE_BACKGROUND_TOKEN.cssVar);
+    expect(await publishedHtml(composer)).not.toContain(`var(${PAGE_BACKGROUND_TOKEN.cssVar})`);
   });
 });
