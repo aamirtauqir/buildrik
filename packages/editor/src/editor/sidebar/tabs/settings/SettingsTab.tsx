@@ -792,6 +792,11 @@ export const SettingsTab: React.FC<
   const trimmed = query.trim();
   const results = React.useMemo(() => (trimmed ? searchSettings(trimmed) : []), [trimmed]);
   const activeIndex = Math.min(activeResult, Math.max(results.length - 1, 0));
+  /* ↑/↓ can wrap to a result far below the fold: keep the active one in view. */
+  React.useEffect(() => {
+    if (!searchOpen) return;
+    document.getElementById(`set-search-option-${activeIndex}`)?.scrollIntoView?.({ block: "nearest" });
+  }, [searchOpen, activeIndex]);
   const openResult = (entry: SearchEntry) => {
     pendingFieldRef.current = entry.fieldId ?? null;
     closeSearch(false);

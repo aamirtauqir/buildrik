@@ -1041,6 +1041,28 @@ describe("SettingsTab — Search Mode (owner 2026-10-04, overrides 6816:60270 / 
     expect(screen.getByTestId("set-search-empty").className).toContain("tw:break-words");
   });
 
+  /* QA 2026-10-05: "a" lists 65 results; ↑ from the first wrapped to the
+     last, which sat 2,500px below the fold. */
+  it("↑/↓ keep the active result in view", () => {
+    const proto = Element.prototype as Element & { scrollIntoView?: (arg?: ScrollIntoViewOptions) => void };
+    const original = proto.scrollIntoView;
+    const spy = vi.fn();
+    proto.scrollIntoView = spy;
+    try {
+      renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+      openSearch();
+      fireEvent.change(input(), { target: { value: "seo" } });
+      fireEvent.keyDown(input(), { key: "ArrowUp" });
+      const all = screen.getAllByRole("option");
+      const last = all[all.length - 1];
+      expect(last.getAttribute("aria-selected")).toBe("true");
+      expect(spy.mock.contexts.at(-1)).toBe(last);
+      expect(spy.mock.calls.at(-1)?.[0]).toEqual({ block: "nearest" });
+    } finally {
+      proto.scrollIntoView = original;
+    }
+  });
+
   it("Escape closes Search Mode — from the field or the ✕ — never Settings", () => {
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
