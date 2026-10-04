@@ -7,6 +7,7 @@
 import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys, writeBoundValue } from "./RepeaterRenderer";
 import type { Composer } from "../Composer";
 import { URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
+import { cmsRecordToken } from "@buildrik/shared/schemas/cms";
 
 export type CMSExportMode = "static" | "template" | "none";
 export type TemplateSyntax = "handlebars" | "liquid";
@@ -123,7 +124,7 @@ export class CMSExportResolver {
         /* Already filled from its list copy's own record (C0.8). */
         if (onPageRecord && currentItemOf === binding.collectionId) return;
         if (onPageRecord && pageFile && this.composer.cms.collections?.getCollection?.(binding.collectionId)?.pageTemplatePath === pageFile) {
-          writeBoundValue(el, binding.property, `{${binding.fieldSlug}}`);
+          writeBoundValue(el, binding.property, cmsRecordToken(binding.fieldSlug));
           return;
         }
         const promise = this.composer.cms.bindings.resolveBinding(binding).then((value) => {

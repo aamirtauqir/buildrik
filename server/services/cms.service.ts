@@ -19,6 +19,7 @@ import {
   cmsRecordErrors,
   stripDangerousRichtextLinks,
   cmsTextOf,
+  fillCmsRecordTokens,
   type CmsFieldRule,
 } from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
@@ -811,15 +812,17 @@ function substituteOutsideScriptStyle(
   data: Record<string, unknown>,
   /** Rich text fields: substituted as their allow-listed markup (PD-1). */
   richtext: ReadonlySet<string> = new Set(),
+  /** The collection's field keys — a bare `{word}` is a token only for these (BD-13). */
+  fieldKeys: ReadonlySet<string> = new Set(Object.keys(data)),
 ): string {
   const spanRe = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
   let result = "";
   let last = 0;
   let m: RegExpExecArray | null;
   const sub = (segment: string) =>
-    segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-      return richtext.has(key) ? sanitizeRichtext(cmsTextOf(data[key])) : escapeHtmlText(cmsTextOf(data[key]));
-    });
+    fillCmsRecordTokens(segment, fieldKeys, (key) =>
+      richtext.has(key) ? sanitizeRichtext(cmsTextOf(data[key])) : escapeHtmlText(cmsTextOf(data[key])),
+    );
   while ((m = spanRe.exec(html))) {
     result += sub(html.slice(last, m.index));
     result += m[0]; // script/style span verbatim — never substituted
@@ -856,14 +859,16 @@ export async function generateDynamicPages(
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
-  const richtext = new Set(fieldRules(col.fields).filter((f) => f.type === "richtext").map((f) => f.slug));
+  const rules = fieldRules(col.fields);
+  const richtext = new Set(rules.filter((f) => f.type === "richtext").map((f) => f.slug));
+  const fieldKeys = new Set(rules.map((f) => f.slug));
   const cleanedTemplate = stripExistingSeoTags(templateHtml);
   return entries.map((e) => {
     const data = (e.data as Record<string, unknown>) ?? {};
     const slug = applyCmsPattern(col.pageSlugPattern as string, data, true);
     const seoTitle = col.pageSeoTitle ? applyCmsPattern(col.pageSeoTitle, data, false) : "";
     const seoDescription = col.pageSeoDescription ? applyCmsPattern(col.pageSeoDescription, data, false) : "";
-    let html = substituteOutsideScriptStyle(cleanedTemplate, data, richtext);
+    let html = substituteOutsideScriptStyle(cleanedTemplate, data, richtext, fieldKeys);
     const seoTags =
       `<title>${escapeHtmlText(seoTitle)}</title>` +
       (seoDescription ? `<meta name="description" content="${escapeHtmlText(seoDescription)}">` : "");

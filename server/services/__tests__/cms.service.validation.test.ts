@@ -206,3 +206,14 @@ describe("findUnboundLists (BD-06)", () => {
     expect(await findUnboundLists("s1", [{ name: "Home", blocks: { id: "r", children: [] } }], raw)).toBeNull();
   });
 });
+
+describe("template page tokens (BD-13)", () => {
+  it("fills {{bk:key}} and a bare {field}; author text in braces survives", async () => {
+    const { generateDynamicPages } = await import("@server/services/cms.service");
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{slug}", pageSeoTitle: null, pageSeoDescription: null, fields: FIELDS });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { slug: "a", name: "Tea" } }]);
+    const [page] = await generateDynamicPages("s1", "c1", "<html><head></head><body><h1>{{bk:name}}</h1><p>{name} — use {note} or { }</p></body></html>");
+    expect(page.content).toContain("<h1>Tea</h1>");
+    expect(page.content).toContain("<p>Tea — use {note} or { }</p>");
+  });
+});

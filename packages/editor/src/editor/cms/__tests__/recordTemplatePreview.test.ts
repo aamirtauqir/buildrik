@@ -16,7 +16,12 @@ vi.mock("@/editor/shell/exportPublishPages", () => ({
 
 import { renderRecordTemplatePreview } from "../recordTemplatePreview";
 
-const MENU = { id: "col-1", name: "Menu items", pageTemplatePath: "menu-item.html" } as unknown as CMSCollection;
+const MENU = {
+  id: "col-1",
+  name: "Menu items",
+  pageTemplatePath: "menu-item.html",
+  fields: [{ slug: "name", type: "text" }, { slug: "price", type: "text" }, { slug: "link", type: "url" }],
+} as unknown as CMSCollection;
 const RECORD = {
   id: "r1",
   collectionId: "col-1",
@@ -49,10 +54,12 @@ describe("renderRecordTemplatePreview", () => {
 
   it("substitutes {fieldSlug} tokens with the record's values, HTML-escaped", async () => {
     exportPublishPagesMock.mockResolvedValueOnce([
-      { path: "menu-item.html", html: "<h1>{name}</h1><p>{price}</p><p>{missing}</p>" },
+      { path: "menu-item.html", html: "<h1>{{bk:name}}</h1><p>{price}</p><p>{missing}</p>" },
     ]);
     const out = await renderRecordTemplatePreview({} as never, MENU, RECORD);
-    expect(out).toEqual({ ok: true, html: "<h1>Margherita &amp; Basil</h1><p>$12</p><p></p>" });
+    /* BD-13: `{{bk:key}}` and a bare `{key}` naming a FIELD are tokens;
+       `{missing}` is the author's own text and stays. */
+    expect(out).toEqual({ ok: true, html: "<h1>Margherita &amp; Basil</h1><p>$12</p><p>{missing}</p>" });
   });
 
   it("a javascript: value substituted into an href never reaches the preview iframe's srcDoc", async () => {

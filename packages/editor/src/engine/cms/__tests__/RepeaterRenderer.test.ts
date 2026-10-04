@@ -333,7 +333,7 @@ describe("RepeaterRenderer", () => {
       expect(queryContent).toHaveBeenCalledWith({
         collectionId: "col-posts",
         status: "draft",
-        limit: undefined,
+        limit: 10_000, // "All" asks for the cap (BD-08), not queryContent's default 50
       });
     });
   });

@@ -19,7 +19,8 @@
 import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
-import { sanitizeHTML } from "@/shared/utils/html/sanitization";
+import { sanitizeHTML, sanitizeRichtext } from "@/shared/utils/html/sanitization";
+import { cmsTextOf, fillCmsRecordTokens } from "@buildrik/shared/schemas/cms";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 
 export type RecordTemplatePreview =
@@ -53,9 +54,11 @@ export async function renderRecordTemplatePreview(
   const bodyStart = bodyOpen ? bodyOpen.index + bodyOpen[0].length : 0;
   const bodyEnd = bodyOpen ? page.html.lastIndexOf("</body>") : -1;
   const end = bodyEnd >= bodyStart ? bodyEnd : page.html.length;
-  const body = page.html.slice(bodyStart, end).replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-    const v = record.data[key];
-    return v === undefined || v === null ? "" : escapeHtmlText(String(v));
-  });
+  /* The server's token rule (shared fillCmsRecordTokens) and value rules:
+     rich text as its allow-listed markup, anything else escaped text. */
+  const rich = new Set(collection.fields.filter((f) => f.type === "richtext").map((f) => f.slug));
+  const body = fillCmsRecordTokens(page.html.slice(bodyStart, end), new Set(collection.fields.map((f) => f.slug)), (key) =>
+    rich.has(key) ? sanitizeRichtext(cmsTextOf(record.data[key])) : escapeHtmlText(cmsTextOf(record.data[key])),
+  );
   return { ok: true, html: page.html.slice(0, bodyStart) + sanitizeHTML(body) + page.html.slice(end) };
 }

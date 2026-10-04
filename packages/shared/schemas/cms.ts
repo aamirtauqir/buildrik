@@ -199,6 +199,27 @@ export function cmsTextOf(value: unknown): string {
   return String(value);
 }
 
+/**
+ * The token the export writes on a collection's template page where a
+ * binding follows "this page's record" — filled per record on the server
+ * (BD-13). Namespaced so author copy with braces ("{note}", "{ }") is never
+ * read as a field.
+ */
+export function cmsRecordToken(key: string): string {
+  return `{{bk:${key}}}`;
+}
+
+/**
+ * Fill a template page's record tokens: every `{{bk:key}}`, and — for pages
+ * exported before the namespaced token — a bare `{key}` only when `key` IS a
+ * field of the collection. Any other braces are the author's text and stay.
+ */
+export function fillCmsRecordTokens(text: string, fieldKeys: ReadonlySet<string>, render: (key: string) => string): string {
+  return text.replace(/\{\{bk:([a-zA-Z0-9_-]+)\}\}|\{([a-zA-Z0-9_-]+)\}/g, (m, bk?: string, bare?: string) =>
+    bk ? render(bk) : bare && fieldKeys.has(bare) ? render(bare) : m,
+  );
+}
+
 /** A record's name: its collection's display field, else the first field —
  *  what a reference shows for the record it points at. "" when empty. */
 export function cmsRecordLabel(
