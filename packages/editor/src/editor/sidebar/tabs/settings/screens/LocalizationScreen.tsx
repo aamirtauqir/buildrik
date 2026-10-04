@@ -9,8 +9,9 @@
  *  - **Locales** are objects that save immediately (SA-16): `Add locale`
  *    (AddLocaleDialog) and `Remove` each write `enabledLocales` at once and
  *    re-read the table — never carrying the staged default with them.
- *    Remove asks first only when the locale has translations (Q-B6), and the
- *    translations are kept (they live in `Page.translations`, untouched).
+ *    Remove always asks first (OWNER OVERRIDE 2026-10-04 — supersedes Q-B6
+ *    "confirm only when translations exist"), and the translations are kept
+ *    (they live in `Page.translations`, untouched).
  *
  * SA-05: no Auto-redirect row — the stored `localeAutoRedirect` is never sent.
  * Two reads on open, one load state: `settings.get` and `siteDetail.locales`.
@@ -183,11 +184,6 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
     }
   };
 
-  const askRemove = (row: LocaleRow) => {
-    if (row.translated > 0) setRemoving(row);
-    else void removeNow(row.code);
-  };
-
   if (!projectId) {
     return (
       <Screen>
@@ -316,7 +312,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
                       variant="link"
                       className="tw:min-h-5"
                       disabled={readOnly || busy || enabledLocales.length <= 1}
-                      onClick={() => askRemove(row)}
+                      onClick={() => setRemoving(row)}
                       data-testid={`set-loc-row-remove-${row.code}`}
                     >
                       Remove
