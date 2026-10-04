@@ -107,3 +107,24 @@ describe("a list child's binding resolves per copy (current item)", () => {
     expect(titles).toEqual(["Quattro", "Quattro"]);
   });
 });
+
+/* BD-19 / BD-06: what the expansion leaves — an unbound list's starter text,
+   a field a record lacks inside an ATTRIBUTE — never reaches the page. */
+describe("residual {{item.*}} on export", () => {
+  it("is cleared from text and attributes; an emptied URL attribute goes", async () => {
+    const { CMSExportResolver } = await import("../CMSExportResolver");
+    const composer = {
+      cms: {
+        bindings: { getBindings: () => [], getAllCollectionBindings: () => [], getCollectionBinding: () => null },
+        collections: { queryContent: async () => ({ items: [], total: 0, hasMore: false }), getCollection: () => null },
+      },
+    };
+    const out = await new CMSExportResolver(composer as never).resolve(
+      '<div data-buildrick-id="l"><h3 data-buildrick-id="h">{{item.name}}</h3><img data-buildrick-id="i" src="{{item.photo}}" alt="{{item.name}} photo"></div>',
+      { mode: "static" },
+    );
+    expect(out).not.toContain("{{item.");
+    expect(out).toContain('alt="photo"');
+    expect(out).not.toContain("src=");
+  });
+});

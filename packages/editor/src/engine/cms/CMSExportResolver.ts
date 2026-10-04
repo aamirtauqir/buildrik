@@ -6,6 +6,7 @@
 
 import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys, writeBoundValue } from "./RepeaterRenderer";
 import type { Composer } from "../Composer";
+import { URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 
 export type CMSExportMode = "static" | "template" | "none";
 export type TemplateSyntax = "handlebars" | "liquid";
@@ -36,6 +37,32 @@ function serialize(doc: Document, original: string): string {
   if (!wasDocument) return doc.body.innerHTML;
   const doctype = /<!doctype[^>]*>/i.exec(original)?.[0] ?? "<!DOCTYPE html>";
   return `${doctype}\n${doc.documentElement.outerHTML}`;
+}
+
+const ITEM_PLACEHOLDER = /\{\{\s*item\.[\w.-]+\s*\}\}/g;
+
+/**
+ * A published page never carries `{{item.…}}` (BD-06, BD-19): what is left
+ * after the lists expanded — a Collection list bound to nothing, a field a
+ * record lacks in an ATTRIBUTE (the text pass already cleared text) — is
+ * removed. A URL attribute left empty goes entirely (an empty src/href
+ * re-requests the page). The pre-publish check names unbound lists first.
+ */
+function clearItemPlaceholders(doc: Document): void {
+  const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (node.textContent && ITEM_PLACEHOLDER.test(node.textContent)) node.textContent = node.textContent.replace(ITEM_PLACEHOLDER, "");
+    ITEM_PLACEHOLDER.lastIndex = 0;
+  }
+  doc.body.querySelectorAll("*").forEach((el) => {
+    for (const attr of Array.from(el.attributes)) {
+      if (!ITEM_PLACEHOLDER.test(attr.value)) continue;
+      ITEM_PLACEHOLDER.lastIndex = 0;
+      const value = attr.value.replace(ITEM_PLACEHOLDER, "").trim();
+      if (!value && URL_ATTRIBUTES.has(attr.name.toLowerCase())) el.removeAttribute(attr.name);
+      else el.setAttribute(attr.name, value);
+    }
+  });
 }
 
 export class CMSExportResolver {
@@ -113,6 +140,8 @@ export class CMSExportResolver {
     });
 
     await Promise.all(promises);
+
+    clearItemPlaceholders(doc);
 
     /* Editor-only state goes; the ID STAYS. `data-buildrick-id` is what the
        StyleEngine's breakpoint rules target (`@media { [data-buildrick-id] }`)

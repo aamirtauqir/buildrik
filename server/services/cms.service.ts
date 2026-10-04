@@ -698,6 +698,50 @@ export async function findEmptyBindings(
   return found;
 }
 
+/** A Collection list that publishes no records: bound to nothing, or to a
+ *  collection that no longer exists (BD-06). */
+export interface UnboundList {
+  pageName: string;
+  element: string;
+}
+
+/**
+ * Collection lists on the pages that ship with no live collection behind
+ * them. Read by `runPrePublishChecks` as a blocking row: such a list
+ * published its `{{item.*}}` starter text (the export now clears it, so it
+ * would publish an empty shell instead). Null when no page has a list.
+ */
+export async function findUnboundLists(
+  siteId: string,
+  pages: { name: string; blocks: unknown }[],
+  rawBindings: unknown,
+): Promise<UnboundList[] | null> {
+  const lists: { pageName: string; node: BoundNode }[] = [];
+  const walk = (pageName: string, node: BoundNode | undefined) => {
+    if (!node || typeof node !== "object") return;
+    if (node.type === "collection-list") lists.push({ pageName, node });
+    for (const child of Array.isArray(node.children) ? node.children : []) walk(pageName, child);
+  };
+  for (const page of pages) walk(page.name, page.blocks as BoundNode);
+  if (lists.length === 0) return null;
+  const bound = filterCmsBindings(rawBindings)?.collection ?? {};
+  const ids = [...new Set(Object.values(bound).map((b) => b.collectionId))];
+  const live = new Set(
+    ids.length
+      ? (await prisma.cmsCollection.findMany({ where: { siteId, deletedAt: null, id: { in: ids } }, select: { id: true } })).map((c) => c.id)
+      : [],
+  );
+  return lists
+    .filter(({ node }) => {
+      const b = typeof node.id === "string" ? bound[node.id] : undefined;
+      return !b || !live.has(b.collectionId);
+    })
+    .map(({ pageName, node }) => {
+      const layerName = node.data?.layerName;
+      return { pageName, element: typeof layerName === "string" && layerName ? layerName : "Collection list" };
+    });
+}
+
 export interface GeneratedPage {
   path: string;
   content: string;

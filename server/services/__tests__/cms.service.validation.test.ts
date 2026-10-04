@@ -181,3 +181,28 @@ describe("publish snapshot follows references (PD-1)", () => {
     expect(colFindMany.mock.calls[1][0].where.id).toEqual({ in: ["team"] });
   });
 });
+
+describe("findUnboundLists (BD-06)", () => {
+  it("names a Collection list bound to nothing or to a deleted collection; null without lists", async () => {
+    const { findUnboundLists } = await import("@server/services/cms.service");
+    const prismaMod = (await import("@/lib/prisma")) as unknown as { prisma: { cmsCollection: Record<string, unknown> } };
+    prismaMod.prisma.cmsCollection.findMany = vi.fn().mockResolvedValue([{ id: "live" }]);
+    const page = {
+      name: "Home",
+      blocks: {
+        id: "root",
+        children: [
+          { id: "a", type: "collection-list" },
+          { id: "b", type: "collection-list", data: { layerName: "Team grid" } },
+          { id: "c", type: "collection-list" },
+        ],
+      },
+    };
+    const raw = { collection: { b: { elementId: "b", collectionId: "gone", itemVar: "item" }, c: { elementId: "c", collectionId: "live", itemVar: "item" } } };
+    expect(await findUnboundLists("s1", [page], raw)).toEqual([
+      { pageName: "Home", element: "Collection list" },
+      { pageName: "Home", element: "Team grid" },
+    ]);
+    expect(await findUnboundLists("s1", [{ name: "Home", blocks: { id: "r", children: [] } }], raw)).toBeNull();
+  });
+});

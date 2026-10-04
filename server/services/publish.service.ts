@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
 import { asContentRoot, CONTENT_CHECK_LABELS, detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
-import { appendDynamicPagesToPublish, findEmptyBindings, findStaleTemplateBindings } from "@/server/services/cms.service";
+import { appendDynamicPagesToPublish, findEmptyBindings, findStaleTemplateBindings, findUnboundLists } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
 import { publishApprovalBlock, latestEditAt } from "@server/services/publish-approval";
 import { isFeatureEnabled } from "@server/services/feature-flag.service";
@@ -201,6 +201,21 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
           }
         : { label: CMS_EMPTY_BINDINGS_LABEL, status: "pass", detail: "Every bound element has a value." },
     );
+  }
+
+  /* BD-06: a Collection list with no collection behind it publishes an
+     empty shell — a blocking row naming it, so it is connected or removed. */
+  const unboundLists = await findUnboundLists(
+    siteId,
+    livePages.map((p) => ({ name: p.name, blocks: asContentRoot(p.blocks) })),
+    site?.projectCmsBindings,
+  );
+  if (unboundLists?.length) {
+    checks.push({
+      label: "Collection lists",
+      status: "fail",
+      detail: `${unboundLists.map((l) => `${l.pageName} › ${l.element}`).join("; ")} ${unboundLists.length > 1 ? "aren't" : "isn't"} connected to a collection. Connect it in Behaviour › Collection, or remove it.`,
+    });
   }
 
   const hasFail = checks.some((c) => c.status === "fail");
