@@ -506,6 +506,29 @@ function hasQueuedMirror(siteId: string, kind: "collection" | "entry", id: strin
   return isHeld(siteId, `${kind}Upsert:${id}`) || isHeld(siteId, `${kind}Delete:${id}`);
 }
 
+/** Not this site's, and not known to be any other's — hidden everywhere,
+ *  kept in the store. The site that does own it claims it back on its next
+ *  hydrate (its server lists the id). */
+export const UNCLAIMED_SITE = "~unclaimed";
+
+/**
+ * DM-20: rows written before CMS was site-scoped carry no `siteId`, and
+ * "no siteId" read as "every site's" — they showed on every site in the
+ * browser. After a hydrate of this site, an unscoped (or unclaimed) row the
+ * server lists for this site becomes this site's; one it does not list, with
+ * no local change still owed to a server, is marked unclaimed. Nothing is
+ * deleted.
+ */
+async function claimLegacyCollections(siteId: string, remoteIds: ReadonlySet<string>): Promise<void> {
+  for (const local of (await Storage.loadCollections()) ?? []) {
+    if (local.siteId && local.siteId !== UNCLAIMED_SITE) continue;
+    if (remoteIds.has(local.id)) await Storage.saveCollection({ ...local, siteId });
+    else if (!local.siteId && !hasQueuedMirror(siteId, "collection", local.id)) {
+      await Storage.saveCollection({ ...local, siteId: UNCLAIMED_SITE });
+    }
+  }
+}
+
 export async function hydrateCmsFromServer(): Promise<void> {
   const siteId = getSiteIdFromUrl();
   // No site or no storage is not a failure — there is nothing to hydrate FROM,
@@ -646,6 +669,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
       }
       forgetServerStamp(`collection:${local.id}`);
     }
+    await claimLegacyCollections(siteId, remoteIds);
     if (!skippedQueued) markStampMigrationDone(migrationScope);
     /* Hydrate writes past the manager straight to IndexedDB. Ask the engine
        to re-read so every consumer (Content panel, RecordsTable, binding
