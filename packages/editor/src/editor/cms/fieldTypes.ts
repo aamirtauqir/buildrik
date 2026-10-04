@@ -14,7 +14,7 @@
 import { CMS_FIELD_KEY_RE, CMS_RESERVED_FIELD_KEYS } from "@buildrik/shared/schemas/cms";
 import type { CMSField, CMSFieldType } from "@/shared/types/cms";
 
-export const FIELD_TYPES = ["text", "number", "richtext", "image", "boolean", "reference", "slug", "textarea", "date"] as const;
+export const FIELD_TYPES = ["text", "number", "richtext", "image", "boolean", "reference", "slug", "textarea", "date", "multiselect"] as const;
 
 export const FIELD_TYPE_LABEL: Record<string, string> = {
   text: "Text",
@@ -26,6 +26,7 @@ export const FIELD_TYPE_LABEL: Record<string, string> = {
   date: "Date",
   slug: "Slug",
   reference: "Reference",
+  multiselect: "Multi-select",
 };
 
 /** A field's key from its name: "Unit price" → "unit-price". */

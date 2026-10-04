@@ -18,6 +18,7 @@ import {
   cmsRecordClash,
   cmsRecordErrors,
   stripDangerousRichtextLinks,
+  cmsTextOf,
   type CmsFieldRule,
 } from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
@@ -665,8 +666,7 @@ export async function findEmptyBindings(
     const record = itemId
       ? entries.find((e) => e.id === itemId && e.collectionId === collectionId)
       : entries.find((e) => e.collectionId === collectionId);
-    const v = ((record?.data ?? {}) as Record<string, unknown>)[fieldSlug];
-    return v === undefined || v === null ? "" : String(v);
+    return cmsTextOf(((record?.data ?? {}) as Record<string, unknown>)[fieldSlug]);
   };
 
   const found: EmptyBinding[] = [];
@@ -772,8 +772,7 @@ function substituteOutsideScriptStyle(
   let m: RegExpExecArray | null;
   const sub = (segment: string) =>
     segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-      const v = data[key];
-      return v == null ? "" : escapeHtmlText(String(v));
+      return escapeHtmlText(cmsTextOf(data[key]));
     });
   while ((m = spanRe.exec(html))) {
     result += sub(html.slice(last, m.index));

@@ -190,6 +190,20 @@ export function cmsValueError(field: CmsFieldRule, value: unknown): string | nul
   return null;
 }
 
+/** A field value as text on a page — a multi-select's options read
+ *  "a, b"; nothing reads "". The one formatter every text sink uses (canvas
+ *  binding, list copies, the server's record pages). */
+export function cmsTextOf(value: unknown): string {
+  if (value === undefined || value === null) return "";
+  if (Array.isArray(value)) return value.map((v) => cmsTextOf(v)).filter(Boolean).join(", ");
+  return String(value);
+}
+
+/** A multi-select's options from "one per line" text: trimmed, unique, non-empty. */
+export function cmsOptionsFrom(text: string): string[] {
+  return [...new Set(text.split("\n").map((o) => o.trim()).filter(Boolean))].slice(0, CMS_MAX_OPTIONS);
+}
+
 /** Every field's reason, keyed by field key; empty when the record may publish. */
 export function cmsRecordErrors(fields: readonly CmsFieldRule[], data: Record<string, unknown>): Record<string, string> {
   const errors: Record<string, string> = {};
@@ -217,7 +231,7 @@ export function cmsSlugify(s: string): string {
 export function applyCmsPattern(pattern: string, data: Record<string, unknown>, asSlug: boolean): string {
   return pattern.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
     const v = data[key];
-    const s = v == null ? "" : Array.isArray(v) ? v.join(" ") : String(v);
+    const s = cmsTextOf(v);
     return asSlug ? cmsSlugify(s) : s;
   });
 }

@@ -22,6 +22,7 @@
 import type { CMSContentItem, CMSFieldType } from "../../shared/types/cms";
 import { filterCmsBindings, isSafeCmsBoundValue, type CmsBindableProperty } from "@buildrik/shared/schemas/sites";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
+import { cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
@@ -86,7 +87,7 @@ export function findItemFieldRefs(content: string): string[] {
 }
 
 /** Field types whose value reads as text in a placeholder. */
-const TEXT_LIKE_FIELDS = new Set<CMSFieldType>(["text", "textarea", "richtext", "number", "select", "date", "datetime", "url", "email"]);
+const TEXT_LIKE_FIELDS = new Set<CMSFieldType>(["text", "textarea", "richtext", "number", "select", "multiselect", "date", "datetime", "url", "email", "slug"]);
 
 /**
  * CMS Binding Manager
@@ -150,8 +151,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
          the canvas, a plain page — it previews the first published record. */
       if (!itemId || itemId === "context") {
         const first = (await this.cmsManager.queryContent({ collectionId, status: "published", filter: {} })).items[0];
-        const v = first?.data[fieldSlug];
-        return v === undefined || v === null ? fallback || "" : String(v);
+        return cmsTextOf(first?.data[fieldSlug]) || fallback || "";
       }
 
       // Get the content item. Only published records may resolve: static
@@ -173,12 +173,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       }
 
       // Get the field value
-      const value = item.data[fieldSlug];
-      if (value === undefined || value === null) {
-        return fallback || "";
-      }
-
-      return String(value);
+      return cmsTextOf(item.data[fieldSlug]) || fallback || "";
     } catch {
       return binding.fallback || "";
     }
@@ -193,12 +188,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   ): Promise<string> {
     const { fieldSlug, fallback } = binding;
 
-    const value = contextItem.data[fieldSlug];
-    if (value === undefined || value === null) {
-      return fallback || "";
-    }
-
-    return String(value);
+    return cmsTextOf(contextItem.data[fieldSlug]) || fallback || "";
   }
 
   /**

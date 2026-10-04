@@ -6,6 +6,7 @@
 
 import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
+import { cmsTextOf } from "@buildrik/shared/schemas/cms";
 import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
@@ -192,8 +193,7 @@ export class RepeaterRenderer {
       }
       if (nested) continue;
       for (const b of own) {
-        const raw = item.data[b.fieldSlug];
-        const value = raw === undefined || raw === null || raw === "" ? b.fallback || "" : String(raw);
+        const value = cmsTextOf(item.data[b.fieldSlug]) || b.fallback || "";
         if (canvas && !value) continue;
         writeBoundValue(el, b.property, value);
       }
@@ -346,7 +346,7 @@ export class RepeaterRenderer {
         const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
         text = text.replace(fieldPattern, () => {
           injectedValue = true;
-          return escapeHtmlText(String(value ?? ""));
+          return escapeHtmlText(cmsTextOf(value));
         });
       });
 
@@ -392,7 +392,7 @@ export class RepeaterRenderer {
         Object.entries(item.data).forEach(([fieldName, fieldValue]) => {
           const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
           if (fieldPattern.test(value)) {
-            value = value.replace(fieldPattern, () => String(fieldValue ?? ""));
+            value = value.replace(fieldPattern, () => cmsTextOf(fieldValue));
             modified = true;
           }
         });

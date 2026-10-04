@@ -25,6 +25,7 @@ import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import {
   Button,
+  Chip,
   IconButton,
   Menu,
   MenuItem,
@@ -98,7 +99,7 @@ const NAV_TAB =
 
 const OFFLINE = "Saved on this device only. The server is offline — the change will sync when you reconnect.";
 
-const WIDE: ReadonlySet<CMSField["type"]> = new Set(["textarea", "richtext", "image", "file"]);
+const WIDE: ReadonlySet<CMSField["type"]> = new Set(["textarea", "richtext", "image", "file", "multiselect"]);
 
 function blank(fields: CMSField[]): Record<string, unknown> {
   return Object.fromEntries(fields.map((f) => [f.slug, fieldDefault(f)]));
@@ -371,7 +372,7 @@ export function RecordSheet({
     const id = `cms-field-${f.slug}`;
     const v = form[f.slug];
     const label = (
-      <label className={LABEL} htmlFor={id}>
+      <label className={LABEL} htmlFor={id} id={`${id}-label`}>
         {f.name}
         {f.validation?.required ? " *" : ""}
       </label>
@@ -432,6 +433,24 @@ export function RecordSheet({
           value={String(v ?? "")}
           onChange={(e) => set(f.slug, e.target.value)}
         />
+      );
+    } else if (f.type === "multiselect") {
+      /* PD-1: a chip per option; the value is the list of chosen options
+         (a text box here stored "a,b" over the array — UI-07). */
+      const chosen = Array.isArray(v) ? (v as string[]) : [];
+      input = f.options?.length ? (
+        <span className="tw:flex tw:flex-wrap tw:gap-1" role="group" aria-labelledby={`${id}-label`} data-testid={`${id}-chips`}>
+          {f.options.map((o) => (
+            <Chip
+              key={o}
+              label={o}
+              selected={chosen.includes(o)}
+              onClick={() => set(f.slug, chosen.includes(o) ? chosen.filter((x) => x !== o) : [...chosen, o])}
+            />
+          ))}
+        </span>
+      ) : (
+        <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">No options yet · add them in Fields</span>
       );
     } else if (f.type === "boolean") {
       input = (

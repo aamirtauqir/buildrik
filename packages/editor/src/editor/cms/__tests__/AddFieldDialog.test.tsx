@@ -40,6 +40,23 @@ describe("AddFieldDialog", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it("a multi-select field carries its options, one per line (PD-1)", async () => {
+    const { onAdd } = mount();
+    fireEvent.click(screen.getByTestId("cms-add-field-type-multiselect"));
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Tags" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-options"), { target: { value: "Vegan\n Spicy \n\nVegan" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-save"));
+    await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ name: "Tags", slug: "tags", type: "multiselect", options: ["Vegan", "Spicy"] }));
+  });
+
+  it("a reserved key (the record's own names) is refused under the key", () => {
+    mount();
+    fireEvent.click(screen.getByTestId("cms-add-field-type-boolean"));
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Published" } });
+    expect(screen.getByTestId("cms-add-field-key-error")).toHaveTextContent("published is reserved");
+    expect(screen.getByTestId("cms-add-field-save")).toBeDisabled();
+  });
+
   it("goes back to the type list", () => {
     mount();
     fireEvent.click(screen.getByTestId("cms-add-field-type-image"));

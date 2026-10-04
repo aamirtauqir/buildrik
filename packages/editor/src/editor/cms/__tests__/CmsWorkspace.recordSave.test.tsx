@@ -162,3 +162,24 @@ describe("slug is a real field type (CMS-09)", () => {
     expect(screen.getByTestId("cms-field-error-permalink").textContent).toMatch(/lowercase letters, numbers and single hyphens/);
   });
 });
+
+describe("multi-select (PD-1 = build, UI-07)", () => {
+  it("a chip per option; the record stores the chosen options as a list", async () => {
+    sync.reached = true;
+    const TAGGED = {
+      ...COL,
+      fields: [...COL.fields, { id: "t", name: "Tags", slug: "tags", type: "multiselect", order: 1, options: ["Vegan", "Spicy", "New"] }],
+    } as unknown as CMSCollection;
+    const { composer } = makeEngine({ collections: [TAGGED] });
+    cmsWorkspace.openCollection("col-1");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
+    fireEvent.change(await screen.findByLabelText(/Name/), { target: { value: "Tea" } });
+    fireEvent.click(screen.getByRole("button", { name: "Spicy" }));
+    fireEvent.click(screen.getByRole("button", { name: "Vegan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Spicy" }));
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    await waitFor(() => expect(composer.cms.collections.createContentItem).toHaveBeenCalled());
+    expect(composer.cms.collections.createContentItem.mock.calls[0][1].tags).toEqual(["Vegan"]);
+  });
+});

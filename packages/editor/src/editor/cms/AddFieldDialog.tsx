@@ -17,6 +17,7 @@ import * as React from "react";
 import type { CMSCollection, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { Button, Chip, Modal, Select, TextInput } from "@/editor/chrome-ui";
 import { FIELD_TYPES, FIELD_TYPE_LABEL, fieldKeyError, fieldKeyFrom, freeKey } from "./fieldTypes";
+import { OptionsEditor } from "./OptionsEditor";
 
 const ROW = "tw:grid tw:grid-cols-[88px_1fr] tw:items-center tw:gap-2";
 const ROW_LABEL = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
@@ -45,6 +46,7 @@ export function AddFieldDialog({
   const [key, setKey] = React.useState<string | null>(null);
   const [required, setRequired] = React.useState(false);
   const [target, setTarget] = React.useState(collection.id);
+  const [options, setOptions] = React.useState<string[]>([]);
   const [clash, setClash] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
 
@@ -71,6 +73,7 @@ export function AddFieldDialog({
         type,
         ...(required ? { validation: { required: true } } : {}),
         ...(type === "reference" ? { referenceCollection: target } : {}),
+        ...(type === "multiselect" ? { options } : {}),
       });
       onClose();
     } finally {
@@ -207,6 +210,12 @@ export function AddFieldDialog({
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </Select>
+          </div>
+        ) : null}
+        {type === "multiselect" ? (
+          <div className={`${ROW} tw:items-start`}>
+            <label className={`${ROW_LABEL} tw:pt-1.5`} htmlFor="cms-add-field-options">Options</label>
+            <OptionsEditor id="cms-add-field-options" options={options} onChange={setOptions} live />
           </div>
         ) : null}
         <p className={`${NOTE} tw:mt-2`}>Existing records keep empty values until edited.</p>

@@ -28,6 +28,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { EVENTS } from "@/shared/constants";
+import { cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { ButtonGroup, Section, SelectRow, type SectionTier } from "../shared/controls";
 import { canWrite } from "@/engine/commands/commandOperations";
 import { ActionRow, NoteRow } from "./behaviourRows";
@@ -54,7 +55,7 @@ function boundProperty(type: string | undefined): BoundProperty {
 const FIELD_TYPES_FOR: Record<BoundProperty, ReadonlySet<CMSFieldType>> = {
   src: new Set(["image", "file", "url"]),
   href: new Set(["url", "email", "file", "text"]),
-  content: new Set(["text", "textarea", "richtext", "number", "date", "datetime", "select", "email", "url", "slug"]),
+  content: new Set(["text", "textarea", "richtext", "number", "date", "datetime", "select", "multiselect", "email", "url", "slug"]),
 };
 
 const FIELD_TYPE_LABEL: Record<CMSFieldType, string> = {
@@ -145,8 +146,7 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
         const found = itemId && itemId !== "context" ? items.findIndex((i) => i.id === itemId) : 0;
         const index = Math.max(found, 0);
         const record = items[index] ?? null;
-        const raw = record?.data[fieldSlug];
-        setPreview({ value: raw === undefined || raw === null ? "" : String(raw), record, index, total: items.length });
+        setPreview({ value: cmsTextOf(record?.data[fieldSlug]), record, index, total: items.length });
       })
       .catch(() => live && setPreview(null));
     return () => {

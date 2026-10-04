@@ -20,6 +20,7 @@ import { cmsWorkspace } from "./cmsWorkspaceStore";
 import { FIELD_TYPES, FIELD_TYPE_LABEL, fieldKeyError } from "./fieldTypes";
 import type { FieldUse } from "./fieldUsage";
 import { DeleteFieldDialog } from "./DeleteFieldDialog";
+import { OptionsEditor } from "./OptionsEditor";
 import { SECTION } from "./paneStyles";
 
 const ASIDE =
@@ -33,7 +34,7 @@ const CONTROL =
 const TEXT = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 const NOTE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /** The header glyph before the field name ("# Price"). */
-const TYPE_GLYPH: Record<string, string> = { number: "#", text: "T", textarea: "¶", richtext: "¶", image: "▣", boolean: "◐", date: "▦", reference: "↗", slug: "/" };
+const TYPE_GLYPH: Record<string, string> = { number: "#", text: "T", textarea: "¶", richtext: "¶", image: "▣", boolean: "◐", date: "▦", reference: "↗", slug: "/", multiselect: "☰" };
 
 /** The rules each type can carry (CMSFieldValidation, enforced on publish by
  *  validateFieldValue): numbers take a range, text a length. */
@@ -189,6 +190,12 @@ export function FieldInspector({ composer, collection, collections, field, recor
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </Select>
+          </div>
+        ) : null}
+        {field.type === "multiselect" || field.type === "select" ? (
+          <div className={`${ROW} tw:items-start`}>
+            <label className={`${ROW_LABEL} tw:pt-1.5`} htmlFor="cms-fi-options">Options</label>
+            <OptionsEditor id="cms-fi-options" options={field.options ?? []} onChange={(next) => update({ options: next })} />
           </div>
         ) : null}
         {keyError ? (
