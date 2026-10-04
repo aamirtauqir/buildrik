@@ -34,7 +34,7 @@ const { api } = vi.hoisted(() => ({
 }));
 
 const { addToast, removeToast, updateProjectSettings } = vi.hoisted(() => ({
-  addToast: vi.fn(() => "toast-1"),
+  addToast: vi.fn((_input: { action: { onClick(): void } }) => "toast-1"),
   removeToast: vi.fn(),
   updateProjectSettings: vi.fn(),
 }));
@@ -78,7 +78,7 @@ beforeEach(() => {
   r.import_csv.mutate.mockReset().mockResolvedValue({ created: 12 });
   r.export_csv.query.mockReset().mockResolvedValue({ csv: "from,to,type\n/a,/b,301" });
   addToast.mockReset();
-  addToast.mockImplementation(() => "toast-1");
+  addToast.mockImplementation((_input: { action: { onClick(): void } }) => "toast-1");
   removeToast.mockReset();
   updateProjectSettings.mockReset().mockResolvedValue({ saved: { redirects: { suggestFrom404s: false } }, warnings: {} });
 });
