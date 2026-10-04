@@ -15,7 +15,7 @@ import {
   injectBadge,
   injectWorkspaceApps,
 } from "../publish-html";
-import { pageCanonicalUrl } from "../publish-urls";
+import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 
 const page = (title: string) =>
   `<!doctype html><html><head><title>${title}</title></head><body><h1>${title}</h1></body></html>`;

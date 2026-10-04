@@ -135,56 +135,19 @@ describe("SEOInjector.inject — Open Graph + Twitter", () => {
   });
 });
 
-describe("SEOInjector.inject — canonical URL + slug fallback", () => {
+describe("SEOInjector.inject — canonical URL", () => {
   it("uses pageSEO.canonicalUrl verbatim when set", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
+    const html = new SEOInjector().inject(
       makePage({ slug: "about", settings: { seo: { canonicalUrl: "https://canonical.example/x" } } })
     );
     expect(html).toContain('<link rel="canonical" href="https://canonical.example/x">');
     expect(html).toContain('<meta property="og:url" content="https://canonical.example/x">');
   });
 
-  it("builds the URL from baseUrl for home pages (no slug appended)", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ isHome: true, slug: "home" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com">');
-  });
-
-  it("builds baseUrl/slug for non-home pages", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ slug: "pricing" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com/pricing">');
-    expect(html).toContain('<meta property="og:url" content="https://example.com/pricing">');
-  });
-
-  it("derives a slug from the page name when slug is missing (whitespace -> dashes)", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ name: "About Us" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com/about-us">');
-  });
-
-  it("strips invalid URL-segment characters from the slug fallback (reuses shared slugify)", () => {
-    // getPageUrl now delegates to shared/utils/helpers slugify(), which drops
-    // non-URL-safe characters (&, /, !, ?) instead of leaking them.
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ name: "Q&A / FAQ!" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com/qa-faq">');
-    expect(html).toContain('<meta property="og:url" content="https://example.com/qa-faq">');
-    expect(html).not.toContain("q&a");
-  });
-
-  it("collapses punctuation and whitespace runs into single dashes in the slug fallback", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ name: "Hello,  World & More!" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com/hello-world-more">');
-  });
-
-  it("omits canonical and og:url when there is no baseUrl and no canonicalUrl", () => {
+  /* The default canonical is the server's (pageCanonicalUrl, from the served
+     file path). The editor never invents one from a slug: that produced
+     `/about` while the deploy serves `/about.html`. */
+  it("omits canonical and og:url when the page has no canonicalUrl of its own", () => {
     const html = new SEOInjector().inject(makePage({ slug: "about" }));
     expect(html).not.toContain('rel="canonical"');
     expect(html).not.toContain("og:url");

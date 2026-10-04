@@ -18,11 +18,8 @@ import {
   injectSeoTags,
   injectBadge,
 } from "@lib/publish-html";
-import {
-  pageCanonicalUrl,
-  buildSitemapXml,
-  withSitemapDirective,
-} from "@lib/publish-urls";
+import { buildSitemapXml, resolveSiteOrigin, withSitemapDirective } from "@lib/publish-urls";
+import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 
 export interface DeployPage {
   path: string;
@@ -48,6 +45,17 @@ export interface DeployDomain {
   domain: string;
   kind: string;
   isPrimary: boolean;
+  /** PENDING | VERIFIED | FAILED — only a VERIFIED primary may be canonical. */
+  status: string;
+}
+
+/**
+ * The custom domain a site's absolute URLs default to: the primary, and only
+ * once it is verified (owner decision Q10, 2026-10-04). Never a `*.vercel.app`
+ * host — canonicalising to a preview host hands it the ranking.
+ */
+export function verifiedPrimaryDomain(domains: ReadonlyArray<DeployDomain>): string | null {
+  return domains.find((d) => d.isPrimary && d.status === "VERIFIED")?.domain ?? null;
 }
 
 /** The Site's Headers-screen columns; each null / blank / 0 means "not set". */
@@ -65,6 +73,8 @@ export interface DeployInputs {
   /** The site's own origin, already resolved (see resolveSiteOrigin). */
   origin: string | null;
   icons: { favicon: string | null; touchIcon: string | null; ogImage: string | null };
+  /** The typed "Canonical domain" (Settings › SEO), or null. Without one,
+   *  canonicals default to the verified primary domain in `domains`. */
   canonicalUrl: string | null;
   allowIndexing: boolean;
   robotsTxt: string | null;
@@ -158,6 +168,12 @@ function buildVercelConfig(input: Pick<DeployInputs, "redirects" | "domains" | "
 }
 
 export function buildDeployFiles(input: DeployInputs): DeployFile[] {
+  /* A site with a verified custom domain and no typed canonical used to ship
+     NO canonical at all — only the typed value was ever consulted. */
+  const canonicalOrigin = resolveSiteOrigin({
+    canonicalUrl: input.canonicalUrl,
+    verifiedDomain: verifiedPrimaryDomain(input.domains),
+  });
   const files: DeployFile[] = input.pages.map((p) => ({
     file: p.path,
     data: injectBadge(
@@ -167,7 +183,7 @@ export function buildDeployFiles(input: DeployInputs): DeployFile[] {
           input.icons,
         ),
         {
-          canonical: pageCanonicalUrl(input.canonicalUrl, p.path),
+          canonical: pageCanonicalUrl(canonicalOrigin, p.path),
           allowIndexing: input.allowIndexing,
         },
       ),
