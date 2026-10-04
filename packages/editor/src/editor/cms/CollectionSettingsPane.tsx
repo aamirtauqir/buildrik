@@ -52,6 +52,11 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
      (`appendDynamicPagesToPublish`), and then one per published record. */
   const generates = Boolean(collection.pageSlugPattern && collection.pageTemplatePath);
   const pages = generates ? records.filter((r) => r.status === "published").length : 0;
+  /* A Reference field in another collection points here: deleting this one
+     would leave every such record pointing at nothing (PD-1 delete guard). */
+  const referencedBy = (composer?.cms.collections.getAllCollections() ?? [])
+    .filter((c) => c.id !== collection.id)
+    .flatMap((c) => c.fields.filter((f) => f.type === "reference" && f.referenceCollection === collection.id).map((f) => `${c.name} › ${f.name}`));
   const consequence = `Deleting removes ${plural(records.length, "record")}${pages ? ` and ${plural(pages, "generated page")}` : ""}.`;
 
   const rename = async () => {
@@ -107,10 +112,16 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
       <p className={`${NOTE} tw:m-0`} data-testid="cms-settings-danger">
         {consequence} This can’t be undone.
       </p>
+      {referencedBy.length ? (
+        <p className={`${WARN} tw:m-0`} data-testid="cms-settings-referenced">
+          {referencedBy.join(", ")} {referencedBy.length === 1 ? "points" : "point"} at this collection. Change or delete{" "}
+          {referencedBy.length === 1 ? "that field" : "those fields"} first.
+        </p>
+      ) : null}
       <div>
         {/* 4428:148660 draws this one at the default 40px height, not the tab's
             28px ACTION size — the one irreversible action on the screen. */}
-        <Button size="xs" variant="danger" className="tw:h-10 tw:px-4 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]" onClick={() => setConfirmDelete(true)} data-testid="cms-settings-delete">
+        <Button size="xs" variant="danger" className="tw:h-10 tw:px-4 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]" disabled={referencedBy.length > 0} onClick={() => setConfirmDelete(true)} data-testid="cms-settings-delete">
           Delete collection…
         </Button>
       </div>

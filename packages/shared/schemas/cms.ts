@@ -199,6 +199,16 @@ export function cmsTextOf(value: unknown): string {
   return String(value);
 }
 
+/** A record's name: its collection's display field, else the first field —
+ *  what a reference shows for the record it points at. "" when empty. */
+export function cmsRecordLabel(
+  collection: { displayField?: string | null; fields: readonly { slug: string }[] },
+  data: Record<string, unknown>,
+): string {
+  const key = collection.fields.find((f) => f.slug === collection.displayField)?.slug ?? collection.fields[0]?.slug;
+  return key ? cmsTextOf(data[key]).trim() : "";
+}
+
 /** A multi-select's options from "one per line" text: trimmed, unique, non-empty. */
 export function cmsOptionsFrom(text: string): string[] {
   return [...new Set(text.split("\n").map((o) => o.trim()).filter(Boolean))].slice(0, CMS_MAX_OPTIONS);

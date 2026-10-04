@@ -24,7 +24,7 @@ import { FieldInspector } from "./FieldInspector";
 import { fieldUsage } from "./fieldUsage";
 import { AddFieldDialog } from "./AddFieldDialog";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
-import { RecordsTable } from "./RecordsTable";
+import { RecordsTable, recordTitle } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
 import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
@@ -141,6 +141,29 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       composer.emit(EVENTS.UI_CRUMB_CONTEXT, null);
     };
   }, [composer]);
+
+  /* Reference cells name their record (UI-05): the referenced collections'
+     records, read once per collection and on any store change. */
+  const [referenceLabels, setReferenceLabels] = React.useState<Map<string, Map<string, string>>>(new Map());
+  const refFields = collection?.fields.filter((f) => f.type === "reference" && f.referenceCollection) ?? [];
+  const refKey = refFields.map((f) => `${f.slug}:${f.referenceCollection}`).join("|");
+  React.useEffect(() => {
+    let live = true;
+    if (!composer || !refKey) {
+      setReferenceLabels(new Map());
+      return;
+    }
+    void Promise.all(
+      refFields.map(async (f) => {
+        const target = composer.cms.collections.getCollection(f.referenceCollection!);
+        const rows = target ? await composer.cms.collections.getContentItems(target.id) : [];
+        return [f.slug, new Map(rows.map((r) => [r.id, recordTitle(target!, r)]))] as const;
+      }),
+    ).then((entries) => live && setReferenceLabels(new Map(entries)));
+    return () => {
+      live = false;
+    };
+  }, [composer, refKey, panel.recordCounts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const importer = useImportRecords(composer, collection);
   const back = onBackToCanvas ? (
@@ -279,6 +302,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
         collection={collection}
         records={panel.records}
         query={query}
+        referenceLabels={referenceLabels}
         onOpenRecord={(id) => cmsWorkspace.openRecord(id)}
       />
     );

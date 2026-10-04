@@ -6,7 +6,7 @@
 
 import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
-import { cmsTextOf } from "@buildrik/shared/schemas/cms";
+import { cmsRecordLabel, cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
 import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
@@ -61,6 +61,10 @@ export function richtextKeys(fields: ReadonlyArray<{ slug: string; type: string 
 export interface CollectionListExpandOptions {
   canvas?: boolean;
 }
+
+/** A reference field's target records by id (and the target collection, for
+ *  the record's display name). */
+type ReferenceTables = Map<string, { collection: { displayField?: string; fields: Array<{ slug: string }> }; byId: Map<string, CMSContentItem> }>;
 
 interface RepeaterContext {
   item: CMSContentItem;
@@ -150,6 +154,7 @@ export class RepeaterRenderer {
       status: canvas || binding.status === "all" ? undefined : binding.status,
       limit: binding.limit,
     });
+    const refs = await this.referenceTables(binding.collectionId, canvas);
     const templates = Array.from(listEl.children) as HTMLElement[];
     const pristine = templates.map((t) => t.cloneNode(true) as HTMLElement);
     items.forEach((item, index) => {
@@ -163,7 +168,7 @@ export class RepeaterRenderer {
       const intoTemplate = canvas && index === 0;
       const nodes = intoTemplate ? templates : pristine.map((t) => t.cloneNode(true) as HTMLElement);
       for (const node of nodes) {
-        this.applyContext(node, context, binding, null);
+        this.applyContext(node, context, binding, null, refs);
         this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas);
         if (intoTemplate) continue;
         if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
@@ -215,7 +220,7 @@ export class RepeaterRenderer {
   /** A published page never shows `{{item.x}}` for a field the record does
    *  not have — the canvas keeps it visible so the author can re-aim it. */
   private clearUnresolved(el: HTMLElement, itemVar: string): void {
-    const pattern = new RegExp(`\\{\\{\\s*${itemVar}\\.[\\w-]+\\s*\\}\\}`, "g");
+    const pattern = new RegExp(`\\{\\{\\s*${itemVar}\\.[\\w.-]+\\s*\\}\\}`, "g");
     const walker = (el.ownerDocument ?? document).createTreeWalker(el, NodeFilter.SHOW_TEXT);
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       if (node.textContent && pattern.test(node.textContent)) node.textContent = node.textContent.replace(pattern, "");
@@ -240,6 +245,7 @@ export class RepeaterRenderer {
       status: binding.status === "all" ? undefined : binding.status,
       limit: binding.limit,
     });
+    const refs = await this.referenceTables(binding.collectionId, false);
 
     const items = result.items;
     if (items.length === 0) {
@@ -265,7 +271,7 @@ export class RepeaterRenderer {
 
       // Clone the template element
       const clonedEl = templateEl.cloneNode(true) as HTMLElement;
-      this.applyContext(clonedEl, context, binding, `${originalId}-${index}`);
+      this.applyContext(clonedEl, context, binding, `${originalId}-${index}`, refs);
 
       // Add repeater metadata
       clonedEl.setAttribute("data-cms-repeater-item", String(index));
@@ -315,6 +321,24 @@ export class RepeaterRenderer {
   }
 
   /**
+   * The records each Reference field of `collectionId` points at (PD-1), so a
+   * copy can read `{{item.author.name}}`. The canvas reads any status; an
+   * export only published records — a draft author publishes as nothing.
+   */
+  private async referenceTables(collectionId: string, canvas: boolean): Promise<ReferenceTables> {
+    const tables: ReferenceTables = new Map();
+    const cms = this.composer.cms.collections;
+    for (const f of cms.getCollection?.(collectionId)?.fields ?? []) {
+      if (f.type !== "reference" || !f.referenceCollection) continue;
+      const target = cms.getCollection?.(f.referenceCollection);
+      if (!target) continue;
+      const items = (await cms.getContentItems(target.id)).filter((i) => canvas || i.status === "published");
+      tables.set(f.slug, { collection: target, byId: new Map(items.map((i) => [i.id, i])) });
+    }
+    return tables;
+  }
+
+  /**
    * Apply item context to a cloned element using safe DOM methods
    */
   private applyContext(
@@ -323,9 +347,28 @@ export class RepeaterRenderer {
     binding: CMSCollectionBinding,
     /** The clone root's new id, or null to keep every id (Collection list
      *  copies share their template's ids — the breakpoint CSS selects on them). */
-    cloneId: string | null
+    cloneId: string | null,
+    refs: ReferenceTables = new Map()
   ): void {
     const { item, index } = context;
+    /* `{{item.<field>}}` reads the value; through a Reference field it reads
+       the record it points at — `{{item.author}}` its name,
+       `{{item.author.name}}` one of its fields. A deleted or unpublished
+       target reads as nothing. */
+    const refRecord = (field: string) => {
+      const table = refs.get(field);
+      const id = item.data[field];
+      return table && typeof id === "string" ? table.byId.get(id) : undefined;
+    };
+    const valueOf = (field: string, sub?: string): string => {
+      if (refs.has(field)) {
+        const target = refRecord(field);
+        if (!target) return "";
+        return sub ? cmsTextOf(target.data[sub]) : cmsRecordLabel(refs.get(field)!.collection, target.data);
+      }
+      return sub ? "" : cmsTextOf(item.data[field]);
+    };
+    const pathPattern = new RegExp(`\\{\\{\\s*${binding.itemVar || "item"}\\.([\\w-]+)\\.([\\w-]+)\\s*\\}\\}`, "g");
     const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(binding.collectionId)?.fields);
     const itemVar = binding.itemVar || "item";
     const indexVar = binding.indexVar || "index";
@@ -349,6 +392,12 @@ export class RepeaterRenderer {
       const indexPattern = new RegExp(`\\{\\{\\s*${indexVar}\\s*\\}\\}`, "g");
       text = text.replace(indexPattern, () => String(index));
 
+      // A path through a Reference field (`{{item.author.name}}`).
+      text = text.replace(pathPattern, (_m, field: string, sub: string) => {
+        injectedValue = true;
+        return escapeHtmlText(valueOf(field, sub));
+      });
+
       // Replace item fields. The replacement is a function so a value
       // containing "$&", "$1", etc. is inserted verbatim rather than being
       // interpreted as a String.replace substitution pattern. The value is
@@ -359,7 +408,7 @@ export class RepeaterRenderer {
           injectedValue = true;
           /* Rich text lands as its allow-listed markup; anything else as
              escaped text. */
-          return rich.has(fieldName) ? sanitizeRichtext(cmsTextOf(value)) : escapeHtmlText(cmsTextOf(value));
+          return rich.has(fieldName) ? sanitizeRichtext(cmsTextOf(value)) : escapeHtmlText(valueOf(fieldName));
         });
       });
 
@@ -397,15 +446,21 @@ export class RepeaterRenderer {
           modified = true;
         }
 
+        if (pathPattern.test(value)) {
+          value = value.replace(pathPattern, (_m, field: string, sub: string) => valueOf(field, sub));
+          modified = true;
+        }
+        pathPattern.lastIndex = 0;
+
         // Replace item fields. Replacer function so a value containing "$&"
         // etc. is inserted literally. The value is set through setAttribute
         // (a DOM sink) and serialized by innerHTML on the way out, which
         // entity-encodes it — no manual escaping needed (and pre-escaping
         // here would double-encode the attribute).
-        Object.entries(item.data).forEach(([fieldName, fieldValue]) => {
+        Object.keys(item.data).forEach((fieldName) => {
           const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
           if (fieldPattern.test(value)) {
-            value = value.replace(fieldPattern, () => cmsTextOf(fieldValue));
+            value = value.replace(fieldPattern, () => valueOf(fieldName));
             modified = true;
           }
         });

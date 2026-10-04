@@ -892,10 +892,25 @@ export async function getPublishedCmsForCollections(siteId: string, collectionId
      this page" binding as the `{field}` token the worker fills per record
      only when it knows the page IS the template. Without it every record page
      published the newest record's values. */
-  const collections = await prisma.cmsCollection.findMany({
+  const select = { id: true, name: true, slug: true, displayField: true, fields: true, pageTemplatePath: true, createdAt: true, updatedAt: true } as const;
+  const bound = await prisma.cmsCollection.findMany({
     where: { siteId, deletedAt: null, id: { in: [...collectionIds] } },
-    select: { id: true, name: true, slug: true, displayField: true, fields: true, pageTemplatePath: true, createdAt: true, updatedAt: true },
+    select,
   });
+  /* A Reference field's records are read through it ({{item.author.name}}):
+     the collections it points at publish from the server too. */
+  const targets = [
+    ...new Set(
+      bound.flatMap((c) =>
+        (Array.isArray(c.fields) ? (c.fields as Array<{ type?: unknown; referenceCollection?: unknown }>) : [])
+          .filter((f) => f.type === "reference" && typeof f.referenceCollection === "string")
+          .map((f) => f.referenceCollection as string),
+      ),
+    ),
+  ].filter((id) => !bound.some((c) => c.id === id));
+  const collections = targets.length
+    ? [...bound, ...(await prisma.cmsCollection.findMany({ where: { siteId, deletedAt: null, id: { in: targets } }, select }))]
+    : bound;
   const entries = await prisma.cmsEntry.findMany({
     where: { collectionId: { in: collections.map((c) => c.id) }, status: "PUBLISHED", deletedAt: null },
     orderBy: { updatedAt: "desc" },

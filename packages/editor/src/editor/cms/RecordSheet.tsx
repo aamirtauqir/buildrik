@@ -43,6 +43,7 @@ import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
 import { RichTextField } from "./RichTextField";
+import { ReferenceField } from "./ReferenceField";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { applyCmsPattern, cmsSlugField, cmsSlugify, cmsValueError } from "@buildrik/shared/schemas/cms";
 import { cmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
@@ -455,6 +456,8 @@ export function RecordSheet({
       ) : (
         <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">No options yet · add them in Fields</span>
       );
+    } else if (f.type === "reference") {
+      input = <ReferenceField id={id} composer={composer} field={f} value={v} className={CONTROL} onChange={(rid) => set(f.slug, rid)} />;
     } else if (f.type === "boolean") {
       input = (
         <Select id={id} sizing="sm" className={CONTROL} value={v ? "yes" : "no"} onChange={(e) => set(f.slug, e.target.value === "yes")}>

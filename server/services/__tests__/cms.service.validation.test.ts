@@ -166,3 +166,18 @@ describe("record pages fill rich text as markup (PD-1)", () => {
     expect(page.content).toContain("<h1>&lt;b&gt;Tom&lt;/b&gt;</h1>");
   });
 });
+
+describe("publish snapshot follows references (PD-1)", () => {
+  it("adds the collections a bound collection's Reference fields point at", async () => {
+    const { getPublishedCmsForCollections } = await import("@server/services/cms.service");
+    const colFindMany = vi.fn()
+      .mockResolvedValueOnce([{ id: "posts", fields: [{ slug: "author", type: "reference", referenceCollection: "team" }] }])
+      .mockResolvedValueOnce([{ id: "team", fields: [] }]);
+    const prismaMod = (await import("@/lib/prisma")) as unknown as { prisma: { cmsCollection: Record<string, unknown> } };
+    prismaMod.prisma.cmsCollection.findMany = colFindMany;
+    mocks.entFindMany.mockResolvedValue([]);
+    const snap = await getPublishedCmsForCollections("s1", ["posts"]);
+    expect(snap.collections.map((c) => c.id)).toEqual(["posts", "team"]);
+    expect(colFindMany.mock.calls[1][0].where.id).toEqual({ in: ["team"] });
+  });
+});
