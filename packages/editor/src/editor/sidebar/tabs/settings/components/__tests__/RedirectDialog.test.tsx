@@ -235,18 +235,34 @@ describe("Clone 4254:75747 · Edit redirect", () => {
     );
   });
 
-  it("Delete redirect deletes at once — no confirm is drawn", async () => {
+  it("owner 2026-10-04: Delete redirect asks first — Cancel deletes nothing and the edit dialog stays", () => {
     const onDelete = vi.fn().mockResolvedValue(undefined);
     mount({ mode: "edit", initial: menuOld, onDelete });
     fireEvent.click(screen.getByTestId("set-rd-delete"));
+    const confirm = screen.getByTestId("set-rd-confirm");
+    expect(confirm).toHaveTextContent("Delete redirect /menu-old → /menu?");
+    expect(screen.getByTestId("set-rd-confirm-confirm")).toHaveTextContent("Delete");
+    expect(onDelete).not.toHaveBeenCalled();
+    fireEvent.click(within(screen.getByTestId("modal-foot-set-rd-confirm")).getByText("Cancel"));
+    expect(screen.queryByTestId("set-rd-confirm")).toBeNull();
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(screen.getByTestId("set-rd-dialog")).toBeInTheDocument();
+  });
+
+  it("confirming deletes once", async () => {
+    const onDelete = vi.fn().mockResolvedValue(undefined);
+    mount({ mode: "edit", initial: menuOld, onDelete });
+    fireEvent.click(screen.getByTestId("set-rd-delete"));
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1));
-    expect(screen.queryByText(/are you sure/i)).toBeNull();
+    expect(screen.queryByTestId("set-rd-confirm")).toBeNull();
   });
 
   it("a refused delete stays inline and the row's values are untouched", async () => {
     const onDelete = vi.fn().mockRejectedValue(new Error("Only an editor can delete a redirect."));
     mount({ mode: "edit", initial: menuOld, onDelete });
     fireEvent.click(screen.getByTestId("set-rd-delete"));
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     expect(await screen.findByTestId("set-rd-error")).toHaveTextContent("Only an editor can delete a redirect.");
     expect(from().value).toBe("/menu-old");
     expect(screen.getByTestId("set-rd-delete")).toBeEnabled();

@@ -1,6 +1,9 @@
 /**
- * RemoveLocaleDialog — 8135:214262 `Remove French?` (560): asked only when the
- * locale has page translations (owner decision Q-B6). Removing a locale takes
+ * RemoveLocaleDialog — 8135:214262 `Remove French?` (560). Asked on every
+ * Remove — OWNER OVERRIDE 2026-10-04 (supersedes Q-B6 "confirm only when
+ * translations exist"; board to update): with translations the body is the
+ * board's copy, without them it is the short "Visitors won't be able to
+ * switch to <name>." line (no board yet). Removing a locale takes
  * it out of `Site.enabledLocales` and nothing else — the translations stay in
  * `Page.translations[<code>]` (`getLocales` reads them back the moment the
  * code is enabled again), which is what the body says.
@@ -29,6 +32,7 @@ export interface RemoveLocaleDialogProps {
 }
 
 function removeLocaleBody(name: string, translated: number, total: number): string {
+  if (translated === 0) return `Visitors won't be able to switch to ${name}.`;
   const pages = translated === 1 ? "page has" : "pages have";
   return `${translated} of ${total} ${pages} ${name} translations. They are kept and come back if you add ${name} again.`;
 }
