@@ -136,7 +136,7 @@ describe("RecordSheet", () => {
     fireEvent.change(screen.getByLabelText("Name *"), { target: { value: "Diavola" } });
     fireEvent.click(screen.getByTestId("cms-sheet-save"));
     await waitFor(() =>
-      expect(composer.cms.collections.createContentItem).toHaveBeenCalledWith("col-1", expect.objectContaining({ name: "Diavola" })),
+      expect(composer.cms.collections.createContentItem).toHaveBeenCalledWith("col-1", expect.objectContaining({ name: "Diavola" }), expect.objectContaining({ status: "draft" })),
     );
   });
 
@@ -326,7 +326,7 @@ describe("RecordSheet", () => {
     await waitFor(() => expect(composer.cms.collections.deleteContentItem).toHaveBeenCalledWith("r1"));
     fireEvent.click(await screen.findByRole("button", { name: "Undo" }));
     await waitFor(() =>
-      expect(composer.cms.collections.createContentItem).toHaveBeenCalledWith("col-1", MARGHERITA.data),
+      expect(composer.cms.collections.createContentItem).toHaveBeenCalledWith("col-1", MARGHERITA.data, expect.anything()),
     );
   });
 

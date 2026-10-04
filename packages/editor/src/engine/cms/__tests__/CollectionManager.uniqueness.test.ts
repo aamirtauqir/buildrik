@@ -29,8 +29,8 @@ async function seed() {
 describe("publishing beside other records", () => {
   it("refuses a slug another record already holds (CMS-07)", async () => {
     const { manager, c } = await seed();
-    await manager.createContentItem(c.id, { title: "A", slug: "hello" }, "published");
-    await expect(manager.createContentItem(c.id, { title: "B", slug: "hello" }, "published")).rejects.toBeInstanceOf(CMSValidationError);
+    await manager.createContentItem(c.id, { title: "A", slug: "hello" }, { status: "published" });
+    await expect(manager.createContentItem(c.id, { title: "B", slug: "hello" }, { status: "published" })).rejects.toBeInstanceOf(CMSValidationError);
   });
 
   it("refuses a record whose page path resolves to nothing (BD-14)", async () => {
@@ -42,14 +42,14 @@ describe("publishing beside other records", () => {
   it("a refused new published record leaves nothing behind (CMS-01)", async () => {
     const { manager, c } = await seed();
     for (let i = 0; i < 3; i++) {
-      await expect(manager.createContentItem(c.id, { slug: "x" }, "published")).rejects.toBeInstanceOf(CMSValidationError);
+      await expect(manager.createContentItem(c.id, { slug: "x" }, { status: "published" })).rejects.toBeInstanceOf(CMSValidationError);
     }
     expect(await manager.getContentItems(c.id)).toHaveLength(0);
   });
 
   it("creates straight into Published in one write", async () => {
     const { manager, c } = await seed();
-    const item = await manager.createContentItem(c.id, { title: "A", slug: "a" }, "published");
+    const item = await manager.createContentItem(c.id, { title: "A", slug: "a" }, { status: "published" });
     expect(item?.status).toBe("published");
     expect((await manager.getContentItem(item!.id))?.status).toBe("published");
   });

@@ -101,12 +101,13 @@ export function makeEngine(opts?: {
         getAllCollections: () => collections,
         getCollection: (id: string) => collections.find((c) => c.id === id) ?? null,
         getContentItems: vi.fn((cid: string) => Promise.resolve(items.filter((i) => i.collectionId === cid))),
-        createContentItem: vi.fn((cid: string, data: Record<string, unknown>) => {
+        nextId: () => `it-${items.length + 1}`,
+        createContentItem: vi.fn((cid: string, data: Record<string, unknown>, options?: { status?: CMSContentItem["status"]; id?: string }) => {
           const item: CMSContentItem = {
-            id: `it-${items.length + 1}`,
+            id: options?.id ?? `it-${items.length + 1}`,
             collectionId: cid,
             data,
-            status: "draft",
+            status: options?.status ?? "draft",
             createdAt: "",
             updatedAt: "",
           };

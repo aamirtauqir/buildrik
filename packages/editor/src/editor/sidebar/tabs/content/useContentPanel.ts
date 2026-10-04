@@ -19,6 +19,7 @@ import {
   isCmsConflictPending,
   markDirectSync,
   syncEntryUpsert,
+  takeCmsInvalid,
 } from "@/services/cmsSync";
 import {
   SITE_VARS_SOURCE_ID,
@@ -38,6 +39,14 @@ export interface ConditionRow {
   binding: ConditionBinding;
 }
 
+export interface SaveRecordResult {
+  item: CMSContentItem | null;
+  reached: boolean;
+  conflict: boolean;
+  /** The server refused the record under the collection's rules — its reason. */
+  invalid: string | null;
+}
+
 export interface UseContentPanelReturn {
   view: ContentView;
   setView: (v: ContentView) => void;
@@ -54,7 +63,7 @@ export interface UseContentPanelReturn {
     recordId: string | null,
     data: Record<string, unknown>,
     published: boolean,
-  ) => Promise<{ item: CMSContentItem | null; reached: boolean; conflict: boolean }>;
+  ) => Promise<SaveRecordResult>;
   deleteRecord: (recordId: string) => Promise<void>;
   addField: (collectionId: string, field: Omit<CMSField, "id" | "order">) => Promise<void>;
   deleteField: (collectionId: string, fieldId: string) => Promise<void>;
@@ -215,45 +224,41 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
       recordId: string | null,
       data: Record<string, unknown>,
       published: boolean,
-    ): Promise<{ item: CMSContentItem | null; reached: boolean; conflict: boolean }> => {
-      if (!composer) return { item: null, reached: true, conflict: false };
+    ): Promise<SaveRecordResult> => {
+      if (!composer) return { item: null, reached: true, conflict: false, invalid: null };
       const status = published ? ("published" as const) : ("draft" as const);
       /* P0-B audit 2026-09-30: the sheet's save needs to know whether the
          mirror landed on the server, so it fires the sync DIRECTLY for a
          reach signal, and `markDirectSync` makes the event-driven mirror in
          `useCmsSync` skip its own POST for this id. The mark has to be set
-         BEFORE the engine write: updateContentItem emits its event while it
-         runs, so a mark set afterwards was never seen — every save POSTed
-         twice (two "changed elsewhere" toasts on a conflict, C0.3 live
-         2026-10-02) and the unconsumed mark then swallowed the NEXT mirror
-         for this record. A new record's id only exists after the create, so
-         its create mirror is the event's; the mark covers the publish step. */
+         BEFORE the engine write: the write emits its event while it runs, so
+         a mark set afterwards was never seen — every save POSTed twice (C0.3
+         live 2026-10-02). A new record's id is reserved first for the same
+         reason, and the record is created straight into its status in one
+         write (CMS-01: create-then-publish left a draft behind on a refused
+         publish, and each Retry made another). */
+      const cms = composer.cms.collections;
+      const id = recordId ?? cms.nextId();
       let item: CMSContentItem | null = null;
       let reached = true;
-      if (recordId) markDirectSync("entry", recordId);
+      markDirectSync("entry", id);
       try {
-        if (recordId) {
-          item = await composer.cms.collections.updateContentItem(recordId, { data, status });
-        } else {
-          item = await composer.cms.collections.createContentItem(collectionId, data);
-          if (item && status !== "draft") {
-            markDirectSync("entry", item.id);
-            item = await composer.cms.collections.updateContentItem(item.id, { status });
-          }
-        }
+        item = recordId
+          ? await cms.updateContentItem(recordId, { data, status })
+          : await cms.createContentItem(collectionId, data, { status, id });
         if (item) reached = await syncEntryUpsert(item);
       } finally {
         /* A write that threw (validation) never emitted — drop the mark so it
            can't swallow a later, unrelated mirror. */
-        if (recordId) consumeDirectSync("entry", recordId);
-        if (item) consumeDirectSync("entry", item.id);
+        consumeDirectSync("entry", id);
       }
       await loadRecords(collectionId);
       reload();
       /* Not reached because the server refused this copy (another device
          changed the record) — a different sentence from "not reached yet". */
       const conflict = !reached && item !== null && isCmsConflictPending("entry", item.id);
-      return { item, reached, conflict };
+      const invalid = !reached && item !== null ? takeCmsInvalid("entry", item.id) : null;
+      return { item, reached, conflict, invalid };
     },
     [composer, loadRecords, reload],
   );

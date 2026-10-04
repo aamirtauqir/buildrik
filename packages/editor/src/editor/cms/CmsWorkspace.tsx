@@ -110,6 +110,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const [fieldId, setFieldId] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
   const { loadRecords } = panel;
+  /* CMS-01: the record a "new" sheet's first save created. A later save from
+     the same sheet (Retry after a queued or refused write) updates it — the
+     sheet still reads "new", and saving it as new again made a second,
+     third… record. Cleared whenever the sheet changes. */
+  const created = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    created.current = null;
+  }, [ws.recordId]);
 
   React.useEffect(() => {
     if (collection) void loadRecords(collection.id);
@@ -398,13 +406,15 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           }
           onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
           onSave={async (data, published) => {
-            const { reached, conflict } = await panel.saveRecord(
+            const isNew = ws.recordId === "new";
+            const { item, reached, conflict, invalid } = await panel.saveRecord(
               collection.id,
-              ws.recordId === "new" ? null : ws.recordId,
+              isNew ? created.current : ws.recordId,
               data,
               published,
             );
-            return reached ? true : conflict ? "conflict" : false;
+            if (isNew && item) created.current = item.id;
+            return reached ? true : conflict ? "conflict" : invalid ? { refused: invalid } : false;
           }}
           onDelete={async (r) => {
             await panel.deleteRecord(r.id);

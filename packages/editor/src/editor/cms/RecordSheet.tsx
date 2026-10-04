@@ -68,8 +68,10 @@ export interface RecordSheetProps {
    *  queued for retry (false), or been refused because another device changed
    *  the record ("conflict" — the toast offers Keep mine / Use theirs). The
    *  sheet stays open on the last two — closing on a queued save was hiding
-   *  the queued mirror from the user. */
-  onSave: (data: Record<string, unknown>, published: boolean) => Promise<boolean | "conflict">;
+   *  the queued mirror from the user.
+   *  `{ refused }`: the server refused the record under the collection's
+   *  rules (the shared validator) — the sheet shows the reason and stays. */
+  onSave: (data: Record<string, unknown>, published: boolean) => Promise<boolean | "conflict" | { refused: string }>;
   onDelete: (record: CMSContentItem) => Promise<void>;
   /** Undo for an instant delete: writes the record back. */
   onRestore: (record: CMSContentItem) => Promise<void>;
@@ -274,6 +276,8 @@ export function RecordSheet({
       const reached = await onSave(form, published);
       if (reached === true) {
         closeSaved();
+      } else if (typeof reached === "object") {
+        setSaveError(reached.refused);
       } else if (reached !== "conflict") {
         /* "conflict": the server answered that another device changed this
            record; the claim above already holds the choice and the footer

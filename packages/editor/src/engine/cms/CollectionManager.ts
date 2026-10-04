@@ -130,7 +130,7 @@ export class CollectionManager extends EventEmitter {
 
     const now = new Date().toISOString();
     const collection: CMSCollection = {
-      id: this.generateId(),
+      id: this.nextId(),
       name,
       slug: slug || this.slugify(name),
       description,
@@ -206,7 +206,7 @@ export class CollectionManager extends EventEmitter {
 
     const newField: CMSField = {
       ...field,
-      id: this.generateId(),
+      id: this.nextId(),
     };
 
     const updatedFields = [...collection.fields, newField];
@@ -295,12 +295,18 @@ export class CollectionManager extends EventEmitter {
   async createContentItem(
     collectionId: string,
     data: Record<string, unknown> = {},
-    /** Created straight into this status — a new record saved as Published
-       is ONE write, checked before it exists. Created as a draft and then
-       published, a refused publish left the draft behind and every retry
-       made another (CMS-01), and the server could see the draft last (RT-02). */
-    status: CMSContentItem["status"] = "draft"
+    options: {
+      /** Created straight into this status — a new record saved as Published
+         is ONE write, checked before it exists. Created as a draft and then
+         published, a refused publish left the draft behind and every retry
+         made another (CMS-01), and the server could see the draft last (RT-02). */
+      status?: CMSContentItem["status"];
+      /** An id the caller reserved with `nextId()` — the record sheet marks
+         it for its own mirror before the create's event fires. */
+      id?: string;
+    } = {}
   ): Promise<CMSContentItem | null> {
+    const status = options.status ?? "draft";
     await this.ensureInitialized();
 
     const collection = this.collections.get(collectionId);
@@ -308,7 +314,7 @@ export class CollectionManager extends EventEmitter {
 
     const now = new Date().toISOString();
     const item: CMSContentItem = {
-      id: this.generateId(),
+      id: options.id ?? this.nextId(),
       collectionId,
       data,
       status,
@@ -523,7 +529,8 @@ export class CollectionManager extends EventEmitter {
     this.contentCache.delete(collectionId);
   }
 
-  private generateId(): string {
+  /** A fresh collection / field / record id. */
+  nextId(): string {
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
   }
 
