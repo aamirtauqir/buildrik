@@ -54,7 +54,7 @@ function boundProperty(type: string | undefined): BoundProperty {
 const FIELD_TYPES_FOR: Record<BoundProperty, ReadonlySet<CMSFieldType>> = {
   src: new Set(["image", "file", "url"]),
   href: new Set(["url", "email", "file", "text"]),
-  content: new Set(["text", "textarea", "richtext", "number", "date", "datetime", "select", "email", "url"]),
+  content: new Set(["text", "textarea", "richtext", "number", "date", "datetime", "select", "email", "url", "slug"]),
 };
 
 const FIELD_TYPE_LABEL: Record<CMSFieldType, string> = {
@@ -73,6 +73,7 @@ const FIELD_TYPE_LABEL: Record<CMSFieldType, string> = {
   color: "Colour",
   url: "URL",
   email: "Email",
+  slug: "Slug",
 };
 
 const fieldOption = (f: CMSField) => ({ value: f.slug, label: `${f.slug} · ${FIELD_TYPE_LABEL[f.type] ?? f.type}` });

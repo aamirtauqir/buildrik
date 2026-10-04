@@ -248,11 +248,41 @@ export function isCmsConflictPending(kind: "collection" | "entry", id: string): 
   return conflicted.has(`${kind}Upsert:${id}`);
 }
 
-type Outcome = "ok" | "conflict" | "gone";
+/* A write the server refused because it breaks the collection's own rules
+   (the shared validator, DM-09): answered once with a reason, never retried —
+   retrying the same payload can only be refused again, and a refusal retried
+   forever was a permanent "didn't sync" notice. The reason is kept for the
+   surface that made the write (the record sheet) and announced to the rest. */
+export interface CmsInvalid {
+  kind: "collection" | "entry";
+  id: string;
+  message: string;
+}
+const invalidListeners = new Set<(i: CmsInvalid) => void>();
+export function onCmsInvalid(cb: (i: CmsInvalid) => void): () => void {
+  invalidListeners.add(cb);
+  return () => invalidListeners.delete(cb);
+}
+const invalidReasons = new Map<string, string>();
+/** The server's reason for refusing the last write of this row, once. */
+export function takeCmsInvalid(kind: "collection" | "entry", id: string): string | null {
+  const key = `${kind}:${id}`;
+  const reason = invalidReasons.get(key) ?? null;
+  invalidReasons.delete(key);
+  return reason;
+}
+function announceInvalid(kind: CmsInvalid["kind"], id: string, e: unknown): void {
+  const message = (e instanceof Error ? e.message : "").replace(/^CMS_INVALID:/, "");
+  invalidReasons.set(`${kind}:${id}`, message);
+  for (const cb of invalidListeners) cb({ kind, id, message });
+}
+
+type Outcome = "ok" | "conflict" | "gone" | "invalid";
 function classify(e: unknown): Outcome | null {
   const msg = e instanceof Error ? e.message : "";
   if (msg.startsWith("CMS_CONFLICT:")) return "conflict";
   if (msg.startsWith("CMS_GONE:")) return "gone";
+  if (msg.startsWith("CMS_INVALID:")) return "invalid";
   return null;
 }
 
@@ -283,7 +313,7 @@ async function mirror(
   body: OutboxBody,
   task: () => Promise<unknown>,
   onWarn: (e: unknown) => void,
-  on: Record<"conflict" | "gone", (e: unknown) => void>,
+  on: Record<"conflict" | "gone", (e: unknown) => void> & { invalid?: (e: unknown) => void },
 ): Promise<boolean> {
   const seq = outboxPut(siteId, body);
   let last: Outcome = "ok";
@@ -307,7 +337,8 @@ async function mirror(
     if (outcome !== "conflict") outboxRemove(siteId, body.key, seq);
     if (outcome === "ok") return;
     try {
-      on[outcome](answer);
+      if (outcome === "invalid") on.invalid?.(answer);
+      else on[outcome](answer);
     } catch {
       // A listener throwing must not turn an answered op into a queued retry.
     }
@@ -678,6 +709,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
           },
           useTheirs: () => takeServerCopy(siteId, "collection", c.id),
         }),
+      invalid: (e) => announceInvalid("collection", c.id, e),
     },
   );
 }
@@ -760,6 +792,20 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
           },
           useTheirs: () => takeServerCopy(siteId, "entry", item.id),
         }),
+      /* Refused as published: a record the server already holds goes back
+         to the server's copy; one it never held is kept here as a draft (and
+         mirrored as one, which always passes) — either way this device and
+         the server agree, and the reason reaches the sheet. */
+      invalid: (e) => {
+        announceInvalid("entry", item.id, e);
+        if (hasServerStamp(`entry:${item.id}`)) void takeServerCopy(siteId, "entry", item.id);
+        else if (item.status === "published") {
+          const draft: CMSContentItem = { ...item, status: "draft" };
+          void Storage.saveContentItem(draft)
+            .then(() => engine?.refreshFromStorage())
+            .then(() => syncEntryUpsert(draft));
+        }
+      },
     },
   );
 }

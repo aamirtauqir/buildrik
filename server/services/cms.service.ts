@@ -7,7 +7,19 @@ import type {
   UpsertCollectionInput,
   UpsertEntryInput,
 } from "@buildrik/shared/schemas/cms";
-import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
+import {
+  CSV_IMPORT_MAX_ROWS,
+  CSV_IMPORT_MAX_COLUMNS,
+  CSV_IMPORT_MAX_CELL_LENGTH,
+  CMS_RICHTEXT_PURIFY,
+  applyCmsPattern,
+  cmsFieldsSchema,
+  cmsPatternError,
+  cmsRecordClash,
+  cmsRecordErrors,
+  stripDangerousRichtextLinks,
+  type CmsFieldRule,
+} from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { CMS_COLLECTION_LIMIT_MAX, filterCmsBindings } from "@buildrik/shared/schemas/sites";
@@ -21,7 +33,9 @@ import { CMS_COLLECTION_LIMIT_MAX, filterCmsBindings } from "@buildrik/shared/sc
 
 export class CmsError extends Error {
   constructor(
-    public code: "NOT_FOUND" | "BAD_REQUEST" | "CONFLICT" | "GONE",
+    /* INVALID: the write breaks the collection's own rules (the shared
+       validator, DM-09) — answered with the reason, never retried. */
+    public code: "NOT_FOUND" | "BAD_REQUEST" | "CONFLICT" | "GONE" | "INVALID",
     message: string,
   ) {
     super(message);
@@ -46,12 +60,33 @@ export class CmsError extends Error {
  * meets an attribute an HTML parser will navigate/load — not here at write
  * time, and not by guessing which fields are "URL fields" up front.
  */
-function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknown> {
+function sanitizeEntryData(data: Record<string, unknown>, fields: readonly CmsFieldRule[] = []): Record<string, unknown> {
+  const richtext = new Set(fields.filter((f) => f.type === "richtext").map((f) => f.slug));
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(data)) {
-    out[key] = typeof value === "string" ? stripMarkup(value) : value;
+    if (typeof value === "string") out[key] = richtext.has(key) ? sanitizeRichtext(value) : stripMarkup(value);
+    else if (Array.isArray(value)) out[key] = value.map((v) => (typeof v === "string" ? stripMarkup(v) : v));
+    else out[key] = value;
   }
   return out;
+}
+
+/**
+ * A rich text value keeps the shared allow-list's markup (PD-1 = build) — the
+ * same list the editor's control sanitizes to — and loses everything else,
+ * including any href the shared URL rule refuses.
+ */
+function sanitizeRichtext(value: string): string {
+  const clean = DOMPurify.sanitize(value, { ...CMS_RICHTEXT_PURIFY, ALLOWED_TAGS: [...CMS_RICHTEXT_PURIFY.ALLOWED_TAGS], ALLOWED_ATTR: [...CMS_RICHTEXT_PURIFY.ALLOWED_ATTR] });
+  return stripDangerousRichtextLinks(String(clean));
+}
+
+/** A stored `fields` column as the record rules read it. */
+function fieldRules(fields: unknown): CmsFieldRule[] {
+  if (!Array.isArray(fields)) return [];
+  return fields.filter(
+    (f): f is CmsFieldRule => !!f && typeof f === "object" && typeof (f as CmsFieldRule).slug === "string" && typeof (f as CmsFieldRule).name === "string",
+  );
 }
 
 /**
@@ -152,6 +187,12 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
   if (input.pageTemplatePath === "index.html") {
     throw new CmsError("BAD_REQUEST", "The home page can't be a collection template. Pick another page.");
   }
+  /* The shared schema (DM-13): field types from the one list, keys unique
+     and pattern-safe; the URL pattern a real path naming real fields (DM-18). */
+  const fieldsCheck = cmsFieldsSchema.safeParse(input.fields);
+  if (!fieldsCheck.success) throw new CmsError("INVALID", fieldsCheck.error.issues[0]?.message ?? "These fields can't be saved.");
+  const patternProblem = input.pageSlugPattern ? cmsPatternError(input.pageSlugPattern, input.fields) : null;
+  if (patternProblem) throw new CmsError("INVALID", patternProblem);
   const data = {
     name: input.name,
     slug: input.slug,
@@ -252,24 +293,46 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
      still held the collection (C0a live run, 2026-10-02). */
   const collection = await prisma.cmsCollection.findFirst({
     where: { id: input.collectionId, siteId },
-    select: { deletedAt: true },
+    select: { deletedAt: true, fields: true, pageSlugPattern: true },
   });
   if (!collection) throw new CmsError("NOT_FOUND", "Collection not found");
   if (collection.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
+  const fields = fieldRules(collection.fields);
+  const clean = sanitizeEntryData(input.data, fields);
   const data = {
-    data: sanitizeEntryData(input.data) as unknown as Prisma.InputJsonValue,
+    data: clean as unknown as Prisma.InputJsonValue,
     ...(input.status ? { status: input.status } : {}),
   };
   // CSV import loops upsertEntry; skip the per-row bump and let the
   // importer touch cmsEditedAt once at the end.
   const bump = input._skipTouchCmsEdited !== true;
-  if (input.id) {
-    const existing = await prisma.cmsEntry.findUnique({
-      where: { id: input.id },
-      select: { deletedAt: true, collection: { select: { siteId: true } } },
+  const existing = input.id
+    ? await prisma.cmsEntry.findUnique({
+        where: { id: input.id },
+        select: { deletedAt: true, status: true, collection: { select: { siteId: true } } },
+      })
+    : null;
+  if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
+  if (existing?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
+  /* DM-09: what publishes meets the collection's rules here too, not only in
+     the browser — required, types, min/max, pattern, a slug no other record
+     holds and a page path no other published record resolves to. A draft
+     stays free-form. */
+  if ((input.status ?? existing?.status) === "PUBLISHED") {
+    const problems = Object.values(cmsRecordErrors(fields, clean));
+    if (problems.length) throw new CmsError("INVALID", problems.join(" · "));
+    const peers = await prisma.cmsEntry.findMany({
+      where: { collectionId: input.collectionId, deletedAt: null },
+      select: { id: true, data: true, status: true },
     });
-    if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
-    if (existing?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
+    const clash = cmsRecordClash(
+      { fields, pageSlugPattern: collection.pageSlugPattern },
+      { id: input.id ?? "", data: clean },
+      peers.map((p) => ({ id: p.id, data: (p.data ?? {}) as Record<string, unknown>, published: p.status === "PUBLISHED" })),
+    );
+    if (clash) throw new CmsError("INVALID", clash);
+  }
+  if (input.id) {
     if (existing) {
       await assertFresh(
         "cmsEntry",
@@ -450,20 +513,6 @@ export async function importCsvEntries(
 }
 
 // ── Dynamic pages (E7) ──────────────────────────────────────────────────────
-
-function slugify(s: string): string {
-  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-
-// Replace {fieldSlug} placeholders with each entry's values. slug patterns
-// slugify the substituted value; SEO patterns keep it human-readable.
-function applyPattern(pattern: string, data: Record<string, unknown>, asSlug: boolean): string {
-  return pattern.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-    const v = data[key];
-    const s = v == null ? "" : String(v);
-    return asSlug ? slugify(s) : s;
-  });
-}
 
 export interface DynamicPage {
   entryId: string;
@@ -646,9 +695,9 @@ export async function resolveDynamicPages(
     const data = (e.data as Record<string, unknown>) ?? {};
     return {
       entryId: e.id,
-      slug: applyPattern(col.pageSlugPattern as string, data, true),
-      seoTitle: col.pageSeoTitle ? applyPattern(col.pageSeoTitle, data, false) : "",
-      seoDescription: col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "",
+      slug: applyCmsPattern(col.pageSlugPattern as string, data, true),
+      seoTitle: col.pageSeoTitle ? applyCmsPattern(col.pageSeoTitle, data, false) : "",
+      seoDescription: col.pageSeoDescription ? applyCmsPattern(col.pageSeoDescription, data, false) : "",
     };
   });
 }
@@ -731,9 +780,9 @@ export async function generateDynamicPages(
   const cleanedTemplate = stripExistingSeoTags(templateHtml);
   return entries.map((e) => {
     const data = (e.data as Record<string, unknown>) ?? {};
-    const slug = applyPattern(col.pageSlugPattern as string, data, true);
-    const seoTitle = col.pageSeoTitle ? applyPattern(col.pageSeoTitle, data, false) : "";
-    const seoDescription = col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "";
+    const slug = applyCmsPattern(col.pageSlugPattern as string, data, true);
+    const seoTitle = col.pageSeoTitle ? applyCmsPattern(col.pageSeoTitle, data, false) : "";
+    const seoDescription = col.pageSeoDescription ? applyCmsPattern(col.pageSeoDescription, data, false) : "";
     let html = substituteOutsideScriptStyle(cleanedTemplate, data);
     const seoTags =
       `<title>${escapeHtmlText(seoTitle)}</title>` +

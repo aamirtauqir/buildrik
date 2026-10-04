@@ -1,20 +1,316 @@
 import { z } from "zod";
+import { isDangerousUrl } from "./element-markup";
 
 /**
- * CMS server persistence (redesign E7). SSOT for the collection/entry payloads.
- * The editor owns the rich field shape (engine src/shared/types/cms.ts); the
- * server stores `fields` and entry `data` as opaque JSON so the editor can
- * round-trip its own structures without the server re-validating their internals.
+ * CMS — the SSOT for the collection schema (field types, field shape, record
+ * status) and for the rules a record has to meet (DM-13). The engine
+ * (`CollectionManager`), the record sheet and the server (`cms.service`, on
+ * every PUBLISHED upsert) all validate through the functions below, so the
+ * editor and the server can never disagree about what may publish.
+ *
+ * Collections and entry `data` still travel as JSON; the server checks them
+ * with these rules inside the service (a `CmsError("INVALID")`), not at the
+ * tRPC input boundary — a stored collection that predates a rule must be
+ * answered with a reason the client can show, not a bare 400 it retries
+ * forever.
  */
-const cmsField = z
+
+/** Every field type the model stores. `slug` is a real type (CMS-09). */
+export const CMS_FIELD_TYPES = [
+  "text",
+  "textarea",
+  "richtext",
+  "number",
+  "date",
+  "datetime",
+  "boolean",
+  "select",
+  "multiselect",
+  "image",
+  "file",
+  "reference",
+  "color",
+  "url",
+  "email",
+  "slug",
+] as const;
+export type CmsFieldType = (typeof CMS_FIELD_TYPES)[number];
+
+/** Record status as the editor stores it; the server keeps DRAFT | PUBLISHED. */
+export const CMS_RECORD_STATUSES = ["draft", "published", "archived"] as const;
+export type CmsRecordStatus = (typeof CMS_RECORD_STATUSES)[number];
+
+/** A field key as a person may type it: what `{key}` patterns, `{{item.key}}`
+ *  placeholders and record data all read. */
+export const CMS_FIELD_KEY_RE = /^[a-z][a-z0-9_-]*$/;
+/** What the server accepts in a stored key — looser than the UI rule so a
+ *  collection made before the rule still saves, strict enough that a key can
+ *  never break a `{key}` pattern or a `{{item.key}}` path. */
+const STORED_FIELD_KEY_RE = /^[^\s{}.]+$/;
+/** Names a record already uses for itself (RT-15: a field named "Published"
+ *  collided with the record's Published switch), plus `url` — `{{item.url}}`
+ *  is the record's own page (BD-12). */
+export const CMS_RESERVED_FIELD_KEYS: ReadonlySet<string> = new Set(["id", "status", "published", "url", "createdat", "updatedat"]);
+
+export const CMS_MAX_FIELDS = 100;
+export const CMS_MAX_OPTIONS = 100;
+
+const cmsFieldValidation = z
   .object({
-    id: z.string(),
-    name: z.string().min(1),
-    slug: z.string().min(1),
-    type: z.string(),
-    order: z.number(),
+    required: z.boolean().optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    minLength: z.number().int().min(0).optional(),
+    maxLength: z.number().int().min(0).optional(),
+    pattern: z.string().max(200).optional(),
+    patternMessage: z.string().max(200).optional(),
   })
   .passthrough();
+
+/** One field of a collection's schema. */
+export const cmsFieldSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1).max(100),
+    slug: z.string().min(1).max(64).regex(STORED_FIELD_KEY_RE, "Field keys can't contain spaces, braces or dots"),
+    type: z.enum(CMS_FIELD_TYPES),
+    order: z.number(),
+    validation: cmsFieldValidation.optional(),
+    options: z.array(z.string().max(100)).max(CMS_MAX_OPTIONS).optional(),
+    referenceCollection: z.string().max(200).optional(),
+  })
+  .passthrough();
+export type CmsFieldInput = z.infer<typeof cmsFieldSchema>;
+
+/** A collection's whole field list: each field well formed, keys unique. */
+export const cmsFieldsSchema = z
+  .array(cmsFieldSchema)
+  .max(CMS_MAX_FIELDS)
+  .superRefine((fields, ctx) => {
+    const seen = new Set<string>();
+    for (const f of fields) {
+      if (seen.has(f.slug)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: `Two fields use the key ${f.slug}` });
+      seen.add(f.slug);
+    }
+  });
+
+/** The minimal field shape the record rules read — the engine's `CMSField`
+ *  and the server's stored JSON both satisfy it. */
+export interface CmsFieldRule {
+  name: string;
+  slug: string;
+  type: string;
+  validation?: {
+    required?: boolean;
+    min?: number;
+    max?: number;
+    minLength?: number;
+    maxLength?: number;
+    pattern?: string;
+    patternMessage?: string;
+  };
+  options?: string[];
+}
+
+/** No value: nothing, an empty or blank string, or an empty list. An empty
+ *  number is empty too — it is never stored as 0. */
+export function isEmptyCmsValue(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  if (typeof value === "string") return value.trim() === "";
+  if (Array.isArray(value)) return value.length === 0;
+  return false;
+}
+
+const SLUG_VALUE_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/* A user-written pattern runs on the server too; only short values are
+   tested so a pathological pattern cannot hold a request for long. */
+const PATTERN_VALUE_LIMIT = 1_000;
+
+function lengthOf(field: CmsFieldRule, value: string): number {
+  return field.type === "richtext" ? value.replace(/<[^>]*>/g, "").length : value.length;
+}
+
+/**
+ * Why `value` cannot stand in `field` on a published record, or null.
+ * Required, type, min/max, length and pattern — the one rule set the record
+ * sheet, `CollectionManager` and the server's PUBLISHED upsert all run.
+ */
+export function cmsValueError(field: CmsFieldRule, value: unknown): string | null {
+  const v = field.validation;
+  if (isEmptyCmsValue(value)) return v?.required ? `${field.name} is required` : null;
+  switch (field.type) {
+    case "number": {
+      const n = typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN;
+      if (!Number.isFinite(n)) return `${field.name} must be a number`;
+      if (v?.min !== undefined && n < v.min) return `${field.name} must be at least ${v.min}`;
+      if (v?.max !== undefined && n > v.max) return `${field.name} must be at most ${v.max}`;
+      return null;
+    }
+    case "boolean":
+      return typeof value === "boolean" || value === "true" || value === "false" ? null : `${field.name} must be yes or no`;
+    case "multiselect": {
+      if (!Array.isArray(value) || value.some((x) => typeof x !== "string")) return `${field.name} must be a list of options`;
+      const off = field.options?.length ? value.filter((x) => !field.options!.includes(x)) : [];
+      return off.length ? `${field.name} has an option that isn't offered: ${off[0]}` : null;
+    }
+    case "select":
+      return field.options?.length && !field.options.includes(String(value))
+        ? `${field.name} must be one of: ${field.options.join(", ")}`
+        : null;
+    case "date":
+    case "datetime":
+      return typeof value === "string" && !Number.isNaN(Date.parse(value)) ? null : `${field.name} must be a date`;
+    case "reference":
+      return typeof value === "string" ? null : `${field.name} must name a record`;
+  }
+  if (typeof value !== "string") return `${field.name} must be text`;
+  const len = lengthOf(field, value);
+  if (v?.minLength !== undefined && len < v.minLength) return `${field.name} must be at least ${v.minLength} characters`;
+  if (v?.maxLength !== undefined && len > v.maxLength) return `${field.name} must be at most ${v.maxLength} characters`;
+  if (field.type === "slug" && !SLUG_VALUE_RE.test(value)) return `${field.name} uses lowercase letters, numbers and single hyphens`;
+  if (field.type === "email" && !EMAIL_RE.test(value)) return `${field.name} must be a valid email`;
+  if (field.type === "url") {
+    try {
+      new URL(value);
+    } catch {
+      return `${field.name} must be a valid URL`;
+    }
+    if (isDangerousUrl(value)) return `${field.name} must be a web address`;
+  }
+  if (v?.pattern && value.length <= PATTERN_VALUE_LIMIT) {
+    let re: RegExp | null = null;
+    try {
+      re = new RegExp(v.pattern);
+    } catch {
+      re = null; // An unreadable pattern is the schema's fault, not the record's.
+    }
+    if (re && !re.test(value)) return v.patternMessage || `${field.name} format is invalid`;
+  }
+  return null;
+}
+
+/** Every field's reason, keyed by field key; empty when the record may publish. */
+export function cmsRecordErrors(fields: readonly CmsFieldRule[], data: Record<string, unknown>): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const f of fields) {
+    const e = cmsValueError(f, data[f.slug]);
+    if (e) errors[f.slug] = e;
+  }
+  return errors;
+}
+
+/** The field that holds a record's slug: a `slug`-type field, else one keyed
+ *  `slug` (collections made before the type existed). */
+export function cmsSlugField<F extends { slug: string; type: string }>(fields: readonly F[]): F | undefined {
+  return fields.find((f) => f.type === "slug") ?? fields.find((f) => f.slug === "slug");
+}
+
+/** The publish service's slug rule — one implementation for the server's
+ *  page paths and the editor's preview of them. */
+export function cmsSlugify(s: string): string {
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+/** `{key}` placeholders in a pattern, filled from a record. `asSlug` slugifies
+ *  each value (URL patterns); SEO patterns keep the text as written. */
+export function applyCmsPattern(pattern: string, data: Record<string, unknown>, asSlug: boolean): string {
+  return pattern.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
+    const v = data[key];
+    const s = v == null ? "" : Array.isArray(v) ? v.join(" ") : String(v);
+    return asSlug ? cmsSlugify(s) : s;
+  });
+}
+
+/** A record's page path from the collection's URL pattern, without the
+ *  slashes at either end — "" when a placeholder resolves to nothing (the
+ *  page would land on the collection's own prefix, shared by every such
+ *  record). */
+export function cmsRecordPath(pattern: string, data: Record<string, unknown>): string {
+  const keys = [...pattern.matchAll(/\{([a-zA-Z0-9_-]+)\}/g)].map((m) => m[1]);
+  if (keys.some((k) => applyCmsPattern(`{${k}}`, data, true) === "")) return "";
+  return applyCmsPattern(pattern, data, true)
+    .split("/")
+    .filter(Boolean)
+    .join("/");
+}
+
+/**
+ * Why a URL pattern can't be saved, or null (DM-18). It has to be a path —
+ * letters, digits, `-`, `_`, `/` and `{key}` placeholders, no empty or `..`
+ * segment — name at least one field (or every record gets one page), and
+ * name only fields the collection has.
+ */
+export function cmsPatternError(pattern: string, fields: readonly { slug: string }[]): string | null {
+  const p = pattern.trim();
+  if (!p) return null;
+  if (p.length > 200) return "The URL pattern is longer than 200 characters.";
+  if (!/^[A-Za-z0-9_\-/{}]+$/.test(p)) return "A URL pattern uses letters, numbers, -, _, / and {field} only.";
+  if (/\/\//.test(p) || p.split("/").some((seg) => seg === "." || seg === "..")) return "A URL pattern can't have an empty or dot segment.";
+  const keys = [...p.matchAll(/\{([a-zA-Z0-9_-]+)\}/g)].map((m) => m[1]);
+  if (p.replace(/\{[a-zA-Z0-9_-]+\}/g, "").includes("{") || p.replace(/\{[a-zA-Z0-9_-]+\}/g, "").includes("}")) {
+    return "A URL pattern's braces must hold a field key, like {slug}.";
+  }
+  if (keys.length === 0) return "A URL pattern needs a field, like {slug} — otherwise every record gets the same page.";
+  const unknown = keys.filter((k) => !fields.some((f) => f.slug === k));
+  if (unknown.length) return `${unknown.join(", ")} ${unknown.length === 1 ? "is" : "are"} not a field of this collection.`;
+  return null;
+}
+
+/** A record the uniqueness rules compare against. */
+export interface CmsRecordPeer {
+  id: string;
+  data: Record<string, unknown>;
+  published: boolean;
+}
+
+/**
+ * Why `record` can't be published beside the collection's other records, or
+ * null: its slug is another record's (CMS-07), its page path resolves to
+ * nothing or to another published record's path (BD-14).
+ */
+export function cmsRecordClash(
+  collection: { fields: readonly CmsFieldRule[]; pageSlugPattern?: string | null },
+  record: { id: string; data: Record<string, unknown> },
+  peers: readonly CmsRecordPeer[],
+): string | null {
+  const others = peers.filter((p) => p.id !== record.id);
+  const slugField = cmsSlugField(collection.fields);
+  if (slugField) {
+    const mine = record.data[slugField.slug];
+    if (!isEmptyCmsValue(mine) && others.some((p) => p.data[slugField.slug] === mine)) {
+      return `Another record already uses the ${slugField.name} “${String(mine)}”.`;
+    }
+  }
+  const pattern = collection.pageSlugPattern?.trim();
+  if (pattern) {
+    const path = cmsRecordPath(pattern, record.data);
+    if (!path) return "This record's page URL comes out empty — fill the fields its URL pattern uses.";
+    const owner = others.find((p) => p.published && cmsRecordPath(pattern, p.data) === path);
+    if (owner) return `Another published record already has the page /${path}.`;
+  }
+  return null;
+}
+
+/* ── Rich text (PD-1 = build) ────────────────────────────────────────────
+   A rich text value is HTML restricted to this list. The editor's control
+   and the server sanitize to the same list (DOMPurify on each side), and the
+   server writes the sanitized value back (DM-10). */
+export const CMS_RICHTEXT_TAGS = ["p", "br", "strong", "b", "em", "i", "u", "s", "a", "ul", "ol", "li", "h2", "h3", "h4", "blockquote", "code"] as const;
+export const CMS_RICHTEXT_ATTRS = ["href"] as const;
+/** The DOMPurify config both sides pass; a dangerous href is removed after. */
+export const CMS_RICHTEXT_PURIFY = {
+  ALLOWED_TAGS: [...CMS_RICHTEXT_TAGS],
+  ALLOWED_ATTR: [...CMS_RICHTEXT_ATTRS],
+  ALLOW_DATA_ATTR: false,
+} as const;
+/** Drop an `href` the shared URL rule refuses (DOMPurify's own URI check is
+ *  looser than `isDangerousUrl`). Runs over DOMPurify's output. */
+export function stripDangerousRichtextLinks(html: string): string {
+  return html.replace(/\shref\s*=\s*("([^"]*)"|'([^']*)')/gi, (m, _q, dq?: string, sq?: string) =>
+    isDangerousUrl((dq ?? sq ?? "").replace(/&amp;/g, "&")) ? "" : m,
+  );
+}
 
 export const upsertCollectionInput = z.object({
   id: z.string().optional(),
@@ -25,7 +321,9 @@ export const upsertCollectionInput = z.object({
   description: z.string().nullable().optional(),
   icon: z.string().nullable().optional(),
   displayField: z.string().nullable().optional(),
-  fields: z.array(cmsField).default([]),
+  /* Shape only here; the service applies `cmsFieldsSchema` and answers a
+     collection that fails it with a reason (CmsError INVALID). */
+  fields: z.array(z.object({ id: z.string(), name: z.string().min(1), slug: z.string().min(1), type: z.string(), order: z.number() }).passthrough()).max(CMS_MAX_FIELDS).default([]),
   // Dynamic-page binding + pattern SEO (set pageSlugPattern to generate one page
   // per entry; {fieldSlug} placeholders resolve against each entry's data).
   pageSlugPattern: z.string().max(200).nullable().optional(),
