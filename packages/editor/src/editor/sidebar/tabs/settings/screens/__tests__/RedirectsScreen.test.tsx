@@ -33,7 +33,11 @@ const { api } = vi.hoisted(() => ({
   },
 }));
 
-const { addToast, updateProjectSettings } = vi.hoisted(() => ({ addToast: vi.fn(), updateProjectSettings: vi.fn() }));
+const { addToast, removeToast, updateProjectSettings } = vi.hoisted(() => ({
+  addToast: vi.fn(() => "toast-1"),
+  removeToast: vi.fn(),
+  updateProjectSettings: vi.fn(),
+}));
 
 vi.mock("@/services/api-client", () => ({
   getBuildrikClient: () => api,
@@ -41,7 +45,7 @@ vi.mock("@/services/api-client", () => ({
 vi.mock("@/services/BuildrikSyncProvider", () => ({ updateProjectSettings }));
 vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
-  useToast: () => ({ addToast, removeToast: vi.fn() }),
+  useToast: () => ({ addToast, removeToast }),
 }));
 
 import { RedirectsScreen, renamedDay, type RedirectRow } from "../RedirectsScreen";
@@ -74,6 +78,8 @@ beforeEach(() => {
   r.import_csv.mutate.mockReset().mockResolvedValue({ created: 12 });
   r.export_csv.query.mockReset().mockResolvedValue({ csv: "from,to,type\n/a,/b,301" });
   addToast.mockReset();
+  addToast.mockImplementation(() => "toast-1");
+  removeToast.mockReset();
   updateProjectSettings.mockReset().mockResolvedValue({ saved: { redirects: { suggestFrom404s: false } }, warnings: {} });
 });
 
@@ -314,6 +320,23 @@ describe("Delete → confirm → the undo toast (8136:215838)", () => {
       }),
     );
     await waitFor(() => expect(screen.getByTestId("set-rd-row-r1")).toBeInTheDocument());
+  });
+
+  /* QA 2026-10-05: the toast stayed up after Undo (a focused toast never times
+     out), and a second Undo posted the rule again — a 409 and the "not saved"
+     banner over a rule that was back. Undo runs once and takes its toast down. */
+  it("Undo runs once and dismisses its toast", async () => {
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
+    await waitFor(() => expect(addToast).toHaveBeenCalled());
+    const undo = addToast.mock.calls[0][0].action.onClick;
+    await act(async () => undo());
+    await act(async () => undo());
+    expect(removeToast).toHaveBeenCalledWith("toast-1");
+    await waitFor(() => expect(r.create.mutate).toHaveBeenCalledTimes(1));
+    expect(screen.queryByTestId("set-save-error")).toBeNull();
   });
 
   it("a refused delete shows the banner and keeps the row, with no toast", async () => {

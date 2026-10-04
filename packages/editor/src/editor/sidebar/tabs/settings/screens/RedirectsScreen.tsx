@@ -140,7 +140,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
 }) => {
   const siteName = composer?.getProjectMetadata?.()?.name ?? "";
 
-  const { addToast } = useToast();
+  const { addToast, removeToast } = useToast();
 
   // ── The suggester switch: applies at once (SA-16) ──
   const { value: suggestSaved } = useSettingsScreen(composer, (s) => s.redirects?.suggestFrom404s ?? true, true);
@@ -289,12 +289,18 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     if (!projectId) return;
     await api().delete.mutate({ id: row.id });
     setRows((current) => current.filter((r) => r.id !== row.id));
-    addToast({
+    /* Undo runs once: a toast holding focus never times out, and a second
+       Undo would post the restored rule again (409, "not saved" banner). */
+    let undone = false;
+    const toastId = addToast({
       title: `Redirect ${row.fromPath} → ${row.toUrl} deleted`,
       description: "You can undo this deletion.",
       action: {
         label: "Undo",
         onClick: () => {
+          if (undone) return;
+          undone = true;
+          removeToast(toastId);
           void (async () => {
             try {
               await api().create.mutate({
