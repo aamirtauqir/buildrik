@@ -5,7 +5,7 @@
  */
 
 import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
-import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
+import { CMS_COLLECTION_LIMIT_MAX, isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 import { cmsRecordLabel, cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
 import type { CMSContentItem } from "../../shared/types/cms";
@@ -152,7 +152,9 @@ export class RepeaterRenderer {
     const { items } = await this.composer.cms.collections.queryContent({
       collectionId: binding.collectionId,
       status: canvas || binding.status === "all" ? undefined : binding.status,
-      limit: binding.limit,
+      /* No limit is "All" (BD-08): queryContent's own default is 50, so an
+         "All" list silently stopped at 50. */
+      limit: binding.limit || CMS_COLLECTION_LIMIT_MAX,
     });
     const refs = await this.referenceTables(binding.collectionId, canvas);
     const templates = Array.from(listEl.children) as HTMLElement[];
@@ -243,7 +245,9 @@ export class RepeaterRenderer {
     const result = await this.composer.cms.collections.queryContent({
       collectionId: binding.collectionId,
       status: binding.status === "all" ? undefined : binding.status,
-      limit: binding.limit,
+      /* No limit is "All" (BD-08): queryContent's own default is 50, so an
+         "All" list silently stopped at 50. */
+      limit: binding.limit || CMS_COLLECTION_LIMIT_MAX,
     });
     const refs = await this.referenceTables(binding.collectionId, false);
 
