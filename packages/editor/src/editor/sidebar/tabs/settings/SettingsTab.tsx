@@ -450,7 +450,10 @@ export const SettingsTab: React.FC<
     if (navRef.current) navRef.current.scrollTop = navScrollRef.current;
     if (refocusEntryRef.current) {
       refocusEntryRef.current = false;
-      searchEntryRef.current?.focus();
+      /* preventScroll: the entry sits at the nav's top, and a plain focus()
+         scrolls it into view — undoing the restore above (measured live:
+         140 → 0 at 1440×732). */
+      searchEntryRef.current?.focus({ preventScroll: true });
     }
   }, [searchOpen]);
 
@@ -969,14 +972,16 @@ export const SettingsTab: React.FC<
                 {siteName}
               </div>
             </div>
-            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-3" aria-label="Settings sections">
-              {/* Owner 2026-10-04: the entry into Search Mode, where the always-on field was (6816:60270). */}
+            <div className="tw:shrink-0 tw:px-4 tw:pt-3">
+              {/* Owner 2026-10-04: the entry into Search Mode, where the always-on field was (6816:60270).
+                  Outside the scrolling nav, so it is always in reach and opening it
+                  never moves the nav scroll Search Mode gives back. */}
               <Button
                 ref={searchEntryRef}
                 type="button"
                 variant="ghost"
                 size="xs"
-                className={`${NAV_ROW} tw:mb-1 tw:shrink-0 tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]`}
+                className={`${NAV_ROW} tw:shrink-0 tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]`}
                 onClick={openSearch}
                 aria-label="Search settings"
                 data-testid="set-search-mode-open"
@@ -986,6 +991,8 @@ export const SettingsTab: React.FC<
                 </span>
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate">Search</span>
               </Button>
+            </div>
+            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-1" aria-label="Settings sections">
               <Button
                 type="button"
                 variant="ghost"

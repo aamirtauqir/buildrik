@@ -1013,6 +1013,7 @@ describe("SettingsTab — Search Mode (owner 2026-10-04, overrides 6816:60270 / 
     fireEvent.click(screen.getByTestId("set-nav-domains"));
     await waitFor(() => expect(headTitle()).toBe("Domains"));
     nav()!.scrollTop = 120;
+    const focusSpy = vi.spyOn(HTMLElement.prototype, "focus");
     openSearch();
     fireEvent.change(input(), { target: { value: "seo" } });
     fireEvent.click(screen.getByRole("button", { name: "Close search" }));
@@ -1021,6 +1022,10 @@ describe("SettingsTab — Search Mode (owner 2026-10-04, overrides 6816:60270 / 
     expect(screen.getByTestId("set-nav-domains").getAttribute("aria-current")).toBe("page");
     expect(headTitle()).toBe("Domains");
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "Search settings" }));
+    // The refocus must not scroll the nav back to its top (jsdom never scrolls on focus; the option is the contract).
+    const entryFocus = focusSpy.mock.calls.at(-1);
+    expect(entryFocus?.[0]).toEqual({ preventScroll: true });
+    focusSpy.mockRestore();
     openSearch();
     expect(input().value).toBe("");
     expect(options()).toEqual([]);
