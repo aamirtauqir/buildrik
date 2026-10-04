@@ -411,7 +411,13 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
         <CsvImportDialog
           collection={collection}
           onClose={() => setCsvImportOpen(false)}
-          onImported={() => void loadRecords(collection.id)}
+          /* DM-15: the import wrote on the server and the hydrate wrote to
+             this browser's store behind the engine; its cache still held the
+             pre-import rows, so "Imported 4 of 4" showed none of them until a
+             reload. Re-read the store, then the table. */
+          onImported={() =>
+            void Promise.resolve(composer?.cms.collections.refreshFromStorage()).then(() => loadRecords(collection.id))
+          }
         />
       ) : null}
       {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}

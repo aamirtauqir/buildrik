@@ -98,6 +98,7 @@ export function makeEngine(opts?: {
         on: vi.fn(),
         off: vi.fn(),
         initialize: vi.fn(() => Promise.resolve()),
+        refreshFromStorage: vi.fn(() => Promise.resolve()),
         getAllCollections: () => collections,
         getCollection: (id: string) => collections.find((c) => c.id === id) ?? null,
         getContentItems: vi.fn((cid: string) => Promise.resolve(items.filter((i) => i.collectionId === cid))),
