@@ -42,6 +42,7 @@ import type { ScreenProps } from "../types";
 /** The settings path the password's refusals are keyed by (BuildrikSyncProvider's column map). */
 const PASSWORD_PATH = "publishing.publishedPassword";
 const NEED_PASSWORD = "Enter a password to turn protection on";
+const BLANK_PASSWORD = "A password can't be only spaces";
 const PURPOSE =
   "Visitors must enter a password before they can see the published site. Useful for client previews and staging.";
 const QUIET_BTN = `${SET_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
@@ -88,15 +89,18 @@ export const AccessScreen: React.FC<ScreenProps> = ({
   );
 
   const dirty = enabled !== hasPassword || (enabled && password.length > 0);
-  const invalid = enabled && !hasPassword && password.trim() === "";
+  /* Turning protection on needs a password; a typed one (new, or a Change)
+     can't be only spaces. */
+  const invalidReason =
+    !enabled || password.trim() !== "" ? null : !hasPassword ? NEED_PASSWORD : password.length > 0 ? BLANK_PASSWORD : null;
 
   React.useEffect(() => {
     onDirtyChange?.(dirty);
   }, [dirty, onDirtyChange]);
 
   React.useEffect(() => {
-    registerFieldErrors?.(invalid ? { [PASSWORD_PATH]: NEED_PASSWORD } : null);
-  }, [invalid, registerFieldErrors]);
+    registerFieldErrors?.(invalidReason ? { [PASSWORD_PATH]: invalidReason } : null);
+  }, [invalidReason, registerFieldErrors]);
   React.useEffect(() => () => registerFieldErrors?.(null), [registerFieldErrors]);
 
   /* Save: the new value, or null to remove — only on an explicit change, so a
