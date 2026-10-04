@@ -39,12 +39,14 @@ vi.mock("@server/services/integrations.service", () => ({
 vi.mock("@/lib/vercel", async () => ({
   VercelApiError: (await vi.importActual<typeof import("@/lib/vercel")>("@/lib/vercel")).VercelApiError,
   addDomainToVercelProject: vi.fn(),
+  getVercelDomainConfig: vi.fn(),
+  getVercelProjectDomain: vi.fn(),
   removeDomainFromVercelProject: vi.fn(),
   resolveVercelProjectName: (site: { slug: string; vercelProjectName: string | null }) =>
     site.vercelProjectName ?? site.slug,
 }));
 
-import { addDomainToVercelProject, VercelApiError } from "@/lib/vercel";
+import { addDomainToVercelProject, getVercelDomainConfig, getVercelProjectDomain, VercelApiError } from "@/lib/vercel";
 import {
   connectDomain,
   checkDomainAvailability,
@@ -158,6 +160,70 @@ describe("connectDomain — the Add-a-domain dialog", () => {
     });
     // The answer carries the records just written — the dialog shows the real rows after.
     expect(result.dnsRecords).toEqual([{ type: "A" }]);
+  });
+
+  /* A subdomain used to get the apex pair (A @, CNAME www), which in the
+     parent zone points the parent and www.<parent> — never the subdomain. */
+  it("a subdomain gets one CNAME on itself (plus its own TXT) without a Vercel attachment", async () => {
+    connectable();
+    await connectDomain("s1", { domain: "shop.bellacucina.com", kind: "SUBDOMAIN" });
+    expect(db.dnsRecord.createMany).toHaveBeenCalledWith({
+      data: [
+        { domainId: "dom1", type: "CNAME", host: "shop", value: "cname.vercel-dns.com" },
+        { domainId: "dom1", type: "TXT", host: "_buildrick.shop", value: dnsVerificationToken("dom1") },
+      ],
+    });
+  });
+
+  /* Fixtures from the documented shapes: POST /v10/projects/{p}/domains 200
+     (apexName, verified, verification[]) and GET /v6/domains/{d}/config 200
+     (recommendedCNAME / recommendedIPv4, rank 1 preferred). */
+  it("with Vercel, a subdomain's CNAME target comes from the config endpoint's rank-1 recommendedCNAME", async () => {
+    connectable();
+    vercelConnection.mockResolvedValue({ token: "t", teamId: "team_1" });
+    vi.mocked(addDomainToVercelProject).mockResolvedValue({
+      name: "shop.bellacucina.com",
+      apexName: "bellacucina.com",
+      verified: true,
+      verification: [],
+    });
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({
+      misconfigured: true,
+      recommendedIPv4: "216.198.79.1",
+      recommendedCNAME: "d1a2b3c4.vercel-dns-017.com",
+    });
+
+    await connectDomain("s1", { domain: "shop.bellacucina.com" });
+
+    expect(getVercelDomainConfig).toHaveBeenCalledWith({ token: "t", teamId: "team_1", projectName: "bella", domain: "shop.bellacucina.com" });
+    const written = vi.mocked(db.dnsRecord.createMany).mock.calls[0][0].data as Array<{ type: string; host: string; value: string }>;
+    expect(written.filter((r) => r.type !== "TXT")).toEqual([
+      { domainId: "dom1", type: "CNAME", host: "shop", value: "d1a2b3c4.vercel-dns-017.com" },
+    ]);
+  });
+
+  it("with Vercel, an apex keeps A @ (rank-1 recommendedIPv4) + CNAME www", async () => {
+    connectable();
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    vi.mocked(addDomainToVercelProject).mockResolvedValue({
+      name: "bellacucina.com",
+      apexName: "bellacucina.com",
+      verified: true,
+      verification: [],
+    });
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({
+      misconfigured: true,
+      recommendedIPv4: "216.198.79.1",
+      recommendedCNAME: "d1a2b3c4.vercel-dns-017.com",
+    });
+
+    await connectDomain("s1", { domain: "bellacucina.com" });
+
+    const written = vi.mocked(db.dnsRecord.createMany).mock.calls[0][0].data as Array<{ type: string; host: string; value: string }>;
+    expect(written.filter((r) => r.type !== "TXT")).toEqual([
+      { domainId: "dom1", type: "A", host: "@", value: "216.198.79.1" },
+      { domainId: "dom1", type: "CNAME", host: "www", value: "d1a2b3c4.vercel-dns-017.com" },
+    ]);
   });
 
   it("defaults to PRIMARY · https on · no provider when the dialog sends only a name", async () => {

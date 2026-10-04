@@ -3,16 +3,17 @@ import { createHash } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import { addDomainToVercelProject, removeDomainFromVercelProject, resolveVercelProjectName, VercelApiError } from "@/lib/vercel";
+import {
+  addDomainToVercelProject,
+  getVercelDomainConfig,
+  removeDomainFromVercelProject,
+  resolveVercelProjectName,
+  VercelApiError,
+} from "@/lib/vercel";
 import { getActiveVercelConnection } from "@server/services/integrations.service";
 import { siteScopeWhere } from "@/server/services/permission.service";
-import { domainNameSchema, type DomainAvailability, type DomainKind, DNS_TARGETS } from "@buildrik/shared/schemas/site-detail";
-
-// Vercel's canonical targets — what a domain should point at when we have no
-// live verification records yet: the apex A record and the `www` CNAME
-// (replacing the old dead "sites.buildrik.app" host that nothing ever served).
-const VERCEL_CNAME = DNS_TARGETS.cname;
-const VERCEL_APEX_IP = DNS_TARGETS.apexIp;
+import { domainNameSchema, type DomainAvailability, type DomainKind } from "@buildrik/shared/schemas/site-detail";
+import { apexOf, expectedDnsRecords, recordFqdn, type ExpectedDnsRecord } from "@buildrik/shared/dns/records";
 
 /**
  * The `TXT _buildrick brk-verify-…` record the Add-a-domain dialog draws
@@ -45,7 +46,7 @@ export async function checkDomainDns(domainId: string, siteId: string) {
   let anyVerified = false;
   let allVerified = domain.dnsRecords.length > 0;
   for (const rec of domain.dnsRecords) {
-    const fqdn = rec.host === "@" || rec.host === "" ? domain.domain : `${rec.host}.${domain.domain}`;
+    const fqdn = recordFqdn(rec.host, apexOf(domain.domain));
     let ok = false;
     try {
       if (rec.type.toUpperCase() === "A") {
@@ -151,6 +152,43 @@ export interface ConnectDomainOptions {
   forceHttps?: boolean;
 }
 
+type VercelConnection = { token: string; teamId: string | null };
+
+/**
+ * The records a domain's owner must add, apex vs subdomain (shared
+ * `expectedDnsRecords`). With a Vercel connection the apex comes from
+ * Vercel's `apexName` and the targets from its domain config
+ * (`recommendedIPv4` / `recommendedCNAME`, rank 1); without one, or when the
+ * config read fails, the static Vercel targets and `apexOf`. Any ownership
+ * challenge Vercel issued (`verification[]`, a TXT) is added as given.
+ */
+async function instructionsFor(opts: {
+  domain: string;
+  projectName: string;
+  conn: VercelConnection | null;
+  attached: { apexName: string | null; verification: Array<{ type: string; domain: string; value: string }> } | null;
+  ownershipToken: string | null;
+}): Promise<ExpectedDnsRecord[]> {
+  let config: { recommendedIPv4: string | null; recommendedCNAME: string | null } | null = null;
+  if (opts.conn) {
+    try {
+      config = await getVercelDomainConfig({ ...opts.conn, projectName: opts.projectName, domain: opts.domain });
+    } catch (err) {
+      console.error(`[domain] Vercel config read failed for ${opts.domain}:`, err);
+    }
+  }
+  return [
+    ...expectedDnsRecords({
+      domain: opts.domain,
+      apex: opts.attached?.apexName ?? apexOf(opts.domain),
+      ipv4: config?.recommendedIPv4,
+      cname: config?.recommendedCNAME,
+      ownershipToken: opts.ownershipToken,
+    }),
+    ...(opts.attached?.verification ?? []).map((v) => ({ type: v.type.toUpperCase(), host: v.domain, value: v.value })),
+  ];
+}
+
 export async function connectDomain(siteId: string, input: ConnectDomainOptions) {
   const { domain } = input;
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, slug: true, vercelProjectName: true, deletedAt: true } });
@@ -194,9 +232,11 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
      is an integration hiccup: keep the fallback instructions, leave the domain
      PENDING, and let the dns-verify cron re-check — but log it. */
   let attached: Awaited<ReturnType<typeof addDomainToVercelProject>> | null = null;
+  let attachedWith: VercelConnection | null = null;
   try {
     const conn = await getActiveVercelConnection(site.workspaceId);
     if (conn) {
+      attachedWith = conn;
       attached = await addDomainToVercelProject({
         token: conn.token,
         teamId: conn.teamId,
@@ -221,17 +261,13 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
     },
   });
 
-  // Vercel's real verification records when it gave any, else the three
-  // records the Add-a-domain dialog draws (apex A, `www` CNAME, our
-  // `_buildrick` TXT — Clone 3737:43669).
-  const dnsRecords: Array<{ type: string; host: string; value: string }> =
-    attached && attached.verification.length > 0
-      ? attached.verification.map((v) => ({ type: v.type.toUpperCase(), host: v.domain, value: v.value }))
-      : [
-          { type: "A", host: "@", value: VERCEL_APEX_IP },
-          { type: "CNAME", host: "www", value: VERCEL_CNAME },
-          { type: "TXT", host: "_buildrick", value: dnsVerificationToken(created.id) },
-        ];
+  const dnsRecords = await instructionsFor({
+    domain,
+    projectName,
+    conn: attachedWith,
+    attached,
+    ownershipToken: dnsVerificationToken(created.id),
+  });
 
   await prisma.dnsRecord.createMany({
     data: dnsRecords.map((r) => ({ domainId: created.id, type: r.type, host: r.host, value: r.value })),

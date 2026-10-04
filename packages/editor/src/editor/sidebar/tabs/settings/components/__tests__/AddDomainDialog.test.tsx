@@ -229,3 +229,30 @@ describe("Add a domain — the two doors out", () => {
     expect(submit()).toBeDisabled();
   });
 });
+
+describe("records preview — apex vs subdomain", () => {
+  const rows = () =>
+    within(screen.getByTestId("set-dom-records"))
+      .getAllByRole("row")
+      .slice(1)
+      .map((r) => within(r).getAllByRole("cell").map((c) => c.textContent));
+
+  it("a subdomain previews ONE CNAME on itself, not the apex A @ + CNAME www", () => {
+    mount();
+    typeName("shop.bellacucina.com");
+    expect(rows()).toEqual([
+      ["CNAME", "shop", "cname.vercel-dns.com"],
+      ["TXT", "_buildrick.shop", "brk-verify-…"],
+    ]);
+  });
+
+  it("an apex keeps the frame's A @ + CNAME www", () => {
+    mount();
+    typeName("bellacucina.com");
+    expect(rows().map((r) => r.slice(0, 2))).toEqual([
+      ["A", "@"],
+      ["CNAME", "www"],
+      ["TXT", "_buildrick"],
+    ]);
+  });
+});

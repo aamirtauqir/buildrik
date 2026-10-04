@@ -348,6 +348,89 @@ export async function addDomainToVercelProject({
 }
 
 /**
+ * `GET /v9/projects/{idOrName}/domains/{domain}` — the domain as THIS project
+ * holds it. Null on 404: the domain is not on the project (never attached,
+ * removed in Vercel, or attached to a different project).
+ */
+export async function getVercelProjectDomain({
+  token,
+  teamId,
+  projectName,
+  domain,
+}: {
+  token: string;
+  teamId: string | null;
+  projectName: string;
+  domain: string;
+}): Promise<AddDomainResult | null> {
+  const res = await fetch(
+    `${VERCEL_API_BASE}/v9/projects/${encodeURIComponent(projectName)}/domains/${encodeURIComponent(domain)}${teamQueryString(teamId)}`,
+    { headers: authHeaders(token) },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const errBody = (await res.json().catch(() => ({}))) as { error?: { code?: string; message?: string } };
+    throw new VercelApiError(res.status, errBody.error?.code ?? "UNKNOWN", errBody.error?.message ?? `Vercel API ${res.status}`);
+  }
+  return parseProjectDomain(await res.json(), domain);
+}
+
+export interface VercelDomainConfig {
+  /**
+   * Vercel's own answer to "is this domain set up": per the docs, false means
+   * "configured AND we can automatically generate a TLS certificate". It is
+   * what Connected and SSL active are decided by (owner decisions Q7).
+   */
+  misconfigured: boolean;
+  /** rank-1 `recommendedIPv4` value — what an apex A record should point at. */
+  recommendedIPv4: string | null;
+  /** rank-1 `recommendedCNAME` value — what a subdomain (or www) CNAME should point at. */
+  recommendedCNAME: string | null;
+}
+
+/** The rank-1 entry of a `recommended*` list (`rank=1 is the preferred value`). */
+function preferred<T extends { rank: number }>(list: T[] | undefined): T | undefined {
+  return [...(list ?? [])].sort((a, b) => a.rank - b.rank)[0];
+}
+
+/**
+ * `GET /v6/domains/{domain}/config?projectIdOrName=` — whether the domain's
+ * DNS reaches Vercel and a certificate can be issued, plus what to point it at.
+ */
+export async function getVercelDomainConfig({
+  token,
+  teamId,
+  projectName,
+  domain,
+}: {
+  token: string;
+  teamId: string | null;
+  projectName: string;
+  domain: string;
+}): Promise<VercelDomainConfig> {
+  const query = new URLSearchParams({ projectIdOrName: projectName });
+  if (teamId) query.set("teamId", teamId);
+  const res = await fetch(`${VERCEL_API_BASE}/v6/domains/${encodeURIComponent(domain)}/config?${query}`, {
+    headers: authHeaders(token),
+  });
+  if (!res.ok) {
+    const errBody = (await res.json().catch(() => ({}))) as { error?: { code?: string; message?: string } };
+    throw new VercelApiError(res.status, errBody.error?.code ?? "UNKNOWN", errBody.error?.message ?? `Vercel API ${res.status}`);
+  }
+  const data = (await res.json()) as {
+    misconfigured?: boolean;
+    recommendedIPv4?: Array<{ rank: number; value: string[] }>;
+    recommendedCNAME?: Array<{ rank: number; value: string }>;
+  };
+  return {
+    // Absent is not proof of a working setup: only an explicit false is.
+    misconfigured: data.misconfigured !== false,
+    recommendedIPv4: preferred(data.recommendedIPv4)?.value?.[0] ?? null,
+    recommendedCNAME: preferred(data.recommendedCNAME)?.value ?? null,
+  };
+}
+
+/**
  * Detach a custom domain from a Vercel project. Called when a user removes a
  * domain in Buildrik — without it the domain stays attached to the Vercel
  * project (an orphan) even though our DB row is gone. A 404 means it was

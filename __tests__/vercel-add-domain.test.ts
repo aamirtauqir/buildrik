@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { addDomainToVercelProject, VercelApiError } from "@/lib/vercel";
+import { addDomainToVercelProject, getVercelDomainConfig, VercelApiError } from "@/lib/vercel";
 
 const realFetch = global.fetch;
 
@@ -71,5 +71,48 @@ describe("addDomainToVercelProject", () => {
     await expect(
       addDomainToVercelProject({ token: "t", teamId: null, projectName: "p", domain: "x.com" }),
     ).rejects.toBeInstanceOf(VercelApiError);
+  });
+});
+
+/* GET /v6/domains/{domain}/config — required fields per the docs:
+   acceptedChallenges, configuredBy, misconfigured, recommendedCNAME[{rank,value}],
+   recommendedIPv4[{rank,value[]}] (rank 1 preferred). */
+describe("getVercelDomainConfig", () => {
+  it("reads misconfigured and the rank-1 recommendations, scoped to the project", async () => {
+    mockFetch(200, {
+      acceptedChallenges: ["http-01"],
+      configuredBy: null,
+      misconfigured: true,
+      recommendedCNAME: [
+        { rank: 2, value: "cname.vercel-dns.com" },
+        { rank: 1, value: "d1a2b3c4.vercel-dns-017.com" },
+      ],
+      recommendedIPv4: [
+        { rank: 1, value: ["216.198.79.1"] },
+        { rank: 2, value: ["76.76.21.21"] },
+      ],
+    });
+    const cfg = await getVercelDomainConfig({ token: "t", teamId: "team_1", projectName: "buildrik-site-x", domain: "shop.x.com" });
+    const url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+    expect(url).toContain("/v6/domains/shop.x.com/config?");
+    expect(url).toContain("projectIdOrName=buildrik-site-x");
+    expect(url).toContain("teamId=team_1");
+    expect(cfg).toEqual({
+      misconfigured: true,
+      recommendedIPv4: "216.198.79.1",
+      recommendedCNAME: "d1a2b3c4.vercel-dns-017.com",
+    });
+  });
+
+  it("a configured domain (misconfigured: false, configuredBy CNAME)", async () => {
+    mockFetch(200, {
+      acceptedChallenges: ["dns-01", "http-01"],
+      configuredBy: "CNAME",
+      misconfigured: false,
+      recommendedCNAME: [{ rank: 1, value: "cname.vercel-dns.com" }],
+      recommendedIPv4: [{ rank: 1, value: ["76.76.21.21"] }],
+    });
+    const cfg = await getVercelDomainConfig({ token: "t", teamId: null, projectName: "p", domain: "x.com" });
+    expect(cfg.misconfigured).toBe(false);
   });
 });
