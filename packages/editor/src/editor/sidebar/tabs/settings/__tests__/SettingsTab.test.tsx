@@ -1063,6 +1063,38 @@ describe("SettingsTab — Search Mode (owner 2026-10-04, overrides 6816:60270 / 
     }
   });
 
+  /* QA 2026-10-05: a screen result (no field) left focus on <body> — the
+     field it was typed in had gone with Search Mode. */
+  it("a screen result lands focus on that screen's nav row", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    openSearch();
+    fireEvent.change(input(), { target: { value: "dns" } });
+    expect(options()[0]).toBe("domains");
+    fireEvent.keyDown(input(), { key: "Enter" });
+    await waitFor(() => expect(headTitle()).toBe("Domains"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByTestId("set-nav-domains")));
+  });
+
+  /* QA 2026-10-05: a field result raised the Unsaved guard, Keep editing was
+     pressed — and the field was still "pending": the next plain visit to its
+     screen scrolled to it and stole focus. */
+  it("a result abandoned at the guard (Keep editing) is dropped, and focus comes back to the nav", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
+    openSearch();
+    fireEvent.change(input(), { target: { value: "meta title" } });
+    fireEvent.keyDown(input(), { key: "Enter" });
+    expect(screen.getByTestId("set-unsaved")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByTestId("set-nav-general")));
+    fireEvent.click(screen.getByTestId("set-foot-discard"));
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO"));
+    await nextFrame();
+    await nextFrame();
+    expect(document.activeElement).not.toBe(document.getElementById("seo-meta-title"));
+  });
+
   it("Escape closes Search Mode — from the field or the ✕ — never Settings", () => {
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
