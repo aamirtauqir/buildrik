@@ -271,7 +271,9 @@ function instructionsFrom(opts: {
 }
 
 export async function connectDomain(siteId: string, input: ConnectDomainOptions) {
-  const { domain } = input;
+  // DNS names are case-insensitive and `bella.com.` is `bella.com`; the schema
+  // accepts both spellings, so one name is stored — and refused — one way.
+  const domain = input.domain.trim().toLowerCase().replace(/\.$/, "");
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, slug: true, vercelProjectName: true, deletedAt: true } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
@@ -284,7 +286,7 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
   const currentDomainCount = await prisma.domain.count({ where: { site: { workspaceId: site.workspaceId } } });
   if (maxDomains > 0 && currentDomainCount >= maxDomains) throw new Error("DOMAIN_LIMIT");
 
-  const existing = await prisma.domain.findFirst({ where: { domain } });
+  const existing = await prisma.domain.findFirst({ where: { domain: { equals: domain, mode: "insensitive" } } });
   if (existing) throw new Error("DOMAIN_IN_USE");
 
   // The domain lives on this project from now on — pin it, so a slug change

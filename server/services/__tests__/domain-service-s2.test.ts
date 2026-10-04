@@ -270,6 +270,22 @@ describe("connectDomain — the Add-a-domain dialog", () => {
     await expect(connectDomain("s1", { domain: "bellacucina.com" })).rejects.toThrow("DOMAIN_IN_USE");
     expect(db.domain.create).not.toHaveBeenCalled();
   });
+
+  /* QA 2026-10-05: the schema accepts `Bella.COM` and `bella.com.`, and the
+     in-use check was an exact match — so a case or trailing-dot variant of a
+     domain another site holds got its own row and its own Vercel attach. DNS
+     names are case-insensitive; one name is one row. */
+  it("stores the name lowercased without a trailing dot, and checks in-use case-insensitively", async () => {
+    connectable();
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    vi.mocked(addDomainToVercelProject).mockResolvedValue({ name: "bellacucina.com", apexName: "bellacucina.com", verified: false, verification: [] });
+
+    await connectDomain("s1", { domain: "BellaCucina.COM." });
+
+    expect(db.domain.findFirst).toHaveBeenCalledWith({ where: { domain: { equals: "bellacucina.com", mode: "insensitive" } } });
+    expect(addDomainToVercelProject).toHaveBeenCalledWith(expect.objectContaining({ domain: "bellacucina.com" }));
+    expect(db.domain.create).toHaveBeenCalledWith({ data: expect.objectContaining({ domain: "bellacucina.com" }) });
+  });
 });
 
 describe("checkDomainAvailability — the dialog's tag", () => {
