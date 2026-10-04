@@ -153,7 +153,8 @@ describe("SEO › Indexing — 8135:214820 / 8135:215066", () => {
     expect(input("seo-canonical").value).toBe("https://acme.test");
     const robots = document.getElementById("seo-robots") as HTMLTextAreaElement;
     expect(robots.value).toBe("");
-    expect(robots.placeholder).toBe("User-agent: *\nAllow: /\nSitemap: https://acme.com/sitemap.xml");
+    // The typed canonical (acme.test) wins over the verified primary (acme.com), as at publish.
+    expect(robots.placeholder).toBe("User-agent: *\nAllow: /\nSitemap: https://acme.test/sitemap.xml");
     expect(screen.getByText("Leave blank to use the generated default shown above.")).toBeInTheDocument();
   });
 
@@ -271,9 +272,15 @@ describe("SEO — what Save sends", () => {
 });
 
 describe("robotsPreview / sitemapOrigin — pure", () => {
-  it("prefers the primary verified domain, then any verified, then the published origin", () => {
+  /* The publish worker's own order (resolveSiteOrigin over
+     verifiedPrimaryDomain, lib/publish-files.ts): typed canonical, then the
+     VERIFIED PRIMARY, then the deploy host. A verified non-primary is not the
+     sitemap's host — the preview used to say it was (QA 2026-10-05). */
+  it("prefers the typed canonical, then the verified primary, then the published origin — like the worker", () => {
     expect(sitemapOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }, { domain: "a.com", status: "VERIFIED", isPrimary: true }], null)).toBe("https://a.com");
-    expect(sitemapOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }], null)).toBe("https://b.com");
+    expect(sitemapOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }], null)).toBeNull();
+    expect(sitemapOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }], "https://x.vercel.app")).toBe("https://x.vercel.app");
+    expect(sitemapOrigin([{ domain: "a.com", status: "VERIFIED", isPrimary: true }], null, "www.typed.com/")).toBe("https://www.typed.com");
     expect(sitemapOrigin([{ domain: "p.com", status: "PENDING", isPrimary: true }], "https://x.vercel.app/path")).toBe("https://x.vercel.app");
     expect(sitemapOrigin([], "not a url")).toBeNull();
     expect(sitemapOrigin([], null)).toBeNull();
