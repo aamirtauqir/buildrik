@@ -42,7 +42,7 @@ import { devWarn } from "../../shared/utils/devLogger";
 import { FormspreeInjector } from "./FormspreeInjector";
 import { SEOInjector, resolveLanguage } from "./SEOInjector";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
-import { SitemapGenerator } from "./SitemapGenerator";
+import { buildSitemapXml } from "@buildrik/shared/seo/sitemap";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./interactionRuntime";
@@ -162,7 +162,7 @@ function hideRulesFor(selector: string, styles: Record<string, string>): string[
  * them. Falling back to the first page keeps the deployed site answering at its
  * own root, which is the whole point of publishing it.
  */
-export function resolveHomePageId(pages: PageData[]): string | undefined {
+export function resolveHomePageId(pages: ReadonlyArray<Pick<PageData, "id" | "isHome">>): string | undefined {
   return (pages.find((p) => p.isHome) ?? pages[0])?.id;
 }
 
@@ -173,7 +173,7 @@ export function resolveHomePageId(pages: PageData[]): string | undefined {
  * name (`pageTemplatePath`, matched against the publish payload's paths by
  * `appendDynamicPagesToPublish`), so both read it from here.
  */
-export function pageFileNames(pages: PageData[]): Map<string, string> {
+export function pageFileNames(pages: ReadonlyArray<Pick<PageData, "id" | "slug" | "isHome">>): Map<string, string> {
   const homeId = resolveHomePageId(pages);
   const used = new Set<string>(["index.html"]);
   return new Map(
@@ -872,10 +872,13 @@ export class ExportEngine {
 
     // Add sitemap if requested and baseUrl is provided
     if (options.includeSitemap && options.baseUrl) {
-      const generator = new SitemapGenerator(options.baseUrl);
+      /* The publish worker's own builder, over the files this export wrote: a
+         page's noindex is read from its emitted robots meta, and each loc is
+         the served file name through pageCanonicalUrl. */
+      const written = files.filter((f) => f.type === "html").map((f) => ({ path: f.name, html: f.content }));
       files.push({
         name: "sitemap.xml",
-        content: generator.generate(pages, this.pageHrefs),
+        content: buildSitemapXml(options.baseUrl, written),
         type: "xml",
       });
     }

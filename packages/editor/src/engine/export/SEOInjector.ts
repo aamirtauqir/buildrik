@@ -7,18 +7,8 @@
  */
 
 import type { PageSEO, SiteSEO, PageData } from "../../shared/types";
-import { slugify } from "../../shared/utils/helpers/string";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
 import { SOCIAL_NETWORKS } from "@buildrik/shared/schemas/site-detail";
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-export interface SEOInjectorOptions {
-  /** Base URL for the site (e.g., "https://example.com") */
-  baseUrl?: string;
-}
 
 // ============================================================================
 // SEO INJECTOR
@@ -32,13 +22,33 @@ export interface SEOInjectorOptions {
  * typed over it. One precedence, both paths.
  */
 export function resolvePageTitle(
-  page: PageData,
+  page: Pick<PageData, "name">,
   pageSEO?: PageSEO,
   pageSettings?: { title?: string },
   siteSEO?: SiteSEO
 ): string {
-  const own = pageSEO?.metaTitle || pageSettings?.title || page.name || "Untitled";
-  return applyTitleTemplate(own, siteSEO);
+  const own = pageSEO?.metaTitle || pageSettings?.title;
+  if (own) return applyTitleTemplate(own, siteSEO);
+  /* A page with no title of its own inherits the site's default title
+     (Settings › SEO › Defaults — owner decision Q4, 2026-10-04). That value is
+     already a whole title, so the template does not wrap it a second time.
+     Without one, the page name stands in, as before. */
+  const siteDefault = siteSEO?.metaTitle?.trim();
+  if (siteDefault) return siteDefault;
+  return applyTitleTemplate(page.name || "Untitled", siteSEO);
+}
+
+/**
+ * The description a page ships with: its own, else the site's default from
+ * Settings › SEO › Defaults (owner decision Q4). A page without one used to
+ * ship no description at all while the Defaults card held one.
+ */
+export function resolvePageDescription(
+  pageSEO?: PageSEO,
+  pageSettings?: { description?: string },
+  siteSEO?: SiteSEO
+): string {
+  return pageSEO?.metaDescription || pageSettings?.description || siteSEO?.metaDescription?.trim() || "";
 }
 
 /**
@@ -88,12 +98,6 @@ function robotsDirectives(pageSEO?: PageSEO): string {
 }
 
 export class SEOInjector {
-  private options: SEOInjectorOptions;
-
-  constructor(options: SEOInjectorOptions = {}) {
-    this.options = options;
-  }
-
   /**
    * Generate all SEO meta tags for a page
    */
@@ -121,12 +125,17 @@ export class SEOInjector {
     const title =
       overrides?.title?.trim() || resolvePageTitle(page, pageSEO, pageSettings, siteSEO);
     const description =
-      overrides?.description?.trim() || this.getDescription(pageSEO, pageSettings);
+      overrides?.description?.trim() || resolvePageDescription(pageSEO, pageSettings, siteSEO);
     const ogImage = pageSEO?.ogImage || siteSEO?.defaultOgImage || "";
     const ogTitle = pageSEO?.ogTitle || title;
     const ogDescription = pageSEO?.ogDescription || description;
     const twitterCard = pageSEO?.twitterCard || "summary_large_image";
-    const canonicalUrl = pageSEO?.canonicalUrl || this.getPageUrl(page);
+    /* Only the page's own override is emitted here. The default canonical is
+       built on the server from the URL the deploy serves (`pageCanonicalUrl`,
+       packages/shared/seo/urls.ts) — the editor does not know the domain. A
+       second builder here produced `/<slug>` while the deploy serves
+       `/<slug>.html`, and no export ever passed it a base URL. */
+    const canonicalUrl = pageSEO?.canonicalUrl || "";
     const language = resolveLanguage(siteSEO);
 
     const tags: string[] = [];
@@ -213,7 +222,7 @@ export class SEOInjector {
         sameAs,
       };
       if (siteSEO?.siteName) org.name = siteSEO.siteName;
-      if (canonicalUrl) org.url = this.options.baseUrl || canonicalUrl;
+      if (canonicalUrl) org.url = canonicalUrl;
       const orgLd = JSON.stringify(org).replace(/<\/script/gi, "<\\/script");
       tags.push(`<script type="application/ld+json">${orgLd}</script>`);
     }
@@ -242,20 +251,6 @@ export class SEOInjector {
        six, so an Instagram, YouTube or GitHub profile never reached a page. */
     return SOCIAL_NETWORKS.map((network) => (links[network] ?? "").trim())
       .filter((v) => /^https?:\/\//i.test(v));
-  }
-
-  private getDescription(pageSEO?: PageSEO, pageSettings?: { description?: string }): string {
-    return pageSEO?.metaDescription || pageSettings?.description || "";
-  }
-
-  private getPageUrl(page: PageData): string {
-    if (!this.options.baseUrl) return "";
-
-    // Reuse the shared slugify so the fallback strips non-URL-safe characters
-    // (&, /, !, ?, …). The old inline `replace(/\s+/g, "-")` only collapsed
-    // whitespace and leaked punctuation into an invalid canonical URL.
-    const slug = page.slug || slugify(page.name);
-    return page.isHome ? this.options.baseUrl : `${this.options.baseUrl}/${slug}`;
   }
 
   private escape(str: string): string {

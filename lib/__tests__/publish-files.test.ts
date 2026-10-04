@@ -103,6 +103,54 @@ describe("buildDeployFiles", () => {
     expect(byName(dressed, "index.html")).toContain("Made with Buildrick");
   });
 
+  /* Owner decision Q10 (2026-10-04): with no typed canonical, canonicals
+     default to the verified PRIMARY custom domain — never *.vercel.app. A site
+     in exactly that state used to ship no canonical at all. */
+  describe("canonical default — verified primary domain", () => {
+    const vercelOrigin = "https://buildrik-site-bella.vercel.app";
+
+    it("a verified primary domain with no typed canonical gets per-page canonicals, og:url and sitemap on that domain", () => {
+      const files = build({
+        canonicalUrl: null,
+        origin: "https://bellacucina.com",
+        domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "VERIFIED" }],
+      });
+      expect(byName(files, "index.html")).toContain('<link rel="canonical" href="https://bellacucina.com/">');
+      expect(byName(files, "about.html")).toContain('<link rel="canonical" href="https://bellacucina.com/about.html">');
+      expect(byName(files, "about.html")).toContain('<meta property="og:url" content="https://bellacucina.com/about.html">');
+      expect(byName(files, "sitemap.xml")).toContain("<loc>https://bellacucina.com/about.html</loc>");
+    });
+
+    it("a typed canonical still wins over the primary domain", () => {
+      const files = build({
+        canonicalUrl: "https://www.bellacucina.com",
+        domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "VERIFIED" }],
+      });
+      expect(byName(files, "about.html")).toContain('<link rel="canonical" href="https://www.bellacucina.com/about.html">');
+    });
+
+    it("never canonicalises to *.vercel.app — no custom domain means no canonical (sitemap may still list the vercel host)", () => {
+      const files = build({ canonicalUrl: null, origin: vercelOrigin, domains: [] });
+      expect(byName(files, "about.html")).not.toContain("canonical");
+      expect(byName(files, "about.html")).not.toContain("og:url");
+    });
+
+    it("an unverified primary, or a verified non-primary, is not a canonical", () => {
+      const pending = build({
+        canonicalUrl: null,
+        origin: vercelOrigin,
+        domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "PENDING" }],
+      });
+      expect(byName(pending, "about.html")).not.toContain("canonical");
+      const notPrimary = build({
+        canonicalUrl: null,
+        origin: vercelOrigin,
+        domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: false, status: "VERIFIED" }],
+      });
+      expect(byName(notPrimary, "about.html")).not.toContain("canonical");
+    });
+  });
+
   it("emits no canonical, and no sitemap, when there is no origin at all", () => {
     const files = build({ origin: null, canonicalUrl: null });
     expect(files.map((f) => f.file)).not.toContain("sitemap.xml");
@@ -122,7 +170,7 @@ describe("buildDeployFiles — vercel.json", () => {
 
   it("ships no vercel.json when the site has no redirects, no redirect domains and no headers", () => {
     expect(build().map((f) => f.file)).not.toContain("vercel.json");
-    expect(vercelJson({ domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true }] })).toBeNull();
+    expect(vercelJson({ domains: [{ domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "VERIFIED" }] })).toBeNull();
     expect(vercelJson({ headers: headers({ cspPolicy: "   ", hstsMaxAge: 0, xFrameOptions: "" }) })).toBeNull();
   });
 
@@ -146,9 +194,9 @@ describe("buildDeployFiles — vercel.json", () => {
   it("sends a REDIRECT-kind domain to the primary with a host rule, carrying the path", () => {
     const json = vercelJson({
       domains: [
-        { domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true },
-        { domain: "bella-cucina.co.uk", kind: "REDIRECT", isPrimary: false },
-        { domain: "menu.bellacucina.com", kind: "SUBDOMAIN", isPrimary: false },
+        { domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "VERIFIED" },
+        { domain: "bella-cucina.co.uk", kind: "REDIRECT", isPrimary: false, status: "VERIFIED" },
+        { domain: "menu.bellacucina.com", kind: "SUBDOMAIN", isPrimary: false, status: "VERIFIED" },
       ],
     });
     expect(json).toEqual({
@@ -164,16 +212,16 @@ describe("buildDeployFiles — vercel.json", () => {
   });
 
   it("writes no host rule without a primary, and never one that points the primary at itself", () => {
-    expect(vercelJson({ domains: [{ domain: "bella-cucina.co.uk", kind: "REDIRECT", isPrimary: false }] })).toBeNull();
-    expect(vercelJson({ domains: [{ domain: "bellacucina.com", kind: "REDIRECT", isPrimary: true }] })).toBeNull();
+    expect(vercelJson({ domains: [{ domain: "bella-cucina.co.uk", kind: "REDIRECT", isPrimary: false, status: "VERIFIED" }] })).toBeNull();
+    expect(vercelJson({ domains: [{ domain: "bellacucina.com", kind: "REDIRECT", isPrimary: true, status: "VERIFIED" }] })).toBeNull();
   });
 
   it("lists the row rules before the host rules", () => {
     const json = vercelJson({
       redirects: [rule("/old-menu", "/menu")],
       domains: [
-        { domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true },
-        { domain: "bella-cucina.co.uk", kind: "REDIRECT", isPrimary: false },
+        { domain: "bellacucina.com", kind: "PRIMARY", isPrimary: true, status: "VERIFIED" },
+        { domain: "bella-cucina.co.uk", kind: "REDIRECT", isPrimary: false, status: "VERIFIED" },
       ],
     });
     expect((json?.redirects as Array<{ source: string }>).map((r) => r.source)).toEqual(["/old-menu", "/(.*)"]);

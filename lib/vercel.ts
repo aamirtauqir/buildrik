@@ -270,24 +270,51 @@ export interface VercelDomainVerification {
   reason?: string;
 }
 
+/**
+ * A project domain, as `POST /v10/projects/{idOrName}/domains` and
+ * `GET /v9/projects/{idOrName}/domains/{domain}` both return it (the docs'
+ * required fields: name, apexName, projectId, verified; plus verification[]).
+ */
 export interface AddDomainResult {
   name: string;
-  /** True once Vercel can serve the domain (DNS points at Vercel). */
+  /** The registrable apex Vercel derived for this name (`shop.example.com` → `example.com`). */
+  apexName: string | null;
+  /**
+   * Ownership on this project. NOT "DNS points at Vercel" — that is the
+   * config endpoint's `misconfigured` (getVercelDomainConfig).
+   */
   verified: boolean;
-  /** Records the user must add at their DNS provider (when not yet verified). */
+  /** The TXT ownership challenge(s), present while `verified` is false. */
   verification: VercelDomainVerification[];
+}
+
+function parseProjectDomain(data: {
+  name?: string;
+  apexName?: string;
+  verified?: boolean;
+  verification?: VercelDomainVerification[];
+}, domain: string): AddDomainResult {
+  return {
+    name: data.name ?? domain,
+    apexName: data.apexName ?? null,
+    verified: Boolean(data.verified),
+    verification: data.verification ?? [],
+  };
 }
 
 /**
  * Attach a custom domain to a Vercel project so the project actually serves it.
  * Without this call a "connected" domain in our DB resolved to nothing — the
  * DNS instructions pointed at a host Vercel was never told to route. Returns
- * Vercel's verification records (TXT/CNAME) for the user to add.
+ * Vercel's verification records (TXT) for the user to add.
  *
- * `409 domain_already_in_use` is treated as success (idempotent re-connect):
- * the domain is already attached to this project.
+ * A 409 is NOT success. Per the endpoint's docs it means "The domain is
+ * already assigned to another Vercel project" (or to another project on this
+ * account, or is not allowed). It used to be mapped to `verified: true`, so a
+ * domain serving someone else's project showed Connected here. It now throws
+ * like every other non-2xx; the service names it DOMAIN_ATTACHED_ELSEWHERE.
  *
- * Throws VercelApiError on other non-2xx responses.
+ * Throws VercelApiError on any non-2xx response.
  */
 export async function addDomainToVercelProject({
   token,
@@ -314,22 +341,92 @@ export async function addDomainToVercelProject({
       error?: { code?: string; message?: string };
     };
     const code = errBody.error?.code ?? "UNKNOWN";
-    // Already attached → idempotent success.
-    if (res.status === 409 || code === "domain_already_in_use") {
-      return { name: domain, verified: true, verification: [] };
-    }
     throw new VercelApiError(res.status, code, errBody.error?.message ?? `Vercel API ${res.status}`);
   }
 
+  return parseProjectDomain(await res.json(), domain);
+}
+
+/**
+ * `GET /v9/projects/{idOrName}/domains/{domain}` — the domain as THIS project
+ * holds it. Null on 404: the domain is not on the project (never attached,
+ * removed in Vercel, or attached to a different project).
+ */
+export async function getVercelProjectDomain({
+  token,
+  teamId,
+  projectName,
+  domain,
+}: {
+  token: string;
+  teamId: string | null;
+  projectName: string;
+  domain: string;
+}): Promise<AddDomainResult | null> {
+  const res = await fetch(
+    `${VERCEL_API_BASE}/v9/projects/${encodeURIComponent(projectName)}/domains/${encodeURIComponent(domain)}${teamQueryString(teamId)}`,
+    { headers: authHeaders(token) },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const errBody = (await res.json().catch(() => ({}))) as { error?: { code?: string; message?: string } };
+    throw new VercelApiError(res.status, errBody.error?.code ?? "UNKNOWN", errBody.error?.message ?? `Vercel API ${res.status}`);
+  }
+  return parseProjectDomain(await res.json(), domain);
+}
+
+export interface VercelDomainConfig {
+  /**
+   * Vercel's own answer to "is this domain set up": per the docs, false means
+   * "configured AND we can automatically generate a TLS certificate". It is
+   * what Connected and SSL active are decided by (owner decisions Q7).
+   */
+  misconfigured: boolean;
+  /** rank-1 `recommendedIPv4` value — what an apex A record should point at. */
+  recommendedIPv4: string | null;
+  /** rank-1 `recommendedCNAME` value — what a subdomain (or www) CNAME should point at. */
+  recommendedCNAME: string | null;
+}
+
+/** The rank-1 entry of a `recommended*` list (`rank=1 is the preferred value`). */
+function preferred<T extends { rank: number }>(list: T[] | undefined): T | undefined {
+  return [...(list ?? [])].sort((a, b) => a.rank - b.rank)[0];
+}
+
+/**
+ * `GET /v6/domains/{domain}/config?projectIdOrName=` — whether the domain's
+ * DNS reaches Vercel and a certificate can be issued, plus what to point it at.
+ */
+export async function getVercelDomainConfig({
+  token,
+  teamId,
+  projectName,
+  domain,
+}: {
+  token: string;
+  teamId: string | null;
+  projectName: string;
+  domain: string;
+}): Promise<VercelDomainConfig> {
+  const query = new URLSearchParams({ projectIdOrName: projectName });
+  if (teamId) query.set("teamId", teamId);
+  const res = await fetch(`${VERCEL_API_BASE}/v6/domains/${encodeURIComponent(domain)}/config?${query}`, {
+    headers: authHeaders(token),
+  });
+  if (!res.ok) {
+    const errBody = (await res.json().catch(() => ({}))) as { error?: { code?: string; message?: string } };
+    throw new VercelApiError(res.status, errBody.error?.code ?? "UNKNOWN", errBody.error?.message ?? `Vercel API ${res.status}`);
+  }
   const data = (await res.json()) as {
-    name?: string;
-    verified?: boolean;
-    verification?: VercelDomainVerification[];
+    misconfigured?: boolean;
+    recommendedIPv4?: Array<{ rank: number; value: string[] }>;
+    recommendedCNAME?: Array<{ rank: number; value: string }>;
   };
   return {
-    name: data.name ?? domain,
-    verified: Boolean(data.verified),
-    verification: data.verification ?? [],
+    // Absent is not proof of a working setup: only an explicit false is.
+    misconfigured: data.misconfigured !== false,
+    recommendedIPv4: preferred(data.recommendedIPv4)?.value?.[0] ?? null,
+    recommendedCNAME: preferred(data.recommendedCNAME)?.value ?? null,
   };
 }
 

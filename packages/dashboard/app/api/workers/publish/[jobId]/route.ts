@@ -4,7 +4,7 @@ import { deliverWebhook } from "@/server/services/webhook.service";
 import { prisma } from "@lib/prisma";
 import { resolveVercelProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
-import { buildDeployFiles } from "@lib/publish-files";
+import { buildDeployFiles, verifiedPrimaryDomain } from "@lib/publish-files";
 import { planFormWiring } from "@lib/publish-forms";
 import { getPublishedFormSettings, recordPublishedForms } from "@server/services/form-submission.service";
 import { wireSliders } from "@lib/publish-sliders";
@@ -307,7 +307,7 @@ async function runVercelDeployJob(
       orderBy: { createdAt: "asc" },
       select: { fromPath: true, toUrl: true, type: true, matchQuery: true },
     }),
-    prisma.domain.findMany({ where: { siteId }, select: { domain: true, kind: true, isPrimary: true } }),
+    prisma.domain.findMany({ where: { siteId }, select: { domain: true, kind: true, isPrimary: true, status: true } }),
   ]);
 
   // Enforce the published-site password on the live URL via Vercel deployment
@@ -332,10 +332,6 @@ async function runVercelDeployJob(
   // this deploy will land on, and that is derived from the project name.
   const projectName = resolveVercelProjectName(site);
   if (!site.vercelProjectName) await assertProjectNameFree(siteId, projectName);
-  const verifiedDomain = await prisma.domain.findFirst({
-    where: { siteId, status: "VERIFIED" },
-    select: { domain: true },
-  });
 
   /* Forms: point every actionless one at the public endpoint and record it.
      The endpoint, its validation, its rate limit and the Submissions tab were
@@ -365,7 +361,7 @@ async function runVercelDeployJob(
     pages: slidedPages,
     origin: resolveSiteOrigin({
       canonicalUrl: site.canonicalUrl,
-      verifiedDomain: verifiedDomain?.domain ?? null,
+      verifiedDomain: verifiedPrimaryDomain(domains),
       vercelProjectName: projectName,
     }),
     icons: { favicon: site.favicon, touchIcon: site.touchIcon, ogImage: site.ogImage },
