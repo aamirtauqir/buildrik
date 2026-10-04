@@ -134,3 +134,24 @@ describe("rich text keeps the shared allow-list (PD-1, DM-10)", () => {
     expect(stored.name).toBe("plain");
   });
 });
+
+describe("unique-constraint answers (DM-07)", () => {
+  const base = { siteId: "s1", name: "Blog", slug: "blog", fields: [] };
+  it("a slug another live collection holds → CONFLICT SLUG_TAKEN:<its id>, not a raw 500", async () => {
+    mocks.colFindUnique.mockResolvedValueOnce(null);
+    mocks.colCreate.mockRejectedValueOnce(Object.assign(new Error("Unique constraint failed"), { code: "P2002", meta: { target: ["siteId", "slug"] } }));
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c-server" });
+    await expect(upsertCollection("s1", { ...base, id: "c-local" })).rejects.toMatchObject({ code: "CONFLICT", message: "SLUG_TAKEN:c-server" });
+  });
+
+  it("a create that raced itself on the id becomes the update of the row it lost to", async () => {
+    mocks.colFindUnique
+      .mockResolvedValueOnce(null) // first look: not there yet
+      .mockResolvedValueOnce({ siteId: "s1", deletedAt: null }) // retry: there now
+      .mockResolvedValueOnce({ id: "c1", name: "Blog" }); // returned row
+    mocks.colCreate.mockRejectedValueOnce(Object.assign(new Error("Unique constraint failed"), { code: "P2002", meta: { target: ["id"] } }));
+    mocks.colUpdateMany.mockResolvedValueOnce({ count: 1 });
+    await expect(upsertCollection("s1", { ...base, id: "c1" })).resolves.toMatchObject({ id: "c1" });
+    expect(mocks.colUpdateMany).toHaveBeenCalledTimes(1);
+  });
+});

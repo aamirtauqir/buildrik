@@ -2,7 +2,7 @@ import DOMPurify from "isomorphic-dompurify";
 import { prisma } from "@/lib/prisma";
 import { parseCsvText } from "@/lib/csv";
 import { sanitizeGeneratedPageHtml } from "@/lib/sanitize-blocks";
-import type { Prisma } from "@prisma/client";
+import type { CmsCollection, Prisma } from "@prisma/client";
 import type {
   UpsertCollectionInput,
   UpsertEntryInput,
@@ -180,7 +180,41 @@ async function assertFresh(
   return expected ?? row.updatedAt;
 }
 
-export async function upsertCollection(siteId: string, input: UpsertCollectionInput) {
+/** A unique-constraint refusal (Prisma P2002) and the column(s) it names. */
+function uniqueViolation(e: unknown): string | null {
+  const err = e as { code?: unknown; meta?: { target?: unknown } } | null;
+  return err?.code === "P2002" ? String(err.meta?.target ?? "") : null;
+}
+
+/**
+ * DM-07: a create that meets a unique constraint is answered, not left as a
+ * raw 500 the client retries forever (a Prisma stack reached the browser,
+ * RT-11). Two cases:
+ *  - the id: the same create raced itself (concurrent mirrors of one new
+ *    collection) — the row exists now, so this write is an update of it;
+ *  - the slug: another collection of this site already has it (made on
+ *    another device) — CONFLICT naming that collection's id, which the
+ *    client adopts (`SLUG_TAKEN:<id>`).
+ */
+async function createCollectionRow(siteId: string, input: UpsertCollectionInput, data: Prisma.CmsCollectionUncheckedCreateInput): Promise<CmsCollection | null> {
+  try {
+    return await prisma.cmsCollection.create({ data });
+  } catch (e) {
+    const target = uniqueViolation(e);
+    if (target === null) throw e;
+    if (/slug/i.test(target)) {
+      const owner = await prisma.cmsCollection.findFirst({
+        where: { siteId, slug: input.slug, deletedAt: null },
+        select: { id: true },
+      });
+      throw new CmsError("CONFLICT", `SLUG_TAKEN:${owner?.id ?? ""}`);
+    }
+    if (input.id) return upsertCollection(siteId, { ...input, expectedUpdatedAt: undefined });
+    throw e;
+  }
+}
+
+export async function upsertCollection(siteId: string, input: UpsertCollectionInput): Promise<CmsCollection | null> {
   /* The home page is index.html; a collection bound to it would emit
      {field} tokens at the site root (BD-04). The picker (DynamicPagesPane)
      hides it too — refuse here as a defence in depth. */
@@ -242,11 +276,11 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
       await touchCmsEdited(siteId);
       return prisma.cmsCollection.findUnique({ where: { id: input.id } });
     }
-    const created = await prisma.cmsCollection.create({ data: { id: input.id, siteId, ...data } });
+    const created = await createCollectionRow(siteId, input, { id: input.id, siteId, ...data });
     await touchCmsEdited(siteId);
     return created;
   }
-  const created = await prisma.cmsCollection.create({ data: { siteId, ...data } });
+  const created = await createCollectionRow(siteId, input, { siteId, ...data });
   await touchCmsEdited(siteId);
   return created;
 }

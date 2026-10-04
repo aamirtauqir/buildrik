@@ -699,7 +699,15 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
         else void Storage.deleteCollection(c.id);
         announceGone("collection", c.id, e);
       },
-      conflict: () =>
+      conflict: (e) => {
+        /* DM-07: the slug is another collection's on the server (made on
+           another device) — adopt that collection rather than ask whose copy
+           wins: they are two collections, not two versions of one. */
+        const taken = /SLUG_TAKEN:(\S*)/.exec(e instanceof Error ? e.message : "");
+        if (taken) {
+          void adoptServerCollection(siteId, c, taken[1]);
+          return;
+        }
         raiseConflict({
           kind: "collection",
           id: c.id,
@@ -708,7 +716,8 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
             return syncCollectionUpsert(c);
           },
           useTheirs: () => takeServerCopy(siteId, "collection", c.id),
-        }),
+        });
+      },
       invalid: (e) => announceInvalid("collection", c.id, e),
     },
   );
@@ -725,6 +734,29 @@ async function takeServerCopy(siteId: string, kind: "collection" | "entry", id: 
   forceServer.add(`${kind}:${id}`);
   await hydrateCmsFromServer();
   await engine?.refreshFromStorage();
+}
+
+/**
+ * DM-07: this device made a collection whose slug the server already holds
+ * under another id. Its records move to the server's collection (re-keyed
+ * here, then mirrored), the local copy goes, and the server's collection is
+ * hydrated in — so a second "Blog" made on another device becomes the one
+ * Blog with both devices' records, instead of a create 500ing forever.
+ * Not covered: element bindings made to the local id in the window before
+ * its first mirror; they still name it.
+ */
+async function adoptServerCollection(siteId: string, local: CMSCollection, serverId: string): Promise<void> {
+  const key = `collectionUpsert:${local.id}`;
+  conflicted.delete(key);
+  outboxRemove(siteId, key);
+  if (!serverId) return;
+  const moved = (await Storage.loadContentItems(local.id)).map((i) => ({ ...i, collectionId: serverId }));
+  for (const item of moved) await Storage.saveContentItem(item);
+  await Storage.deleteCollection(local.id);
+  forgetServerStamp(`collection:${local.id}`);
+  forceServer.add(`collection:${serverId}`);
+  await hydrateCmsFromServer();
+  await Promise.all(moved.map((item) => syncEntryUpsert(item)));
 }
 
 export async function syncCollectionDelete(id: string): Promise<void> {
