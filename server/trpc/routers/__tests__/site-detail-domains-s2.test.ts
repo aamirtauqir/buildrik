@@ -100,6 +100,17 @@ describe("siteDetail.domains.connect", () => {
     });
   });
 
+  it("maps DOMAIN_ATTACHED_ELSEWHERE (Vercel 409) to CONFLICT naming the other Vercel project", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    connectDomainMock.mockRejectedValueOnce(new Error("DOMAIN_ATTACHED_ELSEWHERE"));
+
+    await expect(caller().domains.connect({ siteId: "s1", domain: "bellacucina.com" })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "This domain is used by another Vercel project. Remove it from that project first, then try again.",
+    });
+    expect(recordForSiteMock).not.toHaveBeenCalled();
+  });
+
   it("rejects a kind the schema does not know before touching access", async () => {
     await expect(
       caller().domains.connect({ siteId: "s1", domain: "bellacucina.com", kind: "ALIAS" } as never),

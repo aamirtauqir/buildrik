@@ -36,14 +36,15 @@ vi.mock("@/lib/prisma", () => ({ prisma: db }));
 vi.mock("@server/services/integrations.service", () => ({
   getActiveVercelConnection: (...a: unknown[]) => vercelConnection(...a),
 }));
-vi.mock("@/lib/vercel", () => ({
+vi.mock("@/lib/vercel", async () => ({
+  VercelApiError: (await vi.importActual<typeof import("@/lib/vercel")>("@/lib/vercel")).VercelApiError,
   addDomainToVercelProject: vi.fn(),
   removeDomainFromVercelProject: vi.fn(),
   resolveVercelProjectName: (site: { slug: string; vercelProjectName: string | null }) =>
     site.vercelProjectName ?? site.slug,
 }));
 
-import { addDomainToVercelProject } from "@/lib/vercel";
+import { addDomainToVercelProject, VercelApiError } from "@/lib/vercel";
 import {
   connectDomain,
   checkDomainAvailability,
@@ -165,6 +166,22 @@ describe("connectDomain — the Add-a-domain dialog", () => {
     expect(db.domain.create).toHaveBeenCalledWith({
       data: expect.objectContaining({ kind: "PRIMARY", forceHttps: true, dnsProvider: null }),
     });
+  });
+
+  /* A Vercel 409 = the domain is assigned to another Vercel project. It used
+     to come back as verified: true and the row was written VERIFIED, so the
+     card read "Connected" for a domain serving someone else's site. */
+  it("refuses a domain Vercel says is on another project (409): DOMAIN_ATTACHED_ELSEWHERE, no row, never VERIFIED", async () => {
+    connectable();
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    vi.mocked(addDomainToVercelProject).mockRejectedValue(
+      new VercelApiError(409, "domain_already_in_use", "The domain is already assigned to another Vercel project"),
+    );
+
+    await expect(connectDomain("s1", { domain: "bellacucina.com" })).rejects.toThrow("DOMAIN_ATTACHED_ELSEWHERE");
+    expect(db.domain.create).not.toHaveBeenCalled();
+    expect(db.domain.update).not.toHaveBeenCalled();
+    expect(db.dnsRecord.createMany).not.toHaveBeenCalled();
   });
 
   it("still refuses a hostname another site holds", async () => {

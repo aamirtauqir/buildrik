@@ -270,24 +270,51 @@ export interface VercelDomainVerification {
   reason?: string;
 }
 
+/**
+ * A project domain, as `POST /v10/projects/{idOrName}/domains` and
+ * `GET /v9/projects/{idOrName}/domains/{domain}` both return it (the docs'
+ * required fields: name, apexName, projectId, verified; plus verification[]).
+ */
 export interface AddDomainResult {
   name: string;
-  /** True once Vercel can serve the domain (DNS points at Vercel). */
+  /** The registrable apex Vercel derived for this name (`shop.example.com` → `example.com`). */
+  apexName: string | null;
+  /**
+   * Ownership on this project. NOT "DNS points at Vercel" — that is the
+   * config endpoint's `misconfigured` (getVercelDomainConfig).
+   */
   verified: boolean;
-  /** Records the user must add at their DNS provider (when not yet verified). */
+  /** The TXT ownership challenge(s), present while `verified` is false. */
   verification: VercelDomainVerification[];
+}
+
+function parseProjectDomain(data: {
+  name?: string;
+  apexName?: string;
+  verified?: boolean;
+  verification?: VercelDomainVerification[];
+}, domain: string): AddDomainResult {
+  return {
+    name: data.name ?? domain,
+    apexName: data.apexName ?? null,
+    verified: Boolean(data.verified),
+    verification: data.verification ?? [],
+  };
 }
 
 /**
  * Attach a custom domain to a Vercel project so the project actually serves it.
  * Without this call a "connected" domain in our DB resolved to nothing — the
  * DNS instructions pointed at a host Vercel was never told to route. Returns
- * Vercel's verification records (TXT/CNAME) for the user to add.
+ * Vercel's verification records (TXT) for the user to add.
  *
- * `409 domain_already_in_use` is treated as success (idempotent re-connect):
- * the domain is already attached to this project.
+ * A 409 is NOT success. Per the endpoint's docs it means "The domain is
+ * already assigned to another Vercel project" (or to another project on this
+ * account, or is not allowed). It used to be mapped to `verified: true`, so a
+ * domain serving someone else's project showed Connected here. It now throws
+ * like every other non-2xx; the service names it DOMAIN_ATTACHED_ELSEWHERE.
  *
- * Throws VercelApiError on other non-2xx responses.
+ * Throws VercelApiError on any non-2xx response.
  */
 export async function addDomainToVercelProject({
   token,
@@ -314,23 +341,10 @@ export async function addDomainToVercelProject({
       error?: { code?: string; message?: string };
     };
     const code = errBody.error?.code ?? "UNKNOWN";
-    // Already attached → idempotent success.
-    if (res.status === 409 || code === "domain_already_in_use") {
-      return { name: domain, verified: true, verification: [] };
-    }
     throw new VercelApiError(res.status, code, errBody.error?.message ?? `Vercel API ${res.status}`);
   }
 
-  const data = (await res.json()) as {
-    name?: string;
-    verified?: boolean;
-    verification?: VercelDomainVerification[];
-  };
-  return {
-    name: data.name ?? domain,
-    verified: Boolean(data.verified),
-    verification: data.verification ?? [],
-  };
+  return parseProjectDomain(await res.json(), domain);
 }
 
 /**

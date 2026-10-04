@@ -40,11 +40,30 @@ describe("addDomainToVercelProject", () => {
     expect(res.verification[0].value).toBe("vc-123");
   });
 
-  it("treats 409 already-in-use as idempotent success", async () => {
-    mockFetch(409, { error: { code: "domain_already_in_use", message: "in use" } });
-    const res = await addDomainToVercelProject({ token: "t", teamId: null, projectName: "p", domain: "x.com" });
-    expect(res.verified).toBe(true);
-    expect(res.name).toBe("x.com");
+  /* Docs (add-a-domain-to-a-project): 409 = "The domain is already assigned
+     to another Vercel project". It was read as verified: true. */
+  it("throws a 409 VercelApiError — a domain on another project is never verified", async () => {
+    mockFetch(409, { error: { code: "domain_already_in_use", message: "The domain is already assigned to another Vercel project" } });
+    const err = await addDomainToVercelProject({ token: "t", teamId: null, projectName: "p", domain: "x.com" }).catch((e) => e);
+    expect(err).toBeInstanceOf(VercelApiError);
+    expect(err.status).toBe(409);
+  });
+
+  it("parses the documented 200 shape, apexName included", async () => {
+    mockFetch(200, {
+      name: "shop.x.com",
+      apexName: "x.com",
+      projectId: "prj_123",
+      verified: true,
+      createdAt: 1727000000000,
+      updatedAt: 1727000000000,
+      redirect: null,
+      redirectStatusCode: null,
+      gitBranch: null,
+      customEnvironmentId: null,
+    });
+    const res = await addDomainToVercelProject({ token: "t", teamId: null, projectName: "p", domain: "shop.x.com" });
+    expect(res).toEqual({ name: "shop.x.com", apexName: "x.com", verified: true, verification: [] });
   });
 
   it("throws VercelApiError on other failures", async () => {

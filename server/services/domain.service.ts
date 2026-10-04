@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import { addDomainToVercelProject, removeDomainFromVercelProject, resolveVercelProjectName } from "@/lib/vercel";
+import { addDomainToVercelProject, removeDomainFromVercelProject, resolveVercelProjectName, VercelApiError } from "@/lib/vercel";
 import { getActiveVercelConnection } from "@server/services/integrations.service";
 import { siteScopeWhere } from "@/server/services/permission.service";
 import { domainNameSchema, type DomainAvailability, type DomainKind, DNS_TARGETS } from "@buildrik/shared/schemas/site-detail";
@@ -187,11 +187,33 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
     }
   }
 
+  /* Attach first, so a domain Vercel refuses never becomes a row here. A 409
+     means the domain is assigned to ANOTHER Vercel project (docs: "add a
+     domain to a project"); it used to be read as verified, so the domain
+     showed Connected while it served someone else's site. Any other failure
+     is an integration hiccup: keep the fallback instructions, leave the domain
+     PENDING, and let the dns-verify cron re-check — but log it. */
+  let attached: Awaited<ReturnType<typeof addDomainToVercelProject>> | null = null;
+  try {
+    const conn = await getActiveVercelConnection(site.workspaceId);
+    if (conn) {
+      attached = await addDomainToVercelProject({
+        token: conn.token,
+        teamId: conn.teamId,
+        projectName,
+        domain,
+      });
+    }
+  } catch (err) {
+    if (err instanceof VercelApiError && err.status === 409) throw new Error("DOMAIN_ATTACHED_ELSEWHERE");
+    console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
+  }
+
   const created = await prisma.domain.create({
     data: {
       siteId,
       domain,
-      status: "PENDING",
+      status: attached?.verified ? "VERIFIED" : "PENDING",
       sslStatus: "PENDING",
       kind: input.kind ?? "PRIMARY",
       forceHttps: input.forceHttps ?? true,
@@ -199,45 +221,17 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
     },
   });
 
-  // Attach the domain to the workspace's Vercel project so it actually serves
-  // traffic, and use Vercel's real verification records as the DNS instructions.
-  // Falls back to the three records the Add-a-domain dialog draws (apex A,
-  // `www` CNAME, our `_buildrick` TXT — Clone 3737:43669) if the workspace has
-  // no Vercel connection (dev / not yet authed) or the API call fails — the
-  // domain stays PENDING and the dns-verify cron can re-attempt.
-  let dnsRecords: Array<{ type: string; host: string; value: string }> = [
-    { type: "A", host: "@", value: VERCEL_APEX_IP },
-    { type: "CNAME", host: "www", value: VERCEL_CNAME },
-    { type: "TXT", host: "_buildrick", value: dnsVerificationToken(created.id) },
-  ];
-
-  try {
-    const conn = await getActiveVercelConnection(site.workspaceId);
-    if (conn) {
-      const result = await addDomainToVercelProject({
-        token: conn.token,
-        teamId: conn.teamId,
-        projectName,
-        domain,
-      });
-      if (result.verification.length > 0) {
-        dnsRecords = result.verification.map((v) => ({
-          type: v.type.toUpperCase(),
-          host: v.domain,
-          value: v.value,
-        }));
-      }
-      if (result.verified) {
-        await prisma.domain.update({ where: { id: created.id }, data: { status: "VERIFIED" } });
-      }
-    }
-  } catch (err) {
-    // Vercel attach failed — keep the fallback CNAME instructions and leave the
-    // domain PENDING (the dns-verify cron re-attempts). Never fail the whole
-    // connect on an integration hiccup, but log it so the silent swallow is
-    // diagnosable rather than invisible.
-    console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
-  }
+  // Vercel's real verification records when it gave any, else the three
+  // records the Add-a-domain dialog draws (apex A, `www` CNAME, our
+  // `_buildrick` TXT — Clone 3737:43669).
+  const dnsRecords: Array<{ type: string; host: string; value: string }> =
+    attached && attached.verification.length > 0
+      ? attached.verification.map((v) => ({ type: v.type.toUpperCase(), host: v.domain, value: v.value }))
+      : [
+          { type: "A", host: "@", value: VERCEL_APEX_IP },
+          { type: "CNAME", host: "www", value: VERCEL_CNAME },
+          { type: "TXT", host: "_buildrick", value: dnsVerificationToken(created.id) },
+        ];
 
   await prisma.dnsRecord.createMany({
     data: dnsRecords.map((r) => ({ domainId: created.id, type: r.type, host: r.host, value: r.value })),
