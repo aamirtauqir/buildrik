@@ -875,7 +875,9 @@ export async function generateDynamicPages(
     const slug = applyCmsPattern(col.pageSlugPattern as string, data, true);
     const seoTitle = col.pageSeoTitle ? applyCmsPattern(col.pageSeoTitle, data, false) : "";
     const seoDescription = col.pageSeoDescription ? applyCmsPattern(col.pageSeoDescription, data, false) : "";
-    let html = substituteOutsideScriptStyle(cleanedTemplate, data, richtext, fieldKeys);
+    /* A record's own keys count as fields too (a collection stored without
+       its field list still fills its tokens); any other {word} stays. */
+    let html = substituteOutsideScriptStyle(cleanedTemplate, data, richtext, new Set([...fieldKeys, ...Object.keys(data)]));
     const seoTags =
       `<title>${escapeHtmlText(seoTitle)}</title>` +
       (seoTitle ? `<meta property="og:title" content="${escapeHtmlText(seoTitle)}">` : "") +
