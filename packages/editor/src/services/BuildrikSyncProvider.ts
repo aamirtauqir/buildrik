@@ -17,6 +17,7 @@ import type { PageMeta, PageSettings, ProjectData, ProjectSettings, SiteSEO, Slu
 import type { ProjectSettingsPatch } from "@buildrik/shared/schemas/project-settings";
 import type { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-detail";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
+import { MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import type { z } from "zod";
 import type { ElementData } from "@/shared/types/element";
 import { blankPageRoot } from "@buildrik/shared/content/elementIds";
@@ -209,6 +210,17 @@ function emitSettingsMirrorError(message: string): void {
   }
 }
 
+/* BD-15: a bindings map past the server's cap is not stored (the save keeps
+   its pages, the server keeps the previous bindings) — the server only logged
+   it. The save says so here, before sending, so the editor can tell the user. */
+export const CMS_BINDINGS_TOO_LARGE_EVENT = "buildrik:cms-bindings-too-large";
+function checkCmsBindingsSize(projectData: ProjectData): void {
+  if (!projectData.cmsBindings || typeof window === "undefined") return;
+  const size = JSON.stringify(projectData.cmsBindings).length;
+  if (size > MAX_CMS_BINDINGS_CHARS) {
+    window.dispatchEvent(new CustomEvent(CMS_BINDINGS_TOO_LARGE_EVENT, { detail: { size, max: MAX_CMS_BINDINGS_CHARS } }));
+  }
+}
 
 /**
  * P0.2b SSOT: shape of Site columns that mirror editor projectSettings fields.
@@ -798,6 +810,7 @@ async function saveProjectNow(
     }),
   };
 
+  checkCmsBindingsSize(persisted);
   let primaryResult: unknown;
   try {
     primaryResult = await client.sites.saveProject.mutate({

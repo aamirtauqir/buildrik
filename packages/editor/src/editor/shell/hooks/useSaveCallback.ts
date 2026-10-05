@@ -26,6 +26,7 @@ import {
   saveProject,
   SaveConflictError,
   SETTINGS_MIRROR_ERROR_EVENT,
+  CMS_BINDINGS_TOO_LARGE_EVENT,
 } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
@@ -170,7 +171,21 @@ export function useSaveCallback({
       });
     };
     window.addEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirrorError);
-    return () => window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirrorError);
+    /* BD-15: the server keeps a save's pages but not a bindings map past its
+       cap — say so instead of letting the newest bindings vanish on reload. */
+    const onBindingsTooLarge = () => {
+      addToast({
+        title: "Saved — CMS bindings didn't",
+        description:
+          "This site binds more CMS content than one save can store, so the newest bindings weren't saved. Remove some bindings, then save again.",
+        tone: "error",
+      });
+    };
+    window.addEventListener(CMS_BINDINGS_TOO_LARGE_EVENT, onBindingsTooLarge);
+    return () => {
+      window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirrorError);
+      window.removeEventListener(CMS_BINDINGS_TOO_LARGE_EVENT, onBindingsTooLarge);
+    };
   }, [addToast]);
 
   const save = React.useCallback((): Promise<SaveOutcome> => {
