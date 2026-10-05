@@ -556,3 +556,13 @@ options editor (Add field + field inspector), Records · "No fields yet",
 Inspector › CMS binding "Record" row + context note, Dynamic pages SEO
 pattern inputs, "Collection lists" pre-publish row, "Saved — CMS bindings
 didn't" toast.
+
+### Gates (C1, run one at a time; the machine's load average was 200–430)
+
+| Gate | Result |
+|---|---|
+| Editor tsc (`packages/editor`) | exit 0 |
+| Dashboard tsc (`-p packages/dashboard`) | exit 0 after `rm -rf packages/dashboard/.next` (the first run failed only in a stale generated `.next/dev/types/validator.ts`) |
+| Editor vitest, full | 1259 files, 12486 passed / 36 failed. Re-run of the 22 failing files alone: 2 real failures (an old `{field}` token expectation, and an outdated baseline for the unbound Collection list), both fixed in the last two test commits. The rest passed alone; they were timeouts under load. `stripMarkup` (known flaky) passes alone. |
+| Root vitest, full | 1414 files, 13909 passed / 1 failed, the known-flaky `stripMarkup` 15 s timeout (passes alone) |
+| `pnpm run verify:ds` | exit 0 |
