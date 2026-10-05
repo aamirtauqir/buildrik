@@ -97,6 +97,20 @@ describe("AccessScreen — a password is stored (8136:216089)", () => {
     expect(screen.getByTestId("set-access-is-set")).toBeInTheDocument();
   });
 
+  /* QA 2026-10-05: a New password of only spaces enabled Save and would have
+     stored a blank-looking password. */
+  it("a New password of only spaces is refused before Save", async () => {
+    const { registerFieldErrors } = setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-access-change"));
+    fireEvent.change(screen.getByLabelText("New password"), { target: { value: "   " } });
+    await waitFor(() =>
+      expect(registerFieldErrors).toHaveBeenLastCalledWith({ "publishing.publishedPassword": "A password can't be only spaces" }),
+    );
+    fireEvent.change(screen.getByLabelText("New password"), { target: { value: " ok " } });
+    await waitFor(() => expect(registerFieldErrors).toHaveBeenLastCalledWith(null));
+  });
+
   it("Remove turns protection off (8136:216319) and Save sends null", async () => {
     const { save } = setup();
     await loaded();

@@ -1031,6 +1031,70 @@ describe("SettingsTab — Search Mode (owner 2026-10-04, overrides 6816:60270 / 
     expect(options()).toEqual([]);
   });
 
+  /* QA 2026-10-05 (live, 1440×732): an unbroken query ran the no-match line
+     out of the 256 sidebar and into the pane. jsdom has no layout; the wrap
+     is the contract. */
+  it("the no-match line wraps a query with no spaces inside the sidebar", () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    openSearch();
+    fireEvent.change(input(), { target: { value: "x".repeat(120) } });
+    expect(screen.getByTestId("set-search-empty").className).toContain("tw:break-words");
+  });
+
+  /* QA 2026-10-05: "a" lists 65 results; ↑ from the first wrapped to the
+     last, which sat 2,500px below the fold. */
+  it("↑/↓ keep the active result in view", () => {
+    const proto = Element.prototype as Element & { scrollIntoView?: (arg?: ScrollIntoViewOptions) => void };
+    const original = proto.scrollIntoView;
+    const spy = vi.fn();
+    proto.scrollIntoView = spy;
+    try {
+      renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+      openSearch();
+      fireEvent.change(input(), { target: { value: "seo" } });
+      fireEvent.keyDown(input(), { key: "ArrowUp" });
+      const all = screen.getAllByRole("option");
+      const last = all[all.length - 1];
+      expect(last.getAttribute("aria-selected")).toBe("true");
+      expect(spy.mock.contexts.at(-1)).toBe(last);
+      expect(spy.mock.calls.at(-1)?.[0]).toEqual({ block: "nearest" });
+    } finally {
+      proto.scrollIntoView = original;
+    }
+  });
+
+  /* QA 2026-10-05: a screen result (no field) left focus on <body> — the
+     field it was typed in had gone with Search Mode. */
+  it("a screen result lands focus on that screen's nav row", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    openSearch();
+    fireEvent.change(input(), { target: { value: "dns" } });
+    expect(options()[0]).toBe("domains");
+    fireEvent.keyDown(input(), { key: "Enter" });
+    await waitFor(() => expect(headTitle()).toBe("Domains"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByTestId("set-nav-domains")));
+  });
+
+  /* QA 2026-10-05: a field result raised the Unsaved guard, Keep editing was
+     pressed — and the field was still "pending": the next plain visit to its
+     screen scrolled to it and stole focus. */
+  it("a result abandoned at the guard (Keep editing) is dropped, and focus comes back to the nav", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
+    openSearch();
+    fireEvent.change(input(), { target: { value: "meta title" } });
+    fireEvent.keyDown(input(), { key: "Enter" });
+    expect(screen.getByTestId("set-unsaved")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByTestId("set-nav-general")));
+    fireEvent.click(screen.getByTestId("set-foot-discard"));
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO"));
+    await nextFrame();
+    await nextFrame();
+    expect(document.activeElement).not.toBe(document.getElementById("seo-meta-title"));
+  });
+
   it("Escape closes Search Mode — from the field or the ✕ — never Settings", () => {
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);

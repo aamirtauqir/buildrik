@@ -286,6 +286,9 @@ export const SettingsTab: React.FC<
   const [resetKey, setResetKey] = React.useState(0);
   /* A Search result names a field; it is scrolled to once its screen is on. */
   const pendingFieldRef = React.useRef<string | null>(null);
+  /* A Search result with no field lands focus on its screen's nav row — the
+     field it was typed in goes with Search Mode. */
+  const focusNavRowRef = React.useRef(false);
   /* The screen's own invalid fields (they disable Save) and the fields the
      server refused on the last Save (handed back to the screen). */
   const [clientFieldErrors, setClientFieldErrors] = React.useState<SettingsFieldErrors | null>(null);
@@ -457,6 +460,12 @@ export const SettingsTab: React.FC<
     }
   }, [searchOpen]);
 
+  React.useEffect(() => {
+    if (!focusNavRowRef.current || searchOpen || guardOpen) return;
+    focusNavRowRef.current = false;
+    navRef.current?.querySelector<HTMLElement>('[aria-current="page"]')?.focus();
+  }, [currentScreen, searchOpen, guardOpen, fieldJump]);
+
   // Escape is one more door out — guarded like the rest. The dialogs own
   // their own Escape while they are up; an input keeps its own. Search Mode
   // takes it first: Escape there closes the search, never Settings.
@@ -484,6 +493,13 @@ export const SettingsTab: React.FC<
   const handleKeepEditing = React.useCallback(() => {
     pendingRef.current = null;
     setGuardOpen(false);
+    /* A Search result that raised the guard is abandoned, not deferred: the
+       next plain visit to its screen must not jump to its field. Focus goes
+       to the nav, since the search field it came from is gone. */
+    if (pendingFieldRef.current) {
+      pendingFieldRef.current = null;
+      focusNavRowRef.current = true;
+    }
   }, []);
 
   /* Drop the screen's edits by remounting it (it re-reads the composer, a
@@ -792,8 +808,14 @@ export const SettingsTab: React.FC<
   const trimmed = query.trim();
   const results = React.useMemo(() => (trimmed ? searchSettings(trimmed) : []), [trimmed]);
   const activeIndex = Math.min(activeResult, Math.max(results.length - 1, 0));
+  /* ↑/↓ can wrap to a result far below the fold: keep the active one in view. */
+  React.useEffect(() => {
+    if (!searchOpen) return;
+    document.getElementById(`set-search-option-${activeIndex}`)?.scrollIntoView?.({ block: "nearest" });
+  }, [searchOpen, activeIndex]);
   const openResult = (entry: SearchEntry) => {
     pendingFieldRef.current = entry.fieldId ?? null;
+    focusNavRowRef.current = !entry.fieldId;
     closeSearch(false);
     if (entry.screen === currentScreen) setFieldJump((n) => n + 1);
     else requestNav(entry.screen);
@@ -919,7 +941,7 @@ export const SettingsTab: React.FC<
                   Type to find a setting, an option or a feature.
                 </p>
               ) : results.length === 0 ? (
-                <p className="tw:m-0 tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty" role="status">
+                <p className="tw:m-0 tw:break-words tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty" role="status">
                   {`No settings match "${trimmed}"`}
                 </p>
               ) : null}
