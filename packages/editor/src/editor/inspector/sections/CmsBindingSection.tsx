@@ -32,6 +32,8 @@ import { cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { ButtonGroup, Section, SelectRow, type SectionTier } from "../shared/controls";
 import { canWrite } from "@/engine/commands/commandOperations";
 import { ActionRow, NoteRow } from "./behaviourRows";
+import { pageFileNames } from "@/engine/export";
+import { recordTitle } from "@/editor/cms/RecordsTable";
 
 export interface CmsBindingSectionProps {
   elementId: string;
@@ -131,6 +133,33 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
   const field = boundHere ? collection?.fields.find((f) => f.slug === boundHere.fieldSlug) ?? null : null;
   const fromCms = Boolean(binding) || cmsChosen;
 
+  /* BD-09 / CMS-04 — which record the element shows, by context (§5b.2):
+     inside a Collection list of this collection → each copy's own record;
+     on this collection's template page → each generated page's record;
+     anywhere else a SPECIFIC record, chosen here. It used to bind "no
+     record" everywhere, which previews and publishes whichever record was
+     edited last. */
+  const context: "list" | "template" | "record" = React.useMemo(() => {
+    if (!composer || !collection) return "record";
+    for (let up = composer.elements.getElement(elementId)?.getParent?.() ?? null; up; up = up.getParent?.() ?? null) {
+      const list = composer.cms.bindings.getCollectionBinding(up.getId());
+      if (list?.repeat === "children" && list.collectionId === collection.id) return "list";
+    }
+    const page = composer.elements.getActivePage?.();
+    const file = page ? pageFileNames(composer.elements.getAllPages()).get(page.id) : undefined;
+    return file && collection.pageTemplatePath === file ? "template" : "record";
+  }, [composer, collection, elementId, tick]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [records, setRecords] = React.useState<CMSContentItem[]>([]);
+  React.useEffect(() => {
+    let live = true;
+    if (!composer || !collection || context !== "record") return setRecords([]);
+    void composer.cms.collections.getContentItems(collection.id).then((rows) => live && setRecords(rows));
+    return () => {
+      live = false;
+    };
+  }, [composer, collection, context, tick]);
+  const pinned = boundHere?.itemId && boundHere.itemId !== "context" ? boundHere.itemId : "";
+
   React.useEffect(() => {
     let live = true;
     if (!boundHere || !composer) {
@@ -144,7 +173,13 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
         if (!live) return;
         /* No record = "the record on this page": the canvas previews the first. */
         const found = itemId && itemId !== "context" ? items.findIndex((i) => i.id === itemId) : 0;
-        const index = Math.max(found, 0);
+        /* A pinned record that isn't published publishes nothing — say so,
+           never preview another record in its place. */
+        if (found < 0) {
+          setPreview({ value: "", record: null, index: -1, total: items.length });
+          return;
+        }
+        const index = found;
         const record = items[index] ?? null;
         setPreview({ value: cmsTextOf(record?.data[fieldSlug]), record, index, total: items.length });
       })
@@ -160,8 +195,17 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
   const bindField = (slug: string) => {
     const f = collection?.fields.find((x) => x.slug === slug);
     if (!composer || !collection || !f || !writable()) return;
-    // Replaces any binding on this property — one undo step (P-2).
-    composer.cms.bindings.bindToField(elementId, collection.id, undefined, f.slug, property, undefined, `Bind ${f.name}`);
+    /* Outside a list or the template page the binding names its record: the
+       one already chosen, else the newest published one — explicitly. */
+    const bind = (rows: CMSContentItem[]) => {
+      const itemId =
+        context === "record" ? pinned || rows.find((r) => r.status === "published")?.id || rows[0]?.id : undefined;
+      // Replaces any binding on this property — one undo step (P-2).
+      composer.cms.bindings.bindToField(elementId, collection.id, itemId, f.slug, property, undefined, `Bind ${f.name}`);
+    };
+    /* The record list may not have arrived yet on a first pick. */
+    if (context === "record" && !pinned && records.length === 0) void composer.cms.collections.getContentItems(collection.id).then(bind);
+    else bind(records);
     setReconnecting(false);
   };
   const unbind = () => {
@@ -206,6 +250,22 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
         onChange={bindField}
         options={fields.map(fieldOption)}
       />
+      {context === "record" ? (
+        <SelectRow
+          label="Record"
+          value={pinned}
+          placeholder={boundHere ? "Newest published record" : "Choose a record…"}
+          onChange={(rid) => {
+            if (!composer || !collection || !boundHere || !writable()) return;
+            composer.cms.bindings.bindToField(elementId, collection.id, rid || undefined, boundHere.fieldSlug, property, boundHere.fallback, "Choose record");
+          }}
+          options={collection ? records.map((r) => ({ value: r.id, label: `${recordTitle(collection, r)}${r.status === "published" ? "" : " · Draft"}` })) : []}
+        />
+      ) : (
+        <NoteRow testId="cms-record-context">
+          {context === "list" ? "Record · each copy shows its own" : "Record · each generated page shows its own"}
+        </NoteRow>
+      )}
     </div>
   );
 
@@ -240,9 +300,11 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
             <>
               <NoteRow testId="cms-preview">
                 {preview
-                  ? preview.total
-                    ? `${preview.value || "—"} (record ${preview.index + 1} of ${preview.total})`
-                    : "No published records yet"
+                  ? preview.index < 0
+                    ? "This record isn't published — the page shows nothing here"
+                    : preview.total
+                      ? `${preview.value || "—"} (record ${preview.index + 1} of ${preview.total})`
+                      : "No published records yet"
                   : "…"}
               </NoteRow>
               <ActionRow

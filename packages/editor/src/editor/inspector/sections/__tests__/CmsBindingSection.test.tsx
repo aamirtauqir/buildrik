@@ -51,6 +51,7 @@ function makeComposer(type = "heading", collections = [MENU], initial: Array<Rec
         getAllCollections: () => collections,
         getCollection: (id: string) => collections.find((c) => c.id === id) ?? null,
         queryContent: vi.fn(() => Promise.resolve({ items: RECORDS, total: 3, hasMore: false })),
+        getContentItems: vi.fn(() => Promise.resolve(RECORDS.map((r) => ({ ...r, collectionId: "col-1", status: "published" })))),
       },
       bindings: {
         getBindings: () => bindings,
@@ -80,12 +81,19 @@ describe("CmsBindingSection — Source", () => {
     expect(screen.queryByTestId("cms-pickers")).toBeNull();
   });
 
-  it("From CMS → Field binds the page's record (no record), one step, then previews record 1 of N (board 24)", async () => {
+  /* BD-09 / CMS-04: outside a list or the template page the binding names
+     its record — the newest published one, explicitly — and a Record row
+     changes it. It used to bind "no record" (whichever was edited last). */
+  it("From CMS → Field binds a specific record (the newest published), one step, then previews record 1 of N (board 24)", async () => {
     const composer = makeComposer();
     render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
     fireEvent.click(screen.getByRole("radio", { name: "From CMS" }));
     fireEvent.change(screen.getByLabelText("Field"), { target: { value: "name" } });
-    expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-1", undefined, "name", "content", undefined, "Bind Name");
+    await waitFor(() =>
+      expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-1", "r1", "name", "content", undefined, "Bind Name"),
+    );
+    fireEvent.change(await screen.findByLabelText("Record"), { target: { value: "r2" } });
+    expect(composer.cms.bindings.bindToField).toHaveBeenLastCalledWith("e1", "col-1", "r2", "name", "content", undefined, "Choose record");
     await waitFor(() => expect(screen.getByTestId("cms-preview")).toHaveTextContent("Cacio e pepe (record 1 of 3)"));
     expect(screen.getByTestId("cms-unbind-hint")).toHaveTextContent("Unbind keeps the text you see now");
   });
@@ -108,14 +116,14 @@ describe("CmsBindingSection — Field filtered by type", () => {
     expect(options).not.toContain("vegan · Yes / no");
   });
 
-  it("an image is offered image fields and binds its source", () => {
+  it("an image is offered image fields and binds its source", async () => {
     const composer = makeComposer("image");
     render(<CmsBindingSection elementId="img" composer={composer as never} isOpen />);
     fireEvent.click(screen.getByRole("radio", { name: "From CMS" }));
     const options = Array.from((screen.getByLabelText("Field") as HTMLSelectElement).options).map((o) => o.value);
     expect(options).toEqual(["", "photo"]);
     fireEvent.change(screen.getByLabelText("Field"), { target: { value: "photo" } });
-    expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("img", "col-1", undefined, "photo", "src", undefined, "Bind Photo");
+    await waitFor(() => expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("img", "col-1", "r1", "photo", "src", undefined, "Bind Photo")); // BD-09: an explicit record
   });
 });
 
@@ -158,7 +166,7 @@ describe("CmsBindingSection — bound (board 24)", () => {
 
   /* P-2 / X-10: changing Collection does not unbind; the next Field pick
      replaces the binding in one step. */
-  it("changing Collection does not unbind; the next Field pick replaces the binding", () => {
+  it("changing Collection does not unbind; the next Field pick replaces the binding", async () => {
     const composer = makeComposer("heading", [MENU, TEAM], BOUND);
     render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
     fireEvent.change(screen.getByLabelText("Collection"), { target: { value: "col-2" } });
@@ -166,7 +174,7 @@ describe("CmsBindingSection — bound (board 24)", () => {
     expect(screen.getByLabelText("Field")).toHaveValue("");
     fireEvent.change(screen.getByLabelText("Field"), { target: { value: "bio" } });
     expect(composer.cms.bindings.unbindAll).not.toHaveBeenCalled();
-    expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-2", undefined, "bio", "content", undefined, "Bind Bio");
+    await waitFor(() => expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-2", "r1", "bio", "content", undefined, "Bind Bio")); // BD-09: an explicit record
   });
 
   it("with no collections: a note and the + New collection… door", () => {
@@ -206,14 +214,14 @@ describe("CmsBindingSection — source missing (board 25)", () => {
     );
   });
 
-  it("Reconnect… opens the pickers; a Field pick replaces the dead binding in one step", () => {
+  it("Reconnect… opens the pickers; a Field pick replaces the dead binding in one step", async () => {
     const composer = makeComposer("heading", [MENU], GONE);
     render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
     fireEvent.click(screen.getByTestId("cms-reconnect"));
     expect(screen.getByLabelText("Collection")).toHaveValue("col-1");
     fireEvent.change(screen.getByLabelText("Field"), { target: { value: "name" } });
     expect(composer.cms.bindings.unbindAll).not.toHaveBeenCalled();
-    expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-1", undefined, "name", "content", undefined, "Bind Name");
+    await waitFor(() => expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-1", "r1", "name", "content", undefined, "Bind Name")); // BD-09: an explicit record
     expect(screen.queryByTestId("cms-source-missing")).toBeNull();
   });
 
@@ -223,5 +231,18 @@ describe("CmsBindingSection — source missing (board 25)", () => {
     fireEvent.click(screen.getByTestId("cms-unbind"));
     expect(composer.cms.bindings.unbindAll).toHaveBeenCalledWith("e1", "Unbind title");
     expect(screen.queryByTestId("cms-source-missing")).toBeNull();
+  });
+});
+
+describe("CmsBindingSection — record by context (BD-09)", () => {
+  it("inside a Collection list of the same collection: no record picker, each copy shows its own", async () => {
+    const composer = makeComposer("heading", [MENU], BOUND);
+    const list = { getId: () => "list", getParent: () => null };
+    (composer.elements as unknown as { getElement: () => unknown }).getElement = () => ({ getType: () => "heading", getParent: () => list });
+    (composer.cms.bindings as unknown as { getCollectionBinding: (id: string) => unknown }).getCollectionBinding = (id: string) =>
+      id === "list" ? { collectionId: "col-1", repeat: "children" } : null;
+    render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
+    expect(await screen.findByTestId("cms-record-context")).toHaveTextContent("each copy shows its own");
+    expect(screen.queryByLabelText("Record")).toBeNull();
   });
 });
