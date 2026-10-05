@@ -1,0 +1,60 @@
+{
+  "recordPages": [
+    {
+      "path": "zz-c1-posts/hello-world/index.html",
+      "title": "Hello World · Posts",
+      "h1": "Hello World",
+      "list": "Hello World by Ada (Chef)",
+      "og": "Hello World · Posts"
+    }
+  ],
+  "g_find_usage": {
+    "steps": 4,
+    "notes": [
+      "1. rail CMS",
+      "2. open Posts",
+      "3. Fields tab",
+      "4. title row → field inspector"
+    ]
+  },
+  "usedByCell": "Heading · Heading · Collection list",
+  "usedByList": "HeadingHeadingCollection list",
+  "f1_rename_field_in_use": {
+    "steps": 2,
+    "notes": [
+      "   starts in the open field inspector",
+      "1. Name → Headline",
+      "2. Enter"
+    ]
+  },
+  "f1KeyDisabled": true,
+  "f1Name": "Headline",
+  "f2_delete_field_in_use": {
+    "steps": 1,
+    "notes": [
+      "1. Delete field"
+    ]
+  },
+  "f2Dialog": "E2E Blank Full d013128c (Copy) › ZZ C1 Posts › HeadlineCannot delete — field is boundHeadline is locked because 3 live bindings depend on it. Remove the bindings, then delete the field.Heading › HeadlineHeading › HeadlineCollection list › HeadlineBack to fieldOpen the Heading binding",
+  "cms07_duplicate_slug": {
+    "steps": 5,
+    "notes": [
+      "1. Records tab",
+      "2. + Add record",
+      "3. Title (slug follows → hello-world)",
+      "4. Published",
+      "5. Save"
+    ]
+  },
+  "cms07State": "Another record already uses the Slug “hello-world”.",
+  "ui02_drawer_guard": {
+    "steps": 2,
+    "notes": [
+      "1. drawer: Team",
+      "2. Discard and leave"
+    ]
+  },
+  "ui02Dialog": true,
+  "ui02After": "ZZ C1 Team",
+  "error": "page.evaluate: Execution context was destroyed, most likely because of a navigation.\n    at /private/tmp/claude-501/-Users-shahg-Desktop-pencil-buildrik-packages-editor/efcd568a-31ce-48ec-862b-20a9e7baaa9e/scratchpad/live/walk4.mjs:82:27"
+}

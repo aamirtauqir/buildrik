@@ -433,3 +433,126 @@ cannot resolve" → "writes nothing …, never the stored text".
   added to `getPublishedCmsForCollections`' select.
 - Tests: `server/services/__tests__/cms.service.test.ts`,
   `server/services/__tests__/publish-prechecks-visibility.test.ts`.
+
+## C1 verification (Correctness, P1) — 2026-10-04/05
+
+Worktree `~/Desktop/buildrik-worktrees/cms-c1` @ `feat/cms-c1` (from main
+`82b9d1c0d`). Dashboard dev server from this worktree on `:3370` (clean
+`.next`, `NEXT_PUBLIC_FEATURE_PUBLISH=true`), headless Playwright at
+1440×900, `qa@buildrik.local`, site `cmugopwzg005nnvjysp00b3pf`. Every
+`sites.publish` / `sites.rollback` was aborted at the network and its body
+kept: that body is the publish writer's output. **No publish ran.** No
+migration was needed or created (Reference ids, rich text and multi-select
+live in the existing `data` JSON). Scripts + evidence:
+`docs/plans/cms-c1-evidence/`.
+
+### Commits (finding → SHA)
+
+| Finding | SHA |
+|---|---|
+| Shared validator: DM-13, DM-09, CMS-07, BD-14, DM-18 | `2e5af2dc7` |
+| CMS-01 retry updates the created record | `0a7afb1b7` |
+| UI-02 every exit through one guarded navigate | `029dd19ae` |
+| UI-01 sorted table on collection switch | `cac23365c` |
+| UI-08 no empty record in a field-less collection | `5192f07d8` |
+| CMS-02, CMS-03 one field-creation path | `80b228d18` |
+| DM-06 per-site IDB slug index (DB v2) | `d28882536` |
+| DM-07 P2002 → CONFLICT / adopt server collection | `789961b2b` |
+| DM-10 keep the server's sanitized entry | `61348b4d7` |
+| DM-15 CSV rows visible without reload | `8a55726ab` |
+| DM-20 legacy unscoped collections claimed | `ae2b243c2` |
+| Empty number ≠ 0 | `434408525` |
+| CMS-09 slug type; DM-18 in the pane | `583eae52c` |
+| Multi-select (UI-07) | `607ae7e16` |
+| Rich text (UI-06, DM-10) | `40a0d012e`, security `ba32d408a` |
+| Reference (DM-11, UI-05) | `e82b3ccb8` |
+| CMS-06 collection delete unbinds | `6ac88dc61`, live fix `f669c589c` |
+| BD-22 / BD-06 bindings follow their element | `ddc9ef465` |
+| BD-06 / BD-19 no `{{item.*}}` published; unbound list blocks publish | `1b2fced79` |
+| BD-08 "All" = all | `71b1b470b` |
+| BD-12 `{{item.url}}` | `1e9cdb178`, live fix `4abf07e2d` |
+| BD-13 namespaced template token | `4ad455c3e`, `8057eb17c` |
+| BD-05 record-page SEO patterns | `f8f408e44` |
+| DM-12 size caps | `d4884b6e6` |
+| BD-15 oversize bindings announced | `62ed0536b` |
+| BD-11 / CMS-19 engine bind gate | `0452533b2` |
+| BD-09 / CMS-04 explicit record by context | `063cdebfe` |
+| Older suites re-pinned | `fe1278d4e`, last commit |
+
+### Security fix (review 2026-10-04, `ba32d408a`)
+
+| | Before | After |
+|---|---|---|
+| Rich text, editor | DOMPurify (browser) + regex href post-filter | `sanitizeCmsRichText(DOMPurify, …)` — `packages/shared/content/cmsRichText.ts` |
+| Rich text, server | isomorphic DOMPurify + the same regex post-filter, published + draft upserts | the same shared function (isomorphic-dompurify as parser), every upsert |
+| Export writer (canvas binding, preview, list copies, export) | DOMPurify output inserted | shared function at output time, never trusting storage |
+| Server record pages | `escapeHtmlText` / rich via DOMPurify | shared function at output time + `sanitizeGeneratedPageHtml` over the page |
+| List copy text | any substitution re-parsed the whole text node via innerHTML (author's literal `<img onerror>` text became an element) | tokenized: literal text and non-rich values are text nodes; only a sanitized rich value is parsed |
+
+The shared function serializes its own output (allow-listed tags only, text
+escaped, `href` on `<a>` only, http(s)/mailto/relative after control/space
+stripping and case-folding, written unquoted and percent-encoded). 11
+payloads (img onerror, svg/style, math/mglyph, noscript, `jav&#x09;ascript:`,
+` JaVaScRiPt:`, comment breakout, mixed case, `data:`, style/formaction,
+template/iframe srcdoc) run through the shared function, the server path
+(draft and published upsert, then a record page from the stored AND a raw
+value, text and attribute tokens) and the export path; the parsed output
+has no execution vector. The literal-text case failed on the old code.
+
+### Live flows (04-cms.md §4, target 4 for a–d)
+
+| Flow | Steps live | Before | Result |
+|---|---|---|---|
+| (a) create a collection | 7 (Team, 2 rows) / 8 (Posts, 2 rows + rich text + pages) | 5 + 2/field | **PASS**: one write; `slug:slug` added, `displayField` set, pattern `/zz-c1-posts/{slug}` names a real field (CMS-02/03). Above target only by the per-row steps. |
+| (b) add a field | 4 (number) · 5 (multi-select + options) · 6 (reference, incl. opening Fields tab) | 5 | **PASS** |
+| (c) add a record | 6 (Team) · 8 (Post: title, rich bold, reference, 2 chips, Published, Save) | 4 + inputs | **PASS**: one server row PUBLISHED, `body` `Plain then <strong>bold</strong>`, `tags` array, `author` id, Price empty (not 0) |
+| (d1) bind an element | 5 | 5 | **PASS** (target 4 not met: Behaviour tab is a step). Binding pinned to a record; Record row shows it |
+| (d2) Collection list | 4 (search, insert, Behaviour, Collection) | 4 | **PASS**: canvas + export `Hello World by Ada (Chef)` / rich `<strong>` / `Vegan, Spicy` / `/zz-c1-posts/hello-world/` |
+| (e) template page | 13 (Dynamic pages: template + SEO pattern + Generate, then bind heading) | 7 + 5/element | **PASS**: export writes `{{bk:title}}`; server record page `<title>`/og:title `Hello World · Posts`, h1 `Hello World`; context note "each generated page shows its own" |
+| (f1) rename a field in use | 2 | 3 | **PASS**: name free, key locked |
+| (f2) delete a field in use | 1 → lock dialog naming 3 uses | ~12 | **PASS** (lock, unchanged) |
+| (f3) delete a collection in use | 7 | 5, no guard | **PASS**: consequence "…and unbinds 1 element — each keeps what it shows now", element keeps "Tempy", binding gone. Found + fixed live: the unbind wasn't saved (`f669c589c`) |
+| (g) find where a field is used | 2 (Fields → row) | 2, dead end | **PARTIAL**: USED BY lists the uses; click-through to the element is C2 (CMS-08) |
+
+Also live: CMS-07 — a second "Hello World" published record refused with
+"Another record already uses the Slug “hello-world”." (no record created).
+UI-02 — a drawer collection click over a dirty sheet raised "Discard record
+changes?". Reference delete guard — Team's delete disabled, "ZZ C1 Posts ›
+Author points at this collection". Cleanup: all `ZZ C1*` collections
+deleted through the UI (DB `deletedAt` set), test page deleted, no binding to
+them left in `projectCmsBindings`.
+
+### NOT verified
+
+- A real deploy / curl of a deployed record page (aborted publish + the
+  server's own `cms.generateDynamicPages` render only).
+- DM-06 cross-site IDB clash and DM-20 legacy rows in a real browser (unit
+  only); DM-07 two-device slug race (unit only); DM-15 live CSV import;
+  BD-15 at >1M chars; DM-12 caps live; BD-22/BD-06 duplicate/delete live.
+- Rich text link button and bulleted list live (only Bold walked);
+  `execCommand` is not available under jsdom.
+- (d2) insert through the Add panel was clicked live; the template text was
+  set through the composer, not typed on the canvas.
+- Figma side-by-side for new controls: there are no boards for them (below).
+
+### Skipped / not done
+
+- **Conditions + Sources removal (PD-3/5)**: skipped. D4–D6 supersede it:
+  C5 builds per-collection sources, Views and Inspector › Visibility, and
+  the stored `dataBindings.condition` rows and DataManager's condition
+  evaluator are what a C5 migration/evaluator would build on; stripping them
+  now destroys that input. The drawer views stay until C5 replaces them.
+- **Plan limits (DM-12)**: PD-9 has no founder numbers; only technical size
+  caps shipped.
+- **BD-05 canonical / og:url per record**: need the site's published URL,
+  owned by the SEO/publish-URL code (seo-dns lane) — recorded as a request.
+- PD-8 localization shape: not reserved.
+
+### Missing boards
+
+Reference record picker (built as the 32px select boards draw for Category,
+4428:144760), Deleted record + Clear, rich text toolbar, multi-select chips,
+options editor (Add field + field inspector), Records · "No fields yet",
+Inspector › CMS binding "Record" row + context note, Dynamic pages SEO
+pattern inputs, "Collection lists" pre-publish row, "Saved — CMS bindings
+didn't" toast.
