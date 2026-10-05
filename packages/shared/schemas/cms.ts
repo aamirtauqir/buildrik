@@ -53,6 +53,12 @@ const STORED_FIELD_KEY_RE = /^[^\s{}.]+$/;
 export const CMS_RESERVED_FIELD_KEYS: ReadonlySet<string> = new Set(["id", "status", "published", "url", "createdat", "updatedat"]);
 
 export const CMS_MAX_FIELDS = 100;
+/* DM-12 size caps — technical bounds, not plan limits (per-plan numbers wait
+   on PD-9). A record's data as JSON; records per collection (the list cap,
+   CMS_COLLECTION_LIMIT_MAX); collections per site. */
+export const CMS_MAX_ENTRY_CHARS = 200_000;
+export const CMS_MAX_ENTRIES_PER_COLLECTION = 10_000;
+export const CMS_MAX_COLLECTIONS_PER_SITE = 100;
 export const CMS_MAX_OPTIONS = 100;
 
 const cmsFieldValidation = z

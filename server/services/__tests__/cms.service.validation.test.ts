@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   colFindFirst: vi.fn(), colFindUnique: vi.fn(), colCreate: vi.fn(), colUpdateMany: vi.fn(),
   entFindMany: vi.fn(), entFindUnique: vi.fn(), entCreate: vi.fn(), entUpdateMany: vi.fn(),
   siteUpdate: vi.fn(),
+  colCount: vi.fn(), entCount: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -19,12 +20,14 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: (...a: unknown[]) => mocks.colFindUnique(...a),
       create: (...a: unknown[]) => mocks.colCreate(...a),
       updateMany: (...a: unknown[]) => mocks.colUpdateMany(...a),
+      count: (...a: unknown[]) => mocks.colCount(...a),
     },
     cmsEntry: {
       findMany: (...a: unknown[]) => mocks.entFindMany(...a),
       findUnique: (...a: unknown[]) => mocks.entFindUnique(...a),
       create: (...a: unknown[]) => mocks.entCreate(...a),
       updateMany: (...a: unknown[]) => mocks.entUpdateMany(...a),
+      count: (...a: unknown[]) => mocks.entCount(...a),
     },
   },
 }));
@@ -38,6 +41,8 @@ const FIELDS = [field("name", "text", { validation: { required: true } }), field
 beforeEach(() => {
   Object.values(mocks).forEach((m) => m.mockReset());
   mocks.siteUpdate.mockResolvedValue({});
+  mocks.colCount.mockResolvedValue(0);
+  mocks.entCount.mockResolvedValue(0);
   mocks.colFindFirst.mockResolvedValue({ deletedAt: null, fields: FIELDS, pageSlugPattern: "/menu/{slug}" });
   mocks.entFindUnique.mockResolvedValue(null);
   mocks.entFindMany.mockResolvedValue([]);
@@ -266,3 +271,12 @@ describe("record page SEO (BD-05)", () => {
   });
 });
 
+describe("size caps (DM-12)", () => {
+  it("refuses a record over the size cap, a collection past its record cap, a site past its collection cap", async () => {
+    expect(await invalid(upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { name: "x".repeat(200_001) } }))).toMatch(/too large/);
+    mocks.entCount.mockResolvedValueOnce(10_000);
+    expect(await invalid(upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { name: "x" } }))).toMatch(/at most 10,000 records/);
+    mocks.colCount.mockResolvedValueOnce(100);
+    expect(await invalid(upsertCollection("s1", { siteId: "s1", name: "N", slug: "n", fields: [] }))).toMatch(/at most 100 collections/);
+  });
+});

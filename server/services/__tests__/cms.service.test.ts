@@ -21,6 +21,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     $transaction: mocks.dollar,
     cmsCollection: {
+      count: async () => 0,
       findMany: (...a: unknown[]) => mocks.colFindMany(...a),
       findFirst: (...a: unknown[]) => mocks.colFindFirst(...a),
       findUnique: (...a: unknown[]) => mocks.colFindUnique(...a),
@@ -30,6 +31,7 @@ vi.mock("@/lib/prisma", () => ({
       delete: (...a: unknown[]) => mocks.colDelete(...a),
     },
     cmsEntry: {
+      count: async () => 0,
       findMany: (...a: unknown[]) => mocks.entFindMany(...a),
       findFirst: (...a: unknown[]) => mocks.entFindFirst(...a),
       findUnique: (...a: unknown[]) => mocks.entFindUnique(...a),

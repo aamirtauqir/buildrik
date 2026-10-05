@@ -12,6 +12,9 @@ import {
   CSV_IMPORT_MAX_COLUMNS,
   CSV_IMPORT_MAX_CELL_LENGTH,
   applyCmsPattern,
+  CMS_MAX_COLLECTIONS_PER_SITE,
+  CMS_MAX_ENTRIES_PER_COLLECTION,
+  CMS_MAX_ENTRY_CHARS,
   cmsFieldsSchema,
   cmsPatternError,
   cmsRecordClash,
@@ -198,6 +201,11 @@ function uniqueViolation(e: unknown): string | null {
  *    client adopts (`SLUG_TAKEN:<id>`).
  */
 async function createCollectionRow(siteId: string, input: UpsertCollectionInput, data: Prisma.CmsCollectionUncheckedCreateInput): Promise<CmsCollection | null> {
+  /* DM-12: a bounded number of collections per site. */
+  const count = await prisma.cmsCollection.count({ where: { siteId, deletedAt: null } });
+  if (count >= CMS_MAX_COLLECTIONS_PER_SITE) {
+    throw new CmsError("INVALID", `A site holds at most ${CMS_MAX_COLLECTIONS_PER_SITE} collections.`);
+  }
   try {
     return await prisma.cmsCollection.create({ data });
   } catch (e) {
@@ -333,6 +341,10 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
   if (!collection) throw new CmsError("NOT_FOUND", "Collection not found");
   if (collection.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
   const fields = fieldRules(collection.fields);
+  /* DM-12: one record is bounded (the column is one JSON value per row). */
+  if (JSON.stringify(input.data).length > CMS_MAX_ENTRY_CHARS) {
+    throw new CmsError("INVALID", `This record is too large to save — keep it under ${CMS_MAX_ENTRY_CHARS / 1000}k characters.`);
+  }
   const clean = sanitizeEntryData(input.data, fields);
   const data = {
     data: clean as unknown as Prisma.InputJsonValue,
@@ -389,13 +401,23 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
       if (bump) await touchCmsEdited(siteId);
       return prisma.cmsEntry.findUnique({ where: { id: input.id } });
     }
+    await assertEntryRoom(input.collectionId);
     const created = await prisma.cmsEntry.create({ data: { id: input.id, collectionId: input.collectionId, ...data } });
     if (bump) await touchCmsEdited(siteId);
     return created;
   }
+  await assertEntryRoom(input.collectionId);
   const created = await prisma.cmsEntry.create({ data: { collectionId: input.collectionId, ...data } });
   if (bump) await touchCmsEdited(siteId);
   return created;
+}
+
+/** DM-12: records per collection are bounded (the most a list can show). */
+async function assertEntryRoom(collectionId: string): Promise<void> {
+  const count = await prisma.cmsEntry.count({ where: { collectionId, deletedAt: null } });
+  if (count >= CMS_MAX_ENTRIES_PER_COLLECTION) {
+    throw new CmsError("INVALID", `A collection holds at most ${CMS_MAX_ENTRIES_PER_COLLECTION.toLocaleString("en-US")} records.`);
+  }
 }
 
 export async function deleteEntry(siteId: string, id: string): Promise<void> {
@@ -836,6 +858,12 @@ function substituteOutsideScriptStyle(
 // removing them produced two <title> elements, and browsers/crawlers use the
 // first, so the pattern-derived title the collection is configured for never
 // actually won.
+/* BD-05: the template page's own social + canonical tags described the
+   TEMPLATE page (which never publishes) — every record page claimed to be it.
+   They go with its title and description; og:title / og:description are
+   re-emitted per record from the patterns below. A per-record canonical and
+   og:url need the site's published URL, which this service does not own
+   (publish URLs live with the SEO/publish code) — not emitted here. */
 function stripExistingSeoTags(html: string): string {
   return html
     .replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, "")
@@ -860,12 +888,6 @@ export async function generateDynamicPages(
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
-/* BD-05: the template page's own social + canonical tags described the
-   TEMPLATE page (which never publishes) — every record page claimed to be it.
-   They go with its title and description; og:title / og:description are
-   re-emitted per record from the patterns below. A per-record canonical and
-   og:url need the site's published URL, which this service does not own
-   (publish URLs live with the SEO/publish code) — not emitted here. */
   const rules = fieldRules(col.fields);
   const richtext = new Set(rules.filter((f) => f.type === "richtext").map((f) => f.slug));
   const fieldKeys = new Set(rules.map((f) => f.slug));

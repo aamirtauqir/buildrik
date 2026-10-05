@@ -12,7 +12,7 @@ const entryFindUnique = vi.fn();
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     cmsCollection: { findFirst: (...a: unknown[]) => findFirst(...a) },
-    cmsEntry: { findUnique: (...a: unknown[]) => entryFindUnique(...a) },
+    cmsEntry: { findUnique: (...a: unknown[]) => entryFindUnique(...a), count: async () => 0 },
   },
 }));
 
