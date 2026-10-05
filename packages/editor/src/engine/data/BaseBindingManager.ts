@@ -136,6 +136,10 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
       this.bindings.set(elementId, filtered);
     }
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId, key });
+    /* The map is part of the saved project: an unbind that dirties nothing
+       is never saved, and the server kept the binding (found live, C1 —
+       a collection delete's unbinds came back on reload). */
+    this.composer.markDirty?.();
     this.composer.history?.noteUnrecordedAction?.("unbinding a field");
   }
 
@@ -146,6 +150,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
     if (historyLabel) this.composer.history?.flushPending?.();
     this.bindings.delete(elementId);
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId });
+    this.composer.markDirty?.();
     if (historyLabel) this.composer.history?.record?.(historyLabel);
     else this.composer.history?.noteUnrecordedAction?.("unbinding a field");
   }

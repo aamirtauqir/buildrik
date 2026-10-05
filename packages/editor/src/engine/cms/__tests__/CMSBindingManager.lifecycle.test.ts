@@ -92,3 +92,16 @@ describe("bindable types (BD-11)", () => {
     expect(bindings.getBindings("h")).toHaveLength(1);
   });
 });
+
+describe("an unbind is a project change (CMS-06 live)", () => {
+  it("unbind and unbindAll dirty the project, so the save carries them", () => {
+    const { composer, bindings } = setup(new Set(["h1", "h2"]));
+    const markDirty = (composer as unknown as { markDirty: ReturnType<typeof vi.fn> }).markDirty;
+    bindings.import({ h1: [field()], h2: [field()] });
+    markDirty.mockClear();
+    bindings.unbind("h1", "content");
+    expect(markDirty).toHaveBeenCalledTimes(1);
+    bindings.unbindAll("h2");
+    expect(markDirty).toHaveBeenCalledTimes(2);
+  });
+});
