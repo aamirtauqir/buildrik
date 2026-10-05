@@ -33,7 +33,7 @@ const page = (id: string, slug: string, extra: Record<string, unknown> = {}) => 
 });
 
 describe("ExportEngine — page-record bindings", () => {
-  it("writes {field} on the template page and the first record's value elsewhere", async () => {
+  it("writes {{bk:field}} on the template page and the first record's value elsewhere", async () => {
     const composer = new Composer({} as never);
     composer.importProject({ pages: [page("home", "", { isHome: true }), page("item", "menu-item")] } as never);
     const cms = composer.cms.collections;
@@ -51,8 +51,8 @@ describe("ExportEngine — page-record bindings", () => {
 
     const { files } = await new ExportEngine(composer).exportAllPages({ format: "html" });
     const html = (n: string) => files.find((f) => f.name === n)!.content;
-    expect(html("menu-item.html")).toMatch(/<h1[^>]*>\{name\}<\/h1>/);
-    expect(html("menu-item.html")).toContain('src="{photo}"');
+    expect(html("menu-item.html")).toMatch(/<h1[^>]*>\{\{bk:name\}\}<\/h1>/); // BD-13 namespaced token
+    expect(html("menu-item.html")).toContain('src="{{bk:photo}}"');
     expect(html("index.html")).toMatch(/<h1[^>]*>Margherita<\/h1>/);
     expect(html("index.html")).toContain('src="m.jpg"');
   });
