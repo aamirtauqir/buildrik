@@ -130,6 +130,8 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
 - `emitTokenCss` keeps today's value sanitizing (`siteTokensCSS` strips `;`, `{`, `}`, `<`) and also
   refuses values that fail the kind's schema. This matters more now that §9 feeds extracted values in.
 - Canvas: one `<style>` element with this string replaces `ProjectTokensApplier`'s per-var `setProperty`.
+  Writes are coalesced to at most one per animation frame, and a continuous drag is one history entry
+  (eng P1).
   The editor's Light/Dark switch sets `data-theme` on the canvas root.
 - Export (single-file, ZIP) and publish write the same string. An optional theme-toggle element flips
   `data-theme`.
@@ -198,7 +200,9 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
   Version skew). Never both for the same request.
 - **First migrated save (payload newer than store):** `saveProjectData` writes the `migration` snapshot
   of the stored (old-shape) tokens **in the same DB transaction** as the save. No migrated data can be
-  stored without its snapshot.
+  stored without its snapshot. Such a save **must** carry `expectedLastEditedAt` (refused otherwise);
+  the pre-transaction read also selects `lastEditedAt` and must equal it (else conflict), so the snapshot
+  is exactly the state the CAS overwrites (eng E4).
 - `custom-<id>` primitives are named deterministically from the original token id (`custom-<originalId>`),
   so two tabs migrating the same site produce identical patches. The
   workspace shared theme (pushed into sites by `withTokens`) is migrated by the same function, both when
@@ -231,7 +235,7 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
 ## 5 · Testing and done-conditions
 
 ### Tests (each must fail on the old code)
-1. Schema refuses alias cycles, kind mismatches and modes on primitives — client and server.
+1. Schema (`packages/shared/schemas/design-tokens.ts`) refuses alias cycles, kind mismatches and modes on primitives — client and server.
 2. `emitTokenCss` emits every token, keeps aliases as `var()`, writes light / `prefers-color-scheme` /
    `data-theme` blocks, and emits legacy names as aliases.
 3. Token closure: every `var()` in every catalog block and component export is defined.
@@ -261,7 +265,18 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
 20. Legacy backstop: a deleted seed token used by an element still resolves after migration.
 21. Theme push keeps in-use site-only tokens.
 22. Toggle block: flips `data-theme`, persists, no flash on reload; hidden on publish when Dark mode is Off.
-23. Kill switch off: no migration, old-shape saves accepted, Brand read-only.
+23. Kill switch off: un-migrated site is not migrated and Brand is read-only; an already-migrated site
+    still loads and saves normally.
+31. Admin theme-push rollback takes the newest `theme-push` snapshot even when a newer generator
+    snapshot exists (E1).
+32. Migration rollback sets the hold; reload does not re-migrate; clearing the hold allows migration (E2).
+33. A tokens-version-raising save without `expectedLastEditedAt` is refused; a pre-read whose
+    `lastEditedAt` differs yields a conflict (E4).
+34. Prune failure is logged and does not fail the save (E5); legacy rows absent from the Brand list,
+    present for admin rollback (E6).
+35. Emit coalescing: 50 rapid edits → one stylesheet write per frame, final value correct (P1).
+36. E2E (Playwright, QA workspace, publish blocked): Primary change + ⌘Z measured with
+    `getComputedStyle`; migration fixture export CSS diff = 0; Dark Auto flow (T1).
 24. `migrateTokens` throwing: editor loads old tokens, Brand read-only, Sentry event; nothing saved.
 25. `emitTokenCss` with one bad value: skips it, still emits the backstop var, does not throw.
 26. Autosave refusal: persistent banner, local recovery copy, no retry loop on the same payload.
@@ -322,7 +337,8 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
   - `darkMode` (the site's Dark mode setting at snapshot time), so restoring a `dark-auto` snapshot also
     restores the setting.
   **One restore list per site**, shown in Brand. **Retention:** the cap of 10 applies to all reasons
-  except `migration`, which is never pruned (at most one per schema version). Writing a snapshot changes
+  except `migration`, which is never pruned (at most one per schema version). A prune failure is logged
+  with siteId instead of being swallowed; the save still succeeds (eng E5). Writing a snapshot changes
   neither `lastEditedAt` nor `dsSchemaVersion`, so no open editor reloads or conflicts because of it. Snapshot writes go through `theme.service.ts` (Router → Service → Prisma). The
   Prisma migration is created by the agent and applied by the owner.
 - Taken automatically before: migration, scale generator, Dark-mode Auto switch, Connect to tokens
@@ -331,9 +347,14 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
   the shared migration if the snapshot is an older schema version, and applies it as one transaction.
   So it is one ⌘Z step and is saved by normal autosave. If a theme push lands between fetching the
   snapshot and saving it, the save gets the normal `lastEditedAt` conflict (acceptable; user reloads).
-- **Migration rollback is the one server-only path:** for `reason=migration`, `rollbackSiteTheme` is kept
-  (extended to restore `tokensSchemaVersion` too) and writes the old shape verbatim, bumping
-  `dsSchemaVersion` so open editors reload. It is an operator/owner action, not shown in the user's
+- **Migration rollback is the one server-only path:** for `reason=migration`, a rollback writes the old shape
+  verbatim (tokens + `tokensSchemaVersion`), bumps `dsSchemaVersion` so open editors reload, and sets a
+  per-site `tokensMigrationHold` (eng E2): while held, neither the editor nor the server migrates that
+  site; the runbook clears the hold once the bug is fixed.
+- The existing admin theme-push rollback (`rollbackSiteTheme`) and its list filter on `reason = 'theme-push'`
+  (eng E1), so a newer generator/logo snapshot never changes what "undo the push" undoes.
+- The Brand restore list returns only rows whose `prevStyles` is a token set; legacy projectStyles rows
+  stay admin-rollback-only (eng E6). It is an operator/owner action, not shown in the user's
   restore list. All other restores use the client path.
 
 ## 9 · Brand from logo or website URL (D7)
@@ -360,9 +381,9 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
 
 ### Kill switch (D14)
 - A **server-side** env var (`BRAND_TOKENS_V2`, not `NEXT_PUBLIC_*`, which would bake at build time) is
-  read by the server and sent to the editor at load. Off → the editor does not migrate, reads the old
-  shape, and Brand is read-only with a notice; the server accepts old-shape saves. On → Part 1
-  behaviour. Rollout: QA workspace first, then everyone. The CLAUDE.md env table gets the row in the
+  read by the server and sent to the editor at load. **Off = no new migrations (eng E3):** sites already
+  migrated keep working on the new shape (version rule unchanged); sites not yet migrated stay on the
+  old shape with Brand read-only and a notice. On → Part 1 behaviour. Rollout: QA workspace first, then everyone. The CLAUDE.md env table gets the row in the
   same commit.
 
 ### Migration and emit safety (D17)
@@ -539,9 +560,9 @@ Stale diagram audit: no existing ASCII diagrams in the files this plan touches w
 ## Implementation Tasks
 Synthesized from this review's findings (detailed plan comes from `writing-plans`).
 
-- [ ] **T1 (P1, human: ~3d / CC: ~1.5h)** — shared — tokens schema (DTCG shape), migrate, emit + backstop + sanitize
-  - Surfaced by: Step 0 corrections, D4, D9, rounds 2–3
-  - Files: `packages/shared/` (to be determined), `engine/designSystem/types.ts`, `engine/export/ExportHelpers.ts`
+- [ ] **T1 (P1, human: ~3d / CC: ~1.5h)** — shared — tokens schema (DTCG shape), migrate, emit + backstop + sanitize, usage index
+  - Surfaced by: Step 0 corrections, D4, D9, rounds 2–3; eng D1 arrangement
+  - Files: `packages/shared/tokens/{schema,migrate,emit,usage}.ts`; browser-only `engine/designSystem/{scale,quantize}.ts`, `engine/designSystem/types.ts`, `engine/export/ExportHelpers.ts`
   - Verify: tests 1, 2, 5, 10, 15, 19, 20, 25
 - [ ] **T2 (P1, human: ~2d / CC: ~1h)** — server — schema on 4 write paths, version rule, migration snapshot in save txn, kill switch
   - Surfaced by: D9(b), D14, round 3
@@ -611,17 +632,219 @@ Synthesized from this review's findings (detailed plan comes from `writing-plans
 Spec-review loop: 3 rounds (6, 5, 6 / 10). The 6 round-3 fixes (§4/§8 snapshot mechanics) were applied
 after the last reviewer launch and are **not reviewer-verified**; `/plan-eng-review` must re-check them.
 
+# Eng review record (/plan-eng-review, 2026-10-05)
+
+Target: `docs/superpowers/specs/2026-10-05-brand-token-foundation-design.md` (commit 90c756935).
+
+## Scope record
+feature answers: none proposed (CEO scope D2–D17 kept); structure: B "Smaller arrangement" (eng D1, owner answer 2026-10-05); accepted scope: shared `packages/shared/tokens/` holds schema.ts (DTCG shape + round-trip), migrate.ts, emit.ts, usage.ts; editor `engine/designSystem/` holds scale.ts and quantize.ts (browser-only); pending remedies: E1–E6.
+Scope Challenge result: scope accepted as-is (smaller arrangement, no feature reduction).
+
+## Decision ledger
+
+### E1: theme-push rollback must ignore Brand snapshots
+Finding: 1, P1, confidence 9/10, `server/services/theme.service.ts:331-334` (`findFirst({ where: { siteId, workspaceId }, orderBy: { createdAt: "desc" } })`), reviewer: eng review
+Plan baseline: spec §8 (D10 reopened) puts generator/connect/logo/dark-auto/migration snapshots in the same `SiteThemeSnapshot` table; admin rollback route unchanged.
+Runtime evidence: `rollbackSiteTheme` pops the newest snapshot of any kind and deletes it.
+Comparison grid: | Choice | Current | A | B | / E1 rollback filter | none | `reason = 'theme-push'` on rollback + admin list, regression test | none (admin rollback may undo a generator/logo snapshot) |
+Question D2: see AskUserQuestion D2 (filter vs do nothing). Recommendation A. Completeness A=10/10, B=3/10.
+State: approved
+Actual answer: D2 A "Filter by reason" (owner, 2026-10-05)
+Accepted scope: `rollbackSiteTheme` and the admin snapshot list filter `reason = 'theme-push'`; regression test: a newer generator snapshot does not change which snapshot admin rollback takes.
+
+### E2: migration rollback is undone by the next load
+Finding: 2, P1, confidence 8/10, spec §4 "server-only migration rollback" + §10 kill switch, reviewer: eng review
+Plan baseline: rollback writes old shape + old version; switch on → editor migrates on load.
+Runtime evidence: proposed behaviour only (no code yet); with the switch on, a rolled-back site re-migrates on its next open.
+Comparison grid: | Choice | Current | A | B | / E2 hold | none | per-site `tokensMigrationHold` set by rollback, editor + server skip migration while held, runbook clears it | rollback only with global switch off (documented) |
+Question D3: see AskUserQuestion D3. Recommendation A. Completeness A=9/10, B=6/10.
+State: approved
+Actual answer: D3 A "Per-site hold" (owner, 2026-10-05)
+Accepted scope: rollback sets per-site `tokensMigrationHold`; editor and server skip migration while held; runbook step clears it; test: rollback → reload → site stays old shape.
+
+### E3: kill switch "off" cannot read old shape for migrated sites
+Finding: 3, P2, confidence 8/10, spec §10 "Off → the editor does not migrate, reads the old shape … the server accepts old-shape saves", reviewer: eng review
+Plan baseline: D14 server-side switch.
+Runtime evidence: contradiction inside the spec (migrated sites store the new shape; §4 version rule refuses older payloads).
+Comparison grid: | Choice | Current | A | B | / E3 off-semantics | ambiguous | Off = no NEW migrations; migrated sites keep working; version rule unchanged; un-migrated sites stay old with Brand read-only | Off = also roll every migrated site back |
+Question D4: see AskUserQuestion D4. Recommendation A. Note: options differ in kind.
+State: approved
+Actual answer: D4 A "Off = no new migrations" (owner, 2026-10-05)
+Accepted scope: §10 reworded: Off stops new migrations only; migrated sites keep working; version rule unchanged; un-migrated sites stay old with Brand read-only; test 23 updated.
+
+### E4: migration snapshot source read outside the save transaction
+Finding: 4, P2, confidence 7/10, `server/services/sites.service.ts:908-911` (`findUnique … select: { deletedAt: true, projectSettings: true }` before `$transaction`) and `:948` (`...(expectedLastEditedAt ? { lastEditedAt: … } : {})`), reviewer: eng review
+Plan baseline: spec §4 "writes the migration snapshot of the stored tokens in the same DB transaction".
+Runtime evidence: stored settings are read before the transaction; CAS is skipped when `expectedLastEditedAt` is omitted.
+Comparison grid: | Choice | Current | A | B | / E4 snapshot consistency | pre-txn read, optional CAS | a save that raises the tokens schema version must carry `expectedLastEditedAt`; pre-read also selects `lastEditedAt` and must equal it; snapshot from that read | lock row inside txn with raw `SELECT … FOR UPDATE` and snapshot from it |
+Question D5: see AskUserQuestion D5. Recommendation A. Completeness A=9/10, B=9/10 (kind differs).
+State: approved
+Actual answer: D5 A "Require CAS" (owner, 2026-10-05)
+Accepted scope: a save that raises the tokens schema version is refused without `expectedLastEditedAt`; the pre-read selects `lastEditedAt` and must equal it or conflict; snapshot taken from that read; tests for both.
+
+### E5: snapshot pruning swallows errors
+Finding: 5, P3, confidence 9/10, `server/services/theme.service.ts:288-290` (`.deleteMany(…).catch(() => {})`), reviewer: eng review
+Plan baseline: spec §8 retention 10, migration rows exempt.
+Runtime evidence: prune failures are silent.
+Comparison grid: | Choice | Current | A | B | / E5 prune | silent catch, all reasons | exempt `migration` in the query, log failure with siteId, test | leave as is |
+Question D6: see AskUserQuestion D6. Recommendation A. Completeness A=10/10, B=5/10.
+State: approved
+Actual answer: D6 A "Exempt + log" (owner, 2026-10-05)
+Accepted scope: prune query excludes `reason = 'migration'`; prune failure logged with siteId (save still succeeds); tests: migration row survives 15 generator runs, prune error is logged.
+
+### E6: legacy snapshots cannot be restored by the client
+Finding: 6, P2, confidence 9/10, `server/services/theme.service.ts:340-341` (`const prevTokens = readTokenTheme(snap.prevStyles);` … legacy rows hold projectStyles), reviewer: eng review
+Plan baseline: spec §8 "One restore list per site … Restore runs in the editor".
+Runtime evidence: some stored rows are projectStyles snapshots, not token sets.
+Comparison grid: | Choice | Current | A | B | / E6 list filter | n/a | Brand list returns only rows where `readTokenTheme(prevStyles)` is a token set; legacy rows stay for admin rollback only; test | show all, client errors on legacy |
+Question D7: see AskUserQuestion D7. Recommendation A. Completeness A=10/10, B=4/10.
+State: approved
+Actual answer: D7 A "Filter legacy rows" (owner, 2026-10-05)
+Accepted scope: Brand restore list returns only rows whose `prevStyles` is a token set; legacy rows stay admin-rollback-only; test.
+
+### F1: schema file location (factual correction, no behaviour change)
+Finding: 7, P2, confidence 9/10, CLAUDE.md Global Invariants ("Shared/domain validation schemas live in `packages/shared/schemas/` (SSOT)"); eng D1 had put schema.ts under `packages/shared/tokens/`.
+Correction: schema at `packages/shared/schemas/design-tokens.ts`; migrate/emit/usage stay in `packages/shared/tokens/`. No question needed.
+
+### T1: automated E2E for the three critical flows
+Finding: 8, P2, confidence 8/10, spec §5 live done-conditions have no automated E2E, reviewer: eng review (Section 3)
+Comparison grid: | Choice | Current | A | B | / E2E | none (live QA only) | 3 Playwright tests in the QA workspace with publish blocked | live QA only |
+State: approved
+Actual answer: D8 A "Add 3 E2E" (owner, 2026-10-05)
+Accepted scope: Playwright: (1) change Primary → canvas computed colour changes → one ⌘Z restores it; (2) migration fixture site → export CSS diff = 0; (3) Dark Auto → generate → preview → confirm.
+
+### P1: coalesce token CSS writes during continuous edits
+Finding: 9, P2, confidence 6/10 (unmeasured), spec §2 "one `<style>` element with this string replaces … per-var `setProperty`"; canvas shares the editor document, reviewer: eng review (Section 4)
+Comparison grid: | Choice | Current | A | B | / emit rate | every edit rewrites the stylesheet | at most one write per animation frame; one history entry per drag | measure after 1a |
+State: approved
+Actual answer: D9 A "rAF coalesce" (owner, 2026-10-05)
+Accepted scope: emitter writes coalesced to one per animation frame; test: 50 rapid edits → one write per frame, final value correct; live measure of picker drag on a ~200-element page.
+
+### N1: autosave times out on large pages (pre-existing, outside this plan)
+Finding: 10, P1, confidence 8/10, Brand QA walk 2026-10-05 (`qa/brand-bugs-2026-10-05`, 615487d05): saving a ~700-element page → 500 from DB timeout in `tx.page.upsert`, then 409. Not caused by this plan, but E4 adds a snapshot write to the same transaction. Recorded for a separate /investigate.
+State: approved
+Actual answer: D10 C "Build now, before 1a" (owner, 2026-10-05)
+Accepted scope: before any 1a work, root-cause and fix the save-transaction timeout on large pages via /investigate; regression test: a ~700-element page saves without 500/409.
+
+Approval readiness: PASS — checked E1 (D2 A), E2 (D3 A), E3 (D4 A), E4 (D5 A), E5 (D6 A), E6 (D7 A), T1 (D8 A), P1 (D9 A), N1 (D10 C); F1 is a factual correction (no behaviour change); scope record = D1 B.
+
+## Eng review outputs
+
+### NOT in scope
+- Canvas-vs-export fidelity differences unrelated to tokens (2,435 computed-style diffs from canvas-only
+  styling, found by Brand QA 2026-10-05): needs its own audit; not part of the token pipeline.
+- Everything already listed under the CEO review's NOT in scope.
+
+### What already exists
+CEO review table stands. Added by this review: the CAS pattern in `saveProjectData` (`sites.service.ts:948`)
+is reused for E4; `SiteThemeSnapshot` + `pruneSnapshots` + `rollbackSiteTheme` are extended, not rebuilt
+(E1, E2, E5, E6); `@buildrik/shared` is already a dependency of the editor (`packages/editor/package.json:54`).
+
+### Diagrams
+Save path after E4 (replaces the CEO data-flow line for the first migrated save):
+```
+saveProjectData(input, expectedLastEditedAt)
+  pre-read {deletedAt, projectSettings, lastEditedAt}
+  ├─ tokens version raised? ── no ──► normal save (CAS optional, as today)
+  └─ yes ─┬─ expectedLastEditedAt missing ──► refuse (reload)
+          ├─ pre-read.lastEditedAt ≠ expected ──► SAVE_CONFLICT
+          └─ txn: CAS update ─► create SiteThemeSnapshot{reason:migration, tokensSchemaVersion, darkMode}
+                  └─ CAS lost ──► SAVE_CONFLICT (snapshot rolled back with it)
+```
+Migration hold (E2):
+```
+[migrated] ──operator rollback──► [old shape + hold] ──load──► no migration (held)
+                                          └─ runbook clears hold ──► [old shape] ──load──► migrate
+```
+Inline diagrams to add in code: `migrate.ts` (shape → version branches), `saveProjectData` (the block above).
+
+### Failure modes (new paths from this review)
+| Path | Failure | Test | Handling | User sees |
+|------|---------|------|----------|-----------|
+| admin push rollback | picks a Brand snapshot | 31 | reason filter | correct undo |
+| migration rollback | re-migrates on load | 32 | hold | site stays rolled back |
+| switch off | migrated site saves refused | 23 | Off = no new migrations | normal saves |
+| first migrated save | stale snapshot | 33 | required CAS + pre-read check | conflict → reload |
+| prune | silent failure | 34 | logged | nothing (logged) |
+| Brand restore list | legacy row | 34 | filtered | only restorable rows |
+| picker drag | style-recalc jank | 35 | rAF coalesce | smooth drag |
+| large page save | DB timeout (pre-existing) | N1 test | fix before 1a | save succeeds |
+0 critical gaps.
+
+### Worktree parallelization strategy
+| Step | Modules touched | Depends on |
+|------|----------------|------------|
+| N1 save-timeout fix | server/services (sites) | — |
+| S shared tokens | packages/shared/schemas, packages/shared/tokens | — |
+| B server | server/services (sites, theme), server/trpc/routers, prisma | N1, S |
+| C editor engine + Brand | packages/editor/src/engine, editor/design-system, editor/shell | S |
+| E E2E | e2e/ Playwright | B, C |
+
+Parallel lanes: Lane 1: N1 → B (shared `server/services/sites.service.ts`). Lane 2: S → C.
+Execution order: launch N1 and S together; when both merge, launch B and C in parallel; then E.
+Conflict flags: B and C both read the shared schema (S must be merged first); `ExportEngine`/publish
+files overlap with the cleanUrls and SEO lanes (coordinate on `lib/publish-*.ts`).
+
+## Implementation Tasks (eng review)
+Synthesized from this review's findings; add to the CEO task list T1–T8.
+
+- [ ] **E-T1 (P1, human: ~1d / CC: ~45min)** — server — fix save-transaction timeout on large pages (before 1a)
+  - Surfaced by: N1 (Brand QA 615487d05)
+  - Files: `server/services/sites.service.ts`
+  - Verify: ~700-element page saves, no 500/409
+- [ ] **E-T2 (P1, human: ~4h / CC: ~20min)** — server — snapshot reason/version/darkMode columns; rollback + list filter `theme-push`; Brand list filters legacy rows; prune exempts migration + logs
+  - Surfaced by: E1, E5, E6
+  - Files: `prisma/schema.prisma`, `server/services/theme.service.ts`, `server/trpc/routers/theme.ts`
+  - Verify: tests 31, 34
+- [ ] **E-T3 (P1, human: ~4h / CC: ~20min)** — server — required CAS + pre-read check for tokens-version-raising saves; migration snapshot in txn
+  - Surfaced by: E4
+  - Files: `server/services/sites.service.ts`
+  - Verify: tests 17, 33
+- [ ] **E-T4 (P1, human: ~4h / CC: ~20min)** — server+editor — migration hold + Off-means-no-new-migrations
+  - Surfaced by: E2, E3
+  - Files: to be determined (site flag storage), migrate.ts callers
+  - Verify: tests 23, 32
+- [ ] **E-T5 (P2, human: ~3h / CC: ~15min)** — editor — rAF-coalesced emitter, one history entry per drag
+  - Surfaced by: P1
+  - Files: `ProjectTokensApplier.tsx` replacement
+  - Verify: test 35 + live drag measure
+- [ ] **E-T6 (P2, human: ~2d / CC: ~1h)** — e2e — three Playwright flows (QA workspace, publish blocked)
+  - Surfaced by: T1
+  - Verify: test 36
+- [ ] **E-T7 (P2, human: ~30m / CC: ~5min)** — shared — schema at `packages/shared/schemas/design-tokens.ts`
+  - Surfaced by: F1
+  - Verify: gate/tsc green
+_No new tasks from Code Quality._
+
+### Unresolved decisions
+None in this review.
+
+### Completion summary
+- Step 0: Scope Challenge — scope accepted as-is (smaller arrangement D1 B; 6 round-3 findings E1–E6 resolved)
+- Architecture Review: 2 issues found
+- Code Quality Review: 0 issues found
+- Test Review: diagram produced, 1 gap identified (E2E) + regression contract for the catalog baseline
+- Performance Review: 1 issue found
+- NOT in scope: written
+- What already exists: written
+- TODOS.md updates: 1 item proposed to user (N1 → build now)
+- Failure modes: 0 critical gaps flagged
+- Unresolved decisions: 0 in this review
+- Outside voice: codex, unavailable (probe: missing gstack module `resolve-codex-generation-model.ts`); native fallback not run (TaskOutput unavailable)
+- Parallelization: 2 lanes, 2 parallel / 3 sequential steps
+- Lake Score: 4/4
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | CLEAR | 7 proposals, 6 accepted, 1 deferred |
-| Outside Review | codex via `/plan-ceo-review` | Independent 2nd opinion | 1 | unavailable | Codex probe failed (missing gstack module); no completed external review |
-| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 0 | — | — |
+| Outside Review | codex via `/plan-ceo-review` and `/plan-eng-review` | Independent 2nd opinion | 2 | unavailable | Codex probe failed (missing gstack module); no completed external review |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | ISSUES OPEN | 4 issues, 0 critical gaps (all 4 resolved with approved remedies; plus 6 scope-challenge findings E1–E6 resolved) |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | 7 UI surfaces need boards first (D15) |
 | DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
 
-- **OUTSIDE COVERAGE:** codex, plan-review phase, unavailable (probe `Module not found .../resolve-codex-generation-model.ts`); native fallback not run (TaskOutput not available in this session). No outside findings.
-- **VERDICT:** CEO CLEARED — eng review required.
+- **OUTSIDE COVERAGE:** codex, plan-review phase (CEO and eng), unavailable both times: `Module not found ".../resolve-codex-generation-model.ts"`; native fallback not run. No outside findings.
+- **VERDICT:** CEO CLEARED. Eng review ISSUES OPEN only as mapped work: all 10 findings resolved by approved remedies, 0 critical gaps, ready for the implementation plan — eng review required (re-run after implementation to clear).
 
 NO UNRESOLVED DECISIONS
