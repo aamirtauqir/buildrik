@@ -839,7 +839,9 @@ function substituteOutsideScriptStyle(
 function stripExistingSeoTags(html: string): string {
   return html
     .replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, "")
-    .replace(/<meta\b[^>]*\bname\s*=\s*["']description["'][^>]*>/gi, "");
+    .replace(/<meta\b[^>]*\bname\s*=\s*["'](?:description|twitter:title|twitter:description|twitter:url)["'][^>]*>/gi, "")
+    .replace(/<meta\b[^>]*\bproperty\s*=\s*["']og:(?:title|description|url)["'][^>]*>/gi, "")
+    .replace(/<link\b[^>]*\brel\s*=\s*["']canonical["'][^>]*>/gi, "");
 }
 
 export async function generateDynamicPages(
@@ -858,6 +860,12 @@ export async function generateDynamicPages(
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
+/* BD-05: the template page's own social + canonical tags described the
+   TEMPLATE page (which never publishes) — every record page claimed to be it.
+   They go with its title and description; og:title / og:description are
+   re-emitted per record from the patterns below. A per-record canonical and
+   og:url need the site's published URL, which this service does not own
+   (publish URLs live with the SEO/publish code) — not emitted here. */
   const rules = fieldRules(col.fields);
   const richtext = new Set(rules.filter((f) => f.type === "richtext").map((f) => f.slug));
   const fieldKeys = new Set(rules.map((f) => f.slug));
@@ -870,7 +878,11 @@ export async function generateDynamicPages(
     let html = substituteOutsideScriptStyle(cleanedTemplate, data, richtext, fieldKeys);
     const seoTags =
       `<title>${escapeHtmlText(seoTitle)}</title>` +
-      (seoDescription ? `<meta name="description" content="${escapeHtmlText(seoDescription)}">` : "");
+      (seoTitle ? `<meta property="og:title" content="${escapeHtmlText(seoTitle)}">` : "") +
+      (seoDescription
+        ? `<meta name="description" content="${escapeHtmlText(seoDescription)}">` +
+          `<meta property="og:description" content="${escapeHtmlText(seoDescription)}">`
+        : "");
     html = insertBeforeHeadClose(html, seoTags);
     // The sink defense against a dangerous URL a
     // substitution introduced runs here, over the FINAL page, through a real

@@ -249,3 +249,20 @@ describe("XSS through the server path (rich text + plain text)", async () => {
   });
 });
 
+describe("record page SEO (BD-05)", () => {
+  it("drops the template's title, description, og/twitter and canonical tags; writes the record's own", async () => {
+    const { generateDynamicPages } = await import("@server/services/cms.service");
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{slug}", pageSeoTitle: "{name} · Menu", pageSeoDescription: "About {name}", fields: FIELDS });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { slug: "tea", name: "Tea" } }]);
+    const [page] = await generateDynamicPages(
+      "s1",
+      "c1",
+      '<html><head><title>Template</title><meta name="description" content="tpl"><meta property="og:title" content="Template"><meta property="og:url" content="https://x/tpl.html"><link rel="canonical" href="https://x/tpl.html"></head><body></body></html>',
+    );
+    expect(page.content).not.toMatch(/Template|tpl/);
+    expect(page.content).toContain("<title>Tea · Menu</title>");
+    expect(page.content).toContain('<meta property="og:title" content="Tea · Menu">');
+    expect(page.content).toContain('<meta property="og:description" content="About Tea">');
+  });
+});
+
