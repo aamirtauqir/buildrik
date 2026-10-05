@@ -976,7 +976,9 @@ export async function getPublishedCmsForCollections(siteId: string, collectionId
      this page" binding as the `{field}` token the worker fills per record
      only when it knows the page IS the template. Without it every record page
      published the newest record's values. */
-  const select = { id: true, name: true, slug: true, displayField: true, fields: true, pageTemplatePath: true, createdAt: true, updatedAt: true } as const;
+  /* pageSlugPattern too: a list copy's {{item.url}} is built from it (BD-12);
+     without it every published card linked nowhere. */
+  const select = { id: true, name: true, slug: true, displayField: true, fields: true, pageTemplatePath: true, pageSlugPattern: true, createdAt: true, updatedAt: true } as const;
   const bound = await prisma.cmsCollection.findMany({
     where: { siteId, deletedAt: null, id: { in: [...collectionIds] } },
     select,

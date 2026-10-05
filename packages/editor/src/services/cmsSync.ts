@@ -52,6 +52,8 @@ export interface CmsRows {
     id: string; name: string; slug: string; displayField?: string | null; fields: unknown;
     /** The collection's template page (publish snapshot only). */
     pageTemplatePath?: string | null;
+    /** Its URL pattern ({{item.url}}; publish snapshot only). */
+    pageSlugPattern?: string | null;
     createdAt?: Date | string; updatedAt?: Date | string;
   }>;
   entries: ReadonlyArray<{
@@ -72,6 +74,7 @@ export function cmsFromRows(rows: CmsRows): { collections: CMSCollection[]; item
       displayField: c.displayField ?? undefined,
       fields: withSlugs(c.fields),
       ...(c.pageTemplatePath ? { pageTemplatePath: c.pageTemplatePath } : {}),
+      ...(c.pageSlugPattern ? { pageSlugPattern: c.pageSlugPattern } : {}),
       createdAt: iso(c.createdAt ?? c.updatedAt ?? new Date(0)),
       updatedAt: iso(c.updatedAt ?? new Date(0)),
     })),

@@ -71,3 +71,14 @@ describe("the server's sanitized copy comes back (DM-10)", () => {
     expect(saveContentItem).not.toHaveBeenCalled();
   });
 });
+
+describe("publish snapshot rows → engine collections (BD-12 live)", () => {
+  it("keep the URL pattern, which {{item.url}} reads", async () => {
+    const { cmsFromRows } = await import("../cmsSync");
+    const { collections } = cmsFromRows({
+      collections: [{ id: "c", name: "P", slug: "p", fields: [], pageSlugPattern: "/p/{slug}", updatedAt: "2026-10-05T00:00:00.000Z" }],
+      entries: [],
+    });
+    expect(collections[0].pageSlugPattern).toBe("/p/{slug}");
+  });
+});

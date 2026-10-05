@@ -280,3 +280,15 @@ describe("size caps (DM-12)", () => {
     expect(await invalid(upsertCollection("s1", { siteId: "s1", name: "N", slug: "n", fields: [] }))).toMatch(/at most 100 collections/);
   });
 });
+
+describe("publish snapshot carries the URL pattern (BD-12 live)", () => {
+  it("selects pageSlugPattern", async () => {
+    const { getPublishedCmsForCollections } = await import("@server/services/cms.service");
+    const prismaMod = (await import("@/lib/prisma")) as unknown as { prisma: { cmsCollection: Record<string, unknown> } };
+    const findMany = vi.fn().mockResolvedValue([]);
+    prismaMod.prisma.cmsCollection.findMany = findMany;
+    mocks.entFindMany.mockResolvedValue([]);
+    await getPublishedCmsForCollections("s1", ["c"]);
+    expect(findMany.mock.calls[0][0].select).toMatchObject({ pageSlugPattern: true });
+  });
+});
