@@ -44,6 +44,10 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
 | D11 | Turning Dark mode Auto on a site with missing dark values | Generate the missing dark aliases, preview, restore point, confirm (§2) |
 | D12 | Theme-toggle block for published sites | Added to Part 1, against the reviewer's Defer recommendation (§2) |
 | D13 | How logo/URL colours are extracted | Deterministic (image quantization / CSS parse); AI only optional for naming roles (§9) |
+| D14 | Global migration kill switch | Server-side env switch; off → no migration, Brand read-only on old shape (§10) |
+| D15 | Part 1 UI has no Figma boards | Request boards from the designer; engine/server work starts now; UI tasks blocked on boards; `/plan-design-review` before UI build (§11) |
+| D16 | Where logos are decoded | In the browser (canvas), not server-side sharp; no upload endpoint (§9) |
+| D17 | Hardening from the section review | All four groups accepted: migration/emit safety, authz + upload safety, preview + Apply safety, observability + runbook (§10) |
 
 ## Current state (verified on main, 2026-10-05)
 
@@ -257,6 +261,14 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
 20. Legacy backstop: a deleted seed token used by an element still resolves after migration.
 21. Theme push keeps in-use site-only tokens.
 22. Toggle block: flips `data-theme`, persists, no flash on reload; hidden on publish when Dark mode is Off.
+23. Kill switch off: no migration, old-shape saves accepted, Brand read-only.
+24. `migrateTokens` throwing: editor loads old tokens, Brand read-only, Sentry event; nothing saved.
+25. `emitTokenCss` with one bad value: skips it, still emits the backstop var, does not throw.
+26. Autosave refusal: persistent banner, local recovery copy, no retry loop on the same payload.
+27. Snapshot list/restore as VIEWER → refused; as editor without agency layer → allowed.
+28. Extract endpoint rate limit; >4 MP image downscaled; SVG parsed, never rasterized; font names sanitized.
+29. Each preview reverts on cancel, navigation and unmount; double-click Apply → one transaction.
+30. Usage index built in one pass (call count asserted) and matches per-token counts.
 18. Editor always sets `data-theme`; `Off` disables the dark preview; switching to `Auto` fills missing
     dark aliases.
 
@@ -325,9 +337,13 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
   restore list. All other restores use the client path.
 
 ## 9 · Brand from logo or website URL (D7)
-- The user uploads a logo or pastes a site URL. **Extraction is deterministic (D13):** for an image, the
-  server decodes it and quantizes colours (one new lazily-loaded image dependency) to get dominant and
-  accent colours; for a URL, it parses the page's CSS for colours and font families. The scale
+- The user picks a logo file or pastes a site URL. **Extraction is deterministic (D13):** a logo is
+  **decoded in the browser (D16)** via canvas `getImageData` and quantized by a pure function in
+  `packages/shared` (no native dependency, no upload endpoint). Images over 4 megapixels are downscaled
+  before reading; SVG logos are never rasterized: their `fill`/`stroke` colours are parsed from the
+  markup. For a URL, the server fetches the page and parses its CSS for colours and font families.
+- No colours found (e.g. a monochrome logo) → a clear "We couldn't find brand colours in this logo" state
+  with a colour picker fallback. Fetch timeout → "That site took too long to answer". The scale
   generator (§7) builds the token set. AI is optional and only suggests which colour plays which role
   (Primary/Accent); without `OPENAI_API_KEY` the most saturated dominant colour becomes Primary.
 - Fonts found on a URL: a Google Fonts family is added to the site's font list; any other family is
@@ -339,6 +355,61 @@ This spec is **Part 1 only**. Parts 2–5 get their own spec → plan → build 
 - Live done-condition: upload a logo → the preview repaints the canvas with its colours in ≤ 2 steps;
   confirm → one ⌘Z reverts; a restore point is listed.
 - Plan gating per decision 13 is Part 2's job; Part 1 ships it behind the existing `dsAi` flag.
+
+## 10 · Rollout, safety and operations (D14, D17)
+
+### Kill switch (D14)
+- A **server-side** env var (`BRAND_TOKENS_V2`, not `NEXT_PUBLIC_*`, which would bake at build time) is
+  read by the server and sent to the editor at load. Off → the editor does not migrate, reads the old
+  shape, and Brand is read-only with a notice; the server accepts old-shape saves. On → Part 1
+  behaviour. Rollout: QA workspace first, then everyone. The CLAUDE.md env table gets the row in the
+  same commit.
+
+### Migration and emit safety (D17)
+- If `migrateTokens` throws for a site, the editor still loads with the old tokens, Brand is read-only
+  with "We couldn't upgrade this site's brand — nothing was changed", and the error goes to Sentry with
+  siteId and schema version. The site is never half-migrated.
+- `emitTokenCss` never throws on a bad value: it skips that token, logs it, and the legacy backstop
+  still defines the var. Publish never fails because of one token.
+- An autosave refused by the schema shows a persistent banner (not a toast), keeps the unsaved tokens
+  in local recovery storage, and stops retrying the same payload in a loop.
+
+### Authorization and input safety (D17)
+- Snapshot list and restore require site membership with edit rights; VIEWER is refused. They do not
+  require the agency layer (the existing theme-push rollback route stays admin + agency gated).
+- The URL-extract endpoint is rate limited per user and per workspace.
+- Font family names from a URL pass through the same sanitizer as token values.
+
+### Preview and Apply safety (D17)
+- Every preview (Dark-Auto, Connect to tokens, logo/URL, generator) reverts the canvas on cancel,
+  navigation away or unmount.
+- Apply buttons are disabled while their transaction is in flight, so a double-click cannot create two
+  transactions.
+- The usage scanner builds one index of all references in a single pass; per-token counts read from
+  that index.
+
+### Observability (D17)
+- Metrics/logs: sites migrated, migrations failed (Sentry, with siteId + versions), schema refusals
+  (siteId + reason), extraction failures (kind, no URL contents logged).
+- An operator script for the migration rollback (§8), plus a runbook in `docs/` covering: switch off
+  `BRAND_TOKENS_V2`, find affected sites from the failure metric, roll them back, verify.
+
+## 11 · UI surfaces and design boards (D15)
+Part 1 adds seven UI surfaces: token usage count/highlight, restore list, Dark mode setting, Auto
+switch flow, logo/URL import, theme-toggle block, and Connect to tokens suggestions. None has a Figma
+board yet. The designer gets a brief for all seven; **engine and server work starts now, UI tasks wait
+for the boards**, and `/plan-design-review` runs before UI build. Verification follows the editor's
+board-vs-live rule.
+
+## Delivery order (recommended)
+1. **1a Foundation:** shared schema + DTCG shape, `emitTokenCss` (+ backstop), migration + kill switch,
+   snapshot columns (owner applies the Prisma migration), server validation on all four paths, one undo
+   stack, observability.
+2. **1b Binding:** insert-bound defaults, usage index + safe delete, Connect to tokens, theme push keeps
+   in-use tokens.
+3. **1c Generators:** scale generator, Dark mode Auto/Off + D11 flow, toggle block, restore list,
+   logo/URL import.
+UI parts of 1b/1c land when their boards arrive (D15).
 
 ## Out of scope (later specs)
 Part 2 Brand panel UI (surface, sections, checks as badges, starters as themes, plan gating) · Part 3
@@ -354,3 +425,203 @@ staged Save).
   store.
 - Publish output size grows because every token is emitted — measure; acceptable if under a few KB gzip.
 - `cleanUrls` and SEO lanes touch publish files in parallel — coordinate on `lib/publish-*.ts`.
+
+---
+
+# CEO review record (/plan-ceo-review, 2026-10-05, SCOPE EXPANSION)
+
+CEO scope summary: `~/.gstack/projects/aamirtauqir-buildrik/ceo-plans/2026-10-05-brand-token-foundation.md`.
+
+## Decision ledger
+
+| ID | Owner section | Answer | Status |
+|----|---------------|--------|--------|
+| D1 | Step 0E mode | SCOPE EXPANSION (owner; reviewer recommended SCOPE REDUCTION) | settled |
+| D2 | 0G | Usage map + safe delete: Add | approved |
+| D3 | 0G | Scale generator: Add | approved |
+| D4 | 0G | DTCG shape: Add | approved |
+| D5 | 0G | Contrast guard: Defer to Part 2 (TODOS.md § Brand) | deferred |
+| D6 | 0G | Restore points: Add | approved |
+| D7 | 0G | Logo/URL brand: Add (reviewer recommended Defer) | approved |
+| D8 | 0D | Dark mode per-site Auto/Off, migrated Off, new Auto | approved |
+| D9 | 0D | Three code-audit corrections: Accept all | approved |
+| D10 | 0H loop | Restore store: new table → **reopened** round 2 → extend `SiteThemeSnapshot` | approved (latest) |
+| D11 | 0H loop | Auto on missing dark values: generate + preview + snapshot | approved |
+| D12 | 0H loop | Theme-toggle block: Add (reviewer recommended Defer) | approved |
+| D13 | 0H loop | Deterministic extraction; AI optional for roles | approved |
+| D14 | Section 9 | Server-side kill switch | approved |
+| D15 | Section 11 | Boards from designer; engine first; UI blocked on boards | approved |
+| D16 | Section 5 | Browser canvas decode, no sharp | approved |
+| D17 | Sections 2–8 | All four hardening groups | approved |
+| — | Spec approval | "Approve, continue" | approved |
+
+Approval readiness: PASS (D2–D17 each cite the owner's AskUserQuestion answer in this session; no unapproved remedy is in the spec).
+
+## NOT in scope
+- Contrast guard (WCAG AA): deferred to Part 2 badges (D5), recorded in TODOS.md.
+- Parts 2–5 (Brand panel UI, Inspector picker, Text/Component styles, workspace library, import/export UI).
+- Server-side image decoding (D16 rejected sharp).
+
+## What already exists (reused)
+| Need | Existing code | Reused? |
+|------|---------------|---------|
+| Undo of token edits | `HistoryManager` snapshot/patch incl. `designTokens` (:376-410) | Yes, only the extra stacks go |
+| Dark CSS shape | `CSSBundler.ts:70-85` | Folded into `emitTokenCss` |
+| Alias redirect for deleted tokens | `AliasResolver.ts:107-124` + `replacedBy` | Yes (safe delete) |
+| Canvas Light/Dark switch | `ColorModeToggle` / `composer.colorMode` | Yes |
+| Snapshots + retention | `SiteThemeSnapshot`, `pruneSnapshots`, `rollbackSiteTheme` | Extended (D10) |
+| Transactions | `Composer` begin/endTransaction | Yes, for every multi-token write |
+| Save conflicts | `lastEditedAt` compare-and-swap | Yes, for version skew |
+| Lazy AI client | `openai.client.ts` | Optional role naming only |
+
+## Dream state delta
+After Part 1: one token pipeline (schema → emitter) shared by canvas, export and publish; safe binding,
+delete and restore; dark mode that never surprises a live site; tokens in a standard format. Still
+missing vs the 12-month ideal: the Brand panel UX (Part 2), the Inspector picker everywhere (Part 3),
+styles (Part 4), and the agency library (Part 5).
+
+## Error & Rescue Registry
+| Codepath | Failure | Rescue | User sees | Test |
+|----------|---------|--------|-----------|------|
+| `migrateTokens` on load | throws on unexpected data | load old tokens, Brand read-only, Sentry | "We couldn't upgrade this site's brand — nothing was changed" | 24 |
+| server schema on save | invalid payload | domain error → tRPC error; client stops retrying that payload | persistent banner; local recovery copy | 8, 26 |
+| server version rule | old payload vs newer store | refuse | "reload to continue" | 16, 19 |
+| `emitTokenCss` | bad value | skip + log; backstop defines var | nothing broken | 15, 25 |
+| first migrated save | snapshot write fails | whole DB transaction fails | normal save-failed state | 17 |
+| client restore | theme push in between | `lastEditedAt` conflict | reload prompt | 17 |
+| URL extract | SSRF / redirect / rebinding | refuse | "This address can't be used" | 14 |
+| URL extract | timeout / too big | abort | "That site took too long to answer" | 14 |
+| logo decode | no colours / huge image | empty state / downscale | picker fallback | 28 |
+| AI role naming | missing key, malformed or refused | deterministic fallback | nothing (works without AI) | 14 |
+| delete in-use token | usage > 0 or unknown | refuse until replacement picked | replacement picker | 11 |
+
+## Failure Modes Registry
+```
+CODEPATH            | FAILURE MODE              | RESCUED? | TEST? | USER SEES?            | LOGGED?
+--------------------|---------------------------|----------|-------|-----------------------|--------
+migrateTokens       | throw                     | Y        | Y(24) | read-only notice      | Sentry
+autosave + schema   | refusal loop              | Y        | Y(26) | persistent banner     | Y
+emitTokenCss        | bad value                 | Y        | Y(25) | nothing               | Y
+theme push          | drops in-use token        | Y        | Y(21) | nothing               | -
+migration rollout   | bug across many sites     | Y (D14)  | Y(23) | read-only notice      | metric
+previews            | stuck after navigate      | Y        | Y(29) | canvas reverts        | -
+Apply               | double transaction        | Y        | Y(29) | one change            | -
+snapshot retention  | migration row pruned      | Y        | Y(17) | rollback still works  | -
+```
+0 CRITICAL GAPS (the one found in Section 2, `migrateTokens` blocking load, is closed by D17).
+
+## Diagrams
+System architecture: see Section 1 of the review (shared pure modules → editor, server, export). Data
+flow (save path with shadow paths):
+```
+edit ─► Composer txn ─► history patch ─► autosave ─► schema(Zod) ──ok──► saveProjectData
+                                                      │                    ├─ store old & payload new → write migration snapshot (same txn)
+                                                      │                    └─ lastEditedAt CAS ──stale──► conflict "reload"
+                                                      └─invalid─► domain error ─► banner + local copy (no retry loop)
+load ─► kill switch? ─off─► old shape, Brand read-only
+          └─on─► migrateTokens ─throw─► old tokens, read-only, Sentry
+                     └─ok─► emitTokenCss ─► <style> ; data-theme from colorMode
+```
+Dark mode state:
+```
+ [Off] ──owner turns Auto──► [Auto pending: generate missing dark → preview → snapshot]
+   ▲                                 │confirm                 │cancel/navigate
+   │                                 ▼                        ▼
+   └──────owner turns Off────── [Auto]                     [Off] (canvas reverted)
+```
+Rollback: `BRAND_TOKENS_V2=off` (stops spread) → find sites from failure metric → operator script runs
+migration rollback per site (restores tokens + schema version, bumps `dsSchemaVersion`) → verify CSS.
+Deployment: Prisma migration (owner) → server accepting both shapes → editor; switch on for QA
+workspace → three-site live check → switch on for all.
+
+Stale diagram audit: no existing ASCII diagrams in the files this plan touches were found.
+
+## Implementation Tasks
+Synthesized from this review's findings (detailed plan comes from `writing-plans`).
+
+- [ ] **T1 (P1, human: ~3d / CC: ~1.5h)** — shared — tokens schema (DTCG shape), migrate, emit + backstop + sanitize
+  - Surfaced by: Step 0 corrections, D4, D9, rounds 2–3
+  - Files: `packages/shared/` (to be determined), `engine/designSystem/types.ts`, `engine/export/ExportHelpers.ts`
+  - Verify: tests 1, 2, 5, 10, 15, 19, 20, 25
+- [ ] **T2 (P1, human: ~2d / CC: ~1h)** — server — schema on 4 write paths, version rule, migration snapshot in save txn, kill switch
+  - Surfaced by: D9(b), D14, round 3
+  - Files: `server/services/sites.service.ts`, `server/services/theme.service.ts`, `prisma/schema.prisma`
+  - Verify: tests 8, 16, 17, 23, 26
+- [ ] **T3 (P1, human: ~2d / CC: ~1h)** — editor — one undo stack, `<style>` emitter, always-set data-theme, migration-failure path
+  - Surfaced by: D9(a)(c), Section 2
+  - Files: `ProjectTokensApplier.tsx`, `useBrandDraft.ts` (delete), `ReviewModal.tsx` (delete), `useTokensForKind.ts`, `BrandWorkspace.tsx`
+  - Verify: tests 7, 18, 24; live: change Primary, one ⌘Z
+- [ ] **T4 (P1, human: ~3d / CC: ~1.5h)** — binding — insert-bound blocks, usage index + safe delete, Connect to tokens, theme push keeps in-use tokens
+  - Surfaced by: §3, D2, round 2
+  - Files: `shared/constants/defaultStyles.ts`, `blocks/`, theme.service
+  - Verify: tests 3, 4, 6, 11, 21, 30
+- [ ] **T5 (P2, human: ~3d / CC: ~1.5h)** — generators — scale generator, Dark Auto/Off + D11 flow, toggle block, restore list (UI after boards)
+  - Surfaced by: D3, D8, D11, D12, D10
+  - Files: to be determined
+  - Verify: tests 9, 12, 13, 22, 27, 29
+- [ ] **T6 (P2, human: ~4d / CC: ~2h)** — import — logo (browser decode) and URL (server fetch, SSRF guard, rate limit)
+  - Surfaced by: D7, D13, D16, D17
+  - Files: to be determined
+  - Verify: tests 14, 28
+- [ ] **T7 (P2, human: ~1d / CC: ~30m)** — ops — metrics, Sentry events, rollback script, runbook, CLAUDE.md env row
+  - Surfaced by: Section 8, D14
+  - Verify: run the runbook against a seeded local site
+- [ ] **T8 (P1, owner/designer)** — design — brief for the 7 UI surfaces; `/plan-design-review` before UI build
+  - Surfaced by: Section 11, D15
+  - Verify: boards exist and are linked in `boards.json`
+
+## Completion Summary
+```
+  +====================================================================+
+  |            MEGA PLAN REVIEW — COMPLETION SUMMARY                   |
+  +====================================================================+
+  | Mode selected        | SCOPE EXPANSION                             |
+  | System Audit         | 5 spec assumptions wrong vs code (dark on   |
+  |                      | live sites, undo stacks, server paths,      |
+  |                      | delete → undefined var, existing toggle)    |
+  | Step 0               | EXPANSION; D2-D7, D8, D9                     |
+  | Section 1  (Arch)    | 3 issues found                              |
+  | Section 2  (Errors)  | 11 error paths mapped, 4 GAPS (all closed)  |
+  | Section 3  (Security)| 5 issues found, 2 High severity             |
+  | Section 4  (Data/UX) | 3 edge cases mapped, 2 unhandled (closed)   |
+  | Section 5  (Quality) | 2 issues found                              |
+  | Section 6  (Tests)   | Diagram produced, 6 gaps (closed)           |
+  | Section 7  (Perf)    | 1 issue found                               |
+  | Section 8  (Observ)  | 2 gaps found (closed)                       |
+  | Section 9  (Deploy)  | 2 risks flagged                             |
+  | Section 10 (Future)  | Reversibility: 2/5, debt items: 1           |
+  | Section 11 (Design)  | 1 issue (7 surfaces without boards)         |
+  +--------------------------------------------------------------------+
+  | NOT in scope         | written (3 items)                           |
+  | What already exists  | written                                     |
+  | Dream state delta    | written                                     |
+  | Error/rescue registry| 11 rows, 0 CRITICAL GAPS                    |
+  | Failure modes        | 8 total, 0 CRITICAL GAPS                    |
+  | TODOS.md updates     | 1 item (D5)                                 |
+  | Scope proposals      | 7 proposed, 6 accepted (EXP)                |
+  | CEO plan             | written                                     |
+  | Outside voice        | codex: unavailable (probe module missing)   |
+  | Lake Score           | 5/5 recommendations chose complete option   |
+  | Diagrams produced    | 5 (architecture, data flow, state, rollback,|
+  |                      | deployment)                                 |
+  | Stale diagrams found | 0                                           |
+  | Unresolved decisions | 0                                           |
+  +====================================================================+
+```
+Spec-review loop: 3 rounds (6, 5, 6 / 10). The 6 round-3 fixes (§4/§8 snapshot mechanics) were applied
+after the last reviewer launch and are **not reviewer-verified**; `/plan-eng-review` must re-check them.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | CLEAR | 7 proposals, 6 accepted, 1 deferred |
+| Outside Review | codex via `/plan-ceo-review` | Independent 2nd opinion | 1 | unavailable | Codex probe failed (missing gstack module); no completed external review |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 0 | — | — |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | 7 UI surfaces need boards first (D15) |
+| DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
+
+- **OUTSIDE COVERAGE:** codex, plan-review phase, unavailable (probe `Module not found .../resolve-codex-generation-model.ts`); native fallback not run (TaskOutput not available in this session). No outside findings.
+- **VERDICT:** CEO CLEARED — eng review required.
+
+NO UNRESOLVED DECISIONS
