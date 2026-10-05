@@ -73,3 +73,22 @@ describe("binding lifecycle", () => {
     expect(bindings.getCollectionBinding("list2")).toMatchObject({ elementId: "list2", collectionId: "c1", limit: 3 });
   });
 });
+
+describe("bindable types (BD-11)", () => {
+  it("a container never takes a field binding, from any door; a heading does", () => {
+    const types: Record<string, string> = { box: "container", h: "heading" };
+    const composer = {
+      data: { on: vi.fn(), off: vi.fn() },
+      markDirty: vi.fn(),
+      on: vi.fn(),
+      emit: vi.fn(),
+      history: undefined,
+      elements: { getElement: (id: string) => (types[id] ? { getType: () => types[id], setContent: vi.fn(), setTrait: vi.fn() } : null) },
+    } as unknown as Composer;
+    const bindings = new CMSBindingManager(composer, new CollectionManager());
+    bindings.bindToField("box", "c1", undefined, "title", "content");
+    bindings.bindToField("h", "c1", undefined, "title", "content");
+    expect(bindings.getBindings("box")).toEqual([]);
+    expect(bindings.getBindings("h")).toHaveLength(1);
+  });
+});

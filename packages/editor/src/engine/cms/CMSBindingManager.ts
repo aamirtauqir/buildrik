@@ -25,6 +25,7 @@ import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
 import { EVENTS } from "../../shared/constants/events";
+import { BINDABLE_TYPES } from "../../shared/constants/elementCapabilities";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
 import type { CollectionManager } from "./CollectionManager";
@@ -175,6 +176,11 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     /** Makes the bind one undo step (the inspector passes it; loads don't). */
     historyLabel?: string
   ): void {
+    /* BD-11: only element types that show content bind (BINDABLE_TYPES —
+       the Inspector's own gate), from any door. A container bound to a field
+       had its children replaced by the value. */
+    const type = this.composer.elements.getElement(elementId)?.getType?.();
+    if (type !== undefined && !BINDABLE_TYPES.has(type)) return;
     const collectionName = this.cmsManager.getCollection(collectionId)?.name;
     const binding: CMSElementBinding = {
       binding: {
