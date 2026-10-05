@@ -129,7 +129,7 @@ describe("rich text keeps the shared allow-list (PD-1, DM-10)", () => {
     });
     const stored = mocks.entCreate.mock.calls[0][0].data.data as { body: string; name: string };
     expect(stored.body).toContain("<strong>there</strong>");
-    expect(stored.body).toContain('<a href="https://x.test">ok</a>');
+    expect(stored.body).toContain("<a href=https://x.test>ok</a>"); // the shared sanitizer's canonical, unquoted href
     expect(stored.body).not.toMatch(/javascript:|<img|<script|onerror/i);
     expect(stored.name).toBe("plain");
   });
@@ -217,3 +217,35 @@ describe("template page tokens (BD-13)", () => {
     expect(page.content).toContain("<p>Tea — use {note} or { }</p>");
   });
 });
+
+/* Security review 2026-10-04: every payload through the server's whole path —
+   stored by an upsert (draft AND published), then rendered on a record page
+   (text and attribute tokens) — leaves no execution vector in the parsed
+   page. Rich text runs the one shared sanitizer at both moments. */
+describe("XSS through the server path (rich text + plain text)", async () => {
+  const { XSS_PAYLOADS, executionVector } = await import("@buildrik/shared/content/__tests__/xssVectors");
+  it.each(XSS_PAYLOADS)("%s", async (payload) => {
+    const { generateDynamicPages } = await import("@server/services/cms.service");
+    for (const status of ["DRAFT", "PUBLISHED"] as const) {
+      mocks.entCreate.mockClear();
+      await upsertEntry("s1", { siteId: "s1", collectionId: "c1", status, data: { name: "N", slug: "n", body: payload } });
+      const stored = (mocks.entCreate.mock.calls[0][0].data.data as { body: string }).body;
+      expect(executionVector(new DOMParser().parseFromString(stored, "text/html").body)).toBeNull();
+      /* Output time: the page sanitizes what it emits, even from a stored
+         value that was never sanitized (a row written before this code). */
+      for (const body of [stored, payload]) {
+        mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{slug}", pageSeoTitle: null, pageSeoDescription: null, fields: FIELDS });
+        mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { slug: "n", name: payload, body } }]);
+        const [page] = await generateDynamicPages(
+          "s1",
+          "c1",
+          '<html><head></head><body><div>{{bk:body}}</div><h1>{{bk:name}}</h1><img src="/a.png" alt="{{bk:body}}"><p title="{{bk:name}}">x</p></body></html>',
+        );
+        const doc = new DOMParser().parseFromString(page.content, "text/html");
+        expect(executionVector(doc.body, { allowImages: true })).toBeNull();
+        expect(doc.querySelectorAll("img")).toHaveLength(1);
+      }
+    }
+  });
+});
+

@@ -21,7 +21,7 @@ describe("RichTextField", () => {
     fireEvent.input(box);
     const html = onChange.mock.calls.at(-1)![0] as string;
     expect(html).toContain("<em>you</em>");
-    expect(html).toContain('<a href="https://ok.test">ok</a>');
+    expect(html).toContain("<a href=https://ok.test>ok</a>");
     expect(html).not.toMatch(/onclick|<script|javascript:/i);
   });
 

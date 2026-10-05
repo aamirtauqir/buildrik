@@ -11,18 +11,17 @@ import {
   CSV_IMPORT_MAX_ROWS,
   CSV_IMPORT_MAX_COLUMNS,
   CSV_IMPORT_MAX_CELL_LENGTH,
-  CMS_RICHTEXT_PURIFY,
   applyCmsPattern,
   cmsFieldsSchema,
   cmsPatternError,
   cmsRecordClash,
   cmsRecordErrors,
-  stripDangerousRichtextLinks,
   cmsTextOf,
   fillCmsRecordTokens,
   type CmsFieldRule,
 } from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
+import { sanitizeCmsRichText } from "@buildrik/shared/content/cmsRichText";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { CMS_COLLECTION_LIMIT_MAX, filterCmsBindings } from "@buildrik/shared/schemas/sites";
 
@@ -74,13 +73,13 @@ function sanitizeEntryData(data: Record<string, unknown>, fields: readonly CmsFi
 }
 
 /**
- * A rich text value keeps the shared allow-list's markup (PD-1 = build) — the
- * same list the editor's control sanitizes to — and loses everything else,
- * including any href the shared URL rule refuses.
+ * A rich text value through the ONE shared sanitizer (sanitizeCmsRichText —
+ * the editor runs the same code), with DOMPurify-over-jsdom as its parser.
+ * Runs on every upsert, draft or published, and again at output time on
+ * every record page.
  */
 function sanitizeRichtext(value: string): string {
-  const clean = DOMPurify.sanitize(value, { ...CMS_RICHTEXT_PURIFY, ALLOWED_TAGS: [...CMS_RICHTEXT_PURIFY.ALLOWED_TAGS], ALLOWED_ATTR: [...CMS_RICHTEXT_PURIFY.ALLOWED_ATTR] });
-  return stripDangerousRichtextLinks(String(clean));
+  return sanitizeCmsRichText(DOMPurify, value);
 }
 
 /** A stored `fields` column as the record rules read it. */

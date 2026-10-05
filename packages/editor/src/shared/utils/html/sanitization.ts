@@ -29,7 +29,7 @@ import {
   srcsetUrls,
   toAllowedElementTag,
 } from "@buildrik/shared/schemas/element-markup";
-import { CMS_RICHTEXT_PURIFY, stripDangerousRichtextLinks } from "@buildrik/shared/schemas/cms";
+import { sanitizeCmsRichText } from "@buildrik/shared/content/cmsRichText";
 import type { ElementData } from "../../types";
 import { generateId } from "../helpers/id";
 import {
@@ -145,17 +145,12 @@ export function isSafeAttrValue(attr: string, value: string, _tag: string): bool
 const EDITOR_ADD_ATTR = ["target", "data-buildrick-id", "data-buildrick-type"];
 
 /**
- * A CMS rich text value cut to the shared allow-list (PD-1 = build) — the
- * same list the server sanitizes a stored value to (cms.service), so the
- * record editor, the canvas and the published page all hold one markup.
+ * A CMS rich text value through the ONE shared sanitizer (PD-1) — the code
+ * the server runs too (`sanitizeCmsRichText`, this browser's DOMPurify as its
+ * parser).
  */
 export function sanitizeRichtext(html: string): string {
-  const clean = DOMPurify.sanitize(html, {
-    ...CMS_RICHTEXT_PURIFY,
-    ALLOWED_TAGS: [...CMS_RICHTEXT_PURIFY.ALLOWED_TAGS],
-    ALLOWED_ATTR: [...CMS_RICHTEXT_PURIFY.ALLOWED_ATTR],
-  });
-  return stripDangerousRichtextLinks(String(clean));
+  return sanitizeCmsRichText(DOMPurify, html);
 }
 
 /**

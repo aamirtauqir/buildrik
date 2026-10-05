@@ -7,7 +7,6 @@ import {
   cmsRecordPath,
   cmsValueError,
   isEmptyCmsValue,
-  stripDangerousRichtextLinks,
 } from "../cms";
 
 const f = (slug: string, type: string, extra: Record<string, unknown> = {}) => ({ id: slug, name: slug, slug, type, order: 0, ...extra });
@@ -63,8 +62,5 @@ describe("schema + pattern + uniqueness", () => {
     expect(cmsRecordClash(col, { id: "1", data: { slug: "x" } }, [{ id: "2", data: { slug: "x" }, published: false }])).toMatch(/already uses/);
     expect(cmsRecordClash(col, { id: "1", data: { slug: "x" } }, [{ id: "1", data: { slug: "x" }, published: true }])).toBeNull();
     expect(cmsRecordClash(col, { id: "1", data: {} }, [])).toMatch(/empty/);
-  });
-  it("rich text links: a dangerous href goes, a safe one stays", () => {
-    expect(stripDangerousRichtextLinks('<a href="javascript:x()">a</a><a href="https://y">b</a>')).toBe('<a>a</a><a href="https://y">b</a>');
   });
 });

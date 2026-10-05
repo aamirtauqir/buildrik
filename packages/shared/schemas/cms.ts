@@ -337,25 +337,8 @@ export function cmsRecordClash(
   return null;
 }
 
-/* ── Rich text (PD-1 = build) ────────────────────────────────────────────
-   A rich text value is HTML restricted to this list. The editor's control
-   and the server sanitize to the same list (DOMPurify on each side), and the
-   server writes the sanitized value back (DM-10). */
-export const CMS_RICHTEXT_TAGS = ["p", "br", "strong", "b", "em", "i", "u", "s", "a", "ul", "ol", "li", "h2", "h3", "h4", "blockquote", "code"] as const;
-export const CMS_RICHTEXT_ATTRS = ["href"] as const;
-/** The DOMPurify config both sides pass; a dangerous href is removed after. */
-export const CMS_RICHTEXT_PURIFY = {
-  ALLOWED_TAGS: [...CMS_RICHTEXT_TAGS],
-  ALLOWED_ATTR: [...CMS_RICHTEXT_ATTRS],
-  ALLOW_DATA_ATTR: false,
-} as const;
-/** Drop an `href` the shared URL rule refuses (DOMPurify's own URI check is
- *  looser than `isDangerousUrl`). Runs over DOMPurify's output. */
-export function stripDangerousRichtextLinks(html: string): string {
-  return html.replace(/\shref\s*=\s*("([^"]*)"|'([^']*)')/gi, (m, _q, dq?: string, sq?: string) =>
-    isDangerousUrl((dq ?? sq ?? "").replace(/&amp;/g, "&")) ? "" : m,
-  );
-}
+/* Rich text (PD-1): the allow-list and the one sanitizer live in
+   packages/shared/content/cmsRichText.ts. */
 
 export const upsertCollectionInput = z.object({
   id: z.string().optional(),

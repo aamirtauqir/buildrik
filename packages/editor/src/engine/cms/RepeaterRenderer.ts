@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
+import { isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { CMS_COLLECTION_LIMIT_MAX, isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 import { cmsRecordLabel, cmsRecordPath, cmsTextOf } from "@buildrik/shared/schemas/cms";
 import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
@@ -396,59 +396,53 @@ export class RepeaterRenderer {
       textNodes.push(node);
     }
 
+    /* One tokenizer over each text node. The node's literal text stays TEXT
+       and every non-rich value is inserted as text — nothing here is parsed
+       as markup except a rich text value, and that only after the shared
+       sanitizer at this, the output, moment. (Before, any substitution sent
+       the whole node — the author's own literal text with it — through
+       innerHTML, so text like "<img onerror=…>" became an element.) */
+    const tokenRe = new RegExp(
+      `\\{\\{\\s*(?:(${indexVar}|isFirst|isLast|total)|${itemVar}\\.([\\w-]+)(?:\\.([\\w-]+))?)\\s*\\}\\}`,
+      "g",
+    );
+    const ownerDoc = el.ownerDocument ?? document;
     textNodes.forEach((textNode) => {
-      let text = textNode.textContent || "";
-      let injectedValue = false;
-
-      // Replace index variable (numeric — safe literal)
-      const indexPattern = new RegExp(`\\{\\{\\s*${indexVar}\\s*\\}\\}`, "g");
-      text = text.replace(indexPattern, () => String(index));
-
-      if (!("url" in item.data)) {
-        text = text.replace(urlPattern, () => {
-          injectedValue = true;
-          return escapeHtmlText(itemUrl);
-        });
+      const text = textNode.textContent || "";
+      const parts: Node[] = [];
+      let last = 0;
+      let changed = false;
+      let m: RegExpExecArray | null;
+      tokenRe.lastIndex = 0;
+      while ((m = tokenRe.exec(text))) {
+        const [whole, helper, field, sub] = m;
+        let value: string | null = null;
+        let richHtml: string | null = null;
+        if (helper === indexVar) value = String(index);
+        else if (helper === "isFirst") value = String(context.isFirst);
+        else if (helper === "isLast") value = String(context.isLast);
+        else if (helper === "total") value = String(context.total);
+        else if (field === "url" && !sub && !("url" in item.data)) value = itemUrl;
+        else if (field && sub) value = valueOf(field, sub);
+        else if (field && field in item.data) {
+          if (rich.has(field)) richHtml = sanitizeRichtext(cmsTextOf(item.data[field]));
+          else value = valueOf(field);
+        }
+        if (value === null && richHtml === null) continue; // not this record's: left for clearUnresolved / the canvas
+        changed = true;
+        if (m.index > last) parts.push(ownerDoc.createTextNode(text.slice(last, m.index)));
+        if (richHtml !== null) {
+          const template = ownerDoc.createElement("template");
+          template.innerHTML = richHtml;
+          parts.push(template.content);
+        } else {
+          parts.push(ownerDoc.createTextNode(value ?? ""));
+        }
+        last = m.index + whole.length;
       }
-
-      // A path through a Reference field (`{{item.author.name}}`).
-      text = text.replace(pathPattern, (_m, field: string, sub: string) => {
-        injectedValue = true;
-        return escapeHtmlText(valueOf(field, sub));
-      });
-
-      // Replace item fields. The replacement is a function so a value
-      // containing "$&", "$1", etc. is inserted verbatim rather than being
-      // interpreted as a String.replace substitution pattern. The value is
-      // HTML-escaped so any markup it carries is inert once injected below.
-      Object.entries(item.data).forEach(([fieldName, value]) => {
-        const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
-        text = text.replace(fieldPattern, () => {
-          injectedValue = true;
-          /* Rich text lands as its allow-listed markup; anything else as
-             escaped text. */
-          return rich.has(fieldName) ? sanitizeRichtext(cmsTextOf(value)) : escapeHtmlText(valueOf(fieldName));
-        });
-      });
-
-      // Replace context helpers (boolean / count — safe literals)
-      text = text.replace(/\{\{\s*isFirst\s*\}\}/g, () => String(context.isFirst));
-      text = text.replace(/\{\{\s*isLast\s*\}\}/g, () => String(context.isLast));
-      text = text.replace(/\{\{\s*total\s*\}\}/g, () => String(context.total));
-
-      if (injectedValue) {
-        // A field value was substituted and HTML-escaped. Inject through an
-        // innerHTML sink so the escaped entities decode back to inert text —
-        // a raw "<script>" in a CMS value lands as literal characters, never
-        // a live node. This is the sink escapeHtmlText exists to protect.
-        const template = (el.ownerDocument ?? document).createElement("template");
-        template.innerHTML = text;
-        textNode.replaceWith(template.content);
-      } else {
-        // Pure literal / index / helper text — assign as text so author
-        // markup stays verbatim (no re-parse of trusted template text).
-        textNode.textContent = text;
-      }
+      if (!changed) return;
+      if (last < text.length) parts.push(ownerDoc.createTextNode(text.slice(last)));
+      textNode.replaceWith(...parts);
     });
 
     // Process attributes
