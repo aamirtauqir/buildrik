@@ -7,6 +7,7 @@
 import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
 import { THEME } from "../../shared/constants/defaultStyles";
 import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
+import { DEFAULT_TOKENS } from "../designSystem/defaultTokens";
 
 // ============================================================================
 // RESET CSS
@@ -88,16 +89,30 @@ export function siteFontCSS(fonts: {
  * at all. Any style bound to a token — every Brand preset and class binding —
  * therefore resolved to nothing once the page left the editor.
  *
+ * The SEED is declared too, under the site's own values. A site saves only
+ * the tokens it has touched, while element defaults name seed tokens the
+ * Brand panel never writes (`btn-height-md`, `input-radius`, …) — the canvas
+ * resolves those from `design.css`, the export resolved them to nothing:
+ * every exported and published button was 24px tall with no padding and no
+ * radius (BRD-23). Same merge as the canvas's (`mergeProjectTokens`): a saved
+ * row wins by cssVar, and a saved row's value reaches its seed's cssVar by id.
+ *
  * A token value is user data, so it is stripped of the characters that could
  * leave its declaration: `;` and `}` end the declaration or the rule, `{`
  * opens a block, and `<` could close the surrounding `</style>`.
  */
 export function siteTokensCSS(
-  tokens: ReadonlyArray<{ cssVar?: string; value?: string }> = []
+  tokens: ReadonlyArray<{ id?: string; cssVar?: string; value?: string }> | null = []
 ): string {
+  const saved = tokenList(tokens);
+  const savedById = new Map(saved.filter((t) => t.id).map((t) => [t.id, t]));
+  const seed = DEFAULT_TOKENS.map((d) => ({
+    cssVar: d.cssVar,
+    value: savedById.get(d.id)?.value || d.value,
+  }));
   const decls: string[] = [];
   const seen = new Set<string>();
-  for (const t of tokens) {
+  for (const t of [...saved, ...seed]) {
     const name = (t.cssVar ?? "").trim();
     const value = (t.value ?? "").trim().replace(/[;{}<]/g, "");
     if (!name.startsWith("--") || !value || seen.has(name)) continue;

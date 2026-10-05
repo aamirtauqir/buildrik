@@ -19,6 +19,7 @@ import type { ComponentType, VariantBindings } from "./types";
 import { interpretSchema } from "./schemaInterpreter";
 import { applyInterpretedTree } from "./applyInterpretedTree";
 import { tokenToCssVar } from "@/editor/design-system/types";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 
 interface PlaceCatalogResult {
   elementId: string | undefined;
@@ -36,6 +37,12 @@ interface PlaceOptions {
  * Convert a variant's PartialBindings into a styles record consumable by
  * Element.setStyles. Each binding becomes `cssProperty: var(--token-cssVar)`
  * so propagation stays O(1) — token edits change the var, not the binding.
+ *
+ * The name is the token's own `cssVar`, as the token picker writes it. Deriving
+ * it from the id named `--buildrick-design-border-default` for a token whose
+ * variable is `--bd-border-default` — 18 seed tokens differ that way — so a
+ * placed Card, Header or Hero read a variable nothing declared, on the canvas
+ * or in the export (BRD-23).
  */
 function bindingsToStyles(
   defaultBindings: VariantBindings,
@@ -44,7 +51,8 @@ function bindingsToStyles(
   const variantBindings = defaultBindings[variant] ?? {};
   const out: Record<string, string> = {};
   for (const [css, b] of Object.entries(variantBindings)) {
-    out[css] = `var(${tokenToCssVar(b.tokenId)})`;
+    const cssVar = DEFAULT_TOKENS.find((t) => t.id === b.tokenId)?.cssVar ?? tokenToCssVar(b.tokenId);
+    out[css] = `var(${cssVar})`;
   }
   return out;
 }

@@ -29,9 +29,26 @@ describe("siteTokensCSS", () => {
     expect(css.trim().startsWith(":root{")).toBe(true);
   });
 
-  it("emits nothing when the site has no tokens", () => {
-    expect(siteTokensCSS([])).toBe("");
-    expect(siteTokensCSS()).toBe("");
+  /* BRD-23: a site saves only the tokens it touched, while element defaults
+     name seed tokens (button and form sizes) the Brand panel never writes.
+     "Emits nothing" for a site with no saved tokens was the bug. */
+  it("declares the seed when the site has saved no tokens", () => {
+    for (const css of [siteTokensCSS([]), siteTokensCSS(), siteTokensCSS(null)]) {
+      expect(css).toContain("--buildrick-design-btn-height-md:40px");
+      expect(css).toContain("--buildrick-design-input-radius:8px");
+      expect(css).toContain("--buildrick-design-color-primary:#1A56DB");
+    }
+  });
+
+  it("a saved value wins over the seed, by cssVar and by id", () => {
+    expect(siteTokensCSS([{ cssVar: "--buildrick-design-btn-radius", value: "2px" }])).toContain(
+      "--buildrick-design-btn-radius:2px"
+    );
+    /* A saved row whose cssVar is not the seed's still feeds the seed's name. */
+    const css = siteTokensCSS([{ id: "btn-radius", cssVar: "--legacy-btn-radius", value: "3px" }]);
+    expect(css).toContain("--legacy-btn-radius:3px");
+    expect(css).toContain("--buildrick-design-btn-radius:3px");
+    expect(css).not.toContain("--buildrick-design-btn-radius:8px");
   });
 
   it("skips records with no cssVar or no value rather than writing `:undefined`", () => {
@@ -41,7 +58,10 @@ describe("siteTokensCSS", () => {
       { cssVar: "color-y", value: "#000" },
       { cssVar: "--buildrick-design-ok", value: "#123456" },
     ]);
-    expect(css).toBe("\n:root{--buildrick-design-ok:#123456}\n");
+    expect(css.startsWith("\n:root{--buildrick-design-ok:#123456;")).toBe(true);
+    expect(css).not.toContain("--buildrick-design-color-x:");
+    expect(css).not.toContain("color-y");
+    expect(css).not.toContain("undefined");
   });
 
   it("keeps the first declaration when a cssVar repeats", () => {
@@ -49,7 +69,8 @@ describe("siteTokensCSS", () => {
       { cssVar: "--buildrick-design-color-a", value: "#111111" },
       { cssVar: "--buildrick-design-color-a", value: "#222222" },
     ]);
-    expect(css).toBe("\n:root{--buildrick-design-color-a:#111111}\n");
+    expect(css).toContain("--buildrick-design-color-a:#111111");
+    expect(css).not.toContain("#222222");
   });
 
   /* A token value is user data. It must not be able to end its declaration,
@@ -57,7 +78,7 @@ describe("siteTokensCSS", () => {
   it("strips the characters that would let a value escape its declaration", () => {
     expect(
       siteTokensCSS([{ cssVar: "--buildrick-design-x", value: "red;} body{display:none" }])
-    ).toBe("\n:root{--buildrick-design-x:red bodydisplay:none}\n");
+    ).toContain(":root{--buildrick-design-x:red bodydisplay:none;");
   });
 
   it("cannot close the style element", () => {

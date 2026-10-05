@@ -120,7 +120,11 @@ async function publishedFiles(composer: ReturnType<typeof createTestComposer>): 
   return res.files
     .filter((f) => /\.(html|css)$/.test(f.name))
     .map((f) => `/* ${f.name} */\n${f.name.endsWith(".html") ? f.content.slice(f.content.indexOf("<body")) : f.content}`)
-    .join("\n");
+    .join("\n")
+    /* The site's token declarations are site-wide, not the block's: since
+       BRD-23 every export declares the seed tokens (the baseline predates it).
+       That block is pinned by `ExportEngine.tokenClosure.test.ts`. */
+    .replace(/\n\n\n:root\{--buildrick-design-[^}]*\}\n/, "");
 }
 
 describe("Q2 — inserted blocks keep their real element type", () => {
