@@ -375,9 +375,9 @@ export interface DesignTokenRecord {
 export interface SiteSEO {
   /** Site name - used in og:site_name */
   siteName?: string;
-  /** [Site column] Default meta title (overrides per-page if set) */
+  /** [Site column] Default meta title — used by pages with no title of their own */
   metaTitle?: string;
-  /** [Site column] Default meta description */
+  /** [Site column] Default meta description — used by pages with no description of their own */
   metaDescription?: string;
   /** [Site column] Title template, e.g. "{page} — Site Name" */
   metaTitleTemplate?: string;

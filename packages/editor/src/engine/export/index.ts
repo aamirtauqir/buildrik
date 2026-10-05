@@ -7,7 +7,6 @@
 export { ExportEngine, isPageLive, pageFileNames } from "./ExportEngine";
 export { ReactExporter } from "./ReactExporter";
 export { AssetBundler } from "./AssetBundler";
-export { SitemapGenerator } from "./SitemapGenerator";
 export { generateStripeScripts, isValidStripePublishableKey } from "./StripeInjector";
 export { SEOInjector } from "./SEOInjector";
 export { FormspreeInjector } from "./FormspreeInjector";

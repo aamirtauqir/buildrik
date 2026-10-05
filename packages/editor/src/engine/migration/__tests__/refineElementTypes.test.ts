@@ -44,7 +44,11 @@ async function published(composer: ReturnType<typeof createTestComposer>): Promi
   return res.files
     .filter((f) => /\.(html|css)$/.test(f.name))
     .map((f) => `/* ${f.name} */\n${f.name.endsWith(".html") ? f.content.slice(f.content.indexOf("<body")) : f.content}`)
-    .join("\n");
+    .join("\n")
+    /* The site's token declarations are site-wide, not the markup's: since
+       BRD-23 every export declares the seed tokens (the baseline predates it).
+       That block is pinned by `ExportEngine.tokenClosure.test.ts`. */
+    .replace(/\n\n\n:root\{--buildrick-design-[^}]*\}\n/, "");
 }
 
 /** Top-level blocks of the fixture page, in insert order. */

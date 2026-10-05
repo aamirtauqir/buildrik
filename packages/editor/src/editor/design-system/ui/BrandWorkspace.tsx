@@ -644,6 +644,29 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     return () => window.removeEventListener("keydown", handler, true);
   }, [guardOpen, showReview, showAddToken, aiOpen, classAddOpen, requestLeave]);
 
+  /* ⌘Z / ⇧⌘Z / ⌘Y never reach the canvas while Brand is open (BRD-24). The
+     shell's global handler ran canvas history under the workspace, where
+     nothing shows it, and the `history:undo` it emitted re-hydrated the
+     registries over the draft: one ⌘Z dropped the staged edit AND deleted a
+     CTA block out of sight (13 → 9 elements, measured 2026-10-05). Brand has
+     no undo of its own yet — autosave + ⌘Z is the redesign — so the chord
+     does nothing here. A text field keeps the browser's own undo: only the
+     propagation is stopped there, never the default. Window capture, so it
+     runs ahead of the shell's window listener. */
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
+      const key = e.key.toLowerCase();
+      if (key !== "z" && key !== "y") return;
+      e.stopPropagation();
+      const target = e.target instanceof HTMLElement ? e.target : null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']") || target?.isContentEditable) return;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", handler, true);
+    return () => window.removeEventListener("keydown", handler, true);
+  }, []);
+
   // ─ Pane content ─
   const visibleColors = filterTokensByMode(color.tokens ?? [], isBeginner ? "beginner" : "pro");
 

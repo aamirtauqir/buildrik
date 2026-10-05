@@ -26,6 +26,7 @@
 
 import * as React from "react";
 import { connectDomainSchema } from "@buildrik/shared/schemas/site-detail";
+import { apexOf, expectedDnsRecords } from "@buildrik/shared/dns/records";
 import {
   BK_LABEL_CLASS,
   Button,
@@ -79,14 +80,15 @@ const KINDS: { id: DomainKind; label: string }[] = [
   { id: "SUBDOMAIN", label: "Subdomain" },
 ];
 
-/* The three records `connect` writes (phase2-backend §1) — the real targets
-   from the shared constant, as the frame draws them; only the TXT token is
-   minted per row, so it is the one value still elided. */
-const EXPECTED_DNS_RECORDS: { type: string; host: string; value: string }[] = [
-  { type: "A", host: "@", value: DNS_TARGETS.apexIp },
-  { type: "CNAME", host: "www", value: DNS_TARGETS.cname },
-  { type: "TXT", host: DNS_TARGETS.txtHost, value: `${DNS_TARGETS.txtPrefix}…` },
-];
+/* The records `connect` writes, in the shape the typed name needs — the
+   shared `expectedDnsRecords`, so an apex draws A @ + CNAME www (the frame)
+   and a subdomain its one CNAME. Only the TXT token is minted per row, so it
+   is the one value still elided. The REAL rows replace this after connect. */
+function expectedRecordsFor(name: string) {
+  const valid = connectDomainSchema.shape.domain.safeParse(name).success;
+  const domain = valid ? name : "example.com";
+  return expectedDnsRecords({ domain, apex: apexOf(domain), ownershipToken: `${DNS_TARGETS.txtPrefix}…` });
+}
 
 type Availability = "idle" | "checking" | "failed" | DomainAvailability;
 
@@ -321,7 +323,7 @@ export function AddDomainDialog({ open, siteName, checkAvailability, onSubmit, o
                 </tr>
               </thead>
               <tbody>
-                {EXPECTED_DNS_RECORDS.map((rec) => (
+                {expectedRecordsFor(name).map((rec) => (
                   <tr key={rec.type}>
                     <td className={`${RECORDS_CELL} tw:whitespace-nowrap tw:text-[var(--bk-ink)]`}>{rec.type}</td>
                     <td className={`${RECORDS_CELL} tw:whitespace-nowrap`}>{rec.host}</td>
