@@ -17,8 +17,9 @@
  *     HTML parser reads the same way.
  *
  * The output is also inert inside an attribute value: `href` is written
- * unquoted with every quote, `=`, `<`, `>`, backtick and space
- * percent-encoded, and text escapes both quotes — so a record page that
+ * unquoted with every quote (`"` and `'` — `encodeURIComponent` leaves `'`
+ * alone, so it is encoded as %27 by hand), `=`, `<`, `>`, backtick and
+ * whitespace percent-encoded, and text escapes both quotes — so a record page that
  * substitutes it where an attribute was (a mis-bound token) cannot close
  * that attribute.
  *
@@ -100,7 +101,7 @@ export function isSafeCmsRichTextHref(raw: string): boolean {
 
 /** An href written unquoted, inert in any attribute or text context. */
 function writeHref(href: string): string {
-  return href.trim().replace(/&/g, "&amp;").replace(/[\s"'<>=`]/g, (c) => encodeURIComponent(c));
+  return href.trim().replace(/&/g, "&amp;").replace(/[\s"'<>=`]/g, (c) => (c === "'" ? "%27" : encodeURIComponent(c)));
 }
 
 function write(node: NodeLike): string {

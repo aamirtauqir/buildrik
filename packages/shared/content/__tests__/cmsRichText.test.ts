@@ -29,6 +29,17 @@ describe("sanitizeCmsRichText", () => {
     );
   });
 
+  it("an href with a quote and spaces is inert in single-quoted and unquoted attributes", () => {
+    const out = clean(`<a href="/x' onmouseover='alert(1) y">l</a>`);
+    expect(out).not.toContain("'");
+    const single = parse(`<p title='${out}'>x</p>`);
+    expect(single.querySelectorAll("*")).toHaveLength(1);
+    expect(single.querySelector("p")!.getAttributeNames()).toEqual(["title"]);
+    const unquoted = parse(`<p title=${out}>x</p>`);
+    expect(executionVector(unquoted)).toBeNull();
+    expect(Array.from(unquoted.querySelectorAll("*")).flatMap((e) => e.getAttributeNames()).filter((n) => n.startsWith("on"))).toEqual([]);
+  });
+
   it("text never becomes markup", () => {
     expect(clean("<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>")).toBe("<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>");
   });

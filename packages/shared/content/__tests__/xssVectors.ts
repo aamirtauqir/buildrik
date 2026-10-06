@@ -14,6 +14,8 @@ export const XSS_PAYLOADS = [
   '<a href="data:text/html,<script>alert(1)</script>">d</a>',
   '<p style="background:url(javascript:alert(1))">s</p><form><button formaction=javascript:alert(1)>b</button></form>',
   '<template><img src=x onerror=alert(1)></template><iframe srcdoc="<script>alert(1)</script>"></iframe>',
+  "<form><math><mtext></form><form><mglyph><style></math><img src onerror=alert(1)>",
+  '<noscript><a title="</noscript><img src=x onerror=alert(1)>">',
 ] as const;
 
 const BANNED_TAGS = new Set(["script", "style", "svg", "math", "iframe", "object", "embed", "template", "noscript", "frame", "frameset", "base", "form", "button"]);
