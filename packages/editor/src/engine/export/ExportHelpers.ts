@@ -113,9 +113,12 @@ export function siteTokensCSS(
   const decls: string[] = [];
   const seen = new Set<string>();
   for (const t of [...saved, ...seed]) {
+    /* The name is user data too (saveProjectData stores designTokens without
+       a schema): only a plain custom-property name may reach the stylesheet,
+       or a crafted cssVar closes the rule and the <style> tag. */
     const name = (t.cssVar ?? "").trim();
     const value = (t.value ?? "").trim().replace(/[;{}<]/g, "");
-    if (!name.startsWith("--") || !value || seen.has(name)) continue;
+    if (!/^--[a-zA-Z0-9_-]+$/.test(name) || !value || seen.has(name)) continue;
     seen.add(name);
     decls.push(`${name}:${value}`);
   }
