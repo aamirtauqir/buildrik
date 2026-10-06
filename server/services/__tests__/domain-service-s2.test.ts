@@ -406,7 +406,11 @@ describe("checkDomainDns — TXT", () => {
   it("without Vercel, a row with no _buildrick TXT gets one and is not VERIFIED on A + CNAME alone", async () => {
     const row = records(true);
     db.domain.findUnique.mockResolvedValue({ ...row, dnsRecords: row.dnsRecords.filter((r) => r.type !== "TXT") });
-    db.dnsRecord.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: "r-new", verified: false, ...data }));
+    db.dnsRecord.createMany.mockResolvedValue({ count: 1 });
+    db.dnsRecord.findMany.mockResolvedValue([
+      ...row.dnsRecords.filter((r) => r.type !== "TXT"),
+      { id: "r-new", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1"), verified: false },
+    ]);
     db.domain.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: "dom1", ...data }));
     vi.spyOn(dnsPromises, "resolve4").mockResolvedValue(["76.76.21.21"]);
     vi.spyOn(dnsPromises, "resolveCname").mockResolvedValue(["cname.vercel-dns.com"]);
@@ -414,8 +418,9 @@ describe("checkDomainDns — TXT", () => {
 
     const result = await checkDomainDns("dom1", "s1");
 
-    expect(db.dnsRecord.create).toHaveBeenCalledWith({
-      data: { domainId: "dom1", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1") },
+    expect(db.dnsRecord.createMany).toHaveBeenCalledWith({
+      data: [{ domainId: "dom1", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1") }],
+      skipDuplicates: true,
     });
     expect(result?.status).toBe("PENDING");
   });
@@ -567,6 +572,7 @@ describe("checkDomainDns — Vercel decides status and SSL (Q7)", () => {
       data: expect.arrayContaining([
         { domainId: "dom1", type: "TXT", host: "_vercel.bellacucina.com", value: "vc-domain-verify=bellacucina.com,abc123" },
       ]),
+      skipDuplicates: true,
     });
   });
 
@@ -662,12 +668,30 @@ describe("checkDomainDns — Vercel decides status and SSL (Q7)", () => {
 
     await checkDomainDns("dom1", "s1");
 
-    expect(db.dnsRecord.deleteMany).toHaveBeenCalledWith({ where: { domainId: "dom1" } });
+    // Stale rows go by id and the write skips duplicates, so a cron and a
+    // manual check running at once cannot double the table.
+    expect(db.dnsRecord.deleteMany).toHaveBeenCalledWith({ where: { domainId: "dom1", id: { in: ["r-a", "r-cname", "r-txt"] } } });
     expect(db.dnsRecord.createMany).toHaveBeenCalledWith({
       data: [{ domainId: "dom1", type: "CNAME", host: "shop", value: "cname.vercel-dns.com" }],
+      skipDuplicates: true,
     });
     expect(dnsPromises.resolveCname).toHaveBeenCalledWith("shop.bellacucina.com");
     expect(writtenStatus()).toMatchObject({ status: "VERIFIED", sslStatus: "ACTIVE" });
+  });
+
+  it("keeps the rows that already match and writes only the missing one (idempotent)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ dnsRecords: [apexRows(false)[0]] }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(projectDomain());
+    vi.mocked(getVercelDomainConfig).mockResolvedValue(configured);
+    db.dnsRecord.findMany.mockResolvedValue(apexRows(false));
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(db.dnsRecord.deleteMany).not.toHaveBeenCalled();
+    expect(db.dnsRecord.createMany).toHaveBeenCalledWith({
+      data: [{ domainId: "dom1", type: "CNAME", host: "www", value: "cname.vercel-dns.com" }],
+      skipDuplicates: true,
+    });
   });
 
   it("leaves matching rows alone (no rewrite churn)", async () => {

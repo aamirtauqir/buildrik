@@ -143,10 +143,8 @@ export async function checkDomainDns(domainId: string, siteId: string) {
         apex: apexOf(domain.domain),
         ownershipToken: dnsVerificationToken(domainId),
       }).filter(isOwnershipTxt);
-      records = [
-        ...records,
-        ...(await Promise.all(ownership.map((r) => prisma.dnsRecord.create({ data: { domainId, ...r } })))),
-      ];
+      await prisma.dnsRecord.createMany({ data: ownership.map((r) => ({ domainId, ...r })), skipDuplicates: true });
+      records = await prisma.dnsRecord.findMany({ where: { domainId } });
     }
     const { any, all } = await resolveRecords(records, apexOf(domain.domain));
     const status = all ? "VERIFIED" : any ? "PENDING" : "FAILED";
@@ -169,8 +167,19 @@ export async function checkDomainDns(domainId: string, siteId: string) {
     if (vercel?.project && vercel.config) {
       const expected = instructionsFrom({ domain: domain.domain, attached: vercel.project, config: vercel.config, ownershipToken: null });
       if (!sameRecords(expected, records)) {
-        await prisma.dnsRecord.deleteMany({ where: { domainId } });
-        await prisma.dnsRecord.createMany({ data: expected.map((r) => ({ domainId, ...r })) });
+        /* Cron + "Check DNS" can run this at once. Delete only rows that are
+           stale (by id) and insert only what is missing with skipDuplicates,
+           backed by the unique (domainId, type, host, value) index — a
+           delete-all + create-all interleaved into doubled rows. */
+        const recordKey = (r: ExpectedDnsRecord) => `${r.type}\u0000${r.host}\u0000${r.value}`;
+        const wanted = new Set(expected.map(recordKey));
+        const held = new Set(records.map(recordKey));
+        const stale = records.filter((r) => !wanted.has(recordKey(r)));
+        if (stale.length) await prisma.dnsRecord.deleteMany({ where: { domainId, id: { in: stale.map((r) => r.id) } } });
+        await prisma.dnsRecord.createMany({
+          data: expected.filter((r) => !held.has(recordKey(r))).map((r) => ({ domainId, ...r })),
+          skipDuplicates: true,
+        });
         records = await prisma.dnsRecord.findMany({ where: { domainId } });
       }
     }

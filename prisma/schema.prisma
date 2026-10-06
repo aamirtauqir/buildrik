@@ -649,6 +649,7 @@ model DnsRecord {
 
   domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
 
+  @@unique([domainId, type, host, value])
   @@map("dns_records")
 }
 
