@@ -104,3 +104,15 @@ describe("getSiteSettings — page SEO", () => {
     expect(result.pageSeo?.metaDescription).toBeNull();
   });
 });
+
+describe("getSiteSettings — brand token kill switch", () => {
+  it("reports BRAND_TOKENS_V2 for the editor", async () => {
+    pageFindFirst.mockResolvedValue(null);
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    expect((await getSiteSettings("s1")).brandTokensV2).toBe(true);
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    expect((await getSiteSettings("s1")).brandTokensV2).toBe(false);
+    vi.unstubAllEnvs();
+  });
+});
+

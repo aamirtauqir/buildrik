@@ -59,4 +59,12 @@ describe("rollback-migration script", () => {
     svc.getLatestMigrationSnapshot.mockResolvedValueOnce(null as never);
     expect(await main(["site-1", "--dry-run"], async () => svc, makeLog())).toBe(1);
   });
+
+  it("reports a service failure as one line, exit 1, no stack", async () => {
+    const svc = makeSvc();
+    svc.rollbackTokenMigration.mockRejectedValueOnce(new Error("No migration snapshot for this site"));
+    const log = makeLog();
+    expect(await main(["site-1"], async () => svc, log)).toBe(1);
+    expect(log.error).toHaveBeenCalledWith("No migration snapshot for this site");
+  });
 });

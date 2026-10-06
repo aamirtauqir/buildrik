@@ -34,8 +34,9 @@
  * autosave persists it, and ⌘Z undoes it alongside canvas edits. There is no
  * draft, no Save, no review-before-apply and no leave guard. "Review changes"
  * is a non-blocking list of this session's token edits, each with Revert.
- * When the site's tokens could not be migrated (`designSystem.readOnly`) the
- * workspace shows them, says so, and disables every edit.
+ * When the site's tokens are read-only (`designSystem.readOnly`: migration
+ * failed, the kill switch is off for an unmigrated site, or the site is held)
+ * the workspace shows them, says why (`readOnlyReason`), and disables every edit.
  *
  * @license BSD-3-Clause
  */
@@ -183,7 +184,6 @@ const PAGE_ACTION =
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const lightOf = (tokens: readonly DesignToken[], id: string): string => resolveTokenLiteral(tokens, id, "light") ?? "";
-
 
 /** Disables every native control inside while the tokens are read-only.
  *  `display: contents`, so it never takes part in the layout it sits in. */
@@ -816,7 +816,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               data-testid="brand-read-only-banner"
               className="tw:mt-4 tw:rounded-lg tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
             >
-              {(store.readOnlyReason && BRAND_READ_ONLY_COPY[store.readOnlyReason]) ?? BRAND_READ_ONLY_FAILED_COPY}
+              {(store.readOnlyReason && BRAND_READ_ONLY_COPY[store.readOnlyReason]) || BRAND_READ_ONLY_FAILED_COPY}
             </div>
           )}
           <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">

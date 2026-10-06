@@ -64,6 +64,7 @@ const mockComposer = {
   },
   aliasResolver: { validate: vi.fn() },
   destroy: vi.fn(),
+  designSystem: { readOnly: false, readOnlyReason: null as string | null },
 };
 
 vi.mock("../../../../engine", () => ({
@@ -180,6 +181,8 @@ function resetMockComposer() {
   vi.mocked(loadProject).mockResolvedValue({} as never);
   vi.mocked(loadServerMedia).mockResolvedValue(null as never);
   vi.mocked(syncSaveProject).mockResolvedValue({ success: true } as never);
+  mockComposer.designSystem.readOnly = false;
+  mockComposer.designSystem.readOnlyReason = null;
   hasProductsCollectionMock.mockResolvedValue(false);
   createProductsCollectionMock.mockResolvedValue(undefined);
 }
@@ -187,6 +190,52 @@ function resetMockComposer() {
 // ---------------------------------------------------------------------------
 // 1. siteId happy-path load flow
 // ---------------------------------------------------------------------------
+
+describe("useComposerInit — brand token kill switch wiring", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    resetMockComposer();
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  const open = async (extra: Record<string, unknown>) => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-t");
+    vi.mocked(loadProject).mockResolvedValue({
+      pages: [{ id: "p" }],
+      styles: [],
+      settings: { designTokens: [], designTokensSchemaVersion: 5 },
+      ...extra,
+    } as never);
+    renderHook(() => useComposerInit(makeParams()));
+    await act(async () => {
+      mockComposer.emit("composer:ready");
+      await flushMicrotasks();
+    });
+    return mockComposer.importProject.mock.calls[0]?.[0] as { settings: { designTokensSchemaVersion: number } };
+  };
+
+  it("migrates when the server says the switch is on", async () => {
+    const imported = await open({ brandTokensV2: true, tokensMigrationHold: false });
+    expect(imported.settings.designTokensSchemaVersion).toBe(6);
+    expect(mockComposer.designSystem.readOnly).toBe(false);
+    expect(mockComposer.emit).toHaveBeenCalledWith(EVENTS.DESIGN_SYSTEM_MIGRATED, { siteId: "site-t" });
+  });
+
+  it("does not migrate when the server did not say the switch is on (fail safe)", async () => {
+    const imported = await open({});
+    expect(imported.settings.designTokensSchemaVersion).toBe(5);
+    expect(mockComposer.designSystem.readOnly).toBe(true);
+    expect(mockComposer.designSystem.readOnlyReason).toBe("switch_off");
+    expect(mockComposer.emit).not.toHaveBeenCalledWith(EVENTS.DESIGN_SYSTEM_MIGRATED, expect.anything());
+  });
+
+  it("does not migrate a held site", async () => {
+    const imported = await open({ brandTokensV2: true, tokensMigrationHold: true });
+    expect(imported.settings.designTokensSchemaVersion).toBe(5);
+    expect(mockComposer.designSystem.readOnlyReason).toBe("held");
+  });
+});
 
 describe("useComposerInit — siteId load flow (happy path)", () => {
   beforeEach(() => {

@@ -20,30 +20,32 @@ is never migrated and Brand is read-only for it.
 
 ## 2. Stop the spread
 
-Unset `BRAND_TOKENS_V2` in the cPanel Node app environment, then restart the
-app.
-
-**Warning:** `cloudlinux-selector set --env-vars` REPLACES the whole map. Read
-the existing env first and write back every key except `BRAND_TOKENS_V2`, or
-you delete `DATABASE_URL` and take the site down.
-
-```bash
-ssh vortyoyz
-cloudlinux-selector get --json --interpreter nodejs --app-root apps/dashboard   # note every existing var
-# Same call as the one that set it, with the full map minus BRAND_TOKENS_V2:
-cloudlinux-selector set --json --interpreter nodejs --app-root apps/dashboard --env-vars '{"KEY":"value", ...}'
-```
-
-Restart. Identify the Buildrik process by its working directory; **never**
-`pkill -f next-server` (another app on the host also runs `next-server`):
+Set `BRAND_TOKENS_V2=off` (the server enables the migration only on the exact
+value `on`) with `scripts/set-prod-env.mjs` (`pnpm env:set:prod`). It reads the
+live cPanel env map, merges on top of it, refuses to write if the merge would
+drop a key, and verifies after writing. Never call
+`cloudlinux-selector set --env-vars` by hand: it REPLACES the whole map.
 
 ```bash
-for p in $(pgrep -f next-server); do echo "$p $(readlink /proc/$p/cwd)"; done
-# kill only the pid whose cwd ends in /apps/dashboard, then let Passenger respawn it
-kill <pid>
+echo "BRAND_TOKENS_V2=off" > /tmp/brand-off.env
+pnpm env:set:prod --file /tmp/brand-off.env                     # dry run: prints the plan, writes nothing
+pnpm env:set:prod --file /tmp/brand-off.env --apply --restart   # writes, verifies, restarts
 ```
 
-The flag is read per request on the server; the next editor load sees it.
+`--restart` kills this app's node workers by `/proc/<pid>/cwd` and lets
+lsnode respawn them. If you restart by hand instead, identify the Buildrik
+process by its cwd (`~/apps/dashboard`) and never `pkill -f next-server`
+(another app on the host runs `next-server`).
+
+Effect: no new migrations. The editor opens an unmigrated site on v5 with Brand
+read-only ("Brand editing is paused while we upgrade brand tokens."), and the
+server refuses a first v6 save from a stale tab ("Brand upgrade is paused").
+Sites already at v6 keep working normally. The editor treats a missing flag as
+off, so a failed settings read never migrates anything.
+
+Status of the commands here: the `set-prod-env.mjs` flags are read from the
+script; this exact sequence has not been run against the host for
+`BRAND_TOKENS_V2` (unverified).
 
 ## 3. Find affected sites
 
@@ -57,6 +59,7 @@ psql "postgresql://<user>@127.0.0.1:15432/<db>" -c \
   "select \"siteId\", \"createdAt\" from site_theme_snapshots where reason='migration' order by \"createdAt\" desc;"
 ```
 
+(The tunnel and `psql` lines are unverified; adjust user/db to the real ones.)
 Each row is a site that was migrated; its snapshot holds the pre-migration tokens.
 
 ## 4. Roll back one site
@@ -68,7 +71,7 @@ npx tsx --tsconfig packages/dashboard/tsconfig.json scripts/brand/rollback-migra
 npx tsx --tsconfig packages/dashboard/tsconfig.json scripts/brand/rollback-migration.mjs <siteId>             # restore the tokens and set the hold
 ```
 
-The script refuses to run without a siteId. Rollback is compare-and-swap on
+The script refuses to run without a siteId. It has only been exercised with the service mocked (unverified against a real DB). Rollback is compare-and-swap on
 `lastEditedAt`: if someone saved the site meanwhile it fails, re-run it. It
 bumps `dsSchemaVersion`, so a stale open tab gets a save conflict instead of
 overwriting the rollback.
@@ -82,6 +85,7 @@ export; Brand shows the read-only "rolled back" notice.
 npx tsx --tsconfig packages/dashboard/tsconfig.json scripts/brand/rollback-migration.mjs <siteId> --clear      # per held site
 ```
 
-Set `BRAND_TOKENS_V2=on` (merge into the existing env map, see the warning in
-step 2), restart, open the site and confirm it migrates (Brand editable,
+Set `BRAND_TOKENS_V2=on` the same way (`echo BRAND_TOKENS_V2=on > /tmp/brand-on.env`,
+then `pnpm env:set:prod --file /tmp/brand-on.env --apply --restart`; unverified on
+the host), open the site and confirm it migrates (Brand editable,
 `[tokens] migrated` in the console).

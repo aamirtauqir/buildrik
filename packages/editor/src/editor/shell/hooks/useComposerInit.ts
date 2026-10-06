@@ -11,7 +11,7 @@ import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
-import { BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "../../../shared/constants/brandReadOnly";
+import { BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "@/shared/constants/brandReadOnly";
 import { EVENTS, isNavigationOnlyChange } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
@@ -96,7 +96,6 @@ export function loadTokensSafely<
     const alreadyV6 = Array.isArray(rows) && rows.length > 0 && rows.every(isV6TokenRow);
     const v5 = from < 5 && Array.isArray(rows) ? migrateDesignTokens(rows, from, 5) : rows;
     const designTokens = alreadyV6 ? rows : migrateTokensToV6(v5);
-    console.info("[tokens] migrated", { siteId, from });
     return {
       settings: {
         ...settings,
@@ -242,7 +241,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                revert it. */
             const tokenLoad = data.settings
               ? loadTokensSafely(data.settings, siteId, {
-                  switchOn: data.brandTokensV2 ?? true,
+                  switchOn: data.brandTokensV2 === true,
                   hold: data.tokensMigrationHold ?? false,
                 })
               : null;
@@ -252,6 +251,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             let migrated = false;
             try {
               migrated = importMigratedProject(instance, loaded, siteId);
+              if (tokenLoad?.migrated) {
+                console.info("[tokens] migrated", { siteId });
+                instance.emit(EVENTS.DESIGN_SYSTEM_MIGRATED, { siteId });
+              }
             } catch (err) {
               console.error("[BuildrikSync] DS migration failed:", err);
               addToastRef.current({
@@ -261,7 +264,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               });
               instance.importProject(loaded);
             }
-            if (tokenLoad?.migrated) instance.emit(EVENTS.DESIGN_SYSTEM_MIGRATED, { siteId });
             if (tokenLoad?.readOnly) {
               instance.designSystem.readOnly = true;
               instance.designSystem.readOnlyReason = tokenLoad.reason ?? null;

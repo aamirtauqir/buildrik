@@ -85,6 +85,7 @@ export function checkTokenPayload(payload: unknown, stored: unknown, opts: { hol
   if (!checked.ok) throw new TokenSaveError("TOKENS_INVALID", checked.reason);
   if (sv >= TOKENS_SCHEMA_VERSION) return { kind: "same-version", tokens: checked.tokens };
   if (opts.hold) throw new TokenSaveError("TOKENS_STALE_CLIENT", "This site's brand was rolled back — reload to continue.");
+  if (!isBrandTokensV2Enabled()) throw new TokenSaveError("TOKENS_STALE_CLIENT", "Brand upgrade is paused — reload to continue.");
   const storedTokens = stored && typeof stored === "object" ? (stored as { designTokens?: unknown }).designTokens : undefined;
   return { kind: "first-migrated", tokens: checked.tokens, storedTokens, storedVersion: sv };
 }

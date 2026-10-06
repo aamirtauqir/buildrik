@@ -36,6 +36,7 @@ describe("checkTokenPayload", () => {
   });
 
   it("marks the first migrated save", () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
     const r = checkTokenPayload({ designTokens: v6, designTokensSchemaVersion: 6 }, { designTokens: v5seed, designTokensSchemaVersion: 5 });
     expect(r).toMatchObject({ kind: "first-migrated", storedTokens: v5seed, storedVersion: 5 });
   });
@@ -68,6 +69,18 @@ describe("checkTokenPayload", () => {
     expect(checkTokenPayload({ designTokens: v5seed, designTokensSchemaVersion: 3 }, { designTokensSchemaVersion: 3 }))
       .toEqual({ kind: "unchanged" });
     expect(checkTokenPayload({ designTokens: v5seed }, {})).toEqual({ kind: "unchanged" });
+  });
+
+  describe("kill switch off", () => {
+    it("refuses a first migrated save: the switch is server-enforced, not just an editor hint", () => {
+      vi.stubEnv("BRAND_TOKENS_V2", "");
+      expect(() => checkTokenPayload({ designTokens: v6, designTokensSchemaVersion: 6 }, { designTokens: v5seed, designTokensSchemaVersion: 5 }))
+        .toThrow(expect.objectContaining({ code: "TOKENS_STALE_CLIENT", message: "Brand upgrade is paused — reload to continue." }));
+    });
+    it("still accepts a save over an already-v6 store", () => {
+      vi.stubEnv("BRAND_TOKENS_V2", "");
+      expect(checkTokenPayload({ designTokens: v6, designTokensSchemaVersion: 6 }, { designTokensSchemaVersion: 6 }).kind).toBe("same-version");
+    });
   });
 
   describe("tokensMigrationHold", () => {

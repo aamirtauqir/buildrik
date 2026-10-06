@@ -17,7 +17,15 @@ export async function main(argv, loadSvc, log = console) {
     log.error(USAGE);
     return 2;
   }
-  const svc = await loadSvc();
+  try {
+    return await run(await loadSvc(), siteId, flag, log);
+  } catch (e) {
+    log.error(e instanceof Error ? e.message : String(e));
+    return 1;
+  }
+}
+
+async function run(svc, siteId, flag, log) {
   if (flag === "--clear") {
     await svc.clearTokenMigrationHold(siteId);
     log.log(`hold cleared for ${siteId}`);

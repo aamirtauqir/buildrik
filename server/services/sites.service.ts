@@ -19,7 +19,7 @@ import { assertSiteQuota } from "@/server/services/site-quota";
 import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
 import { slugifyProjectName } from "@/lib/vercel";
 import { TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
-import { checkTokenPayload, isBrandTokensV2Enabled, TokenSaveError, type TokenCheck } from "@/server/services/brand-tokens";
+import { checkTokenPayload, TokenSaveError, type TokenCheck } from "@/server/services/brand-tokens";
 
 function slugify(name: string): string {
   return name
@@ -1177,7 +1177,6 @@ export async function getProjectData(siteId: string) {
       projectSettings: true,
       projectCmsBindings: true,
       dsSchemaVersion: true,
-      tokensMigrationHold: true,
       sitePages: {
         select: {
           id: true,
@@ -1210,8 +1209,6 @@ export async function getProjectData(siteId: string) {
     settings: site.projectSettings ?? {},
     dsSchemaVersion: site.dsSchemaVersion,
     cmsBindings: site.projectCmsBindings ?? undefined,
-    brandTokensV2: isBrandTokensV2Enabled(),
-    tokensMigrationHold: site.tokensMigrationHold,
   };
 }
 
