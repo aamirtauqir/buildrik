@@ -64,7 +64,7 @@ const mockComposer = {
   },
   aliasResolver: { validate: vi.fn() },
   destroy: vi.fn(),
-  designSystem: { readOnly: false, readOnlyReason: null as string | null },
+  designSystem: { readOnly: false, readOnlyReason: null as string | null, brandTokensV2: true },
 };
 
 vi.mock("../../../../engine", () => ({
@@ -183,6 +183,7 @@ function resetMockComposer() {
   vi.mocked(syncSaveProject).mockResolvedValue({ success: true } as never);
   mockComposer.designSystem.readOnly = false;
   mockComposer.designSystem.readOnlyReason = null;
+  mockComposer.designSystem.brandTokensV2 = true;
   hasProductsCollectionMock.mockResolvedValue(false);
   createProductsCollectionMock.mockResolvedValue(undefined);
 }
@@ -228,6 +229,15 @@ describe("useComposerInit — brand token kill switch wiring", () => {
     expect(mockComposer.designSystem.readOnly).toBe(true);
     expect(mockComposer.designSystem.readOnlyReason).toBe("switch_off");
     expect(mockComposer.emit).not.toHaveBeenCalledWith(EVENTS.DESIGN_SYSTEM_MIGRATED, expect.anything());
+  });
+
+  it("hands the switch to the composer, so canvas, export and publish follow it (I3)", async () => {
+    await open({});
+    expect(mockComposer.designSystem.brandTokensV2).toBe(false);
+    resetMockComposer();
+    mockComposer.designSystem.brandTokensV2 = false;
+    await open({ brandTokensV2: true });
+    expect(mockComposer.designSystem.brandTokensV2).toBe(true);
   });
 
   it("does not migrate a held site", async () => {

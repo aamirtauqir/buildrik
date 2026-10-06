@@ -45,7 +45,7 @@ export function readTokens(composer: Composer | null): DesignToken[] {
   let tokens = cache.get(saved);
   if (!tokens) {
     tokens = readOnly
-      ? tokensForEmit(settings)
+      ? tokensForEmit(settings, { migrate: composer?.designSystem.brandTokensV2 !== false })
       : mergeProjectTokens(saved, settings?.designTokensSchemaVersion);
     cache.set(saved, tokens);
   }

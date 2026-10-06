@@ -164,3 +164,53 @@ describe("siteFontsFromSettings", () => {
     expect(siteFontsFromSettings({ designTokens: [only], designTokensSchemaVersion: 5 })).toEqual({ text: "#123456" });
   });
 });
+
+/* I3: export and publish follow the kill switch the load read. With it off, a
+   v5 site ships its saved literals (the v5-equivalent output), never an
+   in-memory migration the server has not allowed. */
+describe("the three documents follow the brand switch", () => {
+  const v5 = {
+    designTokens: DEFAULT_TOKENS_V5.map((t) => (t.id === "color-primary" ? { ...t, value: "#FF0000" } : t)),
+    designTokensSchemaVersion: 5,
+  };
+  const page = { id: "p1", name: "Home", slug: "home", isHome: true, root: { id: "r1" }, settings: {} };
+  const composerWith = (brandTokensV2: boolean) => ({
+    getProjectSettings: () => v5,
+    designSystem: { brandTokensV2 },
+    elements: {
+      getActivePage: () => page,
+      getAllPages: () => [page],
+      exportPages: () => [page],
+      getElement: () => null,
+      toHTML: () => "<div></div>",
+    },
+    styles: { toCSS: () => "", generateResponsiveCSS: () => "" },
+    getProjectMetadata: () => ({ name: "Site" }),
+  });
+  const LITERAL = "--buildrick-design-color-primary:#FF0000";
+  const MIGRATED = "--buildrick-design-color-primary:var(--buildrick-design-custom-color-primary)";
+
+  it.each([
+    [false, LITERAL, MIGRATED],
+    [true, MIGRATED, LITERAL],
+  ])("switch %s: single-file export, publish and preview", async (on, has, hasNot) => {
+    const { ExportEngine } = await import("../ExportEngine");
+    const engine = new ExportEngine(composerWith(on) as never);
+    const single = engine.generateCSS();
+    const { files } = await engine.exportAllPages({ format: "html" });
+    const published = files.find((f) => f.name === "styles.css")?.content ?? "";
+    const { Composer } = await import("../../Composer");
+    const c = Object.create(Composer.prototype) as InstanceType<typeof Composer>;
+    Object.assign(c, {
+      elements: { toHTML: () => "<div></div>", getActivePage: () => ({ name: "Home" }) },
+      styles: { toCSS: () => "" },
+      getProjectSettings: () => v5,
+      designSystem: { brandTokensV2: on },
+    });
+    const preview = c.exportHTML().combined;
+    for (const doc of [single, published, preview]) {
+      expect(doc).toContain(has);
+      expect(doc).not.toContain(hasNot);
+    }
+  });
+});

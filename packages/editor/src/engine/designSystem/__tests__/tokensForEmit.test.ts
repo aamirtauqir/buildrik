@@ -1,5 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { emitTokenCss } from "@buildrik/shared/tokens";
+import * as sharedTokens from "@buildrik/shared/tokens";
+
+vi.mock("@buildrik/shared/tokens", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@buildrik/shared/tokens")>();
+  return { ...real, migrateTokensToV6: vi.fn(real.migrateTokensToV6) };
+});
 import { DEFAULT_TOKENS_V5 } from "../defaultTokens";
 import { mergeProjectTokens, tokensForEmit } from "../projectTokens";
 
@@ -50,5 +56,27 @@ describe("tokensForEmit", () => {
       expect(() => mergeProjectTokens(bad as never)).not.toThrow();
       expect(css({ designTokens: bad })).toContain("--buildrick-design-btn-height-md:40px");
     }
+  });
+
+  describe("kill switch off (I3): a pre-v6 site is never migrated in memory", () => {
+    const v5 = { designTokens: rowsWith({ "color-primary": "#FF0000" }), designTokensSchemaVersion: 5 };
+
+    it("emits the v5-equivalent overlay and never calls the migration", () => {
+      const migrate = vi.mocked(sharedTokens.migrateTokensToV6);
+      migrate.mockClear();
+      const off = emitTokenCss(tokensForEmit(v5, { migrate: false }), { darkMode: "off" });
+      expect(migrate).not.toHaveBeenCalled();
+      expect(off).toContain("--buildrick-design-color-primary:#FF0000");
+      expect(off).not.toContain("--buildrick-design-color-primary:var(");
+      const on = emitTokenCss(tokensForEmit(v5), { darkMode: "off" });
+      expect(migrate).toHaveBeenCalled();
+      expect(on).toContain("--buildrick-design-color-primary:var(--buildrick-design-custom-color-primary)");
+    });
+
+    it("an already-v6 site emits the same either way", () => {
+      const v6 = { designTokens: mergeProjectTokens(v5.designTokens, 5), designTokensSchemaVersion: 6 };
+      expect(emitTokenCss(tokensForEmit(v6, { migrate: false }), { darkMode: "off" }))
+        .toBe(emitTokenCss(tokensForEmit(v6), { darkMode: "off" }));
+    });
   });
 });

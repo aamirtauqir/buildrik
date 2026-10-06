@@ -11,14 +11,14 @@ import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
-import { BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "@/shared/constants/brandReadOnly";
+import { BRAND_READ_ONLY_FAILED, BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "@/shared/constants/brandReadOnly";
 import { EVENTS, isNavigationOnlyChange } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
 import { importMigratedProject } from "@/editor/design-system";
 import { migrateTokensToV6, TokenMigrationError } from "@buildrik/shared/tokens";
-import { TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
+import { TOKENS_SCHEMA_VERSION, validateTokens } from "@buildrik/shared/schemas/design-tokens";
 import { migrateDesignTokens } from "@/engine/designSystem/tokenMigrations";
 import { isV6TokenRow } from "@/engine/designSystem/projectTokens";
 import { captureError } from "@/shared/utils/errorTracking";
@@ -85,17 +85,28 @@ export function loadTokensSafely<
   siteId: string,
   opts: { switchOn: boolean; hold: boolean } = { switchOn: true, hold: false },
 ): { settings: S; readOnly: boolean; migrated: boolean; reason?: string } {
-  const from = settings.designTokensSchemaVersion ?? 1;
   const rows = settings.designTokens;
-  if (rows === undefined || from >= TOKENS_SCHEMA_VERSION) return { settings, readOnly: false, migrated: false };
+  if (rows === undefined) return { settings, readOnly: false, migrated: false };
+  const v6Shaped = Array.isArray(rows) && rows.length > 0 && rows.every(isV6TokenRow);
+  /* A missing version is read from the rows' shape, as mergeProjectTokens
+     reads it: v6 rows are never pushed through the v1→v5 chain. */
+  const from = settings.designTokensSchemaVersion ?? (v6Shaped ? TOKENS_SCHEMA_VERSION : 1);
+  if (from >= TOKENS_SCHEMA_VERSION) {
+    /* Saved v6 rows that do not validate would open Brand on the SEED (the
+       strict merge's fallback) and its first save would write the seed over
+       the site's brand. Read-only on the old tokens instead. */
+    const checked = validateTokens(rows);
+    if (checked.ok) return { settings, readOnly: false, migrated: false };
+    captureError(new Error(`saved v6 tokens invalid: ${checked.reason}`), { siteId, fromVersion: from, reason: checked.reason });
+    return { settings, readOnly: true, migrated: false, reason: BRAND_READ_ONLY_FAILED };
+  }
   /* Switch off = no NEW migrations (an already-v6 site returned above and works
      normally); a held site is never migrated. Either way the site stays as-is. */
   if (opts.hold) return { settings, readOnly: true, migrated: false, reason: BRAND_READ_ONLY_HELD };
   if (!opts.switchOn) return { settings, readOnly: true, migrated: false, reason: BRAND_READ_ONLY_SWITCH_OFF };
   try {
-    const alreadyV6 = Array.isArray(rows) && rows.length > 0 && rows.every(isV6TokenRow);
     const v5 = from < 5 && Array.isArray(rows) ? migrateDesignTokens(rows, from, 5) : rows;
-    const designTokens = alreadyV6 ? rows : migrateTokensToV6(v5);
+    const designTokens = v6Shaped ? rows : migrateTokensToV6(v5);
     return {
       settings: {
         ...settings,
@@ -239,6 +250,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             /* Token migration (v1–v5 → v6) is part of the imported project, so
                it lands before history starts recording: ⌘Z after load cannot
                revert it. */
+            /* Before the import: the canvas, export and publish emit from
+               it, and a pre-v6 site must not be migrated in memory while
+               the server's switch is off for it (I3). */
+            instance.designSystem.brandTokensV2 = data.brandTokensV2 === true;
             const tokenLoad = data.settings
               ? loadTokensSafely(data.settings, siteId, {
                   switchOn: data.brandTokensV2 === true,

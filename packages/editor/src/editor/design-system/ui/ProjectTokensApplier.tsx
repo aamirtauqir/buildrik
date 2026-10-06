@@ -29,7 +29,7 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
       frame = 0;
       const settings = composer.getProjectSettings?.();
       const darkMode = DarkModeSchema.catch("off").parse(settings?.darkMode);
-      const tokens = tokensForEmit(settings);
+      const tokens = tokensForEmit(settings, { migrate: composer.designSystem?.brandTokensV2 !== false });
       let style = document.getElementById(STYLE_ID);
       if (!style) {
         style = document.createElement("style");
@@ -54,6 +54,8 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
       composer.off(EVENTS.PROJECT_LOADED, schedule);
       composer.off(EVENTS.SETTINGS_CHANGE, schedule);
       composer.off("colorMode:changed", schedule);
+      document.getElementById(STYLE_ID)?.remove();
+      delete document.documentElement.dataset.theme;
     };
   }, [composer]);
 

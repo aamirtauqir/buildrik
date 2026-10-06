@@ -110,6 +110,27 @@ describe("ProjectTokensApplier", () => {
     expect(listenerCount(EVENTS.PROJECT_LOADED)).toBe(0);
   });
 
+  it("removes its <style> and data-theme on unmount (M6)", () => {
+    const { composer } = stubComposer([]);
+    const { unmount } = render(<ProjectTokensApplier composer={composer} />);
+    expect(document.getElementById("bk-site-tokens")).not.toBeNull();
+    expect(document.documentElement.dataset.theme).toBe("light");
+    unmount();
+    expect(document.getElementById("bk-site-tokens")).toBeNull();
+    expect(document.documentElement.dataset.theme).toBeUndefined();
+  });
+
+  it("follows the brand switch: off paints a v5 site from its saved literals, like the export (I3)", () => {
+    const rows = DEFAULT_TOKENS_V5.map((t) => (t.id === "color-primary" ? { ...t, value: "#FF0000" } : t));
+    const settings = { designTokens: rows, designTokensSchemaVersion: 5, darkMode: "off" };
+    const { composer } = stubComposer([]);
+    composer.getProjectSettings = () => settings as never;
+    Object.assign(composer, { designSystem: { brandTokensV2: false } });
+    render(<ProjectTokensApplier composer={composer} />);
+    expect(css()).toBe(emitSiteTokenCss(settings, { migrate: false }));
+    expect(css()).toContain("--buildrick-design-color-primary:#FF0000");
+  });
+
   it("is mounted where every project sees it, not inside the panel", () => {
     const shell = readFileSync(
       resolve(dirname(fileURLToPath(import.meta.url)), "../../../shell/StudioPanels.tsx"),

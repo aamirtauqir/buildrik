@@ -197,6 +197,11 @@ export class Composer extends EventEmitter {
     readOnly: boolean;
     /** Why `readOnly` is set (null when it is not): selects the Brand notice. */
     readOnlyReason: string | null;
+    /** The server's brand-token switch for this site (`brandTokensV2`), set by
+     *  the load path. False: a pre-v6 site's tokens are emitted (canvas,
+     *  export, publish) as saved, never migrated in memory. True when nothing
+     *  loaded from the server (standalone editor). */
+    brandTokensV2: boolean;
     readonly tokenUsage: TokenUsageTracker;
     readonly lintState: LintState;
     readonly tokenBindingResolver: TokenBindingResolver;
@@ -313,6 +318,7 @@ export class Composer extends EventEmitter {
     this.designSystem = {
       readOnly: false,
       readOnlyReason: null,
+      brandTokensV2: true,
       tokenUsage,
       lintState,
       tokenBindingResolver,
@@ -779,12 +785,13 @@ export class Composer extends EventEmitter {
     // the families that need fetching, and this document — the one the preview
     // renders — kept building a head with neither.
     const projectSettings = this.getProjectSettings?.();
-    const fonts = siteFontsFromSettings(projectSettings);
+    const brandSwitch = { migrate: this.designSystem?.brandTokensV2 !== false };
+    const fonts = siteFontsFromSettings(projectSettings, brandSwitch);
     /* Preview builds its own document, so it needs the token definitions too —
        otherwise the preview and the published page disagree on every value a
        Brand preset binds. */
     const siteCss =
-      emitSiteTokenCss(projectSettings) + siteFontCSS(fonts);
+      emitSiteTokenCss(projectSettings, brandSwitch) + siteFontCSS(fonts);
     // The HTML too, not just the CSS: this document carries element styles
     // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
     // a style attribute and nowhere in the stylesheet.

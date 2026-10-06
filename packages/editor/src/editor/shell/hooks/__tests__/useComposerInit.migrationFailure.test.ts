@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { loadTokensSafely } from "../useComposerInit";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 
 vi.mock("@/shared/utils/errorTracking", () => ({ captureError: vi.fn() }));
 import { captureError } from "@/shared/utils/errorTracking";
@@ -61,5 +62,25 @@ describe("loadTokensSafely", () => {
   it("reports a successful migration", () => {
     const r = loadTokensSafely({ designTokens: [], designTokensSchemaVersion: 5 }, "s", { switchOn: true, hold: false });
     expect(r.migrated).toBe(true);
+  });
+
+  describe("v6-shaped rows (M3)", () => {
+    const broken = [{ ...DEFAULT_TOKENS[0], modes: { light: { alias: "nowhere" } } }];
+
+    it("a missing version over v6-shaped rows is read as v6, never pushed through the v5 chain", () => {
+      const settings = { designTokens: DEFAULT_TOKENS };
+      const r = loadTokensSafely(settings, "s");
+      expect(r).toEqual({ settings, readOnly: false, migrated: false });
+    });
+
+    it.each([
+      ["stated v6", { designTokens: broken, designTokensSchemaVersion: 6 }],
+      ["inferred v6", { designTokens: broken }],
+    ])("%s rows that fail validation open read-only (reason failed), not editable on the seed", (_l, settings) => {
+      const r = loadTokensSafely(settings, "s");
+      expect(r.readOnly).toBe(true);
+      expect(r.reason).toBe("failed");
+      expect(r.settings).toBe(settings);
+    });
   });
 });

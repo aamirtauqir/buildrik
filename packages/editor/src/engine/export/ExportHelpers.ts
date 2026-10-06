@@ -64,10 +64,11 @@ export function siteFontsFromTokens(
  * could never be true.
  */
 export function siteFontsFromSettings(
-  settings: SiteTokenSettings | undefined
+  settings: SiteTokenSettings | undefined,
+  opts?: { migrate: boolean }
 ): ReturnType<typeof siteFontsFromTokens> {
   const saved = new Set(tokenList(settings?.designTokens).map((r) => (r as { id?: unknown } | null)?.id));
-  const all = siteFontsFromTokens(tokensForEmit(settings));
+  const all = siteFontsFromTokens(tokensForEmit(settings, opts));
   return {
     heading: saved.has("font-heading") ? all.heading : undefined,
     body: saved.has("font-body") ? all.body : undefined,
@@ -116,9 +117,10 @@ export function siteFontCSS(fonts: {
  * `var(--buildrick-design-*)` without declaring it resolves to nothing once
  * the page leaves the editor. The site's Dark mode decides whether dark blocks
  * ship; a token the emitter cannot write is skipped and reported, never thrown.
+ * `opts.migrate` is the brand switch (see `tokensForEmit`).
  */
-export function emitSiteTokenCss(settings: SiteTokenSettings | undefined): string {
-  return emitTokenCss(tokensForEmit(settings), {
+export function emitSiteTokenCss(settings: SiteTokenSettings | undefined, opts?: { migrate: boolean }): string {
+  return emitTokenCss(tokensForEmit(settings, opts), {
     darkMode: DarkModeSchema.catch("off").parse(settings?.darkMode),
     onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
   });

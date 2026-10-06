@@ -123,11 +123,19 @@ function overlayUnvalidated(rows: readonly unknown[]): DesignToken[] {
  * The strict merge when the saved list is valid. Otherwise the saved rows are
  * laid over the seed as unvalidated literals: a site opens with its OLD brand
  * and one odd row never reverts the rest to the default (D17).
+ *
+ * `migrate: false` is the server's brand switch being off for this site
+ * (`composer.designSystem.brandTokensV2`): a pre-v6 list is then laid over the
+ * seed as literals — the v5-equivalent output — and never migrated in memory,
+ * so the switch protects published pages too, not just saves.
  */
 export function tokensForEmit(
-  settings: { designTokens?: unknown; designTokensSchemaVersion?: number } | undefined
+  settings: { designTokens?: unknown; designTokensSchemaVersion?: number } | undefined,
+  opts: { migrate: boolean } = { migrate: true }
 ): DesignToken[] {
   const rows = Array.isArray(settings?.designTokens) ? settings.designTokens : [];
-  const merged = tryMerge(rows, settings?.designTokensSchemaVersion ?? inferStoredVersion(rows));
+  const version = settings?.designTokensSchemaVersion ?? inferStoredVersion(rows);
+  if (!opts.migrate && version < CURRENT_SCHEMA_VERSION) return overlayUnvalidated(rows);
+  const merged = tryMerge(rows, version);
   return merged.ok ? merged.tokens : overlayUnvalidated(rows);
 }

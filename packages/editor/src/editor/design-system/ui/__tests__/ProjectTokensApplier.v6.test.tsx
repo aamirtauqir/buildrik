@@ -96,9 +96,10 @@ describe("ProjectTokensApplier (v6)", () => {
     settings.darkMode = "off";
     c.emit("settings:change");
     unmount();
-    const before = document.getElementById("bk-site-tokens")!.textContent;
+    expect(document.getElementById("bk-site-tokens")).toBeNull();
     act(() => { vi.advanceTimersToNextFrame(); });
-    expect(document.getElementById("bk-site-tokens")!.textContent).toBe(before);
+    /* A pending frame that still ran would re-create the style after unmount. */
+    expect(document.getElementById("bk-site-tokens")).toBeNull();
   });
 
   it("two mounts leave exactly one style element", () => {

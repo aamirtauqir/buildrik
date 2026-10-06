@@ -2,6 +2,8 @@
  *  these two are the operator-set causes (kill switch, per-site hold). */
 export const BRAND_READ_ONLY_SWITCH_OFF = "switch_off";
 export const BRAND_READ_ONLY_HELD = "held";
+/** Saved v6 rows that fail validation: shown with the failed-migration copy. */
+export const BRAND_READ_ONLY_FAILED = "failed";
 
 export const BRAND_READ_ONLY_COPY: Readonly<Record<string, string>> = {
   [BRAND_READ_ONLY_SWITCH_OFF]: "Brand editing is paused while we upgrade brand tokens.",
