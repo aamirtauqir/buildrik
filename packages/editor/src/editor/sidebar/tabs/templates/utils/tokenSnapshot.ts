@@ -12,6 +12,7 @@
  * @license BSD-3-Clause
  */
 
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../../../../design-system/types";
 
 export interface TokenSnapshot {
@@ -74,15 +75,19 @@ export function snapshotFromTokens(
   for (const token of tokens) {
     const placement = bucketAndKey(token);
     if (!placement) continue;
-    out[placement.bucket][placement.key] = token.value;
+    /* A semantic token and the primitive it aliases can share a key; the
+       semantic one is the site's name for the value. */
+    const bucket = out[placement.bucket];
+    if (placement.key in bucket && token.layer !== "semantic") continue;
+    bucket[placement.key] = resolveTokenLiteral(tokens, token.id, "light") ?? "";
   }
   return out;
 }
 
 /**
  * Build a snapshot from :root computed style. For each token, reads
- * `getPropertyValue(cssVar).trim()` and falls back to `token.value`
- * when the computed value is empty (e.g., test environment without
+ * `getPropertyValue(cssVar).trim()` and falls back to the token's light
+ * literal when the computed value is empty (e.g., test environment without
  * the runtime cascade).
  *
  * Use at apply time so the snapshot reflects in-flight token edits
@@ -94,10 +99,9 @@ export function snapshotFromComputedStyle(
   tokens: ReadonlyArray<DesignToken>,
 ): TokenSnapshot {
   const style = el.ownerDocument?.defaultView?.getComputedStyle?.(el);
-  return snapshotFromTokens(
-    tokens.map((token) => {
-      const computed = style?.getPropertyValue(token.cssVar).trim() ?? "";
-      return computed ? { ...token, value: computed } : token;
-    }),
-  );
+  const live = tokens.reduce<DesignToken[]>((acc, token) => {
+    const computed = style?.getPropertyValue(token.cssVar).trim() ?? "";
+    return computed ? setTokenLiteral(acc, token.id, "light", computed) : acc;
+  }, [...tokens]);
+  return snapshotFromTokens(live);
 }

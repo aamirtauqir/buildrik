@@ -7,9 +7,10 @@ import {
   type TokenSnapshot,
 } from "../tokenSnapshot";
 import type { DesignToken } from "../../../../../design-system/types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const sampleTokens: DesignToken[] = [
-  {
+  v6Token({
     id: "color-primary",
     name: "Primary",
     value: "#2D6DFF",
@@ -17,8 +18,8 @@ const sampleTokens: DesignToken[] = [
     cssVar: "--buildrick-design-color-primary",
     type: "color",
     kind: "color",
-  },
-  {
+  }),
+  v6Token({
     id: "color-text",
     name: "Text",
     value: "#0F172A",
@@ -26,8 +27,8 @@ const sampleTokens: DesignToken[] = [
     cssVar: "--buildrick-design-color-text",
     type: "color",
     kind: "color",
-  },
-  {
+  }),
+  v6Token({
     id: "spacing-md",
     name: "Medium",
     value: "16px",
@@ -35,8 +36,8 @@ const sampleTokens: DesignToken[] = [
     cssVar: "--buildrick-design-spacing-md",
     type: "string",
     kind: "spacing",
-  },
-  {
+  }),
+  v6Token({
     id: "radius-sm",
     name: "Small",
     value: "4px",
@@ -44,7 +45,7 @@ const sampleTokens: DesignToken[] = [
     cssVar: "--buildrick-design-radius-sm",
     type: "string",
     kind: "radius",
-  },
+  }),
 ];
 
 const snap: TokenSnapshot = snapshotFromTokens(sampleTokens);
@@ -64,7 +65,7 @@ describe("snapshotFromTokens", () => {
 
   it("derives kind from category when token.kind missing (legacy compat)", () => {
     const legacy: DesignToken[] = [
-      {
+      v6Token({
         id: "color-legacy",
         name: "Legacy",
         value: "#abcdef",
@@ -72,7 +73,7 @@ describe("snapshotFromTokens", () => {
         cssVar: "--buildrick-design-color-legacy",
         type: "color",
         // no `kind` set
-      },
+      }),
     ];
     const s = snapshotFromTokens(legacy);
     expect(s.colors.legacy).toBe("#abcdef");
