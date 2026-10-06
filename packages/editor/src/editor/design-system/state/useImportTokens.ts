@@ -50,7 +50,7 @@ interface RegistryHandle {
  * this returns null for cannot be applied, and counting it as "valid" is what
  * produced "Valid tokens 3 / Errors 0" followed by a silent "2 skipped".
  */
-export function inferKind(t: DesignToken): TokenKind | null {
+export function inferKind(t: { kind?: TokenKind; category: string }): TokenKind | null {
   if (t.kind) return t.kind;
   switch (t.category) {
     case "colors":     return "color";

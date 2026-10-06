@@ -14,6 +14,7 @@ import {
 } from "../../../state/TokenRegistryContext";
 // useColorRegistry is used in the Apply test via Probe.
 import { ToastProvider } from "@/editor/chrome-ui";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
@@ -142,7 +143,7 @@ describe("ImportCard — conflict strategy behavior", () => {
     const colors: { current: Array<{ id: string; value: string }> } = { current: [] };
     const Probe: React.FC = () => {
       const c = useColorRegistry();
-      colors.current = c.tokens.map((t) => ({ id: t.id, value: t.value }));
+      colors.current = c.tokens.map((t) => ({ id: t.id, value: resolveTokenLiteral(c.tokens, t.id, "light") ?? "" }));
       return null;
     };
     const utils = render(

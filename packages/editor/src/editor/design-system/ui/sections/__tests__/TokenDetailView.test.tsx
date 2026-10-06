@@ -18,8 +18,10 @@ import { DSModeProvider } from "../../../state/DSModeContext";
 import type { DesignToken } from "../../../types";
 import type { LintIssue } from "../../../../../engine/designSystem/LintState";
 import type { UsageRef } from "../../../../../engine/designSystem/TokenUsageTracker";
+import { v6Token, ownLight } from "@/engine/__tests__/test-utils/v6Token";
+import { lightAliasOf } from "@buildrik/shared/tokens";
 
-const colorToken: DesignToken = {
+const colorToken: DesignToken = v6Token({
   id: "color.brand.primary",
   name: "Brand · Primary",
   value: "#2D6DFF",
@@ -27,9 +29,9 @@ const colorToken: DesignToken = {
   cssVar: "--buildrick-design-color-brand-primary",
   type: "color",
   kind: "color",
-};
+});
 
-const radiusToken: DesignToken = {
+const radiusToken: DesignToken = v6Token({
   id: "radius.md",
   name: "Medium",
   value: "8px",
@@ -37,7 +39,7 @@ const radiusToken: DesignToken = {
   cssVar: "--buildrick-design-radius-md",
   type: "length",
   kind: "radius",
-};
+});
 
 interface MockTrackerOpts {
   getUsage?: (id: string) => number;
@@ -93,7 +95,7 @@ function makeMockComposer(opts: {
     },
     aliasResolver: {
       findAliasesOf: (targetId: string, tokens: readonly DesignToken[]) =>
-        tokens.filter((t) => t.aliasOf === targetId),
+        tokens.filter((t) => lightAliasOf(t) === targetId),
     },
     designSystem: {
       tokenUsage: {
@@ -165,14 +167,14 @@ describe("TokenDetailView", () => {
       fireEvent.blur(input);
       expect(onValueChange).toHaveBeenCalledWith(
         colorToken.id,
-        colorToken.value,
+        ownLight(colorToken),
         "#89A7FF",
       );
     });
 
     it("does not commit when the value is unchanged", () => {
       const onValueChange = vi.fn();
-      const withDark = { ...colorToken, darkValue: "#89A7FF" };
+      const withDark = v6Token({ ...colorToken, dark: "#89A7FF" });
       const { getByLabelText } = renderDark(onValueChange, withDark);
       fireEvent.blur(getByLabelText("Dark value"));
       expect(onValueChange).not.toHaveBeenCalled();
@@ -180,7 +182,7 @@ describe("TokenDetailView", () => {
 
     it("trims, so trailing whitespace is not a change", () => {
       const onValueChange = vi.fn();
-      const withDark = { ...colorToken, darkValue: "#89A7FF" };
+      const withDark = v6Token({ ...colorToken, dark: "#89A7FF" });
       const { getByLabelText } = renderDark(onValueChange, withDark);
       const input = getByLabelText("Dark value");
       fireEvent.change(input, { target: { value: "  #89A7FF  " } });
@@ -190,12 +192,12 @@ describe("TokenDetailView", () => {
 
     it("commits an empty string, which is how a dark value is cleared", () => {
       const onValueChange = vi.fn();
-      const withDark = { ...colorToken, darkValue: "#89A7FF" };
+      const withDark = v6Token({ ...colorToken, dark: "#89A7FF" });
       const { getByLabelText } = renderDark(onValueChange, withDark);
       const input = getByLabelText("Dark value");
       fireEvent.change(input, { target: { value: "" } });
       fireEvent.blur(input);
-      expect(onValueChange).toHaveBeenCalledWith(colorToken.id, colorToken.value, "");
+      expect(onValueChange).toHaveBeenCalledWith(colorToken.id, ownLight(colorToken), "");
     });
 
     it("has no Dark value field for a non-color token", () => {
@@ -368,7 +370,9 @@ describe("TokenDetailView", () => {
   /* G3-140 · 7318:80959: the one picker, in a popover titled with the token,
      its WORKSPACE PALETTE the other brand colours. */
   it("Change on a color token opens the picker popover (title, palette, Apply)", () => {
-    const other = { ...colorToken, id: "color-accent", name: "Accent", value: "#15803D" };
+    /* A brand colour is a semantic token in v6; primitives (which may hold a
+       dark literal) stay out of the light palette. */
+    const other = v6Token({ ...colorToken, id: "color-accent", name: "Accent", value: "#15803D", layer: "semantic" });
     const onValueChange = vi.fn();
     const { getByTestId, queryByTestId, getByRole, getByText } = render(
       wrap(<TokenDetailView token={colorToken} allTokens={[colorToken, other]} composer={makeMockComposer({})} onValueChange={onValueChange} />),
@@ -413,7 +417,7 @@ describe("TokenDetailView", () => {
 
   it("Aliased by row visible with count + names when N > 0", () => {
     const composer = makeMockComposer({});
-    const aliasA: DesignToken = {
+    const aliasA: DesignToken = v6Token({
       id: "color.alias.a",
       name: "Alias A",
       value: "",
@@ -421,9 +425,9 @@ describe("TokenDetailView", () => {
       cssVar: "--buildrick-design-color-alias-a",
       type: "color",
       kind: "color",
-      aliasOf: colorToken.id,
-    };
-    const aliasB: DesignToken = {
+      alias: colorToken.id,
+    });
+    const aliasB: DesignToken = v6Token({
       id: "color.alias.b",
       name: "Alias B",
       value: "",
@@ -431,8 +435,8 @@ describe("TokenDetailView", () => {
       cssVar: "--buildrick-design-color-alias-b",
       type: "color",
       kind: "color",
-      aliasOf: colorToken.id,
-    };
+      alias: colorToken.id,
+    });
     const allTokens: DesignToken[] = [colorToken, aliasA, aliasB];
     const { container, getByText } = render(
       wrap(
@@ -455,7 +459,7 @@ describe("TokenDetailView", () => {
 
   it("Aliased by row updates when tokens:alias-changed fires", () => {
     const composer = makeMockComposer({});
-    const aliasA: DesignToken = {
+    const aliasA: DesignToken = v6Token({
       id: "color.alias.a",
       name: "Alias A",
       value: "",
@@ -463,8 +467,8 @@ describe("TokenDetailView", () => {
       cssVar: "--buildrick-design-color-alias-a",
       type: "color",
       kind: "color",
-      aliasOf: colorToken.id,
-    };
+      alias: colorToken.id,
+    });
     // Mutable allTokens reference — we swap its contents and fire the event.
     // The component re-reads via findAliasesOf on each event.
     let allTokens: DesignToken[] = [colorToken];
@@ -680,7 +684,7 @@ describe("TokenDetailView", () => {
 
   // ── B4 follow-up: replacement picker modal on Delete ──────────────────────
   describe("Delete → replacement picker (B4 follow-up 2026-05-17)", () => {
-    const candidate: DesignToken = {
+    const candidate: DesignToken = v6Token({
       id: "color.brand.secondary",
       name: "Brand · Secondary",
       value: "#64748B",
@@ -688,7 +692,7 @@ describe("TokenDetailView", () => {
       cssVar: "--buildrick-design-color-brand-secondary",
       type: "color",
       kind: "color",
-    };
+    });
 
     it("Pro + usage=0: clicking Delete hard-deletes immediately (no modal, no replaceWith)", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 0 } });

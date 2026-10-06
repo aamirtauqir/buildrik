@@ -59,16 +59,19 @@ export function TokenAddDialog({ open, kind, siblings, takenIds, onCancel, onAdd
     setTouched(true);
     if (nameErr || valErr) return;
     const like = siblings[0];
-    onAdd({
+    /* Semantic with its own literal: the layer a dark value can be set on. */
+    const token: DesignToken = {
       id,
       name: name.trim(),
-      value: kind === "color" ? value.trim().toUpperCase() : value.trim(),
+      kind,
+      layer: "semantic",
+      modes: { light: { value: kind === "color" ? value.trim().toUpperCase() : value.trim() } },
       cssVar: `--buildrick-design-${id}`,
       category: kind === "color" ? "colors" : kind === "spacing" ? "spacing" : (like?.category ?? "layout"),
       type: kind === "color" ? "color" : (like?.type ?? "length"),
-      kind,
       ...(kind === "color" ? { group: "brand" } : {}),
-    } as DesignToken);
+    };
+    onAdd(token);
   };
 
   const err = (m: string | null, tid: string) =>

@@ -16,6 +16,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from "vites
 import * as React from "react";
 import { Composer } from "@/engine/Composer";
 import { TokenRegistryProvider } from "@/editor/design-system";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 describe("dark-mode trilogy · end-to-end", () => {
   let originalGetContext: any;
@@ -107,13 +108,9 @@ describe("dark-mode trilogy · end-to-end", () => {
     // DEFAULT_TOKENS id and inheriting that default's `--buildrick-design-*` cssVar.
     composer.setProjectSettingsRaw({
       designTokens: [
-        {
-          id: "test-color-primary", name: "Primary", value: "#fff",
-          category: "colors", cssVar: "--bd-color-primary", type: "color",
-          darkValue: "#000",
-        },
+        v6Token({ id: "test-color-primary", name: "Primary", value: "#fff", cssVar: "--bd-color-primary", dark: "#000" }),
       ],
-    } as any);
+    });
 
     render(
       <TokenRegistryProvider projectId="int-test" composer={composer}>
@@ -142,12 +139,9 @@ describe("dark-mode trilogy · end-to-end", () => {
     const composer = new Composer({} as any);
     composer.setProjectSettingsRaw({
       designTokens: [
-        {
-          id: "test-color-secondary", name: "Secondary", value: "#aaa",
-          category: "colors", cssVar: "--bd-color-secondary", type: "color",
-        },
+        v6Token({ id: "test-color-secondary", name: "Secondary", value: "#aaa", cssVar: "--bd-color-secondary", layer: "semantic" }),
       ],
-    } as any);
+    });
 
     render(
       <TokenRegistryProvider projectId="int-test" composer={composer}>

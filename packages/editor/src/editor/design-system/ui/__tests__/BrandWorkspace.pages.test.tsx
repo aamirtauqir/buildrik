@@ -11,7 +11,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AIAssistService } from "../../../../engine/designSystem/services/AIAssistService";
 import { EventEmitter } from "../../../../engine/EventEmitter";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
-import { installDomShims, makeFakeComposer, openPage, renderOnRadius, renderWorkspace } from "./brandWorkspaceHarness";
+import { SMALL_RADIUS_ID, installDomShims, makeFakeComposer, openPage, renderOnRadius, renderWorkspace } from "./brandWorkspaceHarness";
 import { requestBrandToken } from "../brandOpenRequest";
 
 /* The AI entry is gated on the SAME flag that decides whether an AIClient is
@@ -310,10 +310,10 @@ describe("BrandWorkspace › Component styles — a section row hands off to Add
 describe("BrandWorkspace — opens on a requested token", () => {
   it("a pending chip request lands on the token's page with its card open", async () => {
     const composer = makeFakeComposer();
-    requestBrandToken(composer, "radius-sm");
+    requestBrandToken(composer, SMALL_RADIUS_ID);
     const utils = renderWorkspace(composer);
     await waitFor(() => expect(utils.getByTestId("brand-page-title").textContent).toBe("Radius"));
-    expect(utils.container.querySelector('[data-token-row="radius-sm"]')?.getAttribute("aria-selected")).toBe("true");
+    expect(utils.container.querySelector(`[data-token-row="${SMALL_RADIUS_ID}"]`)?.getAttribute("aria-selected")).toBe("true");
     // Read once: a second mount lands on the default page.
     utils.unmount();
     const again = renderWorkspace(composer);

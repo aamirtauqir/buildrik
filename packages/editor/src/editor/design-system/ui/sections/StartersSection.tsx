@@ -21,12 +21,13 @@ import { useApplyStarter } from "../../state/useApplyStarter";
 import { useTypeRegistry } from "../../state/TokenRegistryContext";
 import type { StarterDS } from "../../starters/types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface StartersSectionProps {
   projectId?: string | null;
 }
 
-const family = (v: string | undefined) => String(v ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
+const family = (v: string | null | undefined) => String(v ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
 
 /**
  * 7316:85139's line under a starter: "<fonts> · <colour>" ("Playfair + Inter ·
@@ -36,7 +37,7 @@ const family = (v: string | undefined) => String(v ?? "").split(",")[0].trim().r
  */
 function starterLine(starter: StarterDS, headingFont: string, bodyFont: string): string {
   const fonts = headingFont && headingFont !== bodyFont ? `${headingFont} + ${bodyFont}` : bodyFont;
-  const hex = (id: string) => starter.tokens.find((t) => t.id === id)?.value?.toUpperCase();
+  const hex = (id: string) => resolveTokenLiteral(starter.tokens, id, "light")?.toUpperCase();
   const primary = hex("color-primary");
   const page = hex("color-background");
   const colour = primary ? (page ? `${primary} on ${page}` : primary) : "";
@@ -45,8 +46,8 @@ function starterLine(starter: StarterDS, headingFont: string, bodyFont: string):
 
 export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) => {
   const type = useTypeRegistry();
-  const headingFont = family(type.tokens.find((t) => t.id === "font-heading")?.value);
-  const bodyFont = family(type.tokens.find((t) => t.id === "font-body")?.value);
+  const headingFont = family(resolveTokenLiteral(type.tokens, "font-heading", "light"));
+  const bodyFont = family(resolveTokenLiteral(type.tokens, "font-body", "light"));
   const [selectedId, setSelectedId] = React.useState<string>("");
   const applyStarter = useApplyStarter(projectId);
 

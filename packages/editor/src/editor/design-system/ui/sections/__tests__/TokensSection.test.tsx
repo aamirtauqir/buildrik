@@ -13,6 +13,7 @@ import { TokensSection } from "../TokensSection";
 import { TokenRegistryProvider } from "../../../state/TokenRegistryContext";
 import { DSModeProvider } from "../../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 
 const wrap = (children: React.ReactNode, mode: "beginner" | "pro" = "beginner") => (
   <ToastProvider>
@@ -40,9 +41,9 @@ describe("TokensSection — mode-driven token filter (carried over)", () => {
     const { container } = render(wrap(<TokensSection openKind="color" />, "pro"));
     const ids = tokenIds(container);
     expect(ids).toEqual(expect.arrayContaining(["color-action", "color-brand-500", "color-primary"]));
-    /* 18 since `color-warning` joined the seed (founder call G4, 2026-09-02);
-       19 with `color-page-background` (owner decision 2026-10-02). */
-    expect(ids).toHaveLength(19);
+    /* Every colour token the seed carries. 19 in the v5 seed; the v6 seed adds
+       the primitives each semantic colour now aliases (`custom-*`). */
+    expect(ids).toHaveLength(DEFAULT_TOKENS.filter((t) => t.category === "colors").length);
   });
 
   it("a Beginner page emptied by the filter blames the mode", () => {

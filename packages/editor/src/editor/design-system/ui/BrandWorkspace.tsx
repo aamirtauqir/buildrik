@@ -51,7 +51,8 @@ import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, 
 import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
-import type { DesignTokenRecord } from "../../../shared/types/project";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
 import { DEFAULT_TOKENS } from "../constants";
 import type { SpacingPreset } from "../state/useSpacingTokens";
 import {
@@ -209,9 +210,18 @@ interface KindRegistryLike {
   discardAll: () => void;
 }
 
+const lightOf = (tokens: readonly DesignToken[], id: string): string => resolveTokenLiteral(tokens, id, "light") ?? "";
+const darkOf = (tokens: readonly DesignToken[], t: DesignToken): string =>
+  t.modes.dark ? resolveTokenLiteral(tokens, t.id, "dark") ?? "" : "";
+
 /** A token is dirty when its value OR its dark value differs from the saved one. */
-function tokenDirty(t: DesignToken, saved: DesignToken | undefined): boolean {
-  return saved === undefined || t.value !== saved.value || (t.darkValue ?? "") !== (saved.darkValue ?? "");
+function tokenDirty(t: DesignToken, reg: KindRegistryLike): boolean {
+  const saved = reg.savedTokens.find((s) => s.id === t.id);
+  return (
+    saved === undefined ||
+    lightOf(reg.tokens, t.id) !== lightOf(reg.savedTokens, t.id) ||
+    darkOf(reg.tokens, t) !== darkOf(reg.savedTokens, saved)
+  );
 }
 
 function dirtyCount(reg: KindRegistryLike): number {
@@ -221,7 +231,7 @@ function dirtyCount(reg: KindRegistryLike): number {
   // section-tab dot, no DraftChip count increment. Removals are not counted
   // here; deleteToken UX is a separate concern. A dark value set on the card
   // counts too — it used to stage without ever lighting the footer (C1 (ii)).
-  return reg.tokens.filter((t) => tokenDirty(t, reg.savedTokens.find((s) => s.id === t.id))).length;
+  return reg.tokens.filter((t) => tokenDirty(t, reg)).length;
 }
 
 // ─── BrandWorkspace ───────────────────────────────────────────────────────────
@@ -390,15 +400,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       }
 
       if (settings.designTokens && settings.designTokens.length > 0) {
-        // DesignTokenRecord is structurally compatible with DesignToken at runtime
-        // (id/name/value/cssVar/category/type/group are shared); cast to silence
-        // a pre-existing TS narrowing gap in the migration signature.
-        // The merge itself lives in state/projectTokens so ProjectTokensApplier —
+        // The merge lives in state/projectTokens so ProjectTokensApplier —
         // which runs this at project load, not at mount — shares it.
-        const merged = mergeProjectTokens(
-          settings.designTokens as unknown as DesignToken[],
-          storedVersion
-        );
+        const merged = mergeProjectTokens(settings.designTokens, storedVersion);
         // C1 fix: single fan-out resets all 14 kinds atomically. Internally:
         // color/type/spacing get resetFromSaved(merged), the 11 new kinds get
         // hydrateFromExternal(merged) (filters by kind, replaces tokens+saved).
@@ -486,33 +490,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   // ─ Apply ─
   const handleApply = () => {
     if (!composer) return;
-    const allTokens: DesignToken[] = allRegistries.flatMap((r) => r.tokens);
-    const validCategories: DesignTokenRecord["category"][] = [
-      "colors", "typography", "spacing", "effects",
-      "layout", "icons", "buttons", "forms", "theme",
-    ];
-    const tokenRecords: DesignTokenRecord[] = allTokens
-      .filter((t): t is DesignToken & { category: DesignTokenRecord["category"] } =>
-        validCategories.includes(t.category as DesignTokenRecord["category"])
-      )
-      .map((t) => ({
-        id: t.id,
-        name: t.name,
-        value: t.value,
-        cssVar: t.cssVar,
-        category: t.category,
-        type: t.type,
-        group: t.group,
-        /* The dark variant. It was dropped here, so a dark value set in the
-           drawer's detail view — and the card's "Dark value · Set" now —
-           reached the registry and never the project: measured live
-           2026-09-22, Apply persisted `#C81E1E` and lost `#76A9FA`. */
-        ...(t.darkValue ? { darkValue: t.darkValue } : {}),
-        /* The kind rides along: the eleven generic registries hydrate by
-           `kind`, and an added token (not in the seed) has nothing else to
-           say which registry it belongs to on the next load. */
-        ...(t.kind ? { kind: t.kind } : {}),
-      }));
+    /* Whole v6 tokens, modes included: the dark variant was once dropped
+       here (measured live 2026-09-22, Apply persisted `#C81E1E` and lost
+       `#76A9FA`), and the kind is what the generic registries hydrate by. */
+    const tokenRecords: DesignToken[] = allRegistries.flatMap((r) => r.tokens);
 
     // S2: pull all 11 preset categories into a flat record array for persistence.
     const presetRecords = allPresets.map((p) => ({
@@ -522,6 +503,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
     applyingRef.current = true;
     try {
+      /* A save that does not validate (an alias left pointing at a deleted
+         token) would load back as the seed — refuse it instead. */
+      const checked = validateTokens(tokenRecords);
+      if (!checked.ok) throw new Error(checked.reason);
       const current = composer.getProjectSettings();
       composer.setProjectSettings({
         ...current,
@@ -551,11 +536,13 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const handleDiscard = () => {
     const flat = allRegistries.flatMap((r) =>
       r.tokens
-        .filter((t) => {
-          const saved = r.savedTokens.find((s) => s.id === t.id);
-          return saved !== undefined && tokenDirty(t, saved);
-        })
-        .map((t) => ({ id: t.id, value: t.value, darkValue: t.darkValue, registry: r }))
+        .filter((t) => r.savedTokens.some((s) => s.id === t.id) && tokenDirty(t, r))
+        .map((t) => ({
+          id: t.id,
+          value: lightOf(r.tokens, t.id),
+          darkValue: t.modes.dark ? resolveTokenLiteral(r.tokens, t.id, "dark") ?? undefined : undefined,
+          registry: r,
+        }))
     );
     const count = totalDirty;
 
@@ -991,8 +978,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 if (fix) changeToken(tok.id, fix.value, fix.darkValue);
                 return;
               }
-              const fixed = composer?.designSystem?.computeAutoFix(tok.value, issue.autoFixHint);
-              if (fixed && fixed !== tok.value) changeToken(tok.id, fixed);
+              const current = lightOf(allTokens, tok.id);
+              const fixed = composer?.designSystem?.computeAutoFix(current, issue.autoFixHint);
+              if (fixed && fixed !== current) changeToken(tok.id, fixed);
             }}
             onOpen={openToken}
           />
@@ -1224,7 +1212,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 <span className="tw:flex-1">Live preview</span>
                 {previewControls}
               </div>
-              <BrandPreview colors={visibleColors} />
+              <BrandPreview colors={visibleColors} tokens={color.tokens} />
             </section>
           )}
           {isTokenPage && selectedToken && (
@@ -1280,9 +1268,13 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             return {
               title: `${label} Changes`,
               rows: reg.tokens
-                .map((t) => ({ t, saved: reg.savedTokens.find((x) => x.id === t.id) }))
-                .filter(({ t, saved }) => tokenDirty(t, saved))
-                .map(({ t, saved }) => ({ id: t.id, name: t.name, was: saved?.value ?? "new", now: t.value })),
+                .filter((t) => tokenDirty(t, reg))
+                .map((t) => ({
+                  id: t.id,
+                  name: t.name,
+                  was: reg.savedTokens.some((x) => x.id === t.id) ? lightOf(reg.savedTokens, t.id) : "new",
+                  now: lightOf(reg.tokens, t.id),
+                })),
             };
           })}
           onConfirm={handleApply}

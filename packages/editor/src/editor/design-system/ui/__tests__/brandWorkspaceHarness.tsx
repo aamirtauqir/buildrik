@@ -15,6 +15,13 @@ import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
 import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
+
+/** The seed's "Small radius" of kind radius. The v6 seed keeps the v5 list's
+ *  duplicate radius ids apart with a suffix, so this is looked up rather than
+ *  spelled out. */
+export const SMALL_RADIUS_ID =
+  DEFAULT_TOKENS.find((t) => t.kind === "radius" && t.name === "Small radius")?.id ?? "radius-sm";
 
 export type ComposerProp = NonNullable<React.ComponentProps<typeof BrandWorkspace>["composer"]>;
 
@@ -100,7 +107,7 @@ export function openPage(utils: ReturnType<typeof render>, id: BrandPageId) {
   fireEvent.click(row);
 }
 
-/** The workspace on the Radius page with "Small" (radius-sm) selected and its
+/** The workspace on the Radius page with "Small" (SMALL_RADIUS_ID) selected and its
  *  card's value field open — the non-colour / type / spacing kind that proves
  *  the 14-registry aggregation. C1 (ii): values are edited on the card
  *  (row → Change), not inline in the table. */
@@ -111,8 +118,8 @@ export async function renderOnRadius(
   const utils = renderWorkspace(composer, props);
   openPage(utils, "kind-radius");
   const row = (await waitFor(() => {
-    const el = utils.container.querySelector<HTMLElement>('[data-token-row="radius-sm"]');
-    if (!el) throw new Error("radius-sm row not rendered");
+    const el = utils.container.querySelector<HTMLElement>(`[data-token-row="${SMALL_RADIUS_ID}"]`);
+    if (!el) throw new Error(`${SMALL_RADIUS_ID} row not rendered`);
     return el;
   }))!;
   fireEvent.click(row);

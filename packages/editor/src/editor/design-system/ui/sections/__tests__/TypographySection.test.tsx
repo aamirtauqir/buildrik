@@ -13,13 +13,13 @@ import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TypographySection, fontsCaption } from "../TypographySection";
-import type { DesignToken } from "../../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const TOKENS = [
-  { id: "font-heading", value: "General Sans" },
-  { id: "font-body", value: '"Inter", sans-serif' },
-  { id: "font-mono", value: "Geist Mono" },
-] as unknown as DesignToken[];
+  v6Token({ id: "font-heading", value: "General Sans" }),
+  v6Token({ id: "font-body", value: '"Inter", sans-serif' }),
+  v6Token({ id: "font-mono", value: "Geist Mono" }),
+];
 
 function makeComposer(elements: Array<Record<string, string>>) {
   return {
@@ -162,9 +162,9 @@ describe("Brand · Typography — a page that declares no font still uses one", 
 describe("Brand · Fonts & type styles — the board's card (7316:81551)", () => {
   const WITH_SIZES = [
     ...TOKENS,
-    { id: "font-size-base", name: "Base", value: "16px", type: "font-size" },
-    { id: "font-size-4xl", name: "4XL", value: "36px", type: "font-size" },
-  ] as unknown as DesignToken[];
+    v6Token({ id: "font-size-base", name: "Base", value: "16px", type: "font-size" }),
+    v6Token({ id: "font-size-4xl", name: "4XL", value: "36px", type: "font-size" }),
+  ];
 
   it("one card: the three roles, then the type styles largest first", () => {
     render(<TypographySection composer={makeComposer([])} tokens={WITH_SIZES} />);
@@ -194,7 +194,7 @@ describe("Brand · Fonts & type styles — the board's card (7316:81551)", () =>
 
   it("captions the page: roles and distinct active fonts", () => {
     expect(fontsCaption(TOKENS)).toBe("3 roles · 3 active fonts");
-    expect(fontsCaption([...TOKENS.slice(0, 2), { id: "font-mono", value: "Inter" } as DesignToken])).toBe(
+    expect(fontsCaption([...TOKENS.slice(0, 2), v6Token({ id: "font-mono", value: "Inter" })])).toBe(
       "3 roles · 2 active fonts",
     );
   });

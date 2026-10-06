@@ -12,7 +12,10 @@
  * @license BSD-3-Clause
  */
 
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
 import type { DesignToken } from "../types";
+import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
 export interface ParseResult {
   tokens: DesignToken[];
@@ -31,12 +34,11 @@ export interface DiffResult {
 }
 
 import { inferKind } from "../state/useImportTokens";
+import { isV6TokenRow } from "../state/projectTokens";
 
-/* `DesignSystemTab.handleApply` persists only tokens whose category is in this
-   set (it must — `DesignTokenRecord["category"]` is exactly this union), so a
-   token with a category outside it routes to a registry, applies, and is then
-   dropped at persist with nothing said. Same class of silent loss as the
-   `kind` gap below, one layer down. Rejected here instead. */
+/* A token with a category outside this set routes to a registry, applies, and
+   is then dropped at persist with nothing said — the v6 schema's category enum
+   is exactly this union. Rejected here instead, with its id. */
 const PERSISTABLE_CATEGORIES = [
   "colors", "typography", "spacing", "effects",
   "layout", "icons", "buttons", "forms", "theme",
@@ -44,12 +46,29 @@ const PERSISTABLE_CATEGORIES = [
 
 const REQUIRED_FIELDS = ["id", "name", "value", "category", "cssVar", "type"] as const;
 
-function isCandidateToken(x: unknown): x is DesignToken {
+/** A row of a pre-v6 export (`value` / `darkValue` fields). */
+function isLegacyRow(x: unknown): x is LegacyDesignToken {
   if (!x || typeof x !== "object") return false;
   const obj = x as Record<string, unknown>;
   return REQUIRED_FIELDS.every((f) => typeof obj[f] === "string");
 }
 
+/** An imported pre-v6 row, one for one: a semantic token holding its own
+ *  literals. No primitives are extracted — the registry update path writes
+ *  literals, and an added token must stand alone in the import. */
+function legacyRowToV6(row: LegacyDesignToken, kind: DesignToken["kind"]): DesignToken {
+  const token: DesignToken = {
+    id: row.id, name: row.name, kind, layer: "semantic",
+    modes: row.darkValue !== undefined
+      ? { light: { value: row.value }, dark: { value: row.darkValue } }
+      : { light: { value: row.value } },
+    category: row.category, cssVar: row.cssVar, type: row.type,
+  };
+  for (const key of ["group", "options", "description", "friendlyName", "semanticKind", "replacedBy"] as const) {
+    if (row[key] !== undefined) Object.assign(token, { [key]: row[key] });
+  }
+  return token;
+}
 export function parseImportJSON(raw: string): ParseResult {
   let parsed: unknown;
   try {
@@ -76,10 +95,17 @@ export function parseImportJSON(raw: string): ParseResult {
     return { tokens: [], errors: ["Import is empty — no tokens to apply"] };
   }
 
+  /* A v6 export (every row carries `modes`) is the graph as saved: validate it
+     whole, aliases included. */
+  if (candidates.every(isV6TokenRow)) {
+    const checked = validateTokens(candidates);
+    return checked.ok ? { tokens: checked.tokens, errors: [] } : { tokens: [], errors: [checked.reason] };
+  }
+
   const errors: string[] = [];
   const tokens: DesignToken[] = [];
   candidates.forEach((c, i) => {
-    if (!isCandidateToken(c)) {
+    if (!isLegacyRow(c)) {
       errors.push(`Token #${i} is missing required fields (${REQUIRED_FIELDS.join(", ")})`);
       return;
     }
@@ -95,18 +121,20 @@ export function parseImportJSON(raw: string): ParseResult {
       );
       return;
     }
-    if (inferKind(c) === null) {
+    const kind = inferKind(c);
+    if (kind === null) {
       errors.push(
         `Token "${c.id}" has no "kind" and category "${c.category}" doesn't name one — ` +
           `add "kind" (e.g. radius, shadow, motion) so it can be applied.`,
       );
       return;
     }
-    tokens.push(c);
+    tokens.push(legacyRowToV6(c, kind));
   });
 
   if (errors.length > 0) return { tokens: [], errors };
-  return { tokens, errors: [] };
+  const checked = validateTokens(tokens);
+  return checked.ok ? { tokens: checked.tokens, errors: [] } : { tokens: [], errors: [checked.reason] };
 }
 
 export function diffTokens(current: DesignToken[], incoming: DesignToken[]): DiffResult {
@@ -118,11 +146,17 @@ export function diffTokens(current: DesignToken[], incoming: DesignToken[]): Dif
     const existing = currentById.get(t.id);
     if (!existing) {
       added.push(t);
-    } else if (existing.value !== t.value || existing.darkValue !== t.darkValue) {
+    } else {
+      const previousValue = resolveTokenLiteral(current, t.id, "light") ?? "";
+      const nextValue = resolveTokenLiteral(incoming, t.id, "light") ?? "";
+      const darkOf = (list: readonly DesignToken[], tok: DesignToken) =>
+        tok.modes.dark ? resolveTokenLiteral(list, tok.id, "dark") : undefined;
       // §2-B13: a dark-mode-only change (light value identical) must still
       // count as a modification, else re-importing a dark-complete export
       // shows "nothing to apply" and the dark variant silently never lands.
-      modified.push({ id: t.id, previousValue: existing.value, nextValue: t.value });
+      if (previousValue !== nextValue || darkOf(current, existing) !== darkOf(incoming, t)) {
+        modified.push({ id: t.id, previousValue, nextValue });
+      }
     }
   }
 

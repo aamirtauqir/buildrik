@@ -31,6 +31,7 @@ import {
   TOKEN_CELL_PREVIEW,
   TOKEN_CELL_VALUE,
 } from "../tokens/TokenTable";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -45,6 +46,9 @@ export interface ColorTokenListProps {
   isPro?: boolean;
   /** How many colour tokens Beginner mode is hiding right now. */
   hiddenByModeCount?: number;
+  /** The list `tokens` resolves aliases against — every colour token, since
+   *  the mode filter can hide the primitives. Defaults to `tokens`. */
+  allTokens?: readonly DesignToken[];
 }
 
 /* 7315:80955: swatch gutter 52 · TOKEN 180 · LIGHT 120 · DARK 120 · USED. */
@@ -109,6 +113,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   onSelectToken,
   isPro,
   hiddenByModeCount = 0,
+  allTokens = tokens,
 }) => {
   const ordered = React.useMemo(() => orderColourTokens(tokens), [tokens]);
 
@@ -148,7 +153,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
     <div data-color-token-list>
       <TokenTable columns={COLUMNS} template={TEMPLATE} label="Colour tokens">
         {ordered.map((token) => {
-          const currentValue = pendingDiff[token.id]?.currentValue ?? token.value;
+          const currentValue = pendingDiff[token.id]?.currentValue ?? resolveTokenLiteral(allTokens, token.id, "light") ?? "";
+          const darkValue = token.modes.dark ? resolveTokenLiteral(allTokens, token.id, "dark") : null;
           const isDirty = pendingDiff[token.id] !== undefined;
           const usage = usageByTokenId?.get(token.id) ?? 0;
           return (
@@ -169,7 +175,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               </span>
               <span className={TOKEN_CELL_VALUE}>{displayValue(currentValue)}</span>
               <span className={TOKEN_CELL_VALUE} data-testid={`brand-token-dark-${token.id}`}>
-                {token.darkValue ? displayValue(token.darkValue) : "—"}
+                {darkValue ? displayValue(darkValue) : "—"}
               </span>
               <span className={TOKEN_CELL_VALUE} data-testid={`brand-token-used-${token.id}`}>
                 {usage > 0 ? `used ${usage}×` : "unused"}

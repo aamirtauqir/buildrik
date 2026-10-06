@@ -130,6 +130,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     return (
       <ColorTokenList
         tokens={visible}
+        allTokens={color.tokens}
         pendingDiff={color.pendingDiff}
         onAddToken={() => onAddTokenClick?.()}
         hiddenByModeCount={color.tokens.length - visible.length}
@@ -146,6 +147,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
         <KindTokenList
           tokens={visible}
           savedTokens={spacing.savedTokens}
+          allTokens={spacing.tokens}
           kindLabel="spacing"
           hiddenByModeCount={spacing.tokens.length - visible.length}
           /* The board's PRESET column: which preset a token's value came
@@ -163,6 +165,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     <KindTokenList
       tokens={visible}
       savedTokens={r.savedTokens}
+      allTokens={r.tokens}
       kindLabel={openKind}
       hiddenByModeCount={r.tokens.length - visible.length}
       {...selection}

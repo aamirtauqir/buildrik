@@ -6,13 +6,13 @@ import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { ReusableStylesSection, presetLine, reusableStylesCount } from "../ReusableStylesSection";
 import { DEFAULT_PRESETS } from "../../../constants";
-import type { DesignToken } from "../../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const TYPE = [
-  { id: "font-heading", value: "Inter" },
-  { id: "font-body", value: "Inter" },
-  { id: "font-size-4xl", name: "4XL", value: "36px", type: "font-size" },
-] as unknown as DesignToken[];
+  v6Token({ id: "font-heading", value: "Inter", category: "typography", type: "font-family" }),
+  v6Token({ id: "font-body", value: "Inter", category: "typography", type: "font-family" }),
+  v6Token({ id: "font-size-4xl", name: "4XL", value: "36px", category: "typography", type: "font-size" }),
+];
 const primary = DEFAULT_PRESETS.find((p) => p.id === "button-primary")!;
 
 describe("Brand › Styles (7316:82153)", () => {

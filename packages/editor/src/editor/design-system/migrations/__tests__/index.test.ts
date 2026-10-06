@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../index";
-import type { DesignToken } from "../../types";
+import type { LegacyDesignToken } from "@/engine/designSystem/types";
+
+/** Steps up to v5 read and write legacy rows; v6 is migrateTokensToV6's. */
+const migrateLegacy = (rows: LegacyDesignToken[], from: number, to: number) =>
+  migrateDesignTokens(rows, from, to) as LegacyDesignToken[];
 
 describe("migrateDesignTokens", () => {
   it("CURRENT_SCHEMA_VERSION is 6 after the v6 token shape (2026-10-06, on top of the v5 brand-blue rename)", () => {
@@ -8,7 +12,7 @@ describe("migrateDesignTokens", () => {
   });
 
   it("v3 → v4 injects 4 primitive + 4 semantic color tokens into stored projects when absent", () => {
-    const existing: DesignToken[] = [
+    const existing: LegacyDesignToken[] = [
       {
         id: "color-primary",
         name: "Primary",
@@ -18,7 +22,7 @@ describe("migrateDesignTokens", () => {
         type: "color",
       },
     ];
-    const after = migrateDesignTokens(existing, 3, 4);
+    const after = migrateLegacy(existing, 3, 4);
     // Existing token preserved.
     expect(after.find((t) => t.id === "color-primary")).toBeDefined();
     // 4 new primitives added.
@@ -44,7 +48,7 @@ describe("migrateDesignTokens", () => {
   });
 
   it("v3 → v4 does NOT duplicate seeds already present in stored projects", () => {
-    const existing: DesignToken[] = [
+    const existing: LegacyDesignToken[] = [
       {
         id: "color-action",
         name: "Action (user-edited)",
@@ -56,7 +60,7 @@ describe("migrateDesignTokens", () => {
         aliasOf: "color-blue-500",
       },
     ];
-    const after = migrateDesignTokens(existing, 3, 4);
+    const after = migrateLegacy(existing, 3, 4);
     // Only one color-action entry — user version preserved.
     const matches = after.filter((t) => t.id === "color-action");
     expect(matches).toHaveLength(1);
@@ -65,7 +69,7 @@ describe("migrateDesignTokens", () => {
   });
 
   it("is no-op for same-version (V1 → V1)", () => {
-    const tokens: DesignToken[] = [
+    const tokens: LegacyDesignToken[] = [
       {
         id: "color-primary",
         name: "Primary",
@@ -75,12 +79,12 @@ describe("migrateDesignTokens", () => {
         type: "color",
       },
     ];
-    expect(migrateDesignTokens(tokens, 1, 1)).toEqual(tokens);
+    expect(migrateLegacy(tokens, 1, 1)).toEqual(tokens);
   });
 
   it("logs warning and returns unchanged when no migration defined", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const tokens: DesignToken[] = [];
+    const tokens: LegacyDesignToken[] = [];
     // Start from CURRENT_SCHEMA_VERSION so all real migrations are skipped;
     // only the warning loop runs.
     const result = migrateDesignTokens(tokens, CURRENT_SCHEMA_VERSION, 99);
@@ -90,7 +94,7 @@ describe("migrateDesignTokens", () => {
   });
 
   it("is no-op when fromVersion >= toVersion", () => {
-    const tokens: DesignToken[] = [];
+    const tokens: LegacyDesignToken[] = [];
     expect(migrateDesignTokens(tokens, 5, 3)).toEqual(tokens);
     expect(migrateDesignTokens(tokens, 5, 5)).toEqual(tokens);
   });

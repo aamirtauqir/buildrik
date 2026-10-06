@@ -22,7 +22,7 @@ import {
 } from "@/engine/__tests__/test-utils/realComposer";
 import { useEditorShortcuts } from "@/editor/shell/hooks/useEditorShortcuts";
 import { BrandWorkspace } from "../BrandWorkspace";
-import { installDomShims, openPage, wrap, type ComposerProp } from "./brandWorkspaceHarness";
+import { SMALL_RADIUS_ID, installDomShims, openPage, wrap, type ComposerProp } from "./brandWorkspaceHarness";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -61,8 +61,8 @@ function chord(target: EventTarget, init: KeyboardEventInit) {
 async function stageRadiusEdit(utils: ReturnType<typeof render>) {
   openPage(utils, "kind-radius");
   const row = await waitFor(() => {
-    const el = utils.container.querySelector<HTMLElement>('[data-token-row="radius-sm"]');
-    if (!el) throw new Error("radius-sm row not rendered");
+    const el = utils.container.querySelector<HTMLElement>(`[data-token-row="${SMALL_RADIUS_ID}"]`);
+    if (!el) throw new Error(`${SMALL_RADIUS_ID} row not rendered`);
     return el;
   });
   fireEvent.click(row);

@@ -9,9 +9,13 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { CURRENT_SCHEMA_VERSION, migrateDesignTokens } from "../index";
-import type { DesignToken } from "../../types";
+import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
-const stubToken: DesignToken = {
+/** Steps up to v5 read and write legacy rows; v6 is migrateTokensToV6's. */
+const migrateLegacy = (rows: LegacyDesignToken[], from: number, to: number) =>
+  migrateDesignTokens(rows, from, to) as LegacyDesignToken[];
+
+const stubToken: LegacyDesignToken = {
   id: "color-primary",
   name: "Primary",
   value: "#000000",
@@ -55,7 +59,7 @@ describe("schema version — load path branches", () => {
 
   it("v1 → v3 migration preserves all existing token fields", () => {
     const tokens = [stubToken];
-    const migrated = migrateDesignTokens(tokens, 1, 3);
+    const migrated = migrateLegacy(tokens, 1, 3);
     expect(migrated).toHaveLength(1);
     expect(migrated[0].id).toBe(stubToken.id);
     expect(migrated[0].value).toBe(stubToken.value);
@@ -64,7 +68,7 @@ describe("schema version — load path branches", () => {
 
   it("v1 → v3 migration leaves semanticKind + replacedBy undefined on existing tokens", () => {
     const tokens = [stubToken];
-    const migrated = migrateDesignTokens(tokens, 1, 3);
+    const migrated = migrateLegacy(tokens, 1, 3);
     expect(migrated[0].semanticKind).toBeUndefined();
     expect(migrated[0].replacedBy).toBeUndefined();
   });

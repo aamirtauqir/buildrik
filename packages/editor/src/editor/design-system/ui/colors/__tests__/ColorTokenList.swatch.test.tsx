@@ -15,9 +15,10 @@ import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { ColorTokenList } from "../ColorTokenList";
 import type { DesignToken, TokenDiff } from "../../../types";
+import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
-function makeToken(id: string, name: string, value: string, extra: Partial<DesignToken> = {}): DesignToken {
-  return { id, name, value, category: "colors", cssVar: `--${id}`, type: "color", kind: "color", ...extra };
+function makeToken(id: string, name: string, value: string, extra: Partial<V6TokenSpec> = {}): DesignToken {
+  return v6Token({ id, name, value, category: "colors", cssVar: `--${id}`, type: "color", kind: "color", ...extra });
 }
 
 const baseProps = {
@@ -50,7 +51,7 @@ describe("ColorTokenList — the Colours table (7315:80955)", () => {
     const { getByTestId } = render(
       <ColorTokenList
         tokens={[
-          makeToken("color-primary", "Primary", "#1a56db", { darkValue: "#76a9fa" }),
+          makeToken("color-primary", "Primary", "#1a56db", { dark: "#76a9fa" }),
           makeToken("color-pale", "Pale", "#F9FAFB"),
         ]}
         {...baseProps}

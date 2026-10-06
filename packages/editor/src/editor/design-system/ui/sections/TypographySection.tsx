@@ -37,6 +37,7 @@ import { getDefaultStyles } from "../../../../shared/constants/defaultStyles";
 import { DEFAULT_TOKENS } from "../../constants";
 import type { DesignToken } from "../../types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface TypographySectionProps {
   composer?: Composer | null;
@@ -99,11 +100,11 @@ export function typeStyleRows(source: readonly DesignToken[]): Array<{ id: strin
     })
     .map((t) => {
       const known = STYLE_NAMES[t.id];
-      const family = familyOf(String(source.find((f) => f.id === (known?.slot ?? "font-body"))?.value ?? ""));
+      const family = familyOf(resolveTokenLiteral(source, known?.slot ?? "font-body", "light") ?? "");
       return {
         id: t.id,
         name: known?.name ?? t.friendlyName ?? t.name,
-        line: typeStyleLine(family, t.value, known?.element ?? "text"),
+        line: typeStyleLine(family, resolveTokenLiteral(source, t.id, "light") ?? "", known?.element ?? "text"),
       };
     });
 }
@@ -111,7 +112,7 @@ export function typeStyleRows(source: readonly DesignToken[]): Array<{ id: strin
 /** "N roles · M active fonts" — the page header's caption. */
 export function fontsCaption(tokens: readonly DesignToken[]): string {
   const families = new Set(
-    FONT_SLOTS.map(({ id }) => familyOf(String(tokens.find((t) => t.id === id)?.value ?? "")).toLowerCase())
+    FONT_SLOTS.map(({ id }) => familyOf(resolveTokenLiteral(tokens, id, "light") ?? "").toLowerCase())
       .filter(Boolean),
   );
   const roles = FONT_SLOTS.filter(({ id }) => tokens.some((t) => t.id === id)).length;
@@ -190,8 +191,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
 
   const read = React.useCallback(() => {
     return FONT_SLOTS.map(({ id, title, role }) => {
-      const token = source.find((t) => t.id === id);
-      const family = familyOf(String(token?.value ?? ""));
+      const family = familyOf(resolveTokenLiteral(source, id, "light") ?? "");
       return { id, title, role, family, weights: weightsInUse(composer, family, id) };
     }).filter((row) => row.family.length > 0);
   }, [composer, source]);

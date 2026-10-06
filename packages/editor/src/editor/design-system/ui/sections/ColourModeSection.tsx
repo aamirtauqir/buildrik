@@ -33,6 +33,7 @@
 import * as React from "react";
 import { Check } from "lucide-react";
 import { X } from "lucide-react";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { Button, IconButton, Popover } from "@/editor/chrome-ui";
 import { darkShadeSuggestions } from "../../utils/colorUtils";
 import { ColorPicker } from "../colors/ColorPicker";
@@ -52,13 +53,20 @@ export const ColourModeSection: React.FC = () => {
      the lint rule, which stays silent until the project has at least one.
      The same mode filter as the Colours page, so the two pages count the same
      palette. */
+  const all = React.useMemo(() => color?.tokens ?? [], [color?.tokens]);
+  const lightOf = (id: string) => resolveTokenLiteral(all, id, "light") ?? "";
+  const darkOf = (id: string) => resolveTokenLiteral(all, id, "dark") ?? "";
+  /* Only a semantic token can carry a dark mode (v6) — a primitive is the
+     literal one aliases, and offering it a dark value would be a dead Set. */
   const { missing, paired } = React.useMemo(() => {
-    const visible = filterTokensByMode(color?.tokens ?? [], mode);
+    const visible = filterTokensByMode(all, mode).filter((t) => t.layer === "semantic");
+    const hasDark = (t: (typeof visible)[number]) =>
+      t.modes.dark !== undefined && Boolean(resolveTokenLiteral(all, t.id, "dark"));
     return {
-      missing: visible.filter((t) => !t.darkValue),
-      paired: visible.filter((t) => t.darkValue),
+      missing: visible.filter((t) => !hasDark(t)),
+      paired: visible.filter(hasDark),
     };
-  }, [color?.tokens, mode]);
+  }, [all, mode]);
 
   const commit = (id: string, lightValue: string, darkValue: string) => {
     setEditing(null);
@@ -117,11 +125,11 @@ export const ColourModeSection: React.FC = () => {
               {editing === t.id && custom ? (
                 <div className="tw:-m-2 tw:overflow-hidden tw:rounded-lg">
                   <ColorPicker
-                    initialHex={t.value}
+                    initialHex={lightOf(t.id)}
                     title={`${t.id} · dark`}
                     onChange={() => {}}
                     onCancel={() => setCustom(false)}
-                    onSave={(hex) => commit(t.id, t.value, hex)}
+                    onSave={(hex) => commit(t.id, lightOf(t.id), hex)}
                   />
                 </div>
               ) : editing === t.id ? (
@@ -141,11 +149,11 @@ export const ColourModeSection: React.FC = () => {
                     Pick the value this token resolves to when the site is in dark mode.
                   </p>
                   <div className="tw:flex tw:flex-col tw:gap-2">
-                    {darkShadeSuggestions(t.value).map((sh, i) => (
+                    {darkShadeSuggestions(lightOf(t.id)).map((sh, i) => (
                       <Button
                         key={sh.hex + sh.label}
                         type="button"
-                        onClick={() => commit(t.id, t.value, sh.hex)}
+                        onClick={() => commit(t.id, lightOf(t.id), sh.hex)}
                         data-testid={`dark-shade-option-${i}`}
                         data-hex={sh.hex}
                         className={`tw:h-auto tw:min-h-0 tw:w-full tw:justify-start tw:gap-3 tw:rounded-md tw:border tw:bg-[var(--bk-gray-900)] tw:px-2.5 tw:py-2 tw:text-left tw:enabled:hover:bg-[var(--bk-gray-800)] ${
@@ -193,7 +201,7 @@ export const ColourModeSection: React.FC = () => {
           name={<span title={t.name}>{t.id}</span>}
           sub={
             <span data-testid={`brand-dark-pair-${t.id}`}>
-              {displayValue(t.value)} → {displayValue(t.darkValue ?? "")}
+              {displayValue(lightOf(t.id))} → {displayValue(darkOf(t.id))}
             </span>
           }
           trailing={<Check size={12} aria-label="Has a dark value" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />}

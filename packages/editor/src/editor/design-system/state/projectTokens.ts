@@ -31,10 +31,14 @@ function fallBackToSeed(reason: string): DesignToken[] {
   return DEFAULT_TOKENS;
 }
 
+/** A row in the v6 shape (it carries `modes`). Shape only — not validated. */
+export function isV6TokenRow(r: unknown): r is DesignToken {
+  return typeof r === "object" && r !== null && "modes" in r;
+}
+
 /** v6 iff every row is an object carrying `modes`; anything else is the v5 shape. */
 function inferStoredVersion(rows: readonly unknown[]): number {
-  const isV6Row = (r: unknown) => typeof r === "object" && r !== null && "modes" in r;
-  return rows.length > 0 && rows.every(isV6Row) ? CURRENT_SCHEMA_VERSION : 5;
+  return rows.length > 0 && rows.every(isV6TokenRow) ? CURRENT_SCHEMA_VERSION : 5;
 }
 
 /**

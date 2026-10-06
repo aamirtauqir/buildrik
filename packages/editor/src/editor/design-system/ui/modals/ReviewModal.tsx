@@ -13,6 +13,7 @@
 import * as React from "react";
 import type { DesignToken } from "../../types";
 import { Button, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface ReviewModalProps {
   colorTokens: DesignToken[];
@@ -103,14 +104,13 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     cancelRef.current?.focus();
   }, []);
   const changedEntries = Object.values(colorDiff);
-  const changedTypeTokens = typeTokens.filter((t) => {
-    const saved = typeSavedTokens.find((s) => s.id === t.id);
-    return saved !== undefined && t.value !== saved.value;
-  });
-  const changedSpacingTokens = spacingTokens.filter((t) => {
-    const saved = spacingSavedTokens.find((s) => s.id === t.id);
-    return saved !== undefined && t.value !== saved.value;
-  });
+  const lightOf = (tokens: readonly DesignToken[], id: string) => resolveTokenLiteral(tokens, id, "light") ?? "";
+  const changedTypeTokens = typeTokens.filter(
+    (t) => typeSavedTokens.some((s) => s.id === t.id) && lightOf(typeTokens, t.id) !== lightOf(typeSavedTokens, t.id),
+  );
+  const changedSpacingTokens = spacingTokens.filter(
+    (t) => spacingSavedTokens.some((s) => s.id === t.id) && lightOf(spacingTokens, t.id) !== lightOf(spacingSavedTokens, t.id),
+  );
   const totalChanges =
     changedEntries.length +
     changedTypeTokens.length +
@@ -120,14 +120,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   const typeRows = changedTypeTokens.map((t) => ({
     id: t.id,
     name: t.name,
-    was: typeSavedTokens.find((x) => x.id === t.id)?.value ?? "—",
-    now: t.value,
+    was: typeSavedTokens.some((x) => x.id === t.id) ? lightOf(typeSavedTokens, t.id) : "—",
+    now: lightOf(typeTokens, t.id),
   }));
   const spacingRows = changedSpacingTokens.map((t) => ({
     id: t.id,
     name: t.name,
-    was: spacingSavedTokens.find((x) => x.id === t.id)?.value ?? "—",
-    now: t.value,
+    was: spacingSavedTokens.some((x) => x.id === t.id) ? lightOf(spacingSavedTokens, t.id) : "—",
+    now: lightOf(spacingTokens, t.id),
   }));
 
   return (

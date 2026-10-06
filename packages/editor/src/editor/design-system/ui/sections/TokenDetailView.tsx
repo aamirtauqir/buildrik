@@ -31,6 +31,7 @@
 
 import * as React from "react";
 import { Info } from "lucide-react";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { Composer } from "../../../../engine/Composer";
 import type { DesignToken } from "../../types";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
@@ -84,23 +85,23 @@ const LINK = "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:
    computed value; everything else is chrome. */
 const TILE = "tw:flex tw:size-10 tw:flex-none tw:items-center tw:justify-center tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-alpha-ink-10)]";
 
-const previewTile = (token: DesignToken): React.ReactNode => {
+const previewTile = (token: DesignToken, value: string): React.ReactNode => {
   if (token.kind === "color" || token.category === "colors") {
-    return <span aria-hidden="true" data-testid="brand-token-detail-swatch" className={TILE} style={{ background: token.value }} />;
+    return <span aria-hidden="true" data-testid="brand-token-detail-swatch" className={TILE} style={{ background: value }} />;
   }
   if (token.kind === "type" || token.category === "typography") {
     return (
       <span
         aria-hidden="true"
         className={`${TILE} tw:bg-[var(--bk-gray-50)] tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]`}
-        style={token.type === "font-family" ? { fontFamily: token.value } : undefined}
+        style={token.type === "font-family" ? { fontFamily: value } : undefined}
       >
         Aa
       </span>
     );
   }
   if (token.kind === "spacing" || token.category === "spacing") {
-    const num = parseFloat(token.value);
+    const num = parseFloat(value);
     const widthPx = Number.isFinite(num) ? Math.min(num, 24) : 8;
     return (
       <span aria-hidden="true" className={`${TILE} tw:bg-[var(--bk-gray-50)]`}>
@@ -128,6 +129,9 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const dsMode = useDSModeOptional();
   const isPro = dsMode?.mode === "pro";
   const isColor = token.kind === "color" || token.category === "colors";
+  const resolveList = React.useMemo(() => allTokens ?? [token], [allTokens, token]);
+  const value = resolveTokenLiteral(resolveList, token.id, "light") ?? "";
+  const darkValue = token.modes.dark ? resolveTokenLiteral(resolveList, token.id, "dark") ?? "" : undefined;
 
   // ─ Used by: subscribe to tokenUsage:changed for live count + breakdown updates.
   const tracker = composer?.designSystem?.tokenUsage;
@@ -185,14 +189,14 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const contrast = React.useMemo(() => {
     if (!isColor) return null;
     const surface = findSurfaceToken(allTokens ?? [token]);
-    const bg = resolveSurface(surface, mode);
-    const fg = shownValue(token, mode);
+    const bg = resolveSurface(surface, resolveList, mode);
+    const fg = shownValue(token, resolveList, mode);
     if (!fg || fg.toUpperCase() === bg.toUpperCase()) return null;
     const ratio = calcContrastRatio(fg, bg);
     if (!Number.isFinite(ratio)) return null;
     const on = bg.toUpperCase() === "#FFFFFF" ? "white" : (surface?.friendlyName ?? surface?.name ?? bg);
     return `${ratio.toFixed(1)}:1 contrast on ${on}`;
-  }, [isColor, allTokens, token, mode]);
+  }, [isColor, resolveList, token, mode]);
 
   // ─ Editors. The value line is read-only until its Change is pressed.
   const [editingLight, setEditingLight] = React.useState(false);
@@ -202,33 +206,36 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
      distinct value, eight at most (the board draws seven). */
   const workspacePalette = React.useMemo(() => {
     const seen = new Set<string>();
-    return (allTokens ?? [])
-      .filter((t) => t.type === "color" && t.id !== token.id && !t.replacedBy)
+    /* Semantic tokens only: a primitive may hold another token's DARK literal,
+       which is not a brand colour of the light palette. */
+    const list = allTokens ?? [];
+    return list
+      .filter((t) => t.type === "color" && t.layer === "semantic" && t.id !== token.id && !t.replacedBy)
+      .map((t) => ({ id: t.id, name: t.name, value: resolveTokenLiteral(list, t.id, "light") ?? "" }))
       .filter((t) => {
         const v = t.value.toUpperCase();
         if (seen.has(v)) return false;
         seen.add(v);
         return true;
       })
-      .slice(0, 8)
-      .map((t) => ({ id: t.id, name: t.name, value: t.value }));
+      .slice(0, 8);
   }, [allTokens, token.id]);
   const [editingDark, setEditingDark] = React.useState(false);
-  const [darkInput, setDarkInput] = React.useState(token.darkValue ?? "");
+  const [darkInput, setDarkInput] = React.useState(darkValue ?? "");
   React.useEffect(() => {
-    setDarkInput(token.darkValue ?? "");
+    setDarkInput(darkValue ?? "");
     setEditingLight(false);
     setFontPopoverOpen(false);
     setEditingDark(false);
     setUsageExpanded(false);
-  }, [token.id, token.darkValue]);
+  }, [token.id, darkValue]);
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const commitDark = () => {
     const next = darkInput.trim();
     setEditingDark(false);
-    if (next === (token.darkValue ?? "")) return;
-    onValueChange?.(token.id, token.value, next);
+    if (next === (darkValue ?? "")) return;
+    onValueChange?.(token.id, value, next);
   };
 
   // ─ Lint actions.
@@ -244,12 +251,12 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     if (typeof engineApply === "function") {
       const fixed = engineApply(token.id, hint);
       if (fixed === null) {
-        const computed = composer.designSystem.computeAutoFix(token.value, hint);
-        if (computed && computed !== token.value) onValueChange?.(token.id, computed);
+        const computed = composer.designSystem.computeAutoFix(value, hint);
+        if (computed && computed !== value) onValueChange?.(token.id, computed);
       }
     } else {
-      const fixed = composer.designSystem.computeAutoFix(token.value, hint);
-      if (fixed && fixed !== token.value) onValueChange?.(token.id, fixed);
+      const fixed = composer.designSystem.computeAutoFix(value, hint);
+      if (fixed && fixed !== value) onValueChange?.(token.id, fixed);
     }
     lintState?.suppress(token.id);
   };
@@ -306,7 +313,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     >
       {/* Header — tile + name + id/description + ⋯ */}
       <div className="tw:flex tw:items-center tw:gap-3" data-testid="brand-token-detail-header">
-        {previewTile(token)}
+        {previewTile(token, value)}
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
           {/* 7315:80955: Pro titles the card with the id ("color-primary") and
               puts the name under it ("Blue 700"); Beginner, which hides ids,
@@ -388,7 +395,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       <div className={`${ROW} tw:mt-2`}>
         <span className={LABEL}>{isColor ? "Light value" : "Value"}</span>
         <span className={`${VALUE} ${isColor ? "" : MONO}`} data-testid="brand-token-value-light">
-          {displayValue(token.value)}
+          {displayValue(value)}
         </span>
         {token.type === "font-family" ? (
           <BrandFontPopover
@@ -409,7 +416,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               </Button>
             }
             roleName={token.name}
-            value={token.value}
+            value={value}
             onPick={(family) => {
               onValueChange?.(token.id, family);
               setFontPopoverOpen(false);
@@ -446,7 +453,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                 and grey foot run edge to edge as on the board. */}
             <div className="tw:-m-2 tw:overflow-hidden tw:rounded-lg" data-testid="brand-token-light-editor">
               <ColorPicker
-                initialHex={token.value}
+                initialHex={value}
                 title={token.name}
                 palette={workspacePalette}
                 onChange={() => {
@@ -484,7 +491,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               {token.type === "font-family" && (
                 <div className="tw:mb-1.5">
                   <FontFamilyPicker
-                    value={token.value}
+                    value={value}
                     onChange={(family) => onValueChange?.(token.id, family)}
                     composer={composer}
                   />
@@ -492,7 +499,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               )}
               <TextInput
                 type="text"
-                value={token.value}
+                value={value}
                 onChange={(e) => onValueChange?.(token.id, e.target.value)}
                 className={MONO}
                 aria-label="Value"
@@ -508,8 +515,8 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <>
           <div className={ROW}>
             <span className={LABEL}>Dark value</span>
-            {token.darkValue ? (
-              <span className={VALUE} data-testid="brand-token-value-dark">{displayValue(token.darkValue)}</span>
+            {darkValue ? (
+              <span className={VALUE} data-testid="brand-token-value-dark">{displayValue(darkValue)}</span>
             ) : (
               <span className={VALUE_EMPTY} data-testid="brand-token-value-dark">No dark value</span>
             )}
@@ -522,7 +529,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               data-testid="brand-token-action-dark"
               className={ACTION}
             >
-              {token.darkValue ? "Change" : "Set"}
+              {darkValue ? "Change" : "Set"}
             </Button>
           </div>
           {editingDark && (
@@ -536,7 +543,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                 onKeyDown={(e) => {
                   if (e.key === "Enter") commitDark();
                   if (e.key === "Escape") {
-                    setDarkInput(token.darkValue ?? "");
+                    setDarkInput(darkValue ?? "");
                     setEditingDark(false);
                   }
                 }}

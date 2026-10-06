@@ -63,15 +63,6 @@ const ZOOMS = [
   { value: "1", label: "100%" },
 ] as const;
 
-/** Every `--buildrick-design-*` the draft carries, resolved for the mode. */
-function stagedTokensCSS(tokens: readonly DesignToken[], mode: "light" | "dark"): string {
-  return siteTokensCSS(
-    tokens.map((t) => ({
-      cssVar: t.cssVar,
-      value: mode === "dark" ? (t.darkValue ?? t.value) : t.value,
-    })),
-  );
-}
 
 function buildDocument(composer: Composer): string {
   const raw = composer.exportHTML?.().combined;
@@ -89,7 +80,8 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
   const [pageIsEmpty, setPageIsEmpty] = React.useState(false);
   const [doc, setDoc] = React.useState<string>("");
   const frameRef = React.useRef<HTMLIFrameElement | null>(null);
-  const stagedCSS = React.useMemo(() => stagedTokensCSS(tokens, mode), [tokens, mode]);
+  /* Every `--buildrick-design-*` the draft carries, resolved for the mode. */
+  const stagedCSS = React.useMemo(() => siteTokensCSS(tokens, mode), [tokens, mode]);
 
   /* The document follows the canvas: rebuilt on load and on every document
      mutation (a page switch is a `project:changed` too), debounced so a burst

@@ -9,8 +9,9 @@ import { TokenDetailView } from "../TokenDetailView";
 import { renameError } from "../TokenRenameDialog";
 import { DSModeProvider } from "../../../state/DSModeContext";
 import type { DesignToken } from "../../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
-const token = { id: "color-primary", name: "Primary", value: "#1A56DB", category: "colors", cssVar: "--x", type: "color", kind: "color" } as DesignToken;
+const token = v6Token({ id: "color-primary", name: "Primary", value: "#1A56DB", category: "colors", cssVar: "--x", type: "color", kind: "color" }) as DesignToken;
 const other = { ...token, id: "color-text", name: "Text" } as DesignToken;
 const composer = {
   designSystem: {

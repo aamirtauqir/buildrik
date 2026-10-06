@@ -22,24 +22,25 @@ import { DSModeProvider } from "../../../state/DSModeContext";
 import { EVENTS } from "@/shared/constants/events";
 import type { DesignToken } from "../../../types";
 import type { Composer } from "../../../../../engine";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
-const fontToken: DesignToken = {
+const fontToken: DesignToken = v6Token({
   id: "font-heading",
   name: "Heading Font",
   value: "Inter",
   category: "typography",
   cssVar: "--buildrick-design-font-heading",
   type: "font-family",
-};
+});
 
-const sizeToken: DesignToken = {
+const sizeToken: DesignToken = v6Token({
   id: "font-size-sm",
   name: "Font SM",
   value: "14px",
   category: "typography",
   cssVar: "--buildrick-design-font-size-sm",
   type: "font-size",
-};
+});
 
 function composerWithFonts(families: string[]) {
   const listeners = new Map<string, Set<(p?: unknown) => void>>();
@@ -114,7 +115,7 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
 
   it("reads the token's family back as the selected row, uploaded source visible", () => {
     const { composer } = composerWithFonts(["Inter Variable"]);
-    renderDetail({ ...fontToken, value: "Inter Variable" }, composer);
+    renderDetail(v6Token({ ...fontToken, value: "Inter Variable" }), composer);
     const trigger = screen.getByTestId("brand-token-font-picker");
     expect(trigger).toHaveTextContent("Inter Variable");
     expect(trigger).toHaveAttribute("data-font-source", "uploaded");
@@ -212,7 +213,7 @@ describe("TokenDetailView — the Brand font picker popover (7318:81029)", () =>
 
   it("a family from elsewhere (Google / typed) is listed first as Custom; Manage opens Site fonts", () => {
     const { composer, emit } = composerWithFonts([]);
-    openPopover({ ...fontToken, value: "Lora" }, composer);
+    openPopover(v6Token({ ...fontToken, value: "Lora" }), composer);
     expect(screen.getByTestId("brand-font-current")).toHaveTextContent("Lora · Custom");
     fireEvent.click(screen.getByTestId("brand-font-manage"));
     expect(emit).toHaveBeenCalledWith("ui:site-fonts", {});

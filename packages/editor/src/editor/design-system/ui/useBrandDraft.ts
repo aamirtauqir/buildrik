@@ -20,6 +20,7 @@
  */
 import * as React from "react";
 import type { DesignToken } from "../types";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface DraftRegistry {
   tokens: DesignToken[];
@@ -93,8 +94,13 @@ export function useBrandDraft({
         const saved = r.savedTokens.find((s) => s.id === t.id);
         if (!saved) {
           if (r === color) added.push(t);
-        } else if (t.value !== saved.value || (t.darkValue ?? "") !== (saved.darkValue ?? "")) {
-          changed.push({ id: t.id, value: t.value, ...(t.darkValue !== undefined ? { darkValue: t.darkValue } : {}) });
+          continue;
+        }
+        const value = resolveTokenLiteral(r.tokens, t.id, "light") ?? "";
+        const darkValue = t.modes.dark ? resolveTokenLiteral(r.tokens, t.id, "dark") ?? "" : undefined;
+        const savedDark = saved.modes.dark ? resolveTokenLiteral(r.savedTokens, t.id, "dark") ?? "" : undefined;
+        if (value !== (resolveTokenLiteral(r.savedTokens, t.id, "light") ?? "") || (darkValue ?? "") !== (savedDark ?? "")) {
+          changed.push({ id: t.id, value, ...(darkValue !== undefined ? { darkValue } : {}) });
         }
       }
     }

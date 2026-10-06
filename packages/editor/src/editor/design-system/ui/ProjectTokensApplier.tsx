@@ -20,6 +20,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { mergeProjectTokens } from "../state/projectTokens";
 
 export interface ProjectTokensApplierProps {
@@ -45,8 +46,8 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
         // identified by category, the same field the registry filters on.
         const value =
           token.category === "colors" && composer.darkResolver
-            ? composer.darkResolver.resolve(token, resolved)
-            : token.value;
+            ? composer.darkResolver.resolve(token, merged, resolved)
+            : resolveTokenLiteral(merged, token.id, "light") ?? "";
         document.documentElement.style.setProperty(token.cssVar, value);
       }
     };

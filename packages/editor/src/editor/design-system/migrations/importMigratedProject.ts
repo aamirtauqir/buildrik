@@ -23,7 +23,8 @@
 
 import type { Composer } from "@/engine";
 import type { ProjectData } from "@/shared/types";
-import type { DesignToken } from "../types";
+import type { LegacyDesignToken } from "@/engine/designSystem/types";
+import { isV6TokenRow } from "../state/projectTokens";
 
 export function importMigratedProject(
   composer: Composer,
@@ -32,7 +33,7 @@ export function importMigratedProject(
 ): boolean {
   const fromVersion = data.dsSchemaVersion ?? 0;
   const result = composer.migration.run({
-    project: { tokens: (data.styles ?? []) as unknown as DesignToken[] },
+    project: { tokens: (data.styles ?? []) as unknown as LegacyDesignToken[] },
     currentVersion: fromVersion,
     siteId,
   });
@@ -44,7 +45,10 @@ export function importMigratedProject(
           dsSchemaVersion: result.newVersion,
         }
       : data;
-  composer.aliasResolver.validate((toImport.styles ?? []) as unknown as DesignToken[]);
+  /* Pre-v6 rows carry `aliasOf` as metadata the v6 resolver does not follow;
+     only rows in the v6 shape have an alias graph to check. */
+  const rows: readonly unknown[] = toImport.styles ?? [];
+  composer.aliasResolver.validate(rows.filter(isV6TokenRow));
   composer.importProject(toImport);
   return toImport !== data;
 }

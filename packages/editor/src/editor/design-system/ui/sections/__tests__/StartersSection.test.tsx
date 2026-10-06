@@ -14,6 +14,7 @@ import { DSModeProvider } from "../../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { STARTER_DS_REGISTRY } from "../../../starters";
 import { starterTokenStorageKey } from "../../../state/useApplyStarter";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 /** Reads the live colour registry from inside the provider. */
 const seen: { registry?: ReturnType<typeof useColorRegistry> } = {};
@@ -59,9 +60,9 @@ describe("StartersSection", () => {
 
   it("moves the live tokens to the starter's values", () => {
     const { container } = render(wrap(<StartersSection projectId="p1" />));
-    const wanted = STARTER_DS_REGISTRY[0].tokens.find((t) => t.id === "color-primary");
+    const wanted = resolveTokenLiteral(STARTER_DS_REGISTRY[0].tokens, "color-primary", "light");
     fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[0]);
-    expect(seen.registry?.tokens.find((t) => t.id === "color-primary")?.value).toBe(wanted?.value);
+    expect(resolveTokenLiteral(seen.registry?.tokens ?? [], "color-primary", "light")).toBe(wanted);
   });
 
   it("does not write the token blob itself — persistAll on Apply owns that", () => {

@@ -14,14 +14,14 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ColorTokenList } from "../ColorTokenList";
 import type { DesignToken } from "../../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const base = {
   pendingDiff: {},
   onAddToken: vi.fn(),
 };
 
-const token = (id: string): DesignToken =>
-  ({ id, name: id, value: "#171717", kind: "color" }) as unknown as DesignToken;
+const token = (id: string): DesignToken => v6Token({ id, value: "#171717" });
 
 describe("ColorTokenList — which empty is it", () => {
   it("blames the mode when the mode is what emptied it", () => {

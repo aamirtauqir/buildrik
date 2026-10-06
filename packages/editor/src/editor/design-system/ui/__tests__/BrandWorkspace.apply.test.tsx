@@ -23,6 +23,7 @@ import { BrandWorkspace } from "../BrandWorkspace";
 import { useButtonPresets } from "../../state/StylePresetRegistryContext";
 import { CURRENT_SCHEMA_VERSION } from "../../migrations";
 import {
+  SMALL_RADIUS_ID,
   installDomShims,
   makeFakeComposer,
   openPage,
@@ -30,6 +31,8 @@ import {
   renderWorkspace,
   wrap,
 } from "./brandWorkspaceHarness";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import type { DesignToken } from "@/engine/designSystem/types";
 
 beforeEach(installDomShims);
 
@@ -110,7 +113,7 @@ describe("BrandWorkspace — pages", () => {
 
     openPage(utils, "kind-radius");
     await waitFor(() => {
-      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px");
+      expect(utils.getByTestId(`brand-token-value-${SMALL_RADIUS_ID}`).textContent).toBe("10px");
     });
   });
 
@@ -125,7 +128,7 @@ describe("BrandWorkspace — pages", () => {
     fireEvent.click(utils.getByText("Discard"));
 
     await waitFor(() => {
-      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe(original);
+      expect(utils.getByTestId(`brand-token-value-${SMALL_RADIUS_ID}`).textContent).toBe(original);
     });
     expect(utils.queryByText("Unsaved brand changes")).toBeNull();
   });
@@ -191,12 +194,12 @@ describe("BrandWorkspace — Apply pipeline (footer -> ReviewModal)", () => {
 
     await waitFor(() => expect(setSpy).toHaveBeenCalledTimes(1));
     const arg = setSpy.mock.calls[0][0] as {
-      designTokens: Array<{ id: string; value: string; category: string }>;
+      designTokens: DesignToken[];
       designTokensSchemaVersion: number;
       designPresets: Array<{ id: string; category: string; bindings: unknown }>;
     };
 
-    expect(arg.designTokens.find((t) => t.id === "radius-sm" && t.value === "10px")).toBeDefined();
+    expect(resolveTokenLiteral(arg.designTokens, SMALL_RADIUS_ID, "light")).toBe("10px");
     expect(arg.designTokensSchemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(Array.isArray(arg.designPresets)).toBe(true);
     expect(arg.designPresets.length).toBeGreaterThan(0);
@@ -259,7 +262,7 @@ describe("BrandWorkspace — engine undo preserves unsaved edits", () => {
     });
 
     await waitFor(() => {
-      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px");
+      expect(utils.getByTestId(`brand-token-value-${SMALL_RADIUS_ID}`).textContent).toBe("10px");
       expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
     });
   });
@@ -273,7 +276,7 @@ describe("BrandWorkspace — engine undo preserves unsaved edits", () => {
     });
 
     await waitFor(() => {
-      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("4px");
+      expect(utils.getByTestId(`brand-token-value-${SMALL_RADIUS_ID}`).textContent).toBe("4px");
       expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
     });
   });
