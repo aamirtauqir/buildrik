@@ -132,7 +132,7 @@ export function toDTCG(tokens: DesignToken[]): DtcgDocument {
       $type: DTCG_TYPE[kind] ?? `com.buildrik.${kind}`,
       $value: refToDtcg(modes.light),
       ...(description !== undefined ? { $description: description } : {}),
-      $extensions: { "com.buildrik": { ...rest, kind, modes: modes.dark ? { dark: refToDtcg(modes.dark) } : {} } },
+      $extensions: { "com.buildrik": { ...rest, kind, modes: modes.dark !== undefined ? { dark: refToDtcg(modes.dark) } : {} } },
     };
   }
   return doc;
@@ -146,7 +146,7 @@ export function fromDTCG(doc: DtcgDocument): DesignToken[] {
       name: rest.name,
       kind,
       layer: rest.layer,
-      modes: modes.dark ? { light: dtcgToRef(e.$value), dark: dtcgToRef(modes.dark) } : { light: dtcgToRef(e.$value) },
+      modes: modes.dark !== undefined ? { light: dtcgToRef(e.$value), dark: dtcgToRef(modes.dark) } : { light: dtcgToRef(e.$value) },
       category: rest.category,
       cssVar: rest.cssVar,
       type: rest.type,

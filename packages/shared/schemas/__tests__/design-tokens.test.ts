@@ -54,4 +54,49 @@ describe("validateTokens (v6)", () => {
     expect(validateTokens(null)).toEqual({ ok: false, reason: expect.any(String) });
     expect(validateTokens([null]).ok).toBe(false);
   });
+
+  it("refuses a dark-only alias cycle (light literals, dark A→B, B→A)", () => {
+    const r = validateTokens([
+      sem("a", { value: "#1A56DB" }, { alias: "b" }),
+      sem("b", { value: "#76A9FA" }, { alias: "a" }),
+    ]);
+    expect(r).toEqual({ ok: false, reason: expect.stringContaining("cycle") });
+  });
+
+  it("round-trips every optional field + dark literal with empty string", () => {
+    const full: DesignToken = {
+      id: "complex-token",
+      name: "Complex",
+      kind: "color",
+      layer: "semantic",
+      modes: { light: { alias: "blue-600" }, dark: { value: "" } },
+      category: "colors",
+      cssVar: "--buildrick-design-complex-token",
+      type: "color",
+      group: "brand",
+      options: ["opt1", "opt2"],
+      description: "A complex token",
+      friendlyName: "Complex Token",
+      semanticKind: "action",
+      replacedBy: "complex-token-v2",
+      legacyNames: ["--old-name", "--ancient-name"],
+    };
+    const result = validateTokens([prim("blue-600", "#1A56DB"), { ...full, replacedBy: undefined }]);
+    expect(result.ok).toBe(true);
+  });
+
+  it("refuses an unknown key in token object", () => {
+    const bad = { ...prim("x", "#000"), unknownField: "value" };
+    expect(validateTokens([bad]).ok).toBe(false);
+  });
+
+  it("refuses a malformed id (uppercase or spaces)", () => {
+    const bad = { ...prim("Bad-Id", "#000") };
+    expect(validateTokens([bad]).ok).toBe(false);
+  });
+
+  it("refuses a malformed cssVar (missing -- or uppercase)", () => {
+    const bad = { ...prim("x", "#000"), cssVar: "not-a-var" };
+    expect(validateTokens([bad]).ok).toBe(false);
+  });
 });
