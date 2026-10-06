@@ -9,7 +9,15 @@ import { QA_EMAIL } from "./accounts";
  * Brand Part 1a, flows 1 and 2 (spec §5, test 36). Needs a dashboard started
  * with `BRAND_TOKENS_V2=on`: both flows open a v5 site, which migrates on load
  * only when the server says so. With the switch off the site opens read-only
- * and the first assertion below says why.
+ * and `openBrand` fails with "BRAND_TOKENS_V2 is off on the test server".
+ *
+ * Run LOCALLY ONLY — it seeds sites through this machine's database:
+ *   PW_FORCE_LOCAL=1 PW_BASE_URL=http://localhost:<port> \
+ *     npx playwright test e2e/brand-tokens.spec.ts --project=chromium
+ * `.env.local` holds BrowserStack credentials, and with them the config has
+ * only bs-* projects: `--project=chromium` then errors, and a run without
+ * `--project` would go to the cloud grid. PW_FORCE_LOCAL=1 keeps the local
+ * projects; the guard below fails any bs-* run instead of letting it pass.
  *
  * Each test seeds its own v5 site in the QA workspace (the `custom-colours`
  * migration fixture as its tokens) and deletes it afterwards, so nothing here
@@ -17,8 +25,9 @@ import { QA_EMAIL } from "./accounts";
  *
  * `fixtures/brand-v5-export-tokens.json` is the v5 colour each var resolved to
  * before migration: v5 emitted every token as `cssVar: value`, so the expected
- * colour is the fixture's own `value`. Measured against three real v5 sites on
- * 2026-10-06 (export with the switch off = stored value, 54/54 per site).
+ * colour is the fixture's own `value` — derived from the stored v5 values, not
+ * measured from a v5 build. (Live check, 2026-10-06: three real v5 sites
+ * exported with the switch off resolved to their stored values, 54/54 each.)
  */
 
 const SHARED_FIXTURE = path.resolve(__dirname, "..", "..", "shared", "tokens", "__tests__", "__fixtures__", "custom-colours.json");
@@ -94,9 +103,15 @@ async function seedV5Site(): Promise<string> {
   return site.id;
 }
 
-/** The QA workspace has a real Vercel connection — nothing here may publish. */
+/** The QA workspace has a real Vercel connection — nothing here may publish.
+ *  Returns the number of publish requests the page attempted (all refused). */
 async function blockPublish(page: Page) {
-  await page.route("**/api/trpc/**sites.publish**", (route) => route.fulfill({ status: 403, body: "publish blocked in e2e" }));
+  const hits = { count: 0 };
+  await page.route("**/api/trpc/**sites.publish**", (route) => {
+    hits.count++;
+    return route.fulfill({ status: 403, body: "publish blocked in e2e" });
+  });
+  return hits;
 }
 
 async function openEditor(page: Page, siteId: string) {
@@ -119,14 +134,31 @@ const canvasColour = (page: Page, id: string, prop: "backgroundColor" | "color")
     [id, prop] as const,
   );
 
+/** Opens Brand and fails fast when the server's kill switch is off: a v5
+ *  site then opens read-only with the paused notice instead of migrating. */
 async function openBrand(page: Page) {
   await page.getByTestId("rail-tab-design").click();
-  await expect(page.getByText("Brand editing is paused", { exact: false }), "server must run with BRAND_TOKENS_V2=on").toHaveCount(0);
+  // Fully rendered: the token table lists Primary.
+  await expect(page.getByText("color-primary", { exact: true }).first()).toBeVisible({ timeout: 30_000 });
+  expect(
+    await page.getByText("Brand editing is paused", { exact: false }).count(),
+    "BRAND_TOKENS_V2 is off on the test server",
+  ).toBe(0);
 }
 
 test.describe("Brand Part 1a", () => {
-  test.beforeEach(async ({ page }) => {
-    await blockPublish(page);
+  let publishHits: { count: number };
+
+  test.beforeEach(async ({ page }, testInfo) => {
+    expect(
+      testInfo.project.name.startsWith("bs-"),
+      "brand-tokens.spec.ts seeds this machine's database — run it locally with PW_FORCE_LOCAL=1",
+    ).toBe(false);
+    publishHits = await blockPublish(page);
+  });
+
+  test.afterEach(() => {
+    expect(publishHits.count, "no sites.publish request may be made").toBe(0);
   });
 
   test.afterAll(async () => {
@@ -148,13 +180,12 @@ test.describe("Brand Part 1a", () => {
     const hex = picker.locator("input[type=text]").first();
     await hex.fill("#C2410C");
     await hex.press("Enter");
-    const apply = picker.getByRole("button", { name: "Apply" });
-    if (await apply.count()) await apply.click();
+    await picker.getByRole("button", { name: "Apply" }).click();
 
     await expect.poll(() => canvasColour(page, "e2e-brand-button", "backgroundColor")).toBe("rgb(194, 65, 12)");
     await expect.poll(() => canvasColour(page, "e2e-brand-link", "color")).toBe("rgb(194, 65, 12)");
 
-    await page.keyboard.press("Meta+z");
+    await page.keyboard.press("ControlOrMeta+z");
     await expect.poll(() => canvasColour(page, "e2e-brand-button", "backgroundColor")).toBe(before);
     await expect.poll(() => canvasColour(page, "e2e-brand-link", "color")).toBe(before);
   });
@@ -162,6 +193,7 @@ test.describe("Brand Part 1a", () => {
   test("a v5 site migrates and its export resolves every colour exactly as before", async ({ page }) => {
     const siteId = await seedV5Site();
     await openEditor(page, siteId);
+    await openBrand(page);
 
     // The migration is saved (with its rollback snapshot) by the first autosave.
     await expect
@@ -176,7 +208,6 @@ test.describe("Brand Part 1a", () => {
     expect(await prisma.siteThemeSnapshot.count({ where: { siteId, reason: "migration" } })).toBe(1);
 
     // The Brand live preview is the export document (`composer.exportHTML`).
-    await openBrand(page);
     const frame = page.frameLocator('[data-testid="brand-live-preview-frame"] iframe');
     await frame.locator('[data-buildrick-id="e2e-brand-button"]').waitFor({ timeout: 30_000 });
     const exported = await frame.locator("html").evaluate((root) => root.outerHTML);
