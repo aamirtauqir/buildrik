@@ -556,13 +556,79 @@ describe("checkDomainDns — Vercel decides status and SSL (Q7)", () => {
     });
   });
 
-  it("a row an old 409 marked VERIFIED, which the project does not hold (404 → null), drops to FAILED", async () => {
+  it("a row an old 409 marked VERIFIED, which the project does not hold (404 → null) and Vercel still refuses (409), drops to FAILED", async () => {
     db.domain.findUnique.mockResolvedValue(row({ status: "VERIFIED" }));
     vi.mocked(getVercelProjectDomain).mockResolvedValue(null);
+    vi.mocked(addDomainToVercelProject).mockRejectedValue(new VercelApiError(409, "domain_already_in_use", "elsewhere"));
 
     await checkDomainDns("dom1", "s1");
 
     expect(writtenStatus()).toMatchObject({ status: "FAILED", sslStatus: "PENDING" });
+  });
+
+  /* D7 (QA 2026-10-05): a transient attach failure at connect left the row
+     FAILED forever — every later check saw 404 and nothing re-attached. */
+  it("a 404 on the project re-attaches the domain, then re-verifies it (D7)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(null);
+    vi.mocked(addDomainToVercelProject).mockResolvedValue(projectDomain());
+    vi.mocked(getVercelDomainConfig).mockResolvedValue(configured);
+    db.dnsRecord.findMany.mockResolvedValue(apexRows(true));
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(addDomainToVercelProject).toHaveBeenCalledWith({
+      token: "t",
+      teamId: "team_1",
+      projectName: "buildrik-site-bella",
+      domain: "bellacucina.com",
+    });
+    expect(writtenStatus()).toMatchObject({ status: "VERIFIED", sslStatus: "ACTIVE" });
+  });
+
+  it("a re-attach that succeeds but is not yet pointed stays PENDING, never VERIFIED (D7)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(null);
+    vi.mocked(addDomainToVercelProject).mockResolvedValue(projectDomain({ verified: true }));
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({ ...configured, misconfigured: true });
+    db.dnsRecord.findMany.mockResolvedValue(apexRows(true));
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(writtenStatus()).toMatchObject({ status: "PENDING", sslStatus: "PENDING" });
+  });
+
+  it("a re-attach that fails again (non-409) leaves the domain FAILED (D7)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(null);
+    vi.mocked(addDomainToVercelProject).mockRejectedValue(new VercelApiError(500, "internal", "boom"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(writtenStatus()).toMatchObject({ status: "FAILED", sslStatus: "PENDING" });
+  });
+
+  it("does not re-attach when the project already holds the domain (a DNS mismatch is not an attach failure)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(projectDomain());
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({ ...configured, misconfigured: true });
+    db.dnsRecord.findMany.mockResolvedValue(apexRows(false));
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(addDomainToVercelProject).not.toHaveBeenCalled();
+  });
+
+  it("an unreadable Vercel does not trigger a re-attach and leaves status unchanged", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockRejectedValue(new VercelApiError(500, "internal", "boom"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(addDomainToVercelProject).not.toHaveBeenCalled();
+    expect(writtenStatus()).not.toHaveProperty("status");
   });
 
   it("repairs a subdomain's old apex-shaped rows to the one CNAME Vercel recommends", async () => {

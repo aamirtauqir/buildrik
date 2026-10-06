@@ -77,6 +77,24 @@ function sameRecords(a: ReadonlyArray<ExpectedDnsRecord>, b: ReadonlyArray<Expec
 }
 
 /**
+ * The project does not hold the domain (404): the attach at connect time
+ * failed, or the domain was removed in Vercel. Attach it again so the check
+ * can re-verify it, instead of leaving it FAILED forever (QA D7). A refusal —
+ * 409 (another project holds it) or any other error — keeps it unattached,
+ * which the caller reads as FAILED.
+ */
+async function reattachToProject(opts: { token: string; teamId: string | null; projectName: string; domain: string }) {
+  try {
+    return await addDomainToVercelProject(opts);
+  } catch (err) {
+    if (!(err instanceof VercelApiError && err.status === 409)) {
+      console.error(`[domain] Vercel re-attach failed for ${opts.domain}:`, err);
+    }
+    return null;
+  }
+}
+
+/**
  * Re-check one domain (P6 "⟳ Check now" and the dns-verify cron — the ONE
  * implementation; the cron used to carry its own copy of the node:dns match).
  *
@@ -138,7 +156,8 @@ export async function checkDomainDns(domainId: string, siteId: string) {
     const projectName = resolveVercelProjectName(domain.site);
     let vercel: { project: Awaited<ReturnType<typeof getVercelProjectDomain>>; config: VercelDomainConfig | null } | null = null;
     try {
-      const project = await getVercelProjectDomain({ ...conn, projectName, domain: domain.domain });
+      let project = await getVercelProjectDomain({ ...conn, projectName, domain: domain.domain });
+      if (!project) project = await reattachToProject({ ...conn, projectName, domain: domain.domain });
       const config = project ? await getVercelDomainConfig({ ...conn, projectName, domain: domain.domain }) : null;
       vercel = { project, config };
     } catch (err) {
