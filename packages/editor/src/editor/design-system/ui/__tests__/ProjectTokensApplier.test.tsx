@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render } from "@testing-library/react";
+import { render, act } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,10 +35,12 @@ function stubComposer(tokens: DesignToken[]) {
   };
 }
 
-const read = (v: string) => document.documentElement.style.getPropertyValue(v);
+const css = () => document.getElementById("bk-site-tokens")?.textContent ?? "";
 
 beforeEach(() => {
-  document.documentElement.removeAttribute("style");
+  document.head.innerHTML = "";
+  delete document.documentElement.dataset.theme;
+  vi.useFakeTimers({ toFake: ["requestAnimationFrame"] });
 });
 
 describe("ProjectTokensApplier", () => {
@@ -47,7 +49,7 @@ describe("ProjectTokensApplier", () => {
       v6Token({ id: "font-body", value: "Palatino", category: "typography", type: "font-family", layer: "semantic" }),
     ]);
     render(<ProjectTokensApplier composer={composer} />);
-    expect(read("--buildrick-design-font-body")).toBe("Palatino");
+    expect(css()).toMatch(/--buildrick-design-font-body:\s*Palatino/);
   });
 
   it("re-applies when the project loads after mount", () => {
@@ -61,33 +63,27 @@ describe("ProjectTokensApplier", () => {
     } as unknown as Composer;
 
     render(<ProjectTokensApplier composer={composer} />);
-    expect(read("--buildrick-design-color-action")).toBe("");
+    expect(css()).not.toContain("#B91C1C");
 
     tokens = [
       v6Token({ id: "color-action", value: "#B91C1C", layer: "semantic" }),
     ];
     handlers[EVENTS.PROJECT_LOADED].forEach((h) => h());
-    expect(read("--buildrick-design-color-action")).toBe("#B91C1C");
+    act(() => { vi.advanceTimersToNextFrame(); });
+    expect(css()).toMatch(/--buildrick-design-color-action:\s*#B91C1C/i);
   });
 
-  it("resolves colours through the dark resolver, so dark mode does not flash light", () => {
-    const resolve_ = vi.fn(() => "#0F172A");
+  it("sets data-theme from the resolved colour mode so a dark site does not flash light", () => {
     const composer = {
       on: () => {}, off: () => {},
-      getProjectSettings: () => ({
-        designTokens: [
-          v6Token({ id: "color-action", value: "#B91C1C", layer: "semantic" }),
-        ],
-      }),
+      getProjectSettings: () => ({ darkMode: "auto", designTokens: [] }),
       colorMode: { resolved: () => "dark" as const },
-      darkResolver: { resolve: resolve_ },
     } as unknown as Composer;
     render(<ProjectTokensApplier composer={composer} />);
-    expect(resolve_).toHaveBeenCalled();
-    expect(read("--buildrick-design-color-action")).toBe("#0F172A");
+    expect(document.documentElement.dataset.theme).toBe("dark");
   });
 
-  it("writes nothing for a project that carries no tokens", () => {
+  it("never writes per-variable inline styles on <html>", () => {
     const { composer } = stubComposer([]);
     render(<ProjectTokensApplier composer={composer} />);
     expect(document.documentElement.getAttribute("style")).toBeNull();

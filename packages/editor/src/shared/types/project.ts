@@ -7,7 +7,7 @@
  */
 
 import type { CmsBindingsInput } from "@buildrik/shared/schemas/sites";
-import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
+import type { DarkMode, DesignToken } from "@buildrik/shared/schemas/design-tokens";
 import type { AssetData } from "./asset";
 import type { CanvasGuide } from "./canvas";
 import type { ElementData } from "./element";
@@ -296,6 +296,8 @@ export interface ProjectSettings {
   designTokensSchemaVersion?: number;
   /** Design tokens (CSS custom properties), schema v6 */
   designTokens?: DesignToken[];
+  /** Whether the published site ships a dark palette. Absent = "off". */
+  darkMode?: DarkMode;
   /** Style presets — Phase B preset infra, S2. */
   designPresets?: DesignPresetRecord[];
   /** Custom code injection (head scripts, body scripts, global CSS) */
