@@ -3,8 +3,8 @@ import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../index";
 import type { DesignToken } from "../../types";
 
 describe("migrateDesignTokens", () => {
-  it("CURRENT_SCHEMA_VERSION is 5 after the brand-blue rename (2026-08-16, on top of the B5-wire v4 seed)", () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(5);
+  it("CURRENT_SCHEMA_VERSION is 6 after the v6 token shape (2026-10-06, on top of the v5 brand-blue rename)", () => {
+    expect(CURRENT_SCHEMA_VERSION).toBe(6);
   });
 
   it("v3 → v4 injects 4 primitive + 4 semantic color tokens into stored projects when absent", () => {

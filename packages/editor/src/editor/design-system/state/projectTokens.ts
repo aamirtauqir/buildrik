@@ -16,28 +16,50 @@
  */
 
 import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
+import { TokenMigrationError } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
 import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../migrations";
 
+const warnedReasons = new Set<string>();
+
+function fallBackToSeed(reason: string): DesignToken[] {
+  if (!warnedReasons.has(reason)) {
+    warnedReasons.add(reason);
+    console.warn("[tokens] merge fell back to seed", { reason });
+  }
+  return DEFAULT_TOKENS;
+}
+
+/** v6 iff every row is an object carrying `modes`; anything else is the v5 shape. */
+function inferStoredVersion(rows: readonly unknown[]): number {
+  const isV6Row = (r: unknown) => typeof r === "object" && r !== null && "modes" in r;
+  return rows.length > 0 && rows.every(isV6Row) ? CURRENT_SCHEMA_VERSION : 5;
+}
+
 /**
  * The site's saved tokens over the seed (v6). A saved token replaces its seed
  * wholesale, modes included; tokens the site added follow the seed. Saves
- * written by an older schema are migrated first.
+ * written by an older schema are migrated first. Never throws: input that
+ * cannot migrate or validate yields the seed, so the editor still opens.
  */
 export function mergeProjectTokens(
   incoming: readonly unknown[],
-  storedVersion = CURRENT_SCHEMA_VERSION
+  storedVersion = inferStoredVersion(incoming)
 ): DesignToken[] {
-  const checked = validateTokens(
-    storedVersion < CURRENT_SCHEMA_VERSION
-      ? migrateDesignTokens(incoming, storedVersion, CURRENT_SCHEMA_VERSION)
-      : incoming
-  );
-  if (!checked.ok) throw new Error(`[ds] saved tokens are not valid v6: ${checked.reason}`);
-  const saved = checked.tokens;
-  const savedById = new Map(saved.map((t) => [t.id, t]));
+  let migrated: unknown;
+  try {
+    migrated =
+      storedVersion < CURRENT_SCHEMA_VERSION
+        ? migrateDesignTokens(incoming, storedVersion, CURRENT_SCHEMA_VERSION)
+        : incoming;
+  } catch (e) {
+    return fallBackToSeed(e instanceof TokenMigrationError ? e.reason : String(e));
+  }
+  const checked = validateTokens(migrated);
+  if (!checked.ok) return fallBackToSeed(checked.reason);
+  const savedById = new Map(checked.tokens.map((t) => [t.id, t]));
   const seeded = DEFAULT_TOKENS.map((def) => savedById.get(def.id) ?? def);
-  const added = saved.filter((t) => !DEFAULT_TOKENS.some((def) => def.id === t.id));
+  const added = checked.tokens.filter((t) => !DEFAULT_TOKENS.some((def) => def.id === t.id));
   return [...seeded, ...added];
 }
