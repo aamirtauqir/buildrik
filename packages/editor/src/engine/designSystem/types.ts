@@ -102,7 +102,7 @@ export type TokenType =
   | "string"
   | "select";
 
-export interface DesignToken {
+export interface LegacyDesignToken {
   id: string;
   name: string;
   value: string;
@@ -121,6 +121,8 @@ export interface DesignToken {
   darkValue?: string;
   typedValue?: TokenValue;
 }
+
+export type { DesignToken, TokenRef, TokenLayer, DarkMode } from "@buildrik/shared/schemas/design-tokens";
 
 export type ThemeMode = "light" | "dark" | "system";
 

@@ -7,7 +7,8 @@
  * @license BSD-3-Clause
  */
 
-import type { DesignToken } from "../types";
+import { migrateTokensToV6 } from "@buildrik/shared/tokens";
+import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
 /**
  * Current schema version. Bump when renaming/splitting/removing tokens
@@ -43,14 +44,18 @@ import type { DesignToken } from "../types";
  *                   CSS variable resolving for two versions. Fresh seeds get
  *                   #1A56DB from V4_SEEDS above, which is id-gated, so this
  *                   migration and that seed can never both fire on one token.
+ *
+ * v6 (2026-10-06) — Brand Part 1a. Tokens become `DesignToken` v6 (layers, modes,
+ *                   TokenRef). `migrateTokensToV6` converts the legacy rows the
+ *                   v1–v5 steps above operate on.
  */
-export const CURRENT_SCHEMA_VERSION = 5;
+export const CURRENT_SCHEMA_VERSION = 6;
 
 /** The v5 rename, named once so the migration and its tests cannot drift. */
 const OLD_BRAND_PRIMITIVE_ID = "color-blue-500";
 const BRAND_PRIMITIVE_ID = "color-brand-500";
 
-const V4_SEEDS: DesignToken[] = [
+const V4_SEEDS: LegacyDesignToken[] = [
   // Primitives (Pro-only).
   {
     id: "color-brand-500",
@@ -144,7 +149,7 @@ const V4_SEEDS: DesignToken[] = [
  *   2. Add MIGRATIONS[newVersion] = migratorFn here
  *   3. Add alias to generateCompatibilityShim in exportUtils.ts (2-version retention)
  */
-const MIGRATIONS: Record<number, (tokens: DesignToken[]) => DesignToken[]> = {
+const MIGRATIONS: Record<number, (tokens: LegacyDesignToken[]) => unknown[]> = {
   // v1 → v2: additive only. semanticKind field defaults to undefined,
   // preserving all existing tokens as primitives. Identity transform.
   2: (tokens) => tokens,
@@ -183,6 +188,8 @@ const MIGRATIONS: Record<number, (tokens: DesignToken[]) => DesignToken[]> = {
       return next;
     });
   },
+  // v5 → v6: legacy rows become v6 tokens (layers, modes, TokenRef).
+  6: (tokens) => migrateTokensToV6(tokens),
 };
 
 /**
@@ -200,13 +207,13 @@ const MIGRATIONS: Record<number, (tokens: DesignToken[]) => DesignToken[]> = {
  * @returns Migrated tokens array
  */
 export function migrateDesignTokens(
-  tokens: DesignToken[],
+  tokens: readonly unknown[],
   fromVersion: number,
   toVersion: number,
-): DesignToken[] {
-  if (fromVersion >= toVersion) return tokens;
+): unknown[] {
+  if (fromVersion >= toVersion) return [...tokens];
 
-  let result = tokens;
+  let result: unknown[] = [...tokens];
   for (let v = fromVersion; v < toVersion; v++) {
     const target = v + 1;
     const migration = MIGRATIONS[target];
@@ -216,7 +223,8 @@ export function migrateDesignTokens(
       );
       continue;
     }
-    result = migration(result);
+    // Steps 2–5 read legacy rows; the chain is only ever fed saves of that shape.
+    result = migration(result as LegacyDesignToken[]);
   }
   return result;
 }

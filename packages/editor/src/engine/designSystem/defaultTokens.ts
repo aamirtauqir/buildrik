@@ -15,7 +15,8 @@
  * @license BSD-3-Clause
  */
 
-import type { DesignToken } from "./types";
+import { migrateTokensToV6 } from "@buildrik/shared/tokens";
+import type { DesignToken, LegacyDesignToken } from "./types";
 
 /**
  * V3 theme unification: cssVar fields below will be renamed from --buildrick-design-* to
@@ -23,7 +24,7 @@ import type { DesignToken } from "./types";
  * cssVar each DesignToken carries. Chrome tokens live in themes/default.css
  * under --buildrick-*; design tokens live here.
  */
-export const DEFAULT_TOKENS: DesignToken[] = [
+export const DEFAULT_TOKENS_V5: LegacyDesignToken[] = [
   // Colors (9 core tokens) — groups: brand / surface / state
   {
     id: "color-primary",
@@ -791,3 +792,5 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   { id: "icon-default", name: "Default icon size", value: "16px", category: "icons", cssVar: "--bd-icon-default", type: "length", kind: "icon", friendlyName: "Default icon size" },
   { id: "imagery-placeholder", name: "Placeholder image", value: "https://placehold.co/600x400", category: "theme", cssVar: "--bd-imagery-placeholder", type: "string", kind: "imagery", friendlyName: "Placeholder image" },
 ];
+
+export const DEFAULT_TOKENS: DesignToken[] = migrateTokensToV6(DEFAULT_TOKENS_V5);
