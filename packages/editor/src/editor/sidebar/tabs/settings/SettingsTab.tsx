@@ -362,6 +362,12 @@ export const SettingsTab: React.FC<
   // ─── Doors and navigation ─────────────────────────────────────────────
 
   const leave = React.useCallback(() => {
+    /* Closing in place: a reload must not reopen Settings from the deep link. */
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("settings")) {
+      url.searchParams.delete("settings");
+      window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    }
     onClose?.();
   }, [onClose]);
 
