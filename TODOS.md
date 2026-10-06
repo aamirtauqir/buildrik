@@ -539,4 +539,4 @@ root cause is fixed in `466158dd`; these are the rest.
 
 ## Design conformance
 
-- [x] **Refresh stale Figma conformance specs (spec-age gate).** Done 2026-10-07: retired 308 dead V1 specs (their Figma nodes were deleted; 165 recipes and 306 boards.json rows superseded by Editor v3 page 4418:45431, owner decision). v3 specs are created per surface by the build loop. See docs/design-jobs/SPEC-REFRESH-2026-10-07.md.
+- [x] **Refresh stale Figma conformance specs (spec-age gate).** Done 2026-10-07: retired 308 dead V1 specs (their Figma nodes were deleted; 168 recipes removed; boards.json: 291 rows newly superseded + 15 that only lost their recipe; superseded by Editor v3 page 4418:45431, owner decision). v3 specs are created per surface by the build loop. See docs/design-jobs/SPEC-REFRESH-2026-10-07.md.

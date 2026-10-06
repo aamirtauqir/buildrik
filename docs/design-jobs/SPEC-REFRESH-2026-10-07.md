@@ -32,8 +32,8 @@ Figma calls used: 19 of the 150 budget. Tooling used: scratch fetch script on `s
 ## Resolution (owner decision 2026-10-07): RETIRE
 
 - 308 stale specs retired: removed `raw-figma/<s>.json` and `specs/<s>.json` for each (616 files).
-- 165 recipes in `surfaces/` removed (every recipe that joined to a retired spec; none mixed retired with live specs) and their `.conformance-baseline.json` keys.
-- `boards.json`: 291 active/design-ahead V1 rows marked `state: superseded`, `status: out-of-scope`, `authority: superseded:v3-4418:45431`, `recipe: null`, reason "V1 node deleted — superseded by Editor v3 page 4418:45431 (owner 2026-10-07)" (same fields as 807:8723); 15 already retired/out-of-scope rows only lost their recipe. Counts recomputed; `coveredFloor` 204 -> 39 (recipes removed with their specs). No v3 or Clone page row touched.
+- 168 recipes in `surfaces/` removed, with their `.conformance-baseline.json` keys: 160 matched boards.json rows by recipe name (160 + 5 + 3 = 168), 5 were unattributed recipes that joined a retired spec (media-card, layers-load-error, shell-default, s1-2f-save-indicator-saved-stale, media-bulk-bar), and 3 orphans (canvas-zoom-levels, shell-state-4-multi-select, components-create-modal-canvas-save-as) whose rows were superseded but whose recipes survived the first pass. 36 `inspector-v4-*` recipes remain.
+- `boards.json`: 291 active/design-ahead V1 rows marked `state: superseded`, `status: out-of-scope`, `authority: superseded:v3-4418:45431`, `recipe: null`, reason "V1 node deleted — superseded by Editor v3 page 4418:45431 (owner 2026-10-07)" (same fields as 807:8723); 15 already retired/out-of-scope rows only lost their recipe. Counts recomputed; `coveredFloor` 204 -> 36; `activeFamilies` array now the 8 families with active rows. No v3 or Clone page row touched.
 - `.hex-drift-baseline.json` re-recorded (106 pairs belonged to the retired captures).
 - Topbar (681:26, RETIRED in Figma) retired the same way; its v3 replacement is 4418:144989, to be re-pointed when the topbar is next built.
 - Gates after: check-spec-age exit 0 (36 specs), check-boards 0, check-anchors 0, `npm run verify:ds` exit 0.

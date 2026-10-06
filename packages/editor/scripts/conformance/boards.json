@@ -20,43 +20,13 @@
     "active": 302
   },
   "activeFamilies": [
-    "AI",
     "Assets · Clone",
-    "B9.1",
-    "B9.5",
     "Brand",
-    "Canvas",
     "Client sign-off",
-    "CmdK",
-    "Compare",
-    "Components",
-    "Content",
-    "Exit",
-    "History",
     "Insert",
     "Inspector v4",
-    "Issues",
     "Layers",
-    "Media",
-    "Media drill-ins — the five destinations",
-    "Modal",
-    "Notifications",
-    "Onboarding",
-    "Orphan comments",
-    "Pages",
-    "Publish",
-    "Review panel",
-    "S1",
-    "S1 flows",
-    "S2 flows",
-    "S3 flows",
-    "S5 flows",
-    "S6 flows",
-    "S7",
     "Settings · Clone",
-    "Shell",
-    "Shell states",
-    "Templates",
     "Settings · Phase B"
   ],
   "boards": [
@@ -9963,6 +9933,6 @@
       "verifiedNote": "Not walked in the QA walk 2026-10-03: a §1 related state board; only General's loading / load-error / save-error were forced (they share the load/save-error shell components). Board image not fetched (Figma budget)."
     }
   ],
-  "coveredFloor": 39,
+  "coveredFloor": 36,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

@@ -1,30 +1,4 @@
 {
-  "components-create-modal-canvas-save-as": {
-    "skipped": 8,
-    "compared": 8,
-    "contrastFailures": 1,
-    "nonTextFailures": 0,
-    "contrastPairs": {
-      "p.tw:absolute.tw:right-0 | \u29c9 Duplicate \u2318D  \u00b7  \ud83d\uddd1 Delete \u232b  \u00b7  \u22ef Mor | rgb(107, 114, 128) | rgb(17, 24, 39)": 3.67
-    },
-    "nonTextPairs": {}
-  },
-  "shell-state-4-multi-select": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 3,
-    "compared": 3
-  },
-  "canvas-zoom-levels": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 3,
-    "compared": 36
-  },
   "inspector-v4-01": {
     "contrastFailures": 0,
     "nonTextFailures": 0,

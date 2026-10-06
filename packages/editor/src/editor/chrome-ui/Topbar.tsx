@@ -191,7 +191,7 @@ export function Topbar({
     <header
       // Conformance anchor. The bar wears only utility classes, so any selector
       // built from them breaks on the next drain commit — which is exactly what
-      // happened: scripts/conformance/surfaces/shell-default.json waited on
+      // happened: the V1 recipe surfaces/shell-default.json (retired 2026-10-07 with its V1 spec) waited on
       // `.bd-topbar`, a class that exists in no file under src/. Rendered once
       // (StudioHeader.tsx), so the id is unambiguous.
       data-testid="topbar"
