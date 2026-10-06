@@ -472,6 +472,24 @@ export async function listSiteThemeSnapshots(
   });
 }
 
+/** What `rollbackTokenMigration` would restore, without writing: the newest
+ *  migration snapshot of a site (operator `--dry-run`). */
+export async function getLatestMigrationSnapshot(
+  siteId: string,
+): Promise<{ id: string; createdAt: Date; tokensSchemaVersion: number; tokenCount: number } | null> {
+  const snap = await prisma.siteThemeSnapshot.findFirst({
+    where: { siteId, reason: "migration" },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!snap) return null;
+  return {
+    id: snap.id,
+    createdAt: snap.createdAt,
+    tokensSchemaVersion: snap.tokensSchemaVersion,
+    tokenCount: readTokenTheme(snap.prevStyles)?.designTokens.length ?? 0,
+  };
+}
+
 /**
  * Operator-only (no router): undo a site's v6 migration. Writes the migration
  * snapshot's tokens and version back verbatim, drops dark mode, bumps

@@ -25,7 +25,7 @@ describe("loadTokensSafely", () => {
 
   it("leaves a site that is already v6 untouched", () => {
     const settings = { designTokens: [], designTokensSchemaVersion: 6 };
-    expect(loadTokensSafely(settings, "site-1")).toEqual({ settings, readOnly: false });
+    expect(loadTokensSafely(settings, "site-1")).toEqual({ settings, readOnly: false, migrated: false });
   });
 
   it("walks a v3 site through the v1–v5 steps before v6", () => {
@@ -37,5 +37,29 @@ describe("loadTokensSafely", () => {
   it("never touches a site that has no saved tokens", () => {
     const settings = { designTokensSchemaVersion: undefined };
     expect(loadTokensSafely(settings, "site-1").settings).toBe(settings);
+  });
+
+  it("does not migrate when the switch is off; Brand read-only for an unmigrated site", () => {
+    const r = loadTokensSafely({ designTokens: [], designTokensSchemaVersion: 5 }, "s", { switchOn: false, hold: false });
+    expect(r.settings.designTokensSchemaVersion).toBe(5);
+    expect(r.readOnly).toBe(true);
+    expect(r.reason).toBe("switch_off");
+  });
+
+  it("an already-migrated site works normally with the switch off", () => {
+    const r = loadTokensSafely({ designTokens: [], designTokensSchemaVersion: 6 }, "s", { switchOn: false, hold: false });
+    expect(r.readOnly).toBe(false);
+  });
+
+  it("a held site is never migrated", () => {
+    const r = loadTokensSafely({ designTokens: [], designTokensSchemaVersion: 5 }, "s", { switchOn: true, hold: true });
+    expect(r.settings.designTokensSchemaVersion).toBe(5);
+    expect(r.readOnly).toBe(true);
+    expect(r.reason).toBe("held");
+  });
+
+  it("reports a successful migration", () => {
+    const r = loadTokensSafely({ designTokens: [], designTokensSchemaVersion: 5 }, "s", { switchOn: true, hold: false });
+    expect(r.migrated).toBe(true);
   });
 });

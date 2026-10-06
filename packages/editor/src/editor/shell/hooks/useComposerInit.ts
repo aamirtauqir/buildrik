@@ -11,6 +11,7 @@ import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
+import { BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "../../../shared/constants/brandReadOnly";
 import { EVENTS, isNavigationOnlyChange } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
@@ -79,14 +80,23 @@ export interface UseComposerInitParams {
  *  tokens, Brand read-only, a Sentry event. Never a half-migrated save. */
 export function loadTokensSafely<
   S extends { designTokens?: unknown; designTokensSchemaVersion?: number; darkMode?: unknown },
->(settings: S, siteId: string): { settings: S; readOnly: boolean; reason?: string } {
+>(
+  settings: S,
+  siteId: string,
+  opts: { switchOn: boolean; hold: boolean } = { switchOn: true, hold: false },
+): { settings: S; readOnly: boolean; migrated: boolean; reason?: string } {
   const from = settings.designTokensSchemaVersion ?? 1;
   const rows = settings.designTokens;
-  if (rows === undefined || from >= TOKENS_SCHEMA_VERSION) return { settings, readOnly: false };
+  if (rows === undefined || from >= TOKENS_SCHEMA_VERSION) return { settings, readOnly: false, migrated: false };
+  /* Switch off = no NEW migrations (an already-v6 site returned above and works
+     normally); a held site is never migrated. Either way the site stays as-is. */
+  if (opts.hold) return { settings, readOnly: true, migrated: false, reason: BRAND_READ_ONLY_HELD };
+  if (!opts.switchOn) return { settings, readOnly: true, migrated: false, reason: BRAND_READ_ONLY_SWITCH_OFF };
   try {
     const alreadyV6 = Array.isArray(rows) && rows.length > 0 && rows.every(isV6TokenRow);
     const v5 = from < 5 && Array.isArray(rows) ? migrateDesignTokens(rows, from, 5) : rows;
     const designTokens = alreadyV6 ? rows : migrateTokensToV6(v5);
+    console.info("[tokens] migrated", { siteId, from });
     return {
       settings: {
         ...settings,
@@ -95,11 +105,12 @@ export function loadTokensSafely<
         darkMode: settings.darkMode ?? "off",
       },
       readOnly: false,
+      migrated: true,
     };
   } catch (err) {
     const reason = err instanceof TokenMigrationError ? err.reason : String(err);
     captureError(err instanceof Error ? err : new Error(reason), { siteId, fromVersion: from, reason });
-    return { settings, readOnly: true, reason };
+    return { settings, readOnly: true, migrated: false, reason };
   }
 }
 
@@ -229,7 +240,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             /* Token migration (v1–v5 → v6) is part of the imported project, so
                it lands before history starts recording: ⌘Z after load cannot
                revert it. */
-            const tokenLoad = data.settings ? loadTokensSafely(data.settings, siteId) : null;
+            const tokenLoad = data.settings
+              ? loadTokensSafely(data.settings, siteId, {
+                  switchOn: data.brandTokensV2 ?? true,
+                  hold: data.tokensMigrationHold ?? false,
+                })
+              : null;
             const loaded: ProjectData =
               tokenLoad && tokenLoad.settings !== data.settings ? { ...data, settings: tokenLoad.settings } : data;
             const tokensMigrated = loaded !== data;
@@ -245,8 +261,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               });
               instance.importProject(loaded);
             }
+            if (tokenLoad?.migrated) instance.emit(EVENTS.DESIGN_SYSTEM_MIGRATED, { siteId });
             if (tokenLoad?.readOnly) {
               instance.designSystem.readOnly = true;
+              instance.designSystem.readOnlyReason = tokenLoad.reason ?? null;
               instance.emit(EVENTS.DESIGN_SYSTEM_READ_ONLY, { reason: tokenLoad.reason ?? "token migration failed" });
             }
             // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"

@@ -24,6 +24,8 @@ export interface ProjectTokens {
   /** Every token the site has, all kinds. */
   all: DesignToken[];
   readOnly: boolean;
+  /** Why it is read-only; null when it is not. */
+  readOnlyReason: string | null;
   /** One labelled write of the whole set. False when refused (read-only,
    *  invalid, no composer) — nothing was written. */
   commit: (next: DesignToken[], label: string) => boolean;
@@ -53,11 +55,13 @@ export function readTokens(composer: Composer | null): DesignToken[] {
 export function useProjectTokens(composer: Composer | null): ProjectTokens {
   const [all, setAll] = React.useState<DesignToken[]>(() => readTokens(composer));
   const [readOnly, setReadOnly] = React.useState(() => composer?.designSystem.readOnly ?? false);
+  const [readOnlyReason, setReadOnlyReason] = React.useState(() => composer?.designSystem.readOnlyReason ?? null);
 
   React.useEffect(() => {
     const sync = () => {
       setAll(readTokens(composer));
       setReadOnly(composer?.designSystem.readOnly ?? false);
+      setReadOnlyReason(composer?.designSystem.readOnlyReason ?? null);
     };
     sync();
     if (!composer) return;
@@ -76,5 +80,5 @@ export function useProjectTokens(composer: Composer | null): ProjectTokens {
     [composer],
   );
 
-  return React.useMemo(() => ({ all, readOnly, commit }), [all, readOnly, commit]);
+  return React.useMemo(() => ({ all, readOnly, readOnlyReason, commit }), [all, readOnly, readOnlyReason, commit]);
 }

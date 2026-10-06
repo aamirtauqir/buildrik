@@ -195,6 +195,8 @@ export class Composer extends EventEmitter {
      *  old tokens and refuses edits. Set by the load path, announced with
      *  `EVENTS.DESIGN_SYSTEM_READ_ONLY`. */
     readOnly: boolean;
+    /** Why `readOnly` is set (null when it is not): selects the Brand notice. */
+    readOnlyReason: string | null;
     readonly tokenUsage: TokenUsageTracker;
     readonly lintState: LintState;
     readonly tokenBindingResolver: TokenBindingResolver;
@@ -310,6 +312,7 @@ export class Composer extends EventEmitter {
     const tokenBindingResolver = new TokenBindingResolver();
     this.designSystem = {
       readOnly: false,
+      readOnlyReason: null,
       tokenUsage,
       lintState,
       tokenBindingResolver,

@@ -41,6 +41,7 @@
  */
 
 import * as React from "react";
+import { BRAND_READ_ONLY_COPY, BRAND_READ_ONLY_FAILED_COPY } from "@/shared/constants/brandReadOnly";
 import { ChevronLeft } from "lucide-react";
 import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, Tooltip, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine/Composer";
@@ -183,8 +184,6 @@ const PAGE_ACTION =
 
 const lightOf = (tokens: readonly DesignToken[], id: string): string => resolveTokenLiteral(tokens, id, "light") ?? "";
 
-/* The read-only notice (Task 9's failed migration). Brief copy, verbatim. */
-const READ_ONLY_COPY = "We couldn't upgrade this site's brand — nothing was changed. Editing is paused.";
 
 /** Disables every native control inside while the tokens are read-only.
  *  `display: contents`, so it never takes part in the layout it sits in. */
@@ -817,7 +816,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               data-testid="brand-read-only-banner"
               className="tw:mt-4 tw:rounded-lg tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
             >
-              {READ_ONLY_COPY}
+              {(store.readOnlyReason && BRAND_READ_ONLY_COPY[store.readOnlyReason]) ?? BRAND_READ_ONLY_FAILED_COPY}
             </div>
           )}
           <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">

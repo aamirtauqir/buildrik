@@ -66,6 +66,10 @@ export interface ProjectData {
    * -> repeater binding (CMSBindingManager.exportCollectionBindings()).
    */
   cmsBindings?: CmsBindingsInput;
+  /** Server kill switch for the v5→v6 token migration. Absent = on. */
+  brandTokensV2?: boolean;
+  /** Operator rollback hold: this site is never migrated while set. */
+  tokensMigrationHold?: boolean;
 }
 
 export interface ProjectMetadata {

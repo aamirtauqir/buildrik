@@ -22,7 +22,7 @@ export type ComposerProp = NonNullable<React.ComponentProps<typeof BrandWorkspac
 /** A composer with the surface Brand reads, and the ONE token write it makes:
  *  `designSystem.setTokens` validates, writes, and emits SETTINGS_CHANGE the
  *  way the engine does. `readOnly` refuses it. */
-export function makeFakeComposer(designTokens: unknown[] = [], { readOnly = false } = {}) {
+export function makeFakeComposer(designTokens: unknown[] = [], { readOnly = false, readOnlyReason = null }: { readOnly?: boolean; readOnlyReason?: string | null } = {}) {
   const settings: Record<string, unknown> = {
     designTokens,
     designTokensSchemaVersion: 2,
@@ -49,6 +49,7 @@ export function makeFakeComposer(designTokens: unknown[] = [], { readOnly = fals
     emit: vi.fn(emit),
     designSystem: {
       readOnly,
+      readOnlyReason,
       setTokens: vi.fn((next: unknown[], _label: string) => {
         if (readOnly || !validateTokens(next).ok) return false;
         Object.assign(settings, { designTokens: next, designTokensSchemaVersion: 6 });

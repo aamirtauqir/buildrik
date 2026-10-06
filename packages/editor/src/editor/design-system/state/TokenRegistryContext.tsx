@@ -82,8 +82,8 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
 }) => {
   const project = useProjectTokens(composer);
   const { commit, edits, revert } = useSessionEdits(composer, project);
-  const { all, readOnly } = project;
-  const store = React.useMemo<TokenStore>(() => ({ all, readOnly, commit, edits, revert }), [all, readOnly, commit, edits, revert]);
+  const { all, readOnly, readOnlyReason } = project;
+  const store = React.useMemo<TokenStore>(() => ({ all, readOnly, readOnlyReason, commit, edits, revert }), [all, readOnly, readOnlyReason, commit, edits, revert]);
   const kinds = React.useMemo(() => {
     const k = (kind: TokenKind) => kindRegistry(kind, all, commit);
     return {
@@ -165,7 +165,7 @@ const FALLBACK_SPACING: SpacingRegistry = {
   applyPreset: refuse,
   resetToDefaults: refuse,
 };
-const FALLBACK_STORE: TokenStore = { all: DEFAULT_TOKENS, readOnly: false, commit: refuse, edits: [], revert: refuse };
+const FALLBACK_STORE: TokenStore = { all: DEFAULT_TOKENS, readOnly: false, readOnlyReason: null, commit: refuse, edits: [], revert: refuse };
 
 export function useColorRegistry(): ColorRegistry {
   const ctx = React.useContext(ColorRegistryContext);

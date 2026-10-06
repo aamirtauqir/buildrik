@@ -291,6 +291,16 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
   });
 });
 
+describe("BrandWorkspace — read-only notice by reason", () => {
+  it.each([
+    ["switch_off", "Brand editing is paused while we upgrade brand tokens."],
+    ["held", "This site's brand was rolled back — editing is paused."],
+  ])("%s says its own thing", (readOnlyReason, copy) => {
+    const utils = renderWorkspace(makeFakeComposer([], { readOnly: true, readOnlyReason }));
+    expect(utils.getByTestId("brand-read-only-banner").textContent).toBe(copy);
+  });
+});
+
 describe("BrandWorkspace — read-only tokens (failed migration)", () => {
   it("says so, disables every edit, and writes nothing", async () => {
     const composer = makeFakeComposer([], { readOnly: true });
