@@ -1,145 +1,48 @@
 import { render, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { TokenRegistryProvider } from "../TokenRegistryContext";
-import type { DesignToken } from "../../types";
+import { ProjectTokensApplier } from "../../ui/ProjectTokensApplier";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 
 type Listener = (payload: unknown) => void;
 
-function makeFakeComposer() {
+function makeFakeComposer(darkMode: "off" | "auto") {
   const listeners = new Map<string, Listener[]>();
-  const colorMode = {
-    get: vi.fn(() => "dark"),
-    set: vi.fn(),
-    resolved: vi.fn(() => "dark" as "light" | "dark"),
-  };
-  const darkResolver = {
-    resolve: vi.fn((token: DesignToken, tokens: readonly DesignToken[], mode: "light" | "dark") =>
-      resolveTokenLiteral(tokens, token.id, mode) ?? ""
-    ),
-    resolveAll: vi.fn(),
-  };
   return {
     on: vi.fn((evt: string, cb: Listener) => {
-      const arr = listeners.get(evt) ?? [];
-      arr.push(cb);
-      listeners.set(evt, arr);
+      listeners.set(evt, [...(listeners.get(evt) ?? []), cb]);
     }),
     off: vi.fn((evt: string, cb: Listener) => {
-      const arr = listeners.get(evt) ?? [];
-      listeners.set(evt, arr.filter((x) => x !== cb));
+      listeners.set(evt, (listeners.get(evt) ?? []).filter((x) => x !== cb));
     }),
-    emit: vi.fn((evt: string, payload?: unknown) => {
-      (listeners.get(evt) ?? []).forEach((c) => c(payload));
-    }),
-    colorMode,
-    darkResolver,
+    emit: (evt: string) => (listeners.get(evt) ?? []).forEach((c) => c(undefined)),
+    getProjectSettings: () => ({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode }),
+    colorMode: { resolved: () => "dark" as const },
   };
 }
 
-describe("TokenRegistryProvider · dark-mode applier", () => {
-  let setPropertySpy: ReturnType<typeof vi.spyOn>;
-
+describe("site Dark mode off, editor in dark (D8)", () => {
   beforeEach(() => {
     localStorage.clear();
-    setPropertySpy = vi.spyOn(document.documentElement.style, "setProperty");
-    setPropertySpy.mockClear();
+    document.head.innerHTML = "";
+    document.documentElement.removeAttribute("style");
+    delete document.documentElement.dataset.theme;
   });
 
-  it("on mount: walks color tokens and applies darkResolver-resolved value when colorMode is 'dark'", () => {
-    const composer = makeFakeComposer();
-    localStorage.setItem(
-      "buildrick-design-tokens-test-v1",
-      JSON.stringify({
-        schemaVersion: 1,
-        tokens: [
-          {
-            id: "color-primary", name: "Primary", value: "#fff",
-            category: "colors", cssVar: "--bd-color-primary", type: "color",
-            darkValue: "#000",
-          },
-        ],
-      })
-    );
-
+  it("leaves no inline colour override on <html> and previews light", () => {
+    const composer = makeFakeComposer("off");
     render(
-      <TokenRegistryProvider projectId="test" composer={composer as any}>
-        <div />
+      <TokenRegistryProvider projectId="test" composer={composer as never}>
+        <ProjectTokensApplier composer={composer as never} />
       </TokenRegistryProvider>
     );
-
-    expect(composer.darkResolver.resolve).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "color-primary" }),
-      expect.arrayContaining([expect.objectContaining({ id: "color-primary" })]),
-      "dark"
-    );
-    expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#000");
-  });
-
-  it("on colorMode:changed event: re-walks tokens and re-applies", () => {
-    const composer = makeFakeComposer();
-    localStorage.setItem(
-      "buildrick-design-tokens-test-v1",
-      JSON.stringify({
-        schemaVersion: 1,
-        tokens: [
-          {
-            id: "color-primary", name: "Primary", value: "#fff",
-            category: "colors", cssVar: "--bd-color-primary", type: "color",
-            darkValue: "#000",
-          },
-        ],
-      })
-    );
-
-    render(
-      <TokenRegistryProvider projectId="test" composer={composer as any}>
-        <div />
-      </TokenRegistryProvider>
-    );
-    setPropertySpy.mockClear();
-
-    composer.colorMode.resolved.mockReturnValue("light");
-    act(() => {
-      composer.emit("colorMode:changed", { mode: "light", resolved: "light" });
-    });
-
-    expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#fff");
-  });
-
-  it("when composer prop is omitted: still applies raw token.value (legacy fallback)", () => {
-    localStorage.setItem(
-      "buildrick-design-tokens-test-v1",
-      JSON.stringify({
-        schemaVersion: 1,
-        tokens: [
-          {
-            id: "color-primary", name: "Primary", value: "#fff",
-            category: "colors", cssVar: "--bd-color-primary", type: "color",
-            darkValue: "#000",
-          },
-        ],
-      })
-    );
-
-    render(
-      <TokenRegistryProvider projectId="test">
-        <div />
-      </TokenRegistryProvider>
-    );
-    expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#fff");
-    expect(setPropertySpy).not.toHaveBeenCalledWith("--bd-color-primary", "#000");
-  });
-
-  it("unsubscribes on unmount", () => {
-    const composer = makeFakeComposer();
-    const { unmount } = render(
-      <TokenRegistryProvider projectId="test" composer={composer as any}>
-        <div />
-      </TokenRegistryProvider>
-    );
-    unmount();
-    expect(composer.off).toHaveBeenCalledWith("colorMode:changed", expect.any(Function));
+    const inline = () =>
+      document.documentElement.style.getPropertyValue("--buildrick-design-color-primary");
+    expect(inline()).toBe("");
+    expect(document.documentElement.dataset.theme).toBe("light");
+    act(() => composer.emit("colorMode:changed"));
+    expect(inline()).toBe("");
+    expect(document.documentElement.dataset.theme).toBe("light");
   });
 });

@@ -40,7 +40,7 @@ const css = () => document.getElementById("bk-site-tokens")?.textContent ?? "";
 beforeEach(() => {
   document.head.innerHTML = "";
   delete document.documentElement.dataset.theme;
-  vi.useFakeTimers({ toFake: ["requestAnimationFrame"] });
+  vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame"] });
 });
 
 describe("ProjectTokensApplier", () => {

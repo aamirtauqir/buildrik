@@ -16,7 +16,6 @@
 import * as React from "react";
 import type { DesignToken } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { CURRENT_SCHEMA_VERSION } from "../migrations";
 import { mergeProjectTokens } from "./projectTokens";
 import { EVENTS } from "@/shared/constants/events";
@@ -170,28 +169,6 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   const sizingState     = useSizingTokens(initialTokens);
   const iconState       = useIconTokens(initialTokens);
   const imageryState    = useImageryTokens(initialTokens);
-
-  // Phase B.1: dark-mode applier. When composer is wired, subscribe to
-  // colorMode:changed and re-apply each color token via darkResolver.
-  // The effect also runs on mount (and whenever colorState.tokens changes)
-  // so live edits in dark mode don't leave the LIGHT value flashed by
-  // useColorTokens' internal applyToRoot.
-  React.useEffect(() => {
-    const apply = () => {
-      const resolved = composer?.colorMode.resolved() ?? "light";
-      colorState.tokens.forEach((t) => {
-        const value = composer
-          ? composer.darkResolver.resolve(t, colorState.tokens, resolved)
-          : resolveTokenLiteral(colorState.tokens, t.id, "light") ?? "";
-        document.documentElement.style.setProperty(t.cssVar, value);
-      });
-    };
-    apply();
-    if (!composer) return;
-    const handler = () => apply();
-    composer.on("colorMode:changed", handler);
-    return () => composer.off("colorMode:changed", handler);
-  }, [composer, colorState.tokens]);
 
   // Save all tokens to localStorage in versioned format. Call this after apply.
   // Versioned format is {schemaVersion, tokens} — the loader accepts both

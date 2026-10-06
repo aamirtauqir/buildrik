@@ -15,7 +15,8 @@ import { render, act } from "@testing-library/react";
 import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from "vitest";
 import * as React from "react";
 import { Composer } from "@/engine/Composer";
-import { TokenRegistryProvider } from "@/editor/design-system";
+import { ProjectTokensApplier } from "@/editor/design-system/ui/ProjectTokensApplier";
+import { EVENTS } from "@/shared/constants/events";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 describe("dark-mode trilogy · end-to-end", () => {
@@ -98,65 +99,27 @@ describe("dark-mode trilogy · end-to-end", () => {
     setPropertySpy.mockClear();
   });
 
-  it("real Composer + real TokenRegistryProvider: colorMode.set('dark') triggers darkValue setProperty across the full chain", () => {
+  it("real Composer + ProjectTokensApplier: colorMode.set follows data-theme for an auto site and ignores it for an off site", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame"] });
+    document.head.innerHTML = "";
     const composer = new Composer({} as any);
-    // D-4: ProjectTokensHydrator merges `projectSettings.designTokens` into the
-    // registries on mount (not the localStorage cache), so the token to
-    // exercise must be seeded on the composer's project settings. A non-default
-    // id ("test-color-primary") goes through mergeProjectTokens' `added` path
-    // and keeps its own cssVar/darkValue verbatim, instead of colliding with a
-    // DEFAULT_TOKENS id and inheriting that default's `--buildrick-design-*` cssVar.
     composer.setProjectSettingsRaw({
+      darkMode: "auto",
       designTokens: [
         v6Token({ id: "test-color-primary", name: "Primary", value: "#fff", cssVar: "--bd-color-primary", dark: "#000" }),
       ],
     });
+    render(<ProjectTokensApplier composer={composer} />);
+    expect(document.documentElement.dataset.theme).toBe("light");
 
-    render(
-      <TokenRegistryProvider projectId="int-test" composer={composer}>
-        <div />
-      </TokenRegistryProvider>
-    );
+    act(() => { composer.colorMode.set("dark"); vi.advanceTimersToNextFrame(); });
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(document.documentElement.style.getPropertyValue("--bd-color-primary")).toBe("");
 
-    // Initial mode is "system" → matchMedia.matches=false → resolved="light"
-    // Effect runs once: applies token.value (light).
-    expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#fff");
-
-    setPropertySpy.mockClear();
-
-    // Real chain: ColorMode.set("dark") → emits "colorMode:changed" via Composer's
-    // EventEmitter → TokenRegistryProvider's handler fires → walks tokens through
-    // composer.darkResolver.resolve(token, "dark") → darkValue ("#000") returned →
-    // document.documentElement.style.setProperty called with darkValue.
-    act(() => {
-      composer.colorMode.set("dark");
-    });
-
-    expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#000");
-  });
-
-  it("real chain: token without darkValue under dark mode falls back to value", () => {
-    const composer = new Composer({} as any);
-    composer.setProjectSettingsRaw({
-      designTokens: [
-        v6Token({ id: "test-color-secondary", name: "Secondary", value: "#aaa", cssVar: "--bd-color-secondary", layer: "semantic" }),
-      ],
-    });
-
-    render(
-      <TokenRegistryProvider projectId="int-test" composer={composer}>
-        <div />
-      </TokenRegistryProvider>
-    );
-
-    setPropertySpy.mockClear();
-
-    act(() => {
-      composer.colorMode.set("dark");
-    });
-
-    // Fell back to value (no darkValue present).
-    expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-secondary", "#aaa");
+    composer.setProjectSettingsRaw({ darkMode: "off" });
+    act(() => { composer.emit(EVENTS.SETTINGS_CHANGE, composer.getProjectSettings()); vi.advanceTimersToNextFrame(); });
+    expect(document.documentElement.dataset.theme).toBe("light");
+    vi.useRealTimers();
   });
 
   it("real chain: composer.aliasResolver coexists with darkResolver wiring (A.2 + B.0 + B.1 + B.2 don't conflict)", () => {

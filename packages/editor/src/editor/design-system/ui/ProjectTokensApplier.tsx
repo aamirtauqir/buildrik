@@ -15,7 +15,6 @@ import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { mergeProjectTokens } from "../state/projectTokens";
 
 const STYLE_ID = "bk-site-tokens";
-const COLOR_MODE_CHANGED = "colorMode:changed";
 
 export interface ProjectTokensApplierProps {
   composer?: Composer | null;
@@ -49,12 +48,12 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
     write();
     composer.on(EVENTS.PROJECT_LOADED, schedule);
     composer.on(EVENTS.SETTINGS_CHANGE, schedule);
-    composer.on(COLOR_MODE_CHANGED as never, schedule);
+    composer.on("colorMode:changed", schedule);
     return () => {
       if (frame) cancelAnimationFrame(frame);
       composer.off(EVENTS.PROJECT_LOADED, schedule);
       composer.off(EVENTS.SETTINGS_CHANGE, schedule);
-      composer.off(COLOR_MODE_CHANGED as never, schedule);
+      composer.off("colorMode:changed", schedule);
     };
   }, [composer]);
 

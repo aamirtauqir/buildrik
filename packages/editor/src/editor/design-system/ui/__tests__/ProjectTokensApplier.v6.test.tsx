@@ -5,11 +5,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProjectTokensApplier } from "../ProjectTokensApplier";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 
-function fakeComposer(settings: Record<string, unknown>, mode: "light" | "dark" = "light") {
+function fakeComposer(settings: Record<string, unknown>, initialMode: "light" | "dark" = "light") {
+  let mode = initialMode;
   const handlers = new Map<string, Set<() => void>>();
   return {
     getProjectSettings: () => settings,
     colorMode: { resolved: () => mode },
+    setMode: (m: "light" | "dark") => { mode = m; },
     on: (e: string, h: () => void) => { if (!handlers.has(e)) handlers.set(e, new Set()); handlers.get(e)!.add(h); },
     off: (e: string, h: () => void) => handlers.get(e)?.delete(h),
     emit: (e: string) => handlers.get(e)?.forEach((h) => h()),
@@ -20,7 +22,7 @@ describe("ProjectTokensApplier (v6)", () => {
   beforeEach(() => {
     document.head.innerHTML = "";
     delete document.documentElement.dataset.theme;
-    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] });
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame"] });
   });
 
   it("writes one style element and always sets data-theme", () => {
@@ -62,5 +64,47 @@ describe("ProjectTokensApplier (v6)", () => {
     const c = fakeComposer({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "auto" }, "dark");
     render(<ProjectTokensApplier composer={c as never} />);
     expect(document.documentElement.dataset.theme).toBe("dark");
+  });
+
+  it("a colorMode:changed event rewrites data-theme for an auto site", () => {
+    const c = fakeComposer({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "auto" });
+    render(<ProjectTokensApplier composer={c as never} />);
+    expect(document.documentElement.dataset.theme).toBe("light");
+    c.setMode("dark");
+    c.emit("colorMode:changed");
+    act(() => { vi.advanceTimersToNextFrame(); });
+    expect(document.documentElement.dataset.theme).toBe("dark");
+  });
+
+  it("switching darkMode off to auto adds the dark block and follows the mode", () => {
+    const settings: Record<string, unknown> = { designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "off" };
+    const c = fakeComposer(settings, "dark");
+    render(<ProjectTokensApplier composer={c as never} />);
+    expect(document.getElementById("bk-site-tokens")!.textContent).not.toContain(':root[data-theme="dark"]{');
+    expect(document.documentElement.dataset.theme).toBe("light");
+    settings.darkMode = "auto";
+    c.emit("settings:change");
+    act(() => { vi.advanceTimersToNextFrame(); });
+    expect(document.getElementById("bk-site-tokens")!.textContent).toContain(':root[data-theme="dark"]{');
+    expect(document.documentElement.dataset.theme).toBe("dark");
+  });
+
+  it("unmounting with a pending frame cancels the write", () => {
+    const settings: Record<string, unknown> = { designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "auto" };
+    const c = fakeComposer(settings);
+    const { unmount } = render(<ProjectTokensApplier composer={c as never} />);
+    settings.darkMode = "off";
+    c.emit("settings:change");
+    unmount();
+    const before = document.getElementById("bk-site-tokens")!.textContent;
+    act(() => { vi.advanceTimersToNextFrame(); });
+    expect(document.getElementById("bk-site-tokens")!.textContent).toBe(before);
+  });
+
+  it("two mounts leave exactly one style element", () => {
+    const c = fakeComposer({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "auto" });
+    render(<ProjectTokensApplier composer={c as never} />);
+    render(<ProjectTokensApplier composer={c as never} />);
+    expect(document.querySelectorAll("#bk-site-tokens")).toHaveLength(1);
   });
 });
