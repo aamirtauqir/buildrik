@@ -33,11 +33,12 @@ export function lightAliasOf(token: DesignToken): string | undefined {
  *  aliases it: that is the v6 design (spec §2).
  *
  *  A semantic token never holds a literal after an edit and never repaints a
- *  sibling. If its mode aliases a primitive nothing else aliases (in any mode,
- *  its own other mode included), that primitive takes the literal. Otherwise
+ *  sibling. If its mode aliases a `custom-*` primitive nothing else aliases (in
+ *  any mode, its own other mode included), that primitive takes the literal; a
+ *  real palette primitive is never overwritten from a semantic edit. Otherwise
  *  the token gets its own `custom-<id>` primitive (`custom-<id>-dark` for dark,
- *  reused when it already owns one; suffixed when the id or css var is taken)
- *  and its mode aliases it. */
+ *  reused when it is an unaliased primitive under `--buildrick-design-<that id>`;
+ *  suffixed when the id or css var is taken) and its mode aliases it. */
 export function setTokenLiteral(
   tokens: readonly DesignToken[],
   id: string,
@@ -61,7 +62,7 @@ export function setTokenLiteral(
 
   const ref = mode === "dark" ? t.modes.dark : t.modes.light;
   const current = ref && "alias" in ref ? tokens.find((x) => x.id === ref.alias) : undefined;
-  if (current && current.layer === "primitive" && aliasCount(current.id) === 1) {
+  if (current && current.layer === "primitive" && current.id.startsWith("custom-") && aliasCount(current.id) === 1) {
     return writePrimitive(tokens, current.id);
   }
 
@@ -71,9 +72,10 @@ export function setTokenLiteral(
   let ownId = base;
   for (let n = 2; ; n++) {
     const existing = tokens.find((x) => x.id === ownId);
-    // Its own: a primitive by that name nothing aliases yet (the alias being
-    // replaced here is the only other reference it could have had).
-    if (existing && existing.layer === "primitive" && aliasCount(ownId) === 0) break;
+    // Its own: a primitive under its own var that nothing aliases yet (the
+    // alias being replaced here is the only other reference it could have had).
+    const own = existing?.layer === "primitive" && existing.cssVar === `--buildrick-design-${ownId}`;
+    if (own && aliasCount(ownId) === 0) break;
     if (!ids.has(ownId) && !vars.has(`--buildrick-design-${ownId}`)) break;
     ownId = `${base}-${n}`;
   }
