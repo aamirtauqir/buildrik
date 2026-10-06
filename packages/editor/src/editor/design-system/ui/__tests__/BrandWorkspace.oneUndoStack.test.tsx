@@ -71,18 +71,24 @@ async function editRadius(utils: ReturnType<typeof render>, value: string) {
     const el = utils.container.querySelector<HTMLElement>('[data-token-row="radius-sm"]');
     if (!el) throw new Error("radius-sm row not rendered");
     return el;
-  });
+  }, WAIT);
   fireEvent.click(row);
   fireEvent.click(utils.getByTestId("brand-token-action-replace"));
-  const input = await waitFor(() => utils.getByLabelText("Value") as HTMLInputElement);
+  const input = await waitFor(() => utils.getByLabelText("Value") as HTMLInputElement, WAIT);
   fireEvent.change(input, { target: { value } });
   fireEvent.blur(input);
   return input;
 }
 
+/* Under a full-suite run the real Composer + workspace render is slow; the
+   whole file once timed out at the 15 s default while passing alone. Every
+   wait is generous and the tests get their own budget — none of them depends
+   on how fast anything happens, only on the order. */
+const WAIT = { timeout: 10_000 };
+
 const tableValue = (utils: ReturnType<typeof render>) => utils.getByTestId("brand-token-value-radius-sm").textContent;
 
-describe("one undo stack — Brand edits and canvas edits", () => {
+describe("one undo stack — Brand edits and canvas edits", { timeout: 60_000 }, () => {
   it("a Brand edit is in the project at once — one history step, nothing staged", async () => {
     const c = seededComposer();
     const steps = c.history.getUndoCount();
@@ -103,7 +109,7 @@ describe("one undo stack — Brand edits and canvas edits", () => {
     const before = radius(c);
     await editRadius(utils, "7px");
     c.history.flushPending();
-    await waitFor(() => expect(tableValue(utils)).toBe("7px"));
+    await waitFor(() => expect(tableValue(utils)).toBe("7px"), WAIT);
 
     act(() => {
       chord(document.body, { key: "z", metaKey: true });
@@ -112,7 +118,7 @@ describe("one undo stack — Brand edits and canvas edits", () => {
     expect(radius(c)).toBe(before);
     expect(count(c)).toBe(elements);
     /* The workspace follows the undo — it reads the project. */
-    await waitFor(() => expect(tableValue(utils)).toBe(before));
+    await waitFor(() => expect(tableValue(utils)).toBe(before), WAIT);
 
     act(() => {
       chord(document.body, { key: "z", metaKey: true });
@@ -135,7 +141,7 @@ describe("one undo stack — Brand edits and canvas edits", () => {
     });
     c.history.flushPending();
     expect(radius(c)).toBe("7px");
-    await waitFor(() => expect(tableValue(utils)).toBe("7px"));
+    await waitFor(() => expect(tableValue(utils)).toBe("7px"), WAIT);
   });
 
   it("a text field inside Brand keeps the browser's own undo", async () => {
