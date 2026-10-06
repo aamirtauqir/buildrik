@@ -36,6 +36,7 @@ const composer = {
   cmsManager: {},
   migration: { run: vi.fn(({ project, currentVersion }) => ({ project, newVersion: currentVersion })) },
   aliasResolver: { validate: vi.fn(), resolve: vi.fn(), getChain: vi.fn() },
+  designSystem: { readOnly: false, readOnlyReason: null, brandTokensV2: true },
   destroy: vi.fn(),
 };
 
@@ -246,5 +247,41 @@ describe("C-9 — a demoted member lands in view mode and autosave stops", () =>
     await runAutosave(p);
     expect(syncSaveProject).not.toHaveBeenCalled();
     expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(false);
+  });
+});
+
+/* I1: the server refused the brand tokens in this save (TOKENS_INVALID). The
+   same payload can only be refused again, so it is not re-sent; the work is
+   kept for the reload, and the failure stays on screen as the persistent
+   save-failed banner (status "error"), not a toast. */
+describe("autosave refused with TOKENS_INVALID", () => {
+  const REFUSAL = "TOKENS_INVALID: alias target missing: nowhere";
+
+  it("keeps the work, raises the banner state without a toast, and does not resend the same payload", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    composer.exportProject.mockReturnValue({ settings: { designTokens: ["bad"] } } as never);
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(
+      new TRPCClientError(REFUSAL, { result: { error: { message: REFUSAL, code: -32600, data: { code: "BAD_REQUEST", httpStatus: 400, path: "sites.saveProject" } } } as never }),
+    );
+    const p = params();
+    const toasts = await runAutosave(p);
+
+    expect(toasts).toEqual([]);
+    const states = vi.mocked(p.setSaveState!).mock.calls.map(([s]) => (typeof s === "function" ? s({ status: "idle" }) : s));
+    expect(states.at(-1)).toMatchObject({ status: "error", error: REFUSAL });
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
+    expect(syncSaveProject).toHaveBeenCalledTimes(1);
+
+    act(() => { composer.emit("project:changed"); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
+    expect(syncSaveProject).toHaveBeenCalledTimes(1);
+
+    vi.mocked(syncSaveProject).mockResolvedValueOnce(undefined as never);
+    composer.exportProject.mockReturnValue({ settings: { designTokens: [] } } as never);
+    act(() => { composer.emit("project:changed"); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
+    expect(syncSaveProject).toHaveBeenCalledTimes(2);
+    composer.exportProject.mockReturnValue({} as never);
+    localStorage.removeItem("bk-unsaved-v1-site-1");
   });
 });

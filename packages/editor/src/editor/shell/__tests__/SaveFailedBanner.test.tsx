@@ -25,6 +25,23 @@ describe("SaveFailedBanner", () => {
     expect(screen.getByTestId("save-failed-keep")).toHaveTextContent("Keep editing");
   });
 
+  it("names a brand refusal instead of blaming the connection, and offers no pointless retry (I1)", () => {
+    render(
+      <SaveFailedBanner
+        where="My Site · Home"
+        leaving={false}
+        busy={false}
+        refusal="alias target missing: nowhere"
+        onRetry={vi.fn()}
+        onKeepEditing={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("save-failed-banner")).toHaveTextContent("The brand change was refused: alias target missing: nowhere");
+    expect(screen.getByTestId("save-failed-banner")).not.toHaveTextContent("Check your connection");
+    expect(screen.queryByTestId("save-failed-retry")).toBeNull();
+    expect(screen.getByTestId("save-failed-keep")).toBeInTheDocument();
+  });
+
   it("falls back to the default position when the toast anchor is a real, sized element", () => {
     const anchor = document.createElement("div");
     anchor.setAttribute("data-bk-toast-anchor", "");

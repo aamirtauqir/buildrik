@@ -66,6 +66,8 @@ export interface StudioHeaderProps {
      copy of that union, and each copy is a place the set can silently fall
      behind. */
   saveStatus: StudioSaveState["status"];
+  /** The last save's error message; a `TOKENS_INVALID:` refusal gets its own banner copy. */
+  saveError?: string;
   /** Has unsaved changes */
   isDirty: boolean;
   /** Network offline. Nothing is queued for a dashboard-backed site — the save
@@ -219,6 +221,7 @@ function pillAgo(at?: string | Date | null): string {
 export const StudioHeader: React.FC<StudioHeaderProps> = ({
   composer,
   saveStatus,
+  saveError,
   isDirty,
   isOffline,
   lastSaved,
@@ -919,6 +922,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           where={[siteName, crumbCtx ?? pageName].filter(Boolean).join(" · ")}
           leaving={leaveAfterSave !== null}
           busy={retrying}
+          refusal={saveError?.startsWith("TOKENS_INVALID:") ? saveError.slice("TOKENS_INVALID:".length).trim() : undefined}
           onRetry={() => void retrySave()}
           onKeepEditing={() => {
             setLeaveAfterSave(null);

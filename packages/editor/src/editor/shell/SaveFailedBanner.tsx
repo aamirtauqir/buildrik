@@ -22,9 +22,13 @@ export const SaveFailedBanner: React.FC<{
   /** Set when the failed save was the exit's — the retry then leaves. */
   leaving: boolean;
   busy: boolean;
+  /** Set when the server refused the save's brand tokens (TOKENS_INVALID):
+   *  its reason. Not a connection problem, and the same save would be refused
+   *  again, so the copy says so and Retry is not offered (unless leaving). */
+  refusal?: string;
   onRetry: () => void;
   onKeepEditing: () => void;
-}> = ({ where, leaving, busy, onRetry, onKeepEditing }) => {
+}> = ({ where, leaving, busy, refusal, onRetry, onKeepEditing }) => {
   const [col, setCol] = React.useState<DOMRect | null>(null);
   React.useLayoutEffect(() => {
     const el = document.querySelector("[data-bk-toast-anchor]");
@@ -57,12 +61,16 @@ export const SaveFailedBanner: React.FC<{
       >
         <span className="tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Couldn&apos;t save {where}</span>
         <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
-          Your changes are still here. Check your connection, then retry saving. You have not left the editor.
+          {refusal
+            ? `The brand change was refused: ${refusal}. Your changes are kept in this browser — undo the last brand change, then keep editing.`
+            : "Your changes are still here. Check your connection, then retry saving. You have not left the editor."}
         </span>
         <span className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
-          <Button size="xs" className="tw:h-7" disabled={busy} aria-busy={busy || undefined} onClick={onRetry} data-testid="save-failed-retry">
-            {leaving ? "Retry save & leave" : "Retry save"}
-          </Button>
+          {refusal && !leaving ? null : (
+            <Button size="xs" className="tw:h-7" disabled={busy} aria-busy={busy || undefined} onClick={onRetry} data-testid="save-failed-retry">
+              {leaving ? "Retry save & leave" : "Retry save"}
+            </Button>
+          )}
           <Button
             color="light"
             size="xs"

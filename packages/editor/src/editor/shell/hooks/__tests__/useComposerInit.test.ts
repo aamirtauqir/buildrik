@@ -56,6 +56,7 @@ const mockComposer = {
     resolve: vi.fn(),
     getChain: vi.fn(),
   },
+  designSystem: { readOnly: false, readOnlyReason: null, brandTokensV2: true },
   destroy: vi.fn(),
 };
 

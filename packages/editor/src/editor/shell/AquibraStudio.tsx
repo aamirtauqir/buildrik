@@ -653,6 +653,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         <StudioHeader
           composer={composer}
           saveStatus={state.saveState.status}
+          saveError={state.saveState.error}
           isDirty={state.isDirty}
           isOffline={isOffline}
           lastSaved={state.saveState.lastSavedAt ? new Date(state.saveState.lastSavedAt) : null}
