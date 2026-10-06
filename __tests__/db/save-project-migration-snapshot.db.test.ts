@@ -5,9 +5,9 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { saveProjectData } from "@/server/services/sites.service";
+import { duplicateSite, saveProjectData } from "@/server/services/sites.service";
 import { migrateTokensToV6 } from "@buildrik/shared/tokens";
-import { createTestUser, createTestWorkspace, createTestSite, truncateTables } from "./helpers";
+import { createTestUser, createTestWorkspace, createTestWorkspaceMember, createTestSite, truncateTables } from "./helpers";
 import v5seed from "../../packages/shared/tokens/__tests__/__fixtures__/seed-only.json";
 
 beforeEach(async () => {
@@ -17,14 +17,17 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-async function v5Site(designTokens: unknown = v5seed) {
+async function v5Site(designTokens: unknown = v5seed, extra: { tokensMigrationHold?: boolean; dsSchemaVersion?: number } = {}) {
   const user = await createTestUser();
-  const workspace = await createTestWorkspace({ ownerId: user.id });
-  return createTestSite({
+  const workspace = await createTestWorkspace({ ownerId: user.id, plan: "PRO" });
+  await createTestWorkspaceMember({ userId: user.id, workspaceId: workspace.id, role: "OWNER" });
+  const site = await createTestSite({
     workspaceId: workspace.id,
     createdBy: user.id,
     projectSettings: { designTokens, designTokensSchemaVersion: 5 } as never,
+    ...extra,
   });
+  return Object.assign(site, { userId: user.id });
 }
 
 const v6Settings = (extra: Record<string, unknown> = {}) => ({
@@ -90,5 +93,66 @@ describe("first migrated save", () => {
     expect(after.projectSettings).toEqual({ designTokens: invalid, designTokensSchemaVersion: 5 });
     expect(after.lastEditedAt.getTime()).toBeGreaterThan(site.lastEditedAt.getTime());
     expect(await prisma.siteThemeSnapshot.count({ where: { siteId: site.id } })).toBe(0);
+  });
+
+  it("records the STORED dsSchemaVersion in the snapshot, not the payload's", async () => {
+    const site = await v5Site(v5seed, { dsSchemaVersion: 3 });
+    await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings(), dsSchemaVersion: 7 }, site.lastEditedAt.toISOString());
+    const [snap] = await prisma.siteThemeSnapshot.findMany({ where: { siteId: site.id, reason: "migration" } });
+    expect(snap.prevDsSchemaVersion).toBe(3);
+  });
+
+  it("writes no snapshot when the store had no tokens", async () => {
+    const user = await createTestUser();
+    const workspace = await createTestWorkspace({ ownerId: user.id });
+    const site = await createTestSite({ workspaceId: workspace.id, createdBy: user.id });
+    await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings() }, site.lastEditedAt.toISOString());
+    expect(await prisma.siteThemeSnapshot.count({ where: { siteId: site.id } })).toBe(0);
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toMatchObject({ designTokensSchemaVersion: 6 });
+  });
+
+  it("refuses a first migrated save on a held site and leaves the store alone", async () => {
+    const site = await v5Site(v5seed, { tokensMigrationHold: true });
+    await expect(saveProjectData({ siteId: site.id, pages: [], settings: v6Settings() }, site.lastEditedAt.toISOString()))
+      .rejects.toMatchObject({ code: "TOKENS_STALE_CLIENT" });
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+    expect(await prisma.siteThemeSnapshot.count({ where: { siteId: site.id } })).toBe(0);
+  });
+
+  it("saves a v5 payload unchanged on a held site with the switch on", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    const site = await v5Site(v5seed, { tokensMigrationHold: true });
+    await saveProjectData({ siteId: site.id, pages: [], settings: { designTokens: v5seed, designTokensSchemaVersion: 5 } }, site.lastEditedAt.toISOString());
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+  });
+});
+
+describe("schema version is the server's call", () => {
+  it("refuses a version above the current schema and keeps the site saveable", async () => {
+    const site = await v5Site();
+    await expect(saveProjectData({ siteId: site.id, pages: [], settings: v6Settings({ designTokensSchemaVersion: 999 }) }, site.lastEditedAt.toISOString()))
+      .rejects.toMatchObject({ code: "TOKENS_INVALID" });
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toMatchObject({ designTokensSchemaVersion: 5 });
+  });
+
+  it("stores 6 for a validated payload regardless of extra client fields", async () => {
+    const site = await v5Site();
+    await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings({ seo: {}, tokensVersion: 42 }) }, site.lastEditedAt.toISOString());
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect((after.projectSettings as { designTokensSchemaVersion: unknown }).designTokensSchemaVersion).toBe(6);
+  });
+});
+
+describe("duplicateSite", () => {
+  it.each([false, true])("copies a v5 site's tokens and version verbatim (hold=%s), even with the switch on", async (hold) => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    const site = await v5Site(v5seed, { tokensMigrationHold: hold });
+    const copy = await duplicateSite(site.id, site.workspaceId, site.userId);
+    const row = await prisma.site.findUniqueOrThrow({ where: { id: copy.id } });
+    expect(row.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
   });
 });

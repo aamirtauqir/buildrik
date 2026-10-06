@@ -487,11 +487,6 @@ export async function duplicateSite(
      keyed by a renamed id (style rules, form blocks, CMS bindings) is copied
      along. */
   const reid = reidSite(originalPages, sanitizeProjectStyles(original.projectStyles));
-  // A pre-v6 source is copied migrated when the switch is on (no snapshot: the copy is new).
-  const copiedSettings = withCheckedTokens(
-    original.projectSettings,
-    checkTokenPayload(original.projectSettings, original.projectSettings),
-  );
 
   // Site + pages + form blocks must be copied atomically — a crash mid-copy
   // previously left an orphan half-built site. The page copy also dropped
@@ -513,7 +508,7 @@ export async function duplicateSite(
         // (:639) rather than trusting the source row.
         projectStyles: (reid.styles as Prisma.InputJsonValue) ?? undefined,
         projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
-        projectSettings: (copiedSettings as Prisma.InputJsonValue) ?? undefined,
+        projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
         projectCmsBindings: copyCmsBindings(original.projectCmsBindings, reid.renames),
         lastEditedAt: new Date(),
       },
@@ -897,14 +892,10 @@ function withValidAnalyticsIds(settings: unknown): unknown {
   return { ...settings, analytics };
 }
 
-/** The settings payload with its tokens replaced by the checked (and, on a first migrated save, migrated) set. */
+/** The settings payload with its checked (and possibly migrated) tokens and the server's schema version. */
 function withCheckedTokens(settings: unknown, check: TokenCheck): unknown {
-  if (check.kind === "no-tokens" || !isPlainObject(settings)) return settings;
-  return {
-    ...settings,
-    designTokens: check.tokens,
-    ...(check.kind === "first-migrated" ? { designTokensSchemaVersion: TOKENS_SCHEMA_VERSION } : {}),
-  };
+  if (check.kind === "no-tokens" || check.kind === "unchanged" || !isPlainObject(settings)) return settings;
+  return { ...settings, designTokens: check.tokens, designTokensSchemaVersion: TOKENS_SCHEMA_VERSION };
 }
 
 /**
@@ -924,7 +915,14 @@ function withCheckedTokens(settings: unknown, check: TokenCheck): unknown {
 export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
-    select: { deletedAt: true, projectSettings: true, lastEditedAt: true, workspaceId: true },
+    select: {
+      deletedAt: true,
+      projectSettings: true,
+      lastEditedAt: true,
+      workspaceId: true,
+      dsSchemaVersion: true,
+      tokensMigrationHold: true,
+    },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
@@ -932,7 +930,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
      must carry the CAS token and match it now — the migration snapshot below
      records what that save replaced, and a blind write could snapshot a
      version the user never saw. The in-transaction CAS still decides races. */
-  const tokenCheck = checkTokenPayload(input.settings, site.projectSettings);
+  const tokenCheck = checkTokenPayload(input.settings, site.projectSettings, { hold: site.tokensMigrationHold });
   if (tokenCheck.kind === "first-migrated") {
     if (!expectedLastEditedAt) throw new TokenSaveError("TOKENS_NEED_CAS", "Reload to continue.");
     if (site.lastEditedAt.toISOString() !== new Date(expectedLastEditedAt).toISOString()) {
@@ -1018,13 +1016,14 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
     }
 
     // Same transaction as the CAS: a losing racer rolls its snapshot back too.
-    if (tokenCheck.kind === "first-migrated") {
+    // A store with no tokens (a new site) has nothing to restore.
+    if (tokenCheck.kind === "first-migrated" && Array.isArray(tokenCheck.storedTokens) && tokenCheck.storedTokens.length > 0) {
       await tx.siteThemeSnapshot.create({
         data: {
           siteId: input.siteId,
           workspaceId: site.workspaceId,
-          prevStyles: { designTokens: tokenCheck.storedTokens ?? [] } as Prisma.InputJsonValue,
-          prevDsSchemaVersion: input.dsSchemaVersion ?? 0,
+          prevStyles: { designTokens: tokenCheck.storedTokens } as Prisma.InputJsonValue,
+          prevDsSchemaVersion: site.dsSchemaVersion,
           reason: "migration",
           tokensSchemaVersion: tokenCheck.storedVersion,
           darkMode: null,

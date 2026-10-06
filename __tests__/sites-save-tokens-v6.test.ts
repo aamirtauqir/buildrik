@@ -49,12 +49,36 @@ describe("checkTokenPayload", () => {
   it("leaves an old payload over an old store unmigrated when the switch is off", () => {
     vi.stubEnv("BRAND_TOKENS_V2", "");
     const r = checkTokenPayload({ designTokens: v5seed, designTokensSchemaVersion: 5 }, { designTokensSchemaVersion: 5 });
-    expect(r).toEqual({ kind: "same-version", tokens: v5seed });
+    expect(r).toEqual({ kind: "unchanged" });
   });
 
   it("accepts an unmigratable v5 payload over a v5 store unchanged (switch on, read-only site)", () => {
     vi.stubEnv("BRAND_TOKENS_V2", "on");
     const r = checkTokenPayload({ designTokens: invalidV5, designTokensSchemaVersion: 5 }, { designTokens: invalidV5, designTokensSchemaVersion: 5 });
-    expect(r).toEqual({ kind: "same-version", tokens: invalidV5 });
+    expect(r).toEqual({ kind: "unchanged" });
+  });
+
+  it.each([999, 6.5, "6", -1, 0])("refuses designTokensSchemaVersion %j as TOKENS_INVALID", (version) => {
+    expect(() => checkTokenPayload({ designTokens: v6, designTokensSchemaVersion: version }, { designTokensSchemaVersion: 6 }))
+      .toThrow(expect.objectContaining({ code: "TOKENS_INVALID" }));
+  });
+
+  it("only migrates a v5 payload server-side: a v3 payload with the switch on stays unchanged", () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    expect(checkTokenPayload({ designTokens: v5seed, designTokensSchemaVersion: 3 }, { designTokensSchemaVersion: 3 }))
+      .toEqual({ kind: "unchanged" });
+    expect(checkTokenPayload({ designTokens: v5seed }, {})).toEqual({ kind: "unchanged" });
+  });
+
+  describe("tokensMigrationHold", () => {
+    it("refuses a first migrated save while held", () => {
+      expect(() => checkTokenPayload({ designTokens: v6, designTokensSchemaVersion: 6 }, { designTokens: v5seed, designTokensSchemaVersion: 5 }, { hold: true }))
+        .toThrow(expect.objectContaining({ code: "TOKENS_STALE_CLIENT" }));
+    });
+    it("leaves a v5 payload unmigrated while held, even with the switch on", () => {
+      vi.stubEnv("BRAND_TOKENS_V2", "on");
+      expect(checkTokenPayload({ designTokens: v5seed, designTokensSchemaVersion: 5 }, { designTokensSchemaVersion: 5 }, { hold: true }))
+        .toEqual({ kind: "unchanged" });
+    });
   });
 });
