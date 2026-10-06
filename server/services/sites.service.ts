@@ -935,6 +935,14 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
     cmsBindings = undefined;
   }
 
+  // Defense-in-depth: strip XSS from the stored element tree at the write
+  // boundary. The editor sanitizes on import/serialize, but a direct API
+  // write (bypassing the editor) would otherwise persist hostile blocks.
+  // N1: this is synchronous DOMPurify/jsdom CPU (~1 s per 700 rich-text
+  // elements). Inside the interactive transaction it burned Prisma's 5 s
+  // timeout before the page upsert ran (P2028 → 500, then a 409 on retry).
+  for (const page of input.pages) sanitizeBlocks(page.blocks);
+
   await prisma.$transaction(async (tx) => {
     /* 61-conflict / A-2: optimistic concurrency as a compare-and-swap, FIRST in
        the transaction. The `lastEditedAt` match is part of the UPDATE's WHERE,
@@ -1021,11 +1029,6 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
 
     // Upsert each incoming page.
     for (const [index, page] of input.pages.entries()) {
-      // Defense-in-depth: strip XSS from the stored element tree at the write
-      // boundary. The editor sanitizes on import/serialize, but a direct API
-      // write (bypassing the editor) would otherwise persist hostile blocks.
-      sanitizeBlocks(page.blocks);
-
       const slug =
         page.slug ?? (page.name ? page.name.toLowerCase().replace(/\s+/g, "-") : undefined);
 
