@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setTokenLiteral, resolveTokenLiteral } from "../resolve";
+import { setTokenLiteral, resolveTokenLiteral, lightAliasOf } from "../resolve";
 import type { DesignToken } from "../../schemas/design-tokens";
 
 const p: DesignToken = { id: "b", name: "b", kind: "color", layer: "primitive", modes: { light: { value: "#000" } }, category: "colors", cssVar: "--buildrick-design-b", type: "color" };
@@ -14,5 +14,12 @@ describe("setTokenLiteral", () => {
   });
   it("writes a primitive's single literal", () => {
     expect(resolveTokenLiteral(setTokenLiteral([p], "b", "light", "#123"), "b", "light")).toBe("#123");
+  });
+});
+
+describe("lightAliasOf", () => {
+  it("names the light alias, or nothing for a literal", () => {
+    expect(lightAliasOf(s1)).toBe("b");
+    expect(lightAliasOf(p)).toBeUndefined();
   });
 });
