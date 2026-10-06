@@ -20,6 +20,7 @@ const { api } = vi.hoisted(() => ({
       domains: {
         list: { query: vi.fn() },
         checkAvailability: { query: vi.fn() },
+        usesVercel: { query: vi.fn() },
         connect: { mutate: vi.fn() },
         update: { mutate: vi.fn() },
         check: { mutate: vi.fn() },
@@ -72,6 +73,7 @@ const shop = (): DomainRow => ({
 beforeEach(() => {
   d.list.query.mockReset().mockResolvedValue([bella()]);
   d.checkAvailability.query.mockReset().mockResolvedValue({ available: true });
+  d.usesVercel.query.mockReset().mockResolvedValue({ vercelConnected: false });
   d.connect.mutate.mockReset().mockResolvedValue(bella({ id: "dom9", domain: "new.example", status: "PENDING" }));
   d.update.mutate.mockReset().mockImplementation(async (input: { id: string; forceHttps: boolean }) =>
     bella({ forceHttps: input.forceHttps }),
@@ -417,6 +419,17 @@ describe("DomainsScreen — empty (3397:33034), loading (3397:32985), load-error
 describe("DomainsScreen — Add a domain → 3737:43669 → connect → re-list", () => {
   beforeEach(() => vi.useFakeTimers({ shouldAdvanceTime: true }));
   afterEach(() => vi.useRealTimers());
+
+  it("a Vercel-connected workspace gets an Add dialog with no _buildrick TXT row", async () => {
+    d.usesVercel.query.mockResolvedValue({ vercelConnected: true });
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-dom-add"));
+    fireEvent.change(screen.getByTestId("set-dom-name"), { target: { value: "bellacucina.com" } });
+    const records = screen.getByTestId("set-dom-records");
+    await waitFor(() => expect(records).not.toHaveTextContent("_buildrick"));
+    expect(d.usesVercel.query).toHaveBeenCalled();
+  });
 
   it("Add a domain opens the dialog; a valid, available name connects with the site id and the form's choices, then the new row is listed", async () => {
     setup();

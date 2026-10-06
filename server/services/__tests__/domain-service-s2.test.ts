@@ -55,6 +55,7 @@ import {
   checkDomainDns,
   dnsVerificationToken,
   verifyPendingDomains,
+  siteUsesVercel,
 } from "@server/services/domain.service";
 
 beforeEach(() => {
@@ -801,5 +802,22 @@ describe("verifyPendingDomains — the dns-verify cron", () => {
 
     await expect(verifyPendingDomains()).resolves.toEqual({ checked: 2, verified: 0 });
     expect(db.domain.findUnique).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("siteUsesVercel — whether the Add-a-domain dialog needs the _buildrick TXT", () => {
+  it("is true when the site's workspace has an active Vercel connection", async () => {
+    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1" });
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    await expect(siteUsesVercel("s1")).resolves.toBe(true);
+    expect(vercelConnection).toHaveBeenCalledWith("ws1");
+  });
+
+  it("is false without a connection, and false for an unknown site", async () => {
+    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1" });
+    vercelConnection.mockResolvedValue(null);
+    await expect(siteUsesVercel("s1")).resolves.toBe(false);
+    db.site.findUnique.mockResolvedValue(null);
+    await expect(siteUsesVercel("nope")).resolves.toBe(false);
   });
 });

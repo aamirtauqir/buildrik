@@ -255,4 +255,13 @@ describe("records preview — apex vs subdomain", () => {
       ["TXT", "_buildrick"],
     ]);
   });
+
+  it("with a Vercel-connected workspace the _buildrick TXT row is not drawn — connect neither writes nor needs it", () => {
+    mount({ vercelConnected: true });
+    typeName("bellacucina.com");
+    expect(rows().map((r) => r.slice(0, 2))).toEqual([
+      ["A", "@"],
+      ["CNAME", "www"],
+    ]);
+  });
 });

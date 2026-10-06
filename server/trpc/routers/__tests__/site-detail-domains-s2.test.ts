@@ -17,6 +17,7 @@ const updateDomainMock = vi.fn();
 const recordForSiteMock = vi.fn();
 const domainFindUnique = vi.fn();
 const checkDnsMock = vi.fn();
+const siteUsesVercelMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -46,6 +47,7 @@ vi.mock("@/server/services/domain.service", () => ({
   listWorkspaceDomains: vi.fn(),
   checkDomainAvailability: (...a: unknown[]) => checkAvailabilityMock(...a),
   updateDomain: (...a: unknown[]) => updateDomainMock(...a),
+  siteUsesVercel: (...a: unknown[]) => siteUsesVercelMock(...a),
 }));
 vi.mock("@/server/services/activity-log.service", () => ({
   recordForSite: (...a: unknown[]) => recordForSiteMock(...a),
@@ -60,7 +62,7 @@ function caller() {
 }
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkDnsMock, connectDomainMock, checkAvailabilityMock, updateDomainMock, recordForSiteMock, domainFindUnique].forEach((m) =>
+  [siteUsesVercelMock, checkSiteRoleMock, checkDnsMock, connectDomainMock, checkAvailabilityMock, updateDomainMock, recordForSiteMock, domainFindUnique].forEach((m) =>
     m.mockReset(),
   );
   recordForSiteMock.mockResolvedValue(undefined);
@@ -172,5 +174,13 @@ describe("siteDetail.domains.check", () => {
     await expect(caller().domains.check({ id: "dom1", siteId: "s1" })).resolves.toMatchObject({ status: "VERIFIED" });
     expect(checkSiteRoleMock).toHaveBeenCalledWith(prisma, "u_1", "s1", "EDITOR");
     expect(checkDnsMock).toHaveBeenCalledWith("dom1", "s1");
+  });
+});
+
+describe("siteDetail.domains.usesVercel", () => {
+  it("answers from the service for a site the caller can read", async () => {
+    siteUsesVercelMock.mockResolvedValueOnce(true);
+    await expect(caller().domains.usesVercel({ siteId: "s1" })).resolves.toEqual({ vercelConnected: true });
+    expect(siteUsesVercelMock).toHaveBeenCalledWith("s1");
   });
 });

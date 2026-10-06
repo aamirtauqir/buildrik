@@ -283,6 +283,15 @@ export async function listWorkspaceDomains(workspaceId: string, userId: string):
   return rows.map(({ site, ...r }) => ({ ...r, siteName: site.name }));
 }
 
+/**
+ * Whether the site's workspace has a Vercel connection — i.e. whether `connect`
+ * will skip our `_buildrick` TXT (Q6), so the Add-a-domain dialog must not draw it.
+ */
+export async function siteUsesVercel(siteId: string): Promise<boolean> {
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+  return site ? (await getActiveVercelConnection(site.workspaceId)) !== null : false;
+}
+
 export interface ConnectDomainOptions {
   domain: string;
   kind?: DomainKind;
