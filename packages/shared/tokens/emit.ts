@@ -22,10 +22,34 @@ export function emitTokenCss(
   opts: { darkMode: DarkMode; onSkip?: (id: string, reason: string) => void },
 ): string {
   const byId = new Map(tokens.map((t) => [t.id, t]));
+  const safeNames = (t: DesignToken) => SAFE_VAR.test(t.cssVar) && (t.legacyNames ?? []).every((n) => SAFE_VAR.test(n));
+
+  /* Pass one: which tokens get a light declaration. An alias counts only when
+     its target does — `var()` of a var nobody defines is not a fallback, it
+     is no value at all, and it would beat the legacy backstop below. */
+  const emitted = new Map<string, boolean>();
+  const emits = (t: DesignToken, visiting: Set<string> = new Set()): boolean => {
+    const known = emitted.get(t.id);
+    if (known !== undefined) return known;
+    if (visiting.has(t.id)) return false;
+    visiting.add(t.id);
+    const ref = t.modes.light;
+    let ok = safeNames(t);
+    if (ok && "alias" in ref) {
+      const target = byId.get(ref.alias);
+      ok = target !== undefined && emits(target, visiting);
+    } else if (ok) {
+      ok = clean((ref as { value: string }).value) !== "";
+    }
+    emitted.set(t.id, ok);
+    return ok;
+  };
+  for (const t of tokens) emits(t);
+
   const refCss = (ref: TokenRef): string | null => {
     if ("alias" in ref) {
       const target = byId.get(ref.alias);
-      return target && SAFE_VAR.test(target.cssVar) ? `var(${target.cssVar})` : null;
+      return target && emitted.get(target.id) ? `var(${target.cssVar})` : null;
     }
     return clean(ref.value) || null;
   };
@@ -34,13 +58,13 @@ export function emitTokenCss(
   const dark: string[] = [];
   const seen = new Set<string>();
   for (const t of tokens) {
-    if (!SAFE_VAR.test(t.cssVar) || !(t.legacyNames ?? []).every((n) => SAFE_VAR.test(n))) {
+    if (!safeNames(t)) {
       opts.onSkip?.(t.id, "unsafe custom-property name");
       continue;
     }
-    const lv = refCss(t.modes.light);
+    const lv = emitted.get(t.id) ? refCss(t.modes.light) : null;
     if (!lv) {
-      opts.onSkip?.(t.id, "empty or unresolvable light value");
+      opts.onSkip?.(t.id, "alias" in t.modes.light ? "alias target not emitted" : "empty or unresolvable light value");
       continue;
     }
     seen.add(t.cssVar);

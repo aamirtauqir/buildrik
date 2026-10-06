@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { emitTokenCss } from "../emit";
 import { LEGACY_SEED } from "../legacySeed";
-import type { DesignToken } from "../../schemas/design-tokens";
+import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
 
 const t = (over: Partial<DesignToken> & Pick<DesignToken, "id" | "modes" | "layer">): DesignToken => ({
   name: over.id, kind: "color", category: "colors", cssVar: `--buildrick-design-${over.id}`, type: "color", ...over,
@@ -51,6 +51,41 @@ describe("emitTokenCss", () => {
     const empty = t({ id: "empty", layer: "primitive", modes: { light: { value: "  " } } });
     expect(() => emitTokenCss([empty], { darkMode: "off", onSkip })).not.toThrow();
     expect(onSkip).toHaveBeenCalledWith("empty", expect.any(String));
+  });
+
+  describe("an alias is emitted only when its target is (I2)", () => {
+    it("skips an alias whose target was skipped, and the legacy backstop defines the var", () => {
+      const onSkip = vi.fn();
+      const list = [
+        t({ id: "custom-color-accent", layer: "primitive", modes: { light: { value: "{}" } } }),
+        t({ id: "color-accent", layer: "semantic", modes: { light: { alias: "custom-color-accent" } } }),
+      ];
+      const css = emitTokenCss(list, { darkMode: "off", onSkip });
+      expect(css).not.toContain("var(--buildrick-design-custom-color-accent)");
+      expect(css).toContain("--buildrick-design-color-accent:#15803D");
+      expect(onSkip).toHaveBeenCalledWith("color-accent", expect.stringContaining("alias"));
+    });
+    it("follows an alias chain: a skipped root drops every alias above it", () => {
+      const list = [
+        t({ id: "p", layer: "primitive", modes: { light: { value: "  " } } }),
+        t({ id: "a", layer: "semantic", modes: { light: { alias: "p" } } }),
+        t({ id: "b", layer: "semantic", modes: { light: { alias: "a" } } }),
+      ];
+      const css = emitTokenCss(list, { darkMode: "off" });
+      expect(css).not.toContain("--buildrick-design-a:");
+      expect(css).not.toContain("--buildrick-design-b:");
+    });
+    it("skips a dark alias whose target was skipped", () => {
+      const onSkip = vi.fn();
+      const list = [
+        ...tokens.slice(0, 1),
+        t({ id: "blue-400", layer: "primitive", modes: { light: { value: ";" } } }),
+        tokens[2],
+      ];
+      const css = emitTokenCss(list, { darkMode: "auto", onSkip });
+      expect(css).not.toContain("var(--buildrick-design-blue-400)");
+      expect(onSkip).toHaveBeenCalledWith("color-primary", "unresolvable dark value");
+    });
   });
 
   it("strips control characters like the v5 escapeCssValue", () => {

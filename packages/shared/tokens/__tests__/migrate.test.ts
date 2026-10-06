@@ -2,6 +2,7 @@
 import { describe, it, expect } from "vitest";
 import { migrateTokensToV6, TokenMigrationError } from "../migrate";
 import { resolveTokenLiteral } from "../resolve";
+import { emitTokenCss } from "../emit";
 import seedOnly from "./__fixtures__/seed-only.json";
 import customColours from "./__fixtures__/custom-colours.json";
 import darkValues from "./__fixtures__/dark-values.json";
@@ -120,6 +121,31 @@ describe("migrateTokensToV6", () => {
       const rows = edit(clone(seedOnly), "color-slate-700", { darkValue: "#010203" });
       expectSameResolvedValues(rows);
       expect(migrateTokensToV6(rows).find((t) => t.id === "color-slate-700")!.layer).toBe("semantic");
+    });
+  });
+
+  describe("an empty value is absent: the seed value, as v5 emitted it (I2)", () => {
+    it.each(["", "   "])("primary %j migrates to the seed #1A56DB and emits it", (value) => {
+      const rows = edit(clone(seedOnly), "color-primary", { value });
+      const v6 = migrateTokensToV6(rows);
+      expect(resolveTokenLiteral(v6, "color-primary", "light")).toBe("#1A56DB");
+      const css = emitTokenCss(v6, { darkMode: "off" });
+      const decl = /--buildrick-design-color-primary:([^;}]*)/.exec(css)?.[1] ?? "";
+      const target = /^var\((--[^)]+)\)$/.exec(decl)?.[1];
+      const resolved = target ? new RegExp(`${target}:([^;}]*)`).exec(css)?.[1] : decl;
+      expect(resolved).toBe("#1A56DB");
+    });
+    it("a lone empty primary (no other rows) emits the seed value too", () => {
+      const v6 = migrateTokensToV6([colour("color-primary", "")]);
+      const css = emitTokenCss(v6, { darkMode: "off" });
+      expect(css).toContain("--buildrick-design-custom-color-primary:#1A56DB");
+      expect(resolveTokenLiteral(v6, "color-primary", "light")).toBe("#1A56DB");
+    });
+    it("a '{}' value (stripped to nothing at emit) is filled by the backstop, never an undefined var", () => {
+      const v6 = migrateTokensToV6([colour("color-accent", "{}")]);
+      const css = emitTokenCss(v6, { darkMode: "off" });
+      expect(css).toContain("--buildrick-design-color-accent:#15803D");
+      expect(css).not.toContain("var(--buildrick-design-custom-color-accent)");
     });
   });
 

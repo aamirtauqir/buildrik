@@ -5,6 +5,7 @@
  * never changes a resolved value; the tests prove that per fixture.
  */
 import { validateTokens, type DesignToken, type TokenRef } from "../schemas/design-tokens";
+import { LEGACY_SEED } from "./legacySeed";
 
 export class TokenMigrationError extends Error {
   constructor(readonly reason: string) {
@@ -68,12 +69,23 @@ function darkOf(r: V5Row): string | undefined {
   return d ? d : undefined;
 }
 
+const SEED_VALUE_BY_VAR = new Map(LEGACY_SEED.map((s) => [s.cssVar, s.value]));
+
+/** v5 shipped `value || seed value`: an empty (or blank) saved value meant the
+ *  seed's, so it migrates as the seed's literal. A var the seed never had keeps
+ *  its empty value, and the emitter skips it. */
+function withSeedFallback(r: V5Row): V5Row {
+  if (r.value.trim()) return r;
+  const seed = SEED_VALUE_BY_VAR.get(r.cssVar);
+  return seed === undefined ? r : { ...r, value: seed };
+}
+
 export function migrateTokensToV6(legacy: unknown): DesignToken[] {
   if (!Array.isArray(legacy)) throw new TokenMigrationError("designTokens is not an array");
   const parsed: V5Row[] = [];
   for (const [i, x] of legacy.entries()) {
     if (!isV5Row(x)) throw new TokenMigrationError(`entry ${i} is not a v5 token`);
-    parsed.push(x);
+    parsed.push(withSeedFallback(x));
   }
   // The v5 seed list declares radius/shadow ids twice under different CSS
   // vars (`--buildrick-design-*` and `--bd-*`). The `--buildrick-design-<id>`

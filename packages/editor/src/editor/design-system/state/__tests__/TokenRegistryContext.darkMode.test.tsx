@@ -2,7 +2,7 @@ import { render, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { TokenRegistryProvider } from "../TokenRegistryContext";
-import { ProjectTokensApplier } from "../../ui/ProjectTokensApplier";
+import { ProjectTokensApplier } from "@/editor/design-system/ui/ProjectTokensApplier";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 
 type Listener = (payload: unknown) => void;

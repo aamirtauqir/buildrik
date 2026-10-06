@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { setTokenLiteral, resolveTokenLiteral, lightAliasOf } from "../resolve";
-import type { DesignToken } from "../../schemas/design-tokens";
+import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
 
 const p: DesignToken = { id: "b", name: "b", kind: "color", layer: "primitive", modes: { light: { value: "#000" } }, category: "colors", cssVar: "--buildrick-design-b", type: "color" };
 const s1: DesignToken = { ...p, id: "s1", layer: "semantic", cssVar: "--buildrick-design-s1", modes: { light: { alias: "b" } } };

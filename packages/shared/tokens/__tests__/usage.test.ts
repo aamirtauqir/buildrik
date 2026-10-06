@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildTokenUsageIndex } from "../usage";
-import type { DesignToken } from "../../schemas/design-tokens";
+import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
 
 const tok = (id: string, light: DesignToken["modes"]["light"], layer: DesignToken["layer"] = "semantic"): DesignToken => ({
   id, name: id, kind: "color", layer, modes: { light }, category: "colors", cssVar: `--buildrick-design-${id}`, type: "color",
