@@ -77,60 +77,89 @@ export function migrateTokensToV6(legacy: unknown): DesignToken[] {
   }
 
   const byId = new Map(rows.map((r) => [r.id, r]));
-  // Merge equal duplicates (BRD-12). Unequal ones stay separate.
+  // v5 emitted `darkValue` only for colour tokens (CSSBundler); on any other
+  // kind it was inert, so it must not become a v6 dark mode.
+  const darkOf = (r: V5Row): string | undefined => {
+    if (r.category !== "colors" && r.kind !== "color") return undefined;
+    const d = r.darkValue?.trim();
+    return d ? d : undefined;
+  };
+
+  // Merge equal duplicates (BRD-12). Equality is exact (after trim) because the
+  // emitted literal must not change. Unequal ones stay separate.
   const legacyNamesFor = new Map<string, string[]>();
-  const dropped = new Set<string>();
+  const survivorOf = new Map<string, string>(); // dropped id → survivor id
   for (const [dupId, keepId] of Object.entries(DUPLICATE_OF)) {
     const dup = byId.get(dupId);
     const keep = byId.get(keepId);
     if (!dup || !keep) continue;
-    if (norm(dup.value) !== norm(keep.value) || norm(dup.darkValue ?? "") !== norm(keep.darkValue ?? "")) continue;
-    dropped.add(dupId);
+    if (dup.value.trim() !== keep.value.trim() || darkOf(dup) !== darkOf(keep)) continue;
+    survivorOf.set(dupId, keepId);
     legacyNamesFor.set(keepId, [...(legacyNamesFor.get(keepId) ?? []), dup.cssVar]);
   }
+  const live = (id: string) => survivorOf.get(id) ?? id;
 
   const out: DesignToken[] = [];
-  const primitiveByValue = new Map<string, string>(); // `${kind}|${value}` → primitive id
+  const primitiveByValue = new Map<string, string>(); // `${kind}|${exact value}` → primitive id
   const usedIds = new Set(rows.map((r) => r.id));
+  const usedVars = new Set(rows.map((r) => r.cssVar));
+  const keyOf = (r: V5Row, value: string) => `${kindOf(r)}|${value.trim()}`;
 
   const base = (r: V5Row) => {
     const t: Omit<DesignToken, "layer" | "modes"> = {
       id: r.id, name: r.name, kind: kindOf(r), category: r.category, cssVar: r.cssVar, type: r.type,
     };
-    for (const key of ["group", "options", "description", "friendlyName", "semanticKind", "replacedBy"] as const) {
+    for (const key of ["group", "options", "description", "friendlyName", "semanticKind"] as const) {
       if (r[key] !== undefined) Object.assign(t, { [key]: r[key] });
     }
+    if (r.replacedBy !== undefined) t.replacedBy = live(r.replacedBy);
     return t;
   };
 
+  // A v5 primitive that carries a dark value cannot be a v6 primitive (those
+  // have exactly one literal), so it migrates as a semantic token below.
+  const isPrimitive = (r: V5Row) =>
+    ((LEGACY_PRIMITIVE_IDS as readonly string[]).includes(r.id) || r.group === "primitive") && darkOf(r) === undefined;
+  const primitiveIds = new Set<string>();
   for (const r of rows) {
-    if (!(LEGACY_PRIMITIVE_IDS as readonly string[]).includes(r.id) && r.group !== "primitive") continue;
-    out.push({ ...base(r), layer: "primitive", modes: { light: { value: r.value } } });
-    primitiveByValue.set(`${kindOf(r)}|${norm(r.value)}`, r.id);
+    if (!isPrimitive(r)) continue;
+    out.push({ ...base(r), layer: "primitive", modes: { light: { value: r.value.trim() } } });
+    primitiveIds.add(r.id);
+    if (!primitiveByValue.has(keyOf(r, r.value))) primitiveByValue.set(keyOf(r, r.value), r.id);
   }
 
   const primitiveFor = (r: V5Row, value: string, suffix: string): TokenRef => {
-    const key = `${kindOf(r)}|${norm(value)}`;
+    const key = keyOf(r, value);
     const hit = primitiveByValue.get(key);
     if (hit) return { alias: hit };
     let id = `custom-${r.id}${suffix}`;
-    for (let n = 2; usedIds.has(id); n++) id = `custom-${r.id}${suffix}-${n}`;
+    for (let n = 2; usedIds.has(id) || usedVars.has(`--buildrick-design-${id}`); n++) id = `custom-${r.id}${suffix}-${n}`;
     usedIds.add(id);
+    usedVars.add(`--buildrick-design-${id}`);
     out.push({
       id, name: `${r.name}${suffix ? " (dark)" : ""}`, kind: kindOf(r), layer: "primitive",
-      modes: { light: { value } }, category: r.category, cssVar: `--buildrick-design-${id}`, type: r.type,
+      modes: { light: { value: value.trim() } }, category: r.category, cssVar: `--buildrick-design-${id}`, type: r.type,
     });
     primitiveByValue.set(key, id);
     return { alias: id };
   };
 
+  // v5 emitted `${cssVar}: ${value}` for every token; `aliasOf` was metadata.
+  // It only becomes an alias when it points at a primitive holding that exact literal.
+  const aliasTarget = (r: V5Row): string | undefined => {
+    if (!r.aliasOf) return undefined;
+    const id = live(r.aliasOf);
+    const target = byId.get(id);
+    return target && primitiveIds.has(id) && kindOf(target) === kindOf(r) && target.value.trim() === r.value.trim() ? id : undefined;
+  };
+
   for (const r of rows) {
-    if (dropped.has(r.id) || out.some((t) => t.id === r.id)) continue;
-    const kind = kindOf(r);
-    const isColour = kind === "color";
-    const light: TokenRef = r.aliasOf ? { alias: r.aliasOf } : isColour ? primitiveFor(r, r.value, "") : { value: r.value };
-    const dark: TokenRef | undefined =
-      r.darkValue === undefined || r.darkValue === "" ? undefined : isColour ? primitiveFor(r, r.darkValue, "-dark") : { value: r.darkValue };
+    if (survivorOf.has(r.id) || primitiveIds.has(r.id)) continue;
+    const isColour = kindOf(r) === "color";
+    const target = aliasTarget(r);
+    const light: TokenRef = target ? { alias: target } : isColour ? primitiveFor(r, r.value, "") : { value: r.value.trim() };
+    const darkValue = darkOf(r);
+    const dark: TokenRef | undefined = darkValue === undefined ? undefined : isColour ? primitiveFor(r, darkValue, "-dark") : { value: darkValue };
     const legacyNames = legacyNamesFor.get(r.id);
     out.push({
       ...base(r), layer: "semantic",
