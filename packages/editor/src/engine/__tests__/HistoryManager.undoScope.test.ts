@@ -10,7 +10,7 @@
  */
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { Composer } from "@/engine/Composer";
-import type { DesignTokenRecord } from "@/shared/types/project";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 function pageData() {
   return {
@@ -82,11 +82,11 @@ describe("undo scope (A-4 / PD-12)", () => {
   });
 
   it("design tokens stay undoable", () => {
-    const token = { id: "t1", kind: "color", name: "Brand", cssVar: "--brand", value: "#1A56DB" };
+    const token = v6Token({ id: "t1", name: "Brand", cssVar: "--brand", value: "#1A56DB" });
     composer.history.record("baseline");
     composer.setProjectSettings({
       ...composer.getProjectSettings(),
-      designTokens: [token as unknown as DesignTokenRecord],
+      designTokens: [token],
     });
     composer.history.flushPending();
     composer.history.record("add token");

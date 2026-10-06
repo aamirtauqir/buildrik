@@ -27,6 +27,7 @@ import { ExportEngine } from "../ExportEngine";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { CATALOG } from "@/editor/components-catalog/catalog";
 import { placeCatalogComponent } from "@/editor/components-catalog/placeCatalogComponent";
+import { setTokenLiteral } from "@buildrik/shared/tokens";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -43,8 +44,8 @@ function undeclared(doc: string): string[] {
 
 /* A site that saved its brand once: colours and fonts only — the shape the
    audit's scratch site had. No button or form token among them. */
-const SAVED_BRAND = DEFAULT_TOKENS.filter((t) => t.category === "colors" || t.category === "typography").map(
-  (t) => (t.id === "color-primary" ? { ...t, value: "#B91C1C" } : t)
+const SAVED_BRAND = setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#B91C1C").filter(
+  (t) => t.category === "colors" || t.category === "typography"
 );
 
 describe.each([

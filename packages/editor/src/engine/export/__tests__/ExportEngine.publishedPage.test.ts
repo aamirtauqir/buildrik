@@ -14,6 +14,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { Composer } from "../../Composer";
 import { ExportEngine } from "../ExportEngine";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({
@@ -54,8 +55,8 @@ function fullSite() {
   composer.setProjectSettings({
     ...composer.getProjectSettings(),
     designTokens: [
-      { id: "font-body", name: "font-body", value: "Verdana", cssVar: "--buildrick-design-font-body", category: "typography", type: "string" },
-      { id: "color-text", name: "color-text", value: "#334155", cssVar: "--buildrick-design-color-text", category: "colors", type: "color" },
+      v6Token({ id: "font-body", value: "Verdana", kind: "type", category: "typography", type: "string" }),
+      v6Token({ id: "color-text", value: "#334155" }),
     ],
     customCode: { headScripts: '<script src="https://plausible.io/js/script.js"></script>' },
     analytics: { googleAnalytics: { enabled: true, measurementId: "G-FULLSITE" } },

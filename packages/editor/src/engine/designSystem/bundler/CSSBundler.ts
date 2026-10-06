@@ -1,4 +1,5 @@
-import type { DesignToken } from "../types";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import type { DesignToken } from "@/engine/designSystem/types";
 
 export interface BundleOptions {
   /**
@@ -59,21 +60,21 @@ export class CSSBundler {
     const indent = opts.pretty ? "  " : "";
     const nl = opts.pretty ? "\n" : "";
 
-    // Light block — every token contributes its `value`.
+    // Light block — every token contributes its light literal.
     const lightLines: string[] = [];
     for (const t of tokens) {
-      lightLines.push(`${indent}${t.cssVar}: ${escapeCssValue(t.value)};`);
+      lightLines.push(`${indent}${t.cssVar}: ${escapeCssValue(resolveTokenLiteral(tokens, t.id, "light") ?? "")};`);
     }
 
     let bundle = `:root {${nl}${lightLines.join(nl)}${nl}}`;
 
-    // Dark block — only color tokens with darkValue. Skip if strategy=off.
+    // Dark block — only color tokens with a dark mode. Skip if strategy=off.
     if (opts.darkStrategy !== "off") {
       const darkColorLines: string[] = [];
       for (const t of tokens) {
         if (!isColorToken(t)) continue;
-        if (t.darkValue === undefined) continue;
-        darkColorLines.push(`${indent}${indent}${t.cssVar}: ${escapeCssValue(t.darkValue)};`);
+        if (!t.modes.dark) continue;
+        darkColorLines.push(`${indent}${indent}${t.cssVar}: ${escapeCssValue(resolveTokenLiteral(tokens, t.id, "dark") ?? "")};`);
       }
 
       if (darkColorLines.length > 0) {

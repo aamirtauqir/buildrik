@@ -17,12 +17,13 @@
 
 import { describe, it, expect } from "vitest";
 import { siteTokensCSS } from "../ExportHelpers";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 describe("siteTokensCSS", () => {
   it("declares every token that has a cssVar", () => {
     const css = siteTokensCSS([
-      { cssVar: "--buildrick-design-color-text-primary", value: "#22AA66" },
-      { cssVar: "--buildrick-design-space-4", value: "16px" },
+      v6Token({ id: "color-text-primary", cssVar: "--buildrick-design-color-text-primary", value: "#22AA66" }),
+      v6Token({ id: "space-4", cssVar: "--buildrick-design-space-4", value: "16px" }),
     ]);
     expect(css).toContain("--buildrick-design-color-text-primary:#22AA66");
     expect(css).toContain("--buildrick-design-space-4:16px");
@@ -41,11 +42,11 @@ describe("siteTokensCSS", () => {
   });
 
   it("a saved value wins over the seed, by cssVar and by id", () => {
-    expect(siteTokensCSS([{ cssVar: "--buildrick-design-btn-radius", value: "2px" }])).toContain(
+    expect(siteTokensCSS([v6Token({ id: "my-radius", cssVar: "--buildrick-design-btn-radius", value: "2px" })])).toContain(
       "--buildrick-design-btn-radius:2px"
     );
     /* A saved row whose cssVar is not the seed's still feeds the seed's name. */
-    const css = siteTokensCSS([{ id: "btn-radius", cssVar: "--legacy-btn-radius", value: "3px" }]);
+    const css = siteTokensCSS([v6Token({ id: "btn-radius", cssVar: "--legacy-btn-radius", value: "3px" })]);
     expect(css).toContain("--legacy-btn-radius:3px");
     expect(css).toContain("--buildrick-design-btn-radius:3px");
     expect(css).not.toContain("--buildrick-design-btn-radius:8px");
@@ -53,10 +54,10 @@ describe("siteTokensCSS", () => {
 
   it("skips records with no cssVar or no value rather than writing `:undefined`", () => {
     const css = siteTokensCSS([
-      { cssVar: "", value: "#fff" },
-      { cssVar: "--buildrick-design-color-x", value: "" },
-      { cssVar: "color-y", value: "#000" },
-      { cssVar: "--buildrick-design-ok", value: "#123456" },
+      v6Token({ id: "no-var", cssVar: "", value: "#fff" }),
+      v6Token({ id: "color-x", cssVar: "--buildrick-design-color-x", value: "" }),
+      v6Token({ id: "color-y", cssVar: "color-y", value: "#000" }),
+      v6Token({ id: "ok", cssVar: "--buildrick-design-ok", value: "#123456" }),
     ]);
     expect(css.startsWith("\n:root{--buildrick-design-ok:#123456;")).toBe(true);
     expect(css).not.toContain("--buildrick-design-color-x:");
@@ -66,8 +67,8 @@ describe("siteTokensCSS", () => {
 
   it("keeps the first declaration when a cssVar repeats", () => {
     const css = siteTokensCSS([
-      { cssVar: "--buildrick-design-color-a", value: "#111111" },
-      { cssVar: "--buildrick-design-color-a", value: "#222222" },
+      v6Token({ id: "color-a", cssVar: "--buildrick-design-color-a", value: "#111111" }),
+      v6Token({ id: "color-a-again", cssVar: "--buildrick-design-color-a", value: "#222222" }),
     ]);
     expect(css).toContain("--buildrick-design-color-a:#111111");
     expect(css).not.toContain("#222222");
@@ -77,13 +78,13 @@ describe("siteTokensCSS", () => {
      open a block, or close the surrounding </style>. */
   it("strips the characters that would let a value escape its declaration", () => {
     expect(
-      siteTokensCSS([{ cssVar: "--buildrick-design-x", value: "red;} body{display:none" }])
+      siteTokensCSS([v6Token({ id: "x", cssVar: "--buildrick-design-x", value: "red;} body{display:none" })])
     ).toContain(":root{--buildrick-design-x:red bodydisplay:none;");
   });
 
   it("cannot close the style element", () => {
     const css = siteTokensCSS([
-      { cssVar: "--buildrick-design-x", value: "red</style><script>go()</script>" },
+      v6Token({ id: "x", cssVar: "--buildrick-design-x", value: "red</style><script>go()</script>" }),
     ]);
     expect(css).not.toContain("</style>");
     expect(css).not.toContain("<script");
@@ -95,7 +96,7 @@ describe("siteTokensCSS", () => {
    pin all three at once for the token definitions. */
 describe("the three documents carry the token definitions", () => {
   const tokens = [
-    { id: "color-text-primary", name: "Text Primary", cssVar: "--buildrick-design-color-text-primary", value: "#22AA66", category: "colors", type: "color" },
+    v6Token({ id: "color-text-primary", name: "Text Primary", value: "#22AA66" }),
   ];
 
   function makeComposer() {

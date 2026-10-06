@@ -41,6 +41,7 @@ import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/intera
 import { escapeHTML } from "../shared/utils/html/encoding";
 import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import { copyIdKeyedRecord, copyIdKeyedStyles, type IdRename } from "@buildrik/shared/content/elementIds";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
@@ -302,12 +303,12 @@ export class Composer extends EventEmitter {
         if (!hint) return null;
         const settings = this.getProjectSettings();
         const tokens = settings.designTokens ?? [];
-        const target = tokens.find((t) => t.id === tokenId);
-        if (!target) return null;
-        const fixed = applyContrastFix(target.value, hint);
-        if (fixed === target.value) return null;
+        const current = resolveTokenLiteral(tokens, tokenId, "light");
+        if (current === null) return null;
+        const fixed = applyContrastFix(current, hint);
+        if (fixed === current) return null;
         this.beginTransaction("Auto-fix contrast");
-        const updated = tokens.map((t) => (t.id === tokenId ? { ...t, value: fixed } : t));
+        const updated = setTokenLiteral(tokens, tokenId, "light", fixed);
         this.setProjectSettings({ ...settings, designTokens: updated });
         this.endTransaction();
         return fixed;
@@ -318,9 +319,9 @@ export class Composer extends EventEmitter {
         const target = tokens.find((t) => t.id === tokenId);
         if (!target) return null; // unknown id — never write a token that isn't registered
         if (!isAiEditableTokenValue(target.type, value)) return null; // per-type value guard
-        if (value === target.value) return null; // no-op
+        if (value === resolveTokenLiteral(tokens, tokenId, "light")) return null; // no-op
         this.beginTransaction("Set design token");
-        const updated = tokens.map((t) => (t.id === tokenId ? { ...t, value } : t));
+        const updated = setTokenLiteral(tokens, tokenId, "light", value);
         this.setProjectSettings({ ...settings, designTokens: updated });
         this.endTransaction();
         return value;

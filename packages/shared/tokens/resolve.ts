@@ -21,6 +21,11 @@ export function resolveTokenLiteral(
   return null;
 }
 
+/** The id a token's light mode aliases, or undefined when it holds a literal. */
+export function lightAliasOf(token: DesignToken): string | undefined {
+  return "alias" in token.modes.light ? token.modes.light.alias : undefined;
+}
+
 /** Writes a literal for a token in a mode. A semantic token aliasing a
  *  primitive writes through to that primitive only if no other token aliases
  *  it; otherwise it gets its own literal so siblings do not change. */

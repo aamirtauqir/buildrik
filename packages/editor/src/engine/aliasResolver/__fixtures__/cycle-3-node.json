@@ -3,35 +3,47 @@
     {
       "id": "a",
       "name": "A",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "b"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-a",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "A",
-      "aliasOf": "b"
+      "friendlyName": "A"
     },
     {
       "id": "b",
       "name": "B",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "c"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-b",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "B",
-      "aliasOf": "c"
+      "friendlyName": "B"
     },
     {
       "id": "c",
       "name": "C",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "a"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-c",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "C",
-      "aliasOf": "a"
+      "friendlyName": "C"
     }
   ]
 }

@@ -7,7 +7,9 @@
 import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
 import { THEME } from "../../shared/constants/defaultStyles";
 import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { DEFAULT_TOKENS } from "../designSystem/defaultTokens";
+import type { DesignToken } from "../designSystem/types";
 
 // ============================================================================
 // RESET CSS
@@ -34,9 +36,10 @@ function tokenList<T>(tokens: ReadonlyArray<T> | null | undefined): ReadonlyArra
 }
 
 export function siteFontsFromTokens(
-  tokens: ReadonlyArray<{ id?: string; value?: string }> | null = []
+  tokens: readonly DesignToken[] | null = []
 ): { heading?: string; body?: string; mono?: string; text?: string } {
-  const value = (id: string) => tokenList(tokens).find((t) => t.id === id)?.value;
+  const list = tokenList(tokens);
+  const value = (id: string) => resolveTokenLiteral(list, id, "light") ?? undefined;
   return {
     heading: value("font-heading"),
     body: value("font-body"),
@@ -102,22 +105,26 @@ export function siteFontCSS(fonts: {
  * opens a block, and `<` could close the surrounding `</style>`.
  */
 export function siteTokensCSS(
-  tokens: ReadonlyArray<{ id?: string; cssVar?: string; value?: string }> | null = []
+  tokens: readonly DesignToken[] | null = [],
+  mode: "light" | "dark" = "light"
 ): string {
   const saved = tokenList(tokens);
-  const savedById = new Map(saved.filter((t) => t.id).map((t) => [t.id, t]));
-  const seed = DEFAULT_TOKENS.map((d) => ({
-    cssVar: d.cssVar,
-    value: savedById.get(d.id)?.value || d.value,
-  }));
+  const savedIds = new Set(saved.map((t) => t.id));
+  const literal = (t: DesignToken) =>
+    (savedIds.has(t.id) ? resolveTokenLiteral(saved, t.id, mode) : null) ||
+    resolveTokenLiteral(DEFAULT_TOKENS, t.id, "light");
   const decls: string[] = [];
   const seen = new Set<string>();
-  for (const t of [...saved, ...seed]) {
-    const name = (t.cssVar ?? "").trim();
-    const value = (t.value ?? "").trim().replace(/[;{}<]/g, "");
-    if (!name.startsWith("--") || !value || seen.has(name)) continue;
-    seen.add(name);
-    decls.push(`${name}:${value}`);
+  for (const t of [...saved, ...DEFAULT_TOKENS]) {
+    const value = (literal(t) ?? "").trim().replace(/[;{}<]/g, "");
+    /* A merged duplicate's old var (v6 `legacyNames`) is still read by pages
+       saved before the merge, so it is declared alongside. */
+    for (const cssVar of [t.cssVar, ...(t.legacyNames ?? [])]) {
+      const name = cssVar.trim();
+      if (!name.startsWith("--") || !value || seen.has(name)) continue;
+      seen.add(name);
+      decls.push(`${name}:${value}`);
+    }
   }
   return decls.length ? `\n:root{${decls.join(";")}}\n` : "";
 }

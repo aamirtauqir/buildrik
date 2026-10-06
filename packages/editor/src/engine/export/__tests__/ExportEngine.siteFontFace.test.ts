@@ -16,6 +16,7 @@ import JSZip from "jszip";
 import { Composer } from "../../Composer";
 import { ExportEngine } from "../ExportEngine";
 import { devWarn } from "../../../shared/utils/devLogger";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 vi.mock("../../../shared/utils/devLogger", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../../shared/utils/devLogger")>()),
@@ -71,9 +72,7 @@ async function site(opts: {
   if (opts.tokens) {
     composer.setProjectSettings({
       ...composer.getProjectSettings(),
-      designTokens: opts.tokens.map((t) => ({
-        ...t, name: t.id, cssVar: `--buildrick-design-${t.id}`, category: "typography" as const, type: "string",
-      })),
+      designTokens: opts.tokens.map((t) => v6Token({ ...t, kind: "type", category: "typography", type: "string" })),
     } as never);
   }
   // The ADDED site font — what `getAllFonts({ source: "custom" })` lists.
@@ -126,8 +125,7 @@ describe("the head declares the site's own faces before it asks Google for the r
     const composer = await site(google);
     composer.setProjectSettings({
       ...composer.getProjectSettings(),
-      designTokens: [{ id: "font-body", name: "font-body", value: "Poppins",
-        cssVar: "--buildrick-design-font-body", category: "typography", type: "string" }],
+      designTokens: [v6Token({ id: "font-body", value: "Poppins", kind: "type", category: "typography", type: "string" })],
     } as never);
     return composer;
   };

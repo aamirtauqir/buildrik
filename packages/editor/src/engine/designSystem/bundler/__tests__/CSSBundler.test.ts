@@ -1,24 +1,23 @@
 import { describe, it, expect } from "vitest";
 import { CSSBundler } from "../CSSBundler";
 import type { DesignToken } from "../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const tokens: DesignToken[] = [
-  {
+  v6Token({
     id: "color-primary", name: "Primary", value: "#3B82F6",
-    category: "colors", cssVar: "--buildrick-design-color-primary",
-    type: "color", kind: "color", darkValue: "#60A5FA",
-  },
-  {
+    cssVar: "--buildrick-design-color-primary", dark: "#60A5FA",
+  }),
+  v6Token({
     id: "color-text", name: "Text", value: "#334155",
-    category: "colors", cssVar: "--buildrick-design-color-text",
-    type: "color", kind: "color",
-    // no darkValue
-  },
-  {
+    cssVar: "--buildrick-design-color-text",
+    // no dark mode
+  }),
+  v6Token({
     id: "spacing-md", name: "Spacing MD", value: "16px",
-    category: "spacing", cssVar: "--buildrick-design-spacing-md",
+    kind: "spacing", category: "spacing", cssVar: "--buildrick-design-spacing-md",
     type: "length",
-  },
+  }),
 ];
 
 describe("CSSBundler.bundle", () => {
@@ -75,10 +74,7 @@ describe("CSSBundler.bundle", () => {
 
   it("escapes control chars from token values (defensive)", () => {
     const dangerous: DesignToken[] = [
-      {
-        id: "x", name: "X", value: "#fff} body { background: url('evil')",
-        category: "colors", cssVar: "--bd-x", type: "color",
-      },
+      v6Token({ id: "x", name: "X", value: "#fff} body { background: url('evil')", cssVar: "--bd-x" }),
     ];
     const bundler = new CSSBundler();
     const css = bundler.bundle(dangerous);

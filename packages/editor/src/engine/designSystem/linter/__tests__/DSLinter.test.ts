@@ -1,13 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { DSLinter } from "../DSLinter";
 import type { DesignToken, StylePreset, PresetBinding } from "../../types";
+import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
-function makeColor(id: string, value: string, darkValue?: string): DesignToken {
-  return {
-    id, name: id, value,
-    category: "colors", cssVar: `--bd-${id}`, type: "color", kind: "color",
-    ...(darkValue !== undefined ? { darkValue } : {}),
-  };
+/** A semantic colour token — the layer every v5 colour token but the
+ *  primitives migrated to, and the one a dark mode can live on. */
+function makeColor(id: string, value: string, darkValue?: string, extra: Partial<V6TokenSpec> = {}): DesignToken {
+  return v6Token({ id, value, dark: darkValue, layer: "semantic", cssVar: `--bd-${id}`, ...extra });
 }
 
 function bind(tokenId: string): PresetBinding {
@@ -35,7 +34,7 @@ describe("DSLinter.lint — semantic-needs-alias (B5 lock 2026-05-16)", () => {
     // only enforce semantic-needs-alias on tokens that DECLARE semanticKind.
     const tokens: DesignToken[] = [
       makeColor("color-brand-primary", "#2D6DFF"),
-      { ...makeColor("color-brand-hover", ""), aliasOf: "color-brand-primary" /* semanticKind undefined */ },
+      makeColor("color-brand-hover", "", undefined, { alias: "color-brand-primary" }) /* semanticKind undefined */,
     ];
     const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "semantic-needs-alias");
     expect(issues).toEqual([]);
@@ -44,7 +43,7 @@ describe("DSLinter.lint — semantic-needs-alias (B5 lock 2026-05-16)", () => {
   it("does NOT flag a semantic token that has aliasOf (well-formed)", () => {
     const tokens: DesignToken[] = [
       makeColor("color-brand-primary", "#2D6DFF"),
-      { ...makeColor("action-default", ""), semanticKind: "action", aliasOf: "color-brand-primary" },
+      makeColor("action-default", "", undefined, { semanticKind: "action", alias: "color-brand-primary" }),
     ];
     const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "semantic-needs-alias");
     expect(issues).toEqual([]);
@@ -52,7 +51,7 @@ describe("DSLinter.lint — semantic-needs-alias (B5 lock 2026-05-16)", () => {
 
   it("flags semantic-needs-alias when semanticKind set but aliasOf missing", () => {
     const tokens: DesignToken[] = [
-      { ...makeColor("action-orphan", ""), semanticKind: "action" /* aliasOf missing */ },
+      makeColor("action-orphan", "", undefined, { semanticKind: "action" }) /* aliasOf missing */,
     ];
     const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "semantic-needs-alias");
     expect(issues).toHaveLength(1);
@@ -66,9 +65,9 @@ describe("DSLinter.lint — semantic-needs-alias (B5 lock 2026-05-16)", () => {
 describe("DSLinter.lint — alias-depth-exceeded (B2 lock 2026-05-16)", () => {
   it("does NOT flag a depth-2 alias chain (a → b → c)", () => {
     const tokens: DesignToken[] = [
-      { ...makeColor("c", "#2D6DFF"), aliasOf: undefined },
-      { ...makeColor("b", ""), aliasOf: "c" },
-      { ...makeColor("a", ""), aliasOf: "b" },
+      makeColor("c", "#2D6DFF"),
+      makeColor("b", "", undefined, { alias: "c" }),
+      makeColor("a", "", undefined, { alias: "b" }),
     ];
     const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "alias-depth-exceeded");
     expect(issues).toEqual([]);
@@ -76,10 +75,10 @@ describe("DSLinter.lint — alias-depth-exceeded (B2 lock 2026-05-16)", () => {
 
   it("does NOT flag a depth-3 alias chain (a → b → c → d)", () => {
     const tokens: DesignToken[] = [
-      { ...makeColor("d", "#2D6DFF"), aliasOf: undefined },
-      { ...makeColor("c", ""), aliasOf: "d" },
-      { ...makeColor("b", ""), aliasOf: "c" },
-      { ...makeColor("a", ""), aliasOf: "b" },
+      makeColor("d", "#2D6DFF"),
+      makeColor("c", "", undefined, { alias: "d" }),
+      makeColor("b", "", undefined, { alias: "c" }),
+      makeColor("a", "", undefined, { alias: "b" }),
     ];
     const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "alias-depth-exceeded");
     expect(issues).toEqual([]);
@@ -87,11 +86,11 @@ describe("DSLinter.lint — alias-depth-exceeded (B2 lock 2026-05-16)", () => {
 
   it("flags a depth-4 alias chain (a → b → c → d → e) on the entry token only", () => {
     const tokens: DesignToken[] = [
-      { ...makeColor("e", "#2D6DFF"), aliasOf: undefined },
-      { ...makeColor("d", ""), aliasOf: "e" },
-      { ...makeColor("c", ""), aliasOf: "d" },
-      { ...makeColor("b", ""), aliasOf: "c" },
-      { ...makeColor("a", ""), aliasOf: "b" },
+      makeColor("e", "#2D6DFF"),
+      makeColor("d", "", undefined, { alias: "e" }),
+      makeColor("c", "", undefined, { alias: "d" }),
+      makeColor("b", "", undefined, { alias: "c" }),
+      makeColor("a", "", undefined, { alias: "b" }),
     ];
     const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "alias-depth-exceeded");
     expect(issues).toHaveLength(1);
@@ -159,7 +158,7 @@ describe("DSLinter.lint", () => {
   it("flags empty value (color token: warning, non-color token: error)", () => {
     const tokens: DesignToken[] = [
       makeColor("color-empty", ""),
-      { id: "spacing-empty", name: "Spacing", value: "", category: "spacing", cssVar: "--bd-sp", type: "length" },
+      v6Token({ id: "spacing-empty", name: "Spacing", value: "", kind: "spacing", category: "spacing", cssVar: "--bd-sp", type: "length" }),
     ];
     const issues = new DSLinter().lint(tokens);
     const empty = issues.filter((i) => i.rule === "empty-value");
@@ -189,6 +188,15 @@ describe("DSLinter.lint", () => {
     const missing = issues.filter((i) => i.rule === "missing-dark");
     expect(missing.map((i) => i.tokenId).sort()).toEqual(["color-muted", "color-text"]);
     expect(missing.every((i) => i.severity === "warning")).toBe(true);
+  });
+
+  it("missing-dark: never asks a primitive, which cannot carry a dark mode (v6)", () => {
+    const tokens = [
+      makeColor("color-primary", "#2D6DFF", "#60A5FA"),
+      v6Token({ id: "color-brand-500", value: "#1A56DB" }),
+    ];
+    const issues = new DSLinter().lint(tokens);
+    expect(issues.filter((i) => i.rule === "missing-dark")).toHaveLength(0);
   });
 
   it("returns issues in deterministic per-token order", () => {
@@ -286,7 +294,7 @@ describe("autoFixHint — the rules that can be fixed mechanically say how (B9 /
   it("pure-black carries lighten-22, the one-step move off #000", () => {
     const linter = new DSLinter();
     const issues = linter.lint([
-      { id: "color-ink", name: "Ink", kind: "color", category: "colors", value: "#000000" } as never,
+      v6Token({ id: "color-ink", name: "Ink", value: "#000000" }),
     ]);
     const black = issues.find((i) => i.rule === "pure-black");
     expect(black?.autoFixHint).toBe("lighten-22");
@@ -295,7 +303,7 @@ describe("autoFixHint — the rules that can be fixed mechanically say how (B9 /
   it("banned-hue carries no hint — which colour replaces purple is a decision, not a step", () => {
     const linter = new DSLinter();
     const issues = linter.lint([
-      { id: "color-accent", name: "Accent", kind: "color", category: "colors", value: "#8B5CF6" } as never,
+      v6Token({ id: "color-accent", name: "Accent", value: "#8B5CF6" }),
     ]);
     const hue = issues.find((i) => i.rule === "banned-hue");
     expect(hue).toBeDefined();
