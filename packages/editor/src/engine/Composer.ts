@@ -66,6 +66,9 @@ import { LintState } from "./designSystem/LintState";
 import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import { applyContrastFix } from "./designSystem/contrastFix";
 import { isAiEditableTokenValue } from "./designSystem/tokenValueGuard";
+import { mergeProjectTokens } from "./designSystem/projectTokens";
+import type { DesignToken } from "./designSystem/types";
+import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { CSSBundler } from "./designSystem/bundler";
 import { DSLinter } from "./designSystem/linter";
 import { AIAssistService } from "./designSystem/services";
@@ -235,6 +238,16 @@ export class Composer extends EventEmitter {
      * The single engine write path means the AI never touches the React hooks.
      */
     readonly setDesignToken: (tokenId: string, value: string) => string | null;
+    /**
+     * THE token write (spec §4: one undo stack). Validates the whole v6 set
+     * and writes `projectSettings.designTokens` + schema version 6 inside one
+     * labelled transaction, so a multi-token edit is one ⌘Z step shared with
+     * canvas history. Brand, "Update everywhere", import, starters, auto-fix
+     * and the AI write all land here. Returns false and writes nothing when
+     * the tokens are read-only or the set does not validate. A successful
+     * write announces `EVENTS.BRAND_APPLIED` (onboarding's "Set your brand").
+     */
+    readonly setTokens: (next: DesignToken[], label: string) => boolean;
   };
 
   constructor(config: ComposerConfig) {
@@ -306,30 +319,44 @@ export class Composer extends EventEmitter {
       },
       applyAutoFix: (tokenId, hint) => {
         if (!hint) return null;
-        const settings = this.getProjectSettings();
-        const tokens = settings.designTokens ?? [];
+        const tokens = this.mergedDesignTokens();
         const current = resolveTokenLiteral(tokens, tokenId, "light");
         if (current === null) return null;
         const fixed = applyContrastFix(current, hint);
         if (fixed === current) return null;
-        this.beginTransaction("Auto-fix contrast");
-        const updated = setTokenLiteral(tokens, tokenId, "light", fixed);
-        this.setProjectSettings({ ...settings, designTokens: updated });
-        this.endTransaction();
-        return fixed;
+        return this.designSystem.setTokens(setTokenLiteral(tokens, tokenId, "light", fixed), "Auto-fix contrast")
+          ? fixed
+          : null;
       },
       setDesignToken: (tokenId, value) => {
-        const settings = this.getProjectSettings();
-        const tokens = settings.designTokens ?? [];
+        const tokens = this.mergedDesignTokens();
         const target = tokens.find((t) => t.id === tokenId);
         if (!target) return null; // unknown id — never write a token that isn't registered
         if (!isAiEditableTokenValue(target.type, value)) return null; // per-type value guard
         if (value === resolveTokenLiteral(tokens, tokenId, "light")) return null; // no-op
-        this.beginTransaction("Set design token");
-        const updated = setTokenLiteral(tokens, tokenId, "light", value);
-        this.setProjectSettings({ ...settings, designTokens: updated });
-        this.endTransaction();
-        return value;
+        return this.designSystem.setTokens(setTokenLiteral(tokens, tokenId, "light", value), "Set design token")
+          ? value
+          : null;
+      },
+      setTokens: (next, label) => {
+        if (this.designSystem.readOnly) return false;
+        const checked = validateTokens(next);
+        if (!checked.ok) {
+          console.warn(`[tokens] refused "${label}": ${checked.reason}`);
+          return false;
+        }
+        this.beginTransaction(label);
+        try {
+          this.setProjectSettings({
+            ...this.getProjectSettings(),
+            designTokens: checked.tokens,
+            designTokensSchemaVersion: TOKENS_SCHEMA_VERSION,
+          });
+        } finally {
+          this.endTransaction();
+        }
+        this.emit(EVENTS.BRAND_APPLIED, undefined);
+        return true;
       },
     };
     // Recompute token usage whenever element trees or styles change. These
@@ -872,6 +899,13 @@ ${html}${interactionScript}
     if (options?.emitProjectChanged !== false) {
       this.emit(EVENTS.PROJECT_CHANGED);
     }
+  }
+
+  /** The site's tokens as every write starts from them: the saved set merged
+   *  over the seed (strict, never throws). */
+  private mergedDesignTokens(): DesignToken[] {
+    const settings = this.getProjectSettings();
+    return mergeProjectTokens(settings.designTokens ?? [], settings.designTokensSchemaVersion);
   }
 
   /**
