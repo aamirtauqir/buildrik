@@ -3,3 +3,4 @@ export { migrateTokensToV6, TokenMigrationError, LEGACY_PRIMITIVE_IDS } from "./
 export { resolveTokenLiteral } from "./resolve";
 export { emitTokenCss } from "./emit";
 export { LEGACY_SEED } from "./legacySeed";
+export { buildTokenUsageIndex } from "./usage";
