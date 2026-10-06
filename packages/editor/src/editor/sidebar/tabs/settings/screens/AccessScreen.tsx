@@ -74,6 +74,14 @@ export const AccessScreen: React.FC<ScreenProps> = ({
   const [password, setPassword] = React.useState("");
   /* Stored password: the New password field is open (Change). */
   const [changing, setChanging] = React.useState(false);
+  /* Remove unmounts its own button; focus goes to the switch row it leaves behind. */
+  const switchRowRef = React.useRef<HTMLDivElement>(null);
+  const focusSwitchRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!focusSwitchRef.current || enabled) return;
+    focusSwitchRef.current = false;
+    switchRowRef.current?.querySelector<HTMLElement>('[role="switch"]')?.focus();
+  }, [enabled]);
 
   const load = useServerLoad<{ hasPublishedPassword?: boolean }>(
     projectId,
@@ -194,7 +202,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
         <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-access-purpose">
           {PURPOSE}
         </p>
-        <div className="tw:flex tw:min-h-8 tw:items-center tw:gap-4">
+        <div ref={switchRowRef} className="tw:flex tw:min-h-8 tw:items-center tw:gap-4">
           <span id="access-password-toggle-label" className={SET_ROW_LABEL}>
             Password protection
           </span>
@@ -275,6 +283,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
               variant="ghost"
               className={QUIET_BTN}
               onClick={() => {
+                focusSwitchRef.current = true;
                 setEnabled(false);
                 setChanging(false);
                 setPassword("");
