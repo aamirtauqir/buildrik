@@ -218,8 +218,8 @@ describe("entries cross-site guard", () => {
     expect(stored).not.toMatch(/<img/i);
   });
 
-  it("stripMarkup has no fixed pass limit — a payload nested past any small cap still loses its markup", async () => {
-    // A fixed N-pass cap fails OPEN: build a payload that still has live
+  it("stripMarkup pass cap fails closed — a payload nested past the cap still loses its markup", async () => {
+    // A cap that returned the text unchanged would fail OPEN: build a payload that still has live
     // markup after N passes by re-wrapping the tag N times over.
     let payload = "<img src=x onerror=alert(1)>";
     for (let i = 0; i < 10; i++) payload = payload.replace(/</g, "<<i>");

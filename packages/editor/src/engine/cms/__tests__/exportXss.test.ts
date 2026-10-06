@@ -53,6 +53,18 @@ describe("XSS through the export path", () => {
     expect(doc.querySelector('[data-buildrick-id="plain"]')!.textContent).toBe(payload);
   });
 
+  it("raw-text elements in a list template are not substituted: <script>{{item.name}}</script>", async () => {
+    const doc = await exportWith(
+      "</script><script>alert(1)</script>",
+      '<div data-buildrick-id="list"><script data-buildrick-id="s">var a = "{{item.name}}";</script><style data-buildrick-id="st">.x::after{content:"{{item.name}}"}</style><textarea data-buildrick-id="ta">{{item.name}}</textarea></div>',
+    );
+    const scripts = Array.from(doc.querySelectorAll("script"));
+    expect(scripts).toHaveLength(1);
+    /* The record's value never lands there; the leftover placeholder is blanked (BD-06). */
+    for (const raw of [scripts[0], doc.querySelector("style")!]) expect(raw.textContent).not.toMatch(/alert|<|Margherita/);
+    expect(doc.querySelector("textarea")!.value).not.toContain("alert");
+  });
+
   it("a plain value with <script> lands as text: <p>{{item.x}}</p>", async () => {
     const doc = await exportWith("<script>alert(1)</script>", '<div data-buildrick-id="list"><p data-buildrick-id="p">{{item.name}}</p></div>');
     expect(doc.querySelector("script")).toBeNull();

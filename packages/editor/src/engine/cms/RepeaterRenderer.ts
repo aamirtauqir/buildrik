@@ -12,6 +12,11 @@ import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
 
+/** Elements whose content is raw text, never HTML text. */
+const RAW_TEXT_SELECTOR = "script, style, xmp, iframe, noembed, noframes, noscript, textarea, title";
+
+const escapeRegExp = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 /**
  * Set on an element inside a Collection list whose field bindings were filled
  * from the list's CURRENT record (C0.8), valued with that collection's id. The
@@ -388,7 +393,12 @@ export class RepeaterRenderer {
     if (cloneId) el.setAttribute("data-buildrick-id", cloneId);
 
     // Process text content in all child elements
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    /* Not inside a raw-text element: its content is not HTML text, so a value
+       substituted there (`</script><script>…`) would close the element
+       (server A17 skips the same set). */
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement?.closest(RAW_TEXT_SELECTOR) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
     const textNodes: Text[] = [];
 
     let node: Text | null;
@@ -476,7 +486,7 @@ export class RepeaterRenderer {
         // entity-encodes it — no manual escaping needed (and pre-escaping
         // here would double-encode the attribute).
         Object.keys(item.data).forEach((fieldName) => {
-          const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
+          const fieldPattern = new RegExp(`\\{\\{\\s*${escapeRegExp(itemVar)}\\.${escapeRegExp(fieldName)}\\s*\\}\\}`, "g");
           if (fieldPattern.test(value)) {
             value = value.replace(fieldPattern, () => valueOf(fieldName));
             modified = true;
