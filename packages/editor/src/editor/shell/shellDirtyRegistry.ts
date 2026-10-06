@@ -41,8 +41,6 @@ export const shellDirty = {
   /** True when ANY registered domain is dirty — what leaving the editor
    *  (exit, beforeunload) or switching a left-panel tab can lose. */
   get: (): boolean => dirtyDomains().length > 0,
-  /** The dirty domains, in a fixed order — for the confirm's copy. */
-  dirtyDomains,
   /** Each producer owns its own entry: it sets it from its dirty state and
    *  clears it when its surface unmounts or discards — never anyone else. */
   set: (domain: DirtyDomain, dirty: boolean): void => {

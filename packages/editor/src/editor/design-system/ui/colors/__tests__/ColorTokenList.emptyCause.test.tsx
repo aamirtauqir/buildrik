@@ -13,7 +13,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ColorTokenList } from "../ColorTokenList";
-import type { DesignToken } from "../../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const base = {

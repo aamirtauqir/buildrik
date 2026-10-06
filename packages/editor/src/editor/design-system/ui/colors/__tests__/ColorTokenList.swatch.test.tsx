@@ -14,7 +14,7 @@ import { render, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { ColorTokenList } from "../ColorTokenList";
-import type { DesignToken } from "../../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
 function makeToken(id: string, name: string, value: string, extra: Partial<V6TokenSpec> = {}): DesignToken {

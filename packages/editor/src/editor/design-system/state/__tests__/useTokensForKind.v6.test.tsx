@@ -13,12 +13,14 @@ import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "@/engine/designSystem/types";
+import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
 
 function fakeComposer(initial: DesignToken[] = DEFAULT_TOKENS, readOnly = false) {
   const listeners = new Map<string, Set<() => void>>();
   let settings = { designTokens: initial, designTokensSchemaVersion: 6 };
+  /* Validates like the engine does, so a write that breaks the graph is refused. */
   const setTokens = vi.fn((next: DesignToken[]) => {
-    if (composer.designSystem.readOnly) return false;
+    if (composer.designSystem.readOnly || !validateTokens(next).ok) return false;
     settings = { designTokens: next, designTokensSchemaVersion: 6 };
     listeners.get(EVENTS.SETTINGS_CHANGE)?.forEach((l) => l());
     return true;
@@ -134,5 +136,82 @@ describe("useTokensForKind (v6, composer-backed)", () => {
       ok = result.current.updateToken("color-primary", "#C2410C");
     });
     expect(ok).toBe(false);
+  });
+});
+
+/** A colour primitive some other token aliases — deleting it would break the graph. */
+const aliasedPrimitive = () =>
+  DEFAULT_TOKENS.find(
+    (p) => p.kind === "color" && p.layer === "primitive" &&
+      DEFAULT_TOKENS.some((t) => "alias" in t.modes.light && t.modes.light.alias === p.id),
+  )!;
+
+describe("useTokensForKind — delete, add, filter through the commit path", () => {
+  const extra: DesignToken = {
+    id: "color-extra", name: "Extra", kind: "color", layer: "primitive", category: "colors",
+    cssVar: "--buildrick-design-color-extra", type: "color", modes: { light: { value: "#123456" } },
+  };
+
+  it("hard delete removes the token in one write", () => {
+    const composer = fakeComposer([...DEFAULT_TOKENS, extra]);
+    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    let ok = false;
+    act(() => {
+      ok = result.current.deleteToken("color-extra");
+    });
+    expect(ok).toBe(true);
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+    expect(result.current.tokens.some((t) => t.id === "color-extra")).toBe(false);
+  });
+
+  it("soft delete keeps the token and bridges it to the replacement", () => {
+    const composer = fakeComposer([...DEFAULT_TOKENS, extra]);
+    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    act(() => {
+      result.current.deleteToken("color-extra", { replaceWith: "color-primary" });
+    });
+    expect(result.current.tokens.find((t) => t.id === "color-extra")?.replacedBy).toBe("color-primary");
+  });
+
+  it("deleting a token another token aliases is refused — nothing written", () => {
+    const composer = fakeComposer();
+    const target = aliasedPrimitive();
+    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    let ok = true;
+    act(() => {
+      ok = result.current.deleteToken(target.id);
+    });
+    expect(ok).toBe(false);
+    expect(composer.getProjectSettings().designTokens).toBe(DEFAULT_TOKENS);
+    expect(result.current.tokens.some((t) => t.id === target.id)).toBe(true);
+  });
+
+  it("adding a token whose id is taken is refused before any write", () => {
+    const composer = fakeComposer();
+    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    let ok = true;
+    act(() => {
+      ok = result.current.addToken({ ...extra, id: "color-primary" });
+    });
+    expect(ok).toBe(false);
+    expect(composer.designSystem.setTokens).not.toHaveBeenCalled();
+  });
+
+  it("adding a new token is one write", () => {
+    const composer = fakeComposer();
+    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    act(() => {
+      result.current.addToken(extra);
+    });
+    expect(result.current.tokens.some((t) => t.id === "color-extra")).toBe(true);
+  });
+
+  it("filterTokens matches name or id, case-insensitively; blank returns all", () => {
+    const composer = fakeComposer([...DEFAULT_TOKENS, extra]);
+    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    expect(result.current.filterTokens("EXTRA").map((t) => t.id)).toEqual(["color-extra"]);
+    expect(result.current.filterTokens("color-extra").map((t) => t.id)).toEqual(["color-extra"]);
+    expect(result.current.filterTokens("  ")).toHaveLength(result.current.tokens.length);
+    expect(result.current.filterTokens("zzz-nothing")).toEqual([]);
   });
 });

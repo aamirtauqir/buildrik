@@ -14,7 +14,7 @@ import { TokenRegistryProvider, useColorRegistry } from "../../../state/TokenReg
 import { DSModeProvider } from "../../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
-import { makeFakeComposer } from "../../__tests__/brandWorkspaceHarness";
+import { makeFakeComposer } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
 /* A composer behind the registry, so a commit lands in the project and the
    registry reads it back — the only way a value reaches it now. */

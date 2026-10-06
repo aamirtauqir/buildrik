@@ -25,7 +25,7 @@ import {
   renderOnRadius,
   renderWorkspace,
   wrap,
-} from "../ui/__tests__/brandWorkspaceHarness";
+} from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
 beforeEach(installDomShims);
 
@@ -77,6 +77,7 @@ describe("BrandWorkspace › ‹ Back to canvas (nothing staged, nothing to guar
     const onClose = vi.fn();
     const utils = await renderOnRadius(composer, { onClose });
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    fireEvent.blur(utils.radiusInput);
     expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
 
     fireEvent.click(utils.getByTestId("brand-back-link"));
@@ -101,6 +102,7 @@ describe("BrandWorkspace › ‹ Back to canvas (nothing staged, nothing to guar
     const onClose = vi.fn();
     const utils = await renderOnRadius(composer, { onClose });
     fireEvent.change(utils.radiusInput, { target: { value: "12px" } });
+    fireEvent.blur(utils.radiusInput);
     (document.activeElement as HTMLElement | null)?.blur();
 
     act(() => {

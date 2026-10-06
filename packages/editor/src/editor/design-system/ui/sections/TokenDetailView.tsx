@@ -132,6 +132,13 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const resolveList = React.useMemo(() => allTokens ?? [token], [allTokens, token]);
   const value = resolveTokenLiteral(resolveList, token.id, "light") ?? "";
   const darkValue = token.modes.dark ? resolveTokenLiteral(resolveList, token.id, "dark") ?? "" : undefined;
+  /* The typed value commits on blur / Enter, not per keystroke: one write and
+     one ⌘Z step per edit, and no half-typed (or empty) value reaches the canvas. */
+  const [draft, setDraft] = React.useState(value);
+  React.useEffect(() => setDraft(value), [value]);
+  const commitDraft = () => {
+    if (draft !== value) onValueChange?.(token.id, draft);
+  };
 
   // ─ Used by: subscribe to tokenUsage:changed for live count + breakdown updates.
   const tracker = composer?.designSystem?.tokenUsage;
@@ -499,8 +506,12 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               )}
               <TextInput
                 type="text"
-                value={value}
-                onChange={(e) => onValueChange?.(token.id, e.target.value)}
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onBlur={commitDraft}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") commitDraft();
+                }}
                 className={MONO}
                 aria-label="Value"
                 autoFocus

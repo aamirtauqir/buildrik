@@ -3,11 +3,12 @@
  * re-renders colour consumers only, never SizeSection.
  *
  * Every registry reads the PROJECT's tokens and writes them back through
- * `composer.designSystem.setTokens` (useTokensForKind): no local copy, no
- * localStorage cache, nothing staged, one undo stack with the canvas
- * (spec §4, Brand Part 1a Task 10). `useProjectTokenStore` hands the whole
- * set and its writer to the multi-kind writes (import, starters, Update
- * everywhere).
+ * `composer.designSystem.setTokens`: no local copy, no localStorage cache,
+ * nothing staged, one undo stack with the canvas (spec §4, Brand Part 1a
+ * Task 10). All fourteen are built from ONE project read and ONE commit,
+ * which `useSessionEdits` logs — Brand's "Review changes". `useProjectTokenStore`
+ * hands the whole set, that commit and the session's edits to the multi-kind
+ * writes (import, starters, Colour mode) and to Brand.
  *
  * @license BSD-3-Clause
  */
@@ -16,9 +17,10 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { TokenKind } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
-import { useTokensForKind, type TokensForKindRegistry } from "./useTokensForKind";
-import { useSpacingTokens, type SpacingRegistry } from "./useSpacingTokens";
+import { kindRegistry, type TokensForKindRegistry } from "./useTokensForKind";
+import { spacingRegistry, type SpacingRegistry } from "./spacingRegistry";
 import { useProjectTokens, type ProjectTokens } from "./useProjectTokens";
+import { useSessionEdits, type SessionEdit } from "./useSessionEdits";
 
 // ============================================================================
 // CONTEXT TYPES
@@ -57,7 +59,13 @@ const GridRegistryContext       = React.createContext<GridRegistry | null>(null)
 const SizingRegistryContext     = React.createContext<SizingRegistry | null>(null);
 const IconRegistryContext       = React.createContext<IconRegistry | null>(null);
 const ImageryRegistryContext    = React.createContext<ImageryRegistry | null>(null);
-const ProjectTokenStoreContext  = React.createContext<ProjectTokens | null>(null);
+/** The whole set, its one (logged) commit, and this session's edits. */
+export interface TokenStore extends ProjectTokens {
+  edits: SessionEdit[];
+  /** Revert one session edit; false when it is stale or refused. */
+  revert: (index: number) => boolean;
+}
+const ProjectTokenStoreContext  = React.createContext<TokenStore | null>(null);
 
 // ============================================================================
 // PROVIDER
@@ -72,21 +80,25 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   composer = null,
   children,
 }) => {
-  const store           = useProjectTokens(composer);
-  const colorState      = useTokensForKind("color", composer);
-  const spacingState    = useSpacingTokens(composer);
-  const typeState       = useTokensForKind("type", composer);
-  const radiusState     = useTokensForKind("radius", composer);
-  const shadowState     = useTokensForKind("shadow", composer);
-  const motionState     = useTokensForKind("motion", composer);
-  const borderState     = useTokensForKind("border", composer);
-  const opacityState    = useTokensForKind("opacity", composer);
-  const zindexState     = useTokensForKind("zindex", composer);
-  const breakpointState = useTokensForKind("breakpoint", composer);
-  const gridState       = useTokensForKind("grid", composer);
-  const sizingState     = useTokensForKind("sizing", composer);
-  const iconState       = useTokensForKind("icon", composer);
-  const imageryState    = useTokensForKind("imagery", composer);
+  const project = useProjectTokens(composer);
+  const { commit, edits, revert } = useSessionEdits(composer, project);
+  const { all, readOnly } = project;
+  const store = React.useMemo<TokenStore>(() => ({ all, readOnly, commit, edits, revert }), [all, readOnly, commit, edits, revert]);
+  const kinds = React.useMemo(() => {
+    const k = (kind: TokenKind) => kindRegistry(kind, all, commit);
+    return {
+      color: k("color"), spacing: spacingRegistry(all, commit), type: k("type"), radius: k("radius"),
+      shadow: k("shadow"), motion: k("motion"), border: k("border"), opacity: k("opacity"),
+      zindex: k("zindex"), breakpoint: k("breakpoint"), grid: k("grid"), sizing: k("sizing"),
+      icon: k("icon"), imagery: k("imagery"),
+    };
+  }, [all, commit]);
+  const {
+    color: colorState, spacing: spacingState, type: typeState, radius: radiusState,
+    shadow: shadowState, motion: motionState, border: borderState, opacity: opacityState,
+    zindex: zindexState, breakpoint: breakpointState, grid: gridState, sizing: sizingState,
+    icon: iconState, imagery: imageryState,
+  } = kinds;
 
   // Flat list of (Context, value) pairs that wrap children, outermost first.
   // composeProviders below reduces this into the equivalent nested JSX tree.
@@ -153,7 +165,7 @@ const FALLBACK_SPACING: SpacingRegistry = {
   applyPreset: refuse,
   resetToDefaults: refuse,
 };
-const FALLBACK_STORE: ProjectTokens = { all: DEFAULT_TOKENS, readOnly: false, commit: refuse };
+const FALLBACK_STORE: TokenStore = { all: DEFAULT_TOKENS, readOnly: false, commit: refuse, edits: [], revert: refuse };
 
 export function useColorRegistry(): ColorRegistry {
   const ctx = React.useContext(ColorRegistryContext);
@@ -236,8 +248,9 @@ export function useImageryRegistry(): ImageryRegistry {
   return ctx;
 }
 
-/** The whole token set and its one writer — for writes that span kinds
- *  (import, starters, Update everywhere) and the read-only state. */
-export function useProjectTokenStore(): ProjectTokens {
+/** The whole token set, its one logged writer and the session's edits — for
+ *  writes that span kinds (import, starters, Colour mode), the read-only state
+ *  and Brand's Review changes. */
+export function useProjectTokenStore(): TokenStore {
   return React.useContext(ProjectTokenStoreContext) ?? FALLBACK_STORE;
 }

@@ -35,7 +35,7 @@ const NO_SAVED_TOKENS: readonly unknown[] = [];
 const mergedCache = new WeakMap<readonly unknown[], DesignToken[]>();
 const emitCache = new WeakMap<readonly unknown[], DesignToken[]>();
 
-function readTokens(composer: Composer | null): DesignToken[] {
+export function readTokens(composer: Composer | null): DesignToken[] {
   const settings = composer?.getProjectSettings();
   const saved: readonly unknown[] = settings?.designTokens ?? NO_SAVED_TOKENS;
   const readOnly = composer?.designSystem.readOnly ?? false;

@@ -145,11 +145,25 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
     expect(within(list).getByRole("option", { name: /Brand/ })).toBeInTheDocument();
   });
 
-  it("the text field still takes a hand-typed stack", () => {
+  it("the text field still takes a hand-typed stack — committed on blur, not per keystroke", () => {
     const { composer } = composerWithFonts([]);
     const onValueChange = renderDetail(fontToken, composer);
-    fireEvent.change(screen.getByLabelText("Value"), { target: { value: "Inter, sans-serif" } });
+    const field = screen.getByLabelText("Value");
+    fireEvent.change(field, { target: { value: "" } });
+    fireEvent.change(field, { target: { value: "Inter, sans-serif" } });
+    expect(onValueChange).not.toHaveBeenCalled();
+    fireEvent.blur(field);
+    expect(onValueChange).toHaveBeenCalledTimes(1);
     expect(onValueChange).toHaveBeenCalledWith("font-heading", "Inter, sans-serif");
+  });
+
+  it("Enter commits the typed value too", () => {
+    const { composer } = composerWithFonts([]);
+    const onValueChange = renderDetail(fontToken, composer);
+    const field = screen.getByLabelText("Value");
+    fireEvent.change(field, { target: { value: "Lora, serif" } });
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(onValueChange).toHaveBeenCalledWith("font-heading", "Lora, serif");
   });
 
   it("is a separate selection from the Typography picker — picking here leaves the Heading inspector alone", () => {

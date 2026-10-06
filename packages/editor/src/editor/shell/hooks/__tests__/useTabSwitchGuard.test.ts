@@ -140,7 +140,10 @@ describe("useTabSwitchGuard", () => {
     expect(recordDiscard).toHaveBeenCalledTimes(1);
     expect(setLeftPanelTab).toHaveBeenCalledWith("add");
     expect(onDiscardFailed).toHaveBeenCalledWith(["settings"]);
-    expect(shellDirty.dirtyDomains()).toEqual(["settings"]);
+    // Only the failed domain stays dirty: clearing it leaves the registry clean.
+    expect(shellDirty.get()).toBe(true);
+    act(() => shellDirty.set("settings", false));
+    expect(shellDirty.get()).toBe(false);
     act(() => {
       shellDirty.setDiscard("settings", null);
       shellDirty.setDiscard("cms-record", null);

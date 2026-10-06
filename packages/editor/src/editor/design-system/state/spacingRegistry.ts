@@ -1,16 +1,13 @@
 /**
- * useSpacingTokens — the spacing kind + its preset actions, composer-backed.
- * No JSX.
+ * spacingRegistry — the spacing kind + its preset actions (`spacingRegistry`),
+ * built over the project's tokens and the provider's one commit. No JSX.
  * @license BSD-3-Clause
  */
 
-import * as React from "react";
-import type { Composer } from "@/engine";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
-import { useTokensForKind } from "./useTokensForKind";
-import { useProjectTokens } from "./useProjectTokens";
+import { kindRegistry } from "./useTokensForKind";
 
 export type SpacingPreset = "compact" | "normal" | "spacious";
 
@@ -52,23 +49,18 @@ function presetOf(tokens: readonly DesignToken[]): SpacingPreset | null {
 
 /** Spacing is a kind like any other, plus Brand's ⋯ menu: apply a whole
  *  preset, or put the seed spacing back — each one write, one ⌘Z. */
-export function useSpacingTokens(composer: Composer | null) {
-  const base = useTokensForKind("spacing", composer);
-  const { all, commit } = useProjectTokens(composer);
-
-  return React.useMemo(
-    () => ({
-      ...base,
-      activePreset: presetOf(base.tokens),
-      applyPreset: (preset: SpacingPreset) => commit(applyPresetToTokens(all, preset), "Apply spacing preset"),
-      resetToDefaults: () =>
-        commit(
-          [...all.filter((t) => t.kind !== "spacing"), ...DEFAULT_TOKENS.filter((t) => t.kind === "spacing")],
-          "Reset spacing",
-        ),
-    }),
-    [base, all, commit],
-  );
+export function spacingRegistry(all: DesignToken[], commit: (next: DesignToken[], label: string) => boolean) {
+  const base = kindRegistry("spacing", all, commit);
+  return {
+    ...base,
+    activePreset: presetOf(base.tokens),
+    applyPreset: (preset: SpacingPreset) => commit(applyPresetToTokens(all, preset), "Apply spacing preset"),
+    resetToDefaults: () =>
+      commit(
+        [...all.filter((t) => t.kind !== "spacing"), ...DEFAULT_TOKENS.filter((t) => t.kind === "spacing")],
+        "Reset spacing",
+      ),
+  };
 }
 
-export type SpacingRegistry = ReturnType<typeof useSpacingTokens>;
+export type SpacingRegistry = ReturnType<typeof spacingRegistry>;

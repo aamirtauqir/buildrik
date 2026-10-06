@@ -5,7 +5,7 @@ import { render } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { ColorTokenList } from "../ColorTokenList";
-import type { DesignToken } from "../../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 function makeToken(id: string, name: string, value: string, group = "brand"): DesignToken {

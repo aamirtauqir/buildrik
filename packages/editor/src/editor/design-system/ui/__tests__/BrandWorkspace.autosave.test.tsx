@@ -14,7 +14,6 @@ import { describe, it, expect, beforeEach } from "vitest";
 import * as React from "react";
 import { BrandWorkspace } from "../BrandWorkspace";
 import { ProjectTokensApplier } from "../ProjectTokensApplier";
-import { useButtonPresets } from "../../state/StylePresetRegistryContext";
 import {
   installDomShims,
   makeFakeComposer,
@@ -72,6 +71,7 @@ describe("BrandWorkspace — pages", () => {
     const utils = await renderOnRadius(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    fireEvent.blur(utils.radiusInput);
     openPage(utils, "presets");
     expect(document.getElementById("design-section-presets")).toBeTruthy();
 
@@ -88,6 +88,7 @@ describe("BrandWorkspace — autosave (one write per edit, nothing staged)", () 
     const utils = await renderOnRadius(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    fireEvent.blur(utils.radiusInput);
 
     expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
     expect(resolveTokenLiteral(written(composer), "radius-sm", "light")).toBe("10px");
@@ -139,61 +140,97 @@ describe("BrandWorkspace — autosave (one write per edit, nothing staged)", () 
     expect(utils.queryByText(/changed from another window/)).toBeNull();
   });
 
-  it("a preset edit autosaves into projectSettings.designPresets", async () => {
-    const composer = makeFakeComposer();
-    let buttonReg: ReturnType<typeof useButtonPresets> | null = null;
-    function Capture() {
-      buttonReg = useButtonPresets();
-      return null;
-    }
-    const utils = renderWorkspace(composer);
-    utils.rerender(
-      wrap(
-        <>
-          <Capture />
-          <BrandWorkspace composer={composer} />
-        </>,
-        composer,
-      ),
-    );
-
-    act(() => {
-      buttonReg!.addPreset({ id: "button-test-auto", friendlyName: "Test", category: "button", variant: "primary", bindings: {} });
-    });
-
-    await waitFor(() => {
-      const presets = composer.settings.designPresets as Array<{ id: string }> | undefined;
-      expect(presets?.some((p) => p.id === "button-test-auto")).toBe(true);
-    });
-    await waitFor(() => expect(buttonReg!.isDirty).toBe(false));
-  });
 });
 
-describe("BrandWorkspace — Review changes (non-blocking, this session, Revert)", () => {
-  it("lists the session's edit as was → now; a run of edits is one row; Revert writes the start value back", async () => {
-    const composer = makeFakeComposer();
-    const utils = await renderOnRadius(composer);
-    const original = utils.getByTestId("brand-token-value-radius-sm").textContent!;
-    expect(utils.queryByTestId("brand-session-edits")).toBeNull();
-
-    fireEvent.change(utils.radiusInput, { target: { value: "1" } });
-    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-
+describe("BrandWorkspace — Review changes (non-blocking, every Brand write this session, Revert)", () => {
+  const rows = (utils: ReturnType<typeof renderWorkspace>) => utils.queryAllByTestId("brand-session-edit");
+  const openList = async (utils: ReturnType<typeof renderWorkspace>) =>
     fireEvent.click(await utils.findByTestId("brand-session-edits"));
-    // Two keystrokes on one value are one row, remembering where it started.
+
+  it("a value edit is a row (was → now); Revert writes the set back exactly — the edit's custom-* primitive goes too", async () => {
+    const composer = makeFakeComposer();
+    const utils = renderWorkspace(composer);
+    expect(utils.queryByTestId("brand-session-edits")).toBeNull();
+    const seedIds = DEFAULT_TOKENS.map((t) => t.id).sort();
+
+    // A semantic colour edit adds its own custom-<id> primitive (setTokenLiteral).
+    fireEvent.click(utils.container.querySelector('[data-token-row="color-primary"]')!);
+    fireEvent.click(utils.getByTestId("brand-token-action-replace"));
+    fireEvent.change(await utils.findByLabelText("Hex color value"), { target: { value: "#C2410C" } });
+    fireEvent.click(within(utils.getByTestId("color-picker")).getByRole("button", { name: "Apply" }));
+    const afterEdit = (composer.settings.designTokens as DesignToken[]).map((t) => t.id).sort();
+    expect(afterEdit.length).toBeGreaterThan(seedIds.length);
+
+    await openList(utils);
     expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1");
-    const row = utils.getByTestId("brand-session-edit-radius-sm");
-    expect(row.textContent).toContain(original);
-    expect(row.textContent).toContain("10px");
-    // Non-blocking: the page stays usable, no modal.
+    expect(rows(utils)[0].textContent).toMatch(/Changed a token/);
+    expect(rows(utils)[0].textContent).toMatch(/→ #C2410C/i);
+    // Non-blocking: no modal.
     expect(document.querySelector('[aria-modal="true"]')).toBeNull();
 
-    const callsBefore = composer.designSystem.setTokens.mock.calls.length;
-    fireEvent.click(utils.getByTestId("brand-session-revert-radius-sm"));
-    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(callsBefore + 1);
-    expect(resolveTokenLiteral(written(composer, callsBefore), "radius-sm", "light")).toBe(original);
-    await waitFor(() => expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe(original));
-    expect(utils.queryByTestId("brand-session-edits")).toBeNull();
+    fireEvent.click(within(rows(utils)[0]).getByTestId("brand-session-revert"));
+    const reverted = composer.settings.designTokens as DesignToken[];
+    expect(reverted.map((t) => t.id).sort()).toEqual(seedIds);
+    expect(resolveTokenLiteral(reverted, "color-primary", "light")).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"));
+    await waitFor(() => expect(utils.queryByTestId("brand-session-edits")).toBeNull());
+  });
+
+  it("a starter apply and an import each appear as a row", async () => {
+    const composer = makeFakeComposer();
+    const utils = renderWorkspace(composer);
+    openPage(utils, "starters");
+    fireEvent.click(utils.container.querySelectorAll<HTMLElement>('[role="radio"]')[1]);
+
+    openPage(utils, "export");
+    fireEvent.click(await utils.findByText(/or paste JSON/i));
+    fireEvent.change(utils.getByLabelText(/Paste JSON/i), {
+      target: { value: JSON.stringify([{ id: "color-imported", name: "Imported", value: "#00FF99", category: "colors", cssVar: "--buildrick-design-color-imported", type: "color", kind: "color" }]) },
+    });
+    fireEvent.click(utils.getByText(/^Parse$/i));
+    fireEvent.click(await utils.findByText(/Apply 1 valid only/i));
+
+    openPage(utils, "colours");
+    await openList(utils);
+    const labels = rows(utils).map((r) => r.textContent ?? "");
+    expect(labels).toHaveLength(2);
+    expect(labels[0]).toMatch(/Imported tokens/);
+    expect(labels[0]).toMatch(/\+ Imported/);
+    expect(labels[1]).toMatch(/Applied a starter/);
+  });
+
+  it("a row the site has moved past is stale: 'Changed since — use ⌘Z', Revert off", async () => {
+    const composer = makeFakeComposer();
+    const utils = await renderOnRadius(composer);
+    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    fireEvent.blur(utils.radiusInput);
+    fireEvent.change(utils.radiusInput, { target: { value: "12px" } });
+    fireEvent.blur(utils.radiusInput);
+
+    await openList(utils);
+    const [newest, older] = rows(utils);
+    expect(within(newest).getByTestId("brand-session-revert")).not.toBeDisabled();
+    expect(within(older).getByTestId("brand-session-stale").textContent).toBe("Changed since — use ⌘Z");
+    expect(within(older).getByTestId("brand-session-revert")).toBeDisabled();
+
+    // ⌘Z (any write made outside the log) makes the newest stale too.
+    act(() => {
+      composer.setProjectSettings({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6 });
+    });
+    await waitFor(() => expect(within(rows(utils)[0]).getByTestId("brand-session-revert")).toBeDisabled());
+  });
+
+  it("deleting a token another token aliases is refused with a toast — nothing written", async () => {
+    const composer = makeFakeComposer();
+    const utils = renderWorkspace(composer);
+    const target = DEFAULT_TOKENS.find(
+      (p) => p.kind === "color" && p.layer === "primitive" &&
+        DEFAULT_TOKENS.some((t) => "alias" in t.modes.light && t.modes.light.alias === p.id),
+    )!;
+    fireEvent.click(utils.container.querySelector(`[data-token-row="${target.id}"]`)!);
+    fireEvent.click(utils.getByTestId("brand-token-menu"));
+    fireEvent.click(utils.getByRole("menuitem", { name: /Delete/ }));
+    expect(await utils.findByText(new RegExp(`Deleting "${target.name}" wasn't applied`))).toBeTruthy();
+    expect(composer.settings.designTokens).toEqual([]);
   });
 });
 

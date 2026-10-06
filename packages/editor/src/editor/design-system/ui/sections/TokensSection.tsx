@@ -35,7 +35,7 @@ import {
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { filterTokensByMode } from "../../utils/semanticKind";
 import type { TokenKind } from "../../types";
-import type { SpacingPreset } from "../../state/useSpacingTokens";
+import type { SpacingPreset } from "@/editor/design-system/state/spacingRegistry";
 import type { Composer } from "../../../../engine/Composer";
 
 /* The PRESET column (7576:197036): the spacing preset a token's value came

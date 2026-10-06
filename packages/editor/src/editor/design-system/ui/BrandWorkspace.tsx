@@ -12,7 +12,7 @@
  *   │ Colours        18 │    │ ● color-primary #1A56DB …  │    │ ▇ token card  │    │
  *   │ Colour mode       │    │ …                          │    │ Light value … │    │
  *   │ …                 │    ├────────────────────────────┤    │ Used by …     │    │
- *   │ Beginner | Pro    │    │ Unsaved brand changes  Save│    │ ✓ Brand checks│    │
+ *   │ Beginner | Pro    │    │      (edits apply at once) │    │ ✓ Brand checks│    │
  *   └───────────────────┴────┴────────────────────────────┴────┴───────────────┴────┘
  *
  * Measured off 7315:80955 at 1440×900 (C1 (ii)): nav 256 with the Brand head,
@@ -46,7 +46,7 @@ import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, 
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
-import type { SpacingPreset } from "../state/useSpacingTokens";
+import type { SpacingPreset } from "../state/spacingRegistry";
 import {
   useColorRegistry,
   useTypeRegistry,
@@ -75,13 +75,13 @@ import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils"
 import { DSModeProvider, useDSModeOptional } from "../state/DSModeContext";
 import { AIPromptModal } from "./AIPromptModal";
 import { TokenAddDialog } from "./modals/TokenAddDialog";
-import { SessionEditsPopover, type SessionEdit } from "./SessionEditsPopover";
+import { SessionEditsPopover } from "./SessionEditsPopover";
 import { BrandPreview } from "./BrandPreview";
 import { BrandLivePreview } from "./BrandLivePreview";
 import { orderColourTokens } from "./colors/ColorTokenList";
 import { TokenDetailView } from "./sections/TokenDetailView";
 import { TokensSection } from "./sections/TokensSection";
-import { StylesSection, usePresetAutosave } from "./sections/StylesSection";
+import { StylesSection } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ReusableStylesSection, reusableStylesCount } from "./sections/ReusableStylesSection";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
@@ -169,7 +169,7 @@ const NAV_ROW_ON =
 const NAV_COUNT =
   "tw:flex-none tw:tabular-nums tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* The header's page action (7315:80955 "+ Add token": 28 tall, 13px, hairline). */
-/* Spacing's ⋯ menu: the three presets on the 4px grid (useSpacingTokens). */
+/* Spacing's ⋯ menu: the three presets on the 4px grid (spacingRegistry). */
 const SPACING_PRESETS: [SpacingPreset, string][] = [
   ["compact", "Compact · 2px"],
   ["normal", "Normal · 4px"],
@@ -230,8 +230,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
-  /* This session's token edits, newest first — "Review changes" (spec §4). */
-  const [sessionEdits, setSessionEdits] = React.useState<SessionEdit[]>([]);
 
   // T10 / spec D8: outermost wrapper gets data-ds-preview={resolvedMode} so
   // ds-panel-dark.css can scope overrides to the Brand surface only. Editor
@@ -268,8 +266,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* "No brand set" (4418:49685): the site has never saved a token. */
   const isFirstLoad = !composer?.getProjectSettings()?.designTokens?.length;
 
-  // The preset registries feed the Styles page's counts; their edits autosave.
-  usePresetAutosave(composer);
+  // The preset registries feed the Styles page's count (read-only).
   const buttonPresets   = useButtonPresets();
   const cardPresets     = useCardPresets();
   const formPresets     = useFormPresets();
@@ -422,37 +419,18 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedToken, allTokens]);
   /* A value edit — light, and the dark value when the card sets one — is ONE
-     write, so ⌘Z undoes it in one step. It joins this session's list; a run
-     of edits to the same value (a picker drag) stays one row that remembers
-     where it started. */
+     write, so ⌘Z undoes it in one step (and Review changes lists one row). */
   const changeToken = (id: string, value: string, darkValue?: string) => {
     const tok = tokenById(id);
     if (!tok) return;
-    const edits: SessionEdit[] = [];
     let next = allTokens;
     const write = (mode: "light" | "dark", v: string) => {
-      const was = resolveTokenLiteral(next, id, mode) ?? "";
-      if (was === v) return;
-      next = setTokenLiteral(next, id, mode, v);
-      edits.push({ id, name: tok.name, mode, was, now: v });
+      if ((resolveTokenLiteral(next, id, mode) ?? "") !== v) next = setTokenLiteral(next, id, mode, v);
     };
     write("light", value);
     if (darkValue !== undefined) write("dark", darkValue);
-    if (edits.length === 0) return;
-    if (!store.commit(next, "Edit token")) return refused(`"${tok.name}"`);
-    setSessionEdits((prev) => edits.reduce(
-      (list, e) => list[0]?.id === e.id && list[0].mode === e.mode
-        ? [{ ...list[0], now: e.now }, ...list.slice(1)]
-        : [e, ...list],
-      prev,
-    ));
-  };
-  /* Revert puts the value the session started from back — one write, one ⌘Z. */
-  const revertEdit = (index: number) => {
-    const e = sessionEdits[index];
-    if (!e) return;
-    if (!store.commit(setTokenLiteral(allTokens, e.id, e.mode, e.was), "Revert token")) return refused(`Revert of "${e.name}"`);
-    setSessionEdits((prev) => prev.filter((_, i) => i !== index));
+    if (next === allTokens) return;
+    if (!store.commit(next, "Edit token")) refused(`"${tok.name}"`);
   };
   const deleteToken = (id: string, opts?: { replaceWith?: string }) => {
     const tok = tokenById(id);
@@ -534,7 +512,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         );
       case "brand-checks":
         /* 7316:84555's page action. The checks also run by themselves on
-           every staged edit; this runs them now (useDSLint's one trigger). */
+           every edit; this runs them now (useDSLint's one trigger). */
         return (
           <Button
             type="button"
@@ -819,8 +797,14 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
               {/* "Review changes" (spec §4): non-blocking, this session's
                   edits with Revert. Drawn only once there is one. */}
-              {sessionEdits.length > 0 && (
-                <SessionEditsPopover edits={sessionEdits} onRevert={revertEdit} disabled={readOnly} />
+              {store.edits.length > 0 && (
+                <SessionEditsPopover
+                  edits={store.edits}
+                  onRevert={(i) => {
+                    if (!store.revert(i)) refused("That revert");
+                  }}
+                  disabled={readOnly}
+                />
               )}
               <EditLock locked={readOnly}>{pageAction}</EditLock>
             </div>

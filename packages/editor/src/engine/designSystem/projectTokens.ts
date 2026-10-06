@@ -2,7 +2,8 @@
  * The site's own tokens, as the canvas must render them.
  *
  * `projectSettings.designTokens` is where a site's brand actually lives — the
- * Brand panel writes it on Apply and the export reads it. Merging it over
+ * Brand panel writes it (`designSystem.setTokens`, every edit) and the export
+ * reads it. Merging it over
  * DEFAULT_TOKENS was written inside `DesignSystemTab.loadFromComposer`, which
  * runs when the PANEL mounts, so on a machine with no local cache a site's
  * brand did not reach the canvas until someone opened Brand. Measured: a site

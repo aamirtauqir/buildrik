@@ -2,9 +2,10 @@
  * StylePresetRegistryContext — 11 separate contexts (one per PresetCategory).
  *
  * Mirrors TokenRegistryContext architecturally so consumers learn one pattern
- * for both Tokens and Styles. Persistence: separate localStorage namespace
- * `buildrick-design-presets-${projectId}-v1` so preset reads/writes don't
- * thrash the token blob and vice versa.
+ * for both Tokens and Styles. Seeded from the localStorage namespace
+ * `buildrick-design-presets-${projectId}-v1` when a cache exists, else
+ * DEFAULT_PRESETS. Read-only since Brand Part 1a Task 10: no UI edits presets,
+ * so nothing writes that cache any more.
  *
  * @license BSD-3-Clause
  */
@@ -20,10 +21,6 @@ const PRESET_CATEGORIES: PresetCategory[] = [
   "alert", "tooltip", "modal", "nav", "table", "layout",
 ];
 
-interface PresetRegistryConfig {
-  persistAll: () => void;
-}
-
 const ButtonContext   = React.createContext<PresetsForCategoryRegistry | null>(null);
 const CardContext     = React.createContext<PresetsForCategoryRegistry | null>(null);
 const FormContext     = React.createContext<PresetsForCategoryRegistry | null>(null);
@@ -35,7 +32,6 @@ const ModalContext    = React.createContext<PresetsForCategoryRegistry | null>(n
 const NavContext      = React.createContext<PresetsForCategoryRegistry | null>(null);
 const TableContext    = React.createContext<PresetsForCategoryRegistry | null>(null);
 const LayoutContext   = React.createContext<PresetsForCategoryRegistry | null>(null);
-const ConfigContext   = React.createContext<PresetRegistryConfig | null>(null);
 
 const CONTEXT_BY_CATEGORY: Record<PresetCategory, React.Context<PresetsForCategoryRegistry | null>> = {
   button: ButtonContext, card: CardContext, form: FormContext, link: LinkContext,
@@ -88,24 +84,6 @@ export const StylePresetRegistryProvider: React.FC<StylePresetRegistryProviderPr
   const table    = usePresetsForCategory("table",    initialPresets);
   const layout   = usePresetsForCategory("layout",   initialPresets);
 
-  const persistAll = React.useCallback(() => {
-    const all: StylePreset[] = [
-      ...button.presets, ...card.presets, ...form.presets, ...link.presets,
-      ...badge.presets, ...alert.presets, ...tooltip.presets, ...modal.presets,
-      ...nav.presets, ...table.presets, ...layout.presets,
-    ];
-    try {
-      localStorage.setItem(storageKey, JSON.stringify({ schemaVersion: 1, presets: all }));
-    } catch {
-      // SecurityError in private browsing → no crash.
-    }
-  }, [
-    button.presets, card.presets, form.presets, link.presets, badge.presets,
-    alert.presets, tooltip.presets, modal.presets, nav.presets, table.presets, layout.presets,
-    storageKey,
-  ]);
-
-  const config = React.useMemo<PresetRegistryConfig>(() => ({ persistAll }), [persistAll]);
 
   const providers: Array<{ Context: React.Context<unknown>; value: unknown }> = [
     { Context: ButtonContext   as React.Context<unknown>, value: button   },
@@ -119,7 +97,6 @@ export const StylePresetRegistryProvider: React.FC<StylePresetRegistryProviderPr
     { Context: NavContext      as React.Context<unknown>, value: nav      },
     { Context: TableContext    as React.Context<unknown>, value: table    },
     { Context: LayoutContext   as React.Context<unknown>, value: layout   },
-    { Context: ConfigContext   as React.Context<unknown>, value: config   },
   ];
 
   return <>{composeProviders(providers, children)}</>;
@@ -141,19 +118,10 @@ function composeProviders(
 
 // Fallback so consumers rendered outside StylePresetRegistryProvider (isolated
 // tests, AI-modal previews) don't crash. Returns an empty registry with no-op
-// actions — mirrors the FALLBACK_COLOR/FALLBACK_SPACING/FALLBACK_TYPE pattern
-// in TokenRegistryContext for color/spacing/type. Mutations are silent no-ops.
-const noop = () => {};
+// hydrate — mirrors the seed fallbacks in TokenRegistryContext.
 const FALLBACK_REGISTRY: PresetsForCategoryRegistry = {
   presets: [],
-  savedPresets: [],
-  isDirty: false,
-  updatePreset: noop,
-  addPreset: noop,
-  deletePreset: noop,
-  markSaved: noop,
-  discardAll: noop,
-  hydrateFromExternal: noop,
+  hydrateFromExternal: () => {},
 };
 
 function useCategoryRegistry(category: PresetCategory, _hookName: string): PresetsForCategoryRegistry {
@@ -173,11 +141,6 @@ export const useNavPresets      = (): PresetsForCategoryRegistry => useCategoryR
 export const useTablePresets    = (): PresetsForCategoryRegistry => useCategoryRegistry("table",    "useTablePresets");
 export const useLayoutPresets   = (): PresetsForCategoryRegistry => useCategoryRegistry("layout",   "useLayoutPresets");
 
-export function usePresetRegistryConfig(): PresetRegistryConfig {
-  const ctx = React.useContext(ConfigContext);
-  if (!ctx) throw new Error("usePresetRegistryConfig must be used within StylePresetRegistryProvider");
-  return ctx;
-}
 
 /** Fans an external preset list out to all 11 category registries via hydrateFromExternal. */
 export function useResetAllPresets(): (allPresets: StylePreset[]) => void {

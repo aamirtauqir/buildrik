@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { Button, EmptyState } from "@/editor/chrome-ui";
 import {
   TokenTable,

@@ -15,7 +15,7 @@ import {
 // useColorRegistry is used in the Apply test via Probe.
 import { ToastProvider } from "@/editor/chrome-ui";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
-import { makeFakeComposer } from "../../__tests__/brandWorkspaceHarness";
+import { makeFakeComposer } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
 let composer = makeFakeComposer();
 const wrap = (ui: React.ReactNode) => (

@@ -16,7 +16,7 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import { STARTER_DS_REGISTRY } from "../../../starters";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
-import { makeFakeComposer } from "../../__tests__/brandWorkspaceHarness";
+import { makeFakeComposer } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
 /** Reads the live colour registry from inside the provider. */
 const seen: { registry?: ReturnType<typeof useColorRegistry> } = {};

@@ -386,7 +386,7 @@ describe("TokenDetailView", () => {
     expect(queryByTestId("color-picker")).toBeNull();
   });
 
-  it("Change on a non-color token opens a text field → onValueChange(id, newValue)", () => {
+  it("Change on a non-color token opens a text field → onValueChange(id, newValue) on blur", () => {
     const onValueChange = vi.fn();
     const { getByTestId, container } = render(
       wrap(<TokenDetailView token={radiusToken} composer={makeMockComposer({})} onValueChange={onValueChange} />),
@@ -395,6 +395,9 @@ describe("TokenDetailView", () => {
     fireEvent.click(getByTestId("brand-token-action-replace"));
     const input = container.querySelector('input[aria-label="Value"]') as HTMLInputElement;
     fireEvent.change(input, { target: { value: "12px" } });
+    expect(onValueChange).not.toHaveBeenCalled();
+    fireEvent.blur(input);
+    expect(onValueChange).toHaveBeenCalledTimes(1);
     expect(onValueChange).toHaveBeenCalledWith(radiusToken.id, "12px");
   });
 

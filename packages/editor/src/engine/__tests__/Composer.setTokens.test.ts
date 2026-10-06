@@ -7,7 +7,7 @@
  */
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import { Composer } from "../Composer";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { setTokenLiteral, resolveTokenLiteral } from "@buildrik/shared/tokens";
 

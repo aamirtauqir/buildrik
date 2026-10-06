@@ -1,13 +1,14 @@
 /**
- * useSpacingTokens — the three presets produce explicit, predictable pixel
+ * spacingRegistry — the three presets produce explicit, predictable pixel
  * values, each applied as ONE write; the active preset is read off the values
  * (a hand edit makes it "custom"), and Reset puts the seed spacing back.
  */
 
 import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useSpacingTokens } from "../useSpacingTokens";
-import type { DesignToken } from "../../types";
+import { spacingRegistry } from "../spacingRegistry";
+import { useProjectTokens } from "../useProjectTokens";
+import type { DesignToken } from "@/editor/design-system/types";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
@@ -47,11 +48,14 @@ function getValues(tokens: DesignToken[]): Record<string, number> {
 
 function setup() {
   const composer = fakeComposer();
-  const hook = renderHook(() => useSpacingTokens(composer as never));
+  const hook = renderHook(() => {
+    const { all, commit } = useProjectTokens(composer as never);
+    return spacingRegistry(all, commit);
+  });
   return { composer, result: hook.result };
 }
 
-describe("useSpacingTokens presets", () => {
+describe("spacingRegistry presets", () => {
   it("compact preset produces expected values in one write", () => {
     const { composer, result } = setup();
     act(() => {
@@ -92,7 +96,7 @@ describe("useSpacingTokens presets", () => {
   });
 });
 
-describe("useSpacingTokens — activePreset is read off the values", () => {
+describe("spacingRegistry — activePreset is read off the values", () => {
   it("the seed is the Normal preset", () => {
     const { result } = setup();
     expect(result.current.activePreset).toBe("normal");

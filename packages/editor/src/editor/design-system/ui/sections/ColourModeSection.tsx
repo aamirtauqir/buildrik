@@ -19,8 +19,7 @@
  *     this screen most.
  *   · The WRITE was genuinely missing, and worse than missing: TokenDetailView
  *     had a dark-value input with an empty onBlur that discarded what you
- *     typed. Fixed earlier today, so `updateToken(id, value, darkValue)` is now
- *     reachable from the UI at all.
+ *     typed. The pair is now written here as one `setTokens` write.
  *
  * Set opens "Set the dark-mode value" (7318:80995, G3-146) in place: three
  * shades derived from the light value (`darkShadeSuggestions`), each with its
@@ -34,18 +33,19 @@ import * as React from "react";
 import { Check } from "lucide-react";
 import { X } from "lucide-react";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
-import { Button, IconButton, Popover } from "@/editor/chrome-ui";
-import { darkShadeSuggestions } from "../../utils/colorUtils";
+import { Button, IconButton, Popover, useToast } from "@/editor/chrome-ui";
+import { darkShadeSuggestions } from "@/editor/design-system/utils/colorUtils";
 import { ColorPicker } from "../colors/ColorPicker";
-import { useColorRegistry, useProjectTokenStore } from "../../state/TokenRegistryContext";
-import { useDSModeOptional } from "../../state/DSModeContext";
-import { filterTokensByMode } from "../../utils/semanticKind";
+import { useColorRegistry, useProjectTokenStore } from "@/editor/design-system/state/TokenRegistryContext";
+import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
+import { filterTokensByMode } from "@/editor/design-system/utils/semanticKind";
 import { displayValue } from "../colors/ColorTokenList";
 import { BrandCard, BrandRow } from "../BrandCard";
 
 export const ColourModeSection: React.FC = () => {
   const color = useColorRegistry();
   const store = useProjectTokenStore();
+  const { addToast } = useToast();
   const mode = useDSModeOptional()?.mode ?? "beginner";
   const [editing, setEditing] = React.useState<string | null>(null);
   const [custom, setCustom] = React.useState(false);
@@ -74,7 +74,9 @@ export const ColourModeSection: React.FC = () => {
     setCustom(false);
     /* Both values in ONE write — one ⌘Z puts the pair back. */
     const withLight = lightValue === lightOf(id) ? store.all : setTokenLiteral(store.all, id, "light", lightValue);
-    store.commit(setTokenLiteral(withLight, id, "dark", darkValue), "Set dark value");
+    if (!store.commit(setTokenLiteral(withLight, id, "dark", darkValue), "Set dark value")) {
+      addToast({ description: "The dark value wasn't applied — nothing was changed.", tone: "error" });
+    }
   };
   const open = (id: string) => {
     setCustom(false);

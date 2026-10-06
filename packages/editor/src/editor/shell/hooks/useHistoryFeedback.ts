@@ -99,7 +99,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "add token": "Added a design token",
   "delete token": "Deleted a design token",
   "rename token": "Renamed a design token",
-  "revert token": "Reverted a design token",
+  "revert brand edit": "Reverted a brand edit",
   "set dark value": "Set a dark value",
   "update everywhere": "Changed a brand colour everywhere",
   "apply spacing preset": "Applied a spacing preset",

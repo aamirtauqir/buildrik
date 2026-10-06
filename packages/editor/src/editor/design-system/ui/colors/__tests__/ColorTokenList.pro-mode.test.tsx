@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { ColorTokenList } from "../ColorTokenList";
-import type { DesignToken } from "../../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const baseToken: DesignToken = v6Token({

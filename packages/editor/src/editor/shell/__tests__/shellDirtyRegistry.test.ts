@@ -49,7 +49,10 @@ describe("shellDirtyRegistry", () => {
     shellDirty.set("cms-record", true);
     expect(shellDirty.discardDirty()).toEqual(["settings"]);
     expect(recordDiscard).toHaveBeenCalledTimes(1);
-    expect(shellDirty.dirtyDomains()).toEqual(["settings"]);
+    // Only the failed domain stays dirty: clearing it leaves the registry clean.
+    expect(shellDirty.get()).toBe(true);
+    shellDirty.set("settings", false);
+    expect(shellDirty.get()).toBe(false);
     expect(err).toHaveBeenCalledWith(expect.stringContaining("settings"), expect.any(Error));
     shellDirty.setDiscard("settings", null);
     shellDirty.setDiscard("cms-record", null);

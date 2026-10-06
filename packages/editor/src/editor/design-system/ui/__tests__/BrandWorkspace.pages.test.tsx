@@ -294,6 +294,7 @@ describe("BrandWorkspace › Component styles — a section row hands off to Add
     const onClose = vi.fn();
     const utils = await renderOnRadius(composer, { onClose });
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    fireEvent.blur(utils.radiusInput);
     act(() => openPage(utils, "component-styles"));
     fireEvent.click(utils.container.querySelector<HTMLElement>("[data-section-row]")!);
     expect(onClose).toHaveBeenCalledTimes(1);

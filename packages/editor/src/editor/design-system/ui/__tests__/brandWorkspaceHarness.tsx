@@ -47,8 +47,6 @@ export function makeFakeComposer(designTokens: unknown[] = [], { readOnly = fals
       handlers.get(e)?.delete(h);
     }),
     emit: vi.fn(emit),
-    beginTransaction: vi.fn(),
-    endTransaction: vi.fn(),
     designSystem: {
       readOnly,
       setTokens: vi.fn((next: unknown[], _label: string) => {
