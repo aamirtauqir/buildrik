@@ -57,7 +57,7 @@ export const TokenTypeSchema = z.enum([
   "shadow", "number", "string", "select",
 ]);
 
-export const DesignTokenSchema = z.object({
+export const LegacyDesignTokenSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   value: z.string(),
@@ -73,4 +73,4 @@ export const DesignTokenSchema = z.object({
   typedValue: TokenValueSchema.optional(),
 });
 
-export type DesignToken = z.infer<typeof DesignTokenSchema>;
+export type LegacyDesignToken = z.infer<typeof LegacyDesignTokenSchema>;
