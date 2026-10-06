@@ -95,3 +95,66 @@ export function validateTokens(
   const issue = parsed.error.issues[0];
   return { ok: false, reason: `${issue.path.join(".") || "tokens"}: ${issue.message}` };
 }
+
+/* ── DTCG (D4) ──────────────────────────────────────────────────────────
+   Kinds with a DTCG type map to it; the rest use "com.buildrik.<kind>".
+   Everything that is not $type/$value/$description rides in
+   $extensions["com.buildrik"], so the round trip is lossless. */
+const DTCG_TYPE: Partial<Record<DesignToken["kind"], string>> = {
+  color: "color", spacing: "dimension", radius: "dimension", sizing: "dimension",
+  breakpoint: "dimension", shadow: "shadow", opacity: "number", zindex: "number",
+  type: "typography", border: "border",
+};
+
+type DtcgExt = Omit<DesignToken, "id" | "kind" | "modes" | "description"> & {
+  kind: DesignToken["kind"];
+  modes: { dark?: string };
+};
+export interface DtcgEntry {
+  $type: string;
+  $value: string;
+  $description?: string;
+  $extensions: { "com.buildrik": DtcgExt };
+}
+export type DtcgDocument = Record<string, DtcgEntry>;
+
+const refToDtcg = (r: TokenRef): string => ("alias" in r ? `{${r.alias}}` : r.value);
+const dtcgToRef = (s: string): TokenRef => {
+  const m = /^\{([a-z0-9][a-z0-9-]*)\}$/.exec(s);
+  return m ? { alias: m[1] } : { value: s };
+};
+
+export function toDTCG(tokens: DesignToken[]): DtcgDocument {
+  const doc: DtcgDocument = {};
+  for (const t of tokens) {
+    const { id, kind, modes, description, ...rest } = t;
+    doc[id] = {
+      $type: DTCG_TYPE[kind] ?? `com.buildrik.${kind}`,
+      $value: refToDtcg(modes.light),
+      ...(description !== undefined ? { $description: description } : {}),
+      $extensions: { "com.buildrik": { ...rest, kind, modes: modes.dark ? { dark: refToDtcg(modes.dark) } : {} } },
+    };
+  }
+  return doc;
+}
+
+export function fromDTCG(doc: DtcgDocument): DesignToken[] {
+  return Object.entries(doc).map(([id, e]) => {
+    const { kind, modes, ...rest } = e.$extensions["com.buildrik"];
+    const token: DesignToken = {
+      id,
+      name: rest.name,
+      kind,
+      layer: rest.layer,
+      modes: modes.dark ? { light: dtcgToRef(e.$value), dark: dtcgToRef(modes.dark) } : { light: dtcgToRef(e.$value) },
+      category: rest.category,
+      cssVar: rest.cssVar,
+      type: rest.type,
+    };
+    for (const key of ["group", "options", "friendlyName", "semanticKind", "replacedBy", "legacyNames"] as const) {
+      if (rest[key] !== undefined) Object.assign(token, { [key]: rest[key] });
+    }
+    if (e.$description !== undefined) token.description = e.$description;
+    return token;
+  });
+}
