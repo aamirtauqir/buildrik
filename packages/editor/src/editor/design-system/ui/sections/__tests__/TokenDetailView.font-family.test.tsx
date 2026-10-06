@@ -164,6 +164,9 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
     fireEvent.change(field, { target: { value: "Lora, serif" } });
     fireEvent.keyDown(field, { key: "Enter" });
     expect(onValueChange).toHaveBeenCalledWith("font-heading", "Lora, serif");
+    // The blur that follows does not send the same draft a second time.
+    fireEvent.blur(field);
+    expect(onValueChange).toHaveBeenCalledTimes(1);
   });
 
   it("is a separate selection from the Typography picker — picking here leaves the Heading inspector alone", () => {

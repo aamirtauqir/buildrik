@@ -2,13 +2,16 @@
 /**
  * Brand Part 1a, Task 10: a kind's tokens are the PROJECT's tokens. Every
  * edit is one `composer.designSystem.setTokens` write — no local copy, no
- * per-token undo stack, nothing staged (spec §4).
+ * per-token undo stack, nothing staged (spec §4). Exercised through the
+ * registries the provider hands Brand — the LOGGED commit (useSessionEdits),
+ * so every successful write is also a Review-changes row.
  *
  * @license BSD-3-Clause
  */
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { useTokensForKind } from "../useTokensForKind";
+import * as React from "react";
+import { TokenRegistryProvider, useColorRegistry, useSpacingRegistry, useProjectTokenStore } from "../TokenRegistryContext";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
@@ -42,10 +45,21 @@ function fakeComposer(initial: DesignToken[] = DEFAULT_TOKENS, readOnly = false)
   return composer;
 }
 
-describe("useTokensForKind (v6, composer-backed)", () => {
+
+type Fake = ReturnType<typeof fakeComposer>;
+/** The colour registry Brand reads, plus the store (its session log). */
+function colorRegistry(composer: Fake | null) {
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <TokenRegistryProvider composer={composer as never}>{children}</TokenRegistryProvider>
+  );
+  const { result } = renderHook(() => ({ ...useColorRegistry(), store: useProjectTokenStore() }), { wrapper });
+  return { result };
+}
+
+describe("the colour registry (v6, composer-backed, logged)", () => {
   it("writes through composer.designSystem.setTokens and keeps no local undo", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     act(() => {
       result.current.updateToken("color-primary", "#C2410C");
     });
@@ -57,11 +71,13 @@ describe("useTokensForKind (v6, composer-backed)", () => {
     expect(result.current).not.toHaveProperty("savedTokens");
     expect(result.current).not.toHaveProperty("pendingDiff");
     expect(result.current).not.toHaveProperty("isDirty");
+    // The write is a Review-changes row.
+    expect(result.current.store.edits).toHaveLength(1);
   });
 
   it("shows the project's value right after the write — nothing staged", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     act(() => {
       result.current.updateToken("color-primary", "#C2410C");
     });
@@ -70,21 +86,24 @@ describe("useTokensForKind (v6, composer-backed)", () => {
 
   it("follows a write it did not make (undo, update everywhere)", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     act(() => composer.replace(setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#111111")));
     expect(resolveTokenLiteral(result.current.tokens, "color-primary", "light")).toBe("#111111");
   });
 
   it("only lists its own kind", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("spacing", composer as never));
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <TokenRegistryProvider composer={composer as never}>{children}</TokenRegistryProvider>
+    );
+    const { result } = renderHook(() => useSpacingRegistry(), { wrapper });
     expect(result.current.tokens.length).toBeGreaterThan(0);
     expect(result.current.tokens.every((t) => t.kind === "spacing")).toBe(true);
   });
 
   it("a dark edit writes the dark mode", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     act(() => {
       result.current.updateToken("color-primary", "#222222", "dark");
     });
@@ -94,7 +113,7 @@ describe("useTokensForKind (v6, composer-backed)", () => {
 
   it("rename is one write and bridges the old id to the new one (B1 replacedBy)", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     act(() => {
       result.current.renameToken("color-accent", "color-highlight");
     });
@@ -106,7 +125,7 @@ describe("useTokensForKind (v6, composer-backed)", () => {
 
   it("rename onto a taken id writes nothing", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     let ok = true;
     act(() => {
       ok = result.current.renameToken("color-accent", "color-primary");
@@ -117,7 +136,7 @@ describe("useTokensForKind (v6, composer-backed)", () => {
 
   it("writes nothing while read-only", () => {
     const composer = fakeComposer(DEFAULT_TOKENS, true);
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     let ok = true;
     act(() => {
       ok = result.current.updateToken("color-primary", "#C2410C");
@@ -129,7 +148,7 @@ describe("useTokensForKind (v6, composer-backed)", () => {
   });
 
   it("without a composer it reads the seed and writes nothing", () => {
-    const { result } = renderHook(() => useTokensForKind("color", null));
+    const { result } = colorRegistry(null);
     expect(result.current.tokens.length).toBeGreaterThan(0);
     let ok = true;
     act(() => {
@@ -146,7 +165,7 @@ const aliasedPrimitive = () =>
       DEFAULT_TOKENS.some((t) => "alias" in t.modes.light && t.modes.light.alias === p.id),
   )!;
 
-describe("useTokensForKind — delete, add, filter through the commit path", () => {
+describe("the colour registry — delete, add, filter through the logged commit", () => {
   const extra: DesignToken = {
     id: "color-extra", name: "Extra", kind: "color", layer: "primitive", category: "colors",
     cssVar: "--buildrick-design-color-extra", type: "color", modes: { light: { value: "#123456" } },
@@ -154,19 +173,20 @@ describe("useTokensForKind — delete, add, filter through the commit path", () 
 
   it("hard delete removes the token in one write", () => {
     const composer = fakeComposer([...DEFAULT_TOKENS, extra]);
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     let ok = false;
     act(() => {
       ok = result.current.deleteToken("color-extra");
     });
     expect(ok).toBe(true);
     expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+    expect(result.current.store.edits[0].label).toBe("Delete token");
     expect(result.current.tokens.some((t) => t.id === "color-extra")).toBe(false);
   });
 
   it("soft delete keeps the token and bridges it to the replacement", () => {
     const composer = fakeComposer([...DEFAULT_TOKENS, extra]);
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     act(() => {
       result.current.deleteToken("color-extra", { replaceWith: "color-primary" });
     });
@@ -176,19 +196,20 @@ describe("useTokensForKind — delete, add, filter through the commit path", () 
   it("deleting a token another token aliases is refused — nothing written", () => {
     const composer = fakeComposer();
     const target = aliasedPrimitive();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     let ok = true;
     act(() => {
       ok = result.current.deleteToken(target.id);
     });
     expect(ok).toBe(false);
+    expect(result.current.store.edits).toHaveLength(0);
     expect(composer.getProjectSettings().designTokens).toBe(DEFAULT_TOKENS);
     expect(result.current.tokens.some((t) => t.id === target.id)).toBe(true);
   });
 
   it("adding a token whose id is taken is refused before any write", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     let ok = true;
     act(() => {
       ok = result.current.addToken({ ...extra, id: "color-primary" });
@@ -199,7 +220,7 @@ describe("useTokensForKind — delete, add, filter through the commit path", () 
 
   it("adding a new token is one write", () => {
     const composer = fakeComposer();
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     act(() => {
       result.current.addToken(extra);
     });
@@ -208,7 +229,7 @@ describe("useTokensForKind — delete, add, filter through the commit path", () 
 
   it("filterTokens matches name or id, case-insensitively; blank returns all", () => {
     const composer = fakeComposer([...DEFAULT_TOKENS, extra]);
-    const { result } = renderHook(() => useTokensForKind("color", composer as never));
+    const { result } = colorRegistry(composer);
     expect(result.current.filterTokens("EXTRA").map((t) => t.id)).toEqual(["color-extra"]);
     expect(result.current.filterTokens("color-extra").map((t) => t.id)).toEqual(["color-extra"]);
     expect(result.current.filterTokens("  ")).toHaveLength(result.current.tokens.length);

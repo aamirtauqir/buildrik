@@ -206,10 +206,9 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     const preFixValue = lightValue(container);
     expect(preFixValue.toLowerCase()).toBe(seedValue.toLowerCase());
 
-    // Click Auto-fix → engine applyAutoFix writes through setProjectSettings
-    // inside a "Auto-fix contrast" transaction → PROJECT_CHANGED records a
-    // history entry. The project:changed subscriber in TokensSection
-    // re-hydrates the React registries so the input value reflects the fix.
+    // Click Auto-fix → computeAutoFix → onValueChange → the colour registry's
+    // updateToken → designSystem.setTokens (one transaction, one history
+    // entry). The registries read the project, so the card reflects the fix.
     act(() => {
       fireEvent.click(autoFixBtn);
     });

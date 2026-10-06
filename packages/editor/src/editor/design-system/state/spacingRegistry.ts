@@ -7,7 +7,7 @@
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
-import { kindRegistry } from "./useTokensForKind";
+import { kindRegistry } from "./kindRegistry";
 
 export type SpacingPreset = "compact" | "normal" | "spacious";
 

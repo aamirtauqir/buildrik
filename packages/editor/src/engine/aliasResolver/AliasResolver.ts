@@ -17,8 +17,8 @@ import { AliasCycleError, AliasDepthError, MAX_ALIAS_DEPTH } from "./errors";
  *     `tokens:alias-changed` event from the editor token editor.
  *
  * Pure with respect to DOM: this resolver does NOT call setProperty / write
- * to :root. CSS variable application stays the responsibility of
- * useTokensForKind's applyToRoot at registry mount time.
+ * to :root. Token CSS is written only by ProjectTokensApplier's
+ * `<style id="bk-site-tokens">`.
  */
 export class AliasResolver {
   constructor(private readonly events: EventEmitter) {}

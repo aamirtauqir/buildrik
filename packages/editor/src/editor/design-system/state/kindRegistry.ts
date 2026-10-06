@@ -1,20 +1,17 @@
 /**
- * useTokensForKind — one kind's tokens as the project holds them, and the
- * edits Brand makes to them. Every edit is one `composer.designSystem.setTokens`
- * transaction over the whole set, so Brand and the canvas share one undo stack
- * (spec §4). Nothing is staged and nothing is kept locally: the list re-reads
- * the project on every settings change (useProjectTokens).
+ * kindRegistry — one kind's tokens as the project holds them, and the edits
+ * Brand makes to them. Every edit is one write of the whole set through the
+ * provider's commit (useSessionEdits → `composer.designSystem.setTokens`), so
+ * Brand and the canvas share one undo stack (spec §4) and every write is a
+ * Review-changes row. Nothing is staged and nothing is kept locally.
  *
  * Writes return false when refused (read-only tokens, a set that does not
  * validate — e.g. deleting a token another one aliases — or no composer).
  *
  * @license BSD-3-Clause
  */
-import * as React from "react";
-import type { Composer } from "@/engine";
 import { setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken, TokenKind } from "../types";
-import { useProjectTokens } from "./useProjectTokens";
 
 type Commit = (next: DesignToken[], label: string) => boolean;
 
@@ -55,9 +52,4 @@ export function kindRegistry(kind: TokenKind, all: DesignToken[], commit: Commit
   };
 }
 
-export function useTokensForKind(kind: TokenKind, composer: Composer | null) {
-  const { all, commit } = useProjectTokens(composer);
-  return React.useMemo(() => kindRegistry(kind, all, commit), [all, commit, kind]);
-}
-
-export type TokensForKindRegistry = ReturnType<typeof useTokensForKind>;
+export type TokensForKindRegistry = ReturnType<typeof kindRegistry>;

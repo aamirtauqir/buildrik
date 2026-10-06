@@ -19,8 +19,9 @@
  *
  * Engine reads (unchanged): usage from `tokenUsage` ("tokenUsage:changed"),
  * findings from `lintState` ("lint:changed"), the reverse alias lookup from
- * `aliasResolver` ("tokens:alias-changed"). Auto-fix goes through the
- * history-aware `designSystem.applyAutoFix` so Cmd+Z reverts it.
+ * `aliasResolver` ("tokens:alias-changed"). Auto-fix computes the value
+ * (`computeAutoFix`) and writes it through `onValueChange` — Brand's logged
+ * commit — so it is one ⌘Z step and a Review-changes row.
  *
  * Departures from the board, recorded: "Used by 34 elements on 3 pages" —
  * the tracker counts elements, not pages, so the page half is not printed;
@@ -135,9 +136,17 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   /* The typed value commits on blur / Enter, not per keystroke: one write and
      one ⌘Z step per edit, and no half-typed (or empty) value reaches the canvas. */
   const [draft, setDraft] = React.useState(value);
-  React.useEffect(() => setDraft(value), [value]);
+  /* The draft last sent: a refused one (its toast already shown) is not sent
+     again by the blur that follows Enter. Cleared when the value moves. */
+  const sentRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    setDraft(value);
+    sentRef.current = null;
+  }, [value]);
   const commitDraft = () => {
-    if (draft !== value) onValueChange?.(token.id, draft);
+    if (draft === value || draft === sentRef.current) return;
+    sentRef.current = draft;
+    onValueChange?.(token.id, draft);
   };
 
   // ─ Used by: subscribe to tokenUsage:changed for live count + breakdown updates.
@@ -249,22 +258,11 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const handleAutoFix = () => {
     const issue = lintIssues[0];
     if (!issue || !composer) return;
-    const hint = issue.autoFixHint;
-    // D6.c: prefer the history-aware engine path. It writes through
-    // projectSettings inside a labeled transaction, so Cmd+Z roundtrips
-    // into a single undoable entry. The React registries re-hydrate via
-    // TokensSection's project:changed subscription.
-    const engineApply = composer.designSystem.applyAutoFix;
-    if (typeof engineApply === "function") {
-      const fixed = engineApply(token.id, hint);
-      if (fixed === null) {
-        const computed = composer.designSystem.computeAutoFix(value, hint);
-        if (computed && computed !== value) onValueChange?.(token.id, computed);
-      }
-    } else {
-      const fixed = composer.designSystem.computeAutoFix(value, hint);
-      if (fixed && fixed !== value) onValueChange?.(token.id, fixed);
-    }
+    /* Through the card's own write (onValueChange → Brand's logged commit),
+       exactly like Brand checks' Fix: one ⌘Z step AND a Review-changes row.
+       The engine's applyAutoFix wrote around that log. */
+    const fixed = composer.designSystem.computeAutoFix(value, issue.autoFixHint);
+    if (fixed && fixed !== value) onValueChange?.(token.id, fixed);
     lintState?.suppress(token.id);
   };
   const handleIgnore = () => lintState?.suppress(token.id);
@@ -279,7 +277,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   // B4 follow-up (2026-05-17): per-token consumer count drives the delete
   // path. Zero consumers → hard delete bypasses the modal. > 0 consumers →
   // open the picker modal; user picks a replacement which routes through
-  // useColorTokens / useTokensForKind deleteToken(id, { replaceWith }).
+  // the kind registry's deleteToken(id, { replaceWith }).
   const consumerCount = composer?.designSystem?.tokenUsage?.getUsage(token.id) ?? 0;
   const tokenKind = token.kind ?? (token.category === "colors" ? "color" : undefined);
   const replaceCandidates = React.useMemo(

@@ -41,7 +41,9 @@ export function useSessionEdits(composer: Composer | null, project: ProjectToken
       const before = readTokens(composer);
       if (!write(next, label)) return false;
       const after = readTokens(composer);
-      setLog((prev) => [{ label, before, after, at: Date.now() }, ...prev]);
+      /* A write that changed nothing (re-applying the starter you are on) is
+         not an edit — no row. */
+      if (!sameTokens(before, after)) setLog((prev) => [{ label, before, after, at: Date.now() }, ...prev]);
       return true;
     },
     [composer, write],
@@ -59,10 +61,10 @@ export function useSessionEdits(composer: Composer | null, project: ProjectToken
     [composer, log, write],
   );
 
-  const edits = React.useMemo<SessionEdit[]>(
-    () => log.map((r) => ({ ...r, stale: !sameTokens(all, r.after) })),
-    [log, all],
-  );
+  const edits = React.useMemo<SessionEdit[]>(() => {
+    const current = JSON.stringify(all);
+    return log.map((r) => ({ ...r, stale: r.after !== all && JSON.stringify(r.after) !== current }));
+  }, [log, all]);
 
   return { commit, edits, revert };
 }

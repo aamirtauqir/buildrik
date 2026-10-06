@@ -10,7 +10,7 @@
  */
 
 import { render, fireEvent, waitFor, act, within } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as React from "react";
 import { BrandWorkspace } from "../BrandWorkspace";
 import { ProjectTokensApplier } from "../ProjectTokensApplier";
@@ -130,6 +130,17 @@ describe("BrandWorkspace — autosave (one write per edit, nothing staged)", () 
     expect(document.documentElement.getAttribute("style") ?? "").not.toContain("--buildrick-design-");
   });
 
+  it("a refused value toasts once — the blur after Enter does not send the same draft again", async () => {
+    const composer = makeFakeComposer();
+    composer.designSystem.setTokens.mockImplementation(() => false);
+    const utils = await renderOnRadius(composer);
+    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    fireEvent.keyDown(utils.radiusInput, { key: "Enter" });
+    fireEvent.blur(utils.radiusInput);
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(utils.getAllByText(/wasn't applied/)).toHaveLength(1));
+  });
+
   it("follows a token write made elsewhere (⌘Z, Update everywhere) without a reload", async () => {
     const composer = makeFakeComposer();
     const utils = await renderOnRadius(composer);
@@ -173,6 +184,52 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     expect(reverted.map((t) => t.id).sort()).toEqual(seedIds);
     expect(resolveTokenLiteral(reverted, "color-primary", "light")).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"));
     await waitFor(() => expect(utils.queryByTestId("brand-session-edits")).toBeNull());
+  });
+
+  it("the card's Auto-fix is a recorded write: a row, and Revert restores", async () => {
+    const composer = makeFakeComposer();
+    const issue = { type: "contrast", severity: "warning", message: "Contrast 2.8:1", autoFixHint: "darken-22" };
+    Object.assign(composer.designSystem, {
+      lintState: {
+        getVisibleIssues: (id: string) => (id === "color-primary" ? [issue] : []),
+        setAllIssues: () => {},
+        suppress: () => {},
+        suppressedCount: () => 0,
+        on: () => {},
+        off: () => {},
+      },
+      computeAutoFix: () => "#0B2F8C",
+      /* The engine path writes around Brand's log — the card must not use it. */
+      applyAutoFix: vi.fn(() => {
+        composer.setProjectSettings({ designTokens: setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#0B2F8C"), designTokensSchemaVersion: 6 });
+        return "#0B2F8C";
+      }),
+    });
+    const utils = renderWorkspace(composer);
+    const original = resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light");
+    fireEvent.click(utils.container.querySelector('[data-token-row="color-primary"]')!);
+    fireEvent.click(await utils.findByText("Auto-fix"));
+
+    expect(resolveTokenLiteral(composer.settings.designTokens as DesignToken[], "color-primary", "light")).toBe("#0B2F8C");
+    expect((composer.designSystem as unknown as { applyAutoFix: ReturnType<typeof vi.fn> }).applyAutoFix).not.toHaveBeenCalled();
+    await openList(utils);
+    expect(rows(utils)).toHaveLength(1);
+    expect(rows(utils)[0].textContent).toMatch(/→ #0B2F8C/i);
+
+    fireEvent.click(within(rows(utils)[0]).getByTestId("brand-session-revert"));
+    expect(resolveTokenLiteral(composer.settings.designTokens as DesignToken[], "color-primary", "light")).toBe(original);
+  });
+
+  it("a write that changes nothing logs no row (re-applying the starter you are on)", async () => {
+    const composer = makeFakeComposer();
+    const utils = renderWorkspace(composer);
+    openPage(utils, "starters");
+    const second = () => utils.container.querySelectorAll<HTMLElement>('[role="radio"]')[1];
+    fireEvent.click(second());
+    fireEvent.click(second());
+    openPage(utils, "colours");
+    await openList(utils);
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1");
   });
 
   it("a starter apply and an import each appear as a row", async () => {

@@ -70,7 +70,7 @@ import {
   useNavPresets, useTablePresets, useLayoutPresets,
 } from "../state/StylePresetRegistryContext";
 import type { DesignToken, StylePreset, TokenKind } from "../types";
-import type { TokensForKindRegistry } from "../state/useTokensForKind";
+import type { TokensForKindRegistry } from "../state/kindRegistry";
 import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils";
 import { DSModeProvider, useDSModeOptional } from "../state/DSModeContext";
 import { AIPromptModal } from "./AIPromptModal";

@@ -17,7 +17,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { TokenKind } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
-import { kindRegistry, type TokensForKindRegistry } from "./useTokensForKind";
+import { kindRegistry, type TokensForKindRegistry } from "./kindRegistry";
 import { spacingRegistry, type SpacingRegistry } from "./spacingRegistry";
 import { useProjectTokens, type ProjectTokens } from "./useProjectTokens";
 import { useSessionEdits, type SessionEdit } from "./useSessionEdits";
