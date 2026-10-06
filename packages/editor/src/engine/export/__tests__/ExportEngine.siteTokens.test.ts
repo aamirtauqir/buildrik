@@ -16,7 +16,8 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { emitSiteTokenCss } from "../ExportHelpers";
+import { emitSiteTokenCss, siteFontsFromSettings } from "../ExportHelpers";
+import { DEFAULT_TOKENS, DEFAULT_TOKENS_V5 } from "@/engine/designSystem/defaultTokens";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const siteTokensCSS = (designTokens?: unknown[] | null) =>
@@ -53,17 +54,28 @@ describe("emitSiteTokenCss", () => {
     expect(css).not.toContain("--buildrick-design-btn-radius:8px");
   });
 
-  /* A saved list with an unusable row is not half-applied: it falls back to
-     the seed (mergeProjectTokens, D17), so the export never writes
-     `:undefined` and never loses the seed either. */
-  it("an unusable saved row falls back to the seed rather than writing `:undefined`", () => {
-    const css = siteTokensCSS([
-      v6Token({ id: "no-var", cssVar: "", value: "#fff" }),
-      v6Token({ id: "ok", cssVar: "--buildrick-design-ok", value: "#123456" }),
-    ]);
-    expect(css).toContain("--buildrick-design-btn-height-md:40px");
+  /* D17: an unusable saved row never reverts the site to the default brand. */
+  it("an unusable saved row keeps every other saved value and its own value", () => {
+    const rows = DEFAULT_TOKENS_V5.map((t) =>
+      t.id === "color-primary" ? { ...t, value: "#FF0000" } : t.id === "color-text" ? { ...t, value: "#123456" } : t
+    );
+    const bad = { id: "My Token", name: "My Token", value: "#00FF00", category: "colors", cssVar: "--buildrick-design-my-token", type: "color" };
+    const css = emitSiteTokenCss({ designTokens: [...rows, bad], designTokensSchemaVersion: 5 });
+    expect(css).toContain("--buildrick-design-color-primary:#FF0000");
+    expect(css).toContain("--buildrick-design-color-text:#123456");
+    expect(css).toContain("--buildrick-design-my-token:#00FF00");
     expect(css).not.toContain("undefined");
-    expect(css).not.toContain("--buildrick-design-ok:");
+  });
+
+  it("a bad custom-property name on one token is skipped while the rest export", () => {
+    const css = siteTokensCSS([
+      ...DEFAULT_TOKENS,
+      v6Token({ id: "evil", cssVar: "--x:red}</style><script>", value: "#000" }),
+      v6Token({ id: "good", cssVar: "--buildrick-design-good", value: "#123456" }),
+    ]);
+    expect(css).not.toMatch(/<\/style>|<script|--x:/);
+    expect(css).toContain("--buildrick-design-good:#123456");
+    expect(css).toContain("--buildrick-design-btn-height-md:40px");
   });
 
   it("skips a token whose value is empty", () => {
@@ -143,5 +155,12 @@ describe("the three documents carry the token definitions", () => {
     const { files } = await engine.exportAllPages({ format: "html" });
     const css = files.find((f) => f.name === "styles.css")?.content ?? "";
     expect(css).toContain("--buildrick-design-color-text-primary:#22AA66");
+  });
+});
+
+describe("siteFontsFromSettings", () => {
+  it("resolves a text-only v5 save against the emit list", () => {
+    const only = { id: "color-text", name: "Text", value: "#123456", category: "colors", cssVar: "--buildrick-design-color-text", type: "color" };
+    expect(siteFontsFromSettings({ designTokens: [only], designTokensSchemaVersion: 5 })).toEqual({ text: "#123456" });
   });
 });

@@ -8,7 +8,8 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { ProjectTokensApplier } from "../ProjectTokensApplier";
 import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
-import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
+import { DEFAULT_TOKENS, DEFAULT_TOKENS_V5 } from "@/engine/designSystem/defaultTokens";
+import { emitSiteTokenCss } from "@/engine/export/ExportHelpers";
 import type { DesignToken } from "@/engine/designSystem/types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
@@ -44,6 +45,18 @@ beforeEach(() => {
 });
 
 describe("ProjectTokensApplier", () => {
+  it("writes exactly the export's token block, even when one saved row is invalid (D17)", () => {
+    const rows = DEFAULT_TOKENS_V5.map((t) => (t.id === "color-primary" ? { ...t, value: "#FF0000" } : t));
+    const bad = { id: "My Token", name: "My Token", value: "#00FF00", category: "colors", cssVar: "--buildrick-design-my-token", type: "color" };
+    const settings = { designTokens: [...rows, bad], designTokensSchemaVersion: 5, darkMode: "off" };
+    const { composer } = stubComposer([]);
+    composer.getProjectSettings = () => settings as never;
+    render(<ProjectTokensApplier composer={composer} />);
+    expect(css()).toBe(emitSiteTokenCss(settings));
+    expect(css()).toContain("--buildrick-design-color-primary:#FF0000");
+    expect(css()).toContain("--buildrick-design-my-token:#00FF00");
+  });
+
   it("puts the site's own tokens on the page without the Brand panel", () => {
     const { composer } = stubComposer([
       v6Token({ id: "font-body", value: "Palatino", category: "typography", type: "font-family", layer: "semantic" }),

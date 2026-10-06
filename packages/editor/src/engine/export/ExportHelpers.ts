@@ -9,7 +9,7 @@ import { THEME } from "../../shared/constants/defaultStyles";
 import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
 import { resolveTokenLiteral, emitTokenCss } from "@buildrik/shared/tokens";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
-import { mergeProjectTokens } from "../designSystem/projectTokens";
+import { tokensForEmit } from "../designSystem/projectTokens";
 import type { DesignToken } from "../designSystem/types";
 
 /** The slice of project settings the token emitters read. */
@@ -57,18 +57,23 @@ export function siteFontsFromTokens(
 }
 
 /**
- * The font slots and text colour the SITE saved. Read off the merged v6 list,
- * but only for tokens the site actually carries: the seed's Inter must not
- * become a rule on every export, or "a missing token leaves the reset's family
- * in place" (`siteFontCSS`) could never be true.
+ * The font slots and text colour the SITE saved, resolved against the same
+ * list the canvas and the token CSS use. A slot is reported only when the site
+ * carries its token: the seed's Inter must not become a rule on every export,
+ * or "a missing token leaves the reset's family in place" (`siteFontCSS`)
+ * could never be true.
  */
 export function siteFontsFromSettings(
   settings: SiteTokenSettings | undefined
 ): ReturnType<typeof siteFontsFromTokens> {
-  const savedIds = new Set(
-    tokenList(settings?.designTokens).map((r) => (r as { id?: unknown } | null)?.id)
-  );
-  return siteFontsFromTokens(resolveSiteTokens(settings).filter((t) => savedIds.has(t.id)));
+  const saved = new Set(tokenList(settings?.designTokens).map((r) => (r as { id?: unknown } | null)?.id));
+  const all = siteFontsFromTokens(tokensForEmit(settings));
+  return {
+    heading: saved.has("font-heading") ? all.heading : undefined,
+    body: saved.has("font-body") ? all.body : undefined,
+    mono: saved.has("font-mono") ? all.mono : undefined,
+    text: saved.has("color-text") ? all.text : undefined,
+  };
 }
 
 /**
@@ -105,17 +110,6 @@ export function siteFontCSS(fonts: {
 }
 
 /**
- * The site's tokens as every export and the preview must see them: what the
- * project saved, merged over the seed and migrated to v6 — the same list the
- * canvas paints from. A site saves only the tokens it touched, while element
- * defaults name seed tokens (`btn-height-md`, `input-radius`, …), so an export
- * that read the saved rows alone declared none of them (BRD-23).
- */
-function resolveSiteTokens(settings: SiteTokenSettings | undefined): DesignToken[] {
-  return mergeProjectTokens(settings?.designTokens ?? [], settings?.designTokensSchemaVersion);
-}
-
-/**
  * The token definitions a published page needs, written by the one emitter the
  * canvas also uses (spec §2). The Brand panel writes every token into the
  * project and the canvas paints from them, so an export that names
@@ -124,7 +118,7 @@ function resolveSiteTokens(settings: SiteTokenSettings | undefined): DesignToken
  * ship; a token the emitter cannot write is skipped and reported, never thrown.
  */
 export function emitSiteTokenCss(settings: SiteTokenSettings | undefined): string {
-  return emitTokenCss(resolveSiteTokens(settings), {
+  return emitTokenCss(tokensForEmit(settings), {
     darkMode: DarkModeSchema.catch("off").parse(settings?.darkMode),
     onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
   });

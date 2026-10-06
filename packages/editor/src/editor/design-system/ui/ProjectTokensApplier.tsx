@@ -12,7 +12,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { emitTokenCss } from "@buildrik/shared/tokens";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
-import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
+import { tokensForEmit } from "@/engine/designSystem/projectTokens";
 
 const STYLE_ID = "bk-site-tokens";
 
@@ -29,7 +29,7 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
       frame = 0;
       const settings = composer.getProjectSettings?.();
       const darkMode = DarkModeSchema.catch("off").parse(settings?.darkMode);
-      const tokens = mergeProjectTokens(settings?.designTokens ?? [], settings?.designTokensSchemaVersion);
+      const tokens = tokensForEmit(settings);
       let style = document.getElementById(STYLE_ID);
       if (!style) {
         style = document.createElement("style");

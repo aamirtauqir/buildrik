@@ -15,6 +15,7 @@ const clean = (v: string) => v.replace(/[\x00-\x1f\x7f;{}<]/g, "").trim();
 
 /** A custom-property name is user data too: a crafted `--x:red}</style><script>` must never reach a page. */
 const SAFE_VAR = /^--[a-zA-Z0-9_-]+$/;
+export const isSafeCssVarName = (name: string) => SAFE_VAR.test(name);
 
 export function emitTokenCss(
   tokens: readonly DesignToken[],
