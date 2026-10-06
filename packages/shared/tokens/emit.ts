@@ -1,0 +1,66 @@
+// packages/shared/tokens/emit.ts
+/**
+ * The one token CSS emitter (spec §2): canvas, single-file export, ZIP export
+ * and publish all write this string. Aliases stay `var()` so a primitive edit
+ * cascades in the browser. Dark blocks only when the site's Dark mode is
+ * "auto" (D8). A bad value is skipped and reported, never thrown, so one token
+ * can never fail a publish (D17).
+ */
+import type { DarkMode, DesignToken, TokenRef } from "../schemas/design-tokens";
+import { LEGACY_SEED } from "./legacySeed";
+
+// Same strip set as v5's escapeCssValue (control chars, braces) plus `;` and `<`.
+// eslint-disable-next-line no-control-regex -- control-char stripping is the intent
+const clean = (v: string) => v.replace(/[\x00-\x1f\x7f;{}<]/g, "").trim();
+
+export function emitTokenCss(
+  tokens: readonly DesignToken[],
+  opts: { darkMode: DarkMode; onSkip?: (id: string, reason: string) => void },
+): string {
+  const byId = new Map(tokens.map((t) => [t.id, t]));
+  const refCss = (ref: TokenRef): string | null => {
+    if ("alias" in ref) {
+      const target = byId.get(ref.alias);
+      return target ? `var(${target.cssVar})` : null;
+    }
+    return clean(ref.value) || null;
+  };
+
+  const light: string[] = [];
+  const dark: string[] = [];
+  const seen = new Set<string>();
+  for (const t of tokens) {
+    const lv = refCss(t.modes.light);
+    if (!lv) {
+      opts.onSkip?.(t.id, "empty or unresolvable light value");
+      continue;
+    }
+    seen.add(t.cssVar);
+    light.push(`${t.cssVar}:${lv}`);
+    for (const legacy of t.legacyNames ?? []) {
+      if (seen.has(legacy)) continue;
+      seen.add(legacy);
+      light.push(`${legacy}:var(${t.cssVar})`);
+    }
+    if (opts.darkMode === "auto" && t.modes.dark) {
+      const dv = refCss(t.modes.dark);
+      if (dv) dark.push(`${t.cssVar}:${dv}`);
+      else opts.onSkip?.(t.id, "unresolvable dark value");
+    }
+  }
+  for (const s of LEGACY_SEED) {
+    if (seen.has(s.cssVar)) continue;
+    const v = clean(s.value);
+    if (!v) continue;
+    seen.add(s.cssVar);
+    light.push(`${s.cssVar}:${v}`);
+  }
+
+  let css = `\n:root{${light.join(";")}}\n`;
+  if (dark.length) {
+    const body = dark.join(";");
+    css += `@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${body}}}\n`;
+    css += `:root[data-theme="dark"]{${body}}\n`;
+  }
+  return css;
+}

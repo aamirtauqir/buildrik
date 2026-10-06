@@ -36,8 +36,6 @@ function isV5Row(x: unknown): x is V5Row {
     typeof r.value === "string" && typeof r.cssVar === "string" && typeof r.category === "string" && typeof r.type === "string";
 }
 
-const norm = (v: string) => v.trim().toLowerCase();
-
 function kindOf(r: V5Row): DesignToken["kind"] {
   if (r.kind) return r.kind;
   if (r.category === "colors" || r.type === "color") return "color";
