@@ -7,8 +7,8 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { LoadingSkeleton, ErrorState, DeniedState, StateEmpty } from "@/components/states";
 import { SelectField, Button } from "@/components/dashboard/primitives";
 
-type PushResultRow = { siteId: string; name: string; status: "pushed" | "skipped-locked" | "failed"; error?: string };
-type PushPreviewRow = { siteId: string; name: string; status: "would-push" | "skipped-locked"; willChange: boolean };
+type PushResultRow = { siteId: string; name: string; status: "pushed" | "skipped-locked" | "skipped-held" | "skipped-version" | "failed"; error?: string };
+type PushPreviewRow = { siteId: string; name: string; status: "would-push" | "skipped-locked" | "skipped-held" | "skipped-version"; willChange: boolean };
 
 function timeAgo(d: Date | string): string {
   const diff = Date.now() - new Date(d).getTime();
@@ -200,7 +200,8 @@ export function ThemeManager() {
                       <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                         <strong>{preview.filter((p) => p.status === "would-push" && p.willChange).length}</strong> will change ·{" "}
                         {preview.filter((p) => p.status === "would-push" && !p.willChange).length} already match ·{" "}
-                        {preview.filter((p) => p.status === "skipped-locked").length} locked (kept)
+                        {preview.filter((p) => p.status === "skipped-locked").length} locked (kept) ·{" "}
+                        {preview.filter((p) => p.status === "skipped-held" || p.status === "skipped-version").length} skipped (brand format)
                       </p>
                     ) : (
                       <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
@@ -249,6 +250,10 @@ export function ThemeManager() {
                         <span className="inline-flex items-center gap-1 text-[var(--color-success)]"><Check className="h-3 w-3" /> Updated</span>
                       ) : r.status === "skipped-locked" ? (
                         <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Locked — kept own</span>
+                      ) : r.status === "skipped-held" ? (
+                        <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Brand rolled back — skipped</span>
+                      ) : r.status === "skipped-version" ? (
+                        <span className="inline-flex items-center gap-1 text-neutral-400" title={r.error}><Lock className="h-3 w-3" /> New brand format — re-capture theme</span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-[var(--color-error)]" title={r.error}><AlertTriangle className="h-3 w-3" /> Failed</span>
                       )}

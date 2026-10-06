@@ -85,6 +85,7 @@ function restoreTokens(projectSettings: unknown, snapshot: TokenTheme, snapshotV
   const upgraded = storedTokensVersion(projectSettings) > snapshotVersion;
   const restored = { ...(withTokens(projectSettings, snapshot, upgraded ? snapshotVersion : undefined) as Record<string, unknown>) };
   if (!snapshot.designPresets) delete restored.designPresets;
+  if (upgraded) delete restored.darkMode;
   return restored as Prisma.InputJsonValue;
 }
 
@@ -125,7 +126,7 @@ export interface ThemeTarget {
   dsSchemaVersion: number;
 }
 
-export type PushStatus = "pushed" | "skipped-locked" | "failed";
+export type PushStatus = "pushed" | "skipped-locked" | "skipped-held" | "skipped-version" | "failed";
 
 export interface PushResult {
   siteId: string;
@@ -140,7 +141,7 @@ const SNAPSHOT_RETENTION = 10;
 export interface PushPreview {
   siteId: string;
   name: string;
-  status: "would-push" | "skipped-locked";
+  status: "would-push" | "skipped-locked" | "skipped-held" | "skipped-version";
   /** True when the shared theme differs from the site's current tokens. */
   willChange: boolean;
 }
@@ -252,8 +253,17 @@ export async function pushSharedTheme(
       results.push({ siteId: site.id, name: site.name, status: "skipped-locked" });
       continue;
     }
-    /* A held site (brand rolled back) is never migrated forward. */
-    const pushed = migrated && !site.tokensMigrationHold ? migrated : { theme, version: undefined };
+    const plan = planPush(theme, migrated, site);
+    if (plan.kind !== "write") {
+      results.push({
+        siteId: site.id,
+        name: site.name,
+        status: plan.kind,
+        ...(plan.kind === "skipped-version" ? { error: SKIPPED_VERSION_MESSAGE } : {}),
+      });
+      continue;
+    }
+    const pushed = plan;
     try {
       // D2: snapshot the site's CURRENT tokens before the push overwrites them,
       // atomically with the overwrite, so a bad push can be rolled back. Push was
@@ -297,19 +307,44 @@ export async function pushSharedTheme(
   return results;
 }
 
-/** A v5 workspace theme moved to v6 for a push (switch on). Null when it is
- *  already v6, the switch is off, or it cannot migrate — the push then goes
- *  out as it is rather than failing. */
-function migrateSharedTheme(theme: TokenTheme): { theme: TokenTheme; version: number } | null {
+/** A non-v6 workspace theme moved to v6 for a push (switch on). Null when it
+ *  is already v6, the switch is off, or it cannot migrate. */
+function migrateSharedTheme(theme: TokenTheme): TokenTheme | null {
   if (!isBrandTokensV2Enabled() || validateTokens(theme.designTokens).ok) return null;
   try {
-    return { theme: { ...theme, designTokens: migrateTokensToV6(theme.designTokens) }, version: TOKENS_SCHEMA_VERSION };
+    return { ...theme, designTokens: migrateTokensToV6(theme.designTokens) };
   } catch (e) {
     console.warn("[theme] workspace theme did not migrate; pushing as-is", {
       error: e instanceof Error ? e.message : String(e),
     });
     return null;
   }
+}
+
+const SKIPPED_VERSION_MESSAGE =
+  "This site uses the new brand format; re-capture the theme from an upgraded site.";
+
+type PushPlan =
+  | { kind: "write"; theme: TokenTheme; version: number }
+  | { kind: "skipped-held" | "skipped-version" };
+
+/**
+ * What a push does to one site, from the theme's REAL version (v6 when it
+ * validates, else v5), so the stored version label always matches the tokens
+ * written. A held site (brand rolled back) never takes v6; a v6 site never
+ * takes v5. A v5 theme migrates for a non-held site when the switch is on.
+ */
+function planPush(
+  theme: TokenTheme,
+  migrated: TokenTheme | null,
+  site: { projectSettings: unknown; tokensMigrationHold: boolean },
+): PushPlan {
+  if (validateTokens(theme.designTokens).ok) {
+    return site.tokensMigrationHold ? { kind: "skipped-held" } : { kind: "write", theme, version: TOKENS_SCHEMA_VERSION };
+  }
+  if (migrated && !site.tokensMigrationHold) return { kind: "write", theme: migrated, version: TOKENS_SCHEMA_VERSION };
+  if (storedTokensVersion(site.projectSettings) >= TOKENS_SCHEMA_VERSION) return { kind: "skipped-version" };
+  return { kind: "write", theme, version: 5 };
 }
 
 /** Keep only the newest SNAPSHOT_RETENTION snapshots per site (best-effort).
@@ -344,15 +379,23 @@ export async function previewSharedThemePush(
   const targets = await prisma.site.findMany({
     where: { workspaceId, deletedAt: null, ...(siteIds ? { id: { in: siteIds } } : {}) },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, themeLocked: true, projectSettings: true },
+    select: { id: true, name: true, themeLocked: true, projectSettings: true, tokensMigrationHold: true },
   });
-  const after = JSON.stringify(theme.designTokens);
+  const migrated = migrateSharedTheme(theme);
   return targets.map((site) => {
     if (site.themeLocked) {
       return { siteId: site.id, name: site.name, status: "skipped-locked" as const, willChange: false };
     }
+    const plan = planPush(theme, migrated, site);
+    if (plan.kind !== "write") return { siteId: site.id, name: site.name, status: plan.kind, willChange: false };
     const before = JSON.stringify(readTokenTheme(site.projectSettings)?.designTokens ?? []);
-    return { siteId: site.id, name: site.name, status: "would-push" as const, willChange: before !== after };
+    const versionChanges = storedTokensVersion(site.projectSettings) !== plan.version;
+    return {
+      siteId: site.id,
+      name: site.name,
+      status: "would-push" as const,
+      willChange: versionChanges || before !== JSON.stringify(plan.theme.designTokens),
+    };
   });
 }
 
@@ -446,15 +489,15 @@ export async function rollbackTokenMigration(siteId: string): Promise<{ restored
   if (!prev) throw new ThemeError("BAD_REQUEST", "The migration snapshot holds no token set");
   const site = await prisma.site.findUniqueOrThrow({
     where: { id: siteId },
-    select: { projectSettings: true, dsSchemaVersion: true },
+    select: { projectSettings: true, dsSchemaVersion: true, lastEditedAt: true },
   });
   const current =
     site.projectSettings && typeof site.projectSettings === "object" && !Array.isArray(site.projectSettings)
       ? (site.projectSettings as Record<string, unknown>)
       : {};
   const { darkMode: _darkMode, ...rest } = current;
-  await prisma.site.update({
-    where: { id: siteId },
+  const claimed = await prisma.site.updateMany({
+    where: { id: siteId, lastEditedAt: site.lastEditedAt },
     data: {
       projectSettings: {
         ...rest,
@@ -466,6 +509,9 @@ export async function rollbackTokenMigration(siteId: string): Promise<{ restored
       lastEditedAt: new Date(),
     },
   });
+  if (claimed.count === 0) {
+    throw new ThemeError("CONFLICT", "This site changed while rolling back — nothing was changed. Try again.");
+  }
   return { restoredVersion: snap.tokensSchemaVersion };
 }
 
@@ -480,7 +526,7 @@ export async function listBrandRestorePoints(
   siteId: string,
 ): Promise<Array<{ id: string; reason: string; createdAt: Date }>> {
   const rows = await prisma.siteThemeSnapshot.findMany({
-    where: { siteId },
+    where: { siteId, site: { deletedAt: null } },
     orderBy: { createdAt: "desc" },
     select: { id: true, reason: true, createdAt: true, prevStyles: true },
   });

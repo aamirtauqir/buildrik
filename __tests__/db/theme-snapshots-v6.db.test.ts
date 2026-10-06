@@ -4,19 +4,26 @@
  * holds the site, prune never touches migration rows, and the Brand restore
  * list hides legacy projectStyles snapshots.
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { prisma } from "@/lib/prisma";
 import {
   rollbackSiteTheme,
   rollbackTokenMigration,
+  pushSharedTheme,
   clearTokenMigrationHold,
   listBrandRestorePoints,
   pruneThemeSnapshots,
 } from "@/server/services/theme.service";
+import { migrateTokensToV6 } from "@buildrik/shared/tokens";
+import v5seed from "@buildrik/shared/tokens/__tests__/__fixtures__/seed-only.json";
 import { createTestUser, createTestWorkspace, createTestSite, truncateTables } from "./helpers";
 
 beforeEach(async () => {
   await truncateTables("site", "workspace", "user");
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 async function site(extra: Record<string, unknown> = {}) {
@@ -56,6 +63,38 @@ describe("SiteThemeSnapshot v6 rules", () => {
     expect(after.lastEditedAt.getTime()).toBeGreaterThan(s.lastEditedAt.getTime());
     await clearTokenMigrationHold(s.id);
     expect((await prisma.site.findUniqueOrThrow({ where: { id: s.id } })).tokensMigrationHold).toBe(false);
+  });
+
+  it("push (migrating) then admin rollback restores v5 tokens, version 5 and no darkMode", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    const s = await site({ projectSettings: { designTokens: v5seed, designTokensSchemaVersion: 5 } });
+    await prisma.workspace.update({ where: { id: s.workspaceId }, data: { sharedTheme: { designTokens: v5seed }, sharedThemeUpdatedAt: new Date() } });
+    const res = await pushSharedTheme(s.workspaceId);
+    expect(res[0].status).toBe("pushed");
+    const pushed = await prisma.site.findUniqueOrThrow({ where: { id: s.id } });
+    expect(pushed.projectSettings).toMatchObject({ designTokens: migrateTokensToV6(v5seed), designTokensSchemaVersion: 6 });
+    await prisma.site.update({ where: { id: s.id }, data: { projectSettings: { ...(pushed.projectSettings as object), darkMode: "auto" } } });
+    await rollbackSiteTheme(s.workspaceId, s.id);
+    const back = await prisma.site.findUniqueOrThrow({ where: { id: s.id } });
+    expect(back.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+  });
+
+  it("migration rollback refuses with CONFLICT when the row changed between read and write", async () => {
+    const s = await site();
+    await snap(s.id, s.workspaceId, "migration", { designTokens: [] }, 1);
+    const real = prisma.site.updateMany.bind(prisma.site);
+    const spy = vi.spyOn(prisma.site, "updateMany").mockImplementationOnce(((args: Parameters<typeof real>[0]) =>
+      prisma.site.update({ where: { id: s.id }, data: { lastEditedAt: new Date() } }).then(() => real(args))) as never);
+    await expect(rollbackTokenMigration(s.id)).rejects.toMatchObject({ code: "CONFLICT" });
+    spy.mockRestore();
+    expect((await prisma.site.findUniqueOrThrow({ where: { id: s.id } })).tokensMigrationHold).toBe(false);
+  });
+
+  it("Brand restore list excludes a soft-deleted site", async () => {
+    const s = await site();
+    await snap(s.id, s.workspaceId, "generator", { designTokens: [] }, 1);
+    await prisma.site.update({ where: { id: s.id }, data: { deletedAt: new Date() } });
+    expect(await listBrandRestorePoints(s.id)).toEqual([]);
   });
 
   it("migration rollback with no migration snapshot is NOT_FOUND", async () => {

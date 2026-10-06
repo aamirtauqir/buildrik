@@ -9,6 +9,8 @@
  * overwrite wholesale).
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { migrateTokensToV6 } from "@buildrik/shared/tokens";
+import v5seed from "@buildrik/shared/tokens/__tests__/__fixtures__/seed-only.json";
 
 const wsFindUnique = vi.fn();
 const wsUpdate = vi.fn();
@@ -173,7 +175,7 @@ describe("pushSharedTheme", () => {
     ]);
     await pushSharedTheme("w1");
     const data = siteUpdateMany.mock.calls[0][0].data;
-    expect(data.projectSettings).toEqual({ designTokens: [{ id: "t", v: "new" }], seo: { metaTitle: "Keep" } });
+    expect(data.projectSettings).toEqual({ designTokens: [{ id: "t", v: "new" }], seo: { metaTitle: "Keep" }, designTokensSchemaVersion: 5 });
     expect("projectStyles" in data).toBe(false);
     expect(data.lastEditedAt).toBeInstanceOf(Date); // an open editor gets SAVE_CONFLICT, not a silent overwrite
   });
@@ -257,10 +259,62 @@ describe("pushSharedTheme — D2 snapshot", () => {
     ]);
     const res = await pushSharedTheme("w1");
     expect(res[0].status).toBe("pushed");
-    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: [{ id: "t" }] });
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: [{ id: "t" }], designTokensSchemaVersion: 5 });
     expect(warn).toHaveBeenCalledWith("[theme] workspace theme did not migrate; pushing as-is", expect.anything());
     warn.mockRestore();
     vi.unstubAllEnvs();
+  });
+});
+
+describe("pushSharedTheme — version label matches the tokens written", () => {
+  const v6 = migrateTokensToV6(v5seed);
+  const site = (extra: Record<string, unknown> = {}) => ({
+    id: "s", name: "S", themeLocked: false, dsSchemaVersion: 1, lastEditedAt: new Date(1),
+    projectSettings: { designTokens: [], designTokensSchemaVersion: 5 }, tokensMigrationHold: false, ...extra,
+  });
+  const theme = (tokens: unknown) =>
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: tokens }, sharedThemeUpdatedAt: new Date() });
+
+  beforeEach(() => vi.unstubAllEnvs());
+
+  it("migrates a v5 theme (switch on) and writes v6 rows + version 6", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site()]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0].status).toBe("pushed");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v6, designTokensSchemaVersion: 6 });
+  });
+
+  it("a held site with a v6 theme is skipped-held and untouched", async () => {
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([site({ tokensMigrationHold: true })]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0]).toMatchObject({ status: "skipped-held" });
+    expect(siteUpdateMany).not.toHaveBeenCalled();
+    expect(snapCreate).not.toHaveBeenCalled();
+  });
+
+  it("a v6 site with a v5 theme (switch off) is skipped-version with the re-capture message", async () => {
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site({ projectSettings: { designTokens: v6, designTokensSchemaVersion: 6 } })]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0]).toMatchObject({ status: "skipped-version", error: expect.stringContaining("re-capture") });
+    expect(siteUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("a v5 non-held site with the switch off gets v5 tokens and version 5", async () => {
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site({ projectSettings: { designTokens: [] } })]);
+    await pushSharedTheme("w1");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+  });
+
+  it("preview reports the same skips", async () => {
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([site({ tokensMigrationHold: true })]);
+    const res = await previewSharedThemePush("w1");
+    expect(res[0]).toMatchObject({ status: "skipped-held", willChange: false });
   });
 });
 
@@ -330,6 +384,16 @@ describe("rollbackSiteTheme (D2)", () => {
     // E1: only theme-push rows are admin-rollback candidates, never a newer generator/migration row.
     expect(snapFindFirst.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1", reason: "theme-push" });
     expect(res.rolledBackTo).toBeInstanceOf(Date);
+  });
+
+  it("restores the snapshot's version and drops darkMode when the push had upgraded the site", async () => {
+    siteFindFirst.mockResolvedValueOnce({
+      id: "s1", dsSchemaVersion: 4, lastEditedAt: new Date(1),
+      projectSettings: { designTokens: [], designTokensSchemaVersion: 6, darkMode: "auto" },
+    });
+    snapFindFirst.mockResolvedValueOnce({ id: "snap1", prevStyles: { designTokens: [{ was: 1 }] }, tokensSchemaVersion: 5, createdAt: new Date() });
+    await rollbackSiteTheme("w1", "s1");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: [{ was: 1 }], designTokensSchemaVersion: 5 });
   });
 
   /* Rollback merged into the projectSettings it read and wrote it
