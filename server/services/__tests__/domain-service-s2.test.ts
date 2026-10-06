@@ -264,6 +264,20 @@ describe("connectDomain — the Add-a-domain dialog", () => {
     expect(db.dnsRecord.createMany).not.toHaveBeenCalled();
   });
 
+  /* A 409 is also what Vercel says when OUR project already holds the domain
+     (a best-effort detach that failed, or a hand-added domain). */
+  it("a 409 for a domain already on this site's own project is treated as attached, not refused", async () => {
+    connectable();
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    vi.mocked(addDomainToVercelProject).mockRejectedValue(new VercelApiError(409, "domain_already_in_use", "in use"));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue({ name: "bellacucina.com", apexName: "bellacucina.com", verified: true, verification: [] });
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({ misconfigured: true, recommendedIPv4: null, recommendedCNAME: null });
+
+    await expect(connectDomain("s1", { domain: "bellacucina.com" })).resolves.toBeDefined();
+    expect(getVercelProjectDomain).toHaveBeenCalledWith(expect.objectContaining({ projectName: "bella", domain: "bellacucina.com" }));
+    expect(db.domain.create).toHaveBeenCalled();
+  });
+
   it("still refuses a hostname another site holds", async () => {
     connectable();
     db.domain.findFirst.mockResolvedValue({ id: "elsewhere" });

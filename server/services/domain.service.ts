@@ -364,8 +364,19 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
       });
     }
   } catch (err) {
-    if (err instanceof VercelApiError && err.status === 409) throw new Error("DOMAIN_ATTACHED_ELSEWHERE");
-    console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
+    if (err instanceof VercelApiError && err.status === 409) {
+      /* 409 is "already assigned" — to another project, or to OURS (a failed
+         detach, a domain added by hand in Vercel). Only the project's own
+         read tells them apart. */
+      try {
+        attached = attachedWith ? await getVercelProjectDomain({ ...attachedWith, projectName, domain }) : null;
+      } catch {
+        attached = null;
+      }
+      if (!attached) throw new Error("DOMAIN_ATTACHED_ELSEWHERE");
+    } else {
+      console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
+    }
   }
 
   const created = await prisma.domain.create({
