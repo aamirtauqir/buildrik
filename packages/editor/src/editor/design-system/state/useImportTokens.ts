@@ -1,13 +1,11 @@
 /**
- * useImportTokens — orchestrator that routes incoming DesignTokens to the
- * correct kind registry. Routing rule:
- *   1. If a token's id already exists in any registry → updateToken on that
- *      registry (preserves kind regardless of the incoming token's kind hint).
- *   2. Otherwise → infer the target registry from `kind` (preferred) or
- *      `category` (legacy fallback) and call addToken.
- *
- * type/spacing registries don't expose addToken (fixed-set primitives). New
- * tokens routed there are recorded in `skipped` instead.
+ * useImportTokens — writes incoming DesignTokens into the site's tokens, as
+ * ONE `setTokens` write (one ⌘Z, refused while read-only). Rule per token:
+ *   1. Its id already exists → that token takes the incoming light (and dark)
+ *      value, whatever kind the incoming row claims.
+ *   2. Otherwise → it joins under its kind (`kind`, else the `category`
+ *      fallback); type and spacing are fixed sets, so new ids there are
+ *      recorded in `skipped`, as are rows with no routable kind.
  *
  * Returns a `Stats` object so the UI can show "n modified, m added, k skipped".
  *
@@ -15,30 +13,21 @@
  */
 
 import * as React from "react";
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken, TokenKind } from "../types";
-import {
-  useColorRegistry, useTypeRegistry, useSpacingRegistry,
-  useRadiusRegistry, useShadowRegistry, useMotionRegistry,
-  useBorderRegistry, useOpacityRegistry, useZindexRegistry,
-  useBreakpointRegistry, useGridRegistry, useSizingRegistry,
-  useIconRegistry, useImageryRegistry,
-} from "./TokenRegistryContext";
+import { useProjectTokenStore } from "./TokenRegistryContext";
 
 export interface ImportStats {
   modified: number;
   added: number;
   skipped: string[];
+  /** The write was refused (read-only tokens, or the result does not
+   *  validate): nothing was imported, whatever the counts say. */
+  refused: boolean;
 }
 
-interface RegistryHandle {
-  kind: TokenKind;
-  tokens: readonly DesignToken[];
-  // darkValue is optional + color-specific; registries that ignore the third
-  // arg (narrower signatures) remain assignable here.
-  updateToken: (id: string, value: string, darkValue?: string) => void;
-  addToken?: (token: DesignToken) => void;
-}
+/* Type and spacing are fixed sets: an import may change their values, never add to them. */
+const NO_ADD: readonly TokenKind[] = ["type", "spacing"];
 
 /**
  * Which registry a token belongs to. `kind` is authoritative; `category` is a
@@ -60,75 +49,39 @@ export function inferKind(t: { kind?: TokenKind; category: string }): TokenKind 
   }
 }
 
-export function useImportTokens(): (incoming: DesignToken[]) => ImportStats {
-  const color      = useColorRegistry();
-  const type       = useTypeRegistry();
-  const spacing    = useSpacingRegistry();
-  const radius     = useRadiusRegistry();
-  const shadow     = useShadowRegistry();
-  const motion     = useMotionRegistry();
-  const border     = useBorderRegistry();
-  const opacity    = useOpacityRegistry();
-  const zindex     = useZindexRegistry();
-  const breakpoint = useBreakpointRegistry();
-  const grid       = useGridRegistry();
-  const sizing     = useSizingRegistry();
-  const icon       = useIconRegistry();
-  const imagery    = useImageryRegistry();
-
-  const registries: RegistryHandle[] = React.useMemo(
-    () => [
-      { kind: "color",      tokens: color.tokens,      updateToken: color.updateToken,      addToken: color.addToken },
-      { kind: "type",       tokens: type.tokens,       updateToken: type.updateToken /* no addToken */ },
-      { kind: "spacing",    tokens: spacing.tokens,    updateToken: spacing.updateToken /* no addToken */ },
-      { kind: "radius",     tokens: radius.tokens,     updateToken: radius.updateToken,     addToken: radius.addToken },
-      { kind: "shadow",     tokens: shadow.tokens,     updateToken: shadow.updateToken,     addToken: shadow.addToken },
-      { kind: "motion",     tokens: motion.tokens,     updateToken: motion.updateToken,     addToken: motion.addToken },
-      { kind: "border",     tokens: border.tokens,     updateToken: border.updateToken,     addToken: border.addToken },
-      { kind: "opacity",    tokens: opacity.tokens,    updateToken: opacity.updateToken,    addToken: opacity.addToken },
-      { kind: "zindex",     tokens: zindex.tokens,     updateToken: zindex.updateToken,     addToken: zindex.addToken },
-      { kind: "breakpoint", tokens: breakpoint.tokens, updateToken: breakpoint.updateToken, addToken: breakpoint.addToken },
-      { kind: "grid",       tokens: grid.tokens,       updateToken: grid.updateToken,       addToken: grid.addToken },
-      { kind: "sizing",     tokens: sizing.tokens,     updateToken: sizing.updateToken,     addToken: sizing.addToken },
-      { kind: "icon",       tokens: icon.tokens,       updateToken: icon.updateToken,       addToken: icon.addToken },
-      { kind: "imagery",    tokens: imagery.tokens,    updateToken: imagery.updateToken,    addToken: imagery.addToken },
-    ],
-    [
-      color, type, spacing, radius, shadow, motion, border,
-      opacity, zindex, breakpoint, grid, sizing, icon, imagery,
-    ],
-  );
-
-  return React.useCallback((incoming: DesignToken[]): ImportStats => {
-    const stats: ImportStats = { modified: 0, added: 0, skipped: [] };
-
-    for (const t of incoming) {
-      // Modification path: any registry already has this id.
-      const existingHost = registries.find((r) => r.tokens.some((x) => x.id === t.id));
-      if (existingHost) {
-        // Carry darkValue so a dark-complete re-import isn't stripped on the
-        // modify path (color registry persists it; other kinds ignore it).
-        const dark = t.modes.dark ? resolveTokenLiteral(incoming, t.id, "dark") ?? undefined : undefined;
-        existingHost.updateToken(t.id, resolveTokenLiteral(incoming, t.id, "light") ?? "", dark);
-        stats.modified++;
-        continue;
-      }
-
-      // Add path: route on kind (preferred) or category fallback.
-      const kind = inferKind(t);
-      if (!kind) {
-        stats.skipped.push(t.id);
-        continue;
-      }
-      const target = registries.find((r) => r.kind === kind);
-      if (!target || !target.addToken) {
-        stats.skipped.push(t.id);
-        continue;
-      }
-      target.addToken(t);
-      stats.added++;
+/** The import over the site's tokens: an existing id takes the incoming
+ *  light (and dark) value; a new id joins under its inferred kind. */
+function importInto(all: DesignToken[], incoming: DesignToken[]): { next: DesignToken[]; stats: Omit<ImportStats, "refused"> } {
+  const stats = { modified: 0, added: 0, skipped: [] as string[] };
+  let next = all;
+  for (const t of incoming) {
+    if (next.some((x) => x.id === t.id)) {
+      next = setTokenLiteral(next, t.id, "light", resolveTokenLiteral(incoming, t.id, "light") ?? "");
+      const dark = t.modes.dark ? resolveTokenLiteral(incoming, t.id, "dark") : null;
+      if (dark !== null) next = setTokenLiteral(next, t.id, "dark", dark);
+      stats.modified++;
+      continue;
     }
+    const kind = inferKind(t);
+    if (!kind || NO_ADD.includes(kind)) {
+      stats.skipped.push(t.id);
+      continue;
+    }
+    next = [...next, { ...t, kind }];
+    stats.added++;
+  }
+  return { next, stats };
+}
 
-    return stats;
-  }, [registries]);
+/** One write for the whole import — one ⌘Z undoes it. */
+export function useImportTokens(): (incoming: DesignToken[]) => ImportStats {
+  const { all, commit } = useProjectTokenStore();
+  return React.useCallback(
+    (incoming: DesignToken[]): ImportStats => {
+      const { next, stats } = importInto(all, incoming);
+      const changed = stats.modified + stats.added > 0;
+      return { ...stats, refused: changed && !commit(next, "Import tokens") };
+    },
+    [all, commit],
+  );
 }

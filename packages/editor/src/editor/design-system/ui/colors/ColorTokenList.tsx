@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import type { DesignToken, TokenDiff } from "../../types";
+import type { DesignToken } from "../../types";
 import { Button, EmptyState } from "@/editor/chrome-ui";
 import {
   TokenTable,
@@ -35,7 +35,6 @@ import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
-  pendingDiff: Record<string, TokenDiff>;
   onAddToken: () => void;
   /** Per-token usage counts (from composer.designSystem.tokenUsage). */
   usageByTokenId?: ReadonlyMap<string, number>;
@@ -86,7 +85,7 @@ function isLikelyLightValue(hex: string): boolean {
 }
 
 /** The 16px round swatch on the gutter; light values get a visible edge. */
-const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, isDirty }) => (
+const ColorSwatch: React.FC<{ value: string }> = ({ value }) => (
   <span
     aria-hidden="true"
     data-testid="brand-color-swatch"
@@ -94,19 +93,11 @@ const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, is
       isLikelyLightValue(value) ? "tw:border-[var(--bk-gray-300)]" : "tw:border-[var(--bk-alpha-ink-10)]"
     }`}
     style={{ background: value }}
-  >
-    {isDirty && (
-      <span
-        aria-label="unsaved changes"
-        className="tw:absolute tw:-right-0.5 tw:-top-0.5 tw:size-[5px] tw:rounded-full tw:bg-[var(--bk-warning)]"
-      />
-    )}
-  </span>
+  />
 );
 
 export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   tokens,
-  pendingDiff,
   onAddToken,
   usageByTokenId,
   selectedTokenId,
@@ -153,9 +144,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
     <div data-color-token-list>
       <TokenTable columns={COLUMNS} template={TEMPLATE} label="Colour tokens">
         {ordered.map((token) => {
-          const currentValue = pendingDiff[token.id]?.currentValue ?? resolveTokenLiteral(allTokens, token.id, "light") ?? "";
+          const currentValue = resolveTokenLiteral(allTokens, token.id, "light") ?? "";
           const darkValue = token.modes.dark ? resolveTokenLiteral(allTokens, token.id, "dark") : null;
-          const isDirty = pendingDiff[token.id] !== undefined;
           const usage = usageByTokenId?.get(token.id) ?? 0;
           return (
             <TokenTableRow
@@ -166,7 +156,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               onSelect={() => onSelectToken?.(token.id)}
             >
               <span className={TOKEN_CELL_PREVIEW}>
-                <ColorSwatch value={currentValue} isDirty={isDirty} />
+                <ColorSwatch value={currentValue} />
               </span>
               <span className={TOKEN_CELL_NAME}>
                 <span className="tw:truncate" data-testid={`brand-token-name-${token.id}`}>

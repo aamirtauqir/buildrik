@@ -4,10 +4,9 @@
  * the generic "Tokens · <kind>" pattern). A row click selects the token; the
  * workspace draws its card in the right column.
  *
- * It also owns two engine subscriptions every token page needs:
- * `tokenUsage:changed` for the USED column, and the settings re-hydrate that
- * brings an engine-side write (applyAutoFix, the AI's setDesignToken) and
- * Cmd+Z back into the registries.
+ * It also owns the engine subscription every token page needs:
+ * `tokenUsage:changed` for the USED column. (Engine-side writes and ⌘Z reach
+ * the registries by themselves now — they read the project.)
  *
  * (The drawer's kind drill-in list and its Beginner hint band lived here until
  * C1 (ii); the workspace nav replaced the first, the nav's own Beginner note
@@ -32,7 +31,6 @@ import {
   useSizingRegistry,
   useIconRegistry,
   useImageryRegistry,
-  useResetAllKinds,
 } from "../../state/TokenRegistryContext";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { filterTokensByMode } from "../../utils/semanticKind";
@@ -85,28 +83,6 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     };
   }, [composer]);
 
-  /* D6.c: re-hydrate every kind registry when project settings shift under
-     the React state — project:changed (applyAutoFix's labelled transaction,
-     setDesignToken) and history:undo / :redo (importProject emits no
-     project:changed, so Cmd+Z needs its own listener). */
-  const resetAll = useResetAllKinds();
-  React.useEffect(() => {
-    if (!composer) return;
-    const onSettingsShift = () => {
-      const settings = composer.getProjectSettings();
-      if (!settings) return;
-      resetAll((settings.designTokens ?? []) as Parameters<typeof resetAll>[0]);
-    };
-    composer.on("project:changed", onSettingsShift);
-    composer.on("history:undo", onSettingsShift);
-    composer.on("history:redo", onSettingsShift);
-    return () => {
-      composer.off("project:changed", onSettingsShift);
-      composer.off("history:undo", onSettingsShift);
-      composer.off("history:redo", onSettingsShift);
-    };
-  }, [composer, resetAll]);
-
   const color = useColorRegistry();
   const spacing = useSpacingRegistry();
   const generic = {
@@ -131,7 +107,6 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       <ColorTokenList
         tokens={visible}
         allTokens={color.tokens}
-        pendingDiff={color.pendingDiff}
         onAddToken={() => onAddTokenClick?.()}
         hiddenByModeCount={color.tokens.length - visible.length}
         {...selection}
@@ -146,13 +121,11 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
 
         <KindTokenList
           tokens={visible}
-          savedTokens={spacing.savedTokens}
           allTokens={spacing.tokens}
           kindLabel="spacing"
           hiddenByModeCount={spacing.tokens.length - visible.length}
-          /* The board's PRESET column: which preset a token's value came
-             from, or "custom" once it has been hand-edited (the registry
-             drops the active preset on any manual edit). */
+          /* The board's PRESET column: which preset the spacing values
+             match, or "custom" once any has been hand-edited. */
           presetOf={() => (preset ? SPACING_PRESET_LABELS[preset] : "custom")}
           {...selection}
         />
@@ -164,7 +137,6 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   return (
     <KindTokenList
       tokens={visible}
-      savedTokens={r.savedTokens}
       allTokens={r.tokens}
       kindLabel={openKind}
       hiddenByModeCount={r.tokens.length - visible.length}

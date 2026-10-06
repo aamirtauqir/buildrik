@@ -33,11 +33,11 @@
 import * as React from "react";
 import { Check } from "lucide-react";
 import { X } from "lucide-react";
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { Button, IconButton, Popover } from "@/editor/chrome-ui";
 import { darkShadeSuggestions } from "../../utils/colorUtils";
 import { ColorPicker } from "../colors/ColorPicker";
-import { useColorRegistry } from "../../state/TokenRegistryContext";
+import { useColorRegistry, useProjectTokenStore } from "../../state/TokenRegistryContext";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { filterTokensByMode } from "../../utils/semanticKind";
 import { displayValue } from "../colors/ColorTokenList";
@@ -45,6 +45,7 @@ import { BrandCard, BrandRow } from "../BrandCard";
 
 export const ColourModeSection: React.FC = () => {
   const color = useColorRegistry();
+  const store = useProjectTokenStore();
   const mode = useDSModeOptional()?.mode ?? "beginner";
   const [editing, setEditing] = React.useState<string | null>(null);
   const [custom, setCustom] = React.useState(false);
@@ -71,7 +72,9 @@ export const ColourModeSection: React.FC = () => {
   const commit = (id: string, lightValue: string, darkValue: string) => {
     setEditing(null);
     setCustom(false);
-    color.updateToken(id, lightValue, darkValue);
+    /* Both values in ONE write — one ⌘Z puts the pair back. */
+    const withLight = lightValue === lightOf(id) ? store.all : setTokenLiteral(store.all, id, "light", lightValue);
+    store.commit(setTokenLiteral(withLight, id, "dark", darkValue), "Set dark value");
   };
   const open = (id: string) => {
     setCustom(false);

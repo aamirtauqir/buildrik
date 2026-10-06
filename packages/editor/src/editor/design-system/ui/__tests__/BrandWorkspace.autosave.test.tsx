@@ -1,27 +1,20 @@
 /**
- * BrandWorkspace — page switching, unsaved-edit survival, the 14-kind
- * aggregation, and the Apply pipeline (composer.setProjectSettings + persist +
- * markSaved fan-out). Ported from the drawer's `DesignSystemTab.guard-apply` and
- * `.aggregation` suites when the drawer was replaced by the workspace (C1 (i)).
- *
- * There is no navigation guard BETWEEN pages, and there never should be:
- * `TokenRegistryProvider` sits above the whole shell, so staged edits survive a
- * page change and even a full unmount — navigating never lost anything. The
- * one guard is on the way OUT (`BrandWorkspace.shell.test.tsx`).
- *
- * The Apply pipeline is exercised through the footer's Save -> ReviewModal
- * confirm, which is the only route a user has.
+ * BrandWorkspace — page switching, and the save model after Brand Part 1a
+ * Task 10 (spec §4): every edit is ONE `composer.designSystem.setTokens` write
+ * the moment it is made. No draft, no Save / Review & Apply, no dirty dots,
+ * no discard. "Review changes" is a non-blocking list of this session's
+ * edits with Revert. A read-only site (tokens failed to migrate) says so and
+ * disables editing. Ported from the Apply-pipeline suite this replaced.
  *
  * @license BSD-3-Clause
  */
 
-import { fireEvent, waitFor, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, fireEvent, waitFor, act, within } from "@testing-library/react";
+import { describe, it, expect, beforeEach } from "vitest";
 import * as React from "react";
-import { APPLY_CHANGES_LABEL } from "../DesignTabFooter";
 import { BrandWorkspace } from "../BrandWorkspace";
+import { ProjectTokensApplier } from "../ProjectTokensApplier";
 import { useButtonPresets } from "../../state/StylePresetRegistryContext";
-import { CURRENT_SCHEMA_VERSION } from "@/engine/designSystem/tokenMigrations";
 import {
   installDomShims,
   makeFakeComposer,
@@ -30,26 +23,14 @@ import {
   renderWorkspace,
   wrap,
 } from "./brandWorkspaceHarness";
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 
 beforeEach(installDomShims);
 
-/* The route a user actually has: the footer's primary button -> ReviewModal
-   -> "Apply N changes". The label is read from the constant rather than
-   spelled: it moved from "Apply Changes" to board 154:78's "Save" on
-   2026-08-27, and a test that hard-codes copy breaks on every wording
-   decision instead of on behaviour. */
-async function applyViaFooter(utils: ReturnType<typeof renderWorkspace>) {
-  const bar = utils.container.querySelector('[data-screen-savebar="true"]');
-  if (!bar) throw new Error("footer savebar not rendered");
-  const applyBtn = [...bar.querySelectorAll("button")].find(
-    (b) => (b.textContent || "").trim() === APPLY_CHANGES_LABEL,
-  );
-  if (!applyBtn) throw new Error(`footer ${APPLY_CHANGES_LABEL} not found`);
-  fireEvent.click(applyBtn);
-  fireEvent.click(await utils.findByText(/^Apply \d+ changes?$/));
-}
+const written = (composer: ReturnType<typeof makeFakeComposer>, call = 0) =>
+  composer.designSystem.setTokens.mock.calls[call][0] as DesignToken[];
 
 describe("BrandWorkspace — pages", () => {
   it("lands on Colours and switches pages directly", async () => {
@@ -78,28 +59,12 @@ describe("BrandWorkspace — pages", () => {
       "Colours", "Colour mode", "Fonts & type styles", "Styles", "Component styles", "Classes",
       "Presets", "Brand checks", "Starters", "Spacing", "Import / export",
     ]);
-    // No Beginner / Pro switch and no clean-state footer (7315:80955 draws neither).
-    expect(utils.queryByText("Brand is up to date")).toBeNull();
     expect(utils.container.querySelector('[data-testid="brand-basic-note"]')).toBeNull();
     fireEvent.click(utils.container.querySelector('[data-section-id="spacing"]')!);
     fireEvent.change(utils.getByTestId("brand-kind-switch"), { target: { value: "kind-imagery" } });
     expect(utils.getByTestId("brand-page-title").textContent).toBe("Imagery");
     // Spacing stays the current nav row on a kind page.
     expect(utils.getByTestId("brand-row-spacing").getAttribute("aria-current")).toBe("page");
-  });
-
-  it("editing a radius token surfaces the dirty signal (14-kind aggregation)", async () => {
-    const composer = makeFakeComposer();
-    const utils = await renderOnRadius(composer);
-    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    await waitFor(() => {
-      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
-    });
-    // The nav row for that kind carries the dot; the chip reads Draft.
-    expect(
-      utils.getByTestId("brand-row-spacing").querySelector('[aria-label="unsaved changes"]'),
-    ).toBeTruthy();
-    expect(utils.getByText("Draft")).toBeTruthy();
   });
 
   it("the edit survives the trip to another page and back", async () => {
@@ -115,35 +80,72 @@ describe("BrandWorkspace — pages", () => {
       expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px");
     });
   });
+});
 
-  it("footer Discard reverts a dirty TOKEN and the dirty signal clears", async () => {
+describe("BrandWorkspace — autosave (one write per edit, nothing staged)", () => {
+  it("a radius edit is written to the project at once — one setTokens, v6, no draft UI", async () => {
     const composer = makeFakeComposer();
     const utils = await renderOnRadius(composer);
-    const original = utils.radiusInput.value;
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    await utils.findByText("Unsaved brand changes");
 
-    fireEvent.click(utils.getByText("Discard"));
-
-    await waitFor(() => {
-      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe(original);
-    });
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+    expect(resolveTokenLiteral(written(composer), "radius-sm", "light")).toBe("10px");
+    expect(composer.settings.designTokensSchemaVersion).toBe(6);
+    await waitFor(() => expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px"));
+    // The staging layer is gone: no save bar, no Draft chip, no dirty dots.
     expect(utils.queryByText("Unsaved brand changes")).toBeNull();
+    expect(document.querySelector('[data-screen-savebar="true"]')).toBeNull();
+    expect(utils.queryByText("Draft")).toBeNull();
+    expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
   });
 
-  // §2-B13 (FIXED): Discard calls discardAll on the 11 STYLE PRESET registries
-  // as well as the 14 token registries, so a preset-only dirty state is
-  // reverted and the Presets row's dot clears.
-  it("footer Discard reverts a dirty STYLE PRESET so the dirty signal clears", async () => {
+  it("the canvas repaints from the <style> — no inline var on <html> (one writer)", async () => {
+    document.documentElement.removeAttribute("style");
+    document.getElementById("bk-site-tokens")?.remove();
     const composer = makeFakeComposer();
+    const utils = render(
+      wrap(
+        <>
+          <ProjectTokensApplier composer={composer} />
+          <BrandWorkspace composer={composer} />
+        </>,
+        composer,
+      ),
+    );
 
+    // Colour Primary through the card's picker, the way a user changes it.
+    fireEvent.click(utils.container.querySelector('[data-token-row="color-primary"]')!);
+    fireEvent.click(utils.getByTestId("brand-token-action-replace"));
+    fireEvent.change(await utils.findByLabelText("Hex color value"), { target: { value: "#C2410C" } });
+    fireEvent.click(within(utils.getByTestId("color-picker")).getByRole("button", { name: "Apply" }));
+    expect(resolveTokenLiteral(written(composer), "color-primary", "light")).toBe("#C2410C");
+
+    await waitFor(() => {
+      const css = document.getElementById("bk-site-tokens")?.textContent ?? "";
+      expect(css).toMatch(/#C2410C/i);
+    });
+    expect(document.documentElement.style.getPropertyValue("--buildrick-design-color-primary")).toBe("");
+    expect(document.documentElement.getAttribute("style") ?? "").not.toContain("--buildrick-design-");
+  });
+
+  it("follows a token write made elsewhere (⌘Z, Update everywhere) without a reload", async () => {
+    const composer = makeFakeComposer();
+    const utils = await renderOnRadius(composer);
+    act(() => {
+      composer.setProjectSettings({ designTokens: setTokenLiteral(DEFAULT_TOKENS, "radius-sm", "light", "12px"), designTokensSchemaVersion: 6 });
+    });
+    await waitFor(() => expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("12px"));
+    expect(utils.queryByText(/changed from another window/)).toBeNull();
+  });
+
+  it("a preset edit autosaves into projectSettings.designPresets", async () => {
+    const composer = makeFakeComposer();
     let buttonReg: ReturnType<typeof useButtonPresets> | null = null;
     function Capture() {
       buttonReg = useButtonPresets();
       return null;
     }
-
     const utils = renderWorkspace(composer);
     utils.rerender(
       wrap(
@@ -151,151 +153,71 @@ describe("BrandWorkspace — pages", () => {
           <Capture />
           <BrandWorkspace composer={composer} />
         </>,
+        composer,
       ),
     );
 
     act(() => {
-      buttonReg!.addPreset({
-        id: "button-test-dirty",
-        friendlyName: "Test",
-        category: "button",
-        variant: "primary",
-        bindings: {},
-      });
+      buttonReg!.addPreset({ id: "button-test-auto", friendlyName: "Test", category: "button", variant: "primary", bindings: {} });
     });
 
     await waitFor(() => {
-      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
+      const presets = composer.settings.designPresets as Array<{ id: string }> | undefined;
+      expect(presets?.some((p) => p.id === "button-test-auto")).toBe(true);
     });
-    expect(buttonReg!.isDirty).toBe(true);
-    expect(
-      utils.getByTestId("brand-row-presets").querySelector('[aria-label="unsaved changes"]'),
-    ).toBeTruthy();
-
-    fireEvent.click(utils.getByText("Discard"));
-
-    await waitFor(() => {
-      // Clean: the save bar is gone (its clean state is not drawn).
-      expect(utils.queryByTestId("brand-save-bar")).toBeNull();
-    });
-    expect(buttonReg!.isDirty).toBe(false);
+    await waitFor(() => expect(buttonReg!.isDirty).toBe(false));
   });
 });
 
-describe("BrandWorkspace — Apply pipeline (footer -> ReviewModal)", () => {
-  it("persists tokens + presets + schema version through composer.setProjectSettings and clears dirty", async () => {
+describe("BrandWorkspace — Review changes (non-blocking, this session, Revert)", () => {
+  it("lists the session's edit as was → now; a run of edits is one row; Revert writes the start value back", async () => {
     const composer = makeFakeComposer();
-    const setSpy = vi.spyOn(composer, "setProjectSettings");
     const utils = await renderOnRadius(composer);
+    const original = utils.getByTestId("brand-token-value-radius-sm").textContent!;
+    expect(utils.queryByTestId("brand-session-edits")).toBeNull();
 
+    fireEvent.change(utils.radiusInput, { target: { value: "1" } });
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    await applyViaFooter(utils);
 
-    await waitFor(() => expect(setSpy).toHaveBeenCalledTimes(1));
-    const arg = setSpy.mock.calls[0][0] as {
-      designTokens: DesignToken[];
-      designTokensSchemaVersion: number;
-      designPresets: Array<{ id: string; category: string; bindings: unknown }>;
-    };
+    fireEvent.click(await utils.findByTestId("brand-session-edits"));
+    // Two keystrokes on one value are one row, remembering where it started.
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1");
+    const row = utils.getByTestId("brand-session-edit-radius-sm");
+    expect(row.textContent).toContain(original);
+    expect(row.textContent).toContain("10px");
+    // Non-blocking: the page stays usable, no modal.
+    expect(document.querySelector('[aria-modal="true"]')).toBeNull();
 
-    expect(resolveTokenLiteral(arg.designTokens, "radius-sm", "light")).toBe("10px");
-    expect(arg.designTokensSchemaVersion).toBe(CURRENT_SCHEMA_VERSION);
-    expect(Array.isArray(arg.designPresets)).toBe(true);
-    expect(arg.designPresets.length).toBeGreaterThan(0);
-
-    // Success toast + dirty cleared. Applying does NOT move you.
-    expect(await utils.findByText("Design tokens applied successfully")).toBeTruthy();
-    // The engine echoes the write as SETTINGS_CHANGE; that is not another window.
-    expect(utils.queryByText(/changed from another window/)).toBeNull();
-    await waitFor(() => {
-      expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
-    });
-    expect(document.getElementById("design-section-kind-radius")).toBeTruthy();
-    // The onboarding "Set your brand" wire — announced only after the whole
-    // apply succeeded.
-    expect(composer.emit).toHaveBeenCalledWith("brand:applied", undefined);
-  });
-
-  it("shows the error toast and stays recoverable when setProjectSettings throws", async () => {
-    const composer = makeFakeComposer();
-    vi.spyOn(composer, "setProjectSettings").mockImplementation(() => {
-      throw new Error("boom");
-    });
-    const utils = await renderOnRadius(composer);
-
-    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    await applyViaFooter(utils);
-
-    expect(await utils.findByText("Failed to apply tokens. Try again.")).toBeTruthy();
-    // A failed apply must not tick the onboarding step (codex, plan review).
-    expect(composer.emit).not.toHaveBeenCalledWith("brand:applied", undefined);
+    const callsBefore = composer.designSystem.setTokens.mock.calls.length;
+    fireEvent.click(utils.getByTestId("brand-session-revert-radius-sm"));
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(callsBefore + 1);
+    expect(resolveTokenLiteral(written(composer, callsBefore), "radius-sm", "light")).toBe(original);
+    await waitFor(() => expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe(original));
+    expect(utils.queryByTestId("brand-session-edits")).toBeNull();
   });
 });
 
-describe("BrandWorkspace — engine undo preserves unsaved edits", () => {
-  const STORED = [
-    {
-      id: "radius-sm",
-      name: "Small radius",
-      value: "4px",
-      category: "layout",
-      cssVar: "--bd-radius-sm",
-      type: "length",
-    },
-  ];
+describe("BrandWorkspace — read-only tokens (failed migration)", () => {
+  it("says so, disables every edit, and writes nothing", async () => {
+    const composer = makeFakeComposer([], { readOnly: true });
+    const utils = renderWorkspace(composer);
 
-  it("history:undo does NOT wipe staged edits when the workspace is dirty", async () => {
-    // Stored settings carry radius-sm at its default 4px so the load path
-    // takes the designTokens branch (non-empty) and hydrates all kinds.
-    const composer = makeFakeComposer(STORED);
-    const utils = await renderOnRadius(composer);
+    expect(utils.getByTestId("brand-read-only-banner").textContent).toBe(
+      "We couldn't upgrade this site's brand — nothing was changed. Editing is paused.",
+    );
+    expect((utils.getByTestId("brand-page-action") as HTMLButtonElement).matches(":disabled")).toBe(true);
 
-    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    await waitFor(() => {
-      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
+    openPage(utils, "kind-radius");
+    const row = await waitFor(() => {
+      const el = utils.container.querySelector<HTMLElement>('[data-token-row="radius-sm"]');
+      if (!el) throw new Error("radius-sm row not rendered");
+      return el;
     });
+    expect(row.closest("fieldset")?.disabled).toBe(true);
+    expect((utils.getByTestId("brand-token-action-replace") as HTMLButtonElement).matches(":disabled")).toBe(true);
 
-    // Engine-level undo (canvas action) — nothing to do with Brand.
-    act(() => {
-      composer.emit("history:undo");
-    });
-
-    await waitFor(() => {
-      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px");
-      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
-    });
-  });
-
-  it("history:undo still reloads from settings when clean (no staged edits to protect)", async () => {
-    const composer = makeFakeComposer(STORED);
-    const utils = await renderOnRadius(composer);
-
-    act(() => {
-      composer.emit("history:undo");
-    });
-
-    await waitFor(() => {
-      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("4px");
-      expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
-    });
-  });
-});
-
-/* G3-124: the review listed colour / type / spacing only, so a radius (or any
-   of the other 11 kinds) edit showed "Review 0 staged changes" while the
-   footer said there was one. Every kind is listed now. */
-describe("BrandWorkspace — Review lists every kind (G3-124)", () => {
-  it("a radius edit appears in the review under Radius, and the title counts it", async () => {
-    const composer = makeFakeComposer();
-    const utils = await renderOnRadius(composer);
-    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    await waitFor(() => expect(utils.getByText("Unsaved brand changes")).toBeTruthy());
-    const bar = utils.container.querySelector('[data-screen-savebar="true"]')!;
-    const save = [...bar.querySelectorAll("button")].find((b) => (b.textContent || "").trim() === APPLY_CHANGES_LABEL)!;
-    fireEvent.click(save);
-    const modal = await utils.findByTestId("brand-review-modal");
-    expect(utils.getByTestId("brand-review-title").textContent).toBe("Review 1 staged change");
-    expect(modal.textContent).toContain("Radius Changes");
-    expect(modal.textContent).toMatch(/10px/);
+    // Even a write that gets past the UI is refused by the one write path.
+    expect(composer.designSystem.setTokens([...DEFAULT_TOKENS], "x")).toBe(false);
+    expect(composer.settings.designTokens).toEqual([]);
   });
 });

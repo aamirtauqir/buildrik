@@ -18,7 +18,7 @@ import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 const wrap = (children: React.ReactNode, mode: "beginner" | "pro" = "beginner") => (
   <ToastProvider>
     <DSModeProvider initialMode={mode}>
-      <TokenRegistryProvider projectId="tokens-section-test">{children}</TokenRegistryProvider>
+      <TokenRegistryProvider>{children}</TokenRegistryProvider>
     </DSModeProvider>
   </ToastProvider>
 );
@@ -42,8 +42,12 @@ describe("TokensSection — mode-driven token filter (carried over)", () => {
     const ids = tokenIds(container);
     expect(ids).toEqual(expect.arrayContaining(["color-action", "color-brand-500", "color-primary"]));
     /* Every colour token the seed carries. 19 in the v5 seed; the v6 seed adds
-       the primitives each semantic colour now aliases (`custom-*`). */
-    expect(ids).toHaveLength(DEFAULT_TOKENS.filter((t) => t.category === "colors").length);
+       the primitives each semantic colour now aliases (`custom-*`). The list is
+       by KIND since Task 10, so the form colours (category "forms": input
+       border / focus / placeholder) are on it too — under the category filter
+       they were in no registry at all. */
+    expect(ids).toHaveLength(DEFAULT_TOKENS.filter((t) => t.kind === "color").length);
+    expect(ids).toContain("input-border");
   });
 
   it("a Beginner page emptied by the filter blames the mode", () => {
@@ -72,7 +76,7 @@ describe("TokensSection — a generic kind page", () => {
     expect(onSelectToken).toHaveBeenCalledWith(first.getAttribute("data-token-row"));
   });
 
-  it("a freshly loaded kind shows no unsaved dot", () => {
+  it("draws no unsaved dot — there is no staging to mark (spec §4)", () => {
     const { container } = render(wrap(<TokensSection openKind="radius" />, "pro"));
     expect(container.querySelector('[aria-label="unsaved changes"]')).toBeNull();
   });

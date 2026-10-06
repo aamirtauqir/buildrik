@@ -13,6 +13,8 @@ import { EventEmitter } from "../../../../engine/EventEmitter";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { installDomShims, makeFakeComposer, openPage, renderOnRadius, renderWorkspace } from "./brandWorkspaceHarness";
 import { requestBrandToken } from "../brandOpenRequest";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import type { DesignToken } from "@/engine/designSystem/types";
 
 /* The AI entry is gated on the SAME flag that decides whether an AIClient is
    built at all (useComposerInit.ts:132). Default the mock ON so the entry
@@ -83,7 +85,7 @@ describe("BrandWorkspace › Import / export", () => {
     expect(utils.getByText(/Custom properties/i)).toBeTruthy();
   });
 
-  it("import flow stages a modified colour token and lights the dirty signal", async () => {
+  it("import writes a modified colour token to the site at once — one write, no draft", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
     openPage(utils, "export");
@@ -91,16 +93,16 @@ describe("BrandWorkspace › Import / export", () => {
     // ID collision → default "replace" strategy → applyCount=1.
     await importViaPaste(utils, COLOR_PAYLOAD("color-primary", "Primary", "#FF00AA"));
 
-    await waitFor(() => {
-      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
-    });
     // G3-123: no status pill band — the import toast says it.
+    expect(await utils.findByText(/^Imported · /)).toBeTruthy();
     expect(utils.queryByTestId("brand-section-status-imported")).toBeNull();
     expect(utils.queryByTestId("brand-section-status")).toBeNull();
-    expect(await utils.findByText(/^Imported · /)).toBeTruthy();
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+    expect(resolveTokenLiteral(composer.settings.designTokens as DesignToken[], "color-primary", "light")).toBe("#FF00AA");
+    expect(utils.queryByText("Unsaved brand changes")).toBeNull();
   });
 
-  it("ADD via import lights the dirty marker (adds count, not just modifications)", async () => {
+  it("ADD via import lands the new token in the site's tokens", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
     openPage(utils, "export");
@@ -108,7 +110,7 @@ describe("BrandWorkspace › Import / export", () => {
     await importViaPaste(utils, COLOR_PAYLOAD("color-brand-new", "Brand New", "#00FF99"));
 
     await waitFor(() => {
-      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
+      expect((composer.settings.designTokens as DesignToken[]).some((t) => t.id === "color-brand-new")).toBe(true);
     });
   });
 
@@ -287,20 +289,13 @@ describe("BrandWorkspace › Component styles — a section row hands off to Add
     expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-group", { group: "blocks" });
   });
 
-  it("dirty: the discard guard comes first; Keep editing stays, Discard goes", async () => {
+  it("after an edit it still hands off at once — nothing is staged to guard", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
     const utils = await renderOnRadius(composer, { onClose });
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    await waitFor(() => expect(utils.getByText("Unsaved brand changes")).toBeTruthy());
     act(() => openPage(utils, "component-styles"));
     fireEvent.click(utils.container.querySelector<HTMLElement>("[data-section-row]")!);
-    expect(onClose).not.toHaveBeenCalled();
-    fireEvent.click(await utils.findByRole("button", { name: /Keep editing/ }));
-    expect(composer.emit).not.toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
-
-    fireEvent.click(utils.container.querySelector<HTMLElement>("[data-section-row]")!);
-    fireEvent.click(await utils.findByRole("button", { name: "Discard changes" }));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
   });

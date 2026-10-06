@@ -13,7 +13,7 @@ export {
   useColorRegistry,
   useSpacingRegistry,
   useTypeRegistry,
-  useRegistryConfig,
+  useProjectTokenStore,
 } from "./state/TokenRegistryContext";
 export type { ColorRegistry, SpacingRegistry, TypeRegistry } from "./state/TokenRegistryContext";
 export { useTokenUsageMap } from "./state/useTokenUsageMap";

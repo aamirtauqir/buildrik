@@ -1,7 +1,7 @@
 /**
  * The Brand workspace's test harness: the three providers `StudioPanels`
- * mounts it under, a fake composer with just enough surface for the load
- * path, and the two moves every page test makes — open a page, reach the
+ * mounts it under, a fake composer with just enough surface for the token
+ * read and write, and the two moves every page test makes — open a page, reach the
  * radius control (the non-colour / type / spacing kind that proves the
  * 14-registry aggregation).
  *
@@ -15,10 +15,14 @@ import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
 import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
+import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
 
 export type ComposerProp = NonNullable<React.ComponentProps<typeof BrandWorkspace>["composer"]>;
 
-export function makeFakeComposer(designTokens: unknown[] = []) {
+/** A composer with the surface Brand reads, and the ONE token write it makes:
+ *  `designSystem.setTokens` validates, writes, and emits SETTINGS_CHANGE the
+ *  way the engine does. `readOnly` refuses it. */
+export function makeFakeComposer(designTokens: unknown[] = [], { readOnly = false } = {}) {
   const settings: Record<string, unknown> = {
     designTokens,
     designTokensSchemaVersion: 2,
@@ -30,8 +34,7 @@ export function makeFakeComposer(designTokens: unknown[] = []) {
   return {
     getProjectSettings: () => settings,
     /* Emits the way the engine does (`Composer.setProjectSettings` →
-       SETTINGS_CHANGE, synchronously) — the workspace's own Apply must not
-       mistake that echo for another window's write. */
+       SETTINGS_CHANGE, synchronously). */
     setProjectSettings: (next: Record<string, unknown>) => {
       Object.assign(settings, next);
       emit("settings:change", settings);
@@ -44,10 +47,25 @@ export function makeFakeComposer(designTokens: unknown[] = []) {
       handlers.get(e)?.delete(h);
     }),
     emit: vi.fn(emit),
+    beginTransaction: vi.fn(),
+    endTransaction: vi.fn(),
+    designSystem: {
+      readOnly,
+      setTokens: vi.fn((next: unknown[], _label: string) => {
+        if (readOnly || !validateTokens(next).ok) return false;
+        Object.assign(settings, { designTokens: next, designTokensSchemaVersion: 6 });
+        emit("settings:change", settings);
+        return true;
+      }),
+    },
     elements: { getAll: () => [], getAllElements: () => [] },
     dsLinter: { lint: () => [] },
     settings,
-  } as unknown as ComposerProp & { emit: (e: string, ...a: unknown[]) => void };
+  } as unknown as ComposerProp & {
+    emit: (e: string, ...a: unknown[]) => void;
+    designSystem: { setTokens: ReturnType<typeof vi.fn> };
+    settings: Record<string, unknown>;
+  };
 }
 
 export function installDomShims() {
@@ -69,10 +87,10 @@ export function installDomShims() {
   });
 }
 
-export const wrap = (ui: React.ReactNode, projectId = "brand-workspace-test") => (
+export const wrap = (ui: React.ReactNode, composer: ComposerProp | null = null, projectId = "brand-workspace-test") => (
   <ToastProvider>
     <DSModeProvider initialMode="pro">
-      <TokenRegistryProvider projectId={projectId}>
+      <TokenRegistryProvider composer={composer}>
         <StylePresetRegistryProvider projectId={projectId}>{ui}</StylePresetRegistryProvider>
       </TokenRegistryProvider>
     </DSModeProvider>
@@ -83,7 +101,7 @@ export function renderWorkspace(
   composer: ComposerProp,
   props: Partial<React.ComponentProps<typeof BrandWorkspace>> = {},
 ) {
-  return render(wrap(<BrandWorkspace composer={composer} {...props} />));
+  return render(wrap(<BrandWorkspace composer={composer} {...props} />, composer));
 }
 
 /** Click a nav row. The eleven other kinds are Spacing's header kind switch. */

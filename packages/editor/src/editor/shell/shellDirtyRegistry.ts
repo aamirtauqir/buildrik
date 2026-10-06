@@ -2,9 +2,8 @@
  * shellDirtyRegistry — the ONE place every navigation guard reads to know
  * whether ANY shell-owned surface has a staged-but-unsaved edit (B-1).
  *
- * Settings (SettingsTab), Brand (StudioHeader's BRAND_DIRTY_CHANGED
- * listener) and a CMS record sheet (RecordSheet) are
- * three sibling surfaces with no common parent closer than AquibraStudio —
+ * Settings (SettingsTab) and a CMS record sheet (RecordSheet) are
+ * sibling surfaces with no common parent closer than AquibraStudio —
  * threading a boolean down through props and back up through callbacks for
  * three unrelated subtrees is exactly the coupling Composer-gateway rule 9
  * (`packages/editor/CLAUDE.md`) warns about. A tiny module-level store,
@@ -17,18 +16,16 @@
  */
 import * as React from "react";
 
-export type DirtyDomain = "settings" | "brand" | "cms-record";
+export type DirtyDomain = "settings" | "cms-record";
 
 let state: Record<DirtyDomain, boolean> = {
   settings: false,
-  brand: false,
   "cms-record": false,
 };
 /* A producer whose unsaved work really is thrown away by "Leave anyway"
    registers how to throw it away (Settings rolls its live composer writes
-   back; a record sheet resets its fields). One that cannot — Brand, whose
-   staging lives in TokenRegistryProvider — registers nothing, and the
-   confirm then must not promise the edits are lost. Not part of the
+   back; a record sheet resets its fields). One that cannot registers
+   nothing, and the confirm then must not promise the edits are lost. Not part of the
    subscribed snapshot: nothing renders from it. */
 const discards: Partial<Record<DirtyDomain, () => void>> = {};
 const listeners = new Set<() => void>();
@@ -37,7 +34,7 @@ function emit(): void {
   listeners.forEach((l) => l());
 }
 
-const DOMAINS: DirtyDomain[] = ["settings", "brand", "cms-record"];
+const DOMAINS: DirtyDomain[] = ["settings", "cms-record"];
 const dirtyDomains = (): DirtyDomain[] => DOMAINS.filter((d) => state[d]);
 
 export const shellDirty = {

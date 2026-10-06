@@ -26,8 +26,11 @@ describe("StudioPanels — where projectId comes from", () => {
     expect(src).not.toMatch(/^\s*projectId\??:\s*string/m);
   });
 
-  it("still hands the resolved id to the token registry", () => {
-    expect(src).toContain("<TokenRegistryProvider projectId={projectId}");
+  /* The token registry no longer keys anything by site: it reads the
+     project's own tokens through the composer (Brand Part 1a Task 10). The
+     preset registry still caches per site. */
+  it("hands the composer to the token registry and the resolved id to the preset registry", () => {
+    expect(src).toContain("<TokenRegistryProvider composer={composer}>");
     expect(src).toContain("<StylePresetRegistryProvider projectId={projectId}>");
   });
 });

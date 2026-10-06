@@ -1,35 +1,63 @@
 /**
- * useSpacingTokens — preset value tests
- * Verifies all 3 presets produce explicit, predictable pixel values.
+ * useSpacingTokens — the three presets produce explicit, predictable pixel
+ * values, each applied as ONE write; the active preset is read off the values
+ * (a hand edit makes it "custom"), and Reset puts the seed spacing back.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSpacingTokens } from "../useSpacingTokens";
 import type { DesignToken } from "../../types";
-import { v6Token, ownLight } from "@/engine/__tests__/test-utils/v6Token";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
+import { EVENTS } from "@/shared/constants/events";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 const SPACING_IDS = [
   "space-1", "space-2", "space-3", "space-4", "space-5",
   "space-6", "space-8", "space-10", "space-12",
 ] as const;
 
-function makeTokens(): DesignToken[] {
-  return SPACING_IDS.map((id) =>
-    v6Token({ id, value: "0px", kind: "spacing", category: "spacing", type: "length" })
-  );
+function fakeComposer() {
+  const listeners = new Map<string, Set<() => void>>();
+  let settings = { designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6 };
+  const composer = {
+    getProjectSettings: () => settings,
+    designSystem: {
+      readOnly: false,
+      setTokens: vi.fn((next: DesignToken[]) => {
+        settings = { designTokens: next, designTokensSchemaVersion: 6 };
+        listeners.get(EVENTS.SETTINGS_CHANGE)?.forEach((l) => l());
+        return true;
+      }),
+    },
+    on: (evt: string, l: () => void) => {
+      if (!listeners.has(evt)) listeners.set(evt, new Set());
+      listeners.get(evt)!.add(l);
+    },
+    off: (evt: string, l: () => void) => listeners.get(evt)?.delete(l),
+  };
+  return composer;
 }
 
 function getValues(tokens: DesignToken[]): Record<string, number> {
   const result: Record<string, number> = {};
-  for (const t of tokens) result[t.id] = parseFloat(ownLight(t) ?? "");
+  for (const id of SPACING_IDS) result[id] = parseFloat(resolveTokenLiteral(tokens, id, "light") ?? "");
   return result;
 }
 
+function setup() {
+  const composer = fakeComposer();
+  const hook = renderHook(() => useSpacingTokens(composer as never));
+  return { composer, result: hook.result };
+}
+
 describe("useSpacingTokens presets", () => {
-  it("compact preset produces expected values", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.applyPreset("compact"));
+  it("compact preset produces expected values in one write", () => {
+    const { composer, result } = setup();
+    act(() => {
+      result.current.applyPreset("compact");
+    });
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
     expect(getValues(result.current.tokens)).toEqual({
       "space-1": 2, "space-2": 6, "space-3": 8, "space-4": 12,
       "space-5": 16, "space-6": 20, "space-8": 24, "space-10": 32, "space-12": 40,
@@ -37,8 +65,13 @@ describe("useSpacingTokens presets", () => {
   });
 
   it("normal preset produces expected values", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.applyPreset("normal"));
+    const { result } = setup();
+    act(() => {
+      result.current.applyPreset("compact");
+    });
+    act(() => {
+      result.current.applyPreset("normal");
+    });
     expect(getValues(result.current.tokens)).toEqual({
       "space-1": 4, "space-2": 8, "space-3": 12, "space-4": 16,
       "space-5": 20, "space-6": 24, "space-8": 32, "space-10": 40, "space-12": 48,
@@ -46,91 +79,54 @@ describe("useSpacingTokens presets", () => {
   });
 
   it("spacious preset produces expected values (all even numbers)", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.applyPreset("spacious"));
+    const { result } = setup();
+    act(() => {
+      result.current.applyPreset("spacious");
+    });
     const values = getValues(result.current.tokens);
     expect(values).toEqual({
       "space-1": 6, "space-2": 12, "space-3": 16, "space-4": 20,
       "space-5": 24, "space-6": 32, "space-8": 40, "space-10": 48, "space-12": 64,
     });
-    // All values should be even (on 2px grid at minimum)
     Object.values(values).forEach((v) => expect(v % 2).toBe(0));
   });
 });
 
-describe("useSpacingTokens — activePreset lifecycle", () => {
-  it("starts with activePreset and savedPreset both 'normal'", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+describe("useSpacingTokens — activePreset is read off the values", () => {
+  it("the seed is the Normal preset", () => {
+    const { result } = setup();
     expect(result.current.activePreset).toBe("normal");
-    expect(result.current.savedPreset).toBe("normal");
   });
 
-  it("applyPreset switches activePreset and clears per-token undo stacks", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.updateToken("space-4", "99px"));
-    expect(result.current.canUndo("space-4")).toBe(true);
-    act(() => result.current.applyPreset("compact"));
+  it("applying a preset makes it active", () => {
+    const { result } = setup();
+    act(() => {
+      result.current.applyPreset("compact");
+    });
     expect(result.current.activePreset).toBe("compact");
-    expect(result.current.canUndo("space-4")).toBe(false);
   });
 
-  it("manual token edit drops activePreset to null (custom scale)", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.applyPreset("spacious"));
-    expect(result.current.activePreset).toBe("spacious");
-    act(() => result.current.updateToken("space-4", "21px"));
+  it("a hand edit makes the scale custom (null)", () => {
+    const { result } = setup();
+    act(() => {
+      result.current.applyPreset("spacious");
+    });
+    act(() => {
+      result.current.updateToken("space-4", "99px");
+    });
     expect(result.current.activePreset).toBeNull();
   });
 
-  it("markSaved persists the active preset as savedPreset", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.applyPreset("compact"));
-    act(() => result.current.markSaved());
-    expect(result.current.savedPreset).toBe("compact");
-    expect(result.current.isDirty).toBe(false);
-  });
-
-  it("discardAll restores savedPreset alongside token values", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.applyPreset("compact"));
-    act(() => result.current.markSaved());
-    // Manual edit → activePreset null + dirty values.
-    act(() => result.current.updateToken("space-4", "77px"));
-    expect(result.current.activePreset).toBeNull();
-    act(() => result.current.discardAll());
-    expect(result.current.activePreset).toBe("compact");
-    expect(ownLight(result.current.tokens.find((t) => t.id === "space-4"))).toBe("12px");
-  });
-
-  it("markSaved after a manual edit persists savedPreset=null (custom scale saved)", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.updateToken("space-4", "77px"));
-    act(() => result.current.markSaved());
-    expect(result.current.savedPreset).toBeNull();
-  });
-});
-
-describe("useSpacingTokens — stageDefaults (C3 factory reset)", () => {
-  it("stages spacing defaults without touching savedTokens (Review/Apply flow)", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    const defaults = makeTokens().map((t) => v6Token({ ...t, value: "5px" }));
-    act(() => result.current.stageDefaults(defaults));
-    expect(result.current.tokens.every((t) => ownLight(t) === "5px")).toBe(true);
-    // savedTokens untouched — the reset is staged, so the panel goes dirty.
-    expect(result.current.savedTokens.every((t) => ownLight(t) === "0px")).toBe(true);
-    expect(result.current.isDirty).toBe(true);
-  });
-
-  it("resets activePreset to 'normal' and filters non-spacing categories out", () => {
-    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    act(() => result.current.updateToken("space-4", "77px")); // preset → null
-    const defaults: ReturnType<typeof makeTokens> = [
-      ...makeTokens(),
-      v6Token({ id: "color-primary", name: "Primary", value: "#FFF" }),
-    ];
-    act(() => result.current.stageDefaults(defaults));
+  it("Reset puts the seed spacing back in one write", () => {
+    const { composer, result } = setup();
+    act(() => {
+      result.current.applyPreset("spacious");
+    });
+    act(() => {
+      result.current.resetToDefaults();
+    });
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(2);
     expect(result.current.activePreset).toBe("normal");
-    expect(result.current.tokens.some((t) => t.id === "color-primary")).toBe(false);
-    expect(result.current.tokens).toHaveLength(9);
+    expect(getValues(result.current.tokens)["space-1"]).toBe(4);
   });
 });

@@ -20,7 +20,6 @@ import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface KindTokenListProps {
   tokens: readonly DesignToken[];
-  savedTokens: readonly DesignToken[];
   /** The list `tokens` resolves aliases against — the whole registry, since
    *  the mode filter can hide the primitives. Defaults to `tokens`. */
   allTokens?: readonly DesignToken[];
@@ -43,7 +42,6 @@ const WITHOUT_PRESET = "52px 180px 240px minmax(0, 1fr)";
 
 export const KindTokenList: React.FC<KindTokenListProps> = ({
   tokens,
-  savedTokens,
   allTokens = tokens,
   kindLabel,
   usageByTokenId,
@@ -70,8 +68,6 @@ export const KindTokenList: React.FC<KindTokenListProps> = ({
     <TokenTable columns={columns} template={template} label={`${kindLabel} tokens`}>
       {tokens.map((token) => {
         const value = resolveTokenLiteral(allTokens, token.id, "light") ?? "";
-        const isDirty =
-          !savedTokens.some((s) => s.id === token.id) || resolveTokenLiteral(savedTokens, token.id, "light") !== value;
         const usage = usageByTokenId?.get(token.id) ?? 0;
         return (
           <TokenTableRow
@@ -82,14 +78,7 @@ export const KindTokenList: React.FC<KindTokenListProps> = ({
             onSelect={() => onSelectToken?.(token.id)}
           >
             <span className={TOKEN_CELL_PREVIEW}>
-              <span aria-hidden="true" className="tw:relative tw:inline-block tw:size-4 tw:rounded-full tw:bg-[var(--bk-gray-200)]">
-                {isDirty && (
-                  <span
-                    aria-label="unsaved changes"
-                    className="tw:absolute tw:-right-0.5 tw:-top-0.5 tw:size-[5px] tw:rounded-full tw:bg-[var(--bk-warning)]"
-                  />
-                )}
-              </span>
+              <span aria-hidden="true" className="tw:relative tw:inline-block tw:size-4 tw:rounded-full tw:bg-[var(--bk-gray-200)]" />
             </span>
             <span className={TOKEN_CELL_NAME}>
               <span className="tw:truncate" data-testid={`brand-token-name-${token.id}`}>

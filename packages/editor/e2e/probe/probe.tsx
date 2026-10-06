@@ -79,11 +79,6 @@ import type { ComparePage } from "@/shared/utils/html";
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { ComponentDetailScreen } from "@/editor/sidebar/tabs/component-library/ComponentDetailScreen";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
-import {
-  BrandWorkspace,
-  TokenRegistryProvider,
-  StylePresetRegistryProvider,
-} from "@/editor/design-system";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import type { LayerItem } from "@/editor/panels/layers/types";
 import { HistoryTab } from "@/editor/sidebar/tabs/history/HistoryTab";
@@ -640,46 +635,6 @@ const DETACH_COMPOSER = {
     getInstancesOfComponent: () => new Array(18).fill(null),
   },
 } as unknown as React.ComponentProps<typeof ComponentDetailScreen>["composer"];
-
-/**
- * Brand · load-error fixture (board 781:4311; the drawer it drew is archived —
- * the surface is the Brand workspace since C1 (i), 2026-09-22).
- *
- * The state is the `error` branch of `BrandWorkspace`, and nothing a user can
- * click produces it: `loadFromComposer` only sets `error` when reading the
- * project's own settings THROWS. So the composer here throws from
- * `getProjectSettings`, which is the one call that branch depends on, and the
- * surface under measurement is the real one — real PanelErrorState, real
- * copy, mounted under the same three providers `StudioPanels.tsx:405-407`
- * wraps it in. Nothing about the error block is re-drawn here.
- */
-const BRAND_ERROR_COMPOSER = {
-  on: () => {},
-  off: () => {},
-  emit: () => {},
-  getProjectSettings: () => {
-    throw new Error("design tokens unavailable");
-  },
-  elements: { getAllElements: () => [] },
-  /* Everything below is answered because the panel asks for it on the way to
-     the error branch, not because the branch needs it: `useDSLint` calls
-     `composer.dsLinter.lint()` unguarded, `colorMode.resolved()` seeds the
-     panel's `data-ds-preview`, and `designSystem.lintState` is where the hook
-     publishes what it found. A stub thinner than this throws before the error
-     state can render. */
-  dsLinter: { lint: () => [] },
-  colorMode: { resolved: () => "light" },
-  designSystem: {
-    lintState: {
-      setAllIssues: () => {},
-      suppressedCount: () => 0,
-      getVisibleIssues: () => [],
-      on: () => {},
-      off: () => {},
-    },
-    tokenUsage: null,
-  },
-} as unknown as React.ComponentProps<typeof BrandWorkspace>["composer"];
 
 /**
  * Layers · component-instance fixture (board 1082:4739).
@@ -2249,26 +2204,6 @@ const CASES: Record<string, () => React.ReactElement> = {
           </AutoOpen>
         </DSModeProvider>,
       )}
-    </div>
-  ),
-  "brand-load-error": () => (
-    <div data-probe="brand-load-error">
-      <ToastProvider>
-        {/* 1440 x 900, the workspace's own frame (7315:80955). */}
-        <div className="tw:flex tw:h-[900px] tw:w-[1440px] tw:flex-col tw:overflow-hidden tw:bg-white">
-          <DSModeProvider>
-            <TokenRegistryProvider projectId="probe" composer={undefined}>
-              <StylePresetRegistryProvider projectId="probe">
-                <BrandWorkspace
-                  composer={BRAND_ERROR_COMPOSER}
-                  projectId="probe"
-                  onClose={() => {}}
-                />
-              </StylePresetRegistryProvider>
-            </TokenRegistryProvider>
-          </DSModeProvider>
-        </div>
-      </ToastProvider>
     </div>
   ),
   "layers-component-instance": () => (

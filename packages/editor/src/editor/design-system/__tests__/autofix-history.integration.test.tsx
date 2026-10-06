@@ -106,8 +106,6 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     });
   });
 
-  const projectId = "autofix-history-test";
-
   // Pre-seed a color token + matching lint issue so Auto-fix has work to do.
   // Hex chosen so applyContrastFix("darken-22") returns a different value.
   const seedToken = v6Token({
@@ -140,7 +138,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
   const wrap = (composer: Composer, children: React.ReactNode) => (
     <ToastProvider>
       <DSModeProvider initialMode="pro">
-        <TokenRegistryProvider projectId={projectId} composer={composer as any}>
+        <TokenRegistryProvider composer={composer}>
           {children}
         </TokenRegistryProvider>
       </DSModeProvider>
@@ -161,7 +159,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
             token={token}
             composer={composer}
             allTokens={color.tokens}
-            onValueChange={(id, value, dark) => color.updateToken(id, value, dark)}
+            onValueChange={(id, value) => color.updateToken(id, value)}
           />
         )}
       </>
@@ -173,12 +171,6 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     (container.querySelector('[data-testid="brand-token-value-light"]')?.textContent ?? "");
 
   it("Click Auto-fix → registry value mutates AND composer.history.undo() reverts", async () => {
-    // Pre-seed localStorage so registry mounts with the lint-flagged token.
-    localStorage.setItem(
-      `buildrick-design-tokens-${projectId}-v1`,
-      JSON.stringify({ schemaVersion: 6, tokens: [seedToken] }),
-    );
-
     const composer = new Composer({} as any);
     // History coalesce defaults to 500ms which would batch seed() and
     // Auto-fix into a single recorded entry. Zero it for deterministic
@@ -262,11 +254,6 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
   // updates the live registry value AND that Cmd+Z reverts it — the propagation
   // + undo contract the AI relies on (it never touches the React hooks).
   it("set-token (W4): setDesignToken updates the registry value AND undo reverts", async () => {
-    localStorage.setItem(
-      `buildrick-design-tokens-${projectId}-v1`,
-      JSON.stringify({ schemaVersion: 6, tokens: [seedToken] }),
-    );
-
     const composer = new Composer({} as any);
     composer.history.setCoalesceDelay(0);
     seed(composer);

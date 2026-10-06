@@ -15,15 +15,18 @@ import {
 // useColorRegistry is used in the Apply test via Probe.
 import { ToastProvider } from "@/editor/chrome-ui";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { makeFakeComposer } from "../../__tests__/brandWorkspaceHarness";
 
+let composer = makeFakeComposer();
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
-    <TokenRegistryProvider projectId="import-card-test">{ui}</TokenRegistryProvider>
+    <TokenRegistryProvider composer={composer}>{ui}</TokenRegistryProvider>
   </ToastProvider>
 );
 
 beforeEach(() => {
   localStorage.clear();
+  composer = makeFakeComposer();
 });
 
 function makeJsonFile(payload: unknown, name = "tokens.json"): File {
@@ -245,21 +248,18 @@ describe("ImportCard — cancel + apply", () => {
     expect(getByTestId("import-drop-zone")).toBeTruthy();
   });
 
-  it("Apply stages tokens through registries (modifies dirty state)", async () => {
-    const Probe: React.FC<{ onColors: (count: number, dirty: boolean) => void }> = ({ onColors }) => {
+  it("Apply writes the tokens to the site in ONE write — live at once, nothing staged", async () => {
+    let lastCount = 0;
+    const Probe: React.FC = () => {
       const c = useColorRegistry();
-      React.useEffect(() => { onColors(c.tokens.length, c.isDirty); }, [c.tokens, c.isDirty, onColors]);
+      lastCount = c.tokens.length;
       return null;
     };
-
-    let lastCount = 0;
-    let lastDirty = false;
-    const onColors = (n: number, d: boolean) => { lastCount = n; lastDirty = d; };
 
     const { getByTestId, getByText, findByText } = render(
       wrap(
         <>
-          <Probe onColors={onColors} />
+          <Probe />
           <ImportCard />
         </>,
       ),
@@ -280,10 +280,27 @@ describe("ImportCard — cancel + apply", () => {
     await findByText(/Apply 1 valid only/i);
     fireEvent.click(getByText(/Apply 1 valid only/i));
 
-    await waitFor(() => {
-      expect(lastCount).toBe(initialCount + 1);
-      expect(lastDirty).toBe(true);
+    await waitFor(() => expect(lastCount).toBe(initialCount + 1));
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+  });
+
+  it("a read-only site imports nothing and says so", async () => {
+    composer = makeFakeComposer([], { readOnly: true });
+    const { getByTestId, getByText, findByText } = render(wrap(<ImportCard />));
+    const file = makeJsonFile([
+      {
+        id: "color-ro-add", name: "RO Add", value: "#FF00AA",
+        category: "colors", cssVar: "--buildrick-design-color-ro-add", type: "color",
+        kind: "color",
+      },
+    ]);
+    await act(async () => {
+      fireEvent.drop(getByTestId("import-drop-zone"), { dataTransfer: { files: [file] } });
     });
+    fireEvent.click(await findByText(/Apply 1 valid only/i));
+    expect(await findByText("Import failed")).toBeTruthy();
+    expect(getByText(/Nothing was imported — the brand can't be changed right now/)).toBeTruthy();
+    expect(composer.settings.designTokens).toEqual([]);
   });
 });
 

@@ -1,9 +1,10 @@
 /**
  * StartersSection — Brand › Starters, board 7316:85139 (C1 (ii)).
  *
- * The row is the control: a click STAGES the starter (draft, never saved
- * here). The drawer's warning callout, thumbnails and "Starter applied" pill
- * are not on the board.
+ * The row is the control: a click APPLIES the starter — one write to the
+ * site's tokens, one ⌘Z (Brand Part 1a Task 10; it used to stage a draft).
+ * The drawer's warning callout, thumbnails and "Starter applied" pill are not
+ * on the board.
  */
 import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach } from "vitest";
@@ -13,8 +14,9 @@ import { TokenRegistryProvider, useColorRegistry } from "../../../state/TokenReg
 import { DSModeProvider } from "../../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { STARTER_DS_REGISTRY } from "../../../starters";
-import { starterTokenStorageKey } from "../../../state/useApplyStarter";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
+import { makeFakeComposer } from "../../__tests__/brandWorkspaceHarness";
 
 /** Reads the live colour registry from inside the provider. */
 const seen: { registry?: ReturnType<typeof useColorRegistry> } = {};
@@ -23,10 +25,11 @@ const Probe: React.FC = () => {
   return null;
 };
 
+let composer = makeFakeComposer();
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
     <DSModeProvider initialMode="pro">
-      <TokenRegistryProvider projectId="starters-test">
+      <TokenRegistryProvider composer={composer}>
         <Probe />
         {ui}
       </TokenRegistryProvider>
@@ -34,7 +37,10 @@ const wrap = (ui: React.ReactNode) => (
   </ToastProvider>
 );
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  composer = makeFakeComposer();
+});
 
 describe("StartersSection", () => {
   it("offers every starter in the registry as a row in one radiogroup card", () => {
@@ -52,23 +58,32 @@ describe("StartersSection", () => {
     expect(row.getAttribute("title")).toBe(first.description);
   });
 
-  it("stages the starter rather than declaring it saved", () => {
+  it("applies the starter in ONE write — a valid v6 set, live at once", () => {
     const { container } = render(wrap(<StartersSection projectId="p1" />));
     fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[0]);
-    expect(seen.registry?.isDirty, "a starter the panel calls saved can never be applied").toBe(true);
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+    const [written] = composer.designSystem.setTokens.mock.calls[0];
+    expect(validateTokens(written).ok).toBe(true);
   });
 
-  it("moves the live tokens to the starter's values", () => {
+  it("moves the live tokens to the starter's values, dark included, keeping the palette", () => {
     const { container } = render(wrap(<StartersSection projectId="p1" />));
-    const wanted = resolveTokenLiteral(STARTER_DS_REGISTRY[0].tokens, "color-primary", "light");
-    fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[0]);
-    expect(resolveTokenLiteral(seen.registry?.tokens ?? [], "color-primary", "light")).toBe(wanted);
+    const starter = STARTER_DS_REGISTRY[1];
+    const before = seen.registry?.tokens.length ?? 0;
+    fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[1]);
+    const tokens = seen.registry?.tokens ?? [];
+    expect(resolveTokenLiteral(tokens, "color-primary", "light")).toBe(resolveTokenLiteral(starter.tokens, "color-primary", "light"));
+    expect(resolveTokenLiteral(tokens, "color-primary", "dark")).toBe(resolveTokenLiteral(starter.tokens, "color-primary", "dark"));
+    // The palette primitives survive: a starter is values, not a replacement list.
+    expect(tokens.some((t) => t.id === "color-brand-500")).toBe(true);
+    expect(tokens.length).toBeGreaterThanOrEqual(before);
   });
 
-  it("does not write the token blob itself — persistAll on Apply owns that", () => {
+  it("writes nothing while the tokens are read-only", () => {
+    composer = makeFakeComposer([], { readOnly: true });
     const { container } = render(wrap(<StartersSection projectId="p1" />));
     fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[0]);
-    expect(localStorage.getItem(starterTokenStorageKey("p1"))).toBeNull();
+    expect(composer.settings.designTokens).toEqual([]);
   });
 
   it("marks the chosen row checked, and Enter chooses too", () => {

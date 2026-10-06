@@ -560,12 +560,8 @@ export const EVENTS = {
   // ============================================
   // Brand / Review milestone events (onboarding wires, 2026-08-28)
   // ============================================
-  /** DesignSystemTab's Apply persisted brand tokens — fired only on success. */
+  /** A token write landed (`designSystem.setTokens`) — fired only on success. */
   BRAND_APPLIED: "brand:applied",
-  /** Brand has staged, unsaved token edits (or no longer does). The panel is
-   *  the only thing that knows, and the topbar sits outside the provider that
-   *  holds the staging — so it is announced rather than read. */
-  BRAND_DIRTY_CHANGED: "brand:dirty-changed",
   /** The site's tokens could not be migrated on load: Brand stays on the old
    *  tokens and refuses edits (spec §10, D17). */
   DESIGN_SYSTEM_READ_ONLY: "designSystem:readOnly",
@@ -984,7 +980,6 @@ export interface EventPayloads {
   [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
   [EVENTS.UI_CRUMB_CONTEXT]: { label: string } | null;
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
-  [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.DESIGN_SYSTEM_READ_ONLY]: { reason: string };
   [EVENTS.BRAND_CHECKS_RUN]: void;
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };

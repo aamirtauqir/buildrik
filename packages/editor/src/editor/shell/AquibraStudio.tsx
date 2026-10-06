@@ -146,7 +146,6 @@ class StudioErrorBoundary extends React.Component<
 /** How a failed "Leave anyway" discard names its surface in the toast. */
 const DISCARD_SURFACE: Record<DirtyDomain, string> = {
   settings: "Settings",
-  brand: "brand",
   "cms-record": "record",
 };
 

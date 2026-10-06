@@ -14,16 +14,23 @@ import { TokenRegistryProvider, useColorRegistry } from "../../../state/TokenReg
 import { DSModeProvider } from "../../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { makeFakeComposer } from "../../__tests__/brandWorkspaceHarness";
 
+/* A composer behind the registry, so a commit lands in the project and the
+   registry reads it back — the only way a value reaches it now. */
+let composer = makeFakeComposer();
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
     <DSModeProvider initialMode="pro">
-      <TokenRegistryProvider projectId="colour-mode-test">{ui}</TokenRegistryProvider>
+      <TokenRegistryProvider composer={composer}>{ui}</TokenRegistryProvider>
     </DSModeProvider>
   </ToastProvider>
 );
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  composer = makeFakeComposer();
+});
 
 /** Reads the live registry so a commit can be checked at its source. */
 function Probe({ onReady }: { onReady: (r: ReturnType<typeof useColorRegistry>) => void }) {
@@ -101,6 +108,8 @@ describe("ColourModeSection", () => {
     const hex = options[1].getAttribute("data-hex")!;
     fireEvent.click(options[1]);
     expect(resolveTokenLiteral(reg!.tokens, id, "dark")).toBe(hex);
+    // One write for the light + dark pair — one ⌘Z.
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
     expect(queryByTestId("dark-shade-popover")).toBeNull();
     expect(container.querySelector(`[data-no-dark-row="${id}"]`)).toBeNull();
   });

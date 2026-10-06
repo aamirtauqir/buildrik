@@ -1,20 +1,22 @@
 /**
- * BRD-24: ⌘Z inside Brand never reaches the canvas history.
+ * Spec §4 / test 7 — Brand and the canvas share ONE undo stack.
  *
- * Measured 2026-10-05 on a site with 13 elements and one staged colour: one
- * ⌘Z discarded the staged edit AND undid the last canvas action (13 → 9, a
- * CTA block gone), all under the workspace where nothing showed it. The
- * shell's window keydown ran `composer.history.undo()`, and the
- * `history:undo` it emitted re-hydrated the registries over the draft.
+ * This file used to pin BRD-24's interim block (⌘Z swallowed while Brand was
+ * open, because one ⌘Z dropped a STAGED edit and undid a canvas step out of
+ * sight). Task 10 removed the staging: a Brand edit is a composer transaction
+ * the moment it is made, so ⌘Z is allowed through again and undoes exactly
+ * that edit — the canvas history is untouched until the next ⌘Z.
  *
- * Real Composer, real history (flushed, so the canvas steps are on the undo
- * stack), the shell's real shortcut hook, the real workspace.
+ * Real Composer, real history (flushed so each step is on the stack), the
+ * shell's real shortcut hook, the real workspace.
  *
  * @license BSD-3-Clause
  */
 import { render, fireEvent, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import * as React from "react";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import {
   createTestComposer,
   installEngineBrowserStubs,
@@ -50,6 +52,11 @@ function seededComposer() {
 }
 
 const count = (c: RealComposer) => c.elements.getAllElements().length;
+/** The site's radius-sm as the canvas and Brand see it (saved tokens over the seed). */
+const radius = (c: RealComposer) => {
+  const s = c.getProjectSettings();
+  return resolveTokenLiteral(mergeProjectTokens(s.designTokens ?? [], s.designTokensSchemaVersion), "radius-sm", "light");
+};
 
 function chord(target: EventTarget, init: KeyboardEventInit) {
   const e = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init });
@@ -57,8 +64,8 @@ function chord(target: EventTarget, init: KeyboardEventInit) {
   return e;
 }
 
-/** Stage one radius edit on the card, the way a user does. */
-async function stageRadiusEdit(utils: ReturnType<typeof render>) {
+/** One radius edit on the card, the way a user makes it. */
+async function editRadius(utils: ReturnType<typeof render>, value: string) {
   openPage(utils, "kind-radius");
   const row = await waitFor(() => {
     const el = utils.container.querySelector<HTMLElement>('[data-token-row="radius-sm"]');
@@ -68,72 +75,81 @@ async function stageRadiusEdit(utils: ReturnType<typeof render>) {
   fireEvent.click(row);
   fireEvent.click(utils.getByTestId("brand-token-action-replace"));
   const input = await waitFor(() => utils.getByLabelText("Value") as HTMLInputElement);
-  fireEvent.change(input, { target: { value: "7px" } });
+  fireEvent.change(input, { target: { value } });
   fireEvent.blur(input);
-  await waitFor(() => expect(document.querySelector('[data-screen-savebar="true"]')).toBeTruthy());
   return input;
 }
 
-describe("BRD-24 — ⌘Z while Brand is open", () => {
-  it("control: with Brand closed the shell's ⌘Z undoes a canvas step", () => {
+const tableValue = (utils: ReturnType<typeof render>) => utils.getByTestId("brand-token-value-radius-sm").textContent;
+
+describe("one undo stack — Brand edits and canvas edits", () => {
+  it("a Brand edit is in the project at once — one history step, nothing staged", async () => {
     const c = seededComposer();
-    const before = count(c);
-    render(wrap(<Shell composer={c} brandOpen={false} />));
-    chord(document.body, { key: "z", metaKey: true });
+    const steps = c.history.getUndoCount();
+    const utils = render(wrap(<Shell composer={c} brandOpen />, c as unknown as ComposerProp));
+    await editRadius(utils, "7px");
     c.history.flushPending();
-    expect(count(c)).toBe(before - 1);
+
+    expect(radius(c)).toBe("7px");
+    expect(c.history.getUndoCount()).toBe(steps + 1);
+    expect(document.querySelector('[data-screen-savebar="true"]')).toBeNull();
+    expect(utils.queryByText(/unsaved/i)).toBeNull();
   });
 
-  it.each([
-    ["⌘Z", { key: "z", metaKey: true }],
-    ["⌃Z", { key: "z", ctrlKey: true }],
-    ["⇧⌘Z", { key: "Z", metaKey: true, shiftKey: true }],
-    ["⌃Y", { key: "y", ctrlKey: true }],
-  ] as const)("%s leaves the canvas history and the staged edit alone", async (_label, init) => {
+  it("⌘Z with Brand open undoes the Brand edit — and only it; the next ⌘Z undoes the canvas", async () => {
     const c = seededComposer();
-    /* One canvas step undone BEFORE Brand opens, so redo has something it
-       could wrongly replay too. */
-    c.history.undo();
+    const elements = count(c);
+    const utils = render(wrap(<Shell composer={c} brandOpen />, c as unknown as ComposerProp));
+    const before = radius(c);
+    await editRadius(utils, "7px");
     c.history.flushPending();
-    const utils = render(wrap(<Shell composer={c} brandOpen />));
-    await stageRadiusEdit(utils);
-    c.history.flushPending();
-    const before = { n: count(c), undo: c.history.getUndoCount(), redo: c.history.getRedoCount() };
-    const savebar = () => document.querySelector('[data-screen-savebar="true"]')?.textContent ?? "";
-    const dirtyText = savebar();
-    expect(dirtyText).toMatch(/unsaved/i);
+    await waitFor(() => expect(tableValue(utils)).toBe("7px"));
 
-    let e: KeyboardEvent | undefined;
-    act(() => { e = chord(document.body, init); });
-    act(() => { chord(document.body, init); });
+    act(() => {
+      chord(document.body, { key: "z", metaKey: true });
+    });
     c.history.flushPending();
+    expect(radius(c)).toBe(before);
+    expect(count(c)).toBe(elements);
+    /* The workspace follows the undo — it reads the project. */
+    await waitFor(() => expect(tableValue(utils)).toBe(before));
 
-    expect(e!.defaultPrevented).toBe(true);
-    expect({ n: count(c), undo: c.history.getUndoCount(), redo: c.history.getRedoCount() }).toEqual(before);
-    /* The draft is still staged: the footer still reports it. */
-    expect(savebar()).toBe(dirtyText);
+    act(() => {
+      chord(document.body, { key: "z", metaKey: true });
+    });
+    c.history.flushPending();
+    expect(count(c)).toBe(elements - 1);
   });
 
-  it("a text field inside Brand keeps the browser's own undo and still never reaches the canvas", async () => {
+  it("⇧⌘Z redoes the Brand edit", async () => {
     const c = seededComposer();
-    const before = count(c);
-    const utils = render(wrap(<Shell composer={c} brandOpen />));
-    const input = await stageRadiusEdit(utils);
+    const utils = render(wrap(<Shell composer={c} brandOpen />, c as unknown as ComposerProp));
+    await editRadius(utils, "7px");
+    c.history.flushPending();
+    act(() => {
+      chord(document.body, { key: "z", metaKey: true });
+    });
+    c.history.flushPending();
+    act(() => {
+      chord(document.body, { key: "Z", metaKey: true, shiftKey: true });
+    });
+    c.history.flushPending();
+    expect(radius(c)).toBe("7px");
+    await waitFor(() => expect(tableValue(utils)).toBe("7px"));
+  });
+
+  it("a text field inside Brand keeps the browser's own undo", async () => {
+    const c = seededComposer();
+    const utils = render(wrap(<Shell composer={c} brandOpen />, c as unknown as ComposerProp));
+    const input = await editRadius(utils, "7px");
+    c.history.flushPending();
     input.focus();
     let e: KeyboardEvent | undefined;
-    act(() => { e = chord(input, { key: "z", metaKey: true }); });
+    act(() => {
+      e = chord(input, { key: "z", metaKey: true });
+    });
     expect(e!.defaultPrevented).toBe(false);
     c.history.flushPending();
-    expect(count(c)).toBe(before);
-  });
-
-  it("closing Brand gives ⌘Z back to the canvas", async () => {
-    const c = seededComposer();
-    const before = count(c);
-    const utils = render(wrap(<Shell composer={c} brandOpen />));
-    utils.rerender(wrap(<Shell composer={c} brandOpen={false} />));
-    chord(document.body, { key: "z", metaKey: true });
-    c.history.flushPending();
-    expect(count(c)).toBe(before - 1);
+    expect(radius(c)).toBe("7px");
   });
 });

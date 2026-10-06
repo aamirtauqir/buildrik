@@ -19,6 +19,7 @@ function makeFakeComposer(darkMode: "off" | "auto") {
     emit: (evt: string) => (listeners.get(evt) ?? []).forEach((c) => c(undefined)),
     getProjectSettings: () => ({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode }),
     colorMode: { resolved: () => "dark" as const },
+    designSystem: { readOnly: false, setTokens: vi.fn(() => false) },
   };
 }
 
@@ -33,7 +34,7 @@ describe("site Dark mode off, editor in dark (D8)", () => {
   it("leaves no inline colour override on <html> and previews light", () => {
     const composer = makeFakeComposer("off");
     render(
-      <TokenRegistryProvider projectId="test" composer={composer as never}>
+      <TokenRegistryProvider composer={composer as never}>
         <ProjectTokensApplier composer={composer as never} />
       </TokenRegistryProvider>
     );

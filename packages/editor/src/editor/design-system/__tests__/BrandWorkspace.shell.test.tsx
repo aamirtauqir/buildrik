@@ -1,13 +1,13 @@
 /**
  * BrandWorkspace — the shell (C1 (i), boards `7315:80955` workspace ·
- * `7317:80979` "Discard brand changes?" · `4418:168885` Import / export ·
- * parked `4418:49685` "Brand · empty" · `781:4311` load-error).
+ * `4418:168885` Import / export · parked `4418:49685` "Brand · empty").
  *
  *   rail Brand → fullpage → the workspace, landing on Colours
- *   ‹ Back / Escape with staged edits → the discard overlay; without → out
+ *   ‹ Back / Escape → out, always: edits autosave, so there is nothing to
+ *     guard (spec §4; board 7317:80979's discard overlay and 781:4311's
+ *     load-error card went with the staging layer — Brand Part 1a Task 10)
  *   Import / export: a bad file → "Import failed" row
  *   first run → "No brand set." with Browse starters · Import
- *   settings unreadable → the load-error card with Try again
  *
  * @license BSD-3-Clause
  */
@@ -71,52 +71,17 @@ describe("BrandWorkspace › the rail target", () => {
   });
 });
 
-describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () => {
-  it("raises the discard overlay; Keep editing stays with the edit intact", async () => {
+describe("BrandWorkspace › ‹ Back to canvas (nothing staged, nothing to guard)", () => {
+  it("leaves at once after an edit — the edit is already in the project", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
     const utils = await renderOnRadius(composer, { onClose });
-    const input = utils.radiusInput;
-    fireEvent.change(input, { target: { value: "10px" } });
-    await utils.findByText("Unsaved brand changes");
+    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
 
     fireEvent.click(utils.getByTestId("brand-back-link"));
-
-    const dialog = await screen.findByTestId("brand-discard");
-    expect(dialog.textContent).toContain("Discard brand changes?");
-    expect(screen.getByTestId("brand-discard-body").textContent).toBe(
-      "Your brand edit has not been saved. Discard it and leave Brand, or keep editing.",
-    );
-    // 7317:80979: Discard (danger) first, Keep editing (primary, focused) last.
-    const buttons = [...dialog.querySelectorAll("button")].map((b) => b.getAttribute("data-testid")).filter((t) => t?.startsWith("brand-discard-"));
-    expect(buttons).toEqual(["brand-discard-confirm", "brand-discard-keep"]);
-    expect(onClose).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByTestId("brand-discard-keep"));
-    await waitFor(() => expect(screen.queryByTestId("brand-discard")).toBeNull());
-    expect(onClose).not.toHaveBeenCalled();
-    expect((utils.getByLabelText("Value") as HTMLInputElement).value).toBe("10px");
-  });
-
-  it("Discard changes reverts the staged edits and leaves", async () => {
-    const composer = makeFakeComposer();
-    const onClose = vi.fn();
-    const utils = await renderOnRadius(composer, { onClose });
-    const input = utils.radiusInput;
-    const original = input.value;
-    fireEvent.change(input, { target: { value: "10px" } });
-    await utils.findByText("Unsaved brand changes");
-
-    fireEvent.click(utils.getByTestId("brand-back-link"));
-    fireEvent.click(await screen.findByTestId("brand-discard-confirm"));
-
     expect(onClose).toHaveBeenCalledTimes(1);
-    await waitFor(() => {
-      expect((utils.getByLabelText("Value") as HTMLInputElement).value).toBe(original);
-    });
-    expect(utils.queryByText("Unsaved brand changes")).toBeNull();
-    // The footer's own discard, with its Undo toast.
-    expect(await utils.findByText("1 change discarded")).toBeTruthy();
+    expect(screen.queryByTestId("brand-discard")).toBeNull();
   });
 
   it("Escape that closes an open menu does not also leave the workspace", async () => {
@@ -129,30 +94,20 @@ describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () =
       fireEvent.keyDown(document.body, { key: "Escape" });
     });
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.queryByTestId("brand-discard")).toBeNull();
   });
 
-  it("Escape is the same door, guarded the same way", async () => {
+  it("Escape is the same door — out at once, edit or no edit", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
     const utils = await renderOnRadius(composer, { onClose });
-    const input = utils.radiusInput;
-    fireEvent.change(input, { target: { value: "12px" } });
-    await utils.findByText("Unsaved brand changes");
+    fireEvent.change(utils.radiusInput, { target: { value: "12px" } });
+    (document.activeElement as HTMLElement | null)?.blur();
 
     act(() => {
       fireEvent.keyDown(document.body, { key: "Escape" });
     });
-    expect(await screen.findByTestId("brand-discard")).toBeTruthy();
-    expect(onClose).not.toHaveBeenCalled();
-
-    // Answer it, then Escape with nothing staged leaves directly.
-    fireEvent.click(screen.getByTestId("brand-discard-confirm"));
     expect(onClose).toHaveBeenCalledTimes(1);
-    act(() => {
-      fireEvent.keyDown(document.body, { key: "Escape" });
-    });
-    expect(onClose).toHaveBeenCalledTimes(2);
+    expect(screen.queryByTestId("brand-discard")).toBeNull();
   });
 });
 
@@ -173,7 +128,7 @@ describe("BrandWorkspace › Import / export failed row (4418:168885)", () => {
   });
 });
 
-describe("BrandWorkspace › first run and load error", () => {
+describe("BrandWorkspace › first run", () => {
   it("with no saved tokens the landing shows 'No brand set.' with its two doors", async () => {
     const composer = makeFakeComposer([]);
     const utils = renderWorkspace(composer);
@@ -197,24 +152,4 @@ describe("BrandWorkspace › first run and load error", () => {
     expect(utils.queryByTestId("brand-tokens-first-load-banner")).toBeNull();
   });
 
-  it("settings that cannot be read show the load-error card, and Try again recovers", async () => {
-    const composer = makeFakeComposer();
-    let broken = true;
-    const settings = composer.getProjectSettings();
-    vi.spyOn(composer, "getProjectSettings").mockImplementation(() => {
-      if (broken) throw new Error("design tokens unavailable");
-      return settings;
-    });
-    const utils = renderWorkspace(composer);
-
-    const card = utils.getByTestId("panel-load-error");
-    expect(card.textContent).toContain("Couldn't load your brand system.");
-    expect(card.textContent).toContain("Your tokens are safe");
-    expect(utils.queryByTestId("brand-page-body")).toBeNull();
-
-    broken = false;
-    fireEvent.click(utils.getByTestId("panel-load-error-retry"));
-    await waitFor(() => expect(utils.queryByTestId("panel-load-error")).toBeNull());
-    expect(utils.getByTestId("brand-page-body")).toBeTruthy();
-  });
 });

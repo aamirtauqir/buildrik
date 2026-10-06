@@ -1,29 +1,26 @@
 /**
- * useApplyStarter — stage a starter's tokens as a pending change.
+ * useApplyStarter — apply a starter's brand to the site: one write, one ⌘Z.
  *
- * Lifted out of `StarterGalleryMount` when Starters became a Brand destination
- * (board 152:137). Two surfaces apply a starter now — the first-run modal and
- * the destination — and a second copy of this would be a second chance to get
- * the persist-then-repaint order wrong.
+ * Two surfaces apply a starter (the first-run modal and Brand › Starters), so
+ * the write lives here once. Each starter token's light and dark values land
+ * through `setTokenLiteral` on the project's own set — a semantic keeps its
+ * alias and takes a `custom-<id>` primitive, so the two-layer model survives
+ * (it used to replace the colour, type and spacing lists wholesale with the
+ * starter's nine rows, dropping every primitive). Nothing is staged: the
+ * canvas repaints from the write (spec §4).
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { STARTER_DS_REGISTRY } from "../starters";
-import {
-  useColorRegistry,
-  useSpacingRegistry,
-  useTypeRegistry,
-} from "./TokenRegistryContext";
+import type { DesignToken } from "../types";
+import { useProjectTokenStore } from "./TokenRegistryContext";
 
 const SEEN_KEY_PREFIX = "buildrik:starter-gallery-seen-";
 
 function starterSeenKey(projectId: string | null | undefined): string {
   return `${SEEN_KEY_PREFIX}${projectId ?? "default"}`;
-}
-
-export function starterTokenStorageKey(projectId: string | null | undefined): string {
-  return `buildrick-design-tokens-${projectId ?? "default"}-v1`;
 }
 
 function markStarterSeen(projectId: string | null | undefined): void {
@@ -34,38 +31,31 @@ function markStarterSeen(projectId: string | null | undefined): void {
   }
 }
 
+/** The site's tokens with the starter's values written over them. */
+function withStarter(all: DesignToken[], starter: readonly DesignToken[]): DesignToken[] {
+  return starter.reduce((acc, t) => {
+    if (!acc.some((x) => x.id === t.id)) return acc;
+    const light = resolveTokenLiteral(starter, t.id, "light");
+    const dark = t.modes.dark ? resolveTokenLiteral(starter, t.id, "dark") : null;
+    const lit = light === null ? acc : setTokenLiteral(acc, t.id, "light", light);
+    return dark === null ? lit : setTokenLiteral(lit, t.id, "dark", dark);
+  }, all);
+}
+
+/** Returns false when the write was refused (read-only tokens) or the starter is unknown. */
 export function useApplyStarter(
   projectId: string | null | undefined,
-): (starterId: string) => void {
-  const colorRegistry = useColorRegistry();
-  const spacingRegistry = useSpacingRegistry();
-  const typeRegistry = useTypeRegistry();
+): (starterId: string) => boolean {
+  const { all, commit } = useProjectTokenStore();
 
   return React.useCallback(
     (starterId: string) => {
       const starter = STARTER_DS_REGISTRY.find((s) => s.id === starterId);
-      if (!starter) return;
-
-      /* STAGE, do not save. This used to write the versioned blob straight to
-         localStorage and call `resetFromSaved`, which moves `savedTokens` too
-         — so the panel read "All changes saved" over tokens the PROJECT had
-         never been told about. Nothing staged, so there was nothing to Apply,
-         and `composer.setProjectSettings` was never reached: the starter lived
-         in one browser's localStorage and the published site kept its old
-         palette. Verified against the database on 2026-08-18 — after applying
-         Stripe Blue, `projectSettings.designTokens` still held the defaults.
-
-         Staging puts the starter through the same Review & Apply the panel
-         already offers for a single token edit, which is the one path that
-         persists (DesignSystemTab's apply → setProjectSettings + persistAll).
-         localStorage is written by persistAll on that apply, so writing it
-         here would just be the same lie one layer down. */
-      colorRegistry.stageTokens(starter.tokens);
-      spacingRegistry.stageTokens(starter.tokens);
-      typeRegistry.stageTokens(starter.tokens);
-
-      markStarterSeen(projectId);
+      if (!starter) return false;
+      const ok = commit(withStarter(all, starter.tokens), "Apply starter");
+      if (ok) markStarterSeen(projectId);
+      return ok;
     },
-    [projectId, colorRegistry, spacingRegistry, typeRegistry],
+    [projectId, all, commit],
   );
 }

@@ -462,14 +462,6 @@
     "skipped": 1,
     "compared": 27
   },
-  "brand-dirty": {
-    "skipped": 0,
-    "compared": 100,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
   "s3-11-smart-guides-snap-indicators": {
     "contrastFailures": 4,
     "nonTextFailures": 0,
@@ -688,14 +680,6 @@
     "nonTextPairs": {},
     "skipped": 0,
     "compared": 7
-  },
-  "brand-load-error": {
-    "skipped": 1,
-    "compared": 21,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
   },
   "brand-classes": {
     "skipped": 1,
@@ -1302,14 +1286,6 @@
     "nonTextPairs": {},
     "skipped": 2,
     "compared": 53
-  },
-  "brand-review-changes": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 6,
-    "compared": 55
   },
   "brand-root": {
     "contrastFailures": 0,

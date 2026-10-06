@@ -449,25 +449,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // after a refused save) so beforeunload does not double-prompt.
   React.useEffect(() => endUnloadGuardBypass, []);
 
-  /* Brand stages its token edits in a provider this header sits outside, so it
-     announces them. Without this the chip read "Saved · just now" with a green
-     dot while the Brand footer two panels away said "Unsaved brand changes" —
-     same concept, two surfacings, and the global one is the one a user watches.
-     It is deliberately not the project's dirty flag: see the emit site.
-     The announcement goes into the shell dirty registry (B-1), the ONE source
-     the exit guard, beforeunload and this chip read — alongside Settings'
-     and an open CMS record's entries, which their own surfaces register. */
-  React.useEffect(() => {
-    if (!composer) return;
-    const onBrandDirty = (p?: { dirty?: boolean }) => shellDirty.set("brand", Boolean(p?.dirty));
-    composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-    /* Block body, not a shorthand: `off` is chainable and returns the composer,
-       so an arrow shorthand hands React an instance where a destructor belongs. */
-    return () => {
-      composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-      shellDirty.set("brand", false);
-    };
-  }, [composer]);
   const shellIsDirty = useShellDirty();
 
   const guardNavigation = React.useCallback(

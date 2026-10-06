@@ -28,19 +28,14 @@
  * Spacing got a page, W-7) stay reachable behind the same "More token kinds"
  * disclosure the drawer's Tokens list used, so no kind loses its editor.
  *
- * Save model is the CODE's (behaviour → code contract): edits are staged in
- * the registries above this tree, the footer's Save opens the review → Apply
- * persists. `DraftChip` is the auto-draft indicator (#28); `‹ Back to canvas`
- * and Escape are guarded by `BrandDiscardDialog` (7317:80979) while anything
- * is staged. The staged edits survive leaving — `TokenRegistryProvider` sits
- * above the whole shell — so the guard is about the user's intent, not data
- * loss; Discard from the dialog is the footer's own Discard (with its Undo
- * toast), then leave.
- *
- * The aggregation, load and apply logic below is the drawer's, moved verbatim:
- * 14 token registries + 11 preset registries → one dirty count, one Apply,
- * one Discard. It stays here rather than in a hook because the footer, the
- * chip, the guard and the review modal all read the same numbers.
+ * Save model (spec §4, Brand Part 1a Task 10): autosave + ONE undo stack.
+ * Every edit is one `composer.designSystem.setTokens` transaction the moment
+ * it is made — the canvas repaints from that write, the project's debounced
+ * autosave persists it, and ⌘Z undoes it alongside canvas edits. There is no
+ * draft, no Save, no review-before-apply and no leave guard. "Review changes"
+ * is a non-blocking list of this session's token edits, each with Revert.
+ * When the site's tokens could not be migrated (`designSystem.readOnly`) the
+ * workspace shows them, says so, and disables every edit.
  *
  * @license BSD-3-Clause
  */
@@ -48,12 +43,9 @@
 import * as React from "react";
 import { ChevronLeft } from "lucide-react";
 import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, Tooltip, useToast } from "@/editor/chrome-ui";
-import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
-import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
-import { DEFAULT_TOKENS } from "../constants";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { SpacingPreset } from "../state/useSpacingTokens";
 import {
   useColorRegistry,
@@ -70,35 +62,26 @@ import {
   useSizingRegistry,
   useIconRegistry,
   useImageryRegistry,
-  useRegistryConfig,
-  useResetAllKinds,
+  useProjectTokenStore,
 } from "../state/TokenRegistryContext";
 import {
   useButtonPresets, useCardPresets, useFormPresets, useLinkPresets,
   useBadgePresets, useAlertPresets, useTooltipPresets, useModalPresets,
   useNavPresets, useTablePresets, useLayoutPresets,
-  usePresetRegistryConfig,
 } from "../state/StylePresetRegistryContext";
 import type { DesignToken, StylePreset, TokenKind } from "../types";
-import { useTokenUsageMap } from "../state/useTokenUsageMap";
-import { CURRENT_SCHEMA_VERSION } from "@/engine/designSystem/tokenMigrations";
 import type { TokensForKindRegistry } from "../state/useTokensForKind";
-import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils";
-import { APPLY_CHANGES_LABEL, DesignTabFooter } from "./DesignTabFooter";
-import { DraftChip } from "./DraftChip";
-import { useBrandDraft } from "./useBrandDraft";
 import { DSModeProvider, useDSModeOptional } from "../state/DSModeContext";
 import { AIPromptModal } from "./AIPromptModal";
 import { TokenAddDialog } from "./modals/TokenAddDialog";
-import { ReviewModal } from "./modals/ReviewModal";
-import { BrandDiscardDialog } from "./BrandDiscardDialog";
+import { SessionEditsPopover, type SessionEdit } from "./SessionEditsPopover";
 import { BrandPreview } from "./BrandPreview";
 import { BrandLivePreview } from "./BrandLivePreview";
 import { orderColourTokens } from "./colors/ColorTokenList";
 import { TokenDetailView } from "./sections/TokenDetailView";
 import { TokensSection } from "./sections/TokensSection";
-import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
+import { StylesSection, usePresetAutosave } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ReusableStylesSection, reusableStylesCount } from "./sections/ReusableStylesSection";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
@@ -198,53 +181,19 @@ const PAGE_ACTION =
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-// Only the truly-shared subset across all 14 registries. Color/Type/Spacing
-// expose richer types (TypeRegistry has no pendingDiff field; ColorRegistry's
-// pendingDiff is Record<string, TokenDiff>, not Record<string, string>). Stick
-// to value-vs-savedTokens for a uniform dirty calculation that works for all 14.
-interface KindRegistryLike {
-  tokens: DesignToken[];
-  savedTokens: DesignToken[];
-  updateToken: (id: string, value: string) => void;
-  markSaved: () => void;
-  discardAll: () => void;
-}
-
 const lightOf = (tokens: readonly DesignToken[], id: string): string => resolveTokenLiteral(tokens, id, "light") ?? "";
-const darkOf = (tokens: readonly DesignToken[], t: DesignToken): string =>
-  t.modes.dark ? resolveTokenLiteral(tokens, t.id, "dark") ?? "" : "";
 
-/** A token is dirty when its value OR its dark value differs from the saved one. */
-function tokenDirty(t: DesignToken, reg: KindRegistryLike): boolean {
-  const saved = reg.savedTokens.find((s) => s.id === t.id);
+/* The read-only notice (Task 9's failed migration). Brief copy, verbatim. */
+const READ_ONLY_COPY = "We couldn't upgrade this site's brand — nothing was changed. Editing is paused.";
+
+/** Disables every native control inside while the tokens are read-only.
+ *  `display: contents`, so it never takes part in the layout it sits in. */
+function EditLock({ locked, children }: { locked: boolean; children: React.ReactNode }) {
   return (
-    saved === undefined ||
-    lightOf(reg.tokens, t.id) !== lightOf(reg.savedTokens, t.id) ||
-    darkOf(reg.tokens, t) !== darkOf(reg.savedTokens, saved)
+    <fieldset disabled={locked} className="tw:contents" data-testid={locked ? "brand-edit-lock" : undefined}>
+      {children}
+    </fieldset>
   );
-}
-
-/** A primitive an edit created for a semantic token (setTokenLiteral's
- *  `custom-<id>`) is part of that edit, not a change of its own. */
-function editSpawned(t: DesignToken, reg: KindRegistryLike): boolean {
-  if (t.layer !== "primitive" || reg.savedTokens.some((s) => s.id === t.id)) return false;
-  const aliases = (ref: DesignToken["modes"]["light"] | undefined) => ref !== undefined && "alias" in ref && ref.alias === t.id;
-  return reg.tokens.some((x) => aliases(x.modes.light) || aliases(x.modes.dark));
-}
-
-/** The tokens a registry's staged changes are about — edits and additions. */
-function changedTokens(reg: KindRegistryLike): DesignToken[] {
-  return reg.tokens.filter((t) => tokenDirty(t, reg) && !editSpawned(t, reg));
-}
-
-function dirtyCount(reg: KindRegistryLike): number {
-  // Counts both modifications (id present in saved with different value) AND
-  // additions (id not in saved at all). Pre-fix this only counted modifications,
-  // so import-via-add and AddTokenModal both shipped tokens silently — no
-  // section-tab dot, no DraftChip count increment. Removals are not counted
-  // here; deleteToken UX is a separate concern. A dark value set on the card
-  // counts too — it used to stage without ever lighting the footer (C1 (ii)).
-  return changedTokens(reg).length;
 }
 
 // ─── BrandWorkspace ───────────────────────────────────────────────────────────
@@ -277,16 +226,12 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const [page, setPage] = React.useState<BrandPageId>(() =>
     initialPage && isPageId(initialPage) ? initialPage : LANDING
   );
-  const [showReview, setShowReview] = React.useState(false);
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
-  const [guardOpen, setGuardOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [isFirstLoad, setIsFirstLoad] = React.useState(false);
-  /* The saved brand is in the registries — the auto-draft may restore on top. */
-  const [brandLoaded, setBrandLoaded] = React.useState(false);
+  /* This session's token edits, newest first — "Review changes" (spec §4). */
+  const [sessionEdits, setSessionEdits] = React.useState<SessionEdit[]>([]);
 
   // T10 / spec D8: outermost wrapper gets data-ds-preview={resolvedMode} so
   // ds-panel-dark.css can scope overrides to the Brand surface only. Editor
@@ -304,17 +249,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     };
   }, [composer]);
 
-  const hasLoadedRef = React.useRef(false);
-  // Identity of the composer that has already been loaded into the React
-  // registries. Used by the load effect below to ensure each composer
-  // instance gets a single initial loadFromComposer() call, even if
-  // surrounding identity (resetAllKinds, loadFromComposer, addToast) ever
-  // re-rotates. Cleared implicitly by the comparison when composer prop
-  // changes (e.g. project switch).
-  const loadedComposerRef = React.useRef<typeof composer | null>(null);
-
-  const [usageVersion, setUsageVersion] = React.useState(0);
-  const usageMap = useTokenUsageMap(composer, usageVersion);
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
   const spacing    = useSpacingRegistry();
@@ -329,11 +263,13 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const sizing     = useSizingRegistry();
   const icon       = useIconRegistry();
   const imagery    = useImageryRegistry();
-  const { persistAll } = useRegistryConfig();
-  const resetAllKinds = useResetAllKinds();
+  const store      = useProjectTokenStore();
+  const readOnly   = store.readOnly;
+  /* "No brand set" (4418:49685): the site has never saved a token. */
+  const isFirstLoad = !composer?.getProjectSettings()?.designTokens?.length;
 
-  // S2: preset registries — fanned out so handleApply can persist + markSaved
-  // them in lockstep with tokens. Same pattern as the 14 token registries.
+  // The preset registries feed the Styles page's counts; their edits autosave.
+  usePresetAutosave(composer);
   const buttonPresets   = useButtonPresets();
   const cardPresets     = useCardPresets();
   const formPresets     = useFormPresets();
@@ -345,7 +281,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const navPresets      = useNavPresets();
   const tablePresets    = useTablePresets();
   const layoutPresets   = useLayoutPresets();
-  const { persistAll: persistAllPresets } = usePresetRegistryConfig();
   const allPresetRegistries = [
     buttonPresets, cardPresets, formPresets, linkPresets, badgePresets, alertPresets,
     tooltipPresets, modalPresets, navPresets, tablePresets, layoutPresets,
@@ -353,285 +288,40 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   const allPresets: StylePreset[] = allPresetRegistries.flatMap((r) => r.presets);
 
-  const allRegistries: KindRegistryLike[] = [
-    color, type, spacing, radius, shadow, motion, border,
-    opacity, zindex, breakpoint, grid, sizing, icon, imagery,
-  ];
-
-  // Decision #28: the draft survives a reload.
-  useBrandDraft({
-    projectId,
-    registries: allRegistries,
-    color,
-    addColorToken: color.addToken,
-    ready: brandLoaded,
-  });
-
-
-  const tokensDirty = allRegistries.reduce((n, r) => n + dirtyCount(r), 0);
-  const stylesDirty = useStylesSectionTotalDirty();
-  const totalDirty = tokensDirty + stylesDirty;
-  const isDirty = totalDirty > 0;
-
-  const isDirtyRef = React.useRef(isDirty);
-  React.useEffect(() => { isDirtyRef.current = isDirty; }, [isDirty]);
-  /* True while Apply writes the settings. `setProjectSettings` emits
-     SETTINGS_CHANGE synchronously, before `markSaved` has cleared the dirty
-     flag, so the cross-window listener below read our own write as another
-     window's and toasted "Your edits may conflict" on every Save — measured
-     live 2026-09-22 on the first Apply through the workspace. */
-  const applyingRef = React.useRef(false);
-
-  /* The topbar read only the PROJECT's dirty flag, so a token mid-edit left it
-     reading "Saved · just now" with a green dot while this surface's own footer
-     said "Unsaved brand changes". Same concept, two surfacings, and the global
-     one — the one a user watches — was the wrong one.
-     Announced rather than shared: brand staging lives in TokenRegistryProvider
-     above the shell, and the topbar sits outside it. It deliberately does NOT
-     raise the project's dirty flag: autosave would then write a project that
-     has not changed and clear the flag, putting "Saved" back over brand work
-     that is still only staged. */
-  React.useEffect(() => {
-    /* Optional CALL, not just optional access: this surface is mounted in
-       tests with partial composer mocks that carry no emitter, and a hard call
-       turns a missing test double into a crash in the component under test. */
-    composer?.emit?.(EVENTS.BRAND_DIRTY_CHANGED, { dirty: isDirty });
-  }, [composer, isDirty]);
-
-  // ─ Load from Composer ─
-  const loadFromComposer = React.useCallback(() => {
-    if (!composer) return;
-    try {
-      const settings = composer.getProjectSettings();
-      const storedVersion = settings.designTokensSchemaVersion ?? 1;
-
-      if (storedVersion > CURRENT_SCHEMA_VERSION) {
-        console.warn(
-          `project was saved with designTokensSchemaVersion=${storedVersion} ` +
-          `(editor supports up to ${CURRENT_SCHEMA_VERSION}); loading tokens as-is`
-        );
-      }
-
-      if (settings.designTokens && settings.designTokens.length > 0) {
-        // The merge lives in engine/designSystem/projectTokens so ProjectTokensApplier —
-        // which runs this at project load, not at mount — shares it.
-        const merged = mergeProjectTokens(settings.designTokens, storedVersion);
-        // C1 fix: single fan-out resets all 14 kinds atomically. Internally:
-        // color/type/spacing get resetFromSaved(merged), the 11 new kinds get
-        // hydrateFromExternal(merged) (filters by kind, replaces tokens+saved).
-        resetAllKinds(merged);
-        hasLoadedRef.current = true;
-        setIsFirstLoad(false);
-      } else {
-        setIsFirstLoad(true);
-      }
-      setError(null);
-      setBrandLoaded(true);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load design tokens");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [composer, resetAllKinds]);
-
-  React.useEffect(() => {
-    if (!composer) return;
-    // Defense-in-depth alongside the useRef stabilisation of useResetAllKinds:
-    // gate the initial load to once per composer instance, so that even if a
-    // future change re-introduces identity churn for loadFromComposer, the
-    // effect's self-invocation cannot drive an unbounded render loop. A
-    // genuine project switch (new composer prop) still re-triggers because
-    // the ref comparison fails. Cross-window settings change still flows
-    // through handleSettingsChange below.
-    if (loadedComposerRef.current !== composer) {
-      loadedComposerRef.current = composer;
-      loadFromComposer();
-    }
-
-    const handleProjectLoaded = () => { if (!hasLoadedRef.current) loadFromComposer(); };
-    const handleSettingsChange = () => {
-      if (applyingRef.current) return;
-      if (isDirtyRef.current) {
-        addToast({
-          description: "Design tokens changed from another window. Your edits may conflict.",
-          tone: "warning",
-        });
-      } else {
-        loadFromComposer();
-      }
-    };
-    const handleUndoRedo = () => {
-      // Dirty guard (mirrors handleSettingsChange): a global engine undo/redo
-      // is a canvas action that must NOT silently discard unsaved token edits.
-      // When there are staged changes, keep them and warn instead of
-      // reloading over them from stored settings.
-      if (isDirtyRef.current) {
-        addToast({
-          description: "Canvas undo/redo — your unsaved design token edits were kept.",
-          tone: "info",
-        });
-        return;
-      }
-      loadFromComposer();
-    };
-    const bumpUsage = () => setUsageVersion((v) => v + 1);
-
-    composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-    composer.on(EVENTS.SETTINGS_CHANGE, handleSettingsChange);
-    // Engine emits history:undo / history:redo (EVENTS.HISTORY_UNDO/REDO).
-    // The original "undo:applied" / "redo:applied" names matched zero
-    // emitters anywhere in the codebase — handler never fired in production.
-    composer.on("history:undo", handleUndoRedo);
-    composer.on("history:redo", handleUndoRedo);
-    composer.on(EVENTS.ELEMENT_CREATED, bumpUsage);
-    composer.on(EVENTS.ELEMENT_UPDATED, bumpUsage);
-    composer.on(EVENTS.ELEMENT_DELETED, bumpUsage);
-    composer.on(EVENTS.STYLE_CHANGED, bumpUsage);
-    composer.on(EVENTS.STYLE_APPLIED, bumpUsage);
-    return () => {
-      composer.off(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-      composer.off(EVENTS.SETTINGS_CHANGE, handleSettingsChange);
-      composer.off("history:undo", handleUndoRedo);
-      composer.off("history:redo", handleUndoRedo);
-      composer.off(EVENTS.ELEMENT_CREATED, bumpUsage);
-      composer.off(EVENTS.ELEMENT_UPDATED, bumpUsage);
-      composer.off(EVENTS.ELEMENT_DELETED, bumpUsage);
-      composer.off(EVENTS.STYLE_CHANGED, bumpUsage);
-      composer.off(EVENTS.STYLE_APPLIED, bumpUsage);
-    };
-  }, [composer, loadFromComposer, addToast]);
-
-  // ─ Apply ─
-  const handleApply = () => {
-    if (!composer) return;
-    /* Whole v6 tokens, modes included: the dark variant was once dropped
-       here (measured live 2026-09-22, Apply persisted `#C81E1E` and lost
-       `#76A9FA`), and the kind is what the generic registries hydrate by. */
-    const tokenRecords: DesignToken[] = allRegistries.flatMap((r) => r.tokens);
-
-    // S2: pull all 11 preset categories into a flat record array for persistence.
-    const presetRecords = allPresets.map((p) => ({
-      id: p.id, friendlyName: p.friendlyName, category: p.category,
-      variant: p.variant, bindings: p.bindings,
-    }));
-
-    /* A save that does not validate (an alias left pointing at a deleted
-       token) would load back as the seed — refuse it, and say why. */
-    const checked = validateTokens(tokenRecords);
-    if (!checked.ok) {
-      console.warn("[tokens] apply refused", { reason: checked.reason });
-      addToast({ description: `Failed to apply tokens: ${checked.reason}`, tone: "error" });
-      return;
-    }
-
-    applyingRef.current = true;
-    try {
-      const current = composer.getProjectSettings();
-      composer.setProjectSettings({
-        ...current,
-        designTokens: tokenRecords,
-        designTokensSchemaVersion: CURRENT_SCHEMA_VERSION,
-        designPresets: presetRecords,
-      });
-      persistAll();
-      persistAllPresets();
-      allRegistries.forEach((r) => r.markSaved());
-      allPresetRegistries.forEach((r) => r.markSaved());
-      setShowReview(false);
-      setIsFirstLoad(false);
-      /* Last line of the try, deliberately: every persist step above can still
-         throw into the catch, and a failed apply must not tick the "Set your
-         brand" onboarding step (codex, plan review 2026-08-28). */
-      composer.emit(EVENTS.BRAND_APPLIED, undefined);
-      addToast({ description: "Design tokens applied successfully", tone: "success" });
-    } catch {
-      addToast({ description: "Failed to apply tokens. Try again.", tone: "error" });
-    } finally {
-      applyingRef.current = false;
-    }
-  };
-
-  // ─ Discard ─
-  const handleDiscard = () => {
-    const flat = allRegistries.flatMap((r) =>
-      r.tokens
-        .filter((t) => r.savedTokens.some((s) => s.id === t.id) && tokenDirty(t, r))
-        .map((t) => ({
-          id: t.id,
-          value: lightOf(r.tokens, t.id),
-          darkValue: t.modes.dark ? resolveTokenLiteral(r.tokens, t.id, "dark") ?? undefined : undefined,
-          registry: r,
-        }))
-    );
-    const count = totalDirty;
-
-    allRegistries.forEach((r) => r.discardAll());
-    allPresetRegistries.forEach((r) => r.discardAll());
-
-    addToast({
-      description: `${count} change${count !== 1 ? "s" : ""} discarded`,
-      tone: "info",
-      action: {
-        label: "Undo",
-        onClick: () => {
-          flat.forEach(({ id, value, darkValue, registry }) =>
-            registry === color ? color.updateToken(id, value, darkValue) : registry.updateToken(id, value));
-        },
-      },
-    });
-  };
-
-
   /* "+ Add token" (7318:81125): the kind is the page's. Only kinds with an
      add path offer it — colour, spacing and the eleven generic kinds. */
   const addKind: TokenKind | null =
     page === "colours" ? "color" : page === "spacing" ? "spacing" : page.startsWith("kind-") ? (page.slice(5) as TokenKind) : null;
-  const addRegistry = (k: TokenKind | null): { tokens: DesignToken[]; addToken: (t: DesignToken) => void } | null =>
+  const addRegistry = (k: TokenKind | null): { tokens: DesignToken[]; addToken: (t: DesignToken) => boolean } | null =>
     k === "color" ? color : k === "spacing" ? spacing : k && isMoreKind(k) ? moreKindRegistry[k] : null;
+  /* A refused write (read-only, or a set that would not validate) changed
+     nothing — say so rather than letting the edit look applied. */
+  const refused = (what: string) => addToast({ description: `${what} wasn't applied — nothing was changed.`, tone: "error" });
   const handleAddToken = (token: DesignToken) => {
-    addRegistry(token.kind ?? null)?.addToken(token);
     setShowAddToken(false);
+    if (!addRegistry(token.kind ?? null)?.addToken(token)) return refused(`Token "${token.name}"`);
     setSelectedTokenId(token.id);
-    addToast({ description: `Token "${token.name}" added to the draft`, tone: "success" });
+    addToast({ description: `Token "${token.name}" added`, tone: "success" });
   };
 
-  // ─ The door out (7315:80955 KEY_D: if draft → 7317:80979, else → canvas) ─
-  /* What runs once the workspace has closed — a Component styles row's hand-
-     off to Add › Blocks. Held across the guard; Keep editing drops it. */
-  const afterLeaveRef = React.useRef<(() => void) | null>(null);
-  const requestLeave = React.useCallback((then?: () => void) => {
-    afterLeaveRef.current = then ?? null;
-    if (isDirtyRef.current) {
-      setGuardOpen(true);
-      return;
-    }
-    onClose?.();
-    then?.();
-  }, [onClose]);
-
-  const handleGuardDiscard = () => {
-    setGuardOpen(false);
-    handleDiscard();
-    onClose?.();
-    afterLeaveRef.current?.();
-    afterLeaveRef.current = null;
-  };
+  /* `‹ Back to canvas` / Escape: nothing is staged, so nothing to guard. */
+  const requestLeave = React.useCallback(() => onClose?.(), [onClose]);
 
   /* Component styles (7316:82755) lists the Add › Blocks sections; a row
      leaves Brand for Add with BLOCKS open, where that section lives. */
   const openSectionInAdd = React.useCallback(() => {
-    requestLeave(() => {
-      if (!composer) return;
-      composer.emit?.(EVENTS.UI_SWITCH_TAB, { tab: "add" });
-      requestInsertGroup(composer, "blocks");
-    });
-  }, [requestLeave, composer]);
+    onClose?.();
+    if (!composer) return;
+    composer.emit?.(EVENTS.UI_SWITCH_TAB, { tab: "add" });
+    requestInsertGroup(composer, "blocks");
+  }, [onClose, composer]);
 
-  // Escape is the same door, guarded the same way. The dialogs own their own
-  // Escape while they are up; an input keeps its own.
+  // Escape is the same door. The dialogs own their own Escape while they are
+  // up; an input keeps its own.
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (guardOpen || showReview || showAddToken || aiOpen || classAddOpen) return;
+      if (showAddToken || aiOpen || classAddOpen) return;
       /* An open popover, menu or dialog owns this Escape (the token card's ⋯
          menu, the font picker, the rename / replace dialogs). Leaving the
          workspace on the same keypress that closed a menu was found live. */
@@ -647,30 +337,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
        unmounts it before a later listener could see it was open. */
     window.addEventListener("keydown", handler, true);
     return () => window.removeEventListener("keydown", handler, true);
-  }, [guardOpen, showReview, showAddToken, aiOpen, classAddOpen, requestLeave]);
-
-  /* ⌘Z / ⇧⌘Z / ⌘Y never reach the canvas while Brand is open (BRD-24). The
-     shell's global handler ran canvas history under the workspace, where
-     nothing shows it, and the `history:undo` it emitted re-hydrated the
-     registries over the draft: one ⌘Z dropped the staged edit AND deleted a
-     CTA block out of sight (13 → 9 elements, measured 2026-10-05). Brand has
-     no undo of its own yet — autosave + ⌘Z is the redesign — so the chord
-     does nothing here. A text field keeps the browser's own undo: only the
-     propagation is stopped there, never the default. Window capture, so it
-     runs ahead of the shell's window listener. */
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
-      const key = e.key.toLowerCase();
-      if (key !== "z" && key !== "y") return;
-      e.stopPropagation();
-      const target = e.target instanceof HTMLElement ? e.target : null;
-      if (target?.closest("input, textarea, select, [contenteditable='true']") || target?.isContentEditable) return;
-      e.preventDefault();
-    };
-    window.addEventListener("keydown", handler, true);
-    return () => window.removeEventListener("keydown", handler, true);
-  }, []);
+  }, [showAddToken, aiOpen, classAddOpen, requestLeave]);
 
   // ─ Pane content ─
   const visibleColors = filterTokensByMode(color.tokens ?? [], isBeginner ? "beginner" : "pro");
@@ -700,11 +367,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     setPage(id);
     setSelectedTokenId(tokenId);
   };
-  const allTokens = React.useMemo(
-    () => allRegistries.flatMap((r) => r.tokens),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    allRegistries.map((r) => r.tokens),
-  );
+  const allTokens = store.all;
   const selectedToken = selectedTokenId ? allTokens.find((t) => t.id === selectedTokenId) : undefined;
 
 
@@ -758,28 +421,52 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     setRequestedToken(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedToken, allTokens]);
+  /* A value edit — light, and the dark value when the card sets one — is ONE
+     write, so ⌘Z undoes it in one step. It joins this session's list; a run
+     of edits to the same value (a picker drag) stays one row that remembers
+     where it started. */
   const changeToken = (id: string, value: string, darkValue?: string) => {
     const tok = tokenById(id);
     if (!tok) return;
-    const k = kindOf(tok);
-    if (k === "color") color.updateToken(id, value, darkValue);
-    else if (k === "type") type.updateToken(id, value);
-    else if (k === "spacing") spacing.updateToken(id, value);
-    else if (isMoreKind(k)) moreKindRegistry[k].updateToken(id, value);
+    const edits: SessionEdit[] = [];
+    let next = allTokens;
+    const write = (mode: "light" | "dark", v: string) => {
+      const was = resolveTokenLiteral(next, id, mode) ?? "";
+      if (was === v) return;
+      next = setTokenLiteral(next, id, mode, v);
+      edits.push({ id, name: tok.name, mode, was, now: v });
+    };
+    write("light", value);
+    if (darkValue !== undefined) write("dark", darkValue);
+    if (edits.length === 0) return;
+    if (!store.commit(next, "Edit token")) return refused(`"${tok.name}"`);
+    setSessionEdits((prev) => edits.reduce(
+      (list, e) => list[0]?.id === e.id && list[0].mode === e.mode
+        ? [{ ...list[0], now: e.now }, ...list.slice(1)]
+        : [e, ...list],
+      prev,
+    ));
+  };
+  /* Revert puts the value the session started from back — one write, one ⌘Z. */
+  const revertEdit = (index: number) => {
+    const e = sessionEdits[index];
+    if (!e) return;
+    if (!store.commit(setTokenLiteral(allTokens, e.id, e.mode, e.was), "Revert token")) return refused(`Revert of "${e.name}"`);
+    setSessionEdits((prev) => prev.filter((_, i) => i !== index));
   };
   const deleteToken = (id: string, opts?: { replaceWith?: string }) => {
     const tok = tokenById(id);
     if (!tok) return;
     const k = kindOf(tok);
-    if (k === "color") color.deleteToken(id, opts);
-    else if (isMoreKind(k)) moreKindRegistry[k].deleteToken(id, opts);
+    const ok = k === "color" ? color.deleteToken(id, opts) : isMoreKind(k) ? moreKindRegistry[k].deleteToken(id, opts) : false;
+    if (!ok) refused(`Deleting "${tok.name}"`);
   };
   const renameToken = (id: string, newId: string) => {
     const tok = tokenById(id);
     if (!tok) return;
     const k = kindOf(tok);
-    if (k === "color") color.renameToken(id, newId);
-    else if (isMoreKind(k)) moreKindRegistry[k].renameToken(id, newId);
+    const ok = k === "color" ? color.renameToken(id, newId) : isMoreKind(k) ? moreKindRegistry[k].renameToken(id, newId) : false;
+    if (!ok) refused(`Renaming "${tok.name}"`);
   };
 
   const caption = (() => {
@@ -792,7 +479,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "classes":          return "Names shared across elements";
       case "presets":          return "Section and element presets";
       case "brand-checks":     return brandChecksCaption(lintIssues, suppressedCount);
-      case "starters":         return "Pick a starter, then apply it to the draft";
+      case "starters":         return "Pick a starter to apply it to the site";
       case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
       case "export":           return "Move the brand in and out";
       default: {
@@ -887,7 +574,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             {page === "spacing" ? (
               /* Owner ruling 2026-09-24: applying a whole preset comes back
                  (removed in 91ab74b33 for parity) — in a menu, so the page
-                 still draws no chips (7576:197036). Both actions stage. */
+                 still draws no chips (7576:197036). Each action is one write. */
               <Popover
                 open={spacingMenuOpen}
                 onClose={() => setSpacingMenuOpen(false)}
@@ -907,8 +594,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                       radio
                       selected={spacing.activePreset === p}
                       onClick={() => {
-                        spacing.applyPreset(p);
                         setSpacingMenuOpen(false);
+                        if (!spacing.applyPreset(p)) refused("The spacing preset");
                       }}
                       data-testid={`spacing-preset-${p}`}
                     >
@@ -918,9 +605,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                   <MenuSeparator />
                   <MenuItem
                     onClick={() => {
-                      spacing.stageDefaults(DEFAULT_TOKENS);
                       setSpacingMenuOpen(false);
-                      addToast({ description: "Spacing reset to defaults — review and Save to keep it.", tone: "info" });
+                      if (spacing.resetToDefaults()) addToast({ description: "Spacing reset to defaults.", tone: "info" });
+                      else refused("Resetting spacing");
                     }}
                     data-testid="spacing-reset-defaults"
                   >
@@ -1024,7 +711,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   /** `slot` names the row when its target moves (the Other tokens row lands
    *  on whichever kind is open). */
-  const navRow = (id: BrandPageId, label: string, dirtyHere: boolean, count?: number, slot: string = id) => {
+  const navRow = (id: BrandPageId, label: string, count?: number, slot: string = id) => {
     /* The eleven other kinds are reached from Spacing's kind switch, so the
        Spacing row stays current on their pages. */
     const active = page === id || (id === "spacing" && page.startsWith("kind-"));
@@ -1043,12 +730,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-testid={`brand-row-label-${slot}`}>
           {label}
         </span>
-        {dirtyHere && (
-          <span
-            className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
-            aria-label="unsaved changes"
-          />
-        )}
         {count !== undefined && (
           <span className={NAV_COUNT} data-testid={`brand-row-count-${id}`}>
             {count}
@@ -1057,8 +738,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       </Button>
     );
   };
-
-  const kindDirty = (reg: KindRegistryLike) => dirtyCount(reg) > 0;
 
   /* The count the board draws beside two rows: the palette size on Colours,
      the open findings on Brand checks (only while there are any). */
@@ -1114,19 +793,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         {/* 72 down to the first row — 7315:80955 leaves the band under the
             site name empty. */}
         <nav className="tw:flex tw:flex-col tw:gap-0.5 tw:px-2 tw:pb-4 tw:pt-18" aria-label="Brand pages">
-          {NAV.map((n) => {
-            const dirtyHere =
-              (n.id === "colours" && kindDirty(color)) ||
-              (n.id === "fonts" && kindDirty(type)) ||
-              (n.id === "spacing" && (kindDirty(spacing) || MORE_KINDS.some((k) => kindDirty(moreKindRegistry[k.kind])))) ||
-              (n.id === "presets" && stylesDirty > 0);
-            return (
-              <React.Fragment key={n.id}>
-                {navRow(n.id, n.label, dirtyHere, navCount(n.id))}
-
-              </React.Fragment>
-            );
-          })}
+          {NAV.map((n) => navRow(n.id, n.label, navCount(n.id)))}
         </nav>
       </aside>
 
@@ -1150,64 +817,57 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               </p>
             </div>
             <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
-              {/* The auto-draft pill (#28). The board's clean state draws no
-                  chip, so it appears only while something is staged. */}
-              <div aria-live="polite" aria-atomic="true">
-                {isDirty && <DraftChip state="dirty" count={totalDirty} />}
-              </div>
-              {pageAction}
+              {/* "Review changes" (spec §4): non-blocking, this session's
+                  edits with Revert. Drawn only once there is one. */}
+              {sessionEdits.length > 0 && (
+                <SessionEditsPopover edits={sessionEdits} onRevert={revertEdit} disabled={readOnly} />
+              )}
+              <EditLock locked={readOnly}>{pageAction}</EditLock>
             </div>
           </header>
           )}
 
-          {error ? (
-            /* Board 781:4311's copy: what failed, and — the half that matters —
-               that nothing was lost. The raw exception text said neither. */
-            <PanelErrorState
-              title="Couldn't load your brand system."
-              message="Your tokens are safe — only this list failed to load."
-              onRetry={() => { setError(null); loadFromComposer(); }}
-            />
-          ) : (
-            <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">
-              {/* Parked STATE board `4418:49685` "Brand · empty": "No brand set."
-                  with Browse starters · Import — the workspace's first-run state,
-                  on the landing page, until the first Save. The sentence is the
-                  design doc's own (§5.7, conformance copy.json). */}
-              {isFirstLoad && page === "colours" && (
-                <div
-                  data-testid="brand-tokens-first-load-banner"
-                  className="tw:mb-4 tw:flex tw:flex-col tw:gap-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3"
-                >
-                  <span
-                    data-testid="brand-tokens-first-load-text"
-                    className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
-                  >
-                    <strong>No brand set.</strong> Start from a theme or import your client's tokens. These
-                    are the site's default design tokens — customize them and click{" "}
-                    <strong>{APPLY_CHANGES_LABEL}</strong> to go live.
-                  </span>
-                  <span className="tw:flex tw:gap-2">
-                    <Button size="xs" variant="secondary" onClick={() => openPage("starters")} data-testid="brand-empty-starters">
-                      Browse starters
-                    </Button>
-                    <Button size="xs" variant="secondary" onClick={() => openPage("export")} data-testid="brand-empty-import">
-                      Import
-                    </Button>
-                  </span>
-                </div>
-              )}
-
-              {renderPage()}
+          {readOnly && (
+            <div
+              role="alert"
+              data-testid="brand-read-only-banner"
+              className="tw:mt-4 tw:rounded-lg tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
+            >
+              {READ_ONLY_COPY}
             </div>
           )}
+          <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">
+            {/* Parked STATE board `4418:49685` "Brand · empty": "No brand set."
+                with Browse starters · Import — the workspace's first-run state,
+                on the landing page, until the site's first token edit. The
+                sentence is the design doc's own (§5.7, conformance copy.json). */}
+            {isFirstLoad && !readOnly && page === "colours" && (
+              <div
+                data-testid="brand-tokens-first-load-banner"
+                className="tw:mb-4 tw:flex tw:flex-col tw:gap-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3"
+              >
+                <span
+                  data-testid="brand-tokens-first-load-text"
+                  className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+                >
+                  <strong>No brand set.</strong> Start from a theme or import your client's tokens. These
+                  are the site's default design tokens — every change you make applies to the site straight away.
+                </span>
+                <span className="tw:flex tw:gap-2">
+                  <Button size="xs" variant="secondary" onClick={() => openPage("starters")} data-testid="brand-empty-starters">
+                    Browse starters
+                  </Button>
+                  <Button size="xs" variant="secondary" onClick={() => openPage("export")} data-testid="brand-empty-import">
+                    Import
+                  </Button>
+                </span>
+              </div>
+            )}
 
-          <DesignTabFooter
-            isDirty={isDirty}
-            dirtyCount={totalDirty}
-            onDiscard={handleDiscard}
-            onReview={() => setShowReview(true)}
-          />
+            {/* Import / export stays usable read-only: export is a read, and
+                an import is refused by the one write path (setTokens). */}
+            <EditLock locked={readOnly && !isPanelPage}>{renderPage()}</EditLock>
+          </div>
         </div>
 
         {/* ── Preview column ────────────────────────────────────────────── */}
@@ -1234,6 +894,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             </section>
           )}
           {isTokenPage && selectedToken && (
+            <EditLock locked={readOnly}>
             <TokenDetailView
               key={selectedToken.id}
               token={selectedToken}
@@ -1256,6 +917,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               })()}
               onDeleted={() => setSelectedTokenId(null)}
             />
+            </EditLock>
           )}
         </aside>
         )}
@@ -1263,53 +925,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
       <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />
 
-      <BrandDiscardDialog
-        open={guardOpen}
-        count={totalDirty}
-        onKeepEditing={() => {
-          setGuardOpen(false);
-          afterLeaveRef.current = null;
-        }}
-        onDiscard={handleGuardDiscard}
-      />
-
-      {showReview && (
-        <ReviewModal
-          colorTokens={color.tokens}
-          colorDiff={color.pendingDiff}
-          typeTokens={type.tokens}
-          typeSavedTokens={type.savedTokens}
-          spacingTokens={spacing.tokens}
-          spacingSavedTokens={spacing.savedTokens}
-          otherSections={MORE_KINDS.map(({ kind, label }) => {
-            const reg = moreKindRegistry[kind];
-            return {
-              title: `${label} Changes`,
-              rows: changedTokens(reg)
-                .map((t) => ({
-                  id: t.id,
-                  name: t.name,
-                  was: reg.savedTokens.some((x) => x.id === t.id) ? lightOf(reg.savedTokens, t.id) : "new",
-                  now: lightOf(reg.tokens, t.id),
-                })),
-            };
-          })}
-          onConfirm={handleApply}
-          onClose={() => setShowReview(false)}
-          /* Board 1172:4840's third door. The same discard the footer runs,
-             with its undo toast — reachable from the review, which is where
-             someone decides they do not want these edits after all. */
-          onDiscardAll={() => {
-            setShowReview(false);
-            handleDiscard();
-          }}
-          usageCount={(() => {
-            let n = 0;
-            for (const set of usageMap.values()) n += set.size;
-            return n;
-          })()}
-        />
-      )}
       {addKind && (
         <TokenAddDialog
           open={showAddToken}

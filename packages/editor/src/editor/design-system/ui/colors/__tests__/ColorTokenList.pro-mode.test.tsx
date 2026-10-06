@@ -26,7 +26,6 @@ const aliasedToken: DesignToken = v6Token({
 });
 
 const baseProps = {
-  pendingDiff: {},
   onAddToken: () => {},
 };
 

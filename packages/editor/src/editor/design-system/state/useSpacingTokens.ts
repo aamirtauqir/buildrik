@@ -1,13 +1,16 @@
 /**
- * useSpacingTokens — spacing token state + preset logic
- * No JSX — pure state management.
+ * useSpacingTokens — the spacing kind + its preset actions, composer-backed.
+ * No JSX.
  * @license BSD-3-Clause
  */
 
-import { useState, useCallback } from "react";
+import * as React from "react";
+import type { Composer } from "@/engine";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";
-import { useTokenBase } from "./useTokenBase";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
+import { useTokensForKind } from "./useTokensForKind";
+import { useProjectTokens } from "./useProjectTokens";
 
 export type SpacingPreset = "compact" | "normal" | "spacious";
 
@@ -35,119 +38,37 @@ function applyPresetToTokens(tokens: DesignToken[], preset: SpacingPreset): Desi
   }, tokens);
 }
 
-export interface SpacingTokensState {
-  tokens: DesignToken[];
-  savedTokens: DesignToken[];
-  isDirty: boolean;
-  activePreset: SpacingPreset | null;
-  savedPreset: SpacingPreset | null;
+/** The preset every spacing token currently matches, or null once any has been hand-edited. */
+function presetOf(tokens: readonly DesignToken[]): SpacingPreset | null {
+  const presets = Object.keys(PRESET_VALUES) as SpacingPreset[];
+  return (
+    presets.find((p) =>
+      Object.entries(PRESET_VALUES[p]).every(
+        ([id, px]) => !tokens.some((t) => t.id === id) || resolveTokenLiteral(tokens, id, "light") === `${px}px`,
+      ),
+    ) ?? null
+  );
 }
 
-export interface SpacingTokensActions {
-  updateToken: (id: string, value: string) => void;
-  /** Append a token the site adds (Brand's "+ Add token"). Staged: it is
-   *  unsaved until Apply, like every other edit. */
-  addToken: (token: DesignToken) => void;
-  applyPreset: (preset: SpacingPreset) => void;
-  markSaved: () => void;
-  discardAll: () => void;
-  resetFromSaved: (newTokens: DesignToken[]) => void;
-  /** Load a token set as a PENDING change — what applying a starter does. */
-  stageTokens: (newTokens: DesignToken[]) => void;
-  stageDefaults: (defaultTokens: DesignToken[]) => void;
-  undoToken: (id: string) => void;
-  canUndo: (id: string) => boolean;
-  redoToken: (id: string) => void;
-  canRedo: (id: string) => boolean;
+/** Spacing is a kind like any other, plus Brand's ⋯ menu: apply a whole
+ *  preset, or put the seed spacing back — each one write, one ⌘Z. */
+export function useSpacingTokens(composer: Composer | null) {
+  const base = useTokensForKind("spacing", composer);
+  const { all, commit } = useProjectTokens(composer);
+
+  return React.useMemo(
+    () => ({
+      ...base,
+      activePreset: presetOf(base.tokens),
+      applyPreset: (preset: SpacingPreset) => commit(applyPresetToTokens(all, preset), "Apply spacing preset"),
+      resetToDefaults: () =>
+        commit(
+          [...all.filter((t) => t.kind !== "spacing"), ...DEFAULT_TOKENS.filter((t) => t.kind === "spacing")],
+          "Reset spacing",
+        ),
+    }),
+    [base, all, commit],
+  );
 }
 
-export function useSpacingTokens(
-  initialTokens: DesignToken[]
-): SpacingTokensState & SpacingTokensActions {
-  const base = useTokenBase(initialTokens, "spacing");
-  const {
-    setTokens,
-    setUndoStack,
-    setRedoStack,
-    updateToken: baseUpdateToken,
-    markSaved: baseMarkSaved,
-    discardAll: baseDiscardAll,
-  } = base;
-  const [activePreset, setActivePreset] = useState<SpacingPreset | null>("normal");
-  const [savedPreset, setSavedPreset] = useState<SpacingPreset | null>("normal");
-
-  // Spacing-specific: clear preset when a token is manually edited
-  const updateToken = useCallback(
-    (id: string, value: string) => {
-      setActivePreset(null);
-      baseUpdateToken(id, value);
-    },
-    [baseUpdateToken]
-  );
-
-  const applyPreset = useCallback(
-    (preset: SpacingPreset) => {
-      setActivePreset(preset);
-      setUndoStack({});
-      setRedoStack({});
-      setTokens((prev) => {
-        const next = applyPresetToTokens(prev, preset);
-        next.forEach((t) => document.documentElement.style.setProperty(t.cssVar, resolveTokenLiteral(next, t.id, "light") ?? ""));
-        return next;
-      });
-    },
-    [setTokens, setUndoStack, setRedoStack]
-  );
-
-  const markSaved = useCallback(() => {
-    baseMarkSaved();
-    setSavedPreset(activePreset);
-  }, [baseMarkSaved, activePreset]);
-
-  const discardAll = useCallback(() => {
-    baseDiscardAll();
-    setActivePreset(savedPreset);
-  }, [baseDiscardAll, savedPreset]);
-
-  const stageDefaults = useCallback(
-    (defaultTokens: DesignToken[]) => {
-      const spacingDefaults = defaultTokens.filter((t) => t.category === "spacing");
-      setTokens(spacingDefaults);
-      setActivePreset("normal");
-      setUndoStack({});
-      setRedoStack({});
-      spacingDefaults.forEach((t) =>
-        document.documentElement.style.setProperty(t.cssVar, resolveTokenLiteral(spacingDefaults, t.id, "light") ?? "")
-      );
-    },
-    [setTokens, setUndoStack, setRedoStack]
-  );
-
-  const addToken = useCallback(
-    (token: DesignToken) => {
-      setTokens((prev) => (prev.some((t) => t.id === token.id) ? prev : [...prev, token]));
-      setActivePreset(null);
-    },
-    [setTokens],
-  );
-
-  return {
-    tokens: base.tokens,
-    savedTokens: base.savedTokens,
-    isDirty: base.isDirty,
-    addToken,
-    activePreset,
-    savedPreset,
-    updateToken,
-    applyPreset,
-    undoToken: base.undoToken,
-    canUndo: base.canUndo,
-    redoToken: base.redoToken,
-    canRedo: base.canRedo,
-    markSaved,
-    discardAll,
-    resetFromSaved: base.resetFromSaved,
-    stageTokens: base.stageTokens,
-    stageDefaults,
-  };
-}
+export type SpacingRegistry = ReturnType<typeof useSpacingTokens>;

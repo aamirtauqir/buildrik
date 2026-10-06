@@ -10,14 +10,14 @@
     "verifiedActive": {
       "match": 151,
       "driven": 15,
-      "drift-fixed": 337,
+      "drift-fixed": 334,
       "drift-open": 11,
       "unreachable": 53,
       "no": 26
     },
-    "retired": 46,
+    "retired": 49,
     "total": 742,
-    "active": 593
+    "active": 590
   },
   "activeFamilies": [
     "AI",
@@ -274,11 +274,11 @@
       "state": "dirty",
       "width": 280,
       "height": 812,
-      "status": "active",
+      "status": "retired",
       "authority": "board:154-78-save-bar",
-      "recipe": "brand-dirty",
-      "verified": "drift-fixed",
-      "verifiedNote": "conformed + measured 2026-09-08 (recipe brand-dirty): 100/100. Save-bar type 11 → 12/18 and Save weight. AA FLOOR OVERRIDES THE BOARD, stated loudly: 154:186 colours the Basic-mode footnote --color/ink-muted on --color/bg-subtle = 4.39:1 at 11px against a 4.5 floor — a real WCAG AA failure, and what shipped before this pass, unmeasured. The code paints --bk-ink-soft (the substitution DesignTabFooter already documents for the same pair) and that node is SKIPPED rather than joined or baselined. FOUND, NOT FIXED: a canvas edit silently discards staged brand edits — Composer.markDirty() emits project:changed on every logical modification and TokensSection's handler calls resetAll → resetFromSaved, which moves savedTokens too; DesignSystemTab's handlers for the NEIGHBOURING events guard on isDirtyRef and warn, for exactly this reason. One flake in four; the recipe now re-waits for the save bar so it fails loudly."
+      "recipe": null,
+      "verified": "no",
+      "verifiedNote": "RETIRED 2026-10-06 (Brand Part 1a Task 10, spec §4 autosave + one undo stack): the staging layer this board draws — the 'Unsaved brand changes' save bar with Discard and Save — is gone: every Brand edit is one setTokens write the moment it is made, so there is never a dirty state to draw. Its recipe `brand-dirty` and its spec are deleted. Prior note: conformed + measured 2026-09-08 (recipe brand-dirty): 100/100. Save-bar type 11 → 12/18 and Save weight. AA FLOOR OVERRIDES THE BOARD, stated loudly: 154:186 colours the Basic-mode footnote --color/ink-muted on --color/bg-subtle = 4.39:1 at 11px against a 4.5 floor — a real WCAG AA failure, and what shipped before this pass, unmeasured. The code paints --bk-ink-soft (the substitution DesignTabFooter already documents for the same pair) and that node is SKIPPED rather than joined or baselined. FOUND, NOT FIXED: a canvas edit silently discards staged brand edits — Composer.markDirty() emits project:changed on every logical modification and TokensSection's handler calls resetAll → resetFromSaved, which moves savedTokens too; DesignSystemTab's handlers for the NEIGHBOURING events guard on isDirtyRef and warn, for exactly this reason. One flake in four; the recipe now re-waits for the save bar so it fails loudly."
     },
     {
       "nodeId": "306:2298",
@@ -377,11 +377,11 @@
       "state": "load-error",
       "width": 280,
       "height": 812,
-      "status": "active",
+      "status": "retired",
       "authority": "board:781-4311",
-      "recipe": "brand-load-error",
-      "verified": "drift-fixed",
-      "verifiedNote": "conformed + measured 2026-09-08 (recipe brand-load-error): 21/21, 1 skipped. The only PROBED surface of the eleven — the other ten were measured live at :5050, because Brand is a rail destination with a B shortcut. Probed because `error` is set solely when loadFromComposer catches; the probe's composer throws from getProjectSettings and everything else is the real panel under the same three providers StudioPanels.tsx:405-407 uses. PanelErrorState rebuilt to 781:4368: it was a centred EmptyState with a filled button where the board draws a left-aligned column with a link."
+      "recipe": null,
+      "verified": "no",
+      "verifiedNote": "RETIRED 2026-10-06 (Brand Part 1a Task 10, spec §4 autosave + one undo stack): the load-error card it draws had become unreachable: the token read cannot throw (mergeProjectTokens never does) and a site whose tokens cannot be loaded opens READ-ONLY instead (spec §10, D17) — its old tokens, a notice, editing disabled. That notice has no board yet. Its recipe `brand-load-error` and its spec are deleted. Prior note: conformed + measured 2026-09-08 (recipe brand-load-error): 21/21, 1 skipped. The only PROBED surface of the eleven — the other ten were measured live at :5050, because Brand is a rail destination with a B shortcut. Probed because `error` is set solely when loadFromComposer catches; the probe's composer throws from getProjectSettings and everything else is the real panel under the same three providers StudioPanels.tsx:405-407 uses. PanelErrorState rebuilt to 781:4368: it was a centred EmptyState with a filled button where the board draws a left-aligned column with a link."
     },
     {
       "nodeId": "775:4305",
@@ -5231,11 +5231,11 @@
       "state": "review-changes",
       "width": 520,
       "height": 239,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
-      "recipe": "brand-review-changes",
-      "verifiedNote": "conformed + measured 2026-09-08 (recipe brand-review-changes): 55/55. CONFORMING TO THE BOARD'S ROW FILL INTRODUCED 18 FAILURES: moving from --bk-gray-50 (4.66:1) to the board's --color/bg-subtle dropped the struck-through old value and the '→' to 4.39:1, nine rows x two nodes. The fill is the board's and stayed; the TEXT moved to --bk-ink-soft, so 1172:4845/4849/4853 are NOT joined. ReviewModal also took the board's 16px title, --color/bg-subtle diff rows at 10/6, and three buttons at 12/7 radius-6 13px.",
-      "verified": "drift-fixed"
+      "recipe": null,
+      "verifiedNote": "RETIRED 2026-10-06 (Brand Part 1a Task 10, spec §4 autosave + one undo stack): the blocking 'Review N staged changes' / Apply modal is gone with the staging layer; Review changes is now a non-blocking list of this session's edits with Revert (SessionEditsPopover), which no board draws yet (Part 2). Its recipe `brand-review-changes` and its spec are deleted. Prior note: conformed + measured 2026-09-08 (recipe brand-review-changes): 55/55. CONFORMING TO THE BOARD'S ROW FILL INTRODUCED 18 FAILURES: moving from --bk-gray-50 (4.66:1) to the board's --color/bg-subtle dropped the struck-through old value and the '→' to 4.39:1, nine rows x two nodes. The fill is the board's and stayed; the TEXT moved to --bk-ink-soft, so 1172:4845/4849/4853 are NOT joined. ReviewModal also took the board's 16px title, --color/bg-subtle diff rows at 10/6, and three buttons at 12/7 radius-6 13px.",
+      "verified": "no"
     },
     {
       "nodeId": "1172:4867",
@@ -9956,6 +9956,6 @@
       "verifiedNote": "Not walked in the QA walk 2026-10-03: a §1 related state board; only General's loading / load-error / save-error were forced (they share the load/save-error shell components). Board image not fetched (Figma budget)."
     }
   ],
-  "coveredFloor": 204,
+  "coveredFloor": 201,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

@@ -17,7 +17,6 @@ import type { DesignToken } from "../../../types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const base = {
-  pendingDiff: {},
   onAddToken: vi.fn(),
 };
 

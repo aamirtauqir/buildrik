@@ -1,3 +1,9 @@
+/**
+ * useImportTokens — routing rules, stats, and (Brand Part 1a Task 10) ONE
+ * `setTokens` write per import, refused while the tokens are read-only.
+ *
+ * @license BSD-3-Clause
+ */
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
@@ -6,9 +12,11 @@ import { useColorRegistry, useRadiusRegistry, TokenRegistryProvider } from "../T
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../../types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
+import { makeFakeComposer } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
+let composer = makeFakeComposer();
 const wrap = ({ children }: { children: React.ReactNode }) => (
-  <TokenRegistryProvider projectId="import-test">{children}</TokenRegistryProvider>
+  <TokenRegistryProvider composer={composer}>{children}</TokenRegistryProvider>
 );
 
 const mkToken = (id: string, value: string, extra: Partial<V6TokenSpec> = {}): DesignToken =>
@@ -18,6 +26,7 @@ const lightOf = (tokens: readonly DesignToken[], id: string) => resolveTokenLite
 
 beforeEach(() => {
   localStorage.clear();
+  composer = makeFakeComposer();
 });
 
 describe("useImportTokens", () => {
@@ -163,5 +172,26 @@ describe("useImportTokens", () => {
       // The dark value now reaches the registry on the modify path.
       expect(resolveTokenLiteral(result.current.color.tokens, targetId, "dark")).toBe("#220000");
     });
+  });
+});
+
+describe("useImportTokens — one write, read-only refuses", () => {
+  it("a mixed import (modify + add) is ONE setTokens write", () => {
+    const { result } = renderHook(() => useImportTokens(), { wrapper: wrap });
+    act(() => {
+      result.current([mkToken("color-primary", "#FF0000"), mkToken("color-new-1", "#00FF00", { kind: "color" })]);
+    });
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+  });
+
+  it("while read-only nothing is written and the stats say refused", () => {
+    composer = makeFakeComposer([], { readOnly: true });
+    const { result } = renderHook(() => useImportTokens(), { wrapper: wrap });
+    let stats: ReturnType<typeof result.current> | undefined;
+    act(() => {
+      stats = result.current([mkToken("color-primary", "#FF0000")]);
+    });
+    expect(stats?.refused).toBe(true);
+    expect(composer.settings.designTokens).toEqual([]);
   });
 });

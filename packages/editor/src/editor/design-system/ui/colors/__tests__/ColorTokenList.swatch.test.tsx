@@ -14,7 +14,7 @@ import { render, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { ColorTokenList } from "../ColorTokenList";
-import type { DesignToken, TokenDiff } from "../../../types";
+import type { DesignToken } from "../../../types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
 function makeToken(id: string, name: string, value: string, extra: Partial<V6TokenSpec> = {}): DesignToken {
@@ -22,7 +22,6 @@ function makeToken(id: string, name: string, value: string, extra: Partial<V6Tok
 }
 
 const baseProps = {
-  pendingDiff: {} as Record<string, TokenDiff>,
   onAddToken: vi.fn(),
 };
 
@@ -111,16 +110,12 @@ describe("ColorTokenList — the Colours table (7315:80955)", () => {
     expect(container.querySelector("[data-group]")).toBeNull();
   });
 
-  it("shows a dirty marker on the swatch when the token has a pending diff", () => {
-    const pendingDiff: Record<string, TokenDiff> = {
-      "color-primary": { tokenId: "color-primary", previousValue: "#1A56DB", currentValue: "#FF0000" },
-    };
+  it("draws no dirty marker — edits are live, nothing is pending (spec §4)", () => {
     const { container, getByTestId } = render(
-      <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1A56DB")]} {...baseProps} pendingDiff={pendingDiff} />,
+      <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1A56DB")]} {...baseProps} />,
     );
-    expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
-    // The row prints the staged value, not the saved one.
-    expect(within(getByTestId("brand-token-row-color-primary")).getByText("#FF0000")).toBeTruthy();
+    expect(container.querySelector('[aria-label="unsaved changes"]')).toBeNull();
+    expect(within(getByTestId("brand-token-row-color-primary")).getByText("#1A56DB")).toBeTruthy();
   });
 
   it("the empty library offers its own Add door", () => {
