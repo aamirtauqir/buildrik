@@ -246,20 +246,21 @@ export async function pushSharedTheme(
 
   const results: PushResult[] = [];
   const savedAt = new Date();
-  const migrated = migrateSharedTheme(theme);
+  const switchOn = isBrandTokensV2Enabled(workspaceId);
+  const migrated = migrateSharedTheme(theme, switchOn);
 
   for (const site of targets) {
     if (site.themeLocked) {
       results.push({ siteId: site.id, name: site.name, status: "skipped-locked" });
       continue;
     }
-    const plan = planPush(theme, migrated, site);
+    const plan = planPush(theme, migrated, site, switchOn);
     if (plan.kind !== "write") {
       results.push({
         siteId: site.id,
         name: site.name,
         status: plan.kind,
-        ...(plan.kind === "skipped-version" ? { error: SKIPPED_VERSION_MESSAGE } : {}),
+        ...(plan.kind === "skipped-version" ? { error: plan.message } : {}),
       });
       continue;
     }
@@ -309,8 +310,8 @@ export async function pushSharedTheme(
 
 /** A non-v6 workspace theme moved to v6 for a push (switch on). Null when it
  *  is already v6, the switch is off, or it cannot migrate. */
-function migrateSharedTheme(theme: TokenTheme): TokenTheme | null {
-  if (!isBrandTokensV2Enabled() || validateTokens(theme.designTokens).ok) return null;
+function migrateSharedTheme(theme: TokenTheme, switchOn: boolean): TokenTheme | null {
+  if (!switchOn || validateTokens(theme.designTokens).ok) return null;
   try {
     return { ...theme, designTokens: migrateTokensToV6(theme.designTokens) };
   } catch (e) {
@@ -323,27 +324,40 @@ function migrateSharedTheme(theme: TokenTheme): TokenTheme | null {
 
 const SKIPPED_VERSION_MESSAGE =
   "This site uses the new brand format; re-capture the theme from an upgraded site.";
+const SKIPPED_PAUSED_MESSAGE = "Brand upgrade is paused for this site.";
 
 type PushPlan =
   | { kind: "write"; theme: TokenTheme; version: number }
-  | { kind: "skipped-held" | "skipped-version" };
+  | { kind: "skipped-held" }
+  | { kind: "skipped-version"; message: string };
+
+const hasTokens = (projectSettings: unknown) => (readTokenTheme(projectSettings)?.designTokens.length ?? 0) > 0;
 
 /**
  * What a push does to one site, from the theme's REAL version (v6 when it
  * validates, else v5), so the stored version label always matches the tokens
  * written. A held site (brand rolled back) never takes v6; a v6 site never
  * takes v5. A v5 theme migrates for a non-held site when the switch is on.
+ * With the switch off, a v6 theme never moves a pre-v6 site that has tokens
+ * (that would be a migration without its snapshot); a tokenless site has
+ * nothing to migrate and takes it.
  */
 function planPush(
   theme: TokenTheme,
   migrated: TokenTheme | null,
   site: { projectSettings: unknown; tokensMigrationHold: boolean },
+  switchOn: boolean,
 ): PushPlan {
+  const siteVersion = storedTokensVersion(site.projectSettings);
   if (validateTokens(theme.designTokens).ok) {
-    return site.tokensMigrationHold ? { kind: "skipped-held" } : { kind: "write", theme, version: TOKENS_SCHEMA_VERSION };
+    if (site.tokensMigrationHold) return { kind: "skipped-held" };
+    if (!switchOn && siteVersion < TOKENS_SCHEMA_VERSION && hasTokens(site.projectSettings)) {
+      return { kind: "skipped-version", message: SKIPPED_PAUSED_MESSAGE };
+    }
+    return { kind: "write", theme, version: TOKENS_SCHEMA_VERSION };
   }
   if (migrated && !site.tokensMigrationHold) return { kind: "write", theme: migrated, version: TOKENS_SCHEMA_VERSION };
-  if (storedTokensVersion(site.projectSettings) >= TOKENS_SCHEMA_VERSION) return { kind: "skipped-version" };
+  if (siteVersion >= TOKENS_SCHEMA_VERSION) return { kind: "skipped-version", message: SKIPPED_VERSION_MESSAGE };
   return { kind: "write", theme, version: 5 };
 }
 
@@ -381,12 +395,13 @@ export async function previewSharedThemePush(
     orderBy: { name: "asc" },
     select: { id: true, name: true, themeLocked: true, projectSettings: true, tokensMigrationHold: true },
   });
-  const migrated = migrateSharedTheme(theme);
+  const switchOn = isBrandTokensV2Enabled(workspaceId);
+  const migrated = migrateSharedTheme(theme, switchOn);
   return targets.map((site) => {
     if (site.themeLocked) {
       return { siteId: site.id, name: site.name, status: "skipped-locked" as const, willChange: false };
     }
-    const plan = planPush(theme, migrated, site);
+    const plan = planPush(theme, migrated, site, switchOn);
     if (plan.kind !== "write") return { siteId: site.id, name: site.name, status: plan.kind, willChange: false };
     const before = JSON.stringify(readTokenTheme(site.projectSettings)?.designTokens ?? []);
     const versionChanges = storedTokensVersion(site.projectSettings) !== plan.version;

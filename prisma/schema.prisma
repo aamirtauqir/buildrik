@@ -360,8 +360,9 @@ model Site {
   // E2-T5b per-site override: when true, the agency shared-theme push skips
   // this site (it keeps its own tokens). Default false = follows the shared theme.
   themeLocked       Boolean   @default(false)
-  // Brand Part 1: set when this site's tokens could not migrate to v6; the
-  // editor keeps them read-only until the owner resolves it.
+  // Brand Part 1: set by the operator rollback (scripts/brand/rollback-migration.mjs)
+  // when a migrated site is put back on its pre-v6 tokens; the site is never
+  // migrated again and Brand stays read-only until `--clear`.
   tokensMigrationHold Boolean @default(false)
   projectAssets     Json?
   projectSettings   Json?

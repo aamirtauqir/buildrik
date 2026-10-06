@@ -253,7 +253,7 @@ export function ThemeManager() {
                       ) : r.status === "skipped-held" ? (
                         <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Brand rolled back — skipped</span>
                       ) : r.status === "skipped-version" ? (
-                        <span className="inline-flex items-center gap-1 text-neutral-400" title={r.error}><Lock className="h-3 w-3" /> New brand format — re-capture theme</span>
+                        <span className="inline-flex items-center gap-1 text-neutral-400" title={r.error}><Lock className="h-3 w-3" /> {r.error?.startsWith("Brand upgrade is paused") ? "Brand upgrade paused — skipped" : "New brand format — re-capture theme"}</span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-[var(--color-error)]" title={r.error}><AlertTriangle className="h-3 w-3" /> Failed</span>
                       )}

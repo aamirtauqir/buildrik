@@ -175,7 +175,8 @@ Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packa
 | `AUTH_SECRET` / `AUTH_URL` | NextAuth v5's own names for `NEXTAUTH_SECRET` / `NEXTAUTH_URL`. Also read internally, not through our source. Production sets both pairs. | Yes in production |
 | `COOKIE_DOMAIN` | Optional cookie domain override when the app and editor sit on different subdomains. | No |
 | `CRON_SECRET` | Bearer token the cron routes (`/api/cron/*`) check before running. | Yes in production |
-| `BRAND_TOKENS_V2` | `on` enables the v6 brand-token migration (Brand Part 1). Off (unset) = no NEW migrations; already-migrated sites keep working. Server-side, read per request — never `NEXT_PUBLIC_*`. Rollout: QA workspace first. See docs/runbooks/brand-token-migration.md. | Yes once Part 1 ships |
+| `BRAND_TOKENS_V2` | `on` enables the v6 brand-token migration (Brand Part 1) for every workspace. Off (unset) = no NEW migrations; already-migrated sites keep working. Server-side, read per request — never `NEXT_PUBLIC_*`. Rollout: QA workspace first via `BRAND_TOKENS_V2_WORKSPACES`, then `on`. See docs/runbooks/brand-token-migration.md. | Yes once Part 1 ships |
+| `BRAND_TOKENS_V2_WORKSPACES` | Comma-separated workspace ids the v6 migration is enabled for while `BRAND_TOKENS_V2` is not `on` (`isBrandTokensV2Enabled(workspaceId)`, `server/services/brand-tokens.ts`) — the save path, the editor's settings read and the theme push all ask per site's workspace. Ignored once `BRAND_TOKENS_V2=on`. | Only for the staged rollout |
 
 ### Auth providers
 

@@ -12,6 +12,9 @@ import v5seed from "../../packages/shared/tokens/__tests__/__fixtures__/seed-onl
 
 beforeEach(async () => {
   await truncateTables("page", "site", "workspace", "user");
+  /* The migration paths below need the switch on; the switch-off cases stub it off themselves. */
+  vi.stubEnv("BRAND_TOKENS_V2", "on");
+  vi.stubEnv("BRAND_TOKENS_V2_WORKSPACES", "");
 });
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -112,10 +115,10 @@ describe("first migrated save", () => {
     expect(after.projectSettings).toMatchObject({ designTokensSchemaVersion: 6 });
   });
 
-  it("refuses a first migrated save on a held site and leaves the store alone", async () => {
+  it("refuses a first migrated save on a held site as a SAVE_CONFLICT (the editor's conflict dialog) and leaves the store alone", async () => {
     const site = await v5Site(v5seed, { tokensMigrationHold: true });
     await expect(saveProjectData({ siteId: site.id, pages: [], settings: v6Settings() }, site.lastEditedAt.toISOString()))
-      .rejects.toMatchObject({ code: "TOKENS_STALE_CLIENT" });
+      .rejects.toThrow(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
     const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
     expect(after.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
     expect(await prisma.siteThemeSnapshot.count({ where: { siteId: site.id } })).toBe(0);
@@ -127,6 +130,59 @@ describe("first migrated save", () => {
     await saveProjectData({ siteId: site.id, pages: [], settings: { designTokens: v5seed, designTokensSchemaVersion: 5 } }, site.lastEditedAt.toISOString());
     const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
     expect(after.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+  });
+});
+
+describe("kill switch and stale tabs (C1, I1, I4)", () => {
+  it("switch off: a v6 save over a site with no stored tokens lands, and the next page save too", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    const user = await createTestUser();
+    const workspace = await createTestWorkspace({ ownerId: user.id });
+    const site = await createTestSite({ workspaceId: workspace.id, createdBy: user.id, projectSettings: { designTokensSchemaVersion: 5 } as never });
+    const first = await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings() }, site.lastEditedAt.toISOString());
+    await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings({ seo: { author: "Ann" } }) }, first.savedAt.toISOString());
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toMatchObject({ designTokensSchemaVersion: 6, seo: { author: "Ann" } });
+    expect(await prisma.siteThemeSnapshot.count({ where: { siteId: site.id } })).toBe(0);
+  });
+
+  it("switch off: a first migrated save is refused as SAVE_CONFLICT with the stored lastEditedAt", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    const site = await v5Site();
+    await expect(saveProjectData({ siteId: site.id, pages: [], settings: v6Settings() }, site.lastEditedAt.toISOString()))
+      .rejects.toThrow(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+  });
+
+  it("a stale v5 tab over a v6 store gets SAVE_CONFLICT, not a token error", async () => {
+    const site = await v5Site();
+    const first = await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings() }, site.lastEditedAt.toISOString());
+    await expect(
+      saveProjectData({ siteId: site.id, pages: [], settings: { designTokens: v5seed, designTokensSchemaVersion: 5 } }, first.savedAt.toISOString()),
+    ).rejects.toThrow(`SAVE_CONFLICT:${first.savedAt.toISOString()}`);
+  });
+
+  it("an undo payload (designTokens: undefined) over a v6 store keeps the stored tokens (C2)", async () => {
+    const site = await v5Site();
+    const first = await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings({ darkMode: "auto" }) }, site.lastEditedAt.toISOString());
+    await saveProjectData(
+      { siteId: site.id, pages: [], settings: { designTokens: undefined, designTokensSchemaVersion: undefined, seo: { author: "Bo" } } },
+      first.savedAt.toISOString(),
+    );
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toMatchObject({ designTokens: migrateTokensToV6(v5seed), designTokensSchemaVersion: 6, darkMode: "auto" });
+  });
+
+  it("BRAND_TOKENS_V2_WORKSPACES migrates a listed workspace's site and refuses another's", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    const listed = await v5Site();
+    const other = await v5Site();
+    vi.stubEnv("BRAND_TOKENS_V2_WORKSPACES", listed.workspaceId);
+    await saveProjectData({ siteId: listed.id, pages: [], settings: v6Settings() }, listed.lastEditedAt.toISOString());
+    expect(await prisma.siteThemeSnapshot.count({ where: { siteId: listed.id, reason: "migration" } })).toBe(1);
+    await expect(saveProjectData({ siteId: other.id, pages: [], settings: v6Settings() }, other.lastEditedAt.toISOString()))
+      .rejects.toThrow(/SAVE_CONFLICT/);
+    const otherAfter = await prisma.site.findUniqueOrThrow({ where: { id: other.id } });
+    expect(otherAfter.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
   });
 });
 

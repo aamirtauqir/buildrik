@@ -915,6 +915,27 @@ function withCheckedTokens(settings: unknown, check: TokenCheck, stored: unknown
 }
 
 /**
+ * The save's token check for this site's workspace switch. A stale tab (an
+ * older brand format than the store, or a first v6 save the switch or the
+ * site's hold refuses) answers as the ordinary `SAVE_CONFLICT:<stored
+ * lastEditedAt>`, so every editor bundle opens its conflict dialog and a
+ * reload brings the stored brand; the token reason stays in the server log.
+ */
+function checkedTokensOrConflict(
+  siteId: string,
+  settings: unknown,
+  site: { projectSettings: unknown; tokensMigrationHold: boolean; workspaceId: string; lastEditedAt: Date },
+): TokenCheck {
+  try {
+    return checkTokenPayload(settings, site.projectSettings, { hold: site.tokensMigrationHold, workspaceId: site.workspaceId });
+  } catch (e) {
+    if (!(e instanceof TokenSaveError) || e.code !== "TOKENS_STALE_CLIENT") throw e;
+    console.warn("[tokens] save refused", { siteId, code: e.code, reason: e.message });
+    throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+  }
+}
+
+/**
  * Phase -1: canonical project-data persistence path.
  *
  * Writes:
@@ -946,7 +967,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
      must carry the CAS token and match it now — the migration snapshot below
      records what that save replaced, and a blind write could snapshot a
      version the user never saw. The in-transaction CAS still decides races. */
-  const tokenCheck = checkTokenPayload(input.settings, site.projectSettings, { hold: site.tokensMigrationHold });
+  const tokenCheck = checkedTokensOrConflict(input.siteId, input.settings, site);
   if (tokenCheck.kind === "first-migrated") {
     if (!expectedLastEditedAt) throw new TokenSaveError("TOKENS_NEED_CAS", "Reload to continue.");
     if (site.lastEditedAt.toISOString() !== new Date(expectedLastEditedAt).toISOString()) {

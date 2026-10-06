@@ -8,9 +8,16 @@ export class TokenSaveError extends Error {
   }
 }
 
-/** Kill switch (D14, eng E3). Off = no NEW migrations; migrated sites keep working. */
-export function isBrandTokensV2Enabled(): boolean {
-  return process.env.BRAND_TOKENS_V2 === "on";
+/**
+ * Kill switch (D14, eng E3). Off = no NEW migrations; migrated sites keep
+ * working. `BRAND_TOKENS_V2=on` enables every workspace;
+ * `BRAND_TOKENS_V2_WORKSPACES` (comma-separated ids) enables only those — the
+ * "QA workspace first" rollout step.
+ */
+export function isBrandTokensV2Enabled(workspaceId?: string): boolean {
+  if (process.env.BRAND_TOKENS_V2 === "on") return true;
+  if (!workspaceId) return false;
+  return (process.env.BRAND_TOKENS_V2_WORKSPACES ?? "").split(",").some((id) => id.trim() === workspaceId);
 }
 
 const isKnownVersion = (v: unknown): v is number =>
@@ -42,8 +49,15 @@ function payloadVersionOf(p: { designTokensSchemaVersion?: unknown }): number {
   return v;
 }
 
+const hasStoredTokens = (s: unknown): boolean => {
+  const rows = s && typeof s === "object" ? (s as { designTokens?: unknown }).designTokens : undefined;
+  return Array.isArray(rows) && rows.length > 0;
+};
+
 /**
- * `no-tokens`: the payload has no `designTokens`; the stored token state is kept.
+ * `no-tokens`: the payload carries no token list (`designTokens` absent,
+ * undefined — superjson keeps an undefined key, which is what ⌘Z of a site's
+ * first token edit sends — or not an array); the stored token state is kept.
  * `unchanged`: store the payload's tokens and version as sent (pre-v6 only).
  * `same-version` / `first-migrated`: store `tokens` with the current schema
  * version — the server sets it, never the payload.
@@ -60,11 +74,19 @@ export type TokenCheck =
  * on and the site is not held — the editor runs the v1→v5 chain itself, and a
  * v5 set that cannot migrate belongs to a site the editor shows read-only,
  * whose save must still land. A v6 payload must validate; a held site
- * (brand rolled back) cannot take its first v6 save.
+ * (brand rolled back) cannot take its first v6 save. A v6 payload over a
+ * store with no tokens replaces nothing, so it is an ordinary save whatever
+ * the switch says. `workspaceId` selects the switch for that workspace.
  */
-export function checkTokenPayload(payload: unknown, stored: unknown, opts: { hold?: boolean } = {}): TokenCheck {
-  if (!payload || typeof payload !== "object" || !("designTokens" in payload)) return { kind: "no-tokens" };
-  const p = payload as { designTokens: unknown; designTokensSchemaVersion?: unknown; darkMode?: unknown };
+export function checkTokenPayload(
+  payload: unknown,
+  stored: unknown,
+  opts: { hold?: boolean; workspaceId?: string } = {},
+): TokenCheck {
+  if (!payload || typeof payload !== "object") return { kind: "no-tokens" };
+  const p = payload as { designTokens?: unknown; designTokensSchemaVersion?: unknown; darkMode?: unknown };
+  if (!Array.isArray(p.designTokens)) return { kind: "no-tokens" };
+  const switchOn = isBrandTokensV2Enabled(opts.workspaceId);
   const pv = payloadVersionOf(p);
   const sv = storedVersionOf(stored);
   if (pv < sv) throw new TokenSaveError("TOKENS_STALE_CLIENT", "This tab has an older brand format — reload to continue.");
@@ -73,7 +95,7 @@ export function checkTokenPayload(payload: unknown, stored: unknown, opts: { hol
   }
   let tokens: unknown = p.designTokens;
   if (pv < TOKENS_SCHEMA_VERSION) {
-    if (pv !== 5 || opts.hold || !isBrandTokensV2Enabled()) return { kind: "unchanged" };
+    if (pv !== 5 || opts.hold || !switchOn) return { kind: "unchanged" };
     try {
       tokens = migrateTokensToV6(tokens);
     } catch (e) {
@@ -83,9 +105,11 @@ export function checkTokenPayload(payload: unknown, stored: unknown, opts: { hol
   }
   const checked = validateTokens(tokens);
   if (!checked.ok) throw new TokenSaveError("TOKENS_INVALID", checked.reason);
-  if (sv >= TOKENS_SCHEMA_VERSION) return { kind: "same-version", tokens: checked.tokens };
+  if (sv >= TOKENS_SCHEMA_VERSION || (pv === TOKENS_SCHEMA_VERSION && !hasStoredTokens(stored))) {
+    return { kind: "same-version", tokens: checked.tokens };
+  }
   if (opts.hold) throw new TokenSaveError("TOKENS_STALE_CLIENT", "This site's brand was rolled back — reload to continue.");
-  if (!isBrandTokensV2Enabled()) throw new TokenSaveError("TOKENS_STALE_CLIENT", "Brand upgrade is paused — reload to continue.");
+  if (!switchOn) throw new TokenSaveError("TOKENS_STALE_CLIENT", "Brand upgrade is paused — reload to continue.");
   const storedTokens = stored && typeof stored === "object" ? (stored as { designTokens?: unknown }).designTokens : undefined;
   return { kind: "first-migrated", tokens: checked.tokens, storedTokens, storedVersion: sv };
 }

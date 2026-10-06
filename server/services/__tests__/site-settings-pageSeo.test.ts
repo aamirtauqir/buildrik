@@ -34,7 +34,7 @@ const site = {
   metaTitle: null,
   metaDescription: null,
   deletedAt: null,
-  workspace: { plan: "FREE" },
+  workspace: { id: "ws-qa", plan: "FREE" },
 };
 
 beforeEach(() => {
@@ -112,6 +112,17 @@ describe("getSiteSettings — brand token kill switch", () => {
     expect((await getSiteSettings("s1")).brandTokensV2).toBe(true);
     vi.stubEnv("BRAND_TOKENS_V2", "");
     expect((await getSiteSettings("s1")).brandTokensV2).toBe(false);
+    vi.unstubAllEnvs();
+  });
+
+  it("reports the switch for the site's own workspace (BRAND_TOKENS_V2_WORKSPACES)", async () => {
+    pageFindFirst.mockResolvedValue(null);
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    vi.stubEnv("BRAND_TOKENS_V2_WORKSPACES", "ws-qa");
+    expect((await getSiteSettings("s1")).brandTokensV2).toBe(true);
+    vi.stubEnv("BRAND_TOKENS_V2_WORKSPACES", "ws-other");
+    expect((await getSiteSettings("s1")).brandTokensV2).toBe(false);
+    expect(siteFindUnique.mock.calls.at(-1)?.[0].select.workspace.select).toMatchObject({ id: true });
     vi.unstubAllEnvs();
   });
 });

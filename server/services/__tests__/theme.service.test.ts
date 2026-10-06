@@ -310,6 +310,50 @@ describe("pushSharedTheme — version label matches the tokens written", () => {
     expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
   });
 
+  it("switch off: a v6 theme never migrates a v5 site with tokens — skipped-version, paused (M1)", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([site({ projectSettings: { designTokens: v5seed, designTokensSchemaVersion: 5 } })]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0]).toMatchObject({ status: "skipped-version", error: "Brand upgrade is paused for this site." });
+    expect(siteUpdateMany).not.toHaveBeenCalled();
+    expect(snapCreate).not.toHaveBeenCalled();
+  });
+
+  it("switch off: a v6 theme still reaches a site with no tokens (nothing to migrate)", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([site()]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0].status).toBe("pushed");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v6, designTokensSchemaVersion: 6 });
+  });
+
+  it("BRAND_TOKENS_V2_WORKSPACES: a listed workspace's v5 site takes a v6 theme; another workspace's is paused", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    vi.stubEnv("BRAND_TOKENS_V2_WORKSPACES", "w-qa");
+    const v5site = site({ projectSettings: { designTokens: v5seed, designTokensSchemaVersion: 5 } });
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([v5site]);
+    expect((await pushSharedTheme("w-qa"))[0].status).toBe("pushed");
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([v5site]);
+    expect((await pushSharedTheme("w-other"))[0]).toMatchObject({ status: "skipped-version", error: "Brand upgrade is paused for this site." });
+  });
+
+  it("BRAND_TOKENS_V2_WORKSPACES: a v5 theme migrates for a listed workspace only", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    vi.stubEnv("BRAND_TOKENS_V2_WORKSPACES", "w-qa");
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site()]);
+    await pushSharedTheme("w-qa");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v6, designTokensSchemaVersion: 6 });
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site()]);
+    await pushSharedTheme("w-other");
+    expect(siteUpdateMany.mock.calls[1][0].data.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+  });
+
   it("preview reports the same skips", async () => {
     theme(v6);
     siteFindMany.mockResolvedValueOnce([site({ tokensMigrationHold: true })]);
