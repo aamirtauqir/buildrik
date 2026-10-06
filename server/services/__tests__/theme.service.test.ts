@@ -72,6 +72,7 @@ import {
   setSiteThemeLock,
   previewSharedThemePush,
   rollbackSiteTheme,
+  pruneThemeSnapshots,
   listSiteThemeSnapshots,
   saveWorkspacePreset,
   applyWorkspacePreset,
@@ -233,7 +234,45 @@ describe("pushSharedTheme — D2 snapshot", () => {
       workspaceId: "w1",
       prevStyles: { designTokens: [{ old: 2 }] },
       prevDsSchemaVersion: 2,
+      reason: "theme-push",
+      tokensSchemaVersion: 5,
     });
+  });
+
+  it("records the site's stored tokens version on the snapshot", async () => {
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2, projectSettings: { designTokens: [], designTokensSchemaVersion: 4 } },
+    ]);
+    await pushSharedTheme("w1");
+    expect(snapCreate.mock.calls[0][0].data.tokensSchemaVersion).toBe(4);
+  });
+
+  it("pushes an unmigratable v5 workspace theme as-is (switch on) instead of failing", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2, projectSettings: { designTokens: [] }, tokensMigrationHold: false },
+    ]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0].status).toBe("pushed");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: [{ id: "t" }] });
+    expect(warn).toHaveBeenCalledWith("[theme] workspace theme did not migrate; pushing as-is", expect.anything());
+    warn.mockRestore();
+    vi.unstubAllEnvs();
+  });
+});
+
+describe("pruneThemeSnapshots", () => {
+  it("logs '[theme] prune failed' with the siteId and does not throw", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    snapFindMany.mockResolvedValueOnce(Array.from({ length: 10 }, (_, i) => ({ id: `s${i}` })));
+    snapDeleteMany.mockRejectedValueOnce(new Error("db down"));
+    await expect(pruneThemeSnapshots("site-9")).resolves.toBeUndefined();
+    expect(warn).toHaveBeenCalledWith("[theme] prune failed", { siteId: "site-9", error: "db down" });
+    expect(snapDeleteMany.mock.calls[0][0].where).toMatchObject({ siteId: "site-9", reason: { not: "migration" } });
+    warn.mockRestore();
   });
 });
 
@@ -288,6 +327,8 @@ describe("rollbackSiteTheme (D2)", () => {
       dsSchemaVersion: 5,
     });
     expect(snapDelete.mock.calls[0][0].where).toEqual({ id: "snap1" });
+    // E1: only theme-push rows are admin-rollback candidates, never a newer generator/migration row.
+    expect(snapFindFirst.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1", reason: "theme-push" });
     expect(res.rolledBackTo).toBeInstanceOf(Date);
   });
 
