@@ -10,19 +10,13 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import type { DesignToken, TokenKind } from "../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 import { useRadiusTokens } from "../useRadiusTokens";
 import { useShadowTokens } from "../useShadowTokens";
 import { useMotionTokens } from "../useMotionTokens";
 
-const mk = (id: string, kind: TokenKind, value: string): DesignToken => ({
-  id,
-  name: id,
-  value,
-  category: kind === "radius" ? "layout" : "effects",
-  cssVar: `--bd-${id}`,
-  type: "string",
-  kind,
-});
+const mk = (id: string, kind: TokenKind, value: string): DesignToken =>
+  v6Token({ id, value, category: kind === "radius" ? "layout" : "effects", cssVar: `--bd-${id}`, type: "string", kind });
 
 // A mixed multi-kind seed — each wrapper must filter to only its own kind.
 const SEED: DesignToken[] = [

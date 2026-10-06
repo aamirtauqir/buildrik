@@ -7,6 +7,7 @@ import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSpacingTokens } from "../useSpacingTokens";
 import type { DesignToken } from "../../types";
+import { v6Token, ownLight } from "@/engine/__tests__/test-utils/v6Token";
 
 const SPACING_IDS = [
   "space-1", "space-2", "space-3", "space-4", "space-5",
@@ -14,19 +15,14 @@ const SPACING_IDS = [
 ] as const;
 
 function makeTokens(): DesignToken[] {
-  return SPACING_IDS.map((id) => ({
-    id,
-    name: id,
-    value: "0px",
-    category: "spacing" as const,
-    cssVar: `--buildrick-design-${id}`,
-    type: "length" as const,
-  }));
+  return SPACING_IDS.map((id) =>
+    v6Token({ id, value: "0px", kind: "spacing", category: "spacing", type: "length" })
+  );
 }
 
 function getValues(tokens: DesignToken[]): Record<string, number> {
   const result: Record<string, number> = {};
-  for (const t of tokens) result[t.id] = parseFloat(t.value);
+  for (const t of tokens) result[t.id] = parseFloat(ownLight(t) ?? "");
   return result;
 }
 
@@ -103,7 +99,7 @@ describe("useSpacingTokens — activePreset lifecycle", () => {
     expect(result.current.activePreset).toBeNull();
     act(() => result.current.discardAll());
     expect(result.current.activePreset).toBe("compact");
-    expect(result.current.tokens.find((t) => t.id === "space-4")?.value).toBe("12px");
+    expect(ownLight(result.current.tokens.find((t) => t.id === "space-4"))).toBe("12px");
   });
 
   it("markSaved after a manual edit persists savedPreset=null (custom scale saved)", () => {
@@ -117,11 +113,11 @@ describe("useSpacingTokens — activePreset lifecycle", () => {
 describe("useSpacingTokens — stageDefaults (C3 factory reset)", () => {
   it("stages spacing defaults without touching savedTokens (Review/Apply flow)", () => {
     const { result } = renderHook(() => useSpacingTokens(makeTokens()));
-    const defaults = makeTokens().map((t) => ({ ...t, value: "5px" }));
+    const defaults = makeTokens().map((t) => v6Token({ ...t, value: "5px" }));
     act(() => result.current.stageDefaults(defaults));
-    expect(result.current.tokens.every((t) => t.value === "5px")).toBe(true);
+    expect(result.current.tokens.every((t) => ownLight(t) === "5px")).toBe(true);
     // savedTokens untouched — the reset is staged, so the panel goes dirty.
-    expect(result.current.savedTokens.every((t) => t.value === "0px")).toBe(true);
+    expect(result.current.savedTokens.every((t) => ownLight(t) === "0px")).toBe(true);
     expect(result.current.isDirty).toBe(true);
   });
 
@@ -130,10 +126,7 @@ describe("useSpacingTokens — stageDefaults (C3 factory reset)", () => {
     act(() => result.current.updateToken("space-4", "77px")); // preset → null
     const defaults: ReturnType<typeof makeTokens> = [
       ...makeTokens(),
-      {
-        id: "color-primary", name: "Primary", value: "#FFF",
-        category: "colors", cssVar: "--buildrick-design-color-primary", type: "color",
-      },
+      v6Token({ id: "color-primary", name: "Primary", value: "#FFF" }),
     ];
     act(() => result.current.stageDefaults(defaults));
     expect(result.current.activePreset).toBe("normal");

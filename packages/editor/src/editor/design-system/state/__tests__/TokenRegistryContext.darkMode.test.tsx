@@ -1,7 +1,9 @@
 import { render, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { TokenRegistryProvider } from "../TokenRegistryContext";
+import type { DesignToken } from "../../types";
 
 type Listener = (payload: unknown) => void;
 
@@ -13,8 +15,8 @@ function makeFakeComposer() {
     resolved: vi.fn(() => "dark" as "light" | "dark"),
   };
   const darkResolver = {
-    resolve: vi.fn((token: { value: string; darkValue?: string }, mode: "light" | "dark") =>
-      mode === "dark" && token.darkValue !== undefined ? token.darkValue : token.value
+    resolve: vi.fn((token: DesignToken, tokens: readonly DesignToken[], mode: "light" | "dark") =>
+      resolveTokenLiteral(tokens, token.id, mode) ?? ""
     ),
     resolveAll: vi.fn(),
   };
@@ -68,7 +70,8 @@ describe("TokenRegistryProvider · dark-mode applier", () => {
     );
 
     expect(composer.darkResolver.resolve).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "color-primary", darkValue: "#000" }),
+      expect.objectContaining({ id: "color-primary" }),
+      expect.arrayContaining([expect.objectContaining({ id: "color-primary" })]),
       "dark"
     );
     expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#000");

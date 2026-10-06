@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback } from "react";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";
 import { useTokenBase } from "./useTokenBase";
 
@@ -28,11 +29,10 @@ const PRESET_VALUES: Record<SpacingPreset, Record<string, number>> = {
 
 function applyPresetToTokens(tokens: DesignToken[], preset: SpacingPreset): DesignToken[] {
   const values = PRESET_VALUES[preset];
-  return tokens.map((t) => {
+  return tokens.reduce((acc, t) => {
     const px = values[t.id];
-    if (px === undefined) return t;
-    return { ...t, value: `${px}px` };
-  });
+    return px === undefined ? acc : setTokenLiteral(acc, t.id, "light", `${px}px`);
+  }, tokens);
 }
 
 export interface SpacingTokensState {
@@ -92,7 +92,7 @@ export function useSpacingTokens(
       setRedoStack({});
       setTokens((prev) => {
         const next = applyPresetToTokens(prev, preset);
-        next.forEach((t) => document.documentElement.style.setProperty(t.cssVar, t.value));
+        next.forEach((t) => document.documentElement.style.setProperty(t.cssVar, resolveTokenLiteral(next, t.id, "light") ?? ""));
         return next;
       });
     },
@@ -116,7 +116,9 @@ export function useSpacingTokens(
       setActivePreset("normal");
       setUndoStack({});
       setRedoStack({});
-      spacingDefaults.forEach((t) => document.documentElement.style.setProperty(t.cssVar, t.value));
+      spacingDefaults.forEach((t) =>
+        document.documentElement.style.setProperty(t.cssVar, resolveTokenLiteral(spacingDefaults, t.id, "light") ?? "")
+      );
     },
     [setTokens, setUndoStack, setRedoStack]
   );

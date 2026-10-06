@@ -6,7 +6,11 @@
  */
 
 import { useState, useCallback } from "react";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken, TokenDiff, UndoEntry } from "../types";
+
+const lightOf = (tokens: readonly DesignToken[], id: string): string =>
+  resolveTokenLiteral(tokens, id, "light") ?? "";
 
 export interface ColorTokensState {
   /** Current (possibly unsaved) token values */
@@ -98,12 +102,11 @@ export function useColorTokens(
   const pendingDiff: Record<string, TokenDiff> = {};
   tokens.forEach((token) => {
     const saved = savedTokens.find((s) => s.id === token.id);
-    if (saved && (token.value !== saved.value || token.replacedBy !== saved.replacedBy)) {
-      pendingDiff[token.id] = {
-        tokenId: token.id,
-        previousValue: saved.value,
-        currentValue: token.value,
-      };
+    if (!saved) return;
+    const previousValue = lightOf(savedTokens, token.id);
+    const currentValue = lightOf(tokens, token.id);
+    if (currentValue !== previousValue || token.replacedBy !== saved.replacedBy) {
+      pendingDiff[token.id] = { tokenId: token.id, previousValue, currentValue };
     }
   });
 
@@ -115,24 +118,24 @@ export function useColorTokens(
       const idx = prev.findIndex((t) => t.id === id);
       if (idx === -1) return prev;
 
-      const old = prev[idx];
-      const darkChanged = darkValue !== undefined && darkValue !== old.darkValue;
+      const oldValue = lightOf(prev, id);
+      const oldDark = prev[idx].modes.dark ? resolveTokenLiteral(prev, id, "dark") : undefined;
+      const darkChanged = darkValue !== undefined && darkValue !== oldDark;
       // No-op guard: skip if neither the light nor the dark value changes.
-      if (old.value === value && !darkChanged) return prev;
+      if (oldValue === value && !darkChanged) return prev;
 
       // Undo history tracks the light value only — push an entry only when the
       // light value actually changes (a dark-only edit is not its own step).
-      if (old.value !== value) {
+      let next = prev;
+      if (oldValue !== value) {
         setUndoStack((prevStack) => {
           const existing = prevStack[id] ?? [];
-          return { ...prevStack, [id]: [...existing, { tokenId: id, snapshot: old.value }] };
+          return { ...prevStack, [id]: [...existing, { tokenId: id, snapshot: oldValue }] };
         });
         setRedoStack((prevRedo) => ({ ...prevRedo, [id]: [] }));
+        next = setTokenLiteral(next, id, "light", value);
       }
-
-      const next = prev.map((t, i) =>
-        i === idx ? { ...t, value, ...(darkValue !== undefined ? { darkValue } : {}) } : t
-      );
+      if (darkValue !== undefined && darkChanged) next = setTokenLiteral(next, id, "dark", darkValue);
       return next;
     });
   }, []);
@@ -155,12 +158,11 @@ export function useColorTokens(
           const redoList = prevRedo[id] ?? [];
           return {
             ...prevRedo,
-            [id]: [...redoList, { tokenId: id, snapshot: prevTokens[idx].value }],
+            [id]: [...redoList, { tokenId: id, snapshot: lightOf(prevTokens, id) }],
           };
         });
 
-        const next = prevTokens.map((t, i) => (i === idx ? { ...t, value: entry.snapshot } : t));
-        return next;
+        return setTokenLiteral(prevTokens, id, "light", entry.snapshot);
       });
 
       return { ...prevStack, [id]: newStack };
@@ -185,12 +187,11 @@ export function useColorTokens(
           const undoList = prevUndo[id] ?? [];
           return {
             ...prevUndo,
-            [id]: [...undoList, { tokenId: id, snapshot: prevTokens[idx].value }],
+            [id]: [...undoList, { tokenId: id, snapshot: lightOf(prevTokens, id) }],
           };
         });
 
-        const next = prevTokens.map((t, i) => (i === idx ? { ...t, value: entry.snapshot } : t));
-        return next;
+        return setTokenLiteral(prevTokens, id, "light", entry.snapshot);
       });
 
       return { ...prevRedo, [id]: newStack };
@@ -289,7 +290,7 @@ export function useColorTokens(
       return tokens.filter(
         (t) =>
           t.name.toLowerCase().includes(q) ||
-          t.value.toLowerCase().includes(q) ||
+          lightOf(tokens, t.id).toLowerCase().includes(q) ||
           (t.description ?? "").toLowerCase().includes(q)
       );
     },

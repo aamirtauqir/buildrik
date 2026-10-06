@@ -7,10 +7,12 @@ import {
   useRadiusRegistry,
   useColorRegistry,
 } from "../TokenRegistryContext";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const externalTokens: DesignToken[] = [
-  {
+  v6Token({
     id: "color-fg-primary",
     name: "Primary text",
     value: "#FF0000",
@@ -19,8 +21,8 @@ const externalTokens: DesignToken[] = [
     type: "color",
     kind: "color",
     friendlyName: "Primary text",
-  },
-  {
+  }),
+  v6Token({
     id: "radius-sm",
     name: "Small radius",
     value: "99px",
@@ -29,7 +31,7 @@ const externalTokens: DesignToken[] = [
     type: "length",
     kind: "radius",
     friendlyName: "Small radius",
-  },
+  }),
 ];
 
 const Probe: React.FC<{ apply: { current: ((t: DesignToken[]) => void) | null } }> = ({ apply }) => {
@@ -40,10 +42,10 @@ const Probe: React.FC<{ apply: { current: ((t: DesignToken[]) => void) | null } 
   return (
     <div>
       <span data-testid="radius-sm">
-        {radius.tokens.find((t) => t.id === "radius-sm")?.value ?? "?"}
+        {resolveTokenLiteral(radius.tokens, "radius-sm", "light") ?? "?"}
       </span>
       <span data-testid="color-fg-primary">
-        {color.tokens.find((t) => t.id === "color-fg-primary")?.value ?? "?"}
+        {resolveTokenLiteral(color.tokens, "color-fg-primary", "light") ?? "?"}
       </span>
     </div>
   );

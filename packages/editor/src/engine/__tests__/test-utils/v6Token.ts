@@ -25,3 +25,14 @@ export function v6Token(spec: V6TokenSpec): DesignToken {
     modes: dark !== undefined ? { light, dark: { value: dark } } : { light },
   };
 }
+
+/** The light literal a token holds itself — undefined when it aliases. */
+export function ownLight(token: DesignToken | undefined): string | undefined {
+  return token && "value" in token.modes.light ? token.modes.light.value : undefined;
+}
+
+/** The dark literal a token holds itself — undefined when it has none or aliases. */
+export function ownDark(token: DesignToken | undefined): string | undefined {
+  const dark = token?.modes.dark;
+  return dark && "value" in dark ? dark.value : undefined;
+}

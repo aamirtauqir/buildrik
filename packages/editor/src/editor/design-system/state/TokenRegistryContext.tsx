@@ -16,7 +16,8 @@
 import * as React from "react";
 import type { DesignToken } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
-import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../migrations";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { CURRENT_SCHEMA_VERSION } from "../migrations";
 import { mergeProjectTokens } from "./projectTokens";
 import { EVENTS } from "@/shared/constants/events";
 import { useColorTokens } from "./useColorTokens";
@@ -103,7 +104,7 @@ export interface TokenRegistryProviderProps {
     on: (evt: string, cb: (payload: unknown) => void) => void;
     off: (evt: string, cb: (payload: unknown) => void) => void;
     colorMode: { resolved: () => "light" | "dark" };
-    darkResolver: { resolve: (token: DesignToken, resolved: "light" | "dark") => string };
+    darkResolver: { resolve: (token: DesignToken, tokens: readonly DesignToken[], resolved: "light" | "dark") => string };
     /** D-4: the registries hydrate from the project's own tokens on load. */
     getProjectSettings?: () => { designTokens?: unknown[]; designTokensSchemaVersion?: number };
   };
@@ -118,21 +119,22 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   const storageKey = `buildrick-design-tokens-${projectId ?? "default"}-v1`;
 
   // Load from localStorage on first render. Supports BOTH legacy array format
-  // and new versioned format ({schemaVersion, tokens}). Applies migrations
-  // when stored version < CURRENT_SCHEMA_VERSION. Falls through to DEFAULT_TOKENS
-  // on any error (private browsing, corrupt JSON, unknown shape).
+  // and new versioned format ({schemaVersion, tokens}). `mergeProjectTokens`
+  // migrates older saves and falls back to the seed on anything that does not
+  // validate. Falls through to DEFAULT_TOKENS on any error (private browsing,
+  // corrupt JSON, unknown shape).
   const initialTokens = React.useMemo((): DesignToken[] => {
     try {
       const raw = localStorage.getItem(storageKey);
       if (!raw) return DEFAULT_TOKENS;
 
       const parsed: unknown = JSON.parse(raw);
-      let tokens: DesignToken[];
+      let tokens: unknown[];
       let storedVersion: number;
 
       if (Array.isArray(parsed)) {
         // Legacy format — pre-versioned. Treat as V1.
-        tokens = parsed as DesignToken[];
+        tokens = parsed;
         storedVersion = 1;
       } else if (
         parsed &&
@@ -141,17 +143,13 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
         "tokens" in parsed &&
         Array.isArray((parsed as { tokens: unknown }).tokens)
       ) {
-        tokens = (parsed as { tokens: DesignToken[] }).tokens;
+        tokens = (parsed as { tokens: unknown[] }).tokens;
         storedVersion = (parsed as { schemaVersion: number }).schemaVersion;
       } else {
         return DEFAULT_TOKENS;
       }
 
-      if (storedVersion < CURRENT_SCHEMA_VERSION) {
-        tokens = migrateDesignTokens(tokens, storedVersion, CURRENT_SCHEMA_VERSION);
-      }
-
-      return tokens.length > 0 ? tokens : DEFAULT_TOKENS;
+      return tokens.length > 0 ? mergeProjectTokens(tokens, storedVersion) : DEFAULT_TOKENS;
     } catch {
       // SecurityError (private browsing) or JSON.parse failure → use defaults
       return DEFAULT_TOKENS;
@@ -183,8 +181,8 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
       const resolved = composer?.colorMode.resolved() ?? "light";
       colorState.tokens.forEach((t) => {
         const value = composer
-          ? composer.darkResolver.resolve(t, resolved)
-          : t.value;
+          ? composer.darkResolver.resolve(t, colorState.tokens, resolved)
+          : resolveTokenLiteral(colorState.tokens, t.id, "light") ?? "";
         document.documentElement.style.setProperty(t.cssVar, value);
       });
     };

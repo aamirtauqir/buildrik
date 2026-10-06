@@ -6,7 +6,11 @@
 
 import { useState, useCallback } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken, UndoEntry } from "../types";
+
+const lightOf = (tokens: readonly DesignToken[], id: string): string =>
+  resolveTokenLiteral(tokens, id, "light") ?? "";
 
 export interface TokenBaseState {
   tokens: DesignToken[];
@@ -46,23 +50,22 @@ export function useTokenBase(
 
   const isDirty = tokens.some((t) => {
     const saved = savedTokens.find((s) => s.id === t.id);
-    return saved !== undefined && t.value !== saved.value;
+    return saved !== undefined && lightOf(tokens, t.id) !== lightOf(savedTokens, t.id);
   });
 
   const updateToken = useCallback((id: string, value: string) => {
     setTokens((prev) => {
       const idx = prev.findIndex((t) => t.id === id);
       if (idx === -1) return prev;
-      const oldValue = prev[idx].value;
+      const oldValue = lightOf(prev, id);
       if (oldValue === value) return prev;
       setUndoStack((s) => ({
         ...s,
         [id]: [...(s[id] ?? []), { tokenId: id, snapshot: oldValue }],
       }));
       setRedoStack((s) => ({ ...s, [id]: [] }));
-      const next = prev.map((t, i) => (i === idx ? { ...t, value } : t));
-      document.documentElement.style.setProperty(next[idx].cssVar, value);
-      return next;
+      document.documentElement.style.setProperty(prev[idx].cssVar, value);
+      return setTokenLiteral(prev, id, "light", value);
     });
   }, []);
 
@@ -76,11 +79,10 @@ export function useTokenBase(
         if (idx === -1) return prev;
         setRedoStack((r) => ({
           ...r,
-          [id]: [...(r[id] ?? []), { tokenId: id, snapshot: prev[idx].value }],
+          [id]: [...(r[id] ?? []), { tokenId: id, snapshot: lightOf(prev, id) }],
         }));
-        const next = prev.map((t, i) => (i === idx ? { ...t, value: entry.snapshot } : t));
-        document.documentElement.style.setProperty(next[idx].cssVar, entry.snapshot);
-        return next;
+        document.documentElement.style.setProperty(prev[idx].cssVar, entry.snapshot);
+        return setTokenLiteral(prev, id, "light", entry.snapshot);
       });
       return { ...s, [id]: stack.slice(0, -1) };
     });
@@ -98,11 +100,10 @@ export function useTokenBase(
         if (idx === -1) return prev;
         setUndoStack((s) => ({
           ...s,
-          [id]: [...(s[id] ?? []), { tokenId: id, snapshot: prev[idx].value }],
+          [id]: [...(s[id] ?? []), { tokenId: id, snapshot: lightOf(prev, id) }],
         }));
-        const next = prev.map((t, i) => (i === idx ? { ...t, value: entry.snapshot } : t));
-        document.documentElement.style.setProperty(next[idx].cssVar, entry.snapshot);
-        return next;
+        document.documentElement.style.setProperty(prev[idx].cssVar, entry.snapshot);
+        return setTokenLiteral(prev, id, "light", entry.snapshot);
       });
       return { ...r, [id]: stack.slice(0, -1) };
     });
@@ -121,7 +122,7 @@ export function useTokenBase(
 
   const discardAll = useCallback(() => {
     setTokens(savedTokens);
-    savedTokens.forEach((t) => document.documentElement.style.setProperty(t.cssVar, t.value));
+    savedTokens.forEach((t) => document.documentElement.style.setProperty(t.cssVar, lightOf(savedTokens, t.id)));
     setUndoStack({});
     setRedoStack({});
   }, [savedTokens]);
@@ -142,7 +143,7 @@ export function useTokenBase(
       setTokens(next);
       setUndoStack({});
       setRedoStack({});
-      next.forEach((t) => document.documentElement.style.setProperty(t.cssVar, t.value));
+      next.forEach((t) => document.documentElement.style.setProperty(t.cssVar, lightOf(next, t.id)));
     },
     [category]
   );
@@ -154,7 +155,7 @@ export function useTokenBase(
       setSavedTokens(next);
       setUndoStack({});
       setRedoStack({});
-      next.forEach((t) => document.documentElement.style.setProperty(t.cssVar, t.value));
+      next.forEach((t) => document.documentElement.style.setProperty(t.cssVar, lightOf(next, t.id)));
     },
     [category]
   );

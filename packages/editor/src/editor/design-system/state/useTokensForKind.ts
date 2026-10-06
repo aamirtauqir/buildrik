@@ -1,5 +1,9 @@
 import * as React from "react";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken, TokenKind } from "../types";
+
+const lightOf = (tokens: readonly DesignToken[], id: string): string =>
+  resolveTokenLiteral(tokens, id, "light") ?? "";
 
 /**
  * Apply a token value to :root so the canvas live-previews the change
@@ -60,10 +64,11 @@ export function useTokensForKind(
     const diff: Record<string, string> = {};
     for (const t of tokens) {
       const saved = savedTokens.find((s) => s.id === t.id);
+      const value = lightOf(tokens, t.id);
       // B4 (2026-05-16): replacedBy soft-delete also counts as a change so
-      // isDirty fires for soft-deletes that don't touch token.value.
-      if (!saved || saved.value !== t.value || saved.replacedBy !== t.replacedBy) {
-        diff[t.id] = t.value;
+      // isDirty fires for soft-deletes that don't touch the token's value.
+      if (!saved || lightOf(savedTokens, t.id) !== value || saved.replacedBy !== t.replacedBy) {
+        diff[t.id] = value;
       }
     }
     return diff;
@@ -76,17 +81,16 @@ export function useTokensForKind(
       const idx = prev.findIndex((t) => t.id === id);
       if (idx === -1) return prev;
       const old = prev[idx];
+      const oldValue = lightOf(prev, id);
       // No-op guard: setting the same value should not push an undo entry
       // (mirrors useColorTokens contract).
-      if (old.value === value) return prev;
+      if (oldValue === value) return prev;
       const stack = undoStackRef.current.get(id) ?? [];
-      stack.push(old.value);
+      stack.push(oldValue);
       undoStackRef.current.set(id, stack);
       redoStackRef.current.set(id, []);
-      const next = [...prev];
-      next[idx] = { ...old, value };
       applyToRoot(old.cssVar, value);
-      return next;
+      return setTokenLiteral(prev, id, "light", value);
     });
   }, []);
 
@@ -98,12 +102,10 @@ export function useTokensForKind(
       const idx = cur.findIndex((t) => t.id === id);
       if (idx === -1) return cur;
       const redoStack = redoStackRef.current.get(id) ?? [];
-      redoStack.push(cur[idx].value);
+      redoStack.push(lightOf(cur, id));
       redoStackRef.current.set(id, redoStack);
-      const next = [...cur];
-      next[idx] = { ...next[idx], value: prev };
-      applyToRoot(next[idx].cssVar, prev);
-      return next;
+      applyToRoot(cur[idx].cssVar, prev);
+      return setTokenLiteral(cur, id, "light", prev);
     });
   }, []);
 
@@ -115,12 +117,10 @@ export function useTokensForKind(
       const idx = cur.findIndex((t) => t.id === id);
       if (idx === -1) return cur;
       const undoStack = undoStackRef.current.get(id) ?? [];
-      undoStack.push(cur[idx].value);
+      undoStack.push(lightOf(cur, id));
       undoStackRef.current.set(id, undoStack);
-      const out = [...cur];
-      out[idx] = { ...out[idx], value: next };
-      applyToRoot(out[idx].cssVar, next);
-      return out;
+      applyToRoot(cur[idx].cssVar, next);
+      return setTokenLiteral(cur, id, "light", next);
     });
   }, []);
 
@@ -144,7 +144,7 @@ export function useTokensForKind(
     setTokens(savedTokens);
     // Restore :root CSS vars to saved values so canvas snaps back.
     for (const t of savedTokens) {
-      applyToRoot(t.cssVar, t.value);
+      applyToRoot(t.cssVar, lightOf(savedTokens, t.id));
     }
     undoStackRef.current.clear();
     redoStackRef.current.clear();
@@ -158,7 +158,7 @@ export function useTokensForKind(
       if (filtered.length === 0) return;
       setTokens(filtered);
       setSavedTokens(filtered);
-      for (const t of filtered) applyToRoot(t.cssVar, t.value);
+      for (const t of filtered) applyToRoot(t.cssVar, lightOf(filtered, t.id));
       undoStackRef.current.clear();
       redoStackRef.current.clear();
     },

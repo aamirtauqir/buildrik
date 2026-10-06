@@ -13,7 +13,9 @@ import { render, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { TokenRegistryProvider, useColorRegistry } from "../TokenRegistryContext";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
+import type { DesignToken } from "@/editor/design-system/types";
 
 type Listener = (payload: unknown) => void;
 
@@ -28,7 +30,9 @@ function makeComposer(primary: string) {
     off: vi.fn((evt: string, cb: Listener) => listeners.set(evt, (listeners.get(evt) ?? []).filter((x) => x !== cb))),
     emit: (evt: string) => (listeners.get(evt) ?? []).forEach((c) => c(undefined)),
     colorMode: { resolved: () => "light" as const },
-    darkResolver: { resolve: (t: { value: string }) => t.value },
+    darkResolver: {
+      resolve: (t: DesignToken, tokens: readonly DesignToken[]) => resolveTokenLiteral(tokens, t.id, "light") ?? "",
+    },
     getProjectSettings: () => settings,
     setPrimary(value: string) {
       settings = { ...settings, designTokens: [{ ...(settings.designTokens[0] as object), value }] };
@@ -41,7 +45,7 @@ function makeComposer(primary: string) {
 
 let seen = "";
 function PrimaryProbe() {
-  seen = useColorRegistry().tokens.find((t) => t.id === "color-primary")?.value ?? "";
+  seen = resolveTokenLiteral(useColorRegistry().tokens, "color-primary", "light") ?? "";
   return null;
 }
 
@@ -86,7 +90,7 @@ describe("TokenRegistryProvider · project token hydration (D-4)", () => {
     composer.clearTokens();
     act(() => composer.emit("project:loaded"));
     expect(seen.toLowerCase()).not.toBe("#123456");
-    expect(seen).toBe(DEFAULT_TOKENS.find((t) => t.id === "color-primary")?.value);
+    expect(seen).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"));
   });
 
   it("does not listen to settings changes (Brand stages edits in these registries)", () => {

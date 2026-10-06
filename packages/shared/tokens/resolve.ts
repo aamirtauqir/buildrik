@@ -26,9 +26,11 @@ export function lightAliasOf(token: DesignToken): string | undefined {
   return "alias" in token.modes.light ? token.modes.light.alias : undefined;
 }
 
-/** Writes a literal for a token in a mode. A semantic token aliasing a
- *  primitive writes through to that primitive only if no other token aliases
- *  it; otherwise it gets its own literal so siblings do not change. */
+/** Writes a literal for a token in a mode. A semantic token gets its own
+ *  literal in that mode (replacing any alias there), so tokens that alias the
+ *  same primitive do not change. A primitive has exactly one (light) literal,
+ *  so a dark write to one is a no-op rather than an overwrite of its light
+ *  value. */
 export function setTokenLiteral(
   tokens: readonly DesignToken[],
   id: string,
@@ -38,6 +40,7 @@ export function setTokenLiteral(
   const t = tokens.find((x) => x.id === id);
   if (!t) return [...tokens];
   if (t.layer === "primitive") {
+    if (mode === "dark") return [...tokens];
     return tokens.map((x) => (x.id === id ? { ...x, modes: { light: { value } } } : x));
   }
   return tokens.map((x) => (x.id === id ? { ...x, modes: { ...x.modes, [mode]: { value } } } : x));

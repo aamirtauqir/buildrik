@@ -18,6 +18,7 @@ import {
   useRegistryConfig,
 } from "../TokenRegistryContext";
 import type { DesignToken, TokenKind, TokenCategory, TokenType } from "../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const STORAGE_KEY = "buildrick-design-tokens-persistall-v1";
 
@@ -42,7 +43,7 @@ const KIND_CATEGORY: Array<[TokenKind, TokenCategory, TokenType]> = [
 ];
 
 function seedToken(kind: TokenKind, category: TokenCategory, type: TokenType): DesignToken {
-  return {
+  return v6Token({
     id: `${kind}-seed`,
     name: `${kind} seed`,
     value: kind === "color" ? "#123456" : "42",
@@ -50,7 +51,7 @@ function seedToken(kind: TokenKind, category: TokenCategory, type: TokenType): D
     cssVar: `--bd-${kind}-seed`,
     type,
     kind,
-  };
+  });
 }
 
 const ALL_SEED: DesignToken[] = KIND_CATEGORY.map(([k, c, t]) => seedToken(k, c, t));

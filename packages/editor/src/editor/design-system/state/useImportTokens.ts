@@ -15,6 +15,7 @@
  */
 
 import * as React from "react";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken, TokenKind } from "../types";
 import {
   useColorRegistry, useTypeRegistry, useSpacingRegistry,
@@ -107,7 +108,8 @@ export function useImportTokens(): (incoming: DesignToken[]) => ImportStats {
       if (existingHost) {
         // Carry darkValue so a dark-complete re-import isn't stripped on the
         // modify path (color registry persists it; other kinds ignore it).
-        existingHost.updateToken(t.id, t.value, t.darkValue);
+        const dark = t.modes.dark ? resolveTokenLiteral(incoming, t.id, "dark") ?? undefined : undefined;
+        existingHost.updateToken(t.id, resolveTokenLiteral(incoming, t.id, "light") ?? "", dark);
         stats.modified++;
         continue;
       }

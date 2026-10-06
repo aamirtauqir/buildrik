@@ -2,8 +2,9 @@ import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useTokensForKind } from "../useTokensForKind";
 import type { DesignToken } from "../../types";
+import { v6Token, ownLight } from "@/engine/__tests__/test-utils/v6Token";
 
-const radiusToken: DesignToken = {
+const radiusToken: DesignToken = v6Token({
   id: "radius-md",
   name: "Medium radius",
   value: "8px",
@@ -11,9 +12,9 @@ const radiusToken: DesignToken = {
   cssVar: "--bd-radius-md",
   type: "length",
   kind: "radius",
-};
+});
 
-const colorToken: DesignToken = {
+const colorToken: DesignToken = v6Token({
   id: "color-brand-500",
   name: "Brand 500",
   value: "#2D6DFF",
@@ -21,7 +22,7 @@ const colorToken: DesignToken = {
   cssVar: "--bd-color-brand-500",
   type: "color",
   kind: "color",
-};
+});
 
 describe("useTokensForKind", () => {
   it("filters initial tokens by kind", () => {
@@ -49,7 +50,7 @@ describe("useTokensForKind", () => {
     act(() => result.current.updateToken("radius-md", "12px"));
     expect(result.current.canUndo("radius-md")).toBe(true);
     act(() => result.current.undoToken("radius-md"));
-    expect(result.current.tokens[0].value).toBe("8px");
+    expect(ownLight(result.current.tokens[0])).toBe("8px");
   });
 
   it("redoToken re-applies after undo", () => {
@@ -58,7 +59,7 @@ describe("useTokensForKind", () => {
     act(() => result.current.undoToken("radius-md"));
     expect(result.current.canRedo("radius-md")).toBe(true);
     act(() => result.current.redoToken("radius-md"));
-    expect(result.current.tokens[0].value).toBe("12px");
+    expect(ownLight(result.current.tokens[0])).toBe("12px");
   });
 
   it("markSaved clears dirty state and undo stack", () => {
@@ -73,7 +74,7 @@ describe("useTokensForKind", () => {
     const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
     act(() => result.current.updateToken("radius-md", "12px"));
     act(() => result.current.discardAll());
-    expect(result.current.tokens[0].value).toBe("8px");
+    expect(ownLight(result.current.tokens[0])).toBe("8px");
     expect(result.current.isDirty).toBe(false);
   });
 
@@ -131,7 +132,7 @@ describe("useTokensForKind", () => {
     expect(result.current.tokens).toHaveLength(2);
     const fresh = result.current.tokens.find((t) => t.id === "radius-medium");
     expect(fresh).toBeDefined();
-    expect(fresh?.value).toBe("8px");
+    expect(ownLight(fresh)).toBe("8px");
     expect(fresh?.kind).toBe("radius");
     expect(fresh?.replacedBy).toBeUndefined();
     const old = result.current.tokens.find((t) => t.id === "radius-md");
@@ -157,7 +158,7 @@ describe("useTokensForKind", () => {
   it("addToken surfaces the new id in pendingDiff (no saved counterpart)", () => {
     const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
     act(() =>
-      result.current.addToken({ ...radiusToken, id: "radius-xl", value: "24px" })
+      result.current.addToken(v6Token({ ...radiusToken, id: "radius-xl", value: "24px" }))
     );
     expect(result.current.pendingDiff["radius-xl"]).toBe("24px");
     expect(result.current.isDirty).toBe(true);
@@ -171,13 +172,13 @@ describe("useTokensForKind", () => {
       const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
       act(() =>
         result.current.hydrateFromExternal([
-          { ...radiusToken, value: "99px" },
+          v6Token({ ...radiusToken, value: "99px" }),
           colorToken, // different kind — must be filtered out
         ])
       );
       expect(result.current.tokens).toHaveLength(1);
-      expect(result.current.tokens[0].value).toBe("99px");
-      expect(result.current.savedTokens[0].value).toBe("99px");
+      expect(ownLight(result.current.tokens[0])).toBe("99px");
+      expect(ownLight(result.current.savedTokens[0])).toBe("99px");
       expect(result.current.isDirty).toBe(false);
     });
 
@@ -185,7 +186,7 @@ describe("useTokensForKind", () => {
       const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
       act(() => result.current.updateToken("radius-md", "12px"));
       expect(result.current.isDirty).toBe(true);
-      act(() => result.current.hydrateFromExternal([{ ...radiusToken, value: "10px" }]));
+      act(() => result.current.hydrateFromExternal([v6Token({ ...radiusToken, value: "10px" })]));
       expect(result.current.isDirty).toBe(false);
       expect(result.current.canUndo("radius-md")).toBe(false);
       expect(result.current.canRedo("radius-md")).toBe(false);
@@ -193,7 +194,7 @@ describe("useTokensForKind", () => {
 
     it("applies hydrated values to :root CSS vars", () => {
       const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
-      act(() => result.current.hydrateFromExternal([{ ...radiusToken, value: "42px" }]));
+      act(() => result.current.hydrateFromExternal([v6Token({ ...radiusToken, value: "42px" })]));
       expect(
         document.documentElement.style.getPropertyValue(radiusToken.cssVar)
       ).toBe("42px");
@@ -204,7 +205,7 @@ describe("useTokensForKind", () => {
       act(() => result.current.updateToken("radius-md", "12px"));
       act(() => result.current.hydrateFromExternal([colorToken]));
       // No radius entries in the external set → nothing replaced.
-      expect(result.current.tokens[0].value).toBe("12px");
+      expect(ownLight(result.current.tokens[0])).toBe("12px");
       expect(result.current.isDirty).toBe(true);
       expect(result.current.canUndo("radius-md")).toBe(true);
     });

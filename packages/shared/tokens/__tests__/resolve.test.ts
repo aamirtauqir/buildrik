@@ -15,6 +15,14 @@ describe("setTokenLiteral", () => {
   it("writes a primitive's single literal", () => {
     expect(resolveTokenLiteral(setTokenLiteral([p], "b", "light", "#123"), "b", "light")).toBe("#123");
   });
+  it("a dark write never overwrites a primitive's light literal", () => {
+    expect(resolveTokenLiteral(setTokenLiteral([p], "b", "dark", "#123"), "b", "light")).toBe("#000");
+  });
+  it("writes a semantic token's dark literal and leaves its light alias", () => {
+    const out = setTokenLiteral([p, s1], "s1", "dark", "#FFF");
+    expect(resolveTokenLiteral(out, "s1", "dark")).toBe("#FFF");
+    expect(resolveTokenLiteral(out, "s1", "light")).toBe("#000");
+  });
 });
 
 describe("lightAliasOf", () => {
