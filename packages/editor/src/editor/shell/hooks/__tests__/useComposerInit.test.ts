@@ -557,7 +557,14 @@ describe("useComposerInit — alias validation runs at load (A.2)", () => {
       dsSchemaVersion: 0,
     });
     mockComposer.migration.run.mockReturnValue({
-      project: { tokens: [{ id: "color-primary", aliasOf: "color-blue-500" }, { id: "color-blue-500" }] },
+      /* Rows in the v6 shape: the alias graph the resolver checks lives in
+         `modes` (pre-v6 rows carry `aliasOf` as metadata it does not follow). */
+      project: {
+        tokens: [
+          { id: "color-primary", modes: { light: { alias: "color-blue-500" } } },
+          { id: "color-blue-500", modes: { light: { value: "#2D6DFF" } } },
+        ],
+      },
       newVersion: 1,
     });
 
@@ -583,8 +590,8 @@ describe("useComposerInit — alias validation runs at load (A.2)", () => {
     expect(mockComposer.aliasResolver.validate).toHaveBeenCalledTimes(1);
     const validateArgs = mockComposer.aliasResolver.validate.mock.calls[0][0];
     expect(validateArgs).toEqual([
-      { id: "color-primary", aliasOf: "color-blue-500" },
-      { id: "color-blue-500" },
+      { id: "color-primary", modes: { light: { alias: "color-blue-500" } } },
+      { id: "color-blue-500", modes: { light: { value: "#2D6DFF" } } },
     ]);
 
     const migOrder = mockComposer.migration.run.mock.invocationCallOrder[0];
