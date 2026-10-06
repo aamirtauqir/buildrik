@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { ProjectTokensApplier } from "../ProjectTokensApplier";
-import { mergeProjectTokens } from "../../state/projectTokens";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import type { DesignToken } from "@/engine/designSystem/types";

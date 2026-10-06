@@ -2,7 +2,7 @@
 /**
  * The v5 seed's var names and light values, frozen 2026-10-05. emitTokenCss
  * emits any of these that no current token defines, so an element bound to a
- * seed var whose token was deleted still resolves (siteTokensCSS did the same
+ * seed var whose token was deleted still resolves (the retired siteTokensCSS did the same
  * by appending all 78 DEFAULT_TOKENS). Do not edit: it is a compatibility
  * record, not the seed.
  */

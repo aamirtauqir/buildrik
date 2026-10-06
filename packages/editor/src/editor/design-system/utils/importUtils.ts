@@ -34,7 +34,7 @@ export interface DiffResult {
 }
 
 import { inferKind } from "../state/useImportTokens";
-import { isV6TokenRow } from "../state/projectTokens";
+import { isV6TokenRow } from "@/engine/designSystem/projectTokens";
 
 /* A token with a category outside this set routes to a registry, applies, and
    is then dropped at persist with nothing said — the v6 schema's category enum

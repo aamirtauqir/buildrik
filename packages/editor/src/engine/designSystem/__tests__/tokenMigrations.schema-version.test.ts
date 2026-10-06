@@ -8,7 +8,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { CURRENT_SCHEMA_VERSION, migrateDesignTokens } from "../index";
+import { CURRENT_SCHEMA_VERSION, migrateDesignTokens } from "../tokenMigrations";
 import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
 /** Steps up to v5 read and write legacy rows; v6 is migrateTokensToV6's. */

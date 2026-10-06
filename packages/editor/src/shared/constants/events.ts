@@ -566,6 +566,9 @@ export const EVENTS = {
    *  the only thing that knows, and the topbar sits outside the provider that
    *  holds the staging — so it is announced rather than read. */
   BRAND_DIRTY_CHANGED: "brand:dirty-changed",
+  /** The site's tokens could not be migrated on load: Brand stays on the old
+   *  tokens and refuses edits (spec §10, D17). */
+  DESIGN_SYSTEM_READ_ONLY: "designSystem:readOnly",
   /** Brand checks' "Run checks": lint now, skipping the edit debounce. */
   BRAND_CHECKS_RUN: "brand:checks-run",
   /** A review round went out (send or re-send, any of the three send sites). */
@@ -982,6 +985,7 @@ export interface EventPayloads {
   [EVENTS.UI_CRUMB_CONTEXT]: { label: string } | null;
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
+  [EVENTS.DESIGN_SYSTEM_READ_ONLY]: { reason: string };
   [EVENTS.BRAND_CHECKS_RUN]: void;
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
   [EVENTS.REVIEW_STATUS_RETRY]: void;

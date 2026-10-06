@@ -12,7 +12,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { emitTokenCss } from "@buildrik/shared/tokens";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
-import { mergeProjectTokens } from "../state/projectTokens";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 
 const STYLE_ID = "bk-site-tokens";
 

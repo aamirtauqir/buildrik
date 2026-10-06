@@ -101,7 +101,7 @@ function buildPreview(
   darkStrategy: DarkStrategy,
 ): string {
   if (format === "css") {
-    return bundler.bundle(tokens, { darkStrategy, pretty: true });
+    return bundler.bundle(tokens, { darkStrategy });
   }
   return buildExport(tokens, format).content;
 }

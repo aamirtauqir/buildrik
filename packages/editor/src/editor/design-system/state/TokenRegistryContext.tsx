@@ -16,8 +16,8 @@
 import * as React from "react";
 import type { DesignToken } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
-import { CURRENT_SCHEMA_VERSION } from "../migrations";
-import { mergeProjectTokens } from "./projectTokens";
+import { CURRENT_SCHEMA_VERSION } from "@/engine/designSystem/tokenMigrations";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import { EVENTS } from "@/shared/constants/events";
 import { useColorTokens } from "./useColorTokens";
 import type { ColorTokensState, ColorTokensActions } from "./useColorTokens";

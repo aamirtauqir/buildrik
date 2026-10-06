@@ -1,51 +1,21 @@
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { emitTokenCss } from "@buildrik/shared/tokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 
 export interface BundleOptions {
   /**
-   * Strategy for dark-mode emission:
-   *   - "media": emit dark block under `@media (prefers-color-scheme: dark)`
-   *   - "data-attr": emit dark block under `:root[data-theme="dark"]`
-   *   - "off": skip dark block entirely (light only)
-   * Default: "media".
+   * Which dark block to ship:
+   *   - "media": `@media (prefers-color-scheme: dark)` (default)
+   *   - "data-attr": `:root[data-theme="dark"]`
+   *   - "off": light only
    */
   darkStrategy?: "media" | "data-attr" | "off";
-  /**
-   * Pretty-print or single-line. Default: pretty.
-   */
-  pretty?: boolean;
-}
-
-const DEFAULT_OPTIONS: Required<BundleOptions> = {
-  darkStrategy: "media",
-  pretty: true,
-};
-
-function escapeCssValue(value: string): string {
-  // Reject control chars + closing-brace injection. CSS values shouldn't
-  // contain `{`, `}`, or unescaped backslashes anyway.
-  // eslint-disable-next-line no-control-regex -- control-char stripping is the intent
-  return value.replace(/[\x00-\x1f\x7f{}]/g, "");
-}
-
-function isColorToken(t: DesignToken): boolean {
-  return t.category === "colors" || t.kind === "color";
 }
 
 /**
  * D5: CSSBundler — emits a publish-ready CSS bundle from project tokens.
  *
- * Output structure:
- *   :root {
- *     --buildrick-design-color-primary: #3B82F6;
- *     ...
- *   }
- *   @media (prefers-color-scheme: dark) {
- *     :root {
- *       --buildrick-design-color-primary: #60A5FA;
- *       ...
- *     }
- *   }
+ * Delegates to `emitTokenCss` — the one emitter the canvas and every export
+ * share — so a bundle can never disagree with the canvas about a value.
  *
  * Used at publish time (Phase 1c+) to inject the active DS into the
  * generated site bundle, so Buildrik-generated pages style themselves
@@ -56,38 +26,16 @@ function isColorToken(t: DesignToken): boolean {
  */
 export class CSSBundler {
   bundle(tokens: readonly DesignToken[], options: BundleOptions = {}): string {
-    const opts = { ...DEFAULT_OPTIONS, ...options };
-    const indent = opts.pretty ? "  " : "";
-    const nl = opts.pretty ? "\n" : "";
-
-    // Light block — every token contributes its light literal.
-    const lightLines: string[] = [];
-    for (const t of tokens) {
-      lightLines.push(`${indent}${t.cssVar}: ${escapeCssValue(resolveTokenLiteral(tokens, t.id, "light") ?? "")};`);
-    }
-
-    let bundle = `:root {${nl}${lightLines.join(nl)}${nl}}`;
-
-    // Dark block — only color tokens with a dark mode. Skip if strategy=off.
-    if (opts.darkStrategy !== "off") {
-      const darkColorLines: string[] = [];
-      for (const t of tokens) {
-        if (!isColorToken(t)) continue;
-        if (!t.modes.dark) continue;
-        darkColorLines.push(`${indent}${indent}${t.cssVar}: ${escapeCssValue(resolveTokenLiteral(tokens, t.id, "dark") ?? "")};`);
-      }
-
-      if (darkColorLines.length > 0) {
-        if (opts.darkStrategy === "media") {
-          bundle += `${nl}@media (prefers-color-scheme: dark) {${nl}${indent}:root {${nl}${darkColorLines.join(nl)}${nl}${indent}}${nl}}`;
-        } else {
-          // data-attr: :root[data-theme="dark"] { ... }
-          const dataAttrLines = darkColorLines.map((l) => l.replace(`${indent}${indent}`, indent));
-          bundle += `${nl}:root[data-theme="dark"] {${nl}${dataAttrLines.join(nl)}${nl}}`;
-        }
-      }
-    }
-
-    return bundle;
+    const { darkStrategy = "media" } = options;
+    const css = emitTokenCss(tokens, {
+      darkMode: darkStrategy === "off" ? "off" : "auto",
+      onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
+    });
+    // The emitter writes both dark blocks, one per line; a strategy keeps one.
+    const drop = darkStrategy === "media" ? ":root[data-theme" : "@media";
+    return css
+      .split("\n")
+      .filter((line) => !line.startsWith(drop))
+      .join("\n");
   }
 }

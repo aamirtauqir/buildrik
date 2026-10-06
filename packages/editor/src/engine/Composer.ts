@@ -35,7 +35,7 @@ import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
-import { RESET_CSS, siteFontCSS, siteFontFaceCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
+import { RESET_CSS, siteFontCSS, siteFontFaceCSS, emitSiteTokenCss, googleFontsHeadLinks, siteFontsFromSettings } from "./export/ExportHelpers";
 import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
@@ -188,6 +188,10 @@ export class Composer extends EventEmitter {
     readonly interactions: InteractionManager;
   };
   readonly designSystem!: {
+    /** True when the site's tokens failed to migrate on load: Brand shows the
+     *  old tokens and refuses edits. Set by the load path, announced with
+     *  `EVENTS.DESIGN_SYSTEM_READ_ONLY`. */
+    readOnly: boolean;
     readonly tokenUsage: TokenUsageTracker;
     readonly lintState: LintState;
     readonly tokenBindingResolver: TokenBindingResolver;
@@ -292,6 +296,7 @@ export class Composer extends EventEmitter {
     const lintState = new LintState();
     const tokenBindingResolver = new TokenBindingResolver();
     this.designSystem = {
+      readOnly: false,
       tokenUsage,
       lintState,
       tokenBindingResolver,
@@ -743,12 +748,13 @@ export class Composer extends EventEmitter {
     // reopened: the export learned to emit the three font slots and to fetch
     // the families that need fetching, and this document — the one the preview
     // renders — kept building a head with neither.
-    const fonts = siteFontsFromTokens(this.getProjectSettings?.()?.designTokens);
+    const projectSettings = this.getProjectSettings?.();
+    const fonts = siteFontsFromSettings(projectSettings);
     /* Preview builds its own document, so it needs the token definitions too —
        otherwise the preview and the published page disagree on every value a
        Brand preset binds. */
     const siteCss =
-      siteTokensCSS(this.getProjectSettings?.()?.designTokens) + siteFontCSS(fonts);
+      emitSiteTokenCss(projectSettings) + siteFontCSS(fonts);
     // The HTML too, not just the CSS: this document carries element styles
     // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
     // a style attribute and nowhere in the stylesheet.

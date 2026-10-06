@@ -81,9 +81,9 @@ import {
 } from "../state/StylePresetRegistryContext";
 import type { DesignToken, StylePreset, TokenKind } from "../types";
 import { useTokenUsageMap } from "../state/useTokenUsageMap";
-import { CURRENT_SCHEMA_VERSION } from "../migrations";
+import { CURRENT_SCHEMA_VERSION } from "@/engine/designSystem/tokenMigrations";
 import type { TokensForKindRegistry } from "../state/useTokensForKind";
-import { mergeProjectTokens } from "../state/projectTokens";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils";
 import { APPLY_CHANGES_LABEL, DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
@@ -413,7 +413,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       }
 
       if (settings.designTokens && settings.designTokens.length > 0) {
-        // The merge lives in state/projectTokens so ProjectTokensApplier —
+        // The merge lives in engine/designSystem/projectTokens so ProjectTokensApplier —
         // which runs this at project load, not at mount — shares it.
         const merged = mergeProjectTokens(settings.designTokens, storedVersion);
         // C1 fix: single fan-out resets all 14 kinds atomically. Internally:

@@ -7,11 +7,13 @@
  * The document is the same one Quick preview shows (`composer.exportHTML`,
  * through the same sanitizer), in a frame that runs no script. The staged
  * tokens reach it as ONE `:root{…}` block appended to its head — later than
- * the saved `siteTokensCSS`, so it wins the cascade — and that block is
+ * the saved token CSS, so it wins the cascade — and that block is
  * rewritten in place on every edit instead of reloading the frame, which is
  * what keeps a keystroke in a hex field from flashing the page white.
  *
- * Dark preview (`mode`) swaps in each token's `darkValue` where it has one;
+ * Dark preview (`mode`) is the emitter's `data-theme="dark"` block, switched on
+ * by setting `data-theme` on the frame's root, so each token with a dark mode
+ * shows it;
  * the Colour mode page's Light / Dark switch drives it (7316:80949 draws the
  * switch INSIDE this card, so it comes in as `controls`).
  *
@@ -21,7 +23,7 @@
 import * as React from "react";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS, DOCUMENT_CHANGED_EVENTS } from "@/shared/constants/events";
-import { siteTokensCSS } from "@/engine/export/ExportHelpers";
+import { emitTokenCss } from "@buildrik/shared/tokens";
 import { sanitizeHTMLForPreview } from "@/editor/export/ExportUtils";
 import { Select, type CustomFlowbiteTheme } from "@/editor/chrome-ui";
 import type { DesignToken } from "../types";
@@ -81,7 +83,7 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
   const [doc, setDoc] = React.useState<string>("");
   const frameRef = React.useRef<HTMLIFrameElement | null>(null);
   /* Every `--buildrick-design-*` the draft carries, resolved for the mode. */
-  const stagedCSS = React.useMemo(() => siteTokensCSS(tokens, mode), [tokens, mode]);
+  const stagedCSS = React.useMemo(() => emitTokenCss(tokens, { darkMode: "auto" }), [tokens]);
 
   /* The document follows the canvas: rebuilt on load and on every document
      mutation (a page switch is a `project:changed` too), debounced so a burst
@@ -122,7 +124,8 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
       frameDoc.head.appendChild(el);
     }
     el.textContent = stagedCSS;
-  }, [stagedCSS]);
+    frameDoc.documentElement.setAttribute("data-theme", mode);
+  }, [stagedCSS, mode]);
   React.useEffect(() => {
     writeStaged();
   }, [writeStaged]);

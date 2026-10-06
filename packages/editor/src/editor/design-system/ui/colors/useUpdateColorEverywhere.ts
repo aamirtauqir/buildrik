@@ -3,7 +3,7 @@
  * changes a Brand colour token for the whole site, the way Brand's Save does
  * for one token: the project's saved `designTokens` take the value (the
  * code contract — `projectSettings.designTokens` is where a site's brand
- * lives, see state/projectTokens.ts), and the colour registry follows so the
+ * lives, see engine/designSystem/projectTokens.ts), and the colour registry follows so the
  * canvas re-renders the var at once.
  *
  * The write goes over the merged v6 list (`mergeProjectTokens`): a lone row
@@ -20,8 +20,8 @@ import * as React from "react";
 import { setTokenLiteral } from "@buildrik/shared/tokens";
 import type { Composer } from "@/engine/Composer";
 import { useColorRegistry } from "../../state/TokenRegistryContext";
-import { mergeProjectTokens } from "../../state/projectTokens";
-import { CURRENT_SCHEMA_VERSION } from "../../migrations";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
+import { CURRENT_SCHEMA_VERSION } from "@/engine/designSystem/tokenMigrations";
 
 export function useUpdateColorEverywhere(composer: Composer | null | undefined): (tokenId: string, hex: string) => void {
   const color = useColorRegistry();

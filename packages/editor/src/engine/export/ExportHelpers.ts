@@ -7,9 +7,17 @@
 import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
 import { THEME } from "../../shared/constants/defaultStyles";
 import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
-import { DEFAULT_TOKENS } from "../designSystem/defaultTokens";
+import { resolveTokenLiteral, emitTokenCss } from "@buildrik/shared/tokens";
+import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
+import { mergeProjectTokens } from "../designSystem/projectTokens";
 import type { DesignToken } from "../designSystem/types";
+
+/** The slice of project settings the token emitters read. */
+export interface SiteTokenSettings {
+  designTokens?: readonly unknown[];
+  designTokensSchemaVersion?: number;
+  darkMode?: unknown;
+}
 
 // ============================================================================
 // RESET CSS
@@ -49,6 +57,21 @@ export function siteFontsFromTokens(
 }
 
 /**
+ * The font slots and text colour the SITE saved. Read off the merged v6 list,
+ * but only for tokens the site actually carries: the seed's Inter must not
+ * become a rule on every export, or "a missing token leaves the reset's family
+ * in place" (`siteFontCSS`) could never be true.
+ */
+export function siteFontsFromSettings(
+  settings: SiteTokenSettings | undefined
+): ReturnType<typeof siteFontsFromTokens> {
+  const savedIds = new Set(
+    tokenList(settings?.designTokens).map((r) => (r as { id?: unknown } | null)?.id)
+  );
+  return siteFontsFromTokens(resolveSiteTokens(settings).filter((t) => savedIds.has(t.id)));
+}
+
+/**
  * The site's own font rules, from its three font tokens.
  *
  * RESET_CSS names one hardcoded family for every site ever exported. The Brand
@@ -82,51 +105,29 @@ export function siteFontCSS(fonts: {
 }
 
 /**
- * The site's design tokens, as the custom properties a published page needs.
- *
- * The Brand panel writes every token into the project ("Apply Changes to go
- * live") and the canvas paints from them — but nothing emitted their
- * DEFINITIONS into an export. Measured on a site whose Text Primary token was
- * changed: the value reached project settings and the canvas custom property,
- * while the exported document contained no `--buildrick-design-*` declaration
- * at all. Any style bound to a token — every Brand preset and class binding —
- * therefore resolved to nothing once the page left the editor.
- *
- * The SEED is declared too, under the site's own values. A site saves only
- * the tokens it has touched, while element defaults name seed tokens the
- * Brand panel never writes (`btn-height-md`, `input-radius`, …) — the canvas
- * resolves those from `design.css`, the export resolved them to nothing:
- * every exported and published button was 24px tall with no padding and no
- * radius (BRD-23). Same merge as the canvas's (`mergeProjectTokens`): a saved
- * row wins by cssVar, and a saved row's value reaches its seed's cssVar by id.
- *
- * A token value is user data, so it is stripped of the characters that could
- * leave its declaration: `;` and `}` end the declaration or the rule, `{`
- * opens a block, and `<` could close the surrounding `</style>`.
+ * The site's tokens as every export and the preview must see them: what the
+ * project saved, merged over the seed and migrated to v6 — the same list the
+ * canvas paints from. A site saves only the tokens it touched, while element
+ * defaults name seed tokens (`btn-height-md`, `input-radius`, …), so an export
+ * that read the saved rows alone declared none of them (BRD-23).
  */
-export function siteTokensCSS(
-  tokens: readonly DesignToken[] | null = [],
-  mode: "light" | "dark" = "light"
-): string {
-  const saved = tokenList(tokens);
-  const savedIds = new Set(saved.map((t) => t.id));
-  const literal = (t: DesignToken) =>
-    (savedIds.has(t.id) ? resolveTokenLiteral(saved, t.id, mode) : null) ||
-    resolveTokenLiteral(DEFAULT_TOKENS, t.id, "light");
-  const decls: string[] = [];
-  const seen = new Set<string>();
-  for (const t of [...saved, ...DEFAULT_TOKENS]) {
-    const value = (literal(t) ?? "").trim().replace(/[;{}<]/g, "");
-    /* A merged duplicate's old var (v6 `legacyNames`) is still read by pages
-       saved before the merge, so it is declared alongside. */
-    for (const cssVar of [t.cssVar, ...(t.legacyNames ?? [])]) {
-      const name = cssVar.trim();
-      if (!name.startsWith("--") || !value || seen.has(name)) continue;
-      seen.add(name);
-      decls.push(`${name}:${value}`);
-    }
-  }
-  return decls.length ? `\n:root{${decls.join(";")}}\n` : "";
+function resolveSiteTokens(settings: SiteTokenSettings | undefined): DesignToken[] {
+  return mergeProjectTokens(settings?.designTokens ?? [], settings?.designTokensSchemaVersion);
+}
+
+/**
+ * The token definitions a published page needs, written by the one emitter the
+ * canvas also uses (spec §2). The Brand panel writes every token into the
+ * project and the canvas paints from them, so an export that names
+ * `var(--buildrick-design-*)` without declaring it resolves to nothing once
+ * the page leaves the editor. The site's Dark mode decides whether dark blocks
+ * ship; a token the emitter cannot write is skipped and reported, never thrown.
+ */
+export function emitSiteTokenCss(settings: SiteTokenSettings | undefined): string {
+  return emitTokenCss(resolveSiteTokens(settings), {
+    darkMode: DarkModeSchema.catch("off").parse(settings?.darkMode),
+    onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
+  });
 }
 
 /**

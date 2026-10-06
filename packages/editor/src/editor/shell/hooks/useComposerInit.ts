@@ -16,6 +16,11 @@ import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
 import { importMigratedProject } from "@/editor/design-system";
+import { migrateTokensToV6, TokenMigrationError } from "@buildrik/shared/tokens";
+import { TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
+import { migrateDesignTokens } from "@/engine/designSystem/tokenMigrations";
+import { isV6TokenRow } from "@/engine/designSystem/projectTokens";
+import { captureError } from "@/shared/utils/errorTracking";
 import {
   getSiteIdFromUrl,
   isSaveConflictPending,
@@ -68,6 +73,34 @@ export interface UseComposerInitParams {
   /** Board 813:4870: a mid-session 401 during AUTOSAVE opens the blocking
    *  recovery surface. Same back-compat shape as onLoadError. */
   onAuthExpired?: () => void;
+}
+
+/** Spec §10 (D17): a site whose tokens cannot be migrated still opens — old
+ *  tokens, Brand read-only, a Sentry event. Never a half-migrated save. */
+export function loadTokensSafely<
+  S extends { designTokens?: unknown; designTokensSchemaVersion?: number; darkMode?: unknown },
+>(settings: S, siteId: string): { settings: S; readOnly: boolean; reason?: string } {
+  const from = settings.designTokensSchemaVersion ?? 1;
+  const rows = settings.designTokens;
+  if (rows === undefined || from >= TOKENS_SCHEMA_VERSION) return { settings, readOnly: false };
+  try {
+    const alreadyV6 = Array.isArray(rows) && rows.length > 0 && rows.every(isV6TokenRow);
+    const v5 = from < 5 && Array.isArray(rows) ? migrateDesignTokens(rows, from, 5) : rows;
+    const designTokens = alreadyV6 ? rows : migrateTokensToV6(v5);
+    return {
+      settings: {
+        ...settings,
+        designTokens,
+        designTokensSchemaVersion: TOKENS_SCHEMA_VERSION,
+        darkMode: settings.darkMode ?? "off",
+      },
+      readOnly: false,
+    };
+  } catch (err) {
+    const reason = err instanceof TokenMigrationError ? err.reason : String(err);
+    captureError(err instanceof Error ? err : new Error(reason), { siteId, fromVersion: from, reason });
+    return { settings, readOnly: true, reason };
+  }
 }
 
 export function useComposerInit(params: UseComposerInitParams): Composer | null {
@@ -193,9 +226,16 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // editor still loads — DS migrations are forward-fix, not load-gating.
             // The run-then-import step is shared with the migration modal's
             // Restore / Retry (A2), so a re-run lands tokens the way this does.
+            /* Token migration (v1–v5 → v6) is part of the imported project, so
+               it lands before history starts recording: ⌘Z after load cannot
+               revert it. */
+            const tokenLoad = data.settings ? loadTokensSafely(data.settings, siteId) : null;
+            const loaded: ProjectData =
+              tokenLoad && tokenLoad.settings !== data.settings ? { ...data, settings: tokenLoad.settings } : data;
+            const tokensMigrated = loaded !== data;
             let migrated = false;
             try {
-              migrated = importMigratedProject(instance, data, siteId);
+              migrated = importMigratedProject(instance, loaded, siteId);
             } catch (err) {
               console.error("[BuildrikSync] DS migration failed:", err);
               addToastRef.current({
@@ -203,7 +243,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 description: "Could not update design system schema. Loaded as-is.",
                 tone: "warning",
               });
-              instance.importProject(data);
+              instance.importProject(loaded);
+            }
+            if (tokenLoad?.readOnly) {
+              instance.designSystem.readOnly = true;
+              instance.emit(EVENTS.DESIGN_SYSTEM_READ_ONLY, { reason: tokenLoad.reason ?? "token migration failed" });
             }
             // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"
             // instead of "Not saved" on fresh load. The just-loaded state IS
@@ -260,7 +304,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                "Updating your project" modal returned on every open (walk A2,
                2026-09-24). A project:changed schedules the autosave that
                persists it — once; the next load is at the target and skips. */
-            if (migrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
+            if (migrated || tokensMigrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
             // Phase B3: hydrate media library from server. Additive — never
             // throws. Returns null on offline/auth/unconfigured; we just
             // keep going with engine-only state in that case.

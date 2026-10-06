@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../index";
+import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../tokenMigrations";
 import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
 /** Steps up to v5 read and write legacy rows; v6 is migrateTokensToV6's. */

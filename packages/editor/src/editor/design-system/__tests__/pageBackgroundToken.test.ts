@@ -17,7 +17,7 @@ import { ExportEngine } from "@/engine/export/ExportEngine";
 import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
 import { colourTokenLabel } from "@/editor/inspector/shared/controls/ColorInput";
 import { DEFAULT_TOKENS } from "../constants";
-import { mergeProjectTokens } from "../state/projectTokens";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import { buildContrastIssues } from "../utils/contrastLint";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 

@@ -14,7 +14,7 @@ import { cssVarToTokenId, extractVarName, resolveTokenVar } from "../../shared/t
 import { getDOMElement } from "@/engine/canvas/resize/utils";
 import { parseColor } from "@/shared/utils/parsers/colorParser";
 import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
-import { mergeProjectTokens } from "@/editor/design-system/state/projectTokens";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 import type { Composer } from "@/engine";
 import { colourTokenLabel } from "../../shared/controls/ColorInput";

@@ -7,7 +7,7 @@
 import { describe, it, expect } from "vitest";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { mergeProjectTokens } from "../projectTokens";
-import { DEFAULT_TOKENS } from "../../constants";
+import { DEFAULT_TOKENS } from "../defaultTokens";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 describe("mergeProjectTokens", () => {

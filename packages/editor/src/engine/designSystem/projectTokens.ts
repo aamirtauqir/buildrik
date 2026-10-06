@@ -17,9 +17,9 @@
 
 import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
 import { TokenMigrationError } from "@buildrik/shared/tokens";
-import type { DesignToken } from "../types";
-import { DEFAULT_TOKENS } from "../constants";
-import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../migrations";
+import type { DesignToken } from "./types";
+import { DEFAULT_TOKENS } from "./defaultTokens";
+import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "./tokenMigrations";
 
 const warnedReasons = new Set<string>();
 

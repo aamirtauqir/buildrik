@@ -21,7 +21,7 @@ import * as React from "react";
 import { APPLY_CHANGES_LABEL } from "../DesignTabFooter";
 import { BrandWorkspace } from "../BrandWorkspace";
 import { useButtonPresets } from "../../state/StylePresetRegistryContext";
-import { CURRENT_SCHEMA_VERSION } from "../../migrations";
+import { CURRENT_SCHEMA_VERSION } from "@/engine/designSystem/tokenMigrations";
 import {
   installDomShims,
   makeFakeComposer,

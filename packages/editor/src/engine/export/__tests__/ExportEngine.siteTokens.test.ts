@@ -16,10 +16,13 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { siteTokensCSS } from "../ExportHelpers";
+import { emitSiteTokenCss } from "../ExportHelpers";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
-describe("siteTokensCSS", () => {
+const siteTokensCSS = (designTokens?: unknown[] | null) =>
+  emitSiteTokenCss({ designTokens: designTokens ?? undefined });
+
+describe("emitSiteTokenCss", () => {
   it("declares every token that has a cssVar", () => {
     const css = siteTokensCSS([
       v6Token({ id: "color-text-primary", cssVar: "--buildrick-design-color-text-primary", value: "#22AA66" }),
@@ -37,41 +40,35 @@ describe("siteTokensCSS", () => {
     for (const css of [siteTokensCSS([]), siteTokensCSS(), siteTokensCSS(null)]) {
       expect(css).toContain("--buildrick-design-btn-height-md:40px");
       expect(css).toContain("--buildrick-design-input-radius:8px");
-      expect(css).toContain("--buildrick-design-color-primary:#1A56DB");
+      expect(css).toContain("--buildrick-design-color-brand-500:#1A56DB");
+      expect(css).toContain("--buildrick-design-color-primary:var(--buildrick-design-color-brand-500)");
     }
   });
 
-  it("a saved value wins over the seed, by cssVar and by id", () => {
-    expect(siteTokensCSS([v6Token({ id: "my-radius", cssVar: "--buildrick-design-btn-radius", value: "2px" })])).toContain(
-      "--buildrick-design-btn-radius:2px"
-    );
-    /* A saved row whose cssVar is not the seed's still feeds the seed's name. */
-    const css = siteTokensCSS([v6Token({ id: "btn-radius", cssVar: "--legacy-btn-radius", value: "3px" })]);
-    expect(css).toContain("--legacy-btn-radius:3px");
-    expect(css).toContain("--buildrick-design-btn-radius:3px");
+  it("a saved value wins over the seed", () => {
+    const seed = siteTokensCSS([]);
+    expect(seed).toContain("--buildrick-design-btn-radius:8px");
+    const css = siteTokensCSS([v6Token({ id: "btn-radius", cssVar: "--buildrick-design-btn-radius", value: "2px" })]);
+    expect(css).toContain("--buildrick-design-btn-radius:2px");
     expect(css).not.toContain("--buildrick-design-btn-radius:8px");
   });
 
-  it("skips records with no cssVar or no value rather than writing `:undefined`", () => {
+  /* A saved list with an unusable row is not half-applied: it falls back to
+     the seed (mergeProjectTokens, D17), so the export never writes
+     `:undefined` and never loses the seed either. */
+  it("an unusable saved row falls back to the seed rather than writing `:undefined`", () => {
     const css = siteTokensCSS([
       v6Token({ id: "no-var", cssVar: "", value: "#fff" }),
-      v6Token({ id: "color-x", cssVar: "--buildrick-design-color-x", value: "" }),
-      v6Token({ id: "color-y", cssVar: "color-y", value: "#000" }),
       v6Token({ id: "ok", cssVar: "--buildrick-design-ok", value: "#123456" }),
     ]);
-    expect(css.startsWith("\n:root{--buildrick-design-ok:#123456;")).toBe(true);
-    expect(css).not.toContain("--buildrick-design-color-x:");
-    expect(css).not.toContain("color-y");
+    expect(css).toContain("--buildrick-design-btn-height-md:40px");
     expect(css).not.toContain("undefined");
+    expect(css).not.toContain("--buildrick-design-ok:");
   });
 
-  it("keeps the first declaration when a cssVar repeats", () => {
-    const css = siteTokensCSS([
-      v6Token({ id: "color-a", cssVar: "--buildrick-design-color-a", value: "#111111" }),
-      v6Token({ id: "color-a-again", cssVar: "--buildrick-design-color-a", value: "#222222" }),
-    ]);
-    expect(css).toContain("--buildrick-design-color-a:#111111");
-    expect(css).not.toContain("#222222");
+  it("skips a token whose value is empty", () => {
+    const css = siteTokensCSS([v6Token({ id: "color-x", cssVar: "--buildrick-design-color-x", value: "" })]);
+    expect(css).not.toContain("--buildrick-design-color-x:");
   });
 
   /* A token value is user data. It must not be able to end its declaration,
@@ -79,15 +76,23 @@ describe("siteTokensCSS", () => {
   it("strips the characters that would let a value escape its declaration", () => {
     expect(
       siteTokensCSS([v6Token({ id: "x", cssVar: "--buildrick-design-x", value: "red;} body{display:none" })])
-    ).toContain(":root{--buildrick-design-x:red bodydisplay:none;");
+    ).toContain("--buildrick-design-x:red bodydisplay:none");
   });
 
-  it("cannot close the style element", () => {
+  it("cannot close the style element, by value or by custom-property name", () => {
     const css = siteTokensCSS([
       v6Token({ id: "x", cssVar: "--buildrick-design-x", value: "red</style><script>go()</script>" }),
+      v6Token({ id: "y", cssVar: "--y:red}</style><script>", value: "#000" }),
     ]);
     expect(css).not.toContain("</style>");
     expect(css).not.toContain("<script");
+  });
+
+  it("ships dark blocks only when the site's Dark mode is auto", () => {
+    const tokens = [v6Token({ id: "color-primary", cssVar: "--buildrick-design-color-primary", value: "#111111", dark: "#EEEEEE" })];
+    expect(emitSiteTokenCss({ designTokens: tokens, darkMode: "off" })).not.toContain("prefers-color-scheme");
+    expect(emitSiteTokenCss({ designTokens: tokens, darkMode: "auto" })).toContain("prefers-color-scheme: dark");
+    expect(emitSiteTokenCss({ designTokens: tokens, darkMode: "bogus" })).not.toContain("prefers-color-scheme");
   });
 });
 
