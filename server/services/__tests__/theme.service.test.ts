@@ -416,7 +416,7 @@ describe("listSiteThemeSnapshots (D2)", () => {
     snapFindMany.mockResolvedValueOnce([{ id: "a", createdAt: new Date() }]);
     const res = await listSiteThemeSnapshots("w1", "s1");
     expect(res).toHaveLength(1);
-    expect(snapFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1" });
+    expect(snapFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1", reason: "theme-push" });
   });
 });
 
