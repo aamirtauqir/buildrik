@@ -28,3 +28,12 @@ Re-map each stale surface to its v3 node (`boards.json` rows with `page: 4418:45
 the specs whose boards were deleted, then refresh. Refreshing by the stored nodeIds is impossible.
 
 Figma calls used: 19 of the 150 budget. Tooling used: scratch fetch script on `scripts/baseline/figma-mcp.mjs`.
+
+## Resolution (owner decision 2026-10-07): RETIRE
+
+- 308 stale specs retired: removed `raw-figma/<s>.json` and `specs/<s>.json` for each (616 files).
+- 165 recipes in `surfaces/` removed (every recipe that joined to a retired spec; none mixed retired with live specs) and their `.conformance-baseline.json` keys.
+- `boards.json`: 291 active/design-ahead V1 rows marked `state: superseded`, `status: out-of-scope`, `authority: superseded:v3-4418:45431`, `recipe: null`, reason "V1 node deleted — superseded by Editor v3 page 4418:45431 (owner 2026-10-07)" (same fields as 807:8723); 15 already retired/out-of-scope rows only lost their recipe. Counts recomputed; `coveredFloor` 204 -> 39 (recipes removed with their specs). No v3 or Clone page row touched.
+- `.hex-drift-baseline.json` re-recorded (106 pairs belonged to the retired captures).
+- Topbar (681:26, RETIRED in Figma) retired the same way; its v3 replacement is 4418:144989, to be re-pointed when the topbar is next built.
+- Gates after: check-spec-age exit 0 (36 specs), check-boards 0, check-anchors 0, `npm run verify:ds` exit 0.

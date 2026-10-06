@@ -539,10 +539,4 @@ root cause is fixed in `466158dd`; these are the rest.
 
 ## Design conformance
 
-- [ ] **Refresh stale Figma conformance specs (spec-age gate).** On 2026-10-06
-  `check-spec-age.mjs --mode=prepush` reported 308 of 344 specs older than 14
-  days and blocked the push of 399 commits whose code gates (verify:ds, gate:ds,
-  gate:figma, gate:trpc-orphans, tsc) all passed. The owner chose
-  `git push --no-verify` for that push. Re-extract with `get_design_context` +
-  `scripts/conformance/extract.mjs <surface>`; the Figma MCP budget is ~200
-  calls/day, so plan it over ~2 days, highest-traffic surfaces first.
+- [x] **Refresh stale Figma conformance specs (spec-age gate).** Done 2026-10-07: retired 308 dead V1 specs (their Figma nodes were deleted; 165 recipes and 306 boards.json rows superseded by Editor v3 page 4418:45431, owner decision). v3 specs are created per surface by the build loop. See docs/design-jobs/SPEC-REFRESH-2026-10-07.md.
