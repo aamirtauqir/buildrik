@@ -486,7 +486,7 @@ export async function setPrimaryDomain(id: string, siteId: string) {
  */
 export async function verifyPendingDomains(limit = 20): Promise<{ checked: number; verified: number }> {
   const due = await prisma.domain.findMany({
-    where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }] },
+    where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }], site: { deletedAt: null } },
     orderBy: [{ lastCheckedAt: { sort: "asc", nulls: "first" } }],
     take: limit,
     select: { id: true, siteId: true },

@@ -783,7 +783,7 @@ describe("verifyPendingDomains — the dns-verify cron", () => {
     await expect(verifyPendingDomains(20)).resolves.toEqual({ checked: 2, verified: 2 });
 
     expect(db.domain.findMany).toHaveBeenCalledWith({
-      where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }] },
+      where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }], site: { deletedAt: null } },
       orderBy: [{ lastCheckedAt: { sort: "asc", nulls: "first" } }],
       take: 20,
       select: { id: true, siteId: true },
