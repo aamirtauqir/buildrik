@@ -7,8 +7,9 @@ import { QA_EMAIL } from "./accounts";
 
 /**
  * Brand Part 1a, flows 1 and 2 (spec §5, test 36). Needs a dashboard started
- * with `BRAND_TOKENS_V2=on`: both flows open a v5 site, which migrates on load
- * only when the server says so. With the switch off the site opens read-only
+ * with the switch on for the QA workspace (`BRAND_TOKENS_V2=on`, or its id in
+ * `BRAND_TOKENS_V2_WORKSPACES`): both flows open a v5 site, which migrates on
+ * load only when the server says so. With the switch off the site opens read-only
  * and `openBrand` fails with "BRAND_TOKENS_V2 is off on the test server".
  *
  * Run LOCALLY ONLY — it seeds sites through this machine's database:
@@ -134,6 +135,19 @@ const canvasColour = (page: Page, id: string, prop: "backgroundColor" | "color")
     [id, prop] as const,
   );
 
+/** The single-file HTML the editor's own Export dialog downloads (Site menu →
+ *  Export site… → the default HTML format's primary button). */
+async function downloadSingleFileExport(page: Page): Promise<string> {
+  await page.getByTestId("site-menu-trigger").click();
+  await page.getByTestId("site-menu-export-code").click();
+  const primary = page.getByTestId("export-primary");
+  await expect(primary).toBeEnabled({ timeout: 30_000 });
+  const [download] = await Promise.all([page.waitForEvent("download"), primary.click()]);
+  const file = await download.path();
+  if (!file) throw new Error("export download has no file");
+  return fs.readFileSync(file, "utf8");
+}
+
 /** Opens Brand and fails fast when the server's kill switch is off: a v5
  *  site then opens read-only with the paused notice instead of migrating. */
 async function openBrand(page: Page) {
@@ -207,31 +221,43 @@ test.describe("Brand Part 1a", () => {
       .toBe(6);
     expect(await prisma.siteThemeSnapshot.count({ where: { siteId, reason: "migration" } })).toBe(1);
 
-    // The Brand live preview is the export document (`composer.exportHTML`).
-    const frame = page.frameLocator('[data-testid="brand-live-preview-frame"] iframe');
-    await frame.locator('[data-buildrick-id="e2e-brand-button"]').waitFor({ timeout: 30_000 });
-    const exported = await frame.locator("html").evaluate((root) => root.outerHTML);
+    /* The real export: the single-file HTML the editor's Export dialog
+       downloads. It is loaded on its own in a fresh page — not the Brand live
+       preview, whose staged block (always Dark "auto") sits on top of the
+       export and would answer instead of it — with the colour scheme pinned
+       both ways, so no prefers-color-scheme block can decide the result. */
+    // Brand is a full-page view over the header; leave it for the Site menu.
+    await page.getByTestId("brand-back-link").click();
+    await expect(page.getByTestId("brand-panel")).toHaveCount(0);
+    const exported = await downloadSingleFileExport(page);
+    expect(exported).toContain("--buildrick-design-");
     expect(exported).not.toContain("prefers-color-scheme");
+    expect(exported).not.toContain("data-bk-staged");
 
-    const resolve = (vars: string[]) =>
-      frame.locator("body").evaluate((body, vs) => {
+    const exportPage = await page.context().newPage();
+    await exportPage.route("**/*", (route) => route.abort());
+    for (const colorScheme of ["light", "dark"] as const) {
+      await exportPage.emulateMedia({ colorScheme });
+      await exportPage.setContent(exported, { waitUntil: "domcontentloaded" });
+      const resolved = await exportPage.evaluate((vars) => {
         const out: Record<string, string> = {};
-        for (const v of vs) {
-          const el = body.ownerDocument.createElement("div");
+        for (const v of vars) {
+          const el = document.createElement("div");
           el.style.color = `var(${v})`;
-          body.appendChild(el);
+          document.body.appendChild(el);
           out[v] = getComputedStyle(el).color;
           el.remove();
         }
         return out;
-      }, vars);
-    const resolved = await resolve(Object.keys(EXPECTED));
-    for (const [cssVar, value] of Object.entries(EXPECTED)) expect(resolved[cssVar], cssVar).toBe(value);
+      }, Object.keys(EXPECTED));
+      for (const [cssVar, value] of Object.entries(EXPECTED)) expect(resolved[cssVar], `${cssVar} (${colorScheme})`).toBe(value);
 
-    // Canvas = export for the bound elements.
-    const exportedButton = await frame
-      .locator('[data-buildrick-id="e2e-brand-button"]')
-      .evaluate((el) => getComputedStyle(el).backgroundColor);
-    expect(exportedButton).toBe(await canvasColour(page, "e2e-brand-button", "backgroundColor"));
+      // Canvas = export for the bound elements.
+      const exportedButton = await exportPage
+        .locator('[data-buildrick-id="e2e-brand-button"]')
+        .evaluate((el) => getComputedStyle(el).backgroundColor);
+      expect(exportedButton).toBe(await canvasColour(page, "e2e-brand-button", "backgroundColor"));
+    }
+    await exportPage.close();
   });
 });
