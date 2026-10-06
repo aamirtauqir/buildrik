@@ -222,7 +222,9 @@ describe("entries cross-site guard", () => {
     // A cap that returned the text unchanged would fail OPEN: build a payload that still has live
     // markup after N passes by re-wrapping the tag N times over.
     let payload = "<img src=x onerror=alert(1)>";
-    for (let i = 0; i < 10; i++) payload = payload.replace(/</g, "<<i>");
+    // 8 rounds need 9+ passes to peel — past the 8-pass cap, yet ~0.8k chars
+    // (10 rounds was 1024 deep and made jsdom itself the flaky 15 s timeout).
+    for (let i = 0; i < 8; i++) payload = payload.replace(/</g, "<<i>");
     mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
     mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: payload } });
