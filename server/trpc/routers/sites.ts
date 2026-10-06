@@ -60,6 +60,7 @@ import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publish
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
+import { TokenSaveError } from "@/server/services/brand-tokens";
 
 const WORKSPACE_DELETION_SCHEDULED_MESSAGE =
   "This workspace is scheduled for deletion. Cancel the deletion to publish.";
@@ -394,6 +395,13 @@ export const sitesRouter = router({
             code: "PRECONDITION_FAILED",
             message: "This save carried no pages, so it was not applied. Reload the site before editing.",
           });
+        if (e instanceof TokenSaveError) {
+          console.warn("[tokens] save refused", { siteId: input.siteId, code: e.code, reason: e.message });
+          throw new TRPCError({
+            code: e.code === "TOKENS_INVALID" ? "BAD_REQUEST" : "CONFLICT",
+            message: `${e.code}: ${e.message}`,
+          });
+        }
         // 61-conflict: the site changed elsewhere since this editor loaded it.
         // The serverLastEditedAt suffix lets the client offer "Reload latest".
         if (e instanceof Error && e.message.startsWith("SAVE_CONFLICT"))

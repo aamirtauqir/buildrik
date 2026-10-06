@@ -175,6 +175,7 @@ Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packa
 | `AUTH_SECRET` / `AUTH_URL` | NextAuth v5's own names for `NEXTAUTH_SECRET` / `NEXTAUTH_URL`. Also read internally, not through our source. Production sets both pairs. | Yes in production |
 | `COOKIE_DOMAIN` | Optional cookie domain override when the app and editor sit on different subdomains. | No |
 | `CRON_SECRET` | Bearer token the cron routes (`/api/cron/*`) check before running. | Yes in production |
+| `BRAND_TOKENS_V2` | `on` enables the v6 brand-token migration (Brand Part 1). Off (unset) = no NEW migrations; already-migrated sites keep working. Server-side, read per request — never `NEXT_PUBLIC_*`. Rollout: QA workspace first. See docs/runbooks/brand-token-migration.md. | Yes once Part 1 ships |
 
 ### Auth providers
 

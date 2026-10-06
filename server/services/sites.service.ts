@@ -18,6 +18,8 @@ import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
 import { slugifyProjectName } from "@/lib/vercel";
+import { TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
+import { checkTokenPayload, isBrandTokensV2Enabled, TokenSaveError, type TokenCheck } from "@/server/services/brand-tokens";
 
 function slugify(name: string): string {
   return name
@@ -485,6 +487,11 @@ export async function duplicateSite(
      keyed by a renamed id (style rules, form blocks, CMS bindings) is copied
      along. */
   const reid = reidSite(originalPages, sanitizeProjectStyles(original.projectStyles));
+  // A pre-v6 source is copied migrated when the switch is on (no snapshot: the copy is new).
+  const copiedSettings = withCheckedTokens(
+    original.projectSettings,
+    checkTokenPayload(original.projectSettings, original.projectSettings),
+  );
 
   // Site + pages + form blocks must be copied atomically — a crash mid-copy
   // previously left an orphan half-built site. The page copy also dropped
@@ -506,7 +513,7 @@ export async function duplicateSite(
         // (:639) rather than trusting the source row.
         projectStyles: (reid.styles as Prisma.InputJsonValue) ?? undefined,
         projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
-        projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
+        projectSettings: (copiedSettings as Prisma.InputJsonValue) ?? undefined,
         projectCmsBindings: copyCmsBindings(original.projectCmsBindings, reid.renames),
         lastEditedAt: new Date(),
       },
@@ -890,6 +897,16 @@ function withValidAnalyticsIds(settings: unknown): unknown {
   return { ...settings, analytics };
 }
 
+/** The settings payload with its tokens replaced by the checked (and, on a first migrated save, migrated) set. */
+function withCheckedTokens(settings: unknown, check: TokenCheck): unknown {
+  if (check.kind === "no-tokens" || !isPlainObject(settings)) return settings;
+  return {
+    ...settings,
+    designTokens: check.tokens,
+    ...(check.kind === "first-migrated" ? { designTokensSchemaVersion: TOKENS_SCHEMA_VERSION } : {}),
+  };
+}
+
 /**
  * Phase -1: canonical project-data persistence path.
  *
@@ -907,9 +924,21 @@ function withValidAnalyticsIds(settings: unknown): unknown {
 export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
-    select: { deletedAt: true, projectSettings: true },
+    select: { deletedAt: true, projectSettings: true, lastEditedAt: true, workspaceId: true },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  /* Brand Part 1 (eng E4): the first save that moves a site's tokens to v6
+     must carry the CAS token and match it now — the migration snapshot below
+     records what that save replaced, and a blind write could snapshot a
+     version the user never saw. The in-transaction CAS still decides races. */
+  const tokenCheck = checkTokenPayload(input.settings, site.projectSettings);
+  if (tokenCheck.kind === "first-migrated") {
+    if (!expectedLastEditedAt) throw new TokenSaveError("TOKENS_NEED_CAS", "Reload to continue.");
+    if (site.lastEditedAt.toISOString() !== new Date(expectedLastEditedAt).toISOString()) {
+      throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+    }
+  }
 
   const savedAt = new Date();
   // Delete pages not in incoming set (only when caller supplies position
@@ -923,7 +952,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // SA-01: the column-backed keys live in their Site columns only. BE-1: a
   // JSON-only key that fails its schema keeps the stored value.
   const settings = stripColumnBackedSettings(
-    keepValidJsonOnlySettings(withValidAnalyticsIds(input.settings), site.projectSettings),
+    keepValidJsonOnlySettings(withValidAnalyticsIds(withCheckedTokens(input.settings, tokenCheck)), site.projectSettings),
   );
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
@@ -986,6 +1015,21 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       });
       if (!current || current.deletedAt) throw new Error("SITE_NOT_FOUND");
       throw new Error(`SAVE_CONFLICT:${current.lastEditedAt.toISOString()}`);
+    }
+
+    // Same transaction as the CAS: a losing racer rolls its snapshot back too.
+    if (tokenCheck.kind === "first-migrated") {
+      await tx.siteThemeSnapshot.create({
+        data: {
+          siteId: input.siteId,
+          workspaceId: site.workspaceId,
+          prevStyles: { designTokens: tokenCheck.storedTokens ?? [] } as Prisma.InputJsonValue,
+          prevDsSchemaVersion: input.dsSchemaVersion ?? 0,
+          reason: "migration",
+          tokensSchemaVersion: tokenCheck.storedVersion,
+          darkMode: null,
+        },
+      });
     }
 
     /* I-2: the page writes below go by id alone (upsert / update where {id}),
@@ -1118,6 +1162,7 @@ export async function getProjectData(siteId: string) {
       projectSettings: true,
       projectCmsBindings: true,
       dsSchemaVersion: true,
+      tokensMigrationHold: true,
       sitePages: {
         select: {
           id: true,
@@ -1150,6 +1195,8 @@ export async function getProjectData(siteId: string) {
     settings: site.projectSettings ?? {},
     dsSchemaVersion: site.dsSchemaVersion,
     cmsBindings: site.projectCmsBindings ?? undefined,
+    brandTokensV2: isBrandTokensV2Enabled(),
+    tokensMigrationHold: site.tokensMigrationHold,
   };
 }
 
