@@ -13,23 +13,37 @@ export function isBrandTokensV2Enabled(): boolean {
   return process.env.BRAND_TOKENS_V2 === "on";
 }
 
+const isKnownVersion = (v: unknown): v is number =>
+  typeof v === "number" && Number.isInteger(v) && v >= 1 && v <= TOKENS_SCHEMA_VERSION;
+
+/**
+ * Missing = 1. A stored value outside 1..current (written before the payload
+ * check existed) counts as current, so it cannot mark every client stale; the
+ * next validated save overwrites it with the current version.
+ */
 const storedVersionOf = (s: unknown): number => {
   if (!s || typeof s !== "object") return 1;
   const v = (s as { designTokensSchemaVersion?: unknown }).designTokensSchemaVersion;
-  return typeof v === "number" ? v : 1;
+  if (v === undefined) return 1;
+  return isKnownVersion(v) ? v : TOKENS_SCHEMA_VERSION;
 };
 
-/** The payload's version is client-controlled: only an integer 1..current is believed (a stored 999 would lock every client out). */
+/**
+ * Missing = 1; anything else must be an integer 1..current or the save is
+ * TOKENS_INVALID. The stored version is then always the server's: current for
+ * a validated set, the payload's own (≤ current - 1) only when it is kept unchanged.
+ */
 function payloadVersionOf(p: { designTokensSchemaVersion?: unknown }): number {
   const v = p.designTokensSchemaVersion;
   if (v === undefined) return 1;
-  if (typeof v !== "number" || !Number.isInteger(v) || v < 1 || v > TOKENS_SCHEMA_VERSION) {
+  if (!isKnownVersion(v)) {
     throw new TokenSaveError("TOKENS_INVALID", `designTokensSchemaVersion must be an integer from 1 to ${TOKENS_SCHEMA_VERSION}`);
   }
   return v;
 }
 
 /**
+ * `no-tokens`: the payload has no `designTokens`; the stored token state is kept.
  * `unchanged`: store the payload's tokens and version as sent (pre-v6 only).
  * `same-version` / `first-migrated`: store `tokens` with the current schema
  * version — the server sets it, never the payload.

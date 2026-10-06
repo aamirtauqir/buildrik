@@ -147,6 +147,43 @@ describe("schema version is the server's call", () => {
   });
 });
 
+describe("a save without designTokens never changes stored token state", () => {
+  it("ignores a client-sent version (999) when the tokens key is absent", async () => {
+    const site = await v5Site();
+    await saveProjectData({ siteId: site.id, pages: [], settings: { designTokensSchemaVersion: 999, darkMode: "auto" } }, site.lastEditedAt.toISOString());
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+  });
+
+  it("keeps the stored tokens, version and darkMode on a settings save without the tokens key", async () => {
+    const site = await v5Site();
+    const first = await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings({ darkMode: "auto" }) }, site.lastEditedAt.toISOString());
+    await saveProjectData({ siteId: site.id, pages: [], settings: { seo: { author: "Ann" } } }, first.savedAt.toISOString());
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toMatchObject({
+      designTokens: migrateTokensToV6(v5seed),
+      designTokensSchemaVersion: 6,
+      darkMode: "auto",
+      seo: { author: "Ann" },
+    });
+  });
+});
+
+describe("a corrupt stored version", () => {
+  it("counts as current: a v6 save over a stored 999 succeeds and stores 6", async () => {
+    const user = await createTestUser();
+    const workspace = await createTestWorkspace({ ownerId: user.id });
+    const site = await createTestSite({
+      workspaceId: workspace.id,
+      createdBy: user.id,
+      projectSettings: { designTokens: migrateTokensToV6(v5seed), designTokensSchemaVersion: 999 } as never,
+    });
+    await saveProjectData({ siteId: site.id, pages: [], settings: v6Settings() }, site.lastEditedAt.toISOString());
+    const after = await prisma.site.findUniqueOrThrow({ where: { id: site.id } });
+    expect(after.projectSettings).toMatchObject({ designTokensSchemaVersion: 6 });
+  });
+});
+
 describe("duplicateSite", () => {
   it.each([false, true])("copies a v5 site's tokens and version verbatim (hold=%s), even with the switch on", async (hold) => {
     vi.stubEnv("BRAND_TOKENS_V2", "on");

@@ -892,9 +892,25 @@ function withValidAnalyticsIds(settings: unknown): unknown {
   return { ...settings, analytics };
 }
 
-/** The settings payload with its checked (and possibly migrated) tokens and the server's schema version. */
-function withCheckedTokens(settings: unknown, check: TokenCheck): unknown {
-  if (check.kind === "no-tokens" || check.kind === "unchanged" || !isPlainObject(settings)) return settings;
+const TOKEN_STATE_KEYS = ["designTokens", "designTokensSchemaVersion", "darkMode"] as const;
+
+/**
+ * The settings to write, with the token state decided by the server: the
+ * checked (possibly migrated) tokens at the current version; the payload as
+ * sent on the unchanged pre-v6 path; and on a save without `designTokens`, the
+ * STORED token state — such a save never changes or deletes it.
+ */
+function withCheckedTokens(settings: unknown, check: TokenCheck, stored: unknown): unknown {
+  if (check.kind === "unchanged" || !isPlainObject(settings)) return settings;
+  if (check.kind === "no-tokens") {
+    const out: Record<string, unknown> = { ...settings };
+    const previous = isPlainObject(stored) ? stored : {};
+    for (const key of TOKEN_STATE_KEYS) {
+      if (previous[key] === undefined) delete out[key];
+      else out[key] = previous[key];
+    }
+    return out;
+  }
   return { ...settings, designTokens: check.tokens, designTokensSchemaVersion: TOKENS_SCHEMA_VERSION };
 }
 
@@ -950,7 +966,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // SA-01: the column-backed keys live in their Site columns only. BE-1: a
   // JSON-only key that fails its schema keeps the stored value.
   const settings = stripColumnBackedSettings(
-    keepValidJsonOnlySettings(withValidAnalyticsIds(withCheckedTokens(input.settings, tokenCheck)), site.projectSettings),
+    keepValidJsonOnlySettings(withValidAnalyticsIds(withCheckedTokens(input.settings, tokenCheck, site.projectSettings)), site.projectSettings),
   );
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
