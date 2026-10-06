@@ -8,10 +8,17 @@
  * the password card is the plan's — it says so, with `Upgrade to Pro` — and
  * Share links stays, since every plan has them.
  *
- * Card **Password protection · Pro**: the switch, then — on, with a password
- * stored — "A password is set", a `New password` field that changes it and
- * `Remove`; on, with none — the `Password` field; switched off over a stored
- * one — "Password protection will be off after the next publish." The stored
+ * Card **Password protection · Pro**: a purpose line, the switch, then — on,
+ * with a password stored — "A password is set" with `Change` (opens a `New
+ * password` field) and `Remove`; on, with none — the `Password` field, focused
+ * the moment the switch turns on; switched off over a stored one — "Password
+ * protection will be off after the next publish."
+ *
+ * OWNER OVERRIDE 2026-10-04 ("no form, no flow, what is it for?"; boards
+ * 8136:216089 / 8136:216319 / 8136:216535 to update): the purpose line is new
+ * on every state, and the stored state shows Change + Remove with the New
+ * password field behind Change — 8136:216089 draws the field always open. The
+ * stored
  * value is never read back (the server redacts it; `settings.get` says only
  * `hasPublishedPassword`). Save is the footer's: a save handler writes
  * `publishedPassword` through `siteDetail.settings.update` (ADMIN, Pro) —
@@ -35,6 +42,10 @@ import type { ScreenProps } from "../types";
 /** The settings path the password's refusals are keyed by (BuildrikSyncProvider's column map). */
 const PASSWORD_PATH = "publishing.publishedPassword";
 const NEED_PASSWORD = "Enter a password to turn protection on";
+const BLANK_PASSWORD = "A password can't be only spaces";
+const PURPOSE =
+  "Visitors must enter a password before they can see the published site. Useful for client previews and staging.";
+const QUIET_BTN = `${SET_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
 /* 8136:216089: the card — 24 in, 16 between its rows, title 16/600. */
 const CARD = `${SET_CARD} tw:flex tw:flex-col tw:items-start tw:gap-4 tw:p-6`;
@@ -61,6 +72,8 @@ export const AccessScreen: React.FC<ScreenProps> = ({
   const [hasPassword, setHasPassword] = React.useState(false);
   const [enabled, setEnabled] = React.useState(false);
   const [password, setPassword] = React.useState("");
+  /* Stored password: the New password field is open (Change). */
+  const [changing, setChanging] = React.useState(false);
 
   const load = useServerLoad<{ hasPublishedPassword?: boolean }>(
     projectId,
@@ -70,20 +83,24 @@ export const AccessScreen: React.FC<ScreenProps> = ({
       setHasPassword(set);
       setEnabled(set);
       setPassword("");
+      setChanging(false);
     },
     { onLoadStateChange, registerRetryLoad },
   );
 
   const dirty = enabled !== hasPassword || (enabled && password.length > 0);
-  const invalid = enabled && !hasPassword && password.trim() === "";
+  /* Turning protection on needs a password; a typed one (new, or a Change)
+     can't be only spaces. */
+  const invalidReason =
+    !enabled || password.trim() !== "" ? null : !hasPassword ? NEED_PASSWORD : password.length > 0 ? BLANK_PASSWORD : null;
 
   React.useEffect(() => {
     onDirtyChange?.(dirty);
   }, [dirty, onDirtyChange]);
 
   React.useEffect(() => {
-    registerFieldErrors?.(invalid ? { [PASSWORD_PATH]: NEED_PASSWORD } : null);
-  }, [invalid, registerFieldErrors]);
+    registerFieldErrors?.(invalidReason ? { [PASSWORD_PATH]: invalidReason } : null);
+  }, [invalidReason, registerFieldErrors]);
   React.useEffect(() => () => registerFieldErrors?.(null), [registerFieldErrors]);
 
   /* Save: the new value, or null to remove — only on an explicit change, so a
@@ -103,6 +120,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
       setHasPassword(publishedPassword !== null);
       setEnabled(publishedPassword !== null);
       setPassword("");
+      setChanging(false);
     });
     return () => registerSaveHandler(null);
   }, [dirty, projectId, registerSaveHandler]);
@@ -173,6 +191,9 @@ export const AccessScreen: React.FC<ScreenProps> = ({
 
       <section className={CARD} data-testid="set-card-password-protection">
         <h3 className={TITLE}>Password protection · Pro</h3>
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-access-purpose">
+          {PURPOSE}
+        </p>
         <div className="tw:flex tw:min-h-8 tw:items-center tw:gap-4">
           <span id="access-password-toggle-label" className={SET_ROW_LABEL}>
             Password protection
@@ -181,6 +202,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
             checked={enabled}
             onChange={(next) => {
               setEnabled(next);
+              setChanging(false);
               if (!next) setPassword("");
             }}
             aria-labelledby="access-password-toggle-label"
@@ -195,7 +217,9 @@ export const AccessScreen: React.FC<ScreenProps> = ({
           </p>
         ) : null}
 
-        {enabled ? (
+        {/* The field mounts only on a person's action (the switch, or Change),
+            so autoFocus never steals focus on open. */}
+        {enabled && (!hasPassword || changing) ? (
           <div className="tw:flex tw:w-full tw:flex-col tw:gap-1" data-testid="set-field-access-password">
             <label htmlFor="access-password" className={LABEL_11}>
               {hasPassword ? "New password" : "Password"}
@@ -204,6 +228,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
               id="access-password"
               type="password"
               autoComplete="new-password"
+              autoFocus
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={hasPassword ? "Enter a new password to change it" : "Enter a password"}
@@ -215,19 +240,51 @@ export const AccessScreen: React.FC<ScreenProps> = ({
         ) : null}
 
         {enabled && hasPassword ? (
-          <Button
-            type="button"
-            size="xs"
-            variant="ghost"
-            className={`${SET_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`}
-            onClick={() => {
-              setEnabled(false);
-              setPassword("");
-            }}
-            data-testid="set-access-remove"
-          >
-            Remove
-          </Button>
+          <div className="tw:flex tw:items-center tw:gap-2">
+            {changing ? (
+              <Button
+                type="button"
+                size="xs"
+                variant="ghost"
+                className={QUIET_BTN}
+                onClick={() => {
+                  setChanging(false);
+                  setPassword("");
+                }}
+                aria-label="Cancel password change"
+                data-testid="set-access-change-cancel"
+              >
+                Cancel
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                size="xs"
+                variant="ghost"
+                className={QUIET_BTN}
+                onClick={() => setChanging(true)}
+                aria-label="Change password"
+                data-testid="set-access-change"
+              >
+                Change
+              </Button>
+            )}
+            <Button
+              type="button"
+              size="xs"
+              variant="ghost"
+              className={QUIET_BTN}
+              onClick={() => {
+                setEnabled(false);
+                setChanging(false);
+                setPassword("");
+              }}
+              aria-label="Remove password"
+              data-testid="set-access-remove"
+            >
+              Remove
+            </Button>
+          </div>
         ) : null}
 
         {!enabled ? (

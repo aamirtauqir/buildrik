@@ -135,56 +135,19 @@ describe("SEOInjector.inject — Open Graph + Twitter", () => {
   });
 });
 
-describe("SEOInjector.inject — canonical URL + slug fallback", () => {
+describe("SEOInjector.inject — canonical URL", () => {
   it("uses pageSEO.canonicalUrl verbatim when set", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
+    const html = new SEOInjector().inject(
       makePage({ slug: "about", settings: { seo: { canonicalUrl: "https://canonical.example/x" } } })
     );
     expect(html).toContain('<link rel="canonical" href="https://canonical.example/x">');
     expect(html).toContain('<meta property="og:url" content="https://canonical.example/x">');
   });
 
-  it("builds the URL from baseUrl for home pages (no slug appended)", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ isHome: true, slug: "home" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com">');
-  });
-
-  it("builds baseUrl/slug for non-home pages", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ slug: "pricing" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com/pricing">');
-    expect(html).toContain('<meta property="og:url" content="https://example.com/pricing">');
-  });
-
-  it("derives a slug from the page name when slug is missing (whitespace -> dashes)", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ name: "About Us" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com/about-us">');
-  });
-
-  it("strips invalid URL-segment characters from the slug fallback (reuses shared slugify)", () => {
-    // getPageUrl now delegates to shared/utils/helpers slugify(), which drops
-    // non-URL-safe characters (&, /, !, ?) instead of leaking them.
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ name: "Q&A / FAQ!" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com/qa-faq">');
-    expect(html).toContain('<meta property="og:url" content="https://example.com/qa-faq">');
-    expect(html).not.toContain("q&a");
-  });
-
-  it("collapses punctuation and whitespace runs into single dashes in the slug fallback", () => {
-    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
-      makePage({ name: "Hello,  World & More!" })
-    );
-    expect(html).toContain('<link rel="canonical" href="https://example.com/hello-world-more">');
-  });
-
-  it("omits canonical and og:url when there is no baseUrl and no canonicalUrl", () => {
+  /* The default canonical is the server's (pageCanonicalUrl, from the served
+     file path). The editor never invents one from a slug: that produced
+     `/about` while the deploy serves `/about.html`. */
+  it("omits canonical and og:url when the page has no canonicalUrl of its own", () => {
     const html = new SEOInjector().inject(makePage({ slug: "about" }));
     expect(html).not.toContain('rel="canonical"');
     expect(html).not.toContain("og:url");
@@ -268,3 +231,46 @@ describe("SEOInjector.inject — custom head code (sanitizeHeadCode path)", () =
   });
 });
 
+
+/* Owner decision Q4 (2026-10-04): a page with no title or description of its
+   own inherits the site defaults from Settings › SEO › Defaults. Both export
+   paths (ZIP + publish) run through `inject`, so this is the one place. */
+describe("SEOInjector.inject — site default title/description fallback", () => {
+  const SITE = { metaTitle: "Acme Bakery — fresh bread daily", metaDescription: "Sourdough baked every morning in Leeds." };
+
+  it("a page with no description ships the site default description (meta, og, twitter)", () => {
+    const html = new SEOInjector().inject(makePage({ name: "About" }), SITE);
+    expect(html).toContain('<meta name="description" content="Sourdough baked every morning in Leeds.">');
+    expect(html).toContain('<meta property="og:description" content="Sourdough baked every morning in Leeds.">');
+    expect(html).toContain('<meta name="twitter:description" content="Sourdough baked every morning in Leeds.">');
+  });
+
+  it("a page with no title ships the site default title, ahead of the page name", () => {
+    const html = new SEOInjector().inject(makePage({ name: "About" }), SITE);
+    expect(html).toContain("<title>Acme Bakery — fresh bread daily</title>");
+    expect(html).toContain('<meta property="og:title" content="Acme Bakery — fresh bread daily">');
+  });
+
+  it("the page's own title and description still win over the defaults", () => {
+    const html = new SEOInjector().inject(
+      makePage({ settings: { seo: { metaTitle: "Our story", metaDescription: "Three generations of bakers." } } }),
+      SITE
+    );
+    expect(html).toContain("<title>Our story</title>");
+    expect(html).toContain('<meta name="description" content="Three generations of bakers.">');
+  });
+
+  it("the site default title is not wrapped in the title template a second time", () => {
+    const html = new SEOInjector().inject(makePage({ name: "About" }), {
+      ...SITE,
+      metaTitleTemplate: "{page_title} | Acme",
+    });
+    expect(html).toContain("<title>Acme Bakery — fresh bread daily</title>");
+  });
+
+  it("without site defaults the page name (through the template) stands, as before", () => {
+    const html = new SEOInjector().inject(makePage({ name: "About" }), { metaTitleTemplate: "{page_title} | Acme" });
+    expect(html).toContain("<title>About | Acme</title>");
+    expect(html).not.toContain('name="description"');
+  });
+});

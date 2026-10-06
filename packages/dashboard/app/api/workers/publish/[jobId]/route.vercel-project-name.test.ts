@@ -27,7 +27,7 @@ const { db, runVercelDeploy, assertProjectNameFree } = vi.hoisted(() => ({
 vi.mock("@/lib/prisma", () => ({ prisma: db }));
 vi.mock("@/lib/cron-auth", () => ({ checkWorkerAuth: () => null }));
 vi.mock("@/server/services/webhook.service", () => ({ deliverWebhook: vi.fn() }));
-vi.mock("@/lib/publish-files", () => ({ buildDeployFiles: () => [] }));
+vi.mock("@/lib/publish-files", () => ({ buildDeployFiles: () => [], verifiedPrimaryDomain: () => null }));
 vi.mock("@/lib/publish-forms", () => ({
   planFormWiring: (pages: unknown) => ({ pages, forms: [], deactivateMissing: false }),
 }));

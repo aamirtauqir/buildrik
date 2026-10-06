@@ -2,7 +2,7 @@
  * LocalizationScreen — Phase B Languages: 8135:214023 (default) and
  * 8135:214262 (remove-locale confirm). Default locale is a footer field;
  * Add / Remove write the enabled list at once (SA-16) and never carry the
- * staged default; Remove asks first only when translations exist (Q-B6);
+ * staged default; Remove always asks first (owner 2026-10-04, overrides Q-B6);
  * SA-05's auto-redirect value is never sent.
  *
  * @license BSD-3-Clause
@@ -159,13 +159,29 @@ describe("Languages — the default locale is a footer field", () => {
 });
 
 describe("Languages — locales save immediately", () => {
-  it("Remove of a locale with no translations writes the list at once, without the staged default", async () => {
+  it("owner 2026-10-04: Remove of a locale with no translations still asks first, with the short copy, and Cancel writes nothing", async () => {
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
+    expect(screen.getByTestId("set-loc-remove-title")).toHaveTextContent("Remove Arabic?");
+    expect(screen.getByTestId("set-loc-remove-body")).toHaveTextContent(
+      "Visitors won't be able to switch to Arabic.",
+    );
+    expect(screen.getByTestId("set-loc-remove-ok")).toHaveTextContent("Remove Arabic");
+    fireEvent.click(screen.getByTestId("set-loc-remove-cancel"));
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(screen.getByTestId("set-loc-row-ar")).toBeInTheDocument();
+  });
+
+  it("Remove of a locale with no translations writes the list once confirmed, without the staged default", async () => {
     setup();
     await loaded();
     fireEvent.change(screen.getByTestId("set-loc-default"), { target: { value: "fr" } });
     fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
+    expect(updateMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("set-loc-remove-ok"));
     await waitFor(() => expect(updateMock).toHaveBeenCalledWith({ id: "s1", enabledLocales: ["en", "fr"] }));
-    expect(screen.queryByTestId("set-loc-remove-confirm")).toBeNull();
+    await waitFor(() => expect(screen.queryByTestId("set-loc-remove-confirm")).toBeNull());
     await waitFor(() => expect(screen.queryByTestId("set-loc-row-ar")).toBeNull());
     expect(localesMock).toHaveBeenCalledTimes(2);
   });
@@ -191,6 +207,7 @@ describe("Languages — locales save immediately", () => {
     await loaded();
     fireEvent.change(screen.getByTestId("set-loc-default"), { target: { value: "ar" } });
     fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
+    fireEvent.click(screen.getByTestId("set-loc-remove-ok"));
     await waitFor(() => expect((screen.getByTestId("set-loc-default") as HTMLSelectElement).value).toBe("en"));
   });
 
@@ -199,6 +216,7 @@ describe("Languages — locales save immediately", () => {
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
+    fireEvent.click(screen.getByTestId("set-loc-remove-ok"));
     expect(await screen.findByTestId("set-loc-action-error")).toHaveTextContent("Arabic was not removed: Server said no");
     expect(screen.getByTestId("set-loc-row-ar")).toBeInTheDocument();
   });

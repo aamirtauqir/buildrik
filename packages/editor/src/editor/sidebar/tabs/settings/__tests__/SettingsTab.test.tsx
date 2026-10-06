@@ -19,7 +19,9 @@
  *     `Retry save` + the banner + the refused fields handed to the screen; a
  *     screen's own invalid fields disable Save.
  *   Load: the screen's `onLoadStateChange` drives the footer and disables Save.
- *   Search: a result opens its screen and lands on its field.
+ *   Search Mode (owner 2026-10-04): the Search entry swaps the sidebar for a
+ *     field + ✕; a result opens its screen and lands on its field; ✕ / Escape
+ *     restore the sidebar as it was.
  *
  * E3's dialogs and the Search modal are stubbed to their prop contracts here;
  * `useSettingsScreen` is mocked as before (the production hook re-creates
@@ -347,8 +349,9 @@ describe("SettingsTab — the shell", () => {
     // M0: the workspace doors sit under a separator, the label carrying ↗.
     expect(screen.getByTestId("set-nav-group-workspace").previousElementSibling?.tagName).toBe("HR");
     expect(screen.getByTestId("set-nav-overview").getAttribute("aria-current")).toBe("page");
-    // The search field is always there (8134:212121).
-    expect(screen.getByRole("searchbox", { name: "Search site settings" })).toBeTruthy();
+    // Owner 2026-10-04: no always-on field — a Search entry opens Search Mode.
+    expect(screen.queryByRole("searchbox", { name: "Search site settings" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Search settings" })).toBeTruthy();
     // M0: Billing carries the plan.
     expect(within(screen.getByTestId("set-nav-billing")).getByTestId("set-nav-plan").textContent).toBe("Business");
   });
@@ -493,6 +496,34 @@ describe("SettingsTab — doors", () => {
     const input = await screen.findByLabelText("Site name");
     fireEvent.keyDown(input, { key: "Escape" });
     expect(onClose).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("SettingsTab — Back to canvas is a link (owner 2026-10-04)", () => {
+  afterEach(() => window.history.replaceState(null, "", "/"));
+
+  it("is an anchor to the editor's canvas URL — this URL without ?settings=", () => {
+    window.history.replaceState(null, "", "/edit/site-1?settings=access");
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    const back = screen.getByRole("link", { name: /Back to canvas/ });
+    expect(back).toBe(screen.getByTestId("set-back"));
+    expect(back.tagName).toBe("A");
+    expect(back.getAttribute("href")).toBe("/edit/site-1");
+    expect(back.textContent).toContain("Back to canvas");
+  });
+
+  it("a plain click stays in the page and closes Settings; ⌘ / Ctrl-click is left to the browser", () => {
+    window.history.replaceState(null, "", "/edit/site-1?settings=general&page=p1");
+    const onClose = vi.fn();
+    renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    const back = screen.getByTestId("set-back");
+    expect(back.getAttribute("href")).toBe("/edit/site-1?page=p1");
+    expect(fireEvent.click(back)).toBe(false); // default prevented
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(fireEvent.click(back, { metaKey: true })).toBe(true);
+    expect(fireEvent.click(back, { ctrlKey: true })).toBe(true);
+    expect(fireEvent.click(back, { shiftKey: true })).toBe(true);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -892,77 +923,191 @@ describe("SettingsTab — the footer follows the screen's load", () => {
    the ⌕ opens a field under the site name, the nav narrows to matching rows
    (a field's label matches its screen), and "Search everywhere" hands the
    query to ⌘K. A row reached through a field still lands on that field. */
-describe("SettingsTab — Search settings (inline filter)", () => {
-  const field = () => screen.getByRole("searchbox", { name: "Search site settings" }) as HTMLInputElement;
-  const navIds = () =>
-    Array.from(screen.getByRole("navigation", { name: "Settings sections" }).querySelectorAll("[data-testid^='set-nav-']")).map((e) =>
-      e.getAttribute("data-testid")!.slice("set-nav-".length),
-    );
+describe("SettingsTab — Search Mode (owner 2026-10-04, overrides 6816:60270 / 8134:212121's always-on field)", () => {
+  const nav = () => screen.queryByRole("navigation", { name: "Settings sections" });
+  const input = () => screen.getByRole("combobox", { name: "Search site settings" }) as HTMLInputElement;
+  const options = () => screen.queryAllByRole("option").map((o) => o.getAttribute("data-testid")!.slice("set-search-result-".length));
+  const openSearch = () => fireEvent.click(screen.getByRole("button", { name: "Search settings" }));
+  const nextFrame = () =>
+    act(async () => {
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+    });
 
-  it("the field is always there (8134:212121); typing narrows the nav to matches, with their group label", () => {
+  it("no field on screen until Search is pressed; then the panel is only the field (focused) and ✕", () => {
+    role.value = "OWNER";
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    expect(field().placeholder).toBe("Search site settings");
-    expect(navIds()).toContain("overview");
-    fireEvent.change(field(), { target: { value: "dns" } });
-    expect(navIds()).toEqual(["group-publishing", "domains"]);
-    const nav = screen.getByRole("navigation", { name: "Settings sections" });
-    expect(within(nav).getByText("Publishing", { exact: false })).toBeTruthy();
-    expect(within(nav).queryByText("Search & sharing", { exact: false })).toBeNull();
-    fireEvent.change(field(), { target: { value: "domain" } });
-    expect(screen.getByTestId("set-search-everywhere").textContent).toContain('"domain"');
-    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.queryByRole("combobox", { name: "Search site settings" })).toBeNull();
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    expect(nav()).toBeTruthy();
+    openSearch();
+    expect(document.activeElement).toBe(input());
+    expect(input().placeholder).toBe("Search site settings");
+    expect(screen.getByRole("button", { name: "Close search" })).toBeTruthy();
+    // Every sidebar item is away: Overview, the groups, the workspace doors, the role foot, the header.
+    expect(nav()).toBeNull();
+    expect(screen.queryByTestId("set-nav-overview")).toBeNull();
+    expect(screen.queryByTestId("set-nav-members")).toBeNull();
+    expect(screen.queryByTestId("set-role")).toBeNull();
+    expect(screen.queryByTestId("set-back")).toBeNull();
+    expect(screen.queryByTestId("set-title")).toBeNull();
+    role.value = null;
   });
 
-  it("a row matched by a field label opens its screen and lands on the field", async () => {
+  it("typing lists matching settings and fields in real time", () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    fireEvent.change(field(), { target: { value: "meta title" } });
-    expect(navIds()).toEqual(["group-search-sharing", "seo"]);
-    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    openSearch();
+    expect(options()).toEqual([]);
+    fireEvent.change(input(), { target: { value: "dns" } });
+    expect(options()).toContain("domains");
+    fireEvent.change(input(), { target: { value: "meta title" } });
+    expect(options()).toEqual(["seo/seo-meta-title"]);
+    expect(screen.getByTestId("set-search-result-seo/seo-meta-title").textContent).toContain("Meta title");
+    expect(input().getAttribute("aria-activedescendant")).toBe(screen.getAllByRole("option")[0].id);
+  });
+
+  it("↑/↓ move through the results and Enter opens the field's screen, landing on the field", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    openSearch();
+    fireEvent.change(input(), { target: { value: "seo" } });
+    const all = screen.getAllByRole("option");
+    expect(all.length).toBeGreaterThan(2);
+    expect(all[0].getAttribute("aria-selected")).toBe("true");
+    fireEvent.keyDown(input(), { key: "ArrowDown" });
+    fireEvent.keyDown(input(), { key: "ArrowDown" });
+    expect(screen.getAllByRole("option")[2].getAttribute("aria-selected")).toBe("true");
+    fireEvent.keyDown(input(), { key: "ArrowUp" });
+    expect(screen.getAllByRole("option")[1].getAttribute("aria-selected")).toBe("true");
+    fireEvent.change(input(), { target: { value: "meta title" } });
+    fireEvent.keyDown(input(), { key: "Enter" });
     await waitFor(() => expect(headTitle()).toBe("SEO"));
-    await act(async () => {
-      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
-    });
+    await nextFrame();
     expect(document.activeElement).toBe(document.getElementById("seo-meta-title"));
-    // The filter stays while the screen is open (the board shows both).
-    expect(field().value).toBe("meta title");
+    // Opening a result leaves Search Mode; the nav is back with the new screen current.
+    expect(nav()).toBeTruthy();
+    expect(screen.getByTestId("set-nav-seo").getAttribute("aria-current")).toBe("page");
   });
 
-  it("a field whose control has no id lands on its Field anchor's control", async () => {
+  it("a click on a result opens it; a field whose control has no id lands on its Field anchor's control", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    fireEvent.change(field(), { target: { value: "site name" } });
-    fireEvent.click(screen.getByTestId("set-nav-general"));
+    openSearch();
+    fireEvent.change(input(), { target: { value: "site name" } });
+    fireEvent.click(screen.getByTestId("set-search-result-general/site-name"));
     await waitFor(() => expect(headTitle()).toBe("General"));
-    await act(async () => {
-      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
-    });
-    const input = within(screen.getByTestId("set-field-site-name")).getByRole("textbox");
-    expect(document.activeElement).toBe(input);
+    await nextFrame();
+    expect(document.activeElement).toBe(within(screen.getByTestId("set-field-site-name")).getByRole("textbox"));
   });
 
-  it("Search everywhere hands the query to the ⌘K palette", () => {
+  it("no match says so; Search everywhere hands the query to the ⌘K palette", () => {
     const composer = makeComposer();
     renderS(<SettingsTab composer={asComposer(composer)} />);
-    fireEvent.change(field(), { target: { value: "domain" } });
-    fireEvent.click(screen.getByTestId("set-search-everywhere"));
-    expect(composer.emit).toHaveBeenCalledWith("ui:toggle:command-palette", { query: "domain" });
-  });
-
-  it("no match says so; ✕ closes the field and brings the whole nav back", () => {
-    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    fireEvent.change(field(), { target: { value: "zzqx" } });
-    expect(navIds()).toEqual([]);
+    openSearch();
+    fireEvent.change(input(), { target: { value: "zzqx" } });
+    expect(options()).toEqual([]);
     expect(screen.getByTestId("set-search-empty").textContent).toContain("zzqx");
-    fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
-    expect(field().value).toBe("");
-    expect(navIds()).toContain("general");
+    fireEvent.click(screen.getByTestId("set-search-everywhere"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:toggle:command-palette", { query: "zzqx" });
   });
 
-  it("Escape in the field closes the search, not Settings", () => {
+  it("✕ clears the query and restores the sidebar as it was — same current row, same scroll", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-domains"));
+    await waitFor(() => expect(headTitle()).toBe("Domains"));
+    nav()!.scrollTop = 120;
+    const focusSpy = vi.spyOn(HTMLElement.prototype, "focus");
+    openSearch();
+    fireEvent.change(input(), { target: { value: "seo" } });
+    fireEvent.click(screen.getByRole("button", { name: "Close search" }));
+    expect(screen.queryByRole("combobox", { name: "Search site settings" })).toBeNull();
+    expect(nav()!.scrollTop).toBe(120);
+    expect(screen.getByTestId("set-nav-domains").getAttribute("aria-current")).toBe("page");
+    expect(headTitle()).toBe("Domains");
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Search settings" }));
+    // The refocus must not scroll the nav back to its top (jsdom never scrolls on focus; the option is the contract).
+    const entryFocus = focusSpy.mock.calls.at(-1);
+    expect(entryFocus?.[0]).toEqual({ preventScroll: true });
+    focusSpy.mockRestore();
+    openSearch();
+    expect(input().value).toBe("");
+    expect(options()).toEqual([]);
+  });
+
+  /* QA 2026-10-05 (live, 1440×732): an unbroken query ran the no-match line
+     out of the 256 sidebar and into the pane. jsdom has no layout; the wrap
+     is the contract. */
+  it("the no-match line wraps a query with no spaces inside the sidebar", () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    openSearch();
+    fireEvent.change(input(), { target: { value: "x".repeat(120) } });
+    expect(screen.getByTestId("set-search-empty").className).toContain("tw:break-words");
+  });
+
+  /* QA 2026-10-05: "a" lists 65 results; ↑ from the first wrapped to the
+     last, which sat 2,500px below the fold. */
+  it("↑/↓ keep the active result in view", () => {
+    const proto = Element.prototype as Element & { scrollIntoView?: (arg?: ScrollIntoViewOptions) => void };
+    const original = proto.scrollIntoView;
+    const spy = vi.fn();
+    proto.scrollIntoView = spy;
+    try {
+      renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+      openSearch();
+      fireEvent.change(input(), { target: { value: "seo" } });
+      fireEvent.keyDown(input(), { key: "ArrowUp" });
+      const all = screen.getAllByRole("option");
+      const last = all[all.length - 1];
+      expect(last.getAttribute("aria-selected")).toBe("true");
+      expect(spy.mock.contexts.at(-1)).toBe(last);
+      expect(spy.mock.calls.at(-1)?.[0]).toEqual({ block: "nearest" });
+    } finally {
+      proto.scrollIntoView = original;
+    }
+  });
+
+  /* QA 2026-10-05: a screen result (no field) left focus on <body> — the
+     field it was typed in had gone with Search Mode. */
+  it("a screen result lands focus on that screen's nav row", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    openSearch();
+    fireEvent.change(input(), { target: { value: "dns" } });
+    expect(options()[0]).toBe("domains");
+    fireEvent.keyDown(input(), { key: "Enter" });
+    await waitFor(() => expect(headTitle()).toBe("Domains"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByTestId("set-nav-domains")));
+  });
+
+  /* QA 2026-10-05: a field result raised the Unsaved guard, Keep editing was
+     pressed — and the field was still "pending": the next plain visit to its
+     screen scrolled to it and stole focus. */
+  it("a result abandoned at the guard (Keep editing) is dropped, and focus comes back to the nav", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
+    openSearch();
+    fireEvent.change(input(), { target: { value: "meta title" } });
+    fireEvent.keyDown(input(), { key: "Enter" });
+    expect(screen.getByTestId("set-unsaved")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByTestId("set-nav-general")));
+    fireEvent.click(screen.getByTestId("set-foot-discard"));
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO"));
+    await nextFrame();
+    await nextFrame();
+    expect(document.activeElement).not.toBe(document.getElementById("seo-meta-title"));
+  });
+
+  it("Escape closes Search Mode — from the field or the ✕ — never Settings", () => {
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
-    fireEvent.change(field(), { target: { value: "seo" } });
-    fireEvent.keyDown(field(), { key: "Escape" });
-    expect(field().value).toBe("");
+    openSearch();
+    fireEvent.change(input(), { target: { value: "seo" } });
+    fireEvent.keyDown(input(), { key: "Escape" });
+    expect(screen.queryByRole("combobox", { name: "Search site settings" })).toBeNull();
+    expect(nav()).toBeTruthy();
+    openSearch();
+    const close = screen.getByRole("button", { name: "Close search" });
+    close.focus();
+    fireEvent.keyDown(close, { key: "Escape" });
+    expect(screen.queryByRole("combobox", { name: "Search site settings" })).toBeNull();
     expect(onClose).not.toHaveBeenCalled();
   });
 });

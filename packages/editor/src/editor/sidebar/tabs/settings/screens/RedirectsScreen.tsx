@@ -9,8 +9,10 @@
  * The header carries `Import CSV` · `Export CSV` · `Add redirect`
  * (`registerHeaderAction`). Card **Redirect rules**: FROM · TO · TYPE and
  * `Edit · Delete` per row — Edit opens RedirectDialog (update / delete inside
- * it), Delete removes the rule at once and the toast offers `Undo`, which
- * creates the same rule again. Import is all-or-nothing on the server
+ * it), Delete asks first (DeleteRedirectDialog — OWNER OVERRIDE 2026-10-04;
+ * 8136:215838 draws a delete at once, board to update), then removes the
+ * rule and the toast offers `Undo`, which creates the same rule again. The
+ * Edit dialog's delete ends in the same toast. Import is all-or-nothing on the server
  * (RedirectCsvDialog → `redirects.import_csv`; the toast says how many were
  * created); Export downloads `redirects.export_csv`. Card **404 suggester**:
  * `Suggest redirects from 404s` writes `projectSettings.redirects
@@ -47,6 +49,7 @@ import { SAVE_ERROR_MESSAGES } from "../constants";
 import { useServerLoad } from "../hooks/useServerLoad";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { RedirectCsvDialog } from "../components/RedirectCsvDialog";
+import { DeleteRedirectDialog } from "../components/DeleteRedirectDialog";
 import type { RedirectRepair, ScreenProps } from "../types";
 import { RedirectDialog, type RedirectDraft } from "../components/RedirectDialog";
 import { RedirectRepairCard } from "../components/RedirectRepairCard";
@@ -137,7 +140,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
 }) => {
   const siteName = composer?.getProjectMetadata?.()?.name ?? "";
 
-  const { addToast } = useToast();
+  const { addToast, removeToast } = useToast();
 
   // ── The suggester switch: applies at once (SA-16) ──
   const { value: suggestSaved } = useSettingsScreen(composer, (s) => s.redirects?.suggestFrom404s ?? true, true);
@@ -174,6 +177,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
   const [rows, setRows] = React.useState<RedirectRow[]>([]);
   const [suggestions, setSuggestions] = React.useState<RedirectSuggestion[]>([]);
   const [dialog, setDialog] = React.useState<Dialog>(null);
+  const [confirmDelete, setConfirmDelete] = React.useState<RedirectRow | null>(null);
   const [accepting, setAccepting] = React.useState<number | null>(null);
   const [actionFailed, setActionFailed] = React.useState(false);
 
@@ -279,23 +283,24 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     await relist();
   };
 
-  // Delete at once; the toast's Undo creates the same rule again (8136:215838).
-  const deleteRow = async (row: RedirectRow) => {
+  // Deletes (the caller has confirmed); the toast's Undo creates the same rule again (8136:215838).
+  // Rejects when the server refuses — each caller shows that in its own place.
+  const deleteRule = async (row: RedirectRow) => {
     if (!projectId) return;
-    setActionFailed(false);
-    try {
-      await api().delete.mutate({ id: row.id });
-    } catch {
-      setActionFailed(true);
-      return;
-    }
+    await api().delete.mutate({ id: row.id });
     setRows((current) => current.filter((r) => r.id !== row.id));
-    addToast({
+    /* Undo runs once: a toast holding focus never times out, and a second
+       Undo would post the restored rule again (409, "not saved" banner). */
+    let undone = false;
+    const toastId = addToast({
       title: `Redirect ${row.fromPath} → ${row.toUrl} deleted`,
       description: "You can undo this deletion.",
       action: {
         label: "Undo",
         onClick: () => {
+          if (undone) return;
+          undone = true;
+          removeToast(toastId);
           void (async () => {
             try {
               await api().create.mutate({
@@ -317,6 +322,16 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     await relist();
   };
 
+  // A row's Delete, once confirmed: a refusal is the banner.
+  const deleteRow = async (row: RedirectRow) => {
+    setActionFailed(false);
+    try {
+      await deleteRule(row);
+    } catch {
+      setActionFailed(true);
+    }
+  };
+
   // ── The dialog's three writes: resolve = close + re-list, reject = inline in the dialog ──
   const submitDialog = async (draft: RedirectDraft) => {
     if (!projectId || !dialog) return;
@@ -328,9 +343,8 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
 
   const deleteFromDialog = async () => {
     if (!dialog || dialog.mode !== "edit") return;
-    await api().delete.mutate({ id: dialog.row.id });
+    await deleteRule(dialog.row);
     setDialog(null);
-    await relist();
   };
 
   // ── Accept: a 301 at once; a refusal is the banner ──
@@ -472,7 +486,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
                     type="button"
                     size="xs"
                     variant="link"
-                    onClick={() => void deleteRow(row)}
+                    onClick={() => setConfirmDelete(row)}
                     aria-label={`Delete redirect from ${row.fromPath}`}
                     data-testid={`set-rd-delete-${row.id}`}
                   >
@@ -537,6 +551,15 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         onSubmit={submitDialog}
         onDelete={dialog?.mode === "edit" ? deleteFromDialog : undefined}
         onCancel={() => setDialog(null)}
+      />
+      <DeleteRedirectDialog
+        rule={confirmDelete}
+        onCancel={() => setConfirmDelete(null)}
+        onConfirm={() => {
+          const row = confirmDelete;
+          setConfirmDelete(null);
+          if (row) void deleteRow(row);
+        }}
       />
       <RedirectCsvDialog open={csvOpen} onImport={importCsv} onCancel={() => setCsvOpen(false)} />
     </Screen>

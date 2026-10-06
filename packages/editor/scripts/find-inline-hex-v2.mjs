@@ -62,6 +62,7 @@ const USER_CONTENT_EXCLUDES = [
   "src/editor/sidebar/tabs/templates/templatesData.ts",
   "src/editor/wizard/sectionData.ts",
   "src/editor/design-system/constants.ts",
+  "src/engine/designSystem/defaultTokens.ts",
   "src/editor/design-system/starters/", // entire directory
   "src/editor/sidebar/tabs/media/components/StockSourceModal.tsx",
 ];

@@ -480,6 +480,23 @@ describe("ExportEngine.exportAllPages — sitemap & SEO titles", () => {
     expect(noBaseUrl.files.some((f) => f.name === "sitemap.xml")).toBe(false);
   });
 
+  it("the ZIP sitemap is the publish builder's: served .html locs, noindex pages left out", async () => {
+    const pages = [
+      page("Home", { isHome: true }),
+      page("About", { slug: "about" }),
+      page("Secret", { slug: "secret", settings: { seo: { noIndex: true } } }),
+    ];
+    const { files } = await new ExportEngine(makeComposer({ pages })).exportAllPages({
+      format: "html",
+      includeSitemap: true,
+      baseUrl: "https://example.com",
+    });
+    const xml = files.find((f) => f.name === "sitemap.xml")!.content;
+    expect(xml).toContain("<loc>https://example.com/</loc>");
+    expect(xml).toContain("<loc>https://example.com/about.html</loc>");
+    expect(xml).not.toContain("secret");
+  });
+
   it("falls back through metaTitle → settings.title → page.name → 'Untitled' for the <title>", async () => {
     const pages = [
       page("Home", { isHome: true }),

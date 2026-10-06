@@ -528,3 +528,21 @@ root cause is fixed in `466158dd`; these are the rest.
 - [ ] Stock colour filters: drawer 10 vs fullpage 12 (incl. Purple/Magenta — DESIGN.md ban check)
 - [ ] Quick Style ctx actions write literals #ccc/#f5f5f5 — off-token (styleActions.ts)
 - [ ] SaveTemplate button: no busy label while saving (aria-busy only)
+
+## Brand
+
+- [ ] **Contrast guard (WCAG AA) for semantic colour pairs.** Deferred from the
+  Brand Part 1 CEO review (D5, 2026-10-05) to Part 2, where checks render as
+  badges on token rows. Check Text/Background, on-Primary and similar pairs in
+  both light and dark modes; the scale generator (Part 1 §7) should feed it.
+  Spec: `docs/superpowers/specs/2026-10-05-brand-token-foundation-design.md`.
+
+## Design conformance
+
+- [ ] **Refresh stale Figma conformance specs (spec-age gate).** On 2026-10-06
+  `check-spec-age.mjs --mode=prepush` reported 308 of 344 specs older than 14
+  days and blocked the push of 399 commits whose code gates (verify:ds, gate:ds,
+  gate:figma, gate:trpc-orphans, tsc) all passed. The owner chose
+  `git push --no-verify` for that push. Re-extract with `get_design_context` +
+  `scripts/conformance/extract.mjs <surface>`; the Figma MCP budget is ~200
+  calls/day, so plan it over ~2 days, highest-traffic surfaces first.

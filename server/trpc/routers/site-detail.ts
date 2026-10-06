@@ -396,6 +396,11 @@ export const siteDetailRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "DOMAIN_IN_USE")
             throw new TRPCError({ code: "CONFLICT", message: "Domain already in use." });
+          if (e instanceof Error && e.message === "DOMAIN_ATTACHED_ELSEWHERE")
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "This domain is used by another Vercel project. Remove it from that project first, then try again.",
+            });
           if (e instanceof Error && e.message === "PROJECT_NAME_TAKEN")
             throw new TRPCError({ code: "CONFLICT", message: PROJECT_NAME_TAKEN_MESSAGE });
           if (e instanceof Error && e.message === "DOMAIN_LIMIT")

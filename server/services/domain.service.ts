@@ -3,16 +3,19 @@ import { createHash } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import { addDomainToVercelProject, removeDomainFromVercelProject, resolveVercelProjectName } from "@/lib/vercel";
+import {
+  addDomainToVercelProject,
+  getVercelDomainConfig,
+  getVercelProjectDomain,
+  removeDomainFromVercelProject,
+  resolveVercelProjectName,
+  VercelApiError,
+  type VercelDomainConfig,
+} from "@/lib/vercel";
 import { getActiveVercelConnection } from "@server/services/integrations.service";
 import { siteScopeWhere } from "@/server/services/permission.service";
-import { domainNameSchema, type DomainAvailability, type DomainKind, DNS_TARGETS } from "@buildrik/shared/schemas/site-detail";
-
-// Vercel's canonical targets — what a domain should point at when we have no
-// live verification records yet: the apex A record and the `www` CNAME
-// (replacing the old dead "sites.buildrik.app" host that nothing ever served).
-const VERCEL_CNAME = DNS_TARGETS.cname;
-const VERCEL_APEX_IP = DNS_TARGETS.apexIp;
+import { domainNameSchema, type DomainAvailability, type DomainKind } from "@buildrik/shared/schemas/site-detail";
+import { apexOf, expectedDnsRecords, recordFqdn, type ExpectedDnsRecord } from "@buildrik/shared/dns/records";
 
 /**
  * The `TXT _buildrick brk-verify-…` record the Add-a-domain dialog draws
@@ -24,55 +27,163 @@ export function dnsVerificationToken(domainId: string): string {
   return `brk-verify-${createHash("sha256").update(domainId).digest("hex").slice(0, 16)}`;
 }
 
+/** Our own `TXT _buildrick[.<sub>] brk-verify-…` row (not one Vercel issued). */
+function isOwnershipTxt(rec: { type: string; host: string }): boolean {
+  return rec.type.toUpperCase() === "TXT" && /^_buildrick(\.|$)/i.test(rec.host);
+}
+
+/** Does public DNS answer this record with its expected value? */
+async function recordAnswers(rec: { type: string; host: string; value: string }, apex: string): Promise<boolean> {
+  const fqdn = recordFqdn(rec.host, apex);
+  const norm = (v: string) => v.trim().replace(/\.$/, "").toLowerCase();
+  try {
+    switch (rec.type.toUpperCase()) {
+      case "A":
+        return (await dns.resolve4(fqdn)).includes(rec.value);
+      case "AAAA":
+        return (await dns.resolve6(fqdn)).some((a) => norm(a) === norm(rec.value));
+      case "CNAME":
+        return (await dns.resolveCname(fqdn)).some((a) => norm(a) === norm(rec.value));
+      case "TXT":
+        // A TXT answer arrives as character-string chunks; the record is one value.
+        return (await dns.resolveTxt(fqdn)).some((chunks) => chunks.join("") === rec.value);
+      default:
+        return false;
+    }
+  } catch {
+    // ENOTFOUND / ENODATA / SERVFAIL are expected while DNS propagates.
+    return false;
+  }
+}
+
+/** Resolve every record, persist each row's `verified`, report any/all. */
+async function resolveRecords(records: ReadonlyArray<{ id: string; type: string; host: string; value: string; verified: boolean }>, apex: string) {
+  let any = false;
+  let all = records.length > 0;
+  for (const rec of records) {
+    const ok = await recordAnswers(rec, apex);
+    any = any || ok;
+    all = all && ok;
+    if (ok !== rec.verified) await prisma.dnsRecord.update({ where: { id: rec.id }, data: { verified: ok } });
+  }
+  return { any, all };
+}
+
+function sameRecords(a: ReadonlyArray<ExpectedDnsRecord>, b: ReadonlyArray<ExpectedDnsRecord>): boolean {
+  const key = (r: ExpectedDnsRecord) => `${r.type.toUpperCase()} ${r.host.toLowerCase()} ${r.value.toLowerCase()}`;
+  const ka = a.map(key).sort();
+  const kb = b.map(key).sort();
+  return ka.length === kb.length && ka.every((k, i) => k === kb[i]);
+}
+
 /**
- * Re-check a domain's DNS against its expected records (P6 "⟳ Check now",
- * Figma Domains boards). Resolves A/CNAME/TXT live via node:dns, marks each
- * DnsRecord verified, and flips Domain.status PENDING → VERIFIED when every
- * record answers (FAILED when none do after a lookup). SSL issuance stays
- * with the deploy pipeline — status VERIFIED + sslStatus PENDING is the
- * "issuing certificate" board state.
+ * Re-check one domain (P6 "⟳ Check now" and the dns-verify cron — the ONE
+ * implementation; the cron used to carry its own copy of the node:dns match).
+ *
+ * With a Vercel connection, Vercel decides (owner decision Q7): the project
+ * domain's `verified` (ownership on THIS project) and the domain config's
+ * `misconfigured` (false = "configured AND we can automatically generate a
+ * TLS certificate"). Both good → status VERIFIED and sslStatus ACTIVE —
+ * nothing ever set ACTIVE before, so "SSL active" could never show. A domain
+ * the project does not hold (404 — e.g. a row an old 409 marked VERIFIED)
+ * is FAILED. The required records are re-derived from Vercel's apexName and
+ * recommendations, which also repairs rows written with the old apex-only
+ * instructions, and surfaces any `verification[]` ownership challenge (a TXT
+ * Vercel issues when the domain is claimed elsewhere) as a record to add.
+ * Per-record `verified` stays a public-DNS reading, for the records table
+ * only — it never decides status here. If Vercel cannot be read, status and
+ * SSL are left unchanged.
+ *
+ * AUTHORIZATION: with a Vercel connection a domain is VERIFIED only when
+ * Vercel's project-domain `verified` is true AND config `misconfigured` is
+ * false. DNS answering, or `misconfigured: false` alone, is never enough.
+ *
+ * Without a Vercel connection the resolver decides, and every stored record
+ * — our `_buildrick` TXT included — must answer.
  */
 export async function checkDomainDns(domainId: string, siteId: string) {
   const domain = await prisma.domain.findUnique({
     where: { id: domainId },
-    include: { dnsRecords: true },
+    include: { dnsRecords: true, site: { select: { workspaceId: true, slug: true, vercelProjectName: true } } },
   });
   // Site-bound BEFORE any write: the caller's role was checked on `siteId`,
   // and a domain id from another site used to get its records rewritten
   // before the router noticed the mismatch (audit 2026-09-24).
   if (!domain || domain.siteId !== siteId) return null;
 
-  let anyVerified = false;
-  let allVerified = domain.dnsRecords.length > 0;
-  for (const rec of domain.dnsRecords) {
-    const fqdn = rec.host === "@" || rec.host === "" ? domain.domain : `${rec.host}.${domain.domain}`;
-    let ok = false;
-    try {
-      if (rec.type.toUpperCase() === "A") {
-        const answers = await dns.resolve4(fqdn);
-        ok = answers.includes(rec.value);
-      } else if (rec.type.toUpperCase() === "CNAME") {
-        const answers = await dns.resolveCname(fqdn);
-        ok = answers.some((a) => a.replace(/\.$/, "") === rec.value.replace(/\.$/, ""));
-      } else if (rec.type.toUpperCase() === "TXT") {
-        // A TXT answer arrives as character-string chunks; the record is one value.
-        const answers = await dns.resolveTxt(fqdn);
-        ok = answers.some((chunks) => chunks.join("") === rec.value);
-      }
-    } catch {
-      ok = false;
+  const conn = await getActiveVercelConnection(domain.site.workspaceId);
+  let data: { status: string; sslStatus?: string };
+
+  if (!conn) {
+    /* A row written while the workspace had Vercel carries no `_buildrick`
+       TXT (Q6), nor does a legacy one; judged on A + CNAME alone it would
+       turn VERIFIED with no ownership proof. Give it its TXT first. */
+    let records = domain.dnsRecords;
+    if (!records.some(isOwnershipTxt)) {
+      const ownership = expectedDnsRecords({
+        domain: domain.domain,
+        apex: apexOf(domain.domain),
+        ownershipToken: dnsVerificationToken(domainId),
+      }).filter(isOwnershipTxt);
+      records = [
+        ...records,
+        ...(await Promise.all(ownership.map((r) => prisma.dnsRecord.create({ data: { domainId, ...r } })))),
+      ];
     }
-    anyVerified = anyVerified || ok;
-    allVerified = allVerified && ok;
-    if (ok !== rec.verified) {
-      await prisma.dnsRecord.update({ where: { id: rec.id }, data: { verified: ok } });
+    const { any, all } = await resolveRecords(records, apexOf(domain.domain));
+    const status = all ? "VERIFIED" : any ? "PENDING" : "FAILED";
+    // SSL is never ACTIVE on a domain that is not VERIFIED.
+    data = status === "VERIFIED" ? { status } : { status, sslStatus: "PENDING" };
+  } else {
+    const projectName = resolveVercelProjectName(domain.site);
+    let vercel: { project: Awaited<ReturnType<typeof getVercelProjectDomain>>; config: VercelDomainConfig | null } | null = null;
+    try {
+      const project = await getVercelProjectDomain({ ...conn, projectName, domain: domain.domain });
+      const config = project ? await getVercelDomainConfig({ ...conn, projectName, domain: domain.domain }) : null;
+      vercel = { project, config };
+    } catch (err) {
+      console.error(`[domain] Vercel status read failed for ${domain.domain}:`, err);
+    }
+
+    let records = domain.dnsRecords;
+    const apex = vercel?.project?.apexName ?? apexOf(domain.domain);
+    if (vercel?.project && vercel.config) {
+      const expected = instructionsFrom({ domain: domain.domain, attached: vercel.project, config: vercel.config, ownershipToken: null });
+      if (!sameRecords(expected, records)) {
+        await prisma.dnsRecord.deleteMany({ where: { domainId } });
+        await prisma.dnsRecord.createMany({ data: expected.map((r) => ({ domainId, ...r })) });
+        records = await prisma.dnsRecord.findMany({ where: { domainId } });
+      }
+    }
+
+    const { any } = await resolveRecords(
+      records.filter((rec) => !isOwnershipTxt(rec)),
+      apex,
+    );
+    if (!vercel) {
+      /* Vercel unreadable: we cannot know ownership, so status and SSL are
+         left exactly as they were. DNS that answers is NEVER promoted to
+         VERIFIED here — pointing records at Vercel proves nothing about who
+         owns the domain on this project. */
+      return prisma.domain.update({
+        where: { id: domainId },
+        data: { lastCheckedAt: new Date() },
+        include: { dnsRecords: true },
+      });
+    } else if (!vercel.project) {
+      data = { status: "FAILED", sslStatus: "PENDING" };
+    } else {
+      const configured = vercel.project.verified && vercel.config?.misconfigured === false;
+      data = {
+        status: configured ? "VERIFIED" : any ? "PENDING" : "FAILED",
+        sslStatus: configured ? "ACTIVE" : "PENDING",
+      };
     }
   }
 
-  const status = allVerified ? "VERIFIED" : anyVerified ? "PENDING" : "FAILED";
   return prisma.domain.update({
     where: { id: domainId },
-    data: { status, lastCheckedAt: new Date() },
+    data: { ...data, lastCheckedAt: new Date() },
     include: { dnsRecords: true },
   });
 }
@@ -151,8 +262,35 @@ export interface ConnectDomainOptions {
   forceHttps?: boolean;
 }
 
+/**
+ * The records a domain's owner must add, apex vs subdomain (shared
+ * `expectedDnsRecords`). The apex comes from Vercel's `apexName` and the
+ * targets from its domain config (`recommendedIPv4` / `recommendedCNAME`,
+ * rank 1) when we have them, else `apexOf` and the static Vercel targets. Any
+ * ownership challenge Vercel issued (`verification[]`, a TXT) is added as given.
+ */
+function instructionsFrom(opts: {
+  domain: string;
+  attached: { apexName: string | null; verification: Array<{ type: string; domain: string; value: string }> } | null;
+  config: Pick<VercelDomainConfig, "recommendedIPv4" | "recommendedCNAME"> | null;
+  ownershipToken: string | null;
+}): ExpectedDnsRecord[] {
+  return [
+    ...expectedDnsRecords({
+      domain: opts.domain,
+      apex: opts.attached?.apexName ?? apexOf(opts.domain),
+      ipv4: opts.config?.recommendedIPv4,
+      cname: opts.config?.recommendedCNAME,
+      ownershipToken: opts.ownershipToken,
+    }),
+    ...(opts.attached?.verification ?? []).map((v) => ({ type: v.type.toUpperCase(), host: v.domain, value: v.value })),
+  ];
+}
+
 export async function connectDomain(siteId: string, input: ConnectDomainOptions) {
-  const { domain } = input;
+  // DNS names are case-insensitive and `bella.com.` is `bella.com`; the schema
+  // accepts both spellings, so one name is stored — and refused — one way.
+  const domain = input.domain.trim().toLowerCase().replace(/\.$/, "");
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, slug: true, vercelProjectName: true, deletedAt: true } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
@@ -165,7 +303,7 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
   const currentDomainCount = await prisma.domain.count({ where: { site: { workspaceId: site.workspaceId } } });
   if (maxDomains > 0 && currentDomainCount >= maxDomains) throw new Error("DOMAIN_LIMIT");
 
-  const existing = await prisma.domain.findFirst({ where: { domain } });
+  const existing = await prisma.domain.findFirst({ where: { domain: { equals: domain, mode: "insensitive" } } });
   if (existing) throw new Error("DOMAIN_IN_USE");
 
   // The domain lives on this project from now on — pin it, so a slug change
@@ -187,6 +325,30 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
     }
   }
 
+  /* Attach first, so a domain Vercel refuses never becomes a row here. A 409
+     means the domain is assigned to ANOTHER Vercel project (docs: "add a
+     domain to a project"); it used to be read as verified, so the domain
+     showed Connected while it served someone else's site. Any other failure
+     is an integration hiccup: keep the fallback instructions, leave the domain
+     PENDING, and let the dns-verify cron re-check — but log it. */
+  let attached: Awaited<ReturnType<typeof addDomainToVercelProject>> | null = null;
+  let attachedWith: { token: string; teamId: string | null } | null = null;
+  try {
+    const conn = await getActiveVercelConnection(site.workspaceId);
+    if (conn) {
+      attachedWith = conn;
+      attached = await addDomainToVercelProject({
+        token: conn.token,
+        teamId: conn.teamId,
+        projectName,
+        domain,
+      });
+    }
+  } catch (err) {
+    if (err instanceof VercelApiError && err.status === 409) throw new Error("DOMAIN_ATTACHED_ELSEWHERE");
+    console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
+  }
+
   const created = await prisma.domain.create({
     data: {
       siteId,
@@ -199,49 +361,32 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
     },
   });
 
-  // Attach the domain to the workspace's Vercel project so it actually serves
-  // traffic, and use Vercel's real verification records as the DNS instructions.
-  // Falls back to the three records the Add-a-domain dialog draws (apex A,
-  // `www` CNAME, our `_buildrick` TXT — Clone 3737:43669) if the workspace has
-  // no Vercel connection (dev / not yet authed) or the API call fails — the
-  // domain stays PENDING and the dns-verify cron can re-attempt.
-  let dnsRecords: Array<{ type: string; host: string; value: string }> = [
-    { type: "A", host: "@", value: VERCEL_APEX_IP },
-    { type: "CNAME", host: "www", value: VERCEL_CNAME },
-    { type: "TXT", host: "_buildrick", value: dnsVerificationToken(created.id) },
-  ];
-
-  try {
-    const conn = await getActiveVercelConnection(site.workspaceId);
-    if (conn) {
-      const result = await addDomainToVercelProject({
-        token: conn.token,
-        teamId: conn.teamId,
-        projectName,
-        domain,
-      });
-      if (result.verification.length > 0) {
-        dnsRecords = result.verification.map((v) => ({
-          type: v.type.toUpperCase(),
-          host: v.domain,
-          value: v.value,
-        }));
-      }
-      if (result.verified) {
-        await prisma.domain.update({ where: { id: created.id }, data: { status: "VERIFIED" } });
-      }
+  let config: VercelDomainConfig | null = null;
+  if (attachedWith) {
+    try {
+      config = await getVercelDomainConfig({ ...attachedWith, projectName, domain });
+    } catch (err) {
+      console.error(`[domain] Vercel config read failed for ${domain}:`, err);
     }
-  } catch (err) {
-    // Vercel attach failed — keep the fallback CNAME instructions and leave the
-    // domain PENDING (the dns-verify cron re-attempts). Never fail the whole
-    // connect on an integration hiccup, but log it so the silent swallow is
-    // diagnosable rather than invisible.
-    console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
   }
+  const dnsRecords = instructionsFrom({
+    domain,
+    attached,
+    config,
+    // Q6: only the no-Vercel path needs our ownership TXT.
+    ownershipToken: attachedWith ? null : dnsVerificationToken(created.id),
+  });
 
   await prisma.dnsRecord.createMany({
     data: dnsRecords.map((r) => ({ domainId: created.id, type: r.type, host: r.host, value: r.value })),
   });
+
+  /* Connected = Vercel holds it on this project AND its config is not
+     misconfigured (Q7) — `verified` alone is only ownership. A domain already
+     pointed at Vercel is live the moment it is attached. */
+  if (attached?.verified && config?.misconfigured === false) {
+    await prisma.domain.update({ where: { id: created.id }, data: { status: "VERIFIED", sslStatus: "ACTIVE" } });
+  }
 
   // The dialog shows the provider's expected shape before and the REAL rows
   // after — so the answer carries the records just written, not the bare row.
@@ -290,4 +435,31 @@ export async function setPrimaryDomain(id: string, siteId: string) {
     await tx.domain.updateMany({ where: { siteId }, data: { isPrimary: false } });
     await tx.domain.update({ where: { id }, data: { isPrimary: true } });
   });
+}
+
+/**
+ * The dns-verify cron's whole job: re-check the domains that are not yet
+ * Connected with SSL, oldest check first, through `checkDomainDns` — the same
+ * function "Check DNS" runs. The cron route used to carry its own copy of the
+ * node:dns match (and its own VERIFIED rule), which is how the two drifted.
+ * Capped per run (Vercel's domain endpoints are rate limited); one domain's
+ * failure is logged and does not stop the rest.
+ */
+export async function verifyPendingDomains(limit = 20): Promise<{ checked: number; verified: number }> {
+  const due = await prisma.domain.findMany({
+    where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }] },
+    orderBy: [{ lastCheckedAt: { sort: "asc", nulls: "first" } }],
+    take: limit,
+    select: { id: true, siteId: true },
+  });
+  let verified = 0;
+  for (const d of due) {
+    try {
+      const result = await checkDomainDns(d.id, d.siteId);
+      if (result?.status === "VERIFIED") verified++;
+    } catch (err) {
+      console.error(`[domain] scheduled DNS check failed for domain ${d.id}:`, err);
+    }
+  }
+  return { checked: due.length, verified };
 }

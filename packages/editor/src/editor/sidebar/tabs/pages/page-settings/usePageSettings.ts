@@ -15,6 +15,10 @@ import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore, isPlaceholderSlug } from "../utils/seoScore";
+import { resolvePageTitle } from "@/engine/export/SEOInjector";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useServerLoad } from "@/editor/sidebar/tabs/settings/hooks/useServerLoad";
+import { siteOrigin, type SiteDomainRow } from "@buildrik/shared/seo/urls";
 import { normalizeSlug, validateSlug, isSlugDuplicate } from "../utils/slug";
 
 export type SaveState = "clean" | "saving" | "error";
@@ -23,8 +27,17 @@ export interface UsePageSettingsReturn {
   activeTab: DrawerTab;
   setActiveTab: (tab: DrawerTab) => void;
 
+  /** The page's OWN meta title — empty when it has none. Only what the user
+   *  types here is saved (D1, owner 2026-10-06 "empty field + placeholder"). */
   seoTitle: string;
   setSeoTitle: (v: string) => void;
+  /** The title this page ships with when it has no own title — the exporter's
+   *  own precedence (site default, else the page name through the template).
+   *  The title field's placeholder. */
+  inheritedTitle: string;
+  /** The title this page ships with as drafted: the own title through the
+   *  site template, else the inherited one. The Google / social previews. */
+  effectiveTitle: string;
   seoDesc: string;
   setSeoDesc: (v: string) => void;
   slug: string;
@@ -52,6 +65,8 @@ export interface UsePageSettingsReturn {
   setCustomHead: (v: string) => void;
   headCodeError: string | null;
 
+  /** The host the published page sits on, without the scheme (`acme.com`,
+   *  `proj.vercel.app`); null until something is known. */
   domain: string | null;
   /** The site's live URL, or null when it has never been published. Gates the
       slug-change warning: "existing links" can only exist if the site is
@@ -97,7 +112,10 @@ function getPersistedState(page: PageItem): PersistedState {
   /* A legacy password page already arrives as "hidden" (usePages, #26). */
   const visibility: PersistedState["visibility"] = page.status === "hidden" ? "hidden" : "live";
   return {
-    seoTitle: page.seo?.metaTitle ?? page.name,
+    /* The page's own title only. Seeding page.name here (D1) wrote it back as
+       the page's title on any save and opted the page out of the site's
+       default title. What the page inherits is the placeholder instead. */
+    seoTitle: page.seo?.metaTitle ?? "",
     seoDesc: page.seo?.metaDescription ?? "",
     slug: page.slug ?? "",
     ogTitle: page.seo?.ogTitle ?? "",
@@ -136,6 +154,27 @@ export function usePageSettings(
   const [saveState, setSaveState] = React.useState<SaveState>("clean");
 
   const savedSnapshot = React.useRef<string>("");
+
+  /* The two facts the host choice needs that the composer does not hold: the
+     typed canonical (a Site column) and the custom domains. Read on open, as
+     Settings › SEO reads them, so a canonical changed this session counts. */
+  const [siteHost, setSiteHost] = React.useState<{ canonicalUrl: string | null; domains: SiteDomainRow[] }>({
+    canonicalUrl: null,
+    domains: [],
+  });
+  const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
+  useServerLoad(
+    siteId,
+    async (client, id) => {
+      const [row, domains] = await Promise.all([
+        client.siteDetail.settings.get.query({ siteId: id }),
+        client.siteDetail.domains.list.query({ siteId: id }).catch((): SiteDomainRow[] => []),
+      ]);
+      return { canonicalUrl: row.canonicalUrl ?? null, domains };
+    },
+    setSiteHost,
+    {},
+  );
 
   const applyPersistedState = React.useCallback((p: PageItem) => {
     const state = getPersistedState(p);
@@ -289,12 +328,22 @@ export function usePageSettings(
     applyPersistedState(page);
   }, [page, applyPersistedState]);
 
+  /* What ships, by the exporter's own rule (`resolvePageTitle`): the stored
+     page settings carry a legacy `title` the exporter still honours. */
+  const siteSeo = composer?.getProjectSettings?.()?.seo;
+  const storedSettings = page ? composer?.elements?.getPage?.(page.id)?.settings : undefined;
+  const inheritedTitle = page ? resolvePageTitle(page, undefined, storedSettings, siteSeo) : "";
+  const effectiveTitle = page ? resolvePageTitle(page, { metaTitle: seoTitle }, storedSettings, siteSeo) : "";
+  /* An empty field is not a missing title: the page ships the inherited one,
+     so that is what the score grades. */
+  const gradedTitle = seoTitle || inheritedTitle;
+
   const seoScore = React.useMemo(
-    () => calculateSeoScore({ title: seoTitle, desc: seoDesc, slug, allowIndex }),
-    [seoTitle, seoDesc, slug, allowIndex]
+    () => calculateSeoScore({ title: gradedTitle, desc: seoDesc, slug, allowIndex }),
+    [gradedTitle, seoDesc, slug, allowIndex]
   );
   const seoChecks = {
-    titleSet: seoTitle.length >= 10,
+    titleSet: gradedTitle.length >= 10,
     /* Green means the full "+30 pts" the panel advertises is actually earned.
        It used to mean "valid and non-empty", which is only 20 of them on a
        placeholder slug — the tick said yes while the score said no. */
@@ -303,21 +352,24 @@ export function usePageSettings(
     descSet: seoDesc.length >= 50,
   };
 
-  // A4 parity with usePages.copyPageLink: domain lives in ProjectData metadata,
-  // NOT on `composer.project.domain` (that property doesn't exist on Composer
-  // and silently resolved to undefined — the slug preview was always broken).
-  const domain = composer?.getProjectMetadata?.()?.domain ?? null;
-
   /* Whether this site is reachable by anyone. The slug warning is about
      "existing links", so the honest question is whether links can exist —
      which is a fact about the site being published, not about the page. */
   const publishedUrl = composer?.getProjectMetadata?.()?.publishedUrl ?? null;
+
+  /* D2: the host the publish worker puts this page on (`siteOrigin`, the
+     same order as the robots.txt preview). It read `metadata.domain`, filled
+     from a `sites.get` field that does not exist — always yoursite.com. */
+  const origin = siteOrigin(siteHost.domains, publishedUrl, siteHost.canonicalUrl);
+  const domain = origin ? origin.replace(/^https?:\/\//, "") : null;
 
   return {
     activeTab,
     setActiveTab,
     seoTitle,
     setSeoTitle,
+    inheritedTitle,
+    effectiveTitle,
     seoDesc,
     setSeoDesc,
     slug,

@@ -30,6 +30,7 @@ import type { BuildrikApiClient } from "@/services/api-client";
 import { EVENTS } from "@/shared/constants/events";
 import type { ProjectSettings } from "@/shared/types/project";
 import { SOCIAL_NETWORKS, updateSiteSettingsSchema, type SocialNetwork } from "@buildrik/shared/schemas/site-detail";
+import { siteOrigin, type SiteDomainRow } from "@buildrik/shared/seo/urls";
 import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen, SiteColumnGate, Textarea } from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps, SettingsFlushResult } from "../types";
@@ -50,29 +51,6 @@ interface SeoRow {
   allowIndexing?: boolean | null;
   robotsTxt?: string | null;
   socialLinks?: unknown;
-}
-
-interface DomainRow {
-  domain: string;
-  status: string;
-  isPrimary: boolean;
-}
-
-/**
- * The origin the published sitemap will sit on: the site's primary custom
- * domain when one is verified, else where the site was last published; null
- * when nothing is known yet (the default then names no host).
- */
-export function sitemapOrigin(domains: ReadonlyArray<DomainRow>, publishedUrl: string | null | undefined): string | null {
-  const verified = domains.filter((d) => d.status === "VERIFIED");
-  const custom = verified.find((d) => d.isPrimary) ?? verified[0];
-  if (custom) return `https://${custom.domain}`;
-  if (!publishedUrl) return null;
-  try {
-    return new URL(publishedUrl).origin;
-  } catch {
-    return null;
-  }
 }
 
 /**
@@ -160,12 +138,12 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     }),
   );
 
-  const load = useServerLoad<{ row: SeoRow; domains: DomainRow[] }>(
+  const load = useServerLoad<{ row: SeoRow; domains: SiteDomainRow[] }>(
     projectId,
     async (client: BuildrikApiClient, siteId) => {
       const [row, domains] = await Promise.all([
         client.siteDetail.settings.get.query({ siteId }),
-        client.siteDetail.domains.list.query({ siteId }).catch((): DomainRow[] => []),
+        client.siteDetail.domains.list.query({ siteId }).catch((): SiteDomainRow[] => []),
       ]);
       return { row, domains };
     },
@@ -188,7 +166,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           robotsTxt: row.robotsTxt ?? "",
         }),
       );
-      setOrigin(sitemapOrigin(domains, composer?.getProjectMetadata().publishedUrl));
+      setOrigin(siteOrigin(domains, composer?.getProjectMetadata().publishedUrl, row.canonicalUrl));
     },
     { onLoadStateChange, registerRetryLoad },
   );

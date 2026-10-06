@@ -16,6 +16,9 @@ import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 import { isPlaceholderSlug } from "../utils/seoScore";
+import { resolvePageDescription } from "@/engine/export/SEOInjector";
+import { pageFileNames } from "@/engine/export/ExportEngine";
+import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -30,7 +33,7 @@ interface Props {
 }
 
 /** The public path a page answers on. The home page is `/` whatever its slug
- *  says (SitemapGenerator, the exporter), so a home-page slug edit moves no URL. */
+ *  says (the exporter), so a home-page slug edit moves no URL. */
 function publicPath(page: PageItem, slug: string): string {
   return page.isHome ? "/" : `/${slug}`;
 }
@@ -66,7 +69,24 @@ const BTN_SECONDARY = `${BTN_32} tw:border-transparent tw:bg-[var(--bk-bg-subtle
 export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpenSiteDefaults }) => {
   const siteName = composer?.getProjectMetadata?.()?.name;
   const domain = s.domain ?? "yoursite.com";
-  const range = titleRange(s.seoTitle);
+  /* An empty field ships the inherited title, so the counter measures that. */
+  const countedTitle = s.seoTitle || s.inheritedTitle;
+  const range = titleRange(countedTitle);
+  /* The preview shows what ships: the exporter's own precedence, so a page
+     with no title or description of its own previews the site defaults it
+     inherits (owner decision Q4), not an empty slot. */
+  const siteSeo = composer?.getProjectSettings?.()?.seo;
+  const previewTitle = s.effectiveTitle;
+  const previewDesc = resolvePageDescription({ metaDescription: s.seoDesc }, undefined, siteSeo);
+  /* The URL the deploy serves for this page: the file the export writes for it
+     (`about.html`, numbered on a slug clash, index.html for home) through the
+     same builder as the canonical and sitemap. It read `/<slug>` while the
+     deploy served `/<slug>.html` (no cleanUrls yet). */
+  const sitePages = composer?.elements?.getAllPages?.() ?? [];
+  const withThis = sitePages.some((p) => p.id === page.id) ? sitePages : [...sitePages, page];
+  const servedFile =
+    pageFileNames(withThis.map((p) => (p.id === page.id ? { ...p, slug: s.slug } : p))).get(page.id) ?? "index.html";
+  const previewUrl = (pageCanonicalUrl(domain, servedFile) ?? "").replace(/^https?:\/\//, "");
   const [aiBusy, setAiBusy] = React.useState(false);
 
   /* The redirect offer (Clone 3519:19920's door). `page.slug` is the SAVED
@@ -254,7 +274,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
                   : "tw:text-[var(--bk-error)]"
             }`}
           >
-            {s.seoTitle.length}/60{rangeLabel[range]}
+            {countedTitle.length}/60{rangeLabel[range]}
           </span>
         </div>
         <TextInput
@@ -264,6 +284,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
           value={s.seoTitle}
           onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 60))}
           maxLength={60}
+          placeholder={s.inheritedTitle}
           aria-describedby="seo-title-hint"
         />
       </div>
@@ -332,18 +353,19 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       </div>
       {/* Google preview — prototype .gpreview */}
       <div className={`tw:p-3.5 ${CARD}`}>
-        <div className={`tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
-          {s.domain ?? "yoursite.com"} › {page.slug?.replace(/^\//, "") || page.id}
+        <div className={`tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`} data-testid="seo-preview-url">
+          {previewUrl}
         </div>
-        <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`}>
-          {s.seoTitle || page.name}
+        <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`} data-testid="seo-preview-title">
+          {previewTitle}
         </div>
         <div
           className={`tw:text-[length:var(--bk-text-13)] tw:leading-snug ${UI} ${
-            s.seoDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)] tw:italic"
+            previewDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)] tw:italic"
           }`}
+          data-testid="seo-preview-desc"
         >
-          {s.seoDesc || "No description — add one below to improve ranking"}
+          {previewDesc || "No description — add one below to improve ranking"}
         </div>
       </div>
       {/* ── 2. SEO SCORE ────────────────────────────────────────────────── */}

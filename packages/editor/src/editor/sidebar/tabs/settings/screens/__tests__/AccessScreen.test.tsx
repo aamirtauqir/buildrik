@@ -1,7 +1,9 @@
 /**
  * AccessScreen tests — 8136:216089 password-set, 8136:216319 password-off,
  * 8136:216535 set-password: the switch, the "A password is set" line and its
- * New password + Remove, the Password field when none is stored, the off line,
+ * Change + Remove (owner 2026-10-04: the New password field waits behind
+ * Change), the purpose line on every state, the Password field when none is
+ * stored, the off line,
  * the footer save through `siteDetail.settings.update` (never echoing the
  * stored value), the refusal before Save, and the Share links door.
  *
@@ -50,29 +52,63 @@ function setup(over: Partial<React.ComponentProps<typeof AccessScreen>> = {}) {
 const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-password-protection")).toBeInTheDocument());
 
 describe("AccessScreen — a password is stored (8136:216089)", () => {
-  it("draws the switch on, 'A password is set', the New password field, Remove and the publish note", async () => {
+  it("owner 2026-10-04: draws the switch on, 'A password is set' with Change and Remove — no field until Change — and the publish note", async () => {
     setup();
     await loaded();
     expect(screen.getByText("Password protection · Pro")).toBeInTheDocument();
     expect(screen.getByTestId("set-access-toggle")).toHaveAttribute("aria-checked", "true");
     expect(screen.getByTestId("set-access-is-set")).toHaveTextContent("A password is set");
-    expect(screen.getByLabelText("New password")).toHaveAttribute("placeholder", "Enter a new password to change it");
-    expect(screen.getByLabelText("New password")).toHaveValue("");
-    expect(screen.getByLabelText("New password").id).toBe("access-password");
+    expect(screen.getByTestId("set-access-change")).toHaveTextContent("Change");
     expect(screen.getByTestId("set-access-remove")).toHaveTextContent("Remove");
+    expect(screen.queryByLabelText("New password")).toBeNull();
     expect(screen.getByText("Applies on next publish")).toBeInTheDocument();
     expect(get).toHaveBeenCalledWith({ siteId: "s1" });
+    // The stored value is never on screen.
+    expect(document.querySelector("input[type=password]")).toBeNull();
+  });
+
+  it("Change opens the New password field, focused and empty; Cancel closes it without a write", async () => {
+    const { onDirtyChange } = setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-access-change"));
+    const field = screen.getByLabelText("New password");
+    expect(field).toHaveAttribute("placeholder", "Enter a new password to change it");
+    expect(field).toHaveValue("");
+    expect(field.id).toBe("access-password");
+    await waitFor(() => expect(document.activeElement).toBe(field));
+    expect(screen.queryByTestId("set-access-change")).toBeNull();
+    fireEvent.change(field, { target: { value: "half" } });
+    fireEvent.click(screen.getByTestId("set-access-change-cancel"));
+    expect(screen.queryByLabelText("New password")).toBeNull();
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
+    expect(updateSiteColumns).not.toHaveBeenCalled();
   });
 
   it("typing a new password is dirty and Save sends it — and only it", async () => {
     const { onDirtyChange, save } = setup();
     await loaded();
+    fireEvent.click(screen.getByTestId("set-access-change"));
     fireEvent.change(screen.getByLabelText("New password"), { target: { value: "s3cret!" } });
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
     await save();
     expect(updateSiteColumns).toHaveBeenCalledWith("s1", { publishedPassword: "s3cret!" });
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
-    expect(screen.getByLabelText("New password")).toHaveValue("");
+    expect(screen.queryByLabelText("New password")).toBeNull();
+    expect(screen.getByTestId("set-access-is-set")).toBeInTheDocument();
+  });
+
+  /* QA 2026-10-05: a New password of only spaces enabled Save and would have
+     stored a blank-looking password. */
+  it("a New password of only spaces is refused before Save", async () => {
+    const { registerFieldErrors } = setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-access-change"));
+    fireEvent.change(screen.getByLabelText("New password"), { target: { value: "   " } });
+    await waitFor(() =>
+      expect(registerFieldErrors).toHaveBeenLastCalledWith({ "publishing.publishedPassword": "A password can't be only spaces" }),
+    );
+    fireEvent.change(screen.getByLabelText("New password"), { target: { value: " ok " } });
+    await waitFor(() => expect(registerFieldErrors).toHaveBeenLastCalledWith(null));
   });
 
   it("Remove turns protection off (8136:216319) and Save sends null", async () => {
@@ -98,13 +134,23 @@ describe("AccessScreen — a password is stored (8136:216089)", () => {
 describe("AccessScreen — no password stored (8136:216535)", () => {
   beforeEach(() => get.mockResolvedValue({ hasPublishedPassword: false }));
 
-  it("switching on asks for a Password, refuses Save until one is typed, then saves it", async () => {
+  it("owner 2026-10-04: off, the card says what password protection is for", async () => {
+    setup();
+    await loaded();
+    expect(screen.getByTestId("set-access-purpose")).toHaveTextContent(
+      "Visitors must enter a password before they can see the published site. Useful for client previews and staging.",
+    );
+  });
+
+  it("switching on asks for a Password at once (focused), refuses Save until one is typed, then saves it", async () => {
     const { registerFieldErrors, save } = setup();
     await loaded();
     expect(screen.getByTestId("set-access-toggle")).toHaveAttribute("aria-checked", "false");
     expect(screen.getByTestId("set-access-off")).toHaveTextContent("Anyone with the address can view the published site.");
+    expect(screen.queryByLabelText("Password")).toBeNull();
     fireEvent.click(screen.getByTestId("set-access-toggle"));
     expect(screen.getByLabelText("Password")).toHaveAttribute("placeholder", "Enter a password");
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText("Password")));
     expect(screen.queryByTestId("set-access-is-set")).toBeNull();
     await waitFor(() =>
       expect(registerFieldErrors).toHaveBeenLastCalledWith({ "publishing.publishedPassword": "Enter a password to turn protection on" }),
@@ -114,6 +160,9 @@ describe("AccessScreen — no password stored (8136:216535)", () => {
     await save();
     expect(updateSiteColumns).toHaveBeenCalledWith("s1", { publishedPassword: "open-sesame" });
     await waitFor(() => expect(screen.getByTestId("set-access-is-set")).toBeInTheDocument());
+    // Set → the stored state: Change + Remove, the typed value gone from the DOM.
+    expect(screen.getByTestId("set-access-change")).toBeInTheDocument();
+    expect(document.querySelector("input[type=password]")).toBeNull();
   });
 
   it("shows the server's refusal under the field", async () => {

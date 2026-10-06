@@ -1,7 +1,7 @@
 /**
  * RedirectsScreen tests — 8136:214826 csv-actions: the header's Import CSV ·
  * Export CSV · Add redirect, the Redirect rules table FROM · TO · TYPE with
- * `Edit · Delete` per row (Delete at once → the toast's Undo, 8136:215838),
+ * `Edit · Delete` per row (Delete asks first — owner 2026-10-04 — then the toast's Undo, 8136:215838),
  * Import → RedirectCsvDialog → `import_csv` → "Created N" (8136:215568), a
  * refused file inline (8136:215307), Export → `export_csv`; the empty card,
  * the 404 suggester (the switch applies at once through
@@ -33,7 +33,11 @@ const { api } = vi.hoisted(() => ({
   },
 }));
 
-const { addToast, updateProjectSettings } = vi.hoisted(() => ({ addToast: vi.fn(), updateProjectSettings: vi.fn() }));
+const { addToast, removeToast, updateProjectSettings } = vi.hoisted(() => ({
+  addToast: vi.fn((_input: { action: { onClick(): void } }) => "toast-1"),
+  removeToast: vi.fn(),
+  updateProjectSettings: vi.fn(),
+}));
 
 vi.mock("@/services/api-client", () => ({
   getBuildrikClient: () => api,
@@ -41,7 +45,7 @@ vi.mock("@/services/api-client", () => ({
 vi.mock("@/services/BuildrikSyncProvider", () => ({ updateProjectSettings }));
 vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
-  useToast: () => ({ addToast, removeToast: vi.fn() }),
+  useToast: () => ({ addToast, removeToast }),
 }));
 
 import { RedirectsScreen, renamedDay, type RedirectRow } from "../RedirectsScreen";
@@ -74,6 +78,8 @@ beforeEach(() => {
   r.import_csv.mutate.mockReset().mockResolvedValue({ created: 12 });
   r.export_csv.query.mockReset().mockResolvedValue({ csv: "from,to,type\n/a,/b,301" });
   addToast.mockReset();
+  addToast.mockImplementation((_input: { action: { onClick(): void } }) => "toast-1");
+  removeToast.mockReset();
   updateProjectSettings.mockReset().mockResolvedValue({ saved: { redirects: { suggestFrom404s: false } }, warnings: {} });
 });
 
@@ -266,12 +272,24 @@ describe("the suggester switch — applies at once (SA-16)", () => {
   });
 });
 
-describe("Delete → the undo toast (8136:215838)", () => {
-  it("deletes at once, the row leaves, and the toast names the rule with Undo", async () => {
+describe("Delete → confirm → the undo toast (8136:215838)", () => {
+  it("owner 2026-10-04: a row's Delete asks first, and Cancel deletes nothing", async () => {
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
+    expect(screen.getByTestId("set-rd-confirm")).toHaveTextContent("Delete redirect /menu-old → /menu?");
+    fireEvent.click(within(screen.getByTestId("modal-foot-set-rd-confirm")).getByText("Cancel"));
+    await waitFor(() => expect(screen.queryByTestId("set-rd-confirm")).toBeNull());
+    expect(r.delete.mutate).not.toHaveBeenCalled();
+    expect(screen.getByTestId("set-rd-row-r1")).toBeInTheDocument();
+  });
+
+  it("once confirmed, deletes, the row leaves, and the toast names the rule with Undo", async () => {
     setup();
     await loaded();
     r.list.query.mockResolvedValue(SEEDED.filter((x) => x.id !== "r1"));
     fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(r.delete.mutate).toHaveBeenCalledWith({ id: "r1" }));
     await waitFor(() => expect(screen.queryByTestId("set-rd-row-r1")).toBeNull());
     expect(addToast).toHaveBeenCalledWith(
@@ -287,6 +305,7 @@ describe("Delete → the undo toast (8136:215838)", () => {
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(addToast).toHaveBeenCalled());
     r.list.query.mockResolvedValue(SEEDED);
     await act(async () => addToast.mock.calls[0][0].action.onClick());
@@ -303,11 +322,29 @@ describe("Delete → the undo toast (8136:215838)", () => {
     await waitFor(() => expect(screen.getByTestId("set-rd-row-r1")).toBeInTheDocument());
   });
 
+  /* QA 2026-10-05: the toast stayed up after Undo (a focused toast never times
+     out), and a second Undo posted the rule again — a 409 and the "not saved"
+     banner over a rule that was back. Undo runs once and takes its toast down. */
+  it("Undo runs once and dismisses its toast", async () => {
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-rd-delete-r1"));
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
+    await waitFor(() => expect(addToast).toHaveBeenCalled());
+    const undo = addToast.mock.calls[0][0].action.onClick;
+    await act(async () => undo());
+    await act(async () => undo());
+    expect(removeToast).toHaveBeenCalledWith("toast-1");
+    await waitFor(() => expect(r.create.mutate).toHaveBeenCalledTimes(1));
+    expect(screen.queryByTestId("set-save-error")).toBeNull();
+  });
+
   it("a refused delete shows the banner and keeps the row, with no toast", async () => {
     r.delete.mutate.mockRejectedValue(new Error("FORBIDDEN"));
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-rd-delete-r2"));
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(screen.getByTestId("set-save-error")).toBeInTheDocument());
     expect(screen.getByTestId("set-rd-row-r2")).toBeInTheDocument();
     expect(addToast).not.toHaveBeenCalled();
@@ -490,16 +527,21 @@ describe("a row's Edit → 4254:75747 → redirects.update / delete → re-list"
     expect(r.list.query).toHaveBeenCalledTimes(2);
   });
 
-  it("Delete redirect deletes at once with the id, closes, and the row leaves on re-list", async () => {
+  it("Delete redirect asks first, then deletes with the id, closes, the row leaves on re-list, and the Undo toast shows", async () => {
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-rd-edit-r2"));
     r.list.query.mockResolvedValue(SEEDED.filter((x) => x.id !== "r2"));
     fireEvent.click(screen.getByTestId("set-rd-delete"));
+    expect(r.delete.mutate).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(r.delete.mutate).toHaveBeenCalledWith({ id: "r2" }));
     await waitFor(() => expect(screen.queryByTestId("set-rd-dialog")).toBeNull());
     await waitFor(() => expect(screen.queryByTestId("set-rd-row-r2")).toBeNull());
     expect(screen.getByTestId("set-rd-row-r1")).toBeInTheDocument();
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ title: expect.stringMatching(/^Redirect .* deleted$/), action: expect.objectContaining({ label: "Undo" }) }),
+    );
   });
 
   it("a refused delete stays inline in the dialog and the row stays", async () => {
@@ -508,6 +550,7 @@ describe("a row's Edit → 4254:75747 → redirects.update / delete → re-list"
     await loaded();
     fireEvent.click(screen.getByTestId("set-rd-edit-r2"));
     fireEvent.click(screen.getByTestId("set-rd-delete"));
+    fireEvent.click(screen.getByTestId("set-rd-confirm-confirm"));
     await waitFor(() => expect(screen.getByTestId("set-rd-error")).toHaveTextContent("Only an editor can delete a redirect."));
     expect(screen.getByTestId("set-rd-dialog")).toBeInTheDocument();
     expect(screen.getByTestId("set-rd-row-r2")).toBeInTheDocument();

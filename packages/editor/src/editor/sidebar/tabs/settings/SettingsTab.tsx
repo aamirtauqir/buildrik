@@ -5,8 +5,9 @@
  *
  *   ┌ sidebar 256 ─────────┬ pane ─────────────────────────────────────────┐
  *   │ ‹ Back to canvas     │ Group / Screen               [action | Upgrade]│
- *   │ Settings        ⌕    │ <site> · all pages · applies on next publish   │
+ *   │ Settings             │ <site> · all pages · applies on next publish   │
  *   │ <site>               │ subtitle                                       │
+ *   │ ⌕ Search             │                                                │
  *   │ ▸ Overview           ├────────────────────────────────────────────────┤
  *   │ SITE · SEARCH & …    │ [read-only banner] the screen's cards          │
  *   │ … DANGER ZONE        ├────────────────────────────────────────────────┤
@@ -22,6 +23,15 @@
  * `sites.saveProject`), the Saved toast, field errors, and the Unsaved
  * settings guard (Back to canvas / Escape / any nav click while dirty). The
  * screen owns its cards, its load card and its save-error banner.
+ *
+ * Search Mode — OWNER OVERRIDE 2026-10-04 (boards 6816:60270 / 8134:212121
+ * draw the field always on, at the top of the nav; to update): the field is
+ * gone from the sidebar. The `Search` entry swaps the whole sidebar in place
+ * for a focused field and a ✕ — header, Overview, groups, workspace doors and
+ * role foot all step away — and typing lists `searchSettings` results (screens
+ * and fields) live; ↑/↓ move, Enter or a click opens the result's screen and
+ * lands on its field, leaving Search Mode. ✕ and Escape leave it too, clear
+ * the query and give back the sidebar as it was (current row, scroll).
  *
  * @license BSD-3-Clause
  */
@@ -81,7 +91,7 @@ import {
 } from "./index";
 import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
-import { searchSettings } from "./searchIndex";
+import { searchSettings, type SearchEntry } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import {
   getEditorPlanTier,
@@ -147,6 +157,21 @@ const NAV_PILL =
 
 /* M0's group label: 24 tall, 8 in, 11px uppercase in ink. */
 const NAV_GROUP = "tw:flex tw:h-6 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:uppercase tw:leading-4 tw:text-[var(--bk-ink)]";
+
+/* Search Mode's field: 36 tall, 12px, on the subtle fill until focused. */
+const INPUT_THEME = {
+  field: {
+    input: {
+      base: "tw:[&::-webkit-search-cancel-button]:hidden tw:rounded-[var(--bk-radius-sm)]! tw:placeholder:text-[var(--bk-ink-muted)]",
+      /* 36 tall, 12px — the theme's own `md` is 32 / 13. */
+      sizes: { md: "tw:h-9 tw:py-0 tw:text-[length:var(--bk-text-12)]" },
+      colors: {
+        gray:
+          "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:focus:border-[var(--bk-accent)] tw:focus:bg-[var(--bk-bg-panel)] tw:focus:ring-[var(--bk-accent)]",
+      },
+    },
+  },
+};
 
 const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
   /* 4418:127313 marks Overview with a dot, not a glyph. */
@@ -243,14 +268,27 @@ export const SettingsTab: React.FC<
   type Pending = { kind: "leave" } | { kind: "nav"; id: SettingsNavId };
   const [guardOpen, setGuardOpen] = React.useState(false);
   const pendingRef = React.useRef<Pending | null>(null);
-  /* G3-097 · 6816:60270: Search is an inline sidebar filter, always on screen (8134:212121). */
+  /* Search Mode (owner 2026-10-04): the sidebar's own state while it is up. */
+  const [searchOpen, setSearchOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
+  const [activeResult, setActiveResult] = React.useState(0);
+  /* What Search Mode hands back on close: the nav's scroll, and focus to the entry. */
+  const navRef = React.useRef<HTMLElement | null>(null);
+  const navScrollRef = React.useRef(0);
+  const searchEntryRef = React.useRef<HTMLButtonElement | null>(null);
+  const refocusEntryRef = React.useRef(false);
+  /* Bumped when a result lands on a field of the screen already open — the
+     screen does not change, so the landing effect needs its own nudge. */
+  const [fieldJump, setFieldJump] = React.useState(0);
   const [loadState, setLoadState] = React.useState<ScreenLoadState>("ready");
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
   const [resetKey, setResetKey] = React.useState(0);
   /* A Search result names a field; it is scrolled to once its screen is on. */
   const pendingFieldRef = React.useRef<string | null>(null);
+  /* A Search result with no field lands focus on its screen's nav row — the
+     field it was typed in goes with Search Mode. */
+  const focusNavRowRef = React.useRef(false);
   /* The screen's own invalid fields (they disable Save) and the fields the
      server refused on the last Save (handed back to the screen). */
   const [clientFieldErrors, setClientFieldErrors] = React.useState<SettingsFieldErrors | null>(null);
@@ -319,7 +357,7 @@ export const SettingsTab: React.FC<
       (el.matches("input, select, textarea") ? el : el.querySelector<HTMLElement>("input, select, textarea") ?? el).focus();
     });
     return () => cancelAnimationFrame(frame);
-  }, [currentScreen, loadState, resetKey]);
+  }, [currentScreen, loadState, resetKey, fieldJump]);
 
   // ─── Doors and navigation ─────────────────────────────────────────────
 
@@ -395,12 +433,51 @@ export const SettingsTab: React.FC<
   }, [currentScreen]);
   const clearRepair = React.useCallback(() => setRepair(null), []);
 
+  // ─── Search Mode ──────────────────────────────────────────────────────
+
+  const openSearch = React.useCallback(() => {
+    navScrollRef.current = navRef.current?.scrollTop ?? 0;
+    setQuery("");
+    setActiveResult(0);
+    setSearchOpen(true);
+  }, []);
+  const closeSearch = React.useCallback((refocusEntry = true) => {
+    refocusEntryRef.current = refocusEntry;
+    setQuery("");
+    setActiveResult(0);
+    setSearchOpen(false);
+  }, []);
+  /* The nav re-mounts on close: put its scroll back before paint. */
+  React.useLayoutEffect(() => {
+    if (searchOpen) return;
+    if (navRef.current) navRef.current.scrollTop = navScrollRef.current;
+    if (refocusEntryRef.current) {
+      refocusEntryRef.current = false;
+      /* preventScroll: the entry sits at the nav's top, and a plain focus()
+         scrolls it into view — undoing the restore above (measured live:
+         140 → 0 at 1440×732). */
+      searchEntryRef.current?.focus({ preventScroll: true });
+    }
+  }, [searchOpen]);
+
+  React.useEffect(() => {
+    if (!focusNavRowRef.current || searchOpen || guardOpen) return;
+    focusNavRowRef.current = false;
+    navRef.current?.querySelector<HTMLElement>('[aria-current="page"]')?.focus();
+  }, [currentScreen, searchOpen, guardOpen, fieldJump]);
+
   // Escape is one more door out — guarded like the rest. The dialogs own
-  // their own Escape while they are up; an input keeps its own.
+  // their own Escape while they are up; an input keeps its own. Search Mode
+  // takes it first: Escape there closes the search, never Settings.
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (guardOpen) return;
+      if (searchOpen) {
+        e.preventDefault();
+        closeSearch();
+        return;
+      }
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return;
@@ -409,13 +486,20 @@ export const SettingsTab: React.FC<
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [guardOpen, requestLeave]);
+  }, [guardOpen, requestLeave, searchOpen, closeSearch]);
 
   // ─── The guard ────────────────────────────────────────────────────────
 
   const handleKeepEditing = React.useCallback(() => {
     pendingRef.current = null;
     setGuardOpen(false);
+    /* A Search result that raised the guard is abandoned, not deferred: the
+       next plain visit to its screen must not jump to its field. Focus goes
+       to the nav, since the search field it came from is gone. */
+    if (pendingFieldRef.current) {
+      pendingFieldRef.current = null;
+      focusNavRowRef.current = true;
+    }
   }, []);
 
   /* Drop the screen's edits by remounting it (it re-reads the composer, a
@@ -712,25 +796,47 @@ export const SettingsTab: React.FC<
 
   // ─── Sidebar rows ─────────────────────────────────────────────────────
 
-  /* The filter: a screen matches on its own title / description / group, or
-     through one of its fields — then the row lands on that field (the
-     retired dialog's jump & focus). */
+  /* Back to canvas's href: this editor's own URL without the Settings deep
+     link (`/edit/<siteId>?settings=…` → `/edit/<siteId>`). */
+  const canvasHref = (() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("settings");
+    return `${url.pathname}${url.search}${url.hash}`;
+  })();
+
+  /* Search Mode's results: screens and their fields, in the index's order. */
   const trimmed = query.trim();
-  const matchField = React.useMemo(() => {
-    if (!trimmed) return null;
-    const byScreen = new Map<string, string | null>();
-    for (const e of searchSettings(trimmed)) {
-      const prev = byScreen.get(e.screen);
-      if (e.fieldId === undefined) byScreen.set(e.screen, null);
-      else if (prev === undefined) byScreen.set(e.screen, e.fieldId);
-    }
-    return byScreen;
-  }, [trimmed]);
-  const openFromRow = (id: SettingsNavId) => {
-    pendingFieldRef.current = matchField?.get(id) ?? null;
-    requestNav(id);
+  const results = React.useMemo(() => (trimmed ? searchSettings(trimmed) : []), [trimmed]);
+  const activeIndex = Math.min(activeResult, Math.max(results.length - 1, 0));
+  /* ↑/↓ can wrap to a result far below the fold: keep the active one in view. */
+  React.useEffect(() => {
+    if (!searchOpen) return;
+    document.getElementById(`set-search-option-${activeIndex}`)?.scrollIntoView?.({ block: "nearest" });
+  }, [searchOpen, activeIndex]);
+  const openResult = (entry: SearchEntry) => {
+    pendingFieldRef.current = entry.fieldId ?? null;
+    focusNavRowRef.current = !entry.fieldId;
+    closeSearch(false);
+    if (entry.screen === currentScreen) setFieldJump((n) => n + 1);
+    else requestNav(entry.screen);
   };
-  const clearSearch = () => setQuery("");
+  const onSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
+      closeSearch();
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (results.length === 0) return;
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      setActiveResult((activeIndex + step + results.length) % results.length);
+    } else if (e.key === "Enter") {
+      const entry = results[activeIndex];
+      if (!entry) return;
+      e.preventDefault();
+      openResult(entry);
+    }
+  };
 
   const renderRow = (n: SettingsNavDef) => {
     const active = currentScreen === n.id;
@@ -743,7 +849,7 @@ export const SettingsTab: React.FC<
         size="xs"
         className={`${NAV_ROW}${active ? ` ${NAV_ROW_ON}` : ""}`}
         aria-current={active ? "page" : undefined}
-        onClick={() => openFromRow(n.id)}
+        onClick={() => requestNav(n.id)}
         data-testid={`set-nav-${n.id}`}
       >
         <NavRowIcon id={n.id} />
@@ -766,152 +872,210 @@ export const SettingsTab: React.FC<
     <div className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]" data-testid="set-root">
       {/* ── Sidebar (M0, 8134:212121) ───────────────────────────────────── */}
       <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
-        <div className="tw:flex tw:shrink-0 tw:flex-col tw:px-4 tw:pt-3">
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
-            className="tw:h-8 tw:w-54 tw:justify-center tw:gap-0.5 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]"
-            onClick={requestLeave}
-            data-testid="set-back"
-          >
-            <ChevronLeft size={12} aria-hidden />
-            Back to canvas
-          </Button>
-          <h2
-            className="tw:m-0 tw:mt-2.5 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:tracking-[-0.015em] tw:text-[var(--bk-ink)]"
-            data-testid="set-title"
-          >
-            Settings
-          </h2>
-          <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-site">
-            {siteName}
-          </div>
-        </div>
-        <nav className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-3" aria-label="Settings sections">
-          {/* 8134:212121 / 6816:60270: the search field is always there, at the top of the nav. */}
-          <div className="tw:relative tw:mb-1 tw:shrink-0" data-testid="set-search">
-            <TextInput
-              type="search"
-              icon={trimmed ? SearchIcon : undefined}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  clearSearch();
-                  e.currentTarget.blur();
-                }
-              }}
-              placeholder="Search site settings"
-              aria-label="Search site settings"
-              theme={{
-                field: {
-                  input: {
-                    base: "tw:pr-8 tw:[&::-webkit-search-cancel-button]:hidden tw:rounded-[var(--bk-radius-sm)]! tw:placeholder:text-[var(--bk-ink)]",
-                    /* 36 tall, 12px — the theme's own `md` is 32 / 13. */
-                    sizes: { md: "tw:h-9 tw:py-0 tw:text-[length:var(--bk-text-12)]" },
-                    colors: {
-                      gray:
-                        "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:focus:border-[var(--bk-accent)] tw:focus:bg-[var(--bk-bg-panel)] tw:focus:ring-[var(--bk-accent)]",
-                    },
-                  },
-                },
-              }}
-              data-testid="set-search-input"
-            />
-            {trimmed ? (
+        {searchOpen ? (
+          /* Search Mode (owner 2026-10-04): the field and its ✕, then the results — nothing else. */
+          <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" data-testid="set-search-mode">
+            <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:px-4 tw:pt-3 tw:pb-2">
+              <TextInput
+                type="search"
+                role="combobox"
+                autoFocus
+                icon={SearchIcon}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActiveResult(0);
+                }}
+                onKeyDown={onSearchKeyDown}
+                placeholder="Search site settings"
+                aria-label="Search site settings"
+                aria-autocomplete="list"
+                aria-expanded={results.length > 0}
+                aria-controls="set-search-results"
+                aria-activedescendant={results[activeIndex] ? `set-search-option-${activeIndex}` : undefined}
+                className="tw:min-w-0 tw:flex-1"
+                theme={INPUT_THEME}
+                data-testid="set-search-input"
+              />
               <IconButton
-                label="Clear search"
-                onClick={clearSearch}
-                className="tw:absolute tw:right-1.5 tw:top-1.5 tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]"
-                data-testid="set-search-clear"
+                label="Close search"
+                onClick={() => closeSearch()}
+                className="tw:size-8 tw:min-h-0 tw:min-w-0 tw:shrink-0 tw:text-[var(--bk-ink-muted)]"
+                data-testid="set-search-close"
               >
-                <X size={14} aria-hidden />
+                <X size={16} aria-hidden />
               </IconButton>
-            ) : null}
-          </div>
-          {matchField ? null : (
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              className={`${NAV_ROW}${isOverview ? ` ${NAV_ROW_ON}` : ""}`}
-              aria-current={isOverview ? "page" : undefined}
-              onClick={() => requestNav("overview")}
-              data-testid="set-nav-overview"
-            >
-              <NavRowIcon id="overview" />
-              <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
-            </Button>
-          )}
-          {SETTINGS_NAV_GROUP_ORDER.map((group) => {
-            const rows = SETTINGS_NAV.filter((n) => n.group === group && (!matchField || matchField.has(n.id)));
-            if (rows.length === 0) return null;
-            /* M0: the workspace doors sit apart, under a separator, as
-               "Managed in workspace settings ↗" — they are not this site's. */
-            if (group === "workspace") {
-              return (
-                <React.Fragment key={group}>
-                  <hr className="tw:my-0 tw:h-px tw:w-full tw:shrink-0 tw:border-0 tw:bg-[var(--bk-border)]" aria-hidden />
-                  <div
-                    className="tw:flex tw:h-10 tw:shrink-0 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
-                    data-testid={`set-nav-group-${group}`}
+            </div>
+            <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4">
+              <ul
+                id="set-search-results"
+                role="listbox"
+                aria-label="Settings search results"
+                className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-0.5 tw:p-0"
+                data-testid="set-search-results"
+              >
+                {results.map((entry, i) => (
+                  <li
+                    key={entry.id}
+                    id={`set-search-option-${i}`}
+                    role="option"
+                    aria-selected={i === activeIndex}
+                    className={`tw:flex tw:cursor-pointer tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:px-2 tw:py-1.5 ${i === activeIndex ? "tw:bg-[var(--bk-accent-tint)]" : ""}`}
+                    /* Keeps focus in the field: the keyboard stays on the list. */
+                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseMove={() => setActiveResult(i)}
+                    onClick={() => openResult(entry)}
+                    data-testid={`set-search-result-${entry.id}`}
                   >
-                    {`${SETTINGS_NAV_GROUPS[group]} ↗`}
-                  </div>
-                  {rows.map(renderRow)}
-                </React.Fragment>
-              );
-            }
-            return (
-              <React.Fragment key={group}>
-                <div className={`${NAV_GROUP} tw:shrink-0`} data-testid={`set-nav-group-${group}`}>
-                  {SETTINGS_NAV_GROUPS[group]}
-                </div>
-                {rows.map(renderRow)}
-              </React.Fragment>
-            );
-          })}
-          {matchField && matchField.size === 0 ? (
-            <p className="tw:m-0 tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty">
-              {`No settings match "${trimmed}"`}
-            </p>
-          ) : null}
-          {trimmed ? (
-            /* 6816:60270's hand-off: the same query, everywhere (⌘K). */
-            <Button
-              type="button"
-              variant="secondary"
-              size="xs"
-              className="tw:mt-4 tw:h-auto tw:min-h-0 tw:w-full tw:shrink-0 tw:items-start tw:justify-between tw:gap-2 tw:rounded-md tw:px-2.5 tw:py-2 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]"
-              onClick={() => composer?.emit?.(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query: trimmed })}
-              data-testid="set-search-everywhere"
-            >
-              <span className="tw:min-w-0 tw:break-words">{`Search everywhere for "${trimmed}"`}</span>
-              <Kbd>⌘K</Kbd>
-            </Button>
-          ) : null}
-        </nav>
-        {/* S5 Q1: every role sees who they are and can open what that allows
-            (the Permissions dialog, PermissionsHost). Not on the M0 board —
-            an owner decision (2026-10-02) the board predates. */}
-        {editorRole ? (
-          <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:border-t tw:border-[var(--bk-border)] tw:px-6 tw:py-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-role">
-            <span>{`Your role: ${editorRole.charAt(0)}${editorRole.slice(1).toLowerCase()}`}</span>
-            <span aria-hidden>·</span>
-            <Button
-              type="button"
-              variant="link"
-              className="tw:h-auto tw:min-h-0 tw:px-0 tw:text-[length:var(--bk-text-11)] tw:leading-4"
-              onClick={() => composer?.emit(EVENTS.UI_OPEN_PERMISSIONS, undefined)}
-              data-testid="set-role-permissions"
-            >
-              Permissions
-            </Button>
+                    <span className="tw:truncate tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">
+                      {entry.title}
+                    </span>
+                    <span className="tw:truncate tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                      {`${entry.group} · ${entry.description}`}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {!trimmed ? (
+                <p className="tw:m-0 tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-hint">
+                  Type to find a setting, an option or a feature.
+                </p>
+              ) : results.length === 0 ? (
+                <p className="tw:m-0 tw:break-words tw:px-2 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty" role="status">
+                  {`No settings match "${trimmed}"`}
+                </p>
+              ) : null}
+              {trimmed ? (
+                /* 6816:60270's hand-off: the same query, everywhere (⌘K). */
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="xs"
+                  className="tw:mt-4 tw:h-auto tw:min-h-0 tw:w-full tw:shrink-0 tw:items-start tw:justify-between tw:gap-2 tw:rounded-md tw:px-2.5 tw:py-2 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]"
+                  onClick={() => composer?.emit?.(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query: trimmed })}
+                  data-testid="set-search-everywhere"
+                >
+                  <span className="tw:min-w-0 tw:break-words">{`Search everywhere for "${trimmed}"`}</span>
+                  <Kbd>⌘K</Kbd>
+                </Button>
+              ) : null}
+            </div>
           </div>
-        ) : null}
+        ) : (
+          <>
+            <div className="tw:flex tw:shrink-0 tw:flex-col tw:px-4 tw:pt-3">
+              {/* OWNER OVERRIDE 2026-10-04 (M0 4418:144988 / 8134:212121 draw a
+                  quiet button; to update): a real link to the canvas, styled as
+                  the text link. A plain click stays in the page and goes
+                  through the Unsaved guard; ⌘/Ctrl/Shift-click and middle-click
+                  are the browser's — the canvas in a new tab or window. */}
+              <Button
+                href={canvasHref}
+                variant="link"
+                size="xs"
+                className="tw:h-8 tw:w-54 tw:justify-center tw:gap-0.5 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:no-underline tw:hover:underline"
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                  e.preventDefault();
+                  requestLeave();
+                }}
+                data-testid="set-back"
+              >
+                <ChevronLeft size={12} aria-hidden />
+                Back to canvas
+              </Button>
+              <h2
+                className="tw:m-0 tw:mt-2.5 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:tracking-[-0.015em] tw:text-[var(--bk-ink)]"
+                data-testid="set-title"
+              >
+                Settings
+              </h2>
+              <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-site">
+                {siteName}
+              </div>
+            </div>
+            <div className="tw:shrink-0 tw:px-4 tw:pt-3">
+              {/* Owner 2026-10-04: the entry into Search Mode, where the always-on field was (6816:60270).
+                  Outside the scrolling nav, so it is always in reach and opening it
+                  never moves the nav scroll Search Mode gives back. */}
+              <Button
+                ref={searchEntryRef}
+                type="button"
+                variant="ghost"
+                size="xs"
+                className={`${NAV_ROW} tw:shrink-0 tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]`}
+                onClick={openSearch}
+                aria-label="Search settings"
+                data-testid="set-search-mode-open"
+              >
+                <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
+                  <SearchIcon size={16} strokeWidth={1.5} />
+                </span>
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate">Search</span>
+              </Button>
+            </div>
+            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-1" aria-label="Settings sections">
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                className={`${NAV_ROW}${isOverview ? ` ${NAV_ROW_ON}` : ""}`}
+                aria-current={isOverview ? "page" : undefined}
+                onClick={() => requestNav("overview")}
+                data-testid="set-nav-overview"
+              >
+                <NavRowIcon id="overview" />
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
+              </Button>
+              {SETTINGS_NAV_GROUP_ORDER.map((group) => {
+                const rows = SETTINGS_NAV.filter((n) => n.group === group);
+                if (rows.length === 0) return null;
+                /* M0: the workspace doors sit apart, under a separator, as
+                   "Managed in workspace settings ↗" — they are not this site's. */
+                if (group === "workspace") {
+                  return (
+                    <React.Fragment key={group}>
+                      <hr className="tw:my-0 tw:h-px tw:w-full tw:shrink-0 tw:border-0 tw:bg-[var(--bk-border)]" aria-hidden />
+                      <div
+                        className="tw:flex tw:h-10 tw:shrink-0 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
+                        data-testid={`set-nav-group-${group}`}
+                      >
+                        {`${SETTINGS_NAV_GROUPS[group]} ↗`}
+                      </div>
+                      {rows.map(renderRow)}
+                    </React.Fragment>
+                  );
+                }
+                return (
+                  <React.Fragment key={group}>
+                    <div className={`${NAV_GROUP} tw:shrink-0`} data-testid={`set-nav-group-${group}`}>
+                      {SETTINGS_NAV_GROUPS[group]}
+                    </div>
+                    {rows.map(renderRow)}
+                  </React.Fragment>
+                );
+              })}
+            </nav>
+            {/* S5 Q1: every role sees who they are and can open what that allows
+                (the Permissions dialog, PermissionsHost). Not on the M0 board —
+                an owner decision (2026-10-02) the board predates. */}
+            {editorRole ? (
+              <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:border-t tw:border-[var(--bk-border)] tw:px-6 tw:py-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-role">
+                <span>{`Your role: ${editorRole.charAt(0)}${editorRole.slice(1).toLowerCase()}`}</span>
+                <span aria-hidden>·</span>
+                <Button
+                  type="button"
+                  variant="link"
+                  className="tw:h-auto tw:min-h-0 tw:px-0 tw:text-[length:var(--bk-text-11)] tw:leading-4"
+                  onClick={() => composer?.emit(EVENTS.UI_OPEN_PERMISSIONS, undefined)}
+                  data-testid="set-role-permissions"
+                >
+                  Permissions
+                </Button>
+              </div>
+            ) : null}
+          </>
+        )}
       </aside>
 
       {/* ── Pane ────────────────────────────────────────────────────────── */}
