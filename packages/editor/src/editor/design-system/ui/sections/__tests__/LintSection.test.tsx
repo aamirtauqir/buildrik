@@ -10,7 +10,6 @@ import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { LintSection, brandChecksCaption, contrastFixFor } from "../LintSection";
 import { calcContrastRatio } from "../../../utils/colorUtils";
-import type { DesignToken } from "../../../types";
 import type { LintIssue } from "../../../../../engine/designSystem/linter";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
@@ -88,8 +87,8 @@ describe("LintSection", () => {
 });
 
 describe("contrastFixFor — a Fix that actually fixes", () => {
-  const bg = v6Token({ id: "color-background", name: "Background", value: "#FFFFFF", dark: "#111827", kind: "color", category: "colors" }) as DesignToken;
-  const pale = v6Token({ id: "color-pale", name: "Pale", value: "#EEEEEE", dark: "#1F2937", kind: "color", category: "colors" }) as DesignToken;
+  const bg = v6Token({ id: "color-background", name: "Background", value: "#FFFFFF", dark: "#111827", kind: "color", category: "colors" });
+  const pale = v6Token({ id: "color-pale", name: "Pale", value: "#EEEEEE", dark: "#1F2937", kind: "color", category: "colors" });
 
   it("light mode: moves the light value to at least 4.5:1 on the page", () => {
     const fix = contrastFixFor(pale, [bg, pale], "light")!;
@@ -104,7 +103,7 @@ describe("contrastFixFor — a Fix that actually fixes", () => {
   });
 
   it("returns null when the token already passes", () => {
-    const ink = v6Token({ ...pale, id: "color-ink", value: "#111827" }) as DesignToken;
+    const ink = v6Token({ ...pale, id: "color-ink", value: "#111827" });
     expect(contrastFixFor(ink, [bg, ink], "light")).toBeNull();
   });
 });

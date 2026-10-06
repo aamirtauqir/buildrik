@@ -313,7 +313,7 @@ const ProjectTokensHydrator: React.FC<{ composer: TokenRegistryProviderProps["co
          imports a project with no designTokens, and returning early here left
          the undone value standing in the registries. No saved tokens = the
          seed, which is what mergeProjectTokens([]) yields. */
-      const incoming = (settings?.designTokens ?? []) as DesignToken[];
+      const incoming = settings?.designTokens ?? [];
       resetAllKinds(mergeProjectTokens(incoming, settings?.designTokensSchemaVersion));
     };
     hydrate();

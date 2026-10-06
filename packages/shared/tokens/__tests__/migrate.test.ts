@@ -123,6 +123,54 @@ describe("migrateTokensToV6", () => {
     });
   });
 
+  it("never shares a custom primitive between semantic tokens", () => {
+    const v6 = migrateTokensToV6(seedOnly);
+    const aliasers = new Map<string, string[]>();
+    for (const t of v6) {
+      for (const ref of [t.modes.light, t.modes.dark]) {
+        if (ref && "alias" in ref && ref.alias.startsWith("custom-")) aliasers.set(ref.alias, [...(aliasers.get(ref.alias) ?? []), t.id]);
+      }
+    }
+    for (const [prim, ids] of aliasers) expect(ids, prim).toHaveLength(1);
+    expect(v6.find((t) => t.id === "color-success")!.modes.light).toEqual({ alias: "custom-color-success" });
+  });
+
+  it("still aliases a real seed primitive on an exact value match", () => {
+    const v6 = migrateTokensToV6(seedOnly);
+    expect(v6.find((t) => t.id === "color-text")!.modes.light).toEqual({ alias: "color-slate-700" });
+  });
+
+  describe("duplicate ids in one list", () => {
+    const v6 = migrateTokensToV6(seedOnly);
+    it("the --buildrick-design-<id> row keeps the id; an equal --bd-* row folds into legacyNames", () => {
+      const sm = v6.filter((t) => t.id.startsWith("radius-sm"));
+      expect(sm.map((t) => t.id)).toEqual(["radius-sm"]);
+      expect(sm[0].cssVar).toBe("--buildrick-design-radius-sm");
+      expect(sm[0].legacyNames).toContain("--bd-radius-sm");
+      expect(v6.find((t) => t.id === "radius-md")!.legacyNames).toContain("--bd-radius-md");
+    });
+    it("an unequal --bd-* row keeps its var under a suffixed id", () => {
+      expect(v6.find((t) => t.id === "shadow-sm")!.cssVar).toBe("--buildrick-design-shadow-sm");
+      expect(v6.find((t) => t.cssVar === "--bd-shadow-sm")!.id).toBe("shadow-sm-2");
+    });
+  });
+
+  it("infers kind from the id before falling back to category", () => {
+    const v6 = migrateTokensToV6(seedOnly);
+    const kind = (id: string) => v6.find((t) => t.id === id)!.kind;
+    for (const id of ["radius-none", "radius-sm", "radius-lg", "radius-xl", "radius-full"]) expect(kind(id), id).toBe("radius");
+    expect(kind("shadow-sm")).toBe("shadow");
+    expect(kind("space-4")).toBe("spacing");
+    expect(kind("font-heading")).toBe("type");
+    expect(kind("font-size-sm")).toBe("type");
+    const rows = [
+      { id: "z-top", name: "z", value: "9", category: "layout", cssVar: "--buildrick-design-z-top", type: "number" },
+      { id: "opacity-10", name: "o", value: "0.1", category: "effects", cssVar: "--buildrick-design-opacity-10", type: "number" },
+      { id: "duration-fast", name: "d", value: "100ms", category: "effects", cssVar: "--buildrick-design-duration-fast", type: "string" },
+    ];
+    expect(migrateTokensToV6(rows).map((t) => t.kind)).toEqual(["zindex", "opacity", "motion"]);
+  });
+
   it("throws a typed error on malformed input and never returns partial data", () => {
     expect(() => migrateTokensToV6(malformed)).toThrow(TokenMigrationError);
     expect(() => migrateTokensToV6(null)).toThrow(TokenMigrationError);

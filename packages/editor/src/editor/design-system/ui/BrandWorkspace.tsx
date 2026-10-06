@@ -224,6 +224,19 @@ function tokenDirty(t: DesignToken, reg: KindRegistryLike): boolean {
   );
 }
 
+/** A primitive an edit created for a semantic token (setTokenLiteral's
+ *  `custom-<id>`) is part of that edit, not a change of its own. */
+function editSpawned(t: DesignToken, reg: KindRegistryLike): boolean {
+  if (t.layer !== "primitive" || reg.savedTokens.some((s) => s.id === t.id)) return false;
+  const aliases = (ref: DesignToken["modes"]["light"] | undefined) => ref !== undefined && "alias" in ref && ref.alias === t.id;
+  return reg.tokens.some((x) => aliases(x.modes.light) || aliases(x.modes.dark));
+}
+
+/** The tokens a registry's staged changes are about — edits and additions. */
+function changedTokens(reg: KindRegistryLike): DesignToken[] {
+  return reg.tokens.filter((t) => tokenDirty(t, reg) && !editSpawned(t, reg));
+}
+
 function dirtyCount(reg: KindRegistryLike): number {
   // Counts both modifications (id present in saved with different value) AND
   // additions (id not in saved at all). Pre-fix this only counted modifications,
@@ -231,7 +244,7 @@ function dirtyCount(reg: KindRegistryLike): number {
   // section-tab dot, no DraftChip count increment. Removals are not counted
   // here; deleteToken UX is a separate concern. A dark value set on the card
   // counts too — it used to stage without ever lighting the footer (C1 (ii)).
-  return reg.tokens.filter((t) => tokenDirty(t, reg)).length;
+  return changedTokens(reg).length;
 }
 
 // ─── BrandWorkspace ───────────────────────────────────────────────────────────
@@ -501,12 +514,17 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       variant: p.variant, bindings: p.bindings,
     }));
 
+    /* A save that does not validate (an alias left pointing at a deleted
+       token) would load back as the seed — refuse it, and say why. */
+    const checked = validateTokens(tokenRecords);
+    if (!checked.ok) {
+      console.warn("[tokens] apply refused", { reason: checked.reason });
+      addToast({ description: `Failed to apply tokens: ${checked.reason}`, tone: "error" });
+      return;
+    }
+
     applyingRef.current = true;
     try {
-      /* A save that does not validate (an alias left pointing at a deleted
-         token) would load back as the seed — refuse it instead. */
-      const checked = validateTokens(tokenRecords);
-      if (!checked.ok) throw new Error(checked.reason);
       const current = composer.getProjectSettings();
       composer.setProjectSettings({
         ...current,
@@ -1267,8 +1285,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             const reg = moreKindRegistry[kind];
             return {
               title: `${label} Changes`,
-              rows: reg.tokens
-                .filter((t) => tokenDirty(t, reg))
+              rows: changedTokens(reg)
                 .map((t) => ({
                   id: t.id,
                   name: t.name,

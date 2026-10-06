@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { DSLinter } from "../DSLinter";
 import type { DesignToken, StylePreset, PresetBinding } from "../../types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 
 /** A semantic colour token — the layer every v5 colour token but the
  *  primitives migrated to, and the one a dark mode can live on. */
@@ -59,6 +61,19 @@ describe("DSLinter.lint — semantic-needs-alias (B5 lock 2026-05-16)", () => {
     expect(issues[0].severity).toBe("error");
     expect(issues[0].message).toContain("semantic");
     expect(issues[0].message).toContain("aliasOf");
+  });
+});
+
+describe("DSLinter.lint — an edited seed stays alias-shaped", () => {
+  it("editing a semanticKind token through setTokenLiteral raises no semantic-needs-alias", () => {
+    let tokens = DEFAULT_TOKENS;
+    for (const id of ["color-action", "color-surface", "color-text-primary", "color-feedback-error"]) {
+      tokens = setTokenLiteral(tokens, id, "light", "#123456");
+      tokens = setTokenLiteral(tokens, id, "dark", "#654321");
+    }
+    expect(new DSLinter().lint(tokens).filter((i) => i.rule === "semantic-needs-alias")).toEqual([]);
+    expect(resolveTokenLiteral(tokens, "color-action", "light")).toBe("#123456");
+    expect(resolveTokenLiteral(tokens, "color-primary", "light")).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"));
   });
 });
 

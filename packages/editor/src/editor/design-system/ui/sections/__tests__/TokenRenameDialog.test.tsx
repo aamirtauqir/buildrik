@@ -11,8 +11,8 @@ import { DSModeProvider } from "../../../state/DSModeContext";
 import type { DesignToken } from "../../../types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
-const token = v6Token({ id: "color-primary", name: "Primary", value: "#1A56DB", category: "colors", cssVar: "--x", type: "color", kind: "color" }) as DesignToken;
-const other = { ...token, id: "color-text", name: "Text" } as DesignToken;
+const token = v6Token({ id: "color-primary", name: "Primary", value: "#1A56DB", category: "colors", cssVar: "--x", type: "color", kind: "color" });
+const other: DesignToken = { ...token, id: "color-text", name: "Text" };
 const composer = {
   designSystem: {
     tokenUsage: { getUsage: () => 3, getBreakdown: () => [{ elementId: "a", styleProp: "color" }, { elementId: "b", styleProp: "color" }, { elementId: "c", styleProp: "color" }], on: vi.fn(), off: vi.fn() },

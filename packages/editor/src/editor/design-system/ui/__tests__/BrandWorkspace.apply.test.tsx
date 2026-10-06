@@ -23,7 +23,6 @@ import { BrandWorkspace } from "../BrandWorkspace";
 import { useButtonPresets } from "../../state/StylePresetRegistryContext";
 import { CURRENT_SCHEMA_VERSION } from "../../migrations";
 import {
-  SMALL_RADIUS_ID,
   installDomShims,
   makeFakeComposer,
   openPage,
@@ -113,7 +112,7 @@ describe("BrandWorkspace — pages", () => {
 
     openPage(utils, "kind-radius");
     await waitFor(() => {
-      expect(utils.getByTestId(`brand-token-value-${SMALL_RADIUS_ID}`).textContent).toBe("10px");
+      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px");
     });
   });
 
@@ -128,7 +127,7 @@ describe("BrandWorkspace — pages", () => {
     fireEvent.click(utils.getByText("Discard"));
 
     await waitFor(() => {
-      expect(utils.getByTestId(`brand-token-value-${SMALL_RADIUS_ID}`).textContent).toBe(original);
+      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe(original);
     });
     expect(utils.queryByText("Unsaved brand changes")).toBeNull();
   });
@@ -199,7 +198,7 @@ describe("BrandWorkspace — Apply pipeline (footer -> ReviewModal)", () => {
       designPresets: Array<{ id: string; category: string; bindings: unknown }>;
     };
 
-    expect(resolveTokenLiteral(arg.designTokens, SMALL_RADIUS_ID, "light")).toBe("10px");
+    expect(resolveTokenLiteral(arg.designTokens, "radius-sm", "light")).toBe("10px");
     expect(arg.designTokensSchemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(Array.isArray(arg.designPresets)).toBe(true);
     expect(arg.designPresets.length).toBeGreaterThan(0);
@@ -262,7 +261,7 @@ describe("BrandWorkspace — engine undo preserves unsaved edits", () => {
     });
 
     await waitFor(() => {
-      expect(utils.getByTestId(`brand-token-value-${SMALL_RADIUS_ID}`).textContent).toBe("10px");
+      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px");
       expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
     });
   });
@@ -276,7 +275,7 @@ describe("BrandWorkspace — engine undo preserves unsaved edits", () => {
     });
 
     await waitFor(() => {
-      expect(utils.getByTestId(`brand-token-value-${SMALL_RADIUS_ID}`).textContent).toBe("4px");
+      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("4px");
       expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
     });
   });

@@ -112,7 +112,10 @@ describe("ProjectTokensApplier", () => {
 
 describe("mergeProjectTokens", () => {
   it("keeps the seed for slots the site never changed", () => {
-    const saved = setTokenLiteral(DEFAULT_TOKENS, "color-action", "light", "#B91C1C").filter((t) => t.id === "color-action");
+    /* The site saved one edit: color-action and the primitive the edit gave it. */
+    const saved = setTokenLiteral(DEFAULT_TOKENS, "color-action", "light", "#B91C1C").filter(
+      (t) => t.id === "color-action" || t.id === "custom-color-action",
+    );
     const merged = mergeProjectTokens(saved);
     expect(resolveTokenLiteral(merged, "color-action", "light")).toBe("#B91C1C");
     expect(resolveTokenLiteral(merged, "font-body", "light")).toBe("Inter");

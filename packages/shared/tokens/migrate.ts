@@ -36,13 +36,36 @@ function isV5Row(x: unknown): x is V5Row {
     typeof r.value === "string" && typeof r.cssVar === "string" && typeof r.category === "string" && typeof r.type === "string";
 }
 
+/** Kind for a v5 row: its explicit kind, then what its id (or var) names,
+ *  then its category/type. The v5 seed's radius rows had no kind and an
+ *  "effects" category, which the fallback alone read as sizing. */
+const KIND_BY_PREFIX: Array<[RegExp, DesignToken["kind"]]> = [
+  [/^radius-/, "radius"],
+  [/^shadow-/, "shadow"],
+  [/^(space|spacing)-/, "spacing"],
+  [/^(z-|zindex)/, "zindex"],
+  [/^opacity-/, "opacity"],
+  [/^(motion|duration)-/, "motion"],
+];
+
 function kindOf(r: V5Row): DesignToken["kind"] {
   if (r.kind) return r.kind;
+  const names = [r.id, r.cssVar.replace(/^--(buildrick-design|bd)-/, "")];
+  for (const [re, kind] of KIND_BY_PREFIX) if (names.some((n) => re.test(n))) return kind;
+  if (r.category === "typography" && names.some((n) => /^(font|text)-/.test(n))) return "type";
   if (r.category === "colors" || r.type === "color") return "color";
   if (r.category === "typography") return "type";
   if (r.category === "spacing") return "spacing";
   if (r.type === "shadow") return "shadow";
   return "sizing";
+}
+
+/** v5 emitted `darkValue` only for colour tokens (CSSBundler); on any other
+ *  kind it was inert, so it must not become a v6 dark mode. */
+function darkOf(r: V5Row): string | undefined {
+  if (r.category !== "colors" && r.kind !== "color") return undefined;
+  const d = r.darkValue?.trim();
+  return d ? d : undefined;
 }
 
 export function migrateTokensToV6(legacy: unknown): DesignToken[] {
@@ -53,19 +76,39 @@ export function migrateTokensToV6(legacy: unknown): DesignToken[] {
     parsed.push(x);
   }
   // The v5 seed list declares radius/shadow ids twice under different CSS
-  // vars (`--buildrick-design-*` and `--bd-*`). Both vars are live, so the
-  // later row keeps its var under a suffixed id. The same CSS var twice is
-  // genuinely corrupt.
-  const rows: V5Row[] = [];
-  const idsTaken = new Set(parsed.map((r) => r.id));
-  const idsSeen = new Set<string>();
+  // vars (`--buildrick-design-*` and `--bd-*`). The `--buildrick-design-<id>`
+  // row keeps the id. Another row with the same id and the same values folds
+  // into it as a legacy name (its kind and friendly name fill gaps); one with
+  // different values keeps its var under a suffixed id. The same CSS var twice
+  // is genuinely corrupt.
   const varsSeen = new Set<string>();
   for (const x of parsed) {
     if (varsSeen.has(x.cssVar)) throw new TokenMigrationError(`duplicate token ${x.id} (${x.cssVar})`);
     varsSeen.add(x.cssVar);
-    if (!idsSeen.has(x.id)) {
-      idsSeen.add(x.id);
+  }
+  const ownVar = (r: V5Row) => r.cssVar === `--buildrick-design-${r.id}`;
+  const keeperOf = new Map<string, V5Row>();
+  for (const x of parsed) {
+    const kept = keeperOf.get(x.id);
+    if (!kept || (!ownVar(kept) && ownVar(x))) keeperOf.set(x.id, x);
+  }
+  const sameValues = (a: V5Row, b: V5Row) => a.value.trim() === b.value.trim() && darkOf(a) === darkOf(b);
+  const legacyNamesFor = new Map<string, string[]>();
+  const keeperFill = new Map<string, Partial<V5Row>>();
+  const rows: V5Row[] = [];
+  const idsTaken = new Set(parsed.map((r) => r.id));
+  for (const x of parsed) {
+    const keeper = keeperOf.get(x.id)!;
+    if (x === keeper) {
       rows.push(x);
+      continue;
+    }
+    if (sameValues(x, keeper)) {
+      legacyNamesFor.set(x.id, [...(legacyNamesFor.get(x.id) ?? []), x.cssVar]);
+      const fill = keeperFill.get(x.id) ?? {};
+      if (keeper.kind === undefined && fill.kind === undefined && x.kind !== undefined) fill.kind = x.kind;
+      if (keeper.friendlyName === undefined && fill.friendlyName === undefined && x.friendlyName !== undefined) fill.friendlyName = x.friendlyName;
+      keeperFill.set(x.id, fill);
       continue;
     }
     let id = x.id;
@@ -73,19 +116,15 @@ export function migrateTokensToV6(legacy: unknown): DesignToken[] {
     idsTaken.add(id);
     rows.push({ ...x, id });
   }
+  for (const [i, r] of rows.entries()) {
+    const fill = keeperFill.get(r.id);
+    if (fill && keeperOf.get(r.id) === r) rows[i] = { ...fill, ...r };
+  }
 
   const byId = new Map(rows.map((r) => [r.id, r]));
-  // v5 emitted `darkValue` only for colour tokens (CSSBundler); on any other
-  // kind it was inert, so it must not become a v6 dark mode.
-  const darkOf = (r: V5Row): string | undefined => {
-    if (r.category !== "colors" && r.kind !== "color") return undefined;
-    const d = r.darkValue?.trim();
-    return d ? d : undefined;
-  };
 
   // Merge equal duplicates (BRD-12). Equality is exact (after trim) because the
   // emitted literal must not change. Unequal ones stay separate.
-  const legacyNamesFor = new Map<string, string[]>();
   const survivorOf = new Map<string, string>(); // dropped id → survivor id
   for (const [dupId, keepId] of Object.entries(DUPLICATE_OF)) {
     const dup = byId.get(dupId);
@@ -98,7 +137,7 @@ export function migrateTokensToV6(legacy: unknown): DesignToken[] {
   const live = (id: string) => survivorOf.get(id) ?? id;
 
   const out: DesignToken[] = [];
-  const primitiveByValue = new Map<string, string>(); // `${kind}|${exact value}` → primitive id
+  const primitiveByValue = new Map<string, string>(); // `${kind}|${exact value}` → real seed primitive id
   const usedIds = new Set(rows.map((r) => r.id));
   const usedVars = new Set(rows.map((r) => r.cssVar));
   const keyOf = (r: V5Row, value: string) => `${kindOf(r)}|${value.trim()}`;
@@ -121,14 +160,19 @@ export function migrateTokensToV6(legacy: unknown): DesignToken[] {
   const primitiveIds = new Set<string>();
   for (const r of rows) {
     if (!isPrimitive(r)) continue;
-    out.push({ ...base(r), layer: "primitive", modes: { light: { value: r.value.trim() } } });
+    const legacyNames = legacyNamesFor.get(r.id);
+    out.push({
+      ...base(r), layer: "primitive", modes: { light: { value: r.value.trim() } },
+      ...(legacyNames ? { legacyNames } : {}),
+    });
     primitiveIds.add(r.id);
     if (!primitiveByValue.has(keyOf(r, r.value))) primitiveByValue.set(keyOf(r, r.value), r.id);
   }
 
+  // A real seed primitive holding the exact literal is aliased; otherwise the
+  // token gets a primitive of its own (spec §4) — never one another token uses.
   const primitiveFor = (r: V5Row, value: string, suffix: string): TokenRef => {
-    const key = keyOf(r, value);
-    const hit = primitiveByValue.get(key);
+    const hit = primitiveByValue.get(keyOf(r, value));
     if (hit) return { alias: hit };
     let id = `custom-${r.id}${suffix}`;
     for (let n = 2; usedIds.has(id) || usedVars.has(`--buildrick-design-${id}`); n++) id = `custom-${r.id}${suffix}-${n}`;
@@ -138,7 +182,6 @@ export function migrateTokensToV6(legacy: unknown): DesignToken[] {
       id, name: `${r.name}${suffix ? " (dark)" : ""}`, kind: kindOf(r), layer: "primitive",
       modes: { light: { value: value.trim() } }, category: r.category, cssVar: `--buildrick-design-${id}`, type: r.type,
     });
-    primitiveByValue.set(key, id);
     return { alias: id };
   };
 
