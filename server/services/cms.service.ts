@@ -68,11 +68,17 @@ function sanitizeEntryData(data: Record<string, unknown>, fields: readonly CmsFi
   const richtext = new Set(fields.filter((f) => f.type === "richtext").map((f) => f.slug));
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(data)) {
-    if (typeof value === "string") out[key] = richtext.has(key) ? sanitizeRichtext(value) : stripMarkup(value);
-    else if (Array.isArray(value)) out[key] = value.map((v) => (typeof v === "string" ? stripMarkup(v) : v));
-    else out[key] = value;
+    out[key] = typeof value === "string" && richtext.has(key) ? sanitizeRichtext(value) : sanitizeLeaves(value);
   }
   return out;
+}
+
+/** Every string leaf of a nested array/object value, markup-stripped. */
+function sanitizeLeaves(value: unknown): unknown {
+  if (typeof value === "string") return stripMarkup(value);
+  if (Array.isArray(value)) return value.map(sanitizeLeaves);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, sanitizeLeaves(v)]));
+  return value;
 }
 
 /**
@@ -100,23 +106,27 @@ function fieldRules(fields: unknown): CmsFieldRule[] {
  * it once more. `&` is escaped before parsing so nothing reads as an entity —
  * the text comes back exactly as typed. Escaping belongs to the sink.
  *
- * Repeated until nothing changes: cutting a tag out of the middle of another
- * (`<<img …>img …>`) leaves text that is itself a tag. Unbounded by design —
- * each changing pass strictly shortens the text (DOMPurify only ever removes
- * a tag's markup characters, never adds any, and the `&`-escape means it
- * never reintroduces one via entity decoding), so this always terminates. A
- * fixed iteration cap here would fail OPEN instead: a payload built by
- * repeatedly re-escaping `<` (e.g. `<img src=x onerror=alert(1)>` wrapped as
- * `<<<...<img…>...i>i>i>` N times) can still contain live markup after N
- * passes, and a cap would hand that back untouched. As a fail-closed
- * backstop for a parser disagreement the loop cannot see, a converged result
- * that still holds a tag opener (`<` followed by a letter, `!`, `/` or `?`)
- * loses every angle bracket. A bare `<` or `>` is never markup, so ordinary
- * text ("5 < 10", "a -> b", "<3") comes back exactly as typed.
+ * Repeated until nothing changes, at most MAX_STRIP_PASSES times: cutting a
+ * tag out of the middle of another (`<<img …>img …>`) leaves text that is
+ * itself a tag. Each jsdom pass peels one nesting level, so an unbounded loop
+ * is quadratic in the nesting depth (a 200k-char payload runs for minutes). A
+ * value that has not converged by the pass cap, or by a total-characters
+ * budget (long text gets fewer passes), fails CLOSED: every `<` and `>` is
+ * removed, the same backstop applied to a converged result that still holds a
+ * tag opener (`<` followed by a letter, `!`, `/` or `?`). A bare `<` or `>`
+ * is never markup, so ordinary text ("5 < 10", "a -> b", "<3") comes back
+ * exactly as typed.
  */
+const MAX_STRIP_PASSES = 8;
+/** Total characters all passes together may parse. A pass costs time in proportion to the text, so a long payload gets fewer passes than a short one (a 200k-char bomb: one pass, ~0.4 s). */
+const MAX_STRIP_WORK = 300_000;
+
 function stripMarkup(value: string): string {
   let text = value;
-  for (;;) {
+  let work = 0;
+  for (let pass = 0; ; pass++) {
+    work += text.length;
+    if (pass === MAX_STRIP_PASSES || (pass > 0 && work > MAX_STRIP_WORK)) return text.replace(/[<>]/g, "");
     const fragment = DOMPurify.sanitize(text.replace(/&/g, "&amp;"), { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true });
     const next = fragment.textContent ?? "";
     if (next === text) break;

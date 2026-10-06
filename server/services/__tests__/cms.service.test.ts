@@ -229,6 +229,30 @@ describe("entries cross-site guard", () => {
     const stored = (mocks.entCreate.mock.calls[0][0].data.data as { title: string }).title;
     expect(stored).not.toMatch(/<img/i);
   });
+
+  it("stripMarkup is bounded: a 200k-char nesting bomb finishes fast and fails closed (no angle brackets)", async () => {
+    const payload = "<".repeat(66000) + "a>".repeat(66000);
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
+    const t0 = Date.now();
+    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: payload } });
+    expect(Date.now() - t0).toBeLessThan(1000);
+    const stored = (mocks.entCreate.mock.calls[0][0].data.data as { title: string }).title;
+    expect(stored).not.toMatch(/[<>]/);
+  });
+
+  it("sanitizes every string leaf of nested arrays and objects", async () => {
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
+    await upsertEntry("s1", {
+      siteId: "s1",
+      collectionId: "c1",
+      data: { tags: [["<img onerror=x>ok"]], deep: { a: [{ b: "<script>x</script>hi" }] } },
+    });
+    const stored = mocks.entCreate.mock.calls[0][0].data.data as { tags: string[][]; deep: { a: { b: string }[] } };
+    expect(stored.tags[0][0]).toBe("ok");
+    expect(stored.deep.a[0].b).toBe("hi");
+  });
 });
 
 describe("CSV import", () => {
