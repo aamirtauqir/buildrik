@@ -62,4 +62,40 @@ describe("emitTokenCss", () => {
     const css = emitTokenCss(tokens, { darkMode: "off" });
     expect(css.match(/--buildrick-design-color-primary:/g)).toHaveLength(1);
   });
+
+  describe("custom-property names are user data", () => {
+    const bad = "--x:red}</style><script>";
+    const emitWith = (over: Partial<DesignToken>) => {
+      const onSkip = vi.fn();
+      const css = emitTokenCss(
+        [...tokens, t({ id: "evil", layer: "primitive", modes: { light: { value: "#000" } }, ...over })],
+        { darkMode: "auto", onSkip },
+      );
+      return { css, onSkip };
+    };
+
+    it("skips a token whose cssVar is not a plain custom-property name", () => {
+      const { css, onSkip } = emitWith({ cssVar: bad });
+      expect(css).not.toMatch(/<\/style>|<script/);
+      expect(css).not.toContain("--x:");
+      expect(onSkip).toHaveBeenCalledWith("evil", expect.any(String));
+    });
+
+    it("skips a token with a bad legacy name", () => {
+      const { css, onSkip } = emitWith({ legacyNames: [bad] });
+      expect(css).not.toMatch(/<\/style>|<script/);
+      expect(onSkip).toHaveBeenCalledWith("evil", expect.any(String));
+    });
+
+    it("skips a token aliasing a token whose cssVar is bad", () => {
+      const evil = t({ id: "evil", layer: "primitive", cssVar: bad, modes: { light: { value: "#000" } } });
+      const onSkip = vi.fn();
+      const css = emitTokenCss(
+        [evil, t({ id: "pointer", layer: "semantic", modes: { light: { alias: "evil" }, dark: { alias: "evil" } } })],
+        { darkMode: "auto", onSkip },
+      );
+      expect(css).not.toMatch(/<\/style>|<script|--x:/);
+      expect(onSkip).toHaveBeenCalledWith("pointer", expect.any(String));
+    });
+  });
 });

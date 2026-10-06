@@ -13,6 +13,9 @@ import { LEGACY_SEED } from "./legacySeed";
 // eslint-disable-next-line no-control-regex -- control-char stripping is the intent
 const clean = (v: string) => v.replace(/[\x00-\x1f\x7f;{}<]/g, "").trim();
 
+/** A custom-property name is user data too: a crafted `--x:red}</style><script>` must never reach a page. */
+const SAFE_VAR = /^--[a-zA-Z0-9_-]+$/;
+
 export function emitTokenCss(
   tokens: readonly DesignToken[],
   opts: { darkMode: DarkMode; onSkip?: (id: string, reason: string) => void },
@@ -21,7 +24,7 @@ export function emitTokenCss(
   const refCss = (ref: TokenRef): string | null => {
     if ("alias" in ref) {
       const target = byId.get(ref.alias);
-      return target ? `var(${target.cssVar})` : null;
+      return target && SAFE_VAR.test(target.cssVar) ? `var(${target.cssVar})` : null;
     }
     return clean(ref.value) || null;
   };
@@ -30,6 +33,10 @@ export function emitTokenCss(
   const dark: string[] = [];
   const seen = new Set<string>();
   for (const t of tokens) {
+    if (!SAFE_VAR.test(t.cssVar) || !(t.legacyNames ?? []).every((n) => SAFE_VAR.test(n))) {
+      opts.onSkip?.(t.id, "unsafe custom-property name");
+      continue;
+    }
     const lv = refCss(t.modes.light);
     if (!lv) {
       opts.onSkip?.(t.id, "empty or unresolvable light value");
