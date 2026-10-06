@@ -10,7 +10,22 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Mock } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 
-const { addToastMock } = vi.hoisted(() => ({ addToastMock: vi.fn() }));
+const { addToastMock, api, site } = vi.hoisted(() => ({
+  addToastMock: vi.fn(),
+  api: {
+    siteDetail: {
+      settings: { get: { query: vi.fn() } },
+      domains: { list: { query: vi.fn() } },
+    },
+  },
+  site: { id: null as string | null },
+}));
+
+vi.mock("@/services/api-client", () => ({ getBuildrikClient: () => api }));
+vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/BuildrikSyncProvider")>()),
+  getSiteIdFromUrl: () => site.id,
+}));
 
 vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
@@ -43,7 +58,12 @@ function setup(composer: MockComposer, p: PageItem, all: PageItem[] = [p]) {
   });
 }
 
-beforeEach(() => addToastMock.mockClear());
+beforeEach(() => {
+  addToastMock.mockClear();
+  site.id = null;
+  api.siteDetail.settings.get.query.mockReset().mockResolvedValue({ canonicalUrl: null });
+  api.siteDetail.domains.list.query.mockReset().mockResolvedValue([]);
+});
 
 // ── Seed from page ───────────────────────────────────────────────────────────
 
@@ -101,10 +121,52 @@ describe("usePageSettings seed", () => {
     expect(result.current.visibility).toBe("hidden");
   });
 
-  it("exposes the project domain from composer metadata", () => {
-    const composer = createMockComposer({ projectMetadata: { domain: "acme.dev" } });
-    const { result } = setup(composer, page());
-    expect(result.current.domain).toBe("acme.dev");
+});
+
+// ── The host the previews name (D2) ─────────────────────────────────────────
+
+/* D2 (QA 2026-10-05): the drawer read `metadata.domain`, filled from a
+   `sites.get` field that does not exist, so every preview said yoursite.com.
+   The host is now the one the publish worker uses (and the robots.txt preview
+   since f4f1fbbb4): the typed canonical, else the VERIFIED PRIMARY custom
+   domain, else where the site is published. */
+describe("usePageSettings domain — the publish worker's host order", () => {
+  const primary = { domain: "qa-seo-dns.example", status: "VERIFIED", isPrimary: true };
+
+  it("names the typed canonical domain first", async () => {
+    site.id = "s1";
+    api.siteDetail.settings.get.query.mockResolvedValue({ canonicalUrl: "https://www.typed.example/" });
+    api.siteDetail.domains.list.query.mockResolvedValue([primary]);
+    const { result } = setup(createMockComposer({}), page());
+    await waitFor(() => expect(result.current.domain).toBe("www.typed.example"));
+    expect(api.siteDetail.settings.get.query).toHaveBeenCalledWith({ siteId: "s1" });
+    expect(api.siteDetail.domains.list.query).toHaveBeenCalledWith({ siteId: "s1" });
+  });
+
+  it("else the verified primary custom domain", async () => {
+    site.id = "s1";
+    api.siteDetail.domains.list.query.mockResolvedValue([
+      { domain: "other.example", status: "VERIFIED", isPrimary: false },
+      primary,
+    ]);
+    const { result } = setup(createMockComposer({ projectMetadata: { publishedUrl: "https://proj.vercel.app" } }), page());
+    await waitFor(() => expect(result.current.domain).toBe("qa-seo-dns.example"));
+  });
+
+  it("else the host the site is published on — never an unverified or non-primary domain", async () => {
+    site.id = "s1";
+    api.siteDetail.domains.list.query.mockResolvedValue([
+      { domain: "pending.example", status: "PENDING", isPrimary: true },
+      { domain: "other.example", status: "VERIFIED", isPrimary: false },
+    ]);
+    const { result } = setup(createMockComposer({ projectMetadata: { publishedUrl: "https://proj.vercel.app/" } }), page());
+    await waitFor(() => expect(api.siteDetail.domains.list.query).toHaveBeenCalled());
+    await waitFor(() => expect(result.current.domain).toBe("proj.vercel.app"));
+  });
+
+  it("is null when nothing is known (the tabs then say yoursite.com)", () => {
+    const { result } = setup(createMockComposer({ projectMetadata: { domain: "stale.example" } }), page());
+    expect(result.current.domain).toBeNull();
   });
 });
 

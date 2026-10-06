@@ -30,7 +30,7 @@ import type { BuildrikApiClient } from "@/services/api-client";
 import { EVENTS } from "@/shared/constants/events";
 import type { ProjectSettings } from "@/shared/types/project";
 import { SOCIAL_NETWORKS, updateSiteSettingsSchema, type SocialNetwork } from "@buildrik/shared/schemas/site-detail";
-import { normalizeCanonicalOrigin } from "@buildrik/shared/seo/urls";
+import { siteOrigin, type SiteDomainRow } from "@buildrik/shared/seo/urls";
 import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen, SiteColumnGate, Textarea } from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps, SettingsFlushResult } from "../types";
@@ -51,35 +51,6 @@ interface SeoRow {
   allowIndexing?: boolean | null;
   robotsTxt?: string | null;
   socialLinks?: unknown;
-}
-
-interface DomainRow {
-  domain: string;
-  status: string;
-  isPrimary: boolean;
-}
-
-/**
- * The origin the published sitemap will sit on, in the publish worker's order
- * (`resolveSiteOrigin` over `verifiedPrimaryDomain`): the typed canonical, else
- * the primary custom domain once it is verified, else where the site was last
- * published; null when nothing is known yet (the default then names no host).
- */
-export function sitemapOrigin(
-  domains: ReadonlyArray<DomainRow>,
-  publishedUrl: string | null | undefined,
-  canonicalUrl?: string | null,
-): string | null {
-  const typed = normalizeCanonicalOrigin(canonicalUrl ?? "");
-  if (typed) return typed;
-  const primary = domains.find((d) => d.isPrimary && d.status === "VERIFIED");
-  if (primary) return `https://${primary.domain}`;
-  if (!publishedUrl) return null;
-  try {
-    return new URL(publishedUrl).origin;
-  } catch {
-    return null;
-  }
 }
 
 /**
@@ -167,12 +138,12 @@ export const SeoScreen: React.FC<ScreenProps> = ({
     }),
   );
 
-  const load = useServerLoad<{ row: SeoRow; domains: DomainRow[] }>(
+  const load = useServerLoad<{ row: SeoRow; domains: SiteDomainRow[] }>(
     projectId,
     async (client: BuildrikApiClient, siteId) => {
       const [row, domains] = await Promise.all([
         client.siteDetail.settings.get.query({ siteId }),
-        client.siteDetail.domains.list.query({ siteId }).catch((): DomainRow[] => []),
+        client.siteDetail.domains.list.query({ siteId }).catch((): SiteDomainRow[] => []),
       ]);
       return { row, domains };
     },
@@ -195,7 +166,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           robotsTxt: row.robotsTxt ?? "",
         }),
       );
-      setOrigin(sitemapOrigin(domains, composer?.getProjectMetadata().publishedUrl, row.canonicalUrl));
+      setOrigin(siteOrigin(domains, composer?.getProjectMetadata().publishedUrl, row.canonicalUrl));
     },
     { onLoadStateChange, registerRetryLoad },
   );

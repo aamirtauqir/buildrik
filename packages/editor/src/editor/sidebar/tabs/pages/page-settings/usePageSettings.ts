@@ -16,6 +16,9 @@ import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore, isPlaceholderSlug } from "../utils/seoScore";
 import { resolvePageTitle } from "@/engine/export/SEOInjector";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useServerLoad } from "@/editor/sidebar/tabs/settings/hooks/useServerLoad";
+import { siteOrigin, type SiteDomainRow } from "@buildrik/shared/seo/urls";
 import { normalizeSlug, validateSlug, isSlugDuplicate } from "../utils/slug";
 
 export type SaveState = "clean" | "saving" | "error";
@@ -62,6 +65,8 @@ export interface UsePageSettingsReturn {
   setCustomHead: (v: string) => void;
   headCodeError: string | null;
 
+  /** The host the published page sits on, without the scheme (`acme.com`,
+   *  `proj.vercel.app`); null until something is known. */
   domain: string | null;
   /** The site's live URL, or null when it has never been published. Gates the
       slug-change warning: "existing links" can only exist if the site is
@@ -149,6 +154,27 @@ export function usePageSettings(
   const [saveState, setSaveState] = React.useState<SaveState>("clean");
 
   const savedSnapshot = React.useRef<string>("");
+
+  /* The two facts the host choice needs that the composer does not hold: the
+     typed canonical (a Site column) and the custom domains. Read on open, as
+     Settings › SEO reads them, so a canonical changed this session counts. */
+  const [siteHost, setSiteHost] = React.useState<{ canonicalUrl: string | null; domains: SiteDomainRow[] }>({
+    canonicalUrl: null,
+    domains: [],
+  });
+  const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
+  useServerLoad(
+    siteId,
+    async (client, id) => {
+      const [row, domains] = await Promise.all([
+        client.siteDetail.settings.get.query({ siteId: id }),
+        client.siteDetail.domains.list.query({ siteId: id }).catch((): SiteDomainRow[] => []),
+      ]);
+      return { canonicalUrl: row.canonicalUrl ?? null, domains };
+    },
+    setSiteHost,
+    {},
+  );
 
   const applyPersistedState = React.useCallback((p: PageItem) => {
     const state = getPersistedState(p);
@@ -326,15 +352,16 @@ export function usePageSettings(
     descSet: seoDesc.length >= 50,
   };
 
-  // A4 parity with usePages.copyPageLink: domain lives in ProjectData metadata,
-  // NOT on `composer.project.domain` (that property doesn't exist on Composer
-  // and silently resolved to undefined — the slug preview was always broken).
-  const domain = composer?.getProjectMetadata?.()?.domain ?? null;
-
   /* Whether this site is reachable by anyone. The slug warning is about
      "existing links", so the honest question is whether links can exist —
      which is a fact about the site being published, not about the page. */
   const publishedUrl = composer?.getProjectMetadata?.()?.publishedUrl ?? null;
+
+  /* D2: the host the publish worker puts this page on (`siteOrigin`, the
+     same order as the robots.txt preview). It read `metadata.domain`, filled
+     from a `sites.get` field that does not exist — always yoursite.com. */
+  const origin = siteOrigin(siteHost.domains, publishedUrl, siteHost.canonicalUrl);
+  const domain = origin ? origin.replace(/^https?:\/\//, "") : null;
 
   return {
     activeTab,
