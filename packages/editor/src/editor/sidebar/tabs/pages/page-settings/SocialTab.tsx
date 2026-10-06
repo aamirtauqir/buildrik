@@ -6,16 +6,15 @@
 
 import * as React from "react";
 import { BK_HELPER_CLASS, BK_LABEL_CLASS, HelperText, Label, Textarea, TextInput } from "@/editor/chrome-ui";
-import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
 interface Props {
   s: UsePageSettingsReturn;
-  page: PageItem;
 }
 
-export const SocialTab: React.FC<Props> = ({ s, page }) => {
-  const title = s.ogTitle || s.seoTitle || page.name;
+export const SocialTab: React.FC<Props> = ({ s }) => {
+  /* og:title ships as the OG title, else the page's resolved title. */
+  const title = s.ogTitle || s.effectiveTitle;
   const desc = s.ogDesc || s.seoDesc || "";
   const domain = s.domain ?? "yoursite.com";
 
@@ -49,7 +48,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           data-testid="social-input-title"
           value={s.ogTitle}
           onChange={(e) => s.setOgTitle(e.target.value)}
-          placeholder={s.seoTitle || page.name}
+          placeholder={s.effectiveTitle}
         />
         <HelperText className={BK_HELPER_CLASS}>Title shown when the page is shared on social networks. Defaults to SEO title.</HelperText>
       </div>

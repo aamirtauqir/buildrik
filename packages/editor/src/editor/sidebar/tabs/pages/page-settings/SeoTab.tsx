@@ -16,7 +16,7 @@ import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 import { isPlaceholderSlug } from "../utils/seoScore";
-import { resolvePageDescription, resolvePageTitle } from "@/engine/export/SEOInjector";
+import { resolvePageDescription } from "@/engine/export/SEOInjector";
 import { pageFileNames } from "@/engine/export/ExportEngine";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 
@@ -69,12 +69,14 @@ const BTN_SECONDARY = `${BTN_32} tw:border-transparent tw:bg-[var(--bk-bg-subtle
 export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpenSiteDefaults }) => {
   const siteName = composer?.getProjectMetadata?.()?.name;
   const domain = s.domain ?? "yoursite.com";
-  const range = titleRange(s.seoTitle);
+  /* An empty field ships the inherited title, so the counter measures that. */
+  const countedTitle = s.seoTitle || s.inheritedTitle;
+  const range = titleRange(countedTitle);
   /* The preview shows what ships: the exporter's own precedence, so a page
      with no title or description of its own previews the site defaults it
      inherits (owner decision Q4), not an empty slot. */
   const siteSeo = composer?.getProjectSettings?.()?.seo;
-  const previewTitle = resolvePageTitle(page, { metaTitle: s.seoTitle }, undefined, siteSeo);
+  const previewTitle = s.effectiveTitle;
   const previewDesc = resolvePageDescription({ metaDescription: s.seoDesc }, undefined, siteSeo);
   /* The URL the deploy serves for this page: the file the export writes for it
      (`about.html`, numbered on a slug clash, index.html for home) through the
@@ -272,7 +274,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
                   : "tw:text-[var(--bk-error)]"
             }`}
           >
-            {s.seoTitle.length}/60{rangeLabel[range]}
+            {countedTitle.length}/60{rangeLabel[range]}
           </span>
         </div>
         <TextInput
@@ -282,6 +284,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
           value={s.seoTitle}
           onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 60))}
           maxLength={60}
+          placeholder={s.inheritedTitle}
           aria-describedby="seo-title-hint"
         />
       </div>

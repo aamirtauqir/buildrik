@@ -8,7 +8,6 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { SocialTab } from "../SocialTab";
 import type { UsePageSettingsReturn } from "../usePageSettings";
-import type { PageItem } from "../../types";
 
 function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSettingsReturn {
   return {
@@ -16,6 +15,8 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     setActiveTab: vi.fn(),
     publishedUrl: null,
     seoTitle: "",
+    inheritedTitle: "Home",
+    effectiveTitle: "Home",
     setSeoTitle: vi.fn(),
     seoDesc: "",
     setSeoDesc: vi.fn(),
@@ -50,16 +51,12 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
   };
 }
 
-function makePage(over: Partial<PageItem> = {}): PageItem {
-  return { id: "p1", name: "Home", slug: "home", status: "draft", ...over };
-}
-
 beforeEach(() => vi.clearAllMocks());
 
 describe("SocialTab OG fields", () => {
   it("forwards OG title / description input to their setters", () => {
     const s = makeSettings();
-    render(<SocialTab s={s} page={makePage()} />);
+    render(<SocialTab s={s} />);
     fireEvent.change(document.getElementById("og-title") as HTMLInputElement, {
       target: { value: "Share Title" },
     });
@@ -72,7 +69,7 @@ describe("SocialTab OG fields", () => {
 
   it("sets ogImageUrl to null when the image field is cleared", () => {
     const s = makeSettings({ ogImageUrl: "https://img.example/pic.png" });
-    render(<SocialTab s={s} page={makePage()} />);
+    render(<SocialTab s={s} />);
     const img = document.getElementById("og-image") as HTMLInputElement;
     expect(img.value).toBe("https://img.example/pic.png");
     fireEvent.change(img, { target: { value: "" } });
@@ -81,7 +78,7 @@ describe("SocialTab OG fields", () => {
 
   it("passes a non-empty image URL straight through", () => {
     const s = makeSettings();
-    render(<SocialTab s={s} page={makePage()} />);
+    render(<SocialTab s={s} />);
     fireEvent.change(document.getElementById("og-image") as HTMLInputElement, {
       target: { value: "https://img.example/new.png" },
     });
@@ -90,39 +87,45 @@ describe("SocialTab OG fields", () => {
 
   it("shows OG title/description char counters", () => {
     const s = makeSettings({ ogTitle: "abc", ogDesc: "de" });
-    render(<SocialTab s={s} page={makePage()} />);
+    render(<SocialTab s={s} />);
     expect(screen.getByText("3/60")).toBeTruthy();
     expect(screen.getByText("2/160")).toBeTruthy();
   });
 });
 
 describe("SocialTab preview card fallbacks", () => {
-  it("falls back to seoTitle then page.name when ogTitle is empty", () => {
-    const withSeo = makeSettings({ ogTitle: "", seoTitle: "SEO Fallback Title" });
-    const { rerender } = render(<SocialTab s={withSeo} page={makePage({ name: "Home" })} />);
+  /* og:title ships as `ogTitle || <the page's resolved title>` (SEOInjector),
+     so with no OG title the card shows the effective title — which, for a
+     page with no title of its own, is the inherited site default (D1), not
+     page.name. */
+  it("falls back to the effective (shipped) title when ogTitle is empty", () => {
+    const own = makeSettings({ ogTitle: "", seoTitle: "SEO Fallback Title", effectiveTitle: "SEO Fallback Title" });
+    const { rerender } = render(<SocialTab s={own} />);
     expect(screen.getByText("SEO Fallback Title")).toBeTruthy();
 
-    const noSeo = makeSettings({ ogTitle: "", seoTitle: "" });
-    rerender(<SocialTab s={noSeo} page={makePage({ name: "Landing Page" })} />);
-    expect(screen.getByText("Landing Page")).toBeTruthy();
+    const inherited = makeSettings({ ogTitle: "", seoTitle: "", inheritedTitle: "Bella Default Title", effectiveTitle: "Bella Default Title" });
+    rerender(<SocialTab s={inherited} />);
+    expect(screen.getByText("Bella Default Title")).toBeTruthy();
+    expect(screen.queryByText("Landing Page")).toBeNull();
+    expect((document.getElementById("og-title") as HTMLInputElement).placeholder).toBe("Bella Default Title");
   });
 
   it("prefers ogTitle over seoTitle in the preview", () => {
     const s = makeSettings({ ogTitle: "OG Wins", seoTitle: "SEO Loses" });
-    render(<SocialTab s={s} page={makePage()} />);
+    render(<SocialTab s={s} />);
     expect(screen.getByText("OG Wins")).toBeTruthy();
     expect(screen.queryByText("SEO Loses")).toBeNull();
   });
 
   it("shows the placeholder description prompt when no description is available", () => {
     const s = makeSettings({ ogDesc: "", seoDesc: "" });
-    render(<SocialTab s={s} page={makePage()} />);
+    render(<SocialTab s={s} />);
     expect(screen.getByText("Add a description to preview here")).toBeTruthy();
   });
 
   it("renders the OG image in the preview when an image URL is set", () => {
     const s = makeSettings({ ogImageUrl: "https://img.example/pic.png" });
-    const { container } = render(<SocialTab s={s} page={makePage()} />);
+    const { container } = render(<SocialTab s={s} />);
     const img = container.querySelector('img[src="https://img.example/pic.png"]');
     expect(img).toBeTruthy();
     // Placeholder dimensions text is not shown when an image exists
@@ -131,13 +134,13 @@ describe("SocialTab preview card fallbacks", () => {
 
   it("shows the 1200 × 630 placeholder when no image is set", () => {
     const s = makeSettings({ ogImageUrl: null });
-    render(<SocialTab s={s} page={makePage()} />);
+    render(<SocialTab s={s} />);
     expect(screen.getByText("1200 × 630")).toBeTruthy();
   });
 
   it("uses the custom domain in the preview when provided", () => {
     const s = makeSettings({ domain: "acme.com" });
-    render(<SocialTab s={s} page={makePage()} />);
+    render(<SocialTab s={s} />);
     expect(screen.getByText("acme.com")).toBeTruthy();
   });
 });

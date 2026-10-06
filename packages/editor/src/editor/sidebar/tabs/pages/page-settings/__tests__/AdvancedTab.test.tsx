@@ -17,6 +17,8 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     setActiveTab: vi.fn(),
     publishedUrl: null,
     seoTitle: "",
+    inheritedTitle: "Home",
+    effectiveTitle: "Home",
     setSeoTitle: vi.fn(),
     seoDesc: "",
     setSeoDesc: vi.fn(),

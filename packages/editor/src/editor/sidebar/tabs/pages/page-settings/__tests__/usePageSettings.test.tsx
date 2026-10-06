@@ -65,10 +65,32 @@ describe("usePageSettings seed", () => {
     expect(result.current.isDirty).toBe(false);
   });
 
-  it("falls back to page.name for the SEO title when no metaTitle is set", () => {
-    const composer = createMockComposer({});
+  /* D1 (QA 2026-10-05, owner 2026-10-06 "empty field + placeholder"): the
+     field used to be seeded with page.name, and save() wrote that back as the
+     page's own title — every page the drawer saved opted out of the site's
+     default title. The field now holds only the page's OWN title; what the
+     page inherits is offered as the placeholder. */
+  it("starts the title field EMPTY when the page has no own title, and offers the inherited site default", () => {
+    const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Default Title" } } });
     const { result } = setup(composer, page({ name: "About Us", seo: undefined }));
-    expect(result.current.seoTitle).toBe("About Us");
+    expect(result.current.seoTitle).toBe("");
+    expect(result.current.inheritedTitle).toBe("Bella Default Title");
+    expect(result.current.effectiveTitle).toBe("Bella Default Title");
+  });
+
+  it("without a site default, the inherited title is the page name through the site template — as exported", () => {
+    const composer = createMockComposer({ projectSettings: { seo: { metaTitleTemplate: "{page_title} | Acme" } } });
+    const { result } = setup(composer, page({ name: "Blog Post", seo: undefined }));
+    expect(result.current.seoTitle).toBe("");
+    expect(result.current.inheritedTitle).toBe("Blog Post | Acme");
+  });
+
+  it("a typed title is the effective one (through the template, as exported)", () => {
+    const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Default Title", metaTitleTemplate: "{page_title} | Acme" } } });
+    const { result } = setup(composer, page({ name: "About", seo: undefined }));
+    act(() => result.current.setSeoTitle("Our story"));
+    expect(result.current.effectiveTitle).toBe("Our story | Acme");
+    expect(result.current.inheritedTitle).toBe("Bella Default Title");
   });
 
   /* #21 / #26: a legacy password page arrives as "hidden" (usePages maps it —
@@ -192,6 +214,32 @@ describe("usePageSettings save", () => {
     expect(lastToast()).toMatchObject({ tone: "warning" });
   });
 
+  /* D1: editing only the description must not stamp the page name in as the
+     page's own title (live: "Blog Post | Acme" shipped instead of the site
+     default). */
+  it("saves NO own title when the page had none and only the description was edited", async () => {
+    const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Default Title" } } });
+    const { result } = setup(composer, page({ name: "Blog Post", seo: undefined }));
+    act(() => result.current.setSeoDesc("A post about bread."));
+    await act(async () => {
+      await result.current.save();
+    });
+    const [, patch] = (composer.elements.updatePage as unknown as Mock).mock.calls[0];
+    expect(patch.settings.seo.metaTitle).toBeUndefined();
+    expect(patch.settings.seo.metaDescription).toBe("A post about bread.");
+  });
+
+  it("clearing a saved own title saves no own title (the page inherits again)", async () => {
+    const composer = createMockComposer({});
+    const { result } = setup(composer, page({ seo: { metaTitle: "Old title" } }));
+    act(() => result.current.setSeoTitle(""));
+    await act(async () => {
+      await result.current.save();
+    });
+    const [, patch] = (composer.elements.updatePage as unknown as Mock).mock.calls[0];
+    expect(patch.settings.seo.metaTitle).toBeUndefined();
+  });
+
   /* #20: Done is the retry — the failure toast carries no Retry action. */
   it("sets saveState=error, resolves false and offers no Retry when updatePage rejects", async () => {
     const composer = createMockComposer({});
@@ -228,6 +276,17 @@ describe("usePageSettings seoScore", () => {
     );
     // title 30(+20/+10) + slug 30(+20/+10) + desc 40(+30/+10) = 100
     expect(result.current.seoScore).toBe(100);
+  });
+
+  /* D1: an empty field is not a missing title — the page ships the inherited
+     one, so the score and the "Page title" check grade that. */
+  it("grades the inherited title when the field is empty", () => {
+    const composer = createMockComposer({ projectSettings: { seo: { metaTitle: "Bella Cucina — handmade pasta daily" } } });
+    const { result } = setup(composer, page({ slug: "about-us", seo: undefined }));
+    expect(result.current.seoTitle).toBe("");
+    expect(result.current.seoChecks.titleSet).toBe(true);
+    // title 30 (35 chars) + slug 30 + desc 0 = 60
+    expect(result.current.seoScore).toBe(60);
   });
 
   // Indexing is an all-or-nothing GATE in calculateSeoScore: turning it off
