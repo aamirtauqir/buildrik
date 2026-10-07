@@ -73,7 +73,9 @@ export interface TabRouterProps {
    *  mounted sidebar owns, consumed once by the tab it was meant for. */
   unpublishIntent?: boolean;
   onUnpublishIntentConsumed?: () => void;
-  onCreateComponent: () => void;
+  /** Omitted where Components is never hosted (the inspector column): the
+   *  tab then hides its Create rows rather than offering a dead button. */
+  onCreateComponent?: () => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
   /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */

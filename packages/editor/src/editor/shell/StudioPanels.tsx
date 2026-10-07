@@ -785,7 +785,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         activeSubTab={leftPanelSubTab}
         composer={composer}
         commonTabProps={{ isExpanded: false, onClose: () => onLeftPanelToggle?.() }}
-        onCreateComponent={() => {}}
         unpublishIntent={unpublishIntent}
         onUnpublishIntentConsumed={() => setUnpublishIntent(false)}
         projectId={projectId}
