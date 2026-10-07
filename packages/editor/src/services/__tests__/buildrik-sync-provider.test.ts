@@ -755,6 +755,23 @@ describe("loadProject — a failed site-settings read (SA-01)", () => {
   });
 });
 
+/* P1-2 (2026-10-08 audit): a load that failed leaves the fallback (a stale
+   local copy or the default project) on screen. Saves already refuse it
+   (ProjectNotLoadedError); publish did not — `siteColumnsLoaded` answered true
+   for a site no load ever touched, and the fallback went live. */
+describe("publish after a failed project load", () => {
+  it("is refused before any request, and the columns do not count as loaded", async () => {
+    mocks.sitesGetQuery.mockRejectedValueOnce(new Error("fetch failed"));
+    mocks.pagesListQuery.mockResolvedValue([]);
+    await expect(loadProject("never-loaded")).rejects.toThrow(/loadProject failed/);
+
+    expect(siteColumnsLoaded("never-loaded")).toBe(false);
+    await expect(
+      publishSite("never-loaded", [{ path: "index.html", html: "<html></html>" }]),
+    ).rejects.toThrow("This site didn't load. Reload the editor before publishing.");
+  });
+});
+
 describe("saveProject dual-save routing (P0.2b)", () => {
   beforeEach(async () => {
     await loadedSite("s1");

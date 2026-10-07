@@ -8,7 +8,12 @@
  */
 
 import { createBuildrikApiClient } from "./api-client";
-import { settledBaselineLastEditedAt, raiseSaveConflict, siteColumnsLoaded } from "./BuildrikSyncProvider";
+import {
+  settledBaselineLastEditedAt,
+  raiseSaveConflict,
+  siteColumnsLoaded,
+  hasProjectLoaded,
+} from "./BuildrikSyncProvider";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 import type { ComparePage } from "../shared/utils/html";
@@ -69,6 +74,12 @@ export async function publishSite(
   // publish so the server gate can still block.
   // C-3: the pages are this tab's; the server refuses them if the site moved
   // on since this tab last loaded or saved it.
+  // A tab whose project never loaded shows the fallback (a stale local copy or
+  // the default project); publishing it would replace the live site with that.
+  // Same invariant the save boundary enforces (ProjectNotLoadedError).
+  if (!hasProjectLoaded(siteId)) {
+    throw new Error("This site didn't load. Reload the editor before publishing.");
+  }
   // SA-01: without the Site columns the rendered pages carry an empty <head>.
   if (!siteColumnsLoaded(siteId)) {
     throw new Error("Site settings didn't load. Reload the editor before publishing.");

@@ -79,9 +79,15 @@ export const publishInputSchema = z
     /** C-3: the `lastEditedAt` the publishing tab last loaded or saved. The
      *  tab publishes its IN-MEMORY pages, so a tab that fell behind another
      *  writer would ship the older copy over theirs; the server refuses with
-     *  SAVE_CONFLICT when the site moved past this. Optional — callers that
-     *  send no pages (cron, dashboard) are not checked. */
+     *  SAVE_CONFLICT when the site moved past this. Required whenever `pages`
+     *  is sent (refined below): a tab with no token never loaded the site, and
+     *  its pages are whatever the fallback put on screen. Callers that send no
+     *  pages (cron, dashboard) carry nothing to be stale. */
     expectedLastEditedAt: z.string().datetime().nullish(),
+  })
+  .refine((input) => !input.pages || !!input.expectedLastEditedAt, {
+    message: "Publishing pages requires expectedLastEditedAt — reload the editor before publishing.",
+    path: ["expectedLastEditedAt"],
   })
   .refine(
     (input) => {
