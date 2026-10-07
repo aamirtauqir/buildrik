@@ -31,10 +31,6 @@ export function getOpenAI(): OpenAI {
   return _client;
 }
 
-export function isOpenAIConfigured(): boolean {
-  return (process.env.OPENAI_API_KEY ?? "").length > 0;
-}
-
 class OpenAIProvider implements AIProvider {
   async *stream(
     prompt: string,

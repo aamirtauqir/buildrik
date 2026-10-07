@@ -12,10 +12,6 @@ import type { AIProvider, TokenChunk } from "./types";
 
 export const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "qwen3.5";
 
-export function isOllamaConfigured(): boolean {
-  return (process.env.OLLAMA_BASE_URL ?? "").length > 0;
-}
-
 // Local models can be slow to (re)load into memory, especially large ones, so
 // allow a generous timeout. Override with OLLAMA_TIMEOUT_MS.
 const OLLAMA_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 300_000);
