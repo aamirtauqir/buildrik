@@ -127,7 +127,7 @@ function makeStubComposer(opts: { hasDragManager?: boolean } = {}) {
         calculateSnapPoints: vi.fn(() => []),
       },
     },
-    mediaOps: { insertMediaAt: vi.fn(() => true) },
+    mediaOps: { insertMediaAt: vi.fn(() => true), replaceMedia: vi.fn(() => ({ elementId: "img1", previousSrc: "" })) },
   } as any;
 }
 
@@ -550,16 +550,19 @@ describe("useCanvasDragDrop — handleDrop", () => {
     expect(handleBlockDrop).toHaveBeenCalled();
   });
 
-  it("handles OS file drop with image: uploads + sets src on target", async () => {
+  /* Media P0-1: the file used to be written as `src` onto whatever was under
+     the cursor — the page root by fallback — with no lock check. Dropped on
+     a non-image it now inserts a new image at the drop point. */
+  it("handles OS file drop with image: uploads + inserts a new image (the section under it untouched)", async () => {
     const targetEl: any = { setAttribute: vi.fn() };
     const composer = makeStubComposer();
     composer.elements.getElement = vi.fn(() => targetEl);
     composer.media.uploadFile = vi.fn().mockResolvedValue({
       success: true,
-      asset: { src: "blob:uploaded.png" },
+      asset: { src: "https://cdn.example/uploaded.png", altText: "A cat" },
     });
 
-    const { result } = renderDragDrop({ composer });
+    const { result, onDropSuccess } = renderDragDrop({ composer });
     const file = new File(["x"], "img.png", { type: "image/png" });
     const e = makeDragEvent({}, [file]);
 
@@ -568,7 +571,44 @@ describe("useCanvasDragDrop — handleDrop", () => {
     });
 
     expect(composer.media.uploadFile).toHaveBeenCalledWith(file);
-    expect(targetEl.setAttribute).toHaveBeenCalledWith("src", "blob:uploaded.png");
+    expect(targetEl.setAttribute).not.toHaveBeenCalled();
+    expect(composer.mediaOps.insertMediaAt).toHaveBeenCalledWith(
+      "https://cdn.example/uploaded.png",
+      "image",
+      { x: 100, y: 100, path: "drag", alt: "A cat" },
+    );
+    expect(onDropSuccess).toHaveBeenLastCalledWith(expect.objectContaining({ elementLabel: "img.png added ✓" }));
+  });
+
+  it("OS file dropped on an image replaces it", async () => {
+    const imageEl: any = { getType: () => "image", getId: () => "img1", isLocked: () => false, setAttribute: vi.fn() };
+    const composer = makeStubComposer();
+    composer.elements.getElement = vi.fn(() => imageEl);
+    composer.media.uploadFile = vi.fn().mockResolvedValue({ success: true, asset: { src: "https://cdn.example/u.png" } });
+
+    const { result } = renderDragDrop({ composer });
+    await act(async () => {
+      await result.current.handleDrop(makeDragEvent({}, [new File(["x"], "img.png", { type: "image/png" })]));
+    });
+
+    expect(composer.mediaOps.replaceMedia).toHaveBeenCalledWith("img1", "https://cdn.example/u.png", { alt: undefined });
+    expect(composer.mediaOps.insertMediaAt).not.toHaveBeenCalled();
+  });
+
+  it("OS file dropped on a LOCKED image is refused before anything uploads", async () => {
+    const imageEl: any = { getType: () => "image", getId: () => "img1", isLocked: () => true };
+    const composer = makeStubComposer();
+    composer.emit = vi.fn();
+    composer.elements.getElement = vi.fn(() => imageEl);
+
+    const { result } = renderDragDrop({ composer });
+    await act(async () => {
+      await result.current.handleDrop(makeDragEvent({}, [new File(["x"], "img.png", { type: "image/png" })]));
+    });
+
+    expect(composer.media.uploadFile).not.toHaveBeenCalled();
+    expect(composer.mediaOps.replaceMedia).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith("clipboard:locked-elements-skipped", undefined);
   });
 
   it("an OS-file drop whose upload stayed local says so too", async () => {
@@ -587,9 +627,8 @@ describe("useCanvasDragDrop — handleDrop", () => {
       await result.current.handleDrop(makeDragEvent({}, [file]));
     });
 
-    // the src is still applied — the element exists, it just cannot render
-    expect((targetEl as unknown as { setAttribute: ReturnType<typeof vi.fn> }).setAttribute)
-      .toHaveBeenCalledWith("src", "blob:uploaded.png");
+    // the image is still placed — the element exists, it just cannot render
+    expect(composer.mediaOps.insertMediaAt).toHaveBeenCalledWith("blob:uploaded.png", "image", expect.anything());
     /* The path opens with an "Uploading …" progress toast, which is fine —
        what must not follow it is "applied ✓". */
     expect(onDropSuccess.mock.calls.map((c) => c[0].elementLabel)).toEqual([
@@ -708,7 +747,11 @@ describe("useCanvasDragDrop — handleDrop", () => {
     });
   });
 
-  it("handles internal-media drop via handleInternalMediaDrop short-circuit", async () => {
+  /* Media P0-1: this asserted `targetElementId: "r1"` — the PAGE ROOT, the
+     drop-target fallback — as correct, i.e. a library image dropped on the
+     canvas wrote `src` onto the root and inserted nothing. A drop that is not
+     on an image inserts at the drop point; no replace target is passed. */
+  it("handles internal-media drop via handleInternalMediaDrop short-circuit: inserts at the drop point", async () => {
     const { result, composer } = renderDragDrop();
     const targetEl: any = { setAttribute: vi.fn() };
     composer.elements.getElement = vi.fn(() => targetEl);
@@ -726,8 +769,44 @@ describe("useCanvasDragDrop — handleDrop", () => {
     expect(composer.mediaOps.insertMediaAt).toHaveBeenCalledWith(
       "https://example.com/img.png",
       "image",
-      expect.objectContaining({ targetElementId: "r1", path: "drag" }),
+      { x: 100, y: 100, path: "drag", alt: undefined },
     );
+    expect(targetEl.setAttribute).not.toHaveBeenCalled();
+  });
+
+  it("internal-media drop on an image replaces it, carrying the asset's alt", async () => {
+    const { result, composer, onDropSuccess } = renderDragDrop();
+    composer.elements.getElement = vi.fn(() => ({ getType: () => "image", getId: () => "img1", isLocked: () => false }));
+
+    await act(async () => {
+      await result.current.handleDrop(makeDragEvent({
+        "application/x-aquibra-media-src": "https://example.com/img.png",
+        "application/x-aquibra-media-type": "img",
+        "application/x-aquibra-media-name": "img.png",
+        "application/x-aquibra-media-alt": "A cat",
+      }));
+    });
+
+    expect(composer.mediaOps.replaceMedia).toHaveBeenCalledWith("img1", "https://example.com/img.png", { alt: "A cat" });
+    expect(composer.mediaOps.insertMediaAt).not.toHaveBeenCalled();
+    expect(onDropSuccess).toHaveBeenCalledWith(expect.objectContaining({ elementLabel: "img.png applied ✓" }));
+  });
+
+  it("does not upload a library asset again on drop", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("no network"));
+    const { result, composer } = renderDragDrop();
+    composer.media.getAssets = vi.fn(() => [{ src: "https://blob.example/lib.png" }]);
+
+    await act(async () => {
+      await result.current.handleDrop(makeDragEvent({
+        "application/x-aquibra-media-src": "https://blob.example/lib.png",
+        "application/x-aquibra-media-type": "img",
+      }));
+    });
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(composer.media.uploadFile).not.toHaveBeenCalled();
+    fetchSpy.mockRestore();
   });
 });
 

@@ -44,6 +44,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "added block": "Added block",
   "insert-block-drop": "Added block",
   "insert-block-sidebar": "Added block",
+  "insert-media-drop": "Added media",
   "insert-component": "Added component",
   "instantiate-component-drop": "Added component",
   "insert-template-drop": "Added template",
