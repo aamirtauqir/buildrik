@@ -116,8 +116,11 @@ describe("ai-generate worker", () => {
     const completed = txJobUpdateMany.mock.calls[0][0];
     expect(completed.data.status).toBe("COMPLETED");
     expect(completed.data.siteId).toBe("site-1");
-    // a CANCELLED job must not be overwritten by COMPLETED
-    expect(completed.where.status).toEqual({ not: "CANCELLED" });
+    // a CANCELLED job must not be overwritten by COMPLETED, nor a job the
+    // dispatcher or the stale-job cron already marked FAILED
+    expect(completed.where.status).toEqual({ notIn: ["CANCELLED", "FAILED"] });
+    const phase = p.aIGenerationJob.updateMany.mock.calls.find((c) => c[0].data?.status === "GENERATING");
+    if (phase) expect(phase[0].where.status).toEqual({ notIn: ["CANCELLED", "FAILED"] });
   });
 
   /**

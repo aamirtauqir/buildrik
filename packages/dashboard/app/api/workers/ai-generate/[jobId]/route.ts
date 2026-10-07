@@ -98,10 +98,10 @@ async function assertNotCancelled(jobId: string): Promise<void> {
   if (current?.status === "CANCELLED") throw new CancelledError();
 }
 
-/** Advance status/progress, but never resurrect a CANCELLED job. */
+/** Advance status/progress, but never resurrect a CANCELLED or FAILED job. */
 async function setPhase(jobId: string, status: string, progress: number): Promise<void> {
   const updated = await prisma.aIGenerationJob.updateMany({
-    where: { id: jobId, status: { not: "CANCELLED" } },
+    where: { id: jobId, status: { notIn: ["CANCELLED", "FAILED"] } },
     data: { status, progress },
   });
   if (updated.count === 0) throw new CancelledError();
@@ -239,7 +239,7 @@ export async function POST(
         data: rows.map((r, i) => ({ ...r, blocks: unique[i].blocks as Prisma.InputJsonValue })),
       });
       const flipped = await tx.aIGenerationJob.updateMany({
-        where: { id: jobId, status: { not: "CANCELLED" } },
+        where: { id: jobId, status: { notIn: ["CANCELLED", "FAILED"] } },
         data: { status: "COMPLETED", progress: 100, siteId: siteRowId, completedAt: new Date(), error: null },
       });
       if (flipped.count === 0) throw new CancelledError();
