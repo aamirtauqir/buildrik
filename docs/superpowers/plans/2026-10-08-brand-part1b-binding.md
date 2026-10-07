@@ -134,6 +134,22 @@ spec's picture and the shipped code differ; the tasks below are written against 
 | OQ-10 | **Interim UI before boards.** Until BRP1-M5/M6 land: the "Used by" chip shows nothing when the count is unknown, and a refused delete reuses Brand's existing refusal toast. Acceptable? | Task 4 | as described |
 | OQ-11 | **Deploy.** 1b changes theme push and every token write's guard. Prod deploy and its timing are yours (no deploys until asked, 2026-10-07). Run the read-only `replacedBy` audit query (Task 14 Step 6) before deploying. | Task 14 | ships to `main` only |
 
+### Owner answers (2026-10-08)
+
+| # | Answer |
+|---|--------|
+| OQ-1 | **Add the six recommended seed colour tokens** (on-primary, raised surface, muted surface, subtle border, strong text, subtle text; light + dark). Task 6 starts. |
+| OQ-2 | **Keep raw on a tracked (ratcheted) allow-list** — no snapping. |
+| OQ-3 | **Leave font-weight / line-height raw in 1b.** |
+| OQ-4 | **Drop the Connect restore point** — ⌘Z + version history cover it. |
+| OQ-5 | **Skip component instances and masters.** |
+| OQ-6 | **Whole-value matches only (no shorthand parts), breakpoint overrides INCLUDED.** Task 8 widens from "base styles only" to base + breakpoint overrides. |
+| OQ-7 | **Delete on a seed token becomes "Reset to default".** |
+| OQ-8 | **Show "kept N site tokens"** in the Theme manager push result (copy within the existing M4 status row; board M4 to confirm). |
+| OQ-9 | **Social brand colours stay raw**, allow-listed with reason. |
+| OQ-10 | **Interim UI accepted** (hidden chip when unknown, existing refusal toast). |
+| OQ-11 | Open — no prod deploy until the owner asks. |
+
 ---
 
 ## File Structure
