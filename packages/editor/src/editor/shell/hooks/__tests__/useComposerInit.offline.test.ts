@@ -259,7 +259,13 @@ describe("autosave refused with TOKENS_INVALID", () => {
 
   it("keeps the work, raises the banner state without a toast, and does not resend the same payload", async () => {
     localStorage.removeItem("bk-unsaved-v1-site-1");
-    composer.exportProject.mockReturnValue({ settings: { designTokens: ["bad"] } } as never);
+    /* The real exportProject stamps metadata.updatedAt on every call
+       (Composer.exportProject), so no two snapshots are ever byte-equal. A
+       constant mock hid that the whole-payload guard could never match. */
+    let stamp = 0;
+    composer.exportProject.mockImplementation(
+      () => ({ settings: { designTokens: ["bad"] }, metadata: { updatedAt: `t${++stamp}` } }) as never,
+    );
     vi.mocked(syncSaveProject).mockRejectedValueOnce(
       new TRPCClientError(REFUSAL, { result: { error: { message: REFUSAL, code: -32600, data: { code: "BAD_REQUEST", httpStatus: 400, path: "sites.saveProject" } } } as never }),
     );
@@ -277,11 +283,13 @@ describe("autosave refused with TOKENS_INVALID", () => {
     expect(syncSaveProject).toHaveBeenCalledTimes(1);
 
     vi.mocked(syncSaveProject).mockResolvedValueOnce(undefined as never);
-    composer.exportProject.mockReturnValue({ settings: { designTokens: [] } } as never);
+    composer.exportProject.mockImplementation(
+      () => ({ settings: { designTokens: [] }, metadata: { updatedAt: `t${++stamp}` } }) as never,
+    );
     act(() => { composer.emit("project:changed"); });
     await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
     expect(syncSaveProject).toHaveBeenCalledTimes(2);
-    composer.exportProject.mockReturnValue({} as never);
+    composer.exportProject.mockImplementation(() => ({}));
     localStorage.removeItem("bk-unsaved-v1-site-1");
   });
 });

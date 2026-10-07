@@ -586,10 +586,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        Read once, like every other view-mode consumer — the mode is the URL. */
     const readOnlyView = getEditorViewMode().readOnlyView;
 
-    /* The serialized payload the server refused for its brand tokens
-       (TOKENS_INVALID). Sending it again can only be refused again, so it is
-       held until the document changes; null once anything saves. */
-    let refusedPayload: string | null = null;
+    /* The serialized brand tokens the server refused (TOKENS_INVALID).
+       Keyed on the tokens, not the whole payload: exportProject stamps
+       metadata.updatedAt on every call, so two whole snapshots never compare
+       equal, and any other edit still carries the same refused tokens. Held
+       until the tokens change; null once anything saves. */
+    let refusedTokens: string | null = null;
 
     const handler = (payload?: unknown) => {
       if (readOnlyView) return;
@@ -630,7 +632,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
            snapshot, and a second `exportProject()` per autosave tick is a full
            serialize of the document. */
         const snapshot = siteId ? composer.exportProject() : null;
-        if (snapshot && refusedPayload !== null && JSON.stringify(snapshot) === refusedPayload) {
+        if (
+          snapshot &&
+          refusedTokens !== null &&
+          JSON.stringify(snapshot.settings?.designTokens ?? null) === refusedTokens
+        ) {
           keepUnsaved(siteId!, snapshot);
           setIsDirty(true);
           return;
@@ -661,7 +667,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                that is missing — leaving it would offer a stale restore on the
                next load. */
             if (siteId) clearUnsaved(siteId);
-            refusedPayload = null;
+            refusedTokens = null;
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })
@@ -682,12 +688,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             const message = err instanceof Error ? err.message : "Auto-save failed";
             /* The server refused this save's brand tokens. Not a blip: the
                same payload is refused every time, so it is not re-sent (see
-               refusedPayload), the edit is kept for the reload like an
+               refusedTokens), the edit is kept for the reload like an
                offline one, and the failure stays up as the persistent
                save-failed banner rather than a toast. */
             if (message.startsWith("TOKENS_INVALID:")) {
               if (siteId && snapshot) {
-                refusedPayload = JSON.stringify(snapshot);
+                refusedTokens = JSON.stringify(snapshot.settings?.designTokens ?? null);
                 keepUnsaved(siteId, snapshot);
               }
               console.error("[BuildrikSync] auto-save refused:", message);
