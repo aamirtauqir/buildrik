@@ -271,3 +271,28 @@ describe("buildDeployFiles — vercel.json", () => {
     });
   });
 });
+
+/* P1-3: the schema refuses unsafe page paths at the transport boundary, but a
+   deploy also ships pages that never crossed it — a rollback re-deploys a
+   payload stored before the schema tightened, and the CMS generator appends
+   pages server-side. The assembly refuses them too, before anything uploads. */
+describe("buildDeployFiles — page path guard", () => {
+  it.each(["vercel.json", "api/x.js", "../x.html", "/index.html", ".well-known/x.html"])(
+    "refuses a page at %s",
+    (path) => {
+      expect(() => build({ pages: [{ path, html: page("X") }] })).toThrow(/UNSAFE_PUBLISH_PATH/);
+    },
+  );
+
+  it("ships nested and CMS-generated page paths", () => {
+    const files = build({
+      pages: [
+        { path: "index.html", html: page("Home") },
+        { path: "blog/post.html", html: page("Post") },
+        { path: "blog/my-first-post/index.html", html: page("Record") },
+        { path: "404.html", html: page("Missing") },
+      ],
+    });
+    expect(files.map((f) => f.file)).toContain("blog/my-first-post/index.html");
+  });
+});
