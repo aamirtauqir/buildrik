@@ -390,6 +390,7 @@ export class HistoryManager {
       designTokens: settings.designTokens,
       designTokensSchemaVersion: settings.designTokensSchemaVersion,
       designPresets: settings.designPresets,
+      darkMode: settings.darkMode,
     };
     return project;
   }
@@ -402,22 +403,28 @@ export class HistoryManager {
    *  schema version. An absent key leaves designTokens out of the save
    *  payload, so the server kept the edit that was undone and the next load
    *  brought it back; `[]` without a version reads as v1. A site that never
-   *  had tokens keeps the key absent, so its save payload is unchanged. */
+   *  had tokens keeps the key absent, so its save payload is unchanged.
+   *
+   *  Dark mode follows the same rule: absent over a live value is written as
+   *  "off" — what an absent darkMode reads as everywhere
+   *  (`DarkModeSchema.catch("off")`) — and a site that never set it keeps
+   *  the key absent. */
   private importScoped(state: ProjectData): void {
     const live: ProjectSettings = this.composer.exportProject().settings ?? {};
     const clearsLiveTokens =
       state.settings?.designTokens === undefined && live.designTokens !== undefined;
-    this.composer.importProject({
-      ...state,
-      settings: {
-        ...live,
-        designTokens: clearsLiveTokens ? [] : state.settings?.designTokens,
-        designTokensSchemaVersion: clearsLiveTokens
-          ? TOKENS_SCHEMA_VERSION
-          : state.settings?.designTokensSchemaVersion,
-        designPresets: state.settings?.designPresets,
-      },
-    });
+    const settings: ProjectSettings = {
+      ...live,
+      designTokens: clearsLiveTokens ? [] : state.settings?.designTokens,
+      designTokensSchemaVersion: clearsLiveTokens
+        ? TOKENS_SCHEMA_VERSION
+        : state.settings?.designTokensSchemaVersion,
+      designPresets: state.settings?.designPresets,
+    };
+    const darkMode = state.settings?.darkMode ?? (live.darkMode !== undefined ? "off" : undefined);
+    if (darkMode === undefined) delete settings.darkMode;
+    else settings.darkMode = darkMode;
+    this.composer.importProject({ ...state, settings });
   }
 
   private getCurrentState(): ProjectData {
