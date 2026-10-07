@@ -19,10 +19,12 @@
  */
 import { describe, it, expect } from "vitest";
 import { DEFAULT_TOKENS } from "../../constants";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 import { buildContrastIssues, contrastFixHint, findSurfaceToken, resolveSurface, contrastFails } from "../contrastLint";
 
-const colors = DEFAULT_TOKENS.filter((t) => t.category === "colors") as DesignToken[];
+const colors = DEFAULT_TOKENS.filter((t) => t.category === "colors");
 
 describe("contrast lint — a surface colour is not a foreground colour", () => {
   it("does not flag a token that is the page colour under another id", () => {
@@ -35,7 +37,7 @@ describe("contrast lint — a surface colour is not a foreground colour", () => 
     /* Built here rather than taken from DEFAULT_TOKENS: the shipped palette
        passes now, and a test that needs the product to be broken in order to
        prove the rule stops proving it the moment the product is fixed. */
-    const tooPale: DesignToken = { ...(colors[0] as DesignToken), id: "color-pale", value: "#DDEEDD" };
+    const tooPale = v6Token({ id: "color-pale", value: "#DDEEDD", layer: "semantic" });
     const ids = buildContrastIssues([...colors, tooPale], "light").map((i) => i.tokenId);
     expect(ids).toContain("color-pale");
   });
@@ -50,9 +52,9 @@ describe("contrast lint — a surface colour is not a foreground colour", () => 
 
   it("matches on value regardless of hex case", () => {
     const surface = findSurfaceToken(colors);
-    const bg = resolveSurface(surface, "light");
-    const lower: DesignToken = { ...(colors[0] as DesignToken), id: "color-copy", value: bg.toLowerCase() };
-    expect(contrastFails(lower, bg, "light", surface?.id)).toBe(false);
+    const bg = resolveSurface(surface, colors, "light");
+    const lower = v6Token({ id: "color-copy", value: bg.toLowerCase(), layer: "semantic" });
+    expect(contrastFails(lower, [...colors, lower], bg, "light", surface?.id)).toBe(false);
   });
 });
 
@@ -67,20 +69,35 @@ describe("contrast lint — a surface colour is not a foreground colour", () => 
 describe("contrast lint — the page colour is findable under its semantic name", () => {
   const semanticOnly = colors.filter((t) => t.group === "semantic");
 
+  /* The semantic tokens alias primitives, so values resolve against the full
+     list; only the surface SEARCH is limited to what is in view. */
   it("finds the surface when only the semantic tokens are in view", () => {
     const surface = findSurfaceToken(semanticOnly);
     expect(surface?.id).toBe("color-surface");
-    expect(resolveSurface(surface, "light")).toBe(
-      colors.find((t) => t.id === "color-background")?.value,
+    expect(resolveSurface(surface, colors, "light")).toBe(
+      resolveTokenLiteral(colors, "color-background", "light"),
     );
   });
 
   it("does not report the page colour as failing against itself", () => {
-    expect(buildContrastIssues(semanticOnly, "light").map((i) => i.tokenId)).not.toContain("color-surface");
+    const surface = findSurfaceToken(semanticOnly);
+    const bg = resolveSurface(surface, colors, "light");
+    const failing = semanticOnly.filter((t) => contrastFails(t, colors, bg, "light", surface?.id));
+    expect(failing.map((t) => t.id)).not.toContain("color-surface");
   });
 
   it("still prefers color-background when both are present", () => {
     expect(findSurfaceToken(colors)?.id).toBe("color-background");
+  });
+});
+
+describe("contrast lint — primitives are not measured", () => {
+  it("never reports a primitive, which may hold a dark-mode literal", () => {
+    const tokens = [
+      v6Token({ id: "color-background", value: "#FFFFFF", layer: "semantic" }),
+      v6Token({ id: "custom-text-dark", value: "#F9FAFB" }),
+    ];
+    expect(buildContrastIssues(tokens, "light")).toEqual([]);
   });
 });
 
@@ -92,9 +109,9 @@ describe("contrast findings carry the engine's fix hint (B9 / SH-64)", () => {
 
   it("every contrast issue carries a hint the Issues panel's Fix can act on", () => {
     const tokens = [
-      { id: "color-background", name: "Background", kind: "color", category: "colors", value: "#FFFFFF" },
-      { id: "color-faint", name: "Faint", kind: "color", category: "colors", value: "#EEEEEE" },
-    ] as never;
+      v6Token({ id: "color-background", name: "Background", value: "#FFFFFF", layer: "semantic" }),
+      v6Token({ id: "color-faint", name: "Faint", value: "#EEEEEE", layer: "semantic" }),
+    ];
     const issues = buildContrastIssues(tokens, "light");
     expect(issues).toHaveLength(1);
     expect(issues[0]).toMatchObject({ tokenId: "color-faint", autoFixHint: "darken-22" });
@@ -108,13 +125,10 @@ describe("contrast findings carry the engine's fix hint (B9 / SH-64)", () => {
    against a hardcoded #0A0A0A, inverting every verdict. */
 describe("contrast is checked against the customer's surface, not a hardcoded one", () => {
   const LIGHT_SITE = [
-    { id: "color-background", name: "Background", value: "#FFFFFF", darkValue: "#111827",
-      category: "colors", type: "color", kind: "color", group: "surface" },
-    { id: "color-text", name: "Text", value: "#111827", darkValue: "#F9FAFB",
-      category: "colors", type: "color", kind: "color", group: "surface" },
-    { id: "color-pale", name: "Pale", value: "#F5F5F5", darkValue: "#F5F5F5",
-      category: "colors", type: "color", kind: "color", group: "brand" },
-  ] as DesignToken[];
+    v6Token({ id: "color-background", name: "Background", value: "#FFFFFF", dark: "#111827", group: "surface" }),
+    v6Token({ id: "color-text", name: "Text", value: "#111827", dark: "#F9FAFB", group: "surface" }),
+    v6Token({ id: "color-pale", name: "Pale", value: "#F5F5F5", dark: "#F5F5F5", group: "brand" }),
+  ];
   const flagged = (tokens: DesignToken[], mode: "light" | "dark") =>
     buildContrastIssues(tokens, mode).map((i) => i.tokenId);
 
@@ -127,10 +141,7 @@ describe("contrast is checked against the customer's surface, not a hardcoded on
   });
 
   it("falls back to white, never to near-black, when the palette has no background token", () => {
-    const noSurface = [
-      { id: "color-paper", name: "Paper", value: "#F2F2F2",
-        category: "colors", type: "color", kind: "color", group: "brand" },
-    ] as DesignToken[];
+    const noSurface = [v6Token({ id: "color-paper", name: "Paper", value: "#F2F2F2", group: "brand", layer: "semantic" })];
     expect(flagged(noSurface, "light")).toEqual(["color-paper"]);
   });
 });

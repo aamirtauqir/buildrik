@@ -4,6 +4,7 @@
  */
 
 import type { DesignToken } from "../types";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export type ExportFormat = "css" | "tailwind" | "json";
 
@@ -92,7 +93,7 @@ export function buildExport(
       (t) => !["colors", "typography", "spacing", "theme"].includes(t.category)
     );
 
-    const toVar = (t: DesignToken) => `  ${t.cssVar}: ${t.value};`;
+    const toVar = (t: DesignToken) => `  ${t.cssVar}: ${resolveTokenLiteral(tokens, t.id, "light") ?? ""};`;
 
     const lines: string[] = [":root {"];
     if (colorVars.length) {
@@ -127,7 +128,7 @@ export function buildExport(
     const out: Record<string, string> = {};
     for (const t of tokens) {
       const k = t.kind ?? "";
-      if (kinds.includes(k) || types.includes(t.type)) out[key(t)] = t.value;
+      if (kinds.includes(k) || types.includes(t.type)) out[key(t)] = resolveTokenLiteral(tokens, t.id, "light") ?? "";
     }
     return out;
   };

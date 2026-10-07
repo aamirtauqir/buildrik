@@ -182,3 +182,18 @@ describe("projectDataFromRows → renderProjectPages", () => {
     expect(projectDataFromRows(rows, [page], null).settings?.seo?.siteName).toBe("Bella");
   });
 });
+
+describe("projectDataFromRows — brand token kill switch fields", () => {
+  const rows = { name: "Bella", projectSettings: {} };
+  it("carries the server's switch and the site's hold", () => {
+    const d = projectDataFromRows({ ...rows, tokensMigrationHold: true }, [], { brandTokensV2: true });
+    expect(d.brandTokensV2).toBe(true);
+    expect(d.tokensMigrationHold).toBe(true);
+  });
+  it("leaves the switch undefined when the site columns failed to load (editor then does not migrate)", () => {
+    const d = projectDataFromRows({ ...rows, tokensMigrationHold: false }, [], null);
+    expect(d.brandTokensV2).toBeUndefined();
+    expect(d.tokensMigrationHold).toBe(false);
+  });
+});
+

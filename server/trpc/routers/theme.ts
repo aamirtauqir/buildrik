@@ -4,6 +4,7 @@ import { protectedProcedure, router } from "../trpc";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { isFeatureEnabled } from "@/server/services/feature-flag.service";
 import {
+  checkSiteRole,
   checkWorkspaceRole,
   PermissionError,
 } from "@/server/services/permission.service";
@@ -16,6 +17,7 @@ import {
   previewSharedThemePush,
   rollbackSiteTheme,
   listSiteThemeSnapshots,
+  listBrandRestorePoints,
   saveWorkspacePreset,
   listWorkspacePresets,
   deleteWorkspacePreset,
@@ -154,6 +156,19 @@ export const themeRouter = router({
       } catch (e) {
         translateThemeError(e);
       }
+    }),
+
+  // Brand panel restore points: any site editor (not VIEWER), no agency gate.
+  brandRestorePoints: protectedProcedure
+    .input(siteThemeSnapshotInput)
+    .query(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return listBrandRestorePoints(input.siteId);
     }),
 
   // D4: the agency's named brand preset library.

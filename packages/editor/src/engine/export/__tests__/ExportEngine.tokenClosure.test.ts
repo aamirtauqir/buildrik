@@ -24,9 +24,10 @@ import {
 } from "@/engine/__tests__/test-utils/realComposer";
 import { insertBlock, getBlockDefinitions } from "@/blocks/blockRegistry";
 import { ExportEngine } from "../ExportEngine";
-import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
+import { DEFAULT_TOKENS, DEFAULT_TOKENS_V5 } from "@/engine/designSystem/defaultTokens";
 import { CATALOG } from "@/editor/components-catalog/catalog";
 import { placeCatalogComponent } from "@/editor/components-catalog/placeCatalogComponent";
+import { setTokenLiteral } from "@buildrik/shared/tokens";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -43,8 +44,8 @@ function undeclared(doc: string): string[] {
 
 /* A site that saved its brand once: colours and fonts only — the shape the
    audit's scratch site had. No button or form token among them. */
-const SAVED_BRAND = DEFAULT_TOKENS.filter((t) => t.category === "colors" || t.category === "typography").map(
-  (t) => (t.id === "color-primary" ? { ...t, value: "#B91C1C" } : t)
+const SAVED_BRAND = setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#B91C1C").filter(
+  (t) => t.category === "colors" || t.category === "typography"
 );
 
 describe.each([
@@ -96,9 +97,40 @@ describe.each([
       expect(doc).toContain("--buildrick-design-input-height:40px");
     }
     if (designTokens) {
-      /* The saved value still wins over the seed. */
-      expect(multi).toContain("--buildrick-design-color-primary:#B91C1C");
+      /* The saved value still wins over the seed. v6 writes a literal edit of
+         a semantic colour into its own primitive, and the semantic token
+         stays a `var()` alias the browser resolves. */
+      expect(multi).toContain("--buildrick-design-custom-color-primary:#B91C1C");
+      expect(multi).toContain("--buildrick-design-color-primary:var(--buildrick-design-custom-color-primary)");
       expect(multi).not.toContain("--buildrick-design-color-primary:#1A56DB");
+    }
+  });
+});
+
+/* A v5 site is migrated on read, and a site in Dark mode "auto" ships extra
+   blocks — neither may open a var() the export does not declare. */
+describe("token closure — a v5 site in Dark mode auto", () => {
+  it("declares every var() the button block's export reads", async () => {
+    const def = getBlockDefinitions().find((d) => d.id === "button");
+    expect(def).toBeDefined();
+    const composer = createTestComposer();
+    /* A v5 save is what the server hands back, not a v6 list. */
+    const stored: Record<string, unknown> = {
+      designTokens: DEFAULT_TOKENS_V5,
+      designTokensSchemaVersion: 5,
+      darkMode: "auto",
+    };
+    composer.setProjectSettings({ ...composer.getProjectSettings(), ...stored });
+    const page = composer.elements.createPage("Home");
+    composer.elements.setActivePage?.(page.id);
+    insertBlock(composer, def!, page.root.id);
+    const engine = new ExportEngine(composer);
+    const single = engine.generateHTML({ includeResetCSS: true }) + engine.generateCSS();
+    const { files } = await engine.exportAllPages({ format: "html" });
+    const multi = files.map((f) => f.content).join("\n");
+    for (const doc of [single, multi]) {
+      expect(undeclared(doc)).toEqual([]);
+      expect(doc).toContain(':root[data-theme="dark"]');
     }
   });
 });

@@ -229,6 +229,17 @@ export function useSaveCallback({
           return "conflict";
         }
         const errorMessage = err?.message || "Unknown error";
+        /* The server refused this save's brand tokens. A Retry would send the
+           same tokens and be refused again, so there is no toast: the edit is
+           kept for the reload and the persistent save-failed banner reads its
+           copy from saveState.error — the same handling as autosave
+           (useComposerInit). */
+        if (errorMessage.startsWith("TOKENS_INVALID:")) {
+          if (siteId) keepUnsaved(siteId, composer.exportProject());
+          setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
+          setIsDirty(true);
+          return "error";
+        }
         // 60-save-states: a network/connection failure is NOT a lost save — the
         // edit stays in the local project and syncs on reconnect. Don't show the
         // scary "Save failed" + Retry; clear the spinner (the topbar's offline

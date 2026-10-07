@@ -1,6 +1,6 @@
 /**
  * B-1: shellDirtyRegistry is the one place every navigation guard reads to
- * know whether Settings, Brand or a CMS record has a staged-but-unsaved
+ * know whether Settings or a CMS record has a staged-but-unsaved
  * edit. Each surface owns (sets and clears) its own entry.
  */
 import { describe, it, expect, afterEach, vi } from "vitest";
@@ -9,7 +9,7 @@ import { shellDirty, useShellDirty } from "../shellDirtyRegistry";
 
 describe("shellDirtyRegistry", () => {
   afterEach(() => {
-    act(() => (["settings", "brand", "cms-record"] as const).forEach((d) => shellDirty.set(d, false)));
+    act(() => (["settings", "cms-record"] as const).forEach((d) => shellDirty.set(d, false)));
   });
 
   it("get() is false when nothing is registered dirty", () => {
@@ -17,11 +17,6 @@ describe("shellDirtyRegistry", () => {
   });
 
   it("get() is true when any single domain is dirty", () => {
-    shellDirty.set("brand", true);
-    expect(shellDirty.get()).toBe(true);
-    shellDirty.set("brand", false);
-    expect(shellDirty.get()).toBe(false);
-
     shellDirty.set("settings", true);
     expect(shellDirty.get()).toBe(true);
     shellDirty.set("settings", false);
@@ -32,17 +27,13 @@ describe("shellDirtyRegistry", () => {
 
   it("discardDirty() runs the discard of every dirty domain that registered one, and only those", () => {
     const settingsDiscard = vi.fn(() => shellDirty.set("settings", false));
-    const recordDiscard = vi.fn();
     shellDirty.setDiscard("settings", settingsDiscard);
-    shellDirty.setDiscard("cms-record", recordDiscard);
     shellDirty.set("settings", true);
-    shellDirty.set("brand", true);
+    shellDirty.set("cms-record", true);
     shellDirty.discardDirty();
     expect(settingsDiscard).toHaveBeenCalledTimes(1);
-    expect(recordDiscard).not.toHaveBeenCalled(); // not dirty
-    expect(shellDirty.get()).toBe(true); // brand registered no discard
+    expect(shellDirty.get()).toBe(true); // cms-record registered no discard
     shellDirty.setDiscard("settings", null);
-    shellDirty.setDiscard("cms-record", null);
   });
 
   /* Fix: one throwing discard must not abort the rest, and its
@@ -58,18 +49,21 @@ describe("shellDirtyRegistry", () => {
     shellDirty.set("cms-record", true);
     expect(shellDirty.discardDirty()).toEqual(["settings"]);
     expect(recordDiscard).toHaveBeenCalledTimes(1);
-    expect(shellDirty.dirtyDomains()).toEqual(["settings"]);
+    // Only the failed domain stays dirty: clearing it leaves the registry clean.
+    expect(shellDirty.get()).toBe(true);
+    shellDirty.set("settings", false);
+    expect(shellDirty.get()).toBe(false);
     expect(err).toHaveBeenCalledWith(expect.stringContaining("settings"), expect.any(Error));
     shellDirty.setDiscard("settings", null);
     shellDirty.setDiscard("cms-record", null);
     err.mockRestore();
   });
 
-  it("everyDirtyDiscards() is false while a dirty domain has no discard (Brand)", () => {
+  it("everyDirtyDiscards() is false while a dirty domain has no discard", () => {
     shellDirty.setDiscard("settings", () => {});
     shellDirty.set("settings", true);
     expect(shellDirty.everyDirtyDiscards()).toBe(true);
-    shellDirty.set("brand", true);
+    shellDirty.set("cms-record", true);
     expect(shellDirty.everyDirtyDiscards()).toBe(false);
     shellDirty.setDiscard("settings", null);
   });

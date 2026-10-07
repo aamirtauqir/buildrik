@@ -1,6 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeProjectStyles } from "@/lib/sanitize-blocks";
+import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
+import { migrateTokensToV6 } from "@buildrik/shared/tokens";
+import { isBrandTokensV2Enabled } from "@server/services/brand-tokens";
 
 /**
  * Shared-theme push (redesign E2-T5b) — the ONLY layer that reads/writes the
@@ -39,7 +42,7 @@ function readTokenTheme(value: unknown): TokenTheme | null {
 }
 
 /** `projectSettings` with a token set written into it; every other setting kept. */
-function withTokens(projectSettings: unknown, theme: TokenTheme): Prisma.InputJsonValue {
+function withTokens(projectSettings: unknown, theme: TokenTheme, schemaVersion?: number): Prisma.InputJsonValue {
   const current =
     projectSettings && typeof projectSettings === "object" && !Array.isArray(projectSettings)
       ? (projectSettings as Record<string, unknown>)
@@ -48,7 +51,16 @@ function withTokens(projectSettings: unknown, theme: TokenTheme): Prisma.InputJs
     ...current,
     designTokens: theme.designTokens,
     ...(theme.designPresets ? { designPresets: theme.designPresets } : {}),
+    ...(schemaVersion === undefined ? {} : { designTokensSchemaVersion: schemaVersion }),
   } as Prisma.InputJsonValue;
+}
+
+/** The token schema version a site's settings declare; a site that never
+ *  stored one is v5 (what every site held before versions were written). */
+function storedTokensVersion(projectSettings: unknown): number {
+  if (!projectSettings || typeof projectSettings !== "object") return 5;
+  const v = (projectSettings as { designTokensSchemaVersion?: unknown }).designTokensSchemaVersion;
+  return typeof v === "number" && Number.isInteger(v) ? v : 5;
 }
 
 /** A site's token set exactly as it stands — designPresets absence included,
@@ -66,9 +78,14 @@ function snapshotTokens(projectSettings: unknown): TokenTheme {
 
 /** `projectSettings` put back to a snapshot's token set — presets removed when
  *  the snapshot had none (withTokens leaves them, which is right for a push). */
-function restoreTokens(projectSettings: unknown, snapshot: TokenTheme): Prisma.InputJsonValue {
-  const restored = { ...(withTokens(projectSettings, snapshot) as Record<string, unknown>) };
+function restoreTokens(projectSettings: unknown, snapshot: TokenTheme, snapshotVersion: number): Prisma.InputJsonValue {
+  /* A push that migrated the tokens also raised the stored version; put the
+     version back with them. Never lowered otherwise — older snapshots carry
+     the column default, which says nothing about a v1-v4 site. */
+  const upgraded = storedTokensVersion(projectSettings) > snapshotVersion;
+  const restored = { ...(withTokens(projectSettings, snapshot, upgraded ? snapshotVersion : undefined) as Record<string, unknown>) };
   if (!snapshot.designPresets) delete restored.designPresets;
+  if (upgraded) delete restored.darkMode;
   return restored as Prisma.InputJsonValue;
 }
 
@@ -109,7 +126,7 @@ export interface ThemeTarget {
   dsSchemaVersion: number;
 }
 
-export type PushStatus = "pushed" | "skipped-locked" | "failed";
+export type PushStatus = "pushed" | "skipped-locked" | "skipped-held" | "skipped-version" | "failed";
 
 export interface PushResult {
   siteId: string;
@@ -124,7 +141,7 @@ const SNAPSHOT_RETENTION = 10;
 export interface PushPreview {
   siteId: string;
   name: string;
-  status: "would-push" | "skipped-locked";
+  status: "would-push" | "skipped-locked" | "skipped-held" | "skipped-version";
   /** True when the shared theme differs from the site's current tokens. */
   willChange: boolean;
 }
@@ -224,17 +241,30 @@ export async function pushSharedTheme(
       deletedAt: null,
       ...(siteIds ? { id: { in: siteIds } } : {}),
     },
-    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectSettings: true, lastEditedAt: true },
+    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectSettings: true, lastEditedAt: true, tokensMigrationHold: true },
   });
 
   const results: PushResult[] = [];
   const savedAt = new Date();
+  const switchOn = isBrandTokensV2Enabled(workspaceId);
+  const migrated = migrateSharedTheme(theme, switchOn);
 
   for (const site of targets) {
     if (site.themeLocked) {
       results.push({ siteId: site.id, name: site.name, status: "skipped-locked" });
       continue;
     }
+    const plan = planPush(theme, migrated, site, switchOn);
+    if (plan.kind !== "write") {
+      results.push({
+        siteId: site.id,
+        name: site.name,
+        status: plan.kind,
+        ...(plan.kind === "skipped-version" ? { error: plan.message } : {}),
+      });
+      continue;
+    }
+    const pushed = plan;
     try {
       // D2: snapshot the site's CURRENT tokens before the push overwrites them,
       // atomically with the overwrite, so a bad push can be rolled back. Push was
@@ -247,7 +277,7 @@ export async function pushSharedTheme(
         const claimed = await tx.site.updateMany({
           where: { id: site.id, lastEditedAt: site.lastEditedAt },
           data: {
-            projectSettings: withTokens(site.projectSettings, theme),
+            projectSettings: withTokens(site.projectSettings, pushed.theme, pushed.version),
             dsSchemaVersion: site.dsSchemaVersion + 1,
             lastEditedAt: savedAt,
           },
@@ -259,10 +289,12 @@ export async function pushSharedTheme(
             workspaceId,
             prevStyles: snapshotTokens(site.projectSettings) as unknown as Prisma.InputJsonValue,
             prevDsSchemaVersion: site.dsSchemaVersion,
+            reason: "theme-push",
+            tokensSchemaVersion: storedTokensVersion(site.projectSettings),
           },
         });
       });
-      await pruneSnapshots(site.id);
+      await pruneThemeSnapshots(site.id);
       results.push({ siteId: site.id, name: site.name, status: "pushed" });
     } catch (e) {
       results.push({
@@ -276,18 +308,76 @@ export async function pushSharedTheme(
   return results;
 }
 
-/** Keep only the newest SNAPSHOT_RETENTION snapshots per site (best-effort). */
-async function pruneSnapshots(siteId: string): Promise<void> {
-  const keep = await prisma.siteThemeSnapshot.findMany({
-    where: { siteId },
-    orderBy: { createdAt: "desc" },
-    take: SNAPSHOT_RETENTION,
-    select: { id: true },
-  });
-  if (keep.length < SNAPSHOT_RETENTION) return;
-  await prisma.siteThemeSnapshot
-    .deleteMany({ where: { siteId, id: { notIn: keep.map((s) => s.id) } } })
-    .catch(() => {});
+/** A non-v6 workspace theme moved to v6 for a push (switch on). Null when it
+ *  is already v6, the switch is off, or it cannot migrate. */
+function migrateSharedTheme(theme: TokenTheme, switchOn: boolean): TokenTheme | null {
+  if (!switchOn || validateTokens(theme.designTokens).ok) return null;
+  try {
+    return { ...theme, designTokens: migrateTokensToV6(theme.designTokens) };
+  } catch (e) {
+    console.warn("[theme] workspace theme did not migrate; pushing as-is", {
+      error: e instanceof Error ? e.message : String(e),
+    });
+    return null;
+  }
+}
+
+const SKIPPED_VERSION_MESSAGE =
+  "This site uses the new brand format; re-capture the theme from an upgraded site.";
+const SKIPPED_PAUSED_MESSAGE = "Brand upgrade is paused for this site.";
+
+type PushPlan =
+  | { kind: "write"; theme: TokenTheme; version: number }
+  | { kind: "skipped-held" }
+  | { kind: "skipped-version"; message: string };
+
+const hasTokens = (projectSettings: unknown) => (readTokenTheme(projectSettings)?.designTokens.length ?? 0) > 0;
+
+/**
+ * What a push does to one site, from the theme's REAL version (v6 when it
+ * validates, else v5), so the stored version label always matches the tokens
+ * written. A held site (brand rolled back) never takes v6; a v6 site never
+ * takes v5. A v5 theme migrates for a non-held site when the switch is on.
+ * With the switch off, a v6 theme never moves a pre-v6 site that has tokens
+ * (that would be a migration without its snapshot); a tokenless site has
+ * nothing to migrate and takes it.
+ */
+function planPush(
+  theme: TokenTheme,
+  migrated: TokenTheme | null,
+  site: { projectSettings: unknown; tokensMigrationHold: boolean },
+  switchOn: boolean,
+): PushPlan {
+  const siteVersion = storedTokensVersion(site.projectSettings);
+  if (validateTokens(theme.designTokens).ok) {
+    if (site.tokensMigrationHold) return { kind: "skipped-held" };
+    if (!switchOn && siteVersion < TOKENS_SCHEMA_VERSION && hasTokens(site.projectSettings)) {
+      return { kind: "skipped-version", message: SKIPPED_PAUSED_MESSAGE };
+    }
+    return { kind: "write", theme, version: TOKENS_SCHEMA_VERSION };
+  }
+  if (migrated && !site.tokensMigrationHold) return { kind: "write", theme: migrated, version: TOKENS_SCHEMA_VERSION };
+  if (siteVersion >= TOKENS_SCHEMA_VERSION) return { kind: "skipped-version", message: SKIPPED_VERSION_MESSAGE };
+  return { kind: "write", theme, version: 5 };
+}
+
+/** Keep only the newest SNAPSHOT_RETENTION snapshots per site (best-effort).
+ *  `migration` rows are the one-time undo for the v6 move and are never pruned. */
+export async function pruneThemeSnapshots(siteId: string): Promise<void> {
+  try {
+    const keep = await prisma.siteThemeSnapshot.findMany({
+      where: { siteId, reason: { not: "migration" } },
+      orderBy: { createdAt: "desc" },
+      take: SNAPSHOT_RETENTION,
+      select: { id: true },
+    });
+    if (keep.length < SNAPSHOT_RETENTION) return;
+    await prisma.siteThemeSnapshot.deleteMany({
+      where: { siteId, reason: { not: "migration" }, id: { notIn: keep.map((s) => s.id) } },
+    });
+  } catch (e) {
+    console.warn("[theme] prune failed", { siteId, error: e instanceof Error ? e.message : String(e) });
+  }
 }
 
 /**
@@ -303,15 +393,24 @@ export async function previewSharedThemePush(
   const targets = await prisma.site.findMany({
     where: { workspaceId, deletedAt: null, ...(siteIds ? { id: { in: siteIds } } : {}) },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, themeLocked: true, projectSettings: true },
+    select: { id: true, name: true, themeLocked: true, projectSettings: true, tokensMigrationHold: true },
   });
-  const after = JSON.stringify(theme.designTokens);
+  const switchOn = isBrandTokensV2Enabled(workspaceId);
+  const migrated = migrateSharedTheme(theme, switchOn);
   return targets.map((site) => {
     if (site.themeLocked) {
       return { siteId: site.id, name: site.name, status: "skipped-locked" as const, willChange: false };
     }
+    const plan = planPush(theme, migrated, site, switchOn);
+    if (plan.kind !== "write") return { siteId: site.id, name: site.name, status: plan.kind, willChange: false };
     const before = JSON.stringify(readTokenTheme(site.projectSettings)?.designTokens ?? []);
-    return { siteId: site.id, name: site.name, status: "would-push" as const, willChange: before !== after };
+    const versionChanges = storedTokensVersion(site.projectSettings) !== plan.version;
+    return {
+      siteId: site.id,
+      name: site.name,
+      status: "would-push" as const,
+      willChange: versionChanges || before !== JSON.stringify(plan.theme.designTokens),
+    };
   });
 }
 
@@ -331,7 +430,7 @@ export async function rollbackSiteTheme(
   if (!site) throw new ThemeError("NOT_FOUND", "Site not found");
 
   const snap = await prisma.siteThemeSnapshot.findFirst({
-    where: { siteId, workspaceId },
+    where: { siteId, workspaceId, reason: "theme-push" },
     orderBy: { createdAt: "desc" },
   });
   if (!snap) throw new ThemeError("NO_THEME", "No theme snapshot to roll back to");
@@ -348,7 +447,7 @@ export async function rollbackSiteTheme(
       where: { id: siteId, lastEditedAt: site.lastEditedAt },
       data: {
         ...(prevTokens
-          ? { projectSettings: restoreTokens(site.projectSettings, prevTokens) }
+          ? { projectSettings: restoreTokens(site.projectSettings, prevTokens, snap.tokensSchemaVersion) }
           : {
               // S-1 class: a legacy snapshot's `prevStyles` was frozen before
               // the allowlist sanitizer shipped (or by a path that predates
@@ -382,10 +481,91 @@ export async function listSiteThemeSnapshots(
   });
   if (!site) throw new ThemeError("NOT_FOUND", "Site not found");
   return prisma.siteThemeSnapshot.findMany({
-    where: { siteId, workspaceId },
+    where: { siteId, workspaceId, reason: "theme-push" },
     orderBy: { createdAt: "desc" },
     select: { id: true, createdAt: true },
   });
+}
+
+/** What `rollbackTokenMigration` would restore, without writing: the newest
+ *  migration snapshot of a site (operator `--dry-run`). */
+export async function getLatestMigrationSnapshot(
+  siteId: string,
+): Promise<{ id: string; createdAt: Date; tokensSchemaVersion: number; tokenCount: number } | null> {
+  const snap = await prisma.siteThemeSnapshot.findFirst({
+    where: { siteId, reason: "migration" },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!snap) return null;
+  return {
+    id: snap.id,
+    createdAt: snap.createdAt,
+    tokensSchemaVersion: snap.tokensSchemaVersion,
+    tokenCount: readTokenTheme(snap.prevStyles)?.designTokens.length ?? 0,
+  };
+}
+
+/**
+ * Operator-only (no router): undo a site's v6 migration. Writes the migration
+ * snapshot's tokens and version back verbatim, drops dark mode, bumps
+ * dsSchemaVersion and sets the hold so nothing migrates the site again until
+ * clearTokenMigrationHold. lastEditedAt moves too, so a stale open tab gets a
+ * save conflict instead of overwriting the rollback.
+ */
+export async function rollbackTokenMigration(siteId: string): Promise<{ restoredVersion: number }> {
+  const snap = await prisma.siteThemeSnapshot.findFirst({
+    where: { siteId, reason: "migration" },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!snap) throw new ThemeError("NOT_FOUND", "No migration snapshot for this site");
+  const prev = readTokenTheme(snap.prevStyles);
+  if (!prev) throw new ThemeError("BAD_REQUEST", "The migration snapshot holds no token set");
+  const site = await prisma.site.findUniqueOrThrow({
+    where: { id: siteId },
+    select: { projectSettings: true, dsSchemaVersion: true, lastEditedAt: true },
+  });
+  const current =
+    site.projectSettings && typeof site.projectSettings === "object" && !Array.isArray(site.projectSettings)
+      ? (site.projectSettings as Record<string, unknown>)
+      : {};
+  const { darkMode: _darkMode, ...rest } = current;
+  const claimed = await prisma.site.updateMany({
+    where: { id: siteId, lastEditedAt: site.lastEditedAt },
+    data: {
+      projectSettings: {
+        ...rest,
+        designTokens: prev.designTokens,
+        designTokensSchemaVersion: snap.tokensSchemaVersion,
+      } as Prisma.InputJsonValue,
+      dsSchemaVersion: site.dsSchemaVersion + 1,
+      tokensMigrationHold: true,
+      lastEditedAt: new Date(),
+    },
+  });
+  if (claimed.count === 0) {
+    throw new ThemeError("CONFLICT", "This site changed while rolling back — nothing was changed. Try again.");
+  }
+  return { restoredVersion: snap.tokensSchemaVersion };
+}
+
+/** Operator-only (no router): let a rolled-back site migrate again. */
+export async function clearTokenMigrationHold(siteId: string): Promise<void> {
+  await prisma.site.update({ where: { id: siteId }, data: { tokensMigrationHold: false } });
+}
+
+/** Restore points the Brand panel offers: only snapshots holding a token set.
+ *  Legacy projectStyles snapshots stay admin-rollback-only. */
+export async function listBrandRestorePoints(
+  siteId: string,
+): Promise<Array<{ id: string; reason: string; createdAt: Date }>> {
+  const rows = await prisma.siteThemeSnapshot.findMany({
+    where: { siteId, site: { deletedAt: null } },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, reason: true, createdAt: true, prevStyles: true },
+  });
+  return rows
+    .filter((r) => readTokenTheme(r.prevStyles) !== null)
+    .map(({ id, reason, createdAt }) => ({ id, reason, createdAt }));
 }
 
 /**

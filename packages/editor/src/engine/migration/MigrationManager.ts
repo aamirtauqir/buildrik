@@ -12,7 +12,7 @@ import { TARGET_PROJECT_VERSION } from "../designSystem/migrations/projectMigrat
  *   1. loadProject (BuildrikSyncProvider)
  *   2. composer.migration.run(...)         ← this manager
  *   3. TokenRegistryProvider mounts with migrated tokens
- *   4. useTokensForKind.applyToRoot writes :root CSS vars
+ *   4. ProjectTokensApplier writes the token <style>
  *
  * Post-load edge (A2): the migration modal's Retry / Restore re-enter at
  * step 2 through `editor/design-system/migrations/importMigratedProject`,

@@ -260,7 +260,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 }) => {
   /* The site whose brand/tokens/publish state these panels edit.
      This was a prop, and `AquibraStudio` never passed it — so every consumer
-     below ran on `undefined`, and `TokenRegistryProvider` fell through to its
+     below ran on `undefined`, and the token registry fell through to its
      `"default"` storage key. One key for every site on the origin: apply a
      brand colour on one site and the next site you open loads it, on a
      surface whose whole job is per-site identity. The id is not something
@@ -800,7 +800,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   return (
     <DSModeProvider>
-    <TokenRegistryProvider projectId={projectId} composer={composer ?? undefined}>
+    <TokenRegistryProvider composer={composer}>
     <StylePresetRegistryProvider projectId={projectId}>
       {/* Headless. The linter only ran from inside the Brand panel, so the
           topbar Issues chip — which gates the publish-anyway confirm — read

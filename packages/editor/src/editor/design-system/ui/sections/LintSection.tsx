@@ -28,6 +28,7 @@ import { suggestContrastFix } from "../../utils/contrastFix";
 import { findSurfaceToken, resolveSurface } from "../../utils/contrastLint";
 import { Button } from "@/editor/chrome-ui";
 import { BrandCard, BrandRow } from "../BrandCard";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface LintSectionProps {
   issues: readonly LintIssue[];
@@ -61,12 +62,14 @@ export function contrastFixFor(
   colorTokens: readonly DesignToken[],
   mode: "light" | "dark",
 ): { value: string; darkValue?: string } | null {
-  const surface = resolveSurface(findSurfaceToken(colorTokens), mode);
-  if (mode === "dark" && token.darkValue) {
-    const dark = suggestContrastFix(token.darkValue, surface);
-    return dark ? { value: token.value, darkValue: dark } : null;
+  const surface = resolveSurface(findSurfaceToken(colorTokens), colorTokens, mode);
+  const light = resolveTokenLiteral(colorTokens, token.id, "light") ?? "";
+  const darkValue = token.modes.dark ? resolveTokenLiteral(colorTokens, token.id, "dark") : null;
+  if (mode === "dark" && darkValue) {
+    const dark = suggestContrastFix(darkValue, surface);
+    return dark ? { value: light, darkValue: dark } : null;
   }
-  const value = suggestContrastFix(token.value, surface);
+  const value = suggestContrastFix(light, surface);
   return value ? { value } : null;
 }
 

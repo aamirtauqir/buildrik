@@ -13,7 +13,11 @@ vi.mock("../../../../design-system/state/TokenRegistryContext", () => ({
       {
         id: "color-primary",
         name: "Primary",
-        value: "#2D6DFF",
+        kind: "color",
+        layer: "primitive",
+        modes: { light: { value: "#2D6DFF" } },
+        category: "colors",
+        type: "color",
         cssVar: "--buildrick-design-color-primary",
       },
     ],

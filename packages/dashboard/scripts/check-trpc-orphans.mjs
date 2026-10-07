@@ -87,6 +87,7 @@ const ALLOWED = {
     "Scheduled publish: cancel half of the same unbuilt UI. See sites.schedulePublish.",
   "sites.getScheduledPublish":
     "Scheduled publish: read half of the same unbuilt UI. See sites.schedulePublish.",
+  "theme.brandRestorePoints": "Brand restore list UI is Part 1c, board BRP1-M10.",
 };
 
 /** Every procedure the app router exposes, as its full dotted path. */

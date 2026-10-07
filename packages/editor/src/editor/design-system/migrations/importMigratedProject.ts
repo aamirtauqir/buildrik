@@ -13,7 +13,7 @@
  * treat the project as unsaved, or the bumped `dsSchemaVersion` never
  * reaches the server and the migration runs again on every open (walk A2).
  *
- * Throws when a migration step (or alias validation) throws. Nothing is
+ * Throws when a migration step throws. Nothing is
  * imported in that case; the caller decides what the engine holds next —
  * the load imports the payload as-is with a warning, Restore falls back to
  * the snapshot as-is, Retry leaves the current project alone.
@@ -23,7 +23,7 @@
 
 import type { Composer } from "@/engine";
 import type { ProjectData } from "@/shared/types";
-import type { DesignToken } from "../types";
+import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
 export function importMigratedProject(
   composer: Composer,
@@ -32,7 +32,7 @@ export function importMigratedProject(
 ): boolean {
   const fromVersion = data.dsSchemaVersion ?? 0;
   const result = composer.migration.run({
-    project: { tokens: (data.styles ?? []) as unknown as DesignToken[] },
+    project: { tokens: (data.styles ?? []) as unknown as LegacyDesignToken[] },
     currentVersion: fromVersion,
     siteId,
   });
@@ -44,7 +44,6 @@ export function importMigratedProject(
           dsSchemaVersion: result.newVersion,
         }
       : data;
-  composer.aliasResolver.validate((toImport.styles ?? []) as unknown as DesignToken[]);
   composer.importProject(toImport);
   return toImport !== data;
 }

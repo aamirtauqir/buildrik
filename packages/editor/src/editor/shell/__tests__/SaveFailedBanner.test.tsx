@@ -25,6 +25,23 @@ describe("SaveFailedBanner", () => {
     expect(screen.getByTestId("save-failed-keep")).toHaveTextContent("Keep editing");
   });
 
+  it("names a brand refusal instead of blaming the connection, and offers no pointless retry (I1)", () => {
+    render(
+      <SaveFailedBanner
+        where="My Site · Home"
+        leaving={false}
+        busy={false}
+        refusal="alias target missing: nowhere"
+        onRetry={vi.fn()}
+        onKeepEditing={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("save-failed-banner")).toHaveTextContent("The brand change was refused: alias target missing: nowhere");
+    expect(screen.getByTestId("save-failed-banner")).not.toHaveTextContent("Check your connection");
+    expect(screen.queryByTestId("save-failed-retry")).toBeNull();
+    expect(screen.getByTestId("save-failed-keep")).toBeInTheDocument();
+  });
+
   it("falls back to the default position when the toast anchor is a real, sized element", () => {
     const anchor = document.createElement("div");
     anchor.setAttribute("data-bk-toast-anchor", "");
@@ -47,37 +64,52 @@ describe("SaveFailedBanner", () => {
     expect(banner.style.width).toBe("784px");
   });
 
-  /* The canvas column collapses to 0 width in full-page views without
-     unmounting (Settings, Preview, Brand). Before this fix the banner used
-     `col.width - 16` unguarded, clamping to a ~0-width column that wrapped
-     every word onto its own line and sat over whatever was at x:0 — measured
-     live at 32×482 over the Settings nav rail. */
-  it("falls back to the default fixed position when the toast anchor has collapsed to 0 width", () => {
+  const anchorWithRect = (left: number, width: number) => {
     const anchor = document.createElement("div");
     anchor.setAttribute("data-bk-toast-anchor", "");
     document.body.appendChild(anchor);
     vi.spyOn(anchor, "getBoundingClientRect").mockReturnValue({
-      left: 0,
+      left,
       top: 0,
-      width: 0,
-      height: 0,
-      right: 0,
-      bottom: 0,
-      x: 0,
+      width,
+      height: width ? 900 : 0,
+      right: left + width,
+      bottom: width ? 900 : 0,
+      x: left,
       y: 0,
       toJSON() {},
     });
-    render(<SaveFailedBanner where="Site · Home" leaving={false} busy={false} onRetry={vi.fn()} onKeepEditing={vi.fn()} />);
+  };
+
+  /* Full-page views (Settings, Brand, Templates) cover the canvas column and
+     squeeze it without unmounting it. The fallback must clear their shared
+     256px nav at x:0 — the old 68px-left default sat on top of it. */
+  const expectFullPageFallback = () => {
     const banner = screen.getByTestId("save-failed-banner");
-    expect(banner.style.left).toBe("68px");
+    expect(banner.style.left).toBe("264px");
+    expect(banner.style.top).toBe("8px");
+    expect(banner.style.right).toBe("8px");
     expect(banner.style.width).toBe("");
-    expect(banner.style.right).toBe("336px");
+  };
+
+  it("falls back clear of the full-page nav when the toast anchor has collapsed to 0 width", () => {
+    anchorWithRect(0, 0);
+    render(<SaveFailedBanner where="Site · Home" leaving={false} busy={false} onRetry={vi.fn()} onKeepEditing={vi.fn()} />);
+    expectFullPageFallback();
   });
 
-  it("falls back to the default fixed position when no toast anchor exists at all", () => {
+  /* Measured live in full-page Brand at 1440×900: the column was squeezed to
+     a 48px sliver at x:0, not 0 — the banner rendered 32px wide over the
+     Brand nav with one word per line. A column too narrow to hold the card
+     is the same case as no column. */
+  it("falls back clear of the full-page nav when the toast anchor is a non-zero sliver", () => {
+    anchorWithRect(0, 48);
     render(<SaveFailedBanner where="Site · Home" leaving={false} busy={false} onRetry={vi.fn()} onKeepEditing={vi.fn()} />);
-    const banner = screen.getByTestId("save-failed-banner");
-    expect(banner.style.left).toBe("68px");
-    expect(banner.style.right).toBe("336px");
+    expectFullPageFallback();
+  });
+
+  it("falls back clear of the full-page nav when no toast anchor exists at all", () => {
+    render(<SaveFailedBanner where="Site · Home" leaving={false} busy={false} onRetry={vi.fn()} onKeepEditing={vi.fn()} />);
+    expectFullPageFallback();
   });
 });

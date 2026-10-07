@@ -1,4 +1,5 @@
-import type { DesignToken, StylePreset } from "../types";
+import { lightAliasOf, resolveTokenLiteral } from "@buildrik/shared/tokens";
+import type { DesignToken, StylePreset } from "@/engine/designSystem/types";
 
 export type LintSeverity = "warning" | "error";
 
@@ -56,18 +57,21 @@ const MAX_ALIAS_DEPTH = 3;
 export class DSLinter {
   lint(tokens: readonly DesignToken[]): LintIssue[] {
     const issues: LintIssue[] = [];
-    const projectHasAnyDark = tokens.some((t) => t.darkValue !== undefined);
+    const projectHasAnyDark = tokens.some((t) => t.modes.dark !== undefined);
     const byId = new Map<string, DesignToken>();
     for (const t of tokens) byId.set(t.id, t);
 
     for (const t of tokens) {
       const isColor = t.category === "colors" || t.kind === "color";
+      const value = resolveTokenLiteral(tokens, t.id, "light") ?? "";
+      const darkValue = t.modes.dark ? resolveTokenLiteral(tokens, t.id, "dark") ?? "" : undefined;
+      const aliasOf = lightAliasOf(t);
 
       // semantic-needs-alias (B5 lock 2026-05-16): a token with semanticKind
       // set MUST also have aliasOf set. Semantics are role-named pointers to
       // a primitive (or another semantic); without aliasOf they resolve to
       // nothing. Lint as error to prevent silent rendering failure.
-      if (t.semanticKind !== undefined && !t.aliasOf) {
+      if (t.semanticKind !== undefined && !aliasOf) {
         issues.push({
           rule: "semantic-needs-alias",
           severity: "error",
@@ -80,16 +84,17 @@ export class DSLinter {
       // token; if length exceeds MAX_ALIAS_DEPTH + 1, emit issue on the entry
       // token only. AliasResolver.validate throws on save, this rule surfaces
       // the same condition non-fatally for lint UI (banner/chip).
-      if (t.aliasOf) {
+      if (aliasOf) {
         const visited = new Set<string>([t.id]);
         const chain: string[] = [t.id];
-        let cursor: DesignToken | undefined = byId.get(t.aliasOf);
+        let cursor: DesignToken | undefined = byId.get(aliasOf);
         while (cursor) {
           chain.push(cursor.id);
           if (visited.has(cursor.id)) break; // cycle — separate concern
           visited.add(cursor.id);
-          if (!cursor.aliasOf) break;
-          cursor = byId.get(cursor.aliasOf);
+          const next = lightAliasOf(cursor);
+          if (!next) break;
+          cursor = byId.get(next);
         }
         if (chain.length > MAX_ALIAS_DEPTH + 1) {
           issues.push({
@@ -102,7 +107,7 @@ export class DSLinter {
       }
 
       // empty-value (warning — color tokens can be intentionally empty)
-      if (!t.value || t.value.trim() === "") {
+      if (!value || value.trim() === "") {
         issues.push({
           rule: "empty-value",
           severity: isColor ? "warning" : "error",
@@ -114,26 +119,26 @@ export class DSLinter {
       if (!isColor) continue;
 
       // banned-hue: purple/violet/indigo
-      if (isBannedHue(t.value)) {
+      if (isBannedHue(value)) {
         issues.push({
           rule: "banned-hue",
           severity: "error",
           tokenId: t.id,
-          message: `Token "${t.id}" uses a purple/violet/indigo hue ("${t.value}"). DESIGN.md bans these — use the accent #1A56DB or a gray neutral.`,
+          message: `Token "${t.id}" uses a purple/violet/indigo hue ("${value}"). DESIGN.md bans these — use the accent #1A56DB or a gray neutral.`,
         });
       }
-      if (t.darkValue !== undefined && isBannedHue(t.darkValue)) {
+      if (darkValue !== undefined && isBannedHue(darkValue)) {
         issues.push({
           rule: "banned-hue",
           severity: "error",
           tokenId: t.id,
-          message: `Token "${t.id}" darkValue ("${t.darkValue}") uses a banned hue.`,
+          message: `Token "${t.id}" darkValue ("${darkValue}") uses a banned hue.`,
         });
       }
 
       // pure-black: #000 / #000000. Mechanical fix: lift L off zero — one
       // step towards the ink scale, which is what the rule asks for.
-      if (isPureBlack(t.value)) {
+      if (isPureBlack(value)) {
         issues.push({
           rule: "pure-black",
           severity: "error",
@@ -142,7 +147,7 @@ export class DSLinter {
           autoFixHint: "lighten-22",
         });
       }
-      if (t.darkValue !== undefined && isPureBlack(t.darkValue)) {
+      if (darkValue !== undefined && isPureBlack(darkValue)) {
         issues.push({
           rule: "pure-black",
           severity: "error",
@@ -151,8 +156,9 @@ export class DSLinter {
         });
       }
 
-      // missing-dark: warn only when project has any dark intent at all
-      if (projectHasAnyDark && t.darkValue === undefined) {
+      // missing-dark: warn only when project has any dark intent at all. Only a
+      // semantic token can carry a dark mode (v6), so a primitive is never asked.
+      if (projectHasAnyDark && t.layer === "semantic" && t.modes.dark === undefined) {
         issues.push({
           rule: "missing-dark",
           severity: "warning",

@@ -11,7 +11,7 @@ import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import { GOOGLE_FONT_CATALOGUE } from "@/shared/constants/googleFonts";
 import { googleFontsHeadLinks, siteFontCSS, siteFontsFromTokens } from "../ExportHelpers";
 
-const dsFonts = siteFontsFromTokens(DEFAULT_TOKENS as never);
+const dsFonts = siteFontsFromTokens(DEFAULT_TOKENS);
 
 describe("DS default fonts", () => {
   it("every default font token names a family the export can load", () => {

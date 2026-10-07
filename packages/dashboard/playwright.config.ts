@@ -10,7 +10,11 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 const BASE_URL = process.env.PW_BASE_URL ?? "http://localhost:3000";
 const AUTH_STATE = path.resolve(__dirname, "e2e/.auth/user.json");
 const ONBOARDING_AUTH_STATE = path.resolve(__dirname, "e2e/.auth/onboarding.json");
-const isBS = !!(process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY);
+// `.env.local` carries BrowserStack credentials, which replace every local
+// project with bs-* ones. PW_FORCE_LOCAL=1 keeps the local projects for specs
+// that need this machine's server and database (brand-tokens.spec.ts).
+const isBS =
+  process.env.PW_FORCE_LOCAL !== "1" && !!(process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY);
 
 function bsConnect(caps: Record<string, unknown>) {
   const merged = {

@@ -1,13 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { tokenIsSemantic, filterTokensByMode } from "../semanticKind";
 import type { DesignToken } from "../../types";
+import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
-function makeToken(id: string, overrides: Partial<DesignToken> = {}): DesignToken {
-  return {
+function makeToken(id: string, overrides: Partial<V6TokenSpec> = {}): DesignToken {
+  return v6Token({
     id, name: id, value: "#000",
     category: "colors", cssVar: `--bd-${id}`, type: "color", kind: "color",
     ...overrides,
-  };
+  });
 }
 
 describe("tokenIsSemantic", () => {
@@ -16,13 +17,13 @@ describe("tokenIsSemantic", () => {
   });
 
   it("returns true for a token with semanticKind = 'action'", () => {
-    expect(tokenIsSemantic(makeToken("action.default", { semanticKind: "action", aliasOf: "color.brand.primary" }))).toBe(true);
+    expect(tokenIsSemantic(makeToken("action.default", { semanticKind: "action", alias: "color.brand.primary" }))).toBe(true);
   });
 
   it("returns true for each of action/surface/text/feedback", () => {
     const kinds: Array<"action" | "surface" | "text" | "feedback"> = ["action", "surface", "text", "feedback"];
     for (const sk of kinds) {
-      expect(tokenIsSemantic(makeToken(`x.${sk}`, { semanticKind: sk, aliasOf: "x" }))).toBe(true);
+      expect(tokenIsSemantic(makeToken(`x.${sk}`, { semanticKind: sk, alias: "x" }))).toBe(true);
     }
   });
 });
@@ -31,8 +32,8 @@ describe("filterTokensByMode", () => {
   const tokens: DesignToken[] = [
     makeToken("color.brand.primary"),                                          // primitive
     makeToken("color.brand.secondary"),                                        // primitive
-    makeToken("action.default", { semanticKind: "action", aliasOf: "color.brand.primary" }), // semantic
-    makeToken("surface.card", { semanticKind: "surface", aliasOf: "color.brand.secondary" }), // semantic
+    makeToken("action.default", { semanticKind: "action", alias: "color.brand.primary" }), // semantic
+    makeToken("surface.card", { semanticKind: "surface", alias: "color.brand.secondary" }), // semantic
   ];
 
   it("'pro' mode returns ALL tokens (primitives + semantics)", () => {

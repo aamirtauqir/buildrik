@@ -1,26 +1,32 @@
+/**
+ * useImportTokens — routing rules, stats, and (Brand Part 1a Task 10) ONE
+ * `setTokens` write per import, refused while the tokens are read-only.
+ *
+ * @license BSD-3-Clause
+ */
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { useImportTokens } from "../useImportTokens";
 import { useColorRegistry, useRadiusRegistry, TokenRegistryProvider } from "../TokenRegistryContext";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../../types";
+import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
+import { makeFakeComposer } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
+let composer = makeFakeComposer();
 const wrap = ({ children }: { children: React.ReactNode }) => (
-  <TokenRegistryProvider projectId="import-test">{children}</TokenRegistryProvider>
+  <TokenRegistryProvider composer={composer}>{children}</TokenRegistryProvider>
 );
 
-const mkToken = (id: string, value: string, extra: Partial<DesignToken> = {}): DesignToken => ({
-  id,
-  name: id,
-  value,
-  category: "colors",
-  cssVar: `--buildrick-design-${id}`,
-  type: "color",
-  ...extra,
-});
+const mkToken = (id: string, value: string, extra: Partial<V6TokenSpec> = {}): DesignToken =>
+  v6Token({ id, value, ...extra });
+
+const lightOf = (tokens: readonly DesignToken[], id: string) => resolveTokenLiteral(tokens, id, "light");
 
 beforeEach(() => {
   localStorage.clear();
+  composer = makeFakeComposer();
 });
 
 describe("useImportTokens", () => {
@@ -31,15 +37,14 @@ describe("useImportTokens", () => {
       return { apply, color };
     };
     const { result } = renderHook(useCombined, { wrapper: wrap });
-    const targetId = result.current.color.tokens[0].id;
-    const originalValue = result.current.color.tokens[0].value;
+    const targetId = "color-primary";
+    const originalValue = lightOf(result.current.color.tokens, targetId);
 
     act(() => {
       result.current.apply([mkToken(targetId, "#FF0000")]);
     });
 
-    const updated = result.current.color.tokens.find((t) => t.id === targetId);
-    expect(updated?.value).toBe("#FF0000");
+    expect(lightOf(result.current.color.tokens, targetId)).toBe("#FF0000");
     expect(originalValue).not.toBe("#FF0000");
   });
 
@@ -57,7 +62,7 @@ describe("useImportTokens", () => {
     });
 
     expect(result.current.color.tokens).toHaveLength(before + 1);
-    expect(result.current.color.tokens.find((t) => t.id === "color-imported-brand")?.value).toBe("#00FF00");
+    expect(lightOf(result.current.color.tokens, "color-imported-brand")).toBe("#00FF00");
   });
 
   it("adds a new radius token by routing on kind", () => {
@@ -156,16 +161,37 @@ describe("useImportTokens", () => {
         return { apply, color };
       };
       const { result } = renderHook(useCombined, { wrapper: wrap });
-      const targetId = result.current.color.tokens[0].id;
+      // A semantic token: only those carry a dark mode in v6.
+      const targetId = "color-primary";
 
       act(() => {
-        result.current.apply([mkToken(targetId, "#FF0000", { darkValue: "#220000" })]);
+        result.current.apply([mkToken(targetId, "#FF0000", { dark: "#220000" })]);
       });
 
-      const updated = result.current.color.tokens.find((t) => t.id === targetId);
-      expect(updated?.value).toBe("#FF0000");
-      // darkValue now reaches the registry on the modify path.
-      expect(updated?.darkValue).toBe("#220000");
+      expect(lightOf(result.current.color.tokens, targetId)).toBe("#FF0000");
+      // The dark value now reaches the registry on the modify path.
+      expect(resolveTokenLiteral(result.current.color.tokens, targetId, "dark")).toBe("#220000");
     });
+  });
+});
+
+describe("useImportTokens — one write, read-only refuses", () => {
+  it("a mixed import (modify + add) is ONE setTokens write", () => {
+    const { result } = renderHook(() => useImportTokens(), { wrapper: wrap });
+    act(() => {
+      result.current([mkToken("color-primary", "#FF0000"), mkToken("color-new-1", "#00FF00", { kind: "color" })]);
+    });
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+  });
+
+  it("while read-only nothing is written and the stats say refused", () => {
+    composer = makeFakeComposer([], { readOnly: true });
+    const { result } = renderHook(() => useImportTokens(), { wrapper: wrap });
+    let stats: ReturnType<typeof result.current> | undefined;
+    act(() => {
+      stats = result.current([mkToken("color-primary", "#FF0000")]);
+    });
+    expect(stats?.refused).toBe(true);
+    expect(composer.settings.designTokens).toEqual([]);
   });
 });

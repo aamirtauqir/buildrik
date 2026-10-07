@@ -3,15 +3,15 @@
  * drawer's 152:137 / 306:2186 grid).
  *
  * One card, a 48px row per starter: its name over "<fonts> · <colour>"
- * (the description rides in the row's title), ending in ›. The ROW is the control, as the card was: a click stages the
- * starter's colour, type and spacing tokens in the draft (useApplyStarter) —
- * the header's caption says so ("Pick a starter, then apply it to the draft"),
- * the Draft chip lights, the live preview repaints, Save's review names every
- * overwrite. The chosen row stays tinted for the visit.
+ * (the description rides in the row's title), ending in ›. The ROW is the control, as the card was: a click APPLIES the
+ * starter's values to the site in one write (useApplyStarter) — the header's
+ * caption says so ("Pick a starter to apply it to the site"), the canvas and
+ * live preview repaint, ⌘Z or Review changes takes it back. The chosen row
+ * stays tinted for the visit.
  *
  * Gone with the grid, none of it on the board: the gradient thumbnails, the
- * 150px warning callout and the "Starter applied" pill (the Draft chip and the
- * tinted row carry that now). StarterGrid had no other consumer and is deleted.
+ * 150px warning callout and the "Starter applied" pill (the tinted row and
+ * Review changes carry that now). StarterGrid had no other consumer and is deleted.
  *
  * @license BSD-3-Clause
  */
@@ -21,12 +21,13 @@ import { useApplyStarter } from "../../state/useApplyStarter";
 import { useTypeRegistry } from "../../state/TokenRegistryContext";
 import type { StarterDS } from "../../starters/types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface StartersSectionProps {
   projectId?: string | null;
 }
 
-const family = (v: string | undefined) => String(v ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
+const family = (v: string | null | undefined) => String(v ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
 
 /**
  * 7316:85139's line under a starter: "<fonts> · <colour>" ("Playfair + Inter ·
@@ -36,7 +37,7 @@ const family = (v: string | undefined) => String(v ?? "").split(",")[0].trim().r
  */
 function starterLine(starter: StarterDS, headingFont: string, bodyFont: string): string {
   const fonts = headingFont && headingFont !== bodyFont ? `${headingFont} + ${bodyFont}` : bodyFont;
-  const hex = (id: string) => starter.tokens.find((t) => t.id === id)?.value?.toUpperCase();
+  const hex = (id: string) => resolveTokenLiteral(starter.tokens, id, "light")?.toUpperCase();
   const primary = hex("color-primary");
   const page = hex("color-background");
   const colour = primary ? (page ? `${primary} on ${page}` : primary) : "";
@@ -45,8 +46,8 @@ function starterLine(starter: StarterDS, headingFont: string, bodyFont: string):
 
 export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) => {
   const type = useTypeRegistry();
-  const headingFont = family(type.tokens.find((t) => t.id === "font-heading")?.value);
-  const bodyFont = family(type.tokens.find((t) => t.id === "font-body")?.value);
+  const headingFont = family(resolveTokenLiteral(type.tokens, "font-heading", "light"));
+  const bodyFont = family(resolveTokenLiteral(type.tokens, "font-body", "light"));
   const [selectedId, setSelectedId] = React.useState<string>("");
   const applyStarter = useApplyStarter(projectId);
 

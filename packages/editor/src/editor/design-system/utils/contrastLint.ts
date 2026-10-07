@@ -16,6 +16,7 @@
  */
 import type { LintIssue } from "../../../engine/designSystem/linter";
 import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";
 import { calcWcagLevel, hexToRgb, relativeLuminance } from "./colorUtils";
 
@@ -41,15 +42,19 @@ export function findSurfaceToken(tokens: readonly DesignToken[]): DesignToken | 
   );
 }
 
-export function resolveSurface(bg: DesignToken | undefined, mode: "light" | "dark"): string {
+export function resolveSurface(
+  bg: DesignToken | undefined,
+  tokens: readonly DesignToken[],
+  mode: "light" | "dark",
+): string {
   if (!bg) return FALLBACK_BG;
-  return (mode === "dark" ? bg.darkValue : bg.value) || bg.value || FALLBACK_BG;
+  return shownValue(bg, tokens, mode) || FALLBACK_BG;
 }
 
 /** In dark mode a token is shown as its dark value, so that is the value that
- *  has to survive the dark surface. */
-export const shownValue = (t: DesignToken, mode: "light" | "dark") =>
-  (mode === "dark" ? t.darkValue : t.value) || t.value;
+ *  has to survive the dark surface. An empty dark literal shows the light one. */
+export const shownValue = (t: DesignToken, tokens: readonly DesignToken[], mode: "light" | "dark") =>
+  resolveTokenLiteral(tokens, t.id, mode) || resolveTokenLiteral(tokens, t.id, "light") || "";
 
 /** The page colour itself is not "text on the page" — never compare it to
  *  itself. By VALUE, not just by id: the default palette ships that same
@@ -60,6 +65,7 @@ export const shownValue = (t: DesignToken, mode: "light" | "dark") =>
  *  Slate 50 can do and stay Slate 50. */
 export const contrastFails = (
   t: DesignToken,
+  tokens: readonly DesignToken[],
   surfaceBg: string,
   mode: "light" | "dark",
   surfaceId?: string,
@@ -68,15 +74,15 @@ export const contrastFails = (
   /* The page root's own background is a surface too, never text on one —
      and seeded `transparent`, which no ratio can be read from. */
   if (t.id === PAGE_BACKGROUND_TOKEN.id) return false;
-  const shown = shownValue(t, mode);
+  const shown = shownValue(t, tokens, mode);
   if (shown && shown.toUpperCase() === surfaceBg.toUpperCase()) return false;
   return calcWcagLevel(shown, surfaceBg) === "fail";
 };
 
 /** Which way the engine's one-step fix should push the token: away from the
  *  surface. A token darker than the page darkens further; one lighter than
- *  the page lightens. `applyAutoFix` rewrites `value`, so the direction is
- *  read off the light value against the light surface. */
+ *  the page lightens. `applyAutoFix` rewrites the light literal, so the
+ *  direction is read off the light value against the light surface. */
 export function contrastFixHint(tokenValue: string, surfaceBg: string): "darken-22" | "lighten-22" {
   const t = hexToRgb(tokenValue);
   const s = hexToRgb(surfaceBg);
@@ -92,15 +98,18 @@ export function buildContrastIssues(
   mode: "light" | "dark",
 ): LintIssue[] {
   const surfaceToken = findSurfaceToken(tokens);
-  const surfaceBg = resolveSurface(surfaceToken, mode);
-  const lightSurface = resolveSurface(surfaceToken, "light");
+  const surfaceBg = resolveSurface(surfaceToken, tokens, mode);
+  const lightSurface = resolveSurface(surfaceToken, tokens, "light");
+  /* Only semantic tokens are shown on a page. A primitive is the literal a
+     semantic token aliases — often its DARK literal — so measuring it against
+     the light surface reports colours no page shows in that mode. */
   return tokens
-    .filter((t) => contrastFails(t, surfaceBg, mode, surfaceToken?.id))
+    .filter((t) => t.layer === "semantic" && contrastFails(t, tokens, surfaceBg, mode, surfaceToken?.id))
     .map((t) => ({
       rule: "contrast" as const,
       severity: "warning" as const,
       tokenId: t.id,
       message: `${t.name || t.id} fails WCAG AA against the page background`,
-      autoFixHint: contrastFixHint(t.value, lightSurface),
+      autoFixHint: contrastFixHint(resolveTokenLiteral(tokens, t.id, "light") ?? "", lightSurface),
     }));
 }

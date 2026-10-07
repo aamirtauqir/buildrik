@@ -1,76 +1,45 @@
 /**
- * TokenRegistryContext — 3 separate contexts for color, spacing, and type tokens.
+ * TokenRegistryContext — one context per token kind, so a colour edit
+ * re-renders colour consumers only, never SizeSection.
  *
- * Architecture rationale:
- *   3 distinct contexts (not 1 combined) prevents cross-category re-renders.
- *   A color keystroke re-renders only ColorInput consumers, never SizeSection.
- *
- * CP2 (localStorage persistence):
- *   - On mount: reads buildrick-design-tokens-{projectId}-v1, falls back to DEFAULT_TOKENS
- *   - On apply: call persistAll() after composer.setProjectSettings
- *   - Private browsing (SecurityError) or corrupt JSON → falls through to DEFAULT_TOKENS, no crash
+ * Every registry reads the PROJECT's tokens and writes them back through
+ * `composer.designSystem.setTokens`: no local copy, no localStorage cache,
+ * nothing staged, one undo stack with the canvas (spec §4, Brand Part 1a
+ * Task 10). All fourteen are built from ONE project read and ONE commit,
+ * which `useSessionEdits` logs — Brand's "Review changes". `useProjectTokenStore`
+ * hands the whole set, that commit and the session's edits to the multi-kind
+ * writes (import, starters, Colour mode) and to Brand.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import type { DesignToken } from "../types";
+import type { Composer } from "@/engine";
+import type { TokenKind } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
-import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../migrations";
-import { mergeProjectTokens } from "./projectTokens";
-import { EVENTS } from "@/shared/constants/events";
-import { useColorTokens } from "./useColorTokens";
-import type { ColorTokensState, ColorTokensActions } from "./useColorTokens";
-import { useSpacingTokens } from "./useSpacingTokens";
-import type { SpacingTokensState, SpacingTokensActions } from "./useSpacingTokens";
-import { useTypeTokens } from "./useTypeTokens";
-import type { TypeTokensState, TypeTokensActions } from "./useTypeTokens";
-import { useRadiusTokens } from "./useRadiusTokens";
-import type { RadiusTokensState } from "./useRadiusTokens";
-import { useShadowTokens } from "./useShadowTokens";
-import type { ShadowTokensState } from "./useShadowTokens";
-import { useMotionTokens } from "./useMotionTokens";
-import type { MotionTokensState } from "./useMotionTokens";
-import { useBorderTokens } from "./useBorderTokens";
-import type { BorderTokensState } from "./useBorderTokens";
-import { useOpacityTokens } from "./useOpacityTokens";
-import type { OpacityTokensState } from "./useOpacityTokens";
-import { useZindexTokens } from "./useZindexTokens";
-import type { ZindexTokensState } from "./useZindexTokens";
-import { useBreakpointTokens } from "./useBreakpointTokens";
-import type { BreakpointTokensState } from "./useBreakpointTokens";
-import { useGridTokens } from "./useGridTokens";
-import type { GridTokensState } from "./useGridTokens";
-import { useSizingTokens } from "./useSizingTokens";
-import type { SizingTokensState } from "./useSizingTokens";
-import { useIconTokens } from "./useIconTokens";
-import type { IconTokensState } from "./useIconTokens";
-import { useImageryTokens } from "./useImageryTokens";
-import type { ImageryTokensState } from "./useImageryTokens";
+import { kindRegistry, type TokensForKindRegistry } from "./kindRegistry";
+import { spacingRegistry, type SpacingRegistry } from "./spacingRegistry";
+import { useProjectTokens, type ProjectTokens } from "./useProjectTokens";
+import { useSessionEdits, type SessionEdit } from "./useSessionEdits";
 
 // ============================================================================
 // CONTEXT TYPES
 // ============================================================================
 
-export type ColorRegistry = ColorTokensState & ColorTokensActions;
-export type SpacingRegistry = SpacingTokensState & SpacingTokensActions;
-export type TypeRegistry = TypeTokensState & TypeTokensActions;
-export type RadiusRegistry     = RadiusTokensState;
-export type ShadowRegistry     = ShadowTokensState;
-export type MotionRegistry     = MotionTokensState;
-export type BorderRegistry     = BorderTokensState;
-export type OpacityRegistry    = OpacityTokensState;
-export type ZindexRegistry     = ZindexTokensState;
-export type BreakpointRegistry = BreakpointTokensState;
-export type GridRegistry       = GridTokensState;
-export type SizingRegistry     = SizingTokensState;
-export type IconRegistry       = IconTokensState;
-export type ImageryRegistry    = ImageryTokensState;
-
-interface RegistryConfig {
-  /** Save all current token values to localStorage (call after composer.setProjectSettings) */
-  persistAll: () => void;
-}
+export type ColorRegistry      = TokensForKindRegistry;
+export type { SpacingRegistry };
+export type TypeRegistry       = TokensForKindRegistry;
+export type RadiusRegistry     = TokensForKindRegistry;
+export type ShadowRegistry     = TokensForKindRegistry;
+export type MotionRegistry     = TokensForKindRegistry;
+export type BorderRegistry     = TokensForKindRegistry;
+export type OpacityRegistry    = TokensForKindRegistry;
+export type ZindexRegistry     = TokensForKindRegistry;
+export type BreakpointRegistry = TokensForKindRegistry;
+export type GridRegistry       = TokensForKindRegistry;
+export type SizingRegistry     = TokensForKindRegistry;
+export type IconRegistry       = TokensForKindRegistry;
+export type ImageryRegistry    = TokensForKindRegistry;
 
 // ============================================================================
 // CONTEXTS
@@ -90,169 +59,51 @@ const GridRegistryContext       = React.createContext<GridRegistry | null>(null)
 const SizingRegistryContext     = React.createContext<SizingRegistry | null>(null);
 const IconRegistryContext       = React.createContext<IconRegistry | null>(null);
 const ImageryRegistryContext    = React.createContext<ImageryRegistry | null>(null);
-const RegistryConfigContext = React.createContext<RegistryConfig | null>(null);
+/** The whole set, its one (logged) commit, and this session's edits. */
+export interface TokenStore extends ProjectTokens {
+  edits: SessionEdit[];
+  /** Revert one session edit; false when it is stale or refused. */
+  revert: (index: number) => boolean;
+}
+const ProjectTokenStoreContext  = React.createContext<TokenStore | null>(null);
 
 // ============================================================================
 // PROVIDER
 // ============================================================================
 
 export interface TokenRegistryProviderProps {
-  projectId?: string | null;
-  /** Phase B.1: when present, dark-mode applier subscribes to composer.colorMode. */
-  composer?: {
-    on: (evt: string, cb: (payload: unknown) => void) => void;
-    off: (evt: string, cb: (payload: unknown) => void) => void;
-    colorMode: { resolved: () => "light" | "dark" };
-    darkResolver: { resolve: (token: DesignToken, resolved: "light" | "dark") => string };
-    /** D-4: the registries hydrate from the project's own tokens on load. */
-    getProjectSettings?: () => { designTokens?: unknown[]; designTokensSchemaVersion?: number };
-  };
+  composer?: Composer | null;
   children: React.ReactNode;
 }
 
 export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
-  projectId,
-  composer,
+  composer = null,
   children,
 }) => {
-  const storageKey = `buildrick-design-tokens-${projectId ?? "default"}-v1`;
-
-  // Load from localStorage on first render. Supports BOTH legacy array format
-  // and new versioned format ({schemaVersion, tokens}). Applies migrations
-  // when stored version < CURRENT_SCHEMA_VERSION. Falls through to DEFAULT_TOKENS
-  // on any error (private browsing, corrupt JSON, unknown shape).
-  const initialTokens = React.useMemo((): DesignToken[] => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return DEFAULT_TOKENS;
-
-      const parsed: unknown = JSON.parse(raw);
-      let tokens: DesignToken[];
-      let storedVersion: number;
-
-      if (Array.isArray(parsed)) {
-        // Legacy format — pre-versioned. Treat as V1.
-        tokens = parsed as DesignToken[];
-        storedVersion = 1;
-      } else if (
-        parsed &&
-        typeof parsed === "object" &&
-        "schemaVersion" in parsed &&
-        "tokens" in parsed &&
-        Array.isArray((parsed as { tokens: unknown }).tokens)
-      ) {
-        tokens = (parsed as { tokens: DesignToken[] }).tokens;
-        storedVersion = (parsed as { schemaVersion: number }).schemaVersion;
-      } else {
-        return DEFAULT_TOKENS;
-      }
-
-      if (storedVersion < CURRENT_SCHEMA_VERSION) {
-        tokens = migrateDesignTokens(tokens, storedVersion, CURRENT_SCHEMA_VERSION);
-      }
-
-      return tokens.length > 0 ? tokens : DEFAULT_TOKENS;
-    } catch {
-      // SecurityError (private browsing) or JSON.parse failure → use defaults
-      return DEFAULT_TOKENS;
-    }
-  }, [storageKey]);
-
-  const colorState = useColorTokens(initialTokens);
-  const spacingState = useSpacingTokens(initialTokens);
-  const typeState = useTypeTokens(initialTokens);
-  const radiusState     = useRadiusTokens(initialTokens);
-  const shadowState     = useShadowTokens(initialTokens);
-  const motionState     = useMotionTokens(initialTokens);
-  const borderState     = useBorderTokens(initialTokens);
-  const opacityState    = useOpacityTokens(initialTokens);
-  const zindexState     = useZindexTokens(initialTokens);
-  const breakpointState = useBreakpointTokens(initialTokens);
-  const gridState       = useGridTokens(initialTokens);
-  const sizingState     = useSizingTokens(initialTokens);
-  const iconState       = useIconTokens(initialTokens);
-  const imageryState    = useImageryTokens(initialTokens);
-
-  // Phase B.1: dark-mode applier. When composer is wired, subscribe to
-  // colorMode:changed and re-apply each color token via darkResolver.
-  // The effect also runs on mount (and whenever colorState.tokens changes)
-  // so live edits in dark mode don't leave the LIGHT value flashed by
-  // useColorTokens' internal applyToRoot.
-  React.useEffect(() => {
-    const apply = () => {
-      const resolved = composer?.colorMode.resolved() ?? "light";
-      colorState.tokens.forEach((t) => {
-        const value = composer
-          ? composer.darkResolver.resolve(t, resolved)
-          : t.value;
-        document.documentElement.style.setProperty(t.cssVar, value);
-      });
+  const project = useProjectTokens(composer);
+  const { commit, edits, revert } = useSessionEdits(composer, project);
+  const { all, readOnly, readOnlyReason } = project;
+  const store = React.useMemo<TokenStore>(() => ({ all, readOnly, readOnlyReason, commit, edits, revert }), [all, readOnly, readOnlyReason, commit, edits, revert]);
+  const kinds = React.useMemo(() => {
+    const k = (kind: TokenKind) => kindRegistry(kind, all, commit);
+    return {
+      color: k("color"), spacing: spacingRegistry(all, commit), type: k("type"), radius: k("radius"),
+      shadow: k("shadow"), motion: k("motion"), border: k("border"), opacity: k("opacity"),
+      zindex: k("zindex"), breakpoint: k("breakpoint"), grid: k("grid"), sizing: k("sizing"),
+      icon: k("icon"), imagery: k("imagery"),
     };
-    apply();
-    if (!composer) return;
-    const handler = () => apply();
-    composer.on("colorMode:changed", handler);
-    return () => composer.off("colorMode:changed", handler);
-  }, [composer, colorState.tokens]);
-
-  // Save all tokens to localStorage in versioned format. Call this after apply.
-  // Versioned format is {schemaVersion, tokens} — the loader accepts both
-  // this and the legacy array-only format for backward compat.
-  const persistAll = React.useCallback(() => {
-    // Persist ALL 14 token kinds. Previously only color/spacing/type were saved,
-    // so edits to the other 11 (radius, shadow, motion, border, opacity, zindex,
-    // breakpoint, grid, sizing, icon, imagery) were silently lost on reload — the
-    // load path reads every kind, but the save dropped 11 of them. Any kind added
-    // here MUST also appear in the deps array below.
-    const all: DesignToken[] = [
-      ...colorState.tokens,
-      ...spacingState.tokens,
-      ...typeState.tokens,
-      ...radiusState.tokens,
-      ...shadowState.tokens,
-      ...motionState.tokens,
-      ...borderState.tokens,
-      ...opacityState.tokens,
-      ...zindexState.tokens,
-      ...breakpointState.tokens,
-      ...gridState.tokens,
-      ...sizingState.tokens,
-      ...iconState.tokens,
-      ...imageryState.tokens,
-    ];
-    try {
-      const versioned = {
-        schemaVersion: CURRENT_SCHEMA_VERSION,
-        tokens: all,
-      };
-      localStorage.setItem(storageKey, JSON.stringify(versioned));
-    } catch {
-      // SecurityError in private browsing → no crash, just skip persistence
-    }
-  }, [
-    colorState.tokens,
-    spacingState.tokens,
-    typeState.tokens,
-    radiusState.tokens,
-    shadowState.tokens,
-    motionState.tokens,
-    borderState.tokens,
-    opacityState.tokens,
-    zindexState.tokens,
-    breakpointState.tokens,
-    gridState.tokens,
-    sizingState.tokens,
-    iconState.tokens,
-    imageryState.tokens,
-    storageKey,
-  ]);
-
-  const config = React.useMemo<RegistryConfig>(() => ({ persistAll }), [persistAll]);
+  }, [all, commit]);
+  const {
+    color: colorState, spacing: spacingState, type: typeState, radius: radiusState,
+    shadow: shadowState, motion: motionState, border: borderState, opacity: opacityState,
+    zindex: zindexState, breakpoint: breakpointState, grid: gridState, sizing: sizingState,
+    icon: iconState, imagery: imageryState,
+  } = kinds;
 
   // Flat list of (Context, value) pairs that wrap children, outermost first.
   // composeProviders below reduces this into the equivalent nested JSX tree.
-  // Adding a 15th kind = add one row, no indentation pyramid.
   const providers: Array<{ Context: React.Context<unknown>; value: unknown }> = [
+    { Context: ProjectTokenStoreContext  as React.Context<unknown>, value: store           },
     { Context: ColorRegistryContext      as React.Context<unknown>, value: colorState      },
     { Context: SpacingRegistryContext    as React.Context<unknown>, value: spacingState    },
     { Context: TypeRegistryContext       as React.Context<unknown>, value: typeState       },
@@ -267,63 +118,9 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
     { Context: SizingRegistryContext     as React.Context<unknown>, value: sizingState     },
     { Context: IconRegistryContext       as React.Context<unknown>, value: iconState       },
     { Context: ImageryRegistryContext    as React.Context<unknown>, value: imageryState    },
-    { Context: RegistryConfigContext     as React.Context<unknown>, value: config          },
   ];
 
-  return (
-    <>
-      {composeProviders(
-        providers,
-        <>
-          <ProjectTokensHydrator composer={composer} />
-          {children}
-        </>,
-      )}
-    </>
-  );
-};
-
-/**
- * D-4: fill the registries from `projectSettings.designTokens` when the project
- * loads — not when the Brand panel first opens. The provider seeds from a
- * localStorage cache (DEFAULT_TOKENS on a cold browser), and the only
- * project → registry hydration lived in BrandWorkspace, so the shell-wide DS
- * linter (useDSLint reads these registries) counted issues against the DEFAULT
- * brand until someone clicked Brand. The project wins over the cache on load.
- *
- * PROJECT_LOADED only, never SETTINGS_CHANGE: Brand stages edits in these same
- * registries, and a reset on every settings change would wipe them. For the
- * same reason a load that lands while Brand holds staged edits is skipped —
- * Brand's own loadFromComposer owns that case.
- */
-const ProjectTokensHydrator: React.FC<{ composer: TokenRegistryProviderProps["composer"] }> = ({
-  composer,
-}) => {
-  const resetAllKinds = useResetAllKinds();
-  const color = useColorRegistry();
-  const type = useTypeRegistry();
-  const spacing = useSpacingRegistry();
-  const staged = React.useRef(false);
-  staged.current = color.isDirty || type.isDirty || spacing.isDirty;
-
-  React.useEffect(() => {
-    if (!composer?.getProjectSettings) return;
-    const hydrate = () => {
-      if (staged.current) return;
-      const settings = composer.getProjectSettings?.();
-      /* An empty list is a state too: undoing a site's first token edit
-         imports a project with no designTokens, and returning early here left
-         the undone value standing in the registries. No saved tokens = the
-         seed, which is what mergeProjectTokens([]) yields. */
-      const incoming = (settings?.designTokens ?? []) as DesignToken[];
-      resetAllKinds(mergeProjectTokens(incoming, settings?.designTokensSchemaVersion));
-    };
-    hydrate();
-    composer.on(EVENTS.PROJECT_LOADED, hydrate);
-    return () => composer.off(EVENTS.PROJECT_LOADED, hydrate);
-  }, [composer, resetAllKinds]);
-
-  return null;
+  return <>{composeProviders(providers, children)}</>;
 };
 
 /**
@@ -346,69 +143,29 @@ function composeProviders(
 // ============================================================================
 
 // Static fallbacks for Inspector controls rendered outside the provider
-// (e.g. isolated component tests). Reads return default tokens; writes are no-ops.
-const noop = () => {};
-const colorDefaults = DEFAULT_TOKENS.filter((t) => t.category === "colors");
-const spacingDefaults = DEFAULT_TOKENS.filter((t) => t.category === "spacing");
-const typeDefaults = DEFAULT_TOKENS.filter((t) => t.category === "typography");
+// (e.g. isolated component tests). Reads return the seed; writes refuse.
+const refuse = () => false;
+function seedRegistry(kind: TokenKind): TokensForKindRegistry {
+  const tokens = DEFAULT_TOKENS.filter((t) => t.kind === kind);
+  return {
+    tokens,
+    updateToken: refuse,
+    addToken: refuse,
+    deleteToken: refuse,
+    renameToken: refuse,
+    filterTokens: (q: string) => tokens.filter((t) => t.name.toLowerCase().includes(q.trim().toLowerCase())),
+  };
+}
 
-const FALLBACK_COLOR: ColorRegistry = {
-  tokens: colorDefaults,
-  savedTokens: colorDefaults,
-  pendingDiff: {},
-  isDirty: false,
-  updateToken: noop,
-  undoToken: noop,
-  redoToken: noop,
-  canUndo: () => false,
-  canRedo: () => false,
-  markSaved: noop,
-  discardAll: noop,
-  resetFromSaved: noop,
-  stageTokens: noop,
-  filterTokens: (q: string) =>
-    colorDefaults.filter((t) => t.name.toLowerCase().includes(q.toLowerCase())),
-  addToken: noop,
-  deleteToken: noop,
-  renameToken: noop,
-};
-
+const FALLBACK_COLOR: ColorRegistry = seedRegistry("color");
+const FALLBACK_TYPE: TypeRegistry = seedRegistry("type");
 const FALLBACK_SPACING: SpacingRegistry = {
-  tokens: spacingDefaults,
-  savedTokens: spacingDefaults,
+  ...seedRegistry("spacing"),
   activePreset: "normal",
-  savedPreset: "normal",
-  isDirty: false,
-  updateToken: noop,
-  undoToken: noop,
-  redoToken: noop,
-  canUndo: () => false,
-  canRedo: () => false,
-  markSaved: noop,
-  discardAll: noop,
-  resetFromSaved: noop,
-  stageTokens: noop,
-  applyPreset: noop,
-  stageDefaults: noop,
-  addToken: noop,
-} as SpacingRegistry;
-
-const FALLBACK_TYPE: TypeRegistry = {
-  tokens: typeDefaults,
-  savedTokens: typeDefaults,
-  responsiveMode: "desktop",
-  isDirty: false,
-  updateToken: noop,
-  undoToken: noop,
-  redoToken: noop,
-  canUndo: () => false,
-  canRedo: () => false,
-  markSaved: noop,
-  discardAll: noop,
-  resetFromSaved: noop,
-  stageTokens: noop,
-  setResponsiveMode: noop,
-} as TypeRegistry;
+  applyPreset: refuse,
+  resetToDefaults: refuse,
+};
+const FALLBACK_STORE: TokenStore = { all: DEFAULT_TOKENS, readOnly: false, readOnlyReason: null, commit: refuse, edits: [], revert: refuse };
 
 export function useColorRegistry(): ColorRegistry {
   const ctx = React.useContext(ColorRegistryContext);
@@ -491,75 +248,9 @@ export function useImageryRegistry(): ImageryRegistry {
   return ctx;
 }
 
-export function useRegistryConfig(): RegistryConfig {
-  const ctx = React.useContext(RegistryConfigContext);
-  if (!ctx) throw new Error("useRegistryConfig must be used within TokenRegistryProvider");
-  return ctx;
-}
-
-/**
- * Replaces both `tokens` and `savedTokens` for ALL 14 kinds atomically from a
- * single external source (typically `composer.getProjectSettings().designTokens`
- * after migration merge). Closes the C1 persistence gap from S1: without this,
- * the 11 new-kind hooks silently revert to DEFAULT_TOKENS on project reload
- * because their `resetFromSaved` is no-arg.
- *
- * Color/Type/Spacing keep their bespoke `resetFromSaved(merged)` API; the 11
- * new kinds use `hydrateFromExternal(merged)` from `useTokensForKind`.
- */
-export function useResetAllKinds(): (allTokens: DesignToken[]) => void {
-  const color      = useColorRegistry();
-  const type       = useTypeRegistry();
-  const spacing    = useSpacingRegistry();
-  const radius     = useRadiusRegistry();
-  const shadow     = useShadowRegistry();
-  const motion     = useMotionRegistry();
-  const border     = useBorderRegistry();
-  const opacity    = useOpacityRegistry();
-  const zindex     = useZindexRegistry();
-  const breakpoint = useBreakpointRegistry();
-  const grid       = useGridRegistry();
-  const sizing     = useSizingRegistry();
-  const icon       = useIconRegistry();
-  const imagery    = useImageryRegistry();
-
-  // Each useXTokens hook returns a fresh object on every render (no
-  // useMemo around the return). Listing those 14 registries in the
-  // useCallback deps below would make this callable rotate identity on
-  // every render, which destabilises any downstream useCallback/useEffect
-  // that lists it as a dep — DesignSystemTab.loadFromComposer + the
-  // effect that calls it synchronously produced an unbounded render loop
-  // when `composer.getProjectSettings().designTokens.length > 0`.
-  //
-  // We only need to invoke registry mutator methods — we never need to
-  // *react* to registry identity changes — so pinning the latest values
-  // in a ref and returning an empty-deps useCallback is the correct
-  // shape here. The ref is reassigned on every render so each invocation
-  // hits the current registries.
-  const latest = React.useRef({
-    color, type, spacing, radius, shadow, motion, border,
-    opacity, zindex, breakpoint, grid, sizing, icon, imagery,
-  });
-  latest.current = {
-    color, type, spacing, radius, shadow, motion, border,
-    opacity, zindex, breakpoint, grid, sizing, icon, imagery,
-  };
-
-  return React.useCallback((allTokens: DesignToken[]) => {
-    const r = latest.current;
-    r.color.resetFromSaved(allTokens);
-    r.type.resetFromSaved(allTokens);
-    r.spacing.resetFromSaved(allTokens);
-    r.radius.hydrateFromExternal(allTokens);
-    r.shadow.hydrateFromExternal(allTokens);
-    r.motion.hydrateFromExternal(allTokens);
-    r.border.hydrateFromExternal(allTokens);
-    r.opacity.hydrateFromExternal(allTokens);
-    r.zindex.hydrateFromExternal(allTokens);
-    r.breakpoint.hydrateFromExternal(allTokens);
-    r.grid.hydrateFromExternal(allTokens);
-    r.sizing.hydrateFromExternal(allTokens);
-    r.icon.hydrateFromExternal(allTokens);
-    r.imagery.hydrateFromExternal(allTokens);
-  }, []);
+/** The whole token set, its one logged writer and the session's edits — for
+ *  writes that span kinds (import, starters, Colour mode), the read-only state
+ *  and Brand's Review changes. */
+export function useProjectTokenStore(): TokenStore {
+  return React.useContext(ProjectTokenStoreContext) ?? FALLBACK_STORE;
 }

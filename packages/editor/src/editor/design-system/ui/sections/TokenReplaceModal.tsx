@@ -3,9 +3,9 @@
  *
  * Picker shown when a Pro-mode user tries to delete a token that still has
  * live consumers. Lets them pick a same-kind replacement; resulting call is
- * `onConfirm(replaceWith)` which the caller forwards to
- * `useColorTokens.deleteToken(id, { replaceWith })` / its useTokensForKind
- * equivalent — both apply the B1 `replacedBy` bridge.
+ * `onConfirm(replaceWith)` which the caller forwards to the kind registry's
+ * `deleteToken(id, { replaceWith })` — one write that applies the B1
+ * `replacedBy` bridge.
  *
  * "Hard delete anyway" is intentionally NOT offered here: by contract the
  * caller only opens this modal when usage > 0; consumers would break on a

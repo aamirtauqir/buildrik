@@ -942,35 +942,6 @@ describe("F1 dirty-exit guard", () => {
     await waitFor(() => expect(assign).toHaveBeenCalled());
   });
 
-  // B-1: the exit guard used to check only the project's `isDirty`, so a
-  // staged-but-unsaved Brand token edit (project clean) walked straight out
-  // with no dialog — the same gap the beforeunload tests below close.
-  function brandComposerForExit() {
-    const handlers = new Map<string, Set<(p?: unknown) => void>>();
-    return {
-      on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
-        if (!handlers.has(ev)) handlers.set(ev, new Set());
-        handlers.get(ev)!.add(fn);
-      }),
-      off: vi.fn((ev: string, fn: (p?: unknown) => void) => {
-        handlers.get(ev)?.delete(fn);
-      }),
-      emit: (ev: string, payload?: unknown) => {
-        handlers.get(ev)?.forEach((fn) => fn(payload));
-      },
-    };
-  }
-
-  it("a staged Brand edit with a clean project still opens the exit dialog", () => {
-    const assign = stubLocation();
-    const composer = brandComposerForExit();
-    render(<StudioHeader {...makeProps({ isDirty: false, composer: composer as never })} />);
-    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
-    fireEvent.click(exitBtn());
-    expect(assign).not.toHaveBeenCalled();
-    expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
-  });
-
   it("offline + dirty: Exit goes straight to the risky dialog (5A — never fake-save)", () => {
     render(<StudioHeader {...makeProps({ isDirty: true, isOffline: true })} />);
     fireEvent.click(exitBtn());
@@ -1032,39 +1003,6 @@ describe("F1 dirty-exit guard", () => {
     lastProps = makeProps();
     expect(fireBeforeUnload().prevented).toBe(true);
     strandedMirrors = 0;
-  });
-
-  // B-1: a staged Brand edit with a clean project used to leave the native
-  // beforeunload prompt silent too — reload with unsaved token changes lost
-  // them with no warning at all.
-  it("beforeunload prompts on a CLEAN project when Brand has a staged edit", () => {
-    strandedMirrors = 0;
-    const handlers = new Map<string, Set<(p?: unknown) => void>>();
-    const composer = {
-      on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
-        if (!handlers.has(ev)) handlers.set(ev, new Set());
-        handlers.get(ev)!.add(fn);
-      }),
-      off: vi.fn((ev: string, fn: (p?: unknown) => void) => {
-        handlers.get(ev)?.delete(fn);
-      }),
-      emit: (ev: string, payload?: unknown) => {
-        handlers.get(ev)?.forEach((fn) => fn(payload));
-      },
-    };
-    const spy = vi.spyOn(window, "addEventListener");
-    const { unmount } = render(
-      <StudioHeader {...makeProps({ isDirty: false, composer: composer as never })} />,
-    );
-    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
-    const handler = spy.mock.calls.filter(([t]) => t === "beforeunload").pop()?.[1] as (
-      e: Partial<BeforeUnloadEvent>,
-    ) => void;
-    const e = { preventDefault: vi.fn(), returnValue: undefined as unknown };
-    handler(e as unknown as BeforeUnloadEvent);
-    spy.mockRestore();
-    unmount();
-    expect((e.preventDefault as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(0);
   });
 
   /* B-1 fix: the exit guard, beforeunload and the chip read the ONE
@@ -1267,60 +1205,6 @@ describe("T8 status grammar", () => {
     );
     const label = await screen.findByText("Changes requested");
     expect(isWarningTone(label)).toBe(true);
-  });
-});
-
-// ── brand's unsaved work reaches the chip ───────────────────────────────────
-describe("the save chip counts brand's staged edits, not only the project's", () => {
-  /* A token mid-edit left this reading "Saved · just now" with a green dot
-     while the Brand panel's own footer said "Unsaved brand changes". Same
-     concept, two surfacings, and the global one is the one a user watches.
-     Brand stages in a provider this header sits outside, so it announces. */
-  function brandComposer() {
-    const handlers = new Map<string, Set<(p?: unknown) => void>>();
-    return {
-      on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
-        if (!handlers.has(ev)) handlers.set(ev, new Set());
-        handlers.get(ev)!.add(fn);
-      }),
-      off: vi.fn((ev: string, fn: (p?: unknown) => void) => {
-        handlers.get(ev)?.delete(fn);
-      }),
-      emit: (ev: string, payload?: unknown) => {
-        handlers.get(ev)?.forEach((fn) => fn(payload));
-      },
-      getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
-    };
-  }
-
-  it("reads unsaved once brand announces staged edits, with the project clean", () => {
-    const composer = brandComposer();
-    render(
-      <StudioHeader
-        {...makeProps({
-          composer: composer as unknown as StudioHeaderProps["composer"],
-          isDirty: false,
-        })}
-      />,
-    );
-    expect(screen.queryByText("Unsaved changes")).toBeNull();
-    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
-    expect(screen.getByText("Unsaved changes")).toBeTruthy();
-  });
-
-  it("goes back to saved when brand's edits are applied or discarded", () => {
-    const composer = brandComposer();
-    render(
-      <StudioHeader
-        {...makeProps({
-          composer: composer as unknown as StudioHeaderProps["composer"],
-          isDirty: false,
-        })}
-      />,
-    );
-    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
-    act(() => composer.emit("brand:dirty-changed", { dirty: false }));
-    expect(screen.queryByText("Unsaved changes")).toBeNull();
   });
 });
 

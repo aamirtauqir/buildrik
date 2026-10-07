@@ -27,6 +27,7 @@ import { FieldDot } from "../shared/controls/FieldDot";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER } from "../shared/controls/controlClasses";
 import { ItemControls, type ParentLayout } from "./layout/ItemControls";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 // ============================================================================
 // FIXED · FILL · HUG
@@ -61,7 +62,9 @@ interface ChainButtonProps {
 const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { tokens: spacingTokens } = useSpacingRegistry();
-  const tokenEntries = spacingTokens.map((t) => ({ id: t.id, name: t.name, value: t.value, cssVar: t.cssVar }));
+  const tokenEntries = spacingTokens.map((t) => ({
+    id: t.id, name: t.name, value: resolveTokenLiteral(spacingTokens, t.id, "light") ?? "", cssVar: t.cssVar,
+  }));
   const isBound = isTokenVar(value);
   const boundToken = isBound ? tokenEntries.find((t) => value === `var(${t.cssVar})`) : null;
 

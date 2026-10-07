@@ -1,5 +1,5 @@
 import type { ProjectMigration, ProjectPayload } from "./types";
-import type { DesignToken, TokenKind } from "../../types";
+import type { LegacyDesignToken, TokenKind } from "@/engine/designSystem/types";
 
 const NEW_KINDS: TokenKind[] = [
   "radius", "shadow", "motion", "border", "opacity",
@@ -13,7 +13,7 @@ const NEW_KINDS: TokenKind[] = [
  * If DEFAULT_TOKENS changes for these 18 entries, mirror here manually;
  * the migration is by definition frozen schema, so drift risk is bounded.
  */
-const SEED_TOKENS: DesignToken[] = [
+const SEED_TOKENS: LegacyDesignToken[] = [
   { id: "radius-sm", name: "Small radius", value: "4px", category: "layout", cssVar: "--bd-radius-sm", type: "length", kind: "radius", friendlyName: "Small radius" },
   { id: "radius-md", name: "Medium radius", value: "8px", category: "layout", cssVar: "--bd-radius-md", type: "length", kind: "radius", friendlyName: "Medium radius" },
   { id: "shadow-sm", name: "Small shadow", value: "0 1px 2px rgba(15,23,42,0.04)", category: "effects", cssVar: "--bd-shadow-sm", type: "shadow", kind: "shadow", friendlyName: "Small shadow" },

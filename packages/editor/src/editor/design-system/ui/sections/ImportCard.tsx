@@ -8,13 +8,11 @@
  *      When conflicts > 0 the Resolve section surfaces 3 strategy buttons.
  *   3. Action row → "Apply N valid only" (cobalt) + Cancel.
  *
- * Apply path still stages tokens through useImportTokens which routes each
- * token to the correct registry's updateToken (modify) or addToken (new).
- * That marks the registry dirty, which surfaces in the global Apply Changes
- * footer the same way as inline token edits.
+ * Apply writes the tokens through useImportTokens — one write over the
+ * site's tokens (modify existing ids, add new ones), one ⌘Z, live at once.
  *
  * Conflict resolution is local to this component — strategy state filters
- * the staged token set before calling useImportTokens:
+ * the parsed token set before calling useImportTokens:
  *   - replace          → all incoming tokens (existing-id rows update in place)
  *   - merge-keep-mine  → only NEW ids (skip existing-id rows)
  *
@@ -218,6 +216,10 @@ export const ImportCard: React.FC = () => {
     }
 
     const stats = apply(toApply);
+    if (stats.refused) {
+      addToast({ title: "Import failed", description: "Nothing was imported — the brand can't be changed right now.", tone: "error" });
+      return;
+    }
     addToast({
       /* `ImportStats.skipped` has always carried the ids; the toast reported
          only its length, so "2 skipped" named nothing the user could act on. */

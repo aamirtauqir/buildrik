@@ -8,11 +8,12 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { BrandPreview } from "../BrandPreview";
 import type { DesignToken } from "@/engine/designSystem/types";
+import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
-const token = (over: Partial<DesignToken>): DesignToken => ({
+const token = (over: Partial<V6TokenSpec>): DesignToken => (v6Token({
   id: "t", name: "brand", value: "#1a56db", category: "colors",
   cssVar: "--x", type: "color", ...over,
-});
+}));
 
 describe("BrandPreview", () => {
   it("draws a swatch per colour token, each carrying its name and value", () => {

@@ -625,6 +625,7 @@ export function projectDataFromRows(
     projectSettings?: unknown;
     projectCmsBindings?: ProjectData["cmsBindings"] | null;
     dsSchemaVersion?: number;
+    tokensMigrationHold?: boolean;
   };
   // tRPC `pages.list` returns Prisma rows with Json columns typed as
   // JsonValue. Runtime shape matches DashboardPageRow (blocks/settings/meta
@@ -687,6 +688,8 @@ export function projectDataFromRows(
     dsSchemaVersion: siteRow.dsSchemaVersion ?? 0,
     // Stored by sites.saveProject from exportProject()'s own `cmsBindings`.
     cmsBindings: siteRow.projectCmsBindings ?? undefined,
+    brandTokensV2: (siteColumns as { brandTokensV2?: boolean } | null)?.brandTokensV2,
+    tokensMigrationHold: siteRow.tokensMigrationHold,
     metadata: {
       name: siteRow.name,
       domain: siteRow.domain,

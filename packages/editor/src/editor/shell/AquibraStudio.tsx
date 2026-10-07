@@ -146,7 +146,6 @@ class StudioErrorBoundary extends React.Component<
 /** How a failed "Leave anyway" discard names its surface in the toast. */
 const DISCARD_SURFACE: Record<DirtyDomain, string> = {
   settings: "Settings",
-  brand: "brand",
   "cms-record": "record",
 };
 
@@ -654,6 +653,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         <StudioHeader
           composer={composer}
           saveStatus={state.saveState.status}
+          saveError={state.saveState.error}
           isDirty={state.isDirty}
           isOffline={isOffline}
           lastSaved={state.saveState.lastSavedAt ? new Date(state.saveState.lastSavedAt) : null}

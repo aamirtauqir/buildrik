@@ -150,7 +150,7 @@ describe("AITab — scope + composer wiring", () => {
         ],
       },
       getProjectSettings: () => ({
-        designTokens: [{ id: "tok1", name: "Brand", value: "#2D6DFF", type: "color" }],
+        designTokens: [{ id: "tok1", name: "Brand", kind: "color", layer: "primitive", modes: { light: { value: "#2D6DFF" } }, category: "colors", cssVar: "--buildrick-design-tok1", type: "color" }],
       }),
       media: {
         getAssets: () => [

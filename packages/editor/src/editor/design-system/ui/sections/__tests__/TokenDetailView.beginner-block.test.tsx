@@ -14,8 +14,9 @@ import * as React from "react";
 import { TokenDetailView } from "../TokenDetailView";
 import { DSModeProvider } from "../../../state/DSModeContext";
 import type { DesignToken } from "../../../types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
-const colorToken: DesignToken = {
+const colorToken: DesignToken = v6Token({
   id: "color.brand.primary",
   name: "Brand · Primary",
   value: "#2D6DFF",
@@ -23,7 +24,7 @@ const colorToken: DesignToken = {
   cssVar: "--buildrick-design-color-brand-primary",
   type: "color",
   kind: "color",
-};
+});
 
 function makeMockComposer(): any {
   const handlers: Record<string, Array<() => void>> = {};

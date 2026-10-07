@@ -4,26 +4,15 @@ import * as React from "react";
 import { ExportSection } from "../ExportSection";
 import { TokenRegistryProvider } from "../../../state/TokenRegistryContext";
 import { ToastProvider } from "@/editor/chrome-ui";
-import { DEFAULT_TOKENS } from "../../../constants";
-
-const PROJECT_ID = "export-test";
-const STORAGE_KEY = `buildrick-design-tokens-${PROJECT_ID}-v1`;
 
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
-    <TokenRegistryProvider projectId={PROJECT_ID}>{ui}</TokenRegistryProvider>
+    <TokenRegistryProvider>{ui}</TokenRegistryProvider>
   </ToastProvider>
 );
 
 beforeEach(() => {
   localStorage.clear();
-  // Seed darkValue on the first color token so CSSBundler emits a dark block.
-  // Mirrors what migration0002 does on real project loads (which run through
-  // Composer, not the default-bootstrap path).
-  const seeded = DEFAULT_TOKENS.map((t, i) =>
-    i === 0 && t.category === "colors" ? { ...t, darkValue: "#000000" } : t,
-  );
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ schemaVersion: 1, tokens: seeded }));
   if (typeof URL.createObjectURL !== "function") {
     Object.defineProperty(URL, "createObjectURL", {
       configurable: true,

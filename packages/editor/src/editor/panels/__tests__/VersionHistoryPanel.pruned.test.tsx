@@ -13,8 +13,8 @@
  * so it tests the subscription contract (nothing until VERSION_PRUNED, and the
  * kept count comes from the payload rather than a hardcoded 50) and NOT the
  * shipped markup. The real block is measured against 163:315/316/317 by
- * `scripts/conformance/surfaces/history-saves-pruned-notice.json`, which mounts
- * VersionHistoryPanel itself.
+ * the V1 recipe `history-saves-pruned-notice` (retired 2026-10-07 with its V1
+ * spec), which mounted VersionHistoryPanel itself.
  *
  * VersionTimelineManager has always pruned past maxVersions and said nothing —
  * older auto-saves simply stopped being there. It now emits VERSION_PRUNED and

@@ -9,6 +9,8 @@
  * overwrite wholesale).
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { migrateTokensToV6 } from "@buildrik/shared/tokens";
+import v5seed from "@buildrik/shared/tokens/__tests__/__fixtures__/seed-only.json";
 
 const wsFindUnique = vi.fn();
 const wsUpdate = vi.fn();
@@ -72,6 +74,7 @@ import {
   setSiteThemeLock,
   previewSharedThemePush,
   rollbackSiteTheme,
+  pruneThemeSnapshots,
   listSiteThemeSnapshots,
   saveWorkspacePreset,
   applyWorkspacePreset,
@@ -172,7 +175,7 @@ describe("pushSharedTheme", () => {
     ]);
     await pushSharedTheme("w1");
     const data = siteUpdateMany.mock.calls[0][0].data;
-    expect(data.projectSettings).toEqual({ designTokens: [{ id: "t", v: "new" }], seo: { metaTitle: "Keep" } });
+    expect(data.projectSettings).toEqual({ designTokens: [{ id: "t", v: "new" }], seo: { metaTitle: "Keep" }, designTokensSchemaVersion: 5 });
     expect("projectStyles" in data).toBe(false);
     expect(data.lastEditedAt).toBeInstanceOf(Date); // an open editor gets SAVE_CONFLICT, not a silent overwrite
   });
@@ -233,7 +236,141 @@ describe("pushSharedTheme — D2 snapshot", () => {
       workspaceId: "w1",
       prevStyles: { designTokens: [{ old: 2 }] },
       prevDsSchemaVersion: 2,
+      reason: "theme-push",
+      tokensSchemaVersion: 5,
     });
+  });
+
+  it("records the site's stored tokens version on the snapshot", async () => {
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2, projectSettings: { designTokens: [], designTokensSchemaVersion: 4 } },
+    ]);
+    await pushSharedTheme("w1");
+    expect(snapCreate.mock.calls[0][0].data.tokensSchemaVersion).toBe(4);
+  });
+
+  it("pushes an unmigratable v5 workspace theme as-is (switch on) instead of failing", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2, projectSettings: { designTokens: [] }, tokensMigrationHold: false },
+    ]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0].status).toBe("pushed");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: [{ id: "t" }], designTokensSchemaVersion: 5 });
+    expect(warn).toHaveBeenCalledWith("[theme] workspace theme did not migrate; pushing as-is", expect.anything());
+    warn.mockRestore();
+    vi.unstubAllEnvs();
+  });
+});
+
+describe("pushSharedTheme — version label matches the tokens written", () => {
+  const v6 = migrateTokensToV6(v5seed);
+  const site = (extra: Record<string, unknown> = {}) => ({
+    id: "s", name: "S", themeLocked: false, dsSchemaVersion: 1, lastEditedAt: new Date(1),
+    projectSettings: { designTokens: [], designTokensSchemaVersion: 5 }, tokensMigrationHold: false, ...extra,
+  });
+  const theme = (tokens: unknown) =>
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: tokens }, sharedThemeUpdatedAt: new Date() });
+
+  beforeEach(() => vi.unstubAllEnvs());
+
+  it("migrates a v5 theme (switch on) and writes v6 rows + version 6", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "on");
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site()]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0].status).toBe("pushed");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v6, designTokensSchemaVersion: 6 });
+  });
+
+  it("a held site with a v6 theme is skipped-held and untouched", async () => {
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([site({ tokensMigrationHold: true })]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0]).toMatchObject({ status: "skipped-held" });
+    expect(siteUpdateMany).not.toHaveBeenCalled();
+    expect(snapCreate).not.toHaveBeenCalled();
+  });
+
+  it("a v6 site with a v5 theme (switch off) is skipped-version with the re-capture message", async () => {
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site({ projectSettings: { designTokens: v6, designTokensSchemaVersion: 6 } })]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0]).toMatchObject({ status: "skipped-version", error: expect.stringContaining("re-capture") });
+    expect(siteUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("a v5 non-held site with the switch off gets v5 tokens and version 5", async () => {
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site({ projectSettings: { designTokens: [] } })]);
+    await pushSharedTheme("w1");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+  });
+
+  it("switch off: a v6 theme never migrates a v5 site with tokens — skipped-version, paused (M1)", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([site({ projectSettings: { designTokens: v5seed, designTokensSchemaVersion: 5 } })]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0]).toMatchObject({ status: "skipped-version", error: "Brand upgrade is paused for this site." });
+    expect(siteUpdateMany).not.toHaveBeenCalled();
+    expect(snapCreate).not.toHaveBeenCalled();
+  });
+
+  it("switch off: a v6 theme still reaches a site with no tokens (nothing to migrate)", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([site()]);
+    const res = await pushSharedTheme("w1");
+    expect(res[0].status).toBe("pushed");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v6, designTokensSchemaVersion: 6 });
+  });
+
+  it("BRAND_TOKENS_V2_WORKSPACES: a listed workspace's v5 site takes a v6 theme; another workspace's is paused", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    vi.stubEnv("BRAND_TOKENS_V2_WORKSPACES", "w-qa");
+    const v5site = site({ projectSettings: { designTokens: v5seed, designTokensSchemaVersion: 5 } });
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([v5site]);
+    expect((await pushSharedTheme("w-qa"))[0].status).toBe("pushed");
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([v5site]);
+    expect((await pushSharedTheme("w-other"))[0]).toMatchObject({ status: "skipped-version", error: "Brand upgrade is paused for this site." });
+  });
+
+  it("BRAND_TOKENS_V2_WORKSPACES: a v5 theme migrates for a listed workspace only", async () => {
+    vi.stubEnv("BRAND_TOKENS_V2", "");
+    vi.stubEnv("BRAND_TOKENS_V2_WORKSPACES", "w-qa");
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site()]);
+    await pushSharedTheme("w-qa");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: v6, designTokensSchemaVersion: 6 });
+    theme(v5seed);
+    siteFindMany.mockResolvedValueOnce([site()]);
+    await pushSharedTheme("w-other");
+    expect(siteUpdateMany.mock.calls[1][0].data.projectSettings).toEqual({ designTokens: v5seed, designTokensSchemaVersion: 5 });
+  });
+
+  it("preview reports the same skips", async () => {
+    theme(v6);
+    siteFindMany.mockResolvedValueOnce([site({ tokensMigrationHold: true })]);
+    const res = await previewSharedThemePush("w1");
+    expect(res[0]).toMatchObject({ status: "skipped-held", willChange: false });
+  });
+});
+
+describe("pruneThemeSnapshots", () => {
+  it("logs '[theme] prune failed' with the siteId and does not throw", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    snapFindMany.mockResolvedValueOnce(Array.from({ length: 10 }, (_, i) => ({ id: `s${i}` })));
+    snapDeleteMany.mockRejectedValueOnce(new Error("db down"));
+    await expect(pruneThemeSnapshots("site-9")).resolves.toBeUndefined();
+    expect(warn).toHaveBeenCalledWith("[theme] prune failed", { siteId: "site-9", error: "db down" });
+    expect(snapDeleteMany.mock.calls[0][0].where).toMatchObject({ siteId: "site-9", reason: { not: "migration" } });
+    warn.mockRestore();
   });
 });
 
@@ -288,7 +425,19 @@ describe("rollbackSiteTheme (D2)", () => {
       dsSchemaVersion: 5,
     });
     expect(snapDelete.mock.calls[0][0].where).toEqual({ id: "snap1" });
+    // E1: only theme-push rows are admin-rollback candidates, never a newer generator/migration row.
+    expect(snapFindFirst.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1", reason: "theme-push" });
     expect(res.rolledBackTo).toBeInstanceOf(Date);
+  });
+
+  it("restores the snapshot's version and drops darkMode when the push had upgraded the site", async () => {
+    siteFindFirst.mockResolvedValueOnce({
+      id: "s1", dsSchemaVersion: 4, lastEditedAt: new Date(1),
+      projectSettings: { designTokens: [], designTokensSchemaVersion: 6, darkMode: "auto" },
+    });
+    snapFindFirst.mockResolvedValueOnce({ id: "snap1", prevStyles: { designTokens: [{ was: 1 }] }, tokensSchemaVersion: 5, createdAt: new Date() });
+    await rollbackSiteTheme("w1", "s1");
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({ designTokens: [{ was: 1 }], designTokensSchemaVersion: 5 });
   });
 
   /* Rollback merged into the projectSettings it read and wrote it
@@ -375,7 +524,7 @@ describe("listSiteThemeSnapshots (D2)", () => {
     snapFindMany.mockResolvedValueOnce([{ id: "a", createdAt: new Date() }]);
     const res = await listSiteThemeSnapshots("w1", "s1");
     expect(res).toHaveLength(1);
-    expect(snapFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1" });
+    expect(snapFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1", reason: "theme-push" });
   });
 });
 

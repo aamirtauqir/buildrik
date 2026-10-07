@@ -18,6 +18,8 @@ import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
 import { slugifyProjectName } from "@/lib/vercel";
+import { TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
+import { checkTokenPayload, TokenSaveError, type TokenCheck } from "@/server/services/brand-tokens";
 
 function slugify(name: string): string {
   return name
@@ -890,6 +892,49 @@ function withValidAnalyticsIds(settings: unknown): unknown {
   return { ...settings, analytics };
 }
 
+const TOKEN_STATE_KEYS = ["designTokens", "designTokensSchemaVersion", "darkMode"] as const;
+
+/**
+ * The settings to write, with the token state decided by the server: the
+ * checked (possibly migrated) tokens at the current version; the payload as
+ * sent on the unchanged pre-v6 path; and on a save without `designTokens`, the
+ * STORED token state — such a save never changes or deletes it.
+ */
+function withCheckedTokens(settings: unknown, check: TokenCheck, stored: unknown): unknown {
+  if (check.kind === "unchanged" || !isPlainObject(settings)) return settings;
+  if (check.kind === "no-tokens") {
+    const out: Record<string, unknown> = { ...settings };
+    const previous = isPlainObject(stored) ? stored : {};
+    for (const key of TOKEN_STATE_KEYS) {
+      if (previous[key] === undefined) delete out[key];
+      else out[key] = previous[key];
+    }
+    return out;
+  }
+  return { ...settings, designTokens: check.tokens, designTokensSchemaVersion: TOKENS_SCHEMA_VERSION };
+}
+
+/**
+ * The save's token check for this site's workspace switch. A stale tab (an
+ * older brand format than the store, or a first v6 save the switch or the
+ * site's hold refuses) answers as the ordinary `SAVE_CONFLICT:<stored
+ * lastEditedAt>`, so every editor bundle opens its conflict dialog and a
+ * reload brings the stored brand; the token reason stays in the server log.
+ */
+function checkedTokensOrConflict(
+  siteId: string,
+  settings: unknown,
+  site: { projectSettings: unknown; tokensMigrationHold: boolean; workspaceId: string; lastEditedAt: Date },
+): TokenCheck {
+  try {
+    return checkTokenPayload(settings, site.projectSettings, { hold: site.tokensMigrationHold, workspaceId: site.workspaceId });
+  } catch (e) {
+    if (!(e instanceof TokenSaveError) || e.code !== "TOKENS_STALE_CLIENT") throw e;
+    console.warn("[tokens] save refused", { siteId, code: e.code, reason: e.message });
+    throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+  }
+}
+
 /**
  * Phase -1: canonical project-data persistence path.
  *
@@ -907,9 +952,28 @@ function withValidAnalyticsIds(settings: unknown): unknown {
 export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
-    select: { deletedAt: true, projectSettings: true },
+    select: {
+      deletedAt: true,
+      projectSettings: true,
+      lastEditedAt: true,
+      workspaceId: true,
+      dsSchemaVersion: true,
+      tokensMigrationHold: true,
+    },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  /* Brand Part 1 (eng E4): the first save that moves a site's tokens to v6
+     must carry the CAS token and match it now — the migration snapshot below
+     records what that save replaced, and a blind write could snapshot a
+     version the user never saw. The in-transaction CAS still decides races. */
+  const tokenCheck = checkedTokensOrConflict(input.siteId, input.settings, site);
+  if (tokenCheck.kind === "first-migrated") {
+    if (!expectedLastEditedAt) throw new TokenSaveError("TOKENS_NEED_CAS", "Reload to continue.");
+    if (site.lastEditedAt.toISOString() !== new Date(expectedLastEditedAt).toISOString()) {
+      throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+    }
+  }
 
   const savedAt = new Date();
   // Delete pages not in incoming set (only when caller supplies position
@@ -923,7 +987,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
   // SA-01: the column-backed keys live in their Site columns only. BE-1: a
   // JSON-only key that fails its schema keeps the stored value.
   const settings = stripColumnBackedSettings(
-    keepValidJsonOnlySettings(withValidAnalyticsIds(input.settings), site.projectSettings),
+    keepValidJsonOnlySettings(withValidAnalyticsIds(withCheckedTokens(input.settings, tokenCheck, site.projectSettings)), site.projectSettings),
   );
 
   // Bad entries were already dropped per entry (cmsBindingsSchema). A map
@@ -934,6 +998,14 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
     console.warn(`[saveProjectData] site=${input.siteId} cmsBindings over ${MAX_CMS_BINDINGS_CHARS} chars — not stored`);
     cmsBindings = undefined;
   }
+
+  // Defense-in-depth: strip XSS from the stored element tree at the write
+  // boundary. The editor sanitizes on import/serialize, but a direct API
+  // write (bypassing the editor) would otherwise persist hostile blocks.
+  // N1: this is synchronous DOMPurify/jsdom CPU (~1 s per 700 rich-text
+  // elements). Inside the interactive transaction it burned Prisma's 5 s
+  // timeout before the page upsert ran (P2028 → 500, then a 409 on retry).
+  for (const page of input.pages) sanitizeBlocks(page.blocks);
 
   await prisma.$transaction(async (tx) => {
     /* 61-conflict / A-2: optimistic concurrency as a compare-and-swap, FIRST in
@@ -980,6 +1052,22 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       throw new Error(`SAVE_CONFLICT:${current.lastEditedAt.toISOString()}`);
     }
 
+    // Same transaction as the CAS: a losing racer rolls its snapshot back too.
+    // A store with no tokens (a new site) has nothing to restore.
+    if (tokenCheck.kind === "first-migrated" && Array.isArray(tokenCheck.storedTokens) && tokenCheck.storedTokens.length > 0) {
+      await tx.siteThemeSnapshot.create({
+        data: {
+          siteId: input.siteId,
+          workspaceId: site.workspaceId,
+          prevStyles: { designTokens: tokenCheck.storedTokens } as Prisma.InputJsonValue,
+          prevDsSchemaVersion: site.dsSchemaVersion,
+          reason: "migration",
+          tokensSchemaVersion: tokenCheck.storedVersion,
+          darkMode: null,
+        },
+      });
+    }
+
     /* I-2: the page writes below go by id alone (upsert / update where {id}),
        and the caller's role was checked on THIS site only — a page id that
        already lives under another site would overwrite that site's page.
@@ -1021,11 +1109,6 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
 
     // Upsert each incoming page.
     for (const [index, page] of input.pages.entries()) {
-      // Defense-in-depth: strip XSS from the stored element tree at the write
-      // boundary. The editor sanitizes on import/serialize, but a direct API
-      // write (bypassing the editor) would otherwise persist hostile blocks.
-      sanitizeBlocks(page.blocks);
-
       const slug =
         page.slug ?? (page.name ? page.name.toLowerCase().replace(/\s+/g, "-") : undefined);
 

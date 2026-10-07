@@ -3,22 +3,31 @@
     {
       "id": "color-primary",
       "name": "Primary",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "color-blue-500"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-color-primary",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "Primary",
-      "aliasOf": "color-blue-500"
+      "friendlyName": "Primary"
     },
     {
       "id": "color-blue-500",
       "name": "Blue 500",
-      "value": "#2D6DFF",
+      "kind": "color",
+      "layer": "primitive",
+      "modes": {
+        "light": {
+          "value": "#2D6DFF"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-color-blue-500",
       "type": "color",
-      "kind": "color",
       "friendlyName": "Blue 500"
     }
   ]

@@ -17,8 +17,9 @@ import { ExportEngine } from "@/engine/export/ExportEngine";
 import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
 import { colourTokenLabel } from "@/editor/inspector/shared/controls/ColorInput";
 import { DEFAULT_TOKENS } from "../constants";
-import { mergeProjectTokens } from "../state/projectTokens";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import { buildContrastIssues } from "../utils/contrastLint";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -34,8 +35,9 @@ describe("the seed's page-background token", () => {
   const token = DEFAULT_TOKENS.find((t) => t.id === PAGE_BACKGROUND_TOKEN.id);
 
   it("is a transparent surface colour on the shared css variable", () => {
-    expect(token).toMatchObject({ value: "transparent", category: "colors", group: "surface", cssVar: PAGE_BACKGROUND_TOKEN.cssVar });
-    expect(token?.darkValue).toBeUndefined();
+    expect(resolveTokenLiteral(DEFAULT_TOKENS, PAGE_BACKGROUND_TOKEN.id, "light")).toBe("transparent");
+    expect(token).toMatchObject({ category: "colors", group: "surface", cssVar: PAGE_BACKGROUND_TOKEN.cssVar });
+    expect(token?.modes.dark).toBeUndefined();
   });
 
   it("reads 'Page / background' in the Inspector", () => {
@@ -49,7 +51,7 @@ describe("the seed's page-background token", () => {
 
   it("reaches a site whose saved tokens predate it, and raises no contrast warning", () => {
     const merged = mergeProjectTokens(DEFAULT_TOKENS.filter((t) => t.id !== PAGE_BACKGROUND_TOKEN.id));
-    expect(merged.find((t) => t.id === PAGE_BACKGROUND_TOKEN.id)?.value).toBe("transparent");
+    expect(resolveTokenLiteral(merged, PAGE_BACKGROUND_TOKEN.id, "light")).toBe("transparent");
     const colours = merged.filter((t) => t.category === "colors");
     expect(buildContrastIssues(colours, "light").map((i) => i.tokenId)).not.toContain(PAGE_BACKGROUND_TOKEN.id);
     expect(buildContrastIssues(colours, "dark").map((i) => i.tokenId)).not.toContain(PAGE_BACKGROUND_TOKEN.id);

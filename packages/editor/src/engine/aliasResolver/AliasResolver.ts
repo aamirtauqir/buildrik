@@ -1,4 +1,5 @@
-import type { DesignToken } from "../designSystem/types";
+import { lightAliasOf } from "@buildrik/shared/tokens";
+import type { DesignToken } from "@/engine/designSystem/types";
 import type { EventEmitter } from "../EventEmitter";
 import { AliasCycleError, AliasDepthError, MAX_ALIAS_DEPTH } from "./errors";
 
@@ -16,8 +17,8 @@ import { AliasCycleError, AliasDepthError, MAX_ALIAS_DEPTH } from "./errors";
  *     `tokens:alias-changed` event from the editor token editor.
  *
  * Pure with respect to DOM: this resolver does NOT call setProperty / write
- * to :root. CSS variable application stays the responsibility of
- * useTokensForKind's applyToRoot at registry mount time.
+ * to :root. Token CSS is written only by ProjectTokensApplier's
+ * `<style id="bk-site-tokens">`.
  */
 export class AliasResolver {
   constructor(private readonly events: EventEmitter) {}
@@ -59,10 +60,11 @@ export class AliasResolver {
     if (!m) {
       m = new Map<string, DesignToken[]>();
       for (const t of tokens) {
-        if (!t.aliasOf) continue;
-        const list = m.get(t.aliasOf);
+        const target = lightAliasOf(t);
+        if (!target) continue;
+        const list = m.get(target);
         if (list) list.push(t);
-        else m.set(t.aliasOf, [t]);
+        else m.set(target, [t]);
       }
       this.aliasOfIndex.set(tokens, m);
     }
@@ -78,20 +80,22 @@ export class AliasResolver {
     const byId = this.getForwardIndex(tokens);
 
     for (const start of tokens) {
-      if (!start.aliasOf) continue;
+      const startTarget = lightAliasOf(start);
+      if (!startTarget) continue;
 
       const visited = new Set<string>([start.id]);
       const chain: string[] = [start.id];
 
-      let cursor: DesignToken | undefined = byId.get(start.aliasOf);
+      let cursor: DesignToken | undefined = byId.get(startTarget);
       while (cursor) {
         chain.push(cursor.id);
         if (visited.has(cursor.id)) {
           throw new AliasCycleError(chain);
         }
         visited.add(cursor.id);
-        if (!cursor.aliasOf) break;
-        cursor = byId.get(cursor.aliasOf);
+        const next = lightAliasOf(cursor);
+        if (!next) break;
+        cursor = byId.get(next);
       }
 
       // chain.length === depth + 1 (entry token + N alias hops).
@@ -124,8 +128,9 @@ export class AliasResolver {
         cursor = byId.get(cursor.replacedBy);
         continue;
       }
-      if (!cursor.aliasOf) return cursor;
-      cursor = byId.get(cursor.aliasOf);
+      const next = lightAliasOf(cursor);
+      if (!next) return cursor;
+      cursor = byId.get(next);
     }
     return undefined;
   }
@@ -143,7 +148,7 @@ export class AliasResolver {
    */
   validateAndEmit(tokens: readonly DesignToken[]): void {
     this.validate(tokens);
-    this.events.emit("tokens:alias-changed", { count: tokens.filter((t) => t.aliasOf).length });
+    this.events.emit("tokens:alias-changed", { count: tokens.filter((t) => lightAliasOf(t)).length });
   }
 
   getChain(tokenId: string, tokens: readonly DesignToken[]): readonly string[] {
@@ -155,7 +160,8 @@ export class AliasResolver {
     const chain: string[] = [start.id];
     const visited = new Set<string>([start.id]);
 
-    let cursor: DesignToken | undefined = start.aliasOf ? byId.get(start.aliasOf) : undefined;
+    const startTarget = lightAliasOf(start);
+    let cursor: DesignToken | undefined = startTarget ? byId.get(startTarget) : undefined;
     while (cursor) {
       if (visited.has(cursor.id)) {
         chain.push(cursor.id);
@@ -163,7 +169,8 @@ export class AliasResolver {
       }
       chain.push(cursor.id);
       visited.add(cursor.id);
-      cursor = cursor.aliasOf ? byId.get(cursor.aliasOf) : undefined;
+      const next = lightAliasOf(cursor);
+      cursor = next ? byId.get(next) : undefined;
     }
     return chain;
   }
