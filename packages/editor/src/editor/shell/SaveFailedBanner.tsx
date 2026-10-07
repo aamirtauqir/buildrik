@@ -16,6 +16,15 @@
 import * as React from "react";
 import { Button, Portal } from "@/editor/chrome-ui";
 
+/** The board's inset from the canvas column's edges. */
+const EDGE = 8;
+/** Narrower than this the copy wraps a word per line — no column at all. */
+const MIN_WIDTH = 480;
+/** No usable canvas column means a full-page view covers it: clear the 256px
+ *  nav every full-page screen draws at x:0 (FullPageRouter), EDGE in from the
+ *  rest of the window. */
+const FULL_PAGE_POSITION = { left: 256 + EDGE, top: EDGE, right: EDGE };
+
 export const SaveFailedBanner: React.FC<{
   /** "<site> · <page>". */
   where: string;
@@ -32,14 +41,14 @@ export const SaveFailedBanner: React.FC<{
   const [col, setCol] = React.useState<DOMRect | null>(null);
   React.useLayoutEffect(() => {
     const el = document.querySelector("[data-bk-toast-anchor]");
-    /* The canvas column collapses to 0 width in full-page views (Settings,
-       Preview, Brand) without unmounting — a zero-width rect must fall back
-       to the viewport-relative default below, or the banner renders in a
-       clamped near-0-width column (measured: 32×482, overlapping whatever
-       sits at x:0). */
+    /* Full-page views (Settings, Brand, Templates) cover the canvas column
+       and squeeze it without unmounting it — to 0 in Settings, to a 48px
+       sliver at x:0 in Brand (measured 2026-10-07: the banner 32px wide over
+       the Brand nav, one word per line). So "non-zero" is not the test; "can
+       hold the card" is, as in chrome-ui/Toast's measureAnchor. */
     const update = () => {
       const rect = el?.getBoundingClientRect() ?? null;
-      setCol(rect && rect.width > 0 ? rect : null);
+      setCol(rect && rect.width - 2 * EDGE >= MIN_WIDTH ? rect : null);
     };
     update();
     window.addEventListener("resize", update);
@@ -55,7 +64,7 @@ export const SaveFailedBanner: React.FC<{
     <Portal>
       <div
         className="tw:fixed tw:z-[60] tw:flex tw:flex-col tw:gap-1 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-error-tint)] tw:px-3 tw:py-2 tw:[font-family:var(--bk-font-ui)]"
-        style={col ? { left: col.left + 8, top: col.top + 8, width: col.width - 16 } : { left: 68, top: 100, right: 336 }}
+        style={col ? { left: col.left + EDGE, top: col.top + EDGE, width: col.width - 2 * EDGE } : FULL_PAGE_POSITION}
         role="alert"
         data-testid="save-failed-banner"
       >
