@@ -146,4 +146,23 @@ describe("applyAiEdit integrity (real Composer)", () => {
     expect(res.proposals).toEqual([{ actionId: "site.publish" }]);
     expect(res.undo).toBeNull();
   });
+  /* Undo all's contract on the real stack: two AI entries come back newest
+     first; with a user edit on top, the AI handle refuses and nothing moves. */
+  it("chained handles undo two AI edits in reverse, and refuse under a user edit", async () => {
+    const { composer, ids } = setup();
+    const before = liveRows(composer);
+    const first = await applyAiEdit(composer, batch(["set-style", { elementId: ids[0], property: "color", value: "red" }]));
+    const second = await applyAiEdit(composer, batch(["set-text", { elementId: ids[1], text: "AI words" }]));
+    expect(second.undo!()).toBe(true);
+    expect(first.undo!()).toBe(true);
+    expect(liveRows(composer)).toEqual(before);
+
+    const { composer: c2, ids: ids2 } = setup();
+    const ai = await applyAiEdit(c2, batch(["set-style", { elementId: ids2[0], property: "color", value: "red" }]));
+    c2.elements.getElement(firstChildId(c2))!.setContent("user edit");
+    c2.history.flushPending();
+    const afterUser = liveRows(c2);
+    expect(ai.undo!()).toBe(false);
+    expect(liveRows(c2)).toEqual(afterUser);
+  });
 });

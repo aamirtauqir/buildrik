@@ -91,7 +91,7 @@ describe("AI column — board 35", () => {
     renderColumn();
     fireEvent.click(screen.getByRole("button", { name: "Try a warmer tone" }));
     expect(lastSubscribe.input?.prompt).toBe("Try a warmer tone");
-    expect(lastSubscribe.input?.scope).toEqual({ kind: "element", id: "h-1" });
+    expect(lastSubscribe.input?.scope).toMatchObject({ kind: "element", id: "h-1" });
   });
 
   it("Enter in the prompt runs it; the typed prompt survives into the run's states", async () => {

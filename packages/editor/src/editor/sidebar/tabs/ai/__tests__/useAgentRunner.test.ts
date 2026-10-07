@@ -21,6 +21,8 @@ const composer = {
     getAllElements: () => [
       { getId: () => "a", getType: () => "heading", getContent: () => "Hi" },
     ],
+    // Element steps snapshot their element (gatherElementContext).
+    getElement: () => undefined,
   },
   // set-token recall (W4): gatherTokens reads the design-token registry.
   getProjectSettings: () => ({ designTokens: [] }),
@@ -45,8 +47,9 @@ beforeEach(() => {
   runPromptOnce.mockReset();
   applyAiEdit.mockReset();
   trackAgentRun.mockReset();
-  // applyAiEdit returns { applied, proposals } — the runner destructures proposals.
-  applyAiEdit.mockResolvedValue({ applied: 1, proposals: [] });
+  // applyAiEdit returns { applied, proposals, undo } — undo is the handle bound
+  // to the history entry the edit recorded (null when it recorded nothing).
+  applyAiEdit.mockResolvedValue({ applied: 1, proposals: [], undo: () => true });
 });
 
 describe("useAgentRunner", () => {
@@ -225,5 +228,159 @@ describe("useAgentRunner", () => {
     await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
     act(() => { result.current.stop(); });
     expect(result.current.steps.map((s) => s.status)).toEqual(["skipped", "skipped"]);
+  });
+  /* An "applied" step is one that recorded a history entry. A proposal-only
+     step (or one whose commands were all no-ops) recorded nothing, and
+     counting it made Undo all take back one of the user's own edits. */
+  it("a step that recorded no history entry is 'nochange', not 'applied'", async () => {
+    runPromptOnce.mockResolvedValue({ plan: null, edit: editWithRows(1), text: "" });
+    applyAiEdit.mockResolvedValue({ applied: 0, proposals: [{ actionId: "site.publish" }], undo: null });
+    const onProposal = vi.fn();
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini", onProposal));
+    await act(async () => { result.current.start("publish it", { id: "a" }); });
+    await waitFor(() => expect(result.current.steps[0]?.status).toBe("awaiting"));
+    await act(async () => { result.current.approve(); });
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+    expect(result.current.steps[0].status).toBe("nochange");
+    expect(onProposal).toHaveBeenCalledWith("site.publish");
+  });
+
+  /* applyAiEdit rolls a failing batch back, then throws. The run must stop
+     there (the same rule as a step that fails to generate), not advance to
+     the next step planned against a state the failed one never produced. */
+  it("a step that fails to apply stops the run and says why", async () => {
+    let generated = 0;
+    runPromptOnce.mockImplementation(async (args: { intent: string }) => {
+      if (args.intent === "plan") return { plan: PLAN, edit: null, text: "" };
+      generated += 1;
+      return { plan: null, edit: editWithRows(1), text: "" };
+    });
+    applyAiEdit.mockRejectedValueOnce(new Error("This element is locked"));
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    await act(async () => { result.current.start("x"); });
+    act(() => { result.current.runPlan(); });
+    await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
+    await act(async () => { result.current.approve(); });
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+    expect(result.current.steps[0].status).toBe("failed");
+    expect(result.current.error).toMatch(/locked/);
+    expect(generated).toBe(1);
+  });
+
+  /* Undo all reverts exactly the run's own entries, newest first, through the
+     handles applyAiEdit returned — and stops at the first one that refuses
+     (a newer user edit sits on top), never undoing the user's work. */
+  it("undoAll undoes only the AI's entries, newest first, and stops at a refusal", async () => {
+    runPromptOnce.mockImplementation(async (args: { intent: string }) =>
+      args.intent === "plan"
+        ? { plan: PLAN, edit: null, text: "" }
+        : { plan: null, edit: editWithRows(1), text: "" },
+    );
+    const order: string[] = [];
+    const undo1 = vi.fn(() => { order.push("1"); return true; });
+    const undo2 = vi.fn(() => { order.push("2"); return true; });
+    applyAiEdit
+      .mockResolvedValueOnce({ applied: 1, proposals: [], undo: undo1 })
+      .mockResolvedValueOnce({ applied: 1, proposals: [], undo: undo2 });
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    await act(async () => { result.current.start("x"); });
+    act(() => { result.current.runPlan(); });
+    await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
+    await act(async () => { result.current.approve(); });
+    await waitFor(() => expect(result.current.steps[1].status).toBe("awaiting"));
+    await act(async () => { result.current.approve(); });
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+
+    let undone = 0;
+    act(() => { undone = result.current.undoAll(); });
+    expect(undone).toBe(2);
+    expect(order).toEqual(["2", "1"]);
+    // Nothing left to take back.
+    act(() => { undone = result.current.undoAll(); });
+    expect(undone).toBe(0);
+  });
+
+  it("undoAll stops when an entry refuses (the user edited after the run)", async () => {
+    runPromptOnce.mockImplementation(async (args: { intent: string }) =>
+      args.intent === "plan"
+        ? { plan: PLAN, edit: null, text: "" }
+        : { plan: null, edit: editWithRows(1), text: "" },
+    );
+    const undo1 = vi.fn(() => true);
+    const undo2 = vi.fn(() => false); // superseded by a newer user edit
+    applyAiEdit
+      .mockResolvedValueOnce({ applied: 1, proposals: [], undo: undo1 })
+      .mockResolvedValueOnce({ applied: 1, proposals: [], undo: undo2 });
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    await act(async () => { result.current.start("x"); });
+    act(() => { result.current.runPlan(); });
+    await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
+    await act(async () => { result.current.approve(); });
+    await waitFor(() => expect(result.current.steps[1].status).toBe("awaiting"));
+    await act(async () => { result.current.approve(); });
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+
+    let undone = -1;
+    act(() => { undone = result.current.undoAll(); });
+    expect(undone).toBe(0);
+    expect(undo2).toHaveBeenCalledTimes(1);
+    expect(undo1).not.toHaveBeenCalled();
+  });
+
+  /* Stop has to reach the server: the request in flight is aborted, so the
+     subscription is torn down rather than left generating. */
+  it("stop aborts the request in flight", async () => {
+    let signal: AbortSignal | undefined;
+    runPromptOnce.mockImplementation((args: { signal?: AbortSignal }) => {
+      signal = args.signal;
+      return new Promise(() => {});
+    });
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    act(() => { result.current.start("x"); });
+    await waitFor(() => expect(signal).toBeDefined());
+    expect(signal!.aborted).toBe(false);
+    act(() => { result.current.stop(); });
+    expect(signal!.aborted).toBe(true);
+  });
+  /* P1-6: an element prompt used to send the id alone, so "make it more
+     concise" asked the model to rewrite copy it had never been shown. The
+     step now carries a capped snapshot of the element, plus the token
+     registry and media library page steps already send. */
+  it("sends an element snapshot, tokens and assets with an element-scoped step", async () => {
+    const child = { getId: () => "c1", getType: () => "text", getContent: () => "<b>child</b> copy", getChildren: () => [] };
+    const el = {
+      getId: () => "a",
+      getType: () => "heading",
+      getTagName: () => "h1",
+      getContent: () => "Welcome   to <em>Bella</em>",
+      getStyles: () => ({ "font-size": "48px", color: "#111111" }),
+      getAttributes: () => ({ title: "Hero", "data-buildrik-id": "a", class: "x" }),
+      getChildren: () => [child],
+    };
+    const withEl = {
+      elements: { getAllElements: () => [el], getElement: (id: string) => (id === "a" ? el : null) },
+      getProjectSettings: () => ({ designTokens: [] }),
+      media: { getAssets: () => [{ id: "m1", src: "https://cdn.x.com/a.jpg", name: "a.jpg", originalName: "a.jpg" }] },
+      emit: vi.fn(),
+    } as never;
+    runPromptOnce.mockResolvedValue({ plan: null, edit: editWithRows(1), text: "" });
+    const { result } = renderHook(() => useAgentRunner(withEl, "gpt-4o-mini"));
+    await act(async () => { result.current.start("make it more concise", { id: "a" }); });
+    await waitFor(() => expect(runPromptOnce).toHaveBeenCalledTimes(1));
+    const scope = runPromptOnce.mock.calls[0][0].scope;
+    expect(scope).toMatchObject({
+      kind: "element",
+      id: "a",
+      context: {
+        type: "heading",
+        tag: "h1",
+        text: "Welcome to Bella",
+        styles: { "font-size": "48px", color: "#111111" },
+        attributes: { title: "Hero" },
+        children: [{ id: "c1", type: "text", text: "child copy" }],
+      },
+      tokens: [],
+      assets: [{ url: "https://cdn.x.com/a.jpg" }],
+    });
   });
 });
