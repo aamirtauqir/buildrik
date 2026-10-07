@@ -41,8 +41,6 @@ export interface UseLayerActionsReturn {
   startEditing: (id: string, currentName: string, e: React.MouseEvent) => void;
   saveEditedName: () => void;
   cancelEditing: () => void;
-  deleteLayer: (id: string, layers: LayerItem[], onConfirm: () => void) => void;
-  duplicateLayer: (id: string) => void;
   moveToTop: (id: string, layers: LayerItem[]) => void;
   moveToBottom: (id: string, layers: LayerItem[]) => void;
   groupLayers: (ids: string[], layers: LayerItem[]) => void;
@@ -295,27 +293,6 @@ export function useLayerActions(
     setEditingName("");
   }, []);
 
-  const deleteLayer = React.useCallback(
-    (id: string, _layers: LayerItem[], onConfirm: () => void) => {
-      if (!composer) return;
-      composer.beginTransaction("delete-layer");
-      composer.elements.removeElement(id);
-      composer.endTransaction();
-      onConfirm();
-    },
-    [composer]
-  );
-
-  const duplicateLayer = React.useCallback(
-    (id: string) => {
-      if (!composer) return;
-      composer.beginTransaction("duplicate-layer");
-      composer.elements.duplicateElement(id);
-      composer.endTransaction();
-    },
-    [composer]
-  );
-
   const moveToTop = React.useCallback(
     (id: string, _layers: LayerItem[]) => {
       if (!composer) return;
@@ -397,8 +374,6 @@ export function useLayerActions(
     startEditing,
     saveEditedName,
     cancelEditing,
-    deleteLayer,
-    duplicateLayer,
     moveToTop,
     moveToBottom,
     groupLayers,
