@@ -77,6 +77,24 @@ function sameRecords(a: ReadonlyArray<ExpectedDnsRecord>, b: ReadonlyArray<Expec
 }
 
 /**
+ * The project does not hold the domain (404): the attach at connect time
+ * failed, or the domain was removed in Vercel. Attach it again so the check
+ * can re-verify it, instead of leaving it FAILED forever (QA D7). A refusal —
+ * 409 (another project holds it) or any other error — keeps it unattached,
+ * which the caller reads as FAILED.
+ */
+async function reattachToProject(opts: { token: string; teamId: string | null; projectName: string; domain: string }) {
+  try {
+    return await addDomainToVercelProject(opts);
+  } catch (err) {
+    if (!(err instanceof VercelApiError && err.status === 409)) {
+      console.error(`[domain] Vercel re-attach failed for ${opts.domain}:`, err);
+    }
+    return null;
+  }
+}
+
+/**
  * Re-check one domain (P6 "⟳ Check now" and the dns-verify cron — the ONE
  * implementation; the cron used to carry its own copy of the node:dns match).
  *
@@ -125,10 +143,8 @@ export async function checkDomainDns(domainId: string, siteId: string) {
         apex: apexOf(domain.domain),
         ownershipToken: dnsVerificationToken(domainId),
       }).filter(isOwnershipTxt);
-      records = [
-        ...records,
-        ...(await Promise.all(ownership.map((r) => prisma.dnsRecord.create({ data: { domainId, ...r } })))),
-      ];
+      await prisma.dnsRecord.createMany({ data: ownership.map((r) => ({ domainId, ...r })), skipDuplicates: true });
+      records = await prisma.dnsRecord.findMany({ where: { domainId } });
     }
     const { any, all } = await resolveRecords(records, apexOf(domain.domain));
     const status = all ? "VERIFIED" : any ? "PENDING" : "FAILED";
@@ -138,7 +154,8 @@ export async function checkDomainDns(domainId: string, siteId: string) {
     const projectName = resolveVercelProjectName(domain.site);
     let vercel: { project: Awaited<ReturnType<typeof getVercelProjectDomain>>; config: VercelDomainConfig | null } | null = null;
     try {
-      const project = await getVercelProjectDomain({ ...conn, projectName, domain: domain.domain });
+      let project = await getVercelProjectDomain({ ...conn, projectName, domain: domain.domain });
+      if (!project) project = await reattachToProject({ ...conn, projectName, domain: domain.domain });
       const config = project ? await getVercelDomainConfig({ ...conn, projectName, domain: domain.domain }) : null;
       vercel = { project, config };
     } catch (err) {
@@ -150,8 +167,19 @@ export async function checkDomainDns(domainId: string, siteId: string) {
     if (vercel?.project && vercel.config) {
       const expected = instructionsFrom({ domain: domain.domain, attached: vercel.project, config: vercel.config, ownershipToken: null });
       if (!sameRecords(expected, records)) {
-        await prisma.dnsRecord.deleteMany({ where: { domainId } });
-        await prisma.dnsRecord.createMany({ data: expected.map((r) => ({ domainId, ...r })) });
+        /* Cron + "Check DNS" can run this at once. Delete only rows that are
+           stale (by id) and insert only what is missing with skipDuplicates,
+           backed by the unique (domainId, type, host, value) index — a
+           delete-all + create-all interleaved into doubled rows. */
+        const recordKey = (r: ExpectedDnsRecord) => `${r.type}\u0000${r.host}\u0000${r.value}`;
+        const wanted = new Set(expected.map(recordKey));
+        const held = new Set(records.map(recordKey));
+        const stale = records.filter((r) => !wanted.has(recordKey(r)));
+        if (stale.length) await prisma.dnsRecord.deleteMany({ where: { domainId, id: { in: stale.map((r) => r.id) } } });
+        await prisma.dnsRecord.createMany({
+          data: expected.filter((r) => !held.has(recordKey(r))).map((r) => ({ domainId, ...r })),
+          skipDuplicates: true,
+        });
         records = await prisma.dnsRecord.findMany({ where: { domainId } });
       }
     }
@@ -255,6 +283,15 @@ export async function listWorkspaceDomains(workspaceId: string, userId: string):
   return rows.map(({ site, ...r }) => ({ ...r, siteName: site.name }));
 }
 
+/**
+ * Whether the site's workspace has a Vercel connection — i.e. whether `connect`
+ * will skip our `_buildrick` TXT (Q6), so the Add-a-domain dialog must not draw it.
+ */
+export async function siteUsesVercel(siteId: string): Promise<boolean> {
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+  return site ? (await getActiveVercelConnection(site.workspaceId)) !== null : false;
+}
+
 export interface ConnectDomainOptions {
   domain: string;
   kind?: DomainKind;
@@ -345,8 +382,19 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
       });
     }
   } catch (err) {
-    if (err instanceof VercelApiError && err.status === 409) throw new Error("DOMAIN_ATTACHED_ELSEWHERE");
-    console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
+    if (err instanceof VercelApiError && err.status === 409) {
+      /* 409 is "already assigned" — to another project, or to OURS (a failed
+         detach, a domain added by hand in Vercel). Only the project's own
+         read tells them apart. */
+      try {
+        attached = attachedWith ? await getVercelProjectDomain({ ...attachedWith, projectName, domain }) : null;
+      } catch {
+        attached = null;
+      }
+      if (!attached) throw new Error("DOMAIN_ATTACHED_ELSEWHERE");
+    } else {
+      console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
+    }
   }
 
   const created = await prisma.domain.create({
@@ -379,6 +427,9 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
 
   await prisma.dnsRecord.createMany({
     data: dnsRecords.map((r) => ({ domainId: created.id, type: r.type, host: r.host, value: r.value })),
+    // Under the (domainId, type, host, value) index a repeated instruction
+    // would throw P2002 after the domain row exists, leaving it with no records.
+    skipDuplicates: true,
   });
 
   /* Connected = Vercel holds it on this project AND its config is not
@@ -447,7 +498,7 @@ export async function setPrimaryDomain(id: string, siteId: string) {
  */
 export async function verifyPendingDomains(limit = 20): Promise<{ checked: number; verified: number }> {
   const due = await prisma.domain.findMany({
-    where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }] },
+    where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }], site: { deletedAt: null } },
     orderBy: [{ lastCheckedAt: { sort: "asc", nulls: "first" } }],
     take: limit,
     select: { id: true, siteId: true },

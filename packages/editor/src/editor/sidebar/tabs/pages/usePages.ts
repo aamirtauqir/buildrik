@@ -25,7 +25,10 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { slugify } from "@shared/utils/helpers/string";
 import type { PageItem, PageStatus } from "./types";
 import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
+import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
+import { pageFileNames } from "@/engine/export/ExportEngine";
+import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 
 /** A page's stored visibility → its panel status. Unset is "live" (what the
  *  deploy does with it). C4 #26: a "password" stored before Password pages
@@ -104,6 +107,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
   const [loaded, setLoaded] = React.useState(() => !siteId || hasProjectLoaded(siteId));
   const [retryKey, setRetryKey] = React.useState(0);
+  const getSiteOrigin = useSiteOrigin(composer, siteId);
 
   // ── Sync from composer ────────────────────────────────────────────────────
   React.useEffect(() => {
@@ -357,16 +361,16 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       const page = pages.find((p) => p.id === pageId);
       setContextMenu(null);
       if (!page) return;
-      const slug = page.slug || page.id;
-      // A4: read real domain from ProjectData metadata. Was previously cast
-      // from a nonexistent `composer.project.domain`, always undefined.
-      const domain = composer?.getProjectMetadata?.()?.domain ?? null;
+      // The host the publish worker puts the page on (typed canonical → verified
+      // primary → published URL). The old `getProjectMetadata().domain` field
+      // does not exist, so Copy link always said "No address yet".
+      const origin = getSiteOrigin();
 
-      // No domain means there is no link yet. Copying a made-up one (this used to
+      // No address means there is no link yet. Copying a made-up one (this used to
       // hand out `yoursite.aquibra.io/<slug>` — a host from the project this was
       // forked from) puts a dead URL in the user's clipboard, which is worse than
       // telling them there isn't one.
-      if (!domain) {
+      if (!origin) {
         addToast({
           title: "No address yet",
           description: "Connect a custom domain in Settings, or publish the site first.",
@@ -375,9 +379,12 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         return;
       }
 
-      const url = `https://${domain}/${slug}`;
+      // The URL the deploy serves, the same as the page drawer's preview: the
+      // file the export writes (index.html → `/`, `about.html`), not `/<slug>`,
+      // which 404s while the generated vercel.json carries no cleanUrls.
+      const url = pageCanonicalUrl(origin, pageFileNames(pages).get(page.id) ?? "index.html") ?? origin;
       /* v3 4418:93929: "Link copied · bellacucina.com/menu". */
-      const successMsg = `Link copied · ${domain}/${slug}`;
+      const successMsg = `Link copied · ${url.replace(/^https?:\/\//, "")}`;
 
       // A8: a copy that cannot land (no clipboard on an insecure origin,
       // or refused) shows the URL so the user can copy it by hand.
@@ -391,7 +398,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
           });
         });
     },
-    [composer, pages, addToast]
+    [pages, addToast, getSiteOrigin]
   );
 
   const retrySync = React.useCallback(() => {

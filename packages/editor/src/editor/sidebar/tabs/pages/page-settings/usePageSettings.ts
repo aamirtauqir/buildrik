@@ -17,8 +17,7 @@ import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore, isPlaceholderSlug } from "../utils/seoScore";
 import { resolvePageTitle } from "@/engine/export/SEOInjector";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
-import { useServerLoad } from "@/editor/sidebar/tabs/settings/hooks/useServerLoad";
-import { siteOrigin, type SiteDomainRow } from "@buildrik/shared/seo/urls";
+import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { normalizeSlug, validateSlug, isSlugDuplicate } from "../utils/slug";
 
 export type SaveState = "clean" | "saving" | "error";
@@ -155,26 +154,8 @@ export function usePageSettings(
 
   const savedSnapshot = React.useRef<string>("");
 
-  /* The two facts the host choice needs that the composer does not hold: the
-     typed canonical (a Site column) and the custom domains. Read on open, as
-     Settings › SEO reads them, so a canonical changed this session counts. */
-  const [siteHost, setSiteHost] = React.useState<{ canonicalUrl: string | null; domains: SiteDomainRow[] }>({
-    canonicalUrl: null,
-    domains: [],
-  });
   const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
-  useServerLoad(
-    siteId,
-    async (client, id) => {
-      const [row, domains] = await Promise.all([
-        client.siteDetail.settings.get.query({ siteId: id }),
-        client.siteDetail.domains.list.query({ siteId: id }).catch((): SiteDomainRow[] => []),
-      ]);
-      return { canonicalUrl: row.canonicalUrl ?? null, domains };
-    },
-    setSiteHost,
-    {},
-  );
+  const getSiteOrigin = useSiteOrigin(composer, siteId);
 
   const applyPersistedState = React.useCallback((p: PageItem) => {
     const state = getPersistedState(p);
@@ -360,7 +341,7 @@ export function usePageSettings(
   /* D2: the host the publish worker puts this page on (`siteOrigin`, the
      same order as the robots.txt preview). It read `metadata.domain`, filled
      from a `sites.get` field that does not exist — always yoursite.com. */
-  const origin = siteOrigin(siteHost.domains, publishedUrl, siteHost.canonicalUrl);
+  const origin = getSiteOrigin();
   const domain = origin ? origin.replace(/^https?:\/\//, "") : null;
 
   return {

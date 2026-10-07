@@ -33,6 +33,12 @@ vi.mock("../../../engine/export", () => ({
   },
 }));
 
+/* The site's published host is server-read (canonical, custom domains); the
+   modal hands it to generateZip so the archive's sitemap names it. */
+vi.mock("@/editor/shared/useSiteOrigin", () => ({
+  useSiteOrigin: () => () => "https://bellacucina.com",
+}));
+
 vi.mock("../../../engine/export/ReactExporter", () => ({
   ReactExporter: class {
     constructor(...args: unknown[]) {
@@ -223,7 +229,10 @@ describe("ExportModal — download flows", () => {
         { download: "Buildrick Export.zip", href: expect.stringContaining("blob:") },
       ])
     );
-    expect(mocks.generateZip).toHaveBeenCalledWith(expect.objectContaining({ format: "zip" }));
+    expect(mocks.generateZip).toHaveBeenCalledWith(
+      expect.objectContaining({ format: "zip" }),
+      "https://bellacucina.com",
+    );
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
   });
 

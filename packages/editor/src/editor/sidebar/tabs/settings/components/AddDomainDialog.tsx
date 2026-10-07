@@ -64,6 +64,8 @@ export interface AddDomainSubmission {
 export interface AddDomainDialogProps {
   open: boolean;
   siteName: string;
+  /** The workspace has Vercel connected, so `connect` writes no `_buildrick` TXT and the preview omits it. */
+  vercelConnected?: boolean;
   /** `domains.checkAvailability` — called 300 ms after the last keystroke of a well-formed name. */
   checkAvailability(domain: string): Promise<DomainAvailability>;
   /** `domains.connect`. Resolve = the caller closes the dialog and re-lists; reject = the reason stays under the form. */
@@ -83,11 +85,12 @@ const KINDS: { id: DomainKind; label: string }[] = [
 /* The records `connect` writes, in the shape the typed name needs — the
    shared `expectedDnsRecords`, so an apex draws A @ + CNAME www (the frame)
    and a subdomain its one CNAME. Only the TXT token is minted per row, so it
-   is the one value still elided. The REAL rows replace this after connect. */
-function expectedRecordsFor(name: string) {
+   is the one value still elided. The REAL rows replace this after connect.
+   A Vercel-connected workspace gets no TXT at all (owner decision Q6). */
+function expectedRecordsFor(name: string, vercelConnected: boolean) {
   const valid = connectDomainSchema.shape.domain.safeParse(name).success;
   const domain = valid ? name : "example.com";
-  return expectedDnsRecords({ domain, apex: apexOf(domain), ownershipToken: `${DNS_TARGETS.txtPrefix}…` });
+  return expectedDnsRecords({ domain, apex: apexOf(domain), ownershipToken: vercelConnected ? null : `${DNS_TARGETS.txtPrefix}…` });
 }
 
 type Availability = "idle" | "checking" | "failed" | DomainAvailability;
@@ -127,7 +130,7 @@ const RECORDS_HEAD =
   "tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
 const RECORDS_CELL = "tw:h-7 tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:text-[var(--bk-ink-soft)]";
 
-export function AddDomainDialog({ open, siteName, checkAvailability, onSubmit, onCancel }: AddDomainDialogProps) {
+export function AddDomainDialog({ open, siteName, vercelConnected = false, checkAvailability, onSubmit, onCancel }: AddDomainDialogProps) {
   const [domain, setDomain] = React.useState("");
   const [kind, setKind] = React.useState<DomainKind>("PRIMARY");
   const [provider, setProvider] = React.useState<DnsProviderId>("namecheap");
@@ -323,7 +326,7 @@ export function AddDomainDialog({ open, siteName, checkAvailability, onSubmit, o
                 </tr>
               </thead>
               <tbody>
-                {expectedRecordsFor(name).map((rec) => (
+                {expectedRecordsFor(name, vercelConnected).map((rec) => (
                   <tr key={rec.type}>
                     <td className={`${RECORDS_CELL} tw:whitespace-nowrap tw:text-[var(--bk-ink)]`}>{rec.type}</td>
                     <td className={`${RECORDS_CELL} tw:whitespace-nowrap`}>{rec.host}</td>

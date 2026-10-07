@@ -9,7 +9,22 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Mock } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 
-const { addToastMock } = vi.hoisted(() => ({ addToastMock: vi.fn() }));
+const { addToastMock, api, site } = vi.hoisted(() => ({
+  addToastMock: vi.fn(),
+  api: {
+    siteDetail: {
+      settings: { get: { query: vi.fn() } },
+      domains: { list: { query: vi.fn() } },
+    },
+  },
+  site: { id: null as string | null },
+}));
+
+vi.mock("@/services/api-client", () => ({ getBuildrikClient: () => api }));
+vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/BuildrikSyncProvider")>()),
+  getSiteIdFromUrl: () => site.id,
+}));
 
 vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
@@ -52,6 +67,9 @@ function setup(composer: MockComposer) {
 
 beforeEach(() => {
   addToastMock.mockClear();
+  site.id = null;
+  api.siteDetail.settings.get.query.mockReset().mockResolvedValue({ canonicalUrl: null });
+  api.siteDetail.domains.list.query.mockReset().mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -372,10 +390,50 @@ describe("usePages copyPageLink", () => {
     expect(lastToast()).toMatchObject({ title: "No address yet", tone: "info" });
   });
 
-  it("writes https://<domain>/<slug> to the clipboard and toasts the copied link", async () => {
+  /* The `domain` metadata field does not exist (SEO D2): Copy link read it
+     and always said "No address yet". The host is `siteOrigin`'s answer. */
+  it("uses a verified primary custom domain over the published URL", async () => {
+    site.id = "s1";
+    api.siteDetail.domains.list.query.mockResolvedValue([{ domain: "bellacucina.com", status: "VERIFIED", isPrimary: true }]);
     const composer = createMockComposer({
-      pages: [pg("p1", "Home")],
-      projectMetadata: { domain: "example.com" },
+      pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
+      projectMetadata: { publishedUrl: "https://bella.vercel.app" },
+    });
+    const writeText = vi.fn(() => Promise.resolve());
+    defineClipboard({ writeText });
+    const { result } = setup(composer);
+    await waitFor(() => expect(api.siteDetail.domains.list.query).toHaveBeenCalled());
+    await act(async () => {});
+
+    act(() => result.current.copyPageLink("p2"));
+
+    expect(writeText).toHaveBeenCalledWith("https://bellacucina.com/menu.html");
+  });
+
+  it("a typed canonical wins over everything", async () => {
+    site.id = "s1";
+    api.siteDetail.settings.get.query.mockResolvedValue({ canonicalUrl: "https://www.bella.example" });
+    const composer = createMockComposer({
+      pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
+      projectMetadata: { publishedUrl: "https://bella.vercel.app" },
+    });
+    const writeText = vi.fn(() => Promise.resolve());
+    defineClipboard({ writeText });
+    const { result } = setup(composer);
+    await waitFor(() => expect(api.siteDetail.settings.get.query).toHaveBeenCalled());
+    await act(async () => {});
+
+    act(() => result.current.copyPageLink("p2"));
+
+    expect(writeText).toHaveBeenCalledWith("https://www.bella.example/menu.html");
+  });
+
+  /* The served URL, as the page drawer previews it: home is the bare origin,
+     every other page its written file (no cleanUrls yet), never `/<slug>`. */
+  it("copies the home page as the site root", async () => {
+    const composer = createMockComposer({
+      pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
+      projectMetadata: { publishedUrl: "https://bella.vercel.app/" },
     });
     const writeText = vi.fn(() => Promise.resolve());
     defineClipboard({ writeText });
@@ -383,10 +441,24 @@ describe("usePages copyPageLink", () => {
 
     act(() => result.current.copyPageLink("p1"));
 
-    expect(writeText).toHaveBeenCalledWith("https://example.com/home");
+    expect(writeText).toHaveBeenCalledWith("https://bella.vercel.app/");
+  });
+
+  it("writes the served page URL to the clipboard and toasts the copied link", async () => {
+    const composer = createMockComposer({
+      pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
+      projectMetadata: { publishedUrl: "https://example.com" },
+    });
+    const writeText = vi.fn(() => Promise.resolve());
+    defineClipboard({ writeText });
+    const { result } = setup(composer);
+
+    act(() => result.current.copyPageLink("p2"));
+
+    expect(writeText).toHaveBeenCalledWith("https://example.com/menu.html");
     await waitFor(() =>
       expect(lastToast()).toMatchObject({
-        description: "Link copied · example.com/home",
+        description: "Link copied · example.com/menu.html",
         tone: "success",
       })
     );
@@ -397,8 +469,8 @@ describe("usePages copyPageLink", () => {
      carries the URL so the user can copy it by hand. */
   it("shows the URL to copy by hand when nothing can copy", async () => {
     const composer = createMockComposer({
-      pages: [pg("p1", "Home")],
-      projectMetadata: { domain: "example.com" },
+      pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
+      projectMetadata: { publishedUrl: "https://example.com" },
     });
     defineClipboard(undefined);
     const { result } = setup(composer);
@@ -407,7 +479,7 @@ describe("usePages copyPageLink", () => {
 
     await waitFor(() =>
       expect(lastToast()).toMatchObject({
-        description: "Couldn't copy. Link: https://example.com/home",
+        description: "Couldn't copy. Link: https://example.com/",
         tone: "error",
       }),
     );

@@ -18,6 +18,8 @@ import { FormatGrid, OptionsPanel } from "./ExportOptions";
 import { downloadFile } from "./ExportUtils";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { PreviewFrame } from "./PreviewFrame";
+import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -65,6 +67,10 @@ type DownloadPhase = "idle" | "preparing" | "ready" | "failed";
 const READY_AUTO_CLEAR_MS = 1600;
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, composer }) => {
+  const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
+  /* The modal stays mounted for the whole session; reading on open keeps a
+     canonical or domain changed since then in the ZIP's sitemap. */
+  const getSiteOrigin = useSiteOrigin(composer, isOpen ? siteId : null);
   const [downloadPhase, setDownloadPhase] = React.useState<DownloadPhase>("idle");
   const [downloadedFile, setDownloadedFile] = React.useState("");
   const [downloadError, setDownloadError] = React.useState("");
@@ -186,7 +192,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
     setDownloadPhase("preparing");
     try {
       const engine = new ExportEngine(composer, config);
-      const zipBlob = await engine.generateZip(config);
+      const zipBlob = await engine.generateZip(config, getSiteOrigin());
       const url = URL.createObjectURL(zipBlob);
       const a = document.createElement("a");
       a.href = url;
