@@ -14,6 +14,7 @@ import type { BlockData, ElementType } from "../../../shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "../../../shared/utils/dragDrop/animations";
 import { canNestElement, getSuggestedParents } from "../../../shared/utils/nesting";
+import { writableElements } from "@/engine/commands/commandOperations";
 import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { elementLocation, getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
 
@@ -82,6 +83,10 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
         const replaceId = takeReplaceTarget(composer);
         const replaced = replaceId ? composer.elements.getElement(replaceId) : undefined;
         const replacedParent = replaced?.getParent();
+        /* The block takes the marked element's place, so a locked one refuses
+           the whole replace (the lock gate says so) — it used to be removed
+           (audit 2026-10-08 P1-3). */
+        if (replaced && writableElements(composer, [replaced]).length === 0) return;
 
         if (replaced && replacedParent) {
           parentId = replacedParent.getId();

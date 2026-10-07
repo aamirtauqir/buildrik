@@ -226,6 +226,52 @@ describe("useCanvasElementDrag", () => {
     });
   });
 
+  /* Audit 2026-10-08 P1-3: a plain click refused a locked element, but a
+     mousedown → drag moved it anyway. */
+  describe("dragstart — a locked element does not move", () => {
+    function lockedComposer() {
+      return makeComposer({
+        emit: vi.fn(),
+        elements: {
+          getElement: vi.fn((id: string) => ({
+            getId: () => id,
+            getType: () => "text",
+            getParent: () => null,
+            isLocked: () => id === "el-1",
+          })),
+          duplicateElement: vi.fn(),
+        },
+      });
+    }
+
+    it("refuses the drag with the locked signal", () => {
+      composer = lockedComposer();
+      mountHook();
+      const ev = dragEvent("dragstart", makeDataTransfer());
+      child.dispatchEvent(ev);
+      expect(ev.defaultPrevented).toBe(true);
+      expect(composer.canvas.drag.start).not.toHaveBeenCalled();
+      expect(onDraggingChange).not.toHaveBeenCalled();
+      expect((composer as unknown as { emit: ReturnType<typeof vi.fn> }).emit).toHaveBeenCalledWith(
+        "clipboard:locked-elements-skipped",
+        undefined,
+      );
+    });
+
+    it("refuses a multi-drag that carries a locked element", () => {
+      composer = lockedComposer();
+      composer.selection.getSelectedIds = vi.fn(() => ["el-2", "el-1"]);
+      const other = document.createElement("div");
+      other.setAttribute("data-buildrick-id", "el-2");
+      canvas.appendChild(other);
+      mountHook();
+      const ev = dragEvent("dragstart", makeDataTransfer());
+      other.dispatchEvent(ev);
+      expect(ev.defaultPrevented).toBe(true);
+      expect(onDraggingChange).not.toHaveBeenCalled();
+    });
+  });
+
   describe("dragstart — Ctrl/Cmd+drag clone mode", () => {
     it("duplicates the element in a clone-element transaction and drags the clone", () => {
       const clone = { getId: () => "el-1-copy", getType: () => "text", getParent: () => null };

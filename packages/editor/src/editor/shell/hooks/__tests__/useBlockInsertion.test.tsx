@@ -40,7 +40,10 @@ vi.mock("@/shared/utils/nesting", () => ({
   getSuggestedParents: mocks.getSuggestedParents,
 }));
 
-vi.mock("@/shared/utils/dragDrop/animations", () => ({
+/* importOriginal: the hook now reaches the engine lock gate, whose module
+   loads the dragDrop barrel, which reads every animation export. */
+vi.mock("@/shared/utils/dragDrop/animations", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shared/utils/dragDrop/animations")>()),
   animateDropSuccess: mocks.animateDropSuccess,
 }));
 
@@ -157,6 +160,20 @@ describe("useBlockInsertion", () => {
     expect(composer.elements.removeElement).toHaveBeenCalledWith("sec-2");
     expect(mocks.addToast).toHaveBeenCalledWith(expect.objectContaining({ description: expect.stringMatching(/replaced with Hero/) }));
     expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  /* Audit 2026-10-08 P1-3: the replace removed a locked section. */
+  it("a locked marked element is not replaced: nothing inserted, nothing removed, the locked signal", () => {
+    const root = elements.get("root-1")!;
+    const old = { ...makeElement("sec-2", "section", { getParent: () => root as never }), isLocked: () => true };
+    elements.set("sec-2", old);
+    selectedIds = ["sec-2"];
+    requestReplaceWithBlock(composer as unknown as Composer, "sec-2");
+    const { result } = mountHook();
+    act(() => result.current.handleBlockClick(heroBlock));
+    expect(mocks.insertBlock).not.toHaveBeenCalled();
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith("clipboard:locked-elements-skipped", undefined);
   });
 
   it("a replace is dropped once the selection moved elsewhere (plain insert)", () => {
