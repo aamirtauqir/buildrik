@@ -187,6 +187,34 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
     expect(persisted).not.toMatch(/onerror/i);
   });
 
+  /* Audit 2026-10-08 P2-2: the commit also called composer.saveProject(), which
+     with a site bound only writes localStorage yet marks the project saved —
+     the saved indicator cleared before the server had the edit. The
+     transaction's project:changed already schedules the real autosave. */
+  it("a commit leaves saving to autosave — it does not call saveProject", () => {
+    const composer = {
+      beginTransaction: vi.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
+      endTransaction: vi.fn(),
+      emit: vi.fn(),
+      saveProject: vi.fn().mockResolvedValue(undefined),
+      elements: { getElement: vi.fn().mockReturnValue({ setContent: vi.fn() }) },
+    } as unknown as Composer;
+    const { result } = renderHook(() => useCanvasInlineEdit({ composer, canvasRef }));
+    act(() => {
+      result.current.handleDoubleClick({ target: editableEl, stopPropagation: vi.fn() } as unknown as React.MouseEvent);
+    });
+    act(() => {
+      editableEl.innerHTML = "Edited";
+    });
+    act(() => {
+      outsideEl.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, button: 0 }));
+    });
+    expect(composer.beginTransaction).toHaveBeenCalledWith("inline-edit");
+    expect(composer.saveProject).not.toHaveBeenCalled();
+  });
+
   /* Found live 2026-08-14: clicking any of the toolbar's eighteen controls
      ended the edit session. Two contracts pin the fix. The guard: mousedown
      inside .bd-inline-toolbar must not finish the edit — the class is
