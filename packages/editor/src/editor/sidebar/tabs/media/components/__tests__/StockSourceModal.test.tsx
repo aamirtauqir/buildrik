@@ -58,7 +58,7 @@ function mount(over: Partial<React.ComponentProps<typeof StockSourceModal>> = {}
     videos: [],
     loading: { img: false, vid: false, ico: false, fnt: false },
     searchQuery: "",
-    searchFailed: null,
+    searchFailed: { img: null, vid: null },
     onSearch: vi.fn(),
     orientation: "all",
     color: "all",
@@ -242,37 +242,42 @@ describe("StockSourceModal — a failure never poses as an empty result", () => 
   });
 
   it("says nothing matched when the search genuinely returned nothing", () => {
-    mount({ searchQuery: "asdfgh", searchFailed: null });
+    mount({ searchQuery: "asdfgh", searchFailed: { img: null, vid: null } });
     expect(screen.getByText(/No photos found for/i)).toBeInTheDocument();
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("names the missing configuration instead of blaming the query", () => {
-    mount({ searchQuery: "cats", searchFailed: "not-configured" });
+    mount({ searchQuery: "cats", searchFailed: { img: "not-configured", vid: null } });
     expect(screen.getByRole("alert").textContent).toMatch(/not set up|isn't configured|not configured/i);
     expect(screen.queryByText(/No photos found for/i)).toBeNull();
   });
 
   it("distinguishes a rejected key from an unconfigured one", () => {
-    mount({ searchQuery: "cats", searchFailed: "unauthorized" });
+    mount({ searchQuery: "cats", searchFailed: { img: "unauthorized", vid: null } });
     expect(screen.getByRole("alert").textContent).toMatch(/key/i);
   });
 
   it("offers Try again only for a failure retrying can fix", () => {
     const onSearch = vi.fn();
-    const retryable = mount({ searchQuery: "cats", searchFailed: "request-failed", onSearch });
+    const retryable = mount({ searchQuery: "cats", searchFailed: { img: "request-failed", vid: null }, onSearch });
     fireEvent.click(retryable.getByText("Try again"));
     expect(onSearch).toHaveBeenCalledWith("cats");
     retryable.unmount();
 
     // Retrying cannot conjure an API key — offering the button would be a lie.
-    const unconfigured = mount({ searchQuery: "cats", searchFailed: "not-configured" });
+    const unconfigured = mount({ searchQuery: "cats", searchFailed: { img: "not-configured", vid: null } });
     expect(unconfigured.queryByText("Try again")).toBeNull();
+  });
+
+  it("a video-provider failure does not replace the photos tab's results", () => {
+    mount({ searchQuery: "cats", searchFailed: { img: null, vid: "not-configured" } });
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("the three failure messages are all different from one another", () => {
     const texts = (["not-configured", "unauthorized", "request-failed"] as const).map((reason) => {
-      const { unmount } = mount({ searchQuery: "cats", searchFailed: reason });
+      const { unmount } = mount({ searchQuery: "cats", searchFailed: { img: reason, vid: null } });
       const text = screen.getByRole("alert").textContent ?? "";
       unmount();
       return text;
