@@ -55,14 +55,14 @@ describe("dropMedia — elsewhere inserts a new image", () => {
   it("dropped on a section: a new image at the drop point, selected, the section untouched", () => {
     const c = load();
     const out = dropMedia(c, { src: NEW, type: "image", alt: "A cat", targetId: "section", x: 40, y: 60 });
-    expect(out?.kind).toBe("added");
-    const added = c.elements.getElement(out!.elementId)!;
+    if (out?.kind !== "added") throw new Error(`expected an insert, got ${JSON.stringify(out)}`);
+    const added = c.elements.getElement(out.elementId)!;
     expect(added.getType()).toBe("image");
     expect(added.getAttribute("src")).toBe(NEW);
     expect(added.getAttribute("alt")).toBe("A cat");
     expect(added.getStyle("left")).toBe("40px");
     expect(c.elements.getElement("section")!.getAttribute("src")).toBeFalsy();
-    expect(c.selection.getSelected()?.getId()).toBe(out!.elementId);
+    expect(c.selection.getSelected()?.getId()).toBe(out.elementId);
   });
 
   it("dropped on the page root (empty canvas) inserts too", () => {
