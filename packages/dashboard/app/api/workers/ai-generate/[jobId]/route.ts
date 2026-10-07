@@ -28,12 +28,34 @@ import { sanitizeBlocks } from "@lib/sanitize-blocks";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-const VALID_PAGE_TYPES = ["landing", "portfolio", "product", "pricing", "blog"] as const;
-type PageType = (typeof VALID_PAGE_TYPES)[number];
+type PageType = "landing" | "portfolio" | "product" | "pricing" | "blog";
+
+/* The wizard sends display names (`SUGGESTED_PAGE_NAMES` plus the always-on
+   "Home"); this used to match only the lowercase enum, so every page fell back
+   to "landing". Names with no page type of their own (About, Contact, FAQ)
+   still use the landing section order — the page name in the prompt below is
+   what makes their copy differ. */
+const PAGE_TYPE_BY_NAME: Record<string, PageType> = {
+  home: "landing",
+  landing: "landing",
+  services: "product",
+  service: "product",
+  product: "product",
+  products: "product",
+  features: "product",
+  pricing: "pricing",
+  plans: "pricing",
+  portfolio: "portfolio",
+  work: "portfolio",
+  projects: "portfolio",
+  gallery: "portfolio",
+  blog: "blog",
+  news: "blog",
+  articles: "blog",
+};
 
 function asPageType(name: string): PageType {
-  const n = name.toLowerCase();
-  return (VALID_PAGE_TYPES as readonly string[]).includes(n) ? (n as PageType) : "landing";
+  return PAGE_TYPE_BY_NAME[name.trim().toLowerCase()] ?? "landing";
 }
 
 function slugify(s: string): string {
@@ -145,7 +167,10 @@ export async function POST(
       const pageName = pages[i];
       const result = await generatePage({
         pageType: asPageType(pageName),
-        description,
+        // generatePage has no page-name field; its per-section prompt is
+        // "Generate a <section> section for: <description>", so the name rides
+        // there. Without it every page got the identical prompt.
+        description: `the "${pageName}" page of this site. ${description}`,
         style: safeStyle,
         tone: safeTone,
       });

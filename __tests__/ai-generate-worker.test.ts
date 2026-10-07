@@ -174,6 +174,36 @@ describe("ai-generate worker", () => {
     expect(rows[0].blocks.id).toBe("root");
   });
 
+  /* F-03: the wizard sends display names ("Home", "About", "Services", ...).
+     asPageType only matched the lowercase enum, so every page became
+     "landing", and the page name never reached the model — every page got the
+     same prompt and came back near-identical. */
+  it("maps the wizard's page names to page types and tells the model which page it is writing", async () => {
+    p.aIGenerationJob.findUnique.mockResolvedValue({
+      id: "j9", status: "QUEUED", workspaceId: "w1", userId: "u1",
+      businessType: "BUSINESS", selectedPages: ["Home", "About", "Services", "Pricing", "Portfolio", "Blog", "Contact"],
+      description: "A bakery", metadata: {},
+    });
+    p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
+    p.site.findMany.mockResolvedValue([]);
+    txSiteCreate.mockResolvedValue({ id: "site-9" });
+    txPageCreateMany.mockResolvedValue({ count: 7 });
+    txJobUpdateMany.mockResolvedValue({ count: 1 });
+    genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
+
+    await POST(req("secret"), ctx);
+
+    const calls = genPage.mock.calls.map((c) => c[0] as { pageType: string; description: string });
+    expect(calls.map((c) => c.pageType)).toEqual([
+      "landing", "landing", "product", "pricing", "portfolio", "blog", "landing",
+    ]);
+    const names = ["Home", "About", "Services", "Pricing", "Portfolio", "Blog", "Contact"];
+    calls.forEach((c, i) => {
+      expect(c.description).toContain(names[i]);
+      expect(c.description).toContain("A bakery");
+    });
+  });
+
   it("forwards a tone the 3-value style cannot express", async () => {
     p.aIGenerationJob.findUnique.mockResolvedValue({
       id: "j2", status: "QUEUED", workspaceId: "w1", userId: "u1",
