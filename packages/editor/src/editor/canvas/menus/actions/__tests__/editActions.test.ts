@@ -2,9 +2,8 @@
  * editActions — copy/paste feedback + clipboard wiring test
  *
  * Recovery Phase 1 (feedback layer). Two things this locks in:
- *   1. Context-menu Copy populates `composer.clipboard` (the in-app clipboard
- *      the engine `paste` command reads), not only the OS clipboard. Without
- *      this, copy→paste from the right-click menu silently did nothing.
+ *   1. Context-menu Copy is the engine `copy` command (the in-app clipboard
+ *      the engine `paste` command reads), the same action as ⌘C.
  *   2. Context-menu Paste reports its outcome: an info toast when there is
  *      nothing to paste, a success toast after a real paste — and it runs the
  *      real engine `paste` command instead of emitting a dead event.
@@ -42,25 +41,29 @@ function buildMockElement() {
   } as unknown as Element;
 }
 
-describe("editActions — copy populates the in-app clipboard", () => {
+/* Audit 2026-10-08 P1-4: the row used to write `[element.getData()]` itself —
+   one element out of a multi-selection, with getData()'s stale children, and
+   its own toast. It is now the engine `copy` (⌘C): whole selection, pruned,
+   serialised fresh, CLIPBOARD_COPY → useClipboardToasts. */
+describe("editActions — copy runs the engine command", () => {
   let composer: Composer;
 
   beforeEach(() => {
     composer = buildMockComposer();
   });
 
-  it("copy sets composer.clipboard from element.getData()", () => {
+  it("copy runs composer.commands.run('copy') and writes no clipboard or toast itself", () => {
     const copy = editSubmenu.find((a) => a.id === "copy");
     expect(copy).toBeDefined();
+    const element = buildMockElement();
+    const addToast = vi.fn();
 
-    copy!.handler!({
-      composer,
-      element: buildMockElement(),
-      isRoot: false,
-      addToast: vi.fn(),
-    } as Ctx);
+    copy!.handler!({ composer, element, isRoot: false, addToast } as Ctx);
 
-    expect(composer.clipboard).toEqual([sampleData]);
+    expect(composer.commands.run).toHaveBeenCalledWith("copy");
+    expect(element.getData).not.toHaveBeenCalled();
+    expect(composer.clipboard).toBeNull();
+    expect(addToast).not.toHaveBeenCalled();
   });
 });
 

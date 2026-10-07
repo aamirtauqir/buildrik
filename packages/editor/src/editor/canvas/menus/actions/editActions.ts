@@ -15,29 +15,23 @@ export const editSubmenu: ContextAction[] = [
     icon: "clipboard",
     group: "Edit",
     shortcut: "Cmd+C",
-    handler: ({ composer, element, addToast }) => {
-      const data = element.getData?.();
-      // Populate the in-app clipboard (not only the OS clipboard) so the
-      // context-menu Paste below — which runs the engine `paste` command —
-      // has something to paste. Without this, copy→paste from the right-click
-      // menu silently did nothing (the two used separate clipboards).
-      if (composer) composer.clipboard = data ? [data] : null;
-      const text = JSON.stringify(data, null, 2);
-      writeClipboardText(text)
-        .then(() => {
-          addToast?.({
-            description: "Copied to clipboard",
-            tone: "success",
-            duration: 2000,
-          });
-        })
-        .catch(() => {
-          addToast?.({
-            description: "Failed to copy to clipboard",
-            tone: "error",
-            duration: 3000,
-          });
+    /* The engine `copy` — the same action as ⌘C: the whole selection (the
+       right-click keeps a multi-selection), pruned to top-most, serialised
+       fresh (getData() carries stale children), and CLIPBOARD_COPY, which
+       useClipboardToasts turns into the one "Copied" toast. This row used to
+       write `[element.getData()]` and toast for itself (audit 2026-10-08
+       P1-4). The OS-clipboard copy, for pasting outside the app, is built
+       from what the command put on the in-app clipboard. */
+    handler: ({ composer, addToast }) => {
+      composer.commands.run("copy");
+      if (!composer.clipboard?.length) return;
+      writeClipboardText(JSON.stringify(composer.clipboard, null, 2)).catch(() => {
+        addToast?.({
+          description: "Failed to copy to clipboard",
+          tone: "warning",
+          duration: 3000,
         });
+      });
     },
   },
   {
