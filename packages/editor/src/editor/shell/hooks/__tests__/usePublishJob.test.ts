@@ -416,6 +416,57 @@ describe("usePublishJob", () => {
     });
   });
 
+  /* P2-1 (2026-10-08 audit): the poll was a bare setInterval over an async
+     tick. A slow tick still in flight when a later one applied COMPLETED (and
+     stopped polling) then landed BUILDING over it — "publishing" forever, no
+     outcome toast. Ticks no longer overlap, and a response from a poll that
+     has since stopped or moved to another job is dropped. */
+  describe("poll sequencing (P2-1)", () => {
+    it("does not send a status request while the previous one is still in flight", async () => {
+      let release: (s: PublishStatus) => void = () => {};
+      mockFetchStatus.mockImplementationOnce(() => new Promise((r) => { release = r; }));
+      mockFetchStatus.mockResolvedValue(statusOf("COMPLETED", { progress: 100, publishedUrl: "https://x" }));
+
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+      await advance(2000);
+      await advance(2000);
+      expect(mockFetchStatus).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        release(statusOf("BUILDING", { progress: 40 }));
+      });
+      await advance(2000);
+      expect(mockFetchStatus).toHaveBeenCalledTimes(2);
+      expect(result.current.uiState).toBe("published");
+    });
+
+    it("drops a response that belongs to a job the hook has moved off", async () => {
+      let release: (s: PublishStatus) => void = () => {};
+      mockFetchStatus.mockImplementationOnce(() => new Promise((r) => { release = r; }));
+      mockFetchStatus.mockResolvedValue(statusOf("QUEUED", { jobId: "job-2" }));
+
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+
+      act(() => result.current.track("job-2"));
+      await flushMicrotasks();
+      await act(async () => {
+        release(statusOf("FAILED", { error: "old job" }));
+      });
+
+      expect(result.current.jobId).toBe("job-2");
+      expect(result.current.uiState).toBe("publishing");
+      expect(result.current.error).toBeNull();
+    });
+  });
+
   describe("mount hydration from fetchSitePublishState", () => {
     it("hydrates a previously published site to 'published' with no job", async () => {
       mockGetSiteId.mockReturnValue("site-9");
