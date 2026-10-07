@@ -98,6 +98,12 @@ export async function publishSite(
     if (raiseSaveConflict(err)) {
       throw new Error("This site changed somewhere else since you opened it. Resolve the conflict, then publish.");
     }
+    /* The server words the refusal for people; the code the "Vercel not
+       connected · Open settings" toast keys on arrives as data.cause.reason. */
+    const reason = (err as { data?: { cause?: { reason?: unknown } } }).data?.cause?.reason;
+    if (reason === "VERCEL_NOT_CONNECTED" && err instanceof Error) {
+      throw new Error(`VERCEL_NOT_CONNECTED: ${err.message}`);
+    }
     throw err;
   }
 }
