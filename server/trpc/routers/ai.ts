@@ -21,7 +21,13 @@ import {
   releaseQuota,
   resolveModelForUser,
 } from "../../services/quota.service";
-import { modelSchema, DEFAULT_MODEL, aiQuotaSchema } from "@buildrik/shared/schemas/ai";
+import {
+  modelSchema,
+  DEFAULT_MODEL,
+  aiQuotaSchema,
+  aiElementContextSchema,
+  AI_SUMMARY_LIMITS,
+} from "@buildrik/shared/schemas/ai";
 import { aiAdoptionInputSchema } from "@buildrik/shared/schemas/ai-adoption";
 import { recordAiAdoption } from "../../services/ai-adoption.service";
 
@@ -79,9 +85,9 @@ const layoutInputSchema = z.object({
 });
 
 const summarizeInputSchema = z.object({
-  versionName: z.string().min(1).max(200),
+  versionName: z.string().min(1).max(AI_SUMMARY_LIMITS.versionName),
   changes: z.object({
-    elementName: z.string().max(200),
+    elementName: z.string().max(AI_SUMMARY_LIMITS.elementName),
     summary: z.object({
       style: z.number().int().nonnegative(),
       text: z.number().int().nonnegative(),
@@ -93,12 +99,12 @@ const summarizeInputSchema = z.object({
       .array(
         z.object({
           type: z.enum(["style", "text", "layout", "content", "other"]),
-          property: z.string().max(100),
-          before: z.string().max(2000),
-          after: z.string().max(2000),
+          property: z.string().max(AI_SUMMARY_LIMITS.property),
+          before: z.string().max(AI_SUMMARY_LIMITS.value),
+          after: z.string().max(AI_SUMMARY_LIMITS.value),
         })
       )
-      .max(200),
+      .max(AI_SUMMARY_LIMITS.changes),
   }),
 });
 
@@ -143,7 +149,16 @@ const mediaAssetRefSchema = z.object({
 });
 
 const scopeSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("element"), id: z.string().min(1).max(100) }),
+  // Element scope carries a capped snapshot of the element (so the model sees
+  // what it edits) plus the same token registry / media library page scope
+  // sends, for set-token and image recall on a single element.
+  z.object({
+    kind: z.literal("element"),
+    id: z.string().min(1).max(100),
+    context: aiElementContextSchema.optional(),
+    tokens: z.array(tokenRefSchema).max(120).optional(),
+    assets: z.array(mediaAssetRefSchema).max(100).optional(),
+  }),
   // Page scope may carry the page's element list for multi-element edits (P3),
   // the design-token registry for set-token recall (W4), and the media library
   // for set-image recall (W5).
@@ -366,7 +381,14 @@ export const aiRouter = router({
         try {
           commands =
             input.scope.kind === "element"
-              ? await generateEditCommands({ prompt: input.prompt, elementId: input.scope.id, model })
+              ? await generateEditCommands({
+                  prompt: input.prompt,
+                  elementId: input.scope.id,
+                  context: input.scope.context,
+                  tokens: input.scope.tokens ?? [],
+                  assets: input.scope.assets ?? [],
+                  model,
+                })
               : await generatePageEditCommands({
                   prompt: input.prompt,
                   elements: input.scope.elements ?? [],

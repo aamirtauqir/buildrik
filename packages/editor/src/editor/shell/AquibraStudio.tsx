@@ -379,15 +379,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     };
   }, [composer]);
 
-  // The Issues panel had a state slot but no producer, so it rendered "No
-  // issues" no matter how many the DS linter had found. `useIssuesFeed`
-  // bridges DS-lint (designSystem.lintState) live, and — B-15 / A02-9's
-  // decision-free fix — folds in the page-content scanner (missing alt,
-  // broken links) and the SAME pre-publish check list the Publish panel
-  // renders verbatim, so Issues and Publish stop disagreeing about what's
-  // wrong with the site.
-  const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues);
-
   // 60-save-states: track connectivity so the topbar can reassure "changes
   // queued, will sync" instead of looking like a failed/lost save.
   const [isOffline, setIsOffline] = React.useState(() => typeof navigator !== "undefined" && !navigator.onLine);
@@ -428,6 +419,19 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     addToast,
     setExportLoading: modals.setExportLoading,
+  });
+  // The Issues panel had a state slot but no producer, so it rendered "No
+  // issues" no matter how many the DS linter had found. `useIssuesFeed`
+  // bridges DS-lint (designSystem.lintState) live, and — B-15 / A02-9's
+  // decision-free fix — folds in the page-content scanner (missing alt,
+  // broken links) and the SAME pre-publish check list the Publish panel
+  // renders verbatim, so Issues and Publish stop disagreeing about what's
+  // wrong with the site.
+  // Its server check rows re-read when a publish settles and when the panel
+  // opens (IR-1), as well as after a save and on return to the tab.
+  const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues, {
+    publishState: publishJob.uiState,
+    panelOpen: issuesOpen,
   });
 
   /* ── The site's ONE next move, derived once (B4, decision #34) ────────────
