@@ -62,9 +62,8 @@ const PRIVILEGED_ACTIONS: Record<string, ActionDef> = {
     execute: async (ctx, claims, payload) => {
       // Re-check the site role via the domain path — the token is not a role grant.
       await checkSiteRole(ctx.prisma, claims.actorId, claims.siteId, "EDITOR");
-      const workspaceId = await resolveWorkspaceId(ctx);
       const { pages } = payload as { pages?: PublishPage[] };
-      return startPublish(claims.siteId, workspaceId, claims.actorId, pages);
+      return startPublish(claims.siteId, claims.actorId, pages);
     },
   },
 };

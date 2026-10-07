@@ -109,17 +109,17 @@ describe("getPublishHistory", () => {
 describe("rollbackPublish", () => {
   it("refuses a target that isn't found in the workspace (IDOR)", async () => {
     jobFindFirst.mockResolvedValue(null);
-    await expect(rollbackPublish("ws1", "s1", "jX", "u1")).rejects.toThrow(/NOT_FOUND/);
+    await expect(rollbackPublish("s1", "jX", "u1")).rejects.toThrow(/NOT_FOUND/);
   });
 
   it("refuses a non-completed target", async () => {
     jobFindFirst.mockResolvedValue({ id: "j1", status: "FAILED", log: { pages: [] } });
-    await expect(rollbackPublish("ws1", "s1", "j1", "u1")).rejects.toThrow(/NOT_ROLLBACKABLE/);
+    await expect(rollbackPublish("s1", "j1", "u1")).rejects.toThrow(/NOT_ROLLBACKABLE/);
   });
 
   it("refuses a completed target whose payload was pruned", async () => {
     jobFindFirst.mockResolvedValue({ id: "j1", status: "COMPLETED", log: null });
-    await expect(rollbackPublish("ws1", "s1", "j1", "u1")).rejects.toThrow(/NOT_ROLLBACKABLE/);
+    await expect(rollbackPublish("s1", "j1", "u1")).rejects.toThrow(/NOT_ROLLBACKABLE/);
   });
 
   it("re-publishes the stored version as a NEW job, bypassing the approval gate, tagged rolledBackFrom", async () => {
@@ -131,7 +131,7 @@ describe("rollbackPublish", () => {
     siteFindUnique.mockResolvedValue({ name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws1", lastEditedAt: new Date(), workspace: { deletionScheduledAt: null } });
     jobCreate.mockResolvedValue({ id: "jNew" });
     siteUpdate.mockResolvedValue({});
-    await rollbackPublish("ws1", "s1", "j1", "u1");
+    await rollbackPublish("s1", "j1", "u1");
     // a new job was created carrying the stored pages + the rollback provenance
     const createArg = jobCreate.mock.calls[0][0];
     expect(createArg.data.rolledBackFrom).toBe("j1");
@@ -139,6 +139,42 @@ describe("rollbackPublish", () => {
     // the approval gate was NOT consulted (bypassed for a rollback)
     expect(wsFindUnique).not.toHaveBeenCalled();
     expect(reviewFindFirst).not.toHaveBeenCalled();
+  });
+});
+
+/* P1-1 (2026-10-08 audit): every workspace-scoped decision the worker makes —
+   whose Vercel account, which plan's badge, whose app scripts and webhooks —
+   reads `job.workspaceId`. It was the caller's SESSION workspace, which differs
+   from the site's for a member of two workspaces; the site's own workspace is
+   the only right answer. */
+describe("the publish job's workspace", () => {
+  const siteIn = (workspaceId: string) => ({
+    name: "Acme", deletedAt: null, publishedUrl: null, workspaceId, lastEditedAt: new Date(),
+    workspace: { deletionScheduledAt: null },
+  });
+
+  it("is the SITE's workspace", async () => {
+    jobFindFirst.mockResolvedValue(null);
+    jobUpdateMany.mockResolvedValue({ count: 0 });
+    siteFindUnique.mockResolvedValue(siteIn("ws-site"));
+    jobCreate.mockResolvedValue({ id: "jNew" });
+    siteUpdate.mockResolvedValue({});
+    const { startPublish } = await import("@server/services/publish.service");
+    // bypassApproval keeps this on the job write; the gate has its own suite.
+    await startPublish("s1", "u1", [{ path: "index.html", html: "x" }], false, { bypassApproval: true });
+    expect(jobCreate.mock.calls[0][0].data.workspaceId).toBe("ws-site");
+  });
+
+  it("a rollback finds its target by site, and its new job carries the site's workspace", async () => {
+    jobFindFirst.mockResolvedValueOnce({ id: "j1", status: "COMPLETED", log: { pages: [{ path: "index.html", html: "v1" }] } });
+    jobFindFirst.mockResolvedValue(null);
+    jobUpdateMany.mockResolvedValue({ count: 0 });
+    siteFindUnique.mockResolvedValue(siteIn("ws-site"));
+    jobCreate.mockResolvedValue({ id: "jNew" });
+    siteUpdate.mockResolvedValue({});
+    await rollbackPublish("s1", "j1", "u1");
+    expect(jobFindFirst.mock.calls[0][0].where).toEqual({ id: "j1", siteId: "s1" });
+    expect(jobCreate.mock.calls[0][0].data.workspaceId).toBe("ws-site");
   });
 });
 
@@ -155,7 +191,7 @@ describe("publishing into a workspace scheduled for deletion", () => {
     jobUpdateMany.mockResolvedValue({ count: 0 });
     siteFindUnique.mockResolvedValue(pendingSite);
     const { startPublish } = await import("@server/services/publish.service");
-    await expect(startPublish("s1", "ws1", "u1", [{ path: "/", html: "x" }] as never)).rejects.toThrow("WORKSPACE_DELETION_SCHEDULED");
+    await expect(startPublish("s1", "u1", [{ path: "/", html: "x" }] as never)).rejects.toThrow("WORKSPACE_DELETION_SCHEDULED");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 
@@ -164,7 +200,7 @@ describe("publishing into a workspace scheduled for deletion", () => {
     jobFindFirst.mockResolvedValue(null);
     jobUpdateMany.mockResolvedValue({ count: 0 });
     siteFindUnique.mockResolvedValue(pendingSite);
-    await expect(rollbackPublish("ws1", "s1", "j1", "u1")).rejects.toThrow("WORKSPACE_DELETION_SCHEDULED");
+    await expect(rollbackPublish("s1", "j1", "u1")).rejects.toThrow("WORKSPACE_DELETION_SCHEDULED");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 });

@@ -239,7 +239,7 @@ describe("Publish Service", () => {
       } as any);
       vi.mocked(prisma.site.update).mockResolvedValue({ id: "s1" } as any);
 
-      const job = await startPublish("s1", "ws1", "user1");
+      const job = await startPublish("s1", "user1");
       expect(job.id).toBe("job1");
       expect(prisma.site.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -279,7 +279,7 @@ describe("Publish Service", () => {
       vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 500 }));
       queueOneJob();
 
-      const job = await startPublish("s1", "ws1", "user1");
+      const job = await startPublish("s1", "user1");
 
       expect(job.id).toBe("job1");
       // The worker owns the outcome from here — overwriting it is what erased
@@ -298,7 +298,7 @@ describe("Publish Service", () => {
       vi.stubGlobal("fetch", f);
       queueOneJob();
 
-      await startPublish("s1", "ws1", "user1");
+      await startPublish("s1", "user1");
 
       expect(f).toHaveBeenCalledTimes(1);
     });
@@ -313,7 +313,7 @@ describe("Publish Service", () => {
         workspace: { deletionScheduledAt: null },
       } as never);
 
-      await expect(startPublish("s1", "ws1", "user1")).rejects.toThrow("WORKER_DISPATCH_FAILED");
+      await expect(startPublish("s1", "user1")).rejects.toThrow("WORKER_DISPATCH_FAILED");
       expect(f).toHaveBeenCalledTimes(3);
     });
 
@@ -323,7 +323,7 @@ describe("Publish Service", () => {
         status: "BUILDING",
       } as any);
 
-      await expect(startPublish("s1", "ws1", "user1")).rejects.toThrow("ALREADY_PUBLISHING");
+      await expect(startPublish("s1", "user1")).rejects.toThrow("ALREADY_PUBLISHING");
     });
   });
 

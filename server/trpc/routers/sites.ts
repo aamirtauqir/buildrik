@@ -453,11 +453,9 @@ export const sitesRouter = router({
           throw e;
         }
       }
-      const workspaceId = await getWorkspaceId(ctx);
       try {
         return await startPublish(
           input.siteId,
-          workspaceId,
           ctx.session.user.id,
           input.pages,
           input.acknowledgeStale,
@@ -712,10 +710,9 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      const workspaceId = await getWorkspaceId(ctx);
       let result;
       try {
-        result = await rollbackPublish(workspaceId, input.siteId, input.jobId, ctx.session.user!.id!);
+        result = await rollbackPublish(input.siteId, input.jobId, ctx.session.user!.id!);
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "";
         if (msg === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "That version was not found." });
