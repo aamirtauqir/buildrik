@@ -35,9 +35,12 @@ export const SaveFailedBanner: React.FC<{
    *  its reason. Not a connection problem, and the same save would be refused
    *  again, so the copy says so and Retry is not offered (unless leaving). */
   refusal?: string;
+  /** Brand is read-only this session — there is no brand change to undo, so
+   *  a refusal's copy points at Reload instead. */
+  brandLocked?: boolean;
   onRetry: () => void;
   onKeepEditing: () => void;
-}> = ({ where, leaving, busy, refusal, onRetry, onKeepEditing }) => {
+}> = ({ where, leaving, busy, refusal, brandLocked = false, onRetry, onKeepEditing }) => {
   const [col, setCol] = React.useState<DOMRect | null>(null);
   React.useLayoutEffect(() => {
     const el = document.querySelector("[data-bk-toast-anchor]");
@@ -70,9 +73,11 @@ export const SaveFailedBanner: React.FC<{
       >
         <span className="tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Couldn&apos;t save {where}</span>
         <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
-          {refusal
-            ? `The brand change was refused: ${refusal}. Your changes are kept in this browser — undo the last brand change, then keep editing.`
-            : "Your changes are still here. Check your connection, then retry saving. You have not left the editor."}
+          {!refusal
+            ? "Your changes are still here. Check your connection, then retry saving. You have not left the editor."
+            : brandLocked
+              ? `This site's brand was refused: ${refusal}. Your changes are kept in this browser — reload to keep editing.`
+              : `The brand change was refused: ${refusal}. Your changes are kept in this browser — undo the last brand change, then keep editing.`}
         </span>
         <span className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
           {refusal && !leaving ? null : (

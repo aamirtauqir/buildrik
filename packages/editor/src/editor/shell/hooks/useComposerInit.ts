@@ -31,6 +31,7 @@ import {
   saveProject,
   SaveConflictError,
   SAVE_CONFLICT_EVENT,
+  keepStoredTokensOnSave,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import { clearUnsaved, keepUnsaved, readUnsaved } from "@/services/unsavedRecovery";
@@ -283,6 +284,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               instance.designSystem.readOnly = true;
               instance.designSystem.readOnlyReason = tokenLoad.reason ?? null;
               instance.emit(EVENTS.DESIGN_SYSTEM_READ_ONLY, { reason: tokenLoad.reason ?? "token migration failed" });
+              /* Invalid STORED v6 rows: sending them back would get every save
+                 refused TOKENS_INVALID. The other read-only causes send a
+                 pre-v6 set the server keeps unchanged, so they still save it. */
+              if (tokenLoad.reason === BRAND_READ_ONLY_FAILED) keepStoredTokensOnSave(siteId);
             }
             // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"
             // instead of "Not saved" on fresh load. The just-loaded state IS

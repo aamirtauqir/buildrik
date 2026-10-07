@@ -42,6 +42,23 @@ describe("SaveFailedBanner", () => {
     expect(screen.getByTestId("save-failed-keep")).toBeInTheDocument();
   });
 
+  it("does not tell a user whose Brand is read-only to undo a brand change they cannot make", () => {
+    render(
+      <SaveFailedBanner
+        where="My Site · Home"
+        leaving={false}
+        busy={false}
+        refusal="alias target missing: nowhere"
+        brandLocked
+        onRetry={vi.fn()}
+        onKeepEditing={vi.fn()}
+      />,
+    );
+    const banner = screen.getByTestId("save-failed-banner");
+    expect(banner).not.toHaveTextContent(/undo/i);
+    expect(banner).toHaveTextContent(/reload/i);
+  });
+
   it("falls back to the default position when the toast anchor is a real, sized element", () => {
     const anchor = document.createElement("div");
     anchor.setAttribute("data-bk-toast-anchor", "");

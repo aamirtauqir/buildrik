@@ -96,6 +96,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
   saveProject: vi.fn(() => Promise.resolve({ success: true })),
+  keepStoredTokensOnSave: vi.fn(),
   /* The real class, so `instanceof` in the autosave catch behaves as it does
      in the app. */
   isSaveConflictPending: vi.fn(() => false),
@@ -117,6 +118,7 @@ import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 import {
   getSiteIdFromUrl,
   isSaveConflictPending,
+  keepStoredTokensOnSave,
   loadProject,
   loadServerMedia,
   saveProject as syncSaveProject,
@@ -238,6 +240,19 @@ describe("useComposerInit — brand token kill switch wiring", () => {
     mockComposer.designSystem.brandTokensV2 = false;
     await open({ brandTokensV2: true });
     expect(mockComposer.designSystem.brandTokensV2).toBe(true);
+  });
+
+  it("a site whose stored v6 tokens are invalid opens read-only and its saves leave the tokens to the server", async () => {
+    vi.mocked(keepStoredTokensOnSave).mockClear();
+    await open({ settings: { designTokens: [{ broken: true }], designTokensSchemaVersion: 6 } });
+    expect(mockComposer.designSystem.readOnlyReason).toBe("failed");
+    expect(keepStoredTokensOnSave).toHaveBeenCalledWith("site-t");
+  });
+
+  it("a held site still sends its tokens (the server keeps a pre-v6 payload unchanged)", async () => {
+    vi.mocked(keepStoredTokensOnSave).mockClear();
+    await open({ brandTokensV2: true, tokensMigrationHold: true });
+    expect(keepStoredTokensOnSave).not.toHaveBeenCalled();
   });
 
   it("does not migrate a held site", async () => {

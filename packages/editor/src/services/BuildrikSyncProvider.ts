@@ -124,6 +124,19 @@ const _loadedSites = new Set<string>();
    icons, OG image or head/body code — publishing it is refused. */
 const _siteColumnsMissing = new Set<string>();
 
+/* Sites whose STORED v6 tokens failed validation at load (Brand opens
+   read-only, reason "failed"). Their saves send `designTokens: undefined`, so
+   the server carries the stored token state forward (ruling C2) instead of
+   refusing every save — pages included — as TOKENS_INVALID. Brand cannot be
+   edited in such a session, so nothing the user changed is left out. */
+const _storedTokensKept = new Set<string>();
+
+/** Mark the open site's saves as leaving its brand tokens to the server. The
+ *  shell calls it when the loaded tokens are invalid; the next load clears it. */
+export function keepStoredTokensOnSave(siteId: string): void {
+  _storedTokensKept.add(siteId);
+}
+
 /** Whether the open site's Site-column settings loaded. Publish reads it. */
 export function siteColumnsLoaded(siteId: string): boolean {
   return !_siteColumnsMissing.has(siteId);
@@ -745,6 +758,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
     clearConflictToken();
     _baselineSiteColumns = extractSiteColumnPatch(data.settings);
+    _storedTokensKept.delete(siteId);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
@@ -823,6 +837,9 @@ async function saveProjectNow(
       dropSessionMediaUrls(root);
       return { ...page, root };
     }),
+    ...(_storedTokensKept.has(siteId) && projectData.settings
+      ? { settings: { ...projectData.settings, designTokens: undefined } }
+      : {}),
   };
 
   checkCmsBindingsSize(persisted);

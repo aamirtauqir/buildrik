@@ -61,6 +61,7 @@ import {
   SAVE_CONFLICT_CLEARED_EVENT,
   getPendingConflictToken,
   isBrandFormatConflict,
+  keepStoredTokensOnSave,
   isSaveConflictPending,
   siteColumnsLoaded,
 } from "../BuildrikSyncProvider";
@@ -266,6 +267,41 @@ describe("saveProject", () => {
       // project has been loaded/saved in this session).
       expectedLastEditedAt: null,
     });
+  });
+});
+
+/* A site whose STORED v6 tokens fail validation opens Brand read-only; its
+   saves must leave the tokens to the server (ruling C2), or every save —
+   pages included — is refused TOKENS_INVALID. */
+describe("saveProject — stored tokens kept server-side (Brand read-only, failed)", () => {
+  const withTokens = {
+    version: "1.0" as const, pages: [], styles: [], assets: [], metadata: { name: "T" },
+    settings: { designTokens: [{ broken: true }], designTokensSchemaVersion: 6, darkMode: "off", seo: { author: "Ann" } },
+  };
+
+  it("sends designTokens undefined once the site is marked, keeping every other setting", async () => {
+    await loadedSite("site-bad-tokens");
+    mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
+    keepStoredTokensOnSave("site-bad-tokens");
+
+    await saveProject("site-bad-tokens", withTokens as never);
+
+    const sent = mocks.saveProjectMutate.mock.calls.at(-1)![0].projectData.settings;
+    expect("designTokens" in sent).toBe(true);
+    expect(sent.designTokens).toBeUndefined();
+    expect(sent.seo).toEqual({ author: "Ann" });
+    expect(withTokens.settings.designTokens).toEqual([{ broken: true }]);
+  });
+
+  it("a fresh load forgets the mark — the next session decides again", async () => {
+    await loadedSite("site-bad-tokens-2");
+    keepStoredTokensOnSave("site-bad-tokens-2");
+    await loadedSite("site-bad-tokens-2");
+    mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
+
+    await saveProject("site-bad-tokens-2", withTokens as never);
+
+    expect(mocks.saveProjectMutate.mock.calls.at(-1)![0].projectData.settings.designTokens).toEqual([{ broken: true }]);
   });
 });
 
