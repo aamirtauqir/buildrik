@@ -7,6 +7,7 @@
 import * as React from "react";
 import { TextField } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
+import { writeCanvasStyles } from "../../../engine/commands/commandOperations";
 import type { SpacingIndicator } from "../../../shared/types/canvas";
 import "./CanvasSpotSpacing.css";
 
@@ -14,14 +15,12 @@ export interface CanvasSpotSpacingProps {
   composer: Composer | null;
   elementId: string;
   indicators: SpacingIndicator[];
-  onUpdate?: (elementId: string, type: "margin" | "padding", side: string, value: number) => void;
 }
 
 export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
   composer,
   elementId,
   indicators,
-  onUpdate,
 }) => {
   const [editing, setEditing] = React.useState<string | null>(null);
   const [tempValue, setTempValue] = React.useState<number>(0);
@@ -36,15 +35,14 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
     setTempValue(value);
   };
 
+  /* At the active breakpoint, through the lock gate, one undo step — it
+     wrote the base styles at every device, unchecked (audit 2026-10-08
+     P1-2/P1-3). The never-passed `onUpdate` override went with it. */
   const handleValueCommit = (indicator: SpacingIndicator) => {
-    if (onUpdate) {
-      onUpdate(elementId, indicator.type, indicator.side, tempValue);
-    } else if (composer) {
-      const element = composer.elements.getElement(elementId);
-      if (element) {
-        const styleKey = `${indicator.type}-${indicator.side}`;
-        element.setStyle(styleKey, `${tempValue}px`);
-      }
+    if (composer) {
+      writeCanvasStyles(composer, composer.elements.getElement(elementId), "style-change", {
+        [`${indicator.type}-${indicator.side}`]: `${tempValue}px`,
+      });
     }
     setEditing(null);
   };

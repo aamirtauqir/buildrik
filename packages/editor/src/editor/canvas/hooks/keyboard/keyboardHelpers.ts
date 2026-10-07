@@ -6,6 +6,12 @@
 
 import type { Composer } from "../../../../engine/Composer";
 import type { Element } from "../../../../engine/elements/Element";
+import {
+  activeBreakpoint,
+  stylesAt,
+  writableElements,
+  writeCanvasStyles,
+} from "../../../../engine/commands/commandOperations";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -88,6 +94,11 @@ export function getAllNavigableElements(
  * a transform, which moved the pixels while the layout box — and the page
  * around it — stayed put, and nothing in the inspector showed it (G2-047,
  * CI-62). The caller says why nothing moved.
+ *
+ * Reads and writes at the active breakpoint and goes through the lock gate
+ * (writeCanvasStyles) — a nudge on Tablet moved Desktop too, and a locked
+ * element moved (audit 2026-10-08 P1-2/P1-3). A locked refusal returns true:
+ * the "locked" toast already said why, so the in-flow hint must not.
  */
 export function moveElementPosition(
   composer: Composer,
@@ -98,19 +109,16 @@ export function moveElementPosition(
   const element = composer.elements.getElement(elementId);
   if (!element) return false;
 
-  const currentStyles = element.getStyles?.() || {};
-  const position = currentStyles.position || "static";
+  const current = stylesAt(composer, element, activeBreakpoint(composer));
+  const position = current.position || "static";
   if (position === "static") return false;
 
-  composer.beginTransaction("keyboard-move");
-  try {
-    const currentTop = parseFloat(currentStyles.top || "0") || 0;
-    const currentLeft = parseFloat(currentStyles.left || "0") || 0;
-    element.setStyle?.("top", `${currentTop + deltaY}px`);
-    element.setStyle?.("left", `${currentLeft + deltaX}px`);
-  } finally {
-    composer.endTransaction();
-  }
+  const currentTop = parseFloat(current.top || "0") || 0;
+  const currentLeft = parseFloat(current.left || "0") || 0;
+  writeCanvasStyles(composer, element, "keyboard-move", {
+    top: `${currentTop + deltaY}px`,
+    left: `${currentLeft + deltaX}px`,
+  });
   return true;
 }
 
@@ -138,6 +146,9 @@ export function reorderElement(
      both measured live before this was written. `moveToBottom` in
      useLayerActions already speaks this dialect (it passes getChildCount()). */
   let newIndex: number | null = null;
+  /* A locked element keeps its place (audit 2026-10-08 P1-3); the lock gate
+     raises the "locked" toast. */
+  if (writableElements(composer, [element]).length === 0) return;
 
   switch (direction) {
     case "up":

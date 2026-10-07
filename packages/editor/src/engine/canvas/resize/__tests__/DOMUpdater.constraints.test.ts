@@ -17,6 +17,7 @@ function makeElement(styles: Record<string, string>) {
   return {
     written,
     el: {
+      getStyles: () => styles,
       getStyle: (prop: string) => styles[prop],
       setStyle: (prop: string, value: string) => {
         written[prop] = value;
@@ -83,6 +84,7 @@ describe("expandParent — growing a parent to fit still honours its constraints
     return {
       written,
       model: {
+        getStyles: () => styles,
         getStyle: (prop: string) => styles[prop],
         setStyle: (prop: string, value: string) => {
           written[prop] = value;
@@ -94,18 +96,14 @@ describe("expandParent — growing a parent to fit still honours its constraints
 
   it("does not store a parent width past its max-width", () => {
     const { written, model } = parentEl({ "max-width": "1200px" });
-    expandParent("p-1", domStub(), 1400, 900, {
-      elements: { getElement: () => model },
-    });
+    expandParent("p-1", domStub(), 1400, 900, makeComposer(model));
     expect(written.width).toBe("1200px");
     expect(written.height).toBe("900px");
   });
 
   it("leaves a parent inside its constraints exactly as grown", () => {
     const { written, model } = parentEl({ "max-width": "1600px" });
-    expandParent("p-1", domStub(), 1400, 900, {
-      elements: { getElement: () => model },
-    });
+    expandParent("p-1", domStub(), 1400, 900, makeComposer(model));
     expect(written.width).toBe("1400px");
   });
 });
