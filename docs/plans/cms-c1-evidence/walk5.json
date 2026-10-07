@@ -1,0 +1,48 @@
+{
+  "nav": [
+    "2026-10-05T11:08:15.905Z http://localhost:3370/dashboard",
+    "2026-10-05T11:08:19.530Z http://localhost:3370/edit/cmugopwzg005nnvjysp00b3pf",
+    "2026-10-05T11:08:21.164Z http://localhost:3370/edit/cmugopwzg005nnvjysp00b3pf"
+  ],
+  "navBeforeSetup": 3,
+  "navAfterCreate": 3,
+  "tempBinding": [
+    {
+      "binding": {
+        "sourceId": "cms:muv5co66-874ssc3",
+        "path": "muv5cp6o-qcmk0sf.title",
+        "type": "variable"
+      },
+      "collectionId": "muv5co66-874ssc3",
+      "collectionName": "ZZ C1 Temp",
+      "itemId": "muv5cp6o-qcmk0sf",
+      "fieldSlug": "title",
+      "property": "content"
+    }
+  ],
+  "f3_delete_collection_in_use": {
+    "steps": 7,
+    "notes": [
+      "1. rail CMS",
+      "2. open Temp",
+      "3. ⋯",
+      "4. Settings",
+      "5. Delete collection…",
+      "6. type DELETE",
+      "7. Delete collection"
+    ]
+  },
+  "f3Consequence": "Deleting removes 1 record, and unbinds 1 element — each keeps what it shows now. This can’t be undone.",
+  "f3After": {
+    "bindings": [],
+    "text": "Tempy",
+    "exists": false
+  },
+  "console": [
+    "Each child in a list should have a unique \"key\" prop.%s%s See https://react.dev/link/warning-keys for more information. \n\nCheck the render method of `div`.  It was passed a child from RecordsTable."
+  ],
+  "teamDeleteBlocked": {
+    "note": "ZZ C1 Posts › Author points at this collection. Change or delete that field first.",
+    "disabled": true
+  }
+}

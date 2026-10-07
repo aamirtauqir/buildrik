@@ -32,6 +32,8 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     setActiveTab: vi.fn(),
     publishedUrl: null,
     seoTitle: "",
+    inheritedTitle: "Home",
+    effectiveTitle: "Home",
     setSeoTitle: vi.fn(),
     seoDesc: "",
     setSeoDesc: vi.fn(),
@@ -81,6 +83,17 @@ describe("SeoTab title field", () => {
     const input = document.getElementById("seo-title") as HTMLInputElement;
     fireEvent.change(input, { target: { value: "x".repeat(90) } });
     expect(s.setSeoTitle).toHaveBeenCalledWith("x".repeat(60));
+  });
+
+  /* D1 (owner 2026-10-06 "empty field + placeholder"): a page with no title
+     of its own shows an EMPTY field whose placeholder is what it inherits. */
+  it("an empty field shows the inherited title as its placeholder, and the counter measures that title", () => {
+    const s = makeSettings({ seoTitle: "", inheritedTitle: "Bella Default Title", effectiveTitle: "Bella Default Title" });
+    render(<SeoTab s={s} page={makePage({ name: "Blog Post" })} composer={null} />);
+    const input = document.getElementById("seo-title") as HTMLInputElement;
+    expect(input.value).toBe("");
+    expect(input.placeholder).toBe("Bella Default Title");
+    expect(screen.getByText("19/60 · Too short")).toBeTruthy();
   });
 
   it("appends the range label to the counter (Ideal at 55 chars)", () => {
@@ -375,7 +388,14 @@ describe("SeoTab Google preview — inherited site defaults", () => {
   } as unknown as Composer;
 
   it("a page with no title/description previews the site defaults it will ship with", () => {
-    render(<SeoTab s={makeSettings()} page={makePage({ name: "About", slug: "about" })} composer={composerWithDefaults} />);
+    const inherited = "Acme Bakery — fresh bread daily";
+    render(
+      <SeoTab
+        s={makeSettings({ inheritedTitle: inherited, effectiveTitle: inherited })}
+        page={makePage({ name: "About", slug: "about" })}
+        composer={composerWithDefaults}
+      />,
+    );
     expect(screen.getByTestId("seo-preview-title").textContent).toBe("Acme Bakery — fresh bread daily");
     expect(screen.getByTestId("seo-preview-desc").textContent).toBe("Sourdough baked every morning.");
   });
@@ -383,7 +403,7 @@ describe("SeoTab Google preview — inherited site defaults", () => {
   it("the page's own values win in the preview", () => {
     render(
       <SeoTab
-        s={makeSettings({ seoTitle: "Our story", seoDesc: "Three generations." })}
+        s={makeSettings({ seoTitle: "Our story", effectiveTitle: "Our story", seoDesc: "Three generations." })}
         page={makePage({ name: "About", slug: "about" })}
         composer={composerWithDefaults}
       />,

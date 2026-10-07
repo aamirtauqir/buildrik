@@ -21,6 +21,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     $transaction: mocks.dollar,
     cmsCollection: {
+      count: async () => 0,
       findMany: (...a: unknown[]) => mocks.colFindMany(...a),
       findFirst: (...a: unknown[]) => mocks.colFindFirst(...a),
       findUnique: (...a: unknown[]) => mocks.colFindUnique(...a),
@@ -30,6 +31,7 @@ vi.mock("@/lib/prisma", () => ({
       delete: (...a: unknown[]) => mocks.colDelete(...a),
     },
     cmsEntry: {
+      count: async () => 0,
       findMany: (...a: unknown[]) => mocks.entFindMany(...a),
       findFirst: (...a: unknown[]) => mocks.entFindFirst(...a),
       findUnique: (...a: unknown[]) => mocks.entFindUnique(...a),
@@ -216,16 +218,42 @@ describe("entries cross-site guard", () => {
     expect(stored).not.toMatch(/<img/i);
   });
 
-  it("stripMarkup has no fixed pass limit — a payload nested past any small cap still loses its markup", async () => {
-    // A fixed N-pass cap fails OPEN: build a payload that still has live
+  it("stripMarkup pass cap fails closed — a payload nested past the cap still loses its markup", async () => {
+    // A cap that returned the text unchanged would fail OPEN: build a payload that still has live
     // markup after N passes by re-wrapping the tag N times over.
     let payload = "<img src=x onerror=alert(1)>";
-    for (let i = 0; i < 10; i++) payload = payload.replace(/</g, "<<i>");
+    // 8 rounds need 9+ passes to peel — past the 8-pass cap, yet ~0.8k chars
+    // (10 rounds was 1024 deep and made jsdom itself the flaky 15 s timeout).
+    for (let i = 0; i < 8; i++) payload = payload.replace(/</g, "<<i>");
     mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
     mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
     await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: payload } });
     const stored = (mocks.entCreate.mock.calls[0][0].data.data as { title: string }).title;
     expect(stored).not.toMatch(/<img/i);
+  });
+
+  it("stripMarkup is bounded: a 200k-char nesting bomb finishes fast and fails closed (no angle brackets)", async () => {
+    const payload = "<".repeat(66000) + "a>".repeat(66000);
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
+    const t0 = Date.now();
+    await upsertEntry("s1", { siteId: "s1", collectionId: "c1", data: { title: payload } });
+    expect(Date.now() - t0).toBeLessThan(1000);
+    const stored = (mocks.entCreate.mock.calls[0][0].data.data as { title: string }).title;
+    expect(stored).not.toMatch(/[<>]/);
+  });
+
+  it("sanitizes every string leaf of nested arrays and objects", async () => {
+    mocks.colFindFirst.mockResolvedValueOnce({ id: "c1" });
+    mocks.entCreate.mockResolvedValueOnce({ id: "e1" });
+    await upsertEntry("s1", {
+      siteId: "s1",
+      collectionId: "c1",
+      data: { tags: [["<img onerror=x>ok"]], deep: { a: [{ b: "<script>x</script>hi" }] } },
+    });
+    const stored = mocks.entCreate.mock.calls[0][0].data.data as { tags: string[][]; deep: { a: { b: string }[] } };
+    expect(stored.tags[0][0]).toBe("ok");
+    expect(stored.deep.a[0].b).toBe("hi");
   });
 });
 

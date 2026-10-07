@@ -70,6 +70,16 @@ describe("DynamicPagesPane", () => {
     expect(screen.getByTestId("cms-dp-pattern")).toHaveValue("/menu/{slug}");
   });
 
+  it("refuses a pattern that isn't a path, or names no field (DM-18)", () => {
+    mount(MENU, [rec("a", "Margherita")]);
+    fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/all" } });
+    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("/menu/all cannot be saved: A URL pattern needs a field");
+    expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
+    fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu?x={slug}" } });
+    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("letters, numbers, -, _, / and {field} only");
+    expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
+  });
+
   it("says drafts generate nothing (4418:89287)", () => {
     mount({ ...MENU, pageSlugPattern: "/menu/{slug}" } as CMSCollection, [rec("a", "Margherita", "draft")]);
     expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("1 record, none published.");
@@ -86,6 +96,19 @@ describe("DynamicPagesPane", () => {
       "The saved template page is missing — choose one again",
     );
     expect(screen.getByTestId("cms-dp-status")).not.toHaveTextContent("Ready");
+  });
+
+  it("saves SEO title and description patterns, refusing a field the collection lacks (BD-05)", async () => {
+    const { updateCollection } = mount({ ...MENU, pageSlugPattern: "/menu/{slug}" } as CMSCollection, [rec("a", "Margherita")]);
+    fireEvent.change(screen.getByTestId("cms-dp-seo-title"), { target: { value: "{title} · Menu" } });
+    expect(screen.getByTestId("cms-dp-seo-error")).toHaveTextContent("title is not a field of Menu items.");
+    expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
+    fireEvent.change(screen.getByTestId("cms-dp-seo-title"), { target: { value: "{name} · Menu" } });
+    fireEvent.change(screen.getByTestId("cms-dp-seo-description"), { target: { value: "About {name}" } });
+    fireEvent.click(screen.getByTestId("cms-dp-save"));
+    await waitFor(() =>
+      expect(updateCollection).toHaveBeenCalledWith("col-1", expect.objectContaining({ pageSeoTitle: "{name} · Menu", pageSeoDescription: "About {name}" })),
+    );
   });
 
   it("never offers the home page (index.html) as a template", () => {

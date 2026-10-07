@@ -240,6 +240,7 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
           getAllCollections: vi.fn(() => [{ id: "menu", name: "Menu", slug: "menu", fields: [{ slug: "title", name: "Title" }] }]),
           getCollection: vi.fn(() => ({ id: "menu", name: "Menu", slug: "menu", fields: [{ slug: "title", name: "Title" }] })),
           queryContent: vi.fn(() => Promise.resolve({ items: [], total: 0, hasMore: false })),
+          getContentItems: vi.fn(() => Promise.resolve([])),
         },
       },
     } as unknown as Composer;

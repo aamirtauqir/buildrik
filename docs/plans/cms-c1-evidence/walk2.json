@@ -1,0 +1,80 @@
+{
+  "setup": {
+    "page": "page-muv4vl0c-1jxbm2v1awp",
+    "heading": "el-muv4vl0e-1tms6tzb33p",
+    "tplHeading": "el-muv4vl0e-1glegwb1ppq",
+    "temp": "el-muv4vl0f-mhyo028uvz"
+  },
+  "d1_bind_element": {
+    "steps": 5,
+    "notes": [
+      "1. select heading on canvas",
+      "2. Behaviour tab",
+      "3. Source · From CMS",
+      "4. Collection · Posts",
+      "5. Field · title",
+      "   binding itemId=undefined canvas=\"Hello World\""
+    ]
+  },
+  "d1": {
+    "binding": [
+      {
+        "binding": {
+          "sourceId": "cms:muv3r2lu-hqvozp5",
+          "path": "title",
+          "type": "variable"
+        },
+        "collectionId": "muv3r2lu-hqvozp5",
+        "collectionName": "ZZ C1 Posts",
+        "fieldSlug": "title",
+        "property": "content"
+      }
+    ],
+    "canvasText": "Hello World"
+  },
+  "d2_collection_list": {
+    "steps": 4,
+    "notes": [
+      "1. search",
+      "2. insert Collection list (Add panel)",
+      "3. Behaviour tab",
+      "4. Collection · Posts"
+    ]
+  },
+  "listId": "el-muv4vtri-1654nm61i61",
+  "d2Canvas": "<div data-buildrick-id=\"el-muv4vtrk-vvhemm14rw\" data-buildrick-type=\"container\" style=\"display: flex; flex-direction: column; gap: 8px; background: rgb(243, 244, 246); padding: 16px; border-radius: 8px; cursor: grab;\" draggable=\"true\"><div data-buildrick-id=\"el-muv4vtrk-1gv1xtz1qzr\" data-buildrick-type=\"container\" style=\"height: 96px; background: rgb(229, 231, 235); border-radius: 6px; cursor: grab;\" draggable=\"true\"></div><h3 data-buildrick-id=\"el-muv4vtrk-5u5uph162w\" data-buildrick-type=\"heading\" draggable=\"true\" style=\"cursor: grab;\">Hello World by Ada (Chef)</h3><p data-buildrick-id=\"el-muv4vtrk-22kp7bbwh\" data-buildrick-type=\"paragraph\" draggable=\"true\" style=\"cursor: grab;\">Plain then <strong>bold</strong> | tags: Vegan, Spicy | link: /zz-c1-posts/hello-world/</p></div>",
+  "e_template_page": {
+    "steps": 13,
+    "notes": [
+      "1. rail CMS",
+      "2. open Posts",
+      "3. ⋯",
+      "4. Dynamic pages",
+      "   template options: Choose a page… | About | Page 3 | Page 4 | ZZ C1 Page",
+      "5. Template page",
+      "6. SEO title pattern",
+      "7. Generate",
+      "8. back to canvas",
+      "9. select template heading",
+      "10. Behaviour tab",
+      "11. From CMS",
+      "12. Collection",
+      "13. Field"
+    ]
+  },
+  "eContext": "Record · each generated page shows its own",
+  "eBinding": [
+    {
+      "binding": {
+        "sourceId": "cms:muv3r2lu-hqvozp5",
+        "path": "title",
+        "type": "variable"
+      },
+      "collectionId": "muv3r2lu-hqvozp5",
+      "collectionName": "ZZ C1 Posts",
+      "fieldSlug": "title",
+      "property": "content"
+    }
+  ],
+  "error": "page.evaluate: Execution context was destroyed, most likely because of a navigation.\n    at /private/tmp/claude-501/-Users-shahg-Desktop-pencil-buildrik-packages-editor/efcd568a-31ce-48ec-862b-20a9e7baaa9e/scratchpad/live/walk2.mjs:122:14"
+}

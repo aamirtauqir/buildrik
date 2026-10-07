@@ -289,6 +289,25 @@ describe("saveProject — no session Object URLs reach the server (walk 2026-09-
   });
 });
 
+/* BD-15: a bindings map past the server's cap is dropped by the server with
+   only a log line; the save now says so before it sends. */
+describe("saveProject — CMS bindings past the cap are announced", () => {
+  it("dispatches the too-large event for a map over MAX_CMS_BINDINGS_CHARS, not for a normal one", async () => {
+    const { CMS_BINDINGS_TOO_LARGE_EVENT } = await import("../BuildrikSyncProvider");
+    await loadedSite("site-big");
+    mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date("2026-04-01") });
+    const seen: unknown[] = [];
+    const on = (e: Event) => seen.push((e as CustomEvent).detail);
+    window.addEventListener(CMS_BINDINGS_TOO_LARGE_EVENT, on);
+    const base = { version: "1.0" as const, pages: [], styles: [], assets: [], metadata: { name: "T" } };
+    await saveProject("site-big", { ...base, cmsBindings: { field: { a: [{ fieldSlug: "x".repeat(1_100_000) }] } } } as never);
+    await saveProject("site-big", { ...base, cmsBindings: { field: {} } } as never);
+    window.removeEventListener(CMS_BINDINGS_TOO_LARGE_EVENT, on);
+    expect(seen).toHaveLength(1);
+    expect(seen[0]).toMatchObject({ max: 1_000_000 });
+  });
+});
+
 describe("getSiteIdFromUrl", () => {
   it("extracts siteId from query params", () => {
     const originalLocation = window.location;

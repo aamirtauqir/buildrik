@@ -174,7 +174,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
           )}
           {s.activeTab === "social" && (
             <div id="pg-drawer-tab-social" role="tabpanel" aria-label="Social settings">
-              <SocialTab s={s} page={page} />
+              <SocialTab s={s} />
             </div>
           )}
           {s.activeTab === "advanced" && (

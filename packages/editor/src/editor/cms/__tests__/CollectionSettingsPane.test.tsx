@@ -81,4 +81,28 @@ describe("CollectionSettingsPane", () => {
     await waitFor(() => expect(composer.cms.collections.deleteCollection).toHaveBeenCalledWith("col-1"));
     await waitFor(() => expect(cmsWorkspace.get().collectionId).toBeNull());
   });
+
+  /* CMS-06: the delete warned only about records and left every bound
+     element bound to nothing. */
+  it("names the bound elements it will unbind, and unbinds them before the delete", async () => {
+    const engine = makeEngine({
+      collections: [MENU, TEAM],
+      items: [rec("a")],
+      bindings: { h1: [{ collectionId: "col-1", fieldSlug: "slug", property: "content" }], h2: [{ collectionId: "col-2", fieldSlug: "x", property: "content" }] },
+      collectionBindings: [{ elementId: "list", collectionId: "col-1", repeat: "children" }],
+    });
+    render(
+      <ToastProvider>
+        <CollectionSettingsPane composer={engine.composer as never} collection={MENU} records={[rec("a")]} />
+      </ToastProvider>,
+    );
+    expect(screen.getByTestId("cms-settings-danger")).toHaveTextContent("Deleting removes 1 record, and unbinds 2 elements — each keeps what it shows now.");
+    fireEvent.click(screen.getByTestId("cms-settings-delete"));
+    fireEvent.change(screen.getByPlaceholderText("Click to type DELETE"), { target: { value: "DELETE" } });
+    fireEvent.click(screen.getByTestId("cms-delete-collection-confirm"));
+    await waitFor(() => expect(engine.composer.cms.collections.deleteCollection).toHaveBeenCalledWith("col-1"));
+    expect(engine.composer.cms.bindings.unbind).toHaveBeenCalledWith("h1", "content");
+    expect(engine.composer.cms.bindings.unbind).not.toHaveBeenCalledWith("h2", expect.anything());
+    expect(engine.composer.cms.bindings.unbindCollection).toHaveBeenCalledWith("list");
+  });
 });

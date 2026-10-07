@@ -11,7 +11,8 @@
 import * as React from "react";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { Button } from "@/editor/chrome-ui";
-import { resolveUrl } from "./DynamicPagesPane";
+import { applyCmsPattern } from "@buildrik/shared/schemas/cms";
+import { stripAllTags } from "@/shared/utils/html/sanitization";
 
 const text = (v: unknown) => (v === undefined || v === null ? "" : String(v));
 const firstOf = (fields: CMSField[], types: CMSField["type"][], skip: string[] = []) =>
@@ -36,9 +37,11 @@ export function RecordPreview({
   /* The short value beside the title (a price) — never the title itself or the URL slug. */
   const meta = firstOf(fields, ["number", "text"], [collection.displayField ?? "name", "slug"]);
   const body = firstOf(fields, ["textarea", "richtext"]);
+  /* A rich text body previews as its words; the card is a summary. */
+  const bodyText = body ? (body.type === "richtext" ? stripAllTags(text(form[body.slug])) : text(form[body.slug])) : "";
   const src = image ? text(form[image.slug]) : "";
   const metaValue = meta ? text(form[meta.slug]) : "";
-  const url = collection.pageSlugPattern ? resolveUrl(collection.pageSlugPattern, form) : null;
+  const url = collection.pageSlugPattern ? applyCmsPattern(collection.pageSlugPattern, form, true) : null;
   const live = record?.status === "published";
 
   return (
@@ -76,8 +79,8 @@ export function RecordPreview({
           <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[16px] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]">{title}</span>
           {metaValue ? <span className="tw:flex-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{metaValue}</span> : null}
         </div>
-        {body && text(form[body.slug]) ? (
-          <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">{text(form[body.slug])}</p>
+        {bodyText ? (
+          <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">{bodyText}</p>
         ) : null}
       </div>
       {onDelete ? (

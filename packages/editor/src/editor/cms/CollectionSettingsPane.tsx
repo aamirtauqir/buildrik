@@ -52,7 +52,25 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
      (`appendDynamicPagesToPublish`), and then one per published record. */
   const generates = Boolean(collection.pageSlugPattern && collection.pageTemplatePath);
   const pages = generates ? records.filter((r) => r.status === "published").length : 0;
-  const consequence = `Deleting removes ${plural(records.length, "record")}${pages ? ` and ${plural(pages, "generated page")}` : ""}.`;
+  /* A Reference field in another collection points here: deleting this one
+     would leave every such record pointing at nothing (PD-1 delete guard). */
+  const referencedBy = (composer?.cms.collections.getAllCollections() ?? [])
+    .filter((c) => c.id !== collection.id)
+    .flatMap((c) => c.fields.filter((f) => f.type === "reference" && f.referenceCollection === collection.id).map((f) => `${c.name} › ${f.name}`));
+  /* CMS-06: the elements bound to this collection (a field binding or a
+     Collection list). Deleting unbinds them — each keeps what it shows now —
+     instead of leaving them bound to nothing (a raw id in the banner, the
+     canvas still showing deleted records). */
+  const boundElements = new Set<string>();
+  if (composer) {
+    for (const [elementId, list] of Object.entries(composer.cms.bindings.export())) {
+      if (list.some((b) => b.collectionId === collection.id)) boundElements.add(elementId);
+    }
+    for (const b of composer.cms.bindings.getAllCollectionBindings()) if (b.collectionId === collection.id) boundElements.add(b.elementId);
+  }
+  const consequence =
+    `Deleting removes ${plural(records.length, "record")}${pages ? ` and ${plural(pages, "generated page")}` : ""}` +
+    (boundElements.size ? `, and unbinds ${plural(boundElements.size, "element")} — each keeps what it shows now.` : ".");
 
   const rename = async () => {
     if (!composer || error || !dirty) return;
@@ -67,10 +85,15 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
 
   const remove = async () => {
     if (!composer) return;
+    const bindings = composer.cms.bindings;
+    for (const elementId of boundElements) {
+      for (const b of bindings.getBindings(elementId)) if (b.collectionId === collection.id) bindings.unbind(elementId, b.property);
+      if (bindings.getCollectionBinding(elementId)?.collectionId === collection.id) bindings.unbindCollection(elementId);
+    }
     await composer.cms.collections.deleteCollection(collection.id);
     setConfirmDelete(false);
     cmsWorkspace.openCollection(null);
-    addToast({ tone: "success", title: `“${collection.name}” deleted`, description: consequence.replace("Deleting removes", "Removed") });
+    addToast({ tone: "success", title: `“${collection.name}” deleted`, description: consequence.replace("Deleting removes", "Removed").replace("and unbinds", "and unbound") });
   };
 
   return (
@@ -107,10 +130,16 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
       <p className={`${NOTE} tw:m-0`} data-testid="cms-settings-danger">
         {consequence} This can’t be undone.
       </p>
+      {referencedBy.length ? (
+        <p className={`${WARN} tw:m-0`} data-testid="cms-settings-referenced">
+          {referencedBy.join(", ")} {referencedBy.length === 1 ? "points" : "point"} at this collection. Change or delete{" "}
+          {referencedBy.length === 1 ? "that field" : "those fields"} first.
+        </p>
+      ) : null}
       <div>
         {/* 4428:148660 draws this one at the default 40px height, not the tab's
             28px ACTION size — the one irreversible action on the screen. */}
-        <Button size="xs" variant="danger" className="tw:h-10 tw:px-4 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]" onClick={() => setConfirmDelete(true)} data-testid="cms-settings-delete">
+        <Button size="xs" variant="danger" className="tw:h-10 tw:px-4 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]" disabled={referencedBy.length > 0} onClick={() => setConfirmDelete(true)} data-testid="cms-settings-delete">
           Delete collection…
         </Button>
       </div>

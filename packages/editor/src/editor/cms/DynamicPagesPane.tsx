@@ -18,6 +18,7 @@ import type { Composer } from "@/engine";
 import { pageFileNames } from "@/engine/export";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
+import { applyCmsPattern, cmsPatternError, cmsSlugField } from "@buildrik/shared/schemas/cms";
 import { ACTION, CONTROL, CONTROL_W, LABEL, NOTE, PANE, SECTION, WARN } from "./paneStyles";
 
 export interface DynamicPagesPaneProps {
@@ -26,19 +27,15 @@ export interface DynamicPagesPaneProps {
   records: CMSContentItem[];
 }
 
-/** The publish service's slug rule (`applyPattern` in cms.service.ts), for
- *  the preview list only — the server resolves the real URLs. */
-export function slugify(s: string): string {
-  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-export function resolveUrl(pattern: string, data: Record<string, unknown>): string {
-  return pattern.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => slugify(data[key] == null ? "" : String(data[key])));
-}
-
 export function DynamicPagesPane({ composer, collection, records }: DynamicPagesPaneProps) {
   const { addToast } = useToast();
   const [pattern, setPattern] = React.useState(collection.pageSlugPattern ?? "");
   const [template, setTemplate] = React.useState(collection.pageTemplatePath ?? "");
+  /* BD-05: each record page's <title> and description, from its fields. */
+  const [seoTitle, setSeoTitle] = React.useState(collection.pageSeoTitle ?? "");
+  const [seoDescription, setSeoDescription] = React.useState(collection.pageSeoDescription ?? "");
+  React.useEffect(() => setSeoTitle(collection.pageSeoTitle ?? ""), [collection.pageSeoTitle]);
+  React.useEffect(() => setSeoDescription(collection.pageSeoDescription ?? ""), [collection.pageSeoDescription]);
   const [saving, setSaving] = React.useState(false);
   React.useEffect(() => setPattern(collection.pageSlugPattern ?? ""), [collection.pageSlugPattern]);
   React.useEffect(() => setTemplate(collection.pageTemplatePath ?? ""), [collection.pageTemplatePath]);
@@ -62,15 +59,25 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
   const unknown = keys.filter((k) => !collection.fields.some((f) => f.slug === k));
   const published = records.filter((r) => r.status === "published");
   const drafts = records.length - published.length;
-  const urls = trimmed && unknown.length === 0 ? published.map((r) => resolveUrl(trimmed, r.data)) : [];
+  /* DM-18: the pattern is a real path (the server refuses one that isn't);
+     unknown fields keep their own board line (4418:164278). */
+  const patternProblem = trimmed && unknown.length === 0 ? cmsPatternError(trimmed, collection.fields) : null;
+  /* The server's own slug rule (shared applyCmsPattern), for the preview. */
+  const urls = trimmed && unknown.length === 0 && !patternProblem ? published.map((r) => applyCmsPattern(trimmed, r.data, true)) : [];
   const collide = urls.length !== new Set(urls).size;
-  const ready = Boolean(trimmed) && unknown.length === 0 && Boolean(templateName) && published.length > 0 && !collide;
-  const dirty = trimmed !== (collection.pageSlugPattern ?? "") || template !== (collection.pageTemplatePath ?? "");
-  const slugField = collection.fields.find((f) => f.slug === "slug") ?? collection.fields[0];
+  const ready = Boolean(trimmed) && unknown.length === 0 && !patternProblem && Boolean(templateName) && published.length > 0 && !collide;
+  const seoKeys = [...`${seoTitle} ${seoDescription}`.matchAll(/\{([a-zA-Z0-9_-]+)\}/g)].map((m) => m[1]);
+  const seoUnknown = seoKeys.filter((k) => !collection.fields.some((f) => f.slug === k));
+  const dirty =
+    trimmed !== (collection.pageSlugPattern ?? "") ||
+    template !== (collection.pageTemplatePath ?? "") ||
+    seoTitle.trim() !== (collection.pageSeoTitle ?? "") ||
+    seoDescription.trim() !== (collection.pageSeoDescription ?? "");
+  const slugField = cmsSlugField(collection.fields) ?? collection.fields[0];
   const fix = unknown.length && slugField ? trimmed.replace(`{${unknown[0]}}`, `{${slugField.slug}}`) : null;
 
   const save = async () => {
-    if (!composer || unknown.length) return;
+    if (!composer || unknown.length || patternProblem || seoUnknown.length) return;
     setSaving(true);
     try {
       /* Empty clears the binding rather than storing "" — a collection with
@@ -78,6 +85,8 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
       await composer.cms.collections.updateCollection(collection.id, {
         pageSlugPattern: trimmed || undefined,
         pageTemplatePath: template || undefined,
+        pageSeoTitle: seoTitle.trim() || undefined,
+        pageSeoDescription: seoDescription.trim() || undefined,
       });
       addToast({
         tone: "success",
@@ -105,6 +114,8 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
         ) : null}
       </span>
     );
+  } else if (patternProblem) {
+    status = <span className={WARN} data-testid="cms-dp-status">{trimmed} cannot be saved: {patternProblem}</span>;
   } else if (published.length === 0) {
     status = (
       <span className={WARN} data-testid="cms-dp-status">
@@ -166,6 +177,34 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
           ))}
         </Select>
       </div>
+      <div className={CONTROL_W}>
+        <label className={LABEL} htmlFor="cms-dp-seo-title">SEO title pattern</label>
+        <TextInput
+          id="cms-dp-seo-title"
+          sizing="sm"
+          className={CONTROL}
+          placeholder={`{${collection.displayField ?? collection.fields[0]?.slug ?? "title"}}`}
+          value={seoTitle}
+          onChange={(e) => setSeoTitle(e.target.value)}
+          data-testid="cms-dp-seo-title"
+        />
+      </div>
+      <div className={CONTROL_W}>
+        <label className={LABEL} htmlFor="cms-dp-seo-description">SEO description pattern</label>
+        <TextInput
+          id="cms-dp-seo-description"
+          sizing="sm"
+          className={CONTROL}
+          value={seoDescription}
+          onChange={(e) => setSeoDescription(e.target.value)}
+          data-testid="cms-dp-seo-description"
+        />
+      </div>
+      {seoUnknown.length ? (
+        <span className={WARN} data-testid="cms-dp-seo-error">
+          {seoUnknown.join(", ")} {seoUnknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
+        </span>
+      ) : null}
       <div>{status}</div>
       {urls.length ? (
         <section className={CONTROL_W}>
@@ -186,7 +225,7 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
         <Button
           size="xs"
           className={ACTION}
-          disabled={!(dirty || ready) || saving || unknown.length > 0}
+          disabled={!(dirty || ready) || saving || unknown.length > 0 || Boolean(patternProblem) || seoUnknown.length > 0}
           data-testid="cms-dp-save"
           onClick={() => void save()}
         >

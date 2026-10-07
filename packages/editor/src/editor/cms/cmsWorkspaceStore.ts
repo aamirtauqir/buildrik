@@ -42,15 +42,41 @@ function set(next: CmsWorkspaceState): void {
   listeners.forEach((l) => l());
 }
 
+/** Asked before a move that closes the open record; returns true when it
+ *  took the move over (it calls `go` itself once the person agrees). */
+export type CmsLeaveGuard = (go: () => void) => boolean;
+let leaveGuard: CmsLeaveGuard | null = null;
+
+/**
+ * Every move goes through here (UI-02). A move that closes the open record —
+ * another record, another collection, a tab, ⌘K's jump, the drawer's
+ * collection rows — first asks the record's guard, so unsaved edits get the
+ * discard question whichever door was used. Before, the sheet guarded only
+ * its own buttons and three doors dropped the edits silently.
+ */
+function navigate(next: CmsWorkspaceState): void {
+  const closesRecord =
+    state.recordId !== null && (next.recordId !== state.recordId || next.collectionId !== state.collectionId);
+  if (closesRecord && leaveGuard?.(() => set(next))) return;
+  set(next);
+}
+
 export const cmsWorkspace = {
   get: (): CmsWorkspaceState => state,
   openCollection: (collectionId: string | null, tab: CmsTab = "records"): void =>
-    set({ collectionId, tab, recordId: null }),
-  setTab: (tab: CmsTab): void => set({ ...state, tab, recordId: null }),
-  openRecord: (recordId: string | null): void => set({ ...state, tab: "records", recordId }),
+    navigate({ collectionId, tab, recordId: null }),
+  setTab: (tab: CmsTab): void => navigate({ ...state, tab, recordId: null }),
+  openRecord: (recordId: string | null): void => navigate({ ...state, tab: "records", recordId }),
   /** One write for both, so the table never renders a frame without its sheet. */
   openRequest: ({ collectionId, recordId, tab }: CmsOpenRequest): void =>
-    set({ collectionId, tab: tab ?? "records", recordId: recordId ?? null }),
+    navigate({ collectionId, tab: tab ?? "records", recordId: recordId ?? null }),
+  /** The open record's guard (RecordSheet); returns its release. */
+  setLeaveGuard: (guard: CmsLeaveGuard): (() => void) => {
+    leaveGuard = guard;
+    return () => {
+      if (leaveGuard === guard) leaveGuard = null;
+    };
+  },
   reset: (): void => set(INITIAL),
   subscribe: (l: () => void): (() => void) => {
     listeners.add(l);

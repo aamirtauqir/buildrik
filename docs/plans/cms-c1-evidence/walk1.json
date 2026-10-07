@@ -1,0 +1,136 @@
+{
+  "a_create_collection_team": {
+    "steps": 7,
+    "notes": [
+      "1. rail CMS",
+      "2. + New collection",
+      "3. name “ZZ C1 Team”",
+      "4. row 1 name Name",
+      "5. + Add field (row)",
+      "6. row 2 name Role",
+      "7. Create Collection",
+      "   created {\"id\":\"muv3r0ae-347zwtd\",\"displayField\":\"name\",\"fields\":[\"name:text\",\"role:text\",\"slug:slug\"]}"
+    ]
+  },
+  "a_create_collection_posts": {
+    "steps": 8,
+    "notes": [
+      "1. + New collection",
+      "2. name “ZZ C1 Posts”",
+      "3. row 1 name Title",
+      "4. + Add field (row)",
+      "5. row 2 name Body",
+      "6. row 2 type richtext",
+      "7. Generate a page per entry",
+      "8. Create Collection",
+      "   created {\"id\":\"muv3r2lu-hqvozp5\",\"displayField\":\"title\",\"pattern\":\"/zz-c1-posts/{slug}\",\"fields\":[\"title:text\",\"body:richtext\",\"slug:slug\"]}"
+    ]
+  },
+  "ids": {
+    "team": "muv3r0ae-347zwtd",
+    "posts": "muv3r2lu-hqvozp5"
+  },
+  "b_add_field_reference": {
+    "steps": 6,
+    "notes": [
+      "1. Fields tab",
+      "2. + Add field",
+      "3. type reference",
+      "4. name Author",
+      "5. target collection",
+      "6. Save field"
+    ]
+  },
+  "b_add_field_multiselect": {
+    "steps": 5,
+    "notes": [
+      "1. + Add field",
+      "2. type multiselect",
+      "3. name Tags",
+      "4. options",
+      "5. Save field"
+    ]
+  },
+  "b_add_field_number": {
+    "steps": 4,
+    "notes": [
+      "1. + Add field",
+      "2. type number",
+      "3. name Price",
+      "4. Save field"
+    ]
+  },
+  "postsFields": [
+    {
+      "slug": "title",
+      "type": "text"
+    },
+    {
+      "slug": "body",
+      "type": "richtext"
+    },
+    {
+      "slug": "slug",
+      "type": "slug"
+    },
+    {
+      "slug": "author",
+      "type": "reference",
+      "ref": "muv3r0ae-347zwtd"
+    },
+    {
+      "slug": "tags",
+      "type": "multiselect",
+      "options": [
+        "Vegan",
+        "Spicy",
+        "New"
+      ]
+    },
+    {
+      "slug": "price",
+      "type": "number"
+    }
+  ],
+  "c_add_record_team": {
+    "steps": 6,
+    "notes": [
+      "1. open Team",
+      "2. + Add record",
+      "3. Name",
+      "4. Role",
+      "5. Published",
+      "6. Save record"
+    ]
+  },
+  "c_add_record_post": {
+    "steps": 8,
+    "notes": [
+      "1. open Posts",
+      "2. + Add record",
+      "3. Title (slug follows)",
+      "4. Body (rich text, bold)",
+      "5. Author (reference)",
+      "6. Tags (2 chips)",
+      "7. Published",
+      "8. Save record"
+    ]
+  },
+  "priceBefore": "",
+  "postsLocal": [
+    {
+      "id": "muv3rgny-41oesg5",
+      "status": "published",
+      "data": {
+        "title": "Hello World",
+        "body": "Plain then <strong>bold</strong>",
+        "slug": "hello-world",
+        "author": "muv3r7m4-ft96wo7",
+        "tags": [
+          "Vegan",
+          "Spicy"
+        ]
+      }
+    }
+  ]
+}

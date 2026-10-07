@@ -22,7 +22,10 @@
 import type { CMSContentItem, CMSFieldType } from "../../shared/types/cms";
 import { filterCmsBindings, isSafeCmsBoundValue, type CmsBindableProperty } from "@buildrik/shared/schemas/sites";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
+import { cmsTextOf } from "@buildrik/shared/schemas/cms";
+import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
 import { EVENTS } from "../../shared/constants/events";
+import { BINDABLE_TYPES } from "../../shared/constants/elementCapabilities";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
 import type { CollectionManager } from "./CollectionManager";
@@ -68,6 +71,12 @@ export interface CMSCollectionBinding {
   repeat?: "self" | "children";
 }
 
+/** The part of an element a binding copy walks. */
+interface TreeNode {
+  getId(): string;
+  getChildren(): TreeNode[];
+}
+
 /** An element whose whole content is one `{{item.<field>}}` placeholder. */
 const ITEM_PLACEHOLDER = /^\s*\{\{\s*item\.([\w-]+)\s*\}\}\s*$/;
 
@@ -86,7 +95,7 @@ export function findItemFieldRefs(content: string): string[] {
 }
 
 /** Field types whose value reads as text in a placeholder. */
-const TEXT_LIKE_FIELDS = new Set<CMSFieldType>(["text", "textarea", "richtext", "number", "select", "date", "datetime", "url", "email"]);
+const TEXT_LIKE_FIELDS = new Set<CMSFieldType>(["text", "textarea", "richtext", "number", "select", "multiselect", "date", "datetime", "url", "email", "slug"]);
 
 /**
  * CMS Binding Manager
@@ -104,6 +113,54 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     this.cmsManager.on("content:created", () => this.reapplyAll());
     this.cmsManager.on("content:updated", () => this.reapplyAll());
     this.cmsManager.on("content:deleted", () => this.reapplyAll());
+
+    /* BD-22 / BD-06: a binding lives as long as its element, and a copy of
+       the element carries a copy of it. Bindings sit in this map, keyed by
+       element id, so neither happened: a deleted element's binding stayed
+       (counted as "Used by", locking the field), and a duplicate showed the
+       bound text but was bound to nothing. */
+    this.composer.on?.(EVENTS.ELEMENT_DELETED, (payload: unknown) => {
+      const el = payload as { getId?: () => string; id?: string } | null;
+      const id = el?.getId?.() ?? el?.id;
+      if (id) this.forgetBoundElement(id);
+    });
+    this.composer.on?.(EVENTS.ELEMENT_DUPLICATED, (payload: unknown) => {
+      const { original, clone } = (payload ?? {}) as { original?: TreeNode; clone?: TreeNode };
+      if (original && clone) this.copyTree(original, clone);
+    });
+    this.composer.on?.(EVENTS.PROJECT_CHANGED, (payload: unknown) => {
+      if ((payload as { type?: string } | null)?.type === "page:deleted") this.pruneMissing();
+    });
+  }
+
+  /** An element's field AND list bindings, gone with it. */
+  private forgetBoundElement(elementId: string): void {
+    this.forgetElement(elementId);
+    if (this.collectionBindings.delete(elementId)) this.composer.emit(EVENTS.CMS_COLLECTION_UNBOUND, { elementId });
+  }
+
+  /** Bindings whose element no longer exists anywhere (a deleted page). */
+  private pruneMissing(): void {
+    const ids = new Set([...Object.keys(this.export()), ...this.collectionBindings.keys()]);
+    for (const id of ids) if (!this.composer.elements.getElement(id)) this.forgetBoundElement(id);
+  }
+
+  /**
+   * A copied element tree (duplicate element or page) gets the source tree's
+   * bindings, position by position — the copy has the same shape and new ids.
+   */
+  copyTree(from: TreeNode, to: TreeNode): void {
+    const fromId = from.getId();
+    const toId = to.getId();
+    this.copyElement(fromId, toId);
+    const list = this.collectionBindings.get(fromId);
+    if (list) {
+      this.collectionBindings.set(toId, { ...list, elementId: toId });
+      this.composer.emit(EVENTS.CMS_COLLECTION_BOUND, { elementId: toId, collectionId: list.collectionId });
+    }
+    const a = from.getChildren();
+    const b = to.getChildren();
+    for (let i = 0; i < Math.min(a.length, b.length); i++) this.copyTree(a[i], b[i]);
   }
 
   /**
@@ -119,6 +176,11 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     /** Makes the bind one undo step (the inspector passes it; loads don't). */
     historyLabel?: string
   ): void {
+    /* BD-11: only element types that show content bind (BINDABLE_TYPES —
+       the Inspector's own gate), from any door. A container bound to a field
+       had its children replaced by the value. */
+    const type = this.composer.elements.getElement(elementId)?.getType?.();
+    if (type !== undefined && !BINDABLE_TYPES.has(type)) return;
     const collectionName = this.cmsManager.getCollection(collectionId)?.name;
     const binding: CMSElementBinding = {
       binding: {
@@ -150,8 +212,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
          the canvas, a plain page — it previews the first published record. */
       if (!itemId || itemId === "context") {
         const first = (await this.cmsManager.queryContent({ collectionId, status: "published", filter: {} })).items[0];
-        const v = first?.data[fieldSlug];
-        return v === undefined || v === null ? fallback || "" : String(v);
+        return cmsTextOf(first?.data[fieldSlug]) || fallback || "";
       }
 
       // Get the content item. Only published records may resolve: static
@@ -173,12 +234,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       }
 
       // Get the field value
-      const value = item.data[fieldSlug];
-      if (value === undefined || value === null) {
-        return fallback || "";
-      }
-
-      return String(value);
+      return cmsTextOf(item.data[fieldSlug]) || fallback || "";
     } catch {
       return binding.fallback || "";
     }
@@ -193,12 +249,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   ): Promise<string> {
     const { fieldSlug, fallback } = binding;
 
-    const value = contextItem.data[fieldSlug];
-    if (value === undefined || value === null) {
-      return fallback || "";
-    }
-
-    return String(value);
+    return cmsTextOf(contextItem.data[fieldSlug]) || fallback || "";
   }
 
   /**
@@ -231,10 +282,13 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     if (!value) return;
     if (!isSafeCmsBoundValue(binding.property, value)) return;
     const property = binding.property;
+    const richtext =
+      this.cmsManager.getCollection(binding.collectionId)?.fields.find((f) => f.slug === binding.fieldSlug)?.type === "richtext";
     const write = () => {
       // Text semantics, as publish (textContent): the value is escaped, or
-      // toHTML would emit a CMS entry's markup raw into the canvas.
-      if (property === "content") element.setContent(escapeHtmlText(value));
+      // toHTML would emit a CMS entry's markup raw into the canvas. A rich
+      // text field is markup by design — cut to the shared allow-list.
+      if (property === "content") element.setContent(richtext ? sanitizeRichtext(value) : escapeHtmlText(value));
       else element.setTrait(property, value);
     };
     const history = this.composer.history;

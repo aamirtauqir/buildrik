@@ -17,9 +17,10 @@ import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { Button, Chip, IconButton, Select, TextInput } from "@/editor/chrome-ui";
 import { cmsWorkspace } from "./cmsWorkspaceStore";
-import { FIELD_TYPES, FIELD_TYPE_LABEL } from "./fieldTypes";
+import { FIELD_TYPES, FIELD_TYPE_LABEL, fieldKeyError } from "./fieldTypes";
 import type { FieldUse } from "./fieldUsage";
 import { DeleteFieldDialog } from "./DeleteFieldDialog";
+import { OptionsEditor } from "./OptionsEditor";
 import { SECTION } from "./paneStyles";
 
 const ASIDE =
@@ -32,9 +33,8 @@ const CONTROL =
   "tw:[&_select]:h-7 tw:[&_select]:py-0 tw:[&_select]:pl-2 tw:[&_select]:text-[12px] tw:[&_select]:rounded-[6px]";
 const TEXT = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 const NOTE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const KEY_RE = /^[a-z][a-z0-9_-]*$/;
 /** The header glyph before the field name ("# Price"). */
-const TYPE_GLYPH: Record<string, string> = { number: "#", text: "T", textarea: "¶", richtext: "¶", image: "▣", boolean: "◐", date: "▦", reference: "↗", slug: "/" };
+const TYPE_GLYPH: Record<string, string> = { number: "#", text: "T", textarea: "¶", richtext: "¶", image: "▣", boolean: "◐", date: "▦", reference: "↗", slug: "/", multiselect: "☰" };
 
 /** The rules each type can carry (CMSFieldValidation, enforced on publish by
  *  validateFieldValue): numbers take a range, text a length. */
@@ -97,11 +97,9 @@ export function FieldInspector({ composer, collection, collections, field, recor
   const keyError =
     nextKey === field.slug
       ? null
-      : !KEY_RE.test(nextKey)
-        ? "Keys start with a letter: lowercase letters, digits, - and _."
-        : collection.fields.some((f) => f.id !== field.id && f.slug === nextKey)
-          ? `${collection.name} already has the key ${nextKey}.`
-          : null;
+      : collection.fields.some((f) => f.id !== field.id && f.slug === nextKey)
+        ? `${collection.name} already has the key ${nextKey}.`
+        : fieldKeyError(nextKey, new Set());
   const affected = records.find((r) => r.data[field.slug] != null && r.data[field.slug] !== "");
   /* The addable types, plus whatever this field already is. */
   const types = (FIELD_TYPES as readonly string[]).includes(field.type) ? FIELD_TYPES : [...FIELD_TYPES, field.type];
@@ -192,6 +190,12 @@ export function FieldInspector({ composer, collection, collections, field, recor
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </Select>
+          </div>
+        ) : null}
+        {field.type === "multiselect" || field.type === "select" ? (
+          <div className={`${ROW} tw:items-start`}>
+            <label className={`${ROW_LABEL} tw:pt-1.5`} htmlFor="cms-fi-options">Options</label>
+            <OptionsEditor id="cms-fi-options" options={field.options ?? []} onChange={(next) => update({ options: next })} />
           </div>
         ) : null}
         {keyError ? (

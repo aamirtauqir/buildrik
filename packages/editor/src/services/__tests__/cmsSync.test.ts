@@ -753,3 +753,22 @@ describe("a delete the server no longer has is done, not queued", () => {
     off();
   });
 });
+
+/* DM-20: unscoped legacy rows read as "every site's". */
+describe("legacy unscoped collections (DM-20)", () => {
+  const serverRow = (id: string) => ({
+    id, name: id, slug: id, description: null, icon: null, displayField: null, fields: [],
+    createdAt: "2026-09-01T00:00:00.000Z", updatedAt: "2026-09-01T00:00:00.000Z",
+    pageSlugPattern: null, pageSeoTitle: null, pageSeoDescription: null, pageTemplatePath: null,
+  });
+  it("a hydrate claims the ones this site's server lists, and marks the rest unclaimed", async () => {
+    const legacy = (id: string) => ({ id, name: id, slug: id, fields: [], createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" });
+    loadCollections.mockResolvedValue([legacy("mine"), legacy("someone-elses")]);
+    colListQuery.mockResolvedValueOnce([serverRow("mine")]);
+    entListQuery.mockResolvedValue([]);
+    await hydrateCmsFromServer();
+    const saved = saveCollection.mock.calls.map((c) => c[0] as { id: string; siteId?: string });
+    expect(saved.filter((c) => c.id === "mine").at(-1)?.siteId).toBe("site-123");
+    expect(saved.filter((c) => c.id === "someone-elses").at(-1)?.siteId).toBe("~unclaimed");
+  });
+});

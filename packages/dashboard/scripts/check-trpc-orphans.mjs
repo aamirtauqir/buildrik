@@ -99,17 +99,27 @@ function collectProcedures() {
     const base = file.slice(0, -3);
     const key = ROUTER_KEYS[base];
     if (!key) continue;
-    const stack = [key];
-    let nestedIndent = 2;
+    /* Nested routers are tracked with their indent. A sibling router at the
+       same (or shallower) indent closes the previous one — without popping,
+       `settings`, `projectSettings`, `redirects` and `domains` stacked into
+       `settings.projectSettings.redirects.domains.*` and real procedures
+       read as orphans. */
+    const stack = [{ name: key, indent: -1 }];
     for (const line of fs.readFileSync(path.join(dir, file), "utf8").split("\n")) {
       const nested = line.match(/^(\s+)([a-zA-Z][a-zA-Z0-9]*):\s*router\(\{/);
-      if (nested) { stack.push(nested[2]); nestedIndent = nested[1].length; continue; }
+      if (nested) {
+        const indent = nested[1].length;
+        while (stack.length > 1 && stack[stack.length - 1].indent >= indent) stack.pop();
+        stack.push({ name: nested[2], indent });
+        continue;
+      }
       const proc = line.match(
         /^(\s+)([a-zA-Z][a-zA-Z0-9]*):\s*(publicProcedure|protectedProcedure|[a-zA-Z]*[Rr]ate[a-zA-Z]*|[a-zA-Z]*[Pp]rocedure|proc)\b/,
       );
       if (!proc) continue;
-      const prefix = proc[1].length > nestedIndent && stack.length > 1 ? stack.join(".") : stack[0];
-      out.push({ full: `${prefix}.${proc[2]}`, file });
+      const indent = proc[1].length;
+      while (stack.length > 1 && stack[stack.length - 1].indent >= indent) stack.pop();
+      out.push({ full: `${stack.map((s) => s.name).join(".")}.${proc[2]}`, file });
     }
   }
   return out;
@@ -122,6 +132,7 @@ function consumerSource() {
     "packages/editor/src", "packages/shared", "lib", "scripts",
   ];
   let blob = "";
+  const files = [];
   const walk = (rel) => {
     const abs = path.join(ROOT, rel);
     if (!fs.existsSync(abs)) return;
@@ -131,16 +142,18 @@ function consumerSource() {
         if (/^(node_modules|\.next|dist|\.playwright-mcp)$/.test(entry.name)) continue;
         walk(child);
       } else if (/\.(ts|tsx|mjs|js)$/.test(entry.name)) {
-        blob += "\n" + fs.readFileSync(path.join(ROOT, child), "utf8");
+        const text = fs.readFileSync(path.join(ROOT, child), "utf8");
+        files.push(text);
+        blob += "\n" + text;
       }
     }
   };
   roots.forEach(walk);
-  return blob;
+  return { blob, files };
 }
 
 const procedures = collectProcedures();
-const blob = consumerSource();
+const { blob, files } = consumerSource();
 const seen = new Set();
 const orphans = [];
 
@@ -150,7 +163,13 @@ for (const proc of procedures) {
   // `.parent.leaf` matches trpc.a.b.c and client().a.b.c alike; the full dotted
   // path matches the raw-fetch style.
   const parentLeaf = proc.full.split(".").slice(-2).join(".");
-  const called = blob.includes("." + parentLeaf) || blob.includes(`/api/trpc/${proc.full}`);
+  /* Namespace alias: `const api = () => client().siteDetail.domains;` then
+     `api().connect.mutate(...)` in the SAME file (DomainsScreen, RedirectsScreen). */
+  const segs = proc.full.split(".");
+  const ns = segs.slice(-3, -1).join(".");
+  const leafCall = new RegExp(`\\.${segs[segs.length - 1]}\\.(mutate|query|useMutation|useQuery)\\(`);
+  const aliased = segs.length >= 3 && files.some((f) => f.includes("." + ns) && leafCall.test(f));
+  const called = blob.includes("." + parentLeaf) || blob.includes(`/api/trpc/${proc.full}`) || aliased;
   if (!called) orphans.push(proc);
 }
 

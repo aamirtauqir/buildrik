@@ -3,23 +3,10 @@
  * @license BSD-3-Clause
  */
 
-/** Field types supported in CMS collections */
-export type CMSFieldType =
-  | "text"
-  | "textarea"
-  | "richtext"
-  | "number"
-  | "date"
-  | "datetime"
-  | "boolean"
-  | "select"
-  | "multiselect"
-  | "image"
-  | "file"
-  | "reference"
-  | "color"
-  | "url"
-  | "email";
+import { cmsValueError, type CmsFieldType } from "@buildrik/shared/schemas/cms";
+
+/** Field types supported in CMS collections — the shared schema's list (DM-13). */
+export type CMSFieldType = CmsFieldType;
 
 /** Validation rules for CMS fields */
 export interface CMSFieldValidation {
@@ -170,85 +157,9 @@ export function createContentItem(
   };
 }
 
-/** Validate field value against its type */
-export function validateFieldValue(
-  field: CMSField,
-  value: unknown
-): { valid: boolean; error?: string } {
-  const { type, validation } = field;
-
-  // Check required
-  if (validation?.required && (value === undefined || value === null || value === "")) {
-    return { valid: false, error: `${field.name} is required` };
-  }
-
-  // Skip further validation if empty and not required
-  if (value === undefined || value === null || value === "") {
-    return { valid: true };
-  }
-
-  // Type-specific validation
-  switch (type) {
-    case "number": {
-      const num = Number(value);
-      if (isNaN(num)) return { valid: false, error: `${field.name} must be a number` };
-      if (validation?.min !== undefined && num < validation.min) {
-        return { valid: false, error: `${field.name} must be at least ${validation.min}` };
-      }
-      if (validation?.max !== undefined && num > validation.max) {
-        return { valid: false, error: `${field.name} must be at most ${validation.max}` };
-      }
-      break;
-    }
-    case "text":
-    case "textarea":
-    case "richtext": {
-      const str = String(value);
-      if (validation?.minLength !== undefined && str.length < validation.minLength) {
-        return {
-          valid: false,
-          error: `${field.name} must be at least ${validation.minLength} characters`,
-        };
-      }
-      if (validation?.maxLength !== undefined && str.length > validation.maxLength) {
-        return {
-          valid: false,
-          error: `${field.name} must be at most ${validation.maxLength} characters`,
-        };
-      }
-      if (validation?.pattern) {
-        const regex = new RegExp(validation.pattern);
-        if (!regex.test(str)) {
-          return {
-            valid: false,
-            error: validation.patternMessage || `${field.name} format is invalid`,
-          };
-        }
-      }
-      break;
-    }
-    case "email": {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(String(value))) {
-        return { valid: false, error: `${field.name} must be a valid email` };
-      }
-      break;
-    }
-    case "url": {
-      try {
-        new URL(String(value));
-      } catch {
-        return { valid: false, error: `${field.name} must be a valid URL` };
-      }
-      break;
-    }
-    case "select": {
-      if (field.options && !field.options.includes(String(value))) {
-        return { valid: false, error: `${field.name} must be one of: ${field.options.join(", ")}` };
-      }
-      break;
-    }
-  }
-
-  return { valid: true };
+/** Validate field value against its type — the shared rule set (DM-13),
+ *  the same one the server runs on a PUBLISHED upsert. */
+export function validateFieldValue(field: CMSField, value: unknown): { valid: boolean; error?: string } {
+  const error = cmsValueError(field, value);
+  return error ? { valid: false, error } : { valid: true };
 }

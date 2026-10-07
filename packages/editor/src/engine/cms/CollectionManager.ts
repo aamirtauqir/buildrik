@@ -12,6 +12,7 @@ import type {
   CMSQueryResult,
 } from "../../shared/types/cms";
 import { validateFieldValue } from "../../shared/types/cms";
+import { cmsRecordClash, cmsSlugField } from "@buildrik/shared/schemas/cms";
 import { EVENTS } from "../../shared/constants/events";
 import { EventEmitter } from "../EventEmitter";
 import * as Storage from "./CollectionStorage";
@@ -123,17 +124,22 @@ export class CollectionManager extends EventEmitter {
   async createCollection(
     name: string,
     slug?: string,
-    description?: string
+    description?: string,
+    /** The schema it starts with — one write (one server mirror) for the
+       New collection modal, not a create plus one update per field. */
+    init: Partial<Pick<CMSCollection, "fields" | "displayField" | "pageSlugPattern">> = {}
   ): Promise<CMSCollection> {
     await this.ensureInitialized();
 
     const now = new Date().toISOString();
     const collection: CMSCollection = {
-      id: this.generateId(),
+      id: this.nextId(),
       name,
       slug: slug || this.slugify(name),
       description,
-      fields: [],
+      fields: init.fields ?? [],
+      ...(init.displayField ? { displayField: init.displayField } : {}),
+      ...(init.pageSlugPattern ? { pageSlugPattern: init.pageSlugPattern } : {}),
       createdAt: now,
       updatedAt: now,
     };
@@ -205,7 +211,7 @@ export class CollectionManager extends EventEmitter {
 
     const newField: CMSField = {
       ...field,
-      id: this.generateId(),
+      id: this.nextId(),
     };
 
     const updatedFields = [...collection.fields, newField];
@@ -293,8 +299,19 @@ export class CollectionManager extends EventEmitter {
 
   async createContentItem(
     collectionId: string,
-    data: Record<string, unknown> = {}
+    data: Record<string, unknown> = {},
+    options: {
+      /** Created straight into this status — a new record saved as Published
+         is ONE write, checked before it exists. Created as a draft and then
+         published, a refused publish left the draft behind and every retry
+         made another (CMS-01), and the server could see the draft last (RT-02). */
+      status?: CMSContentItem["status"];
+      /** An id the caller reserved with `nextId()` — the record sheet marks
+         it for its own mirror before the create's event fires. */
+      id?: string;
+    } = {}
   ): Promise<CMSContentItem | null> {
+    const status = options.status ?? "draft";
     await this.ensureInitialized();
 
     const collection = this.collections.get(collectionId);
@@ -302,13 +319,15 @@ export class CollectionManager extends EventEmitter {
 
     const now = new Date().toISOString();
     const item: CMSContentItem = {
-      id: this.generateId(),
+      id: options.id ?? this.nextId(),
       collectionId,
       data,
-      status: "draft",
+      status,
       createdAt: now,
       updatedAt: now,
+      ...(status === "published" ? { publishedAt: now } : {}),
     };
+    if (status === "published") await this.assertPublishable(item);
 
     await Storage.saveContentItem(item);
     this.invalidateContentCache(collectionId);
@@ -337,13 +356,7 @@ export class CollectionManager extends EventEmitter {
        that never ran: a Product could go live with no Name, no Price and a
        negative Inventory. Drafts stay free-form on purpose — an unfinished
        record is the point of a draft. */
-    if (updated.status === "published") {
-      // The collections map is the validator's source; a cold manager has an
-      // empty one and would read as "Collection not found" on every publish.
-      await this.ensureInitialized();
-      const check = this.validateContent(updated.collectionId, updated.data);
-      if (!check.valid) throw new CMSValidationError(check.errors);
-    }
+    if (updated.status === "published") await this.assertPublishable(updated);
 
     // Handle publish/unpublish
     if (updates.status === "published" && existing.status !== "published") {
@@ -485,6 +498,30 @@ export class CollectionManager extends EventEmitter {
     return { valid: Object.keys(errors).length === 0, errors };
   }
 
+  /**
+   * Throw `CMSValidationError` unless `item` may publish: the collection's
+   * field rules (the shared validator — the server runs the same on its
+   * PUBLISHED upsert) and its place among the other records — a slug no
+   * other record holds (CMS-07), a page path that is neither empty nor
+   * another published record's (BD-14).
+   */
+  private async assertPublishable(item: CMSContentItem): Promise<void> {
+    // The collections map is the validator's source; a cold manager has an
+    // empty one and would read as "Collection not found" on every publish.
+    await this.ensureInitialized();
+    const check = this.validateContent(item.collectionId, item.data);
+    if (!check.valid) throw new CMSValidationError(check.errors);
+    const collection = this.collections.get(item.collectionId);
+    if (!collection) return;
+    const peers = this.snapshotOnly ? [] : await Storage.loadContentItems(item.collectionId);
+    const clash = cmsRecordClash(
+      collection,
+      item,
+      peers.map((p) => ({ id: p.id, data: p.data, published: p.status === "published" })),
+    );
+    if (clash) throw new CMSValidationError({ [cmsSlugField(collection.fields)?.slug ?? "_record"]: clash });
+  }
+
   // ============================================
   // Helpers
   // ============================================
@@ -497,7 +534,8 @@ export class CollectionManager extends EventEmitter {
     this.contentCache.delete(collectionId);
   }
 
-  private generateId(): string {
+  /** A fresh collection / field / record id. */
+  nextId(): string {
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
   }
 

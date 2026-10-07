@@ -84,6 +84,16 @@ describe("RepeaterRenderer.expandCollectionLists", () => {
     expect(canvas.querySelector("p")!.textContent).toBe("{{item.missing}}");
   });
 
+  it("a data key with RegExp metacharacters neither throws nor mis-matches an attribute token", async () => {
+    const doc = new DOMParser().parseFromString(
+      '<div data-buildrick-id="list"><p data-buildrick-id="p" title="{{item.name}}">x</p></div>',
+      "text/html",
+    );
+    const { renderer } = setup([binding()], [item("r1", { name: "Margherita", "a.*(": "bad" })]);
+    await renderer.expandCollectionLists(doc);
+    expect(doc.querySelector("p")!.getAttribute("title")).toBe("Margherita");
+  });
+
   it("honours the binding's limit", async () => {
     const { renderer, queryContent } = setup([binding({ limit: 2 })]);
     const doc = list();

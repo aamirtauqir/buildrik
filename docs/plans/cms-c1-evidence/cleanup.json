@@ -1,0 +1,19 @@
+{
+  "boundBefore": [
+    "el-muv4vl0e-1glegwb1ppq",
+    "el-muv4vl0e-1tms6tzb33p",
+    "el-muv4vtri-1654nm61i61"
+  ],
+  "postsConsequence": "Deleting removes 1 record and 1 generated page, and unbinds 3 elements — each keeps what it shows now. This can’t be undone.",
+  "teamConsequence": "Deleting removes 1 record. This can’t be undone.",
+  "boundAfter": [],
+  "left": {
+    "cols": [],
+    "pages": [
+      "Home",
+      "About",
+      "Page 3",
+      "Page 4"
+    ]
+  }
+}

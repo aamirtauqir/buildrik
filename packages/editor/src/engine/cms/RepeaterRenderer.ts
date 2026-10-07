@@ -4,11 +4,18 @@
  * @license BSD-3-Clause
  */
 
-import { escapeHtmlText, isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
-import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
+import { isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
+import { CMS_COLLECTION_LIMIT_MAX, isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
+import { cmsRecordLabel, cmsRecordPath, cmsTextOf } from "@buildrik/shared/schemas/cms";
+import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
 import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
+
+/** Elements whose content is raw text, never HTML text. */
+const RAW_TEXT_SELECTOR = "script, style, xmp, iframe, noembed, noframes, noscript, textarea, title";
+
+const escapeRegExp = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Set on an element inside a Collection list whose field bindings were filled
@@ -32,7 +39,7 @@ export function followsContextRecord(binding: Pick<CMSElementBinding, "itemId">)
  * re-requests the page). Values come from CMS entries and property names from
  * stored bindings, so only the shared allowlist and safe URLs land.
  */
-export function writeBoundValue(el: Element, property: string, value: string): void {
+export function writeBoundValue(el: Element, property: string, value: string, richtext = false): void {
   if (!value) {
     if (property === "content") el.textContent = "";
     else if (property === "src" || property === "href") el.removeAttribute(property);
@@ -40,8 +47,16 @@ export function writeBoundValue(el: Element, property: string, value: string): v
     return;
   }
   if (!isSafeCmsBoundValue(property, value)) return;
-  if (property === "content") el.textContent = value;
+  /* A rich text field fills an element with its markup, cut to the shared
+     allow-list — as text it showed its own tags. */
+  if (property === "content" && richtext) el.innerHTML = sanitizeRichtext(value);
+  else if (property === "content") el.textContent = value;
   else el.setAttribute(property, value);
+}
+
+/** The keys of a collection's rich text fields. */
+export function richtextKeys(fields: ReadonlyArray<{ slug: string; type: string }> | undefined): ReadonlySet<string> {
+  return new Set((fields ?? []).filter((f) => f.type === "richtext").map((f) => f.slug));
 }
 
 /** Canvas keeps the template editable: record 0 renders INTO the real
@@ -51,6 +66,10 @@ export function writeBoundValue(el: Element, property: string, value: string): v
 export interface CollectionListExpandOptions {
   canvas?: boolean;
 }
+
+/** A reference field's target records by id (and the target collection, for
+ *  the record's display name). */
+type ReferenceTables = Map<string, { collection: { displayField?: string; fields: Array<{ slug: string }> }; byId: Map<string, CMSContentItem> }>;
 
 interface RepeaterContext {
   item: CMSContentItem;
@@ -138,8 +157,11 @@ export class RepeaterRenderer {
     const { items } = await this.composer.cms.collections.queryContent({
       collectionId: binding.collectionId,
       status: canvas || binding.status === "all" ? undefined : binding.status,
-      limit: binding.limit,
+      /* No limit is "All" (BD-08): queryContent's own default is 50, so an
+         "All" list silently stopped at 50. */
+      limit: binding.limit || CMS_COLLECTION_LIMIT_MAX,
     });
+    const refs = await this.referenceTables(binding.collectionId, canvas);
     const templates = Array.from(listEl.children) as HTMLElement[];
     const pristine = templates.map((t) => t.cloneNode(true) as HTMLElement);
     items.forEach((item, index) => {
@@ -153,7 +175,7 @@ export class RepeaterRenderer {
       const intoTemplate = canvas && index === 0;
       const nodes = intoTemplate ? templates : pristine.map((t) => t.cloneNode(true) as HTMLElement);
       for (const node of nodes) {
-        this.applyContext(node, context, binding, null);
+        this.applyContext(node, context, binding, null, refs);
         this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas);
         if (intoTemplate) continue;
         if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
@@ -181,6 +203,7 @@ export class RepeaterRenderer {
     canvas: boolean,
   ): void {
     const bindings = this.composer.cms.bindings;
+    const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(collectionId)?.fields);
     const isList = (el: Element) => bindings.getCollectionBinding?.(el.getAttribute("data-buildrick-id") ?? "")?.repeat === "children";
     const candidates = [node, ...Array.from(node.querySelectorAll<HTMLElement>("[data-buildrick-id]"))];
     for (const el of candidates) {
@@ -192,10 +215,9 @@ export class RepeaterRenderer {
       }
       if (nested) continue;
       for (const b of own) {
-        const raw = item.data[b.fieldSlug];
-        const value = raw === undefined || raw === null || raw === "" ? b.fallback || "" : String(raw);
+        const value = cmsTextOf(item.data[b.fieldSlug]) || b.fallback || "";
         if (canvas && !value) continue;
-        writeBoundValue(el, b.property, value);
+        writeBoundValue(el, b.property, value, rich.has(b.fieldSlug));
       }
       el.setAttribute(CURRENT_ITEM_ATTR, collectionId);
       if (canvas) el.setAttribute("data-cms-bound", "true");
@@ -205,7 +227,7 @@ export class RepeaterRenderer {
   /** A published page never shows `{{item.x}}` for a field the record does
    *  not have — the canvas keeps it visible so the author can re-aim it. */
   private clearUnresolved(el: HTMLElement, itemVar: string): void {
-    const pattern = new RegExp(`\\{\\{\\s*${itemVar}\\.[\\w-]+\\s*\\}\\}`, "g");
+    const pattern = new RegExp(`\\{\\{\\s*${itemVar}\\.[\\w.-]+\\s*\\}\\}`, "g");
     const walker = (el.ownerDocument ?? document).createTreeWalker(el, NodeFilter.SHOW_TEXT);
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       if (node.textContent && pattern.test(node.textContent)) node.textContent = node.textContent.replace(pattern, "");
@@ -228,8 +250,11 @@ export class RepeaterRenderer {
     const result = await this.composer.cms.collections.queryContent({
       collectionId: binding.collectionId,
       status: binding.status === "all" ? undefined : binding.status,
-      limit: binding.limit,
+      /* No limit is "All" (BD-08): queryContent's own default is 50, so an
+         "All" list silently stopped at 50. */
+      limit: binding.limit || CMS_COLLECTION_LIMIT_MAX,
     });
+    const refs = await this.referenceTables(binding.collectionId, false);
 
     const items = result.items;
     if (items.length === 0) {
@@ -255,7 +280,7 @@ export class RepeaterRenderer {
 
       // Clone the template element
       const clonedEl = templateEl.cloneNode(true) as HTMLElement;
-      this.applyContext(clonedEl, context, binding, `${originalId}-${index}`);
+      this.applyContext(clonedEl, context, binding, `${originalId}-${index}`, refs);
 
       // Add repeater metadata
       clonedEl.setAttribute("data-cms-repeater-item", String(index));
@@ -305,6 +330,24 @@ export class RepeaterRenderer {
   }
 
   /**
+   * The records each Reference field of `collectionId` points at (PD-1), so a
+   * copy can read `{{item.author.name}}`. The canvas reads any status; an
+   * export only published records — a draft author publishes as nothing.
+   */
+  private async referenceTables(collectionId: string, canvas: boolean): Promise<ReferenceTables> {
+    const tables: ReferenceTables = new Map();
+    const cms = this.composer.cms.collections;
+    for (const f of cms.getCollection?.(collectionId)?.fields ?? []) {
+      if (f.type !== "reference" || !f.referenceCollection) continue;
+      const target = cms.getCollection?.(f.referenceCollection);
+      if (!target) continue;
+      const items = (await cms.getContentItems(target.id)).filter((i) => canvas || i.status === "published");
+      tables.set(f.slug, { collection: target, byId: new Map(items.map((i) => [i.id, i])) });
+    }
+    return tables;
+  }
+
+  /**
    * Apply item context to a cloned element using safe DOM methods
    */
   private applyContext(
@@ -313,16 +356,49 @@ export class RepeaterRenderer {
     binding: CMSCollectionBinding,
     /** The clone root's new id, or null to keep every id (Collection list
      *  copies share their template's ids — the breakpoint CSS selects on them). */
-    cloneId: string | null
+    cloneId: string | null,
+    refs: ReferenceTables = new Map()
   ): void {
     const { item, index } = context;
+    /* `{{item.<field>}}` reads the value; through a Reference field it reads
+       the record it points at — `{{item.author}}` its name,
+       `{{item.author.name}}` one of its fields. A deleted or unpublished
+       target reads as nothing. */
+    const refRecord = (field: string) => {
+      const table = refs.get(field);
+      const id = item.data[field];
+      return table && typeof id === "string" ? table.byId.get(id) : undefined;
+    };
+    const valueOf = (field: string, sub?: string): string => {
+      if (refs.has(field)) {
+        const target = refRecord(field);
+        if (!target) return "";
+        return sub ? cmsTextOf(target.data[sub]) : cmsRecordLabel(refs.get(field)!.collection, target.data);
+      }
+      return sub ? "" : cmsTextOf(item.data[field]);
+    };
+    /* BD-12: `{{item.url}}` is the record's own page — the collection's URL
+       pattern through the server's slug rule, root-absolute (the record page
+       is written at <path>/index.html). Nothing when the collection makes no
+       pages. `url` is a reserved key, so no field shadows it. */
+    const pattern = this.composer.cms.collections?.getCollection?.(binding.collectionId)?.pageSlugPattern;
+    const recordPath = pattern ? cmsRecordPath(pattern, item.data) : "";
+    const itemUrl = recordPath ? `/${recordPath}/` : "";
+    const urlPattern = new RegExp(`\\{\\{\\s*${binding.itemVar || "item"}\\.url\\s*\\}\\}`, "g");
+    const pathPattern = new RegExp(`\\{\\{\\s*${binding.itemVar || "item"}\\.([\\w-]+)\\.([\\w-]+)\\s*\\}\\}`, "g");
+    const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(binding.collectionId)?.fields);
     const itemVar = binding.itemVar || "item";
     const indexVar = binding.indexVar || "index";
 
     if (cloneId) el.setAttribute("data-buildrick-id", cloneId);
 
     // Process text content in all child elements
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    /* Not inside a raw-text element: its content is not HTML text, so a value
+       substituted there (`</script><script>…`) would close the element
+       (server A17 skips the same set). */
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement?.closest(RAW_TEXT_SELECTOR) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
     const textNodes: Text[] = [];
 
     let node: Text | null;
@@ -330,44 +406,53 @@ export class RepeaterRenderer {
       textNodes.push(node);
     }
 
+    /* One tokenizer over each text node. The node's literal text stays TEXT
+       and every non-rich value is inserted as text — nothing here is parsed
+       as markup except a rich text value, and that only after the shared
+       sanitizer at this, the output, moment. (Before, any substitution sent
+       the whole node — the author's own literal text with it — through
+       innerHTML, so text like "<img onerror=…>" became an element.) */
+    const tokenRe = new RegExp(
+      `\\{\\{\\s*(?:(${indexVar}|isFirst|isLast|total)|${itemVar}\\.([\\w-]+)(?:\\.([\\w-]+))?)\\s*\\}\\}`,
+      "g",
+    );
+    const ownerDoc = el.ownerDocument ?? document;
     textNodes.forEach((textNode) => {
-      let text = textNode.textContent || "";
-      let injectedValue = false;
-
-      // Replace index variable (numeric — safe literal)
-      const indexPattern = new RegExp(`\\{\\{\\s*${indexVar}\\s*\\}\\}`, "g");
-      text = text.replace(indexPattern, () => String(index));
-
-      // Replace item fields. The replacement is a function so a value
-      // containing "$&", "$1", etc. is inserted verbatim rather than being
-      // interpreted as a String.replace substitution pattern. The value is
-      // HTML-escaped so any markup it carries is inert once injected below.
-      Object.entries(item.data).forEach(([fieldName, value]) => {
-        const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
-        text = text.replace(fieldPattern, () => {
-          injectedValue = true;
-          return escapeHtmlText(String(value ?? ""));
-        });
-      });
-
-      // Replace context helpers (boolean / count — safe literals)
-      text = text.replace(/\{\{\s*isFirst\s*\}\}/g, () => String(context.isFirst));
-      text = text.replace(/\{\{\s*isLast\s*\}\}/g, () => String(context.isLast));
-      text = text.replace(/\{\{\s*total\s*\}\}/g, () => String(context.total));
-
-      if (injectedValue) {
-        // A field value was substituted and HTML-escaped. Inject through an
-        // innerHTML sink so the escaped entities decode back to inert text —
-        // a raw "<script>" in a CMS value lands as literal characters, never
-        // a live node. This is the sink escapeHtmlText exists to protect.
-        const template = (el.ownerDocument ?? document).createElement("template");
-        template.innerHTML = text;
-        textNode.replaceWith(template.content);
-      } else {
-        // Pure literal / index / helper text — assign as text so author
-        // markup stays verbatim (no re-parse of trusted template text).
-        textNode.textContent = text;
+      const text = textNode.textContent || "";
+      const parts: Node[] = [];
+      let last = 0;
+      let changed = false;
+      let m: RegExpExecArray | null;
+      tokenRe.lastIndex = 0;
+      while ((m = tokenRe.exec(text))) {
+        const [whole, helper, field, sub] = m;
+        let value: string | null = null;
+        let richHtml: string | null = null;
+        if (helper === indexVar) value = String(index);
+        else if (helper === "isFirst") value = String(context.isFirst);
+        else if (helper === "isLast") value = String(context.isLast);
+        else if (helper === "total") value = String(context.total);
+        else if (field === "url" && !sub && !("url" in item.data)) value = itemUrl;
+        else if (field && sub) value = valueOf(field, sub);
+        else if (field && field in item.data) {
+          if (rich.has(field)) richHtml = sanitizeRichtext(cmsTextOf(item.data[field]));
+          else value = valueOf(field);
+        }
+        if (value === null && richHtml === null) continue; // not this record's: left for clearUnresolved / the canvas
+        changed = true;
+        if (m.index > last) parts.push(ownerDoc.createTextNode(text.slice(last, m.index)));
+        if (richHtml !== null) {
+          const template = ownerDoc.createElement("template");
+          template.innerHTML = richHtml;
+          parts.push(template.content);
+        } else {
+          parts.push(ownerDoc.createTextNode(value ?? ""));
+        }
+        last = m.index + whole.length;
       }
+      if (!changed) return;
+      if (last < text.length) parts.push(ownerDoc.createTextNode(text.slice(last)));
+      textNode.replaceWith(...parts);
     });
 
     // Process attributes
@@ -384,15 +469,26 @@ export class RepeaterRenderer {
           modified = true;
         }
 
+        if (!("url" in item.data) && urlPattern.test(value)) {
+          value = value.replace(urlPattern, () => itemUrl);
+          modified = true;
+        }
+        urlPattern.lastIndex = 0;
+        if (pathPattern.test(value)) {
+          value = value.replace(pathPattern, (_m, field: string, sub: string) => valueOf(field, sub));
+          modified = true;
+        }
+        pathPattern.lastIndex = 0;
+
         // Replace item fields. Replacer function so a value containing "$&"
         // etc. is inserted literally. The value is set through setAttribute
         // (a DOM sink) and serialized by innerHTML on the way out, which
         // entity-encodes it — no manual escaping needed (and pre-escaping
         // here would double-encode the attribute).
-        Object.entries(item.data).forEach(([fieldName, fieldValue]) => {
-          const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
+        Object.keys(item.data).forEach((fieldName) => {
+          const fieldPattern = new RegExp(`\\{\\{\\s*${escapeRegExp(itemVar)}\\.${escapeRegExp(fieldName)}\\s*\\}\\}`, "g");
           if (fieldPattern.test(value)) {
-            value = value.replace(fieldPattern, () => String(fieldValue ?? ""));
+            value = value.replace(fieldPattern, () => valueOf(fieldName));
             modified = true;
           }
         });

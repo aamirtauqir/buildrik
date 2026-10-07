@@ -18,6 +18,7 @@ import * as React from "react";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { Button, IconButton } from "@/editor/chrome-ui";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
+import { cmsRecordLabel } from "@buildrik/shared/schemas/cms";
 import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
 
 export const PAGE_SIZE = 50;
@@ -57,6 +58,9 @@ export interface RecordsTableProps {
   records: CMSContentItem[];
   query: string;
   onOpenRecord: (id: string) => void;
+  /** A Reference cell's record name (by field key, then record id); absent
+   *  until the referenced records are read. */
+  referenceLabels?: ReadonlyMap<string, ReadonlyMap<string, string>>;
 }
 
 type SortKey = { key: string; dir: "asc" | "desc" };
@@ -68,9 +72,7 @@ function displayFieldOf(collection: CMSCollection): CMSField | undefined {
 
 /** A record's name, from its display field. */
 export function recordTitle(collection: CMSCollection, record: CMSContentItem): string {
-  const f = displayFieldOf(collection);
-  const v = f ? record.data[f.slug] : undefined;
-  return typeof v === "string" && v.trim() ? v : `Record ${record.id.slice(-4)}`;
+  return cmsRecordLabel(collection, record.data) || `Record ${record.id.slice(-4)}`;
 }
 
 /** A value as the table prints it. */
@@ -85,7 +87,14 @@ function isEmpty(value: unknown): boolean {
   return value === undefined || value === null || (typeof value === "string" && value.trim() === "");
 }
 
-export function RecordsTable({ collection, records, query, onOpenRecord }: RecordsTableProps) {
+export function RecordsTable({ collection, records, query, onOpenRecord, referenceLabels }: RecordsTableProps) {
+  /* A reference cell names its record — "Deleted record" for a target that
+     is gone — never the raw id (UI-05). */
+  const cell = (f: CMSField, v: unknown): string => {
+    if (f.type !== "reference" || typeof v !== "string" || !v) return cellText(f, v);
+    const labels = referenceLabels?.get(f.slug);
+    return labels ? labels.get(v) ?? "Deleted record" : "";
+  };
   const [sort, setSort] = React.useState<SortKey | null>(null);
   const [page, setPage] = React.useState(0);
 
@@ -93,7 +102,7 @@ export function RecordsTable({ collection, records, query, onOpenRecord }: Recor
   const extra = React.useMemo(
     () =>
       collection.fields
-        .filter((f) => f !== nameField && f.slug !== "slug" && !SHEET_ONLY.has(f.type))
+        .filter((f) => f !== nameField && f.slug !== "slug" && f.type !== "slug" && !SHEET_ONLY.has(f.type))
         .slice(0, MAX_EXTRA_COLUMNS),
     [collection, nameField],
   );
@@ -102,14 +111,15 @@ export function RecordsTable({ collection, records, query, onOpenRecord }: Recor
     const q = query.trim().toLowerCase();
     const matched = q
       ? records.filter((r) =>
-          collection.fields.some((f) => cellText(f, r.data[f.slug]).toLowerCase().includes(q)),
+          collection.fields.some((f) => cell(f, r.data[f.slug]).toLowerCase().includes(q)),
         )
       : records;
-    if (!sort) return matched;
+    const sortField = sort ? collection.fields.find((f) => f.slug === sort.key) : undefined;
+    if (!sort || (sort.key !== "__updated" && !sortField)) return matched;
     const read = (r: CMSContentItem): string | number => {
-      if (sort.key === "__updated") return Date.parse(r.updatedAt) || 0;
+      if (sort.key === "__updated" || !sortField) return Date.parse(r.updatedAt) || 0;
       const v = r.data[sort.key];
-      return typeof v === "number" ? v : cellText(collection.fields.find((f) => f.slug === sort.key)!, v).toLowerCase();
+      return typeof v === "number" ? v : cell(sortField, v).toLowerCase();
     };
     const dir = sort.dir === "asc" ? 1 : -1;
     return [...matched].sort((a, b) => {
@@ -117,7 +127,7 @@ export function RecordsTable({ collection, records, query, onOpenRecord }: Recor
       const y = read(b);
       return x < y ? -dir : x > y ? dir : 0;
     });
-  }, [records, query, sort, collection]);
+  }, [records, query, sort, collection, referenceLabels]); // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => setPage(0), [query, collection.id]);
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
@@ -189,7 +199,7 @@ export function RecordsTable({ collection, records, query, onOpenRecord }: Recor
                     {f.name} required
                   </>
                 ) : (
-                  cellText(f, r.data[f.slug])
+                  cell(f, r.data[f.slug])
                 )}
               </div>
             ))}

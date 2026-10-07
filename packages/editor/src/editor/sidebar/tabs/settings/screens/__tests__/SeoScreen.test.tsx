@@ -30,7 +30,8 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
   saveSiteSettings: sync.saveSiteSettings,
 }));
 
-import { SeoScreen, robotsPreview, sitemapOrigin } from "../SeoScreen";
+import { SeoScreen, robotsPreview } from "../SeoScreen";
+import { siteOrigin } from "@buildrik/shared/seo/urls";
 import type { SettingsFlush } from "../../types";
 
 const getMock = api.siteDetail.settings.get.query;
@@ -271,19 +272,19 @@ describe("SEO — what Save sends", () => {
   });
 });
 
-describe("robotsPreview / sitemapOrigin — pure", () => {
+describe("robotsPreview / siteOrigin — pure", () => {
   /* The publish worker's own order (resolveSiteOrigin over
      verifiedPrimaryDomain, lib/publish-files.ts): typed canonical, then the
      VERIFIED PRIMARY, then the deploy host. A verified non-primary is not the
      sitemap's host — the preview used to say it was (QA 2026-10-05). */
   it("prefers the typed canonical, then the verified primary, then the published origin — like the worker", () => {
-    expect(sitemapOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }, { domain: "a.com", status: "VERIFIED", isPrimary: true }], null)).toBe("https://a.com");
-    expect(sitemapOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }], null)).toBeNull();
-    expect(sitemapOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }], "https://x.vercel.app")).toBe("https://x.vercel.app");
-    expect(sitemapOrigin([{ domain: "a.com", status: "VERIFIED", isPrimary: true }], null, "www.typed.com/")).toBe("https://www.typed.com");
-    expect(sitemapOrigin([{ domain: "p.com", status: "PENDING", isPrimary: true }], "https://x.vercel.app/path")).toBe("https://x.vercel.app");
-    expect(sitemapOrigin([], "not a url")).toBeNull();
-    expect(sitemapOrigin([], null)).toBeNull();
+    expect(siteOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }, { domain: "a.com", status: "VERIFIED", isPrimary: true }], null)).toBe("https://a.com");
+    expect(siteOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }], null)).toBeNull();
+    expect(siteOrigin([{ domain: "b.com", status: "VERIFIED", isPrimary: false }], "https://x.vercel.app")).toBe("https://x.vercel.app");
+    expect(siteOrigin([{ domain: "a.com", status: "VERIFIED", isPrimary: true }], null, "www.typed.com/")).toBe("https://www.typed.com");
+    expect(siteOrigin([{ domain: "p.com", status: "PENDING", isPrimary: true }], "https://x.vercel.app/path")).toBe("https://x.vercel.app");
+    expect(siteOrigin([], "not a url")).toBeNull();
+    expect(siteOrigin([], null)).toBeNull();
   });
 
   it("builds the default from the switch and origin, and returns a custom file untouched", () => {

@@ -31,9 +31,6 @@ export function createInMemoryCollectionStorage() {
       return collections.get(id) ?? null;
     }),
 
-    loadCollectionBySlug: vi.fn(async (slug: string): Promise<CMSCollection | null> => {
-      return Array.from(collections.values()).find((c) => c.slug === slug) ?? null;
-    }),
 
     deleteCollection: vi.fn(async (id: string): Promise<void> => {
       collections.delete(id);

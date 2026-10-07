@@ -2,13 +2,29 @@ import DOMPurify from "isomorphic-dompurify";
 import { prisma } from "@/lib/prisma";
 import { parseCsvText } from "@/lib/csv";
 import { sanitizeGeneratedPageHtml } from "@/lib/sanitize-blocks";
-import type { Prisma } from "@prisma/client";
+import type { CmsCollection, Prisma } from "@prisma/client";
 import type {
   UpsertCollectionInput,
   UpsertEntryInput,
 } from "@buildrik/shared/schemas/cms";
-import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
+import {
+  CSV_IMPORT_MAX_ROWS,
+  CSV_IMPORT_MAX_COLUMNS,
+  CSV_IMPORT_MAX_CELL_LENGTH,
+  applyCmsPattern,
+  CMS_MAX_COLLECTIONS_PER_SITE,
+  CMS_MAX_ENTRIES_PER_COLLECTION,
+  CMS_MAX_ENTRY_CHARS,
+  cmsFieldsSchema,
+  cmsPatternError,
+  cmsRecordClash,
+  cmsRecordErrors,
+  cmsTextOf,
+  fillCmsRecordTokens,
+  type CmsFieldRule,
+} from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
+import { sanitizeCmsRichText } from "@buildrik/shared/content/cmsRichText";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { CMS_COLLECTION_LIMIT_MAX, filterCmsBindings } from "@buildrik/shared/schemas/sites";
 
@@ -21,7 +37,9 @@ import { CMS_COLLECTION_LIMIT_MAX, filterCmsBindings } from "@buildrik/shared/sc
 
 export class CmsError extends Error {
   constructor(
-    public code: "NOT_FOUND" | "BAD_REQUEST" | "CONFLICT" | "GONE",
+    /* INVALID: the write breaks the collection's own rules (the shared
+       validator, DM-09) — answered with the reason, never retried. */
+    public code: "NOT_FOUND" | "BAD_REQUEST" | "CONFLICT" | "GONE" | "INVALID",
     message: string,
   ) {
     super(message);
@@ -46,12 +64,39 @@ export class CmsError extends Error {
  * meets an attribute an HTML parser will navigate/load — not here at write
  * time, and not by guessing which fields are "URL fields" up front.
  */
-function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknown> {
+function sanitizeEntryData(data: Record<string, unknown>, fields: readonly CmsFieldRule[] = []): Record<string, unknown> {
+  const richtext = new Set(fields.filter((f) => f.type === "richtext").map((f) => f.slug));
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(data)) {
-    out[key] = typeof value === "string" ? stripMarkup(value) : value;
+    out[key] = typeof value === "string" && richtext.has(key) ? sanitizeRichtext(value) : sanitizeLeaves(value);
   }
   return out;
+}
+
+/** Every string leaf of a nested array/object value, markup-stripped. */
+function sanitizeLeaves(value: unknown): unknown {
+  if (typeof value === "string") return stripMarkup(value);
+  if (Array.isArray(value)) return value.map(sanitizeLeaves);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, sanitizeLeaves(v)]));
+  return value;
+}
+
+/**
+ * A rich text value through the ONE shared sanitizer (sanitizeCmsRichText —
+ * the editor runs the same code), with DOMPurify-over-jsdom as its parser.
+ * Runs on every upsert, draft or published, and again at output time on
+ * every record page.
+ */
+function sanitizeRichtext(value: string): string {
+  return sanitizeCmsRichText(DOMPurify, value);
+}
+
+/** A stored `fields` column as the record rules read it. */
+function fieldRules(fields: unknown): CmsFieldRule[] {
+  if (!Array.isArray(fields)) return [];
+  return fields.filter(
+    (f): f is CmsFieldRule => !!f && typeof f === "object" && typeof (f as CmsFieldRule).slug === "string" && typeof (f as CmsFieldRule).name === "string",
+  );
 }
 
 /**
@@ -61,23 +106,27 @@ function sanitizeEntryData(data: Record<string, unknown>): Record<string, unknow
  * it once more. `&` is escaped before parsing so nothing reads as an entity —
  * the text comes back exactly as typed. Escaping belongs to the sink.
  *
- * Repeated until nothing changes: cutting a tag out of the middle of another
- * (`<<img …>img …>`) leaves text that is itself a tag. Unbounded by design —
- * each changing pass strictly shortens the text (DOMPurify only ever removes
- * a tag's markup characters, never adds any, and the `&`-escape means it
- * never reintroduces one via entity decoding), so this always terminates. A
- * fixed iteration cap here would fail OPEN instead: a payload built by
- * repeatedly re-escaping `<` (e.g. `<img src=x onerror=alert(1)>` wrapped as
- * `<<<...<img…>...i>i>i>` N times) can still contain live markup after N
- * passes, and a cap would hand that back untouched. As a fail-closed
- * backstop for a parser disagreement the loop cannot see, a converged result
- * that still holds a tag opener (`<` followed by a letter, `!`, `/` or `?`)
- * loses every angle bracket. A bare `<` or `>` is never markup, so ordinary
- * text ("5 < 10", "a -> b", "<3") comes back exactly as typed.
+ * Repeated until nothing changes, at most MAX_STRIP_PASSES times: cutting a
+ * tag out of the middle of another (`<<img …>img …>`) leaves text that is
+ * itself a tag. Each jsdom pass peels one nesting level, so an unbounded loop
+ * is quadratic in the nesting depth (a 200k-char payload runs for minutes). A
+ * value that has not converged by the pass cap, or by a total-characters
+ * budget (long text gets fewer passes), fails CLOSED: every `<` and `>` is
+ * removed, the same backstop applied to a converged result that still holds a
+ * tag opener (`<` followed by a letter, `!`, `/` or `?`). A bare `<` or `>`
+ * is never markup, so ordinary text ("5 < 10", "a -> b", "<3") comes back
+ * exactly as typed.
  */
+const MAX_STRIP_PASSES = 8;
+/** Total characters all passes together may parse. A pass costs time in proportion to the text, so a long payload gets fewer passes than a short one (a 200k-char bomb: one pass, ~0.4 s). */
+const MAX_STRIP_WORK = 300_000;
+
 function stripMarkup(value: string): string {
   let text = value;
-  for (;;) {
+  let work = 0;
+  for (let pass = 0; ; pass++) {
+    work += text.length;
+    if (pass === MAX_STRIP_PASSES || (pass > 0 && work > MAX_STRIP_WORK)) return text.replace(/[<>]/g, "");
     const fragment = DOMPurify.sanitize(text.replace(/&/g, "&amp;"), { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true });
     const next = fragment.textContent ?? "";
     if (next === text) break;
@@ -145,13 +194,58 @@ async function assertFresh(
   return expected ?? row.updatedAt;
 }
 
-export async function upsertCollection(siteId: string, input: UpsertCollectionInput) {
+/** A unique-constraint refusal (Prisma P2002) and the column(s) it names. */
+function uniqueViolation(e: unknown): string | null {
+  const err = e as { code?: unknown; meta?: { target?: unknown } } | null;
+  return err?.code === "P2002" ? String(err.meta?.target ?? "") : null;
+}
+
+/**
+ * DM-07: a create that meets a unique constraint is answered, not left as a
+ * raw 500 the client retries forever (a Prisma stack reached the browser,
+ * RT-11). Two cases:
+ *  - the id: the same create raced itself (concurrent mirrors of one new
+ *    collection) — the row exists now, so this write is an update of it;
+ *  - the slug: another collection of this site already has it (made on
+ *    another device) — CONFLICT naming that collection's id, which the
+ *    client adopts (`SLUG_TAKEN:<id>`).
+ */
+async function createCollectionRow(siteId: string, input: UpsertCollectionInput, data: Prisma.CmsCollectionUncheckedCreateInput): Promise<CmsCollection | null> {
+  /* DM-12: a bounded number of collections per site. */
+  const count = await prisma.cmsCollection.count({ where: { siteId, deletedAt: null } });
+  if (count >= CMS_MAX_COLLECTIONS_PER_SITE) {
+    throw new CmsError("INVALID", `A site holds at most ${CMS_MAX_COLLECTIONS_PER_SITE} collections.`);
+  }
+  try {
+    return await prisma.cmsCollection.create({ data });
+  } catch (e) {
+    const target = uniqueViolation(e);
+    if (target === null) throw e;
+    if (/slug/i.test(target)) {
+      const owner = await prisma.cmsCollection.findFirst({
+        where: { siteId, slug: input.slug, deletedAt: null },
+        select: { id: true },
+      });
+      throw new CmsError("CONFLICT", `SLUG_TAKEN:${owner?.id ?? ""}`);
+    }
+    if (input.id) return upsertCollection(siteId, { ...input, expectedUpdatedAt: undefined });
+    throw e;
+  }
+}
+
+export async function upsertCollection(siteId: string, input: UpsertCollectionInput): Promise<CmsCollection | null> {
   /* The home page is index.html; a collection bound to it would emit
      {field} tokens at the site root (BD-04). The picker (DynamicPagesPane)
      hides it too — refuse here as a defence in depth. */
   if (input.pageTemplatePath === "index.html") {
     throw new CmsError("BAD_REQUEST", "The home page can't be a collection template. Pick another page.");
   }
+  /* The shared schema (DM-13): field types from the one list, keys unique
+     and pattern-safe; the URL pattern a real path naming real fields (DM-18). */
+  const fieldsCheck = cmsFieldsSchema.safeParse(input.fields);
+  if (!fieldsCheck.success) throw new CmsError("INVALID", fieldsCheck.error.issues[0]?.message ?? "These fields can't be saved.");
+  const patternProblem = input.pageSlugPattern ? cmsPatternError(input.pageSlugPattern, input.fields) : null;
+  if (patternProblem) throw new CmsError("INVALID", patternProblem);
   const data = {
     name: input.name,
     slug: input.slug,
@@ -201,11 +295,11 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
       await touchCmsEdited(siteId);
       return prisma.cmsCollection.findUnique({ where: { id: input.id } });
     }
-    const created = await prisma.cmsCollection.create({ data: { id: input.id, siteId, ...data } });
+    const created = await createCollectionRow(siteId, input, { id: input.id, siteId, ...data });
     await touchCmsEdited(siteId);
     return created;
   }
-  const created = await prisma.cmsCollection.create({ data: { siteId, ...data } });
+  const created = await createCollectionRow(siteId, input, { siteId, ...data });
   await touchCmsEdited(siteId);
   return created;
 }
@@ -252,24 +346,50 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
      still held the collection (C0a live run, 2026-10-02). */
   const collection = await prisma.cmsCollection.findFirst({
     where: { id: input.collectionId, siteId },
-    select: { deletedAt: true },
+    select: { deletedAt: true, fields: true, pageSlugPattern: true },
   });
   if (!collection) throw new CmsError("NOT_FOUND", "Collection not found");
   if (collection.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
+  const fields = fieldRules(collection.fields);
+  /* DM-12: one record is bounded (the column is one JSON value per row). */
+  if (JSON.stringify(input.data).length > CMS_MAX_ENTRY_CHARS) {
+    throw new CmsError("INVALID", `This record is too large to save — keep it under ${CMS_MAX_ENTRY_CHARS / 1000}k characters.`);
+  }
+  const clean = sanitizeEntryData(input.data, fields);
   const data = {
-    data: sanitizeEntryData(input.data) as unknown as Prisma.InputJsonValue,
+    data: clean as unknown as Prisma.InputJsonValue,
     ...(input.status ? { status: input.status } : {}),
   };
   // CSV import loops upsertEntry; skip the per-row bump and let the
   // importer touch cmsEditedAt once at the end.
   const bump = input._skipTouchCmsEdited !== true;
-  if (input.id) {
-    const existing = await prisma.cmsEntry.findUnique({
-      where: { id: input.id },
-      select: { deletedAt: true, collection: { select: { siteId: true } } },
+  const existing = input.id
+    ? await prisma.cmsEntry.findUnique({
+        where: { id: input.id },
+        select: { deletedAt: true, status: true, collection: { select: { siteId: true } } },
+      })
+    : null;
+  if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
+  if (existing?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
+  /* DM-09: what publishes meets the collection's rules here too, not only in
+     the browser — required, types, min/max, pattern, a slug no other record
+     holds and a page path no other published record resolves to. A draft
+     stays free-form. */
+  if ((input.status ?? existing?.status) === "PUBLISHED") {
+    const problems = Object.values(cmsRecordErrors(fields, clean));
+    if (problems.length) throw new CmsError("INVALID", problems.join(" · "));
+    const peers = await prisma.cmsEntry.findMany({
+      where: { collectionId: input.collectionId, deletedAt: null },
+      select: { id: true, data: true, status: true },
     });
-    if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
-    if (existing?.deletedAt) throw new CmsError("GONE", "This record was deleted.");
+    const clash = cmsRecordClash(
+      { fields, pageSlugPattern: collection.pageSlugPattern },
+      { id: input.id ?? "", data: clean },
+      peers.map((p) => ({ id: p.id, data: (p.data ?? {}) as Record<string, unknown>, published: p.status === "PUBLISHED" })),
+    );
+    if (clash) throw new CmsError("INVALID", clash);
+  }
+  if (input.id) {
     if (existing) {
       await assertFresh(
         "cmsEntry",
@@ -291,13 +411,23 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
       if (bump) await touchCmsEdited(siteId);
       return prisma.cmsEntry.findUnique({ where: { id: input.id } });
     }
+    await assertEntryRoom(input.collectionId);
     const created = await prisma.cmsEntry.create({ data: { id: input.id, collectionId: input.collectionId, ...data } });
     if (bump) await touchCmsEdited(siteId);
     return created;
   }
+  await assertEntryRoom(input.collectionId);
   const created = await prisma.cmsEntry.create({ data: { collectionId: input.collectionId, ...data } });
   if (bump) await touchCmsEdited(siteId);
   return created;
+}
+
+/** DM-12: records per collection are bounded (the most a list can show). */
+async function assertEntryRoom(collectionId: string): Promise<void> {
+  const count = await prisma.cmsEntry.count({ where: { collectionId, deletedAt: null } });
+  if (count >= CMS_MAX_ENTRIES_PER_COLLECTION) {
+    throw new CmsError("INVALID", `A collection holds at most ${CMS_MAX_ENTRIES_PER_COLLECTION.toLocaleString("en-US")} records.`);
+  }
 }
 
 export async function deleteEntry(siteId: string, id: string): Promise<void> {
@@ -451,20 +581,6 @@ export async function importCsvEntries(
 
 // ── Dynamic pages (E7) ──────────────────────────────────────────────────────
 
-function slugify(s: string): string {
-  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-
-// Replace {fieldSlug} placeholders with each entry's values. slug patterns
-// slugify the substituted value; SEO patterns keep it human-readable.
-function applyPattern(pattern: string, data: Record<string, unknown>, asSlug: boolean): string {
-  return pattern.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-    const v = data[key];
-    const s = v == null ? "" : String(v);
-    return asSlug ? slugify(s) : s;
-  });
-}
-
 export interface DynamicPage {
   entryId: string;
   slug: string;
@@ -582,8 +698,7 @@ export async function findEmptyBindings(
     const record = itemId
       ? entries.find((e) => e.id === itemId && e.collectionId === collectionId)
       : entries.find((e) => e.collectionId === collectionId);
-    const v = ((record?.data ?? {}) as Record<string, unknown>)[fieldSlug];
-    return v === undefined || v === null ? "" : String(v);
+    return cmsTextOf(((record?.data ?? {}) as Record<string, unknown>)[fieldSlug]);
   };
 
   const found: EmptyBinding[] = [];
@@ -613,6 +728,50 @@ export async function findEmptyBindings(
     walk(page.blocks as BoundNode, undefined);
   }
   return found;
+}
+
+/** A Collection list that publishes no records: bound to nothing, or to a
+ *  collection that no longer exists (BD-06). */
+export interface UnboundList {
+  pageName: string;
+  element: string;
+}
+
+/**
+ * Collection lists on the pages that ship with no live collection behind
+ * them. Read by `runPrePublishChecks` as a blocking row: such a list
+ * published its `{{item.*}}` starter text (the export now clears it, so it
+ * would publish an empty shell instead). Null when no page has a list.
+ */
+export async function findUnboundLists(
+  siteId: string,
+  pages: { name: string; blocks: unknown }[],
+  rawBindings: unknown,
+): Promise<UnboundList[] | null> {
+  const lists: { pageName: string; node: BoundNode }[] = [];
+  const walk = (pageName: string, node: BoundNode | undefined) => {
+    if (!node || typeof node !== "object") return;
+    if (node.type === "collection-list") lists.push({ pageName, node });
+    for (const child of Array.isArray(node.children) ? node.children : []) walk(pageName, child);
+  };
+  for (const page of pages) walk(page.name, page.blocks as BoundNode);
+  if (lists.length === 0) return null;
+  const bound = filterCmsBindings(rawBindings)?.collection ?? {};
+  const ids = [...new Set(Object.values(bound).map((b) => b.collectionId))];
+  const live = new Set(
+    ids.length
+      ? (await prisma.cmsCollection.findMany({ where: { siteId, deletedAt: null, id: { in: ids } }, select: { id: true } })).map((c) => c.id)
+      : [],
+  );
+  return lists
+    .filter(({ node }) => {
+      const b = typeof node.id === "string" ? bound[node.id] : undefined;
+      return !b || !live.has(b.collectionId);
+    })
+    .map(({ pageName, node }) => {
+      const layerName = node.data?.layerName;
+      return { pageName, element: typeof layerName === "string" && layerName ? layerName : "Collection list" };
+    });
 }
 
 export interface GeneratedPage {
@@ -646,9 +805,9 @@ export async function resolveDynamicPages(
     const data = (e.data as Record<string, unknown>) ?? {};
     return {
       entryId: e.id,
-      slug: applyPattern(col.pageSlugPattern as string, data, true),
-      seoTitle: col.pageSeoTitle ? applyPattern(col.pageSeoTitle, data, false) : "",
-      seoDescription: col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "",
+      slug: applyCmsPattern(col.pageSlugPattern as string, data, true),
+      seoTitle: col.pageSeoTitle ? applyCmsPattern(col.pageSeoTitle, data, false) : "",
+      seoDescription: col.pageSeoDescription ? applyCmsPattern(col.pageSeoDescription, data, false) : "",
     };
   });
 }
@@ -682,16 +841,19 @@ export async function resolveDynamicPages(
 function substituteOutsideScriptStyle(
   html: string,
   data: Record<string, unknown>,
+  /** Rich text fields: substituted as their allow-listed markup (PD-1). */
+  richtext: ReadonlySet<string> = new Set(),
+  /** The collection's field keys — a bare `{word}` is a token only for these (BD-13). */
+  fieldKeys: ReadonlySet<string> = new Set(Object.keys(data)),
 ): string {
   const spanRe = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
   let result = "";
   let last = 0;
   let m: RegExpExecArray | null;
   const sub = (segment: string) =>
-    segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-      const v = data[key];
-      return v == null ? "" : escapeHtmlText(String(v));
-    });
+    fillCmsRecordTokens(segment, fieldKeys, (key) =>
+      richtext.has(key) ? sanitizeRichtext(cmsTextOf(data[key])) : escapeHtmlText(cmsTextOf(data[key])),
+    );
   while ((m = spanRe.exec(html))) {
     result += sub(html.slice(last, m.index));
     result += m[0]; // script/style span verbatim — never substituted
@@ -706,10 +868,18 @@ function substituteOutsideScriptStyle(
 // removing them produced two <title> elements, and browsers/crawlers use the
 // first, so the pattern-derived title the collection is configured for never
 // actually won.
+/* BD-05: the template page's own social + canonical tags described the
+   TEMPLATE page (which never publishes) — every record page claimed to be it.
+   They go with its title and description; og:title / og:description are
+   re-emitted per record from the patterns below. A per-record canonical and
+   og:url need the site's published URL, which this service does not own
+   (publish URLs live with the SEO/publish code) — not emitted here. */
 function stripExistingSeoTags(html: string): string {
   return html
     .replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, "")
-    .replace(/<meta\b[^>]*\bname\s*=\s*["']description["'][^>]*>/gi, "");
+    .replace(/<meta\b[^>]*\bname\s*=\s*["'](?:description|twitter:title|twitter:description|twitter:url)["'][^>]*>/gi, "")
+    .replace(/<meta\b[^>]*\bproperty\s*=\s*["']og:(?:title|description|url)["'][^>]*>/gi, "")
+    .replace(/<link\b[^>]*\brel\s*=\s*["']canonical["'][^>]*>/gi, "");
 }
 
 export async function generateDynamicPages(
@@ -719,7 +889,7 @@ export async function generateDynamicPages(
 ): Promise<GeneratedPage[]> {
   const col = await prisma.cmsCollection.findFirst({
     where: { id: collectionId, siteId, deletedAt: null },
-    select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true },
+    select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true, fields: true },
   });
   if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
   if (!col.pageSlugPattern) return [];
@@ -728,16 +898,25 @@ export async function generateDynamicPages(
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
+  const rules = fieldRules(col.fields);
+  const richtext = new Set(rules.filter((f) => f.type === "richtext").map((f) => f.slug));
+  const fieldKeys = new Set(rules.map((f) => f.slug));
   const cleanedTemplate = stripExistingSeoTags(templateHtml);
   return entries.map((e) => {
     const data = (e.data as Record<string, unknown>) ?? {};
-    const slug = applyPattern(col.pageSlugPattern as string, data, true);
-    const seoTitle = col.pageSeoTitle ? applyPattern(col.pageSeoTitle, data, false) : "";
-    const seoDescription = col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "";
-    let html = substituteOutsideScriptStyle(cleanedTemplate, data);
+    const slug = applyCmsPattern(col.pageSlugPattern as string, data, true);
+    const seoTitle = col.pageSeoTitle ? applyCmsPattern(col.pageSeoTitle, data, false) : "";
+    const seoDescription = col.pageSeoDescription ? applyCmsPattern(col.pageSeoDescription, data, false) : "";
+    /* A record's own keys count as fields too (a collection stored without
+       its field list still fills its tokens); any other {word} stays. */
+    let html = substituteOutsideScriptStyle(cleanedTemplate, data, richtext, new Set([...fieldKeys, ...Object.keys(data)]));
     const seoTags =
       `<title>${escapeHtmlText(seoTitle)}</title>` +
-      (seoDescription ? `<meta name="description" content="${escapeHtmlText(seoDescription)}">` : "");
+      (seoTitle ? `<meta property="og:title" content="${escapeHtmlText(seoTitle)}">` : "") +
+      (seoDescription
+        ? `<meta name="description" content="${escapeHtmlText(seoDescription)}">` +
+          `<meta property="og:description" content="${escapeHtmlText(seoDescription)}">`
+        : "");
     html = insertBeforeHeadClose(html, seoTags);
     // The sink defense against a dangerous URL a
     // substitution introduced runs here, over the FINAL page, through a real
@@ -807,10 +986,27 @@ export async function getPublishedCmsForCollections(siteId: string, collectionId
      this page" binding as the `{field}` token the worker fills per record
      only when it knows the page IS the template. Without it every record page
      published the newest record's values. */
-  const collections = await prisma.cmsCollection.findMany({
+  /* pageSlugPattern too: a list copy's {{item.url}} is built from it (BD-12);
+     without it every published card linked nowhere. */
+  const select = { id: true, name: true, slug: true, displayField: true, fields: true, pageTemplatePath: true, pageSlugPattern: true, createdAt: true, updatedAt: true } as const;
+  const bound = await prisma.cmsCollection.findMany({
     where: { siteId, deletedAt: null, id: { in: [...collectionIds] } },
-    select: { id: true, name: true, slug: true, displayField: true, fields: true, pageTemplatePath: true, createdAt: true, updatedAt: true },
+    select,
   });
+  /* A Reference field's records are read through it ({{item.author.name}}):
+     the collections it points at publish from the server too. */
+  const targets = [
+    ...new Set(
+      bound.flatMap((c) =>
+        (Array.isArray(c.fields) ? (c.fields as Array<{ type?: unknown; referenceCollection?: unknown }>) : [])
+          .filter((f) => f.type === "reference" && typeof f.referenceCollection === "string")
+          .map((f) => f.referenceCollection as string),
+      ),
+    ),
+  ].filter((id) => !bound.some((c) => c.id === id));
+  const collections = targets.length
+    ? [...bound, ...(await prisma.cmsCollection.findMany({ where: { siteId, deletedAt: null, id: { in: targets } }, select }))]
+    : bound;
   const entries = await prisma.cmsEntry.findMany({
     where: { collectionId: { in: collections.map((c) => c.id) }, status: "PUBLISHED", deletedAt: null },
     orderBy: { updatedAt: "desc" },

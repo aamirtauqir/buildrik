@@ -25,6 +25,7 @@ import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import {
   Button,
+  Chip,
   IconButton,
   Menu,
   MenuItem,
@@ -41,9 +42,11 @@ import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
+import { RichTextField } from "./RichTextField";
+import { ReferenceField } from "./ReferenceField";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
-import { resolveUrl, slugify } from "./DynamicPagesPane";
-import type { CmsTab } from "./cmsWorkspaceStore";
+import { applyCmsPattern, cmsSlugField, cmsSlugify, cmsValueError } from "@buildrik/shared/schemas/cms";
+import { cmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { claimCmsConflict, isCmsConflictPending, type CmsConflict } from "@/services/cmsSync";
 
@@ -68,8 +71,10 @@ export interface RecordSheetProps {
    *  queued for retry (false), or been refused because another device changed
    *  the record ("conflict" — the toast offers Keep mine / Use theirs). The
    *  sheet stays open on the last two — closing on a queued save was hiding
-   *  the queued mirror from the user. */
-  onSave: (data: Record<string, unknown>, published: boolean) => Promise<boolean | "conflict">;
+   *  the queued mirror from the user.
+   *  `{ refused }`: the server refused the record under the collection's
+   *  rules (the shared validator) — the sheet shows the reason and stays. */
+  onSave: (data: Record<string, unknown>, published: boolean) => Promise<boolean | "conflict" | { refused: string }>;
   onDelete: (record: CMSContentItem) => Promise<void>;
   /** Undo for an instant delete: writes the record back. */
   onRestore: (record: CMSContentItem) => Promise<void>;
@@ -96,7 +101,7 @@ const NAV_TAB =
 
 const OFFLINE = "Saved on this device only. The server is offline — the change will sync when you reconnect.";
 
-const WIDE: ReadonlySet<CMSField["type"]> = new Set(["textarea", "richtext", "image", "file"]);
+const WIDE: ReadonlySet<CMSField["type"]> = new Set(["textarea", "richtext", "image", "file", "multiselect"]);
 
 function blank(fields: CMSField[]): Record<string, unknown> {
   return Object.fromEntries(fields.map((f) => [f.slug, fieldDefault(f)]));
@@ -183,12 +188,35 @@ export function RecordSheet({
     published !== initialPublished ||
     collection.fields.some((f) => JSON.stringify(form[f.slug] ?? "") !== JSON.stringify(initial[f.slug] ?? ""));
   const missing = collection.fields.filter((f) => f.validation?.required && isEmpty(form[f.slug]));
+  /* UI-08: a collection with no fields has nothing to store — Save made an
+     empty record. */
+  const noFields = collection.fields.length === 0;
   const singular = collection.name.replace(/s$/, "");
   const title = record ? recordTitle(collection, record) : `New ${singular}`;
   const crumb = record ? title : "New record";
 
+  /* Leaving on purpose (saved, discarded, deleted, the server's copy taken)
+     must not meet the workspace's leave guard below. */
+  const leaving$ = React.useRef(false);
+  const leave = (go: () => void) => {
+    leaving$.current = true;
+    go();
+  };
   /* A deleted record has nothing left to discard: its edit is already lost. */
-  const guard = (go: () => void) => (dirty && !gone ? setLeaveTo(() => go) : go());
+  const guard = (go: () => void) => (dirty && !gone ? setLeaveTo(() => go) : leave(go));
+  /* UI-02: every other door out of this record — a drawer collection row, ⌘K,
+     a table row, a tab — moves the workspace store, which asks here first. */
+  const stillDirty = React.useRef(false);
+  stillDirty.current = dirty && !gone;
+  React.useEffect(
+    () =>
+      cmsWorkspace.setLeaveGuard((go) => {
+        if (leaving$.current || !stillDirty.current) return false;
+        setLeaveTo(() => go);
+        return true;
+      }),
+    [],
+  );
 
   /* 8139:217560 — a save the server refused because another device changed
      the record waits here for Keep mine / Use theirs, not in the shell's
@@ -240,7 +268,7 @@ export function RecordSheet({
       title: `Record saved · ${collection.name}`,
       description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
     });
-    onClose();
+    leave(onClose);
   };
 
   /* Keep mine re-sends this device's copy; it can conflict again (the claim
@@ -254,7 +282,7 @@ export function RecordSheet({
       if (choice === "useTheirs") {
         await c.useTheirs();
         settleConflict();
-        onClose();
+        leave(onClose);
         return;
       }
       const landed = await c.keepMine();
@@ -274,6 +302,8 @@ export function RecordSheet({
       const reached = await onSave(form, published);
       if (reached === true) {
         closeSaved();
+      } else if (typeof reached === "object") {
+        setSaveError(reached.refused);
       } else if (reached !== "conflict") {
         /* "conflict": the server answered that another device changed this
            record; the claim above already holds the choice and the footer
@@ -311,7 +341,7 @@ export function RecordSheet({
       return;
     }
     await onDelete(record);
-    onClose();
+    leave(onClose);
     /* 6881:70387 — "<name> deleted · <collection>", what went, what Undo does. */
     addToast({
       tone: "success",
@@ -324,16 +354,19 @@ export function RecordSheet({
   /* 6749:59940 — a new record's slug follows its name ("auto from name")
      until someone types into the slug field itself. */
   const nameSlug = collection.displayField ?? "name";
-  const autoSlug = !record && collection.fields.some((f) => f.slug === "slug") && collection.fields.some((f) => f.slug === nameSlug);
+  /* The slug is a real field type (CMS-09); a collection from before the
+     type keeps a field keyed `slug`. */
+  const slugKey = cmsSlugField(collection.fields)?.slug ?? null;
+  const autoSlug = !record && slugKey !== null && collection.fields.some((f) => f.slug === nameSlug);
   const [slugTouched, setSlugTouched] = React.useState(false);
   const nameField = collection.fields.find((f) => f.slug === nameSlug);
   const nameMissing = Boolean(nameField) && isEmpty(form[nameSlug]);
   const set = (slug: string, v: unknown) => {
-    if (slug === "slug") setSlugTouched(true);
+    if (slug === slugKey) setSlugTouched(true);
     setForm((p) => ({
       ...p,
       [slug]: v,
-      ...(autoSlug && !slugTouched && slug === nameSlug ? { slug: slugify(String(v ?? "")) } : {}),
+      ...(autoSlug && slugKey && !slugTouched && slug === nameSlug ? { [slugKey]: cmsSlugify(String(v ?? "")) } : {}),
     }));
   };
 
@@ -341,15 +374,21 @@ export function RecordSheet({
     const id = `cms-field-${f.slug}`;
     const v = form[f.slug];
     const label = (
-      <label className={LABEL} htmlFor={id}>
+      <label className={LABEL} htmlFor={id} id={`${id}-label`}>
         {f.name}
         {f.validation?.required ? " *" : ""}
       </label>
     );
-    const err =
-      f.validation?.required && isEmpty(v) && (published || saveError) ? (
-        <span className={ERROR} data-testid={`cms-field-error-${f.slug}`}>{f.name} is required to publish</span>
-      ) : null;
+    /* Per-field rules run live (§10c) — the shared validator, so the sheet
+       says what the server would refuse: a slug's format, a number, a URL… */
+    const problem = isEmpty(v)
+      ? f.validation?.required && (published || saveError)
+        ? `${f.name} is required to publish`
+        : null
+      : cmsValueError(f, v);
+    const err = problem ? (
+      <span className={ERROR} data-testid={`cms-field-error-${f.slug}`}>{problem}</span>
+    ) : null;
     if (f.type === "image") {
       const src = typeof v === "string" ? v : "";
       return (
@@ -387,7 +426,9 @@ export function RecordSheet({
       );
     }
     let input: React.ReactNode;
-    if (f.type === "textarea" || f.type === "richtext") {
+    if (f.type === "richtext") {
+      input = <RichTextField id={id} labelId={`${id}-label`} value={typeof v === "string" ? v : ""} onChange={(html) => set(f.slug, html)} />;
+    } else if (f.type === "textarea") {
       input = (
         <Textarea
           id={id}
@@ -397,6 +438,26 @@ export function RecordSheet({
           onChange={(e) => set(f.slug, e.target.value)}
         />
       );
+    } else if (f.type === "multiselect") {
+      /* PD-1: a chip per option; the value is the list of chosen options
+         (a text box here stored "a,b" over the array — UI-07). */
+      const chosen = Array.isArray(v) ? (v as string[]) : [];
+      input = f.options?.length ? (
+        <span className="tw:flex tw:flex-wrap tw:gap-1" role="group" aria-labelledby={`${id}-label`} data-testid={`${id}-chips`}>
+          {f.options.map((o) => (
+            <Chip
+              key={o}
+              label={o}
+              selected={chosen.includes(o)}
+              onClick={() => set(f.slug, chosen.includes(o) ? chosen.filter((x) => x !== o) : [...chosen, o])}
+            />
+          ))}
+        </span>
+      ) : (
+        <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">No options yet · add them in Fields</span>
+      );
+    } else if (f.type === "reference") {
+      input = <ReferenceField id={id} composer={composer} field={f} value={v} className={CONTROL} onChange={(rid) => set(f.slug, rid)} />;
     } else if (f.type === "boolean") {
       input = (
         <Select id={id} sizing="sm" className={CONTROL} value={v ? "yes" : "no"} onChange={(e) => set(f.slug, e.target.value === "yes")}>
@@ -423,9 +484,11 @@ export function RecordSheet({
           type={type}
           sizing="sm"
           className={CONTROL}
-          placeholder={autoSlug && f.slug === "slug" ? "auto from name" : f.placeholder}
+          placeholder={autoSlug && f.slug === slugKey ? "auto from name" : f.placeholder}
           value={v === undefined || v === null ? "" : String(v)}
-          onChange={(e) => set(f.slug, f.type === "number" && e.target.value !== "" ? Number(e.target.value) : e.target.value)}
+          onChange={(e) =>
+            set(f.slug, f.type === "number" ? (e.target.value === "" ? undefined : Number(e.target.value)) : e.target.value)
+          }
         />
       );
     }
@@ -625,7 +688,13 @@ export function RecordSheet({
                 : conflict
                   ? "Your changes are waiting for a conflict choice."
                   : saveError ??
-                    (dirty ? "Unsaved changes on this record" : record ? "No unsaved changes on this record" : "New record · nothing saved yet")}
+                    (noFields
+                      ? "Add a field to this collection before saving a record."
+                      : dirty
+                        ? "Unsaved changes on this record"
+                        : record
+                          ? "No unsaved changes on this record"
+                          : "New record · nothing saved yet")}
             </span>
             {/* 6749:59940 — a new record says what Save needs and what it does. */}
             {!record && !saveError && !blocked ? (
@@ -638,7 +707,7 @@ export function RecordSheet({
           <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel" onClick={() => guard(onClose)}>
             Cancel
           </Button>
-          <Button size="xs" className={SMALL_BTN} disabled={blocked || (!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
+          <Button size="xs" className={SMALL_BTN} disabled={blocked || noFields || (!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
             {saveError && !blocked ? "Retry save" : "Save record"}
           </Button>
         </div>
@@ -663,7 +732,7 @@ export function RecordSheet({
               onClick={() => {
                 const go = leaveTo;
                 setLeaveTo(null);
-                go?.();
+                if (go) leave(go);
               }}
               data-testid="cms-discard-confirm"
             >
@@ -684,11 +753,11 @@ export function RecordSheet({
           onConfirm={async () => {
             await onDelete(record);
             setTypedDelete(false);
-            onClose();
+            leave(onClose);
             addToast({ tone: "success", title: `${title} deleted · ${collection.name}`, description: "The record and its generated page are gone." });
           }}
           name={title}
-          consequence={`Deleting removes this record and its generated page ${resolveUrl(collection.pageSlugPattern ?? "", record.data)}.`}
+          consequence={`Deleting removes this record and its generated page ${applyCmsPattern(collection.pageSlugPattern ?? "", record.data, true)}.`}
           confirmLabel="Delete record"
           testId="cms-delete-record"
         />

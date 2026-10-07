@@ -136,6 +136,10 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
       this.bindings.set(elementId, filtered);
     }
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId, key });
+    /* The map is part of the saved project: an unbind that dirties nothing
+       is never saved, and the server kept the binding (found live, C1 —
+       a collection delete's unbinds came back on reload). */
+    this.composer.markDirty?.();
     this.composer.history?.noteUnrecordedAction?.("unbinding a field");
   }
 
@@ -146,8 +150,27 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
     if (historyLabel) this.composer.history?.flushPending?.();
     this.bindings.delete(elementId);
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId });
+    this.composer.markDirty?.();
     if (historyLabel) this.composer.history?.record?.(historyLabel);
     else this.composer.history?.noteUnrecordedAction?.("unbinding a field");
+  }
+
+  /**
+   * Drop an element's bindings because the element is gone (BD-22). Not an
+   * unbind: the delete that removed the element is the history step, and its
+   * snapshot (and Undo's) already reads this map.
+   */
+  forgetElement(elementId: string): void {
+    if (!this.bindings.delete(elementId)) return;
+    this.composer.emit(EVENTS.BINDING_REMOVED, { elementId });
+  }
+
+  /** Give `toId` a copy of `fromId`'s bindings (a duplicated element, BD-06). */
+  copyElement(fromId: string, toId: string): void {
+    const list = this.bindings.get(fromId);
+    if (!list?.length) return;
+    this.bindings.set(toId, list.map((b) => structuredClone(b)));
+    list.forEach((binding) => this.composer.emit(EVENTS.BINDING_CREATED, { elementId: toId, binding }));
   }
 
   /**

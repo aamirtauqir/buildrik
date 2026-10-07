@@ -29,6 +29,7 @@ import {
   srcsetUrls,
   toAllowedElementTag,
 } from "@buildrik/shared/schemas/element-markup";
+import { sanitizeCmsRichText } from "@buildrik/shared/content/cmsRichText";
 import type { ElementData } from "../../types";
 import { generateId } from "../helpers/id";
 import {
@@ -142,6 +143,15 @@ export function isSafeAttrValue(attr: string, value: string, _tag: string): bool
  * these are the named exceptions DOMPurify does not allow out of the box.
  */
 const EDITOR_ADD_ATTR = ["target", "data-buildrick-id", "data-buildrick-type"];
+
+/**
+ * A CMS rich text value through the ONE shared sanitizer (PD-1) — the code
+ * the server runs too (`sanitizeCmsRichText`, this browser's DOMPurify as its
+ * parser).
+ */
+export function sanitizeRichtext(html: string): string {
+  return sanitizeCmsRichText(DOMPurify, html);
+}
 
 /**
  * Sanitize an HTML string, removing dangerous elements and attributes while

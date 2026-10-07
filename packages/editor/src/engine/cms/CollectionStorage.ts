@@ -11,7 +11,11 @@ import type { CMSCollection, CMSContentItem } from "../../shared/types/cms";
 // ============================================
 
 const DB_NAME = "aquibra-cms";
-const DB_VERSION = 1;
+/* v2 (DM-06): v1 indexed collections by `slug` UNIQUE across the whole
+   browser store — but slugs are unique per SITE, so a second site's
+   `products` collection failed to save or hydrate in a browser that had
+   opened the first. */
+const DB_VERSION = 2;
 const COLLECTIONS_STORE = "collections";
 const CONTENT_STORE = "content";
 
@@ -31,26 +35,49 @@ function getDatabase(): Promise<IDBDatabase> {
     request.onsuccess = () => resolve(request.result);
 
     request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      // Create collections store
-      if (!db.objectStoreNames.contains(COLLECTIONS_STORE)) {
-        const store = db.createObjectStore(COLLECTIONS_STORE, { keyPath: "id" });
-        store.createIndex("slug", "slug", { unique: true });
-        store.createIndex("updatedAt", "updatedAt", { unique: false });
-      }
-
-      // Create content store
-      if (!db.objectStoreNames.contains(CONTENT_STORE)) {
-        const store = db.createObjectStore(CONTENT_STORE, { keyPath: "id" });
-        store.createIndex("collectionId", "collectionId", { unique: false });
-        store.createIndex("status", "status", { unique: false });
-        store.createIndex("updatedAt", "updatedAt", { unique: false });
-      }
+      const req = event.target as IDBOpenDBRequest;
+      upgradeCmsDatabase(req.result, req.transaction);
     };
   });
 
   return dbPromise;
+}
+
+/** The minimal IndexedDB surface the upgrade touches (a test can fake it). */
+export interface CmsDbLike {
+  objectStoreNames: { contains(name: string): boolean };
+  createObjectStore(name: string, options: IDBObjectStoreParameters): CmsStoreLike;
+}
+export interface CmsStoreLike {
+  indexNames: { contains(name: string): boolean };
+  createIndex(name: string, keyPath: string | string[], options?: IDBIndexParameters): unknown;
+  deleteIndex(name: string): void;
+}
+
+/**
+ * Bring the stores to the current shape from any older version: create what
+ * is missing, and replace v1's browser-wide unique `slug` index with a
+ * per-site `[siteId, slug]` one (DM-06). Not unique: the server owns slug
+ * uniqueness, and a local index refusing a write would strand the row.
+ */
+export function upgradeCmsDatabase(
+  db: CmsDbLike,
+  tx: { objectStore(name: string): CmsStoreLike } | null,
+): void {
+  const collections = db.objectStoreNames.contains(COLLECTIONS_STORE)
+    ? tx?.objectStore(COLLECTIONS_STORE)
+    : db.createObjectStore(COLLECTIONS_STORE, { keyPath: "id" });
+  if (collections) {
+    if (collections.indexNames.contains("slug")) collections.deleteIndex("slug");
+    if (!collections.indexNames.contains("siteSlug")) collections.createIndex("siteSlug", ["siteId", "slug"], { unique: false });
+    if (!collections.indexNames.contains("updatedAt")) collections.createIndex("updatedAt", "updatedAt", { unique: false });
+  }
+  if (!db.objectStoreNames.contains(CONTENT_STORE)) {
+    const store = db.createObjectStore(CONTENT_STORE, { keyPath: "id" });
+    store.createIndex("collectionId", "collectionId", { unique: false });
+    store.createIndex("status", "status", { unique: false });
+    store.createIndex("updatedAt", "updatedAt", { unique: false });
+  }
 }
 
 // ============================================
@@ -108,20 +135,6 @@ export async function loadCollection(id: string): Promise<CMSCollection | null> 
     const request = store.get(id);
 
     request.onerror = () => reject(new Error("Failed to load collection"));
-    request.onsuccess = () => resolve(request.result as CMSCollection | null);
-  });
-}
-
-export async function loadCollectionBySlug(slug: string): Promise<CMSCollection | null> {
-  const db = await getDatabase();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([COLLECTIONS_STORE], "readonly");
-    const store = transaction.objectStore(COLLECTIONS_STORE);
-    const index = store.index("slug");
-    const request = index.get(slug);
-
-    request.onerror = () => reject(new Error("Failed to load collection by slug"));
     request.onsuccess = () => resolve(request.result as CMSCollection | null);
   });
 }

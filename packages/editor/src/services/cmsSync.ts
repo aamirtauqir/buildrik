@@ -52,6 +52,8 @@ export interface CmsRows {
     id: string; name: string; slug: string; displayField?: string | null; fields: unknown;
     /** The collection's template page (publish snapshot only). */
     pageTemplatePath?: string | null;
+    /** Its URL pattern ({{item.url}}; publish snapshot only). */
+    pageSlugPattern?: string | null;
     createdAt?: Date | string; updatedAt?: Date | string;
   }>;
   entries: ReadonlyArray<{
@@ -72,6 +74,7 @@ export function cmsFromRows(rows: CmsRows): { collections: CMSCollection[]; item
       displayField: c.displayField ?? undefined,
       fields: withSlugs(c.fields),
       ...(c.pageTemplatePath ? { pageTemplatePath: c.pageTemplatePath } : {}),
+      ...(c.pageSlugPattern ? { pageSlugPattern: c.pageSlugPattern } : {}),
       createdAt: iso(c.createdAt ?? c.updatedAt ?? new Date(0)),
       updatedAt: iso(c.updatedAt ?? new Date(0)),
     })),
@@ -248,11 +251,41 @@ export function isCmsConflictPending(kind: "collection" | "entry", id: string): 
   return conflicted.has(`${kind}Upsert:${id}`);
 }
 
-type Outcome = "ok" | "conflict" | "gone";
+/* A write the server refused because it breaks the collection's own rules
+   (the shared validator, DM-09): answered once with a reason, never retried —
+   retrying the same payload can only be refused again, and a refusal retried
+   forever was a permanent "didn't sync" notice. The reason is kept for the
+   surface that made the write (the record sheet) and announced to the rest. */
+export interface CmsInvalid {
+  kind: "collection" | "entry";
+  id: string;
+  message: string;
+}
+const invalidListeners = new Set<(i: CmsInvalid) => void>();
+export function onCmsInvalid(cb: (i: CmsInvalid) => void): () => void {
+  invalidListeners.add(cb);
+  return () => invalidListeners.delete(cb);
+}
+const invalidReasons = new Map<string, string>();
+/** The server's reason for refusing the last write of this row, once. */
+export function takeCmsInvalid(kind: "collection" | "entry", id: string): string | null {
+  const key = `${kind}:${id}`;
+  const reason = invalidReasons.get(key) ?? null;
+  invalidReasons.delete(key);
+  return reason;
+}
+function announceInvalid(kind: CmsInvalid["kind"], id: string, e: unknown): void {
+  const message = (e instanceof Error ? e.message : "").replace(/^CMS_INVALID:/, "");
+  invalidReasons.set(`${kind}:${id}`, message);
+  for (const cb of invalidListeners) cb({ kind, id, message });
+}
+
+type Outcome = "ok" | "conflict" | "gone" | "invalid";
 function classify(e: unknown): Outcome | null {
   const msg = e instanceof Error ? e.message : "";
   if (msg.startsWith("CMS_CONFLICT:")) return "conflict";
   if (msg.startsWith("CMS_GONE:")) return "gone";
+  if (msg.startsWith("CMS_INVALID:")) return "invalid";
   return null;
 }
 
@@ -283,7 +316,7 @@ async function mirror(
   body: OutboxBody,
   task: () => Promise<unknown>,
   onWarn: (e: unknown) => void,
-  on: Record<"conflict" | "gone", (e: unknown) => void>,
+  on: Record<"conflict" | "gone", (e: unknown) => void> & { invalid?: (e: unknown) => void },
 ): Promise<boolean> {
   const seq = outboxPut(siteId, body);
   let last: Outcome = "ok";
@@ -307,7 +340,8 @@ async function mirror(
     if (outcome !== "conflict") outboxRemove(siteId, body.key, seq);
     if (outcome === "ok") return;
     try {
-      on[outcome](answer);
+      if (outcome === "invalid") on.invalid?.(answer);
+      else on[outcome](answer);
     } catch {
       // A listener throwing must not turn an answered op into a queued retry.
     }
@@ -475,6 +509,29 @@ function hasQueuedMirror(siteId: string, kind: "collection" | "entry", id: strin
   return isHeld(siteId, `${kind}Upsert:${id}`) || isHeld(siteId, `${kind}Delete:${id}`);
 }
 
+/** Not this site's, and not known to be any other's — hidden everywhere,
+ *  kept in the store. The site that does own it claims it back on its next
+ *  hydrate (its server lists the id). */
+export const UNCLAIMED_SITE = "~unclaimed";
+
+/**
+ * DM-20: rows written before CMS was site-scoped carry no `siteId`, and
+ * "no siteId" read as "every site's" — they showed on every site in the
+ * browser. After a hydrate of this site, an unscoped (or unclaimed) row the
+ * server lists for this site becomes this site's; one it does not list, with
+ * no local change still owed to a server, is marked unclaimed. Nothing is
+ * deleted.
+ */
+async function claimLegacyCollections(siteId: string, remoteIds: ReadonlySet<string>): Promise<void> {
+  for (const local of (await Storage.loadCollections()) ?? []) {
+    if (local.siteId && local.siteId !== UNCLAIMED_SITE) continue;
+    if (remoteIds.has(local.id)) await Storage.saveCollection({ ...local, siteId });
+    else if (!local.siteId && !hasQueuedMirror(siteId, "collection", local.id)) {
+      await Storage.saveCollection({ ...local, siteId: UNCLAIMED_SITE });
+    }
+  }
+}
+
 export async function hydrateCmsFromServer(): Promise<void> {
   const siteId = getSiteIdFromUrl();
   // No site or no storage is not a failure — there is nothing to hydrate FROM,
@@ -615,6 +672,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
       }
       forgetServerStamp(`collection:${local.id}`);
     }
+    await claimLegacyCollections(siteId, remoteIds);
     if (!skippedQueued) markStampMigrationDone(migrationScope);
     /* Hydrate writes past the manager straight to IndexedDB. Ask the engine
        to re-read so every consumer (Content panel, RecordsTable, binding
@@ -668,7 +726,15 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
         else void Storage.deleteCollection(c.id);
         announceGone("collection", c.id, e);
       },
-      conflict: () =>
+      conflict: (e) => {
+        /* DM-07: the slug is another collection's on the server (made on
+           another device) — adopt that collection rather than ask whose copy
+           wins: they are two collections, not two versions of one. */
+        const taken = /SLUG_TAKEN:(\S*)/.exec(e instanceof Error ? e.message : "");
+        if (taken) {
+          void adoptServerCollection(siteId, c, taken[1]);
+          return;
+        }
         raiseConflict({
           kind: "collection",
           id: c.id,
@@ -677,7 +743,9 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
             return syncCollectionUpsert(c);
           },
           useTheirs: () => takeServerCopy(siteId, "collection", c.id),
-        }),
+        });
+      },
+      invalid: (e) => announceInvalid("collection", c.id, e),
     },
   );
 }
@@ -693,6 +761,29 @@ async function takeServerCopy(siteId: string, kind: "collection" | "entry", id: 
   forceServer.add(`${kind}:${id}`);
   await hydrateCmsFromServer();
   await engine?.refreshFromStorage();
+}
+
+/**
+ * DM-07: this device made a collection whose slug the server already holds
+ * under another id. Its records move to the server's collection (re-keyed
+ * here, then mirrored), the local copy goes, and the server's collection is
+ * hydrated in — so a second "Blog" made on another device becomes the one
+ * Blog with both devices' records, instead of a create 500ing forever.
+ * Not covered: element bindings made to the local id in the window before
+ * its first mirror; they still name it.
+ */
+async function adoptServerCollection(siteId: string, local: CMSCollection, serverId: string): Promise<void> {
+  const key = `collectionUpsert:${local.id}`;
+  conflicted.delete(key);
+  outboxRemove(siteId, key);
+  if (!serverId) return;
+  const moved = (await Storage.loadContentItems(local.id)).map((i) => ({ ...i, collectionId: serverId }));
+  for (const item of moved) await Storage.saveContentItem(item);
+  await Storage.deleteCollection(local.id);
+  forgetServerStamp(`collection:${local.id}`);
+  forceServer.add(`collection:${serverId}`);
+  await hydrateCmsFromServer();
+  await Promise.all(moved.map((item) => syncEntryUpsert(item)));
 }
 
 export async function syncCollectionDelete(id: string): Promise<void> {
@@ -736,10 +827,19 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
         data: item.data,
         status: item.status === "published" ? "PUBLISHED" : "DRAFT",
         expectedUpdatedAt: serverStampOf(`entry:${item.id}`) ?? null,
-      }).then((row) => {
+      }).then(async (row) => {
         /* No row back is still a mirror that landed; reading updatedAt off
            undefined made it a "failure", queued and replayed forever. */
         if (row?.updatedAt) recordServerStamp(`entry:${item.id}`, row.updatedAt, item.updatedAt);
+        /* DM-10: the server stores what it sanitized (markup stripped, rich
+           text cut to the allow-list). This device keeps that, not what it
+           sent — otherwise the canvas and a later save carried markup the
+           server never held, and the next hydrate looked like a remote edit. */
+        const stored = row?.data as Record<string, unknown> | undefined;
+        if (stored && !sameContent(stored, item.data)) {
+          await Storage.saveContentItem({ ...item, data: stored });
+          await engine?.refreshFromStorage();
+        }
       }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e),
@@ -760,6 +860,20 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
           },
           useTheirs: () => takeServerCopy(siteId, "entry", item.id),
         }),
+      /* Refused as published: a record the server already holds goes back
+         to the server's copy; one it never held is kept here as a draft (and
+         mirrored as one, which always passes) — either way this device and
+         the server agree, and the reason reaches the sheet. */
+      invalid: (e) => {
+        announceInvalid("entry", item.id, e);
+        if (hasServerStamp(`entry:${item.id}`)) void takeServerCopy(siteId, "entry", item.id);
+        else if (item.status === "published") {
+          const draft: CMSContentItem = { ...item, status: "draft" };
+          void Storage.saveContentItem(draft)
+            .then(() => engine?.refreshFromStorage())
+            .then(() => syncEntryUpsert(draft));
+        }
+      },
     },
   );
 }

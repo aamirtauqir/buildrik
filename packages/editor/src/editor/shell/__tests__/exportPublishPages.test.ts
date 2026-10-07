@@ -263,7 +263,7 @@ describe("exportPublishPages — server-snapshot CMS", () => {
 
     const post = (await exportPublishPages(composer)).find((p) => p.path === "post.html");
 
-    expect(post?.html).toMatch(/<h1[^>]*>\{title\}<\/h1>/);
+    expect(post?.html).toMatch(/<h1[^>]*>\{\{bk:title\}\}<\/h1>/); // BD-13: the namespaced token
     expect(post?.html).not.toContain("SERVER");
   });
 

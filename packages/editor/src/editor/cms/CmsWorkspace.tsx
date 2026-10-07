@@ -24,7 +24,7 @@ import { FieldInspector } from "./FieldInspector";
 import { fieldUsage } from "./fieldUsage";
 import { AddFieldDialog } from "./AddFieldDialog";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
-import { RecordsTable } from "./RecordsTable";
+import { RecordsTable, recordTitle } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
 import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
@@ -110,6 +110,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const [fieldId, setFieldId] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
   const { loadRecords } = panel;
+  /* CMS-01: the record a "new" sheet's first save created. A later save from
+     the same sheet (Retry after a queued or refused write) updates it — the
+     sheet still reads "new", and saving it as new again made a second,
+     third… record. Cleared whenever the sheet changes. */
+  const created = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    created.current = null;
+  }, [ws.recordId]);
 
   React.useEffect(() => {
     if (collection) void loadRecords(collection.id);
@@ -133,6 +141,29 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       composer.emit(EVENTS.UI_CRUMB_CONTEXT, null);
     };
   }, [composer]);
+
+  /* Reference cells name their record (UI-05): the referenced collections'
+     records, read once per collection and on any store change. */
+  const [referenceLabels, setReferenceLabels] = React.useState<Map<string, Map<string, string>>>(new Map());
+  const refFields = collection?.fields.filter((f) => f.type === "reference" && f.referenceCollection) ?? [];
+  const refKey = refFields.map((f) => `${f.slug}:${f.referenceCollection}`).join("|");
+  React.useEffect(() => {
+    let live = true;
+    if (!composer || !refKey) {
+      setReferenceLabels(new Map());
+      return;
+    }
+    void Promise.all(
+      refFields.map(async (f) => {
+        const target = composer.cms.collections.getCollection(f.referenceCollection!);
+        const rows = target ? await composer.cms.collections.getContentItems(target.id) : [];
+        return [f.slug, new Map(rows.map((r) => [r.id, recordTitle(target!, r)]))] as const;
+      }),
+    ).then((entries) => live && setReferenceLabels(new Map(entries)));
+    return () => {
+      live = false;
+    };
+  }, [composer, refKey, panel.recordCounts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const importer = useImportRecords(composer, collection);
   const back = onBackToCanvas ? (
@@ -184,7 +215,13 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const isEmpty = ws.tab === "records" && count === 0;
   const primary =
     ws.tab === "records" ? (
-      <Button size="xs" className={PRIMARY} data-testid="cms-ws-add-record" onClick={() => cmsWorkspace.openRecord("new")}>
+      <Button
+        size="xs"
+        className={PRIMARY}
+        data-testid="cms-ws-add-record"
+        disabled={collection.fields.length === 0}
+        onClick={() => cmsWorkspace.openRecord("new")}
+      >
         + Add record
       </Button>
     ) : ws.tab === "fields" ? (
@@ -210,7 +247,30 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   };
 
   let body: React.ReactNode;
-  if (ws.tab === "records") {
+  if (ws.tab === "records" && isEmpty && collection.fields.length === 0) {
+    /* UI-08 (§7 "Empty: no fields"): a record of a collection with no fields
+       is an empty record — the way in is a field first. */
+    body = (
+      <div className="tw:flex tw:flex-col tw:items-center tw:pt-[132px] tw:text-center" data-testid="cms-ws-no-fields">
+        <Table2 size={20} className="tw:text-[var(--bk-ink-soft)]" aria-hidden="true" />
+        <p className="tw:m-0 tw:mt-3 tw:text-[16px] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]">No fields yet</p>
+        <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Add a field to start.</p>
+        <div className="tw:mt-3 tw:flex tw:gap-2">
+          <Button
+            size="xs"
+            className={`${PRIMARY} tw:h-8`}
+            data-testid="cms-ws-empty-add-field"
+            onClick={() => {
+              cmsWorkspace.setTab("fields");
+              setAddingField(true);
+            }}
+          >
+            Add field
+          </Button>
+        </div>
+      </div>
+    );
+  } else if (ws.tab === "records") {
     body = isEmpty ? (
       /* 4428:148905 — an empty collection offers both ways in. */
       <div className="tw:flex tw:flex-col tw:items-center tw:pt-[132px] tw:text-center" data-testid="cms-ws-no-records">
@@ -235,9 +295,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       </div>
     ) : (
       <RecordsTable
+        /* UI-01: a sort (and page) belongs to its collection. Kept across a
+           switch, a sort on a field the next collection lacks crashed the
+           table. */
+        key={collection.id}
         collection={collection}
         records={panel.records}
         query={query}
+        referenceLabels={referenceLabels}
         onOpenRecord={(id) => cmsWorkspace.openRecord(id)}
       />
     );
@@ -370,7 +435,13 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
         <CsvImportDialog
           collection={collection}
           onClose={() => setCsvImportOpen(false)}
-          onImported={() => void loadRecords(collection.id)}
+          /* DM-15: the import wrote on the server and the hydrate wrote to
+             this browser's store behind the engine; its cache still held the
+             pre-import rows, so "Imported 4 of 4" showed none of them until a
+             reload. Re-read the store, then the table. */
+          onImported={() =>
+            void Promise.resolve(composer?.cms.collections.refreshFromStorage()).then(() => loadRecords(collection.id))
+          }
         />
       ) : null}
       {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
@@ -398,13 +469,15 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           }
           onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
           onSave={async (data, published) => {
-            const { reached, conflict } = await panel.saveRecord(
+            const isNew = ws.recordId === "new";
+            const { item, reached, conflict, invalid } = await panel.saveRecord(
               collection.id,
-              ws.recordId === "new" ? null : ws.recordId,
+              isNew ? created.current : ws.recordId,
               data,
               published,
             );
-            return reached ? true : conflict ? "conflict" : false;
+            if (isNew && item) created.current = item.id;
+            return reached ? true : conflict ? "conflict" : invalid ? { refused: invalid } : false;
           }}
           onDelete={async (r) => {
             await panel.deleteRecord(r.id);

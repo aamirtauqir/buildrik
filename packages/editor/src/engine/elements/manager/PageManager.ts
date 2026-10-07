@@ -326,8 +326,10 @@ export class PageManager {
     };
 
     this.ctx.pages.set(page.id, page);
-    this.ctx.buildElementTree(page.root);
+    const copy = this.ctx.buildElementTree(page.root);
     this.registerRoute(page);
+    /* BD-06: the copy's elements are bound like the source's. */
+    if (liveRoot && copy) this.ctx.composer.cms?.bindings?.copyTree(liveRoot, copy);
 
     this.ctx.composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:created", page });
     return page;

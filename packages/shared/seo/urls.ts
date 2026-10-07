@@ -25,6 +25,38 @@ export function normalizeCanonicalOrigin(domain: string): string | null {
   }
 }
 
+/** One row of `siteDetail.domains.list` — the fields the host choice reads. */
+export interface SiteDomainRow {
+  domain: string;
+  status: string;
+  isPrimary: boolean;
+}
+
+/**
+ * The origin the published site's absolute URLs sit on, in the publish
+ * worker's order (`resolveSiteOrigin` over `verifiedPrimaryDomain`,
+ * lib/publish-files.ts): the typed canonical, else the primary custom domain
+ * once it is verified, else where the site was last published; null when
+ * nothing is known yet. The editor's robots.txt/sitemap preview and the page
+ * drawer's search preview both name their host through this.
+ */
+export function siteOrigin(
+  domains: ReadonlyArray<SiteDomainRow>,
+  publishedUrl: string | null | undefined,
+  canonicalUrl?: string | null,
+): string | null {
+  const typed = normalizeCanonicalOrigin(canonicalUrl ?? "");
+  if (typed) return typed;
+  const primary = domains.find((d) => d.isPrimary && d.status === "VERIFIED");
+  if (primary) return `https://${primary.domain}`;
+  if (!publishedUrl) return null;
+  try {
+    return new URL(publishedUrl).origin;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * The canonical URL for one exported page, or null when no domain is set.
  * `index.html` is the site root, so it canonicalizes to the bare origin.

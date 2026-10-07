@@ -24,17 +24,16 @@ import { EVENTS } from "@/shared/constants/events";
 import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, Select, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 import { slugify } from "@shared/utils/helpers/string";
 import type { CMSFieldType } from "@/shared/types/cms";
+import { FIELD_TYPES, FIELD_TYPE_LABEL, collectionSchemaFrom } from "@/editor/cms/fieldTypes";
 import type { Composer } from "../../../engine";
 // =============================================================================
 // TYPES
 // =============================================================================
 
-type FieldType = "Text" | "Number" | "Image" | "Date" | "Boolean";
-
 interface FieldRow {
   id: string;
   name: string;
-  type: FieldType;
+  type: CMSFieldType;
 }
 
 export interface CMSCollectionSetupModalProps {
@@ -46,16 +45,6 @@ export interface CMSCollectionSetupModalProps {
 // =============================================================================
 // CONSTANTS
 // =============================================================================
-
-const FIELD_TYPES: FieldType[] = ["Text", "Number", "Image", "Date", "Boolean"];
-
-const FIELD_TYPE_SLUG: Record<FieldType, CMSFieldType> = {
-  Text: "text",
-  Number: "number",
-  Image: "image",
-  Date: "date",
-  Boolean: "boolean",
-};
 
 /** Board 4418:88263's "Use Menu items 2": the first `<name> N` (N ≥ 2) that
  *  no collection holds yet. Compared case-insensitively, as the clash is. */
@@ -138,7 +127,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   composer,
 }) => {
   const [name, setName] = React.useState("");
-  const [fields, setFields] = React.useState<FieldRow[]>([{ id: makeId(), name: "title", type: "Text" }]);
+  const [fields, setFields] = React.useState<FieldRow[]>([{ id: makeId(), name: "title", type: "text" }]);
   /* 6940:79789 — the last removed row and where it stood, for Undo. */
   const [removed, setRemoved] = React.useState<{ row: FieldRow; index: number } | null>(null);
   const [genPages, setGenPages] = React.useState(false);
@@ -153,7 +142,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
     if (isOpen) return;
     const t = setTimeout(() => {
       setName("");
-      setFields([{ id: makeId(), name: "title", type: "Text" }]);
+      setFields([{ id: makeId(), name: "title", type: "text" }]);
       setRemoved(null);
       setGenPages(false);
       setCreating(false);
@@ -183,7 +172,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
     setClashShown(false);
   };
 
-  const addField = () => setFields((prev) => [...prev, { id: makeId(), name: "", type: "Text" }]);
+  const addField = () => setFields((prev) => [...prev, { id: makeId(), name: "", type: "text" }]);
   const removeField = (id: string) =>
     setFields((prev) => {
       const index = prev.findIndex((f) => f.id === id);
@@ -215,20 +204,17 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         // No fake success: the collection was NOT created — say so.
         throw new Error("Collections are unavailable in this editor session.");
       }
-      const collection = await collections.createCollection(finalName, undefined, undefined);
-      const named = fields.filter((f) => f.name.trim());
-      for (const [order, field] of named.entries()) {
-        await collections.addField(collection.id, {
-          name: field.name.trim(),
-          slug: field.name.trim().toLowerCase().replace(/\s+/g, "_"),
-          type: FIELD_TYPE_SLUG[field.type],
-          order,
-        });
-      }
-      // E7: persist the dynamic-page binding so publish generates a page per entry.
-      if (genPages && collections.updateCollection) {
-        await collections.updateCollection(collection.id, { pageSlugPattern: `/${slugify(finalName) || "collection"}/{slug}` });
-      }
+      /* One field path (CMS-03): the rows go through Add field's key rule,
+         and the collection is made with a name and a slug field (CMS-02),
+         its display field and — when pages are on — a pattern over that
+         slug, in one write. */
+      const schema = collectionSchemaFrom(fields, () => collections.nextId());
+      if ("error" in schema) throw new Error(schema.error);
+      const collection = await collections.createCollection(finalName, undefined, undefined, {
+        fields: schema.fields,
+        displayField: schema.displayField,
+        ...(genPages ? { pageSlugPattern: `/${slugify(finalName) || "collection"}/{${schema.slugKey}}` } : {}),
+      });
       /* 6887:72969 / 4418:84646: a created collection opens in the CMS
          workspace (L4's ui:cms-open), rather than leaving a success line
          in a closing modal. */
@@ -344,11 +330,13 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   className="tw:w-28"
                   aria-label={`Field ${i + 1} type`}
                   value={field.type}
-                  onChange={(e) => updateField(field.id, { type: e.target.value as FieldType })}
+                  onChange={(e) => updateField(field.id, { type: e.target.value as CMSFieldType })}
                 >
-                  {FIELD_TYPES.map((ft) => (
+                  {/* A reference needs its target collection — + Add field asks
+                      for it; the row has no room to. */}
+                  {FIELD_TYPES.filter((ft) => ft !== "reference").map((ft) => (
                     <option key={ft} value={ft}>
-                      {ft}
+                      {FIELD_TYPE_LABEL[ft]}
                     </option>
                   ))}
                 </Select>
