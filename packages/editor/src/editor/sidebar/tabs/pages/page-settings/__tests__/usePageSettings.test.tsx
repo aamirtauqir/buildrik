@@ -246,6 +246,33 @@ describe("usePageSettings save", () => {
     expect(lastToast()).toMatchObject({ description: "Page settings saved", tone: "success" });
   });
 
+  /* SEO-P2-4: the form owns only some SEO fields. Saving used to replace
+     settings.seo wholesale and erase the rest (canonical URL, structured
+     data, Twitter card) — fields the exporter ships. */
+  it("keeps the SEO fields the form does not own", async () => {
+    const composer = createMockComposer({});
+    const p = page({
+      seo: {
+        metaTitle: "Old title",
+        canonicalUrl: "https://example.com/about",
+        structuredData: { "@type": "Organization", name: "Bella" },
+        twitterCard: "summary_large_image",
+      },
+    });
+    const { result } = setup(composer, p);
+    act(() => result.current.setSeoTitle("New title"));
+    await act(async () => {
+      await result.current.save();
+    });
+    const [, patch] = (composer.elements.updatePage as unknown as Mock).mock.calls[0];
+    expect(patch.settings.seo).toMatchObject({
+      metaTitle: "New title",
+      canonicalUrl: "https://example.com/about",
+      structuredData: { "@type": "Organization", name: "Bella" },
+      twitterCard: "summary_large_image",
+    });
+  });
+
   it("blocks save and warns when there is a slug error", async () => {
     const composer = createMockComposer({});
     const { result } = setup(composer, page());
