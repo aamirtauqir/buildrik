@@ -581,7 +581,10 @@ export async function getPublishStatus(jobId: string) {
 }
 
 export async function cancelPublish(jobId: string) {
-  const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
+  const job = await prisma.publishBuildJob.findUnique({
+    where: { id: jobId },
+    include: { site: { select: { publishedUrl: true } } },
+  });
   if (!job || !["QUEUED", "BUILDING"].includes(job.status)) {
     throw new Error("NOT_CANCELLABLE");
   }
@@ -593,9 +596,11 @@ export async function cancelPublish(jobId: string) {
       // row and keeps the rendered HTML at rest forever.
       data: { status: "CANCELLED", log: Prisma.DbNull },
     }),
+    // A cancelled RE-publish leaves the previous deployment serving — keep the
+    // site PUBLISHED, same rule as the dispatch-failure and worker-failure exits.
     prisma.site.update({
       where: { id: job.siteId },
-      data: { status: "DRAFT" },
+      data: { status: job.site.publishedUrl ? "PUBLISHED" : "DRAFT" },
     }),
   ]);
   return updated;

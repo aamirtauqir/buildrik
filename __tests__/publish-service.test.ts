@@ -373,6 +373,7 @@ describe("Publish Service", () => {
       vi.mocked(prisma.publishBuildJob.findUnique).mockResolvedValue({
         id: "job1",
         status: "QUEUED",
+        site: { publishedUrl: null },
       } as any);
       vi.mocked(prisma.publishBuildJob.update).mockResolvedValue({
         id: "job1",
@@ -381,6 +382,30 @@ describe("Publish Service", () => {
 
       const job = await cancelPublish("job1");
       expect(job.status).toBe("CANCELLED");
+    });
+
+    /* P1-4: cancelling a RE-publish leaves the previous deployment serving, so
+       the site is still live — same rule as the dispatch-failure and worker
+       failure exits (`publishedUrl ? "PUBLISHED" : "DRAFT"`). */
+    it("keeps an already-live site PUBLISHED when its re-publish is cancelled", async () => {
+      vi.mocked(prisma.publishBuildJob.findUnique).mockResolvedValue({
+        id: "job1", siteId: "s1", status: "BUILDING",
+        site: { publishedUrl: "https://acme.vercel.app" },
+      } as any);
+      vi.mocked(prisma.publishBuildJob.update).mockResolvedValue({ id: "job1", status: "CANCELLED" } as any);
+
+      await cancelPublish("job1");
+      expect(prisma.site.update).toHaveBeenCalledWith({ where: { id: "s1" }, data: { status: "PUBLISHED" } });
+    });
+
+    it("returns a never-published site to DRAFT when its publish is cancelled", async () => {
+      vi.mocked(prisma.publishBuildJob.findUnique).mockResolvedValue({
+        id: "job1", siteId: "s1", status: "QUEUED", site: { publishedUrl: null },
+      } as any);
+      vi.mocked(prisma.publishBuildJob.update).mockResolvedValue({ id: "job1", status: "CANCELLED" } as any);
+
+      await cancelPublish("job1");
+      expect(prisma.site.update).toHaveBeenCalledWith({ where: { id: "s1" }, data: { status: "DRAFT" } });
     });
 
     it("throws when job is not cancellable", async () => {
