@@ -1,5 +1,5 @@
 /**
- * Text Controls — TextInputRow, SectionLabel, SubSectionTitle.
+ * Text Controls — TextInputRow, SubSectionTitle.
  * Ported to .bdi-text + .bdi-row-ctrl + .bdi-sub-label.
  *
  * @license BSD-3-Clause
@@ -59,29 +59,6 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
     </div>
   );
 };
-
-// ============================================================================
-// SECTION LABEL (inline block label)
-// ============================================================================
-
-export interface SectionLabelProps {
-  children: React.ReactNode;
-  style?: React.CSSProperties;
-}
-
-export const SectionLabel: React.FC<SectionLabelProps> = ({ children, style }) => (
-  <label
-    style={{
-      font: "500 11px var(--bk-font-ui)",
-      color: "var(--bk-ink-soft)",
-      display: "block",
-      marginBottom: 4,
-      ...style,
-    }}
-  >
-    {children}
-  </label>
-);
 
 // ============================================================================
 // SUB SECTION TITLE (uppercase mini-header)
