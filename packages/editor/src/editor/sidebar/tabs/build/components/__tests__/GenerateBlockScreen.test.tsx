@@ -10,7 +10,7 @@ import { render as rtlRender, screen, fireEvent, act, within } from "@testing-li
 import { ToastProvider } from "@/editor/chrome-ui";
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { GenerateBlockScreen, generateTarget, type GenerateFn } from "../GenerateBlockScreen";
+import { GenerateBlockScreen, generateTarget, type GenerateFn, type ApplyFn } from "../GenerateBlockScreen";
 import { AiRunError, type ServerEdit } from "../../../ai/hooks/runPromptOnce";
 
 vi.mock("../../../ai/hooks/useAiQuota", () => ({ useAiQuota: () => null, quotaLeftLabel: () => null }));
@@ -52,6 +52,14 @@ function makeComposer(selected: string[] = []) {
   return { composer, undo, select, insertFeatures };
 }
 
+/** The insert as the screen applies it: runs `effect` (what the real insert
+ *  does to the tree) and hands back the undo handle bound to it. */
+const applyWith = (undo: () => boolean, effect: () => void = () => {}): ApplyFn =>
+  vi.fn(async () => {
+    effect();
+    return undo;
+  });
+
 const edit: ServerEdit = {
   target: "page",
   summary: "Added a features section",
@@ -82,12 +90,17 @@ describe("GenerateBlockScreen", () => {
     const generate: GenerateFn = vi.fn(() => new Promise<ServerEdit>((r) => (resolve = r)));
     const onBack = vi.fn();
     const { composer, undo } = makeComposer(["h1"]);
-    render(<GenerateBlockScreen composer={composer} onBack={onBack} generate={generate} />);
+    render(<GenerateBlockScreen composer={composer} onBack={onBack} generate={generate} apply={applyWith(undo)} />);
     fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "A features grid" } });
     fireEvent.click(screen.getByTestId("generate-run"));
     expect(screen.getByTestId("generate-thinking").textContent).toBe("Generating your block…");
     expect(screen.getByTestId("generate-target").textContent).toBe("Insert into: Home · after Hero");
-    expect(generate).toHaveBeenCalledWith(composer, "A features grid", { afterId: "hero", label: "Home · after Hero" });
+    expect(generate).toHaveBeenCalledWith(
+      composer,
+      "A features grid",
+      { afterId: "hero", label: "Home · after Hero" },
+      expect.any(AbortSignal),
+    );
     await act(async () => resolve(edit));
     const done = screen.getByTestId("generate-inserted");
     expect(done.textContent).toContain("Block inserted after Hero");
@@ -100,14 +113,25 @@ describe("GenerateBlockScreen", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it("Stop drops the run in flight", async () => {
+  /* Stop must keep the block off the page: the insert used to run inside the
+     generate call, before the cancellation check, so a stopped run still
+     landed a block (and a re-run landed a second one). The request in flight
+     is aborted too. */
+  it("Stop drops the run in flight: aborts the request and never inserts", async () => {
     let resolve!: (e: ServerEdit) => void;
-    const generate: GenerateFn = () => new Promise<ServerEdit>((r) => (resolve = r));
-    render(<GenerateBlockScreen composer={makeComposer().composer} onBack={vi.fn()} generate={generate} />);
+    let signal: AbortSignal | undefined;
+    const generate: GenerateFn = (_c, _p, _t, s) => {
+      signal = s;
+      return new Promise<ServerEdit>((r) => (resolve = r));
+    };
+    const apply = applyWith(vi.fn(() => true));
+    render(<GenerateBlockScreen composer={makeComposer().composer} onBack={vi.fn()} generate={generate} apply={apply} />);
     fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "x" } });
     fireEvent.click(screen.getByTestId("generate-run"));
     fireEvent.click(screen.getByTestId("generate-stop"));
+    expect(signal?.aborted).toBe(true);
     await act(async () => resolve(edit));
+    expect(apply).not.toHaveBeenCalled();
     expect(screen.queryByTestId("generate-inserted")).toBeNull();
     expect(screen.getByTestId("generate-run")).toBeTruthy();
   });
@@ -117,11 +141,8 @@ describe("GenerateBlockScreen", () => {
   it("selects the inserted section, and Done toasts 'Block added · Undo'", async () => {
     const { composer, select, insertFeatures, undo } = makeComposer(["h1"]);
     const onBack = vi.fn();
-    const generate: GenerateFn = async () => {
-      insertFeatures();
-      return edit;
-    };
-    render(<GenerateBlockScreen composer={composer} onBack={onBack} generate={generate} />);
+    const generate: GenerateFn = async () => edit;
+    render(<GenerateBlockScreen composer={composer} onBack={onBack} generate={generate} apply={applyWith(undo, insertFeatures)} />);
     fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "A features grid" } });
     await act(async () => fireEvent.click(screen.getByTestId("generate-run")));
     expect(select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
@@ -134,21 +155,31 @@ describe("GenerateBlockScreen", () => {
   });
 
   /* Review (#3): the toast's Undo was captured on the Done click, so an edit
-     made between the insert and Done became what it undid. It is bound when
-     the insert lands. */
-  it("binds the toast's Undo to the insert when it lands, not when Done is clicked", async () => {
-    const { composer, insertFeatures } = makeComposer(["h1"]);
-    const capture = (composer as unknown as { history: { captureUndo: ReturnType<typeof vi.fn> } }).history.captureUndo;
-    const generate: GenerateFn = async () => {
-      insertFeatures();
-      return edit;
-    };
-    render(<GenerateBlockScreen composer={composer} onBack={vi.fn()} generate={generate} />);
+     made between the insert and Done became what it undid. It is the handle
+     the insert itself returned (bound to its own history entry), and the
+     band's Undo uses the same handle rather than a bare history.undo(). */
+  it("binds both Undos to the insert's own history entry", async () => {
+    const { composer, insertFeatures, undo: bareUndo } = makeComposer(["h1"]);
+    const insertUndo = vi.fn(() => true);
+    render(
+      <GenerateBlockScreen composer={composer} onBack={vi.fn()} generate={async () => edit} apply={applyWith(insertUndo, insertFeatures)} />,
+    );
     fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "A features grid" } });
     await act(async () => fireEvent.click(screen.getByTestId("generate-run")));
-    expect(capture).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByTestId("generate-done"));
-    expect(capture).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId("generate-undo"));
+    expect(insertUndo).toHaveBeenCalledTimes(1);
+    expect(bareUndo).not.toHaveBeenCalled();
+  });
+
+  it("an edit that inserted nothing is an error, not 'Block inserted'", async () => {
+    const { composer } = makeComposer(["h1"]);
+    render(
+      <GenerateBlockScreen composer={composer} onBack={vi.fn()} generate={async () => edit} apply={vi.fn(async () => null)} />,
+    );
+    fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "A features grid" } });
+    await act(async () => fireEvent.click(screen.getByTestId("generate-run")));
+    expect(screen.queryByTestId("generate-inserted")).toBeNull();
+    expect(screen.getByTestId("generate-error")).toBeTruthy();
   });
 
   const fail = async (kind: "not-configured" | "quota" | "other") => {
