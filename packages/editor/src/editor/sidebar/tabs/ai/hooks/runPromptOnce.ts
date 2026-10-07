@@ -1,5 +1,6 @@
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import type { AIModel } from "../types";
+import type { AiElementContext } from "@buildrik/shared/schemas/ai";
 
 /**
  * Promise wrapper around the streamPrompt subscription for DISCRETE
@@ -30,8 +31,11 @@ function aiErrorKind(code: string | undefined): AiErrorKind {
 /**
  * tRPC's SSE link treats INTERNAL_SERVER_ERROR as retryable and reconnects
  * instead of calling `onError` — every provider failure arrives that way, so
- * an outage used to hold the panel on "Thinking…" indefinitely. Two attempts,
- * then the failure is surfaced.
+ * an outage used to hold the panel on "Thinking…" indefinitely. A reconnect
+ * RE-RUNS the procedure (another provider call, another quota reserve), so a
+ * state carrying a server error (`error.data.code` — the procedure ran and
+ * answered) fails at once. Only transport blips with no server answer get a
+ * second attempt.
  */
 const AI_RECONNECT_BUDGET = 2;
 
@@ -73,7 +77,14 @@ export interface MediaAssetRef {
 }
 
 export type RunScope =
-  | { kind: "element"; id: string }
+  | {
+      kind: "element";
+      id: string;
+      /** What the model is shown about the element (gatherElementContext). */
+      context?: AiElementContext;
+      tokens?: TokenRef[];
+      assets?: MediaAssetRef[];
+    }
   | {
       kind: "page";
       elements?: PageElementRef[];
@@ -93,6 +104,9 @@ interface PromptArgs {
   scope: RunScope;
   model: AIModel;
   intent: "plan" | "style-command";
+  /** Aborting unsubscribes, so the server sees its request signal abort and
+   *  stops (Stop in the agent and in Generate-a-block). */
+  signal?: AbortSignal;
 }
 
 interface PromptResult {
@@ -104,16 +118,28 @@ interface PromptResult {
 /**
  * Fire one streamPrompt subscription and resolve when it completes (`done`),
  * accumulating text and capturing the first edit / plan chunk. Rejects with an
- * `AiRunError` on stream error (quota, provider failure, auth) or once the
- * reconnect budget is spent. The caller is responsible for sequencing.
+ * `AiRunError` on stream error (quota, provider failure, auth), once the
+ * reconnect budget is spent, or when `args.signal` aborts. The caller is
+ * responsible for sequencing.
  */
 export function runPromptOnce(args: PromptArgs): Promise<PromptResult> {
   return new Promise<PromptResult>((resolve, reject) => {
+    const stopped = () => new AiRunError("Stopped", "other");
+    if (args.signal?.aborted) {
+      reject(stopped());
+      return;
+    }
     let text = "";
     let edit: ServerEdit | null = null;
     let plan: PlanStep[] | null = null;
     let settled = false;
     let reconnects = 0;
+    const onAbort = () => {
+      if (settled) return;
+      settled = true;
+      sub.unsubscribe();
+      reject(stopped());
+    };
     const sub = getAiSubscriptionClient().ai.streamPrompt.subscribe(
       { prompt: args.prompt, scope: args.scope, model: args.model, intent: args.intent },
       {
@@ -129,6 +155,7 @@ export function runPromptOnce(args: PromptArgs): Promise<PromptResult> {
           else if (chunk.type === "done") {
             if (settled) return;
             settled = true;
+            args.signal?.removeEventListener("abort", onAbort);
             sub.unsubscribe();
             resolve({ text, edit, plan });
           }
@@ -136,18 +163,25 @@ export function runPromptOnce(args: PromptArgs): Promise<PromptResult> {
         onError: (err: { message?: string; data?: { code?: string } | null }) => {
           if (settled) return;
           settled = true;
+          args.signal?.removeEventListener("abort", onAbort);
           sub.unsubscribe();
           reject(new AiRunError(err.message || "Stream failed", aiErrorKind(err.data?.code)));
         },
-        onConnectionStateChange: (state: { state: string; error?: { message?: string } | null }) => {
+        onConnectionStateChange: (state: {
+          state: string;
+          error?: { message?: string; data?: { code?: string } | null } | null;
+        }) => {
           if (settled || state.state !== "connecting" || !state.error) return;
+          const serverCode = state.error.data?.code;
           reconnects += 1;
-          if (reconnects < AI_RECONNECT_BUDGET) return;
+          if (!serverCode && reconnects < AI_RECONNECT_BUDGET) return;
           settled = true;
+          args.signal?.removeEventListener("abort", onAbort);
           sub.unsubscribe();
-          reject(new AiRunError(state.error.message || "The AI service didn't respond.", "other"));
+          reject(new AiRunError(state.error.message || "The AI service didn't respond.", aiErrorKind(serverCode)));
         },
       },
     );
+    args.signal?.addEventListener("abort", onAbort, { once: true });
   });
 }
