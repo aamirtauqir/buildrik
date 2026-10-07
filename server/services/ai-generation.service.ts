@@ -14,14 +14,16 @@ export async function createGenerationJob(
   const plan = (ws?.plan ?? "FREE") as PlanName;
   const monthlyLimit = PLAN_LIMITS[plan].aiGenerations as number;
 
-  // Monthly plan limit check (-1 = unlimited). Cancelled jobs don't count —
-  // the worker aborts them before any site is written, so charging the
-  // monthly slot would bill work that never happened.
+  // Monthly plan limit check (-1 = unlimited). Cancelled and failed jobs don't
+  // count — neither writes a site (the worker persists everything in one
+  // transaction at the end), so charging the monthly slot would bill work that
+  // never happened. The hourly throttle below still counts them: it is
+  // anti-abuse, not billing.
   if (monthlyLimit >= 0) {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthlyCount = await prisma.aIGenerationJob.count({
-      where: { workspaceId, createdAt: { gte: startOfMonth }, status: { not: "CANCELLED" } },
+      where: { workspaceId, createdAt: { gte: startOfMonth }, status: { notIn: ["CANCELLED", "FAILED"] } },
     });
     if (monthlyCount >= monthlyLimit) throw new Error("AI_MONTHLY_LIMIT");
   }
@@ -88,40 +90,56 @@ async function dispatchAIWorker(jobId: string): Promise<void> {
     process.env.NEXTAUTH_URL ??
     "http://localhost:3000"
   ).replace(/\/$/, "");
-  /* Read the answer. A 401 — what the worker returns when CRON_SECRET is
-     missing or wrong, and this dispatch sends `?? ""` — is a SUCCESSFUL fetch,
-     so the catch below never fired and nothing recorded that the job would
-     never start. The row stayed QUEUED and the onboarding screen span forever.
-     `publish.service.ts:175` already draws the line in the right place: 401 and
-     404 mean the worker did not claim the job. Anything else it answered, it
-     owns, including a 500 it will write its own FAILED row for — overwriting
-     that would replace a diagnosis with a dispatch message. */
+  /* The worker answers 500 "CRON_SECRET is not configured" before it claims
+     anything, and the reaper cron needs the same secret — so with it unset a
+     dispatched job would sit QUEUED for good. Same process, same env: say so
+     now instead of dispatching. */
+  if (!process.env.CRON_SECRET) {
+    await failUnclaimed(jobId, "AI generation is not configured on this server (CRON_SECRET is not set).");
+    return;
+  }
+
+  /* Read the answer. A 401 (secret rejected) or 404 is a SUCCESSFUL fetch, so
+     the catch alone never recorded that the job would never start; any other
+     non-2xx may or may not have come after the worker's claim.
+
+     Every failure write below is therefore guarded on the row still being
+     QUEUED: the dispatcher only fails jobs no worker claimed. A claimed job's
+     final status belongs to the worker — a 500 it answered comes with its own
+     FAILED row and real reason, and a fetch that throws AFTER the claim (the
+     worker answers only once every page is generated, and undici gives up on
+     headers at 300s) must not mark a still-running job FAILED for the worker to
+     flip back to COMPLETED later. */
   let unclaimed: string | null = null;
   try {
     const res = await fetch(`${base}/api/workers/ai-generate/${jobId}`, {
       method: "POST",
-      headers: { "x-worker-secret": process.env.CRON_SECRET ?? "" },
+      headers: { "x-worker-secret": process.env.CRON_SECRET },
     });
-    if (res.status === 401 || res.status === 404) {
+    if (!res.ok) {
       unclaimed =
         res.status === 401
           ? "The generator refused this job (worker secret rejected). Check CRON_SECRET."
-          : "The generator could not be reached at this deployment.";
+          : res.status === 404
+            ? "The generator could not be reached at this deployment."
+            : `The generator did not start this job (HTTP ${res.status}).`;
     }
   } catch {
     unclaimed = "The generator could not be reached. Nothing answered the request.";
   }
 
-  if (unclaimed) {
-    /* Fail it loudly rather than leaving a QUEUED row nobody will ever pick up.
-       The onboarding screen already renders FAILED (generating/page.tsx:83); it
-       has no rendering at all for "queued forever". */
-    await prisma.aIGenerationJob
-      .update({ where: { id: jobId }, data: { status: "FAILED", error: unclaimed } })
-      .catch(() => {
-        /* The job row is gone or already resolved; nothing left to report to. */
-      });
-  }
+  if (unclaimed) await failUnclaimed(jobId, unclaimed);
+}
+
+/* Fail it loudly rather than leaving a QUEUED row nobody will ever pick up.
+   The onboarding screen already renders FAILED (generating/page.tsx:83); it
+   has no rendering at all for "queued forever". */
+async function failUnclaimed(jobId: string, error: string): Promise<void> {
+  await prisma.aIGenerationJob
+    .updateMany({ where: { id: jobId, status: "QUEUED" }, data: { status: "FAILED", error } })
+    .catch(() => {
+      /* The job row is gone; nothing left to report to. */
+    });
 }
 
 // jobId comes from the client — both reads below scope by workspaceId so a
