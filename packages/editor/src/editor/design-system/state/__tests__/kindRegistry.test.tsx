@@ -14,7 +14,7 @@ import * as React from "react";
 import { TokenRegistryProvider, useColorRegistry, useSpacingRegistry, useProjectTokenStore } from "../TokenRegistryContext";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { EVENTS } from "@/shared/constants/events";
-import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
+import { emitTokenCss, resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
 
@@ -123,6 +123,20 @@ describe("the colour registry (v6, composer-backed, logged)", () => {
     expect(result.current.tokens.find((t) => t.id === "color-accent")?.replacedBy).toBe("color-highlight");
   });
 
+  it("after a rename, an edit reaches elements still bound to the old var (BR-1, real emitter)", () => {
+    const composer = fakeComposer();
+    const { result } = colorRegistry(composer);
+    act(() => {
+      result.current.renameToken("color-accent", "color-highlight");
+    });
+    act(() => {
+      result.current.updateToken("color-highlight", "#FF0000");
+    });
+    const css = emitTokenCss(composer.getProjectSettings().designTokens, { darkMode: "off" });
+    expect(css).toContain("--buildrick-design-color-accent:var(--buildrick-design-color-highlight)");
+    expect(resolveTokenLiteral(composer.getProjectSettings().designTokens, "color-highlight", "light")).toBe("#FF0000");
+  });
+
   it("rename onto a taken id writes nothing", () => {
     const composer = fakeComposer();
     const { result } = colorRegistry(composer);
@@ -191,6 +205,17 @@ describe("the colour registry — delete, add, filter through the logged commit"
       result.current.deleteToken("color-extra", { replaceWith: "color-primary" });
     });
     expect(result.current.tokens.find((t) => t.id === "color-extra")?.replacedBy).toBe("color-primary");
+  });
+
+  it("replace & delete re-points the deleted token's var at the replacement (BR-1, real emitter)", () => {
+    const composer = fakeComposer([...DEFAULT_TOKENS, extra]);
+    const { result } = colorRegistry(composer);
+    act(() => {
+      result.current.deleteToken("color-extra", { replaceWith: "color-primary" });
+    });
+    const css = emitTokenCss(composer.getProjectSettings().designTokens, { darkMode: "off" });
+    expect(css).toContain("--buildrick-design-color-extra:var(--buildrick-design-color-primary)");
+    expect(css).not.toContain("--buildrick-design-color-extra:#123456");
   });
 
   it("deleting a token another token aliases is refused — nothing written", () => {

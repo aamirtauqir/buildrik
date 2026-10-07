@@ -26,8 +26,13 @@ export function emitTokenCss(
 
   /* Pass one: which tokens get a light declaration. An alias counts only when
      its target does — `var()` of a var nobody defines is not a fallback, it
-     is no value at all, and it would beat the legacy backstop below. */
+     is no value at all, and it would beat the legacy backstop below.
+     A renamed or replaced token (`replacedBy`) keeps its var — elements are
+     still bound to it — but that var follows the replacement, so later edits
+     reach them. A replacement that cannot be emitted (or a bridge loop) leaves
+     the token on its own value. */
   const emitted = new Map<string, boolean>();
+  const redirect = new Map<string, DesignToken>();
   const emits = (t: DesignToken, visiting: Set<string> = new Set()): boolean => {
     const known = emitted.get(t.id);
     if (known !== undefined) return known;
@@ -35,7 +40,10 @@ export function emitTokenCss(
     visiting.add(t.id);
     const ref = t.modes.light;
     let ok = safeNames(t);
-    if (ok) {
+    const replacement = t.replacedBy !== undefined ? byId.get(t.replacedBy) : undefined;
+    if (ok && replacement && emits(replacement, visiting)) {
+      redirect.set(t.id, replacement);
+    } else if (ok) {
       if ("alias" in ref) {
         const target = byId.get(ref.alias);
         ok = target !== undefined && emits(target, visiting);
@@ -64,7 +72,8 @@ export function emitTokenCss(
       opts.onSkip?.(t.id, "unsafe custom-property name");
       continue;
     }
-    const lv = emitted.get(t.id) ? refCss(t.modes.light) : null;
+    const replacement = redirect.get(t.id);
+    const lv = !emitted.get(t.id) ? null : replacement ? `var(${replacement.cssVar})` : refCss(t.modes.light);
     if (!lv) {
       opts.onSkip?.(t.id, "alias" in t.modes.light ? "alias target not emitted" : "empty or unresolvable light value");
       continue;
@@ -76,7 +85,7 @@ export function emitTokenCss(
       seen.add(legacy);
       light.push(`${legacy}:var(${t.cssVar})`);
     }
-    if (opts.darkMode === "auto" && t.modes.dark) {
+    if (opts.darkMode === "auto" && t.modes.dark && !replacement) {
       const dv = refCss(t.modes.dark);
       if (dv) dark.push(`${t.cssVar}:${dv}`);
       else opts.onSkip?.(t.id, "unresolvable dark value");
