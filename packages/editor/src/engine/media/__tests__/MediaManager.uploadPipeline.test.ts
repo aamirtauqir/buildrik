@@ -216,6 +216,51 @@ describe("uploadFile — validation (size per type, allowed MIME)", () => {
   });
 });
 
+/* The plan's quota is the server's (500 MB / 5 GB / unlimited); the engine's
+   1 GB constant is only the offline backstop. It blocked PRO and BUSINESS. */
+describe("uploadFile — plan quota from the server", () => {
+  const opts = { autoOptimize: false, generateThumbnail: false };
+  const GB = 1_073_741_824;
+
+  it("lets a PRO library past 1 GB keep uploading under its server quota", async () => {
+    const manager = new MediaManager();
+    mockStorage(manager);
+    manager.setStorageQuota(5 * GB);
+    seedAsset(manager, { id: "big", size: 2 * GB });
+    const result = await manager.uploadFile(makeFile("i", "pro.png", "image/png", 4096), opts);
+    expect(result.success).toBe(true);
+  });
+
+  it("never blocks an unlimited plan (-1)", async () => {
+    const manager = new MediaManager();
+    mockStorage(manager);
+    manager.setStorageQuota(-1);
+    seedAsset(manager, { id: "big", size: 60 * GB });
+    const result = await manager.uploadFile(makeFile("i", "biz.png", "image/png", 4096), opts);
+    expect(result.success).toBe(true);
+  });
+
+  it("blocks against the plan's own number, not the 1 GB constant", async () => {
+    const manager = new MediaManager();
+    mockStorage(manager);
+    const quotaEvents = captureEvents(manager, MEDIA_EVENTS.QUOTA_EXCEEDED);
+    manager.setStorageQuota(500 * 1024 * 1024);
+    seedAsset(manager, { id: "big", size: 500 * 1024 * 1024 });
+    await expect(manager.uploadFile(makeFile("i", "free.png", "image/png", 4096), opts)).rejects.toBeInstanceOf(
+      MediaQuotaError,
+    );
+    expect(quotaEvents[0]).toMatchObject({ quotaBytes: 500 * 1024 * 1024 });
+  });
+
+  it("with the server wired and its quota not yet known, leaves the decision to the server", async () => {
+    const manager = new MediaManager(makeRemoteSync());
+    mockStorage(manager);
+    seedAsset(manager, { id: "big", size: 2 * GB });
+    const result = await manager.uploadFile(makeFile("i", "later.png", "image/png", 4096), opts);
+    expect(result.success).toBe(true);
+  });
+});
+
 describe("uploadFile — SVG sanitize path", () => {
   it("sanitizes a malicious SVG and stores the clean blob", async () => {
     const manager = new MediaManager();

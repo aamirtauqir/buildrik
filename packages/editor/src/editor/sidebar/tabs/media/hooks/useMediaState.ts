@@ -59,6 +59,12 @@ export function useMediaState(composer: Composer): MediaStateResult {
   // Returns null on offline / unconfigured / auth-fail — useUploadState falls back to local.
   const serverQuota = useServerStorageQuota(composer);
   const upload = useUploadState(composer, showToast, serverQuota.quota);
+  // The engine gates every upload (canvas drops and stock saves too) — on the
+  // plan's quota, which only the server knows.
+  const planQuotaBytes = serverQuota.quota?.totalBytes;
+  useEffect(() => {
+    if (planQuotaBytes !== undefined) composer.media.setStorageQuota(planQuotaBytes);
+  }, [composer, planQuotaBytes]);
   const selection = useSelectionState(composer, library.libraryItems, showToast, library.versionsOf);
   const discovery = useDiscoveryState(composer, showToast);
 
