@@ -66,6 +66,8 @@ export interface StudioHeaderProps {
      copy of that union, and each copy is a place the set can silently fall
      behind. */
   saveStatus: StudioSaveState["status"];
+  /** The last save's error message; a `TOKENS_INVALID:` refusal gets its own banner copy. */
+  saveError?: string;
   /** Has unsaved changes */
   isDirty: boolean;
   /** Network offline. Nothing is queued for a dashboard-backed site — the save
@@ -219,6 +221,7 @@ function pillAgo(at?: string | Date | null): string {
 export const StudioHeader: React.FC<StudioHeaderProps> = ({
   composer,
   saveStatus,
+  saveError,
   isDirty,
   isOffline,
   lastSaved,
@@ -449,25 +452,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // after a refused save) so beforeunload does not double-prompt.
   React.useEffect(() => endUnloadGuardBypass, []);
 
-  /* Brand stages its token edits in a provider this header sits outside, so it
-     announces them. Without this the chip read "Saved · just now" with a green
-     dot while the Brand footer two panels away said "Unsaved brand changes" —
-     same concept, two surfacings, and the global one is the one a user watches.
-     It is deliberately not the project's dirty flag: see the emit site.
-     The announcement goes into the shell dirty registry (B-1), the ONE source
-     the exit guard, beforeunload and this chip read — alongside Settings'
-     and an open CMS record's entries, which their own surfaces register. */
-  React.useEffect(() => {
-    if (!composer) return;
-    const onBrandDirty = (p?: { dirty?: boolean }) => shellDirty.set("brand", Boolean(p?.dirty));
-    composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-    /* Block body, not a shorthand: `off` is chainable and returns the composer,
-       so an arrow shorthand hands React an instance where a destructor belongs. */
-    return () => {
-      composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-      shellDirty.set("brand", false);
-    };
-  }, [composer]);
   const shellIsDirty = useShellDirty();
 
   const guardNavigation = React.useCallback(
@@ -938,6 +922,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           where={[siteName, crumbCtx ?? pageName].filter(Boolean).join(" · ")}
           leaving={leaveAfterSave !== null}
           busy={retrying}
+          refusal={saveError?.startsWith("TOKENS_INVALID:") ? saveError.slice("TOKENS_INVALID:".length).trim() : undefined}
           onRetry={() => void retrySave()}
           onKeepEditing={() => {
             setLeaveAfterSave(null);

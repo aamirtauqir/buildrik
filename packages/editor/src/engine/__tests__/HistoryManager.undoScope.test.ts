@@ -10,7 +10,9 @@
  */
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { Composer } from "@/engine/Composer";
-import type { DesignTokenRecord } from "@/shared/types/project";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
+import { tokensForEmit } from "@/engine/designSystem/projectTokens";
 
 function pageData() {
   return {
@@ -82,11 +84,11 @@ describe("undo scope (A-4 / PD-12)", () => {
   });
 
   it("design tokens stay undoable", () => {
-    const token = { id: "t1", kind: "color", name: "Brand", cssVar: "--brand", value: "#1A56DB" };
+    const token = v6Token({ id: "t1", name: "Brand", cssVar: "--brand", value: "#1A56DB" });
     composer.history.record("baseline");
     composer.setProjectSettings({
       ...composer.getProjectSettings(),
-      designTokens: [token as unknown as DesignTokenRecord],
+      designTokens: [token],
     });
     composer.history.flushPending();
     composer.history.record("add token");
@@ -96,5 +98,29 @@ describe("undo scope (A-4 / PD-12)", () => {
     expect(composer.getProjectSettings().designTokens ?? []).toHaveLength(0);
     // Undoing the token did not take the other settings with it.
     expect(composer.getProjectSettings().seo?.metaTitle).toBe("Old title");
+  });
+
+  /* Undoing a site's FIRST brand edit restored "no tokens" as an absent key.
+     The save payload then carried no designTokens at all, the server kept
+     the edited row, and the next load brought the undone edit back. Undo
+     writes the seed explicitly instead: [] at the current schema version
+     ([] with no version reads as v1). */
+  it("undoing the first brand edit persists as an explicit empty v6 token set", () => {
+    expect(composer.designSystem.setDesignToken("color-primary", "#FF0000")).toBe("#FF0000");
+    expect(composer.exportProject().settings?.designTokens).toBeDefined();
+
+    composer.history.undo();
+
+    const settings = composer.exportProject().settings;
+    expect(settings?.designTokens).toEqual([]);
+    expect(settings?.designTokensSchemaVersion).toBe(6);
+    expect(tokensForEmit(settings)).toEqual(DEFAULT_TOKENS);
+    expect(settings?.seo?.metaTitle).toBe("Old title");
+  });
+
+  it("an undo on a site that never had tokens does not invent them", () => {
+    canvasEdit();
+    composer.history.undo();
+    expect(composer.exportProject().settings?.designTokens).toBeUndefined();
   });
 });

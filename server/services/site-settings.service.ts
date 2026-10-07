@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/encryption";
 import { slugifyProjectName } from "@/lib/vercel";
 import { hasEverDeployed } from "@/server/services/publish.service";
+import { isBrandTokensV2Enabled } from "@/server/services/brand-tokens";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import {
   PROJECT_SETTINGS_KEY_SCHEMAS,
@@ -192,7 +193,7 @@ export async function getSiteSettings(siteId: string) {
       id: true,
       ...SITE_SETTINGS_COLUMNS,
       deletedAt: true,
-      workspace: { select: { plan: true, name: true } },
+      workspace: { select: { id: true, plan: true, name: true } },
     },
   });
 
@@ -235,6 +236,10 @@ export async function getSiteSettings(siteId: string) {
     /* The editor's workspace doors (Members, Billing, Integrations &
        webhooks) name the workspace they lead to (8139:217358). */
     workspaceName: workspace.name,
+    /* Kill switch for the token migration (D14), for this site's workspace:
+       the editor reads it with the site's own hold flag to decide whether an
+       unmigrated site may upgrade. */
+    brandTokensV2: isBrandTokensV2Enabled(workspace.id),
     pageSeo,
   };
 }

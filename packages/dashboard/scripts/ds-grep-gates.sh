@@ -161,15 +161,19 @@ pass "D6: @theme block present in globals.css"
 # baseline ratchet (may only go DOWN from here, same shape as the editor's
 # Gate 16 hex-ratchet) rather than a hardcoded allowlist that drifts stale.
 # emails/ excepted (email clients have no CSS-var support).
+# e2e/ excepted (2026-10-07): Playwright specs are not chrome — a hex there is
+# test data typed into an input or asserted against, never a rendered style.
+# Baseline lowered 177 -> 175 by the same change (the e2e hits it dropped).
 # globals.css excepted (canonical token definition site; also not .tsx/.ts).
 # ─────────────────────────────────────────────────────────────
 D7_HEX_PATTERN="#[0-9A-Fa-f]{3,8}\b"
-D7_BASELINE=177
+D7_BASELINE=175
 D7_HITS=$(grep -rEn "$D7_HEX_PATTERN" packages/dashboard \
   --include="*.tsx" --include="*.ts" 2>/dev/null \
   | grep -v "/node_modules/" \
   | grep -v "/.next/" \
   | grep -v "/emails/" \
+  | grep -v "/e2e/" \
   | wc -l | tr -d ' ')
 if [ "$D7_HITS" -gt "$D7_BASELINE" ]; then
   echo "GATE FAIL: D7 — $D7_HITS hardcoded hex literal(s) in dashboard chrome tsx/ts, baseline is $D7_BASELINE (use var(--color-*) or token classes; the baseline may only go down)"
@@ -178,10 +182,11 @@ if [ "$D7_HITS" -gt "$D7_BASELINE" ]; then
     | grep -v "/node_modules/" \
     | grep -v "/.next/" \
     | grep -v "/emails/" \
+    | grep -v "/e2e/" \
     | head -5
   exit 1
 fi
-pass "D7: $D7_HITS hardcoded hex literal(s) in dashboard chrome tsx/ts (baseline $D7_BASELINE, emails + globals.css exempt)"
+pass "D7: $D7_HITS hardcoded hex literal(s) in dashboard chrome tsx/ts (baseline $D7_BASELINE, emails + e2e + globals.css exempt)"
 
 echo
 echo "=== Dashboard DS gates: 7 passed ==="

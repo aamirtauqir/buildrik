@@ -12,6 +12,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { Composer } from "../../Composer";
 import { ExportEngine } from "../ExportEngine";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({
@@ -39,13 +40,7 @@ function exportCSSWithFonts(tokens: Array<{ id: string; value: string }>): strin
   } as never);
   composer.setProjectSettings({
     ...composer.getProjectSettings(),
-    designTokens: tokens.map((t) => ({
-      ...t,
-      name: t.id,
-      cssVar: `--buildrick-design-${t.id}`,
-      category: "typography" as const,
-      type: "string",
-    })),
+    designTokens: tokens.map((t) => v6Token({ ...t, kind: "type", category: "typography", type: "string" })),
   } as never);
   return new ExportEngine(composer).generateCSS();
 }
@@ -101,10 +96,7 @@ describe("the published page fetches the families it names", () => {
     if (tokens.length) {
       composer.setProjectSettings({
         ...composer.getProjectSettings(),
-        designTokens: tokens.map((t) => ({
-          ...t, name: t.id, cssVar: `--buildrick-design-${t.id}`,
-          category: "typography" as const, type: "string",
-        })),
+        designTokens: tokens.map((t) => v6Token({ ...t, kind: "type", category: "typography", type: "string" })),
       } as never);
     }
     return new ExportEngine(composer).generateHTML();

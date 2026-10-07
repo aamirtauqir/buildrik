@@ -11,6 +11,7 @@
  * @license BSD-3-Clause
  */
 
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { Composer } from "../../../../../engine";
 import { AI_EDITABLE_TOKEN_TYPES } from "@/engine/designSystem/tokenValueGuard";
 import type { TokenRef, MediaAssetRef } from "./runPromptOnce";
@@ -23,7 +24,7 @@ export function gatherTokens(composer: Composer | null): TokenRef[] {
   const tokens = composer.getProjectSettings?.()?.designTokens ?? [];
   return tokens
     .filter((t) => t.type !== undefined && AI_EDITABLE_TOKEN_TYPES.has(t.type))
-    .map((t) => ({ id: t.id, name: t.name, value: t.value, type: t.type as string }))
+    .map((t) => ({ id: t.id, name: t.name, value: resolveTokenLiteral(tokens, t.id, "light") ?? "", type: t.type as string }))
     .slice(0, 120);
 }
 

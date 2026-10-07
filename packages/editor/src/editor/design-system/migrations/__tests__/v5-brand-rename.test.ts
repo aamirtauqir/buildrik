@@ -14,12 +14,17 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import { migrateDesignTokens } from "../index";
+import { lightAliasOf, resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { migrateDesignTokens } from "@/engine/designSystem/tokenMigrations";
 import { generateCompatibilityShim } from "../../utils/exportUtils";
 import { DEFAULT_TOKENS } from "../../constants";
-import type { DesignToken } from "../../types";
+import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
-const stored = (over: Partial<DesignToken> = {}): DesignToken => ({
+/** Steps up to v5 read and write legacy rows; v6 is migrateTokensToV6's. */
+const migrateLegacy = (rows: LegacyDesignToken[], from: number, to: number) =>
+  migrateDesignTokens(rows, from, to) as LegacyDesignToken[];
+
+const stored = (over: Partial<LegacyDesignToken> = {}): LegacyDesignToken => ({
   id: "color-blue-500",
   name: "Blue 500",
   value: "#2D6DFF",
@@ -32,25 +37,25 @@ const stored = (over: Partial<DesignToken> = {}): DesignToken => ({
 
 describe("v5 — brand primitive rename", () => {
   it("renames the id, the name and the cssVar", () => {
-    const [t] = migrateDesignTokens([stored()], 4, 5);
+    const [t] = migrateLegacy([stored()], 4, 5);
     expect(t.id).toBe("color-brand-500");
     expect(t.name).toBe("Brand 500");
     expect(t.cssVar).toBe("--buildrick-design-color-brand-500");
   });
 
   it("does NOT touch the value — a published site keeps the colour it shipped", () => {
-    const [t] = migrateDesignTokens([stored()], 4, 5);
+    const [t] = migrateLegacy([stored()], 4, 5);
     expect(t.value).toBe("#2D6DFF");
   });
 
   it("keeps a value the user chose themselves", () => {
-    const [t] = migrateDesignTokens([stored({ value: "#FF0000" })], 4, 5);
+    const [t] = migrateLegacy([stored({ value: "#FF0000" })], 4, 5);
     expect(t.value).toBe("#FF0000");
     expect(t.id).toBe("color-brand-500");
   });
 
   it("repoints every alias that pointed at the old id", () => {
-    const tokens = migrateDesignTokens(
+    const tokens = migrateLegacy(
       [
         stored(),
         stored({
@@ -75,12 +80,12 @@ describe("v5 — brand primitive rename", () => {
 
   it("leaves a token set that never had the old id completely alone", () => {
     const before = [stored({ id: "color-slate-50", cssVar: "--x", aliasOf: undefined })];
-    const after = migrateDesignTokens(before, 4, 5);
+    const after = migrateLegacy(before, 4, 5);
     expect(after).toEqual(before);
   });
 
   it("does not leave a bridge token behind — the Tokens screen shows one primitive, not two", () => {
-    const after = migrateDesignTokens([stored()], 4, 5);
+    const after = migrateLegacy([stored()], 4, 5);
     expect(after).toHaveLength(1);
     expect(after.find((t) => t.id === "color-blue-500")).toBeUndefined();
   });
@@ -95,14 +100,17 @@ describe("v5 — brand primitive rename", () => {
 
 describe("the seed the rename was for", () => {
   it("ships ONE brand blue — primary, the primitive and action all agree", () => {
-    const byId = (id: string) => DEFAULT_TOKENS.find((t) => t.id === id);
-    expect(byId("color-primary")?.value).toBe("#1A56DB");
-    expect(byId("color-brand-500")?.value).toBe("#1A56DB");
-    expect(byId("color-action")?.value).toBe("#1A56DB");
-    expect(byId("color-action")?.aliasOf).toBe("color-brand-500");
+    const light = (id: string) => resolveTokenLiteral(DEFAULT_TOKENS, id, "light");
+    expect(light("color-primary")).toBe("#1A56DB");
+    expect(light("color-brand-500")).toBe("#1A56DB");
+    expect(light("color-action")).toBe("#1A56DB");
+    const action = DEFAULT_TOKENS.find((t) => t.id === "color-action");
+    expect(action && lightAliasOf(action)).toBe("color-brand-500");
   });
 
   it("no longer seeds the retired cobalt anywhere", () => {
-    expect(DEFAULT_TOKENS.filter((t) => /#2d6dff/i.test(t.value))).toEqual([]);
+    const shipsCobalt = (id: string) =>
+      (["light", "dark"] as const).some((m) => /#2d6dff/i.test(resolveTokenLiteral(DEFAULT_TOKENS, id, m) ?? ""));
+    expect(DEFAULT_TOKENS.filter((t) => shipsCobalt(t.id))).toEqual([]);
   });
 });

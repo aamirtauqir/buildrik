@@ -22,6 +22,7 @@ import { DSBindingChip } from "../../sections/DSBindingChip";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../engine";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 // ============================================================================
 // HELPERS
@@ -101,7 +102,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   const tokenEntries = colorTokens.map((t) => ({
     id: t.id,
     name: t.name,
-    value: t.value,
+    value: resolveTokenLiteral(colorTokens, t.id, "light") ?? "",
     cssVar: t.cssVar,
   }));
 

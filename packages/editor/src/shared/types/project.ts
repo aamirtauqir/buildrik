@@ -7,6 +7,7 @@
  */
 
 import type { CmsBindingsInput } from "@buildrik/shared/schemas/sites";
+import type { DarkMode, DesignToken } from "@buildrik/shared/schemas/design-tokens";
 import type { AssetData } from "./asset";
 import type { CanvasGuide } from "./canvas";
 import type { ElementData } from "./element";
@@ -65,6 +66,10 @@ export interface ProjectData {
    * -> repeater binding (CMSBindingManager.exportCollectionBindings()).
    */
   cmsBindings?: CmsBindingsInput;
+  /** Server kill switch for the v5→v6 token migration. Absent = on. */
+  brandTokensV2?: boolean;
+  /** Operator rollback hold: this site is never migrated while set. */
+  tokensMigrationHold?: boolean;
 }
 
 export interface ProjectMetadata {
@@ -293,8 +298,10 @@ export interface ProjectSettings {
    * Bumped when token names rename/split/remove.
    */
   designTokensSchemaVersion?: number;
-  /** Design tokens (CSS custom properties) */
-  designTokens?: DesignTokenRecord[];
+  /** Design tokens (CSS custom properties), schema v6 */
+  designTokens?: DesignToken[];
+  /** Whether the published site ships a dark palette. Absent = "off". */
+  darkMode?: DarkMode;
   /** Style presets — Phase B preset infra, S2. */
   designPresets?: DesignPresetRecord[];
   /** Custom code injection (head scripts, body scripts, global CSS) */
@@ -343,26 +350,6 @@ export interface DesignPresetRecord {
     | "nav" | "table" | "layout";
   variant: string;
   bindings: Record<string, { tokenId: string }>;
-}
-
-/** Serializable design token for project settings */
-export interface DesignTokenRecord {
-  id: string;
-  name: string;
-  value: string;
-  cssVar: string;
-  category:
-    | "colors"
-    | "typography"
-    | "spacing"
-    | "effects"
-    | "layout"
-    | "icons"
-    | "buttons"
-    | "forms"
-    | "theme";
-  type?: string;
-  group?: string;
 }
 
 /**

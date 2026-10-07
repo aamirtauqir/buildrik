@@ -69,8 +69,8 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
                      does with the base — so hovering the SELECTED segment
                      repainted it gray-100 under `text-white` and the label
                      measured 1.1:1 and disappeared. Caught by measure.mjs's
-                     contrast sweep on brand-dirty, whose click path happens to
-                     park the pointer here. */
+                     contrast sweep on the (since-retired) brand-dirty recipe,
+                     whose click path happened to park the pointer here. */
                   ? "tw:bg-[var(--bk-accent)] tw:hover:bg-[var(--bk-accent-hover)] tw:text-white tw:font-medium tw:border-0"
                   /* White on a `--bk-gray-300` edge — 1747:8399. Only the
                      UNSELECTED segment carries a stroke: 1747:8397 draws the

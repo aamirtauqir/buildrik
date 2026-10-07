@@ -10,7 +10,9 @@ import type { ProjectData } from "@/shared/types";
 import { importMigratedProject } from "../importMigratedProject";
 import { TARGET_PROJECT_VERSION } from "@/engine/designSystem/migrations/projectMigrations";
 import { migration0002 } from "@/engine/designSystem/migrations/projectMigrations/0002-seed-dark-color-values";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { DEFAULT_TOKENS } from "../../constants";
+import { DEFAULT_TOKENS_V5 } from "@/engine/designSystem/defaultTokens";
 
 beforeEach(() => localStorage.clear());
 
@@ -47,8 +49,10 @@ describe("importMigratedProject — runs once", () => {
    defaults carry them now — running v2 over the defaults changes nothing. */
 describe("DEFAULT_TOKENS carry migration v2's dark values", () => {
   it("v2 is a no-op on the defaults", () => {
-    const out = migration0002.up({ tokens: DEFAULT_TOKENS } as never);
-    expect(out.tokens).toEqual(DEFAULT_TOKENS);
-    expect(DEFAULT_TOKENS.find((t) => t.id === "color-primary")?.darkValue).toBe("#60A5FA");
+    /* v2 is a legacy step, so it runs over the legacy seed the v6 one is
+       migrated from; the v6 seed must still resolve the dark value. */
+    const out = migration0002.up({ tokens: DEFAULT_TOKENS_V5 });
+    expect(out.tokens).toEqual(DEFAULT_TOKENS_V5);
+    expect(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "dark")).toBe("#60A5FA");
   });
 });

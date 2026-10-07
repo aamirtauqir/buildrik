@@ -11,11 +11,17 @@ import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
+import { BRAND_READ_ONLY_FAILED, BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "@/shared/constants/brandReadOnly";
 import { EVENTS, isNavigationOnlyChange } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
 import { importMigratedProject } from "@/editor/design-system";
+import { migrateTokensToV6, TokenMigrationError } from "@buildrik/shared/tokens";
+import { TOKENS_SCHEMA_VERSION, validateTokens } from "@buildrik/shared/schemas/design-tokens";
+import { migrateDesignTokens } from "@/engine/designSystem/tokenMigrations";
+import { isV6TokenRow } from "@/engine/designSystem/projectTokens";
+import { captureError } from "@/shared/utils/errorTracking";
 import {
   getSiteIdFromUrl,
   isSaveConflictPending,
@@ -68,6 +74,54 @@ export interface UseComposerInitParams {
   /** Board 813:4870: a mid-session 401 during AUTOSAVE opens the blocking
    *  recovery surface. Same back-compat shape as onLoadError. */
   onAuthExpired?: () => void;
+}
+
+/** Spec §10 (D17): a site whose tokens cannot be migrated still opens — old
+ *  tokens, Brand read-only, a Sentry event. Never a half-migrated save. */
+export function loadTokensSafely<
+  S extends { designTokens?: unknown; designTokensSchemaVersion?: number; darkMode?: unknown },
+>(
+  settings: S,
+  siteId: string,
+  opts: { switchOn: boolean; hold: boolean } = { switchOn: true, hold: false },
+): { settings: S; readOnly: boolean; migrated: boolean; reason?: string } {
+  const rows = settings.designTokens;
+  if (rows === undefined) return { settings, readOnly: false, migrated: false };
+  const v6Shaped = Array.isArray(rows) && rows.length > 0 && rows.every(isV6TokenRow);
+  /* A missing version is read from the rows' shape, as mergeProjectTokens
+     reads it: v6 rows are never pushed through the v1→v5 chain. */
+  const from = settings.designTokensSchemaVersion ?? (v6Shaped ? TOKENS_SCHEMA_VERSION : 1);
+  if (from >= TOKENS_SCHEMA_VERSION) {
+    /* Saved v6 rows that do not validate would open Brand on the SEED (the
+       strict merge's fallback) and its first save would write the seed over
+       the site's brand. Read-only on the old tokens instead. */
+    const checked = validateTokens(rows);
+    if (checked.ok) return { settings, readOnly: false, migrated: false };
+    captureError(new Error(`saved v6 tokens invalid: ${checked.reason}`), { siteId, fromVersion: from, reason: checked.reason });
+    return { settings, readOnly: true, migrated: false, reason: BRAND_READ_ONLY_FAILED };
+  }
+  /* Switch off = no NEW migrations (an already-v6 site returned above and works
+     normally); a held site is never migrated. Either way the site stays as-is. */
+  if (opts.hold) return { settings, readOnly: true, migrated: false, reason: BRAND_READ_ONLY_HELD };
+  if (!opts.switchOn) return { settings, readOnly: true, migrated: false, reason: BRAND_READ_ONLY_SWITCH_OFF };
+  try {
+    const v5 = from < 5 && Array.isArray(rows) ? migrateDesignTokens(rows, from, 5) : rows;
+    const designTokens = v6Shaped ? rows : migrateTokensToV6(v5);
+    return {
+      settings: {
+        ...settings,
+        designTokens,
+        designTokensSchemaVersion: TOKENS_SCHEMA_VERSION,
+        darkMode: settings.darkMode ?? "off",
+      },
+      readOnly: false,
+      migrated: true,
+    };
+  } catch (err) {
+    const reason = err instanceof TokenMigrationError ? err.reason : String(err);
+    captureError(err instanceof Error ? err : new Error(reason), { siteId, fromVersion: from, reason });
+    return { settings, readOnly: true, migrated: false, reason };
+  }
 }
 
 export function useComposerInit(params: UseComposerInitParams): Composer | null {
@@ -193,9 +247,29 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // editor still loads — DS migrations are forward-fix, not load-gating.
             // The run-then-import step is shared with the migration modal's
             // Restore / Retry (A2), so a re-run lands tokens the way this does.
+            /* Token migration (v1–v5 → v6) is part of the imported project, so
+               it lands before history starts recording: ⌘Z after load cannot
+               revert it. */
+            /* Before the import: the canvas, export and publish emit from
+               it, and a pre-v6 site must not be migrated in memory while
+               the server's switch is off for it (I3). */
+            instance.designSystem.brandTokensV2 = data.brandTokensV2 === true;
+            const tokenLoad = data.settings
+              ? loadTokensSafely(data.settings, siteId, {
+                  switchOn: data.brandTokensV2 === true,
+                  hold: data.tokensMigrationHold ?? false,
+                })
+              : null;
+            const loaded: ProjectData =
+              tokenLoad && tokenLoad.settings !== data.settings ? { ...data, settings: tokenLoad.settings } : data;
+            const tokensMigrated = loaded !== data;
             let migrated = false;
             try {
-              migrated = importMigratedProject(instance, data, siteId);
+              migrated = importMigratedProject(instance, loaded, siteId);
+              if (tokenLoad?.migrated) {
+                console.info("[tokens] migrated", { siteId });
+                instance.emit(EVENTS.DESIGN_SYSTEM_MIGRATED, { siteId });
+              }
             } catch (err) {
               console.error("[BuildrikSync] DS migration failed:", err);
               addToastRef.current({
@@ -203,7 +277,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 description: "Could not update design system schema. Loaded as-is.",
                 tone: "warning",
               });
-              instance.importProject(data);
+              instance.importProject(loaded);
+            }
+            if (tokenLoad?.readOnly) {
+              instance.designSystem.readOnly = true;
+              instance.designSystem.readOnlyReason = tokenLoad.reason ?? null;
+              instance.emit(EVENTS.DESIGN_SYSTEM_READ_ONLY, { reason: tokenLoad.reason ?? "token migration failed" });
             }
             // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"
             // instead of "Not saved" on fresh load. The just-loaded state IS
@@ -260,7 +339,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                "Updating your project" modal returned on every open (walk A2,
                2026-09-24). A project:changed schedules the autosave that
                persists it — once; the next load is at the target and skips. */
-            if (migrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
+            if (migrated || tokensMigrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
             // Phase B3: hydrate media library from server. Additive — never
             // throws. Returns null on offline/auth/unconfigured; we just
             // keep going with engine-only state in that case.
@@ -507,6 +586,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        Read once, like every other view-mode consumer — the mode is the URL. */
     const readOnlyView = getEditorViewMode().readOnlyView;
 
+    /* The serialized brand tokens the server refused (TOKENS_INVALID).
+       Keyed on the tokens, not the whole payload: exportProject stamps
+       metadata.updatedAt on every call, so two whole snapshots never compare
+       equal, and any other edit still carries the same refused tokens. Held
+       until the tokens change; null once anything saves. */
+    let refusedTokens: string | null = null;
+
     const handler = (payload?: unknown) => {
       if (readOnlyView) return;
       /* L-3: `project:changed` also fires on `page:activated`, i.e. merely
@@ -541,12 +627,21 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           return;
         }
         const seqAtSend = changeSeq;
-        setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
 
         /* Captured, not re-derived: `markSaved` below re-announces THIS
            snapshot, and a second `exportProject()` per autosave tick is a full
            serialize of the document. */
         const snapshot = siteId ? composer.exportProject() : null;
+        if (
+          snapshot &&
+          refusedTokens !== null &&
+          JSON.stringify(snapshot.settings?.designTokens ?? null) === refusedTokens
+        ) {
+          keepUnsaved(siteId!, snapshot);
+          setIsDirty(true);
+          return;
+        }
+        setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
         const savePromise = snapshot
           ? saveProject(siteId!, snapshot).then(() => undefined)
           : composer.saveProject();
@@ -572,6 +667,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                that is missing — leaving it would offer a stale restore on the
                next load. */
             if (siteId) clearUnsaved(siteId);
+            refusedTokens = null;
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })
@@ -590,6 +686,21 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             const message = err instanceof Error ? err.message : "Auto-save failed";
+            /* The server refused this save's brand tokens. Not a blip: the
+               same payload is refused every time, so it is not re-sent (see
+               refusedTokens), the edit is kept for the reload like an
+               offline one, and the failure stays up as the persistent
+               save-failed banner rather than a toast. */
+            if (message.startsWith("TOKENS_INVALID:")) {
+              if (siteId && snapshot) {
+                refusedTokens = JSON.stringify(snapshot.settings?.designTokens ?? null);
+                keepUnsaved(siteId, snapshot);
+              }
+              console.error("[BuildrikSync] auto-save refused:", message);
+              setSaveState((prev) => ({ ...prev, status: "error", error: message }));
+              setIsDirty(true);
+              return;
+            }
             /* Offline is not a server error. `useSaveCallback` already draws
                this line for a manual save; autosave shouted "Save failed —
                Could not save to dashboard" at someone whose wifi dropped.

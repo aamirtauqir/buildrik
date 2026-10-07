@@ -14,15 +14,11 @@
  *     lives inside useStudioState): it goes straight to the sink, which
  *     no-ops, and `onSwitched` is not run;
  *
- * Every dirty domain prompts, Brand included: its staging lives in
- * TokenRegistryProvider but does not reliably survive a switch (a
- * BrandWorkspace remount can reset staged registries, and the draft store
- * restores only part of the staging).
- *
  * "Leave anyway" first runs each dirty surface's registered discard (Settings
  * rolls back its live composer writes, a record sheet resets its fields), then
  * switches. The copy promises loss only when every dirty surface can discard;
- * Brand registers none, so its copy says "may discard some of them".
+ * otherwise it says "may discard some of them". (Brand has nothing to guard
+ * since its edits autosave — spec §4.)
  *
  * @license BSD-3-Clause
  */
@@ -64,11 +60,8 @@ function leaveCopy(): { body: string; leaveLabel: string } {
   if (shellDirty.everyDirtyDiscards()) {
     return { body: "You have unsaved changes. Switching away will lose them.", leaveLabel: "Leave and lose changes" };
   }
-  const onlyBrand = shellDirty.dirtyDomains().every((d) => d === "brand");
   return {
-    body: onlyBrand
-      ? "You have unsaved brand changes. Switching away may discard some of them."
-      : "You have unsaved changes. Switching away may discard some of them.",
+    body: "You have unsaved changes. Switching away may discard some of them.",
     leaveLabel: "Leave anyway",
   };
 }

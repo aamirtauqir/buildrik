@@ -7,7 +7,17 @@
 import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
 import { THEME } from "../../shared/constants/defaultStyles";
 import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
-import { DEFAULT_TOKENS } from "../designSystem/defaultTokens";
+import { resolveTokenLiteral, emitTokenCss } from "@buildrik/shared/tokens";
+import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
+import { tokensForEmit } from "../designSystem/projectTokens";
+import type { DesignToken } from "../designSystem/types";
+
+/** The slice of project settings the token emitters read. */
+export interface SiteTokenSettings {
+  designTokens?: readonly unknown[];
+  designTokensSchemaVersion?: number;
+  darkMode?: unknown;
+}
 
 // ============================================================================
 // RESET CSS
@@ -34,14 +44,36 @@ function tokenList<T>(tokens: ReadonlyArray<T> | null | undefined): ReadonlyArra
 }
 
 export function siteFontsFromTokens(
-  tokens: ReadonlyArray<{ id?: string; value?: string }> | null = []
+  tokens: readonly DesignToken[] | null = []
 ): { heading?: string; body?: string; mono?: string; text?: string } {
-  const value = (id: string) => tokenList(tokens).find((t) => t.id === id)?.value;
+  const list = tokenList(tokens);
+  const value = (id: string) => resolveTokenLiteral(list, id, "light") ?? undefined;
   return {
     heading: value("font-heading"),
     body: value("font-body"),
     mono: value("font-mono"),
     text: value("color-text"),
+  };
+}
+
+/**
+ * The font slots and text colour the SITE saved, resolved against the same
+ * list the canvas and the token CSS use. A slot is reported only when the site
+ * carries its token: the seed's Inter must not become a rule on every export,
+ * or "a missing token leaves the reset's family in place" (`siteFontCSS`)
+ * could never be true.
+ */
+export function siteFontsFromSettings(
+  settings: SiteTokenSettings | undefined,
+  opts?: { migrate: boolean }
+): ReturnType<typeof siteFontsFromTokens> {
+  const saved = new Set(tokenList(settings?.designTokens).map((r) => (r as { id?: unknown } | null)?.id));
+  const all = siteFontsFromTokens(tokensForEmit(settings, opts));
+  return {
+    heading: saved.has("font-heading") ? all.heading : undefined,
+    body: saved.has("font-body") ? all.body : undefined,
+    mono: saved.has("font-mono") ? all.mono : undefined,
+    text: saved.has("color-text") ? all.text : undefined,
   };
 }
 
@@ -79,50 +111,19 @@ export function siteFontCSS(fonts: {
 }
 
 /**
- * The site's design tokens, as the custom properties a published page needs.
- *
- * The Brand panel writes every token into the project ("Apply Changes to go
- * live") and the canvas paints from them — but nothing emitted their
- * DEFINITIONS into an export. Measured on a site whose Text Primary token was
- * changed: the value reached project settings and the canvas custom property,
- * while the exported document contained no `--buildrick-design-*` declaration
- * at all. Any style bound to a token — every Brand preset and class binding —
- * therefore resolved to nothing once the page left the editor.
- *
- * The SEED is declared too, under the site's own values. A site saves only
- * the tokens it has touched, while element defaults name seed tokens the
- * Brand panel never writes (`btn-height-md`, `input-radius`, …) — the canvas
- * resolves those from `design.css`, the export resolved them to nothing:
- * every exported and published button was 24px tall with no padding and no
- * radius (BRD-23). Same merge as the canvas's (`mergeProjectTokens`): a saved
- * row wins by cssVar, and a saved row's value reaches its seed's cssVar by id.
- *
- * A token value is user data, so it is stripped of the characters that could
- * leave its declaration: `;` and `}` end the declaration or the rule, `{`
- * opens a block, and `<` could close the surrounding `</style>`.
+ * The token definitions a published page needs, written by the one emitter the
+ * canvas also uses (spec §2). The Brand panel writes every token into the
+ * project and the canvas paints from them, so an export that names
+ * `var(--buildrick-design-*)` without declaring it resolves to nothing once
+ * the page leaves the editor. The site's Dark mode decides whether dark blocks
+ * ship; a token the emitter cannot write is skipped and reported, never thrown.
+ * `opts.migrate` is the brand switch (see `tokensForEmit`).
  */
-export function siteTokensCSS(
-  tokens: ReadonlyArray<{ id?: string; cssVar?: string; value?: string }> | null = []
-): string {
-  const saved = tokenList(tokens);
-  const savedById = new Map(saved.filter((t) => t.id).map((t) => [t.id, t]));
-  const seed = DEFAULT_TOKENS.map((d) => ({
-    cssVar: d.cssVar,
-    value: savedById.get(d.id)?.value || d.value,
-  }));
-  const decls: string[] = [];
-  const seen = new Set<string>();
-  for (const t of [...saved, ...seed]) {
-    /* The name is user data too (saveProjectData stores designTokens without
-       a schema): only a plain custom-property name may reach the stylesheet,
-       or a crafted cssVar closes the rule and the <style> tag. */
-    const name = (t.cssVar ?? "").trim();
-    const value = (t.value ?? "").trim().replace(/[;{}<]/g, "");
-    if (!/^--[a-zA-Z0-9_-]+$/.test(name) || !value || seen.has(name)) continue;
-    seen.add(name);
-    decls.push(`${name}:${value}`);
-  }
-  return decls.length ? `\n:root{${decls.join(";")}}\n` : "";
+export function emitSiteTokenCss(settings: SiteTokenSettings | undefined, opts?: { migrate: boolean }): string {
+  return emitTokenCss(tokensForEmit(settings, opts), {
+    darkMode: DarkModeSchema.catch("off").parse(settings?.darkMode),
+    onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
+  });
 }
 
 /**

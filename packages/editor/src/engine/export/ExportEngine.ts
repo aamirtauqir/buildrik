@@ -25,9 +25,9 @@ import {
   RESET_CSS,
   siteFontCSS,
   siteFontFaceCSS,
-  siteTokensCSS,
+  emitSiteTokenCss,
+  siteFontsFromSettings,
   googleFontsHeadLinks,
-  siteFontsFromTokens,
   escapeHTML,
   stylesToString,
   stylesToCSS,
@@ -293,15 +293,19 @@ export class ExportEngine {
     return this.wrapInDocument(bodyContent, cfg, this.generateCSS(cfg));
   }
 
+  /** The server's brand switch for this site, as the load read it: off means a
+   *  pre-v6 site's tokens ship as saved, never migrated in memory (I3). */
+  private brandSwitch(): { migrate: boolean } {
+    return { migrate: this.composer.designSystem?.brandTokensV2 !== false };
+  }
+
   /**
    * The three font families the SITE names in its own tokens. They reach the
    * page through `siteFontCSS`, so they need fetching just like a family an
    * element names directly.
    */
   private siteFontFamilies(): string[] {
-    const { heading, body, mono } = siteFontsFromTokens(
-      this.composer.getProjectSettings?.()?.designTokens
-    );
+    const { heading, body, mono } = siteFontsFromSettings(this.composer.getProjectSettings?.(), this.brandSwitch());
     return [heading, body, mono].filter((v): v is string => Boolean(v));
   }
 
@@ -359,8 +363,9 @@ export class ExportEngine {
     /* The token DEFINITIONS first — every Brand preset and class binding emits
        `var(--buildrick-design-*)`, and an export that names them without
        declaring them resolves to nothing on the published page. */
-    css += siteTokensCSS(this.composer.getProjectSettings?.()?.designTokens);
-    css += siteFontCSS(siteFontsFromTokens(this.composer.getProjectSettings?.()?.designTokens));
+    const settings = this.composer.getProjectSettings?.();
+    css += emitSiteTokenCss(settings, this.brandSwitch());
+    css += siteFontCSS(siteFontsFromSettings(settings, this.brandSwitch()));
 
     const page = this.composer.elements.getActivePage?.();
     const rootElement = page ? this.composer.elements.getElement(page.root.id) : undefined;
@@ -810,9 +815,10 @@ export class ExportEngine {
        whatever the reset named. Found by the whole-page test, which exists to
        catch exactly this — it was the ninth thing a publish dropped in one
        day. */
-    const projectTokens = this.composer.getProjectSettings?.()?.designTokens;
+    const projectSettings = this.composer.getProjectSettings?.();
     const siteCss =
-      siteTokensCSS(projectTokens) + siteFontCSS(siteFontsFromTokens(projectTokens));
+      emitSiteTokenCss(projectSettings, this.brandSwitch()) +
+      siteFontCSS(siteFontsFromSettings(projectSettings, this.brandSwitch()));
 
     /* The reset leads, as in `generateCSS`: it carries the base body font
        (THEME.fontFamily — what the canvas renders unstyled text in) and the

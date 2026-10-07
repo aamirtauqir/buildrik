@@ -29,6 +29,7 @@ import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSB
 import { ImportCard } from "./ImportCard";
 import { Button, CopyButton, IconButton, Menu, MenuItem, Popover, Radio, Select, useToast } from "@/editor/chrome-ui";
 import { X } from "lucide-react";
+import { lightAliasOf, resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 const TOKEN_KINDS_COUNT = 14;
 
@@ -100,7 +101,7 @@ function buildPreview(
   darkStrategy: DarkStrategy,
 ): string {
   if (format === "css") {
-    return bundler.bundle(tokens, { darkStrategy, pretty: true });
+    return bundler.bundle(tokens, { darkStrategy });
   }
   return buildExport(tokens, format).content;
 }
@@ -180,9 +181,9 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onClose }) => {
 
   const stats = React.useMemo(() => {
     const tokensCount = allTokens.length;
-    const aliasEdges = allTokens.filter((t) => t.aliasOf).length;
+    const aliasEdges = allTokens.filter((t) => lightAliasOf(t)).length;
     const darkVariants = allTokens.filter(
-      (t) => t.type === "color" && typeof t.darkValue === "string" && t.darkValue !== "",
+      (t) => t.type === "color" && t.modes.dark !== undefined && Boolean(resolveTokenLiteral(allTokens, t.id, "dark")),
     ).length;
     return { tokensCount, aliasEdges, darkVariants };
   }, [allTokens]);

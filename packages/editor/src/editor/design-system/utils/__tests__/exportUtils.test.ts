@@ -6,8 +6,9 @@ import {
   generateColorCssVar,
 } from "../exportUtils";
 import type { DesignToken } from "../../types";
+import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
-const tok = (id: string, value: string, extra: Partial<DesignToken> = {}): DesignToken => ({
+const tok = (id: string, value: string, extra: Partial<V6TokenSpec> = {}): DesignToken => (v6Token({
   id,
   name: id,
   value,
@@ -15,7 +16,7 @@ const tok = (id: string, value: string, extra: Partial<DesignToken> = {}): Desig
   cssVar: `--buildrick-design-${id}`,
   type: "color",
   ...extra,
-});
+}));
 
 describe("generateCompatibilityShim", () => {
   it("returns empty string at V1 (baseline — no deprecated aliases yet)", () => {
@@ -34,14 +35,14 @@ describe("generateCompatibilityShim", () => {
 describe("buildExport CSS includes compatibility shim", () => {
   it("prepends empty shim at V1 (no change for current user projects)", () => {
     const tokens: DesignToken[] = [
-      {
+      v6Token({
         id: "color-primary",
         name: "Primary",
         value: "#2D6DFF",
         category: "colors",
         cssVar: "--buildrick-design-color-primary",
         type: "color",
-      },
+      }),
     ];
     const { content, filename } = buildExport(tokens, "css");
     expect(filename).toBe("design-tokens.css");
@@ -88,13 +89,13 @@ describe("buildExport — CSS category grouping", () => {
 
 describe("buildExport — JSON format", () => {
   it("serializes the full token array losslessly (darkValue included)", () => {
-    const tokens = [tok("color-primary", "#2D6DFF", { darkValue: "#0A1F4D" })];
+    const tokens = [tok("color-primary", "#2D6DFF", { dark: "#0A1F4D" })];
     const { content, filename } = buildExport(tokens, "json");
     expect(filename).toBe("design-tokens.json");
     const parsed = JSON.parse(content) as DesignToken[];
     expect(parsed).toHaveLength(1);
     expect(parsed[0].id).toBe("color-primary");
-    expect(parsed[0].darkValue).toBe("#0A1F4D");
+    expect(parsed[0].modes.dark).toEqual({ value: "#0A1F4D" });
   });
 });
 
@@ -108,12 +109,13 @@ describe("buildExport — Tailwind format", () => {
     expect(filename).toBe("tailwind.config.js");
     expect(content).toContain("module.exports");
     expect(content).toContain('"brand-primary": "#2D6DFF"');
-    // Non-color tokens are not represented in the Tailwind color map.
-    expect(content).not.toContain("16px");
+    // Non-color tokens are not represented in the Tailwind color map (every
+    // v6 token has a kind, so the spacing token lands in `spacing` instead).
+    expect(content).not.toMatch(/colors: \{[^}]*16px/);
   });
 
   it("drops dark variants — Tailwind config has no per-token dark model (surfaced by ExportSection warning)", () => {
-    const tokens = [tok("color-primary", "#2D6DFF", { darkValue: "#0A1F4D" })];
+    const tokens = [tok("color-primary", "#2D6DFF", { dark: "#0A1F4D" })];
     const { content } = buildExport(tokens, "tailwind");
     expect(content).toContain("#2D6DFF");
     expect(content).not.toContain("#0A1F4D");

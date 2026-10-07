@@ -23,7 +23,7 @@ describe("TokenAddDialog", () => {
     fireEvent.change(screen.getByTestId("brand-token-add-value"), { target: { value: "96px" } });
     fireEvent.click(screen.getByTestId("brand-token-add-confirm"));
     expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({
-      id: "space-section-gap", value: "96px", category: "spacing", kind: "spacing", cssVar: "--buildrick-design-space-section-gap",
+      id: "space-section-gap", modes: { light: { value: "96px" } }, category: "spacing", kind: "spacing", cssVar: "--buildrick-design-space-section-gap",
     }));
   });
 

@@ -1,11 +1,12 @@
-import type { DesignToken } from "../../types";
+import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
 /**
  * Whole-project payload visible to a project migration.
  * Mirrors what `Site.projectStyles` + sibling fields will hold.
  */
 export interface ProjectPayload {
-  tokens: DesignToken[];
+  /** Pre-v6 rows: these steps predate the v6 schema and only ever see legacy saves. */
+  tokens: LegacyDesignToken[];
   /** Future: presets, components, dsBound, etc. Migrations declare their slice. */
   [extension: string]: unknown;
 }

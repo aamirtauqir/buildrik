@@ -3,24 +3,32 @@
     {
       "id": "a",
       "name": "A",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "b"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-a",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "A",
-      "aliasOf": "b"
+      "friendlyName": "A"
     },
     {
       "id": "b",
       "name": "B",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "a"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-b",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "B",
-      "aliasOf": "a"
+      "friendlyName": "B"
     }
   ]
 }

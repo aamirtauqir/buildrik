@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TokenKindSchema, TokenValueSchema, DesignTokenSchema } from "../designToken";
+import { TokenKindSchema, TokenValueSchema, LegacyDesignTokenSchema } from "../designToken";
 
 describe("TokenKindSchema", () => {
   it("accepts all 14 spec kinds", () => {
@@ -74,7 +74,7 @@ describe("TokenValueSchema (discriminated union)", () => {
   });
 });
 
-describe("DesignTokenSchema", () => {
+describe("LegacyDesignTokenSchema", () => {
   it("accepts a minimal legacy-shape token (no kind field)", () => {
     const legacy = {
       id: "color-brand-500",
@@ -84,7 +84,7 @@ describe("DesignTokenSchema", () => {
       cssVar: "--bd-color-brand-500",
       type: "color",
     };
-    expect(DesignTokenSchema.safeParse(legacy).success).toBe(true);
+    expect(LegacyDesignTokenSchema.safeParse(legacy).success).toBe(true);
   });
 
   it("accepts a Phase A.0 token with kind + typedValue", () => {
@@ -99,7 +99,7 @@ describe("DesignTokenSchema", () => {
       friendlyName: "Medium radius",
       typedValue: { kind: "radius", value: "8px" },
     };
-    expect(DesignTokenSchema.safeParse(newShape).success).toBe(true);
+    expect(LegacyDesignTokenSchema.safeParse(newShape).success).toBe(true);
   });
 
   it("rejects token with malformed cssVar", () => {
@@ -111,6 +111,6 @@ describe("DesignTokenSchema", () => {
       cssVar: "not-a-css-var",
       type: "color",
     };
-    expect(DesignTokenSchema.safeParse(bad).success).toBe(false);
+    expect(LegacyDesignTokenSchema.safeParse(bad).success).toBe(false);
   });
 });

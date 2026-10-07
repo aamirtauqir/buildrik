@@ -29,6 +29,7 @@ import { TokenDetailView } from "@/editor/design-system/ui/sections/TokenDetailV
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import type { LintIssue } from "@/engine/designSystem/LintState";
+import { v6Token, ownLight } from "@/engine/__tests__/test-utils/v6Token";
 
 describe("Arc D6.c · Auto-fix history-awareness", () => {
   let originalGetContext: any;
@@ -105,19 +106,15 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     });
   });
 
-  const projectId = "autofix-history-test";
-
   // Pre-seed a color token + matching lint issue so Auto-fix has work to do.
   // Hex chosen so applyContrastFix("darken-22") returns a different value.
-  const seedToken = {
+  const seedToken = v6Token({
     id: "color-primary",
     name: "Primary",
     value: "#3B82F6",
-    category: "colors" as const,
-    cssVar: "--buildrick-design-color-primary",
-    type: "color" as const,
-    kind: "color" as const,
-  };
+    layer: "semantic",
+  });
+  const seedValue = ownLight(seedToken) ?? "";
 
   function seed(composer: Composer) {
     // Persist the token via setProjectSettings so projectSettings has a known
@@ -125,7 +122,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     composer.setProjectSettings({
       ...composer.getProjectSettings(),
       designTokens: [seedToken],
-      designTokensSchemaVersion: 2,
+      designTokensSchemaVersion: 6,
     });
 
     // Seed a lint issue against the token so TokenDetailView shows Auto-fix.
@@ -141,7 +138,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
   const wrap = (composer: Composer, children: React.ReactNode) => (
     <ToastProvider>
       <DSModeProvider initialMode="pro">
-        <TokenRegistryProvider projectId={projectId} composer={composer as any}>
+        <TokenRegistryProvider composer={composer}>
           {children}
         </TokenRegistryProvider>
       </DSModeProvider>
@@ -162,7 +159,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
             token={token}
             composer={composer}
             allTokens={color.tokens}
-            onValueChange={(id, value, dark) => color.updateToken(id, value, dark)}
+            onValueChange={(id, value) => color.updateToken(id, value)}
           />
         )}
       </>
@@ -174,12 +171,6 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     (container.querySelector('[data-testid="brand-token-value-light"]')?.textContent ?? "");
 
   it("Click Auto-fix → registry value mutates AND composer.history.undo() reverts", async () => {
-    // Pre-seed localStorage so registry mounts with the lint-flagged token.
-    localStorage.setItem(
-      `buildrick-design-tokens-${projectId}-v1`,
-      JSON.stringify({ schemaVersion: 2, tokens: [seedToken] }),
-    );
-
     const composer = new Composer({} as any);
     // History coalesce defaults to 500ms which would batch seed() and
     // Auto-fix into a single recorded entry. Zero it for deterministic
@@ -213,12 +204,11 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
 
     // Snapshot value before Auto-fix.
     const preFixValue = lightValue(container);
-    expect(preFixValue.toLowerCase()).toBe(seedToken.value.toLowerCase());
+    expect(preFixValue.toLowerCase()).toBe(seedValue.toLowerCase());
 
-    // Click Auto-fix → engine applyAutoFix writes through setProjectSettings
-    // inside a "Auto-fix contrast" transaction → PROJECT_CHANGED records a
-    // history entry. The project:changed subscriber in TokensSection
-    // re-hydrates the React registries so the input value reflects the fix.
+    // Click Auto-fix → computeAutoFix → onValueChange → the colour registry's
+    // updateToken → designSystem.setTokens (one transaction, one history
+    // entry). The registries read the project, so the card reflects the fix.
     act(() => {
       fireEvent.click(autoFixBtn);
     });
@@ -263,11 +253,6 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
   // updates the live registry value AND that Cmd+Z reverts it — the propagation
   // + undo contract the AI relies on (it never touches the React hooks).
   it("set-token (W4): setDesignToken updates the registry value AND undo reverts", async () => {
-    localStorage.setItem(
-      `buildrick-design-tokens-${projectId}-v1`,
-      JSON.stringify({ schemaVersion: 2, tokens: [seedToken] }),
-    );
-
     const composer = new Composer({} as any);
     composer.history.setCoalesceDelay(0);
     seed(composer);
@@ -291,7 +276,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
       if (!v) throw new Error("card not open");
       return v;
     });
-    expect(preValue.toLowerCase()).toBe(seedToken.value.toLowerCase());
+    expect(preValue.toLowerCase()).toBe(seedValue.toLowerCase());
 
     // The AI write path: engine-side, no React hooks.
     let written: string | null = null;
@@ -327,7 +312,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     // Unsafe value → null.
     expect(composer.designSystem.setDesignToken(seedToken.id, "url(http://x)")).toBeNull();
     // No-op (same value) → null.
-    expect(composer.designSystem.setDesignToken(seedToken.id, seedToken.value)).toBeNull();
+    expect(composer.designSystem.setDesignToken(seedToken.id, seedValue)).toBeNull();
     // Valid change → returns the value.
     expect(composer.designSystem.setDesignToken(seedToken.id, "#0a0a0a")).toBe("#0a0a0a");
   });

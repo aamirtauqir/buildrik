@@ -35,12 +35,13 @@ import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
-import { RESET_CSS, siteFontCSS, siteFontFaceCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
+import { RESET_CSS, siteFontCSS, siteFontFaceCSS, emitSiteTokenCss, googleFontsHeadLinks, siteFontsFromSettings } from "./export/ExportHelpers";
 import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
 import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import { copyIdKeyedRecord, copyIdKeyedStyles, type IdRename } from "@buildrik/shared/content/elementIds";
+import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
@@ -65,6 +66,9 @@ import { LintState } from "./designSystem/LintState";
 import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import { applyContrastFix } from "./designSystem/contrastFix";
 import { isAiEditableTokenValue } from "./designSystem/tokenValueGuard";
+import { mergeProjectTokens } from "./designSystem/projectTokens";
+import type { DesignToken } from "./designSystem/types";
+import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { CSSBundler } from "./designSystem/bundler";
 import { DSLinter } from "./designSystem/linter";
 import { AIAssistService } from "./designSystem/services";
@@ -187,6 +191,17 @@ export class Composer extends EventEmitter {
     readonly interactions: InteractionManager;
   };
   readonly designSystem!: {
+    /** True when the site's tokens failed to migrate on load: Brand shows the
+     *  old tokens and refuses edits. Set by the load path, announced with
+     *  `EVENTS.DESIGN_SYSTEM_READ_ONLY`. */
+    readOnly: boolean;
+    /** Why `readOnly` is set (null when it is not): selects the Brand notice. */
+    readOnlyReason: string | null;
+    /** The server's brand-token switch for this site (`brandTokensV2`), set by
+     *  the load path. False: a pre-v6 site's tokens are emitted (canvas,
+     *  export, publish) as saved, never migrated in memory. True when nothing
+     *  loaded from the server (standalone editor). */
+    brandTokensV2: boolean;
     readonly tokenUsage: TokenUsageTracker;
     readonly lintState: LintState;
     readonly tokenBindingResolver: TokenBindingResolver;
@@ -230,6 +245,16 @@ export class Composer extends EventEmitter {
      * The single engine write path means the AI never touches the React hooks.
      */
     readonly setDesignToken: (tokenId: string, value: string) => string | null;
+    /**
+     * THE token write (spec §4: one undo stack). Validates the whole v6 set
+     * and writes `projectSettings.designTokens` + schema version 6 inside one
+     * labelled transaction, so a multi-token edit is one ⌘Z step shared with
+     * canvas history. Brand, "Update everywhere", import, starters, auto-fix
+     * and the AI write all land here. Returns false and writes nothing when
+     * the tokens are read-only or the set does not validate. A successful
+     * write announces `EVENTS.BRAND_APPLIED` (onboarding's "Set your brand").
+     */
+    readonly setTokens: (next: DesignToken[], label: string) => boolean;
   };
 
   constructor(config: ComposerConfig) {
@@ -291,6 +316,9 @@ export class Composer extends EventEmitter {
     const lintState = new LintState();
     const tokenBindingResolver = new TokenBindingResolver();
     this.designSystem = {
+      readOnly: false,
+      readOnlyReason: null,
+      brandTokensV2: true,
       tokenUsage,
       lintState,
       tokenBindingResolver,
@@ -300,30 +328,44 @@ export class Composer extends EventEmitter {
       },
       applyAutoFix: (tokenId, hint) => {
         if (!hint) return null;
-        const settings = this.getProjectSettings();
-        const tokens = settings.designTokens ?? [];
-        const target = tokens.find((t) => t.id === tokenId);
-        if (!target) return null;
-        const fixed = applyContrastFix(target.value, hint);
-        if (fixed === target.value) return null;
-        this.beginTransaction("Auto-fix contrast");
-        const updated = tokens.map((t) => (t.id === tokenId ? { ...t, value: fixed } : t));
-        this.setProjectSettings({ ...settings, designTokens: updated });
-        this.endTransaction();
-        return fixed;
+        const tokens = this.mergedDesignTokens();
+        const current = resolveTokenLiteral(tokens, tokenId, "light");
+        if (current === null) return null;
+        const fixed = applyContrastFix(current, hint);
+        if (fixed === current) return null;
+        return this.designSystem.setTokens(setTokenLiteral(tokens, tokenId, "light", fixed), "Auto-fix contrast")
+          ? fixed
+          : null;
       },
       setDesignToken: (tokenId, value) => {
-        const settings = this.getProjectSettings();
-        const tokens = settings.designTokens ?? [];
+        const tokens = this.mergedDesignTokens();
         const target = tokens.find((t) => t.id === tokenId);
         if (!target) return null; // unknown id — never write a token that isn't registered
         if (!isAiEditableTokenValue(target.type, value)) return null; // per-type value guard
-        if (value === target.value) return null; // no-op
-        this.beginTransaction("Set design token");
-        const updated = tokens.map((t) => (t.id === tokenId ? { ...t, value } : t));
-        this.setProjectSettings({ ...settings, designTokens: updated });
-        this.endTransaction();
-        return value;
+        if (value === resolveTokenLiteral(tokens, tokenId, "light")) return null; // no-op
+        return this.designSystem.setTokens(setTokenLiteral(tokens, tokenId, "light", value), "Set design token")
+          ? value
+          : null;
+      },
+      setTokens: (next, label) => {
+        if (this.designSystem.readOnly) return false;
+        const checked = validateTokens(next);
+        if (!checked.ok) {
+          console.warn(`[tokens] refused "${label}": ${checked.reason}`);
+          return false;
+        }
+        this.beginTransaction(label);
+        try {
+          this.setProjectSettings({
+            ...this.getProjectSettings(),
+            designTokens: checked.tokens,
+            designTokensSchemaVersion: TOKENS_SCHEMA_VERSION,
+          });
+        } finally {
+          this.endTransaction();
+        }
+        this.emit(EVENTS.BRAND_APPLIED, undefined);
+        return true;
       },
     };
     // Recompute token usage whenever element trees or styles change. These
@@ -742,12 +784,14 @@ export class Composer extends EventEmitter {
     // reopened: the export learned to emit the three font slots and to fetch
     // the families that need fetching, and this document — the one the preview
     // renders — kept building a head with neither.
-    const fonts = siteFontsFromTokens(this.getProjectSettings?.()?.designTokens);
+    const projectSettings = this.getProjectSettings?.();
+    const brandSwitch = { migrate: this.designSystem?.brandTokensV2 !== false };
+    const fonts = siteFontsFromSettings(projectSettings, brandSwitch);
     /* Preview builds its own document, so it needs the token definitions too —
        otherwise the preview and the published page disagree on every value a
        Brand preset binds. */
     const siteCss =
-      siteTokensCSS(this.getProjectSettings?.()?.designTokens) + siteFontCSS(fonts);
+      emitSiteTokenCss(projectSettings, brandSwitch) + siteFontCSS(fonts);
     // The HTML too, not just the CSS: this document carries element styles
     // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
     // a style attribute and nowhere in the stylesheet.
@@ -865,6 +909,13 @@ ${html}${interactionScript}
     if (options?.emitProjectChanged !== false) {
       this.emit(EVENTS.PROJECT_CHANGED);
     }
+  }
+
+  /** The site's tokens as every write starts from them: the saved set merged
+   *  over the seed (strict, never throws). */
+  private mergedDesignTokens(): DesignToken[] {
+    const settings = this.getProjectSettings();
+    return mergeProjectTokens(settings.designTokens ?? [], settings.designTokensSchemaVersion);
   }
 
   /**

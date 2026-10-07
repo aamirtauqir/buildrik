@@ -8,12 +8,15 @@
 import { fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach } from "vitest";
 import { installDomShims, makeFakeComposer, openPage, renderWorkspace } from "./brandWorkspaceHarness";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import type { DesignToken } from "@/engine/designSystem/types";
 
 beforeEach(installDomShims);
 
 describe("BrandWorkspace — Spacing presets menu", () => {
-  it("draws no preset chips; the ⋯ menu applies a whole preset and stages it", async () => {
-    const utils = renderWorkspace(makeFakeComposer());
+  it("draws no preset chips; the ⋯ menu applies a whole preset in one write", async () => {
+    const composer = makeFakeComposer();
+    const utils = renderWorkspace(composer);
     openPage(utils, "spacing");
     expect(utils.queryByTestId("spacing-presets")).toBeNull();
 
@@ -23,12 +26,14 @@ describe("BrandWorkspace — Spacing presets menu", () => {
     fireEvent.click(utils.getByTestId("spacing-preset-spacious"));
 
     await waitFor(() => expect(utils.getByTestId("brand-token-value-space-1").textContent).toBe("6px"));
-    expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
+    expect(resolveTokenLiteral(composer.settings.designTokens as DesignToken[], "space-12", "light")).toBe("64px");
 
     fireEvent.click(utils.getByTestId("brand-spacing-menu"));
     expect(utils.getByTestId("spacing-preset-spacious").getAttribute("aria-checked")).toBe("true");
     fireEvent.click(utils.getByTestId("spacing-reset-defaults"));
     await waitFor(() => expect(utils.getByTestId("brand-token-value-space-1").textContent).toBe("4px"));
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(2);
   });
 
   it("the menu is Spacing's only — a kind page has none", () => {

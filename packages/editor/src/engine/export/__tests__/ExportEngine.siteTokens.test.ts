@@ -16,13 +16,18 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { siteTokensCSS } from "../ExportHelpers";
+import { emitSiteTokenCss, siteFontsFromSettings } from "../ExportHelpers";
+import { DEFAULT_TOKENS, DEFAULT_TOKENS_V5 } from "@/engine/designSystem/defaultTokens";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
-describe("siteTokensCSS", () => {
+const siteTokensCSS = (designTokens?: unknown[] | null) =>
+  emitSiteTokenCss({ designTokens: designTokens ?? undefined });
+
+describe("emitSiteTokenCss", () => {
   it("declares every token that has a cssVar", () => {
     const css = siteTokensCSS([
-      { cssVar: "--buildrick-design-color-text-primary", value: "#22AA66" },
-      { cssVar: "--buildrick-design-space-4", value: "16px" },
+      v6Token({ id: "color-text-primary", cssVar: "--buildrick-design-color-text-primary", value: "#22AA66" }),
+      v6Token({ id: "space-4", cssVar: "--buildrick-design-space-4", value: "16px" }),
     ]);
     expect(css).toContain("--buildrick-design-color-text-primary:#22AA66");
     expect(css).toContain("--buildrick-design-space-4:16px");
@@ -36,57 +41,70 @@ describe("siteTokensCSS", () => {
     for (const css of [siteTokensCSS([]), siteTokensCSS(), siteTokensCSS(null)]) {
       expect(css).toContain("--buildrick-design-btn-height-md:40px");
       expect(css).toContain("--buildrick-design-input-radius:8px");
-      expect(css).toContain("--buildrick-design-color-primary:#1A56DB");
+      expect(css).toContain("--buildrick-design-color-brand-500:#1A56DB");
+      expect(css).toContain("--buildrick-design-color-primary:var(--buildrick-design-color-brand-500)");
     }
   });
 
-  it("a saved value wins over the seed, by cssVar and by id", () => {
-    expect(siteTokensCSS([{ cssVar: "--buildrick-design-btn-radius", value: "2px" }])).toContain(
-      "--buildrick-design-btn-radius:2px"
-    );
-    /* A saved row whose cssVar is not the seed's still feeds the seed's name. */
-    const css = siteTokensCSS([{ id: "btn-radius", cssVar: "--legacy-btn-radius", value: "3px" }]);
-    expect(css).toContain("--legacy-btn-radius:3px");
-    expect(css).toContain("--buildrick-design-btn-radius:3px");
+  it("a saved value wins over the seed", () => {
+    const seed = siteTokensCSS([]);
+    expect(seed).toContain("--buildrick-design-btn-radius:8px");
+    const css = siteTokensCSS([v6Token({ id: "btn-radius", cssVar: "--buildrick-design-btn-radius", value: "2px" })]);
+    expect(css).toContain("--buildrick-design-btn-radius:2px");
     expect(css).not.toContain("--buildrick-design-btn-radius:8px");
   });
 
-  it("skips records with no cssVar or no value rather than writing `:undefined`", () => {
-    const css = siteTokensCSS([
-      { cssVar: "", value: "#fff" },
-      { cssVar: "--buildrick-design-color-x", value: "" },
-      { cssVar: "color-y", value: "#000" },
-      { cssVar: "--buildrick-design-ok", value: "#123456" },
-    ]);
-    expect(css.startsWith("\n:root{--buildrick-design-ok:#123456;")).toBe(true);
-    expect(css).not.toContain("--buildrick-design-color-x:");
-    expect(css).not.toContain("color-y");
+  /* D17: an unusable saved row never reverts the site to the default brand. */
+  it("an unusable saved row keeps every other saved value and its own value", () => {
+    const rows = DEFAULT_TOKENS_V5.map((t) =>
+      t.id === "color-primary" ? { ...t, value: "#FF0000" } : t.id === "color-text" ? { ...t, value: "#123456" } : t
+    );
+    const bad = { id: "My Token", name: "My Token", value: "#00FF00", category: "colors", cssVar: "--buildrick-design-my-token", type: "color" };
+    const css = emitSiteTokenCss({ designTokens: [...rows, bad], designTokensSchemaVersion: 5 });
+    expect(css).toContain("--buildrick-design-color-primary:#FF0000");
+    expect(css).toContain("--buildrick-design-color-text:#123456");
+    expect(css).toContain("--buildrick-design-my-token:#00FF00");
     expect(css).not.toContain("undefined");
   });
 
-  it("keeps the first declaration when a cssVar repeats", () => {
+  it("a bad custom-property name on one token is skipped while the rest export", () => {
     const css = siteTokensCSS([
-      { cssVar: "--buildrick-design-color-a", value: "#111111" },
-      { cssVar: "--buildrick-design-color-a", value: "#222222" },
+      ...DEFAULT_TOKENS,
+      v6Token({ id: "evil", cssVar: "--x:red}</style><script>", value: "#000" }),
+      v6Token({ id: "good", cssVar: "--buildrick-design-good", value: "#123456" }),
     ]);
-    expect(css).toContain("--buildrick-design-color-a:#111111");
-    expect(css).not.toContain("#222222");
+    expect(css).not.toMatch(/<\/style>|<script|--x:/);
+    expect(css).toContain("--buildrick-design-good:#123456");
+    expect(css).toContain("--buildrick-design-btn-height-md:40px");
+  });
+
+  it("skips a token whose value is empty", () => {
+    const css = siteTokensCSS([v6Token({ id: "color-x", cssVar: "--buildrick-design-color-x", value: "" })]);
+    expect(css).not.toContain("--buildrick-design-color-x:");
   });
 
   /* A token value is user data. It must not be able to end its declaration,
      open a block, or close the surrounding </style>. */
   it("strips the characters that would let a value escape its declaration", () => {
     expect(
-      siteTokensCSS([{ cssVar: "--buildrick-design-x", value: "red;} body{display:none" }])
-    ).toContain(":root{--buildrick-design-x:red bodydisplay:none;");
+      siteTokensCSS([v6Token({ id: "x", cssVar: "--buildrick-design-x", value: "red;} body{display:none" })])
+    ).toContain("--buildrick-design-x:red bodydisplay:none");
   });
 
-  it("cannot close the style element", () => {
+  it("cannot close the style element, by value or by custom-property name", () => {
     const css = siteTokensCSS([
-      { cssVar: "--buildrick-design-x", value: "red</style><script>go()</script>" },
+      v6Token({ id: "x", cssVar: "--buildrick-design-x", value: "red</style><script>go()</script>" }),
+      v6Token({ id: "y", cssVar: "--y:red}</style><script>", value: "#000" }),
     ]);
     expect(css).not.toContain("</style>");
     expect(css).not.toContain("<script");
+  });
+
+  it("ships dark blocks only when the site's Dark mode is auto", () => {
+    const tokens = [v6Token({ id: "color-primary", cssVar: "--buildrick-design-color-primary", value: "#111111", dark: "#EEEEEE" })];
+    expect(emitSiteTokenCss({ designTokens: tokens, darkMode: "off" })).not.toContain("prefers-color-scheme");
+    expect(emitSiteTokenCss({ designTokens: tokens, darkMode: "auto" })).toContain("prefers-color-scheme: dark");
+    expect(emitSiteTokenCss({ designTokens: tokens, darkMode: "bogus" })).not.toContain("prefers-color-scheme");
   });
 });
 
@@ -95,7 +113,7 @@ describe("siteTokensCSS", () => {
    pin all three at once for the token definitions. */
 describe("the three documents carry the token definitions", () => {
   const tokens = [
-    { id: "color-text-primary", name: "Text Primary", cssVar: "--buildrick-design-color-text-primary", value: "#22AA66", category: "colors", type: "color" },
+    v6Token({ id: "color-text-primary", name: "Text Primary", value: "#22AA66" }),
   ];
 
   function makeComposer() {
@@ -137,5 +155,62 @@ describe("the three documents carry the token definitions", () => {
     const { files } = await engine.exportAllPages({ format: "html" });
     const css = files.find((f) => f.name === "styles.css")?.content ?? "";
     expect(css).toContain("--buildrick-design-color-text-primary:#22AA66");
+  });
+});
+
+describe("siteFontsFromSettings", () => {
+  it("resolves a text-only v5 save against the emit list", () => {
+    const only = { id: "color-text", name: "Text", value: "#123456", category: "colors", cssVar: "--buildrick-design-color-text", type: "color" };
+    expect(siteFontsFromSettings({ designTokens: [only], designTokensSchemaVersion: 5 })).toEqual({ text: "#123456" });
+  });
+});
+
+/* I3: export and publish follow the kill switch the load read. With it off, a
+   v5 site ships its saved literals (the v5-equivalent output), never an
+   in-memory migration the server has not allowed. */
+describe("the three documents follow the brand switch", () => {
+  const v5 = {
+    designTokens: DEFAULT_TOKENS_V5.map((t) => (t.id === "color-primary" ? { ...t, value: "#FF0000" } : t)),
+    designTokensSchemaVersion: 5,
+  };
+  const page = { id: "p1", name: "Home", slug: "home", isHome: true, root: { id: "r1" }, settings: {} };
+  const composerWith = (brandTokensV2: boolean) => ({
+    getProjectSettings: () => v5,
+    designSystem: { brandTokensV2 },
+    elements: {
+      getActivePage: () => page,
+      getAllPages: () => [page],
+      exportPages: () => [page],
+      getElement: () => null,
+      toHTML: () => "<div></div>",
+    },
+    styles: { toCSS: () => "", generateResponsiveCSS: () => "" },
+    getProjectMetadata: () => ({ name: "Site" }),
+  });
+  const LITERAL = "--buildrick-design-color-primary:#FF0000";
+  const MIGRATED = "--buildrick-design-color-primary:var(--buildrick-design-custom-color-primary)";
+
+  it.each([
+    [false, LITERAL, MIGRATED],
+    [true, MIGRATED, LITERAL],
+  ])("switch %s: single-file export, publish and preview", async (on, has, hasNot) => {
+    const { ExportEngine } = await import("../ExportEngine");
+    const engine = new ExportEngine(composerWith(on) as never);
+    const single = engine.generateCSS();
+    const { files } = await engine.exportAllPages({ format: "html" });
+    const published = files.find((f) => f.name === "styles.css")?.content ?? "";
+    const { Composer } = await import("../../Composer");
+    const c = Object.create(Composer.prototype) as InstanceType<typeof Composer>;
+    Object.assign(c, {
+      elements: { toHTML: () => "<div></div>", getActivePage: () => ({ name: "Home" }) },
+      styles: { toCSS: () => "" },
+      getProjectSettings: () => v5,
+      designSystem: { brandTokensV2: on },
+    });
+    const preview = c.exportHTML().combined;
+    for (const doc of [single, published, preview]) {
+      expect(doc).toContain(has);
+      expect(doc).not.toContain(hasNot);
+    }
   });
 });

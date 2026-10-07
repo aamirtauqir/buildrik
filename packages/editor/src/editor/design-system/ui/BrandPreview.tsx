@@ -23,11 +23,15 @@
  */
 
 import * as React from "react";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 
 export interface BrandPreviewProps {
   /** Colour tokens, already filtered to the panel's current mode. */
   colors: readonly DesignToken[];
+  /** The list `colors` resolves its aliases against — every colour token,
+   *  since the mode filter can hide the primitives. Defaults to `colors`. */
+  tokens?: readonly DesignToken[];
 }
 
 /** Enough to read the palette, few enough to stay one row at 320px. */
@@ -38,7 +42,7 @@ const SPECIMENS: Array<{ label: string; varName: string }> = [
   { label: "Body", varName: "--buildrick-design-font-body" },
 ];
 
-export function BrandPreview({ colors }: BrandPreviewProps) {
+export function BrandPreview({ colors, tokens = colors }: BrandPreviewProps) {
   const shown = colors.slice(0, MAX_SWATCHES);
   const more = colors.length - shown.length;
 
@@ -54,13 +58,13 @@ export function BrandPreview({ colors }: BrandPreviewProps) {
     >
       {shown.length > 0 && (
         <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5" data-testid="brand-preview-swatches">
-          {shown.map((t) => (
+          {shown.map((t) => ({ t, value: resolveTokenLiteral(tokens, t.id, "light") ?? "" })).map(({ t, value }) => (
             <span
               key={t.id}
               /* The value is the whole point, so it is the title — a swatch
                  nobody can name is decoration. */
-              title={`${t.friendlyName ?? t.name} — ${t.value}`}
-              style={{ background: t.value }}
+              title={`${t.friendlyName ?? t.name} — ${value}`}
+              style={{ background: value }}
               /* A real 1px `--bk-gray-200` edge, which is what 1691:7343..7346
                  draw. The inset box-shadow it replaced was an 8%-ink hairline
                  that vanished on any dark swatch — the case the edge exists

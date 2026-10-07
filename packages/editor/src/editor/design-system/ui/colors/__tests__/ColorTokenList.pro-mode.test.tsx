@@ -1,9 +1,10 @@
 import { describe, test, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { ColorTokenList } from "../ColorTokenList";
-import type { DesignToken } from "../../../types";
+import type { DesignToken } from "@/editor/design-system/types";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
-const baseToken: DesignToken = {
+const baseToken: DesignToken = v6Token({
   id: "color.brand.primary",
   name: "Brand · Primary",
   kind: "color",
@@ -11,9 +12,9 @@ const baseToken: DesignToken = {
   category: "colors",
   cssVar: "--ds-color-brand-primary",
   type: "color",
-};
+});
 
-const aliasedToken: DesignToken = {
+const aliasedToken: DesignToken = v6Token({
   id: "color.action.default",
   name: "Action · Default",
   kind: "color",
@@ -21,11 +22,10 @@ const aliasedToken: DesignToken = {
   category: "colors",
   cssVar: "--ds-color-action-default",
   type: "color",
-  aliasOf: "color.brand.primary",
-};
+  alias: "color.brand.primary",
+});
 
 const baseProps = {
-  pendingDiff: {},
   onAddToken: () => {},
 };
 

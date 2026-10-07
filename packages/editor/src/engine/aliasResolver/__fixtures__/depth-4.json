@@ -3,55 +3,76 @@
     {
       "id": "a",
       "name": "A",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "b"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-a",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "A",
-      "aliasOf": "b"
+      "friendlyName": "A"
     },
     {
       "id": "b",
       "name": "B",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "c"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-b",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "B",
-      "aliasOf": "c"
+      "friendlyName": "B"
     },
     {
       "id": "c",
       "name": "C",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "d"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-c",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "C",
-      "aliasOf": "d"
+      "friendlyName": "C"
     },
     {
       "id": "d",
       "name": "D",
-      "value": "",
+      "kind": "color",
+      "layer": "semantic",
+      "modes": {
+        "light": {
+          "alias": "e"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-d",
       "type": "color",
-      "kind": "color",
-      "friendlyName": "D",
-      "aliasOf": "e"
+      "friendlyName": "D"
     },
     {
       "id": "e",
       "name": "E",
-      "value": "#2D6DFF",
+      "kind": "color",
+      "layer": "primitive",
+      "modes": {
+        "light": {
+          "value": "#2D6DFF"
+        }
+      },
       "category": "colors",
       "cssVar": "--bd-e",
       "type": "color",
-      "kind": "color",
       "friendlyName": "E"
     }
   ]

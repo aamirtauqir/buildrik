@@ -13,16 +13,24 @@ import { ColourModeSection } from "../ColourModeSection";
 import { TokenRegistryProvider, useColorRegistry } from "../../../state/TokenRegistryContext";
 import { DSModeProvider } from "../../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { makeFakeComposer } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
+/* A composer behind the registry, so a commit lands in the project and the
+   registry reads it back — the only way a value reaches it now. */
+let composer = makeFakeComposer();
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
     <DSModeProvider initialMode="pro">
-      <TokenRegistryProvider projectId="colour-mode-test">{ui}</TokenRegistryProvider>
+      <TokenRegistryProvider composer={composer}>{ui}</TokenRegistryProvider>
     </DSModeProvider>
   </ToastProvider>
 );
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  composer = makeFakeComposer();
+});
 
 /** Reads the live registry so a commit can be checked at its source. */
 function Probe({ onReady }: { onReady: (r: ReturnType<typeof useColorRegistry>) => void }) {
@@ -36,7 +44,7 @@ function Probe({ onReady }: { onReady: (r: ReturnType<typeof useColorRegistry>) 
 }
 
 describe("ColourModeSection", () => {
-  it("lists every colour token in one card: the missing ones first, then the paired ones", () => {
+  it("lists every semantic colour token in one card: the missing ones first, then the paired ones", () => {
     let reg: ReturnType<typeof useColorRegistry> | null = null;
     const { container, getByTestId } = render(
       wrap(
@@ -48,7 +56,9 @@ describe("ColourModeSection", () => {
     );
     const card = getByTestId("brand-colour-mode-list");
     const rows = [...card.querySelectorAll("[data-no-dark-row],[data-dark-row]")];
-    expect(rows.length).toBe(reg!.tokens.length);
+    // Every colour token that can carry a dark value: v6 primitives cannot,
+    // so they are not offered a Set that would do nothing.
+    expect(rows.length).toBe(reg!.tokens.filter((t) => t.layer === "semantic").length);
     const firstPaired = rows.findIndex((r) => r.hasAttribute("data-dark-row"));
     const lastMissing = rows.map((r) => r.hasAttribute("data-no-dark-row")).lastIndexOf(true);
     if (firstPaired !== -1 && lastMissing !== -1) expect(lastMissing).toBeLessThan(firstPaired);
@@ -97,7 +107,9 @@ describe("ColourModeSection", () => {
     for (const o of options) expect(o.textContent).toMatch(/contrast \d+\.\d:1/);
     const hex = options[1].getAttribute("data-hex")!;
     fireEvent.click(options[1]);
-    expect(reg!.tokens.find((t) => t.id === id)?.darkValue).toBe(hex);
+    expect(resolveTokenLiteral(reg!.tokens, id, "dark")).toBe(hex);
+    // One write for the light + dark pair — one ⌘Z.
+    expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
     expect(queryByTestId("dark-shade-popover")).toBeNull();
     expect(container.querySelector(`[data-no-dark-row="${id}"]`)).toBeNull();
   });
@@ -119,7 +131,7 @@ describe("ColourModeSection", () => {
     fireEvent.click(getByTestId("dark-shade-custom"));
     fireEvent.change(getByLabelText("Hex color value"), { target: { value: "#123456" } });
     fireEvent.click(getByText("Apply"));
-    expect(reg!.tokens.find((t) => t.id === id)?.darkValue).toBe("#123456");
+    expect(resolveTokenLiteral(reg!.tokens, id, "dark")).toBe("#123456");
   });
 });
 

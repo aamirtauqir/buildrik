@@ -17,6 +17,7 @@
  * @license BSD-3-Clause
  */
 
+import { TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { EVENTS, THRESHOLDS } from "../shared/constants";
 import type { ProjectData, ProjectSettings } from "../shared/types";
 import { deepClone } from "../shared/utils/helpers";
@@ -395,15 +396,25 @@ export class HistoryManager {
 
   /** Import a history-scoped state: its tokens replace the live ones (even
    *  when absent — undoing the first token edit removes it), every other
-   *  setting and all metadata stay as they are now. */
+   *  setting and all metadata stay as they are now.
+   *
+   *  "Absent" over live tokens is written as an explicit `[]` at the current
+   *  schema version. An absent key leaves designTokens out of the save
+   *  payload, so the server kept the edit that was undone and the next load
+   *  brought it back; `[]` without a version reads as v1. A site that never
+   *  had tokens keeps the key absent, so its save payload is unchanged. */
   private importScoped(state: ProjectData): void {
     const live: ProjectSettings = this.composer.exportProject().settings ?? {};
+    const clearsLiveTokens =
+      state.settings?.designTokens === undefined && live.designTokens !== undefined;
     this.composer.importProject({
       ...state,
       settings: {
         ...live,
-        designTokens: state.settings?.designTokens,
-        designTokensSchemaVersion: state.settings?.designTokensSchemaVersion,
+        designTokens: clearsLiveTokens ? [] : state.settings?.designTokens,
+        designTokensSchemaVersion: clearsLiveTokens
+          ? TOKENS_SCHEMA_VERSION
+          : state.settings?.designTokensSchemaVersion,
         designPresets: state.settings?.designPresets,
       },
     });

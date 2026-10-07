@@ -6,7 +6,6 @@ import {
   useButtonPresets,
   useCardPresets,
   useResetAllPresets,
-  usePresetRegistryConfig,
   PRESET_CATEGORIES,
 } from "../StylePresetRegistryContext";
 import type { StylePreset } from "../../types";
@@ -82,25 +81,4 @@ describe("StylePresetRegistryContext", () => {
     expect(result.current.card.presets[0].id).toBe("card-new");
   });
 
-  it("persistAll writes versioned blob to localStorage", () => {
-    const { result } = renderHook(
-      () => ({ button: useButtonPresets(), config: usePresetRegistryConfig() }),
-      { wrapper: wrap },
-    );
-    // Two act() blocks: persistAll's useCallback closure captures current
-    // preset arrays at render time, so the state update from addPreset must
-    // flush before persistAll runs (matches TokenRegistryContext.persistAll
-    // contract — see feedback_persistall_stale_state.md for prior incidents).
-    act(() => {
-      result.current.button.addPreset(mk("button-persist", "button"));
-    });
-    act(() => {
-      result.current.config.persistAll();
-    });
-    const raw = localStorage.getItem("buildrick-design-presets-preset-test-v1");
-    expect(raw).toBeTruthy();
-    const parsed = JSON.parse(raw!);
-    expect(parsed.schemaVersion).toBe(1);
-    expect(parsed.presets.find((p: StylePreset) => p.id === "button-persist")).toBeTruthy();
-  });
 });

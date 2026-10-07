@@ -1,0 +1,23 @@
+{
+  "--buildrick-design-color-primary": "rgb(26, 86, 219)",
+  "--buildrick-design-color-secondary": "rgb(124, 58, 158)",
+  "--buildrick-design-color-accent": "rgb(18, 171, 52)",
+  "--buildrick-design-color-background": "rgb(248, 250, 252)",
+  "--buildrick-design-color-text": "rgb(51, 65, 85)",
+  "--buildrick-design-color-muted": "rgb(113, 113, 122)",
+  "--buildrick-design-color-border": "rgb(39, 39, 42)",
+  "--buildrick-design-color-success": "rgb(21, 128, 61)",
+  "--buildrick-design-color-warning": "rgb(142, 75, 16)",
+  "--buildrick-design-color-error": "rgb(239, 68, 68)",
+  "--buildrick-design-color-brand-500": "rgb(26, 86, 219)",
+  "--buildrick-design-color-slate-50": "rgb(248, 250, 252)",
+  "--buildrick-design-color-slate-700": "rgb(51, 65, 85)",
+  "--buildrick-design-color-red-500": "rgb(239, 68, 68)",
+  "--buildrick-design-color-action": "rgb(26, 86, 219)",
+  "--buildrick-design-color-surface": "rgb(248, 250, 252)",
+  "--buildrick-design-color-text-primary": "rgb(51, 65, 85)",
+  "--buildrick-design-color-feedback-error": "rgb(239, 68, 68)",
+  "--buildrick-design-input-border": "rgb(39, 39, 42)",
+  "--buildrick-design-input-focus": "rgb(59, 130, 246)",
+  "--buildrick-design-placeholder-color": "rgb(113, 113, 122)"
+}

@@ -92,7 +92,7 @@ export function escapeHtmlText(text: string): string {
 const CSS_PROPERTY_SHAPE = /^(?:--[a-zA-Z0-9_-]+|-?[a-zA-Z][a-zA-Z0-9-]*)$/;
 /**
  * `<` could close the surrounding `</style>`; `{` and `}` open or end a rule.
- * The same characters `siteTokensCSS` strips from a token value.
+ * The same characters `emitTokenCss` strips from a token value.
  */
 const CSS_BREAKOUT = /[<{}]/;
 /** A template token placeholder (`{{token.color.primary}}`), resolved before

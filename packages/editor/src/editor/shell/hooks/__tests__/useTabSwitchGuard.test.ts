@@ -13,7 +13,7 @@ import { renderHook, act } from "@testing-library/react";
 import { shellDirty, type DirtyDomain } from "../../shellDirtyRegistry";
 import { useTabSwitchGuard } from "../useTabSwitchGuard";
 
-const DOMAINS: DirtyDomain[] = ["settings", "brand", "cms-record"];
+const DOMAINS: DirtyDomain[] = ["settings", "cms-record"];
 
 function setup(opts: { tab?: string; subTabs?: Record<string, string>; allowed?: (t: string) => boolean } = {}) {
   const setLeftPanelTab = vi.fn();
@@ -61,17 +61,15 @@ describe("useTabSwitchGuard", () => {
     expect(setLeftPanelTab).not.toHaveBeenCalled();
   });
 
-  /* Fix (ruling): Brand staging does NOT reliably survive a switch
-     (a BrandWorkspace remount can reset staged registries; the draft store
-     restores only part of it), so Brand prompts too — with copy that does
-     not overclaim, since Brand registers no discard. */
-  it("Brand staged edits prompt on a switch, with honest may-discard copy", () => {
-    act(() => shellDirty.set("brand", true));
+  /* A surface that registers no discard still prompts — with copy that does
+     not overclaim. (This was Brand's case until its edits autosaved, spec §4.) */
+  it("a dirty surface with no discard prompts on a switch, with honest may-discard copy", () => {
+    act(() => shellDirty.set("cms-record", true));
     const { result, setLeftPanelTab } = setup({ tab: "design" });
     act(() => result.current.setLeftPanelTab("pages"));
     expect(setLeftPanelTab).not.toHaveBeenCalled();
     expect(result.current.dialogProps.open).toBe(true);
-    expect(result.current.dialogProps.body).toBe("You have unsaved brand changes. Switching away may discard some of them.");
+    expect(result.current.dialogProps.body).toBe("You have unsaved changes. Switching away may discard some of them.");
     expect(result.current.dialogProps.leaveLabel).toBe("Leave anyway");
   });
 
@@ -111,7 +109,7 @@ describe("useTabSwitchGuard", () => {
   it("Leave anyway runs the switch + onSwitched and does NOT clear other surfaces' entries", () => {
     act(() => {
       shellDirty.set("settings", true);
-      shellDirty.set("brand", true);
+      shellDirty.set("cms-record", true);
     });
     const { result, setLeftPanelTab } = setup();
     const onSwitched = vi.fn();
@@ -121,7 +119,7 @@ describe("useTabSwitchGuard", () => {
     expect(onSwitched).toHaveBeenCalledTimes(1);
     expect(result.current.dialogProps.open).toBe(false);
     // The registry is not reset: Settings clears its own entry when it
-    // unmounts, and Brand's staged edits are still staged.
+    // unmounts, and the record sheet clears its own.
     expect(shellDirty.get()).toBe(true);
   });
 
@@ -142,7 +140,10 @@ describe("useTabSwitchGuard", () => {
     expect(recordDiscard).toHaveBeenCalledTimes(1);
     expect(setLeftPanelTab).toHaveBeenCalledWith("add");
     expect(onDiscardFailed).toHaveBeenCalledWith(["settings"]);
-    expect(shellDirty.dirtyDomains()).toEqual(["settings"]);
+    // Only the failed domain stays dirty: clearing it leaves the registry clean.
+    expect(shellDirty.get()).toBe(true);
+    act(() => shellDirty.set("settings", false));
+    expect(shellDirty.get()).toBe(false);
     act(() => {
       shellDirty.setDiscard("settings", null);
       shellDirty.setDiscard("cms-record", null);

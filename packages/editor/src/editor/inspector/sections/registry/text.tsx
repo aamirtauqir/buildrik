@@ -14,10 +14,11 @@ import { cssVarToTokenId, extractVarName, resolveTokenVar } from "../../shared/t
 import { getDOMElement } from "@/engine/canvas/resize/utils";
 import { parseColor } from "@/shared/utils/parsers/colorParser";
 import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
-import { mergeProjectTokens } from "@/editor/design-system/state/projectTokens";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 import type { Composer } from "@/engine";
 import { colourTokenLabel } from "../../shared/controls/ColorInput";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 const SUMMARY_KEYS = ["font-family", "font-size", "color"] as const;
 
@@ -59,10 +60,12 @@ const isRamp = (id: string) => /-\d+$/.test(id);
  */
 function colourTokenFor(composer: Composer | null | undefined, hex: string): DesignToken | null {
   const settings = composer?.getProjectSettings?.();
-  const tokens = mergeProjectTokens((settings?.designTokens ?? []) as DesignToken[], settings?.designTokensSchemaVersion);
+  const tokens = mergeProjectTokens(settings?.designTokens ?? [], settings?.designTokensSchemaVersion);
   const want = hex.toUpperCase();
-  const hits = tokens.filter((t) => t.category === "colors" && toHex(t.value) === want);
-  return hits.find((t) => !isRamp(t.id)) ?? hits[0] ?? null;
+  const hits = tokens.filter((t) => t.category === "colors" && toHex(resolveTokenLiteral(tokens, t.id, "light") ?? "") === want);
+  /* A semantic token is the name a site gave the colour; the primitive it
+     aliases shares its value and comes earlier in the list. */
+  return hits.find((t) => t.layer === "semantic" && !isRamp(t.id)) ?? hits.find((t) => !isRamp(t.id)) ?? hits[0] ?? null;
 }
 
 /**

@@ -16,10 +16,13 @@
 import * as React from "react";
 import type { DesignToken } from "../../types";
 import { TokenTable, TokenTableRow, TOKEN_CELL_NAME, TOKEN_CELL_PREVIEW, TOKEN_CELL_VALUE } from "./TokenTable";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface KindTokenListProps {
   tokens: readonly DesignToken[];
-  savedTokens: readonly DesignToken[];
+  /** The list `tokens` resolves aliases against — the whole registry, since
+   *  the mode filter can hide the primitives. Defaults to `tokens`. */
+  allTokens?: readonly DesignToken[];
   /** "spacing", "radius" … — the empty-state noun. */
   kindLabel: string;
   usageByTokenId?: ReadonlyMap<string, number>;
@@ -39,7 +42,7 @@ const WITHOUT_PRESET = "52px 180px 240px minmax(0, 1fr)";
 
 export const KindTokenList: React.FC<KindTokenListProps> = ({
   tokens,
-  savedTokens,
+  allTokens = tokens,
   kindLabel,
   usageByTokenId,
   selectedTokenId,
@@ -64,8 +67,7 @@ export const KindTokenList: React.FC<KindTokenListProps> = ({
   return (
     <TokenTable columns={columns} template={template} label={`${kindLabel} tokens`}>
       {tokens.map((token) => {
-        const saved = savedTokens.find((s) => s.id === token.id);
-        const isDirty = saved === undefined || saved.value !== token.value;
+        const value = resolveTokenLiteral(allTokens, token.id, "light") ?? "";
         const usage = usageByTokenId?.get(token.id) ?? 0;
         return (
           <TokenTableRow
@@ -76,21 +78,14 @@ export const KindTokenList: React.FC<KindTokenListProps> = ({
             onSelect={() => onSelectToken?.(token.id)}
           >
             <span className={TOKEN_CELL_PREVIEW}>
-              <span aria-hidden="true" className="tw:relative tw:inline-block tw:size-4 tw:rounded-full tw:bg-[var(--bk-gray-200)]">
-                {isDirty && (
-                  <span
-                    aria-label="unsaved changes"
-                    className="tw:absolute tw:-right-0.5 tw:-top-0.5 tw:size-[5px] tw:rounded-full tw:bg-[var(--bk-warning)]"
-                  />
-                )}
-              </span>
+              <span aria-hidden="true" className="tw:relative tw:inline-block tw:size-4 tw:rounded-full tw:bg-[var(--bk-gray-200)]" />
             </span>
             <span className={TOKEN_CELL_NAME}>
               <span className="tw:truncate" data-testid={`brand-token-name-${token.id}`}>
                 {isPro ? token.id : (token.friendlyName ?? token.name)}
               </span>
             </span>
-            <span className={TOKEN_CELL_VALUE} data-testid={`brand-token-value-${token.id}`}>{token.value}</span>
+            <span className={TOKEN_CELL_VALUE} data-testid={`brand-token-value-${token.id}`}>{value}</span>
             {presetOf && (
               <span className={TOKEN_CELL_VALUE} data-testid={`brand-token-preset-${token.id}`}>{presetOf(token)}</span>
             )}

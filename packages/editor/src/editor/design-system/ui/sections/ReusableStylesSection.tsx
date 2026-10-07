@@ -18,6 +18,7 @@ import type { DesignToken, PresetCategory, StylePreset } from "../../types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 import { typeStyleRows } from "./TypographySection";
 import { DEFAULT_TOKENS } from "../../constants";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 const CATEGORY: Record<PresetCategory, string> = {
   button: "Button", card: "Card", form: "Form", link: "Link", badge: "Badge", alert: "Alert",
@@ -29,7 +30,9 @@ export function presetLine(preset: StylePreset, tokens: readonly DesignToken[]):
   const b = preset.bindings as Record<string, { tokenId?: string; value?: string } | undefined>;
   /* Component tokens (btn-radius …) sit in no kind registry; the seed has them. */
   const tokenValue = (id?: string) =>
-    (tokens.find((t) => t.id === id) ?? DEFAULT_TOKENS.find((t) => t.id === id))?.value;
+    id === undefined
+      ? undefined
+      : (resolveTokenLiteral(tokens, id, "light") ?? resolveTokenLiteral(DEFAULT_TOKENS, id, "light") ?? undefined);
   const parts: string[] = [];
   const paint = b["background-color"]?.tokenId ?? b["color"]?.tokenId ?? b["border-color"]?.tokenId;
   if (paint) parts.push(paint);

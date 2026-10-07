@@ -360,6 +360,10 @@ model Site {
   // E2-T5b per-site override: when true, the agency shared-theme push skips
   // this site (it keeps its own tokens). Default false = follows the shared theme.
   themeLocked       Boolean   @default(false)
+  // Brand Part 1: set by the operator rollback (scripts/brand/rollback-migration.mjs)
+  // when a migrated site is put back on its pre-v6 tokens; the site is never
+  // migrated again and Brand stays read-only until `--clear`.
+  tokensMigrationHold Boolean @default(false)
   projectAssets     Json?
   projectSettings   Json?
   // Editor CMS bindings (element id → collection field / repeater), as
@@ -418,12 +422,19 @@ model SiteThemeSnapshot {
   workspaceId         String
   prevStyles          Json?
   prevDsSchemaVersion Int
+  /// theme-push | migration | generator | dark-auto | connect | logo
+  reason              String   @default("theme-push")
+  /// designTokensSchemaVersion at snapshot time (not the dsSchemaVersion reload counter)
+  tokensSchemaVersion Int      @default(5)
+  /// site Dark mode at snapshot time ("auto" | "off"); null = pre-v6
+  darkMode            String?
   createdAt           DateTime @default(now())
 
   site      Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([siteId, createdAt])
+  @@index([siteId, reason, createdAt])
   @@index([workspaceId])
   @@map("site_theme_snapshots")
 }

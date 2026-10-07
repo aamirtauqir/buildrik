@@ -37,7 +37,7 @@ describe("STARTER_DS_REGISTRY · structure", () => {
     for (const s of STARTER_DS_REGISTRY) {
       for (const t of s.tokens) {
         if (t.category === "colors") {
-          expect(t.darkValue).toBeDefined();
+          expect(t.modes.dark).toBeDefined();
         }
       }
     }
