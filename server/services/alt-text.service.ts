@@ -20,6 +20,13 @@
  * Domain errors:
  *   - "ASSET_NOT_FOUND" — asset id is not owned by userId or doesn't exist
  *   - "NOT_IMAGE" — asset.type !== "image" (gate to vision-eligible assets)
+ *   - AltTextError — NOT_CONFIGURED / QUOTA_EXCEEDED / PROVIDER_FAILED. Each
+ *     carries a fixed, client-safe message; the raw provider error is logged
+ *     here and never attached (it held the masked key suffix and request ids).
+ *
+ * Every provider call costs one AI unit from the same daily quota as the ai.*
+ * procedures (reserved before the call, refunded if the provider fails). The
+ * free paths — kept user text, refused asset — never reserve.
  *
  * @license BSD-3-Clause
  */
@@ -29,6 +36,7 @@ import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import { getOpenAI } from "./openai.client";
 import { assertProviderConfigured } from "./ai.service";
 import { assertMediaWrite } from "./media.service";
+import { releaseQuota, reserveQuota } from "./quota.service";
 
 const ALT_TEXT_PROMPT = [
   "Generate concise alt text for this image suitable for screen readers.",
@@ -41,6 +49,18 @@ const ALT_TEXT_PROMPT = [
 ].join("\n");
 
 const MODEL = DEFAULT_MODEL;
+
+export type AltTextErrorCode = "NOT_CONFIGURED" | "QUOTA_EXCEEDED" | "PROVIDER_FAILED";
+
+export class AltTextError extends Error {
+  constructor(
+    public readonly code: AltTextErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = "AltTextError";
+  }
+}
 
 export interface GenerateAltTextOptions {
   /** Public image URL — must be reachable from the provider. */
@@ -147,10 +167,34 @@ export async function applyAltTextToAsset(
     return { altText: asset.altText as string, skipped: true };
   }
 
-  const result = await generateAltText({ imageUrl: asset.url });
+  try {
+    assertProviderConfigured(MODEL);
+  } catch {
+    throw new AltTextError("NOT_CONFIGURED", "AI alt text isn't configured on this server.");
+  }
+  const quota = await reserveQuota(userId, MODEL);
+  if (!quota.ok) {
+    throw new AltTextError(
+      "QUOTA_EXCEEDED",
+      `Daily AI limit reached (${quota.limit}). Resets at ${quota.resetsAt.toISOString()}.`,
+    );
+  }
+
+  let result: AltTextResult;
+  try {
+    result = await generateAltText({ imageUrl: asset.url });
+  } catch (e) {
+    console.error("[alt-text] provider call failed", e);
+    try {
+      await releaseQuota(userId);
+    } catch (releaseErr) {
+      console.error("[alt-text] releaseQuota failed", releaseErr);
+    }
+    throw new AltTextError("PROVIDER_FAILED", "Alt text generation failed. Try again.");
+  }
 
   // TOCTOU re-check: user may have typed alt-text while we were waiting on
-  // Anthropic. Re-read with ownership scope; if non-empty now, discard.
+  // the provider. Re-read with ownership scope; if non-empty now, discard.
   const fresh = await prisma.mediaAsset.findUnique({
     where: { id: assetId },
     select: { userId: true, altText: true },
