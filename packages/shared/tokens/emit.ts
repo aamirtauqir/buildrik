@@ -35,11 +35,13 @@ export function emitTokenCss(
     visiting.add(t.id);
     const ref = t.modes.light;
     let ok = safeNames(t);
-    if (ok && "alias" in ref) {
-      const target = byId.get(ref.alias);
-      ok = target !== undefined && emits(target, visiting);
-    } else if (ok) {
-      ok = clean((ref as { value: string }).value) !== "";
+    if (ok) {
+      if ("alias" in ref) {
+        const target = byId.get(ref.alias);
+        ok = target !== undefined && emits(target, visiting);
+      } else {
+        ok = clean(ref.value) !== "";
+      }
     }
     emitted.set(t.id, ok);
     return ok;
