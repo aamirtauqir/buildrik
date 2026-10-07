@@ -107,8 +107,11 @@ export async function POST(
       );
     }
 
-    await prisma.publishBuildJob.update({
-      where: { id: jobId },
+    /* Conditional claim: the QUEUED read above is not a lock. A cancel landing
+       between it and this write was overwritten by BUILDING and the job
+       deployed anyway; now the cancel wins and nothing is written. */
+    const claimed = await prisma.publishBuildJob.updateMany({
+      where: { id: jobId, status: "QUEUED" },
       data: {
         status: "BUILDING",
         startedAt: new Date(),
@@ -116,6 +119,9 @@ export async function POST(
         steps: buildSteps(0),
       },
     });
+    if (claimed.count === 0) {
+      return new Response("Job left QUEUED before it was claimed", { status: 409 });
+    }
 
     /* DEPLOYING is written HERE, and until 2026-09-09 nothing ever wrote it.
        The enum carried the state and `publish.service.ts:206,227` FILTERED on

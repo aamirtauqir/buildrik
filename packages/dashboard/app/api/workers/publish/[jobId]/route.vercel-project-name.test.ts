@@ -13,7 +13,7 @@ import type { NextRequest } from "next/server";
 
 const { db, runVercelDeploy, assertProjectNameFree } = vi.hoisted(() => ({
   db: {
-    publishBuildJob: { findUnique: vi.fn(), update: vi.fn() },
+    publishBuildJob: { findUnique: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     site: { findUnique: vi.fn(), update: vi.fn() },
     redirect: { findMany: vi.fn() },
     domain: { findMany: vi.fn(), findFirst: vi.fn() },
@@ -90,6 +90,7 @@ function setup(vercelProjectName: string | null) {
   db.domain.findMany.mockResolvedValue([]);
   db.domain.findFirst.mockResolvedValue(null);
   db.workspace.findUnique.mockResolvedValue({ plan: "PRO" });
+  db.publishBuildJob.updateMany.mockResolvedValue({ count: 1 });
 }
 
 function run() {
@@ -188,5 +189,32 @@ describe("publish worker — pinned Vercel project (SA-06)", () => {
 
     expect(res.status).toBe(500);
     expect(pinWrites()).toEqual([]);
+  });
+});
+
+/* P2-5 (2026-10-08 audit): the worker read QUEUED, then wrote BUILDING by id
+   alone. A cancel landing between the two was overwritten and the job deployed
+   anyway. The claim is now conditional on the row still being QUEUED. */
+describe("publish worker — claiming the job", () => {
+  it("claims QUEUED → BUILDING only while the row is still QUEUED", async () => {
+    setup("p");
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
+    await run();
+    expect(db.publishBuildJob.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "job1", status: "QUEUED" },
+        data: expect.objectContaining({ status: "BUILDING" }),
+      }),
+    );
+  });
+
+  it("does not deploy, or overwrite the row, when a cancel won the race", async () => {
+    setup("p");
+    db.publishBuildJob.updateMany.mockResolvedValue({ count: 0 });
+    const res = await run();
+    expect(res.status).toBe(409);
+    expect(runVercelDeploy).not.toHaveBeenCalled();
+    expect(db.publishBuildJob.update).not.toHaveBeenCalled();
+    expect(db.$transaction).not.toHaveBeenCalled();
   });
 });
