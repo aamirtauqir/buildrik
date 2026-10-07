@@ -592,3 +592,52 @@ describe("useSaveCallback — an expired session is not a retryable save failure
     expect(toast.action?.label).toBe("Retry");
   });
 });
+
+/* I1 (manual ⌘S): the server refused the brand tokens in this save. Retry
+   can only be refused again, so no "Save failed" toast with Retry: the work
+   is kept for the reload and the persistent banner (status "error", copy
+   from saveState.error) carries it — the same as autosave. */
+describe("useSaveCallback — TOKENS_INVALID", () => {
+  it("keeps the work, raises the banner state, and shows no toast", async () => {
+    const REFUSAL = "TOKENS_INVALID: alias target missing: nowhere";
+    const url = new URL("http://localhost:3000/edit/site_tokens");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    localStorage.removeItem("bk-unsaved-v1-site_tokens");
+    try {
+      const opts = makeOpts();
+      svc.saveProject.mockRejectedValueOnce(
+        TRPCClientError.from({
+          error: {
+            message: REFUSAL,
+            code: -32600,
+            data: { code: "BAD_REQUEST", httpStatus: 400, path: "sites.saveProject" },
+          },
+        }),
+      );
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+        }),
+      );
+      let outcome: string | undefined;
+      await act(async () => {
+        outcome = await result.current();
+        await flushMicrotasks();
+      });
+      expect(outcome).toBe("error");
+      expect(opts.addToast).not.toHaveBeenCalled();
+      const last = opts.setSaveState.mock.calls.at(-1)?.[0];
+      const state = typeof last === "function" ? last({ status: "saving" }) : last;
+      expect(state).toMatchObject({ status: "error", error: REFUSAL });
+      expect(opts.setIsDirty).toHaveBeenLastCalledWith(true);
+      expect(localStorage.getItem("bk-unsaved-v1-site_tokens")).not.toBeNull();
+    } finally {
+      localStorage.removeItem("bk-unsaved-v1-site_tokens");
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
+});
