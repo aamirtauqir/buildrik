@@ -216,10 +216,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
       try {
         if (replaceTarget) {
           // SELECTION MODE: Replace existing element's media via command layer
-          const result = composer.mediaOps.replaceMedia(
-            replaceTarget,
-            asset.src
-          );
+          const result = composer.mediaOps.replaceMedia(replaceTarget, asset.src, { alt: asset.altText });
           if (result) {
             /* Replacing an element's media has the same trap as inserting one:
                a device-only asset's src is a session Object URL the sanitizer

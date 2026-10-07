@@ -110,9 +110,25 @@ describe("insertToCanvas — an image element selected on the canvas", () => {
     await act(async () => {
       await result.current.insertToCanvas("a1");
     });
-    expect(c.mediaOps.replaceMedia).toHaveBeenCalledWith("menu-preview", "https://cdn/menu.png");
+    expect(c.mediaOps.replaceMedia).toHaveBeenCalledWith("menu-preview", "https://cdn/menu.png", { alt: undefined });
     expect(c.mediaOps.insertMediaAt).not.toHaveBeenCalled();
     expect(toasts[toasts.length - 1].description).toContain("applied");
+  });
+
+  it("hands the new asset's alt text to the replace, so the old image's alt does not stay", async () => {
+    const composer = composerWith({ src: "https://cdn/menu.png", type: "img", name: "menu-cover.png", altText: "Pasta on a plate" });
+    const c = composer as unknown as {
+      selection: { getSelected: ReturnType<typeof vi.fn>; getCount: ReturnType<typeof vi.fn> };
+      mediaOps: Record<string, ReturnType<typeof vi.fn>>;
+    };
+    c.selection.getSelected = vi.fn(() => ({ getId: () => "menu-preview", getType: () => "image" }));
+    c.selection.getCount = vi.fn(() => 1);
+    c.mediaOps.replaceMedia = vi.fn(() => ({ elementId: "menu-preview", previousSrc: "old" }));
+    const { result } = renderHook(() => useMediaState(composer as never));
+    await act(async () => {
+      await result.current.insertToCanvas("a1");
+    });
+    expect(c.mediaOps.replaceMedia).toHaveBeenCalledWith("menu-preview", "https://cdn/menu.png", { alt: "Pasta on a plate" });
   });
 
   it("inserts a new element when the selection is not a media element", async () => {
@@ -139,7 +155,7 @@ describe("insertToCanvas — an image element selected on the canvas", () => {
       await act(async () => {
         await result.current.insertToCanvas("a1");
       });
-      expect(c.mediaOps.replaceMedia).toHaveBeenCalledWith("el", src);
+      expect(c.mediaOps.replaceMedia).toHaveBeenCalledWith("el", src, { alt: undefined });
       expect(c.mediaOps.insertMediaAt).not.toHaveBeenCalled();
     }
   });
