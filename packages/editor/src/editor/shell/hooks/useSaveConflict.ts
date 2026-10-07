@@ -6,7 +6,8 @@
  *
  * The sync provider owns the conflict: it holds the server token from the
  * refused save until Overwrite or a fresh load, and announces both ends on
- * `window`. `resolve` re-sends SAVE_CONFLICT_EVENT with the held token, so
+ * `window`. `resolve` re-sends SAVE_CONFLICT_EVENT with the held token (and
+ * whether it is a brand-format refusal), so
  * AquibraStudio's existing listener reopens ConflictModal (AquibraStudio is
  * not edited).
  *
@@ -16,6 +17,7 @@
 import * as React from "react";
 import {
   getPendingConflictToken,
+  isBrandFormatConflict,
   isSaveConflictPending,
   SAVE_CONFLICT_CLEARED_EVENT,
   SAVE_CONFLICT_EVENT,
@@ -30,7 +32,9 @@ export interface SaveConflict {
 const reopen = () => {
   const token = getPendingConflictToken();
   if (token === null) return;
-  window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: token } }));
+  window.dispatchEvent(
+    new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: token, brandFormat: isBrandFormatConflict() } }),
+  );
 };
 
 export function useSaveConflict(): SaveConflict {

@@ -45,6 +45,9 @@ import {
   saveProjectFromEditor,
   saveProjectData,
 } from "@/server/services/sites.service";
+import { migrateTokensToV6 } from "@buildrik/shared/tokens";
+import { BRAND_FORMAT_CONFLICT } from "@buildrik/shared/schemas/design-tokens";
+import v5seed from "@/packages/shared/tokens/__tests__/__fixtures__/seed-only.json";
 
 function makeTx() {
   const txPage = {
@@ -444,5 +447,36 @@ describe("saveProjectData — 61-conflict optimistic concurrency (A-2 CAS)", () 
     await expect(
       saveProjectData({ siteId: "site-1", pages: [] }, loaded.toISOString())
     ).rejects.toThrow("SITE_NOT_FOUND");
+  });
+});
+
+describe("saveProjectData — a stale brand-format tab (Brand Part 1 follow-up)", () => {
+  const stored = new Date("2026-10-01T09:00:00.000Z");
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      deletedAt: null,
+      lastEditedAt: stored,
+      workspaceId: "ws-1",
+      dsSchemaVersion: 1,
+      tokensMigrationHold: false,
+      projectSettings: { designTokens: migrateTokensToV6(v5seed), designTokensSchemaVersion: 6 },
+    } as never);
+  });
+
+  it("refuses with the brand-format reason ahead of the ordinary SAVE_CONFLICT:<iso> tail", async () => {
+    const save = saveProjectData(
+      { siteId: "site-1", pages: [], settings: { designTokens: v5seed, designTokensSchemaVersion: 5 } },
+      stored.toISOString(),
+    );
+    await expect(save).rejects.toThrow(`${BRAND_FORMAT_CONFLICT} SAVE_CONFLICT:${stored.toISOString()}`);
+  });
+
+  it("an older bundle's /SAVE_CONFLICT:(.+)$/ read still yields the bare ISO token", async () => {
+    const err = await saveProjectData(
+      { siteId: "site-1", pages: [], settings: { designTokens: v5seed, designTokensSchemaVersion: 5 } },
+      stored.toISOString(),
+    ).catch((e: Error) => e);
+    expect(/SAVE_CONFLICT:(.+)$/.exec((err as Error).message)?.[1]).toBe(stored.toISOString());
   });
 });

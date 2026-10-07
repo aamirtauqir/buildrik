@@ -8,6 +8,11 @@
  *   - Save a backup   → download the local project, then reload
  *   - Overwrite       → force the local copy over the server's (with confirm)
  *
+ * A brand-format conflict (`brandFormat`: the server refused this tab's
+ * brand as an older format) offers no Overwrite — the same save would be
+ * refused again, and the dialog would come straight back. Reload is the way
+ * out; Save a backup still keeps the local copy.
+ *
  * Mounted through the chrome-ui overlay primitive (B-7 / A13-10): the bespoke
  * fixed overlay it replaced put role="dialog" on the scrim, closed on a scrim
  * click, never moved focus in and let Tab walk out into the editor behind it.
@@ -45,11 +50,13 @@ export interface ConflictModalProps {
   onSaveBackup: () => void;
   onOverwrite: () => void;
   onClose: () => void;
+  /** The server refused this tab's brand as an older format: Reload only. */
+  brandFormat?: boolean;
 }
 
 const TITLE_ID = "conflict-modal-title";
 
-export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrite, onClose }: ConflictModalProps) {
+export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrite, onClose, brandFormat = false }: ConflictModalProps) {
   const [confirmOverwrite, setConfirmOverwrite] = React.useState(false);
   const discardThen = (resolve: () => void) => () => {
     if (siteId) discardUnsaved(siteId);
@@ -62,10 +69,17 @@ export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrit
       <ModalContent size="question" data-testid="conflict-modal">
         <ModalTitle id={TITLE_ID} data-testid="conflict-title">This site changed somewhere else</ModalTitle>
         <ModalBody>
-          <p data-testid="conflict-body" className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
-            Your copy is behind — it was edited in another tab or device since you opened it.
-            We can&apos;t auto-merge, so pick how to continue. Nothing is lost without your choice.
-          </p>
+          {brandFormat ? (
+            <p data-testid="conflict-body" className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
+              This site&apos;s brand was upgraded to a newer format, so this tab can&apos;t save over it.
+              Reload to keep editing. Save a backup first if you want a copy of your recent changes.
+            </p>
+          ) : (
+            <p data-testid="conflict-body" className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
+              Your copy is behind — it was edited in another tab or device since you opened it.
+              We can&apos;t auto-merge, so pick how to continue. Nothing is lost without your choice.
+            </p>
+          )}
           {confirmOverwrite && (
             <p className="tw:mt-2.5 tw:mb-0 tw:text-[13px] tw:text-[var(--bk-warning-text)]">
               Overwrite replaces the newer copy with yours. The other changes will be gone.
@@ -75,7 +89,7 @@ export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrit
         <ModalFooter data-testid="conflict-actions">
           <Button onClick={discardThen(onReload)}>Reload latest</Button>
           <Button color="light" onClick={discardThen(onSaveBackup)}>Save a backup</Button>
-          {confirmOverwrite ? (
+          {brandFormat ? null : confirmOverwrite ? (
             <Button color="red" onClick={() => { resumeKeepingUnsaved(); onOverwrite(); }}>Yes, overwrite</Button>
           ) : (
             <Button color="light" onClick={() => setConfirmOverwrite(true)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Overwrite…</Button>

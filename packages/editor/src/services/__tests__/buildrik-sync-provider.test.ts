@@ -60,6 +60,7 @@ import {
   SAVE_CONFLICT_EVENT,
   SAVE_CONFLICT_CLEARED_EVENT,
   getPendingConflictToken,
+  isBrandFormatConflict,
   isSaveConflictPending,
   siteColumnsLoaded,
 } from "../BuildrikSyncProvider";
@@ -446,6 +447,34 @@ describe("save-conflict parsing (61-conflict)", () => {
 
     await expect(saveProject("s1", PROJECT)).rejects.toThrow("SAVE_CONFLICT");
     expect(heard).toEqual(["2026-07-01T10:00:00.000Z"]);
+
+    window.removeEventListener(SAVE_CONFLICT_EVENT, listener);
+  });
+
+  it("a brand-format refusal keeps the bare ISO token and marks the conflict brandFormat", async () => {
+    mocks.saveProjectMutate.mockRejectedValue(
+      new Error("SAVE_CONFLICT_BRAND_FORMAT SAVE_CONFLICT:2026-07-01T10:00:00.000Z")
+    );
+    const heard: unknown[] = [];
+    const listener = (e: Event) => heard.push((e as CustomEvent).detail);
+    window.addEventListener(SAVE_CONFLICT_EVENT, listener);
+
+    await expect(saveProject("s1", PROJECT)).rejects.toMatchObject({ serverLastEditedAt: "2026-07-01T10:00:00.000Z" });
+    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: true }]);
+    expect(isBrandFormatConflict()).toBe(true);
+
+    window.removeEventListener(SAVE_CONFLICT_EVENT, listener);
+  });
+
+  it("an ordinary conflict is not brandFormat", async () => {
+    mocks.saveProjectMutate.mockRejectedValue(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+    const heard: unknown[] = [];
+    const listener = (e: Event) => heard.push((e as CustomEvent).detail);
+    window.addEventListener(SAVE_CONFLICT_EVENT, listener);
+
+    await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
+    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: false }]);
+    expect(isBrandFormatConflict()).toBe(false);
 
     window.removeEventListener(SAVE_CONFLICT_EVENT, listener);
   });

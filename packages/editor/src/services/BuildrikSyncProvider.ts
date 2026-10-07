@@ -18,6 +18,7 @@ import type { ProjectSettingsPatch } from "@buildrik/shared/schemas/project-sett
 import type { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-detail";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import { MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
+import { BRAND_FORMAT_CONFLICT } from "@buildrik/shared/schemas/design-tokens";
 import type { z } from "zod";
 import type { ElementData } from "@/shared/types/element";
 import { blankPageRoot } from "@buildrik/shared/content/elementIds";
@@ -61,6 +62,9 @@ let _baselineLastEditedAt: string | null = null;
    stale token, be refused again, and re-raise the dialog the user just
    dismissed — the "Conflict — reload" pill is the standing notice instead. */
 let _conflictToken: string | null = null;
+/* The held conflict was refused for its brand format (BRAND_FORMAT_CONFLICT):
+   Overwrite would resend the same refused payload, so only Reload resolves it. */
+let _conflictBrandFormat = false;
 
 /** Whether a save conflict is waiting on the user's choice. Autosave reads it
  *  and holds the edit; a manual save is not sent either — saveProjectNow
@@ -76,6 +80,12 @@ export function getPendingConflictToken(): string | null {
   return _conflictToken;
 }
 
+/** Whether the pending conflict is a brand-format refusal — the dialog then
+ *  offers Reload, not Overwrite. */
+export function isBrandFormatConflict(): boolean {
+  return _conflictToken !== null && _conflictBrandFormat;
+}
+
 /** Dispatched on `window` when a pending conflict is resolved — Overwrite
  *  adopted the server token, or a fresh load replaced the copy. */
 export const SAVE_CONFLICT_CLEARED_EVENT = "buildrik:save-conflict-cleared";
@@ -83,6 +93,7 @@ export const SAVE_CONFLICT_CLEARED_EVENT = "buildrik:save-conflict-cleared";
 function clearConflictToken(): void {
   if (_conflictToken === null) return;
   _conflictToken = null;
+  _conflictBrandFormat = false;
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_CLEARED_EVENT));
 }
 
@@ -172,15 +183,16 @@ export function raiseSaveConflict(err: unknown): SaveConflictError | null {
   const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
   if (!match) return null;
   _conflictToken = match[1].trim();
-  return announceConflict(_conflictToken);
+  _conflictBrandFormat = msg.includes(BRAND_FORMAT_CONFLICT);
+  return announceConflict(_conflictToken, _conflictBrandFormat);
 }
 
-function announceConflict(serverToken: string): SaveConflictError {
+function announceConflict(serverToken: string, brandFormat: boolean): SaveConflictError {
   /* A conflict raised after a Reload whose unload prompt was cancelled: the
      page lives on, and its refused work must be kept again. */
   resumeKeepingUnsaved();
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken } }));
+    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken, brandFormat } }));
   }
   return new SaveConflictError(serverToken);
 }
@@ -797,7 +809,7 @@ async function saveProjectNow(
   /* A save queued behind the one that was refused carries the same stale
      token — sending it would only be refused again. It is refused here, with
      the same conflict, until the user resolves it (Overwrite / reload). */
-  if (_conflictToken !== null) throw announceConflict(_conflictToken);
+  if (_conflictToken !== null) throw announceConflict(_conflictToken, _conflictBrandFormat);
   const client = getClient();
   /* Never persist a session Object URL: it is a broken image on every later
      open. The live element keeps its preview; once its upload reaches the

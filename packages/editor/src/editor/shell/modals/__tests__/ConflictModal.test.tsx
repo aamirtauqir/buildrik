@@ -57,6 +57,21 @@ afterEach(() => {
 });
 
 describe("ConflictModal", () => {
+  describe("a brand-format conflict (the tab's brand is an older format)", () => {
+    it("offers no Overwrite — the same save would be refused again — and says to reload", () => {
+      render(<ConflictModal {...makeProps({ brandFormat: true })} />);
+      expect(screen.queryByRole("button", { name: /overwrite/i })).toBeNull();
+      expect(screen.getByRole("button", { name: "Reload latest" })).toBeTruthy();
+      expect(screen.getByTestId("conflict-body").textContent).toMatch(/reload/i);
+      expect(screen.getByTestId("conflict-body").textContent).not.toMatch(/another tab or device/);
+    });
+
+    it("an ordinary conflict still offers Overwrite", () => {
+      render(<ConflictModal {...makeProps()} />);
+      expect(screen.getByRole("button", { name: "Overwrite…" })).toBeTruthy();
+    });
+  });
+
   it("renders nothing when closed", () => {
     render(<ConflictModal {...makeProps({ open: false })} />);
     expect(screen.queryByRole("dialog")).toBeNull();
