@@ -161,6 +161,7 @@ describe("connectDomain — the Add-a-domain dialog", () => {
         { domainId: "dom1", type: "CNAME", host: "www", value: "cname.vercel-dns.com" },
         { domainId: "dom1", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1") },
       ],
+      skipDuplicates: true,
     });
     // The answer carries the records just written — the dialog shows the real rows after.
     expect(result.dnsRecords).toEqual([{ type: "A" }]);
@@ -176,6 +177,7 @@ describe("connectDomain — the Add-a-domain dialog", () => {
         { domainId: "dom1", type: "CNAME", host: "shop", value: "cname.vercel-dns.com" },
         { domainId: "dom1", type: "TXT", host: "_buildrick.shop", value: dnsVerificationToken("dom1") },
       ],
+      skipDuplicates: true,
     });
   });
 
@@ -746,6 +748,7 @@ describe("connectDomain — status at attach (Q7)", () => {
       data: expect.arrayContaining([
         { domainId: "dom1", type: "TXT", host: "_vercel.bellacucina.com", value: "vc-domain-verify=bellacucina.com,abc123" },
       ]),
+      skipDuplicates: true,
     });
   });
 

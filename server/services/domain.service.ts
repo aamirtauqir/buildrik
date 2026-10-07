@@ -427,6 +427,9 @@ export async function connectDomain(siteId: string, input: ConnectDomainOptions)
 
   await prisma.dnsRecord.createMany({
     data: dnsRecords.map((r) => ({ domainId: created.id, type: r.type, host: r.host, value: r.value })),
+    // Under the (domainId, type, host, value) index a repeated instruction
+    // would throw P2002 after the domain row exists, leaving it with no records.
+    skipDuplicates: true,
   });
 
   /* Connected = Vercel holds it on this project AND its config is not
