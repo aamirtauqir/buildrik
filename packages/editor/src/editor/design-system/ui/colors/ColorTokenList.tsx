@@ -14,6 +14,11 @@
  * ids. The row draws no lint state; the Brand checks page and the selected
  * token's card carry the findings.
  *
+ * USAGE (BRP1-M5, 8224:229485 / 8224:230173) is the site-wide count:
+ * "Used by N" — above zero, a click highlights those elements in the live
+ * preview — or "Can't count right now" while some site content (saved
+ * components) is unread, with the board's warning notice under the table.
+ *
  * Beginner mode's filter is upstream (`filterTokensByMode`); this list only
  * knows how many it hid, so an empty Beginner view blames the mode and not a
  * search the user never typed.
@@ -24,6 +29,7 @@
 import * as React from "react";
 import type { DesignToken } from "@/editor/design-system/types";
 import { Button, EmptyState } from "@/editor/chrome-ui";
+import type { TokenUsageCount } from "@buildrik/shared/tokens";
 import {
   TokenTable,
   TokenTableRow,
@@ -36,8 +42,11 @@ import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 export interface ColorTokenListProps {
   tokens: DesignToken[];
   onAddToken: () => void;
-  /** Per-token usage counts (from composer.designSystem.tokenUsage). */
-  usageByTokenId?: ReadonlyMap<string, number>;
+  /** Site-wide usage per token (`tokenUsage.getCount`) — "unknown" while
+   *  some site content cannot be read. A token missing from the map reads 0. */
+  usageCounts?: ReadonlyMap<string, TokenUsageCount>;
+  /** "Used by N" (N > 0) clicked — highlight that token's elements. */
+  onShowUsage?: (tokenId: string) => void;
   /** The token whose card the right column shows. */
   selectedTokenId?: string | null;
   onSelectToken?: (tokenId: string) => void;
@@ -50,9 +59,20 @@ export interface ColorTokenListProps {
   allTokens?: readonly DesignToken[];
 }
 
-/* 7315:80955: swatch gutter 52 · TOKEN 180 · LIGHT 120 · DARK 120 · USED. */
+/* 7315:80955: swatch gutter 52 · TOKEN 180 · LIGHT 120 · DARK 120 · USAGE
+   (BRP1-M5 renames the last column). */
 const TEMPLATE = "52px 180px 120px 120px minmax(0, 1fr)";
-const COLUMNS = ["Token", "Light", "Dark", "Used"] as const;
+const COLUMNS = ["Token", "Light", "Dark", "Usage"] as const;
+
+/* 8224:229485 "Action · Used by 14": 13/20 medium gray-700. The cell keeps
+   the column's left edge, so the 12px inset the board's ghost draws is not
+   added here (it would push the text off the header's line). */
+const USAGE_TEXT = "tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)]";
+/* The ghost Button's focus ring drew on a mouse click (the workspace nav hit
+   the same, NAV_ROW): keyboard focus keeps it, a click does not. */
+const USAGE_ACTION =
+  `tw:h-7 tw:min-h-0 tw:rounded-[var(--bk-radius-md)] tw:p-0 tw:enabled:hover:text-[var(--bk-accent)] ${USAGE_TEXT} ` +
+  "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 /* Board order: the role-named semantic tokens first, then brand, surface,
    state, and the primitive scale Pro reveals. */
@@ -99,7 +119,8 @@ const ColorSwatch: React.FC<{ value: string }> = ({ value }) => (
 export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   tokens,
   onAddToken,
-  usageByTokenId,
+  usageCounts,
+  onShowUsage,
   selectedTokenId,
   onSelectToken,
   isPro,
@@ -146,7 +167,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         {ordered.map((token) => {
           const currentValue = resolveTokenLiteral(allTokens, token.id, "light") ?? "";
           const darkValue = token.modes.dark ? resolveTokenLiteral(allTokens, token.id, "dark") : null;
-          const usage = usageByTokenId?.get(token.id) ?? 0;
+          const usage = usageCounts?.get(token.id) ?? 0;
           return (
             <TokenTableRow
               key={token.id}
@@ -167,13 +188,43 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               <span className={TOKEN_CELL_VALUE} data-testid={`brand-token-dark-${token.id}`}>
                 {darkValue ? displayValue(darkValue) : "—"}
               </span>
-              <span className={TOKEN_CELL_VALUE} data-testid={`brand-token-used-${token.id}`}>
-                {usage > 0 ? `used ${usage}×` : "unused"}
+              <span className="tw:flex tw:min-w-0 tw:items-center tw:pr-3" data-testid={`brand-token-used-${token.id}`}>
+                {usage === "unknown" ? (
+                  <span className={`tw:truncate ${USAGE_TEXT}`}>Can&apos;t count right now</span>
+                ) : usage > 0 && onShowUsage ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    className={USAGE_ACTION}
+                    aria-label={`Used by ${usage} — highlight on the canvas`}
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      onShowUsage(token.id);
+                    }}
+                    data-testid={`brand-token-usage-show-${token.id}`}
+                  >
+                    Used by {usage}
+                  </Button>
+                ) : (
+                  <span className={USAGE_TEXT}>Used by {usage}</span>
+                )}
               </span>
             </TokenTableRow>
           );
         })}
       </TokenTable>
+      {[...ordered].some((t) => usageCounts?.get(t.id) === "unknown") && (
+        /* 8224:230855 "Notice · warning", 16 under the table card — held at
+           the pane's foot while a long table scrolls under it. */
+        <p
+          role="status"
+          data-testid="brand-usage-unknown-notice"
+          className="tw:sticky tw:bottom-0 tw:mt-4 tw:mb-0 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
+        >
+          Can&apos;t count right now. Some site content couldn&apos;t be checked. Try again before deleting a token.
+        </p>
+      )}
     </div>
   );
 };

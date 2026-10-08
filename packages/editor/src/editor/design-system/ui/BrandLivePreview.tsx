@@ -17,6 +17,11 @@
  * the Colour mode page's Light / Dark switch drives it (7316:80949 draws the
  * switch INSIDE this card, so it comes in as `controls`).
  *
+ * `highlightIds` outlines elements in the page (BRP1-M5 "Used by" highlight,
+ * BRP1-M7 Connect preview): a second appended block, one outline rule per
+ * `data-buildrick-id`, in the editor's accent read from the chrome — the
+ * `--bk-*` tokens do not exist inside the frame. Nothing is repainted.
+ *
  * @license BSD-3-Clause
  */
 
@@ -54,6 +59,8 @@ export interface BrandLivePreviewProps {
   /** A control drawn over the top edge of the page frame — the Colour mode
    *  page's Light / Dark switch (7316:80949). */
   controls?: React.ReactNode;
+  /** Elements to outline in the page — empty or absent draws none. */
+  highlightIds?: readonly string[];
 }
 
 /* 7315:80955: the page frame is 346 × 265 inside the 468 card, centred. */
@@ -76,6 +83,7 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
   tokens,
   mode,
   controls,
+  highlightIds,
 }) => {
   const [zoom, setZoom] = React.useState<(typeof ZOOMS)[number]["value"]>("0.5");
   const [pageName, setPageName] = React.useState<string>("");
@@ -84,6 +92,12 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
   const frameRef = React.useRef<HTMLIFrameElement | null>(null);
   /* Every `--buildrick-design-*` the draft carries, resolved for the mode. */
   const stagedCSS = React.useMemo(() => emitTokenCss(tokens, { darkMode: "auto" }), [tokens]);
+  const highlightCSS = React.useMemo(() => {
+    if (!highlightIds?.length) return "";
+    const accent = getComputedStyle(document.documentElement).getPropertyValue("--bk-accent").trim() || "Highlight";
+    const selector = highlightIds.map((id) => `[data-buildrick-id="${CSS.escape(id)}"]`).join(",");
+    return `${selector}{outline:2px solid ${accent} !important;outline-offset:2px !important;}`;
+  }, [highlightIds]);
 
   /* The document follows the canvas: rebuilt on load and on every document
      mutation (a page switch is a `project:changed` too), debounced so a burst
@@ -124,8 +138,15 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
       frameDoc.head.appendChild(el);
     }
     el.textContent = stagedCSS;
+    let hl = frameDoc.head.querySelector<HTMLStyleElement>("style[data-bk-highlight]");
+    if (!hl) {
+      hl = frameDoc.createElement("style");
+      hl.setAttribute("data-bk-highlight", "");
+      frameDoc.head.appendChild(hl);
+    }
+    hl.textContent = highlightCSS;
     frameDoc.documentElement.setAttribute("data-theme", mode);
-  }, [stagedCSS, mode]);
+  }, [stagedCSS, highlightCSS, mode]);
   React.useEffect(() => {
     writeStaged();
   }, [writeStaged]);

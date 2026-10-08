@@ -100,6 +100,12 @@ import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { ColorModeToggle } from "./ColorModeToggle";
 import { useDSLint } from "../state/useDSLint";
+import {
+  useTokenBreakdownIds,
+  useUsageHighlight,
+  UsageHighlightCard,
+  UsageHighlightNotice,
+} from "./sections/UsageHighlight";
 
 // ─── Pages ────────────────────────────────────────────────────────────────────
 
@@ -357,11 +363,17 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
      workspace, cleared on a page change; a row click on any token page sets
      it. The card is a sibling of the table, not a drill-in. */
   const [selectedTokenId, setSelectedTokenId] = React.useState<string | null>(null);
+  /* BRP1-M5: the token whose "Used by N" was clicked — its elements are
+     outlined in the live preview until Clear highlight or a page change. */
+  const [usageTokenId, setUsageTokenId] = React.useState<string | null>(null);
+  const usageIds = useTokenBreakdownIds(composer, usageTokenId);
+  const usageHighlight = useUsageHighlight(composer, usageIds);
   /* A page change drops the selection — unless the move is FOR a token
      (Brand checks' Open), which lands on its page with its card open. */
   const openPage = (id: BrandPageId, tokenId: string | null = null) => {
     setPage(id);
     setSelectedTokenId(tokenId);
+    setUsageTokenId(null);
   };
   const allTokens = store.all;
   const selectedToken = selectedTokenId ? allTokens.find((t) => t.id === selectedTokenId) : undefined;
@@ -613,7 +625,13 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     composer,
     selectedTokenId,
     onSelectToken: setSelectedTokenId,
+    onShowUsage: (tokenId: string) => {
+      setSelectedTokenId(tokenId);
+      setUsageTokenId(tokenId);
+    },
   };
+  const usageToken = usageTokenId ? allTokens.find((t) => t.id === usageTokenId) : undefined;
+  const usageTokenName = usageToken ? (usageToken.friendlyName ?? usageToken.name) : "";
 
   const renderPage = (): React.ReactNode => {
     switch (page) {
@@ -850,6 +868,18 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             {/* Import / export stays usable read-only: export is a read, and
                 an import is refused by the one write path (setTokens). */}
             <EditLock locked={readOnly && !isPanelPage}>{renderPage()}</EditLock>
+            {usageToken && (
+              /* 8224:231539: 16 under the table, the token's reach in one line —
+                 held at the pane's foot, so a long table cannot push it out of view. */
+              <div className="tw:sticky tw:bottom-0 tw:mt-4">
+                <UsageHighlightNotice
+                  tokenName={usageTokenName}
+                  elements={usageIds.length}
+                  pages={usageHighlight.pages.length}
+                  references={composer?.designSystem?.tokenUsage?.getUsage(usageToken.id) ?? 0}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -860,7 +890,13 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           data-testid="brand-preview-column"
         >
           {composer?.exportHTML ? (
-            <BrandLivePreview composer={composer} tokens={allTokens} mode={resolvedMode} controls={previewControls} />
+            <BrandLivePreview
+              composer={composer}
+              tokens={allTokens}
+              mode={resolvedMode}
+              controls={previewControls}
+              highlightIds={usageIds}
+            />
           ) : (
             /* No document to render (no composer, or one without an export —
                the load-error and test harnesses): the palette and type slots
@@ -875,6 +911,15 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               </div>
               <BrandPreview colors={visibleColors} tokens={color.tokens} />
             </section>
+          )}
+          {usageToken && usageIds.length > 0 && usageHighlight.active && (
+            <UsageHighlightCard
+              active={usageHighlight.active}
+              tokenName={usageTokenName}
+              pageCount={usageHighlight.pages.length}
+              onNext={usageHighlight.nextPage}
+              onClear={() => setUsageTokenId(null)}
+            />
           )}
           {isTokenPage && selectedToken && (
             <EditLock locked={readOnly}>
