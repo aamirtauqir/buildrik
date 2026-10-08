@@ -33,9 +33,9 @@ export function buildProductGrid(
     styles: {
       display: "grid",
       "grid-template-columns": "repeat(auto-fill, minmax(280px, 1fr))",
-      gap: "24px",
+      gap: "var(--buildrick-design-space-6)",
       width: "100%",
-      padding: "20px",
+      padding: "var(--buildrick-design-space-5)",
     },
   });
 

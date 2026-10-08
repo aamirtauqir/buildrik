@@ -16,5 +16,5 @@ export const submitButtonBlockConfig: SubmitButtonBlockConfig = {
   elementType: "button",
   icon: "/src/assets/icons/blocks/button.svg",
   content:
-    '<button type="submit" style="padding:10px 20px;background:#1A56DB;color:white;border:none;border-radius:4px;cursor:pointer">Submit</button>',
+    '<button type="submit" style="padding:10px var(--buildrick-design-space-5);background:var(--buildrick-design-color-primary);color:var(--buildrick-design-color-on-primary);border:none;border-radius:var(--buildrick-design-radius-sm);cursor:pointer">Submit</button>',
 };

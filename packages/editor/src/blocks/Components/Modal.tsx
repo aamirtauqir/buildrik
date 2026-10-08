@@ -18,12 +18,12 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       class: "modal-trigger",
     },
     styles: {
-      padding: "12px 24px",
+      padding: "var(--buildrick-design-space-3) var(--buildrick-design-space-6)",
       background: BLOCK_COLORS.accent,
       color: BLOCK_COLORS.accentOn,
       border: "none",
-      borderRadius: "8px",
-      fontSize: "14px",
+      borderRadius: "var(--buildrick-design-radius-md)",
+      fontSize: "var(--buildrick-design-font-size-sm)",
       fontWeight: "600",
       cursor: "pointer",
       transition: "background 0.2s ease",
@@ -70,7 +70,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     },
     styles: {
       background: BLOCK_COLORS.surface,
-      borderRadius: "12px",
+      borderRadius: "var(--buildrick-design-radius-lg)",
       maxWidth: "480px",
       width: "100%",
       maxHeight: "90vh",
@@ -90,7 +90,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      padding: "20px 24px",
+      padding: "var(--buildrick-design-space-5) var(--buildrick-design-space-6)",
       borderBottom: "1px solid " + BLOCK_COLORS.border,
     },
   });
@@ -101,7 +101,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     content: "Modal Title",
     styles: {
       margin: "0",
-      fontSize: "18px",
+      fontSize: "var(--buildrick-design-font-size-lg)",
       fontWeight: "600",
     },
   });
@@ -115,7 +115,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     styles: {
       background: "transparent",
       border: "none",
-      fontSize: "24px",
+      fontSize: "var(--buildrick-design-font-size-2xl)",
       cursor: "pointer",
       color: BLOCK_COLORS.textMuted,
       padding: "0",
@@ -137,7 +137,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       class: "modal-body",
     },
     styles: {
-      padding: "24px",
+      padding: "var(--buildrick-design-space-6)",
     },
   });
   composer.elements.addElement(body, modalContent.getId());

@@ -62,8 +62,8 @@ function buildAccordion(
       },
       styles: {
         border: "1px solid " + BLOCK_COLORS.border,
-        borderRadius: "8px",
-        marginBottom: "8px",
+        borderRadius: "var(--buildrick-design-radius-md)",
+        marginBottom: "var(--buildrick-design-space-2)",
         overflow: "hidden",
       },
     });
@@ -80,11 +80,11 @@ function buildAccordion(
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "16px 20px",
-        background: "#fff",
+        padding: "var(--buildrick-design-space-4) var(--buildrick-design-space-5)",
+        background: "var(--buildrick-design-color-surface-raised)",
         border: "none",
         cursor: "pointer",
-        fontSize: "16px",
+        fontSize: "var(--buildrick-design-font-size-base)",
         fontWeight: "500",
         textAlign: "left",
       },
@@ -116,7 +116,7 @@ function buildAccordion(
     const contentInner = composer.elements.createElement("container", {
       tagName: "div",
       styles: {
-        padding: "0 20px 16px",
+        padding: "0 var(--buildrick-design-space-5) var(--buildrick-design-space-4)",
       },
     });
     composer.elements.addElement(contentInner, contentArea.getId());

@@ -1,46 +1,42 @@
 /**
  * Default colours for block markup — the CUSTOMER's page, not editor chrome.
  *
- * These must be literal values. A published page defines no custom properties
- * at all: `--bk-*` is editor chrome and never leaves the editor, and the
- * site-builder `--buildrick-design-*` bundle is produced by CSSBundler, which
- * only the design-system panel's "export tokens" button calls — the publish
- * path never runs it. So any `var(--token)` in a block resolves inside the
- * editor canvas and resolves to NOTHING on the live site, where the whole
- * declaration is invalid at computed-value time and silently drops. Blocks
- * looked right in the editor and shipped unstyled.
+ * A colour with a site-builder token of exactly the same value binds to it
+ * (Brand Part 1b, spec §3): `var(--buildrick-design-<id>)`, no fallback. Those
+ * vars are defined on every surface a page reaches — canvas, single-file and
+ * ZIP export, publish — by the one token emitter (`emitTokenCss`), and every
+ * seed var also sits in its `LEGACY_SEED` backstop, so the binding resolves
+ * even on a site that never saved the token. A brand change then reaches every
+ * inserted block. (Before 1a the publish path emitted no token CSS, which is
+ * why this file used to be all literals.)
  *
- * Values are the resolved `--bk-*` values the blocks previously pointed at, so
- * the published page now renders what the editor always showed. Keeping them
- * literal is the point: a block must not depend on a stylesheet it cannot see.
- *
- * Customer theming happens through the site-builder design system on top of
- * these defaults; it does not happen by blocks reaching into chrome tokens.
+ * The rest stay literal: no token holds their value, and the owner chose to
+ * keep them raw rather than snap them to the nearest one (OQ-2, 2026-10-08).
+ * `--bk-*` is editor chrome and never belongs in a block.
  *
  * @lint-hex-policy: block default colours — exported user-site content, not
- * editor chrome. Gate 16 governs chrome hex; this file is customer output and
- * is deliberately literal.
+ * editor chrome. Gate 16 governs chrome hex; this file is customer output.
  *
  * @license BSD-3-Clause
  */
 
 export const BLOCK_COLORS = {
   /** Brand accent (was --bk-accent). */
-  accent: "#1A56DB",
+  accent: "var(--buildrick-design-color-primary)",
   /** Text/icons on top of `accent` (was --bk-accent-on). */
-  accentOn: "#FFFFFF",
+  accentOn: "var(--buildrick-design-color-on-primary)",
   /** Tinted accent wash for highlighted rows/cards (was --bk-accent-subtle). */
   accentSubtle: "#E1EFFE",
   /** Card and panel surfaces (was --bk-bg-card / --bk-bg-panel). */
-  surface: "#FFFFFF",
+  surface: "var(--buildrick-design-color-surface-raised)",
   /** Zebra-stripe / muted fill (was --bk-bg-subtle). */
-  surfaceSubtle: "#F3F4F6",
+  surfaceSubtle: "var(--buildrick-design-color-surface-muted)",
   /** Hairline borders (was --bk-border). */
-  border: "#E5E7EB",
+  border: "var(--buildrick-design-color-border-subtle)",
   /** Heavier borders and switch tracks (was --bk-border-medium). */
   borderStrong: "#D1D5DB",
   /** Body copy (was --bk-ink-soft). */
   text: "#4B5563",
   /** Secondary/caption copy (was --bk-ink-muted). */
-  textMuted: "#6B7280",
+  textMuted: "var(--buildrick-design-color-text-subtle)",
 } as const;

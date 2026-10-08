@@ -12,7 +12,7 @@ export const gridBlockConfig: BlockBuildConfig = {
   category: "Layout",
   elementType: "grid",
   content:
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px"><div style="background:#f0f0f0;padding:20px;border-radius:8px">Grid Item 1</div><div style="background:#f0f0f0;padding:20px;border-radius:8px">Grid Item 2</div><div style="background:#f0f0f0;padding:20px;border-radius:8px">Grid Item 3</div></div>',
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--buildrick-design-space-4)"><div style="background:#f0f0f0;padding:var(--buildrick-design-space-5);border-radius:var(--buildrick-design-radius-md)">Grid Item 1</div><div style="background:#f0f0f0;padding:var(--buildrick-design-space-5);border-radius:var(--buildrick-design-radius-md)">Grid Item 2</div><div style="background:#f0f0f0;padding:var(--buildrick-design-space-5);border-radius:var(--buildrick-design-radius-md)">Grid Item 3</div></div>',
   build: (composer, parentId, dropIndex) =>
     buildLayoutWithChildren(
       composer,
@@ -22,7 +22,7 @@ export const gridBlockConfig: BlockBuildConfig = {
         styles: {
           display: "grid",
           "grid-template-columns": "repeat(3, 1fr)",
-          gap: "16px",
+          gap: "var(--buildrick-design-space-4)",
         },
       },
       [

@@ -40,7 +40,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       width: "100%",
       borderCollapse: "collapse",
       background: BLOCK_COLORS.surface,
-      borderRadius: "8px",
+      borderRadius: "var(--buildrick-design-radius-md)",
       overflow: "hidden",
       boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
     },
@@ -67,10 +67,10 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     const th = composer.elements.createElement("container", {
       tagName: "th",
       styles: {
-        padding: "14px 16px",
+        padding: "14px var(--buildrick-design-space-4)",
         textAlign: "left",
         fontWeight: "600",
-        fontSize: "12px",
+        fontSize: "var(--buildrick-design-font-size-xs)",
         color: BLOCK_COLORS.text,
         textTransform: "uppercase",
         letterSpacing: "0.05em",
@@ -112,7 +112,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     const tdName = composer.elements.createElement("container", {
       tagName: "td",
       styles: {
-        padding: "14px 16px",
+        padding: "14px var(--buildrick-design-space-4)",
         fontWeight: "500",
         color: "#1e293b",
       },
@@ -129,7 +129,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     const tdEmail = composer.elements.createElement("container", {
       tagName: "td",
       styles: {
-        padding: "14px 16px",
+        padding: "14px var(--buildrick-design-space-4)",
         color: BLOCK_COLORS.text,
       },
     });
@@ -145,7 +145,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     const tdStatus = composer.elements.createElement("container", {
       tagName: "td",
       styles: {
-        padding: "14px 16px",
+        padding: "14px var(--buildrick-design-space-4)",
       },
     });
     composer.elements.addElement(tdStatus, tr.getId());
@@ -157,14 +157,14 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       },
       styles: {
         display: "inline-block",
-        padding: "4px 12px",
+        padding: "var(--buildrick-design-space-1) var(--buildrick-design-space-3)",
         borderRadius: "999px",
-        fontSize: "12px",
+        fontSize: "var(--buildrick-design-font-size-xs)",
         fontWeight: "500",
         background:
-          row.status === "Active" ? "#dcfce7" : row.status === "Pending" ? "#fef3c7" : "#f3f4f6",
+          row.status === "Active" ? "#dcfce7" : row.status === "Pending" ? "#fef3c7" : "var(--buildrick-design-color-surface-muted)",
         color:
-          row.status === "Active" ? "#166534" : row.status === "Pending" ? "#92400e" : "#6b7280",
+          row.status === "Active" ? "#166534" : row.status === "Pending" ? "#92400e" : "var(--buildrick-design-color-text-subtle)",
       },
     });
     composer.elements.addElement(statusBadge, tdStatus.getId());
@@ -179,7 +179,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     const tdActions = composer.elements.createElement("container", {
       tagName: "td",
       styles: {
-        padding: "14px 16px",
+        padding: "14px var(--buildrick-design-space-4)",
       },
     });
     composer.elements.addElement(tdActions, tr.getId());
@@ -190,11 +190,11 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
         class: "table-action-btn",
       },
       styles: {
-        padding: "6px 12px",
+        padding: "6px var(--buildrick-design-space-3)",
         background: BLOCK_COLORS.surfaceSubtle,
         border: "none",
         borderRadius: "6px",
-        fontSize: "12px",
+        fontSize: "var(--buildrick-design-font-size-xs)",
         fontWeight: "500",
         color: BLOCK_COLORS.text,
         cursor: "pointer",

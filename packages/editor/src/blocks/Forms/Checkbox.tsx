@@ -16,5 +16,5 @@ export const checkboxBlockConfig: CheckboxBlockConfig = {
   elementType: "checkbox",
   icon: "/src/assets/icons/blocks/input.svg",
   content:
-    '<label data-buildrick-type="checkbox" style="display:flex;align-items:center;gap:8px"><input type="checkbox" name="checkbox"/> Checkbox option</label>',
+    '<label data-buildrick-type="checkbox" style="display:flex;align-items:center;gap:var(--buildrick-design-space-2)"><input type="checkbox" name="checkbox"/> Checkbox option</label>',
 };
