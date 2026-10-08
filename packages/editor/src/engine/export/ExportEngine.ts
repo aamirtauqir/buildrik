@@ -485,13 +485,15 @@ export class ExportEngine {
     let childContent = "";
     if (embedFrame) {
       childContent = embedFrame;
-    } else if (children.length > 0) {
-      childContent =
-        newline +
-        children.map((child) => this.elementToHTML(child, config, indent + 1)).join("") +
-        indentStr;
-    } else if (content) {
-      childContent = this.renderContent(content, contentFormat, type);
+    } else {
+      // Own text first, then children — the canvas renders both, in this order.
+      if (content) childContent = this.renderContent(content, contentFormat, type);
+      if (children.length > 0) {
+        childContent +=
+          newline +
+          children.map((child) => this.elementToHTML(child, config, indent + 1)).join("") +
+          indentStr;
+      }
     }
 
     return `${indentStr}${openLink}<${tag}${attrStr}>${childContent}</${tag}>${closeLink}${newline}`;
@@ -1239,13 +1241,15 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
     let childContent = "";
     if (embedFrame) {
       childContent = embedFrame;
-    } else if (children.length > 0) {
-      childContent =
-        "\n" +
-        children.map((child) => this.renderPageElement(child, indent + 1)).join("") +
-        indentStr;
-    } else if (content) {
-      childContent = this.renderContent(content, contentFormat, element.type);
+    } else {
+      // Own text first, then children — the canvas renders both, in this order.
+      if (content) childContent = this.renderContent(content, contentFormat, element.type);
+      if (children.length > 0) {
+        childContent +=
+          "\n" +
+          children.map((child) => this.renderPageElement(child, indent + 1)).join("") +
+          indentStr;
+      }
     }
 
     return `${indentStr}${openLink}<${tag}${attrStr}>${childContent}</${tag}>${closeLink}\n`;
