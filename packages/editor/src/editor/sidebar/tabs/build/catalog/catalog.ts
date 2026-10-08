@@ -189,7 +189,7 @@ export const CATALOG: CatEntry[] = [
   {
     id: "forms",
     name: "Forms",
-    sub: "Input, Select, Checkbox, Radio, Switch, Slider, Upload, Submit",
+    sub: "Input, Select, Checkbox, Radio, Switch, Slider, Submit",
     iconHtml:
       '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/>',
     elements: [
@@ -246,14 +246,9 @@ export const CATALOG: CatEntry[] = [
         description: "Range slider input for numeric values",
         tags: ["range", "slider", "number input", "volume"],
       },
-      {
-        name: "Upload",
-        iconHtml:
-          '<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
-        blockId: "file",
-        description: "File upload dropzone",
-        tags: ["file upload", "drop zone", "attachment", "photo upload"],
-      },
+      /* Upload is not offered (L3-025, owner default 2026-10-09): the public
+         form endpoint takes JSON only, so a published upload field cannot
+         submit a file. The "file" block stays registered for existing pages. */
       {
         name: "Submit",
         iconHtml:

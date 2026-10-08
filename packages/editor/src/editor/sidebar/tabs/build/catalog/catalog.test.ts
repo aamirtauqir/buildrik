@@ -35,3 +35,13 @@ describe("Build Tab Catalog — blockId integrity", () => {
     }
   });
 });
+
+/* L3-025 (owner default 2026-10-09): a published form cannot take a file —
+   the public endpoint refuses multipart as "Invalid JSON" — so Add does not
+   offer the Upload element until uploads are supported. */
+describe("Build Tab Catalog — Upload is not offered", () => {
+  it("lists no file-upload element, and the Forms summary does not name one", () => {
+    expect(flatCatalog.some((el) => el.blockId === "file")).toBe(false);
+    expect(CATALOG.find((c) => c.id === "forms")?.sub ?? "").not.toMatch(/Upload/);
+  });
+});
