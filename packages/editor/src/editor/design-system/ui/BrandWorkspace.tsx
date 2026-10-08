@@ -179,7 +179,7 @@ const SPACING_PRESETS: [SpacingPreset, string][] = [
 ];
 
 const PAGE_ACTION =
-  "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
+  "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)]";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -774,50 +774,54 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         </nav>
       </aside>
 
-      {/* ── Main: pane + preview column, 40 top / 32 sides, 32 between ──── */}
-      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:gap-8 tw:px-8 tw:pt-10">
-        {/* ── Pane ──────────────────────────────────────────────────────── */}
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
-          {/* 36 tall: the title and the 28px action share the centre line at
-              y=58, and the card starts 16 under it at y=92 (7315:80955). */}
-          {!isPanelPage && (
-          <header className="tw:flex tw:h-9 tw:shrink-0 tw:items-center tw:justify-between tw:gap-6">
-            <div className="tw:flex tw:min-w-0 tw:items-baseline tw:gap-2.5">
+      {/* ── Main: header over pane + preview column (BRP1-M3 8222:232627):
+           32 top / 32 sides, the 30-tall header spans both columns, the
+           columns start 20 under it, 32 between them. ───────────────────── */}
+      <div className={`tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:px-8 ${isPanelPage ? "tw:pt-10" : "tw:pt-8"}`}>
+        {/* The board's header: the 700-wide title, then the actions. No
+            Save — every edit is already applied (autosave). The page caption
+            (counts, ignored checks) is kept beside the title; the board draws
+            none. */}
+        {!isPanelPage && (
+          <header className="tw:flex tw:h-[30px] tw:shrink-0 tw:items-center tw:gap-2" data-testid="brand-header">
+            <div className="tw:flex tw:w-[700px] tw:min-w-0 tw:shrink tw:items-baseline tw:gap-2.5">
               <h2
-                className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
+                className="tw:m-0 tw:shrink-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
                 data-testid="brand-page-title"
               >
                 {pageLabel(page)}
               </h2>
-              <p className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-caption">
+              <p className="tw:m-0 tw:min-w-0 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-caption">
                 {caption}
               </p>
             </div>
-            <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
-              {/* "Review changes" (spec §4): non-blocking, this session's
-                  edits with Revert — drawn at 0 too (8222:230854). */}
-              <SessionEditsPopover
-                edits={store.edits}
-                onRevert={(key) => {
-                  if (!store.revert(key)) refused("That revert");
-                }}
-                disabled={readOnly}
-                extraActions={<EditLock locked={readOnly}>{pageAction}</EditLock>}
-              />
-            </div>
+            {/* "Review changes" (spec §4): non-blocking, this session's
+                edits with Revert — drawn at 0 too (8222:230854). */}
+            <SessionEditsPopover
+              edits={store.edits}
+              onRevert={(key) => {
+                if (!store.revert(key)) refused("That revert");
+              }}
+              disabled={readOnly}
+              extraActions={<EditLock locked={readOnly}>{pageAction}</EditLock>}
+            />
           </header>
-          )}
-
+        )}
+      <div className={`tw:flex tw:min-h-0 tw:flex-1 tw:gap-8 ${isPanelPage ? "" : "tw:mt-5"}`}>
+        {/* ── Pane ──────────────────────────────────────────────────────── */}
+        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
+          {/* BRP1-M1 (8222:229015 / 229636 / 230245): a flat warning-tint
+              strip, 12 in, 12/18 ink — no border, no radius. */}
           {readOnly && (
             <div
               role="alert"
               data-testid="brand-read-only-banner"
-              className="tw:mt-4 tw:rounded-lg tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
+              className="tw:mb-4 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
             >
               {(store.readOnlyReason && BRAND_READ_ONLY_COPY[store.readOnlyReason]) || BRAND_READ_ONLY_FAILED_COPY}
             </div>
           )}
-          <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">
+          <div id={`design-section-${page}`} className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4" data-testid="brand-page-body">
             {/* Parked STATE board `4418:49685` "Brand · empty": "No brand set."
                 with Browse starters · Import — the workspace's first-run state,
                 on the landing page, until the site's first token edit. The
@@ -902,6 +906,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           )}
         </aside>
         )}
+      </div>
       </div>
 
       <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />

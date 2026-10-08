@@ -311,6 +311,8 @@ describe("BrandWorkspace — read-only tokens (failed migration)", () => {
     expect(utils.getByTestId("brand-read-only-banner").textContent).toBe(
       "We couldn't upgrade this site's brand — nothing was changed. Editing is paused.",
     );
+    // 8222:229015: the header's actions are inert too.
+    expect(utils.getByTestId("brand-session-edits")).toBeDisabled();
     expect((utils.getByTestId("brand-page-action") as HTMLButtonElement).matches(":disabled")).toBe(true);
 
     openPage(utils, "kind-radius");
