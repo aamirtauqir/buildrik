@@ -312,7 +312,22 @@ export class Composer extends EventEmitter {
       interactions: new InteractionManager(this),
     };
 
-    const tokenUsage = new TokenUsageTracker();
+    const tokenUsage = new TokenUsageTracker(
+      () => this.mergedDesignTokens(),
+      () => {
+        const components = this.components.isLoaded() ? this.components.getAllComponents() : null;
+        return {
+          sources: [
+            this.elements.exportPages(),
+            this.styles.exportStyles(),
+            this.globalStyles.getAll(),
+            components ?? [],
+            this.getProjectSettings().designPresets ?? [],
+          ],
+          unavailable: components === null ? ["components"] : [],
+        };
+      },
+    );
     const lintState = new LintState();
     const tokenBindingResolver = new TokenBindingResolver();
     this.designSystem = {
@@ -383,13 +398,19 @@ export class Composer extends EventEmitter {
       recomputeScheduled = true;
       queueMicrotask(() => {
         recomputeScheduled = false;
-        tokenUsage.recompute(this.elements.getAllElements());
+        this.recomputeTokenUsage();
       });
     };
     this.on(EVENTS.ELEMENT_CREATED, scheduleRecomputeTokenUsage);
     this.on(EVENTS.ELEMENT_DELETED, scheduleRecomputeTokenUsage);
     this.on(EVENTS.ELEMENT_UPDATED, scheduleRecomputeTokenUsage);
     this.on(EVENTS.ELEMENT_STYLE_UPDATED, scheduleRecomputeTokenUsage);
+    // The site-wide count also reads tokens, project styles, saved components
+    // and presets: those changes only mark it stale (it rebuilds on next read).
+    const invalidateTokenUsage = () => tokenUsage.invalidate();
+    this.on(EVENTS.PROJECT_CHANGED, invalidateTokenUsage);
+    this.on(EVENTS.PROJECT_LOADED, invalidateTokenUsage);
+    this.on(EVENTS.COMPONENT_LIST_UPDATED, invalidateTokenUsage);
 
     const operationApplyHandler = (patch: Patch) => {
       this.history.applyRemoteOperation(patch);
@@ -909,6 +930,11 @@ ${html}${interactionScript}
     if (options?.emitProjectChanged !== false) {
       this.emit(EVENTS.PROJECT_CHANGED);
     }
+  }
+
+  /** Rebuilds the element breakdown now (the event path coalesces it into a microtask). */
+  private recomputeTokenUsage(): void {
+    this.designSystem.tokenUsage.recompute(this.elements.getAllElements());
   }
 
   /** The site's tokens as every write starts from them: the saved set merged
