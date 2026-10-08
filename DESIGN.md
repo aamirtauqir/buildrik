@@ -135,7 +135,7 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 ```css
 /* Generated from Figma — src/themes/tokens.generated.css. Do not hand-edit:
    change the Figma text style, re-export figma-tokens.json, regenerate. */
---bk-font-ui:   "Inter";   /* no named fallbacks in any stack — Inter Tight left editor chrome 2026-07-26. figma-tokens.json still exports "Inter", "Inter Tight", sans-serif; the Figma ui/* text-style fallback is the owner/designer fix */
+--bk-font-ui:   "Inter", sans-serif;   /* generic family only, no named fallbacks — Inter Tight left editor chrome 2026-07-26. The stack is hand-authored in figma-tokens.json (Figma text styles carry only the family). */
 --bk-font-mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
 ```
 
