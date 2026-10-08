@@ -25,8 +25,9 @@ export interface TokenReplaceModalProps {
   token: DesignToken;
   /** Pre-filtered candidates list — same kind, not self, not already soft-deleted. */
   candidates: ReadonlyArray<DesignToken>;
-  /** Consumer count for the title. */
-  usage: number;
+  /** Consumer count for the description; undefined while it cannot be
+   *  counted (saved components still loading) — the count line is omitted. */
+  usage?: number;
   /** Called with the chosen replacement id when the user confirms. */
   onConfirm: (replaceWithId: string) => void;
 }
@@ -120,9 +121,9 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
       <ModalContent size="lg" data-token-replace-modal={token.id}>
         <ModalTitle>Replace {token.name}?</ModalTitle>
         <ModalDescription>
-          {usage} consumer{usage === 1 ? "" : "s"} reference this token. Pick a
-          replacement and Buildrick will redirect every binding via the rename
-          bridge — no consumer breaks.
+          {usage !== undefined && `${usage} consumer${usage === 1 ? "" : "s"} reference this token. `}
+          Pick a replacement and Buildrick will redirect every binding via the
+          rename bridge — no consumer breaks.
         </ModalDescription>
         <ModalBody>
         <div style={listStyle} role="radiogroup" aria-label="Replacement candidates">

@@ -253,6 +253,9 @@ export class Composer extends EventEmitter {
      * and the AI write all land here. Returns false and writes nothing when
      * the tokens are read-only or the set does not validate. A successful
      * write announces `EVENTS.BRAND_APPLIED` (onboarding's "Set your brand").
+     * Also refuses a write that would remove a token the site still uses, or
+     * whose usage cannot be counted yet (spec §6) — soft delete via
+     * `replacedBy` keeps the token and is never refused for that.
      */
     readonly setTokens: (next: DesignToken[], label: string) => boolean;
   };
@@ -367,6 +370,11 @@ export class Composer extends EventEmitter {
         const checked = validateTokens(next);
         if (!checked.ok) {
           console.warn(`[tokens] refused "${label}": ${checked.reason}`);
+          return false;
+        }
+        const blocked = this.tokensRemovedInUse(checked.tokens);
+        if (blocked.length > 0) {
+          console.warn(`[tokens] refused "${label}": still in use or uncounted: ${blocked.join(", ")}`);
           return false;
         }
         this.beginTransaction(label);
@@ -930,6 +938,17 @@ ${html}${interactionScript}
     if (options?.emitProjectChanged !== false) {
       this.emit(EVENTS.PROJECT_CHANGED);
     }
+  }
+
+  /** Ids the write would remove (after the seed merges back) whose site-wide
+   *  usage is not a known 0. Builds usage synchronously: the microtask-coalesced
+   *  recompute may not have run since the last element edit. */
+  private tokensRemovedInUse(next: DesignToken[]): string[] {
+    const after = new Set(mergeProjectTokens(next, TOKENS_SCHEMA_VERSION).map((t) => t.id));
+    const removed = this.mergedDesignTokens().filter((t) => !after.has(t.id));
+    if (removed.length === 0) return [];
+    this.recomputeTokenUsage();
+    return removed.filter((t) => this.designSystem.tokenUsage.getCount(t.id) !== 0).map((t) => t.id);
   }
 
   /** Rebuilds the element breakdown now (the event path coalesces it into a microtask). */

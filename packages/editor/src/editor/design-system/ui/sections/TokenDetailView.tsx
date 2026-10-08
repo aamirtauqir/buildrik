@@ -275,10 +275,12 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   };
 
   // B4 follow-up (2026-05-17): per-token consumer count drives the delete
-  // path. Zero consumers → hard delete bypasses the modal. > 0 consumers →
-  // open the picker modal; user picks a replacement which routes through
-  // the kind registry's deleteToken(id, { replaceWith }).
-  const consumerCount = composer?.designSystem?.tokenUsage?.getUsage(token.id) ?? 0;
+  // path. A known zero → hard delete bypasses the modal. In use, or not yet
+  // countable ("unknown" while saved components load) → open the picker
+  // modal; user picks a replacement which routes through the kind registry's
+  // deleteToken(id, { replaceWith }). The engine refuses a hard delete of an
+  // in-use token either way (setTokens' removal guard).
+  const consumerCount = composer?.designSystem?.tokenUsage?.getCount(token.id) ?? 0;
   const tokenKind = token.kind ?? (token.category === "colors" ? "color" : undefined);
   const replaceCandidates = React.useMemo(
     () =>
@@ -695,7 +697,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         onOpenChange={setReplaceOpen}
         token={token}
         candidates={replaceCandidates}
-        usage={consumerCount}
+        usage={typeof consumerCount === "number" ? consumerCount : undefined}
         onConfirm={handleReplaceConfirm}
       />
     </section>

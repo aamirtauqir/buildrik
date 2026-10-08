@@ -46,6 +46,7 @@ function makeMockComposer(): any {
     designSystem: {
       tokenUsage: {
         getUsage: () => 3,
+        getCount: () => 3,
         getBreakdown: () => refs,
         on,
         off,
