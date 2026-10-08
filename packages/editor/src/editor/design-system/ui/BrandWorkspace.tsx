@@ -101,6 +101,7 @@ import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { DarkModeCard } from "./sections/DarkModeCard";
 import { ScaleGenerator } from "./sections/ScaleGenerator";
+import { RestorePointsSection } from "./sections/RestorePointsSection";
 import { useSiteDarkMode } from "../state/useColorMode";
 import type { BrandPreview as CanvasPreview } from "@/engine/designSystem/types";
 import { ColorModeToggle } from "./ColorModeToggle";
@@ -155,18 +156,21 @@ const MORE_KINDS = [
 type MoreKind = (typeof MORE_KINDS)[number]["kind"];
 /* "connect" — Connect to tokens (BRP1-M7), a page under Brand checks: no nav
    row of its own, Brand checks stays current on it. "scale" — the colour
-   scale generator (BRP1-M9), a page under Colours the same way. */
-export type BrandPageId = NavId | `kind-${MoreKind}` | "connect" | "scale";
+   scale generator (BRP1-M9), a page under Colours the same way.
+   "restore-points" (BRP1-M10) is the header's action on every page; no nav
+   row is current on it. */
+export type BrandPageId = NavId | `kind-${MoreKind}` | "connect" | "scale" | "restore-points";
 
 const LANDING: BrandPageId = "colours";
 
 function isPageId(value: string): value is BrandPageId {
-  return value === "connect" || value === "scale" || NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value);
+  return value === "connect" || value === "scale" || value === "restore-points" || NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value);
 }
 
 function pageLabel(id: BrandPageId): string {
   if (id === "connect") return "Connect to tokens";
   if (id === "scale") return "Colour scale generator";
+  if (id === "restore-points") return "Restore points";
   /* BRP1-M8 titles the Colour mode page by its card: "Dark mode". */
   if (id === "colour-mode") return "Dark mode";
   return NAV.find((n) => n.id === id)?.label
@@ -548,6 +552,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "export":           return "Move the brand in and out";
       case "connect":          return "";
       case "scale":            return "";
+      case "restore-points":   return "";
       default: {
         const n = moreKindRegistry[page.slice("kind-".length) as MoreKind]?.tokens.length ?? 0;
         return `${n} token${n === 1 ? "" : "s"}`;
@@ -810,6 +815,15 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             onApplied={() => addToast({ description: "Tokens connected · Undo ⌘Z", tone: "info" })}
           />
         );
+      case "restore-points":
+        return (
+          <RestorePointsSection
+            composer={composer}
+            /* 8224:245787's toast. */
+            onRestored={() => addToast({ description: "Brand restored · Undo ⌘Z", tone: "info" })}
+            onFailed={() => refused("That restore point")}
+          />
+        );
       case "starters":
         return <StartersSection projectId={projectId} />;
       case "spacing":
@@ -950,7 +964,26 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 if (!store.revert(key)) refused("That revert");
               }}
               disabled={readOnly}
-              extraActions={<EditLock locked={readOnly}>{pageAction}</EditLock>}
+              extraActions={
+                <>
+                  {/* BRP1-M3 (8222:232627): "Restore points", a borderless
+                      action right after Review changes, on every page (the
+                      page's own action follows it). Opening the list is a read, so
+                      it stays live on a read-only site (Restore does not). */}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
+                    aria-current={page === "restore-points" ? "page" : undefined}
+                    onClick={() => openPage("restore-points")}
+                    data-testid="brand-restore-points-action"
+                  >
+                    Restore points
+                  </Button>
+                  <EditLock locked={readOnly}>{pageAction}</EditLock>
+                </>
+              }
             />
           </header>
         )}
@@ -1049,6 +1082,19 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               <p className={SIDE_CARD_TITLE}>Preview before applying</p>
               <p className={SIDE_CARD_BODY}>
                 Explore the result on your canvas. Confirm or Apply commits the whole change as one ⌘Z step.
+              </p>
+              <p className={`${SIDE_CARD_BODY} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
+              <p className={SIDE_CARD_BODY}>
+                Edit Primary to change only Primary. Edit its palette value to update every token that uses it.
+              </p>
+            </section>
+          )}
+          {page === "restore-points" && (
+            /* 8224:244521's guidance card under the preview. */
+            <section aria-label="About restore points" className={SIDE_CARD} data-testid="brand-restore-guide">
+              <p className={SIDE_CARD_TITLE}>Changes apply instantly</p>
+              <p className={SIDE_CARD_BODY}>
+                Every edit updates your canvas. Use ⌘Z to undo, including changes made on the canvas.
               </p>
               <p className={`${SIDE_CARD_BODY} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
               <p className={SIDE_CARD_BODY}>

@@ -34,3 +34,18 @@ describe("BrandWorkspace › Colour scale generator (BRP1-M9)", () => {
     expect((u.getByTestId("brand-scale-input") as HTMLInputElement).value).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-success", "light"));
   });
 });
+
+describe("BrandWorkspace › Restore points (BRP1-M10)", () => {
+  it("the header's 'Restore points' opens the list on any page, after Review changes", () => {
+    const composer = makeFakeComposer(DEFAULT_TOKENS);
+    const u = renderWorkspace(composer);
+    const header = u.getByTestId("brand-header");
+    const action = u.getByTestId("brand-restore-points-action");
+    expect(header.contains(action)).toBe(true);
+    act(() => { fireEvent.click(action); });
+    expect(u.getByTestId("brand-page-title").textContent).toBe("Restore points");
+    expect(u.getByTestId("brand-restore-points")).toBeTruthy();
+    expect(u.getByTestId("brand-restore-guide").textContent).toContain("Changes apply instantly");
+    expect(u.container.querySelector('[aria-current="page"][data-section-id]')).toBeNull();
+  });
+});
