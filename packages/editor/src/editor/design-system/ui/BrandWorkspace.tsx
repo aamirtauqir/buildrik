@@ -103,7 +103,9 @@ import { ColourModeSection } from "./sections/ColourModeSection";
 import { DarkModeCard } from "./sections/DarkModeCard";
 import { ScaleGenerator } from "./sections/ScaleGenerator";
 import { RestorePointsSection } from "./sections/RestorePointsSection";
-import { useSiteDarkMode } from "../state/useColorMode";
+import { useSiteDarkMode } from "../state/useSiteDarkMode";
+import { useBrandPreview } from "../state/useBrandPreview";
+import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { BrandPreview as CanvasPreview } from "@/engine/designSystem/types";
 import { ColorModeToggle } from "./ColorModeToggle";
 import { useDSLint } from "../state/useDSLint";
@@ -277,25 +279,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const [aiOpen, setAiOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
 
-  // T10 / spec D8: outermost wrapper gets data-ds-preview={shownMode} so
-  // ds-panel-dark.css can scope overrides to the Brand surface only. Editor
-  // chrome (topbar, rail) keeps the canonical light theme.
-  const [resolvedMode, setResolvedMode] = React.useState<"light" | "dark">(
-    () => composer?.colorMode?.resolved?.() ?? "light",
-  );
-  React.useEffect(() => {
-    if (!composer?.colorMode) return;
-    const sync = () => setResolvedMode(composer.colorMode.resolved?.() ?? "light");
-    sync();
-    composer.on("colorMode:changed", sync);
-    return () => {
-      composer.off("colorMode:changed", sync);
-    };
-  }, [composer]);
-
-  /* What the live preview SHOWS (BRP1-M8): a Brand flow's preview first (its
-     tokens and theme), and never dark on a site whose Dark mode is Off — the
-     same rule ProjectTokensApplier paints the canvas by. */
+  /* What the live preview SHOWS (BRP1-M8): the Brand preview layer's tokens
+     and theme, else the saved brand in light — the same rule
+     ProjectTokensApplier paints the canvas by. The outermost wrapper carries
+     it as data-ds-preview. */
   const siteDarkMode = useSiteDarkMode(composer);
   const [canvasPreview, setCanvasPreview] = React.useState<CanvasPreview | null>(() => composer?.designSystem?.preview ?? null);
   React.useEffect(() => {
@@ -307,7 +294,21 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       composer.off(EVENTS.BRAND_PREVIEW_CHANGED, sync);
     };
   }, [composer]);
-  const shownMode: "light" | "dark" = canvasPreview?.theme ?? (siteDarkMode === "off" ? "light" : resolvedMode);
+  const shownMode: "light" | "dark" = canvasPreview?.theme ?? "light";
+  /* L4-021: the Light / Dark switch is PREVIEW-ONLY — a dark preview of the
+     saved brand through the preview layer: never saved, never in ⌘Z, gone
+     when Brand closes. Dark needs the site's Dark mode on (an Off site
+     publishes light only); turning it Off mid-preview drops back to light.
+     While another flow (generator, Dark-mode Auto, logo/URL) is previewing,
+     the switch waits. */
+  const themePreview = useBrandPreview(composer ?? null);
+  const setPreviewTheme = (theme: "light" | "dark") => {
+    if (theme === "light") return themePreview.clear();
+    themePreview.show((tokens, settings) =>
+      DarkModeSchema.catch("off").parse(settings.darkMode) === "off" ? null : { tokens, darkMode: "auto", theme: "dark" },
+    );
+  };
+  const previewLocked = canvasPreview !== null && !themePreview.active;
 
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
@@ -763,7 +764,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         /* BRP1-M8's Dark mode card over the per-token dark values (7316:80949). */
         return (
           <div className="tw:flex tw:flex-col tw:gap-4">
-            <DarkModeCard composer={composer} />
+            <DarkModeCard composer={composer} previewTheme={shownMode} onPreviewTheme={setPreviewTheme} />
             <ColourModeSection />
           </div>
         );
@@ -905,7 +906,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   /* The preview card's Light / Dark switch, on every page that has the
      preview — the dark check is not a Colour-mode-only question. */
-  const previewControls = composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
+  const previewControls = composer ? (
+    <ColorModeToggle theme={shownMode} onChange={setPreviewTheme} siteOff={siteDarkMode === "off"} locked={previewLocked} />
+  ) : undefined;
 
   /* Import / export is drawn as a panel, not a page with a preview. */
   const isPanelPage = page === "export";

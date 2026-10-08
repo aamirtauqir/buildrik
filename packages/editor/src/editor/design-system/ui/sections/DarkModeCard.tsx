@@ -37,7 +37,7 @@ import { useProjectTokenStore } from "@/editor/design-system/state/TokenRegistry
 import { useBrandPreview } from "@/editor/design-system/state/useBrandPreview";
 import { useGuardedApply } from "@/editor/design-system/state/useGuardedApply";
 import { takeRestorePoint } from "@/editor/design-system/state/useBrandRestorePoints";
-import { useColorMode, useSiteDarkMode } from "@/editor/design-system/state/useColorMode";
+import { useSiteDarkMode } from "@/editor/design-system/state/useSiteDarkMode";
 import { displayValue } from "../colors/ColorTokenList";
 import { NOTICE, SMALL_ACTION } from "./UsageHighlight";
 import { CARD, COPY, TITLE } from "./ConnectTokensCheck";
@@ -52,9 +52,13 @@ type Phase = "idle" | "aliases" | "preview";
 
 export interface DarkModeCardProps {
   composer: Composer | null | undefined;
+  /** The workspace's preview-only Light / Dark switch (L4-021) — the card
+   *  draws it as "Light preview · Dark preview". Absent: not drawn. */
+  previewTheme?: "light" | "dark";
+  onPreviewTheme?: (theme: "light" | "dark") => void;
 }
 
-export const DarkModeCard: React.FC<DarkModeCardProps> = ({ composer }) => {
+export const DarkModeCard: React.FC<DarkModeCardProps> = ({ composer, previewTheme, onPreviewTheme }) => {
   const store = useProjectTokenStore();
   const siteMode = useSiteDarkMode(composer);
   const preview = useBrandPreview(composer ?? null);
@@ -176,7 +180,9 @@ export const DarkModeCard: React.FC<DarkModeCardProps> = ({ composer }) => {
               Retry
             </Button>
           )}
-          {composer?.colorMode && <PreviewSwitch composer={composer} siteOff={siteMode === "off"} />}
+          {previewTheme && onPreviewTheme && (
+            <PreviewSwitch theme={previewTheme} onChange={onPreviewTheme} siteOff={siteMode === "off"} />
+          )}
           {siteMode === "off" && <p className={`${COPY} tw:text-[var(--bk-ink-muted)]`}>Existing sites start with Dark mode Off.</p>}
         </>
       )}
@@ -207,25 +213,21 @@ const SegButton: React.FC<{ on: boolean; onClick: () => void; testId: string; di
   </Button>
 );
 
-/** Light / Dark preview of the canvas — the designer's view, never the site's
- *  setting. Dark is disabled while the site's Dark mode is Off (8224:241285):
- *  an Off site publishes light only, so there is nothing dark to see. */
-const PreviewSwitch: React.FC<{ composer: Composer; siteOff: boolean }> = ({ composer, siteOff }) => {
-  useColorMode(composer);
-  const resolved = composer.colorMode.resolved?.() === "dark" && !siteOff ? "dark" : "light";
-  return (
-    <div className="tw:flex tw:items-center tw:gap-2" role="group" aria-label="Canvas preview">
-      <SegButton on={resolved === "light"} onClick={() => composer.colorMode.set("light")} testId="brand-dark-mode-preview-light">
-        Light preview
-      </SegButton>
-      <SegButton
-        on={resolved === "dark"}
-        onClick={() => composer.colorMode.set("dark")}
-        disabled={siteOff}
-        testId="brand-dark-mode-preview-dark"
-      >
-        Dark preview
-      </SegButton>
-    </div>
-  );
-};
+/** Light / Dark preview of the canvas — the designer's view, never saved and
+ *  never in the undo history (L4-021). Dark is disabled while the site's Dark
+ *  mode is Off (8224:241285): an Off site publishes light only, so there is
+ *  nothing dark to see. */
+const PreviewSwitch: React.FC<{ theme: "light" | "dark"; onChange: (t: "light" | "dark") => void; siteOff: boolean }> = ({
+  theme,
+  onChange,
+  siteOff,
+}) => (
+  <div className="tw:flex tw:items-center tw:gap-2" role="group" aria-label="Canvas preview">
+    <SegButton on={theme === "light"} onClick={() => onChange("light")} testId="brand-dark-mode-preview-light">
+      Light preview
+    </SegButton>
+    <SegButton on={theme === "dark"} onClick={() => onChange("dark")} disabled={siteOff} testId="brand-dark-mode-preview-dark">
+      Dark preview
+    </SegButton>
+  </div>
+);

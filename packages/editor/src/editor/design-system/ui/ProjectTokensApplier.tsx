@@ -3,9 +3,10 @@
  * write (`emitTokenCss`) — into one <style>, at most once per animation frame,
  * and keeps `data-theme` on <html> explicit so the emitted
  * `prefers-color-scheme` block never follows the designer's OS (spec §2).
- * A site whose Dark mode is "off" always previews light (D8). A Brand flow's
- * preview (`designSystem.preview`) is painted instead of the saved tokens
- * while it is set.
+ * The canvas is light unless a Brand preview (`designSystem.preview`) says
+ * otherwise — its tokens and theme are painted instead of the saved ones
+ * while it is set. The dark look is a PREVIEW (L4-021): it used to follow
+ * `composer.colorMode`, a saved, all-sites designer preference.
  *
  * @license BSD-3-Clause
  */
@@ -50,7 +51,7 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
           : "");
       if (style.textContent !== css) style.textContent = css;
       document.documentElement.dataset.theme =
-        preview?.theme ?? (darkMode === "off" ? "light" : (composer.colorMode?.resolved?.() ?? "light"));
+        preview?.theme ?? "light";
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(write);
@@ -59,7 +60,6 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
     write();
     composer.on(EVENTS.PROJECT_LOADED, schedule);
     composer.on(EVENTS.SETTINGS_CHANGE, schedule);
-    composer.on("colorMode:changed", schedule);
     composer.on(EVENTS.ELEMENT_CREATED, schedule);
     composer.on(EVENTS.ELEMENT_DELETED, schedule);
     composer.on(EVENTS.BRAND_PREVIEW_CHANGED, schedule);
@@ -67,7 +67,6 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
       if (frame) cancelAnimationFrame(frame);
       composer.off(EVENTS.PROJECT_LOADED, schedule);
       composer.off(EVENTS.SETTINGS_CHANGE, schedule);
-      composer.off("colorMode:changed", schedule);
       composer.off(EVENTS.ELEMENT_CREATED, schedule);
       composer.off(EVENTS.ELEMENT_DELETED, schedule);
       composer.off(EVENTS.BRAND_PREVIEW_CHANGED, schedule);

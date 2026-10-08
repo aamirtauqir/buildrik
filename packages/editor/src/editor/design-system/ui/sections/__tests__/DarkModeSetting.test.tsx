@@ -16,7 +16,6 @@ vi.mock("@/editor/design-system/state/useBrandRestorePoints", () => ({ takeResto
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "s1" }));
 
 import { DarkModeCard } from "../DarkModeCard";
-import { ColorModeToggle } from "../../ColorModeToggle";
 import { wrap } from "../../__tests__/brandWorkspaceHarness";
 
 /* The seed with every semantic colour already given a dark value. */
@@ -67,7 +66,9 @@ function fake(designTokens: DesignToken[], darkMode: "off" | "auto" = "off") {
 }
 
 type Fake = ReturnType<typeof fake>;
-const mount = (c: Fake) => render(wrap(<DarkModeCard composer={c as never} />, c as never));
+const onPreviewTheme = vi.fn();
+const mount = (c: Fake) =>
+  render(wrap(<DarkModeCard composer={c as never} previewTheme="light" onPreviewTheme={onPreviewTheme} />, c as never));
 
 beforeEach(() => {
   take.mockReset();
@@ -164,33 +165,20 @@ describe("DarkModeCard (BRP1-M8)", () => {
     expect(take).not.toHaveBeenCalled();
   });
 
+  it("the card's Light / Dark preview asks the workspace's preview-only switch (L4-021)", () => {
+    const c = fake(FILLED, "auto");
+    const u = mount(c);
+    fireEvent.click(u.getByTestId("brand-dark-mode-preview-dark"));
+    expect(onPreviewTheme).toHaveBeenCalledWith("dark");
+    expect(c.colorMode.set).not.toHaveBeenCalled();
+  });
+
   it("the card's Dark preview is disabled while Off, enabled in Auto", () => {
     const off = mount(fake(DEFAULT_TOKENS));
     expect((off.getByTestId("brand-dark-mode-preview-dark") as HTMLButtonElement).disabled).toBe(true);
     off.unmount();
     const auto = mount(fake(DEFAULT_TOKENS, "auto"));
     expect((auto.getByTestId("brand-dark-mode-preview-dark") as HTMLButtonElement).disabled).toBe(false);
-  });
-});
-
-describe("ColorModeToggle knows the site's Dark mode (BRP1-M8 preview-disabled)", () => {
-  it("Off: the Dark segment is disabled with the hint; Auto: enabled", () => {
-    const off = fake(DEFAULT_TOKENS);
-    const a = render(<ColorModeToggle composer={off as never} />);
-    const dark = a.getByTestId("brand-colour-mode-seg-dark") as HTMLButtonElement;
-    expect(dark.disabled).toBe(true);
-    expect(dark.getAttribute("title")).toBe("Dark mode is off for this site");
-    a.unmount();
-    const auto = fake(DEFAULT_TOKENS, "auto");
-    const b = render(<ColorModeToggle composer={auto as never} />);
-    expect((b.getByTestId("brand-colour-mode-seg-dark") as HTMLButtonElement).disabled).toBe(false);
-  });
-
-  it("Off shows Light as active even when the designer last picked Dark", () => {
-    const off = fake(DEFAULT_TOKENS);
-    off.colorMode.set("dark");
-    const a = render(<ColorModeToggle composer={off as never} />);
-    expect(a.getByTestId("brand-colour-mode-seg-light").getAttribute("aria-selected")).toBe("true");
   });
 });
 

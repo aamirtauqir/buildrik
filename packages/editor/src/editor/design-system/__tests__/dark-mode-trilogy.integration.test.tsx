@@ -99,7 +99,7 @@ describe("dark-mode trilogy · end-to-end", () => {
     setPropertySpy.mockClear();
   });
 
-  it("real Composer + ProjectTokensApplier: colorMode.set follows data-theme for an auto site and ignores it for an off site", () => {
+  it("real Composer + ProjectTokensApplier: a dark preview sets data-theme, colorMode does not (L4-021)", () => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame"] });
     document.head.innerHTML = "";
     const composer = new Composer({} as any);
@@ -113,11 +113,15 @@ describe("dark-mode trilogy · end-to-end", () => {
     expect(document.documentElement.dataset.theme).toBe("light");
 
     act(() => { composer.colorMode.set("dark"); vi.advanceTimersToNextFrame(); });
+    expect(document.documentElement.dataset.theme).toBe("light");
+    act(() => {
+      composer.designSystem.setPreview({ tokens: [], darkMode: "auto", theme: "dark" });
+      vi.advanceTimersToNextFrame();
+    });
     expect(document.documentElement.dataset.theme).toBe("dark");
     expect(document.documentElement.style.getPropertyValue("--bd-color-primary")).toBe("");
 
-    composer.setProjectSettingsRaw({ darkMode: "off" });
-    act(() => { composer.emit(EVENTS.SETTINGS_CHANGE, composer.getProjectSettings()); vi.advanceTimersToNextFrame(); });
+    act(() => { composer.designSystem.setPreview(null); vi.advanceTimersToNextFrame(); });
     expect(document.documentElement.dataset.theme).toBe("light");
     vi.useRealTimers();
   });

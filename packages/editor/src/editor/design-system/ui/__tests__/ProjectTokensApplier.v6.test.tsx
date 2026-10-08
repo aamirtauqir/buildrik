@@ -60,23 +60,29 @@ describe("ProjectTokensApplier (v6)", () => {
     expect(document.documentElement.dataset.theme).toBe("light");
   });
 
-  it("follows the resolved color mode when Dark mode is on", () => {
+  it("a saved dark colour mode does not reach the canvas — dark is a preview (L4-021)", () => {
     const c = fakeComposer({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "auto" }, "dark");
     render(<ProjectTokensApplier composer={c as never} />);
-    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(document.documentElement.dataset.theme).toBe("light");
   });
 
-  it("a colorMode:changed event rewrites data-theme for an auto site", () => {
+  it("a dark preview rewrites data-theme, clearing it goes back to light", () => {
     const c = fakeComposer({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "auto" });
+    const ds: { preview: unknown } = { preview: null };
+    Object.assign(c, { designSystem: ds });
     render(<ProjectTokensApplier composer={c as never} />);
     expect(document.documentElement.dataset.theme).toBe("light");
-    c.setMode("dark");
-    c.emit("colorMode:changed");
+    ds.preview = { tokens: DEFAULT_TOKENS, darkMode: "auto", theme: "dark" };
+    c.emit("brand:preview-changed");
     act(() => { vi.advanceTimersToNextFrame(); });
     expect(document.documentElement.dataset.theme).toBe("dark");
+    ds.preview = null;
+    c.emit("brand:preview-changed");
+    act(() => { vi.advanceTimersToNextFrame(); });
+    expect(document.documentElement.dataset.theme).toBe("light");
   });
 
-  it("switching darkMode off to auto adds the dark block and follows the mode", () => {
+  it("switching darkMode off to auto adds the dark block; the canvas stays light until previewed", () => {
     const settings: Record<string, unknown> = { designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "off" };
     const c = fakeComposer(settings, "dark");
     render(<ProjectTokensApplier composer={c as never} />);
@@ -86,7 +92,7 @@ describe("ProjectTokensApplier (v6)", () => {
     c.emit("settings:change");
     act(() => { vi.advanceTimersToNextFrame(); });
     expect(document.getElementById("bk-site-tokens")!.textContent).toContain(':root[data-theme="dark"]{');
-    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(document.documentElement.dataset.theme).toBe("light");
   });
 
   it("unmounting with a pending frame cancels the write", () => {

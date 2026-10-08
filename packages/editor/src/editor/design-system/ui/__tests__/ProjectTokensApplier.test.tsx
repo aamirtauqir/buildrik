@@ -86,12 +86,17 @@ describe("ProjectTokensApplier", () => {
     expect(css()).toMatch(/--buildrick-design-color-action:\s*#B91C1C/i);
   });
 
-  it("sets data-theme from the resolved colour mode so a dark site does not flash light", () => {
+  it("data-theme is the preview's theme, else light — never the designer's saved colour mode (L4-021)", () => {
     const composer = {
       on: () => {}, off: () => {},
       getProjectSettings: () => ({ darkMode: "auto", designTokens: [] }),
       colorMode: { resolved: () => "dark" as const },
-    } as unknown as Composer;
+      designSystem: { preview: null as unknown },
+    } as unknown as Composer & { designSystem: { preview: unknown } };
+    const view = render(<ProjectTokensApplier composer={composer} />);
+    expect(document.documentElement.dataset.theme).toBe("light");
+    view.unmount();
+    composer.designSystem.preview = { tokens: [], darkMode: "auto", theme: "dark" };
     render(<ProjectTokensApplier composer={composer} />);
     expect(document.documentElement.dataset.theme).toBe("dark");
   });

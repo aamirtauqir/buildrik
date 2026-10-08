@@ -216,73 +216,71 @@ describe("BrandWorkspace › Component styles — AI assist entry", () => {
   });
 });
 
-describe("BrandWorkspace › dark preview chrome (T10)", () => {
-  function makeModeComposer(initial: "light" | "dark") {
-    let resolved = initial;
+describe("BrandWorkspace › the Light / Dark switch is preview-only (L4-021, BRP1-M8)", () => {
+  /** A site in the given Dark mode whose composer has the preview layer and
+   *  a colorMode spy — the switch must never touch the latter. */
+  function makePreviewComposer(darkMode: "off" | "auto") {
     const composer = makeFakeComposer();
-    const colorMode = {
-      get: vi.fn(() => resolved),
-      set: vi.fn((next: "light" | "dark") => {
-        resolved = next;
-        composer.emit("colorMode:changed", { mode: next, resolved: next });
-      }),
-      resolved: vi.fn(() => resolved),
+    composer.settings.darkMode = darkMode;
+    const colorMode = { get: vi.fn(() => "light"), set: vi.fn(), resolved: vi.fn(() => "light") };
+    const ds = composer.designSystem as unknown as { preview: unknown; setPreview: (p: unknown) => void };
+    ds.preview = null;
+    ds.setPreview = (p: unknown) => {
+      ds.preview = p;
+      composer.emit("brand:preview-changed");
     };
     Object.assign(composer, { colorMode });
-    /* An Auto site — an Off one never previews dark (BRP1-M8). */
-    composer.settings.darkMode = "auto";
-    return { composer, colorMode };
+    return { composer, colorMode, ds };
   }
 
-  it("an Off site previews light even when the designer picked dark (BRP1-M8)", () => {
-    const { composer } = makeModeComposer("dark");
-    composer.settings.darkMode = "off";
+  it("Dark paints the saved brand dark through the preview layer; nothing is saved, nothing enters ⌘Z", () => {
+    const { composer, colorMode, ds } = makePreviewComposer("auto");
+    const before = JSON.stringify(composer.settings);
+    const utils = renderWorkspace(composer);
+    expect(utils.getByTestId("brand-live-preview").contains(utils.getByTestId("brand-colour-mode-seg"))).toBe(true);
+    act(() => {
+      fireEvent.click(utils.getByTestId("brand-colour-mode-seg-dark"));
+    });
+    expect(ds.preview).toMatchObject({ theme: "dark", darkMode: "auto" });
+    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("dark");
+    expect(colorMode.set).not.toHaveBeenCalled();
+    expect(composer.designSystem.setTokens).not.toHaveBeenCalled();
+    expect(JSON.stringify(composer.settings)).toBe(before);
+    act(() => {
+      fireEvent.click(utils.getByTestId("brand-colour-mode-seg-light"));
+    });
+    expect(ds.preview).toBeNull();
+    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("light");
+  });
+
+  it("closing Brand mid-preview puts the canvas back to the saved brand", () => {
+    const { composer, ds } = makePreviewComposer("auto");
+    const utils = renderWorkspace(composer);
+    act(() => {
+      fireEvent.click(utils.getByTestId("brand-colour-mode-seg-dark"));
+    });
+    utils.unmount();
+    expect(ds.preview).toBeNull();
+  });
+
+  it("an Off site previews light only: Dark is disabled (8224:241285)", () => {
+    const { composer } = makePreviewComposer("off");
     const utils = renderWorkspace(composer);
     expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("light");
     expect((utils.getByTestId("brand-colour-mode-seg-dark") as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it("initial light / dark mode: the root carries data-ds-preview", () => {
-    for (const mode of ["light", "dark"] as const) {
-      const { composer } = makeModeComposer(mode);
-      const utils = renderWorkspace(composer);
-      expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe(mode);
-      utils.unmount();
-    }
-  });
-
-  it("colorMode:changed light→dark: attribute flips", () => {
-    const { composer, colorMode } = makeModeComposer("light");
+  it("turning Dark mode Off mid-preview drops the preview to light", () => {
+    const { composer, ds } = makePreviewComposer("auto");
     const utils = renderWorkspace(composer);
-    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("light");
-
-    act(() => {
-      colorMode.set("dark");
-    });
-
-    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("dark");
-  });
-
-  it("the Light / Dark switch sits in the preview card on every page, and flips it", () => {
-    const { composer } = makeModeComposer("light");
-    const utils = renderWorkspace(composer);
-    // Not only on Colour mode (BRP1-M8): Colours carries it too.
-    expect(utils.getByTestId("brand-live-preview").contains(utils.getByTestId("brand-colour-mode-seg"))).toBe(true);
-    openPage(utils, "colour-mode");
-    const seg = utils.getByTestId("brand-colour-mode-seg");
-    expect(utils.getByTestId("brand-live-preview").contains(seg)).toBe(true);
-    expect(utils.getByTestId("brand-page-body").contains(seg)).toBe(false);
     act(() => {
       fireEvent.click(utils.getByTestId("brand-colour-mode-seg-dark"));
     });
-    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("dark");
-  });
-
-  it("unsubscribes on unmount", () => {
-    const { composer } = makeModeComposer("light");
-    const utils = renderWorkspace(composer);
-    utils.unmount();
-    expect(composer.off).toHaveBeenCalledWith("colorMode:changed", expect.any(Function));
+    act(() => {
+      composer.setProjectSettings({ darkMode: "off" });
+    });
+    expect(ds.preview).toBeNull();
+    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("light");
   });
 });
 

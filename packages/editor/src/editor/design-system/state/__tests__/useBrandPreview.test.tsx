@@ -48,4 +48,21 @@ describe("useBrandPreview (spec D17: previews revert)", () => {
     expect(c.designSystem.preview).toBeNull();
     expect(calls).toBe(1);
   });
+
+  it("one slot, last owner wins: a replaced owner stops repainting and never clears the newer preview (L4-021)", () => {
+    const c = fake();
+    let a!: ReturnType<typeof useBrandPreview>;
+    let b!: ReturnType<typeof useBrandPreview>;
+    render(<><Harness c={c} onApi={(x) => { a = x; }} /><Harness c={c} onApi={(x) => { b = x; }} /></>);
+    act(() => a.show((tokens) => ({ tokens, darkMode: "auto", theme: "dark" })));
+    act(() => b.show((tokens) => ({ tokens, darkMode: "auto" })));
+    act(() => c.emit("settings:change"));
+    expect(c.designSystem.preview).toMatchObject({ darkMode: "auto" });
+    expect(c.designSystem.preview).not.toHaveProperty("theme");
+    act(() => a.clear());
+    expect(c.designSystem.preview).not.toBeNull();
+    expect(a.active).toBe(false);
+    act(() => b.clear());
+    expect(c.designSystem.preview).toBeNull();
+  });
 });

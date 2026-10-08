@@ -61,7 +61,7 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
   React.useEffect(() => {
     if (!composer || typeof composer.on !== "function") return;
     const bump = () => setSiteNonce((n) => n + 1);
-    const events = [EVENTS.SETTINGS_CHANGE, EVENTS.ELEMENT_CREATED, EVENTS.ELEMENT_DELETED, EVENTS.ELEMENT_UPDATED] as const;
+    const events = [EVENTS.SETTINGS_CHANGE, EVENTS.ELEMENT_CREATED, EVENTS.ELEMENT_DELETED, EVENTS.ELEMENT_UPDATED, EVENTS.BRAND_PREVIEW_CHANGED] as const;
     for (const e of events) composer.on(e, bump);
     return () => {
       for (const e of events) composer.off(e, bump);
@@ -76,7 +76,8 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
       /* Contrast is computed here, not in DSLinter — it needs the resolved
          mode. Merged so the Lint destination, the banner and the colour
          list's chip can never tell three different stories again. */
-      const mode = composer.colorMode?.resolved?.() ?? "light";
+      /* The theme the canvas shows: dark only under a Brand preview (L4-021). */
+      const mode = composer.designSystem?.preview?.theme ?? "light";
       const off = DarkModeSchema.catch("off").parse(composer.getProjectSettings?.()?.darkMode) === "off";
       const hiddenToggle: LintIssue[] =
         off && siteHasThemeToggle(composer.elements?.getAllElements?.() ?? [])

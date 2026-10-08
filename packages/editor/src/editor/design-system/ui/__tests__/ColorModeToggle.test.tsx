@@ -1,132 +1,44 @@
-import { render, fireEvent, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+/**
+ * The live preview card's Light / Dark switch — controlled and preview-only
+ * (L4-021). The workspace's wiring to the preview layer is pinned in
+ * BrandWorkspace.previewSwitch.test.tsx.
+ */
+import { render, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { ColorModeToggle } from "../ColorModeToggle";
-import type { ThemeMode } from "../../types";
 
-type Listener = (payload: unknown) => void;
-
-function makeFakeComposer(initialMode: ThemeMode = "system") {
-  let mode: ThemeMode = initialMode;
-  const listeners = new Map<string, Listener[]>();
-  const colorMode = {
-    get: vi.fn(() => mode),
-    set: vi.fn((next: ThemeMode) => {
-      mode = next;
-      (listeners.get("colorMode:changed") ?? []).forEach((cb) =>
-        cb({ mode: next, resolved: next === "system" ? "light" : next })
-      );
-    }),
-    resolved: vi.fn(() => (mode === "system" ? "light" : mode) as "light" | "dark"),
-  };
-  return {
-    on: vi.fn((evt: string, cb: Listener) => {
-      const arr = listeners.get(evt) ?? [];
-      arr.push(cb);
-      listeners.set(evt, arr);
-    }),
-    off: vi.fn((evt: string, cb: Listener) => {
-      const arr = listeners.get(evt) ?? [];
-      listeners.set(evt, arr.filter((x) => x !== cb));
-    }),
-    colorMode,
-    /* An Auto site: Dark is disabled on an Off one (BRP1-M8, DarkModeSetting.test). */
-    getProjectSettings: () => ({ darkMode: "auto" }),
-    dsLinter: { lint: vi.fn(() => []) },
-  };
-}
-
-describe("ColorModeToggle (2-pill seg)", () => {
-  beforeEach(() => {
-    Object.defineProperty(window, "matchMedia", {
-      writable: true,
-      value: vi.fn().mockImplementation((q: string) => ({
-        matches: false, media: q,
-        addEventListener: vi.fn(), removeEventListener: vi.fn(),
-        addListener: vi.fn(), removeListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      })),
-    });
+describe("ColorModeToggle (2-pill seg, preview-only)", () => {
+  it("renders a role=tablist container with aria-label 'Color mode' and two tabs", () => {
+    const u = render(<ColorModeToggle theme="light" onChange={vi.fn()} siteOff={false} />);
+    const list = u.getByRole("tablist");
+    expect(list.getAttribute("aria-label")).toBe("Color mode");
+    expect(u.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Light", "Dark"]);
   });
 
-  it("renders a role=tablist container with aria-label 'Color mode'", () => {
-    const composer = makeFakeComposer("light");
-    const { getByRole } = render(<ColorModeToggle composer={composer as any} />);
-    const tablist = getByRole("tablist");
-    expect(tablist.getAttribute("aria-label")).toBe("Color mode");
+  it("marks the shown theme selected", () => {
+    const u = render(<ColorModeToggle theme="dark" onChange={vi.fn()} siteOff={false} />);
+    expect(u.getByTestId("brand-colour-mode-seg-dark").getAttribute("aria-selected")).toBe("true");
+    expect(u.getByTestId("brand-colour-mode-seg-light").getAttribute("aria-selected")).toBe("false");
   });
 
-  it("renders exactly 2 tabs with role=tab", () => {
-    const composer = makeFakeComposer("light");
-    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
-    const tabs = getAllByRole("tab");
-    expect(tabs).toHaveLength(2);
-    expect(tabs[0].textContent).toBe("Light");
-    expect(tabs[1].textContent).toBe("Dark");
+  it("asks the owner for the other theme; it writes nothing itself", () => {
+    const onChange = vi.fn();
+    const u = render(<ColorModeToggle theme="light" onChange={onChange} siteOff={false} />);
+    fireEvent.click(u.getByTestId("brand-colour-mode-seg-dark"));
+    expect(onChange).toHaveBeenCalledWith("dark");
   });
 
-  it("when resolved=light, Light tab has aria-selected=true and Dark is false", () => {
-    const composer = makeFakeComposer("light");
-    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
-    const [lightTab, darkTab] = getAllByRole("tab");
-    expect(lightTab.getAttribute("aria-selected")).toBe("true");
-    expect(darkTab.getAttribute("aria-selected")).toBe("false");
+  it("Off site: Dark is disabled with the board's hint (8224:241285)", () => {
+    const u = render(<ColorModeToggle theme="light" onChange={vi.fn()} siteOff />);
+    const dark = u.getByTestId("brand-colour-mode-seg-dark") as HTMLButtonElement;
+    expect(dark.disabled).toBe(true);
+    expect(dark.getAttribute("title")).toBe("Dark mode is off for this site");
   });
 
-  it("when resolved=dark, Dark tab has aria-selected=true and Light is false", () => {
-    const composer = makeFakeComposer("dark");
-    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
-    const [lightTab, darkTab] = getAllByRole("tab");
-    expect(lightTab.getAttribute("aria-selected")).toBe("false");
-    expect(darkTab.getAttribute("aria-selected")).toBe("true");
-  });
-
-  it("when stored mode=system, resolved() decides which pill is active", () => {
-    const composer = makeFakeComposer("system");
-    // resolved() defaults to "light" when system since matchMedia is mocked false
-    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
-    const [lightTab, darkTab] = getAllByRole("tab");
-    expect(lightTab.getAttribute("aria-selected")).toBe("true");
-    expect(darkTab.getAttribute("aria-selected")).toBe("false");
-  });
-
-  it("click [Light] calls composer.colorMode.set('light')", () => {
-    const composer = makeFakeComposer("dark");
-    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
-    const [lightTab] = getAllByRole("tab");
-    fireEvent.click(lightTab);
-    expect(composer.colorMode.set).toHaveBeenLastCalledWith("light");
-  });
-
-  it("click [Dark] calls composer.colorMode.set('dark')", () => {
-    const composer = makeFakeComposer("light");
-    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
-    const [, darkTab] = getAllByRole("tab");
-    fireEvent.click(darkTab);
-    expect(composer.colorMode.set).toHaveBeenLastCalledWith("dark");
-  });
-
-  it("after colorMode:changed external emit, active pill swaps to new resolved mode", () => {
-    const composer = makeFakeComposer("light");
-    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
-    let [lightTab, darkTab] = getAllByRole("tab");
-    expect(lightTab.getAttribute("aria-selected")).toBe("true");
-    expect(darkTab.getAttribute("aria-selected")).toBe("false");
-
-    // Simulate external set + emit (e.g., another component flipping mode).
-    act(() => {
-      composer.colorMode.set("dark");
-    });
-
-    [lightTab, darkTab] = getAllByRole("tab");
-    expect(lightTab.getAttribute("aria-selected")).toBe("false");
-    expect(darkTab.getAttribute("aria-selected")).toBe("true");
-  });
-
-  it("unsubscribes on unmount", () => {
-    const composer = makeFakeComposer();
-    const { unmount } = render(<ColorModeToggle composer={composer as any} />);
-    unmount();
-    expect(composer.off).toHaveBeenCalledWith("colorMode:changed", expect.any(Function));
+  it("locked while another flow previews: both segments wait", () => {
+    const u = render(<ColorModeToggle theme="light" onChange={vi.fn()} siteOff={false} locked />);
+    expect((u.getByTestId("brand-colour-mode-seg-light") as HTMLButtonElement).disabled).toBe(true);
+    expect((u.getByTestId("brand-colour-mode-seg-dark") as HTMLButtonElement).disabled).toBe(true);
   });
 });
