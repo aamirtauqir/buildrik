@@ -5,9 +5,9 @@
  */
 import { describe, it, expect } from "vitest";
 import { DEFAULT_TOKENS } from "../defaultTokens";
-import { findConnectSuggestions, normalizeTokenValue } from "../connectTokens";
+import { findConnectSuggestions, normalizeTokenValue, type StyledNode } from "../connectTokens";
 
-const node = (id: string, styles: Record<string, string>, children: unknown[] = []) => ({ id, styles, children });
+const node = (id: string, styles: Record<string, string>, children: StyledNode[] = []): StyledNode => ({ id, styles, children });
 
 /* The seed ships #1A56DB under two semantic ids — color-primary and the B5
    Beginner alias color-action — so on a real site #1A56DB is a tie the user
