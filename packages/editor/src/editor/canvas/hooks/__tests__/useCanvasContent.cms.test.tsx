@@ -131,19 +131,34 @@ describe("useCanvasContent — CMS binding resolution", () => {
     expect(result.current.displayContent).not.toContain("data-cms-bound");
   });
 
-  it("keeps the original markup when a binding resolves to an empty value", async () => {
+  /* L3-016: a binding that resolves to nothing (record unpublished or deleted,
+     empty field, no fallback) ships as nothing (CMSExportResolver, BD-03). The
+     canvas kept the stored text — the old record's copy — so it showed what the
+     live site would not, and lost the bound marker on reload. */
+  it("shows what publish ships when a binding resolves to nothing, and stays marked bound", async () => {
     const { composer } = makeComposer(
       { "el-1": [{ elementId: "el-1", property: "content" }] },
-      "" // falsy value → binding skipped
+      "",
     );
-    const content = '<div data-buildrick-id="root-1"><p data-buildrick-id="el-1">Fallback</p></div>';
+    const content = '<div data-buildrick-id="root-1"><p data-buildrick-id="el-1">First post EDITED</p></div>';
 
     const { result } = renderHook(() => useCanvasContent({ composer, content }));
 
     await waitFor(() => {
-      expect(result.current.displayContent).toContain("Fallback");
+      expect(result.current.displayContent).toContain('data-cms-bound="true"');
     });
-    expect(result.current.displayContent).not.toContain("data-cms-bound");
+    expect(result.current.displayContent).not.toContain("First post EDITED");
+  });
+
+  it("re-resolves when a record is published or unpublished", () => {
+    const { composer, collectionsOn, collectionsOff } = makeComposer({});
+    const { unmount } = renderHook(() =>
+      useCanvasContent({ composer, content: "<div data-buildrick-id='root-1'></div>" })
+    );
+    expect(collectionsOn).toHaveBeenCalledWith(EVENTS.CMS_CONTENT_PUBLISHED, expect.any(Function));
+    expect(collectionsOn).toHaveBeenCalledWith(EVENTS.CMS_CONTENT_UNPUBLISHED, expect.any(Function));
+    unmount();
+    expect(collectionsOff).toHaveBeenCalledWith(EVENTS.CMS_CONTENT_UNPUBLISHED, expect.any(Function));
   });
 
   it("renders the empty-canvas root wrapper (with root id) when content is empty", () => {

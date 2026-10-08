@@ -75,20 +75,22 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
           // Resolve each binding — except those a Collection list copy
           // already filled from its own record (C0.8).
           const currentItemOf = el.getAttribute(CURRENT_ITEM_ATTR);
+          // Bound is bound, resolved or not — the marker used to vanish on a
+          // reload once the record stopped resolving (L3-016).
+          el.setAttribute("data-cms-bound", "true");
           bindings.forEach((binding) => {
             if (followsContextRecord(binding) && currentItemOf === binding.collectionId) return;
             const promise = composer.cms.bindings.resolveBinding(binding).then((value) => {
-              if (!value) return;
-
               /* Rendered into the app origin (Canvas innerHTML): stored
                  property names and CMS entry values are data — only the
                  shared allowlist, and never a dangerous src/href URL. */
-              if (!isSafeCmsBoundValue(binding.property, value)) return;
+              if (value && !isSafeCmsBoundValue(binding.property, value)) return;
+              /* Nothing resolved (record unpublished or deleted, empty field,
+                 no fallback) is written as nothing, as the export does
+                 (CMSExportResolver, BD-03). Keeping the stored text showed the
+                 old record's copy on a canvas whose live site is empty (L3-016). */
               const rich = richtextKeys(composer.cms.collections?.getCollection?.(binding.collectionId)?.fields);
               writeBoundValue(el, binding.property, value, rich.has(binding.fieldSlug));
-
-              // Add visual indicator that this element has CMS binding
-              el.setAttribute("data-cms-bound", "true");
             });
 
             resolvePromises.push(promise);
@@ -126,6 +128,10 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
     composer.cms.collections.on("content:updated", handleContentChange);
     composer.cms.collections.on("content:created", handleContentChange);
     composer.cms.collections.on("content:deleted", handleContentChange);
+    /* Publishing or unpublishing a record changes what resolves (only
+       published records do) but emits neither updated nor deleted. */
+    composer.cms.collections.on(EVENTS.CMS_CONTENT_PUBLISHED, handleContentChange);
+    composer.cms.collections.on(EVENTS.CMS_CONTENT_UNPUBLISHED, handleContentChange);
     composer.cms.collections.on(EVENTS.CMS_STORE_REFRESHED, handleContentChange);
     /* Binding a Collection list changes what renders without changing the
        element HTML this hook is keyed on. */
@@ -136,6 +142,8 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
       composer.cms.collections.off("content:updated", handleContentChange);
       composer.cms.collections.off("content:created", handleContentChange);
       composer.cms.collections.off("content:deleted", handleContentChange);
+      composer.cms.collections.off(EVENTS.CMS_CONTENT_PUBLISHED, handleContentChange);
+      composer.cms.collections.off(EVENTS.CMS_CONTENT_UNPUBLISHED, handleContentChange);
       composer.cms.collections.off(EVENTS.CMS_STORE_REFRESHED, handleContentChange);
       composer.off(EVENTS.CMS_COLLECTION_BOUND, handleContentChange);
       composer.off(EVENTS.CMS_COLLECTION_UNBOUND, handleContentChange);
