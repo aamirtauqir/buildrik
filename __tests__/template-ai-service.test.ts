@@ -5,7 +5,7 @@ vi.mock("@/lib/prisma", () => ({
     template: { findMany: vi.fn(), findUnique: vi.fn(), findFirst: vi.fn(), count: vi.fn(), update: vi.fn() },
     site: { create: vi.fn(), count: vi.fn(), findFirst: vi.fn(), findMany: vi.fn().mockResolvedValue([]) },
     page: { createMany: vi.fn() },
-    aIGenerationJob: { create: vi.fn(), findFirst: vi.fn(), update: vi.fn(), count: vi.fn() },
+    aIGenerationJob: { create: vi.fn(), findFirst: vi.fn(), update: vi.fn(), updateMany: vi.fn().mockResolvedValue({ count: 0 }), count: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
     workspace: { findUnique: vi.fn() },
   },

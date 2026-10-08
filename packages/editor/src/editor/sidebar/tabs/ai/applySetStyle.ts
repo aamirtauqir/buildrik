@@ -3,6 +3,9 @@ import type { Composer } from "@/engine/Composer";
 import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 import { CATALOG } from "@/editor/components-catalog/catalog";
 import { placeCatalogComponent } from "@/editor/components-catalog/placeCatalogComponent";
+import { canWrite } from "@/engine/commands/commandOperations";
+import { EVENTS } from "@/shared/constants/events";
+import { isDangerousUrl } from "@buildrik/shared/schemas/element-markup";
 
 /**
  * v1 in-canvas AI command: `set-style`. Desktop / normal-state inline styles
@@ -316,14 +319,15 @@ export function applyMoveElement(composer: Composer, args: MoveElementArgs): voi
 /**
  * v1 in-canvas AI command: `set-attribute`. Sets a safe authoring attribute
  * (href / alt / title / target / rel / aria-label / name) via `el.setAttribute`.
- * Per-attribute value guards mirror the server: href rejects script/data URIs,
+ * Per-attribute value guards mirror the server: href rejects script URLs and
+ * non-image data: URLs as a browser reads them (`isDangerousUrl`, the shared
+ * check — so "java\tscript:" is caught),
  * target is enum-restricted, the rest are plain text (no markup). The property
  * allow-list excludes event handlers, `style`, `src`, and `id`.
  */
 const ATTRIBUTE_NAMES = [
   "href", "alt", "title", "target", "rel", "aria-label", "name", "src",
 ] as const;
-const UNSAFE_HREF = /^\s*(javascript|data|vbscript):/i;
 const ALLOWED_TARGETS = ["_blank", "_self", "_parent", "_top"] as const;
 
 // `src` uses a scheme allowlist (http/https/relative only), mirroring the
@@ -344,7 +348,7 @@ export const setAttributeArgsSchema = z
   })
   .refine(
     (a) => {
-      if (a.attribute === "href") return !UNSAFE_HREF.test(a.value);
+      if (a.attribute === "href") return !isDangerousUrl(a.value);
       if (a.attribute === "target")
         return (ALLOWED_TARGETS as readonly string[]).includes(a.value);
       if (a.attribute === "src") return isSafeSrcValue(a.value);
@@ -565,12 +569,22 @@ function applySetToken(composer: Composer, args: SetTokenArgs): void {
  * handler whose `run` re-validates (defense in depth; the server already
  * validated) and skips invalid args. The batch loop awaits every `run`, so sync
  * and async commands compose in one transaction → one undo step.
+ *
+ * `writesElement` marks commands that change the element named by
+ * `args.elementId` — those go through the engine's lock gate first.
  */
+interface CommandHandler {
+  writesElement: boolean;
+  run: (composer: Composer, rawArgs: unknown) => boolean | Promise<boolean>;
+}
+
 function defineCommand<T>(
   schema: z.ZodType<T>,
   apply: (composer: Composer, args: T) => void,
-): { run: (composer: Composer, rawArgs: unknown) => boolean | Promise<boolean> } {
+  writesElement = false,
+): CommandHandler {
   return {
+    writesElement,
     run(composer, rawArgs) {
       const parsed = schema.safeParse(rawArgs);
       if (!parsed.success) return false;
@@ -583,8 +597,9 @@ function defineCommand<T>(
 function defineAsyncCommand<T>(
   schema: z.ZodType<T>,
   apply: (composer: Composer, args: T) => Promise<void>,
-): { run: (composer: Composer, rawArgs: unknown) => Promise<boolean> } {
+): CommandHandler {
   return {
+    writesElement: false,
     async run(composer, rawArgs) {
       const parsed = schema.safeParse(rawArgs);
       if (!parsed.success) return false;
@@ -594,19 +609,16 @@ function defineAsyncCommand<T>(
   };
 }
 
-const COMMAND_HANDLERS: Record<
-  string,
-  { run: (composer: Composer, rawArgs: unknown) => boolean | Promise<boolean> }
-> = {
-  "set-style": defineCommand(setStyleArgsSchema, applySetStyle),
-  "set-text": defineCommand(setTextArgsSchema, applySetText),
+const COMMAND_HANDLERS: Record<string, CommandHandler> = {
+  "set-style": defineCommand(setStyleArgsSchema, applySetStyle, true),
+  "set-text": defineCommand(setTextArgsSchema, applySetText, true),
   "add-element": defineCommand(addElementArgsSchema, applyAddElement),
-  "delete-element": defineCommand(elementRefArgsSchema, applyDeleteElement),
+  "delete-element": defineCommand(elementRefArgsSchema, applyDeleteElement, true),
   "duplicate-element": defineCommand(elementRefArgsSchema, applyDuplicateElement),
-  "move-element": defineCommand(moveElementArgsSchema, applyMoveElement),
+  "move-element": defineCommand(moveElementArgsSchema, applyMoveElement, true),
   "add-section": defineCommand(addSectionArgsSchema, applyAddSection),
-  "set-attribute": defineCommand(setAttributeArgsSchema, applySetAttribute),
-  "set-style-variant": defineCommand(setStyleVariantArgsSchema, applySetStyleVariant),
+  "set-attribute": defineCommand(setAttributeArgsSchema, applySetAttribute, true),
+  "set-style-variant": defineCommand(setStyleVariantArgsSchema, applySetStyleVariant, true),
   "insert-component": defineAsyncCommand(insertComponentArgsSchema, applyInsertComponent),
   "set-page-setting": defineCommand(setPageSettingArgsSchema, applySetPageSetting),
   "set-token": defineCommand(setTokenArgsSchema, applySetToken),
@@ -614,13 +626,44 @@ const COMMAND_HANDLERS: Record<
 };
 
 /**
+ * Refuse a write to a locked element through the engine's one lock gate
+ * (`canWrite` — it also raises the "locked" toast). A missing element is left
+ * to the handler, which reports it as not found.
+ */
+function assertWritable(composer: Composer, rawArgs: unknown): void {
+  const elementId = (rawArgs as { elementId?: unknown } | undefined)?.elementId;
+  if (typeof elementId !== "string" || !composer.elements.getElement(elementId)) return;
+  if (!canWrite(composer, elementId)) {
+    throw new Error(`This element is locked, so AI can't change it (${elementId}). Unlock it and try again.`);
+  }
+}
+
+export interface AiEditResult {
+  /** Commands that passed re-validation and ran. */
+  applied: number;
+  /** propose-action commands, for the propose → confirm gate. */
+  proposals: Array<{ actionId: string }>;
+  /** Undoes exactly the history entry this edit recorded — and nothing else:
+   *  it refuses once a newer entry sits on top (`history.captureUndo`). Null
+   *  when the edit recorded nothing (all no-ops, proposals only). */
+  undo: (() => boolean) | null;
+}
+
+/**
  * Run an accepted AI edit's command batch inside ONE outer transaction so the
  * whole edit is a single undo step. Each command is re-validated client-side
  * (defense in depth — the server already validated) before applying; invalid
- * entries are skipped. `endTransaction` runs in `finally`, never
- * `rollbackTransaction` (Unit 0 finding #3: rollback suppresses the history
- * record without reverting the in-memory mutation, which would strand a
- * visible-but-unrecorded change). Returns how many commands were applied.
+ * entries are skipped.
+ *
+ * All or nothing: when a command throws (a locked element, an element an
+ * earlier step removed, an unknown component) the batch is rolled back with
+ * `rollbackTransaction`, which restores the pre-transaction snapshot quietly,
+ * and the error is rethrown — no partial edit stays on the page or reaches
+ * history. (This used to commit the partial batch with `endTransaction`, on
+ * the grounds that rollback only hid the change; rollback has restored the
+ * snapshot since the transaction-snapshot fix.) One thing sits outside the
+ * snapshot: a component an earlier `save-as-component` already persisted to
+ * the browser registry.
  */
 export async function applyAiEdit(
   composer: Composer,
@@ -630,7 +673,7 @@ export async function applyAiEdit(
       preview?: Record<string, unknown>;
     };
   },
-): Promise<{ applied: number; proposals: Array<{ actionId: string }> }> {
+): Promise<AiEditResult> {
   const commit = edit.applyOps.commit as { commands?: unknown };
   const commands = Array.isArray(commit.commands) ? commit.commands : [];
 
@@ -639,6 +682,9 @@ export async function applyAiEdit(
   // into the propose→confirm-token→execute gate (platform phase 4).
   const proposals: Array<{ actionId: string }> = [];
 
+  // Commit any edit the user made just before Apply as its own entry, so it is
+  // neither folded into the AI's entry nor taken back by its undo.
+  composer.history?.flushPending?.();
   composer.beginTransaction("ai-edit");
   let applied = 0;
   try {
@@ -651,18 +697,32 @@ export async function applyAiEdit(
       }
       const handler =
         typeof cmd.commandId === "string" ? COMMAND_HANDLERS[cmd.commandId] : undefined;
+      if (!handler) continue;
+      if (handler.writesElement) assertWritable(composer, cmd.args);
       // Await every handler — sync ones resolve immediately (await of a boolean),
       // async ones (insert-component) settle their mutation before the next
       // command + before endTransaction, keeping the whole batch one undo step.
-      if (handler && (await handler.run(composer, cmd.args))) applied++;
+      if (await handler.run(composer, cmd.args)) applied++;
     }
-  } finally {
-    composer.endTransaction();
+  } catch (err) {
+    composer.rollbackTransaction();
+    throw err;
   }
+  composer.endTransaction();
   // Commit the edit to history synchronously. History records are debounced
   // ~500ms; without flushing, an undo fired right after Apply reverts the
   // PREVIOUS action (the edit isn't committed yet) and the late record then
   // clears the redo stack. Flush makes the AI edit one clean, immediate undo.
-  composer.history?.flushPending?.();
-  return { applied, proposals };
+  let recorded = false;
+  const onRecorded = () => {
+    recorded = true;
+  };
+  composer.on?.(EVENTS.HISTORY_RECORDED, onRecorded);
+  try {
+    composer.history?.flushPending?.();
+  } finally {
+    composer.off?.(EVENTS.HISTORY_RECORDED, onRecorded);
+  }
+  const undo = recorded ? composer.history?.captureUndo?.() ?? null : null;
+  return { applied, proposals, undo };
 }

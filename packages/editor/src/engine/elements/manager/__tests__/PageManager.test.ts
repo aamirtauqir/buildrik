@@ -512,3 +512,31 @@ describe("PageManager.setActivePage", () => {
     expect(composer.emit).not.toHaveBeenCalled();
   });
 });
+
+/* L3-001 / L2-002: a second page called "About" got slug `about`; the server's
+   (siteId, slug) unique key then rejected every save of the whole site with a
+   500 until the user renamed it. Create and rename pick a free slug instead. */
+describe("PageManager — page slugs stay unique", () => {
+  it("a new page named like an existing one gets a numbered slug", () => {
+    const { pm } = makeHarness();
+    pm.createPage("About");
+    expect(pm.createPage("About").slug).toBe("about-2");
+    expect(pm.createPage("About").slug).toBe("about-3");
+  });
+
+  it("an explicit slug already in use is numbered too", () => {
+    const { pm } = makeHarness();
+    pm.createPage("Team");
+    expect(pm.createPage("Crew", { slug: "team" }).slug).toBe("team-2");
+  });
+
+  it("a rename onto another page's slug is numbered; onto its own is a no-op", () => {
+    const { pm } = makeHarness();
+    pm.createPage("About");
+    const team = pm.createPage("Team");
+    pm.updatePage(team.id, { name: "About", slug: "about" });
+    expect(pm.getPage(team.id)?.slug).toBe("about-2");
+    pm.updatePage(team.id, { slug: "about-2" });
+    expect(pm.getPage(team.id)?.slug).toBe("about-2");
+  });
+});

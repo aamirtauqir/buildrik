@@ -86,7 +86,7 @@ describe("sites.publish — acknowledgeStale requires ADMIN (S-7 / PD-9)", () =>
   it("an EDITOR publishing WITHOUT acknowledgeStale needs only EDITOR", async () => {
     checkSiteRoleMock.mockResolvedValueOnce(undefined); // EDITOR gate only
     const caller = sitesRouter.createCaller(ctx() as never);
-    await expect(caller.publish({ siteId: "s1", pages: [] } as never)).resolves.toEqual({ jobId: "job_1" });
+    await expect(caller.publish({ siteId: "s1", pages: [], expectedLastEditedAt: "2026-10-08T10:00:00.000Z" } as never)).resolves.toEqual({ jobId: "job_1" });
     expect(checkSiteRoleMock).toHaveBeenCalledTimes(1);
     expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u_1", "s1", "EDITOR");
   });
@@ -97,7 +97,7 @@ describe("sites.publish — acknowledgeStale requires ADMIN (S-7 / PD-9)", () =>
       .mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs ADMIN")); // ADMIN gate for acknowledgeStale
     const caller = sitesRouter.createCaller(ctx() as never);
     await expect(
-      caller.publish({ siteId: "s1", pages: [], acknowledgeStale: true } as never),
+      caller.publish({ siteId: "s1", pages: [], expectedLastEditedAt: "2026-10-08T10:00:00.000Z", acknowledgeStale: true } as never),
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
     expect(startPublishMock).not.toHaveBeenCalled();
   });
@@ -108,10 +108,30 @@ describe("sites.publish — acknowledgeStale requires ADMIN (S-7 / PD-9)", () =>
       .mockResolvedValueOnce(undefined); // ADMIN gate
     const caller = sitesRouter.createCaller(ctx() as never);
     await expect(
-      caller.publish({ siteId: "s1", pages: [], acknowledgeStale: true } as never),
+      caller.publish({ siteId: "s1", pages: [], expectedLastEditedAt: "2026-10-08T10:00:00.000Z", acknowledgeStale: true } as never),
     ).resolves.toEqual({ jobId: "job_1" });
-    expect(startPublishMock).toHaveBeenCalledWith("s1", "ws_1", "u_1", [], true, {
-      expectedLastEditedAt: undefined,
+    expect(startPublishMock).toHaveBeenCalledWith("s1", "u_1", [], true, {
+      expectedLastEditedAt: "2026-10-08T10:00:00.000Z",
+    });
+  });
+});
+
+/* P2-3 (2026-10-08 audit): the router rewrote VERCEL_NOT_CONNECTED into a
+   sentence, and the editor's "Vercel not connected · Open settings" toast
+   matches the code — so the pre-job refusal fell through to a generic
+   "Publish failed". The code now rides along as `cause.reason`, which the
+   errorFormatter forwards to the client as `data.cause`. */
+describe("sites.publish — Vercel not connected", () => {
+  it("carries the stable reason code alongside the sentence", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    startPublishMock.mockRejectedValueOnce(new Error("VERCEL_NOT_CONNECTED"));
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await expect(
+      caller.publish({ siteId: "s1", pages: [], expectedLastEditedAt: "2026-10-08T10:00:00.000Z" } as never),
+    ).rejects.toMatchObject({
+      code: "PRECONDITION_FAILED",
+      message: "Connect this workspace to Vercel before publishing.",
+      cause: expect.objectContaining({ reason: "VERCEL_NOT_CONNECTED" }),
     });
   });
 });

@@ -6,6 +6,8 @@
  * @license BSD-3-Clause
  */
 
+import type { Composer } from "../../Composer";
+import { activeBreakpoint, stylesAt, writeCanvasStyles } from "../../commands/commandOperations";
 import { scaleBounds } from "./resizeMath";
 import type { TransformBounds, ResizeState } from "./types";
 import { getDOMElement } from "./utils";
@@ -101,47 +103,31 @@ function clampToConstraints(
 
 /**
  * Apply bounds to element model
- * Updates width, height, position, and rotation in data model
+ * Updates width, height, position, and rotation in data model — at the
+ * active breakpoint and through the lock gate (writeCanvasStyles): a resize on
+ * Tablet is a tablet override, and a locked element is not resized. It wrote
+ * the base styles at every device, unchecked, until audit 2026-10-08 P1-2.
  */
-export function applyBoundsToModel(
-  elementId: string,
-  bounds: TransformBounds,
-  composer: {
-    elements: {
-      getElement(id: string):
-        | {
-            getStyle?(prop: string): string | undefined;
-            setStyle?(prop: string, value: string): void;
-          }
-        | null
-        | undefined;
-    };
-    markDirty?(): void;
-  }
-): void {
+export function applyBoundsToModel(elementId: string, bounds: TransformBounds, composer: Composer): void {
   const element = composer.elements.getElement(elementId);
   if (!element) return;
 
-  element.setStyle?.(
-    "width",
-    `${clampToConstraints(Math.round(bounds.width), element.getStyle?.("min-width"), element.getStyle?.("max-width"))}px`
-  );
-  element.setStyle?.(
-    "height",
-    `${clampToConstraints(Math.round(bounds.height), element.getStyle?.("min-height"), element.getStyle?.("max-height"))}px`
-  );
+  const current = stylesAt(composer, element, activeBreakpoint(composer));
+  const styles: Record<string, string> = {
+    width: `${clampToConstraints(Math.round(bounds.width), current["min-width"], current["max-width"])}px`,
+    height: `${clampToConstraints(Math.round(bounds.height), current["min-height"], current["max-height"])}px`,
+  };
 
-  const position = element.getStyle?.("position");
-  if (position === "absolute" || position === "fixed") {
-    element.setStyle?.("left", `${Math.round(bounds.x)}px`);
-    element.setStyle?.("top", `${Math.round(bounds.y)}px`);
+  if (current.position === "absolute" || current.position === "fixed") {
+    styles.left = `${Math.round(bounds.x)}px`;
+    styles.top = `${Math.round(bounds.y)}px`;
   }
 
   if (bounds.rotation !== undefined && bounds.rotation !== 0) {
-    element.setStyle?.("transform", `rotate(${bounds.rotation}deg)`);
+    styles.transform = `rotate(${bounds.rotation}deg)`;
   }
 
-  composer.markDirty?.();
+  writeCanvasStyles(composer, element, "resize-element", styles);
 }
 
 /**
@@ -151,18 +137,7 @@ export function applyBoundsToModel(
 export function applyMultiResizeToModel(
   state: ResizeState,
   primaryBounds: TransformBounds,
-  composer: {
-    elements: {
-      getElement(id: string):
-        | {
-            getStyle?(prop: string): string | undefined;
-            setStyle?(prop: string, value: string): void;
-          }
-        | null
-        | undefined;
-    };
-    markDirty?(): void;
-  }
+  composer: Composer
 ): void {
   for (const elId of state.additionalElementIds) {
     const elStartBounds = state.additionalStartBounds.get(elId);
@@ -181,17 +156,7 @@ export function expandParent(
   parentElement: HTMLElement,
   newWidth: number,
   newHeight: number,
-  composer: {
-    elements: {
-      getElement(id: string):
-        | {
-            getStyle?(prop: string): string | undefined;
-            setStyle?(prop: string, value: string): void;
-          }
-        | null
-        | undefined;
-    };
-  }
+  composer: Composer
 ): void {
   expandParentDOM(parentElement, newWidth, newHeight);
 
@@ -201,14 +166,12 @@ export function expandParent(
        cannot have. Growing a parent to fit a resized child is a different
        intent, but the browser clamps the parent's box against its own
        min/max exactly the same way, so an unclamped write leaves the model
-       holding a width the parent never renders at. */
-    parentModel.setStyle?.(
-      "width",
-      `${clampToConstraints(Math.round(newWidth), parentModel.getStyle?.("min-width"), parentModel.getStyle?.("max-width"))}px`
-    );
-    parentModel.setStyle?.(
-      "height",
-      `${clampToConstraints(Math.round(newHeight), parentModel.getStyle?.("min-height"), parentModel.getStyle?.("max-height"))}px`
-    );
+       holding a width the parent never renders at. Same breakpoint + lock
+       rules too (writeCanvasStyles). */
+    const current = stylesAt(composer, parentModel, activeBreakpoint(composer));
+    writeCanvasStyles(composer, parentModel, "resize-element", {
+      width: `${clampToConstraints(Math.round(newWidth), current["min-width"], current["max-width"])}px`,
+      height: `${clampToConstraints(Math.round(newHeight), current["min-height"], current["max-height"])}px`,
+    });
   }
 }

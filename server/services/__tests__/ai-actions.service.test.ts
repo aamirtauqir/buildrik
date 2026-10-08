@@ -47,7 +47,7 @@ describe("privileged-action registry", () => {
     // M3: a designer (EDITOR) may publish, same as the sites.publish route; the
     // approval gate in startPublish is the real control below OWNER.
     expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u1", "s1", "EDITOR");
-    expect(startPublishMock).toHaveBeenCalledWith("s1", "ws-1", "u1", []);
+    expect(startPublishMock).toHaveBeenCalledWith("s1", "u1", []);
   });
 
   it("propagates a permission failure (does not publish)", async () => {

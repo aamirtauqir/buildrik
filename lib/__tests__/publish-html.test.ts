@@ -115,6 +115,27 @@ describe("the rest of the head the worker adds", () => {
     expect(publishPage("index.html", page("H"), { allowIndexing: true })).not.toContain("noindex");
   });
 
+  /* SEO-2: a page's own robots tag (e.g. "Follow links" off → nofollow) used
+     to make the worker skip its noindex, so the page shipped indexable while
+     the site's "Allow indexing" was off. */
+  it("with indexing off, a page's own robots tag still gets noindex", () => {
+    const withOwn = (content: string) =>
+      `<!doctype html><html><head><title>A</title><meta name="robots" content="${content}"></head><body></body></html>`;
+    const robotsOf = (html: string) => html.match(/<meta name="robots"[^>]*>/g) ?? [];
+
+    const nofollowPage = publishPage("about.html", withOwn("nofollow"), { allowIndexing: false });
+    expect(robotsOf(nofollowPage)).toEqual(['<meta name="robots" content="noindex,nofollow">']);
+
+    // The page's other directives survive; an explicit "index" does not.
+    const ownDirectives = publishPage("about.html", withOwn("index, follow, noarchive"), { allowIndexing: false });
+    expect(robotsOf(ownDirectives)).toEqual(['<meta name="robots" content="noindex,nofollow,noarchive">']);
+
+    // Indexing on: the page's own tag is left exactly as it was.
+    expect(robotsOf(publishPage("about.html", withOwn("nofollow"), { allowIndexing: true }))).toEqual([
+      '<meta name="robots" content="nofollow">',
+    ]);
+  });
+
   it("ships the icons stored on the site row", () => {
     const html = publishPage("index.html", page("H"), {
       icons: { favicon: "/f.ico", touchIcon: "/t.png", ogImage: "https://cdn/og.png" },

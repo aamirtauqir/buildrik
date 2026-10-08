@@ -13,7 +13,13 @@ import type { Composer } from "../../../engine";
 import type { BlockData, ElementType } from "../../../shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "../../../shared/utils/dragDrop/animations";
-import { canNestElement, getSuggestedParents } from "../../../shared/utils/nesting";
+import {
+  canNestElement,
+  ELEMENT_CATEGORIES,
+  ElementCategory,
+  getSuggestedParents,
+} from "../../../shared/utils/nesting";
+import { writableElements } from "@/engine/commands/commandOperations";
 import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { elementLocation, getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
 
@@ -82,6 +88,10 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
         const replaceId = takeReplaceTarget(composer);
         const replaced = replaceId ? composer.elements.getElement(replaceId) : undefined;
         const replacedParent = replaced?.getParent();
+        /* The block takes the marked element's place, so a locked one refuses
+           the whole replace (the lock gate says so) — it used to be removed
+           (audit 2026-10-08 P1-3). */
+        if (replaced && writableElements(composer, [replaced]).length === 0) return;
 
         if (replaced && replacedParent) {
           parentId = replacedParent.getId();
@@ -94,10 +104,14 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
             let isSelected = true;
 
             while (candidate) {
-              const canContain = canNestElement(
-                def.elementType,
-                candidate.getType() as ElementType
-              );
+              const candidateType = candidate.getType() as ElementType;
+              /* A selected text element (heading, paragraph, text, label) is
+                 never the target: the rules let it hold blocks, so Add → Divider
+                 produced <h2>Heading<hr></h2> (audit L1-001). The block goes
+                 after it instead. */
+              const textLeaf =
+                isSelected && (ELEMENT_CATEGORIES[candidateType] ?? []).includes(ElementCategory.TEXT);
+              const canContain = !textLeaf && canNestElement(def.elementType, candidateType);
               if (canContain) {
                 if (isSelected) {
                   // Selected itself accepts the block: insert inside at end.

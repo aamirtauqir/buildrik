@@ -75,6 +75,14 @@ describe("INSPECTOR_MENU — board 30, nothing else", () => {
     }
   });
 
+  /* Audit 2026-10-08 P1-3: Replace-with-block deleted a locked section. */
+  it("Replace with block is disabled, with its reason, on a locked element", () => {
+    const section = add("section");
+    expect(ELEMENT_ACTIONS["replace-with-block"].isEnabled!(ctxFor(section))).toBe(true);
+    section.setLocked(true);
+    expect(ELEMENT_ACTIONS["replace-with-block"].isEnabled!(ctxFor(section))).toBe("Unlock it to replace it");
+  });
+
   it("a locked element offers Unlock in Lock's place", () => {
     h3.setLocked(true);
     const rows = visibleRows(ctxFor(h3));

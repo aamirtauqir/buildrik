@@ -55,11 +55,12 @@ function bucketAndKey(
       return null;
   }
 
-  // Strip `${kind}-` prefix from id; fall back to lowercased name.
+  // Strip `${kind}-` prefix from id; fall back to the slugged name — a
+  // placeholder cannot carry the spaces of "Radius None" (audit L2-001).
   const prefix = `${kind}-`;
   const key = token.id.startsWith(prefix)
     ? token.id.slice(prefix.length)
-    : token.name.toLowerCase();
+    : token.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   return { bucket, key };
 }
 

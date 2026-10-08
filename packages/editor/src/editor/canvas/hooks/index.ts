@@ -92,6 +92,7 @@ export { useCanvasContent } from "./useCanvasContent";
 export { useSliderRuntime } from "./useSliderRuntime";
 export { useCountdownRuntime } from "./useCountdownRuntime";
 export { useAccordionRuntime } from "./useAccordionRuntime";
+export { useCanvasEditorFlags } from "./useCanvasEditorFlags";
 export {
   useCanvasContextMenu,
   type ContextMenuState,

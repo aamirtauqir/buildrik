@@ -72,8 +72,27 @@ export async function instantiateComponent(
   const component = maps.components.get(componentId);
   if (!component) return null;
 
-  const requested = composer.elements.getElement(parentId);
+  let requested = composer.elements.getElement(parentId);
   if (!requested) return null;
+
+  /* L2-006: an instance's children are its master's, so a target that is an
+     instance (or inside one) never takes the new instance as a child — that
+     nested a card in the selected card. It goes right after the outermost
+     instance root instead. */
+  let afterInstance: Element | null = null;
+  let host = findInstanceContainingElement(composer, maps.instances, requested.getId());
+  while (host) {
+    const el = composer.elements.getElement(host.elementId);
+    if (!el) break;
+    afterInstance = el;
+    const up = el.getParent();
+    host = up ? findInstanceContainingElement(composer, maps.instances, up.getId()) : null;
+  }
+  const hostParent = afterInstance?.getParent();
+  if (afterInstance && hostParent) {
+    requested = hostParent;
+    _index = hostParent.getChildIndex(afterInstance) + 1;
+  }
 
   /* Put the instance where it can legally live. Callers pass whatever is
      SELECTED — the components panel does, twice — so inserting a card with a

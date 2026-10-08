@@ -127,26 +127,4 @@ export const ControlRow: React.FC<ControlRowProps> = ({
   );
 };
 
-export const CompactRow: React.FC<Omit<ControlRowProps, "variant">> = (props) => (
-  <ControlRow {...props} variant="compact" labelWidth="sm" />
-);
-
-export const StackedRow: React.FC<Omit<ControlRowProps, "variant">> = (props) => (
-  <ControlRow {...props} variant="stacked" />
-);
-
-export interface SubTitleProps {
-  children: React.ReactNode;
-  marginTop?: number;
-}
-
-export const SubTitle: React.FC<SubTitleProps> = ({ children, marginTop = 6 }) => (
-  <div
-    className="bdi-sub-label"
-    style={{ marginTop }}
-  >
-    {children}
-  </div>
-);
-
 export default ControlRow;

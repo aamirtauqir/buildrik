@@ -51,6 +51,7 @@ import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
 import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
 import { submitForReview } from "../../services/ReviewService";
+import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
@@ -379,15 +380,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     };
   }, [composer]);
 
-  // The Issues panel had a state slot but no producer, so it rendered "No
-  // issues" no matter how many the DS linter had found. `useIssuesFeed`
-  // bridges DS-lint (designSystem.lintState) live, and — B-15 / A02-9's
-  // decision-free fix — folds in the page-content scanner (missing alt,
-  // broken links) and the SAME pre-publish check list the Publish panel
-  // renders verbatim, so Issues and Publish stop disagreeing about what's
-  // wrong with the site.
-  const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues);
-
   // 60-save-states: track connectivity so the topbar can reassure "changes
   // queued, will sync" instead of looking like a failed/lost save.
   const [isOffline, setIsOffline] = React.useState(() => typeof navigator !== "undefined" && !navigator.onLine);
@@ -429,6 +421,19 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     addToast,
     setExportLoading: modals.setExportLoading,
+  });
+  // The Issues panel had a state slot but no producer, so it rendered "No
+  // issues" no matter how many the DS linter had found. `useIssuesFeed`
+  // bridges DS-lint (designSystem.lintState) live, and — B-15 / A02-9's
+  // decision-free fix — folds in the page-content scanner (missing alt,
+  // broken links) and the SAME pre-publish check list the Publish panel
+  // renders verbatim, so Issues and Publish stop disagreeing about what's
+  // wrong with the site.
+  // Its server check rows re-read when a publish settles and when the panel
+  // opens (IR-1), as well as after a save and on return to the tab.
+  const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues, {
+    publishState: publishJob.uiState,
+    panelOpen: issuesOpen,
   });
 
   /* ── The site's ONE next move, derived once (B4, decision #34) ────────────
@@ -595,10 +600,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
          engine's usage tracker knows), else the Brand panel where the
          token lives. Never a dead click. */
       onSelectElement={(issue) => {
-        const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
-        const ids = [issue.elementId, ...refs.map((r) => r.elementId)].filter((id): id is string => Boolean(id));
-        const target = ids.map((id) => composer.elements.getElement(id)).find((el) => el != null);
         setIssuesOpen(false);
+        /* An element-bound issue may live on another page ("Whole site"):
+           the registry is site-wide, so selecting alone left the canvas on
+           the current page with an invisible selection. Page first, then
+           select and scroll — the one locate seam Review and Forms use. */
+        if (issue.elementId && locateComment(composer, { pageId: issue.pageId ?? null, targetSelector: issue.elementId }) === "located") return;
+        const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
+        const target = refs.map((r) => composer.elements.getElement(r.elementId)).find((el) => el != null);
         if (target) composer.selection.select(target);
         /* Brand ON the issue's token — it landed on the first colour
            row (walk B9: color-primary opened color-action). */

@@ -22,7 +22,21 @@ export class SelectionManager {
 
   constructor(composer: Composer) {
     this.composer = composer;
+    composer.on(EVENTS.PAGE_CHANGED, this.dropOffPageSelection);
   }
+
+  /* L3-002: a selection survived a page switch, and the Add panel's smart
+     placement inserted next to it — on the page no longer shown. A switch drops
+     any selection whose tree is not the newly active page's. */
+  private dropOffPageSelection = (): void => {
+    const rootId = this.composer.elements.getActivePage()?.root.id;
+    const offPage = Array.from(this.multiSelected).some((el) => {
+      let top: Element = el;
+      for (let p = top.getParent(); p; p = p.getParent()) top = p;
+      return top.getId() !== rootId;
+    });
+    if (offPage) this.clear();
+  };
 
   /**
    * Select an element
@@ -323,6 +337,7 @@ export class SelectionManager {
    * Destroy selection manager
    */
   destroy(): void {
+    this.composer.off(EVENTS.PAGE_CHANGED, this.dropOffPageSelection);
     this.clear();
   }
 }

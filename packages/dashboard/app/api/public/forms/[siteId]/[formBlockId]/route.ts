@@ -47,7 +47,15 @@ export async function POST(
   );
   let parsedJson: unknown;
   if (isForm) {
-    const fields = Object.fromEntries(new URLSearchParams(raw).entries());
+    /* A checkbox group posts one key per ticked box; Object.fromEntries kept
+       only the last, silently losing the rest (audit L3-024). Repeated values
+       are kept, joined in the order sent. */
+    const joined = new Map<string, string>();
+    for (const [key, value] of new URLSearchParams(raw)) {
+      const prior = joined.get(key);
+      joined.set(key, prior === undefined ? value : `${prior}, ${value}`);
+    }
+    const fields = Object.fromEntries(joined);
     const { _honeypot, _return, ...data } = fields;
     parsedJson = {
       data,

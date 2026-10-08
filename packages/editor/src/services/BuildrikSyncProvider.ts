@@ -137,9 +137,11 @@ export function keepStoredTokensOnSave(siteId: string): void {
   _storedTokensKept.add(siteId);
 }
 
-/** Whether the open site's Site-column settings loaded. Publish reads it. */
+/** Whether the open site's Site-column settings loaded. Publish reads it.
+ *  A site no load ever reached has no columns either — this answered true for
+ *  it, so a failed project load published the fallback with an empty <head>. */
 export function siteColumnsLoaded(siteId: string): boolean {
-  return !_siteColumnsMissing.has(siteId);
+  return _loadedSites.has(siteId) && !_siteColumnsMissing.has(siteId);
 }
 
 /* Sites the server says do not exist. A refused save is not the same story for

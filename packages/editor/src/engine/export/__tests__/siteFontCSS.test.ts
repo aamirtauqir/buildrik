@@ -14,9 +14,9 @@ describe("siteFontCSS", () => {
     expect(css).toContain("code,pre,kbd,samp{font-family:IBM Plex Mono,monospace}");
   });
 
-  it("carries the site's text colour on body", () => {
+  it("carries the site's text colour on body through its token, so Dark mode repaints it", () => {
     expect(siteFontCSS({ body: "Verdana", text: "#334155" })).toContain(
-      "body{font-family:Verdana,sans-serif;color:#334155}"
+      "body{font-family:Verdana,sans-serif;color:var(--buildrick-design-color-text,#334155)}"
     );
   });
 

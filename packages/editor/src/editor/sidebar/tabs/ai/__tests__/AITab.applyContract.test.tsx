@@ -46,9 +46,10 @@ describe("applyAiEdit — the board's one-undo-step promise", () => {
     expect(calls[calls.length - 1]).toBe("end");
   });
 
-  /* A bad element id must not split the batch — the transaction still closes,
-     so the partial edit is one undoable entry rather than none. */
-  it("still closes the transaction when a command throws", async () => {
+  /* An unknown command is skipped, not an error: the transaction still
+     closes normally. (A command that THROWS rolls the batch back instead —
+     see applyAiEdit.integrity.integration.test.ts.) */
+  it("still closes the transaction when a command is unknown", async () => {
     const { composer, calls } = makeComposer();
 
     await applyAiEdit(composer, {

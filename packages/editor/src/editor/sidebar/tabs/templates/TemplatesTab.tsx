@@ -12,6 +12,7 @@
 
 import * as React from "react";
 import { useToast, Button, openUpgrade } from "@/editor/chrome-ui";
+import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
 import { X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -150,6 +151,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   // P6 permissions boards: applying a template rewrites the whole page —
   // admin-scoped. Non-admins get the reason, not a silent no-op.
   const canApplyTemplate = roleAtLeast(useEditorRole(), "ADMIN") !== false;
+  /* L2-009: the Pro gate never read the plan, so a BUSINESS workspace was told
+     "requires the Pro plan". Only the starter (FREE) tier is gated. */
+  const isLockedPremium = (t: { status?: string }) =>
+    t.status === "premium" && getEditorPlanTier() === "starter";
   function denyApply(): boolean {
     if (canApplyTemplate) return false;
     addToast({ description: "Only an admin can apply a template", tone: "warning" });
@@ -163,7 +168,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     if (denyApply()) return;
     const t = findTemplate(id);
     if (!t) return;
-    if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
+    if (isLockedPremium(t)) { openUpgrade({ feature: t.name }); return; }
     addAsNewPageRef.current = false;
     pendingId.current = id;
     if (hasExistingContent) sel.setShowReplace(true);
@@ -206,7 +211,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     if (denyApply()) return;
     const t = findTemplate(id);
     if (!t) return;
-    if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
+    if (isLockedPremium(t)) { openUpgrade({ feature: t.name }); return; }
     setCreateConfirmId(id);
   }
 

@@ -250,7 +250,11 @@ export function usePageSettings(
         settings: {
           visibility,
           head: customHead || undefined,
+          /* Merged over what the page holds: the form owns only these
+             fields, and canonical URL / structured data / Twitter fields
+             (set by import, API or templates) ship too. */
           seo: {
+            ...page.seo,
             metaTitle: seoTitle || undefined,
             metaDescription: seoDesc || undefined,
             ogTitle: ogTitle || undefined,

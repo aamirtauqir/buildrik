@@ -35,6 +35,8 @@ const asElement = (m: MockElement): Element => m as unknown as Element;
 
 interface MockComposer {
   emit: ReturnType<typeof vi.fn>;
+  on: ReturnType<typeof vi.fn>;
+  off: ReturnType<typeof vi.fn>;
   elements: {
     getActivePage: ReturnType<typeof vi.fn>;
     getElement: ReturnType<typeof vi.fn>;
@@ -44,6 +46,8 @@ interface MockComposer {
 function makeMockComposer(): MockComposer {
   return {
     emit: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
     elements: {
       getActivePage: vi.fn(() => null),
       getElement: vi.fn(() => null),

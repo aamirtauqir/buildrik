@@ -26,7 +26,10 @@ beforeAll(() => {
   };
 });
 
-function exportCSSWithFonts(tokens: Array<{ id: string; value: string }>): string {
+function exportCSSWithFonts(
+  tokens: Array<{ id: string; value: string; dark?: string }>,
+  extra: Record<string, unknown> = {}
+): string {
   const composer = new Composer({} as never);
   composer.importProject({
     pages: [
@@ -41,6 +44,7 @@ function exportCSSWithFonts(tokens: Array<{ id: string; value: string }>): strin
   composer.setProjectSettings({
     ...composer.getProjectSettings(),
     designTokens: tokens.map((t) => v6Token({ ...t, kind: "type", category: "typography", type: "string" })),
+    ...extra,
   } as never);
   return new ExportEngine(composer).generateCSS();
 }
@@ -70,7 +74,18 @@ describe("the published page carries the site's own fonts", () => {
       { id: "font-body", value: "Verdana" },
       { id: "color-text", value: "#334155" },
     ]);
-    expect(css).toContain("color:#334155");
+    expect(css).toContain("color:var(--buildrick-design-color-text,#334155)");
+  });
+
+  it("flips the body text in Dark mode: the body rule reads the token the dark block redefines", () => {
+    const css = exportCSSWithFonts(
+      [{ id: "color-text", value: "#334155", dark: "#E5E7EB" }],
+      { darkMode: "auto" }
+    );
+    expect(css).toMatch(/body\{[^}]*color:var\(--buildrick-design-color-text/);
+    expect(css).not.toMatch(/body\{[^}]*color:#334155/);
+    expect(css).toContain(':root[data-theme="dark"]{');
+    expect(css).toMatch(/:root\[data-theme="dark"\]\{[^}]*--buildrick-design-color-text:#E5E7EB/);
   });
 
   it("says nothing when the site carries no font tokens", () => {

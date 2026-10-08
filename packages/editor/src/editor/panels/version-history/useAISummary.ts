@@ -22,8 +22,27 @@ import * as React from "react";
 import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
 import type { AISummaryState } from "./AIPanel";
 import { aiTrpcClient } from "@/services/ai/AiTrpcClient";
+import { AI_SUMMARY_LIMITS } from "@buildrik/shared/schemas/ai";
 
 const AI_COOLDOWN_MS = 60_000;
+
+/** A comparison trimmed to what `ai.summarize` accepts. compareVersions caps
+ *  nothing, and an over-limit diff was refused whole ("AI summary
+ *  unavailable"); the server only reads the first few changes anyway. The
+ *  summary counts are kept as they are. */
+function withinSummaryLimits(compare: CompareResult): CompareResult {
+  const L = AI_SUMMARY_LIMITS;
+  return {
+    ...compare,
+    elementName: compare.elementName.slice(0, L.elementName),
+    changes: compare.changes.slice(0, L.changes).map((c) => ({
+      ...c,
+      property: c.property.slice(0, L.property),
+      before: c.before.slice(0, L.value),
+      after: c.after.slice(0, L.value),
+    })),
+  };
+}
 
 export interface UseAISummaryArgs {
   versions: NamedVersion[];
@@ -110,7 +129,10 @@ export function useAISummary({
         /* `versionName` is `.min(1)` on the server: an unnamed version sent
            "" and was refused before the model was ever asked. */
         const response = await aiTrpcClient
-          .summarize({ versionName: version?.name || "Untitled", changes: compareData })
+          .summarize({
+            versionName: (version?.name || "Untitled").slice(0, AI_SUMMARY_LIMITS.versionName),
+            changes: withinSummaryLimits(compareData),
+          })
           .catch(() => {
             throw new Error("AI summary unavailable");
           });

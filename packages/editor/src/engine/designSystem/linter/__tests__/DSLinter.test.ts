@@ -149,7 +149,7 @@ describe("DSLinter.lint", () => {
       makeColor("color-primary", "#2D6DFF", "#8B5CF6"),
     ];
     const issues = new DSLinter().lint(tokens);
-    expect(issues.some((i) => i.rule === "banned-hue" && i.message.includes("darkValue"))).toBe(true);
+    expect(issues.some((i) => i.rule === "banned-hue" && i.message.includes("dark value"))).toBe(true);
   });
 
   it("flags pure black (#000, #000000, 'black')", () => {
@@ -167,7 +167,7 @@ describe("DSLinter.lint", () => {
       makeColor("color-primary", "#fff", "#000000"),
     ];
     const issues = new DSLinter().lint(tokens);
-    expect(issues.some((i) => i.rule === "pure-black" && i.message.includes("darkValue"))).toBe(true);
+    expect(issues.some((i) => i.rule === "pure-black" && i.message.includes("dark value"))).toBe(true);
   });
 
   it("flags empty value (color token: warning, non-color token: error)", () => {
@@ -203,6 +203,19 @@ describe("DSLinter.lint", () => {
     const missing = issues.filter((i) => i.rule === "missing-dark");
     expect(missing.map((i) => i.tokenId).sort()).toEqual(["color-muted", "color-text"]);
     expect(missing.every((i) => i.severity === "warning")).toBe(true);
+  });
+
+  it("speaks to people, never in field names: no 'darkValue' in any message", () => {
+    const tokens = [
+      makeColor("color-primary", "#2D6DFF", "#8B5CF6"),
+      makeColor("color-ink", "#fff", "#000000"),
+      makeColor("color-text", "#334155"),
+    ];
+    const messages = new DSLinter().lint(tokens).map((i) => i.message);
+    expect(messages.length).toBeGreaterThanOrEqual(3);
+    for (const m of messages) expect(m).not.toMatch(/darkValue/);
+    const missing = new DSLinter().lint(tokens).find((i) => i.rule === "missing-dark" && i.tokenId === "color-text");
+    expect(missing?.message).toMatch(/No dark value/);
   });
 
   it("missing-dark: never asks a primitive, which cannot carry a dark mode (v6)", () => {

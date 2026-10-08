@@ -228,6 +228,8 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
     icon: "layout",
     /* Blocks are sections; offering to replace a heading with a hero is noise. */
     isVisible: ({ element, isRoot }) => !isRoot && SECTION_TYPES.has(element.getType?.() ?? ""),
+    /* Replacing deletes the element: a lock refuses it (audit 2026-10-08 P1-3). */
+    isEnabled: ({ element }) => (element.isLocked?.() ? "Unlock it to replace it" : true),
     run: ({ composer, element }) => {
       composer.selection.select(element as never);
       composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });

@@ -8,6 +8,8 @@
 
 import { snapToGrid } from "../../shared/utils/dragDrop";
 import { EVENTS } from "../../shared/constants/events";
+import { isValidBreakpoint } from "../../shared/constants/breakpoints";
+import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 
@@ -223,6 +225,73 @@ export function writeElement<T extends Element>(
     composer.endTransaction?.();
   }
   return true;
+}
+
+/**
+ * The breakpoint an edit made on the canvas belongs to: the composer's device
+ * (the shell keeps it in step with the device switcher). "wide" has no
+ * override layer of its own, so it edits the base — as the Inspector does
+ * (ProInspector maps an unknown device to desktop).
+ */
+export function activeBreakpoint(composer: Pick<Composer, "device">): BreakpointId {
+  const device = composer.device;
+  return device && isValidBreakpoint(device) ? device : "desktop";
+}
+
+/**
+ * The element's styles as they apply at `breakpoint`: the base, with that
+ * breakpoint's override on top. The read side of setStyleAt.
+ */
+export function stylesAt(
+  composer: Pick<Composer, "styles"> | null | undefined,
+  el: Element,
+  breakpoint: BreakpointId,
+): Record<string, string> {
+  const base = { ...(el.getStyles?.() || {}) };
+  if (breakpoint === "desktop" || !composer?.styles) return base;
+  return { ...base, ...composer.styles.getBreakpointStyle(el.getId(), breakpoint) };
+}
+
+/**
+ * Set (or, with "", remove) one style property at `breakpoint` — the element's
+ * base styles on desktop, its override rule on tablet/mobile. The one branch
+ * the Inspector and the canvas-direct writes share. No lock check and no
+ * transaction: callers run it inside writeElement / writableElements.
+ */
+export function setStyleAt(
+  composer: Pick<Composer, "styles"> | null | undefined,
+  el: Element,
+  breakpoint: BreakpointId,
+  property: string,
+  value: string,
+): void {
+  if (breakpoint === "desktop") {
+    if (value === "") el.removeStyle?.(property);
+    else el.setStyle?.(property, value);
+  } else if (value === "") {
+    composer?.styles?.removeBreakpointStyleProperty(el.getId(), breakpoint, property);
+  } else {
+    composer?.styles?.setBreakpointStyle(el.getId(), breakpoint, { [property]: value });
+  }
+}
+
+/**
+ * A style write made directly on the canvas (resize handles, keyboard resize,
+ * spacing spots, keyboard nudge): refused when the element is locked (the
+ * "locked" toast), written at the active breakpoint, one undo step. These
+ * paths used to call `element.setStyle` — base styles at every device, no lock
+ * check (audit 2026-10-08 P1-2/P1-3). Returns whether the write ran.
+ */
+export function writeCanvasStyles(
+  composer: Composer,
+  element: Element | null | undefined,
+  label: string,
+  styles: Record<string, string>,
+): boolean {
+  const breakpoint = activeBreakpoint(composer);
+  return writeElement(composer, element, label, (el) => {
+    for (const [property, value] of Object.entries(styles)) setStyleAt(composer, el, breakpoint, property, value);
+  });
 }
 
 /**

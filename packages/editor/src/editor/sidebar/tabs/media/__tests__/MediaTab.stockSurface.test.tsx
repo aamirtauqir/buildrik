@@ -28,7 +28,7 @@ vi.mock("../hooks/useMediaWriteAccess", () => ({
 const discSearchAll = vi.fn();
 const saveToLibrary = vi.fn();
 const mediaState = vi.hoisted(() => ({
-  searchFailed: null as string | null,
+  searchFailed: { img: null as string | null, vid: null as string | null },
   discoverySearch: "",
 }));
 vi.mock("../hooks/useMediaState", () => ({
@@ -168,7 +168,7 @@ describe("MediaTab — FC-6: the drawer's stock door opens StockSourceModal", ()
   });
 
   it("the search-failure copy renders inside the drawer's StockSourceModal", () => {
-    mediaState.searchFailed = "not-configured";
+    mediaState.searchFailed = { img: "not-configured", vid: null };
     mediaState.discoverySearch = "cats";
     render(
       <ToastProvider>
@@ -176,7 +176,7 @@ describe("MediaTab — FC-6: the drawer's stock door opens StockSourceModal", ()
       </ToastProvider>,
     );
     expect(screen.getByRole("alert").textContent).toMatch(/not set up|isn't configured|not configured/i);
-    mediaState.searchFailed = null;
+    mediaState.searchFailed = { img: null, vid: null };
     mediaState.discoverySearch = "";
   });
 });

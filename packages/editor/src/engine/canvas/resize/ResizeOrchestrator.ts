@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import type { Composer } from "../../Composer";
 import { applyConstraints, applyBoundaryConstraints } from "./ConstraintManager";
 import { expandParent } from "./DOMUpdater";
 import {
@@ -36,16 +37,7 @@ export function calculateResizeBounds(
   state: ResizeState,
   mouseX: number,
   mouseY: number,
-  composer: {
-    elements: {
-      getElement(id: string):
-        | {
-            setStyle?(prop: string, value: string): void;
-          }
-        | null
-        | undefined;
-    };
-  }
+  composer: Composer
 ): TransformBounds {
   const { handle, startBounds, startMouse, constraints, modifiers, snap, centerPoint } = state;
 

@@ -543,6 +543,10 @@ export class ComponentManager {
       relinked++;
     }
     if (relinked > 0) this.composer.markDirty();
+    /* The server mirror re-upserts on COMPONENT_CREATED; without it the undone
+       delete stayed deleted on the server and came back after a reload
+       (audit L2-010). */
+    this.composer.emit(EVENTS.COMPONENT_CREATED, { component });
     this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, { components: this.getAllComponents() });
     return relinked;
   }

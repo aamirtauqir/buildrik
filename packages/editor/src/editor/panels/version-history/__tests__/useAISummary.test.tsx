@@ -20,7 +20,11 @@ import { useAISummary } from "../useAISummary";
 import type { NamedVersion, CompareResult } from "../../../../shared/types/versions";
 
 const BASE = 1_000_000;
-const compare = { summary: { added: 1, removed: 0, modified: 0 } } as unknown as CompareResult;
+const compare = {
+  elementName: "Page",
+  changes: [],
+  summary: { added: 1, removed: 0, modified: 0 },
+} as unknown as CompareResult;
 
 function version(id: string, extra: Partial<NamedVersion> = {}): NamedVersion {
   return { id, name: `Version ${id}`, ...extra } as unknown as NamedVersion;
@@ -190,5 +194,43 @@ describe("useAISummary — rate limiting", () => {
       vi.setSystemTime(BASE + 30_000);
     });
     expect(result.current.getCooldownSeconds("v1")).toBe(30);
+  });
+});
+
+/* `ai.summarize` refuses more than 200 changes or a before/after over 2000
+   characters, and compareVersions caps neither — so any big version came back
+   "AI summary unavailable". The hook trims to the server's limits instead. */
+describe("useAISummary — server limits", () => {
+  it("sends at most 200 changes, each value within 2000 characters", async () => {
+    summaryResolves("Big diff");
+    const updateAiSummary = vi.fn().mockResolvedValue(undefined);
+    const big = {
+      elementName: "e".repeat(500),
+      summary: { style: 500, text: 0, layout: 0, content: 0, other: 0 },
+      changes: Array.from({ length: 500 }, (_, i) => ({
+        type: "style",
+        property: `p${i}`.padEnd(300, "x"),
+        before: "b".repeat(5000),
+        after: "a".repeat(5000),
+      })),
+    } as unknown as CompareResult;
+    const { result } = renderHook(() =>
+      useAISummary({ versions: [version("v1", { name: "n".repeat(500) })], compareResults: { v1: big }, updateAiSummary })
+    );
+    await act(async () => {
+      await result.current.handleGetAiSummary("v1");
+    });
+    const sent = summarize.mock.calls[0][0] as { versionName: string; changes: CompareResult };
+    expect(sent.versionName.length).toBeLessThanOrEqual(200);
+    expect(sent.changes.elementName.length).toBeLessThanOrEqual(200);
+    expect(sent.changes.changes).toHaveLength(200);
+    for (const c of sent.changes.changes) {
+      expect(c.before.length).toBeLessThanOrEqual(2000);
+      expect(c.after.length).toBeLessThanOrEqual(2000);
+      expect(c.property.length).toBeLessThanOrEqual(100);
+    }
+    // The counts the model reads are untouched.
+    expect(sent.changes.summary).toEqual(big.summary);
+    expect(result.current.aiSummaryStates.v1).toMatchObject({ result: "Big diff", error: null });
   });
 });

@@ -242,8 +242,13 @@ export class MediaCommandLayer {
   /**
    * Replace the src of a single element. Wrapped in a transaction so the
    * change is a single undo step.
+   *
+   * `asset` is the new media's own description. When given and the image
+   * actually changes, the element takes the asset's alt text, or loses its
+   * alt when the asset has none — the old image's description is never left
+   * on the new one (a missing alt is flagged; a wrong one is not).
    */
-  replaceMedia(elementId: string, newSrc: string): ReplaceResult | null {
+  replaceMedia(elementId: string, newSrc: string, asset?: { alt?: string }): ReplaceResult | null {
     const element = this.composer.elements.getElement(elementId);
     if (!element) return null;
 
@@ -251,6 +256,12 @@ export class MediaCommandLayer {
     try {
       const previousSrc = this.getElementSrc(element);
       this.setElementSrc(element, previousSrc, newSrc);
+      // Only an element whose `src` took the new media has an alt to fix — a
+      // background-image element's alt (if any) describes something else.
+      if (asset && newSrc !== previousSrc && element.getAttribute("src") === newSrc) {
+        if (asset.alt) element.setAttribute("alt", asset.alt);
+        else element.removeAttribute("alt");
+      }
       this.composer.endTransaction();
       return { elementId, previousSrc };
     } catch (err) {

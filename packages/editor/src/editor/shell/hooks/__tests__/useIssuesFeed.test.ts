@@ -168,3 +168,49 @@ describe("useIssuesFeed", () => {
     expect(issues.get().some((i) => i.id === "publish-check:Image alt text")).toBe(false);
   });
 });
+
+/* IR-1: the check list was fetched once per mount, so a row the server had
+   since cleared (Vercel connected, a page added, a publish settled) kept
+   counting as an open error — "Publish anyway" over nothing. */
+describe("useIssuesFeed — the publish-check rows stay current", () => {
+  const vercelFail = { ready: false, checks: [{ label: "Vercel connected", status: "fail", detail: "Not connected" }] };
+  const allPass = { ready: true, checks: [{ label: "Vercel connected", status: "pass", detail: "Connected" }] };
+  const hasVercelRow = (issues: Issue[]) => issues.some((i) => i.id === "publish-check:Vercel connected");
+
+  it("re-reads the checks after the project saves to the server", async () => {
+    fetchPrePublishChecks.mockResolvedValueOnce(vercelFail).mockResolvedValue(allPass);
+    const composer = makeComposer() as unknown as { emit: (ev: string) => void };
+    const issues = setIssuesHook();
+    renderHook(() => useIssuesFeed(composer as never, "site-1", issues.setIssues));
+    await waitFor(() => expect(hasVercelRow(issues.get())).toBe(true));
+    act(() => composer.emit("project:saved"));
+    await waitFor(() => expect(hasVercelRow(issues.get())).toBe(false), { timeout: 3000 });
+  });
+
+  it("re-reads the checks when a publish settles", async () => {
+    fetchPrePublishChecks.mockResolvedValueOnce(vercelFail).mockResolvedValue(allPass);
+    const issues = setIssuesHook();
+    const composer = makeComposer();
+    const { rerender } = renderHook(
+      ({ publishState }: { publishState?: string }) =>
+        useIssuesFeed(composer, "site-1", issues.setIssues, { publishState }),
+      { initialProps: { publishState: "publishing" } },
+    );
+    await waitFor(() => expect(hasVercelRow(issues.get())).toBe(true));
+    rerender({ publishState: "published" });
+    await waitFor(() => expect(hasVercelRow(issues.get())).toBe(false));
+  });
+
+  it("re-reads the checks when the Issues panel opens", async () => {
+    fetchPrePublishChecks.mockResolvedValueOnce(vercelFail).mockResolvedValue(allPass);
+    const issues = setIssuesHook();
+    const composer = makeComposer();
+    const { rerender } = renderHook(
+      ({ panelOpen }: { panelOpen: boolean }) => useIssuesFeed(composer, "site-1", issues.setIssues, { panelOpen }),
+      { initialProps: { panelOpen: false } },
+    );
+    await waitFor(() => expect(hasVercelRow(issues.get())).toBe(true));
+    rerender({ panelOpen: true });
+    await waitFor(() => expect(hasVercelRow(issues.get())).toBe(false));
+  });
+});

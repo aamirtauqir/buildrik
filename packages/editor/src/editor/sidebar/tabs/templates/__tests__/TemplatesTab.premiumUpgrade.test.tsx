@@ -26,6 +26,12 @@ vi.mock("@/editor/chrome-ui", async () => {
   };
 });
 
+const plan = vi.hoisted(() => ({ tier: "starter" as "starter" | "pro" | "enterprise" }));
+vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/BuildrikSyncProvider")>()),
+  getEditorPlanTier: () => plan.tier,
+}));
+
 import { TemplatesTab } from "../TemplatesTab";
 import { UpgradeModal } from "@/editor/chrome-ui";
 import { SITE_TEMPLATES } from "../templatesData";
@@ -48,7 +54,10 @@ function makeComposer() {
   };
 }
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  plan.tier = "starter";
+});
 
 const premium = () => {
   const t = SITE_TEMPLATES.find((x) => x.status === "premium");
@@ -101,4 +110,16 @@ describe("Templates — a premium template reaches the boarded prompt", () => {
     expect(composer.elements.importHTMLToActivePage).not.toHaveBeenCalled();
   });
 
+  /* L2-009: a BUSINESS workspace was told "requires the Pro plan" — the gate
+     never read the plan. Pro and Business use premium templates. */
+  it.each(["pro", "enterprise"] as const)("a %s-tier workspace is not gated", async (tier) => {
+    plan.tier = tier;
+    const t = premium();
+    renderTab();
+
+    await openDetail(t.name);
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+
+    expect(screen.queryByText("Upgrade Your Plan")).toBeNull();
+  });
 });

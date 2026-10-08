@@ -453,11 +453,9 @@ export const sitesRouter = router({
           throw e;
         }
       }
-      const workspaceId = await getWorkspaceId(ctx);
       try {
         return await startPublish(
           input.siteId,
-          workspaceId,
           ctx.session.user.id,
           input.pages,
           input.acknowledgeStale,
@@ -478,10 +476,14 @@ export const sitesRouter = router({
         // Sites deploy into the workspace's own Vercel account. The pre-publish
         // check already disables the button, but the editor and the API can still
         // reach here — they get a reason, not a 500.
+        // `cause.reason` carries the code the editor's "Vercel not connected ·
+        // Open settings" toast keys on (forwarded as `data.cause`); the
+        // sentence alone never matched it.
         if (e instanceof Error && e.message === "VERCEL_NOT_CONNECTED")
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
             message: "Connect this workspace to Vercel before publishing.",
+            cause: { reason: "VERCEL_NOT_CONNECTED" },
           });
         // m-approval gate (publish.service startPublish): a member in an
         // approval-required workspace without an APPROVED review gets a clear
@@ -712,10 +714,9 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      const workspaceId = await getWorkspaceId(ctx);
       let result;
       try {
-        result = await rollbackPublish(workspaceId, input.siteId, input.jobId, ctx.session.user!.id!);
+        result = await rollbackPublish(input.siteId, input.jobId, ctx.session.user!.id!);
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "";
         if (msg === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "That version was not found." });

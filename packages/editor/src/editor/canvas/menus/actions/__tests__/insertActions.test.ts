@@ -64,6 +64,21 @@ describe("insertActions", () => {
     expect(element.unwrap).toHaveBeenCalled();
   });
 
+  /* Audit 2026-10-08 P1-3: Wrap refused a locked element; its sibling Unwrap
+     dissolved it. Now through the lock gate, one undo step. */
+  it("unwrap runs in one transaction", () => {
+    action("unwrap").handler!(ctx);
+    expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
+    expect(composer.endTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("unwrap refuses a locked element and says so", () => {
+    element.isLocked.mockReturnValue(true);
+    action("unwrap").handler!(ctx);
+    expect(element.unwrap).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith("clipboard:locked-elements-skipped", undefined);
+  });
+
   describe("visibility / enablement predicates", () => {
 
 

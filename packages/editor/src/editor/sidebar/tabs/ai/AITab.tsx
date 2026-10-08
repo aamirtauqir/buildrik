@@ -413,15 +413,16 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             agent.reset();
             promptRef.current?.querySelector("textarea")?.focus();
           }}
-          /* Each applied step is its own transaction, so taking the run back
-             is exactly that many undos — and nothing has happened since the
-             failure to undo by mistake. Undo drops the selection; the run's
+          /* Undo all takes back exactly the run's own history entries, through
+             the handle each applied step recorded — never a count of undos,
+             which reverted the user's own work whenever a counted step had
+             recorded nothing or the user edited in between. It stops at an
+             entry a newer edit sits on. Undo drops the selection; the run's
              element is picked again, as 4418:105548 keeps it selected. */
           onUndoAll={
             composer
               ? () => {
-                  const applied = agent.steps.filter((s) => s.status === "applied").length;
-                  for (let i = 0; i < applied; i++) composer.history.undo();
+                  agent.undoAll();
                   setUndone(true);
                   const target = runScope?.kind === "element" ? composer.elements.getElement(runScope.id) : undefined;
                   if (target) composer.selection.select(target);

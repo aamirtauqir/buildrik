@@ -112,11 +112,31 @@ export function injectSeoTags(
       tags.push(`<meta property="og:url" content="${escapeAttr(seo.canonical)}">`);
     }
   }
-  if (!seo.allowIndexing && !/<meta[^>]+name=["']?robots/i.test(html)) {
-    tags.push(`<meta name="robots" content="noindex,nofollow">`);
+  let out = html;
+  if (!seo.allowIndexing) {
+    /* The site says "do not index". A page's own robots tag ("Follow links"
+       off → nofollow) must not switch that off: it is merged, not obeyed. */
+    if (html.match(ROBOTS_META)) out = html.replace(ROBOTS_META, (tag) => robotsTag(siteOffDirectives(tag)));
+    else tags.push(robotsTag(["noindex", "nofollow"]));
   }
-  if (tags.length === 0) return html;
-  return insertBeforeHeadClose(html, tags.join(""));
+  if (tags.length === 0) return out;
+  return insertBeforeHeadClose(out, tags.join(""));
+}
+
+const ROBOTS_META = /<meta\b[^>]*\bname=["']?robots\b[^>]*>/gi;
+/** Directives the site's "no indexing" overrides. */
+const INDEXING_DIRECTIVES = new Set(["index", "follow", "all", "none", "noindex", "nofollow"]);
+
+const robotsTag = (directives: string[]) => `<meta name="robots" content="${escapeAttr(directives.join(","))}">`;
+
+/** noindex,nofollow plus whatever else the page's own tag asked for (noarchive, …). */
+function siteOffDirectives(tag: string): string[] {
+  const content = tag.match(/\bcontent=(["'])(.*?)\1/i)?.[2] ?? "";
+  const own = content
+    .split(",")
+    .map((d) => d.trim().toLowerCase())
+    .filter((d) => d && !INDEXING_DIRECTIVES.has(d));
+  return ["noindex", "nofollow", ...new Set(own)];
 }
 
 /**

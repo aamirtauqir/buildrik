@@ -24,7 +24,6 @@ import {
   loadSetFromStorage,
   saveSetToStorage,
   takeLegacyLayerState,
-  applyStoredStatesToDOM,
 } from "./layersPersistence";
 
 export interface UseLayerActionsReturn {
@@ -41,8 +40,6 @@ export interface UseLayerActionsReturn {
   startEditing: (id: string, currentName: string, e: React.MouseEvent) => void;
   saveEditedName: () => void;
   cancelEditing: () => void;
-  deleteLayer: (id: string, layers: LayerItem[], onConfirm: () => void) => void;
-  duplicateLayer: (id: string) => void;
   moveToTop: (id: string, layers: LayerItem[]) => void;
   moveToBottom: (id: string, layers: LayerItem[]) => void;
   groupLayers: (ids: string[], layers: LayerItem[]) => void;
@@ -86,15 +83,9 @@ export function useLayerActions(
   const editInputRef = React.useRef<HTMLInputElement>(null);
   const pendingVisibilityRef = React.useRef<{ id: string; hidden: boolean } | null>(null);
   const pendingLockRef = React.useRef<{ id: string; locked: boolean } | null>(null);
-  const hydrateTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const hydrateFromStorage = React.useCallback(
     (pageId: string) => {
-      // Cancel any in-flight hydration from a prior page
-      if (hydrateTimeoutRef.current !== null) {
-        clearTimeout(hydrateTimeoutRef.current);
-        hydrateTimeoutRef.current = null;
-      }
       // Claim the page BEFORE the setters, so the persist effects that run on
       // this commit are writing hydrated state rather than the empty initial.
       hydratedPage.current = pageId;
@@ -117,22 +108,12 @@ export function useLayerActions(
       setHiddenIds(storedHidden);
       setLockedIds(storedLocked);
       setCustomNames(storedNames);
-      hydrateTimeoutRef.current = setTimeout(() => {
-        applyStoredStatesToDOM(storedHidden, storedLocked);
-        hydrateTimeoutRef.current = null;
-      }, 100);
+      /* The canvas puts the hidden / locked flags on its own DOM after every
+         render (useCanvasEditorFlags), from these same stores. */
     },
     [composer]
   );
 
-  // Cancel pending DOM apply on unmount
-  React.useEffect(() => {
-    return () => {
-      if (hydrateTimeoutRef.current !== null) {
-        clearTimeout(hydrateTimeoutRef.current);
-      }
-    };
-  }, []);
 
   // Persist hidden state
   React.useEffect(() => {
@@ -244,15 +225,15 @@ export function useLayerActions(
     };
   }, [composer]);
 
-  // Apply DOM lock attribute + engine lock state after state commit
+  // Apply the engine lock state after state commit
   React.useEffect(() => {
     const pending = pendingLockRef.current;
     if (!pending) return;
     pendingLockRef.current = null;
-    const el = document.querySelector(`[data-buildrick-id="${pending.id}"]`) as HTMLElement | null;
-    if (el) el.setAttribute("data-locked", String(pending.locked));
     /* The shared lock command — one undo step, the transaction name the
-       canvas menu and the Inspector use (editor/shared/elementActions.ts). */
+       canvas menu and the Inspector use (editor/shared/elementActions.ts).
+       No DOM write: the canvas derives `data-locked` from the element
+       (useCanvasEditorFlags). */
     composer?.commands.run(pending.locked ? "lock-element" : "unlock-element", { elementId: pending.id });
   }, [lockedIds, composer]);
 
@@ -294,27 +275,6 @@ export function useLayerActions(
     setEditingId(null);
     setEditingName("");
   }, []);
-
-  const deleteLayer = React.useCallback(
-    (id: string, _layers: LayerItem[], onConfirm: () => void) => {
-      if (!composer) return;
-      composer.beginTransaction("delete-layer");
-      composer.elements.removeElement(id);
-      composer.endTransaction();
-      onConfirm();
-    },
-    [composer]
-  );
-
-  const duplicateLayer = React.useCallback(
-    (id: string) => {
-      if (!composer) return;
-      composer.beginTransaction("duplicate-layer");
-      composer.elements.duplicateElement(id);
-      composer.endTransaction();
-    },
-    [composer]
-  );
 
   const moveToTop = React.useCallback(
     (id: string, _layers: LayerItem[]) => {
@@ -397,8 +357,6 @@ export function useLayerActions(
     startEditing,
     saveEditedName,
     cancelEditing,
-    deleteLayer,
-    duplicateLayer,
     moveToTop,
     moveToBottom,
     groupLayers,

@@ -11,8 +11,9 @@ import {
   type PageElementRef,
   type TokenRef,
   type MediaAssetRef,
+  type RunScope,
 } from "./runPromptOnce";
-import { gatherTokens, gatherMediaAssets } from "./aiScopeContext";
+import { gatherTokens, gatherMediaAssets, gatherElementContext, toElementRef } from "./aiScopeContext";
 import { activePageElements } from "./useAIScope";
 import { trackAgentRun } from "@/services/ai/adoptionTracker";
 
@@ -87,6 +88,10 @@ interface UseAgentRunnerResult {
   skip: () => void;
   stop: () => void;
   reset: () => void;
+  /** Undo the run's own history entries, newest first, and return how many
+   *  were undone. Stops at the first entry that is no longer on top (the user
+   *  edited after it), so it never undoes the user's work. */
+  undoAll: () => number;
 }
 
 export function useAgentRunner(
@@ -109,6 +114,17 @@ export function useAgentRunner(
   const indexRef = React.useRef(-1);
   indexRef.current = currentIndex;
   const cancelledRef = React.useRef(false);
+  /* The request in flight — Stop / reset abort it, so the subscription is torn
+     down and the server stops generating. */
+  const abortRef = React.useRef<AbortController | null>(null);
+  const nextSignal = React.useCallback((): AbortSignal => {
+    const ac = new AbortController();
+    abortRef.current = ac;
+    return ac.signal;
+  }, []);
+  /* One undo handle per step that recorded a history entry, oldest first
+     (applyAiEdit → history.captureUndo). Undo all walks these, not a count. */
+  const undoHandlesRef = React.useRef<Array<() => boolean>>([]);
   const generateStepRef = React.useRef<(i: number) => void>(() => {});
   // Adoption telemetry: one agent.run report per run (start time + once-guard).
   const runStartRef = React.useRef(0);
@@ -146,14 +162,7 @@ export function useAgentRunner(
             })()
           : pool.ids.flatMap((id) => composer.elements.getElement(id) ?? []);
     return els
-      .map((el) => {
-        const content = el.getContent?.();
-        return {
-          id: el.getId(),
-          type: el.getType(),
-          text: content ? String(content).slice(0, 200) : undefined,
-        };
-      })
+      .map(toElementRef)
       .filter((e) => e.id)
       .slice(0, 200);
   }, [composer]);
@@ -177,6 +186,45 @@ export function useAgentRunner(
     generateStepRef.current(next);
   }, [reportRun]);
 
+  /* A failed step — one that could not be generated or could not be applied —
+     STOPS the run. This used to mark the step failed and then `advance(i + 1)`,
+     so the agent quietly carried on editing the user's page after a step had
+     already failed, while the band above it read "STOPPED AT STEP N", which it
+     computes from `steps` alone. Walked live: the band said stopped at step 1
+     with step 2 still showing a running dot, the run finished "0 changes
+     applied", and no error, Retry or Undo-all ever appeared, because
+     AgentPlan's error card is gated on `error` and nothing here ever set it.
+
+     Continuing past a failure is the wrong default for an agent that writes
+     to the page: later steps are planned against a state the failed step was
+     supposed to produce. Stop, say so, and leave the user the Undo-all the
+     board promises. (A failed apply leaves nothing behind — applyAiEdit rolls
+     the batch back.) */
+  const failRun = React.useCallback(
+    (i: number, e: unknown) => {
+      cancelledRef.current = true;
+      /* Write the ref in the same breath as the state. `stepsRef.current` is
+         assigned during RENDER, and `reportRun` reads it synchronously — so
+         marking the step failed with `setStep` alone and reporting straight
+         after logged `stepsFailed: 0` for the very run that just failed.
+         (Caught in review, not by the suite: nothing asserts telemetry.) */
+      const failed = stepsRef.current.map((s, idx) =>
+        idx === i ? { ...s, status: "failed" as const } : s,
+      );
+      stepsRef.current = failed;
+      setSteps(failed);
+      setError(e instanceof Error ? e.message : "That step failed.");
+      setErrorKind(errorKindOf(e));
+      setPhase("done");
+      setCurrentIndex(-1);
+      composer?.emit("ai:agent-run", { running: false, summary: "" });
+      /* `advance` reports the run when it ends; this path does not go
+         through it, and a run that failed is the one most worth measuring. */
+      reportRun();
+    },
+    [composer, reportRun],
+  );
+
   const generateStep = React.useCallback(
     async (i: number) => {
       const step = stepsRef.current[i];
@@ -187,23 +235,32 @@ export function useAgentRunner(
       // Inspector takeover (board 160:512) — broadcast what the agent is doing
       // so the right panel can show "AI · {step}…" instead of stale controls.
       composer.emit("ai:agent-run", { running: true, summary: step.plan.title ?? step.plan.instruction });
-      // Re-ground page-scope steps against the live canvas; element-scope steps
-      // target the id the plan chose.
-      const scope =
+      // Re-ground every step against the live canvas: page steps send the
+      // pool's elements, element steps a snapshot of the element the plan
+      // chose (the model used to get its id alone). Both carry the token
+      // registry and media library for set-token / image recall.
+      const scope: RunScope =
         step.plan.scope.kind === "page"
           ? {
-              kind: "page" as const,
+              kind: "page",
               elements: gatherElements(),
               tokens: gatherTokensCb(),
               assets: gatherMediaAssetsCb(),
             }
-          : step.plan.scope;
+          : {
+              kind: "element",
+              id: step.plan.scope.id,
+              context: gatherElementContext(composer, step.plan.scope.id),
+              tokens: gatherTokensCb(),
+              assets: gatherMediaAssetsCb(),
+            };
       try {
         const { edit } = await runPromptOnce({
           prompt: step.plan.instruction,
           scope,
           model,
           intent: "style-command",
+          signal: nextSignal(),
         });
         if (cancelledRef.current) return;
         if (edit && edit.rows.length > 0) {
@@ -214,41 +271,10 @@ export function useAgentRunner(
         }
       } catch (e) {
         if (cancelledRef.current) return;
-        /* A failed step STOPS the run. This used to mark the step failed and
-           then `advance(i + 1)`, so the agent quietly carried on editing the
-           user's page after a step had already failed — while the band above
-           it read "STOPPED AT STEP N", which it computes from `steps` alone.
-           Walked live: the band said stopped at step 1 with step 2 still
-           showing a running dot, the run finished "0 changes applied", and no
-           error, Retry or Undo-all ever appeared, because AgentPlan's error
-           card is gated on `error` and nothing here ever set it.
-
-           Continuing past a failure is the wrong default for an agent that
-           writes to the page: later steps are planned against a state the
-           failed step was supposed to produce. Stop, say so, and leave the
-           user the Undo-all the board promises. */
-        cancelledRef.current = true;
-        /* Write the ref in the same breath as the state. `stepsRef.current` is
-           assigned during RENDER, and `reportRun` reads it synchronously — so
-           marking the step failed with `setStep` alone and reporting straight
-           after logged `stepsFailed: 0` for the very run that just failed.
-           (Caught in review, not by the suite: nothing asserts telemetry.) */
-        const failed = stepsRef.current.map((s, idx) =>
-          idx === i ? { ...s, status: "failed" as const } : s,
-        );
-        stepsRef.current = failed;
-        setSteps(failed);
-        setError(e instanceof Error ? e.message : "That step failed.");
-        setErrorKind(errorKindOf(e));
-        setPhase("done");
-        setCurrentIndex(-1);
-        composer?.emit("ai:agent-run", { running: false, summary: "" });
-        /* `advance` reports the run when it ends; this path no longer goes
-           through it, and a run that failed is the one most worth measuring. */
-        reportRun();
+        failRun(i, e);
       }
     },
-    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, reportRun],
+    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, failRun, nextSignal],
   );
   generateStepRef.current = generateStep;
 
@@ -257,6 +283,7 @@ export function useAgentRunner(
       if (!composer) return;
       poolRef.current = pool;
       cancelledRef.current = false;
+      undoHandlesRef.current = [];
       setStoppedByUser(false);
       runStartRef.current = Date.now();
       reportedRef.current = false;
@@ -280,6 +307,7 @@ export function useAgentRunner(
             scope: { kind: "page", elements, tokens: gatherTokensCb(), assets: gatherMediaAssetsCb() },
             model,
             intent: "plan",
+            signal: nextSignal(),
           }));
         }
         if (cancelledRef.current) return;
@@ -300,27 +328,37 @@ export function useAgentRunner(
           setPhase("review");
         }
       } catch (e) {
+        if (cancelledRef.current) return;
         setError(e instanceof Error ? e.message : "Planning failed");
         setErrorKind(errorKindOf(e));
         setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
       }
     },
-    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb],
+    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, nextSignal],
   );
 
   const approve = React.useCallback(async () => {
     const i = indexRef.current;
     const step = stepsRef.current[i];
     if (!step || step.status !== "awaiting" || !step.edit || !composer) return;
+    let undo: (() => boolean) | null;
     try {
-      const { proposals } = await applyAiEdit(composer, { applyOps: step.edit.applyOps });
+      let proposals: Array<{ actionId: string }>;
+      ({ proposals, undo } = await applyAiEdit(composer, { applyOps: step.edit.applyOps }));
       if (proposals.length > 0) onProposal?.(proposals[0].actionId);
-      setStep(i, { status: "applied" });
-    } catch {
-      setStep(i, { status: "failed" });
+    } catch (e) {
+      failRun(i, e);
+      return;
     }
+    /* "Applied" means a history entry was recorded — a proposal-only or
+       all-no-op step changed nothing Undo all could take back. Write the ref
+       with the state so a following advance()/reportRun reads it. */
+    if (undo) undoHandlesRef.current.push(undo);
+    const status: StepStatus = undo ? "applied" : "nochange";
+    stepsRef.current = stepsRef.current.map((s, idx) => (idx === i ? { ...s, status } : s));
+    setStep(i, { status });
     advance(i + 1);
-  }, [composer, setStep, advance, onProposal]);
+  }, [composer, setStep, advance, failRun, onProposal]);
 
   const skip = React.useCallback(() => {
     const i = indexRef.current;
@@ -331,6 +369,7 @@ export function useAgentRunner(
 
   const stop = React.useCallback(() => {
     cancelledRef.current = true;
+    abortRef.current?.abort();
     setStoppedByUser(true);
     /* Board 4418:105261: what had not run when the user stopped is Skipped —
        an awaiting step left as a live dot read as still running. */
@@ -346,6 +385,8 @@ export function useAgentRunner(
 
   const reset = React.useCallback(() => {
     cancelledRef.current = true;
+    abortRef.current?.abort();
+    undoHandlesRef.current = [];
     setStoppedByUser(false);
     setPhase("idle"); composer?.emit("ai:agent-run", { running: false, summary: "" });
     setSteps([]);
@@ -369,5 +410,17 @@ export function useAgentRunner(
     generateStepRef.current(0);
   }, []);
 
-  return { phase, steps, currentIndex, error, errorKind, stoppedByUser, editStep, runPlan, start, approve, skip, stop, reset };
+  const undoAll = React.useCallback((): number => {
+    const handles = undoHandlesRef.current;
+    let undone = 0;
+    while (handles.length > 0) {
+      // Each handle undoes only while its own entry is still the newest.
+      if (!handles[handles.length - 1]()) break;
+      handles.pop();
+      undone++;
+    }
+    return undone;
+  }, []);
+
+  return { phase, steps, currentIndex, error, errorKind, stoppedByUser, editStep, runPlan, start, approve, skip, stop, reset, undoAll };
 }

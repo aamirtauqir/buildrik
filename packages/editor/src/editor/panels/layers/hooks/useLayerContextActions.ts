@@ -2,9 +2,9 @@
  * useLayerContextActions - Handles actions dispatched from the right-click context menu.
  * Bridges LayerContextMenu → useLayerActions / useLayerSelection / useLayerTree.
  *
- * With the clicked row inside a multi-selection (board 6881:71323), cut / copy
- * / duplicate / delete act on the WHOLE selection through the engine's own
- * commands — `composer.selection` is the single source of truth the tree
+ * Cut / copy / duplicate / delete run the engine's own commands. With the
+ * clicked row inside a multi-selection (board 6881:71323) they act on the
+ * WHOLE selection — `composer.selection` is the single source of truth the tree
  * mirrors, and the registry commands prune to top-most elements and wrap one
  * transaction (defaultCommands.ts). Delete of N > 1 asks first (board
  * 6887:78291), which is the panel's dialog: `requestDeleteSelection`.
@@ -37,19 +37,27 @@ export function useLayerContextActions(
       /* The clicked row is one of two or more selected rows: the menu was the
          selection's, so the action is too. */
       const multi = selectionHook.selectedIds.size >= 2 && selectionHook.selectedIds.has(nodeId);
+      /* Cut / copy / duplicate / delete are the ENGINE commands on every
+         door: they carry the lock + instance gate, top-most pruning, one
+         transaction and the shared toasts. A single row becomes the selection
+         first; a multi-selection already is it. The single-row branch used to
+         call removeElement directly — no lock check, so the menu deleted a
+         locked element the keyboard Delete refused (audit 2026-10-08 P1-1). */
+      const runOnRow = (command: "copy" | "cut" | "duplicate" | "delete") => {
+        if (!composer) return;
+        if (!multi) {
+          const el = composer.elements.getElement(nodeId);
+          if (!el) return;
+          composer.selection.select(el);
+        }
+        composer.commands.run(command);
+      };
       switch (action) {
         // Board 1082:4527 Cut/Copy/Paste — the same composer.clipboard
         // contract the canvas ⌘X/⌘C/⌘V path uses (useCanvasKeyboard).
-        case "copy": {
-          if (!composer) break;
-          if (multi) {
-            composer.commands.run("copy");
-            break;
-          }
-          const data = composer.elements.serializeElement(nodeId);
-          composer.clipboard = data ? [data] : null;
+        case "copy":
+          runOnRow("copy");
           break;
-        }
         case "copyLink": {
           /* Board 1082:4527's "Copy link": a URL that reopens THIS editor with
              this element selected. The page id rides along because the element
@@ -66,17 +74,9 @@ export function useLayerContextActions(
           );
           break;
         }
-        case "cut": {
-          if (!composer) break;
-          if (multi) {
-            composer.commands.run("cut");
-            break;
-          }
-          const cutData = composer.elements.serializeElement(nodeId);
-          composer.clipboard = cutData ? [cutData] : null;
-          actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
+        case "cut":
+          runOnRow("cut");
           break;
-        }
         case "paste": {
           /* Select the clicked row, then run the ENGINE command.
              This used to resolve its own target as `target.getParent() ?? target`
@@ -102,8 +102,7 @@ export function useLayerContextActions(
           break;
         }
         case "duplicate":
-          if (multi) composer?.commands.run("duplicate");
-          else actionsHook.duplicateLayer(nodeId);
+          runOnRow("duplicate");
           break;
         case "hide":
         case "show":
@@ -113,25 +112,12 @@ export function useLayerContextActions(
         case "unlock":
           actionsHook.toggleLock(nodeId, syntheticEvent);
           break;
-        case "delete": {
-          /* Decision #17: a Layers delete is instant, with the same Undo toast
-             the canvas gives — never a confirm for one row. Two or more ask
-             first. */
-          if (multi) {
-            requestDeleteSelection();
-            break;
-          }
-          const node = findById(treeHook.layers, nodeId);
-          const type = actionsHook.customNames.get(nodeId) ?? node?.type ?? "Element";
-          const label = type.charAt(0).toUpperCase() + type.slice(1);
-          actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
-          addToast({
-            description: `${label} deleted`,
-            tone: "info",
-            action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
-          });
+        case "delete":
+          /* Decision #17: one row deletes at once (the shell's
+             useHistoryFeedback toasts it with Undo); two or more ask first. */
+          if (multi) requestDeleteSelection();
+          else runOnRow("delete");
           break;
-        }
         case "group": {
           const ids = multi ? [...selectionHook.selectedIds] : [nodeId];
           const node = findById(treeHook.layers, nodeId);

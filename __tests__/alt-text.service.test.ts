@@ -14,6 +14,13 @@ vi.mock("@/server/services/permission.service", () => ({
   checkSiteRole: (...a: unknown[]) => checkSiteRoleMock(...a),
 }));
 
+const reserveQuotaMock = vi.fn();
+const releaseQuotaMock = vi.fn();
+vi.mock("@/server/services/quota.service", () => ({
+  reserveQuota: (...a: unknown[]) => reserveQuotaMock(...a),
+  releaseQuota: (...a: unknown[]) => releaseQuotaMock(...a),
+}));
+
 const mockCompletionsCreate = vi.fn();
 vi.mock("openai", () => ({
   default: class MockOpenAI {
@@ -39,6 +46,8 @@ describe("alt-text.service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.OPENAI_API_KEY = "test-key";
+    reserveQuotaMock.mockResolvedValue({ ok: true, used: 1, limit: 10, resetsAt: new Date("2026-10-09T00:00:00Z") });
+    releaseQuotaMock.mockResolvedValue(undefined);
   });
 
   // ─── generateAltText (bare AI call) ─────────────────────────────────────
@@ -239,6 +248,81 @@ describe("alt-text.service", () => {
 
       await expect(applyAltTextToAsset("u1", "a1", { force: true })).rejects.toMatchObject({ code: "FORBIDDEN" });
       expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u1", "s1", "EDITOR");
+      expect(mockCompletionsCreate).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── AI quota + error masking (audit F-01 / F-02) ───────────────────────
+  /* Alt-text ran a paid vision call on every upload with no quota at all, and a
+     provider failure (401 with the masked key suffix, 429 headers, request ids)
+     reached the client verbatim. It now reserves one AI unit like every ai.*
+     call, refunds it when the provider fails, and throws a fixed domain error. */
+  describe("applyAltTextToAsset — AI quota", () => {
+    it("reserves one AI unit for the user before calling the provider", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique)
+        .mockResolvedValueOnce(SAMPLE_ASSET as any)
+        .mockResolvedValueOnce({ userId: "u1", altText: null } as any);
+      mockCompletionsCreate.mockResolvedValueOnce(SAMPLE_RESPONSE);
+      vi.mocked(prisma.mediaAsset.update).mockResolvedValue({} as any);
+
+      await applyAltTextToAsset("u1", "a1");
+
+      expect(reserveQuotaMock).toHaveBeenCalledTimes(1);
+      expect(reserveQuotaMock).toHaveBeenCalledWith("u1", "gpt-4o-mini");
+      expect(releaseQuotaMock).not.toHaveBeenCalled();
+    });
+
+    it("does not charge when the user's alt text is kept (no provider call)", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValue({ ...SAMPLE_ASSET, altText: "Typed" } as any);
+
+      await applyAltTextToAsset("u1", "a1");
+
+      expect(reserveQuotaMock).not.toHaveBeenCalled();
+    });
+
+    it("refuses with QUOTA_EXCEEDED and never calls the provider when the daily limit is spent", async () => {
+      const { applyAltTextToAsset, AltTextError } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValue(SAMPLE_ASSET as any);
+      reserveQuotaMock.mockResolvedValueOnce({ ok: false, used: 10, limit: 10, resetsAt: new Date() });
+
+      const err = await applyAltTextToAsset("u1", "a1").catch((e: unknown) => e);
+
+      expect(err).toBeInstanceOf(AltTextError);
+      expect(err).toMatchObject({ code: "QUOTA_EXCEEDED" });
+      expect(mockCompletionsCreate).not.toHaveBeenCalled();
+    });
+
+    it("refunds the unit and throws a fixed PROVIDER_FAILED error when the provider fails", async () => {
+      const { applyAltTextToAsset, AltTextError } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValue(SAMPLE_ASSET as any);
+      const providerError = Object.assign(new Error("401 Incorrect API key provided: sk-...abcd"), {
+        status: 401,
+        headers: { "x-request-id": "req_123" },
+        request_id: "req_123",
+      });
+      mockCompletionsCreate.mockRejectedValueOnce(providerError);
+      const logSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const err = await applyAltTextToAsset("u1", "a1").catch((e: unknown) => e);
+      logSpy.mockRestore();
+
+      expect(err).toBeInstanceOf(AltTextError);
+      expect(err).toMatchObject({ code: "PROVIDER_FAILED" });
+      expect((err as Error).message).not.toMatch(/sk-|API key|401/);
+      expect((err as Error).cause).toBeUndefined();
+      expect(releaseQuotaMock).toHaveBeenCalledWith("u1");
+      expect(prisma.mediaAsset.update).not.toHaveBeenCalled();
+    });
+
+    it("refuses with NOT_CONFIGURED before reserving when no provider key is set", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      delete process.env.OPENAI_API_KEY;
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValue(SAMPLE_ASSET as any);
+
+      await expect(applyAltTextToAsset("u1", "a1")).rejects.toMatchObject({ code: "NOT_CONFIGURED" });
+      expect(reserveQuotaMock).not.toHaveBeenCalled();
       expect(mockCompletionsCreate).not.toHaveBeenCalled();
     });
   });

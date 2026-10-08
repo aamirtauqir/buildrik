@@ -175,9 +175,10 @@ export function useCanvasInlineEdit({
                emitter, so the onboarding step that asks for exactly this
                action had nothing to listen to. */
             composer.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId: editing.id });
-            composer.saveProject?.().catch(() => {
-              // Autosave failure handled silently
-            });
+            /* No saveProject() here: with a site bound it only wrote
+               localStorage yet marked the project saved before the server had
+               the edit. The transaction's project:changed schedules the real
+               autosave (audit 2026-10-08 P2-2). */
           }
         } else {
           el.innerHTML = sanitizeHTML(editing.original);

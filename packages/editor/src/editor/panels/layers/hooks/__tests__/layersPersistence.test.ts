@@ -1,6 +1,6 @@
 /**
  * layersPersistence — localStorage-backed hidden/locked/names/expanded state.
- * Pure functions; jsdom provides localStorage + DOM for applyStoredStatesToDOM.
+ * Pure functions; jsdom provides localStorage.
  *
  * @license BSD-3-Clause
  */
@@ -12,7 +12,6 @@ import {
   takeLegacyLayerState,
   getLayerName,
   saveSetToStorage,
-  applyStoredStatesToDOM,
 } from "../layersPersistence";
 
 beforeEach(() => {
@@ -84,25 +83,5 @@ describe("getLayerName", () => {
     expect(getLayerName({ getCustomData: (k) => (k === "layerName" ? "Hero" : undefined) })).toBe("Hero");
     expect(getLayerName({ getCustomData: () => "" })).toBeUndefined();
     expect(getLayerName(undefined)).toBeUndefined();
-  });
-});
-
-describe("applyStoredStatesToDOM", () => {
-  it("marks hidden and locked elements by data-buildrick-id", () => {
-    const hiddenEl = document.createElement("div");
-    hiddenEl.setAttribute("data-buildrick-id", "hidden-1");
-    const lockedEl = document.createElement("div");
-    lockedEl.setAttribute("data-buildrick-id", "locked-1");
-    document.body.append(hiddenEl, lockedEl);
-
-    applyStoredStatesToDOM(new Set(["hidden-1"]), new Set(["locked-1"]));
-
-    expect(hiddenEl.getAttribute("data-hidden")).toBe("true");
-    expect(lockedEl.getAttribute("data-locked")).toBe("true");
-  });
-
-  it("ignores ids with no matching DOM element", () => {
-    // No elements in DOM — should not throw.
-    expect(() => applyStoredStatesToDOM(new Set(["ghost"]), new Set(["ghost"]))).not.toThrow();
   });
 });

@@ -26,6 +26,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { ElementType, GrapesElement } from "../../../shared/types";
 import { setMultiDragData } from "../../../shared/utils/dragDrop";
+import { writableElements } from "../../../engine/commands/commandOperations";
 import {
   DRAG_THROTTLE_MS,
   type AxisConstraint,
@@ -181,6 +182,20 @@ export function useCanvasElementDrag({
       if (elementId === rootId) {
         e.preventDefault();
         return;
+      }
+
+      /* A locked element does not move: a plain click already refused to
+         select one, but mousedown → drag moved it (audit 2026-10-08 P1-3).
+         A multi-drag carrying one is refused whole; the lock gate raises the
+         "locked" toast. Ctrl/Cmd+drag clones and leaves the original put. */
+      if (!(e.ctrlKey || e.metaKey)) {
+        const selected = composer.selection.getSelectedIds();
+        const moving = selected.length > 1 && selected.includes(elementId) ? selected : [elementId];
+        const present = moving.map((id) => composer.elements.getElement(id)).filter(Boolean);
+        if (writableElements(composer, present).length !== present.length) {
+          e.preventDefault();
+          return;
+        }
       }
 
       // Capture modifiers from event (more reliable at drag start)
