@@ -51,6 +51,10 @@ vi.mock("@/lib/prisma", () => ({
       findMany: (...a: unknown[]) => siteFindMany(...a),
       update: (...a: unknown[]) => siteUpdate(...a),
     },
+    // Brand Part 1b: a v6 push reads the site's pages and saved components for
+    // token usage (none here — every site-only token is unused).
+    page: { findMany: async () => [] },
+    siteComponent: { findMany: async () => [] },
     siteThemeSnapshot: {
       create: (...a: unknown[]) => snapCreate(...a),
       findMany: (...a: unknown[]) => snapFindMany(...a),
