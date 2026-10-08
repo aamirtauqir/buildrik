@@ -1,7 +1,8 @@
 /**
  * UnifiedSelectionToolbar — board 5936:44788 ("Canvas · selected · Hero").
  *
- * Three buttons pinned inside the selected element's top-right corner:
+ * Three buttons pinned inside the selected element's top-right corner (outside,
+ * above it, when the element is too small to hold them — L1-003):
  * Duplicate (⌘D) · Delete (⌫) · More (⋯). More opens the same element menu a
  * right-click opens (G2-024: one menu, not a second dropdown of its own), at
  * the button.
@@ -40,6 +41,14 @@ export interface UnifiedSelectionToolbarProps {
 
 /** Inset from the element's top-right corner (board 5936:44788). */
 const INSET = 8;
+/** The pill's height (24px buttons + 4px padding) and its gap to a small element. */
+const PILL_H = 32;
+const OUTSIDE_GAP = 4;
+/* L1-003 / L2-007: the board draws the inset pill on a Hero. Inside a button
+   or a line of text it covered the element, and a second click — to edit the
+   text — landed on Duplicate or Delete. Below this size it goes outside. */
+const INSIDE_MIN_H = 2 * PILL_H + 2 * INSET;
+const INSIDE_MIN_W = 2 * 88;
 
 const PILL = "tw:relative tw:flex tw:items-center tw:gap-1 tw:p-1 tw:rounded-lg tw:bg-[var(--bk-ink)]";
 /* Board 5940:148012: 11/16 medium gray-500, 4px under the pill. The board
@@ -62,7 +71,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
   onDelete,
   onOpenMenu,
 }) => {
-  const [anchor, setAnchor] = React.useState<{ right: number; top: number; scale: number } | null>(null);
+  const [anchor, setAnchor] = React.useState<{ right: number; top: number; scale: number; outside: boolean } | null>(null);
   /* Pulls the pill back onto the scrollable canvas viewport when `anchor`
      alone would place it past the viewport's right edge (see the effect
      below). Reset to 0 every time `anchor` gets a fresh raw value — it is
@@ -83,10 +92,17 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
       /* The overlay layer is scaled with the canvas; positions are in canvas
          (unscaled) units, so undo the zoom the rects carry. */
       const scale = canvasScale(canvas);
+      const right = (r.right - c.left) / scale + (canvas.scrollLeft || 0);
+      const top = (r.top - c.top) / scale + (canvas.scrollTop || 0);
+      const outside = r.height / scale < INSIDE_MIN_H || r.width / scale < INSIDE_MIN_W;
+      /* Outside: above the element, or under it when the page has no room
+         above (the pill is chrome — 1:1 at any zoom, so its size is unscaled). */
+      const above = top - (PILL_H + OUTSIDE_GAP) / scale;
       setAnchor({
-        right: (r.right - c.left) / scale + (canvas.scrollLeft || 0) - INSET / scale,
-        top: (r.top - c.top) / scale + (canvas.scrollTop || 0) + INSET / scale,
+        right: outside ? right : right - INSET / scale,
+        top: !outside ? top + INSET / scale : above >= 0 ? above : top + r.height / scale + OUTSIDE_GAP / scale,
         scale,
+        outside,
       });
       /* A fresh raw anchor means the last frame's viewport correction no
          longer applies — the effect below re-measures from scratch. */
@@ -185,9 +201,13 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
       </IconButton>
       {/* The board's caption under the pill: what each glyph does and its key.
           Absolute, so the pill (not the caption) sets the anchor. */}
-      <p aria-hidden="true" data-testid="selection-toolbar-caption" className={CAPTION}>
-        {"⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ More"}
-      </p>
+      {/* Outside a small element the caption would lie over the element's own
+          content, which is exactly what moving the pill out avoids. */}
+      {anchor.outside ? null : (
+        <p aria-hidden="true" data-testid="selection-toolbar-caption" className={CAPTION}>
+          {"⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ More"}
+        </p>
+      )}
     </div>
   );
 };
