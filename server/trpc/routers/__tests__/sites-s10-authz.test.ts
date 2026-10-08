@@ -148,9 +148,12 @@ describe("sites.saveProject — two pages on one slug (L3-001)", () => {
     checkSiteRoleMock.mockResolvedValueOnce(undefined);
     saveProjectFromEditorMock.mockRejectedValueOnce(new PageSlugTakenError("about", ["About", "About us"]));
     const caller = sitesRouter.createCaller(ctx() as never);
-    const err = await caller
+    const err = (await caller
       .saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never)
-      .catch((e: unknown) => e as { code: string; message: string });
+      .then(
+        () => null,
+        (e: unknown) => e,
+      )) as { code: string; message: string };
     expect(err).toMatchObject({ code: "CONFLICT" });
     expect(err.message).toBe('Two pages use the address /about ("About" and "About us"). Change one page\'s URL in Page settings to keep saving.');
   });
