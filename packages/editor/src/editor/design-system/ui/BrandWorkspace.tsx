@@ -724,9 +724,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     return undefined;
   };
 
-  /* 7316:80949 draws the Light / Dark switch inside the preview card. */
-  const previewControls =
-    page === "colour-mode" && composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
+  /* The preview card's Light / Dark switch, on every page that has the
+     preview — the dark check is not a Colour-mode-only question. */
+  const previewControls = composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
 
   /* Import / export is drawn as a panel, not a page with a preview. */
   const isPanelPage = page === "export";

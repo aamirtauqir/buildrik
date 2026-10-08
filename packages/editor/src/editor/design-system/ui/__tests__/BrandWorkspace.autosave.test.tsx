@@ -329,3 +329,15 @@ describe("BrandWorkspace — read-only tokens (failed migration)", () => {
     expect(composer.settings.designTokens).toEqual([]);
   });
 });
+
+describe("BrandWorkspace — the preview's Light / Dark switch is on every page", () => {
+  it.each(["colours", "fonts", "colour-mode"] as const)("%s carries it", (page) => {
+    const composer = makeFakeComposer();
+    Object.assign(composer, {
+      colorMode: { get: () => "light", set: vi.fn(), resolved: () => "light" },
+    });
+    const utils = renderWorkspace(composer);
+    openPage(utils, page);
+    expect(utils.getByTestId("brand-colour-mode-seg")).toBeTruthy();
+  });
+});

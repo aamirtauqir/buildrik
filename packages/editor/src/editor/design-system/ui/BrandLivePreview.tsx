@@ -14,8 +14,9 @@
  * Dark preview (`mode`) is the emitter's `data-theme="dark"` block, switched on
  * by setting `data-theme` on the frame's root, so each token with a dark mode
  * shows it;
- * the Colour mode page's Light / Dark switch drives it (7316:80949 draws the
- * switch INSIDE this card, so it comes in as `controls`).
+ * the Light / Dark switch drives it. It comes in as `controls` and sits in
+ * the card's header row beside the zoom, on every Brand page — laid over the
+ * page frame (7316:80949) it covered the page's own content (BRP1-M8).
  *
  * @license BSD-3-Clause
  */
@@ -51,8 +52,7 @@ export interface BrandLivePreviewProps {
   /** Every staged token, all kinds — the preview shows the draft, not the saved brand. */
   tokens: readonly DesignToken[];
   mode: "light" | "dark";
-  /** A control drawn over the top edge of the page frame — the Colour mode
-   *  page's Light / Dark switch (7316:80949). */
+  /** Drawn in the header row beside the zoom — the Light / Dark switch. */
   controls?: React.ReactNode;
 }
 
@@ -148,6 +148,9 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
         >
           Live preview{pageName ? ` · ${pageName}` : ""}
         </span>
+        {/* The Light / Dark switch rides in this row, beside the zoom: the
+            page frame below stays clear (BRP1-M8 8224:240644). */}
+        {controls && <span className="tw:inline-flex tw:shrink-0" data-testid="brand-live-preview-controls">{controls}</span>}
         {/* 7315:80955 draws the zoom as bare text with a caret ("50% ▾"), not
             a boxed field: the bare theme strips flowbite's border, fill and
             arrow image, and the caret is drawn beside it. */}
@@ -179,7 +182,6 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
       </header>
       {pageIsEmpty ? (
         <div className="tw:flex tw:flex-col tw:gap-3 tw:px-4 tw:pb-4" data-testid="brand-live-preview-empty">
-          {controls}
           <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
             This page is empty. Add content to the canvas to preview your brand changes.
           </p>
@@ -190,14 +192,6 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
           style={{ width: FRAME_W, height: FRAME_H }}
           data-testid="brand-live-preview-frame"
         >
-          {controls && (
-            /* 7316:80949 sets the switch 96px in from the page's left edge
-               (x=1100 at 1440), not centred — it sits in the page's nav
-               band, left of the page's own links. */
-            <div className="tw:absolute tw:left-[98px] tw:top-0.5 tw:z-10" data-testid="brand-live-preview-controls">
-              {controls}
-            </div>
-          )}
           {doc && (
             <iframe
               ref={frameRef}
