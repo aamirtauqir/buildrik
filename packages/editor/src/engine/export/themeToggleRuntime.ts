@@ -13,8 +13,8 @@
  */
 
 export const THEME_TOGGLE_ATTR = "data-bk-theme-toggle";
-export const THEME_TOGGLE_ICON_ATTR = "data-bk-tt";
-export const THEME_STORAGE_KEY = "buildrick-theme";
+const THEME_TOGGLE_ICON_ATTR = "data-bk-tt";
+const THEME_STORAGE_KEY = "buildrick-theme";
 
 export function initThemeToggleRuntime(root: ParentNode): () => void {
   const html = document.documentElement;
@@ -45,7 +45,7 @@ export function initThemeToggleRuntime(root: ParentNode): () => void {
 }
 
 export const THEME_BOOT_SCRIPT =
-  '<script data-buildrick-theme-boot>try{var t=localStorage.getItem("buildrick-theme");' +
+  `<script data-buildrick-theme-boot>try{var t=localStorage.getItem("${THEME_STORAGE_KEY}");` +
   'if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>';
 
 export function buildThemeToggleRuntimeScript(): string {
@@ -58,7 +58,7 @@ export function buildThemeToggleRuntimeScript(): string {
 
 const DARK = '[data-theme="dark"]';
 const OS_DARK_SCOPE = ':root:not([data-theme="light"])';
-const ICON = (mode: "light" | "dark") => `[data-bk-theme-toggle] [data-bk-tt="${mode}"]`;
+const ICON = (mode: "light" | "dark") => `[${THEME_TOGGLE_ATTR}] [${THEME_TOGGLE_ICON_ATTR}="${mode}"]`;
 
 export function themeToggleCss(state: "show" | "hide"): string {
   if (state === "hide") return "\n[data-bk-theme-toggle]{display:none!important}\n";

@@ -1,3 +1,4 @@
+import type { LookupAddress } from "node:dns";
 import dns from "node:dns/promises";
 import http from "node:http";
 import https from "node:https";
@@ -161,7 +162,7 @@ function requestOnce(
   if (remaining <= 0) return Promise.reject(new Error("TIMEOUT"));
   const lookup: net.LookupFunction = (_host, options, callback) => {
     if (options.all) {
-      (callback as (err: null, addresses: net.LookupAddress[]) => void)(null, [pinned]);
+      (callback as (err: null, addresses: LookupAddress[]) => void)(null, [pinned]);
     } else {
       callback(null, pinned.address, pinned.family);
     }
