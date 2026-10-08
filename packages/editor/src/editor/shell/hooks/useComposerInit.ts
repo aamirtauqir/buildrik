@@ -331,6 +331,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     setIsDirty(true);
                     setSaveState({ status: "idle", error: undefined });
                     clearUnsaved(siteId);
+                    /* L5-075: the import emits only PROJECT_LOADED, which
+                       autosave does not follow, so the restored edits sat
+                       under "Unsaved changes" until some other edit. This
+                       schedules their save. */
+                    instance.emit(EVENTS.PROJECT_CHANGED, { reason: "restore-unsaved" });
                   },
                 },
                 duration: Infinity,

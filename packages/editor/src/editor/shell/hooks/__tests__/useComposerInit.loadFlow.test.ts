@@ -304,6 +304,36 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
   });
 
+  /* L5-075: Restore put the edits back and lit "Unsaved changes", then nothing
+     saved them — importProject emits PROJECT_LOADED, which is not an autosave
+     trigger. Closing the tab then lost them a second time. */
+  it("Restore my edits schedules a save of the restored edits", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
+    localStorage.setItem(
+      "bk-unsaved-v1-site-9",
+      JSON.stringify({ project: { pages: [{ id: "p" }, { id: "q" }], styles: [] }, at: "2026-10-08T00:00:00.000Z" }),
+    );
+    try {
+      const params = makeParams();
+      renderHook(() => useComposerInit(params));
+      await act(async () => {
+        mockComposer.emit("composer:ready");
+        await flushMicrotasks();
+      });
+      const toast = vi
+        .mocked(params.addToast!)
+        .mock.calls.map(([t]) => t)
+        .find((t) => /never reached the server/i.test(t.title ?? ""));
+      mockComposer.emit.mockClear();
+      act(() => toast!.action!.onClick());
+      expect(mockComposer.importProject).toHaveBeenLastCalledWith({ pages: [{ id: "p" }, { id: "q" }], styles: [] });
+      expect(mockComposer.emit).toHaveBeenCalledWith("project:changed", expect.anything());
+    } finally {
+      localStorage.removeItem("bk-unsaved-v1-site-9");
+    }
+  });
+
   /* C-9: a member demoted mid-save is sent to view mode, where nothing can
      be saved — offering "Restore my edits" there would put back edits that
      can only be refused again. The record stays for when the role returns. */
