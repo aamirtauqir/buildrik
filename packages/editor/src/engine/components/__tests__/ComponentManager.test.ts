@@ -209,6 +209,35 @@ describe("ComponentManager.updateComponentMaster — version bump + autosync", (
     expect(mgr.getInstance(payload.instanceId)!.syncedVersion).toBe(2);
   });
 
+  it("keeps an instance's own text through a master update (L2-005)", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const instanceId = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+
+    // Inline text edit on the instance's heading — an override like any style.
+    manager.getElement(instanceId)!.getChildren()[0].setContent("OVERRIDE TEXT");
+    expect(mgr.getInstance(instanceId)!.overrides).toHaveLength(1);
+
+    card.addClass("v2");
+    const outcome = await mgr.updateComponentMaster(comp.id, card.getId());
+    expect(outcome.overridesDropped).toBe(0);
+
+    const fresh = mgr.getInstancesOfComponent(comp.id)[0];
+    expect(manager.getElement(fresh.elementId)!.getChildren()[0].getContent()).toBe("OVERRIDE TEXT");
+  });
+
+  it("counts a text override whose element the master dropped (L2-005)", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const instanceId = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    manager.getElement(instanceId)!.getChildren()[0].setContent("OVERRIDE TEXT");
+
+    manager.removeElement(card.getChildren()[0].getId());
+    expect((await mgr.updateComponentMaster(comp.id, card.getId())).overridesDropped).toBe(1);
+  });
+
   it("reports how many instances it synced and how many overrides it could not keep", async () => {
     const { manager, mgr, page } = makeStack();
     const card = sourceElement(manager, page.root.id);
