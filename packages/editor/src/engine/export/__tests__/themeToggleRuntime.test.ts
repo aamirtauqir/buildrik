@@ -11,26 +11,32 @@ afterEach(() => dispose());
 beforeEach(() => {
   document.documentElement.removeAttribute("data-theme");
   localStorage.clear();
-  document.body.innerHTML = `<button data-bk-theme-toggle="true"><span data-bk-tt="light"></span><span data-bk-tt="dark"></span></button>`;
+  document.body.innerHTML = `<div data-bk-theme-toggle="true" role="group"><button data-bk-tt="light">Light</button><button data-bk-tt="dark">Dark</button></div>`;
 });
 
 describe("theme toggle runtime (spec D12, test 22)", () => {
-  it("flips data-theme from the OS default, persists the choice and reports it", () => {
+  const seg = (mode: "light" | "dark") => document.querySelector<HTMLElement>(`[data-bk-tt="${mode}"]`)!;
+
+  it("a segment picks its theme, persists the choice and reports it (M12 published-dark)", () => {
     prefersDark(false);
     dispose = initThemeToggleRuntime(document);
-    const btn = document.querySelector("button")!;
-    btn.click();
+    expect(seg("light").getAttribute("aria-pressed")).toBe("true");
+    seg("dark").click();
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
     expect(localStorage.getItem("buildrick-theme")).toBe("dark");
-    expect(btn.getAttribute("aria-pressed")).toBe("true");
-    btn.querySelector("span")!.click(); // a click on the icon counts
+    expect(seg("dark").getAttribute("aria-pressed")).toBe("true");
+    expect(seg("light").getAttribute("aria-pressed")).toBe("false");
+    seg("dark").click(); // the current segment again keeps the theme
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    seg("light").click();
     expect(document.documentElement.getAttribute("data-theme")).toBe("light");
   });
 
-  it("starts from dark when the visitor's OS is dark", () => {
+  it("reports the visitor's OS theme before any choice (M12 published-auto)", () => {
     prefersDark(true);
     dispose = initThemeToggleRuntime(document);
-    document.querySelector("button")!.click();
+    expect(seg("dark").getAttribute("aria-pressed")).toBe("true");
+    seg("light").click();
     expect(document.documentElement.getAttribute("data-theme")).toBe("light");
   });
 
@@ -50,9 +56,14 @@ describe("theme toggle runtime (spec D12, test 22)", () => {
     expect(initThemeToggleRuntime.toString()).not.toMatch(/THEME_|import\(|require\(/);
   });
 
-  it("hide CSS hides every toggle; show CSS swaps the icons by theme", () => {
+  it("hide CSS hides every toggle; show CSS fills the current theme's segment; the Off canvas dims it", () => {
     expect(themeToggleCss("hide")).toContain("[data-bk-theme-toggle]{display:none!important}");
-    expect(themeToggleCss("show")).toContain(':root[data-theme="dark"] [data-bk-theme-toggle] [data-bk-tt="light"]{display:none!important}');
+    const show = themeToggleCss("show");
+    expect(show).toContain(':root[data-theme="dark"] [data-bk-theme-toggle] [data-bk-tt="dark"]{background-color:var(--buildrick-design-color-primary)!important;color:var(--buildrick-design-color-on-primary)!important;border-color:var(--buildrick-design-color-primary)!important}');
+    expect(show).toContain(':root[data-theme="light"] [data-bk-theme-toggle] [data-bk-tt="light"]{background-color:var(--buildrick-design-color-primary)!important;color:var(--buildrick-design-color-on-primary)!important;border-color:var(--buildrick-design-color-primary)!important}');
+    expect(show).toContain('@media (prefers-color-scheme: dark){:root:not([data-theme]) [data-bk-theme-toggle] [data-bk-tt="dark"]{background-color:var(--buildrick-design-color-primary)!important;color:var(--buildrick-design-color-on-primary)!important;border-color:var(--buildrick-design-color-primary)!important}}');
+    expect(show).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    expect(themeToggleCss("dimmed")).toContain("[data-bk-theme-toggle]{opacity:0.35}");
   });
 
   it("finds a toggle on any page", () => {

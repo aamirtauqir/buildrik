@@ -98,6 +98,7 @@ import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupReque
 import { takeBrandPageRequest, takeBrandTokenRequest } from "./brandOpenRequest";
 import { ConnectTokensCheck } from "./sections/ConnectTokensCheck";
 import { StartersSection } from "./sections/StartersSection";
+import { BrandFromSource } from "./sections/BrandFromSource";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { DarkModeCard } from "./sections/DarkModeCard";
 import { ScaleGenerator } from "./sections/ScaleGenerator";
@@ -154,21 +155,27 @@ const MORE_KINDS = [
 ] as const satisfies ReadonlyArray<{ kind: TokenKind; label: string }>;
 
 type MoreKind = (typeof MORE_KINDS)[number]["kind"];
-/* "connect" — Connect to tokens (BRP1-M7), a page under Brand checks: no nav
-   row of its own, Brand checks stays current on it. "scale" — the colour
-   scale generator (BRP1-M9), a page under Colours the same way.
+/* "connect" — Connect to tokens (BRP1-M7), a page under Brand checks;
+   "brand-from-source" — Brand from logo or website (BRP1-M11), reached from
+   Starters behind dsAi; "scale" — the colour scale generator (BRP1-M9),
+   under Colours. None has a nav row: its parent row stays current.
    "restore-points" (BRP1-M10) is the header's action on every page; no nav
    row is current on it. */
-export type BrandPageId = NavId | `kind-${MoreKind}` | "connect" | "scale" | "restore-points";
+const FROM_SOURCE = "brand-from-source";
+export type BrandPageId = NavId | `kind-${MoreKind}` | "connect" | typeof FROM_SOURCE | "scale" | "restore-points";
 
 const LANDING: BrandPageId = "colours";
 
 function isPageId(value: string): value is BrandPageId {
-  return value === "connect" || value === "scale" || value === "restore-points" || NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value);
+  return (
+    value === "connect" || value === FROM_SOURCE || value === "scale" || value === "restore-points" ||
+    NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value)
+  );
 }
 
 function pageLabel(id: BrandPageId): string {
   if (id === "connect") return "Connect to tokens";
+  if (id === FROM_SOURCE) return "Brand from logo or website";
   if (id === "scale") return "Colour scale generator";
   if (id === "restore-points") return "Restore points";
   /* BRP1-M8 titles the Colour mode page by its card: "Dark mode". */
@@ -550,6 +557,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "presets":          return "Section and element presets";
       case "brand-checks":     return brandChecksCaption(lintIssues, suppressedCount);
       case "starters":         return "Pick a starter to apply it to the site";
+      case FROM_SOURCE:        return "";
       case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
       case "export":           return "Move the brand in and out";
       case "connect":          return "";
@@ -827,7 +835,14 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           />
         );
       case "starters":
-        return <StartersSection projectId={projectId} />;
+        return (
+          <StartersSection
+            projectId={projectId}
+            onOpenFromSource={isFeatureEnabled("dsAi") ? () => openPage(FROM_SOURCE) : undefined}
+          />
+        );
+      case FROM_SOURCE:
+        return <BrandFromSource composer={composer ?? null} />;
       case "spacing":
         return <TokensSection {...tokenPageProps} openKind="spacing" />;
       case "export":
@@ -854,6 +869,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       page === id ||
       (id === "spacing" && page.startsWith("kind-")) ||
       (id === "brand-checks" && page === "connect") ||
+      (id === "starters" && page === FROM_SOURCE) ||
       (id === "colours" && page === "scale");
     return (
       <Button
@@ -1078,9 +1094,15 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               <BrandPreview colors={visibleColors} tokens={color.tokens} />
             </section>
           )}
-          {(page === "connect" || page === "colour-mode" || page === "scale") && (
-            /* 8224:234362's (and BRP1-M8's) guidance card under the preview. */
-            <section aria-label="About Connect to tokens" className={SIDE_CARD} data-testid="brand-connect-guide">
+          {(page === "connect" || page === FROM_SOURCE || page === "colour-mode" || page === "scale") && (
+            /* The guidance card under the preview on Connect (8224:234362),
+               Brand from logo or website (BRP1-M11), Dark mode (M8) and the
+               scale generator (M9): the same card. */
+            <section
+              aria-label={page === FROM_SOURCE ? "About Brand from logo or website" : "About Connect to tokens"}
+              className={SIDE_CARD}
+              data-testid={page === FROM_SOURCE ? "brand-from-source-guide" : "brand-connect-guide"}
+            >
               <p className={SIDE_CARD_TITLE}>Preview before applying</p>
               <p className={SIDE_CARD_BODY}>
                 Explore the result on your canvas. Confirm or Apply commits the whole change as one ⌘Z step.

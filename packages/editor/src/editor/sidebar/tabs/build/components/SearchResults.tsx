@@ -15,6 +15,7 @@ import type { BlockDragStartFn, DragStartFn, ElClickFn } from "../hooks/useBuild
 import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { Button } from "@/editor/chrome-ui";
+import { themeToggleBlockConfig } from "@/blocks/Basic/ThemeToggle";
 
 interface SearchResultsProps {
   query: string;
@@ -95,7 +96,32 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
   return (
     <div role="status" aria-live="polite" data-testid="insert-search-results">
-      {hits.map((hit) => (
+      {hits.map((hit) =>
+        hit.group === "ELEMENTS" && hit.el.blockId === themeToggleBlockConfig.id ? (
+          /* BRP1-M12 add-panel-auto (8228:232784): the toggle is a card, with
+             the condition it is offered under beneath it. */
+          <div key={hit.key} className="tw:flex tw:flex-col tw:gap-4 tw:px-4 tw:py-2">
+            <div
+              data-testid="insert-theme-toggle-tile"
+              draggable
+              onDragStart={(e) => dragStart(e, hit)}
+              className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:p-3"
+            >
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]">
+                {hit.label}
+              </p>
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
+                {hit.el.description}
+              </p>
+              <Button type="button" size="xs" onClick={() => activate(hit)}>
+                Add to page
+              </Button>
+            </div>
+            <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+              Available with Dark mode Auto.
+            </p>
+          </div>
+        ) : (
         <div
           key={hit.key}
           role="button"
@@ -142,7 +168,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             ⠿
           </span>
         </div>
-      ))}
+        ),
+      )}
     </div>
   );
 };

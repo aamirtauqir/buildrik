@@ -326,3 +326,23 @@ describe("BrandWorkspace — opens on a requested token", () => {
     expect(again.getByTestId("brand-page-title").textContent).toBe("Colours");
   });
 });
+
+describe("BrandWorkspace › Brand from logo or website (BRP1-M11)", () => {
+  it("Starters opens it behind dsAi; the Starters row stays current and the guide card sits in the preview column", async () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    openPage(utils, "starters");
+    fireEvent.click(await waitFor(() => utils.getByTestId("starter-row-from-source")));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Brand from logo or website");
+    expect(utils.getByTestId("brand-row-starters").getAttribute("aria-current")).toBe("page");
+    expect(utils.getByTestId("brand-from-source")).toBeTruthy();
+    expect(utils.getByTestId("brand-from-source-guide")).toBeTruthy();
+  });
+
+  it("is not offered when dsAi is off", async () => {
+    vi.mocked(isFeatureEnabled).mockReturnValue(false);
+    const utils = renderWorkspace(makeFakeComposer());
+    openPage(utils, "starters");
+    await waitFor(() => utils.getByTestId("starter-list"));
+    expect(utils.queryByTestId("starter-row-from-source")).toBeNull();
+  });
+});

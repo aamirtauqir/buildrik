@@ -464,3 +464,58 @@ describe("TokenUsageTracker via Composer · sources", () => {
     expect(typeof c.designSystem.tokenUsage.getCount("color-primary")).toBe("number");
   });
 });
+
+/* A loaded project reaches the element tree through `importProject`: page
+   load, undo/redo, transaction rollback and version restore. None of those
+   emit per-element events, so the breakdown (which drives "Used by N
+   elements" and the M5 canvas highlight) must be rebuilt on PROJECT_LOADED —
+   otherwise the site-wide count sees the button and the breakdown does not. */
+describe("TokenUsageTracker via Composer · loaded project", () => {
+  beforeAll(installEngineBrowserStubs);
+  afterAll(removeEngineBrowserStubs);
+
+  const page = (styles: Record<string, string>) => ({
+    pages: [
+      {
+        id: "p",
+        name: "Home",
+        slug: "",
+        root: {
+          id: "root",
+          type: "container",
+          tagName: "div",
+          children: [{ id: "btn", type: "button", tagName: "button", content: "Go", styles }],
+        },
+      },
+    ],
+  });
+  const flush = async () => {
+    for (let i = 0; i < 3; i++) await Promise.resolve();
+  };
+
+  it("an element's inline var() binding is an element use after load", async () => {
+    const c = createTestComposer();
+    c.importProject(page({ "background-color": "var(--buildrick-design-color-primary)" }) as never);
+    await flush();
+    const t = c.designSystem.tokenUsage;
+    expect(t.getUsage("color-primary")).toBe(1);
+    expect(t.getBreakdown("color-primary")).toEqual([{ elementId: "btn", styleProp: "background-color" }]);
+  });
+
+  it("a {{token.*}} binding in the element style map is an element use after load", async () => {
+    const c = createTestComposer();
+    c.importProject(page({ color: "{{token.color-primary}}" }) as never);
+    await flush();
+    expect(c.designSystem.tokenUsage.getBreakdown("color-primary")).toEqual([{ elementId: "btn", styleProp: "color" }]);
+  });
+
+  it("drops the previous project's elements when another is loaded (undo / restore)", async () => {
+    const c = createTestComposer();
+    c.importProject(page({ "background-color": "var(--buildrick-design-color-primary)" }) as never);
+    await flush();
+    expect(c.designSystem.tokenUsage.getBreakdown("color-primary")).toHaveLength(1);
+    c.importProject(page({ "background-color": "#fff" }) as never);
+    await flush();
+    expect(c.designSystem.tokenUsage.getBreakdown("color-primary")).toEqual([]);
+  });
+});

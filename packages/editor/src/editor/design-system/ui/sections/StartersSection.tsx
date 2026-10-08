@@ -25,6 +25,8 @@ import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface StartersSectionProps {
   projectId?: string | null;
+  /** BRP1-M11's door (behind dsAi): absent → no row. */
+  onOpenFromSource?: () => void;
 }
 
 const family = (v: string | null | undefined) => String(v ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
@@ -44,7 +46,7 @@ function starterLine(starter: StarterDS, headingFont: string, bodyFont: string):
   return [fonts, colour].filter(Boolean).join(" · ");
 }
 
-export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) => {
+export const StartersSection: React.FC<StartersSectionProps> = ({ projectId, onOpenFromSource }) => {
   const type = useTypeRegistry();
   const headingFont = family(resolveTokenLiteral(type.tokens, "font-heading", "light"));
   const bodyFont = family(resolveTokenLiteral(type.tokens, "font-body", "light"));
@@ -52,6 +54,20 @@ export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) =
   const applyStarter = useApplyStarter(projectId);
 
   return (
+    <>
+    {onOpenFromSource && (
+      <div className="tw:mb-4">
+        <BrandCard label="Your own brand" data-testid="starter-from-source">
+          <BrandRow
+            data-testid="starter-row-from-source"
+            onSelect={onOpenFromSource}
+            trailing={<BrandChevron />}
+            name="Brand from logo or website"
+            sub="Colours and fonts from your logo or your current site"
+          />
+        </BrandCard>
+      </div>
+    )}
     <BrandCard label="Starter design systems" role="radiogroup" data-testid="starter-list">
       {STARTER_DS_REGISTRY.map((s) => (
         <BrandRow
@@ -72,6 +88,7 @@ export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) =
         />
       ))}
     </BrandCard>
+    </>
   );
 };
 

@@ -35,6 +35,8 @@ import { InspectorHeader } from "./components/InspectorHeader";
 import { InspectorLoading } from "./components/InspectorLoading";
 import { MultiSelectBar } from "./components/MultiSelectBar";
 import { PagePanel } from "./components/PagePanel";
+import { ThemeToggleInspector } from "./components/ThemeToggleInspector";
+import { THEME_TOGGLE_ATTR } from "@/engine/export/themeToggleRuntime";
 import { StatusLine } from "./components/StatusLine";
 import { StatusMarks } from "./components/StatusMarks";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
@@ -312,6 +314,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
      select; an empty canvas message would read as "your site is empty". */
   if (projectLoading && !selectedElement) return <InspectorLoading />;
   if (!selectedElement) return <PagePanel composer={composer} />;
+  /* BRP1-M12: a theme toggle's look and behaviour are the site's Brand and
+     Dark mode — its inspector says so instead of offering element styles. */
+  if (
+    composer &&
+    targetIds.length <= 1 &&
+    composer.elements?.getElement?.(selectedElement.id)?.getAttribute?.(THEME_TOGGLE_ATTR) !== undefined
+  ) {
+    return <ThemeToggleInspector composer={composer} />;
+  }
 
   const showContextRow = activeTab !== "behaviour";
 

@@ -41,11 +41,13 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
         style.id = STYLE_ID;
         document.head.appendChild(style);
       }
-      /* The canvas always swaps a theme toggle's icons, even on an Off site —
-         publish hides it there, the canvas shows it with the board's note. */
+      /* The canvas always shows a theme toggle — on an Off site dimmed, as
+         BRP1-M12 draws it, where publish hides it. */
       const css =
         emitTokenCss(tokens, { darkMode }) +
-        (siteHasThemeToggle(composer.elements?.getAllElements?.() ?? []) ? themeToggleCss("show") : "");
+        (siteHasThemeToggle(composer.elements?.getAllElements?.() ?? [])
+          ? themeToggleCss(darkMode === "off" ? "dimmed" : "show")
+          : "");
       if (style.textContent !== css) style.textContent = css;
       document.documentElement.dataset.theme =
         preview?.theme ?? (darkMode === "off" ? "light" : (composer.colorMode?.resolved?.() ?? "light"));
