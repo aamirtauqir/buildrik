@@ -47,6 +47,26 @@ describe("RecoveryBanner", () => {
     expect(sessionStorage.getItem(SENTINEL)).toBeNull();
   });
 
+  /* L5-074: on a dashboard site the editor loads the SERVER copy; the local
+     draft this banner describes is only loaded when that load fails. Shown over
+     the server copy it said "Recovered your work … Keep changes" beside the
+     toast saying "The version on screen is the server's" — and "Keep changes"
+     kept nothing. */
+  it("stays hidden, and leaves the sentinel, while the screen shows the server copy", async () => {
+    seedCrash();
+    const { container } = renderBanner({ localDraftShown: false, serverEditedAt: async () => new Date(0).toISOString() });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(container).toBeEmptyDOMElement();
+    expect(sessionStorage.getItem(SENTINEL)).not.toBeNull();
+  });
+
+  it("shows once the local draft is what loaded (server load failed)", async () => {
+    seedCrash();
+    const { rerender } = renderBanner({ localDraftShown: false, serverEditedAt: async () => new Date(0).toISOString() });
+    rerender(<RecoveryBanner pageCount={3} localDraftShown serverEditedAt={async () => new Date(0).toISOString()} />);
+    await waitFor(() => expect(screen.getByText(/recovered your work/i)).toBeInTheDocument());
+  });
+
   it("Keep changes dismisses the banner", async () => {
     seedCrash();
     renderBanner({ serverEditedAt: async () => new Date(0).toISOString() });

@@ -648,7 +648,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         ...style,
       }}
     >
-      <RecoveryBanner pageCount={composer?.elements.getAllPages().length} />
+      <RecoveryBanner
+        pageCount={composer?.elements.getAllPages().length}
+        /* A dashboard site shows the server's copy unless its load failed
+           (L5-074) — the unsaved-edits toast owns recovery there. */
+        localDraftShown={!getSiteIdFromUrl() || loadError !== null}
+      />
       <LoadErrorBanner
         kind={loadError}
         onRetry={() => window.location.reload()}
