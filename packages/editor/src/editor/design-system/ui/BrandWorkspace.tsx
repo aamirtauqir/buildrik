@@ -795,17 +795,15 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             </div>
             <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
               {/* "Review changes" (spec §4): non-blocking, this session's
-                  edits with Revert. Drawn only once there is one. */}
-              {store.edits.length > 0 && (
-                <SessionEditsPopover
-                  edits={store.edits}
-                  onRevert={(i) => {
-                    if (!store.revert(i)) refused("That revert");
-                  }}
-                  disabled={readOnly}
-                />
-              )}
-              <EditLock locked={readOnly}>{pageAction}</EditLock>
+                  edits with Revert — drawn at 0 too (8222:230854). */}
+              <SessionEditsPopover
+                edits={store.edits}
+                onRevert={(key) => {
+                  if (!store.revert(key)) refused("That revert");
+                }}
+                disabled={readOnly}
+                extraActions={<EditLock locked={readOnly}>{pageAction}</EditLock>}
+              />
             </div>
           </header>
           )}
