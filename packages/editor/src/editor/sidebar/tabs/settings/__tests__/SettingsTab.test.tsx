@@ -525,6 +525,18 @@ describe("SettingsTab — Back to canvas is a link (owner 2026-10-04)", () => {
     expect(fireEvent.click(back, { shiftKey: true })).toBe(true);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("closing in place drops ?settings= from the URL with no new history entry, so a reload does not reopen Settings; opening keeps the deep link", () => {
+    window.history.replaceState(null, "", "/edit/site-1?settings=access&page=p1#x");
+    const historyLength = window.history.length;
+    const onClose = vi.fn();
+    renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    expect(window.location.search).toBe("?settings=access&page=p1");
+    fireEvent.click(screen.getByTestId("set-back"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(window.location.pathname + window.location.search + window.location.hash).toBe("/edit/site-1?page=p1#x");
+    expect(window.history.length).toBe(historyLength);
+  });
 });
 
 // ─── The guard ────────────────────────────────────────────────────────────

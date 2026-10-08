@@ -18,7 +18,7 @@ import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
 import { slugifyProjectName } from "@/lib/vercel";
-import { TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
+import { BRAND_FORMAT_CONFLICT, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { checkTokenPayload, TokenSaveError, type TokenCheck } from "@/server/services/brand-tokens";
 
 function slugify(name: string): string {
@@ -917,9 +917,10 @@ function withCheckedTokens(settings: unknown, check: TokenCheck, stored: unknown
 /**
  * The save's token check for this site's workspace switch. A stale tab (an
  * older brand format than the store, or a first v6 save the switch or the
- * site's hold refuses) answers as the ordinary `SAVE_CONFLICT:<stored
- * lastEditedAt>`, so every editor bundle opens its conflict dialog and a
- * reload brings the stored brand; the token reason stays in the server log.
+ * site's hold refuses) answers as `BRAND_FORMAT_CONFLICT SAVE_CONFLICT:<stored
+ * lastEditedAt>`: every editor bundle still opens its conflict dialog, and a
+ * bundle that knows the reason offers Reload only — Overwrite would send the
+ * same refused payload again. The token reason stays in the server log.
  */
 function checkedTokensOrConflict(
   siteId: string,
@@ -931,7 +932,7 @@ function checkedTokensOrConflict(
   } catch (e) {
     if (!(e instanceof TokenSaveError) || e.code !== "TOKENS_STALE_CLIENT") throw e;
     console.warn("[tokens] save refused", { siteId, code: e.code, reason: e.message });
-    throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+    throw new Error(`${BRAND_FORMAT_CONFLICT} SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
   }
 }
 

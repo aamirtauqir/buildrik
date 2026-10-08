@@ -118,6 +118,45 @@ describe("undo scope (A-4 / PD-12)", () => {
     expect(settings?.seo?.metaTitle).toBe("Old title");
   });
 
+  /* Dark mode is token state (the server keeps it beside designTokens), so a
+     ⌘Z of a Dark mode change must revert it — the snapshot did not carry it,
+     and the undo left the new value standing. */
+  it("undoing a Dark mode change restores the previous setting", () => {
+    composer.setProjectSettings({ ...composer.getProjectSettings(), darkMode: "off" });
+    composer.history.flushPending();
+    composer.history.record("baseline");
+    composer.setProjectSettings({ ...composer.getProjectSettings(), darkMode: "auto" });
+    composer.history.flushPending();
+    composer.history.record("dark mode auto");
+    expect(composer.getProjectSettings().darkMode).toBe("auto");
+
+    composer.history.undo();
+    expect(composer.getProjectSettings().darkMode).toBe("off");
+    expect(composer.getProjectSettings().seo?.metaTitle).toBe("Old title");
+
+    composer.history.redo();
+    expect(composer.getProjectSettings().darkMode).toBe("auto");
+  });
+
+  /* The site's first Dark mode change: the restored state had no darkMode.
+     Absent reads as "off" everywhere (DarkModeSchema.catch("off")), and an
+     absent key is left out of a save, so undo writes "off" explicitly. */
+  it("undoing the first Dark mode change writes an explicit off", () => {
+    composer.history.record("baseline");
+    composer.setProjectSettings({ ...composer.getProjectSettings(), darkMode: "auto" });
+    composer.history.flushPending();
+    composer.history.record("dark mode auto");
+
+    composer.history.undo();
+    expect(composer.exportProject().settings?.darkMode).toBe("off");
+  });
+
+  it("an undo on a site that never set Dark mode does not invent it", () => {
+    canvasEdit();
+    composer.history.undo();
+    expect("darkMode" in (composer.exportProject().settings ?? {})).toBe(false);
+  });
+
   it("an undo on a site that never had tokens does not invent them", () => {
     canvasEdit();
     composer.history.undo();

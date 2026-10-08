@@ -72,3 +72,33 @@ describe("the ZIP is the whole site", () => {
     expect(home).not.toContain('href="/about.html"');
   });
 });
+
+/* The ZIP never held sitemap.xml: generateZip ran exportAllPages without
+   includeSitemap/baseUrl and no caller set them. It now follows the publish
+   worker's rule (lib/publish-files.ts): a sitemap whenever indexing is on and
+   the site has an origin, built by the same shared builder. */
+describe("the ZIP's sitemap follows the publish rule", () => {
+  async function zipOf(composer: Composer, origin: string | null) {
+    const blob = await new ExportEngine(composer).generateZip(undefined, origin);
+    return JSZip.loadAsync(await blob.arrayBuffer());
+  }
+
+  it("carries sitemap.xml on the site's origin when indexing is on", async () => {
+    const zip = await zipOf(twoPageComposer("about"), "https://bellacucina.com");
+    const xml = await zip.file("sitemap.xml")!.async("string");
+    expect(xml).toContain("<loc>https://bellacucina.com/</loc>");
+    expect(xml).toContain("<loc>https://bellacucina.com/about.html</loc>");
+  });
+
+  it("has no sitemap when the site has no origin yet", async () => {
+    const zip = await zipOf(twoPageComposer("about"), null);
+    expect(zip.file("sitemap.xml")).toBeNull();
+  });
+
+  it("has no sitemap when indexing is off", async () => {
+    const composer = twoPageComposer("about");
+    composer.setProjectSettingsRaw({ ...composer.getProjectSettings(), seo: { allowIndexing: false } });
+    const zip = await zipOf(composer, "https://bellacucina.com");
+    expect(zip.file("sitemap.xml")).toBeNull();
+  });
+});

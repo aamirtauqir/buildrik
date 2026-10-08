@@ -923,6 +923,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           leaving={leaveAfterSave !== null}
           busy={retrying}
           refusal={saveError?.startsWith("TOKENS_INVALID:") ? saveError.slice("TOKENS_INVALID:".length).trim() : undefined}
+          brandLocked={composer?.designSystem.readOnly ?? false}
           onRetry={() => void retrySave()}
           onKeepEditing={() => {
             setLeaveAfterSave(null);

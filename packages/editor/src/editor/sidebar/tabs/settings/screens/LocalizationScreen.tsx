@@ -335,7 +335,12 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
       <RemoveLocaleDialog
         locale={removing ? { name: localeLabel(removing.code), translated: removing.translated, total: removing.total } : null}
         busy={busy}
-        onCancel={() => setRemoving(null)}
+        onCancel={() => {
+          const code = removing?.code;
+          setRemoving(null);
+          /* The dialog's close leaves focus on <body>: hand it back to the row that asked. */
+          if (code) requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-testid="set-loc-row-remove-${code}"]`)?.focus());
+        }}
         onRemove={() => removing && void removeNow(removing.code)}
       />
       <TranslationChecklistDialog

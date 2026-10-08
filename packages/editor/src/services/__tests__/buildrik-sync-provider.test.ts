@@ -60,6 +60,8 @@ import {
   SAVE_CONFLICT_EVENT,
   SAVE_CONFLICT_CLEARED_EVENT,
   getPendingConflictToken,
+  isBrandFormatConflict,
+  keepStoredTokensOnSave,
   isSaveConflictPending,
   siteColumnsLoaded,
 } from "../BuildrikSyncProvider";
@@ -268,6 +270,41 @@ describe("saveProject", () => {
   });
 });
 
+/* A site whose STORED v6 tokens fail validation opens Brand read-only; its
+   saves must leave the tokens to the server (ruling C2), or every save —
+   pages included — is refused TOKENS_INVALID. */
+describe("saveProject — stored tokens kept server-side (Brand read-only, failed)", () => {
+  const withTokens = {
+    version: "1.0" as const, pages: [], styles: [], assets: [], metadata: { name: "T" },
+    settings: { designTokens: [{ broken: true }], designTokensSchemaVersion: 6, darkMode: "off", seo: { author: "Ann" } },
+  };
+
+  it("sends designTokens undefined once the site is marked, keeping every other setting", async () => {
+    await loadedSite("site-bad-tokens");
+    mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
+    keepStoredTokensOnSave("site-bad-tokens");
+
+    await saveProject("site-bad-tokens", withTokens as never);
+
+    const sent = mocks.saveProjectMutate.mock.calls.at(-1)![0].projectData.settings;
+    expect("designTokens" in sent).toBe(true);
+    expect(sent.designTokens).toBeUndefined();
+    expect(sent.seo).toEqual({ author: "Ann" });
+    expect(withTokens.settings.designTokens).toEqual([{ broken: true }]);
+  });
+
+  it("a fresh load forgets the mark — the next session decides again", async () => {
+    await loadedSite("site-bad-tokens-2");
+    keepStoredTokensOnSave("site-bad-tokens-2");
+    await loadedSite("site-bad-tokens-2");
+    mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
+
+    await saveProject("site-bad-tokens-2", withTokens as never);
+
+    expect(mocks.saveProjectMutate.mock.calls.at(-1)![0].projectData.settings.designTokens).toEqual([{ broken: true }]);
+  });
+});
+
 describe("saveProject — no session Object URLs reach the server (walk 2026-09-24)", () => {
   it("drops blob: src / background-image from the saved copy and leaves the live data alone", async () => {
     await loadedSite("site-blob");
@@ -446,6 +483,34 @@ describe("save-conflict parsing (61-conflict)", () => {
 
     await expect(saveProject("s1", PROJECT)).rejects.toThrow("SAVE_CONFLICT");
     expect(heard).toEqual(["2026-07-01T10:00:00.000Z"]);
+
+    window.removeEventListener(SAVE_CONFLICT_EVENT, listener);
+  });
+
+  it("a brand-format refusal keeps the bare ISO token and marks the conflict brandFormat", async () => {
+    mocks.saveProjectMutate.mockRejectedValue(
+      new Error("SAVE_CONFLICT_BRAND_FORMAT SAVE_CONFLICT:2026-07-01T10:00:00.000Z")
+    );
+    const heard: unknown[] = [];
+    const listener = (e: Event) => heard.push((e as CustomEvent).detail);
+    window.addEventListener(SAVE_CONFLICT_EVENT, listener);
+
+    await expect(saveProject("s1", PROJECT)).rejects.toMatchObject({ serverLastEditedAt: "2026-07-01T10:00:00.000Z" });
+    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: true }]);
+    expect(isBrandFormatConflict()).toBe(true);
+
+    window.removeEventListener(SAVE_CONFLICT_EVENT, listener);
+  });
+
+  it("an ordinary conflict is not brandFormat", async () => {
+    mocks.saveProjectMutate.mockRejectedValue(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+    const heard: unknown[] = [];
+    const listener = (e: Event) => heard.push((e as CustomEvent).detail);
+    window.addEventListener(SAVE_CONFLICT_EVENT, listener);
+
+    await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
+    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: false }]);
+    expect(isBrandFormatConflict()).toBe(false);
 
     window.removeEventListener(SAVE_CONFLICT_EVENT, listener);
   });

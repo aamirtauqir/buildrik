@@ -123,6 +123,15 @@ describe("AccessScreen — a password is stored (8136:216089)", () => {
     await waitFor(() => expect(screen.getByTestId("set-access-off")).toHaveTextContent("Anyone with the address"));
   });
 
+  it("after Remove, keyboard focus moves to the protection switch, not <body>", async () => {
+    setup();
+    await loaded();
+    const remove = screen.getByTestId("set-access-remove");
+    remove.focus();
+    fireEvent.click(remove);
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByTestId("set-access-toggle")));
+  });
+
   it("untouched, nothing is dirty and no save handler is registered", async () => {
     const { onDirtyChange, registerSaveHandler } = setup();
     await loaded();

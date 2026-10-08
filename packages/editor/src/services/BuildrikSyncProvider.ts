@@ -18,6 +18,7 @@ import type { ProjectSettingsPatch } from "@buildrik/shared/schemas/project-sett
 import type { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-detail";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import { MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
+import { BRAND_FORMAT_CONFLICT } from "@buildrik/shared/schemas/design-tokens";
 import type { z } from "zod";
 import type { ElementData } from "@/shared/types/element";
 import { blankPageRoot } from "@buildrik/shared/content/elementIds";
@@ -61,6 +62,9 @@ let _baselineLastEditedAt: string | null = null;
    stale token, be refused again, and re-raise the dialog the user just
    dismissed — the "Conflict — reload" pill is the standing notice instead. */
 let _conflictToken: string | null = null;
+/* The held conflict was refused for its brand format (BRAND_FORMAT_CONFLICT):
+   Overwrite would resend the same refused payload, so only Reload resolves it. */
+let _conflictBrandFormat = false;
 
 /** Whether a save conflict is waiting on the user's choice. Autosave reads it
  *  and holds the edit; a manual save is not sent either — saveProjectNow
@@ -76,6 +80,12 @@ export function getPendingConflictToken(): string | null {
   return _conflictToken;
 }
 
+/** Whether the pending conflict is a brand-format refusal — the dialog then
+ *  offers Reload, not Overwrite. */
+export function isBrandFormatConflict(): boolean {
+  return _conflictToken !== null && _conflictBrandFormat;
+}
+
 /** Dispatched on `window` when a pending conflict is resolved — Overwrite
  *  adopted the server token, or a fresh load replaced the copy. */
 export const SAVE_CONFLICT_CLEARED_EVENT = "buildrik:save-conflict-cleared";
@@ -83,6 +93,7 @@ export const SAVE_CONFLICT_CLEARED_EVENT = "buildrik:save-conflict-cleared";
 function clearConflictToken(): void {
   if (_conflictToken === null) return;
   _conflictToken = null;
+  _conflictBrandFormat = false;
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_CLEARED_EVENT));
 }
 
@@ -112,6 +123,19 @@ const _loadedSites = new Set<string>();
    settings, so such a session renders pages without their title template,
    icons, OG image or head/body code — publishing it is refused. */
 const _siteColumnsMissing = new Set<string>();
+
+/* Sites whose STORED v6 tokens failed validation at load (Brand opens
+   read-only, reason "failed"). Their saves send `designTokens: undefined`, so
+   the server carries the stored token state forward (ruling C2) instead of
+   refusing every save — pages included — as TOKENS_INVALID. Brand cannot be
+   edited in such a session, so nothing the user changed is left out. */
+const _storedTokensKept = new Set<string>();
+
+/** Mark the open site's saves as leaving its brand tokens to the server. The
+ *  shell calls it when the loaded tokens are invalid; the next load clears it. */
+export function keepStoredTokensOnSave(siteId: string): void {
+  _storedTokensKept.add(siteId);
+}
 
 /** Whether the open site's Site-column settings loaded. Publish reads it.
  *  A site no load ever reached has no columns either — this answered true for
@@ -174,15 +198,16 @@ export function raiseSaveConflict(err: unknown): SaveConflictError | null {
   const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
   if (!match) return null;
   _conflictToken = match[1].trim();
-  return announceConflict(_conflictToken);
+  _conflictBrandFormat = msg.includes(BRAND_FORMAT_CONFLICT);
+  return announceConflict(_conflictToken, _conflictBrandFormat);
 }
 
-function announceConflict(serverToken: string): SaveConflictError {
+function announceConflict(serverToken: string, brandFormat: boolean): SaveConflictError {
   /* A conflict raised after a Reload whose unload prompt was cancelled: the
      page lives on, and its refused work must be kept again. */
   resumeKeepingUnsaved();
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken } }));
+    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken, brandFormat } }));
   }
   return new SaveConflictError(serverToken);
 }
@@ -735,6 +760,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
     clearConflictToken();
     _baselineSiteColumns = extractSiteColumnPatch(data.settings);
+    _storedTokensKept.delete(siteId);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
@@ -799,7 +825,7 @@ async function saveProjectNow(
   /* A save queued behind the one that was refused carries the same stale
      token — sending it would only be refused again. It is refused here, with
      the same conflict, until the user resolves it (Overwrite / reload). */
-  if (_conflictToken !== null) throw announceConflict(_conflictToken);
+  if (_conflictToken !== null) throw announceConflict(_conflictToken, _conflictBrandFormat);
   const client = getClient();
   /* Never persist a session Object URL: it is a broken image on every later
      open. The live element keeps its preview; once its upload reaches the
@@ -813,6 +839,9 @@ async function saveProjectNow(
       dropSessionMediaUrls(root);
       return { ...page, root };
     }),
+    ...(_storedTokensKept.has(siteId) && projectData.settings
+      ? { settings: { ...projectData.settings, designTokens: undefined } }
+      : {}),
   };
 
   checkCmsBindingsSize(persisted);

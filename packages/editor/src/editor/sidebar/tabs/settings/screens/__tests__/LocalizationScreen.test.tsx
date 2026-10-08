@@ -173,6 +173,17 @@ describe("Languages — locales save immediately", () => {
     expect(screen.getByTestId("set-loc-row-ar")).toBeInTheDocument();
   });
 
+  it("Cancel returns focus to the Remove button that opened the dialog, not <body>", async () => {
+    setup();
+    await loaded();
+    const remove = screen.getByTestId("set-loc-row-remove-ar");
+    remove.focus();
+    fireEvent.click(remove);
+    fireEvent.click(screen.getByTestId("set-loc-remove-cancel"));
+    await waitFor(() => expect(screen.queryByTestId("set-loc-remove-confirm")).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByTestId("set-loc-row-remove-ar")));
+  });
+
   it("Remove of a locale with no translations writes the list once confirmed, without the staged default", async () => {
     setup();
     await loaded();

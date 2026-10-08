@@ -396,12 +396,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // don't stack dialogs while one is open. `open` is separate from the token:
   // a dismissed dialog keeps the token, so the save pill's `conflict` state
   // can re-open it (B2, decision #23) with the same three ways out.
-  const [conflict, setConflict] = React.useState<{ serverToken: string; open: boolean } | null>(null);
+  const [conflict, setConflict] = React.useState<{ serverToken: string; brandFormat: boolean; open: boolean } | null>(null);
 
   React.useEffect(() => {
     const onConflict = (e: Event) => {
-      const token = (e as CustomEvent<{ serverLastEditedAt: string }>).detail?.serverLastEditedAt;
-      if (token) setConflict((c) => (c?.open ? c : { serverToken: token, open: true }));
+      const detail = (e as CustomEvent<{ serverLastEditedAt: string; brandFormat?: boolean }>).detail;
+      const token = detail?.serverLastEditedAt;
+      if (token) setConflict((c) => (c?.open ? c : { serverToken: token, brandFormat: detail.brandFormat === true, open: true }));
     };
     window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
     return () => window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
@@ -796,6 +797,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       <ConflictModal
         open={!!conflict?.open}
+        brandFormat={conflict?.brandFormat}
         siteId={getSiteIdFromUrl()}
         onClose={() => setConflict((c) => (c ? { ...c, open: false } : c))}
         onReload={() => window.location.reload()}

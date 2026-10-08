@@ -53,7 +53,7 @@ describe("Save conflict — board 29", () => {
     try {
       fireEvent.click(screen.getByTestId("inspector-resolve"));
       expect(heard).toHaveBeenCalledTimes(1);
-      expect((heard.mock.calls[0][0] as CustomEvent).detail).toEqual({ serverLastEditedAt: "2026-09-28T10:00:00.000Z" });
+      expect((heard.mock.calls[0][0] as CustomEvent).detail).toEqual({ serverLastEditedAt: "2026-09-28T10:00:00.000Z", brandFormat: false });
     } finally {
       window.removeEventListener(SAVE_CONFLICT_EVENT, heard);
     }

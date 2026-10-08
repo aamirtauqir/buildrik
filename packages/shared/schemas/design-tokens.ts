@@ -12,6 +12,15 @@ import { TokenKindSchema, TokenCategorySchema, TokenTypeSchema } from "./designT
 
 export const TOKENS_SCHEMA_VERSION = 6;
 
+/**
+ * The reason a save refused for its brand format (a stale tab, or a first v6
+ * save the kill switch or the site's hold refuses) carries AHEAD of the
+ * ordinary `SAVE_CONFLICT:<iso>` tail. Overwrite cannot win such a conflict —
+ * the same payload is refused again — so the editor offers only Reload. The
+ * tail stays last, so a bundle that predates the reason still reads the ISO.
+ */
+export const BRAND_FORMAT_CONFLICT = "SAVE_CONFLICT_BRAND_FORMAT";
+
 export const TokenRefSchema = z.union([
   z.object({ alias: z.string().min(1) }).strict(),
   z.object({ value: z.string() }).strict(),

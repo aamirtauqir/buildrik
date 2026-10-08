@@ -156,6 +156,8 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
   const [busy, setBusy] = React.useState<Busy>(null);
   const [actionFailed, setActionFailed] = React.useState(false);
   const [addOpen, setAddOpen] = React.useState(false);
+  /** Unknown (still loading, or the read failed) counts as "no": the dialog then keeps drawing the TXT. */
+  const [vercelConnected, setVercelConnected] = React.useState(false);
   const [removeTarget, setRemoveTarget] = React.useState<DomainRow | null>(null);
   const [primaryTarget, setPrimaryTarget] = React.useState<DomainRow | null>(null);
   const [primaryError, setPrimaryError] = React.useState<string | null>(null);
@@ -177,6 +179,20 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
   );
 
   const api = () => getBuildrikClient(DASHBOARD_URL).siteDetail.domains;
+
+  React.useEffect(() => {
+    if (!projectId) return;
+    let stale = false;
+    getBuildrikClient(DASHBOARD_URL)
+      .siteDetail.domains.usesVercel.query({ siteId: projectId })
+      .then((r) => {
+        if (!stale) setVercelConnected(r.vercelConnected);
+      })
+      .catch(() => {});
+    return () => {
+      stale = true;
+    };
+  }, [projectId]);
 
   /* After an action: the rows as the server now has them, without the load
      card in between. A read that fails here goes back through the load path,
@@ -315,6 +331,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
       <AddDomainDialog
         open={addOpen}
         siteName={siteName}
+        vercelConnected={vercelConnected}
         checkAvailability={(domain) => api().checkAvailability.query({ domain })}
         onSubmit={connect}
         onCancel={() => setAddOpen(false)}

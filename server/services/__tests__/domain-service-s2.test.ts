@@ -55,6 +55,7 @@ import {
   checkDomainDns,
   dnsVerificationToken,
   verifyPendingDomains,
+  siteUsesVercel,
 } from "@server/services/domain.service";
 
 beforeEach(() => {
@@ -160,6 +161,7 @@ describe("connectDomain — the Add-a-domain dialog", () => {
         { domainId: "dom1", type: "CNAME", host: "www", value: "cname.vercel-dns.com" },
         { domainId: "dom1", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1") },
       ],
+      skipDuplicates: true,
     });
     // The answer carries the records just written — the dialog shows the real rows after.
     expect(result.dnsRecords).toEqual([{ type: "A" }]);
@@ -175,6 +177,7 @@ describe("connectDomain — the Add-a-domain dialog", () => {
         { domainId: "dom1", type: "CNAME", host: "shop", value: "cname.vercel-dns.com" },
         { domainId: "dom1", type: "TXT", host: "_buildrick.shop", value: dnsVerificationToken("dom1") },
       ],
+      skipDuplicates: true,
     });
   });
 
@@ -262,6 +265,20 @@ describe("connectDomain — the Add-a-domain dialog", () => {
     expect(db.domain.create).not.toHaveBeenCalled();
     expect(db.domain.update).not.toHaveBeenCalled();
     expect(db.dnsRecord.createMany).not.toHaveBeenCalled();
+  });
+
+  /* A 409 is also what Vercel says when OUR project already holds the domain
+     (a best-effort detach that failed, or a hand-added domain). */
+  it("a 409 for a domain already on this site's own project is treated as attached, not refused", async () => {
+    connectable();
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    vi.mocked(addDomainToVercelProject).mockRejectedValue(new VercelApiError(409, "domain_already_in_use", "in use"));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue({ name: "bellacucina.com", apexName: "bellacucina.com", verified: true, verification: [] });
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({ misconfigured: true, recommendedIPv4: null, recommendedCNAME: null });
+
+    await expect(connectDomain("s1", { domain: "bellacucina.com" })).resolves.toBeDefined();
+    expect(getVercelProjectDomain).toHaveBeenCalledWith(expect.objectContaining({ projectName: "bella", domain: "bellacucina.com" }));
+    expect(db.domain.create).toHaveBeenCalled();
   });
 
   it("still refuses a hostname another site holds", async () => {
@@ -392,7 +409,11 @@ describe("checkDomainDns — TXT", () => {
   it("without Vercel, a row with no _buildrick TXT gets one and is not VERIFIED on A + CNAME alone", async () => {
     const row = records(true);
     db.domain.findUnique.mockResolvedValue({ ...row, dnsRecords: row.dnsRecords.filter((r) => r.type !== "TXT") });
-    db.dnsRecord.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: "r-new", verified: false, ...data }));
+    db.dnsRecord.createMany.mockResolvedValue({ count: 1 });
+    db.dnsRecord.findMany.mockResolvedValue([
+      ...row.dnsRecords.filter((r) => r.type !== "TXT"),
+      { id: "r-new", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1"), verified: false },
+    ]);
     db.domain.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: "dom1", ...data }));
     vi.spyOn(dnsPromises, "resolve4").mockResolvedValue(["76.76.21.21"]);
     vi.spyOn(dnsPromises, "resolveCname").mockResolvedValue(["cname.vercel-dns.com"]);
@@ -400,8 +421,9 @@ describe("checkDomainDns — TXT", () => {
 
     const result = await checkDomainDns("dom1", "s1");
 
-    expect(db.dnsRecord.create).toHaveBeenCalledWith({
-      data: { domainId: "dom1", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1") },
+    expect(db.dnsRecord.createMany).toHaveBeenCalledWith({
+      data: [{ domainId: "dom1", type: "TXT", host: "_buildrick", value: dnsVerificationToken("dom1") }],
+      skipDuplicates: true,
     });
     expect(result?.status).toBe("PENDING");
   });
@@ -553,16 +575,83 @@ describe("checkDomainDns — Vercel decides status and SSL (Q7)", () => {
       data: expect.arrayContaining([
         { domainId: "dom1", type: "TXT", host: "_vercel.bellacucina.com", value: "vc-domain-verify=bellacucina.com,abc123" },
       ]),
+      skipDuplicates: true,
     });
   });
 
-  it("a row an old 409 marked VERIFIED, which the project does not hold (404 → null), drops to FAILED", async () => {
+  it("a row an old 409 marked VERIFIED, which the project does not hold (404 → null) and Vercel still refuses (409), drops to FAILED", async () => {
     db.domain.findUnique.mockResolvedValue(row({ status: "VERIFIED" }));
     vi.mocked(getVercelProjectDomain).mockResolvedValue(null);
+    vi.mocked(addDomainToVercelProject).mockRejectedValue(new VercelApiError(409, "domain_already_in_use", "elsewhere"));
 
     await checkDomainDns("dom1", "s1");
 
     expect(writtenStatus()).toMatchObject({ status: "FAILED", sslStatus: "PENDING" });
+  });
+
+  /* D7 (QA 2026-10-05): a transient attach failure at connect left the row
+     FAILED forever — every later check saw 404 and nothing re-attached. */
+  it("a 404 on the project re-attaches the domain, then re-verifies it (D7)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(null);
+    vi.mocked(addDomainToVercelProject).mockResolvedValue(projectDomain());
+    vi.mocked(getVercelDomainConfig).mockResolvedValue(configured);
+    db.dnsRecord.findMany.mockResolvedValue(apexRows(true));
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(addDomainToVercelProject).toHaveBeenCalledWith({
+      token: "t",
+      teamId: "team_1",
+      projectName: "buildrik-site-bella",
+      domain: "bellacucina.com",
+    });
+    expect(writtenStatus()).toMatchObject({ status: "VERIFIED", sslStatus: "ACTIVE" });
+  });
+
+  it("a re-attach that succeeds but is not yet pointed stays PENDING, never VERIFIED (D7)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(null);
+    vi.mocked(addDomainToVercelProject).mockResolvedValue(projectDomain({ verified: true }));
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({ ...configured, misconfigured: true });
+    db.dnsRecord.findMany.mockResolvedValue(apexRows(true));
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(writtenStatus()).toMatchObject({ status: "PENDING", sslStatus: "PENDING" });
+  });
+
+  it("a re-attach that fails again (non-409) leaves the domain FAILED (D7)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(null);
+    vi.mocked(addDomainToVercelProject).mockRejectedValue(new VercelApiError(500, "internal", "boom"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(writtenStatus()).toMatchObject({ status: "FAILED", sslStatus: "PENDING" });
+  });
+
+  it("does not re-attach when the project already holds the domain (a DNS mismatch is not an attach failure)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(projectDomain());
+    vi.mocked(getVercelDomainConfig).mockResolvedValue({ ...configured, misconfigured: true });
+    db.dnsRecord.findMany.mockResolvedValue(apexRows(false));
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(addDomainToVercelProject).not.toHaveBeenCalled();
+  });
+
+  it("an unreadable Vercel does not trigger a re-attach and leaves status unchanged", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ status: "FAILED" }));
+    vi.mocked(getVercelProjectDomain).mockRejectedValue(new VercelApiError(500, "internal", "boom"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(addDomainToVercelProject).not.toHaveBeenCalled();
+    expect(writtenStatus()).not.toHaveProperty("status");
   });
 
   it("repairs a subdomain's old apex-shaped rows to the one CNAME Vercel recommends", async () => {
@@ -582,12 +671,30 @@ describe("checkDomainDns — Vercel decides status and SSL (Q7)", () => {
 
     await checkDomainDns("dom1", "s1");
 
-    expect(db.dnsRecord.deleteMany).toHaveBeenCalledWith({ where: { domainId: "dom1" } });
+    // Stale rows go by id and the write skips duplicates, so a cron and a
+    // manual check running at once cannot double the table.
+    expect(db.dnsRecord.deleteMany).toHaveBeenCalledWith({ where: { domainId: "dom1", id: { in: ["r-a", "r-cname", "r-txt"] } } });
     expect(db.dnsRecord.createMany).toHaveBeenCalledWith({
       data: [{ domainId: "dom1", type: "CNAME", host: "shop", value: "cname.vercel-dns.com" }],
+      skipDuplicates: true,
     });
     expect(dnsPromises.resolveCname).toHaveBeenCalledWith("shop.bellacucina.com");
     expect(writtenStatus()).toMatchObject({ status: "VERIFIED", sslStatus: "ACTIVE" });
+  });
+
+  it("keeps the rows that already match and writes only the missing one (idempotent)", async () => {
+    db.domain.findUnique.mockResolvedValue(row({ dnsRecords: [apexRows(false)[0]] }));
+    vi.mocked(getVercelProjectDomain).mockResolvedValue(projectDomain());
+    vi.mocked(getVercelDomainConfig).mockResolvedValue(configured);
+    db.dnsRecord.findMany.mockResolvedValue(apexRows(false));
+
+    await checkDomainDns("dom1", "s1");
+
+    expect(db.dnsRecord.deleteMany).not.toHaveBeenCalled();
+    expect(db.dnsRecord.createMany).toHaveBeenCalledWith({
+      data: [{ domainId: "dom1", type: "CNAME", host: "www", value: "cname.vercel-dns.com" }],
+      skipDuplicates: true,
+    });
   });
 
   it("leaves matching rows alone (no rewrite churn)", async () => {
@@ -641,6 +748,7 @@ describe("connectDomain — status at attach (Q7)", () => {
       data: expect.arrayContaining([
         { domainId: "dom1", type: "TXT", host: "_vercel.bellacucina.com", value: "vc-domain-verify=bellacucina.com,abc123" },
       ]),
+      skipDuplicates: true,
     });
   });
 
@@ -679,7 +787,7 @@ describe("verifyPendingDomains — the dns-verify cron", () => {
     await expect(verifyPendingDomains(20)).resolves.toEqual({ checked: 2, verified: 2 });
 
     expect(db.domain.findMany).toHaveBeenCalledWith({
-      where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }] },
+      where: { OR: [{ status: { not: "VERIFIED" } }, { sslStatus: { not: "ACTIVE" } }], site: { deletedAt: null } },
       orderBy: [{ lastCheckedAt: { sort: "asc", nulls: "first" } }],
       take: 20,
       select: { id: true, siteId: true },
@@ -697,5 +805,22 @@ describe("verifyPendingDomains — the dns-verify cron", () => {
 
     await expect(verifyPendingDomains()).resolves.toEqual({ checked: 2, verified: 0 });
     expect(db.domain.findUnique).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("siteUsesVercel — whether the Add-a-domain dialog needs the _buildrick TXT", () => {
+  it("is true when the site's workspace has an active Vercel connection", async () => {
+    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1" });
+    vercelConnection.mockResolvedValue({ token: "t", teamId: null });
+    await expect(siteUsesVercel("s1")).resolves.toBe(true);
+    expect(vercelConnection).toHaveBeenCalledWith("ws1");
+  });
+
+  it("is false without a connection, and false for an unknown site", async () => {
+    db.site.findUnique.mockResolvedValue({ workspaceId: "ws1" });
+    vercelConnection.mockResolvedValue(null);
+    await expect(siteUsesVercel("s1")).resolves.toBe(false);
+    db.site.findUnique.mockResolvedValue(null);
+    await expect(siteUsesVercel("nope")).resolves.toBe(false);
   });
 });

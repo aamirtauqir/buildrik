@@ -18,6 +18,7 @@ import {
   listWorkspaceDomains,
   checkDomainAvailability,
   updateDomain,
+  siteUsesVercel,
 } from "@/server/services/domain.service";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
@@ -341,6 +342,19 @@ export const siteDetailRouter = router({
           throw e;
         }
         return listDomains(input.siteId);
+      }),
+
+    // The Add-a-domain dialog draws the `_buildrick` TXT only without Vercel.
+    usesVercel: protectedProcedure
+      .input(z.object({ siteId: z.string() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return { vercelConnected: await siteUsesVercel(input.siteId) };
       }),
 
     // Cross-site monitor: every domain in the caller's workspace.

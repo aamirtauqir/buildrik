@@ -1270,9 +1270,15 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
   }
 
   /**
-   * Generate ZIP file with HTML, CSS, and bundled assets
+   * Generate ZIP file with HTML, CSS, and bundled assets.
+   *
+   * `siteOrigin` is the host the site is published on (`siteOrigin` in
+   * @buildrik/shared/seo/urls — the canonical and the custom domains are
+   * server facts, so the caller supplies it). The archive carries sitemap.xml
+   * by the publish worker's rule (lib/publish-files.ts): indexing on and an
+   * origin known. It never carried one before — nothing set includeSitemap.
    */
-  async generateZip(config?: Partial<ExportConfig>): Promise<Blob> {
+  async generateZip(config?: Partial<ExportConfig>, siteOrigin?: string | null): Promise<Blob> {
     const cfg = { ...this.config, ...config };
     // D-12: JSZip is a heavy dep only needed on the ZIP export path — lazy
     // import keeps it out of the /edit/:id first-load chunk.
@@ -1286,7 +1292,13 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
     // other eleven, while Publish (which runs `exportAllPages`) shipped them
     // all. Verified on a two-page site: the ZIP held index.html + styles.css,
     // and the React export beside it held both pages.
-    const { files } = await this.exportAllPages({ format: "html", minify: cfg.minify });
+    const allowIndexing = this.composer.getProjectSettings?.()?.seo?.allowIndexing ?? true;
+    const { files } = await this.exportAllPages({
+      format: "html",
+      minify: cfg.minify,
+      includeSitemap: allowIndexing && !!siteOrigin,
+      baseUrl: siteOrigin ?? undefined,
+    });
 
     const htmlFiles = files.filter((f) => f.type === "html");
     let css = files.find((f) => f.name === "styles.css")?.content ?? "";
