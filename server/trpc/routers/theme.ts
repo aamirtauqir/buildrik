@@ -18,6 +18,8 @@ import {
   rollbackSiteTheme,
   listSiteThemeSnapshots,
   listBrandRestorePoints,
+  createBrandRestorePoint,
+  getBrandRestorePoint,
   saveWorkspacePreset,
   listWorkspacePresets,
   deleteWorkspacePreset,
@@ -28,6 +30,8 @@ import {
   captureSharedThemeInput,
   pushSharedThemeInput,
   setSiteThemeLockInput,
+  createBrandRestorePointInput,
+  brandRestorePointInput,
   previewSharedThemeInput,
   siteThemeSnapshotInput,
   saveWorkspacePresetInput,
@@ -169,6 +173,40 @@ export const themeRouter = router({
         throw e;
       }
       return listBrandRestorePoints(input.siteId);
+    }),
+
+  // A restore point taken before a generator, Dark-Auto or logo apply.
+  createBrandRestorePoint: protectedProcedure
+    .input(createBrandRestorePointInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return await createBrandRestorePoint(input);
+      } catch (e) {
+        translateThemeError(e);
+      }
+    }),
+
+  // One restore point's tokens, for the editor to restore.
+  brandRestorePoint: protectedProcedure
+    .input(brandRestorePointInput)
+    .query(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return await getBrandRestorePoint(input.siteId, input.id);
+      } catch (e) {
+        translateThemeError(e);
+      }
     }),
 
   // D4: the agency's named brand preset library.
