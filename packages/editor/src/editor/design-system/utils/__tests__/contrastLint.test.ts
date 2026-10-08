@@ -22,7 +22,7 @@ import { DEFAULT_TOKENS } from "../../constants";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../../types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
-import { buildContrastIssues, contrastFixHint, findSurfaceToken, resolveSurface, contrastFails } from "../contrastLint";
+import { buildContrastIssues, contrastFixHint, contrastLintMode, findSurfaceToken, resolveSurface, contrastFails } from "../contrastLint";
 
 const colors = DEFAULT_TOKENS.filter((t) => t.category === "colors");
 
@@ -151,5 +151,31 @@ describe("contrast is checked against the customer's surface, not a hardcoded on
   it("falls back to white, never to near-black, when the palette has no background token", () => {
     const noSurface = [v6Token({ id: "color-paper", name: "Paper", value: "#F2F2F2", group: "brand", layer: "semantic" })];
     expect(flagged(noSurface, "light")).toEqual(["color-paper"]);
+  });
+});
+
+/* L4-021 / L4-022: the Brand preview's Light/Dark switch sets the editor's
+   global colour mode, and the linter measured in it — a light-only site
+   (darkMode "off") gained four dark-mode contrast failures, and Fix › then
+   darkened a colour that was failing against the DARK surface. */
+describe("contrast is measured in the mode the site ships", () => {
+  it("a site with dark mode off is measured in light, whatever the editor's mode", () => {
+    expect(contrastLintMode("off", "dark")).toBe("light");
+    expect(contrastLintMode(undefined, "dark")).toBe("light");
+  });
+
+  it("a site that ships dark mode follows the editor's mode", () => {
+    expect(contrastLintMode("auto", "dark")).toBe("dark");
+    expect(contrastLintMode("auto", "light")).toBe("light");
+  });
+
+  it("a dark-mode finding offers no auto-fix — the fix rewrites the light value", () => {
+    const tokens = [
+      v6Token({ id: "color-background", name: "Background", value: "#FFFFFF", dark: "#111111", layer: "semantic" }),
+      v6Token({ id: "color-ink", name: "Ink", value: "#222222", dark: "#1A1A1A", layer: "semantic" }),
+    ];
+    const issues = buildContrastIssues(tokens, "dark");
+    expect(issues.map((i) => i.tokenId)).toContain("color-ink");
+    expect(issues.find((i) => i.tokenId === "color-ink")?.autoFixHint).toBeUndefined();
   });
 });
