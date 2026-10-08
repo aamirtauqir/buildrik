@@ -842,7 +842,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     <SendForReview
       composer={composer ?? null}
       disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
-      reviewStatus={round ?? null}
+      reviewStatus={round ? { at: round.revision } : null}
       onSent={(outcome) => {
         /* The panel keeps this, not SendForReview — that component is
            unmounted by the very reload this triggers. */
