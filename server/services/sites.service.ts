@@ -936,6 +936,15 @@ function checkedTokensOrConflict(
   }
 }
 
+/** L3-001: a page write hit the (siteId, slug) unique key. `pageNames` are the
+ *  pages in this save that carry `slug` — the ones the user can rename. */
+export class PageSlugTakenError extends Error {
+  constructor(readonly slug: string, readonly pageNames: string[]) {
+    super("PAGE_SLUG_TAKEN");
+    this.name = "PageSlugTakenError";
+  }
+}
+
 /**
  * Phase -1: canonical project-data persistence path.
  *
@@ -1110,8 +1119,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
 
     // Upsert each incoming page.
     for (const [index, page] of input.pages.entries()) {
-      const slug =
-        page.slug ?? (page.name ? page.name.toLowerCase().replace(/\s+/g, "-") : undefined);
+      const slug = slugOfSavedPage(page);
 
       // Phase -1: persist meta + settings + slugHistory + slugManuallySet
       // (previously silently dropped, breaking applied-template reload).
@@ -1147,44 +1155,56 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       if (page.slugManuallySet !== undefined) updateData.slugManuallySet = page.slugManuallySet;
 
       // Upsert path used when full snapshot (covers new pages); plain update otherwise.
-      if (isFullSnapshot && page.name !== undefined && slug !== undefined) {
-        await tx.page.upsert({
-          where: { id: page.id },
-          create: {
-            id: page.id,
-            siteId: input.siteId,
-            name: page.name,
-            slug,
-            position: page.position ?? index,
-            isHomePage: page.isHomePage ?? false,
-            blocks: page.blocks as Prisma.InputJsonValue,
-            ...(metaJson !== undefined && metaJson !== Prisma.JsonNull
-              ? { meta: metaJson }
-              : {}),
-            ...(settingsJson !== undefined ? { settings: settingsJson } : {}),
-            ...(slugHistoryJson !== undefined && slugHistoryJson !== Prisma.JsonNull
-              ? { slugHistory: slugHistoryJson }
-              : {}),
-            ...(page.slugManuallySet !== undefined
-              ? { slugManuallySet: page.slugManuallySet }
-              : {}),
-            ...(page.seoTitle !== undefined ? { seoTitle: page.seoTitle } : {}),
-            ...(page.seoDescription !== undefined
-              ? { seoDescription: page.seoDescription }
-              : {}),
-          },
-          update: updateData,
-        });
-      } else {
-        await tx.page.update({
-          where: { id: page.id },
-          data: updateData,
-        });
+      try {
+        if (isFullSnapshot && page.name !== undefined && slug !== undefined) {
+          await tx.page.upsert({
+            where: { id: page.id },
+            create: {
+              id: page.id,
+              siteId: input.siteId,
+              name: page.name,
+              slug,
+              position: page.position ?? index,
+              isHomePage: page.isHomePage ?? false,
+              blocks: page.blocks as Prisma.InputJsonValue,
+              ...(metaJson !== undefined && metaJson !== Prisma.JsonNull
+                ? { meta: metaJson }
+                : {}),
+              ...(settingsJson !== undefined ? { settings: settingsJson } : {}),
+              ...(slugHistoryJson !== undefined && slugHistoryJson !== Prisma.JsonNull
+                ? { slugHistory: slugHistoryJson }
+                : {}),
+              ...(page.slugManuallySet !== undefined
+                ? { slugManuallySet: page.slugManuallySet }
+                : {}),
+              ...(page.seoTitle !== undefined ? { seoTitle: page.seoTitle } : {}),
+              ...(page.seoDescription !== undefined
+                ? { seoDescription: page.seoDescription }
+                : {}),
+            },
+            update: updateData,
+          });
+        } else {
+          await tx.page.update({
+            where: { id: page.id },
+            data: updateData,
+          });
+        }
+      } catch (e) {
+        if (slug !== undefined && e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+          const holders = input.pages.filter((p) => slugOfSavedPage(p) === slug).map((p) => p.name ?? p.id);
+          throw new PageSlugTakenError(slug, holders);
+        }
+        throw e;
       }
     }
   });
 
   return { success: true, savedAt };
+}
+
+function slugOfSavedPage(page: { slug?: string; name?: string }): string | undefined {
+  return page.slug ?? (page.name ? page.name.toLowerCase().replace(/\s+/g, "-") : undefined);
 }
 
 export async function getProjectData(siteId: string) {

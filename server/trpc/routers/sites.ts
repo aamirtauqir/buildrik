@@ -18,6 +18,7 @@ import {
   transferSite,
   canTransferSite,
   saveProjectFromEditor,
+  PageSlugTakenError,
   getProjectData,
   redactSitePassword,
 } from "@/server/services/sites.service";
@@ -386,6 +387,18 @@ export const sitesRouter = router({
             code: "NOT_FOUND",
             message: "Site not found",
           });
+        /* L3-001: the (siteId, slug) unique key refused a page write. It was a
+           raw P2002 500 on every autosave; say which address and which pages. */
+        if (e instanceof PageSlugTakenError) {
+          const names = e.pageNames.map((n) => `"${n}"`);
+          throw new TRPCError({
+            code: "CONFLICT",
+            message:
+              names.length > 1
+                ? `${names.length === 2 ? "Two" : names.length} pages use the address /${e.slug} (${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}). Change one page's URL in Page settings to keep saving.`
+                : `Another page already uses the address /${e.slug} (${names[0] ?? "this page"}). Change its URL in Page settings to keep saving.`,
+          });
+        }
         /* The editor sent a full snapshot with no pages in it — refused at the
            write boundary before it could delete the site's pages. Surfaced as a
            precondition rather than a 500 so the editor can say something true
