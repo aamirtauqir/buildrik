@@ -56,6 +56,9 @@ export function resolveSurface(
 export const shownValue = (t: DesignToken, tokens: readonly DesignToken[], mode: "light" | "dark") =>
   resolveTokenLiteral(tokens, t.id, mode) || resolveTokenLiteral(tokens, t.id, "light") || "";
 
+/** Token ids that name a fill, a border or a colour shown on another fill. */
+const NOT_PAGE_TEXT = /(^|-)(surface|border)(-|$)|^color-on-/;
+
 /** The page colour itself is not "text on the page" — never compare it to
  *  itself. By VALUE, not just by id: the default palette ships that same
  *  colour under three ids (`color-background`, `color-slate-50`,
@@ -74,6 +77,10 @@ export const contrastFails = (
   /* The page root's own background is a surface too, never text on one —
      and seeded `transparent`, which no ratio can be read from. */
   if (t.id === PAGE_BACKGROUND_TOKEN.id) return false;
+  /* Fills, borders and on-fill colours are not text on the page either: a
+     raised surface is white ON the page by design, a border is not read, and
+     on-primary is read against Primary (Brand Part 1b seed roles). */
+  if (NOT_PAGE_TEXT.test(t.id)) return false;
   const shown = shownValue(t, tokens, mode);
   if (shown && shown.toUpperCase() === surfaceBg.toUpperCase()) return false;
   return calcWcagLevel(shown, surfaceBg) === "fail";

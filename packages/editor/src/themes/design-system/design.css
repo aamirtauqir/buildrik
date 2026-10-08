@@ -22,6 +22,14 @@
   --buildrick-design-color-error: #EF4444;
   --buildrick-design-color-warning: #8E4B10;
 
+  /* COLORS — Brand Part 1b seed roles (owner OQ-1, 2026-10-08) */
+  --buildrick-design-color-on-primary: #FFFFFF;
+  --buildrick-design-color-surface-raised: #FFFFFF;
+  --buildrick-design-color-surface-muted: #F3F4F6;
+  --buildrick-design-color-border-subtle: #E5E7EB;
+  --buildrick-design-color-text-strong: #111827;
+  --buildrick-design-color-text-subtle: #6B7280;
+
   /* COLORS — v4 migration (4 primitives + 4 semantic aliases, added via
    * projectMigrations/0002. Synced to CSS 2026-05-18 to satisfy baseline
    * parity check against DEFAULT_TOKENS in constants.ts). */

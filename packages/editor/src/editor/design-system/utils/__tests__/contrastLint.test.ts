@@ -50,6 +50,14 @@ describe("contrast lint — a surface colour is not a foreground colour", () => 
     expect(buildContrastIssues(colors, "light")).toHaveLength(0);
   });
 
+  it("never measures a fill, border or on-primary colour as text on the page", () => {
+    const ids = buildContrastIssues(colors, "light").map((i) => i.tokenId);
+    for (const id of ["color-on-primary", "color-surface-raised", "color-surface-muted", "color-border-subtle"]) {
+      expect(colors.some((t) => t.id === id)).toBe(true);
+      expect(ids).not.toContain(id);
+    }
+  });
+
   it("matches on value regardless of hex case", () => {
     const surface = findSurfaceToken(colors);
     const bg = resolveSurface(surface, colors, "light");
