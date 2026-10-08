@@ -150,6 +150,17 @@ describe("useCanvasContent — CMS binding resolution", () => {
     expect(result.current.displayContent).not.toContain("First post EDITED");
   });
 
+  it("re-resolves when a field binding is made, removed or loaded", () => {
+    const { composer, composerOn, composerOff } = makeComposer({});
+    const { unmount } = renderHook(() =>
+      useCanvasContent({ composer, content: "<div data-buildrick-id='root-1'></div>" })
+    );
+    expect(composerOn).toHaveBeenCalledWith(EVENTS.BINDING_CREATED, expect.any(Function));
+    expect(composerOn).toHaveBeenCalledWith(EVENTS.BINDING_REMOVED, expect.any(Function));
+    unmount();
+    expect(composerOff).toHaveBeenCalledWith(EVENTS.BINDING_CREATED, expect.any(Function));
+  });
+
   it("re-resolves when a record is published or unpublished", () => {
     const { composer, collectionsOn, collectionsOff } = makeComposer({});
     const { unmount } = renderHook(() =>

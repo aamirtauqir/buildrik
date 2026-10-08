@@ -137,6 +137,11 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
        element HTML this hook is keyed on. */
     composer.on(EVENTS.CMS_COLLECTION_BOUND, handleContentChange);
     composer.on(EVENTS.CMS_COLLECTION_UNBOUND, handleContentChange);
+    /* Same for a field binding made, removed or loaded (L3-016): one that
+       resolves to nothing changes no element HTML either, so the canvas kept
+       the old text and never drew the bound marker. */
+    composer.on(EVENTS.BINDING_CREATED, handleContentChange);
+    composer.on(EVENTS.BINDING_REMOVED, handleContentChange);
 
     return () => {
       composer.cms.collections.off("content:updated", handleContentChange);
@@ -147,6 +152,8 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
       composer.cms.collections.off(EVENTS.CMS_STORE_REFRESHED, handleContentChange);
       composer.off(EVENTS.CMS_COLLECTION_BOUND, handleContentChange);
       composer.off(EVENTS.CMS_COLLECTION_UNBOUND, handleContentChange);
+      composer.off(EVENTS.BINDING_CREATED, handleContentChange);
+      composer.off(EVENTS.BINDING_REMOVED, handleContentChange);
     };
   }, [composer]);
 
