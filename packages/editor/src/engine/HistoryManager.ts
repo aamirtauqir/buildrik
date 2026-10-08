@@ -424,7 +424,15 @@ export class HistoryManager {
     const darkMode = state.settings?.darkMode ?? (live.darkMode !== undefined ? "off" : undefined);
     if (darkMode === undefined) delete settings.darkMode;
     else settings.darkMode = darkMode;
+    /* importProject resets the active page to the first one, so an undo on
+       "About" landed the user on "Home" with the change out of view (audit
+       L1-007). Navigation is not history: stay on the page if it still exists. */
+    const elements = this.composer.elements;
+    const activePageId = elements?.getActivePage?.()?.id;
     this.composer.importProject({ ...state, settings });
+    if (activePageId && activePageId !== elements?.getActivePage?.()?.id && elements?.getPage?.(activePageId)) {
+      elements.setActivePage(activePageId);
+    }
   }
 
   private getCurrentState(): ProjectData {
