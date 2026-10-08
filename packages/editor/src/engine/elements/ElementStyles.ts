@@ -9,6 +9,7 @@
 import type { ElementData, TraitData, TraitValue } from "../../shared/types";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
+import type { Element } from "./Element";
 
 /**
  * Delegate that manages style, attribute, class, and trait operations
@@ -16,6 +17,10 @@ import type { Composer } from "../Composer";
  */
 export class ElementStyles {
   constructor(
+    /* The element these writes belong to — the ELEMENT_UPDATED payload. It
+       was `this` (the delegate), and every listener reading `el.getId()`
+       threw (L2-017). */
+    private getSelf: () => Element,
     private getData: () => ElementData,
     private getComposer: () => Composer,
     private getElementId: () => string,
@@ -45,7 +50,7 @@ export class ElementStyles {
       value
     );
 
-    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 
@@ -53,7 +58,7 @@ export class ElementStyles {
     const data = this.getData();
     if (data.attributes) {
       delete data.attributes[name];
-      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
       this.getComposer().markDirty();
     }
   }
@@ -84,7 +89,7 @@ export class ElementStyles {
     }
     if (!data.classes.includes(className)) {
       data.classes.push(className);
-      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
       this.getComposer().markDirty();
     }
   }
@@ -95,7 +100,7 @@ export class ElementStyles {
       const index = data.classes.indexOf(className);
       if (index !== -1) {
         data.classes.splice(index, 1);
-        this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+        this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
         this.getComposer().markDirty();
       }
     }
@@ -111,7 +116,7 @@ export class ElementStyles {
 
   setClasses(classes: string[]): void {
     this.getData().classes = [...classes];
-    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 
@@ -150,7 +155,7 @@ export class ElementStyles {
       value,
     });
 
-    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 
@@ -162,7 +167,7 @@ export class ElementStyles {
         elementId: this.getElementId(),
         property,
       });
-      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
       this.getComposer().markDirty();
     }
   }
@@ -180,7 +185,7 @@ export class ElementStyles {
   setStyles(styles: Record<string, string>): void {
     this.getData().styles = { ...styles };
     this.getComposer().emit(EVENTS.STYLE_CHANGED, { elementId: this.getElementId(), styles });
-    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 
@@ -205,7 +210,7 @@ export class ElementStyles {
       data.traits.push({ name, type: "text", value });
     }
 
-    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 

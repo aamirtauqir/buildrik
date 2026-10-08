@@ -58,6 +58,7 @@ export class Element {
     );
 
     this._styles = new ElementStyles(
+      () => this,
       () => this.data,
       () => this.composer,
       () => this.data.id,

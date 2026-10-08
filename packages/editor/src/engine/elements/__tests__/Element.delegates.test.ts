@@ -361,3 +361,24 @@ describe("ElementChildren — selector queries", () => {
     expect(headings.map((e) => e.getId())).toEqual([title.getId()]);
   });
 });
+
+/* L2-017: ElementStyles emitted ELEMENT_UPDATED with ITSELF as the payload,
+   not the element — every listener that read `el.getId()` (Layers lock
+   resync, the canvas lock flag) threw "el.getId is not a function". */
+describe("style / attribute / class / trait writes announce the element", () => {
+  it("every ELEMENT_UPDATED payload is the element itself", () => {
+    const { composer, manager } = makeEngine();
+    const el = manager.createElement("button");
+    composer.emit.mockClear();
+    el.setStyle("color", "red");
+    el.removeStyle("color");
+    el.setAttribute("title", "x");
+    el.removeAttribute("title");
+    el.addClass("a");
+    el.removeClass("a");
+    el.setStyles({ color: "blue" });
+    const payloads = emitsOf(composer, EVENTS.ELEMENT_UPDATED).map((c) => c[1]);
+    expect(payloads.length).toBeGreaterThan(5);
+    for (const p of payloads) expect(p).toBe(el);
+  });
+});
