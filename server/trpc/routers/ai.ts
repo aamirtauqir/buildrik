@@ -30,6 +30,7 @@ import {
 } from "@buildrik/shared/schemas/ai";
 import { aiAdoptionInputSchema } from "@buildrik/shared/schemas/ai-adoption";
 import { recordAiAdoption } from "../../services/ai-adoption.service";
+import { AIProviderUnreachableError } from "@/server/services/types";
 
 // Every provider-error catch below releases the quota unit it reserved, then
 // throws a fixed client-facing message with the real error logged
@@ -37,6 +38,16 @@ import { recordAiAdoption } from "../../services/ai-adoption.service";
 // reservation), that raw error must not replace the fixed message the catch
 // was about to throw — it's swallowed here and logged, so the caller always
 // gets the masked message, never a leaked DB error.
+/* L5-001: a provider nobody is running (OLLAMA_BASE_URL set, no listener) is
+   "not available", not a generic failure — the panel draws its own state for
+   PRECONDITION_FAILED. Anything else stays masked behind the fixed message. */
+function streamPromptError(e: unknown, message: string): TRPCError {
+  if (e instanceof AIProviderUnreachableError) {
+    return new TRPCError({ code: "PRECONDITION_FAILED", message: "AI provider not reachable" });
+  }
+  return new TRPCError({ code: "INTERNAL_SERVER_ERROR", message });
+}
+
 async function safeReleaseQuota(userId: string): Promise<void> {
   try {
     await releaseQuota(userId);
@@ -362,7 +373,7 @@ export const aiRouter = router({
         } catch (e) {
           await safeReleaseQuota(userId);
           console.error("[ai.streamPrompt] plan generation error", e);
-          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Plan generation failed" });
+          throw streamPromptError(e, "Plan generation failed");
         }
         yield { type: "plan" as const, plan: { steps } };
         yield { type: "done" as const };
@@ -399,7 +410,7 @@ export const aiRouter = router({
         } catch (e) {
           await safeReleaseQuota(userId);
           console.error("[ai.streamPrompt] edit-command generation error", e);
-          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Edit generation failed" });
+          throw streamPromptError(e, "Edit generation failed");
         }
         yield {
           type: "edit" as const,
@@ -426,7 +437,7 @@ export const aiRouter = router({
       } catch (e) {
         if (!delivered) await safeReleaseQuota(userId);
         console.error("[ai.streamPrompt] stream error", e);
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "AI response failed" });
+        throw streamPromptError(e, "AI response failed");
       }
     }),
 

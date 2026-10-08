@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import type { AIModel } from "@buildrik/shared/schemas/ai";
-import type { AIProvider, TokenChunk } from "./types";
+import { AIProviderUnreachableError, type AIProvider, type TokenChunk } from "./types";
 
 /**
  * Local Ollama provider via its OpenAI-compatible endpoint. Lets the editor run
@@ -30,17 +30,32 @@ function getOllamaClient(): OpenAI {
   return _client;
 }
 
+/* A refused connection means no local model is running — not a model error.
+   A timeout is excluded: the server answered the connect and is just slow. */
+function unreachableOr(e: unknown): unknown {
+  if (e instanceof OpenAI.APIConnectionError && !(e instanceof OpenAI.APIConnectionTimeoutError)) {
+    return new AIProviderUnreachableError(
+      `Local AI (Ollama) isn't reachable at ${process.env.OLLAMA_BASE_URL}. Start it, or unset OLLAMA_BASE_URL to use OpenAI.`,
+    );
+  }
+  return e;
+}
+
 class OllamaProvider implements AIProvider {
   async *stream(
     prompt: string,
     _model: AIModel,
     signal: AbortSignal,
   ): AsyncIterable<TokenChunk> {
-    const sdkStream = await getOllamaClient().chat.completions.create({
-      model: OLLAMA_MODEL,
-      stream: true,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const sdkStream = await getOllamaClient()
+      .chat.completions.create({
+        model: OLLAMA_MODEL,
+        stream: true,
+        messages: [{ role: "user", content: prompt }],
+      })
+      .catch((e: unknown) => {
+        throw unreachableOr(e);
+      });
     for await (const event of sdkStream) {
       if (signal.aborted) return;
       const text = event.choices[0]?.delta?.content;
@@ -53,10 +68,14 @@ class OllamaProvider implements AIProvider {
   }
 
   async generate(prompt: string, _model: AIModel): Promise<string> {
-    const res = await getOllamaClient().chat.completions.create({
-      model: OLLAMA_MODEL,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const res = await getOllamaClient()
+      .chat.completions.create({
+        model: OLLAMA_MODEL,
+        messages: [{ role: "user", content: prompt }],
+      })
+      .catch((e: unknown) => {
+        throw unreachableOr(e);
+      });
     return res.choices[0]?.message?.content ?? "";
   }
 }

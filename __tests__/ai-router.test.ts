@@ -49,6 +49,7 @@ vi.mock("@/server/services/ai.service", () => ({
 
 import { aiRouter } from "@server/trpc/routers/ai";
 import { TRPCError } from "@trpc/server";
+import { AIProviderUnreachableError } from "@/server/services/types";
 
 const callerCtx = { session: { user: { id: "user-1" } } } as never;
 
@@ -300,6 +301,26 @@ describe("ai router", () => {
     }
     expect(caught?.code).toBe("INTERNAL_SERVER_ERROR");
     expect(caught?.message).not.toContain("secret");
+  });
+
+  it("streamPrompt answers an unreachable local provider as PRECONDITION_FAILED and releases quota (L5-001)", async () => {
+    generateEditCommands.mockRejectedValueOnce(new AIProviderUnreachableError("Local AI (Ollama) isn't reachable"));
+    const caller = aiRouter.createCaller(callerCtx);
+    let caught: TRPCError | null = null;
+    try {
+      const sub = await caller.streamPrompt({
+        prompt: "make it bold",
+        scope: { kind: "element", id: "el-1" },
+        model: "gpt-4o-mini",
+        intent: "style-command",
+      });
+      await sub[Symbol.asyncIterator]().next();
+    } catch (err) {
+      caught = err as TRPCError;
+    }
+    expect(caught?.code).toBe("PRECONDITION_FAILED");
+    expect(caught?.message).toBe("AI provider not reachable");
+    expect(releaseQuota).toHaveBeenCalledWith("user-1");
   });
 
   it("rejects an oversized options.tone/length on content (S-8 .max())", async () => {
