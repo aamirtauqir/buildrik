@@ -457,7 +457,9 @@ export class Composer extends EventEmitter {
     // and presets: those changes only mark it stale (it rebuilds on next read).
     const invalidateTokenUsage = () => tokenUsage.invalidate();
     this.on(EVENTS.PROJECT_CHANGED, invalidateTokenUsage);
-    this.on(EVENTS.PROJECT_LOADED, invalidateTokenUsage);
+    // L4-020: a load replaces every element without one element event, so the
+    // breakdown ("Used by", canvas highlight) is rebuilt here, not just marked stale.
+    this.on(EVENTS.PROJECT_LOADED, () => this.recomputeTokenUsage());
     this.on(EVENTS.COMPONENT_LIST_UPDATED, invalidateTokenUsage);
     // A template that lands raw values a token already holds: offer Connect.
     this.on(EVENTS.TEMPLATE_APPLIED, ({ pageId }) => {
