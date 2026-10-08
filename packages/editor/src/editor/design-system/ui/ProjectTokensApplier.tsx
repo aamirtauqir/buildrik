@@ -3,7 +3,9 @@
  * write (`emitTokenCss`) — into one <style>, at most once per animation frame,
  * and keeps `data-theme` on <html> explicit so the emitted
  * `prefers-color-scheme` block never follows the designer's OS (spec §2).
- * A site whose Dark mode is "off" always previews light (D8).
+ * A site whose Dark mode is "off" always previews light (D8). A Brand flow's
+ * preview (`designSystem.preview`) is painted instead of the saved tokens
+ * while it is set.
  *
  * @license BSD-3-Clause
  */
@@ -28,9 +30,11 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
 
     const write = () => {
       frame = 0;
+      const preview = composer.designSystem?.preview ?? null;
       const settings = composer.getProjectSettings?.();
-      const darkMode = DarkModeSchema.catch("off").parse(settings?.darkMode);
-      const tokens = tokensForEmit(settings, { migrate: composer.designSystem?.brandTokensV2 !== false });
+      const darkMode = preview?.darkMode ?? DarkModeSchema.catch("off").parse(settings?.darkMode);
+      const tokens =
+        preview?.tokens ?? tokensForEmit(settings, { migrate: composer.designSystem?.brandTokensV2 !== false });
       let style = document.getElementById(STYLE_ID);
       if (!style) {
         style = document.createElement("style");
@@ -44,7 +48,7 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
         (siteHasThemeToggle(composer.elements?.getAllElements?.() ?? []) ? themeToggleCss("show") : "");
       if (style.textContent !== css) style.textContent = css;
       document.documentElement.dataset.theme =
-        darkMode === "off" ? "light" : (composer.colorMode?.resolved?.() ?? "light");
+        preview?.theme ?? (darkMode === "off" ? "light" : (composer.colorMode?.resolved?.() ?? "light"));
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(write);
@@ -56,6 +60,7 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
     composer.on("colorMode:changed", schedule);
     composer.on(EVENTS.ELEMENT_CREATED, schedule);
     composer.on(EVENTS.ELEMENT_DELETED, schedule);
+    composer.on(EVENTS.BRAND_PREVIEW_CHANGED, schedule);
     return () => {
       if (frame) cancelAnimationFrame(frame);
       composer.off(EVENTS.PROJECT_LOADED, schedule);
@@ -63,6 +68,7 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
       composer.off("colorMode:changed", schedule);
       composer.off(EVENTS.ELEMENT_CREATED, schedule);
       composer.off(EVENTS.ELEMENT_DELETED, schedule);
+      composer.off(EVENTS.BRAND_PREVIEW_CHANGED, schedule);
       document.getElementById(STYLE_ID)?.remove();
       delete document.documentElement.dataset.theme;
     };

@@ -108,4 +108,23 @@ describe("ProjectTokensApplier (v6)", () => {
     render(<ProjectTokensApplier composer={c as never} />);
     expect(document.querySelectorAll("#bk-site-tokens")).toHaveLength(1);
   });
+
+  it("paints the preview first, with its theme, and goes back when it clears", () => {
+    const settings = { designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6, darkMode: "off" };
+    const c = { ...fakeComposer(settings), designSystem: { preview: null as null | { tokens: unknown[]; darkMode: "auto"; theme: "dark" } } };
+    render(<ProjectTokensApplier composer={c as never} />);
+    act(() => { vi.advanceTimersToNextFrame(); });
+    const off = document.getElementById("bk-site-tokens")!.textContent;
+    expect(off).not.toContain("prefers-color-scheme");
+
+    c.designSystem.preview = { tokens: DEFAULT_TOKENS, darkMode: "auto", theme: "dark" };
+    act(() => { c.emit("brand:preview-changed"); vi.advanceTimersToNextFrame(); });
+    expect(document.getElementById("bk-site-tokens")!.textContent).toContain(':root[data-theme="dark"]');
+    expect(document.documentElement.dataset.theme).toBe("dark");
+
+    c.designSystem.preview = null;
+    act(() => { c.emit("brand:preview-changed"); vi.advanceTimersToNextFrame(); });
+    expect(document.getElementById("bk-site-tokens")!.textContent).toBe(off);
+    expect(document.documentElement.dataset.theme).toBe("light");
+  });
 });
