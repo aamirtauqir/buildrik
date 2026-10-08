@@ -28,7 +28,8 @@ function Status({ row }: { row: PushResultRow }) {
       return row.error?.startsWith("Brand upgrade is paused") ? (
         <p className={`${line} text-[var(--color-warning-text)]`} data-testid="push-result-status">Brand upgrade paused — skipped</p>
       ) : (
-        <p className={`${line} text-[var(--color-warning-text)]`} data-testid="push-result-status">
+        /* A div: flowbite's Tooltip renders a <div>, which a <p> may not hold. */
+        <div className={`${line} text-[var(--color-warning-text)]`} data-testid="push-result-status">
           New brand format — re-capture theme
           <Tooltip
             content={
@@ -42,7 +43,7 @@ function Status({ row }: { row: PushResultRow }) {
           >
             <Info className="h-3 w-3" aria-label="Why re-capture" />
           </Tooltip>
-        </p>
+        </div>
       );
     case "skipped-locked":
       return <p className={`${line} text-[var(--color-text-secondary)]`} data-testid="push-result-status">Locked — kept own</p>;
@@ -61,7 +62,7 @@ function Status({ row }: { row: PushResultRow }) {
 export function PushResults({ rows, onDismiss }: { rows: readonly PushResultRow[]; onDismiss: () => void }) {
   return (
     <section
-      className="flex flex-col gap-3 rounded-sm border border-[var(--color-border-default)] bg-white p-4"
+      className="flex w-full max-w-[620px] flex-col gap-3 rounded-sm border border-[var(--color-border-default)] bg-white p-4"
       data-testid="push-results"
     >
       <div className="flex items-center justify-between gap-4">
