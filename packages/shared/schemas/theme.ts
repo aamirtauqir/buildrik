@@ -68,3 +68,7 @@ export type CreateBrandRestorePointInput = z.infer<typeof createBrandRestorePoin
 
 export const brandRestorePointInput = z.object({ siteId: z.string().min(1), id: z.string().min(1) });
 export type BrandRestorePointInput = z.infer<typeof brandRestorePointInput>;
+
+// Brand Part 1c (spec §9): colours and fonts read from a website.
+export const extractBrandFromUrlInput = z.object({ siteId: z.string().min(1), url: z.string().trim().min(1).max(2048) });
+export type ExtractBrandFromUrlInput = z.infer<typeof extractBrandFromUrlInput>;

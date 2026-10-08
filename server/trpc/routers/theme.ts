@@ -2,6 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { requireAgencyLayer } from "@/server/trpc/guards";
 import { protectedProcedure, router } from "../trpc";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
+import { checkRateLimit } from "@/server/services/rate-limiter";
+import { extractBrandFromUrl, BrandExtractError } from "@/server/services/brand-extract.service";
 import { isFeatureEnabled } from "@/server/services/feature-flag.service";
 import {
   checkSiteRole,
@@ -32,6 +34,7 @@ import {
   setSiteThemeLockInput,
   createBrandRestorePointInput,
   brandRestorePointInput,
+  extractBrandFromUrlInput,
   previewSharedThemeInput,
   siteThemeSnapshotInput,
   saveWorkspacePresetInput,
@@ -206,6 +209,34 @@ export const themeRouter = router({
         return await getBrandRestorePoint(input.siteId, input.id);
       } catch (e) {
         translateThemeError(e);
+      }
+    }),
+
+  // Brand Part 1c (spec §9): colours and fonts from a website, behind dsAi (spec §9 last line).
+  extractBrandFromUrl: protectedProcedure
+    .input(extractBrandFromUrlInput)
+    .mutation(async ({ ctx, input }) => {
+      if (process.env.NEXT_PUBLIC_FEATURE_DS_AI !== "true") throw new TRPCError({ code: "NOT_FOUND" });
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      const workspaceId = await resolveWorkspaceId(ctx);
+      for (const [key, max] of [[`brand-extract:user:${ctx.session.user.id}`, 10], [`brand-extract:ws:${workspaceId}`, 30]] as const) {
+        if (!(await checkRateLimit(key, max, 10 * 60_000)).allowed) {
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many brand imports — try again in a few minutes." });
+        }
+      }
+      try {
+        return await extractBrandFromUrl(input.url);
+      } catch (e) {
+        if (e instanceof BrandExtractError) {
+          console.warn("[brand-extract] failed", { kind: e.code, siteId: input.siteId });
+          throw new TRPCError({ code: "BAD_REQUEST", message: `${e.code}: ${e.message}` });
+        }
+        throw e;
       }
     }),
 
