@@ -178,18 +178,27 @@ const SPACING_PRESETS: [SpacingPreset, string][] = [
   ["spacious", "Spacious · 6px"],
 ];
 
+/* The disabled look is spelled out: on a read-only site the action is
+   disabled by its EditLock fieldset, not by its own prop, and flowbite only
+   applies its disabled theme for the prop (BRP1-M1 greys the header). */
 const PAGE_ACTION =
-  "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
+  "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] " +
+  "tw:disabled:border-transparent tw:disabled:bg-[var(--bk-bg-subtle)] tw:disabled:text-[var(--bk-ink-muted)]";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const lightOf = (tokens: readonly DesignToken[], id: string): string => resolveTokenLiteral(tokens, id, "light") ?? "";
 
 /** Disables every native control inside while the tokens are read-only.
- *  `display: contents`, so it never takes part in the layout it sits in. */
+ *  `display: contents`, so it never takes part in the layout it sits in.
+ *  A button disabled by the fieldset matches `:disabled` but never gets
+ *  flowbite's disabled theme (that follows the prop), so "Change" / "Set"
+ *  stayed in live ink on a read-only site. BRP1-M1 mutes every locked
+ *  control's label; the descendant selector outranks the button's own colour. */
+const EDIT_LOCK = "tw:contents tw:[&_button:disabled]:text-[var(--bk-ink-muted)]";
 function EditLock({ locked, children }: { locked: boolean; children: React.ReactNode }) {
   return (
-    <fieldset disabled={locked} className="tw:contents" data-testid={locked ? "brand-edit-lock" : undefined}>
+    <fieldset disabled={locked} className={EDIT_LOCK} data-testid={locked ? "brand-edit-lock" : undefined}>
       {children}
     </fieldset>
   );
@@ -724,9 +733,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     return undefined;
   };
 
-  /* 7316:80949 draws the Light / Dark switch inside the preview card. */
-  const previewControls =
-    page === "colour-mode" && composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
+  /* The preview card's Light / Dark switch, on every page that has the
+     preview — the dark check is not a Colour-mode-only question. */
+  const previewControls = composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
 
   /* Import / export is drawn as a panel, not a page with a preview. */
   const isPanelPage = page === "export";
@@ -774,52 +783,54 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         </nav>
       </aside>
 
-      {/* ── Main: pane + preview column, 40 top / 32 sides, 32 between ──── */}
-      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:gap-8 tw:px-8 tw:pt-10">
-        {/* ── Pane ──────────────────────────────────────────────────────── */}
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
-          {/* 36 tall: the title and the 28px action share the centre line at
-              y=58, and the card starts 16 under it at y=92 (7315:80955). */}
-          {!isPanelPage && (
-          <header className="tw:flex tw:h-9 tw:shrink-0 tw:items-center tw:justify-between tw:gap-6">
-            <div className="tw:flex tw:min-w-0 tw:items-baseline tw:gap-2.5">
+      {/* ── Main: header over pane + preview column (BRP1-M3 8222:232627):
+           32 top / 32 sides, the 30-tall header spans both columns, the
+           columns start 20 under it, 32 between them. ───────────────────── */}
+      <div className={`tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:px-8 ${isPanelPage ? "tw:pt-10" : "tw:pt-8"}`}>
+        {/* The board's header: the 700-wide title, then the actions. No
+            Save — every edit is already applied (autosave). The page caption
+            (counts, ignored checks) is kept beside the title; the board draws
+            none. */}
+        {!isPanelPage && (
+          <header className="tw:flex tw:h-[30px] tw:shrink-0 tw:items-center tw:gap-2" data-testid="brand-header">
+            <div className="tw:flex tw:w-[700px] tw:min-w-0 tw:shrink tw:items-baseline tw:gap-2.5">
               <h2
-                className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
+                className="tw:m-0 tw:shrink-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
                 data-testid="brand-page-title"
               >
                 {pageLabel(page)}
               </h2>
-              <p className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-caption">
+              <p className="tw:m-0 tw:min-w-0 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-caption">
                 {caption}
               </p>
             </div>
-            <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
-              {/* "Review changes" (spec §4): non-blocking, this session's
-                  edits with Revert. Drawn only once there is one. */}
-              {store.edits.length > 0 && (
-                <SessionEditsPopover
-                  edits={store.edits}
-                  onRevert={(i) => {
-                    if (!store.revert(i)) refused("That revert");
-                  }}
-                  disabled={readOnly}
-                />
-              )}
-              <EditLock locked={readOnly}>{pageAction}</EditLock>
-            </div>
+            {/* "Review changes" (spec §4): non-blocking, this session's
+                edits with Revert — drawn at 0 too (8222:230854). */}
+            <SessionEditsPopover
+              edits={store.edits}
+              onRevert={(key) => {
+                if (!store.revert(key)) refused("That revert");
+              }}
+              disabled={readOnly}
+              extraActions={<EditLock locked={readOnly}>{pageAction}</EditLock>}
+            />
           </header>
-          )}
-
+        )}
+      <div className={`tw:flex tw:min-h-0 tw:flex-1 tw:gap-8 ${isPanelPage ? "" : "tw:mt-5"}`}>
+        {/* ── Pane ──────────────────────────────────────────────────────── */}
+        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
+          {/* BRP1-M1 (8222:229015 / 229636 / 230245): a flat warning-tint
+              strip, 12 in, 12/18 ink — no border, no radius — 20 over the body. */}
           {readOnly && (
             <div
               role="alert"
               data-testid="brand-read-only-banner"
-              className="tw:mt-4 tw:rounded-lg tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
+              className="tw:mb-5 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
             >
               {(store.readOnlyReason && BRAND_READ_ONLY_COPY[store.readOnlyReason]) || BRAND_READ_ONLY_FAILED_COPY}
             </div>
           )}
-          <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">
+          <div id={`design-section-${page}`} className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4" data-testid="brand-page-body">
             {/* Parked STATE board `4418:49685` "Brand · empty": "No brand set."
                 with Browse starters · Import — the workspace's first-run state,
                 on the landing page, until the site's first token edit. The
@@ -904,6 +915,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           )}
         </aside>
         )}
+      </div>
       </div>
 
       <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />

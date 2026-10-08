@@ -161,7 +161,11 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
   it("a value edit is a row (was → now); Revert writes the set back exactly — the edit's custom-* primitive goes too", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    expect(utils.queryByTestId("brand-session-edits")).toBeNull();
+    // Drawn at 0 too (8222:230854): the empty list says so.
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0");
+    await openList(utils);
+    expect(utils.getByText("No changes to review yet.")).toBeTruthy();
+    fireEvent.click(utils.getByTestId("brand-session-close"));
     const seedIds = DEFAULT_TOKENS.map((t) => t.id).sort();
 
     // A semantic colour edit adds its own custom-<id> primitive (setTokenLiteral).
@@ -174,7 +178,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
 
     await openList(utils);
     expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1");
-    expect(rows(utils)[0].textContent).toMatch(/Changed a token/);
+    expect(within(rows(utils)[0]).getByTestId("brand-session-edit-title").textContent).toBe("Primary · Light");
     expect(rows(utils)[0].textContent).toMatch(/→ #C2410C/i);
     // Non-blocking: no modal.
     expect(document.querySelector('[aria-modal="true"]')).toBeNull();
@@ -183,7 +187,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     const reverted = composer.settings.designTokens as DesignToken[];
     expect(reverted.map((t) => t.id).sort()).toEqual(seedIds);
     expect(resolveTokenLiteral(reverted, "color-primary", "light")).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"));
-    await waitFor(() => expect(utils.queryByTestId("brand-session-edits")).toBeNull());
+    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0"));
   });
 
   it("the card's Auto-fix is a recorded write: a row, and Revert restores", async () => {
@@ -226,18 +230,18 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     openPage(utils, "starters");
     const second = () => utils.container.querySelectorAll<HTMLElement>('[role="radio"]')[1];
     fireEvent.click(second());
+    openPage(utils, "colours");
+    const after1 = utils.getByTestId("brand-session-edits").textContent;
+    openPage(utils, "starters");
     fireEvent.click(second());
     openPage(utils, "colours");
-    await openList(utils);
-    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1");
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe(after1);
+    expect(after1).not.toBe("Review changes · 0");
   });
 
-  it("a starter apply and an import each appear as a row", async () => {
+  it("an import is a row per token it added", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    openPage(utils, "starters");
-    fireEvent.click(utils.container.querySelectorAll<HTMLElement>('[role="radio"]')[1]);
-
     openPage(utils, "export");
     fireEvent.click(await utils.findByText(/or paste JSON/i));
     fireEvent.change(utils.getByLabelText(/Paste JSON/i), {
@@ -248,14 +252,11 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
 
     openPage(utils, "colours");
     await openList(utils);
-    const labels = rows(utils).map((r) => r.textContent ?? "");
-    expect(labels).toHaveLength(2);
-    expect(labels[0]).toMatch(/Imported tokens/);
-    expect(labels[0]).toMatch(/\+ Imported/);
-    expect(labels[1]).toMatch(/Applied a starter/);
+    const titles = utils.getAllByTestId("brand-session-edit-title").map((t) => t.textContent);
+    expect(titles).toContain("Imported · Added");
   });
 
-  it("a row the site has moved past is stale: 'Changed since — use ⌘Z', Revert off", async () => {
+  it("each row has its own Revert: a later edit to ANOTHER token leaves it live; only its own token changing makes it stale", async () => {
     const composer = makeFakeComposer();
     const utils = await renderOnRadius(composer);
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
@@ -268,8 +269,9 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     expect(within(newest).getByTestId("brand-session-revert")).not.toBeDisabled();
     expect(within(older).getByTestId("brand-session-stale").textContent).toBe("Changed since — use ⌘Z");
     expect(within(older).getByTestId("brand-session-revert")).toBeDisabled();
+    expect(within(newest).queryByTestId("brand-session-stale")).toBeNull();
 
-    // ⌘Z (any write made outside the log) makes the newest stale too.
+    // ⌘Z (any write made outside the log) that moves the token makes the newest stale too.
     act(() => {
       composer.setProjectSettings({ designTokens: DEFAULT_TOKENS, designTokensSchemaVersion: 6 });
     });
@@ -309,6 +311,8 @@ describe("BrandWorkspace — read-only tokens (failed migration)", () => {
     expect(utils.getByTestId("brand-read-only-banner").textContent).toBe(
       "We couldn't upgrade this site's brand — nothing was changed. Editing is paused.",
     );
+    // 8222:229015: the header's actions are inert too.
+    expect(utils.getByTestId("brand-session-edits")).toBeDisabled();
     expect((utils.getByTestId("brand-page-action") as HTMLButtonElement).matches(":disabled")).toBe(true);
 
     openPage(utils, "kind-radius");
@@ -323,5 +327,17 @@ describe("BrandWorkspace — read-only tokens (failed migration)", () => {
     // Even a write that gets past the UI is refused by the one write path.
     expect(composer.designSystem.setTokens([...DEFAULT_TOKENS], "x")).toBe(false);
     expect(composer.settings.designTokens).toEqual([]);
+  });
+});
+
+describe("BrandWorkspace — the preview's Light / Dark switch is on every page", () => {
+  it.each(["colours", "fonts", "colour-mode"] as const)("%s carries it", (page) => {
+    const composer = makeFakeComposer();
+    Object.assign(composer, {
+      colorMode: { get: () => "light", set: vi.fn(), resolved: () => "light" },
+    });
+    const utils = renderWorkspace(composer);
+    openPage(utils, page);
+    expect(utils.getByTestId("brand-colour-mode-seg")).toBeTruthy();
   });
 });

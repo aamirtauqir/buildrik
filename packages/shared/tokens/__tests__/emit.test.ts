@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { emitTokenCss } from "../emit";
 import { LEGACY_SEED } from "../legacySeed";
-import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
+import type { DesignToken, TokenRef } from "@buildrik/shared/schemas/design-tokens";
 
 const t = (over: Partial<DesignToken> & Pick<DesignToken, "id" | "modes" | "layer">): DesignToken => ({
   name: over.id, kind: "color", category: "colors", cssVar: `--buildrick-design-${over.id}`, type: "color", ...over,
 });
+const semantic = (id: string, light: TokenRef): DesignToken => ({ id, name: id, kind: "color", layer: "semantic", modes: { light }, category: "colors", cssVar: `--buildrick-design-${id}`, type: "color" });
 const tokens: DesignToken[] = [
   t({ id: "blue-600", layer: "primitive", modes: { light: { value: "#1A56DB" } } }),
   t({ id: "blue-400", layer: "primitive", modes: { light: { value: "#76A9FA" } } }),
@@ -134,59 +135,16 @@ describe("emitTokenCss", () => {
     });
   });
 
-  /* BR-1: rename and "replace & delete" leave the old token in place with
-     `replacedBy`. Elements stay bound to the OLD var, so the old var must
-     follow the replacement or every later edit misses them. */
-  describe("replacedBy (rename / replace & delete bridge)", () => {
-    const bridged = [
-      t({ id: "blue-600", layer: "primitive", modes: { light: { value: "#1A56DB" } } }),
-      t({ id: "red-600", layer: "primitive", modes: { light: { value: "#FF0000" } } }),
-      t({ id: "red-400", layer: "primitive", modes: { light: { value: "#F98080" } } }),
-      t({ id: "color-primary", layer: "semantic", replacedBy: "brand",
-          modes: { light: { alias: "blue-600" }, dark: { alias: "blue-600" } }, legacyNames: ["--buildrick-design-color-action"] }),
-      t({ id: "brand", layer: "semantic", modes: { light: { alias: "red-600" }, dark: { alias: "red-400" } } }),
-    ];
-
-    it("emits a replaced token as var() of its replacement, not its own stale value", () => {
-      const css = emitTokenCss(bridged, { darkMode: "off" });
-      expect(css).toContain("--buildrick-design-color-primary:var(--buildrick-design-brand)");
-      expect(css).not.toContain("--buildrick-design-color-primary:var(--buildrick-design-blue-600)");
-      // Its legacy names still reach it, and through it the replacement.
-      expect(css).toContain("--buildrick-design-color-action:var(--buildrick-design-color-primary)");
-    });
-
-    it("leaves dark to the replacement's own dark block", () => {
-      const css = emitTokenCss(bridged, { darkMode: "auto" });
-      expect(css).toContain(":root[data-theme=\"dark\"]{--buildrick-design-brand:var(--buildrick-design-red-400)}");
-      expect(css).not.toMatch(/data-theme="dark"\]\{[^}]*--buildrick-design-color-primary:/);
-    });
-
-    it("follows a chain of replacements hop by hop to the live token", () => {
-      const chain = [
-        ...bridged.map((x) => (x.id === "brand" ? { ...x, replacedBy: "brand-2" } : x)),
-        t({ id: "brand-2", layer: "primitive", modes: { light: { value: "#00FF00" } } }),
-      ];
-      const css = emitTokenCss(chain, { darkMode: "off" });
-      expect(css).toContain("--buildrick-design-color-primary:var(--buildrick-design-brand)");
-      expect(css).toContain("--buildrick-design-brand:var(--buildrick-design-brand-2)");
-    });
-
-    it("keeps the token's own value when the replacement cannot be emitted or the bridge cycles", () => {
-      const missing = emitTokenCss(
-        [t({ id: "blue-600", layer: "primitive", modes: { light: { value: "#1A56DB" } }, replacedBy: "gone" })],
-        { darkMode: "off" },
-      );
-      expect(missing).toContain("--buildrick-design-blue-600:#1A56DB");
-      const cycle = emitTokenCss(
-        [
-          t({ id: "a", layer: "primitive", modes: { light: { value: "#111111" } }, replacedBy: "b" }),
-          t({ id: "b", layer: "primitive", modes: { light: { value: "#222222" } }, replacedBy: "a" }),
-        ],
-        { darkMode: "off" },
-      );
-      // A bridge loop never becomes a CSS var loop: one side keeps its literal.
-      expect(cycle).toMatch(/--buildrick-design-a:#111111|--buildrick-design-b:#222222/);
-      expect(cycle).not.toMatch(/--buildrick-design-a:var\(--buildrick-design-b\)[\s\S]*--buildrick-design-b:var\(--buildrick-design-a\)/);
-    });
+  it("emits a replaced token as var() of its replacement, with no dark block of its own", () => {
+    const css = emitTokenCss(
+      [
+        { ...semantic("color-new", { value: "#1A56DB" }), modes: { light: { value: "#1A56DB" }, dark: { value: "#60A5FA" } } },
+        { ...semantic("color-old", { value: "#000000" }), modes: { light: { value: "#000000" }, dark: { value: "#FFFFFF" } }, replacedBy: "color-new" },
+      ],
+      { darkMode: "auto" },
+    );
+    expect(css).toContain("--buildrick-design-color-old:var(--buildrick-design-color-new)");
+    expect(css).not.toMatch(/--buildrick-design-color-old:#FFFFFF/);
+    expect(css).not.toContain("--buildrick-design-color-old:#000000");
   });
 });

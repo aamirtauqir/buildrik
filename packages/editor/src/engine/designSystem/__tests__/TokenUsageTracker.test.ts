@@ -3,10 +3,16 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, beforeEach, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeEach, beforeAll, afterAll, vi } from "vitest";
 import { TokenUsageTracker } from "../TokenUsageTracker";
 import { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
+import {
+  createTestComposer,
+  installEngineBrowserStubs,
+  removeEngineBrowserStubs,
+} from "@/engine/__tests__/test-utils/realComposer";
 
 /**
  * Test stand-in for Element. The tracker reads `getId()` + `getStyles()`, so
@@ -23,11 +29,28 @@ function makeStub(
   } as unknown as Element;
 }
 
+/** A tracker whose only site source is the element styles it was last given —
+ *  the element-level cases below, where the site-wide count and the element
+ *  breakdown must agree. */
+function elementOnlyTracker(): TokenUsageTracker {
+  let current: readonly Element[] = [];
+  const tracker = new TokenUsageTracker(
+    () => [],
+    () => ({ sources: [current.map((el) => el.getStyles())], unavailable: [] }),
+  );
+  const recompute = tracker.recompute.bind(tracker);
+  tracker.recompute = (els) => {
+    current = els;
+    recompute(els);
+  };
+  return tracker;
+}
+
 describe("TokenUsageTracker", () => {
   let tracker: TokenUsageTracker;
 
   beforeEach(() => {
-    tracker = new TokenUsageTracker();
+    tracker = elementOnlyTracker();
   });
 
   it("returns 0 for unused token", () => {
@@ -373,5 +396,71 @@ describe("TokenUsageTracker via Composer", () => {
     expect(calls).toBe(0); // all five coalesced, none flushed yet
     await Promise.resolve();
     expect(calls).toBe(1); // single recompute for the burst
+  });
+});
+
+function stubElement(id: string, styles: Record<string, string>): Element {
+  return makeStub(styles, id);
+}
+
+describe("TokenUsageTracker · site-wide", () => {
+  const make = (sources: unknown[], unavailable: string[] = []) => {
+    const build = vi.fn(() => ({ sources, unavailable }));
+    return { tracker: new TokenUsageTracker(() => DEFAULT_TOKENS, build), build };
+  };
+
+  it("counts project styles and components, not only element styles", () => {
+    const { tracker } = make([
+      [],
+      [{ rules: { color: "var(--buildrick-design-color-primary)" } }],
+      [{ masterTree: { styles: { color: "var(--buildrick-design-color-primary)" } } }],
+    ]);
+    tracker.recompute([]);
+    expect(tracker.getUsage("color-primary")).toBe(2);
+  });
+
+  it("getCount is unknown while components load", () => {
+    const { tracker } = make([[]], ["components"]);
+    tracker.recompute([]);
+    expect(tracker.getCount("color-primary")).toBe("unknown");
+  });
+
+  it("builds the site index lazily, once per change burst", () => {
+    const { tracker, build } = make([[]]);
+    tracker.recompute([]);
+    tracker.recompute([]);
+    expect(build).not.toHaveBeenCalled();
+    tracker.getUsage("color-primary");
+    tracker.getCount("color-secondary");
+    expect(build).toHaveBeenCalledTimes(1);
+    tracker.invalidate();
+    tracker.getUsage("color-primary");
+    expect(build).toHaveBeenCalledTimes(2);
+  });
+
+  /* A merged duplicate keeps answering to its old var name (legacyNames) —
+     a binding written under that name is the surviving token's. */
+  it("breakdown follows a legacy var name to its token", () => {
+    const tokens = DEFAULT_TOKENS.map((t) =>
+      t.id === "color-primary" ? { ...t, legacyNames: ["--buildrick-design-color-brand-old"] } : t,
+    );
+    const tracker = new TokenUsageTracker(() => tokens, () => ({ sources: [[]], unavailable: [] }));
+    tracker.recompute([stubElement("e1", { color: "var(--buildrick-design-color-brand-old)" })]);
+    expect(tracker.getBreakdown("color-primary")).toEqual([{ elementId: "e1", styleProp: "color" }]);
+  });
+});
+
+describe("TokenUsageTracker via Composer · sources", () => {
+  beforeAll(installEngineBrowserStubs);
+  afterAll(removeEngineBrowserStubs);
+
+  it("is unknown until saved components have loaded, then counts", () => {
+    const c = createTestComposer();
+    vi.spyOn(c.components, "isLoaded").mockReturnValue(false);
+    c.designSystem.tokenUsage.invalidate();
+    expect(c.designSystem.tokenUsage.getCount("color-primary")).toBe("unknown");
+    vi.mocked(c.components.isLoaded).mockReturnValue(true);
+    c.designSystem.tokenUsage.invalidate();
+    expect(typeof c.designSystem.tokenUsage.getCount("color-primary")).toBe("number");
   });
 });

@@ -22,28 +22,23 @@ export function emitTokenCss(
   opts: { darkMode: DarkMode; onSkip?: (id: string, reason: string) => void },
 ): string {
   const byId = new Map(tokens.map((t) => [t.id, t]));
+  /* A soft-deleted token (spec §6) points at its replacement: every name it
+     answers to must read the replacement's value, in both modes. */
+  const lightRef = (t: DesignToken): TokenRef => (t.replacedBy ? { alias: t.replacedBy } : t.modes.light);
   const safeNames = (t: DesignToken) => SAFE_VAR.test(t.cssVar) && (t.legacyNames ?? []).every((n) => SAFE_VAR.test(n));
 
   /* Pass one: which tokens get a light declaration. An alias counts only when
      its target does — `var()` of a var nobody defines is not a fallback, it
-     is no value at all, and it would beat the legacy backstop below.
-     A renamed or replaced token (`replacedBy`) keeps its var — elements are
-     still bound to it — but that var follows the replacement, so later edits
-     reach them. A replacement that cannot be emitted (or a bridge loop) leaves
-     the token on its own value. */
+     is no value at all, and it would beat the legacy backstop below. */
   const emitted = new Map<string, boolean>();
-  const redirect = new Map<string, DesignToken>();
   const emits = (t: DesignToken, visiting: Set<string> = new Set()): boolean => {
     const known = emitted.get(t.id);
     if (known !== undefined) return known;
     if (visiting.has(t.id)) return false;
     visiting.add(t.id);
-    const ref = t.modes.light;
+    const ref = lightRef(t);
     let ok = safeNames(t);
-    const replacement = t.replacedBy !== undefined ? byId.get(t.replacedBy) : undefined;
-    if (ok && replacement && emits(replacement, visiting)) {
-      redirect.set(t.id, replacement);
-    } else if (ok) {
+    if (ok) {
       if ("alias" in ref) {
         const target = byId.get(ref.alias);
         ok = target !== undefined && emits(target, visiting);
@@ -72,10 +67,9 @@ export function emitTokenCss(
       opts.onSkip?.(t.id, "unsafe custom-property name");
       continue;
     }
-    const replacement = redirect.get(t.id);
-    const lv = !emitted.get(t.id) ? null : replacement ? `var(${replacement.cssVar})` : refCss(t.modes.light);
+    const lv = emitted.get(t.id) ? refCss(lightRef(t)) : null;
     if (!lv) {
-      opts.onSkip?.(t.id, "alias" in t.modes.light ? "alias target not emitted" : "empty or unresolvable light value");
+      opts.onSkip?.(t.id, "alias" in lightRef(t) ? "alias target not emitted" : "empty or unresolvable light value");
       continue;
     }
     seen.add(t.cssVar);
@@ -85,7 +79,7 @@ export function emitTokenCss(
       seen.add(legacy);
       light.push(`${legacy}:var(${t.cssVar})`);
     }
-    if (opts.darkMode === "auto" && t.modes.dark && !replacement) {
+    if (opts.darkMode === "auto" && t.modes.dark && !t.replacedBy) {
       const dv = refCss(t.modes.dark);
       if (dv) dark.push(`${t.cssVar}:${dv}`);
       else opts.onSkip?.(t.id, "unresolvable dark value");

@@ -34,7 +34,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
     styles: {
       display: "flex",
       borderBottom: "2px solid " + BLOCK_COLORS.border,
-      marginBottom: "16px",
+      marginBottom: "var(--buildrick-design-space-4)",
     },
   });
   composer.elements.addElement(tabNav, tabsId);
@@ -51,13 +51,13 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
         "aria-selected": index === 0 ? "true" : "false",
       },
       styles: {
-        padding: "12px 20px",
+        padding: "var(--buildrick-design-space-3) var(--buildrick-design-space-5)",
         background: "transparent",
         border: "none",
         borderBottom: index === 0 ? `2px solid ${BLOCK_COLORS.accent}` : "2px solid transparent",
         marginBottom: "-2px",
         cursor: "pointer",
-        fontSize: "14px",
+        fontSize: "var(--buildrick-design-font-size-sm)",
         fontWeight: index === 0 ? "600" : "500",
         color: index === 0 ? BLOCK_COLORS.accent : BLOCK_COLORS.text,
         transition: "all 0.2s ease",
@@ -82,9 +82,9 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
       },
       styles: {
         display: index === 0 ? "block" : "none",
-        padding: "20px",
+        padding: "var(--buildrick-design-space-5)",
         background: BLOCK_COLORS.surface,
-        borderRadius: "8px",
+        borderRadius: "var(--buildrick-design-radius-md)",
         minHeight: "120px",
       },
     });

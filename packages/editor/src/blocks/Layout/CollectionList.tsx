@@ -17,21 +17,21 @@ import type { BlockBuildConfig } from "../types";
 const LIST_STYLES: Record<string, string> = {
   display: "grid",
   "grid-template-columns": "repeat(3, 1fr)",
-  gap: "16px",
+  gap: "var(--buildrick-design-space-4)",
 };
 
 const CARD_STYLES: Record<string, string> = {
   display: "flex",
   "flex-direction": "column",
-  gap: "8px",
-  background: "#f3f4f6",
-  padding: "16px",
-  "border-radius": "8px",
+  gap: "var(--buildrick-design-space-2)",
+  background: "var(--buildrick-design-color-surface-muted)",
+  padding: "var(--buildrick-design-space-4)",
+  "border-radius": "var(--buildrick-design-radius-md)",
 };
 
 const MEDIA_STYLES: Record<string, string> = {
   height: "96px",
-  background: "#e5e7eb",
+  background: "var(--buildrick-design-color-border-subtle)",
   "border-radius": "6px",
 };
 
@@ -41,7 +41,7 @@ export const collectionListBlockConfig: BlockBuildConfig = {
   category: "Layout",
   elementType: "collection-list",
   content:
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px"><div style="display:flex;flex-direction:column;gap:8px;background:#f3f4f6;padding:16px;border-radius:8px"><div style="height:96px;background:#e5e7eb;border-radius:6px"></div><h3>{{item.name}}</h3><p>{{item.description}}</p></div></div>',
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--buildrick-design-space-4)"><div style="display:flex;flex-direction:column;gap:var(--buildrick-design-space-2);background:var(--buildrick-design-color-surface-muted);padding:var(--buildrick-design-space-4);border-radius:var(--buildrick-design-radius-md)"><div style="height:96px;background:var(--buildrick-design-color-border-subtle);border-radius:6px"></div><h3>{{item.name}}</h3><p>{{item.description}}</p></div></div>',
   build: (composer, parentId, dropIndex) => {
     const els = composer.elements;
     const list = els.createElement("collection-list", { styles: LIST_STYLES });

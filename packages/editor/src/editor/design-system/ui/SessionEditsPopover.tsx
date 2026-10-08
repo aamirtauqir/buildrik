@@ -1,12 +1,14 @@
 /**
- * SessionEditsPopover — Brand's "Review changes" (spec §4): a NON-blocking list
- * of every token write made in Brand this session (useSessionEdits), each with
- * Revert. Every edit is already live and saved, so the list only offers a way
- * back. A row whose result the site no longer holds (a later edit, ⌘Z) says so
- * and cannot be reverted from here.
+ * SessionEditsPopover — Brand's "Review changes" (spec §4, boards BRP1-M2
+ * 8222:230854 empty · 8222:231429 list · 8222:232022 stale · 8230:232344
+ * one-row-reverted): a NON-blocking list of the tokens Brand changed this
+ * session (useSessionEdits), one row per token, each with its own Revert.
+ * Every edit is already live and saved, so the list only offers a way back.
+ * A row whose token changed again since says so and cannot be reverted from
+ * here — ⌘Z is the tool.
  *
- * No board draws it yet (Part 2 redesigns the panel); the row reuses the old
- * review's plate — `--bk-bg-subtle`, the was → now pair in mono.
+ * The popover's anchor is the header's whole action cluster, so the card's
+ * right edge lands on the workspace's right edge, as the board draws it.
  *
  * @license BSD-3-Clause
  */
@@ -16,56 +18,63 @@ import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "@/editor/design-system/types";
 import type { SessionEdit } from "@/editor/design-system/state/useSessionEdits";
 
-const ROW = "tw:flex tw:flex-col tw:gap-1 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:py-1.5";
-const SMALL = "tw:text-[length:var(--bk-text-11)] tw:leading-4";
-const MONO = `${SMALL} tw:[font-family:var(--bk-font-mono)]`;
+const SMALL_TYPE = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px]";
+const SMALL = `${SMALL_TYPE} tw:text-[var(--bk-ink-soft)]`;
+/* The stale note is a step quieter than the value line (8222:232022). */
+const STALE_NOTE = `${SMALL_TYPE} tw:text-[var(--bk-ink-muted)]`;
+/* The board's ghost action: 28 tall, 12 in, 13/20 medium in gray-700. Its
+   disabled state is the label alone in --bk-ink-disabled — no plate, so a
+   stale row reads as inert, not as a pressed button. */
+const ACTION =
+  "tw:h-7 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] " +
+  "tw:disabled:bg-transparent tw:disabled:text-[var(--bk-ink-disabled)]";
 
-const WORDS: Record<string, string> = {
-  "Edit token": "Changed a token",
-  "Add token": "Added a token",
-  "Delete token": "Deleted a token",
-  "Rename token": "Renamed a token",
-  "Set dark value": "Set a dark value",
-  "Apply spacing preset": "Applied a spacing preset",
-  "Reset spacing": "Reset spacing",
-  "Apply starter": "Applied a starter",
-  "Import tokens": "Imported tokens",
-};
-
-/** What a write did, token by token — the edit's own `custom-*` primitives
- *  are its implementation, not a change of their own. */
-function changes(before: readonly DesignToken[], after: readonly DesignToken[]): string[] {
-  const was = new Map(before.map((t) => [t.id, t]));
-  const now = new Map(after.map((t) => [t.id, t]));
-  const out: string[] = [];
-  for (const id of new Set([...was.keys(), ...now.keys()])) {
-    const a = was.get(id);
-    const b = now.get(id);
-    const t = b ?? a!;
-    if (t.layer === "primitive" && id.startsWith("custom-")) continue;
-    if (!a) out.push(`+ ${t.name}`);
-    else if (!b) out.push(`− ${t.name}`);
-    else if (b.replacedBy !== a.replacedBy) out.push(`${t.name} → ${b.replacedBy ?? "restored"}`);
-    else {
-      for (const mode of ["light", "dark"] as const) {
-        const x = resolveTokenLiteral(before, id, mode) ?? "";
-        const y = resolveTokenLiteral(after, id, mode) ?? "";
-        if (x !== y) out.push(`${t.name}${mode === "dark" ? " · dark" : ""}  ${x || "—"} → ${y || "—"}`);
-      }
-    }
+/** A mode's value as the board writes it: the palette entry's name when the
+ *  token points at one, the literal otherwise. */
+function valueLabel(list: readonly DesignToken[], id: string, mode: "light" | "dark"): string {
+  const t = list.find((x) => x.id === id);
+  const ref = t && (mode === "dark" ? t.modes.dark : t.modes.light);
+  if (ref && "alias" in ref && !ref.alias.startsWith("custom-")) {
+    const target = list.find((x) => x.id === ref.alias);
+    if (target) return target.name;
   }
-  return out;
+  return (ref ? resolveTokenLiteral(list as DesignToken[], id, mode) : null) ?? "—";
+}
+
+/** "Primary · Light" + "Blue 500 → Blue 600" — what changed on the row's token. */
+function describeEdit(e: Pick<SessionEdit, "tokenId" | "before" | "after">): { title: string; lines: string[] } {
+  const was = e.before.find((t) => t.id === e.tokenId);
+  const now = e.after.find((t) => t.id === e.tokenId);
+  const name = (now ?? was)?.name ?? e.tokenId;
+  if (!was) return { title: `${name} · Added`, lines: [valueLabel(e.after, e.tokenId, "light")] };
+  if (!now) return { title: `${name} · Deleted`, lines: [`Was ${valueLabel(e.before, e.tokenId, "light")}`] };
+  if (now.replacedBy !== was.replacedBy) {
+    const to = now.replacedBy ? e.after.find((t) => t.id === now.replacedBy)?.name ?? now.replacedBy : "restored";
+    return { title: `${name} · Renamed`, lines: [`${name} → ${to}`] };
+  }
+  const modes = (["light", "dark"] as const)
+    .map((mode) => ({ mode, x: valueLabel(e.before, e.tokenId, mode), y: valueLabel(e.after, e.tokenId, mode) }))
+    .filter((m) => m.x !== m.y);
+  if (modes.length === 0) return { title: name, lines: [] };
+  if (modes.length === 1) {
+    const [m] = modes;
+    return { title: `${name} · ${m.mode === "dark" ? "Dark" : "Light"}`, lines: [`${m.x} → ${m.y}`] };
+  }
+  return { title: `${name} · Light & dark`, lines: modes.map((m) => `${m.mode === "dark" ? "Dark" : "Light"} ${m.x} → ${m.y}`) };
 }
 
 export function SessionEditsPopover({
   edits,
   onRevert,
   disabled = false,
+  extraActions,
 }: {
   edits: readonly SessionEdit[];
-  /** The index in `edits` of the row to put back. */
-  onRevert: (index: number) => void;
+  /** The `key` of the row to put back. */
+  onRevert: (key: string) => void;
   disabled?: boolean;
+  /** The header's other actions, drawn after the trigger inside the anchor. */
+  extraActions?: React.ReactNode;
 }) {
   const [open, setOpen] = React.useState(false);
   return (
@@ -73,55 +82,70 @@ export function SessionEditsPopover({
       open={open}
       onClose={() => setOpen(false)}
       placement="bottom-end"
-      label="Changes this session"
+      block
+      label="Review changes"
+      /* The board's card: 6 radius, hairline, no elevation (8222:232001).
+         The primitive's surface classes sit on a plain div, so nothing merges —
+         `!` is what makes these win. */
+      className="tw:mt-[11px] tw:w-[460px] tw:rounded-[var(--bk-radius-md)]! tw:[box-shadow:none]!"
       trigger={
-        <Button
-          type="button"
-          variant="secondary"
-          size="xs"
-          className="tw:h-7 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal"
-          onClick={() => setOpen((v) => !v)}
-          data-testid="brand-session-edits"
-        >
-          Review changes · {edits.length}
-        </Button>
+        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            className="tw:h-7 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)]"
+            onClick={() => setOpen((v) => !v)}
+            disabled={disabled}
+            data-testid="brand-session-edits"
+          >
+            Review changes · {edits.length}
+          </Button>
+          {extraActions}
+        </div>
       }
     >
-      <div className="tw:flex tw:max-h-96 tw:w-80 tw:flex-col tw:gap-1 tw:overflow-y-auto tw:p-2" data-testid="brand-session-edits-list">
-        <p className={`tw:m-0 tw:px-1 tw:pb-1 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]`}>
-          Already applied and saved. Revert puts the brand back as it was before that change.
+      <div className="tw:flex tw:max-h-[640px] tw:flex-col tw:gap-3 tw:overflow-y-auto tw:p-2" data-testid="brand-session-edits-list">
+        <h3 className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]">
+          Review changes
+        </h3>
+        <p className={SMALL}>
+          {edits.length === 0 ? "No changes to review yet." : "Edits in this session. Each edit is one ⌘Z step."}
         </p>
-        {edits.map((e, i) => {
-          const lines = changes(e.before, e.after);
+        {edits.map((e) => {
+          const { title, lines } = describeEdit(e);
           return (
-            <div key={e.at + "-" + i} className={ROW} data-testid="brand-session-edit" data-stale={e.stale || undefined}>
-              <div className="tw:flex tw:items-center tw:gap-2">
-                <span className={`${SMALL} tw:min-w-0 tw:flex-1 tw:truncate tw:font-medium tw:text-[var(--bk-ink)]`}>
-                  {WORDS[e.label] ?? e.label}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  disabled={disabled || e.stale}
-                  onClick={() => onRevert(i)}
-                  data-testid="brand-session-revert"
-                >
-                  Revert
-                </Button>
-              </div>
-              {lines.slice(0, 3).map((l) => (
-                <span key={l} className={`${MONO} tw:truncate tw:text-[var(--bk-ink-soft)]`}>{l}</span>
+            <div key={e.key} className="tw:flex tw:flex-col tw:items-start tw:gap-2" data-testid="brand-session-edit" data-stale={e.stale || undefined}>
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]" data-testid="brand-session-edit-title">
+                {title}
+              </p>
+              {lines.map((l) => (
+                <p key={l} className={SMALL}>{l}</p>
               ))}
-              {lines.length > 3 && <span className={`${SMALL} tw:text-[var(--bk-ink-muted)]`}>+{lines.length - 3} more</span>}
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                className={ACTION}
+                disabled={disabled || e.stale}
+                onClick={() => onRevert(e.key)}
+                data-testid="brand-session-revert"
+              >
+                Revert
+              </Button>
               {e.stale && (
-                <span className={`${SMALL} tw:text-[var(--bk-ink-muted)]`} data-testid="brand-session-stale">
+                <p className={STALE_NOTE} data-testid="brand-session-stale">
                   Changed since — use ⌘Z
-                </span>
+                </p>
               )}
             </div>
           );
         })}
+        <div>
+          <Button type="button" variant="ghost" size="xs" className={ACTION} onClick={() => setOpen(false)} data-testid="brand-session-close">
+            Close
+          </Button>
+        </div>
       </div>
     </Popover>
   );

@@ -2,7 +2,8 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
-import { migrateTokensToV6 } from "@buildrik/shared/tokens";
+import { buildTokenUsageIndex, keepInUseSiteTokens, migrateTokensToV6 } from "@buildrik/shared/tokens";
+import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
 import { isBrandTokensV2Enabled } from "@server/services/brand-tokens";
 
 /**
@@ -133,6 +134,8 @@ export interface PushResult {
   name: string;
   status: PushStatus;
   error?: string;
+  /** Site-only token ids a v6 push kept because the site still uses them (spec §4). */
+  kept?: string[];
 }
 
 // D2: how many pre-push snapshots to keep per site (oldest pruned on capture).
@@ -241,7 +244,7 @@ export async function pushSharedTheme(
       deletedAt: null,
       ...(siteIds ? { id: { in: siteIds } } : {}),
     },
-    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectSettings: true, lastEditedAt: true, tokensMigrationHold: true },
+    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectSettings: true, projectStyles: true, lastEditedAt: true, tokensMigrationHold: true },
   });
 
   const results: PushResult[] = [];
@@ -266,6 +269,13 @@ export async function pushSharedTheme(
     }
     const pushed = plan;
     try {
+      /* Read before the transaction: the CAS on lastEditedAt below guarantees
+         the pages read here are the pages the write lands on. A ThemeError
+         (unreadable or clashing site tokens) fails this site, nothing written. */
+      const final =
+        pushed.version === TOKENS_SCHEMA_VERSION
+          ? await withKeptSiteTokens(site, pushed.theme)
+          : { theme: pushed.theme, kept: [] };
       // D2: snapshot the site's CURRENT tokens before the push overwrites them,
       // atomically with the overwrite, so a bad push can be rolled back. Push was
       // previously a wholesale overwrite with no prior-value capture.
@@ -277,7 +287,7 @@ export async function pushSharedTheme(
         const claimed = await tx.site.updateMany({
           where: { id: site.id, lastEditedAt: site.lastEditedAt },
           data: {
-            projectSettings: withTokens(site.projectSettings, pushed.theme, pushed.version),
+            projectSettings: withTokens(site.projectSettings, final.theme, pushed.version),
             dsSchemaVersion: site.dsSchemaVersion + 1,
             lastEditedAt: savedAt,
           },
@@ -295,7 +305,12 @@ export async function pushSharedTheme(
         });
       });
       await pruneThemeSnapshots(site.id);
-      results.push({ siteId: site.id, name: site.name, status: "pushed" });
+      results.push({
+        siteId: site.id,
+        name: site.name,
+        status: "pushed",
+        ...(final.kept.length ? { kept: final.kept } : {}),
+      });
     } catch (e) {
       results.push({
         siteId: site.id,
@@ -361,6 +376,48 @@ function planPush(
   return { kind: "write", theme, version: 5 };
 }
 
+/**
+ * The token set a v6 push really writes to one site: the theme plus the site's
+ * own tokens still in use (spec §4). Reads the site's pages, saved components
+ * and presets for usage (the same shared scanner as the editor). A site whose
+ * own tokens cannot be read, or whose merged set does not validate, is refused
+ * for this push — never written with a token dropped.
+ */
+async function withKeptSiteTokens(
+  site: { id: string; projectSettings: unknown; projectStyles: unknown },
+  theme: TokenTheme,
+): Promise<{ theme: TokenTheme; kept: string[] }> {
+  const themeTokens = validateTokens(theme.designTokens);
+  if (!themeTokens.ok) throw new ThemeError("BAD_REQUEST", `Theme tokens are invalid: ${themeTokens.reason}`);
+  const stored = readTokenTheme(site.projectSettings)?.designTokens ?? [];
+  if (stored.length === 0) return { theme, kept: [] };
+  let siteTokens: DesignToken[];
+  const v6 = validateTokens(stored);
+  if (v6.ok) siteTokens = v6.tokens;
+  else {
+    try {
+      siteTokens = migrateTokensToV6(stored);
+    } catch {
+      throw new ThemeError("CONFLICT", "This site's own brand tokens could not be read — nothing was changed.");
+    }
+  }
+  const [pages, components] = await Promise.all([
+    prisma.page.findMany({ where: { siteId: site.id }, select: { blocks: true, settings: true } }),
+    prisma.siteComponent.findMany({ where: { siteId: site.id }, select: { payload: true } }),
+  ]);
+  /* A theme that carries presets replaces the site's; otherwise the site's
+     presets stay and their token references count. */
+  const presets = theme.designPresets ? [] : (readTokenTheme(site.projectSettings)?.designPresets ?? []);
+  const usage = buildTokenUsageIndex([pages, site.projectStyles, components, presets], siteTokens);
+  const merged = keepInUseSiteTokens(themeTokens.tokens, siteTokens, usage);
+  if (merged.kept.length === 0) return { theme, kept: [] };
+  const checked = validateTokens(merged.tokens);
+  if (!checked.ok) {
+    throw new ThemeError("CONFLICT", `This site's own tokens clash with the theme (${checked.reason}) — nothing was changed.`);
+  }
+  return { theme: { ...theme, designTokens: checked.tokens }, kept: merged.kept };
+}
+
 /** Keep only the newest SNAPSHOT_RETENTION snapshots per site (best-effort).
  *  `migration` rows are the one-time undo for the v6 move and are never pruned. */
 export async function pruneThemeSnapshots(siteId: string): Promise<void> {
@@ -380,6 +437,13 @@ export async function pruneThemeSnapshots(siteId: string): Promise<void> {
   }
 }
 
+/** A token list as comparable text: a valid v6 set in its parsed shape, so key
+ *  order in stored JSON never reads as a change. */
+function canonicalTokens(tokens: unknown[]): string {
+  const v6 = validateTokens(tokens);
+  return JSON.stringify(v6.ok ? v6.tokens : tokens);
+}
+
 /**
  * D1: dry-run a push. Returns, per target, whether the shared theme would change
  * the site's tokens — so the UI can show the blast radius (and per-site opt-out)
@@ -393,25 +457,44 @@ export async function previewSharedThemePush(
   const targets = await prisma.site.findMany({
     where: { workspaceId, deletedAt: null, ...(siteIds ? { id: { in: siteIds } } : {}) },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, themeLocked: true, projectSettings: true, tokensMigrationHold: true },
+    select: { id: true, name: true, themeLocked: true, projectSettings: true, projectStyles: true, tokensMigrationHold: true },
   });
   const switchOn = isBrandTokensV2Enabled(workspaceId);
   const migrated = migrateSharedTheme(theme, switchOn);
-  return targets.map((site) => {
+  const previews: PushPreview[] = [];
+  for (const site of targets) {
     if (site.themeLocked) {
-      return { siteId: site.id, name: site.name, status: "skipped-locked" as const, willChange: false };
+      previews.push({ siteId: site.id, name: site.name, status: "skipped-locked", willChange: false });
+      continue;
     }
     const plan = planPush(theme, migrated, site, switchOn);
-    if (plan.kind !== "write") return { siteId: site.id, name: site.name, status: plan.kind, willChange: false };
-    const before = JSON.stringify(readTokenTheme(site.projectSettings)?.designTokens ?? []);
+    if (plan.kind !== "write") {
+      previews.push({ siteId: site.id, name: site.name, status: plan.kind, willChange: false });
+      continue;
+    }
+    const before = canonicalTokens(readTokenTheme(site.projectSettings)?.designTokens ?? []);
     const versionChanges = storedTokensVersion(site.projectSettings) !== plan.version;
-    return {
+    /* Compare against what the push would REALLY write — the theme plus the
+       site's in-use tokens. A site the push would refuse still "changes" (it
+       shows in the blast radius; the push reports it failed). */
+    let written: unknown[] = plan.theme.designTokens;
+    let refused = false;
+    if (plan.version === TOKENS_SCHEMA_VERSION) {
+      try {
+        written = (await withKeptSiteTokens(site, plan.theme)).theme.designTokens;
+      } catch (e) {
+        if (!(e instanceof ThemeError)) throw e;
+        refused = true;
+      }
+    }
+    previews.push({
       siteId: site.id,
       name: site.name,
-      status: "would-push" as const,
-      willChange: versionChanges || before !== JSON.stringify(plan.theme.designTokens),
-    };
-  });
+      status: "would-push",
+      willChange: refused || versionChanges || before !== canonicalTokens(written),
+    });
+  }
+  return previews;
 }
 
 /**

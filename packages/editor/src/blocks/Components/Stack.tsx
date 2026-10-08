@@ -19,9 +19,9 @@ function buildStack(composer: Composer, parentId: string, dropIndex?: number): s
     styles: {
       display: "flex",
       flexDirection: "column",
-      gap: "16px",
+      gap: "var(--buildrick-design-space-4)",
       width: "100%",
-      padding: "16px",
+      padding: "var(--buildrick-design-space-4)",
     },
   });
 
@@ -36,9 +36,9 @@ function buildStack(composer: Composer, parentId: string, dropIndex?: number): s
         class: "stack-item",
       },
       styles: {
-        padding: "16px",
+        padding: "var(--buildrick-design-space-4)",
         background: BLOCK_COLORS.surface,
-        borderRadius: "8px",
+        borderRadius: "var(--buildrick-design-radius-md)",
         border: "1px solid " + BLOCK_COLORS.border,
       },
     });

@@ -16,5 +16,5 @@ export const footerBlockConfig: FooterBlockConfig = {
   category: "Sections",
   elementType: "footer",
   content:
-    '<footer style="padding:40px 20px;background:#1a1a2e;color:#fff;text-align:center"><p>&copy; 2024 Buildrick. All rights reserved.</p></footer>',
+    '<footer style="padding:var(--buildrick-design-space-10) var(--buildrick-design-space-5);background:#1a1a2e;color:#fff;text-align:center"><p>&copy; 2024 Buildrick. All rights reserved.</p></footer>',
 };

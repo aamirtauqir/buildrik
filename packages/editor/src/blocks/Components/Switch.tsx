@@ -19,7 +19,7 @@ function buildSwitch(composer: Composer, parentId: string, dropIndex?: number): 
     styles: {
       display: "inline-flex",
       alignItems: "center",
-      gap: "12px",
+      gap: "var(--buildrick-design-space-3)",
       cursor: "pointer",
     },
   });
@@ -85,7 +85,7 @@ function buildSwitch(composer: Composer, parentId: string, dropIndex?: number): 
     tagName: "span",
     content: "Toggle Option",
     styles: {
-      fontSize: "14px",
+      fontSize: "var(--buildrick-design-font-size-sm)",
       color: "#374151",
     },
   });

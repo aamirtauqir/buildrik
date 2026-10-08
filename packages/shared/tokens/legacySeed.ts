@@ -4,7 +4,9 @@
  * emits any of these that no current token defines, so an element bound to a
  * seed var whose token was deleted still resolves (the retired siteTokensCSS did the same
  * by appending all 78 DEFAULT_TOKENS). Do not edit: it is a compatibility
- * record, not the seed.
+ * record, not the seed. The one exception is append-only: a var the seed
+ * gains (Brand Part 1b, 2026-10-08: the six role colours inserted blocks bind
+ * to) joins the end, so a binding to it can never go undefined.
  */
 export const LEGACY_SEED: ReadonlyArray<{ cssVar: string; value: string }> = [
   {
@@ -390,5 +392,29 @@ export const LEGACY_SEED: ReadonlyArray<{ cssVar: string; value: string }> = [
   {
     "cssVar": "--bd-imagery-placeholder",
     "value": "https://placehold.co/600x400"
+  },
+  {
+    "cssVar": "--buildrick-design-color-on-primary",
+    "value": "#FFFFFF"
+  },
+  {
+    "cssVar": "--buildrick-design-color-surface-raised",
+    "value": "#FFFFFF"
+  },
+  {
+    "cssVar": "--buildrick-design-color-surface-muted",
+    "value": "#F3F4F6"
+  },
+  {
+    "cssVar": "--buildrick-design-color-border-subtle",
+    "value": "#E5E7EB"
+  },
+  {
+    "cssVar": "--buildrick-design-color-text-strong",
+    "value": "#111827"
+  },
+  {
+    "cssVar": "--buildrick-design-color-text-subtle",
+    "value": "#6B7280"
   }
 ];

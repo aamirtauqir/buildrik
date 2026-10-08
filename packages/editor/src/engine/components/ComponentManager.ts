@@ -104,6 +104,7 @@ export class ComponentManager {
   private components: Map<string, ComponentDefinition> = new Map();
   private instances: Map<string, ComponentInstance> = new Map();
   private projectId: string = "default";
+  private loaded = false;
   private instanceUtils: ComponentInstanceUtils;
 
   constructor(composer: Composer, config?: Partial<ComponentManagerConfig>) {
@@ -144,25 +145,39 @@ export class ComponentManager {
   }
 
   private async loadComponentsFromStorage(): Promise<void> {
-    const componentList = await loadComponents(this.projectId);
+    this.loaded = false;
+    try {
+      const componentList = await loadComponents(this.projectId);
 
-    this.components.clear();
-    componentList.forEach((comp) => {
-      // One malformed row (any member can store one; the server only checks
-      // it is an object) must not take every other master down with it.
-      if (!hasUsableMaster(comp)) {
-        console.warn(`[components] skipped "${comp?.id}": its master tree is not an element`);
-        return;
-      }
-      // A master reaches the canvas by instancing, never via importProject,
-      // so it gets importProject's ingest sanitizing here.
-      sanitizeElementTreeContent(comp.masterTree);
-      this.components.set(comp.id, comp);
-    });
+      this.components.clear();
+      componentList.forEach((comp) => {
+        // One malformed row (any member can store one; the server only checks
+        // it is an object) must not take every other master down with it.
+        if (!hasUsableMaster(comp)) {
+          console.warn(`[components] skipped "${comp?.id}": its master tree is not an element`);
+          return;
+        }
+        // A master reaches the canvas by instancing, never via importProject,
+        // so it gets importProject's ingest sanitizing here.
+        sanitizeElementTreeContent(comp.masterTree);
+        this.components.set(comp.id, comp);
+      });
 
-    this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, {
-      components: this.getAllComponents(),
-    });
+      this.loaded = true;
+      this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, {
+        components: this.getAllComponents(),
+      });
+    } catch (e) {
+      console.warn("[components] load failed", e);
+      this.loaded = false;
+    }
+  }
+
+  /** True once saved components are in memory — or when nothing can be stored
+   *  (no storage / disabled), so there is nothing to wait for. False while a
+   *  load is in flight or after it failed: token usage is then unknown. */
+  isLoaded(): boolean {
+    return this.loaded || !this.isAvailable();
   }
 
   /**

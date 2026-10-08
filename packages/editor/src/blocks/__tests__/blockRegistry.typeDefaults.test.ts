@@ -112,9 +112,10 @@ describe("a catalog block gets its type's default styles", () => {
     const el = fakeElement("button", "button");
     insertBlock(composerWith([el]), buttonBlock, "parent");
     const expected = getDefaultStyles("button", "button");
-    expect(expected.color).toBe("#ffffff");
+    // Bound to the on-primary role since Brand Part 1b (spec §3).
+    expect(expected.color).toBe("var(--buildrick-design-color-on-primary)");
     expect(expected.color).not.toBe(THEME.textPrimary);
-    expect(el.__styles.color).toBe("#ffffff");
+    expect(el.__styles.color).toBe("var(--buildrick-design-color-on-primary)");
     expect(el.__styles["background-color"]).toBe(expected["background-color"]);
   });
 

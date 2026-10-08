@@ -135,6 +135,43 @@ describe("token closure — a v5 site in Dark mode auto", () => {
   });
 });
 
+/* Brand Part 1b: inserted blocks bind to semantic tokens (incl. the six seed
+   roles added in 1b). A v5 site the brand switch leaves unmigrated emits its
+   saved v5 set through the overlay path — every var a block reads must still
+   be declared there (the LEGACY_SEED backstop covers the new roles). */
+const ROLES_1B = [
+  "color-on-primary", "color-surface-raised", "color-surface-muted",
+  "color-border-subtle", "color-text-strong", "color-text-subtle",
+];
+
+describe("token closure — a v5 site the switch leaves unmigrated", () => {
+  it("declares every var an inserted block reads", async () => {
+    const gaps: string[] = [];
+    for (const def of getBlockDefinitions()) {
+      const composer = createTestComposer();
+      composer.designSystem.brandTokensV2 = false;
+      /* Saved before 1b: none of the six new seed roles is in it. */
+      const stored: Record<string, unknown> = {
+        designTokens: DEFAULT_TOKENS_V5.filter((t) => !ROLES_1B.includes(t.id)),
+        designTokensSchemaVersion: 5,
+      };
+      composer.setProjectSettings({ ...composer.getProjectSettings(), ...stored });
+      const page = composer.elements.createPage("Home");
+      composer.elements.setActivePage?.(page.id);
+      insertBlock(composer, def, page.root.id);
+      const engine = new ExportEngine(composer);
+      const single = engine.generateHTML({ includeResetCSS: true }) + engine.generateCSS();
+      const { files } = await engine.exportAllPages({ format: "html" });
+      const multi = files.map((f) => f.content).join("\n");
+      for (const [doc, text] of Object.entries({ single, multi, preview: composer.exportHTML().combined })) {
+        const missing = undeclared(text);
+        if (missing.length) gaps.push(`${def.id} [${doc}]: ${missing.join(", ")}`);
+      }
+    }
+    expect(gaps).toEqual([]);
+  });
+});
+
 /* The Components catalog (drag from the Components tab) places through its
    own interpreter and binds each variant inline as `var(--token)`. */
 describe("token closure — components catalog", () => {

@@ -9,7 +9,6 @@
 import type { Composer } from "../../engine";
 import type { ElementType } from "../../shared/types";
 import type { BlockBuildConfig } from "../types";
-import { BLOCK_COLORS } from "../blockPalette";
 
 export interface IconBlockConfig extends BlockBuildConfig {
   elementType: ElementType;
@@ -56,14 +55,16 @@ function buildIconBlock(
     "justify-content": "center",
     width: "32px",
     height: "32px",
-    color: BLOCK_COLORS.accentOn,
+    // White glyph with no fill behind it: no token role holds it (OQ-2), so it
+    // stays literal — and data-icon-color below is an attribute, where var() never resolves.
+    color: "#FFFFFF",
   });
 
   // Add data attributes for icon config
   element.setAttribute("data-icon-name", "star");
   element.setAttribute("data-icon-library", "lucide");
   element.setAttribute("data-icon-size", "32");
-  element.setAttribute("data-icon-color", BLOCK_COLORS.surface);
+  element.setAttribute("data-icon-color", "#FFFFFF");
   element.setAttribute("data-icon-stroke", "2");
 
   composer.elements.addElement(element, parentId, dropIndex);

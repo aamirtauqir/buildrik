@@ -43,6 +43,8 @@ const radiusToken: DesignToken = v6Token({
 
 interface MockTrackerOpts {
   getUsage?: (id: string) => number;
+  /** Site-wide count; defaults to `getUsage` (a known number). */
+  getCount?: (id: string) => number | "unknown";
   /** D6.b: ref breakdown per token id. When absent, getBreakdown returns []. */
   getBreakdown?: (id: string) => readonly UsageRef[];
 }
@@ -100,6 +102,7 @@ function makeMockComposer(opts: {
     designSystem: {
       tokenUsage: {
         getUsage: (id: string) => opts.usage?.getUsage?.(id) ?? 0,
+        getCount: (id: string) => opts.usage?.getCount?.(id) ?? opts.usage?.getUsage?.(id) ?? 0,
         getBreakdown: (id: string) => opts.usage?.getBreakdown?.(id) ?? [],
         on,
         off,
@@ -716,6 +719,27 @@ describe("TokenDetailView", () => {
       expect(onDelete).toHaveBeenCalledWith(colorToken.id);
       // Modal must NOT be mounted.
       expect(container.querySelector('[data-token-replace-modal]')).toBeNull();
+    });
+
+    it("Pro + usage unknown: clicking Delete never hard-deletes (opens the picker)", () => {
+      const composer = makeMockComposer({ usage: { getCount: () => "unknown", getBreakdown: () => [] } });
+      const onDelete = vi.fn();
+      const { getByTestId } = render(
+        wrap(
+          <TokenDetailView
+            token={colorToken}
+            composer={composer}
+            allTokens={[colorToken, candidate]}
+            onDelete={onDelete}
+          />,
+        ),
+      );
+      clickDelete(getByTestId);
+      expect(onDelete).not.toHaveBeenCalled();
+      const modal = document.querySelector('[data-token-replace-modal]');
+      expect(modal).toBeTruthy();
+      // The count is unknown: the modal does not claim a number.
+      expect(modal?.textContent).not.toMatch(/\d+ consumers?/);
     });
 
     it("Pro + usage>0: clicking Delete opens picker modal instead of deleting", () => {

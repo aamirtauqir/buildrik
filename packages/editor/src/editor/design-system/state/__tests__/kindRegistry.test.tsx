@@ -261,3 +261,72 @@ describe("the colour registry — delete, add, filter through the logged commit"
     expect(result.current.filterTokens("zzz-nothing")).toEqual([]);
   });
 });
+
+/* Review changes, per token (spec §4): every row has its own Revert. A row is
+   stale only when THAT token moved after the edit — a later edit to a
+   different token leaves it revertable. */
+describe("Review changes — one row per token, each with its own Revert", () => {
+  const light = (list: readonly DesignToken[], id: string) => resolveTokenLiteral(list, id, "light");
+  const tokensOf = (c: Fake) => c.getProjectSettings().designTokens as DesignToken[];
+
+  it("a later edit to another token leaves the earlier row revertable, and Revert restores only that token", () => {
+    const composer = fakeComposer();
+    const { result } = colorRegistry(composer);
+    const primary = light(DEFAULT_TOKENS, "color-primary");
+    act(() => {
+      result.current.updateToken("color-primary", "#C2410C");
+    });
+    act(() => {
+      result.current.updateToken("color-secondary", "#0E9F6E");
+    });
+    const rows = result.current.store.edits;
+    expect(rows.map((r) => r.tokenId)).toEqual(["color-secondary", "color-primary"]);
+    expect(rows.every((r) => !r.stale)).toBe(true);
+
+    const calls = composer.designSystem.setTokens.mock.calls.length;
+    let ok = false;
+    act(() => {
+      ok = result.current.store.revert(rows[1].key);
+    });
+    expect(ok).toBe(true);
+    // One write — one ⌘Z step.
+    expect(composer.designSystem.setTokens.mock.calls.length).toBe(calls + 1);
+    expect(light(tokensOf(composer), "color-primary")).toBe(primary);
+    expect(light(tokensOf(composer), "color-secondary")).toBe("#0E9F6E");
+    // The edit's own custom-* primitive goes with it; the other edit's stays.
+    expect(tokensOf(composer).some((t) => t.id === "custom-color-primary")).toBe(false);
+    expect(tokensOf(composer).some((t) => t.id === "custom-color-secondary")).toBe(true);
+    // The reverted row leaves the list; the other one stays live.
+    expect(result.current.store.edits.map((r) => r.tokenId)).toEqual(["color-secondary"]);
+    expect(result.current.store.edits[0].stale).toBe(false);
+  });
+
+  it("a row is stale once its own token changes again", () => {
+    const composer = fakeComposer();
+    const { result } = colorRegistry(composer);
+    act(() => {
+      result.current.updateToken("color-primary", "#C2410C");
+    });
+    act(() => {
+      result.current.updateToken("color-primary", "#111111");
+    });
+    const [newest, older] = result.current.store.edits;
+    expect(newest.stale).toBe(false);
+    expect(older.stale).toBe(true);
+    let ok = true;
+    act(() => {
+      ok = result.current.store.revert(older.key);
+    });
+    expect(ok).toBe(false);
+  });
+
+  it("⌘Z (a write outside the log) that moves the token makes its row stale", () => {
+    const composer = fakeComposer();
+    const { result } = colorRegistry(composer);
+    act(() => {
+      result.current.updateToken("color-primary", "#C2410C");
+    });
+    act(() => composer.replace(DEFAULT_TOKENS));
+    expect(result.current.store.edits[0].stale).toBe(true);
+  });
+});

@@ -141,8 +141,8 @@ export function buildColumns(
  */
 export const FLEX_ITEM_STYLES: Record<string, string> = {
   background: "#e0e0e0",
-  padding: "20px",
-  "border-radius": "8px",
+  padding: "var(--buildrick-design-space-5)",
+  "border-radius": "var(--buildrick-design-radius-md)",
 };
 
 /**
@@ -150,6 +150,6 @@ export const FLEX_ITEM_STYLES: Record<string, string> = {
  */
 export const GRID_ITEM_STYLES: Record<string, string> = {
   background: "#f0f0f0",
-  padding: "20px",
-  "border-radius": "8px",
+  padding: "var(--buildrick-design-space-5)",
+  "border-radius": "var(--buildrick-design-radius-md)",
 };

@@ -12,7 +12,7 @@ export const flexBlockConfig: BlockBuildConfig = {
   category: "Layout",
   elementType: "flex",
   content:
-    '<div style="display:flex;gap:16px;align-items:center"><div style="background:#e0e0e0;padding:20px;border-radius:8px">Flex Item 1</div><div style="background:#e0e0e0;padding:20px;border-radius:8px">Flex Item 2</div><div style="background:#e0e0e0;padding:20px;border-radius:8px">Flex Item 3</div></div>',
+    '<div style="display:flex;gap:var(--buildrick-design-space-4);align-items:center"><div style="background:#e0e0e0;padding:var(--buildrick-design-space-5);border-radius:var(--buildrick-design-radius-md)">Flex Item 1</div><div style="background:#e0e0e0;padding:var(--buildrick-design-space-5);border-radius:var(--buildrick-design-radius-md)">Flex Item 2</div><div style="background:#e0e0e0;padding:var(--buildrick-design-space-5);border-radius:var(--buildrick-design-radius-md)">Flex Item 3</div></div>',
   build: (composer, parentId, dropIndex) =>
     buildLayoutWithChildren(
       composer,
@@ -21,7 +21,7 @@ export const flexBlockConfig: BlockBuildConfig = {
       {
         styles: {
           display: "flex",
-          gap: "16px",
+          gap: "var(--buildrick-design-space-4)",
           "align-items": "center",
         },
       },

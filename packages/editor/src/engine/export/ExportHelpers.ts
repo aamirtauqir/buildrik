@@ -102,7 +102,10 @@ export function siteFontCSS(fonts: {
   const rules: string[] = [];
   const body: string[] = [];
   if (family(fonts.body)) body.push(`font-family:${family(fonts.body)},sans-serif`);
-  if (family(fonts.text)) body.push(`color:${family(fonts.text)}`);
+  /* Through the token, with the literal as its fallback: the token block's
+     dark rules redefine `--buildrick-design-color-text`, and a literal here
+     left body text in its light colour on a dark page. */
+  if (family(fonts.text)) body.push(`color:var(--buildrick-design-color-text,${family(fonts.text)})`);
   if (body.length) rules.push(`body{${body.join(";")}}`);
   if (family(fonts.heading))
     rules.push(`h1,h2,h3,h4,h5,h6{font-family:${family(fonts.heading)},sans-serif}`);

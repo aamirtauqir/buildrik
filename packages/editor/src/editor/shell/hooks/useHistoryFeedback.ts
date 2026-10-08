@@ -107,6 +107,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "reset spacing": "Reset spacing",
   "apply starter": "Applied a starter",
   "import tokens": "Imported tokens",
+  "connect to tokens": "Connected values to tokens",
   "edit preset": "Changed a style preset",
   "inline edit": "Edited text",
   "inline-edit": "Edited text",

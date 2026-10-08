@@ -64,13 +64,72 @@ Read-only notice copy (shipped, `shared/constants/brandReadOnly.ts`):
 
 ## Delivery checklist
 
-- [ ] BRP1-M1 … M4 (shipped surfaces) — highest priority, they are live with placeholder styling
-- [ ] BRP1-M5 … M7 (1b)
-- [ ] BRP1-M8 … M12 (1c)
-- [ ] Node ledger below filled in with node IDs
+- [x] BRP1-M1 … M4 (shipped surfaces) — highest priority, they are live with placeholder styling
+- [x] BRP1-M5 … M7 (1b)
+- [x] BRP1-M8 … M12 (1c)
+- [x] Node ledger below filled in with node IDs
 
 ## Node ledger
 
 | Board | State | Node |
 |---|---|---|
-| | | |
+| BRP1-M1 | Read-only notice · migration-failed | [8222:229015](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8222-229015) |
+| BRP1-M1 | Read-only notice · upgrade-paused | [8222:229636](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8222-229636) |
+| BRP1-M1 | Read-only notice · rolled-back | [8222:230245](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8222-230245) |
+| BRP1-M2 | Review changes · empty | [8222:230854](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8222-230854) |
+| BRP1-M2 | Review changes · list | [8222:231429](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8222-231429) |
+| BRP1-M2 | Review changes · stale | [8222:232022](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8222-232022) |
+| BRP1-M2 | Review changes · one-row-reverted | [8230:232344](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8230-232344) |
+| BRP1-M3 | Header without Save · idle | [8222:232627](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8222-232627) |
+| BRP1-M4 | Theme push results · skipped-and-recapture | [8222:233199](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8222-233199) |
+| BRP1-M5 | Token usage · counts | [8224:229485](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-229485) |
+| BRP1-M5 | Token usage · unknown | [8224:230173](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-230173) |
+| BRP1-M5 | Token usage · highlight | [8224:230857](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-230857) |
+| BRP1-M6 | Safe delete · replacement-required | [8224:231573](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-231573) |
+| BRP1-M6 | Safe delete · unused-confirm | [8224:232280](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-232280) |
+| BRP1-M6 | Safe delete · usage-unknown | [8224:232979](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-232979) |
+| BRP1-M6 | Safe delete · replaced | [8224:233678](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-233678) |
+| BRP1-M7 | Connect to tokens · suggestions | [8224:234362](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-234362) |
+| BRP1-M7 | Connect to tokens · choose-token | [8224:234982](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-234982) |
+| BRP1-M7 | Connect to tokens · preview | [8224:235608](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-235608) |
+| BRP1-M7 | Connect to tokens · applied | [8224:236236](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-236236) |
+| BRP1-M7 | Connect to tokens · nothing-to-connect | [8224:236852](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-236852) |
+| BRP1-M8 | Dark mode · off | [8224:238726](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-238726) |
+| BRP1-M8 | Dark mode · auto | [8224:239369](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-239369) |
+| BRP1-M8 | Dark mode · generated-aliases | [8224:240003](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-240003) |
+| BRP1-M8 | Dark mode · dark-preview | [8224:240644](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-240644) |
+| BRP1-M8 | Dark mode · preview-disabled | [8224:241285](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-241285) |
+| BRP1-M8 | Dark mode · auto-dark-preview | [8230:232622](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8230-232622) |
+| BRP1-M9 | Colour scale generator · pick-colour | [8224:241925](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-241925) |
+| BRP1-M9 | Colour scale generator · generated-scale | [8224:242543](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-242543) |
+| BRP1-M9 | Colour scale generator · preview | [8224:243206](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-243206) |
+| BRP1-M9 | Colour scale generator · confirmed | [8224:243869](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-243869) |
+| BRP1-M10 | Restore points · list | [8224:244521](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-244521) |
+| BRP1-M10 | Restore points · empty | [8224:245178](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-245178) |
+| BRP1-M10 | Restore points · restored | [8224:245787](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-245787) |
+| BRP1-M11 | Brand from logo or website · source | [8224:246458](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-246458) |
+| BRP1-M11 | Brand from logo or website · loading | [8224:247084](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-247084) |
+| BRP1-M11 | Brand from logo or website · preview | [8224:247700](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-247700) |
+| BRP1-M11 | Brand from logo or website · no-colours | [8224:248332](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-248332) |
+| BRP1-M11 | Brand from logo or website · timeout | [8224:248970](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-248970) |
+| BRP1-M11 | Brand from logo or website · address-refused | [8224:249604](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-249604) |
+| BRP1-M11 | Brand from logo or website · confirmed | [8224:250233](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8224-250233) |
+| BRP1-M12 | Theme-toggle block · add-panel-auto | [8228:232784](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8228-232784) |
+| BRP1-M12 | Theme-toggle block · canvas-light | [8228:233132](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8228-233132) |
+| BRP1-M12 | Theme-toggle block · canvas-dark | [8228:233404](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8228-233404) |
+| BRP1-M12 | Theme-toggle block · published-auto | [8228:233676](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8228-233676) |
+| BRP1-M12 | Theme-toggle block · off-hidden-on-publish | [8228:233827](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8228-233827) |
+| BRP1-M12 | Theme-toggle block · published-dark | [8230:232749](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8230-232749) |
+
+
+## Delivery — 2026-10-07
+
+47 state boards delivered in [Brand · Part 1](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8220-229015), next to the existing Brand section. [Open the clickable handoff index](https://www.figma.com/design/g4GzQFqzNYz5sosz1QtZXC?node-id=8230-233164).
+
+- All 12 families are covered, including 3 read-only reasons, review/revert/stale rows, token usage and safe-delete branches, Connect to tokens, Dark Auto generation and ordinary dark preview, 11-step scale, restore points, extraction errors and fallback, and actual Add/canvas/published theme-toggle views.
+- Reused existing Brand/editor shells, token-row layout, native button/input/select/navigation instances, live-preview card and the file’s dining-room photo. UI is editable text and layers; no flattened UI screenshots.
+- Verified 48 frames including the handoff index: 1440×900, Inter text, zero scoped auto-layout overflow. Inspected representative screenshots and rechecked visual corrections.
+- Prototype links cover representative navigation, preview/confirm/cancel, one-row revert, replacement/delete, restore and light/dark flows. File picking, typing, extraction, saving, undo and usage scanning remain engineering behavior; these boards do not implement runtime logic.
+- Native Figma comments were unavailable through the connector. Board annotations, this node ledger and boards.json provide the handoff.
+
+The colours and counts are illustrative. The generator must compute the picked colour’s step and preserve it exactly, as specified in the token-foundation design; these samples do not override that algorithm.

@@ -16,5 +16,5 @@ export const radioBlockConfig: RadioBlockConfig = {
   elementType: "radio",
   icon: "/src/assets/icons/blocks/input.svg",
   content:
-    '<label data-buildrick-type="radio" style="display:flex;align-items:center;gap:8px"><input type="radio" name="radio-group"/> Radio option</label>',
+    '<label data-buildrick-type="radio" style="display:flex;align-items:center;gap:var(--buildrick-design-space-2)"><input type="radio" name="radio-group"/> Radio option</label>',
 };

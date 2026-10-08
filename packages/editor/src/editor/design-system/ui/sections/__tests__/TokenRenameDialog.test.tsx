@@ -15,7 +15,7 @@ const token = v6Token({ id: "color-primary", name: "Primary", value: "#1A56DB", 
 const other: DesignToken = { ...token, id: "color-text", name: "Text" };
 const composer = {
   designSystem: {
-    tokenUsage: { getUsage: () => 3, getBreakdown: () => [{ elementId: "a", styleProp: "color" }, { elementId: "b", styleProp: "color" }, { elementId: "c", styleProp: "color" }], on: vi.fn(), off: vi.fn() },
+    tokenUsage: { getUsage: () => 3, getCount: () => 3, getBreakdown: () => [{ elementId: "a", styleProp: "color" }, { elementId: "b", styleProp: "color" }, { elementId: "c", styleProp: "color" }], on: vi.fn(), off: vi.fn() },
     lintState: { getVisibleIssues: () => [], on: vi.fn(), off: vi.fn() },
   },
 } as never;

@@ -76,10 +76,11 @@ describe("Text inside summary (board 17)", () => {
     node.setAttribute("data-buildrick-id", "grid-1");
     node.style.fontFamily = "Inter, sans-serif";
     node.style.fontSize = "16px";
-    node.style.color = "rgb(17, 24, 39)";
+    // A colour no seed token holds (#111827 became "Strong text" in Brand Part 1b).
+    node.style.color = "rgb(18, 52, 86)";
     document.body.appendChild(node);
     const summary = TEXT_SECTIONS["text-inside"].summary!({ selectedElement: { id: "grid-1", type: "grid" }, styles: {} } as never);
-    expect(summary).toBe("Inter · 16px · #111827");
+    expect(summary).toBe("Inter · 16px · #123456");
     node.remove();
   });
 

@@ -253,11 +253,11 @@ describe("BrandWorkspace › dark preview chrome (T10)", () => {
     expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("dark");
   });
 
-  it("Colour mode (7316:80949): the Light / Dark switch sits in the preview card, and flips it", () => {
+  it("the Light / Dark switch sits in the preview card on every page, and flips it", () => {
     const { composer } = makeModeComposer("light");
     const utils = renderWorkspace(composer);
-    // Only on Colour mode.
-    expect(utils.queryByTestId("brand-colour-mode-seg")).toBeNull();
+    // Not only on Colour mode (BRP1-M8): Colours carries it too.
+    expect(utils.getByTestId("brand-live-preview").contains(utils.getByTestId("brand-colour-mode-seg"))).toBe(true);
     openPage(utils, "colour-mode");
     const seg = utils.getByTestId("brand-colour-mode-seg");
     expect(utils.getByTestId("brand-live-preview").contains(seg)).toBe(true);

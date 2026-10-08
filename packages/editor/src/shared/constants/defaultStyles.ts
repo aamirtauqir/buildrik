@@ -10,8 +10,9 @@
 
 // Theme constants - use actual values (not CSS vars) so they display properly in Inspector
 export const THEME = {
-  // This is the colour every newly-created button, link, blockquote rule and
-  // form accent gets, and the Inspector's fallback swatch. It must track the
+  // The Inspector's fallback swatch and the gradient default. Newly-created
+  // buttons, links, blockquote rules and form accents bind to the site's
+  // Primary token instead (Brand Part 1b) — this literal must still track the
   // single product accent (DESIGN.md) — it lagged behind BOTH accent
   // migrations (cobalt→#406ED6 2026-07-21, #406ED6→#1A56DB 2026-07-30), each
   // time handing a retired brand blue to user sites.
@@ -43,16 +44,16 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     "font-weight": "700",
     "line-height": "1.1",
     color: THEME.textPrimary,
-    "margin-bottom": "24px",
+    "margin-bottom": "var(--buildrick-design-space-6)",
   },
 
   h2: {
     "font-family": THEME.fontFamily,
-    "font-size": "36px",
+    "font-size": "var(--buildrick-design-font-size-4xl)",
     "font-weight": "700",
     "line-height": "1.2",
     color: THEME.textPrimary,
-    "margin-bottom": "20px",
+    "margin-bottom": "var(--buildrick-design-space-5)",
   },
 
   h3: {
@@ -61,12 +62,12 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     "font-weight": "600",
     "line-height": "1.25",
     color: THEME.textPrimary,
-    "margin-bottom": "16px",
+    "margin-bottom": "var(--buildrick-design-space-4)",
   },
 
   h4: {
     "font-family": THEME.fontFamily,
-    "font-size": "24px",
+    "font-size": "var(--buildrick-design-font-size-2xl)",
     "font-weight": "600",
     "line-height": "1.3",
     color: THEME.textPrimary,
@@ -75,16 +76,16 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   h5: {
     "font-family": THEME.fontFamily,
-    "font-size": "20px",
+    "font-size": "var(--buildrick-design-font-size-xl)",
     "font-weight": "500",
     "line-height": "1.4",
     color: THEME.textPrimary,
-    "margin-bottom": "12px",
+    "margin-bottom": "var(--buildrick-design-space-3)",
   },
 
   h6: {
     "font-family": THEME.fontFamily,
-    "font-size": "18px",
+    "font-size": "var(--buildrick-design-font-size-lg)",
     "font-weight": "500",
     "line-height": "1.4",
     color: THEME.textPrimary,
@@ -98,7 +99,7 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     "font-weight": "700",
     "line-height": "1.2",
     color: THEME.textPrimary,
-    "margin-bottom": "16px",
+    "margin-bottom": "var(--buildrick-design-space-4)",
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -107,16 +108,16 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   paragraph: {
     "font-family": THEME.fontFamily,
-    "font-size": "16px",
+    "font-size": "var(--buildrick-design-font-size-base)",
     "font-weight": "400",
     "line-height": "1.6",
     color: THEME.textSecondary,
-    "margin-bottom": "12px",
+    "margin-bottom": "var(--buildrick-design-space-3)",
   },
 
   text: {
     "font-family": THEME.fontFamily,
-    "font-size": "16px",
+    "font-size": "var(--buildrick-design-font-size-base)",
     "font-weight": "400",
     "line-height": "1.5",
     color: THEME.textSecondary,
@@ -131,29 +132,29 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   label: {
     "font-family": THEME.fontFamily,
-    "font-size": "14px",
+    "font-size": "var(--buildrick-design-font-size-sm)",
     "font-weight": "500",
     color: THEME.textSecondary,
-    "margin-bottom": "4px",
+    "margin-bottom": "var(--buildrick-design-space-1)",
   },
 
   blockquote: {
     "font-family": THEME.fontFamily,
-    "font-size": "18px",
+    "font-size": "var(--buildrick-design-font-size-lg)",
     "font-style": "italic",
     "line-height": "1.6",
     color: THEME.textSecondary,
-    "padding-left": "20px",
-    "border-left": `4px solid ${THEME.primary}`,
-    margin: "16px 0",
+    "padding-left": "var(--buildrick-design-space-5)",
+    "border-left": "4px solid var(--buildrick-design-color-primary)",
+    margin: "var(--buildrick-design-space-4) 0",
   },
 
   code: {
     "font-family": "monospace",
-    "font-size": "14px",
-    "background-color": "#f3f4f6",
+    "font-size": "var(--buildrick-design-font-size-sm)",
+    "background-color": "var(--buildrick-design-color-surface-muted)",
     padding: "2px 6px",
-    "border-radius": "4px",
+    "border-radius": "var(--buildrick-design-radius-sm)",
     color: THEME.textPrimary,
   },
 
@@ -163,7 +164,7 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   container: {
     display: "block",
-    padding: "20px",
+    padding: "var(--buildrick-design-space-5)",
     "background-color": "transparent",
   },
 
@@ -173,39 +174,39 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   section: {
     display: "block",
-    padding: "60px 20px",
+    padding: "60px var(--buildrick-design-space-5)",
     "background-color": "transparent",
   },
 
   flex: {
     display: "flex",
-    gap: "16px",
+    gap: "var(--buildrick-design-space-4)",
     "align-items": "stretch",
   },
 
   grid: {
     display: "grid",
-    gap: "16px",
+    gap: "var(--buildrick-design-space-4)",
     "grid-template-columns": "repeat(3, 1fr)",
   },
 
   /* G3-079 — the board draws the list as a 3-up row of record cards. */
   "collection-list": {
     display: "grid",
-    gap: "16px",
+    gap: "var(--buildrick-design-space-4)",
     "grid-template-columns": "repeat(3, 1fr)",
   },
 
   row: {
     display: "flex",
     "flex-direction": "row",
-    gap: "16px",
+    gap: "var(--buildrick-design-space-4)",
   },
 
   column: {
     display: "flex",
     "flex-direction": "column",
-    gap: "12px",
+    gap: "var(--buildrick-design-space-3)",
   },
 
   spacer: {
@@ -224,8 +225,8 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     height: "var(--buildrick-design-btn-height-md)",
     "padding-left": "var(--buildrick-design-btn-padding-x)",
     "padding-right": "var(--buildrick-design-btn-padding-x)",
-    "background-color": THEME.primary,
-    color: "#ffffff",
+    "background-color": "var(--buildrick-design-color-primary)",
+    color: "var(--buildrick-design-color-on-primary)",
     "border-radius": "var(--buildrick-design-btn-radius)",
     border: "none",
     cursor: "pointer",
@@ -235,21 +236,21 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
   link: {
     "font-family": "inherit",
     "font-size": "inherit",
-    color: THEME.primary,
+    color: "var(--buildrick-design-color-primary)",
     "text-decoration": "underline",
     cursor: "pointer",
   },
 
   nav: {
     display: "flex",
-    gap: "24px",
+    gap: "var(--buildrick-design-space-6)",
     "align-items": "center",
   },
 
   accordion: {
     display: "block",
-    "border-radius": "8px",
-    border: "1px solid #e5e7eb",
+    "border-radius": "var(--buildrick-design-radius-md)",
+    border: "1px solid var(--buildrick-design-color-border-subtle)",
     overflow: "hidden",
   },
 
@@ -314,7 +315,7 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
   form: {
     display: "flex",
     "flex-direction": "column",
-    gap: "16px",
+    gap: "var(--buildrick-design-space-4)",
   },
 
   input: {
@@ -325,7 +326,7 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     "padding-right": "var(--buildrick-design-input-padding-x)",
     border: "1px solid var(--buildrick-design-input-border)",
     "border-radius": "var(--buildrick-design-input-radius)",
-    "background-color": "#ffffff",
+    "background-color": "var(--buildrick-design-color-surface-raised)",
     color: THEME.textPrimary,
   },
 
@@ -338,7 +339,7 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     "padding-bottom": "10px",
     border: "1px solid var(--buildrick-design-input-border)",
     "border-radius": "var(--buildrick-design-input-radius)",
-    "background-color": "#ffffff",
+    "background-color": "var(--buildrick-design-color-surface-raised)",
     color: THEME.textPrimary,
     "min-height": "100px",
     resize: "vertical",
@@ -352,26 +353,26 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     "padding-right": "var(--buildrick-design-input-padding-x)",
     border: "1px solid var(--buildrick-design-input-border)",
     "border-radius": "var(--buildrick-design-input-radius)",
-    "background-color": "#ffffff",
+    "background-color": "var(--buildrick-design-color-surface-raised)",
     color: THEME.textPrimary,
   },
 
   checkbox: {
     width: "18px",
     height: "18px",
-    "accent-color": THEME.primary,
+    "accent-color": "var(--buildrick-design-color-primary)",
   },
 
   radio: {
     width: "18px",
     height: "18px",
-    "accent-color": THEME.primary,
+    "accent-color": "var(--buildrick-design-color-primary)",
   },
 
   "file-upload": {
-    padding: "20px",
+    padding: "var(--buildrick-design-space-5)",
     border: "2px dashed #d1d5db",
-    "border-radius": "8px",
+    "border-radius": "var(--buildrick-design-radius-md)",
     "text-align": "center",
     cursor: "pointer",
   },
@@ -382,15 +383,15 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   list: {
     "font-family": THEME.fontFamily,
-    "font-size": "16px",
+    "font-size": "var(--buildrick-design-font-size-base)",
     "line-height": "1.6",
     color: THEME.textSecondary,
-    "padding-left": "24px",
-    "margin-bottom": "12px",
+    "padding-left": "var(--buildrick-design-space-6)",
+    "margin-bottom": "var(--buildrick-design-space-3)",
   },
 
   "list-item": {
-    "margin-bottom": "8px",
+    "margin-bottom": "var(--buildrick-design-space-2)",
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -399,20 +400,20 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   card: {
     display: "block",
-    padding: "24px",
-    "background-color": "#ffffff",
-    "border-radius": "12px",
+    padding: "var(--buildrick-design-space-6)",
+    "background-color": "var(--buildrick-design-color-surface-raised)",
+    "border-radius": "var(--buildrick-design-radius-lg)",
     "box-shadow": "0 1px 3px rgba(0,0,0,0.1)",
   },
 
   badge: {
     display: "inline-block",
-    padding: "4px 8px",
-    "font-size": "12px",
+    padding: "var(--buildrick-design-space-1) var(--buildrick-design-space-2)",
+    "font-size": "var(--buildrick-design-font-size-xs)",
     "font-weight": "500",
-    "border-radius": "9999px",
-    "background-color": THEME.primary,
-    color: "#ffffff",
+    "border-radius": "var(--buildrick-design-radius-full)",
+    "background-color": "var(--buildrick-design-color-primary)",
+    color: "var(--buildrick-design-color-on-primary)",
   },
 
   avatar: {
@@ -430,15 +431,15 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
   divider: {
     display: "block",
     height: "1px",
-    "background-color": "#e5e7eb",
-    margin: "24px 0",
+    "background-color": "var(--buildrick-design-color-border-subtle)",
+    margin: "var(--buildrick-design-space-6) 0",
   },
 
   hr: {
     display: "block",
     height: "1px",
-    "background-color": "#e5e7eb",
-    margin: "24px 0",
+    "background-color": "var(--buildrick-design-color-border-subtle)",
+    margin: "var(--buildrick-design-space-6) 0",
     border: "none",
   },
 
@@ -448,7 +449,7 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   social: {
     display: "flex",
-    gap: "12px",
+    gap: "var(--buildrick-design-space-3)",
     "align-items": "center",
   },
 
@@ -456,14 +457,14 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     display: "block",
     width: "100%",
     height: "300px",
-    "border-radius": "8px",
+    "border-radius": "var(--buildrick-design-radius-md)",
   },
 
   countdown: {
     display: "flex",
-    gap: "16px",
+    gap: "var(--buildrick-design-space-4)",
     "font-family": THEME.fontFamily,
-    "font-size": "24px",
+    "font-size": "var(--buildrick-design-font-size-2xl)",
     "font-weight": "700",
   },
 
@@ -471,8 +472,8 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     display: "block",
     width: "100%",
     height: "8px",
-    "border-radius": "4px",
-    "background-color": "#e5e7eb",
+    "border-radius": "var(--buildrick-design-radius-sm)",
+    "background-color": "var(--buildrick-design-color-border-subtle)",
   },
 
   slider: {
@@ -482,23 +483,23 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
 
   rating: {
     display: "flex",
-    gap: "4px",
+    gap: "var(--buildrick-design-space-1)",
   },
 
   testimonial: {
     display: "block",
-    padding: "24px",
+    padding: "var(--buildrick-design-space-6)",
     "background-color": "#f9fafb",
-    "border-radius": "12px",
+    "border-radius": "var(--buildrick-design-radius-lg)",
   },
 
   pricing: {
     display: "block",
-    padding: "32px",
-    "background-color": "#ffffff",
-    "border-radius": "16px",
+    padding: "var(--buildrick-design-space-8)",
+    "background-color": "var(--buildrick-design-color-surface-raised)",
+    "border-radius": "var(--buildrick-design-radius-xl)",
     "text-align": "center",
-    border: "1px solid #e5e7eb",
+    border: "1px solid var(--buildrick-design-color-border-subtle)",
   },
 };
 

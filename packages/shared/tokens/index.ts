@@ -3,4 +3,5 @@ export { migrateTokensToV6, TokenMigrationError, LEGACY_PRIMITIVE_IDS } from "./
 export { resolveTokenLiteral, setTokenLiteral, lightAliasOf } from "./resolve";
 export { emitTokenCss, isSafeCssVarName } from "./emit";
 export { LEGACY_SEED } from "./legacySeed";
-export { buildTokenUsageIndex } from "./usage";
+export { buildTokenUsageIndex, scanTokenRefs, tokenIdsByVarName, type TokenUsageCount, type TokenUsageIndex } from "./usage";
+export { keepInUseSiteTokens } from "./keepInUse";

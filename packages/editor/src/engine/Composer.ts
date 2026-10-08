@@ -62,6 +62,7 @@ import { AliasResolver } from "./aliasResolver";
 import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
 import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
+import { findConnectSuggestions, type ConnectRef, type ConnectSuggestion } from "./designSystem/connectTokens";
 import { LintState } from "./designSystem/LintState";
 import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import { applyContrastFix } from "./designSystem/contrastFix";
@@ -253,8 +254,18 @@ export class Composer extends EventEmitter {
      * and the AI write all land here. Returns false and writes nothing when
      * the tokens are read-only or the set does not validate. A successful
      * write announces `EVENTS.BRAND_APPLIED` (onboarding's "Set your brand").
+     * Also refuses a write that would remove a token the site still uses, or
+     * whose usage cannot be counted yet (spec §6) — soft delete via
+     * `replacedBy` keeps the token and is never refused for that.
      */
     readonly setTokens: (next: DesignToken[], label: string) => boolean;
+    /** Connect to tokens (spec §3): exact-match suggestions over every page,
+     *  or one. Skips component instances and masters (owner, OQ-5). */
+    readonly connectSuggestions: (pageId?: string) => ConnectSuggestion[];
+    /** Binds the picked suggestions (base styles and breakpoint overrides) in
+     *  ONE transaction; returns the style writes made — 0 when read-only or
+     *  nothing applies. No restore point (owner, OQ-4): ⌘Z covers it. */
+    readonly applyConnect: (picks: ReadonlyArray<{ key: string; tokenId: string }>) => number;
   };
 
   constructor(config: ComposerConfig) {
@@ -312,7 +323,22 @@ export class Composer extends EventEmitter {
       interactions: new InteractionManager(this),
     };
 
-    const tokenUsage = new TokenUsageTracker();
+    const tokenUsage = new TokenUsageTracker(
+      () => this.mergedDesignTokens(),
+      () => {
+        const components = this.components.isLoaded() ? this.components.getAllComponents() : null;
+        return {
+          sources: [
+            this.elements.exportPages(),
+            this.styles.exportStyles(),
+            this.globalStyles.getAll(),
+            components ?? [],
+            this.getProjectSettings().designPresets ?? [],
+          ],
+          unavailable: components === null ? ["components"] : [],
+        };
+      },
+    );
     const lintState = new LintState();
     const tokenBindingResolver = new TokenBindingResolver();
     this.designSystem = {
@@ -354,6 +380,11 @@ export class Composer extends EventEmitter {
           console.warn(`[tokens] refused "${label}": ${checked.reason}`);
           return false;
         }
+        const blocked = this.tokensRemovedInUse(checked.tokens);
+        if (blocked.length > 0) {
+          console.warn(`[tokens] refused "${label}": still in use or uncounted: ${blocked.join(", ")}`);
+          return false;
+        }
         this.beginTransaction(label);
         try {
           this.setProjectSettings({
@@ -366,6 +397,38 @@ export class Composer extends EventEmitter {
         }
         this.emit(EVENTS.BRAND_APPLIED, undefined);
         return true;
+      },
+      connectSuggestions: (pageId) => {
+        const pages = this.elements.exportPages().filter((p) => pageId === undefined || p.id === pageId);
+        return findConnectSuggestions(
+          pages.map((p) => p.root),
+          this.mergedDesignTokens(),
+          // Never write inside a component instance (it would create overrides).
+          { skip: (id) => this.components.findInstanceContainingElement(id) !== null },
+        );
+      },
+      applyConnect: (picks) => {
+        if (this.designSystem.readOnly) return 0;
+        const tokens = this.mergedDesignTokens();
+        const byKey = new Map(this.designSystem.connectSuggestions().map((s) => [s.key, s]));
+        const writes: Array<ConnectRef & { value: string }> = [];
+        for (const pick of picks) {
+          const s = byKey.get(pick.key);
+          const token = tokens.find((t) => t.id === pick.tokenId);
+          if (!s || !token || !s.candidates.includes(token.id)) continue;
+          for (const r of s.refs) writes.push({ ...r, value: `var(${token.cssVar})` });
+        }
+        if (writes.length === 0) return 0;
+        this.beginTransaction("Connect to tokens");
+        try {
+          for (const w of writes) {
+            if (w.breakpoint) this.styles.setBreakpointStyle(w.elementId, w.breakpoint, { [w.prop]: w.value });
+            else this.elements.getElement(w.elementId)?.setStyle(w.prop, w.value);
+          }
+        } finally {
+          this.endTransaction();
+        }
+        return writes.length;
       },
     };
     // Recompute token usage whenever element trees or styles change. These
@@ -383,13 +446,24 @@ export class Composer extends EventEmitter {
       recomputeScheduled = true;
       queueMicrotask(() => {
         recomputeScheduled = false;
-        tokenUsage.recompute(this.elements.getAllElements());
+        this.recomputeTokenUsage();
       });
     };
     this.on(EVENTS.ELEMENT_CREATED, scheduleRecomputeTokenUsage);
     this.on(EVENTS.ELEMENT_DELETED, scheduleRecomputeTokenUsage);
     this.on(EVENTS.ELEMENT_UPDATED, scheduleRecomputeTokenUsage);
     this.on(EVENTS.ELEMENT_STYLE_UPDATED, scheduleRecomputeTokenUsage);
+    // The site-wide count also reads tokens, project styles, saved components
+    // and presets: those changes only mark it stale (it rebuilds on next read).
+    const invalidateTokenUsage = () => tokenUsage.invalidate();
+    this.on(EVENTS.PROJECT_CHANGED, invalidateTokenUsage);
+    this.on(EVENTS.PROJECT_LOADED, invalidateTokenUsage);
+    this.on(EVENTS.COMPONENT_LIST_UPDATED, invalidateTokenUsage);
+    // A template that lands raw values a token already holds: offer Connect.
+    this.on(EVENTS.TEMPLATE_APPLIED, ({ pageId }) => {
+      const suggestions = this.designSystem.connectSuggestions(pageId);
+      if (suggestions.length > 0) this.emit(EVENTS.BRAND_CONNECT_SUGGESTED, { pageId, suggestions });
+    });
 
     const operationApplyHandler = (patch: Patch) => {
       this.history.applyRemoteOperation(patch);
@@ -909,6 +983,22 @@ ${html}${interactionScript}
     if (options?.emitProjectChanged !== false) {
       this.emit(EVENTS.PROJECT_CHANGED);
     }
+  }
+
+  /** Ids the write would remove (after the seed merges back) whose site-wide
+   *  usage is not a known 0. Builds usage synchronously: the microtask-coalesced
+   *  recompute may not have run since the last element edit. */
+  private tokensRemovedInUse(next: DesignToken[]): string[] {
+    const after = new Set(mergeProjectTokens(next, TOKENS_SCHEMA_VERSION).map((t) => t.id));
+    const removed = this.mergedDesignTokens().filter((t) => !after.has(t.id));
+    if (removed.length === 0) return [];
+    this.recomputeTokenUsage();
+    return removed.filter((t) => this.designSystem.tokenUsage.getCount(t.id) !== 0).map((t) => t.id);
+  }
+
+  /** Rebuilds the element breakdown now (the event path coalesces it into a microtask). */
+  private recomputeTokenUsage(): void {
+    this.designSystem.tokenUsage.recompute(this.elements.getAllElements());
   }
 
   /** The site's tokens as every write starts from them: the saved set merged

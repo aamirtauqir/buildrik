@@ -15,5 +15,5 @@ export const timeInputBlockConfig: TimeInputBlockConfig = {
   category: "Forms",
   elementType: "input",
   icon: "/src/assets/icons/blocks/input.svg",
-  content: '<input type="time" name="time" style="padding:8px;border:1px solid #ccc;border-radius:4px"/>',
+  content: '<input type="time" name="time" style="padding:var(--buildrick-design-space-2);border:1px solid #ccc;border-radius:var(--buildrick-design-radius-sm)"/>',
 };

@@ -10,6 +10,7 @@ import { Composer } from "../Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { setTokenLiteral, resolveTokenLiteral } from "@buildrik/shared/tokens";
+import type { DesignToken } from "@/engine/designSystem/types";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({
@@ -114,5 +115,68 @@ describe("token write paths route through setTokens (read-only refuses them all)
     c.designSystem.readOnly = true;
     expect(c.designSystem.applyAutoFix("color-primary", "darken-22")).toBeNull();
     expect(c.getProjectSettings().designTokens).toBe(before);
+  });
+});
+
+const custom = (id: string, kind: DesignToken["kind"], value: string): DesignToken => ({
+  id, name: id, kind, layer: "semantic", modes: { light: { value } },
+  category: kind === "spacing" ? "spacing" : "colors", cssVar: `--buildrick-design-${id}`, type: kind === "spacing" ? "length" : "color",
+});
+
+function bindRoot(c: Composer, prop: string, value: string) {
+  c.elements.getElement("root")!.setStyle(prop, value);
+  c.history.flushPending();
+}
+
+/* This file's indexedDB stub never opens, so saved components never finish
+   loading and usage would read "unknown" for every token. The guard cases
+   that need a known count say components have loaded. */
+function withLoadedTokens(): Composer {
+  const c = withTokens();
+  vi.spyOn(c.components, "isLoaded").mockReturnValue(true);
+  return c;
+}
+
+describe("setTokens · removal guard (spec §6, test 11)", () => {
+  it("refuses removing a token an element uses, keeps it, and allows it once unused", () => {
+    const c = withLoadedTokens();
+    const brand = custom("color-brand-x", "color", "#0E7490");
+    expect(c.designSystem.setTokens([...DEFAULT_TOKENS, brand], "Add")).toBe(true);
+    bindRoot(c, "color", "var(--buildrick-design-color-brand-x)");
+    expect(c.designSystem.setTokens(DEFAULT_TOKENS, "Delete token")).toBe(false);
+    expect(c.getProjectSettings().designTokens?.some((t) => t.id === "color-brand-x")).toBe(true);
+    bindRoot(c, "color", "#000000");
+    expect(c.designSystem.setTokens(DEFAULT_TOKENS, "Delete token")).toBe(true);
+  });
+
+  it("refuses a spacing reset that drops a bound custom spacing token", () => {
+    const c = withLoadedTokens();
+    expect(c.designSystem.setTokens([...DEFAULT_TOKENS, custom("space-7", "spacing", "28px")], "Add")).toBe(true);
+    bindRoot(c, "padding", "var(--buildrick-design-space-7)");
+    expect(c.designSystem.setTokens(DEFAULT_TOKENS, "Reset spacing")).toBe(false);
+  });
+
+  it("refuses removal while usage is unknown", () => {
+    const c = withLoadedTokens();
+    expect(c.designSystem.setTokens([...DEFAULT_TOKENS, custom("color-brand-y", "color", "#123456")], "Add")).toBe(true);
+    vi.spyOn(c.components, "isLoaded").mockReturnValue(false);
+    expect(c.designSystem.setTokens(DEFAULT_TOKENS, "Delete token")).toBe(false);
+  });
+
+  it("allows a soft delete of an in-use token, and the element resolves to the replacement", () => {
+    const c = withLoadedTokens();
+    expect(c.designSystem.setTokens([...DEFAULT_TOKENS, custom("color-brand-x", "color", "#0E7490")], "Add")).toBe(true);
+    bindRoot(c, "color", "var(--buildrick-design-color-brand-x)");
+    const all = c.getProjectSettings().designTokens ?? [];
+    const soft = all.map((t) => (t.id === "color-brand-x" ? { ...t, replacedBy: "color-primary" } : t));
+    expect(c.designSystem.setTokens(soft, "Delete token")).toBe(true);
+    expect(resolveTokenLiteral(c.getProjectSettings().designTokens ?? [], "color-brand-x", "light")).toBe(
+      resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"),
+    );
+  });
+
+  it("deleting a seed token is not a removal (the seed merges it back)", () => {
+    const c = withLoadedTokens();
+    expect(c.designSystem.setTokens(DEFAULT_TOKENS.filter((t) => t.id !== "space-12"), "Delete token")).toBe(true);
   });
 });

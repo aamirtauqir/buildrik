@@ -9,14 +9,20 @@
  */
 import { describe, it, expect } from "vitest";
 import { DEFAULT_ELEMENT_STYLES, getDefaultStyles } from "../defaultStyles";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 
 const RETIRED_ACCENTS = /#2d6dff|#406ed6/i;
 const ACCENT = "#1A56DB";
+/* Since Brand Part 1b a new button and link bind to the site's Primary token,
+   whose seed value is the accent — so a brand change repaints them. */
+const PRIMARY = "var(--buildrick-design-color-primary)";
 
 describe("default element styles carry the current accent", () => {
   it("paints a new button and link with the accent, not a retired blue", () => {
-    expect(DEFAULT_ELEMENT_STYLES.button?.["background-color"]).toBe(ACCENT);
-    expect(DEFAULT_ELEMENT_STYLES.link?.color).toBe(ACCENT);
+    expect(DEFAULT_ELEMENT_STYLES.button?.["background-color"]).toBe(PRIMARY);
+    expect(DEFAULT_ELEMENT_STYLES.link?.color).toBe(PRIMARY);
+    expect(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light")).toBe(ACCENT);
   });
 
   it("has no retired accent anywhere in the default palette", () => {
@@ -30,6 +36,6 @@ describe("default element styles carry the current accent", () => {
   });
 
   it("serves the same accent through the public getter", () => {
-    expect(getDefaultStyles("button")["background-color"]).toBe(ACCENT);
+    expect(getDefaultStyles("button")["background-color"]).toBe(PRIMARY);
   });
 });
