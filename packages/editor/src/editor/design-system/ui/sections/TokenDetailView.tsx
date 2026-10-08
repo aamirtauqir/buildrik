@@ -73,6 +73,9 @@ export interface TokenDetailViewProps {
   onReset?: (id: string) => void;
   /** After a delete — the caller drops its selection. */
   onDeleted?: () => void;
+  /** BRP1-M9: open the colour scale generator for this token. Given only for
+   *  semantic colours (OQ-3: every one of them). */
+  onGenerateScale?: (id: string) => void;
 }
 
 const MONO = "tw:[font-family:var(--bk-font-mono)]";
@@ -131,6 +134,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   onRename,
   onReset,
   onDeleted,
+  onGenerateScale,
 }) => {
   const dsMode = useDSModeOptional();
   const isPro = dsMode?.mode === "pro";
@@ -362,6 +366,17 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             }
           >
             <Menu>
+              {onGenerateScale && (
+                <MenuItem
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onGenerateScale(token.id);
+                  }}
+                  data-testid="brand-token-action-scale"
+                >
+                  Generate colour scale…
+                </MenuItem>
+              )}
               <MenuItem
                 onClick={handleRenameId}
                 disabled={!onRename}

@@ -100,6 +100,7 @@ import { ConnectTokensCheck } from "./sections/ConnectTokensCheck";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { DarkModeCard } from "./sections/DarkModeCard";
+import { ScaleGenerator } from "./sections/ScaleGenerator";
 import { useSiteDarkMode } from "../state/useColorMode";
 import type { BrandPreview as CanvasPreview } from "@/engine/designSystem/types";
 import { ColorModeToggle } from "./ColorModeToggle";
@@ -153,17 +154,19 @@ const MORE_KINDS = [
 
 type MoreKind = (typeof MORE_KINDS)[number]["kind"];
 /* "connect" — Connect to tokens (BRP1-M7), a page under Brand checks: no nav
-   row of its own, Brand checks stays current on it. */
-export type BrandPageId = NavId | `kind-${MoreKind}` | "connect";
+   row of its own, Brand checks stays current on it. "scale" — the colour
+   scale generator (BRP1-M9), a page under Colours the same way. */
+export type BrandPageId = NavId | `kind-${MoreKind}` | "connect" | "scale";
 
 const LANDING: BrandPageId = "colours";
 
 function isPageId(value: string): value is BrandPageId {
-  return value === "connect" || NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value);
+  return value === "connect" || value === "scale" || NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value);
 }
 
 function pageLabel(id: BrandPageId): string {
   if (id === "connect") return "Connect to tokens";
+  if (id === "scale") return "Colour scale generator";
   /* BRP1-M8 titles the Colour mode page by its card: "Dark mode". */
   if (id === "colour-mode") return "Dark mode";
   return NAV.find((n) => n.id === id)?.label
@@ -423,6 +426,15 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   };
   const allTokens = store.all;
   const selectedToken = selectedTokenId ? allTokens.find((t) => t.id === selectedTokenId) : undefined;
+  /* BRP1-M9: the semantic colour the generator writes a scale for (OQ-3:
+     any of them). The Colours page action takes the selected token when it is
+     one, else Primary; a token card's menu takes its own. */
+  const isSemanticColour = (t: DesignToken | undefined) => Boolean(t && t.kind === "color" && t.layer === "semantic" && !t.replacedBy);
+  const [scaleRole, setScaleRole] = React.useState("color-primary");
+  const openScale = (roleId: string) => {
+    setScaleRole(roleId);
+    openPage("scale");
+  };
 
 
   const moreKindRegistry: Record<MoreKind, TokensForKindRegistry> = {
@@ -535,6 +547,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
       case "export":           return "Move the brand in and out";
       case "connect":          return "";
+      case "scale":            return "";
       default: {
         const n = moreKindRegistry[page.slice("kind-".length) as MoreKind]?.tokens.length ?? 0;
         return `${n} token${n === 1 ? "" : "s"}`;
@@ -700,7 +713,37 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const renderPage = (): React.ReactNode => {
     switch (page) {
       case "colours":
-        return <TokensSection {...tokenPageProps} openKind="color" />;
+        return (
+          <>
+            <TokensSection {...tokenPageProps} openKind="color" />
+            {/* 8222:232627's actions row under the colour tables. */}
+            <div className="tw:mt-4 tw:flex tw:items-center tw:gap-2" data-testid="brand-colours-actions">
+              <Button
+                type="button"
+                variant="secondary"
+                size="xs"
+                className={PAGE_ACTION}
+                onClick={() => openScale(isSemanticColour(selectedToken) && selectedToken ? selectedToken.id : "color-primary")}
+                data-testid="brand-generate-scale"
+              >
+                Generate colour scale
+              </Button>
+              <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => openPage("connect")} data-testid="brand-colours-connect">
+                Connect to tokens
+              </Button>
+            </div>
+          </>
+        );
+      case "scale":
+        return (
+          <ScaleGenerator
+            key={scaleRole}
+            composer={composer}
+            roleId={scaleRole}
+            /* 8224:243869's toast. */
+            onApplied={() => addToast({ description: "Colour scale applied · Undo ⌘Z", tone: "info" })}
+          />
+        );
       case "colour-mode":
         /* BRP1-M8's Dark mode card over the per-token dark values (7316:80949). */
         return (
@@ -791,7 +834,11 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const navRow = (id: BrandPageId, label: string, count?: number, slot: string = id) => {
     /* The eleven other kinds are reached from Spacing's kind switch, so the
        Spacing row stays current on their pages. */
-    const active = page === id || (id === "spacing" && page.startsWith("kind-")) || (id === "brand-checks" && page === "connect");
+    const active =
+      page === id ||
+      (id === "spacing" && page.startsWith("kind-")) ||
+      (id === "brand-checks" && page === "connect") ||
+      (id === "colours" && page === "scale");
     return (
       <Button
         key={slot}
@@ -996,7 +1043,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               <BrandPreview colors={visibleColors} tokens={color.tokens} />
             </section>
           )}
-          {(page === "connect" || page === "colour-mode") && (
+          {(page === "connect" || page === "colour-mode" || page === "scale") && (
             /* 8224:234362's (and BRP1-M8's) guidance card under the preview. */
             <section aria-label="About Connect to tokens" className={SIDE_CARD} data-testid="brand-connect-guide">
               <p className={SIDE_CARD_TITLE}>Preview before applying</p>
@@ -1045,6 +1092,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 return k === "color" || isMoreKind(k) ? renameToken : undefined;
               })()}
               onDeleted={() => setSelectedTokenId(null)}
+              onGenerateScale={isSemanticColour(selectedToken) ? openScale : undefined}
             />
             </EditLock>
           )}
