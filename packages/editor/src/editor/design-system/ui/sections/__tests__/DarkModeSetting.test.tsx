@@ -193,3 +193,19 @@ describe("ColorModeToggle knows the site's Dark mode (BRP1-M8 preview-disabled)"
     expect(a.getByTestId("brand-colour-mode-seg-light").getAttribute("aria-selected")).toBe("true");
   });
 });
+
+describe("DarkModeCard — Off mid-flow", () => {
+  it("is Cancel while the generated values are shown", () => {
+    const c = fake([...proposeMissingDarks(DEFAULT_TOKENS).tokens, {
+      id: "color-brand-y", name: "Brand Y", kind: "color", layer: "semantic", modes: { light: { value: "#0E7490" } },
+      category: "colors", cssVar: "--buildrick-design-color-brand-y", type: "color",
+    }]);
+    const u = mount(c);
+    fireEvent.click(u.getByTestId("brand-dark-mode-auto"));
+    fireEvent.click(u.getByTestId("brand-dark-mode-preview"));
+    fireEvent.click(u.getByTestId("brand-dark-mode-off"));
+    expect(c.designSystem.preview).toBeNull();
+    expect(c.designSystem.setDarkMode).not.toHaveBeenCalled();
+    expect(u.getByTestId("brand-dark-mode-off").getAttribute("aria-pressed")).toBe("true");
+  });
+});

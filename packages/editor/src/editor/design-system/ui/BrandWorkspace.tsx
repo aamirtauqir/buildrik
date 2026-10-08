@@ -431,8 +431,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const allTokens = store.all;
   const selectedToken = selectedTokenId ? allTokens.find((t) => t.id === selectedTokenId) : undefined;
   /* BRP1-M9: the semantic colour the generator writes a scale for (OQ-3:
-     any of them). The Colours page action takes the selected token when it is
-     one, else Primary; a token card's menu takes its own. */
+     any of them). The Colours page action is Primary's (the board's lines
+     name Primary; the landing page auto-selects its first row, so "the
+     selected token" would rarely be what was meant); a token card's menu
+     takes its own. */
   const isSemanticColour = (t: DesignToken | undefined) => Boolean(t && t.kind === "color" && t.layer === "semantic" && !t.replacedBy);
   const [scaleRole, setScaleRole] = React.useState("color-primary");
   const openScale = (roleId: string) => {
@@ -728,7 +730,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 variant="secondary"
                 size="xs"
                 className={PAGE_ACTION}
-                onClick={() => openScale(isSemanticColour(selectedToken) && selectedToken ? selectedToken.id : "color-primary")}
+                onClick={() => openScale("color-primary")}
                 data-testid="brand-generate-scale"
               >
                 Generate colour scale

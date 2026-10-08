@@ -194,7 +194,7 @@ export function buildDarkPairIssues(elements: readonly StyledNode[], tokens: rea
     severity: "warning" as const,
     tokenId,
     message:
-      `In dark mode ${f.count} element${f.count === 1 ? "" : "s"} pair a fixed colour (${f.raw}) with ${tokenId}, ` +
+      `In dark mode ${f.count === 1 ? "1 element pairs" : `${f.count} elements pair`} a fixed colour (${f.raw}) with ${tokenId}, ` +
       `which turns ${f.dark} — ${f.worst.toFixed(1)}:1, below 4.5:1.`,
   }));
 }

@@ -94,6 +94,8 @@ export const DarkModeCard: React.FC<DarkModeCardProps> = ({ composer }) => {
     setPhase("aliases");
   };
   const chooseOff = () => {
+    /* Mid-flow, Off is Cancel: the board draws it live (8224:240003). */
+    if (phase !== "idle") return cancel();
     if (siteMode === "off") return;
     composer?.designSystem.setDarkMode("off", "Turn off dark mode");
   };
@@ -122,7 +124,7 @@ export const DarkModeCard: React.FC<DarkModeCardProps> = ({ composer }) => {
         <SegButton on={!pending && siteMode === "auto"} onClick={chooseAuto} testId="brand-dark-mode-auto" disabled={guard.busy}>
           Auto
         </SegButton>
-        <SegButton on={!pending && siteMode === "off"} onClick={chooseOff} testId="brand-dark-mode-off" disabled={guard.busy || pending}>
+        <SegButton on={!pending && siteMode === "off"} onClick={chooseOff} testId="brand-dark-mode-off" disabled={guard.busy}>
           Off
         </SegButton>
       </div>
