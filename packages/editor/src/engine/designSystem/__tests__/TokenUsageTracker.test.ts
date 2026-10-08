@@ -438,12 +438,15 @@ describe("TokenUsageTracker · site-wide", () => {
     expect(build).toHaveBeenCalledTimes(2);
   });
 
-  /* The seed's radius-sm answers to its pre-v6 name `--bd-radius-sm` too
-     (legacyNames) — a binding written under that name is radius-sm's. */
+  /* A merged duplicate keeps answering to its old var name (legacyNames) —
+     a binding written under that name is the surviving token's. */
   it("breakdown follows a legacy var name to its token", () => {
-    const { tracker } = make([[]]);
-    tracker.recompute([stubElement("e1", { "border-radius": "var(--bd-radius-sm)" })]);
-    expect(tracker.getBreakdown("radius-sm")).toEqual([{ elementId: "e1", styleProp: "border-radius" }]);
+    const tokens = DEFAULT_TOKENS.map((t) =>
+      t.id === "color-primary" ? { ...t, legacyNames: ["--buildrick-design-color-brand-old"] } : t,
+    );
+    const tracker = new TokenUsageTracker(() => tokens, () => ({ sources: [[]], unavailable: [] }));
+    tracker.recompute([stubElement("e1", { color: "var(--buildrick-design-color-brand-old)" })]);
+    expect(tracker.getBreakdown("color-primary")).toEqual([{ elementId: "e1", styleProp: "color" }]);
   });
 });
 
