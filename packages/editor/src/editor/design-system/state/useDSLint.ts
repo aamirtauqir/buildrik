@@ -91,7 +91,9 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
             }]
           : [];
       const found = [
-        ...composer.dsLinter.lint(allTokens),
+        /* "No dark variant" asks for a value the site never shows while its
+           Dark mode is Off — eight of them appeared on a light-only site. */
+        ...composer.dsLinter.lint(allTokens).filter((i) => !(off && i.rule === "missing-dark")),
         ...buildContrastIssues(colorState?.tokens ?? [], mode),
         ...hiddenToggle,
       ];
