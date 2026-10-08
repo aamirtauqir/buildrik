@@ -89,7 +89,6 @@ const ALLOWED = {
     "Brand Part 1c: server half landed (Task 8, SSRF-guarded); the 'Brand from logo or website' screen (board BRP1-M11) is 1c Task 13. Remove this entry when Task 13 wires it.",
   "sites.getScheduledPublish":
     "Scheduled publish: read half of the same unbuilt UI. See sites.schedulePublish.",
-  "theme.brandRestorePoints": "Brand restore list UI is Part 1c, board BRP1-M10.",
 };
 
 /** Every procedure the app router exposes, as its full dotted path. */
