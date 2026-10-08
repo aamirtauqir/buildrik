@@ -28,7 +28,7 @@ import { NOTICE, SMALL_ACTION } from "./UsageHighlight";
 import { CARD, COPY, TITLE } from "./ConnectTokensCheck";
 
 /** What made a point, as the board writes it. Unknown reasons read "Brand change". */
-export const RESTORE_REASON_LABEL: Record<string, string> = {
+const RESTORE_REASON_LABEL: Record<string, string> = {
   "theme-push": "Theme push",
   migration: "Brand upgrade",
   generator: "Generator",
