@@ -100,6 +100,7 @@ import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { ColorModeToggle } from "./ColorModeToggle";
 import { useDSLint } from "../state/useDSLint";
+import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import {
   useTokenBreakdownIds,
   useUsageHighlight,
@@ -188,6 +189,10 @@ const PAGE_ACTION =
   "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/* Seed tokens merge back on every read, so deleting one only ever reset it:
+   its Delete is "Reset to default" (owner, OQ-7). */
+const SEED_BY_ID = new Map(DEFAULT_TOKENS.map((t) => [t.id, t]));
 
 const lightOf = (tokens: readonly DesignToken[], id: string): string => resolveTokenLiteral(tokens, id, "light") ?? "";
 
@@ -448,7 +453,24 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     if (!tok) return;
     const k = kindOf(tok);
     const ok = k === "color" ? color.deleteToken(id, opts) : isMoreKind(k) ? moreKindRegistry[k].deleteToken(id, opts) : false;
-    if (!ok) refused(`Deleting "${tok.name}"`);
+    if (!ok) return refused(`Deleting "${tok.name}"`);
+    /* 8224:233678 "replaced": the toast names both and the one undo. */
+    const replacement = opts?.replaceWith ? tokenById(opts.replaceWith) : undefined;
+    if (replacement) {
+      addToast({
+        description: `${tok.friendlyName ?? tok.name} replaced with ${replacement.friendlyName ?? replacement.name} · Undo ⌘Z`,
+        tone: "info",
+      });
+    }
+  };
+  const resetToken = (id: string) => {
+    const tok = tokenById(id);
+    const seed = SEED_BY_ID.get(id);
+    if (!tok || !seed) return;
+    if (!store.commit(allTokens.map((t) => (t.id === id ? seed : t)), "Reset token")) {
+      return refused(`Resetting "${tok.name}"`);
+    }
+    addToast({ description: `${tok.friendlyName ?? tok.name} reset to default · Undo ⌘Z`, tone: "info" });
   };
   const renameToken = (id: string, newId: string) => {
     const tok = tokenById(id);
@@ -935,6 +957,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               onDelete={(() => {
                 const k = kindOf(selectedToken);
                 return k === "color" || isMoreKind(k) ? deleteToken : undefined;
+              })()}
+              onReset={(() => {
+                const k = kindOf(selectedToken);
+                return SEED_BY_ID.has(selectedToken.id) && (k === "color" || isMoreKind(k)) ? resetToken : undefined;
               })()}
               /* Only colour and the generic kinds can rename; type and spacing
                  have no rename path, and a Rename that silently did nothing

@@ -56,6 +56,12 @@ describe("filterTokensByMode", () => {
     expect(filterTokensByMode(primitivesOnly, "beginner")).toEqual([]);
   });
 
+  it("never lists a token deleted with a replacement (BRP1-M6 'replaced'), in either mode", () => {
+    const gone = { ...makeToken("action.old", { semanticKind: "action" }), replacedBy: "action.default" };
+    expect(filterTokensByMode([...tokens, gone], "pro").map((t) => t.id)).not.toContain("action.old");
+    expect(filterTokensByMode([...tokens, gone], "beginner").map((t) => t.id)).not.toContain("action.old");
+  });
+
   it("'pro' mode returns empty array when input is empty", () => {
     expect(filterTokensByMode([], "pro")).toEqual([]);
   });
