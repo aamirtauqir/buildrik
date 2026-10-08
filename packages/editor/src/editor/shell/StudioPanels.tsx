@@ -41,6 +41,7 @@ import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
 import { ProjectTokensApplier } from "@/editor/design-system/ui/ProjectTokensApplier";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
+import { useConnectOfferToast } from "./hooks/useConnectOfferToast";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
 import { RightColumnPanel } from "./RightColumnPanel";
@@ -274,6 +275,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // carry these next to its own second implementation of those shortcuts; the
   // implementations are gone and the feedback follows the commands' events.
   useClipboardToasts(composer, addToast);
+  useConnectOfferToast(composer, addToast);
   const { handleBlockClick } = useBlockInsertion(composer);
   useAltTextAutoTrigger(composer);
 

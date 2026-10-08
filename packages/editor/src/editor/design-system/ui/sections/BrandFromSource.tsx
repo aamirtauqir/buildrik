@@ -411,20 +411,3 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
     </section>
   );
 };
-
-/** The preview column's guidance card on every M11 board ("Card · How Brand works"). */
-export const BrandFromSourceGuide: React.FC = () => (
-  <section
-    data-testid="brand-from-source-guide"
-    className="tw:flex tw:flex-col tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:p-4"
-  >
-    <p className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Preview before applying</p>
-    <p className={`${SMALL} tw:text-[var(--bk-ink-soft)]`}>
-      Explore the result on your canvas. Confirm or Apply commits the whole change as one ⌘Z step.
-    </p>
-    <p className={`${SMALL} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
-    <p className={`${SMALL} tw:text-[var(--bk-ink-soft)]`}>
-      Edit Primary to change only Primary. Edit its palette value to update every token that uses it.
-    </p>
-  </section>
-);

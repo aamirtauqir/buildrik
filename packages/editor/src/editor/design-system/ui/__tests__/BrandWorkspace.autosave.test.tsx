@@ -279,17 +279,41 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
   });
 
   it("deleting a token another token aliases is refused with a toast — nothing written", async () => {
+    /* A site-added primitive and a semantic token aliasing it: seed tokens
+       offer "Reset to default" instead of Delete (OQ-7), so the refusal is
+       proven on the site's own tokens. */
+    const seedPrimitive = DEFAULT_TOKENS.find((p) => p.kind === "color" && p.layer === "primitive")!;
+    const seedSemantic = DEFAULT_TOKENS.find((t) => t.kind === "color" && t.layer === "semantic" && "alias" in t.modes.light)!;
+    const sand: DesignToken = { ...seedPrimitive, id: "sand-500", name: "Sand 500", cssVar: "--buildrick-design-sand-500", legacyNames: undefined, modes: { light: { value: "#C2B280" } } };
+    const accent: DesignToken = { ...seedSemantic, id: "color-sand", name: "Sand", cssVar: "--buildrick-design-color-sand", legacyNames: undefined, modes: { light: { alias: "sand-500" } } };
     const composer = makeFakeComposer();
+    composer.settings.designTokens = [sand, accent];
+    composer.settings.designTokensSchemaVersion = 6;
     const utils = renderWorkspace(composer);
-    const target = DEFAULT_TOKENS.find(
-      (p) => p.kind === "color" && p.layer === "primitive" &&
-        DEFAULT_TOKENS.some((t) => "alias" in t.modes.light && t.modes.light.alias === p.id),
-    )!;
-    fireEvent.click(utils.container.querySelector(`[data-token-row="${target.id}"]`)!);
+    fireEvent.click(await waitFor(() => utils.container.querySelector(`[data-token-row="${sand.id}"]`)!));
     fireEvent.click(utils.getByTestId("brand-token-menu"));
     fireEvent.click(utils.getByRole("menuitem", { name: /Delete/ }));
-    expect(await utils.findByText(new RegExp(`Deleting "${target.name}" wasn't applied`))).toBeTruthy();
-    expect(composer.settings.designTokens).toEqual([]);
+    /* Nothing uses it on the page (the alias is a token, not an element): the
+       plain confirm (BRP1-M6), then the write is refused. */
+    fireEvent.click(await utils.findByTestId("brand-token-delete-confirm"));
+    expect(await utils.findByText(new RegExp(`Deleting "${sand.name}" wasn't applied`))).toBeTruthy();
+    expect(composer.settings.designTokens).toEqual([sand, accent]);
+  });
+
+  it("a seed token's Delete is Reset to default (OQ-7) — one write back to the seed value", async () => {
+    const seed = DEFAULT_TOKENS.find((t) => t.id === "color-primary")!;
+    const edited = setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#C2410C");
+    const composer = makeFakeComposer();
+    composer.settings.designTokens = edited;
+    composer.settings.designTokensSchemaVersion = 6;
+    const utils = renderWorkspace(composer);
+    fireEvent.click(await waitFor(() => utils.container.querySelector('[data-token-row="color-primary"]')!));
+    fireEvent.click(utils.getByTestId("brand-token-menu"));
+    expect(utils.queryByRole("menuitem", { name: /Delete/ })).toBeNull();
+    fireEvent.click(utils.getByRole("menuitem", { name: "Reset to default" }));
+    const saved = composer.settings.designTokens as DesignToken[];
+    expect(saved.find((t) => t.id === "color-primary")).toEqual(seed);
+    expect(await utils.findByText(/reset to default · Undo ⌘Z/)).toBeTruthy();
   });
 });
 

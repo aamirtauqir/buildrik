@@ -12,6 +12,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 
 const pending = new WeakMap<Composer, string>();
+const pendingPage = new WeakMap<Composer, string>();
 
 export function requestBrandToken(composer: Composer, tokenId: string): void {
   pending.set(composer, tokenId);
@@ -26,10 +27,9 @@ export function takeBrandTokenRequest(composer: Composer | null | undefined): st
   return tokenId;
 }
 
-const pendingPage = new WeakMap<Composer, string>();
-
-/** Open Brand ON a page (the theme-toggle inspector's "Open Brand → Colour
- *  mode", BRP1-M12) — held until the workspace mounts, like a token request. */
+/** Asking Brand to open on one of its pages — the template-applied Connect
+ *  offer (BRP1-M7) opens Connect to tokens; the theme-toggle inspector
+ *  (BRP1-M12) opens Colour mode. Same hold as a token request, read once. */
 export function requestBrandPage(composer: Composer, page: string): void {
   pendingPage.set(composer, page);
   composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});

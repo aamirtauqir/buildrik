@@ -18,6 +18,9 @@ export function tokenIsSemantic(token: DesignToken): boolean {
  * Filter tokens by editor mode.
  *
  *   - `"pro"` returns all tokens (primitives + semantics).
+ *
+ * Neither mode lists a token deleted with a replacement (`replacedBy`): it
+ * stays in the set only so its references resolve (BRP1-M6 "replaced").
  *   - `"beginner"` returns only semantic tokens (those with `semanticKind` set).
  *
  * Beginner mode hides the raw primitive layer so novices see only intent-named
@@ -28,6 +31,7 @@ export function filterTokensByMode(
   tokens: readonly DesignToken[],
   mode: EditorMode,
 ): DesignToken[] {
-  if (mode === "pro") return [...tokens];
-  return tokens.filter(tokenIsSemantic);
+  const live = tokens.filter((t) => !t.replacedBy);
+  if (mode === "pro") return live;
+  return live.filter(tokenIsSemantic);
 }

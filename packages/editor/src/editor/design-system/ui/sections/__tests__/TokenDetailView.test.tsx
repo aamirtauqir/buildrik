@@ -688,8 +688,8 @@ describe("TokenDetailView", () => {
     expect(countEl.getAttribute("data-used-count")).toBe("2");
   });
 
-  // ── B4 follow-up: replacement picker modal on Delete ──────────────────────
-  describe("Delete → replacement picker (B4 follow-up 2026-05-17)", () => {
+  // ── Safe delete (BRP1-M6): the site-wide count picks the dialog's state ──
+  describe("Delete → safe delete dialog (BRP1-M6)", () => {
     const candidate: DesignToken = v6Token({
       id: "color.brand.secondary",
       name: "Brand · Secondary",
@@ -700,95 +700,70 @@ describe("TokenDetailView", () => {
       kind: "color",
     });
 
-    it("Pro + usage=0: clicking Delete hard-deletes immediately (no modal, no replaceWith)", () => {
+    it("Pro + usage=0: Delete asks for a plain confirm, then hard-deletes (no replaceWith)", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 0 } });
       const onDelete = vi.fn();
-      const { getByTestId, container } = render(
-        wrap(
-          <TokenDetailView
-            token={colorToken}
-            composer={composer}
-            allTokens={[colorToken, candidate]}
-            onDelete={onDelete}
-          />,
-        ),
+      const { getByTestId } = render(
+        wrap(<TokenDetailView token={colorToken} composer={composer} allTokens={[colorToken, candidate]} onDelete={onDelete} />),
       );
       clickDelete(getByTestId);
+      expect(onDelete).not.toHaveBeenCalled();
+      expect(document.querySelector('[data-delete-state="unused"]')).toBeTruthy();
+      expect(document.querySelector("[data-replace-candidate]")).toBeNull();
+      fireEvent.click(screen.getByTestId("brand-token-delete-confirm"));
       expect(onDelete).toHaveBeenCalledTimes(1);
-      // Called with single id arg (hard delete) — no replaceWith.
       expect(onDelete).toHaveBeenCalledWith(colorToken.id);
-      // Modal must NOT be mounted.
-      expect(container.querySelector('[data-token-replace-modal]')).toBeNull();
     });
 
-    it("Pro + usage unknown: clicking Delete never hard-deletes (opens the picker)", () => {
+    it("Pro + usage unknown: Delete is refused with the reason — never a hard delete, no picker", () => {
       const composer = makeMockComposer({ usage: { getCount: () => "unknown", getBreakdown: () => [] } });
       const onDelete = vi.fn();
       const { getByTestId } = render(
-        wrap(
-          <TokenDetailView
-            token={colorToken}
-            composer={composer}
-            allTokens={[colorToken, candidate]}
-            onDelete={onDelete}
-          />,
-        ),
+        wrap(<TokenDetailView token={colorToken} composer={composer} allTokens={[colorToken, candidate]} onDelete={onDelete} />),
       );
       clickDelete(getByTestId);
       expect(onDelete).not.toHaveBeenCalled();
-      const modal = document.querySelector('[data-token-replace-modal]');
-      expect(modal).toBeTruthy();
-      // The count is unknown: the modal does not claim a number.
-      expect(modal?.textContent).not.toMatch(/\d+ consumers?/);
+      const dialog = document.querySelector('[data-delete-state="unknown"]');
+      expect(dialog?.textContent).toMatch(/can't count usage right now/i);
+      expect(dialog?.textContent).not.toMatch(/\d+ elements?/);
+      expect(document.querySelector("[data-replace-candidate]")).toBeNull();
     });
 
-    it("Pro + usage>0: clicking Delete opens picker modal instead of deleting", () => {
+    it("Pro + usage>0: Delete opens the replacement picker instead of deleting", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 3 } });
       const onDelete = vi.fn();
       const { getByTestId } = render(
-        wrap(
-          <TokenDetailView
-            token={colorToken}
-            composer={composer}
-            allTokens={[colorToken, candidate]}
-            onDelete={onDelete}
-          />,
-        ),
+        wrap(<TokenDetailView token={colorToken} composer={composer} allTokens={[colorToken, candidate]} onDelete={onDelete} />),
       );
       clickDelete(getByTestId);
-      // No deletion yet — user has to confirm via modal.
       expect(onDelete).not.toHaveBeenCalled();
-      // Modal mounted in portal (OverlayMount-backed).
-      const modal = document.querySelector('[data-token-replace-modal]');
-      expect(modal).toBeTruthy();
+      expect(screen.getByTestId("brand-token-replace-modal")).toBeTruthy();
     });
 
-    it("Picker modal — selecting candidate + Confirm calls onDelete(id, { replaceWith })", () => {
+    it("Picker — selecting a candidate + Replace and delete calls onDelete(id, { replaceWith })", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 3 } });
       const onDelete = vi.fn();
       const { getByTestId } = render(
-        wrap(
-          <TokenDetailView
-            token={colorToken}
-            composer={composer}
-            allTokens={[colorToken, candidate]}
-            onDelete={onDelete}
-          />,
-        ),
+        wrap(<TokenDetailView token={colorToken} composer={composer} allTokens={[colorToken, candidate]} onDelete={onDelete} />),
       );
       clickDelete(getByTestId);
-      // Pick candidate by clicking its row label (modal renders ids).
-      const candidateRow = document.querySelector(
-        `[data-replace-candidate="${candidate.id}"]`,
-      ) as HTMLElement;
-      expect(candidateRow).toBeTruthy();
-      fireEvent.click(candidateRow);
-      // Confirm button is labelled "Delete and replace".
-      const confirmBtn = document.querySelector(
-        '[data-token-replace-confirm]',
-      ) as HTMLButtonElement;
-      fireEvent.click(confirmBtn);
+      fireEvent.click(document.querySelector(`[data-replace-candidate="${candidate.id}"]`) as HTMLElement);
+      fireEvent.click(document.querySelector("[data-token-replace-confirm]") as HTMLButtonElement);
       expect(onDelete).toHaveBeenCalledWith(colorToken.id, { replaceWith: candidate.id });
+    });
+
+    it("a seed token's menu offers Reset to default in place of Delete (OQ-7)", () => {
+      const composer = makeMockComposer({ usage: { getUsage: () => 3 } });
+      const onReset = vi.fn();
+      const onDelete = vi.fn();
+      const { getByTestId } = render(
+        wrap(<TokenDetailView token={colorToken} composer={composer} allTokens={[colorToken]} onDelete={onDelete} onReset={onReset} />),
+      );
+      fireEvent.click(getByTestId("brand-token-menu"));
+      expect(screen.queryByTestId("brand-token-action-delete")).toBeNull();
+      fireEvent.click(screen.getByTestId("brand-token-action-reset"));
+      expect(onReset).toHaveBeenCalledWith(colorToken.id);
+      expect(onDelete).not.toHaveBeenCalled();
     });
 
     it("Picker modal — excludes the token being deleted from candidate list", () => {

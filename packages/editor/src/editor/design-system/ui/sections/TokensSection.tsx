@@ -5,7 +5,8 @@
  * workspace draws its card in the right column.
  *
  * It also owns the engine subscription every token page needs:
- * `tokenUsage:changed` for the USED column. (Engine-side writes and ⌘Z reach
+ * `tokenUsage:changed` for the USED column (Colours: the site-wide,
+ * unknown-aware `getCount`, BRP1-M5). (Engine-side writes and ⌘Z reach
  * the registries by themselves now — they read the project.)
  *
  * (The drawer's kind drill-in list and its Beginner hint band lived here until
@@ -54,6 +55,8 @@ interface TokensSectionProps {
   composer?: Composer | null;
   selectedTokenId?: string | null;
   onSelectToken?: (tokenId: string) => void;
+  /** Colours' "Used by N" — highlight that token's elements (BRP1-M5). */
+  onShowUsage?: (tokenId: string) => void;
 }
 
 export const TokensSection: React.FC<TokensSectionProps> = ({
@@ -62,6 +65,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   composer,
   selectedTokenId = null,
   onSelectToken,
+  onShowUsage,
 }) => {
   const mode = useDSModeOptional()?.mode ?? "beginner";
   const isPro = mode === "pro";
@@ -103,13 +107,21 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
 
   if (openKind === "color") {
     const visible = filterTokensByMode(color.tokens, mode);
+    /* The site-wide count, "unknown" while saved components load. Read on the
+       same "tokenUsage:changed" re-render as `usageMap` above. */
+    const tracker = composer?.designSystem?.tokenUsage;
+    const usageCounts = new Map(visible.map((t) => [t.id, tracker ? tracker.getCount(t.id) : (usageMap.get(t.id) ?? 0)] as const));
     return (
       <ColorTokenList
         tokens={visible}
         allTokens={color.tokens}
         onAddToken={() => onAddTokenClick?.()}
-        hiddenByModeCount={color.tokens.length - visible.length}
-        {...selection}
+        hiddenByModeCount={filterTokensByMode(color.tokens, "pro").length - visible.length}
+        usageCounts={usageCounts}
+        onShowUsage={onShowUsage}
+        selectedTokenId={selectedTokenId}
+        onSelectToken={onSelectToken}
+        isPro={isPro}
       />
     );
   }
@@ -123,7 +135,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
           tokens={visible}
           allTokens={spacing.tokens}
           kindLabel="spacing"
-          hiddenByModeCount={spacing.tokens.length - visible.length}
+          hiddenByModeCount={filterTokensByMode(spacing.tokens, "pro").length - visible.length}
           /* The board's PRESET column: which preset the spacing values
              match, or "custom" once any has been hand-edited. */
           presetOf={() => (preset ? SPACING_PRESET_LABELS[preset] : "custom")}
@@ -139,7 +151,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       tokens={visible}
       allTokens={r.tokens}
       kindLabel={openKind}
-      hiddenByModeCount={r.tokens.length - visible.length}
+      hiddenByModeCount={filterTokensByMode(r.tokens, "pro").length - visible.length}
       {...selection}
     />
   );

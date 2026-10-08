@@ -4,7 +4,9 @@
  * matches. Semantic tokens win over primitives; several semantic tokens tied
  * leave the pick to the user (`target: null`). Whole values only — never the
  * colour part of a shorthand — on the base styles AND every breakpoint
- * override (owner, OQ-6). Pure — the Composer applies.
+ * override (owner, OQ-6). A tie that includes Primary preselects Primary
+ * (owner default, 2026-10-08 — the seed's #1A56DB is both Primary and
+ * Action); the user can still change it. Pure — the Composer applies.
  *
  * @license BSD-3-Clause
  */
@@ -34,6 +36,8 @@ export interface StyledNode {
   breakpointStyles?: Partial<Record<BreakpointId, Record<string, unknown>>>;
   children?: StyledNode[];
 }
+
+const PREFERRED_ON_TIE = "color-primary";
 
 const hex2 = (n: string) => Number(n).toString(16).padStart(2, "0");
 
@@ -94,7 +98,7 @@ export function findConnectSuggestions(
         ...g,
         elementCount: new Set(g.refs.map((r) => r.elementId)).size,
         candidates,
-        target: candidates.length === 1 ? candidates[0] : null,
+        target: candidates.length === 1 ? candidates[0] : candidates.includes(PREFERRED_ON_TIE) ? PREFERRED_ON_TIE : null,
       };
     })
     .sort((a, b) => b.elementCount - a.elementCount || a.key.localeCompare(b.key));

@@ -3,7 +3,7 @@
  * column, under the live preview; Spacing 7576:197036 draws the same card).
  *
  *   ┌ 468 ─────────────────────────────────────────────┐
- *   │ ▇ 40  name                                    ⋯  │  ⋯ → Rename · Delete
+ *   │ ▇ 40  name                                    ⋯  │  ⋯ → Rename · Delete (seed: Reset to default)
  *   │       id (Pro) / description                      │
  *   │ Light value  #1A56DB                    [Change]  │  → inline editor
  *   │ Dark value   #76A9FA                    [Change]  │  → inline field
@@ -32,7 +32,7 @@
 
 import * as React from "react";
 import { Info } from "lucide-react";
-import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { resolveTokenLiteral, type TokenUsageCount } from "@buildrik/shared/tokens";
 import type { Composer } from "../../../../engine/Composer";
 import type { DesignToken } from "../../types";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
@@ -45,7 +45,7 @@ import { ColorPicker } from "../colors/ColorPicker";
 import { displayValue } from "../colors/ColorTokenList";
 import { FontFamilyPicker } from "./FontFamilyPicker";
 import { BrandFontPopover } from "./BrandFontPopover";
-import { TokenReplaceModal } from "./TokenReplaceModal";
+import { TokenDeleteDialog } from "./TokenDeleteDialog";
 import { TokenRenameDialog } from "./TokenRenameDialog";
 import { Button, HintTooltip, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 
@@ -67,6 +67,10 @@ export interface TokenDetailViewProps {
    */
   onDelete?: (id: string, opts?: { replaceWith?: string }) => void;
   onRename?: (id: string, newId: string) => void;
+  /** A seed token's "Delete" is "Reset to default" (owner, OQ-7): a seed
+   *  token cannot be removed — the seed merges it back — so the menu offers
+   *  what deleting it would really do. Given only for seed tokens. */
+  onReset?: (id: string) => void;
   /** After a delete — the caller drops its selection. */
   onDeleted?: () => void;
 }
@@ -125,6 +129,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   onValueChange,
   onDelete,
   onRename,
+  onReset,
   onDeleted,
 }) => {
   const dsMode = useDSModeOptional();
@@ -274,37 +279,25 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     setRenameOpen(true);
   };
 
-  // B4 follow-up (2026-05-17): per-token consumer count drives the delete
-  // path. A known zero → hard delete bypasses the modal. In use, or not yet
-  // countable ("unknown" while saved components load) → open the picker
-  // modal; user picks a replacement which routes through the kind registry's
-  // deleteToken(id, { replaceWith }). The engine refuses a hard delete of an
-  // in-use token either way (setTokens' removal guard).
-  const consumerCount = composer?.designSystem?.tokenUsage?.getCount(token.id) ?? 0;
-  const tokenKind = token.kind ?? (token.category === "colors" ? "color" : undefined);
-  const replaceCandidates = React.useMemo(
-    () =>
-      (allTokens ?? []).filter((t) => {
-        if (t.id === token.id) return false;
-        if (t.replacedBy) return false;
-        const k = t.kind ?? (t.category === "colors" ? "color" : undefined);
-        return k === tokenKind;
-      }),
-    [allTokens, token.id, tokenKind],
-  );
-  const [replaceOpen, setReplaceOpen] = React.useState(false);
+  // Safe delete (BRP1-M6): the site-wide count, read when Delete is pressed,
+  // picks the dialog's state — a known 0 confirms, a number asks for a
+  // replacement (`replacedBy`, one ⌘Z), "unknown" refuses with the reason.
+  // The engine's removal guard refuses a hard delete of a used token anyway.
+  const readCount = (): TokenUsageCount => composer?.designSystem?.tokenUsage?.getCount(token.id) ?? 0;
+  const [deleteUsage, setDeleteUsage] = React.useState<TokenUsageCount | null>(null);
   const handleDelete = () => {
     setMenuOpen(false);
     if (!isPro || !onDelete) return; // Beginner-blocked, or no delete path.
-    if (consumerCount === 0) {
-      onDelete?.(token.id);
-      onDeleted?.();
-      return;
-    }
-    setReplaceOpen(true);
+    setDeleteUsage(readCount());
   };
-  const handleReplaceConfirm = (replaceWithId: string) => {
-    onDelete?.(token.id, { replaceWith: replaceWithId });
+  const handleReset = () => {
+    setMenuOpen(false);
+    onReset?.(token.id);
+  };
+  const confirmDelete = (opts: { replaceWith: string } | undefined) => {
+    setDeleteUsage(null);
+    if (opts) onDelete?.(token.id, opts);
+    else onDelete?.(token.id);
     onDeleted?.();
   };
 
@@ -377,6 +370,11 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               >
                 Rename token…
               </MenuItem>
+              {onReset ? (
+                <MenuItem onClick={handleReset} data-testid="brand-token-action-reset">
+                  Reset to default
+                </MenuItem>
+              ) : (
               <MenuItem
                 danger
                 onClick={handleDelete}
@@ -393,6 +391,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               >
                 Delete token…
               </MenuItem>
+              )}
             </Menu>
           </Popover>
         </div>
@@ -692,13 +691,14 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         }}
       />
 
-      <TokenReplaceModal
-        open={replaceOpen}
-        onOpenChange={setReplaceOpen}
+      <TokenDeleteDialog
+        open={deleteUsage !== null}
         token={token}
-        candidates={replaceCandidates}
-        usage={typeof consumerCount === "number" ? consumerCount : undefined}
-        onConfirm={handleReplaceConfirm}
+        usage={deleteUsage ?? 0}
+        allTokens={allTokens ?? [token]}
+        onClose={() => setDeleteUsage(null)}
+        onDelete={confirmDelete}
+        onRetry={() => setDeleteUsage(readCount())}
       />
     </section>
   );

@@ -26,12 +26,12 @@ const baseProps = {
 };
 
 describe("ColorTokenList — the Colours table (7315:80955)", () => {
-  it("draws the board's four column headers", () => {
+  it("draws the board's four column headers (USAGE per BRP1-M5)", () => {
     const { getAllByRole } = render(
       <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1a56db")]} {...baseProps} />,
     );
     expect(getAllByRole("columnheader").map((h) => h.textContent).filter(Boolean)).toEqual([
-      "Token", "Light", "Dark", "Used",
+      "Token", "Light", "Dark", "Usage",
     ]);
   });
 

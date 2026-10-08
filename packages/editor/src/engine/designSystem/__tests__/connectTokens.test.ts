@@ -10,8 +10,8 @@ import { findConnectSuggestions, normalizeTokenValue, type StyledNode } from "..
 const node = (id: string, styles: Record<string, string>, children: StyledNode[] = []): StyledNode => ({ id, styles, children });
 
 /* The seed ships #1A56DB under two semantic ids — color-primary and the B5
-   Beginner alias color-action — so on a real site #1A56DB is a tie the user
-   resolves. The "unique match" case drops color-action to test the
+   Beginner alias color-action — a tie Primary wins by default (owner, 2026-10-08).
+   The "unique match" case drops color-action to test the
    single-candidate path. */
 const withoutAction = DEFAULT_TOKENS.filter((t) => t.id !== "color-action");
 
@@ -24,10 +24,10 @@ describe("findConnectSuggestions (spec §3, test 6)", () => {
     expect(s.candidates).toEqual(["color-primary"]);
   });
 
-  it("leaves the seed's #1A56DB to the user: Primary and Action tie", () => {
+  it("preselects Primary when it ties (the seed's #1A56DB: Primary and Action), user can still change", () => {
     const [s] = findConnectSuggestions([node("a", { color: "#1A56DB" })], DEFAULT_TOKENS);
     expect(s.candidates).toEqual(["color-action", "color-primary"]);
-    expect(s.target).toBeNull();
+    expect(s.target).toBe("color-primary");
   });
 
   it("never near-matches", () => {
