@@ -35,7 +35,8 @@ vi.mock("@/blocks/blockRegistry", () => ({
   insertBlock: mocks.insertBlock,
 }));
 
-vi.mock("@/shared/utils/nesting", () => ({
+vi.mock("@/shared/utils/nesting", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shared/utils/nesting")>()),
   canNestElement: mocks.canNestElement,
   getSuggestedParents: mocks.getSuggestedParents,
 }));
@@ -253,6 +254,29 @@ describe("useBlockInsertion", () => {
     // sel-1 is at index 1 inside par-1 → insert as its next sibling (index 2)
     expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), "par-1", 2);
   });
+
+  /* L1-001: with a Heading selected, Add → Divider produced <h2>Heading<hr></h2>
+     — the nesting rules let text hold blocks, and the exporter then dropped the
+     heading's words (L1-002). A text element is never the insert target; the
+     block goes after it. */
+  it.each(["heading", "paragraph", "text", "label"])(
+    "inserts AFTER a selected %s, never inside it",
+    (type) => {
+      const parent = makeElement("par-1", "container", {
+        getChildren: () => [{ getId: () => "sel-1" }, { getId: () => "other" }],
+        getChildCount: () => 2,
+      });
+      elements.set("par-1", parent);
+      elements.set("sel-1", makeElement("sel-1", type, { getParent: () => parent }));
+      selectedIds = ["sel-1"];
+      mocks.canNestElement.mockReturnValue(true);
+
+      const { result } = mountHook();
+      act(() => result.current.handleBlockClick(heroBlock));
+
+      expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), "par-1", 1);
+    }
+  );
 
   it("falls back to the page root when no ancestor accepts the block", () => {
     elements.set("sel-1", makeElement("sel-1", "text"));
