@@ -27,7 +27,7 @@ import type { DesignToken } from "../../types";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { findSurfaceToken, resolveSurface } from "../../utils/contrastLint";
 import { Button } from "@/editor/chrome-ui";
-import { BrandCard, BrandRow } from "../BrandCard";
+import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 export interface LintSectionProps {
@@ -36,7 +36,27 @@ export interface LintSectionProps {
   onFix?: (issue: LintIssue) => void;
   /** Go to the finding's token. */
   onOpen?: (tokenId: string) => void;
+  /** The Connect to tokens check (BRP1-M7) — a page under Brand checks. */
+  onConnect?: () => void;
 }
+
+/* The door to Connect to tokens: BRP1-M7 draws the check as a page under
+   Brand checks (the nav keeps Brand checks current there) but no board draws
+   its entry row — it is one 48px row in the page's own card style. */
+const ConnectDoor: React.FC<{ onConnect?: () => void }> = ({ onConnect }) =>
+  onConnect ? (
+    <div className="tw:mt-4">
+    <BrandCard label="More checks" data-testid="brand-checks-more">
+      <BrandRow
+        name="Connect to tokens"
+        sub="Bind raw values that exactly match a token"
+        trailing={<BrandChevron />}
+        onSelect={onConnect}
+        data-testid="brand-check-connect"
+      />
+    </BrandCard>
+    </div>
+  ) : null;
 
 /** What is wrong, as the row's title (7316:84555: "Banned hue — purple / violet"). */
 const RULE_LABEL: Record<LintRuleId, string> = {
@@ -48,6 +68,7 @@ const RULE_LABEL: Record<LintRuleId, string> = {
   "unresolved-binding": "Unresolved binding",
   "alias-depth-exceeded": "Alias chain too deep",
   "semantic-needs-alias": "Semantic token needs an alias",
+  "theme-toggle-hidden": "Theme toggle hidden — Dark mode is off",
 };
 
 const ACTION = "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5";
@@ -82,15 +103,18 @@ export function brandChecksCaption(issues: readonly LintIssue[], ignored = 0): s
   return ignored > 0 ? `${withFix} · ${ignored} ignored` : withFix;
 }
 
-export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen }) => {
+export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen, onConnect }) => {
   if (issues.length === 0) {
     return (
+      <>
       <div className="tw:py-6 tw:text-center" data-testid="brand-checks-empty">
         <div className="tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">Nothing to fix</div>
         <div className="tw:mt-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
           Every token passes the brand rules.
         </div>
       </div>
+      <ConnectDoor onConnect={onConnect} />
+      </>
     );
   }
 
@@ -99,6 +123,7 @@ export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen 
   );
 
   return (
+    <>
     <BrandCard label="Brand checks" data-testid="brand-checks-list">
       {ordered.map((issue) => {
         const key = `${issue.rule}:${issue.tokenId}`;
@@ -138,6 +163,8 @@ export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen 
         );
       })}
     </BrandCard>
+    <ConnectDoor onConnect={onConnect} />
+    </>
   );
 };
 

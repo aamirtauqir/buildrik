@@ -26,7 +26,7 @@ import { SearchResults } from "./components/SearchResults";
 import { useInsertDrag } from "@/editor/canvas/insertDrag";
 import { takePendingGenerate, takePendingInsertGroup, takePendingPasteHtml } from "./insertGroupRequest";
 import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
-import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
+import { buildInsertGroups, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { useComponentList } from "../component-library/useComponentList";
@@ -110,8 +110,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
 
 
   const groups = React.useMemo(
-    () => buildInsertGroups(composer?.components ? mine.length + library.length : null, tab.favs.size, tab.recents.length),
-    [composer, mine.length, library.length, tab.favs.size, tab.recents.length],
+    () => buildInsertGroups(composer?.components ? mine.length + library.length : null, tab.favs.size, tab.recents.length, tab.allElements.length),
+    [composer, mine.length, library.length, tab.favs.size, tab.recents.length, tab.allElements.length],
   );
 
   // MINE row click — the same instantiate contract the Components surface
@@ -323,11 +323,11 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onToggle={() => toggleGroup(g)}
                 elements={
                   g.id === "elements"
-                    ? elementRows
+                    ? tab.allElements
                     : g.id === "favourites"
-                      ? elementRows.filter((el) => tab.favs.has(el.name))
+                      ? tab.allElements.filter((el) => tab.favs.has(el.name))
                       : g.id === "recent"
-                        ? tab.recents.flatMap((n) => elementRows.find((el) => el.name === n) ?? [])
+                        ? tab.recents.flatMap((n) => tab.allElements.find((el) => el.name === n) ?? [])
                         : undefined
                 }
                 favs={tab.favs}

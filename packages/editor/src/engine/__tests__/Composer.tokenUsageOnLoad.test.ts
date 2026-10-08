@@ -43,8 +43,9 @@ describe("token usage straight after a project load", () => {
     expect(composer.designSystem.tokenUsage.getUsage(tokenId)).toBe(1);
   });
 
-  it("lists the bound element in the breakdown", () => {
+  it("lists the bound element in the breakdown", async () => {
     const { composer, tokenId } = loaded();
+    await Promise.resolve(); // the rebuild is microtask-coalesced
     expect(composer.designSystem.tokenUsage.getBreakdown(tokenId)).toEqual([
       { elementId: "btn", styleProp: "backgroundColor" },
     ]);

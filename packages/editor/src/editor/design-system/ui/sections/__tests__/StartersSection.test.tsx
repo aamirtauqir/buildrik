@@ -7,7 +7,7 @@
  * on the board.
  */
 import { render, fireEvent } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as React from "react";
 import { StartersSection } from "../StartersSection";
 import { TokenRegistryProvider, useColorRegistry } from "../../../state/TokenRegistryContext";
@@ -100,5 +100,17 @@ describe("StartersSection", () => {
     expect(container.querySelector("[data-apply-starter]")).toBeNull();
     fireEvent.click(container.querySelectorAll<HTMLElement>('[role="radio"]')[0]);
     expect(queryByText("Starter applied")).toBeNull();
+  });
+});
+
+describe("StartersSection — Brand from logo or website (BRP1-M11, behind dsAi)", () => {
+  it("shows the door only when the caller passes one, and opens it", () => {
+    const open = vi.fn();
+    const off = render(wrap(<StartersSection projectId="p1" />));
+    expect(off.queryByTestId("starter-row-from-source")).toBeNull();
+    off.unmount();
+    const on = render(wrap(<StartersSection projectId="p1" onOpenFromSource={open} />));
+    fireEvent.click(on.getByTestId("starter-row-from-source"));
+    expect(open).toHaveBeenCalledTimes(1);
   });
 });

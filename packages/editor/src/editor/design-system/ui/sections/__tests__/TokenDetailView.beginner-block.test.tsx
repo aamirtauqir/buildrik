@@ -94,7 +94,7 @@ describe("TokenDetailView beginner-block", () => {
     const { deleteBtn, onDelete } = renderCard("beginner");
     fireEvent.click(deleteBtn);
     expect(onDelete).not.toHaveBeenCalled();
-    expect(document.querySelector("[data-token-replace-modal]")).toBeNull();
+    expect(document.querySelector("[data-delete-state]")).toBeNull();
   });
 
   it("Pro: Delete enabled, no blocked title", () => {
@@ -110,6 +110,6 @@ describe("TokenDetailView beginner-block", () => {
     const { deleteBtn, onDelete } = renderCard("pro");
     fireEvent.click(deleteBtn);
     expect(onDelete).not.toHaveBeenCalled();
-    expect(document.querySelector("[data-token-replace-modal]")).toBeTruthy();
+    expect(document.querySelector('[data-delete-state="in-use"]')).toBeTruthy();
   });
 });

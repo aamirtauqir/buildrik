@@ -6,6 +6,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const checkSiteRoleMock = vi.fn();
 const listBrandRestorePointsMock = vi.fn();
+const createBrandRestorePointMock = vi.fn();
+const getBrandRestorePointMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({ extractBearer: () => null, verifyApiToken: vi.fn() }));
@@ -24,6 +26,8 @@ vi.mock("@/server/services/permission.service", () => ({
 }));
 vi.mock("@/server/services/theme.service", () => ({
   listBrandRestorePoints: (...a: unknown[]) => listBrandRestorePointsMock(...a),
+  createBrandRestorePoint: (...a: unknown[]) => createBrandRestorePointMock(...a),
+  getBrandRestorePoint: (...a: unknown[]) => getBrandRestorePointMock(...a),
   ThemeError: class ThemeError extends Error {},
 }));
 
@@ -35,6 +39,8 @@ const caller = () => themeRouter.createCaller({ session: { user: { id: "u_1" } }
 beforeEach(() => {
   checkSiteRoleMock.mockReset();
   listBrandRestorePointsMock.mockReset();
+  createBrandRestorePointMock.mockReset();
+  getBrandRestorePointMock.mockReset();
 });
 
 describe("theme.brandRestorePoints", () => {
@@ -49,5 +55,31 @@ describe("theme.brandRestorePoints", () => {
     checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "viewer"));
     await expect(caller().brandRestorePoints({ siteId: "s1" })).rejects.toMatchObject({ code: "FORBIDDEN" });
     expect(listBrandRestorePointsMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("theme.createBrandRestorePoint / brandRestorePoint (spec test 27)", () => {
+  const input = { siteId: "s1", reason: "generator" as const, designTokens: [], darkMode: "off" as const };
+
+  it("lets an editor create and read, with no agency gate", async () => {
+    checkSiteRoleMock.mockResolvedValue(undefined);
+    createBrandRestorePointMock.mockResolvedValueOnce({ id: "r1", createdAt: new Date(1) });
+    getBrandRestorePointMock.mockResolvedValueOnce({ id: "r1", designTokens: [], tokensSchemaVersion: 6, darkMode: "off" });
+    await expect(caller().createBrandRestorePoint(input)).resolves.toMatchObject({ id: "r1" });
+    await expect(caller().brandRestorePoint({ siteId: "s1", id: "r1" })).resolves.toMatchObject({ id: "r1" });
+    expect(checkSiteRoleMock.mock.calls.every((c) => c[3] === "EDITOR")).toBe(true);
+  });
+
+  it("refuses a VIEWER before the service is reached", async () => {
+    checkSiteRoleMock.mockRejectedValue(new PermissionError("FORBIDDEN", "viewer"));
+    await expect(caller().createBrandRestorePoint(input)).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(caller().brandRestorePoint({ siteId: "s1", id: "r1" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(createBrandRestorePointMock).not.toHaveBeenCalled();
+    expect(getBrandRestorePointMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses server-only reasons at the schema", async () => {
+    checkSiteRoleMock.mockResolvedValue(undefined);
+    await expect(caller().createBrandRestorePoint({ ...input, reason: "migration" as never })).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 });

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DarkModeSchema } from "./design-tokens";
 
 /**
  * Shared-theme push (redesign E2-T5b). An agency captures one site's design
@@ -52,3 +53,22 @@ export const workspacePresetIdInput = z.object({
   presetId: z.string().min(1),
 });
 export type WorkspacePresetIdInput = z.infer<typeof workspacePresetIdInput>;
+
+// Brand Part 1c (spec §8): restore points the editor takes before a big brand
+// change. `migration` and `theme-push` rows are written by the server only.
+export const brandRestorePointReason = z.enum(["generator", "dark-auto", "logo"]);
+export const createBrandRestorePointInput = z.object({
+  siteId: z.string().min(1),
+  reason: brandRestorePointReason,
+  designTokens: z.array(z.unknown()).max(2000),
+  designPresets: z.array(z.unknown()).max(500).optional(),
+  darkMode: DarkModeSchema,
+});
+export type CreateBrandRestorePointInput = z.infer<typeof createBrandRestorePointInput>;
+
+export const brandRestorePointInput = z.object({ siteId: z.string().min(1), id: z.string().min(1) });
+export type BrandRestorePointInput = z.infer<typeof brandRestorePointInput>;
+
+// Brand Part 1c (spec §9): colours and fonts read from a website.
+export const extractBrandFromUrlInput = z.object({ siteId: z.string().min(1), url: z.string().trim().min(1).max(2048) });
+export type ExtractBrandFromUrlInput = z.infer<typeof extractBrandFromUrlInput>;

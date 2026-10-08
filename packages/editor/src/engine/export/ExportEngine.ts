@@ -6,6 +6,7 @@
 
 import type JSZip from "jszip";
 import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/element-markup";
+import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { PageData } from "../../shared/types";
 import type {
   ExportConfig,
@@ -46,6 +47,12 @@ import { buildSitemapXml } from "@buildrik/shared/seo/sitemap";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./interactionRuntime";
+import {
+  buildThemeToggleRuntimeScript,
+  siteHasThemeToggle,
+  THEME_BOOT_SCRIPT,
+  THEME_TOGGLE_ATTR,
+} from "./themeToggleRuntime";
 import { classTokens, isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
 import { embedFrameHTML } from "@/shared/utils/embed/embedFrameHTML";
 
@@ -299,6 +306,16 @@ export class ExportEngine {
     return { migrate: this.composer.designSystem?.brandTokensV2 !== false };
   }
 
+  /** Whether any page carries a theme-toggle block, and whether the site's
+   *  Dark mode is Auto — Off ships the toggle hidden, with no boot script and
+   *  no runtime (spec D12). */
+  private themeToggleState(): { has: boolean; auto: boolean } {
+    return {
+      has: siteHasThemeToggle(this.composer.elements.getAllElements?.() ?? []),
+      auto: DarkModeSchema.catch("off").parse(this.composer.getProjectSettings?.()?.darkMode) === "auto",
+    };
+  }
+
   /**
    * The three font families the SITE names in its own tokens. They reach the
    * page through `siteFontCSS`, so they need fetching just like a family an
@@ -364,7 +381,7 @@ export class ExportEngine {
        `var(--buildrick-design-*)`, and an export that names them without
        declaring them resolves to nothing on the published page. */
     const settings = this.composer.getProjectSettings?.();
-    css += emitSiteTokenCss(settings, this.brandSwitch());
+    css += emitSiteTokenCss(settings, { ...this.brandSwitch(), hasThemeToggle: this.themeToggleState().has });
     css += siteFontCSS(siteFontsFromSettings(settings, this.brandSwitch()));
 
     const page = this.composer.elements.getActivePage?.();
@@ -601,6 +618,10 @@ export class ExportEngine {
       head += `${indent}<meta name="viewport" content="width=device-width, initial-scale=1.0">${nl}`;
     }
 
+    // An Auto site's stored theme choice applies before any stylesheet paints.
+    const toggle = this.themeToggleState();
+    if (toggle.has && toggle.auto) head += `${indent}${THEME_BOOT_SCRIPT}${nl}`;
+
 
 
     // The page's SEO, from the SAME emitter the published page uses. This
@@ -691,12 +712,14 @@ export class ExportEngine {
     const interactionScript = content.includes(INTERACTION_ATTR)
       ? buildInteractionRuntimeScript() + nl
       : "";
+    const themeToggleScript =
+      toggle.auto && content.includes(THEME_TOGGLE_ATTR) ? buildThemeToggleRuntimeScript() + nl : "";
 
     const bodyScripts = sanitizeHeadCode(customCode?.bodyScripts);
     const bodyTail = bodyScripts ? `${nl}${indent}${bodyScripts}` : "";
 
     const lang = resolveLanguage(this.composer.getProjectSettings?.()?.seo);
-    return `<!DOCTYPE html>${nl}<html lang="${lang}">${nl}<head>${nl}${head}</head>${nl}<body>${nl}${content}${interactionScript}${bodyTail}</body>${nl}</html>`;
+    return `<!DOCTYPE html>${nl}<html lang="${lang}">${nl}<head>${nl}${head}</head>${nl}<body>${nl}${content}${interactionScript}${themeToggleScript}${bodyTail}</body>${nl}</html>`;
   }
 
   /**
@@ -819,7 +842,7 @@ export class ExportEngine {
        day. */
     const projectSettings = this.composer.getProjectSettings?.();
     const siteCss =
-      emitSiteTokenCss(projectSettings, this.brandSwitch()) +
+      emitSiteTokenCss(projectSettings, { ...this.brandSwitch(), hasThemeToggle: this.themeToggleState().has }) +
       siteFontCSS(siteFontsFromSettings(projectSettings, this.brandSwitch()));
 
     /* The reset leads, as in `generateCSS`: it carries the base body font
@@ -965,6 +988,8 @@ export class ExportEngine {
       '  <meta charset="UTF-8">',
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0">',
     ];
+    const toggle = this.themeToggleState();
+    if (toggle.has && toggle.auto) headParts.push(`  ${THEME_BOOT_SCRIPT}`);
 
     // Inject SEO meta tags (title, description, OG, Twitter cards, etc.)
     const seoTags = this.seoInjector.inject(page, siteSEO);
@@ -1013,6 +1038,8 @@ export class ExportEngine {
     const interactionScript = bodyContent.includes(INTERACTION_ATTR)
       ? "\n" + buildInteractionRuntimeScript()
       : "";
+    const themeToggleScript =
+      toggle.auto && bodyContent.includes(THEME_TOGGLE_ATTR) ? "\n" + buildThemeToggleRuntimeScript() : "";
 
     let html = `<!DOCTYPE html>
 <html lang="${resolveLanguage(siteSEO)}">
@@ -1020,7 +1047,7 @@ export class ExportEngine {
 ${headParts.join("\n")}
 </head>
 <body>
-${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts) ? `\n  ${sanitizeHeadCode(siteCustomCode?.bodyScripts)}` : ""}
+${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts) ? `\n  ${sanitizeHeadCode(siteCustomCode?.bodyScripts)}` : ""}
 </body>
 </html>`;
 

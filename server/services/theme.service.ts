@@ -1,7 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeProjectStyles } from "@/lib/sanitize-blocks";
-import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
+import { validateTokens, TOKENS_SCHEMA_VERSION, DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
+import type { DarkMode } from "@buildrik/shared/schemas/design-tokens";
+import type { CreateBrandRestorePointInput } from "@buildrik/shared/schemas/theme";
 import { buildTokenUsageIndex, keepInUseSiteTokens, migrateTokensToV6 } from "@buildrik/shared/tokens";
 import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
 import { isBrandTokensV2Enabled } from "@server/services/brand-tokens";
@@ -649,6 +651,67 @@ export async function listBrandRestorePoints(
   return rows
     .filter((r) => readTokenTheme(r.prevStyles) !== null)
     .map(({ id, reason, createdAt }) => ({ id, reason, createdAt }));
+}
+
+/** A restore point the editor takes before a generator, Dark-Auto or logo
+ *  apply (spec §8). The token set must be a valid v6 set. Writing it changes
+ *  neither lastEditedAt nor dsSchemaVersion, so no open editor reloads. */
+export async function createBrandRestorePoint(
+  input: CreateBrandRestorePointInput,
+): Promise<{ id: string; createdAt: Date }> {
+  const checked = validateTokens(input.designTokens);
+  if (!checked.ok) throw new ThemeError("BAD_REQUEST", `Restore point refused: ${checked.reason}`);
+  const site = await prisma.site.findFirst({
+    where: { id: input.siteId, deletedAt: null },
+    select: { workspaceId: true, dsSchemaVersion: true },
+  });
+  if (!site) throw new ThemeError("NOT_FOUND", "Site not found");
+  const theme: TokenTheme = input.designPresets
+    ? { designTokens: checked.tokens, designPresets: input.designPresets }
+    : { designTokens: checked.tokens };
+  const row = await prisma.siteThemeSnapshot.create({
+    data: {
+      siteId: input.siteId,
+      workspaceId: site.workspaceId,
+      prevStyles: theme as unknown as Prisma.InputJsonValue,
+      prevDsSchemaVersion: site.dsSchemaVersion,
+      reason: input.reason,
+      tokensSchemaVersion: TOKENS_SCHEMA_VERSION,
+      darkMode: input.darkMode,
+    },
+    select: { id: true, createdAt: true },
+  });
+  await pruneThemeSnapshots(input.siteId);
+  return row;
+}
+
+export interface BrandRestorePoint {
+  id: string;
+  reason: string;
+  createdAt: Date;
+  designTokens: unknown[];
+  designPresets?: unknown[];
+  tokensSchemaVersion: number;
+  darkMode: DarkMode | null;
+}
+
+/** One restore point's token set, for the editor to restore (spec §8: restore
+ *  runs in the editor). Legacy projectStyles rows are NOT_FOUND here — they
+ *  stay admin-rollback-only (eng E6). */
+export async function getBrandRestorePoint(siteId: string, id: string): Promise<BrandRestorePoint> {
+  const row = await prisma.siteThemeSnapshot.findFirst({ where: { id, siteId, site: { deletedAt: null } } });
+  const theme = row ? readTokenTheme(row.prevStyles) : null;
+  if (!row || !theme) throw new ThemeError("NOT_FOUND", "Restore point not found");
+  const darkMode = DarkModeSchema.safeParse(row.darkMode);
+  return {
+    id: row.id,
+    reason: row.reason,
+    createdAt: row.createdAt,
+    designTokens: theme.designTokens,
+    ...(theme.designPresets ? { designPresets: theme.designPresets } : {}),
+    tokensSchemaVersion: row.tokensSchemaVersion,
+    darkMode: darkMode.success ? darkMode.data : null,
+  };
 }
 
 /**
