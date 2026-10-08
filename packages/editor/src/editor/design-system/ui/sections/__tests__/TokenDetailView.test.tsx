@@ -577,6 +577,26 @@ describe("TokenDetailView", () => {
     expect(list!.textContent).toMatch(/borderColor/);
   });
 
+  it("counts elements, not refs, and labels a breakpoint / pseudo-state use", () => {
+    const refs: UsageRef[] = [
+      { elementId: "el-1", styleProp: "color" },
+      { elementId: "el-1", styleProp: "background-color", context: "tablet" },
+      { elementId: "el-2", styleProp: "border-color", context: "hover" },
+    ];
+    const composer = makeMockComposer({
+      usage: { getBreakdown: () => refs },
+      elements: [
+        { id: "el-1", type: "button" },
+        { id: "el-2", type: "section" },
+      ],
+    });
+    const { container } = render(wrap(<TokenDetailView token={colorToken} composer={composer} />));
+    expect(container.querySelector('[data-testid="brand-token-usedby-value"]')!.textContent).toBe("2 elements");
+    fireEvent.click(container.querySelector("[data-used-by-toggle]") as HTMLButtonElement);
+    const entries = [...container.querySelectorAll("[data-used-by-entry]")].map((e) => e.textContent);
+    expect(entries).toEqual(["Button· color", "Button· background-color · tablet", "Section· border-color · hover"]);
+  });
+
   it("Click element entry → selection API called with correct element", () => {
     const refs: UsageRef[] = [
       { elementId: "el-target", styleProp: "color" },

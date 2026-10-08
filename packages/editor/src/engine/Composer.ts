@@ -482,6 +482,9 @@ export class Composer extends EventEmitter {
     this.on(EVENTS.ELEMENT_DELETED, scheduleRecomputeTokenUsage);
     this.on(EVENTS.ELEMENT_UPDATED, scheduleRecomputeTokenUsage);
     this.on(EVENTS.ELEMENT_STYLE_UPDATED, scheduleRecomputeTokenUsage);
+    // Breakpoint overrides and pseudo-state rules are an element's uses too.
+    this.on(EVENTS.STYLE_CHANGED, scheduleRecomputeTokenUsage);
+    this.on(EVENTS.STYLE_REMOVED, scheduleRecomputeTokenUsage);
     // The site-wide count also reads tokens, project styles, saved components
     // and presets: those changes only mark it stale (it rebuilds on next read).
     const invalidateTokenUsage = () => tokenUsage.invalidate();
@@ -1032,7 +1035,7 @@ ${html}${interactionScript}
 
   /** Rebuilds the element breakdown now (the event path coalesces it into a microtask). */
   private recomputeTokenUsage(): void {
-    this.designSystem.tokenUsage.recompute(this.elements.getAllElements());
+    this.designSystem.tokenUsage.recompute(this.elements.getAllElements(), this.styles.exportStyles());
   }
 
   /** The site's tokens as every write starts from them: the saved set merged

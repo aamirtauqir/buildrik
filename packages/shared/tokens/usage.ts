@@ -9,6 +9,8 @@
  * `legacyNames` — never by assuming `--buildrick-design-<id>`; the seed's
  * radius/shadow tokens live under `--bd-*`. A source the caller could not read
  * makes every count "unknown", never 0: delete must refuse rather than guess.
+ * A breakpoint override counts once, though it is stored as a rule and on the
+ * element (`withoutMirroredOverrides`).
  */
 import type { DesignToken } from "../schemas/design-tokens";
 
@@ -49,6 +51,56 @@ export function scanTokenRefs(text: string, byVar: ReadonlyMap<string, string>):
   return ids;
 }
 
+/** An element's own rule (breakpoint overrides land here): `[data-buildrick-id="<id>"]`, no pseudo. */
+const ELEMENT_RULE_RE = /^\[data-buildrick-id="([^"]+)"\]$/;
+
+/** `id|prop|value` → how many element rules carry it, read from every source
+ *  that is a list of style rules (`{ selector, properties }`). */
+function elementRuleBindings(sources: readonly unknown[]): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const src of sources) {
+    if (!Array.isArray(src)) continue;
+    for (const rule of src) {
+      const sel = (rule as { selector?: unknown })?.selector;
+      const props = (rule as { properties?: unknown })?.properties;
+      if (typeof sel !== "string" || typeof props !== "object" || props === null) continue;
+      const id = ELEMENT_RULE_RE.exec(sel)?.[1];
+      if (!id) continue;
+      for (const [prop, value] of Object.entries(props)) {
+        if (typeof value === "string") out.set(`${id}|${prop}|${value}`, (out.get(`${id}|${prop}|${value}`) ?? 0) + 1);
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * A breakpoint override is stored twice: the element's style rule (what
+ * renders) and the element's `breakpointStyles` mirror. The serializer drops
+ * each mirror entry a rule already carries, one rule per entry, so the
+ * binding counts once; a mirror no rule matches still counts.
+ */
+function withoutMirroredOverrides(rules: Map<string, number>) {
+  return function (this: unknown, key: string, value: unknown): unknown {
+    if (key !== "breakpointStyles" || rules.size === 0 || typeof value !== "object" || value === null) return value;
+    const id = (this as { id?: unknown }).id;
+    if (typeof id !== "string") return value;
+    const kept: Record<string, Record<string, unknown>> = {};
+    for (const [bp, styles] of Object.entries(value as Record<string, unknown>)) {
+      if (typeof styles !== "object" || styles === null) continue;
+      const left: Record<string, unknown> = {};
+      for (const [prop, v] of Object.entries(styles)) {
+        const k = `${id}|${prop}|${String(v)}`;
+        const n = rules.get(k) ?? 0;
+        if (typeof v === "string" && n > 0) rules.set(k, n - 1);
+        else left[prop] = v;
+      }
+      kept[bp] = left;
+    }
+    return kept;
+  };
+}
+
 export function buildTokenUsageIndex(
   sources: readonly unknown[],
   tokens: readonly DesignToken[],
@@ -57,10 +109,11 @@ export function buildTokenUsageIndex(
   const byVar = tokenIdsByVarName(tokens);
   const direct = new Map<string, number>();
   const unavailable = [...(opts.unavailable ?? [])];
+  const replacer = withoutMirroredOverrides(elementRuleBindings(sources));
   for (const [i, src] of sources.entries()) {
     let text: string;
     try {
-      text = JSON.stringify(src) ?? "";
+      text = JSON.stringify(src, replacer) ?? "";
     } catch {
       unavailable.push(`source ${i}`);
       continue;
