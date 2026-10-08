@@ -85,3 +85,34 @@ describe("scanTokenRefs", () => {
     expect(scanTokenRefs("{{token.color-primary}}", byVar)).toEqual(["color-primary"]);
   });
 });
+
+/* A breakpoint override is written twice — the element's own style rule
+   (`[data-buildrick-id]` + media query, what renders) and the element's
+   `breakpointStyles` mirror (serialisation, React export). One binding. */
+describe("buildTokenUsageIndex · breakpoint overrides", () => {
+  const P = "var(--buildrick-design-color-primary)";
+  const page = (breakpointStyles: Record<string, Record<string, string>>) => [
+    { id: "p", root: { id: "root", children: [{ id: "btn", styles: { color: P }, breakpointStyles }] } },
+  ];
+
+  it("counts an override stored as a rule and as the element's mirror once", () => {
+    const styles = [
+      { id: "s1", selector: '[data-buildrick-id="btn"]', mediaQuery: "(max-width: 1023px)", properties: { "background-color": P } },
+      { id: "s2", selector: '[data-buildrick-id="btn"]:hover', pseudo: ":hover", properties: { "border-color": P } },
+    ];
+    const idx = buildTokenUsageIndex([page({ tablet: { "background-color": P } }), styles], tokens);
+    expect(idx.direct.get("color-primary")).toBe(3); // base + tablet + hover
+    expect(idx.total("blue-600")).toBe(3);
+  });
+
+  it("still counts a mirror no rule matches — never a false zero", () => {
+    const idx = buildTokenUsageIndex([page({ mobile: { "background-color": P } }), []], tokens);
+    expect(idx.direct.get("color-primary")).toBe(2);
+  });
+
+  it("a rule on another element does not cancel this element's mirror", () => {
+    const styles = [{ selector: '[data-buildrick-id="other"]', mediaQuery: "(max-width: 1023px)", properties: { "background-color": P } }];
+    const idx = buildTokenUsageIndex([page({ tablet: { "background-color": P } }), styles], tokens);
+    expect(idx.direct.get("color-primary")).toBe(3);
+  });
+});
