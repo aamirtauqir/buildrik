@@ -39,14 +39,14 @@ import { useGuardedApply } from "@/editor/design-system/state/useGuardedApply";
 
 // ─── Proposal (pure) ──────────────────────────────────────────────────────────
 
-export interface FontChoice {
+interface FontChoice {
   heading?: { family: string; replaced?: string };
   body?: { family: string; replaced?: string };
 }
 
 /** The brand a logo or site proposes: Primary (and Accent) get a generated
  *  scale, the heading/body families their closest catalogue family. */
-export function brandProposal(tokens: readonly DesignToken[], roles: BrandRoles, fonts: FontChoice = {}): DesignToken[] {
+function brandProposal(tokens: readonly DesignToken[], roles: BrandRoles, fonts: FontChoice = {}): DesignToken[] {
   let out: DesignToken[] = [...tokens];
   for (const [roleId, hex] of [["color-primary", roles.primary], ["color-accent", roles.accent]] as const) {
     const scale = hex ? generateColorScale(hex) : null;

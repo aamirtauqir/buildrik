@@ -19,7 +19,6 @@
  */
 
 import { flatCatalog } from "./catalog";
-import type { FlatElEntry } from "./types";
 import { getBlockDefinitions, componentBlockDefinitions, type BlockDefinition } from "../../../../../blocks/blockRegistry";
 
 export type InsertGroupId = "favourites" | "recent" | "elements" | "blocks" | "components" | "mine";
@@ -33,9 +32,6 @@ export interface InsertGroup {
   /** Every group expands inline and inserts directly. */
   kind: "inline";
 }
-
-/** ELEMENTS — every element def, flat, exactly as the board lists them. */
-export const elementRows: FlatElEntry[] = flatCatalog;
 
 /** COMPONENTS — the registry's Components-folder subset (board 1069:4790). */
 export const componentRows: BlockDefinition[] = componentBlockDefinitions;
@@ -55,7 +51,8 @@ export function buildInsertGroups(
   mineCount: number | null,
   favCount = 0,
   recentCount = 0,
-  elementCount = elementRows.length,
+  /** ELEMENTS' rows — the catalog less what the site does not offer (BRP1-M12). */
+  elementCount = flatCatalog.length,
 ): InsertGroup[] {
   return [
     ...(favCount ? [{ id: "favourites" as const, label: "★ FAVOURITES", count: favCount, kind: "inline" as const }] : []),
