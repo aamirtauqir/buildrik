@@ -178,8 +178,12 @@ const SPACING_PRESETS: [SpacingPreset, string][] = [
   ["spacious", "Spacious · 6px"],
 ];
 
+/* The disabled look is spelled out: on a read-only site the action is
+   disabled by its EditLock fieldset, not by its own prop, and flowbite only
+   applies its disabled theme for the prop (BRP1-M1 greys the header). */
 const PAGE_ACTION =
-  "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)]";
+  "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] " +
+  "tw:disabled:border-transparent tw:disabled:bg-[var(--bk-bg-subtle)] tw:disabled:text-[var(--bk-ink-muted)]";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
