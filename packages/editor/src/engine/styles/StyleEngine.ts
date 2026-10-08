@@ -20,6 +20,9 @@ import { generateId, camelToKebab } from "../../shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 
+/** The Inspector State menu's states (Base · :hover · :focus · :active · :disabled). */
+const STATE_PSEUDO = /:(hover|focus|focus-visible|focus-within|active|disabled)\b/;
+
 /**
  * Manages CSS styles and selectors
  */
@@ -648,8 +651,27 @@ export class StyleEngine {
    */
   flush(): void {
     if (!this.pendingUpdate || !this.styleElement) return;
-    this.styleElement.textContent = this.toCSS() + this.editorDevicePreviewCSS();
+    this.styleElement.textContent = this.toCSS() + this.editorStatePreviewCSS() + this.editorDevicePreviewCSS();
     this.pendingUpdate = false;
+  }
+
+  /**
+   * The canvas renders an element's BASE styles inline, and inline beats any
+   * stylesheet rule — so a `:hover` / `:focus` rule set in the Inspector's
+   * State menu never showed on the canvas (L2-008: hover fill set, rule in the
+   * sheet, computed background unchanged under the pointer). Re-emit the
+   * state rules `!important`, editor-only, the same answer the device block
+   * below gives breakpoint rules. Placed before that block so a tablet/mobile
+   * state rule it re-emits still wins by order. Exports never see this: the
+   * publish path emits base styles as class rules, which a state rule
+   * out-specifies on its own.
+   */
+  private editorStatePreviewCSS(): string {
+    const out = this.writableRules()
+      .filter((style) => !style.mediaQuery && (style.pseudo || STATE_PSEUDO.test(style.selector)))
+      .map((style) => this.generateStyleRule(style, undefined, true));
+    if (out.length === 0) return "";
+    return `\n\n/* editor state preview — state rules over the inline base styles */\n${out.join("\n")}`;
   }
 
   /**
