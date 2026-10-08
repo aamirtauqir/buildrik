@@ -14,6 +14,8 @@ import type { LintIssue } from "../../../engine/designSystem/linter";
 import type { LintIssue as StoredLintIssue } from "../../../engine/designSystem/LintState";
 import { buildContrastIssues } from "../utils/contrastLint";
 import { EVENTS } from "../../../shared/constants/events";
+import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
+import { siteHasThemeToggle } from "@/engine/export/themeToggleRuntime";
 import {
   useColorRegistry,
   useSpacingRegistry,
@@ -53,6 +55,19 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
     };
   }, [composer]);
 
+  /* Dark mode and the site's elements feed the theme-toggle check, so a
+     settings change or an inserted/deleted element re-lints (debounced). */
+  const [siteNonce, setSiteNonce] = React.useState(0);
+  React.useEffect(() => {
+    if (!composer || typeof composer.on !== "function") return;
+    const bump = () => setSiteNonce((n) => n + 1);
+    const events = [EVENTS.SETTINGS_CHANGE, EVENTS.ELEMENT_CREATED, EVENTS.ELEMENT_DELETED] as const;
+    for (const e of events) composer.on(e, bump);
+    return () => {
+      for (const e of events) composer.off(e, bump);
+    };
+  }, [composer]);
+
   React.useEffect(() => {
     if (!composer) return;
     const immediate = runNonce !== lastNonce.current;
@@ -62,9 +77,20 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
          mode. Merged so the Lint destination, the banner and the colour
          list's chip can never tell three different stories again. */
       const mode = composer.colorMode?.resolved?.() ?? "light";
+      const off = DarkModeSchema.catch("off").parse(composer.getProjectSettings?.()?.darkMode) === "off";
+      const hiddenToggle: LintIssue[] =
+        off && siteHasThemeToggle(composer.elements?.getAllElements?.() ?? [])
+          ? [{
+              rule: "theme-toggle-hidden",
+              severity: "warning",
+              tokenId: "site",
+              message: "Dark mode is off, so the theme toggle is hidden on the published site.",
+            }]
+          : [];
       const found = [
         ...composer.dsLinter.lint(allTokens),
         ...buildContrastIssues(colorState?.tokens ?? [], mode),
+        ...hiddenToggle,
       ];
       setIssues(found);
 
@@ -84,7 +110,7 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
       composer.designSystem?.lintState?.setAllIssues(byToken);
     }, immediate ? 0 : DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [composer, allTokens, runNonce]);
+  }, [composer, allTokens, runNonce, siteNonce]);
 
   return issues;
 }

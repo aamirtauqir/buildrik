@@ -23,6 +23,9 @@ export type LintRuleId =
      linter does not have. In the union so every consumer speaks one
      vocabulary. */
   | "contrast"
+  /* Computed editor-side from settings + elements, like contrast: a theme
+     toggle on a site whose Dark mode is Off is hidden on publish (D12). */
+  | "theme-toggle-hidden"
   | "banned-hue"
   | "pure-black"
   | "empty-value"

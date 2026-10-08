@@ -13,7 +13,7 @@
  */
 
 export const THEME_TOGGLE_ATTR = "data-bk-theme-toggle";
-const THEME_TOGGLE_ICON_ATTR = "data-bk-tt";
+export const THEME_TOGGLE_ICON_ATTR = "data-bk-tt";
 const THEME_STORAGE_KEY = "buildrick-theme";
 
 export function initThemeToggleRuntime(root: ParentNode): () => void {
