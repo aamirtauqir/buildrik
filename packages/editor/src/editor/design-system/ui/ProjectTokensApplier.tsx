@@ -13,6 +13,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { emitTokenCss } from "@buildrik/shared/tokens";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { tokensForEmit } from "@/engine/designSystem/projectTokens";
+import { siteHasThemeToggle, themeToggleCss } from "@/engine/export/themeToggleRuntime";
 
 const STYLE_ID = "bk-site-tokens";
 
@@ -36,7 +37,11 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
         style.id = STYLE_ID;
         document.head.appendChild(style);
       }
-      const css = emitTokenCss(tokens, { darkMode });
+      /* The canvas always swaps a theme toggle's icons, even on an Off site —
+         publish hides it there, the canvas shows it with the board's note. */
+      const css =
+        emitTokenCss(tokens, { darkMode }) +
+        (siteHasThemeToggle(composer.elements?.getAllElements?.() ?? []) ? themeToggleCss("show") : "");
       if (style.textContent !== css) style.textContent = css;
       document.documentElement.dataset.theme =
         darkMode === "off" ? "light" : (composer.colorMode?.resolved?.() ?? "light");
@@ -49,11 +54,15 @@ export const ProjectTokensApplier: React.FC<ProjectTokensApplierProps> = ({ comp
     composer.on(EVENTS.PROJECT_LOADED, schedule);
     composer.on(EVENTS.SETTINGS_CHANGE, schedule);
     composer.on("colorMode:changed", schedule);
+    composer.on(EVENTS.ELEMENT_CREATED, schedule);
+    composer.on(EVENTS.ELEMENT_DELETED, schedule);
     return () => {
       if (frame) cancelAnimationFrame(frame);
       composer.off(EVENTS.PROJECT_LOADED, schedule);
       composer.off(EVENTS.SETTINGS_CHANGE, schedule);
       composer.off("colorMode:changed", schedule);
+      composer.off(EVENTS.ELEMENT_CREATED, schedule);
+      composer.off(EVENTS.ELEMENT_DELETED, schedule);
       document.getElementById(STYLE_ID)?.remove();
       delete document.documentElement.dataset.theme;
     };

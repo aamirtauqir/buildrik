@@ -10,6 +10,7 @@ import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
 import { resolveTokenLiteral, emitTokenCss } from "@buildrik/shared/tokens";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { tokensForEmit } from "../designSystem/projectTokens";
+import { themeToggleCss } from "./themeToggleRuntime";
 import type { DesignToken } from "../designSystem/types";
 
 /** The slice of project settings the token emitters read. */
@@ -119,11 +120,16 @@ export function siteFontCSS(fonts: {
  * ship; a token the emitter cannot write is skipped and reported, never thrown.
  * `opts.migrate` is the brand switch (see `tokensForEmit`).
  */
-export function emitSiteTokenCss(settings: SiteTokenSettings | undefined, opts?: { migrate: boolean }): string {
-  return emitTokenCss(tokensForEmit(settings, opts), {
-    darkMode: DarkModeSchema.catch("off").parse(settings?.darkMode),
+export function emitSiteTokenCss(
+  settings: SiteTokenSettings | undefined,
+  opts?: { migrate: boolean; hasThemeToggle?: boolean },
+): string {
+  const darkMode = DarkModeSchema.catch("off").parse(settings?.darkMode);
+  const css = emitTokenCss(tokensForEmit(settings, opts), {
+    darkMode,
     onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
   });
+  return opts?.hasThemeToggle ? css + themeToggleCss(darkMode === "auto" ? "show" : "hide") : css;
 }
 
 /**
