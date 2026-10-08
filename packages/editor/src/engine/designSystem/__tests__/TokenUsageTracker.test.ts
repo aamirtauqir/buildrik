@@ -519,3 +519,65 @@ describe("TokenUsageTracker via Composer · loaded project", () => {
     expect(c.designSystem.tokenUsage.getBreakdown("color-primary")).toEqual([]);
   });
 });
+
+/* A token used only in a breakpoint override or a pseudo-state rule is still
+   that element's use: the site-wide count always saw the rule, the element
+   breakdown did not, so Brand called it "shared styles" and outlined nothing. */
+describe("TokenUsageTracker · breakpoint and pseudo-state rules", () => {
+  const PRIMARY = "var(--buildrick-design-color-primary)";
+  const rule = (selector: string, properties: Record<string, string>, mediaQuery?: string) => ({ selector, properties, mediaQuery });
+
+  it("names the element and its context for a breakpoint or pseudo rule", () => {
+    const t = new TokenUsageTracker(() => [], () => ({ sources: [], unavailable: [] }));
+    t.recompute(
+      [makeStub({}, "btn"), makeStub({}, "card")],
+      [
+        rule('[data-buildrick-id="btn"]', { "background-color": PRIMARY }, "(max-width: 1023px)"),
+        rule('[data-buildrick-id="card"]:hover', { "border-color": PRIMARY }),
+        rule('[data-buildrick-id="card"]:focus-visible', { color: PRIMARY }, "(max-width: 767px)"),
+        rule('[data-buildrick-id="gone"]', { color: PRIMARY }, "(max-width: 767px)"),
+        rule(".btn-class", { color: PRIMARY }),
+      ],
+    );
+    expect(t.getBreakdown("color-primary")).toEqual([
+      { elementId: "btn", styleProp: "background-color", context: "tablet" },
+      { elementId: "card", styleProp: "border-color", context: "hover" },
+      { elementId: "card", styleProp: "color", context: "mobile · focus-visible" },
+    ]);
+  });
+
+  describe("via Composer", () => {
+    beforeAll(installEngineBrowserStubs);
+    afterAll(removeEngineBrowserStubs);
+    const flush = async () => {
+      for (let i = 0; i < 3; i++) await Promise.resolve();
+    };
+
+    it("a tablet override and a hover rule each count as an element use", async () => {
+      const c = createTestComposer();
+      const root = (c.elements.getActivePage() ?? c.elements.createPage("Home")).root.id;
+      const el = c.elements.createElement("button", { content: "Go", styles: { color: "#fff" } });
+      c.elements.addElement(el, root);
+      await flush();
+      expect(c.designSystem.tokenUsage.getBreakdown("color-primary")).toEqual([]);
+
+      c.styles.setBreakpointStyle(el.getId(), "tablet", { "background-color": PRIMARY });
+      await flush();
+      expect(c.designSystem.tokenUsage.getBreakdown("color-primary")).toEqual([
+        { elementId: el.getId(), styleProp: "background-color", context: "tablet" },
+      ]);
+
+      c.styles.setRule(`[data-buildrick-id="${el.getId()}"]`, { "border-color": PRIMARY }, { pseudo: ":hover" });
+      await flush();
+      expect(c.designSystem.tokenUsage.getBreakdown("color-primary")).toContainEqual({
+        elementId: el.getId(),
+        styleProp: "border-color",
+        context: "hover",
+      });
+
+      c.styles.clearBreakpointStyles(el.getId(), "tablet");
+      await flush();
+      expect(c.designSystem.tokenUsage.getBreakdown("color-primary").map((r) => r.context)).toEqual(["hover"]);
+    });
+  });
+});

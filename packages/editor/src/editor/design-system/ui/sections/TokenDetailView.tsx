@@ -170,7 +170,9 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       tracker.off("tokenUsage:changed", handler);
     };
   }, [tracker, readBreakdown]);
-  const usageCount = usageRefs.length;
+  /* One element can bind the token several times (base, tablet, :hover) —
+     the row says "elements", so count elements. */
+  const usageCount = new Set(usageRefs.map((r) => r.elementId)).size;
   const [usageExpanded, setUsageExpanded] = React.useState(false);
 
   // ─ Lint: subscribe to lint:changed; snapshot visible (non-suppressed) issues.
@@ -594,6 +596,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             const name = type
               ? (ELEMENT_TYPE_LABELS[type] ?? type.charAt(0).toUpperCase() + type.slice(1))
               : ref.elementId;
+            const where = ref.context ? `${ref.styleProp} · ${ref.context}` : ref.styleProp;
             return (
               <li key={`${ref.elementId}-${ref.styleProp}-${idx}`}>
                 <Button
@@ -604,12 +607,12 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                     const target = composer?.elements?.getElement?.(ref.elementId);
                     if (target) composer?.selection?.select(target);
                   }}
-                  aria-label={`Select ${name} · ${ref.styleProp}`}
+                  aria-label={`Select ${name} · ${where}`}
                   data-used-by-entry={ref.elementId}
                   className={`${LINK} tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)]`}
                 >
                   <span>{name}</span>
-                  <span className={`tw:ml-1 tw:text-[var(--bk-ink-muted)] ${MONO}`}>· {ref.styleProp}</span>
+                  <span className={`tw:ml-1 tw:text-[var(--bk-ink-muted)] ${MONO}`}>· {where}</span>
                 </Button>
               </li>
             );

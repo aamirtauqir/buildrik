@@ -29,11 +29,31 @@ import {
 import type { Element } from "../elements/Element";
 import { EventEmitter } from "../EventEmitter";
 import type { DesignToken } from "./types";
+import type { StyleData } from "@/shared/types/style";
+import { BREAKPOINT_QUERIES } from "@/shared/constants/breakpoints";
 
 /** One binding: which element / style property references a token. */
 export interface UsageRef {
   readonly elementId: string;
   readonly styleProp: string;
+  /** Set when the binding lives in an element's breakpoint override or
+   *  pseudo-state rule, not its own styles: "tablet", "hover",
+   *  "mobile · hover". */
+  readonly context?: string;
+}
+
+/** An element's own rule: `[data-buildrick-id="<id>"]`, optionally `:<pseudo>`. */
+const ELEMENT_RULE_RE = /^\[data-buildrick-id="([^"]+)"\](?::{1,2}([A-Za-z-]+))?$/;
+const BREAKPOINT_BY_QUERY = new Map(
+  Object.entries(BREAKPOINT_QUERIES).flatMap(([id, query]) => (query ? [[query, id] as const] : [])),
+);
+
+/** "tablet", "hover", "mobile · hover" — or undefined for the element's base rule. */
+function ruleContext(mediaQuery: string | undefined, pseudo: string | undefined): string | undefined {
+  const parts = [mediaQuery ? (BREAKPOINT_BY_QUERY.get(mediaQuery) ?? mediaQuery) : null, pseudo ?? null].filter(
+    (p): p is string => p !== null,
+  );
+  return parts.length > 0 ? parts.join(" · ") : undefined;
 }
 
 export class TokenUsageTracker extends EventEmitter {
@@ -47,20 +67,32 @@ export class TokenUsageTracker extends EventEmitter {
     super();
   }
 
-  recompute(elements: readonly Element[]): void {
+  /** Rebuilds the element breakdown from each element's own styles and from
+   *  the style rules that target one element (breakpoint overrides,
+   *  pseudo-states). Rules for elements not in `elements` are skipped. */
+  recompute(elements: readonly Element[], rules: readonly Pick<StyleData, "selector" | "properties" | "mediaQuery">[] = []): void {
     this.refs.clear();
     const byVar = tokenIdsByVarName(this.readTokens());
-    for (const el of elements) {
-      const elementId = el.getId();
-      for (const [styleProp, value] of Object.entries(el.getStyles())) {
+    const add = (styles: Record<string, unknown>, elementId: string, context?: string) => {
+      for (const [styleProp, value] of Object.entries(styles)) {
         if (typeof value !== "string") continue;
         for (const id of scanTokenRefs(value, byVar)) {
+          const entry: UsageRef = context ? { elementId, styleProp, context } : { elementId, styleProp };
           const bucket = this.refs.get(id);
-          const entry: UsageRef = { elementId, styleProp };
           if (bucket) bucket.push(entry);
           else this.refs.set(id, [entry]);
         }
       }
+    };
+    const known = new Set<string>();
+    for (const el of elements) {
+      known.add(el.getId());
+      add(el.getStyles(), el.getId());
+    }
+    for (const rule of rules) {
+      const m = ELEMENT_RULE_RE.exec(rule.selector);
+      if (!m || !known.has(m[1])) continue;
+      add(rule.properties, m[1], ruleContext(rule.mediaQuery, m[2]));
     }
     this.invalidate();
   }
