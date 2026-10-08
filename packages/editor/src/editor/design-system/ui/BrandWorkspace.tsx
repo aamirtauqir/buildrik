@@ -99,6 +99,9 @@ import { takeBrandPageRequest, takeBrandTokenRequest } from "./brandOpenRequest"
 import { ConnectTokensCheck } from "./sections/ConnectTokensCheck";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
+import { DarkModeCard } from "./sections/DarkModeCard";
+import { useSiteDarkMode } from "../state/useColorMode";
+import type { BrandPreview as CanvasPreview } from "@/engine/designSystem/types";
 import { ColorModeToggle } from "./ColorModeToggle";
 import { useDSLint } from "../state/useDSLint";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
@@ -161,6 +164,8 @@ function isPageId(value: string): value is BrandPageId {
 
 function pageLabel(id: BrandPageId): string {
   if (id === "connect") return "Connect to tokens";
+  /* BRP1-M8 titles the Colour mode page by its card: "Dark mode". */
+  if (id === "colour-mode") return "Dark mode";
   return NAV.find((n) => n.id === id)?.label
     ?? MORE_KINDS.find((k) => `kind-${k.kind}` === id)?.label
     ?? id;
@@ -258,7 +263,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const [aiOpen, setAiOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
 
-  // T10 / spec D8: outermost wrapper gets data-ds-preview={resolvedMode} so
+  // T10 / spec D8: outermost wrapper gets data-ds-preview={shownMode} so
   // ds-panel-dark.css can scope overrides to the Brand surface only. Editor
   // chrome (topbar, rail) keeps the canonical light theme.
   const [resolvedMode, setResolvedMode] = React.useState<"light" | "dark">(
@@ -273,6 +278,22 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       composer.off("colorMode:changed", sync);
     };
   }, [composer]);
+
+  /* What the live preview SHOWS (BRP1-M8): a Brand flow's preview first (its
+     tokens and theme), and never dark on a site whose Dark mode is Off — the
+     same rule ProjectTokensApplier paints the canvas by. */
+  const siteDarkMode = useSiteDarkMode(composer);
+  const [canvasPreview, setCanvasPreview] = React.useState<CanvasPreview | null>(() => composer?.designSystem?.preview ?? null);
+  React.useEffect(() => {
+    if (!composer || typeof composer.on !== "function") return;
+    const sync = () => setCanvasPreview(composer.designSystem?.preview ?? null);
+    sync();
+    composer.on(EVENTS.BRAND_PREVIEW_CHANGED, sync);
+    return () => {
+      composer.off(EVENTS.BRAND_PREVIEW_CHANGED, sync);
+    };
+  }, [composer]);
+  const shownMode: "light" | "dark" = canvasPreview?.theme ?? (siteDarkMode === "off" ? "light" : resolvedMode);
 
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
@@ -681,7 +702,13 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "colours":
         return <TokensSection {...tokenPageProps} openKind="color" />;
       case "colour-mode":
-        return <ColourModeSection />;
+        /* BRP1-M8's Dark mode card over the per-token dark values (7316:80949). */
+        return (
+          <div className="tw:flex tw:flex-col tw:gap-4">
+            <DarkModeCard composer={composer} />
+            <ColourModeSection />
+          </div>
+        );
       case "fonts":
         /* 7316:81551 — one card: the font roles, then the type styles. */
         return (
@@ -717,7 +744,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               const tok = tokenById(issue.tokenId);
               if (!tok) return;
               if (issue.rule === "contrast") {
-                const fix = contrastFixFor(tok, color.tokens, resolvedMode);
+                const fix = contrastFixFor(tok, color.tokens, shownMode);
                 if (fix) changeToken(tok.id, fix.value, fix.darkValue);
                 return;
               }
@@ -808,7 +835,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   return (
     <div
-      data-ds-preview={resolvedMode}
+      data-ds-preview={shownMode}
       data-testid="brand-panel"
       className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]"
     >
@@ -949,8 +976,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           {composer?.exportHTML ? (
             <BrandLivePreview
               composer={composer}
-              tokens={allTokens}
-              mode={resolvedMode}
+              tokens={canvasPreview?.tokens ?? allTokens}
+              mode={shownMode}
               controls={previewControls}
               highlightIds={connectIds ?? usageIds}
             />
@@ -969,8 +996,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               <BrandPreview colors={visibleColors} tokens={color.tokens} />
             </section>
           )}
-          {page === "connect" && (
-            /* 8224:234362's guidance card under the preview. */
+          {(page === "connect" || page === "colour-mode") && (
+            /* 8224:234362's (and BRP1-M8's) guidance card under the preview. */
             <section aria-label="About Connect to tokens" className={SIDE_CARD} data-testid="brand-connect-guide">
               <p className={SIDE_CARD_TITLE}>Preview before applying</p>
               <p className={SIDE_CARD_BODY}>
@@ -998,7 +1025,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               token={selectedToken}
               composer={composer}
               allTokens={allTokens}
-              mode={resolvedMode}
+              mode={shownMode}
               onValueChange={changeToken}
               /* Same gate as rename (G3-138): type and spacing have no delete
                  path; offering Delete for them was a silent no-op. */

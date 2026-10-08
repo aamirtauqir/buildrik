@@ -229,8 +229,18 @@ describe("BrandWorkspace › dark preview chrome (T10)", () => {
       resolved: vi.fn(() => resolved),
     };
     Object.assign(composer, { colorMode });
+    /* An Auto site — an Off one never previews dark (BRP1-M8). */
+    composer.settings.darkMode = "auto";
     return { composer, colorMode };
   }
+
+  it("an Off site previews light even when the designer picked dark (BRP1-M8)", () => {
+    const { composer } = makeModeComposer("dark");
+    composer.settings.darkMode = "off";
+    const utils = renderWorkspace(composer);
+    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("light");
+    expect((utils.getByTestId("brand-colour-mode-seg-dark") as HTMLButtonElement).disabled).toBe(true);
+  });
 
   it("initial light / dark mode: the root carries data-ds-preview", () => {
     for (const mode of ["light", "dark"] as const) {

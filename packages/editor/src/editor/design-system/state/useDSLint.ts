@@ -12,7 +12,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { LintIssue } from "../../../engine/designSystem/linter";
 import type { LintIssue as StoredLintIssue } from "../../../engine/designSystem/LintState";
-import { buildContrastIssues } from "../utils/contrastLint";
+import { buildContrastIssues, buildDarkPairIssues } from "../utils/contrastLint";
 import { EVENTS } from "../../../shared/constants/events";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { siteHasThemeToggle } from "@/engine/export/themeToggleRuntime";
@@ -55,13 +55,13 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
     };
   }, [composer]);
 
-  /* Dark mode and the site's elements feed the theme-toggle check, so a
+  /* Dark mode and the site's elements feed the theme-toggle and dark-pair checks, so a
      settings change or an inserted/deleted element re-lints (debounced). */
   const [siteNonce, setSiteNonce] = React.useState(0);
   React.useEffect(() => {
     if (!composer || typeof composer.on !== "function") return;
     const bump = () => setSiteNonce((n) => n + 1);
-    const events = [EVENTS.SETTINGS_CHANGE, EVENTS.ELEMENT_CREATED, EVENTS.ELEMENT_DELETED] as const;
+    const events = [EVENTS.SETTINGS_CHANGE, EVENTS.ELEMENT_CREATED, EVENTS.ELEMENT_DELETED, EVENTS.ELEMENT_UPDATED] as const;
     for (const e of events) composer.on(e, bump);
     return () => {
       for (const e of events) composer.off(e, bump);
@@ -87,10 +87,14 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
               message: "Dark mode is off, so the theme toggle is hidden on the published site.",
             }]
           : [];
+      /* Auto only: what a dark-OS visitor gets when a bound surface flips
+         under raw text (or a bound text colour over a raw fill). */
+      const darkPairs = off ? [] : buildDarkPairIssues(composer.elements?.getAllElements?.() ?? [], colorState?.tokens ?? []);
       const found = [
         ...composer.dsLinter.lint(allTokens),
         ...buildContrastIssues(colorState?.tokens ?? [], mode),
         ...hiddenToggle,
+        ...darkPairs,
       ];
       setIssues(found);
 

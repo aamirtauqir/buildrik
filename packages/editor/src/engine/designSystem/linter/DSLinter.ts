@@ -26,6 +26,10 @@ export type LintRuleId =
   /* Computed editor-side from settings + elements, like contrast: a theme
      toggle on a site whose Dark mode is Off is hidden on publish (D12). */
   | "theme-toggle-hidden"
+  /* Computed editor-side from elements, like contrast: on an Auto site, a
+     token-bound side of a text/background pair flips and the raw side does
+     not (BRP1-M8 — dark text left on a dark card). */
+  | "dark-mode-pair"
   | "banned-hue"
   | "pure-black"
   | "empty-value"

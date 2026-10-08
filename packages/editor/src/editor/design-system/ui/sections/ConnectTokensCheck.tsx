@@ -46,10 +46,10 @@ export interface ConnectTokensCheckProps {
 }
 
 /* 8224:235564 "Card · Connect exact matches": 16 in, 12 between, radius-md. */
-const CARD =
+export const CARD =
   "tw:flex tw:flex-col tw:items-start tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:p-4";
-const TITLE = "tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[var(--bk-leading-30)] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]";
-const COPY = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
+export const TITLE = "tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[var(--bk-leading-30)] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]";
+export const COPY = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
 const ROW_TEXT = "tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 const COUNT_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];

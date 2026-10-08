@@ -22,7 +22,8 @@ import { DEFAULT_TOKENS } from "../../constants";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../../types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
-import { buildContrastIssues, contrastFixHint, findSurfaceToken, resolveSurface, contrastFails } from "../contrastLint";
+import { buildContrastIssues, contrastFixHint, findSurfaceToken, resolveSurface, contrastFails, buildDarkPairIssues, type StyledNode } from "../contrastLint";
+import { proposeMissingDarks } from "@/engine/designSystem/scale";
 
 const colors = DEFAULT_TOKENS.filter((t) => t.category === "colors");
 
@@ -151,5 +152,43 @@ describe("contrast is checked against the customer's surface, not a hardcoded on
   it("falls back to white, never to near-black, when the palette has no background token", () => {
     const noSurface = [v6Token({ id: "color-paper", name: "Paper", value: "#F2F2F2", group: "brand", layer: "semantic" })];
     expect(flagged(noSurface, "light")).toEqual(["color-paper"]);
+  });
+});
+
+describe("buildDarkPairIssues (BRP1-M8: dark text left on a card that turns dark)", () => {
+  const FILLED = proposeMissingDarks(DEFAULT_TOKENS).tokens;
+  const node = (styles: Record<string, string>, parent: StyledNode | null = null): StyledNode => ({
+    getStyles: () => styles,
+    getParent: () => parent,
+  });
+
+  it("flags raw text inside a card bound to the raised surface once that surface turns dark", () => {
+    expect(resolveTokenLiteral(FILLED, "color-surface-raised", "dark")).toBe("#1E293B");
+    const card = node({ background: "var(--buildrick-design-color-surface-raised)" });
+    const body = node({}, card);
+    const p = node({ color: "#666" }, body);
+    const issues = buildDarkPairIssues([card, body, p], FILLED);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatchObject({ rule: "dark-mode-pair", tokenId: "color-surface-raised", severity: "warning" });
+    expect(issues[0].message).toContain("#666666");
+    expect(issues[0].message).toContain("#1E293B");
+  });
+
+  it("flags a token text colour over a raw light fill (light-on-light in dark)", () => {
+    const box = node({ "background-color": "#FFFFFF" });
+    const h = node({ color: "var(--buildrick-design-color-text)" }, box);
+    expect(buildDarkPairIssues([box, h], FILLED).map((i) => i.tokenId)).toEqual(["color-text"]);
+  });
+
+  it("stays quiet on raw/raw, token/token, a surface without a dark value, and a pair that already fails in light", () => {
+    const raw = node({ background: "#FFFFFF" });
+    const tokens = node({ background: "var(--buildrick-design-color-surface-raised)" });
+    const noDark = DEFAULT_TOKENS.filter((t) => t.id !== "color-surface-raised").concat(
+      FILLED.filter((t) => t.id === "color-surface-raised").map((t) => ({ ...t, modes: { light: t.modes.light } })),
+    );
+    expect(buildDarkPairIssues([node({ color: "#333" }, raw)], FILLED)).toEqual([]);
+    expect(buildDarkPairIssues([node({ color: "var(--buildrick-design-color-text)" }, tokens)], FILLED)).toEqual([]);
+    expect(buildDarkPairIssues([node({ color: "#333" }, tokens)], noDark)).toEqual([]);
+    expect(buildDarkPairIssues([node({ color: "#EEEEEE" }, tokens)], FILLED)).toEqual([]);
   });
 });

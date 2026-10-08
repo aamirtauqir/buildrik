@@ -69,6 +69,7 @@ const RULE_LABEL: Record<LintRuleId, string> = {
   "alias-depth-exceeded": "Alias chain too deep",
   "semantic-needs-alias": "Semantic token needs an alias",
   "theme-toggle-hidden": "Theme toggle hidden — Dark mode is off",
+  "dark-mode-pair": "Dark mode — fixed colour on a token that turns dark",
 };
 
 const ACTION = "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5";

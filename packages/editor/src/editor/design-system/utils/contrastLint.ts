@@ -18,7 +18,8 @@ import type { LintIssue } from "../../../engine/designSystem/linter";
 import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";
-import { calcWcagLevel, hexToRgb, relativeLuminance } from "./colorUtils";
+import { calcContrastRatio, calcWcagLevel, hexToRgb, relativeLuminance } from "./colorUtils";
+import { parseColor, rgbToHex } from "@/shared/utils/parsers";
 
 /**
  * Resolved from the customer's own background token, honouring their colour
@@ -119,4 +120,81 @@ export function buildContrastIssues(
       message: `${t.name || t.id} fails WCAG AA against the page background`,
       autoFixHint: contrastFixHint(resolveTokenLiteral(tokens, t.id, "light") ?? "", lightSurface),
     }));
+}
+
+/** The element surface the dark-mode pair check reads — `Element` satisfies it. */
+export interface StyledNode {
+  getStyles(): Record<string, string>;
+  getParent(): StyledNode | null;
+}
+
+const TOKEN_VAR = /var\(\s*(--buildrick-design-[\w-]+)/;
+const styleOf = (s: Record<string, string>, kebab: string, camel: string) => (s[kebab] ?? s[camel] ?? "").trim();
+
+/** One side of a pair: a token (with its light and dark literals) or a raw colour. */
+function side(value: string, tokens: readonly DesignToken[]): { tokenId: string | null; light: string; dark: string } | null {
+  const ref = TOKEN_VAR.exec(value);
+  if (ref) {
+    const t = tokens.find((x) => x.cssVar === ref[1]);
+    if (!t) return null;
+    const light = resolveTokenLiteral(tokens, t.id, "light") ?? "";
+    const dark = (t.modes.dark && resolveTokenLiteral(tokens, t.id, "dark")) || light;
+    return hexToRgb(light) && hexToRgb(dark) ? { tokenId: t.id, light, dark } : null;
+  }
+  const rgb = parseColor(value);
+  if (!rgb || (rgb.a !== undefined && rgb.a < 1)) return null;
+  const hex = rgbToHex({ r: rgb.r, g: rgb.g, b: rgb.b }).toUpperCase();
+  return { tokenId: null, light: hex, dark: hex };
+}
+
+/** The nearest painted background at or above `el` — `background-color`, or a
+ *  `background` shorthand that is a colour or a token. */
+function backgroundOf(el: StyledNode | null): string {
+  for (let n = el; n; n = n.getParent()) {
+    const s = n.getStyles();
+    const bg = styleOf(s, "background-color", "backgroundColor") || styleOf(s, "background", "background");
+    if (bg && bg !== "transparent" && bg !== "none" && !/gradient|url\(/.test(bg)) return bg;
+  }
+  return "";
+}
+
+/**
+ * Dark mode only (BRP1-M8): an element whose text colour and background are
+ * ONE token and ONE raw colour. Turning Auto on moves the token side and
+ * leaves the raw side — inserted blocks bind their surfaces
+ * (`color-surface-raised`, #FFFFFF → #1E293B) but some keep raw text
+ * (`#666`, `#333`), so dark text lands on a dark card. Flagged when the pair
+ * reads in light (≥ 4.5:1) and fails in dark; grouped by the token, which is
+ * what Open lands on. Pairs of two tokens are the palette's contrast check,
+ * and two raw colours never change with the mode. Only an element's OWN
+ * `color` is read — inherited text is not followed.
+ */
+export function buildDarkPairIssues(elements: readonly StyledNode[], tokens: readonly DesignToken[]): LintIssue[] {
+  const byToken = new Map<string, { count: number; worst: number; raw: string; dark: string }>();
+  for (const el of elements) {
+    const color = styleOf(el.getStyles(), "color", "color");
+    if (!color) continue;
+    const bgValue = backgroundOf(el);
+    if (!bgValue) continue;
+    const fg = side(color, tokens);
+    const bg = side(bgValue, tokens);
+    if (!fg || !bg || Boolean(fg.tokenId) === Boolean(bg.tokenId)) continue;
+    if (calcContrastRatio(fg.light, bg.light) < 4.5) continue;
+    const ratio = calcContrastRatio(fg.dark, bg.dark);
+    if (ratio >= 4.5) continue;
+    const token = (fg.tokenId ?? bg.tokenId) as string;
+    const raw = fg.tokenId ? bg.dark : fg.dark;
+    const dark = fg.tokenId ? fg.dark : bg.dark;
+    const prev = byToken.get(token);
+    if (!prev || ratio < prev.worst) byToken.set(token, { count: (prev?.count ?? 0) + 1, worst: ratio, raw, dark });
+    else prev.count += 1;
+  }
+  return [...byToken].map(([tokenId, f]) => ({
+    rule: "dark-mode-pair" as const,
+    severity: "warning" as const,
+    tokenId,
+    message:
+      `In dark mode ${f.count} element${f.count === 1 ? "" : "s"} pair a fixed colour (${f.raw}) with ${tokenId}, ` +
+      `which turns ${f.dark} — ${f.worst.toFixed(1)}:1, below 4.5:1.`,
+  }));
 }

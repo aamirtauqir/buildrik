@@ -30,6 +30,8 @@ function makeFakeComposer(initialMode: ThemeMode = "system") {
       listeners.set(evt, arr.filter((x) => x !== cb));
     }),
     colorMode,
+    /* An Auto site: Dark is disabled on an Off one (BRP1-M8, DarkModeSetting.test). */
+    getProjectSettings: () => ({ darkMode: "auto" }),
     dsLinter: { lint: vi.fn(() => []) },
   };
 }

@@ -13,9 +13,10 @@ import { EVENTS } from "@/shared/constants/events";
 import { useDSLint } from "../useDSLint";
 import { TokenRegistryProvider } from "../TokenRegistryContext";
 
-const toggle = { getAttribute: (n: string) => (n === "data-bk-theme-toggle" ? "true" : undefined) };
+/* getStyles/getParent: an Auto site also runs the dark-pair check over its elements. */
+const toggle = { getAttribute: (n: string) => (n === "data-bk-theme-toggle" ? "true" : undefined), getStyles: () => ({}), getParent: () => null };
 
-function makeComposer(darkMode: "auto" | "off", elements: Array<{ getAttribute(n: string): string | undefined }>) {
+function makeComposer(darkMode: "auto" | "off", elements: Array<typeof toggle>) {
   const handlers: Record<string, Array<() => void>> = {};
   const settings = { darkMode };
   return {
