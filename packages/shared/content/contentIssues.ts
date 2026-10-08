@@ -110,7 +110,10 @@ function checkImage(el: ContentElement, pageId: string, pageName: string): Conte
   if (el.attributes?.alt !== undefined) return null;
   return {
     id: `content:alt:${el.id}`,
-    type: "error",
+    /* A warning, never a publish block (L4-033, owner default 2026-10-09):
+       the server's pre-publish check reports it as one, and two verdicts on
+       one fact had the editor asking "Publish with 1 open error?". */
+    type: "warning",
     kind: "missing-alt",
     message: "Image is missing alt text",
     location: describeElement(el, pageName),

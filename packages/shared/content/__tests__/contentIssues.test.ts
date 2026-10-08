@@ -20,7 +20,10 @@ describe("detectContentIssues", () => {
     ];
     const findings = detectContentIssues(pages);
     expect(findings).toHaveLength(1);
-    expect(findings[0]).toMatchObject({ kind: "missing-alt", type: "error", elementId: "img1", pageId: "home" });
+    /* L4-033 (owner default 2026-10-09): a warning, as the server's
+       pre-publish check has always reported it — not a publish-blocking
+       error in the editor and a warning on the server. */
+    expect(findings[0]).toMatchObject({ kind: "missing-alt", type: "warning", elementId: "img1", pageId: "home" });
   });
 
   it("does not flag an image with alt=\"\" (decorative, deliberate)", () => {
