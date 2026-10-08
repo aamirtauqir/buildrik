@@ -82,6 +82,9 @@ export class PageManager {
       slugHistory: [],
       ...options,
     };
+    /* L3-001: a slug another page holds broke every save of the site (the
+       server's (siteId, slug) unique key) — take the next free one instead. */
+    if (page.slug) page.slug = uniqueSlug(page.slug, this.existingSlugs());
 
     this.ctx.pages.set(page.id, page);
     this.ctx.buildElementTree(page.root);
@@ -130,9 +133,13 @@ export class PageManager {
       mutated = true;
     }
 
-    if (typeof data.slug === "string" && data.slug.trim() && data.slug !== page.slug) {
-      const oldSlug = page.slug;
-      const newSlug = data.slug.trim();
+    const oldSlug = page.slug;
+    const taken = this.existingSlugs();
+    if (oldSlug) taken.delete(oldSlug);
+    const newSlug = typeof data.slug === "string" && data.slug.trim()
+      ? uniqueSlug(data.slug.trim(), taken)
+      : oldSlug;
+    if (newSlug !== oldSlug) {
       // Record the prior slug for redirect generation.
       if (oldSlug) {
         const history: SlugChange[] = page.slugHistory ?? [];
@@ -490,6 +497,14 @@ function uniqueCopyName(baseName: string, taken: Set<string>): string {
   let n = 2;
   while (taken.has(`${baseName} Copy ${n}`)) n++;
   return `${baseName} Copy ${n}`;
+}
+
+/** "about" → "about" when free, else "about-2" → "about-3" ... */
+function uniqueSlug(slug: string, taken: Set<string>): string {
+  if (!taken.has(slug)) return slug;
+  let n = 2;
+  while (taken.has(`${slug}-${n}`)) n++;
+  return `${slug}-${n}`;
 }
 
 /** "about" → "about-copy" → "about-copy-2" → ... */
