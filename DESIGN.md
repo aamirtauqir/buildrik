@@ -101,7 +101,7 @@ do NOT apply here):
 - **Ink surfaces** — `--color-ink` `#111827` (Flowbite gray-900 since 2026-07-30; was `#141924`) for hero/featured cards and filled pills (e.g. the Marketplace featured card and its active filter chip). The NO BLACK RULE is editor-chrome only.
 - **Per-app brand tile colours** — third-party branding on Marketplace/Apps tiles, sourced from `lib/marketplace-catalog.ts`. These are illustrative data, not accents; cobalt stays the only accent for CTAs, links, focus and active states.
 - **Multi-column card grids with coloured icon tiles** — the Marketplace/Apps grid is exactly this shape and is intended.
-- **A named font fallback** — the dashboard sets `'Inter', 'Inter Tight', sans-serif` on the shell root so Inter is scoped to the dashboard while auth/onboarding/editor keep Inter Tight.
+- **A named font fallback** — the dashboard sets `'Inter', 'Inter Tight', sans-serif` on the shell root so Inter is scoped to the dashboard while auth/onboarding keep Inter Tight (the editor chrome is Inter-only).
 
 ## Aesthetic Direction
 - **Direction:** Industrial / Utilitarian, **light chrome**. Premium tool, not premium marketing. "Webflow meets Linear, daylight edition."
@@ -135,7 +135,7 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 ```css
 /* Generated from Figma — src/themes/tokens.generated.css. Do not hand-edit:
    change the Figma text style, re-export figma-tokens.json, regenerate. */
---bk-font-ui:   "Inter", "Inter Tight", sans-serif;   /* Inter Tight = transition fallback only */
+--bk-font-ui:   "Inter";   /* no named fallbacks in any stack — Inter Tight left editor chrome 2026-07-26. figma-tokens.json still exports "Inter", "Inter Tight", sans-serif; the Figma ui/* text-style fallback is the owner/designer fix */
 --bk-font-mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
 ```
 
