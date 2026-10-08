@@ -37,7 +37,7 @@ describe("theme toggle in export and publish (spec D12, test 22)", () => {
       expect(body(html)).toContain("data-buildrick-theme-toggle-runtime");
     }
     const css = files.find((f) => f.name.endsWith(".css"))?.content ?? published;
-    expect(css + single).toContain('[data-bk-tt="light"]{display:none!important}');
+    expect(css + single).toContain(':root[data-theme="dark"] [data-bk-theme-toggle] [data-bk-tt="dark"]{background-color:var(--buildrick-design-color-primary)');
   });
 
   it("Off: every toggle hidden on publish; no boot script, no runtime", () => {

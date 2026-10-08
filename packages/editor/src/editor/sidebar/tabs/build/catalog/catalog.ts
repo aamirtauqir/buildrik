@@ -432,6 +432,15 @@ export const CATALOG: CatEntry[] = [
       '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
     elements: [
       {
+        // BRP1-M12: offered only while the site's Dark mode is Auto (useBuildTab).
+        name: "Theme toggle",
+        iconHtml:
+          '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/>',
+        blockId: "theme-toggle",
+        description: "Light / Dark switch",
+        tags: ["theme", "dark mode", "light mode", "switch", "toggle", "color scheme", "night"],
+      },
+      {
         name: "Accordion",
         iconHtml:
           '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',

@@ -95,7 +95,7 @@ import { ClassAddDialog } from "./sections/ClassAddDialog";
 import { TypographySection, fontsCaption } from "./sections/TypographySection";
 import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
-import { takeBrandTokenRequest } from "./brandOpenRequest";
+import { takeBrandPageRequest, takeBrandTokenRequest } from "./brandOpenRequest";
 import { StartersSection } from "./sections/StartersSection";
 import { BrandFromSource, BrandFromSourceGuide } from "./sections/BrandFromSource";
 import { ColourModeSection } from "./sections/ColourModeSection";
@@ -236,9 +236,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
      no pill band). Read here rather than stored: `useDSLint` re-renders this
      component whenever `lint:changed` fires, every suppress and unsuppress. */
   const suppressedCount = composer?.designSystem?.lintState?.suppressedCount?.() ?? 0;
-  const [page, setPage] = React.useState<BrandPageId>(() =>
-    initialPage && isPageId(initialPage) ? initialPage : LANDING
-  );
+  const [page, setPage] = React.useState<BrandPageId>(() => {
+    const asked = takeBrandPageRequest(composer) ?? initialPage;
+    return asked && isPageId(asked) ? asked : LANDING;
+  });
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);

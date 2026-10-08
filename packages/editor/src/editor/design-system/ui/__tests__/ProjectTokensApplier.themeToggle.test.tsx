@@ -24,7 +24,7 @@ function stubComposer(darkMode: "auto" | "off") {
 }
 
 const css = () => document.getElementById("bk-site-tokens")?.textContent ?? "";
-const SWAP = '[data-bk-theme-toggle] [data-bk-tt="dark"]{display:none!important}';
+const SWAP = ':root[data-theme="dark"] [data-bk-theme-toggle] [data-bk-tt="dark"]{background-color:var(--buildrick-design-color-primary)';
 
 beforeEach(() => {
   document.head.innerHTML = "";
@@ -37,7 +37,7 @@ describe("ProjectTokensApplier — theme toggle", () => {
     expect(css()).not.toContain("data-bk-theme-toggle");
   });
 
-  it("an inserted toggle gets the icon swap on the next frame, on an Off site too", () => {
+  it("an inserted toggle gets its segment CSS on the next frame — on an Off site dimmed, never hidden (M12 off-hidden-on-publish)", () => {
     const stub = stubComposer("off");
     render(<ProjectTokensApplier composer={stub.composer} />);
     stub.insertToggle();
@@ -47,5 +47,6 @@ describe("ProjectTokensApplier — theme toggle", () => {
     });
     expect(css()).toContain(SWAP);
     expect(css()).not.toContain("[data-bk-theme-toggle]{display:none!important}");
+    expect(css()).toContain("[data-bk-theme-toggle]{opacity:0.35}");
   });
 });

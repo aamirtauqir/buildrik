@@ -25,3 +25,20 @@ export function takeBrandTokenRequest(composer: Composer | null | undefined): st
   pending.delete(composer);
   return tokenId;
 }
+
+const pendingPage = new WeakMap<Composer, string>();
+
+/** Open Brand ON a page (the theme-toggle inspector's "Open Brand → Colour
+ *  mode", BRP1-M12) — held until the workspace mounts, like a token request. */
+export function requestBrandPage(composer: Composer, page: string): void {
+  pendingPage.set(composer, page);
+  composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});
+}
+
+/** The page asked for before the workspace mounted, if any — read once. */
+export function takeBrandPageRequest(composer: Composer | null | undefined): string | undefined {
+  if (!composer) return undefined;
+  const page = pendingPage.get(composer);
+  pendingPage.delete(composer);
+  return page;
+}

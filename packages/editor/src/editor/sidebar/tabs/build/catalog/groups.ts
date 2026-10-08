@@ -51,11 +51,16 @@ export const blockRows: BlockDefinition[] = getBlockDefinitions().filter(
 
 /** ★ FAVOURITES (board 4418:103353) and RECENT lead the list only while they
  *  have rows. */
-export function buildInsertGroups(mineCount: number | null, favCount = 0, recentCount = 0): InsertGroup[] {
+export function buildInsertGroups(
+  mineCount: number | null,
+  favCount = 0,
+  recentCount = 0,
+  elementCount = elementRows.length,
+): InsertGroup[] {
   return [
     ...(favCount ? [{ id: "favourites" as const, label: "★ FAVOURITES", count: favCount, kind: "inline" as const }] : []),
     ...(recentCount ? [{ id: "recent" as const, label: "RECENT", count: recentCount, kind: "inline" as const }] : []),
-    { id: "elements", label: "ELEMENTS", count: elementRows.length, kind: "inline" },
+    { id: "elements", label: "ELEMENTS", count: elementCount, kind: "inline" },
     { id: "blocks", label: "BLOCKS", count: blockRows.length, kind: "inline" },
     /* Board 4428:140817 names them by where they come from. */
     { id: "components", label: "BUILT-IN COMPONENTS", count: componentRows.length, kind: "inline" },

@@ -18,6 +18,8 @@ import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { MAX_RECENT } from "@/shared/constants/ui";
 import { EVENTS } from "@/shared/constants/events";
 import { announceInsertDrag } from "@/editor/canvas/insertDrag";
+import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
+import { isThemeToggleOffered, themeToggleBlockConfig } from "@/blocks/Basic/ThemeToggle";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
 
@@ -244,9 +246,32 @@ export function useBuildTab(
 
   // Board 138:53: search is flat and cross-source — elements, blocks AND
   // components (the board's third tag).
+  /* BRP1-M12: the theme toggle is offered only while the site's Dark mode is
+     Auto — read live, so flipping Dark mode shows / hides it at once. */
+  const readDarkMode = React.useCallback(
+    () => DarkModeSchema.catch("off").parse(composer?.getProjectSettings?.()?.darkMode),
+    [composer]
+  );
+  const [darkMode, setDarkMode] = React.useState(readDarkMode);
+  React.useEffect(() => {
+    setDarkMode(readDarkMode());
+    if (!composer || typeof composer.on !== "function") return;
+    const sync = () => setDarkMode(readDarkMode());
+    composer.on(EVENTS.SETTINGS_CHANGE, sync);
+    composer.on(EVENTS.PROJECT_LOADED, sync);
+    return () => {
+      composer.off(EVENTS.SETTINGS_CHANGE, sync);
+      composer.off(EVENTS.PROJECT_LOADED, sync);
+    };
+  }, [composer, readDarkMode]);
+  const allElements = React.useMemo(
+    () => (isThemeToggleOffered(darkMode) ? flatCatalog : flatCatalog.filter((el) => el.blockId !== themeToggleBlockConfig.id)),
+    [darkMode]
+  );
+
   const searchResults = React.useMemo(
-    () => searchInsert(searchQuery, flatCatalog, blockRows, componentRows, saved),
-    [searchQuery, saved]
+    () => searchInsert(searchQuery, allElements, blockRows, componentRows, saved),
+    [searchQuery, saved, allElements]
   );
 
   return {
@@ -256,7 +281,7 @@ export function useBuildTab(
     searchQuery,
     favOpen,
     searchResults,
-    allElements: flatCatalog,
+    allElements,
     composer,
     setSearchQuery,
     toggleFav,
