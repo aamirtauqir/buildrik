@@ -97,6 +97,7 @@ import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { takeBrandTokenRequest } from "./brandOpenRequest";
 import { StartersSection } from "./sections/StartersSection";
+import { BrandFromSource, BrandFromSourceGuide } from "./sections/BrandFromSource";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { ColorModeToggle } from "./ColorModeToggle";
 import { useDSLint } from "../state/useDSLint";
@@ -138,15 +139,19 @@ const MORE_KINDS = [
 ] as const satisfies ReadonlyArray<{ kind: TokenKind; label: string }>;
 
 type MoreKind = (typeof MORE_KINDS)[number]["kind"];
-export type BrandPageId = NavId | `kind-${MoreKind}`;
+/* BRP1-M11: reached from Starters (behind dsAi), so the Starters row stays
+   current on it, and it has no nav row of its own. */
+const FROM_SOURCE = "brand-from-source";
+export type BrandPageId = NavId | `kind-${MoreKind}` | typeof FROM_SOURCE;
 
 const LANDING: BrandPageId = "colours";
 
 function isPageId(value: string): value is BrandPageId {
-  return NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value);
+  return NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value) || value === FROM_SOURCE;
 }
 
 function pageLabel(id: BrandPageId): string {
+  if (id === FROM_SOURCE) return "Brand from logo or website";
   return NAV.find((n) => n.id === id)?.label
     ?? MORE_KINDS.find((k) => `kind-${k.kind}` === id)?.label
     ?? id;
@@ -373,6 +378,17 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     setSelectedTokenId(tokenId);
   };
   const allTokens = store.all;
+  /* A Brand flow's canvas preview (logo / website) also paints the live
+     preview card — the canvas sits behind this full-screen workspace. */
+  const [brandPreview, setBrandPreview] = React.useState(() => composer?.designSystem?.preview ?? null);
+  React.useEffect(() => {
+    if (!composer || typeof composer.on !== "function") return;
+    const sync = () => setBrandPreview(composer.designSystem?.preview ?? null);
+    composer.on(EVENTS.BRAND_PREVIEW_CHANGED, sync);
+    return () => {
+      composer.off(EVENTS.BRAND_PREVIEW_CHANGED, sync);
+    };
+  }, [composer]);
   const selectedToken = selectedTokenId ? allTokens.find((t) => t.id === selectedTokenId) : undefined;
 
 
@@ -466,6 +482,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "presets":          return "Section and element presets";
       case "brand-checks":     return brandChecksCaption(lintIssues, suppressedCount);
       case "starters":         return "Pick a starter to apply it to the site";
+      case FROM_SOURCE:        return "";
       case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
       case "export":           return "Move the brand in and out";
       default: {
@@ -677,7 +694,14 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           />
         );
       case "starters":
-        return <StartersSection projectId={projectId} />;
+        return (
+          <StartersSection
+            projectId={projectId}
+            onOpenFromSource={isFeatureEnabled("dsAi") ? () => openPage(FROM_SOURCE) : undefined}
+          />
+        );
+      case FROM_SOURCE:
+        return <BrandFromSource composer={composer ?? null} />;
       case "spacing":
         return <TokensSection {...tokenPageProps} openKind="spacing" />;
       case "export":
@@ -700,7 +724,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const navRow = (id: BrandPageId, label: string, count?: number, slot: string = id) => {
     /* The eleven other kinds are reached from Spacing's kind switch, so the
        Spacing row stays current on their pages. */
-    const active = page === id || (id === "spacing" && page.startsWith("kind-"));
+    const active = page === id || (id === "spacing" && page.startsWith("kind-")) || (id === "starters" && page === FROM_SOURCE);
     return (
       <Button
         key={slot}
@@ -871,7 +895,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           data-testid="brand-preview-column"
         >
           {composer?.exportHTML ? (
-            <BrandLivePreview composer={composer} tokens={allTokens} mode={resolvedMode} controls={previewControls} />
+            <BrandLivePreview composer={composer} tokens={brandPreview?.tokens ?? allTokens} mode={resolvedMode} controls={previewControls} />
           ) : (
             /* No document to render (no composer, or one without an export —
                the load-error and test harnesses): the palette and type slots
@@ -887,6 +911,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               <BrandPreview colors={visibleColors} tokens={color.tokens} />
             </section>
           )}
+          {page === FROM_SOURCE && <BrandFromSourceGuide />}
           {isTokenPage && selectedToken && (
             <EditLock locked={readOnly}>
             <TokenDetailView
