@@ -63,7 +63,7 @@ const ImageryRegistryContext    = React.createContext<ImageryRegistry | null>(nu
 export interface TokenStore extends ProjectTokens {
   edits: SessionEdit[];
   /** Revert one session edit; false when it is stale or refused. */
-  revert: (index: number) => boolean;
+  revert: (key: string) => boolean;
 }
 const ProjectTokenStoreContext  = React.createContext<TokenStore | null>(null);
 

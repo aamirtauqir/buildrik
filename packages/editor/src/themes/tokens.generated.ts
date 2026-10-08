@@ -151,7 +151,7 @@ export const motion = {
 } as const;
 
 export const font = {
-  "ui": "\"Inter\", \"Inter Tight\", sans-serif",
+  "ui": "\"Inter\", sans-serif",
   "mono": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace",
 } as const;
 
