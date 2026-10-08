@@ -18,7 +18,10 @@ import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "@/editor/design-system/types";
 import type { SessionEdit } from "@/editor/design-system/state/useSessionEdits";
 
-const SMALL = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
+const SMALL_TYPE = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px]";
+const SMALL = `${SMALL_TYPE} tw:text-[var(--bk-ink-soft)]`;
+/* The stale note is a step quieter than the value line (8222:232022). */
+const STALE_NOTE = `${SMALL_TYPE} tw:text-[var(--bk-ink-muted)]`;
 /* The board's ghost action: 28 tall, 12 in, 13/20 medium in gray-700. Its
    disabled state is the label alone in --bk-ink-disabled — no plate, so a
    stale row reads as inert, not as a pressed button. */
@@ -81,14 +84,17 @@ export function SessionEditsPopover({
       placement="bottom-end"
       block
       label="Review changes"
-      className="tw:mt-[11px] tw:w-[460px]"
+      /* The board's card: 6 radius, hairline, no elevation (8222:232001).
+         The primitive's surface classes sit on a plain div, so nothing merges —
+         `!` is what makes these win. */
+      className="tw:mt-[11px] tw:w-[460px] tw:rounded-[var(--bk-radius-md)]! tw:[box-shadow:none]!"
       trigger={
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2">
           <Button
             type="button"
             variant="secondary"
             size="xs"
-            className="tw:h-7 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5"
+            className="tw:h-7 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)]"
             onClick={() => setOpen((v) => !v)}
             disabled={disabled}
             data-testid="brand-session-edits"
@@ -128,7 +134,7 @@ export function SessionEditsPopover({
                 Revert
               </Button>
               {e.stale && (
-                <p className={SMALL} data-testid="brand-session-stale">
+                <p className={STALE_NOTE} data-testid="brand-session-stale">
                   Changed since — use ⌘Z
                 </p>
               )}

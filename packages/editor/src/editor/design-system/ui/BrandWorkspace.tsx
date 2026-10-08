@@ -190,10 +190,15 @@ const PAGE_ACTION =
 const lightOf = (tokens: readonly DesignToken[], id: string): string => resolveTokenLiteral(tokens, id, "light") ?? "";
 
 /** Disables every native control inside while the tokens are read-only.
- *  `display: contents`, so it never takes part in the layout it sits in. */
+ *  `display: contents`, so it never takes part in the layout it sits in.
+ *  A button disabled by the fieldset matches `:disabled` but never gets
+ *  flowbite's disabled theme (that follows the prop), so "Change" / "Set"
+ *  stayed in live ink on a read-only site. BRP1-M1 mutes every locked
+ *  control's label; the descendant selector outranks the button's own colour. */
+const EDIT_LOCK = "tw:contents tw:[&_button:disabled]:text-[var(--bk-ink-muted)]";
 function EditLock({ locked, children }: { locked: boolean; children: React.ReactNode }) {
   return (
-    <fieldset disabled={locked} className="tw:contents" data-testid={locked ? "brand-edit-lock" : undefined}>
+    <fieldset disabled={locked} className={EDIT_LOCK} data-testid={locked ? "brand-edit-lock" : undefined}>
       {children}
     </fieldset>
   );
@@ -815,12 +820,12 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         {/* ── Pane ──────────────────────────────────────────────────────── */}
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
           {/* BRP1-M1 (8222:229015 / 229636 / 230245): a flat warning-tint
-              strip, 12 in, 12/18 ink — no border, no radius. */}
+              strip, 12 in, 12/18 ink — no border, no radius — 20 over the body. */}
           {readOnly && (
             <div
               role="alert"
               data-testid="brand-read-only-banner"
-              className="tw:mb-4 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
+              className="tw:mb-5 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
             >
               {(store.readOnlyReason && BRAND_READ_ONLY_COPY[store.readOnlyReason]) || BRAND_READ_ONLY_FAILED_COPY}
             </div>
