@@ -85,6 +85,8 @@ const ALLOWED = {
     "Scheduled publish: service + cron route + ScheduledPublish table landed 2026-09-09; the editor's scheduling UI is the next step. FOUNDER DECISION — build the UI or drop the three endpoints.",
   "sites.cancelScheduledPublish":
     "Scheduled publish: cancel half of the same unbuilt UI. See sites.schedulePublish.",
+  "theme.extractBrandFromUrl":
+    "Brand Part 1c: server half landed (Task 8, SSRF-guarded); the 'Brand from logo or website' screen (board BRP1-M11) is 1c Task 13. Remove this entry when Task 13 wires it.",
   "sites.getScheduledPublish":
     "Scheduled publish: read half of the same unbuilt UI. See sites.schedulePublish.",
   "theme.brandRestorePoints": "Brand restore list UI is Part 1c, board BRP1-M10.",
