@@ -562,6 +562,9 @@ export const EVENTS = {
   // ============================================
   /** A token write landed (`designSystem.setTokens`) — fired only on success. */
   BRAND_APPLIED: "brand:applied",
+  /** A template landed on a page whose raw values match tokens exactly:
+   *  Connect to tokens has suggestions for it (spec §3; UI is board BRP1-M7). */
+  BRAND_CONNECT_SUGGESTED: "brand:connect-suggested",
   /** The site's tokens could not be migrated on load: Brand stays on the old
    *  tokens and refuses edits (spec §10, D17). */
   DESIGN_SYSTEM_READ_ONLY: "designSystem:readOnly",
@@ -975,6 +978,10 @@ export interface EventPayloads {
   // Template apply / remove (S9 — emitted by PageManager.recordAppliedTemplate / removeAppliedTemplate)
   [EVENTS.TEMPLATE_APPLIED]: { templateId: string; pageId: string; version?: string };
   [EVENTS.BRAND_APPLIED]: void;
+  [EVENTS.BRAND_CONNECT_SUGGESTED]: {
+    pageId: string;
+    suggestions: import("../../engine/designSystem/connectTokens").ConnectSuggestion[];
+  };
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;
   [EVENTS.UI_OPEN_PERMISSIONS]: void;

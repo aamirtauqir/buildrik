@@ -62,6 +62,7 @@ import { AliasResolver } from "./aliasResolver";
 import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
 import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
+import { findConnectSuggestions, type ConnectRef, type ConnectSuggestion } from "./designSystem/connectTokens";
 import { LintState } from "./designSystem/LintState";
 import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import { applyContrastFix } from "./designSystem/contrastFix";
@@ -258,6 +259,13 @@ export class Composer extends EventEmitter {
      * `replacedBy` keeps the token and is never refused for that.
      */
     readonly setTokens: (next: DesignToken[], label: string) => boolean;
+    /** Connect to tokens (spec §3): exact-match suggestions over every page,
+     *  or one. Skips component instances and masters (owner, OQ-5). */
+    readonly connectSuggestions: (pageId?: string) => ConnectSuggestion[];
+    /** Binds the picked suggestions (base styles and breakpoint overrides) in
+     *  ONE transaction; returns the style writes made — 0 when read-only or
+     *  nothing applies. No restore point (owner, OQ-4): ⌘Z covers it. */
+    readonly applyConnect: (picks: ReadonlyArray<{ key: string; tokenId: string }>) => number;
   };
 
   constructor(config: ComposerConfig) {
@@ -390,6 +398,38 @@ export class Composer extends EventEmitter {
         this.emit(EVENTS.BRAND_APPLIED, undefined);
         return true;
       },
+      connectSuggestions: (pageId) => {
+        const pages = this.elements.exportPages().filter((p) => pageId === undefined || p.id === pageId);
+        return findConnectSuggestions(
+          pages.map((p) => p.root),
+          this.mergedDesignTokens(),
+          // Never write inside a component instance (it would create overrides).
+          { skip: (id) => this.components.findInstanceContainingElement(id) !== null },
+        );
+      },
+      applyConnect: (picks) => {
+        if (this.designSystem.readOnly) return 0;
+        const tokens = this.mergedDesignTokens();
+        const byKey = new Map(this.designSystem.connectSuggestions().map((s) => [s.key, s]));
+        const writes: Array<ConnectRef & { value: string }> = [];
+        for (const pick of picks) {
+          const s = byKey.get(pick.key);
+          const token = tokens.find((t) => t.id === pick.tokenId);
+          if (!s || !token || !s.candidates.includes(token.id)) continue;
+          for (const r of s.refs) writes.push({ ...r, value: `var(${token.cssVar})` });
+        }
+        if (writes.length === 0) return 0;
+        this.beginTransaction("Connect to tokens");
+        try {
+          for (const w of writes) {
+            if (w.breakpoint) this.styles.setBreakpointStyle(w.elementId, w.breakpoint, { [w.prop]: w.value });
+            else this.elements.getElement(w.elementId)?.setStyle(w.prop, w.value);
+          }
+        } finally {
+          this.endTransaction();
+        }
+        return writes.length;
+      },
     };
     // Recompute token usage whenever element trees or styles change. These
     // four events cover create/delete/update/style-set — markDirty's broader
@@ -419,6 +459,11 @@ export class Composer extends EventEmitter {
     this.on(EVENTS.PROJECT_CHANGED, invalidateTokenUsage);
     this.on(EVENTS.PROJECT_LOADED, invalidateTokenUsage);
     this.on(EVENTS.COMPONENT_LIST_UPDATED, invalidateTokenUsage);
+    // A template that lands raw values a token already holds: offer Connect.
+    this.on(EVENTS.TEMPLATE_APPLIED, ({ pageId }) => {
+      const suggestions = this.designSystem.connectSuggestions(pageId);
+      if (suggestions.length > 0) this.emit(EVENTS.BRAND_CONNECT_SUGGESTED, { pageId, suggestions });
+    });
 
     const operationApplyHandler = (patch: Patch) => {
       this.history.applyRemoteOperation(patch);
