@@ -95,13 +95,17 @@ import { ClassAddDialog } from "./sections/ClassAddDialog";
 import { TypographySection, fontsCaption } from "./sections/TypographySection";
 import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
-import { takeBrandTokenRequest } from "./brandOpenRequest";
+import { takeBrandPageRequest, takeBrandTokenRequest } from "./brandOpenRequest";
+import { ConnectTokensCheck } from "./sections/ConnectTokensCheck";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { ColorModeToggle } from "./ColorModeToggle";
 import { useDSLint } from "../state/useDSLint";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import {
+  SIDE_CARD,
+  SIDE_CARD_BODY,
+  SIDE_CARD_TITLE,
   useTokenBreakdownIds,
   useUsageHighlight,
   UsageHighlightCard,
@@ -145,15 +149,18 @@ const MORE_KINDS = [
 ] as const satisfies ReadonlyArray<{ kind: TokenKind; label: string }>;
 
 type MoreKind = (typeof MORE_KINDS)[number]["kind"];
-export type BrandPageId = NavId | `kind-${MoreKind}`;
+/* "connect" — Connect to tokens (BRP1-M7), a page under Brand checks: no nav
+   row of its own, Brand checks stays current on it. */
+export type BrandPageId = NavId | `kind-${MoreKind}` | "connect";
 
 const LANDING: BrandPageId = "colours";
 
 function isPageId(value: string): value is BrandPageId {
-  return NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value);
+  return value === "connect" || NAV.some((n) => n.id === value) || MORE_KINDS.some((k) => `kind-${k.kind}` === value);
 }
 
 function pageLabel(id: BrandPageId): string {
+  if (id === "connect") return "Connect to tokens";
   return NAV.find((n) => n.id === id)?.label
     ?? MORE_KINDS.find((k) => `kind-${k.kind}` === id)?.label
     ?? id;
@@ -233,9 +240,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
      no pill band). Read here rather than stored: `useDSLint` re-renders this
      component whenever `lint:changed` fires, every suppress and unsuppress. */
   const suppressedCount = composer?.designSystem?.lintState?.suppressedCount?.() ?? 0;
-  const [page, setPage] = React.useState<BrandPageId>(() =>
-    initialPage && isPageId(initialPage) ? initialPage : LANDING
-  );
+  const [page, setPage] = React.useState<BrandPageId>(() => {
+    const requested = takeBrandPageRequest(composer) ?? initialPage;
+    return requested && isPageId(requested) ? requested : LANDING;
+  });
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
@@ -373,12 +381,15 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const [usageTokenId, setUsageTokenId] = React.useState<string | null>(null);
   const usageIds = useTokenBreakdownIds(composer, usageTokenId);
   const usageHighlight = useUsageHighlight(composer, usageIds);
+  /* BRP1-M7: Connect to tokens' preview — the elements its Apply would bind. */
+  const [connectIds, setConnectIds] = React.useState<readonly string[] | null>(null);
   /* A page change drops the selection — unless the move is FOR a token
      (Brand checks' Open), which lands on its page with its card open. */
   const openPage = (id: BrandPageId, tokenId: string | null = null) => {
     setPage(id);
     setSelectedTokenId(tokenId);
     setUsageTokenId(null);
+    setConnectIds(null);
   };
   const allTokens = store.all;
   const selectedToken = selectedTokenId ? allTokens.find((t) => t.id === selectedTokenId) : undefined;
@@ -493,6 +504,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "starters":         return "Pick a starter to apply it to the site";
       case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
       case "export":           return "Move the brand in and out";
+      case "connect":          return "";
       default: {
         const n = moreKindRegistry[page.slice("kind-".length) as MoreKind]?.tokens.length ?? 0;
         return `${n} token${n === 1 ? "" : "s"}`;
@@ -705,6 +717,18 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               if (fixed && fixed !== current) changeToken(tok.id, fixed);
             }}
             onOpen={openToken}
+            onConnect={() => openPage("connect")}
+          />
+        );
+      case "connect":
+        return (
+          <ConnectTokensCheck
+            composer={composer}
+            tokens={allTokens}
+            onPreview={setConnectIds}
+            onBack={() => openPage("colours")}
+            /* 8224:236236's toast. */
+            onApplied={() => addToast({ description: "Tokens connected · Undo ⌘Z", tone: "info" })}
           />
         );
       case "starters":
@@ -731,7 +755,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const navRow = (id: BrandPageId, label: string, count?: number, slot: string = id) => {
     /* The eleven other kinds are reached from Spacing's kind switch, so the
        Spacing row stays current on their pages. */
-    const active = page === id || (id === "spacing" && page.startsWith("kind-"));
+    const active = page === id || (id === "spacing" && page.startsWith("kind-")) || (id === "brand-checks" && page === "connect");
     return (
       <Button
         key={slot}
@@ -917,7 +941,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               tokens={allTokens}
               mode={resolvedMode}
               controls={previewControls}
-              highlightIds={usageIds}
+              highlightIds={connectIds ?? usageIds}
             />
           ) : (
             /* No document to render (no composer, or one without an export —
@@ -932,6 +956,19 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 {previewControls}
               </div>
               <BrandPreview colors={visibleColors} tokens={color.tokens} />
+            </section>
+          )}
+          {page === "connect" && (
+            /* 8224:234362's guidance card under the preview. */
+            <section aria-label="About Connect to tokens" className={SIDE_CARD} data-testid="brand-connect-guide">
+              <p className={SIDE_CARD_TITLE}>Preview before applying</p>
+              <p className={SIDE_CARD_BODY}>
+                Explore the result on your canvas. Confirm or Apply commits the whole change as one ⌘Z step.
+              </p>
+              <p className={`${SIDE_CARD_BODY} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
+              <p className={SIDE_CARD_BODY}>
+                Edit Primary to change only Primary. Edit its palette value to update every token that uses it.
+              </p>
             </section>
           )}
           {usageToken && usageIds.length > 0 && usageHighlight.active && (
