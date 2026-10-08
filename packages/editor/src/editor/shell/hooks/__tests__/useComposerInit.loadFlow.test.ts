@@ -367,7 +367,10 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     }
   });
 
-  it("restores only when the user asks, and clears the record once it has", async () => {
+  /* Rewritten for L5-074: the record used to be cleared the moment Restore
+     was clicked — before any save of it. It now stays until a save of the
+     restored work is confirmed (the autosave success clears it). */
+  it("restores only when the user asks, and keeps the record until that work is saved", async () => {
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
     vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "server" }], styles: [] } as never);
     const mine = { pages: [{ id: "mine" }], styles: [] };
@@ -392,7 +395,8 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     expect(mockComposer.importProject).toHaveBeenLastCalledWith(mine);
     // Restored work is unsaved work — the dirty flag has to say so.
     expect(vi.mocked(params.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
-    expect(localStorage.getItem("bk-unsaved-v1-site-9")).toBeNull();
+    expect(localStorage.getItem("bk-unsaved-v1-site-9")).not.toBeNull();
+    localStorage.removeItem("bk-unsaved-v1-site-9");
   });
 
   it("scopes IndexedDB buckets, imports, seeds saveState, hydrates media, toasts", async () => {

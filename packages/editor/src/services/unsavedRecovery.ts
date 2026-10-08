@@ -43,12 +43,31 @@ export interface UnsavedWork {
    the tab-only edit. */
 const discarded = new Set<string>();
 
+/* L5-074: sites whose kept copy came from an earlier page load and is not on
+   screen — the screen is the server's copy. A save of the screen is not a
+   save of this work: it must neither clear the copy ("on the server now") nor
+   overwrite it with the screen, or Retry / the next autosave deletes the
+   edits. The copy is handed over once (`takeOffScreenUnsaved`) to be restored
+   and saved; after that the usual rules apply. */
+const offScreen = new Set<string>();
+
+/** The load path found kept work it did not apply. */
+export function markUnsavedOffScreen(siteId: string): void {
+  offScreen.add(siteId);
+}
+
+/** The kept work to restore, once; null when none is waiting off screen. */
+export function takeOffScreenUnsaved(siteId: string): UnsavedWork | null {
+  if (!offScreen.delete(siteId)) return null;
+  return readUnsaved(siteId);
+}
+
 /** Keep a snapshot the server refused. Best-effort: a full state is large and
  *  can exceed quota, and failing to keep it must never break the editor the
  *  user is still holding the work in. A no-op once the user discarded this
  *  site's copy (`discardUnsaved`). */
 export function keepUnsaved(siteId: string, project: ProjectData): void {
-  if (discarded.has(siteId)) return;
+  if (discarded.has(siteId) || offScreen.has(siteId)) return;
   try {
     localStorage.setItem(keyFor(siteId), JSON.stringify({ project, at: new Date().toISOString() }));
   } catch {
@@ -71,6 +90,7 @@ export function readUnsaved(siteId: string): UnsavedWork | null {
 }
 
 export function clearUnsaved(siteId: string): void {
+  if (offScreen.has(siteId)) return;
   try {
     localStorage.removeItem(keyFor(siteId));
   } catch {
@@ -82,6 +102,7 @@ export function clearUnsaved(siteId: string): void {
  *  record, and refuse to keep another for the rest of this page's life. */
 export function discardUnsaved(siteId: string): void {
   discarded.add(siteId);
+  offScreen.delete(siteId);
   clearUnsaved(siteId);
 }
 

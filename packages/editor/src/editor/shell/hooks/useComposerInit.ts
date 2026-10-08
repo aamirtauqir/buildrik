@@ -34,7 +34,7 @@ import {
   keepStoredTokensOnSave,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
-import { clearUnsaved, keepUnsaved, readUnsaved } from "@/services/unsavedRecovery";
+import { clearUnsaved, keepUnsaved, markUnsavedOffScreen, readUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
@@ -325,6 +325,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               });
               setSaveState({ status: "idle", error: undefined });
             } else if (unsaved) {
+              markUnsavedOffScreen(siteId);
               setSaveState({
                 status: "error",
                 error: "This site has edits that never reached the server.",
@@ -340,10 +341,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 action: {
                   label: "Restore my edits",
                   onClick: () => {
-                    instance.importProject(unsaved.project);
+                    /* Handed over once; Retry may already have taken it. The
+                       copy stays kept until a save of it is confirmed. */
+                    const kept = takeOffScreenUnsaved(siteId);
+                    if (!kept) return;
+                    instance.importProject(kept.project);
                     setIsDirty(true);
                     setSaveState({ status: "idle", error: undefined });
-                    clearUnsaved(siteId);
                     /* L5-075: the import emits only PROJECT_LOADED, which
                        autosave does not follow, so the restored edits sat
                        under "Unsaved changes" until some other edit. This
