@@ -936,6 +936,14 @@ function checkedTokensOrConflict(
   }
 }
 
+/* One interactive transaction holds a full snapshot: the CAS claim, the page
+   deletes and one upsert per page, each carrying its whole element tree,
+   serialized on one connection. Prisma's 5 s default was outrun by a 6.6 s
+   save on a loaded machine (2026-10-08) — a raw 500 for a save whose writes
+   are all ordinary. 20 s covers a large multi-page site; maxWait bounds the
+   wait for a connection separately so a pool stall fails fast instead. */
+const SAVE_TX_OPTIONS = { maxWait: 5_000, timeout: 20_000 } as const;
+
 /** L3-001: a page write hit the (siteId, slug) unique key. `pageNames` are the
  *  pages in this save that carry `slug` — the ones the user can rename. */
 export class PageSlugTakenError extends Error {
@@ -1198,6 +1206,14 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
         throw e;
       }
     }
+  }, SAVE_TX_OPTIONS).catch(async (e: unknown) => {
+    /* P2028: the transaction outran its budget. The commit may or may not have
+       landed, and answering 500 without asking left the next save to meet a
+       409. `savedAt` is this save's own stamp: if the row carries it, the save
+       is on the server. */
+    if (!(e instanceof Prisma.PrismaClientKnownRequestError) || e.code !== "P2028") throw e;
+    const row = await prisma.site.findUnique({ where: { id: input.siteId }, select: { lastEditedAt: true } });
+    if (row?.lastEditedAt?.getTime() !== savedAt.getTime()) throw new Error("SAVE_TIMEOUT");
   });
 
   return { success: true, savedAt };

@@ -170,3 +170,14 @@ describe("sites.saveProject — two pages on one slug (L3-001)", () => {
     });
   });
 });
+
+describe("sites.saveProject — a save that outran its transaction", () => {
+  it("SAVE_TIMEOUT reaches the client as a retryable server error with plain words", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    saveProjectFromEditorMock.mockRejectedValueOnce(new Error("SAVE_TIMEOUT"));
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await expect(
+      caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never),
+    ).rejects.toMatchObject({ code: "INTERNAL_SERVER_ERROR", message: expect.stringContaining("took too long") });
+  });
+});

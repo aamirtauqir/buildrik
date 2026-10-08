@@ -399,6 +399,14 @@ export const sitesRouter = router({
                 : `Another page already uses the address /${e.slug} (${names[0] ?? "this page"}). Change its URL in Page settings to keep saving.`,
           });
         }
+        /* The save outran its transaction budget and its stamp is not on the
+           row: nothing landed. A server fault (5xx), so autosave sends it
+           again; the words say so instead of a raw Prisma message. */
+        if (e instanceof Error && e.message === "SAVE_TIMEOUT")
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "The save took too long and was not applied. It will be tried again.",
+          });
         /* The editor sent a full snapshot with no pages in it — refused at the
            write boundary before it could delete the site's pages. Surfaced as a
            precondition rather than a 500 so the editor can say something true
