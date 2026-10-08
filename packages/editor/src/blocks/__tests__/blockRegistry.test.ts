@@ -251,8 +251,8 @@ describe("insertBlock — elementType fallback branch", () => {
 // ---------------------------------------------------------------------------
 
 describe("blockDefinitions — registry integrity", () => {
-  it("registers exactly 68 blocks (11 Basic + 9 Media + 6 Layout + 16 Forms + 8 Sections + 14 Components + 4 Ecommerce)", () => {
-    expect(blockDefinitions).toHaveLength(68);
+  it("registers exactly 69 blocks (12 Basic + 9 Media + 6 Layout + 16 Forms + 8 Sections + 14 Components + 4 Ecommerce)", () => {
+    expect(blockDefinitions).toHaveLength(69);
   });
 
   it("has no duplicate block ids", () => {

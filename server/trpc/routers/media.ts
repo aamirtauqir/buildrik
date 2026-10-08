@@ -19,7 +19,8 @@ import {
   restoreAssetVersion,
   updateAsset,
 } from "@/server/services/media.service";
-import { applyAltTextToAsset } from "@/server/services/alt-text.service";
+import { AltTextError, applyAltTextToAsset, type AltTextErrorCode } from "@/server/services/alt-text.service";
+import { checkRateLimit } from "@/server/services/rate-limiter";
 import { PermissionError } from "@/server/services/permission.service";
 import { z } from "zod";
 import { searchStockPhotos, searchStockVideos, StockError } from "@/server/services/stock.service";
@@ -54,6 +55,16 @@ function rethrowPermission(e: unknown): never {
   }
   throw e;
 }
+
+/** Alt text fires on every image upload, so a bulk drop of a few dozen files
+ *  must pass; a script hammering Regenerate must not. Per user, per minute. */
+const ALT_TEXT_PER_MINUTE = 30;
+
+const ALT_TEXT_ERROR_CODES: Record<AltTextErrorCode, "PRECONDITION_FAILED" | "TOO_MANY_REQUESTS" | "INTERNAL_SERVER_ERROR"> = {
+  NOT_CONFIGURED: "PRECONDITION_FAILED",
+  QUOTA_EXCEEDED: "TOO_MANY_REQUESTS",
+  PROVIDER_FAILED: "INTERNAL_SERVER_ERROR",
+};
 
 /**
  * Carry the stock failure's REASON to the client, which only ever sees the tRPC
@@ -303,17 +314,26 @@ export const mediaRouter = router({
   // ─── AI alt-text (P7) ───────────────────────────────────────────────────
 
   /**
-   * Generate alt text via Claude Haiku vision and persist it. Skips when
+   * Generate alt text via the OpenAI vision model and persist it. Skips when
    * the user has already typed alt text (pre-call + post-call TOCTOU
    * guards). Returns { altText, skipped } so the editor can choose
-   * whether to display "AI-generated" provenance.
+   * whether to display "AI-generated" provenance. Each provider call costs
+   * one AI unit (the service reserves/refunds it); the router adds a
+   * per-user burst limit on top.
    */
   generateAltText: protectedProcedure
     .input(generateAltTextSchema)
     .mutation(async ({ ctx, input }) => {
+      const rl = await checkRateLimit(`alt-text:${ctx.session.user.id}`, ALT_TEXT_PER_MINUTE, 60_000);
+      if (!rl.allowed) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many alt text requests. Try again shortly." });
+      }
       try {
         return await applyAltTextToAsset(ctx.session.user.id, input.assetId, { force: input.force });
       } catch (e: unknown) {
+        if (e instanceof AltTextError) {
+          throw new TRPCError({ code: ALT_TEXT_ERROR_CODES[e.code], message: e.message });
+        }
         if (e instanceof Error && e.message === "ASSET_NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found." });
         }

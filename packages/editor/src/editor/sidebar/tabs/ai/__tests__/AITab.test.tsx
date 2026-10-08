@@ -93,7 +93,7 @@ describe("AITab — scope + composer wiring", () => {
     fireEvent.keyDown(ta, { key: "Enter" });
 
     expect(lastSubscribe.input?.intent).toBe("style-command");
-    expect(lastSubscribe.input?.scope).toEqual({ kind: "element", id: "el-1" });
+    expect(lastSubscribe.input?.scope).toMatchObject({ kind: "element", id: "el-1" });
 
     await act(async () => {
       lastSubscribe.onData?.({

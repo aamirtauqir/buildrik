@@ -13,14 +13,22 @@ import type { AIProvider, TokenChunk } from "./types";
  * key for.
  */
 
+/** Per request, until the response headers arrive (the SDK clears its timer
+ *  then, so a stream that has started is not cut off). The SDK default is
+ *  10 minutes with 2 retries — ~30 minutes for one hung call. */
+const REQUEST_TIMEOUT_MS = 60_000;
+const MAX_RETRIES = 1;
+
 let _client: OpenAI | undefined;
 export function getOpenAI(): OpenAI {
-  if (!_client) _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  if (!_client) {
+    _client = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      timeout: REQUEST_TIMEOUT_MS,
+      maxRetries: MAX_RETRIES,
+    });
+  }
   return _client;
-}
-
-export function isOpenAIConfigured(): boolean {
-  return (process.env.OPENAI_API_KEY ?? "").length > 0;
 }
 
 class OpenAIProvider implements AIProvider {

@@ -14,3 +14,4 @@ export { dividerBlockConfig } from "./Divider";
 export { rowBlockConfig } from "./Row";
 export { columnBlockConfig } from "./Column";
 export { spacerBlockConfig } from "./Spacer";
+export { themeToggleBlockConfig } from "./ThemeToggle";

@@ -5,8 +5,8 @@
  */
 
 // Unified ControlRow system
-export { ControlRow, CompactRow, StackedRow, SubTitle, rowTestId, fieldTestId, labelTestId } from "./ControlRow";
-export type { ControlRowProps, SubTitleProps } from "./ControlRow";
+export { ControlRow, rowTestId, fieldTestId, labelTestId } from "./ControlRow";
+export type { ControlRowProps } from "./ControlRow";
 
 // Boolean row (box first, label beside)
 export { CheckRow } from "./CheckRow";
@@ -41,10 +41,9 @@ export { AlignmentGrid } from "./AlignmentGrid";
 export type { AlignmentGridProps } from "./AlignmentGrid";
 
 // Text controls
-export { TextInputRow, SectionLabel, SubSectionTitle } from "./TextControls";
+export { TextInputRow, SubSectionTitle } from "./TextControls";
 export type {
   TextInputRowProps,
-  SectionLabelProps,
   SubSectionTitleProps,
 } from "./TextControls";
 

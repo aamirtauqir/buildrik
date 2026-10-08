@@ -17,6 +17,9 @@ import type { AssetPickRequest } from "./assetPick";
 
 export type { MediaSortBy, SortDirection, UploadProgress, MediaAsset };
 export type { StockFailureReason };
+
+/** Why the last stock search failed for each kind (photos: Unsplash, videos: Pexels). */
+export type StockSearchFailure = Record<"img" | "vid", StockFailureReason | null>;
 export type { StockPhoto, StockVideo, DiscIcon, DiscFont };
 
 // --- Nav ---
@@ -300,11 +303,11 @@ export interface DiscoveryStateResult {
   discFonts: DiscFont[];
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
-  /** WHY the last search failed, or null when it did not. A reason and an
-      empty result are different facts — the modal used to render both as
-      "No photos found for …" (blocker A-STOCK). Truthy on any failure, so
-      callers that only care whether it broke can still just test it. */
-  searchFailed: StockFailureReason | null;
+  /** WHY the last search failed, per kind, or null where it did not. A
+      reason and an empty result are different facts — the modal used to
+      render both as "No photos found for …" (blocker A-STOCK). Per kind
+      because photos and videos are separate providers with separate keys. */
+  searchFailed: StockSearchFailure;
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;
@@ -402,11 +405,11 @@ export interface MediaStateResult {
   discFonts: DiscFont[];
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
-  /** WHY the last search failed, or null when it did not. A reason and an
-      empty result are different facts — the modal used to render both as
-      "No photos found for …" (blocker A-STOCK). Truthy on any failure, so
-      callers that only care whether it broke can still just test it. */
-  searchFailed: StockFailureReason | null;
+  /** WHY the last search failed, per kind, or null where it did not. A
+      reason and an empty result are different facts — the modal used to
+      render both as "No photos found for …" (blocker A-STOCK). Per kind
+      because photos and videos are separate providers with separate keys. */
+  searchFailed: StockSearchFailure;
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;

@@ -325,6 +325,37 @@ describe("ai router", () => {
     ).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
+  /* Element scope carries a snapshot of the element plus the token registry
+     and media library, so the model sees what it edits. */
+  it("streamPrompt passes the element snapshot, tokens and assets to the edit generator", async () => {
+    generateEditCommands.mockResolvedValueOnce([]);
+    const context = { type: "heading", text: "Hello", styles: { color: "#111111" } };
+    const tokens = [{ id: "color-brand", name: "Brand", value: "#1A56DB", type: "color" }];
+    const assets = [{ id: "a1", url: "https://cdn.x.com/a.jpg", name: "a.jpg" }];
+    const caller = aiRouter.createCaller(callerCtx);
+    const sub = await caller.streamPrompt({
+      prompt: "make it more concise",
+      scope: { kind: "element", id: "el-1", context, tokens, assets },
+      model: "gpt-4o-mini",
+      intent: "style-command",
+    });
+    for await (const chunk of sub) void chunk;
+    expect(generateEditCommands).toHaveBeenCalledWith(
+      expect.objectContaining({ elementId: "el-1", context, tokens, assets }),
+    );
+  });
+
+  it("rejects an oversized element snapshot on streamPrompt", async () => {
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.streamPrompt({
+        prompt: "hi",
+        scope: { kind: "element", id: "el-1", context: { type: "text", text: "x".repeat(5000) } },
+        model: "gpt-4o-mini",
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
   it("rejects an oversized element-scope id on streamPrompt (S-8 .max())", async () => {
     const caller = aiRouter.createCaller(callerCtx);
     await expect(

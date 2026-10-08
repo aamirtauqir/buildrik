@@ -21,6 +21,7 @@ import {
 import { resolveSiteOrigin, withSitemapDirective } from "@lib/publish-urls";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 import { buildSitemapXml } from "@buildrik/shared/seo/sitemap";
+import { publishPathError } from "@buildrik/shared/schemas/publish";
 
 export interface DeployPage {
   path: string;
@@ -169,6 +170,13 @@ function buildVercelConfig(input: Pick<DeployInputs, "redirects" | "domains" | "
 }
 
 export function buildDeployFiles(input: DeployInputs): DeployFile[] {
+  /* The schema refuses these at the transport boundary; a rollback's stored
+     payload and the CMS generator's pages never crossed it. Nothing uploads a
+     `vercel.json`, an `api/` function or a climbing path as a "page". */
+  for (const p of input.pages) {
+    const error = publishPathError(p.path);
+    if (error) throw new Error(`UNSAFE_PUBLISH_PATH: ${JSON.stringify(p.path)} — ${error}`);
+  }
   /* A site with a verified custom domain and no typed canonical used to ship
      NO canonical at all — only the typed value was ever consulted. */
   const canonicalOrigin = resolveSiteOrigin({

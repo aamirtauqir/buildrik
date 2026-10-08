@@ -125,15 +125,3 @@ export function saveSetToStorage(
     // localStorage might be full or disabled - silently fail
   }
 }
-
-/** Apply stored hidden/locked states to canvas DOM elements */
-export function applyStoredStatesToDOM(hiddenIds: Set<string>, lockedIds: Set<string>): void {
-  hiddenIds.forEach((id) => {
-    const el = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement;
-    if (el) el.setAttribute("data-hidden", "true");
-  });
-  lockedIds.forEach((id) => {
-    const el = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement;
-    if (el) el.setAttribute("data-locked", "true");
-  });
-}

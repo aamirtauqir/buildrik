@@ -78,6 +78,18 @@ describe("snapshotFromTokens", () => {
     const s = snapshotFromTokens(legacy);
     expect(s.colors.legacy).toBe("#abcdef");
   });
+
+  /* L2-001: a name-derived key kept its spaces ("radius none"), which no
+     placeholder can carry — the save wrote one, the apply never read it. */
+  it("slugs a key derived from a display name", () => {
+    const s = snapshotFromTokens([
+      v6Token({
+        id: "r-none", name: "Radius None", value: "0", category: "spacing",
+        cssVar: "--r-none", type: "length", kind: "radius",
+      }),
+    ]);
+    expect(s.radius["radius-none"]).toBe("0");
+  });
 });
 
 describe("snapshotFromComputedStyle", () => {

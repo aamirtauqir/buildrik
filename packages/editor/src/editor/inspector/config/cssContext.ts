@@ -1,4 +1,5 @@
 import type { Composer, Element } from "../../../engine";
+import { stylesAt } from "../../../engine/commands/commandOperations";
 import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
@@ -56,12 +57,7 @@ export function computeEffectiveStyles(
   currentPseudoState: PseudoStateId,
 ): Record<string, string> {
   if (!el) return {};
-  let out: Record<string, string> = { ...(el.getStyles?.() || {}) };
-
-  if (currentBreakpoint !== "desktop" && composer?.styles) {
-    const bpStyles = composer.styles.getBreakpointStyle(el.getId(), currentBreakpoint);
-    out = { ...out, ...bpStyles };
-  }
+  let out = stylesAt(composer, el, currentBreakpoint);
 
   if (currentPseudoState !== "normal" && composer?.styles) {
     const selector = `[data-buildrick-id="${el.getId()}"]:${currentPseudoState}`;

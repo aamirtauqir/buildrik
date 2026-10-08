@@ -30,6 +30,7 @@ function makeComposer(
 function makeTxComposer(present = true) {
   const beginTransaction = vi.fn();
   const endTransaction = vi.fn();
+  const rollbackTransaction = vi.fn();
   const flushPending = vi.fn();
   const setStyle = vi.fn();
   const setContent = vi.fn();
@@ -39,9 +40,10 @@ function makeTxComposer(present = true) {
     },
     beginTransaction,
     endTransaction,
+    rollbackTransaction,
     history: { flushPending },
   } as unknown as Composer;
-  return { composer, beginTransaction, endTransaction, flushPending, setStyle, setContent };
+  return { composer, beginTransaction, endTransaction, rollbackTransaction, flushPending, setStyle, setContent };
 }
 
 function commitEdit(commands: unknown[]) {
@@ -135,15 +137,19 @@ describe("applyAiEdit", () => {
     expect(setStyle).toHaveBeenCalledTimes(2);
   });
 
-  it("flushes the pending history record so the edit is one immediate undo step", async () => {
-    const { composer, flushPending } = makeTxComposer();
+  /* Once before the batch (a user edit still in the coalesce window becomes
+     its own entry) and once after (the AI edit is one immediate undo step). */
+  it("flushes history before and after the batch", async () => {
+    const { composer, flushPending, beginTransaction, endTransaction } = makeTxComposer();
     await applyAiEdit(
       composer,
       commitEdit([
         { commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#000" } },
       ]),
     );
-    expect(flushPending).toHaveBeenCalledOnce();
+    expect(flushPending).toHaveBeenCalledTimes(2);
+    expect(flushPending.mock.invocationCallOrder[0]).toBeLessThan(beginTransaction.mock.invocationCallOrder[0]);
+    expect(flushPending.mock.invocationCallOrder[1]).toBeGreaterThan(endTransaction.mock.invocationCallOrder[0]);
   });
 
   it("skips invalid / non-set-style entries but still wraps in a transaction", async () => {
@@ -163,8 +169,10 @@ describe("applyAiEdit", () => {
     expect(endTransaction).toHaveBeenCalledOnce();
   });
 
-  it("closes the transaction even when applying throws (endTransaction in finally)", async () => {
-    const { composer, endTransaction } = makeTxComposer(false); // getElement → undefined
+  /* All or nothing: a throwing command rolls the batch back instead of
+     committing what ran before it. */
+  it("rolls the transaction back when applying throws", async () => {
+    const { composer, endTransaction, rollbackTransaction } = makeTxComposer(false); // getElement → undefined
     await expect(
       applyAiEdit(
         composer,
@@ -173,7 +181,8 @@ describe("applyAiEdit", () => {
         ]),
       ),
     ).rejects.toThrow(/element not found/i);
-    expect(endTransaction).toHaveBeenCalledOnce();
+    expect(rollbackTransaction).toHaveBeenCalledOnce();
+    expect(endTransaction).not.toHaveBeenCalled();
   });
 
   it("handles a missing commands payload as a no-op (still balanced transaction)", async () => {
@@ -444,6 +453,14 @@ describe("applyMoveElement", () => {
 });
 
 describe("setAttributeArgsSchema", () => {
+  /* A browser strips tabs/newlines/controls from a scheme, so "java\tscript:"
+     runs; the old anchored regex let it through. */
+  it.each(["java\tscript:alert(1)", "\x01javascript:alert(1)", " vbscript:x", "data:text/html,<b>"])(
+    "rejects a dangerous href %j",
+    (value) => {
+      expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "href", value }).success).toBe(false);
+    },
+  );
   it("accepts a normal href, alt text, and a valid target", () => {
     expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "href", value: "https://x.com" }).success).toBe(true);
     expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "alt", value: "A photo" }).success).toBe(true);
@@ -488,6 +505,7 @@ describe("applySetAttribute", () => {
       elements: { getElement: vi.fn(() => ({ setAttribute })) },
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),
+      rollbackTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
     } as unknown as Composer;
     const r = await applyAiEdit(composer, commitEdit([
@@ -503,6 +521,7 @@ describe("applySetAttribute", () => {
       elements: { getElement: vi.fn(() => ({ setAttribute })) },
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),
+      rollbackTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
     } as unknown as Composer;
     const r = await applyAiEdit(composer, commitEdit([
@@ -521,6 +540,7 @@ function makeStyleComposer() {
     styles: { setRule, setBreakpointStyle },
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
+    rollbackTransaction: vi.fn(),
     history: { flushPending: vi.fn() },
   } as unknown as Composer;
   return { composer, setRule, setBreakpointStyle };
@@ -577,6 +597,7 @@ describe("applySetStyleVariant", () => {
       },
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),
+      rollbackTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
     } as unknown as Composer;
     const r = await applyAiEdit(composer, commitEdit([
@@ -606,6 +627,7 @@ describe("applySetStyleVariant", () => {
       },
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),
+      rollbackTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
     } as unknown as Composer;
     // collision with p2's slug → rejected (throws → batch rejects)
@@ -645,6 +667,7 @@ describe("applySetStyleVariant", () => {
       },
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),
+      rollbackTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
     } as unknown as Composer;
 
@@ -679,6 +702,7 @@ describe("set-token (W4) — design-token command", () => {
     const composer = {
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),
+      rollbackTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
       designSystem: { setDesignToken },
     } as unknown as Composer;
@@ -705,6 +729,7 @@ describe("save-as-component (W12)", () => {
     const composer = {
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),
+      rollbackTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
       elements: { getElement: vi.fn(() => ({ toJSON: () => ({ children: [{ children: [] }] }) })) },
       components: { createComponent },
@@ -723,6 +748,7 @@ describe("save-as-component (W12)", () => {
     const composer = {
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),
+      rollbackTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
       elements: { getElement: vi.fn(() => ({ toJSON: () => big })) },
       components: { createComponent },

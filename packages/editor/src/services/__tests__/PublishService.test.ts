@@ -29,8 +29,10 @@ const raiseSaveConflict = vi.fn((err: unknown) =>
   /SAVE_CONFLICT:/.test(String(err)) ? new Error("SAVE_CONFLICT") : null,
 );
 const siteColumnsLoaded = vi.fn((_siteId: string) => true);
+const hasProjectLoaded = vi.fn((_siteId: string) => true);
 vi.mock("../BuildrikSyncProvider", () => ({
   siteColumnsLoaded: (siteId: string) => siteColumnsLoaded(siteId),
+  hasProjectLoaded: (siteId: string) => hasProjectLoaded(siteId),
   settledBaselineLastEditedAt: () => settledBaseline(),
   raiseSaveConflict: (e: unknown) => raiseSaveConflict(e),
 }));
@@ -97,6 +99,31 @@ describe("publishSite", () => {
     );
     expect(siteColumnsLoaded).toHaveBeenCalledWith("site-1");
     expect(publishMutate).not.toHaveBeenCalled();
+  });
+
+  /* P1-2: a tab whose project never loaded shows the fallback; publishing it
+     would replace the live site with that. Same invariant the save boundary
+     enforces. */
+  it("refuses, before any request, while the project has not loaded from the server", async () => {
+    hasProjectLoaded.mockReturnValueOnce(false);
+    await expect(publishSite("site-1", [{ path: "index.html", html: "<html></html>" }])).rejects.toThrow(
+      "This site didn't load. Reload the editor before publishing.",
+    );
+    expect(hasProjectLoaded).toHaveBeenCalledWith("site-1");
+    expect(publishMutate).not.toHaveBeenCalled();
+  });
+
+  /* P2-3: the router's sentence does not name the code the editor's
+     "Vercel not connected" toast keys on; the code arrives as data.cause.reason. */
+  it("names VERCEL_NOT_CONNECTED when the server refuses for a missing Vercel connection", async () => {
+    publishMutate.mockRejectedValueOnce(
+      Object.assign(new Error("Connect this workspace to Vercel before publishing."), {
+        data: { code: "PRECONDITION_FAILED", cause: { reason: "VERCEL_NOT_CONNECTED" } },
+      }),
+    );
+    await expect(publishSite("site-1", [])).rejects.toThrow(
+      "VERCEL_NOT_CONNECTED: Connect this workspace to Vercel before publishing.",
+    );
   });
 
   it("propagates a tRPC failure (pre-publish checks / no Vercel connection)", async () => {

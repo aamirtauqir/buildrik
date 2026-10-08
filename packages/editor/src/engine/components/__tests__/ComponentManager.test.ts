@@ -431,6 +431,24 @@ describe("ComponentManager — snapshot / restore for toast Undo", () => {
     expect(manager.getElement(i1)!.getData().data?.componentInstance).toMatchObject({ componentId: comp.id, isDetached: false });
   });
 
+  /* L2-010: the restore emitted only COMPONENT_LIST_UPDATED, so the server
+     mirror (which listens to COMPONENT_CREATED) never re-upserted the master —
+     after a reload the undone delete was a delete again. */
+  it("restoreDeletedComponent announces the master so the server copy comes back", async () => {
+    const { composer, manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const snap = mgr.snapshotComponent(comp.id)!;
+    await mgr.deleteComponent(comp.id);
+    const before = emitsOf(composer, EVENTS.COMPONENT_CREATED).length;
+
+    await mgr.restoreDeletedComponent(snap);
+
+    const created = emitsOf(composer, EVENTS.COMPONENT_CREATED);
+    expect(created).toHaveLength(before + 1);
+    expect(created.at(-1)?.[1]).toMatchObject({ component: { id: comp.id } });
+  });
+
   it("a snapshot is a copy — detaching does not mark its instance records detached", async () => {
     const { manager, mgr, page } = makeStack();
     const card = sourceElement(manager, page.root.id);

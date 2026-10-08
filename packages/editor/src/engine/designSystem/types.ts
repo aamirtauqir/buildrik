@@ -123,6 +123,16 @@ export interface LegacyDesignToken {
 }
 
 export type { DesignToken, TokenRef, TokenLayer, DarkMode } from "@buildrik/shared/schemas/design-tokens";
+import type { DesignToken, DarkMode } from "@buildrik/shared/schemas/design-tokens";
+
+/** A token set painted on the canvas INSTEAD of the saved one while a Brand
+ *  flow previews (Dark Auto, generator, logo/URL). Never saved, never in
+ *  history; `theme` forces the canvas light or dark for the preview. */
+export interface BrandPreview {
+  tokens: DesignToken[];
+  darkMode: DarkMode;
+  theme?: "light" | "dark";
+}
 
 export type ThemeMode = "light" | "dark" | "system";
 

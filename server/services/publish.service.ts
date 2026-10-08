@@ -323,7 +323,6 @@ async function dispatchWorker(
 
 export async function startPublish(
   siteId: string,
-  workspaceId: string,
   userId: string,
   pages?: PublishPage[],
   /** Set when the publisher has seen and accepted that the approval is stale
@@ -400,16 +399,14 @@ export async function startPublish(
   // was read only in settings and never enforced.
   if (!opts?.bypassApproval) {
     /* SECURITY: ask the SITE's workspace, never the caller's.
-       `workspaceId` here is `resolveWorkspaceId(ctx)` — the caller's SESSION
-       workspace (workspace-ctx.ts:44, any ACTIVE membership). The route above
-       authorises with `checkSiteRole`, which resolves the role on the SITE. So
-       the two can legitimately differ: every signup owns a personal workspace,
-       and a user who is an EDITOR on someone else's site can have their session
-       resolve to their own. Reading `editsRequireApproval` off that one asked
-       the wrong workspace whether this site needs review — and a workspace with
-       the flag off skipped the gate entirely, so the publish went out with no
-       approval and no error. The deploy 50 lines below already uses
-       `site.workspaceId`; only the gate was reading the session value. */
+       The caller's SESSION workspace (`resolveWorkspaceId(ctx)`, any ACTIVE
+       membership) can legitimately differ from the site's: every signup owns a
+       personal workspace, and a user who is an EDITOR on someone else's site
+       can have their session resolve to their own. Reading
+       `editsRequireApproval` off that one asked the wrong workspace whether
+       this site needs review — and a workspace with the flag off skipped the
+       gate entirely, so the publish went out with no approval and no error.
+       startPublish no longer takes the session workspace at all. */
     const gateWorkspaceId = site.workspaceId;
     // PD-7/8: reviews live behind `agency_layer` —
     // reviews.submit hard-refuses (requireAgencyLayer) when the flag is off, so
@@ -503,7 +500,11 @@ export async function startPublish(
     job = await prisma.publishBuildJob.create({
       data: {
         siteId,
-        workspaceId,
+        /* The worker reads every workspace-scoped decision off this column —
+           whose Vercel account, which plan's badge, whose app scripts and
+           webhooks — so it is the SITE's workspace, never the caller's session
+           one (a member of two workspaces can publish a site in either). */
+        workspaceId: site.workspaceId,
         status: "QUEUED",
         progress: 0,
         steps: [],
@@ -580,7 +581,10 @@ export async function getPublishStatus(jobId: string) {
 }
 
 export async function cancelPublish(jobId: string) {
-  const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
+  const job = await prisma.publishBuildJob.findUnique({
+    where: { id: jobId },
+    include: { site: { select: { publishedUrl: true } } },
+  });
   if (!job || !["QUEUED", "BUILDING"].includes(job.status)) {
     throw new Error("NOT_CANCELLABLE");
   }
@@ -592,9 +596,11 @@ export async function cancelPublish(jobId: string) {
       // row and keeps the rendered HTML at rest forever.
       data: { status: "CANCELLED", log: Prisma.DbNull },
     }),
+    // A cancelled RE-publish leaves the previous deployment serving — keep the
+    // site PUBLISHED, same rule as the dispatch-failure and worker-failure exits.
     prisma.site.update({
       where: { id: job.siteId },
-      data: { status: "DRAFT" },
+      data: { status: job.site.publishedUrl ? "PUBLISHED" : "DRAFT" },
     }),
   ]);
   return updated;
@@ -791,21 +797,18 @@ export async function getPublishHistory(siteId: string): Promise<PublishHistoryR
  * already shipped is not a new change to sign off — and refuses a target that
  * isn't completed or whose payload was pruned.
  */
-export async function rollbackPublish(
-  workspaceId: string,
-  siteId: string,
-  jobId: string,
-  userId: string,
-) {
+export async function rollbackPublish(siteId: string, jobId: string, userId: string) {
+  // Scoped by site, which the router has role-checked. Filtering on the
+  // caller's session workspace refused a member of two workspaces (NOT_FOUND).
   const target = await prisma.publishBuildJob.findFirst({
-    where: { id: jobId, siteId, site: { workspaceId } },
+    where: { id: jobId, siteId },
     select: { id: true, status: true, log: true },
   });
   if (!target) throw new Error("NOT_FOUND");
   if (target.status !== "COMPLETED") throw new Error("NOT_ROLLBACKABLE");
   const pages = (target.log as { pages?: PublishPage[] } | null)?.pages;
   if (!pages) throw new Error("NOT_ROLLBACKABLE");
-  return startPublish(siteId, workspaceId, userId, pages, false, {
+  return startPublish(siteId, userId, pages, false, {
     bypassApproval: true,
     rolledBackFrom: jobId,
   });

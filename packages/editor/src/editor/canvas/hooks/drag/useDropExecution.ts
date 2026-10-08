@@ -7,8 +7,8 @@
  *   2. Tear down the drag session (resetSession + clear visuals +
  *      stop auto-scroll + clear affordance).
  *   3. Guard against !composer / isEditing.
- *   4. OS-file drop branch (image upload + apply src to target).
- *   5. Internal-media drop branch (insertMediaAt + optional auto-save).
+ *   4. OS-file drop branch (image upload + dropMedia).
+ *   5. Internal-media drop branch (dropMedia + optional auto-save).
  *   6. Dispatch chain:
  *        handleMultiElementDrop → handleElementDrop → handleComponentDrop
  *        → handleTemplateDrop → handleBlockDrop (terminal).
@@ -25,6 +25,8 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { findDropTargetElement } from "../../../../shared/utils/dragDrop";
 import { calculateFreshDropTarget } from "./dragCalculations";
+import { dropMedia, isLibraryAsset, replaceTargetFor } from "./mediaDrop";
+import { writableElements } from "../../../../engine/commands/commandOperations";
 import {
   handleMultiElementDrop,
   handleElementDrop,
@@ -107,15 +109,13 @@ export function useDropExecution({
                 : (rawType as "image" | "video" | "icon" | "svg" | "audio" | "lottie" | "font");
 
       try {
-        const result = composer.mediaOps.insertMediaAt(src, insertType, {
-          x,
-          y,
-          targetElementId: targetId ?? undefined,
-          path: "drag",
-          alt: alt || undefined,
-        });
+        /* Insert at the drop point, or replace when dropped on an image /
+           background — mediaDrop.ts decides (media P0-1). */
+        const result = dropMedia(composer, { src, type: insertType, alt: alt || undefined, targetId, x, y });
 
-        if (result && src.startsWith("blob:")) {
+        if (result?.kind === "locked") {
+          // The lock gate already raised the "locked" toast.
+        } else if (result && src.startsWith("blob:")) {
           /* Same truth the Media panel's click-insert tells: an asset that
              never reached the server carries a session URL, which the
              sanitizer strips on the way into the document. The element is
@@ -126,7 +126,7 @@ export function useDropExecution({
           });
         } else if (result) {
           onDropSuccessRef.current?.({
-            elementLabel: `${name || "Media"} ${targetId ? "applied" : "added"} ✓`,
+            elementLabel: `${name || "Media"} ${result.kind === "replaced" ? "applied" : "added"} ✓`,
             elementType: insertType,
           });
         } else {
@@ -142,9 +142,11 @@ export function useDropExecution({
         });
       }
 
-      // Auto-save remote (stock/discovery) assets to the library so the
-      // user's next session has them locally.
-      if ((insertType === "image" || rawType === "img") && src.startsWith("http")) {
+      /* Auto-save a remote (stock/discovery) image to the library so the
+         user's next session has it. Not a library asset: those are already
+         there, and every drag of one used to upload it again as a new
+         "imported-…" asset (media P0-1 follow-up). */
+      if ((insertType === "image" || rawType === "img") && src.startsWith("http") && !isLibraryAsset(composer, src)) {
         try {
           const res = await fetch(src);
           const blob = await res.blob();
@@ -230,45 +232,62 @@ export function useDropExecution({
             canvasRef,
             findDropTargetElement,
           );
+          const rect = canvasRef.current?.getBoundingClientRect();
+          const x = rect ? Math.round(e.clientX - rect.left) : undefined;
+          const y = rect ? Math.round(e.clientY - rect.top) : undefined;
 
-          if (ftId) {
-            const el = composer.elements.getElement(ftId);
-            if (el) {
-              const file = imageFiles[0];
-              onDropSuccessRef.current?.({
-                elementLabel: `Uploading ${file.name}...`,
-                pending: true,
-                elementType: "image",
+          /* A locked image under the cursor refuses before anything uploads. */
+          const replaceTarget = replaceTargetFor(composer, ftId, "image");
+          if (replaceTarget && writableElements(composer, [replaceTarget]).length === 0) return;
+
+          const file = imageFiles[0];
+          onDropSuccessRef.current?.({
+            elementLabel: `Uploading ${file.name}...`,
+            pending: true,
+            elementType: "image",
+          });
+
+          try {
+            const result = await composer.media.uploadFile(file);
+            if (result.success && result.asset) {
+              /* Inserted at the drop point (or replacing the image under it) —
+                 it used to set `src` straight onto whatever was under the
+                 cursor, the page root included, with no lock check and no
+                 transaction (media P0-1). */
+              const placed = dropMedia(composer, {
+                src: result.asset.src,
+                type: "image",
+                alt: result.asset.altText,
+                targetId: ftId,
+                x,
+                y,
               });
-
-              try {
-                const result = await composer.media.uploadFile(file);
-                if (result.success && result.asset) {
-                  el.setAttribute("src", result.asset.src);
-                  /* Third path with the same trap: a file dropped straight onto
-                     the canvas is uploaded here, and when that upload never
-                     reaches the server its src is a session Object URL the
-                     sanitizer strips. The attribute is set either way; only the
-                     sentence changes. */
-                  if (result.asset.localOnly || String(result.asset.src).startsWith("blob:")) {
-                    onDropErrorRef.current?.({
-                      type: "LOCAL_ONLY_MEDIA",
-                      message: `${file.name} is only on this device — it won't show on the page or publish. Re-upload when you're back online.`,
-                    });
-                  } else {
-                    onDropSuccessRef.current?.({
-                      elementLabel: `${file.name} applied ✓`,
-                      elementType: "image",
-                    });
-                  }
-                }
-              } catch (err) {
+              /* Third path with the same trap: a file dropped straight onto
+                 the canvas is uploaded here, and when that upload never
+                 reaches the server its src is a session Object URL the
+                 sanitizer strips. The element is placed either way; only the
+                 sentence changes. */
+              if (!placed) {
+                onDropErrorRef.current?.({ type: "INSERT_FAILED", message: "Could not place media" });
+              } else if (placed.kind === "locked") {
+                // The lock gate already raised the "locked" toast.
+              } else if (result.asset.localOnly || String(result.asset.src).startsWith("blob:")) {
                 onDropErrorRef.current?.({
-                  type: "INSERT_FAILED",
-                  message: "Could not upload dropped image",
+                  type: "LOCAL_ONLY_MEDIA",
+                  message: `${file.name} is only on this device — it won't show on the page or publish. Re-upload when you're back online.`,
+                });
+              } else {
+                onDropSuccessRef.current?.({
+                  elementLabel: `${file.name} ${placed.kind === "replaced" ? "applied" : "added"} ✓`,
+                  elementType: "image",
                 });
               }
             }
+          } catch (err) {
+            onDropErrorRef.current?.({
+              type: "INSERT_FAILED",
+              message: "Could not upload dropped image",
+            });
           }
           return;
         }

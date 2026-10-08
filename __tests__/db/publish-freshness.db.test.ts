@@ -33,7 +33,7 @@ describe("startPublish — freshness (C-3)", () => {
     const { user, workspace, site, loadedAt } = await seed();
 
     await expect(
-      startPublish(site.id, workspace.id, user.id, [], false, {
+      startPublish(site.id, user.id, [], false, {
         expectedLastEditedAt: loadedAt.toISOString(),
       }),
     ).rejects.toThrow(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
@@ -44,7 +44,7 @@ describe("startPublish — freshness (C-3)", () => {
   it("a tab holding the current token passes the freshness gate", async () => {
     const { user, workspace, site } = await seed();
 
-    const outcome = await startPublish(site.id, workspace.id, user.id, [], false, {
+    const outcome = await startPublish(site.id, user.id, [], false, {
       expectedLastEditedAt: site.lastEditedAt.toISOString(),
     }).then(
       () => "published",

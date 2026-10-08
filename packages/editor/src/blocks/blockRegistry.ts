@@ -22,6 +22,7 @@ import {
   rowBlockConfig,
   columnBlockConfig,
   spacerBlockConfig,
+  themeToggleBlockConfig,
 } from "./Basic";
 import {
   cardBlockConfig,
@@ -114,6 +115,7 @@ export const blockDefinitions: BlockDefinition[] = [
   rowBlockConfig,
   columnBlockConfig,
   spacerBlockConfig,
+  themeToggleBlockConfig,
 
   // Media blocks
   imageBlockConfig,

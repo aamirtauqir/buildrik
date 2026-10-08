@@ -41,8 +41,8 @@ export const ColorModeToggle: React.FC<ColorModeToggleProps> = ({ composer }) =>
       role="tablist"
       aria-label="Color mode"
       data-testid="brand-colour-mode-seg"
-      /* 7316:80949: a 24-tall white track with a hairline, drawn over the
-         top of the live preview's frame; the active segment is the grey one. */
+      /* 7316:80949: a 24-tall white track with a hairline, in the live
+         preview card's header row; the active segment is the grey one. */
       className="tw:box-border tw:inline-flex tw:h-6 tw:items-center tw:gap-0.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-px"
     >
       <Pill value="light" label="Light" active={active === "light"} composer={composer} />

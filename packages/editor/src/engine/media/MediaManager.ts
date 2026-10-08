@@ -265,6 +265,28 @@ export class MediaManager extends MediaEventEmitter {
    * intent. The Set itself stays in-memory; the *intent* is stored in
    * IndexedDB via asset.localOnly=true.
    */
+  /**
+   * The plan's storage quota as the server reports it (`media.checkStorageQuota`
+   * totalBytes; -1 = unlimited). Null until the chrome pushes it in.
+   */
+  private storageQuotaBytes: number | null = null;
+
+  /** Record the server's plan quota — the server is the authority on it. */
+  setStorageQuota(totalBytes: number | null): void {
+    this.storageQuotaBytes = totalBytes;
+  }
+
+  /**
+   * The cap the local gate enforces, or null for none. The server's plan
+   * quota when known (-1 = unlimited). Unknown with a server wired: the
+   * server's upload-token check decides. Unknown with no server (offline
+   * demo): the local IndexedDB backstop.
+   */
+  private effectiveQuotaBytes(): number | null {
+    if (this.storageQuotaBytes !== null) return this.storageQuotaBytes < 0 ? null : this.storageQuotaBytes;
+    return this.remoteSync ? null : STORAGE_QUOTA_BYTES;
+  }
+
   constructor(remoteSync?: RemoteAssetSync) {
     super();
     this.storage = new MediaStorage();
@@ -983,19 +1005,20 @@ export class MediaManager extends MediaEventEmitter {
       return { success: false, error: validation.error, fileName: file.name };
     }
 
-    // Pre-upload storage gate. Sum the local library's bytes and block when
-    // the new file would push past the 1GB cap. Emits QUOTA_EXCEEDED (the
+    // Pre-upload storage gate. Sum the library's bytes and block when the new
+    // file would push past the plan's quota. Emits QUOTA_EXCEEDED (the
     // library banner subscribes) and throws MediaQuotaError so callers see
     // the typed error by name — thrown before the try so it propagates
     // instead of being folded into a generic upload:error result.
+    const quotaBytes = this.effectiveQuotaBytes();
     const usedBytes = this.state.assets.reduce((sum, a) => sum + a.size, 0);
-    if (usedBytes + file.size > STORAGE_QUOTA_BYTES) {
+    if (quotaBytes !== null && usedBytes + file.size > quotaBytes) {
       this.emit(MEDIA_EVENTS.QUOTA_EXCEEDED, {
         usedBytes,
-        quotaBytes: STORAGE_QUOTA_BYTES,
+        quotaBytes,
         attemptedBytes: file.size,
       });
-      throw new MediaQuotaError(usedBytes, STORAGE_QUOTA_BYTES, file.size);
+      throw new MediaQuotaError(usedBytes, quotaBytes, file.size);
     }
 
     try {

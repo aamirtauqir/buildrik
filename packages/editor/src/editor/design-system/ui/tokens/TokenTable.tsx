@@ -94,5 +94,5 @@ export const TOKEN_CELL_NAME =
   "tw:flex tw:min-w-0 tw:items-center tw:gap-2 tw:pr-3 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
 export const TOKEN_CELL_VALUE =
   "tw:min-w-0 tw:truncate tw:pr-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
-/** The 16px preview slot: 13px in from the card edge on the board's 52px gutter column. */
-export const TOKEN_CELL_PREVIEW = "tw:flex tw:items-center tw:pl-[13px]";
+/** The 16px preview slot, 12px in from the card edge (4px grid) on the 52px gutter column. */
+export const TOKEN_CELL_PREVIEW = "tw:flex tw:items-center tw:pl-3";

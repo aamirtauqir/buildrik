@@ -22,7 +22,7 @@ import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { devLogger } from "../../../shared/utils/devLogger";
 import { computeEffectiveStyles } from "../config/cssContext";
-import { canWrite, writableElements } from "@/engine/commands/commandOperations";
+import { canWrite, setStyleAt, writableElements } from "@/engine/commands/commandOperations";
 
 // ============================================================================
 // TYPES
@@ -273,18 +273,10 @@ export function useStyleHandlers(
               { pseudo: `:${pseudo}`, mediaQuery: mq }
             );
           }
-        } else if (value === "" || value == null) {
-          if (bp === "desktop") {
-            el.removeStyle?.(property);
-          } else if (composer?.styles) {
-            composer.styles.removeBreakpointStyleProperty(id, bp, property);
-          }
         } else {
-          if (bp === "desktop") {
-            el.setStyle?.(property, value);
-          } else if (composer?.styles) {
-            composer.styles.setBreakpointStyle(id, bp, { [property]: value });
-          }
+          /* The base on desktop, the breakpoint override elsewhere — the same
+             branch the canvas-direct writes use (engine setStyleAt). */
+          setStyleAt(composer, el, bp, property, value ?? "");
         }
       };
 

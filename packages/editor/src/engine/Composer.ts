@@ -68,7 +68,7 @@ import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import { applyContrastFix } from "./designSystem/contrastFix";
 import { isAiEditableTokenValue } from "./designSystem/tokenValueGuard";
 import { mergeProjectTokens } from "./designSystem/projectTokens";
-import type { DesignToken } from "./designSystem/types";
+import type { BrandPreview, DarkMode, DesignToken } from "./designSystem/types";
 import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { CSSBundler } from "./designSystem/bundler";
 import { DSLinter } from "./designSystem/linter";
@@ -259,6 +259,19 @@ export class Composer extends EventEmitter {
      * `replacedBy` keeps the token and is never refused for that.
      */
     readonly setTokens: (next: DesignToken[], label: string) => boolean;
+    /** The canvas preview, or null. Set only through `setPreview`. */
+    preview: BrandPreview | null;
+    /** Paint `p` on the canvas instead of the saved tokens (null = back to the
+     *  saved ones). Touches neither settings nor history. */
+    readonly setPreview: (p: BrandPreview | null) => void;
+    /**
+     * Writes the site's Dark mode AND its tokens in ONE transaction (one ⌘Z).
+     * Tokens are always written — `tokens` when given, else the current merged
+     * set — because the save path keeps the stored darkMode when a payload
+     * carries no designTokens (sites.service withCheckedTokens). False, and
+     * nothing written, when read-only or the token write is refused.
+     */
+    readonly setDarkMode: (mode: DarkMode, label: string, tokens?: DesignToken[]) => boolean;
     /** Connect to tokens (spec §3): exact-match suggestions over every page,
      *  or one. Skips component instances and masters (owner, OQ-5). */
     readonly connectSuggestions: (pageId?: string) => ConnectSuggestion[];
@@ -397,6 +410,22 @@ export class Composer extends EventEmitter {
         }
         this.emit(EVENTS.BRAND_APPLIED, undefined);
         return true;
+      },
+      preview: null,
+      setPreview: (p) => {
+        this.designSystem.preview = p;
+        this.emit(EVENTS.BRAND_PREVIEW_CHANGED, undefined);
+      },
+      setDarkMode: (mode, label, tokens) => {
+        if (this.designSystem.readOnly) return false;
+        this.beginTransaction(label);
+        try {
+          if (!this.designSystem.setTokens(tokens ?? this.mergedDesignTokens(), label)) return false;
+          this.setProjectSettings({ ...this.getProjectSettings(), darkMode: mode });
+          return true;
+        } finally {
+          this.endTransaction();
+        }
       },
       connectSuggestions: (pageId) => {
         const pages = this.elements.exportPages().filter((p) => pageId === undefined || p.id === pageId);

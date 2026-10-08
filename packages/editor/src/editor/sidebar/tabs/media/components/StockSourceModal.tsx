@@ -35,7 +35,7 @@
 import * as React from "react";
 import { Search, X } from "lucide-react";
 import { Button, IconButton, Menu, MenuItem, ModalBody, ModalContent, ModalRoot, Popover, TextInput } from "@/editor/chrome-ui";
-import type { DiscColor, DiscOrientation, StockFailureReason, StockPhoto, StockVideo } from "../data/mediaTypes";
+import type { DiscColor, DiscOrientation, StockFailureReason, StockPhoto, StockSearchFailure, StockVideo } from "../data/mediaTypes";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_OUTLINE,
@@ -173,8 +173,8 @@ interface StockSourceModalProps {
   videos: StockVideo[];
   loading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   searchQuery: string;
-  /** WHY the last search failed, or null/absent when it did not (blocker A-STOCK). */
-  searchFailed?: StockFailureReason | null;
+  /** WHY the last search failed for each kind, absent when it did not (blocker A-STOCK). */
+  searchFailed?: StockSearchFailure;
   onSearch(query: string): void;
   orientation: DiscOrientation;
   color: DiscColor;
@@ -303,6 +303,8 @@ export function StockSourceModal({
   if (!open) return null;
 
   const results: StockItem[] = source === "img" ? photos : videos;
+  /* Photos and videos are separate providers: the tab shows its own failure. */
+  const failed = searchFailed?.[source] ?? null;
   const selected = selectedId === null ? null : (results.find((r) => r.id === selectedId) ?? null);
   const isLoading = loading[source];
   const noun = source === "img" ? "photos" : "videos";
@@ -389,10 +391,10 @@ export function StockSourceModal({
             {/* A failed request is not an empty result, and the three failures
                 are not each other. Until the service carried a reason, all four
                 rendered "No photos found for …" (blocker A-STOCK). */}
-            {!isLoading && searchFailed && searchQuery.length > 0 ? (
+            {!isLoading && failed && searchQuery.length > 0 ? (
               <p className={STATE} role="alert" data-testid="stock-failed">
-                {FAILURE_COPY[searchFailed].message}
-                {FAILURE_COPY[searchFailed].retryable ? (
+                {FAILURE_COPY[failed].message}
+                {FAILURE_COPY[failed].retryable ? (
                   <>
                     {" "}
                     <Button
@@ -409,7 +411,7 @@ export function StockSourceModal({
               </p>
             ) : null}
 
-            {!isLoading && !searchFailed && results.length === 0 && searchQuery.length > 0 ? (
+            {!isLoading && !failed && results.length === 0 && searchQuery.length > 0 ? (
               <p className={STATE} data-testid="stock-empty">
                 {`No ${noun} found for "${searchQuery}"`}
               </p>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Palette, UploadCloud, Lock, Unlock, Check, X, AlertTriangle, Undo2 } from "lucide-react";
+import { Palette, UploadCloud, Lock, Unlock, AlertTriangle, Undo2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { LoadingSkeleton, ErrorState, DeniedState, StateEmpty } from "@/components/states";
 import { SelectField, Button } from "@/components/dashboard/primitives";
+import { PushResults, type PushResultRow } from "./push-results";
 
-type PushResultRow = { siteId: string; name: string; status: "pushed" | "skipped-locked" | "skipped-held" | "skipped-version" | "failed"; error?: string };
 type PushPreviewRow = { siteId: string; name: string; status: "would-push" | "skipped-locked" | "skipped-held" | "skipped-version"; willChange: boolean };
 
 function timeAgo(d: Date | string): string {
@@ -231,35 +231,10 @@ export function ThemeManager() {
               </div>
             )}
 
-            {/* Per-site push result table. */}
+            {/* Per-site push result (BRP1-M4). */}
             {pushResults && pushResults.length > 0 && (
-              <div className="mt-4 overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
-                <div className="flex items-center justify-between border-b px-3 py-2" style={{ borderColor: "var(--color-border-default)" }}>
-                  <span className="text-body-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Push result</span>
-                  <button onClick={() => setPushResults(null)} className="text-neutral-400 hover:text-neutral-600"><X className="h-3.5 w-3.5" /></button>
-                </div>
-                <ul>
-                  {pushResults.map((r) => (
-                    <li key={r.siteId} className="flex items-center justify-between border-b px-3 py-1.5 text-body-sm last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
-                      <span style={{ color: "var(--color-text-primary)" }}>{r.name}</span>
-                      {/* Undo lives on the site row below, not here: this table is
-                          `useState` and the snapshot behind the undo is a DB row that
-                          outlives it. Two Undos for one site — one that vanishes on
-                          reload — was the confusing half of the same defect. */}
-                      {r.status === "pushed" ? (
-                        <span className="inline-flex items-center gap-1 text-[var(--color-success)]"><Check className="h-3 w-3" /> Updated</span>
-                      ) : r.status === "skipped-locked" ? (
-                        <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Locked — kept own</span>
-                      ) : r.status === "skipped-held" ? (
-                        <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Brand rolled back — skipped</span>
-                      ) : r.status === "skipped-version" ? (
-                        <span className="inline-flex items-center gap-1 text-neutral-400" title={r.error}><Lock className="h-3 w-3" /> {r.error?.startsWith("Brand upgrade is paused") ? "Brand upgrade paused — skipped" : "New brand format — re-capture theme"}</span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-[var(--color-error)]" title={r.error}><AlertTriangle className="h-3 w-3" /> Failed</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+              <div className="mt-4">
+                <PushResults rows={pushResults} onDismiss={() => setPushResults(null)} />
               </div>
             )}
 

@@ -7,8 +7,9 @@
  * changed, Undo · Done).
  *
  * One single-shot AI run (runPromptOnce, page scope) asked for one new
- * section after the target; the edit lands through applyAiEdit, which wraps it
- * in ONE transaction — so Undo is one history step. The daily counter
+ * section after the target; once it answers (and only if the run was not
+ * stopped meanwhile) the edit lands through applyAiEdit, which wraps it in ONE
+ * transaction — so Undo is one history step. The daily counter
  * ("7 generations left today") draws only when the ai.quota read answers
  * (useAiQuota, G2-129).
  *
@@ -24,7 +25,8 @@ import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { applyAiEdit } from "../../ai/applySetStyle";
 import { runPromptOnce, AiRunError, type AiErrorKind, type ServerEdit } from "../../ai/hooks/runPromptOnce";
-import { gatherTokens, gatherMediaAssets } from "../../ai/hooks/aiScopeContext";
+import { gatherTokens, gatherMediaAssets, toElementRef } from "../../ai/hooks/aiScopeContext";
+import { activePageElements } from "../../ai/hooks/useAIScope";
 import { DEFAULT_MODEL } from "../../ai/types";
 import { useAiQuota, quotaLeftLabel } from "../../ai/hooks/useAiQuota";
 
@@ -49,24 +51,52 @@ export function generateTarget(composer: Composer): GenerateTarget {
   return { afterId: top.getId(), label: `${pageName} · after ${name}` };
 }
 
-export type GenerateFn = (composer: Composer, prompt: string, target: GenerateTarget) => Promise<ServerEdit | null>;
+/** Asks for the block. Does NOT apply it: the screen applies the answer only
+ *  if the run was not stopped meanwhile. */
+export type GenerateFn = (
+  composer: Composer,
+  prompt: string,
+  target: GenerateTarget,
+  signal?: AbortSignal,
+) => Promise<ServerEdit | null>;
 
-/** The real run: one page-scope prompt, applied as one undo step. */
-const generateBlock: GenerateFn = async (composer, prompt, target) => {
-  const elements = composer.elements.getAllElements().slice(0, 200).map((el) => ({
-    id: el.getId(),
-    type: el.getType(),
-    text: el.getContent?.() ? String(el.getContent()).slice(0, 200) : undefined,
-  }));
+/** Applies the answer; resolves to the undo handle bound to the history entry
+ *  it recorded, or null when nothing changed. */
+export type ApplyFn = (composer: Composer, edit: ServerEdit, target: GenerateTarget) => Promise<(() => boolean) | null>;
+
+/** Elements the server scope-guards the edit against, capped like its schema. */
+const MAX_SCOPE_ELEMENTS = 200;
+
+/** The real run: one page-scope prompt over the ACTIVE page. The root and its
+ *  top-level sections go first, so the cap can never cut off the target. */
+const generateBlock: GenerateFn = async (composer, prompt, target, signal) => {
+  const onPage = activePageElements(composer);
+  const ordered = new Set([...onPage.slice(0, 1), ...(onPage[0]?.getChildren() ?? []), ...onPage]);
+  const elements = [...ordered].slice(0, MAX_SCOPE_ELEMENTS).map(toElementRef);
   const place = target.afterId ? `after element ${target.afterId}` : "at the end of the page";
   const { edit } = await runPromptOnce({
     prompt: `Add ONE new section ${place} (use add-section): ${prompt}`,
     scope: { kind: "page", elements, tokens: gatherTokens(composer), assets: gatherMediaAssets(composer) },
     model: DEFAULT_MODEL,
     intent: "style-command",
+    signal,
   });
-  if (edit && edit.rows.length > 0) await applyAiEdit(composer, { applyOps: edit.applyOps });
   return edit;
+};
+
+/** Apply as one undo step, with every new section pinned to the screen's
+ *  target (the model may anchor on any id it was shown — a nested element puts
+ *  the block inside a section). No target means an empty page: the root. */
+const applyBlock: ApplyFn = async (composer, edit, target) => {
+  const anchor = target.afterId ?? composer.elements.getActivePage()?.root?.id;
+  const commit = edit.applyOps.commit as { commands?: unknown };
+  const commands = Array.isArray(commit.commands) ? commit.commands : [];
+  const pinned = commands.map((c) => {
+    const cmd = c as { commandId?: unknown; args?: Record<string, unknown> };
+    return anchor && cmd.commandId === "add-section" && cmd.args ? { ...cmd, args: { ...cmd.args, elementId: anchor } } : c;
+  });
+  const { undo } = await applyAiEdit(composer, { applyOps: { ...edit.applyOps, commit: { ...commit, commands: pinned } } });
+  return undo;
 };
 
 const EXAMPLES = [
@@ -101,17 +131,22 @@ interface Props {
   onBack: () => void;
   /** Injected in tests; defaults to the real run. */
   generate?: GenerateFn;
+  /** Injected in tests; defaults to the real apply. */
+  apply?: ApplyFn;
 }
 
 const BAND = "tw:px-4 tw:py-2 tw:text-[12px] tw:leading-[18px]";
 
-export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generate = generateBlock }) => {
+export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generate = generateBlock, apply = applyBlock }) => {
   const [text, setText] = React.useState("");
   const [phase, setPhase] = React.useState<Phase>({ kind: "idle" });
   const target = React.useMemo(() => generateTarget(composer), [composer]);
   const runId = React.useRef(0);
-  /* Bound when the insert lands (history.captureUndo) — capturing on Done
-     would bind an edit made in between instead. */
+  /* The request in flight; Stop aborts it so the server stops generating. */
+  const abortRun = React.useRef<AbortController | null>(null);
+  /* The insert's own undo handle, bound to its history entry when it lands
+     (applyAiEdit → history.captureUndo) — capturing on Done would bind an edit
+     made in between instead. */
   const undoInsert = React.useRef<(() => boolean) | null>(null);
   const quota = useAiQuota(phase.kind);
   const quotaLabel = quota && quotaLeftLabel(quota, phase.kind === "idle" ? "generations" : undefined);
@@ -125,12 +160,21 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
 
   const run = async () => {
     const id = ++runId.current;
+    const ac = new AbortController();
+    abortRun.current = ac;
     setPhase({ kind: "thinking" });
-    const before = new Set(rootChildIds());
     try {
-      const edit = await generate(composer, text.trim(), target);
+      const edit = await generate(composer, text.trim(), target, ac.signal);
+      // Stopped (or superseded) while the model was answering: insert nothing.
       if (id !== runId.current) return;
       if (!edit || edit.rows.length === 0) {
+        setPhase({ kind: "error", error: "other" });
+        return;
+      }
+      const before = new Set(rootChildIds());
+      const undo = await apply(composer, edit, target);
+      if (id !== runId.current) return;
+      if (!undo) {
         setPhase({ kind: "error", error: "other" });
         return;
       }
@@ -138,7 +182,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
       const added = rootChildIds().find((c) => !before.has(c));
       const addedEl = added ? composer.elements.getElement(added) : null;
       if (addedEl) composer.selection.select(addedEl);
-      undoInsert.current = composer.history.captureUndo();
+      undoInsert.current = undo;
       setPhase({ kind: "inserted", edit });
     } catch (e) {
       if (id !== runId.current) return;
@@ -153,14 +197,15 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
     onBack();
   };
 
-  // Stop: the result of the run in flight is ignored.
+  // Stop: the request in flight is aborted and its result never applied.
   const stop = () => {
     runId.current++;
+    abortRun.current?.abort();
     setPhase({ kind: "idle" });
   };
 
   const undo = () => {
-    composer.history.undo();
+    undoInsert.current?.();
     setPhase({ kind: "idle" });
   };
 

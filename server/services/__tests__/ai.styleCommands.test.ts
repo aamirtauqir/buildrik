@@ -133,6 +133,54 @@ describe("buildEditCommandPrompt (agent-callable registry)", () => {
     // The user prompt is fenced as data, never instructions.
     expect(p).toContain("<request>do something</request>");
   });
+
+  /* Element scope used to send the id alone, so the model rewrote copy it had
+     never been shown ("make it more concise") and sized relative to styles it
+     could not see. The snapshot, the token registry and the media library
+     now reach the prompt, as they already did for page scope. */
+  it("renders the element snapshot, design tokens and media library when sent", () => {
+    const p = buildEditCommandPrompt(EL, "make it more concise", {
+      context: {
+        type: "heading",
+        tag: "h1",
+        text: "Welcome to the finest Italian kitchen in town",
+        styles: { "font-size": "48px", color: "#111111" },
+        attributes: { title: "Hero heading" },
+        children: [{ id: "c-1", type: "text", text: "child copy" }],
+      },
+      tokens: [{ id: "color-brand", name: "Brand", value: "#1A56DB", type: "color" }],
+      assets: [{ id: "a1", url: "https://cdn.x.com/hero.jpg", name: "hero.jpg" }],
+    });
+    expect(p).toContain("Welcome to the finest Italian kitchen in town");
+    expect(p).toContain("font-size");
+    expect(p).toContain("48px");
+    expect(p).toContain("Hero heading");
+    expect(p).toContain("child copy");
+    expect(p).toContain('id="color-brand"');
+    expect(p).toContain("https://cdn.x.com/hero.jpg");
+    // The snapshot is data, fenced like the request.
+    expect(p).toContain("<element>");
+  });
+
+  it("caps an oversized snapshot server-side", () => {
+    const p = buildEditCommandPrompt(EL, "x", { context: { type: "text", text: "y".repeat(50_000) } });
+    expect(p.length).toBeLessThan(20_000);
+  });
+});
+
+describe("element scope — tokens + media recall", () => {
+  it("accepts set-token / src only against the registry and library sent with the element", () => {
+    const tokens = new Map([["color-brand", "color"]]);
+    const assets = new Set(["https://cdn.x.com/hero.jpg"]);
+    const raw = JSON.stringify([
+      { commandId: "set-token", args: { tokenId: "color-brand", value: "#1A56DB" } },
+      { commandId: "set-token", args: { tokenId: "made-up", value: "#1A56DB" } },
+      { commandId: "set-attribute", args: { elementId: EL, attribute: "src", value: "https://cdn.x.com/hero.jpg" } },
+      { commandId: "set-attribute", args: { elementId: EL, attribute: "src", value: "https://elsewhere.com/guess.jpg" } },
+    ]);
+    const out = extractValidEditCommands(raw, EL, tokens, assets);
+    expect(out.map((c) => c.commandId)).toEqual(["set-token", "set-attribute"]);
+  });
 });
 
 describe("extractValidEditCommands", () => {
@@ -449,7 +497,12 @@ describe("extractValidEditCommands", () => {
   });
 
   it("rejects set-attribute href with a javascript:/data: URI", () => {
-    for (const value of ["javascript:alert(1)", " JavaScript:x", "data:text/html,x", "vbscript:x"]) {
+    // A browser drops tabs, newlines and C0 controls from a scheme, so the
+    // obfuscated forms run too — the anchored regex let them through.
+    for (const value of [
+      "javascript:alert(1)", " JavaScript:x", "data:text/html,x", "vbscript:x",
+      "java\tscript:alert(1)", "java\nscript:alert(1)", "\x01javascript:alert(1)",
+    ]) {
       const raw = JSON.stringify([
         { commandId: "set-attribute", args: { elementId: EL, attribute: "href", value } },
       ]);

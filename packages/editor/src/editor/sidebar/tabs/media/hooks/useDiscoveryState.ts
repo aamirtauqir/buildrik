@@ -21,6 +21,7 @@ import type {
   StockVideo,
   DiscOrientation,
   DiscColor,
+  StockSearchFailure,
 } from "../data/mediaTypes";
 
 /**
@@ -73,6 +74,8 @@ function stockFileName(item: StockPhoto | StockVideo | DiscIcon, mime: string): 
 }
 
 /** One line each, because these are three different things to go and do. */
+const NO_FAILURE: StockSearchFailure = { img: null, vid: null };
+
 const FAILURE_TOAST: Record<StockFailureReason, string> = {
   "not-configured": "Stock search isn't set up on this site",
   unauthorized: "The stock provider rejected our API key",
@@ -91,7 +94,7 @@ export function useDiscoveryState(
   /** WHY the last stock search failed, or null. Distinguishes "not configured"
       from "key refused" from "request failed" from "genuinely no results" —
       the modal rendered all four the same. */
-  const [searchFailed, setSearchFailed] = useState<StockFailureReason | null>(null);
+  const [searchFailed, setSearchFailed] = useState<StockSearchFailure>(NO_FAILURE);
   const [discOrientation, setDiscOrientation_] = useState<DiscOrientation>("all");
   const [discColor, setDiscColor_] = useState<DiscColor>("all");
   const [discSource, setDiscSource_] = useState<DiscSource>("unsplash");
@@ -132,12 +135,12 @@ export function useDiscoveryState(
       if (!query.trim()) {
         setStockPhotos([]);
         setStockVideos([]);
-        setSearchFailed(null);
+        setSearchFailed(NO_FAILURE);
         setPageState({ img: 1, vid: 1 });
         return;
       }
 
-      setSearchFailed(null);
+      setSearchFailed(NO_FAILURE);
       setPageState({ img: 1, vid: 1 });
       setDiscLoading((prev) => ({ ...prev, img: true, vid: true }));
       // P5: stockService expects "landscape"|"portrait"|"squarish"|undefined.
@@ -145,23 +148,29 @@ export function useDiscoveryState(
       const o = activeOrientation === "all" ? undefined : activeOrientation;
       const c = activeColor === "all" ? undefined : (activeColor as string | undefined);
       try {
-        const [photos, videos] = await Promise.all([
+        /* Two providers, two optional keys (Unsplash photos, Pexels videos):
+           one failing must not take the other's results with it. */
+        const [photos, videos] = await Promise.allSettled([
           stockService.searchPhotos(query, 1, o, c, { signal: controller.signal, source: discSource }),
           stockService.searchVideos(query, 1, o, { signal: controller.signal, source: discSource }),
         ]);
         // Drop late resolutions: if a newer search has already started,
         // this controller is no longer the active one.
         if (controller.signal.aborted) return;
-        setStockPhotos(photos as StockPhoto[]);
-        setStockVideos(videos as StockVideo[]);
-      } catch (err) {
-        if (isAbortError(err) || controller.signal.aborted) return;
+        if ([photos, videos].some((r) => r.status === "rejected" && isAbortError(r.reason))) return;
+        setStockPhotos(photos.status === "fulfilled" ? (photos.value as StockPhoto[]) : []);
+        setStockVideos(videos.status === "fulfilled" ? (videos.value as StockVideo[]) : []);
         /* The toast used to be the ONLY signal, and it auto-dismissed. The
            modal reads `searchFailed` for the persistent message, so the reason
-           has to outlive the toast (blocker A-STOCK). */
-        const reason = reasonOf(err);
-        setSearchFailed(reason);
-        showToast(FAILURE_TOAST[reason], "error");
+           has to outlive the toast (blocker A-STOCK). Per kind: the modal
+           shows it on the tab whose provider failed. */
+        const failed: StockSearchFailure = {
+          img: photos.status === "rejected" ? reasonOf(photos.reason) : null,
+          vid: videos.status === "rejected" ? reasonOf(videos.reason) : null,
+        };
+        setSearchFailed(failed);
+        // A toast over results that did land would read as "nothing worked".
+        if (failed.img && failed.vid) showToast(FAILURE_TOAST[failed.img], "error");
       } finally {
         if (!controller.signal.aborted) {
           setDiscLoading((prev) => ({ ...prev, img: false, vid: false }));

@@ -54,6 +54,12 @@ export const createTRPCContext = async (opts?: { headers?: Headers }) => {
   return { prisma, session: effectiveSession, bearer: bearerSession, headers: opts?.headers };
 };
 
+/**
+ * tRPC's internal `UnknownCauseError` — what a PLAIN-OBJECT `cause` becomes.
+ * Not exported by tRPC, so take its constructor off a throwaway instance.
+ */
+const PlainObjectCause = new TRPCError({ code: "INTERNAL_SERVER_ERROR", cause: {} }).cause?.constructor;
+
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
@@ -68,7 +74,15 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
     // therefore threw away *exactly* the shape tRPC produces — so no AuthError
     // data ever reached the client, silently. Lift the cause's own enumerable
     // fields instead, minus the Error plumbing (never ship `stack`).
-    const cause = error.cause as Record<string, unknown> | undefined;
+    //
+    // ONLY a plain-object cause. A raw Error thrown from a procedure becomes the
+    // cause of the INTERNAL_SERVER_ERROR tRPC wraps it in, and its own fields
+    // are whatever the thrower attached — an OpenAI APIError carries `headers`,
+    // `request_id`, `status` and the provider's `error` body (audit F-02).
+    const cause =
+      PlainObjectCause && error.cause instanceof PlainObjectCause
+        ? (error.cause as unknown as Record<string, unknown>)
+        : undefined;
     const causeData =
       cause && !zod
         ? Object.fromEntries(

@@ -23,6 +23,9 @@ export type LintRuleId =
      linter does not have. In the union so every consumer speaks one
      vocabulary. */
   | "contrast"
+  /* Computed editor-side from settings + elements, like contrast: a theme
+     toggle on a site whose Dark mode is Off is hidden on publish (D12). */
+  | "theme-toggle-hidden"
   | "banned-hue"
   | "pure-black"
   | "empty-value"
@@ -132,7 +135,7 @@ export class DSLinter {
           rule: "banned-hue",
           severity: "error",
           tokenId: t.id,
-          message: `Token "${t.id}" darkValue ("${darkValue}") uses a banned hue.`,
+          message: `Token "${t.id}" dark value ("${darkValue}") uses a purple/violet/indigo hue.`,
         });
       }
 
@@ -152,7 +155,7 @@ export class DSLinter {
           rule: "pure-black",
           severity: "error",
           tokenId: t.id,
-          message: `Token "${t.id}" darkValue is pure black. DESIGN.md NO BLACK rule.`,
+          message: `Token "${t.id}" dark value is pure black — use the ink scale (#111827) instead.`,
         });
       }
 
@@ -163,7 +166,7 @@ export class DSLinter {
           rule: "missing-dark",
           severity: "warning",
           tokenId: t.id,
-          message: `Color token "${t.id}" missing darkValue. Will fall back to light value in dark mode.`,
+          message: `No dark value for "${t.id}" — dark mode shows its light value.`,
         });
       }
     }

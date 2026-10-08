@@ -81,14 +81,14 @@ describe("startPublish · approval gate enforcement", () => {
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
     effectiveRole.mockResolvedValue("EDITOR");
 
-    await expect(startPublish("site-1", "ws-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
+    await expect(startPublish("site-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled(); // gate fires before queueing
   });
 
   /* The gate must ask the SITE's workspace, not the caller's session one.
      `sites.publish` authorises with `checkSiteRole` (the SITE's workspace) and
-     then passes `resolveWorkspaceId(ctx)` — the caller's SESSION workspace — to
-     startPublish. Those legitimately differ: every signup owns a personal
+     used to pass `resolveWorkspaceId(ctx)` — the caller's SESSION workspace — to
+     startPublish (it no longer takes one). Those legitimately differ: every signup owns a personal
      workspace, so an EDITOR on someone else's site can have their session
      resolve to their own. Reading `editsRequireApproval` off the caller's
      workspace asked the wrong one whether this site needs review, and a
@@ -110,7 +110,7 @@ describe("startPublish · approval gate enforcement", () => {
     );
     effectiveRole.mockResolvedValue("EDITOR");
 
-    await expect(startPublish("site-1", "ws-2", "user-editor")).rejects.toThrow("APPROVAL_NONE");
+    await expect(startPublish("site-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled();
     // And it asked about the SITE's workspace.
     expect(workspaceFindUnique).toHaveBeenCalledWith(
@@ -125,7 +125,7 @@ describe("startPublish · approval gate enforcement", () => {
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
     effectiveRole.mockResolvedValue("ADMIN");
 
-    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
+    await expect(startPublish("site-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 
@@ -135,7 +135,7 @@ describe("startPublish · approval gate enforcement", () => {
     effectiveRole.mockResolvedValue("ADMIN");
     reviewFindFirst.mockResolvedValue({ status: "CHANGES_REQUESTED" });
 
-    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_CHANGES");
+    await expect(startPublish("site-1", "user-admin")).rejects.toThrow("APPROVAL_CHANGES");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 
@@ -149,7 +149,7 @@ describe("startPublish · approval gate enforcement", () => {
 
     let approvalError = false;
     try {
-      await startPublish("site-1", "ws-1", "user-admin");
+      await startPublish("site-1", "user-admin");
     } catch (e) {
       if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
@@ -175,7 +175,7 @@ describe("startPublish · approval gate enforcement", () => {
       revokedAwareFindFirst({ status: "PENDING", resolvedAt: null, revokedAt: new Date() })
     );
 
-    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
+    await expect(startPublish("site-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 
@@ -187,7 +187,7 @@ describe("startPublish · approval gate enforcement", () => {
       revokedAwareFindFirst({ status: "APPROVED", resolvedAt: new Date(), revokedAt: new Date() })
     );
 
-    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
+    await expect(startPublish("site-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 
@@ -199,7 +199,7 @@ describe("startPublish · approval gate enforcement", () => {
       revokedAwareFindFirst({ status: "PENDING", resolvedAt: null, revokedAt: null })
     );
 
-    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_PENDING");
+    await expect(startPublish("site-1", "user-admin")).rejects.toThrow("APPROVAL_PENDING");
   });
 
   /* M-8: a workspace OWNER whose role on THIS site is capped to EDITOR by a
@@ -211,7 +211,7 @@ describe("startPublish · approval gate enforcement", () => {
     memberFindUnique.mockResolvedValue({ role: "OWNER" });
     effectiveRole.mockResolvedValue("EDITOR");
 
-    await expect(startPublish("site-1", "ws-1", "user-owner")).rejects.toThrow("APPROVAL_NONE");
+    await expect(startPublish("site-1", "user-owner")).rejects.toThrow("APPROVAL_NONE");
     expect(effectiveRole).toHaveBeenCalledWith(expect.anything(), "user-owner", "site-1");
     expect(jobCreate).not.toHaveBeenCalled();
   });
@@ -226,7 +226,7 @@ describe("startPublish · approval gate enforcement", () => {
     // Owner passes the gate; may proceed (dev simulation). Must NOT be the approval error.
     let approvalError = false;
     try {
-      await startPublish("site-1", "ws-1", "user-owner");
+      await startPublish("site-1", "user-owner");
     } catch (e) {
       if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
@@ -243,7 +243,7 @@ describe("startPublish · approval gate enforcement", () => {
 
     let approvalError = false;
     try {
-      await startPublish("site-1", "ws-1", "user-editor");
+      await startPublish("site-1", "user-editor");
     } catch (e) {
       if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
@@ -259,7 +259,7 @@ describe("startPublish · approval gate enforcement", () => {
 
     let approvalError = false;
     try {
-      await startPublish("site-1", "ws-1", "user-editor");
+      await startPublish("site-1", "user-editor");
     } catch (e) {
       if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
@@ -281,7 +281,7 @@ describe("startPublish · approval gate enforcement", () => {
 
     let approvalError = false;
     try {
-      await startPublish("site-1", "ws-1", "user-editor");
+      await startPublish("site-1", "user-editor");
     } catch (e) {
       if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
@@ -296,7 +296,7 @@ describe("startPublish · approval gate enforcement", () => {
     effectiveRole.mockResolvedValue("EDITOR");
     isFeatureEnabledMock.mockResolvedValue(true);
 
-    await expect(startPublish("site-1", "ws-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
+    await expect(startPublish("site-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 
@@ -315,7 +315,7 @@ describe("startPublish · approval gate enforcement", () => {
     // Not asserting the outcome here (a later, unrelated Vercel-connection
     // check may still throw) — only that the approval gate asked about the
     // right workspace before getting there.
-    await startPublish("site-1", "ws-2", "user-editor").catch(() => {});
+    await startPublish("site-1", "user-editor").catch(() => {});
     expect(isFeatureEnabledMock).toHaveBeenCalledWith("ws-1", "agency_layer");
   });
 });

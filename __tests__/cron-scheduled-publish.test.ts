@@ -65,7 +65,7 @@ describe("scheduled-publish cron", () => {
     startPublishMock.mockResolvedValueOnce({ id: "job1" });
     const res = await GET(makeReq("Bearer test-secret"));
     await expect(res.json()).resolves.toEqual({ due: 1, started: 1, failed: 0, skipped: 0 });
-    expect(startPublishMock).toHaveBeenCalledWith("s1", "ws1", "u1");
+    expect(startPublishMock).toHaveBeenCalledWith("s1", "u1");
     expect(markScheduleStartedMock).toHaveBeenCalledWith("sp1", "job1");
   });
 

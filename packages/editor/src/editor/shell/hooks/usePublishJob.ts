@@ -171,7 +171,16 @@ export function usePublishJob(): UsePublishJobResult {
     statusRef.current = status;
   }, [status]);
 
+  // P2-1: each start/stop of the poll is a new generation. A response from an
+  // older generation (polling stopped on a terminal status, or moved to another
+  // job) is dropped, and a tick never starts while its generation's previous
+  // request is still in flight — a slow BUILDING landing after COMPLETED left
+  // the UI "publishing" forever.
+  const pollGenRef = React.useRef(0);
+  const tickBusyGenRef = React.useRef<number | null>(null);
+
   const stopPolling = React.useCallback(() => {
+    pollGenRef.current += 1;
     if (pollTimer.current) {
       clearInterval(pollTimer.current);
       pollTimer.current = null;
@@ -180,9 +189,12 @@ export function usePublishJob(): UsePublishJobResult {
 
   const tick = React.useCallback(async (id: string) => {
     if (abortRef.current) return;
+    const gen = pollGenRef.current;
+    if (tickBusyGenRef.current === gen) return;
+    tickBusyGenRef.current = gen;
     try {
       const next = await fetchPublishStatus(id);
-      if (abortRef.current) return;
+      if (abortRef.current || gen !== pollGenRef.current) return;
       pollFailCountRef.current = 0;
       setStatus(next);
       if (TERMINAL.has(next.status)) {
@@ -190,7 +202,7 @@ export function usePublishJob(): UsePublishJobResult {
         if (next.status === "FAILED" && next.error) setError(next.error);
       }
     } catch (e) {
-      if (abortRef.current) return;
+      if (abortRef.current || gen !== pollGenRef.current) return;
       pollFailCountRef.current += 1;
       // Back off across a few consecutive failures — one dropped request
       // (a flaky network tick) should not orphan an otherwise-healthy job.
@@ -200,6 +212,8 @@ export function usePublishJob(): UsePublishJobResult {
       stopPolling();
       pollLostRef.current = true;
       setPollLost(true);
+    } finally {
+      if (tickBusyGenRef.current === gen) tickBusyGenRef.current = null;
     }
   }, [stopPolling]);
 

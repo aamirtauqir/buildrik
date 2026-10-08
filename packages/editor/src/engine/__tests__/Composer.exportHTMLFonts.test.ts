@@ -56,6 +56,18 @@ describe("the preview document carries the site's fonts", () => {
     expect(combined).toContain("family=Playfair+Display");
   });
 
+  it("paints body text through the colour token, so the Dark preview repaints it", () => {
+    const composer = composerWith({});
+    composer.setProjectSettings({
+      ...composer.getProjectSettings(),
+      darkMode: "auto",
+      designTokens: [v6Token({ id: "color-text", value: "#334155", dark: "#E5E7EB" })],
+    } as never);
+    const { combined } = composer.exportHTML();
+    expect(combined).toMatch(/body\{[^}]*color:var\(--buildrick-design-color-text/);
+    expect(combined).toMatch(/:root\[data-theme="dark"\]\{[^}]*--buildrick-design-color-text:#E5E7EB/);
+  });
+
   it("asks for nothing when no family needs fetching", () => {
     const { combined } = composerWith({ "font-family": "Helvetica Neue, sans-serif" }).exportHTML();
     expect(combined).not.toContain("Helvetica+Neue");

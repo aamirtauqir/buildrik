@@ -7,8 +7,12 @@
  * matches a known token back into a placeholder. The result is a
  * portable template that re-applies cleanly under any project's DS.
  *
- * Per CEO plan AD2: build a `byValue` lookup from TokenSnapshot, run a
- * single-pass replace. Hex colors are case-normalized so `#2D6DFF` and
+ * Only whole values inside `style="…"` declarations are rewritten, and only
+ * against tokens of the property's kind (radius tokens in `border-radius`,
+ * spacing in padding/margin/gap…). It used to be a blind substring replace
+ * over the whole document: a "0" radius token landed inside `#0a081e`, rgba
+ * channels and element ids, and applying the template stripped the page's
+ * styling (audit L2-001). Hex colors are case-normalized so `#2D6DFF` and
  * `#2d6dff` both bind. Non-token values pass through unchanged.
  *
  * Conflict policy: when two tokens share the same value (e.g., color-
@@ -32,31 +36,33 @@ const KIND_OUT: Record<Bucket, string> = {
 interface ReverseEntry {
   /** Pre-built placeholder string, e.g., "{{token.color.primary}}". */
   placeholder: string;
-  /** Original literal value, kept for diagnostics. */
-  value: string;
 }
 
-/**
- * Build a value → placeholder lookup table. Hex colors are stored
- * lowercased; the resolve step normalizes the input before lookup
- * so `#2D6DFF` and `#2d6dff` collide on the same entry.
- */
-function buildReverseLookup(snapshot: TokenSnapshot): Map<string, ReverseEntry> {
-  const out = new Map<string, ReverseEntry>();
-  (Object.keys(snapshot) as Bucket[]).forEach((bucket) => {
-    const kindOut = KIND_OUT[bucket];
-    const entries = snapshot[bucket];
-    for (const [name, value] of Object.entries(entries)) {
-      if (!value) continue;
+/* resolveTemplateTokens' PLACEHOLDER_RE reads only these names; a placeholder
+   it cannot read would be left verbatim in the applied page. */
+const READABLE_NAME = /^[a-z0-9-]+$/;
+
+/** Which token kind a CSS property may take. */
+function bucketFor(property: string): Bucket {
+  if (property.includes("radius")) return "radius";
+  if (/^(padding|margin|gap|row-gap|column-gap|inset|top|right|bottom|left)\b/.test(property)) {
+    return "spacing";
+  }
+  if (/^(font|line-height|letter-spacing)\b/.test(property)) return "typography";
+  return "colors";
+}
+
+/** Per bucket: value → placeholder. First-write wins on ties. */
+function buildReverseLookup(snapshot: TokenSnapshot): Record<Bucket, Map<string, ReverseEntry>> {
+  const out = {} as Record<Bucket, Map<string, ReverseEntry>>;
+  (Object.keys(KIND_OUT) as Bucket[]).forEach((bucket) => {
+    const map = new Map<string, ReverseEntry>();
+    for (const [name, value] of Object.entries(snapshot[bucket] ?? {})) {
+      if (!value || !READABLE_NAME.test(name)) continue;
       const key = normalize(value);
-      // First-write wins on ties.
-      if (!out.has(key)) {
-        out.set(key, {
-          placeholder: `{{token.${kindOut}.${name}}}`,
-          value,
-        });
-      }
+      if (!map.has(key)) map.set(key, { placeholder: `{{token.${KIND_OUT[bucket]}.${name}}}` });
     }
+    out[bucket] = map;
   });
   return out;
 }
@@ -74,12 +80,9 @@ export interface InverseResolveOptions {
 }
 
 /**
- * Walk the HTML once, replace every token value with its placeholder.
- *
- * Strategy: scan with a master regex that matches any token value in
- * the lookup table. We escape values for regex safety and join with
- * alternation. Hex matches are case-insensitive; other values are
- * exact. Avoids parsing the DOM — keeps the function pure + portable.
+ * Replace token values with placeholders inside `style` attributes. A value
+ * matches as a whole, or as a whole space-separated part (`padding: 4px 8px`);
+ * never as a substring of a longer word.
  */
 export function inverseResolveTokens(
   html: string,
@@ -88,27 +91,28 @@ export function inverseResolveTokens(
 ): string {
   if (!html) return html;
   const lookup = buildReverseLookup(snapshot);
-  if (lookup.size === 0) return html;
+  if (Object.values(lookup).every((m) => m.size === 0)) return html;
 
-  // Sort keys by length DESC so longer values match before shorter
-  // substrings of them (e.g., "#2d6dff" before "#2d").
-  const keys = Array.from(lookup.keys()).sort((a, b) => b.length - a.length);
-
-  // Build alternation pattern. Escape regex metacharacters in each
-  // value. Hex colors live as lowercase keys; the matcher uses the
-  // `i` flag so source-case input still matches.
-  const pattern = keys.map(escapeRegExp).join("|");
-  if (!pattern) return html;
-  const re = new RegExp(pattern, "gi");
-
-  return html.replace(re, (match) => {
-    const entry = lookup.get(normalize(match));
-    if (!entry) return match;
-    options.onSwap?.(match, entry.placeholder);
+  const swap = (word: string, bucket: Bucket): string => {
+    const entry = lookup[bucket].get(normalize(word));
+    if (!entry) return word;
+    options.onSwap?.(word, entry.placeholder);
     return entry.placeholder;
-  });
-}
+  };
 
-function escapeRegExp(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return html.replace(/(\sstyle=")([^"]*)(")/gi, (_m, open: string, decls: string, close: string) => {
+    const rewritten = decls.replace(
+      /(^|;)(\s*)([a-zA-Z-]+)(\s*:\s*)([^;]*)/g,
+      (_d, sep: string, ws: string, prop: string, colon: string, value: string) => {
+        const bucket = bucketFor(prop.toLowerCase());
+        const trimmed = value.trim();
+        const whole = swap(trimmed, bucket);
+        const next = whole !== trimmed
+          ? value.replace(trimmed, whole)
+          : value.replace(/[^\s]+/g, (part) => swap(part, bucket));
+        return `${sep}${ws}${prop}${colon}${next}`;
+      },
+    );
+    return `${open}${rewritten}${close}`;
+  });
 }

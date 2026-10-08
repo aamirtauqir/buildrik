@@ -1,0 +1,348 @@
+{
+  "job": "BRAND-PART1",
+  "date": "2026-10-07",
+  "status": "design-complete",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "pageId": "4418:45431",
+  "sectionId": "8220:229015",
+  "handoffNodeId": "8230:233164",
+  "boards": [
+    {
+      "key": "M1-migration-failed",
+      "surface": "Read-only notice",
+      "state": "migration-failed",
+      "id": "8222:229015",
+      "index": 0
+    },
+    {
+      "key": "M1-upgrade-paused",
+      "surface": "Read-only notice",
+      "state": "upgrade-paused",
+      "id": "8222:229636",
+      "index": 1
+    },
+    {
+      "key": "M1-rolled-back",
+      "surface": "Read-only notice",
+      "state": "rolled-back",
+      "id": "8222:230245",
+      "index": 2
+    },
+    {
+      "key": "M2-empty",
+      "surface": "Review changes",
+      "state": "empty",
+      "id": "8222:230854",
+      "index": 3
+    },
+    {
+      "key": "M2-list",
+      "surface": "Review changes",
+      "state": "list",
+      "id": "8222:231429",
+      "index": 4
+    },
+    {
+      "key": "M2-stale",
+      "surface": "Review changes",
+      "state": "stale",
+      "id": "8222:232022",
+      "index": 5
+    },
+    {
+      "key": "M2-reverted",
+      "surface": "Review changes",
+      "state": "one-row-reverted",
+      "index": 44,
+      "id": "8230:232344"
+    },
+    {
+      "key": "M3-idle",
+      "surface": "Header without Save",
+      "state": "idle",
+      "id": "8222:232627",
+      "index": 6
+    },
+    {
+      "key": "M4-results",
+      "surface": "Theme push results",
+      "state": "skipped-and-recapture",
+      "id": "8222:233199",
+      "index": 7
+    },
+    {
+      "key": "M5-counts",
+      "surface": "Token usage",
+      "state": "counts",
+      "id": "8224:229485",
+      "index": 8
+    },
+    {
+      "key": "M5-unknown",
+      "surface": "Token usage",
+      "state": "unknown",
+      "id": "8224:230173",
+      "index": 9
+    },
+    {
+      "key": "M5-highlight",
+      "surface": "Token usage",
+      "state": "highlight",
+      "id": "8224:230857",
+      "index": 10
+    },
+    {
+      "key": "M6-replacement-required",
+      "surface": "Safe delete",
+      "state": "replacement-required",
+      "id": "8224:231573",
+      "index": 11
+    },
+    {
+      "key": "M6-unused-confirm",
+      "surface": "Safe delete",
+      "state": "unused-confirm",
+      "id": "8224:232280",
+      "index": 12
+    },
+    {
+      "key": "M6-usage-unknown",
+      "surface": "Safe delete",
+      "state": "usage-unknown",
+      "id": "8224:232979",
+      "index": 13
+    },
+    {
+      "key": "M6-done",
+      "surface": "Safe delete",
+      "state": "replaced",
+      "id": "8224:233678",
+      "index": 14
+    },
+    {
+      "key": "M7-suggestions",
+      "surface": "Connect to tokens",
+      "state": "suggestions",
+      "id": "8224:234362",
+      "index": 15
+    },
+    {
+      "key": "M7-choose-token",
+      "surface": "Connect to tokens",
+      "state": "choose-token",
+      "id": "8224:234982",
+      "index": 16
+    },
+    {
+      "key": "M7-preview",
+      "surface": "Connect to tokens",
+      "state": "preview",
+      "id": "8224:235608",
+      "index": 17
+    },
+    {
+      "key": "M7-applied",
+      "surface": "Connect to tokens",
+      "state": "applied",
+      "id": "8224:236236",
+      "index": 18
+    },
+    {
+      "key": "M7-nothing-to-connect",
+      "surface": "Connect to tokens",
+      "state": "nothing-to-connect",
+      "id": "8224:236852",
+      "index": 19
+    },
+    {
+      "key": "M8-off",
+      "surface": "Dark mode",
+      "state": "off",
+      "id": "8224:238726",
+      "index": 20
+    },
+    {
+      "key": "M8-auto",
+      "surface": "Dark mode",
+      "state": "auto",
+      "id": "8224:239369",
+      "index": 21
+    },
+    {
+      "key": "M8-generated-aliases",
+      "surface": "Dark mode",
+      "state": "generated-aliases",
+      "id": "8224:240003",
+      "index": 22
+    },
+    {
+      "key": "M8-dark-preview",
+      "surface": "Dark mode",
+      "state": "dark-preview",
+      "id": "8224:240644",
+      "index": 23
+    },
+    {
+      "key": "M8-preview-disabled",
+      "surface": "Dark mode",
+      "state": "preview-disabled",
+      "id": "8224:241285",
+      "index": 24
+    },
+    {
+      "key": "M8-auto-dark",
+      "surface": "Dark mode",
+      "state": "auto-dark-preview",
+      "index": 45,
+      "id": "8230:232622"
+    },
+    {
+      "key": "M9-pick-colour",
+      "surface": "Colour scale generator",
+      "state": "pick-colour",
+      "id": "8224:241925",
+      "index": 25
+    },
+    {
+      "key": "M9-generated-scale",
+      "surface": "Colour scale generator",
+      "state": "generated-scale",
+      "id": "8224:242543",
+      "index": 26
+    },
+    {
+      "key": "M9-preview",
+      "surface": "Colour scale generator",
+      "state": "preview",
+      "id": "8224:243206",
+      "index": 27
+    },
+    {
+      "key": "M9-confirmed",
+      "surface": "Colour scale generator",
+      "state": "confirmed",
+      "id": "8224:243869",
+      "index": 28
+    },
+    {
+      "key": "M10-list",
+      "surface": "Restore points",
+      "state": "list",
+      "id": "8224:244521",
+      "index": 29
+    },
+    {
+      "key": "M10-empty",
+      "surface": "Restore points",
+      "state": "empty",
+      "id": "8224:245178",
+      "index": 30
+    },
+    {
+      "key": "M10-restored",
+      "surface": "Restore points",
+      "state": "restored",
+      "id": "8224:245787",
+      "index": 31
+    },
+    {
+      "key": "M11-source",
+      "surface": "Brand from logo or website",
+      "state": "source",
+      "id": "8224:246458",
+      "index": 32
+    },
+    {
+      "key": "M11-loading",
+      "surface": "Brand from logo or website",
+      "state": "loading",
+      "id": "8224:247084",
+      "index": 33
+    },
+    {
+      "key": "M11-preview",
+      "surface": "Brand from logo or website",
+      "state": "preview",
+      "id": "8224:247700",
+      "index": 34
+    },
+    {
+      "key": "M11-no-colours",
+      "surface": "Brand from logo or website",
+      "state": "no-colours",
+      "id": "8224:248332",
+      "index": 35
+    },
+    {
+      "key": "M11-timeout",
+      "surface": "Brand from logo or website",
+      "state": "timeout",
+      "id": "8224:248970",
+      "index": 36
+    },
+    {
+      "key": "M11-address-refused",
+      "surface": "Brand from logo or website",
+      "state": "address-refused",
+      "id": "8224:249604",
+      "index": 37
+    },
+    {
+      "key": "M11-confirmed",
+      "surface": "Brand from logo or website",
+      "state": "confirmed",
+      "id": "8224:250233",
+      "index": 38
+    },
+    {
+      "key": "M12-add-panel-auto",
+      "surface": "Theme-toggle block",
+      "state": "add-panel-auto",
+      "id": "8228:232784",
+      "index": 39
+    },
+    {
+      "key": "M12-canvas-light",
+      "surface": "Theme-toggle block",
+      "state": "canvas-light",
+      "id": "8228:233132",
+      "index": 40
+    },
+    {
+      "key": "M12-canvas-dark",
+      "surface": "Theme-toggle block",
+      "state": "canvas-dark",
+      "id": "8228:233404",
+      "index": 41
+    },
+    {
+      "key": "M12-published-auto",
+      "surface": "Theme-toggle block",
+      "state": "published-auto",
+      "id": "8228:233676",
+      "index": 42
+    },
+    {
+      "key": "M12-off-hidden-on-publish",
+      "surface": "Theme-toggle block",
+      "state": "off-hidden-on-publish",
+      "id": "8228:233827",
+      "index": 43
+    },
+    {
+      "key": "M12-published-dark",
+      "surface": "Theme-toggle block",
+      "state": "published-dark",
+      "index": 46,
+      "id": "8230:232749"
+    }
+  ],
+  "verification": {
+    "boardCount": 48,
+    "text": 2096,
+    "instances": 1374,
+    "reactions": 651,
+    "images": 6,
+    "issues": []
+  }
+}

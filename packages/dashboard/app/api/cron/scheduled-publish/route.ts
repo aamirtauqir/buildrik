@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
          the site. A publish scheduled on Monday should ship Friday's content —
          storing pages at schedule time would quietly publish a stale snapshot,
          which is the opposite of what someone scheduling a release wants. */
-      const job = await startPublish(s.siteId, s.workspaceId, s.createdBy);
+      const job = await startPublish(s.siteId, s.createdBy);
       await markScheduleStarted(s.id, (job as { id: string }).id);
       started += 1;
     } catch (e) {

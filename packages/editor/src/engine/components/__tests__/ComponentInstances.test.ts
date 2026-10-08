@@ -156,10 +156,18 @@ describe("instantiateComponent", () => {
      (A CONTAINER in a heading is allowed by the matrix, so the same insert with
      the card component is legal and stays where it was put — that is the case
      the first assertion pins.) */
+  /** A plain section > heading on the page, outside any instance. */
+  function plainHeading(manager: ReturnType<typeof makeEngine>["manager"], rootId: string) {
+    const section = manager.createElement("container", {});
+    manager.addElement(section, rootId);
+    const heading = manager.createElement("heading", { content: "Plain" });
+    manager.addElement(heading, section.getId());
+    return { section, heading };
+  }
+
   it("leaves a legal target alone", async () => {
-    const { manager, maps, c, instanceId } = await seed();
-    const heading = manager.getElement(instanceId)!.getChildren()[0];
-    expect(heading.getType()).toBe("heading");
+    const { manager, maps, c, page } = await seed();
+    const { heading } = plainHeading(manager, page.root.id);
 
     const id = (await instantiateComponent(c, maps, "comp-1", heading.getId()))!;
 
@@ -167,8 +175,8 @@ describe("instantiateComponent", () => {
   });
 
   it("walks up to a parent that can hold it, rather than nesting illegally", async () => {
-    const { manager, maps, c, instanceId } = await seed();
-    const heading = manager.getElement(instanceId)!.getChildren()[0];
+    const { manager, maps, c, page } = await seed();
+    const { section, heading } = plainHeading(manager, page.root.id);
     maps.components.set("comp-btn", {
       ...makeComponent(),
       id: "comp-btn",
@@ -179,9 +187,27 @@ describe("instantiateComponent", () => {
 
     expect(id).toBeTruthy();
     expect(heading.getChildCount()).toBe(0);
-    // the heading's own parent is the instance root (a container) — that holds it
-    expect(manager.getElement(id)!.getParent()?.getId()).toBe(instanceId);
+    expect(manager.getElement(id)!.getParent()?.getId()).toBe(section.getId());
   });
+
+  /* L2-006: with instance A selected, Insert put the new instance INSIDE A —
+     whose children are the master's — and the registry then counted it as
+     a second instance on the page. A target that is an instance, or inside
+     one, places the new instance right after that instance's root. */
+  it.each(["root", "child"] as const)(
+    "a target that is an instance %s inserts after the instance, not inside it",
+    async (where) => {
+      const { manager, maps, c, page, instanceId } = await seed();
+      const instance = manager.getElement(instanceId)!;
+      const target = where === "root" ? instance : instance.getChildren()[1];
+
+      const id = (await instantiateComponent(c, maps, "comp-1", target.getId()))!;
+
+      const root = manager.getElement(page.root.id)!;
+      expect(manager.getElement(id)!.getParent()?.getId()).toBe(page.root.id);
+      expect(root.getChildIndex(manager.getElement(id)!)).toBe(root.getChildIndex(instance) + 1);
+    },
+  );
 
   it("registers the instance record and persists it on the element data-bag", async () => {
     const { composer, manager, maps, instanceId, component } = await seed();

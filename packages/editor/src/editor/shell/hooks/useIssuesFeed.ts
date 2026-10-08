@@ -30,6 +30,8 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { CONTENT_CHECK_LABELS } from "@buildrik/shared/content/contentIssues";
 import { fetchPrePublishChecks } from "@/services/PublishService";
+import { EVENTS } from "@/shared/constants/events";
+import { useRefetchOnFocus } from "@/shared/hooks";
 import { useContentIssueScanner } from "./useContentIssueScanner";
 import type { Issue } from "./useStudioState";
 
@@ -45,10 +47,22 @@ export interface UseIssuesFeedReturn {
 
 const SERVER_CONTENT_LABELS = new Set(Object.values(CONTENT_CHECK_LABELS));
 
+/** Autosave can land every few seconds while someone types; one re-read per burst. */
+const SAVE_REFETCH_DEBOUNCE_MS = 1000;
+
+/** What else should re-read the server's check list (IR-1). */
+export interface IssuesFeedTriggers {
+  /** `usePublishJob().uiState` — a settled publish can change the checks. */
+  publishState?: string;
+  /** The Issues panel is open — opening it must never show a stale list. */
+  panelOpen?: boolean;
+}
+
 export function useIssuesFeed(
   composer: Composer | null,
   siteId: string | null,
   setIssues: React.Dispatch<React.SetStateAction<Issue[]>>,
+  { publishState, panelOpen }: IssuesFeedTriggers = {},
 ): UseIssuesFeedReturn {
   const content = useContentIssueScanner(composer);
 
@@ -115,14 +129,40 @@ export function useIssuesFeed(
     };
   }, [siteId, checkRetry]);
 
+  /* The server's list changes when the server's data does: after a save
+     reaches it, after a publish settles, on return to the tab — and whenever
+     the panel opens. It used to be read once per mount, so a row the server
+     had cleared kept counting as an open error ("Publish anyway"). */
+  const refetchChecks = React.useCallback(() => setCheckRetry((n) => n + 1), []);
+  React.useEffect(() => {
+    if (!composer) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onSaved = () => {
+      clearTimeout(timer);
+      timer = setTimeout(refetchChecks, SAVE_REFETCH_DEBOUNCE_MS);
+    };
+    composer.on(EVENTS.PROJECT_SAVED, onSaved);
+    return () => {
+      clearTimeout(timer);
+      composer.off(EVENTS.PROJECT_SAVED, onSaved);
+    };
+  }, [composer, refetchChecks]);
+  React.useEffect(() => {
+    if (publishState === "published" || publishState === "failed") refetchChecks();
+  }, [publishState, refetchChecks]);
+  React.useEffect(() => {
+    if (panelOpen) refetchChecks();
+  }, [panelOpen, refetchChecks]);
+  useRefetchOnFocus(refetchChecks);
+
   React.useEffect(() => {
     setIssues([...lintIssues, ...content.issues, ...checkIssues]);
   }, [lintIssues, content.issues, checkIssues, setIssues]);
 
   const rescan = React.useCallback(() => {
     content.rescan();
-    setCheckRetry((n) => n + 1);
-  }, [content]);
+    refetchChecks();
+  }, [content, refetchChecks]);
 
   return { scanState: content.scanState, rescan };
 }

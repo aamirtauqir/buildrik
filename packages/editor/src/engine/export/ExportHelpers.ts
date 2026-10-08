@@ -10,6 +10,7 @@ import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
 import { resolveTokenLiteral, emitTokenCss } from "@buildrik/shared/tokens";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { tokensForEmit } from "../designSystem/projectTokens";
+import { themeToggleCss } from "./themeToggleRuntime";
 import type { DesignToken } from "../designSystem/types";
 
 /** The slice of project settings the token emitters read. */
@@ -102,7 +103,10 @@ export function siteFontCSS(fonts: {
   const rules: string[] = [];
   const body: string[] = [];
   if (family(fonts.body)) body.push(`font-family:${family(fonts.body)},sans-serif`);
-  if (family(fonts.text)) body.push(`color:${family(fonts.text)}`);
+  /* Through the token, with the literal as its fallback: the token block's
+     dark rules redefine `--buildrick-design-color-text`, and a literal here
+     left body text in its light colour on a dark page. */
+  if (family(fonts.text)) body.push(`color:var(--buildrick-design-color-text,${family(fonts.text)})`);
   if (body.length) rules.push(`body{${body.join(";")}}`);
   if (family(fonts.heading))
     rules.push(`h1,h2,h3,h4,h5,h6{font-family:${family(fonts.heading)},sans-serif}`);
@@ -119,11 +123,16 @@ export function siteFontCSS(fonts: {
  * ship; a token the emitter cannot write is skipped and reported, never thrown.
  * `opts.migrate` is the brand switch (see `tokensForEmit`).
  */
-export function emitSiteTokenCss(settings: SiteTokenSettings | undefined, opts?: { migrate: boolean }): string {
-  return emitTokenCss(tokensForEmit(settings, opts), {
-    darkMode: DarkModeSchema.catch("off").parse(settings?.darkMode),
+export function emitSiteTokenCss(
+  settings: SiteTokenSettings | undefined,
+  opts?: { migrate: boolean; hasThemeToggle?: boolean },
+): string {
+  const darkMode = DarkModeSchema.catch("off").parse(settings?.darkMode);
+  const css = emitTokenCss(tokensForEmit(settings, opts), {
+    darkMode,
     onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
   });
+  return opts?.hasThemeToggle ? css + themeToggleCss(darkMode === "auto" ? "show" : "hide") : css;
 }
 
 /**

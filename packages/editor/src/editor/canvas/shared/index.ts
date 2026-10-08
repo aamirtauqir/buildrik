@@ -55,12 +55,6 @@ export type { Point, Rect, RectEdges, RectEdge } from "./geometry";
 export { HIT_EXPANSION, buildElementStack, findElementWithHitExpansion } from "./hitTesting";
 
 // ============================================
-// Shared Components
-// ============================================
-export { CanvasButton } from "./CanvasButton";
-export type { CanvasButtonProps } from "./CanvasButton";
-
-// ============================================
 // Legacy Exports (for backward compatibility)
 // Re-export from central constants during migration
 // ============================================

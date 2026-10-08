@@ -17,10 +17,44 @@ export const MAX_PUBLISH_PAYLOAD_BYTES = 16 * 1024 * 1024;
 /** Max pages per publish — sanity check against runaway publishes. */
 export const MAX_PUBLISH_PAGES = 500;
 
+/** Top-level directories a deployment reserves: Vercel runs `api/` as
+ *  functions and owns `_next/` and `_vercel/`. Dot-segments (`.well-known`,
+ *  `.vercel`) are refused separately. */
+const RESERVED_PUBLISH_DIRS = new Set(["api", "_next", "_vercel"]);
+
+/**
+ * Why a page path may not ship, or null. A page path becomes a file in the
+ * workspace owner's Vercel deployment, so it must be a relative `.html` page:
+ * never `vercel.json`, `robots.txt` or `sitemap.xml` (the server writes those
+ * from ADMIN-owned settings), never a function under `api/`, never a path that
+ * climbs out or hides. The exporter's `<slug>.html` / `index.html` names and the
+ * CMS generator's `<record path>/index.html` all pass.
+ */
+export function publishPathError(path: string): string | null {
+  if (!path.endsWith(".html")) return "Page paths must end in .html";
+  if (/[\\\u0000-\u001f\u007f]/.test(path)) return "Page paths may not contain backslashes or control characters";
+  if (path.startsWith("/")) return "Page paths must be relative";
+  const segments = path.split("/");
+  if (segments.some((seg) => seg === "" || seg.startsWith("."))) {
+    return "Page paths may not contain empty, '.', '..' or hidden segments";
+  }
+  if (segments.length > 1 && RESERVED_PUBLISH_DIRS.has(segments[0].toLowerCase())) {
+    return `Page paths may not live under ${segments[0]}/`;
+  }
+  return null;
+}
+
 /** Payload sent by editor when publishing — one entry per page. */
 export const publishPageSchema = z.object({
   /** Path inside deployment, e.g. "index.html", "about/index.html". */
-  path: z.string().min(1).max(500),
+  path: z
+    .string()
+    .min(1)
+    .max(500)
+    .superRefine((path, ctx) => {
+      const error = publishPathError(path);
+      if (error) ctx.addIssue({ code: z.ZodIssueCode.custom, message: error });
+    }),
   /** Rendered HTML for this page. Capped at MAX_PAGE_HTML_BYTES. */
   html: z
     .string()
@@ -45,9 +79,15 @@ export const publishInputSchema = z
     /** C-3: the `lastEditedAt` the publishing tab last loaded or saved. The
      *  tab publishes its IN-MEMORY pages, so a tab that fell behind another
      *  writer would ship the older copy over theirs; the server refuses with
-     *  SAVE_CONFLICT when the site moved past this. Optional — callers that
-     *  send no pages (cron, dashboard) are not checked. */
+     *  SAVE_CONFLICT when the site moved past this. Required whenever `pages`
+     *  is sent (refined below): a tab with no token never loaded the site, and
+     *  its pages are whatever the fallback put on screen. Callers that send no
+     *  pages (cron, dashboard) carry nothing to be stale. */
     expectedLastEditedAt: z.string().datetime().nullish(),
+  })
+  .refine((input) => !input.pages || !!input.expectedLastEditedAt, {
+    message: "Publishing pages requires expectedLastEditedAt — reload the editor before publishing.",
+    path: ["expectedLastEditedAt"],
   })
   .refine(
     (input) => {

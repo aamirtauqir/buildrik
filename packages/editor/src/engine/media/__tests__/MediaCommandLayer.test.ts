@@ -20,6 +20,7 @@ interface StubElement {
   id: string;
   src?: string;
   bgImage?: string;
+  alt?: string;
 }
 
 function makeStubComposer(options: {
@@ -63,11 +64,15 @@ function makeStubComposer(options: {
   function makeElementFacade(el: StubElement) {
     return {
       getId: () => el.id,
-      getAttribute: (name: string) => (name === "src" ? el.src : undefined),
+      getAttribute: (name: string) => (name === "src" ? el.src : name === "alt" ? el.alt : undefined),
       getStyle: (prop: string) => (prop === "background-image" ? el.bgImage : undefined),
       setAttribute: (name: string, value: string) => {
         if (options.failOnElementId === el.id) throw new Error("simulated write failure");
         if (name === "src") el.src = value;
+        if (name === "alt") el.alt = value;
+      },
+      removeAttribute: (name: string) => {
+        if (name === "alt") delete el.alt;
       },
       setStyle: (prop: string, value: string) => {
         if (options.failOnElementId === el.id) throw new Error("simulated write failure");
@@ -128,6 +133,43 @@ describe("MediaCommandLayer.insertMediaAt — font path", () => {
     // The INSERT_FAILED event fires even though we also throw, so the UI
     // telemetry records the reason.
     expect(events[0].event).toBe(MEDIA_EVENTS.INSERT_FAILED);
+  });
+});
+
+/* Replacing an image must not leave the old image's description on the new
+   one: the new asset's alt comes along, or the alt is cleared so the
+   missing-alt check asks for one. */
+describe("MediaCommandLayer.replaceMedia — alt text", () => {
+  it("takes the new asset's alt text", () => {
+    const { composer, elementState } = makeStubComposer({
+      elementsBySrc: [{ id: "img-1", src: "old.png", alt: "A red bicycle" }],
+    });
+    new MediaCommandLayer(composer).replaceMedia("img-1", "https://cdn/new.png", { alt: "A blue kayak" });
+    expect(elementState["img-1"]).toMatchObject({ src: "https://cdn/new.png", alt: "A blue kayak" });
+  });
+
+  it("clears the old alt when the new asset has none", () => {
+    const { composer, elementState } = makeStubComposer({
+      elementsBySrc: [{ id: "img-1", src: "old.png", alt: "A red bicycle" }],
+    });
+    new MediaCommandLayer(composer).replaceMedia("img-1", "https://cdn/new.png", { alt: undefined });
+    expect(elementState["img-1"].alt).toBeUndefined();
+  });
+
+  it("keeps the element's alt when the image does not change", () => {
+    const { composer, elementState } = makeStubComposer({
+      elementsBySrc: [{ id: "img-1", src: "https://cdn/same.png", alt: "Typed by the user" }],
+    });
+    new MediaCommandLayer(composer).replaceMedia("img-1", "https://cdn/same.png", { alt: undefined });
+    expect(elementState["img-1"].alt).toBe("Typed by the user");
+  });
+
+  it("leaves alt alone on a background-image element", () => {
+    const { composer, elementState } = makeStubComposer({
+      elementsBySrc: [{ id: "hero", bgImage: "url(old.png)", alt: "kept" }],
+    });
+    new MediaCommandLayer(composer).replaceMedia("hero", "https://cdn/new.png", { alt: "ignored" });
+    expect(elementState["hero"].alt).toBe("kept");
   });
 });
 

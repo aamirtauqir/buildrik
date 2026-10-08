@@ -86,7 +86,7 @@ beforeEach(() => {
 describe("publishing into a workspace scheduled for deletion", () => {
   it("sites.publish → PRECONDITION_FAILED with the cancel-to-publish message", async () => {
     const caller = sitesRouter.createCaller(ctx() as never);
-    await expect(caller.publish({ siteId: "s1", pages: [] } as never)).rejects.toMatchObject({
+    await expect(caller.publish({ siteId: "s1", pages: [], expectedLastEditedAt: "2026-10-08T10:00:00.000Z" } as never)).rejects.toMatchObject({
       code: "PRECONDITION_FAILED",
       message: MESSAGE,
     });

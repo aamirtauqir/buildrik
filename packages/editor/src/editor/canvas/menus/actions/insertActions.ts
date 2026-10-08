@@ -8,6 +8,7 @@
 
 import type { ContextAction } from "../contextMenuRegistry";
 import { wrapInContainer } from "../../utils/wrapInContainer";
+import { writeElement } from "@/engine/commands/commandOperations";
 
 export const insertSubmenu: ContextAction[] = [
   {
@@ -30,8 +31,10 @@ export const insertSubmenu: ContextAction[] = [
        command exists — which is what a disabled row with its chord is for. */
     isEnabled: (ctx) =>
       ctx.element.canBeUnwrapped() && (ctx.element.getChildren?.()?.length ?? 0) > 0,
-    handler: ({ element }) => {
-      element.unwrap();
+    /* Through the lock gate, one undo step — Wrap refused a locked element
+       and this dissolved it (audit 2026-10-08 P1-3). */
+    handler: ({ composer, element }) => {
+      writeElement(composer, element, "unwrap", (el) => el.unwrap());
     },
   },
 ];
