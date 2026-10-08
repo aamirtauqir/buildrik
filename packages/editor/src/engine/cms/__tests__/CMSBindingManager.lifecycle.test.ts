@@ -105,3 +105,17 @@ describe("an unbind is a project change (CMS-06 live)", () => {
     expect(markDirty).toHaveBeenCalledTimes(2);
   });
 });
+
+/* Live 2026-10-08: binding a heading to a draft record (nothing resolves, so
+   nothing is written into the element) was never saved — the binding was gone
+   after a reload. A bind is a project change whatever it resolves to. */
+describe("a bind is a project change", () => {
+  it("a binding that resolves to nothing still dirties the project", async () => {
+    const { composer, bindings } = setup(new Set(["h1"]));
+    const markDirty = (composer as unknown as { markDirty: ReturnType<typeof vi.fn> }).markDirty;
+    markDirty.mockClear();
+    bindings.bind("h1", field("no-such-collection"));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(markDirty).toHaveBeenCalled();
+  });
+});

@@ -497,8 +497,11 @@ describe("CMSBindingManager — a binding tells history it happened outside it",
     manager.bindToField("el-1", collection.id, item.id, "title", "content");
     await vi.waitFor(() => expect(noteUnrecordedAction).toHaveBeenCalled());
 
-    expect(runWithoutTracking).toHaveBeenCalledTimes(1);
-    expect(calls).toEqual(["untracked-write", "announce"]);
+    /* Two untracked writes: the bound value, then the project dirtying that
+       makes the binding map reach autosave (it used to ride on the value
+       write alone, so a binding that resolved to nothing was never saved). */
+    expect(runWithoutTracking).toHaveBeenCalledTimes(2);
+    expect(calls).toEqual(["untracked-write", "untracked-write", "announce"]);
   });
 });
 

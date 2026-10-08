@@ -116,6 +116,14 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
        and braces; the order still matters if a subclass ever writes without
        the wrapper. */
     void Promise.resolve(this.applyBinding(elementId, binding)).finally(() => {
+      /* The map is saved with the project. A binding that resolves to nothing
+         writes nothing into the element, so nothing else dirtied the project
+         and it was never saved (live 2026-10-08) — same rule as unbind.
+         Untracked: the history step is the record()/note below, not this. */
+      const dirty = () => this.composer.markDirty?.();
+      const history = this.composer.history;
+      if (history?.runWithoutTracking) history.runWithoutTracking(dirty);
+      else dirty();
       if (historyLabel) this.composer.history?.record?.(historyLabel);
       else this.composer.history?.noteUnrecordedAction?.("binding a field to content");
     });
