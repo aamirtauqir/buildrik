@@ -99,4 +99,17 @@ describe("validateTokens (v6)", () => {
     const bad = { ...prim("x", "#000"), cssVar: "not-a-var" };
     expect(validateTokens([bad]).ok).toBe(false);
   });
+
+  it("refuses replacedBy of another kind", () => {
+    const radius = { ...prim("radius-x", "4px"), kind: "radius" as const, category: "layout" as const, type: "length" as const };
+    const r = validateTokens([prim("a", "#000"), { ...radius, replacedBy: "a" }]);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toMatch(/replacedBy .* another kind/);
+  });
+
+  it("refuses a replacedBy cycle", () => {
+    const r = validateTokens([{ ...prim("a", "#000"), replacedBy: "b" }, { ...prim("b", "#111"), replacedBy: "a" }]);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toMatch(/cycle/);
+  });
 });

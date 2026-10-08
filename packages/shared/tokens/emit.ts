@@ -22,6 +22,9 @@ export function emitTokenCss(
   opts: { darkMode: DarkMode; onSkip?: (id: string, reason: string) => void },
 ): string {
   const byId = new Map(tokens.map((t) => [t.id, t]));
+  /* A soft-deleted token (spec §6) points at its replacement: every name it
+     answers to must read the replacement's value, in both modes. */
+  const lightRef = (t: DesignToken): TokenRef => (t.replacedBy ? { alias: t.replacedBy } : t.modes.light);
   const safeNames = (t: DesignToken) => SAFE_VAR.test(t.cssVar) && (t.legacyNames ?? []).every((n) => SAFE_VAR.test(n));
 
   /* Pass one: which tokens get a light declaration. An alias counts only when
@@ -33,7 +36,7 @@ export function emitTokenCss(
     if (known !== undefined) return known;
     if (visiting.has(t.id)) return false;
     visiting.add(t.id);
-    const ref = t.modes.light;
+    const ref = lightRef(t);
     let ok = safeNames(t);
     if (ok) {
       if ("alias" in ref) {
@@ -64,9 +67,9 @@ export function emitTokenCss(
       opts.onSkip?.(t.id, "unsafe custom-property name");
       continue;
     }
-    const lv = emitted.get(t.id) ? refCss(t.modes.light) : null;
+    const lv = emitted.get(t.id) ? refCss(lightRef(t)) : null;
     if (!lv) {
-      opts.onSkip?.(t.id, "alias" in t.modes.light ? "alias target not emitted" : "empty or unresolvable light value");
+      opts.onSkip?.(t.id, "alias" in lightRef(t) ? "alias target not emitted" : "empty or unresolvable light value");
       continue;
     }
     seen.add(t.cssVar);
@@ -76,7 +79,7 @@ export function emitTokenCss(
       seen.add(legacy);
       light.push(`${legacy}:var(${t.cssVar})`);
     }
-    if (opts.darkMode === "auto" && t.modes.dark) {
+    if (opts.darkMode === "auto" && t.modes.dark && !t.replacedBy) {
       const dv = refCss(t.modes.dark);
       if (dv) dark.push(`${t.cssVar}:${dv}`);
       else opts.onSkip?.(t.id, "unresolvable dark value");

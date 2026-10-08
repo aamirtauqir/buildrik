@@ -73,7 +73,11 @@ function graphProblem(tokens: DesignToken[]): string | null {
       if (!target) return `${t.id} aliases missing token ${ref.alias}`;
       if (target.kind !== t.kind) return `${t.id} (${t.kind}) aliases ${target.id} of another kind (${target.kind})`;
     }
-    if (t.replacedBy && !byId.has(t.replacedBy)) return `${t.id} replacedBy missing token ${t.replacedBy}`;
+    if (t.replacedBy) {
+      const target = byId.get(t.replacedBy);
+      if (!target) return `${t.id} replacedBy missing token ${t.replacedBy}`;
+      if (target.kind !== t.kind) return `${t.id} (${t.kind}) replacedBy ${target.id} of another kind (${target.kind})`;
+    }
   }
   // Cycle check per mode: follow aliases; light falls back to light, dark to dark then light.
   for (const mode of ["light", "dark"] as const) {
@@ -83,7 +87,10 @@ function graphProblem(tokens: DesignToken[]): string | null {
       while (cur) {
         if (seen.has(cur.id)) return `alias cycle through ${cur.id}`;
         seen.add(cur.id);
-        const ref: TokenRef = (mode === "dark" && cur.modes.dark) || cur.modes.light;
+        // A replaced token resolves through its replacement in every mode.
+        const ref: TokenRef = cur.replacedBy
+          ? { alias: cur.replacedBy }
+          : (mode === "dark" && cur.modes.dark) || cur.modes.light;
         cur = isAlias(ref) ? byId.get(ref.alias) : undefined;
       }
     }

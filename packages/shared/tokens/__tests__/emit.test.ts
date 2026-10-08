@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { emitTokenCss } from "../emit";
 import { LEGACY_SEED } from "../legacySeed";
-import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
+import type { DesignToken, TokenRef } from "@buildrik/shared/schemas/design-tokens";
 
 const t = (over: Partial<DesignToken> & Pick<DesignToken, "id" | "modes" | "layer">): DesignToken => ({
   name: over.id, kind: "color", category: "colors", cssVar: `--buildrick-design-${over.id}`, type: "color", ...over,
 });
+const semantic = (id: string, light: TokenRef): DesignToken => ({ id, name: id, kind: "color", layer: "semantic", modes: { light }, category: "colors", cssVar: `--buildrick-design-${id}`, type: "color" });
 const tokens: DesignToken[] = [
   t({ id: "blue-600", layer: "primitive", modes: { light: { value: "#1A56DB" } } }),
   t({ id: "blue-400", layer: "primitive", modes: { light: { value: "#76A9FA" } } }),
@@ -132,5 +133,18 @@ describe("emitTokenCss", () => {
       expect(css).not.toMatch(/<\/style>|<script|--x:/);
       expect(onSkip).toHaveBeenCalledWith("pointer", expect.any(String));
     });
+  });
+
+  it("emits a replaced token as var() of its replacement, with no dark block of its own", () => {
+    const css = emitTokenCss(
+      [
+        { ...semantic("color-new", { value: "#1A56DB" }), modes: { light: { value: "#1A56DB" }, dark: { value: "#60A5FA" } } },
+        { ...semantic("color-old", { value: "#000000" }), modes: { light: { value: "#000000" }, dark: { value: "#FFFFFF" } }, replacedBy: "color-new" },
+      ],
+      { darkMode: "auto" },
+    );
+    expect(css).toContain("--buildrick-design-color-old:var(--buildrick-design-color-new)");
+    expect(css).not.toMatch(/--buildrick-design-color-old:#FFFFFF/);
+    expect(css).not.toContain("--buildrick-design-color-old:#000000");
   });
 });

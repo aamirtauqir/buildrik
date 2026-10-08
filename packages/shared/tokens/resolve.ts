@@ -14,7 +14,9 @@ export function resolveTokenLiteral(
   while (cur) {
     if (seen.has(cur.id)) return null;
     seen.add(cur.id);
-    const ref: TokenRef = (mode === "dark" && cur.modes.dark) || cur.modes.light;
+    const ref: TokenRef = cur.replacedBy
+      ? { alias: cur.replacedBy }
+      : (mode === "dark" && cur.modes.dark) || cur.modes.light;
     if ("value" in ref) return ref.value;
     cur = byId.get(ref.alias);
   }

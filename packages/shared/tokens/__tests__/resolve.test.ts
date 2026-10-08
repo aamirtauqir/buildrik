@@ -3,6 +3,7 @@ import { setTokenLiteral, resolveTokenLiteral, lightAliasOf } from "../resolve";
 import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
 
 const p: DesignToken = { id: "b", name: "b", kind: "color", layer: "primitive", modes: { light: { value: "#000" } }, category: "colors", cssVar: "--buildrick-design-b", type: "color" };
+const c = (id: string, value: string): DesignToken => ({ ...p, id, layer: "semantic", cssVar: `--buildrick-design-${id}`, modes: { light: { value } } });
 const s1: DesignToken = { ...p, id: "s1", layer: "semantic", cssVar: "--buildrick-design-s1", modes: { light: { alias: "b" } } };
 const s2: DesignToken = { ...s1, id: "s2", cssVar: "--buildrick-design-s2" };
 
@@ -92,5 +93,14 @@ describe("lightAliasOf", () => {
   it("names the light alias, or nothing for a literal", () => {
     expect(lightAliasOf(s1)).toBe("b");
     expect(lightAliasOf(p)).toBeUndefined();
+  });
+
+  it("follows replacedBy before the token's own value, in both modes", () => {
+    const ts: DesignToken[] = [
+      { ...c("color-new", "#1A56DB"), modes: { light: { value: "#1A56DB" }, dark: { value: "#60A5FA" } } },
+      { ...c("color-old", "#000000"), replacedBy: "color-new" },
+    ];
+    expect(resolveTokenLiteral(ts, "color-old", "light")).toBe("#1A56DB");
+    expect(resolveTokenLiteral(ts, "color-old", "dark")).toBe("#60A5FA");
   });
 });

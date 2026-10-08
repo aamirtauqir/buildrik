@@ -19,12 +19,22 @@ const colour = (id: string, value: string, extra: Partial<V5> = {}): V5 => ({
   id, name: id, value, category: "colors", type: "color", cssVar: `--buildrick-design-${id}`, ...extra,
 });
 
-/** Every v5 var name must resolve to the exact same literal, in both modes. */
+/** Every v5 var name must resolve to the exact same literal, in both modes —
+ *  except a soft-deleted row (`replacedBy`), which since 1b reads its
+ *  replacement in every mode (spec §6), exactly as the editor always showed it. */
 function expectSameResolvedValues(v5: V5[]) {
   const v6 = migrateTokensToV6(v5);
+  const holderOf = (cssVar: string) => v6.find((t) => t.cssVar === cssVar || t.legacyNames?.includes(cssVar));
   for (const old of v5) {
-    const holder = v6.find((t) => t.cssVar === old.cssVar || t.legacyNames?.includes(old.cssVar));
+    const holder = holderOf(old.cssVar);
     expect(holder, `no token answers to ${old.cssVar}`).toBeDefined();
+    if (old.replacedBy) {
+      const target = holderOf(v5.find((r) => r.id === old.replacedBy)!.cssVar)!;
+      for (const mode of ["light", "dark"] as const) {
+        expect(resolveTokenLiteral(v6, holder!.id, mode), `${old.id} ${mode}`).toBe(resolveTokenLiteral(v6, target.id, mode));
+      }
+      continue;
+    }
     expect(resolveTokenLiteral(v6, holder!.id, "light"), `${old.id} light`).toBe(old.value.trim());
     const isColour = old.category === "colors" || old.kind === "color";
     const dark = isColour && old.darkValue?.trim() ? old.darkValue.trim() : old.value.trim();
