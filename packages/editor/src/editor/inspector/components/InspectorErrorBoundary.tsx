@@ -62,7 +62,7 @@ export class InspectorErrorBoundary extends React.Component<
             color: "var(--bk-error)",
           }}
         >
-          <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>Inspector Error</div>
+          <div className="tw:font-semibold tw:mb-2 tw:text-[13px]">Inspector Error</div>
           <div style={{ fontSize: 12, color: "var(--bk-error)", marginBottom: 12 }}>
             {this.state.message}
           </div>

@@ -1000,7 +1000,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
               : `Drop ${assetDrag.keys.length} files on a folder to move them · release outside to cancel`}
           </span>
         )}
-        <span><strong style={{ color: "var(--bk-ink-soft)" }}>{state.counts.all}</strong> assets</span>
+        <span><strong className="tw:text-[var(--bk-ink-soft)]">{state.counts.all}</strong> assets</span>
         <span className="mgr-status-dot" />
         <span>{formatQuotaSize(state.storage.used)} / {formatQuotaSize(state.storage.total)}</span>
         <div className="mgr-status-right">

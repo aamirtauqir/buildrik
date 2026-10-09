@@ -31,7 +31,7 @@ export const AlignmentGrid: React.FC<AlignmentGridProps> = ({
   alignItems,
   onChange,
 }) => (
-  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+  <div className="tw:flex tw:gap-2 tw:items-center">
     <div className="bdi-pad" title="Align items · justify-content">
       {POSITIONS.map((pos, i) => {
         const isActive =

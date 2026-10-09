@@ -212,7 +212,7 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
           lineHeight: 1.5,
         }}
       >
-        <strong style={{ color: "var(--bk-accent)" }}>Variant tabs:</strong>{" "}
+        <strong className="tw:text-[var(--bk-accent)]">Variant tabs:</strong>{" "}
         {presets.map((p) => p.variant).join(" / ")} — each an independent
         token-binding map. Edit any binding here = all canvas elements
         restyle.

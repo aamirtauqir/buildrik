@@ -92,7 +92,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           margins instead, so the gap between them was a property of each child
           rather than of the stack, and the middle one changed size when the
           name became an input. */}
-      <div data-testid="milestone-content" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+      <div data-testid="milestone-content" className="tw:flex-1 tw:min-w-0 tw:flex tw:flex-col tw:gap-0.5">
         <div data-testid="milestone-trigger" style={{ fontSize: 11, color: "var(--bk-ink-soft)" }}>
           {triggerLabel}
         </div>
@@ -149,7 +149,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
         )}
       </div>
       {/* Actions */}
-      <div data-testid="milestone-actions" style={{ display: "flex", gap: 6, flexShrink: 0, flexBasis: "100%" }}>
+      <div data-testid="milestone-actions" className="tw:flex tw:gap-1.5 tw:shrink-0 tw:basis-full">
         {isEditing ? (
           <Button
             onClick={handleEditSave}

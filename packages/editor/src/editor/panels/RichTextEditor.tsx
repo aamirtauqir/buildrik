@@ -291,7 +291,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
               marginBottom: 8,
             }}
           />
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="tw:flex tw:gap-2">
             <Button size="xs" color="light" onClick={() => onCommand("unlink")} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
               Remove
             </Button>
