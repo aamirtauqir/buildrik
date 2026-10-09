@@ -85,6 +85,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     [p.pages]
   );
   const f = useFolders(folderScopeId, livePageIds);
+  const [newFolderId, setNewFolderId] = React.useState<string | null>(null);
   const bulk = useBulkSelect();
 
   /* FC-1 (fix-all 2026-09-25): pages a page-generating CMS collection
@@ -450,7 +451,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             search={search}
             onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
             onAddPage={requestNewPage}
-            onAddFolder={() => f.createFolder("New Folder")}
+            onAddFolder={() => setNewFolderId(f.createFolder("New Folder"))}
+            newFolderId={newFolderId}
             onSelectPage={p.selectPage}
             onToggleSelect={handleToggleSelect}
             onBulkDuplicate={handleBulkDuplicate}
