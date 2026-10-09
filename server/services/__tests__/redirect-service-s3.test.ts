@@ -107,6 +107,11 @@ describe("a redirect never shadows a page (L3-005)", () => {
     expect(db.redirect.update).not.toHaveBeenCalled();
   });
 
+  it("accepts the home page's slug — the home page answers on / only", async () => {
+    await createRedirect("s1", { fromPath: "/home", toUrl: "/", type: "301" }, "PRO");
+    expect(db.redirect.create).toHaveBeenCalled();
+  });
+
   it("accepts a path no page answers on", async () => {
     await createRedirect("s1", { fromPath: "/old-about", toUrl: "/about", type: "301" }, "PRO");
     expect(db.redirect.create).toHaveBeenCalled();
