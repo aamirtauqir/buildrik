@@ -327,9 +327,19 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
         .mock.calls.map(([t]) => t)
         .find((t) => /never reached the server/i.test(t.title ?? ""));
       mockComposer.emit.mockClear();
+      const chrome = await import("@/editor/chrome-ui");
+      const dismissed: string[] = [];
+      const spy = vi.spyOn(chrome, "dismissToast").mockImplementation((id: string) => void dismissed.push(id));
       act(() => toast!.action!.onClick());
       expect(mockComposer.importProject).toHaveBeenLastCalledWith({ pages: [{ id: "p" }, { id: "q" }], styles: [] });
       expect(mockComposer.emit).toHaveBeenCalledWith("project:changed", expect.anything());
+      /* L5-076: the toast is acted on, so it goes — it stayed up after
+         Restore and after every later save. */
+      const recoveryId = vi.mocked(params.addToast!).mock.results[
+        vi.mocked(params.addToast!).mock.calls.findIndex(([t]) => /never reached the server/i.test(t.title ?? ""))
+      ].value;
+      expect(dismissed).toContain(recoveryId);
+      spy.mockRestore();
     } finally {
       localStorage.removeItem("bk-unsaved-v1-site-9");
     }

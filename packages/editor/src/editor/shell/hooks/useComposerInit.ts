@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
@@ -336,7 +336,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 status: "error",
                 error: "This site has edits that never reached the server.",
               });
-              addToastRef.current?.({
+              const recoveryToast = addToastRef.current?.({
                 title: "Some work never reached the server",
                 description:
                   "A save failed before this page was reloaded. The version on screen is the server's. Restoring puts your unsaved edits back so you can save them again.",
@@ -350,6 +350,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     /* Handed over once; Retry may already have taken it. The
                        copy stays kept until a save of it is confirmed. */
                     const kept = takeOffScreenUnsaved(siteId);
+                    /* Acted on: the toast goes (L5-076 — it stayed up after
+                       Restore, and after every later save). */
+                    if (recoveryToast) dismissToast(recoveryToast);
                     if (!kept) return;
                     instance.importProject(kept.project);
                     setIsDirty(true);
@@ -363,6 +366,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 },
                 duration: Infinity,
               });
+              if (recoveryToast) trackSaveFailureToast(recoveryToast);
             } else {
               setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             }
