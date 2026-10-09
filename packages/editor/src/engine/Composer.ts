@@ -765,6 +765,10 @@ export class Composer extends EventEmitter {
    */
   importProject(data: ProjectData): void {
     this.emit(EVENTS.PROJECT_LOADED, { importing: true, data });
+    /* Every element is replaced below, so a selection made before the import
+       points at detached objects: after "Restore to draft" a deleted element
+       stayed selected and editable (L5-043). Re-pointed by id at the end. */
+    const selectedIds = this.selection.getSelectedIds();
 
     // Clear current state
     this.elements.clear();
@@ -835,8 +839,21 @@ export class Composer extends EventEmitter {
       this.elements.setActivePage(pages[0].id);
     }
 
+    this.reselectAfterImport(selectedIds);
+
     this.state.dirty = false;
     this.emit(EVENTS.PROJECT_LOADED, data);
+  }
+
+  /** The pre-import selection, on the imported elements with the same ids;
+   *  cleared when none of them exists any more. */
+  private reselectAfterImport(ids: string[]): void {
+    if (ids.length === 0) return;
+    const kept = ids.map((id) => this.elements.getElement(id)).filter((el): el is NonNullable<typeof el> => Boolean(el));
+    this.selection.clear();
+    if (kept.length === 0) return;
+    this.selection.select(kept[0]);
+    for (const el of kept.slice(1)) this.selection.addToSelection(el);
   }
 
   /**
