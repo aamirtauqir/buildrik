@@ -40,7 +40,7 @@ import {
   restoreAssetVersion,
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
-import { Button, PanelFrame, Textarea } from "@/editor/chrome-ui";
+import { Button, PanelFrame, Textarea, useFocusTrap } from "@/editor/chrome-ui";
 import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
 type View = "hub" | "used" | "versions";
@@ -84,26 +84,6 @@ const VERSION_META = "tw:mt-0.5 tw:w-[72px] tw:shrink-0 tw:text-[11px] tw:font-m
    Versions' count is 11/400 ink beside it. */
 const ROW_CHEVRON = "tw:flex tw:w-6 tw:shrink-0 tw:justify-center tw:text-[12px] tw:text-[var(--bk-ink)]";
 const ROW_COUNT = "tw:text-[11px] tw:font-normal tw:tabular-nums tw:text-[var(--bk-ink)]";
-/**
- * True when another modal dialog is VISIBLE above `el` — i.e. one this surface
- * opened. Escape belongs to the topmost layer, not to us.
- *
- * The visibility test is the whole trick: several dialogs stay mounted while
- * closed (the stock modal, the delete confirm), so a presence-only check
- * reported "covered" permanently and swallowed every Escape. A closed dialog
- * has no client rects.
- */
-function isCoveredByModal(el: HTMLElement): boolean {
-  const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"][aria-modal="true"]');
-  for (const d of dialogs) {
-    if (d === el || d.contains(el) || el.contains(d)) continue;
-    if (d.hidden || d.getAttribute("aria-hidden") === "true") continue;
-    const cs = getComputedStyle(d);
-    if (cs.display === "none" || cs.visibility === "hidden") continue;
-    return true;
-  }
-  return false;
-}
 
 /* Button's `link` variant supplies the recipe; the row's own geometry
    (full-width 36h nav row) stays here. */
@@ -147,7 +127,6 @@ export function AssetDetailOverlay({
   // have neither, so the board's first fact shipped blank for most assets.
   // Measured below instead, from the file itself.
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
 
   const display = item.displayName ?? item.name;
@@ -221,54 +200,15 @@ export function AssetDetailOverlay({
     };
   }, []);
 
-  // ESC pops one level: sub-view → hub, hub → grid. Focus stays trapped.
-  useEffect(() => {
-    const el = overlayRef.current;
-    if (!el) return;
-    const firstFocusable = el.querySelector<HTMLElement>(
-      "button, input, [tabindex]:not([tabindex='-1'])",
-    );
-    firstFocusable?.focus();
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        // A modal opened FROM this drill-in (the image editor) sits above it
-        // and owns the keystroke. Without this guard one Escape closed the
-        // modal AND navigated the drawer behind it — found on the live walk.
-        if (isCoveredByModal(el)) return;
-        e.preventDefault();
-        // One level per press — and nobody else's Escape handler (drawer
-        // close, canvas deselect) gets to also fire on the same keystroke.
-        e.stopPropagation();
-        if (viewRef.current === "hub") onClose();
-        else setView("hub");
-        return;
-      }
-      if (e.key !== "Tab") return;
-      const focusable = Array.from(
-        el.querySelectorAll<HTMLElement>(
-          "button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex='-1'])",
-        ),
-      );
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    // Capture on document, not bubble on window: a drill-in is the topmost
-    // layer, and window-bubble is the LAST stop on the event path — the one
-    // any of the app's other keydown listeners can preempt. Measured: with
-    // the overlay open, Escape reached document but not window, so the
-    // overlay ignored it. Capture puts it first instead of last.
-    document.addEventListener("keydown", handleKeyDown, true);
-    return () => document.removeEventListener("keydown", handleKeyDown, true);
-  }, [onClose]);
+  /* ESC pops one level: sub-view → hub, hub → grid. Focus is trapped and
+     returned by chrome-ui's trap (DQ-019) — this file carried its own copy,
+     which differed only in skipping dialogs that are mounted but closed; the
+     shared trap does that now. A modal opened FROM the drill-in (the image
+     editor) is the topmost dialog and owns Escape. */
+  const overlayRef = useFocusTrap(true, () => {
+    if (viewRef.current === "hub") onClose();
+    else setView("hub");
+  });
 
   useEffect(() => {
     setAltDraft(item.altText ?? "");
