@@ -79,10 +79,12 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
       /* The mode the site SHIPS (L4-021/022): an Off site only ever in
          light. On an Auto site, the theme the Brand preview shows — the
          preview is the only dark view now (it no longer writes colorMode),
-         and it cannot move an Off site's verdict. */
+         and it cannot move an Off site's verdict. The theme-toggle block's
+         canvas preview (BRP1-M12, source "canvas") is a view, not a check. */
+      const preview = composer.designSystem?.preview;
       const mode = contrastLintMode(
         composer.getProjectSettings?.()?.darkMode,
-        composer.designSystem?.preview?.theme ?? "light",
+        preview?.source === "canvas" ? "light" : preview?.theme ?? "light",
       );
       const off = DarkModeSchema.catch("off").parse(composer.getProjectSettings?.()?.darkMode) === "off";
       const readOnly = composer.designSystem?.readOnly === true;
