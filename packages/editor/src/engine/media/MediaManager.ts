@@ -1168,6 +1168,15 @@ export class MediaManager extends MediaEventEmitter {
           bytes: finalSize,
           type: serverType,
           folderId: asset.folderId ?? null,
+          /* L4-006: the transfer itself moves the bar between 75 and 99 —
+             it sat at 75 for the whole network upload. 100 is the row. */
+          onProgress: (fraction) => {
+            const next = 75 + Math.round(Math.min(1, Math.max(0, fraction)) * 24);
+            if (next <= progress.progress) return;
+            progress.status = "uploading";
+            progress.progress = next;
+            this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
+          },
         });
         this.inFlightUploads.delete(assetId);
 

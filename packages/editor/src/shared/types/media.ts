@@ -239,6 +239,8 @@ export interface RemoteAssetSync {
       type: "image" | "video" | "icon" | "font";
       folderId?: string | null;
       siteId?: string | null;
+      /** The network transfer's progress, 0–1 (L4-006). */
+      onProgress?: (fraction: number) => void;
     }
   ): Promise<{ serverId: string; url: string } | null>;
 
