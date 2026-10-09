@@ -424,6 +424,16 @@ describe("webhooks — last delivery", () => {
     expect((await getSettingsOverview("s1")).attention[0].detail).toBe("form.submit · failed · 9 Mar");
   });
 
+  /* L3-034: deliveries are workspace-wide and carry no site, so a failure
+     from before this site existed cannot be about it — a site created today
+     was flagged for a 28 Sep failure. */
+  it("does not flag a failure older than the site itself", async () => {
+    const failed = { ...ok, status: "FAILED", error: "fetch failed", createdAt: new Date(2026, 8, 28) };
+    setup({ ...emptySite, createdAt: new Date(2026, 9, 8) } as Site, { webhook: { deliveries: [failed] } });
+    const overview = await getSettingsOverview("s1");
+    expect(overview.attention).toEqual([]);
+  });
+
   it("dates a delivery from another year with its year", async () => {
     const createdAt = new Date(2024, 11, 24);
     setup(emptySite, { webhook: { deliveries: [{ ...ok, status: "FAILED", error: "timeout", createdAt }] } });
