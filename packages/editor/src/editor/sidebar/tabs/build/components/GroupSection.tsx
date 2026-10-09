@@ -17,6 +17,7 @@ import type { InsertGroup } from "../catalog/groups";
 import type { BlockDragStartFn, DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import { BK_TOOLTIP_CLASS, Button, Tooltip } from "@/editor/chrome-ui";
 import { BlockThumb } from "./BlockThumb";
+import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BlockPreviewCard } from "./BlockPreviewCard";
 
 interface GroupSectionProps {
@@ -107,11 +108,11 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
 export const Row: React.FC<{
   label: string;
   /**
-   * The element's own glyph — `ElEntry.iconHtml`, the inner markup of a
-   * `viewBox="0 0 24 24"` svg. Rows without one (blocks, components, the
-   * user's own) keep the plain square.
+   * The element's block id — its glyph comes from the one element-icon map
+   * (`getElementIcon`, the same lucide set Layers draws). Rows without one
+   * (blocks, components, the user's own) keep the plain square.
    */
-  iconHtml?: string;
+  iconType?: string;
   /** Board 1069:5011 draws the Paste-HTML row with no icon slot at all. */
   noIcon?: boolean;
   /** Pinned band (board 1069:5011): standard row height, panel inset, 12/400 soft. */
@@ -135,7 +136,8 @@ export const Row: React.FC<{
    *  6971:77663's "This page" scope) drew identically to a site-wide one —
    *  nothing told the two apart in the Mine list. */
   meta?: string;
-}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, onHoverChange, testId, grip, fav, draggable, onDragStart, onClick, meta }) => {
+}> = ({ label, iconType, noIcon, pinned, disabled, disabledReason, onHoverChange, testId, grip, fav, draggable, onDragStart, onClick, meta }) => {
+  const ElIcon = iconType ? getElementIcon(iconType) : null;
   const row = (
     <div
       role="button"
@@ -168,31 +170,20 @@ export const Row: React.FC<{
           element types visually identical in the first panel a user opens, and
           it is the top row of this arc's ledger.
 
-          The artwork was never missing. `ElEntry.iconHtml` carries a distinct
-          hand-drawn glyph for every catalog entry — 59 entries, 53 distinct —
-          and nothing has ever rendered one. The inspector, meanwhile, shows a
-          real per-type lucide glyph for the SAME element (`ProInspector.tsx`
-          via `elementIcons.tsx`), so the product disagreed with itself about
-          whether an element has a face.
+          The artwork was never missing: every catalog entry has its own
+          type, and the inspector and Layers already showed a per-type lucide
+          glyph for the SAME element (`elementIcons.tsx`). The Add panel drew
+          its own hand-made SVG set instead — 59 fragments at stroke 1.5, one
+          a serif "H" in Times at 700 (DQ-016/017). One map now draws both.
 
-          Reverting is this block. The square is still what a row with no
-          artwork of its own gets — board 1069:4999 draws it at 14 on soft ink. */}
-      {noIcon ? null : iconHtml ? (
-        <svg
-          viewBox="0 0 24 24"
-          width={14}
-          height={14}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          The square is still what a row with no artwork of its own gets —
+          board 1069:4999 draws it at 14 on soft ink. */}
+      {noIcon ? null : ElIcon ? (
+        <ElIcon
+          size="sm"
           className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]"
           data-testid={`insert-row-icon-${testId}`}
           aria-hidden="true"
-          /* Static markup compiled into the bundle from our own catalog — no
-             user input reaches this, and no request fetches it. */
-          dangerouslySetInnerHTML={{ __html: iconHtml }}
         />
       ) : (
         <span className="tw:size-[14px] tw:rounded-[2px] tw:bg-[var(--bk-ink-soft)] tw:shrink-0" data-testid={`insert-row-icon-${testId}`} aria-hidden="true" />
@@ -286,7 +277,7 @@ const ElementRows: React.FC<{
         <React.Fragment key={`${el.catId}-${el.name}`}>
         <Row
           label={el.name}
-          iconHtml={el.iconHtml}
+          iconType={el.blockId}
           disabled={el.disabled}
           disabledReason={el.disabled ? el.description : undefined}
           onHoverChange={
