@@ -6,6 +6,9 @@
  * stub (v2 bundles its own types), so the import had no types and sat behind a
  * `@ts-ignore` with the list ref typed `any` (DQ-032).
  *
+ * Lives in the repo-root types/ so both the editor and the dashboard (which
+ * compiles editor sources) see it.
+ *
  * @module types/react-window
  */
 declare module "react-window" {

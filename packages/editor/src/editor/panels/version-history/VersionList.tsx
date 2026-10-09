@@ -25,7 +25,7 @@ import type { NamedVersion } from "../../../shared/types/versions";
 import { formatRelativeTime } from "../../../editor/sidebar/tabs/history/helpers";
 import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components/SnapshotPreview";
 
-// react-window 1.8.x ships JS only — typed by shared/types/react-window.d.ts.
+// react-window 1.8.x ships JS only — typed by the repo-root types/react-window.d.ts.
 import { FixedSizeList, type ListChildComponentProps } from "react-window";
 import { Button, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 import { MoreHorizontal } from "lucide-react";
