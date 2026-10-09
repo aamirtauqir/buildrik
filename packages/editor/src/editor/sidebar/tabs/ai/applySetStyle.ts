@@ -728,5 +728,17 @@ export async function applyAiEdit(
     composer.off?.(EVENTS.HISTORY_RECORDED, onRecorded);
   }
   const undo = recorded ? composer.history?.captureUndo?.() ?? null : null;
+  /* The canvas shows what landed (FG-023): the elements the applied commands
+     named, flashed by useElementFlash. */
+  if (recorded) {
+    const elementIds = [
+      ...new Set(
+        commands
+          .map((c) => (c as { args?: { elementId?: unknown } }).args?.elementId)
+          .filter((id): id is string => typeof id === "string" && Boolean(composer.elements?.getElement?.(id))),
+      ),
+    ];
+    if (elementIds.length > 0) composer.emit?.(EVENTS.AI_SUGGESTION_APPLIED, { elementIds });
+  }
   return { applied, proposals, undo };
 }

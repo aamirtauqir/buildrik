@@ -58,13 +58,21 @@ export function useElementFlash(composer: Composer | null): void {
       }
     };
 
+    /* FG-023 ("AI assistant · Applied draft · Canvas"): what an applied AI
+       edit touched is shown on the canvas, not only counted in the panel. */
+    const handleAiApplied = (data: { elementIds?: string[] }) => {
+      for (const id of data?.elementIds ?? []) flashElement(id);
+    };
+
     // Subscribe to events
     composer.on(EVENTS.ELEMENT_CREATED, handleElementCreated);
     composer.on(EVENTS.ELEMENT_DUPLICATED, handleElementDuplicated);
+    composer.on(EVENTS.AI_SUGGESTION_APPLIED, handleAiApplied);
 
     return () => {
       composer.off(EVENTS.ELEMENT_CREATED, handleElementCreated);
       composer.off(EVENTS.ELEMENT_DUPLICATED, handleElementDuplicated);
+      composer.off(EVENTS.AI_SUGGESTION_APPLIED, handleAiApplied);
     };
   }, [composer, flashElement]);
 }

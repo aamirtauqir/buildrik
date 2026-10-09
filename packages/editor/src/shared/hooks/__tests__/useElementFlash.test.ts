@@ -92,6 +92,19 @@ describe("useElementFlash", () => {
     }).not.toThrow();
   });
 
+  /* FG-023 ("Applied draft · Canvas"): after an AI edit lands, the canvas
+     shows which elements it touched — the panel alone said "N changes". */
+  it("flashes every element an applied AI edit touched", () => {
+    const composer = createMockComposer();
+    const a = mountCanvasElement("a");
+    const b = mountCanvasElement("b");
+    renderHook(() => useElementFlash(asComposer(composer)));
+
+    act(() => composer.emit(EVENTS.AI_SUGGESTION_APPLIED, { elementIds: ["a", "b"] }));
+    expect(a.classList.contains(FLASH_CLASS)).toBe(true);
+    expect(b.classList.contains(FLASH_CLASS)).toBe(true);
+  });
+
   it("unsubscribes both events on unmount", () => {
     const composer = createMockComposer();
     const { unmount } = renderHook(() => useElementFlash(asComposer(composer)));

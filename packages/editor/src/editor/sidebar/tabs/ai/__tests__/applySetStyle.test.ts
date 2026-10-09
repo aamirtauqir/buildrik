@@ -148,6 +148,27 @@ describe("applyAiEdit", () => {
     expect(beginTransaction).toHaveBeenLastCalledWith("AI: Edit");
   });
 
+  /* FG-023: what landed is announced so the canvas can show it. */
+  it("announces the elements a recorded edit touched", async () => {
+    const { composer } = makeTxComposer();
+    let onRecorded: (() => void) | null = null;
+    const emit = vi.fn();
+    Object.assign(composer as object, {
+      on: (_e: string, cb: () => void) => (onRecorded = cb),
+      off: vi.fn(),
+      emit,
+      history: { flushPending: () => onRecorded?.(), captureUndo: () => () => true },
+    });
+    await applyAiEdit(
+      composer,
+      commitEdit([
+        { commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#000" } },
+        { commandId: "set-text", args: { elementId: "el-1", text: "Hi" } },
+      ]),
+    );
+    expect(emit).toHaveBeenCalledWith("ai:suggestion:applied", { elementIds: ["el-1"] });
+  });
+
   /* Once before the batch (a user edit still in the coalesce window becomes
      its own entry) and once after (the AI edit is one immediate undo step). */
   it("flushes history before and after the batch", async () => {
