@@ -235,7 +235,7 @@ export function DeviceFrameToggle({ active, onToggle, device }: DeviceFrameToggl
       : isHovered
         ? "rgba(255,255,255,0.08)"
         : "transparent",
-    color: active ? "var(--bk-accent)" : "#a1a1aa",
+    color: active ? "var(--bk-accent)" : "var(--bk-ink-muted)",
   };
 
   return (
