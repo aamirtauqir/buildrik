@@ -116,4 +116,34 @@ describe("useContentIssueScanner (real Composer)", () => {
       expect(result.current.issues.some((i) => i.contentKind === "missing-alt")).toBe(true);
     });
   });
+
+  /* L4-042: a hidden page never publishes, and the server's checks skip it;
+     the editor flagged its images too, so the two lists disagreed. */
+  it("skips a page hidden from publishing, as the server's checks do", async () => {
+    const composer = new Composer({} as never);
+    await composer.whenReady();
+    const { result } = renderHook(() => useContentIssueScanner(composer));
+    act(() =>
+      composer.importProject({
+        pages: [
+          { id: "p1", name: "Home", root: { id: "r1", type: "container", tagName: "div", children: [] } },
+          {
+            id: "p2",
+            name: "Draft",
+            settings: { visibility: "hidden" },
+            root: {
+              id: "r2",
+              type: "container",
+              tagName: "div",
+              children: [{ id: "img-hidden", type: "image", tagName: "img", children: [], attributes: { src: "https://x.test/a.png" } }],
+            },
+          },
+        ],
+      } as unknown as ProjectData),
+    );
+    act(() => result.current.rescan());
+    await waitFor(() => expect(result.current.scanState).toBe("idle"));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(result.current.issues.map((i) => i.id)).not.toContain("content:alt:img-hidden");
+  });
 });

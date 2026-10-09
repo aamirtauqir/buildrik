@@ -211,6 +211,7 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
       projectSettings: true,
       status: true,
       publishedPassword: true,
+      createdAt: true,
       workspace: {
         select: {
           plan: true,
@@ -324,7 +325,10 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
       section: "domains",
     });
   }
-  if (lastDelivery && lastDeliveryStatus === "failed") {
+  /* L3-034: deliveries are workspace-wide (no site on the row), so one from
+     before this site existed cannot concern it. */
+  const predatesSite = !!lastDelivery && !!site.createdAt && lastDelivery.createdAt < site.createdAt;
+  if (lastDelivery && lastDeliveryStatus === "failed" && !predatesSite) {
     // `error` already reads "502 Bad Gateway" for an HTTP failure and the
     // exception message for a transport one; the bare status is the fallback.
     const reason = lastDelivery.error ?? (lastDelivery.httpStatus === null ? "failed" : String(lastDelivery.httpStatus));

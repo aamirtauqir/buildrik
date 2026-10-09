@@ -88,7 +88,7 @@ export function TokenRenameDialog({ open, currentId, takenIds, usage, siteName, 
               <Label htmlFor="brand-token-rename-input" className={FIELD_LABEL}>New ID</Label>
               <TextInput
                 id="brand-token-rename-input"
-                autoFocus
+                data-autofocus
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={(e) => {

@@ -85,11 +85,11 @@
     },
     {
       "surface": "Issues panel · clean",
-      "copy": "No brand issues.",
+      "copy": "No issues.",
       "status": "ships",
       "file": "src/editor/shell/IssuesPanel.tsx",
       "shipsInstead": "This page is ready to publish.",
-      "note": "B-14 (2026-09-26, audit-fix lane L4b): board 164:35 draws the verdict as two lines — \"No issues.\" plus \"This page is ready to publish.\" — but the panel only ever knows about brand-lint issues (DS-lint + the page-content scanner's overlap with it), not the whole pre-publish checklist Publish itself runs. \"Ready to publish\" overclaimed what a clean Issues panel actually verified, so it was dropped; the zero state now reads \"No brand issues.\" alone. Board precedence for VISUAL content still applies generally, but a false publish-readiness claim is the behaviour-contract exception CLAUDE.md carves out — see A-20 in the same lane for the same class of fix (an unsupported claim, not a layout choice)."
+      "note": "B-14 (2026-09-26, audit-fix lane L4b): board 164:35 draws the verdict as two lines — \"No issues.\" plus \"This page is ready to publish.\" — but the panel only ever knows about brand-lint issues (DS-lint + the page-content scanner's overlap with it), not the whole pre-publish checklist Publish itself runs. \"Ready to publish\" overclaimed what a clean Issues panel actually verified, so it was dropped; the zero state read \"No brand issues.\" alone, and from L4-042 (2026-10-09) the board's own \"No issues.\" — the feed now carries content and publish-check rows, so \"brand\" undersold it. Board precedence for VISUAL content still applies generally, but a false publish-readiness claim is the behaviour-contract exception CLAUDE.md carves out — see A-20 in the same lane for the same class of fix (an unsupported claim, not a layout choice)."
     },
     {
       "surface": "Comments · none",

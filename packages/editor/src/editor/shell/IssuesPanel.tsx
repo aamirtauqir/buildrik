@@ -172,7 +172,12 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
       setFixing(null);
     }
   };
-  const visible = filter === "all" ? scoped : scoped.filter((i) => i.type === filter);
+  /* Errors first (L4-036): one blocking error sat at row 15 of 20, after the
+     Brand warnings. Array.prototype.sort is stable, so the feed's own order
+     holds within a severity. */
+  const visible = (filter === "all" ? scoped : scoped.filter((i) => i.type === filter))
+    .slice()
+    .sort((a, b) => Number(b.type === "error") - Number(a.type === "error"));
   const filterIndex = FILTERS.findIndex((f) => f.key === filter);
   const currentFilter = FILTERS[filterIndex];
   const nextFilter = FILTERS[(filterIndex + 1) % FILTERS.length];
@@ -234,9 +239,11 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
            the middle of an 844px panel, where the panel read as empty rather
            than as clean. The board puts the first line 40 pixels below the 48-pixel
            header and insets both to the panel's 24px gutter; the pair sat one
-           spacing step high and one step narrow until 2026-09-01. */
+           spacing step high and one step narrow until 2026-09-01. "No brand
+           issues" became "No issues" (6158:51949, L4-042): the feed carries
+           content and publish checks too. */
         <div className="tw:px-6 tw:pt-10 tw:text-center" role="status">
-          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No brand issues.</p>
+          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No issues.</p>
         </div>
       ) : (
         <>

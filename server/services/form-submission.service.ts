@@ -8,7 +8,7 @@ import type {
   ListSubmissionsInput,
   UpdateFormBlockInput,
 } from "@buildrik/shared/schemas/forms";
-import { isAbsoluteHttpUrl } from "@buildrik/shared/schemas/element-markup";
+import { isAbsoluteHttpUrl, isSitePath } from "@buildrik/shared/schemas/element-markup";
 import { resolveSiteOrigins } from "@/lib/publish-urls";
 import { resolveVercelProjectName } from "@/lib/vercel";
 import type { DiscoveredForm, FormBlockWireSettings } from "@/lib/publish-forms";
@@ -177,24 +177,36 @@ export async function submitForm(
     });
   }
 
-  // A row can only reach REDIRECT with no usable URL through direct DB
-  // tampering or a bug elsewhere (the write path validates it) — fail closed
-  // to the message behaviour rather than send a browser to `undefined`.
-  const redirectUrl = formBlock.redirectUrl && isAbsoluteHttpUrl(formBlock.redirectUrl) ? formBlock.redirectUrl : null;
-  const successAction: "MESSAGE" | "REDIRECT" = formBlock.successAction === "REDIRECT" && redirectUrl ? "REDIRECT" : "MESSAGE";
-
   const origins = resolveSiteOrigins({
     canonicalUrl: site.canonicalUrl,
     verifiedDomain: verifiedDomain?.domain ?? null,
     vercelProjectName: site.slug ? resolveVercelProjectName(site) : null,
   });
+  const returnUrl = safeUrlOnOrigins(input.returnUrl, origins);
+
+  // A row can only reach REDIRECT with no usable URL through direct DB
+  // tampering or a bug elsewhere (the write path validates it) — fail closed
+  // to the message behaviour rather than send a browser to `undefined`.
+  // L3-028: a site path (`/thanks`) resolves against the page the visitor
+  // posted from (its origin already checked against the site's), else the
+  // site's own first origin — the published host is not known at edit time.
+  const stored = formBlock.redirectUrl;
+  const sitePathBase = returnUrl ?? origins[0] ?? null;
+  const redirectUrl = !stored
+    ? null
+    : isAbsoluteHttpUrl(stored)
+      ? stored
+      : isSitePath(stored) && sitePathBase
+        ? new URL(stored, sitePathBase).toString()
+        : null;
+  const successAction: "MESSAGE" | "REDIRECT" = formBlock.successAction === "REDIRECT" && redirectUrl ? "REDIRECT" : "MESSAGE";
 
   return {
     id: submission.id,
     successAction,
     redirectUrl,
     successMessage: formBlock.successMessage ?? null,
-    returnUrl: safeUrlOnOrigins(input.returnUrl, origins),
+    returnUrl,
     refererUrl: safeUrlOnOrigins(refererHeader, origins),
     siteOrigin: origins[0] ?? null,
   };
@@ -311,6 +323,11 @@ export async function updateFormBlock(input: UpdateFormBlockInput) {
       redirectUrl: settings.redirectUrl || null,
       notifyEmail: settings.notifyEmail || null,
       spamProtection: settings.spamProtection ?? true,
+      /* L3-027: a settings save is not a publish. The public endpoint only
+         takes posts for an active row, and publish switches it on when it
+         wires the form; an active row from here took submissions (and sent
+         mail) for a form no visitor could have seen. */
+      isActive: false,
     },
     update: data,
   });

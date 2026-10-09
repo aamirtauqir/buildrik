@@ -190,6 +190,28 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0"));
   });
 
+  /* L4-026: ⌘Z put the tokens back, but the list still showed the edit under
+     "Already applied and saved". A row whose tokens are back where the write
+     found them is undone — it leaves the list, and a redo brings it back. */
+  it("an edit undone (tokens back as the write found them) leaves the list; redo brings it back", async () => {
+    const composer = makeFakeComposer();
+    const utils = renderWorkspace(composer);
+    const before = composer.settings.designTokens;
+    fireEvent.click(utils.container.querySelector('[data-token-row="color-primary"]')!);
+    fireEvent.click(utils.getByTestId("brand-token-action-replace"));
+    fireEvent.change(await utils.findByLabelText("Hex color value"), { target: { value: "#C2410C" } });
+    fireEvent.click(within(utils.getByTestId("color-picker")).getByRole("button", { name: "Apply" }));
+    const edited = composer.settings.designTokens;
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1");
+
+    // ⌘Z — the engine restores the settings snapshot and emits SETTINGS_CHANGE.
+    act(() => (composer as unknown as { setProjectSettings: (s: object) => void }).setProjectSettings({ designTokens: before }));
+    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0"));
+
+    act(() => (composer as unknown as { setProjectSettings: (s: object) => void }).setProjectSettings({ designTokens: edited }));
+    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1"));
+  });
+
   it("the card's Auto-fix is a recorded write: a row, and Revert restores", async () => {
     const composer = makeFakeComposer();
     const issue = { type: "contrast", severity: "warning", message: "Contrast 2.8:1", autoFixHint: "darken-22" };

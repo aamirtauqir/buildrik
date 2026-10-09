@@ -113,7 +113,7 @@ describe("Domains tab — read-only (#52)", () => {
 
   it("no domains says the free address is in use", () => {
     unified(<DomainsTab siteId="s1" domains={[]} />);
-    expect(screen.getByTestId("domains-summary-empty")).toHaveTextContent("buildrick.app");
+    expect(screen.getByTestId("domains-summary-empty")).toHaveTextContent("default vercel.app address");
   });
 });
 

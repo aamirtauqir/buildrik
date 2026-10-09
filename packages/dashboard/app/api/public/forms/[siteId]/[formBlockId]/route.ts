@@ -11,32 +11,23 @@ const FORM_SUBMIT_WINDOW_MS = 60_000;
 // (100 fields × 10KB) put a worst case near 1MB, so 256KB is generous.
 const MAX_BODY_BYTES = 256 * 1024;
 
+/* L3-026: a published form is plain HTML, so a visitor whose post fails sees
+   whatever this answers. A browser form post gets a short page in words (same
+   status); a scripted JSON caller keeps the JSON body. */
+function refuse(isForm: boolean, status: number, json: string, words: string, headers?: Record<string, string>) {
+  if (!isForm) return NextResponse.json({ error: json }, { status, headers });
+  return new NextResponse(
+    `<!DOCTYPE html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Message not sent</title><p>${escapeHtmlText(words)}</p><p>Go back and try again.</p>`,
+    { status, headers: { ...headers, "content-type": "text/html; charset=utf-8" } },
+  );
+}
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ siteId: string; formBlockId: string }> }
 ) {
   const { siteId, formBlockId } = await params;
   const ip = clientIp(req.headers);
-
-  const limit = await checkRateLimit(
-    `form-submit:${siteId}:${formBlockId}:${ip}`,
-    FORM_SUBMIT_MAX,
-    FORM_SUBMIT_WINDOW_MS,
-  );
-  if (!limit.allowed) {
-    const retryAfterSec = Math.max(1, Math.ceil((limit.resetAt - Date.now()) / 1000));
-    return NextResponse.json(
-      { error: "Too many submissions. Please wait before trying again." },
-      { status: 429, headers: { "Retry-After": String(retryAfterSec) } },
-    );
-  }
-
-  // The endpoint is public — never trust the body shape. Raw req.json()
-  // previously went straight into the JSON column unvalidated.
-  const raw = await req.text();
-  if (raw.length > MAX_BODY_BYTES) {
-    return NextResponse.json({ error: "Payload too large" }, { status: 413 });
-  }
   /* A published form is plain HTML: `<form method="POST">` sends
      application/x-www-form-urlencoded, and this endpoint accepted JSON only —
      so a real browser submission died at JSON.parse with a 400 before it ever
@@ -45,6 +36,29 @@ export async function POST(
   const isForm = (req.headers.get("content-type") ?? "").includes(
     "application/x-www-form-urlencoded",
   );
+
+  const limit = await checkRateLimit(
+    `form-submit:${siteId}:${formBlockId}:${ip}`,
+    FORM_SUBMIT_MAX,
+    FORM_SUBMIT_WINDOW_MS,
+  );
+  if (!limit.allowed) {
+    const retryAfterSec = Math.max(1, Math.ceil((limit.resetAt - Date.now()) / 1000));
+    return refuse(
+      isForm,
+      429,
+      "Too many submissions. Please wait before trying again.",
+      "Too many messages from you just now. Wait a minute before sending another.",
+      { "Retry-After": String(retryAfterSec) },
+    );
+  }
+
+  // The endpoint is public — never trust the body shape. Raw req.json()
+  // previously went straight into the JSON column unvalidated.
+  const raw = await req.text();
+  if (raw.length > MAX_BODY_BYTES) {
+    return refuse(isForm, 413, "Payload too large", "Your message is too long to send.");
+  }
   let parsedJson: unknown;
   if (isForm) {
     /* A checkbox group posts one key per ticked box; Object.fromEntries kept
@@ -71,7 +85,7 @@ export async function POST(
   }
   const parsed = formSubmissionSchema.safeParse(parsedJson);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid submission" }, { status: 400 });
+    return refuse(isForm, 400, "Invalid submission", "Some of what you entered couldn't be read.");
   }
 
   try {
@@ -139,9 +153,11 @@ export async function POST(
     return NextResponse.json({ id: result.id, message: "Submission received" }, { status: 201 });
   } catch (e: unknown) {
     if (e instanceof FormError) {
-      if (e.message === "FORM_NOT_FOUND") return NextResponse.json({ error: "Form not found" }, { status: 404 });
-      if (e.message === "FORM_SUBMISSION_LIMIT") return NextResponse.json({ error: "Monthly submission limit reached" }, { status: 402 });
+      if (e.message === "FORM_NOT_FOUND")
+        return refuse(isForm, 404, "Form not found", "This form isn't accepting submissions.");
+      if (e.message === "FORM_SUBMISSION_LIMIT")
+        return refuse(isForm, 402, "Monthly submission limit reached", "This form can't take more messages right now.");
     }
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return refuse(isForm, 500, "Internal error", "Something went wrong sending your message.");
   }
 }

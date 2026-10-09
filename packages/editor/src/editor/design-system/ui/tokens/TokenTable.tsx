@@ -27,7 +27,36 @@ export interface TokenTableProps {
 const HEAD_CELL =
   "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:tracking-[var(--bk-tracking-wide)] tw:text-[var(--bk-ink-muted)]";
 
-export const TokenTable: React.FC<TokenTableProps> = ({ columns, template, label, children }) => (
+/* L4-032: one Tab stop for the table — the selected row, or the first when
+   none is — and the arrow keys (Home / End) move between rows. Every row was
+   its own Tab stop, 40+ presses to get past Colours. */
+const rowsIn = (group: HTMLElement | null) =>
+  Array.from(group?.querySelectorAll<HTMLElement>(":scope > [data-token-row]") ?? []);
+
+function onRowKeys(e: React.KeyboardEvent<HTMLDivElement>) {
+  const rows = rowsIn(e.currentTarget);
+  const at = rows.indexOf(e.target as HTMLElement);
+  if (at < 0) return;
+  const next =
+    e.key === "ArrowDown" ? rows[at + 1]
+    : e.key === "ArrowUp" ? rows[at - 1]
+    : e.key === "Home" ? rows[0]
+    : e.key === "End" ? rows[rows.length - 1]
+    : undefined;
+  if (!next) return;
+  e.preventDefault();
+  next.focus();
+}
+
+export const TokenTable: React.FC<TokenTableProps> = ({ columns, template, label, children }) => {
+  const groupRef = React.useRef<HTMLDivElement>(null);
+  /* No row selected: the first row carries the Tab stop. Runs after every
+     render because the rows come and go with the caller's list. */
+  React.useLayoutEffect(() => {
+    const rows = rowsIn(groupRef.current);
+    if (rows.length > 0 && !rows.some((r) => r.tabIndex === 0)) rows[0].tabIndex = 0;
+  });
+  return (
   <div
     role="table"
     aria-label={label}
@@ -46,9 +75,12 @@ export const TokenTable: React.FC<TokenTableProps> = ({ columns, template, label
         </span>
       ))}
     </div>
-    <div role="rowgroup">{children}</div>
+    <div role="rowgroup" ref={groupRef} onKeyDown={onRowKeys}>
+      {children}
+    </div>
   </div>
-);
+  );
+};
 
 export interface TokenTableRowProps {
   tokenId: string;
@@ -67,7 +99,7 @@ export const TokenTableRow: React.FC<TokenTableRowProps> = ({
 }) => (
   <div
     role="row"
-    tabIndex={0}
+    tabIndex={selected ? 0 : -1}
     aria-selected={selected}
     data-token-row={tokenId}
     data-testid={`brand-token-row-${tokenId}`}

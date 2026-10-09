@@ -201,6 +201,7 @@
     "VersionRow": "local",
     "VersionRowProps": "local",
     "dismissToast": "local",
+    "dismissToastKey": "local",
     "formatIssueSummary": "local",
     "getOverlayRoot": "local",
     "isModalOpen": "local",

@@ -207,6 +207,20 @@ describe("RecoveryManager — runtime fault listeners", () => {
     expect(record.reason).toBe("bare message");
   });
 
+  /* L4-015: the browser's own "ResizeObserver loop …" notice is not a crash.
+     It was recorded as one: a crash sentinel, RUNTIME_FAULT_CAUGHT and a
+     console error, every time the full-page library opened. */
+  it.each([
+    "ResizeObserver loop completed with undelivered notifications.",
+    "ResizeObserver loop limit exceeded",
+  ])("ignores the benign %s", (message) => {
+    const stub = createStubComposer();
+    mgr = new RecoveryManager(stub.composer);
+    window.dispatchEvent(new ErrorEvent("error", { message }));
+    expect(sessionStorage.getItem(CRASH_SENTINEL_KEY)).toBeNull();
+    expect(stub.emitted.find((e) => e.event === EVENTS.RUNTIME_FAULT_CAUGHT)).toBeUndefined();
+  });
+
   it("unhandledrejection with a non-Error reason stringifies it; null reason becomes 'unknown rejection'", () => {
     const stub = createStubComposer();
     mgr = new RecoveryManager(stub.composer);

@@ -105,6 +105,12 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     value: resolveTokenLiteral(colorTokens, t.id, "light") ?? "",
     cssVar: t.cssVar,
   }));
+  /* The picker offers the Brand page's own set — live semantic colours. It
+     listed the internal primitives and retired tokens too, so names showed
+     twice and a pick could bind past the semantic alias (L4-025). A value
+     already bound to any token still resolves through `tokenEntries`. */
+  const pickerIds = new Set(colorTokens.filter((t) => t.layer !== "primitive" && !t.replacedBy).map((t) => t.id));
+  const pickerEntries = tokenEntries.filter((t) => pickerIds.has(t.id));
 
   /* Unlinking replaced the token var with its resolved hex and said nothing
      about what had been dropped, so the only route back was reopening the
@@ -310,7 +316,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           }
         >
           <ColorFillPopover
-            tokens={tokenEntries}
+            tokens={pickerEntries}
             boundTokenId={boundToken?.id ?? null}
             currentHex={swatchColor === "transparent" ? "" : swatchColor}
             onSelectToken={(cssVarRef) => {

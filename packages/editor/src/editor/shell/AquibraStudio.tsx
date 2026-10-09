@@ -52,6 +52,8 @@ import { useExportHandlers } from "./hooks/useExportHandlers";
 import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
 import { submitForReview } from "../../services/ReviewService";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
+import { openPublishCheckFix } from "@/editor/sidebar/tabs/publish/PublishTab";
+import { PUBLISH_CHECK_ISSUE } from "./hooks/useIssuesFeed";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
@@ -610,6 +612,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            the current page with an invisible selection. Page first, then
            select and scroll — the one locate seam Review and Forms use. */
         if (issue.elementId && locateComment(composer, { pageId: issue.pageId ?? null, targetSelector: issue.elementId }) === "located") return;
+        /* A server check ("Favicon", "SEO configured", "Domain connected")
+           opens the pane that fixes it — it opened Brand (L4-035). */
+        if (issue.id.startsWith(PUBLISH_CHECK_ISSUE) && openPublishCheckFix(composer, issue.id.slice(PUBLISH_CHECK_ISSUE.length))) return;
         const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
         const target = refs.map((r) => composer.elements.getElement(r.elementId)).find((el) => el != null);
         if (target) composer.selection.select(target);

@@ -296,11 +296,19 @@ export function isAbsoluteHttpUrl(url: string): boolean {
   }
 }
 
-/** After-submit redirect: absolute http(s) only, on top of the shared dangerous-scheme guard above. */
-export const absoluteRedirectUrlSchema = z
+/** A path on the site itself (`/thanks`): one leading slash, never `//host`
+ *  or `/\\host` (both are another host to a browser), no whitespace. */
+export function isSitePath(url: string): boolean {
+  return /^\/(?![/\\])[^\s\\]*$/.test(url);
+}
+
+/** Form after-submit redirect (L3-028): a site path, resolved against the
+ *  visitor's page when they submit, or an absolute http(s) address. */
+export const formRedirectUrlSchema = z
   .string()
   .trim()
   .max(2000)
-  .refine((v) => v === "" || (isAbsoluteHttpUrl(v) && !isDangerousUrl(v)), {
-    message: "Redirect URL must be a full address starting with https:// (or http://)",
+  .refine((v) => v === "" || isSitePath(v) || (isAbsoluteHttpUrl(v) && !isDangerousUrl(v)), {
+    message: "Use a page path like /thanks, or a full address starting with https://",
   });
+

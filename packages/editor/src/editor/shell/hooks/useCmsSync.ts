@@ -20,6 +20,7 @@ import {
   onCmsSyncError,
   onCmsConflict,
   onCmsGone,
+  onCmsInvalid,
   retryCmsSync,
   bindCmsEngine,
   consumeDirectSync,
@@ -150,6 +151,22 @@ export function useCmsSync(
         })
       : undefined;
 
+    /* L3-019: a collection the server refuses for its own rules (a plan's
+       collection cap, an invalid field) is answered once and never retried,
+       so it never reaches the server. Entry refusals surface in the record
+       sheet that made them (`takeCmsInvalid`); a collection's is said here. */
+    const offInvalid = addToast
+      ? onCmsInvalid((i) => {
+          if (i.kind !== "collection") return;
+          const name = cm.getCollection?.(i.id)?.name ?? "This collection";
+          addToast({
+            tone: "error",
+            title: `${name} wasn't saved to the server`,
+            description: `${i.message} It stays on this device only.`,
+          });
+        })
+      : undefined;
+
     const onColUpsert = (c: CMSCollection) => {
       if (consumeDirectSync("collection", c.id)) return;
       void syncCollectionUpsert(c);
@@ -188,6 +205,7 @@ export function useCmsSync(
       unsubscribe?.();
       offConflict?.();
       offGone?.();
+      offInvalid?.();
       bindCmsEngine(null);
     };
   }, [composer, addToast]);

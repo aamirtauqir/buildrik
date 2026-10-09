@@ -118,6 +118,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "interactions-change": "Changed interactions",
   // Media / components
   "replace media": "Replaced media",
+  "update alt text": "Updated alt text",
   "replace across canvas": "Replaced media across the page",
   "replace across selected pages": "Replaced media across pages",
   "instance-sync": "Synced component instances",

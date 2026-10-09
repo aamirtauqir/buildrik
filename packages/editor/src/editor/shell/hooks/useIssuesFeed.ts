@@ -35,6 +35,9 @@ import { useRefetchOnFocus } from "@/shared/hooks";
 import { useContentIssueScanner } from "./useContentIssueScanner";
 import type { Issue } from "./useStudioState";
 
+/** Issue-id prefix of a server pre-publish check row; the rest is its label. */
+export const PUBLISH_CHECK_ISSUE = "publish-check:";
+
 export interface UseIssuesFeedReturn {
   /** Content-scan state only ("idle" | "scanning" | "error") — the one
    *  producer here that runs long enough to need a visible in-progress /
@@ -110,7 +113,7 @@ export function useIssuesFeed(
             // live tree — listing both would count each fact twice.
             .filter((c) => c.status !== "pass" && !SERVER_CONTENT_LABELS.has(c.label))
             .map((c) => ({
-              id: `publish-check:${c.label}`,
+              id: `${PUBLISH_CHECK_ISSUE}${c.label}`,
               type: c.status === "fail" ? ("error" as const) : ("warning" as const),
               message: c.detail,
               location: `Publish › ${c.label}`,

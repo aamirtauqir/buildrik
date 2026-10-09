@@ -498,10 +498,10 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
           <div className={LINE}>{CARD_LINE}</div>
           {removedDomain ? (
             <div className={LINE} role="status" data-testid="set-dom-removed">
-              {removedDomain} removed. This site is still available at its buildrick.app address.
+              {removedDomain} removed. This site is still available at its default vercel.app address.
             </div>
           ) : (
-            <div className={LINE}>No custom domain. Using the free buildrick.app address until you connect one.</div>
+            <div className={LINE}>No custom domain. The site uses its default vercel.app address until you connect one.</div>
           )}
           <div className="tw:mt-1">{addButton}</div>
         </section>

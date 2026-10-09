@@ -48,6 +48,7 @@ function makeComposer() {
     },
     versions: { autoCheckpoint: vi.fn(() => Promise.resolve(null)) },
     elements: { getActivePage: () => ({ id: "p1" }) },
+    designSystem: { brandTokensV2: false },
   };
 }
 
@@ -82,6 +83,8 @@ describe("TimeTravelHost", () => {
     expect(screen.getByTestId("tt-band-text")).toHaveTextContent(/Previewing .*Added Heading — nothing is written until you restore/);
     expect(c.history.getEntrySnapshot).toHaveBeenLastCalledWith("e1");
     await waitFor(() => expect(screen.getByTestId("tt-preview")).toHaveAttribute("data-status", "ready"));
+    // L4-031: rendered with the site's brand-token switch, not the engine default.
+    expect(renderProjectPages.mock.calls.at(-1)?.[3]).toBe(false);
     expect(c.history.restoreEntry).not.toHaveBeenCalled();
     frameEl.remove();
   });

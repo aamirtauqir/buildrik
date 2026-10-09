@@ -154,9 +154,10 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
         setError(
           isForbidden(e) && "notifyEmail" in patch
             ? "Only workspace Admins can change the notification email."
-            : e instanceof Error
-              ? e.message
-              : "Failed to save.",
+            : /* L3-028: the field's own sentence, not "notifyEmail: …" —
+                 the formatter's structured issues carry it without the key. */
+              ((e as { data?: { zodIssues?: Array<{ message: string }> } }).data?.zodIssues?.[0]?.message ??
+                (e instanceof Error ? e.message : "Failed to save.")),
         );
       })
       .finally(() => setSaving(false));
@@ -192,8 +193,8 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
             <CommitRow
               key={`redirect-${revertToken}`}
               label="Redirect to"
-              type="url"
-              placeholder="https://example.com/thanks"
+              type="text"
+              placeholder="/thanks or https://example.com/thanks"
               value={settings.redirectUrl ?? ""}
               onCommit={(v) => save({ redirectUrl: v })}
             />

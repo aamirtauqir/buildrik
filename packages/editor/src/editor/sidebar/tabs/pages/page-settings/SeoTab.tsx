@@ -102,7 +102,10 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
 
   const from = publicPath(page, opened.slug);
   const to = publicPath(page, page.slug);
-  const change = opened.slug && page.slug && from !== to ? `${from} → ${to}` : null;
+  /* L3-005: when another page still answers on the old address, a redirect
+     from it would hide that page once published — no offer. */
+  const oldPathTaken = sitePages.some((p) => p.id !== page.id && (p.isHome ? "/" : `/${p.slug ?? ""}`) === from);
+  const change = opened.slug && page.slug && from !== to && !oldPathTaken ? `${from} → ${to}` : null;
   const redirectOffer = change !== null && change !== answeredChange;
   /* Opened by "Update URL": the offer is why the sheet opened, so bring it
      into view (it sits under the slug field, below the fold). */

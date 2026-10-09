@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { absoluteRedirectUrlSchema } from "./element-markup";
+import { formRedirectUrlSchema } from "./element-markup";
 
 // Public endpoint input — bounds matter: data lands verbatim in a JSON
 // column, so unbounded keys/values are a storage-DoS vector.
@@ -53,8 +53,13 @@ export const updateFormBlockSchema = z
     blockId: z.string(),
     successMessage: z.string().max(500).optional(),
     successAction: z.enum(["MESSAGE", "REDIRECT"]).optional(),
-    redirectUrl: absoluteRedirectUrlSchema.optional(),
-    notifyEmail: z.string().email().max(320).or(z.literal("")).optional(),
+    redirectUrl: formRedirectUrlSchema.optional(),
+    notifyEmail: z
+      .string()
+      .email({ message: "Enter an email address like you@company.com" })
+      .max(320)
+      .or(z.literal(""))
+      .optional(),
     spamProtection: z.boolean().optional(),
   })
   .refine(

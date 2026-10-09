@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
+import { ToastInput, dismissToastKey } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { SaveState } from "./useStudioState";
 import {
@@ -32,6 +32,10 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
 import { clearUnsaved, keepUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
+
+/** One "not saved" card for both save paths (manual and autosave); the next
+ *  save that lands takes it down (L3-006). */
+export const SAVE_FAILED_TOAST_KEY = "save-failed";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -130,6 +134,8 @@ export type SaveProjectFn = () => Promise<SaveOutcome>;
 // alongside the hook so future contributors see all save-error mapping
 // in one place.
 function explainSaveError(rawMessage: string): string {
+  /* L3-013: the plan's page limit — the server's words name the limit. */
+  if (rawMessage.startsWith("PAGE_LIMIT:")) return rawMessage.slice("PAGE_LIMIT:".length).trim();
   /* I-2: the server refused a page that belongs to another site (sites.saveProject
      BAD_REQUEST); retrying the same snapshot cannot succeed. */
   if (rawMessage.includes("belongs to another site")) {
@@ -211,6 +217,7 @@ export function useSaveCallback({
         if (siteId) clearUnsaved(siteId);
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
+        dismissToastKey(SAVE_FAILED_TOAST_KEY);
         addToast({
           title: "Saved",
           description: "Project saved successfully",
@@ -285,6 +292,7 @@ export function useSaveCallback({
                     ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
                     : "Your changes are still open in this tab. Keep it open and try saving again.",
                   tone: "warning",
+                  key: SAVE_FAILED_TOAST_KEY,
                 }
               : {
                   title: isOffline
@@ -380,6 +388,7 @@ export function useSaveCallback({
           description: userMessage,
           tone: "error",
           action: { label: "Retry", onClick: () => void save() },
+          key: SAVE_FAILED_TOAST_KEY,
         });
         return "error";
       });

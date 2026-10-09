@@ -43,6 +43,8 @@ interface Props {
   onRetry: () => void;
   onAddPage: () => void;
   onAddFolder: () => void;
+  /** The folder "New folder" just made — it opens in rename (L3-012). */
+  newFolderId?: string | null;
   onSelectPage: (id: string) => void;
   onToggleSelect: (id: string, e: React.MouseEvent | React.KeyboardEvent) => void;
   onBulkDuplicate: () => void;
@@ -83,6 +85,7 @@ export const PageList: React.FC<Props> = ({
   onRetry,
   onAddPage,
   onAddFolder,
+  newFolderId = null,
   onSelectPage,
   onToggleSelect,
   onBulkDuplicate,
@@ -256,6 +259,7 @@ export const PageList: React.FC<Props> = ({
                   onToggleSelect={onToggleSelect}
                   onToggle={() => onFolderToggle(folder.id)}
                   onFolderRename={(name) => onFolderRename(folder.id, name)}
+                  startRenaming={folder.id === newFolderId}
                   onFolderDelete={() => onFolderDelete(folder.id)}
                   onSelectPage={onSelectPage}
                   onContextMenu={onContextMenu}

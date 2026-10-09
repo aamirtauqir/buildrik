@@ -124,6 +124,14 @@ const isStale = (row: Row, current: readonly DesignToken[]) => {
   return [...row.ids].some((id) => !sameJson(now.get(id), after.get(id)));
 };
 
+/** The row's tokens are back exactly as the write found them — an undo (⌘Z)
+ *  took the edit away. It leaves the list until a redo returns it (L4-026). */
+const isUndone = (row: Row, current: readonly DesignToken[]) => {
+  const now = new Map(current.map((t) => [t.id, t]));
+  const before = new Map(row.write.before.map((t) => [t.id, t]));
+  return [...row.ids].every((id) => sameJson(now.get(id), before.get(id)));
+};
+
 export function useSessionEdits(composer: Composer | null, project: ProjectTokens) {
   const [log, setLog] = React.useState<LoggedWrite[]>([]);
   const [reverted, setReverted] = React.useState<ReadonlySet<string>>(() => new Set());
@@ -169,7 +177,7 @@ export function useSessionEdits(composer: Composer | null, project: ProjectToken
 
   const edits = React.useMemo<SessionEdit[]>(
     () =>
-      rows.map((r) => ({
+      rows.filter((r) => !isUndone(r, all)).map((r) => ({
         key: r.key,
         tokenId: r.tokenId,
         label: r.write.label,

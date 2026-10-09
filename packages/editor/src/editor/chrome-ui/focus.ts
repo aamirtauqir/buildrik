@@ -52,7 +52,9 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
         (el) => !el.hasAttribute("hidden") && el.getAttribute("aria-hidden") !== "true" && el.tabIndex !== -1,
       );
 
-    focusables()[0]?.focus();
+    /* A field marked `data-autofocus` takes the opening focus; React's own
+       `autoFocus` loses to this effect, and the ✕ came first (L4-027). */
+    (container?.querySelector<HTMLElement>("[data-autofocus]") ?? focusables()[0])?.focus();
 
     /**
      * Only the TOPMOST open dialog answers Escape. Every trap listens on the

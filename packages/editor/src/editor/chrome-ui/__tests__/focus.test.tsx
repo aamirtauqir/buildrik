@@ -83,3 +83,29 @@ describe("useFocusTrap — Escape on an alertdialog", () => {
     expect(alertEscaped).toBe(0);
   });
 });
+
+/* L4-027: the opening focus went to the first focusable — the ✕ — even in a
+   dialog whose whole job is one field (Rename token ID). A field marked
+   `data-autofocus` takes the opening focus. */
+describe("useFocusTrap — the opening focus", () => {
+  function Dialog({ withMark }: { withMark: boolean }) {
+    const ref = useFocusTrap(true, () => {});
+    return (
+      <div ref={ref} role="dialog" aria-modal="true">
+        <button aria-label="Close">x</button>
+        <input aria-label="Current" readOnly />
+        <input aria-label="New ID" {...(withMark ? { "data-autofocus": "" } : {})} />
+      </div>
+    );
+  }
+
+  it("lands on the field marked data-autofocus", () => {
+    render(<Dialog withMark />);
+    expect(document.activeElement?.getAttribute("aria-label")).toBe("New ID");
+  });
+
+  it("falls back to the first focusable", () => {
+    render(<Dialog withMark={false} />);
+    expect(document.activeElement?.getAttribute("aria-label")).toBe("Close");
+  });
+});

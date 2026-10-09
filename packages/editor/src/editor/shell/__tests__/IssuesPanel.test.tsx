@@ -40,6 +40,22 @@ describe("IssuesPanel", () => {
     expect(screen.getByText("● red = error · ● amber = warning")).toBeInTheDocument();
   });
 
+  /* L4-036: with 1 error among 19 warnings the error was row 15 — producer
+     order. Errors come first; within a severity the feed's order stands. */
+  it("lists errors before warnings", () => {
+    renderPanel({
+      issues: [
+        { id: "w1", type: "warning" as const, message: "Warning one" },
+        { id: "e1", type: "error" as const, message: "The one error" },
+        { id: "w2", type: "warning" as const, message: "Warning two" },
+      ],
+    });
+    expect(screen.getByTestId("issue-severity-0")).toHaveTextContent("Error");
+    expect(screen.getByTestId("issue-severity-1")).toHaveTextContent("Warning");
+    const text = document.body.textContent ?? "";
+    expect(text.indexOf("Warning one")).toBeLessThan(text.indexOf("Warning two"));
+  });
+
   it("cycles to errors only, and says what it is hiding", () => {
     renderPanel();
     fireEvent.click(screen.getByRole("button", { name: "All" }));
@@ -56,7 +72,7 @@ describe("IssuesPanel", () => {
 
   it("shows a clean state when there are zero issues", () => {
     renderPanel({ issues: [] });
-    expect(screen.getByText(/no brand issues/i)).toBeInTheDocument();
+    expect(screen.getByText("No issues.")).toBeInTheDocument();
   });
 
   it("renders an Ignored (n) row per suppressed token, and Restore calls onUnignore", () => {

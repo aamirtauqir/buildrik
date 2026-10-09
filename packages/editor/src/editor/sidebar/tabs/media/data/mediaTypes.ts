@@ -539,6 +539,8 @@ export interface UploadZoneProps {
   failedUploads?: FailedUpload[];
   /** §22 — fired when user clicks Retry on a failed queue item. */
   onRetryUpload?(fileName: string): void;
+  /** Dismiss on a failure Retry cannot fix (an unsupported type, L4-008). */
+  onDismissUpload?(fileName: string): void;
   /** `Choose a smaller file…` picked one: the refused record and the pick. */
   onReplacementPicked?(original: FailedUpload, file: File): void;
   /** Quota-warn band's "Optimise images to free space ›" (board 145:199). */
