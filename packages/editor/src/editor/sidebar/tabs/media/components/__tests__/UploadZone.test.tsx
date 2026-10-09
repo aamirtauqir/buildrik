@@ -104,6 +104,28 @@ describe("Clone 3584:45522 · drawer · Upload rejected", () => {
     fireEvent.click(screen.getByTestId("media-upload-error-retry"));
     expect(onRetryUpload).toHaveBeenCalledWith("broken.jpg");
   });
+
+  /* L4-008: retrying a file of a type the library does not take can never
+     succeed — its door is Dismiss, not Retry. */
+  it("an unsupported type offers Dismiss, not Retry", () => {
+    const onRetryUpload = vi.fn();
+    const onDismissUpload = vi.fn();
+    render(
+      <UploadZone
+        compact
+        storage={{ used: 0, total: 5 * 1024 ** 3 }}
+        onUpload={vi.fn()}
+        uploadQueue={[{ fileName: "notes.txt", progress: 0, status: "error", error: "Unsupported file type: text/plain" }]}
+        failedUploads={[{ fileName: "notes.txt", reason: "Unsupported file type: text/plain" }]}
+        onRetryUpload={onRetryUpload}
+        onDismissUpload={onDismissUpload}
+        onReplacementPicked={vi.fn()}
+      />,
+    );
+    expect(screen.queryByTestId("media-upload-error-retry")).toBeNull();
+    fireEvent.click(screen.getByTestId("media-upload-error-dismiss"));
+    expect(onDismissUpload).toHaveBeenCalledWith("notes.txt");
+  });
 });
 
 /* Clone 3584:45876 (drawer · uploading) re-draws V1 145:96. */
