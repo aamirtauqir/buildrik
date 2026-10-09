@@ -172,7 +172,12 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
       setFixing(null);
     }
   };
-  const visible = filter === "all" ? scoped : scoped.filter((i) => i.type === filter);
+  /* Errors first (L4-036): one blocking error sat at row 15 of 20, after the
+     Brand warnings. Array.prototype.sort is stable, so the feed's own order
+     holds within a severity. */
+  const visible = (filter === "all" ? scoped : scoped.filter((i) => i.type === filter))
+    .slice()
+    .sort((a, b) => Number(b.type === "error") - Number(a.type === "error"));
   const filterIndex = FILTERS.findIndex((f) => f.key === filter);
   const currentFilter = FILTERS[filterIndex];
   const nextFilter = FILTERS[(filterIndex + 1) % FILTERS.length];
