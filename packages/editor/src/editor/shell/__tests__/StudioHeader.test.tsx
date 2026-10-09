@@ -12,7 +12,12 @@
  */
 
 import * as React from "react";
-import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* The shell mounts StudioHeader inside ToastProvider; TimeTravelHost (in the
+   header) reports a failed safety version with a toast (DQ-011). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // ── controllable module mocks ────────────────────────────────────────────────
@@ -441,7 +446,8 @@ describe("StudioHeader", () => {
       render(<StudioHeader {...makeProps({ publishOutcome: "published" })} />);
       const btn = screen.getByRole("button", { name: "✓ Published" });
       expect(btn).toBeDisabled();
-      expect(screen.getByRole("status").textContent).toBe("Published — site is live");
+      /* The ToastProvider wrapper adds its own (empty) status region. */
+      expect(screen.getAllByRole("status").map((n) => n.textContent)).toContain("Published — site is live");
     });
 
     it("failed announces assertively — the toast (useExportHandlers) owns the retry door", () => {

@@ -12,7 +12,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, cleanup } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* The shell mounts StudioHeader inside ToastProvider; TimeTravelHost (in the
+   header) reports a failed safety version with a toast (DQ-011). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/shared/utils/featureFlags", () => ({ isFeatureEnabled: vi.fn(() => false) }));

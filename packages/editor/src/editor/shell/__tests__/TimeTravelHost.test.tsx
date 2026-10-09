@@ -19,6 +19,7 @@ const mockRole = vi.hoisted(() => vi.fn<() => string | null>(() => "EDITOR"));
 vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => mockRole() }));
 
 import { TimeTravelHost } from "../TimeTravelHost";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 
 afterEach(() => {
@@ -57,7 +58,7 @@ const chord = () => fireEvent.keyDown(document, { key: "T", ctrlKey: true, shift
 describe("TimeTravelHost", () => {
   it("⌃⇧T works with History closed: opens History, starts on the newest point, shows the live canvas", () => {
     const c = makeComposer();
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     chord();
     const band = screen.getByTestId("tt-band");
     expect(band).toHaveAttribute("data-index", "2");
@@ -75,7 +76,7 @@ describe("TimeTravelHost", () => {
     frameEl.className = "buildrick-canvas";
     document.body.appendChild(frameEl);
     const c = makeComposer();
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     c.fire(EVENTS.UI_TIME_TRAVEL_TOGGLE);
     fireEvent.keyDown(document, { key: "ArrowLeft" });
     fireEvent.keyDown(document, { key: "ArrowLeft" });
@@ -99,7 +100,7 @@ describe("TimeTravelHost", () => {
     frameEl.className = "buildrick-canvas";
     document.body.appendChild(frameEl);
     const c = { ...makeComposer(), readOnly: false };
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     expect(c.readOnly).toBe(false);
     c.fire(EVENTS.UI_TIME_TRAVEL_TOGGLE);
     expect(c.readOnly).toBe(true);
@@ -113,7 +114,7 @@ describe("TimeTravelHost", () => {
 
   it("does not clobber a readOnly composer (view mode) that was already true before it opened", () => {
     const c = { ...makeComposer(), readOnly: true };
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     c.fire(EVENTS.UI_TIME_TRAVEL_TOGGLE);
     expect(c.readOnly).toBe(true);
     fireEvent.keyDown(document, { key: "Escape" });
@@ -123,7 +124,7 @@ describe("TimeTravelHost", () => {
   it("Restore… asks (76095), saves a version first, then restores that point", async () => {
     renderProjectPages.mockResolvedValue([]);
     const c = makeComposer();
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     chord();
     expect(screen.getByTestId("tt-restore")).toBeDisabled();
     fireEvent.keyDown(document, { key: "ArrowLeft" });
@@ -135,10 +136,28 @@ describe("TimeTravelHost", () => {
     expect(screen.queryByTestId("tt-band")).toBeNull();
   });
 
+  /* DQ-011: `autoCheckpoint(...).catch(() => null)` restored anyway when the
+     safety version failed to save — the current state was overwritten with no
+     "Before restoring" version and no message. */
+  it("does not restore when the safety version fails, says so, and offers Restore anyway", async () => {
+    renderProjectPages.mockResolvedValue([]);
+    const c = makeComposer();
+    c.versions.autoCheckpoint.mockImplementation(() => Promise.reject(new Error("quota")));
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
+    chord();
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
+    fireEvent.click(screen.getByTestId("tt-restore"));
+    fireEvent.click(screen.getByTestId("tt-confirm-restore"));
+    await waitFor(() => expect(screen.getByText(/Couldn't save a version first/)).toBeInTheDocument());
+    expect(c.history.restoreEntry).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText("Restore anyway"));
+    expect(c.history.restoreEntry).toHaveBeenCalledWith("e2");
+  });
+
   it("restoring with 2+ prior session edits exits Time-Travel immediately — no stale 'Previewing' band (flow-check DEF-history-restore-stale-banner)", async () => {
     renderProjectPages.mockResolvedValue([]);
     const c = makeComposer();
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     chord();
     // 3 prior edits in this session (newest = index 2) — the ledger's repro
     // needed >=2 prior edits; a single-edit session reset correctly even
@@ -164,7 +183,7 @@ describe("TimeTravelHost", () => {
   it("Esc closes the confirm first, then time-travel", () => {
     renderProjectPages.mockResolvedValue([]);
     const c = makeComposer();
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     chord();
     fireEvent.keyDown(document, { key: "ArrowLeft" });
     fireEvent.keyDown(document, { key: "Enter" });
@@ -178,7 +197,7 @@ describe("TimeTravelHost", () => {
   it("leaves when the session stack changes under it — e.g. a restore from the History panel's own row", () => {
     renderProjectPages.mockResolvedValue([{ path: "index.html", html: "<h1>then</h1>", name: "Home", slug: "" }]);
     const c = makeComposer();
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     chord();
     fireEvent.keyDown(document, { key: "ArrowLeft" });
     expect(screen.getByTestId("tt-band-text").textContent).toMatch(/^Previewing/);
@@ -192,7 +211,7 @@ describe("TimeTravelHost — FC-9 (fix-all 2026-09-25): a VIEWER can preview, no
     renderProjectPages.mockResolvedValue([]);
     mockRole.mockReturnValue("VIEWER");
     const c = makeComposer();
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     chord();
     fireEvent.keyDown(document, { key: "ArrowLeft" });
     const restore = screen.getByTestId("tt-restore");
@@ -207,7 +226,7 @@ describe("TimeTravelHost — FC-9 (fix-all 2026-09-25): a VIEWER can preview, no
     renderProjectPages.mockResolvedValue([]);
     mockRole.mockReturnValue("EDITOR");
     const c = makeComposer();
-    render(<TimeTravelHost composer={c as never} />);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     chord();
     fireEvent.keyDown(document, { key: "ArrowLeft" });
     const restore = screen.getByTestId("tt-restore");
