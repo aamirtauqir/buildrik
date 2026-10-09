@@ -2,13 +2,12 @@
  * Phase B.3a — end-to-end integration test for the dark-mode trilogy.
  *
  * Validates A.2 + B.0 + B.1 + B.2 wired together with a REAL Composer
- * (not mocks): real EventEmitter, real ColorMode store, real DarkResolver,
+ * (not mocks): real EventEmitter, real ColorMode store,
  * real TokenRegistryProvider effect.
  *
  * What this catches that the per-phase mocked tests miss:
  *   - EventEmitter coupling between ColorMode.set → on/off → handler
  *   - Composer init order (ColorMode created before TokenRegistryProvider mounts)
- *   - DarkResolver event emission propagating through Composer's EventEmitter
  */
 
 import { render, act } from "@testing-library/react";
@@ -126,11 +125,10 @@ describe("dark-mode trilogy · end-to-end", () => {
     vi.useRealTimers();
   });
 
-  it("real chain: composer.aliasResolver coexists with darkResolver wiring (A.2 + B.0 + B.1 + B.2 don't conflict)", () => {
+  it("real chain: composer.aliasResolver coexists with the colour-mode wiring (A.2 + B.0 + B.1 + B.2 don't conflict)", () => {
     // Smoke: all four pieces exist on the real composer.
     const composer = new Composer({} as any);
     expect(composer.aliasResolver).toBeDefined();
-    expect(composer.darkResolver).toBeDefined();
     expect(composer.colorMode).toBeDefined();
     expect(composer.migration).toBeDefined();
   });

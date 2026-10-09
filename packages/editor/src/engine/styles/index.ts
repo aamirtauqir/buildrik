@@ -4,5 +4,3 @@
  */
 
 export { StyleEngine } from "./StyleEngine";
-export { GlobalStyleManager } from "./GlobalStyleManager";
-export type { GlobalStyle } from "./GlobalStyleManager";

@@ -29,9 +29,6 @@ import { CollaborationManager } from "./collaboration/CollaborationManager";
 import { CommandCenter } from "./commands/CommandCenter";
 import { ComponentManager } from "./components/ComponentManager";
 import { DataManager } from "./data/DataManager";
-import { StyleDataBinding } from "./data/StyleDataBinding";
-import { TextDataBinding } from "./data/TextDataBinding";
-import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
@@ -55,12 +52,10 @@ import { RecoveryManager } from "./recovery/RecoveryManager";
 import { PageRouter } from "./routing/PageRouter";
 import { SelectionManager } from "./SelectionManager";
 import { StorageAdapter } from "./storage/StorageAdapter";
-import { GlobalStyleManager } from "./styles/GlobalStyleManager";
 import { StyleEngine } from "./styles/StyleEngine";
 import type { Patch } from "./utils/JsonPatch";
 import { MigrationManager } from "./migration/MigrationManager";
 import { AliasResolver } from "./aliasResolver";
-import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
 import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
 import { findConnectSuggestions, type ConnectRef, type ConnectSuggestion } from "./designSystem/connectTokens";
@@ -71,7 +66,6 @@ import { isAiEditableTokenValue } from "./designSystem/tokenValueGuard";
 import { mergeProjectTokens } from "./designSystem/projectTokens";
 import type { BrandPreview, DarkMode, DesignToken } from "./designSystem/types";
 import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
-import { CSSBundler } from "./designSystem/bundler";
 import { DSLinter } from "./designSystem/linter";
 import { AIAssistService } from "./designSystem/services";
 import { VersionTimelineManager } from "./VersionTimelineManager";
@@ -155,10 +149,6 @@ export class Composer extends EventEmitter {
   readonly viewport!: Viewport;
   readonly plugins!: PluginManager;
   readonly data!: DataManager;
-  readonly globalStyles!: GlobalStyleManager;
-  readonly styleBindings!: StyleDataBinding;
-  readonly traitBindings!: TraitDataBinding;
-  readonly textBindings!: TextDataBinding;
   readonly fonts!: FontManager;
   readonly components!: ComponentManager;
   readonly media!: MediaManager;
@@ -168,9 +158,7 @@ export class Composer extends EventEmitter {
   readonly recovery!: RecoveryManager;
   readonly migration!: MigrationManager;
   readonly aliasResolver!: AliasResolver;
-  readonly darkResolver!: DarkResolver;
   readonly colorMode!: ColorMode;
-  readonly cssBundler!: CSSBundler;
   readonly dsLinter!: DSLinter;
   readonly aiAssistService!: AIAssistService;
 
@@ -302,10 +290,6 @@ export class Composer extends EventEmitter {
     this.viewport = new Viewport(this);
     this.plugins = new PluginManager(this);
     this.data = new DataManager(this);
-    this.globalStyles = new GlobalStyleManager(this);
-    this.styleBindings = new StyleDataBinding(this);
-    this.traitBindings = new TraitDataBinding(this);
-    this.textBindings = new TextDataBinding(this);
     this.fonts = new FontManager(this);
     this.components = new ComponentManager(this);
     this.media = new MediaManager(this.config.remoteSync);
@@ -315,9 +299,7 @@ export class Composer extends EventEmitter {
     this.recovery = new RecoveryManager(this);
     this.migration = new MigrationManager(this);
     this.aliasResolver = new AliasResolver(this);
-    this.darkResolver = new DarkResolver();
     this.colorMode = new ColorMode(this);
-    this.cssBundler = new CSSBundler();
     this.dsLinter = new DSLinter();
     this.aiAssistService = new AIAssistService(this, config.aiClient ?? null);
 
@@ -345,7 +327,6 @@ export class Composer extends EventEmitter {
           sources: [
             this.elements.exportPages(),
             this.styles.exportStyles(),
-            this.globalStyles.getAll(),
             components ?? [],
             this.getProjectSettings().designPresets ?? [],
           ],
@@ -1432,9 +1413,6 @@ ${html}${interactionScript}
 
     if (this.plugins?.destroy) await this.plugins.destroy();
     if (this.data?.destroy) this.data.destroy();
-    if (this.globalStyles?.destroy) this.globalStyles.destroy();
-    if (this.styleBindings?.destroy) this.styleBindings.destroy();
-    if (this.traitBindings?.destroy) this.traitBindings.destroy();
     if (this.canvas.indicators?.destroy) this.canvas.indicators.destroy();
     if (this.fonts?.destroy) this.fonts.destroy();
     if (this.components?.destroy) this.components.destroy();
