@@ -147,6 +147,29 @@ const RATCHETS = [
     css: true,
   },
   {
+    id: "offscale-icon-size",
+    /* DQ-017 (2026-10-10): lucide `size` took twelve values. The scale is
+       10 / 12 / 14 / 16 / 18 / 20 / 24 (+ 32 / 48 empty-state art); 10 is
+       the Inspector v4 boards' micro-glyph (stepper chevrons). What is left
+       sits in inspector controls no board has been read for yet. */
+    pattern: String.raw`\bsize=\{(8|9|11|13|15|17|19|21|22|23)\}`,
+    baseline: 3,
+  },
+  {
+    id: "inline-svg",
+    /* DQ-017: hand-drawn <svg> beside lucide. 62 at the audit; the dead
+       history icon set (8) and lucide paths copied inline (footer undo/redo)
+       are gone. Drains toward lucide; never grows. */
+    pattern: String.raw`<svg( |>|$)`,
+    baseline: 51,
+  },
+  {
+    id: "icon-stroke-override",
+    /* DQ-017: one stroke — lucide's default 2. */
+    pattern: String.raw`strokeWidth=\{(1|1\.5|1\.75|2\.5|3)\}`,
+    baseline: 0,
+  },
+  {
     id: "css-font-weight-700",
     /* DQ-021: the CSS half. `Canvas.css` set `font-weight: bold` on the
        clone-mode badge (chrome, despite the file) and no gate scanned CSS

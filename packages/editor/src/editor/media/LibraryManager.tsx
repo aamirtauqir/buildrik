@@ -1016,7 +1016,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
               retry queue by scanning for it. */}
           {localOnlyCount > 0 && (
             <span className="mgr-sync-pill" data-testid="mgr-sync-pill">
-              <AlertCircle size={10} />
+              <AlertCircle size={12} />
               {localOnlyCount} not on the server
             </span>
           )}

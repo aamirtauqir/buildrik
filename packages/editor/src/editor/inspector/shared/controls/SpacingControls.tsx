@@ -291,7 +291,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
             color: linked ? "var(--bk-accent)" : "var(--bk-ink-muted)",
           }}
         >
-          {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
+          {linked ? <Link size={12} aria-hidden="true" /> : <Unlink size={12} aria-hidden="true" />}
         </Button>
       )}
     </div>

@@ -136,7 +136,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             title="Minimize"
             data-testid="checklist-minimize"
           >
-            <Minus size={13} />
+            <Minus size={14} />
           </Button>
 
           {/* Close / Confirm */}
@@ -158,7 +158,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               aria-label="Close checklist"
               title="Close"
             >
-              <X size={13} />
+              <X size={14} />
             </Button>
           )}
         </div>
@@ -221,7 +221,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                   aria-hidden="true"
                   data-testid={`checklist-box-${index}`}
                 >
-                  {isCompleted && <Check size={10} strokeWidth={3} color="var(--bk-accent-on)" />}
+                  {isCompleted && <Check size={12} color="var(--bk-accent-on)" />}
                 </span>
 
                 {/* Label */}

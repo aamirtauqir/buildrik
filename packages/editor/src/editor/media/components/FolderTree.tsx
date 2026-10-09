@@ -206,7 +206,7 @@ function TreeNode({
           }}
           aria-label="Delete folder"
         >
-          <Trash2 size={11} />
+          <Trash2 size={12} />
         </Button>
       )}
       {onDelete && deleteViewOnlyReason && (
@@ -217,7 +217,7 @@ function TreeNode({
             aria-disabled="true"
             onClick={(e) => e.stopPropagation()}
           >
-            <Trash2 size={11} />
+            <Trash2 size={12} />
           </Button>
         </Tooltip>
       )}

@@ -282,7 +282,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div className={STEP_BAR} data-testid="cms-setup-steps" aria-hidden="true">
             <div className={STEP}>
               <div className={`${STEP_DOT} ${STEP_DOT_DONE}`}>
-                <Check size={11} />
+                <Check size={12} />
               </div>
               <span className={STEP_LABEL_OFF}>Name &amp; Type</span>
             </div>

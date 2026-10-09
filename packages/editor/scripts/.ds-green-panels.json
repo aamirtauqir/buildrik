@@ -68,7 +68,6 @@
     "packages/editor/src/editor/sidebar/tabs/history/components/DiffRow.tsx",
     "packages/editor/src/editor/sidebar/tabs/history/components/MilestoneSuggestionBanner.tsx",
     "packages/editor/src/editor/sidebar/tabs/history/components/SnapshotPreview.tsx",
-    "packages/editor/src/editor/sidebar/tabs/history/icons.tsx",
     "packages/editor/src/editor/sidebar/tabs/layers/LayersTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/media/components/AssetDetailOverlay.tsx",
     "packages/editor/src/editor/sidebar/tabs/media/components/ConfirmDeleteModal.tsx",
