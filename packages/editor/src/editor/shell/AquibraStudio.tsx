@@ -67,6 +67,7 @@ import { requestAssetPick, useAssetPickBridge } from "../sidebar/tabs/media/data
 import type { MediaAsset, MediaAssetType } from "@shared/types/media";
 import { ConflictModal } from "./modals/ConflictModal";
 import { navigateBypassingUnloadGuard } from "./unloadGuardBypass";
+import { useOtherTabNotice } from "./hooks/useOtherTabNotice";
 import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
 import "../../themes/default.css";
@@ -433,6 +434,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // wrong with the site.
   // Its server check rows re-read when a publish settles and when the panel
   // opens (IR-1), as well as after a save and on return to the tab.
+  useOtherTabNotice(getSiteIdFromUrl(), addToast);
   const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues, {
     publishState: publishJob.uiState,
     panelOpen: issuesOpen,
