@@ -631,6 +631,16 @@ export class Composer extends EventEmitter {
       const p = payload as { asset?: unknown } | undefined;
       syncLibraryFont(p && "asset" in p ? p.asset : payload);
     });
+    /* L4-014: an asset's alt edit reaches the placements that still carry
+       its old alt (or none). */
+    this.media.on(MEDIA_EVENTS.MEDIA_UPDATED, (payload: unknown) => {
+      const p = payload as
+        | { asset?: { src?: string; altText?: string }; previous?: { altText?: string }; changes?: object }
+        | undefined;
+      if (!p?.asset?.src || !p.changes || !("altText" in p.changes)) return;
+      if (p.previous?.altText === p.asset.altText) return;
+      this.mediaOps.followAssetAlt(p.asset.src, p.previous?.altText, p.asset.altText);
+    });
     this.media.on(MEDIA_EVENTS.MEDIA_DELETED, (payload: unknown) => {
       const id = (payload as { id?: string } | undefined)?.id;
       const filename = id ? fontFileById.get(id) : undefined;

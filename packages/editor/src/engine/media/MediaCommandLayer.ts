@@ -271,6 +271,34 @@ export class MediaCommandLayer {
   }
 
   /**
+   * L4-014: an asset's alt text changed (a library edit, or AI alt arriving
+   * after placement). Placements still carrying the asset's previous alt — or
+   * none — take the new one; an alt written on the element by hand is its
+   * own and stays. Locked elements are left alone. One undo step. Returns how
+   * many elements changed.
+   */
+  followAssetAlt(src: string, previousAlt: string | undefined, nextAlt: string | undefined): number {
+    const followers = this.composer.elements.findByMediaSrc(src).filter((el) => {
+      if (el.isLocked()) return false;
+      const alt = el.getAttribute("alt");
+      return !alt || alt === previousAlt;
+    });
+    if (followers.length === 0) return 0;
+    this.composer.beginTransaction("Update alt text");
+    try {
+      for (const el of followers) {
+        if (nextAlt) el.setAttribute("alt", nextAlt);
+        else el.removeAttribute("alt");
+      }
+      this.composer.endTransaction();
+    } catch (err) {
+      this.composer.rollbackTransaction();
+      throw err;
+    }
+    return followers.length;
+  }
+
+  /**
    * Replace `oldSrc` with `newSrc` on every element that references it.
    * One transaction wraps the whole batch, so undo reverses everything.
    *

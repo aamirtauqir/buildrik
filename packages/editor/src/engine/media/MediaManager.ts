@@ -1437,7 +1437,7 @@ export class MediaManager extends MediaEventEmitter {
       }
     }
 
-    this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, changes: updates });
+    this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, previous: asset, changes: updates });
     return updated;
   }
 
