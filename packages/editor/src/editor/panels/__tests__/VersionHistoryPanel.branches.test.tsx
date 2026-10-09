@@ -479,6 +479,28 @@ describe("VersionHistoryPanel — compare branches", () => {
     await waitFor(() => expect(mocks.compareWithDraft).toHaveBeenCalledWith("latest"));
   });
 
+  /* L5-041: saving a new version while a compare is open left the open
+     result computed before it. */
+  it("an open compare recomputes when a new version is saved", async () => {
+    mocks.state.versions = [
+      makeVersion({ id: "latest", name: "Latest" }),
+      makeVersion({ id: "older", name: "Older" }),
+    ];
+    mocks.compareWithDraft.mockResolvedValue(emptyCompareResult);
+    const Panel = await loadPanel();
+    const composer = makeComposer();
+    const { rerender } = render(<Panel composer={composer} />);
+
+    openSaveMenu("Older");
+    fireEvent.click(screen.getByLabelText('Compare "Older"'));
+    await waitFor(() => expect(mocks.compareWithDraft).toHaveBeenCalledTimes(1));
+
+    mocks.state.versions = [makeVersion({ id: "newer", name: "Newer" }), ...mocks.state.versions];
+    rerender(<Panel composer={composer} />);
+    await waitFor(() => expect(mocks.compareWithDraft).toHaveBeenCalledTimes(2));
+    expect(mocks.compareWithDraft).toHaveBeenLastCalledWith("older");
+  });
+
   it("compare view defaults to Visual when snapshots exist and Semantic tab toggles", async () => {
     mocks.state.versions = [
       makeVersion({ id: "latest", name: "Latest" }),

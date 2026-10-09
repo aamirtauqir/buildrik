@@ -276,6 +276,22 @@ export function VersionHistoryPanel({
     [expandedId, compareWithDraft]
   );
 
+  /* A save while a compare is open (L5-041): the open result was computed
+     before it and kept saying so. Recompute the open one when the list moves. */
+  const openCompareRef = React.useRef<string | null>(null);
+  openCompareRef.current = expandedId;
+  React.useEffect(() => {
+    const id = openCompareRef.current;
+    if (!id) return;
+    let live = true;
+    void compareWithDraft(id).then((result) => {
+      if (live && openCompareRef.current === id) setCompareResults((prev) => ({ ...prev, [id]: result }));
+    });
+    return () => {
+      live = false;
+    };
+  }, [versions, compareWithDraft]);
+
   /* G1-075: Named / Auto-saves / author, then the search query. */
   const [savesFilter, setSavesFilter] = React.useState<SavesFilterValue>(ALL_SAVES);
   const currentUserId = composer?.versions?.getCurrentUserId?.() ?? null;
