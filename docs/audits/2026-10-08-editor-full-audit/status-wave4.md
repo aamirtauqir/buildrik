@@ -2,7 +2,22 @@
 
 Branch `fix/editor-audit-wave4` from main `e8df3945b` (2026-10-09). ISSUE-INDEX.md is not edited; this file is the record.
 
-**Live verification:** not done. A dev server from this worktree came up on :3560, but the machine's load average was ~690 (other agents), `/dashboard` took 34 minutes to render and Prisma timed out (`P1001`) during login. The server was stopped and no throwaway site was created. Every row below rests on unit/integration tests (the "evidence" column) and code reading. **None of it was checked in a browser.**
+**Live verification (2026-10-09, after `git merge main` → 6c3bb6fa8, load < 40):** dev server from this worktree on :3560, qa@buildrik.local, 1440×900, `sites.publish` route-aborted, throwaway site `cmv16rsz…` (SaaS Landing applied; soft-deleted afterwards). Screenshots in the session scratchpad `wave4/`. Measured results:
+
+| ID | Live result |
+|---|---|
+| L2-025 | PASS — SaaS hero `<h1>` content `Ship faster with<br><span …>less complexity</span>`; 0 `br`/`strong`/`span` elements carry `data-buildrick-id` (no layers) |
+| L1-016 / L2-023 | PASS — the inserted Image (no src, alt "Image") renders 120×80, computed `content: url(data:image/svg+xml…)`, bg rgb(226,232,240); the screenshot shows the slab and icon only, no broken glyph or alt text |
+| L1-023 | PASS — Add search "pic" lists Image |
+| L1-027 | PASS — CMS workspace open (count 1) → Escape → count 0 |
+| L1-011 | PASS — pointer at (left+10, section top+17), inside the old 48×40 hit box: `elementFromPoint` = the SECTION; click → readout "Section · 991 × 530"; the nearby grip shows opacity 1 / pointer-events auto, the others 0 / none |
+| L1-036 | PASS — comment mode: capture layer up, click on the h1 opened "Leave a comment…", readout stayed "Nothing selected" |
+| L1-010 | PASS — paragraph dragged onto the top edge of the h1: "Drop here" at y=301 (heading top 313); order after drop P, H1, DIV; Undo restores H1, P, DIV |
+| L2-013 | **FAILED, then fixed** — first run: Layers row read "Renamed Hero W4" after Undo (the engine had reverted; the row's `customNames` only followed ELEMENT_RENAMED). Fixed in `967164e6a` (the undo/redo/load rescan rebuilds names; hook test added). Re-run: before "Section" → rename "Renamed Hero W4" → Undo "Section" → Redo "Renamed Hero W4" |
+| L4-034 | PASS — page "Second" with a file-less Image; from Home, Issues › Whole site row "Image has no file @ Second › IMG" → active page tab Second, readout "Image · 120 × 80". Same panel showed the new L1-035 rows ("Image has no file", "Image is missing alt text") |
+| L1-008 | PASS after a copy fix — `aquibra-project` seeded with another project ("LEAK-MARKER") and `pages.list` forced to 500: nothing leaked (no LEAK-MARKER, empty canvas), and the server copy was untouched (36 elements on the next normal load). The banner still said "You're seeing local changes for now", which is false now → fixed in `4bd0bb595` ("Couldn't load this site. Retry — anything done here is not saved until it loads."), re-verified live. Separately, a "Couldn't save … Check your connection" dialog appears in this state (the save is refused because the project never loaded): pre-existing, not changed here |
+
+Not live-checked: everything else in section B (tests only).
 
 Statuses: FIXED (this branch), ALREADY-FIXED (on main before this wave), DECISION (needs an owner or designer call; the recommended default is given), NOT-DONE (plan given).
 
@@ -44,7 +59,7 @@ All of these were fixed on the parked branch `fix/editor-ai-audit-2026-10-08` (m
 |---|---|---|---|
 | L1-005 | ALREADY-FIXED | fc052ec41 | useCanvasElementDrag.test: a locked drag is refused |
 | L1-006 | ALREADY-FIXED | 948197059 | useCanvasEditorFlags.test: dim/lock survive re-render |
-| L1-008 | FIXED | 639a5fcea | useComposerInit.loadFlow: a site session gets `storage:{type:"none"}`, and the demo keeps local storage. Not done: clearing an `aquibra-project` key already written by older builds on logout (that code lives in the dashboard's sign-out) |
+| L1-008 | FIXED | 639a5fcea, 4bd0bb595 | useComposerInit.loadFlow: a site session gets `storage:{type:"none"}`, and the demo keeps local storage. Not done: clearing an `aquibra-project` key already written by older builds on logout (that code lives in the dashboard's sign-out) |
 | L1-009 | NOT-DONE | — | Needs a live repro on a fresh site to find which load-time write records "Updated page". Plan: snapshot `history` right after `importMigratedProject`, then wrap the culprit (likely ProjectTokensApplier / token push) in `runWithoutTracking` or re-baseline after load |
 | L1-010 | FIXED | af8f870bc | dropOperations.test: before → slot 1, after → slot 2, fallback resolver not consulted |
 | L1-011 | FIXED | 526ff717d | SectionReorderHandles.test: no pointer-active div at rest; proximity hover; a hovered grip takes the pointer |
@@ -77,7 +92,7 @@ All of these were fixed on the parked branch `fix/editor-ai-audit-2026-10-08` (m
 | L1-038 | FIXED | dcaa0aa54 | useCanvasKeyboard.arrows: ⇧→ then ⌘→ both explain (the hint was once per element per session) |
 | L2-011 | FIXED | 4eb728855 | useStyleHandlers.shorthandFill: an authored `background` drops the default `background-color` |
 | L2-012 | ALREADY-FIXED | 948197059 | as L1-006 |
-| L2-013 | ALREADY-FIXED | test 51d5fa8a8 | real Composer: rename → ⌘Z clears → redo restores. The Layers row label re-sync on undo was not checked live |
+| L2-013 | FIXED | 51d5fa8a8 (test), 967164e6a (fix) | the engine already undid the rename, but the Layers row did not follow (found live); `useLayerActions` now rebuilds names on undo/redo/load. Live re-run passes |
 | L2-014 | FIXED | b874b9a88 | TemplatePreview.tokens.test: srcdoc has no `{{token.` |
 | L2-015 | NOT-DONE | — | Stable ids across master sync. Plan: reconcile the instance subtree by element path in `syncInstance` and keep existing ids. Engine-wide, needs care with overrides |
 | L2-016 | FIXED | d334fb887 | defaultCommands + useClipboardToasts: instance-only refusals emit `{reason:"instance"}` → "Part of a component — detach the instance to change it". No component name / Detach action in the toast yet |
@@ -104,6 +119,6 @@ All of these were fixed on the parked branch `fix/editor-ai-audit-2026-10-08` (m
 | L2-037 | NOT-DONE | — | Cause unknown and the AI provider is not reachable in dev. Plan (with wave 6 / L5): log adoption only after a successful apply, and filter ResizeObserver errors out of Recovery |
 | L2-038 | NOT-DONE | — | One-off; no repro attempted (no live session). Plan: give resize handles priority over drag start, and require a minimum distance plus a valid hovered target before moving |
 
-## Gates
+## Gates (after merging main 6c3bb6fa8)
 
-See the lane report. Gate results are recorded at commit time in the final report, not here.
+editor + dashboard `tsc` 0 · `verify:ds` 0 · dashboard DS grep 7/7 · tRPC orphans PASS · targeted vitest on touched files: editor 45 files / 563 tests, root 3 files / 35 tests, green. Pre-merge full runs: editor 1326/1327 files and root 1493/1494 files; the one failure in each (FormAfterSubmitSection, RedirectsScreen) is untouched code that fails a different test on each rerun.
