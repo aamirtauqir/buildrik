@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
+import type { CompareResult, NamedVersion } from "@/shared/types/versions";
 import type { AISummaryState } from "./AIPanel";
 import { aiTrpcClient } from "@/services/ai/AiTrpcClient";
 import { AI_SUMMARY_LIMITS } from "@buildrik/shared/schemas/ai";

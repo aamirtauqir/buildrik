@@ -8,7 +8,7 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { InspectorFieldContext, type InspectorFieldContextValue } from "../../shared/controls/InspectorFieldContext";
+import { InspectorFieldContext, type InspectorFieldContextValue } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import { SpacingSection } from "../SpacingSection";
 
 function renderSpacing(styles: Record<string, string> = {}, field?: Partial<InspectorFieldContextValue>) {

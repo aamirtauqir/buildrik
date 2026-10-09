@@ -23,14 +23,14 @@ import {
   type InteractionTrigger,
   type AnimationPreset,
 } from "../types";
-import { gsapEngine } from "../../animations/GSAPEngine";
-import { devError, devLog } from "../../../shared/utils/devLogger";
+import { gsapEngine } from "@/engine/animations/GSAPEngine";
+import { devError, devLog } from "@/shared/utils/devLogger";
 
-vi.mock("../../animations/GSAPEngine", () => ({
+vi.mock("@/engine/animations/GSAPEngine", () => ({
   gsapEngine: { createAnimation: vi.fn() },
 }));
 
-vi.mock("../../../shared/utils/devLogger", () => ({
+vi.mock("@/shared/utils/devLogger", () => ({
   devLog: vi.fn(),
   devError: vi.fn(),
   devWarn: vi.fn(),

@@ -8,8 +8,8 @@
 
 import { fireEvent, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AIAssistService } from "../../../../engine/designSystem/services/AIAssistService";
-import { EventEmitter } from "../../../../engine/EventEmitter";
+import { AIAssistService } from "@/engine/designSystem/services/AIAssistService";
+import { EventEmitter } from "@/engine/EventEmitter";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { installDomShims, makeFakeComposer, openPage, renderOnRadius, renderWorkspace } from "./brandWorkspaceHarness";
 import { requestBrandToken } from "../brandOpenRequest";

@@ -16,7 +16,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { collectUsageByPage } from "../../data/mediaUtils";
+import { collectUsageByPage } from "@/editor/sidebar/tabs/media/data/mediaUtils";
 
 const el = (id: string, type: string, name?: string) => ({
   getId: () => id,

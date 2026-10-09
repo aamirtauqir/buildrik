@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { useCanvasInlineEdit } from "../useCanvasInlineEdit";
 
 // Minimal mock composer satisfying the hook's usage
@@ -258,7 +258,7 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
 /* G2-027: the inspector's "Edit text on canvas" starts the same edit. */
 describe("useCanvasInlineEdit — inspector request", () => {
   it("UI_INLINE_EDIT_REQUEST for a text element starts editing it", async () => {
-    const { EVENTS } = await import("../../../../shared/constants/events");
+    const { EVENTS } = await import("@/shared/constants/events");
     const handlers = new Map<string, (p: { elementId: string }) => void>();
     const composer = {
       ...makeMockComposer(),

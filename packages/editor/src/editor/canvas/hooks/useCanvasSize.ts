@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import type { DeviceType } from "../../../shared/types";
+import type { DeviceType } from "@/shared/types";
 
 interface UseCanvasSizeOptions {
   canvasRef: React.RefObject<HTMLDivElement | null>;

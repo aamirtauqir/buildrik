@@ -16,8 +16,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine/Composer";
-import type { GoogleFont } from "../../../../services/GoogleFontsService";
+import type { Composer } from "@/engine/Composer";
+import type { GoogleFont } from "@/services/GoogleFontsService";
 import {
   FontPickerPanel,
   SYSTEM_FONTS,

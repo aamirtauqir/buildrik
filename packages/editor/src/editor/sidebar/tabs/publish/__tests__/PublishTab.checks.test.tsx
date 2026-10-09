@@ -42,7 +42,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
-import { deriveLifecycleState } from "../../../../shell/lifecycle";
+import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 
 /* No review in the path, nothing blocking: the plain `confirm` gate, so the
    only thing that can shut the CTA in this file is the server's list. */

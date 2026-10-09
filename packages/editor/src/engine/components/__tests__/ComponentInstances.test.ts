@@ -14,15 +14,15 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import { EVENTS } from "../../../shared/constants/events";
-import type { ElementData } from "../../../shared/types";
+import { EVENTS } from "@/shared/constants/events";
+import type { ElementData } from "@/shared/types";
 import type {
   ComponentDefinition,
   ComponentInstance,
   OverrideType,
-} from "../../../shared/types/components";
-import { makeEngine, emitsOf } from "../../elements/__tests__/harness";
-import type { Composer } from "../../Composer";
+} from "@/shared/types/components";
+import { makeEngine, emitsOf } from "@/engine/elements/__tests__/harness";
+import type { Composer } from "@/engine/Composer";
 import { ComponentInstanceUtils } from "../ComponentInstance";
 import {
   type InstanceMaps,

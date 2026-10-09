@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { PresetDetailPane } from "../PresetDetailPane";
-import type { StylePreset } from "../../../types";
+import type { StylePreset } from "@/editor/design-system/types";
 
 const buttonPresets: StylePreset[] = [
   {

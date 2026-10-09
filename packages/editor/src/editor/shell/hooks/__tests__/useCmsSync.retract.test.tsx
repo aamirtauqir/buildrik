@@ -20,7 +20,7 @@ let conflictCb: ((c: { kind: string; id: string; keepMine: () => Promise<void>; 
 let goneCb: ((g: { kind: string; id: string; message: string }) => void) | null = null;
 const flushSpy = vi.fn(() => Promise.resolve());
 
-vi.mock("../../../../services/cmsSync", () => ({
+vi.mock("@/services/cmsSync", () => ({
   bindCmsEngine: () => () => {},
   hydrateCmsFromServer: () => Promise.resolve(),
   flushCmsOutbox: () => flushSpy(),

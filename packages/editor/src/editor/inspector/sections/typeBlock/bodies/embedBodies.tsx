@@ -21,14 +21,14 @@
  */
 
 import type * as React from "react";
-import type { TypeBlockBodyProps } from "../../../config/typeBlocks";
+import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { EMBED_RATIOS, EMBED_URL_ATTR, embedRatio, isOnAttr } from "@/shared/utils/embed/embedFrameHTML";
 import { parseEmbedUrl, type EmbedKind } from "@/shared/utils/embed/parseEmbedUrl";
-import { ButtonGroup, InputRow } from "../../../shared/controls";
+import { ButtonGroup, InputRow } from "@/editor/inspector/shared/controls";
 import { runTxn, writeAttribute } from "../attributeWriter";
 import { Note, Warning, useElementVersion } from "./bodyRows";
-import { CheckRow } from "../../../shared/controls/CheckRow";
+import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 
 const RATIO_OPTIONS = EMBED_RATIOS.map((r) => ({ value: r, label: r }));
 

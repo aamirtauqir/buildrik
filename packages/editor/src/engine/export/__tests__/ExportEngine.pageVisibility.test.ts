@@ -10,12 +10,12 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll } from "vitest";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine, isPageLive } from "../ExportEngine";
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { exportPublishPages } from "../../../editor/shell/exportPublishPages";
+import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({

@@ -22,11 +22,11 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { findDropTargetElement } from "../../../../shared/utils/dragDrop";
+import type { Composer } from "@/engine";
+import { findDropTargetElement } from "@/shared/utils/dragDrop";
 import { calculateFreshDropTarget } from "./dragCalculations";
 import { dropMedia, isLibraryAsset, replaceTargetFor } from "./mediaDrop";
-import { writableElements } from "../../../../engine/commands/commandOperations";
+import { writableElements } from "@/engine/commands/commandOperations";
 import {
   handleMultiElementDrop,
   handleElementDrop,

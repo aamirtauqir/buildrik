@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import type { CMSCollection, CMSContentItem } from "../../shared/types/cms";
+import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 
 // ============================================
 // Database Configuration

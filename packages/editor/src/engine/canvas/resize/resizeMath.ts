@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { clamp } from "../../../shared/utils/helpers";
+import { clamp } from "@/shared/utils/helpers";
 import type { HandlePosition, TransformBounds, SizeConstraints } from "./types";
 
 /**

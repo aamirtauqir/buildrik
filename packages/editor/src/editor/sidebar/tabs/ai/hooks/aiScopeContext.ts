@@ -13,7 +13,7 @@
 
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { AI_ELEMENT_CONTEXT_LIMITS, type AiElementContext } from "@buildrik/shared/schemas/ai";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 import { AI_EDITABLE_TOKEN_TYPES } from "@/engine/designSystem/tokenValueGuard";
 import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import type { Element } from "@/engine/elements/Element";

@@ -21,7 +21,7 @@ vi.mock("../api-client", () => ({
     },
   }),
 }));
-vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
+vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 
 const loadCollections = vi.fn();
 const saveCollection = vi.fn();
@@ -31,7 +31,7 @@ const loadContentItem = vi.fn();
 const storageDeleteContentItem = vi.fn();
 const storageDeleteCollection = vi.fn();
 const storageAvailable = vi.fn(() => true);
-vi.mock("../../engine/cms/CollectionStorage", () => ({
+vi.mock("@/engine/cms/CollectionStorage", () => ({
   isStorageAvailable: () => storageAvailable(),
   loadCollections: (...a: unknown[]) => loadCollections(...a),
   saveCollection: (...a: unknown[]) => saveCollection(...a),

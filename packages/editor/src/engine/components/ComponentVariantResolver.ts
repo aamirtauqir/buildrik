@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { ComponentDefinition, ComponentInstance } from "../../shared/types/components";
-import { EVENTS } from "../../shared/constants/events";
+import type { ComponentDefinition, ComponentInstance } from "@/shared/types/components";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import { usableOverrides } from "./ComponentInstance";
 

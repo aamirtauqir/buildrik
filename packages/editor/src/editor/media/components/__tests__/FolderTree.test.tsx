@@ -8,7 +8,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import type { MediaFolder } from "../../../sidebar/tabs/media/data/mediaTypes";
+import type { MediaFolder } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { FolderTree, type FolderTreeProps } from "../FolderTree";
 
 function makeFolder(over: Partial<MediaFolder> = {}): MediaFolder {

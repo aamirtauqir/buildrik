@@ -11,7 +11,7 @@ import {
   useEditorEventListeners,
   type UseEditorEventListenersOptions,
 } from "../useEditorEventListeners";
-import { EVENTS } from "../../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 // Lightweight composer mock with on/off/emit + canvas facade. Post-D3,
 // indicators live under composer.canvas.indicators.

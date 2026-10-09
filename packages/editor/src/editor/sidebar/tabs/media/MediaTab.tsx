@@ -6,10 +6,10 @@
  */
 
 import * as React from "react";
-import type { ImageEditorOptions } from "../../../shell/hooks/useStudioModals";
+import type { ImageEditorOptions } from "@/editor/shell/hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
 import { PanelFrame, useToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
@@ -22,8 +22,8 @@ import { StockSourceModal } from "./components/StockSourceModal";
 import { PickModePanel } from "./components/PickModePanel";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
-import { createAssetVersion } from "../../../../services/MediaVersionService";
-import { regenerateAltText } from "../../../../services/AltTextService";
+import { createAssetVersion } from "@/services/MediaVersionService";
+import { regenerateAltText } from "@/services/AltTextService";
 import { displayNameFor } from "./data/mediaUtils";
 import type { IconConfig } from "@shared/types/media";
 

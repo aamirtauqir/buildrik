@@ -21,10 +21,10 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { MEDIA_EVENTS } from "../../../shared/constants/media";
-import type { MediaAsset } from "../../../shared/types/media";
-import { generateAltTextRemote } from "../../../services/AltTextService";
+import type { Composer } from "@/engine";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
+import type { MediaAsset } from "@/shared/types/media";
+import { generateAltTextRemote } from "@/services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 
 interface UploadCompletePayload {

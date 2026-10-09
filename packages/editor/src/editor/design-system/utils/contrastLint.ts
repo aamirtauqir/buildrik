@@ -14,7 +14,7 @@
  *
  * @license BSD-3-Clause
  */
-import type { LintIssue } from "../../../engine/designSystem/linter";
+import type { LintIssue } from "@/engine/designSystem/linter";
 import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";

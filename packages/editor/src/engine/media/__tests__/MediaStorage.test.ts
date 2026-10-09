@@ -14,7 +14,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MediaAsset, MediaFolder } from "../../../shared/types/media";
+import type { MediaAsset, MediaFolder } from "@/shared/types/media";
 
 const { instances } = vi.hoisted(() => ({
   instances: [] as Array<{

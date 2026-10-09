@@ -13,7 +13,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, act, waitFor } from "@testing-library/react";
 import * as React from "react";
-import { EVENTS } from "../../../shared/constants";
+import { EVENTS } from "@/shared/constants";
 
 const completeStep = vi.hoisted(() => vi.fn());
 const replayAll = vi.hoisted(() => vi.fn());

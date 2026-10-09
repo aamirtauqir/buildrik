@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../engine";
-import type { ElementType } from "../../shared/types";
+import type { Composer } from "@/engine";
+import type { ElementType } from "@/shared/types";
 import type { BlockBuildConfig } from "../types";
 
 export interface IconBlockConfig extends BlockBuildConfig {

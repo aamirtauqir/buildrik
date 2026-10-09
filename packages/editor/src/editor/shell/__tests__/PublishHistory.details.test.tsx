@@ -9,7 +9,7 @@ import * as React from "react";
 import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../services/PublishService", () => ({
+vi.mock("@/services/PublishService", () => ({
   fetchPublishHistory: vi.fn().mockResolvedValue([
     { id: "j6", version: 6, completedAt: new Date(), deploymentId: "d6", rollbackable: true, rolledBackFrom: null },
     { id: "j5", version: 5, completedAt: new Date(Date.now() - 2 * 86_400_000), deploymentId: "d5", rollbackable: true, rolledBackFrom: null },

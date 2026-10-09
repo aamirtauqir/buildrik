@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { DSLinter } from "../DSLinter";
-import type { DesignToken, StylePreset, PresetBinding } from "../../types";
+import type { DesignToken, StylePreset, PresetBinding } from "@/engine/designSystem/types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";

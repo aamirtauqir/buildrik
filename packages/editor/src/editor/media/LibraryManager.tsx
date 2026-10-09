@@ -13,7 +13,7 @@ import * as React from "react";
 import {
   Upload, Search, AlertCircle, X, ChevronDown,
 } from "lucide-react";
-import type { Composer } from "../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
 import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceModal";
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
@@ -35,19 +35,19 @@ import { VersionsModal } from "./components/VersionsModal";
 import { ApplyVersionModal } from "./components/ApplyVersionModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
-import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
+import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "@/shared/constants/media";
 import { useToast, Button, IconButton, Menu, MenuItem, Popover, TextInput, Tooltip } from "@/editor/chrome-ui";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
-import type { EditsSnapshot, IconConfig, MediaAsset } from "../../shared/types/media";
+import type { EditsSnapshot, IconConfig, MediaAsset } from "@/shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
-import { regenerateAltText } from "../../services/AltTextService";
-import { createAssetVersion } from "../../services/MediaVersionService";
+import { regenerateAltText } from "@/services/AltTextService";
+import { createAssetVersion } from "@/services/MediaVersionService";
 import "./LibraryManager.css";
 
 /* Clone 3721:43697 — the search field's tag token, `Tag: menu · Clear filter ×`,

@@ -19,13 +19,13 @@
  * @license BSD-3-Clause
  */
 
-import type { CMSContentItem, CMSFieldType } from "../../shared/types/cms";
+import type { CMSContentItem, CMSFieldType } from "@/shared/types/cms";
 import { filterCmsBindings, isSafeCmsBoundValue, type CmsBindableProperty } from "@buildrik/shared/schemas/sites";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { cmsTextOf } from "@buildrik/shared/schemas/cms";
-import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
-import { EVENTS } from "../../shared/constants/events";
-import { BINDABLE_TYPES } from "../../shared/constants/elementCapabilities";
+import { sanitizeRichtext } from "@/shared/utils/html/sanitization";
+import { EVENTS } from "@/shared/constants/events";
+import { BINDABLE_TYPES } from "@/shared/constants/elementCapabilities";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
 import type { CollectionManager } from "./CollectionManager";

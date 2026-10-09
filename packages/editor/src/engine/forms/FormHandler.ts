@@ -4,14 +4,14 @@
  * @license BSD-3-Clause
  */
 
-import { type FormEmailOptions } from "../../services/EmailService";
+import { type FormEmailOptions } from "@/services/EmailService";
 import {
   FormSubmissionService,
   type FormSubmissionData,
   type FormValidation,
   type SubmissionResult,
-} from "../../services/FormSubmissionService";
-import { EVENTS } from "../../shared/constants";
+} from "@/services/FormSubmissionService";
+import { EVENTS } from "@/shared/constants";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 

@@ -7,7 +7,7 @@
  */
 
 import type { gsap } from "gsap";
-import { devWarn } from "../../shared/utils/devLogger";
+import { devWarn } from "@/shared/utils/devLogger";
 
 /* D-12: gsap is a heavy dep needed only once an interaction/animation
    actually builds a timeline — lazy-loaded and cached on first use instead

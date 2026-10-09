@@ -9,7 +9,7 @@
 import type {
   NamedVersion,
   StoredVersion,
-} from "../../shared/types/versions";
+} from "@/shared/types/versions";
 
 // ============================================
 // Constants

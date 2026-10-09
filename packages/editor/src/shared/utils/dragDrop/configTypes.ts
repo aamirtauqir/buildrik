@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementType, Point } from "../../types";
+import type { ElementType, Point } from "@/shared/types";
 
 // Forward declare types to avoid circular imports
 // These are defined in types.ts which re-exports them from here

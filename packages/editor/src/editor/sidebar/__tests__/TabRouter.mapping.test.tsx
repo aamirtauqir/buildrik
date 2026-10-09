@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { TabRouter, type TabRouterProps } from "../TabRouter";
-import type { GroupedTabId } from "../../rail/tabsConfig";
+import type { GroupedTabId } from "@/editor/rail/tabsConfig";
 
 const flags = vi.hoisted(() => ({ enabled: new Set<string>() }));
 

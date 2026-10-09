@@ -7,8 +7,8 @@
 
 import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
-import { Z_LAYERS } from "../../../shared/constants/canvas";
-import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
+import { Z_LAYERS } from "@/shared/constants/canvas";
+import type { InvalidDropReason } from "@/shared/utils/dragDrop/dropValidation";
 import type { DropSlotRect, BreadcrumbItem } from "../hooks/useDragSession";
 import { getFriendlyName } from "../utils/elementInfo";
 import type { InsertDragTarget } from "../insertDrag";

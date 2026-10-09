@@ -9,8 +9,8 @@
  */
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Composer } from "../../../../engine";
-import type { BlockData } from "../../../../shared/types";
+import type { Composer } from "@/engine";
+import type { BlockData } from "@/shared/types";
 import { useBlockInsertion } from "../useBlockInsertion";
 import { requestReplaceWithBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 

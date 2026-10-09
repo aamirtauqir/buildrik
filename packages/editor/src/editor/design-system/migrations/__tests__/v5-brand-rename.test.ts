@@ -16,8 +16,8 @@
 import { describe, it, expect } from "vitest";
 import { lightAliasOf, resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { migrateDesignTokens } from "@/engine/designSystem/tokenMigrations";
-import { generateCompatibilityShim } from "../../utils/exportUtils";
-import { DEFAULT_TOKENS } from "../../constants";
+import { generateCompatibilityShim } from "@/editor/design-system/utils/exportUtils";
+import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import type { LegacyDesignToken } from "@/engine/designSystem/types";
 
 /** Steps up to v5 read and write legacy rows; v6 is migrateTokensToV6's. */

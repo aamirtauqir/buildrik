@@ -8,9 +8,9 @@
 
 /* eslint-disable no-useless-catch */
 
-import { EVENTS, THRESHOLDS } from "../../shared/constants";
-import type { StorageConfig, ProjectData, ProjectSettings } from "../../shared/types";
-import { debounce } from "../../shared/utils/helpers";
+import { EVENTS, THRESHOLDS } from "@/shared/constants";
+import type { StorageConfig, ProjectData, ProjectSettings } from "@/shared/types";
+import { debounce } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 
 /**

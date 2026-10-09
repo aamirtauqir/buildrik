@@ -7,16 +7,16 @@
 import type JSZip from "jszip";
 import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/element-markup";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
-import type { PageData } from "../../shared/types";
+import type { PageData } from "@/shared/types";
 import type {
   ExportConfig,
   ExportResult,
   ExportStats,
   ExportedFile,
-} from "../../shared/types/export";
-import { DEFAULT_EXPORT_CONFIG } from "../../shared/types/export";
-import { collectUsedKeyframes } from "../../shared/constants/animationKeyframes";
-import { getDefaultAttributes, getDefaultTagName } from "../../shared/utils/html";
+} from "@/shared/types/export";
+import { DEFAULT_EXPORT_CONFIG } from "@/shared/types/export";
+import { collectUsedKeyframes } from "@/shared/constants/animationKeyframes";
+import { getDefaultAttributes, getDefaultTagName } from "@/shared/utils/html";
 import { CMSExportResolver } from "../cms/CMSExportResolver";
 import type { CMSExportMode, CMSExportOptions } from "../cms/CMSExportResolver";
 import type { Composer } from "../Composer";
@@ -39,7 +39,7 @@ import {
   BLOCK_LINK_STYLE,
   type LinkNodeView,
 } from "./ExportHelpers";
-import { devWarn } from "../../shared/utils/devLogger";
+import { devWarn } from "@/shared/utils/devLogger";
 import { FormspreeInjector } from "./FormspreeInjector";
 import { SEOInjector, resolveLanguage } from "./SEOInjector";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
@@ -53,7 +53,7 @@ import {
   THEME_BOOT_SCRIPT,
   THEME_TOGGLE_ATTR,
 } from "./themeToggleRuntime";
-import { classTokens, isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
+import { classTokens, isSafeAttrValue, sanitizeHTML } from "@/shared/utils/html/sanitization";
 import { embedFrameHTML } from "@/shared/utils/embed/embedFrameHTML";
 
 // ============================================================================
@@ -1065,10 +1065,10 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
    */
   private collectFormElements(
     element: PageData["root"] | undefined
-  ): Array<{ id: string; formSettings?: import("../../shared/types").FormSettings }> {
+  ): Array<{ id: string; formSettings?: import("@/shared/types").FormSettings }> {
     if (!element) return [];
 
-    const forms: Array<{ id: string; formSettings?: import("../../shared/types").FormSettings }> =
+    const forms: Array<{ id: string; formSettings?: import("@/shared/types").FormSettings }> =
       [];
 
     // Check if this is a form element with form config

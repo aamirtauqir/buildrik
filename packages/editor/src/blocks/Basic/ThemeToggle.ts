@@ -8,9 +8,9 @@
  * @license BSD-3-Clause
  */
 import type { DarkMode } from "@buildrik/shared/schemas/design-tokens";
-import { THEME_TOGGLE_ATTR, THEME_TOGGLE_ICON_ATTR } from "../../engine/export/themeToggleRuntime";
+import { THEME_TOGGLE_ATTR, THEME_TOGGLE_ICON_ATTR } from "@/engine/export/themeToggleRuntime";
 import type { BlockBuildConfig, Composer } from "../types";
-import { LAYER_NAME_KEY } from "../../shared/constants/elementTypeLabels";
+import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 
 export const isThemeToggleOffered = (darkMode: DarkMode): boolean => darkMode === "auto";
 

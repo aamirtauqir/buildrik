@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { getStatusLabel } from "../statusLabel";
-import type { PageStatus } from "../../types";
+import type { PageStatus } from "@/editor/sidebar/tabs/pages/types";
 
 describe("getStatusLabel", () => {
   it.each([

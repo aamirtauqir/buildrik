@@ -20,7 +20,7 @@
  */
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { Composer } from "../../engine/Composer";
+import { Composer } from "@/engine/Composer";
 
 describe("Canvas re-render perf (1000 elements)", () => {
   let originalGetContext: any;

@@ -13,7 +13,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
-import type { MediaAsset, UploadResult } from "../../../shared/types/media";
+import type { MediaAsset, UploadResult } from "@/shared/types/media";
 
 const managerMock = vi.hoisted(() => ({
   assets: [] as MediaAsset[],
@@ -25,7 +25,7 @@ const managerMock = vi.hoisted(() => ({
   getAssets: vi.fn(),
 }));
 
-vi.mock("../../shell/hooks", () => ({
+vi.mock("@/editor/shell/hooks", () => ({
   useMediaManager: () => managerMock,
 }));
 

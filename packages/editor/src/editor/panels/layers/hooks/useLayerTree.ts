@@ -11,9 +11,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import type { Element } from "../../../../engine/elements/Element";
-import { EVENTS } from "../../../../shared/constants/events";
+import type { Composer } from "@/engine";
+import type { Element } from "@/engine/elements/Element";
+import { EVENTS } from "@/shared/constants/events";
 import type { LayerItem } from "../types";
 import { getLayerPreview } from "../data/layerUtils";
 import { hasStoredSet, loadSetFromStorage, saveSetToStorage } from "./layersPersistence";

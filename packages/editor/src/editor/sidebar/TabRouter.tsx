@@ -23,13 +23,13 @@
 import * as React from "react";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
-import type { BlockData } from "../../shared/types";
+import type { BlockData } from "@/shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
-import { isFeatureEnabled } from "../../shared/utils/featureFlags";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { FROM_ACTIVITY } from "./tabs/activity/BackToActivityRow";
 
 /** History's deep-link sub-screen: "published", or an Activity row's
@@ -91,8 +91,8 @@ export interface TabRouterProps {
   ) => void;
   /** §20 — opens IconPickerModal from StockSourceModal "Browse full icon library". */
   onOpenIconPicker?: (
-    currentIcon: import("../../shared/types/media").IconConfig | undefined,
-    onSelect: (icon: import("../../shared/types/media").IconConfig) => void,
+    currentIcon: import("@/shared/types/media").IconConfig | undefined,
+    onSelect: (icon: import("@/shared/types/media").IconConfig) => void,
   ) => void;
   /** P0 review loop: full re-send (re-render snapshot + mint fresh token) for
    *  the Review panel — provided by the shell (same path as the topbar send). */

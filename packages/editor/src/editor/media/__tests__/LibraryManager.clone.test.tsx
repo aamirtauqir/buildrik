@@ -13,22 +13,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
-import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
-import type { UploadResult } from "../../../shared/types/media";
+import type { MediaStateResult } from "@/editor/sidebar/tabs/media/data/mediaTypes";
+import type { UploadResult } from "@/shared/types/media";
 import { TEN, makeAsset, makeComposer, makeFile, makeFolder, makeItem, makeMediaState, makeSitePages } from "./libraryFixture";
 
 const mocks = vi.hoisted(() => ({
-  state: { mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult },
+  state: { mediaState: null as unknown as import("@/editor/sidebar/tabs/media/data/mediaTypes").MediaStateResult },
 }));
 
-vi.mock("../../sidebar/tabs/media/hooks/useMediaState", () => ({
+vi.mock("@/editor/sidebar/tabs/media/hooks/useMediaState", () => ({
   useMediaState: () => mocks.state.mediaState,
 }));
 
 /* The save path's best-effort server history (3695:45529) — a network call
    the test only wants to see, never make. */
 const versionServiceStub = vi.hoisted(() => ({ createAssetVersion: vi.fn(async () => ({})) }));
-vi.mock("../../../services/MediaVersionService", () => ({
+vi.mock("@/services/MediaVersionService", () => ({
   createAssetVersion: versionServiceStub.createAssetVersion,
 }));
 beforeEach(() => versionServiceStub.createAssetVersion.mockClear());
@@ -41,7 +41,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 /* A stub with a door: the wiring tests below need to drive `onSave` and to
    see which props the orchestrator hands the stock dialog. */
 const stockStub = vi.hoisted(() => ({ props: null as null | Record<string, unknown> }));
-vi.mock("../../sidebar/tabs/media/components/StockSourceModal", () => ({
+vi.mock("@/editor/sidebar/tabs/media/components/StockSourceModal", () => ({
   StockSourceModal: (props: { open: boolean; onSave: (t: string, item: unknown) => unknown }) => {
     stockStub.props = props;
     return props.open ? (
@@ -55,9 +55,9 @@ vi.mock("../../sidebar/tabs/media/components/StockSourceModal", () => ({
     ) : null;
   },
 }));
-vi.mock("../../sidebar/tabs/media/components/ConfirmDeleteModal", () => ({ ConfirmDeleteModal: () => null }));
-vi.mock("../../sidebar/tabs/media/components/MediaContextMenu", () => ({ MediaContextMenu: () => null }));
-vi.mock("../../sidebar/tabs/media/components/AssetDetailOverlay", () => ({ AssetDetailOverlay: () => null }));
+vi.mock("@/editor/sidebar/tabs/media/components/ConfirmDeleteModal", () => ({ ConfirmDeleteModal: () => null }));
+vi.mock("@/editor/sidebar/tabs/media/components/MediaContextMenu", () => ({ MediaContextMenu: () => null }));
+vi.mock("@/editor/sidebar/tabs/media/components/AssetDetailOverlay", () => ({ AssetDetailOverlay: () => null }));
 
 async function mountLibrary(
   over: Partial<MediaStateResult> = {},

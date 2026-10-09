@@ -15,15 +15,15 @@
  */
 
 import * as React from "react";
-import type { TypeBlockBodyProps } from "../../../config/typeBlocks";
+import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { InputRow } from "../../../shared/controls";
+import { InputRow } from "@/editor/inspector/shared/controls";
 import { handleGenericAttributeChange, runTxn, writeAttribute } from "../attributeWriter";
 import { isAttrOn, useElementRead } from "../blockRows";
-import { CheckRow } from "../../../shared/controls/CheckRow";
+import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 import { EditTextRow } from "../EditTextRow";
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 

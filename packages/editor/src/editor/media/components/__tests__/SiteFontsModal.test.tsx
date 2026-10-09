@@ -22,7 +22,7 @@ import * as React from "react";
 import { EventEmitter } from "@/engine/EventEmitter";
 import type { Composer } from "@/engine/Composer";
 import type { MediaAsset } from "@/shared/types/media";
-import { makeAsset } from "../../__tests__/libraryFixture";
+import { makeAsset } from "@/editor/media/__tests__/libraryFixture";
 import { SiteFontsModal } from "../SiteFontsModal";
 
 /* The prototype's fixture file plus a second, already-added one so both

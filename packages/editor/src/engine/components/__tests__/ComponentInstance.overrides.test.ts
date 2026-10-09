@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { ElementData } from "../../../shared/types";
+import type { ElementData } from "@/shared/types";
 import { applyOverridesToTree } from "../ComponentInstance";
 
 const tree = (): ElementData =>

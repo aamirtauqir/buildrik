@@ -7,21 +7,21 @@
  */
 
 import * as React from "react";
-import { getBlockById, insertBlock } from "../../../../blocks/blockRegistry";
-import { CATALOG } from "../../../components-catalog/catalog";
-import { placeCatalogComponent } from "../../../components-catalog/placeCatalogComponent";
-import type { Composer } from "../../../../engine";
-import type { ElementType, GrapesElement } from "../../../../shared/types";
-import { devError } from "../../../../shared/utils/devLogger";
+import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
+import { CATALOG } from "@/editor/components-catalog/catalog";
+import { placeCatalogComponent } from "@/editor/components-catalog/placeCatalogComponent";
+import type { Composer } from "@/engine";
+import type { ElementType, GrapesElement } from "@/shared/types";
+import { devError } from "@/shared/utils/devLogger";
 import {
   findDropTargetElement,
   getElementId,
   findValidDOMTarget,
   findValidDropTargetWithFallback,
-} from "../../../../shared/utils/dragDrop";
-import { animateDropSuccess } from "../../../../shared/utils/dragDrop/animations";
-import type { MultiDragElement } from "../../../../shared/utils/dragDrop/types";
-import { canNestElement } from "../../../../shared/utils/nesting";
+} from "@/shared/utils/dragDrop";
+import { animateDropSuccess } from "@/shared/utils/dragDrop/animations";
+import type { MultiDragElement } from "@/shared/utils/dragDrop/types";
+import { canNestElement } from "@/shared/utils/nesting";
 import type { DropError, DropSuccess } from "../useCanvasDragDrop";
 import type { DropPosition } from "../useDragSession";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";

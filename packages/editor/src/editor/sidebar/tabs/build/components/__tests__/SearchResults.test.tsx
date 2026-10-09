@@ -9,9 +9,9 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { SearchResults } from "../SearchResults";
-import type { InsertSearchHit } from "../../utils/search";
-import type { FlatElEntry } from "../../catalog/types";
-import type { BlockDefinition } from "../../../../../../blocks/blockRegistry";
+import type { InsertSearchHit } from "@/editor/sidebar/tabs/build/utils/search";
+import type { FlatElEntry } from "@/editor/sidebar/tabs/build/catalog/types";
+import type { BlockDefinition } from "@/blocks/blockRegistry";
 import type { ComponentDefinition } from "@/shared/types/components";
 
 const el: FlatElEntry = {

@@ -6,10 +6,10 @@
 import { listNames } from "@shared/utils/helpers/string";
 import * as React from "react";
 import "./styles/layers-v2.css";
-import type { Element } from "../../../engine/elements/Element";
-import type { ElementType } from "../../../shared/types";
+import type { Element } from "@/engine/elements/Element";
+import type { ElementType } from "@/shared/types";
 import { LayersEmptyState } from "./components/LayersEmptyState";
-import { canNestElement, canHaveChildren } from "../../../shared/utils/nesting";
+import { canNestElement, canHaveChildren } from "@/shared/utils/nesting";
 import { LayerContextMenu, elementsLabel } from "./components/LayerContextMenu";
 import { LayerDisplaySettings } from "./components/LayerDisplaySettings";
 import { MoveToPageDialog } from "./components/MoveToPageDialog";

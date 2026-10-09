@@ -26,14 +26,14 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
-import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { MediaStateResult } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { TEN, makeComposer, makeFolder, makeMediaState } from "./libraryFixture";
 
 const mocks = vi.hoisted(() => ({
-  state: { mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult },
+  state: { mediaState: null as unknown as import("@/editor/sidebar/tabs/media/data/mediaTypes").MediaStateResult },
 }));
 
-vi.mock("../../sidebar/tabs/media/hooks/useMediaState", () => ({
+vi.mock("@/editor/sidebar/tabs/media/hooks/useMediaState", () => ({
   useMediaState: () => mocks.state.mediaState,
 }));
 
@@ -42,8 +42,8 @@ vi.mock("@/editor/chrome-ui", async () => {
   return { ...actual, useToast: () => ({ addToast: vi.fn() }) };
 });
 
-vi.mock("../../sidebar/tabs/media/components/StockSourceModal", () => ({ StockSourceModal: () => null }));
-vi.mock("../../sidebar/tabs/media/components/ConfirmDeleteModal", () => ({ ConfirmDeleteModal: () => null }));
+vi.mock("@/editor/sidebar/tabs/media/components/StockSourceModal", () => ({ StockSourceModal: () => null }));
+vi.mock("@/editor/sidebar/tabs/media/components/ConfirmDeleteModal", () => ({ ConfirmDeleteModal: () => null }));
 
 const PRODUCTS = makeFolder({ id: "f1", name: "Products" });
 const HERO_SHOTS = makeFolder({ id: "f2", name: "Hero shots" });

@@ -19,10 +19,10 @@
 
 import { Sparkles, X } from "lucide-react";
 import * as React from "react";
-import type { Composer } from "../../../engine/Composer";
-import type { LibraryItem, VersionEntry } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { Composer } from "@/engine/Composer";
+import type { LibraryItem, VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { versionLabel, collectUsageByPage } from "../../sidebar/tabs/media/data/mediaUtils";
+import { versionLabel, collectUsageByPage } from "@/editor/sidebar/tabs/media/data/mediaUtils";
 import {
   Button,
   IconButton,

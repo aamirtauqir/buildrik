@@ -6,7 +6,7 @@
 
 import { describe, it, expect } from "vitest";
 import { hitTestHandles, hitTestRotation, hitTestBorder, hitTest } from "../HitTester";
-import type { SelectionBox } from "../../../../shared/types/canvas";
+import type { SelectionBox } from "@/shared/types/canvas";
 import type { HandlePosition } from "../types";
 
 // Box at (100,100) 200x100 with 8 handles at the standard positions.

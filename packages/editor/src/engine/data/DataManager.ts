@@ -32,8 +32,8 @@ import type {
   ConditionBinding,
   ConditionExpression,
   LogicGroup,
-} from "../../shared/types/data";
-import { EVENTS } from "../../shared/constants/events";
+} from "@/shared/types/data";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 import { EventEmitter } from "../EventEmitter";

@@ -11,7 +11,7 @@
 import * as React from "react";
 import { render, screen, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { PanelErrorState } from "../../../sidebar/shared/PanelErrorState";
+import { PanelErrorState } from "@/editor/sidebar/shared/PanelErrorState";
 
 afterEach(cleanup);
 

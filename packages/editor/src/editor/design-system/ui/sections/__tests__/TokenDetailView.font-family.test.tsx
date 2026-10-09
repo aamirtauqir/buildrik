@@ -18,10 +18,10 @@ import "@testing-library/jest-dom";
 import * as React from "react";
 import { TokenDetailView } from "../TokenDetailView";
 import { FontPicker } from "@/editor/inspector/sections/typography";
-import { DSModeProvider } from "../../../state/DSModeContext";
+import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { EVENTS } from "@/shared/constants/events";
-import type { DesignToken } from "../../../types";
-import type { Composer } from "../../../../../engine";
+import type { DesignToken } from "@/editor/design-system/types";
+import type { Composer } from "@/engine";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const fontToken: DesignToken = v6Token({

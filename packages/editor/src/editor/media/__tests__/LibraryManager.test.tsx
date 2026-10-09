@@ -21,22 +21,22 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
-import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { MediaStateResult } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { makeComposer, makeFolder, makeItem, makeMediaState } from "./libraryFixture";
 
 // ─── Hoisted mock state ──────────────────────────────────────────────────────
 
 const mocks = vi.hoisted(() => {
-  const state: { mediaState: import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult } = {
+  const state: { mediaState: import("@/editor/sidebar/tabs/media/data/mediaTypes").MediaStateResult } = {
     // assigned in beforeEach via setMediaState
-    mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult,
+    mediaState: null as unknown as import("@/editor/sidebar/tabs/media/data/mediaTypes").MediaStateResult,
   };
   return { state };
 });
 
 // ─── Mock external surfaces ──────────────────────────────────────────────────
 
-vi.mock("../../sidebar/tabs/media/hooks/useMediaState", () => ({
+vi.mock("@/editor/sidebar/tabs/media/hooks/useMediaState", () => ({
   useMediaState: () => mocks.state.mediaState,
 }));
 
@@ -49,16 +49,16 @@ vi.mock("@/editor/chrome-ui", async () => {
 });
 
 // Stub heavy children so jsdom doesn't choke on portals / overlays.
-vi.mock("../../sidebar/tabs/media/components/StockSourceModal", () => ({
+vi.mock("@/editor/sidebar/tabs/media/components/StockSourceModal", () => ({
   StockSourceModal: () => null,
 }));
-vi.mock("../../sidebar/tabs/media/components/ConfirmDeleteModal", () => ({
+vi.mock("@/editor/sidebar/tabs/media/components/ConfirmDeleteModal", () => ({
   ConfirmDeleteModal: () => null,
 }));
-vi.mock("../../sidebar/tabs/media/components/MediaContextMenu", () => ({
+vi.mock("@/editor/sidebar/tabs/media/components/MediaContextMenu", () => ({
   MediaContextMenu: () => null,
 }));
-vi.mock("../../sidebar/tabs/media/components/AssetDetailOverlay", () => ({
+vi.mock("@/editor/sidebar/tabs/media/components/AssetDetailOverlay", () => ({
   AssetDetailOverlay: () => null,
 }));
 

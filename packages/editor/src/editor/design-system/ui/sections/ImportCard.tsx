@@ -21,16 +21,16 @@
 
 import * as React from "react";
 import { useToast, Button, Textarea, TextInput } from "@/editor/chrome-ui";
-import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
-import { useImportTokens } from "../../state/useImportTokens";
+import { parseImportJSON, diffTokens, type DiffResult } from "@/editor/design-system/utils/importUtils";
+import { useImportTokens } from "@/editor/design-system/state/useImportTokens";
 import {
   useColorRegistry, useTypeRegistry, useSpacingRegistry,
   useRadiusRegistry, useShadowRegistry, useMotionRegistry,
   useBorderRegistry, useOpacityRegistry, useZindexRegistry,
   useBreakpointRegistry, useGridRegistry, useSizingRegistry,
   useIconRegistry, useImageryRegistry,
-} from "../../state/TokenRegistryContext";
-import type { DesignToken } from "../../types";
+} from "@/editor/design-system/state/TokenRegistryContext";
+import type { DesignToken } from "@/editor/design-system/types";
 /* Was `"replace" | "keep-mine" | "keep-theirs"`. `handleApply` filtered on
    "keep-mine" and sent everything otherwise, so Replace and "Merge · keep
    theirs" were the SAME branch — this file's own header said "same as replace

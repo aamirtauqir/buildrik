@@ -26,11 +26,11 @@ export type {
   PresetCategory,
   PresetBinding,
   StylePreset,
-} from "../../engine/designSystem/types";
+} from "@/engine/designSystem/types";
 
-export { tokenToCssVar } from "../../engine/designSystem/types";
+export { tokenToCssVar } from "@/engine/designSystem/types";
 
-import type { DesignToken } from "../../engine/designSystem/types";
+import type { DesignToken } from "@/engine/designSystem/types";
 
 /** React props for token list components — editor-only, no engine consumer. */
 export interface TokenListProps {

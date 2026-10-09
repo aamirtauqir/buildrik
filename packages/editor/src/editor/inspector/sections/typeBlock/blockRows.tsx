@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import type { Element } from "@/engine/elements/Element";
-import type { TypeBlockBodyProps } from "../../config/typeBlocks";
+import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 
 /** A boolean attribute is ON when present — HTML writes it empty
  *  (`required=""`) — and off when absent or "false" (P-11b). */

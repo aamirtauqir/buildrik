@@ -9,13 +9,13 @@
 
 import * as React from "react";
 import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, PanelSearch, Popover, Tooltip, isPanelSearchInput } from "@/editor/chrome-ui";
-import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
-import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
-import { LayersPanel } from "../../../panels/layers/index";
-import { LayersLoadError, LayersLoadingSkeleton } from "../../../panels/layers/components/LayersStateBlocks";
-import { useProjectLoading } from "../../../shell/hooks/useProjectLoading";
-import type { SelectedElementInfo } from "../../../panels/layers/types";
+import { useComposerSelection } from "@/editor/canvas/hooks/useComposerSelection";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import { LayersPanel } from "@/editor/panels/layers/index";
+import { LayersLoadError, LayersLoadingSkeleton } from "@/editor/panels/layers/components/LayersStateBlocks";
+import { useProjectLoading } from "@/editor/shell/hooks/useProjectLoading";
+import type { SelectedElementInfo } from "@/editor/panels/layers/types";
 
 /*
   Boards 781:4217 / 775:4130. A tree that throws mid-render used to blank the

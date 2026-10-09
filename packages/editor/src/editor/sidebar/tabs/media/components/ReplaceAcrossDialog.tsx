@@ -21,7 +21,7 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { Button, Checkbox, useFocusTrap } from "@/editor/chrome-ui";
 import { ReplaceResultModal, replacingLabel, resultIds, type ReplaceOutcome } from "@/editor/media/components/ReplaceResultModal";
 /* `.med-rx-*` lives in MediaTab.css, which only MediaTab imported — so this

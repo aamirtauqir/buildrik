@@ -7,15 +7,15 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import type { ElementType } from "../../../../shared/types";
-import { validateElementDrop } from "../../../../shared/utils/dragDrop";
-import type { InvalidDropReason } from "../../../../shared/utils/dragDrop/dropValidation";
+import type { Composer } from "@/engine";
+import type { ElementType } from "@/shared/types";
+import { validateElementDrop } from "@/shared/utils/dragDrop";
+import type { InvalidDropReason } from "@/shared/utils/dragDrop/dropValidation";
 import {
   isHorizontalLayout,
   calculateDropPosition2D,
-} from "../../../../shared/utils/dragDrop/positioning";
-import { canNestElement } from "../../../../shared/utils/nesting";
+} from "@/shared/utils/dragDrop/positioning";
+import { canNestElement } from "@/shared/utils/nesting";
 import type { DropPosition, DropSlotRect, BreadcrumbItem } from "../useDragSession";
 
 // =============================================================================

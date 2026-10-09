@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
-import { useClickOutside } from "../../../shared/hooks/useClickOutside";
+import { useClickOutside } from "@/shared/hooks/useClickOutside";
 import type { ContextAction, ActionContext } from "./contextMenuRegistry";
 import { MenuItem } from "./MenuItem";
 import { SubmenuItem } from "./SubmenuItem";

@@ -14,9 +14,9 @@
  * @license BSD-3-Clause
  */
 
-import type { StockPhoto, StockVideo } from "../../engine/media/MediaManager";
+import type { StockPhoto, StockVideo } from "@/engine/media/MediaManager";
 import { getBuildrikClient } from "../api-client";
-import { DASHBOARD_URL } from "../../shared/utils/runtimeEnv";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 export type StockOrientation = "landscape" | "portrait" | "squarish" | undefined;
 export type StockColor = string | undefined;

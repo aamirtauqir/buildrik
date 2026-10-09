@@ -12,7 +12,7 @@ vi.mock("../api-client", () => ({
     userTemplates: { upsert: { mutate: upsert }, list: { query: list } },
   }),
 }));
-vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
+vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 
 import {
   mirrorUserTemplate,
@@ -21,7 +21,7 @@ import {
   retryTemplateSync,
   getTemplateSyncPendingCount,
 } from "../templateSync";
-import { STORAGE_KEYS } from "../../shared/constants/storageKeys";
+import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 
 beforeEach(async () => {
   window.history.replaceState({}, "", "/edit/site-123");

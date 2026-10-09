@@ -11,9 +11,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
-import { EVENTS } from "../../shared/constants";
-import type { PageData } from "../../shared/types";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
+import type { PageData } from "@/shared/types";
 import { useDirtyPages } from "../shared/useDirtyPages";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
 import { IconButton } from "@/editor/chrome-ui";

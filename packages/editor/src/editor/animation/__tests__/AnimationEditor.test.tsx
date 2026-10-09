@@ -12,8 +12,8 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { AnimationEditor } from "../AnimationEditor";
-import type { AnimationConfig } from "../../../shared/types/animations";
-import { DEFAULT_ANIMATION } from "../../../shared/types/animations";
+import type { AnimationConfig } from "@/shared/types/animations";
+import { DEFAULT_ANIMATION } from "@/shared/types/animations";
 
 const baseAnimation: AnimationConfig = {
   type: "fadeIn",

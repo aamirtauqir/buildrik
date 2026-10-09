@@ -6,15 +6,15 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { layoutSubmenu } from "../layoutActions";
-import type { ActionContext } from "../../contextMenuRegistry";
+import type { ActionContext } from "@/editor/canvas/menus/contextMenuRegistry";
 import {
   makeComposer,
   makeElementStub,
   asComposer,
   type ComposerStub,
   type ElementStub,
-} from "../../../__tests__/testHarness";
-import type { Element } from "../../../../../engine";
+} from "@/editor/canvas/__tests__/testHarness";
+import type { Element } from "@/engine";
 
 function action(id: string) {
   const found = layoutSubmenu.find((a) => a.id === id);

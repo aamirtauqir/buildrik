@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { instantiateComponentAtSelection } from "../instantiate";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 
 function makeComposer(opts: {
   selectedIds?: string[];

@@ -856,7 +856,7 @@ export function getEventsByPrefix(prefix: string): EventName[] {
  */
 export interface EventPayloads {
   // Composer Events
-  [EVENTS.COMPOSER_READY]: import("../../engine/Composer").Composer | undefined;
+  [EVENTS.COMPOSER_READY]: import("@/engine/Composer").Composer | undefined;
   [EVENTS.COMPOSER_DESTROY]: void;
 
   // Project Events
@@ -878,22 +878,22 @@ export interface EventPayloads {
   [EVENTS.SETTINGS_CHANGE]: import("../types").ProjectSettings;
 
   // Element Events
-  [EVENTS.ELEMENT_SELECTED]: { element: import("../../engine/elements/Element").Element };
-  [EVENTS.ELEMENT_DESELECTED]: { element: import("../../engine/elements/Element").Element };
-  [EVENTS.ELEMENT_CREATED]: import("../../engine/elements/Element").Element;
+  [EVENTS.ELEMENT_SELECTED]: { element: import("@/engine/elements/Element").Element };
+  [EVENTS.ELEMENT_DESELECTED]: { element: import("@/engine/elements/Element").Element };
+  [EVENTS.ELEMENT_CREATED]: import("@/engine/elements/Element").Element;
   [EVENTS.ELEMENT_DELETED]: {
     id: string;
-    element: import("../../engine/elements/Element").Element;
+    element: import("@/engine/elements/Element").Element;
   };
   [EVENTS.ELEMENT_MOVED]: {
-    element: import("../../engine/elements/Element").Element;
-    parent: import("../../engine/elements/Element").Element;
+    element: import("@/engine/elements/Element").Element;
+    parent: import("@/engine/elements/Element").Element;
   };
   [EVENTS.ELEMENT_RESIZED]: {
-    element: import("../../engine/elements/Element").Element;
+    element: import("@/engine/elements/Element").Element;
     dimensions: { width: number; height: number };
   };
-  [EVENTS.ELEMENT_UPDATED]: import("../../engine/elements/Element").Element;
+  [EVENTS.ELEMENT_UPDATED]: import("@/engine/elements/Element").Element;
 
   // Layer Panel Events
   [EVENTS.LAYER_HOVER]: { id: string | null };
@@ -978,7 +978,7 @@ export interface EventPayloads {
   [EVENTS.BRAND_PREVIEW_CHANGED]: void;
   [EVENTS.BRAND_CONNECT_SUGGESTED]: {
     pageId: string;
-    suggestions: import("../../engine/designSystem/connectTokens").ConnectSuggestion[];
+    suggestions: import("@/engine/designSystem/connectTokens").ConnectSuggestion[];
   };
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;

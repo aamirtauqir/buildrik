@@ -13,10 +13,10 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 
-vi.mock("../../canvas/Canvas", () => ({ Canvas: React.forwardRef(() => null) }));
-vi.mock("../../sidebar/LeftSidebar", () => ({ LeftSidebar: () => null }));
-vi.mock("../../sidebar/FullPageView", () => ({ FullPageView: () => null }));
-vi.mock("../../sidebar/TabRouter", () => ({
+vi.mock("@/editor/canvas/Canvas", () => ({ Canvas: React.forwardRef(() => null) }));
+vi.mock("@/editor/sidebar/LeftSidebar", () => ({ LeftSidebar: () => null }));
+vi.mock("@/editor/sidebar/FullPageView", () => ({ FullPageView: () => null }));
+vi.mock("@/editor/sidebar/TabRouter", () => ({
   TabRouter: ({ activeTab }: { activeTab: string }) => <div data-testid={`column-tab-${activeTab}`} />,
 }));
 vi.mock("../PageTabBar", () => ({ PageTabBar: () => null }));
@@ -27,7 +27,7 @@ vi.mock("@/editor/cms/CmsWorkspace", () => ({
     </div>
   ),
 }));
-vi.mock("../../media/components/SiteFontsModal", () => ({ SiteFontsModal: () => null }));
+vi.mock("@/editor/media/components/SiteFontsModal", () => ({ SiteFontsModal: () => null }));
 vi.mock("@/editor/design-system", () => {
   const Pass = ({ children }: { children: React.ReactNode }) => <>{children}</>;
   return { TokenRegistryProvider: Pass, DSModeProvider: Pass, StylePresetRegistryProvider: Pass };
@@ -38,14 +38,14 @@ vi.mock("@/editor/design-system/ui/ProjectTokensApplier", () => ({ ProjectTokens
 vi.mock("../hooks/useBlockInsertion", () => ({ useBlockInsertion: () => ({ handleBlockClick: () => {} }) }));
 vi.mock("../hooks/useClipboardToasts", () => ({ useClipboardToasts: () => {} }));
 vi.mock("../hooks/useAltTextAutoTrigger", () => ({ useAltTextAutoTrigger: () => {} }));
-vi.mock("../../sidebar/tabs/pages/usePageCommands", () => ({ usePageJumpList: () => [], usePageCommands: () => {} }));
+vi.mock("@/editor/sidebar/tabs/pages/usePageCommands", () => ({ usePageJumpList: () => [], usePageCommands: () => {} }));
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
 vi.mock("@shared/utils/editorViewMode", () => ({ getEditorViewMode: () => ({ readOnlyView: false }) }));
 vi.mock("../hooks/useEditorRole", () => ({ useViewerChrome: () => false }));
 
 /* The inspector body: listens for the section-focus request the way the real
    one does (usePropertyJump), and shows what it last revealed. */
-vi.mock("../../inspector/ProInspector", () => ({
+vi.mock("@/editor/inspector/ProInspector", () => ({
   ProInspector: ({ composer }: { composer: { on: Function; off: Function } }) => {
     const [revealed, setRevealed] = React.useState<string | null>(null);
     React.useEffect(() => {
@@ -56,7 +56,7 @@ vi.mock("../../inspector/ProInspector", () => ({
     return <div data-testid="pro-inspector" data-revealed={revealed ?? ""} />;
   },
 }));
-vi.mock("../../sidebar/tabs/ai/AITab", () => ({
+vi.mock("@/editor/sidebar/tabs/ai/AITab", () => ({
   AITab: ({ onBack, onClose }: { onBack?: () => void; onClose: () => void }) => (
     <div data-testid="ai-tab">
       {onBack ? <button onClick={onBack}>‹ Inspector</button> : null}

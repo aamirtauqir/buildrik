@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 
-import type { BlockData, ElementType } from "../../shared/types";
+import type { BlockData, ElementType } from "@/shared/types";
 
 export interface ButtonBlockConfig extends BlockData {
   elementType: ElementType;

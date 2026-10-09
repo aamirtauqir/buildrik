@@ -23,10 +23,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { ElementType, GrapesElement } from "../../../shared/types";
-import { setMultiDragData } from "../../../shared/utils/dragDrop";
-import { writableElements } from "../../../engine/commands/commandOperations";
+import type { Composer } from "@/engine";
+import type { ElementType, GrapesElement } from "@/shared/types";
+import { setMultiDragData } from "@/shared/utils/dragDrop";
+import { writableElements } from "@/engine/commands/commandOperations";
 import {
   DRAG_THROTTLE_MS,
   type AxisConstraint,

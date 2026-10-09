@@ -10,8 +10,8 @@ import {
   CONTROL_ROW,
   CONTROL_SELECT_WRAP,
   compactBtnClass,
-} from "../../shared/controls/controlClasses";
-import { MixedValueIndicator } from "../../shared/controls";
+} from "@/editor/inspector/shared/controls/controlClasses";
+import { MixedValueIndicator } from "@/editor/inspector/shared/controls";
 import { Button, Select } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES

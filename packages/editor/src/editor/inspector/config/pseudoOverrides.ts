@@ -7,10 +7,10 @@
  * up at the right zoom level.
  */
 
-import type { Composer } from "../../../engine";
-import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
-import type { PseudoStateId } from "../../../shared/types";
-import type { BreakpointId } from "../../../shared/types/breakpoints";
+import type { Composer } from "@/engine";
+import { getBreakpointQuery } from "@/shared/constants/breakpoints";
+import type { PseudoStateId } from "@/shared/types";
+import type { BreakpointId } from "@/shared/types/breakpoints";
 
 const PSEUDO_STATES = ["hover", "focus", "active", "disabled"] as const;
 

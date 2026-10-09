@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementType, Point } from "../../types";
+import type { ElementType, Point } from "@/shared/types";
 import { pointInRect, domRectToRect } from "./geometry";
 import type { DropZone, DropZoneRegistry, DragData } from "./types";
 

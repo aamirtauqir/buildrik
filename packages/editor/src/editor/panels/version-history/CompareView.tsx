@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
+import type { CompareResult, NamedVersion } from "@/shared/types/versions";
 import { AIResultText, AIControls } from "./AIPanel";
 import { Button } from "@/editor/chrome-ui";
 import { versionDisplayName } from "@/shared/utils/versionLabel";

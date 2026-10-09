@@ -21,10 +21,10 @@ const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvide
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/shared/utils/featureFlags", () => ({ isFeatureEnabled: vi.fn(() => false) }));
-vi.mock("../../../shared/utils/editorViewMode", () => ({
+vi.mock("@/shared/utils/editorViewMode", () => ({
   getEditorViewMode: vi.fn(() => ({ readOnlyView: false })),
 }));
-vi.mock("../../../services/ReviewService", () => ({
+vi.mock("@/services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),
 }));
 /* L3's C-4 stamps added a SyncRetryQueue export (versionSync.ts constructs
@@ -37,13 +37,13 @@ vi.mock("@/services/syncRetryQueue", async (importOriginal) => {
   return { ...actual, totalPendingMirrors: () => 0 };
 });
 vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => null }));
-vi.mock("../../../services/NotificationService", () => ({
+vi.mock("@/services/NotificationService", () => ({
   fetchRecentNotifications: vi.fn(() => Promise.resolve([])),
   fetchUnreadCount: vi.fn(() => Promise.resolve(0)),
   markNotificationRead: vi.fn(() => Promise.resolve()),
   markAllNotificationsRead: vi.fn(() => Promise.resolve()),
 }));
-vi.mock("../../canvas/hooks/useCollaboration", () => ({
+vi.mock("@/editor/canvas/hooks/useCollaboration", () => ({
   useCollaboration: () => ({ users: [], currentUser: null, state: "disconnected", isConnected: false }),
 }));
 vi.mock("../modals/CommandPalette", () => ({ CommandPalette: () => null }));

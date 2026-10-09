@@ -16,7 +16,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { GROUPED_TABS_CONFIG } from "../../../rail/tabsConfig";
+import { GROUPED_TABS_CONFIG } from "@/editor/rail/tabsConfig";
 
 const listener = readFileSync(join(__dirname, "..", "useEditorEventListeners.ts"), "utf8");
 const router = readFileSync(

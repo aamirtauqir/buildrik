@@ -4,8 +4,8 @@
  * @license BSD-3-Clause
  */
 
-import type { ConnectionQuality, ConnectionQualityStats } from "../../shared/types/collaboration";
-import { EVENTS } from "../../shared/constants/events";
+import type { ConnectionQuality, ConnectionQualityStats } from "@/shared/types/collaboration";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 import type { Patch } from "../utils/JsonPatch";

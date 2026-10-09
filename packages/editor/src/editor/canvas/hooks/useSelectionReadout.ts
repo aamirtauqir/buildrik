@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { useProjectLoading } from "@/editor/shell/hooks/useProjectLoading";

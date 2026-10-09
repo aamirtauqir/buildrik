@@ -12,8 +12,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useProjectLoading } from "../useProjectLoading";
-import { EVENTS } from "../../../../shared/constants/events";
-import type { Composer } from "../../../../engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine";
 
 /** A composer that really dispatches, so the late-subscriber claim is testable. */
 function makeComposer(initial: boolean) {
@@ -107,7 +107,7 @@ describe("Composer.setProjectLoading", () => {
   });
 
   it("emits only on a real edge", async () => {
-    const { Composer } = await import("../../../../engine");
+    const { Composer } = await import("@/engine");
     const composer = new Composer({} as never);
     const seen: boolean[] = [];
     composer.on(EVENTS.PROJECT_LOAD_STATE, (p: { loading: boolean }) => seen.push(p.loading));

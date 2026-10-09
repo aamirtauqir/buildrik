@@ -10,7 +10,7 @@
  */
 
 import type { Composer } from "../Composer";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import type { Element } from "../elements/Element";
 import { InteractionRuntime } from "./InteractionRuntime";
 import type {

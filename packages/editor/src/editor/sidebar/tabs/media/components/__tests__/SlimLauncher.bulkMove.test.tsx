@@ -12,7 +12,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { SlimLauncher } from "../SlimLauncher";
-import type { LibraryItem, MediaFolder } from "../../data/mediaTypes";
+import type { LibraryItem, MediaFolder } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 const item: LibraryItem = {
   key: "a", name: "a.jpg", type: "img", src: "", thumb: "", size: 1, createdAt: new Date().toISOString(), mimeType: "image/jpeg",

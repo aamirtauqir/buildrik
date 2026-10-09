@@ -11,7 +11,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import { makeEngine, emitsOf } from "./harness";
 
 describe("Element identity + data", () => {

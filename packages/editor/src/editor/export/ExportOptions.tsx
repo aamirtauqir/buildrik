@@ -15,8 +15,8 @@
  */
 
 import * as React from "react";
-import type { CMSExportMode, TemplateSyntax } from "../../engine/cms/CMSExportResolver";
-import type { ExportConfig, CSSExportStyle, ExportFormat } from "../../shared/types/export";
+import type { CMSExportMode, TemplateSyntax } from "@/engine/cms/CMSExportResolver";
+import type { ExportConfig, CSSExportStyle, ExportFormat } from "@/shared/types/export";
 import { Button, Checkbox, Label, Radio, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // FORMAT CONFIG

@@ -8,12 +8,12 @@
 
 import * as React from "react";
 import { ToastInput, dismissToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import { STORAGE_KEYS } from "../../../shared/constants/config";
-import { mirrorUserTemplate, retryTemplateSync, getTemplateSyncPendingCount, onTemplateSyncError } from "../../../services/templateSync";
-import { inverseResolveTokens } from "../../sidebar/tabs/templates/utils/inverseResolveTokens";
-import { snapshotFromComputedStyle } from "../../sidebar/tabs/templates/utils/tokenSnapshot";
-import { DEFAULT_TOKENS } from "../../design-system/constants";
+import type { Composer } from "@/engine";
+import { STORAGE_KEYS } from "@/shared/constants/config";
+import { mirrorUserTemplate, retryTemplateSync, getTemplateSyncPendingCount, onTemplateSyncError } from "@/services/templateSync";
+import { inverseResolveTokens } from "@/editor/sidebar/tabs/templates/utils/inverseResolveTokens";
+import { snapshotFromComputedStyle } from "@/editor/sidebar/tabs/templates/utils/tokenSnapshot";
+import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 
 export interface UseStudioHandlersParams {
   composer: Composer | null;

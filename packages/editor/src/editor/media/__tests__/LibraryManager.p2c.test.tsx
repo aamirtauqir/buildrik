@@ -18,14 +18,14 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
-import type { ConfirmDeletePayload, MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { ConfirmDeletePayload, MediaStateResult } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { TEN, makeComposer, makeMediaState } from "./libraryFixture";
 
 const mocks = vi.hoisted(() => ({
-  state: { mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult },
+  state: { mediaState: null as unknown as import("@/editor/sidebar/tabs/media/data/mediaTypes").MediaStateResult },
 }));
 
-vi.mock("../../sidebar/tabs/media/hooks/useMediaState", () => ({
+vi.mock("@/editor/sidebar/tabs/media/hooks/useMediaState", () => ({
   useMediaState: () => mocks.state.mediaState,
 }));
 
@@ -34,8 +34,8 @@ vi.mock("@/editor/chrome-ui", async () => {
   return { ...actual, useToast: () => ({ addToast: vi.fn() }) };
 });
 
-vi.mock("../../sidebar/tabs/media/components/StockSourceModal", () => ({ StockSourceModal: () => null }));
-vi.mock("../../sidebar/tabs/media/components/MediaContextMenu", () => ({ MediaContextMenu: () => null }));
+vi.mock("@/editor/sidebar/tabs/media/components/StockSourceModal", () => ({ StockSourceModal: () => null }));
+vi.mock("@/editor/sidebar/tabs/media/components/MediaContextMenu", () => ({ MediaContextMenu: () => null }));
 
 /* `hero` is placed three times, `menu` once — the counts the Clone prints. */
 const USAGES = { "blob:hero": 3, "blob:menu": 1 };

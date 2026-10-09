@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ColorMode } from "../ColorMode";
-import type { EventEmitter } from "../../EventEmitter";
+import type { EventEmitter } from "@/engine/EventEmitter";
 
 function makeEvents(): EventEmitter & { emit: ReturnType<typeof vi.fn> } {
   return {

@@ -10,9 +10,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
-import { useElementFlash } from "../../shared/hooks";
-import { EVENTS } from "../../shared/constants";
+import type { Composer } from "@/engine";
+import { useElementFlash } from "@/shared/hooks";
+import { EVENTS } from "@/shared/constants";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
 import type { ComposerConfig, ProjectData } from "@/shared/types";
 import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@/editor/chrome-ui";
@@ -26,7 +26,7 @@ import { useLifecycle } from "./hooks/useLifecycle";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { CompareHost } from "./CompareHost";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
-import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
+import { migrateStorageKeys, migrateAqbKeys } from "@/shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { OnboardingMount } from "../onboarding/OnboardingMount";
@@ -50,7 +50,7 @@ import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
 import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
-import { submitForReview } from "../../services/ReviewService";
+import { submitForReview } from "@/services/ReviewService";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { IMPROVE_ELEMENT_PROMPT } from "@/editor/sidebar/tabs/ai/types";
 import { openPublishCheckFix } from "@/editor/sidebar/tabs/publish/PublishTab";

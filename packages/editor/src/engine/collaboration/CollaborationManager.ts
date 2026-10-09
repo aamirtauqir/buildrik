@@ -19,16 +19,16 @@ import type {
   SyncResponsePayload,
   ElementLock,
   LockEventPayload,
-} from "../../shared/types/collaboration";
-import { EVENTS } from "../../shared/constants/events";
+} from "@/shared/types/collaboration";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 import { OTEngine } from "./OTEngine";
 import { SSETransport } from "./SSETransport";
 import type { OTOperation } from "./OTTypes";
 import type { CollaborationTransport } from "./types";
-import { ProjectDataSchema } from "../../shared/schemas/project";
-import type { ProjectData } from "../../shared/types";
+import { ProjectDataSchema } from "@/shared/schemas/project";
+import type { ProjectData } from "@/shared/types";
 import { devWarn } from "@/shared/utils/devLogger";
 
 // ============================================================================

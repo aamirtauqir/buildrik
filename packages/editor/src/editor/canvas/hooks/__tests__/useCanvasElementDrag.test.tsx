@@ -11,8 +11,8 @@
 import { renderHook } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Composer } from "../../../../engine";
-import { MIME_TYPES } from "../../../../shared/constants/config";
+import type { Composer } from "@/engine";
+import { MIME_TYPES } from "@/shared/constants/config";
 import { useCanvasElementDrag } from "../useCanvasElementDrag";
 
 const mocks = vi.hoisted(() => ({

@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { ImageFilters, ImageAdjustments } from "../../../shared/types/media";
+import type { ImageFilters, ImageAdjustments } from "@/shared/types/media";
 import {
   buildFilterString,
   buildAdjustmentString,

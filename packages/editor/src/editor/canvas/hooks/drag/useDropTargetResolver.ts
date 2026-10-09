@@ -13,8 +13,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { findDropTargetElement, getElementId } from "../../../../shared/utils/dragDrop";
+import type { Composer } from "@/engine";
+import { findDropTargetElement, getElementId } from "@/shared/utils/dragDrop";
 import {
   buildBreadcrumbPath,
   calculateDropPositionFromCursor,

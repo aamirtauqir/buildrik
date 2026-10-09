@@ -12,7 +12,7 @@ import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect } from "vitest";
 import { SmartGuidesOverlay } from "../SmartGuidesOverlay";
-import type { SnapLine } from "../../hooks/useCanvasSnapping";
+import type { SnapLine } from "@/editor/canvas/hooks/useCanvasSnapping";
 
 describe("SmartGuidesOverlay — alignment guides vs spacing indicators", () => {
   it("renders nothing when there are no lines", () => {

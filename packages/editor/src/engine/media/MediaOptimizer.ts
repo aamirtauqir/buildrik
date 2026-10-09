@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ImageExportFormat } from "../../shared/types/media";
+import type { ImageExportFormat } from "@/shared/types/media";
 import {
   type OptimizationOptions,
   type OptimizationResult,

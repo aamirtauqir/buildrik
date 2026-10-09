@@ -10,8 +10,8 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { MediaCommandLayer } from "../MediaCommandLayer";
-import { MEDIA_EVENTS } from "../../../shared/constants/media";
-import type { Composer } from "../../Composer";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
+import type { Composer } from "@/engine/Composer";
 
 interface StubElement {
   id: string;

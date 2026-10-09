@@ -5,12 +5,12 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Composer } from "../../../../../engine/Composer";
-import { MEDIA_EVENTS } from "../../../../../shared/constants/media";
-import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
-import { getSiteIdFromUrl, loadServerMedia } from "../../../../../services/BuildrikSyncProvider";
-import type { MediaSortBy, SortDirection } from "../../../../../shared/types/media";
-import type { MediaAsset } from "../../../../../shared/types/media";
+import type { Composer } from "@/engine/Composer";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
+import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
+import { getSiteIdFromUrl, loadServerMedia } from "@/services/BuildrikSyncProvider";
+import type { MediaSortBy, SortDirection } from "@/shared/types/media";
+import type { MediaAsset } from "@/shared/types/media";
 import type { LibraryItem, LibraryStateResult, MediaBucket, MediaTypeFilter } from "../data/mediaTypes";
 import {
   countByType,

@@ -14,8 +14,8 @@
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { Composer } from "../Composer";
-import { THRESHOLDS } from "../../shared/constants";
-import { stepZoom } from "../../shared/constants/canvas";
+import { THRESHOLDS } from "@/shared/constants";
+import { stepZoom } from "@/shared/constants/canvas";
 
 describe("Composer.setZoom — percent, not fraction", () => {
   /* Composer.initialize touches a 2d canvas context, which jsdom does not

@@ -21,9 +21,9 @@
  */
 
 import * as React from "react";
-import type { NamedVersion } from "../../../shared/types/versions";
-import { formatRelativeTime } from "../../../editor/sidebar/tabs/history/helpers";
-import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components/SnapshotPreview";
+import type { NamedVersion } from "@/shared/types/versions";
+import { formatRelativeTime } from "@/editor/sidebar/tabs/history/helpers";
+import { SnapshotPreview } from "@/editor/sidebar/tabs/history/components/SnapshotPreview";
 
 // react-window 1.8.x ships JS only — typed by the repo-root types/react-window.d.ts.
 import { FixedSizeList, type ListChildComponentProps } from "react-window";

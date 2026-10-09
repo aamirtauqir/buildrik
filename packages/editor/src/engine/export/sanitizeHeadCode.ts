@@ -28,7 +28,7 @@
  */
 
 import createDOMPurify, { type DOMPurify } from "dompurify";
-import { ALLOWED_HEAD_TAGS, ALLOWED_HEAD_ATTRS } from "../../shared/constants/headCode";
+import { ALLOWED_HEAD_TAGS, ALLOWED_HEAD_ATTRS } from "@/shared/constants/headCode";
 
 /* The allowlist itself lives in shared/constants/headCode.ts — the settings
    validator reports against the SAME list, so the field can no longer bless

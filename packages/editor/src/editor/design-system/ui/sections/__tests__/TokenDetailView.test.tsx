@@ -14,10 +14,10 @@ import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, act, screen } from "@testing-library/react";
 import * as React from "react";
 import { TokenDetailView } from "../TokenDetailView";
-import { DSModeProvider } from "../../../state/DSModeContext";
-import type { DesignToken } from "../../../types";
-import type { LintIssue } from "../../../../../engine/designSystem/LintState";
-import type { UsageRef } from "../../../../../engine/designSystem/TokenUsageTracker";
+import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
+import type { DesignToken } from "@/editor/design-system/types";
+import type { LintIssue } from "@/engine/designSystem/LintState";
+import type { UsageRef } from "@/engine/designSystem/TokenUsageTracker";
 import { v6Token, ownLight } from "@/engine/__tests__/test-utils/v6Token";
 import { lightAliasOf } from "@buildrik/shared/tokens";
 

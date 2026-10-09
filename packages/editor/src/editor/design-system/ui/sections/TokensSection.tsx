@@ -32,12 +32,12 @@ import {
   useSizingRegistry,
   useIconRegistry,
   useImageryRegistry,
-} from "../../state/TokenRegistryContext";
-import { useDSModeOptional } from "../../state/DSModeContext";
-import { filterTokensByMode } from "../../utils/semanticKind";
-import type { TokenKind } from "../../types";
+} from "@/editor/design-system/state/TokenRegistryContext";
+import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
+import { filterTokensByMode } from "@/editor/design-system/utils/semanticKind";
+import type { TokenKind } from "@/editor/design-system/types";
 import type { SpacingPreset } from "@/editor/design-system/state/spacingRegistry";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 
 /* The PRESET column (7576:197036): the spacing preset a token's value came
    from, or "custom" once hand-edited. */

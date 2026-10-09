@@ -15,8 +15,8 @@
  */
 
 import { vi } from "vitest";
-import type { LibraryItem, MediaFolder, MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
-import type { MediaAsset } from "../../../shared/types/media";
+import type { LibraryItem, MediaFolder, MediaStateResult } from "@/editor/sidebar/tabs/media/data/mediaTypes";
+import type { MediaAsset } from "@/shared/types/media";
 import type { LibraryManager } from "../LibraryManager";
 
 /** A File of a claimed size — the bytes are never read, so a 62 MB one costs nothing. */

@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 
 // Mock deep dependencies before importing LayersTab
 vi.mock("@/editor/panels/layers/index", () => ({

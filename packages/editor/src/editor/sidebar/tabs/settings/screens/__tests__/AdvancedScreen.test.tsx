@@ -30,7 +30,7 @@ vi.mock("@/services/api-client", () => ({
 
 import { AdvancedScreen } from "../AdvancedScreen";
 import { EVENTS } from "@/shared/constants/events";
-import { SiteColumnsLockedContext } from "../../shared";
+import { SiteColumnsLockedContext } from "@/editor/sidebar/tabs/settings/shared";
 
 const getMock = api.siteDetail.settings.get.query;
 

@@ -7,8 +7,8 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FormHandler, type FormConfig } from "../FormHandler";
-import type { Composer } from "../../Composer";
-import type { Element } from "../../elements/Element";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
 
 function config(partial: Partial<FormConfig> = {}): FormConfig {
   return { formId: "contact", action: "store", ...partial };

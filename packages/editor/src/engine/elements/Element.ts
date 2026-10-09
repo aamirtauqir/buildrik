@@ -7,14 +7,14 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants/events";
-import type { ElementData, TraitData, TraitValue } from "../../shared/types";
-import type { AnimationConfig } from "../../shared/types/animations";
-import type { BreakpointStyles } from "../../shared/types/breakpoints";
-import type { DataBinding } from "../../shared/types/data";
-import type { ElementCategory } from "../../shared/utils/nesting/types";
+import { EVENTS } from "@/shared/constants/events";
+import type { ElementData, TraitData, TraitValue } from "@/shared/types";
+import type { AnimationConfig } from "@/shared/types/animations";
+import type { BreakpointStyles } from "@/shared/types/breakpoints";
+import type { DataBinding } from "@/shared/types/data";
+import type { ElementCategory } from "@/shared/utils/nesting/types";
 import { isAllowedElementTag } from "@buildrik/shared/schemas/element-markup";
-import { getDefaultTagName } from "../../shared/utils/html";
+import { getDefaultTagName } from "@/shared/utils/html";
 import type { Composer } from "../Composer";
 import { ElementChildren } from "./ElementChildren";
 import { ElementOperations } from "./ElementOperations";

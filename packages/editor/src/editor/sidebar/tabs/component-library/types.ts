@@ -4,8 +4,8 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../../../engine";
-import type { ComponentDefinition } from "../../../../shared/types/components";
+import type { Composer } from "@/engine";
+import type { ComponentDefinition } from "@/shared/types/components";
 
 export interface ComponentsTabProps {
   composer: Composer | null;

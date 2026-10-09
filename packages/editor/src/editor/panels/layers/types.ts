@@ -9,7 +9,7 @@ export type { SelectedElementInfo };
 
 /** LayersPanel component props */
 export interface LayersPanelProps {
-  composer: import("../../../engine").Composer | null;
+  composer: import("@/engine").Composer | null;
   selectedElement: SelectedElementInfo | null;
   /** Callback when hovering over a layer (for bidirectional highlighting) */
   onLayerHover?: (elementId: string | null) => void;

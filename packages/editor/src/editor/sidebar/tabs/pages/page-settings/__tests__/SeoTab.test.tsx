@@ -20,7 +20,7 @@ vi.mock("@/shared/utils/openai", () => ({
 import * as React from "react";
 import { SeoTab } from "../SeoTab";
 import type { UsePageSettingsReturn } from "../usePageSettings";
-import type { PageItem } from "../../types";
+import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 import type { Composer } from "@/engine";
 
 

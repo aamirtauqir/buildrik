@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 
-import { engineMayPlaceInside } from "../../../shared/utils/nesting";
+import { engineMayPlaceInside } from "@/shared/utils/nesting";
 import type { Element } from "../Element";
 
 export function resolvePlacement(

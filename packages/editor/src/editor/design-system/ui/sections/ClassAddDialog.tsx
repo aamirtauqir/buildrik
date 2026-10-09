@@ -11,8 +11,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer } from "../../../../engine/Composer";
-import { runTransaction } from "../../../../shared/utils/helpers/transaction";
+import type { Composer } from "@/engine/Composer";
+import { runTransaction } from "@/shared/utils/helpers/transaction";
 import { Button, Label, Modal, TextInput } from "@/editor/chrome-ui";
 
 const CLASS_SHAPE = /^-?[_a-zA-Z][_a-zA-Z0-9-]*$/;

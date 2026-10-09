@@ -70,4 +70,4 @@ export {
   SIZES,
   DEVICE_PRESETS,
   ZOOM_LIMITS,
-} from "../../../shared/constants/canvas";
+} from "@/shared/constants/canvas";

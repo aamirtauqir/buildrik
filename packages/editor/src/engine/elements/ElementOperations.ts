@@ -6,10 +6,10 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementData } from "../../shared/types";
-import type { AnimationConfig } from "../../shared/types/animations";
-import type { DataBinding } from "../../shared/types/data";
-import { EVENTS } from "../../shared/constants/events";
+import type { ElementData } from "@/shared/types";
+import type { AnimationConfig } from "@/shared/types/animations";
+import type { DataBinding } from "@/shared/types/data";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import type { Element } from "./Element";
 import { resolvePlacement } from "./manager/placement";

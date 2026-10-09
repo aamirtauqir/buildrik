@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { Button, TextInput } from "@/editor/chrome-ui";
 import { writeElement } from "@/engine/commands/commandOperations";
 // ============================================================================

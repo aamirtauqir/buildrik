@@ -16,16 +16,16 @@
  */
 
 import * as React from "react";
-import type { TypeBlockBodyProps } from "../../../config/typeBlocks";
+import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { ButtonGroup, SelectRow } from "../../../shared/controls";
-import { extractVarName, cssVarToTokenId, resolveTokenVar } from "../../../shared/tokenBindingDetection";
+import { ButtonGroup, SelectRow } from "@/editor/inspector/shared/controls";
+import { extractVarName, cssVarToTokenId, resolveTokenVar } from "@/editor/inspector/shared/tokenBindingDetection";
 import { useTypeRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { typeStyleRows } from "@/editor/design-system/ui/sections/TypographySection";
 import { runTxn, writeAttribute } from "../attributeWriter";
 import { isAttrOn, useElementRead } from "../blockRows";
-import { CheckRow } from "../../../shared/controls/CheckRow";
+import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 import { EditTextRow } from "../EditTextRow";
 
 const LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"].map((v) => ({ value: v, label: v.toUpperCase() }));

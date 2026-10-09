@@ -21,9 +21,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
-import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import { GROUPED_TABS_CONFIG } from "@/editor/rail/tabsConfig";
 import type { UseStudioModalsReturn } from "./useStudioModals";
 import { requestPasteHtml } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import type { ToastInput } from "@/editor/chrome-ui";

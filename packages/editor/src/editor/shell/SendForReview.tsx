@@ -15,9 +15,9 @@
 import * as React from "react";
 import { FormField, Modal, Button, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 import { ReviewSentModal, type ReviewSendState } from "./modals/ReviewSentModal";
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
-import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
+import { submitForReview, type ReviewStatus } from "@/services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 

@@ -29,6 +29,6 @@ export type {
   DeviceDimensions,
   CodeTab,
   CodePreviewState,
-} from "../../shared/types/export";
+} from "@/shared/types/export";
 
-export { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
+export { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "@/shared/types/export";

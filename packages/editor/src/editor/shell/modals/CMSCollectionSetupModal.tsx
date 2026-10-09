@@ -25,7 +25,7 @@ import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, Se
 import { slugify } from "@shared/utils/helpers/string";
 import type { CMSFieldType } from "@/shared/types/cms";
 import { FIELD_TYPES, FIELD_TYPE_LABEL, collectionSchemaFrom } from "@/editor/cms/fieldTypes";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 // =============================================================================
 // TYPES
 // =============================================================================

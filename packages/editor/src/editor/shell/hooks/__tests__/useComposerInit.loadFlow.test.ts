@@ -19,7 +19,7 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
-import { THRESHOLDS } from "../../../../shared/constants/config";
+import { THRESHOLDS } from "@/shared/constants/config";
 import { EVENTS } from "@/shared/constants/events";
 import { AUTOSAVE_RETRY_BASE_MS, useComposerInit, type UseComposerInitParams } from "../useComposerInit";
 
@@ -68,7 +68,7 @@ const mockComposer = {
   designSystem: { readOnly: false, readOnlyReason: null as string | null, brandTokensV2: true },
 };
 
-vi.mock("../../../../engine", () => ({
+vi.mock("@/engine", () => ({
   createComposer: vi.fn(() => mockComposer),
   Composer: class {},
 }));
@@ -78,7 +78,7 @@ const { hasProductsCollectionMock, createProductsCollectionMock } = vi.hoisted((
   createProductsCollectionMock: vi.fn(),
 }));
 
-vi.mock("../../../../engine/cms", () => ({
+vi.mock("@/engine/cms", () => ({
   // Plain function (not vi.fn arrow) so `new ProductCollectionService()` is
   // constructable; returning an object overrides `this`.
   ProductCollectionService: function ProductCollectionServiceMock(this: unknown) {
@@ -455,14 +455,14 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
      the browser, and a failed server load fell back to it. A site session
      has no engine-local storage at all. */
   it("a site session builds the composer with no engine-local storage", async () => {
-    const { createComposer } = await import("../../../../engine");
+    const { createComposer } = await import("@/engine");
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
     renderHook(() => useComposerInit(makeParams()));
     expect(vi.mocked(createComposer).mock.calls.at(-1)?.[0]).toMatchObject({ storage: { type: "none", autoSave: false } });
   });
 
   it("the standalone demo (no site) keeps its local storage", async () => {
-    const { createComposer } = await import("../../../../engine");
+    const { createComposer } = await import("@/engine");
     vi.mocked(getSiteIdFromUrl).mockReturnValue(null);
     renderHook(() => useComposerInit(makeParams()));
     expect((vi.mocked(createComposer).mock.calls.at(-1)?.[0] as { storage?: unknown }).storage).toBeUndefined();

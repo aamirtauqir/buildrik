@@ -16,12 +16,12 @@
  * @license BSD-3-Clause
  */
 
-import { devLog, devWarn, devError } from "../../shared/utils/devLogger";
-import { EVENTS } from "../../shared/constants/events";
-import { generateId } from "../../shared/utils/helpers";
+import { devLog, devWarn, devError } from "@/shared/utils/devLogger";
+import { EVENTS } from "@/shared/constants/events";
+import { generateId } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { ElementManagerContext } from "../elements/manager/types";
-import { getDefaultPageName } from "../../shared/utils/pageUtils";
+import { getDefaultPageName } from "@/shared/utils/pageUtils";
 
 /** sessionStorage key holding the last detected crash record. */
 const CRASH_SENTINEL_KEY = "buildrick:last-crash";

@@ -15,7 +15,7 @@
  */
 
 import * as React from "react";
-import { AlignmentGrid, InputRow, InputWithUnit, MoreSettingsToggle, SelectRow } from "../../shared/controls";
+import { AlignmentGrid, InputRow, InputWithUnit, MoreSettingsToggle, SelectRow } from "@/editor/inspector/shared/controls";
 import { GapRow } from "./GapRow";
 
 export interface GridControlsProps {

@@ -14,7 +14,7 @@
 import * as React from "react";
 import { EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, Button } from "@/editor/chrome-ui";
 import { PanelLoadError, PanelLoadingSkeleton, PanelNoResults } from "@/editor/shared/PanelStates";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 import type { FolderItem, PageItem } from "../types";
 import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";

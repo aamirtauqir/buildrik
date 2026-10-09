@@ -10,7 +10,7 @@ import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { LintSection, brandChecksCaption, contrastFixFor } from "../LintSection";
 import { calcContrastRatio } from "@/engine/designSystem/colorMath";
-import type { LintIssue } from "../../../../../engine/designSystem/linter";
+import type { LintIssue } from "@/engine/designSystem/linter";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const warn: LintIssue = {

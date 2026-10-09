@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { Point } from "../../types";
+import type { Point } from "@/shared/types";
 import { stopAutoScroll } from "./autoScroll";
 import { generateDragSessionId } from "./dragData";
 import type { DragData, DragSession } from "./types";

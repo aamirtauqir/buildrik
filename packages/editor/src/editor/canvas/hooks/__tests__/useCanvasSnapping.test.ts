@@ -13,7 +13,7 @@
 
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { useCanvasSnapping } from "../useCanvasSnapping";
 
 // ---------------------------------------------------------------------------

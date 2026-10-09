@@ -8,8 +8,8 @@
  */
 
 import * as React from "react";
-import { captureError } from "../../../shared/utils/errorTracking";
-import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
+import { captureError } from "@/shared/utils/errorTracking";
+import { trackSidebar } from "@/shared/utils/sidebarAnalytics";
 import { Button } from "@/editor/chrome-ui";
 
 interface InspectorErrorBoundaryProps {

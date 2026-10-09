@@ -11,7 +11,7 @@ import { ImportCard } from "../ImportCard";
 import {
   TokenRegistryProvider,
   useColorRegistry,
-} from "../../../state/TokenRegistryContext";
+} from "@/editor/design-system/state/TokenRegistryContext";
 // useColorRegistry is used in the Apply test via Probe.
 import { ToastProvider } from "@/editor/chrome-ui";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";

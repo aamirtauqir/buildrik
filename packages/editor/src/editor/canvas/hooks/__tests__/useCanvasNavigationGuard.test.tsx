@@ -12,7 +12,7 @@ import * as React from "react";
 import { describe, it, expect, afterEach } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 import { useCanvasNavigationGuard } from "../useCanvasNavigationGuard";
-import { DeviceFramePreview } from "../../DeviceFramePreview";
+import { DeviceFramePreview } from "@/editor/canvas/DeviceFramePreview";
 
 function Frame() {
   const guard = useCanvasNavigationGuard();

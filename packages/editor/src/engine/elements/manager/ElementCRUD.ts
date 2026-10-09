@@ -6,15 +6,15 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../../shared/constants";
-import type { ElementData } from "../../../shared/types";
-import { devWarn } from "../../../shared/utils/devLogger";
-import { generateId } from "../../../shared/utils/helpers";
-import { getDefaultTagName, getDefaultAttributes, CONTAINER_TYPES } from "../../../shared/utils/html";
+import { EVENTS } from "@/shared/constants";
+import type { ElementData } from "@/shared/types";
+import { devWarn } from "@/shared/utils/devLogger";
+import { generateId } from "@/shared/utils/helpers";
+import { getDefaultTagName, getDefaultAttributes, CONTAINER_TYPES } from "@/shared/utils/html";
 import { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
 import { resolvePlacement } from "./placement";
-import { LAYER_NAME_KEY, nextCopyName } from "../../../shared/constants/elementTypeLabels";
+import { LAYER_NAME_KEY, nextCopyName } from "@/shared/constants/elementTypeLabels";
 
 /**
  * Manages element CRUD operations

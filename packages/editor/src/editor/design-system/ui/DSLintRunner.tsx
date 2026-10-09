@@ -23,7 +23,7 @@
  * @license BSD-3-Clause
  */
 import type * as React from "react";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 import { useDSLint } from "../state/useDSLint";
 
 export interface DSLintRunnerProps {

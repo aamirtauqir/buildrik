@@ -137,7 +137,7 @@ export interface VersionDeletedPayload {
 // Compare Result Types
 // ============================================
 
-import type { ChangeType } from "../../engine/historyTypes";
+import type { ChangeType } from "@/engine/historyTypes";
 
 /**
  * A single change detected between two versions

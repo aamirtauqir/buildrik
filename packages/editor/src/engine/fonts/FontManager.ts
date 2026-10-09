@@ -19,8 +19,8 @@ import type {
   FontVariant,
   FontWeight,
   FontStyle,
-} from "../../shared/types/fonts";
-import { EVENTS } from "../../shared/constants/events";
+} from "@/shared/types/fonts";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 

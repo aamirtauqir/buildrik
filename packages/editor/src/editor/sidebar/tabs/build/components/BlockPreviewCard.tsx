@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import { Button, Portal } from "@/editor/chrome-ui";
-import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
+import type { BlockDefinition } from "@/blocks/blockRegistry";
 import { BlockThumb } from "./BlockThumb";
 
 const CARD_W = 320;

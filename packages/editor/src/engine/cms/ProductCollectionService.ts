@@ -4,8 +4,8 @@
  * @license BSD-3-Clause
  */
 
-import type { CMSCollection, CMSField } from "../../shared/types/cms";
-import { PRODUCT_COLLECTION_SCHEMA, SAMPLE_PRODUCTS } from "../../shared/types/ecommerce";
+import type { CMSCollection, CMSField } from "@/shared/types/cms";
+import { PRODUCT_COLLECTION_SCHEMA, SAMPLE_PRODUCTS } from "@/shared/types/ecommerce";
 import type { CollectionManager } from "./CollectionManager";
 
 /**

@@ -39,7 +39,7 @@
 import * as React from "react";
 import { ChevronLeft, Search as SearchIcon, X } from "lucide-react";
 import { Badge, Button, IconButton, Kbd, TextInput, useToast } from "@/editor/chrome-ui";
-import { usePanelNavigation } from "../../shared/usePanelNavigation";
+import { usePanelNavigation } from "@/editor/sidebar/shared/usePanelNavigation";
 import {
   type SettingsTabProps,
   type PlanTier,

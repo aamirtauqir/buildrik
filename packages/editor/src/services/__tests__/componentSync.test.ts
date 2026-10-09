@@ -24,11 +24,11 @@ vi.mock("../api-client", () => ({
     },
   }),
 }));
-vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
+vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 
 const loadComponents = vi.fn();
 const saveComponent = vi.fn();
-vi.mock("../../engine/components/ComponentStorage", () => ({
+vi.mock("@/engine/components/ComponentStorage", () => ({
   loadComponents: (...a: unknown[]) => loadComponents(...a),
   saveComponent: (...a: unknown[]) => saveComponent(...a),
 }));

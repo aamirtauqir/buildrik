@@ -13,7 +13,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { Composer } from "@/engine/Composer";
 import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
-import { computeStatesWithOverrides } from "../../config/pseudoOverrides";
+import { computeStatesWithOverrides } from "@/editor/inspector/config/pseudoOverrides";
 import { useFieldOverrides } from "../useFieldOverrides";
 
 beforeAll(installEngineBrowserStubs);

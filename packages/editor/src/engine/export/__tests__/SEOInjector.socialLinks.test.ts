@@ -11,7 +11,7 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 import { SEOInjector } from "../SEOInjector";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "../ExportEngine";
 import type { PageData, SiteSEO } from "@/shared/types";
 

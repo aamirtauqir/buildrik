@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { ComponentDefinition, ComponentVariant } from "../../../shared/types/components";
-import type { ElementData } from "../../../shared/types";
+import type { ComponentDefinition, ComponentVariant } from "@/shared/types/components";
+import type { ElementData } from "@/shared/types";
 
 /**
  * C2 — master-level variant authoring. The engine already resolves variant styles

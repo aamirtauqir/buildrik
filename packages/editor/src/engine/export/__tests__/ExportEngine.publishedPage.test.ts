@@ -12,7 +12,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll } from "vitest";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "../ExportEngine";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 

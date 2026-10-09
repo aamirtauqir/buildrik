@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import { useEffect, useCallback, useRef } from "react";
-import type { Composer } from "../../../engine/Composer";
-import type { CursorPosition } from "../../../shared/types/collaboration";
+import type { Composer } from "@/engine/Composer";
+import type { CursorPosition } from "@/shared/types/collaboration";
 
 // ============================================================================
 // TYPES

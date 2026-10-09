@@ -10,8 +10,8 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
-import type { Composer } from "../../../engine/Composer";
-import type { ExportResult } from "../../../shared/types/export";
+import type { Composer } from "@/engine/Composer";
+import type { ExportResult } from "@/shared/types/export";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { ExportModal } from "../ExportModal";
 
@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => ({
   exportZip: vi.fn(),
 }));
 
-vi.mock("../../../engine/export", () => ({
+vi.mock("@/engine/export", () => ({
   ExportEngine: class {
     constructor(...args: unknown[]) {
       mocks.engineCtor(...args);
@@ -39,7 +39,7 @@ vi.mock("@/editor/shared/useSiteOrigin", () => ({
   useSiteOrigin: () => () => "https://bellacucina.com",
 }));
 
-vi.mock("../../../engine/export/ReactExporter", () => ({
+vi.mock("@/engine/export/ReactExporter", () => ({
   ReactExporter: class {
     constructor(...args: unknown[]) {
       mocks.reactCtor(...args);

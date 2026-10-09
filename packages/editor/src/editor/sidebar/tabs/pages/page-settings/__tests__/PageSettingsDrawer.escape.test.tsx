@@ -13,7 +13,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PageSettingsDrawer } from "../PageSettingsDrawer";
-import type { PageItem } from "../../types";
+import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 
 const page: PageItem = { id: "p1", name: "Home", slug: "home", isHome: true };
 

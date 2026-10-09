@@ -10,8 +10,8 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { Element } from "../../Element";
-import { makeEngine } from "../../__tests__/harness";
+import type { Element } from "@/engine/elements/Element";
+import { makeEngine } from "@/engine/elements/__tests__/harness";
 
 function importInto(html: string) {
   const { composer, manager } = makeEngine();

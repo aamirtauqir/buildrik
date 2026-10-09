@@ -11,7 +11,7 @@
  */
 
 import { vi } from "vitest";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 
 // =============================================================================
 // Engine element stubs

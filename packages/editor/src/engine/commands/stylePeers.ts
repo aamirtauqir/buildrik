@@ -20,9 +20,9 @@
 
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
-import { getBreakpointQuery } from "../../shared/constants/breakpoints";
-import type { BreakpointId } from "../../shared/types/breakpoints";
-import type { PseudoStateId } from "../../shared/types";
+import { getBreakpointQuery } from "@/shared/constants/breakpoints";
+import type { BreakpointId } from "@/shared/types/breakpoints";
+import type { PseudoStateId } from "@/shared/types";
 import { writableElements } from "./commandOperations";
 
 export interface StylePeers {

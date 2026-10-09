@@ -12,11 +12,11 @@ import * as React from "react";
 import { Kbd, Button, ConfirmDialog, Tooltip } from "@/editor/chrome-ui";
 // react-window 1.8.x ships JS only — typed by the repo-root types/react-window.d.ts.
 import { VariableSizeList } from "react-window";
-import { useHistoryState } from "../../../../../shared/hooks/useHistoryState";
-import { useReducedMotion } from "../../../../../shared/hooks/useReducedMotion";
+import { useHistoryState } from "@/shared/hooks/useHistoryState";
+import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
 import { collapseIdenticalChanges, type CollapsedChange } from "../helpers";
 import type { ActivityViewProps } from "../types";
-import type { HistoryDisplayEntry } from "../../../../../engine/historyTypes";
+import type { HistoryDisplayEntry } from "@/engine/historyTypes";
 import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
 
 /** "⌘Z" on a Mac, "Ctrl+Z" elsewhere — the spelling the palette uses. */

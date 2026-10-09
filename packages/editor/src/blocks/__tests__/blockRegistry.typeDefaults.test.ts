@@ -19,7 +19,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { insertBlock } from "../blockRegistry";
-import { getDefaultStyles, THEME } from "../../shared/constants/defaultStyles";
+import { getDefaultStyles, THEME } from "@/shared/constants/defaultStyles";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function fakeElement(type: string, tagName: string, existing: Record<string, string> = {}) {

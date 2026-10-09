@@ -28,7 +28,7 @@ import {
   fetchSitePublishState,
   rollbackToVersion,
   type PublishHistoryRow,
-} from "../../services/PublishService";
+} from "@/services/PublishService";
 
 export interface PublishHistoryProps {
   siteId: string;

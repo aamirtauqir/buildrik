@@ -45,8 +45,8 @@ import * as React from "react";
 import { BRAND_READ_ONLY_COPY, BRAND_READ_ONLY_FAILED_COPY } from "@/shared/constants/brandReadOnly";
 import { ChevronLeft } from "lucide-react";
 import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, Tooltip, useToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine/Composer";
-import { EVENTS } from "../../../shared/constants/events";
+import type { Composer } from "@/engine/Composer";
+import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { SpacingPreset } from "../state/spacingRegistry";
 import {

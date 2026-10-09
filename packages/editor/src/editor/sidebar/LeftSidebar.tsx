@@ -10,11 +10,11 @@ import * as React from "react";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
 import "./LeftSidebar.css";
-import type { Composer } from "../../engine";
-import { EVENTS } from "../../shared/constants/events";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
 import { getTabConfig, getFigmaRailGroups, RAIL_FIGMA_IDS, VIEWER_TABS } from "../rail/tabsConfig";
-import type { BlockData } from "../../shared/types";
+import type { BlockData } from "@/shared/types";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
@@ -94,8 +94,8 @@ export interface LeftSidebarProps {
   ) => void;
   /** §20 — opens IconPickerModal from StockSourceModal "Browse full icon library". */
   onOpenIconPicker?: (
-    currentIcon: import("../../shared/types/media").IconConfig | undefined,
-    onSelect: (icon: import("../../shared/types/media").IconConfig) => void,
+    currentIcon: import("@/shared/types/media").IconConfig | undefined,
+    onSelect: (icon: import("@/shared/types/media").IconConfig) => void,
   ) => void;
   /** FB-4: see `TabRouter.reviewsEnabled` — also closes the "R" shortcut. */
   reviewsEnabled?: boolean | null;

@@ -22,8 +22,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
-import { DOCUMENT_CHANGED_EVENTS, EVENTS, isNavigationOnlyChange } from "../../shared/constants";
+import type { Composer } from "@/engine";
+import { DOCUMENT_CHANGED_EVENTS, EVENTS, isNavigationOnlyChange } from "@/shared/constants";
 
 interface DirtyStore {
   /** Frozen between mutations — useSyncExternalStore compares by identity. */

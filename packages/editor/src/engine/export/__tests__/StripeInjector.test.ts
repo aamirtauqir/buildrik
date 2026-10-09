@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from "vitest";
 import { generateStripeScripts, isValidStripePublishableKey } from "../StripeInjector";
-import type { StripeConfig } from "../../../shared/types";
+import type { StripeConfig } from "@/shared/types";
 
 const baseConfig: StripeConfig = {
   enabled: true,

@@ -14,9 +14,9 @@ import { describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SlimLauncher } from "../SlimLauncher";
-import { mockComposer } from "../../__tests__/test-utils/mockComposer";
+import { mockComposer } from "@/editor/sidebar/tabs/media/__tests__/test-utils/mockComposer";
 import { makeAsset, makeFile } from "@/editor/media/__tests__/libraryFixture";
-import type { LibraryItem, MediaBucket } from "../../data/mediaTypes";
+import type { LibraryItem, MediaBucket } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 const baseItem: Omit<LibraryItem, "key" | "name" | "type" | "src" | "thumb"> = {
   size: 1024,
@@ -37,7 +37,7 @@ const makeItem = (overrides: Partial<LibraryItem>): LibraryItem => ({
 const baseProps = () => ({
   composer: mockComposer(),
   libraryItems: [] as LibraryItem[],
-  activeTypes: new Set() as ReadonlySet<import("../../data/mediaTypes").MediaBucket>,
+  activeTypes: new Set() as ReadonlySet<import("@/editor/sidebar/tabs/media/data/mediaTypes").MediaBucket>,
   onToggleType: vi.fn(),
   counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },
   searchQuery: "",

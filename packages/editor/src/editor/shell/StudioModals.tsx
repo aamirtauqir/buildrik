@@ -6,10 +6,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
-import type { IconConfig } from "../../shared/types/media";
+import type { Composer } from "@/engine";
+import type { IconConfig } from "@/shared/types/media";
 import type { ImageEditorContext } from "./hooks/useStudioModals";
-import { SaveTemplate } from "../../templates/SaveTemplate";
+import { SaveTemplate } from "@/templates/SaveTemplate";
 import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
 import { IconPickerModal } from "../media";

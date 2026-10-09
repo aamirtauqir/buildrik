@@ -19,16 +19,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // MOCK EXTERNAL UTILITIES
 // ---------------------------------------------------------------------------
 
-vi.mock("../../../../../blocks/blockRegistry", () => ({
+vi.mock("@/blocks/blockRegistry", () => ({
   getBlockById: vi.fn(),
   insertBlock: vi.fn(),
 }));
 
-vi.mock("../../../../../shared/utils/nesting", () => ({
+vi.mock("@/shared/utils/nesting", () => ({
   canNestElement: vi.fn(() => true),
 }));
 
-vi.mock("../../../../../shared/utils/dragDrop", () => ({
+vi.mock("@/shared/utils/dragDrop", () => ({
   findDropTargetElement: vi.fn(() => null),
   getElementId: vi.fn((el: HTMLElement | null) =>
     el?.getAttribute?.("data-buildrick-id") ?? null,
@@ -40,23 +40,23 @@ vi.mock("../../../../../shared/utils/dragDrop", () => ({
   })),
 }));
 
-vi.mock("../../../../../shared/utils/dragDrop/animations", () => ({
+vi.mock("@/shared/utils/dragDrop/animations", () => ({
   animateDropSuccess: vi.fn(),
 }));
 
-vi.mock("../../../../../shared/utils/devLogger", () => ({
+vi.mock("@/shared/utils/devLogger", () => ({
   devError: vi.fn(),
   devLog: vi.fn(),
   devWarn: vi.fn(),
 }));
 
-import { getBlockById, insertBlock } from "../../../../../blocks/blockRegistry";
-import { canNestElement } from "../../../../../shared/utils/nesting";
+import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
+import { canNestElement } from "@/shared/utils/nesting";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import {
   findDropTargetElement,
   findValidDropTargetWithFallback,
-} from "../../../../../shared/utils/dragDrop";
+} from "@/shared/utils/dragDrop";
 
 // Now safe to import the SUT — its imports resolve through the mocks above.
 import {

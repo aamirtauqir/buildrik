@@ -7,8 +7,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { Element } from "../../../engine/elements/Element";
+import type { Composer } from "@/engine";
+import type { Element } from "@/engine/elements/Element";
 
 /** Minimum drag distance (px) in X or Y before a marquee is confirmed and selection is cleared */
 const MARQUEE_MIN_DRAG = 5;

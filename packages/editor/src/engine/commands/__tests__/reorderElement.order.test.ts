@@ -12,13 +12,13 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import {
   createTestComposer,
   installEngineBrowserStubs,
   removeEngineBrowserStubs,
-} from "../../__tests__/test-utils/realComposer";
+} from "@/engine/__tests__/test-utils/realComposer";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);

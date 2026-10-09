@@ -33,7 +33,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
-import { deriveLifecycleState, type LifecycleInput, type NextMove } from "../../../../shell/lifecycle";
+import { deriveLifecycleState, type LifecycleInput, type NextMove } from "@/editor/shell/lifecycle";
 import { EVENTS } from "@/shared/constants";
 
 const base: LifecycleInput = {

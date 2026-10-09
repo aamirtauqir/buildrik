@@ -14,7 +14,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../../engine/export", () => {
+vi.mock("@/engine/export", () => {
   const instance = { downloadZip: vi.fn(), exportAllPages: vi.fn() };
   function ExportEngineMock(this: unknown) {
     return instance;
@@ -62,12 +62,12 @@ vi.mock("../usePublishJob", () => {
 
 /* 8139:218055 — the CMS publish gate throws before any request. */
 const exportPagesMock = vi.fn();
-vi.mock("../../exportPublishPages", async (orig) => ({
-  ...(await orig<typeof import("../../exportPublishPages")>()),
+vi.mock("@/editor/shell/exportPublishPages", async (orig) => ({
+  ...(await orig<typeof import("@/editor/shell/exportPublishPages")>()),
   exportPublishPages: (...a: unknown[]) => exportPagesMock(...a),
 }));
 
-import { PublishBlockedError } from "../../exportPublishPages";
+import { PublishBlockedError } from "@/editor/shell/exportPublishPages";
 import {
   useExportHandlers,
   type UseExportHandlersOptions,

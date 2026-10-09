@@ -12,8 +12,8 @@
  */
 
 import * as React from "react";
-import { MoreSettingsToggle, Section } from "../../shared/controls";
-import { SECTION_SUBTITLE } from "../../shared/controls/controlClasses";
+import { MoreSettingsToggle, Section } from "@/editor/inspector/shared/controls";
+import { SECTION_SUBTITLE } from "@/editor/inspector/shared/controls/controlClasses";
 import { DisplayControls } from "./DisplayControls";
 import { FlexControls } from "./FlexControls";
 import { GridControls } from "./GridControls";

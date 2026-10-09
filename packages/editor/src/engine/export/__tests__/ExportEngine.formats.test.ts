@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import JSZip from "jszip";
 import { ExportEngine } from "../ExportEngine";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 
 // ============================================================================
 // MOCK HELPERS

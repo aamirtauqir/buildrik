@@ -13,7 +13,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { FontManager } from "../FontManager";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 import type { GoogleFont } from "@/shared/types/fonts";
 
 function makeManager(config?: ConstructorParameters<typeof FontManager>[1]) {

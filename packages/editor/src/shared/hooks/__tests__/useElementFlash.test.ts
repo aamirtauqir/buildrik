@@ -7,8 +7,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useElementFlash } from "../useElementFlash";
-import { EVENTS } from "../../constants/events";
-import type { Composer } from "../../../engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine";
 
 const FLASH_CLASS = "buildrick-element-flash";
 

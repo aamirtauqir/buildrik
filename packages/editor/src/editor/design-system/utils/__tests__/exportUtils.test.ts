@@ -5,7 +5,7 @@ import {
   generateColorTokenId,
   generateColorCssVar,
 } from "../exportUtils";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
 const tok = (id: string, value: string, extra: Partial<V6TokenSpec> = {}): DesignToken => (v6Token({

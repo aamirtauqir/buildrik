@@ -13,9 +13,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
-import { EVENTS } from "../../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import type { LayerItem } from "../types";
 import { dropLockedAndInstances } from "@/engine/commands/commandOperations";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";

@@ -13,8 +13,8 @@
  *
  * @license BSD-3-Clause
  */
-import { Composer } from "../../Composer";
-import type { ComposerConfig } from "../../../shared/types";
+import { Composer } from "@/engine/Composer";
+import type { ComposerConfig } from "@/shared/types";
 
 let originalGetContext: typeof HTMLCanvasElement.prototype.getContext | undefined;
 

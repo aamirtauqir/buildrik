@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import type { PresetCategory, StylePreset } from "../../types";
+import type { PresetCategory, StylePreset } from "@/editor/design-system/types";
 import {
   useButtonPresets,
   useCardPresets,
@@ -24,7 +24,7 @@ import {
   useTablePresets,
   useLayoutPresets,
   PRESET_CATEGORIES,
-} from "../../state/StylePresetRegistryContext";
+} from "@/editor/design-system/state/StylePresetRegistryContext";
 import { StyleCategoryRow } from "./StyleCategoryRow";
 import { BrandCard } from "../BrandCard";
 import { PresetDetailPane } from "./PresetDetailPane";

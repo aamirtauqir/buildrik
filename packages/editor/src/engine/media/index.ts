@@ -73,7 +73,7 @@ export type {
   ImageDimensions,
   AspectRatioPreset,
   FilterPreset,
-} from "../../shared/types/media";
+} from "@/shared/types/media";
 
 // Re-export constants
 export {
@@ -89,7 +89,7 @@ export {
   isAllowedMimeType,
   getMaxFileSize,
   getAssetTypeFromMime,
-} from "../../shared/constants/media";
+} from "@/shared/constants/media";
 
 // Re-export defaults from types
 export {
@@ -98,4 +98,4 @@ export {
   DEFAULT_UPLOAD_CONFIG,
   DEFAULT_EXPORT_OPTIONS,
   ASPECT_RATIO_PRESETS,
-} from "../../shared/types/media";
+} from "@/shared/types/media";

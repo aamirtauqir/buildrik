@@ -16,7 +16,7 @@ vi.mock("../tabs/settings/SettingsTab", () => ({
   ),
 }));
 
-vi.mock("../../media/LibraryManager", () => ({
+vi.mock("@/editor/media/LibraryManager", () => ({
   LibraryManager: () => <div data-testid="fp-library" />,
 }));
 

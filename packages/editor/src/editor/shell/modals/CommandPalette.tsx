@@ -19,11 +19,11 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
-import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
-import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
-import { formatChord } from "../../canvas/controls/keyboardSheetRows";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
+import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";

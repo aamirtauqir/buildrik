@@ -17,10 +17,10 @@ import {
   getIconsByCategory,
   ICON_CATEGORY_IDS,
   type IconDefinition,
-} from "../../shared/constants/icons";
-import { InputField } from "../../shared/forms";
-import type { IconConfig, IconLibrary } from "../../shared/types/media";
-import { STORAGE_KEYS } from "../../shared/constants/storageKeys";
+} from "@/shared/constants/icons";
+import { InputField } from "@/shared/forms";
+import type { IconConfig, IconLibrary } from "@/shared/types/media";
+import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 // ============================================
 // Types
 // ============================================

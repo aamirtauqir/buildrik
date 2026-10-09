@@ -139,7 +139,7 @@ describe("the three documents carry the token definitions", () => {
   });
 
   it("the preview document declares them", async () => {
-    const { Composer } = await import("../../Composer");
+    const { Composer } = await import("@/engine/Composer");
     const c = Object.create(Composer.prototype) as InstanceType<typeof Composer>;
     Object.assign(c, {
       elements: { toHTML: () => "<div></div>", getActivePage: () => ({ name: "Home" }) },
@@ -199,7 +199,7 @@ describe("the three documents follow the brand switch", () => {
     const single = engine.generateCSS();
     const { files } = await engine.exportAllPages({ format: "html" });
     const published = files.find((f) => f.name === "styles.css")?.content ?? "";
-    const { Composer } = await import("../../Composer");
+    const { Composer } = await import("@/engine/Composer");
     const c = Object.create(Composer.prototype) as InstanceType<typeof Composer>;
     Object.assign(c, {
       elements: { toHTML: () => "<div></div>", getActivePage: () => ({ name: "Home" }) },

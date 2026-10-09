@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FormHandler, type FormConfig } from "../FormHandler";
 import { EVENTS } from "@/shared/constants";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 
 let composer: { emit: ReturnType<typeof vi.fn> };
 let handler: FormHandler;

@@ -9,8 +9,8 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { Section } from "../../shared/controls";
-import { attributeFieldsFor } from "../../config/attributeFields";
+import { Section } from "@/editor/inspector/shared/controls";
+import { attributeFieldsFor } from "@/editor/inspector/config/attributeFields";
 import { PropertyRows } from "../typeBlock/PropertyField";
 import { DataAttributeEditor } from "./DataAttributeEditor";
 

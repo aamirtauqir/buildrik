@@ -4,7 +4,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { EVENTS } from "../../../../shared/constants";
+import { EVENTS } from "@/shared/constants";
 import { useDeepLink } from "../useDeepLink";
 
 function fakeComposer({ activePageId = "p1", hasElement = true } = {}) {

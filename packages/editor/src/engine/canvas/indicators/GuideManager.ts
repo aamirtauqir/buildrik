@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { CanvasGuide, RulerConfig, ParentBoundaryGuide } from "../../../shared/types/canvas";
-import type { Composer } from "../../Composer";
+import type { CanvasGuide, RulerConfig, ParentBoundaryGuide } from "@/shared/types/canvas";
+import type { Composer } from "@/engine/Composer";
 import { BoundsCalculator } from "./BoundsCalculator";
 
 /**

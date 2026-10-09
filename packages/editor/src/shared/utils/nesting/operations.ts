@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementType } from "../../types";
+import type { ElementType } from "@/shared/types";
 import { FORBIDDEN_NESTING, ALLOWED_CHILDREN } from "./derived";
 import { findElementById, getParentElement, cloneTree } from "./treeOps";
 import { canHaveChildren, isInteractiveType } from "./typeChecks";

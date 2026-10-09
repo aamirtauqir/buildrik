@@ -12,15 +12,15 @@
  */
 
 import { useCallback, useState, useEffect, useRef } from "react";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
-import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
-import { getDefaultStyles } from "../../../shared/constants/defaultStyles";
-import { EVENTS } from "../../../shared/constants";
-import { getDOMElement } from "../../../engine/canvas/resize/utils";
-import type { PseudoStateId } from "../../../shared/types";
-import type { BreakpointId } from "../../../shared/types/breakpoints";
-import { devLogger } from "../../../shared/utils/devLogger";
+import { getBreakpointQuery } from "@/shared/constants/breakpoints";
+import { getDefaultStyles } from "@/shared/constants/defaultStyles";
+import { EVENTS } from "@/shared/constants";
+import { getDOMElement } from "@/engine/canvas/resize/utils";
+import type { PseudoStateId } from "@/shared/types";
+import type { BreakpointId } from "@/shared/types/breakpoints";
+import { devLogger } from "@/shared/utils/devLogger";
 import { computeEffectiveStyles } from "../config/cssContext";
 import { canWrite, setStyleAt, writableElements } from "@/engine/commands/commandOperations";
 

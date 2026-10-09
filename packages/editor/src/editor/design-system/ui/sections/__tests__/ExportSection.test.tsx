@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { ExportSection } from "../ExportSection";
-import { TokenRegistryProvider } from "../../../state/TokenRegistryContext";
+import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 
 const wrap = (ui: React.ReactNode) => (

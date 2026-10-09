@@ -39,7 +39,7 @@ import {
   createMockComposer,
   type MockComposer,
 } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
-import type { PageItem } from "../../types";
+import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 
 interface ToastArg {
   description?: string;

@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 
-import { placeholderImageSrc } from "../../shared/constants/media";
+import { placeholderImageSrc } from "@/shared/constants/media";
 
 export const galleryBlockConfig = {
   id: "gallery",

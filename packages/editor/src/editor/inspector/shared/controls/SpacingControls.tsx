@@ -18,7 +18,7 @@ import { FieldDot } from "./FieldDot";
 import { useInspectorField, mixedName } from "./InspectorFieldContext";
 import { unitWords } from "./InputControls";
 import { TextField, Button, TextInput, IconButton } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import { isTokenVar, extractVarName, cssVarToTokenId, resolveTokenVar } from "../tokenBindingDetection";
 

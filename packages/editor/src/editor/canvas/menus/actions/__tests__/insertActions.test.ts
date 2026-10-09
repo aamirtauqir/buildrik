@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { insertSubmenu } from "../insertActions";
-import type { ActionContext } from "../../contextMenuRegistry";
+import type { ActionContext } from "@/editor/canvas/menus/contextMenuRegistry";
 import {
   makeComposer,
   makeElementStub,
@@ -14,8 +14,8 @@ import {
   asComposer,
   type ComposerStub,
   type ElementStub,
-} from "../../../__tests__/testHarness";
-import type { Element } from "../../../../../engine";
+} from "@/editor/canvas/__tests__/testHarness";
+import type { Element } from "@/engine";
 
 function action(id: string) {
   const found = insertSubmenu.find((a) => a.id === id);

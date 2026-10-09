@@ -17,8 +17,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { IconConfig, MediaAsset, MediaAssetType } from "../../../shared/types/media";
+import type { Composer } from "@/engine";
+import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
 import type { CssContext, PropertyState } from "../config/cssContext";
 import { SECTION_ORDER } from "../config/sectionOrder";
 import type { UseAdvancedSettingsReturn } from "../hooks/useAdvancedSettings";

@@ -18,9 +18,9 @@
  */
 
 import type { Composer } from "../Composer";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import type { Element } from "../elements/Element";
-import { MEDIA_EVENTS } from "../../shared/constants/media";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { isSafeSrc } from "./MediaHelpers";
 import {
   MediaNoActivePageError,

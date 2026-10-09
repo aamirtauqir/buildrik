@@ -17,7 +17,7 @@ const summarize = vi.hoisted(() => vi.fn());
 vi.mock("@/services/ai/AiTrpcClient", () => ({ aiTrpcClient: { summarize } }));
 
 import { useAISummary } from "../useAISummary";
-import type { NamedVersion, CompareResult } from "../../../../shared/types/versions";
+import type { NamedVersion, CompareResult } from "@/shared/types/versions";
 
 const BASE = 1_000_000;
 const compare = {

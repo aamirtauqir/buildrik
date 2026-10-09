@@ -14,14 +14,14 @@ import { render, screen, fireEvent, cleanup, act } from "@testing-library/react"
 vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-vi.mock("../../tabs/InspectorTabContent", () => ({
+vi.mock("@/editor/inspector/tabs/InspectorTabContent", () => ({
   InspectorTabContent: () => <div data-testid="inspector-body" />,
 }));
-vi.mock("../../sections/ComponentRow", () => ({ ComponentRow: () => null }));
+vi.mock("@/editor/inspector/sections/ComponentRow", () => ({ ComponentRow: () => null }));
 vi.mock("../InspectorElementMenu", () => ({ InspectorElementMenu: () => null }));
 vi.mock("../DeleteConfirmModal", () => ({ DeleteConfirmModal: () => null }));
 
-import { ProInspector } from "../../ProInspector";
+import { ProInspector } from "@/editor/inspector/ProInspector";
 
 type Handler = (p: unknown) => void;
 

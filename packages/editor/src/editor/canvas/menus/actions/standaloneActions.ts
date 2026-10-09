@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 
-import { runTransaction } from "../../../../shared/utils/helpers";
+import { runTransaction } from "@/shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
 import { ELEMENT_ACTIONS, type ElementActionId } from "@/editor/shared/elementActions";
 

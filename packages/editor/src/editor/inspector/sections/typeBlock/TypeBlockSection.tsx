@@ -9,8 +9,8 @@
  */
 
 import * as React from "react";
-import { Section } from "../../shared/controls";
-import { TYPE_BLOCKS, type TypeBlockBodyProps } from "../../config/typeBlocks";
+import { Section } from "@/editor/inspector/shared/controls";
+import { TYPE_BLOCKS, type TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 

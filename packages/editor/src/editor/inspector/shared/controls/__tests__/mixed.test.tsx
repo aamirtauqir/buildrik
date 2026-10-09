@@ -26,7 +26,7 @@ import {
   TextInputRow,
 } from "..";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "../InspectorFieldContext";
-import { FontPicker } from "../../../sections/typography/FontPicker";
+import { FontPicker } from "@/editor/inspector/sections/typography/FontPicker";
 
 const ctx = (mixed: string[]): InspectorFieldContextValue => ({
   readOnly: false,

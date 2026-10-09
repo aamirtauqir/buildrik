@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Section, SelectRow, TextInputRow } from "../../shared/controls";
+import { Section, SelectRow, TextInputRow } from "@/editor/inspector/shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
 
 const CURSORS = [

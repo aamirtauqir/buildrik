@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import { requestInsertGroup, requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
@@ -14,11 +14,11 @@ import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
 /** Grey left each side of the page card when the canvas fits on load. */
 const FIT_GUTTER = 60;
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
-import { stepZoom } from "../../shared/constants/canvas";
-import { getBreakpointForWidth } from "../../shared/constants/breakpoints";
-import type { DeviceType } from "../../shared/types";
+import { stepZoom } from "@/shared/constants/canvas";
+import { getBreakpointForWidth } from "@/shared/constants/breakpoints";
+import type { DeviceType } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
-import { getElementId } from "../../shared/utils/dragDrop";
+import { getElementId } from "@/shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
 import { DEVICE_SIZES } from "./Canvas.types";
 import { CanvasEmptyCTA } from "./CanvasEmptyCTA";

@@ -17,7 +17,7 @@ import "@testing-library/jest-dom";
 import * as React from "react";
 import { FontPicker } from "../FontPicker";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 
 function composerWithFonts(families: string[]) {
   const listeners = new Map<string, Set<(p?: unknown) => void>>();
@@ -136,7 +136,7 @@ describe("FontPicker — Clone 3721:43084, the picker's offer", () => {
 
 describe("FontPicker — read-only (DD-18)", () => {
   it("stays legible and focusable, and refuses to open or change", async () => {
-    const { InspectorFieldContext } = await import("../../../shared/controls/InspectorFieldContext");
+    const { InspectorFieldContext } = await import("@/editor/inspector/shared/controls/InspectorFieldContext");
     const onChange = vi.fn();
     render(
       <InspectorFieldContext.Provider

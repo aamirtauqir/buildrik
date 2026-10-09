@@ -13,9 +13,9 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementData } from "../../../shared/types";
-import { getDefaultTagName } from "../../../shared/utils/html";
-import { parserHoists } from "../../../shared/utils/nesting";
+import type { ElementData } from "@/shared/types";
+import { getDefaultTagName } from "@/shared/utils/html";
+import { parserHoists } from "@/shared/utils/nesting";
 
 const tagOf = (data: ElementData): string => data.tagName || getDefaultTagName(data.type);
 

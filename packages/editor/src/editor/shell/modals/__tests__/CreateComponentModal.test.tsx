@@ -16,7 +16,7 @@ vi.mock("@/editor/chrome-ui", async (importActual) => {
   const actual = await importActual<typeof import("@/editor/chrome-ui")>();
   return { ...actual, useToast: () => ({ addToast: addToastMock }) };
 });
-vi.mock("../../../../engine/components/matchingGroups", () => ({
+vi.mock("@/engine/components/matchingGroups", () => ({
   findMatchingElements: (...a: unknown[]) => findMatching(...(a as [])),
 }));
 

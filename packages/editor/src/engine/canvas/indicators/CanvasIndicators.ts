@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../../shared/constants";
+import { EVENTS } from "@/shared/constants";
 import type {
   SpacingIndicator,
   ElementBadge,
@@ -21,9 +21,9 @@ import type {
   HoverHighlight,
   GapHighlight,
   AutoLayoutIndicator,
-} from "../../../shared/types/canvas";
-import type { Composer } from "../../Composer";
-import { EventEmitter } from "../../EventEmitter";
+} from "@/shared/types/canvas";
+import type { Composer } from "@/engine/Composer";
+import { EventEmitter } from "@/engine/EventEmitter";
 import { AutoLayoutManager } from "./AutoLayoutManager";
 import { BoundsCalculator } from "./BoundsCalculator";
 import { GuideManager } from "./GuideManager";

@@ -19,7 +19,7 @@
  */
 
 import { flatCatalog } from "./catalog";
-import { getBlockDefinitions, componentBlockDefinitions, type BlockDefinition } from "../../../../../blocks/blockRegistry";
+import { getBlockDefinitions, componentBlockDefinitions, type BlockDefinition } from "@/blocks/blockRegistry";
 
 export type InsertGroupId = "favourites" | "recent" | "elements" | "blocks" | "components" | "mine";
 

@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import type { MilestoneSuggestion } from "../../../../../shared/hooks/useAutoMilestone";
+import type { MilestoneSuggestion } from "@/shared/hooks/useAutoMilestone";
 import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface MilestoneSuggestionBannerProps {

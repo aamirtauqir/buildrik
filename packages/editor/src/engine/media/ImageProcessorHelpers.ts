@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ImageAdjustments, ImageFilters, ImageExportOptions } from "../../shared/types/media";
+import type { ImageAdjustments, ImageFilters, ImageExportOptions } from "@/shared/types/media";
 
 // ============================================
 // Filter String Builders

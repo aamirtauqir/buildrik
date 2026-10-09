@@ -8,7 +8,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { CommandCenter } from "../CommandCenter";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 import type { CommandData } from "@/shared/types";
 
 function makeComposer() {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePresetsForCategory } from "../usePresetsForCategory";
-import type { StylePreset } from "../../types";
+import type { StylePreset } from "@/editor/design-system/types";
 
 const mk = (id: string, category: StylePreset["category"], variant = "primary"): StylePreset => ({
   id,

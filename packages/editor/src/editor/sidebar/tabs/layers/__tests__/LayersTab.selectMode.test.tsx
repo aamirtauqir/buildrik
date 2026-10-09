@@ -15,7 +15,7 @@
  */
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 
 vi.mock("@/editor/panels/layers/index", () => ({
   LayersPanel: (props: { selecting?: boolean }) => {

@@ -8,16 +8,16 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import type {
   IconConfig,
   MediaAsset,
   MediaAssetType,
-} from "../../../../shared/types/media";
-import type { CssContext, PropertyState } from "../../config/cssContext";
-import type { SectionDisplayMode } from "../../shared/controls/Section";
+} from "@/shared/types/media";
+import type { CssContext, PropertyState } from "@/editor/inspector/config/cssContext";
+import type { SectionDisplayMode } from "@/editor/inspector/shared/controls/Section";
 import type { ElementCapabilities } from "@/shared/constants/elementCapabilities";
-import { masterOverrideProps } from "../../hooks/useFieldOverrides";
+import { masterOverrideProps } from "@/editor/inspector/hooks/useFieldOverrides";
 
 // ============================================================================
 // PICK KEYS HELPER — slices ctx.styles to only the keys a section reads,

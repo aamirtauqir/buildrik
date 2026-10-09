@@ -10,7 +10,7 @@
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { TypeBlockSection } from "../TypeBlockSection";
-import { AttributesSection } from "../../attributes/AttributesSection";
+import { AttributesSection } from "@/editor/inspector/sections/attributes/AttributesSection";
 import { makeMockElement, makeMockComposer } from "@/editor/inspector/__tests__/harness";
 
 function setup(type: string, attrs: Record<string, string> = {}) {

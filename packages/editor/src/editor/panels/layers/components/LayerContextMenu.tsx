@@ -13,7 +13,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
+import { useClickOutside } from "@/shared/hooks/useClickOutside";
 import type { LayerAction } from "../types";
 import { Button } from "@/editor/chrome-ui";
 

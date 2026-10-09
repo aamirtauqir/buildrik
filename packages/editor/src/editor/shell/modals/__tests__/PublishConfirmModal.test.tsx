@@ -16,7 +16,7 @@ import * as React from "react";
 const exportPublishPages = vi.fn();
 const fetchCurrentRound = vi.fn();
 
-vi.mock("../../exportPublishPages", () => ({
+vi.mock("@/editor/shell/exportPublishPages", () => ({
   exportPublishPages: (c: unknown) => exportPublishPages(c),
 }));
 vi.mock("@/services/ReviewService", () => ({

@@ -9,7 +9,7 @@ import * as React from "react";
 import { render, screen, fireEvent, cleanup, act, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../services/ReviewService", () => ({
+vi.mock("@/services/ReviewService", () => ({
   /* Returns the real `SubmitOutcome` shape. It used to resolve `undefined`,
      which was fine while the caller ignored the value — the moment the caller
      started reading `inviteEmailSent`, two unrelated tests failed on a mock
@@ -21,7 +21,7 @@ vi.mock("../exportPublishPages", () => ({
 }));
 
 import { SendForReview } from "../SendForReview";
-import { submitForReview } from "../../../services/ReviewService";
+import { submitForReview } from "@/services/ReviewService";
 
 afterEach(() => {
   cleanup();

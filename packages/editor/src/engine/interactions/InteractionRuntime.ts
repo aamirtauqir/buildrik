@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { devLog, devError } from "../../shared/utils/devLogger";
+import { devLog, devError } from "@/shared/utils/devLogger";
 import { gsapEngine, type TimelineStep } from "../animations/GSAPEngine";
 import type { Interaction } from "./types";
 

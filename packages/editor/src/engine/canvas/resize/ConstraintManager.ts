@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import { devLog } from "../../../shared/utils/devLogger";
-import { clamp } from "../../../shared/utils/helpers";
+import { devLog } from "@/shared/utils/devLogger";
+import { clamp } from "@/shared/utils/helpers";
 import type { TransformBounds, SizeConstraints, BoundaryConstraints, Bounds } from "./types";
 
 /**

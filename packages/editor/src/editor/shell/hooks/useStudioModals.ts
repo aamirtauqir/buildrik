@@ -22,8 +22,8 @@
  */
 
 import * as React from "react";
-import type { IconConfig } from "../../../shared/types/media";
-import type { EditsSnapshot, ImageEditorTab } from "../../media/ImageEditorModal";
+import type { IconConfig } from "@/shared/types/media";
+import type { EditsSnapshot, ImageEditorTab } from "@/editor/media/ImageEditorModal";
 import { useGlobalModals } from "./useGlobalModals";
 import { useContentModals } from "./useContentModals";
 import { useDomainModals } from "./useDomainModals";

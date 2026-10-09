@@ -16,7 +16,7 @@ import { CMSExportResolver } from "../CMSExportResolver";
 import { CMSBindingManager } from "../CMSBindingManager";
 import { CollectionManager } from "../CollectionManager";
 import * as Storage from "../CollectionStorage";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 
 vi.mock("../CollectionStorage", async () => {
   const { createInMemoryCollectionStorage } = await import("./inMemoryCollectionStorage");

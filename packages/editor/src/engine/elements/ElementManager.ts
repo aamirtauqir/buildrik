@@ -6,9 +6,9 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants/events";
-import type { ElementData, PageData, ExportOptions } from "../../shared/types";
-import { generateId } from "../../shared/utils/helpers";
+import { EVENTS } from "@/shared/constants/events";
+import type { ElementData, PageData, ExportOptions } from "@/shared/types";
+import { generateId } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import { Element } from "./Element";
 import { PreviewLayer } from "./PreviewLayer";

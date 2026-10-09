@@ -7,8 +7,8 @@
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import { useSectionReorder } from "../useSectionReorder";
 
 const SECTION_EVENTS = [

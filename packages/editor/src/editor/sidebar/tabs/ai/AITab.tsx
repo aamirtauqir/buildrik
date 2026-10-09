@@ -1,7 +1,7 @@
 import * as React from "react";
 import { X } from "lucide-react";
 import { ConfirmDialog, PanelFrame, Button, IconButton } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import type { AIScope } from "./types";
 import type { RunPool } from "./hooks/useAgentRunner";
 import { ScopeChip } from "./ScopeChip";

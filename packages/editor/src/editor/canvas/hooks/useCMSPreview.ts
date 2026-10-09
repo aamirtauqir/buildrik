@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { devError } from "../../../shared/utils/devLogger";
+import type { Composer } from "@/engine";
+import { devError } from "@/shared/utils/devLogger";
 import { EVENTS } from "@/shared/constants/events";
 import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys, writeBoundValue } from "@/engine/cms/RepeaterRenderer";
 import { isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";

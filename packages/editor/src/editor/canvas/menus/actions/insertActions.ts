@@ -7,7 +7,7 @@
  */
 
 import type { ContextAction } from "../contextMenuRegistry";
-import { wrapInContainer } from "../../utils/wrapInContainer";
+import { wrapInContainer } from "@/editor/canvas/utils/wrapInContainer";
 import { writeElement } from "@/engine/commands/commandOperations";
 
 export const insertSubmenu: ContextAction[] = [

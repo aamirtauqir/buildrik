@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { FormSettings } from "../../shared/types";
+import type { FormSettings } from "@/shared/types";
 
 // ============================================================================
 // CONSTANTS

@@ -22,11 +22,11 @@ vi.mock("../api-client", () => ({
     },
   }),
 }));
-vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
+vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 
 const loadVersions = vi.fn();
 const saveVersion = vi.fn();
-vi.mock("../../engine/storage/VersionHistoryStorage", () => ({
+vi.mock("@/engine/storage/VersionHistoryStorage", () => ({
   loadVersions: (...a: unknown[]) => loadVersions(...a),
   saveVersion: (...a: unknown[]) => saveVersion(...a),
 }));

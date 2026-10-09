@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import { EventEmitter } from "../../EventEmitter";
+import { EventEmitter } from "@/engine/EventEmitter";
 
 export interface InputModifiers {
   shift: boolean;

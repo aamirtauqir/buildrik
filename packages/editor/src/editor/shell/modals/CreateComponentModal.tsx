@@ -35,8 +35,8 @@ import {
   TextInput,
   useToast,
 } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import { findMatchingElements } from "../../../engine/components/matchingGroups";
+import type { Composer } from "@/engine";
+import { findMatchingElements } from "@/engine/components/matchingGroups";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { EVENTS } from "@/shared/constants";
 

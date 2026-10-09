@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import type { PseudoStateId } from "../../../shared/types";
+import type { PseudoStateId } from "@/shared/types";
 
 // ============================================================================
 // TYPES

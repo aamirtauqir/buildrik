@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import type { DeviceType } from "../../shared/types";
+import type { DeviceType } from "@/shared/types";
 import { Button } from "@/editor/chrome-ui";
 // ─── Types ──────────────────────────────────────────────────────────────────
 

@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { Rect } from "../../types";
+import type { Rect } from "@/shared/types";
 
 // =============================================================================
 // ANIMATION HELPERS

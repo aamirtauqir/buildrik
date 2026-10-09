@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { CATALOG, flatCatalog } from "./catalog";
-import { getBlockDefinitions } from "../../../../../blocks/blockRegistry";
+import { getBlockDefinitions } from "@/blocks/blockRegistry";
 
 describe("Build Tab Catalog — blockId integrity", () => {
   const registryIds = new Set(getBlockDefinitions().map((b) => b.id));

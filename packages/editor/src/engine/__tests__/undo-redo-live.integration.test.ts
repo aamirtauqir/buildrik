@@ -13,7 +13,7 @@
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
 import { Composer } from "../Composer";
-import type { ProjectData } from "../../shared/types";
+import type { ProjectData } from "@/shared/types";
 
 // Coalesce delay used by HistoryManager (config.coalesceDelay).
 const COALESCE = 500;

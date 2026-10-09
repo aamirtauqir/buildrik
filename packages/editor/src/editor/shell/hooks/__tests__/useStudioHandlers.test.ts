@@ -10,11 +10,11 @@
 import { renderHook, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useStudioHandlers, type UseStudioHandlersParams } from "../useStudioHandlers";
-import { STORAGE_KEYS } from "../../../../shared/constants/config";
+import { STORAGE_KEYS } from "@/shared/constants/config";
 
 let templateErrCb: (() => void) | null = null;
 let templatePending = 0;
-vi.mock("../../../../services/templateSync", () => ({
+vi.mock("@/services/templateSync", () => ({
   mirrorUserTemplate: vi.fn(() => Promise.resolve(true)),
   retryTemplateSync: vi.fn(() => Promise.resolve()),
   getTemplateSyncPendingCount: () => templatePending,
@@ -29,7 +29,7 @@ vi.mock("../../../../services/templateSync", () => ({
 const dismissed: string[] = [];
 vi.mock("@/editor/chrome-ui", () => ({ dismissToast: (id: string) => dismissed.push(id) }));
 
-import { mirrorUserTemplate, retryTemplateSync } from "../../../../services/templateSync";
+import { mirrorUserTemplate, retryTemplateSync } from "@/services/templateSync";
 
 // ---------------------------------------------------------------------------
 // Mock element / composer factories

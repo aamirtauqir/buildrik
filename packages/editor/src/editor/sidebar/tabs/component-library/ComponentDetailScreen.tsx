@@ -11,9 +11,9 @@
 
 import * as React from "react";
 import { ConfirmDialog, useToast, Button, IconButton, PanelBackRow, TextInput, type ToastInput } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine";
-import type { ComponentDefinition } from "../../../../shared/types/components";
-import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
+import type { Composer } from "@/engine";
+import type { ComponentDefinition } from "@/shared/types/components";
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { captureComponentThumbnail } from "./captureComponentThumbnail";
 import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
 /* Same "switch page, then select + scroll to the element" seam Review's

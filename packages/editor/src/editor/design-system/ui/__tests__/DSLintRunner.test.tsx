@@ -21,7 +21,7 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Composer } from "@/engine";
 import { LintState } from "@/engine/designSystem/LintState";
-import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
+import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
 import { DSLintRunner } from "../DSLintRunner";
 
 const FOUND = [

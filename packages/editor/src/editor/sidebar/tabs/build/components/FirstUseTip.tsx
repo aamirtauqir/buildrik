@@ -9,8 +9,8 @@
  */
 import * as React from "react";
 import { Button, Portal } from "@/editor/chrome-ui";
-import { safeGet, safeSet } from "../../../../../shared/utils/safeStorage";
-import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
+import { safeGet, safeSet } from "@/shared/utils/safeStorage";
+import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 import { TIPS } from "../catalog/tips";
 
 /** 4418:99611 → 7054:78348 is an AFTER (timer) reaction. */

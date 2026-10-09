@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import { THRESHOLDS } from "../../constants";
-import type { Point } from "../../types";
+import { THRESHOLDS } from "@/shared/constants";
+import type { Point } from "@/shared/types";
 import type { AutoScrollConfig } from "./types";
 
 // =============================================================================

@@ -8,9 +8,9 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { THRESHOLDS } from "../../../constants";
-import type { ElementType } from "../../../types";
-import type { Element } from "../../../../engine/elements/Element";
+import { THRESHOLDS } from "@/shared/constants";
+import type { ElementType } from "@/shared/types";
+import type { Element } from "@/engine/elements/Element";
 import {
   validateDrop,
   validateElementDrop,

@@ -4,9 +4,9 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../engine";
-import { DEVICE_PREVIEW_SIZES } from "../../shared/constants/breakpoints";
-import type { DeviceType } from "../../shared/types";
+import type { Composer } from "@/engine";
+import { DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
+import type { DeviceType } from "@/shared/types";
 import type { CanvasOverlayState } from "./CanvasFooterToolbar";
 
 export interface CanvasProps {

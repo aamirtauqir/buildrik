@@ -6,12 +6,12 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants";
-import { stepZoom } from "../../shared/constants/canvas";
-import type { CommandData, CommandOptions, ElementType } from "../../shared/types";
+import { EVENTS } from "@/shared/constants";
+import { stepZoom } from "@/shared/constants/canvas";
+import type { CommandData, CommandOptions, ElementType } from "@/shared/types";
 /* Explicit: without it `Element` in this file resolves to the DOM one. */
 import type { Element } from "../elements/Element";
-import { canNestElement } from "../../shared/utils/nesting";
+import { canNestElement } from "@/shared/utils/nesting";
 import type { Composer } from "../Composer";
 import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement } from "./commandOperations";
 

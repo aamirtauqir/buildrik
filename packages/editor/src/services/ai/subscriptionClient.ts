@@ -5,7 +5,7 @@ import {
   splitLink,
 } from "@trpc/client";
 import superjson from "superjson";
-import type { AppRouter } from "../../../../../server/trpc/router";
+import type { AppRouter } from "@server/trpc/router";
 
 // Relative "/api/trpc" is intentional — the editor is served same-origin with
 // the dashboard (unification spec §572 / trpc-same-origin.test.ts), so the

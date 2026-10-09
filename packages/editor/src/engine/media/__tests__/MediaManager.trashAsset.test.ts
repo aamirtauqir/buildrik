@@ -5,8 +5,8 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { MediaManager } from "../MediaManager";
-import { MEDIA_EVENTS } from "../../../shared/constants/media";
-import type { MediaAsset } from "../../../shared/types/media";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
+import type { MediaAsset } from "@/shared/types/media";
 
 vi.mock("../MediaOptimizer", () => ({ MediaOptimizer: class { optimize = vi.fn(); } }));
 

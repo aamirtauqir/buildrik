@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from "vitest";
 import type {
   SectionBoundary,
   SectionDragState,
-} from "../../hooks/useSectionReorder";
+} from "@/editor/canvas/hooks/useSectionReorder";
 import { SectionReorderHandles } from "../SectionReorderHandles";
 
 function makeBoundary(id: string, index: number, top: number, label = id, height = 40): SectionBoundary {

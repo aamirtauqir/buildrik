@@ -11,7 +11,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { HistoryManager } from "../HistoryManager";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 function makeComposer() {
   return {

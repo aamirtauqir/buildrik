@@ -7,8 +7,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
+import type { Composer } from "@/engine";
+import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { extractGradientUI, composeGradient, deriveBgType, DEFAULT_GRADIENT_STOPS } from "@/shared/utils/parsers/gradientHelpers";
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier } from "../shared/controls";
 import { Button, TextInput } from "@/editor/chrome-ui";

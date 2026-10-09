@@ -18,9 +18,9 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import { DEFAULT_TOKENS } from "../../constants";
+import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 import { buildContrastIssues, contrastLintMode, findSurfaceToken, resolveSurface, contrastFails, buildDarkPairIssues, type StyledNode } from "../contrastLint";
 import { proposeMissingDarks } from "@/engine/designSystem/scale";

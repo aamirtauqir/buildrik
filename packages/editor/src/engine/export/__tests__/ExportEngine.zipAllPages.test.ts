@@ -11,7 +11,7 @@
  */
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import JSZip from "jszip";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "../ExportEngine";
 
 beforeAll(() => {

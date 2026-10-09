@@ -10,7 +10,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { elementDataToHTML } from "../generation";
-import type { ElementData } from "../../../types";
+import type { ElementData } from "@/shared/types";
 
 function el(partial: Partial<ElementData>): ElementData {
   return { id: "el1", type: "container", ...partial };

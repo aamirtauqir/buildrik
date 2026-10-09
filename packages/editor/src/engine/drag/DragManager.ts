@@ -9,9 +9,9 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants";
-import type { Point } from "../../shared/types";
-import type { DragData, DropPosition } from "../../shared/utils/dragDrop/types";
+import { EVENTS } from "@/shared/constants";
+import type { Point } from "@/shared/types";
+import type { DragData, DropPosition } from "@/shared/utils/dragDrop/types";
 import type { Composer } from "../Composer";
 import type {
   DragCancelPayload,

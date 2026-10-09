@@ -82,7 +82,7 @@ vi.mock("../drag/dropOperations", () => ({
   handleBlockDrop: vi.fn(() => true),
 }));
 
-vi.mock("../../../../shared/utils/dragDrop", () => ({
+vi.mock("@/shared/utils/dragDrop", () => ({
   findDropTargetElement: vi.fn(() => null),
   getElementId: vi.fn((el: HTMLElement | null) =>
     el?.getAttribute?.("data-buildrick-id") ?? null,
@@ -100,7 +100,7 @@ import {
   handleTemplateDrop,
   handleBlockDrop,
 } from "../drag/dropOperations";
-import { findDropTargetElement } from "../../../../shared/utils/dragDrop";
+import { findDropTargetElement } from "@/shared/utils/dragDrop";
 import { useCanvasDragDrop } from "../useCanvasDragDrop";
 
 // =============================================================================

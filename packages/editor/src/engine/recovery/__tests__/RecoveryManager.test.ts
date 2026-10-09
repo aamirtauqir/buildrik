@@ -9,7 +9,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import { RecoveryManager } from "../RecoveryManager";
 
 const CRASH_SENTINEL_KEY = "buildrick:last-crash";

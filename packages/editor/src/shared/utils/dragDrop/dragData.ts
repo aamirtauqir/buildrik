@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import { MIME_TYPES } from "../../constants";
-import type { ElementType, ElementData, Point } from "../../types";
+import { MIME_TYPES } from "@/shared/constants";
+import type { ElementType, ElementData, Point } from "@/shared/types";
 import { generateId } from "../helpers";
 import type { DragData, DragDataElement, DragDataBlock, DragDataMulti } from "./types";
 

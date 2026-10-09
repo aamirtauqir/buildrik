@@ -12,9 +12,9 @@
  */
 
 import type * as React from "react";
-import { BREAKPOINTS } from "../../shared/constants/breakpoints";
-import { Z_LAYERS } from "../../shared/constants/canvas";
-import type { DeviceType } from "../../shared/types";
+import { BREAKPOINTS } from "@/shared/constants/breakpoints";
+import { Z_LAYERS } from "@/shared/constants/canvas";
+import type { DeviceType } from "@/shared/types";
 
 /* Does NOT scroll — `.bd-canvas-scroll` (Canvas.css) is the viewport, and the
    reason is written there: an absolute child of a scrolling box travels with

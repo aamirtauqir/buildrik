@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Z_LAYERS } from "../../../shared/constants/canvas";
+import { Z_LAYERS } from "@/shared/constants/canvas";
 
 export interface RulersOverlayProps {
   /** Current zoom level (percentage) */

@@ -11,9 +11,9 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { GenerateBlockScreen, generateTarget, type GenerateFn, type ApplyFn } from "../GenerateBlockScreen";
-import { AiRunError, type ServerEdit } from "../../../ai/hooks/runPromptOnce";
+import { AiRunError, type ServerEdit } from "@/editor/sidebar/tabs/ai/hooks/runPromptOnce";
 
-vi.mock("../../../ai/hooks/useAiQuota", () => ({ useAiQuota: () => null, quotaLeftLabel: () => null }));
+vi.mock("@/editor/sidebar/tabs/ai/hooks/useAiQuota", () => ({ useAiQuota: () => null, quotaLeftLabel: () => null }));
 
 const render = (ui: React.ReactElement) => rtlRender(<ToastProvider>{ui}</ToastProvider>);
 

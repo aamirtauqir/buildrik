@@ -15,12 +15,12 @@ import type {
   ImageExportResult,
   ImageFilters,
   RotationDegrees,
-} from "../../shared/types/media";
+} from "@/shared/types/media";
 import {
   DEFAULT_IMAGE_ADJUSTMENTS,
   DEFAULT_IMAGE_FILTERS,
   DEFAULT_EXPORT_OPTIONS,
-} from "../../shared/types/media";
+} from "@/shared/types/media";
 import {
   buildFilterString,
   buildAdjustmentString,

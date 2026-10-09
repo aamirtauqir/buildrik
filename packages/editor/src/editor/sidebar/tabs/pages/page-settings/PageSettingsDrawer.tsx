@@ -20,7 +20,7 @@
 
 import * as React from "react";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 import type { PageItem, DrawerTab } from "../types";
 import { usePageSettings } from "./usePageSettings";
 import { SeoTab } from "./SeoTab";

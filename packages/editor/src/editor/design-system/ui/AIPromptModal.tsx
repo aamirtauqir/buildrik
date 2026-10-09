@@ -24,7 +24,7 @@ import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle, But
 import type {
   AIAssistService,
   ComponentSchema,
-} from "../../../engine/designSystem/services/AIAssistService";
+} from "@/engine/designSystem/services/AIAssistService";
 type ModalState =
   | { kind: "idle" }
   | { kind: "generating"; abort: AbortController }

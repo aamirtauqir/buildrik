@@ -10,7 +10,7 @@
  */
 import * as React from "react";
 import { Button, Label, Modal, TextInput } from "@/editor/chrome-ui";
-import type { DesignToken, TokenKind } from "../../types";
+import type { DesignToken, TokenKind } from "@/editor/design-system/types";
 
 export interface TokenAddDialogProps {
   open: boolean;

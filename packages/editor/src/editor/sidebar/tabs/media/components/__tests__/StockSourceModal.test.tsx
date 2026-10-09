@@ -21,7 +21,7 @@ import { describe, it, expect, vi } from "vitest";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { StockSourceModal } from "../StockSourceModal";
-import type { StockPhoto, StockVideo } from "../../data/mediaTypes";
+import type { StockPhoto, StockVideo } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 function photo(over: Partial<StockPhoto> = {}): StockPhoto {
   return {

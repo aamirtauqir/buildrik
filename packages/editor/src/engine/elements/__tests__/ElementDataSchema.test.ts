@@ -19,7 +19,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import type { ElementData } from "../../../shared/types";
+import type { ElementData } from "@/shared/types";
 
 // A non-trivial fixture: a landing-page hero with nested sections, media,
 // forms, and interactive elements. Exercises every optional field of ElementData

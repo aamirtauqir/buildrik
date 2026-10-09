@@ -47,8 +47,8 @@ const composer = {
   destroy: vi.fn(),
 };
 
-vi.mock("../../../../engine", () => ({ createComposer: vi.fn(() => composer), Composer: class {} }));
-vi.mock("../../../../engine/cms", () => ({
+vi.mock("@/engine", () => ({ createComposer: vi.fn(() => composer), Composer: class {} }));
+vi.mock("@/engine/cms", () => ({
   ProductCollectionService: class {
     hasProductsCollection() { return Promise.resolve(true); }
     createProductsCollection() { return Promise.resolve(); }

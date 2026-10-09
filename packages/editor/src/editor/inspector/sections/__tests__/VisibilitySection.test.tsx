@@ -7,7 +7,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { VisibilitySection } from "../VisibilitySection";
-import { InspectorFieldContext } from "../../shared/controls/InspectorFieldContext";
+import { InspectorFieldContext } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 
 function renderVisibility(styles: Record<string, string> = {}, isOpen = true) {
   const onChange = vi.fn();

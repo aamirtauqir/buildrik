@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 
-vi.mock("../../nesting", () => ({
+vi.mock("@/shared/utils/nesting", () => ({
   canHaveChildren: () => true,
   canNestElement: () => true,
 }));

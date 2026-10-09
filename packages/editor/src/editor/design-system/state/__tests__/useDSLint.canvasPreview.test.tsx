@@ -14,8 +14,8 @@ import { useDSLint } from "../useDSLint";
 import { TokenRegistryProvider } from "../TokenRegistryContext";
 
 const contrast = vi.hoisted(() => vi.fn(() => []));
-vi.mock("../../utils/contrastLint", async (orig) => ({
-  ...(await orig<typeof import("../../utils/contrastLint")>()),
+vi.mock("@/editor/design-system/utils/contrastLint", async (orig) => ({
+  ...(await orig<typeof import("@/editor/design-system/utils/contrastLint")>()),
   buildContrastIssues: contrast,
 }));
 

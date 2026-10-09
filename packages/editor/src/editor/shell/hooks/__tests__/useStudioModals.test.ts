@@ -10,7 +10,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { useStudioModals } from "../useStudioModals";
-import type { IconConfig } from "../../../../shared/types/media";
+import type { IconConfig } from "@/shared/types/media";
 
 describe("useStudioModals", () => {
   it("starts with every modal closed and no contexts", () => {

@@ -6,7 +6,7 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { useSelectionAnnouncement } from "../useSelectionAnnouncement";
 
 // Minimal Composer mock — only elements.getElement is needed

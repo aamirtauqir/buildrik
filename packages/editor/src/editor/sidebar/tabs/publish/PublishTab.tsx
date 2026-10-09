@@ -27,17 +27,17 @@ import * as React from "react";
 import { PanelFrame, Button, Menu, MenuItem, Modal, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
 import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { SettingsNavId } from "../settings/types";
-import type { Composer } from "../../../../engine";
-import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
-import type { NextMove } from "../../../shell/lifecycle";
+import type { Composer } from "@/engine";
+import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
+import type { NextMove } from "@/editor/shell/lifecycle";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { fetchPrePublishChecks, unpublishSite } from "../../../../services/PublishService";
+import { fetchPrePublishChecks, unpublishSite } from "@/services/PublishService";
 import { EVENTS } from "@/shared/constants";
 import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
 import { CHECK_DOOR, PrePublishChecks } from "./PrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
 import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
-import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import {
   VERCEL_CHECK_LABEL,
   type PrePublishChecksResult,

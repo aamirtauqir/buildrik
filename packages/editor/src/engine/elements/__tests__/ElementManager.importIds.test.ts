@@ -11,7 +11,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { ElementData, PageData } from "../../../shared/types";
+import type { ElementData, PageData } from "@/shared/types";
 import { makeEngine } from "./harness";
 
 function storedPage(id: string, name: string, text: string): PageData {

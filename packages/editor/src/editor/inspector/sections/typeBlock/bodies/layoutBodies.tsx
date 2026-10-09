@@ -12,10 +12,10 @@
  */
 
 import * as React from "react";
-import type { TypeBlockBodyProps } from "../../../config/typeBlocks";
+import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
-import { FlexControls } from "../../layout/FlexControls";
-import { GridControls } from "../../layout/GridControls";
+import { FlexControls } from "@/editor/inspector/sections/layout/FlexControls";
+import { GridControls } from "@/editor/inspector/sections/layout/GridControls";
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 
 const COLUMNS_ROWS: readonly PropertyConfig[] = [

@@ -16,7 +16,7 @@ vi.mock("@/editor/design-system/state/useBrandRestorePoints", () => ({ takeResto
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "s1" }));
 
 import { ScaleGenerator } from "../ScaleGenerator";
-import { wrap } from "../../__tests__/brandWorkspaceHarness";
+import { wrap } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
 function fake(designTokens: DesignToken[] = DEFAULT_TOKENS) {
   const settings: Record<string, unknown> = { designTokens, designTokensSchemaVersion: 6, darkMode: "auto" };

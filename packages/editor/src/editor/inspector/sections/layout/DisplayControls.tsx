@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { ButtonGroup, SelectRow } from "../../shared/controls";
+import { ButtonGroup, SelectRow } from "@/editor/inspector/shared/controls";
 
 export interface DisplayControlsProps {
   display: string;

@@ -18,7 +18,7 @@ vi.mock("@/services/RoleService", () => ({
 vi.mock("@/services/unsavedRecovery", () => ({ keepUnsaved: () => {}, clearUnsaved: () => {} }));
 
 import { refuseForbiddenSave } from "../useSaveCallback";
-import { isUnloadGuardBypassed, navigateBypassingUnloadGuard } from "../../unloadGuardBypass";
+import { isUnloadGuardBypassed, navigateBypassingUnloadGuard } from "@/editor/shell/unloadGuardBypass";
 
 beforeEach(() => {
   vi.useFakeTimers();

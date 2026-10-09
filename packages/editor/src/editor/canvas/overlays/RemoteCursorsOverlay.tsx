@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import type { Composer } from "../../../engine/Composer";
-import type { CollaborationUser, CursorPosition } from "../../../shared/types/collaboration";
+import type { Composer } from "@/engine/Composer";
+import type { CollaborationUser, CursorPosition } from "@/shared/types/collaboration";
 
 // ============================================================================
 // TYPES

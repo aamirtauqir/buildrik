@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 import { useCMSPreview } from "./useCMSPreview";
 
 interface UseCanvasContentProps {

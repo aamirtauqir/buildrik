@@ -5,13 +5,13 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import type { Composer } from "../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import type {
   CollaborationUser,
   CollaborationState,
   CollaborationRoom,
   ConnectionQualityStats,
-} from "../../../shared/types/collaboration";
+} from "@/shared/types/collaboration";
 
 // ============================================================================
 // TYPES

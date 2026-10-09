@@ -18,7 +18,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ConfirmDeleteModal } from "../ConfirmDeleteModal";
-import type { ConfirmDeletePayload } from "../../data/mediaTypes";
+import type { ConfirmDeletePayload } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 function payload(over: Partial<ConfirmDeletePayload> = {}): ConfirmDeletePayload {
   return {

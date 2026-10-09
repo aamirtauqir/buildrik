@@ -19,7 +19,7 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ConfirmDeleteModal } from "../ConfirmDeleteModal";
-import type { ConfirmDeletePayload } from "../../data/mediaTypes";
+import type { ConfirmDeletePayload } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 const payload = (over: Partial<ConfirmDeletePayload> = {}): ConfirmDeletePayload => ({
   keys: ["hero"],

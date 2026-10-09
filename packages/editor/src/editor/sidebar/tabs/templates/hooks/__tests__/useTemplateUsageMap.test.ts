@@ -2,7 +2,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { useTemplateUsageMap } from "../useTemplateUsageMap";
-import { EVENTS } from "../../../../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 type Listener = (payload: unknown) => void;
 

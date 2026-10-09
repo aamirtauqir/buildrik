@@ -8,7 +8,7 @@ import {
   relativeLuminance,
   calcContrastRatio,
 } from "@/engine/designSystem/colorMath";
-import type { WcagLevel } from "../../types";
+import type { WcagLevel } from "@/editor/design-system/types";
 
 describe("expandShorthand", () => {
   it("expands #rgb to #rrggbb", () => {

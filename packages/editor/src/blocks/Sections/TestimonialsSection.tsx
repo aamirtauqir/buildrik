@@ -3,7 +3,7 @@
  * A section, distinct from the Testimonials component (id "testimonials").
  * @license BSD-3-Clause
  */
-import type { BlockData, ElementType } from "../../shared/types";
+import type { BlockData, ElementType } from "@/shared/types";
 
 export const testimonialsSectionBlockConfig: BlockData & { elementType: ElementType } = {
   id: "testimonials-section",

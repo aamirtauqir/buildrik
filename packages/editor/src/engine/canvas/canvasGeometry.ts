@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { Rect } from "../../shared/types/geometry";
-import { parseNumericValue } from "../../shared/utils/helpers";
+import type { Rect } from "@/shared/types/geometry";
+import { parseNumericValue } from "@/shared/utils/helpers";
 // Import canonical DOM utilities from resize/utils.ts
 import { getCanvasContainer as _getCanvasContainer } from "./resize/utils";
 
@@ -16,7 +16,7 @@ import { getCanvasContainer as _getCanvasContainer } from "./resize/utils";
 // ============================================
 
 // Re-export Rect from types for convenience
-export type { Rect } from "../../shared/types/geometry";
+export type { Rect } from "@/shared/types/geometry";
 
 export interface TransformRect extends Rect {
   rotation?: number;

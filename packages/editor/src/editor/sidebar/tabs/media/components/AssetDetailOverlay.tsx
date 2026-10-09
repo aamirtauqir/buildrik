@@ -34,7 +34,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import type { LibraryItem } from "../data/mediaTypes";
 import { collectUsageByPage, fmtSize } from "../data/mediaUtils";
-import type { Composer } from "../../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import {
   listAssetVersions,
   restoreAssetVersion,

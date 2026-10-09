@@ -20,11 +20,11 @@ import { render, screen, fireEvent, cleanup, within, waitFor } from "@testing-li
    the real fetchMyRole → network path. Defaults to false (non-viewer) so
    every pre-existing test in this file keeps seeing the full command set. */
 const mockViewerChrome = vi.hoisted(() => vi.fn<() => boolean>(() => false));
-vi.mock("../../hooks/useEditorRole", () => ({ useViewerChrome: () => mockViewerChrome() }));
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({ useViewerChrome: () => mockViewerChrome() }));
 
 import { CommandPalette } from "../CommandPalette";
-import { EVENTS } from "../../../../shared/constants/events";
-import type { Composer } from "../../../../engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine";
 
 type Reg = {
   id: string;

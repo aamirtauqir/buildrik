@@ -9,13 +9,13 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { STORAGE_KEYS } from "../../shared/constants/storageKeys";
-import { DASHBOARD_URL } from "../../shared/utils/runtimeEnv";
+import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import {
   DEFAULT_ONBOARDING_STEPS,
   ONBOARDING_SCHEMA_VERSION,
   type OnboardingStep,
-} from "../../shared/constants/onboardingSteps";
+} from "@/shared/constants/onboardingSteps";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 

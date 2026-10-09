@@ -6,11 +6,11 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../../shared/constants/events";
-import type { ElementBounds } from "../../../shared/types/canvas";
-import { parseNumericValue } from "../../../shared/utils/helpers";
-import type { Composer } from "../../Composer";
-import type { Element } from "../../elements/Element";
+import { EVENTS } from "@/shared/constants/events";
+import type { ElementBounds } from "@/shared/types/canvas";
+import { parseNumericValue } from "@/shared/utils/helpers";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
 
 /**
  * Calculates element bounds from DOM measurements

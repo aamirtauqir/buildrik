@@ -9,7 +9,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { NamedVersion } from "../../../shared/types/versions";
+import type { NamedVersion } from "@/shared/types/versions";
 import {
   saveVersion,
   loadVersion,

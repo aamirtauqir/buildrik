@@ -22,8 +22,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
-import type { MediaAsset, MediaAssetType } from "../../shared/types/media";
+import type { Composer } from "@/engine";
+import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { Button, ModalBody, ModalContent, ModalRoot, TextInput } from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { acceptedFormats, acceptedLimit, acceptedMimes, kindLabel, kindNoun } from "@shared/constants/media";

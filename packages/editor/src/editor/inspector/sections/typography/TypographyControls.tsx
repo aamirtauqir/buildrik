@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { SelectRow, ButtonGroup, InputWithUnit } from "../../shared/controls";
+import { SelectRow, ButtonGroup, InputWithUnit } from "@/editor/inspector/shared/controls";
 
 interface TextControlsProps {
   styles: Record<string, string>;

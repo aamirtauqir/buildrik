@@ -12,10 +12,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
-import type { CanvasGuide } from "../../../shared/types/canvas";
-import { devLogger } from "../../../shared/utils/devLogger";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { CanvasGuide } from "@/shared/types/canvas";
+import { devLogger } from "@/shared/utils/devLogger";
 
 /** A guide drag updates on every pointer move; the site is written once it rests. */
 const PERSIST_DELAY_MS = 300;

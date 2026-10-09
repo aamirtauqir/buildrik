@@ -8,14 +8,14 @@
 
 import * as React from "react";
 import { ToastInput, dismissToast, dismissToastKey } from "@/editor/chrome-ui";
-import { createComposer, Composer } from "../../../engine";
-import { ProductCollectionService } from "../../../engine/cms";
-import { THRESHOLDS } from "../../../shared/constants/config";
+import { createComposer, Composer } from "@/engine";
+import { ProductCollectionService } from "@/engine/cms";
+import { THRESHOLDS } from "@/shared/constants/config";
 import { BRAND_READ_ONLY_FAILED, BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "@/shared/constants/brandReadOnly";
-import { EVENTS, isNavigationOnlyChange } from "../../../shared/constants/events";
+import { EVENTS, isNavigationOnlyChange } from "@/shared/constants/events";
 import type { SaveState } from "./useStudioState";
-import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
-import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
+import { attachAdoptionRevertListener } from "@/services/ai/adoptionTracker";
+import type { ComposerConfig, ProjectData, DeviceType } from "@/shared/types";
 import { importMigratedProject } from "@/editor/design-system";
 import { migrateTokensToV6, TokenMigrationError } from "@buildrik/shared/tokens";
 import { TOKENS_SCHEMA_VERSION, validateTokens } from "@buildrik/shared/schemas/design-tokens";

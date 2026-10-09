@@ -12,33 +12,33 @@ import { render, screen, cleanup } from "@testing-library/react";
 // Convention: modals with an isOpen prop render their marker only when open —
 // that mirrors the real components' contract (they render null when closed).
 
-vi.mock("../../../templates/SaveTemplate", () => ({
+vi.mock("@/templates/SaveTemplate", () => ({
   SaveTemplate: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-save-template" /> : null,
 }));
-vi.mock("../../ecommerce", () => ({
+vi.mock("@/editor/ecommerce", () => ({
   CollectionSetupModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-collection-setup" /> : null,
 }));
-vi.mock("../../export", () => ({
+vi.mock("@/editor/export", () => ({
   ExportModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-export" /> : null,
 }));
 // D-12: ImageEditorModal is React.lazy-loaded from its own module path
 // (not the ../../media barrel) so react-easy-crop stays out of the shell's
 // eager bundle — mock that submodule directly.
-vi.mock("../../media/ImageEditorModal", () => ({
+vi.mock("@/editor/media/ImageEditorModal", () => ({
   ImageEditorModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-image-editor" /> : null,
 }));
-vi.mock("../../media", () => ({
+vi.mock("@/editor/media", () => ({
   IconPickerModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-icon-picker" /> : null,
 }));
-vi.mock("../../canvas/controls/KeyboardLegend", () => ({
+vi.mock("@/editor/canvas/controls/KeyboardLegend", () => ({
   KeyboardLegend: () => null,
 }));
-vi.mock("../../canvas/controls/KeyboardCheatSheet", () => ({
+vi.mock("@/editor/canvas/controls/KeyboardCheatSheet", () => ({
   KeyboardCheatSheet: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-shortcuts" /> : null,
 }));
@@ -55,7 +55,7 @@ vi.mock("../modals/CreateComponentModal", () => ({
 }));
 import { StudioModals, type StudioModalsProps } from "../StudioModals";
 import { ToastProvider } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 
 function makeComposer() {
   return {

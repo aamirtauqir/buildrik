@@ -39,7 +39,7 @@ vi.mock("@/editor/chrome-ui", async (importOriginal) => {
 });
 
 import { LeftSidebar } from "../LeftSidebar";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 beforeAll(() => {
   Object.defineProperty(globalThis.window, "matchMedia", {

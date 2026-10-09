@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { ElementData } from "../../../../shared/types";
+import type { ElementData } from "@/shared/types";
 import { liftParserHoisted } from "../liftParserHoisted";
 
 const el = (id: string, type: string, children: ElementData[] = [], tagName?: string): ElementData =>

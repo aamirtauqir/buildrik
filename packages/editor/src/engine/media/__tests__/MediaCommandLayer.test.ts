@@ -12,8 +12,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { MediaCommandLayer } from "../MediaCommandLayer";
 import { MediaNoActivePageError } from "../MediaStorageTypes";
-import { MEDIA_EVENTS } from "../../../shared/constants/media";
-import type { Composer } from "../../Composer";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
+import type { Composer } from "@/engine/Composer";
 
 // Minimal stub matching what MediaCommandLayer touches.
 interface StubElement {
@@ -25,7 +25,7 @@ interface StubElement {
 
 function makeStubComposer(options: {
   insertMediaAtResult?: ReturnType<
-    import("../../elements/ElementManager").ElementManager["insertMediaAt"]
+    import("@/engine/elements/ElementManager").ElementManager["insertMediaAt"]
   >;
   elementsBySrc?: StubElement[];
   /** Throw on this elementId during setAttribute — simulates failure in replaceAcross */

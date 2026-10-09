@@ -43,13 +43,13 @@
  */
 import * as React from "react";
 import { useToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import type { ProjectData } from "../../../shared/types";
+import type { Composer } from "@/engine";
+import type { ProjectData } from "@/shared/types";
 import {
   PROJECT_MIGRATIONS,
   TARGET_PROJECT_VERSION,
-} from "../../../engine/designSystem/migrations/projectMigrations";
-import type { ProjectPayload } from "../../../engine/designSystem/migrations/projectMigrations/types";
+} from "@/engine/designSystem/migrations/projectMigrations";
+import type { ProjectPayload } from "@/engine/designSystem/migrations/projectMigrations/types";
 import { importMigratedProject } from "../migrations/importMigratedProject";
 import { MigrationProgressModal, type MigrationStep } from "./MigrationProgressModal";
 

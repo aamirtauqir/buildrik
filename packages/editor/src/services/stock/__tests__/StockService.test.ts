@@ -15,7 +15,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const searchPhotos = vi.fn();
 const searchVideos = vi.fn();
 
-vi.mock("../../api-client", () => ({
+vi.mock("@/services/api-client", () => ({
   getBuildrikClient: () => ({
     media: {
       searchStockPhotos: { query: searchPhotos },
@@ -23,7 +23,7 @@ vi.mock("../../api-client", () => ({
     },
   }),
 }));
-vi.mock("../../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
+vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 
 import { stockService, StockSearchError } from "../StockService";
 

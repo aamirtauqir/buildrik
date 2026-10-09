@@ -9,9 +9,9 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import type { Composer } from "../../../../engine/Composer";
-import type { Element } from "../../../../engine/elements/Element";
-import { EVENTS } from "../../../../shared/constants/events";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
+import { EVENTS } from "@/shared/constants/events";
 import { useComposerSelection } from "../useComposerSelection";
 
 // ---------------------------------------------------------------------------

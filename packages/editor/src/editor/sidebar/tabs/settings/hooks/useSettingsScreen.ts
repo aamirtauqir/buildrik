@@ -9,9 +9,9 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Composer } from "../../../../../engine/Composer";
-import { EVENTS } from "../../../../../shared/constants/events";
-import type { ProjectSettings } from "../../../../../shared/types/project";
+import type { Composer } from "@/engine/Composer";
+import { EVENTS } from "@/shared/constants/events";
+import type { ProjectSettings } from "@/shared/types/project";
 
 export interface UseSettingsScreenResult<T> {
   /** Current value selected from ProjectSettings */

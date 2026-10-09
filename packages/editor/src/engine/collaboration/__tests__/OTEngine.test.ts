@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { OTEngine } from "../OTEngine";
-import type { Patch } from "../../utils/JsonPatch";
+import type { Patch } from "@/engine/utils/JsonPatch";
 
 describe("OTEngine transform fast paths", () => {
   it("skips local replace when remote replace targets exact path", () => {

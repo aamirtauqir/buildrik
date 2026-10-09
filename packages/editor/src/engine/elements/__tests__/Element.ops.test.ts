@@ -8,9 +8,9 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { EVENTS } from "../../../shared/constants/events";
-import type { AnimationConfig } from "../../../shared/types/animations";
-import type { DataBinding } from "../../../shared/types/data";
+import { EVENTS } from "@/shared/constants/events";
+import type { AnimationConfig } from "@/shared/types/animations";
+import type { DataBinding } from "@/shared/types/data";
 import { makeEngine, emitsOf } from "./harness";
 
 function siblings() {

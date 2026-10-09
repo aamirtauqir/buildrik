@@ -5,14 +5,14 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine/Composer";
-import { ExportEngine } from "../../engine/export";
-import { resolvePageTitle } from "../../engine/export/SEOInjector";
-import { ReactExporter } from "../../engine/export/ReactExporter";
-import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
-import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
+import type { Composer } from "@/engine/Composer";
+import { ExportEngine } from "@/engine/export";
+import { resolvePageTitle } from "@/engine/export/SEOInjector";
+import { ReactExporter } from "@/engine/export/ReactExporter";
+import type { ExportConfig, ExportResult, PreviewDevice } from "@/shared/types/export";
+import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "@/shared/types/export";
 import { Button, ModalBody, ModalClose, ModalContent, ModalDescription, ModalRoot, ModalTitle, Spinner, Tabs, plural } from "@/editor/chrome-ui";
-import { devError } from "../../shared/utils/devLogger";
+import { devError } from "@/shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";
 import { downloadFile } from "./ExportUtils";

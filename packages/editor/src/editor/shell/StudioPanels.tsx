@@ -12,13 +12,13 @@
 import * as React from "react";
 import type { ImageEditorOptions } from "./hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode, isColumnTabOpen, isInspectorColumnOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { DeviceType } from "@/shared/types";
-import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
+import type { MediaAsset, MediaAssetType, IconConfig } from "@/shared/types/media";
 import { Button, useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";

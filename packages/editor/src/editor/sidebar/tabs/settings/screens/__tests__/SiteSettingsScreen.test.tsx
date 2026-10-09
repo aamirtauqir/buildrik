@@ -31,9 +31,9 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
 }));
 
 import { SiteSettingsScreen, SLUG_FORMAT_ERROR, SLUG_TAKEN_ERROR } from "../SiteSettingsScreen";
-import { SiteColumnsLockedContext } from "../../shared";
+import { SiteColumnsLockedContext } from "@/editor/sidebar/tabs/settings/shared";
 import { SettingsSaveCancelled } from "@/services/BuildrikSyncProvider";
-import type { SettingsFlush, SettingsFlushResult } from "../../types";
+import type { SettingsFlush, SettingsFlushResult } from "@/editor/sidebar/tabs/settings/types";
 
 const getMock = api.siteDetail.settings.get.query;
 

@@ -11,7 +11,7 @@ import { importMigratedProject } from "../importMigratedProject";
 import { TARGET_PROJECT_VERSION } from "@/engine/designSystem/migrations/projectMigrations";
 import { migration0002 } from "@/engine/designSystem/migrations/projectMigrations/0002-seed-dark-color-values";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
-import { DEFAULT_TOKENS } from "../../constants";
+import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import { DEFAULT_TOKENS_V5 } from "@/engine/designSystem/defaultTokens";
 
 beforeEach(() => localStorage.clear());

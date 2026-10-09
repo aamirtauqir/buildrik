@@ -16,7 +16,7 @@
  * @license BSD-3-Clause
  */
 
-import type { MediaAssetType } from "../../shared/types/media";
+import type { MediaAssetType } from "@/shared/types/media";
 import { LIBRARY_KINDS, acceptsMime } from "@shared/constants/media";
 
 /**

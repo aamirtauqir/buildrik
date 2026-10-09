@@ -7,13 +7,13 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useDiscoveryState } from "../useDiscoveryState";
-import { StockSearchError } from "../../../../../../services/stock/StockService";
+import { StockSearchError } from "@/services/stock/StockService";
 
 const photosMock = vi.fn();
 const videosMock = vi.fn();
 
-vi.mock("../../../../../../services/stock/StockService", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../../../../../../services/stock/StockService")>()),
+vi.mock("@/services/stock/StockService", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/stock/StockService")>()),
   stockService: {
     searchPhotos: (...args: unknown[]) => photosMock(...args),
     searchVideos: (...args: unknown[]) => videosMock(...args),

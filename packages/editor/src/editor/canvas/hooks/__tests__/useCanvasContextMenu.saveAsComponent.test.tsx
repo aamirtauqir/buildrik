@@ -11,10 +11,10 @@
 
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import type { Composer } from "../../../../engine";
-import type { Element } from "../../../../engine/elements/Element";
-import { EVENTS } from "../../../../shared/constants/events";
-import type { ContextAction } from "../../menus";
+import type { Composer } from "@/engine";
+import type { Element } from "@/engine/elements/Element";
+import { EVENTS } from "@/shared/constants/events";
+import type { ContextAction } from "@/editor/canvas/menus";
 import { useCanvasContextMenu } from "../useCanvasContextMenu";
 
 // ---------------------------------------------------------------------------

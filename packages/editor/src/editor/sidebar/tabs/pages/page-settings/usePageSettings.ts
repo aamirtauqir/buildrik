@@ -12,7 +12,7 @@
 import * as React from "react";
 import { useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore, isPlaceholderSlug } from "../utils/seoScore";
 import { resolvePageTitle } from "@/engine/export/SEOInjector";

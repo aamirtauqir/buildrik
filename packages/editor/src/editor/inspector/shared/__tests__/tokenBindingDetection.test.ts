@@ -50,7 +50,7 @@ describe("cssVarToTokenId", () => {
   });
 
   it("round-trips with tokenToCssVar from design-system/types", async () => {
-    const { tokenToCssVar } = await import("../../../design-system/types");
+    const { tokenToCssVar } = await import("@/editor/design-system/types");
     expect(cssVarToTokenId(tokenToCssVar("color-primary"))).toBe("color-primary");
     expect(cssVarToTokenId(tokenToCssVar("radius-sm"))).toBe("radius-sm");
   });

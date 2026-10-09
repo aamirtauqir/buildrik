@@ -10,7 +10,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import type { LibraryItem, VersionEntry } from "../../../sidebar/tabs/media/data/mediaTypes";
+import type { LibraryItem, VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { AssetDetailsPanel, type AssetDetailsPanelProps } from "../AssetDetailsPanel";
 
 function makeItem(over: Partial<LibraryItem> = {}): LibraryItem {

@@ -18,7 +18,7 @@ import {
 // the tests can mutate. Use a plain function (not vi.fn arrow) so `new
 // ExportEngine()` is constructable in jsdom. Returning an object from a
 // function constructor overrides `this`, making it work with `new`.
-vi.mock("../../../../engine/export", () => {
+vi.mock("@/engine/export", () => {
   const instance = {
     downloadZip: vi.fn(),
     exportAllPages: vi.fn(),
@@ -64,7 +64,7 @@ vi.mock("../usePublishJob", () => {
 });
 
 // Lazy imports — must come AFTER the vi.mock calls.
-import * as ExportMod from "../../../../engine/export";
+import * as ExportMod from "@/engine/export";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import * as PublishJobMod from "../usePublishJob";
 

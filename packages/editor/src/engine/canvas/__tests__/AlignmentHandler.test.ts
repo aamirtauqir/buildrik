@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { AlignmentHandler } from "../AlignmentHandler";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 
 interface MockElement {
   getStyles: ReturnType<typeof vi.fn>;

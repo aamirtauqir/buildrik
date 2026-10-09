@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 import { getDisplayName } from "./data/layerUtils";
 import { getElementIcon } from "@/editor/shared/elementIcons";

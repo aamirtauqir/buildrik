@@ -20,8 +20,8 @@
 
 import * as React from "react";
 import { useToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import { slugify } from "@shared/utils/helpers/string";
 import type { PageItem, PageStatus } from "./types";
 import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";

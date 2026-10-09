@@ -5,9 +5,9 @@
 
 import * as React from "react";
 import { TextInput } from "@/editor/chrome-ui";
-import { InputRow, SelectRow } from "../../shared/controls";
-import { CONTROL_INPUT_WRAP } from "../../shared/controls/controlClasses";
-import { MixedValueIndicator } from "../../shared/controls";
+import { InputRow, SelectRow } from "@/editor/inspector/shared/controls";
+import { CONTROL_INPUT_WRAP } from "@/editor/inspector/shared/controls/controlClasses";
+import { MixedValueIndicator } from "@/editor/inspector/shared/controls";
 import { CLUSTER_CAPTION, OFFSET_ANCHOR, OFFSET_PANEL } from "./classes";
 // ============================================================================
 // TYPES

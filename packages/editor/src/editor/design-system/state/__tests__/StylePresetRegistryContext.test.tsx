@@ -8,7 +8,7 @@ import {
   useResetAllPresets,
   PRESET_CATEGORIES,
 } from "../StylePresetRegistryContext";
-import type { StylePreset } from "../../types";
+import type { StylePreset } from "@/editor/design-system/types";
 
 const wrap = ({ children }: { children: React.ReactNode }) => (
   <StylePresetRegistryProvider projectId="preset-test">{children}</StylePresetRegistryProvider>

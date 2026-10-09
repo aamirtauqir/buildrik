@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementData } from "../../types";
+import type { ElementData } from "@/shared/types";
 import { camelToKebab } from "../helpers";
 import { escapeAttr } from "./encoding";
 import { toAllowedElementTag } from "@buildrik/shared/schemas/element-markup";

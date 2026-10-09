@@ -6,9 +6,9 @@
  * @license BSD-3-Clause
  */
 
-import type { Element } from "../../../engine/elements/Element";
-import { THRESHOLDS } from "../../constants";
-import type { ElementType } from "../../types";
+import type { Element } from "@/engine/elements/Element";
+import { THRESHOLDS } from "@/shared/constants";
+import type { ElementType } from "@/shared/types";
 import { insideRefusal, isInteractiveType, type InsideRefusal } from "../nesting";
 
 /** Reasons why a drop might be invalid */

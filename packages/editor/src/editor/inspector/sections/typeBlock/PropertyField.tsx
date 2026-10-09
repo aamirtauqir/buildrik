@@ -6,8 +6,8 @@
  */
 
 import * as React from "react";
-import { InputRow, SelectRow } from "../../shared/controls";
-import { CheckRow } from "../../shared/controls/CheckRow";
+import { InputRow, SelectRow } from "@/editor/inspector/shared/controls";
+import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 import { isAttrOn } from "./blockRows";
 import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";

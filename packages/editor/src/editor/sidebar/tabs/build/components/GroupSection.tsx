@@ -11,8 +11,8 @@
 
 import * as React from "react";
 import type { FlatElEntry } from "../catalog/types";
-import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
-import type { ComponentDefinition } from "../../../../../shared/types/components";
+import type { BlockDefinition } from "@/blocks/blockRegistry";
+import type { ComponentDefinition } from "@/shared/types/components";
 import type { InsertGroup } from "../catalog/groups";
 import type { BlockDragStartFn, DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import { BK_TOOLTIP_CLASS, Button, Tooltip } from "@/editor/chrome-ui";

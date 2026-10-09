@@ -11,8 +11,8 @@ import { render, screen, fireEvent, cleanup, act, waitFor } from "@testing-libra
 import { EVENTS } from "@/shared/constants/events";
 import { PageTabBar } from "../PageTabBar";
 import { ToastProvider } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import type { PageData } from "../../../shared/types";
+import type { Composer } from "@/engine";
+import type { PageData } from "@/shared/types";
 
 type EventHandler = () => void;
 

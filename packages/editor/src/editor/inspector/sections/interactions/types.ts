@@ -3,9 +3,9 @@
  * @license BSD-3-Clause
  */
 
-import { GSAPEngine } from "../../../../engine/animations";
-import type { InteractionAnimationConfig } from "../../../../engine/interactions/types";
-import type { SectionTier } from "../../shared/controls/Section";
+import { GSAPEngine } from "@/engine/animations";
+import type { InteractionAnimationConfig } from "@/engine/interactions/types";
+import type { SectionTier } from "@/editor/inspector/shared/controls/Section";
 import type { Composer } from "@/engine";
 import {
   ArrowDownUp, CircleDashed, Crosshair, DoorOpen, Eye, EyeOff, FileText, Hand, LogOut, Mouse,

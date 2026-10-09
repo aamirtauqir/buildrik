@@ -34,9 +34,9 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
-import type { LibraryItem } from "../../../sidebar/tabs/media/data/mediaTypes";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { AssetDetailsPanel, type AssetDetailsPanelProps } from "../AssetDetailsPanel";
-import { TEN } from "../../__tests__/libraryFixture";
+import { TEN } from "@/editor/media/__tests__/libraryFixture";
 
 function byName(name: string): LibraryItem {
   const item = TEN.find((i) => i.name === name);

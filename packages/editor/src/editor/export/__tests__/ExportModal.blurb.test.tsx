@@ -22,7 +22,7 @@ const renderT = (ui: React.ReactElement) => render(ui, { wrapper: ToastProvider 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ExportModal } from "../ExportModal";
 
-vi.mock("../../../engine/export/ExportEngine", () => ({
+vi.mock("@/engine/export/ExportEngine", () => ({
   ExportEngine: class {
     export() {
       return { html: "<p/>", css: "", stats: { elementCount: 0, htmlSize: 0, cssSize: 0 } };

@@ -1,8 +1,8 @@
-import type { Composer, Element } from "../../../engine";
-import { stylesAt } from "../../../engine/commands/commandOperations";
-import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
-import type { PseudoStateId } from "../../../shared/types";
-import type { BreakpointId } from "../../../shared/types/breakpoints";
+import type { Composer, Element } from "@/engine";
+import { stylesAt } from "@/engine/commands/commandOperations";
+import { getBreakpointQuery } from "@/shared/constants/breakpoints";
+import type { PseudoStateId } from "@/shared/types";
+import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { InspectorContext } from "../config";
 import { buildInspectorContext } from "../config";
 

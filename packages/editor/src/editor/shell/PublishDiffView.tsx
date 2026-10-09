@@ -17,7 +17,7 @@
  */
 import * as React from "react";
 import { Button, SkeletonBlock } from "@/editor/chrome-ui";
-import { fetchPublishDiff, type PublishDiff, type PublishPageChange } from "../../services/PublishService";
+import { fetchPublishDiff, type PublishDiff, type PublishPageChange } from "@/services/PublishService";
 
 export interface PublishDiffViewProps {
   siteId: string;

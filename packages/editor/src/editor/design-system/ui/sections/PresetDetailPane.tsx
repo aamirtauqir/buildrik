@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import type { PresetCategory, StylePreset } from "../../types";
+import type { PresetCategory, StylePreset } from "@/editor/design-system/types";
 import { PresetBindingRow } from "./PresetBindingRow";
 import { Button } from "@/editor/chrome-ui";
 const CATEGORY_LABELS: Record<PresetCategory, string> = {

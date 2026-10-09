@@ -22,10 +22,10 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { LintIssue, LintRuleId } from "../../../../engine/designSystem/linter";
-import type { DesignToken } from "../../types";
+import type { LintIssue, LintRuleId } from "@/engine/designSystem/linter";
+import type { DesignToken } from "@/editor/design-system/types";
 import { suggestContrastFix } from "@/engine/designSystem/colorMath";
-import { findSurfaceToken, resolveSurface } from "../../utils/contrastLint";
+import { findSurfaceToken, resolveSurface } from "@/editor/design-system/utils/contrastLint";
 import { Button } from "@/editor/chrome-ui";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";

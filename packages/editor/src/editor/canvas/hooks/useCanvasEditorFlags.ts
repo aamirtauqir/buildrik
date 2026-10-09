@@ -15,8 +15,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer, Element } from "../../../engine";
-import { EVENTS } from "../../../shared/constants";
+import type { Composer, Element } from "@/engine";
+import { EVENTS } from "@/shared/constants";
 import { loadSetFromStorage } from "@/editor/panels/layers/hooks/layersPersistence";
 
 function setFlag(node: globalThis.Element, name: string, on: boolean): void {

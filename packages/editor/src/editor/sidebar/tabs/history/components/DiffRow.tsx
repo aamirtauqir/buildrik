@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import type { HistoryChange } from "../../../../../engine/HistoryManager";
+import type { HistoryChange } from "@/engine/HistoryManager";
 
 interface DiffRowProps {
   change: HistoryChange;

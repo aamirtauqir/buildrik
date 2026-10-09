@@ -6,9 +6,9 @@
  * @license BSD-3-Clause
  */
 
-import type { Element } from "../../../engine/elements/Element";
-import { THRESHOLDS } from "../../constants";
-import type { ElementType, Point } from "../../types";
+import type { Element } from "@/engine/elements/Element";
+import { THRESHOLDS } from "@/shared/constants";
+import type { ElementType, Point } from "@/shared/types";
 import { canHaveChildren, canNestElement } from "../nesting";
 import { getElementId } from "./domHelpers";
 import { distance, getRectCenter, domRectToRect } from "./geometry";

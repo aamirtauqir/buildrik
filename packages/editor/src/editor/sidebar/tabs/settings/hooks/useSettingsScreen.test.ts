@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { EVENTS } from "../../../../../shared/constants/events";
-import type { ProjectSettings } from "../../../../../shared/types/project";
+import { EVENTS } from "@/shared/constants/events";
+import type { ProjectSettings } from "@/shared/types/project";
 import { useSettingsScreen } from "./useSettingsScreen";
 
 // Minimal mock Composer

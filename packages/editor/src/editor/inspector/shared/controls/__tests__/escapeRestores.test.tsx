@@ -13,7 +13,7 @@ import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { InputWithUnit } from "../InputControls";
 import { SpacingBox } from "../SpacingControls";
-import { SizeSection } from "../../../sections/SizeSection";
+import { SizeSection } from "@/editor/inspector/sections/SizeSection";
 
 /** A parent that writes what the field sends, like the Inspector does. */
 function Owned({ initial, onWrite }: { initial: string; onWrite: (v: string) => void }) {

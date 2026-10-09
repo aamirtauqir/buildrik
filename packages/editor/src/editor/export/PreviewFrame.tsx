@@ -9,8 +9,8 @@
  */
 
 import * as React from "react";
-import type { PreviewDevice } from "../../shared/types/export";
-import { PREVIEW_DEVICES } from "../../shared/types/export";
+import type { PreviewDevice } from "@/shared/types/export";
+import { PREVIEW_DEVICES } from "@/shared/types/export";
 
 // ============================================================================
 // TYPES

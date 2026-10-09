@@ -11,7 +11,7 @@
 
 import { describe, it, expect } from "vitest";
 import { renderHook } from "@testing-library/react";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { useTokenUsageMap } from "../useTokenUsageMap";
 
 interface FakeElement {

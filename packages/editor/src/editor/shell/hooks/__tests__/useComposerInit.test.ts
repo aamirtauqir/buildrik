@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { EVENTS } from "@/shared/constants/events";
-import { THRESHOLDS } from "../../../../shared/constants/config";
+import { THRESHOLDS } from "@/shared/constants/config";
 import { useComposerInit } from "../useComposerInit";
 
 // ---------------------------------------------------------------------------
@@ -60,12 +60,12 @@ const mockComposer = {
   destroy: vi.fn(),
 };
 
-vi.mock("../../../../engine", () => ({
+vi.mock("@/engine", () => ({
   createComposer: vi.fn(() => mockComposer),
   Composer: class {},
 }));
 
-vi.mock("../../../../engine/cms", () => ({
+vi.mock("@/engine/cms", () => ({
   ProductCollectionService: vi.fn(() => ({
     hasProductsCollection: vi.fn(() => Promise.resolve(false)),
   })),

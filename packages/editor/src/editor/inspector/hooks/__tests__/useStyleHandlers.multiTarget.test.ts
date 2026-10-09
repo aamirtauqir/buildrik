@@ -9,7 +9,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useStyleHandlers } from "../useStyleHandlers";
-import { getBreakpointQuery } from "../../../../shared/constants/breakpoints";
+import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 
 function makeComposer() {
   const setStyle = vi.fn();

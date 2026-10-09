@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementData } from "../../types";
+import type { ElementData } from "@/shared/types";
 import { generateId, kebabToCamel } from "../helpers";
 import { unescapeHTML } from "./encoding";
 import { getElementTypeFromTag } from "./typeMapping";

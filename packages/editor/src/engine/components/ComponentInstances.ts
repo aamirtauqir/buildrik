@@ -6,16 +6,16 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants";
-import type { ElementData, ElementType } from "../../shared/types";
+import { EVENTS } from "@/shared/constants";
+import type { ElementData, ElementType } from "@/shared/types";
 import type {
   ComponentDefinition,
   ComponentInstance,
   OverrideType,
-} from "../../shared/types/components";
-import { devError } from "../../shared/utils/devLogger";
-import { deepClone } from "../../shared/utils/helpers";
-import { canNestElement } from "../../shared/utils/nesting";
+} from "@/shared/types/components";
+import { devError } from "@/shared/utils/devLogger";
+import { deepClone } from "@/shared/utils/helpers";
+import { canNestElement } from "@/shared/utils/nesting";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 import { applyOverridesToTree, ComponentInstanceUtils, resolveNodeByElementPath } from "./ComponentInstance";

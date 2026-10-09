@@ -8,7 +8,7 @@
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
-import type { SpacingIndicator } from "../../../../shared/types/canvas";
+import type { SpacingIndicator } from "@/shared/types/canvas";
 import { CanvasSpotSpacing } from "../CanvasSpotSpacing";
 
 describe("CanvasSpotSpacing — right-click", () => {

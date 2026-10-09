@@ -16,7 +16,7 @@
  */
 
 import * as React from "react";
-import type { IconConfig } from "../../../shared/types/media";
+import type { IconConfig } from "@/shared/types/media";
 import type {
   IconPickerContext,
   ImageEditorContext,

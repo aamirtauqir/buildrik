@@ -8,7 +8,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 import {
   buildSimpleElement,
   buildLayoutWithChildren,

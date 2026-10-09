@@ -67,7 +67,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock("../../../shared/hooks/useVersionHistory", () => ({
+vi.mock("@/shared/hooks/useVersionHistory", () => ({
   useVersionHistory: () => ({
     versions: mocks.state.versions,
     isAvailable: mocks.state.isAvailable,

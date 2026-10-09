@@ -6,14 +6,14 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants";
-import type { ElementData } from "../../shared/types";
+import { EVENTS } from "@/shared/constants";
+import type { ElementData } from "@/shared/types";
 import type {
   ComponentInstance,
   Override,
   OverrideType,
-} from "../../shared/types/components";
-import { isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
+} from "@/shared/types/components";
+import { isSafeAttrValue, sanitizeHTML } from "@/shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
 import type { Patch } from "../utils/JsonPatch";
 

@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementType } from "../../types";
+import type { ElementType } from "@/shared/types";
 import {
   ELEMENT_TYPES,
   ELEMENT_CATEGORIES,

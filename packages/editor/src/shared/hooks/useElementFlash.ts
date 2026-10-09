@@ -6,8 +6,8 @@
  */
 
 import { useEffect, useCallback } from "react";
-import type { Composer } from "../../engine";
-import { EVENTS } from "../../shared/constants/events";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 
 const FLASH_CLASS = "buildrick-element-flash";
 const FLASH_DURATION = 500; // ms - matches CSS animation

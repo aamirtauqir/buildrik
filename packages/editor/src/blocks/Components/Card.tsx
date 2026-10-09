@@ -3,8 +3,8 @@
  * @license BSD-3-Clause
  */
 
-import type { BlockData, ElementType } from "../../shared/types";
-import { placeholderImageSrc } from "../../shared/constants/media";
+import type { BlockData, ElementType } from "@/shared/types";
+import { placeholderImageSrc } from "@/shared/constants/media";
 
 export interface CardBlockConfig extends BlockData {
   elementType: ElementType;

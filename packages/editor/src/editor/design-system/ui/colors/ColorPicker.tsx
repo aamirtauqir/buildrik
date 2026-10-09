@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import type { ColorHSB } from "../../types";
+import type { ColorHSB } from "@/editor/design-system/types";
 import { isValidHex } from "@/editor/design-system/utils/colorUtils";
 import { hexToHsb, hsbToHex, expandShorthand, calcContrastRatio } from "@/engine/designSystem/colorMath";
 import { Button, TextField } from "@/editor/chrome-ui";

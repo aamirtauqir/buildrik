@@ -13,7 +13,7 @@ import {
   STORAGE_QUOTA_BYTES,
   getAssetTypeFromMime,
   mimeTypeForFile,
-} from "../../shared/constants/media";
+} from "@/shared/constants/media";
 import { MediaQuotaError } from "./MediaStorageTypes";
 import type {
   EditsSnapshot,
@@ -26,7 +26,7 @@ import type {
   SortDirection,
   UploadProgress,
   UploadResult,
-} from "../../shared/types/media";
+} from "@/shared/types/media";
 import { MediaEventEmitter } from "./MediaEventEmitter";
 import {
   validateFile,

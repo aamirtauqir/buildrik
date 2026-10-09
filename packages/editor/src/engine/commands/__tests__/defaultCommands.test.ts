@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { buildDefaultCommands } from "../defaultCommands";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 import type { CommandData } from "@/shared/types";
 
 interface MockElement {

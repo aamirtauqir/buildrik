@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ColorField } from "../../shared/forms";
+import { ColorField } from "@/shared/forms";
 import { Popover, Button, Select, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 export interface RichTextEditorProps {

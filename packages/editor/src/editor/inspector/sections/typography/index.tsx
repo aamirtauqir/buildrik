@@ -12,8 +12,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { Section, MoreSettingsToggle } from "../../shared/controls";
+import type { Composer } from "@/engine";
+import { Section, MoreSettingsToggle } from "@/editor/inspector/shared/controls";
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
 import { ADVANCED_TYPOGRAPHY_COUNT, TypographyControls } from "./TypographyControls";

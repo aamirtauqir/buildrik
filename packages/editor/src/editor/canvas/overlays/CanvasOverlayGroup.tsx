@@ -9,11 +9,11 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { Z_LAYERS } from "../../../shared/constants/canvas";
-import type { SpacingIndicator, CanvasGuide } from "../../../shared/types/canvas";
-import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
-import { RichTextEditor } from "../../panels/RichTextEditor";
+import type { Composer } from "@/engine";
+import { Z_LAYERS } from "@/shared/constants/canvas";
+import type { SpacingIndicator, CanvasGuide } from "@/shared/types/canvas";
+import type { InvalidDropReason } from "@/shared/utils/dragDrop/dropValidation";
+import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import {
   spotsOverlayStyles,
   getMarqueeStyles,
