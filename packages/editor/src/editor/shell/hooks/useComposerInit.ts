@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
+import { ToastInput, dismissToastKey } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
@@ -40,7 +40,7 @@ import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
-import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave } from "./useSaveCallback";
+import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave, SAVE_FAILED_TOAST_KEY } from "./useSaveCallback";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
@@ -724,6 +724,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             if (siteId) clearUnsaved(siteId);
             refusedTokens = null;
             clearRetry();
+            dismissToastKey(SAVE_FAILED_TOAST_KEY);
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })
@@ -797,6 +798,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
                     : "Your changes are still open in this tab. Keep it open and try saving again.",
                   tone: "warning",
+                  key: SAVE_FAILED_TOAST_KEY,
                 });
               }
               return;
@@ -849,6 +851,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     ? "Autosave is held back so it can't overwrite the stored pages. Reload to get the real site."
                     : "Could not save to dashboard. Changes are unsaved.",
                 tone: notLoaded ? "warning" : "error",
+                key: SAVE_FAILED_TOAST_KEY,
                 ...(notLoaded && !gone
                   ? { action: { label: "Reload", onClick: () => window.location.reload() } }
                   : !gone

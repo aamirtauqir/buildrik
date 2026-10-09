@@ -15,7 +15,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, act, cleanup } from "@testing-library/react";
 import React from "react";
-import { ToastProvider, useToast } from "../index";
+import { ToastProvider, useToast, dismissToastKey } from "../index";
 
 let api: ReturnType<typeof useToast>;
 
@@ -383,5 +383,31 @@ describe("Toast policy — error toasts stay until closed", () => {
     });
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Saved")).toBeTruthy();
+  });
+});
+
+/* L3-006: one fact, one card. A keyed toast replaces the card already carrying
+   its key, and the key is how the owner of the fact clears it ("Save failed"
+   goes when a save lands). */
+describe("Toast policy — keyed toasts", () => {
+  it("a keyed toast replaces the earlier one with the same key", () => {
+    mount();
+    act(() => {
+      api.addToast({ tone: "error", title: "Save failed", description: "Could not save to dashboard.", key: "save-failed" });
+      api.addToast({ tone: "error", title: "Save failed", description: "Could not save project.", key: "save-failed" });
+    });
+    expect(cards()).toHaveLength(1);
+    expect(screen.getByText("Could not save project.")).toBeTruthy();
+  });
+
+  it("dismissToastKey clears every card with that key and nothing else", () => {
+    mount();
+    act(() => {
+      api.addToast({ tone: "error", description: "Save failed", key: "save-failed" });
+      api.addToast({ tone: "error", description: "Upload failed" });
+    });
+    act(() => dismissToastKey("save-failed"));
+    expect(screen.queryByText("Save failed")).toBeNull();
+    expect(screen.getByText("Upload failed")).toBeTruthy();
   });
 });

@@ -139,6 +139,7 @@ export {
   ToastProvider,
   useToast,
   dismissToast,
+  dismissToastKey,
   type ToastInput,
   type QueuedToast,
   type ToastTone,

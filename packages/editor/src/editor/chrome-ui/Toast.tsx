@@ -98,6 +98,10 @@ export interface ToastInput {
   secondaryAction?: ToastActionPayload;
   /** ms; Infinity persists until dismissed. Default 5000 (error: Infinity); Undo toasts ≥ 8000. */
   duration?: number;
+  /** One fact, one card: a toast with a key replaces the card already showing
+   *  that key, and `dismissToastKey` clears it when the fact stops being true
+   *  (L3-006 — "Save failed" stayed up after the next save landed). */
+  key?: string;
 }
 
 export interface QueuedToast extends ToastInput {
@@ -143,6 +147,7 @@ const store = (() => {
     add(input: ToastInput) {
       const id = `toast-${++seq}`;
       const next: QueuedToast = { ...input, id, duration: resolveDuration(input) };
+      if (input.key) toasts = toasts.filter((t) => t.key !== input.key);
       const pinned = toasts.filter(isPersistent);
       /* Persistent first, in arrival order; then the ONE transient — a new
          transient replaces the old, a new persistent slots in above it. */
@@ -154,6 +159,11 @@ const store = (() => {
     },
     remove(id: string) {
       toasts = toasts.filter((t) => t.id !== id);
+      emit();
+    },
+    removeKey(key: string) {
+      if (!toasts.some((t) => t.key === key)) return;
+      toasts = toasts.filter((t) => t.key !== key);
       emit();
     },
     /**
@@ -196,6 +206,9 @@ const store = (() => {
  * `useToast()` throws outside a provider, which their tests run without.
  */
 export const dismissToast = store.remove;
+
+/** Dismiss every toast carrying `key` (see `ToastInput.key`). */
+export const dismissToastKey = store.removeKey;
 
 /* One object for the life of the module. `store.add`/`store.remove` are the
    same functions every time, so nothing here can change identity — the 104

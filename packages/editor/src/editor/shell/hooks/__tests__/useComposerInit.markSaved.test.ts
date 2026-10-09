@@ -55,6 +55,11 @@ vi.mock("../../../../engine/cms", () => ({
   },
 }));
 vi.mock("@/services/AssetUploadService", () => ({ createRemoteAssetSync: vi.fn(() => ({})) }));
+const { dismissToastKey } = vi.hoisted(() => ({ dismissToastKey: vi.fn() }));
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
+  dismissToastKey,
+}));
 
 const syncSave = vi.fn(() => Promise.resolve({ success: true, savedAt: new Date() }));
 vi.mock("@/services/BuildrikSyncProvider", () => ({
@@ -189,5 +194,23 @@ describe("a page switch is not an edit", () => {
     act(() => { composer.emit("project:changed", { type: "page:updated", page: { id: "p2" } }); });
     await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
     expect(syncSave).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* L3-006: "Save failed · Could not save to dashboard" stayed on screen for ten
+   minutes under a header reading "Saved". The failure card is keyed, and the
+   next save that lands takes it down. */
+describe("a landed save clears the save-failed toast", () => {
+  it("keys the failure toast and dismisses that key when the next save lands", async () => {
+    const p = params();
+    syncSave.mockImplementationOnce(() => Promise.reject(new Error("boom")));
+    renderHook(() => useComposerInit(p));
+    await autosave();
+    expect(p.addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Save failed", key: "save-failed" }));
+    expect(dismissToastKey).not.toHaveBeenCalled();
+
+    await autosave();
+    expect(composer.markSaved).toHaveBeenCalledTimes(1);
+    expect(dismissToastKey).toHaveBeenCalledWith("save-failed");
   });
 });
