@@ -311,6 +311,11 @@ export async function updateFormBlock(input: UpdateFormBlockInput) {
       redirectUrl: settings.redirectUrl || null,
       notifyEmail: settings.notifyEmail || null,
       spamProtection: settings.spamProtection ?? true,
+      /* L3-027: a settings save is not a publish. The public endpoint only
+         takes posts for an active row, and publish switches it on when it
+         wires the form; an active row from here took submissions (and sent
+         mail) for a form no visitor could have seen. */
+      isActive: false,
     },
     update: data,
   });

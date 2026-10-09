@@ -315,6 +315,18 @@ describe("Form Submission Service", () => {
         }),
       );
     });
+
+    /* L3-027: a settings save is not a publish. A row it creates stays
+       inactive — the public endpoint refuses posts — until publish wires the
+       form and switches it on; an update leaves the flag alone. */
+    it("creates a row from settings inactive, and never flips the flag on update", async () => {
+      const { updateFormBlock } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.upsert).mockResolvedValue({ id: "el1" } as any);
+      await updateFormBlock({ siteId: "s1", blockId: "el1", successMessage: "Thanks" });
+      const call = vi.mocked(prisma.formBlock.upsert).mock.calls.at(-1)?.[0];
+      expect(call?.create).toMatchObject({ isActive: false });
+      expect(call?.update).not.toHaveProperty("isActive");
+    });
   });
 
   describe("listSubmissions", () => {
