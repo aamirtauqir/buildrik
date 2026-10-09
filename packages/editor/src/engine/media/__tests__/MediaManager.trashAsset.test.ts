@@ -81,7 +81,7 @@ describe("MediaManager — the server page total follows the library", () => {
     const { manager } = seeded();
     manager.setServerPage({ nextCursor: null, total: 2, loaded: 2 });
     const seen: number[] = [];
-    manager.on(MEDIA_EVENTS.SERVER_PAGE_CHANGED, (p: { total: number }) => seen.push(p.total));
+    manager.on(MEDIA_EVENTS.SERVER_PAGE_CHANGED, (p) => seen.push((p as { total: number }).total));
     await manager.trashAsset("a1");
     expect(seen).toEqual([1]);
   });

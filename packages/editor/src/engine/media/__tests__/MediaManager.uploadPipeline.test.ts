@@ -355,7 +355,7 @@ describe("uploadFile — progress follows the network transfer", () => {
     const manager = new MediaManager(remote);
     mockStorage(manager);
     const seen: number[] = [];
-    manager.on(MEDIA_EVENTS.UPLOAD_PROGRESS, (p: { progress: number }) => seen.push(p.progress));
+    manager.on(MEDIA_EVENTS.UPLOAD_PROGRESS, (p) => seen.push((p as { progress: number }).progress));
     await manager.uploadFile(makeFile("img", "a.png", "image/png"), { autoOptimize: false, generateThumbnail: false });
     expect(seen).toContain(87);
     expect(seen).toContain(99);
