@@ -342,5 +342,17 @@ describe("BrandWorkspace › Brand from logo or website (BRP1-M11)", () => {
     openPage(utils, "starters");
     await waitFor(() => utils.getByTestId("starter-list"));
     expect(utils.queryByTestId("starter-row-from-source")).toBeNull();
+    openPage(utils, "colours");
+    expect(utils.queryByTestId("brand-colours-from-source")).toBeNull();
+  });
+
+  it("Colours' actions row offers it as 'From logo or URL' (8222:232627)", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    const action = utils.getByTestId("brand-colours-from-source");
+    expect(action.textContent).toBe("From logo or URL");
+    expect(utils.getByTestId("brand-colours-actions").lastElementChild).toBe(action);
+    fireEvent.click(action);
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Brand from logo or website");
+    expect(utils.getByTestId("brand-from-source")).toBeTruthy();
   });
 });

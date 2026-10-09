@@ -747,6 +747,11 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => openPage("connect")} data-testid="brand-colours-connect">
                 Connect to tokens
               </Button>
+              {isFeatureEnabled("dsAi") && (
+                <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => openPage(FROM_SOURCE)} data-testid="brand-colours-from-source">
+                  From logo or URL
+                </Button>
+              )}
             </div>
           </>
         );
