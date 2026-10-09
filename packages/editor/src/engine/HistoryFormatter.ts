@@ -9,6 +9,14 @@
 
 import type { HistoryEntry, HistoryChange, HistoryDisplayEntry } from "./historyTypes";
 import type { Patch, PatchOperation } from "./utils/JsonPatch";
+import { elementTypeLabel } from "../shared/constants/elementTypeLabels";
+
+/** Keys the engine stamps for itself. A patch on one is not something the
+ *  user did, and a Session row read "~ updatedAt other ×3" (L5-042). */
+const BOOKKEEPING_KEYS = new Set(["updatedAt", "createdAt", "lastModified"]);
+
+const isBookkeeping = (op: PatchOperation): boolean =>
+  BOOKKEEPING_KEYS.has(op.path.split("/").filter(Boolean).pop() ?? "");
 
 /**
  * Build display entries from an undo stack for the history panel UI.
@@ -177,16 +185,17 @@ export function formatPropertyName(prop: string): string {
 export function formatPatchChanges(patch: Patch): HistoryChange[] {
   const changes: HistoryChange[] = [];
   const maxChanges = 10;
+  const ops = patch.filter((op) => !isBookkeeping(op));
 
-  for (let i = 0; i < Math.min(patch.length, maxChanges); i++) {
-    changes.push(formatSingleChange(patch[i]));
+  for (let i = 0; i < Math.min(ops.length, maxChanges); i++) {
+    changes.push(formatSingleChange(ops[i]));
   }
 
-  if (patch.length > maxChanges) {
+  if (ops.length > maxChanges) {
     changes.push({
       property: "...",
       operation: "info",
-      description: `and ${patch.length - maxChanges} more changes`,
+      description: `and ${ops.length - maxChanges} more changes`,
     });
   }
 
@@ -203,6 +212,19 @@ export function formatSingleChange(op: PatchOperation): HistoryChange {
   if (pathParts.includes("styles") || pathParts.includes("style")) {
     property = pathParts[pathParts.length - 1] ?? property;
   } else if (pathParts.includes("children")) {
+    /* A whole child added or removed carries the element: name it by type
+       and text, as the user knows it (L5-042 — it read "child element"). */
+    const child = wholeElement(op.op === "remove" ? op.oldValue : op.value);
+    if (child && /^\d+$/.test(pathParts[pathParts.length - 1] ?? "")) {
+      const text = child.text ? ` “${child.text}”` : "";
+      return {
+        property: child.label,
+        operation: op.op,
+        oldValue: op.oldValue,
+        newValue: op.value,
+        description: op.op === "remove" ? `- ${child.label}${text}` : `+ ${child.label}${text}`,
+      };
+    }
     property = "child element";
   } else if (pathParts.includes("elements")) {
     const elementIndex = pathParts.indexOf("elements");
@@ -234,6 +256,15 @@ export function formatSingleChange(op: PatchOperation): HistoryChange {
     newValue: op.value,
     description,
   };
+}
+
+/** An element object in a patch value: its type label and a short text. */
+function wholeElement(value: unknown): { label: string; text?: string } | null {
+  if (typeof value !== "object" || value === null) return null;
+  const el = value as { type?: unknown; content?: unknown };
+  if (typeof el.type !== "string") return null;
+  const raw = typeof el.content === "string" ? el.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() : "";
+  return { label: elementTypeLabel(el.type), text: raw ? raw.slice(0, 40) : undefined };
 }
 
 /**

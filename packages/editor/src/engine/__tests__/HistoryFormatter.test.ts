@@ -492,3 +492,29 @@ describe("formatValue", () => {
     expect(formatValue({ a: 1, b: 2, c: 3, d: 4 })).toBe("{a, b...}");
   });
 });
+
+/* L5-042: a Session entry read "~ updatedAt other ×3 · + child element
+   other" — bookkeeping keys and raw tree paths, not what the user did. */
+describe("formatPatchChanges — human labels", () => {
+  it("drops bookkeeping keys (updatedAt, createdAt)", () => {
+    const changes = formatPatchChanges([
+      { op: "replace", path: "/pages/0/updatedAt", oldValue: 1, value: 2 },
+      { op: "replace", path: "/metadata/createdAt", oldValue: 1, value: 2 },
+      { op: "replace", path: "/elements/0/styles/color", oldValue: "#000", value: "#fff" },
+    ]);
+    expect(changes.map((c) => c.property)).toEqual(["color"]);
+  });
+
+  it("names an added child by its element type and text", () => {
+    const [change] = formatPatchChanges([
+      {
+        op: "add",
+        path: "/pages/0/root/children/2",
+        value: { id: "el-1", type: "text", content: "<p>Lorem ipsum dolor</p>", children: [] },
+      },
+    ]);
+    expect(change.property).toBe("Text");
+    expect(change.description).toContain("Lorem ipsum dolor");
+    expect(change.description).not.toContain("el-1");
+  });
+});

@@ -225,3 +225,40 @@ describe("VersionTimelineManager.autoCheckpoint — a project nobody touched is 
     expect(await m.autoCheckpoint("Auto: project:loaded")).not.toBeNull();
   });
 });
+
+/* L5-042 / L5-021: the semantic diff read "1 other · − element ·
+   el-muynh0od-14rfhxpyxz4" and the AI summary was fed the same id. Rows name
+   the element (type, layer name) and its text instead. */
+describe("VersionTimelineManager.compareVersions — readable rows", () => {
+  async function managerWith(versions: Record<string, unknown>) {
+    const { VersionTimelineManager } = await import("../VersionTimelineManager");
+    const m = new VersionTimelineManager({ on: () => {}, off: () => {}, emit: () => {} } as never);
+    vi.spyOn(m, "getVersion").mockImplementation(async (id: string) => (versions[id] ?? null) as never);
+    return m;
+  }
+  const page = (children: unknown[]) => ({ pages: [{ id: "p1", name: "Home", root: { id: "root", type: "container", children } }] });
+
+  it("names a removed element by type and text, never by id", async () => {
+    const m = await managerWith({
+      a: { id: "a", name: "v2", snapshot: page([{ id: "el-x1", type: "text", content: "Lorem ipsum dolor sit" }]) },
+      b: { id: "b", name: "v1", snapshot: page([]) },
+    });
+    const result = await m.compareVersions("a", "b");
+    expect(result?.changes).toHaveLength(1);
+    const [row] = result!.changes;
+    expect(row.property).toBe("Text");
+    expect(row.before).toContain("Lorem ipsum dolor sit");
+    expect(JSON.stringify(row)).not.toContain("el-x1");
+    expect(row.type).toBe("content");
+  });
+
+  it("prefixes a property change with the element it belongs to", async () => {
+    const el = (color: string) => ({ id: "h", type: "heading", data: { layerName: "Hero title" }, styles: { color } });
+    const m = await managerWith({
+      a: { id: "a", name: "v2", snapshot: page([el("#000000")]) },
+      b: { id: "b", name: "v1", snapshot: page([el("#ffffff")]) },
+    });
+    const result = await m.compareVersions("a", "b");
+    expect(result?.changes[0]).toMatchObject({ property: "Hero title · color", before: "#000000", after: "#ffffff" });
+  });
+});

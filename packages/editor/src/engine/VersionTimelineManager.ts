@@ -16,6 +16,7 @@ import type {
 import { DEFAULT_VERSION_HISTORY_CONFIG } from "../shared/types/versions";
 import type { ChangeType } from "./historyTypes";
 import { deepClone } from "../shared/utils/helpers";
+import { elementTypeLabel, LAYER_NAME_KEY } from "../shared/constants/elementTypeLabels";
 import type { Composer } from "./Composer";
 import {
   saveVersion,
@@ -717,25 +718,34 @@ export class VersionTimelineManager {
       const currentElement = currentMap.get(elementId) || null;
       const targetElement = targetMap.get(elementId) || null;
 
+      /* Rows name the element — its layer name or type, and its text — never
+         its id (L5-042): "− element · el-muynh0od-…" was unreadable, and the
+         AI summary fed the same id wrote nonsense about it (L5-021). */
       if (!targetElement && currentElement) {
-        // Element was removed
         changes.push({
-          type: "other",
-          property: "element",
-          before: currentElement.id,
+          type: "content",
+          property: snapshotElementLabel(currentElement),
+          before: snapshotElementText(currentElement) ?? "(no text)",
           after: "",
         });
       } else if (!currentElement && targetElement) {
-        // Element was added
         changes.push({
-          type: "other",
-          property: "element",
+          type: "content",
+          property: snapshotElementLabel(targetElement),
           before: "",
-          after: targetElement.id,
+          after: snapshotElementText(targetElement) ?? "(no text)",
         });
       } else if (currentElement && targetElement) {
-        // Element exists in both, compare properties
-        this.compareElements(currentElement, targetElement, changes);
+        const label = snapshotElementLabel(targetElement);
+        const own: Array<{ type: ChangeType; property: string; before: string; after: string }> = [];
+        this.compareElements(currentElement, targetElement, own);
+        for (const c of own) {
+          changes.push(
+            c.property === "content"
+              ? { ...c, property: `${label} · text`, before: plainSnapshotText(c.before) ?? "", after: plainSnapshotText(c.after) ?? "" }
+              : { ...c, property: `${label} · ${c.property}` },
+          );
+        }
       }
     }
 
@@ -1022,4 +1032,28 @@ function sameProject(a: ProjectData | undefined, b: ProjectData): boolean {
     JSON.stringify(a.styles) === JSON.stringify(b.styles) &&
     JSON.stringify(a.settings) === JSON.stringify(b.settings)
   );
+}
+
+/** Longest text a compare row quotes. */
+const ROW_TEXT_MAX = 60;
+
+/** Element markup as plain text, trimmed for a row; undefined when empty. */
+function plainSnapshotText(content: string | undefined): string | undefined {
+  if (!content) return undefined;
+  const text = content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (!text) return undefined;
+  return text.length > ROW_TEXT_MAX ? `${text.slice(0, ROW_TEXT_MAX - 1)}…` : text;
+}
+
+/** A snapshot element's text, quoted — what the user recognises it by. */
+function snapshotElementText(el: { content?: string }): string | undefined {
+  const text = plainSnapshotText(el.content);
+  return text ? `“${text}”` : undefined;
+}
+
+/** A snapshot element's name: its layer name, else its type's label. */
+function snapshotElementLabel(el: { type?: string; data?: Record<string, unknown> }): string {
+  const layerName = el.data?.[LAYER_NAME_KEY];
+  if (typeof layerName === "string" && layerName.trim()) return layerName.trim();
+  return elementTypeLabel(el.type ?? "element");
 }
