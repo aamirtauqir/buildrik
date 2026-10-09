@@ -31,7 +31,19 @@ export interface StatusMarksProps {
 /* The row's 4 · 12 plus this 4 · 4 = a text mark's 8 · 16. */
 const MARK = "tw:inline-flex tw:items-center tw:px-1 tw:py-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
+/* The mark reads the master's name at render; a rename elsewhere (the
+   component detail screen) must re-render it (L2-028). */
+const COMPONENT_EVENTS = [EVENTS.COMPONENT_UPDATED, EVENTS.INSTANCE_DETACHED, EVENTS.COMPONENT_DELETED] as const;
+
 export function StatusMarks({ composer, elementId, binding, locked }: StatusMarksProps) {
+  const [, bump] = React.useReducer((n: number) => n + 1, 0);
+  React.useEffect(() => {
+    if (!composer) return;
+    for (const evt of COMPONENT_EVENTS) composer.on(evt, bump);
+    return () => {
+      for (const evt of COMPONENT_EVENTS) composer.off(evt, bump);
+    };
+  }, [composer]);
   const instance = composer?.components?.getInstanceByElementId?.(elementId);
   const component = instance ? composer?.components?.getComponent?.(instance.componentId) : undefined;
   if (!component && !binding && !locked) return null;
