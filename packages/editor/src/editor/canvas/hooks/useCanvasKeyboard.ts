@@ -52,6 +52,9 @@ export interface UseCanvasKeyboardResult {
  * Hook for handling keyboard navigation and shortcuts on the canvas.
  * Pure helper functions are in ./keyboard/keyboardHelpers.ts.
  */
+/** A held arrow repeats every ~30 ms; a gap this long is a new press. */
+const REFUSED_NUDGE_MS = 1500;
+
 export function useCanvasKeyboard({
   composer,
   selectedId,
@@ -63,7 +66,7 @@ export function useCanvasKeyboard({
   onOpenContextMenu,
   addToast,
 }: UseCanvasKeyboardOptions): UseCanvasKeyboardResult {
-  const refusedNudgeFor = React.useRef<string | null>(null);
+  const refusedNudgeFor = React.useRef<{ id: string; at: number } | null>(null);
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
       if (!composer || editingId) return;
@@ -160,8 +163,12 @@ export function useCanvasKeyboard({
          per element — holding the key would otherwise stack a toast per repeat. */
       const nudge = (dx: number, dy: number) => {
         if (moveElementPosition(composer, selectedId, dx, dy)) return;
-        if (refusedNudgeFor.current === selectedId) return;
-        refusedNudgeFor.current = selectedId;
+        /* Once per burst of key repeats, not once per element forever — ⇧→
+           then ⌘→ on the same element left the second silent (L1-038). */
+        const now = Date.now();
+        const last = refusedNudgeFor.current;
+        refusedNudgeFor.current = { id: selectedId, at: now };
+        if (last?.id === selectedId && now - last.at < REFUSED_NUDGE_MS) return;
         addToast?.({
           description: "This element sits in the page flow. Set Position to move it with the arrow keys.",
           tone: "info",

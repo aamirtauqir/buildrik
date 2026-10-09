@@ -145,6 +145,30 @@ describe("useCanvasKeyboard — arrow navigation and movement", () => {
     expect(addToast.mock.calls[0][0].description).toMatch(/Set Position/);
   });
 
+  /* L1-038: ⇧→ explained itself, then ⌘→ on the same element said nothing —
+     the hint was once per ELEMENT. It is once per burst of key repeats now. */
+  it("a later ⌘+Arrow on the same in-flow element explains itself too", () => {
+    vi.useFakeTimers();
+    helperMocks.moveElementPosition.mockReturnValue(false);
+    const addToast = vi.fn();
+    const { result } = renderHook(() =>
+      useCanvasKeyboard({
+        composer,
+        selectedId: "el-1",
+        editingId: null,
+        select: select as never,
+        clear: vi.fn(),
+        syncFromComposer: vi.fn(),
+        addToast,
+      })
+    );
+    act(() => result.current.handleKeyDown(key("ArrowRight", { shiftKey: true })));
+    vi.advanceTimersByTime(5000);
+    act(() => result.current.handleKeyDown(key("ArrowRight", { metaKey: true })));
+    expect(addToast).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
   it("Alt+ArrowDown reorders the element down among siblings", () => {
     const { result } = mountHook();
     act(() => result.current.handleKeyDown(key("ArrowDown", { altKey: true })));
