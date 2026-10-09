@@ -77,7 +77,6 @@ const ALLOWED = {
   "pages.removeTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",
   "ai.page": "No screen calls it: its only caller was a dead AiTrpcClient wrapper removed by audit A-14 (2026-09-26). Kept pending the owner call on AI page generation; delete the procedure if that is dropped.",
   "ai.layout": "No screen calls it: its only caller was a dead AiTrpcClient wrapper removed by audit A-14 (2026-09-26). Kept pending the owner call on AI layout generation; delete the procedure if that is dropped.",
-  "cms.generateDynamicPages": "Collection-driven pages: server half complete, no UI. FOUNDER DECISION.",
   "templates.cloneFromSite": "\"Save this site as a template\" has no entry point. FOUNDER DECISION.",
   "media.moveFolder": "Re-parents a folder; the media UI is deliberately a flat folder list.",
   "userTemplates.delete": "Editor lane: templateSync saves and lists user templates but never deletes one.",

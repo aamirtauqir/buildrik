@@ -122,11 +122,13 @@ describe("cmsSync", () => {
 
   it("maps optional collection fields to explicit nulls in the upsert payload", async () => {
     colUpsert.mockResolvedValueOnce({ updatedAt: new Date(0) });
+    /* A collection this module (tab) has never written: the tests above
+       already confirmed "c1", which moves this tab's precondition on. */
     await syncCollectionUpsert({
-      id: "c1", name: "Posts", slug: "posts", fields: [], createdAt: "", updatedAt: "",
+      id: "c-new", name: "Posts", slug: "posts", fields: [], createdAt: "", updatedAt: "",
     } as never);
     expect(colUpsert).toHaveBeenCalledWith({
-      id: "c1",
+      id: "c-new",
       siteId: "site-123",
       name: "Posts",
       slug: "posts",
@@ -642,8 +644,10 @@ describe("hydrateCmsFromServer · slugless stored fields", () => {
    tombstoned, so a stale tab can't republish them. */
 describe("C0a sync", () => {
   it("sends the stamped server updatedAt as expectedUpdatedAt", async () => {
-    recordServerStamp("entry:e1", "2026-09-28T10:00:00.000Z", "L1");
-    await syncEntryUpsert({ id: "e1", collectionId: "c1", data: {}, status: "draft", createdAt: "L0", updatedAt: "L1" } as never);
+    /* A row this tab never hydrated nor wrote falls back to the browser's
+       stamp (EDT-002: one it did is covered in cmsSync.tabs.test.ts). */
+    recordServerStamp("entry:e-stamped", "2026-09-28T10:00:00.000Z", "L1");
+    await syncEntryUpsert({ id: "e-stamped", collectionId: "c1", data: {}, status: "draft", createdAt: "L0", updatedAt: "L1" } as never);
     expect(entUpsert).toHaveBeenCalledWith(expect.objectContaining({ expectedUpdatedAt: "2026-09-28T10:00:00.000Z" }));
   });
 
