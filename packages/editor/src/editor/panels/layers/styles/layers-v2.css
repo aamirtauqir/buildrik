@@ -353,7 +353,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.bdc-menu-item:hover { background: var(--bk-bg-subtle); }
+.bdc-menu-item:hover, .bdc-menu-item:focus-visible { background: var(--bk-bg-subtle); outline: none; }
 .bdc-menu-item:disabled { color: var(--bk-ink-muted); cursor: not-allowed; }
 
 

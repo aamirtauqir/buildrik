@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import { formatShortcutHint } from "../MenuItem";
+import { formatShortcutHint } from "../shortcutHint";
 
 describe("formatShortcutHint", () => {
   it("keeps the + on Windows and drops it on a Mac", () => {

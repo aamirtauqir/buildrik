@@ -95,3 +95,21 @@ describe("LayerContextMenu — clicked row outside the selection", () => {
     expect(screen.getByTestId("layer-menu-group")).not.toBeDisabled();
   });
 });
+
+/* DQ-018: the menu is chrome-ui's Menu — one roving tab stop, focus on the
+   first row at open, ↓ / End move it (disabled rows are skipped). */
+describe("LayerContextMenu — chrome-ui Menu keyboard contract", () => {
+  it("focuses Cut on open; ↓ skips the disabled Paste; End lands on Copy link", () => {
+    mount({ hasClipboard: false });
+    const menu = screen.getByRole("menu");
+    expect(document.activeElement).toBe(screen.getByTestId("layer-menu-cut"));
+    fireEvent.keyDown(menu, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(screen.getByTestId("layer-menu-copy"));
+    fireEvent.keyDown(menu, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(screen.getByTestId("layer-menu-duplicate"));
+    fireEvent.keyDown(menu, { key: "End" });
+    expect(document.activeElement).toBe(screen.getByTestId("layer-menu-copy-link"));
+    const stops = screen.getAllByRole("menuitem").filter((b) => b.tabIndex === 0);
+    expect(stops).toHaveLength(1);
+  });
+});

@@ -161,7 +161,7 @@ const RATCHETS = [
        history icon set (8) and lucide paths copied inline (footer undo/redo)
        are gone. Drains toward lucide; never grows. */
     pattern: String.raw`<svg( |>|$)`,
-    baseline: 51,
+    baseline: 50,
   },
   {
     id: "icon-stroke-override",
