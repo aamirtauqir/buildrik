@@ -134,6 +134,8 @@ export type SaveProjectFn = () => Promise<SaveOutcome>;
 // alongside the hook so future contributors see all save-error mapping
 // in one place.
 function explainSaveError(rawMessage: string): string {
+  /* L3-013: the plan's page limit — the server's words name the limit. */
+  if (rawMessage.startsWith("PAGE_LIMIT:")) return rawMessage.slice("PAGE_LIMIT:".length).trim();
   /* I-2: the server refused a page that belongs to another site (sites.saveProject
      BAD_REQUEST); retrying the same snapshot cannot succeed. */
   if (rawMessage.includes("belongs to another site")) {

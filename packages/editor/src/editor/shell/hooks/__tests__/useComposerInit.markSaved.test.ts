@@ -214,3 +214,24 @@ describe("a landed save clears the save-failed toast", () => {
     expect(dismissToastKey).toHaveBeenCalledWith("save-failed");
   });
 });
+
+/* L3-013: the server refuses a save past the plan's page limit. The words say
+   so, and there is no Retry — the same snapshot is refused until a page goes. */
+describe("a save refused for the page limit", () => {
+  it("names the limit and offers no Retry", async () => {
+    const p = params();
+    syncSave.mockImplementation(() =>
+      Promise.reject(new Error("PAGE_LIMIT: Your plan allows 10 pages per site. Delete a page, or upgrade, to keep saving.")),
+    );
+    renderHook(() => useComposerInit(p));
+    await autosave();
+    expect(p.addToast).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Not saved — page limit reached",
+        description: "Your plan allows 10 pages per site. Delete a page, or upgrade, to keep saving.",
+      }),
+    );
+    const toast = (p.addToast as ReturnType<typeof vi.fn>).mock.calls.at(-1)?.[0] as { action?: unknown };
+    expect(toast.action).toBeUndefined();
+  });
+});

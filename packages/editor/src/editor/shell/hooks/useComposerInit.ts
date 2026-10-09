@@ -839,6 +839,17 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               const notLoaded = message.includes("PROJECT_NOT_LOADED");
               // Deleted is not "not loaded yet" — no reload will fix it.
               const gone = message.includes("SITE_MISSING");
+              /* L3-013: over the plan's page limit. The server's words name
+                 the limit; a Retry would send the same refused snapshot. */
+              if (message.startsWith("PAGE_LIMIT:")) {
+                addToast({
+                  title: "Not saved — page limit reached",
+                  description: message.slice("PAGE_LIMIT:".length).trim(),
+                  tone: "error",
+                  key: SAVE_FAILED_TOAST_KEY,
+                });
+                return;
+              }
               addToast({
                 title: gone
                   ? "This site isn't there anymore"
