@@ -13,6 +13,7 @@
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import type { Composer } from "../../Composer";
+import { EVENTS } from "@/shared/constants/events";
 import {
   createTestComposer,
   installEngineBrowserStubs,
@@ -89,4 +90,22 @@ describe("z-order commands move the element", () => {
     composer.history.undo();
     expect(order()).toEqual(ids);
   });
+});
+
+/* DQ-002: the z-order commands skipped the lock gate every other element
+   write passes (commandOperations.writableElements), so the canvas menu's
+   Bring to front and the Layers row's Move to top/bottom moved a LOCKED
+   element. The keyboard reorder (⌥↑/⌥↓) already refused it. */
+describe("z-order commands respect the lock", () => {
+  it.each(["bring-forward", "send-backward", "bring-to-front", "send-to-back"])(
+    "%s leaves a locked element where it is and says so",
+    (command) => {
+      composer.elements.getElement(at(1))?.setLocked(true);
+      const skipped: unknown[] = [];
+      composer.on(EVENTS.LOCKED_ELEMENTS_SKIPPED, (p: unknown) => skipped.push(p));
+      runOn(1, command);
+      expect(order()).toEqual(ids);
+      expect(skipped).toHaveLength(1);
+    },
+  );
 });

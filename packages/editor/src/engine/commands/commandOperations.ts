@@ -123,6 +123,9 @@ export function nudgeSelected(composer: Composer, deltaX: number, deltaY: number
 export function reorderElement(composer: Composer, direction: ReorderDirection): void {
   const selected = composer.selection.getSelected();
   if (!selected) return;
+  /* A locked element keeps its place — the same gate as the keyboard reorder
+     (keyboardHelpers.moveElementInParent); it raises the "locked" toast. */
+  if (writableElements(composer, [selected]).length === 0) return;
 
   const parent = selected.getParent();
   if (!parent) return;
