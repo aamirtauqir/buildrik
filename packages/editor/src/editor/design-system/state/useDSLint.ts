@@ -85,6 +85,7 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
         composer.designSystem?.preview?.theme ?? "light",
       );
       const off = DarkModeSchema.catch("off").parse(composer.getProjectSettings?.()?.darkMode) === "off";
+      const readOnly = composer.designSystem?.readOnly === true;
       const hiddenToggle: LintIssue[] =
         off && siteHasThemeToggle(composer.elements?.getAllElements?.() ?? [])
           ? [{
@@ -100,7 +101,12 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
       const found = [
         /* "No dark variant" asks for a value the site never shows while its
            Dark mode is Off — eight of them appeared on a light-only site. */
-        ...composer.dsLinter.lint(allTokens).filter((i) => !(off && i.rule === "missing-dark")),
+        /* A read-only set is the saved values laid over the seed as literals
+           (v5-equivalent), not a v6 graph: "needs an alias" is a v6 invariant,
+           and nothing can be fixed while Brand is paused anyway. */
+        ...composer.dsLinter.lint(allTokens).filter(
+          (i) => !(off && i.rule === "missing-dark") && !(readOnly && i.rule === "semantic-needs-alias"),
+        ),
         ...buildContrastIssues(colorState?.tokens ?? [], mode),
         ...hiddenToggle,
         ...darkPairs,
