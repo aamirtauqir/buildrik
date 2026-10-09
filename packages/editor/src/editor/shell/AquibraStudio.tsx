@@ -623,11 +623,24 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       // is what lets the panel promise a single undo step. It returns
       // null when it will not touch the token — the panel shows that as
       // fix-failed instead of silently doing nothing.
-      onFix={async (issue) =>
-        issue.tokenId && issue.autoFixHint
-          ? composer.designSystem.applyAutoFix(issue.tokenId, issue.autoFixHint)
-          : null
-      }
+      onFix={async (issue) => {
+        if (!issue.tokenId || !issue.autoFixHint) return null;
+        const fixed = composer.designSystem.applyAutoFix(issue.tokenId, issue.autoFixHint);
+        /* Board 6749:58662: a fix is confirmed, with its one undo step — the
+           issue used to drop off the list with nothing said (FG-028). The
+           handle is bound to the fix's own history entry. */
+        if (fixed !== null) {
+          const undo = composer.history.captureUndo();
+          addToast({
+            title: "Issue fixed",
+            description: issue.message,
+            tone: "success",
+            duration: 8000,
+            action: { label: "Undo", onClick: () => void undo() },
+          });
+        }
+        return fixed;
+      }}
       onOpenBrand={(tokenId) => {
         setIssuesOpen(false);
         if (tokenId) requestBrandToken(composer, tokenId);
