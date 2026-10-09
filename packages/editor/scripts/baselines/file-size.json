@@ -1,9 +1,9 @@
 {
   "limit": 800,
   "files": {
-    "src/engine/media/MediaManager.ts": 1855,
-    "src/engine/Composer.ts": 1452,
-    "src/engine/export/ExportEngine.ts": 1399,
+    "src/engine/media/MediaManager.ts": 1769,
+    "src/engine/Composer.ts": 1365,
+    "src/engine/export/ExportEngine.ts": 1348,
     "src/editor/media/LibraryManager.tsx": 1259,
     "src/editor/sidebar/tabs/review/ReviewTab.tsx": 1238,
     "src/editor/design-system/ui/BrandWorkspace.tsx": 1230,
