@@ -50,6 +50,7 @@ export interface PanelState {
 
 /** Selected element info */
 import type { SelectedElementInfo } from "@/shared/types";
+import type { ContentIssueKind } from "@buildrik/shared/content/contentIssues";
 export type { SelectedElementInfo };
 
 /** Save operation state */
@@ -108,7 +109,7 @@ export interface Issue {
    * field for `missing-alt`, or "Fix" → select + open the Link section for
    * `broken-link`.
    */
-  contentKind?: "missing-alt" | "broken-link";
+  contentKind?: ContentIssueKind;
 }
 
 /**

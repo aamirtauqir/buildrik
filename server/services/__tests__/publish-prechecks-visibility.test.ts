@@ -174,7 +174,9 @@ describe("pre-publish content checks (shared detector)", () => {
     tagName: "div",
     children: [
       { id: "img-noalt", type: "image", tagName: "img", children: [], attributes: { src: "https://placehold.co/300x200" } },
-      { id: "img-ok", type: "image", tagName: "img", children: [], attributes: { alt: "Image" } },
+      /* L1-035: the Image block as inserted — no file, the "Image" placeholder
+         alt. This row used to pass both checks. */
+      { id: "img-placeholder", type: "image", tagName: "img", children: [], attributes: { alt: "Image" } },
       { id: "link-dead", type: "link", tagName: "a", content: "Dead", children: [], attributes: { href: "#page:does-not-exist-xyz" } },
       { id: "link-ok", type: "link", tagName: "a", content: "Services", children: [], attributes: { href: "#page:p2" } },
     ],
@@ -187,7 +189,9 @@ describe("pre-publish content checks (shared detector)", () => {
     ]);
     const result = await runPrePublishChecks("s1");
     expect(status(result.checks, "Image alt text")).toBe("warning");
-    expect(detail(result.checks, "Image alt text")).toContain("1 image");
+    expect(detail(result.checks, "Image alt text")).toContain("2 images");
+    expect(status(result.checks, "Images")).toBe("warning");
+    expect(detail(result.checks, "Images")).toBe("1 image has no file and will show as broken.");
     expect(status(result.checks, "Links")).toBe("warning");
     expect(detail(result.checks, "Links")).toContain("1 link");
     expect(result.ready).toBe(true);
@@ -211,6 +215,7 @@ describe("pre-publish content checks (shared detector)", () => {
     ]);
     const { checks } = await runPrePublishChecks("s1");
     expect(status(checks, "Image alt text")).toBe("pass");
+    expect(status(checks, "Images")).toBe("pass");
     expect(status(checks, "Links")).toBe("pass");
   });
 });

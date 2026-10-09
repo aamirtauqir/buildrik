@@ -41,7 +41,7 @@ export interface ContentPage {
 }
 
 export type ContentIssueSeverity = "error" | "warning";
-export type ContentIssueKind = "missing-alt" | "broken-link";
+export type ContentIssueKind = "missing-alt" | "missing-image" | "broken-link";
 
 export interface ContentIssueFinding {
   id: string;
@@ -107,7 +107,10 @@ function describeElement(el: ContentElement, pageName: string): string {
 function checkImage(el: ContentElement, pageId: string, pageName: string): ContentIssueFinding | null {
   const decorative = (el.data as { decorative?: boolean } | undefined)?.decorative;
   if (decorative === true) return null;
-  if (el.attributes?.alt !== undefined) return null;
+  /* "Image" is the Image block's own placeholder (blocks/Media/Image.tsx), not
+     a description — counted as missing (L1-035). */
+  const alt = el.attributes?.alt;
+  if (alt !== undefined && alt.trim() !== PLACEHOLDER_ALT) return null;
   return {
     id: `content:alt:${el.id}`,
     /* A warning, never a publish block (L4-033, owner default 2026-10-09):
@@ -116,6 +119,27 @@ function checkImage(el: ContentElement, pageId: string, pageName: string): Conte
     type: "warning",
     kind: "missing-alt",
     message: "Image is missing alt text",
+    location: describeElement(el, pageName),
+    elementId: el.id,
+    pageId,
+  };
+}
+
+/** The Image block's inserted alt — a placeholder, not a description. */
+const PLACEHOLDER_ALT = "Image";
+
+/**
+ * No file: an image with no (or a blank) `src` renders and ships as a broken
+ * `<img>` (L1-016 / L1-035). A warning, like missing alt — it degrades the
+ * page, it does not stop the deploy.
+ */
+function checkImageSource(el: ContentElement, pageId: string, pageName: string): ContentIssueFinding | null {
+  if ((el.attributes?.src ?? "").trim() !== "") return null;
+  return {
+    id: `content:no-src:${el.id}`,
+    type: "warning",
+    kind: "missing-image",
+    message: "Image has no file",
     location: describeElement(el, pageName),
     elementId: el.id,
     pageId,
@@ -189,6 +213,8 @@ function walkPage(
 ): void {
   if (!root) return;
   if (isImageElement(root)) {
+    const noFile = checkImageSource(root, pageId, pageName);
+    if (noFile) out.push(noFile);
     const issue = checkImage(root, pageId, pageName);
     if (issue) out.push(issue);
   }
@@ -226,10 +252,11 @@ export function asContentRoot(blocks: unknown): ContentElement | undefined {
   return typeof id === "string" ? (blocks as ContentElement) : undefined;
 }
 
-/** Pre-publish check labels for the two detector kinds. The editor's Issues
+/** Pre-publish check labels for the detector kinds. The editor's Issues
  *  feed drops server rows with these labels — its own live scan already lists
  *  the same facts per element. */
 export const CONTENT_CHECK_LABELS: Record<ContentIssueKind, string> = {
   "missing-alt": "Image alt text",
+  "missing-image": "Images",
   "broken-link": "Links",
 };
