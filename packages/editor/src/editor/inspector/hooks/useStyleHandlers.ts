@@ -165,8 +165,12 @@ export function useStyleHandlers(
       return;
     }
 
-    const defaultStyles = getDefaultStyles(selectedElement.type, selectedElement.tagName);
     const effective = computeEffectiveStyles(el, composer, currentBreakpoint, currentPseudoState);
+    const defaultStyles = getDefaultStyles(selectedElement.type, selectedElement.tagName);
+    /* An authored `background` shorthand carries the fill; the type's default
+       `background-color` would otherwise mask it — Fill read the default blue
+       on a button the shorthand made translucent (L2-011). */
+    if (effective.background && !effective["background-color"]) delete defaultStyles["background-color"];
     /* For a property the element does not carry, the panel used to print the
        TYPE's default — so a legacy heading with no font-size of its own read
        "36" while it rendered at 24. Measured live at 1440×900 on a heading that
