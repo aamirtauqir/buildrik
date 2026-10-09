@@ -11,8 +11,8 @@
  * editor consumers keep their import paths unchanged.
  *
  * Pure data types only — no React, no runtime side effects. The few
- * editor-specific React props (TokenListProps) + UI constants
- * (CATEGORY_CHIPS) stay in editor/design-system/types.ts.
+ * editor-specific React props (TokenListProps) stay in
+ * editor/design-system/types.ts.
  *
  * @license BSD-3-Clause
  */

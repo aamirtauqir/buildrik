@@ -6,7 +6,6 @@
  * import-direction rule). This file:
  *   - re-exports the data types for editor consumers (50+ files)
  *   - keeps the React/UI-specific types (TokenListProps) here
- *   - keeps the CATEGORY_CHIPS UI constant here
  *
  * @license BSD-3-Clause
  */
@@ -38,16 +37,3 @@ export interface TokenListProps {
   onChange: (id: string, value: string) => void;
   onCopy: (id: string) => void;
 }
-
-/** UI chip definitions for the legacy category filter. Editor-only. */
-export const CATEGORY_CHIPS = [
-  { id: "colors", label: "Colors", icon: "⬤" },
-  { id: "typography", label: "Type", icon: "Aa" },
-  { id: "spacing", label: "Space", icon: "↔" },
-  { id: "effects", label: "Effects", icon: "◻" },
-  { id: "layout", label: "Layout", icon: "▦" },
-  { id: "buttons", label: "Buttons", icon: "⬜" },
-  { id: "forms", label: "Forms", icon: "▭" },
-  { id: "icons", label: "Icons", icon: "◈" },
-  { id: "theme", label: "Theme", icon: "◑" },
-];
