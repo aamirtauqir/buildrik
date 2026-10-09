@@ -49,6 +49,9 @@ export interface StyleHandlers {
 // HOOK
 // ============================================================================
 
+/** Minimum gap between two engine writes from one field burst (L2-019). */
+const WRITE_INTERVAL_MS = 50;
+
 /**
  * Hook to manage style changes with breakpoint and pseudo-state awareness
  */
@@ -94,6 +97,8 @@ export function useStyleHandlers(
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** The debounced single write not yet committed, and the property it writes. */
   const pendingFlushRef = useRef<{ property: string; run: () => void } | null>(null);
+  /** When the last single write reached the engine (the write-rate limit). */
+  const lastWriteAtRef = useRef(0);
 
   /** Commit the pending debounced write NOW. Any write that must not be
    *  overtaken by it — another property, a batch, a selection change — calls
@@ -103,13 +108,14 @@ export function useStyleHandlers(
     debounceTimerRef.current = null;
     const pending = pendingFlushRef.current;
     pendingFlushRef.current = null;
-    pending?.run();
+    if (!pending) return;
+    lastWriteAtRef.current = Date.now();
+    pending.run();
   }, []);
 
-  /* Typing and scrubbing coalesce: the 300 ms debounce here and the engine's
-     ~500 ms history window turn a run of keystrokes into one undo step. A
+  /* Typing and scrubbing coalesce: the engine's ~500 ms history window turns a run of keystrokes into one undo step. A
      discrete action must not ride along — Align then Reset 0.4 s later undid
-     as ONE step, and a Reset fired inside the debounce was even overtaken by
+     as ONE step, and a Reset fired inside the write interval was even overtaken by
      the Align it followed (QA 2026-10-02). So a discrete action commits
      what is pending first (in order, as its own step), writes at once, and
      closes its own step before anything else can join it (engine/AGENTS.md:
@@ -225,7 +231,7 @@ export function useStyleHandlers(
   }, [selectedElement, composer, currentBreakpoint, currentPseudoState, bump]);
 
   // Style change handler - breakpoint and pseudo-state aware
-  // Immediate visual update + 300ms debounced history entry to prevent keystroke spam
+  // Immediate panel update + a rate-limited engine write (see below)
   const handleStyleChange = useCallback(
     (property: string, value: string) => {
       if (!selectedElement?.id || blocked) return;
@@ -252,8 +258,7 @@ export function useStyleHandlers(
         pseudoState: currentPseudoState,
       });
 
-      // 2. Debounced engine mutation — batches rapid typing into one history entry.
-      // Stores the flush closure in pendingFlushRef so the cleanup effect can
+      // 2. Rate-limited engine mutation. Stores the flush closure in pendingFlushRef so the cleanup effect can
       // commit it when element/breakpoint/pseudo changes before the timer fires.
       // Rapid writes to the SAME property coalesce (the pending one is
       // superseded); a pending write to another property is committed first.
@@ -317,8 +322,16 @@ export function useStyleHandlers(
           composer?.endTransaction?.();
         }
       };
+      /* L2-019: the canvas follows the field. The first write of a burst
+         lands now; later ones at most WRITE_INTERVAL_MS apart, the last value
+         always written. The 300 ms debounce this replaces held every edit
+         back — sliders lagged. History still folds the burst into one undo
+         step (HistoryManager's coalesce window), and each write is one
+         transaction, which is what the interval keeps rare on a drag. */
       pendingFlushRef.current = { property, run: flush };
-      debounceTimerRef.current = setTimeout(flushPending, 300);
+      const wait = WRITE_INTERVAL_MS - (Date.now() - lastWriteAtRef.current);
+      if (wait <= 0) flushPending();
+      else debounceTimerRef.current = setTimeout(flushPending, wait);
     },
     [selectedElement, composer, currentBreakpoint, currentPseudoState, extraTargetIds, blocked, flushPending]
   );
