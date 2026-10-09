@@ -61,3 +61,34 @@ describe("MediaManager.trashAsset", () => {
     expect(manager.getAssets().map((x) => x.id)).toEqual(["b2"]);
   });
 });
+
+/* L4-005: the drawer's "Assets · N" reads the server page total, which only
+   boot and load-more set — it said "Assets · 0" over three tiles. The
+   library's own adds and removes move it. */
+describe("MediaManager — the server page total follows the library", () => {
+  it("drops by one on a trash, comes back on restore, and drops on a hard delete", async () => {
+    const { manager } = seeded();
+    manager.setServerPage({ nextCursor: null, total: 2, loaded: 2 });
+    const t = await manager.trashAsset("a1");
+    expect(manager.getServerPage()).toMatchObject({ total: 1, loaded: 1 });
+    t!.restore();
+    expect(manager.getServerPage()).toMatchObject({ total: 2, loaded: 2 });
+    await manager.deleteAsset("b2");
+    expect(manager.getServerPage()).toMatchObject({ total: 1, loaded: 1 });
+  });
+
+  it("announces the change so the header re-reads it", async () => {
+    const { manager } = seeded();
+    manager.setServerPage({ nextCursor: null, total: 2, loaded: 2 });
+    const seen: number[] = [];
+    manager.on(MEDIA_EVENTS.SERVER_PAGE_CHANGED, (p: { total: number }) => seen.push(p.total));
+    await manager.trashAsset("a1");
+    expect(seen).toEqual([1]);
+  });
+
+  it("leaves no page alone when there is none", async () => {
+    const { manager } = seeded();
+    await manager.trashAsset("a1");
+    expect(manager.getServerPage()).toBeNull();
+  });
+});
