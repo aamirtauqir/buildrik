@@ -67,6 +67,15 @@ describe("editActions — copy runs the engine command", () => {
   });
 });
 
+/* L1-018: Paste was enabled with an empty clipboard. */
+describe("editActions — paste is disabled with nothing to paste", () => {
+  it("isEnabled follows the in-app clipboard", () => {
+    const paste = editSubmenu.find((a) => a.id === "paste")!;
+    expect(paste.isEnabled?.({ composer: { clipboard: [] } } as never)).toBe(false);
+    expect(paste.isEnabled?.({ composer: { clipboard: [{ id: "x" }] } } as never)).toBe(true);
+  });
+});
+
 describe("editActions — paste reports its outcome", () => {
   let composer: Composer;
   let addToast: ReturnType<typeof vi.fn>;
