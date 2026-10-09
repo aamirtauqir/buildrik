@@ -456,6 +456,28 @@ describe("StudioPanels — the CMS workspace returns to the bound element (§13)
     expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
   });
 
+  /* L1-027: Escape (×3) did not leave a CMS workspace opened from the rail. */
+  it("Escape leaves a workspace opened from the rail", async () => {
+    const composer = selectingComposer([]);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "content" }));
+    await screen.findByTestId("cms-workspace");
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(screen.queryByTestId("cms-workspace")).toBeNull();
+  });
+
+  it("Escape after a bound-element door is Back to canvas", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: "col-1" }));
+    await screen.findByTestId("cms-workspace");
+    act(() => composer.selection.clear());
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(screen.queryByTestId("cms-workspace")).toBeNull();
+    expect(composer.selection.getSelectedIds()).toEqual(["el-1"]);
+  });
+
   it("leaving the workspace another way drops the return", async () => {
     const composer = selectingComposer(["el-1"]);
     composer.selection.select(composer.live.get("el-1")!);

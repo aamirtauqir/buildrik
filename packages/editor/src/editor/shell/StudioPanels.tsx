@@ -464,6 +464,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       restoreSelection(composer, back.ids);
     });
   }, [cmsReturn, composer, onLeftPanelTabChange, onLeftPanelToggle]);
+  /* L1-027: Escape steps out of the CMS workspace, as the Help legend
+     promises — Back to canvas after a bound-element door, else the drawer
+     closes and the canvas returns. */
+  useColumnPanelEscape(cmsWorkspaceOpen, () => (cmsReturn ? backToCanvas() : onLeftPanelToggle?.()));
   const inspectorOpen = isInspectorColumnOpen({
     readOnlyView,
     viewerChrome,
