@@ -231,7 +231,11 @@ Fill = dots/icons/borders. Text = labels on the matching tint. Tint = the chip/b
 - **Editor:** Grid-disciplined. Topbar (56px) / Left rail (60px) / **Drawer 280px — all six panels** / canvas (flex) / **right inspector 300px**. *(Corrected 2026-07-19: read "240 nav / 320 authoring" and "inspector 320px". Both were the previous IA and both were outside the supersede banner below, so they read as live. The canonical source for every chrome dimension is `docs/designs/2026-07-18-editor-shell-wireframes.md` — this line exists only so it does not contradict it.)*
 - **Border radius scale (Flowbite):** `sm: 4px` (row corners, small chips), `md: 6px` (icon tiles, compact controls), `lg: 8px` (buttons, inputs, panels, cards, modals — Flowbite rounded-lg), `full: 9999px` (pills, avatars).
 - **Topbar height:** 56px — canonical. All other chrome heights flow from this rhythm.
-- **Panel header height:** 44px — matches sidebar contract.
+- **Panel header height:** 44px — matches sidebar contract. Every drawer panel (Add, Layers, Pages, Assets, CMS root, Components, History) uses `PanelHeader` at 44. Three named variants are drawn by their own boards and are not drift (DQ-027, measured 2026-10-10):
+  - **Workspace header, 56px** — a full-width workspace beside the drawer carries its own 16/600 title bar under the topbar: CMS collection (`cms-ws-header`, board 4428:143182 "Collection header" 1100×56).
+  - **Workspace page, no PanelHeader** — Brand replaces the drawer and canvas with a full-page workspace: the nav column opens with `‹ Back to canvas` (board 7315:80955) over an `h1` "Brand" at 24/600, and each page titles itself with an `h2` at 20/600 (both on the ui/* ramp).
+  - **Inspector header, 72px** — breadcrumb, element title and the ✦ AI / ⋯ / ✕ actions on two lines (Inspector v4, board 7993:198599).
+  A new surface uses `PanelHeader` (44) unless its board draws one of these.
 
 ## Overflow — what happens when the content is longer than the box
 
