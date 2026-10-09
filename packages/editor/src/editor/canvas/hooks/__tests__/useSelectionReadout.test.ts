@@ -76,3 +76,14 @@ describe("useSelectionReadout — Add drag", () => {
     expect(result.current.label).toBe("Section · Hero");
   });
 });
+
+/* L1-021: ← from a top-level element selects the page root; the inspector
+   calls it "Home · Page", so the bar must not say "Container". */
+describe("useSelectionReadout — page root", () => {
+  it("the page root reads Page · page name", () => {
+    const composer = composerWith({ type: "container" }) as unknown as { elements: Record<string, unknown> };
+    composer.elements.getActivePage = () => ({ id: "p1", name: "Home", root: { id: "e1" } });
+    const { result } = renderHook(() => useSelectionReadout(composer as unknown as Composer, { id: "e1", type: "container" }));
+    expect(result.current.label).toBe("Page · Home");
+  });
+});
