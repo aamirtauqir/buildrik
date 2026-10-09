@@ -44,7 +44,7 @@ export function RemoveDomainDialog({ domain, siteName, busy = false, onCancel, o
         <ModalBody>
           <p className={LIBRARY_MODAL_BODY} data-testid="set-dom-confirm-body">
             {domain} stops pointing at this site. Visitors following that address get nothing until you reconnect it
-            or change your DNS; the site keeps serving on its buildrick.app address.
+            or change your DNS; the site keeps serving on its default vercel.app address.
           </p>
         </ModalBody>
         <div className={`${LIBRARY_MODAL_FOOT} tw:justify-end`} data-testid="set-dom-confirm-foot">
