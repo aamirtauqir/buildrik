@@ -208,6 +208,22 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
             <div key={i} className="h-11 w-full animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
         </div>
+      ) : submissionsQuery.isError ? (
+        /* A failed read is not an empty inbox: it fell through to "No
+           submissions found" (FG-032b). */
+        <div
+          role="alert"
+          className="rounded-lg border border-dashed p-10 text-center"
+          style={{ borderColor: "var(--color-border-default)" }}
+        >
+          <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Couldn&apos;t load submissions</p>
+          <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>
+            The inbox could not be read just now. Try again.
+          </p>
+          <Button variant="ghost" size="sm" className="mt-3" onClick={() => void submissionsQuery.refetch()}>
+            Retry
+          </Button>
+        </div>
       ) : (
         <>
           <DataTable
