@@ -121,7 +121,7 @@
    `components`, NOT `reset`: inside the dashboard the layer order is
    reset, theme, base, components, utilities, tw-utilities — and the
    dashboard's own Tailwind preflight (`base`) re-declares `b, strong
-   { font-weight: bolder }`, which beat this rule from `reset` (measured:
+   }` at weight `bolder`, which beat this rule from `reset` (measured:
    still 700 with the rule loaded). `components` sits after `base` and
    before `tw-utilities`, so a weight utility on the element
    (`tw:font-medium`) still wins. */
