@@ -129,3 +129,64 @@ Set `BRAND_TOKENS_V2=on` the same way (`echo BRAND_TOKENS_V2=on > /tmp/brand-on.
 then `pnpm env:set:prod --file /tmp/brand-on.env --apply --restart`; unverified on
 the host), open the site and confirm it migrates (Brand editable,
 `[tokens] migrated` in the console).
+
+## 6. Part 1b rollout (binding)
+
+- No Prisma migration, no new env var. `BRAND_TOKENS_V2` still governs the
+  migration only; on an un-migrated or held site Brand is read-only, so delete
+  and Connect are refused there (`readOnly`).
+- Inserted blocks bind to seed vars that every emit path declares (seed merge +
+  `LEGACY_SEED` backstop), on v5 and v6 sites alike. **Never remove a seed
+  token once shipped**: elements bind to it.
+- The removal guard in `setTokens` refuses a write that drops a token an
+  element still reaches — counted through the pending set's own aliases, so a
+  Review changes revert that drops its own `custom-*` primitive goes through
+  (fixed 2026-10-09). Usage "unknown" (saved components not read) still refuses.
+- Theme push now refuses a site (`failed`, nothing written) when its own tokens
+  cannot be read or clash with the theme; the message names the reason. It
+  keeps a site's in-use site-only tokens (`keepInUseSiteTokens`).
+- Rollback: revert the 1b commits and redeploy. Elements inserted while 1b was
+  live keep resolving (their vars are seed + backstop vars, which the revert
+  does not remove — check this before reverting the seed-gap commit). Theme
+  push returns to wholesale replace.
+- **Before deploying**, the owner runs this read-only query against prod (1b
+  tightened `replacedBy`: same kind, no cycles — a stored set that breaks it
+  would open read-only):
+
+  ```sql
+  SELECT id, name
+  FROM sites
+  WHERE "deletedAt" IS NULL
+    AND "projectSettings"::text LIKE '%"replacedBy"%';
+  ```
+
+  For each row, open the site locally against a copy and confirm
+  `validateTokens` passes. Not run against prod by any agent.
+
+## 7. Part 1c rollout (generators)
+
+- No Prisma migration, no new env var. `NEXT_PUBLIC_FEATURE_DS_AI` now also
+  gates the server's `theme.extractBrandFromUrl` (404 unless exactly `"true"`;
+  baked at build like every `NEXT_PUBLIC_*`).
+- New outbound traffic: the URL import fetches user-supplied public pages
+  (http/https, ports 80/443, ≤ 3 redirects each re-vetted, 2 MB page + 4 × 1 MB
+  CSS, one 10 s budget), pinned to the vetted IP (`lib/url-guard.ts`). Rate
+  limits 10 / 10 min per user and 30 / 10 min per workspace
+  (`rate_limit_buckets` keys `brand-extract:*`). Failures log
+  `[brand-extract] failed { kind, siteId }`, never page content.
+- Restore points: `generator | dark-auto | logo` rows in
+  `site_theme_snapshots`, kept to the newest 10 per site together with
+  `theme-push` rows (`pruneThemeSnapshots`; `migration` rows exempt). Admin
+  theme-push rollback still only takes `theme-push` rows.
+- Dark mode: nothing changes on deploy — every existing site stays Off until
+  its owner switches (new sites too; Task 15 did not ship). Turning Auto on
+  saves the full token set with the filled dark values and a restore point, in
+  one ⌘Z. Rollback = revert the 1c commits; a site already switched to Auto
+  keeps publishing its dark blocks (that path is 1a's) until its owner turns
+  Auto off.
+- Theme toggles placed while 1c is live are plain buttons after a revert (no
+  runtime, no hide rule). Count them first (read-only, owner runs against prod):
+
+  ```sql
+  SELECT count(*) FROM pages WHERE blocks::text LIKE '%data-bk-theme-toggle%';
+  ```
