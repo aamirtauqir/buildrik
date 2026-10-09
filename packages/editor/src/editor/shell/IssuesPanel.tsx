@@ -236,7 +236,9 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
            header and insets both to the panel's 24px gutter; the pair sat one
            spacing step high and one step narrow until 2026-09-01. */
         <div className="tw:px-6 tw:pt-10 tw:text-center" role="status">
-          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No brand issues.</p>
+          {/* Board 4418:47609. The panel carries content and publish checks as
+              well as Brand's, so "No brand issues." undersold it (FG-027). */}
+          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No issues. This page is ready to publish.</p>
         </div>
       ) : (
         <>

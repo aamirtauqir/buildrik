@@ -54,9 +54,12 @@ describe("IssuesPanel", () => {
     expect(screen.getByText(/no errors/i)).toBeInTheDocument();
   });
 
+  /* FG-027: the panel lists content and publish checks too — board
+     4418:47609's clean state, not "No brand issues." */
   it("shows a clean state when there are zero issues", () => {
     renderPanel({ issues: [] });
-    expect(screen.getByText(/no brand issues/i)).toBeInTheDocument();
+    expect(screen.getByText("No issues. This page is ready to publish.")).toBeInTheDocument();
+    expect(screen.queryByText(/no brand issues/i)).toBeNull();
   });
 
   it("renders an Ignored (n) row per suppressed token, and Restore calls onUnignore", () => {
