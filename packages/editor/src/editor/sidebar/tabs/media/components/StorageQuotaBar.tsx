@@ -40,6 +40,8 @@ interface StorageQuotaBarProps {
  */
 const MIB = 1024 * 1024;
 export function formatQuotaSize(bytes: number): string {
+  /* Under a megabyte, kilobytes: two small files read "1 MB" (L4-017). */
+  if (bytes < MIB) return `${bytes > 0 ? Math.max(1, Math.round(bytes / 1024)) : 0} KB`;
   if (bytes < 1024 * MIB) return `${Math.round(bytes / MIB)} MB`;
   const gb = bytes / (1024 * MIB);
   return `${gb >= 10 ? gb.toFixed(0) : gb.toFixed(1).replace(/\.0$/, "")} GB`;
