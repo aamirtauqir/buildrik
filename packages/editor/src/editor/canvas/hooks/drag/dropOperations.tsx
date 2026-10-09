@@ -206,13 +206,35 @@ export function handleElementDrop(
     const currentParentId = currentParent?.getId();
     const droppingOnSameParent = Boolean(currentParent) && currentParentId === targetId;
 
+    /* L1-010: the indicator drew its line BEFORE/AFTER the target; the move
+       has to land in that slot. Asking findValidDropTargetWithFallback alone
+       nested into the target or went after it, whatever the line said. */
+    const indicated = ctx.freshDropPosition;
+    const targetParent = targetEl.getParent();
+    const targetIndex = targetParent ? targetParent.getChildren().findIndex((c: GrapesElement) => c.getId() === targetId) : -1;
+    const indicatedSlot =
+      targetId === freshTargetId &&
+      targetIndex >= 0 &&
+      (indicated === "before" || indicated === "after") &&
+      targetParent &&
+      !skipIds.has(targetParent.getId()) &&
+      !targetParent.isComponentInstance?.() &&
+      canNestElement(sourceType, targetParent.getType() as ElementType)
+        ? {
+            parent: targetParent,
+            index: targetIndex + (indicated === "after" ? 1 : 0),
+          }
+        : null;
+
     const rootEl = page ? (composer.elements.getElement(page.root.id) ?? null) : null;
-    const resolved = findValidDropTargetWithFallback(targetEl, rootEl, sourceType, {
-      skipElementId: elementId,
-      skipDescendantIds: descendantIds,
-      skipCurrentParent: droppingOnSameParent,
-      currentParentId,
-    });
+    const resolved = indicatedSlot
+      ? { success: true, result: indicatedSlot }
+      : findValidDropTargetWithFallback(targetEl, rootEl, sourceType, {
+          skipElementId: elementId,
+          skipDescendantIds: descendantIds,
+          skipCurrentParent: droppingOnSameParent,
+          currentParentId,
+        });
 
     if (!resolved.success || !resolved.result) {
       return true;

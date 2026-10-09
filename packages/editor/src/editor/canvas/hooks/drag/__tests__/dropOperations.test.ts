@@ -768,6 +768,34 @@ describe("handleElementDrop", () => {
     expect(handleElementDrop(e, ctx, null)).toBe(false);
   });
 
+  /* L1-010: the indicator drew "Drop here" ABOVE the target, and the move
+     landed AFTER it — the single-element path ignored the indicator's
+     before/after and asked findValidDropTargetWithFallback, which nests or
+     goes after. It now lands in the indicator's slot. */
+  it.each([
+    ["before", 1],
+    ["after", 2],
+  ] as const)("a drop the indicator shows %s the target lands in that slot", (pos, slot) => {
+    vi.useFakeTimers();
+    const target = makeStubElement({ id: "t1", getType: () => "heading" });
+    const parent = makeStubElement({ id: "p2", getChildren: () => [makeStubElement({ id: "x" }), target] });
+    target.getParent = () => parent;
+    const sourceEl = makeStubElement({ id: "el1", getType: () => "text" });
+    const root = makeStubElement({ id: "r1" });
+    const composer = makeStubComposer({
+      activePage: { id: "p1", root: { id: "r1" } },
+      elements: new Map([["el1", sourceEl], ["t1", target], ["p2", parent], ["r1", root]]),
+    });
+    const ctx = makeDropContext(composer, { freshTargetId: "t1", freshDropPosition: pos });
+    const targetDom = document.createElement("div");
+    targetDom.setAttribute("data-buildrick-id", "t1");
+    vi.mocked(findDropTargetElement).mockReturnValue(targetDom);
+
+    expect(handleElementDrop(makeDragEvent({ element: JSON.stringify({ elementId: "el1" }) }), ctx, null)).toBe(true);
+    expect(composer.elements.moveElement).toHaveBeenCalledWith("el1", "p2", slot);
+    expect(findValidDropTargetWithFallback).not.toHaveBeenCalled();
+  });
+
   it("happy path: moves source element to resolved new parent", () => {
     vi.useFakeTimers();
     const sourceEl = makeStubElement({ id: "el1", getType: () => "text" });
