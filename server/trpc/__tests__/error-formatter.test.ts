@@ -58,3 +58,38 @@ describe("errorFormatter cause lifting", () => {
     expect(out.data.cause).toBeUndefined();
   });
 });
+
+/* L3-008: a raw error's message is not a user message. A Prisma error's text
+   names server file paths ("Invalid `tx.page.upsert()` invocation in
+   /Users/…/server_services_….js:8716") and reached the editor as the save
+   error. Deliberate TRPCErrors keep their words. */
+describe("errorFormatter message for unexpected server errors", () => {
+  type WithMessage = { message: string };
+  const prismaError = () =>
+    Object.assign(new Error("\nInvalid `tx.page.upsert()` invocation in\n/Users/x/.next/server/chunks/server_services_a.js:8716:20\n\nUnique constraint failed"), {
+      name: "PrismaClientKnownRequestError",
+      code: "P2002",
+    });
+
+  it("never ships a Prisma error's text", () => {
+    const out = format(getTRPCErrorFromUnknown(prismaError())) as unknown as WithMessage;
+    expect(out.message).toBe("Something went wrong on our side. Please try again.");
+  });
+
+  it("replaces any raw error's text in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    try {
+      const out = format(getTRPCErrorFromUnknown(new Error("ECONNREFUSED 10.0.0.4:5432"))) as unknown as WithMessage;
+      expect(out.message).toBe("Something went wrong on our side. Please try again.");
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("keeps a deliberate TRPCError's message, even an INTERNAL one", () => {
+    const out = format(
+      new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "The save took too long and was not applied. It will be tried again." }),
+    ) as unknown as WithMessage;
+    expect(out.message).toBe("The save took too long and was not applied. It will be tried again.");
+  });
+});

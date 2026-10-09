@@ -92,13 +92,25 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
           )
         : {};
 
+    /* L3-008: a raw Error that escaped a procedure is wrapped as an INTERNAL
+       error carrying the raw text, which is not a user message. A Prisma
+       error's text names server file paths, so it never ships; in production
+       no raw text ships at all. A deliberate TRPCError (no Error cause) keeps
+       its words. The server log still has the original. */
+    const raw = error.code === "INTERNAL_SERVER_ERROR" && error.cause instanceof Error && !(PlainObjectCause && error.cause instanceof PlainObjectCause)
+      ? error.cause
+      : null;
+    const hideRaw = raw && (raw.name.startsWith("PrismaClient") || process.env.NODE_ENV === "production");
+
     return {
       ...shape,
       message: zod
         ? zod.issues
             .map((i) => `${i.path.join(".") || "input"}: ${i.message}`)
             .join("; ")
-        : shape.message,
+        : hideRaw
+          ? "Something went wrong on our side. Please try again."
+          : shape.message,
       data: {
         ...shape.data,
         ...(Object.keys(causeData).length > 0 ? { cause: causeData } : {}),
