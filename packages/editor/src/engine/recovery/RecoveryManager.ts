@@ -63,6 +63,9 @@ export class RecoveryManager {
     if (typeof window !== "undefined") {
       this.onWindowError = (event: ErrorEvent) => {
         const reason = event.error?.message ?? event.message ?? "unknown error";
+        /* The browser's own "ResizeObserver loop …" notice: a layout pass
+           deferred to the next frame, not a fault (L4-015). */
+        if (/^ResizeObserver loop/.test(reason)) return;
         this.handleRuntimeFault("error", reason);
       };
       window.addEventListener("error", this.onWindowError);
