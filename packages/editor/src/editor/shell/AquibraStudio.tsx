@@ -52,6 +52,7 @@ import { useExportHandlers } from "./hooks/useExportHandlers";
 import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
 import { submitForReview } from "../../services/ReviewService";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
+import { IMPROVE_ELEMENT_PROMPT } from "@/editor/sidebar/tabs/ai/types";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
@@ -750,7 +751,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            SAME right-column AI thread as every other AI door — same event,
            same panel, no second engine. Without this prop the menu item
            hides itself (useCanvasContextMenu only shows it when set). */
-        onAIRequest={() => composer.emit("ui:switch-tab", { tab: "ai" })}
+        onAIRequest={() => composer.emit("ui:switch-tab", { tab: "ai", prompt: IMPROVE_ELEMENT_PROMPT })}
         onResendReview={resendReview}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}

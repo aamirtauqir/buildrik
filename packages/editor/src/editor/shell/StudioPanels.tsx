@@ -329,6 +329,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   }, [readOnlyView, viewerChrome]);
 
   const [aiInInspector, setAiInInspector] = React.useState(false);
+  /* The intent the door that opened AI carried (L5-014) — its prompt fills
+     the empty field. Cleared when AI closes so the next door starts clean. */
+  const [aiSeedPrompt, setAiSeedPrompt] = React.useState<string | undefined>(undefined);
+  React.useEffect(() => {
+    if (!aiInInspector) setAiSeedPrompt(undefined);
+  }, [aiInInspector]);
   /* Inspector visibility, user-operated. Defaults to SHOWN so the drawn
      no-selection board is still the default state — collapsing it
      automatically was tried before and rendered that board off-viewport.
@@ -659,7 +665,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // Listen for tab switch events
   React.useEffect(() => {
     if (!composer) return;
-    const handler = (data: { tab: string; fullPage?: boolean }) => {
+    const handler = (data: { tab: string; fullPage?: boolean; prompt?: string }) => {
       /* Every "ui:switch-tab" emitter (⌘K palette, canvas context menus,
          inspector doors, PublishTab, CmsWorkspace, …) is a second door onto
          the same tabs the rail gates — without this check a VIEWER could not
@@ -683,6 +689,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         /* A-14: with the inspector hidden, AI used to mount into a 0-px
            column; isInspectorColumnOpen now opens the column for any panel
            it hosts, AI included. */
+        setAiSeedPrompt(data.prompt);
         setAiInInspector(true);
         return;
       }
@@ -954,6 +961,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 isExpanded={false}
                 onExpandToggle={() => {}}
                 onClose={() => setAiInInspector(false)}
+                seedPrompt={aiSeedPrompt}
                 /* M-1: "‹ Inspector" leads to the inspector — shown even if it
                    was hidden, where closing AI alone took the column with it. */
                 onBack={() => {
