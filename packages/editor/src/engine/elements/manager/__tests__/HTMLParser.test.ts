@@ -22,6 +22,30 @@ function importInto(html: string) {
   return { composer, manager, page, root, kids: root.getChildren() };
 }
 
+/* L2-025: the SaaS hero's <h1>Grow<br>faster</h1> imported its <br> as a
+   63-px "Container" layer. Inline phrasing inside a text element stays the
+   element's own content. */
+describe("HTMLParser — inline phrasing inside a text element", () => {
+  it("keeps <br> inside a heading as content, not a layer", () => {
+    const { kids } = importInto("<h1>Grow<br>faster</h1>");
+    expect(kids).toHaveLength(1);
+    expect(kids[0].getType()).toBe("heading");
+    expect(kids[0].getChildren()).toHaveLength(0);
+    expect(kids[0].getContent()).toBe("Grow<br>faster");
+  });
+
+  it("keeps <strong> inside a paragraph as content", () => {
+    const { kids } = importInto("<p>Hello <strong>World</strong></p>");
+    expect(kids[0].getChildren()).toHaveLength(0);
+    expect(kids[0].getContent()).toBe("Hello <strong>World</strong>");
+  });
+
+  it("a link inside a heading is still its own element", () => {
+    const { kids } = importInto('<h2>Read <a href="/x">more</a></h2>');
+    expect(kids[0].getChildren().some((c) => c.getType() === "link")).toBe(true);
+  });
+});
+
 describe("HTMLParser.importHTMLToActivePage", () => {
   it("creates a default page when none exists", () => {
     const { manager } = makeEngine();

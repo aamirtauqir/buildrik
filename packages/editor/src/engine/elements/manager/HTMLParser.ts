@@ -42,6 +42,13 @@ const LANDMARK_LABELS: Record<string, string> = {
   footer: "Footer",
   aside: "Sidebar",
 };
+/** Inline phrasing a text element keeps as its own content (L2-025). */
+const INLINE_PHRASING = new Set(["br", "b", "strong", "i", "em", "u", "s", "small", "sub", "sup", "mark", "code", "span"]);
+
+function isInlinePhrasing(el: globalThis.Element): boolean {
+  return INLINE_PHRASING.has(el.tagName.toLowerCase()) && [...el.children].every(isInlinePhrasing);
+}
+
 function sectionLabel(el: HTMLElement): string {
   const tag = (el.tagName || "div").toLowerCase();
   return LANDMARK_LABELS[tag] ?? tag.charAt(0).toUpperCase() + tag.slice(1);
@@ -235,6 +242,17 @@ export class HTMLParser {
     });
 
     const classes = Array.from(el.classList);
+
+    /* L2-025: inline phrasing (a <br>, <strong>…) inside a text element is
+       that element's own content — it imported as layers, a <br> in a hero
+       <h1> as a 63-px "Container". Links stay elements: they are edited. */
+    if (isTextOnlyTag(tagName) && el.children.length > 0 && [...el.children].every(isInlinePhrasing)) {
+      const data: ElementData = { id: generateId("el"), type, tagName, children: [], content: el.innerHTML };
+      if (Object.keys(attributes).length > 0) data.attributes = attributes;
+      if (classes.length > 0) data.classes = classes;
+      if (styles && Object.keys(styles).length > 0) data.styles = styles;
+      return data;
+    }
 
     const children: ElementData[] = [];
     let textBuffer = "";

@@ -58,7 +58,7 @@ describe("every stock template survives the allowlist unchanged", () => {
     const before = composer.exportProject();
     const root = structuredClone(before.pages[0].root);
     sanitizeElementTreeContent(root);
-    expect(JSON.stringify(root).split("\"id\"").length).toBeGreaterThan(20);
+    expect(JSON.stringify(root).split("\"id\"").length).toBeGreaterThan(15);
     expect(root).toEqual(before.pages[0].root);
 
     const reloaded = new Composer({} as never);
