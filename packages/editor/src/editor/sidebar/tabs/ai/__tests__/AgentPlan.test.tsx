@@ -268,3 +268,24 @@ describe("agent run — Thinking (board 4418:104577)", () => {
     expect(screen.getByRole("button", { name: "Stop run" }).className).toContain("tw:w-[120px]");
   });
 });
+
+/* L5-013: the approval card shows what a row replaces, not only what it sets. */
+describe("approval card before value", () => {
+  it("draws 'field: from → to' when the before value is known", () => {
+    const awaiting: RunStep = {
+      ...step("Rewrite the headline", "awaiting"),
+      edit: {
+        target: "h1",
+        summary: "",
+        rows: [
+          { field: "text", from: "Old heading", to: "AI rewritten heading" },
+          { field: "add", from: "", to: "button" },
+        ],
+        applyOps: { preview: {}, commit: {} },
+      },
+    };
+    renderPlan({ steps: [awaiting], currentIndex: 0 });
+    const rows = screen.getAllByTestId("ai-gate-diff-row").map((r) => r.textContent);
+    expect(rows).toEqual(["text: Old heading → AI rewritten heading", "add → button"]);
+  });
+});

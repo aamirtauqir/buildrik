@@ -125,3 +125,17 @@ describe("AI column — failed suggestion", () => {
     expect((screen.getByTestId("ai-prompt-input") as HTMLTextAreaElement).value).toBe("Make it more concise");
   });
 });
+
+/* L5-014: a door with an intent fills the empty field instead of landing on
+   the same blank prompt as every other door. */
+describe("AI column — door intent", () => {
+  it("prefills the field with the door's prompt, without running it", () => {
+    lastSubscribe.input = undefined;
+    render(
+      <AITab composer={headingComposer()} isExpanded={false} onExpandToggle={vi.fn()} onClose={vi.fn()} onBack={vi.fn()} seedPrompt="Improve this element's copy and spacing" />,
+      { wrapper: ToastProvider },
+    );
+    expect((screen.getByTestId("ai-prompt-input") as HTMLTextAreaElement).value).toBe("Improve this element's copy and spacing");
+    expect(lastSubscribe.input).toBeUndefined();
+  });
+});

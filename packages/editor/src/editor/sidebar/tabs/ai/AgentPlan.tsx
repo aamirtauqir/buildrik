@@ -348,7 +348,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
                 rows are what the server actually proposes. */}
             {(gateStep.edit?.rows ?? []).map((r, i) => (
               <p key={i} className={DIFF_ROW} data-testid="ai-gate-diff-row">
-                {r.field} → {r.to}
+                {r.from ? `${r.field}: ${r.from} → ${r.to}` : `${r.field} → ${r.to}`}
               </p>
             ))}
             <div className={PANEL_ACTIONS}>

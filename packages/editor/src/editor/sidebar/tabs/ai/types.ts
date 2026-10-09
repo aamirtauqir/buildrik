@@ -19,6 +19,11 @@ export type AIScope =
 
 export type AIScopeStatus = "idle" | "locked";
 
+/** What the canvas "Improve with AI" door puts in the prompt field (L5-014:
+ *  every door used to land on the same empty prompt, so "Improve" improved
+ *  nothing by itself). Prefilled, not run — the user still sends it. */
+export const IMPROVE_ELEMENT_PROMPT = "Improve this element's copy and spacing";
+
 export interface DiffEdit {
   target: string;
   summary: string;

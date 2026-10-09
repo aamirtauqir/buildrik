@@ -73,6 +73,9 @@ export interface AITabProps {
   /** Rendered in the inspector column (boards 170:2 · 66:225), where the way
    *  out is back to the inspector rather than a panel close. */
   onBack?: () => void;
+  /** A door's intent: the prompt it puts in the empty field ("Improve with
+   *  AI" → IMPROVE_ELEMENT_PROMPT). */
+  seedPrompt?: string;
 }
 
 /** What a scope's run copy calls it: "Hero", "the 3 selected elements". */
@@ -113,7 +116,7 @@ function scopeNote(scope: AIScope): string {
 const RESIDUE_NOTE =
   "Scoped runs edit only the selection — but page settings (title, description, slug) and a publish request are not element edits and can still come back. Clearing the selection widens the scope to the page.";
 
-export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, onBack }) => {
+export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, onBack, seedPrompt }) => {
   const { scope: liveScope, status, lock, unlock, options, choose } = useAIScope(composer);
   // Not state: the server owns model choice (`resolveModelForUser` gates it by
   // plan and ignores a client hint it doesn't allow). The picker that used to
@@ -287,7 +290,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             quotaLabel={(quota && quotaLeftLabel(quota)) || undefined}
             variant={column35 ? "column" : "band"}
             placeholder={column35 ? "What would you like to change?" : undefined}
-            restoreText={failedKind ? lastPrompt.current?.text : undefined}
+            restoreText={failedKind ? lastPrompt.current?.text : seedPrompt}
           />
         </div>
       )}

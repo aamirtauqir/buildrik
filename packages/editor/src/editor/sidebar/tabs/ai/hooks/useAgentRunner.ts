@@ -13,7 +13,7 @@ import {
   type MediaAssetRef,
   type RunScope,
 } from "./runPromptOnce";
-import { gatherTokens, gatherMediaAssets, gatherElementContext, toElementRef } from "./aiScopeContext";
+import { gatherTokens, gatherMediaAssets, gatherElementContext, toElementRef, withBeforeValues } from "./aiScopeContext";
 import { activePageElements } from "./useAIScope";
 import { trackAgentRun } from "@/services/ai/adoptionTracker";
 
@@ -264,7 +264,7 @@ export function useAgentRunner(
         });
         if (cancelledRef.current) return;
         if (edit && edit.rows.length > 0) {
-          setStep(i, { status: "awaiting", edit });
+          setStep(i, { status: "awaiting", edit: withBeforeValues(composer, edit) });
         } else {
           setStep(i, { status: "nochange" });
           advance(i + 1);

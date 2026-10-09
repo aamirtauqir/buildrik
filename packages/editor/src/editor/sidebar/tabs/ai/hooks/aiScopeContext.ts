@@ -17,7 +17,7 @@ import type { Composer } from "../../../../../engine";
 import { AI_EDITABLE_TOKEN_TYPES } from "@/engine/designSystem/tokenValueGuard";
 import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import type { Element } from "@/engine/elements/Element";
-import type { TokenRef, MediaAssetRef, PageElementRef } from "./runPromptOnce";
+import type { TokenRef, MediaAssetRef, PageElementRef, ServerEdit } from "./runPromptOnce";
 
 /** One element as a page-scope list sends it: id, type and a short text
  *  snippet (capped like the server's `pageElementRefSchema`). */
@@ -104,4 +104,33 @@ export function gatherElementContext(composer: Composer | null, id: string): AiE
       text: plainText(c.getContent?.(), L.childText),
     })),
   };
+}
+
+/** Longest before value a review row shows. */
+const MAX_BEFORE = 120;
+
+/**
+ * The review card's "from" values, read off the live element. The server
+ * cannot know them and always sends `from: ""`, so the user approved a change
+ * without seeing what it replaced (L5-013). Rows map 1:1 onto the edit's
+ * commands; when they do not line up the edit is returned untouched.
+ */
+export function withBeforeValues(composer: Composer | null, edit: ServerEdit): ServerEdit {
+  const commands = (edit.applyOps.commit as { commands?: unknown }).commands;
+  if (!composer || !Array.isArray(commands) || commands.length !== edit.rows.length) return edit;
+  const rows = edit.rows.map((row, i) => {
+    const cmd = commands[i] as { commandId?: unknown; args?: Record<string, unknown> };
+    const el = typeof cmd.args?.elementId === "string" ? composer.elements?.getElement?.(cmd.args.elementId) : null;
+    if (!el || row.from) return row;
+    const before =
+      cmd.commandId === "set-text"
+        ? plainText(el.getContent?.(), MAX_BEFORE)
+        : cmd.commandId === "set-style" && typeof cmd.args?.property === "string"
+          ? el.getStyle?.(cmd.args.property)
+          : cmd.commandId === "set-attribute" && typeof cmd.args?.attribute === "string"
+            ? el.getAttribute?.(cmd.args.attribute)
+            : undefined;
+    return before ? { ...row, from: String(before).slice(0, MAX_BEFORE) } : row;
+  });
+  return { ...edit, rows };
 }
