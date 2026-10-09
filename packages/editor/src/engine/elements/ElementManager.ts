@@ -304,8 +304,8 @@ export class ElementManager {
   }
 
   /** Paste element from clipboard data */
-  pasteElement(data: ElementData, target: Element, index?: number, announce = true): Element | null {
-    return this.elementCRUD.pasteElement(data, target, index, announce);
+  pasteElement(data: ElementData, target: Element, index?: number, announce = true, keepIds = false): Element | null {
+    return this.elementCRUD.pasteElement(data, target, index, announce, keepIds);
   }
 
   // ============================================
