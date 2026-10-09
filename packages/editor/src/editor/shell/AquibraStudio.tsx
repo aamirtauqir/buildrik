@@ -66,6 +66,7 @@ import { StudioPanels } from "./StudioPanels";
 import { requestAssetPick, useAssetPickBridge } from "../sidebar/tabs/media/data/assetPick";
 import type { MediaAsset, MediaAssetType } from "@shared/types/media";
 import { ConflictModal } from "./modals/ConflictModal";
+import { navigateBypassingUnloadGuard } from "./unloadGuardBypass";
 import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
 import "../../themes/default.css";
@@ -807,7 +808,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         brandFormat={conflict?.brandFormat}
         siteId={getSiteIdFromUrl()}
         onClose={() => setConflict((c) => (c ? { ...c, open: false } : c))}
-        onReload={() => window.location.reload()}
+        /* The user already chose to drop this tab's copy; the dirty-tab
+           "Leave site?" prompt on top of that choice was a second, scarier
+           dialog asking the same thing (L5-077). */
+        onReload={() => navigateBypassingUnloadGuard(() => window.location.reload())}
         onSaveBackup={() => {
           // Download the local copy so nothing is lost, then take the latest.
           try {
@@ -819,7 +823,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             a.click();
             URL.revokeObjectURL(url);
           } finally {
-            window.location.reload();
+            navigateBypassingUnloadGuard(() => window.location.reload());
           }
         }}
         onOverwrite={() => {
