@@ -214,6 +214,16 @@ describe("BrandWorkspace › Component styles — AI assist entry", () => {
     });
     expect(utils.queryByText("Generate component with AI")).toBeNull();
   });
+
+  /* L5-019: the flag is a build-wide switch, not a workspace setting, so the
+     tooltip blamed the workspace for something no one in it can change. */
+  it("flag off: the reason says it is coming, not that the workspace is off", () => {
+    vi.mocked(isFeatureEnabled).mockReturnValue(false);
+    const utils = renderWorkspace(makeAiComposer());
+    openComponents(utils);
+    expect(utils.queryByText(/switched on for this workspace/)).toBeNull();
+    expect(utils.getByText(/Coming soon/)).toBeTruthy();
+  });
 });
 
 describe("BrandWorkspace › the Light / Dark switch is preview-only (L4-021, BRP1-M8)", () => {

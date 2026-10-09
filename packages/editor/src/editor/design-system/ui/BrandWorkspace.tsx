@@ -603,7 +603,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           </Button>
         );
         return aiOn ? cta : (
-          <Tooltip content="AI generation isn't switched on for this workspace yet" placement="bottom" arrow={false}>
+          <Tooltip content="Coming soon: AI component styles aren't available yet" placement="bottom" arrow={false}>
             {cta}
           </Tooltip>
         );
