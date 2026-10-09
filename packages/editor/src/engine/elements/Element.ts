@@ -58,6 +58,7 @@ export class Element {
     );
 
     this._styles = new ElementStyles(
+      () => this,
       () => this.data,
       () => this.composer,
       () => this.data.id,
@@ -144,6 +145,9 @@ export class Element {
 
   setContent(content: string): void {
     this.data.content = content;
+    // L2-005: text typed into an instance is an override like a style, or the
+    // next master update re-clones over it without a word.
+    this.composer.components?.recordInstanceOverride(this.getId(), "content", "", content);
     this.composer.emit(EVENTS.ELEMENT_UPDATED, this);
     this.composer.markDirty();
   }

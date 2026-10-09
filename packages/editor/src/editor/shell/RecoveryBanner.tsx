@@ -34,6 +34,10 @@ export interface RecoveryBannerProps {
   reloadFn?: () => void;
   /** ISO of the server's last edit (any kind). Defaults to the site publish state. */
   serverEditedAt?: () => Promise<string | null>;
+  /** Is the local draft what the editor loaded? On a dashboard site it is only
+   *  when the server load failed — otherwise the screen is the server's copy
+   *  and there is nothing here to keep or discard (L5-074). Default true. */
+  localDraftShown?: boolean;
 }
 
 const LOCAL_DRAFT_KEY = "buildrick-project";
@@ -66,10 +70,19 @@ const S: Record<string, React.CSSProperties> = {
   actions: { display: "flex", alignItems: "center", gap: 8 },
 };
 
-export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloadFn, serverEditedAt = defaultServerEditedAt }) => {
-  // Consume once on first render — reading clears the sentinel so a later
+export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({
+  pageCount,
+  reloadFn,
+  serverEditedAt = defaultServerEditedAt,
+  localDraftShown = true,
+}) => {
+  // Consume once, when it can apply — reading clears the sentinel so a later
   // re-render or reload won't re-surface the same crash.
-  const [record] = React.useState(() => RecoveryManager.consumeLastCrash());
+  const [record, setRecord] = React.useState(() => (localDraftShown ? RecoveryManager.consumeLastCrash() : null));
+  React.useEffect(() => {
+    if (localDraftShown && !record) setRecord(RecoveryManager.consumeLastCrash());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localDraftShown]);
   const [dismissed, setDismissed] = React.useState(false);
   /* Three states: `null` = still loading; `true` = server is newer → stay hidden;
      `false` = server is older → show. When `serverEditedAt()` returns null (no
@@ -98,7 +111,7 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
     };
   }, [record, serverEditedAt]);
 
-  if (!record || dismissed) return null;
+  if (!record || dismissed || !localDraftShown) return null;
   // Hide until we know the server's clock, and hide if the server is newer.
   if (serverKnown !== true || serverNewer !== false) return null;
 

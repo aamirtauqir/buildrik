@@ -12,7 +12,8 @@ beforeEach(() => {
   globalThis.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} } as never;
 });
 
-function setup() {
+type Rect = { left: number; top: number; right: number; bottom: number; width: number; height: number };
+function setup(rect: Rect = { left: 100, top: 50, right: 600, bottom: 250, width: 500, height: 200 }) {
   const canvas = document.createElement("div");
   const el = document.createElement("div");
   el.setAttribute("data-buildrick-id", "e1");
@@ -20,7 +21,7 @@ function setup() {
   document.body.appendChild(canvas);
   Object.defineProperty(canvas, "offsetWidth", { value: 1000 });
   canvas.getBoundingClientRect = () => ({ left: 0, top: 0, right: 1000, bottom: 800, width: 1000, height: 800 }) as DOMRect;
-  el.getBoundingClientRect = () => ({ left: 100, top: 50, right: 600, bottom: 250, width: 500, height: 200 }) as DOMRect;
+  el.getBoundingClientRect = () => rect as DOMRect;
   const props = {
     composer: { elements: { getElement: () => ({}) } } as never,
     elementId: "e1",
@@ -41,6 +42,22 @@ describe("UnifiedSelectionToolbar", () => {
     expect(bar.style.left).toBe("592px"); // right edge 600 − 8
     expect(bar.style.top).toBe("58px"); // top 50 + 8
     expect(bar.style.transform).toBe("translateX(-100%) scale(1)");
+  });
+
+  /* L1-003 / L2-007: inside a 164×52 button the 88×32 pill covered the whole
+     element — a second click on it (to edit its text) landed on Duplicate or
+     Delete. A small element gets the pill OUTSIDE, above its top-right. */
+  it("sits outside, above a small element's top-right, so its centre stays the element's", () => {
+    setup({ left: 620, top: 447, right: 784, bottom: 499, width: 164, height: 52 });
+    const bar = screen.getByTestId("selection-toolbar");
+    expect(bar.style.left).toBe("784px"); // flush with the right edge
+    expect(bar.style.top).toBe("411px"); // 447 − 32 pill − 4 gap
+    expect(screen.queryByTestId("selection-toolbar-caption")).toBeNull();
+  });
+
+  it("drops below a small element that has no room above it", () => {
+    setup({ left: 620, top: 10, right: 784, bottom: 50, width: 164, height: 40 });
+    expect(screen.getByTestId("selection-toolbar").style.top).toBe("54px"); // 50 + 4
   });
 
   it("wires the buttons; More opens the element menu", () => {

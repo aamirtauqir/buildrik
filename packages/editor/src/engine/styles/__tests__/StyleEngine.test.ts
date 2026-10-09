@@ -1113,6 +1113,26 @@ describe("StyleEngine editor device preview", () => {
     expect(sheet()).not.toContain("editor device preview");
   });
 
+  /* L2-008: a :hover / :focus rule lost to the element's inline base style
+     (the canvas inlines base styles; inline beats any stylesheet rule), so a
+     hover fill never showed on the canvas. Same answer as the device block:
+     re-emitted !important, editor-only. */
+  it("a state rule is re-emitted !important so it beats the inline base style", () => {
+    engine.setRule('[data-buildrick-id="el-1"]', { "background-color": "#00aa00" }, { pseudo: ":hover" });
+    engine.flush();
+
+    const block = sheet().split("editor state preview")[1];
+    expect(block).toContain('[data-buildrick-id="el-1"]:hover');
+    expect(block).toContain("background-color: #00aa00 !important");
+  });
+
+  it("the exported CSS carries the state rule plain", () => {
+    engine.setRule('[data-buildrick-id="el-1"]', { "background-color": "#00aa00" }, { pseudo: ":hover" });
+    expect(engine.toCSS()).not.toContain("!important");
+    expect(engine.toCSS()).not.toContain("editor state preview");
+    expect(engine.generateCSS()).not.toContain("editor state preview");
+  });
+
   it("exported CSS never contains the preview block", () => {
     engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
     (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");

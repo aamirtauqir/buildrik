@@ -12,7 +12,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { LintIssue } from "../../../engine/designSystem/linter";
 import type { LintIssue as StoredLintIssue } from "../../../engine/designSystem/LintState";
-import { buildContrastIssues, buildDarkPairIssues } from "../utils/contrastLint";
+import { buildContrastIssues, buildDarkPairIssues, contrastLintMode } from "../utils/contrastLint";
 import { EVENTS } from "../../../shared/constants/events";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { siteHasThemeToggle } from "@/engine/export/themeToggleRuntime";
@@ -76,8 +76,14 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
       /* Contrast is computed here, not in DSLinter — it needs the resolved
          mode. Merged so the Lint destination, the banner and the colour
          list's chip can never tell three different stories again. */
-      /* The theme the canvas shows: dark only under a Brand preview (L4-021). */
-      const mode = composer.designSystem?.preview?.theme ?? "light";
+      /* The mode the site SHIPS (L4-021/022): an Off site only ever in
+         light. On an Auto site, the theme the Brand preview shows — the
+         preview is the only dark view now (it no longer writes colorMode),
+         and it cannot move an Off site's verdict. */
+      const mode = contrastLintMode(
+        composer.getProjectSettings?.()?.darkMode,
+        composer.designSystem?.preview?.theme ?? "light",
+      );
       const off = DarkModeSchema.catch("off").parse(composer.getProjectSettings?.()?.darkMode) === "off";
       const hiddenToggle: LintIssue[] =
         off && siteHasThemeToggle(composer.elements?.getAllElements?.() ?? [])
@@ -92,7 +98,9 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
          under raw text (or a bound text colour over a raw fill). */
       const darkPairs = off ? [] : buildDarkPairIssues(composer.elements?.getAllElements?.() ?? [], colorState?.tokens ?? []);
       const found = [
-        ...composer.dsLinter.lint(allTokens),
+        /* "No dark variant" asks for a value the site never shows while its
+           Dark mode is Off — eight of them appeared on a light-only site. */
+        ...composer.dsLinter.lint(allTokens).filter((i) => !(off && i.rule === "missing-dark")),
         ...buildContrastIssues(colorState?.tokens ?? [], mode),
         ...hiddenToggle,
         ...darkPairs,

@@ -21,7 +21,7 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
 import { THRESHOLDS } from "../../../../shared/constants/config";
 import { EVENTS } from "@/shared/constants/events";
-import { useComposerInit, type UseComposerInitParams } from "../useComposerInit";
+import { AUTOSAVE_RETRY_BASE_MS, useComposerInit, type UseComposerInitParams } from "../useComposerInit";
 
 type EventHandler = (...args: unknown[]) => void;
 
@@ -32,6 +32,7 @@ const mockComposer = {
   off: vi.fn(),
   emit: vi.fn(),
   saveProject: vi.fn(() => Promise.resolve()),
+  markSaved: vi.fn(),
   loadProject: vi.fn(() => Promise.resolve(null)),
   importProject: vi.fn(),
   setProjectLoading: vi.fn(),
@@ -304,6 +305,36 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
   });
 
+  /* L5-075: Restore put the edits back and lit "Unsaved changes", then nothing
+     saved them — importProject emits PROJECT_LOADED, which is not an autosave
+     trigger. Closing the tab then lost them a second time. */
+  it("Restore my edits schedules a save of the restored edits", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
+    localStorage.setItem(
+      "bk-unsaved-v1-site-9",
+      JSON.stringify({ project: { pages: [{ id: "p" }, { id: "q" }], styles: [] }, at: "2026-10-08T00:00:00.000Z" }),
+    );
+    try {
+      const params = makeParams();
+      renderHook(() => useComposerInit(params));
+      await act(async () => {
+        mockComposer.emit("composer:ready");
+        await flushMicrotasks();
+      });
+      const toast = vi
+        .mocked(params.addToast!)
+        .mock.calls.map(([t]) => t)
+        .find((t) => /never reached the server/i.test(t.title ?? ""));
+      mockComposer.emit.mockClear();
+      act(() => toast!.action!.onClick());
+      expect(mockComposer.importProject).toHaveBeenLastCalledWith({ pages: [{ id: "p" }, { id: "q" }], styles: [] });
+      expect(mockComposer.emit).toHaveBeenCalledWith("project:changed", expect.anything());
+    } finally {
+      localStorage.removeItem("bk-unsaved-v1-site-9");
+    }
+  });
+
   /* C-9: a member demoted mid-save is sent to view mode, where nothing can
      be saved — offering "Restore my edits" there would put back edits that
      can only be refused again. The record stays for when the role returns. */
@@ -336,7 +367,10 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     }
   });
 
-  it("restores only when the user asks, and clears the record once it has", async () => {
+  /* Rewritten for L5-074: the record used to be cleared the moment Restore
+     was clicked — before any save of it. It now stays until a save of the
+     restored work is confirmed (the autosave success clears it). */
+  it("restores only when the user asks, and keeps the record until that work is saved", async () => {
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
     vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "server" }], styles: [] } as never);
     const mine = { pages: [{ id: "mine" }], styles: [] };
@@ -361,7 +395,8 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     expect(mockComposer.importProject).toHaveBeenLastCalledWith(mine);
     // Restored work is unsaved work — the dirty flag has to say so.
     expect(vi.mocked(params.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
-    expect(localStorage.getItem("bk-unsaved-v1-site-9")).toBeNull();
+    expect(localStorage.getItem("bk-unsaved-v1-site-9")).not.toBeNull();
+    localStorage.removeItem("bk-unsaved-v1-site-9");
   });
 
   it("scopes IndexedDB buckets, imports, seeds saveState, hydrates media, toasts", async () => {
@@ -746,6 +781,79 @@ describe("useComposerInit — autosave conflict handling", () => {
     expect(params.addToast).toHaveBeenCalledWith(
       expect.objectContaining({ title: "Save failed", tone: "error" }),
     );
+  });
+
+  /* L5-070: one failed save left "Save failed — retry" up for good — after a
+     500, and after the network came back — until the user clicked Retry or
+     made another edit. */
+  it("retries a failed save on its own, with backoff, and says nothing more while retrying", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("500 from dashboard")).mockRejectedValueOnce(new Error("500 from dashboard"));
+
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+    expect(syncSaveProject).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_BASE_MS + THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+    expect(syncSaveProject).toHaveBeenCalledTimes(2);
+
+    vi.mocked(syncSaveProject).mockResolvedValue({ success: true } as never);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2 * AUTOSAVE_RETRY_BASE_MS + THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+    expect(syncSaveProject).toHaveBeenCalledTimes(3);
+    expect(params.setIsDirty).toHaveBeenLastCalledWith(false);
+    expect(vi.mocked(params.addToast).mock.calls.filter(([t]) => t.title === "Save failed")).toHaveLength(1);
+
+    // Saved: no further attempts.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(60_000);
+    });
+    expect(syncSaveProject).toHaveBeenCalledTimes(3);
+  });
+
+  it("retries at once when the browser comes back online", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("Failed to fetch"));
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+    vi.mocked(syncSaveProject).mockResolvedValue({ success: true } as never);
+    act(() => {
+      window.dispatchEvent(new Event("online"));
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+    expect(syncSaveProject).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not retry a save the server refused on its merits", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    const refused = Object.assign(new Error("Two pages use the address /about"), { data: { code: "CONFLICT", httpStatus: 409 } });
+    vi.mocked(syncSaveProject).mockRejectedValue(refused);
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(60_000);
+    });
+    expect(syncSaveProject).toHaveBeenCalledTimes(1);
   });
 
   it("autosave failure without a siteId (localStorage path) stays silent — no toast", async () => {

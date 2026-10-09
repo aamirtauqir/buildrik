@@ -36,7 +36,9 @@ import baseline from "./__fixtures__/catalogBlockHtml.baseline.json";
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
 
-/** Add-panel row (block id) → the type its insert must carry. All 55. */
+/** Add-panel row (block id) → the type its insert must carry. All 54
+ *  (Upload left the panel, L3-025; the "file" block still types as input via
+ *  the registry-wide check below). */
 const EXPECTED_TYPE: Record<string, string> = {
   heading: "heading",
   paragraph: "paragraph",
@@ -65,7 +67,6 @@ const EXPECTED_TYPE: Record<string, string> = {
   radio: "radio",
   switch: "switch",
   range: "input",
-  file: "input",
   submit: "button",
   email: "input",
   password: "input",
@@ -129,8 +130,8 @@ async function publishedFiles(composer: ReturnType<typeof createTestComposer>): 
 }
 
 describe("Q2 — inserted blocks keep their real element type", () => {
-  it("pins every one of the 55 Add-panel rows", () => {
-    expect(flatCatalog).toHaveLength(55);
+  it("pins every one of the 54 Add-panel rows", () => {
+    expect(flatCatalog).toHaveLength(54);
     expect(flatCatalog.map((e) => e.blockId).sort()).toEqual(Object.keys(EXPECTED_TYPE).sort());
   });
 

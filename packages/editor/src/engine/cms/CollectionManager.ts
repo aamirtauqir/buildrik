@@ -244,6 +244,18 @@ export class CollectionManager extends EventEmitter {
     const renamed = updates.slug !== undefined && updates.slug !== previous.slug;
     const keyed: Partial<CMSCollection> = {};
     if (renamed) {
+      if (collection.pageSlugPattern)
+        keyed.pageSlugPattern = collection.pageSlugPattern.split(`{${previous.slug}}`).join(`{${updatedField.slug}}`);
+      if (collection.displayField === previous.slug) keyed.displayField = updatedField.slug;
+    }
+
+    /* L3-015: the collection goes first. The server sanitizes a record by its
+       collection's field types, so a record moved to a key the server did not
+       know yet lost its rich text — and the stripped copy was written back
+       here. Each record's mirror waits for the collection's in flight. */
+    await this.updateCollection(collectionId, { fields: updatedFields, ...keyed });
+
+    if (renamed) {
       const from = previous.slug;
       const to = updatedField.slug;
       for (const item of await Storage.loadContentItems(collectionId)) {
@@ -254,11 +266,7 @@ export class CollectionManager extends EventEmitter {
         this.emit(EVENTS.CMS_CONTENT_UPDATED, moved);
       }
       this.invalidateContentCache(collectionId);
-      if (collection.pageSlugPattern) keyed.pageSlugPattern = collection.pageSlugPattern.split(`{${from}}`).join(`{${to}}`);
-      if (collection.displayField === from) keyed.displayField = to;
     }
-
-    await this.updateCollection(collectionId, { fields: updatedFields, ...keyed });
 
     return updatedField;
   }

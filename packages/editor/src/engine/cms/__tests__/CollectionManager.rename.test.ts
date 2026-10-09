@@ -6,10 +6,11 @@
  * rewrite, because the local copy and the server's were no longer talking
  * about the same shape.
  *
- * Order matters: per-record emits must precede the collection update, so the
- * server sees records under the new key before the collection that names the
- * pattern arrives. useCmsSync subscribes to both, and the per-record handler
- * runs ahead of the collection one.
+ * Order matters: the collection update comes first (L3-015). The server
+ * sanitizes a record by its collection's field types, so a rich-text record
+ * moved to a key the server did not know yet was cut to plain text, and the
+ * stripped copy was written back. Each record's mirror waits for the
+ * collection's in flight (syncEntryUpsert → queue.settled).
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { CollectionManager } from "../CollectionManager";
@@ -27,7 +28,7 @@ beforeEach(() => {
 });
 
 describe("updateField key rename", () => {
-  it("emits a content update per migrated record, before the collection update", async () => {
+  it("emits a content update per migrated record, after the collection update", async () => {
     const cm = new CollectionManager();
     await cm.initialize();
     const col = await cm.createCollection("Blog", "blog");
@@ -46,7 +47,7 @@ describe("updateField key rename", () => {
 
     await cm.updateField(col.id, field.id, { slug: "name" });
 
-    expect(order).toEqual([`entry:${item.id}`, "collection"]);
+    expect(order).toEqual(["collection", `entry:${item.id}`]);
   });
 
   it("does not emit for records that never had the old key", async () => {

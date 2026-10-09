@@ -617,54 +617,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     );
   }
 
-  if (!round) {
-    return (
-      <div className={BODY} data-review-state="never-sent">
-        {header}
-        <EmptyState
-          className="tw:flex-1"
-          icon={<CheckCircle2 size={24} aria-hidden="true" />}
-          title="No review yet"
-          /* This used to read "Open client view from the Site menu, then use
-             'Send for review' there" — accurate at the time, because
-             StudioHeader rendered that control under viewMode.readOnlyView and
-             nowhere else. View mode is a VIEW now (founder, 2026-08-23), so
-             that door is shut and the instruction would point at nothing.
-             Inviting a client is the owner's act and this panel already owns
-             the review lifecycle, so the control lives here instead of being
-             described somewhere else. */
-          body="Send this site to a client and they get a link to comment on it."
-        />
-        <div className="tw:px-[16px] tw:pb-[16px]">
-          {/* Three things this line lost when the control moved off the topbar,
-              all of them in the props the topbar used to pass:
-              · disabledReason — a VIEWER got a live button and a silent failure
-              · onSent — the topbar's review pill never refreshed after a send,
-                and this panel kept saying "No review yet" under a button that
-                said it had been sent
-              · reviewStatus={null} — SendForReview unlocks "Sent ✓" into "Send
-                again" only when the round's `at` moves, so a literal null
-                wedged the button forever. */}
-          <SendForReview
-            composer={composer ?? null}
-            disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
-            reviewStatus={round ?? null}
-            onSent={(outcome) => {
-                  /* The panel keeps this, not SendForReview — that component is
-                     unmounted by the very reload this triggers. */
-                  setNotice(
-                    outcome?.inviteEmailSent === false
-                      ? "Round created — but the invite email didn't go out. Send your client the link yourself."
-                      : null,
-                  );
-                  void load();
-                }}
-          />
-        </div>
-      </div>
-    );
-  }
-
   const detached = openComments.filter((c) => detachedIds.has(c.id));
   const attached = comments.filter(
     (c) => (c.status !== "RESOLVED" && !detachedIds.has(c.id)) || (c.status === "RESOLVED" && sessionResolved.has(c.id)),
@@ -764,7 +716,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       /* Board 4418:116040: a revoked round's rows carry no Resolve / Copy
          link line (interim owner default, 2026-09-24). */
       footer={
-        extra?.footer ?? (round.revoked ? undefined : (
+        extra?.footer ?? (round?.revoked ? undefined : (
           <>
             {resolveButton(c)}
             {/* Not on board 4418:115784, kept by the owner rule (never
@@ -784,6 +736,171 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       }
     />
   );
+
+  /* The comment list itself — detached, then page groups, then the resolved
+     disclosure. Comments are site-scoped, not children of a round, so the
+     never-sent panel lists them too (L5-030). */
+  const thread = (
+    <>
+      {detached.length > 0 && (
+        <div data-detached-group>
+          {/* Board 157:2 fills this band, it does not merely tint its words:
+              measured off the frame at #FCFCEA on `var(--bk-yellow-800)`, against `var(--bk-gray-100)`
+              for the OPEN/RESOLVED bands beside it. A detached comment is
+              the one row in this list that lost its anchor, and a grey band
+              with amber text reads as the same band as its neighbours. */}
+          <div
+            className={BAND}
+            style={{ background: "var(--bk-warning-tint)", color: "var(--bk-warning-text)" }}
+            data-testid="review-detached-band"
+          >
+            <span className="tw:flex tw:items-center tw:gap-1.5">
+              <AlertCircle size={12} aria-hidden="true" /> Detached
+            </span>
+            <span className={BAND_COUNT}>{detached.length}</span>
+          </div>
+          {detached.map((c) =>
+            row(c, {
+              detachedNote: "element deleted",
+              footer: (
+                <>
+                  {isViewer ? (
+                    <Tooltip content="Viewers can't reattach comments — ask an editor" placement="top" arrow={false}>
+                      <Button color="light" size="xs" aria-disabled="true" onClick={() => {}} className={GHOST}>
+                        Reattach comment
+                      </Button>
+                    </Tooltip>
+                  ) : (
+                    <Button
+                      color="light"
+                      size="xs"
+                      onClick={() => {
+                        /* The list is the comment's page, and the registry
+                           holds the active page only — so go there first. */
+                        const active = composer?.elements.getActivePage()?.id;
+                        if (composer && c.pageId && c.pageId !== active) composer.elements.setActivePage(c.pageId);
+                        setReattaching(c);
+                      }}
+                      className={GHOST}
+                    >
+                      Reattach comment
+                    </Button>
+                  )}
+                  {resolveButton(c)}
+                </>
+              ),
+            }),
+          )}
+        </div>
+      )}
+
+      {groups.map((g, i) => (
+        <div key={g.key}>
+          <div className={BAND} data-testid={`review-band-${i}`}>
+            {/* Board 156:2 marks where the open thread starts, then names
+                each page after it. */}
+            {/* Boards 4418:117140–118407: every group names its state
+                and page — "OPEN · CONTACT", and "RESOLVED · CONTACT" once
+                everything in it was resolved here. */}
+            <span data-testid={`review-band-label-${i}`}>
+              {g.comments.every((c) => c.status === "RESOLVED") ? "Resolved" : "Open"} · {g.label}
+            </span>
+            <span className={BAND_COUNT} data-testid={`review-band-count-${i}`}>
+              {g.comments.length}
+            </span>
+          </div>
+          {g.comments.map((c) => row(c))}
+        </div>
+      ))}
+
+      {earlierResolved.length > 0 && (
+        <div data-resolved-group>
+          {/* Boards 4418:116040 / 117140: a white disclosure row with a
+              chevron and no count — the status line already carries it. */}
+          <Button
+            color="light"
+            className={`${BAND} tw:h-9 tw:bg-transparent tw:border-b tw:border-[var(--bk-border)]`}
+            aria-expanded={resolvedOpen}
+            aria-label={`${sessionResolved.size > 0 ? "Earlier resolved" : "Resolved"} (${earlierResolved.length})`}
+            onClick={() => setResolvedOpen((v) => !v)}
+            data-testid="review-resolved-band"
+          >
+            <span>{sessionResolved.size > 0 ? "Earlier resolved" : "Resolved"}</span>
+            {resolvedOpen ? (
+              <ChevronDown size={12} aria-hidden="true" />
+            ) : (
+              <ChevronRight size={12} aria-hidden="true" />
+            )}
+          </Button>
+          {resolvedOpen && earlierResolved.map((c) => row(c))}
+        </div>
+      )}
+    </>
+  );
+
+  const sendForReview = (
+    <SendForReview
+      composer={composer ?? null}
+      disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
+      reviewStatus={round ? { at: round.revision } : null}
+      onSent={(outcome) => {
+        /* The panel keeps this, not SendForReview — that component is
+           unmounted by the very reload this triggers. */
+        setNotice(
+          outcome?.inviteEmailSent === false
+            ? "Round created — but the invite email didn't go out. Send your client the link yourself."
+            : null,
+        );
+        void load();
+      }}
+    />
+  );
+
+  if (!round && comments.length > 0) {
+    return (
+      <div className={BODY} data-review-state="never-sent-comments">
+        {header}
+        {progress}
+        {resolveFailedBlock}
+        <div className={SCROLL}>{thread}</div>
+        <div className="tw:px-[16px] tw:pb-[16px]">{sendForReview}</div>
+      </div>
+    );
+  }
+
+  if (!round) {
+    return (
+      <div className={BODY} data-review-state="never-sent">
+        {header}
+        <EmptyState
+          className="tw:flex-1"
+          icon={<CheckCircle2 size={24} aria-hidden="true" />}
+          title="No review yet"
+          /* This used to read "Open client view from the Site menu, then use
+             'Send for review' there" — accurate at the time, because
+             StudioHeader rendered that control under viewMode.readOnlyView and
+             nowhere else. View mode is a VIEW now (founder, 2026-08-23), so
+             that door is shut and the instruction would point at nothing.
+             Inviting a client is the owner's act and this panel already owns
+             the review lifecycle, so the control lives here instead of being
+             described somewhere else. */
+          body="Send this site to a client and they get a link to comment on it."
+        />
+        <div className="tw:px-[16px] tw:pb-[16px]">
+          {/* Three things this line lost when the control moved off the topbar,
+              all of them in the props the topbar used to pass:
+              · disabledReason — a VIEWER got a live button and a silent failure
+              · onSent — the topbar's review pill never refreshed after a send,
+                and this panel kept saying "No review yet" under a button that
+                said it had been sent
+              · reviewStatus={null} — SendForReview unlocks "Sent ✓" into "Send
+                again" only when the round's `at` moves, so a literal null
+                wedged the button forever. */}
+          {sendForReview}
+        </div>
+      </div>
+    );
+  }
 
   /* Two kinds of round land here and the boards draw only one. A round
      submitted from the dashboard's "Send for Review" carries no clientEmail, so
@@ -955,99 +1072,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               ? allResolvedBody
               : null}
 
-        {detached.length > 0 && (
-          <div data-detached-group>
-            {/* Board 157:2 fills this band, it does not merely tint its words:
-                measured off the frame at #FCFCEA on `var(--bk-yellow-800)`, against `var(--bk-gray-100)`
-                for the OPEN/RESOLVED bands beside it. A detached comment is
-                the one row in this list that lost its anchor, and a grey band
-                with amber text reads as the same band as its neighbours. */}
-            <div
-              className={BAND}
-              style={{ background: "var(--bk-warning-tint)", color: "var(--bk-warning-text)" }}
-              data-testid="review-detached-band"
-            >
-              <span className="tw:flex tw:items-center tw:gap-1.5">
-                <AlertCircle size={12} aria-hidden="true" /> Detached
-              </span>
-              <span className={BAND_COUNT}>{detached.length}</span>
-            </div>
-            {detached.map((c) =>
-              row(c, {
-                detachedNote: "element deleted",
-                footer: (
-                  <>
-                    {isViewer ? (
-                      <Tooltip content="Viewers can't reattach comments — ask an editor" placement="top" arrow={false}>
-                        <Button color="light" size="xs" aria-disabled="true" onClick={() => {}} className={GHOST}>
-                          Reattach comment
-                        </Button>
-                      </Tooltip>
-                    ) : (
-                      <Button
-                        color="light"
-                        size="xs"
-                        onClick={() => {
-                          /* The list is the comment's page, and the registry
-                             holds the active page only — so go there first. */
-                          const active = composer?.elements.getActivePage()?.id;
-                          if (composer && c.pageId && c.pageId !== active) composer.elements.setActivePage(c.pageId);
-                          setReattaching(c);
-                        }}
-                        className={GHOST}
-                      >
-                        Reattach comment
-                      </Button>
-                    )}
-                    {resolveButton(c)}
-                  </>
-                ),
-              }),
-            )}
-          </div>
-        )}
-
-        {groups.map((g, i) => (
-          <div key={g.key}>
-            <div className={BAND} data-testid={`review-band-${i}`}>
-              {/* Board 156:2 marks where the open thread starts, then names
-                  each page after it. */}
-              {/* Boards 4418:117140–118407: every group names its state
-                  and page — "OPEN · CONTACT", and "RESOLVED · CONTACT" once
-                  everything in it was resolved here. */}
-              <span data-testid={`review-band-label-${i}`}>
-                {g.comments.every((c) => c.status === "RESOLVED") ? "Resolved" : "Open"} · {g.label}
-              </span>
-              <span className={BAND_COUNT} data-testid={`review-band-count-${i}`}>
-                {g.comments.length}
-              </span>
-            </div>
-            {g.comments.map((c) => row(c))}
-          </div>
-        ))}
-
-        {earlierResolved.length > 0 && (
-          <div data-resolved-group>
-            {/* Boards 4418:116040 / 117140: a white disclosure row with a
-                chevron and no count — the status line already carries it. */}
-            <Button
-              color="light"
-              className={`${BAND} tw:h-9 tw:bg-transparent tw:border-b tw:border-[var(--bk-border)]`}
-              aria-expanded={resolvedOpen}
-              aria-label={`${sessionResolved.size > 0 ? "Earlier resolved" : "Resolved"} (${earlierResolved.length})`}
-              onClick={() => setResolvedOpen((v) => !v)}
-              data-testid="review-resolved-band"
-            >
-              <span>{sessionResolved.size > 0 ? "Earlier resolved" : "Resolved"}</span>
-              {resolvedOpen ? (
-                <ChevronDown size={12} aria-hidden="true" />
-              ) : (
-                <ChevronRight size={12} aria-hidden="true" />
-              )}
-            </Button>
-            {resolvedOpen && earlierResolved.map((c) => row(c))}
-          </div>
-        )}
+        {thread}
       </div>
 
       <RoundHistoryModal

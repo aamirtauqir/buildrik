@@ -18,6 +18,7 @@ import {
   transferSite,
   canTransferSite,
   saveProjectFromEditor,
+  PageSlugTakenError,
   getProjectData,
   redactSitePassword,
 } from "@/server/services/sites.service";
@@ -385,6 +386,26 @@ export const sitesRouter = router({
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Site not found",
+          });
+        /* L3-001: the (siteId, slug) unique key refused a page write. It was a
+           raw P2002 500 on every autosave; say which address and which pages. */
+        if (e instanceof PageSlugTakenError) {
+          const names = e.pageNames.map((n) => `"${n}"`);
+          throw new TRPCError({
+            code: "CONFLICT",
+            message:
+              names.length > 1
+                ? `${names.length === 2 ? "Two" : names.length} pages use the address /${e.slug} (${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}). Change one page's URL in Page settings to keep saving.`
+                : `Another page already uses the address /${e.slug} (${names[0] ?? "this page"}). Change its URL in Page settings to keep saving.`,
+          });
+        }
+        /* The save outran its transaction budget and its stamp is not on the
+           row: nothing landed. A server fault (5xx), so autosave sends it
+           again; the words say so instead of a raw Prisma message. */
+        if (e instanceof Error && e.message === "SAVE_TIMEOUT")
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "The save took too long and was not applied. It will be tried again.",
           });
         /* The editor sent a full snapshot with no pages in it — refused at the
            write boundary before it could delete the site's pages. Surfaced as a

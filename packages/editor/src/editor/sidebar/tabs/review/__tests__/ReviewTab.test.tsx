@@ -170,6 +170,29 @@ describe("load states", () => {
     expect(screen.queryByText(/Open client view from the Site menu/i)).toBeNull();
   });
 
+  /* L5-030: comments are site-scoped (comments.list), not children of a
+     round. A team pin made before any round was sent was counted on the
+     dashboard and drawn on the canvas, while this panel said "No review yet"
+     and listed nothing — nowhere to read or resolve it. */
+  it("lists team comments when no round was ever sent, with Send for review still offered", async () => {
+    fetchCurrentRound.mockResolvedValue(null);
+    fetchReviewComments.mockResolvedValue([COMMENTS[1]]);
+    renderTab();
+    expect(await screen.findByText(/on it, swapping the image/)).toBeInTheDocument();
+    expect(screen.getByTestId("review-status-line")).toHaveTextContent("1 open · 0 resolved");
+    expect(screen.queryByText(/No review yet/i)).toBeNull();
+    expect(screen.getByRole("button", { name: "Resolve" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Send for review/i })).toBeInTheDocument();
+  });
+
+  it("resolves a team comment from the never-sent panel", async () => {
+    fetchCurrentRound.mockResolvedValue(null);
+    fetchReviewComments.mockResolvedValue([COMMENTS[1]]);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: "Resolve" }));
+    await waitFor(() => expect(resolveReviewComment).toHaveBeenCalled());
+  });
+
   /* Board 453:3974 — the failure is stated in red and the reassurance under
      it; it is NEVER the empty state (DF5, fake-empty). */
   it("shows the load failure and a Try again, not an empty thread", async () => {

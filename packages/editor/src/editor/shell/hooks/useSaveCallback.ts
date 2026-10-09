@@ -30,7 +30,7 @@ import {
 } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
-import { clearUnsaved, keepUnsaved } from "@/services/unsavedRecovery";
+import { clearUnsaved, keepUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
 
 export interface UseSaveCallbackOptions {
@@ -196,6 +196,11 @@ export function useSaveCallback({
     // alone only writes localStorage, so the "Saved" toast was a lie for
     // dashboard-backed projects.
     const siteId = getSiteIdFromUrl();
+    /* L5-074: after a reload with work the server never got, the screen is the
+       server's copy. Saving it would send the wrong thing — the kept edits go
+       back on screen first, and are what this save sends. */
+    const kept = siteId ? takeOffScreenUnsaved(siteId) : null;
+    if (kept) composer.importProject(kept.project);
     const savePromise = siteId
       ? saveProject(siteId, composer.exportProject()).then(() => undefined)
       : composer.saveProject();

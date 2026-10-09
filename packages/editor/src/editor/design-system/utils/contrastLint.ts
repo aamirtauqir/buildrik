@@ -98,6 +98,16 @@ export function contrastFixHint(tokenValue: string, surfaceBg: string): "darken-
   return relativeLuminance(t.r, t.g, t.b) < relativeLuminance(s.r, s.g, s.b) ? "darken-22" : "lighten-22";
 }
 
+/** The mode contrast is measured in: the one the site ships. A site with dark
+ *  mode off (the default, and the only state today) is only ever seen light,
+ *  so the editor's own mode — which the Brand preview's Light/Dark switch sets
+ *  — must not move the verdict (L4-021: four false failures, which Fix ›
+ *  then "fixed" the wrong way, L4-022). The same rule ProjectTokensApplier
+ *  applies to the canvas. */
+export function contrastLintMode(darkMode: "auto" | "off" | undefined, editorMode: "light" | "dark"): "light" | "dark" {
+  return darkMode === "auto" ? editorMode : "light";
+}
+
 /** The rule, in the linter's vocabulary — what useDSLint merges in. Each
  *  finding carries the hint `applyAutoFix` needs (B9 / SH-64), so the Issues
  *  panel's Fix › has a producer. */
@@ -118,7 +128,9 @@ export function buildContrastIssues(
       severity: "warning" as const,
       tokenId: t.id,
       message: `${t.name || t.id} fails WCAG AA against the page background`,
-      autoFixHint: contrastFixHint(resolveTokenLiteral(tokens, t.id, "light") ?? "", lightSurface),
+      /* `applyAutoFix` rewrites the LIGHT literal, so it can only answer a
+         light-mode finding; a dark one gets no Fix rather than a wrong one. */
+      autoFixHint: mode === "light" ? contrastFixHint(resolveTokenLiteral(tokens, t.id, "light") ?? "", lightSurface) : undefined,
     }));
 }
 

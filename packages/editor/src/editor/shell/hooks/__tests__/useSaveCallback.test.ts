@@ -640,4 +640,42 @@ describe("useSaveCallback — TOKENS_INVALID", () => {
       Object.defineProperty(window, "location", { value: original, writable: true });
     }
   });
+
+  /* L5-074: on a reload with work the server never got, the save-failed
+     banner's Retry saved the SCREEN (the server's copy) and then deleted the
+     kept edits as "on the server now". Retry re-sends the kept work. */
+  it("Retry after a reload re-sends the kept edits, and keeps them until that save lands", async () => {
+    const { keepUnsaved, markUnsavedOffScreen, readUnsaved, clearUnsaved } = await import("@/services/unsavedRecovery");
+    const url = new URL("http://localhost:3000/edit/site_kept");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    try {
+      const kept = { pages: [{ id: "p", name: "mine" }] };
+      keepUnsaved("site_kept", kept as never);
+      markUnsavedOffScreen("site_kept");
+      const importProject = vi.fn();
+      const opts = makeOpts();
+      const composer = { ...opts.composer, importProject, exportProject: vi.fn(() => kept) } as never;
+      let resolveSave: () => void = () => {};
+      svc.saveProject.mockImplementationOnce(() => new Promise<void>((r) => (resolveSave = r)));
+      const { result } = renderHook(() =>
+        useSaveCallback({ composer, addToast: opts.addToast, setSaveState: opts.setSaveState, setIsDirty: opts.setIsDirty }),
+      );
+      let done: Promise<unknown> = Promise.resolve();
+      act(() => {
+        done = result.current();
+      });
+      expect(importProject).toHaveBeenCalledWith(kept);
+      expect(svc.saveProject).toHaveBeenCalledWith("site_kept", kept);
+      expect(readUnsaved("site_kept")).not.toBeNull();
+      await act(async () => {
+        resolveSave();
+        await done;
+      });
+      expect(readUnsaved("site_kept")).toBeNull();
+      clearUnsaved("site_kept");
+    } finally {
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
 });

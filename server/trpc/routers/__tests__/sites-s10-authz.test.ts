@@ -43,6 +43,9 @@ vi.mock("@/server/services/sites.service", () => ({
   checkSlugAvailability: vi.fn(), transferSite: vi.fn(), saveProjectData: vi.fn(),
   saveProjectFromEditor: (...a: unknown[]) => saveProjectFromEditorMock(...a), getProjectData: vi.fn(), createSite: vi.fn(),
   duplicateSite: (...a: unknown[]) => duplicateSiteMock(...a),
+  PageSlugTakenError: class PageSlugTakenError extends Error {
+    constructor(readonly slug: string, readonly pageNames: string[]) { super("PAGE_SLUG_TAKEN"); }
+  },
 }));
 vi.mock("@/server/services/folder.service", () => ({
   listFolders: vi.fn(), createFolder: vi.fn(), deleteFolder: vi.fn(),
@@ -79,6 +82,7 @@ vi.mock("@buildrik/shared/schemas/sites", () => {
 
 import { sitesRouter } from "@/server/trpc/routers/sites";
 import { PermissionError } from "@/server/services/permission.service";
+import { PageSlugTakenError } from "@/server/services/sites.service";
 
 const ctx = () => ({ session: { user: { id: "u_1" } }, prisma: {} as never });
 
@@ -133,5 +137,47 @@ describe("sites.saveProject — a page of another site (I-2)", () => {
     await expect(
       caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never),
     ).rejects.toMatchObject({ code: "BAD_REQUEST", message: expect.stringContaining("belongs to another site") });
+  });
+});
+
+describe("sites.saveProject — two pages on one slug (L3-001)", () => {
+  /* It was a raw Prisma P2002: a 500 carrying server file paths, on every
+     autosave, naming nothing the user could fix. Not SAVE_CONFLICT-prefixed:
+     that prefix opens the "your copy is behind" dialog, which this is not. */
+  it("reaches the client as CONFLICT naming the address and the pages", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    saveProjectFromEditorMock.mockRejectedValueOnce(new PageSlugTakenError("about", ["About", "About us"]));
+    const caller = sitesRouter.createCaller(ctx() as never);
+    const err = (await caller
+      .saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never)
+      .then(
+        () => null,
+        (e: unknown) => e,
+      )) as { code: string; message: string };
+    expect(err).toMatchObject({ code: "CONFLICT" });
+    expect(err.message).toBe('Two pages use the address /about ("About" and "About us"). Change one page\'s URL in Page settings to keep saving.');
+  });
+
+  it("names the one page when the other holder is not in the save", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    saveProjectFromEditorMock.mockRejectedValueOnce(new PageSlugTakenError("team", ["Team"]));
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await expect(
+      caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never),
+    ).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: 'Another page already uses the address /team ("Team"). Change its URL in Page settings to keep saving.',
+    });
+  });
+});
+
+describe("sites.saveProject — a save that outran its transaction", () => {
+  it("SAVE_TIMEOUT reaches the client as a retryable server error with plain words", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    saveProjectFromEditorMock.mockRejectedValueOnce(new Error("SAVE_TIMEOUT"));
+    const caller = sitesRouter.createCaller(ctx() as never);
+    await expect(
+      caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never),
+    ).rejects.toMatchObject({ code: "INTERNAL_SERVER_ERROR", message: expect.stringContaining("took too long") });
   });
 });

@@ -113,6 +113,9 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     this.cmsManager.on("content:created", () => this.reapplyAll());
     this.cmsManager.on("content:updated", () => this.reapplyAll());
     this.cmsManager.on("content:deleted", () => this.reapplyAll());
+    // Only published records resolve, so a status change re-resolves too (L3-016).
+    this.cmsManager.on(EVENTS.CMS_CONTENT_PUBLISHED, () => this.reapplyAll());
+    this.cmsManager.on(EVENTS.CMS_CONTENT_UNPUBLISHED, () => this.reapplyAll());
 
     /* BD-22 / BD-06: a binding lives as long as its element, and a copy of
        the element carries a copy of it. Bindings sit in this map, keyed by
@@ -276,9 +279,10 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
        input: off-allowlist properties (onclick, style, …) and dangerous
        src/href URLs never reach the element. */
     /* Nothing resolved (no published record, an empty field, no fallback):
-       the element keeps its own content, exactly as the export
-       (CMSExportResolver) and the canvas preview (useCMSPreview) already do.
-       Writing "" here wiped the text on bind and nothing restored it (P-2). */
+       the element keeps its own stored content. What is SHOWN is decided
+       elsewhere — the export (CMSExportResolver) and the canvas preview
+       (useCMSPreview) both render nothing for it. Writing "" here wiped the
+       text on bind and nothing restored it when the record came back (P-2). */
     if (!value) return;
     if (!isSafeCmsBoundValue(binding.property, value)) return;
     const property = binding.property;

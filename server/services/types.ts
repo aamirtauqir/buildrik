@@ -24,3 +24,13 @@ export interface AIProvider {
   ): AsyncIterable<TokenChunk>;
   generate(prompt: string, model: AIModel): Promise<string>;
 }
+
+/** The provider's endpoint refused the connection (L5-001: OLLAMA_BASE_URL set,
+ *  nothing listening). Distinct from a provider error so the router can answer
+ *  "not available" instead of a generic failure. */
+export class AIProviderUnreachableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AIProviderUnreachableError";
+  }
+}

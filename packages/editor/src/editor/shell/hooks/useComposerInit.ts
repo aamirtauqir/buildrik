@@ -34,7 +34,7 @@ import {
   keepStoredTokensOnSave,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
-import { clearUnsaved, keepUnsaved, readUnsaved } from "@/services/unsavedRecovery";
+import { clearUnsaved, keepUnsaved, markUnsavedOffScreen, readUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
@@ -123,6 +123,19 @@ export function loadTokensSafely<
     captureError(err instanceof Error ? err : new Error(reason), { siteId, fromVersion: from, reason });
     return { settings, readOnly: true, migrated: false, reason };
   }
+}
+
+/** Autosave's own retry after a failed save (L5-070): 5s, doubling, capped. */
+export const AUTOSAVE_RETRY_BASE_MS = 5_000;
+const AUTOSAVE_RETRY_MAX_MS = 60_000;
+
+/** A save worth sending again unchanged: it died in transport, or the server
+ *  faulted (5xx) or answered with something that is not tRPC's. A 4xx is a
+ *  refusal on the save's merits and would be refused again. */
+function isRetryableSaveError(err: unknown, message: string): boolean {
+  const data = typeof err === "object" && err !== null ? (err as { data?: { code?: unknown; httpStatus?: unknown } | null }).data : null;
+  if (!data) return !/PROJECT_NOT_LOADED|SITE_MISSING/.test(message);
+  return typeof data.httpStatus === "number" ? data.httpStatus >= 500 : data.code === "INTERNAL_SERVER_ERROR" || data.code === "TIMEOUT";
 }
 
 export function useComposerInit(params: UseComposerInitParams): Composer | null {
@@ -312,6 +325,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               });
               setSaveState({ status: "idle", error: undefined });
             } else if (unsaved) {
+              markUnsavedOffScreen(siteId);
               setSaveState({
                 status: "error",
                 error: "This site has edits that never reached the server.",
@@ -327,10 +341,18 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 action: {
                   label: "Restore my edits",
                   onClick: () => {
-                    instance.importProject(unsaved.project);
+                    /* Handed over once; Retry may already have taken it. The
+                       copy stays kept until a save of it is confirmed. */
+                    const kept = takeOffScreenUnsaved(siteId);
+                    if (!kept) return;
+                    instance.importProject(kept.project);
                     setIsDirty(true);
                     setSaveState({ status: "idle", error: undefined });
-                    clearUnsaved(siteId);
+                    /* L5-075: the import emits only PROJECT_LOADED, which
+                       autosave does not follow, so the restored edits sat
+                       under "Unsaved changes" until some other edit. This
+                       schedules their save. */
+                    instance.emit(EVENTS.PROJECT_CHANGED, { reason: "restore-unsaved" });
                   },
                 },
                 duration: Infinity,
@@ -598,6 +620,34 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        until the tokens change; null once anything saves. */
     let refusedTokens: string | null = null;
 
+    /* L5-070: a failed save used to wait for the user — "Save failed — retry"
+       stayed up after a 500 cleared and after the network came back. A save
+       that died in transport or on a server fault is re-sent with backoff, and
+       at once on `online`. A refusal on its merits (4xx: conflict, invalid
+       tokens, a role) is not: sending it again gets the same answer. */
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    let retryAttempt = 0;
+    const clearRetry = () => {
+      if (retryTimer) clearTimeout(retryTimer);
+      retryTimer = null;
+      retryAttempt = 0;
+    };
+    const scheduleRetry = () => {
+      if (retryTimer) clearTimeout(retryTimer);
+      const delay = Math.min(AUTOSAVE_RETRY_BASE_MS * 2 ** retryAttempt, AUTOSAVE_RETRY_MAX_MS);
+      retryAttempt += 1;
+      retryTimer = setTimeout(() => {
+        retryTimer = null;
+        handler();
+      }, delay);
+    };
+    const onOnline = () => {
+      if (retryAttempt === 0) return;
+      if (retryTimer) clearTimeout(retryTimer);
+      retryTimer = null;
+      handler();
+    };
+
     const handler = (payload?: unknown) => {
       if (readOnlyView) return;
       /* L-3: `project:changed` also fires on `page:activated`, i.e. merely
@@ -673,6 +723,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                next load. */
             if (siteId) clearUnsaved(siteId);
             refusedTokens = null;
+            clearRetry();
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })
@@ -734,7 +785,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                  no "offline" status in this state machine. */
               setSaveState((prev) => ({ ...prev, status: "error", error: message }));
               setIsDirty(true);
-              if (siteId) {
+              const retrying = retryAttempt > 0;
+              if (siteId) scheduleRetry();
+              if (siteId && !retrying) {
                 addToast({
                   /* Same words as the manual path for both branches, so one
                      event cannot be named two different things depending on
@@ -774,7 +827,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               refuseForbiddenSave({ siteId, composer, addToast, setIsDirty, setSaveState });
               return;
             }
-            if (siteId) {
+            const retrying = retryAttempt > 0;
+            if (siteId && isRetryableSaveError(err, message)) scheduleRetry();
+            if (siteId && !retrying) {
               /* A save refused because the project never loaded is not a
                  failed request — it is the guard that stops autosave from
                  overwriting the real site with the fallback. Say so, and
@@ -817,13 +872,20 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        anything was wrong. */
     const onConflict = () =>
       setSaveState((prev) => ({ ...prev, status: "conflict", error: undefined }));
-    if (typeof window !== "undefined") window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
+    if (typeof window !== "undefined") {
+      window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
+      window.addEventListener("online", onOnline);
+    }
     composer.on("project:changed", handler);
     composer.on("history:undo", handler);
     composer.on("history:redo", handler);
     composer.on("version:restored", handler);
     return () => {
-      if (typeof window !== "undefined") window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
+      if (typeof window !== "undefined") {
+        window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
+        window.removeEventListener("online", onOnline);
+      }
+      if (retryTimer) clearTimeout(retryTimer);
       composer.off("project:changed", handler);
       composer.off("history:undo", handler);
       composer.off("history:redo", handler);
