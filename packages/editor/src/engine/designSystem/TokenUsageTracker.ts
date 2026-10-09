@@ -120,6 +120,17 @@ export class TokenUsageTracker extends EventEmitter {
     return this.siteIndex().count(tokenId);
   }
 
+  /** `getCount` as if the set were `tokens` (a pending write): the chain is
+   *  walked through `tokens`' own aliases, so a token the write stops
+   *  aliasing no longer carries that token's elements. */
+  getCountIn(tokenId: string, tokens: readonly DesignToken[]): TokenUsageCount {
+    const idx = this.siteIndex();
+    if (idx.unknown) return "unknown";
+    return buildTokenUsageIndex([], tokens)
+      .closure(tokenId)
+      .reduce((n, id) => n + (idx.direct.get(id) ?? 0), 0);
+  }
+
   /** Element refs for `tokenId` and every token that resolves through it. */
   getBreakdown(tokenId: string): readonly UsageRef[] {
     return this.siteIndex().closure(tokenId).flatMap((id) => this.refs.get(id) ?? []);

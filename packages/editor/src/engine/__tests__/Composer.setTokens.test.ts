@@ -175,6 +175,32 @@ describe("setTokens · removal guard (spec §6, test 11)", () => {
     );
   });
 
+  it("allows dropping a primitive the in-use token no longer aliases (Review changes · Revert)", () => {
+    const c = withLoadedTokens();
+    const own: DesignToken = {
+      id: "custom-primary", name: "Custom primary", kind: "color", layer: "primitive", modes: { light: { value: "#0E7490" } },
+      category: "colors", cssVar: "--buildrick-design-custom-primary", type: "color",
+    };
+    const edited = [...DEFAULT_TOKENS.map((t) => (t.id === "color-primary" ? { ...t, modes: { ...t.modes, light: { alias: own.id } } } : t)), own];
+    expect(c.designSystem.setTokens(edited, "Edit token")).toBe(true);
+    bindRoot(c, "color", "var(--buildrick-design-color-primary)");
+    expect(primary(c)).toBe("#0E7490");
+    // Primary back on the seed, its own primitive gone: nothing is stranded.
+    expect(c.designSystem.setTokens(DEFAULT_TOKENS, "Revert brand edit")).toBe(true);
+    expect(primary(c)).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"));
+  });
+
+  it("still refuses dropping a primitive an element names directly", () => {
+    const c = withLoadedTokens();
+    const own: DesignToken = {
+      id: "custom-primary", name: "Custom primary", kind: "color", layer: "primitive", modes: { light: { value: "#0E7490" } },
+      category: "colors", cssVar: "--buildrick-design-custom-primary", type: "color",
+    };
+    expect(c.designSystem.setTokens([...DEFAULT_TOKENS, own], "Add")).toBe(true);
+    bindRoot(c, "color", "var(--buildrick-design-custom-primary)");
+    expect(c.designSystem.setTokens(DEFAULT_TOKENS, "Delete token")).toBe(false);
+  });
+
   it("deleting a seed token is not a removal (the seed merges it back)", () => {
     const c = withLoadedTokens();
     expect(c.designSystem.setTokens(DEFAULT_TOKENS.filter((t) => t.id !== "space-12"), "Delete token")).toBe(true);

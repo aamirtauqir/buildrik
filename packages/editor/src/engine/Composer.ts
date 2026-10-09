@@ -1026,11 +1026,14 @@ ${html}${interactionScript}
    *  usage is not a known 0. Builds usage synchronously: the microtask-coalesced
    *  recompute may not have run since the last element edit. */
   private tokensRemovedInUse(next: DesignToken[]): string[] {
-    const after = new Set(mergeProjectTokens(next, TOKENS_SCHEMA_VERSION).map((t) => t.id));
+    const merged = mergeProjectTokens(next, TOKENS_SCHEMA_VERSION);
+    const after = new Set(merged.map((t) => t.id));
     const removed = this.mergedDesignTokens().filter((t) => !after.has(t.id));
     if (removed.length === 0) return [];
     this.recomputeTokenUsage();
-    return removed.filter((t) => this.designSystem.tokenUsage.getCount(t.id) !== 0).map((t) => t.id);
+    /* Counted through the NEXT set's aliases: a primitive the write also stops
+       aliasing (Review changes · Revert, a restore) strands nothing. */
+    return removed.filter((t) => this.designSystem.tokenUsage.getCountIn(t.id, merged) !== 0).map((t) => t.id);
   }
 
   /** Rebuilds the element breakdown now (the event path coalesces it into a microtask). */
