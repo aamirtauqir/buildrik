@@ -333,7 +333,7 @@ const PANEL =
    leaves. */
 const PILL =
   `tw:fixed ${CHIP_POS} tw:flex tw:h-6 tw:w-11 tw:items-center tw:justify-center tw:gap-1 tw:px-1 ` +
-  "tw:bg-[var(--bk-accent-tint)] tw:rounded-[12px] " +
+  "tw:bg-[var(--bk-accent-tint)] tw:rounded-full " +
   "tw:[z-index:calc(var(--bk-z-topbar)_+_1)] " +
   "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
 const PILL_DOT = "tw:size-1.5 tw:rounded-full tw:flex-none";

@@ -92,7 +92,6 @@
 .bdc-lr-ic {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
   /* Glyph, not a filled block: this was `background: var(--bk-ink-muted)` and
      the svg inside is stroked in currentColor, which inherits the same token,
      so every row drew a grey square and the per-type icon was invisible. */

@@ -132,6 +132,21 @@ const RATCHETS = [
     css: true,
   },
   {
+    id: "offscale-radius",
+    /* DQ-028 (2026-10-10): DESIGN.md's radius scale is 4 / 6 / 8 / 12
+       (modals) / full. Off-scale literals stay only where a board draws them
+       (the inspector's 3px colour swatch and level chips, the spacing box's
+       2px content chip) — a ratchet, so new ones fail and these drain. */
+    pattern: String.raw`rounded-\[(1|2|3|5|7|9|10|11|14|16)px\]|[rR]adius: ?["']?(1|2|3|5|7|9|10|11|14|16)(px)?["']?[,;]`,
+    baseline: 47,
+  },
+  {
+    id: "css-offscale-radius",
+    pattern: String.raw`border-radius: ?(1|2|3|5|7|9|10|11|14|16)px`,
+    baseline: 32,
+    css: true,
+  },
+  {
     id: "css-font-weight-700",
     /* DQ-021: the CSS half. `Canvas.css` set `font-weight: bold` on the
        clone-mode badge (chrome, despite the file) and no gate scanned CSS
