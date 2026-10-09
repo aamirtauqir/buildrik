@@ -112,6 +112,16 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
               const textLeaf =
                 isSelected && (ELEMENT_CATEGORIES[candidateType] ?? []).includes(ElementCategory.TEXT);
               const canContain = !textLeaf && canNestElement(def.elementType, candidateType);
+              /* L1-037: a Section's lone inner container is its content slot
+                 (the "Drop a block here" box) — the block goes in there, not
+                 beside it. */
+              const sectionKids = isSelected && candidateType === "section" ? candidate.getChildren() : [];
+              const slot = sectionKids.length === 1 && sectionKids[0].getType() === "container" ? sectionKids[0] : null;
+              if (slot && canNestElement(def.elementType, "container")) {
+                parentId = slot.getId();
+                insertIndex = slot.getChildCount?.() ?? 0;
+                break;
+              }
               if (canContain) {
                 if (isSelected) {
                   // Selected itself accepts the block: insert inside at end.
