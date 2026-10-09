@@ -29,7 +29,9 @@
 import * as React from "react";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS, DOCUMENT_CHANGED_EVENTS } from "@/shared/constants/events";
-import { emitTokenCss } from "@buildrik/shared/tokens";
+import { emitTokenCss, resolveTokenLiteral } from "@buildrik/shared/tokens";
+import type { DarkMode } from "@buildrik/shared/schemas/design-tokens";
+import { AUTO_PAGE_CSS, siteFontCSS } from "@/engine/export/ExportHelpers";
 import { sanitizeHTMLForPreview } from "@/editor/export/ExportUtils";
 import { Select, type CustomFlowbiteTheme } from "@/editor/chrome-ui";
 import type { DesignToken } from "../types";
@@ -61,6 +63,10 @@ export interface BrandLivePreviewProps {
   controls?: React.ReactNode;
   /** Elements to outline in the page — empty or absent draws none. */
   highlightIds?: readonly string[];
+  /** The previewed site's Dark mode. Auto adds the page rules an Auto export
+   *  carries, which the frame's document (the SAVED export) lacks while an Off
+   *  site previews turning Auto on (8224:240644). */
+  darkMode?: DarkMode;
 }
 
 /* 7315:80955: the page frame is 346 × 265 inside the 468 card, centred. */
@@ -84,6 +90,7 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
   mode,
   controls,
   highlightIds,
+  darkMode = "off",
 }) => {
   const [zoom, setZoom] = React.useState<(typeof ZOOMS)[number]["value"]>("0.5");
   const [pageName, setPageName] = React.useState<string>("");
@@ -91,7 +98,14 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
   const [doc, setDoc] = React.useState<string>("");
   const frameRef = React.useRef<HTMLIFrameElement | null>(null);
   /* Every `--buildrick-design-*` the draft carries, resolved for the mode. */
-  const stagedCSS = React.useMemo(() => emitTokenCss(tokens, { darkMode: "auto" }), [tokens]);
+  const stagedCSS = React.useMemo(() => {
+    const css = emitTokenCss(tokens, { darkMode: "auto" });
+    if (darkMode !== "auto") return css;
+    /* What a saved Auto site's export adds: the page behind the root, and the
+       body text through the text token (Turn on dark mode saves the full set,
+       so that rule is always there once Auto is saved). */
+    return css + AUTO_PAGE_CSS + siteFontCSS({ text: resolveTokenLiteral(tokens as DesignToken[], "color-text", "light") ?? undefined });
+  }, [tokens, darkMode]);
   const highlightCSS = React.useMemo(() => {
     if (!highlightIds?.length) return "";
     const accent = getComputedStyle(document.documentElement).getPropertyValue("--bk-accent").trim() || "Highlight";

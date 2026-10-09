@@ -133,13 +133,15 @@ export function emitSiteTokenCss(
     darkMode,
     onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
   });
-  /* Auto: the body is painted with the page background token too. The page
-     root carries it, but the viewport below a short page is the body — white
-     by default, under dark-mode text. Transparent in light (the seed), so an
-     Auto site's light page is unchanged; an Off site gets no rule at all. */
-  const page = darkMode === "auto" ? `\nbody{background-color:var(${PAGE_BACKGROUND_TOKEN.cssVar})}\n` : "";
+  const page = darkMode === "auto" ? AUTO_PAGE_CSS : "";
   return (opts?.hasThemeToggle ? css + themeToggleCss(darkMode === "auto" ? "show" : "hide") : css) + page;
 }
+
+/** Auto: the body is painted with the page background token too. The page
+ *  root carries it, but the viewport below a short page is the body — white
+ *  by default, under dark-mode text. Transparent in light (the seed), so an
+ *  Auto site's light page is unchanged; an Off site gets no rule at all. */
+export const AUTO_PAGE_CSS = `\nbody{background-color:var(${PAGE_BACKGROUND_TOKEN.cssVar})}\n`;
 
 /**
  * The families the page uses: the FIRST family of every `font-family` stack

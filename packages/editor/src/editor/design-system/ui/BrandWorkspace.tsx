@@ -1084,6 +1084,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               composer={composer}
               tokens={canvasPreview?.tokens ?? allTokens}
               mode={shownMode}
+              darkMode={canvasPreview?.darkMode ?? siteDarkMode}
               controls={previewControls}
               highlightIds={connectIds ?? usageIds}
             />
