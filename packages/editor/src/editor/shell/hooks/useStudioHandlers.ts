@@ -1,6 +1,6 @@
 /**
  * useStudioHandlers - Hook for action handlers in AquibraStudio
- * Extracts AI, template, and block action handlers
+ * Owns the save-as-template handler and its server-sync notice
  *
  * @module Editor/hooks/useStudioHandlers
  * @license BSD-3-Clause
@@ -8,16 +8,12 @@
 
 import * as React from "react";
 import { ToastInput, dismissToast } from "@/editor/chrome-ui";
-import { getBlockDefinitions, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import { STORAGE_KEYS } from "../../../shared/constants/config";
-import type { BlockData } from "../../../shared/types";
-import { canNestElement } from "../../../shared/utils/nesting";
 import { mirrorUserTemplate, retryTemplateSync, getTemplateSyncPendingCount, onTemplateSyncError } from "../../../services/templateSync";
 import { inverseResolveTokens } from "../../sidebar/tabs/templates/utils/inverseResolveTokens";
 import { snapshotFromComputedStyle } from "../../sidebar/tabs/templates/utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../design-system/constants";
-import { getDefaultPageName } from "@/shared/utils/pageUtils";
 
 export interface UseStudioHandlersParams {
   composer: Composer | null;
@@ -25,7 +21,6 @@ export interface UseStudioHandlersParams {
 }
 
 export interface UseStudioHandlersReturn {
-  handleQuickAdd: (block: BlockData) => void;
   handleSaveTemplate: (data: { name: string; category: string; description: string }) => void;
 }
 
@@ -70,26 +65,6 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
       clear();
     };
   }, [addToast]);
-
-  const handleQuickAdd = React.useCallback(
-    (block: BlockData) => {
-      if (!composer) return;
-      composer.beginTransaction("Add Element");
-      try {
-        const page =
-          composer.elements.getActivePage() ||
-          composer.elements.createPage(getDefaultPageName(composer.elements.getAllPages()));
-        const root = composer.elements.getElement(page.root.id);
-        if (!root) return;
-        const def = getBlockDefinitions().find((b) => b.id === block.id);
-        if (!def || !canNestElement(def.elementType, root.getType())) return;
-        insertBlock(composer, def, root.getId(), root.getChildCount());
-      } finally {
-        composer.endTransaction();
-      }
-    },
-    [composer]
-  );
 
   const handleSaveTemplate = React.useCallback(
     (data: { name: string; category: string; description: string }) => {
@@ -150,7 +125,6 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
   );
 
   return {
-    handleQuickAdd,
     handleSaveTemplate,
   };
 }

@@ -1,7 +1,6 @@
 /**
- * useStudioHandlers.test.ts — quick-add + template select/save.
- * Composer + block registry + template actions are mocked; assertions
- * target transaction discipline and the per-branch element mutations.
+ * useStudioHandlers.test.ts — template save + its server-sync notice.
+ * Composer + template actions are mocked.
  * (AI request/apply + copilot insert were removed with the AIAssistant
  * surface — AI is now the AITab, which owns its own edit apply path.)
  *
@@ -12,19 +11,6 @@ import { renderHook, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useStudioHandlers, type UseStudioHandlersParams } from "../useStudioHandlers";
 import { STORAGE_KEYS } from "../../../../shared/constants/config";
-import type { BlockData } from "../../../../shared/types";
-
-vi.mock("../../../../blocks/blockRegistry", () => ({
-  getBlockDefinitions: vi.fn(() => [
-    { id: "hero-1", elementType: "hero" },
-    { id: "nav-1", elementType: "navbar" },
-  ]),
-  insertBlock: vi.fn(),
-}));
-
-vi.mock("../../../../shared/utils/nesting", () => ({
-  canNestElement: vi.fn(() => true),
-}));
 
 let templateErrCb: (() => void) | null = null;
 let templatePending = 0;
@@ -43,10 +29,7 @@ vi.mock("../../../../services/templateSync", () => ({
 const dismissed: string[] = [];
 vi.mock("@/editor/chrome-ui", () => ({ dismissToast: (id: string) => dismissed.push(id) }));
 
-import { getBlockDefinitions, insertBlock } from "../../../../blocks/blockRegistry";
-import { canNestElement } from "../../../../shared/utils/nesting";
 import { mirrorUserTemplate, retryTemplateSync } from "../../../../services/templateSync";
-import { getDefaultPageName } from "@/shared/utils/pageUtils";
 
 // ---------------------------------------------------------------------------
 // Mock element / composer factories
@@ -112,19 +95,12 @@ function mount(overrides: Partial<UseStudioHandlersParams> = {}) {
   return { hook, composer, root, addToast };
 }
 
-const BLOCK: BlockData = { id: "hero-1" } as unknown as BlockData;
-
 describe("useStudioHandlers", () => {
   beforeEach(() => {
     localStorage.clear();
     templatePending = 0;
     templateErrCb = null;
     dismissed.length = 0;
-    vi.mocked(canNestElement).mockReturnValue(true);
-    vi.mocked(getBlockDefinitions).mockReturnValue([
-      { id: "hero-1", elementType: "hero" },
-      { id: "nav-1", elementType: "navbar" },
-    ] as unknown as ReturnType<typeof getBlockDefinitions>);
   });
 
   afterEach(() => {
@@ -132,56 +108,6 @@ describe("useStudioHandlers", () => {
     localStorage.clear();
   });
 
-  // handleQuickAdd -------------------------------------------------------------
-  describe("handleQuickAdd", () => {
-    it("no-ops without composer", () => {
-      const { hook } = mount({ composer: null });
-      act(() => hook.result.current.handleQuickAdd(BLOCK));
-      expect(insertBlock).not.toHaveBeenCalled();
-    });
-
-    it("inserts the block at the end of the page root inside a transaction", () => {
-      const { hook, composer, root } = mount();
-      act(() => hook.result.current.handleQuickAdd(BLOCK));
-      expect(composer.beginTransaction).toHaveBeenCalledWith("Add Element");
-      expect(insertBlock).toHaveBeenCalledWith(
-        composer,
-        expect.objectContaining({ id: "hero-1" }),
-        "root-1",
-        (root.getChildCount as () => number)(),
-      );
-      expect(composer.endTransaction).toHaveBeenCalledTimes(1);
-    });
-
-    it("skips insert when the block id is unknown — but still ends the transaction", () => {
-      const { hook, composer } = mount();
-      act(() =>
-        hook.result.current.handleQuickAdd({ id: "nope" } as unknown as BlockData),
-      );
-      expect(insertBlock).not.toHaveBeenCalled();
-      expect(composer.endTransaction).toHaveBeenCalledTimes(1);
-    });
-
-    it("skips insert when nesting is not allowed", () => {
-      vi.mocked(canNestElement).mockReturnValue(false);
-      const { hook, composer } = mount();
-      act(() => hook.result.current.handleQuickAdd(BLOCK));
-      expect(insertBlock).not.toHaveBeenCalled();
-      expect(composer.endTransaction).toHaveBeenCalledTimes(1);
-    });
-
-    /* Whatever `getDefaultPageName` says, not a name restated here — six call
-       sites answered "the project has no pages" and gave three answers. */
-    it("creates the shared default page when there is no active page", () => {
-      const { hook, composer } = mount();
-      composer.elements.getActivePage.mockReturnValue(null as never);
-      composer.elements.createPage.mockReturnValue({ root: { id: "root-new" } } as never);
-      act(() => hook.result.current.handleQuickAdd(BLOCK));
-      expect(composer.elements.createPage).toHaveBeenCalledWith(getDefaultPageName([]));
-    });
-  });
-
-  // handleSaveTemplate -------------------------------------------------------------
   describe("handleSaveTemplate — the saved page is portable", () => {
     /* Board 1169:4753 promises "Tokens are snapshotted — applying it later
        re-maps them to that site's brand". The APPLY half was always wired

@@ -10,11 +10,10 @@
  */
 
 import * as React from "react";
-import { getBlockDefinitions } from "../../blocks/blockRegistry";
 import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import { EVENTS } from "../../shared/constants";
-import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
+import type { ComposerConfig, ProjectData } from "@/shared/types";
 import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { SessionExpiredModal } from "./modals/SessionExpiredModal";
@@ -84,7 +83,6 @@ migrateStorageKeys();
 migrateAqbKeys();
 
 export interface AquibraStudioProps {
-  licenseKey?: string;
   options?: Partial<ComposerConfig> & {
     project?: { type?: string; default?: { pages?: Array<{ name: string; component: string }> } };
   };
@@ -156,7 +154,6 @@ const DISCARD_SURFACE: Record<DirtyDomain, string> = {
 };
 
 const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
-  licenseKey: _licenseKey,
   options,
   onEditor,
   onReady,
@@ -171,7 +168,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // Use extracted hooks
   const state = useStudioState();
   const modals = useStudioModals();
-  const blocks: BlockData[] = React.useMemo(() => getBlockDefinitions(), []);
 
   /* B-1: every left-panel tab-switch door gets these two guarded sinks, never
      the raw `state.setLeftPanelTab` / `state.openLeftPanelToTab` — the rail,
@@ -746,11 +742,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         leftPanelTab={state.leftPanelTab}
         leftPanelSubTab={state.leftPanelSubTabs[state.leftPanelTab]}
         onLeftPanelTabChange={guardedSetLeftPanelTab}
-        onLeftPanelSubTabChange={(subTab) =>
-          state.setLeftPanelSubTabs((prev) => ({ ...prev, [state.leftPanelTab]: subTab }))
-        }
-        blocks={blocks}
-        onQuickAdd={handlers.handleQuickAdd}
         showSpacingIndicators={state.overlays.showSpacingIndicators}
         showBadges={state.overlays.showBadges}
         showGuides={state.overlays.showGuides}

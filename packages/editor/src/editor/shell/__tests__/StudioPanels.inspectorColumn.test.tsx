@@ -127,8 +127,6 @@ function Harness({
         device="desktop"
         zoom={100}
         onZoomChange={() => {}}
-        blocks={[]}
-        onQuickAdd={() => {}}
         isLeftPanelOpen={open}
         onLeftPanelToggle={() => setOpen((v) => !v)}
         leftPanelTab={tab}
