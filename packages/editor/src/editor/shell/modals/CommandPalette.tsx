@@ -733,7 +733,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
           <Button
             variant="link"
             onClick={onClose}
-            className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            className="tw:h-auto tw:min-h-5 tw:-my-0.5 tw:p-0 tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]"
           >
             Esc Close
           </Button>

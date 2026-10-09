@@ -73,8 +73,8 @@
 .bdc-lr.bdc-cms-bound { background: var(--bk-accent-tint); }
 
 .bdc-lr-chev {
-  width: 16px;
-  height: 16px;
+  /* 20px target (DESIGN.md A1.4, DQ-020); -2px keeps the 16px footprint. */
+  width: 20px; height: 20px; margin: -2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
