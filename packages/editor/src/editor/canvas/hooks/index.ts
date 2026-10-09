@@ -124,14 +124,6 @@ export {
   type ElementRect,
   type UseElementRectOptions,
 } from "./useElementRect";
-export {
-  useToolbarPosition,
-  useToolbarPositionAbove,
-  useToolbarPositionBelow,
-  type ToolbarPosition,
-  type ToolbarPlacement,
-  type UseToolbarPositionOptions,
-} from "./useToolbarPosition";
 
 // Utility hooks
 export {
