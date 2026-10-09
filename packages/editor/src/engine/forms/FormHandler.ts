@@ -14,7 +14,6 @@ import {
 import { EVENTS } from "../../shared/constants";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
-import { emailMarketingService } from "../integrations";
 
 // ============================================================================
 // TYPES
@@ -266,25 +265,6 @@ export class FormHandler {
 
       // Submit via service
       const result = await this.submissionService.submit(submissionData);
-
-      // Handle email list subscription if configured
-      if (
-        result.success &&
-        config.action === "email" &&
-        config.emailOptions?.subscribeToList &&
-        emailMarketingService.isConfigured()
-      ) {
-        const emailField = state.values["email"] as string | undefined;
-        const nameField = state.values["name"] as string | undefined;
-
-        if (emailField) {
-          // Subscribe to mailing list - fire and forget, don't block form submission
-          await emailMarketingService.subscribe({
-            email: emailField,
-            name: nameField,
-          });
-        }
-      }
 
       // Update state based on result
       const newState: FormState = {

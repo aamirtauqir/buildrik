@@ -43,7 +43,6 @@ import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
-import { emailMarketingService } from "./integrations";
 import { InteractionManager } from "./interactions/InteractionManager";
 import { MediaManager } from "./media/MediaManager";
 import { MediaCommandLayer } from "./media/MediaCommandLayer";
@@ -274,7 +273,7 @@ export class Composer extends EventEmitter {
     super();
     this.config = this.normalizeConfig(config);
     this.state = this.createInitialState();
-    this.applyProjectSettings({}, this.projectSettings, {
+    this.applyProjectSettings(this.projectSettings, {
       emitProjectChanged: false,
       emitSettingsChange: false,
     });
@@ -813,7 +812,7 @@ export class Composer extends EventEmitter {
     }
 
     // Import project settings
-    this.applyProjectSettings(this.projectSettings, data.settings ?? {}, {
+    this.applyProjectSettings(data.settings ?? {}, {
       emitProjectChanged: false,
     });
 
@@ -1000,20 +999,15 @@ ${html}${interactionScript}
    * Apply project settings and update dependent integrations
    */
   private applyProjectSettings(
-    prev: ProjectSettings,
     settings: ProjectSettings,
     options?: { emitProjectChanged?: boolean; emitSettingsChange?: boolean }
   ): void {
     this.projectSettings = settings ?? {};
 
-    // Only reconfigure email marketing when the email integration settings actually changed
     const emailConfig = this.projectSettings.integrations?.email || {
       provider: "none",
       enabled: false,
     };
-    if (JSON.stringify(prev.integrations?.email) !== JSON.stringify(settings.integrations?.email)) {
-      emailMarketingService.configure(emailConfig);
-    }
 
     // Configure form email notification service
     // Maps project settings to the form email service format
@@ -1073,9 +1067,8 @@ ${html}${interactionScript}
    * Set project-wide settings (analytics, integrations, design tokens)
    */
   setProjectSettings(settings: ProjectSettings): void {
-    const prev = this.projectSettings;
     this.markDirty(); // Mark dirty BEFORE applyProjectSettings emits PROJECT_CHANGED
-    this.applyProjectSettings(prev, settings);
+    this.applyProjectSettings(settings);
   }
 
   /**
@@ -1086,7 +1079,7 @@ ${html}${interactionScript}
    * again (`sites.saveProject`) for a change that is already saved.
    */
   adoptSavedProjectSettings(settings: ProjectSettings): void {
-    this.applyProjectSettings(this.projectSettings, settings, { emitProjectChanged: false });
+    this.applyProjectSettings(settings, { emitProjectChanged: false });
   }
 
   /**
