@@ -164,4 +164,27 @@ describe("LayersPanel — single-row Delete/Cut go through the engine lock gate"
     expect(copied).toHaveBeenCalledTimes(1);
     expect(composer.clipboard).toHaveLength(1);
   });
+
+  /* L2-033: Group and Move to page moved a locked element (no lock gate). */
+  it("Group on a locked row is refused, says so, and wraps nothing", () => {
+    const composer = mount([], ["lx-footer"]);
+    const skipped = vi.fn();
+    composer.on(EVENTS.LOCKED_ELEMENTS_SKIPPED, skipped);
+    fireEvent.contextMenu(screen.getByTestId("layer-row-lx-footer"));
+    act(() => {
+      fireEvent.click(screen.getByTestId("layer-menu-group"));
+    });
+    expect(composer.elements.getElement("lx-footer")!.getParent()!.getId()).toBe("lx-root");
+    expect(skipped).toHaveBeenCalled();
+    expect(screen.queryByText(/in a group/)).toBeNull();
+  });
+
+  it("Group on an unlocked row still wraps it", () => {
+    const composer = mount([]);
+    fireEvent.contextMenu(screen.getByTestId("layer-row-lx-footer"));
+    act(() => {
+      fireEvent.click(screen.getByTestId("layer-menu-group"));
+    });
+    expect(composer.elements.getElement("lx-footer")!.getParent()!.getId()).not.toBe("lx-root");
+  });
 });

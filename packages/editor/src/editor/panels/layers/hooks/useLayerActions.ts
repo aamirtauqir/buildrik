@@ -17,6 +17,7 @@ import type { Composer } from "../../../../engine";
 import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
+import { dropLockedAndInstances } from "@/engine/commands/commandOperations";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import {
   getLayerName,
@@ -42,7 +43,8 @@ export interface UseLayerActionsReturn {
   cancelEditing: () => void;
   moveToTop: (id: string, layers: LayerItem[]) => void;
   moveToBottom: (id: string, layers: LayerItem[]) => void;
-  groupLayers: (ids: string[], layers: LayerItem[]) => void;
+  /** False when nothing was grouped (a locked or instance-owned row). */
+  groupLayers: (ids: string[], layers: LayerItem[]) => boolean;
   /** Move to the END of another page's root (board 4418:82847), one
    *  transaction; nested picks travel with their ancestor. False = nothing moved. */
   moveToPage: (ids: string[], pageId: string) => boolean;
@@ -307,10 +309,18 @@ export function useLayerActions(
   const groupLayers = React.useCallback(
     (ids: string[], _layers: LayerItem[]) => {
       /* One element groups too — v3 4418:82409 "Wrapped Heading in a group". */
-      if (!composer || ids.length < 1) return;
+      if (!composer || ids.length < 1) return false;
+      /* Grouping moves the rows: the same lock + instance gate as the engine's
+         delete/cut, all or nothing (L2-033). */
+      const els = ids.map((id) => composer.elements.getElement(id)).filter((e): e is NonNullable<typeof e> => Boolean(e));
+      const { skipped, skippedPayload } = dropLockedAndInstances(els);
+      if (skipped) {
+        composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, skippedPayload);
+        return false;
+      }
       const firstEl = composer.elements.getElement(ids[0]);
       const parent = firstEl?.getParent?.();
-      if (!parent) return;
+      if (!parent) return false;
       const parentId = parent.getId();
       const insertIndex = parent.getChildIndex(firstEl!);
       composer.beginTransaction("group-layers");
@@ -323,6 +333,7 @@ export function useLayerActions(
       }
       composer.endTransaction();
       if (group) renameElement(composer, group.getId(), "Group");
+      return Boolean(group);
     },
     [composer]
   );
@@ -335,6 +346,11 @@ export function useLayerActions(
       const els = ids.map((id) => composer.elements.getElement(id)).filter((e): e is NonNullable<typeof e> => Boolean(e));
       const topMost = els.filter((el) => !els.some((other) => other !== el && el.isDescendantOf(other)));
       if (topMost.length === 0) return false;
+      const { skipped, skippedPayload } = dropLockedAndInstances(topMost);
+      if (skipped) {
+        composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, skippedPayload);
+        return false;
+      }
       composer.beginTransaction("move-to-page");
       topMost.forEach((el) => composer.elements.moveElement(el.getId(), rootId));
       composer.endTransaction();

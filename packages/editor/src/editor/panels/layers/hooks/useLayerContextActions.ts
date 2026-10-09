@@ -122,7 +122,7 @@ export function useLayerContextActions(
           const ids = multi ? [...selectionHook.selectedIds] : [nodeId];
           const node = findById(treeHook.layers, nodeId);
           const name = actionsHook.customNames.get(nodeId) ?? node?.type ?? "Element";
-          actionsHook.groupLayers(ids, treeHook.layers);
+          if (!actionsHook.groupLayers(ids, treeHook.layers)) break;
           addToast({
             description: `Wrapped ${multi ? `${ids.length} elements` : name.charAt(0).toUpperCase() + name.slice(1)} in a group`,
             action: composer ? { label: "Undo", onClick: composer.history.captureUndo() } : undefined,
