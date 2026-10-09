@@ -18,6 +18,7 @@ import { useDiscoveryState } from "./useDiscoveryState";
 import { useServerStorageQuota } from "./useServerStorageQuota";
 import { endAssetPick, requestAssetPick, useAssetPick, type AssetPickRequest } from "../data/assetPick";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
+import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 
 export function useMediaState(composer: Composer): MediaStateResult {
   const { addToast } = useToast();
@@ -250,8 +251,10 @@ export function useMediaState(composer: Composer): MediaStateResult {
             alt: asset.altText,
           });
           if (result) {
-            const insertedEl = composer.elements.getElement(result.elementId);
-            if (insertedEl) composer.selection.select(insertedEl);
+            /* Select it and bring it on screen: with nothing selected the
+               image lands at the end of the page, below the fold, and an
+               unmoved canvas read as a failed insert (L4-004). */
+            locateComment(composer, { pageId: null, targetSelector: result.elementId });
             if (result.kind === "font-applied") {
               showToast(`Font "${asset.name}" applied to selection ✓`, "success");
             } else if (asset.localOnly) {
