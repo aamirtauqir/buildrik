@@ -12,6 +12,6 @@ describe("DeleteConfirmModal copy", () => {
   it("states the restore window instead of 'cannot be undone'", () => {
     render(<DeleteConfirmModal open siteName="Bakery" onClose={vi.fn()} onConfirm={vi.fn()} />);
     expect(screen.queryByText(/cannot be undone/i)).toBeNull();
-    expect(screen.getByText(/Recently deleted for 30 days/)).toBeTruthy();
+    expect(screen.getByText(/Recently deleted, where you can restore it for 30 days/)).toBeTruthy();
   });
 });

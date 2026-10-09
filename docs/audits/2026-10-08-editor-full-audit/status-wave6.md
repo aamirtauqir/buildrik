@@ -16,6 +16,22 @@ tooltips.
 
 Status values: FIXED · ALREADY-FIXED · DECISION · WONTFIX-REASON · NOT-DONE.
 
+## After merging main (`35d3b9883`, merge `3d8a57ac1`)
+
+The live checks were re-run on fresh throwaway sites (load ~6; both deleted
+afterwards). All results held:
+- L5-014 prefill; L5-024: 1 quota request.
+- L5-060 block and re-enable; L5-073 no toast left; L5-071 no banner; L5-078 notice in both tabs.
+- L5-051: page menu and `/contact` link.
+- L5-040/042/043/044/045: history.
+- L5-034/035: review copy. L5-034's banner reads "1 open" once a comment exists.
+- L5-019 tooltip; L5-011 copy; FG-017 clean. L5-077 also passed (see its row).
+
+L5-050 still reproduces: preview rgb(0,0,0) with no font link; canvas rgb(51,65,85) in Inter.
+
+Three rows were fixed by main too; at the merge, main's version was kept and wave 6's
+duplicate was dropped: L5-073, L5-076, FG-027.
+
 ## L5 — Medium
 
 | ID | Status | Commit | Evidence |
@@ -41,7 +57,7 @@ Status values: FIXED · ALREADY-FIXED · DECISION · WONTFIX-REASON · NOT-DONE.
 | L5-051 | FIXED | `ea915ccc0` | The preview now has a page menu and handles link clicks itself. The sandbox is `allow-same-origin` with no scripts. **Live:** clicking `/contact` shows "Get in touch" and moves the menu to Contact; picking Home from the menu goes back. |
 | L5-060 | FIXED | `c31c8345a` | **Live:** with saves returning 500, Publish is disabled with "Save your changes before publishing — the last save failed". It is re-enabled after the retry saves. Flushing autosave before export (01 P2-6) is not done. |
 | L5-071 | FIXED | `fd0c48732` | **Live:** offline in the editor, no "Auto-retrying in Ns" banner appears. Unit test for `/edit/*`. |
-| L5-076 | FIXED | `5ab08c625` | The recovery toast is dismissed on Restore and is registered with the toasts that a successful save takes down. Unit test. The cross-tab marker is cleared on every successful save (waves 2 and 3); a marker for off-screen edits is kept on purpose. |
+| L5-076 | ALREADY-FIXED (main) | main EDT-018; wave-6 `5ab08c625` superseded at merge `3d8a57ac1` | Main's `onOffScreenSettled` dismisses the recovery toast when the copy is handed over or discarded; wave 6's duplicate tracker was dropped at the merge. Kept from wave 6: the loadFlow assertion that Restore dismisses the toast (passes on main's code). Earlier note: | The recovery toast is dismissed on Restore and is registered with the toasts that a successful save takes down. Unit test. The cross-tab marker is cleared on every successful save (waves 2 and 3); a marker for off-screen edits is kept on purpose. |
 
 ## L5 — Low
 
@@ -65,8 +81,8 @@ Status values: FIXED · ALREADY-FIXED · DECISION · WONTFIX-REASON · NOT-DONE.
 | L5-045 | FIXED | `f2e13db09` | **Live:** clicking a row opens Saved version details. "N changes" opens the compare (unit test). |
 | L5-061 | DECISION | — | Publish opens the confirm over the checks panel. See the memo. |
 | L5-072 | DECISION | — | Partly reduced: the dashboard banner is gone (L5-071) and failure toasts close on success (L5-073). See the memo. |
-| L5-073 | FIXED | `56a5aa958` | **Live:** after 500 → Retry save → 200, no "Save failed" toast is left. |
-| L5-077 | FIXED | `d6056e93a` | Reload latest and Save a backup now go through `navigateBypassingUnloadGuard`. Checked in code only; the two-tab conflict was not run live. |
+| L5-073 | ALREADY-FIXED (main) | main L3-006; wave-6 `56a5aa958` superseded at merge `3d8a57ac1` | Main's `SAVE_FAILED_TOAST_KEY` is dismissed on every landed save. **Live after merge:** 500 → Retry save → 200, no toast left. | **Live:** after 500 → Retry save → 200, no "Save failed" toast is left. |
+| L5-077 | FIXED | `d6056e93a` | **Live after merge:** two tabs, both edited; tab 2 got the conflict modal; Reload latest raised no native dialog (0 `dialog` events). |
 | L5-078 | FIXED | `aea5b9d78` + `92717c0c6` | **Live:** both tabs show "This site is open in another tab". The first version was replaced by "Project loaded" in the new tab, so the notice is now persistent. |
 | L5-079 | WONTFIX-REASON | — | Seen once in the audit and not reproduced (the audit's dev overlay read "stale" HMR). Re-test on a production build. |
 
@@ -107,7 +123,7 @@ Status values: FIXED · ALREADY-FIXED · DECISION · WONTFIX-REASON · NOT-DONE.
 | FG-024 | WONTFIX-REASON | — | Figma-only (stale board). |
 | FG-025 | WONTFIX-REASON | — | Figma-only (archive board). |
 | FG-026 | NOT-DONE | — | A single accessibility report needs a design (Issues "Accessibility" category) and scanner work. |
-| FG-027 | FIXED | `5c1f8d1a2` | The clean state reads "No issues. This page is ready to publish." (board copy). Unit test. |
+| FG-027 | ALREADY-FIXED (main) | main L4-042; wave-6 `5c1f8d1a2` superseded at merge | Main ships "No issues." (board 6158:51949, newer than 4418:47609); main's copy is kept. | The clean state reads "No issues. This page is ready to publish." (board copy). Unit test. |
 | FG-028 | FIXED | `b15fdd423` | A successful auto-fix shows "Issue fixed" with Undo, bound to the fix's own history entry. Checked in code only; no fixable contrast issue was set up live. |
 | FG-029 | DECISION | — | See the memo. |
 | FG-030 | DECISION | — | See the memo. |
@@ -125,7 +141,7 @@ Status values: FIXED · ALREADY-FIXED · DECISION · WONTFIX-REASON · NOT-DONE.
 | FG-042 | WONTFIX-REASON | — | Figma-only (board for the invalid-drop state). |
 | FG-043 | NOT-DONE | — | Date field configuration (format, min/max) needs a CMS field schema change. Not built. |
 | FG-044 | NOT-DONE | — | Duplicate of L1-025 (Start from Scratch lands on the dashboard), owned by the wave 4 L1 lane. |
-| FG-045 | FIXED | `a3881498d` | The confirm now names the 30-day restore window. The success toast already did. Unit test. |
+| FG-045 | FIXED (merged with main) | `a3881498d` + merge | Main's wording ("The site moves to Recently deleted, where you can restore it for N days") is kept; the number comes from `SITE_RESTORE_WINDOW_DAYS`. | The confirm now names the 30-day restore window. The success toast already did. Unit test. |
 | FG-005, FG-039 | — | — | Withdrawn or not filed by the audit. |
 
 ## Decision memos
@@ -207,7 +223,6 @@ Status values: FIXED · ALREADY-FIXED · DECISION · WONTFIX-REASON · NOT-DONE.
 ## Not verified
 
 - Every model-dependent AI path (Ollama down; no OpenAI calls made): L5-012, 013, 017, 018 (the call itself), 021, FG-023 live flash.
-- L5-077: the two-tab conflict dialog was not run live.
 - FG-028: a live auto-fix was not run.
 - L5-041 live: the compare re-ran, but the draft had not changed, so the text was the same.
 - The publish path past the gate (`sites.publish` was aborted throughout).
