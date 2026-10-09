@@ -28,13 +28,31 @@ describe("updateFormBlockSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("refuses a relative redirectUrl (NextResponse.redirect needs an absolute URL)", () => {
-    const result = updateFormBlockSchema.safeParse({
-      ...base,
-      successAction: "REDIRECT",
-      redirectUrl: "/thanks",
-    });
+  /* L3-028: a thank-you page on the site itself is a path — the published
+     host is not known before publish. Resolved against the visitor's page at
+     submit time. A protocol-relative or backslash path is another host. */
+  it("accepts a site path like /thanks", () => {
+    const result = updateFormBlockSchema.safeParse({ ...base, successAction: "REDIRECT", redirectUrl: "/thanks" });
+    expect(result.success).toBe(true);
+  });
+
+  it.each(["//evil.example/x", "/\\evil.example", "thanks", "/ thanks"])("refuses %s", (redirectUrl) => {
+    const result = updateFormBlockSchema.safeParse({ ...base, successAction: "REDIRECT", redirectUrl });
     expect(result.success).toBe(false);
+  });
+
+  it("says what to type, in words", () => {
+    const result = updateFormBlockSchema.safeParse({ ...base, redirectUrl: "thanks" });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("Use a page path like /thanks, or a full address starting with https://");
+    }
+  });
+
+  it("names a bad notify email in words", () => {
+    const result = updateFormBlockSchema.safeParse({ ...base, notifyEmail: "nope" });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues[0].message).toBe("Enter an email address like you@company.com");
   });
 
   it("refuses a javascript: redirectUrl", () => {

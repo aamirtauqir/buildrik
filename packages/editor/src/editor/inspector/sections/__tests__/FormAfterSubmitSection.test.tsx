@@ -186,4 +186,20 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
       expect.objectContaining({ spamProtection: false }),
     ));
   });
+
+  /* L3-028: the server's refusal read "notifyEmail: Invalid email" — the
+     raw field key, then Zod's default. The field's own sentence is shown. */
+  it("shows a refused field's sentence without the raw field key", async () => {
+    api.forms.updateBlock.mutate.mockRejectedValueOnce(
+      Object.assign(new Error("notifyEmail: Enter an email address like you@company.com"), {
+        data: { code: "BAD_REQUEST", zodIssues: [{ path: "notifyEmail", message: "Enter an email address like you@company.com" }] },
+      }),
+    );
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Send to"));
+    fireEvent.change(screen.getByLabelText("Send to"), { target: { value: "nope" } });
+    fireEvent.blur(screen.getByLabelText("Send to"));
+    await waitFor(() => expect(screen.getByText("Enter an email address like you@company.com")).toBeInTheDocument());
+    expect(screen.queryByText(/notifyEmail:/)).toBeNull();
+  });
 });
