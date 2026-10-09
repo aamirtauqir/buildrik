@@ -72,7 +72,7 @@ describe("IssuesPanel", () => {
 
   it("shows a clean state when there are zero issues", () => {
     renderPanel({ issues: [] });
-    expect(screen.getByText(/no brand issues/i)).toBeInTheDocument();
+    expect(screen.getByText("No issues.")).toBeInTheDocument();
   });
 
   it("renders an Ignored (n) row per suppressed token, and Restore calls onUnignore", () => {
