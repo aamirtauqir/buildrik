@@ -34,7 +34,9 @@ export function useOtherTabNotice(siteId: string | null, addToast: (t: ToastInpu
         title: "This site is open in another tab",
         description: "Edit in one tab at a time — saves from the other tab can conflict with this one.",
         tone: "warning",
-        duration: 10000,
+        /* Persistent: a transient toast is replaced by the next one, and the
+           load's own "Project loaded" replaced this one in the new tab. */
+        duration: Infinity,
       });
     };
     channel.postMessage({ kind: "hello", tab } satisfies TabMessage);
