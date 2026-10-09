@@ -63,6 +63,12 @@ const DOT = "tw:mt-1.5 tw:size-2 tw:flex-none tw:rounded-full";
    client · Home · 2d"), not a count, so it is not data/11 · mono. */
 const META = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
 
+/** "client" / "you" after the author's name, or null when it repeats it. */
+function kindWord(author: string, kind: "internal" | "client"): string | null {
+  const word = kind === "client" ? "client" : "you";
+  return author.trim().toLowerCase() === word ? null : word;
+}
+
 export function CommentRow({
   author,
   authorKind = "internal",
@@ -137,7 +143,10 @@ export function CommentRow({
           </span>
         ) : null}
         <span className={META} data-testid={`review-comment-meta-${index}`}>
-          {author} · {authorKind === "client" ? "client" : "you"}
+          {author}
+          {/* The kind word, unless the author already says it: the panel
+              names a team comment "You", and "You · you" read twice (L5-035). */}
+          {kindWord(author, authorKind) ? ` · ${kindWord(author, authorKind)}` : ""}
           {meta ? ` · ${meta}` : ""}
           {resolved ? " · Resolved" : ""}
         </span>

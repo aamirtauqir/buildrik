@@ -137,6 +137,13 @@ describe("CommentRow", () => {
     expect(screen.getByText(/Hina Raza · client · Home · 2d/)).toBeTruthy();
   });
 
+  /* L5-035: the Review panel passes "You" for a team comment, and the kind
+     word repeated it — "You · you · Home · 1m". */
+  it("does not repeat the author as its kind ('You · Home', not 'You · you')", () => {
+    render(<CommentRow author="You" authorKind="internal" body="Tighten this" meta="Home · 1m" index={3} />);
+    expect(screen.getByTestId("review-comment-meta-3").textContent).toBe("You · Home · 1m");
+  });
+
   it("quotes the comment — it is the row's headline, not its footnote", () => {
     render(<CommentRow author="Hina Raza" authorKind="client" body="Move the hero up" />);
     expect(screen.getByText(/“Move the hero up”/)).toBeTruthy();
