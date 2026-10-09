@@ -464,7 +464,13 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
         <div
           ref={layerRef}
           data-testid="comment-capture-layer"
-          onClick={handleCaptureClick}
+          /* The layer sits inside the canvas frame: a pin click must not also
+             select the element under it or start a marquee (L1-036). */
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            void handleCaptureClick(e);
+          }}
           style={{
             position: "absolute",
             inset: 0,

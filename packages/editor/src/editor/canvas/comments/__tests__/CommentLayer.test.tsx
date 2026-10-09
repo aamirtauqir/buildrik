@@ -44,7 +44,7 @@ function makeComposer() {
   };
 }
 
-function mount(composer: ReturnType<typeof makeComposer>) {
+function mount(composer: ReturnType<typeof makeComposer>, frame: React.HTMLAttributes<HTMLDivElement> = {}) {
   const canvasRef: React.RefObject<HTMLDivElement | null> = { current: null };
   function Host() {
     const ref = React.useRef<HTMLDivElement | null>(null);
@@ -57,6 +57,7 @@ function mount(composer: ReturnType<typeof makeComposer>) {
             canvasRef.current = el;
           }}
           style={{ position: "relative" }}
+          {...frame}
         >
           <div data-buildrick-id="el-1">anchored</div>
           <CommentLayer composer={composer as never} canvasRef={canvasRef} />
@@ -117,6 +118,22 @@ describe("CommentLayer", () => {
     await waitFor(() => expect(screen.getByText("1")).toBeInTheDocument());
     // other-page comment draws no second pin
     expect(screen.queryByText("2")).toBeNull();
+  });
+
+  /* L1-036: the click that opens "New comment" also selected the element
+     under the pin — it reached the canvas frame's selection handlers. */
+  it("a comment-mode click does not reach the canvas frame's selection handlers", async () => {
+    const composer = makeComposer();
+    const onClick = vi.fn();
+    const onMouseDown = vi.fn();
+    mount(composer, { onClick, onMouseDown });
+    act(() => composer.emit("ui:comment-mode", { on: true }));
+    const layer = await screen.findByTestId("comment-capture-layer");
+    fireEvent.mouseDown(layer, { clientX: 10, clientY: 10 });
+    fireEvent.click(layer, { clientX: 10, clientY: 10 });
+    expect(await screen.findByPlaceholderText("Leave a comment…")).toBeInTheDocument();
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onMouseDown).not.toHaveBeenCalled();
   });
 
   it("click-to-pin opens the composer and posts with page id + fractions", async () => {
