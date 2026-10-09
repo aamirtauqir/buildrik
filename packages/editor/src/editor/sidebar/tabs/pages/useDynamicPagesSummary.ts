@@ -32,9 +32,12 @@ export interface DynamicPagesSummary {
   /** The first page-generating collection with output — where the row's "›"
    *  opens (CMS has no single "every collection's dynamic pages" screen). */
   collectionId: string | null;
+  /** Each page-generating collection's own count — the template page's
+   *  delete confirm names what stops publishing (EDT-057). */
+  byCollection: Record<string, number>;
 }
 
-const EMPTY: DynamicPagesSummary = { count: 0, collectionId: null };
+const EMPTY: DynamicPagesSummary = { count: 0, collectionId: null, byCollection: {} };
 
 export function useDynamicPagesSummary(composer: Composer | null): DynamicPagesSummary {
   const [summary, setSummary] = React.useState<DynamicPagesSummary>(EMPTY);
@@ -71,6 +74,7 @@ export function useDynamicPagesSummary(composer: Composer | null): DynamicPagesS
         setSummary({
           count: results.reduce((sum, r) => sum + r.count, 0),
           collectionId: results.find((r) => r.count > 0)?.id ?? null,
+          byCollection: Object.fromEntries(results.map((r) => [r.id, r.count])),
         });
       });
     };

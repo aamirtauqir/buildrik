@@ -107,13 +107,17 @@ const queue = new SyncRetryQueue();
    precondition, so it never overwrites). Latest-wins per target, in place, so
    a collection keeps its slot ahead of the entries made after it. `seq` stops
    an older request's success from clearing a newer payload for the same row.
+   An upsert also carries `base`, the precondition it was edited against
+   (EDT-002): a replay on a later page load sends THAT, not whatever stamp
+   another tab left in this browser since. Absent on ops written before it
+   existed — those fall back to the browser-wide stamp.
    Storage unavailable → every helper is a no-op and the in-memory queue alone
    carries the session, as before. */
 const OUTBOX_KEY = "bk-cms-outbox-v1";
 
 type OutboxBody =
-  | { key: string; op: "collectionUpsert"; collection: CMSCollection }
-  | { key: string; op: "entryUpsert"; item: CMSContentItem }
+  | { key: string; op: "collectionUpsert"; collection: CMSCollection; base?: string | null }
+  | { key: string; op: "entryUpsert"; item: CMSContentItem; base?: string | null }
   | { key: string; op: "collectionDelete" | "entryDelete"; id: string };
 type OutboxOp = OutboxBody & { seq: string };
 
@@ -162,6 +166,16 @@ function outboxRemove(siteId: string, key: string, seq?: string): void {
   if (left.length === ops.length) return;
   if (left.length > 0) box[siteId] = left;
   else delete box[siteId];
+  writeOutbox(box);
+}
+
+/** Re-point `key`'s queued upsert at the precondition it is now sent with —
+ *  this tab's own earlier write may have landed since it was queued. */
+function outboxRebase(siteId: string, key: string, base: string | null): void {
+  const box = readOutbox();
+  const op = box[siteId]?.find((o) => o.key === key);
+  if (!op || !("base" in op) || op.base === base) return;
+  op.base = base;
   writeOutbox(box);
 }
 
@@ -305,6 +319,51 @@ export function bindCmsEngine(cm: CmsEngine | null): void {
 /* `useTheirs` adds the row's key here before re-hydrating so the
    server's copy wins unconditionally even when a stamp exists. */
 const forceServer = new Set<string>();
+
+/* EDT-002 — the precondition is THIS TAB's, not the browser's. The stamp map
+   (`bk-sync-stamps-v1`) is localStorage, shared by every tab: tab 1 saved,
+   stamped the server's new updatedAt, and tab 2 — its form loaded from the
+   older version — sent tab 1's fresh stamp, so the server accepted the stale
+   copy and tab 1's change was lost. This map is module memory, one per tab:
+   the server updatedAt this tab's copy of a row was hydrated at or last
+   saved at (`null`: no server copy this tab knows of). Set by this tab's
+   hydrate and its own confirmed writes, never by another tab's. A row this
+   tab never hydrated nor wrote falls back to the browser-wide stamp. Keyed
+   like the stamps (`entry:<id>`, `collection:<id>`). */
+const tabBase = new Map<string, string | null>();
+
+function preconditionOf(stampKey: string): string | null {
+  return tabBase.has(stampKey) ? (tabBase.get(stampKey) ?? null) : (serverStampOf(stampKey) ?? null);
+}
+
+/** The server holds `local` as of `server`: stamp the browser (hydration
+ *  reads it) and move this tab's precondition on. */
+function confirmServerCopy(stampKey: string, server: Date | string, local: string | number): void {
+  recordServerStamp(stampKey, server, local);
+  tabBase.set(stampKey, iso(new Date(server)));
+}
+
+/** The row is gone (or never was on the server) for this browser and tab. */
+function forgetRow(stampKey: string): void {
+  forgetServerStamp(stampKey);
+  tabBase.delete(stampKey);
+}
+
+/** Hydration left this tab's local copy in place: unless this tab already
+ *  holds a base for it, the copy it now reads was confirmed at the browser
+ *  stamp — or, unstamped, it is overwriting the server's current copy. */
+function adoptBase(stampKey: string, serverUpdatedAt: Date | string): void {
+  if (!tabBase.has(stampKey)) tabBase.set(stampKey, serverStampOf(stampKey) ?? iso(new Date(serverUpdatedAt)));
+}
+
+/* Keep mine overwrites exactly the copy that refused this one: a CONFLICT
+   carries the server's current updatedAt, so a third write landing meanwhile
+   is refused again rather than overwritten blind (EDT-013). A CONFLICT with
+   no stamp in it sends no precondition, as before. */
+function rebaseOnConflict(stampKey: string, e: unknown): void {
+  const at = (e instanceof Error ? e.message : "").replace(/^CMS_CONFLICT:/, "");
+  tabBase.set(stampKey, Number.isNaN(Date.parse(at)) ? null : iso(new Date(at)));
+}
 
 /* Wrap a mirror task so CONFLICT and GONE leave the queue instead of being
    retried forever. queue.run still drives the lifecycle — it tracks the
@@ -597,13 +656,16 @@ export async function hydrateCmsFromServer(): Promise<void> {
           const colKey = `collection:${rc.id}`;
           if (forceServer.has(colKey) || serverCopyWins(colKey, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
             await Storage.saveCollection(collection);
-            recordServerStamp(colKey, rc.updatedAt, collection.updatedAt);
+            confirmServerCopy(colKey, rc.updatedAt, collection.updatedAt);
             forceServer.delete(colKey);
-          } else if (
-            localCollection && !hasServerStamp(colKey) &&
-            sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
-          ) {
-            recordServerStamp(colKey, rc.updatedAt, localCollection.updatedAt);
+          } else {
+            if (
+              localCollection && !hasServerStamp(colKey) &&
+              sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
+            ) {
+              recordServerStamp(colKey, rc.updatedAt, localCollection.updatedAt);
+            }
+            adoptBase(colKey, rc.updatedAt);
           }
         }
         const [entries, localEntriesList] = await Promise.all([
@@ -629,13 +691,14 @@ export async function hydrateCmsFromServer(): Promise<void> {
               ) {
                 recordServerStamp(eKey, e.updatedAt, localEntry.updatedAt);
               }
+              adoptBase(eKey, e.updatedAt);
               return;
             }
             await Storage.saveContentItem({
               id: e.id, collectionId: rc.id, data: e.data, status,
               createdAt: iso(e.createdAt), updatedAt: iso(e.updatedAt),
             });
-            recordServerStamp(eKey, e.updatedAt, iso(e.updatedAt));
+            confirmServerCopy(eKey, e.updatedAt, iso(e.updatedAt));
             forceServer.delete(eKey);
           }),
         );
@@ -652,7 +715,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
           if (remoteEntryIds.has(le.id)) continue;
           if (!hasServerStamp(`entry:${le.id}`) || hasQueuedMirror(siteId, "entry", le.id)) continue;
           await Storage.deleteContentItem(le.id);
-          forgetServerStamp(`entry:${le.id}`);
+          forgetRow(`entry:${le.id}`);
         }
       }),
     );
@@ -670,7 +733,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
       } else {
         await Storage.deleteCollection(local.id);
       }
-      forgetServerStamp(`collection:${local.id}`);
+      forgetRow(`collection:${local.id}`);
     }
     await claimLegacyCollections(siteId, remoteIds);
     if (!skippedQueued) markStampMigrationDone(migrationScope);
@@ -690,11 +753,16 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return true;
   const key = `collectionUpsert:${c.id}`;
+  const stampKey = `collection:${c.id}`;
   return mirror(
     siteId,
-    { key, op: "collectionUpsert", collection: c },
-    () =>
-      client().cms.collections.upsert.mutate({
+    { key, op: "collectionUpsert", collection: c, base: preconditionOf(stampKey) },
+    () => {
+      /* Read at send time: an earlier write of this row queued ahead of this
+         one may have landed and moved this tab's base on. */
+      const base = preconditionOf(stampKey);
+      outboxRebase(siteId, key, base);
+      return client().cms.collections.upsert.mutate({
         id: c.id,
         siteId,
         name: c.name,
@@ -707,17 +775,18 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
         pageSeoTitle: c.pageSeoTitle ?? null,
         pageSeoDescription: c.pageSeoDescription ?? null,
         pageTemplatePath: c.pageTemplatePath ?? null,
-        expectedUpdatedAt: serverStampOf(`collection:${c.id}`) ?? null,
+        expectedUpdatedAt: base,
       }).then((row) => {
         /* No row back is still a mirror that landed; reading updatedAt off
            undefined made it a "failure", queued and replayed forever. */
-        if (row?.updatedAt) recordServerStamp(`collection:${c.id}`, row.updatedAt, c.updatedAt);
-      }),
+        if (row?.updatedAt) confirmServerCopy(stampKey, row.updatedAt, c.updatedAt);
+      });
+    },
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] collection upsert failed (kept locally, queued)", e),
     {
       gone: (e) => {
-        forgetServerStamp(`collection:${c.id}`);
+        forgetRow(stampKey);
         /* Engine path (forgetLocal) is preferred when bound so the in-memory
            cache clears and CMS_STORE_REFRESHED fires; the unbound fallback
            goes through Storage directly so this branch works in tests and
@@ -739,7 +808,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
           kind: "collection",
           id: c.id,
           keepMine: async () => {
-            forgetServerStamp(`collection:${c.id}`);
+            rebaseOnConflict(stampKey, e);
             return syncCollectionUpsert(c);
           },
           useTheirs: () => takeServerCopy(siteId, "collection", c.id),
@@ -755,7 +824,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
    unconditionally — without `forceServer` an unstamped local row is kept, so
    the button did nothing. */
 async function takeServerCopy(siteId: string, kind: "collection" | "entry", id: string): Promise<void> {
-  forgetServerStamp(`${kind}:${id}`);
+  forgetRow(`${kind}:${id}`);
   outboxRemove(siteId, `${kind}Upsert:${id}`);
   conflicted.delete(`${kind}Upsert:${id}`);
   forceServer.add(`${kind}:${id}`);
@@ -780,7 +849,7 @@ async function adoptServerCollection(siteId: string, local: CMSCollection, serve
   const moved = (await Storage.loadContentItems(local.id)).map((i) => ({ ...i, collectionId: serverId }));
   for (const item of moved) await Storage.saveContentItem(item);
   await Storage.deleteCollection(local.id);
-  forgetServerStamp(`collection:${local.id}`);
+  forgetRow(`collection:${local.id}`);
   forceServer.add(`collection:${serverId}`);
   await hydrateCmsFromServer();
   await Promise.all(moved.map((item) => syncEntryUpsert(item)));
@@ -801,7 +870,7 @@ export async function syncCollectionDelete(id: string): Promise<void> {
     (e) => console.warn("[cms-sync] collection delete failed (queued)", e),
     {
       /* Already gone is the goal of the delete — no resurrection on retry. */
-      gone: () => forgetServerStamp(`collection:${id}`),
+      gone: () => forgetRow(`collection:${id}`),
       /* The delete itself can't conflict against a newer version: the server's
          delete is the newer version. Nothing to reconcile. */
       conflict: () => {},
@@ -816,21 +885,26 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
      first: the server answers "Collection not found" and the record sits
      queued until a reconnect. Wait for the collection's mirror in flight. */
   await queue.settled(`collectionUpsert:${item.collectionId}`);
+  const key = `entryUpsert:${item.id}`;
+  const stampKey = `entry:${item.id}`;
   return mirror(
     siteId,
-    { key: `entryUpsert:${item.id}`, op: "entryUpsert", item },
-    () =>
-      client().cms.entries.upsert.mutate({
+    { key, op: "entryUpsert", item, base: preconditionOf(stampKey) },
+    () => {
+      /* Read at send time — see syncCollectionUpsert. */
+      const base = preconditionOf(stampKey);
+      outboxRebase(siteId, key, base);
+      return client().cms.entries.upsert.mutate({
         id: item.id,
         siteId,
         collectionId: item.collectionId,
         data: item.data,
         status: item.status === "published" ? "PUBLISHED" : "DRAFT",
-        expectedUpdatedAt: serverStampOf(`entry:${item.id}`) ?? null,
+        expectedUpdatedAt: base,
       }).then(async (row) => {
         /* No row back is still a mirror that landed; reading updatedAt off
            undefined made it a "failure", queued and replayed forever. */
-        if (row?.updatedAt) recordServerStamp(`entry:${item.id}`, row.updatedAt, item.updatedAt);
+        if (row?.updatedAt) confirmServerCopy(stampKey, row.updatedAt, item.updatedAt);
         /* DM-10: the server stores what it sanitized (markup stripped, rich
            text cut to the allow-list). This device keeps that, not what it
            sent — otherwise the canvas and a later save carried markup the
@@ -840,22 +914,23 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
           await Storage.saveContentItem({ ...item, data: stored });
           await engine?.refreshFromStorage();
         }
-      }),
+      });
+    },
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e),
     {
       gone: (e) => {
-        forgetServerStamp(`entry:${item.id}`);
+        forgetRow(stampKey);
         if (engine) void engine.forgetLocal("entry", item.id);
         else void Storage.deleteContentItem(item.id);
         announceGone("entry", item.id, e);
       },
-      conflict: () =>
+      conflict: (e) =>
         raiseConflict({
           kind: "entry",
           id: item.id,
           keepMine: async () => {
-            forgetServerStamp(`entry:${item.id}`);
+            rebaseOnConflict(stampKey, e);
             return syncEntryUpsert(item);
           },
           useTheirs: () => takeServerCopy(siteId, "entry", item.id),
@@ -866,7 +941,7 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
          the server agree, and the reason reaches the sheet. */
       invalid: (e) => {
         announceInvalid("entry", item.id, e);
-        if (hasServerStamp(`entry:${item.id}`)) void takeServerCopy(siteId, "entry", item.id);
+        if (hasServerStamp(stampKey)) void takeServerCopy(siteId, "entry", item.id);
         else if (item.status === "published") {
           const draft: CMSContentItem = { ...item, status: "draft" };
           void Storage.saveContentItem(draft)
@@ -890,7 +965,7 @@ export async function syncEntryDelete(id: string): Promise<void> {
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry delete failed (queued)", e),
     {
-      gone: () => forgetServerStamp(`entry:${id}`),
+      gone: () => forgetRow(`entry:${id}`),
       conflict: () => {},
     },
   );
@@ -916,6 +991,13 @@ export function flushCmsOutbox(): Promise<void> {
   const run = (async () => {
     const ops = readOutbox()[siteId];
     if (!Array.isArray(ops)) return;
+    /* A replayed upsert goes up against the version it was edited against,
+       which this fresh page load has no memory of (EDT-002). */
+    for (const o of ops) {
+      if (o.op !== "collectionUpsert" && o.op !== "entryUpsert") continue;
+      const stampKey = o.op === "entryUpsert" ? `entry:${o.item.id}` : `collection:${o.collection.id}`;
+      if (o.base !== undefined && !tabBase.has(stampKey)) tabBase.set(stampKey, o.base);
+    }
     for (const phase of REPLAY_ORDER) {
       await Promise.all(
         ops.filter((o) => o.op === phase).map((o) => {

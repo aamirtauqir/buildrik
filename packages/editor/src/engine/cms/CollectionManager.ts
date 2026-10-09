@@ -48,6 +48,8 @@ export class CollectionManager extends EventEmitter {
   private initialized = false;
   /** Set by loadSnapshot: this store is exactly the snapshot, never IndexedDB. */
   private snapshotOnly = false;
+  /** Each page's published file name as last seen by followPageFiles. */
+  private pageFiles: ReadonlyMap<string, string> | null = null;
 
   // ============================================
   // Initialization
@@ -184,6 +186,33 @@ export class CollectionManager extends EventEmitter {
     this.emit(EVENTS.CMS_COLLECTION_DELETED, id);
 
     return true;
+  }
+
+  /**
+   * EDT-056 stop-gap until the template is referenced by page id (D-12): a
+   * collection names its template page by published file name, so when a
+   * page's file name changes (slug edit, a collision renumbered, undo) every
+   * collection that named the old one moves to the new one — through
+   * updateCollection, so the change persists and mirrors to the server.
+   * `files` is pageId → file name (`pageFileNames`). A page that became the
+   * home page is not followed: index.html cannot be a template.
+   */
+  async followPageFiles(files: ReadonlyMap<string, string>): Promise<void> {
+    const before = this.pageFiles;
+    this.pageFiles = files;
+    if (!before || this.snapshotOnly) return;
+    const moved = new Map<string, string>();
+    for (const [pageId, file] of files) {
+      const was = before.get(pageId);
+      if (was && was !== file && file !== "index.html") moved.set(was, file);
+    }
+    if (moved.size === 0) return;
+    await Promise.all(
+      Array.from(this.collections.values()).flatMap((c) => {
+        const next = c.pageTemplatePath ? moved.get(c.pageTemplatePath) : undefined;
+        return next ? [this.updateCollection(c.id, { pageTemplatePath: next })] : [];
+      })
+    );
   }
 
   getCollection(id: string): CMSCollection | null {

@@ -15,8 +15,11 @@ import { useTabSwitchGuard } from "../useTabSwitchGuard";
 
 const DOMAINS: DirtyDomain[] = ["settings", "cms-record"];
 
-function setup(opts: { tab?: string; subTabs?: Record<string, string>; allowed?: (t: string) => boolean } = {}) {
+function setup(
+  opts: { tab?: string; subTabs?: Record<string, string>; allowed?: (t: string) => boolean; drawerOpen?: boolean } = {},
+) {
   const setLeftPanelTab = vi.fn();
+  const setIsLeftPanelOpen = vi.fn();
   const onDiscardFailed = vi.fn();
   const openLeftPanelToTab = vi.fn();
   const hook = renderHook(() =>
@@ -27,9 +30,11 @@ function setup(opts: { tab?: string; subTabs?: Record<string, string>; allowed?:
       openLeftPanelToTab,
       isTabAllowed: opts.allowed ?? (() => true),
       onDiscardFailed,
+      isLeftPanelOpen: opts.drawerOpen ?? true,
+      setIsLeftPanelOpen,
     }),
   );
-  return { ...hook, setLeftPanelTab, openLeftPanelToTab, onDiscardFailed };
+  return { ...hook, setLeftPanelTab, openLeftPanelToTab, onDiscardFailed, setIsLeftPanelOpen };
 }
 
 describe("useTabSwitchGuard", () => {
@@ -169,5 +174,91 @@ describe("useTabSwitchGuard", () => {
     expect(openLeftPanelToTab).toHaveBeenCalledWith("add", undefined);
     expect(onSwitched).not.toHaveBeenCalled();
     expect(result.current.dialogProps.open).toBe(false);
+  });
+
+  /* EDT-007: closing the drawer unmounts the CMS workspace, and with it an
+     open record sheet. That exit asks through the same dialog as every
+     other; Keep editing keeps the drawer (and the edit). */
+  describe("closing the drawer (EDT-007)", () => {
+    it("clean: the drawer closes at once, no dialog", () => {
+      const { result, setIsLeftPanelOpen } = setup({ tab: "content" });
+      act(() => result.current.toggleLeftPanel());
+      expect(setIsLeftPanelOpen).toHaveBeenCalledWith(false);
+      expect(result.current.dialogProps.open).toBe(false);
+    });
+
+    it("a dirty record: close waits behind the dialog; Keep editing keeps the drawer open and the edit", () => {
+      act(() => shellDirty.set("cms-record", true));
+      const { result, setIsLeftPanelOpen } = setup({ tab: "content" });
+      act(() => result.current.toggleLeftPanel());
+      expect(setIsLeftPanelOpen).not.toHaveBeenCalled();
+      expect(result.current.dialogProps.open).toBe(true);
+      act(() => result.current.dialogProps.onKeepEditing());
+      expect(setIsLeftPanelOpen).not.toHaveBeenCalled();
+      expect(shellDirty.get()).toBe(true);
+      act(() => result.current.closeLeftPanel());
+      expect(setIsLeftPanelOpen).not.toHaveBeenCalled();
+      expect(result.current.dialogProps.open).toBe(true);
+    });
+
+    it("a dirty record: Discard runs the record's discard, then closes", () => {
+      const order: string[] = [];
+      act(() => {
+        shellDirty.setDiscard("cms-record", () => {
+          order.push("discard");
+          shellDirty.set("cms-record", false);
+        });
+        shellDirty.set("cms-record", true);
+      });
+      const { result, setIsLeftPanelOpen } = setup({ tab: "content" });
+      setIsLeftPanelOpen.mockImplementation(() => order.push("close"));
+      act(() => result.current.toggleLeftPanel());
+      expect(result.current.dialogProps.leaveLabel).toBe("Leave and lose changes");
+      act(() => result.current.dialogProps.onLeaveAnyway());
+      expect(order).toEqual(["discard", "close"]);
+      expect(setIsLeftPanelOpen).toHaveBeenCalledWith(false);
+      act(() => shellDirty.setDiscard("cms-record", null));
+    });
+
+    it("dirty Settings alone does not prompt: a closed drawer keeps Settings mounted", () => {
+      const discard = vi.fn();
+      act(() => {
+        shellDirty.setDiscard("settings", discard);
+        shellDirty.set("settings", true);
+      });
+      const { result, setIsLeftPanelOpen } = setup({ tab: "settings" });
+      act(() => result.current.closeLeftPanel());
+      expect(setIsLeftPanelOpen).toHaveBeenCalledWith(false);
+      expect(discard).not.toHaveBeenCalled();
+      expect(result.current.dialogProps.open).toBe(false);
+      act(() => shellDirty.setDiscard("settings", null));
+    });
+
+    it("Discard on a drawer close leaves a dirty Settings untouched", () => {
+      const settingsDiscard = vi.fn();
+      act(() => {
+        shellDirty.setDiscard("settings", settingsDiscard);
+        shellDirty.setDiscard("cms-record", () => shellDirty.set("cms-record", false));
+        shellDirty.set("settings", true);
+        shellDirty.set("cms-record", true);
+      });
+      const { result } = setup({ tab: "content" });
+      act(() => result.current.toggleLeftPanel());
+      act(() => result.current.dialogProps.onLeaveAnyway());
+      expect(settingsDiscard).not.toHaveBeenCalled();
+      expect(shellDirty.get()).toBe(true);
+      act(() => {
+        shellDirty.setDiscard("settings", null);
+        shellDirty.setDiscard("cms-record", null);
+      });
+    });
+
+    it("opening a closed drawer never prompts", () => {
+      act(() => shellDirty.set("cms-record", true));
+      const { result, setIsLeftPanelOpen } = setup({ tab: "content", drawerOpen: false });
+      act(() => result.current.toggleLeftPanel());
+      expect(setIsLeftPanelOpen).toHaveBeenCalledWith(true);
+      expect(result.current.dialogProps.open).toBe(false);
+    });
   });
 });
