@@ -14,6 +14,7 @@ import {
   discardUnsaved,
   keepUnsaved,
   markUnsavedOffScreen,
+  onOffScreenSettled,
   readUnsaved,
   resumeKeepingUnsaved,
   takeOffScreenUnsaved,
@@ -61,5 +62,41 @@ describe("a kept copy the screen does not show", () => {
     markUnsavedOffScreen(SITE);
     discardUnsaved(SITE);
     expect(readUnsaved(SITE)).toBeNull();
+  });
+});
+
+/* EDT-018: the "Restore my edits" prompt is about the off-screen copy. Once
+   that copy is handed over (Restore, or a Retry that restores it first) or
+   thrown away, the prompt has nothing left to offer — its owner hears so. */
+describe("the off-screen offer settling", () => {
+  it("is announced once when the copy is handed over", () => {
+    keepUnsaved(SITE, mine);
+    markUnsavedOffScreen(SITE);
+    let heard = 0;
+    onOffScreenSettled(SITE, () => (heard += 1));
+    takeOffScreenUnsaved(SITE);
+    takeOffScreenUnsaved(SITE);
+    expect(heard).toBe(1);
+  });
+
+  it("is announced when the copy is discarded", () => {
+    keepUnsaved(SITE, mine);
+    markUnsavedOffScreen(SITE);
+    let heard = 0;
+    onOffScreenSettled(SITE, () => (heard += 1));
+    discardUnsaved(SITE);
+    expect(heard).toBe(1);
+  });
+
+  it("is not announced for another site, or after unsubscribing", () => {
+    markUnsavedOffScreen(SITE);
+    markUnsavedOffScreen("other-site");
+    let heard = 0;
+    const stop = onOffScreenSettled(SITE, () => (heard += 1));
+    takeOffScreenUnsaved("other-site");
+    expect(heard).toBe(0);
+    stop();
+    takeOffScreenUnsaved(SITE);
+    expect(heard).toBe(0);
   });
 });

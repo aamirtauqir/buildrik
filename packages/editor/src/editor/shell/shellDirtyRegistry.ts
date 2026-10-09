@@ -35,12 +35,17 @@ function emit(): void {
 }
 
 const DOMAINS: DirtyDomain[] = ["settings", "cms-record"];
-const dirtyDomains = (): DirtyDomain[] => DOMAINS.filter((d) => state[d]);
+/* `only` narrows to the domains a particular exit actually unmounts (closing
+   the drawer unmounts the CMS workspace, not Settings). */
+const dirtyDomains = (only: readonly DirtyDomain[] = DOMAINS): DirtyDomain[] =>
+  only.filter((d) => state[d]);
 
 export const shellDirty = {
   /** True when ANY registered domain is dirty — what leaving the editor
    *  (exit, beforeunload) or switching a left-panel tab can lose. */
   get: (): boolean => dirtyDomains().length > 0,
+  /** True when any of `only` is dirty. */
+  anyDirty: (only: readonly DirtyDomain[]): boolean => dirtyDomains(only).length > 0,
   /** Each producer owns its own entry: it sets it from its dirty state and
    *  clears it when its surface unmounts or discards — never anyone else. */
   set: (domain: DirtyDomain, dirty: boolean): void => {
@@ -54,14 +59,14 @@ export const shellDirty = {
     else delete discards[domain];
   },
   /** True when every dirty domain can actually discard its work. */
-  everyDirtyDiscards: (): boolean => dirtyDomains().every((d) => d in discards),
+  everyDirtyDiscards: (only?: readonly DirtyDomain[]): boolean => dirtyDomains(only).every((d) => d in discards),
   /** "Leave anyway": each dirty domain that registered a discard runs it.
    *  One that throws does not stop the others; it stays dirty (so exit and
    *  beforeunload still warn about it) and is returned for the caller to
    *  report. */
-  discardDirty: (): DirtyDomain[] => {
+  discardDirty: (only?: readonly DirtyDomain[]): DirtyDomain[] => {
     const failed: DirtyDomain[] = [];
-    for (const d of dirtyDomains()) {
+    for (const d of dirtyDomains(only)) {
       const discard = discards[d];
       if (!discard) continue;
       try {
