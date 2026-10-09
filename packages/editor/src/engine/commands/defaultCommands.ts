@@ -657,8 +657,16 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       id: "add-text",
       label: "Add text",
       group: "Insert",
-      keywords: ["paragraph", "heading"],
+      keywords: ["paragraph"],
       run: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "text" }),
+    },
+    /* L1-033: "heading" offered only "Add text". */
+    {
+      id: "add-heading",
+      label: "Add heading",
+      group: "Insert",
+      keywords: ["title", "h1", "h2"],
+      run: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "heading" }),
     },
     {
       id: "add-image",

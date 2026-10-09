@@ -274,6 +274,9 @@ function buildCommands(
     { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.emit(EVENTS.ZOOM_OUT, {})) },
     /* Ctrl+1 is fit (CanvasFooterToolbar binds ⌘1 to fit, ⌘0 to 100%). */
     { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Ctrl+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },
+    /* The registry's chordless "Reset zoom" printed nothing although ⌘0 works
+       (the flyout binds it). The row prints the flyout's chord, like fit's. */
+    { id: "view-zoom-100", label: "Reset zoom", group: "More", shortcut: "Ctrl+0", handler: run(() => composer.setZoom(100)) },
     {
       id: "history-clear",
       label: "Clear history",
@@ -293,6 +296,7 @@ function buildCommands(
     },
   );
   used.add("redo");
+  used.add("zoom-reset");
 
   /* Carried over from the canvas palette, flag-gated the same way StudioHeader
      gates the Collaborate CTA. Not a registry command: it needs the site id

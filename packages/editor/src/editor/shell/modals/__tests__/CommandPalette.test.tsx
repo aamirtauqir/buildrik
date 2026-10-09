@@ -304,6 +304,26 @@ describe("CommandPalette — search", () => {
     expect(screen.getByTestId("cmdk-label-cmd-ungroup")).toHaveTextContent("select a group");
   });
 
+  /* L1-033: ⌘0 worked and the palette's Reset zoom printed no chord. One row,
+     not the registry's chordless copy beside it. */
+  it("Reset zoom prints ⌘0 / Ctrl+0 and appears once", () => {
+    const { composer } = renderPalette(
+      makeComposer({ registry: [...BOARD_REGISTRY, { id: "zoom-reset", label: "Reset zoom" }] }),
+    );
+    type("reset zoom");
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    expect(screen.getByTestId("cmdk-kbd-view-zoom-100").textContent).toMatch(/0$/);
+    fireEvent.click(screen.getByTestId("cmdk-row-view-zoom-100"));
+    expect(composer!.setZoom).toHaveBeenCalledWith(100);
+  });
+
+  /* L1-033: "heading" offered "Add text" only. */
+  it("'heading' finds Add heading", () => {
+    renderPalette(makeComposer({ registry: [...BOARD_REGISTRY, { id: "add-heading", label: "Add heading" }] }));
+    type("heading");
+    expect(screen.getByTestId("cmdk-row-cmd-add-heading")).toBeInTheDocument();
+  });
+
   it("Zoom to fit prints ⌘1 / Ctrl+1, not Ctrl+0", () => {
     renderPalette();
     type("fit");
