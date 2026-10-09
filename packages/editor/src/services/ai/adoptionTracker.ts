@@ -1,6 +1,7 @@
 import { getAiSubscriptionClient } from "./subscriptionClient";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { EVENTS } from "@/shared/constants";
+import { isAiEditLabel } from "@/shared/constants/commands";
 import type { Composer } from "@/engine";
 import type {
   AiAdoptionInput,
@@ -81,13 +82,13 @@ export function trackAgentRun(args: {
 }
 
 /**
- * Subscribe once to undo. An AI edit is wrapped in a "ai-edit"-labeled
- * transaction (applyAiEdit), so an undo carrying that label means the user
- * reverted an AI edit. Returns an unsubscribe fn.
+ * Subscribe once to undo. An AI edit is wrapped in an "AI: …"-labeled
+ * transaction (applyAiEdit; "ai-edit" before L5-022), so an undo carrying
+ * that label means the user reverted an AI edit. Returns an unsubscribe fn.
  */
 export function attachAdoptionRevertListener(composer: Composer): () => void {
   const handler = (data: { entry?: { label?: string } }) => {
-    if (data?.entry?.label !== "ai-edit") return;
+    if (!isAiEditLabel(data?.entry?.label)) return;
     const siteId = getSiteIdFromUrl();
     if (!siteId) return;
     send({ siteId, event: "edit.reverted" });

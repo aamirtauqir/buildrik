@@ -131,3 +131,13 @@ export type CommandCategory =
 export function isValidCommand(id: string): id is CommandId {
   return Object.values(COMMANDS).includes(id as CommandId);
 }
+
+/**
+ * History label of an AI edit: "AI: <what the step did>" (L5-022 — every AI
+ * edit read "Ai Edit"). Undo telemetry and the undo toast recognise an AI edit
+ * by this prefix; "ai-edit" is the label entries carried before it.
+ */
+export const AI_EDIT_LABEL_PREFIX = "AI: ";
+
+export const isAiEditLabel = (label: string | undefined): boolean =>
+  label === "ai-edit" || (label?.startsWith(AI_EDIT_LABEL_PREFIX) ?? false);

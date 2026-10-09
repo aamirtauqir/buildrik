@@ -344,7 +344,7 @@ export function useAgentRunner(
     let undo: (() => boolean) | null;
     try {
       let proposals: Array<{ actionId: string }>;
-      ({ proposals, undo } = await applyAiEdit(composer, { applyOps: step.edit.applyOps }));
+      ({ proposals, undo } = await applyAiEdit(composer, { applyOps: step.edit.applyOps }, step.plan.title));
       if (proposals.length > 0) onProposal?.(proposals[0].actionId);
     } catch (e) {
       failRun(i, e);

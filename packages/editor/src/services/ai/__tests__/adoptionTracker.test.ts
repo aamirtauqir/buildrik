@@ -89,9 +89,12 @@ describe("adoptionTracker", () => {
     handler({ entry: { label: "move-element" } }); // not an AI edit
     expect(mutate).not.toHaveBeenCalled();
 
-    handler({ entry: { label: "ai-edit" } }); // AI edit reverted
+    handler({ entry: { label: "ai-edit" } }); // AI edit reverted (pre-L5-022 label)
     expect(mutate).toHaveBeenCalledOnce();
     expect(mutate.mock.calls[0][0]).toMatchObject({ siteId: "site-1", event: "edit.reverted" });
+
+    handler({ entry: { label: "AI: Rewrite the headline" } }); // L5-022 label
+    expect(mutate).toHaveBeenCalledTimes(2);
 
     detach();
   });

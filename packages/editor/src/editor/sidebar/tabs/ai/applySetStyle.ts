@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Composer } from "@/engine/Composer";
 import { getBreakpointQuery } from "@/shared/constants/breakpoints";
+import { AI_EDIT_LABEL_PREFIX } from "@/shared/constants/commands";
 import { CATALOG } from "@/editor/components-catalog/catalog";
 import { placeCatalogComponent } from "@/editor/components-catalog/placeCatalogComponent";
 import { canWrite } from "@/engine/commands/commandOperations";
@@ -673,6 +674,9 @@ export async function applyAiEdit(
       preview?: Record<string, unknown>;
     };
   },
+  /** What the edit did, for its Session history row ("AI: Rewrite the
+   *  headline"). Every AI edit used to read "Ai Edit" (L5-022). */
+  label?: string,
 ): Promise<AiEditResult> {
   const commit = edit.applyOps.commit as { commands?: unknown };
   const commands = Array.isArray(commit.commands) ? commit.commands : [];
@@ -685,7 +689,7 @@ export async function applyAiEdit(
   // Commit any edit the user made just before Apply as its own entry, so it is
   // neither folded into the AI's entry nor taken back by its undo.
   composer.history?.flushPending?.();
-  composer.beginTransaction("ai-edit");
+  composer.beginTransaction(`${AI_EDIT_LABEL_PREFIX}${label?.trim().slice(0, 80) || "Edit"}`);
   let applied = 0;
   try {
     for (const c of commands) {

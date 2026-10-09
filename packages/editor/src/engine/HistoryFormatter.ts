@@ -118,6 +118,8 @@ export function formatTransactionLabel(label: string): string {
     "instance-sync": "Synced component",
     "move-layer": "Moved layer",
     "Add Element": "Added element",
+    /* AI edits recorded before they carried their step's title (L5-022). */
+    "ai-edit": "AI edit",
   };
 
   if (labelMap[label]) {

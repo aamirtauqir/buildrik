@@ -95,7 +95,11 @@ const applyBlock: ApplyFn = async (composer, edit, target) => {
     const cmd = c as { commandId?: unknown; args?: Record<string, unknown> };
     return anchor && cmd.commandId === "add-section" && cmd.args ? { ...cmd, args: { ...cmd.args, elementId: anchor } } : c;
   });
-  const { undo } = await applyAiEdit(composer, { applyOps: { ...edit.applyOps, commit: { ...commit, commands: pinned } } });
+  const { undo } = await applyAiEdit(
+    composer,
+    { applyOps: { ...edit.applyOps, commit: { ...commit, commands: pinned } } },
+    "Generated a block",
+  );
   return undo;
 };
 

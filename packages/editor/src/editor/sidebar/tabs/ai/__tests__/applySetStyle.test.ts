@@ -137,6 +137,17 @@ describe("applyAiEdit", () => {
     expect(setStyle).toHaveBeenCalledTimes(2);
   });
 
+  /* L5-022: every AI edit in Session history read "Ai Edit". The entry is
+     named after what the step did. */
+  it("names the history entry after the step ('AI: …'), 'AI: Edit' without one", async () => {
+    const { composer, beginTransaction } = makeTxComposer();
+    const batch = commitEdit([{ commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#000" } }]);
+    await applyAiEdit(composer, batch, "Rewrite the headline");
+    expect(beginTransaction).toHaveBeenLastCalledWith("AI: Rewrite the headline");
+    await applyAiEdit(composer, batch);
+    expect(beginTransaction).toHaveBeenLastCalledWith("AI: Edit");
+  });
+
   /* Once before the batch (a user edit still in the coalesce window becomes
      its own entry) and once after (the AI edit is one immediate undo step). */
   it("flushes history before and after the batch", async () => {

@@ -42,7 +42,7 @@ describe("applyAiEdit — the board's one-undo-step promise", () => {
 
     expect(calls.filter((c) => c.startsWith("begin:"))).toHaveLength(1);
     expect(calls.filter((c) => c === "end")).toHaveLength(1);
-    expect(calls[0]).toBe("begin:ai-edit");
+    expect(calls[0]).toBe("begin:AI: Edit");
     expect(calls[calls.length - 1]).toBe("end");
   });
 
