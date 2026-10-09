@@ -89,7 +89,7 @@ function pageCopySample(composer: Composer | null, pageId: string): string[] {
 /** "Write with AI"'s prompt: the site, the page and the page's own copy
  *  (L5-017 — it carried the page name alone, inside a generic "headline"
  *  template, and a local bakery got web-builder marketing back). */
-export function seoTitlePrompt(siteName: string | undefined, pageName: string, description: string, copy: string[]): string {
+function seoTitlePrompt(siteName: string | undefined, pageName: string, description: string, copy: string[]): string {
   const lines = [
     "Write one SEO page title for a web page. At most 60 characters. Plain text, no quotes.",
     siteName ? `Website: ${siteName}` : null,
@@ -103,7 +103,7 @@ export function seoTitlePrompt(siteName: string | undefined, pageName: string, d
 
 /** An AI title cut to `max` characters at the last whole word (L5-018: a
  *  hard slice ended "…Website B"). Quotes the model adds are dropped. */
-export function trimTitle(raw: string, max = 60): string {
+function trimTitle(raw: string, max = 60): string {
   const clean = raw.replace(/^["'\s]+|["'\s]+$/g, "").replace(/\s+/g, " ");
   if (clean.length <= max) return clean;
   const cut = clean.slice(0, max + 1);

@@ -57,7 +57,7 @@ interface PreviewOverlayProps {
 
 /** The page an in-site href points at: "/contact", "contact.html", "./contact/",
  *  "/" (home). Null for anything else — another site, mailto:, a fragment. */
-export function pageForHref(
+function pageForHref(
   href: string,
   pages: ReadonlyArray<{ id: string; slug?: string; isHome?: boolean }>,
 ): string | null {
