@@ -186,12 +186,13 @@ export function CompareView({
           are different facts, so they get different sentences: the panel skips
           the diff entirely when the clicked version IS the newest (nothing to
           compare it against), and a computed diff can come back empty. Before
-          this, both rendered a toggle over blank space. */}
+          this, both rendered a toggle over blank space. Every compare is now
+          against the live draft (L5-040), so null is the compare in flight. */}
       {mode === "semantic" && changes.length === 0 && (
         <p className="tw:mt-[var(--bk-space-8)] tw:mb-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:text-center">
           {compareResult === null
-            ? "This is the newest version — there is nothing later to compare it against."
-            : `Nothing changed since “${versionDisplayName(version)}”.`}
+            ? "Comparing with the current draft…"
+            : `The current draft matches “${versionDisplayName(version)}”.`}
         </p>
       )}
       {/* Semantic mode — change list */}

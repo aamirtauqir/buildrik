@@ -8,7 +8,7 @@
  *   - Delete: cancel path, failure toast, success toast, expanded-row
  *     collapse on delete
  *   - Compare: toggle-off collapse, cached-result reuse, newest-version
- *     short-circuit (no compareVersions call), visual/semantic tab
+ *     short-circuit (no compareWithDraft call), visual/semantic tab
  *     states with and without snapshots
  *
  * Mock strategy mirrors the baseline test: useVersionHistory mocked at
@@ -61,7 +61,7 @@ const mocks = vi.hoisted(() => {
     createVersion: vi.fn(),
     restoreVersion: vi.fn(),
     deleteVersion: vi.fn(),
-    compareVersions: vi.fn(),
+    compareWithDraft: vi.fn(),
     updateAiSummary: vi.fn(),
     getVersion: vi.fn(),
   };
@@ -76,7 +76,7 @@ vi.mock("../../../shared/hooks/useVersionHistory", () => ({
     restoreVersion: mocks.restoreVersion,
     deleteVersion: mocks.deleteVersion,
     getVersion: mocks.getVersion,
-    compareVersions: mocks.compareVersions,
+    compareWithDraft: mocks.compareWithDraft,
     updateAiSummary: mocks.updateAiSummary,
   }),
 }));
@@ -145,7 +145,7 @@ beforeEach(() => {
   mocks.createVersion.mockReset();
   mocks.restoreVersion.mockReset();
   mocks.deleteVersion.mockReset();
-  mocks.compareVersions.mockReset();
+  mocks.compareWithDraft.mockReset();
   mocks.updateAiSummary.mockReset();
   mocks.getVersion.mockReset();
 });
@@ -390,7 +390,7 @@ describe("VersionHistoryPanel — delete branches", () => {
       makeVersion({ id: "latest", name: "Latest" }),
       makeVersion({ id: "older", name: "Older" }),
     ];
-    mocks.compareVersions.mockResolvedValue(emptyCompareResult);
+    mocks.compareWithDraft.mockResolvedValue(emptyCompareResult);
     mocks.deleteVersion.mockResolvedValue(undefined);
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
@@ -413,41 +413,42 @@ describe("VersionHistoryPanel — delete branches", () => {
 // ─── Compare branches ─────────────────────────────────────────────────
 
 describe("VersionHistoryPanel — compare branches", () => {
-  it("clicking Compare again collapses the detail (single compareVersions call)", async () => {
+  it("clicking Compare again collapses the detail (single compareWithDraft call)", async () => {
     mocks.state.versions = [
       makeVersion({ id: "latest", name: "Latest" }),
       makeVersion({ id: "older", name: "Older" }),
     ];
-    mocks.compareVersions.mockResolvedValue(emptyCompareResult);
+    mocks.compareWithDraft.mockResolvedValue(emptyCompareResult);
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
     openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
-    await waitFor(() => expect(mocks.compareVersions).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mocks.compareWithDraft).toHaveBeenCalledTimes(1));
 
     openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await waitFor(() => {
       expect(screen.queryByRole("tablist", { name: "Compare mode" })).toBeNull();
     });
-    expect(mocks.compareVersions).toHaveBeenCalledTimes(1);
+    expect(mocks.compareWithDraft).toHaveBeenCalledTimes(1);
   });
 
-  it("re-expanding reuses the cached compare result (no second compareVersions call)", async () => {
+  /* L5-040: the draft moves between two opens, so a cached result went
+     stale — every open compares again. */
+  it("re-expanding compares again against the live draft", async () => {
     mocks.state.versions = [
       makeVersion({ id: "latest", name: "Latest" }),
       makeVersion({ id: "older", name: "Older" }),
     ];
-    mocks.compareVersions.mockResolvedValue(emptyCompareResult);
+    mocks.compareWithDraft.mockResolvedValue(emptyCompareResult);
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    // Expand → collapse → expand.
     openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
-    await waitFor(() => expect(mocks.compareVersions).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mocks.compareWithDraft).toHaveBeenCalledTimes(1));
     openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await waitFor(() => {
@@ -457,14 +458,17 @@ describe("VersionHistoryPanel — compare branches", () => {
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
 
-    expect(mocks.compareVersions).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(mocks.compareWithDraft).toHaveBeenCalledTimes(2));
   });
 
-  it("comparing the newest version shows the detail without calling compareVersions", async () => {
+  /* L5-040: "Compare with current" on the newest version compares it with
+     the draft — it used to say "nothing later to compare". */
+  it("comparing the newest version compares it with the current draft", async () => {
     mocks.state.versions = [
       makeVersion({ id: "latest", name: "Latest" }),
       makeVersion({ id: "older", name: "Older" }),
     ];
+    mocks.compareWithDraft.mockResolvedValue(emptyCompareResult);
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
@@ -472,9 +476,7 @@ describe("VersionHistoryPanel — compare branches", () => {
     fireEvent.click(screen.getByLabelText('Compare "Latest"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
 
-    // PIN: latest.id === versionId short-circuits — the newest version has
-    // nothing newer to diff against, so no compareVersions request fires.
-    expect(mocks.compareVersions).not.toHaveBeenCalled();
+    await waitFor(() => expect(mocks.compareWithDraft).toHaveBeenCalledWith("latest"));
   });
 
   it("compare view defaults to Visual when snapshots exist and Semantic tab toggles", async () => {
@@ -486,7 +488,7 @@ describe("VersionHistoryPanel — compare branches", () => {
         visualSnapshot: "data:image/jpeg;base64,old",
       }),
     ];
-    mocks.compareVersions.mockResolvedValue(emptyCompareResult);
+    mocks.compareWithDraft.mockResolvedValue(emptyCompareResult);
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
@@ -508,7 +510,7 @@ describe("VersionHistoryPanel — compare branches", () => {
       makeVersion({ id: "latest", name: "Latest" }),
       makeVersion({ id: "older", name: "Older" }),
     ];
-    mocks.compareVersions.mockResolvedValue(emptyCompareResult);
+    mocks.compareWithDraft.mockResolvedValue(emptyCompareResult);
     const Panel = await loadPanel();
     // Snapshotless composer → currentVisualSnapshot stays null; the
     // version itself has no visualSnapshot either → hasVisual = false.

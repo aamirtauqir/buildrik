@@ -121,7 +121,7 @@ export function VersionHistoryPanel({
     restoreVersion,
     deleteVersion,
     renameVersion,
-    compareVersions,
+    compareWithDraft,
     updateAiSummary,
   } = useVersionHistory(composer);
 
@@ -266,16 +266,14 @@ export function VersionHistoryPanel({
         return;
       }
       setExpandedId(versionId);
-
-      if (!compareResults[versionId]) {
-        const latest = versions[0];
-        if (latest && latest.id !== versionId) {
-          const result = await compareVersions(latest.id, versionId);
-          setCompareResults((prev) => ({ ...prev, [versionId]: result }));
-        }
-      }
+      /* Against the live draft every time (L5-040): it compared with the
+         latest SAVED version, so the newest one had "nothing later to
+         compare" however much the draft had changed, and a cached result went
+         stale with the draft. */
+      const result = await compareWithDraft(versionId);
+      setCompareResults((prev) => ({ ...prev, [versionId]: result }));
     },
-    [expandedId, compareResults, compareVersions, versions]
+    [expandedId, compareWithDraft]
   );
 
   /* G1-075: Named / Auto-saves / author, then the search query. */

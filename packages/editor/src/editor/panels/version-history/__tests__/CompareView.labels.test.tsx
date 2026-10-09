@@ -47,16 +47,15 @@ function renderCompare(compareResult: Parameters<typeof CompareView>[0]["compare
 describe("Compare view never prints the engine's event id", () => {
   it("says Auto-save in the nothing-changed line, not Auto: project:loaded", () => {
     renderCompare({ summary: null, changes: [] } as never);
-    expect(screen.getByText(/Nothing changed since “Auto-save”\./)).toBeTruthy();
+    expect(screen.getByText(/The current draft matches “Auto-save”\./)).toBeTruthy();
     expect(screen.queryByText(/project:loaded/)).toBeNull();
   });
 
-  /* The other branch of that same sentence — the clicked version IS the newest,
-     so there is no diff to compute. It names no version, and must not start
-     naming one. */
-  it("keeps the newest-version wording when there is nothing later", () => {
+  /* The other branch of that same sentence — the compare is still in flight
+     (L5-040: every compare is against the draft). It names no version. */
+  it("names no version while the compare is in flight", () => {
     renderCompare(null);
-    expect(screen.getByText(/newest version/)).toBeTruthy();
+    expect(screen.getByText(/Comparing with the current draft/)).toBeTruthy();
     expect(screen.queryByText(/project:loaded/)).toBeNull();
   });
 

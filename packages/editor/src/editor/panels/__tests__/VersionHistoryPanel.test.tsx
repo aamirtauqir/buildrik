@@ -9,7 +9,7 @@
  *
  * Coverage targets (from audit-remediation plan §D3 Stage 0):
  *   - Versions list renders with N items, empty list shows empty state
- *   - Compare view toggles on, calls compareVersions
+ *   - Compare view toggles on, calls compareWithDraft
  *   - AI summary fetch fires on demand, renders result
  *   - Restore action calls restoreVersion + emits success toast
  *   - Delete confirmation flow + deleteVersion
@@ -78,7 +78,7 @@ const mocks = vi.hoisted(() => {
     createVersion: vi.fn(),
     restoreVersion: vi.fn(),
     deleteVersion: vi.fn(),
-    compareVersions: vi.fn(),
+    compareWithDraft: vi.fn(),
     retryLoad: vi.fn(),
     updateAiSummary: vi.fn(),
     getVersion: vi.fn(),
@@ -96,7 +96,7 @@ vi.mock("../../../shared/hooks/useVersionHistory", () => ({
     restoreVersion: mocks.restoreVersion,
     deleteVersion: mocks.deleteVersion,
     getVersion: mocks.getVersion,
-    compareVersions: mocks.compareVersions,
+    compareWithDraft: mocks.compareWithDraft,
     updateAiSummary: mocks.updateAiSummary,
   }),
 }));
@@ -166,7 +166,7 @@ beforeEach(() => {
   mocks.createVersion.mockReset();
   mocks.restoreVersion.mockReset();
   mocks.deleteVersion.mockReset();
-  mocks.compareVersions.mockReset();
+  mocks.compareWithDraft.mockReset();
   mocks.updateAiSummary.mockReset();
   mocks.getVersion.mockReset();
 });
@@ -263,12 +263,12 @@ describe("VersionHistoryPanel — delete flow", () => {
 });
 
 describe("VersionHistoryPanel — compare flow", () => {
-  it("clicking Compare expands a CompareView and calls compareVersions", async () => {
+  it("clicking Compare expands a CompareView and calls compareWithDraft", async () => {
     mocks.state.versions = [
       makeVersion({ id: "latest", name: "Latest" }),
       makeVersion({ id: "older", name: "Older" }),
     ];
-    mocks.compareVersions.mockResolvedValue({
+    mocks.compareWithDraft.mockResolvedValue({
       summary: { changesCount: 1, additions: 0, deletions: 0, modifications: 1 },
       changes: [],
     });
@@ -279,7 +279,7 @@ describe("VersionHistoryPanel — compare flow", () => {
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
 
     await waitFor(() => {
-      expect(mocks.compareVersions).toHaveBeenCalledWith("latest", "older");
+      expect(mocks.compareWithDraft).toHaveBeenCalledWith("older");
     });
   });
 });

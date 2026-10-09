@@ -702,10 +702,28 @@ export class VersionTimelineManager {
     if (!current || !target) {
       return null;
     }
+    return this.compareSnapshots(current.snapshot, target.snapshot, current.name, target.name);
+  }
 
+  /**
+   * The open draft against a saved version — what "Compare with current"
+   * means (L5-040). It compared the version with the LATEST SAVED one, so the
+   * newest version said "nothing later to compare" however much the draft had
+   * changed since. Rows read draft → version: what a restore would change.
+   */
+  async compareWithDraft(targetId: string): Promise<CompareResult | null> {
+    const target = await this.getVersion(targetId);
+    if (!target) return null;
+    return this.compareSnapshots(this.captureSnapshot(), target.snapshot, "Current draft", target.name);
+  }
+
+  private compareSnapshots(
+    currentData: ProjectData,
+    targetData: ProjectData,
+    currentName: string,
+    targetName: string,
+  ): CompareResult {
     const changes: Array<{ type: ChangeType; property: string; before: string; after: string }> = [];
-    const currentData = current.snapshot;
-    const targetData = target.snapshot;
 
     const currentMap = this.flattenSnapshot(currentData);
     const targetMap = this.flattenSnapshot(targetData);
@@ -781,7 +799,7 @@ export class VersionTimelineManager {
     }
 
     return {
-      elementName: `Version Comparison (${current.name} → ${target.name})`,
+      elementName: `Version Comparison (${currentName} → ${targetName})`,
       changes,
       summary,
     };

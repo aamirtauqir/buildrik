@@ -36,7 +36,7 @@ function createMockComposer(versions: NamedVersion[] = []) {
       createVersion: vi.fn().mockResolvedValue(undefined),
       restoreVersion: vi.fn().mockResolvedValue(true),
       deleteVersion: vi.fn().mockResolvedValue(undefined),
-      compareVersions: vi.fn().mockResolvedValue({ added: [], removed: [], modified: [] }),
+      compareWithDraft: vi.fn().mockResolvedValue({ added: [], removed: [], modified: [] }),
       updateVersion: vi.fn().mockResolvedValue(undefined),
     },
   };
@@ -141,16 +141,16 @@ describe("useVersionHistory", () => {
     expect(result.current.getVersion("zzz")).toBeUndefined();
   });
 
-  it("compareVersions returns the manager's diff (null without composer)", async () => {
+  it("compareWithDraft returns the manager's draft diff (null without composer)", async () => {
     const composer = createMockComposer();
     const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
 
-    const diff = await result.current.compareVersions("a", "b");
-    expect(composer.versions.compareVersions).toHaveBeenCalledWith("a", "b");
+    const diff = await result.current.compareWithDraft("b");
+    expect(composer.versions.compareWithDraft).toHaveBeenCalledWith("b");
     expect(diff).toEqual({ added: [], removed: [], modified: [] });
 
     const { result: nullResult } = renderHook(() => useVersionHistory(null));
-    await expect(nullResult.current.compareVersions("a", "b")).resolves.toBeNull();
+    await expect(nullResult.current.compareWithDraft("b")).resolves.toBeNull();
   });
 
   it("updateAiSummary patches the version's aiSummary", async () => {

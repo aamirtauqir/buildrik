@@ -262,3 +262,19 @@ describe("VersionTimelineManager.compareVersions — readable rows", () => {
     expect(result?.changes[0]).toMatchObject({ property: "Hero title · color", before: "#000000", after: "#ffffff" });
   });
 });
+
+/* L5-040: "Compare with current" compared with the latest SAVED version. */
+describe("VersionTimelineManager.compareWithDraft", () => {
+  it("diffs the open draft against the version", async () => {
+    const page = (children: unknown[]) => ({ pages: [{ id: "p1", name: "Home", root: { id: "root", type: "container", children } }] });
+    const { VersionTimelineManager } = await import("../VersionTimelineManager");
+    const draft = page([{ id: "t", type: "text", content: "Added after v1" }]);
+    const m = new VersionTimelineManager({ on: () => {}, off: () => {}, emit: () => {}, exportProject: () => draft } as never);
+    vi.spyOn(m, "getVersion").mockResolvedValue({ id: "v1", name: "v1", snapshot: page([]) } as never);
+    const result = await m.compareWithDraft("v1");
+    expect(result?.elementName).toBe("Version Comparison (Current draft → v1)");
+    expect(result?.changes).toEqual([
+      expect.objectContaining({ property: "Text", before: "“Added after v1”", after: "" }),
+    ]);
+  });
+});

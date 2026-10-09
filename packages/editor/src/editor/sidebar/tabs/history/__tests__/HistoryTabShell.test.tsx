@@ -77,7 +77,7 @@ vi.mock("../../../../../shared/hooks/useVersionHistory", () => ({
     restoreVersion: vi.fn(),
     deleteVersion: vi.fn(),
     getVersion: vi.fn(),
-    compareVersions: vi.fn(),
+    compareWithDraft: vi.fn(),
     updateAiSummary: vi.fn(),
   }),
 }));

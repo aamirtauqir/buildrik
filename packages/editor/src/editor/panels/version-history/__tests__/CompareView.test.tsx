@@ -41,16 +41,18 @@ function renderView(compareResult: React.ComponentProps<typeof CompareView>["com
 }
 
 describe("CompareView — the empty diff says which empty it is", () => {
-  it("no comparison ran (newest version) — says there is nothing later", () => {
+  /* L5-040: every compare is against the live draft, so there is no
+     "newest version, nothing later" case any more — null is the compare in
+     flight. */
+  it("no result yet — says it is comparing with the current draft", () => {
     renderView(null);
-    expect(
-      screen.getByText(/newest version — there is nothing later to compare it against/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Comparing with the current draft/)).toBeInTheDocument();
+    expect(screen.queryByText(/nothing later to compare/)).not.toBeInTheDocument();
   });
 
-  it("comparison ran and found nothing — names the version it matched", () => {
+  it("comparison ran and found nothing — the draft matches the version", () => {
     renderView({ summary: null, changes: [] } as never);
-    expect(screen.getByText(/Nothing changed since “Homepage redesign”/)).toBeInTheDocument();
+    expect(screen.getByText(/The current draft matches “Homepage redesign”/)).toBeInTheDocument();
   });
 
   it("a real diff renders the changes, not the empty line", () => {
@@ -58,7 +60,7 @@ describe("CompareView — the empty diff says which empty it is", () => {
       summary: null,
       changes: [{ property: "element", before: "x", after: "" }],
     } as never);
-    expect(screen.queryByText(/Nothing changed since/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/The current draft matches/)).not.toBeInTheDocument();
     expect(screen.getByText("element")).toBeInTheDocument();
   });
 });

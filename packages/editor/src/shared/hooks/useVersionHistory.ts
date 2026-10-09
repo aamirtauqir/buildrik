@@ -33,8 +33,8 @@ export interface UseVersionHistoryReturn {
   renameVersion: (id: string, name: string) => Promise<void>;
   /** Get a specific version by id */
   getVersion: (id: string) => NamedVersion | undefined;
-  /** Compare two versions and return diff */
-  compareVersions: (currentId: string, targetId: string) => Promise<CompareResult | null>;
+  /** Compare the open draft with a saved version (draft → version) */
+  compareWithDraft: (versionId: string) => Promise<CompareResult | null>;
   /** Update AI summary for a version */
   updateAiSummary: (versionId: string, summary: string) => Promise<void>;
 }
@@ -136,10 +136,10 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     [versions]
   );
 
-  const compareVersions = React.useCallback(
-    async (currentId: string, targetId: string): Promise<CompareResult | null> => {
+  const compareWithDraft = React.useCallback(
+    async (versionId: string): Promise<CompareResult | null> => {
       if (!composer?.versions) return null;
-      return composer.versions.compareVersions(currentId, targetId);
+      return composer.versions.compareWithDraft(versionId);
     },
     [composer]
   );
@@ -170,7 +170,7 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     deleteVersion,
     renameVersion,
     getVersion,
-    compareVersions,
+    compareWithDraft,
     updateAiSummary,
   };
 }
