@@ -39,7 +39,7 @@ import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { UsageRef } from "../../../../engine/designSystem/TokenUsageTracker";
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
 import { useDSModeOptional } from "../../state/DSModeContext";
-import { calcContrastRatio } from "../../utils/colorUtils";
+import { calcContrastRatio } from "@/engine/designSystem/colorMath";
 import { findSurfaceToken, resolveSurface, shownValue } from "../../utils/contrastLint";
 import { ColorPicker } from "../colors/ColorPicker";
 import { displayValue } from "../colors/ColorTokenList";

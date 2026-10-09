@@ -18,7 +18,7 @@ const FIXABLE: Issue = {
   type: "error",
   message: "Contrast 3.1:1 (needs 4.5)",
   tokenId: "color.accent",
-  autoFixHint: "darken-22",
+  autoFixHint: "contrast:#FFFFFF",
   location: "Brand › color.accent",
 };
 const NOT_FIXABLE: Issue = {

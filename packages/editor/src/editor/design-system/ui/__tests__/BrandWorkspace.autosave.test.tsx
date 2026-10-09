@@ -214,7 +214,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
 
   it("the card's Auto-fix is a recorded write: a row, and Revert restores", async () => {
     const composer = makeFakeComposer();
-    const issue = { type: "contrast", severity: "warning", message: "Contrast 2.8:1", autoFixHint: "darken-22" };
+    const issue = { type: "contrast", severity: "warning", message: "Contrast 2.8:1", autoFixHint: "contrast:#FFFFFF" };
     Object.assign(composer.designSystem, {
       lintState: {
         getVisibleIssues: (id: string) => (id === "color-primary" ? [issue] : []),

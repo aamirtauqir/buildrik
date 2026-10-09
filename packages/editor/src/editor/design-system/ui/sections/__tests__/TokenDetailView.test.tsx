@@ -289,7 +289,7 @@ describe("TokenDetailView", () => {
       type: "banned-hue",
       severity: "warning",
       message: "2.8:1 vs surface · WCAG AA needs 4.5",
-      autoFixHint: "darken-22",
+      autoFixHint: "contrast:#FFFFFF",
     };
     const composer = makeMockComposer({
       issues: new Map([[colorToken.id, [issue]]]),
@@ -313,7 +313,7 @@ describe("TokenDetailView", () => {
       type: "banned-hue",
       severity: "warning",
       message: "fail",
-      autoFixHint: "darken-22",
+      autoFixHint: "contrast:#FFFFFF",
     };
     const composer = makeMockComposer({
       issues: new Map([[colorToken.id, [issue]]]),

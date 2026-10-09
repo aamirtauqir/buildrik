@@ -1,16 +1,13 @@
 import { describe, it, expect } from "vitest";
+import { darkShadeSuggestions, isValidHex, calcWcagLevel, wcagTooltip } from "../colorUtils";
 import {
-  darkShadeSuggestions,
   expandShorthand,
-  isValidHex,
   hexToRgb,
   hexToHsb,
   hsbToHex,
   relativeLuminance,
   calcContrastRatio,
-  calcWcagLevel,
-  wcagTooltip,
-} from "../colorUtils";
+} from "@/engine/designSystem/colorMath";
 import type { WcagLevel } from "../../types";
 
 describe("expandShorthand", () => {

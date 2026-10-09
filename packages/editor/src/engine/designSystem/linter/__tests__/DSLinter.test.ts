@@ -319,13 +319,13 @@ describe("DSLinter.errors", () => {
 });
 
 describe("autoFixHint — the rules that can be fixed mechanically say how (B9 / SH-64)", () => {
-  it("pure-black carries lighten-22, the one-step move off #000", () => {
+  it("pure-black carries the ink scale its message names (DQ-010)", () => {
     const linter = new DSLinter();
     const issues = linter.lint([
       v6Token({ id: "color-ink", name: "Ink", value: "#000000" }),
     ]);
     const black = issues.find((i) => i.rule === "pure-black");
-    expect(black?.autoFixHint).toBe("lighten-22");
+    expect(black?.autoFixHint).toBe("set:#111827");
   });
 
   it("banned-hue carries no hint — which colour replaces purple is a decision, not a step", () => {

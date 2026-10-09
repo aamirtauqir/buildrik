@@ -9,7 +9,7 @@ import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { LintSection, brandChecksCaption, contrastFixFor } from "../LintSection";
-import { calcContrastRatio } from "../../../utils/colorUtils";
+import { calcContrastRatio } from "@/engine/designSystem/colorMath";
 import type { LintIssue } from "../../../../../engine/designSystem/linter";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
@@ -56,7 +56,7 @@ describe("LintSection", () => {
       severity: "warning",
       tokenId: "color-pale",
       message: "Pale fails WCAG AA against the page background",
-      autoFixHint: "darken-22",
+      autoFixHint: "contrast:#FFFFFF",
     };
     const onFix = vi.fn();
     const onOpen = vi.fn();
@@ -74,7 +74,7 @@ describe("LintSection", () => {
 
   it("captions the page with the count, and says when auto-fix is available", () => {
     expect(brandChecksCaption([warn, err])).toBe("2 issues");
-    expect(brandChecksCaption([{ ...warn, autoFixHint: "darken-22" }])).toBe("1 issue · auto-fix available");
+    expect(brandChecksCaption([{ ...warn, autoFixHint: "contrast:#FFFFFF" }])).toBe("1 issue · auto-fix available");
     // G3-123: ignored checks ride the caption (no "Warnings suppressed" pill).
     expect(brandChecksCaption([warn], 3)).toBe("1 issue · 3 ignored");
   });

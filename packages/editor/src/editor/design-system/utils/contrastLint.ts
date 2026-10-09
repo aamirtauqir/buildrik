@@ -18,7 +18,9 @@ import type { LintIssue } from "../../../engine/designSystem/linter";
 import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../types";
-import { calcContrastRatio, calcWcagLevel, hexToRgb, relativeLuminance } from "./colorUtils";
+import { calcWcagLevel } from "./colorUtils";
+import { calcContrastRatio, hexToRgb } from "@/engine/designSystem/colorMath";
+import { contrastHint } from "@/engine/designSystem/contrastFix";
 import { parseColor, rgbToHex } from "@/shared/utils/parsers";
 
 /**
@@ -87,16 +89,6 @@ export const contrastFails = (
   return calcWcagLevel(shown, surfaceBg) === "fail";
 };
 
-/** Which way the engine's one-step fix should push the token: away from the
- *  surface. A token darker than the page darkens further; one lighter than
- *  the page lightens. `applyAutoFix` rewrites the light literal, so the
- *  direction is read off the light value against the light surface. */
-export function contrastFixHint(tokenValue: string, surfaceBg: string): "darken-22" | "lighten-22" {
-  const t = hexToRgb(tokenValue);
-  const s = hexToRgb(surfaceBg);
-  if (!t || !s) return "darken-22";
-  return relativeLuminance(t.r, t.g, t.b) < relativeLuminance(s.r, s.g, s.b) ? "darken-22" : "lighten-22";
-}
 
 /** The mode contrast is measured in: the one the site ships. A site with dark
  *  mode off (the default, and the only state today) is only ever seen light,
@@ -130,7 +122,7 @@ export function buildContrastIssues(
       message: `${t.name || t.id} fails WCAG AA against the page background`,
       /* `applyAutoFix` rewrites the LIGHT literal, so it can only answer a
          light-mode finding; a dark one gets no Fix rather than a wrong one. */
-      autoFixHint: mode === "light" ? contrastFixHint(resolveTokenLiteral(tokens, t.id, "light") ?? "", lightSurface) : undefined,
+      autoFixHint: mode === "light" ? contrastHint(lightSurface) : undefined,
     }));
 }
 

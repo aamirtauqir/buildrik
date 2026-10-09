@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { suggestContrastFix } from "../contrastFix";
-import { calcContrastRatio, hexToHsb } from "../colorUtils";
+import { calcContrastRatio, hexToHsb, suggestContrastFix } from "../colorMath";
 
 describe("suggestContrastFix — binary search to WCAG AA (4.5)", () => {
   it("returns null when the pair already meets the default AA target", () => {

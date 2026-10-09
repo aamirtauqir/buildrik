@@ -8,12 +8,12 @@
  * a missing dark variant is a gap.
  *
  * The drawer's note said no rule sets `autoFixHint`. That stopped being true:
- * contrast findings carry `darken-22` / `lighten-22` (utils/contrastLint).
+ * contrast findings carry a `contrast:<surface>` hint (utils/contrastLint).
  * Fix STAGES the fixed value in the draft, the same as any edit on these
  * pages — the Draft chip lights, the live preview repaints, Save applies it.
  * For contrast the value is `suggestContrastFix`'s — searched to AA against
- * the customer's page — not the hint's fixed 22% shift, which measured live
- * took #EEEEEE to #B6B6B6 (still ~2:1) and left the finding standing.
+ * the customer's page, the same algorithm the engine's Auto-fix runs (DQ-010;
+ * the old ±22% shift took #EEEEEE to #B6B6B6, still ~2:1).
  * Open goes to the token's own page with its card open.
  *
  * The header's "Run checks" (the workspace's page action) re-runs them now;
@@ -24,7 +24,7 @@
 import * as React from "react";
 import type { LintIssue, LintRuleId } from "../../../../engine/designSystem/linter";
 import type { DesignToken } from "../../types";
-import { suggestContrastFix } from "../../utils/contrastFix";
+import { suggestContrastFix } from "@/engine/designSystem/colorMath";
 import { findSurfaceToken, resolveSurface } from "../../utils/contrastLint";
 import { Button } from "@/editor/chrome-ui";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";

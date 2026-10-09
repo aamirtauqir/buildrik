@@ -22,7 +22,7 @@ import { DEFAULT_TOKENS } from "../../constants";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken } from "../../types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
-import { buildContrastIssues, contrastFixHint, contrastLintMode, findSurfaceToken, resolveSurface, contrastFails, buildDarkPairIssues, type StyledNode } from "../contrastLint";
+import { buildContrastIssues, contrastLintMode, findSurfaceToken, resolveSurface, contrastFails, buildDarkPairIssues, type StyledNode } from "../contrastLint";
 import { proposeMissingDarks } from "@/engine/designSystem/scale";
 
 const colors = DEFAULT_TOKENS.filter((t) => t.category === "colors");
@@ -111,11 +111,6 @@ describe("contrast lint — primitives are not measured", () => {
 });
 
 describe("contrast findings carry the engine's fix hint (B9 / SH-64)", () => {
-  it("a token lighter than the page darkens; one darker than the page lightens", () => {
-    expect(contrastFixHint("#DDDDDD", "#FFFFFF")).toBe("darken-22");
-    expect(contrastFixHint("#333333", "#111111")).toBe("lighten-22");
-  });
-
   it("every contrast issue carries a hint the Issues panel's Fix can act on", () => {
     const tokens = [
       v6Token({ id: "color-background", name: "Background", value: "#FFFFFF", layer: "semantic" }),
@@ -123,7 +118,9 @@ describe("contrast findings carry the engine's fix hint (B9 / SH-64)", () => {
     ];
     const issues = buildContrastIssues(tokens, "light");
     expect(issues).toHaveLength(1);
-    expect(issues[0]).toMatchObject({ tokenId: "color-faint", autoFixHint: "darken-22" });
+    /* DQ-010: the hint names the surface, so the engine's fix searches to AA
+       against it instead of shifting lightness a fixed 22%. */
+    expect(issues[0]).toMatchObject({ tokenId: "color-faint", autoFixHint: "contrast:#FFFFFF" });
   });
 });
 
