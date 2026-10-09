@@ -27,6 +27,21 @@ async function assertFromPathFree(siteId: string, fromPath: string, exceptId?: s
   if (clash) throw new Error("REDIRECT_EXISTS");
 }
 
+/**
+ * L3-005: Vercel applies redirects before the filesystem, so a rule from a
+ * path a page still answers on (`/about`, `/about.html`, `/` for the home
+ * page) makes that page unreachable once published. Refused as
+ * REDIRECT_SHADOWS_PAGE:<page name>.
+ */
+async function assertFromPathNotAPage(siteId: string, fromPath: string) {
+  const path = fromPath.toLowerCase().replace(/\/+$/, "").replace(/\.html$/, "").replace(/^\//, "");
+  const pages = await prisma.page.findMany({ where: { siteId }, select: { name: true, slug: true, isHomePage: true } });
+  const shadowed = pages.find((p) =>
+    path === "" || path === "index" ? p.isHomePage : p.slug.toLowerCase() === path,
+  );
+  if (shadowed) throw new Error(`REDIRECT_SHADOWS_PAGE:${shadowed.name}`);
+}
+
 export async function createRedirect(
   siteId: string,
   data: { fromPath: string; toUrl: string; type: string; matchQuery?: boolean; notes?: string | null },
@@ -39,6 +54,7 @@ export async function createRedirect(
     if (count >= limit) throw new Error("REDIRECT_LIMIT");
   }
   await assertFromPathFree(siteId, data.fromPath);
+  await assertFromPathNotAPage(siteId, data.fromPath);
 
   return prisma.redirect.create({
     data: {
@@ -57,7 +73,10 @@ export async function updateRedirect(
   siteId: string,
   data: { fromPath?: string; toUrl?: string; type?: string; matchQuery?: boolean; notes?: string | null }
 ) {
-  if (data.fromPath !== undefined) await assertFromPathFree(siteId, data.fromPath, id);
+  if (data.fromPath !== undefined) {
+    await assertFromPathFree(siteId, data.fromPath, id);
+    await assertFromPathNotAPage(siteId, data.fromPath);
+  }
   return prisma.redirect.update({ where: { id }, data });
 }
 

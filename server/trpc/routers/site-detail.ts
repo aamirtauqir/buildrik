@@ -239,6 +239,11 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "FORBIDDEN", message: "Redirect limit reached." });
           if (e instanceof Error && e.message === "REDIRECT_EXISTS")
             throw new TRPCError({ code: "CONFLICT", message: `A redirect from ${input.fromPath} already exists.` });
+          if (e instanceof Error && e.message.startsWith("REDIRECT_SHADOWS_PAGE:"))
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: `${input.fromPath} is the address of the page “${e.message.slice("REDIRECT_SHADOWS_PAGE:".length)}”. A redirect from it would hide that page.`,
+            });
           throw e;
         }
       }),
@@ -263,6 +268,11 @@ export const siteDetailRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "REDIRECT_EXISTS")
             throw new TRPCError({ code: "CONFLICT", message: `A redirect from ${input.fromPath} already exists.` });
+          if (e instanceof Error && e.message.startsWith("REDIRECT_SHADOWS_PAGE:"))
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: `${input.fromPath} is the address of the page “${e.message.slice("REDIRECT_SHADOWS_PAGE:".length)}”. A redirect from it would hide that page.`,
+            });
           throw e;
         }
       }),

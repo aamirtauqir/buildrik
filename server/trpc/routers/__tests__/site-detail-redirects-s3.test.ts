@@ -114,6 +114,18 @@ describe("siteDetail.redirects.create", () => {
     ).rejects.toMatchObject({ code: "CONFLICT", message: "A redirect from /old-menu already exists." });
   });
 
+  it("is CONFLICT naming the page when the path is a page's own address (L3-005)", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    createRedirectMock.mockRejectedValueOnce(new Error("REDIRECT_SHADOWS_PAGE:About"));
+
+    await expect(
+      caller().redirects.create({ siteId: "s1", fromPath: "/about", toUrl: "/team", type: "301" }),
+    ).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "/about is the address of the page “About”. A redirect from it would hide that page.",
+    });
+  });
+
   it("refuses a To URL that is neither a path nor an http(s) URL before touching access", async () => {
     await expect(
       caller().redirects.create({ siteId: "s1", fromPath: "/old", toUrl: "new-page", type: "301" }),
