@@ -13,15 +13,7 @@
   },
   {
     "category": "selectorDuplicates",
-    "violations": [
-      {
-        "path": "src/editor/canvas/Canvas.css",
-        "line": 597,
-        "severity": "important",
-        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:597, src/themes/design-system/a11y.css:60",
-        "suggestion": "Consolidate to single tier CSS file or document layered override."
-      }
-    ]
+    "violations": []
   },
   {
     "category": "homeContractViolations",
@@ -69,92 +61,7 @@
   },
   {
     "category": "legacyResiduals",
-    "violations": [
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 17,
-        "severity": "minor",
-        "message": ".buildrick-canvas at line 17 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 27,
-        "severity": "minor",
-        "message": ".buildrick-viewport-frame at line 27 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 30,
-        "severity": "minor",
-        "message": ".tbOfflineTooltip at line 30 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 46,
-        "severity": "minor",
-        "message": "input[type=\"range\"]::-webkit-slider-thumb, input[type=\"range\"]::-moz-range-thumb at line 46 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 55,
-        "severity": "minor",
-        "message": "input[type=\"color\"] at line 55 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 57,
-        "severity": "minor",
-        "message": "input[type=\"color\"]::-webkit-color-swatch-wrapper at line 57 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 59,
-        "severity": "minor",
-        "message": "input[type=\"color\"]::-webkit-color-swatch at line 59 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 62,
-        "severity": "minor",
-        "message": ".bd-dragging, .bd-dragging * at line 62 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 64,
-        "severity": "minor",
-        "message": ".bd-dragging at line 64 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 67,
-        "severity": "minor",
-        "message": "[data-buildrick-id][data-selected=\"true\"] at line 67 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 72,
-        "severity": "minor",
-        "message": "[data-buildrick-id]:hover:not([data-selected=\"true\"]) at line 72 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 78,
-        "severity": "minor",
-        "message": "input:disabled, select:disabled, textarea:disabled at line 78 — needs annotation",
-        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
-      }
-    ]
+    "violations": []
   },
   {
     "category": "docDrift",
