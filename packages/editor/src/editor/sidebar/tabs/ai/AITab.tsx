@@ -287,6 +287,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             quotaLabel={(quota && quotaLeftLabel(quota)) || undefined}
             variant={column35 ? "column" : "band"}
             placeholder={column35 ? "What would you like to change?" : undefined}
+            restoreText={failedKind ? lastPrompt.current?.text : undefined}
           />
         </div>
       )}

@@ -110,3 +110,18 @@ describe("AI column — board 35", () => {
     expect(document.querySelector("textarea")).toBe(field);
   });
 });
+
+/* L5-012: a suggestion never goes through the field, and the failure swaps
+   the column composer for the band one — so "Your prompt is still here" sat
+   over an empty field. The field now holds the prompt that was sent. */
+describe("AI column — failed suggestion", () => {
+  it("puts the sent suggestion in the field under 'Your prompt is still here'", async () => {
+    renderColumn();
+    fireEvent.click(screen.getByRole("button", { name: "Make it more concise" }));
+    await act(async () => {
+      lastSubscribe.onError?.({ message: "Stream failed", data: { code: "INTERNAL_SERVER_ERROR" } });
+    });
+    expect(screen.getByText(/Your prompt is still here/)).toBeTruthy();
+    expect((screen.getByTestId("ai-prompt-input") as HTMLTextAreaElement).value).toBe("Make it more concise");
+  });
+});

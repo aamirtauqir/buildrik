@@ -18,6 +18,10 @@ export interface ComposerProps {
    *  box on the column's own 16 gutter. `band` is the 4418:* layout. */
   variant?: "band" | "column";
   placeholder?: string;
+  /** The prompt a failed run sent. A suggestion chip never goes through the
+   *  field, so an empty field takes it — "Your prompt is still here" has to
+   *  be true (L5-012). A typed prompt is never overwritten. */
+  restoreText?: string;
 }
 
 /* Board 35's prompt box (7995:210676): bg-subtle, no edge, 12 in, 12/16. */
@@ -27,9 +31,13 @@ const COLUMN_FIELD =
 
 export const Composer: React.FC<ComposerProps> = ({
   onSubmit, streaming, quotaLabel, showPlan = !streaming, variant = "band", placeholder = "Ask AI to change something…",
+  restoreText,
 }) => {
   const column = variant === "column";
-  const [text, setText] = React.useState("");
+  const [text, setText] = React.useState(restoreText ?? "");
+  React.useEffect(() => {
+    if (restoreText) setText((current) => (current.trim() ? current : restoreText));
+  }, [restoreText]);
   const trimmed = text.trim();
 
   /* The prompt stays in the field after sending (board 4418:106919: "Your
