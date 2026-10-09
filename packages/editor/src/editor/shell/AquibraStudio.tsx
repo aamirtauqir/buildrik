@@ -842,6 +842,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         siteId={getSiteIdFromUrl()}
         siteName={previewHtml ? composer.getProjectMetadata?.()?.name : null}
         pageName={previewHtml ? composer.elements.getActivePage?.()?.name : null}
+        pages={previewHtml ? composer.elements.getAllPages() : undefined}
+        currentPageId={previewHtml ? composer.elements.getActivePage?.()?.id : null}
+        /* Another page in the preview (its menu, or an internal link): the
+           editor moves to that page too, so "Back to canvas" lands on what
+           was being previewed (L5-051). */
+        onShowPage={(pageId) => {
+          composer.elements.setActivePage(pageId);
+          void renderPreviewHtml(composer).then((html) => setPreviewHtml(sanitizeHTMLForPreview(html)));
+        }}
       />
       {/* B8: the one Compare, opened by every Compare door via UI_COMPARE_OPEN. */}
       <CompareHost composer={composer} siteId={getSiteIdFromUrl()} />

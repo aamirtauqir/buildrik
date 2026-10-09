@@ -33,7 +33,7 @@
  */
 import * as React from "react";
 import type { DeviceType } from "@/shared/types";
-import { Button, BreakpointSwitcher, type Breakpoint } from "@/editor/chrome-ui";
+import { Button, BreakpointSwitcher, Select, type Breakpoint } from "@/editor/chrome-ui";
 import { isModalOpen } from "@/editor/chrome-ui";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
@@ -47,6 +47,25 @@ interface PreviewOverlayProps {
   /** Named in the share dialog (board 4418:165739). */
   siteName?: string | null;
   pageName?: string | null;
+  /** The site's pages: the preview's page menu, and where its internal links
+   *  go (L5-051 — it showed one page, and a link blanked the frame). */
+  pages?: ReadonlyArray<{ id: string; name: string; slug?: string; isHome?: boolean }>;
+  currentPageId?: string | null;
+  /** Show another page in the preview. */
+  onShowPage?: (pageId: string) => void;
+}
+
+/** The page an in-site href points at: "/contact", "contact.html", "./contact/",
+ *  "/" (home). Null for anything else — another site, mailto:, a fragment. */
+export function pageForHref(
+  href: string,
+  pages: ReadonlyArray<{ id: string; slug?: string; isHome?: boolean }>,
+): string | null {
+  const raw = href.trim();
+  if (!raw || raw.startsWith("#") || /^[a-z][a-z0-9+.-]*:/i.test(raw) || raw.startsWith("//")) return null;
+  const path = raw.split(/[?#]/)[0].replace(/^\.?\//, "").replace(/\/+$/, "").replace(/\.html$/i, "");
+  if (path === "" || path === "index") return pages.find((p) => p.isHome)?.id ?? pages[0]?.id ?? null;
+  return pages.find((p) => p.slug === path)?.id ?? null;
 }
 
 /* Board 4418:165611 (C5 G1-086): the preview is full-screen with its own
@@ -87,9 +106,41 @@ const PAGE_FRAME_CLASS =
 /** Inside a bezel the frame draws them, so the page fills the screen flat. */
 const SCREEN_FRAME_CLASS = "tw:w-full tw:h-full tw:border-0 tw:bg-[var(--bk-bg-elevated)]";
 
-export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, siteId, siteName, pageName }) => {
+export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
+  html,
+  onDone,
+  siteId,
+  siteName,
+  pageName,
+  pages = [],
+  currentPageId,
+  onShowPage,
+}) => {
   const [device, setDevice] = React.useState<Breakpoint>("desktop");
   const [shareOpen, setShareOpen] = React.useState(false);
+  const pagesRef = React.useRef(pages);
+  pagesRef.current = pages;
+  const showPageRef = React.useRef(onShowPage);
+  showPageRef.current = onShowPage;
+
+  /* Links in the frame. Nothing in it runs (no allow-scripts), so the shell
+     answers its clicks: a page of this site opens in the preview, another
+     site opens in a new tab, anything else stays put — it used to navigate
+     the srcdoc frame to nothing (L5-051). */
+  const onFrameLoad = React.useCallback((e: React.SyntheticEvent<HTMLIFrameElement>) => {
+    const doc = e.currentTarget.contentDocument;
+    if (!doc) return;
+    doc.addEventListener("click", (ev) => {
+      const link = (ev.target as Element | null)?.closest?.("a[href]");
+      if (!link) return;
+      const href = link.getAttribute("href") ?? "";
+      if (href.startsWith("#")) return;
+      ev.preventDefault();
+      const pageId = pageForHref(href, pagesRef.current);
+      if (pageId) showPageRef.current?.(pageId);
+      else if (/^https?:\/\//i.test(href)) window.open(href, "_blank", "noopener,noreferrer");
+    });
+  }, []);
 
   React.useEffect(() => {
     if (html == null) return;
@@ -128,18 +179,38 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, si
         <div className={DEVICE_BAR_INNER_CLASS}>
           <BreakpointSwitcher labelled sublabels={DEVICE_WIDTHS} value={device} onChange={setDevice} />
         </div>
-        {siteId && (
-          <Button size="sm" type="button" onClick={() => setShareOpen(true)} data-testid="preview-share-button">
-            Share preview
-          </Button>
-        )}
+        <div className="tw:flex tw:items-center tw:gap-2">
+          {pages.length > 1 && onShowPage && (
+            <Select
+              sizing="sm"
+              aria-label="Preview page"
+              data-testid="preview-page"
+              value={currentPageId ?? ""}
+              onChange={(e) => onShowPage(e.target.value)}
+            >
+              {pages.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </Select>
+          )}
+          {siteId && (
+            <Button size="sm" type="button" onClick={() => setShareOpen(true)} data-testid="preview-share-button">
+              Share preview
+            </Button>
+          )}
+        </div>
       </div>
       <div className={STAGE_CLASS}>
         <DeviceFramePreview device={device as DeviceType} active={framed}>
           <iframe
             title="Site preview"
-            sandbox=""
+            /* No allow-scripts: nothing in the frame runs. allow-same-origin
+               only lets onFrameLoad answer its link clicks. */
+            sandbox="allow-same-origin"
             srcDoc={html}
+            onLoad={onFrameLoad}
             className={framed ? SCREEN_FRAME_CLASS : PAGE_FRAME_CLASS}
           />
         </DeviceFramePreview>

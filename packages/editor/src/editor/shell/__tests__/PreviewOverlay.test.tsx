@@ -24,11 +24,14 @@ describe("PreviewOverlay", () => {
     expect(screen.queryByTestId("preview-overlay")).toBeNull();
   });
 
-  it("renders the sanitized html in a fully sandboxed iframe", () => {
+  /* No allow-scripts, so nothing in the frame ever runs (the html is also
+     sanitized). allow-same-origin only lets the shell read the frame's links
+     (L5-051: a click on an internal link blanked the frame). */
+  it("renders the sanitized html in a sandbox that runs no scripts", () => {
     render(<PreviewOverlay html="<h1>hi</h1>" onDone={vi.fn()} />);
     const frame = screen.getByTitle("Site preview") as HTMLIFrameElement;
     expect(frame.getAttribute("srcDoc") ?? frame.getAttribute("srcdoc")).toBe("<h1>hi</h1>");
-    expect(frame.getAttribute("sandbox")).toBe("");
+    expect(frame.getAttribute("sandbox")).toBe("allow-same-origin");
   });
 
   /* Board 4418:165611 (C5 G1-086): the way out is "‹ Back to canvas" in the
@@ -119,5 +122,46 @@ describe("PreviewOverlay", () => {
 
     fireEvent.keyDown(window, { key: "Escape" });
     expect(onDone).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* L5-051: an internal link inside the preview blanked the frame, and the
+   preview could show only the page that was open. */
+describe("PreviewOverlay — pages", () => {
+  const pages = [
+    { id: "home", name: "Home", slug: "home", isHome: true },
+    { id: "contact", name: "Contact", slug: "contact" },
+  ];
+
+  it("names the page shown and switches to another from the page menu", () => {
+    const onShowPage = vi.fn();
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} pages={pages} currentPageId="home" onShowPage={onShowPage} />);
+    const select = screen.getByLabelText("Preview page") as HTMLSelectElement;
+    expect(select.value).toBe("home");
+    fireEvent.change(select, { target: { value: "contact" } });
+    expect(onShowPage).toHaveBeenCalledWith("contact");
+  });
+
+  it("an internal link opens that page in the preview instead of blanking it", () => {
+    const onShowPage = vi.fn();
+    render(
+      <PreviewOverlay html='<a href="/contact">Get a quote</a>' onDone={vi.fn()} pages={pages} currentPageId="home" onShowPage={onShowPage} />,
+    );
+    const frame = screen.getByTitle("Site preview") as HTMLIFrameElement;
+    const doc = frame.contentDocument!;
+    doc.body.innerHTML = '<a href="/contact">Get a quote</a><a href="contact.html">b</a><a href="/">c</a>';
+    fireEvent.load(frame);
+    const [a, b, c] = Array.from(doc.querySelectorAll("a"));
+    const click = (el: Element) => {
+      const ev = new MouseEvent("click", { bubbles: true, cancelable: true });
+      el.dispatchEvent(ev);
+      return ev.defaultPrevented;
+    };
+    expect(click(a)).toBe(true);
+    expect(onShowPage).toHaveBeenLastCalledWith("contact");
+    click(b);
+    expect(onShowPage).toHaveBeenLastCalledWith("contact");
+    click(c);
+    expect(onShowPage).toHaveBeenLastCalledWith("home");
   });
 });
