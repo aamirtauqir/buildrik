@@ -118,6 +118,25 @@ describe("LinkSection validation gates href writes", () => {
   });
 });
 
+/* L2-030: a bare domain is normalised, not refused. */
+describe("LinkSection — URL normalisation", () => {
+  it("a bare domain writes https://<domain> and shows no error", () => {
+    const { el, container } = renderLinkSection();
+    selectLinkType(container, "url");
+    fireEvent.change(getModeInput(container), { target: { value: "example.com/menu" } });
+    expect(sawInvalidHrefWrite(el, "https://example.com/menu")).toBe(true);
+    expect(screen.queryByText(/must start with/)).toBeNull();
+  });
+
+  it("text that is not a domain is still refused", () => {
+    const { el, container } = renderLinkSection();
+    selectLinkType(container, "url");
+    fireEvent.change(getModeInput(container), { target: { value: "not a url" } });
+    expect(sawInvalidHrefWrite(el, "not a url")).toBe(false);
+    expect(screen.getByText(/must start with/)).toBeTruthy();
+  });
+});
+
 /* Board 6 (Inspector v4) draws the row as "Link to  [Page ▾]". */
 describe("LinkSection — board row copy", () => {
   it("labels the type row Link to, with None · Page · URL · Email · Phone · Anchor", () => {
