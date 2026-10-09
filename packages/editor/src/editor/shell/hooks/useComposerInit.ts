@@ -202,14 +202,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // unconfigured. siteId scopes asset rows when known.
     const remoteSync = createRemoteAssetSync({ siteId: getSiteIdFromUrl() });
     // Phase C.2: ai.componentSchema mutation returns single-shot JSON via
-    // ComponentSchemaAIClient. Adapter uses hand-rolled types so it stays
-    // test-injectable; cast at the impedance boundary preserves type-safety
-    // on both sides.
+    // ComponentSchemaAIClient. The adapter's args are the router's input
+    // shape, so the call is type-checked end to end (DQ-032: was `as any`).
     const aiClient = isFeatureEnabled("dsAi")
       ? new ComponentSchemaAIClient({
-          mutate: (args, options) =>
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (getAiSubscriptionClient().ai.componentSchema.mutate as any)(args, options),
+          mutate: (args, options) => getAiSubscriptionClient().ai.componentSchema.mutate(args, options),
         })
       : null;
     const instance = createComposer({

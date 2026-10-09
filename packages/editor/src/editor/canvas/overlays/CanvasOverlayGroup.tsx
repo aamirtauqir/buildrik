@@ -114,8 +114,7 @@ export interface CanvasOverlayGroupProps {
   // Misc
   marquee: MarqueeState | null;
   editing: EditingState;
-  onInlineCommand: (cmd: string, value?: any) => void;
-  onOpenImageEditor?: (item: any) => void;
+  onInlineCommand: (cmd: string, value?: string) => void;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -168,7 +167,6 @@ export function CanvasOverlayGroup({
   marquee,
   editing,
   onInlineCommand,
-  onOpenImageEditor,
 }: CanvasOverlayGroupProps) {
   /* Board 4418:100890: while an Add row is held, say where it would land —
      the drawer note and the footer readout read the same announcement. */

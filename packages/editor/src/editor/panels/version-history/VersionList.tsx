@@ -25,32 +25,12 @@ import type { NamedVersion } from "../../../shared/types/versions";
 import { formatRelativeTime } from "../../../editor/sidebar/tabs/history/helpers";
 import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components/SnapshotPreview";
 
-// react-window 1.8.11 ships without TS types (the installed
-// @types/react-window@2.0.0 is a deprecated stub for v2). Import as an
-// untyped module and wrap in a local typed alias so this file stays
-// strict.
-// @ts-expect-error — no declaration file for react-window@1.8.x
-import { FixedSizeList as FixedSizeListUntyped } from "react-window";
+// react-window 1.8.x ships JS only — typed by shared/types/react-window.d.ts.
+import { FixedSizeList, type ListChildComponentProps } from "react-window";
 import { Button, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 import { MoreHorizontal } from "lucide-react";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 import { VERSION_NAME_MAX } from "@buildrik/shared/schemas/site-version";
-
-interface ListChildComponentProps {
-  index: number;
-  style: React.CSSProperties;
-  data?: unknown;
-}
-interface FixedSizeListProps {
-  height: number;
-  width: number | string;
-  itemCount: number;
-  itemSize: number;
-  overscanCount?: number;
-  itemKey?: (index: number, data?: unknown) => React.Key;
-  children: (props: ListChildComponentProps) => React.ReactNode;
-}
-const FixedSizeList = FixedSizeListUntyped as unknown as React.ComponentType<FixedSizeListProps>;
 
 // ─── Constants ────────────────────────────────────────────────────────
 

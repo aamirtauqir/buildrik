@@ -10,9 +10,7 @@
 
 import * as React from "react";
 import { Kbd, Button, ConfirmDialog, Tooltip } from "@/editor/chrome-ui";
-// react-window 1.8.x ships JS only; stub the minimal surface we use.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore — module has no bundled .d.ts (see @types/react-window stub)
+// react-window 1.8.x ships JS only — typed by shared/types/react-window.d.ts.
 import { VariableSizeList } from "react-window";
 import { useHistoryState } from "../../../../../shared/hooks/useHistoryState";
 import { useReducedMotion } from "../../../../../shared/hooks/useReducedMotion";
@@ -99,7 +97,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
   const scrollHostRef = React.useRef<HTMLDivElement | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const listRef = React.useRef<any>(null);
+  const listRef = React.useRef<VariableSizeList>(null);
   const [measuredHeight, setMeasuredHeight] = React.useState<number>(0);
 
   // Restore-animation timer tracking (F4).
@@ -178,7 +176,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
   // Reset virtual-list size caches whenever any row's size might have changed.
   React.useEffect(() => {
-    listRef.current?.resetAfterIndex?.(0, true);
+    listRef.current?.resetAfterIndex(0, true);
   }, [allEntries, expandedGroupId, showAllIds, collapsedByEntry]);
 
   /* F1 — Measure the scroll host, via a CALLBACK ref rather than a mount-time
@@ -264,7 +262,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
   // Scroll focused entry into view via react-window's scrollToItem.
   React.useEffect(() => {
     if (!listRef.current || focusedIndex < 0) return;
-    listRef.current.scrollToItem?.(focusedIndex, "smart");
+    listRef.current.scrollToItem(focusedIndex, "smart");
   }, [focusedIndex, allEntries]);
 
   // F4 — Timestamp click = smooth restore with opacity crossfade.

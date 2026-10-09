@@ -1,8 +1,11 @@
 import type { AIClient } from "./AIAssistService";
+import type { AIModel } from "@buildrik/shared/schemas/ai";
 
 interface MutateArgs {
   prompt: string;
-  model?: string;
+  /* The server's model enum, not `string` — a string here is what forced the
+     `as any` at the tRPC call site (DQ-032). */
+  model?: AIModel;
 }
 
 interface MutateResult {
@@ -16,7 +19,7 @@ export type ComponentSchemaMutate = (
 
 export interface ComponentSchemaAIClientDeps {
   mutate: ComponentSchemaMutate;
-  model?: string;
+  model?: AIModel;
 }
 
 /**
