@@ -22,7 +22,7 @@ import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { devLogger } from "../../../shared/utils/devLogger";
 import { computeEffectiveStyles } from "../config/cssContext";
-import { canWrite, setStyleAt, writableElements } from "@/engine/commands/commandOperations";
+import { activeBreakpoint, canWrite, setStyleAt, writableElements } from "@/engine/commands/commandOperations";
 
 // ============================================================================
 // TYPES
@@ -143,11 +143,21 @@ export function useStyleHandlers(
        a crash inside the inspector. */
     if (typeof composer?.on !== "function" || typeof composer?.off !== "function") return;
     const onRepaint = () => setBump((n) => n + 1);
+    /* A device switch re-renders the canvas sheet on the next frame
+       (StyleEngine), so the rendered read waits for it. */
+    let frame = 0;
+    const onDeviceSwitch = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(onRepaint);
+    };
     composer.on(EVENTS.STYLE_CHANGED, onRepaint);
     composer.on(EVENTS.PROJECT_LOADED, onRepaint);
+    composer.on(EVENTS.BREAKPOINT_CHANGED, onDeviceSwitch);
     return () => {
+      cancelAnimationFrame(frame);
       composer.off(EVENTS.STYLE_CHANGED, onRepaint);
       composer.off(EVENTS.PROJECT_LOADED, onRepaint);
+      composer.off(EVENTS.BREAKPOINT_CHANGED, onDeviceSwitch);
     };
   }, [composer]);
 
@@ -182,10 +192,14 @@ export function useStyleHandlers(
        applied last and still wins.
 
        Only keys the defaults already name are read, so the row set does not
-       change; and only on desktop/base, because a computed value describes the
-       live canvas, not the breakpoint or pseudo-state being edited. */
+       change; and only while the canvas shows the breakpoint being edited
+       (L2-018): the canvas re-emits the active device's breakpoint rules, so
+       on Tablet its computed value IS the value cascading from the base. Off
+       that device it describes another breakpoint and is not read. A
+       pseudo-state reads it too: for a row its rule does not set, the normal
+       state's rendered value is what the state inherits. */
     const rendered =
-      currentBreakpoint === "desktop" && currentPseudoState === "normal"
+      currentBreakpoint === activeBreakpoint(composer)
         ? readRenderedValues(selectedElement.id, Object.keys(defaultStyles), effective)
         : {};
     setStyles({ ...defaultStyles, ...rendered, ...effective });
