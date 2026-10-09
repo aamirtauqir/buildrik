@@ -160,6 +160,10 @@ export function VersionHistoryPanel({
   /* The safety save of the last restore, read by its toast's "Undo restore". */
   const safetyIdRef = React.useRef<string | null>(null);
   const [restoring, setRestoring] = React.useState<{ targetName: string; savedAs: string | null } | null>(null);
+  /* The last restore, with its way back. A restore resets the undo stack and
+     its only undo lived in an 8-second toast (L5-044), so it stays here, on
+     the Saves panel, until dismissed or replaced by the next restore. */
+  const [lastRestore, setLastRestore] = React.useState<{ label: string; safetyId: string } | null>(null);
   React.useEffect(() => {
     if (!composer) return;
     const onPruned = (p: { removed: number; kept: number }) => setPruned(p);
@@ -206,16 +210,11 @@ export function VersionHistoryPanel({
       /* G1-071: the restore saved the work on screen first; "Undo restore"
          restores that save (itself a confirmed-safe restore). */
       const safetyId = safetyIdRef.current;
-      addToast({
-          /* No target in this list = the Undo of a restore (its safety save
-             was created after the list was read). */
-          description: target ? `Restored to ${formatTime(target.createdAt)}` : "Restore undone",
-          tone: "success",
-          duration: 8000,
-          action: safetyId
-            ? { label: "Undo restore", onClick: () => void handleRestoreConfirm(safetyId) }
-            : undefined,
-        });
+      /* No target in this list = the Undo of a restore (its safety save was
+         created after the list was read). */
+      const label = target ? `Restored to ${formatTime(target.createdAt)}` : "Restore undone";
+      addToast({ description: label, tone: "success", duration: 8000 });
+      setLastRestore(target && safetyId ? { label, safetyId } : null);
     } catch {
       pushToast("Restore failed", "error");
     } finally {
@@ -420,6 +419,31 @@ export function VersionHistoryPanel({
               first.' The curly quotes around it were the code's, and at 11px
               they read as scare quotes on a version name. */}
           {restoring.savedAs && <span className={NOTICE_SUB} data-testid="history-restoring-sub">Saving your current work as {restoring.savedAs} first.</span>}
+        </div>
+      )}
+
+      {lastRestore && !restoring && (
+        <div className={NOTICE_RESTORING} role="status" data-testid="history-undo-restore-notice">
+          <strong className={NOTICE_STRONG}>{lastRestore.label}</strong>
+          <span className={NOTICE_SUB}>Your work from before is kept as a save.</span>
+          <span className="tw:flex tw:gap-2 tw:pt-1">
+            <Button
+              size="xs"
+              color="light"
+              className="tw:h-6 tw:px-2 tw:text-[12px] tw:focus:ring-0"
+              onClick={() => void handleRestoreConfirm(lastRestore.safetyId)}
+            >
+              Undo restore
+            </Button>
+            <Button
+              size="xs"
+              color="light"
+              className="tw:h-6 tw:px-2 tw:text-[12px] tw:border-0 tw:bg-transparent tw:focus:ring-0"
+              onClick={() => setLastRestore(null)}
+            >
+              Dismiss
+            </Button>
+          </span>
         </div>
       )}
 

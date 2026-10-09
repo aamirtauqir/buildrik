@@ -19,7 +19,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render as rtlRender, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, cleanup, waitFor, within } from "@testing-library/react";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import type { NamedVersion } from "@/shared/types/versions";
@@ -333,9 +333,13 @@ describe("VersionHistoryPanel — restore branches", () => {
     await screen.findByText("Restore “Save A” to the draft?");
     fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
 
-    fireEvent.click(await screen.findByRole("button", { name: "Undo restore" }));
+    /* L5-044: the way back is on the panel, not only in a toast that expires. */
+    const notice = await screen.findByTestId("history-undo-restore-notice");
+    expect(notice.textContent).toContain("Restored to");
+    fireEvent.click(within(notice).getByRole("button", { name: "Undo restore" }));
     await waitFor(() => expect(mocks.restoreVersion).toHaveBeenLastCalledWith("safety-1"));
     expect(await screen.findByText("Restore undone")).toBeTruthy();
+    await waitFor(() => expect(screen.queryByTestId("history-undo-restore-notice")).toBeNull());
   });
 });
 
