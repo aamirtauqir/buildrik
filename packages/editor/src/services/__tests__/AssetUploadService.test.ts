@@ -40,6 +40,7 @@ vi.mock("../api-client", () => ({
 
 vi.mock("../../shared/utils/runtimeEnv", () => ({
   DASHBOARD_URL: "http://dash.test",
+  IS_DEV_BUILD: false,
 }));
 
 import {

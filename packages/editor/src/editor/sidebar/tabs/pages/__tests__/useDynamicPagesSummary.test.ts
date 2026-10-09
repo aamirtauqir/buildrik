@@ -17,7 +17,7 @@ vi.mock("@/services/api-client", () => ({
     cms: { dynamicPages: { query: (...a: unknown[]) => dynamicPagesQuery(...a) } },
   }),
 }));
-vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000" }));
+vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: () => "site-1",
 }));

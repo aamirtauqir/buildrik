@@ -21,7 +21,7 @@ vi.mock("../api-client", () => ({
     },
   }),
 }));
-vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000" }));
+vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 
 const loadCollections = vi.fn();
 const saveCollection = vi.fn();

@@ -25,7 +25,7 @@ const { api } = vi.hoisted(() => ({
 const hydrateMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/services/api-client", () => ({ getBuildrikClient: () => api }));
-vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000" }));
+vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
 vi.mock("@/services/cmsSync", () => ({ hydrateCmsFromServer: (...a: unknown[]) => hydrateMock(...a) }));
 

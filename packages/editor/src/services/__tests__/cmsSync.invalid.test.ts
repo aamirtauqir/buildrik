@@ -9,7 +9,7 @@ const entUpsert = vi.fn();
 vi.mock("../api-client", () => ({
   getBuildrikClient: () => ({ cms: { entries: { upsert: { mutate: entUpsert } }, collections: {} } }),
 }));
-vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000" }));
+vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000", IS_DEV_BUILD: false }));
 const saveContentItem = vi.fn(async () => undefined);
 vi.mock("../../engine/cms/CollectionStorage", () => ({
   isStorageAvailable: () => true,
