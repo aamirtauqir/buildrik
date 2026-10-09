@@ -219,11 +219,12 @@ export function usePages(composer: Composer | null): UsePagesReturn {
            Undo". Update URL says nothing here — it lands in Page settings
            with the redirect offer instead. */
         if (!updateUrl && before && before.name !== trimmed) {
+          const undoRename = composer.history?.captureUndo?.();
           addToast({
             description: before.isHome ? `Renamed to ${trimmed}` : `Renamed to ${trimmed} · URL /${before.slug} kept`,
             tone: "info",
             duration: 8000,
-            action: { label: "Undo", onClick: () => composer.history?.undo?.() },
+            action: { label: "Undo", onClick: () => undoRename?.() },
           });
         }
       }
@@ -296,6 +297,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
 
       const name = page.name;
       composer.elements.deletePage(pageId);
+      // The toast's Undo reverts this delete, never a later edit (L3-007).
+      const undoDelete = composer.history?.captureUndo?.();
       /* v3 4418:90763: "Menu deleted · Undo" — the name bare, no quotes. */
       addToast({
         description: `${name} deleted`,
@@ -304,7 +307,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         action: {
           label: "Undo",
           onClick: () => {
-            composer.history?.undo?.();
+            undoDelete?.();
           },
         },
       });
@@ -320,11 +323,12 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       if (!composer || pageIds.length === 0) return;
       const names = pageIds.map((id) => pages.find((p) => p.id === id)?.name).filter((n): n is string => !!n);
       pageIds.forEach((id) => composer.elements.deletePage(id));
+      const undoDelete = composer.history?.captureUndo?.();
       addToast({
         description: `${pageIds.length} page${pageIds.length === 1 ? "" : "s"} deleted · ${names.join(", ")}`,
         tone: "info",
         duration: 8000,
-        action: { label: "Undo", onClick: () => composer.history?.undo?.() },
+        action: { label: "Undo", onClick: () => undoDelete?.() },
       });
     },
     [composer, pages, addToast]
@@ -337,12 +341,13 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       if (!composer) return;
       try {
         composer.elements.setHomePage?.(pageId);
+        const undoHome = composer.history?.captureUndo?.();
         /* v3 4418:93657: "Menu is now the homepage · Undo". */
         addToast({
           description: `${page?.name ?? "This page"} is now the homepage`,
           tone: "info",
           duration: 8000,
-          action: { label: "Undo", onClick: () => composer.history?.undo?.() },
+          action: { label: "Undo", onClick: () => undoHome?.() },
         });
       } catch (err) {
         addToast({

@@ -174,7 +174,7 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
     components: componentsNs,
     selection,
     commands,
-    history: { undo: vi.fn(), redo: vi.fn() },
+    history: { undo: vi.fn(), redo: vi.fn(), captureUndo: vi.fn(() => vi.fn(() => true)) },
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
     getProjectSettings: vi.fn(() => projectSettings),
