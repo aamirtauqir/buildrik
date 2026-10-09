@@ -5,7 +5,7 @@
  *
  * Left: the view's own sidebar — ‹ Back to canvas · Templates · PAGE
  * TEMPLATES · All page templates · N · one row per page template. Right: the
- * catalogue (search + one flat grid of built-in and saved templates) or, when a
+ * catalogue (one flat grid of built-in and saved templates — no search yet) or, when a
  * template is picked, its preview in place with Create page · Replace page….
  * @license BSD-3-Clause
  */
