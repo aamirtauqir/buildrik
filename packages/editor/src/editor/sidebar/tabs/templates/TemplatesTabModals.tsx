@@ -107,8 +107,12 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
       {currentPageCount > 0
         ? ` (${currentPageCount} element${currentPageCount === 1 ? "" : "s"})`
         : ""}
-      . The template brings its own colours and type — your brand tokens are not
-      applied to it.
+      .{" "}
+      {/* L2-026: a template saved from a page carries {{token…}} placeholders
+          that apply resolves to this site's brand; a built-in one does not. */}
+      {template.html?.includes("{{token.")
+        ? "The template takes this site’s brand colours and type."
+        : "The template brings its own colours and type — your brand tokens are not applied to it."}
     </div>
     <Option
       checked={backupCurrentPage}
