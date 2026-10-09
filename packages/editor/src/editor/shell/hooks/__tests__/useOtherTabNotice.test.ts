@@ -30,8 +30,8 @@ beforeEach(() => {
 
 describe("useOtherTabNotice", () => {
   it("both tabs on one site are told, once each", () => {
-    const first = vi.fn(() => "t1");
-    const second = vi.fn(() => "t2");
+    const first = vi.fn((_t: unknown) => "t1");
+    const second = vi.fn((_t: unknown) => "t2");
     renderHook(() => useOtherTabNotice("site-1", first));
     expect(first).not.toHaveBeenCalled();
     renderHook(() => useOtherTabNotice("site-1", second));

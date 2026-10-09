@@ -102,10 +102,10 @@ export function useAISummary({
         : compareData.changes.length === 0
           ? "Nothing to summarise: no changes"
           : null;
-      if (nothing) {
+      if (nothing || !compareData) {
         setAiSummaryStates((prev) => ({
           ...prev,
-          [versionId]: { loading: false, result: null, error: nothing },
+          [versionId]: { loading: false, result: null, error: nothing ?? "Compare data not loaded yet" },
         }));
         return;
       }

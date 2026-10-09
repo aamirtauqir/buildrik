@@ -30,7 +30,7 @@ describe("importProject — selection", () => {
   it("clears a selection whose element the imported project does not have", () => {
     const composer = new Composer({} as never);
     composer.importProject(project([heading, text]));
-    composer.selection.select(composer.elements.getElement("t"));
+    composer.selection.select(composer.elements.getElement("t") ?? null);
     composer.importProject(project([heading]));
     expect(composer.selection.getSelected()).toBeNull();
     expect(composer.selection.getSelectedIds()).toEqual([]);
@@ -39,7 +39,7 @@ describe("importProject — selection", () => {
   it("re-points a selection at the imported element with the same id", () => {
     const composer = new Composer({} as never);
     composer.importProject(project([heading, text]));
-    composer.selection.select(composer.elements.getElement("h"));
+    composer.selection.select(composer.elements.getElement("h") ?? null);
     composer.importProject(project([heading]));
     expect(composer.selection.getSelected()).toBe(composer.elements.getElement("h"));
   });
