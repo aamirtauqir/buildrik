@@ -358,6 +358,10 @@ export async function summarizeChanges(
   if (summaryCounts.text > 0) parts.push(`${summaryCounts.text} ${textLabel}`);
   if (summaryCounts.layout > 0) parts.push(`${summaryCounts.layout} ${layoutLabel}`);
   if (summaryCounts.content > 0) parts.push(`${summaryCounts.content} ${contentLabel}`);
+  /* `other` is real change too (element type, traits; adds/removes before
+     the editor counted them as content) — skipping it wrote "no recorded
+     changes" beside a non-empty diff (L5-021). */
+  if (summaryCounts.other > 0) parts.push(`${summaryCounts.other} other change${summaryCounts.other === 1 ? "" : "s"}`);
 
   const changeSummary = parts.join(", ") || "no recorded changes";
   const changeDetail =
@@ -379,7 +383,11 @@ Never be vague like "some elements were modified."`;
       { role: "system", content: systemPrompt },
       {
         role: "user",
+        /* The comparison label says which way the diff runs ("Current
+           draft → v1": each detail reads before → after); without it the
+           model guessed, and inverted it (L5-021). */
         content: `Version: "${versionName}"
+Comparison: ${changes.elementName} (each detail reads before → after)
 Changes: ${changeSummary}
 ${changeDetail ? `Details: ${changeDetail}` : ""}`,
       },
