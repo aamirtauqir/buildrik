@@ -186,6 +186,12 @@ export function handleElementDrop(
     const descendants = sourceEl.getDescendants?.() || [];
     const descendantIds = new Set(descendants.map((d: GrapesElement) => d.getId()));
     const skipIds = new Set([elementId, ...descendantIds]);
+    /* L2-038: released over itself (the pointer never left it — a near-miss
+       on the resize edge), the drop is no move. Walking up from here reached
+       the element's own parent, which the resolver skips as "the current
+       parent", and the fallback sent it to the end of the page root. */
+    const under = getElementId(dropTargetEl);
+    if (under && skipIds.has(under)) return true;
     dropTargetEl = findValidDOMTarget(dropTargetEl, skipIds);
 
     if (!dropTargetEl) {
