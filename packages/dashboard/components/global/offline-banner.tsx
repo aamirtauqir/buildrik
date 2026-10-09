@@ -1,10 +1,18 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { WifiOff, RefreshCw, Wifi } from "lucide-react";
 
 const RETRY_INTERVAL = 15;
 
+/* The editor (/edit/*) owns its offline surface — its save chip and a save
+   that retries when the connection returns. This banner's "Auto-retrying"
+   only re-reads navigator.onLine, so inside the editor it promised a retry of
+   nothing beside the editor's own chip (L5-071). */
+const EDITOR_ROUTE = /^\/edit(\/|$)/;
+
 export function OfflineBanner() {
+  const pathname = usePathname();
   const [isOffline, setIsOffline] = useState(false);
   const [showBackOnline, setShowBackOnline] = useState(false);
   const [countdown, setCountdown] = useState(RETRY_INTERVAL);
@@ -57,6 +65,8 @@ export function OfflineBanner() {
 
     return () => clearInterval(tick);
   }, [isOffline, goOnline]);
+
+  if (pathname && EDITOR_ROUTE.test(pathname)) return null;
 
   if (showBackOnline) {
     return (
