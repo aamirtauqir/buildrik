@@ -659,23 +659,28 @@ Select, Badge, etc. — and the `BK_*` theme constants, and the
 `flowbite-react` (bare or subpath, e.g. `flowbite-react/types`) and never from
 a deep `@/editor/chrome-ui/<file>` path (e.g. `chrome-ui/selectTheme`). The
 barrel aggregates three kinds of export: pure `export { X } from
-"flowbite-react"` re-exports (Button, Badge, Avatar, AvatarGroup, Checkbox,
+"flowbite-react"` re-exports (Badge, Avatar, AvatarGroup, Checkbox,
 Radio, ToggleSwitch, Tooltip, Textarea, Label, HelperText, RangeSlider,
 Progress, Card), the 47 editor-specific components already canonical here
-(Topbar, IssueChip, Modal, Toast, etc.), and the closed 2-wrapper set below.
+(Topbar, IssueChip, Modal, Toast, etc.), and the closed 3-wrapper set below.
 The B3 sweep (task report:
 `.superpowers/sdd/2026-07-30-flowbite-bigbang-implementation/task-B-report.md`)
 re-pointed all 249 pre-existing direct imports across 6 surface-sized commits.
 
-**The closed 2-wrapper set — never a 3rd without amending both
-`chrome-ui/index.ts` and the gate's `WRAPPER_FILES` in the same commit:**
+**The closed 3-wrapper set — never a 4th without amending both
+`chrome-ui/index.ts` and the gate manifest
+(`scripts/gates/chrome-ui-surface.manifest.json`, `"wrapper"` provenance) in
+the same commit.** (This section said "2-wrapper set" and named a
+`WRAPPER_FILES` list until 2026-10-09; `Button` joined 2026-08-28 in the
+design-debt arc, and the gate has diffed a manifest since — DQ-030.)
 
 | Wrapper | Default theme | File |
 |---|---|---|
 | `TextInput` | `BK_TEXT_INPUT_THEME` | `chrome-ui/TextInput.tsx` |
 | `Select` | `BK_SELECT_BASE_THEME` | `chrome-ui/Select.tsx` |
+| `Button` | `BK_BUTTON_THEME` (+ `variant` role vocabulary) | `chrome-ui/Button.tsx` |
 
-Both are `forwardRef` (ref reaches the real `<input>`/`<select>` — load-bearing
+All three are `forwardRef` (ref reaches the real `<input>`/`<select>`/`<button>` — load-bearing
 for rename/search focus and hidden file-input clicks) and deep-merge
 (`chrome-ui/mergeTheme.ts`) a caller-supplied `theme` prop on top of the
 default — caller key wins per leaf, untouched default keys survive. Passing
@@ -717,7 +722,7 @@ wrapper (its contract is `className`-based — `BK_LABEL_CLASS`/
 
 ### CI gates relevant to the library
 
-- `gate:chrome-ui-surface` — **ERROR mode**, locked at **0**: (1) no `flowbite-react` import (bare or subpath) outside `chrome-ui/`, (2) barrel purity — every flowbite-sourced export in `chrome-ui/index.ts` is a pure re-export, never a component definition, (3) closed wrapper set is exactly `[TextInput.tsx, Select.tsx]`. Checks 2/3 have been ERROR since the gate shipped; check 1 flipped from WARN once the B3 sweep drained the count to 0.
+- `gate:chrome-ui-surface` — **ERROR mode**, locked at **0**: (1) no `flowbite-react` import (bare or subpath) outside `chrome-ui/`, (2) barrel purity — every flowbite-sourced export in `chrome-ui/index.ts` is a pure re-export, never a component definition, (3) the export surface matches `scripts/gates/chrome-ui-surface.manifest.json`, whose `"wrapper"` entries are exactly TextInput, Select and Button. Checks 2/3 have been ERROR since the gate shipped; check 1 flipped from WARN once the B3 sweep drained the count to 0.
 - `gate:tokens-generated` — generated files current, zero legacy chrome tokens
 - `gate:vibcoder-ratchet` — locked at **0**: any import of the deleted vibcoder/shared-ui paths fails the build
 - `gate:editor-ui-gone` — locked at **0**: any import of the deleted `@/editor/ui` path fails the build

@@ -1,13 +1,11 @@
 /**
  * StockService — adapter for external stock photo/video search (Unsplash, Pexels).
  *
- * Currently a stub: returns empty results. The MediaTab imports it eagerly
- * and `useDiscoveryState` imports it lazily; both paths resolve to this
- * module so the library view loads without a network dependency.
- *
- * To enable real stock search, swap the `searchPhotos` / `searchVideos`
- * implementations for fetch calls against the providers (both require API
- * keys set at the app layer, not committed here).
+ * Live: `searchPhotos` / `searchVideos` call the dashboard's tRPC proxy
+ * (`media.searchStockPhotos` / `media.searchStockVideos`), which holds the
+ * provider keys (PEXELS_API_KEY / UNSPLASH_ACCESS_KEY, root CLAUDE.md). An
+ * empty query returns [] without a request. (This header said "Currently a
+ * stub: returns empty results" long after the proxy shipped — DQ-030.)
  *
  * S19 (2026-05-09): added optional `signal` + `source` so consumers can
  * (a) discard stale responses via AbortController per the prototype §25
