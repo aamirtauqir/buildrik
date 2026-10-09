@@ -42,20 +42,6 @@
         "severity": "minor",
         "message": "Pass-through wrapper \"canHaveChildren\" — body is single return CAN_HAVE_CHILDREN_SET.has(...sameArgs)",
         "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/editor/sidebar/tabs/media/__tests__/test-utils/mockMediaState.ts",
-        "line": 36,
-        "severity": "minor",
-        "message": "Dead export \"mockMediaState\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/editor/sidebar/tabs/media/__tests__/test-utils/renderMediaTab.tsx",
-        "line": 12,
-        "severity": "minor",
-        "message": "Dead export \"renderMediaTab\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
       }
     ]
   },
