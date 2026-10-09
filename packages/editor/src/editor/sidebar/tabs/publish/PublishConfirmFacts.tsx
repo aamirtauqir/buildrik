@@ -73,6 +73,13 @@ function approvalLine(round: CurrentRound | null, loading: boolean): string {
 export const warningsLine = (n: number) =>
   `⚠ ${n} warning${n === 1 ? "" : "s"} — none block. Client approval is a separate gate.`;
 
+/* The blocker a failed checks request reports — label and detail render in
+   the caller's band like any server check. */
+const CHECKS_UNAVAILABLE = {
+  label: "Pre-publish checks",
+  detail: "Couldn't run the pre-publish checks, so this publish stays blocked. Close this and try again.",
+};
+
 export interface PublishConfirmFactsProps {
   /** Gates the reads: neither entry point should fetch while closed. */
   active: boolean;
@@ -136,11 +143,16 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
         siteId ? fetchPrePublishChecks(siteId).catch(() => null) : Promise.resolve(null),
       ]);
       if (cancelled) return;
-      /* A checks call that fails is not a pass: it leaves the row saying what
-         it said before and the button alone, rather than inventing a verdict. */
-      const failed = (checks?.checks ?? [])
-        .filter((c) => c.status === "fail")
-        .map((c) => ({ label: c.label, detail: c.detail }));
+      /* A checks call that fails is not a pass (DQ-001). It used to collapse
+         into "nothing failed" through `null?.checks ?? []`, which cleared the
+         blockers and enabled Publish on any transient error. It now blocks,
+         and says why; the next open runs the checks again. */
+      const failed =
+        siteId && !checks
+          ? [CHECKS_UNAVAILABLE]
+          : (checks?.checks ?? [])
+              .filter((c) => c.status === "fail")
+              .map((c) => ({ label: c.label, detail: c.detail }));
       setBlockers(failed);
       onBlockingChecks?.(failed);
       /* Warnings do not block, which is exactly why they went missing: the
@@ -161,7 +173,9 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
 
   const target = publishedUrl
     ? `Production · ${publishedUrl.replace(/^https?:\/\//, "")}`
-    : blockers.some((b) => b.label === VERCEL_CHECK_LABEL)
+    : blockers.includes(CHECKS_UNAVAILABLE)
+      ? "Vercel connection not checked"
+      : blockers.some((b) => b.label === VERCEL_CHECK_LABEL)
       /* The row states the fact; the sentence that explains it belongs to the
          band under the rows, which has the width for it. Both carrying the
          same sentence printed it twice and ran it to the modal's edge. */
