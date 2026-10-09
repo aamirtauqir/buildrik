@@ -18,6 +18,7 @@ import type { Composer } from "@/engine/Composer";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { siteOrigin, type SiteDomainRow } from "@buildrik/shared/seo/urls";
+import { devWarn } from "@/shared/utils/devLogger";
 
 export function useSiteOrigin(composer: Composer | null, siteId: string | null | undefined): () => string | null {
   const [host, setHost] = React.useState<{ canonicalUrl: string | null; domains: SiteDomainRow[] }>({
@@ -36,7 +37,7 @@ export function useSiteOrigin(composer: Composer | null, siteId: string | null |
       .then(([row, domains]) => {
         if (!stale) setHost({ canonicalUrl: row.canonicalUrl ?? null, domains });
       })
-      .catch(() => {});
+      .catch((error) => devWarn("useSiteOrigin", "site origin read failed", error));
     return () => {
       stale = true;
     };

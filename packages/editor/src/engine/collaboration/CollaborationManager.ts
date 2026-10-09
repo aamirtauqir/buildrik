@@ -29,6 +29,7 @@ import type { OTOperation } from "./OTTypes";
 import type { CollaborationTransport } from "./types";
 import { ProjectDataSchema } from "../../shared/schemas/project";
 import type { ProjectData } from "../../shared/types";
+import { devWarn } from "@/shared/utils/devLogger";
 
 // ============================================================================
 // CONSTANTS
@@ -816,7 +817,7 @@ export class CollaborationManager extends EventEmitter {
     this.otEngine.destroy();
     this.editingStates.clear();
     this.elementLocks.clear();
-    this.leaveRoom().catch(() => {});
+    this.leaveRoom().catch((error) => devWarn("CollaborationManager", "leaveRoom on destroy failed", error));
     this.transport = null;
     this.removeAllListeners();
   }

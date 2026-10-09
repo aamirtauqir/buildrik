@@ -39,6 +39,7 @@ import {
   sourceOptions,
   type SourceCatalog,
 } from "./compareSources";
+import { devWarn } from "@/shared/utils/devLogger";
 
 type Side = { status: "loading" } | { status: "ready"; pages: ComparePage[] | null } | { status: "error" };
 
@@ -84,11 +85,11 @@ export const CompareHost: React.FC<{ composer: Composer | null; siteId: string |
     setCatalog((c) => ({ ...c, saved }));
     void fetchApprovedSnapshot()
       .then((pages) => !cancelled && setCatalog((c) => ({ ...c, approvedAvailable: pages != null })))
-      .catch(() => {});
+      .catch((error) => devWarn("CompareHost", "approved snapshot read failed", error));
     if (siteId) {
       void fetchPublishHistory(siteId)
         .then((rows) => !cancelled && setCatalog((c) => ({ ...c, published: rows.map((r) => ({ id: r.id, version: r.version })) })))
-        .catch(() => {});
+        .catch((error) => devWarn("CompareHost", "publish history read failed", error));
     }
     return () => {
       cancelled = true;

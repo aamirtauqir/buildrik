@@ -39,7 +39,7 @@ import {
   listAssetVersions,
   restoreAssetVersion,
   type AssetVersion,
-} from "../../../../../services/MediaVersionService";
+} from "@/services/MediaVersionService";
 import { Button, PanelFrame, Textarea } from "@/editor/chrome-ui";
 import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
@@ -155,6 +155,8 @@ export function AssetDetailOverlay({
   // ── Server restore points — loaded on mount so the hub row carries a count.
   const [dbVersions, setDbVersions] = useState<AssetVersion[]>([]);
   const [restoringId, setRestoringId] = useState<string | null>(null);
+  /* The version whose restore just failed — its row says so (DQ-012). */
+  const [restoreFailedId, setRestoreFailedId] = useState<string | null>(null);
   const [pendingRestore, setPendingRestore] = useState<string | null>(null);
 
   const reloadDbVersions = useCallback(() => {
@@ -178,6 +180,7 @@ export function AssetDetailOverlay({
   const confirmRestore = useCallback(
     (versionId: string) => {
       setRestoringId(versionId);
+      setRestoreFailedId(null);
       setPendingRestore(null);
       restoreAssetVersion(versionId)
         .then((res) => {
@@ -185,7 +188,9 @@ export function AssetDetailOverlay({
           onUpdate?.(item.key, { src: res.url });
           reloadDbVersions();
         })
-        .catch(() => {})
+        .catch(() => {
+          if (mountedRef.current) setRestoreFailedId(versionId);
+        })
         .finally(() => {
           if (mountedRef.current) setRestoringId(null);
         });
@@ -606,6 +611,15 @@ export function AssetDetailOverlay({
                     {restoringId === v.id ? "…" : "⋯"}
                   </Button>
                 </div>
+                {restoreFailedId === v.id ? (
+                  <div
+                    role="alert"
+                    className="tw:w-full tw:px-4 tw:py-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]"
+                    data-testid={`media-restore-failed-${v.id}`}
+                  >
+                    Couldn&apos;t restore this version. Nothing changed — try again.
+                  </div>
+                ) : null}
                 {/* Board 146:64 — restore confirms INLINE, and the band is 84
                     tall because the question names the cost: it shipped as a
                     32h strip saying "Restore?", which asks for a decision
