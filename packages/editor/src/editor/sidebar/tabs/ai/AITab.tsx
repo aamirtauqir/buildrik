@@ -168,7 +168,13 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
      Keep N changes — clears it by remounting the composer. */
   const [composerKey, setComposerKey] = React.useState(0);
   /* G2-129: the daily counter — drawn only when the quota read answers. */
-  const quota = useAiQuota(agent.phase);
+  /* Re-read when a run ends (it spent one), not on every phase of it —
+     planning / running / done each re-read it (L5-024). */
+  const [runsEnded, setRunsEnded] = React.useState(0);
+  React.useEffect(() => {
+    if (agent.phase === "done") setRunsEnded((n) => n + 1);
+  }, [agent.phase]);
+  const quota = useAiQuota(runsEnded);
   React.useEffect(() => {
     if (agent.phase === "done") unlock();
   }, [agent.phase, unlock]);

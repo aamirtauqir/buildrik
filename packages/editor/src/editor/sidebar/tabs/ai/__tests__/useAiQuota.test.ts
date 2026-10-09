@@ -41,3 +41,20 @@ describe("ai.quota → counter", () => {
     expect(await fetchAiQuota()).toBeNull();
   });
 });
+
+/* L5-024: opening AI sent "ai.quota,ai.quota" in one batch. Reads that
+   overlap share one request. */
+describe("ai.quota read dedupe", () => {
+  it("overlapping reads share one request", async () => {
+    let calls = 0;
+    answer = () => {
+      calls++;
+      return Promise.resolve({ used: 1, limit: 10, resetsAt });
+    };
+    const [a, b] = await Promise.all([fetchAiQuota(), fetchAiQuota()]);
+    expect(calls).toBe(1);
+    expect(a).toEqual(b);
+    await fetchAiQuota();
+    expect(calls).toBe(2);
+  });
+});

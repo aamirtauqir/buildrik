@@ -13,13 +13,27 @@ import * as React from "react";
 import type { AiQuota } from "@buildrik/shared/schemas/ai";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 
-/** The quota, or null when the read fails. */
-export async function fetchAiQuota(): Promise<AiQuota | null> {
+/* The read in flight. Reads that overlap — AI and Generate-a-block mounting
+   together, or a dev StrictMode double effect — share it: opening AI sent
+   "ai.quota,ai.quota" in one batch (L5-024). */
+let inflight: Promise<AiQuota | null> | null = null;
+
+async function readQuota(): Promise<AiQuota | null> {
   try {
     return await getAiSubscriptionClient().ai.quota.query();
   } catch {
     return null;
   }
+}
+
+/** The quota, or null when the read fails. */
+export function fetchAiQuota(): Promise<AiQuota | null> {
+  if (inflight) return inflight;
+  const read: Promise<AiQuota | null> = readQuota().finally(() => {
+    if (inflight === read) inflight = null;
+  });
+  inflight = read;
+  return read;
 }
 
 /** "7 left today" / "7 generations left today"; null when unlimited. */
