@@ -213,6 +213,19 @@ describe("the banner — a zero is not a status", () => {
     expect(screen.queryByText("0 open")).toBeNull();
   });
 
+  /* L5-034: a round sent with a blank client email ("keep this internal")
+     has no client — it read "Sent — waiting on your client" over a status
+     line saying "Not sent yet". */
+  it("an internal round (no client invited) speaks no client language", async () => {
+    fetchCurrentRound.mockResolvedValue(round({ invitedEmail: null, reviewerName: null, openCommentCount: 0 }));
+    fetchReviewComments.mockResolvedValue([comment({ status: "RESOLVED", authorKind: "internal", authorName: null })]);
+    mount();
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("Internal round — no client invited");
+    expect(screen.getByTestId("review-status-line").textContent).toBe("0 open · 1 resolved · Internal round");
+    expect(screen.getByText("All comments are resolved.")).toBeTruthy();
+    expect(screen.queryByText(/waiting on your client|Client approval/)).toBeNull();
+  });
+
   it("with nothing open after changes were requested it says which", async () => {
     fetchCurrentRound.mockResolvedValue(round({ status: "CHANGES_REQUESTED", openCommentCount: 0 }));
     fetchReviewComments.mockResolvedValue([]);

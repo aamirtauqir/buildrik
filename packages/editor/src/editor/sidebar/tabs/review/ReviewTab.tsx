@@ -135,8 +135,9 @@ function shortAge(iso: string | Date): string {
 
 /** "3 open · 9 resolved · Awaiting Sara" — board 4418:115784's status line.
  *  The tail is where the round stands: "Round 3" once its link is revoked
- *  (4418:116040), "Not sent yet" for a round no client link was minted for
- *  (6879:66771), and a detached count slots in before it (4418:116906). */
+ *  (4418:116040), "Internal round" for a round no client link was minted for
+ *  (6879:66771 drew "Not sent yet", which contradicted the round the user had
+ *  just sent — L5-034), and a detached count slots in before it (4418:116906). */
 function statusLine(round: CurrentRound | null, open: number, resolved: number, detached = 0): string {
   const counts = `${open} open · ${resolved} resolved${detached > 0 ? ` · ${detached} detached` : ""}`;
   if (!round) return counts;
@@ -149,7 +150,7 @@ function statusLine(round: CurrentRound | null, open: number, resolved: number, 
       : st === "approved"
         ? "Approved"
         : round.invitedEmail === null
-          ? "Not sent yet"
+          ? "Internal round"
           : `Awaiting ${who}`;
   return `${counts} · ${tail}`;
 }
@@ -928,7 +929,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const allResolvedBody = (
     <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
       <span className="tw:text-[13px] tw:text-[var(--bk-success-text)]">Everything is resolved.</span>
-      <span className={META}>All comments are resolved. Client approval is shown above.</span>
+      <span className={META}>
+        {hasClientLink ? "All comments are resolved. Client approval is shown above." : "All comments are resolved."}
+      </span>
     </div>
   );
 
@@ -960,7 +963,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         : `${openComments.length} open`
       : changesRequested
         ? "Changes requested — nothing left open"
-        : "Sent — waiting on your client";
+        : hasClientLink
+          ? "Sent — waiting on your client"
+          : "Internal round — no client invited";
   const roundBanner = roundLive ? (
     <div
       className={`tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:border-b tw:border-[var(--bk-border)] ${
@@ -998,9 +1003,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const emptyBody = (
     <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
       <span className="tw:text-[14px] tw:text-[var(--bk-ink)]">
-        {round.reviewerName ?? "Your reviewer"} has not commented yet.
+        {hasClientLink ? `${round.reviewerName ?? "Your reviewer"} has not commented yet.` : "No comments yet."}
       </span>
-      <span className={META}>You will be notified.</span>
+      <span className={META}>{hasClientLink ? "You will be notified." : "Team comments on this round show here."}</span>
     </div>
   );
 
