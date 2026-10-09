@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import type {
@@ -90,6 +90,68 @@ describe("SectionReorderHandles — board 4428:44400", () => {
       "Drag to reorder section 2",
       "Drag to reorder section 3",
     ]);
+  });
+
+  /* L1-011: an always-on invisible 48×40 hit div sat on the left edge of
+     every top-level element, so clicks and right-clicks there hit the overlay.
+     Nothing blocks the page until the pointer is near a grip. */
+  it("blocks no clicks while no grip is hovered", () => {
+    const { container, getAllByRole } = renderHandles(three());
+    const auto = [...container.querySelectorAll<HTMLElement>("div")].filter((d) => d.style.pointerEvents === "auto");
+    expect(auto).toHaveLength(0);
+    expect(getAllByRole("button", { hidden: true })[0].style.pointerEvents).toBe("none");
+  });
+
+  it("the pointer near a section's top-left edge hovers its grip", () => {
+    const onHoverBoundary = vi.fn();
+    render(
+      <SectionReorderHandles
+        boundaries={three()}
+        dragState={null}
+        hoveredBoundary={null}
+        onStartDrag={vi.fn()}
+        onUpdateDrag={vi.fn()}
+        onCompleteDrag={vi.fn()}
+        onCancelDrag={vi.fn()}
+        onHoverBoundary={onHoverBoundary}
+      />,
+    );
+    fireEvent.mouseMove(window, { clientX: 10, clientY: 255 });
+    expect(onHoverBoundary).toHaveBeenLastCalledWith("s2");
+  });
+
+  it("moving away from a hovered grip un-hovers it", () => {
+    const onHoverBoundary = vi.fn();
+    render(
+      <SectionReorderHandles
+        boundaries={three()}
+        dragState={null}
+        hoveredBoundary="s2"
+        onStartDrag={vi.fn()}
+        onUpdateDrag={vi.fn()}
+        onCompleteDrag={vi.fn()}
+        onCancelDrag={vi.fn()}
+        onHoverBoundary={onHoverBoundary}
+      />,
+    );
+    fireEvent.mouseMove(window, { clientX: 300, clientY: 255 });
+    expect(onHoverBoundary).toHaveBeenLastCalledWith(null);
+  });
+
+  it("a hovered grip takes the pointer", () => {
+    const { getAllByRole } = render(
+      <SectionReorderHandles
+        boundaries={three()}
+        dragState={null}
+        hoveredBoundary="s2"
+        onStartDrag={vi.fn()}
+        onUpdateDrag={vi.fn()}
+        onCompleteDrag={vi.fn()}
+        onCancelDrag={vi.fn()}
+        onHoverBoundary={vi.fn()}
+      />,
+    );
+    expect(getAllByRole("button", { hidden: true })[1].style.pointerEvents).toBe("auto");
   });
 
   it("draws the dragged section's slot at the target, sized like it and labelled with its name", () => {
