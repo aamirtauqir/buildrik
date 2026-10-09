@@ -150,10 +150,35 @@ describe("SeoTab title field", () => {
     expect(options).toMatchObject({ useEnhancedPrompts: false });
   });
 
-  it('hides "Write with AI" once the title reaches 10 chars', () => {
+  /* L5-018: a filled title keeps a way to ask again — the button used to
+     vanish at 10 characters, so a bad result could not be regenerated. */
+  it('offers "Regenerate" once the title reaches 10 chars', () => {
     const s = makeSettings({ seoTitle: "Long Title Here" });
     render(<SeoTab s={s} page={makePage()} composer={null} />);
-    expect(screen.queryByRole("button", { name: /suggest seo title/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /suggest seo title/i }).textContent).toContain("Regenerate");
+  });
+
+  it("trims a long AI title at a word boundary, never mid-word", async () => {
+    const { generateContent } = await import("@/shared/utils/openai");
+    vi.mocked(generateContent).mockResolvedValueOnce(
+      '"Transform Your Online Presence with Our Innovative Website Builder Today"',
+    );
+    const s = makeSettings({ seoTitle: "" });
+    render(<SeoTab s={s} page={makePage()} composer={null} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
+    });
+    expect(s.setSeoTitle).toHaveBeenCalledWith("Transform Your Online Presence with Our Innovative Website");
+  });
+
+  it("says so when the AI call fails, instead of failing silently", async () => {
+    const { generateContent } = await import("@/shared/utils/openai");
+    vi.mocked(generateContent).mockRejectedValueOnce(new Error("down"));
+    render(<SeoTab s={makeSettings({ seoTitle: "" })} page={makePage()} composer={null} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
+    });
+    expect(screen.getByRole("alert").textContent).toContain("write a title just now");
   });
 });
 

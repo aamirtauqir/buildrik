@@ -101,6 +101,16 @@ export function seoTitlePrompt(siteName: string | undefined, pageName: string, d
   return lines.filter(Boolean).join("\n");
 }
 
+/** An AI title cut to `max` characters at the last whole word (L5-018: a
+ *  hard slice ended "…Website B"). Quotes the model adds are dropped. */
+export function trimTitle(raw: string, max = 60): string {
+  const clean = raw.replace(/^["'\s]+|["'\s]+$/g, "").replace(/\s+/g, " ");
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max + 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : clean.slice(0, max)).replace(/[\s,;:–—-]+$/, "");
+}
+
 export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpenSiteDefaults }) => {
   const siteName = composer?.getProjectMetadata?.()?.name;
   const domain = s.domain ?? "yoursite.com";
@@ -123,6 +133,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
     pageFileNames(withThis.map((p) => (p.id === page.id ? { ...p, slug: s.slug } : p))).get(page.id) ?? "index.html";
   const previewUrl = (pageCanonicalUrl(domain, servedFile) ?? "").replace(/^https?:\/\//, "");
   const [aiBusy, setAiBusy] = React.useState(false);
+  const [aiFailed, setAiFailed] = React.useState(false);
 
   /* The redirect offer (Clone 3519:19920's door). `page.slug` is the SAVED
      slug — the row re-syncs from the engine after updatePage — so a change of
@@ -160,13 +171,16 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
   const suggestTitle = React.useCallback(async () => {
     if (aiBusy) return;
     setAiBusy(true);
+    setAiFailed(false);
     try {
       const prompt = seoTitlePrompt(siteName, page.name, s.seoDesc, pageCopySample(composer, page.id));
       const title = await generateContent(prompt, "headline", "professional", { useEnhancedPrompts: false });
-      const clean = title.replace(/^["']|["']$/g, "").trim().slice(0, 60);
+      const clean = trimTitle(title);
       if (clean) s.setSeoTitle(clean);
+      else setAiFailed(true);
     } catch {
-      // AI unavailable — leave the field for manual entry.
+      // The field stays for manual entry; say why nothing arrived.
+      setAiFailed(true);
     } finally {
       setAiBusy(false);
     }
@@ -282,23 +296,21 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       <div className={FIELD} data-testid="seo-field-title">
         <div className={FIELD_HEAD}>
           <Label htmlFor="seo-title" className={BK_LABEL_CLASS} data-testid="seo-label-title">Meta title · page override</Label>
-          {s.seoTitle.length < 10 && (
-            <Button
-              color="light"
-              size="xs"
-              type="button"
-              aria-label="Suggest SEO title"
-              disabled={aiBusy}
-              onClick={suggestTitle}
-              aria-busy={aiBusy || undefined}
-              className={`tw:ml-auto tw:inline-flex tw:items-center tw:gap-1 tw:h-auto tw:min-h-0 tw:p-0 tw:border-0 tw:bg-transparent tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline tw:text-[length:var(--bk-text-11)] tw:font-medium ${UI}`}
-            >
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                <path d="M5 3l14 9-14 9V3z" />
-              </svg>
-              Write with AI
-            </Button>
-          )}
+          <Button
+            color="light"
+            size="xs"
+            type="button"
+            aria-label="Suggest SEO title"
+            disabled={aiBusy}
+            onClick={suggestTitle}
+            aria-busy={aiBusy || undefined}
+            className={`tw:ml-auto tw:inline-flex tw:items-center tw:gap-1 tw:h-auto tw:min-h-0 tw:p-0 tw:border-0 tw:bg-transparent tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline tw:text-[length:var(--bk-text-11)] tw:font-medium ${UI}`}
+          >
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M5 3l14 9-14 9V3z" />
+            </svg>
+            {s.seoTitle.length < 10 ? "Write with AI" : "Regenerate"}
+          </Button>
           <span
             className={`${COUNTER} ${
               range === "ok" || range === "ideal"
@@ -321,6 +333,11 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
           placeholder={s.inheritedTitle}
           aria-describedby="seo-title-hint"
         />
+        {aiFailed && (
+          <HelperText role="alert" className={BK_HELPER_ERROR_CLASS}>
+            Couldn&rsquo;t write a title just now. Try again, or type one.
+          </HelperText>
+        )}
       </div>
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
       <div className={FIELD} data-testid="seo-field-desc">
