@@ -372,9 +372,12 @@ describe("useUploadState — media event listeners", () => {
     expect(result.current.uploadQueue).toEqual([
       { fileName: "virus.exe", progress: 0, status: "error", error: "Unsupported type" },
     ]);
+    /* L4-009: the band above is the lasting record, so the toast that
+       announces it leaves on its own instead of piling up across panels. */
     expect(showToast).toHaveBeenCalledWith(
       "virus.exe — Unsupported type",
-      "error"
+      "error",
+      { duration: 8000 }
     );
 
     // Payload without fileName/error falls back to generic labels.
