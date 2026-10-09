@@ -15,6 +15,7 @@ import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { AI_ELEMENT_CONTEXT_LIMITS, type AiElementContext } from "@buildrik/shared/schemas/ai";
 import type { Composer } from "../../../../../engine";
 import { AI_EDITABLE_TOKEN_TYPES } from "@/engine/designSystem/tokenValueGuard";
+import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import type { Element } from "@/engine/elements/Element";
 import type { TokenRef, MediaAssetRef, PageElementRef } from "./runPromptOnce";
 
@@ -26,13 +27,20 @@ export function toElementRef(el: Element): PageElementRef {
 }
 
 /** AI-editable design tokens (capped) — only types the model can safely set
- *  from a free string. */
+ *  from a free string. Read from the saved set merged over the seed, the set
+ *  Brand lists: the raw saved set is empty until a token is saved, so a site
+ *  on the defaults sent none (L5-010). */
 export function gatherTokens(composer: Composer | null): TokenRef[] {
   if (!composer) return [];
   // Defensive optional access — callers may pass a partial composer.
-  const tokens = composer.getProjectSettings?.()?.designTokens ?? [];
+  const settings = composer.getProjectSettings?.();
+  const saved = settings?.designTokens ?? [];
+  const tokens = mergeProjectTokens(saved, settings?.designTokensSchemaVersion);
+  // The site's own tokens first, so the cap never drops them for seed ones.
+  const savedIds = new Set(saved.map((t) => t.id));
   return tokens
     .filter((t) => t.type !== undefined && AI_EDITABLE_TOKEN_TYPES.has(t.type))
+    .sort((a, b) => Number(savedIds.has(b.id)) - Number(savedIds.has(a.id)))
     .map((t) => ({ id: t.id, name: t.name, value: resolveTokenLiteral(tokens, t.id, "light") ?? "", type: t.type as string }))
     .slice(0, 120);
 }

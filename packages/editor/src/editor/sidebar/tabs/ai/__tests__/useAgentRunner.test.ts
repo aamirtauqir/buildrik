@@ -379,7 +379,8 @@ describe("useAgentRunner", () => {
         attributes: { title: "Hero" },
         children: [{ id: "c1", type: "text", text: "child copy" }],
       },
-      tokens: [],
+      // The seed set (L5-010: a site with no saved tokens still has Brand's).
+      tokens: expect.arrayContaining([expect.objectContaining({ id: "color-brand-500", type: "color" })]),
       assets: [{ url: "https://cdn.x.com/a.jpg" }],
     });
   });

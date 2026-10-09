@@ -167,8 +167,9 @@ describe("AITab — scope + composer wiring", () => {
     fireEvent.change(ta, { target: { value: "use the brand color" } });
     fireEvent.keyDown(ta, { key: "Enter" });
 
-    const scope = lastSubscribe.input?.scope as { tokens?: unknown[]; assets?: unknown[] };
-    expect(scope.tokens).toHaveLength(1);
+    const scope = lastSubscribe.input?.scope as { tokens?: Array<{ id: string; value: string }>; assets?: unknown[] };
+    // The saved token rides with the seed set it is merged over (L5-010).
+    expect(scope.tokens).toEqual(expect.arrayContaining([expect.objectContaining({ id: "tok1", value: "#2D6DFF" })]));
     expect(scope.assets).toHaveLength(1);
   });
 
