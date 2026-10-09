@@ -270,6 +270,20 @@ describe("BrandWorkspace › the Light / Dark switch is preview-only (L4-021, BR
     expect((utils.getByTestId("brand-colour-mode-seg-dark") as HTMLButtonElement).disabled).toBe(true);
   });
 
+  it("the canvas theme toggle's dark look (BRP1-M12) shows here and is Brand's to turn back: Light clears it", () => {
+    const { composer, ds } = makePreviewComposer("auto");
+    ds.setPreview({ tokens: [], darkMode: "auto", theme: "dark", source: "canvas" });
+    const utils = renderWorkspace(composer);
+    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("dark");
+    const light = utils.getByTestId("brand-colour-mode-seg-light") as HTMLButtonElement;
+    expect(light.disabled).toBe(false);
+    act(() => {
+      fireEvent.click(light);
+    });
+    expect(ds.preview).toBeNull();
+    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("light");
+  });
+
   it("turning Dark mode Off mid-preview drops the preview to light", () => {
     const { composer, ds } = makePreviewComposer("auto");
     const utils = renderWorkspace(composer);

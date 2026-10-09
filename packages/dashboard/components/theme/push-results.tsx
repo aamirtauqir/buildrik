@@ -9,6 +9,8 @@ export type PushResultRow = {
   name: string;
   status: "pushed" | "skipped-locked" | "skipped-held" | "skipped-version" | "failed";
   error?: string;
+  /** Site-only token ids the push kept because the site still uses them. */
+  kept?: string[];
 };
 
 const RECAPTURE_COPY =
@@ -19,7 +21,11 @@ function Status({ row }: { row: PushResultRow }) {
   const line = "m-0 inline-flex items-center gap-1 text-[12px] leading-[18px]";
   switch (row.status) {
     case "pushed":
-      return <p className={`${line} text-[var(--color-success-text)]`} data-testid="push-result-status">Updated</p>;
+      return (
+        <p className={`${line} text-[var(--color-success-text)]`} data-testid="push-result-status">
+          {row.kept?.length ? `Updated · kept ${row.kept.length} site token${row.kept.length === 1 ? "" : "s"}` : "Updated"}
+        </p>
+      );
     case "skipped-held":
       return <p className={`${line} text-[var(--color-warning-text)]`} data-testid="push-result-status">Brand rolled back — skipped</p>;
     case "skipped-version":

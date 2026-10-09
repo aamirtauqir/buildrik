@@ -191,6 +191,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const {
     setLeftPanelTab: guardedSetLeftPanelTab,
     openLeftPanelToTab: guardedOpenLeftPanelToTab,
+    toggleLeftPanel: guardedToggleLeftPanel,
+    closeLeftPanel: guardedCloseLeftPanel,
     dialogProps: tabSwitchDialogProps,
   } = useTabSwitchGuard({
     leftPanelTab: state.leftPanelTab,
@@ -199,6 +201,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     openLeftPanelToTab: state.openLeftPanelToTab,
     isTabAllowed,
     onDiscardFailed,
+    isLeftPanelOpen: state.isLeftPanelOpen,
+    setIsLeftPanelOpen: state.setIsLeftPanelOpen,
   });
 
   // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).
@@ -687,7 +691,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenPublish={() => guardedOpenLeftPanelToTab("publish")}
           onOpenHistory={() => guardedOpenLeftPanelToTab("history")}
           onOpenPages={() => guardedOpenLeftPanelToTab("pages")}
-          onCloseDrawer={() => state.setIsLeftPanelOpen(false)}
+          onCloseDrawer={guardedCloseLeftPanel}
           onOpenActivity={() => guardedOpenLeftPanelToTab("activity")}
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => guardedOpenLeftPanelToTab("review")}
@@ -718,7 +722,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         zoom={state.zoom}
         onZoomChange={state.setZoom}
         isLeftPanelOpen={state.isLeftPanelOpen}
-        onLeftPanelToggle={() => state.setIsLeftPanelOpen((v) => !v)}
+        onLeftPanelToggle={guardedToggleLeftPanel}
         leftPanelTab={state.leftPanelTab}
         leftPanelSubTab={state.leftPanelSubTabs[state.leftPanelTab]}
         onLeftPanelTabChange={guardedSetLeftPanelTab}

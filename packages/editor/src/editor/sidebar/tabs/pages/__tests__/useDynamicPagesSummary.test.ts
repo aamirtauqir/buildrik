@@ -65,13 +65,13 @@ beforeEach(() => {
 describe("useDynamicPagesSummary", () => {
   it("is empty with no composer", () => {
     const { result } = renderHook(() => useDynamicPagesSummary(null));
-    expect(result.current).toEqual({ count: 0, collectionId: null });
+    expect(result.current).toEqual({ count: 0, collectionId: null, byCollection: {} });
   });
 
   it("is empty when no collection has a pageSlugPattern", async () => {
     const { composer } = await loaded([{ id: "c1" }, { id: "c2" }]);
     const { result } = renderHook(() => useDynamicPagesSummary(composer as never));
-    await waitFor(() => expect(result.current).toEqual({ count: 0, collectionId: null }));
+    await waitFor(() => expect(result.current).toEqual({ count: 0, collectionId: null, byCollection: {} }));
     expect(dynamicPagesQuery).not.toHaveBeenCalled();
   });
 
@@ -91,6 +91,8 @@ describe("useDynamicPagesSummary", () => {
     expect(dynamicPagesQuery).toHaveBeenCalledWith({ siteId: "site-1", collectionId: "docs" });
     // collectionId is the first collection that produced output (the row's "›").
     expect(result.current.collectionId).toBe("blog");
+    // EDT-057: each collection's own count, for the template page's delete confirm.
+    expect(result.current.byCollection).toEqual({ blog: 2, docs: 1 });
   });
 
   it("tolerates one collection's query failing — the others still count", async () => {
@@ -119,7 +121,7 @@ describe("useDynamicPagesSummary", () => {
 
     storedCollections.mockResolvedValue([{ id: "posts", name: "Posts", pageSlugPattern: "/blog/{slug}" }]);
     await act(() => manager.refreshFromStorage());
-    await waitFor(() => expect(result.current).toEqual({ count: 1, collectionId: "posts" }));
+    await waitFor(() => expect(result.current).toEqual({ count: 1, collectionId: "posts", byCollection: { posts: 1 } }));
   });
 
   it("re-fetches when an entry is published or unpublished", async () => {

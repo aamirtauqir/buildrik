@@ -39,6 +39,7 @@ import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } fr
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
 import { ProjectTokensApplier } from "@/editor/design-system/ui/ProjectTokensApplier";
+import { ThemeTogglePreview } from "@/editor/design-system/ui/ThemeTogglePreview";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useConnectOfferToast } from "./hooks/useConnectOfferToast";
@@ -816,6 +817,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           tokens reached the page only when the Brand panel mounted, so a
           machine without the localStorage cache drew the DEFAULT brand. */}
       <ProjectTokensApplier composer={composer} />
+      {/* Headless. BRP1-M12: the theme-toggle block flips the canvas (preview only). */}
+      <ThemeTogglePreview composer={composer} />
       <LayoutShell
         /* View mode is a VIEW, the way Figma's is: the person holding the link
            is looking, not building, so the rail, the drawer and the inspector are

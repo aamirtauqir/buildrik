@@ -32,6 +32,19 @@ describe("PushResults (BRP1-M4)", () => {
     expect(status("e")).toBe("Failed");
   });
 
+  /* Owner answer 1b OQ-8 (2026-10-08): a push that kept in-use site tokens
+     says so in the status row. The service returned `kept` and no UI read it. */
+  it("says how many in-use site tokens a push kept", () => {
+    const kept = [
+      { siteId: "k1", name: "One", status: "pushed" as const, kept: ["color-brand-x"] },
+      { siteId: "k3", name: "Three", status: "pushed" as const, kept: ["a", "b", "c"] },
+    ];
+    render(<PushResults rows={kept} onDismiss={vi.fn()} />);
+    const status = (id: string) => within(screen.getByTestId(`push-result-${id}`)).getByTestId("push-result-status").textContent;
+    expect(status("k1")).toBe("Updated · kept 1 site token");
+    expect(status("k3")).toBe("Updated · kept 3 site tokens");
+  });
+
   it("explains the re-capture status in a tooltip", () => {
     render(<PushResults rows={rows} onDismiss={vi.fn()} />);
     const tip = screen.getByRole("tooltip", { hidden: true });

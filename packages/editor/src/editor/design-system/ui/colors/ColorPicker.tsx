@@ -133,9 +133,16 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const currentHex = exactHex ?? hsbToHex(hsb);
   const contrastRatio = calcContrastRatio(currentHex.slice(0, 7), background);
 
+  /* Set by the hex field itself: its own keystroke moved HSB, so the field
+     already shows what the user typed and must not be rewritten. Writing the
+     expanded value back mid-typing turned "#C24" into "#CC2244" and the next
+     keys landed after it ("#CC2244C"). */
+  const typedHex = React.useRef(false);
+
   // Sync hex input when hsb changes externally
   React.useEffect(() => {
-    setHexInput(currentHex.slice(0, 7).toUpperCase());
+    if (typedHex.current) typedHex.current = false;
+    else setHexInput(currentHex.slice(0, 7).toUpperCase());
     onChange(currentHex);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hsb]);
@@ -233,13 +240,14 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   // ─ Hex input ─
   const handleHexInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
-    setHexInput(raw.toUpperCase());
-
     const full = raw.startsWith("#") ? raw : `#${raw}`;
+    setHexInput((raw === "" ? raw : full).toUpperCase());
+
     const expanded = expandShorthand(full);
     if (isValidHex(expanded)) {
       setHexError(false);
       setExactHex(expanded.toUpperCase());
+      typedHex.current = true;
       setHsb(hexToHsb(expanded));
     } else {
       setHexError(true);
