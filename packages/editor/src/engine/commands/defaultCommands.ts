@@ -106,9 +106,9 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
            label would still count it. */
         /* A-5: filter the RAW selection first (dropLockedAndInstances), then
            prune — pruning first hid a locked image inside a selected section. */
-        const { kept, skipped } = dropLockedAndInstances(c.selection.getAllSelected());
+        const { kept, skipped, skippedPayload } = dropLockedAndInstances(c.selection.getAllSelected());
         const selected = topMost(kept);
-        if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+        if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, skippedPayload);
         if (selected.length === 0) return;
         /* Decision #17: one element deletes at once (Undo follows); more than
            one asks first. Every door — Delete/Backspace, ⌘K — lands here, so
@@ -287,9 +287,9 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       shortcut: "ctrl+x",
       requiresSelection: true,
       run: (c) => {
-        const { kept, skipped } = dropLockedAndInstances(c.selection.getAllSelected());
+        const { kept, skipped, skippedPayload } = dropLockedAndInstances(c.selection.getAllSelected());
         const selected = topMost(kept);
-        if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+        if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, skippedPayload);
         if (selected.length === 0) return;
         const ids = selected.map((el) => el.getId());
         c.clipboard = ids

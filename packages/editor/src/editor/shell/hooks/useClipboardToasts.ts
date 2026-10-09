@@ -51,11 +51,14 @@ export function useClipboardToasts(
        field typed into writes per keystroke — one toast while it is up. */
     const LOCKED_TOAST_MS = 2500;
     let lockedShownAt = -Infinity;
-    const lockedSkipped = () => {
+    const lockedSkipped = (e?: { reason?: string }) => {
       const now = Date.now();
       if (now - lockedShownAt < LOCKED_TOAST_MS) return;
       lockedShownAt = now;
-      addToast({ description: "Locked elements were skipped", tone: "info", duration: LOCKED_TOAST_MS });
+      /* L2-016: a component part is refused for a different reason. */
+      const description =
+        e?.reason === "instance" ? "Part of a component — detach the instance to change it" : "Locked elements were skipped";
+      addToast({ description, tone: "info", duration: LOCKED_TOAST_MS });
     };
 
     /* CLIPBOARD_PASTE is emitted by pasteElement, once PER element — so a

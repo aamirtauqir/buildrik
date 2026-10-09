@@ -313,7 +313,14 @@ describe("delete / duplicate / group", () => {
     ]);
     run("delete");
     expect(composer.elements.removeElement).not.toHaveBeenCalled();
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+    /* L2-016: says why — a component part, not a locked element. */
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, { reason: "instance" });
+  });
+
+  it("cut on an element inside a component instance says it is a component part", () => {
+    composer.selection.getAllSelected.mockReturnValue([makeElement("el-instance", "container", { instance: true })]);
+    run("cut");
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, { reason: "instance" });
   });
 
   it("delete removes the unlocked elements and skips the locked one, confirmed", () => {
