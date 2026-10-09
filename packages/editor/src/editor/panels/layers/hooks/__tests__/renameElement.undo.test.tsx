@@ -6,6 +6,8 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useLayerActions } from "../useLayerActions";
 import { Composer } from "@/engine";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import { renameElement } from "../layersPersistence";
@@ -37,5 +39,26 @@ describe("renameElement — undo", () => {
     expect(c.elements.getElement("rn-hero")!.getCustomData(LAYER_NAME_KEY)).toBeUndefined();
     c.history.redo();
     expect(c.elements.getElement("rn-hero")!.getCustomData(LAYER_NAME_KEY)).toBe("Hero");
+  });
+
+  /* Live 2026-10-09: the engine reverted, but the Layers row kept the new
+     name — customNames only followed ELEMENT_RENAMED, which undo never fires. */
+  it("the Layers row name follows an undo and a redo", () => {
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home", {
+      id: "rn-page",
+      root: { id: "rn-root", type: "container", tagName: "div", classes: ["buildrick-page-root"], children: [] },
+    });
+    c.elements.setActivePage(page.id);
+    c.elements.addElement(c.elements.createElement("section" as never, { id: "rn-hero" }), page.root.id);
+    c.history.flushPending();
+    const { result } = renderHook(() => useLayerActions(c, page.id));
+    act(() => renameElement(c, "rn-hero", "Hero"));
+    c.history.flushPending();
+    expect(result.current.customNames.get("rn-hero")).toBe("Hero");
+    act(() => c.history.undo());
+    expect(result.current.customNames.get("rn-hero")).toBeUndefined();
+    act(() => c.history.redo());
+    expect(result.current.customNames.get("rn-hero")).toBe("Hero");
   });
 });

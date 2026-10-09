@@ -212,10 +212,16 @@ export function useLayerActions(
     if (!composer) return;
     const rescanAll = () => {
       const next = new Set<string>();
+      /* Names too: undo/redo of a rename fires no ELEMENT_RENAMED, so the row
+         kept the undone name (L2-013, live 2026-10-09). */
+      const names = new Map<string, string>();
       for (const el of composer.elements.getAllElements() ?? []) {
         if (el.isLocked()) next.add(el.getId());
+        const name = getLayerName(el);
+        if (name) names.set(el.getId(), name);
       }
       setLockedIds(next);
+      setCustomNames(names);
     };
     composer.on(EVENTS.HISTORY_UNDO, rescanAll);
     composer.on(EVENTS.HISTORY_REDO, rescanAll);
