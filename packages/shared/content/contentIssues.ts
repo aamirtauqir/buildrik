@@ -93,7 +93,10 @@ function isImageElement(el: ContentElement): boolean {
  *  or its type/tag, since neither the raw id nor a truncated `src` reads as
  *  a place a person recognizes. */
 function describeElement(el: ContentElement, pageName: string): string {
-  const label = el.content?.trim().slice(0, 40) || el.tagName?.toUpperCase() || el.type;
+  /* The kind in words when there is no text — "Home › IMG" was the raw tag
+     (L4-039). */
+  const kind = el.type && el.type !== "container" ? el.type : el.tagName?.toLowerCase() || "element";
+  const label = el.content?.trim().slice(0, 40) || (isImageElement(el) ? "Image" : kind.charAt(0).toUpperCase() + kind.slice(1).replace(/-/g, " "));
   return `${pageName} › ${label}`;
 }
 

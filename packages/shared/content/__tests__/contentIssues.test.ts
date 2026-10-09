@@ -188,4 +188,13 @@ describe("asContentRoot", () => {
     expect(asContentRoot(null)).toBeUndefined();
     expect(asContentRoot({ type: "container" })).toBeUndefined();
   });
+
+  /* L4-039: the location read "Home › IMG" — the raw tag. It names the
+     element the way a person does. */
+  it("names an element without text by its kind, not its tag", () => {
+    const pages = [
+      page({ id: "home", root: el({ id: "img1", type: "image", tagName: "img", attributes: { src: "/a.png" } }) }),
+    ];
+    expect(detectContentIssues(pages)[0].location).toBe("Home › Image");
+  });
 });
