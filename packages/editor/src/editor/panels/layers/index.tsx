@@ -214,16 +214,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     return () => clearTimeout(scrollTimeout);
   }, [selectedElement?.id, composer, expandIds, scrollToSelection]);
 
-  // Listen for explicit scroll requests ("Show in Layers" button)
-  React.useEffect(() => {
-    if (!composer) return;
-    const onScroll = () => setTimeout(scrollToSelection, 50);
-    composer.on("layers:scroll-to-selection", onScroll);
-    return () => {
-      composer.off("layers:scroll-to-selection", onScroll);
-    };
-  }, [composer, scrollToSelection]);
-
   // Drag handlers
   const handleDragStart = React.useCallback(
     (e: React.DragEvent, layerId: string, layerType: string) => {

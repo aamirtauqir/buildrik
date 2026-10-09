@@ -96,11 +96,6 @@ describe("standaloneActions", () => {
     });
   });
 
-  /* This asserted "layers:reveal", which nothing in the app listens for — the
-     shell listens for SHOW_IN_LAYERS. The test passed for as long as the menu
-     item did nothing. */
-
-
   describe("group / ungroup", () => {
     it("group-elements groups the selection and selects the new group", () => {
       const group = makeElementStub({ id: "group-1", type: "container" });

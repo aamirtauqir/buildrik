@@ -420,7 +420,6 @@ export const EVENTS = {
    *  lazy and unmounted until rail CMS is active. */
   UI_CMS_OPEN: "ui:cms-open",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
-  UI_TOGGLE_LAYERS: "ui:toggle:layers",
   UI_TOGGLE_ASSETS: "ui:toggle:assets",
   UI_TOGGLE_CODE: "ui:toggle:code",
   UI_TOGGLE_PREVIEW: "ui:toggle:preview",
@@ -610,10 +609,6 @@ export const EVENTS = {
   // ============================================
   // Navigation Events (UX Audit 2026)
   // ============================================
-  /** Navigate to Layers tab and scroll to selected element */
-  SHOW_IN_LAYERS: "ui:show-in-layers",
-  /** Trigger scroll to selected element in Layers panel */
-  LAYERS_SCROLL_TO_SELECTION: "layers:scroll-to-selection",
   /** Open the Build/Add panel in the left sidebar */
   /* (UI_TEMPLATES_NEWPAGE_ON deleted 2026-08-28 — the mode is a prop now.
      The event could never be heard: TabRouter mounts one tab at a time, so

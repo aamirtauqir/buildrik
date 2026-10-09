@@ -301,9 +301,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     };
   }, [composer]);
 
-  // 4 composer-driven side-effects (wizard hide, COMPONENT_CREATE_REQUESTED,
-  // SHOW_IN_LAYERS, overlay-defaults init) extracted into useEditorEventListeners
-  // — D2 stage 3.
+  // Composer-driven side-effects (COMPONENT_CREATE_REQUESTED, overlay-defaults
+  // init, …) live in useEditorEventListeners — D2 stage 3.
   // E7: mirror local CMS changes to the server (best-effort + retryable toast on failure).
   useCmsSync(composer, addToast);
 
@@ -324,8 +323,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     modals,
     state: {
-      setLeftPanelTab: guardedSetLeftPanelTab,
-      setIsLeftPanelOpen: state.setIsLeftPanelOpen,
       openLeftPanelToTab: guardedOpenLeftPanelToTab,
       setShowSpacingIndicators: state.setShowSpacingIndicators,
       setShowBadges: state.setShowBadges,

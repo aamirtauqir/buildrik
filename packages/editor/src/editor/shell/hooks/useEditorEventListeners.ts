@@ -5,10 +5,7 @@
  *
  *   1. COMPONENT_CREATE_REQUESTED → open the Create-Component modal
  *      with the requested element id.
- *   2. SHOW_IN_LAYERS  → switch to Layers tab + open left drawer +
- *      emit LAYERS_SCROLL_TO_SELECTION (delayed 100ms so the tab
- *      switch lands first).
- *   3. Overlay defaults init → seed the overlay toggles from
+ *   2. Overlay defaults init → seed the overlay toggles from
  *      composer.canvasIndicators.getOverlay() once the composer is
  *      ready.
  *
@@ -30,8 +27,6 @@ import { requestPasteHtml } from "@/editor/sidebar/tabs/build/insertGroupRequest
 
 // Subset of useStudioState setters we touch — keeps the dep list tight.
 export interface EditorEventListenerStateSetters {
-  setLeftPanelTab: (tab: string) => void;
-  setIsLeftPanelOpen: (open: boolean) => void;
   openLeftPanelToTab: (primaryTab: string, subTab?: string) => void;
   setShowSpacingIndicators: (v: boolean) => void;
   setShowBadges: (v: boolean) => void;
@@ -131,24 +126,6 @@ export function useEditorEventListeners({
     };
   }, [composer, toggleShortcuts]);
 
-  // 3) SHOW_IN_LAYERS → switch tab + open drawer + scroll-to-selection.
-  const { setLeftPanelTab, setIsLeftPanelOpen } = state;
-  React.useEffect(() => {
-    if (!composer) return;
-    const handle = () => {
-      setLeftPanelTab("layers");
-      setIsLeftPanelOpen(true);
-      // Small delay so the tab switch lands before LayersPanel scrolls.
-      setTimeout(() => {
-        composer.emit(EVENTS.LAYERS_SCROLL_TO_SELECTION, {});
-      }, 100);
-    };
-    composer.on(EVENTS.SHOW_IN_LAYERS, handle);
-    return () => {
-      composer.off(EVENTS.SHOW_IN_LAYERS, handle);
-    };
-  }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
-
   // 3b) UI_PANEL_OPEN → open the requested left-panel tab (and optional sub-screen).
   // Emitters: command palette navigation, canvas cmd palette (SmartSuggestions,
   // deleted 2026-09-02, never rendered). Allowlist on panel id — it historically emitted inspector
@@ -182,19 +159,6 @@ export function useEditorEventListeners({
       composer.off(EVENTS.UI_PANEL_OPEN, handle);
     };
   }, [composer, openLeftPanelToTab, VALID_LEFT_TABS]);
-
-  // 3c) UI_TOGGLE_LAYERS → switch to layers tab + open drawer.
-  React.useEffect(() => {
-    if (!composer) return;
-    const handle = () => {
-      setLeftPanelTab("layers");
-      setIsLeftPanelOpen(true);
-    };
-    composer.on(EVENTS.UI_TOGGLE_LAYERS, handle);
-    return () => {
-      composer.off(EVENTS.UI_TOGGLE_LAYERS, handle);
-    };
-  }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
 
   /* 3d) UI_TOGGLE_PREVIEW used to flip `composer.setPreviewMode` here, which
      starts the canvas interaction runtime, emits PREVIEW_MODE_CHANGED (no

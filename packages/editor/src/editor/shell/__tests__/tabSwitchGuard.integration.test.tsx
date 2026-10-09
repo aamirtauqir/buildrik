@@ -72,8 +72,6 @@ function Harness({ composer }: { composer: ReturnType<typeof makeComposer> }) {
       toggleShortcuts: vi.fn(),
     },
     state: {
-      setLeftPanelTab: guarded.setLeftPanelTab,
-      setIsLeftPanelOpen: vi.fn(),
       openLeftPanelToTab: guarded.openLeftPanelToTab,
       setShowSpacingIndicators: vi.fn(),
       setShowBadges: vi.fn(),

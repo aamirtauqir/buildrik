@@ -1,7 +1,6 @@
 /**
  * useEditorEventListeners.test.ts — covers the 4 composer-driven
- * side-effects + composer-null guards + cleanup-on-unmount + the
- * delayed SHOW_IN_LAYERS scroll dispatch.
+ * side-effects + composer-null guards + cleanup-on-unmount.
  *
  * @license BSD-3-Clause
  */
@@ -69,8 +68,6 @@ interface MockOpts {
     openSaveAsComponent: ReturnType<typeof vi.fn>;
   };
   state: {
-    setLeftPanelTab: ReturnType<typeof vi.fn>;
-    setIsLeftPanelOpen: ReturnType<typeof vi.fn>;
     setShowSpacingIndicators: ReturnType<typeof vi.fn>;
     setShowBadges: ReturnType<typeof vi.fn>;
     setShowGuides: ReturnType<typeof vi.fn>;
@@ -87,8 +84,6 @@ function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
         openSaveAsComponent: vi.fn(),
       },
     state: overrides.state ?? {
-      setLeftPanelTab: vi.fn(),
-      setIsLeftPanelOpen: vi.fn(),
       setShowSpacingIndicators: vi.fn(),
       setShowBadges: vi.fn(),
       setShowGuides: vi.fn(),
@@ -154,51 +149,6 @@ describe("useEditorEventListeners", () => {
     });
   });
 
-  // 3) SHOW_IN_LAYERS ----------------------------------------------------------
-  describe("SHOW_IN_LAYERS → switch tab + open drawer + delayed scroll", () => {
-    it("switches to layers tab and opens drawer immediately", () => {
-      mount(opts);
-      act(() => {
-        opts.composer._fire(EVENTS.SHOW_IN_LAYERS);
-      });
-      expect(opts.state.setLeftPanelTab).toHaveBeenCalledWith("layers");
-      expect(opts.state.setIsLeftPanelOpen).toHaveBeenCalledWith(true);
-    });
-
-    it("emits LAYERS_SCROLL_TO_SELECTION after 100ms delay", () => {
-      vi.useFakeTimers();
-      mount(opts);
-      act(() => {
-        opts.composer._fire(EVENTS.SHOW_IN_LAYERS);
-      });
-      // Pre-tick: scroll has not fired
-      expect(opts.composer.emit).not.toHaveBeenCalledWith(
-        EVENTS.LAYERS_SCROLL_TO_SELECTION,
-        expect.anything(),
-      );
-      act(() => {
-        vi.advanceTimersByTime(100);
-      });
-      expect(opts.composer.emit).toHaveBeenCalledWith(
-        EVENTS.LAYERS_SCROLL_TO_SELECTION,
-        {},
-      );
-    });
-
-    it("registers + cleans up the listener", () => {
-      const { unmount } = mount(opts);
-      expect(opts.composer.on).toHaveBeenCalledWith(
-        EVENTS.SHOW_IN_LAYERS,
-        expect.any(Function),
-      );
-      unmount();
-      expect(opts.composer.off).toHaveBeenCalledWith(
-        EVENTS.SHOW_IN_LAYERS,
-        expect.any(Function),
-      );
-    });
-  });
-
   // 4) OVERLAY DEFAULTS --------------------------------------------------------
   describe("Overlay defaults init", () => {
     it("seeds all four overlay setters from composer.canvas.indicators.getOverlay()", () => {
@@ -245,7 +195,6 @@ describe("useEditorEventListeners", () => {
       );
       // Cannot register anything — composer.on doesn't exist.
       expect(opts.modals.openCreateComponent).not.toHaveBeenCalled();
-      expect(opts.state.setLeftPanelTab).not.toHaveBeenCalled();
       expect(opts.state.setShowSpacingIndicators).not.toHaveBeenCalled();
     });
   });

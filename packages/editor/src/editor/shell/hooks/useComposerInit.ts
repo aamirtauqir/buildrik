@@ -556,10 +556,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       // History state is managed in the dedicated undo/redo useEffect
     };
 
-    // Templates is one surface now — the TemplatesTab drawer. The ⌘⇧T command
-    // emits ui:toggle:templates; translate it to opening the "templates" tab
-    // (StudioPanels listens for ui:switch-tab) instead of the retired modal.
-    const toggleTemplatesHandler = () => instance.emit("ui:switch-tab", { tab: "templates" });
     const toggleExporterHandler = () => setShowExporter((v) => !v);
     // AI is one surface now — the AITab rail panel. The ⌘K "AI" command emits
     // ui:toggle:ai; translate it to opening the "ai" tab (StudioPanels listens
@@ -572,7 +568,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     instance.on("composer:ready", composerReadyHandler);
     instance.on("project:changed", projectChangedHandler);
     instance.on("history:recorded", historyRecordedHandler);
-    instance.on("ui:toggle:templates", toggleTemplatesHandler);
     instance.on("ui:toggle:exporter", toggleExporterHandler);
     instance.on("ui:toggle:ai", toggleAIHandler);
     /* The engine names these BREAKPOINT_CHANGED and VIEWPORT_ZOOM (Viewport.ts
@@ -596,7 +591,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       instance.off("composer:ready", composerReadyHandler);
       instance.off("project:changed", projectChangedHandler);
       instance.off("history:recorded", historyRecordedHandler);
-      instance.off("ui:toggle:templates", toggleTemplatesHandler);
       instance.off("ui:toggle:exporter", toggleExporterHandler);
       instance.off("ui:toggle:ai", toggleAIHandler);
       instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);

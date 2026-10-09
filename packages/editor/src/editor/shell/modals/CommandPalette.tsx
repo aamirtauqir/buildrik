@@ -274,6 +274,9 @@ function buildCommands(
     { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.emit(EVENTS.ZOOM_OUT, {})) },
     /* Ctrl+1 is fit (CanvasFooterToolbar binds ⌘1 to fit, ⌘0 to 100%). */
     { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Ctrl+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },
+    /* The footer flyout's third row (⌘2). Canvas has always listened for
+       ZOOM_SELECTION; nothing emitted it (DQ-003). */
+    { id: "view-zoom-selection", label: "Zoom to selection", group: "More", shortcut: "Ctrl+2", handler: run(() => composer.emit(EVENTS.ZOOM_SELECTION, {})) },
     {
       id: "history-clear",
       label: "Clear history",

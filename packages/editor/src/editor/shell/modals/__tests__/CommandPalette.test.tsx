@@ -310,6 +310,15 @@ describe("CommandPalette — search", () => {
     expect(screen.getByTestId("cmdk-kbd-view-fit").textContent).toMatch(/1$/);
   });
 
+  /* DQ-003: Canvas listened for ZOOM_SELECTION and nothing emitted it. */
+  it("Zoom to selection emits ZOOM_SELECTION and prints Ctrl+2", () => {
+    const { composer } = renderPalette();
+    type("zoom to selection");
+    expect(screen.getByTestId("cmdk-kbd-view-zoom-selection").textContent).toMatch(/2$/);
+    fireEvent.click(screen.getByTestId("cmdk-row-view-zoom-selection"));
+    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.ZOOM_SELECTION, {});
+  });
+
   /* PD-38 / C-6 (A14-3): "Clear history" used to emit HISTORY_CLEARED as pure
      notification — nothing actually cleared the undo stack. Kept, but now a
      real op behind a confirm. */
