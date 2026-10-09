@@ -104,14 +104,6 @@ export function useLayerContextActions(
         case "duplicate":
           runOnRow("duplicate");
           break;
-        case "hide":
-        case "show":
-          actionsHook.toggleVisibility(nodeId, syntheticEvent);
-          break;
-        case "lock":
-        case "unlock":
-          actionsHook.toggleLock(nodeId, syntheticEvent);
-          break;
         case "delete":
           /* Decision #17: one row deletes at once (the shell's
              useHistoryFeedback toasts it with Undo); two or more ask first. */
@@ -129,21 +121,6 @@ export function useLayerContextActions(
           });
           break;
         }
-        case "selectChildren": {
-          const node = findById(treeHook.layers, nodeId);
-          if (node && node.children.length > 0) {
-            node.children.forEach((child, i) =>
-              selectionHook.selectLayer(child.id, { meta: i > 0 })
-            );
-          }
-          break;
-        }
-        case "moveToTop":
-          actionsHook.moveToTop(nodeId, treeHook.layers);
-          break;
-        case "moveToBottom":
-          actionsHook.moveToBottom(nodeId, treeHook.layers);
-          break;
         case "moveToPage":
           requestMoveToPage(multi ? [...selectionHook.selectedIds] : [nodeId]);
           break;

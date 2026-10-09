@@ -91,13 +91,6 @@ export type LayerAction =
   | "paste"
   | "rename"
   | "duplicate"
-  | "hide"
-  | "show"
-  | "lock"
-  | "unlock"
   | "delete"
   | "group"
-  | "selectChildren"
-  | "moveToTop"
-  | "moveToBottom"
   | "moveToPage";

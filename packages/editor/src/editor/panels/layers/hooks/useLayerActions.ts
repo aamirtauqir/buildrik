@@ -7,7 +7,7 @@
  * - Toggle visibility/lock with DOM attribute sync
  * - Inline rename editing
  * - Delete with child count confirmation
- * - Duplicate, moveToTop, moveToBottom, groupLayers
+ * - groupLayers, moveToPage
  *
  * @license BSD-3-Clause
  */
@@ -41,8 +41,6 @@ export interface UseLayerActionsReturn {
   startEditing: (id: string, currentName: string, e: React.MouseEvent) => void;
   saveEditedName: () => void;
   cancelEditing: () => void;
-  moveToTop: (id: string, layers: LayerItem[]) => void;
-  moveToBottom: (id: string, layers: LayerItem[]) => void;
   /** False when nothing was grouped (a locked or instance-owned row). */
   groupLayers: (ids: string[], layers: LayerItem[]) => boolean;
   /** Move to the END of another page's root (board 4418:82847), one
@@ -284,34 +282,6 @@ export function useLayerActions(
     setEditingName("");
   }, []);
 
-  const moveToTop = React.useCallback(
-    (id: string, _layers: LayerItem[]) => {
-      if (!composer) return;
-      const el = composer.elements.getElement(id);
-      const parent = el?.getParent?.();
-      if (!el || !parent) return;
-      composer.beginTransaction("move-layer-top");
-      composer.elements.moveElement(id, parent.getId(), 0);
-      composer.endTransaction();
-    },
-    [composer]
-  );
-
-  const moveToBottom = React.useCallback(
-    (id: string, _layers: LayerItem[]) => {
-      if (!composer) return;
-      const el = composer.elements.getElement(id);
-      const parent = el?.getParent?.();
-      if (!el || !parent) return;
-      const idx = parent.getChildCount();
-      composer.beginTransaction("move-layer-bottom");
-      composer.elements.moveElement(id, parent.getId(), idx);
-      composer.endTransaction();
-    },
-    [composer]
-  );
-
-
   const groupLayers = React.useCallback(
     (ids: string[], _layers: LayerItem[]) => {
       /* One element groups too — v3 4418:82409 "Wrapped Heading in a group". */
@@ -379,8 +349,6 @@ export function useLayerActions(
     startEditing,
     saveEditedName,
     cancelEditing,
-    moveToTop,
-    moveToBottom,
     groupLayers,
     moveToPage,
   };
