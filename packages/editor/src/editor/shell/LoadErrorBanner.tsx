@@ -92,12 +92,12 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
             failure, and a screen reader repeating "warning sign" adds nothing. */}
         <span aria-hidden="true">⚠&nbsp;&nbsp;</span>
         {isAuth
-          ? "Session expired. Sign in to load this site from the dashboard — you're seeing local changes for now."
+          ? "Session expired. Sign in to load this site — anything done here is not saved until it loads."
           : isMissing
             ? "This site isn't there anymore. It was deleted, or it isn't yours to open. Deleting is permanent — there is no trash to restore from — so nothing you do here can be saved."
             : isForbidden
               ? "Your role changed, or the site isn't yours to open. Ask the owner — signing in again won't change it, and nothing you do here can be saved."
-              : "Couldn't load the latest version of this site. You're seeing local changes for now."}
+              : "Couldn't load this site. Retry — anything done here is not saved until it loads."}
       </div>
       <div className="tw:flex tw:items-center tw:gap-2">
         {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className={QUIET}>Dismiss</Button>}
