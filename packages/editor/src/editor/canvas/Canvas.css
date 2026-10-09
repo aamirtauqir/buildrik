@@ -248,14 +248,18 @@
   z-index: 100;
 }
 
+/* DQ-022: a dotted neutral, not the off-palette pink (F38BA8) — hue is never
+   load-bearing in chrome (DESIGN.md A2); the lock glyph's own rest colour. */
 [data-buildrick-id][data-locked="true"] {
-  outline: 2px dotted #f38ba8;
+  outline: 2px dotted var(--bk-ink-muted);
   cursor: not-allowed !important;
   user-select: none;
 }
 
+/* Selected wins over locked: board 7995:205108 ("23 · Locked element")
+   draws the locked, selected heading with the ordinary accent ring. */
 [data-buildrick-id][data-locked="true"][data-selected="true"] {
-  outline: 2px dotted #f38ba8;
+  outline: 2px solid var(--bk-accent);
   outline-offset: 2px;
 }
 
@@ -709,30 +713,33 @@ button:hover > .bd-canvas-empty-cta__thumb {
 }
 
 [data-buildrick-id][contenteditable="true"] {
-  outline: 2px solid var(--bk-accent, #667eea) !important;
+  outline: 2px solid var(--bk-accent) !important;
   outline-offset: 2px;
-  background: rgba(102, 126, 234, 0.05) !important;
+  /* DQ-022: was a 5% wash of the banned legacy hue 667EEA, rendered on
+     every inline edit. Still 5% (an opaque tint would cover the
+     element's own background), now mixed from the accent token. */
+  background: color-mix(in srgb, var(--bk-accent) 5%, transparent) !important;
   cursor: text !important;
-  caret-color: var(--bk-accent, #667eea);
+  caret-color: var(--bk-accent);
   min-height: 1em;
   border-radius: 2px;
 }
 
 [data-buildrick-id][contenteditable="true"]:empty::before {
   content: 'Type here...';
-  color: var(--bk-ink-muted, #6b7280);
+  color: var(--bk-ink-muted);
   font-style: italic;
   pointer-events: none;
 }
 
 [data-buildrick-id][contenteditable="true"]::selection {
-  background: rgba(102, 126, 234, 0.3);
+  background: color-mix(in srgb, var(--bk-accent) 30%, transparent);
 }
 
 @keyframes buildrick-element-flash {
   0% {
-    background-color: rgba(102, 126, 234, 0.3);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.4);
+    background-color: color-mix(in srgb, var(--bk-accent) 30%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bk-accent) 40%, transparent);
   }
   100% {
     background-color: transparent;
@@ -745,22 +752,22 @@ button:hover > .bd-canvas-empty-cta__thumb {
 }
 
 :focus-visible {
-  outline: 2px solid var(--bk-accent, #667eea);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 2px;
 }
 
 [data-buildrick-id]:focus-visible {
-  outline: 3px solid var(--bk-accent, #667eea);
+  outline: 3px solid var(--bk-accent);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+  box-shadow: var(--bk-shadow-focus);
 }
 
 .buildrick-input:focus-visible,
 .buildrick-select:focus-visible,
 .buildrick-textarea:focus-visible {
-  outline: 2px solid var(--bk-accent, #667eea);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 0;
-  border-color: var(--bk-accent, #667eea);
+  border-color: var(--bk-accent);
 }
 
 /* .buildrick-sr-only deleted 2026-05-07 — duplicate of canonical .bd-sr-only
