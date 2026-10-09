@@ -1,0 +1,31 @@
+{
+  "limit": 800,
+  "files": {
+    "src/engine/media/MediaManager.ts": 1855,
+    "src/engine/Composer.ts": 1452,
+    "src/engine/export/ExportEngine.ts": 1399,
+    "src/editor/media/LibraryManager.tsx": 1259,
+    "src/editor/sidebar/tabs/review/ReviewTab.tsx": 1238,
+    "src/editor/design-system/ui/BrandWorkspace.tsx": 1230,
+    "src/editor/sidebar/tabs/settings/SettingsTab.tsx": 1179,
+    "src/editor/sidebar/tabs/publish/PublishTab.tsx": 1143,
+    "src/engine/VersionTimelineManager.ts": 1078,
+    "src/editor/media/components/AssetGrid.tsx": 1063,
+    "src/services/BuildrikSyncProvider.ts": 1051,
+    "src/editor/shell/StudioPanels.tsx": 1041,
+    "src/services/cmsSync.ts": 1022,
+    "src/editor/shell/StudioHeader.tsx": 1010,
+    "src/shared/constants/events.ts": 1005,
+    "src/editor/shell/hooks/useComposerInit.ts": 1002,
+    "src/editor/canvas/Canvas.tsx": 993,
+    "src/shared/types/media.ts": 977,
+    "src/editor/shell/AquibraStudio.tsx": 966,
+    "src/shared/constants/icons.ts": 958,
+    "src/editor/sidebar/tabs/media/components/SlimLauncher.tsx": 909,
+    "src/engine/HistoryManager.ts": 895,
+    "src/editor/media/components/AssetDetailsPanel.tsx": 886,
+    "src/engine/designSystem/defaultTokens.ts": 867,
+    "src/engine/collaboration/CollaborationManager.ts": 827,
+    "src/engine/styles/StyleEngine.ts": 826
+  }
+}
