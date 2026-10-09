@@ -44,6 +44,7 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
 import { useDynamicPagesSummary } from "./useDynamicPagesSummary";
+import { pageFileNames } from "@/engine/export";
 import "./PagesTab.css";
 
 export interface PagesTabProps {
@@ -110,6 +111,23 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      selecting three and pressing Delete removed all three on the spot. */
   const [bulkDeleteIds, setBulkDeleteIds] = React.useState<string[] | null>(null);
   const deleteTarget = p.pages.find((pg) => pg.id === deleteTargetId);
+  /* EDT-057 (board E3): deleting a collection's template page stops its
+     record pages publishing — the confirm names the collection and how many. */
+  const deleteTemplateNote = React.useMemo(() => {
+    if (!composer || !deleteTargetId) return "";
+    const file = pageFileNames(composer.elements.getAllPages()).get(deleteTargetId);
+    const generating = (composer.cms?.collections.getAllCollections() ?? []).filter(
+      (c) => c.pageSlugPattern && file && c.pageTemplatePath === file
+    );
+    if (generating.length === 0) return "";
+    const counts = generating.map((c) => dynamicPages.byCollection[c.id]);
+    const n = counts.every((x) => x !== undefined) ? counts.reduce<number>((sum, x) => sum + (x ?? 0), 0) : null;
+    const pagesStop =
+      n === null ? "record pages stop" : `${n} record page${n === 1 ? " stops" : "s stop"}`;
+    return ` It is the template for ${listNames(generating.map((c) => c.name))} — ${
+      generating.length === 1 ? "its" : "their"
+    } ${pagesStop} publishing.`;
+  }, [composer, deleteTargetId, dynamicPages.byCollection]);
 
   // Name conflict error state (Screen GoEJk)
   const [nameError, setNameError] = React.useState<string | null>(null);
@@ -509,7 +527,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
            sentence, and this door raises no toast (only the page-tab bar
            does), so "immediately after" pointed at a control that is not
            there. Undo is the keyboard one — walked live. */
-        message="This page and everything on it is removed. Undo (⌘Z) brings it back."
+        message={`This page and everything on it is removed.${deleteTemplateNote} Undo (⌘Z) brings it back.`}
         confirmLabel="Delete page"
         tone="destructive"
       />

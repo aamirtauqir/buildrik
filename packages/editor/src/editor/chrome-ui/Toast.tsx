@@ -36,6 +36,13 @@
  * bottom. The overlay root is a sibling of `.bd-studio`, so this is measured,
  * not inherited.
  *
+ * THE LAYER is --bk-z-toast, above everything — except an open modal
+ * (EDT-017). While any `aria-modal` dialog is open (every OverlayMount, so
+ * every Modal, confirm and palette) the viewport drops to --bk-z-popover,
+ * under the modal scrim: a sync toast once sat on the Publish confirm's
+ * Cancel. The toast stays visible, dimmed by the scrim, and comes back up
+ * when the modal closes.
+ *
  * THE SURFACE is those boards' card: white (`--bk-bg-elevated`), a 1px
  * `--bk-border` border, r8, pad 16, gap 8, 460 wide, no shadow. Title 14/20
  * semibold, body 13/20 regular, both gray-700 (the boards' #334155 has no
@@ -259,6 +266,23 @@ const TOAST_WIDTH = 460;
 /** Boards 8134:212718 et al.: the card's right edge sits 48px from the window's. */
 const VIEWPORT_ANCHOR: Anchor = { right: 48, bottom: 48 };
 
+const MODAL_SELECTOR = '[aria-modal="true"]';
+
+/** True while an aria-modal dialog is open anywhere in the chrome. Watched
+ *  only while toasts are showing — there is nothing to re-layer otherwise. */
+function useModalOpen(watch: boolean): boolean {
+  const [open, setOpen] = React.useState(false);
+  React.useLayoutEffect(() => {
+    if (!watch) return;
+    const update = () => setOpen(document.querySelector(MODAL_SELECTOR) !== null);
+    update();
+    const mo = new MutationObserver(update);
+    mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["aria-modal"] });
+    return () => mo.disconnect();
+  }, [watch]);
+  return watch && open;
+}
+
 function ToastViewport() {
   const [toasts, setToasts] = React.useState<QueuedToast[]>(() => [...store.toasts]);
   const [anchor, setAnchor] = React.useState<Anchor>(VIEWPORT_ANCHOR);
@@ -292,12 +316,15 @@ function ToastViewport() {
     };
   }, [showing]);
 
+  const underModal = useModalOpen(showing);
+
   if (typeof document === "undefined") return null;
   const hasError = toasts.some((t) => t.tone === "error");
   return createPortal(
     <div
-      className="tw:fixed tw:z-[80] tw:flex tw:flex-col tw:items-end tw:gap-2 tw:max-w-[calc(100vw-32px)] tw:pointer-events-none"
+      className={`tw:fixed ${underModal ? "tw:z-[var(--bk-z-popover)]" : "tw:z-[var(--bk-z-toast)]"} tw:flex tw:flex-col tw:items-end tw:gap-2 tw:max-w-[calc(100vw-32px)] tw:pointer-events-none`}
       style={{ right: anchor.right, bottom: anchor.bottom }}
+      data-under-modal={underModal ? "true" : undefined}
       role="status"
       aria-live={hasError ? "assertive" : "polite"}
       aria-atomic="false"

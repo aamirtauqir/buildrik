@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ToastInput, dismissToastKey } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast, dismissToastKey } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
@@ -34,7 +34,14 @@ import {
   keepStoredTokensOnSave,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
-import { clearUnsaved, keepUnsaved, markUnsavedOffScreen, readUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
+import {
+  clearUnsaved,
+  keepUnsaved,
+  markUnsavedOffScreen,
+  onOffScreenSettled,
+  readUnsaved,
+  takeOffScreenUnsaved,
+} from "@/services/unsavedRecovery";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
@@ -330,7 +337,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 status: "error",
                 error: "This site has edits that never reached the server.",
               });
-              addToastRef.current?.({
+              const recoveryToast = addToastRef.current?.({
                 title: "Some work never reached the server",
                 description:
                   "A save failed before this page was reloaded. The version on screen is the server's. Restoring puts your unsaved edits back so you can save them again.",
@@ -357,6 +364,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 },
                 duration: Infinity,
               });
+              /* EDT-018: the offer is spent once the copy is handed over —
+                 by Restore, or by a manual Retry that restores it first
+                 (useSaveCallback) — or discarded. A warning toast does not
+                 dismiss on its action, so it stood over the saved work
+                 inviting a second, empty restore. */
+              if (recoveryToast) onOffScreenSettled(siteId, () => dismissToast(recoveryToast));
             } else {
               setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             }

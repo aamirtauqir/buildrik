@@ -110,12 +110,19 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   },
 }));
 
+const { dismissToastMock } = vi.hoisted(() => ({ dismissToastMock: vi.fn() }));
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
+  dismissToast: dismissToastMock,
+}));
+
 vi.mock("@/services/AssetUploadService", () => ({
   createRemoteAssetSync: vi.fn(() => ({})),
 }));
 
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { deriveLifecycleState } from "@/editor/shell/lifecycle";
+import { takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import {
   getSiteIdFromUrl,
   isSaveConflictPending,
@@ -331,6 +338,40 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
       expect(mockComposer.importProject).toHaveBeenLastCalledWith({ pages: [{ id: "p" }, { id: "q" }], styles: [] });
       expect(mockComposer.emit).toHaveBeenCalledWith("project:changed", expect.anything());
     } finally {
+      localStorage.removeItem("bk-unsaved-v1-site-9");
+    }
+  });
+
+  /* EDT-018: the prompt outlived the save of the restored work ("still there
+     8 s later, topbar Done"). Once the copy is handed over — by Restore, or by
+     a Retry that restores it first — the prompt has nothing left to offer. */
+  it.each([
+    ["Restore my edits", (t: { action?: { onClick: () => void } }) => t.action!.onClick()],
+    ["a Retry that restores the copy first", () => void takeOffScreenUnsaved("site-9")],
+  ])("the recovery prompt goes once the copy is handed over (%s)", async (_door, handOver) => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
+    localStorage.setItem(
+      "bk-unsaved-v1-site-9",
+      JSON.stringify({ project: { pages: [{ id: "q" }], styles: [] }, at: "2026-10-09T00:00:00.000Z" }),
+    );
+    dismissToastMock.mockClear();
+    try {
+      const params = makeParams({ addToast: vi.fn().mockReturnValue("recovery-toast") });
+      renderHook(() => useComposerInit(params));
+      await act(async () => {
+        mockComposer.emit("composer:ready");
+        await flushMicrotasks();
+      });
+      const toast = vi
+        .mocked(params.addToast!)
+        .mock.calls.map(([t]) => t)
+        .find((t) => /never reached the server/i.test(t.title ?? ""));
+      expect(dismissToastMock).not.toHaveBeenCalled();
+      act(() => handOver(toast!));
+      expect(dismissToastMock).toHaveBeenCalledWith("recovery-toast");
+    } finally {
+      takeOffScreenUnsaved("site-9");
       localStorage.removeItem("bk-unsaved-v1-site-9");
     }
   });

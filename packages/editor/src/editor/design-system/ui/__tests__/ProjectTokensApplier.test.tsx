@@ -101,6 +101,29 @@ describe("ProjectTokensApplier", () => {
     expect(document.documentElement.dataset.theme).toBe("dark");
   });
 
+  it("a dark preview paints the canvas frame with the page background, as the export paints the body (BRP1-M12)", () => {
+    const frameRule = ".buildrick-canvas[data-buildrick-canvas]{background-color:var(--buildrick-design-color-page-background)}";
+    const page = (dark?: string) => v6Token({ id: "color-page-background", value: "transparent", layer: "semantic", ...(dark ? { dark } : {}) });
+    const composer = {
+      on: () => {}, off: () => {},
+      getProjectSettings: () => ({ darkMode: "auto", designTokens: [] }),
+      designSystem: { preview: null as unknown },
+    } as unknown as Composer & { designSystem: { preview: unknown } };
+    composer.designSystem.preview = { tokens: [page("#0F172A")], darkMode: "auto", theme: "dark", source: "canvas" };
+    let view = render(<ProjectTokensApplier composer={composer} />);
+    expect(css()).toContain(`:root[data-theme="dark"] ${frameRule}`);
+    view.unmount();
+    /* light: the card stays white under a transparent page */
+    composer.designSystem.preview = { tokens: [page("#0F172A")], darkMode: "auto" };
+    view = render(<ProjectTokensApplier composer={composer} />);
+    expect(css()).not.toContain(frameRule);
+    view.unmount();
+    /* no dark page colour: the white card is kept rather than the grey behind it */
+    composer.designSystem.preview = { tokens: [page()], darkMode: "auto", theme: "dark" };
+    render(<ProjectTokensApplier composer={composer} />);
+    expect(css()).not.toContain(frameRule);
+  });
+
   it("never writes per-variable inline styles on <html>", () => {
     const { composer } = stubComposer([]);
     render(<ProjectTokensApplier composer={composer} />);

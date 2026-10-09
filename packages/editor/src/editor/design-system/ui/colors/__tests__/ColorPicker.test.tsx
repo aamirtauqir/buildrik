@@ -11,6 +11,7 @@
 
 import { describe, it, expect, vi, type Mock } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { ColorPicker } from "../ColorPicker";
@@ -68,6 +69,22 @@ describe("ColorPicker — hex input", () => {
     expect(screen.getByText(/Enter a valid hex/)).toBeInTheDocument();
     fireEvent.change(hex, { target: { value: "123456" } });
     expect(screen.queryByText(/Enter a valid hex/)).not.toBeInTheDocument();
+  });
+
+  /* Live QA 2026-10-09: typing #C2410C key by key gave "#CC2244C" — the
+     valid prefix "#C24" was expanded to #CC2244 and written back into the
+     field mid-typing, and the next keys landed after it. */
+  it("typing a 6-digit hex key by key keeps exactly what was typed", async () => {
+    const onSave = vi.fn();
+    render(<ColorPicker initialHex="#1A56DB" onChange={vi.fn()} onCancel={vi.fn()} onSave={onSave} />);
+    const hex = screen.getByLabelText("Hex color value") as HTMLInputElement;
+    const user = userEvent.setup();
+    await user.clear(hex);
+    await user.type(hex, "#C2410C");
+    expect(hex.value).toBe("#C2410C");
+    expect(screen.queryByText(/Enter a valid hex/)).not.toBeInTheDocument();
+    await user.click(screen.getByText("Apply"));
+    expect(onSave).toHaveBeenCalledWith("#C2410C");
   });
 
   it("accepts 3-digit shorthand", () => {
