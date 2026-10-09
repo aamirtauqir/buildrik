@@ -459,6 +459,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     serverHasUnpublishedChanges: publishJob.hasUnpublishedChanges,
     serverBlock: publishJob.blockedReason,
     saveConflict: state.saveState.status === "conflict",
+    saveFailed: state.saveState.status === "error",
   });
 
   // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1).

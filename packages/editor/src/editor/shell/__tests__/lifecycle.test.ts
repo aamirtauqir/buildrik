@@ -179,6 +179,9 @@ describe("deriveLifecycleState — off the happy path", () => {
       [{ publishEnabled: false }, "Publishing isn't switched on for this workspace yet"],
       [{ isViewer: true }, "Viewers can't publish — ask an editor"],
       [{ saveConflict: true }, "Resolve the sync conflict before publishing"],
+      /* L5-060: publish exports the live canvas, so after a failed save it
+         would ship edits no stored project or version holds. */
+      [{ saveFailed: true }, "Save your changes before publishing — the last save failed"],
       [{ offline: true }, "Can't publish while offline"],
     ];
     for (const [over, reason] of cases) {

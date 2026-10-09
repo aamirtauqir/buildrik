@@ -60,6 +60,8 @@ export interface UseLifecycleInput {
   serverBlock: string | null;
   /** C-3: the save state is `conflict` — this tab is behind the server. */
   saveConflict: boolean;
+  /** L5-060: the save state is `error` — the server does not hold the canvas. */
+  saveFailed?: boolean;
 }
 
 export interface Lifecycle {
@@ -103,6 +105,7 @@ export function useLifecycle({
   serverHasUnpublishedChanges,
   serverBlock,
   saveConflict,
+  saveFailed = false,
 }: UseLifecycleInput): Lifecycle {
   const isViewer = useEditorRole() === "VIEWER";
   const publishEnabled = isFeatureEnabled("publish");
@@ -242,8 +245,9 @@ export function useLifecycle({
       offline,
       errorCount,
       saveConflict,
+      saveFailed,
     }),
-    [reviewStatus, publishedUrl, hasUnpublishedChanges, isViewer, publishEnabled, offline, errorCount, saveConflict],
+    [reviewStatus, publishedUrl, hasUnpublishedChanges, isViewer, publishEnabled, offline, errorCount, saveConflict, saveFailed],
   );
 
   const nextMove = React.useMemo(() => deriveLifecycleState(input), [input]);

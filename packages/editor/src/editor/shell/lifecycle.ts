@@ -114,6 +114,9 @@ export interface LifecycleInput {
   /** C-3: a save was refused because this tab is behind the server. Its
    *  pages are a behind-copy, so publishing them would overwrite newer work. */
   saveConflict?: boolean;
+  /** L5-060: the last save failed. Publish exports the live canvas, so it
+   *  would ship edits that no stored project or version holds. */
+  saveFailed?: boolean;
 }
 
 /** Which door the single filled button opens. Both review kinds land on the
@@ -235,6 +238,7 @@ function publishBlocker(i: LifecycleInput): string | null {
   if (i.isViewer) return "Viewers can't publish — ask an editor";
   if (i.offline) return "Can't publish while offline";
   if (i.saveConflict) return "Resolve the sync conflict before publishing";
+  if (i.saveFailed) return "Save your changes before publishing — the last save failed";
   return null;
 }
 
