@@ -383,11 +383,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 loaded: remote.assets.length,
               });
             }
-            addToastRef.current({
-              title: "Project loaded",
-              description: "Loaded from dashboard.",
-              tone: "success",
-            });
           })
           .catch((err) => {
             console.error("[BuildrikSync] load failed:", err);

@@ -434,9 +434,8 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
       [{ id: "f1" }],
     );
 
-    expect(params.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "Project loaded", tone: "success" }),
-    );
+    // L1-028: a normal load is silent — toasts are for recovery and conflicts.
+    expect(params.addToast).not.toHaveBeenCalledWith(expect.objectContaining({ tone: "success" }));
     // the localStorage fallback must NOT also run
     expect(mockComposer.loadProject).not.toHaveBeenCalled();
   });
