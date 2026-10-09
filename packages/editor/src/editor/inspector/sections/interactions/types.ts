@@ -7,6 +7,10 @@ import { GSAPEngine } from "../../../../engine/animations";
 import type { InteractionAnimationConfig } from "../../../../engine/interactions/types";
 import type { SectionTier } from "../../shared/controls/Section";
 import type { Composer } from "@/engine";
+import {
+  ArrowDownUp, CircleDashed, Crosshair, DoorOpen, Eye, EyeOff, FileText, Hand, LogOut, Mouse,
+  MousePointer2, MousePointerClick, Move, ScrollText, Zap, type LucideIcon,
+} from "lucide-react";
 import type { AnimationConfig } from "@/shared/types/animations";
 
 // ============================================================================
@@ -80,28 +84,29 @@ export interface InteractionsSectionProps {
 // CONSTANTS
 // ============================================================================
 
-export const TRIGGER_GROUPS = {
+/* Lucide glyphs, not emoji (L2-027; DESIGN.md anti-slop). */
+export const TRIGGER_GROUPS: Record<string, Array<{ value: string; label: string; icon: LucideIcon }>> = {
   element: [
-    { value: "hover", label: "On hover", icon: "👆" },
-    { value: "click", label: "On click", icon: "🖱" },
-    { value: "active", label: "While pressed", icon: "👇" },
-    { value: "focus", label: "On focus", icon: "🎯" },
-    { value: "blur", label: "On blur", icon: "💨" },
+    { value: "hover", label: "On hover", icon: MousePointer2 },
+    { value: "click", label: "On click", icon: MousePointerClick },
+    { value: "active", label: "While pressed", icon: Hand },
+    { value: "focus", label: "On focus", icon: Crosshair },
+    { value: "blur", label: "On blur", icon: CircleDashed },
   ],
   page: [
-    { value: "page-load", label: "On page load", icon: "📄" },
-    { value: "page-scroll", label: "On page scroll", icon: "📜" },
-    { value: "page-leave", label: "On page leave", icon: "👋" },
+    { value: "page-load", label: "On page load", icon: FileText },
+    { value: "page-scroll", label: "On page scroll", icon: ScrollText },
+    { value: "page-leave", label: "On page leave", icon: LogOut },
   ],
   scroll: [
-    { value: "scroll-into-view", label: "On scroll into view", icon: "👁" },
-    { value: "while-scrolling", label: "While scrolling", icon: "🔄" },
-    { value: "scroll-out", label: "On scroll out", icon: "👁‍🗨" },
+    { value: "scroll-into-view", label: "On scroll into view", icon: Eye },
+    { value: "while-scrolling", label: "While scrolling", icon: ArrowDownUp },
+    { value: "scroll-out", label: "On scroll out", icon: EyeOff },
   ],
   mouse: [
-    { value: "mouse-over", label: "On mouse over", icon: "🐭" },
-    { value: "mouse-move", label: "On mouse move", icon: "➡️" },
-    { value: "mouse-out", label: "On mouse out", icon: "🚪" },
+    { value: "mouse-over", label: "On mouse over", icon: Mouse },
+    { value: "mouse-move", label: "On mouse move", icon: Move },
+    { value: "mouse-out", label: "On mouse out", icon: DoorOpen },
   ],
 };
 
@@ -181,5 +186,5 @@ export const getTriggerInfo = (trigger: InteractionTrigger) => {
     const found = group.find((t) => t.value === trigger);
     if (found) return found;
   }
-  return { value: trigger, label: trigger, icon: "⚡" };
+  return { value: trigger, label: trigger, icon: Zap };
 };
