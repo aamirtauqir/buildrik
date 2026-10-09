@@ -190,6 +190,14 @@ describe("GenerateBlockScreen", () => {
     expect(generate).toHaveBeenCalledTimes(2);
   });
 
+  /* L5-011: the screen promised a review step it never had — the block goes
+     straight onto the page, so the copy says that and points at Undo. */
+  it("idle copy does not promise a review step", () => {
+    render(<GenerateBlockScreen composer={makeComposer().composer} onBack={vi.fn()} generate={vi.fn()} />);
+    expect(screen.queryByText(/review the draft/i)).toBeNull();
+    expect(screen.getByText(/goes straight onto the page/)).toBeTruthy();
+  });
+
   it("an edit that inserted nothing is an error, not 'Block inserted'", async () => {
     const { composer } = makeComposer(["h1"]);
     render(

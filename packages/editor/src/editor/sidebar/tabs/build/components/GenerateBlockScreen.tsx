@@ -272,8 +272,8 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
               </Button>
             ))}
             <p className="tw:m-0 tw:px-4 tw:pt-3 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
-              You review the draft before it lands on the page. Generated blocks use your Brand colours and fonts, and you
-              can undo the insert.
+              The block goes straight onto the page, and one Undo takes it back. Generated blocks use your Brand colours
+              and fonts.
             </p>
             <div className="tw:px-4 tw:pt-16 tw:pb-3 tw:flex tw:flex-col tw:gap-2">
               <div className="tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">GENERATE</div>
