@@ -123,6 +123,33 @@ describe("SeoTab title field", () => {
     expect(generateContent).toHaveBeenCalled();
   });
 
+  /* L5-017: the prompt carried only the page name ("Home") inside a generic
+     "headline" template, so a local-business site got web-builder marketing.
+     It now carries the site name and the page's own copy, unwrapped. */
+  it("grounds the AI title in the site name and the page's own copy", async () => {
+    const heading = { getType: () => "heading", getContent: () => "<b>Fresh</b> bread daily", getChildren: () => [] };
+    const para = { getType: () => "paragraph", getContent: () => "Family bakery in Leeds since 1982.", getChildren: () => [] };
+    const root = { getType: () => "container", getContent: () => "", getChildren: () => [heading, para] };
+    const composer = {
+      getProjectMetadata: () => ({ name: "Rosie's Bakery" }),
+      getProjectSettings: () => ({}),
+      elements: {
+        getAllPages: () => [{ id: "p1", name: "Home", slug: "home", root: { id: "root" } }],
+        getElement: (id: string) => (id === "root" ? root : null),
+      },
+    } as unknown as Composer;
+    render(<SeoTab s={makeSettings({ seoTitle: "" })} page={makePage()} composer={composer} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
+    });
+    const { generateContent } = await import("@/shared/utils/openai");
+    const [prompt, , , options] = vi.mocked(generateContent).mock.calls[0];
+    expect(prompt).toContain("Rosie's Bakery");
+    expect(prompt).toContain("Fresh bread daily");
+    expect(prompt).toContain("Family bakery in Leeds since 1982.");
+    expect(options).toMatchObject({ useEnhancedPrompts: false });
+  });
+
   it('hides "Write with AI" once the title reaches 10 chars', () => {
     const s = makeSettings({ seoTitle: "Long Title Here" });
     render(<SeoTab s={s} page={makePage()} composer={null} />);

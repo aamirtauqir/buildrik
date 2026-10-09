@@ -66,6 +66,41 @@ const GHOST_BTN = "tw:border-transparent tw:bg-transparent";
 const BTN_32 = "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-13)] tw:font-medium tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]";
 const BTN_SECONDARY = `${BTN_32} tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]`;
 
+/** The first heading and the first run of body copy on a page — what the
+ *  page is actually about, for the AI title prompt. */
+function pageCopySample(composer: Composer | null, pageId: string): string[] {
+  const rootId = composer?.elements?.getAllPages?.().find((p) => p.id === pageId)?.root?.id;
+  const root = rootId ? composer?.elements?.getElement?.(rootId) : null;
+  if (!root) return [];
+  let heading: string | undefined;
+  let body: string | undefined;
+  const queue = [...root.getChildren()];
+  while (queue.length > 0 && !(heading && body)) {
+    const el = queue.shift();
+    if (!el) break;
+    const text = String(el.getContent?.() ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+    if (text && !heading && el.getType() === "heading") heading = text.slice(0, 120);
+    else if (text && !body && el.getType() !== "heading" && el.getType() !== "button") body = text.slice(0, 240);
+    queue.push(...el.getChildren());
+  }
+  return [heading, body].filter((t): t is string => Boolean(t));
+}
+
+/** "Write with AI"'s prompt: the site, the page and the page's own copy
+ *  (L5-017 — it carried the page name alone, inside a generic "headline"
+ *  template, and a local bakery got web-builder marketing back). */
+export function seoTitlePrompt(siteName: string | undefined, pageName: string, description: string, copy: string[]): string {
+  const lines = [
+    "Write one SEO page title for a web page. At most 60 characters. Plain text, no quotes.",
+    siteName ? `Website: ${siteName}` : null,
+    `Page: ${pageName}`,
+    description ? `Page description: ${description}` : null,
+    ...copy.map((c) => `On the page: ${c}`),
+    "Describe what this page offers; do not invent claims the page does not make.",
+  ];
+  return lines.filter(Boolean).join("\n");
+}
+
 export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpenSiteDefaults }) => {
   const siteName = composer?.getProjectMetadata?.()?.name;
   const domain = s.domain ?? "yoursite.com";
@@ -126,9 +161,8 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
     if (aiBusy) return;
     setAiBusy(true);
     try {
-      const context = [page.name, s.seoDesc].filter(Boolean).join(" — ");
-      const prompt = `Write one concise, compelling SEO page title (max 60 characters, no quotes) for this page: ${context || "a web page"}.`;
-      const title = await generateContent(prompt, "headline", "professional");
+      const prompt = seoTitlePrompt(siteName, page.name, s.seoDesc, pageCopySample(composer, page.id));
+      const title = await generateContent(prompt, "headline", "professional", { useEnhancedPrompts: false });
       const clean = title.replace(/^["']|["']$/g, "").trim().slice(0, 60);
       if (clean) s.setSeoTitle(clean);
     } catch {
@@ -136,7 +170,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
     } finally {
       setAiBusy(false);
     }
-  }, [aiBusy, page.name, s]);
+  }, [aiBusy, page.name, page.id, s, siteName, composer]);
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-4">
