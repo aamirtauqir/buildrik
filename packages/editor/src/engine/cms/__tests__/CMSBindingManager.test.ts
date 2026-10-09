@@ -295,6 +295,47 @@ describe("CMSBindingManager — field bindings", () => {
         })
       ).resolves.toBe("FB");
     });
+    /* EDT-003: a pinned record resolves by id, wherever it sits — the old
+       lookup searched queryContent's default 50-row slice, so with 60
+       published records the ones outside it resolved to the fallback. */
+    it("resolves a pinned record outside the first 50 published records", async () => {
+      const cms = new CollectionManager();
+      const collection = await cms.createCollection("Posts");
+      const ids: string[] = [];
+      for (let n = 1; n <= 60; n++) {
+        const draft = (await cms.createContentItem(collection.id, { title: `Post ${n}` }))!;
+        await cms.updateContentItem(draft.id, { status: "published" });
+        ids.push(draft.id);
+      }
+      const manager = new CMSBindingManager(makeComposer().composer, cms);
+      const pin = (itemId: string) =>
+        manager.resolveBinding({
+          binding: { sourceId: `cms:${collection.id}`, path: `${itemId}.title`, type: "variable" },
+          collectionId: collection.id,
+          itemId,
+          fieldSlug: "title",
+          property: "content" as const,
+          fallback: "FB",
+        });
+      await expect(pin(ids[0]!)).resolves.toBe("Post 1");
+      await expect(pin(ids[59]!)).resolves.toBe("Post 60");
+    });
+
+    it("falls back for a record id that belongs to another collection", async () => {
+      const { cms, item } = await setupWithContent();
+      const other = await cms.createCollection("Other");
+      const manager = new CMSBindingManager(makeComposer().composer, cms);
+      await expect(
+        manager.resolveBinding({
+          binding: { sourceId: `cms:${other.id}`, path: `${item.id}.title`, type: "variable" },
+          collectionId: other.id,
+          itemId: item.id,
+          fieldSlug: "title",
+          property: "content" as const,
+          fallback: "FB",
+        })
+      ).resolves.toBe("FB");
+    });
   });
 
   describe("resolveBindingWithContext", () => {

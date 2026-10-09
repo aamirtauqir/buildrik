@@ -224,14 +224,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       // It is a three-value enum — "draft" and "archived" are both un-published,
       // so this asks for what IS published rather than excluding drafts.
       // A record that is not published takes the same exit as an unknown one
-      // below: the author's fallback.
-      const items = await this.cmsManager.queryContent({
-        collectionId,
-        status: "published",
-        filter: {},
-      });
-
-      const item = items.items.find((i) => i.id === itemId);
+      // below: the author's fallback. Found by id across the whole collection
+      // (EDT-003): queryContent returns a 50-row page, and a pinned record
+      // outside it resolved empty.
+      const item = (await this.cmsManager.getContentItems(collectionId)).find(
+        (i) => i.id === itemId && i.status === "published"
+      );
       if (!item) {
         return fallback || "";
       }

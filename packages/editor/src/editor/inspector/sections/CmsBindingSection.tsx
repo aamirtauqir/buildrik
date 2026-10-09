@@ -167,10 +167,13 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
       return;
     }
     const { collectionId: cid, itemId, fieldSlug } = boundHere;
+    /* Every published record, not queryContent's 50-row page: a pinned record
+       is found by id wherever it sits, as publish finds it (EDT-003). */
     void composer.cms.collections
-      .queryContent({ collectionId: cid, status: "published", filter: {} })
-      .then(({ items }) => {
+      .getContentItems(cid)
+      .then((rows) => {
         if (!live) return;
+        const items = rows.filter((r) => r.status === "published");
         /* No record = "the record on this page": the canvas previews the first. */
         const found = itemId && itemId !== "context" ? items.findIndex((i) => i.id === itemId) : 0;
         /* A pinned record that isn't published publishes nothing — say so,

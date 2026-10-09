@@ -157,6 +157,22 @@ describe("CmsBindingSection — bound (board 24)", () => {
     await waitFor(() => expect(screen.getByTestId("cms-preview")).toHaveTextContent("Margherita (record 2 of 3)"));
   });
 
+  /* EDT-003: the pinned record is found by id among every published record,
+     not inside queryContent's 50-row page — so the Inspector and publish
+     agree on a record beyond the newest 50. */
+  it("a pinned record outside the newest 50 published previews its place among all of them", async () => {
+    const composer = makeComposer("heading", [MENU], [{ ...BOUND[0], itemId: "r60" }]);
+    const rows = Array.from({ length: 60 }, (_, i) => ({
+      id: `r${i + 1}`,
+      collectionId: "col-1",
+      status: "published",
+      data: { name: `Dish ${i + 1}` },
+    }));
+    composer.cms.collections.getContentItems = vi.fn(() => Promise.resolve(rows));
+    render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
+    await waitFor(() => expect(screen.getByTestId("cms-preview")).toHaveTextContent("Dish 60 (record 60 of 60)"));
+  });
+
   it("Unbind unbinds in one step", () => {
     const composer = makeComposer("heading", [MENU], BOUND);
     render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
