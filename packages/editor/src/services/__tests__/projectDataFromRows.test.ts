@@ -197,3 +197,43 @@ describe("projectDataFromRows — brand token kill switch fields", () => {
   });
 });
 
+
+/* L4-031: the scratch composer that renders /share drafts, Compare versions
+   and Time travel was created with the engine default `brandTokensV2: true`,
+   so a site whose switch is OFF had its pre-v6 tokens migrated in memory —
+   the preview's CSS differed from the canvas and the publish. The switch
+   travels with the render. */
+describe("renderProjectPages — the brand-token switch", () => {
+  const page = { id: "p1", name: "Home", slug: "home", isHomePage: true, position: 0, blocks: heading("h", "Hi") };
+  it("renders with the site's switch, read from the rows", async () => {
+    const seen: boolean[] = [];
+    const { Composer } = await import("@/engine/Composer");
+    const original = Composer.prototype.importProject;
+    const spy = vi.spyOn(Composer.prototype, "importProject").mockImplementation(function (
+      this: InstanceType<typeof Composer>,
+      data,
+    ) {
+      seen.push(this.designSystem.brandTokensV2);
+      return original.call(this, data);
+    });
+    await renderProjectPages(projectDataFromRows({ name: "Bella", projectSettings: {} }, [page], { brandTokensV2: false }));
+    spy.mockRestore();
+    expect(seen[0]).toBe(false);
+  });
+
+  it("takes an explicit switch over the rows' (the editor passes its own)", async () => {
+    const seen: boolean[] = [];
+    const { Composer } = await import("@/engine/Composer");
+    const original = Composer.prototype.importProject;
+    const spy = vi.spyOn(Composer.prototype, "importProject").mockImplementation(function (
+      this: InstanceType<typeof Composer>,
+      data,
+    ) {
+      seen.push(this.designSystem.brandTokensV2);
+      return original.call(this, data);
+    });
+    await renderProjectPages(projectDataFromRows({ name: "Bella", projectSettings: {} }, [page], null), [], undefined, true);
+    spy.mockRestore();
+    expect(seen[0]).toBe(true);
+  });
+});
