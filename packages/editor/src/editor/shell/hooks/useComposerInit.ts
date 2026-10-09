@@ -208,6 +208,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     const instance = createComposer({
       container: containerRef.current || document.createElement("div"),
       ...composerOptions,
+      /* L1-008: a site lives on the server. The engine's local adapter wrote
+         it to one unscoped "aquibra-project" key every site and user on this
+         browser shared, and a failed server load read that key back — another
+         site's page. Only the siteless demo keeps a local project. */
+      ...(getSiteIdFromUrl() ? { storage: { type: "none", autoSave: false } } : {}),
       remoteSync,
       aiClient,
     } as ComposerConfig);
@@ -416,7 +421,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               addToastRef.current({
                 title: "Session expired",
                 description:
-                  "Sign in to load this site from the dashboard. Showing local changes for now.",
+                  "Sign in to load this site from the dashboard.",
                 tone: "warning",
                 action: {
                   label: "Sign in",
@@ -429,7 +434,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               addToastRef.current({
                 title: "Load failed",
                 description:
-                  "Could not load project from dashboard. Falling back to local.",
+                  "Could not load this site from the dashboard. Reload to try again.",
                 tone: "warning",
               });
             }

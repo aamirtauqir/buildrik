@@ -399,6 +399,24 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     localStorage.removeItem("bk-unsaved-v1-site-9");
   });
 
+  /* L1-008: the engine mirrored the open site into ONE unscoped
+     localStorage key ("aquibra-project") shared by every site and user on
+     the browser, and a failed server load fell back to it. A site session
+     has no engine-local storage at all. */
+  it("a site session builds the composer with no engine-local storage", async () => {
+    const { createComposer } = await import("../../../../engine");
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    renderHook(() => useComposerInit(makeParams()));
+    expect(vi.mocked(createComposer).mock.calls.at(-1)?.[0]).toMatchObject({ storage: { type: "none", autoSave: false } });
+  });
+
+  it("the standalone demo (no site) keeps its local storage", async () => {
+    const { createComposer } = await import("../../../../engine");
+    vi.mocked(getSiteIdFromUrl).mockReturnValue(null);
+    renderHook(() => useComposerInit(makeParams()));
+    expect((vi.mocked(createComposer).mock.calls.at(-1)?.[0] as { storage?: unknown }).storage).toBeUndefined();
+  });
+
   it("scopes IndexedDB buckets, imports, seeds saveState, hydrates media, toasts", async () => {
     const projectData = { pages: [{ id: "p" }], dsSchemaVersion: 0, styles: [] };
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
