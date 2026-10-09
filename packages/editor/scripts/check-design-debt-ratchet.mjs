@@ -108,9 +108,23 @@ const RATCHETS = [
        ramp doesn't define). 6 → 0 (B-11 decision-free fix, 2026-09-26):
        `tw:font-bold` (Tailwind's 700 utility) and inline `fontWeight: 700`
        snapped onto `tw:font-semibold` / `fontWeight: 600`. Locked at 0. */
-    pattern: String.raw`tw:font-bold|fontWeight: ?700\b`,
+    /* DQ-021 (2026-10-10): the pattern saw `700` but not the word — an
+       inline `fontWeight: "bold"` on the rich-text toolbar's B glyph passed
+       straight through. `<strong>`/`<b>` are capped by chrome-reset.css. */
+    pattern: String.raw`tw:font-(bold|extrabold|black)|fontWeight: ?(700|800|900|["']bold(er)?["'])`,
     baseline: 0,
     excludeDesignSystem: true,
+  },
+  {
+    id: "css-font-weight-700",
+    /* DQ-021: the CSS half. `Canvas.css` set `font-weight: bold` on the
+       clone-mode badge (chrome, despite the file) and no gate scanned CSS
+       for weight at all. `site-content.css` is the CUSTOMER's default
+       heading weights inside the canvas, not chrome — excluded. */
+    pattern: String.raw`font-weight: ?(bold|bolder|[7-9]00)`,
+    baseline: 0,
+    css: true,
+    exclude: "site-content.css",
   },
 ];
 
@@ -144,7 +158,7 @@ function countUnsizedButtons() {
   return unsized;
 }
 
-function count(pattern, css = false, excludeDesignSystem = false) {
+function count(pattern, css = false, excludeDesignSystem = false, exclude = null) {
   try {
     // B-11 fix-round-1 (controller finding): `/design-system/` is scoped to
     // whichever ratchet passes excludeDesignSystem — NOT applied to the
@@ -155,7 +169,8 @@ function count(pattern, css = false, excludeDesignSystem = false) {
     // pre-existing ratchets never needed this exclusion because their one
     // real design-system/ hit, BrandPreview.tsx's offscale font size, was
     // already covered by the specimen-rendering exclusion above).
-    const designSystemExclude = excludeDesignSystem ? "| grep -v '/design-system/' " : "";
+    const designSystemExclude =
+      (excludeDesignSystem ? "| grep -v '/design-system/' " : "") + (exclude ? `| grep -v ${JSON.stringify(exclude)} ` : "");
     const out = execSync(
       `grep -rEn ${JSON.stringify(pattern)} src/editor ${css ? "src/themes --include='*.css'" : "--include='*.tsx' --include='*.ts'"} | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx ${designSystemExclude}| wc -l`,
       { cwd: ROOT, encoding: "utf8", shell: "/bin/bash" },
@@ -168,7 +183,7 @@ function count(pattern, css = false, excludeDesignSystem = false) {
 
 let failed = false;
 for (const r of RATCHETS) {
-  const n = count(r.pattern, r.css, r.excludeDesignSystem === true);
+  const n = count(r.pattern, r.css, r.excludeDesignSystem === true, r.exclude ?? null);
   if (n > r.baseline) {
     console.error(
       `[design-debt-ratchet] FAIL — ${r.id}: ${n} > baseline ${r.baseline}. ` +

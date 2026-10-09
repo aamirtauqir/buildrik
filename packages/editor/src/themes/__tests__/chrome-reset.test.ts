@@ -72,3 +72,16 @@ describe("chrome-reset.css canvas exclusion", () => {
     expect(missingGuard).toEqual([]);
   });
 });
+
+/* DQ-021: `strong`/`b` default to `bolder` (700 on Inter 400) — over the
+   chrome's 600 cap. The reset caps them, in the shell and the overlay root. */
+describe("chrome-reset.css caps strong/b at 600", () => {
+  const css = fs.readFileSync(CSS_PATH, "utf-8").replace(/\/\*[\s\S]*?\*\//g, "");
+  it("has one rule for strong and b in both roots, at the semibold token", () => {
+    const rule = css.match(/([^{}]*#bk-overlay-root strong[^{}]*)\{([^}]*)\}/);
+    expect(rule).not.toBeNull();
+    const [, sel, body] = rule!;
+    for (const s of [".bd-studio strong", ".bd-studio b", "#bk-overlay-root strong", "#bk-overlay-root b"]) expect(sel).toContain(s);
+    expect(body).toMatch(/font-weight:\s*var\(--bk-weight-semibold\)/);
+  });
+});

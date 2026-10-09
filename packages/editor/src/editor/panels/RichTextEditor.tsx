@@ -42,7 +42,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           icon: "B",
           label: "Bold",
           active: activeStyles.bold,
-          style: { fontWeight: "bold" },
+          style: { fontWeight: 600 },
         },
         {
           command: "italic",

@@ -300,7 +300,7 @@
   color: var(--bk-accent-on);
   border-radius: var(--bk-radius-full);
   font-size: var(--bk-text-13);
-  font-weight: bold;
+  font-weight: var(--bk-weight-semibold);
   display: flex;
   align-items: center;
   justify-content: center;
