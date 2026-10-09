@@ -73,6 +73,7 @@ interface MockOpts {
     setShowGuides: ReturnType<typeof vi.fn>;
     setShowGrid: ReturnType<typeof vi.fn>;
   };
+  addToast: ReturnType<typeof vi.fn>;
 }
 
 function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
@@ -89,6 +90,7 @@ function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
       setShowGuides: vi.fn(),
       setShowGrid: vi.fn(),
     },
+    addToast: overrides.addToast ?? vi.fn(() => "toast-id"),
   };
 }
 
@@ -99,6 +101,7 @@ function mount(opts: MockOpts) {
         composer: opts.composer,
         modals: opts.modals,
         state: opts.state,
+        addToast: opts.addToast,
       } as unknown) as UseEditorEventListenersOptions,
     ),
   );
@@ -146,6 +149,68 @@ describe("useEditorEventListeners", () => {
         EVENTS.COMPONENT_CREATE_REQUESTED,
         expect.any(Function),
       );
+    });
+  });
+
+  // ENGINE FAILURES ------------------------------------------------------------
+  /* DQ-005: ERROR, STORAGE_ERROR and COMMAND_ERROR were emitted with no
+     listener anywhere, so a refused command or a failed local save said
+     nothing at all. */
+  describe("engine failure events → one toast each", () => {
+    it("a read-only refusal says the editor is view-only", () => {
+      mount(opts);
+      act(() =>
+        opts.composer._fire(EVENTS.COMMAND_ERROR, {
+          id: "delete",
+          error: new Error("read-only: this command changes the document"),
+        }),
+      );
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: "View only", key: "engine-command-readonly" }),
+      );
+    });
+
+    it("a command that throws reports it", () => {
+      mount(opts);
+      act(() => opts.composer._fire(EVENTS.COMMAND_ERROR, { id: "paste", error: new Error("boom") }));
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Couldn't complete that action", description: "boom" }),
+      );
+    });
+
+    it("a failed local autosave reports it", () => {
+      mount(opts);
+      act(() => opts.composer._fire(EVENTS.STORAGE_ERROR, { error: new Error("quota"), operation: "auto-save" }));
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Couldn't save a local copy", description: "quota" }),
+      );
+    });
+
+    it.each([
+      ["save", "Couldn't save"],
+      ["load", "Couldn't load the project"],
+      ["init", "The editor didn't start properly"],
+    ])("ERROR on %s reports it", (operation, title) => {
+      mount(opts);
+      act(() => opts.composer._fire(EVENTS.ERROR, { error: new Error("disk"), operation }));
+      expect(opts.addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "error", title, description: "disk" }));
+    });
+
+    it("the page-root delete refusal reads as a sentence", () => {
+      mount(opts);
+      act(() =>
+        opts.composer._fire(EVENTS.ERROR, { type: "invalid_operation", message: "Cannot delete page root element" }),
+      );
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ description: "The page itself can't be deleted — select an element inside it." }),
+      );
+    });
+
+    it("unsubscribes on unmount", () => {
+      const { unmount } = mount(opts);
+      unmount();
+      act(() => opts.composer._fire(EVENTS.STORAGE_ERROR, { error: new Error("quota") }));
+      expect(opts.addToast).not.toHaveBeenCalled();
     });
   });
 

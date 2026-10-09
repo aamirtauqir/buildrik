@@ -318,6 +318,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   useEditorEventListeners({
     composer,
     modals,
+    addToast,
     state: {
       openLeftPanelToTab: guardedOpenLeftPanelToTab,
       setShowSpacingIndicators: state.setShowSpacingIndicators,
