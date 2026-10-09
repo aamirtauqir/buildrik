@@ -152,7 +152,7 @@ export const motion = {
 
 export const font = {
   "ui": "\"Inter\", sans-serif",
-  "mono": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace",
+  "mono": "\"Geist Mono\", monospace",
 } as const;
 
 export const text = {

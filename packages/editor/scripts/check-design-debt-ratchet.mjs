@@ -116,6 +116,22 @@ const RATCHETS = [
     excludeDesignSystem: true,
   },
   {
+    id: "named-mono-fallback",
+    /* DQ-025 (2026-10-10): DESIGN.md rule 8 bans named fallbacks, and the
+       mono token itself named SF Mono / Menlo / Consolas. Call sites carried
+       their own stacks on top (`var(--bk-font-mono, ui-monospace, Menlo…)`)
+       and two canvas overlays used bare `monospace`, which skipped Geist Mono
+       entirely. Every chrome mono goes through var(--bk-font-mono). */
+    pattern: String.raw`SF ?Mono|SFMono|Menlo|Consolas|Fira Code|ui-monospace|fontFamily: ?["']monospace|--bk-font-mono, `,
+    baseline: 0,
+  },
+  {
+    id: "css-named-mono-fallback",
+    pattern: String.raw`SF ?Mono|SFMono|Menlo|Consolas|Fira Code|ui-monospace|font-family: ?monospace|--bk-font-mono, `,
+    baseline: 0,
+    css: true,
+  },
+  {
     id: "css-font-weight-700",
     /* DQ-021: the CSS half. `Canvas.css` set `font-weight: bold` on the
        clone-mode badge (chrome, despite the file) and no gate scanned CSS

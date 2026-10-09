@@ -87,7 +87,7 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
           style={{
             fontSize: 12,
             fontFamily:
-              "var(--bk-font-mono, ui-monospace, monospace)",
+              "var(--bk-font-mono)",
             color: "var(--bk-ink-muted)",
             marginTop: 2,
           }}
