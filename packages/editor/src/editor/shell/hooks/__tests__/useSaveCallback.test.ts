@@ -305,6 +305,35 @@ describe("useSaveCallback", () => {
     });
     expect(opts.saveProject).toHaveBeenCalledTimes(2);
   });
+
+  /* L5-073: after Retry saved, the "Save failed · Changes are unsaved" toast
+     stayed on screen (error toasts persist until dismissed). */
+  it("a save that lands takes down the earlier 'Save failed' toast", async () => {
+    const dismissed: string[] = [];
+    const chrome = await import("@/editor/chrome-ui");
+    const spy = vi.spyOn(chrome, "dismissToast").mockImplementation((id: string) => void dismissed.push(id));
+    opts.addToast.mockReturnValueOnce("fail-toast");
+    opts.saveProject.mockRejectedValueOnce(new Error("boom"));
+    const { result } = renderHook(() =>
+      useSaveCallback({
+        composer: opts.composer,
+        addToast: opts.addToast,
+        setSaveState: opts.setSaveState,
+        setIsDirty: opts.setIsDirty,
+      }),
+    );
+    await act(async () => {
+      result.current();
+      await flushMicrotasks();
+    });
+    expect(dismissed).toEqual([]);
+    await act(async () => {
+      result.current();
+      await flushMicrotasks();
+    });
+    expect(dismissed).toEqual(["fail-toast"]);
+    spy.mockRestore();
+  });
 });
 
 /**

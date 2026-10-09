@@ -40,7 +40,13 @@ import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
-import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave } from "./useSaveCallback";
+import {
+  dismissSaveFailureToasts,
+  isAuthSaveError,
+  isForbiddenSaveError,
+  refuseForbiddenSave,
+  trackSaveFailureToast,
+} from "./useSaveCallback";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
@@ -722,6 +728,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                that is missing — leaving it would offer a stale restore on the
                next load. */
             if (siteId) clearUnsaved(siteId);
+            dismissSaveFailureToasts();
             refusedTokens = null;
             clearRetry();
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
@@ -788,7 +795,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               const retrying = retryAttempt > 0;
               if (siteId) scheduleRetry();
               if (siteId && !retrying) {
-                addToast({
+                trackSaveFailureToast(addToast({
                   /* Same words as the manual path for both branches, so one
                      event cannot be named two different things depending on
                      which path reported it. */
@@ -797,7 +804,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
                     : "Your changes are still open in this tab. Keep it open and try saving again.",
                   tone: "warning",
-                });
+                }));
               }
               return;
             }
@@ -837,7 +844,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               const notLoaded = message.includes("PROJECT_NOT_LOADED");
               // Deleted is not "not loaded yet" — no reload will fix it.
               const gone = message.includes("SITE_MISSING");
-              addToast({
+              const failureToast = addToast({
                 title: gone
                   ? "This site isn't there anymore"
                   : notLoaded
@@ -857,6 +864,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                       { action: { label: "Retry now", onClick: handler } }
                     : {}),
               });
+              if (!notLoaded && !gone) trackSaveFailureToast(failureToast);
             }
           });
       }, THRESHOLDS.AUTOSAVE_DEBOUNCE);

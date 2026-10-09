@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { SaveState } from "./useStudioState";
 import {
@@ -32,6 +32,25 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
 import { clearUnsaved, keepUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
+
+/* The toasts that say the work is not on the server: autosave's and the
+   manual save's failures, and the reload's "Some work never reached the
+   server". Error and recovery toasts persist until dismissed, so one stayed
+   up saying "Changes are unsaved" after a Retry had saved them (L5-073), and
+   the recovery one outlived Restore and every later save (L5-076). A save that
+   lands — autosave, Retry or ⌘S — takes them all down. */
+const saveFailureToasts = new Set<string>();
+
+/** Register a toast that a later successful save makes untrue. */
+export function trackSaveFailureToast(id: string): void {
+  saveFailureToasts.add(id);
+}
+
+/** A save landed: every "not saved" toast is now false. */
+export function dismissSaveFailureToasts(): void {
+  for (const id of saveFailureToasts) dismissToast(id);
+  saveFailureToasts.clear();
+}
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -209,6 +228,7 @@ export function useSaveCallback({
         /* On the server now, so the recovery copy is no longer missing work.
            Left behind it would offer a stale restore on the next load. */
         if (siteId) clearUnsaved(siteId);
+        dismissSaveFailureToasts();
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
         addToast({
@@ -277,7 +297,7 @@ export function useSaveCallback({
           setSaveState((prev) =>
             siteId ? { ...prev, status: "error", error: errorMessage } : { ...prev, status: "idle" },
           );
-          addToast(
+          const offlineToast = addToast(
             siteId
               ? {
                   title: isOffline ? "Offline — not saved" : "Couldn't reach the server — not saved",
@@ -294,6 +314,7 @@ export function useSaveCallback({
                   tone: "info",
                 },
           );
+          if (siteId) trackSaveFailureToast(offlineToast);
           return siteId ? "error" : "queued-offline";
         }
         /* Board S1.5b — an expired session is not a failed save to retry. The
@@ -375,12 +396,14 @@ export function useSaveCallback({
         }
         const userMessage = explainSaveError(errorMessage);
         setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-        addToast({
-          title: "Save failed",
-          description: userMessage,
-          tone: "error",
-          action: { label: "Retry", onClick: () => void save() },
-        });
+        trackSaveFailureToast(
+          addToast({
+            title: "Save failed",
+            description: userMessage,
+            tone: "error",
+            action: { label: "Retry", onClick: () => void save() },
+          }),
+        );
         return "error";
       });
   }, [composer, addToast, setSaveState, setIsDirty, onAuthExpired]);
