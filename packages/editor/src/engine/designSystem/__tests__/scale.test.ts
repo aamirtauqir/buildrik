@@ -99,6 +99,20 @@ describe("proposeMissingDarks (spec D11, test 18)", () => {
     expect(validateTokens(out.tokens).ok).toBe(true);
   });
 
+  it("a transparent page background takes the page colour's dark value — an Auto site never keeps a white page", () => {
+    const out = proposeMissingDarks(DEFAULT_TOKENS);
+    expect(out.filled).toContain("color-page-background");
+    expect(resolveTokenLiteral(out.tokens, "color-page-background", "light")).toBe("transparent");
+    expect(resolveTokenLiteral(out.tokens, "color-page-background", "dark")).toBe(resolveTokenLiteral(out.tokens, "color-background", "dark"));
+    expect(resolveTokenLiteral(out.tokens, "color-page-background", "dark")).toBe("#0F172A");
+    expect(validateTokens(out.tokens).ok).toBe(true);
+  });
+
+  it("a transparent token that is not the page background stays without one", () => {
+    const out = proposeMissingDarks([semantic("color-clear", "transparent", { semanticKind: "surface" })]);
+    expect(out.filled).toEqual([]);
+  });
+
   it("returns the input unchanged when nothing is missing", () => {
     const out = proposeMissingDarks(proposeMissingDarks(DEFAULT_TOKENS).tokens);
     expect(out.filled).toEqual([]);

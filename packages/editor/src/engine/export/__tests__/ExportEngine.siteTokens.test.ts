@@ -214,3 +214,14 @@ describe("the three documents follow the brand switch", () => {
     }
   });
 });
+
+describe("emitSiteTokenCss — the page behind the root (Dark mode Auto)", () => {
+  const BODY = "body{background-color:var(--buildrick-design-color-page-background)}";
+  it("an Auto site paints body with the page background token, so dark covers the whole viewport", () => {
+    expect(emitSiteTokenCss({ designTokens: DEFAULT_TOKENS, darkMode: "auto" })).toContain(BODY);
+  });
+  it("an Off site keeps the body exactly as before", () => {
+    expect(emitSiteTokenCss({ designTokens: DEFAULT_TOKENS, darkMode: "off" })).not.toContain(BODY);
+    expect(emitSiteTokenCss({ designTokens: DEFAULT_TOKENS })).not.toContain(BODY);
+  });
+});

@@ -180,6 +180,12 @@ describe("buildDarkPairIssues (BRP1-M8: dark text left on a card that turns dark
     expect(buildDarkPairIssues([box, h], FILLED).map((i) => i.tokenId)).toEqual(["color-text"]);
   });
 
+  it("flags raw dark text straight on the page root once the page background turns dark", () => {
+    const root = node({ "background-color": "var(--buildrick-design-color-page-background)" });
+    const h = node({ color: "#333333" }, root);
+    expect(buildDarkPairIssues([root, h], FILLED).map((i) => i.tokenId)).toEqual(["color-page-background"]);
+  });
+
   it("stays quiet on raw/raw, token/token, a surface without a dark value, and a pair that already fails in light", () => {
     const raw = node({ background: "#FFFFFF" });
     const tokens = node({ background: "var(--buildrick-design-color-surface-raised)" });

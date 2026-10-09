@@ -137,7 +137,10 @@ function side(value: string, tokens: readonly DesignToken[]): { tokenId: string 
   if (ref) {
     const t = tokens.find((x) => x.cssVar === ref[1]);
     if (!t) return null;
-    const light = resolveTokenLiteral(tokens, t.id, "light") ?? "";
+    /* A transparent light value (the page background's seed) shows the
+       browser's white page. */
+    const literal = resolveTokenLiteral(tokens, t.id, "light") ?? "";
+    const light = literal === "transparent" ? FALLBACK_BG : literal;
     const dark = (t.modes.dark && resolveTokenLiteral(tokens, t.id, "dark")) || light;
     return hexToRgb(light) && hexToRgb(dark) ? { tokenId: t.id, light, dark } : null;
   }

@@ -13,6 +13,7 @@
 import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { parseColor, rgbToHex, rgbToOklch, oklchToRgb } from "@/shared/utils/parsers";
+import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
 
 export const SCALE_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
 export type ScaleStep = (typeof SCALE_STEPS)[number];
@@ -118,17 +119,31 @@ const mirrors = (t: DesignToken) =>
 
 /** Dark values for every semantic colour that has none (D11). One
  *  `custom-<id>-dark` primitive each, via `setTokenLiteral` (OQ-5). A token
- *  whose light value is not an opaque colour (`transparent`) is skipped. */
+ *  whose light value is not an opaque colour (`transparent`) is skipped —
+ *  except the page background: transparent in light it shows the browser's
+ *  white page, so in dark it takes the page colour's (`color-background`)
+ *  dark value, filled first if it was missing too. Left transparent, an Auto
+ *  site kept a white page under light dark-mode text. */
 export function proposeMissingDarks(tokens: readonly DesignToken[]): { tokens: DesignToken[]; filled: string[] } {
   let out: DesignToken[] = [...tokens];
   const filled: string[] = [];
+  const missing = (t: DesignToken) => t.kind === "color" && t.layer === "semantic" && !t.replacedBy && !t.modes.dark;
   for (const t of tokens) {
-    if (t.kind !== "color" || t.layer !== "semantic" || t.replacedBy || t.modes.dark) continue;
+    if (!missing(t)) continue;
     const light = resolveTokenLiteral(out, t.id, "light");
     const scale = light ? generateColorScale(light) : null;
     if (!scale) continue;
     out = setTokenLiteral(out, t.id, "dark", stepHex(scale, mirrors(t) ? scale.mirrorStep : scale.darkStep));
     filled.push(t.id);
   }
+  const page = tokens.find((t) => t.id === PAGE_BACKGROUND_TOKEN.id);
+  const pageDark = resolveTokenLiteral(out, PAGE_COLOUR_ID, "dark");
+  if (page && missing(page) && !generateColorScale(resolveTokenLiteral(out, page.id, "light") ?? "") && pageDark) {
+    out = setTokenLiteral(out, page.id, "dark", pageDark);
+    filled.push(page.id);
+  }
   return { tokens: out, filled };
 }
+
+/** The site's page colour — the surface `color-page-background` sits on. */
+const PAGE_COLOUR_ID = "color-background";

@@ -9,6 +9,7 @@ import { THEME } from "../../shared/constants/defaultStyles";
 import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
 import { resolveTokenLiteral, emitTokenCss } from "@buildrik/shared/tokens";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
+import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";
 import { tokensForEmit } from "../designSystem/projectTokens";
 import { themeToggleCss } from "./themeToggleRuntime";
 import type { DesignToken } from "../designSystem/types";
@@ -132,7 +133,12 @@ export function emitSiteTokenCss(
     darkMode,
     onSkip: (id, reason) => console.warn(`[tokens] skipped ${id}: ${reason}`),
   });
-  return opts?.hasThemeToggle ? css + themeToggleCss(darkMode === "auto" ? "show" : "hide") : css;
+  /* Auto: the body is painted with the page background token too. The page
+     root carries it, but the viewport below a short page is the body — white
+     by default, under dark-mode text. Transparent in light (the seed), so an
+     Auto site's light page is unchanged; an Off site gets no rule at all. */
+  const page = darkMode === "auto" ? `\nbody{background-color:var(${PAGE_BACKGROUND_TOKEN.cssVar})}\n` : "";
+  return (opts?.hasThemeToggle ? css + themeToggleCss(darkMode === "auto" ? "show" : "hide") : css) + page;
 }
 
 /**
