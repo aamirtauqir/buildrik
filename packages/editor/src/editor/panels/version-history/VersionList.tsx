@@ -194,6 +194,15 @@ export function VersionRow({
         role="listitem"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        /* L5-045: the row opened nothing — every action sat in a hover-only
+           ⋯. A click on the row (not on one of its controls) opens the
+           save's details, whose footer compares or restores it. */
+        onClick={(e) => {
+          if (isRenaming || isDeleteConfirm) return;
+          if ((e.target as HTMLElement).closest("button, input, [role='menu']")) return;
+          onDetails();
+        }}
+        data-testid="version-row"
       >
         <div className="version-row-main">
           <div>
@@ -235,16 +244,25 @@ export function VersionRow({
               {/* Board 162:2 — "Auto-save · 3 changes · 16:20". Omitted rather
                   than shown as 0 when the undo stack does not reach back that
                   far: see versionChangeCounts. */}
+              {/* L5-045: "N changes" opens the diff — it read as a link and
+                  did nothing. */}
               {changeCount !== undefined && (
-                <span
-                  className="entry-badge"
+                <Button
+                  color="light"
+                  size="xs"
+                  className="entry-badge tw:h-auto tw:min-h-0 tw:border-0 tw:p-0 tw:px-1 tw:focus:ring-0"
                   style={{
                     background: "var(--bk-accent-tint)",
                     color: "var(--bk-accent)",
                   }}
+                  aria-label={`Show the ${changeCount} change${changeCount === 1 ? "" : "s"} in "${versionDisplayName(version)}"`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCompare();
+                  }}
                 >
                   {changeCount} change{changeCount === 1 ? "" : "s"}
-                </span>
+                </Button>
               )}
               {version.isAutoCheckpoint && (
                 <span className="entry-badge auto-save">Auto</span>
