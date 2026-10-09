@@ -55,10 +55,13 @@ export interface AIControlsProps {
   onGetSummary: () => void;
   /** Seconds remaining until the next call is permitted (0 = ready). */
   cooldownSeconds: number;
+  /** Nothing to summarise (no compare yet, or no changes): the button is
+   *  not offered as if it could answer (L5-020). */
+  nothingToSummarise?: boolean;
 }
 
-export function AIControls({ state, onGetSummary, cooldownSeconds }: AIControlsProps) {
-  const disabled = state.loading || cooldownSeconds > 0;
+export function AIControls({ state, onGetSummary, cooldownSeconds, nothingToSummarise = false }: AIControlsProps) {
+  const disabled = state.loading || cooldownSeconds > 0 || nothingToSummarise;
   const buttonLabel = state.loading
     ? "Generating..."
     : cooldownSeconds > 0

@@ -64,3 +64,16 @@ describe("CompareView — the empty diff says which empty it is", () => {
     expect(screen.getByText("element")).toBeInTheDocument();
   });
 });
+
+/* L5-020: an empty compare offered "Get AI Summary" as if it could answer. */
+describe("CompareView — AI summary with nothing to summarise", () => {
+  it("disables Get AI Summary when there are no changes", () => {
+    renderView({ summary: null, changes: [] } as never);
+    expect((screen.getByRole("button", { name: /Get AI Summary/ }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("enables it when there is a diff", () => {
+    renderView({ summary: null, changes: [{ property: "Text", before: "x", after: "" }] } as never);
+    expect((screen.getByRole("button", { name: /Get AI Summary/ }) as HTMLButtonElement).disabled).toBe(false);
+  });
+});

@@ -22,7 +22,7 @@ import type { NamedVersion, CompareResult } from "../../../../shared/types/versi
 const BASE = 1_000_000;
 const compare = {
   elementName: "Page",
-  changes: [],
+  changes: [{ type: "content", property: "Text", before: "", after: "“Hello”" }],
   summary: { added: 1, removed: 0, modified: 0 },
 } as unknown as CompareResult;
 
@@ -106,6 +106,23 @@ describe("useAISummary — summarize branches", () => {
 
     expect(summarize).not.toHaveBeenCalled();
     expect(result.current.aiSummaryStates.v1.error).toBe("Compare data not loaded yet");
+    /* L5-020: nothing was asked, so nothing is rate-limited — the click used
+       to burn the 60-second cooldown before it checked for data. */
+    expect(result.current.getCooldownSeconds("v1")).toBe(0);
+  });
+
+  it("does not ask the model, or arm the cooldown, when nothing changed", async () => {
+    const versions = [version("v1")];
+    const empty = { elementName: "x", changes: [], summary: { style: 0, text: 0, layout: 0, content: 0, other: 0, pagesAdded: 0, pagesDeleted: 0 } };
+    const { result } = renderHook(() =>
+      useAISummary({ versions, compareResults: { v1: empty as never }, updateAiSummary: vi.fn() })
+    );
+    await act(async () => {
+      await result.current.handleGetAiSummary("v1");
+    });
+    expect(summarize).not.toHaveBeenCalled();
+    expect(result.current.getCooldownSeconds("v1")).toBe(0);
+    expect(result.current.aiSummaryStates.v1.error).toBe("Nothing to summarise: no changes");
   });
 
   it("errors when the request is refused", async () => {

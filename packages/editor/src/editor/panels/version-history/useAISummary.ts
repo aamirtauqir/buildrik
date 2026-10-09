@@ -93,6 +93,23 @@ export function useAISummary({
         return;
       }
 
+      /* Nothing to ask about: no compare yet, or a compare with no changes.
+         Checked before the cooldown is armed — a click on an empty compare
+         used to lock the button for 60 s without a request (L5-020). */
+      const compareData = compareResults[versionId];
+      const nothing = !compareData
+        ? "Compare data not loaded yet"
+        : compareData.changes.length === 0
+          ? "Nothing to summarise: no changes"
+          : null;
+      if (nothing) {
+        setAiSummaryStates((prev) => ({
+          ...prev,
+          [versionId]: { loading: false, result: null, error: nothing },
+        }));
+        return;
+      }
+
       // Rate-limit check.
       const lastCall = aiCallTimestamps.current.get(versionId) ?? 0;
       const elapsed = Date.now() - lastCall;
@@ -122,10 +139,6 @@ export function useAISummary({
       }));
 
       try {
-        const compareData = compareResults[versionId];
-        if (!compareData) {
-          throw new Error("Compare data not loaded yet");
-        }
         /* `versionName` is `.min(1)` on the server: an unnamed version sent
            "" and was refused before the model was ever asked. */
         const response = await aiTrpcClient

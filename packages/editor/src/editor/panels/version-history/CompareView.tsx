@@ -229,6 +229,7 @@ export function CompareView({
         state={aiSummaryState}
         onGetSummary={onGetAiSummary}
         cooldownSeconds={aiCooldownSeconds}
+        nothingToSummarise={changes.length === 0}
       />
     </div>
   );
