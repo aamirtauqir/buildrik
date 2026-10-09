@@ -173,6 +173,8 @@ describe("ComponentRow — board 26", () => {
     expect(screen.getByText(/^Home › Hero · This instance becomes an independent container/)).toBeTruthy();
     fireEvent.click(screen.getByTestId("instance-detach-confirm-confirm"));
     expect(detachInstance).toHaveBeenCalledWith("el-1");
+    /* L2-029: a successful detach says so. */
+    expect(await screen.findByText("Reservation banner instance detached")).toBeTruthy();
   });
 
   it("P-1: a locked instance refuses the reset even after the confirm", () => {
