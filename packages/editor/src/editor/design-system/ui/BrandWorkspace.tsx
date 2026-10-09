@@ -300,15 +300,21 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
      when Brand closes. Dark needs the site's Dark mode on (an Off site
      publishes light only); turning it Off mid-preview drops back to light.
      While another flow (generator, Dark-mode Auto, logo/URL) is previewing,
-     the switch waits. */
+     the switch waits. The canvas theme toggle's look (BRP1-M12, source
+     "canvas") is the same saved brand, so the switch shows it and owns it:
+     Light clears it, Dark takes it over. */
   const themePreview = useBrandPreview(composer ?? null);
   const setPreviewTheme = (theme: "light" | "dark") => {
-    if (theme === "light") return themePreview.clear();
+    if (theme === "light") {
+      themePreview.clear();
+      if (composer?.designSystem.preview?.source === "canvas") composer.designSystem.setPreview(null);
+      return;
+    }
     themePreview.show((tokens, settings) =>
       DarkModeSchema.catch("off").parse(settings.darkMode) === "off" ? null : { tokens, darkMode: "auto", theme: "dark" },
     );
   };
-  const previewLocked = canvasPreview !== null && !themePreview.active;
+  const previewLocked = canvasPreview !== null && canvasPreview.source !== "canvas" && !themePreview.active;
 
   const color      = useColorRegistry();
   const type       = useTypeRegistry();

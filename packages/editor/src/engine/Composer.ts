@@ -9,7 +9,7 @@
 import { emailService } from "../services/EmailService";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { MEDIA_EVENTS } from "../shared/constants/media";
-import { EVENTS, THRESHOLDS } from "../shared/constants";
+import { EVENTS, THRESHOLDS, isNavigationOnlyChange } from "../shared/constants";
 import type {
   ComposerConfig,
   ComposerState,
@@ -36,6 +36,7 @@ import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
 import { RESET_CSS, siteFontCSS, siteFontFaceCSS, emitSiteTokenCss, googleFontsHeadLinks, siteFontsFromSettings } from "./export/ExportHelpers";
+import { pageFileNames } from "./export/ExportEngine";
 import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
@@ -496,6 +497,18 @@ export class Composer extends EventEmitter {
       scheduleRecomputeTokenUsage();
     });
     this.on(EVENTS.COMPONENT_LIST_UPDATED, invalidateTokenUsage);
+    /* EDT-056: a collection names its template page by published file name,
+       so after any page change — or the import that undo, redo and a version
+       restore run (the PROJECT_LOADED without `importing`) — the collections
+       follow the file names they named. */
+    const followTemplatePages = () =>
+      void this.cms.collections.followPageFiles(pageFileNames(this.elements.getAllPages()));
+    this.on(EVENTS.PROJECT_CHANGED, (payload: { type?: string } | undefined) => {
+      if (payload?.type?.startsWith("page:") && !isNavigationOnlyChange(payload)) followTemplatePages();
+    });
+    this.on(EVENTS.PROJECT_LOADED, (payload: { importing?: boolean } | undefined) => {
+      if (!payload?.importing) followTemplatePages();
+    });
     // A template that lands raw values a token already holds: offer Connect.
     this.on(EVENTS.TEMPLATE_APPLIED, ({ pageId }) => {
       const suggestions = this.designSystem.connectSuggestions(pageId);
@@ -630,6 +643,16 @@ export class Composer extends EventEmitter {
     this.media.on(MEDIA_EVENTS.MEDIA_UPDATED, (payload: unknown) => {
       const p = payload as { asset?: unknown } | undefined;
       syncLibraryFont(p && "asset" in p ? p.asset : payload);
+    });
+    /* L4-014: an asset's alt edit reaches the placements that still carry
+       its old alt (or none). */
+    this.media.on(MEDIA_EVENTS.MEDIA_UPDATED, (payload: unknown) => {
+      const p = payload as
+        | { asset?: { src?: string; altText?: string }; previous?: { altText?: string }; changes?: object }
+        | undefined;
+      if (!p?.asset?.src || !p.changes || !("altText" in p.changes)) return;
+      if (p.previous?.altText === p.asset.altText) return;
+      this.mediaOps.followAssetAlt(p.asset.src, p.previous?.altText, p.asset.altText);
     });
     this.media.on(MEDIA_EVENTS.MEDIA_DELETED, (payload: unknown) => {
       const id = (payload as { id?: string } | undefined)?.id;

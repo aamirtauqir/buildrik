@@ -52,7 +52,8 @@ export function useSelectionReadout(
   selectedElement: { id: string; type: string } | null
 ): { label: string; dims: string | null } {
   const projectLoading = useProjectLoading(composer);
-  const pageId = composer?.elements?.getActivePage?.()?.id;
+  const activePage = composer?.elements?.getActivePage?.();
+  const pageId = activePage?.id;
 
   const [renamed, setRenamed] = React.useState<{ id: string; name: string | null } | null>(null);
   React.useEffect(() => {
@@ -110,6 +111,8 @@ export function useSelectionReadout(
       ? `${selectionCount} elements selected`
       : master
         ? `Component instance · ${master.name}`
+        : selectedElement && activePage?.root?.id === selectedElement.id
+          ? `Page · ${activePage.name}`
         : selectedElement
           ? `${elementTypeLabel(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
         : "Nothing selected";

@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { ToastInput, dismissToast } from "@/editor/chrome-ui";
+import { ToastInput, dismissToastKey } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { SaveState } from "./useStudioState";
 import {
@@ -33,24 +33,9 @@ import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleServi
 import { clearUnsaved, keepUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
 
-/* The toasts that say the work is not on the server: autosave's and the
-   manual save's failures, and the reload's "Some work never reached the
-   server". Error and recovery toasts persist until dismissed, so one stayed
-   up saying "Changes are unsaved" after a Retry had saved them (L5-073), and
-   the recovery one outlived Restore and every later save (L5-076). A save that
-   lands — autosave, Retry or ⌘S — takes them all down. */
-const saveFailureToasts = new Set<string>();
-
-/** Register a toast that a later successful save makes untrue. */
-export function trackSaveFailureToast(id: string): void {
-  saveFailureToasts.add(id);
-}
-
-/** A save landed: every "not saved" toast is now false. */
-export function dismissSaveFailureToasts(): void {
-  for (const id of saveFailureToasts) dismissToast(id);
-  saveFailureToasts.clear();
-}
+/** One "not saved" card for both save paths (manual and autosave); the next
+ *  save that lands takes it down (L3-006). */
+export const SAVE_FAILED_TOAST_KEY = "save-failed";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -149,6 +134,8 @@ export type SaveProjectFn = () => Promise<SaveOutcome>;
 // alongside the hook so future contributors see all save-error mapping
 // in one place.
 function explainSaveError(rawMessage: string): string {
+  /* L3-013: the plan's page limit — the server's words name the limit. */
+  if (rawMessage.startsWith("PAGE_LIMIT:")) return rawMessage.slice("PAGE_LIMIT:".length).trim();
   /* I-2: the server refused a page that belongs to another site (sites.saveProject
      BAD_REQUEST); retrying the same snapshot cannot succeed. */
   if (rawMessage.includes("belongs to another site")) {
@@ -228,9 +215,9 @@ export function useSaveCallback({
         /* On the server now, so the recovery copy is no longer missing work.
            Left behind it would offer a stale restore on the next load. */
         if (siteId) clearUnsaved(siteId);
-        dismissSaveFailureToasts();
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
+        dismissToastKey(SAVE_FAILED_TOAST_KEY);
         addToast({
           title: "Saved",
           description: "Project saved successfully",
@@ -297,7 +284,7 @@ export function useSaveCallback({
           setSaveState((prev) =>
             siteId ? { ...prev, status: "error", error: errorMessage } : { ...prev, status: "idle" },
           );
-          const offlineToast = addToast(
+          addToast(
             siteId
               ? {
                   title: isOffline ? "Offline — not saved" : "Couldn't reach the server — not saved",
@@ -305,6 +292,7 @@ export function useSaveCallback({
                     ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
                     : "Your changes are still open in this tab. Keep it open and try saving again.",
                   tone: "warning",
+                  key: SAVE_FAILED_TOAST_KEY,
                 }
               : {
                   title: isOffline
@@ -314,7 +302,6 @@ export function useSaveCallback({
                   tone: "info",
                 },
           );
-          if (siteId) trackSaveFailureToast(offlineToast);
           return siteId ? "error" : "queued-offline";
         }
         /* Board S1.5b — an expired session is not a failed save to retry. The
@@ -396,14 +383,13 @@ export function useSaveCallback({
         }
         const userMessage = explainSaveError(errorMessage);
         setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-        trackSaveFailureToast(
-          addToast({
-            title: "Save failed",
-            description: userMessage,
-            tone: "error",
-            action: { label: "Retry", onClick: () => void save() },
-          }),
-        );
+        addToast({
+          title: "Save failed",
+          description: userMessage,
+          tone: "error",
+          action: { label: "Retry", onClick: () => void save() },
+          key: SAVE_FAILED_TOAST_KEY,
+        });
         return "error";
       });
   }, [composer, addToast, setSaveState, setIsDirty, onAuthExpired]);

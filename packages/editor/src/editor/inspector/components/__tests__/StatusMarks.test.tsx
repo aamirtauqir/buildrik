@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
@@ -69,5 +69,17 @@ describe("StatusMarks", () => {
     mount({ binding: { label: "Menu.name", missing: false, collectionId: "m" } });
     fireEvent.click(screen.getByTestId("inspector-bound-chip"));
     expect(focus).toHaveBeenCalledWith({ section: "cms-binding" });
+  });
+
+  /* L2-028: renaming the master left "Component: <old name>" until reselect. */
+  it("the component mark follows a master rename", () => {
+    const master = { id: "cmp-1", name: "Audit Feature Card" };
+    vi.spyOn(c.components, "getInstanceByElementId").mockReturnValue({ componentId: "cmp-1" } as never);
+    vi.spyOn(c.components, "getComponent").mockImplementation(() => ({ ...master }) as never);
+    mount();
+    expect(screen.getByTestId("inspector-mark-component").textContent).toContain("Audit Feature Card");
+    master.name = "Audit Card Renamed";
+    act(() => c.emit(EVENTS.COMPONENT_UPDATED, { id: "cmp-1" }));
+    expect(screen.getByTestId("inspector-mark-component").textContent).toContain("Audit Card Renamed");
   });
 });

@@ -9,7 +9,7 @@ import {
   escapeStyleText,
   isDangerousUrl,
   isAbsoluteHttpUrl,
-  absoluteRedirectUrlSchema,
+  formRedirectUrlSchema,
   isSafeCssDeclaration,
   isSafeCssSelector,
   isSafeElementId,
@@ -235,18 +235,19 @@ describe("isAbsoluteHttpUrl", () => {
   });
 });
 
-describe("absoluteRedirectUrlSchema", () => {
-  it("accepts an absolute https URL and an empty string", () => {
-    expect(absoluteRedirectUrlSchema.safeParse("https://example.com").success).toBe(true);
-    expect(absoluteRedirectUrlSchema.safeParse("").success).toBe(true);
+describe("formRedirectUrlSchema", () => {
+  it("accepts an absolute https URL, a site path and an empty string", () => {
+    expect(formRedirectUrlSchema.safeParse("https://example.com").success).toBe(true);
+    expect(formRedirectUrlSchema.safeParse("/thanks").success).toBe(true);
+    expect(formRedirectUrlSchema.safeParse("").success).toBe(true);
   });
 
   it("refuses a javascript: URL", () => {
-    expect(absoluteRedirectUrlSchema.safeParse("javascript:alert(1)").success).toBe(false);
+    expect(formRedirectUrlSchema.safeParse("javascript:alert(1)").success).toBe(false);
   });
 
-  it("refuses a relative path — NextResponse.redirect needs an absolute URL", () => {
-    expect(absoluteRedirectUrlSchema.safeParse("/thanks").success).toBe(false);
+  it("refuses a protocol-relative path — that is another host", () => {
+    expect(formRedirectUrlSchema.safeParse("//evil.example").success).toBe(false);
   });
 
   it("stays stricter than the shared isDangerousUrl alone — file: passes THAT but fails here", () => {
@@ -254,6 +255,7 @@ describe("absoluteRedirectUrlSchema", () => {
     // redirect to it is still meaningless, so the composed schema still
     // refuses it via isAbsoluteHttpUrl's protocol allowlist.
     expect(isDangerousUrl("file:///etc/passwd")).toBe(false);
-    expect(absoluteRedirectUrlSchema.safeParse("file:///etc/passwd").success).toBe(false);
+    expect(formRedirectUrlSchema.safeParse("file:///etc/passwd").success).toBe(false);
   });
 });
+

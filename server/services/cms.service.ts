@@ -339,7 +339,15 @@ export async function listEntries(siteId: string, collectionId: string) {
   });
 }
 
-export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
+export async function upsertEntry(
+  siteId: string,
+  input: UpsertEntryInput,
+  /* Server-only: the CSV importer loops this and touches cmsEditedAt once at
+     the end. Never part of the transport schema — a client that could skip
+     the bump could change an APPROVED site's content without staling the
+     approval (EDT-021). */
+  options: { skipTouchCmsEdited?: boolean } = {},
+) {
   /* A write into a DELETED collection is GONE, not NOT_FOUND: the client
      drops a GONE row, while NOT_FOUND is just a failure it retries forever —
      a permanent "didn't sync" notice and a blocked publish on the device that
@@ -360,9 +368,7 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
     data: clean as unknown as Prisma.InputJsonValue,
     ...(input.status ? { status: input.status } : {}),
   };
-  // CSV import loops upsertEntry; skip the per-row bump and let the
-  // importer touch cmsEditedAt once at the end.
-  const bump = input._skipTouchCmsEdited !== true;
+  const bump = options.skipTouchCmsEdited !== true;
   const existing = input.id
     ? await prisma.cmsEntry.findUnique({
         where: { id: input.id },
@@ -569,7 +575,7 @@ export async function importCsvEntries(
       continue;
     }
     try {
-      await upsertEntry(siteId, { siteId, collectionId, data, _skipTouchCmsEdited: true });
+      await upsertEntry(siteId, { siteId, collectionId, data }, { skipTouchCmsEdited: true });
       imported += 1;
     } catch (e) {
       errors.push({ row: rowNumber, message: e instanceof Error ? e.message : "Could not be saved" });

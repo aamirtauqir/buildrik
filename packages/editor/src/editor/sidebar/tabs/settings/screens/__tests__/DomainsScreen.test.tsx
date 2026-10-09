@@ -325,7 +325,7 @@ describe("DomainsScreen — Manage DNS › Remove → confirm → removed", () =
     const dialog = screen.getByTestId("set-dom-confirm");
     expect(within(dialog).getByTestId("set-dom-confirm-title")).toHaveTextContent("Remove bellacucina.com?");
     expect(within(dialog).getByTestId("set-dom-confirm-body")).toHaveTextContent(
-      "bellacucina.com stops pointing at this site. Visitors following that address get nothing until you reconnect it or change your DNS; the site keeps serving on its buildrick.app address.",
+      "bellacucina.com stops pointing at this site. Visitors following that address get nothing until you reconnect it or change your DNS; the site keeps serving on its default vercel.app address.",
     );
     expect(dialog).toHaveAttribute("aria-label", "Remove bellacucina.com? · Bella Cucina");
     fireEvent.click(screen.getByTestId("set-dom-confirm-cancel"));
@@ -346,7 +346,7 @@ describe("DomainsScreen — Manage DNS › Remove → confirm → removed", () =
     await waitFor(() => expect(screen.getByTestId("set-dom-empty")).toBeInTheDocument());
     expect(screen.queryByTestId("set-dom-confirm")).toBeNull();
     expect(screen.getByTestId("set-dom-removed")).toHaveTextContent(
-      "bellacucina.com removed. This site is still available at its buildrick.app address.",
+      "bellacucina.com removed. This site is still available at its default vercel.app address.",
     );
     expect(screen.queryByTestId("set-dom-card-dom1")).toBeNull();
     expect(screen.getByTestId("set-dom-add")).toBeInTheDocument();
@@ -372,7 +372,7 @@ describe("DomainsScreen — empty (3397:33034), loading (3397:32985), load-error
     const empty = screen.getByTestId("set-dom-empty");
     expect(empty).toHaveTextContent("Custom domain");
     expect(empty).toHaveTextContent("Point your own domain at this site. DNS changes happen at your domain registrar.");
-    expect(empty).toHaveTextContent("No custom domain. Using the free buildrick.app address until you connect one.");
+    expect(empty).toHaveTextContent("No custom domain. The site uses its default vercel.app address until you connect one.");
     expect(screen.queryByTestId("set-dom-removed")).toBeNull();
     expect(within(empty).getByTestId("set-dom-add")).toHaveTextContent("Add a domain");
     fireEvent.click(within(empty).getByTestId("set-dom-add"));

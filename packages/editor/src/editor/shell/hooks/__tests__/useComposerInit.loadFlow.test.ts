@@ -110,12 +110,19 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   },
 }));
 
+const { dismissToastMock } = vi.hoisted(() => ({ dismissToastMock: vi.fn() }));
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
+  dismissToast: dismissToastMock,
+}));
+
 vi.mock("@/services/AssetUploadService", () => ({
   createRemoteAssetSync: vi.fn(() => ({})),
 }));
 
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { deriveLifecycleState } from "@/editor/shell/lifecycle";
+import { takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import {
   getSiteIdFromUrl,
   isSaveConflictPending,
@@ -345,6 +352,40 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     }
   });
 
+  /* EDT-018: the prompt outlived the save of the restored work ("still there
+     8 s later, topbar Done"). Once the copy is handed over — by Restore, or by
+     a Retry that restores it first — the prompt has nothing left to offer. */
+  it.each([
+    ["Restore my edits", (t: { action?: { onClick: () => void } }) => t.action!.onClick()],
+    ["a Retry that restores the copy first", () => void takeOffScreenUnsaved("site-9")],
+  ])("the recovery prompt goes once the copy is handed over (%s)", async (_door, handOver) => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
+    localStorage.setItem(
+      "bk-unsaved-v1-site-9",
+      JSON.stringify({ project: { pages: [{ id: "q" }], styles: [] }, at: "2026-10-09T00:00:00.000Z" }),
+    );
+    dismissToastMock.mockClear();
+    try {
+      const params = makeParams({ addToast: vi.fn().mockReturnValue("recovery-toast") });
+      renderHook(() => useComposerInit(params));
+      await act(async () => {
+        mockComposer.emit("composer:ready");
+        await flushMicrotasks();
+      });
+      const toast = vi
+        .mocked(params.addToast!)
+        .mock.calls.map(([t]) => t)
+        .find((t) => /never reached the server/i.test(t.title ?? ""));
+      expect(dismissToastMock).not.toHaveBeenCalled();
+      act(() => handOver(toast!));
+      expect(dismissToastMock).toHaveBeenCalledWith("recovery-toast");
+    } finally {
+      takeOffScreenUnsaved("site-9");
+      localStorage.removeItem("bk-unsaved-v1-site-9");
+    }
+  });
+
   /* C-9: a member demoted mid-save is sent to view mode, where nothing can
      be saved — offering "Restore my edits" there would put back edits that
      can only be refused again. The record stays for when the role returns. */
@@ -409,6 +450,24 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     localStorage.removeItem("bk-unsaved-v1-site-9");
   });
 
+  /* L1-008: the engine mirrored the open site into ONE unscoped
+     localStorage key ("aquibra-project") shared by every site and user on
+     the browser, and a failed server load fell back to it. A site session
+     has no engine-local storage at all. */
+  it("a site session builds the composer with no engine-local storage", async () => {
+    const { createComposer } = await import("../../../../engine");
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    renderHook(() => useComposerInit(makeParams()));
+    expect(vi.mocked(createComposer).mock.calls.at(-1)?.[0]).toMatchObject({ storage: { type: "none", autoSave: false } });
+  });
+
+  it("the standalone demo (no site) keeps its local storage", async () => {
+    const { createComposer } = await import("../../../../engine");
+    vi.mocked(getSiteIdFromUrl).mockReturnValue(null);
+    renderHook(() => useComposerInit(makeParams()));
+    expect((vi.mocked(createComposer).mock.calls.at(-1)?.[0] as { storage?: unknown }).storage).toBeUndefined();
+  });
+
   it("scopes IndexedDB buckets, imports, seeds saveState, hydrates media, toasts", async () => {
     const projectData = { pages: [{ id: "p" }], dsSchemaVersion: 0, styles: [] };
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
@@ -444,9 +503,8 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
       [{ id: "f1" }],
     );
 
-    expect(params.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "Project loaded", tone: "success" }),
-    );
+    // L1-028: a normal load is silent — toasts are for recovery and conflicts.
+    expect(params.addToast).not.toHaveBeenCalledWith(expect.objectContaining({ tone: "success" }));
     // the localStorage fallback must NOT also run
     expect(mockComposer.loadProject).not.toHaveBeenCalled();
   });

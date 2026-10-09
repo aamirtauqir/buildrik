@@ -51,6 +51,30 @@ const discarded = new Set<string>();
    and saved; after that the usual rules apply. */
 const offScreen = new Set<string>();
 
+/* EDT-018: whoever offers the off-screen copy back ("Restore my edits") hears
+   when that offer is spent — the copy handed over or thrown away — so the
+   offer does not outlive it. */
+const settledListeners = new Map<string, Set<() => void>>();
+
+function settleOffScreen(siteId: string): boolean {
+  if (!offScreen.delete(siteId)) return false;
+  const listeners = settledListeners.get(siteId);
+  settledListeners.delete(siteId);
+  listeners?.forEach((l) => l());
+  return true;
+}
+
+/** Run `onSettled` once this site's off-screen copy is handed over or
+ *  discarded. Returns an unsubscribe. */
+export function onOffScreenSettled(siteId: string, onSettled: () => void): () => void {
+  let listeners = settledListeners.get(siteId);
+  if (!listeners) settledListeners.set(siteId, (listeners = new Set()));
+  listeners.add(onSettled);
+  return () => {
+    settledListeners.get(siteId)?.delete(onSettled);
+  };
+}
+
 /** The load path found kept work it did not apply. */
 export function markUnsavedOffScreen(siteId: string): void {
   offScreen.add(siteId);
@@ -58,7 +82,7 @@ export function markUnsavedOffScreen(siteId: string): void {
 
 /** The kept work to restore, once; null when none is waiting off screen. */
 export function takeOffScreenUnsaved(siteId: string): UnsavedWork | null {
-  if (!offScreen.delete(siteId)) return null;
+  if (!settleOffScreen(siteId)) return null;
   return readUnsaved(siteId);
 }
 
@@ -102,7 +126,7 @@ export function clearUnsaved(siteId: string): void {
  *  record, and refuse to keep another for the rest of this page's life. */
 export function discardUnsaved(siteId: string): void {
   discarded.add(siteId);
-  offScreen.delete(siteId);
+  settleOffScreen(siteId);
   clearUnsaved(siteId);
 }
 

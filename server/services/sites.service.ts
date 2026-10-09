@@ -16,6 +16,7 @@ import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "
 import { SITE_SETTINGS_COLUMNS, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.service";
 import { slugifyProjectName } from "@/lib/vercel";
 import { BRAND_FORMAT_CONFLICT, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
@@ -967,6 +968,24 @@ export class PageSlugTakenError extends Error {
  * save, breaking applied-template state across reload. Persisting meta is
  * load-bearing for P2 + P9 (template version pinning + applied-template badge).
  */
+/** No plan allows fewer pages than this, so a save at or under it needs no lookup. */
+const MIN_PAGES_PER_SITE = Math.min(...Object.values(PLAN_LIMITS).map((l) => l.pagesPerSite as number));
+
+/**
+ * L3-013: the plan's pages-per-site limit, at the write boundary the editor
+ * uses (it saves full snapshots; `pages.create` was the only gate and the
+ * editor never calls it). A site already over the limit — a downgrade — keeps
+ * saving as long as the save adds no page. Throws `PAGE_LIMIT:<limit>`.
+ */
+async function assertPageLimit(siteId: string, workspaceId: string, incoming: number) {
+  if (incoming <= MIN_PAGES_PER_SITE) return;
+  const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } });
+  const limit = PLAN_LIMITS[(workspace?.plan ?? "FREE") as PlanName].pagesPerSite as number;
+  if (limit === -1 || incoming <= limit) return;
+  const stored = await prisma.page.count({ where: { siteId } });
+  if (incoming > stored) throw new Error(`PAGE_LIMIT:${limit}`);
+}
+
 export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
@@ -992,6 +1011,8 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
     }
   }
+
+  await assertPageLimit(input.siteId, site.workspaceId, input.pages.length);
 
   const savedAt = new Date();
   // Delete pages not in incoming set (only when caller supplies position

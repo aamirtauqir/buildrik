@@ -100,6 +100,26 @@ describe("getShareDraftRows", () => {
     expect(select.publishedPassword).toBeUndefined();
   });
 
+  /* L4-031: the draft renders in a scratch composer; without the server's
+     brand-token switch it took the engine default (on) and migrated a
+     switched-off site's tokens in memory. */
+  it("carries the site's brand-token switch for the scratch render", async () => {
+    const prev = { on: process.env.BRAND_TOKENS_V2, list: process.env.BRAND_TOKENS_V2_WORKSPACES };
+    process.env.BRAND_TOKENS_V2 = "";
+    process.env.BRAND_TOKENS_V2_WORKSPACES = "ws-qa";
+    try {
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", workspaceId: "ws-qa", sitePages: [] } as never);
+      expect((await getShareDraftRows("s1")).siteColumns).toMatchObject({ brandTokensV2: true });
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", workspaceId: "ws-other", sitePages: [] } as never);
+      const rows = await getShareDraftRows("s1");
+      expect(rows.siteColumns).toMatchObject({ brandTokensV2: false });
+      expect(rows.siteColumns).not.toHaveProperty("workspaceId");
+    } finally {
+      process.env.BRAND_TOKENS_V2 = prev.on;
+      process.env.BRAND_TOKENS_V2_WORKSPACES = prev.list;
+    }
+  });
+
   it("carries the site's ADDED fonts, and only those", async () => {
     vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", sitePages: [] } as never);
     vi.mocked(prisma.mediaAsset.findMany).mockResolvedValue([

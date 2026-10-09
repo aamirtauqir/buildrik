@@ -178,4 +178,15 @@ describe("one owner per keystroke", () => {
     expect(commands).toContain('id: "nudge-up"');
     expect(commands).toContain('id: "nudge-up-large"');
   });
+
+  /* L2-016: an instance part refused by delete/cut is not "locked". */
+  it("a refused component part says to detach, not that it is locked", () => {
+    const { composer, fire } = fakeComposer();
+    const addToast = vi.fn();
+    renderHook(() => useClipboardToasts(composer, addToast));
+    fire(EVENTS.LOCKED_ELEMENTS_SKIPPED, { reason: "instance" });
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ description: "Part of a component — detach the instance to change it" }),
+    );
+  });
 });

@@ -157,3 +157,32 @@ describe("STRICT_HTML5_RULES — canNestElementStrict overlay", () => {
     expect(canNestElementStrict("heading", "container")).toBe(true);
   });
 });
+
+describe("button children are phrasing content (L3-003)", () => {
+  // <button> accepts phrasing content only; block and interactive children
+  // ship invalid markup (an <hr> inside a <button> drew a line under it).
+  it.each([
+    "divider",
+    "spacer",
+    "heading",
+    "paragraph",
+    "gallery",
+    "upload",
+    "list-item",
+    "accordion",
+    "tabs",
+    "product-card",
+    "product-grid",
+    "video-embed",
+    "map-embed",
+  ] as ElementType[])("refuses %s inside a button", (child) => {
+    expect(canNestElement(child, "button")).toBe(false);
+  });
+
+  it.each(["text", "label", "icon", "image", "svg"] as ElementType[])(
+    "still accepts %s inside a button",
+    (child) => {
+      expect(canNestElement(child, "button")).toBe(true);
+    }
+  );
+});

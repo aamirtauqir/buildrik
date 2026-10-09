@@ -25,6 +25,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import type { Issue } from "./useStudioState";
+import { isPageLive } from "@/engine/export/ExportEngine";
 
 export type ContentScanState = "idle" | "scanning" | "error";
 
@@ -50,7 +51,9 @@ export function useContentIssueScanner(composer: Composer | null): UseContentIss
       // exportPages(), not getAllPages(): the page map's `root` is a snapshot
       // whose children are emptied once `buildElementTree` hands them to the
       // element registry, so scanning it found nothing on any loaded project.
-      const pages = composer.elements.exportPages();
+      /* Live pages only, as the server's checks and the publish (L4-042):
+         a hidden page never ships, so its images and links are not issues. */
+      const pages = composer.elements.exportPages().filter(isPageLive);
       const findings = detectContentIssues(pages);
       setIssues(
         findings.map((f) => ({

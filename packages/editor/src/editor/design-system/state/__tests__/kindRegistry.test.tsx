@@ -320,13 +320,26 @@ describe("Review changes — one row per token, each with its own Revert", () =>
     expect(ok).toBe(false);
   });
 
-  it("⌘Z (a write outside the log) that moves the token makes its row stale", () => {
+  /* L4-026 (rewritten): ⌘Z puts the token back as the write found it, so the
+     edit is no longer applied — its row leaves the list (it used to stay,
+     stale, under "Already applied"). */
+  it("⌘Z that puts the token back removes its row", () => {
     const composer = fakeComposer();
     const { result } = colorRegistry(composer);
     act(() => {
       result.current.updateToken("color-primary", "#C2410C");
     });
     act(() => composer.replace(DEFAULT_TOKENS));
+    expect(result.current.store.edits).toHaveLength(0);
+  });
+
+  it("a write outside the log that moves the token elsewhere makes its row stale", () => {
+    const composer = fakeComposer();
+    const { result } = colorRegistry(composer);
+    act(() => {
+      result.current.updateToken("color-primary", "#C2410C");
+    });
+    act(() => composer.replace(setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#111111")));
     expect(result.current.store.edits[0].stale).toBe(true);
   });
 });

@@ -87,6 +87,7 @@ describe("Site Detail Service", () => {
       const { createRedirect } = await import("@/server/services/redirect.service");
       vi.mocked(prisma.redirect.count).mockResolvedValue(5);
       vi.mocked(prisma.redirect.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.page.findMany).mockResolvedValue([]);
       vi.mocked(prisma.redirect.create).mockResolvedValue({
         id: "r2", siteId: "s1", fromPath: "/old", toUrl: "/new", type: "301",
       } as any);

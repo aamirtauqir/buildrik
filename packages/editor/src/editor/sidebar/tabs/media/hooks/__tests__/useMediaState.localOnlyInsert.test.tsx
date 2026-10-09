@@ -69,6 +69,8 @@ vi.mock("../useDiscoveryState", () => ({
   }),
 }));
 vi.mock("../useServerStorageQuota", () => ({ useServerStorageQuota: () => ({ quota: null }) }));
+const locateComment = vi.hoisted(() => vi.fn());
+vi.mock("@/editor/sidebar/tabs/review/locate", () => ({ locateComment }));
 
 function composerWith(asset: Record<string, unknown>) {
   return {
@@ -260,5 +262,20 @@ describe("applyPick — pick mode's Use selected image", () => {
     expect(result.current.selectionContext).toEqual({ elementId: "el-9", label: "Hero" });
     act(() => endAssetPick());
     expect(result.current.selectionContext).toBeNull();
+  });
+});
+
+/* L4-004: with nothing selected the image lands at the end of the page, below
+   the fold, and the canvas stayed where it was — "added ✓" over a canvas that
+   showed nothing new. The new element is selected AND scrolled into view. */
+describe("insertToCanvas — the new element is put on screen", () => {
+  it("selects the inserted element and scrolls it into view", async () => {
+    locateComment.mockClear();
+    const composer = composerWith({ src: "https://cdn/red.png", type: "img", name: "red.png" });
+    const { result } = renderHook(() => useMediaState(composer as never));
+    await act(async () => {
+      await result.current.insertToCanvas("a1");
+    });
+    expect(locateComment).toHaveBeenCalledWith(composer, { pageId: null, targetSelector: "el-1" });
   });
 });

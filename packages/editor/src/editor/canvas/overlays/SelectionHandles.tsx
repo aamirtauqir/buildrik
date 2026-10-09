@@ -75,6 +75,8 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
   height,
   onHandleMouseDown,
 }) => {
+  /* 24 px, or what is left between the corner squares on a short element. */
+  const sideEdgeHeight = Math.max(6, Math.min(24, height - SELECTION_HANDLE_SIZE * 2));
   return (
     <>
       {/* Corner handles */}
@@ -158,8 +160,9 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
           />
         </>
       )}
-      {height > 50 && (
-        <>
+      {/* E / W on every element (L1-019): a short text or button needs a
+          width-only resize too. Shortened to fit between the corners. */}
+      <>
           {/* W */}
           <div
             role="button"
@@ -168,9 +171,9 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
             style={{
               ...edgeHandleStyle,
               left: left - EDGE_SIZE / 2,
-              top: top + height / 2 - 12,
+              top: top + height / 2 - sideEdgeHeight / 2,
               width: EDGE_SIZE,
-              height: 24,
+              height: sideEdgeHeight,
               cursor: "ew-resize",
               pointerEvents: "auto",
             }}
@@ -190,9 +193,9 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
             style={{
               ...edgeHandleStyle,
               left: left + width - EDGE_SIZE / 2,
-              top: top + height / 2 - 12,
+              top: top + height / 2 - sideEdgeHeight / 2,
               width: EDGE_SIZE,
-              height: 24,
+              height: sideEdgeHeight,
               cursor: "ew-resize",
               pointerEvents: "auto",
             }}
@@ -204,8 +207,7 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
               }
             }}
           />
-        </>
-      )}
+      </>
     </>
   );
 };

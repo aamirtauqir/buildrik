@@ -421,6 +421,16 @@ describe("SeoTab — the redirect offer after a saved slug change", () => {
     expect(screen.queryByTestId(OFFER)).toBeNull();
   });
 
+  /* L3-005: the old address still belongs to another page, so a redirect
+     from it would hide that page once published. No offer. */
+  it("does not offer a redirect from an address another page still answers on", () => {
+    const others = [{ id: "p-other", name: "About", slug: "about" }];
+    const c = { emit: vi.fn(), elements: { getAllPages: () => others } } as unknown as Composer;
+    const { rerender } = render(<SeoTab s={makeSettings({ slug: "about" })} page={about({ id: "p-dup" })} composer={c} />);
+    rerender(<SeoTab s={makeSettings({ slug: "team" })} page={about({ id: "p-dup", slug: "team" })} composer={c} />);
+    expect(screen.queryByTestId(OFFER)).toBeNull();
+  });
+
   it("starts a fresh baseline when the drawer moves to another page", () => {
     const contact = (slug: string): PageItem => ({ id: "p-contact", name: "Contact", slug });
     const { rerender } = render(<SeoTab s={makeSettings({ slug: "about" })} page={about()} composer={null} />);

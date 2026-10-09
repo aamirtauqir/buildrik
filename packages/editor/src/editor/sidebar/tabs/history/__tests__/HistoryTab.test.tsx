@@ -65,3 +65,22 @@ describe("ActivityView error state", () => {
     expect(container.querySelector(".empty-state")).toBeTruthy();
   });
 });
+
+// ── ActivityView empty state chord (L1-032) ───────────────────────────────────
+
+describe("ActivityView empty state names the platform's undo chord", () => {
+  const original = navigator.platform;
+  afterEach(() => Object.defineProperty(navigator, "platform", { value: original, configurable: true }));
+
+  it("says ⌘Z on macOS", () => {
+    Object.defineProperty(navigator, "platform", { value: "MacIntel", configurable: true });
+    render(<ActivityView composer={null} />);
+    expect(screen.getByText("⌘Z")).toBeInTheDocument();
+  });
+
+  it("says Ctrl+Z elsewhere", () => {
+    Object.defineProperty(navigator, "platform", { value: "Win32", configurable: true });
+    render(<ActivityView composer={null} />);
+    expect(screen.getByText("Ctrl+Z")).toBeInTheDocument();
+  });
+});

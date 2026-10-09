@@ -138,6 +138,12 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   );
   const altCount = contentFindings.filter((f) => f.kind === "missing-alt").length;
   const linkCount = contentFindings.filter((f) => f.kind === "broken-link").length;
+  const noFileCount = contentFindings.filter((f) => f.kind === "missing-image").length;
+  checks.push(
+    noFileCount > 0
+      ? { label: CONTENT_CHECK_LABELS["missing-image"], status: "warning", detail: `${noFileCount} image${noFileCount > 1 ? "s have" : " has"} no file and will show as broken.` }
+      : { label: CONTENT_CHECK_LABELS["missing-image"], status: "pass", detail: "Every image has a file." },
+  );
   checks.push(
     altCount > 0
       ? { label: CONTENT_CHECK_LABELS["missing-alt"], status: "warning", detail: `${altCount} image${altCount > 1 ? "s are" : " is"} missing alt text.` }

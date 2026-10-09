@@ -118,6 +118,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "interactions-change": "Changed interactions",
   // Media / components
   "replace media": "Replaced media",
+  "update alt text": "Updated alt text",
   "replace across canvas": "Replaced media across the page",
   "replace across selected pages": "Replaced media across pages",
   "instance-sync": "Synced component instances",
@@ -250,7 +251,15 @@ export function useHistoryFeedback(
 
     /* Read the selection BEFORE the command runs — afterwards the elements are
        gone and there is nothing left to name. */
+    let groupFrom: string[] | null = null;
     const handleCommandBefore = (data: { id?: string }) => {
+      groupFrom = data?.id === "group" ? [...(composer.selection?.getSelectedIds?.() ?? [])] : null;
+      if (data?.id === "ungroup") {
+        const first = composer.selection?.getSelectedIds?.()[0];
+        if (composer.elements.getElement(first ?? "")?.getType?.() !== "container") {
+          addToast({ description: "Select a group to ungroup", tone: "neutral", duration: 3000 });
+        }
+      }
       if (data?.id !== "delete") {
         pending = null;
         return;
@@ -269,6 +278,24 @@ export function useHistoryFeedback(
        actually disappeared instead of trusting that the command did something —
        the same rule this walk applies to everything else. */
     const handleCommandRun = (data: { id?: string }) => {
+      /* ⌘G on one element did nothing and said nothing; a real group was
+         silent too (L1-020). The group command selects the new group. */
+      if (data?.id === "group" && groupFrom) {
+        const from = groupFrom;
+        groupFrom = null;
+        const now = composer.selection?.getSelectedIds?.() ?? [];
+        if (from.length < 2) {
+          addToast({ description: "Select two or more elements to group", tone: "neutral", duration: 3000 });
+        } else if (now.length === 1 && !from.includes(now[0])) {
+          addToast({
+            description: `${from.length} elements grouped`,
+            tone: "info",
+            duration: 5000,
+            action: { label: "Undo", onClick: composer.history.captureUndo() },
+          });
+        }
+        return;
+      }
       if (data?.id !== "delete" || !pending) return;
       const { ids, name } = pending;
       pending = null;

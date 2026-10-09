@@ -40,6 +40,21 @@ describe("KeyboardLegend", () => {
     expect(card).toHaveTextContent("Also: ⌃, opens Settings");
   });
 
+  /* L1-014: three lines contradicted the real bindings (useEditorShortcuts,
+     tabsConfig) and the ⌘/ sheet. The board's rows and keys stay; what each
+     says follows the code. */
+  it("says what the keys actually do", () => {
+    const c = makeComposer();
+    render(<KeyboardLegend composer={c as never} />);
+    c.fire(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND);
+    const card = screen.getByTestId("kbd-legend");
+    expect(card).not.toHaveTextContent("adds a section");
+    expect(card).not.toHaveTextContent("jump to a page");
+    expect(card).not.toHaveTextContent("only while a review is live");
+    expect(card).toHaveTextContent("⇧A opens Components");
+    expect(card).toHaveTextContent("preview · AI panel");
+  });
+
   it("All shortcuts › opens the full sheet and closes the legend", () => {
     const c = makeComposer();
     render(<KeyboardLegend composer={c as never} />);

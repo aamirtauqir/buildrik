@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ToastInput, dismissToast } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast, dismissToastKey } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import { THRESHOLDS } from "../../../shared/constants/config";
@@ -34,19 +34,20 @@ import {
   keepStoredTokensOnSave,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
-import { clearUnsaved, keepUnsaved, markUnsavedOffScreen, readUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
+import {
+  clearUnsaved,
+  keepUnsaved,
+  markUnsavedOffScreen,
+  onOffScreenSettled,
+  readUnsaved,
+  takeOffScreenUnsaved,
+} from "@/services/unsavedRecovery";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
-import {
-  dismissSaveFailureToasts,
-  isAuthSaveError,
-  isForbiddenSaveError,
-  refuseForbiddenSave,
-  trackSaveFailureToast,
-} from "./useSaveCallback";
+import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave, SAVE_FAILED_TOAST_KEY } from "./useSaveCallback";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
@@ -214,6 +215,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     const instance = createComposer({
       container: containerRef.current || document.createElement("div"),
       ...composerOptions,
+      /* L1-008: a site lives on the server. The engine's local adapter wrote
+         it to one unscoped "aquibra-project" key every site and user on this
+         browser shared, and a failed server load read that key back — another
+         site's page. Only the siteless demo keeps a local project. */
+      ...(getSiteIdFromUrl() ? { storage: { type: "none", autoSave: false } } : {}),
       remoteSync,
       aiClient,
     } as ComposerConfig);
@@ -350,9 +356,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     /* Handed over once; Retry may already have taken it. The
                        copy stays kept until a save of it is confirmed. */
                     const kept = takeOffScreenUnsaved(siteId);
-                    /* Acted on: the toast goes (L5-076 — it stayed up after
-                       Restore, and after every later save). */
-                    if (recoveryToast) dismissToast(recoveryToast);
                     if (!kept) return;
                     instance.importProject(kept.project);
                     setIsDirty(true);
@@ -366,7 +369,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 },
                 duration: Infinity,
               });
-              if (recoveryToast) trackSaveFailureToast(recoveryToast);
+              /* EDT-018: the offer is spent once the copy is handed over —
+                 by Restore, or by a manual Retry that restores it first
+                 (useSaveCallback) — or discarded. A warning toast does not
+                 dismiss on its action, so it stood over the saved work
+                 inviting a second, empty restore. */
+              if (recoveryToast) onOffScreenSettled(siteId, () => dismissToast(recoveryToast));
             } else {
               setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             }
@@ -393,11 +401,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 loaded: remote.assets.length,
               });
             }
-            addToastRef.current({
-              title: "Project loaded",
-              description: "Loaded from dashboard.",
-              tone: "success",
-            });
           })
           .catch((err) => {
             console.error("[BuildrikSync] load failed:", err);
@@ -431,7 +434,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               addToastRef.current({
                 title: "Session expired",
                 description:
-                  "Sign in to load this site from the dashboard. Showing local changes for now.",
+                  "Sign in to load this site from the dashboard.",
                 tone: "warning",
                 action: {
                   label: "Sign in",
@@ -444,7 +447,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               addToastRef.current({
                 title: "Load failed",
                 description:
-                  "Could not load project from dashboard. Falling back to local.",
+                  "Could not load this site from the dashboard. Reload to try again.",
                 tone: "warning",
               });
             }
@@ -732,9 +735,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                that is missing — leaving it would offer a stale restore on the
                next load. */
             if (siteId) clearUnsaved(siteId);
-            dismissSaveFailureToasts();
             refusedTokens = null;
             clearRetry();
+            dismissToastKey(SAVE_FAILED_TOAST_KEY);
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })
@@ -799,7 +802,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               const retrying = retryAttempt > 0;
               if (siteId) scheduleRetry();
               if (siteId && !retrying) {
-                trackSaveFailureToast(addToast({
+                addToast({
                   /* Same words as the manual path for both branches, so one
                      event cannot be named two different things depending on
                      which path reported it. */
@@ -808,7 +811,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
                     : "Your changes are still open in this tab. Keep it open and try saving again.",
                   tone: "warning",
-                }));
+                  key: SAVE_FAILED_TOAST_KEY,
+                });
               }
               return;
             }
@@ -848,7 +852,18 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               const notLoaded = message.includes("PROJECT_NOT_LOADED");
               // Deleted is not "not loaded yet" — no reload will fix it.
               const gone = message.includes("SITE_MISSING");
-              const failureToast = addToast({
+              /* L3-013: over the plan's page limit. The server's words name
+                 the limit; a Retry would send the same refused snapshot. */
+              if (message.startsWith("PAGE_LIMIT:")) {
+                addToast({
+                  title: "Not saved — page limit reached",
+                  description: message.slice("PAGE_LIMIT:".length).trim(),
+                  tone: "error",
+                  key: SAVE_FAILED_TOAST_KEY,
+                });
+                return;
+              }
+              addToast({
                 title: gone
                   ? "This site isn't there anymore"
                   : notLoaded
@@ -860,6 +875,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     ? "Autosave is held back so it can't overwrite the stored pages. Reload to get the real site."
                     : "Could not save to dashboard. Changes are unsaved.",
                 tone: notLoaded ? "warning" : "error",
+                key: SAVE_FAILED_TOAST_KEY,
                 ...(notLoaded && !gone
                   ? { action: { label: "Reload", onClick: () => window.location.reload() } }
                   : !gone
@@ -868,7 +884,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                       { action: { label: "Retry now", onClick: handler } }
                     : {}),
               });
-              if (!notLoaded && !gone) trackSaveFailureToast(failureToast);
             }
           });
       }, THRESHOLDS.AUTOSAVE_DEBOUNCE);

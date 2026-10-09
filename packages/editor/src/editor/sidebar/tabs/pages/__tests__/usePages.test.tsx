@@ -291,7 +291,7 @@ describe("usePages deletePage", () => {
     });
   });
 
-  it("deletes a normal page and offers Undo wired to history.undo", () => {
+  it("deletes a normal page and offers an Undo that reverts that delete only (L3-007)", () => {
     const composer = createMockComposer({
       pages: [pg("p1", "Home", { isHome: true }), pg("p2", "About")],
     });
@@ -304,8 +304,30 @@ describe("usePages deletePage", () => {
     expect(toast).toMatchObject({ description: "About deleted", tone: "info" });
     expect(toast?.action?.label).toBe("Undo");
 
+    // The token is captured right after the delete: a later edit makes it a
+    // no-op instead of undoing that edit (raw history.undo did).
+    const undoDelete = vi.mocked(composer.history.captureUndo).mock.results[0]?.value;
     act(() => toast?.action?.onClick());
-    expect(composer.history.undo).toHaveBeenCalledTimes(1);
+    expect(undoDelete).toHaveBeenCalledTimes(1);
+    expect(composer.history.undo).not.toHaveBeenCalled();
+  });
+});
+
+describe("Pages toast Undo targets the action it names (L3-007)", () => {
+  const cases: Array<[string, (r: ReturnType<typeof usePages>) => void]> = [
+    ["rename", (r) => r.commitRename("p2", "Our menu")],
+    ["bulk delete", (r) => r.deletePages(["p2"])],
+    ["set homepage", (r) => r.setHomepage("p2")],
+  ];
+  it.each(cases)("%s captures its own undo token", (_label, run) => {
+    const composer = createMockComposer({ pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")] });
+    const { result } = setup(composer);
+    act(() => run(result.current));
+    const token = vi.mocked(composer.history.captureUndo).mock.results.at(-1)?.value;
+    expect(token).toBeDefined();
+    act(() => lastToast()?.action?.onClick());
+    expect(token).toHaveBeenCalledTimes(1);
+    expect(composer.history.undo).not.toHaveBeenCalled();
   });
 });
 

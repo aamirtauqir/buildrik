@@ -84,7 +84,7 @@ const FAILURE_TOAST: Record<StockFailureReason, string> = {
 
 export function useDiscoveryState(
   composer: Composer,
-  showToast: (msg: string, type: "success" | "error" | "info") => void
+  showToast: (msg: string, type: "success" | "error" | "info", opts?: { duration?: number }) => void
 ): DiscoveryStateResult {
   const [stockPhotos, setStockPhotos] = useState<StockPhoto[]>([]);
   const [stockVideos, setStockVideos] = useState<StockVideo[]>([]);
@@ -170,7 +170,10 @@ export function useDiscoveryState(
         };
         setSearchFailed(failed);
         // A toast over results that did land would read as "nothing worked".
-        if (failed.img && failed.vid) showToast(FAILURE_TOAST[failed.img], "error");
+        /* The modal draws the same failure in place (`searchFailed`), so the
+           toast leaves on its own rather than following the user into other
+           panels (L4-009). */
+        if (failed.img && failed.vid) showToast(FAILURE_TOAST[failed.img], "error", { duration: 8000 });
       } finally {
         if (!controller.signal.aborted) {
           setDiscLoading((prev) => ({ ...prev, img: false, vid: false }));

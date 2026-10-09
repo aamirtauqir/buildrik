@@ -8,6 +8,11 @@
  * requests) and the guarded `openLeftPanelToTab` (⌘H, ⇧A, the palette,
  * `UI_PANEL_OPEN`, every `onOpen*` deep link) this returns.
  *
+ * Closing the drawer is guarded too (EDT-007): it unmounts the CMS workspace
+ * and an open record sheet with it, so a dirty record asks through this same
+ * dialog. Settings stays mounted in a closed drawer, so it is not asked about
+ * there, and "Leave anyway" on a close discards only the record.
+ *
  * What is NOT a guarded switch, and so never prompts:
  *   - the same tab (and sub-tab) — nothing unmounts;
  *   - a tab the sink will refuse (`isTabAllowed` false — the VIEWER gate that
@@ -43,7 +48,13 @@ export interface TabSwitchSinks {
   /** Told which domains' discards threw during "Leave anyway" — the switch
    *  still happens; those domains stay dirty. */
   onDiscardFailed: (domains: DirtyDomain[]) => void;
+  isLeftPanelOpen: boolean;
+  setIsLeftPanelOpen: (open: boolean) => void;
 }
+
+/* What a drawer close unmounts: the CMS workspace (StudioPanels'
+   `cmsWorkspaceOpen` needs the drawer open) and its record sheet. */
+const DRAWER_CLOSE_LOSES: readonly DirtyDomain[] = ["cms-record"];
 
 export interface UseTabSwitchGuardResult {
   /** `onSwitched` runs only once the switch actually happens — a door's
@@ -51,13 +62,16 @@ export interface UseTabSwitchGuardResult {
    *  switch the user kept away from. */
   setLeftPanelTab: (tab: string, onSwitched?: () => void) => void;
   openLeftPanelToTab: (primaryTab: string, subTab?: string, onSwitched?: () => void) => void;
+  /** The drawer ✕, the active rail icon, the canvas background click. */
+  toggleLeftPanel: () => void;
+  closeLeftPanel: () => void;
   dialogProps: TabSwitchGuardDialogProps;
 }
 
 /** The confirm's words, read when it opens: loss is promised only when every
  *  dirty surface will really discard on "Leave anyway". */
-function leaveCopy(): { body: string; leaveLabel: string } {
-  if (shellDirty.everyDirtyDiscards()) {
+function leaveCopy(only?: readonly DirtyDomain[]): { body: string; leaveLabel: string } {
+  if (shellDirty.everyDirtyDiscards(only)) {
     return { body: "You have unsaved changes. Switching away will lose them.", leaveLabel: "Leave and lose changes" };
   }
   return {
@@ -73,17 +87,20 @@ export function useTabSwitchGuard({
   openLeftPanelToTab,
   isTabAllowed,
   onDiscardFailed,
+  isLeftPanelOpen,
+  setIsLeftPanelOpen,
 }: TabSwitchSinks): UseTabSwitchGuardResult {
-  const pendingRef = React.useRef<(() => void) | null>(null);
+  /* `only` is what the pending exit unmounts (undefined: every domain). */
+  const pendingRef = React.useRef<{ perform: () => void; only?: readonly DirtyDomain[] } | null>(null);
   const [prompt, setPrompt] = React.useState<{ body: string; leaveLabel: string } | null>(null);
 
-  const guard = React.useCallback((switchesAway: boolean, perform: () => void) => {
-    if (!switchesAway || !shellDirty.get()) {
+  const guard = React.useCallback((switchesAway: boolean, perform: () => void, only?: readonly DirtyDomain[]) => {
+    if (!switchesAway || !(only ? shellDirty.anyDirty(only) : shellDirty.get())) {
       perform();
       return;
     }
-    pendingRef.current = perform;
-    setPrompt(leaveCopy());
+    pendingRef.current = { perform, only };
+    setPrompt(leaveCopy(only));
   }, []);
 
   const guardedSetLeftPanelTab = React.useCallback(
@@ -109,23 +126,34 @@ export function useTabSwitchGuard({
     [guard, isTabAllowed, leftPanelTab, leftPanelSubTabs, openLeftPanelToTab],
   );
 
+  const closeLeftPanel = React.useCallback(() => {
+    guard(isLeftPanelOpen, () => setIsLeftPanelOpen(false), DRAWER_CLOSE_LOSES);
+  }, [guard, isLeftPanelOpen, setIsLeftPanelOpen]);
+
+  const toggleLeftPanel = React.useCallback(() => {
+    if (isLeftPanelOpen) closeLeftPanel();
+    else setIsLeftPanelOpen(true);
+  }, [closeLeftPanel, isLeftPanelOpen, setIsLeftPanelOpen]);
+
   const onKeepEditing = React.useCallback(() => {
     pendingRef.current = null;
     setPrompt(null);
   }, []);
 
   const onLeaveAnyway = React.useCallback(() => {
-    const perform = pendingRef.current;
+    const pending = pendingRef.current;
     pendingRef.current = null;
     setPrompt(null);
-    const failed = shellDirty.discardDirty();
-    perform?.();
+    const failed = shellDirty.discardDirty(pending?.only);
+    pending?.perform();
     if (failed.length > 0) onDiscardFailed(failed);
   }, [onDiscardFailed]);
 
   return {
     setLeftPanelTab: guardedSetLeftPanelTab,
     openLeftPanelToTab: guardedOpenLeftPanelToTab,
+    toggleLeftPanel,
+    closeLeftPanel,
     dialogProps: {
       open: prompt !== null,
       body: prompt?.body ?? "",

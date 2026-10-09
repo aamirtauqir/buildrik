@@ -803,6 +803,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           storage={props.storage}
           onUpload={(files) => void uploadFromDrawer(files)}
           onRetryUpload={props.onRetryUpload}
+          onDismissUpload={props.onDismissUpload}
           onReplacementPicked={(original, file) => setReplacement({ original, file })}
           onOptimize={props.onOpenLibrary ? () => props.onOpenLibrary?.() : undefined}
           uploadQueue={props.uploadQueue}

@@ -90,6 +90,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
       const ok = await composer.components.detachInstance(instanceId);
       if (ok) {
         setInfo(null);
+        addToast({ description: `${component.name} instance detached`, tone: "info" });
         return;
       }
       addToast({ description: "Couldn't detach this instance. It may already be detached.", tone: "error" });

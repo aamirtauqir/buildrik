@@ -30,6 +30,7 @@ export function UploadZone({
   uploadQueue,
   failedUploads,
   onRetryUpload,
+  onDismissUpload,
   onReplacementPicked,
   onOptimize,
   inputRef: externalInputRef,
@@ -264,6 +265,21 @@ export function UploadZone({
                     aria-label={`Choose a smaller file to replace ${item.fileName}`}
                   >
                     Choose a smaller file…
+                  </Button>
+                ) : /^Unsupported file type/.test(item.error ?? "") && onDismissUpload ? (
+                  /* L4-008: a type the library does not take is refused every
+                     time — Retry was a dead end. */
+                  <Button
+                    type="button"
+                    color="light"
+                    size="xs"
+                    variant="link"
+                    className="tw:mt-1 tw:min-h-6 tw:self-start tw:pl-3.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+                    data-testid="media-upload-error-dismiss"
+                    onClick={() => onDismissUpload(item.fileName)}
+                    aria-label={`Dismiss ${item.fileName}`}
+                  >
+                    Dismiss
                   </Button>
                 ) : onRetryUpload ? (
                   <Button

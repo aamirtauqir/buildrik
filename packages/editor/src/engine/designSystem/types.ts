@@ -132,6 +132,10 @@ export interface BrandPreview {
   tokens: DesignToken[];
   darkMode: DarkMode;
   theme?: "light" | "dark";
+  /** "canvas": the theme-toggle block's look on the canvas (BRP1-M12) — a
+   *  view of the saved brand only. Brand checks keep measuring as before and
+   *  Brand's own Light / Dark switch may take it over or clear it. */
+  source?: "canvas";
 }
 
 export type ThemeMode = "light" | "dark" | "system";

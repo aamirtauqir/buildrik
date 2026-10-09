@@ -340,6 +340,30 @@ describe("uploadFile — non-image branch", () => {
   });
 });
 
+/* L4-006: the bar sat at 75% for the whole network upload — the milestones
+   were fixed and the Blob PUT reported nothing. The transfer's own fraction
+   now moves it between 75 and 99; 100 is the server row landing. */
+describe("uploadFile — progress follows the network transfer", () => {
+  it("maps the remote upload's fraction onto 75–99, then 100", async () => {
+    const remote = makeRemoteSync({
+      uploadAndCreate: vi.fn(async (_blob, meta) => {
+        meta.onProgress?.(0.5);
+        meta.onProgress?.(1);
+        return { serverId: "srv-1", url: "https://cdn/x.png" };
+      }),
+    });
+    const manager = new MediaManager(remote);
+    mockStorage(manager);
+    const seen: number[] = [];
+    manager.on(MEDIA_EVENTS.UPLOAD_PROGRESS, (p) => seen.push((p as { progress: number }).progress));
+    await manager.uploadFile(makeFile("img", "a.png", "image/png"), { autoOptimize: false, generateThumbnail: false });
+    expect(seen).toContain(87);
+    expect(seen).toContain(99);
+    expect(seen.at(-1)).toBe(100);
+    expect(seen).toEqual([...seen].sort((a, b) => a - b));
+  });
+});
+
 describe("uploadFile — server mirror (Phase B2)", () => {
   it("re-keys the asset to the server CUID on mirror success and emits media:updated", async () => {
     const remote = makeRemoteSync();

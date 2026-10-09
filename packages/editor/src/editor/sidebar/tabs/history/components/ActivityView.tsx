@@ -19,6 +19,11 @@ import { useReducedMotion } from "../../../../../shared/hooks/useReducedMotion";
 import { collapseIdenticalChanges, type CollapsedChange } from "../helpers";
 import type { ActivityViewProps } from "../types";
 import type { HistoryDisplayEntry } from "../../../../../engine/historyTypes";
+import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
+
+/** "⌘Z" on a Mac, "Ctrl+Z" elsewhere — the spelling the palette uses. */
+const undoChord = () =>
+  formatChord("Ctrl+Z", typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform)).replace(/([⌘⇧⌥⌃])\+/g, "$1");
 const MAX_VISIBLE_CHANGES = 5;
 
 // Row sizing constants (see spec §2.5). 44 is board 163:48's change row; the
@@ -592,7 +597,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
           <p className="empty-hint">
             {historyStack.length === 0 ? (
               <>
-                Use <Kbd>Ctrl+Z</Kbd> to undo changes
+                Use <Kbd>{undoChord()}</Kbd> to undo changes
               </>
             ) : (
               "Try a different search term"

@@ -585,6 +585,18 @@ export class MediaManager extends MediaEventEmitter {
     return this.serverPage;
   }
 
+  /** The library's own add or remove moves the server page's count with it —
+   *  only boot and load-more set it, so "Assets · 0" stood over three
+   *  uploaded tiles (L4-005). */
+  private shiftServerPage(delta: 1 | -1): void {
+    if (!this.serverPage) return;
+    this.setServerPage({
+      ...this.serverPage,
+      total: Math.max(0, this.serverPage.total + delta),
+      loaded: Math.max(0, this.serverPage.loaded + delta),
+    });
+  }
+
   async importServerAssets(
     serverAssets: ReadonlyArray<{
       id: string;
@@ -1156,6 +1168,15 @@ export class MediaManager extends MediaEventEmitter {
           bytes: finalSize,
           type: serverType,
           folderId: asset.folderId ?? null,
+          /* L4-006: the transfer itself moves the bar between 75 and 99 —
+             it sat at 75 for the whole network upload. 100 is the row. */
+          onProgress: (fraction) => {
+            const next = 75 + Math.round(Math.min(1, Math.max(0, fraction)) * 24);
+            if (next <= progress.progress) return;
+            progress.status = "uploading";
+            progress.progress = next;
+            this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
+          },
         });
         this.inFlightUploads.delete(assetId);
 
@@ -1228,6 +1249,7 @@ export class MediaManager extends MediaEventEmitter {
         fileName: file.name,
       });
       this.emit(MEDIA_EVENTS.MEDIA_ADDED, finalAsset);
+      this.shiftServerPage(1);
 
       return { success: true, asset: finalAsset, fileName: file.name };
     } catch (error) {
@@ -1245,6 +1267,7 @@ export class MediaManager extends MediaEventEmitter {
     this.state.selectedAssetIds = this.state.selectedAssetIds.filter((sid) => sid !== id);
     await this.finalizeDelete(id, asset?.serverId);
     this.emit(MEDIA_EVENTS.MEDIA_DELETED, { id });
+    if (asset) this.shiftServerPage(-1);
   }
 
   /**
@@ -1274,6 +1297,7 @@ export class MediaManager extends MediaEventEmitter {
     this.state.assets = this.state.assets.filter((a) => a.id !== id);
     this.state.selectedAssetIds = this.state.selectedAssetIds.filter((sid) => sid !== id);
     this.emit(MEDIA_EVENTS.MEDIA_DELETED, { id });
+    this.shiftServerPage(-1);
 
     let settled: "restored" | "committed" | null = null;
     return {
@@ -1284,6 +1308,7 @@ export class MediaManager extends MediaEventEmitter {
         const at = Math.min(index, this.state.assets.length);
         this.state.assets = [...this.state.assets.slice(0, at), asset, ...this.state.assets.slice(at)];
         this.emit(MEDIA_EVENTS.MEDIA_ADDED, asset);
+        this.shiftServerPage(1);
       },
       commit: async () => {
         if (settled) return;
@@ -1412,7 +1437,7 @@ export class MediaManager extends MediaEventEmitter {
       }
     }
 
-    this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, changes: updates });
+    this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, previous: asset, changes: updates });
     return updated;
   }
 

@@ -123,7 +123,7 @@ export async function loadSourcePages(
       return exportPublishPages(composer);
     case "saved": {
       const version = composer.versions?.getVersions().find((v) => v.id === source.versionId);
-      return version ? renderProjectPages(version.snapshot) : null;
+      return version ? renderProjectPages(version.snapshot, [], undefined, composer.designSystem.brandTokensV2) : null;
     }
     case "published":
       return siteId ? fetchPublishedSnapshot(siteId, source.jobId) : null;

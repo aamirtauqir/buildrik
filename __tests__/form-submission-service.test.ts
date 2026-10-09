@@ -99,6 +99,26 @@ describe("Form Submission Service", () => {
       expect(result.redirectUrl).toBeNull();
     });
 
+    /* L3-028: a site path resolves against the page the visitor posted from
+       (its origin was checked against the site's own), else the site's first
+       origin. */
+    it("resolves a site-path redirect against the site's own origin", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({
+        id: "fb1", siteId: "s1", isActive: true, successAction: "REDIRECT", redirectUrl: "/thanks",
+      } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: "https://mysite.example.com", slug: "my-site", vercelProjectName: null,
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub3" } as any);
+
+      const result = await submitForm("s1", "fb1", { data: {}, returnUrl: "https://mysite.example.com/contact" }, "1.2.3.4");
+      expect(result).toMatchObject({ successAction: "REDIRECT", redirectUrl: "https://mysite.example.com/thanks" });
+    });
+
     it("validates returnUrl against the site's own origin before trusting it", async () => {
       const { submitForm } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
@@ -314,6 +334,18 @@ describe("Form Submission Service", () => {
           update: { spamProtection: false },
         }),
       );
+    });
+
+    /* L3-027: a settings save is not a publish. A row it creates stays
+       inactive — the public endpoint refuses posts — until publish wires the
+       form and switches it on; an update leaves the flag alone. */
+    it("creates a row from settings inactive, and never flips the flag on update", async () => {
+      const { updateFormBlock } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.upsert).mockResolvedValue({ id: "el1" } as any);
+      await updateFormBlock({ siteId: "s1", blockId: "el1", successMessage: "Thanks" });
+      const call = vi.mocked(prisma.formBlock.upsert).mock.calls.at(-1)?.[0];
+      expect(call?.create).toMatchObject({ isActive: false });
+      expect(call?.update).not.toHaveProperty("isActive");
     });
   });
 

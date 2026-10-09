@@ -387,6 +387,13 @@ export const sitesRouter = router({
             code: "NOT_FOUND",
             message: "Site not found",
           });
+        /* L3-013: the plan's page limit. A precondition, not a retryable
+           fault — the same snapshot is refused until a page goes. */
+        if (e instanceof Error && e.message.startsWith("PAGE_LIMIT:"))
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: `PAGE_LIMIT: Your plan allows ${e.message.slice("PAGE_LIMIT:".length)} pages per site. Delete a page, or upgrade, to keep saving.`,
+          });
         /* L3-001: the (siteId, slug) unique key refused a page write. It was a
            raw P2002 500 on every autosave; say which address and which pages. */
         if (e instanceof PageSlugTakenError) {

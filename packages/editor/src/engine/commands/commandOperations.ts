@@ -37,13 +37,19 @@ export type ReorderDirection = "forward" | "backward" | "front" | "back";
  * Lives here (not defaultCommands.ts, which imports FROM this module) so
  * delete/cut and nudgeSelected below share it without a circular import.
  */
-export function dropLockedAndInstances(elements: Element[]): { kept: Element[]; skipped: boolean } {
+export function dropLockedAndInstances(elements: Element[]): {
+  kept: Element[];
+  skipped: boolean;
+  /** The LOCKED_ELEMENTS_SKIPPED payload: `{ reason: "instance" }` when every
+   *  dropped element is a component part rather than locked (L2-016). */
+  skippedPayload: { reason: "instance" } | undefined;
+} {
   const selected = new Set(elements.map((el) => el.getId()));
-  const kept = elements.filter(
-    (el) =>
-      !el.isLocked() && !el.isComponentInstance() && !hasLockedDescendant(el) && !hasSelectedLockedAncestor(el, selected),
-  );
-  return { kept, skipped: kept.length !== elements.length };
+  const isLockBound = (el: Element) => el.isLocked() || hasLockedDescendant(el) || hasSelectedLockedAncestor(el, selected);
+  const kept = elements.filter((el) => !el.isComponentInstance() && !isLockBound(el));
+  const dropped = elements.filter((el) => !kept.includes(el));
+  const instanceOnly = dropped.length > 0 && !dropped.some(isLockBound);
+  return { kept, skipped: dropped.length > 0, skippedPayload: instanceOnly ? { reason: "instance" } : undefined };
 }
 
 function hasLockedDescendant(el: Element): boolean {

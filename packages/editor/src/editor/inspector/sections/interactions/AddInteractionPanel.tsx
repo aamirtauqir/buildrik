@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import type { LucideIcon } from "lucide-react";
 import { type InteractionTrigger, TRIGGER_GROUPS } from "./types";
 import { Button } from "@/editor/chrome-ui";
 // ============================================================================
@@ -94,7 +95,7 @@ const styles = {
 
 interface TriggerGroupProps {
   groupName: string;
-  triggers: Array<{ value: string; label: string; icon: string }>;
+  triggers: Array<{ value: string; label: string; icon: LucideIcon }>;
   onAdd: (trigger: InteractionTrigger) => void;
 }
 
@@ -108,7 +109,7 @@ const TriggerGroup: React.FC<TriggerGroupProps> = ({ groupName, triggers, onAdd 
           onClick={() => onAdd(trigger.value as InteractionTrigger)}
           style={styles.triggerButton}
         >
-          <span>{trigger.icon}</span>
+          <trigger.icon size={14} aria-hidden="true" />
           <span>{trigger.label}</span>
         </Button>
       ))}

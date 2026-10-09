@@ -26,6 +26,20 @@ describe("detectContentIssues", () => {
     expect(findings[0]).toMatchObject({ kind: "missing-alt", type: "warning", elementId: "img1", pageId: "home" });
   });
 
+  /* L1-035 / L1-016: an image with no file ships as a broken <img>, and the
+     Image block's own "Image" alt is a placeholder, not a description. */
+  it("flags an image with no src as having no file", () => {
+    const pages = [page({ id: "home", root: el({ id: "img1", type: "image", tagName: "img", attributes: { alt: "Team photo" } }) })];
+    expect(detectContentIssues(pages)).toEqual([
+      expect.objectContaining({ kind: "missing-image", type: "warning", elementId: "img1", message: "Image has no file" }),
+    ]);
+  });
+
+  it("treats the block's placeholder alt \"Image\" as missing alt text", () => {
+    const pages = [page({ id: "home", root: el({ id: "img1", type: "image", tagName: "img", attributes: { src: "/a.png", alt: "Image" } }) })];
+    expect(detectContentIssues(pages)).toEqual([expect.objectContaining({ kind: "missing-alt", elementId: "img1" })]);
+  });
+
   it("does not flag an image with alt=\"\" (decorative, deliberate)", () => {
     const pages = [
       page({
@@ -187,5 +201,14 @@ describe("asContentRoot", () => {
     expect(asContentRoot([])).toBeUndefined();
     expect(asContentRoot(null)).toBeUndefined();
     expect(asContentRoot({ type: "container" })).toBeUndefined();
+  });
+
+  /* L4-039: the location read "Home › IMG" — the raw tag. It names the
+     element the way a person does. */
+  it("names an element without text by its kind, not its tag", () => {
+    const pages = [
+      page({ id: "home", root: el({ id: "img1", type: "image", tagName: "img", attributes: { src: "/a.png" } }) }),
+    ];
+    expect(detectContentIssues(pages)[0].location).toBe("Home › Image");
   });
 });

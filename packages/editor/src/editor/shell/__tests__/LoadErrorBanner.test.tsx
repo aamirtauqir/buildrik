@@ -103,4 +103,12 @@ describe("LoadErrorBanner", () => {
     /* Sign in opens a new tab and is not the thing being waited on. */
     expect(screen.getByRole("button", { name: /sign in/i })).not.toBeDisabled();
   });
+
+  /* L1-008 (live 2026-10-09): a site session no longer falls back to a local
+     copy, so "you're seeing local changes" was false for network and auth. */
+  it.each(["network", "auth"] as const)("a %s failure does not promise local changes", (kind) => {
+    renderBanner({ kind });
+    expect(screen.queryByText(/local changes/i)).not.toBeInTheDocument();
+    expect(screen.getByTestId("load-error-message").textContent).toMatch(/not saved until it loads/);
+  });
 });

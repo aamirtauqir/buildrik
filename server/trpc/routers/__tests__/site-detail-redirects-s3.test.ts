@@ -20,6 +20,8 @@ const listRedirectsMock = vi.fn();
 const getRedirectSuggestionsMock = vi.fn();
 const redirectFindUnique = vi.fn();
 const getSiteWorkspaceMock = vi.fn();
+const recordForSiteMock = vi.fn();
+const deleteRedirectMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -30,6 +32,9 @@ vi.mock("next/headers", () => ({
   cookies: () => Promise.resolve({ get: () => undefined, delete: vi.fn() }),
 }));
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
+vi.mock("@/server/services/activity-log.service", () => ({
+  recordForSite: (...a: unknown[]) => recordForSiteMock(...a),
+}));
 vi.mock("@/server/services/permission.service", () => ({
   assertSiteAccess: (...a: unknown[]) => assertSiteAccessMock(...a),
   checkSiteRole: (...a: unknown[]) => checkSiteRoleMock(...a),
@@ -45,7 +50,7 @@ vi.mock("@/server/services/redirect.service", () => ({
   listRedirects: (...a: unknown[]) => listRedirectsMock(...a),
   createRedirect: (...a: unknown[]) => createRedirectMock(...a),
   updateRedirect: (...a: unknown[]) => updateRedirectMock(...a),
-  deleteRedirect: vi.fn(),
+  deleteRedirect: (...a: unknown[]) => deleteRedirectMock(...a),
   importRedirects: vi.fn(),
   exportRedirects: vi.fn(),
 }));
@@ -70,6 +75,7 @@ beforeEach(() => {
   [
     assertSiteAccessMock, checkSiteRoleMock, createRedirectMock, updateRedirectMock,
     listRedirectsMock, getRedirectSuggestionsMock, redirectFindUnique, getSiteWorkspaceMock,
+    recordForSiteMock, deleteRedirectMock,
   ].forEach((m) => m.mockReset());
   getSiteWorkspaceMock.mockResolvedValue({ workspaceId: "ws1", plan: "PRO", editsRequireApproval: false });
 });
@@ -112,6 +118,18 @@ describe("siteDetail.redirects.create", () => {
     await expect(
       caller().redirects.create({ siteId: "s1", fromPath: "/old-menu", toUrl: "/menu", type: "301" }),
     ).rejects.toMatchObject({ code: "CONFLICT", message: "A redirect from /old-menu already exists." });
+  });
+
+  it("is CONFLICT naming the page when the path is a page's own address (L3-005)", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    createRedirectMock.mockRejectedValueOnce(new Error("REDIRECT_SHADOWS_PAGE:About"));
+
+    await expect(
+      caller().redirects.create({ siteId: "s1", fromPath: "/about", toUrl: "/team", type: "301" }),
+    ).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "/about is the address of the page “About”. A redirect from it would hide that page.",
+    });
   });
 
   it("refuses a To URL that is neither a path nor an http(s) URL before touching access", async () => {
@@ -184,5 +202,42 @@ describe("siteDetail.redirects.suggestions", () => {
   it("is NOT_FOUND for an unknown site", async () => {
     assertSiteAccessMock.mockRejectedValueOnce(new PermissionError("NOT_FOUND"));
     await expect(caller().redirects.suggestions({ siteId: "missing" })).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+});
+
+/* L3-031: `site.redirect.created` / `.deleted` were declared and summarised
+   in the activity log but never written, so the Activity panel stayed empty
+   for redirect work. */
+describe("siteDetail.redirects — the activity log", () => {
+  it("records a created redirect", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    createRedirectMock.mockResolvedValueOnce({ id: "r1" });
+    await caller().redirects.create({ siteId: "s1", fromPath: "/old", toUrl: "/new", type: "301" });
+    expect(recordForSiteMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        siteId: "s1",
+        actorId: "u_1",
+        action: "site.redirect.created",
+        targetId: "r1",
+        description: "Added a redirect from /old to /new",
+      }),
+    );
+  });
+
+  it("records a deleted redirect", async () => {
+    redirectFindUnique.mockResolvedValueOnce({ siteId: "s1", fromPath: "/old" });
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    deleteRedirectMock.mockResolvedValueOnce({ id: "r1" });
+    await caller().redirects.delete({ id: "r1" });
+    expect(recordForSiteMock).toHaveBeenCalledWith(
+      expect.objectContaining({ siteId: "s1", action: "site.redirect.deleted", targetId: "r1", description: "Removed the redirect from /old" }),
+    );
+  });
+
+  it("records nothing when the create is refused", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    createRedirectMock.mockRejectedValueOnce(new Error("REDIRECT_EXISTS"));
+    await expect(caller().redirects.create({ siteId: "s1", fromPath: "/old", toUrl: "/new", type: "301" })).rejects.toThrow();
+    expect(recordForSiteMock).not.toHaveBeenCalled();
   });
 });

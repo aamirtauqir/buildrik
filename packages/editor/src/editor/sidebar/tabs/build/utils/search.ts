@@ -40,6 +40,18 @@ function blockTerms(b: BlockDefinition): string {
   return parts.join(" ").toLowerCase();
 }
 
+/* Short forms people type → the word the catalogue uses (L1-023: "btn"
+   answered "Nothing matches"). Whole-query only: "b" must not mean button. */
+const ALIASES: Record<string, string> = {
+  btn: "button", cta: "button",
+  img: "image", pic: "image", picture: "image", photo: "image",
+  hr: "divider", line: "divider", separator: "divider", rule: "divider",
+  para: "text", paragraph: "text", copy: "text",
+  title: "heading", headline: "heading", h1: "heading",
+  nav: "navigation", menu: "navigation",
+  vid: "video", url: "link",
+};
+
 export function searchInsert(
   query: string,
   elements: FlatElEntry[],
@@ -47,16 +59,19 @@ export function searchInsert(
   components: BlockDefinition[] = [],
   saved: ComponentDefinition[] = []
 ): InsertSearchHit[] {
-  const q = query.toLowerCase().trim();
-  if (!q) return [];
+  const typed = query.toLowerCase().trim();
+  if (!typed) return [];
+  /* The typed word AND its alias both count — "menu" still finds a Menu block. */
+  const words = ALIASES[typed] ? [typed, ALIASES[typed]] : [typed];
+  const has = (text: string) => words.some((w) => text.includes(w));
 
   const elHits: InsertSearchHit[] = elements
     .filter(
       (el) =>
-        el.name.toLowerCase().includes(q) ||
-        el.description.toLowerCase().includes(q) ||
-        el.tags.some((tag) => tag.includes(q)) ||
-        el.catName.toLowerCase().includes(q)
+        has(el.name.toLowerCase()) ||
+        has(el.description.toLowerCase()) ||
+        el.tags.some(has) ||
+        has(el.catName.toLowerCase())
     )
     .map((el) => ({
       key: `el-${el.catId}-${el.name}`,
@@ -66,7 +81,7 @@ export function searchInsert(
     }));
 
   const blockHits: InsertSearchHit[] = blocks
-    .filter((b) => blockTerms(b).includes(q))
+    .filter((b) => has(blockTerms(b)))
     .map((b) => ({
       key: `block-${b.id}`,
       label: b.label,
@@ -75,7 +90,7 @@ export function searchInsert(
     }));
 
   const componentHits: InsertSearchHit[] = components
-    .filter((b) => blockTerms(b).includes(q))
+    .filter((b) => has(blockTerms(b)))
     .map((b) => ({
       key: `component-${b.id}`,
       label: b.label,
@@ -84,7 +99,7 @@ export function searchInsert(
     }));
 
   const savedHits: InsertSearchHit[] = saved
-    .filter((c) => [c.name, c.description ?? "", ...(c.tags ?? [])].join(" ").toLowerCase().includes(q))
+    .filter((c) => has([c.name, c.description ?? "", ...(c.tags ?? [])].join(" ").toLowerCase()))
     .map((c) => ({ key: `saved-${c.id}`, label: c.name, group: "SAVED" as const, component: c }));
 
   return [...elHits, ...blockHits, ...componentHits, ...savedHits];

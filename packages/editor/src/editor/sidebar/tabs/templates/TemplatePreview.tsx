@@ -12,6 +12,9 @@
 import * as React from "react";
 import type { TemplateItem } from "./templatesData";
 import { Button } from "@/editor/chrome-ui";
+import { DEFAULT_TOKENS } from "../../../design-system/constants";
+import { resolveTokens } from "./utils/resolveTemplateTokens";
+import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 
 export interface TemplatePreviewProps {
   template: TemplateItem;
@@ -50,6 +53,12 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
 }) => {
   const [viewport, setViewport] = React.useState<ViewportMode>("desktop");
   const width = VIEWPORTS.find((v) => v.id === viewport)?.width ?? 1100;
+  /* A saved template carries {{token…}} placeholders; show them resolved to
+     this site's brand, as apply will (L2-014). */
+  const html = React.useMemo(
+    () => resolveTokens(template.html ?? "", snapshotFromComputedStyle(document.documentElement, DEFAULT_TOKENS)),
+    [template.html],
+  );
 
   /* Escape belongs to the preview: back to the catalogue, not out of the view. */
   React.useEffect(() => {
@@ -124,7 +133,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           style={{ width }}
           title={`Preview: ${template.name}`}
           sandbox="allow-same-origin"
-          srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0">${template.html}</body></html>`}
+          srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0">${html}</body></html>`}
         />
       </div>
       {/* 4418:53202 foot line. */}

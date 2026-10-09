@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { StorageQuotaBar } from "../StorageQuotaBar";
+import { StorageQuotaBar, formatQuotaSize } from "../StorageQuotaBar";
 
 describe("StorageQuotaBar", () => {
   // Board copy: "X of Y used" — MB-precise under a gigabyte (145:199).
@@ -47,5 +47,17 @@ describe("StorageQuotaBar", () => {
     expect(container.querySelector(".med-quota-fill")).toBeNull();
     expect(getByText(/upload is off until you free space/)).toBeInTheDocument();
     expect(getByText("Nothing already on your sites is affected.")).toBeInTheDocument();
+  });
+});
+
+/* L4-017: two ~590-byte files read "1 MB" in the library footer. Under a
+   megabyte the size is kilobytes. */
+describe("formatQuotaSize — under a megabyte", () => {
+  it("prints kilobytes, never rounding a small library up to a megabyte", () => {
+    expect(formatQuotaSize(1180)).toBe("1 KB");
+    expect(formatQuotaSize(300 * 1024)).toBe("300 KB");
+    expect(formatQuotaSize(200)).toBe("1 KB");
+    expect(formatQuotaSize(0)).toBe("0 KB");
+    expect(formatQuotaSize(842 * 1024 * 1024)).toBe("842 MB");
   });
 });

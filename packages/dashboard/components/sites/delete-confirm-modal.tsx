@@ -32,12 +32,7 @@ export function DeleteConfirmModal({ open, siteName, title = "Delete Site", onCl
     >
       <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "#FDF2F2" }}>
         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
-        {/* A site delete is a soft delete (sites.service deletedAt): the copy said
-            "cannot be undone" over a reversible action (FG-045). */}
-        <p className="text-body" style={{ color: "var(--color-error-text)" }}>
-          It goes offline now. You can restore it from Recently deleted for {SITE_RESTORE_WINDOW_DAYS} days. Type{" "}
-          <strong>{siteName}</strong> to confirm.
-        </p>
+        <p className="text-body" style={{ color: "var(--color-error-text)" }}>The site moves to Recently deleted, where you can restore it for {SITE_RESTORE_WINDOW_DAYS} days. Type <strong>{siteName}</strong> to confirm.</p>
       </div>
       <InputField type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder={`Type "${siteName}" to confirm`} wrapperClassName="mt-4" valid={input === siteName} autoFocus />
     </Modal>

@@ -108,6 +108,7 @@ export async function uploadBlob(
     folderId?: string | null;
     siteId?: string | null;
   },
+  onProgress?: (fraction: number) => void,
 ): Promise<UploadBlobResult> {
   // The signing route issues a token only under the caller's own prefix
   // (`u/<userId>/`, audit S-4); the server says what it is.
@@ -124,6 +125,7 @@ export async function uploadBlob(
       siteId: meta.siteId ?? null,
     }),
     contentType: contentType || undefined,
+    ...(onProgress ? { onUploadProgress: ({ percentage }: { percentage: number }) => onProgress(percentage / 100) } : {}),
   });
 
   return {
@@ -150,11 +152,17 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
         // Forward server-row metadata via clientPayload so the route's
         // onUploadCompleted handler can create the canonical MediaAsset
         // row independently (P1A defense in depth).
-        const uploaded = await uploadBlob(blob, meta.filename, meta.mimeType, {
-          type: meta.type,
-          folderId: meta.folderId ?? null,
-          siteId: meta.siteId ?? siteId,
-        });
+        const uploaded = await uploadBlob(
+          blob,
+          meta.filename,
+          meta.mimeType,
+          {
+            type: meta.type,
+            folderId: meta.folderId ?? null,
+            siteId: meta.siteId ?? siteId,
+          },
+          meta.onProgress,
+        );
         // Client-driven createAsset is now idempotent on URL match
         // server-side. If onUploadCompleted already created the row,
         // this returns the existing one. If completion hasn't fired

@@ -92,7 +92,7 @@ describe("a keyboard delete announces itself", () => {
   it("stays silent for every other command", () => {
     const c = makeComposer(["a"], { a: { type: "heading", children: 0 } });
     renderHook(() => useHistoryFeedback(c as never, addToast as never));
-    for (const id of ["duplicate", "copy", "paste", "save", "group"]) {
+    for (const id of ["duplicate", "copy", "paste", "save"]) {
       c.emit(EVENTS.COMMAND_BEFORE, { id });
       c.emit(EVENTS.COMMAND_RUN, { id });
     }

@@ -97,6 +97,17 @@ const FIX_TARGETS: Record<string, FixTarget> = {
   Favicon: { screen: "general" },
 };
 
+/** Open the pane that fixes a pre-publish check (by its label). False when
+ *  the check has no fix door. Shared by this panel's row buttons and the
+ *  Issues panel's server-check rows, which opened Brand (L4-035). */
+export function openPublishCheckFix(composer: Composer | null | undefined, label: string): boolean {
+  const target = FIX_TARGETS[label];
+  if (!target || !composer) return false;
+  if ("screen" in target) composer.emit(EVENTS.UI_SETTINGS_OPEN, { screen: target.screen });
+  else composer.emit("ui:switch-tab", { tab: target.tab });
+  return true;
+}
+
 /** The board's row rhythm: label left, value right, one line. */
 const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-[3px]";
 
@@ -477,11 +488,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       <Button
         color="light"
         size="xs"
-        onClick={() =>
-          "screen" in target
-            ? composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: target.screen })
-            : composer?.emit("ui:switch-tab", { tab: target.tab })
-        }
+        onClick={() => openPublishCheckFix(composer, label)}
         className={CHECK_DOOR}
       >
         Fix ›

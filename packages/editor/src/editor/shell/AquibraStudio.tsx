@@ -53,6 +53,8 @@ import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
 import { submitForReview } from "../../services/ReviewService";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { IMPROVE_ELEMENT_PROMPT } from "@/editor/sidebar/tabs/ai/types";
+import { openPublishCheckFix } from "@/editor/sidebar/tabs/publish/PublishTab";
+import { PUBLISH_CHECK_ISSUE } from "./hooks/useIssuesFeed";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
@@ -194,6 +196,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const {
     setLeftPanelTab: guardedSetLeftPanelTab,
     openLeftPanelToTab: guardedOpenLeftPanelToTab,
+    toggleLeftPanel: guardedToggleLeftPanel,
+    closeLeftPanel: guardedCloseLeftPanel,
     dialogProps: tabSwitchDialogProps,
   } = useTabSwitchGuard({
     leftPanelTab: state.leftPanelTab,
@@ -202,6 +206,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     openLeftPanelToTab: state.openLeftPanelToTab,
     isTabAllowed,
     onDiscardFailed,
+    isLeftPanelOpen: state.isLeftPanelOpen,
+    setIsLeftPanelOpen: state.setIsLeftPanelOpen,
   });
 
   // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).
@@ -611,6 +617,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            the current page with an invisible selection. Page first, then
            select and scroll — the one locate seam Review and Forms use. */
         if (issue.elementId && locateComment(composer, { pageId: issue.pageId ?? null, targetSelector: issue.elementId }) === "located") return;
+        /* A server check ("Favicon", "SEO configured", "Domain connected")
+           opens the pane that fixes it — it opened Brand (L4-035). */
+        if (issue.id.startsWith(PUBLISH_CHECK_ISSUE) && openPublishCheckFix(composer, issue.id.slice(PUBLISH_CHECK_ISSUE.length))) return;
         const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
         const target = refs.map((r) => composer.elements.getElement(r.elementId)).find((el) => el != null);
         if (target) composer.selection.select(target);
@@ -705,7 +714,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenPublish={() => guardedOpenLeftPanelToTab("publish")}
           onOpenHistory={() => guardedOpenLeftPanelToTab("history")}
           onOpenPages={() => guardedOpenLeftPanelToTab("pages")}
-          onCloseDrawer={() => state.setIsLeftPanelOpen(false)}
+          onCloseDrawer={guardedCloseLeftPanel}
           onOpenActivity={() => guardedOpenLeftPanelToTab("activity")}
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => guardedOpenLeftPanelToTab("review")}
@@ -736,7 +745,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         zoom={state.zoom}
         onZoomChange={state.setZoom}
         isLeftPanelOpen={state.isLeftPanelOpen}
-        onLeftPanelToggle={() => state.setIsLeftPanelOpen((v) => !v)}
+        onLeftPanelToggle={guardedToggleLeftPanel}
         leftPanelTab={state.leftPanelTab}
         leftPanelSubTab={state.leftPanelSubTabs[state.leftPanelTab]}
         onLeftPanelTabChange={guardedSetLeftPanelTab}

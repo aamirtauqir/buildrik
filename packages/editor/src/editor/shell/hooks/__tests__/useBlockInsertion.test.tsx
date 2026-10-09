@@ -278,6 +278,24 @@ describe("useBlockInsertion", () => {
     }
   );
 
+  /* L1-037: a new Section comes with one empty inner Container ("Drop a block
+     here…"). Add with the Section selected put the block NEXT to that
+     container, leaving its prompt empty above it. The section's lone
+     container is its content slot. */
+  it("inserts into a selected Section's lone inner container", () => {
+    const slot = makeElement("slot-1", "container", { getChildCount: () => 0 });
+    const section = makeElement("sec-1", "section", { getChildren: () => [slot] as never, getChildCount: () => 1 });
+    elements.set("sec-1", section);
+    elements.set("slot-1", slot);
+    selectedIds = ["sec-1"];
+    mocks.canNestElement.mockReturnValue(true);
+
+    const { result } = mountHook();
+    act(() => result.current.handleBlockClick(heroBlock));
+
+    expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), "slot-1", 0);
+  });
+
   it("falls back to the page root when no ancestor accepts the block", () => {
     elements.set("sel-1", makeElement("sel-1", "text"));
     selectedIds = ["sel-1"];

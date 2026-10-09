@@ -13,6 +13,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const { db } = vi.hoisted(() => ({
   db: {
     redirect: { count: vi.fn(), findFirst: vi.fn(), create: vi.fn(), update: vi.fn() },
+    page: { findMany: vi.fn() },
   },
 }));
 
@@ -22,6 +23,7 @@ import { createRedirect, updateRedirect } from "@server/services/redirect.servic
 
 beforeEach(() => {
   Object.values(db.redirect).forEach((fn) => fn.mockReset());
+  db.page.findMany.mockReset().mockResolvedValue([]);
   db.redirect.count.mockResolvedValue(0);
   db.redirect.findFirst.mockResolvedValue(null);
   db.redirect.create.mockImplementation(async ({ data }) => ({ id: "r-new", ...data }));
@@ -74,5 +76,44 @@ describe("updateRedirect", () => {
       select: { id: true },
     });
     expect(db.redirect.update).not.toHaveBeenCalled();
+  });
+});
+
+/* L3-005: Vercel runs redirects before the filesystem, so a rule from a path
+   a page still answers on makes that page unreachable once published. */
+describe("a redirect never shadows a page (L3-005)", () => {
+  beforeEach(() => {
+    db.page.findMany.mockResolvedValue([
+      { name: "Home", slug: "home", isHomePage: true },
+      { name: "About", slug: "about", isHomePage: false },
+    ]);
+  });
+
+  it.each(["/about", "/about/", "/about.html", "/About"])("refuses a create from %s", async (fromPath) => {
+    await expect(createRedirect("s1", { fromPath, toUrl: "/team", type: "301" }, "PRO")).rejects.toThrow(
+      "REDIRECT_SHADOWS_PAGE:About",
+    );
+    expect(db.redirect.create).not.toHaveBeenCalled();
+  });
+
+  it("refuses a rule from / (the home page)", async () => {
+    await expect(createRedirect("s1", { fromPath: "/", toUrl: "/team", type: "301" }, "PRO")).rejects.toThrow(
+      "REDIRECT_SHADOWS_PAGE:Home",
+    );
+  });
+
+  it("refuses an edit that moves a rule onto a page path", async () => {
+    await expect(updateRedirect("r1", "s1", { fromPath: "/about" })).rejects.toThrow("REDIRECT_SHADOWS_PAGE:About");
+    expect(db.redirect.update).not.toHaveBeenCalled();
+  });
+
+  it("accepts the home page's slug — the home page answers on / only", async () => {
+    await createRedirect("s1", { fromPath: "/home", toUrl: "/", type: "301" }, "PRO");
+    expect(db.redirect.create).toHaveBeenCalled();
+  });
+
+  it("accepts a path no page answers on", async () => {
+    await createRedirect("s1", { fromPath: "/old-about", toUrl: "/about", type: "301" }, "PRO");
+    expect(db.redirect.create).toHaveBeenCalled();
   });
 });

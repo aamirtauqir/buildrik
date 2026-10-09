@@ -31,7 +31,7 @@ export function DomainsTab({ siteId, domains }: { siteId: string; domains: Domai
       <SectionCard title="Custom domains" actions={<EditInSiteSettings siteId={siteId} screen="domains" />}>
         {rows.length === 0 ? (
           <p className="text-body" style={{ color: "var(--color-text-muted)" }} data-testid="domains-summary-empty">
-            No custom domain. The site uses its free buildrick.app address.
+            No custom domain. The site uses its default vercel.app address.
           </p>
         ) : (
           <ul className="divide-y">

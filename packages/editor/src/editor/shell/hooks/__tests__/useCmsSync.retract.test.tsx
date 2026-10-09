@@ -24,6 +24,7 @@ vi.mock("../../../../services/cmsSync", () => ({
   bindCmsEngine: () => () => {},
   hydrateCmsFromServer: () => Promise.resolve(),
   flushCmsOutbox: () => flushSpy(),
+  onCmsInvalid: () => () => {},
   onCmsGone: (cb: typeof goneCb) => {
     goneCb = cb;
     return () => {

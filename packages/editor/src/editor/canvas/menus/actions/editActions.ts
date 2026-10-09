@@ -72,6 +72,8 @@ export const editSubmenu: ContextAction[] = [
     icon: "clipboard-paste",
     group: "Edit",
     shortcut: "Cmd+V",
+    /* Greyed with nothing to paste (L1-018); the toast below stays for ⌘K. */
+    isEnabled: ({ composer }) => Boolean(composer.clipboard?.length),
     handler: ({ composer, addToast }) => {
       // Was emitting a "clipboard:paste" event that nothing listened to, so the
       // right-click Paste silently did nothing. Run the real engine `paste`

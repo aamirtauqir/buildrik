@@ -11,7 +11,12 @@ import { MEDIA_EVENTS, STORAGE_QUOTA_BYTES } from "../../../../../shared/constan
 import type { UploadProgress, UploadResult } from "../../../../../shared/types/media";
 import type { FailedUpload, UploadStateResult } from "../data/mediaTypes";
 
-type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning") => void;
+type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning", opts?: { duration?: number }) => void;
+
+/** An error toast whose failure the drawer's band already records leaves on
+ *  its own — error toasts otherwise persist, and these piled up across
+ *  panels for twenty minutes (L4-009). */
+const RECORDED_ERROR_TOAST_MS = 8000;
 
 /**
  * Upload toasts have ONE owner per document.
@@ -118,7 +123,7 @@ export function useUploadState(
       // The reason is already computed — say it. This used to claim every
       // failure was an unsupported TYPE, so an oversized JPG was told to
       // upload a JPG.
-      if (speaks()) showToast(`${name} — ${reason}`, "error");
+      if (speaks()) showToast(`${name} — ${reason}`, "error", { duration: RECORDED_ERROR_TOAST_MS });
     };
 
     const onAdded = () => recalcStorage();

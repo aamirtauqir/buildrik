@@ -61,25 +61,14 @@ function getHandleStyle(
     gridTemplateRows: "repeat(3, 1fr)",
     gap: 1.5,
     padding: 4,
-    pointerEvents: "auto",
+    /* Only a visible grip takes the pointer (L1-011). */
+    pointerEvents: isHovered || isDragging ? "auto" : "none",
     transition: "opacity 0.15s ease, transform 0.15s ease, background 0.15s ease",
     opacity: isHovered || isDragging ? 1 : 0,
     transform: isHovered || isDragging ? "scale(1)" : "scale(0.8)",
     boxShadow: isDragging
       ? "0 2px 8px var(--bk-alpha-accent-30)"
       : "var(--bk-shadow-drag)",
-  };
-}
-
-function getHitAreaStyle(top: number): React.CSSProperties {
-  return {
-    position: "absolute",
-    left: 0,
-    top: top - HANDLE_HIT_AREA / 2,
-    width: HANDLE_HIT_AREA + 8,
-    height: HANDLE_HIT_AREA,
-    pointerEvents: "auto",
-    cursor: "default",
   };
 }
 
@@ -152,6 +141,30 @@ export function SectionReorderHandles({
     };
   }, [isDragging, onUpdateDrag, onCompleteDrag, onCancelDrag]);
 
+  /* Hover by proximity, not by an invisible div: a 48×40 pointer-active hit
+     area sat on the left edge of every top-level element and ate its clicks
+     and right-clicks (L1-011). The pointer near a section's top-left edge
+     hovers its grip; nothing blocks the page until then. */
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const hoveredRef = React.useRef(hoveredBoundary);
+  hoveredRef.current = hoveredBoundary;
+  React.useEffect(() => {
+    if (isDragging || boundaries.length < 2) return;
+    const onMove = (e: MouseEvent) => {
+      const box = containerRef.current?.getBoundingClientRect();
+      const scale = box && containerRef.current?.offsetWidth ? box.width / containerRef.current.offsetWidth : 1;
+      const x = (e.clientX - (box?.left ?? 0)) / scale;
+      const y = (e.clientY - (box?.top ?? 0)) / scale;
+      const near =
+        x >= 0 && x <= HANDLE_HIT_AREA + 8
+          ? boundaries.find((b) => Math.abs(y - b.rect.top) <= HANDLE_HIT_AREA / 2)?.sectionId ?? null
+          : null;
+      if (near !== hoveredRef.current) onHoverBoundary(near);
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [isDragging, boundaries, onHoverBoundary]);
+
   // Compute drop line position from drag state.
   // Must run before any early return so the hook order stays stable across
   // renders — otherwise React throws "Rendered more hooks than during the
@@ -170,7 +183,7 @@ export function SectionReorderHandles({
   if (boundaries.length < 2) return null;
 
   return (
-    <div style={containerStyle} aria-hidden>
+    <div ref={containerRef} style={containerStyle} aria-hidden>
       {/* A grab handle on every section's top edge — the first one too
           (board 4428:44400 drags Hero, the page's first section). */}
       {boundaries.map((boundary) => {
@@ -180,12 +193,6 @@ export function SectionReorderHandles({
 
         return (
           <React.Fragment key={boundary.sectionId}>
-            {/* Invisible hit area for hover detection */}
-            <div
-              style={getHitAreaStyle(boundary.rect.top)}
-              onMouseEnter={() => !isDragging && onHoverBoundary(boundary.sectionId)}
-              onMouseLeave={() => !isDragging && onHoverBoundary(null)}
-            />
             {/* Visible grab handle */}
             <div
               style={getHandleStyle(

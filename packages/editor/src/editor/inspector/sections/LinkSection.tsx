@@ -36,6 +36,9 @@ export interface LinkSectionProps {
   tier?: SectionTier;
 }
 
+/** "example.com", "www.example.co.uk/menu" — a host with a TLD, no scheme. */
+const BARE_DOMAIN = /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(:\d+)?([/?#]\S*)?$/i;
+
 type LinkType = "none" | "page" | "url" | "email" | "phone" | "anchor";
 
 const ErrorText: React.FC<{ message: string }> = ({ message }) => (
@@ -215,10 +218,13 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
 
   const handleUrlChange = (url: string) => {
     setExternalUrl(url);
-    const valid = new RegExp("^https?://").test(url);
+    /* A bare domain ("example.com/menu") gets https:// rather than an error
+       (L2-030) — the field keeps what was typed, the href is the full URL. */
+    const href = BARE_DOMAIN.test(url) ? `https://${url}` : url;
+    const valid = /^https?:\/\//.test(href);
     setUrlError(!valid && url.length > 0);
     if (valid || url.length === 0) {
-      updateHref(url);
+      updateHref(href);
     }
   };
 
