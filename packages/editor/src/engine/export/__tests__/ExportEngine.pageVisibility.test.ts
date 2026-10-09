@@ -11,7 +11,8 @@
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { Composer } from "@/engine/Composer";
-import { ExportEngine, isPageLive } from "../ExportEngine";
+import { ExportEngine } from "../ExportEngine";
+import { isPageLive } from "../pageFiles";
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";

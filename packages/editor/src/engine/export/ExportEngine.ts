@@ -8,6 +8,7 @@ import type JSZip from "jszip";
 import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/element-markup";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { PageData } from "@/shared/types";
+import { isPageLive, pageFileNames, resolveHomePageId } from "./pageFiles";
 import type {
   ExportConfig,
   ExportResult,
@@ -122,6 +123,12 @@ function multiPageFileType(name: string): MultiPageExportFile["type"] {
 // EXPORT ENGINE CLASS
 // ============================================================================
 
+const HIDE_MEDIA_QUERIES: Record<string, string> = {
+  "--hide-mobile": "(max-width:767px)",
+  "--hide-tablet": "(min-width:768px) and (max-width:1023px)",
+  "--hide-desktop": "(min-width:1024px)",
+};
+
 /**
  * Per-breakpoint hide, as the media queries that actually hide something.
  *
@@ -131,68 +138,10 @@ function multiPageFileType(name: string): MultiPageExportFile["type"] {
  * the property straight into the stylesheet and nothing else, so an element
  * hidden on mobile was fully visible on mobile in the exported file.
  */
-/**
- * Whether a page is deployed at all.
- *
- * Page settings → Advanced offers Live / Hidden. Anything but unset or "live"
- * is left out of a deploy — including a "password" value stored before
- * Password pages were removed (C4 #26): static hosting cannot ask for a
- * password, and publishing a page the owner believes is protected is the
- * worse mistake.
- *
- * Exported because the Publish panel counts pages too, and a count that does
- * not match what ships is the same lie one layer up: it read "2 pages" for a
- * site with one live page and one hidden.
- */
-export function isPageLive(page: PageData): boolean {
-  const v = page.settings?.visibility;
-  return v === undefined || v === "live";
-}
-
-const HIDE_MEDIA_QUERIES: Record<string, string> = {
-  "--hide-mobile": "(max-width:767px)",
-  "--hide-tablet": "(min-width:768px) and (max-width:1023px)",
-  "--hide-desktop": "(min-width:1024px)",
-};
-
 function hideRulesFor(selector: string, styles: Record<string, string>): string[] {
   return Object.entries(HIDE_MEDIA_QUERIES)
     .filter(([key]) => styles[key] === "true")
     .map(([, query]) => `@media ${query}{${selector}{display:none!important}}`);
-}
-
-/**
- * The page that becomes `index.html`.
- *
- * `isHome` is not guaranteed: pages arrive from AI generation, template apply,
- * duplication and seeds, and a site can reach publish with the flag on none of
- * them. Falling back to the first page keeps the deployed site answering at its
- * own root, which is the whole point of publishing it.
- */
-export function resolveHomePageId(pages: ReadonlyArray<Pick<PageData, "id" | "isHome">>): string | undefined {
-  return (pages.find((p) => p.isHome) ?? pages[0])?.id;
-}
-
-/**
- * Each page's published file name: the home page is index.html, every other
- * page `<slug>.html`, numbered when two slugs collide. The export writes
- * these files, and a CMS collection's template page is bound by the same
- * name (`pageTemplatePath`, matched against the publish payload's paths by
- * `appendDynamicPagesToPublish`), so both read it from here.
- */
-export function pageFileNames(pages: ReadonlyArray<Pick<PageData, "id" | "slug" | "isHome">>): Map<string, string> {
-  const homeId = resolveHomePageId(pages);
-  const used = new Set<string>(["index.html"]);
-  return new Map(
-    pages.map((p, index) => {
-      if (p.id === homeId) return [p.id, "index.html"];
-      const slug = (p.slug ?? "").replace(/^\/+/, "") || `page-${index + 1}`;
-      let name = `${slug}.html`;
-      for (let n = 2; used.has(name); n++) name = `${slug}-${n}.html`;
-      used.add(name);
-      return [p.id, name];
-    }),
-  );
 }
 
 type LiveElement = NonNullable<ReturnType<Composer["elements"]["getElement"]>>;

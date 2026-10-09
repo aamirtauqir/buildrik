@@ -27,7 +27,7 @@ import type { PageItem, PageStatus } from "./types";
 import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
 import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
-import { pageFileNames } from "@/engine/export/ExportEngine";
+import { pageFileNames } from "@/engine/export/pageFiles";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
 

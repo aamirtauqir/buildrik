@@ -17,7 +17,7 @@ import type { UsePageSettingsReturn } from "./usePageSettings";
 import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 import { isPlaceholderSlug } from "../utils/seoScore";
 import { resolvePageDescription } from "@/engine/export/SEOInjector";
-import { pageFileNames } from "@/engine/export/ExportEngine";
+import { pageFileNames } from "@/engine/export/pageFiles";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 
 interface Props {
