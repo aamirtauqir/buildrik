@@ -67,7 +67,7 @@ describe("StudioPanels — ui:switch-tab respects the VIEWER rail gate", () => {
   it("gates the handler with the SAME predicate the rail uses (isTabAllowedForViewer), not a copy", () => {
     // The handler's own gate.
     expect(src).toMatch(
-      /const handler = \(data: \{ tab: string; fullPage\?: boolean \}\) => \{\s*[\s\S]{0,800}if \(!isTabAllowedForViewer\(data\.tab as GroupedTabId, viewerChrome\)\)/
+      /const handler = \(data: \{ tab: string; fullPage\?: boolean; prompt\?: string \}\) => \{\s*[\s\S]{0,800}if \(!isTabAllowedForViewer\(data\.tab as GroupedTabId, viewerChrome\)\)/
     );
     // The rail's gate — same function, not a re-derived VIEWER_TABS.has(...) check.
     expect(src).toMatch(/if \(!isTabAllowedForViewer\(tab, viewerChrome\)\)/);
