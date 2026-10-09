@@ -233,7 +233,16 @@ export const siteDetailRouter = router({
         const safePlan: PlanName = siteWorkspace?.plan ?? "FREE";
         const { siteId, ...data } = input;
         try {
-          return await createRedirect(siteId, data, safePlan);
+          const created = await createRedirect(siteId, data, safePlan);
+          await recordForSite({
+            siteId,
+            actorId: ctx.session.user!.id!,
+            action: "site.redirect.created",
+            targetType: "redirect",
+            targetId: created.id,
+            description: `Added a redirect from ${input.fromPath} to ${input.toUrl}`,
+          });
+          return created;
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "REDIRECT_LIMIT")
             throw new TRPCError({ code: "FORBIDDEN", message: "Redirect limit reached." });
@@ -282,7 +291,7 @@ export const siteDetailRouter = router({
       .mutation(async ({ ctx, input }) => {
         const redirect = await ctx.prisma.redirect.findUnique({
           where: { id: input.id },
-          select: { siteId: true },
+          select: { siteId: true, fromPath: true },
         });
         if (!redirect) throw new TRPCError({ code: "NOT_FOUND" });
         try {
@@ -291,7 +300,16 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return deleteRedirect(input.id);
+        const deleted = await deleteRedirect(input.id);
+        await recordForSite({
+          siteId: redirect.siteId,
+          actorId: ctx.session.user!.id!,
+          action: "site.redirect.deleted",
+          targetType: "redirect",
+          targetId: input.id,
+          description: `Removed the redirect from ${redirect.fromPath}`,
+        });
+        return deleted;
       }),
 
     import_csv: protectedProcedure
