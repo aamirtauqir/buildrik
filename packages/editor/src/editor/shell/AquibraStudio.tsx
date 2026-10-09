@@ -13,6 +13,7 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import { EVENTS } from "../../shared/constants";
+import { useActivePageId } from "@/editor/shared/useActivePageId";
 import type { ComposerConfig, ProjectData } from "@/shared/types";
 import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
@@ -370,18 +371,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // T10 (topbar plan): the Issues panel's page scope needs to know which page
   // the user is on, reactively — a page switch must re-scope the list.
-  const [activePageId, setActivePageId] = React.useState<string | null>(null);
-  React.useEffect(() => {
-    if (!composer) return;
-    const read = () => setActivePageId(composer.elements.getActivePage()?.id ?? null);
-    read();
-    composer.on(EVENTS.PAGE_CHANGED, read);
-    composer.on(EVENTS.PROJECT_LOADED, read);
-    return () => {
-      composer.off(EVENTS.PAGE_CHANGED, read);
-      composer.off(EVENTS.PROJECT_LOADED, read);
-    };
-  }, [composer]);
+  const activePageId = useActivePageId(composer);
 
   // 60-save-states: track connectivity so the topbar can reassure "changes
   // queued, will sync" instead of looking like a failed/lost save.

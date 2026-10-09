@@ -29,6 +29,7 @@ import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { pageFileNames } from "@/engine/export/ExportEngine";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
+import { useActivePageId } from "@/editor/shared/useActivePageId";
 
 /** A page's stored visibility → its panel status. Unset is "live" (what the
  *  deploy does with it). C4 #26: a "password" stored before Password pages
@@ -88,8 +89,15 @@ export interface UsePagesReturn {
 
 export function usePages(composer: Composer | null): UsePagesReturn {
   const { addToast } = useToast();
-  const [pages, setPages] = React.useState<PageItem[]>([]);
-  const [activePageId, setActivePageId] = React.useState<string | null>(null);
+  const [pageRows, setPages] = React.useState<PageItem[]>([]);
+  /* `isActive` is derived from the one active-page source, not set inside
+     the list sync — the list and the active id used to come from separate
+     subscriptions and could disagree (DQ-013). */
+  const activePageId = useActivePageId(composer);
+  const pages = React.useMemo(
+    () => pageRows.map((p) => ({ ...p, isActive: p.id === activePageId })),
+    [pageRows, activePageId],
+  );
   const [renamingPageId, setRenamingPageId] = React.useState<string | null>(null);
   const [contextMenu, setContextMenu] = React.useState<ContextMenuState | null>(null);
   const [settingsPageId, setSettingsPageId] = React.useState<string | null>(null);
@@ -115,8 +123,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     const sync = () => {
       try {
         const raw = composer.elements.getAllPages();
-        const active = composer.elements.getActivePage();
-        setActivePageId(active?.id ?? null);
         setPages(
           raw.map((p) => ({
             id: p.id,
@@ -126,7 +132,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
               composer as { router?: { getPath?: (id: string) => string | undefined } }
             ).router?.getPath?.(p.id),
             isHome: p.isHome,
-            isActive: p.id === active?.id,
             /* Unset visibility is "live", because that is what the deploy
                does with it: `isPageLive` (ExportEngine) ships a page whose
                settings say nothing, and nothing writes the field unless the

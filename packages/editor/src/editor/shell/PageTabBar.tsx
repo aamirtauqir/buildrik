@@ -15,6 +15,7 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
 import { useDirtyPages } from "../shared/useDirtyPages";
+import { useActivePageId } from "@/editor/shared/useActivePageId";
 import { IconButton } from "@/editor/chrome-ui";
 import { Plus } from "lucide-react";
 // ============================================================================
@@ -31,7 +32,7 @@ interface PageTabBarProps {
 
 export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   const [pages, setPages] = React.useState<PageData[]>([]);
-  const [activePageId, setActivePageId] = React.useState<string | null>(null);
+  const activePageId = useActivePageId(composer);
   const dirtyPages = useDirtyPages(composer);
 
   // Sync pages from composer — subscribe to all page events
@@ -39,10 +40,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
     if (!composer) return;
 
     const syncPages = () => {
-      const allPages = composer.elements.getAllPages();
-      setPages(allPages);
-      const active = composer.elements.getActivePage();
-      setActivePageId(active?.id ?? null);
+      setPages(composer.elements.getAllPages());
     };
 
     syncPages();
