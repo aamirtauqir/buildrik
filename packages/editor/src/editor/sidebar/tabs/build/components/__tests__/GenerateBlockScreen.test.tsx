@@ -171,6 +171,25 @@ describe("GenerateBlockScreen", () => {
     expect(bareUndo).not.toHaveBeenCalled();
   });
 
+  /* L5-009: a reply with no usable change is the model's answer, not an
+     outage — "didn't respond / timed out" sent users retrying a healthy
+     service. */
+  it("a reply with no change says 'Nothing to insert', not a timeout", async () => {
+    const empty: ServerEdit = { ...edit, rows: [] };
+    const generate = vi.fn(async () => empty);
+    render(<GenerateBlockScreen composer={makeComposer().composer} onBack={vi.fn()} generate={generate} />);
+    fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "An FAQ block" } });
+    await act(async () => fireEvent.click(screen.getByTestId("generate-run")));
+    const card = screen.getByTestId("generate-error");
+    expect(card.textContent).toContain("Nothing to insert.");
+    expect(card.textContent).toContain("Try describing the block differently");
+    expect(card.textContent).not.toContain("didn't respond");
+    expect(card.textContent).not.toContain("timed out");
+    expect((screen.getByTestId("generate-input") as HTMLTextAreaElement).value).toBe("An FAQ block");
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Try again" })));
+    expect(generate).toHaveBeenCalledTimes(2);
+  });
+
   it("an edit that inserted nothing is an error, not 'Block inserted'", async () => {
     const { composer } = makeComposer(["h1"]);
     render(

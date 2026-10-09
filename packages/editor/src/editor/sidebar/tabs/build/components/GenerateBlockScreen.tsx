@@ -105,16 +105,24 @@ const EXAMPLES = [
   "An FAQ accordion with common questions",
 ] as const;
 
-/* The three failure cards (6881:76122 no provider · 6881:75906 out of credit
-   · 6881:76336 service error). Each says nothing changed and offers a way on. */
-const ERROR_TITLE: Record<AiErrorKind, string> = {
+/* A run that ended without a block: the three failure cards (6881:76122 no
+   provider · 6881:75906 out of credit · 6881:76336 service error), plus
+   "nochange" — the model answered, but with nothing to insert (L5-009; it used
+   to read as a timeout, so users retried a healthy service). Each says nothing
+   changed and offers a way on. */
+type FailKind = AiErrorKind | "nochange";
+
+const ERROR_TITLE: Record<FailKind, string> = {
   "not-configured": "AI isn't available on this workspace.",
   quota: "AI is out of credit.",
   other: "The AI service didn't respond.",
+  nochange: "Nothing to insert.",
 };
 
-const errorBody = (kind: AiErrorKind, limit: number | null): string =>
-  kind === "not-configured"
+const errorBody = (kind: FailKind, limit: number | null): string =>
+  kind === "nochange"
+    ? "The AI answered, but without a block to add. Nothing changed. Try describing the block differently."
+    : kind === "not-configured"
     ? "No AI provider is configured for this deployment. Ask your workspace owner to arrange setup with the deployment administrator. Nothing has changed on your site."
     : kind === "quota"
       ? `Nothing was changed. Daily limit reached${limit !== null && limit >= 0 ? ` (${limit})` : ""}. Resets at midnight UTC.`
@@ -124,7 +132,7 @@ const LINK = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent)] tw:no-under
 const LINK_BTN =
   "tw:h-auto tw:self-start tw:border-0 tw:bg-transparent tw:p-0 tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-accent)] tw:hover:underline tw:focus:ring-0";
 
-type Phase = { kind: "idle" } | { kind: "thinking" } | { kind: "inserted"; edit: ServerEdit } | { kind: "error"; error: AiErrorKind };
+type Phase = { kind: "idle" } | { kind: "thinking" } | { kind: "inserted"; edit: ServerEdit } | { kind: "error"; error: FailKind };
 
 interface Props {
   composer: Composer;
@@ -168,7 +176,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
       // Stopped (or superseded) while the model was answering: insert nothing.
       if (id !== runId.current) return;
       if (!edit || edit.rows.length === 0) {
-        setPhase({ kind: "error", error: "other" });
+        setPhase({ kind: "error", error: "nochange" });
         return;
       }
       const before = new Set(rootChildIds());
@@ -333,7 +341,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
             )}
             <span
               className={
-                phase.error === "not-configured"
+                phase.error === "not-configured" || phase.error === "nochange"
                   ? "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
                   : "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]"
               }
@@ -353,7 +361,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
                 View workspace owner ↗
               </a>
             )}
-            {phase.error === "other" && (
+            {(phase.error === "other" || phase.error === "nochange") && (
               <Button color="light" className={LINK_BTN} onClick={() => void run()}>
                 Try again
               </Button>
