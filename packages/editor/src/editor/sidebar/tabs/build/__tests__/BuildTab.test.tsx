@@ -44,13 +44,16 @@ describe("BuildTab — board 137:2 taxonomy", () => {
 
   // TEMPLATES is OUT of Insert (founder, 2026-08-07) — templates own a full
   // flow (rail tab, Pages new-page, first-run) and never lived here.
-  /* Board 4428:140817 names the component groups by where they come from. */
-  it("renders the four source groups: ELEMENTS BLOCKS BUILT-IN COMPONENTS SAVED COMPONENTS — no TEMPLATES", () => {
+  /* L1-022 (owner 2026-10-10): one name per concept — Elements, Blocks,
+     saved Components. BUILT-IN COMPONENTS (board 4428:140817) repeated
+     ELEMENTS under other names and is gone. */
+  it("renders three source groups: ELEMENTS BLOCKS SAVED COMPONENTS — no TEMPLATES, no BUILT-IN COMPONENTS", () => {
     renderTab();
-    for (const label of ["ELEMENTS", "BLOCKS", "BUILT-IN COMPONENTS", "SAVED COMPONENTS"]) {
+    for (const label of ["ELEMENTS", "BLOCKS", "SAVED COMPONENTS"]) {
       expect(screen.getByText(label)).toBeTruthy();
     }
     expect(screen.queryByText("TEMPLATES")).toBeNull();
+    expect(screen.queryByText("BUILT-IN COMPONENTS")).toBeNull();
   });
 
   it("ELEMENTS is open by default (▾) with its rows mounted; BLOCKS is closed", () => {
@@ -414,8 +417,8 @@ describe("BuildTab — BLOCKS as section cards (board 4428:140817)", () => {
       .map((el) => el.getAttribute("data-testid")!)
       .filter((t) => /^insert-block-[a-z-]+$/.test(t) && !/thumb|label|pill/.test(t))
       .map((t) => t.replace("insert-block-", ""));
-    expect(ids).toEqual(["hero", "features", "menu-grid", "testimonials-section", "cta", "contact", "footer", "navbar"]);
-    expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("8");
+    expect(ids).toEqual(["hero", "features", "menu-grid", "testimonials-section", "cta", "contact", "footer", "navbar", "pricing"]);
+    expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("9");
   });
 
   it("draws a thumbnail on every card — no blank grey box", () => {
@@ -503,15 +506,16 @@ describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
   });
 });
 
-/* Parity V1, board 4428:140817: BLOCKS is 8 sections in a two-column grid,
-   in the board's order. */
+/* Parity V1, board 4428:140817: BLOCKS is the board's 8 sections in a
+   two-column grid, in the board's order — plus Pricing table, the one section
+   the retired BUILT-IN COMPONENTS group carried (L1-022). */
 describe("BuildTab — BLOCKS to board 4428:140817", () => {
-  it("lists the board's 8 blocks in order, two columns", () => {
+  it("lists the board's 8 blocks in order, then Pricing table, two columns", () => {
     renderTab();
     fireEvent.click(screen.getByTestId("insert-group-blocks"));
-    expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("8");
+    expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("9");
     const labels = Array.from(document.querySelectorAll('[data-testid^="insert-block-label-"]')).map((e) => e.textContent);
-    expect(labels).toEqual(["Hero", "Features", "Menu grid", "Testimonials", "CTA", "Contact", "Footer", "Navbar"]);
+    expect(labels).toEqual(["Hero", "Features", "Menu grid", "Testimonials", "CTA", "Contact", "Footer", "Navbar", "Pricing Table"]);
     expect(screen.getByTestId("insert-blocks-grid").className).toMatch(/tw:grid-cols-2/);
   });
 });

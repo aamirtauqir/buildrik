@@ -26,7 +26,7 @@ import { SearchResults } from "./components/SearchResults";
 import { useInsertDrag } from "@/editor/canvas/insertDrag";
 import { takePendingGenerate, takePendingInsertGroup, takePendingPasteHtml } from "./insertGroupRequest";
 import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
-import { buildInsertGroups, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
+import { buildInsertGroups, blockRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "@/shared/constants";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { useComponentList } from "../component-library/useComponentList";
@@ -333,7 +333,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 favs={tab.favs}
                 onToggleFav={tab.toggleFav}
                 blocks={g.id === "blocks" ? blockRows : undefined}
-                components={g.id === "components" ? componentRows : undefined}
                 mine={g.id === "mine" ? mine : undefined}
                 library={g.id === "mine" ? library : undefined}
                 onLibraryInsert={(id) => void insertFromLibrary(id)}

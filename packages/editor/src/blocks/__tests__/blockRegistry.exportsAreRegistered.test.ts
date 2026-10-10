@@ -2,7 +2,7 @@
  * Every block config the package exports must be in the registry.
  *
  * `contactFormBlockConfig` was exported from `blocks/index.ts` and listed in
- * neither `blockDefinitions` nor `componentBlockDefinitions`, so the Contact
+ * `blockDefinitions` (or the since-retired Components subset), so the Contact
  * Form block existed, rendered, and could never be inserted — nothing in the
  * Insert panel could reach it. An export is a claim that the thing is part of
  * the package; for a block, the registry is what makes that claim true.
@@ -42,7 +42,7 @@ describe("block registry covers the package's exports", () => {
          imported at the top of the file. */
       const arrayBody = registrySrc.slice(
         registrySrc.indexOf("export const blockDefinitions"),
-        registrySrc.indexOf("export const componentBlockDefinitions")
+        registrySrc.indexOf("export function getBlockDefinitions")
       );
       return !arrayBody.includes(name);
     });

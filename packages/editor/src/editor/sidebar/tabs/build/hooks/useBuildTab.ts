@@ -11,7 +11,7 @@ import { CATALOG, flatCatalog } from "../catalog/catalog";
 import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
 import type { ComponentDefinition } from "@/shared/types/components";
-import { blockRows, componentRows } from "../catalog/groups";
+import { blockRows } from "../catalog/groups";
 import { getBlockDefinitions } from "@/blocks";
 import type { BlockDefinition } from "@/blocks/blockRegistry";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
@@ -244,8 +244,8 @@ export function useBuildTab(
     [searchQuery, openCats]
   );
 
-  // Board 138:53: search is flat and cross-source — elements, blocks AND
-  // components (the board's third tag).
+  // Board 138:53: search is flat and cross-source — elements, blocks and
+  // saved components (L1-022: one name per concept).
   /* BRP1-M12: the theme toggle is offered only while the site's Dark mode is
      Auto — read live, so flipping Dark mode shows / hides it at once. */
   const readDarkMode = React.useCallback(
@@ -270,7 +270,7 @@ export function useBuildTab(
   );
 
   const searchResults = React.useMemo(
-    () => searchInsert(searchQuery, allElements, blockRows, componentRows, saved),
+    () => searchInsert(searchQuery, allElements, blockRows, saved),
     [searchQuery, saved, allElements]
   );
 

@@ -1,6 +1,6 @@
 /**
  * Insert board taxonomy — founder-final 2026-08-07: ELEMENTS · BLOCKS ·
- * COMPONENTS · MINE. TEMPLATES is OUT of Insert — "template ka apna poora
+ * MINE (saved components; L1-022 retired BUILT-IN COMPONENTS). TEMPLATES is OUT of Insert — "template ka apna poora
  * flow hai, wahan adjust nahi ho raha": its surfaces are the rail Templates
  * tab (gallery board 641:2487), Pages new-page (S1.3b) and first-run
  * (S1.1b), never the Insert panel.
@@ -10,18 +10,15 @@
  * data, not contract.
  *
  * MINE expands INLINE (board 1069:4970) with the user's own components.
- * COMPONENTS expands INLINE too (board 1069:4790): its catalog is the
- * registry's Components-folder subset (Card, Slider, Modal, Tabs, …) —
- * BLOCKS carries the rest of the registry. The Components management
- * surface stays reachable from the rail.
+ * The Components management surface stays reachable from the rail.
  *
  * @license BSD-3-Clause
  */
 
 import { flatCatalog } from "./catalog";
-import { getBlockDefinitions, componentBlockDefinitions, type BlockDefinition } from "@/blocks/blockRegistry";
+import { getBlockDefinitions, type BlockDefinition } from "@/blocks/blockRegistry";
 
-export type InsertGroupId = "favourites" | "recent" | "elements" | "blocks" | "components" | "mine";
+export type InsertGroupId = "favourites" | "recent" | "elements" | "blocks" | "mine";
 
 export interface InsertGroup {
   id: InsertGroupId;
@@ -33,16 +30,15 @@ export interface InsertGroup {
   kind: "inline";
 }
 
-/** COMPONENTS — the registry's Components-folder subset (board 1069:4790). */
-export const componentRows: BlockDefinition[] = componentBlockDefinitions;
-
-const componentIds = new Set(componentRows.map((c) => c.id));
-
-/** BLOCKS — sections only (board 4428:140817, G2-110 / G2-107): the registry's
- *  `Sections` folder, inserted via the existing insertBlock path. The rest of
- *  the registry was 40 rows that duplicated ELEMENTS one for one. */
+/** BLOCKS — sections (board 4428:140817, G2-110 / G2-107): the registry's
+ *  `Sections` folder plus the Pricing table, inserted via the insertBlock
+ *  path. L1-022 (owner 2026-10-10): one name per concept. The board's
+ *  BUILT-IN COMPONENTS group listed the registry's Components folder, every
+ *  row of which ELEMENTS already offered under another name (Slider/Carousel,
+ *  Accordion / FAQ, Modal / Dialog, Contact Form = Form …); the one section
+ *  among them, Pricing, moved here. */
 export const blockRows: BlockDefinition[] = getBlockDefinitions().filter(
-  (b) => b.category === "Sections" && !componentIds.has(b.id),
+  (b) => b.category === "Sections" || b.id === "pricing",
 );
 
 /** ★ FAVOURITES (board 4418:103353) and RECENT lead the list only while they
@@ -59,8 +55,6 @@ export function buildInsertGroups(
     ...(recentCount ? [{ id: "recent" as const, label: "RECENT", count: recentCount, kind: "inline" as const }] : []),
     { id: "elements", label: "ELEMENTS", count: elementCount, kind: "inline" },
     { id: "blocks", label: "BLOCKS", count: blockRows.length, kind: "inline" },
-    /* Board 4428:140817 names them by where they come from. */
-    { id: "components", label: "BUILT-IN COMPONENTS", count: componentRows.length, kind: "inline" },
     { id: "mine", label: "SAVED COMPONENTS", count: mineCount, kind: "inline" },
   ];
 }

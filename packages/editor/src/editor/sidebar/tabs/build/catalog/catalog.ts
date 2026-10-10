@@ -1,5 +1,9 @@
 /**
  * Build Tab — element catalog, spec-aligned to §10.1
+ *
+ * ELEMENTS are primitives (L1-022, owner 2026-10-10). Navbar, Footer, CTA,
+ * Testimonials and Pricing are sections — they are BLOCKS (catalog/groups.ts)
+ * and appear only there, under one name each.
  * Every entry has a blockId that exists in blockRegistry.
  * No disabled entries in production.
  * @license BSD-3-Clause
@@ -300,31 +304,6 @@ export const CATALOG: CatEntry[] = [
     ],
   },
   {
-    id: "navigation",
-    name: "Navigation",
-    sub: "Navbar, Footer, CTA",
-    elements: [
-      {
-        name: "Navbar",
-        blockId: "navbar",
-        description: "Top navigation bar with logo and links",
-        tags: ["navigation", "menu", "header", "nav", "top bar"],
-      },
-      {
-        name: "Footer",
-        blockId: "footer",
-        description: "Site footer with links and copyright",
-        tags: ["bottom", "site footer", "copyright", "contact links"],
-      },
-      {
-        name: "CTA",
-        blockId: "cta",
-        description: "Call-to-action banner with headline and button",
-        tags: ["call to action", "banner", "signup", "convert", "get started"],
-      },
-    ],
-  },
-  {
     id: "interactive",
     name: "Interactive",
     sub: "Accordion, Tabs, Modal, Carousel",
@@ -353,18 +332,6 @@ export const CATALOG: CatEntry[] = [
         blockId: "modal",
         description: "Dialog/modal overlay trigger",
         tags: ["dialog", "popup", "overlay", "lightbox"],
-      },
-      {
-        name: "Testimonials",
-        blockId: "testimonials",
-        description: "Customer testimonial cards or quote display",
-        tags: ["testimonial", "review", "quote", "social proof", "customer"],
-      },
-      {
-        name: "Pricing",
-        blockId: "pricing",
-        description: "Pricing plans comparison table",
-        tags: ["pricing", "plans", "tiers", "cost", "comparison"],
       },
       {
         name: "Social Icons",

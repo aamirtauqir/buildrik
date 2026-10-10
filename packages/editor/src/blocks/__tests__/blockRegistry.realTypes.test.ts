@@ -30,6 +30,7 @@ import {
 } from "@/engine/__tests__/test-utils/realComposer";
 import { ExportEngine } from "@/engine/export/ExportEngine";
 import { flatCatalog } from "@/editor/sidebar/tabs/build/catalog/catalog";
+import { blockRows } from "@/editor/sidebar/tabs/build/catalog/groups";
 import { insertBlock, getBlockById, getBlockDefinitions } from "../blockRegistry";
 import baseline from "./__fixtures__/catalogBlockHtml.baseline.json";
 
@@ -89,12 +90,20 @@ const EXPECTED_TYPE: Record<string, string> = {
   accordion: "accordion",
   tabs: "tabs",
   modal: "button",
-  testimonials: "testimonials",
   pricing: "pricing",
   "social-icons": "social",
   slider: "slider",
   "theme-toggle": "container",
 };
+
+/* The Add panel's typed rows: every ELEMENTS row, plus the sections that
+   L1-022 moved to BLOCKS under their one name (Navbar, Footer, CTA, Pricing).
+   The Testimonials component left Add — BLOCKS' Testimonials section is the
+   one name — and stays covered by the registry-wide check below. */
+const ADD_ROWS: Array<{ name: string; blockId: string }> = [
+  ...flatCatalog,
+  ...blockRows.filter((b) => b.id in EXPECTED_TYPE).map((b) => ({ name: b.label, blockId: b.id })),
+];
 
 function insert(blockId: string) {
   const composer = createTestComposer();
@@ -130,12 +139,12 @@ async function publishedFiles(composer: ReturnType<typeof createTestComposer>): 
 }
 
 describe("Q2 — inserted blocks keep their real element type", () => {
-  it("pins every one of the 54 Add-panel rows", () => {
-    expect(flatCatalog).toHaveLength(54);
-    expect(flatCatalog.map((e) => e.blockId).sort()).toEqual(Object.keys(EXPECTED_TYPE).sort());
+  it("pins every one of the 53 typed Add-panel rows", () => {
+    expect(ADD_ROWS).toHaveLength(53);
+    expect(ADD_ROWS.map((e) => e.blockId).sort()).toEqual(Object.keys(EXPECTED_TYPE).sort());
   });
 
-  it.each(flatCatalog.map((e) => [e.name, e.blockId]))("%s (%s) inserts as its real type", (_name, blockId) => {
+  it.each(ADD_ROWS.map((e) => [e.name, e.blockId]))("%s (%s) inserts as its real type", (_name, blockId) => {
     expect(insert(blockId).el.getType()).toBe(EXPECTED_TYPE[blockId]);
   });
 
@@ -154,7 +163,7 @@ describe("Q2 — inserted blocks keep their real element type", () => {
   });
 
   it("survives a save/load round trip", () => {
-    for (const e of flatCatalog) {
+    for (const e of ADD_ROWS) {
       const { composer, el } = insert(e.blockId);
       const reloaded = createTestComposer();
       reloaded.importProject(JSON.parse(JSON.stringify(composer.exportProject())));
@@ -164,7 +173,7 @@ describe("Q2 — inserted blocks keep their real element type", () => {
 });
 
 describe("Q2 — the type change does not change a single byte of markup", () => {
-  const rows = flatCatalog.filter((e) => e.blockId !== "slider").map((e) => [e.name, e.blockId]);
+  const rows = ADD_ROWS.filter((e) => e.blockId !== "slider").map((e) => [e.name, e.blockId]);
   const recorded = baseline as Record<string, { canvas: string; publish: string }>;
 
   it.each(rows)("%s (%s) renders on the canvas exactly as before", (_name, blockId) => {
