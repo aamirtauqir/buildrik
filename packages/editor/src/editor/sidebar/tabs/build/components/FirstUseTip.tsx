@@ -19,7 +19,7 @@ import { useAutoTip } from "@/editor/onboarding/tipQueue";
 import { TIPS } from "../catalog/tips";
 
 /** One queue id per tip in `TIPS`, in order. */
-export const BUILD_TIP_IDS: readonly EditorTipId[] = ["build-tip-1", "build-tip-2", "build-tip-3", "build-tip-4"];
+const BUILD_TIP_IDS: readonly EditorTipId[] = ["build-tip-1", "build-tip-2", "build-tip-3", "build-tip-4"];
 
 export function FirstUseTip({ anchorRef }: { anchorRef: React.RefObject<HTMLElement | null> }) {
   const tip = useAutoTip(BUILD_TIP_IDS, true);
