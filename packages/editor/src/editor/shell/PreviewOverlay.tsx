@@ -230,7 +230,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
      typed width are a page with edges. */
   const device: Breakpoint | null = typeof width === "number" || width === "fit" ? null : width;
   const framed = device === "tablet" || device === "mobile";
-  const pageWidth = width === "fit" ? "100%" : `${typeof width === "number" ? width : DEVICE_PREVIEW_SIZES.desktop.width}px`;
+  const pageWidth = width === "fit" ? "100%" : String(typeof width === "number" ? width : DEVICE_PREVIEW_SIZES.desktop.width);
 
   return (
     <div
@@ -320,7 +320,9 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
             srcDoc={html}
             onLoad={onFrameLoad}
             className={framed ? SCREEN_FRAME_CLASS : PAGE_FRAME_CLASS}
-            style={framed ? undefined : { width: pageWidth }}
+            /* The HTML width attribute, not a style: the width is data (a
+               preset, the stage, or the typed px). */
+            width={framed ? undefined : pageWidth}
           />
         </DeviceFramePreview>
       </div>

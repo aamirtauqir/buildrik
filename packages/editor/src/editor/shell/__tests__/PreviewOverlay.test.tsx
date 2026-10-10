@@ -175,11 +175,11 @@ describe("PreviewOverlay — pages", () => {
     const frame = () => screen.getByTitle("Site preview") as HTMLIFrameElement;
     it("Fit fills the stage; a preset renders at its own width", () => {
       render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
-      expect(frame().style.width).toBe("1280px");
+      expect(frame().getAttribute("width")).toBe("1280");
       fireEvent.click(screen.getByTestId("preview-width-fit"));
       expect(screen.getByTestId("preview-width-fit")).toHaveAttribute("aria-pressed", "true");
       expect(screen.getByTestId("bp-cell-desktop")).toHaveAttribute("aria-pressed", "false");
-      expect(frame().style.width).toBe("100%");
+      expect(frame().getAttribute("width")).toBe("100%");
     });
 
     it("a typed width renders the page at that many CSS px, without a bezel", () => {
@@ -187,7 +187,7 @@ describe("PreviewOverlay — pages", () => {
       const input = screen.getByRole("textbox", { name: "Preview width in px" });
       fireEvent.change(input, { target: { value: "900" } });
       fireEvent.keyDown(input, { key: "Enter" });
-      expect(frame().style.width).toBe("900px");
+      expect(frame().getAttribute("width")).toBe("900");
       expect(frame().parentElement?.style.width).toBe("");
       for (const id of ["desktop", "tablet", "mobile"]) {
         expect(screen.getByTestId(`bp-cell-${id}`)).toHaveAttribute("aria-pressed", "false");
@@ -199,7 +199,7 @@ describe("PreviewOverlay — pages", () => {
       const input = screen.getByRole("textbox", { name: "Preview width in px" });
       fireEvent.change(input, { target: { value: "50" } });
       fireEvent.keyDown(input, { key: "Enter" });
-      expect(frame().style.width).toBe("1280px");
+      expect(frame().getAttribute("width")).toBe("1280");
       expect(input).toHaveAttribute("aria-invalid", "true");
     });
 
@@ -220,10 +220,10 @@ describe("PreviewOverlay — pages", () => {
       fireEvent.blur(input);
       unmount();
       render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
-      expect(frame().style.width).toBe("1100px");
+      expect(frame().getAttribute("width")).toBe("1100");
       cleanup();
       render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s2" />);
-      expect(frame().style.width).toBe("1280px");
+      expect(frame().getAttribute("width")).toBe("1280");
       cleanup();
       render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
       fireEvent.click(screen.getByRole("button", { name: /^Mobile/ }));
