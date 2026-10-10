@@ -43,7 +43,7 @@ export function readZoomPreference(siteId: string | null): ZoomPreference {
   }
 }
 
-export function writeZoomPreference(siteId: string | null, pref: ZoomPreference): void {
+function writeZoomPreference(siteId: string | null, pref: ZoomPreference): void {
   try {
     window.localStorage.setItem(KEY_PREFIX + (siteId ?? "local"), String(pref));
   } catch {
