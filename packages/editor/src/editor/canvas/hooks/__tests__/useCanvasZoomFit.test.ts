@@ -69,6 +69,26 @@ describe("useCanvasZoomFit", () => {
     expect(t.composer.setZoom).toHaveBeenLastCalledWith(computeFitZoom(1280, 752));
   });
 
+  /* Live regression (2026-10-10): the render that applies the first fit still
+     carries the old 100, and the pin effect read that as a chosen 100%. */
+  it("does not pin the stale zoom of the render that applies the first fit", () => {
+    const t = setup({ frameWidth: 1280, columnWidth: 752 });
+    t.hook.rerender({ zoom: 100, frameWidth: 1280, ready: true });
+    expect(window.localStorage.getItem("bk-canvas-zoom:site-1")).toBeNull();
+    t.sync();
+    expect(window.localStorage.getItem("bk-canvas-zoom:site-1")).toBeNull();
+    expect(t.getZoom()).toBe(computeFitZoom(1280, 752));
+  });
+
+  it("waits for the column to have a width before the first fit", () => {
+    const t = setup({ frameWidth: 1280, columnWidth: 0 });
+    t.sync();
+    expect(t.composer.setZoom).not.toHaveBeenCalled();
+    Object.defineProperty(t.viewport, "clientWidth", { value: 752 });
+    act(() => resizeCallbacks.forEach((cb) => cb()));
+    expect(t.getZoom()).toBe(computeFitZoom(1280, 752));
+  });
+
   it("opens at 100% when the frame already fits", () => {
     const t = setup({ frameWidth: 768, columnWidth: 1100 });
     t.sync();

@@ -69,8 +69,11 @@ export function useCanvasZoomFit({ composer, zoom, frameWidth, scrollRef, ready,
   const prefRef = React.useRef<ZoomPreference>("fit");
   const lastFitRef = React.useRef<number | null>(null);
   const appliedRef = React.useRef(false);
+  const prevZoomRef = React.useRef(zoom);
   const frameWidthRef = React.useRef(frameWidth);
   frameWidthRef.current = frameWidth;
+  const readyRef = React.useRef(ready);
+  readyRef.current = ready;
 
   const applyFit = React.useCallback(() => {
     const viewport = scrollRef.current;
@@ -80,20 +83,28 @@ export function useCanvasZoomFit({ composer, zoom, frameWidth, scrollRef, ready,
     composer.setZoom(next);
   }, [composer, scrollRef]);
 
-  /* First paint after load: the remembered choice, else Fit. */
-  React.useEffect(() => {
-    if (!ready || !composer || appliedRef.current) return;
+  /* First paint after load: the remembered choice, else Fit. Waits for the
+     column to have a width — a fit against 0 would be a fit to nothing. */
+  const applyInitial = React.useCallback(() => {
+    if (appliedRef.current || !readyRef.current || !composer || !scrollRef.current?.clientWidth) return;
     appliedRef.current = true;
     prefRef.current = readZoomPreference(siteId);
     if (prefRef.current === "fit") applyFit();
     else composer.setZoom(prefRef.current);
-  }, [ready, composer, siteId, applyFit]);
+  }, [composer, scrollRef, siteId, applyFit]);
 
-  /* A zoom that Fit did not produce is an explicit percent: pin it. */
   React.useEffect(() => {
-    if (!appliedRef.current) return;
+    applyInitial();
+  }, [ready, applyInitial]);
+
+  /* A zoom CHANGE that Fit did not produce is an explicit percent: pin it.
+     Only a change counts — the render that applies the first fit still
+     carries the old zoom, and that is not a choice. */
+  React.useEffect(() => {
+    const changed = Math.round(prevZoomRef.current) !== Math.round(zoom);
+    prevZoomRef.current = zoom;
+    if (!appliedRef.current || !changed) return;
     if (prefRef.current === "fit" && Math.round(zoom) === lastFitRef.current) return;
-    if (prefRef.current === Math.round(zoom)) return;
     prefRef.current = Math.round(zoom);
     writeZoomPreference(siteId, prefRef.current);
   }, [zoom, siteId]);
@@ -108,11 +119,12 @@ export function useCanvasZoomFit({ composer, zoom, frameWidth, scrollRef, ready,
     const viewport = scrollRef.current;
     if (!viewport || typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(() => {
-      if (appliedRef.current && prefRef.current === "fit") applyFit();
+      if (!appliedRef.current) applyInitial();
+      else if (prefRef.current === "fit") applyFit();
     });
     observer.observe(viewport);
     return () => observer.disconnect();
-  }, [scrollRef, applyFit, ready]);
+  }, [scrollRef, applyFit, applyInitial, ready]);
 
   /** Fit, chosen explicitly: remember it and keep fitting. */
   return React.useCallback(() => {
