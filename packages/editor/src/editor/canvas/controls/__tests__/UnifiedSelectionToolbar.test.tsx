@@ -121,6 +121,19 @@ describe("UnifiedSelectionToolbar", () => {
     expect(screen.queryByTestId("selection-toolbar-hint")).toBeNull();
   });
 
+  it("a key pressed on an already-focused button shows its hint", () => {
+    setup();
+    const more = screen.getByTestId("selection-toolbar-more");
+    act(() => more.focus());
+    fireEvent.mouseLeave(more); // the pointer leaves; focus stays
+    expect(screen.queryByTestId("selection-toolbar-hint")).toBeNull();
+    /* jsdom's :focus-visible does not follow key modality; the browser's
+       does (verified live). Stand in for it on this one element. */
+    more.matches = (sel: string) => sel === ":focus-visible" || Element.prototype.matches.call(more, sel);
+    fireEvent.keyUp(more, { key: "Shift" });
+    expect(screen.getByTestId("selection-toolbar-hint")).toHaveTextContent("More actions");
+  });
+
   it("every button has an accessible name, hint or not", () => {
     setup();
     expect(screen.getByRole("button", { name: "Duplicate (⌘D)" })).toBeInTheDocument();

@@ -88,6 +88,11 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
     onFocus: (e: React.FocusEvent<HTMLButtonElement>) => {
       if (e.currentTarget.matches(":focus-visible")) setHint(key);
     },
+    /* A key pressed while the button already holds focus (it was focused by
+       a click or by script) turns its focus keyboard focus. */
+    onKeyUp: (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (e.currentTarget.matches(":focus-visible")) setHint(key);
+    },
     onBlur: () => setHint(null),
   });
   const toolbarRef = React.useRef<HTMLDivElement>(null);
