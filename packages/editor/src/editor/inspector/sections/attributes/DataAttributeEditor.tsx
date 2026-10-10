@@ -77,7 +77,7 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+      <div className="tw:flex tw:gap-2 tw:mb-2">
         <TextInput
           type="text"
           value={newKey}

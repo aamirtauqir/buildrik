@@ -26,6 +26,7 @@
  */
 
 import * as React from "react";
+import { Redo, Undo } from "lucide-react";
 import { Button, isModalOpen, Menu, MenuGroup, MenuItem, MenuLabel, Popover, TextInput, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { stepZoom } from "@/shared/constants/canvas";
@@ -88,26 +89,13 @@ export interface CanvasFooterToolbarProps {
 }
 
 // ============================================
-// Icons (inline SVG for self-containment)
+// Icons — lucide (DQ-017: the undo/redo glyphs were lucide's own paths,
+// hand-copied into inline SVGs at an off-scale 15px)
 // ============================================
 
 /* The six overlay glyphs that used to sit in this block are gone with the
    icon-only toggles — board 199:205 labels them in words. Recover from git
    history if a future surface needs them. */
-
-const UndoIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 7v6h6" />
-    <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
-  </svg>
-);
-
-const RedoIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 7v6h-6" />
-    <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
-  </svg>
-);
 
 /** Square icon control in the bar — undo/redo/help all share this box. The
  *  board draws a disabled ↶ ↷ as a muted glyph with no fill, so the Button's
@@ -326,7 +314,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                   disabled={canUndo === false}
                   aria-label="Undo"
                 >
-                  <UndoIcon />
+                  <Undo size={16} aria-hidden="true" />
                 </Button>
               </Tooltip>
             )}
@@ -340,7 +328,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                   disabled={canRedo === false}
                   aria-label="Redo"
                 >
-                  <RedoIcon />
+                  <Redo size={16} aria-hidden="true" />
                 </Button>
               </Tooltip>
             )}

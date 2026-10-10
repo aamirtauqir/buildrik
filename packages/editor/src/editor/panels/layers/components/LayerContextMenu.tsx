@@ -15,7 +15,7 @@
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks/useClickOutside";
 import type { LayerAction } from "../types";
-import { Button } from "@/editor/chrome-ui";
+import { Menu, MenuItem } from "@/editor/chrome-ui";
 
 interface LayerContextMenuProps {
   x: number;
@@ -35,10 +35,12 @@ interface LayerContextMenuProps {
 /** "3 elements" — the board's own suffix, singular never shown (N ≥ 2). */
 export const elementsLabel = (n: number) => `${n} elements`;
 
-/* Flowbite's focus ring drew a blue box round the first row every time the
-   menu opened (focus moves there for keyboard users); 4418:79546 draws the
-   rows plain. Keyboard focus keeps a visible cue — the hover fill. */
-const ITEM = "bdc-menu-item tw:focus:ring-0 tw:focus-visible:bg-[var(--bk-bg-subtle)]";
+/* chrome-ui's Menu/MenuItem (DQ-018): one roving-focus contract — first row
+   focused on open, ↑ ↓ Home End — instead of this file's own. The board's
+   geometry (4418:79546: 28h, 12 inset, flush, 13/400 ink) stays in
+   layers-v2.css's `.bdc-menu-item`, which is unlayered and so beats
+   MenuItem's own row classes property by property. */
+const ITEM = "bdc-menu-item";
 
 export function LayerContextMenu({
   x,
@@ -52,12 +54,6 @@ export function LayerContextMenu({
   onClose,
 }: LayerContextMenuProps) {
   const menuRef = React.useRef<HTMLDivElement>(null);
-
-  // Focus first menu item on mount (WCAG 2.1 — focus moves into menu when opened)
-  React.useEffect(() => {
-    const firstItem = menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]');
-    firstItem?.focus();
-  }, []);
 
   useClickOutside(menuRef, onClose, { closeOnEscape: true });
 
@@ -75,76 +71,72 @@ export function LayerContextMenu({
   const suffix = ` · ${multi ? elementsLabel(count) : name}`;
 
   return (
-    <div
-      ref={menuRef}
-      className="bdc-menu"
+    <div ref={menuRef} className="bdc-menu" style={{ left: x, top: y, zIndex: 9999 }}>
+    <Menu
+      className="tw:p-0! tw:min-w-0!"
       data-testid="layer-context-menu"
       data-selection-count={count}
-      style={{ position: "fixed", left: x, top: y, zIndex: 9999 }}
-      role="menu"
-      aria-label={multi ? `Actions for ${elementsLabel(count)}` : `Actions for ${nodeName}`}
+      label={multi ? `Actions for ${elementsLabel(count)}` : `Actions for ${nodeName}`}
     >
       {/* Board 4418:79546 / 6881:71323: Cut · Copy · Paste | Duplicate ·
           Delete | Rename · Group | Move to page… · Copy link. Plain 28h rows,
           no kbd hints, no icons. Hide/Lock live on the row's own eye/lock;
           reordering is drag. */}
-      <Button className={ITEM} role="menuitem" data-testid="layer-menu-cut"
+      <MenuItem className={ITEM} data-testid="layer-menu-cut"
         onClick={() => act("cut")}>
         Cut{suffix}
-      </Button>
-      <Button className={ITEM} role="menuitem" data-testid="layer-menu-copy"
+      </MenuItem>
+      <MenuItem className={ITEM} data-testid="layer-menu-copy"
         onClick={() => act("copy")}>
         Copy{suffix}
-      </Button>
-      <Button
+      </MenuItem>
+      <MenuItem
         className={ITEM}
-        role="menuitem"
         disabled={!hasClipboard}
         title={hasClipboard ? undefined : "Copy or cut an element first"}
         data-testid="layer-menu-paste"
         onClick={() => act("paste")}
       >
         Paste
-      </Button>
-      <div className="bdc-menu-sep" data-testid="layer-menu-sep" />
-      <Button className={ITEM} role="menuitem" data-testid="layer-menu-duplicate"
+      </MenuItem>
+      <div className="bdc-menu-sep" role="separator" data-testid="layer-menu-sep" />
+      <MenuItem className={ITEM} data-testid="layer-menu-duplicate"
         onClick={() => act("duplicate")}>
         Duplicate{suffix}
-      </Button>
-      <Button className={ITEM} role="menuitem" data-testid="layer-menu-delete"
+      </MenuItem>
+      <MenuItem className={ITEM} data-testid="layer-menu-delete"
         onClick={() => act("delete")}>
         Delete{suffix}
-      </Button>
-      <div className="bdc-menu-sep" />
-      <Button
+      </MenuItem>
+      <div className="bdc-menu-sep" role="separator" />
+      <MenuItem
         className={ITEM}
-        role="menuitem"
         disabled={multi}
         title={multi ? "Rename one layer at a time" : undefined}
         data-testid="layer-menu-rename"
         onClick={() => act("rename")}
       >
         Rename{multi ? "" : suffix}
-      </Button>
-      <Button
+      </MenuItem>
+      <MenuItem
         className={ITEM}
-        role="menuitem"
         data-testid="layer-menu-group"
         onClick={() => act("group")}
       >
         Group{suffix}
-      </Button>
-      <div className="bdc-menu-sep" />
-      <Button className={ITEM} role="menuitem" data-testid="layer-menu-move-to-page"
+      </MenuItem>
+      <div className="bdc-menu-sep" role="separator" />
+      <MenuItem className={ITEM} data-testid="layer-menu-move-to-page"
         onClick={() => act("moveToPage")}>
         Move to page…{suffix}
-      </Button>
+      </MenuItem>
       {/* A URL that reopens the editor with the CLICKED element selected —
           one element even inside a selection: a link cannot select three. */}
-      <Button className={ITEM} role="menuitem" data-testid="layer-menu-copy-link"
+      <MenuItem className={ITEM} data-testid="layer-menu-copy-link"
         onClick={() => act("copyLink")}>
         Copy link · {name}
-      </Button>
+      </MenuItem>
+    </Menu>
     </div>
   );
 }

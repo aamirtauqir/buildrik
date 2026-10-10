@@ -138,7 +138,7 @@ export function CsvImportDialog({
   if (step.kind === "upload" || step.kind === "loading-preview") {
     body = (
       <div className="tw:flex tw:h-[280px] tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:text-center">
-        <Upload size={22} className="tw:text-[var(--bk-ink-soft)]" aria-hidden="true" />
+        <Upload size={20} className="tw:text-[var(--bk-ink-soft)]" aria-hidden="true" />
         <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
           Pick a .csv file with a header row. Columns are matched to {collection.name}'s fields on the next step.
         </p>

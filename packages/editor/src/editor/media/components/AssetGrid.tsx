@@ -757,7 +757,7 @@ export function AssetGrid({
                   else state.selectAll();
                 }}
               >
-                {all ? <Check size={10} /> : null}
+                {all ? <Check size={12} /> : null}
               </span>
             );
           })()}

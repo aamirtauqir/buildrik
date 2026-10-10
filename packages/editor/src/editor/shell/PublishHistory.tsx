@@ -585,7 +585,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
             and the modal had no such mark at all. */}
         <div className={STATUS_DISC_WRAP}>
           <span className={`${STATUS_DISC} tw:bg-[var(--bk-success)]`} aria-hidden="true">
-            <Check size={16} strokeWidth={2.5} />
+            <Check size={16} />
           </span>
         </div>
         <div className={MODAL_INSET}>

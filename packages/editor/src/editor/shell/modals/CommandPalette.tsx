@@ -24,7 +24,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { Button, Portal, TextInput, useFocusTrap } from "@/editor/chrome-ui";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
@@ -420,7 +420,15 @@ const bandSlug = (band: string) => band.toLowerCase().replace(/\s+/g, "-");
 // COMPONENT
 // =============================================================================
 
-export const CommandPalette: React.FC<CommandPaletteProps> = ({
+/* The overlay root resolves in an effect (Portal), so the trap lives in the
+   card, which mounts once the root exists — the ElementContextMenu pattern. */
+export const CommandPalette: React.FC<CommandPaletteProps> = (props) => (
+  <Portal>
+    <CommandPaletteCard {...props} />
+  </Portal>
+);
+
+const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
   onClose,
   composer,
   initialQuery = "",
@@ -506,6 +514,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
+  /* DQ-019: chrome-ui's trap — Tab stays in the card, Escape closes it only
+     when it is the topmost dialog, and focus goes back where it was. The
+     palette mounts in the overlay root (Portal) like every other overlay;
+     it used to render inside the topbar. The board's no-dim click catcher
+     stays (4418:141220), so OverlayMount's scrim is not used. */
+  const trapRef = useFocusTrap(true, onClose);
+
   const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
     if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group))];
@@ -569,10 +584,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             if (cmd) runCommand(cmd);
           }
           break;
-        case "Escape":
-          e.preventDefault();
-          onClose();
-          break;
       }
     },
     [orderedCommands, selectedIndex, onClose, query, askAI, runCommand],
@@ -584,6 +595,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           the board leaves the editor at full strength behind the card. */}
       <div onClick={onClose} className="tw:fixed tw:inset-0 tw:bg-transparent tw:[z-index:calc(var(--bk-z-modal)-1)]" />
       <div
+        ref={trapRef}
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
@@ -600,6 +612,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           </span>
           <TextInput
             ref={inputRef}
+            data-autofocus=""
             type="text"
             placeholder="Search pages, layers, assets and actions…"
             value={query}
@@ -723,7 +736,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           <Button
             variant="link"
             onClick={onClose}
-            className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            className="tw:h-auto tw:min-h-5 tw:-my-0.5 tw:p-0 tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]"
           >
             Esc Close
           </Button>

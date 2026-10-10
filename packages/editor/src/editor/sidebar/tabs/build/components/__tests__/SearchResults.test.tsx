@@ -16,7 +16,6 @@ import type { ComponentDefinition } from "@/shared/types/components";
 
 const el: FlatElEntry = {
   name: "Button",
-  iconHtml: "<rect />",
   blockId: "button",
   description: "A clickable button",
   tags: ["cta"],

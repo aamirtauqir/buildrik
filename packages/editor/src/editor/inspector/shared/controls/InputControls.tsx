@@ -359,10 +359,10 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
               path, which also takes Shift for 10). Not a separate control. */}
           <span className="bdi-step" aria-hidden="true">
             <span onMouseDown={(e) => e.preventDefault()} onClick={() => step(1)}>
-              <ChevronUp size={8} />
+              <ChevronUp size={10} />
             </span>
             <span onMouseDown={(e) => e.preventDefault()} onClick={() => step(-1)}>
-              <ChevronDown size={8} />
+              <ChevronDown size={10} />
             </span>
           </span>
           {noUnit ? null : (

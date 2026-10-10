@@ -4,7 +4,6 @@
  */
 
 export * from "./types";
-export * from "./icons";
 export * from "./helpers";
 export { ActivityView } from "./components/ActivityView";
 export { DiffRow } from "./components/DiffRow";

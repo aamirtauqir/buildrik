@@ -27,7 +27,7 @@ const styles = {
     margin: "-6px 0 10px",
     fontSize: 11,
     lineHeight: 1.45,
-    color: "var(--bk-warning-ink, var(--bk-ink-muted))",
+    color: "var(--bk-warning-text)",
   } as React.CSSProperties,
 };
 

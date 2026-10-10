@@ -109,6 +109,20 @@ describe("BuildTab — element row description on hover (G2-108)", () => {
   });
 });
 
+/* DQ-016/017 — the Add panel drew its own SVG set (a serif "H" at 700 for
+   Heading); every row now takes the lucide glyph Layers uses for the type. */
+describe("BuildTab — element row icons come from the shared lucide map", () => {
+  it("draws lucide glyphs, never a <text> glyph", () => {
+    renderTab();
+    for (const name of ["Heading", "Text", "Button", "Container", "Image"]) {
+      const icon = screen.getByTestId(`insert-row-icon-insert-el-${name}`);
+      expect(icon.tagName.toLowerCase()).toBe("svg");
+      expect(icon.getAttribute("class")).toContain("lucide");
+      expect(icon.querySelector("text")).toBeNull();
+    }
+  });
+});
+
 /* G2-111 — board 4418:99857: SAVED COMPONENTS rows carry a ⠿ grip and drag
    onto the canvas; the group ends in "Manage components ›"; an empty group
    says how to make one. */
