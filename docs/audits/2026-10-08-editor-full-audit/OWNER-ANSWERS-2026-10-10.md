@@ -120,3 +120,14 @@ Comment order: L5-033 → L5-031 → L5-032; L5-027 after replies.
 3. **Shared editor foundations** — viewport presets + zoom (L1-012/013), Start from Scratch routing (L1-025/L3-014/FG-044), catalog naming (L1-022/033), component scopes/counts (L1-024, L2-021/022), form defaults (L2-024, L3-029).
 4. **SEO and accessibility** — Page + Site SEO together (FG-007/008/009/010/011/012, L3-010/011/036), one accessibility module (FG-026, L4-040).
 5. **Collaboration and expansion** — comments (L5-033 → 031 → 032), secure client pins (FG-006), AI actions (L5-015/016/026/027), Brand AI (FG-016), commerce (FG-037, deferred).
+
+## Plan questions — owner accepted the recommended defaults (2026-10-10)
+1. Page settings footer: **Cancel / Save** (FG-012); the designer updates the board's "Discard / Save".
+2. Indexing off ⇒ noindex **and** out of the sitemap; no separate per-page sitemap toggle.
+3. Site default title applies to the **home page only** in the title order.
+4. Client pins (FG-006) need a **separate snapshot domain** (not a subdomain), e.g. `buildrick-snapshots.com`, on cPanel with SSL — **owner registers and provisions it**; the pins plan's Task 0 security review stays blocking.
+5. Clients **see team replies** on their own threads.
+6. Reply/mention notifications are **in-app only** for now (no email).
+7. Archive the Preview accessibility-checker board; one Accessibility category in Issues; designer draws one new Issues board.
+8. The real cleanUrls deploy check is run **by the owner** in a test workspace they name (QA workspace never publishes).
+CMS items L3-017/018/020/021/022/023 start now (cms-wave0 is already on main).
