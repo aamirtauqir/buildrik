@@ -84,7 +84,7 @@ const KINDS: { id: DomainKind; label: string }[] = [
 ];
 
 /** The value cell for a record whose value only Vercel can name (L3-033). */
-export const VERCEL_ASSIGNED_VALUE = "Shown after you add the domain";
+const VERCEL_ASSIGNED_VALUE = "Shown after you add the domain";
 
 /* The records `connect` will require, in the shape the typed name needs — the
    shared `expectedDnsRecords`, so an apex draws A @ + CNAME www (the frame)
