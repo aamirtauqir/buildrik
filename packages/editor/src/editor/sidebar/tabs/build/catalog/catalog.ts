@@ -10,6 +10,8 @@
  */
 
 import type { CatEntry, FlatElEntry } from "./types";
+import { isThemeToggleOffered, themeToggleBlockConfig } from "@/blocks/Basic/ThemeToggle";
+import type { DarkMode } from "@buildrik/shared/schemas/design-tokens";
 
 export const CATALOG: CatEntry[] = [
   {
@@ -353,6 +355,12 @@ export const CATALOG: CatEntry[] = [
 export const flatCatalog: FlatElEntry[] = CATALOG.flatMap((cat) =>
   cat.elements.map((el) => ({ ...el, catId: cat.id, catName: cat.name }))
 );
+
+/** The rows this site offers: the theme toggle only while Dark mode is Auto
+ *  (BRP1-M12). Add and the ⌘K palette's Add rows both read it. */
+export function offeredCatalog(darkMode: DarkMode): FlatElEntry[] {
+  return isThemeToggleOffered(darkMode) ? flatCatalog : flatCatalog.filter((el) => el.blockId !== themeToggleBlockConfig.id);
+}
 
 /**
  * Pre-grouped catalog by category id — module-level so CatAccordion can read

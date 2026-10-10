@@ -7,7 +7,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { BlockData } from "@/shared/types";
 import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
-import { CATALOG, flatCatalog } from "../catalog/catalog";
+import { CATALOG, offeredCatalog } from "../catalog/catalog";
 import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
 import type { ComponentDefinition } from "@/shared/types/components";
@@ -19,7 +19,6 @@ import { MAX_RECENT } from "@/shared/constants/ui";
 import { EVENTS } from "@/shared/constants/events";
 import { announceInsertDrag } from "@/editor/canvas/insertDrag";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
-import { isThemeToggleOffered, themeToggleBlockConfig } from "@/blocks/Basic/ThemeToggle";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
 
@@ -264,10 +263,7 @@ export function useBuildTab(
       composer.off(EVENTS.PROJECT_LOADED, sync);
     };
   }, [composer, readDarkMode]);
-  const allElements = React.useMemo(
-    () => (isThemeToggleOffered(darkMode) ? flatCatalog : flatCatalog.filter((el) => el.blockId !== themeToggleBlockConfig.id)),
-    [darkMode]
-  );
+  const allElements = React.useMemo(() => offeredCatalog(darkMode), [darkMode]);
 
   const searchResults = React.useMemo(
     () => searchInsert(searchQuery, allElements, blockRows, saved),

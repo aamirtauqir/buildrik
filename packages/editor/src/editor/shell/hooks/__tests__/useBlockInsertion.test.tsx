@@ -82,6 +82,8 @@ describe("useBlockInsertion", () => {
     beginTransaction: ReturnType<typeof vi.fn>;
     endTransaction: ReturnType<typeof vi.fn>;
     emit: ReturnType<typeof vi.fn>;
+    on: ReturnType<typeof vi.fn>;
+    off: ReturnType<typeof vi.fn>;
     elements: {
       getActivePage: ReturnType<typeof vi.fn>;
       getElement: ReturnType<typeof vi.fn>;
@@ -91,8 +93,11 @@ describe("useBlockInsertion", () => {
     history: { captureUndo: ReturnType<typeof vi.fn> };
   };
 
+  const listeners = new Map<string, (p: unknown) => void>();
+
   beforeEach(() => {
     vi.useFakeTimers();
+    listeners.clear();
     elements = new Map();
     elements.set("root-1", makeElement("root-1", "root", { getChildCount: () => 3 }));
     selectedIds = [];
@@ -102,6 +107,10 @@ describe("useBlockInsertion", () => {
       history: { captureUndo: vi.fn(() => vi.fn()) },
       endTransaction: vi.fn(),
       emit: vi.fn(),
+      on: vi.fn((event: string, fn: (p: unknown) => void) => {
+        listeners.set(event, fn);
+      }),
+      off: vi.fn(),
       elements: {
         getActivePage: vi.fn(() => ({ root: { id: "root-1" } })),
         getElement: vi.fn((id: string) => elements.get(id) ?? null),
@@ -136,6 +145,14 @@ describe("useBlockInsertion", () => {
       useBlockInsertion(withComposer ? (composer as unknown as Composer) : null)
     );
   }
+
+  /* L1-033: ⌘K's catalog rows insert through this same path. */
+  it("inserts a block asked for on UI_INSERT_BLOCK, exactly as a click would", () => {
+    mountHook();
+    act(() => listeners.get("ui:insert-block")?.({ block: heroBlock }));
+    expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.objectContaining({ id: "hero" }), "root-1", 3);
+    expect(composer.beginTransaction).toHaveBeenCalledWith("Added Hero");
+  });
 
   it("warns and bails when the composer is not ready", () => {
     const { result } = mountHook(false);

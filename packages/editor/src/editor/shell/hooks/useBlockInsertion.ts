@@ -10,6 +10,7 @@
 import * as React from "react";
 import { getBlockDefinitions, insertBlock } from "@/blocks/blockRegistry";
 import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import type { BlockData, ElementType } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "@/shared/utils/dragDrop/animations";
@@ -233,6 +234,19 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
     },
     [composer, addToast, isInsertingBlock]
   );
+
+  /* ⌘K's catalog rows (L1-033) insert through this same path — placement,
+     one undo step, the "added" toast — rather than a second insert. */
+  const handleBlockClickRef = React.useRef(handleBlockClick);
+  handleBlockClickRef.current = handleBlockClick;
+  React.useEffect(() => {
+    if (!composer) return;
+    const onInsert = (event: { block: BlockData }) => handleBlockClickRef.current(event.block);
+    composer.on(EVENTS.UI_INSERT_BLOCK, onInsert);
+    return () => {
+      composer.off(EVENTS.UI_INSERT_BLOCK, onInsert);
+    };
+  }, [composer]);
 
   return { handleBlockClick, isInsertingBlock };
 }

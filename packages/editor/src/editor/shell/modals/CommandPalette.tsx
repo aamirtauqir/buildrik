@@ -26,6 +26,9 @@ import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
 import { Button, Portal, TextInput, useFocusTrap } from "@/editor/chrome-ui";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
+import { scoreCommand } from "./commandMatch";
+import { offeredCatalog } from "@/editor/sidebar/tabs/build/catalog/catalog";
+import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
@@ -50,6 +53,9 @@ interface PaletteCommand {
    *  muted as "Label · reason" and don't close the palette. */
   disabled?: boolean;
   disabledReason?: string;
+  /** Answers a query but stays out of the opening list (board 4418:141220
+   *  draws a curated set). */
+  searchOnly?: boolean;
 }
 
 export interface CommandPaletteProps {
@@ -277,9 +283,11 @@ function buildCommands(
     /* The footer flyout's third row (⌘2). Canvas has always listened for
        ZOOM_SELECTION; nothing emitted it (DQ-003). */
     { id: "view-zoom-selection", label: "Zoom to selection", group: "More", shortcut: "Ctrl+2", handler: run(() => composer.emit(EVENTS.ZOOM_SELECTION, {})) },
-    /* The registry's chordless "Reset zoom" printed nothing although ⌘0 works
-       (the flyout binds it). The row prints the flyout's chord, like fit's. */
-    { id: "view-zoom-100", label: "Reset zoom", group: "More", shortcut: "Ctrl+0", handler: run(() => composer.setZoom(100)) },
+    /* The registry's chordless copy printed nothing although ⌘0 works (the
+       flyout binds it). The row prints the flyout's chord, like fit's, and
+       carries the keyboard sheet's name (L1-033: "Reset zoom" here, "Zoom to
+       100%" there). */
+    { id: "view-zoom-100", label: "Zoom to 100%", group: "More", shortcut: "Ctrl+0", keywords: ["reset"], handler: run(() => composer.setZoom(100)) },
     {
       id: "history-clear",
       label: "Clear history",
@@ -315,6 +323,35 @@ function buildCommands(
         if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
       }),
     });
+  }
+
+  /* L1-033 (owner 2026-10-10): an Add row for every element the Add panel
+     offers, generated from its catalog — searchable only, so the opening list
+     stays the board's curated ADD rows, and only where an insert can happen
+     (a page is open; a viewer cannot insert). A catalog row whose label the
+     list already carries ("Add text", "Add heading"…) is not printed twice. */
+  if (!viewerChrome && composer.elements?.getActivePage?.()) {
+    const darkMode = DarkModeSchema.catch("off").parse(composer.getProjectSettings?.()?.darkMode);
+    const taken = new Set([...commands.map((c) => c.label.toLowerCase()), ...registry.map((c) => (c.label ?? c.id).toLowerCase())]);
+    for (const el of offeredCatalog(darkMode)) {
+      const name = el.name
+        .split(" ")
+        .map((w) => (/^[A-Z0-9]+$/.test(w) && w.length > 1 ? w : w.toLowerCase()))
+        .join(" ");
+      const label = `Add ${name}`;
+      if (taken.has(label.toLowerCase())) continue;
+      taken.add(label.toLowerCase());
+      commands.push({
+        id: `add-el-${el.blockId}`,
+        label,
+        group: "Add",
+        searchOnly: true,
+        keywords: [...el.tags, el.catName, "insert"],
+        handler: run(() =>
+          composer.emit(EVENTS.UI_INSERT_BLOCK, { block: { id: el.blockId, label: el.name, category: el.catId } }),
+        ),
+      });
+    }
   }
 
   /* TEMPLATES — the catalogue's own search went with 4418:54134 (it draws
@@ -527,10 +564,15 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
 
   const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
-    if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group))];
-    return [...commands, ...recordCommands].filter((cmd) =>
-      [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q),
-    );
+    if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group) && !c.searchOnly)];
+    /* Word-start matches only, label hits ahead of keyword hits (L1-033).
+       The sort is stable, and bands keep BAND_ORDER, so this orders rows
+       within a band. */
+    return [...commands, ...recordCommands]
+      .map((cmd) => ({ cmd, score: scoreCommand(cmd, q) }))
+      .filter((r) => r.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((r) => r.cmd);
   }, [commands, recordCommands, recentCommands, query]);
 
   // A query that matches nothing is never a dead end: AI, or stock photos.
