@@ -72,3 +72,56 @@ describe("ElementContextMenu — rendered above the chrome", () => {
     expect(document.activeElement).toBe(screen.getByTestId("canvas-ctx-menu"));
   });
 });
+
+describe("ElementContextMenu — keyboard submenus", () => {
+  it("opens a positioned submenu, executes its action, and closes", () => {
+    const run = vi.fn();
+    const close = vi.fn();
+    render(<ElementContextMenu x={200} y={100} context={context} onClose={close} actions={[
+      { id: "style", label: "Style", group: "Style", submenu: [
+        { id: "copy", label: "Copy styles", group: "Style", handler: run },
+      ] },
+    ]} />);
+    const menu = screen.getByTestId("canvas-ctx-menu");
+    const item = screen.getByRole("menuitem", { name: /^Style/ });
+    vi.spyOn(item.parentElement!, "getBoundingClientRect").mockReturnValue({
+      left: 200, right: 400, top: 100, bottom: 130, width: 200, height: 30, x: 200, y: 100, toJSON() {},
+    });
+    expect(item.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.keyDown(menu, { key: "ArrowRight" });
+    expect(screen.getByTestId("canvas-ctx-submenu").style.left).toBe("404px");
+    expect(menu.getAttribute("aria-activedescendant")).toBe("copy");
+    fireEvent.keyDown(menu, { key: "Enter" });
+    expect(run).toHaveBeenCalledOnce();
+    expect(close).toHaveBeenCalledOnce();
+  });
+
+  it("navigates children and closes only the submenu on the first Escape", () => {
+    const run = vi.fn();
+    const close = vi.fn();
+    render(<ElementContextMenu x={200} y={100} context={context} onClose={close} actions={[
+      { id: "style", label: "Style", group: "Style", submenu: [
+        { id: "unavailable", label: "Paste styles", group: "Style", isEnabled: () => false, handler: run },
+        { id: "copy", label: "Copy styles", group: "Style", handler: run },
+      ] },
+    ]} />);
+    const menu = screen.getByTestId("canvas-ctx-menu");
+    fireEvent.keyDown(menu, { key: "ArrowRight" });
+    fireEvent.keyDown(menu, { key: "Enter" });
+    expect(run).not.toHaveBeenCalled();
+    fireEvent.keyDown(menu, { key: "ArrowDown" });
+    expect(menu.getAttribute("aria-activedescendant")).toBe("copy");
+    fireEvent.keyDown(menu, { key: "Escape" });
+    expect(screen.queryByTestId("canvas-ctx-submenu")).toBeNull();
+    expect(close).not.toHaveBeenCalled();
+    expect(menu.getAttribute("aria-activedescendant")).toBe("style");
+    fireEvent.keyDown(menu, { key: "Escape" });
+    expect(close).toHaveBeenCalledOnce();
+  });
+
+  it("opens submenus by click for users without hover", () => {
+    renderInCanvas();
+    fireEvent.click(screen.getByRole("menuitem", { name: /^Style/ }));
+    expect(screen.getByTestId("canvas-ctx-submenu")).toBeTruthy();
+  });
+});

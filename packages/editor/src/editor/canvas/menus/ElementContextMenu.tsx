@@ -50,9 +50,10 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
   const menuRef = React.useRef<HTMLDivElement | null>(null);
   const [activeSubmenu, setActiveSubmenu] = React.useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
+  const [submenuIndex, setSubmenuIndex] = React.useState(0);
   const submenuTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useClickOutside(menuRef, onClose, { closeOnEscape: true });
+  useClickOutside(menuRef, onClose);
 
   // The registry already orders the rows; keyboard navigation walks them.
   const allItems = actions;
@@ -68,6 +69,8 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
     if (submenuTimeoutRef.current) {
       clearTimeout(submenuTimeoutRef.current);
     }
+    menuRef.current?.focus();
+    setSubmenuIndex(0);
     setActiveSubmenu(id);
   }, []);
 
@@ -92,64 +95,56 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
     };
   }, []);
 
-  // Full keyboard navigation: Arrow keys, Enter, Escape
-  const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent) => {
-      const totalItems = allItems.length;
-      if (totalItems === 0) return;
+  const childItems = allItems.find((action) => action.id === activeSubmenu)?.submenu;
+  const focusedAction = childItems ? childItems[submenuIndex] : allItems[focusedIndex];
 
-      switch (e.key) {
-        case "ArrowDown":
-          e.preventDefault();
-          setFocusedIndex((prev) => (prev + 1) % totalItems);
-          setActiveSubmenu(null);
-          break;
-        case "ArrowUp":
-          e.preventDefault();
-          setFocusedIndex((prev) => (prev - 1 + totalItems) % totalItems);
-          setActiveSubmenu(null);
-          break;
-        case "ArrowRight": {
-          e.preventDefault();
-          const focusedAction = allItems[focusedIndex];
-          if (focusedAction?.submenu?.length) {
-            handleSubmenuActivate(focusedAction.id);
-          }
-          break;
+  // Keep DOM focus on the menu; aria-activedescendant follows the active level.
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    const items = childItems ?? allItems;
+    const index = childItems ? submenuIndex : focusedIndex;
+    const setIndex = childItems ? setSubmenuIndex : setFocusedIndex;
+    if (!items.length) return;
+    if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft", "Home", "End", "Enter", " ", "Escape", "Tab"].includes(e.key)) return;
+    e.stopPropagation();
+    if (e.key === "Tab") {
+      onClose();
+      return;
+    }
+    e.preventDefault();
+    switch (e.key) {
+      case "ArrowDown":
+        setIndex((index + 1) % items.length);
+        break;
+      case "ArrowUp":
+        setIndex((index - 1 + items.length) % items.length);
+        break;
+      case "Home":
+        setIndex(0);
+        break;
+      case "End":
+        setIndex(items.length - 1);
+        break;
+      case "ArrowLeft":
+        setActiveSubmenu(null);
+        break;
+      case "Escape":
+        if (activeSubmenu) setActiveSubmenu(null);
+        else onClose();
+        break;
+      case "ArrowRight":
+      case "Enter":
+      case " ": {
+        const action = items[index];
+        if (!action || (action.isEnabled && !action.isEnabled(context))) return;
+        if (action.submenu?.length) handleSubmenuActivate(action.id);
+        else if (e.key !== "ArrowRight" && action.handler) {
+          action.handler(context);
+          onClose();
         }
-        case "ArrowLeft":
-          e.preventDefault();
-          setActiveSubmenu(null);
-          break;
-        case "Enter": {
-          e.preventDefault();
-          const focusedAction = allItems[focusedIndex];
-          if (!focusedAction) return;
-          // If has submenu, open it
-          if (focusedAction.submenu?.length) {
-            handleSubmenuActivate(focusedAction.id);
-          } else {
-            // Execute standalone action
-            const enabled = focusedAction.isEnabled ? focusedAction.isEnabled(context) : true;
-            if (enabled && focusedAction.handler) {
-              focusedAction.handler(context);
-              onClose();
-            }
-          }
-          break;
-        }
-        case "Escape":
-          e.preventDefault();
-          if (activeSubmenu) {
-            setActiveSubmenu(null);
-          } else {
-            onClose();
-          }
-          break;
+        break;
       }
-    },
-    [allItems, focusedIndex, activeSubmenu, context, onClose, handleSubmenuActivate]
-  );
+    }
+  };
 
   if (!actions.length) return null;
 
@@ -181,7 +176,7 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
       role="menu"
       data-testid="canvas-ctx-menu"
       aria-label="Element context menu"
-      aria-activedescendant={allItems[focusedIndex]?.id}
+      aria-activedescendant={focusedAction?.id}
     >
       {/* Board 4428:43928: rows in registry order, a rule wherever the
           group changes. */}
@@ -199,7 +194,11 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({
                 context={context}
                 isActive={activeSubmenu === action.id}
                 isFocused={focusedIndex === index}
-                onActivate={() => handleSubmenuActivate(action.id)}
+                focusedChildIndex={submenuIndex}
+                onActivate={() => {
+                  setFocusedIndex(index);
+                  handleSubmenuActivate(action.id);
+                }}
                 onDeactivate={handleSubmenuDeactivate}
                 onClose={onClose}
               />

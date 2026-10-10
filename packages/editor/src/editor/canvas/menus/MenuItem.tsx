@@ -15,6 +15,7 @@ interface MenuItemProps {
   enabled: boolean;
   hasSubmenu?: boolean;
   isHighlighted?: boolean;
+  isExpanded?: boolean;
   onClick: () => void;
 }
 
@@ -23,6 +24,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   enabled,
   hasSubmenu = false,
   isHighlighted = false,
+  isExpanded = false,
   onClick,
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
@@ -36,7 +38,8 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       id={action.id}
       data-testid={`canvas-ctx-item-${action.id}`}
       onClick={onClick}
-      disabled={!enabled && !hasSubmenu}
+      disabled={!enabled}
+      tabIndex={-1}
       style={{
         display: "flex",
         alignItems: "center",
@@ -67,7 +70,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       onMouseLeave={() => setIsHovered(false)}
       role="menuitem"
       aria-haspopup={hasSubmenu ? "menu" : undefined}
-      aria-expanded={hasSubmenu ? isHighlighted : undefined}
+      aria-expanded={hasSubmenu ? isExpanded : undefined}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {/* 4428:43928 draws text rows; only the AI row keeps its ✦ mark. */}
