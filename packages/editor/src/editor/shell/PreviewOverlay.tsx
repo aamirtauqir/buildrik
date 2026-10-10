@@ -34,9 +34,10 @@
 import * as React from "react";
 import type { DeviceType } from "@/shared/types";
 import { DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
-import { Button, BreakpointSwitcher, Select, type Breakpoint } from "@/editor/chrome-ui";
+import { Button, BreakpointSwitcher, Select, TextInput, type Breakpoint } from "@/editor/chrome-ui";
 import { isModalOpen } from "@/editor/chrome-ui";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
+import { CUSTOM_WIDTH_RANGE } from "../canvas/controls/CustomWidthModal";
 import { PreviewShareModal } from "./PreviewShareModal";
 
 interface PreviewOverlayProps {
@@ -94,6 +95,45 @@ const DEVICE_WIDTHS = {
   mobile: `${DEVICE_PREVIEW_SIZES.mobile.width}px`,
 } as const;
 
+/* FG-030 (owner 2026-10-10): the preview width is a preset, Fit (the stage
+   width) or a number of CSS px. It sizes this frame only — the overlay holds
+   no composer, so it cannot write a style override. Remembered per site in
+   this browser, like the canvas zoom. */
+type PreviewWidth = "fit" | "desktop" | "tablet" | "mobile" | number;
+const PREVIEW_WIDTH_KEY = "bk-preview-width:";
+
+function readPreviewWidth(siteId: string | null | undefined): PreviewWidth {
+  try {
+    const raw = window.localStorage.getItem(PREVIEW_WIDTH_KEY + (siteId ?? "local"));
+    if (raw === "fit" || raw === "desktop" || raw === "tablet" || raw === "mobile") return raw;
+    const n = Number(raw);
+    return raw && Number.isInteger(n) && n >= CUSTOM_WIDTH_RANGE.min && n <= CUSTOM_WIDTH_RANGE.max ? n : "desktop";
+  } catch {
+    return "desktop";
+  }
+}
+
+function writePreviewWidth(siteId: string | null | undefined, width: PreviewWidth): void {
+  try {
+    window.localStorage.setItem(PREVIEW_WIDTH_KEY + (siteId ?? "local"), String(width));
+  } catch {
+    /* Storage blocked: the choice lasts while the overlay is open. */
+  }
+}
+
+/** The width the frame is drawn at, for the number field. */
+function widthDigits(width: PreviewWidth): string {
+  if (typeof width === "number") return String(width);
+  return width === "fit" ? "" : String(DEVICE_PREVIEW_SIZES[width].width);
+}
+
+const FIT_CLASS =
+  "tw:h-7 tw:px-3 tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:bg-[var(--bk-gray-50)] " +
+  "tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:hover:text-[var(--bk-ink)] " +
+  "tw:aria-[pressed=true]:bg-[var(--bk-accent)] tw:aria-[pressed=true]:text-white tw:aria-[pressed=true]:font-semibold";
+
+const WIDTH_INPUT_CLASS = "tw:w-[72px] tw:tabular-nums";
+
 const BACK_CLASS =
   "tw:h-8 tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-100)]";
 
@@ -122,7 +162,23 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   currentPageId,
   onShowPage,
 }) => {
-  const [device, setDevice] = React.useState<Breakpoint>("desktop");
+  const [width, setWidthState] = React.useState<PreviewWidth>(() => readPreviewWidth(siteId));
+  const setWidth = React.useCallback(
+    (next: PreviewWidth) => {
+      setWidthState(next);
+      writePreviewWidth(siteId, next);
+    },
+    [siteId],
+  );
+  const [draft, setDraft] = React.useState(() => widthDigits(width));
+  React.useEffect(() => setDraft(widthDigits(width)), [width]);
+  const draftNumber = Number.parseInt(draft, 10);
+  const draftValid =
+    draft === "" || (draftNumber >= CUSTOM_WIDTH_RANGE.min && draftNumber <= CUSTOM_WIDTH_RANGE.max);
+  const commitDraft = () => {
+    if (draft === "" || !draftValid || draftNumber === Number.parseInt(widthDigits(width), 10)) return;
+    setWidth(draftNumber);
+  };
   const [shareOpen, setShareOpen] = React.useState(false);
   const pagesRef = React.useRef(pages);
   pagesRef.current = pages;
@@ -167,9 +223,11 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
 
   if (html == null) return null;
 
-  /* `wide` and `desktop` have no bezel — DeviceFramePreview passes children
-     straight through for them, which is also what `active` says here. */
+  /* Only the tablet and mobile presets sit in a bezel; Fit, Desktop and a
+     typed width are a page with edges. */
+  const device: Breakpoint | null = typeof width === "number" || width === "fit" ? null : width;
   const framed = device === "tablet" || device === "mobile";
+  const pageWidth = width === "fit" ? "100%" : `${typeof width === "number" ? width : DEVICE_PREVIEW_SIZES.desktop.width}px`;
 
   return (
     <div
@@ -182,8 +240,49 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
         <Button color="light" size="xs" onClick={onDone} className={BACK_CLASS} data-testid="preview-back">
           ‹ Back to canvas
         </Button>
-        <div className={DEVICE_BAR_INNER_CLASS}>
-          <BreakpointSwitcher labelled sublabels={DEVICE_WIDTHS} value={device} onChange={setDevice} />
+        <div className={`${DEVICE_BAR_INNER_CLASS} tw:gap-2`}>
+          <Button
+            color="light"
+            size="xs"
+            className={FIT_CLASS}
+            aria-pressed={width === "fit"}
+            title="Fit the preview to the window"
+            data-testid="preview-width-fit"
+            onClick={() => setWidth("fit")}
+          >
+            Fit
+          </Button>
+          <BreakpointSwitcher
+            labelled
+            sublabels={DEVICE_WIDTHS}
+            value={device}
+            onChange={(bp) => {
+              /* No Wide cell here (includeWide is off). */
+              if (bp !== "wide") setWidth(bp);
+            }}
+          />
+          <div className="tw:flex tw:items-center tw:gap-1">
+            <TextInput
+              sizing="sm"
+              inputMode="numeric"
+              aria-label="Preview width in px"
+              aria-invalid={!draftValid}
+              title={`Custom width, ${CUSTOM_WIDTH_RANGE.min}\u2013${CUSTOM_WIDTH_RANGE.max} px`}
+              placeholder="Width"
+              color={draftValid ? undefined : "failure"}
+              className={WIDTH_INPUT_CLASS}
+              value={draft}
+              data-testid="preview-width-input"
+              onChange={(e) => setDraft(e.target.value.replace(/[^0-9]/g, ""))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitDraft();
+              }}
+              onBlur={commitDraft}
+            />
+            <span aria-hidden="true" className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+              px
+            </span>
+          </div>
         </div>
         <div className="tw:flex tw:items-center tw:gap-2">
           {pages.length > 1 && onShowPage && (
@@ -209,7 +308,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
         </div>
       </div>
       <div className={STAGE_CLASS}>
-        <DeviceFramePreview device={device as DeviceType} active={framed}>
+        <DeviceFramePreview device={(device ?? "desktop") as DeviceType} active={framed}>
           <iframe
             title="Site preview"
             /* No allow-scripts: nothing in the frame runs. allow-same-origin
@@ -218,7 +317,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
             srcDoc={html}
             onLoad={onFrameLoad}
             className={framed ? SCREEN_FRAME_CLASS : PAGE_FRAME_CLASS}
-            style={framed ? undefined : { width: DEVICE_WIDTHS.desktop }}
+            style={framed ? undefined : { width: pageWidth }}
           />
         </DeviceFramePreview>
       </div>
