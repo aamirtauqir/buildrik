@@ -164,31 +164,10 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
             if (domEl) void animateDropSuccess(domEl);
           }, 0);
 
-          // Media elements without a src need an asset — open Media tab picker.
-          // Two-step emit because useMediaState (the element:needs-asset
-          // listener) only mounts when the Media tab is visible. If the user
-          // adds Image from the Add tab, the listener doesn't exist yet:
-          //   1. emit ui:switch-tab synchronously — sidebar swaps to Media,
-          //      React commits, MediaTab.tsx mounts, useMediaState's useEffect
-          //      runs and registers element:needs-asset handler
-          //   2. emit element:needs-asset after a paint frame so the handler
-          //      from step 1 is live before the event arrives
-          //
-          // Timing: useEffect fires after React paint (~16ms). 100ms timeout
-          // is conservative — gives a couple frames for slow renders + makes
-          // the order deterministic even if a parent re-render slows mount.
-          // Cleaner long-term fix: move the handler to a shell-level hook
-          // so the listener is always alive regardless of which tab is open.
-          const mediaTypes = new Set(["image", "video", "audio", "icon", "svg", "lottie"]);
-          if (mediaTypes.has(def.elementType) && el && !el.getAttribute("src")) {
-            composer.emit("ui:switch-tab", { tab: "assets" });
-            setTimeout(() => {
-              composer.emit("element:needs-asset", {
-                elementId: insertedId,
-                type: def.elementType,
-              });
-            }, 100);
-          }
+          /* L1-017 (owner 2026-10-10): an Image (or other media) without a
+             src stays put — inserted, selected, Add still open. The
+             Inspector's "Choose image" picks the asset. It used to switch
+             the panel to Assets and open a pick mode on every insert. */
 
           /* Decision #16 / board 4428:145642 — "Hero added" with Undo. The
              toast store keeps one transient, so ten fast inserts show one

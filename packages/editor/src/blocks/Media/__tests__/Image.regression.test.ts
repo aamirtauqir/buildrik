@@ -1,12 +1,7 @@
-// Regression: V1 walk Iter 19 → Sprint 6 (Image needs-asset auto-picker).
-// imageBlockConfig.content previously embedded a `via.placeholder.com` src
-// which (a) shipped to deployed sites and (b) suppressed the
-// element:needs-asset event at useBlockInsertion.ts:122 because the gate
-// requires `!el.getAttribute("src")`. With a default src present, the
-// Media tab picker never auto-opened — users had to discover the Media
-// tab manually + replace the placeholder.
-//
-// This guard keeps the default empty so the picker fires every time.
+// Regression: V1 walk Iter 19 → Sprint 6. imageBlockConfig.content
+// previously embedded a `via.placeholder.com` src, which shipped to deployed
+// sites. The default stays empty: an inserted Image is selected and the
+// Inspector's "Choose image" picks its asset (L1-017, 2026-10-10).
 // Discovery: 2026-05-24 /qa walk after fixing P0 publish-flow bugs.
 
 import { describe, it, expect } from "vitest";
@@ -21,7 +16,7 @@ describe("imageBlockConfig.content — empty src guard", () => {
     expect(imageBlockConfig.content).not.toMatch(/placeholder\.com|placehold/i);
   });
 
-  it("keeps the alt attribute so screen readers + element:needs-asset both work", () => {
+  it("keeps the alt attribute for screen readers", () => {
     expect(imageBlockConfig.content).toContain('alt="Image"');
   });
 

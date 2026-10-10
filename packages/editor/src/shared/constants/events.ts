@@ -49,8 +49,6 @@ export const EVENTS = {
   ELEMENT_CHANGE_IMAGE: "element:change-image",
   /** New media element inserted (from ElementManager.insertMedia) */
   ELEMENT_INSERTED: "element:inserted",
-  /** Empty media element needs an asset (Build tab → Media tab contract) */
-  ELEMENT_NEEDS_ASSET: "element:needs-asset",
   /** Edit alt text of an image element */
   ELEMENT_EDIT_ALT: "element:edit-alt",
   /** Preview layer changed for element (T8 — AI tab live-preview channel) */

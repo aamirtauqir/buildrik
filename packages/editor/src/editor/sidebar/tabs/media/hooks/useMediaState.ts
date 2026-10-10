@@ -106,18 +106,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
   }, [pickQuery, setLibrarySearch]);
 
   useEffect(() => {
-    // Build tab contract: empty media element dropped → open Media picker
-    const needsAssetHandler = (data: { elementId: string; type: string }) => {
-      requestAssetPick(composer, { elementId: data.elementId, label: data.type });
-      library.setActiveType(
-        data.type === "image" ? "img"
-          : data.type === "video" ? "vid"
-          : data.type === "icon" ? "ico"
-          : "all"
-      );
-    };
-    composer.on("element:needs-asset", needsAssetHandler);
-
     // Contextual panel: when canvas selection changes, hint the type filter
     const selectionHandler = (data: { id?: string; type?: string }) => {
       if (!data.type) return;
@@ -132,7 +120,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
     composer.on("element:selected", selectionHandler);
 
     return () => {
-      composer.off("element:needs-asset", needsAssetHandler);
       composer.off("element:selected", selectionHandler);
     };
   }, [composer, library]);
