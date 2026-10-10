@@ -83,7 +83,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
   // ];
 
   return (
-    <div style={{ padding: 12 }}>
+    <div className="tw:p-3">
       {/* Animation Type */}
       <Tabs
         tabs={[
@@ -95,7 +95,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
         onChange={setActiveTab}
         label="Animation type"
       />
-      <div style={{ marginTop: 16 }}>
+      <div className="tw:mt-4">
         <div
           style={{
             display: "grid",
@@ -138,7 +138,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
         </div>
       </div>
       {/* Timing */}
-      <div style={{ marginTop: 24 }}>
+      <div className="tw:mt-6">
         {/* Board 429:2390 — 11 Semi Bold in ink-muted at 0.66 tracking. It
             shipped 12px with no tracking at all. */}
         <div
@@ -196,7 +196,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
        * the Interactions section, which is GSAP-wired via InteractionRuntime.
        * See memory project_animation_audit_20260518.md. */}
       {/* Preview */}
-      <div style={{ marginTop: 24 }}>
+      <div className="tw:mt-6">
         <Button onClick={onPreview} style={{
           width: "100%"
         }} color="light">
@@ -204,7 +204,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
         </Button>
       </div>
       {/* Generated CSS */}
-      <div style={{ marginTop: 16 }}>
+      <div className="tw:mt-4">
         <div
           style={{
             padding: 12,

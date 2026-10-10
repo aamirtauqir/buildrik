@@ -55,7 +55,7 @@ const CELL = "tw:relative tw:inline-flex tw:items-center tw:justify-center tw:h-
    the nested margin / padding rings leave no room for 24px rows without
    redrawing the box. Every side is also reachable by Tab and ↑ / ↓. */
 const AXIS_INPUT =
-  "tw:h-4! tw:min-w-7! tw:max-w-14! tw:w-auto! tw:[field-sizing:content] tw:px-0! tw:py-0! tw:rounded-[2px]! tw:border-transparent! tw:bg-transparent! tw:text-center " +
+  "tw:h-4! tw:min-w-7! tw:max-w-14! tw:w-auto! tw:[field-sizing:content] tw:px-0! tw:py-0! tw:rounded-[var(--bk-radius-sm)]! tw:border-transparent! tw:bg-transparent! tw:text-center " +
   "tw:[font-family:var(--bk-font-mono)]! tw:text-[12px]! tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]! " +
   "tw:hover:border-[var(--bk-border)]! tw:focus:border-[var(--bk-accent)]! tw:focus:bg-[var(--bk-bg-panel)]! " +
   "tw:read-only:hover:border-transparent!";
@@ -291,7 +291,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
             color: linked ? "var(--bk-accent)" : "var(--bk-ink-muted)",
           }}
         >
-          {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
+          {linked ? <Link size={12} aria-hidden="true" /> : <Unlink size={12} aria-hidden="true" />}
         </Button>
       )}
     </div>

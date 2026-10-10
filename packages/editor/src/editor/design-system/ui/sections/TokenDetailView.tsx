@@ -87,7 +87,9 @@ const VALUE = "tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-14
 const VALUE_EMPTY = "tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 const ACTION =
   "tw:h-6 tw:flex-none tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
-const LINK = "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-4";
+/* DQ-020: a 20px target (DESIGN.md A1.4) for a 16px line — the -2px margins
+   keep the row's layout where the 16px link left it. */
+const LINK = "tw:h-auto tw:min-h-5 tw:-my-0.5 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-4";
 
 /* The 40px preview tile — the token's own colour, family or size is the one
    computed value; everything else is chrome. */

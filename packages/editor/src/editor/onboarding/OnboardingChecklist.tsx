@@ -136,7 +136,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             title="Minimize"
             data-testid="checklist-minimize"
           >
-            <Minus size={13} />
+            <Minus size={14} />
           </Button>
 
           {/* Close / Confirm */}
@@ -158,7 +158,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               aria-label="Close checklist"
               title="Close"
             >
-              <X size={13} />
+              <X size={14} />
             </Button>
           )}
         </div>
@@ -221,7 +221,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                   aria-hidden="true"
                   data-testid={`checklist-box-${index}`}
                 >
-                  {isCompleted && <Check size={10} strokeWidth={3} color="var(--bk-accent-on)" />}
+                  {isCompleted && <Check size={12} color="var(--bk-accent-on)" />}
                 </span>
 
                 {/* Label */}
@@ -333,7 +333,7 @@ const PANEL =
    leaves. */
 const PILL =
   `tw:fixed ${CHIP_POS} tw:flex tw:h-6 tw:w-11 tw:items-center tw:justify-center tw:gap-1 tw:px-1 ` +
-  "tw:bg-[var(--bk-accent-tint)] tw:rounded-[12px] " +
+  "tw:bg-[var(--bk-accent-tint)] tw:rounded-full " +
   "tw:[z-index:calc(var(--bk-z-topbar)_+_1)] " +
   "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
 const PILL_DOT = "tw:size-1.5 tw:rounded-full tw:flex-none";

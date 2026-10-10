@@ -19,7 +19,7 @@ import { MoreHorizontal } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { IconButton, Menu, MenuItem, MenuSeparator, Popover, useToast } from "@/editor/chrome-ui";
-import { formatShortcutHint, isMac } from "@/editor/canvas/menus/MenuItem";
+import { formatShortcutHint, isMac } from "@/editor/canvas/menus/shortcutHint";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import {
   actionLabel,

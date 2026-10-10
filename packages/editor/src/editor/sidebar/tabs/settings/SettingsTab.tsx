@@ -185,7 +185,7 @@ const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
   const Icon = NAV_ICONS[id];
   return (
     <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
-      <Icon size={18} strokeWidth={1.5} />
+      <Icon size={18} />
     </span>
   );
 };
@@ -1015,7 +1015,7 @@ export const SettingsTab: React.FC<
                 data-testid="set-search-mode-open"
               >
                 <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
-                  <SearchIcon size={16} strokeWidth={1.5} />
+                  <SearchIcon size={16} />
                 </span>
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate">Search</span>
               </Button>

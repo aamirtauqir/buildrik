@@ -537,7 +537,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
             padding: "2px 8px",
             borderRadius: "4px",
             fontSize: "11px",
-            fontFamily: "monospace",
+            fontFamily: "var(--bk-font-mono)",
             whiteSpace: "nowrap",
             pointerEvents: "none",
           }}

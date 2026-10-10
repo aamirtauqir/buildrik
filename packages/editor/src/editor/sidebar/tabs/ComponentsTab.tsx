@@ -310,9 +310,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           and a bordered footer with the one primary button. The FROM BRAND
           section ships when a brand-linked source exists; today's registry
           has none, so it would always be empty chrome. */}
-      <div style={{ flex: 1, overflow: "auto" }}>
+      <div className="tw:flex-1 tw:overflow-auto">
         {!state.isLoaded && (
-          <div style={{ padding: "12px" }}>
+          <div className="tw:p-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <SkeletonListItem key={i} hasAvatar avatarSize={24} textLines={1} />
             ))}

@@ -55,7 +55,7 @@ describe("ElementContextMenu — rendered above the chrome", () => {
     try {
       renderInCanvas();
       const style = screen.getByRole("menuitem", { name: /^Style/ });
-      fireEvent.mouseEnter(style.parentElement as HTMLElement);
+      fireEvent.mouseEnter(style);
       act(() => {
         vi.advanceTimersByTime(200);
       });
@@ -67,8 +67,48 @@ describe("ElementContextMenu — rendered above the chrome", () => {
     }
   });
 
-  it("still takes keyboard focus when it opens", () => {
+  it("still takes keyboard focus when it opens — on its first row (chrome-ui Menu)", () => {
     renderInCanvas();
-    expect(document.activeElement).toBe(screen.getByTestId("canvas-ctx-menu"));
+    expect(document.activeElement).toBe(screen.getByTestId("canvas-ctx-item-dup"));
+  });
+});
+
+/* DQ-018: chrome-ui Menu's roving focus, plus the submenu contract this file
+   adds — → opens and focuses the submenu, ← / Esc close it and hand focus
+   back to its row, and that Esc does not close the whole menu. */
+describe("ElementContextMenu — keyboard", () => {
+  it("↓ moves to Style; → opens its submenu on its first row; ← returns", () => {
+    const onClose = vi.fn();
+    render(<ElementContextMenu x={10} y={10} actions={actions} context={context} onClose={onClose} />);
+    const menu = screen.getByTestId("canvas-ctx-menu");
+    fireEvent.keyDown(menu, { key: "ArrowDown" });
+    const style = screen.getByTestId("canvas-ctx-item-style");
+    expect(document.activeElement).toBe(style);
+    expect(style).toHaveAttribute("aria-haspopup", "menu");
+    fireEvent.keyDown(style, { key: "ArrowRight" });
+    expect(style).toHaveAttribute("aria-expanded", "true");
+    expect(document.activeElement).toBe(screen.getByTestId("canvas-ctx-item-paste-styles"));
+    fireEvent.keyDown(screen.getByTestId("canvas-ctx-submenu"), { key: "ArrowLeft" });
+    expect(screen.queryByTestId("canvas-ctx-submenu")).toBeNull();
+    expect(document.activeElement).toBe(style);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("Esc inside the submenu closes only the submenu", () => {
+    const onClose = vi.fn();
+    render(<ElementContextMenu x={10} y={10} actions={actions} context={context} onClose={onClose} />);
+    fireEvent.keyDown(screen.getByTestId("canvas-ctx-item-style"), { key: "Enter" });
+    fireEvent.keyDown(screen.getByTestId("canvas-ctx-item-paste-styles"), { key: "Escape" });
+    expect(screen.queryByTestId("canvas-ctx-submenu")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("a submenu row runs its handler and closes the menu", () => {
+    const onClose = vi.fn();
+    render(<ElementContextMenu x={10} y={10} actions={actions} context={context} onClose={onClose} />);
+    fireEvent.click(screen.getByTestId("canvas-ctx-item-style"));
+    fireEvent.click(screen.getByTestId("canvas-ctx-item-paste-styles"));
+    expect(actions[1].submenu![0].handler).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

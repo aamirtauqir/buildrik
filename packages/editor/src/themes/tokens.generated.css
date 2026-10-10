@@ -182,7 +182,7 @@
   /* ── Typography · mirrors the 11 Figma text styles ────────────── */
 
   --bk-font-ui: "Inter", sans-serif;
-  --bk-font-mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
+  --bk-font-mono: "Geist Mono", monospace;
 
   --bk-text-11: 11px;
   --bk-text-12: 12px;

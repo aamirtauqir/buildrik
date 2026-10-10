@@ -87,7 +87,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
           stroke (width · style · colour) and per-corner radii sit behind
           More settings until the element has a border or split corners. */}
       {radiusSplit ? (
-        <div style={{ position: "relative" }}>
+        <div className="tw:relative">
           <CornerRadiusInput
             values={radii}
             onChange={handleRadius}
@@ -96,7 +96,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
           />
         </div>
       ) : (
-        <div style={{ position: "relative" }}>
+        <div className="tw:relative">
           <InputWithUnit
             property="border-radius"
             label="Radius"
@@ -110,7 +110,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       {(hasStroke || advancedExpanded) && (
         <>
       {/* Border Width */}
-      <div style={{ position: "relative" }}>
+      <div className="tw:relative">
         <InputWithUnit
           property="border-width"
           label="Width"
@@ -121,7 +121,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       </div>
 
       {/* Border Style */}
-      <div style={{ position: "relative" }}>
+      <div className="tw:relative">
         <SelectRow
           property="border-style"
           label="Style"
@@ -142,7 +142,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       </div>
 
       {/* Border Color */}
-      <div style={{ position: "relative" }}>
+      <div className="tw:relative">
         <ColorInput
           property="border-color"
           label="Color"
@@ -156,7 +156,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       )}
 
       {advancedExpanded && !radiusSplit && (
-        <div style={{ position: "relative" }}>
+        <div className="tw:relative">
           <CornerRadiusInput
             values={radii}
             onChange={handleRadius}
@@ -170,7 +170,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       {advancedExpanded && (
         <>
           {/* Individual Borders */}
-          <div style={{ marginTop: 16 }}>
+          <div className="tw:mt-4">
             <div
               style={{
                 fontSize: 12,
@@ -183,7 +183,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             </div>
 
             {(["top", "right", "bottom", "left"] as const).map((side) => (
-              <div key={side} style={{ position: "relative" }}>
+              <div key={side} className="tw:relative">
                 <InputRow
                   label={side.charAt(0).toUpperCase() + side.slice(1)}
                   property={`border-${side}`}

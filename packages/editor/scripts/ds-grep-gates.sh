@@ -469,6 +469,10 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 #     rgba(124, 109, 250, x)  — lavender alpha (E-arc)
 #     rgba(139, 92, 246, x)   — violet-500 alpha (E-arc)
 #     rgba(168, 85, 247, x)   — purple-500 alpha (E-arc)
+#   - The legacy indigo gradient pair #667EEA / #764BA2 and its rgba family
+#     rgba(102, 126, 234, x) (DQ-022, 2026-10-10) — Canvas.css carried it as
+#     every `var(--bk-accent, …)` fallback and as the inline-edit wash, which
+#     DID render; the list above had simply never named it.
 #   - Words: indigo, violet, purple (case-insensitive, word-boundary).
 # Canonical accent: --bk-accent #1A56DB (Flowbite blue-700, DESIGN.md; cobalt
 # #2D6DFF retired 2026-07-21, #406ED6 retired 2026-07-30). See tokens.generated.css.
@@ -528,7 +532,7 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 # History:
 #   docs/ideation/2026-04-26-banned-color-cleanup.md  — H-arc (G1-H4)
 #   docs/ideation/2026-04-26-tailwind-blue-migration.md — C-arc (C1-C6)
-GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA|#3B82F6|#2563EB|#1E3A8A|#E0E7FF|#C7D2FE|#A5B4FC|#818CF8|#6366F1|#8B5CF6|#7C3AED|#7C6DFA|#9D6FFF|rgba\(\s*(0,\s*163,\s*255|37,\s*99,\s*235|59,\s*130,\s*246|99,\s*102,\s*241|129,\s*140,\s*248|124,\s*109,\s*250|139,\s*92,\s*246|168,\s*85,\s*247)|\b(indigo|violet|purple)\b' packages/editor/src \
+GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA|#3B82F6|#2563EB|#1E3A8A|#E0E7FF|#C7D2FE|#A5B4FC|#818CF8|#6366F1|#8B5CF6|#7C3AED|#7C6DFA|#9D6FFF|#667EEA|#764BA2|rgba\(\s*(102,\s*126,\s*234|0,\s*163,\s*255|37,\s*99,\s*235|59,\s*130,\s*246|99,\s*102,\s*241|129,\s*140,\s*248|124,\s*109,\s*250|139,\s*92,\s*246|168,\s*85,\s*247)|\b(indigo|violet|purple)\b' packages/editor/src \
   --include='*.css' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
   --exclude-dir=__tests__ \
   --exclude-dir=project \

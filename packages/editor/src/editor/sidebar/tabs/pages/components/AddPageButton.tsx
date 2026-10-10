@@ -34,7 +34,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
   /* gap 12, not 4 — at 4px "+ Add page" and "From template" read as one
      run-on phrase (designer walk 2026-08-28). */
   return (
-    <div ref={wrapRef} style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
+    <div ref={wrapRef} className="tw:flex tw:items-center tw:gap-3 tw:relative">
       {/* Board 140:38-39: "+  Add page" is a plain accent text link — no
           filled pill. */}
       <Button

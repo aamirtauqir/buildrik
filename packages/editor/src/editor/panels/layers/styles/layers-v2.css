@@ -73,8 +73,8 @@
 .bdc-lr.bdc-cms-bound { background: var(--bk-accent-tint); }
 
 .bdc-lr-chev {
-  width: 16px;
-  height: 16px;
+  /* 20px target (DESIGN.md A1.4, DQ-020); -2px keeps the 16px footprint. */
+  width: 20px; height: 20px; margin: -2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -92,7 +92,6 @@
 .bdc-lr-ic {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
   /* Glyph, not a filled block: this was `background: var(--bk-ink-muted)` and
      the svg inside is stroked in currentColor, which inherits the same token,
      so every row drew a grey square and the per-type icon was invisible. */
@@ -354,7 +353,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.bdc-menu-item:hover { background: var(--bk-bg-subtle); }
+.bdc-menu-item:hover, .bdc-menu-item:focus-visible { background: var(--bk-bg-subtle); outline: none; }
 .bdc-menu-item:disabled { color: var(--bk-ink-muted); cursor: not-allowed; }
 
 

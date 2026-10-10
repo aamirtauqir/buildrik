@@ -27,7 +27,7 @@ import { SeoTab } from "./SeoTab";
 import { SocialTab } from "./SocialTab";
 import { AdvancedTab } from "./AdvancedTab";
 import { UnsavedWarningModal } from "./UnsavedWarningModal";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Portal, useFocusTrap } from "@/editor/chrome-ui";
 const TABS: { id: DrawerTab; label: string }[] = [
   { id: "seo", label: "SEO" },
   { id: "social", label: "Social" },
@@ -45,7 +45,18 @@ interface Props {
   previousSlug?: string;
 }
 
-export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab, previousSlug }) => {
+/* DQ-019: the card mounts in the overlay root (it rendered inside the Pages
+   panel) and takes chrome-ui's focus trap — Tab stays in the card, focus
+   returns on close, and Escape is answered only while it is the topmost
+   dialog (the discard confirm above it owns its own). The trap lives in the
+   card because the overlay root resolves in an effect. */
+export const PageSettingsDrawer: React.FC<Props> = (props) => (
+  <Portal>
+    <PageSettingsCard {...props} />
+  </Portal>
+);
+
+const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab, previousSlug }) => {
   const s = usePageSettings(composer, page, allPages);
 
   /* A door's tab (`ui:pages-open-settings`) lands on open and whenever a new
@@ -104,25 +115,17 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
     handleClose();
   };
 
-  // ESC — the same guarded close as the scrim. Skipped while the discard modal
-  // is open: that dialog owns Escape, and running the guard behind it would
-  // reopen what the dialog had just dismissed.
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape" || s.showDiscardConfirm) return;
-      e.preventDefault();
-      handleClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [s.showDiscardConfirm, handleClose]);
+  // ESC — the same guarded close as the scrim, through the trap. While the
+  // discard modal is open it is the topmost dialog and owns Escape, so the
+  // guard behind it cannot reopen what it just dismissed.
+  const trapRef = useFocusTrap(true, handleClose);
 
   return (
     <>
       {/* Board S3.7: centered modal card on a dark scrim — scrim click closes
           (through the same unsaved guard as ESC). */}
       <div className="bd-pg-drawer-scrim" onClick={handleClose} aria-hidden="true" />
-      <div className="bd-pg-drawer" data-testid="pg-drawer" role="dialog" aria-modal="true" aria-label={`${page.name} settings`}>
+      <div ref={trapRef} className="bd-pg-drawer" data-testid="pg-drawer" role="dialog" aria-modal="true" aria-label={`${page.name} settings`}>
         {/* ── Header — board 302:1980: title + text-link tab row ──── */}
         <div className="bd-pg-drawer-hdr" data-testid="pg-drawer-hdr">
           {/* One text node, not `Page settings — {page.name}`: JSX splits that
