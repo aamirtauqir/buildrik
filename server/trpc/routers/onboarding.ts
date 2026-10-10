@@ -7,6 +7,7 @@ import {
   completeDashboardTask,
   dismissOnboarding,
   getEditorOnboarding,
+  markEditorTip,
   recordEditorMilestone,
   setEditorChecklistDismissed,
   saveWizard,
@@ -15,6 +16,7 @@ import {
 import {
   completeDashboardTaskSchema,
   editorOnboardingInput,
+  markEditorTipSchema,
   recordEditorMilestoneSchema,
   setEditorChecklistDismissedSchema,
   wizardDataSchema,
@@ -84,6 +86,15 @@ export const onboardingRouter = router({
         editorOnboardingError(e, "Failed to update the checklist");
       }
     }),
+
+  /** L1-029: the tip queue's seen/dismissed memory, stored with the L1-015 state. */
+  markEditorTip: protectedProcedure.input(markEditorTipSchema).mutation(async ({ ctx, input }) => {
+    try {
+      return await markEditorTip(ctx.session.user.id, input.siteId, input.tipId, input.action);
+    } catch (e) {
+      editorOnboardingError(e, "Failed to update tips");
+    }
+  }),
 
   saveWizard: protectedProcedure
     .input(wizardDataSchema)

@@ -30,7 +30,7 @@ const STEP_IDS = DEFAULT_ONBOARDING_STEPS.map((s) => s.id);
 
 function view(done: string[] = [], dismissed = false): EditorOnboardingView {
   const steps = Object.fromEntries(STEP_IDS.map((id) => [id, done.includes(id)])) as EditorOnboardingView["steps"];
-  return { steps, completedCount: done.length, totalCount: STEP_IDS.length, dismissed };
+  return { steps, completedCount: done.length, totalCount: STEP_IDS.length, dismissed, tipsSeen: [], tipsDismissed: [] };
 }
 
 async function mounted(siteId: string | null = "site-1") {

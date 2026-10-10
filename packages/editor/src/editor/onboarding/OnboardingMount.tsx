@@ -14,7 +14,8 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@/shared/utils/editorViewMode";
 import { OnboardingChecklist } from "./OnboardingChecklist";
 import { AchievementPrompt } from "./AchievementPrompt";
-import { RailCoach, railCoachDismissed } from "./RailCoach";
+import { RailCoach } from "./RailCoach";
+import { useAutoTip } from "./tipQueue";
 import { useOnboardingOrchestrator } from "./useOnboardingOrchestrator";
 
 /** Block ids that count as "a section" for the insert-section step — the
@@ -28,6 +29,8 @@ const SECTION_BLOCK_IDS: ReadonlySet<string> = new Set([
   "footer",
   "navbar",
 ]);
+
+const RAIL_COACH_TIP = ["rail-coach"] as const;
 
 export interface OnboardingMountProps {
   composer: Composer | null;
@@ -233,12 +236,12 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
   );
 
   /* The rail coach (board 65:2 / S1.1): first run only — nothing done yet,
-     never dismissed, and never over the stripped view-mode chrome (the rail
-     it introduces is not there). Lives with the checklist because both are
-     the same first-run story; dismissing the coach is not dismissing the
-     checklist. State so "Got it" hides it without waiting for a re-render
-     of the flag read. */
-  const [coachDismissed, setCoachDismissed] = React.useState(railCoachDismissed);
+     and never over the stripped view-mode chrome (the rail it introduces is
+     not there). WHEN is the tip queue's call (L1-029): idle only, at most one
+     automatic tip per session, once per site. Closing it is not dismissing
+     the checklist and completes no step. */
+  const readOnlyView = getEditorViewMode().readOnlyView;
+  const coach = useAutoTip(RAIL_COACH_TIP, o.phase === "active" && o.completedCount === 0 && !readOnlyView);
 
   /* View mode is stripped chrome, and the setup checklist is owner chrome.
      Board 1343:7162 draws the read-only editor as topbar + canvas + a bare
@@ -249,13 +252,11 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
      status band, telling someone who cannot edit the site to go set its brand.
      The coach two lines below already carried this condition; the checklist it
      belongs to never got it. */
-  if (o.phase !== "active" || getEditorViewMode().readOnlyView) return null;
-
-  const showCoach = o.completedCount === 0 && !coachDismissed;
+  if (o.phase !== "active" || readOnlyView) return null;
 
   return (
     <>
-      {showCoach && <RailCoach onDismiss={() => setCoachDismissed(true)} />}
+      {coach.tipId && <RailCoach onDismiss={coach.close} />}
       <OnboardingChecklist
         steps={o.steps}
         completedCount={o.completedCount}

@@ -12,6 +12,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
 import {
   getEditorOnboarding,
+  markEditorTip,
   recordEditorMilestone,
   setEditorChecklistDismissed,
 } from "@/server/services/onboarding.service";
@@ -60,6 +61,8 @@ describe("editor onboarding — per user × site (L1-015)", () => {
       completedCount: 0,
       totalCount: 7,
       dismissed: false,
+      tipsSeen: [],
+      tipsDismissed: [],
     });
   });
 
@@ -119,5 +122,25 @@ describe("editor onboarding — per user × site (L1-015)", () => {
     await expect(getEditorOnboarding(stranger.id, siteA.id)).rejects.toBeInstanceOf(PermissionError);
     await expect(recordEditorMilestone(stranger.id, siteA.id, "preview")).rejects.toBeInstanceOf(PermissionError);
     expect(await prisma.editorOnboarding.count()).toBe(0);
+  });
+});
+
+describe("tip queue state (L1-029)", () => {
+  it("stores seen and dismissed per user × site, once each, and dismissing a tip completes no step", async () => {
+    const { user, siteA, siteB } = await seed();
+    await markEditorTip(user.id, siteA.id, "rail-coach", "seen");
+    await markEditorTip(user.id, siteA.id, "rail-coach", "seen");
+    const v = await markEditorTip(user.id, siteA.id, "rail-coach", "dismissed");
+    expect(v.tipsSeen).toEqual(["rail-coach"]);
+    expect(v.tipsDismissed).toEqual(["rail-coach"]);
+    expect(v.completedCount).toBe(0);
+    expect(v.dismissed).toBe(false);
+    expect((await getEditorOnboarding(user.id, siteB.id)).tipsSeen).toEqual([]);
+  });
+
+  it("refuses a site the user is not a member of", async () => {
+    const { siteA } = await seed();
+    const stranger = await createTestUser();
+    await expect(markEditorTip(stranger.id, siteA.id, "rail-coach", "seen")).rejects.toBeInstanceOf(PermissionError);
   });
 });

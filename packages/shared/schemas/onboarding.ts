@@ -51,6 +51,14 @@ export const EDITOR_TASK_IDS = [
 ] as const;
 export type EditorTaskId = (typeof EDITOR_TASK_IDS)[number];
 
+/**
+ * L1-029 (owner, 2026-10-10): the tips the editor's one tip queue may show.
+ * Seen/dismissed are stored with the L1-015 state (per user × site);
+ * dismissing a tip completes no step.
+ */
+export const EDITOR_TIP_IDS = ["rail-coach", "build-tip-1", "build-tip-2", "build-tip-3", "build-tip-4"] as const;
+export type EditorTipId = (typeof EDITOR_TIP_IDS)[number];
+
 export const editorOnboardingInput = z.object({ siteId: z.string().min(1) });
 
 /** A step the editor saw the user really do (the event, never the CTA press). */
@@ -65,12 +73,21 @@ export const setEditorChecklistDismissedSchema = z.object({
   dismissed: z.boolean(),
 });
 
+/** `seen` when the queue shows a tip; `dismissed` when the user closes it. */
+export const markEditorTipSchema = z.object({
+  siteId: z.string().min(1),
+  tipId: z.enum(EDITOR_TIP_IDS),
+  action: z.enum(["seen", "dismissed"]),
+});
+
 /** The one computed answer both onboarding surfaces read. */
 export interface EditorOnboardingView {
   steps: Record<EditorTaskId, boolean>;
   completedCount: number;
   totalCount: number;
   dismissed: boolean;
+  tipsSeen: EditorTipId[];
+  tipsDismissed: EditorTipId[];
 }
 
 // M2 onboarding wizard state (spec §2). Persisted to OnboardingState.wizardData

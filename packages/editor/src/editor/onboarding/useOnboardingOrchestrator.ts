@@ -26,6 +26,7 @@ import {
   recordEditorMilestone,
   setEditorChecklistDismissed,
 } from "@/services/OnboardingService";
+import { primeTipQueue } from "./tipQueue";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -111,11 +112,17 @@ export function useOnboardingOrchestrator(siteId: string | null): OnboardingOrch
   }, []);
 
   useEffect(() => {
-    if (!siteId) return;
+    /* The tip queue (L1-029) keeps its seen/dismissed memory in the same
+       per-site state; an unreadable state primes nothing, so no tip shows. */
+    if (!siteId) {
+      primeTipQueue(null, []);
+      return;
+    }
     let cancelled = false;
     void fetchEditorOnboarding(siteId).then((v) => {
       if (cancelled) return;
       adopt(v);
+      if (v) primeTipQueue(siteId, [...v.tipsSeen, ...v.tipsDismissed]);
       setLoaded(true);
     });
     return () => {

@@ -2,9 +2,11 @@ import { prisma } from "@/lib/prisma";
 import {
   DASHBOARD_TASK_IDS,
   EDITOR_TASK_IDS,
+  EDITOR_TIP_IDS,
   wizardDataSchema,
   type EditorOnboardingView,
   type EditorTaskId,
+  type EditorTipId,
   type WizardData,
 } from "@buildrik/shared/schemas/onboarding";
 import { assertSiteAccess } from "./permission.service";
@@ -152,7 +154,10 @@ export async function getEditorOnboarding(userId: string, siteId: string): Promi
 
 async function computeEditorOnboarding(userId: string, siteId: string): Promise<EditorOnboardingView> {
   const [row, pageCount, rounds, invitedRounds, site] = await Promise.all([
-    prisma.editorOnboarding.findUnique({ where: editorKey(userId, siteId), select: { events: true, dismissedAt: true } }),
+    prisma.editorOnboarding.findUnique({
+      where: editorKey(userId, siteId),
+      select: { events: true, dismissedAt: true, tipsSeen: true, tipsDismissed: true },
+    }),
     prisma.page.count({ where: { siteId } }),
     prisma.reviewRequest.count({ where: { siteId } }),
     prisma.reviewRequest.count({ where: { siteId, invitedEmail: { not: null } } }),
@@ -174,8 +179,12 @@ async function computeEditorOnboarding(userId: string, siteId: string): Promise<
     completedCount: EDITOR_TASK_IDS.filter((id) => steps[id]).length,
     totalCount: EDITOR_TASK_IDS.length,
     dismissed: Boolean(row?.dismissedAt),
+    tipsSeen: [...new Set(row?.tipsSeen ?? [])].filter(isTipId),
+    tipsDismissed: [...new Set(row?.tipsDismissed ?? [])].filter(isTipId),
   };
 }
+
+const isTipId = (id: string): id is EditorTipId => (EDITOR_TIP_IDS as readonly string[]).includes(id);
 
 export async function recordEditorMilestone(userId: string, siteId: string, milestone: EditorTaskId) {
   await assertSiteAccess(prisma, userId, siteId);
@@ -198,6 +207,28 @@ export async function setEditorChecklistDismissed(userId: string, siteId: string
     create: { userId, siteId, dismissedAt },
     update: { dismissedAt },
   });
+  return computeEditorOnboarding(userId, siteId);
+}
+
+/**
+ * L1-029: the tip queue's memory. `seen` is written when a tip is shown (so it
+ * is never auto-shown again on this site), `dismissed` when the user closes
+ * it. Neither touches the checklist — a closed tip completes no step.
+ */
+export async function markEditorTip(userId: string, siteId: string, tipId: EditorTipId, action: "seen" | "dismissed") {
+  await assertSiteAccess(prisma, userId, siteId);
+  const row = await prisma.editorOnboarding.findUnique({
+    where: editorKey(userId, siteId),
+    select: { tipsSeen: true, tipsDismissed: true },
+  });
+  const held = action === "seen" ? row?.tipsSeen : row?.tipsDismissed;
+  if (!held?.includes(tipId)) {
+    await prisma.editorOnboarding.upsert({
+      where: editorKey(userId, siteId),
+      create: action === "seen" ? { userId, siteId, tipsSeen: [tipId] } : { userId, siteId, tipsDismissed: [tipId] },
+      update: action === "seen" ? { tipsSeen: { push: tipId } } : { tipsDismissed: { push: tipId } },
+    });
+  }
   return computeEditorOnboarding(userId, siteId);
 }
 

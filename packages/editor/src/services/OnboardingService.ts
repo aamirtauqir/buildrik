@@ -10,7 +10,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import type { EditorOnboardingView, EditorTaskId } from "@buildrik/shared/schemas/onboarding";
+import type { EditorOnboardingView, EditorTaskId, EditorTipId } from "@buildrik/shared/schemas/onboarding";
 
 async function orNull(run: () => Promise<unknown>): Promise<EditorOnboardingView | null> {
   try {
@@ -30,4 +30,9 @@ export function recordEditorMilestone(siteId: string, milestone: EditorTaskId): 
 
 export function setEditorChecklistDismissed(siteId: string, dismissed: boolean): Promise<EditorOnboardingView | null> {
   return orNull(() => getBuildrikClient(DASHBOARD_URL).onboarding.setEditorChecklistDismissed.mutate({ siteId, dismissed }));
+}
+
+/** L1-029: the tip queue's memory — `seen` when shown, `dismissed` when closed. */
+export function markEditorTip(siteId: string, tipId: EditorTipId, action: "seen" | "dismissed"): Promise<EditorOnboardingView | null> {
+  return orNull(() => getBuildrikClient(DASHBOARD_URL).onboarding.markEditorTip.mutate({ siteId, tipId, action }));
 }
