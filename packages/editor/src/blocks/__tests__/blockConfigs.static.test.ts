@@ -81,11 +81,26 @@ describe("heroBlockConfig — attributes schema", () => {
     expect(attrs.textAlign.default).toBe("center");
   });
 
-  it("hero title default and inserted content HTML both use the unified Buildrick brand", () => {
-    // D5 brand sweep (2026-07-17): the schema default, the inserted HTML
-    // content, and the HeroSection React default were reconciled from the
-    // old divergent "dudo"/"Aquibra" strings to the current Buildrick brand.
-    expect(attrs.title.default).toBe("Welcome to Buildrick");
-    expect(heroBlockConfig.content).toContain("Welcome to Buildrick");
+  /* L1-031 (owner 2026-10-10): a customer block ships neutral placeholders,
+     not Buildrick's own marketing line, and its call to action is a real
+     button painted from the site's Brand tokens — it rendered as an unstyled
+     text link. */
+  it("ships neutral placeholder copy, in the content and the attribute defaults alike", () => {
+    expect(attrs.title.default).toBe("Your headline here");
+    expect(attrs.subtitle.default).toBe("Add a short introduction to your business or idea.");
+    expect(heroBlockConfig.content).toContain("<h1>Your headline here</h1>");
+    expect(heroBlockConfig.content).toContain("<p>Add a short introduction to your business or idea.</p>");
+    expect(heroBlockConfig.content).not.toMatch(/Welcome to Buildrick|visual composer/i);
+  });
+
+  it("its call to action is a Button painted from Brand tokens", () => {
+    const button = heroBlockConfig.content.match(/<button[^>]*>([^<]*)<\/button>/);
+    expect(button?.[1]).toBe(attrs.buttonText.default);
+    const tag = button?.[0] ?? "";
+    expect(tag).toContain("background:var(--buildrick-design-color-primary)");
+    expect(tag).toContain("color:var(--buildrick-design-color-on-primary)");
+    expect(tag).toContain("border-radius:var(--buildrick-design-radius-md)");
+    expect(tag).not.toMatch(/#[0-9a-f]{3,6}\b/i);
+    expect(heroBlockConfig.content).not.toContain("<a ");
   });
 });

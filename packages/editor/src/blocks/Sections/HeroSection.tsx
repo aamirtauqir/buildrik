@@ -13,15 +13,21 @@ export const heroBlockConfig = {
   content:
     '<section class="buildrick-hero-section" data-buildrick-type="hero">' +
     '<div class="buildrick-hero-content">' +
-    "<h1>Welcome to Buildrick</h1>" +
-    "<p>Build beautiful websites in minutes with our visual composer.</p>" +
-    '<a href="#" class="buildrick-hero-button">Get Started</a>' +
+    /* L1-031 (owner 2026-10-10): neutral placeholders — this is the
+       customer's site, not Buildrick's marketing — and the call to action is a
+       Button painted from Brand tokens (it was an unstyled text link). */
+    "<h1>Your headline here</h1>" +
+    "<p>Add a short introduction to your business or idea.</p>" +
+    '<button style="padding:var(--buildrick-design-space-3) var(--buildrick-design-space-6);' +
+    "background:var(--buildrick-design-color-primary);color:var(--buildrick-design-color-on-primary);" +
+    "border:none;border-radius:var(--buildrick-design-radius-md);" +
+    'font-size:var(--buildrick-design-font-size-base);font-weight:600;cursor:pointer">Get started</button>' +
     "</div>" +
     "</section>",
   attributes: {
-    title: { type: "text", default: "Welcome to Buildrick" },
-    subtitle: { type: "text", default: "Build beautiful websites" },
-    buttonText: { type: "text", default: "Get Started" },
+    title: { type: "text", default: "Your headline here" },
+    subtitle: { type: "text", default: "Add a short introduction to your business or idea." },
+    buttonText: { type: "text", default: "Get started" },
     buttonUrl: { type: "text", default: "#" },
     backgroundImage: { type: "image", default: "" },
     backgroundColor: { type: "color", default: "#0d0d1a" },
