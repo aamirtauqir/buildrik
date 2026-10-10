@@ -113,8 +113,10 @@ describe("Effects registry — one writer per property, board 3's arrival", () =
     }
   });
 
-  it("four '+' rows and Advanced closed", () => {
-    expect(ids.map((id) => SECTION_REGISTRY[id].open)).toEqual(["valued", "valued", "valued", "valued", "closed"]);
+  /* FG-022 (owner 2026-10-10): Opacity and Shadow arrive expanded; Filters
+     and Transform & motion stay "+" rows, Advanced closed (under More effects). */
+  it("Opacity and Shadow open, two '+' rows, Advanced closed", () => {
+    expect(ids.map((id) => SECTION_REGISTRY[id].open)).toEqual(["open", "open", "valued", "valued", "closed"]);
   });
 
   it("a shadow of none does not count as a value", () => {

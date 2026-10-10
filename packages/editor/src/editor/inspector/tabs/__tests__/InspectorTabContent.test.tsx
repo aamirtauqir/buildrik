@@ -140,7 +140,8 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
 
   it("Behaviour carries Interactions (Q1) and Visibility; Effects carries neither", () => {
     const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
-    expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform & motion", "Advanced"]);
+    /* FG-022: the three secondary sections sit behind "More effects". */
+    expect(sectionNames()).toEqual(["Opacity", "Shadow", "More effects"]);
     unmount();
     renderTab({ tabId: "behaviour", elementType: "container" });
     expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions", "CSS classes", "Attributes"]);
@@ -187,7 +188,7 @@ describe("InspectorTabContent — display modes (DD-11)", () => {
   });
 
   it("Attributes and Effects › Advanced arrive closed with their one-line summary", () => {
-    renderTab({ tabId: "effects", elementType: "heading" });
+    renderTab({ tabId: "effects", elementType: "heading", choices: { "heading:more-effects": "open" } });
     expect(screen.getByTestId("inspector-summary-effects-advanced")).toHaveTextContent("Cursor: auto · Blend: normal");
   });
 
@@ -201,5 +202,45 @@ describe("InspectorTabContent — display modes (DD-11)", () => {
     renderTab({ tabId: "style", elementType: "heading", onSetChoices });
     fireEvent.click(screen.getByRole("button", { name: "Size section, expanded" }), { altKey: true });
     expect(onSetChoices).toHaveBeenCalledWith("heading", ["type", "typography", "size", "spacing", "fill", "border"], "closed");
+  });
+});
+
+/* FG-022 (owner 2026-10-10): Opacity and Shadow arrive expanded; Filters,
+   Transform & motion and Advanced sit under a collapsed "More effects", and
+   a collapsed More effects says when one of them holds an active effect. */
+describe("InspectorTabContent — Effects › More effects (FG-022)", () => {
+  it("Opacity and Shadow arrive expanded with nothing set", () => {
+    renderTab({ tabId: "effects", elementType: "container" });
+    expect(screen.getByRole("button", { name: "Opacity section, expanded" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Shadow section, expanded" })).toBeInTheDocument();
+  });
+
+  it("More effects arrives collapsed, its three sections unmounted", () => {
+    renderTab({ tabId: "effects", elementType: "container" });
+    expect(screen.getByRole("button", { name: "More effects section, collapsed" })).toBeInTheDocument();
+    expect(screen.queryByTestId("inspector-section-filters")).toBeNull();
+    expect(screen.queryByTestId("inspector-summary-more-effects")).toBeNull();
+  });
+
+  it("opening it records the choice and shows Filters, Transform & motion, Advanced", () => {
+    const onSetChoices = vi.fn();
+    const { unmount } = renderTab({ tabId: "effects", elementType: "container", onSetChoices });
+    fireEvent.click(screen.getByRole("button", { name: "More effects section, collapsed" }));
+    expect(onSetChoices).toHaveBeenCalledWith("container", ["more-effects"], "open");
+    unmount();
+    renderTab({ tabId: "effects", elementType: "container", choices: { "container:more-effects": "open" } });
+    expect(sectionNames()).toEqual(["Opacity", "Shadow", "More effects", "Filters", "Transform & motion", "Advanced"]);
+  });
+
+  it("a collapsed More effects names the active effects it holds", () => {
+    renderTab({ tabId: "effects", elementType: "container", authored: { filter: "blur(4px)", transform: "rotate(5deg)" } });
+    expect(screen.getByRole("button", { name: "More effects section, collapsed" })).toBeInTheDocument();
+    expect(screen.getByTestId("inspector-summary-more-effects")).toHaveTextContent("Active: Filters, Transform & motion");
+    expect(screen.getByTestId("inspector-more-effects-active")).toBeInTheDocument();
+  });
+
+  it("opening a section inside it (a property jump) opens More effects too", () => {
+    renderTab({ tabId: "effects", elementType: "container", choices: { "container:filters": "open" } });
+    expect(screen.getByRole("button", { name: "Filters section, expanded" })).toBeInTheDocument();
   });
 });

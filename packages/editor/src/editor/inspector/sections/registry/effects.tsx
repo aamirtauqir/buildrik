@@ -1,8 +1,9 @@
 /**
- * Effects registry entries (board 3): Opacity, Shadow, Filters, Transform &
- * motion — each a "+" row until the element carries a value — and Advanced,
- * closed with a summary ("Cursor: auto · Blend: normal"). One section per
- * CSS property family; no property is written by two of them.
+ * Effects registry entries (board 3): Opacity and Shadow arrive expanded
+ * (FG-022); Filters and Transform & motion are "+" rows until the element
+ * carries a value, and Advanced arrives closed with a summary ("Cursor: auto
+ * · Blend: normal") — those three under "More effects" (InspectorTabContent).
+ * One section per CSS property family; no property is written by two of them.
  *
  * @license BSD-3-Clause
  */
@@ -20,7 +21,8 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   opacity: defineSection({
     tab: "effects",
     title: "Opacity",
-    open: "valued",
+    /* FG-022: Opacity and Shadow arrive expanded. */
+    open: "open",
     Component: OpacitySection,
     styleKeys: ["opacity"],
     adaptProps: adaptBaseStyleProps,
@@ -29,7 +31,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   shadow: defineSection({
     tab: "effects",
     title: "Shadow",
-    open: "valued",
+    open: "open",
     hasValue: (ctx) => set(ctx.authoredStyles["box-shadow"]),
     Component: ShadowSection,
     styleKeys: ["box-shadow"],
