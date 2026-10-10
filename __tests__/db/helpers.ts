@@ -144,6 +144,7 @@ const MODEL_TO_TABLE = {
   invite: "invites",
   account: "accounts",
   rateLimitBucket: "rate_limit_buckets",
+  editorOnboarding: "editor_onboarding",
 } as const;
 
 export type TruncatableModel = keyof typeof MODEL_TO_TABLE;

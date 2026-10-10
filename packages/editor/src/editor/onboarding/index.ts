@@ -18,4 +18,4 @@ export type {
 
 // Step definitions (SSOT — shared with shell for event wiring)
 export type { OnboardingStep } from "@/shared/constants/onboardingSteps";
-export { DEFAULT_ONBOARDING_STEPS, ONBOARDING_SCHEMA_VERSION } from "@/shared/constants/onboardingSteps";
+export { DEFAULT_ONBOARDING_STEPS } from "@/shared/constants/onboardingSteps";

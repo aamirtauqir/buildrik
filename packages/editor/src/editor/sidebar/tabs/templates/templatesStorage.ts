@@ -10,18 +10,6 @@ import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 import { addRecentTemplate } from "./templatesData";
 import type { TemplateItem } from "./templatesData";
 
-/** Dismiss the new-user onboarding nudge when a template is applied */
-export function dismissOnboarding(): void {
-  try {
-    localStorage.setItem(
-      STORAGE_KEYS.ONBOARDING_DISMISSED,
-      "true"
-    );
-  } catch {
-    /* ignore storage errors */
-  }
-}
-
 /** Record a template as recently used (writes to localStorage via templatesData) */
 export function recordTemplateApplied(template: Pick<TemplateItem, "id" | "name" | "icon">): void {
   addRecentTemplate(template);

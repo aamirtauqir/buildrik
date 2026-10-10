@@ -325,9 +325,9 @@ export const EVENTS = {
   /** Open a specific inspector panel tab by name (layout/style/typography/size) */
   UI_PANEL_OPEN: "panel:open",
   /** Browse templates (opens template browser) */
-  /** Re-open the getting-started checklist after it was dismissed. Until this
-   *  existed `replayAll` had no caller anywhere in the product: skipping the
-   *  checklist once ended it for good, on every site, with no way back. */
+  /** Re-open the getting-started checklist after it was dismissed (Site menu →
+   *  Getting started). Reopens with the site's progress as it is — never a
+   *  reset (L1-015). */
   UI_ONBOARDING_REPLAY: "ui:onboarding-replay",
 
   UI_BROWSE_TEMPLATES: "ui:browse-templates",

@@ -11,7 +11,6 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { dismissOnboarding } from "../templatesStorage";
 
 export type ApplyState = "idle" | "confirming" | "applying" | "success" | "error";
 
@@ -124,7 +123,6 @@ export function useTemplateApply(composer: Composer | null): UseTemplateApplyRet
   const confirmApply = React.useCallback(() => {
     setApplyState("applying");
     setProgress(0);
-    dismissOnboarding();
   }, []);
 
   const cancelApply = React.useCallback(() => {
@@ -156,7 +154,6 @@ export function useTemplateApply(composer: Composer | null): UseTemplateApplyRet
     setCanRetry(false);
     setApplyState("applying");
     setProgress(0);
-    dismissOnboarding();
   }, []);
 
   const resetApply = React.useCallback(() => {
@@ -170,7 +167,6 @@ export function useTemplateApply(composer: Composer | null): UseTemplateApplyRet
   const startApply = React.useCallback(() => {
     setApplyState("applying");
     setProgress(0);
-    dismissOnboarding();
   }, []);
 
   const handleRetry = React.useCallback(() => {

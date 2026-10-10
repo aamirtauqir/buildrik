@@ -113,14 +113,6 @@ export const STORAGE_KEYS = {
   ONBOARDING_MODAL: "buildrick-onboarding-modal",
   /** Spotlight tour — v2 key forces reset for users with old tour state */
   ONBOARDING_TOUR: "buildrick-onboarding-tour-v2",
-  /** Get-started checklist step progress (JSON array of OnboardingStep) */
-  ONBOARDING_PROGRESS: "buildrick-onboarding-progress",
-  /** Whether the checklist widget has been dismissed */
-  ONBOARDING_DISMISSED: "buildrick-onboarding-dismissed",
-  /** Schema version — bump when DEFAULT_STEPS changes to clear stale data */
-  ONBOARDING_SCHEMA_VERSION: "buildrick-onboarding-schema-v",
-  /** Current onboarding phase — "modal" | "tour" | "checklist" | "done" */
-  ONBOARDING_PHASE: "buildrick-onboarding-phase",
   /** Current tour step index (0-based) — persisted so refresh resumes same step */
   ONBOARDING_TOUR_STEP: "buildrick-onboarding-tour-step",
   /** Whether user has named their project during onboarding */

@@ -1,6 +1,7 @@
 /**
  * Onboarding Steps — Single Source of Truth
- * All step definitions, types, and schema version live here.
+ * All step definitions and types live here (ids mirror EDITOR_TASK_IDS in
+ * @buildrik/shared/schemas/onboarding, which the server validates against).
  * Import from here only. Never redefine steps inline.
  *
  * @license BSD-3-Clause
@@ -9,7 +10,7 @@
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export interface OnboardingStep {
-  /** Unique identifier — used for event wiring and localStorage persistence */
+  /** Unique identifier — used for event wiring and the server's per-site state (L1-015) */
   id: string;
   /** Short display label (≤ 40 chars) */
   label: string;
@@ -22,17 +23,6 @@ export interface OnboardingStep {
   /** Whether this step has been completed */
   completed: boolean;
 }
-
-// ── Schema Version ──────────────────────────────────────────────────────────
-// Bump when step IDs or count change — clears stale localStorage automatically.
-
-/* 4 (2026-08-27): every step used to be creditable by pressing its CTA, so
-   stored progress can say "done" over things that were never done. The version
-   bump clears it — a checklist that lied is worse than one that starts over.
-   5 (2026-08-28): the list itself changed — board 296:1972's agency-framed
-   steps replace the tool-framed ones (founder call). The migration resets
-   progress AND phase, or a v4 "done" user would never see this list. */
-export const ONBOARDING_SCHEMA_VERSION = 5;
 
 // ── Default Steps ───────────────────────────────────────────────────────────
 

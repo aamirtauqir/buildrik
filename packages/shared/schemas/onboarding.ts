@@ -34,13 +34,11 @@ export const completeDashboardTaskSchema = z.object({
 /**
  * The editor checklist's seven steps, mirroring `onboardingSteps.ts`.
  *
- * These lived only in `localStorage` until 2026-09-03, which meant the one
- * artefact built to prove a user had activated did not survive the user
- * changing device, browser or clearing their cache: completing a step wrote
- * `completed:true` locally, and the same site as the same logged-in user in a
- * fresh context read `completed:false`. `OnboardingState.editorTasks` already
- * existed for this — the router even carried a comment reserving it "for when
- * an editor tour is actually built".
+ * L1-015 (owner, 2026-10-10): Getting-started progress is server state per
+ * user × site (`EditorOnboarding`), read by the rail pill and the checklist
+ * alike. It used to live in one global `localStorage` key (and, mirrored, in
+ * the per-USER `OnboardingState.editorTasks`), so a brand-new site said
+ * "Done · 7 of 7" while its checklist said 0/7.
  */
 export const EDITOR_TASK_IDS = [
   "set-brand",
@@ -51,10 +49,29 @@ export const EDITOR_TASK_IDS = [
   "preview",
   "publish",
 ] as const;
+export type EditorTaskId = (typeof EDITOR_TASK_IDS)[number];
 
-export const completeEditorTaskSchema = z.object({
-  taskId: z.enum(EDITOR_TASK_IDS),
+export const editorOnboardingInput = z.object({ siteId: z.string().min(1) });
+
+/** A step the editor saw the user really do (the event, never the CTA press). */
+export const recordEditorMilestoneSchema = z.object({
+  siteId: z.string().min(1),
+  milestone: z.enum(EDITOR_TASK_IDS),
 });
+
+/** Close / reopen the checklist on this site. Progress is untouched either way. */
+export const setEditorChecklistDismissedSchema = z.object({
+  siteId: z.string().min(1),
+  dismissed: z.boolean(),
+});
+
+/** The one computed answer both onboarding surfaces read. */
+export interface EditorOnboardingView {
+  steps: Record<EditorTaskId, boolean>;
+  completedCount: number;
+  totalCount: number;
+  dismissed: boolean;
+}
 
 // M2 onboarding wizard state (spec §2). Persisted to OnboardingState.wizardData
 // after every step so a refresh resumes at `route` with inputs intact. Versioned

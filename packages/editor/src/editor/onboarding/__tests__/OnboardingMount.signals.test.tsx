@@ -11,14 +11,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, act, waitFor } from "@testing-library/react";
+import { render, act } from "@testing-library/react";
 import * as React from "react";
 import { EVENTS } from "@/shared/constants";
 
 const completeStep = vi.hoisted(() => vi.fn());
-const replayAll = vi.hoisted(() => vi.fn());
-const restore = vi.hoisted(() => vi.fn());
-const fetchCurrentRound = vi.hoisted(() => vi.fn(async () => null as unknown));
+const reopen = vi.hoisted(() => vi.fn());
+const orchestratorSiteIds = vi.hoisted(() => [] as Array<string | null>);
 const orchestrator = vi.hoisted(() => ({
   steps: [
     { id: "set-brand", actionKey: "open-brand" },
@@ -32,18 +31,21 @@ const orchestrator = vi.hoisted(() => ({
   achievement: null,
   completeStep,
   setActiveStepId: vi.fn(),
-  skipAll: vi.fn(),
+  dismiss: vi.fn(),
   minimize: vi.fn(),
+  restore: vi.fn(),
   dismissAchievement: vi.fn(),
-  replayAll,
-  restore,
+  reopen,
 }));
 
 vi.mock("../useOnboardingOrchestrator", () => ({
-  useOnboardingOrchestrator: () => orchestrator,
+  useOnboardingOrchestrator: (siteId: string | null) => {
+    orchestratorSiteIds.push(siteId);
+    return orchestrator;
+  },
   ACHIEVEMENT_AUTO_DISMISS_MS: 4000,
 }));
-vi.mock("@/services/ReviewService", () => ({ fetchCurrentRound }));
+vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-from-url" }));
 let lastChecklistProps: { onAction: (k: string) => void } | null = null;
 vi.mock("../OnboardingChecklist", () => ({
   OnboardingChecklist: (p: { onAction: (k: string) => void }) => {
@@ -86,14 +88,17 @@ const ids = () => completeStep.mock.calls.map((a) => a[0] as string);
 
 beforeEach(() => {
   completeStep.mockClear();
-  replayAll.mockClear();
-  restore.mockClear();
-  fetchCurrentRound.mockClear();
-  fetchCurrentRound.mockResolvedValue(null);
+  reopen.mockClear();
+  orchestratorSiteIds.length = 0;
   lastChecklistProps = null;
 });
 
 describe("OnboardingMount — outcomes, not intentions", () => {
+  it("asks for THIS site's state (L1-015 — per user × site, never global)", () => {
+    render(<OnboardingMount composer={fakeComposer() as never} />);
+    expect(orchestratorSiteIds[0]).toBe("site-from-url");
+  });
+
   it("ticks each step off the event that means it actually happened", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
@@ -175,38 +180,20 @@ describe("OnboardingMount — outcomes, not intentions", () => {
   });
 
   describe("work finished before the editor opened", () => {
-    it("a second page and a section seed their rows", () => {
+    /* Seeds are silent: they record what the loaded project already shows,
+       and must not fire the achievement overlay on open. (Review rounds and
+       publishes are derived by the server now, so nothing is fetched here.) */
+    it("a second page and a section seed their rows, silently", () => {
       const c = fakeComposer({ pages: 2, sectionTypes: ["container", "section"] });
       render(<OnboardingMount composer={c as never} />);
       expect(ids()).toEqual(["add-page", "insert-section"]);
+      expect(completeStep.mock.calls.every((a) => (a[1] as { silent?: boolean } | undefined)?.silent === true)).toBe(true);
     });
 
     it("one page of bare elements seeds nothing", () => {
       const c = fakeComposer({ pages: 1, sectionTypes: ["container", "text"] });
       render(<OnboardingMount composer={c as never} />);
       expect(ids()).toEqual([]);
-    });
-
-    it("an existing round seeds send-review; its invite email seeds connect-client", async () => {
-      fetchCurrentRound.mockResolvedValue({ invitedEmail: "client@site.io" });
-      const c = fakeComposer();
-      render(<OnboardingMount composer={c as never} />);
-      await waitFor(() => expect(ids()).toEqual(["send-review", "connect-client"]));
-    });
-
-    it("a round with no invite seeds only send-review", async () => {
-      fetchCurrentRound.mockResolvedValue({ invitedEmail: null });
-      const c = fakeComposer();
-      render(<OnboardingMount composer={c as never} />);
-      await waitFor(() => expect(ids()).toEqual(["send-review"]));
-    });
-
-    it("a failed round fetch seeds nothing and throws nothing", async () => {
-      fetchCurrentRound.mockRejectedValue(new Error("network"));
-      const c = fakeComposer();
-      render(<OnboardingMount composer={c as never} />);
-      await act(async () => {});
-      expect(completeStep).not.toHaveBeenCalled();
     });
 
     it("re-seeds when the project finally arrives, not just at mount", () => {
@@ -219,12 +206,11 @@ describe("OnboardingMount — outcomes, not intentions", () => {
     });
   });
 
-  it("the checklist can be re-opened after it was skipped", () => {
+  it("Site menu → Getting started reopens the checklist — it never resets progress", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
     act(() => c.emit(EVENTS.UI_ONBOARDING_REPLAY, {}));
-    expect(replayAll).toHaveBeenCalledOnce();
-    expect(restore).toHaveBeenCalledOnce();
+    expect(reopen).toHaveBeenCalledOnce();
   });
 
   it("unsubscribes on unmount", () => {
