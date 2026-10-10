@@ -120,6 +120,13 @@ const StatusPill: React.FC<{ status: string; "data-testid"?: string }> = ({ stat
   );
 };
 
+/** A record's public-DNS reading (L3-033) — detected, not the domain's status. */
+const DetectedPill: React.FC<{ detected: boolean; "data-testid"?: string }> = ({ detected, ...rest }) => (
+  <span className={pillClass(detected ? "success" : "warning")} data-status={detected ? "DETECTED" : "NOT_DETECTED"} {...rest}>
+    {detected ? "Detected" : "Not detected"}
+  </span>
+);
+
 // ─── Chrome ──────────────────────────────────────────────────────────────────
 
 const LINE = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
@@ -444,7 +451,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
                     Value
                   </th>
                   <th scope="col" className={`${SET_TH} tw:pr-0`}>
-                    Status
+                    Detected
                   </th>
                 </tr>
               </thead>
@@ -464,13 +471,19 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
                         {rec.value}
                       </td>
                       <td className={`${SET_TD} tw:pr-0`}>
-                        <StatusPill status={rec.verified ? "VERIFIED" : "PENDING"} data-testid={`set-dom-dns-state-${row.id}-${j}`} />
+                        <DetectedPill detected={rec.verified} data-testid={`set-dom-dns-state-${row.id}-${j}`} />
                       </td>
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
+            {/* L3-033: the rows are what this domain REQUIRES (the server's list
+                — Vercel's for this project when connected); the last column is
+                a public-DNS reading, which never decides the domain's status. */}
+            <p className={`${LINE} tw:col-span-full tw:m-0`} data-testid={`set-dom-dns-caption-${row.id}`}>
+              Required records. Detected is what public DNS answers right now.
+            </p>
             <div className="tw:col-span-full">
               <Button
                 type="button"

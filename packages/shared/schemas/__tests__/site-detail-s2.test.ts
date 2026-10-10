@@ -39,12 +39,11 @@ describe("domains", () => {
     expect(domainKindSchema.safeParse("ALIAS").success).toBe(false);
   });
 
-  it("DNS_PROVIDERS lists Namecheap, Cloudflare, GoDaddy and Other with nameservers", () => {
+  it("DNS_PROVIDERS lists Namecheap, Cloudflare, GoDaddy and Other — and states no nameservers (L3-033)", () => {
     expect(DNS_PROVIDERS.map((p) => p.id)).toEqual(["namecheap", "cloudflare", "godaddy", "other"]);
     expect(DNS_PROVIDERS.map((p) => p.label)).toEqual(["Namecheap", "Cloudflare", "GoDaddy", "Other"]);
-    // The frame's Namecheap block: dns1/dns2.registrar-servers.com.
-    expect(DNS_PROVIDERS[0].nameservers).toEqual(["dns1.registrar-servers.com", "dns2.registrar-servers.com"]);
-    expect(DNS_PROVIDERS[3].nameservers).toEqual([]);
+    // A registrar's default pair is not the user's: nothing here may claim one.
+    for (const p of DNS_PROVIDERS) expect(p).not.toHaveProperty("nameservers");
   });
 
   it("domainAvailabilitySchema carries a reason only when unavailable", () => {

@@ -168,10 +168,14 @@ describe("DomainsScreen — 8136:214348, one card per domain", () => {
 
     const dns = screen.getByTestId("set-dom-dns-dom1");
     expect(within(dns).getByRole("table").id).toBe("dom-dns-records");
-    expect(within(dns).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Type", "Name", "Value", "Status"]);
+    expect(within(dns).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Type", "Name", "Value", "Detected"]);
     const row2 = screen.getByTestId("set-dom-dns-row-dom1-2");
     expect(row2).toHaveTextContent("_buildrick");
-    expect(within(row2).getByText("PENDING").closest("[data-status]")).toHaveClass("tw:bg-[var(--bk-yellow-100)]");
+    expect(within(row2).getByText("Not detected").closest("[data-status]")).toHaveClass("tw:bg-[var(--bk-yellow-100)]");
+    // L3-033: the rows are what the domain REQUIRES; the column is what DNS answers now.
+    expect(within(dns).getByTestId("set-dom-dns-caption-dom1")).toHaveTextContent(
+      "Required records. Detected is what public DNS answers right now.",
+    );
 
     fireEvent.click(screen.getByTestId("set-dom-back"));
     expect(screen.getByTestId("set-dom-item-dom1")).toBeInTheDocument();
@@ -283,7 +287,7 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
     expect(screen.getByTestId("set-dom-check-dom1")).toBeDisabled();
     await waitFor(() => expect(d.check.mutate).toHaveBeenCalledWith({ id: "dom1", siteId: "s1" }));
     await waitFor(() =>
-      expect(within(screen.getByTestId("set-dom-dns-row-dom1-2")).getByText("VERIFIED")).toBeInTheDocument(),
+      expect(within(screen.getByTestId("set-dom-dns-row-dom1-2")).getByText("Detected")).toBeInTheDocument(),
     );
     expect(d.list.query).toHaveBeenCalledTimes(2);
     expect(screen.getByTestId("set-dom-check-dom1")).toHaveTextContent("Check DNS");
@@ -295,7 +299,7 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
     await manage();
     fireEvent.click(screen.getByTestId("set-dom-check-dom1"));
     await waitFor(() => expect(screen.getByTestId("set-save-error")).toBeInTheDocument());
-    expect(within(screen.getByTestId("set-dom-dns-row-dom1-2")).getByText("PENDING")).toBeInTheDocument();
+    expect(within(screen.getByTestId("set-dom-dns-row-dom1-2")).getByText("Not detected")).toBeInTheDocument();
     expect(d.list.query).toHaveBeenCalledTimes(1);
   });
 

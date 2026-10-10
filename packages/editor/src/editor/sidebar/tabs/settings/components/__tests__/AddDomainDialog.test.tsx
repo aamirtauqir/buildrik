@@ -60,11 +60,10 @@ describe("Clone 3737:43669 · Add a domain — the frame's shape", () => {
     expect(Array.from(provider.options).map((o) => o.textContent)).toEqual(["Namecheap", "Cloudflare", "GoDaddy", "Other"]);
     expect(dialog).toHaveTextContent("Cloudflare, GoDaddy and Other are also supported.");
 
-    expect(dialog).toHaveTextContent("Read-only · set at your registrar");
-    expect(screen.getByTestId("set-dom-ns")).toHaveTextContent("dns1.registrar-servers.com");
-    expect(screen.getByTestId("set-dom-ns")).toHaveTextContent("dns2.registrar-servers.com");
+    expect(dialog).toHaveTextContent("No change needed");
+    expect(screen.getByTestId("set-dom-ns")).not.toHaveTextContent("registrar-servers.com");
 
-    expect(dialog).toHaveTextContent("Add these at Namecheap");
+    expect(dialog).toHaveTextContent("Required · add these at Namecheap");
     const records = screen.getByTestId("set-dom-records");
     expect(within(records).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Type", "Name", "Value"]);
     const rows = within(records).getAllByRole("row").slice(1);
@@ -96,14 +95,36 @@ describe("Clone 3737:43669 · Add a domain — the frame's shape", () => {
     expect(screen.getByTestId("set-dom-kind-redirect")).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("the provider drives the nameservers block and the records note; Other has none to list", () => {
+  it("L3-033: no registrar nameserver values are stated as fact — the block says to keep the registrar's own, for every provider", () => {
     mount();
+    for (const id of ["namecheap", "cloudflare", "godaddy", "other"]) {
+      fireEvent.change(screen.getByTestId("set-dom-provider"), { target: { value: id } });
+      const ns = screen.getByTestId("set-dom-ns");
+      expect(ns).toHaveTextContent("Keep the nameservers your registrar already uses");
+      expect(ns.textContent).not.toMatch(/registrar-servers|domaincontrol|ns\.cloudflare|\bdns\d/);
+    }
     fireEvent.change(screen.getByTestId("set-dom-provider"), { target: { value: "godaddy" } });
-    expect(screen.getByTestId("set-dom-ns")).toHaveTextContent("domaincontrol.com");
-    expect(screen.getByTestId("set-dom-dialog")).toHaveTextContent("Add these at GoDaddy");
+    expect(screen.getByTestId("set-dom-dialog")).toHaveTextContent("Required · add these at GoDaddy");
     fireEvent.change(screen.getByTestId("set-dom-provider"), { target: { value: "other" } });
-    expect(screen.getByTestId("set-dom-ns")).toHaveTextContent("Set at your registrar.");
-    expect(screen.getByTestId("set-dom-dialog")).toHaveTextContent("Add these at your registrar");
+    expect(screen.getByTestId("set-dom-dialog")).toHaveTextContent("Required · add these at your registrar");
+  });
+
+  it("L3-033: with Vercel connected the A/CNAME values are Vercel's to assign — no guessed value is drawn", () => {
+    mount({ vercelConnected: true });
+    typeName("bellacucina.com");
+    const records = screen.getByTestId("set-dom-records");
+    expect(records).not.toHaveTextContent("76.76.21.21");
+    expect(records).not.toHaveTextContent("cname.vercel-dns.com");
+    expect(records).toHaveTextContent("Shown after you add the domain");
+    expect(screen.getByTestId("set-dom-records-source")).toHaveTextContent(/Vercel/);
+  });
+
+  it("L3-033: without Vercel the records are exactly what connect writes (Buildrik's targets)", () => {
+    mount();
+    typeName("bellacucina.com");
+    const records = screen.getByTestId("set-dom-records");
+    expect(records).toHaveTextContent("76.76.21.21");
+    expect(records).toHaveTextContent("cname.vercel-dns.com");
   });
 
   it("names the dialog without a site when none is known, and renders nothing while closed", () => {
