@@ -23,7 +23,7 @@ vi.mock("@/services/ai/subscriptionClient", () => ({
   getAiSubscriptionClient: () => ({ ai: { streamPrompt: { subscribe } } }),
 }));
 
-import { runPromptOnce, AiRunError } from "../runPromptOnce";
+import { runPromptOnce, AiRunError, AI_URL_BUDGET } from "../runPromptOnce";
 
 const args = { prompt: "p", scope: { kind: "page" as const }, model: "gpt-4o-mini" as const, intent: "style-command" as const };
 
@@ -85,5 +85,40 @@ describe("runPromptOnce", () => {
       await expect(p).rejects.toBeInstanceOf(AiRunError);
       expect(unsubscribe).toHaveBeenCalledTimes(1);
     });
+  });
+});
+
+/* L2-037: the subscription is an SSE GET, so the whole input rides in the URL.
+   A site with a full brand token set sent ~17 KB (9.5 KB of tokens) and the
+   server refused the request line — 431 — which the panel can only draw as
+   "The AI service didn't respond". The scope is trimmed to fit, recall lists
+   first (tokens, then assets), the site's own tokens kept longest. */
+describe("runPromptOnce — the request fits in a URL (L2-037)", () => {
+  const token = (i: number) => ({ id: `tok-${i}`, name: `Colour ${i} long descriptive name`, value: "#1A56DB", type: "color" });
+  const asset = (i: number) => ({ id: `a-${i}`, url: `https://example.com/media/${"x".repeat(60)}-${i}.jpg`, name: `asset ${i}` });
+  const encodedLength = (input: unknown) => encodeURIComponent(JSON.stringify(input)).length;
+
+  it("leaves a small scope untouched", () => {
+    const scope = { kind: "element" as const, id: "el-1", tokens: [token(1)], assets: [asset(1)] };
+    void runPromptOnce({ ...args, scope });
+    expect(subscribe.mock.calls[0][0]).toMatchObject({ scope });
+  });
+
+  it("trims recall lists until the encoded input fits the budget, keeping the first tokens", () => {
+    const scope = {
+      kind: "element" as const,
+      id: "el-1",
+      context: { type: "heading", text: "Product Designer" },
+      tokens: Array.from({ length: 120 }, (_, i) => token(i)),
+      assets: Array.from({ length: 100 }, (_, i) => asset(i)),
+    };
+    expect(encodedLength(scope)).toBeGreaterThan(AI_URL_BUDGET);
+    void runPromptOnce({ ...args, scope });
+    const sent = subscribe.mock.calls[0][0] as { scope: typeof scope };
+    expect(encodedLength(sent)).toBeLessThanOrEqual(AI_URL_BUDGET);
+    expect(sent.scope.id).toBe("el-1");
+    expect(sent.scope.context).toEqual(scope.context);
+    expect(sent.scope.tokens.length).toBeGreaterThan(0);
+    expect(sent.scope.tokens[0]).toEqual(token(0));
   });
 });

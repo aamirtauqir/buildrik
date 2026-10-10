@@ -497,13 +497,12 @@ describe("syncInstance — override survival across master re-clone", () => {
 
     expect((await syncInstance(c, maps, instanceId)).synced).toBe(true);
 
-    // Old instance element replaced in place under the page root — fully
-    // deregistered from the ElementManager registry, not merely detached.
-    expect(manager.getElement(instanceId)).toBeUndefined();
-    expect(maps.instances.has(instanceId)).toBe(false);
+    // Instance rebuilt in place under the page root, KEEPING its element id
+    // (L2-015): deep links, comments and selections point at it.
     const root = manager.getElement(page.root.id)!;
     expect(root.getChildCount()).toBe(1);
     const fresh = root.getChildren()[0];
+    expect(fresh.getId()).toBe(instanceId);
     const freshInstance = maps.instances.get(fresh.getId())!;
     expect(freshInstance.syncedVersion).toBe(2);
     expect(fresh.getCustomData("componentInstance")).toBe(freshInstance);
@@ -527,17 +526,52 @@ describe("syncInstance — override survival across master re-clone", () => {
   it("deregisters the OLD instance subtree on sync — no leaked elements", async () => {
     const { manager, maps, instanceId, component, c } = await seed();
     const oldEl = manager.getElement(instanceId)!;
-    const oldIds = [oldEl.getId(), ...oldEl.getDescendants().map((e) => e.getId())];
-    expect(oldIds.length).toBeGreaterThan(1);
+    const oldObjects = [oldEl, ...oldEl.getDescendants()];
+    expect(oldObjects.length).toBeGreaterThan(1);
+    const before = manager.getAllElements().length;
 
     component.version = 2;
     expect((await syncInstance(c, maps, instanceId)).synced).toBe(true);
 
-    // None of the old clone's Element objects remain in the registry.
-    const liveIds = new Set(manager.getAllElements().map((e) => e.getId()));
-    for (const id of oldIds) {
-      expect(liveIds.has(id)).toBe(false);
-    }
+    // None of the old clone's Element objects remain in the registry, and the
+    // registry did not grow: the rebuild replaced them one for one.
+    const live = new Set(manager.getAllElements());
+    for (const obj of oldObjects) expect(live.has(obj)).toBe(false);
+    expect(manager.getAllElements()).toHaveLength(before);
+  });
+
+  /* L2-015: an update used to give every instance element a new id, so
+     "Copy link" (?el=), located comments and the selection all lost their
+     target. Ids now carry over by position — the same key the overrides use. */
+  it("keeps every element id across a master update, by position", async () => {
+    const { manager, maps, instanceId, component, c } = await seed();
+    const oldEl = manager.getElement(instanceId)!;
+    const idsBefore = [oldEl.getId(), ...oldEl.getDescendants().map((e) => e.getId())];
+
+    component.masterTree.styles = { color: "#222" };
+    component.version = 2;
+    expect((await syncInstance(c, maps, instanceId)).synced).toBe(true);
+
+    const fresh = manager.getElement(instanceId)!;
+    expect(fresh.getStyle("color")).toBe("#222");
+    expect([fresh.getId(), ...fresh.getDescendants().map((e) => e.getId())]).toEqual(idsBefore);
+  });
+
+  it("a node the master adds gets a new id; a changed type does not inherit the old one", async () => {
+    const { manager, maps, instanceId, component, c } = await seed();
+    const oldTitleId = manager.getElement(instanceId)!.getChildren()[0].getId();
+    component.masterTree.children = [
+      { id: "master-p", type: "paragraph", tagName: "p", content: "Now a paragraph", children: [] },
+      ...component.masterTree.children!.slice(1),
+      { id: "master-new", type: "heading", tagName: "h3", content: "Added", children: [] },
+    ];
+    component.version = 2;
+    expect((await syncInstance(c, maps, instanceId)).synced).toBe(true);
+
+    const kids = manager.getElement(instanceId)!.getChildren();
+    expect(kids).toHaveLength(3);
+    expect(kids[0].getId()).not.toBe(oldTitleId);
+    expect(new Set(manager.getAllElements().map((e) => e.getId())).size).toBe(manager.getAllElements().length);
   });
 
   it("syncAllInstances brings every stale instance of the component up to date", async () => {

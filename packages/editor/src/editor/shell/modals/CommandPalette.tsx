@@ -277,6 +277,9 @@ function buildCommands(
     /* The footer flyout's third row (⌘2). Canvas has always listened for
        ZOOM_SELECTION; nothing emitted it (DQ-003). */
     { id: "view-zoom-selection", label: "Zoom to selection", group: "More", shortcut: "Ctrl+2", handler: run(() => composer.emit(EVENTS.ZOOM_SELECTION, {})) },
+    /* The registry's chordless "Reset zoom" printed nothing although ⌘0 works
+       (the flyout binds it). The row prints the flyout's chord, like fit's. */
+    { id: "view-zoom-100", label: "Reset zoom", group: "More", shortcut: "Ctrl+0", handler: run(() => composer.setZoom(100)) },
     {
       id: "history-clear",
       label: "Clear history",
@@ -296,6 +299,7 @@ function buildCommands(
     },
   );
   used.add("redo");
+  used.add("zoom-reset");
 
   /* Carried over from the canvas palette, flag-gated the same way StudioHeader
      gates the Collaborate CTA. Not a registry command: it needs the site id
