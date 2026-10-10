@@ -1,6 +1,7 @@
 /**
- * FirstUseTip — board 7054:78348 ("💡 Tip 1/4 · Drag ⠿ to place an element
- * exactly · Got it"), opened a moment after the Add panel opens (4418:99611's
+ * FirstUseTip — board 7054:78348 ("Tip 1/4" behind icon/lightbulb 8274:2288 ·
+ * Drag ⠿ to place an element exactly · Got it; the 💡 emoji was replaced by
+ * the icon, DQ-026, owner 2026-10-10), opened a moment after the Add panel opens (4418:99611's
  * AFTER reaction) beside the panel's lower edge. Replaces the persistent tips
  * strip (G2-113: one first-use surface, no strip). "Got it", Esc and a click
  * outside all close it; each tip is shown once, per browser.
@@ -8,6 +9,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Lightbulb } from "lucide-react";
 import { Button, Portal } from "@/editor/chrome-ui";
 import { safeGet, safeSet } from "@/shared/utils/safeStorage";
 import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
@@ -65,7 +67,7 @@ export function FirstUseTip({ anchorRef }: { anchorRef: React.RefObject<HTMLElem
         style={{ left: pos.left, bottom: pos.bottom }}
       >
         <span className="tw:flex tw:items-center tw:gap-1.5 tw:text-[length:var(--bk-text-12)] tw:font-semibold tw:text-[var(--bk-ink)]">
-          <span aria-hidden="true">💡</span>
+          <Lightbulb size={14} strokeWidth={2} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" data-testid="insert-first-use-tip-icon" />
           {`Tip ${tipIdx + 1}/${TIPS.length}`}
         </span>
         <span className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-soft)]" data-testid="insert-first-use-tip-body">

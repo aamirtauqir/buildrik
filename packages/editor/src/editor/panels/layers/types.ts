@@ -17,6 +17,8 @@ export interface LayersPanelProps {
   canvasHoveredId?: string | null;
   /** Controlled search value lifted to LayersTab (prototype panel-h shape). */
   search?: string;
+  /** Clears the lifted search (the no-results state's "Clear search"). */
+  onClearSearch?: () => void;
   /** Selection mode (LayersTab's Select / Done): rows show their checkbox
    *  and a row click toggles it. Off = no checkboxes. */
   selecting?: boolean;

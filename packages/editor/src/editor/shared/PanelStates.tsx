@@ -29,8 +29,10 @@ const StateGlyph = () => (
   </svg>
 );
 
-/** Glyph, "Nothing here yet", one line — and an optional action under it. */
-export const PanelStateMessage: React.FC<{ message: string; padTop: string; testId: string; children?: React.ReactNode }> = ({
+/** Glyph, a title ("Nothing here yet" unless the panel names its own), one
+ *  line — and an optional action under it. */
+export const PanelStateMessage: React.FC<{ title?: string; message: string; padTop: string; testId: string; children?: React.ReactNode }> = ({
+  title = "Nothing here yet",
   message,
   padTop,
   testId,
@@ -38,7 +40,7 @@ export const PanelStateMessage: React.FC<{ message: string; padTop: string; test
 }) => (
   <div className={`tw:flex tw:flex-col tw:items-center tw:gap-2 tw:px-4 tw:text-center ${padTop}`} data-testid={testId} role="status">
     <StateGlyph />
-    <p className="tw:m-0 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">Nothing here yet</p>
+    <p className="tw:m-0 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]" data-testid={`${testId}-title`}>{title}</p>
     <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid={`${testId}-text`}>{message}</p>
     {children}
   </div>
@@ -76,11 +78,12 @@ export const PanelLoadError: React.FC<{ title: string; rest: string; testId: str
   </div>
 );
 
-/* The no-results block plus one outlined hand-off to ⌘K, "Search everywhere
-   for “carousel”  ⌘K". Clearing the query is the topbar field's own ✕ /
-   Escape. */
+/* The no-results block, an optional "Clear search" (Layers 4418:83498 since
+   L2-031, owner 2026-10-10), plus one outlined hand-off to ⌘K, "Search
+   everywhere for “carousel”  ⌘K". */
 export const PanelNoResults: React.FC<{
   search: string;
+  title?: string;
   message: string;
   testId: string;
   everywhereTestId: string;
@@ -88,8 +91,14 @@ export const PanelNoResults: React.FC<{
    *  (-4), Pages 4418:95333 sets it 24 lower. */
   actionOffset?: string;
   onSearchEverywhere?: (query: string) => void;
-}> = ({ search, message, testId, everywhereTestId, actionOffset = "tw:-mt-1", onSearchEverywhere }) => (
-  <PanelStateMessage message={message} padTop="tw:pt-10" testId={testId}>
+  onClear?: () => void;
+}> = ({ search, title, message, testId, everywhereTestId, actionOffset = "tw:-mt-1", onSearchEverywhere, onClear }) => (
+  <PanelStateMessage title={title} message={message} padTop="tw:pt-10" testId={testId}>
+    {onClear && (
+      <Button type="button" color="light" size="sm" className="tw:h-8 tw:px-3 tw:text-[13px] tw:focus:ring-0" data-testid={`${testId}-clear`} onClick={onClear}>
+        Clear search
+      </Button>
+    )}
     {onSearchEverywhere && (
       <Button
         type="button"

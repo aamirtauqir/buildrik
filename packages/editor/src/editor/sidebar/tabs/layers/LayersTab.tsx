@@ -280,6 +280,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               onLayerHover={handleLayerHover}
               canvasHoveredId={canvasHoveredId}
               search={search}
+              onClearSearch={() => setSearch("")}
               selecting={selecting}
               displaySettingsOpen={displaySettingsOpen}
               onDisplaySettingsToggle={() => setDisplaySettingsOpen((v) => !v)}

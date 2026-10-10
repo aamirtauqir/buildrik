@@ -127,6 +127,7 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 - **Display / Hero (marketing site only):** `General Sans` (Fontshare). 600–700 weight for hero copy.
 - **Body + Editor UI + Dashboard (primary workhorse):** `Inter`. The editor chrome moved from Inter Tight to Inter on 2026-07-26 with the DS replacement — the Figma foundation ("Buildrick — Product", `g4GzQFqzNYz5sosz1QtZXC`) sets every ui/* style in Inter. Used for every label, button, input, breadcrumb, panel title, row label in the editor.
 - **Data / Inspector values / mono content:** `Geist Mono` with `font-variant-numeric: tabular-nums`. Required for dimensions, timestamps, slugs, file sizes, page counts.
+- **Words beside data stay Inter.** A label that sits next to mono values is still a label: the Inspector spacing box's "Margin" / "Padding" ring labels are **Inter 11/500** (`ui/11 · caption medium`, ink-muted) while the side values around them are Geist Mono. Mono is for the value, never for the word naming it (DQ-015, owner 2026-10-10; board `8092:211005` / `8092:211011` corrected the same day — it had drawn the labels in Geist Mono 12).
 - **Loading:** Bunny Fonts CDN with `font-display: swap` in dev. Self-host in production. No `@font-face` redefinitions in individual components.
 - **Auth/onboarding:** still on `Inter Tight` until their own reskin lands; Geist Mono remains the data face everywhere.
 
@@ -402,7 +403,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 3. No 3-column feature grid with icons in colored circles.
 4. No centered-everything sections.
 5. No decorative blobs, wavy SVG dividers, floating circles.
-6. No emoji as design elements.
+6. No emoji as design elements. Use the icon system instead — e.g. the first-use tip's 💡 became `icon/lightbulb` (Lucide `Lightbulb`, Figma `8274:2288`) on 2026-10-10 (DQ-026).
 7. No colored left-border card treatment.
 8. No default font stacks. No specific named fallbacks (`Helvetica`, `Arial`, `system-ui`).
 9. Cards earn their existence. If it's not interactive, don't wrap it in a card.

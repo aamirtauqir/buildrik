@@ -32,6 +32,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   onLayerHover,
   canvasHoveredId,
   search,
+  onClearSearch,
   selecting = false,
   displaySettingsOpen,
   onDisplaySettingsToggle,
@@ -505,6 +506,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           <LayersNoResults
             search={state.search}
             onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
+            onClear={onClearSearch}
           />
         )}
 

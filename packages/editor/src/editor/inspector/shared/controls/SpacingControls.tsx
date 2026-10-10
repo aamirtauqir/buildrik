@@ -194,7 +194,9 @@ export interface SpacingBoxProps {
   composer?: Composer | null;
 }
 
-const BOX_TAG = "tw:absolute tw:left-0 tw:top-0 tw:[font-family:var(--bk-font-mono)] tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* Ring labels are words, not data: Inter 11/500 (board 8092:211005/211011,
+   DQ-015, owner 2026-10-10). The numbers beside them stay Geist Mono. */
+const BOX_TAG = "tw:absolute tw:left-0 tw:top-0 tw:[font-family:var(--bk-font-ui)] tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /** One ring: its label, top number, [left · inner · right], bottom number. */
 function Ring(p: {
