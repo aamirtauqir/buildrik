@@ -203,6 +203,16 @@ describe("PreviewOverlay — pages", () => {
       expect(input).toHaveAttribute("aria-invalid", "true");
     });
 
+    it("a refused entry does not survive closing and reopening", () => {
+      const { rerender } = render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
+      const input = screen.getByRole("textbox", { name: "Preview width in px" });
+      fireEvent.change(input, { target: { value: "50" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+      rerender(<PreviewOverlay html={null} onDone={vi.fn()} siteId="s1" />);
+      rerender(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
+      expect(screen.getByRole("textbox", { name: "Preview width in px" })).toHaveValue("1280");
+    });
+
     it("remembers the choice per site", () => {
       const { unmount } = render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="s1" />);
       const input = screen.getByRole("textbox", { name: "Preview width in px" });

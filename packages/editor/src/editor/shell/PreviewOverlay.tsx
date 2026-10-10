@@ -171,7 +171,10 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
     [siteId],
   );
   const [draft, setDraft] = React.useState(() => widthDigits(width));
-  React.useEffect(() => setDraft(widthDigits(width)), [width]);
+  /* The field shows the width in force — again on every open, so a refused
+     entry from the last visit does not greet the next one. */
+  const isOpen = html != null;
+  React.useEffect(() => setDraft(widthDigits(width)), [width, isOpen]);
   const draftNumber = Number.parseInt(draft, 10);
   const draftValid =
     draft === "" || (draftNumber >= CUSTOM_WIDTH_RANGE.min && draftNumber <= CUSTOM_WIDTH_RANGE.max);
