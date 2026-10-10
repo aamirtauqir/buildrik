@@ -1,8 +1,11 @@
 /**
- * P7 — auto-fire AI alt-text generation after image upload.
+ * P7 — auto-fire AI alt-text generation after image upload — only when the
+ * workspace opted in (L4-007, owner 2026-10-10: automatic paid alt text is a
+ * workspace toggle, OFF by default; the on-demand Generate stays).
  *
  * Subscribes to `MEDIA_EVENTS.UPLOAD_COMPLETE` once at mount. For each
- * successful image upload that:
+ * successful image upload, while the workspace's automatic alt text is on,
+ * that:
  *   - made it to the server (has `serverId`, `localOnly === false`)
  *   - has no user-typed alt text yet
  *
@@ -24,7 +27,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 import type { MediaAsset } from "@/shared/types/media";
-import { generateAltTextRemote } from "@/services/AltTextService";
+import { autoAltTextEnabled, generateAltTextRemote } from "@/services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 
 interface UploadCompletePayload {
@@ -50,8 +53,9 @@ export function useAltTextAutoTrigger(composer: Composer | null): void {
       if (!event?.success || !event.asset) return;
       const asset = event.asset;
       if (!shouldAutoGenerate(asset)) return;
+      if (!(await autoAltTextEnabled())) return;
 
-      const result = await generateAltTextRemote(asset.serverId as string);
+      const result = await generateAltTextRemote(asset.serverId as string, { trigger: "auto" });
       if (!result || result.skipped) return;
 
       // Re-check at write time: if the user typed alt text between the

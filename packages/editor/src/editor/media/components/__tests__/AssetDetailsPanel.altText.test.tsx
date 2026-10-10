@@ -114,6 +114,8 @@ describe("AssetDetailsPanel — alt text section (P7)", () => {
     const button = getByTestId("alt-text-regenerate");
     expect(button.textContent).toMatch(/Generate/);
     expect(button.textContent).not.toMatch(/Regenerate/);
+    // L4-007: the cost is said before the click.
+    expect(button).toHaveAttribute("title", "Uses 1 AI credit from your daily limit");
   });
 
   it("4418:58292: filled alt text sits in the board's box with 'Regenerate', even without provenance", () => {

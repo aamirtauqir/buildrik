@@ -164,6 +164,14 @@ describe("MediaCommandLayer.replaceMedia — alt text", () => {
     expect(elementState["img-1"].alt).toBe("Typed by the user");
   });
 
+  it("L4-007: a decorative image (alt=\"\") stays decorative when its file is replaced", () => {
+    const { composer, elementState } = makeStubComposer({
+      elementsBySrc: [{ id: "img-1", src: "old.png", alt: "" }],
+    });
+    new MediaCommandLayer(composer).replaceMedia("img-1", "https://cdn/new.png", { alt: "A blue kayak" });
+    expect(elementState["img-1"]).toMatchObject({ src: "https://cdn/new.png", alt: "" });
+  });
+
   it("leaves alt alone on a background-image element", () => {
     const { composer, elementState } = makeStubComposer({
       elementsBySrc: [{ id: "hero", bgImage: "url(old.png)", alt: "kept" }],

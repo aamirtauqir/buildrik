@@ -6,7 +6,15 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    site: {
+      findUnique: vi.fn(),
+    },
   },
+}));
+
+const isFeatureEnabledMock = vi.fn();
+vi.mock("@/server/services/feature-flag.service", () => ({
+  isFeatureEnabled: (...a: unknown[]) => isFeatureEnabledMock(...a),
 }));
 
 const checkSiteRoleMock = vi.fn();
@@ -324,6 +332,102 @@ describe("alt-text.service", () => {
       await expect(applyAltTextToAsset("u1", "a1")).rejects.toMatchObject({ code: "NOT_CONFIGURED" });
       expect(reserveQuotaMock).not.toHaveBeenCalled();
       expect(mockCompletionsCreate).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── L4-007: automatic generation is an opt-in, deduped per asset ───────
+
+  describe("applyAltTextToAsset — automatic trigger (L4-007)", () => {
+    const SITE_ASSET = { ...SAMPLE_ASSET, siteId: "s1", generatedMetadata: null };
+
+    it("does nothing — no provider call, no quota — while the workspace toggle is off (the default)", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValueOnce(SITE_ASSET as any);
+      vi.mocked(prisma.site.findUnique).mockResolvedValueOnce({ workspaceId: "ws1" } as any);
+      isFeatureEnabledMock.mockResolvedValueOnce(false);
+
+      const result = await applyAltTextToAsset("u1", "a1", { trigger: "auto" });
+
+      expect(result).toEqual({ altText: "", skipped: true, reason: "AUTO_OFF" });
+      expect(isFeatureEnabledMock).toHaveBeenCalledWith("ws1", "auto_alt_text");
+      expect(reserveQuotaMock).not.toHaveBeenCalled();
+      expect(mockCompletionsCreate).not.toHaveBeenCalled();
+    });
+
+    it("an asset with no site has no workspace to opt in — skipped", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValueOnce({ ...SITE_ASSET, siteId: null } as any);
+
+      const result = await applyAltTextToAsset("u1", "a1", { trigger: "auto" });
+
+      expect(result.reason).toBe("AUTO_OFF");
+      expect(mockCompletionsCreate).not.toHaveBeenCalled();
+    });
+
+    it("toggle on: generates once, charging one unit", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique)
+        .mockResolvedValueOnce(SITE_ASSET as any)
+        .mockResolvedValueOnce({ userId: "u1", altText: null } as any);
+      vi.mocked(prisma.site.findUnique).mockResolvedValueOnce({ workspaceId: "ws1" } as any);
+      isFeatureEnabledMock.mockResolvedValueOnce(true);
+      mockCompletionsCreate.mockResolvedValueOnce(SAMPLE_RESPONSE);
+      vi.mocked(prisma.mediaAsset.update).mockResolvedValue({} as any);
+
+      const result = await applyAltTextToAsset("u1", "a1", { trigger: "auto" });
+
+      expect(result).toEqual({ altText: "A sunset over mountains.", skipped: false, model: "gpt-4o-mini" });
+      expect(reserveQuotaMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("dedupes per asset: an asset the model already described is never auto-generated again", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValueOnce({
+        ...SITE_ASSET,
+        generatedMetadata: { altText: { generatedAt: "2026-10-09T00:00:00Z", model: "gpt-4o-mini" } },
+      } as any);
+      vi.mocked(prisma.site.findUnique).mockResolvedValueOnce({ workspaceId: "ws1" } as any);
+      isFeatureEnabledMock.mockResolvedValueOnce(true);
+
+      const result = await applyAltTextToAsset("u1", "a1", { trigger: "auto" });
+
+      expect(result.reason).toBe("ALREADY_GENERATED");
+      expect(reserveQuotaMock).not.toHaveBeenCalled();
+      expect(mockCompletionsCreate).not.toHaveBeenCalled();
+    });
+
+    it("dedupes concurrent requests for one asset into one provider call", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockImplementation((async (args: { select?: { url?: boolean } }) =>
+        args.select?.url ? SAMPLE_ASSET : { userId: "u1", altText: null }) as any);
+      let release!: (v: unknown) => void;
+      mockCompletionsCreate.mockReturnValueOnce(new Promise((r) => (release = r)));
+      vi.mocked(prisma.mediaAsset.update).mockResolvedValue({} as any);
+
+      const first = applyAltTextToAsset("u1", "a1");
+      const second = applyAltTextToAsset("u1", "a1");
+      await vi.waitFor(() => expect(mockCompletionsCreate).toHaveBeenCalledTimes(1));
+      release(SAMPLE_RESPONSE);
+
+      await expect(first).resolves.toMatchObject({ altText: "A sunset over mountains." });
+      await expect(second).resolves.toMatchObject({ altText: "A sunset over mountains." });
+      expect(mockCompletionsCreate).toHaveBeenCalledTimes(1);
+      expect(reserveQuotaMock).toHaveBeenCalledTimes(1);
+      vi.mocked(prisma.mediaAsset.findUnique).mockReset();
+    });
+
+    it("on demand (manual) ignores the toggle — Generate stays available with it off", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique)
+        .mockResolvedValueOnce(SITE_ASSET as any)
+        .mockResolvedValueOnce({ userId: "u1", altText: null } as any);
+      mockCompletionsCreate.mockResolvedValueOnce(SAMPLE_RESPONSE);
+      vi.mocked(prisma.mediaAsset.update).mockResolvedValue({} as any);
+
+      const result = await applyAltTextToAsset("u1", "a1");
+
+      expect(result.skipped).toBe(false);
+      expect(isFeatureEnabledMock).not.toHaveBeenCalled();
     });
   });
 });

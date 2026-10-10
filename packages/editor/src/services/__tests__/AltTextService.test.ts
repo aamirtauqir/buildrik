@@ -8,6 +8,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mocks = {
   generateAltTextMutate: vi.fn(),
+  featuresList: vi.fn(),
 };
 
 vi.mock("../api-client", () => ({
@@ -17,10 +18,42 @@ vi.mock("../api-client", () => ({
         mutate: (...args: any[]) => mocks.generateAltTextMutate(...args),
       },
     },
+    features: {
+      list: { query: () => mocks.featuresList() },
+    },
   }),
 }));
 
-import { generateAltTextRemote, __resetAltTextClient } from "../AltTextService";
+import { autoAltTextEnabled, generateAltTextRemote, __resetAltTextClient } from "../AltTextService";
+
+describe("AltTextService.autoAltTextEnabled (L4-007)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    __resetAltTextClient();
+  });
+
+  it("reads the workspace's auto_alt_text flag", async () => {
+    mocks.featuresList.mockResolvedValueOnce({ agency_layer: false, client_mode: false, auto_alt_text: true });
+    await expect(autoAltTextEnabled()).resolves.toBe(true);
+  });
+
+  it("is off when the flag is off, absent, or unreadable — an opt-in is never assumed", async () => {
+    mocks.featuresList.mockResolvedValueOnce({ agency_layer: true, client_mode: false, auto_alt_text: false });
+    await expect(autoAltTextEnabled()).resolves.toBe(false);
+    __resetAltTextClient();
+    mocks.featuresList.mockResolvedValueOnce({ agency_layer: true });
+    await expect(autoAltTextEnabled()).resolves.toBe(false);
+    __resetAltTextClient();
+    mocks.featuresList.mockRejectedValueOnce(new Error("401"));
+    await expect(autoAltTextEnabled()).resolves.toBe(false);
+  });
+
+  it("asks the server once per short window, not once per file in a bulk drop", async () => {
+    mocks.featuresList.mockResolvedValue({ auto_alt_text: true });
+    await Promise.all([autoAltTextEnabled(), autoAltTextEnabled(), autoAltTextEnabled()]);
+    expect(mocks.featuresList).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe("AltTextService.generateAltTextRemote", () => {
   beforeEach(() => {
@@ -51,6 +84,12 @@ describe("AltTextService.generateAltTextRemote", () => {
     expect(mocks.generateAltTextMutate).toHaveBeenLastCalledWith({ assetId: "a1", force: true });
     await generateAltTextRemote("a1");
     expect(mocks.generateAltTextMutate).toHaveBeenLastCalledWith({ assetId: "a1" });
+  });
+
+  it("the upload hook's call is marked automatic and can never force", async () => {
+    mocks.generateAltTextMutate.mockResolvedValue({ altText: "", skipped: true, reason: "AUTO_OFF" });
+    await generateAltTextRemote("a1", { trigger: "auto" });
+    expect(mocks.generateAltTextMutate).toHaveBeenLastCalledWith({ assetId: "a1", trigger: "auto" });
   });
 
   it("returns skipped=true when the server preserved a user-typed value", async () => {

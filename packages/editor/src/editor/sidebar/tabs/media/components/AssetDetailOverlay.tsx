@@ -42,6 +42,7 @@ import {
 } from "@/services/MediaVersionService";
 import { Button, PanelFrame, Textarea, useFocusTrap } from "@/editor/chrome-ui";
 import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
+import { ALT_TEXT_CREDIT_HINT } from "@/shared/constants/media";
 
 type View = "hub" | "used" | "versions";
 
@@ -410,6 +411,7 @@ export function AssetDetailOverlay({
                     variant="link"
                     className="tw:min-h-5 tw:self-start tw:text-[length:var(--bk-text-12)]"
                     data-testid="media-alt-generate"
+                    title={ALT_TEXT_CREDIT_HINT}
                     disabled={altBusy}
                     aria-busy={altBusy || undefined}
                     onClick={generateAlt}

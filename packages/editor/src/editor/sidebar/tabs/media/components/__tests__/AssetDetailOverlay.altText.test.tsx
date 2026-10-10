@@ -38,6 +38,8 @@ describe("AssetDetailOverlay — G3-022 alt text Generate", () => {
     const { unmount } = mount(base, vi.fn());
     expect(screen.getByTestId("media-alt-generate")).toHaveTextContent("Generate");
     expect(screen.getByTestId("media-alt-generate")).not.toHaveTextContent("Regenerate");
+    // L4-007: the cost is said before the click.
+    expect(screen.getByTestId("media-alt-generate")).toHaveAttribute("title", "Uses 1 AI credit from your daily limit");
     unmount();
     mount({ ...base, altText: "A plate of pasta" }, vi.fn());
     expect(screen.getByTestId("media-alt-generate")).toHaveTextContent("Regenerate");

@@ -11,10 +11,12 @@ import { renderHook, act } from "@testing-library/react";
 
 const mocks = {
   generateAltTextRemote: vi.fn(),
+  autoAltTextEnabled: vi.fn(),
 };
 
 vi.mock("@/services/AltTextService", () => ({
   generateAltTextRemote: (...args: any[]) => mocks.generateAltTextRemote(...args),
+  autoAltTextEnabled: () => mocks.autoAltTextEnabled(),
 }));
 
 import { useAltTextAutoTrigger } from "../useAltTextAutoTrigger";
@@ -94,6 +96,24 @@ async function flushMicrotasks() {
 describe("useAltTextAutoTrigger", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.autoAltTextEnabled.mockResolvedValue(true);
+  });
+
+  it("L4-007: with the workspace's automatic alt text off (the default) an upload costs nothing — no request", async () => {
+    mocks.autoAltTextEnabled.mockResolvedValue(false);
+    const media = makeMediaMock();
+    const composer = { media } as any;
+    const asset = makeAsset();
+    media._setAsset(asset);
+
+    renderHook(() => useAltTextAutoTrigger(composer));
+    await act(async () => {
+      fireUploadComplete(media, asset);
+      await flushMicrotasks();
+    });
+
+    expect(mocks.autoAltTextEnabled).toHaveBeenCalled();
+    expect(mocks.generateAltTextRemote).not.toHaveBeenCalled();
   });
 
   it("does nothing when composer is null", () => {
@@ -127,7 +147,7 @@ describe("useAltTextAutoTrigger", () => {
       await flushMicrotasks();
     });
 
-    expect(mocks.generateAltTextRemote).toHaveBeenCalledWith("cuid-server-1");
+    expect(mocks.generateAltTextRemote).toHaveBeenCalledWith("cuid-server-1", { trigger: "auto" });
     const [updateId, updates] = media.updateAsset.mock.calls[0];
     expect(updateId).toBe("cuid-server-1");
     expect(updates.altText).toBe("A red bicycle by a brick wall.");

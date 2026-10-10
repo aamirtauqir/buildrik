@@ -54,6 +54,7 @@ describe("feature-flag service", () => {
       await expect(listWorkspaceFeatures("ws-1")).resolves.toEqual({
         agency_layer: true,
         client_mode: false,
+        auto_alt_text: false,
       });
     });
 
@@ -63,7 +64,7 @@ describe("feature-flag service", () => {
         { key: "legacy_dead_flag", enabled: true },
       ]);
       const map = await listWorkspaceFeatures("ws-1");
-      expect(map).toEqual({ agency_layer: true, client_mode: false });
+      expect(map).toEqual({ agency_layer: true, client_mode: false, auto_alt_text: false });
       expect("legacy_dead_flag" in map).toBe(false);
     });
   });

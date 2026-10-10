@@ -25,12 +25,33 @@ function getClient() {
 export interface AltTextRemoteResult {
   altText: string;
   /**
-   * True when the server preserved an existing user-typed alt text instead
-   * of overwriting it. Hook treats `skipped` as "do not write back to
-   * engine" — engine state already matches what the server kept.
+   * True when nothing was generated: the server kept user-typed alt text, or
+   * declined an automatic request (`reason`). Hook treats `skipped` as "do not
+   * write back to engine".
    */
   skipped: boolean;
+  reason?: "AUTO_OFF" | "ALREADY_GENERATED";
   model?: string;
+}
+
+/** How long one read of the workspace flag answers for — a bulk drop asks once. */
+const AUTO_FLAG_TTL_MS = 60_000;
+let _autoFlag: { at: number; value: Promise<boolean> } | null = null;
+
+/**
+ * L4-007: whether the workspace turned on automatic alt text (paid AI, off by
+ * default). Unknown — signed out, unreachable, the flag absent — reads as off:
+ * an opt-in is never assumed. The server enforces the same flag; this only
+ * saves the upload hook a request it would decline.
+ */
+export function autoAltTextEnabled(): Promise<boolean> {
+  if (_autoFlag && Date.now() - _autoFlag.at < AUTO_FLAG_TTL_MS) return _autoFlag.value;
+  const value = getClient()
+    .features.list.query()
+    .then((flags) => (flags as { auto_alt_text?: boolean }).auto_alt_text === true)
+    .catch(() => false);
+  _autoFlag = { at: Date.now(), value };
+  return value;
 }
 
 /**
@@ -41,12 +62,13 @@ export interface AltTextRemoteResult {
 export async function generateAltTextRemote(
   assetId: string,
   /** `force`: the library's explicit Regenerate — replace existing alt text.
-   *  The upload auto-trigger omits it, so a typed alt text is never lost. */
-  opts: { force?: boolean } = {},
+   *  `trigger: "auto"`: the upload hook — held to the workspace opt-in, once
+   *  per asset, never forcing, so a typed alt text is never lost. */
+  opts: { force?: boolean; trigger?: "auto" } = {},
 ): Promise<AltTextRemoteResult | null> {
   try {
     const result = await getClient().media.generateAltText.mutate(
-      opts.force ? { assetId, force: true } : { assetId },
+      opts.trigger === "auto" ? { assetId, trigger: "auto" } : opts.force ? { assetId, force: true } : { assetId },
     );
     return result as AltTextRemoteResult;
   } catch {
@@ -83,4 +105,5 @@ export async function regenerateAltText(
 /** Test-only: reset the cached tRPC client so vi.mock() takes effect per-test. */
 export function __resetAltTextClient() {
   _client = null;
+  _autoFlag = null;
 }

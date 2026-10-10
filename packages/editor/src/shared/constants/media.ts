@@ -333,6 +333,9 @@ export type MediaEventName = (typeof MEDIA_EVENTS)[keyof typeof MEDIA_EVENTS];
 // ============================================
 
 /** Total storage quota per user — single source of truth */
+/** L4-007: what an on-demand alt-text Generate costs — said on every Generate button. */
+export const ALT_TEXT_CREDIT_HINT = "Uses 1 AI credit from your daily limit";
+
 export const STORAGE_QUOTA_BYTES = 1_073_741_824; // 1 GB
 // ============================================
 // Default Values

@@ -91,4 +91,14 @@ describe("media.generateAltText", () => {
     expect(err.message).toBe("Alt text generation failed. Try again.");
     expect(err.cause).toBeUndefined();
   });
+
+  it("L4-007: passes the trigger through, so the upload hook's request is held to the opt-in", async () => {
+    applyAltTextToAsset.mockResolvedValueOnce({ altText: "", skipped: true, reason: "AUTO_OFF" });
+    await expect(caller().generateAltText({ assetId: "a1", trigger: "auto" })).resolves.toEqual({
+      altText: "",
+      skipped: true,
+      reason: "AUTO_OFF",
+    });
+    expect(applyAltTextToAsset).toHaveBeenCalledWith("u_1", "a1", { force: undefined, trigger: "auto" });
+  });
 });

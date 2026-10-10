@@ -45,6 +45,7 @@ import {
   type MediaWriteAction,
 } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
+import { ALT_TEXT_CREDIT_HINT } from "@/shared/constants/media";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
 const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)]";
@@ -766,7 +767,7 @@ function AltTextSection({
   );
   const regenerate = (label: string, className: string) =>
     onRegenerateAltText ? (
-      <Button data-testid="alt-text-regenerate" className={className} onClick={handleRegenerate} disabled={regenerating}>
+      <Button data-testid="alt-text-regenerate" className={className} onClick={handleRegenerate} disabled={regenerating} title={ALT_TEXT_CREDIT_HINT}>
         {label === "Generate" && <Sparkles size={12} />}
         {regenerating ? "Generating…" : label}
       </Button>

@@ -56,8 +56,9 @@ function rethrowPermission(e: unknown): never {
   throw e;
 }
 
-/** Alt text fires on every image upload, so a bulk drop of a few dozen files
- *  must pass; a script hammering Regenerate must not. Per user, per minute. */
+/** With automatic alt text on (L4-007), every image upload asks, so a bulk drop
+ *  of a few dozen files must pass; a script hammering Regenerate must not. Per
+ *  user, per minute. */
 const ALT_TEXT_PER_MINUTE = 30;
 
 const ALT_TEXT_ERROR_CODES: Record<AltTextErrorCode, "PRECONDITION_FAILED" | "TOO_MANY_REQUESTS" | "INTERNAL_SERVER_ERROR"> = {
@@ -329,7 +330,7 @@ export const mediaRouter = router({
         throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many alt text requests. Try again shortly." });
       }
       try {
-        return await applyAltTextToAsset(ctx.session.user.id, input.assetId, { force: input.force });
+        return await applyAltTextToAsset(ctx.session.user.id, input.assetId, { force: input.force, trigger: input.trigger });
       } catch (e: unknown) {
         if (e instanceof AltTextError) {
           throw new TRPCError({ code: ALT_TEXT_ERROR_CODES[e.code], message: e.message });

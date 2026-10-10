@@ -61,9 +61,9 @@ describe("features router", () => {
   });
 
   it("list returns the flag map for a member", async () => {
-    listFeaturesMock.mockResolvedValueOnce({ agency_layer: true, client_mode: false });
+    listFeaturesMock.mockResolvedValueOnce({ agency_layer: true, client_mode: false, auto_alt_text: false });
     const caller = featuresRouter.createCaller(makeCtx("u_1") as never);
-    await expect(caller.list()).resolves.toEqual({ agency_layer: true, client_mode: false });
+    await expect(caller.list()).resolves.toEqual({ agency_layer: true, client_mode: false, auto_alt_text: false });
   });
 
   it("list rejects a user with no workspace (NOT_FOUND)", async () => {
