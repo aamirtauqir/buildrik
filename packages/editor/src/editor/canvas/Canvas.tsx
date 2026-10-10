@@ -658,8 +658,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        the canvas. Fit (the frame's width into the column, never above 100%)
        unless the user picked a percent; the choice is remembered per site. */
     const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
+    const setCanvasZoom = React.useCallback((z: number) => (onZoomChange ? onZoomChange(z) : composer?.setZoom(z)), [onZoomChange, composer]);
     const handleFitToScreen = useCanvasZoomFit({
-      composer,
+      setZoom: setCanvasZoom,
       zoom,
       frameWidth: activeCustomWidth ?? DEVICE_PREVIEW_SIZES[device].width,
       scrollRef,

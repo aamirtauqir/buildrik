@@ -17,7 +17,6 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer } from "@/engine";
 
 /** Gutter each side of a fitted frame (boards 5936:44788 / 4428:44164). */
 export const FIT_GUTTER = 60;
@@ -53,7 +52,12 @@ export function writeZoomPreference(siteId: string | null, pref: ZoomPreference)
 }
 
 interface Options {
-  composer: Composer | null | undefined;
+  /** Sets the zoom the canvas paints from (the shell's zoom state; the canvas
+   *  pushes it on to the composer). Not `composer.setZoom`: the first fit runs
+   *  in the canvas's effect, before the shell has subscribed to the
+   *  composer's zoom event, so a composer-only write was lost and the canvas
+   *  pushed the stale 100% back. */
+  setZoom: ((zoom: number) => void) | undefined;
   /** Current zoom percent (the prop the canvas paints from). */
   zoom: number;
   /** Declared frame width in CSS px — not offsetWidth, which lags the
@@ -65,7 +69,7 @@ interface Options {
   siteId: string | null;
 }
 
-export function useCanvasZoomFit({ composer, zoom, frameWidth, scrollRef, ready, siteId }: Options): () => void {
+export function useCanvasZoomFit({ setZoom, zoom, frameWidth, scrollRef, ready, siteId }: Options): () => void {
   const prefRef = React.useRef<ZoomPreference>("fit");
   const lastFitRef = React.useRef<number | null>(null);
   const appliedRef = React.useRef(false);
@@ -77,21 +81,21 @@ export function useCanvasZoomFit({ composer, zoom, frameWidth, scrollRef, ready,
 
   const applyFit = React.useCallback(() => {
     const viewport = scrollRef.current;
-    if (!composer || !viewport) return;
+    if (!setZoom || !viewport) return;
     const next = computeFitZoom(frameWidthRef.current, viewport.clientWidth);
     lastFitRef.current = next;
-    composer.setZoom(next);
-  }, [composer, scrollRef]);
+    setZoom(next);
+  }, [setZoom, scrollRef]);
 
   /* First paint after load: the remembered choice, else Fit. Waits for the
      column to have a width — a fit against 0 would be a fit to nothing. */
   const applyInitial = React.useCallback(() => {
-    if (appliedRef.current || !readyRef.current || !composer || !scrollRef.current?.clientWidth) return;
+    if (appliedRef.current || !readyRef.current || !setZoom || !scrollRef.current?.clientWidth) return;
     appliedRef.current = true;
     prefRef.current = readZoomPreference(siteId);
     if (prefRef.current === "fit") applyFit();
-    else composer.setZoom(prefRef.current);
-  }, [composer, scrollRef, siteId, applyFit]);
+    else setZoom(prefRef.current);
+  }, [setZoom, scrollRef, siteId, applyFit]);
 
   React.useEffect(() => {
     applyInitial();

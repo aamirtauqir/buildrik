@@ -7,7 +7,6 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import type { Composer } from "@/engine";
 import {
   computeFitZoom,
   readZoomPreference,
@@ -28,10 +27,10 @@ function setup(opts: { frameWidth: number; columnWidth: number; siteId?: string 
   const viewport = { clientWidth: opts.columnWidth } as HTMLElement;
   const scrollRef = { current: viewport };
   let zoom = 100;
-  const composer = { setZoom: vi.fn((z: number) => { zoom = z; }) } as unknown as Composer & { setZoom: ReturnType<typeof vi.fn> };
+  const composer = { setZoom: vi.fn((z: number) => { zoom = z; }) };
   const hook = renderHook(
     (props: { zoom: number; frameWidth: number; ready: boolean }) =>
-      useCanvasZoomFit({ composer, scrollRef, siteId: opts.siteId ?? "site-1", ...props }),
+      useCanvasZoomFit({ setZoom: composer.setZoom, scrollRef, siteId: opts.siteId ?? "site-1", ...props }),
     { initialProps: { zoom, frameWidth: opts.frameWidth, ready: false } },
   );
   /* The canvas re-renders with whatever the composer now holds. */
