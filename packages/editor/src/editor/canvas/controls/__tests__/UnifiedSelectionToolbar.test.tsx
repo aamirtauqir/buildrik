@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { UnifiedSelectionToolbar } from "../UnifiedSelectionToolbar";
 
 beforeEach(() => {
@@ -89,9 +89,43 @@ describe("UnifiedSelectionToolbar", () => {
     expect(screen.getByTestId("selection-toolbar-more").className).toContain("tw:bg-[var(--bk-accent)]");
   });
 
-  it("carries the board's caption row under the pill", () => {
+  /* L2-035 (owner 2026-10-10): the board's always-on caption row sat under
+     the pill over the next element's text. Hints now show only while a button
+     is hovered or keyboard-focused, inside the pill (chrome, not a second
+     layer over the page), and every button keeps its accessible name. */
+  it("shows no hint row at rest", () => {
     setup();
-    expect(screen.getByTestId("selection-toolbar-caption")).toHaveTextContent("⧉ Duplicate ⌘D · 🗑 Delete ⌫ · ⋯ More");
+    expect(screen.queryByTestId("selection-toolbar-caption")).toBeNull();
+    expect(screen.queryByTestId("selection-toolbar-hint")).toBeNull();
+  });
+
+  it("names the hovered button and its key inside the pill, and hides it on leave", () => {
+    setup();
+    const dup = screen.getByTestId("selection-toolbar-duplicate");
+    fireEvent.mouseEnter(dup);
+    const hint = screen.getByTestId("selection-toolbar-hint");
+    expect(hint).toHaveTextContent("Duplicate ⌘D");
+    expect(screen.getByTestId("selection-toolbar").contains(hint)).toBe(true);
+    expect(hint.className).not.toMatch(/tw:absolute/);
+    fireEvent.mouseLeave(dup);
+    expect(screen.queryByTestId("selection-toolbar-hint")).toBeNull();
+  });
+
+  it("shows the hint on keyboard focus too", () => {
+    setup();
+    const del = screen.getByTestId("selection-toolbar-delete");
+    fireEvent.keyDown(document.body, { key: "Tab" });
+    act(() => del.focus());
+    expect(screen.getByTestId("selection-toolbar-hint")).toHaveTextContent("Delete ⌫");
+    act(() => del.blur());
+    expect(screen.queryByTestId("selection-toolbar-hint")).toBeNull();
+  });
+
+  it("every button has an accessible name, hint or not", () => {
+    setup();
+    expect(screen.getByRole("button", { name: "Duplicate (⌘D)" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Delete (⌫)" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "More" })).toBeInTheDocument();
   });
 
   /* Flow-check finding (2026-09-25): a wide (page-width) selection anchored
