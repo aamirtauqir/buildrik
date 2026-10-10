@@ -72,7 +72,8 @@ describe("editor onboarding — per user × site (L1-015)", () => {
     expect((await getEditorOnboarding(user.id, siteA.id)).steps["add-page"]).toBe(false);
     await createTestPage({ siteId: siteA.id, name: "About", position: 1 });
 
-    await prisma.reviewRequest.create({ data: { siteId: siteA.id, requestedById: user.id } });
+    // One PENDING round per site (review_requests_pending_unique): the first is settled.
+    await prisma.reviewRequest.create({ data: { siteId: siteA.id, requestedById: user.id, status: "APPROVED" } });
     let v = await getEditorOnboarding(user.id, siteA.id);
     expect(v.steps["add-page"]).toBe(true);
     expect(v.steps["send-review"]).toBe(true);
