@@ -168,7 +168,7 @@ describe("ExportModal — tab switching", () => {
     await screen.findByText(/5 elements/);
 
     // Preview tab is default — device buttons visible.
-    expect(screen.getByRole("button", { name: "Desktop (1440px)" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Desktop (1280px)" })).toBeInTheDocument();
 
     // Code tab shows the CodePreview HTML/CSS tabs.
     fireEvent.click(screen.getByRole("tab", { name: "Code" }));

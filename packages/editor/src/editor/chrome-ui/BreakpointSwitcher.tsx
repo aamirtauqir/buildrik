@@ -1,7 +1,7 @@
 /**
  * BreakpointSwitcher — segmented viewport switcher (ported from vibcoder).
  *
- * Breakpoints are fixed by design: wide (1920+, opt-in) / desktop (1440) /
+ * Breakpoints are fixed by design: wide (1920+, opt-in) / desktop (1280) /
  * tablet (768) / mobile (375). This is the editor's canonical viewport
  * switcher, not a generic segmented control — don't grow it an `options`
  * array.

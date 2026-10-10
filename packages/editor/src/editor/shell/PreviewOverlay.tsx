@@ -33,6 +33,7 @@
  */
 import * as React from "react";
 import type { DeviceType } from "@/shared/types";
+import { DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
 import { Button, BreakpointSwitcher, Select, type Breakpoint } from "@/editor/chrome-ui";
 import { isModalOpen } from "@/editor/chrome-ui";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
@@ -84,9 +85,14 @@ const DEVICE_BAR_CLASS =
 const DEVICE_BAR_INNER_CLASS =
   "tw:absolute tw:left-1/2 tw:-translate-x-1/2 tw:flex tw:items-center";
 
-/* The widths each device renders at, printed beside its name. Desktop is the
-   page frame's max width; tablet/mobile are DeviceFramePreview's screens. */
-const DEVICE_WIDTHS = { desktop: "1320px", tablet: "768px", mobile: "375px" } as const;
+/* The widths each device renders at, printed beside its name — the one
+   device table the canvas and export read too (L1-013: Desktop was 1320
+   here, 1024 on the canvas and 1440 in export). */
+const DEVICE_WIDTHS = {
+  desktop: `${DEVICE_PREVIEW_SIZES.desktop.width}px`,
+  tablet: `${DEVICE_PREVIEW_SIZES.tablet.width}px`,
+  mobile: `${DEVICE_PREVIEW_SIZES.mobile.width}px`,
+} as const;
 
 const BACK_CLASS =
   "tw:h-8 tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-100)]";
@@ -100,7 +106,7 @@ const STAGE_CLASS =
 
 /** Desktop: the page itself carries the edges. */
 const PAGE_FRAME_CLASS =
-  "tw:w-full tw:max-w-[1320px] tw:h-full tw:border-0 tw:rounded-lg " +
+  "tw:shrink-0 tw:h-full tw:border-0 tw:rounded-lg " +
   "tw:[box-shadow:var(--bk-shadow-overlay)] tw:bg-[var(--bk-bg-elevated)]";
 
 /** Inside a bezel the frame draws them, so the page fills the screen flat. */
@@ -212,6 +218,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
             srcDoc={html}
             onLoad={onFrameLoad}
             className={framed ? SCREEN_FRAME_CLASS : PAGE_FRAME_CLASS}
+            style={framed ? undefined : { width: DEVICE_WIDTHS.desktop }}
           />
         </DeviceFramePreview>
       </div>

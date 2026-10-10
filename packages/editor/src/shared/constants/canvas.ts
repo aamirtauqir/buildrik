@@ -5,7 +5,7 @@
  */
 
 import type React from "react";
-import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "./breakpoints";
+import { DEVICE_PREVIEW_SIZES } from "./breakpoints";
 
 // ============================================
 // DESIGN TOKENS - SINGLE SOURCE OF TRUTH
@@ -343,7 +343,7 @@ export const SIZES = {
 // ============================================
 
 export const DEVICE_PRESETS = [
-  { id: "desktop", name: "Desktop", width: BREAKPOINTS.desktop.minWidth, icon: "🖥️" },
+  { id: "desktop", name: "Desktop", width: DEVICE_PREVIEW_SIZES.desktop.width, icon: "🖥️" },
   { id: "tablet", name: "Tablet", width: DEVICE_PREVIEW_SIZES.tablet.width, icon: "📱" },
   { id: "mobile", name: "Mobile", width: DEVICE_PREVIEW_SIZES.mobile.width, icon: "📲" },
 ] as const;

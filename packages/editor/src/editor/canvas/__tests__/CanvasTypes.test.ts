@@ -26,7 +26,7 @@ describe("DEVICE_SIZES", () => {
   });
 
   it("keeps canonical device dimensions stable", () => {
-    expect(DEVICE_SIZES.desktop).toEqual({ width: "100%", height: "100%" });
+    expect(DEVICE_SIZES.desktop).toEqual({ width: "1280px", height: "100%" });
     expect(DEVICE_SIZES.tablet).toEqual({ width: "768px", height: "1024px" });
     expect(DEVICE_SIZES.mobile).toEqual({ width: "375px", height: "812px" });
     // Decision #26: the Watch device is gone.
@@ -40,7 +40,7 @@ describe("the engine viewport reads the same device table", () => {
     const devices = new Viewport({ emit: () => {} } as unknown as Composer).getDevices();
     expect(devices.tablet).toMatchObject({ width: 768, height: 1024 });
     expect(devices.mobile).toMatchObject({ width: 375, height: 812 });
-    expect(devices.desktop).toMatchObject({ width: 1024 });
+    expect(devices.desktop).toMatchObject({ width: 1280 });
     expect(devices.wide.width).toBe(1920);
   });
 });

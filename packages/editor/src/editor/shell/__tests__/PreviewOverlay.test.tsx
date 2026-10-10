@@ -40,7 +40,7 @@ describe("PreviewOverlay", () => {
     const onDone = vi.fn();
     render(<PreviewOverlay html="<p>x</p>" onDone={onDone} />);
     expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
-    expect(screen.getByTestId("bp-cell-desktop")).toHaveTextContent("Desktop1320px");
+    expect(screen.getByTestId("bp-cell-desktop")).toHaveTextContent("Desktop1280px");
     expect(screen.getByTestId("bp-cell-tablet")).toHaveTextContent("Tablet768px");
     expect(screen.getByTestId("bp-cell-mobile")).toHaveTextContent("Mobile375px");
     fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
