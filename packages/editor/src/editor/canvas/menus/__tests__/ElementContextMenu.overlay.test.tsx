@@ -103,6 +103,31 @@ describe("ElementContextMenu — keyboard", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it("a click on a submenu row opens its submenu, for users who cannot hover", () => {
+    const onClose = vi.fn();
+    render(<ElementContextMenu x={10} y={10} actions={actions} context={context} onClose={onClose} />);
+    const style = screen.getByTestId("canvas-ctx-item-style");
+    fireEvent.click(style);
+    expect(style).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("canvas-ctx-item-paste-styles")).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("Tab leaves the menu and closes it — a menu is one tab stop", () => {
+    const onClose = vi.fn();
+    render(<ElementContextMenu x={10} y={10} actions={actions} context={context} onClose={onClose} />);
+    fireEvent.keyDown(screen.getByTestId("canvas-ctx-item-dup"), { key: "Tab" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("Tab from inside an open submenu closes the whole menu", () => {
+    const onClose = vi.fn();
+    render(<ElementContextMenu x={10} y={10} actions={actions} context={context} onClose={onClose} />);
+    fireEvent.keyDown(screen.getByTestId("canvas-ctx-item-style"), { key: "Enter" });
+    fireEvent.keyDown(screen.getByTestId("canvas-ctx-item-paste-styles"), { key: "Tab" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("a submenu row runs its handler and closes the menu", () => {
     const onClose = vi.fn();
     render(<ElementContextMenu x={10} y={10} actions={actions} context={context} onClose={onClose} />);

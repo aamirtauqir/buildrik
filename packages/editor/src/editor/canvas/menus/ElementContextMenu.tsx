@@ -184,6 +184,8 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({ x, y, actions, co
         className={SURFACE}
         style={{ top: y, left: x, zIndex: Z_INDEX.contextMenu }}
         onKeyDown={(e) => {
+          /* A menu is one tab stop: Tab leaves it, so it closes. */
+          if (e.key === "Tab") onClose();
           /* ↑ ↓ leave an open submenu behind them. */
           if (sub && (e.key === "ArrowDown" || e.key === "ArrowUp")) closeSubmenu(false);
         }}
@@ -204,6 +206,7 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({ x, y, actions, co
             timer.current = setTimeout(() => setSub(null), HOVER_DELAY);
           }}
           onKeyDown={(e) => {
+            if (e.key === "Tab") onClose();
             if (e.key === "ArrowLeft" || e.key === "Escape") {
               e.preventDefault();
               /* This Esc is the submenu's: the whole menu stays open. */
