@@ -30,7 +30,7 @@ import { SET_BTN } from "../shared";
 
 /** The server skips line 1 as a header; a file whose first line is already a rule gets one. */
 function withCsvHeader(text: string): { csv: string; added: boolean } {
-  const first = text.replace(/^﻿/, "").trimStart();
+  const first = text.replace(/^\uFEFF/, "").trimStart();
   const firstCell = first.split(/\r?\n/, 1)[0]?.split(",")[0]?.replace(/^"|"$/g, "").trim() ?? "";
   return firstCell.startsWith("/") ? { csv: `from,to,type\n${first}`, added: true } : { csv: first, added: false };
 }
