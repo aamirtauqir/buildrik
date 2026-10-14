@@ -45,10 +45,12 @@ test.describe("dashboard smoke", () => {
     await expect(page.locator("h1").first()).toHaveText(/^Settings$/i);
   });
 
-  test("Settings rail exposes workspace/platform/billing/personal groups", async ({ page }) => {
+  /* One card per Settings Phase B §25 group (settings-sections.ts). Plans is a
+     sub-page of Plan & billing since 763430dd9, not a card of its own. */
+  test("Settings rail exposes workspace/connections/billing/personal/danger groups", async ({ page }) => {
     await page.goto("/dashboard/settings");
-    for (const group of ["Workspace", "Team", "Plans", "Account"]) {
-      await expect(page.getByRole("link", { name: group }).first()).toBeVisible();
+    for (const card of ["General & branding", "Apps & integrations", "Plan & billing", "Account & sign-in", "Transfer or delete"]) {
+      await expect(page.getByRole("link", { name: card }).first()).toBeVisible();
     }
   });
 });
