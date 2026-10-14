@@ -14,6 +14,7 @@ const MENU_WIDTH = 200;
 interface SubmenuProps {
   actions: ContextAction[];
   context: ActionContext;
+  focusedIndex?: number;
   x: number;
   y: number;
   onClose: () => void;
@@ -24,6 +25,7 @@ interface SubmenuProps {
 export const Submenu: React.FC<SubmenuProps> = ({
   actions,
   context,
+  focusedIndex,
   x,
   y,
   onClose,
@@ -57,13 +59,14 @@ export const Submenu: React.FC<SubmenuProps> = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {actions.map((action) => {
+      {actions.map((action, index) => {
         const enabled = action.isEnabled ? action.isEnabled(context) : true;
         return (
           <MenuItem
             key={action.id}
             action={action}
             enabled={enabled}
+            isHighlighted={focusedIndex === index}
             onClick={() => {
               if (enabled && action.handler) {
                 action.handler(context);

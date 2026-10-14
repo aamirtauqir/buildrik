@@ -17,6 +17,7 @@ interface SubmenuItemProps {
   context: ActionContext;
   isActive: boolean;
   isFocused?: boolean; // Keyboard navigation focus state
+  focusedChildIndex?: number;
   onActivate: () => void;
   onDeactivate: () => void;
   onClose: () => void;
@@ -27,6 +28,7 @@ export const SubmenuItem: React.FC<SubmenuItemProps> = ({
   context,
   isActive,
   isFocused = false,
+  focusedChildIndex = 0,
   onActivate,
   onDeactivate,
   onClose,
@@ -35,34 +37,21 @@ export const SubmenuItem: React.FC<SubmenuItemProps> = ({
   const [submenuPosition, setSubmenuPosition] = React.useState({ x: 0, y: 0 });
   const activateTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Measure for every activation, including keyboard and click, before paint.
+  React.useLayoutEffect(() => {
+    if (!isActive || !itemRef.current) return;
+    const rect = itemRef.current.getBoundingClientRect();
+    const height = (action.submenu?.length ?? 0) * 30 + 12;
+    setSubmenuPosition({
+      x: Math.max(8, window.innerWidth - rect.right < MENU_WIDTH + 20
+        ? rect.left - MENU_WIDTH - SUBMENU_OFFSET : rect.right + SUBMENU_OFFSET),
+      y: Math.max(8, Math.min(rect.top - 6, window.innerHeight - height - 8)),
+    });
+  }, [isActive, action.submenu]);
+
   const handleMouseEnter = () => {
-    // Clear any pending activation
-    if (activateTimeoutRef.current) {
-      clearTimeout(activateTimeoutRef.current);
-    }
-    // Short delay for activation - matches deactivation timeout (150ms) to prevent jitter
-    activateTimeoutRef.current = setTimeout(() => {
-      if (itemRef.current) {
-        const rect = itemRef.current.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        // Determine if submenu should appear on left or right
-        const rightSpace = viewportWidth - rect.right;
-        const shouldShowLeft = rightSpace < MENU_WIDTH + 20;
-
-        // Estimate submenu height and check bottom space
-        const estimatedSubmenuHeight = 300;
-        const bottomSpace = viewportHeight - rect.top;
-        const shouldShowAbove = bottomSpace < estimatedSubmenuHeight;
-
-        setSubmenuPosition({
-          x: shouldShowLeft ? rect.left - MENU_WIDTH - SUBMENU_OFFSET : rect.right + SUBMENU_OFFSET,
-          y: shouldShowAbove ? Math.max(8, rect.bottom - estimatedSubmenuHeight) : rect.top - 6, // Align with padding
-        });
-        onActivate();
-      }
-    }, 150);
+    if (activateTimeoutRef.current) clearTimeout(activateTimeoutRef.current);
+    activateTimeoutRef.current = setTimeout(onActivate, 150);
   };
 
   const handleMouseLeave = () => {
@@ -99,13 +88,15 @@ export const SubmenuItem: React.FC<SubmenuItemProps> = ({
         enabled={enabled}
         hasSubmenu={true}
         isHighlighted={(isActive || isFocused) && enabled}
-        onClick={() => {}} // Submenus open on hover
+        isExpanded={isActive}
+        onClick={enabled ? onActivate : () => {}}
       />
 
       {/* Submenu portal */}
       {isActive && hasVisibleSubmenu && action.submenu && (
         <Submenu
           actions={action.submenu}
+          focusedIndex={focusedChildIndex}
           context={context}
           x={submenuPosition.x}
           y={submenuPosition.y}
