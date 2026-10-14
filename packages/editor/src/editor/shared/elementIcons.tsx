@@ -11,7 +11,40 @@
 import * as React from "react";
 import {
   AlignLeft,
+  AppWindow,
+  BadgeDollarSign,
+  Calendar,
+  CircleDot,
+  Clock,
+  Columns3,
   Dot,
+  Film,
+  GalleryHorizontal,
+  Gauge,
+  Hash,
+  Images,
+  KeyRound,
+  ListCollapse,
+  Mail,
+  Map as MapIcon,
+  Megaphone,
+  MoveVertical,
+  Music,
+  Palette,
+  PanelsTopLeft,
+  PenTool,
+  Quote,
+  Rows3,
+  Send,
+  Share2,
+  SlidersHorizontal,
+  SquareCheck,
+  SquarePlay,
+  SunMoon,
+  Table,
+  Tag,
+  Timer,
+  ToggleLeft,
   Heading1,
   Heading2,
   Heading3,
@@ -47,6 +80,7 @@ import {
   Type,
   Video,
   type LucideIcon,
+  type LucideProps,
 } from "lucide-react";
 
 export type ElementIconSize = "xs" | "sm" | "md" | "lg";
@@ -58,11 +92,9 @@ const sizeMap: Record<ElementIconSize, number> = {
   lg: 20,
 };
 
-export interface ElementIconProps {
+export type ElementIconProps = Omit<LucideProps, "size" | "ref"> & {
   size?: ElementIconSize;
-  className?: string;
-  style?: React.CSSProperties;
-}
+};
 
 const glyphs: Record<string, LucideIcon> = {
   link: Link,
@@ -115,6 +147,43 @@ const glyphs: Record<string, LucideIcon> = {
   li: Dot,
   icon: Shapes,
   divider: Minus,
+
+  /* Add-panel block ids (DQ-016/017). The Add panel drew its own SVG set —
+     59 hand-made fragments, one a serif "H" in Times at 700 — so the same
+     element wore two faces between Add and Layers. Both read this map now. */
+  spacer: MoveVertical,
+  label: Tag,
+  progress: Gauge,
+  countdown: Timer,
+  columns: Columns3,
+  stack: Rows3,
+  table: Table,
+  checkbox: SquareCheck,
+  radio: CircleDot,
+  switch: ToggleLeft,
+  range: SlidersHorizontal,
+  submit: Send,
+  email: Mail,
+  password: KeyRound,
+  number: Hash,
+  date: Calendar,
+  time: Clock,
+  color: Palette,
+  audio: Music,
+  gallery: Images,
+  svg: PenTool,
+  lottie: Film,
+  "video-embed": SquarePlay,
+  "map-embed": MapIcon,
+  cta: Megaphone,
+  "theme-toggle": SunMoon,
+  accordion: ListCollapse,
+  tabs: PanelsTopLeft,
+  modal: AppWindow,
+  testimonials: Quote,
+  pricing: BadgeDollarSign,
+  "social-icons": Share2,
+  slider: GalleryHorizontal,
 
   default: Box,
 };

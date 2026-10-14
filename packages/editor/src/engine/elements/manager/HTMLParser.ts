@@ -6,16 +6,16 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../../shared/constants";
-import type { ElementData, ExportOptions } from "../../../shared/types";
-import { generateId } from "../../../shared/utils/helpers";
+import { EVENTS } from "@/shared/constants";
+import type { ElementData, ExportOptions } from "@/shared/types";
+import { generateId } from "@/shared/utils/helpers";
 import {
   isTextOnlyTag,
   getElementTypeFromTag,
   elementDataToHTML,
   sanitizeHTML,
-} from "../../../shared/utils/html";
-import { parseHTML, parseInlineStyles } from "../../../shared/utils/parsers";
+} from "@/shared/utils/html";
+import { parseHTML, parseInlineStyles } from "@/shared/utils/parsers";
 import type { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
 import { resolvePlacement } from "./placement";

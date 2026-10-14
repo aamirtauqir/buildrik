@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { InputRow, SelectRow } from "../../shared/controls";
+import { InputRow, SelectRow } from "@/editor/inspector/shared/controls";
 
 export type ParentLayout = "flex" | "grid";
 

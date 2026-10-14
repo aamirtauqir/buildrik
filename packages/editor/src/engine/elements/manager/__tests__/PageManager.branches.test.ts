@@ -17,8 +17,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { PageManager } from "../PageManager";
 import type { ElementManagerContext } from "../types";
-import type { ElementData, PageData } from "../../../../shared/types";
-import { EVENTS } from "../../../../shared/constants/events";
+import type { ElementData, PageData } from "@/shared/types";
+import { EVENTS } from "@/shared/constants/events";
 
 interface StubElement {
   getId: () => string;

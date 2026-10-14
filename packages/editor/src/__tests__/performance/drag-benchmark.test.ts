@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
-import { Composer } from "../../engine/Composer";
-import { BoundsCalculator } from "../../engine/canvas/indicators/BoundsCalculator";
-import { SnapCalculator } from "../../engine/canvas/indicators/SnapCalculator";
+import { Composer } from "@/engine/Composer";
+import { BoundsCalculator } from "@/engine/canvas/indicators/BoundsCalculator";
+import { SnapCalculator } from "@/engine/canvas/indicators/SnapCalculator";
 
 /**
  * Performance harness: assert drag frame time ≤ 16 ms on 500-element page.

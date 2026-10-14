@@ -9,8 +9,8 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { StorageAdapter } from "../StorageAdapter";
-import type { Composer } from "../../Composer";
-import type { ProjectData, ProjectSettings } from "../../../shared/types";
+import type { Composer } from "@/engine/Composer";
+import type { ProjectData, ProjectSettings } from "@/shared/types";
 
 function makeAdapter(keyPrefix: string) {
   // autoSave:false → constructor never touches the composer, so a bare stub is safe.

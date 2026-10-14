@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementData, TraitData, TraitValue } from "../../shared/types";
-import { EVENTS } from "../../shared/constants/events";
+import type { ElementData, TraitData, TraitValue } from "@/shared/types";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import type { Element } from "./Element";
 

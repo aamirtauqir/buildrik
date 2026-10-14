@@ -28,7 +28,7 @@ import {
   PanelSearch,
   Popover,
 } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { listNames } from "@shared/utils/helpers/string";
 import type { DrawerTab, PageSettingsOpenRequest } from "./types";

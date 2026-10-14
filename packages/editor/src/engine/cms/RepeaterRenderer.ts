@@ -7,8 +7,8 @@
 import { isDangerousUrl, URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { CMS_COLLECTION_LIMIT_MAX, isSafeCmsBoundValue } from "@buildrik/shared/schemas/sites";
 import { cmsRecordLabel, cmsRecordPath, cmsTextOf } from "@buildrik/shared/schemas/cms";
-import { sanitizeRichtext } from "../../shared/utils/html/sanitization";
-import type { CMSContentItem } from "../../shared/types/cms";
+import { sanitizeRichtext } from "@/shared/utils/html/sanitization";
+import type { CMSContentItem } from "@/shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
 

@@ -7,9 +7,9 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 import { useLayerSelection } from "../useLayerSelection";
-import type { LayerItem } from "../../types";
+import type { LayerItem } from "@/editor/panels/layers/types";
 
 const flatItem = (id: string): LayerItem => ({
   id,

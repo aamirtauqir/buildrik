@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { Element } from "../../../engine/elements/Element";
-import type { Point, Rect } from "../../types";
+import type { Element } from "@/engine/elements/Element";
+import type { Point, Rect } from "@/shared/types";
 import type { DropPosition } from "./types";
 
 // =============================================================================

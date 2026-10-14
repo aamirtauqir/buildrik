@@ -4,16 +4,16 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../../engine";
-import type { BlockData } from "../../../../../shared/types";
-import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
+import type { Composer } from "@/engine";
+import type { BlockData } from "@/shared/types";
+import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 import { CATALOG, flatCatalog } from "../catalog/catalog";
 import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { blockRows, componentRows } from "../catalog/groups";
-import { getBlockDefinitions } from "../../../../../blocks";
-import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
+import { getBlockDefinitions } from "@/blocks";
+import type { BlockDefinition } from "@/blocks/blockRegistry";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { MAX_RECENT } from "@/shared/constants/ui";
 import { EVENTS } from "@/shared/constants/events";

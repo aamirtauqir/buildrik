@@ -14,7 +14,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { TRPCClientError } from "@trpc/client";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { THRESHOLDS } from "../../../../shared/constants/config";
+import { THRESHOLDS } from "@/shared/constants/config";
 import { useComposerInit, type UseComposerInitParams } from "../useComposerInit";
 
 type Handler = (...args: unknown[]) => void;
@@ -40,8 +40,8 @@ const composer = {
   destroy: vi.fn(),
 };
 
-vi.mock("../../../../engine", () => ({ createComposer: vi.fn(() => composer), Composer: class {} }));
-vi.mock("../../../../engine/cms", () => ({
+vi.mock("@/engine", () => ({ createComposer: vi.fn(() => composer), Composer: class {} }));
+vi.mock("@/engine/cms", () => ({
   ProductCollectionService: class {
     hasProductsCollection() { return Promise.resolve(true); }
     createProductsCollection() { return Promise.resolve(); }

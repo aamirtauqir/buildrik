@@ -6,7 +6,7 @@ import {
   snapshotFromComputedStyle,
   type TokenSnapshot,
 } from "../tokenSnapshot";
-import type { DesignToken } from "../../../../../design-system/types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const sampleTokens: DesignToken[] = [

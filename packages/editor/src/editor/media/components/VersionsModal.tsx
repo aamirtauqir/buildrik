@@ -28,8 +28,8 @@
 import * as React from "react";
 import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import type { EditsSnapshot } from "@shared/types/media";
-import type { LibraryItem, VersionEntry } from "../../sidebar/tabs/media/data/mediaTypes";
-import { namePages, versionLabel } from "../../sidebar/tabs/media/data/mediaUtils";
+import type { LibraryItem, VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
+import { namePages, versionLabel } from "@/editor/sidebar/tabs/media/data/mediaUtils";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,

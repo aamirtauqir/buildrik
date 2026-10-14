@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { Element } from "../../../../engine/elements/Element";
+import type { Element } from "@/engine/elements/Element";
 import type { Rect } from "../types";
 import {
   calculateFinalIndex,

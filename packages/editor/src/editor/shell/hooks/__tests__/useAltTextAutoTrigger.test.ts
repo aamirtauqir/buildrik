@@ -13,13 +13,13 @@ const mocks = {
   generateAltTextRemote: vi.fn(),
 };
 
-vi.mock("../../../../services/AltTextService", () => ({
+vi.mock("@/services/AltTextService", () => ({
   generateAltTextRemote: (...args: any[]) => mocks.generateAltTextRemote(...args),
 }));
 
 import { useAltTextAutoTrigger } from "../useAltTextAutoTrigger";
-import { MEDIA_EVENTS } from "../../../../shared/constants/media";
-import type { MediaAsset } from "../../../../shared/types/media";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
+import type { MediaAsset } from "@/shared/types/media";
 
 type Handler = (payload?: unknown) => void;
 

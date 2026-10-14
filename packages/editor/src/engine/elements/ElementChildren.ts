@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import type { Element } from "./Element";
 

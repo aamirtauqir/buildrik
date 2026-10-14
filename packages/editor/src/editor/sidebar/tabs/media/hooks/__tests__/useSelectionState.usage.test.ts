@@ -14,7 +14,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSelectionState } from "../useSelectionState";
-import type { LibraryItem } from "../../data/mediaTypes";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 function makeItem(key: string, name: string, ext: string): LibraryItem {
   return {

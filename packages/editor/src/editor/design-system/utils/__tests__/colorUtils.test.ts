@@ -1,17 +1,14 @@
 import { describe, it, expect } from "vitest";
+import { darkShadeSuggestions, isValidHex, calcWcagLevel, wcagTooltip } from "../colorUtils";
 import {
-  darkShadeSuggestions,
   expandShorthand,
-  isValidHex,
   hexToRgb,
   hexToHsb,
   hsbToHex,
   relativeLuminance,
   calcContrastRatio,
-  calcWcagLevel,
-  wcagTooltip,
-} from "../colorUtils";
-import type { WcagLevel } from "../../types";
+} from "@/engine/designSystem/colorMath";
+import type { WcagLevel } from "@/editor/design-system/types";
 
 describe("expandShorthand", () => {
   it("expands #rgb to #rrggbb", () => {

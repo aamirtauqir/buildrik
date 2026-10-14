@@ -895,8 +895,10 @@
   left: 6px;
   padding: 2px var(--bk-space-4);
   border-radius: var(--bk-radius-sm);
-  background: var(--bk-bg-overlay, rgba(17, 24, 39, 0.5));
-  color: var(--bk-ink-inverse, #fff);
+  /* DQ-024: --bk-bg-overlay / --bk-ink-inverse never existed — the fallbacks
+     were what rendered. Same pixels, from real tokens. */
+  background: color-mix(in srgb, var(--bk-ink) 50%, transparent);
+  color: var(--bk-bg-card);
   font: 500 var(--bk-text-11) var(--bk-font-ui);
 }
 .mgr-asset-use {
@@ -1010,7 +1012,7 @@
   width: 120px;
   height: 5px;
   border-radius: var(--bk-radius-full);
-  background: var(--bk-bg-active, var(--bk-border));
+  background: var(--bk-border);
   overflow: hidden;
   flex-shrink: 0;
 }

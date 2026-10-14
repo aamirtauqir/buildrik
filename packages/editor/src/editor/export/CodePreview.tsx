@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import type { CodeTab } from "../../shared/types/export";
+import type { CodeTab } from "@/shared/types/export";
 import { CopyButton, Tabs } from "@/editor/chrome-ui";
 
 /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome.

@@ -16,7 +16,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { Button, Popover } from "@/editor/chrome-ui";
 import { openSiteFonts, primaryFamily, useUploadedFonts } from "@/editor/inspector/sections/typography";
 

@@ -1,5 +1,5 @@
 // PURE FUNCTIONS ONLY — no React, no side effects, no imports from React
-import { elementTypeLabel } from "../../../../shared/constants/elementTypeLabels";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import type { LayerItem } from "../types";
 
 /* Text-ish layers carry the first words of their own copy — see

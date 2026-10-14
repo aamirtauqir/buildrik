@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 
-import type { MediaAsset, MediaFolder } from "../../shared/types/media";
+import type { MediaAsset, MediaFolder } from "@/shared/types/media";
 
 // ============================================
 // Error Classes

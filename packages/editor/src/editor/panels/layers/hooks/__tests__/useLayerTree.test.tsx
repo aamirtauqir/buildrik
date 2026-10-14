@@ -10,7 +10,7 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { useLayerTree } from "../useLayerTree";
 

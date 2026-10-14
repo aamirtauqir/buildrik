@@ -6,8 +6,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
-import type { HistoryDisplayEntry } from "../../engine/HistoryManager";
+import type { Composer } from "@/engine";
+import type { HistoryDisplayEntry } from "@/engine/HistoryManager";
 import { EVENTS } from "../constants/events";
 
 export interface UseHistoryStateReturn {

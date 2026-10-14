@@ -11,7 +11,7 @@ import {
   startAutoScroll,
   stopAutoScroll,
   getScrollableParent,
-} from "../../../shared/utils/dragDrop";
+} from "@/shared/utils/dragDrop";
 
 // =============================================================================
 // CONSTANTS

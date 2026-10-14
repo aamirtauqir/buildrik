@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { tokenIsSemantic, filterTokensByMode } from "../semanticKind";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 
 function makeToken(id: string, overrides: Partial<V6TokenSpec> = {}): DesignToken {

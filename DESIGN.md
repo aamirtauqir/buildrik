@@ -127,6 +127,7 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 - **Display / Hero (marketing site only):** `General Sans` (Fontshare). 600–700 weight for hero copy.
 - **Body + Editor UI + Dashboard (primary workhorse):** `Inter`. The editor chrome moved from Inter Tight to Inter on 2026-07-26 with the DS replacement — the Figma foundation ("Buildrick — Product", `g4GzQFqzNYz5sosz1QtZXC`) sets every ui/* style in Inter. Used for every label, button, input, breadcrumb, panel title, row label in the editor.
 - **Data / Inspector values / mono content:** `Geist Mono` with `font-variant-numeric: tabular-nums`. Required for dimensions, timestamps, slugs, file sizes, page counts.
+- **Words beside data stay Inter.** A label that sits next to mono values is still a label: the Inspector spacing box's "Margin" / "Padding" ring labels are **Inter 11/500** (`ui/11 · caption medium`, ink-muted) while the side values around them are Geist Mono. Mono is for the value, never for the word naming it (DQ-015, owner 2026-10-10; board `8092:211005` / `8092:211011` corrected the same day — it had drawn the labels in Geist Mono 12).
 - **Loading:** Bunny Fonts CDN with `font-display: swap` in dev. Self-host in production. No `@font-face` redefinitions in individual components.
 - **Auth/onboarding:** still on `Inter Tight` until their own reskin lands; Geist Mono remains the data face everywhere.
 
@@ -136,7 +137,7 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 /* Generated from Figma — src/themes/tokens.generated.css. Do not hand-edit:
    change the Figma text style, re-export figma-tokens.json, regenerate. */
 --bk-font-ui:   "Inter", sans-serif;   /* generic family only, no named fallbacks — Inter Tight left editor chrome 2026-07-26. The stack is hand-authored in figma-tokens.json (Figma text styles carry only the family). */
---bk-font-mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
+--bk-font-mono: "Geist Mono", monospace;   /* generic family only — named SF Mono/Menlo/Consolas until 2026-10-10 (DQ-025), against rule 8 above */
 ```
 
 *(This block named `--buildrick-font-family` until 2026-08-03. That namespace is
@@ -231,7 +232,11 @@ Fill = dots/icons/borders. Text = labels on the matching tint. Tint = the chip/b
 - **Editor:** Grid-disciplined. Topbar (56px) / Left rail (60px) / **Drawer 280px — all six panels** / canvas (flex) / **right inspector 300px**. *(Corrected 2026-07-19: read "240 nav / 320 authoring" and "inspector 320px". Both were the previous IA and both were outside the supersede banner below, so they read as live. The canonical source for every chrome dimension is `docs/designs/2026-07-18-editor-shell-wireframes.md` — this line exists only so it does not contradict it.)*
 - **Border radius scale (Flowbite):** `sm: 4px` (row corners, small chips), `md: 6px` (icon tiles, compact controls), `lg: 8px` (buttons, inputs, panels, cards, modals — Flowbite rounded-lg), `full: 9999px` (pills, avatars).
 - **Topbar height:** 56px — canonical. All other chrome heights flow from this rhythm.
-- **Panel header height:** 44px — matches sidebar contract.
+- **Panel header height:** 44px — matches sidebar contract. Every drawer panel (Add, Layers, Pages, Assets, CMS root, Components, History) uses `PanelHeader` at 44. Three named variants are drawn by their own boards and are not drift (DQ-027, measured 2026-10-10):
+  - **Workspace header, 56px** — a full-width workspace beside the drawer carries its own 16/600 title bar under the topbar: CMS collection (`cms-ws-header`, board 4428:143182 "Collection header" 1100×56).
+  - **Workspace page, no PanelHeader** — Brand replaces the drawer and canvas with a full-page workspace: the nav column opens with `‹ Back to canvas` (board 7315:80955) over an `h1` "Brand" at 24/600, and each page titles itself with an `h2` at 20/600 (both on the ui/* ramp).
+  - **Inspector header, 72px** — breadcrumb, element title and the ✦ AI / ⋯ / ✕ actions on two lines (Inspector v4, board 7993:198599).
+  A new surface uses `PanelHeader` (44) unless its board draws one of these.
 
 ## Overflow — what happens when the content is longer than the box
 
@@ -398,7 +403,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 3. No 3-column feature grid with icons in colored circles.
 4. No centered-everything sections.
 5. No decorative blobs, wavy SVG dividers, floating circles.
-6. No emoji as design elements.
+6. No emoji as design elements. Use the icon system instead — e.g. the first-use tip's 💡 became `icon/lightbulb` (Lucide `Lightbulb`, Figma `8274:2288`) on 2026-10-10 (DQ-026).
 7. No colored left-border card treatment.
 8. No default font stacks. No specific named fallbacks (`Helvetica`, `Arial`, `system-ui`).
 9. Cards earn their existence. If it's not interactive, don't wrap it in a card.

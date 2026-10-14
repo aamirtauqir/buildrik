@@ -10,7 +10,7 @@ import * as React from "react";
 import { useImportTokens } from "../useImportTokens";
 import { useColorRegistry, useRadiusRegistry, TokenRegistryProvider } from "../TokenRegistryContext";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 import { makeFakeComposer } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 

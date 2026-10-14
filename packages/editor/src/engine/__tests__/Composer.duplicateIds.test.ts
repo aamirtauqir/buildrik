@@ -14,8 +14,8 @@
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { installEngineBrowserStubs, removeEngineBrowserStubs, createTestComposer } from "./test-utils/realComposer";
-import { projectDataFromRows } from "../../services/BuildrikSyncProvider";
-import type { ElementData, ProjectData } from "../../shared/types";
+import { projectDataFromRows } from "@/services/BuildrikSyncProvider";
+import type { ElementData, ProjectData } from "@/shared/types";
 
 beforeAll(() => installEngineBrowserStubs());
 afterAll(() => removeEngineBrowserStubs());

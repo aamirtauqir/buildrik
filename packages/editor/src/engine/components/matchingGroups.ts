@@ -13,7 +13,7 @@
  * @license BSD-3-Clause
  */
 import type { Composer } from "../Composer";
-import type { ElementData } from "../../shared/types";
+import type { ElementData } from "@/shared/types";
 
 /** A tree with its ids (and any instance bookkeeping) removed. */
 function strip(el: ElementData): unknown {

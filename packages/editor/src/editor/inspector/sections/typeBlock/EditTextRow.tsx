@@ -13,7 +13,7 @@ import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
-import { useInspectorField } from "../../shared/controls/InspectorFieldContext";
+import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 
 interface EditTextRowProps {
   composer: Composer | null | undefined;

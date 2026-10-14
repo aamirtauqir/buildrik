@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { RangeSlider, Section } from "../../shared/controls";
+import { RangeSlider, Section } from "@/editor/inspector/shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
 import { composeFilter, parseFunction } from "./effectValues";
 

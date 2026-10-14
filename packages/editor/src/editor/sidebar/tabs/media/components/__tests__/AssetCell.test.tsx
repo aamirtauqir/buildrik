@@ -6,7 +6,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AssetCell } from "../AssetCell";
-import type { LibraryItem } from "../../data/mediaTypes";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 /* Note: AssetCell uses alt="" on the thumb (decorative — outer button
  * carries the aria-label), so screen.getByRole("img") would not match.

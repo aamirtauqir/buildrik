@@ -7,9 +7,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useVersionHistory } from "../useVersionHistory";
-import { EVENTS } from "../../constants/events";
-import type { Composer } from "../../../engine";
-import type { NamedVersion } from "../../types/versions";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine";
+import type { NamedVersion } from "@/shared/types/versions";
 
 type Handler = (payload?: unknown) => void;
 

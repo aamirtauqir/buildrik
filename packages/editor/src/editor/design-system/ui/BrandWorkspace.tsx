@@ -45,8 +45,8 @@ import * as React from "react";
 import { BRAND_READ_ONLY_COPY, BRAND_READ_ONLY_FAILED_COPY } from "@/shared/constants/brandReadOnly";
 import { ChevronLeft } from "lucide-react";
 import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, Tooltip, useToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine/Composer";
-import { EVENTS } from "../../../shared/constants/events";
+import type { Composer } from "@/engine/Composer";
+import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { SpacingPreset } from "../state/spacingRegistry";
 import {
@@ -939,7 +939,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           <Button
             type="button"
             variant="link"
-            className="tw:h-auto tw:min-h-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
+            className="tw:h-auto tw:min-h-5 tw:-my-0.5 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
             onClick={() => requestLeave()}
             data-testid="brand-back-link"
           >

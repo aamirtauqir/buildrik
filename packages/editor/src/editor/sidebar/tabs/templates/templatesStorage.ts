@@ -6,7 +6,7 @@
  */
 
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
-import { STORAGE_KEYS } from "../../../../shared/constants/storageKeys";
+import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 import { addRecentTemplate } from "./templatesData";
 import type { TemplateItem } from "./templatesData";
 

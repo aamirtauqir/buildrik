@@ -7,8 +7,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useHistoryState } from "../useHistoryState";
-import { EVENTS } from "../../constants/events";
-import type { Composer } from "../../../engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine";
 
 type Handler = (payload?: unknown) => void;
 

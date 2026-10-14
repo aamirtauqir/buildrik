@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { Point, Rect } from "../../types";
+import type { Point, Rect } from "@/shared/types";
 
 // =============================================================================
 // SORTABLE LIST HELPERS

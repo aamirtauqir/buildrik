@@ -18,9 +18,9 @@
  */
 
 import * as React from "react";
-import { SNAP_THRESHOLD } from "../../../../engine/canvas/constants";
-import type { Composer } from "../../../../engine";
-import type { SnapPoint, SmartGuide } from "../../../../shared/types/canvas";
+import { SNAP_THRESHOLD } from "@/engine/canvas/constants";
+import type { Composer } from "@/engine";
+import type { SnapPoint, SmartGuide } from "@/shared/types/canvas";
 import type { SnapLine } from "../useCanvasSnapping";
 
 export interface UseDragSnapGuidesOptions {

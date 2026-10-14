@@ -26,13 +26,13 @@ vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 const tabContentProps: Array<Record<string, unknown>> = [];
-vi.mock("../../tabs/InspectorTabContent", () => ({
+vi.mock("@/editor/inspector/tabs/InspectorTabContent", () => ({
   InspectorTabContent: (props: Record<string, unknown>) => {
     tabContentProps.push(props);
     return null;
   },
 }));
-vi.mock("../../sections/ComponentRow", () => ({
+vi.mock("@/editor/inspector/sections/ComponentRow", () => ({
   ComponentRow: () => null,
 }));
 vi.mock("../InspectorElementMenu", () => ({
@@ -42,7 +42,7 @@ vi.mock("../DeleteConfirmModal", () => ({
   DeleteConfirmModal: () => null,
 }));
 
-import { ProInspector } from "../../ProInspector";
+import { ProInspector } from "@/editor/inspector/ProInspector";
 import { ToastProvider } from "@/editor/chrome-ui";
 
 /* ProInspector mounts ComponentRow, which reports a refused detach

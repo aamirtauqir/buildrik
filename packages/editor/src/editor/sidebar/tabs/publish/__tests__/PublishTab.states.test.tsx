@@ -35,7 +35,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
-import { deriveLifecycleState } from "../../../../shell/lifecycle";
+import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 
 const OPEN_MOVE = deriveLifecycleState({
   reviewState: "none",

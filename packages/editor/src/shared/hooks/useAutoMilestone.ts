@@ -17,7 +17,7 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 import { EVENTS } from "../constants/events";
 import { aiTrpcClient } from "@/services/ai/AiTrpcClient";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";

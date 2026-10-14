@@ -7,9 +7,9 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
-import type { ProjectSettings } from "../../../../shared/types";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { ProjectSettings } from "@/shared/types";
 import { useCanvasGuides } from "../useCanvasGuides";
 
 let settings: ProjectSettings;

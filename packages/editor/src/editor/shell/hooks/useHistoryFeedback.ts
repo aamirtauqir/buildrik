@@ -14,8 +14,8 @@
 
 import * as React from "react";
 import { ToastInput } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 

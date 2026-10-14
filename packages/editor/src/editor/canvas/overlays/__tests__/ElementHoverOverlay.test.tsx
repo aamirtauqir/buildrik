@@ -5,7 +5,7 @@ import { ElementHoverOverlay } from "../ElementHoverOverlay";
 
 // Mock getBoxModel and getElementInfo so they return stable values without
 // needing actual computed styles (jsdom does not compute CSS).
-vi.mock("../../utils/elementInfo", () => ({
+vi.mock("@/editor/canvas/utils/elementInfo", () => ({
   getBoxModel: () => ({
     margin: { top: 0, right: 0, bottom: 0, left: 0 },
     padding: { top: 0, right: 0, bottom: 0, left: 0 },

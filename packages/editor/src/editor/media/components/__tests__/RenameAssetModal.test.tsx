@@ -15,7 +15,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { RenameAssetModal } from "../RenameAssetModal";
-import { TEN, makeItem } from "../../__tests__/libraryFixture";
+import { TEN, makeItem } from "@/editor/media/__tests__/libraryFixture";
 
 const HERO = makeItem({ key: "hero", name: "hero-dark", displayName: "hero-dark.jpg", mimeType: "image/jpeg" });
 const LIBRARY = [HERO, ...TEN.filter((i) => i.key !== "hero").map((i) => ({ ...i, displayName: i.name }))];

@@ -17,7 +17,7 @@ import {
 } from "../HistoryFormatter";
 import type { CheckpointEntry, PatchEntry } from "../historyTypes";
 import type { Patch, PatchOperation, PatchOperationType } from "../utils/JsonPatch";
-import type { ProjectData } from "../../shared/types";
+import type { ProjectData } from "@/shared/types";
 
 function checkpoint(overrides: Partial<CheckpointEntry> = {}): CheckpointEntry {
   return {

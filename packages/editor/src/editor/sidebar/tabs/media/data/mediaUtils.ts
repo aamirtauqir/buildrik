@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import type { MediaAsset } from "../../../../../shared/types/media";
+import type { MediaAsset } from "@/shared/types/media";
 import type { LibraryItem, MediaTypeFilter, VersionEntry } from "./mediaTypes";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 

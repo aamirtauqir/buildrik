@@ -7,10 +7,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { Element } from "../../../engine/elements/Element";
-import { EVENTS } from "../../../shared/constants/events";
-import { devLogger } from "../../../shared/utils/devLogger";
+import type { Composer } from "@/engine";
+import type { Element } from "@/engine/elements/Element";
+import { EVENTS } from "@/shared/constants/events";
+import { devLogger } from "@/shared/utils/devLogger";
 
 export interface UseComposerSelectionOptions {
   composer: Composer | null;

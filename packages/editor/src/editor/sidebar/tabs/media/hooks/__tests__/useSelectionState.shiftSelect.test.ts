@@ -10,7 +10,7 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSelectionState } from "../useSelectionState";
-import type { LibraryItem } from "../../data/mediaTypes";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 function makeItem(key: string): LibraryItem {
   return {

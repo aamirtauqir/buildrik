@@ -6,7 +6,7 @@ import {
   AIInvalidSchemaError,
   AIPromptRejectedError,
 } from "../aiErrors";
-import type { EventEmitter } from "../../../../engine/EventEmitter";
+import type { EventEmitter } from "@/engine/EventEmitter";
 
 function makeEvents() {
   return {

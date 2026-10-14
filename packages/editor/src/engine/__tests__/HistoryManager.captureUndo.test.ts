@@ -11,7 +11,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import { installEngineBrowserStubs, removeEngineBrowserStubs, createTestComposer } from "./test-utils/realComposer";
 
 beforeAll(() => installEngineBrowserStubs());

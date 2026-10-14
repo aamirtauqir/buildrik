@@ -95,6 +95,7 @@
   font-family: var(--bk-font-ui);
 }
 
+
 /* UI FONT ON THE SHELL ROOT (2026-08-03). Until today the only thing setting a
    UI font was `body { font-family: ... }` inline in demo/index.html, which
    e2e/probe/probe.html does not have. The probe therefore rendered in the
@@ -105,5 +106,29 @@
    keeps overriding it normally. */
 .bd-studio:not(.buildrick-canvas, .buildrick-canvas *) {
   font-family: var(--bk-font-ui);
+}
+}
+
+@layer components {
+/* STRONG / B AT 600 (DQ-021, 2026-10-10). The UA stylesheet gives `strong`
+   and `b` a weight of `bolder`, which on Inter 400 text is 700 — over the
+   chrome's 600 cap (DESIGN.md §Typography). Measured live: the Brand empty
+   state's "No brand set." computed 700, as did eight other `<strong>`/`<b>`
+   with no weight class (delete / unpublish confirms, the Pages bulk bar…).
+   The font-weight-700 ratchet could not see any of them: it counts classes
+   and style objects, and these carried neither.
+
+   `components`, NOT `reset`: inside the dashboard the layer order is
+   reset, theme, base, components, utilities, tw-utilities — and the
+   dashboard's own Tailwind preflight (`base`) re-declares `b, strong
+   }` at weight `bolder`, which beat this rule from `reset` (measured:
+   still 700 with the rule loaded). `components` sits after `base` and
+   before `tw-utilities`, so a weight utility on the element
+   (`tw:font-medium`) still wins. */
+.bd-studio strong:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio b:not(.buildrick-canvas, .buildrick-canvas *),
+#bk-overlay-root strong,
+#bk-overlay-root b {
+  font-weight: var(--bk-weight-semibold);
 }
 }

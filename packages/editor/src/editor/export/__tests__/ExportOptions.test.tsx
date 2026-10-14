@@ -6,7 +6,7 @@
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { DEFAULT_EXPORT_CONFIG } from "../../../shared/types/export";
+import { DEFAULT_EXPORT_CONFIG } from "@/shared/types/export";
 import { FormatGrid, OptionsPanel } from "../ExportOptions";
 
 afterEach(cleanup);

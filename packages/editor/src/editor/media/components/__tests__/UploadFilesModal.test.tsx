@@ -14,7 +14,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { UploadFilesModal } from "../UploadFilesModal";
-import { makeFile } from "../../__tests__/libraryFixture";
+import { makeFile } from "@/editor/media/__tests__/libraryFixture";
 
 const MB = 1024 * 1024;
 

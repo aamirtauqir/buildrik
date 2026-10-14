@@ -22,7 +22,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { CollectionManager } from "../CollectionManager";
 import * as Storage from "../CollectionStorage";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 vi.mock("../CollectionStorage", async () => {
   const { createInMemoryCollectionStorage } = await import("./inMemoryCollectionStorage");

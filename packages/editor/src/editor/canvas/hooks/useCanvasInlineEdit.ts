@@ -6,10 +6,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { getElementId } from "../../../shared/utils/dragDrop";
-import { sanitizeHTML } from "../../../shared/utils/html";
-import { EVENTS } from "../../../shared/constants";
+import type { Composer } from "@/engine";
+import { getElementId } from "@/shared/utils/dragDrop";
+import { sanitizeHTML } from "@/shared/utils/html";
+import { EVENTS } from "@/shared/constants";
 import { canWrite } from "@/engine/commands/commandOperations";
 
 export interface EditingState {

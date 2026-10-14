@@ -7,8 +7,8 @@
 import { describe, it, expect } from "vitest";
 import JSZip from "jszip";
 import { ReactExporter } from "../ReactExporter";
-import type { Composer } from "../../Composer";
-import type { ElementData, PageData } from "../../../shared/types";
+import type { Composer } from "@/engine/Composer";
+import type { ElementData, PageData } from "@/shared/types";
 
 function makeTestComposer(pages: PageData[]): Composer {
   /* Both readers, because they do not return the same thing in the running

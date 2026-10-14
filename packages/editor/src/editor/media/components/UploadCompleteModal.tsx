@@ -17,7 +17,7 @@
 
 import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import type { MediaAsset } from "@shared/types/media";
-import { displayNameFor } from "../../sidebar/tabs/media/data/mediaUtils";
+import { displayNameFor } from "@/editor/sidebar/tabs/media/data/mediaUtils";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,

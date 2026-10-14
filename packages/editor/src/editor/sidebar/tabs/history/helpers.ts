@@ -3,9 +3,9 @@
  * @license BSD-3-Clause
  */
 
-import { VersionTimelineManager } from "../../../../engine/VersionTimelineManager";
-import type { ChangeType, HistoryChange } from "../../../../engine/historyTypes";
-import { formatRelativeTime as sharedFormatRelativeTime } from "../../../../shared/utils/relativeTime";
+import { VersionTimelineManager } from "@/engine/VersionTimelineManager";
+import type { ChangeType, HistoryChange } from "@/engine/historyTypes";
+import { formatRelativeTime as sharedFormatRelativeTime } from "@/shared/utils/relativeTime";
 
 /**
  * Collapsed change group — one row in the diff preview.

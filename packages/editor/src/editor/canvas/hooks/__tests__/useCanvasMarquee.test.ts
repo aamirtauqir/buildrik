@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { useCanvasMarquee } from "../useCanvasMarquee";
 import type { UseCanvasMarqueeOptions } from "../useCanvasMarquee";
 

@@ -6,7 +6,7 @@
  */
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { useCanvasContent } from "../useCanvasContent";
 import type { CMSCollectionBinding } from "@/engine/cms/CMSBindingManager";
 import type { CMSContentItem } from "@/shared/types/cms";

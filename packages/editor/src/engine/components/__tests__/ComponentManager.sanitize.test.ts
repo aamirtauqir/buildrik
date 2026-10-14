@@ -8,10 +8,10 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import type { ComponentDefinition } from "../../../shared/types/components";
-import { makeEngine, emitsOf, type FakeComposer } from "../../elements/__tests__/harness";
-import { EVENTS } from "../../../shared/constants/events";
-import type { Composer } from "../../Composer";
+import type { ComponentDefinition } from "@/shared/types/components";
+import { makeEngine, emitsOf, type FakeComposer } from "@/engine/elements/__tests__/harness";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine/Composer";
 
 const stored: ComponentDefinition[] = [];
 vi.mock("../ComponentStorage", () => ({

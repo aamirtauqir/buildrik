@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { HistoryManager } from "../HistoryManager";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 describe("HistoryManager reconstructState", () => {
   it("returns last snapshot when no checkpoint exists", () => {

@@ -15,7 +15,7 @@
 
 import { describe, it, expect } from "vitest";
 import { validateHtml } from "../validateHtml";
-import { ALLOWED_HEAD_TAGS } from "../../constants/headCode";
+import { ALLOWED_HEAD_TAGS } from "@/shared/constants/headCode";
 
 const warnings = (code: string) => validateHtml(code).warnings.join(" | ");
 

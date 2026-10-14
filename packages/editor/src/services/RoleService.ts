@@ -9,6 +9,7 @@
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
+import { devWarn } from "@/shared/utils/devLogger";
 
 export type WorkspaceRole = "VIEWER" | "EDITOR" | "DESIGNER" | "ADMIN" | "OWNER";
 
@@ -29,11 +30,19 @@ export function fetchMyRole(): Promise<WorkspaceRole | null> {
   if (cached) return cached;
   const siteId = getSiteIdFromUrl();
   if (!siteId) return Promise.resolve(null);
-  cached = getBuildrikClient(DASHBOARD_URL)
+  const lookup: Promise<WorkspaceRole | null> = getBuildrikClient(DASHBOARD_URL)
     .sites.myRole.query({ siteId })
     .then((r: { role: string }) => (r.role as WorkspaceRole) ?? null)
-    .catch(() => null);
-  return cached;
+    .catch((error: unknown) => {
+      /* A failure is "unknown" for THIS read only — never cached (DQ-012).
+         Caching it left role-gated chrome unknown for the whole session after
+         one blip. */
+      if (cached === lookup) cached = null;
+      devWarn("RoleService", "role lookup failed", error);
+      return null;
+    });
+  cached = lookup;
+  return lookup;
 }
 
 /** Forget the cached role. The server just refused a write the cached role

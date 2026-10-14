@@ -20,10 +20,10 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../../shared/constants";
+import { EVENTS } from "@/shared/constants";
 import { claimUniqueIds, newPageRootStyles, type IdRename } from "@buildrik/shared/content/elementIds";
-import type { PageData, SlugChange } from "../../../shared/types";
-import { generateId, slugify } from "../../../shared/utils/helpers";
+import type { PageData, SlugChange } from "@/shared/types";
+import { generateId, slugify } from "@/shared/utils/helpers";
 import type { ElementManagerContext } from "./types";
 import { liftParserHoisted } from "./liftParserHoisted";
 

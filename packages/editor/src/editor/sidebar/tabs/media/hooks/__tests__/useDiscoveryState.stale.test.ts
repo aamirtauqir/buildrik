@@ -6,7 +6,7 @@ import { useDiscoveryState } from "../useDiscoveryState";
 const photosMock = vi.fn();
 const videosMock = vi.fn();
 
-vi.mock("../../../../../../services/stock/StockService", () => ({
+vi.mock("@/services/stock/StockService", () => ({
   stockService: {
     searchPhotos: (...args: unknown[]) => photosMock(...args),
     searchVideos: (...args: unknown[]) => videosMock(...args),

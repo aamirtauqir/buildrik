@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { cleanupDropIndicators } from "../../../shared/utils/dragDrop";
+import { cleanupDropIndicators } from "@/shared/utils/dragDrop";
 import type { DropPosition } from "./useDragSession";
 
 // =============================================================================

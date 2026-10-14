@@ -4,14 +4,14 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../../../engine/Composer";
-import type { Element } from "../../../../engine/elements/Element";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
 import {
   activeBreakpoint,
   stylesAt,
   writableElements,
   writeCanvasStyles,
-} from "../../../../engine/commands/commandOperations";
+} from "@/engine/commands/commandOperations";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

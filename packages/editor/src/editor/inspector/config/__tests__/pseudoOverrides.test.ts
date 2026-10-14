@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { computeStatesWithOverrides } from "../pseudoOverrides";
-import { getBreakpointQuery } from "../../../../shared/constants/breakpoints";
+import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 
 function makeComposer(
   ruleStore: Array<{ selector: string; mediaQuery?: string; properties: Record<string, string> }>

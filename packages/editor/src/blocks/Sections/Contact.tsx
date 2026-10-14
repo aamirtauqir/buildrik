@@ -2,7 +2,7 @@
  * Contact section block — board 4428:140817 ("Contact").
  * @license BSD-3-Clause
  */
-import type { BlockData, ElementType } from "../../shared/types";
+import type { BlockData, ElementType } from "@/shared/types";
 
 export const contactBlockConfig: BlockData & { elementType: ElementType } = {
   id: "contact",

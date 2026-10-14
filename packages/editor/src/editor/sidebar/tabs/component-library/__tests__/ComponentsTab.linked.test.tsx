@@ -9,7 +9,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
-import { createMockComposer } from "../../../__tests__/test-utils/mockComposer";
+import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 
 vi.mock("@/services/componentSync", () => ({
   fetchComponentLibrary: vi.fn(async () => [
@@ -18,7 +18,7 @@ vi.mock("@/services/componentSync", () => ({
   ]),
 }));
 
-import { ComponentsTab } from "../../ComponentsTab";
+import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 
 const c = (id: string, name: string, pageId?: string) =>
   ({ id, name, masterTree: {}, createdAt: 1, updatedAt: 1, version: 1, ...(pageId ? { pageId } : {}) }) as never;

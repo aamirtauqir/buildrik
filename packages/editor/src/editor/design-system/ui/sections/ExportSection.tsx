@@ -21,11 +21,11 @@ import {
   useBorderRegistry, useOpacityRegistry, useZindexRegistry,
   useBreakpointRegistry, useGridRegistry, useSizingRegistry,
   useIconRegistry, useImageryRegistry,
-} from "../../state/TokenRegistryContext";
-import { CSSBundler } from "../../../../engine/designSystem/bundler";
-import { buildExport, downloadFile, type ExportFormat } from "../../utils/exportUtils";
-import type { DesignToken } from "../../types";
-import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
+} from "@/editor/design-system/state/TokenRegistryContext";
+import { CSSBundler } from "@/engine/designSystem/bundler";
+import { buildExport, downloadFile, type ExportFormat } from "@/editor/design-system/utils/exportUtils";
+import type { DesignToken } from "@/editor/design-system/types";
+import type { BundleOptions } from "@/engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
 import { Button, CopyButton, IconButton, Menu, MenuItem, Popover, Radio, Select, useToast } from "@/editor/chrome-ui";
 import { X } from "lucide-react";

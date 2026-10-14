@@ -151,8 +151,8 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
           />
         </div>
         <div className="tw:flex tw:gap-4" role="radiogroup" aria-label="Start from">
-          {card("blank", <Square size={20} strokeWidth={1.75} aria-hidden />, "Blank", "Empty canvas")}
-          {card("template", <Grid3x3 size={20} strokeWidth={1.75} aria-hidden />, "From template", `Pick from ${layoutCount} layouts`)}
+          {card("blank", <Square size={20} aria-hidden />, "Blank", "Empty canvas")}
+          {card("template", <Grid3x3 size={20} aria-hidden />, "From template", `Pick from ${layoutCount} layouts`)}
         </div>
         <div className="tw:flex tw:items-center tw:gap-2">
           <ToggleSwitch

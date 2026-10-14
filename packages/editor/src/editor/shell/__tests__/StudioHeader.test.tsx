@@ -12,20 +12,25 @@
  */
 
 import * as React from "react";
-import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* The shell mounts StudioHeader inside ToastProvider; TimeTravelHost (in the
+   header) reports a failed safety version with a toast (DQ-011). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // ── controllable module mocks ────────────────────────────────────────────────
 
 vi.mock("@/shared/utils/featureFlags", () => ({ isFeatureEnabled: vi.fn(() => false) }));
 
-vi.mock("../../../shared/utils/editorViewMode", () => ({
+vi.mock("@/shared/utils/editorViewMode", () => ({
   getEditorViewMode: vi.fn(() => ({
     readOnlyView: false,
   })),
 }));
 
-vi.mock("../../../services/ReviewService", () => ({
+vi.mock("@/services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),
   fetchReviewStatus: vi.fn(() =>
     Promise.resolve({ state: "none", reviewerName: null, at: null, reviewsEnabled: true, editsRequireApproval: false }),
@@ -65,7 +70,7 @@ vi.mock("@/services/syncRetryQueue", async (importOriginal) => {
 
 vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => roleState.role }));
 
-vi.mock("../../../services/NotificationService", () => ({
+vi.mock("@/services/NotificationService", () => ({
   fetchRecentNotifications: vi.fn(() => Promise.resolve([])),
   fetchUnreadCount: vi.fn(() => Promise.resolve(0)),
   markNotificationRead: vi.fn(() => Promise.resolve()),
@@ -80,7 +85,7 @@ const COLLAB_IDLE = {
   isConnected: false,
 };
 const collab = { current: { ...COLLAB_IDLE } };
-vi.mock("../../canvas/hooks/useCollaboration", () => ({
+vi.mock("@/editor/canvas/hooks/useCollaboration", () => ({
   useCollaboration: () => collab.current,
 }));
 
@@ -96,9 +101,9 @@ import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 import { deriveLifecycleState } from "../lifecycle";
 import { shellDirty } from "../shellDirtyRegistry";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
-import { getEditorViewMode } from "../../../shared/utils/editorViewMode";
-import { submitForReview } from "../../../services/ReviewService";
-import type { ReviewStatus } from "../../../services/ReviewService";
+import { getEditorViewMode } from "@/shared/utils/editorViewMode";
+import { submitForReview } from "@/services/ReviewService";
+import type { ReviewStatus } from "@/services/ReviewService";
 
 /* ReviewStatus gained two flag fields — whether reviews exist here at all, and
    whether publishing is gated on an approval — because `state: "none"` could
@@ -441,7 +446,8 @@ describe("StudioHeader", () => {
       render(<StudioHeader {...makeProps({ publishOutcome: "published" })} />);
       const btn = screen.getByRole("button", { name: "✓ Published" });
       expect(btn).toBeDisabled();
-      expect(screen.getByRole("status").textContent).toBe("Published — site is live");
+      /* The ToastProvider wrapper adds its own (empty) status region. */
+      expect(screen.getAllByRole("status").map((n) => n.textContent)).toContain("Published — site is live");
     });
 
     it("failed announces assertively — the toast (useExportHandlers) owns the retry door", () => {

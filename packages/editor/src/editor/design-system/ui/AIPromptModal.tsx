@@ -24,7 +24,7 @@ import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle, But
 import type {
   AIAssistService,
   ComponentSchema,
-} from "../../../engine/designSystem/services/AIAssistService";
+} from "@/engine/designSystem/services/AIAssistService";
 type ModalState =
   | { kind: "idle" }
   | { kind: "generating"; abort: AbortController }
@@ -175,7 +175,7 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
           {showSuccess && state.kind === "success" && (
             <div data-testid="ai-prompt-schema-preview" style={{
               fontSize: 11,
-              fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+              fontFamily: "var(--bk-font-mono)",
               background: "var(--bk-bg-subtle)",
               border: "1px solid var(--bk-border)",
               borderRadius: 6,

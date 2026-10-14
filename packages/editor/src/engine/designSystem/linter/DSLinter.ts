@@ -1,5 +1,6 @@
 import { lightAliasOf, resolveTokenLiteral } from "@buildrik/shared/tokens";
 import type { DesignToken, StylePreset } from "@/engine/designSystem/types";
+import { setHint } from "@/engine/designSystem/contrastFix";
 
 export type LintSeverity = "warning" | "error";
 
@@ -10,7 +11,7 @@ export interface LintIssue {
   message: string;
   /**
    * What `Composer.designSystem.applyAutoFix` should do to the token's value —
-   * the `darken-22` / `lighten-22` grammar `contrastFix.ts` understands. Set
+   * the `contrast:<surface>` / `set:<hex>` grammar `contrastFix.ts` understands. Set
    * only by rules whose repair is mechanical (pure-black, contrast); absent
    * where the fix is a decision (banned-hue, missing-dark). B9 / SH-64.
    */
@@ -143,15 +144,15 @@ export class DSLinter {
         });
       }
 
-      // pure-black: #000 / #000000. Mechanical fix: lift L off zero — one
-      // step towards the ink scale, which is what the rule asks for.
+      // pure-black: #000 / #000000. The fix is the ink scale the message
+      // names (DQ-010 — it was a ±22% lightness step, #383838).
       if (isPureBlack(value)) {
         issues.push({
           rule: "pure-black",
           severity: "error",
           tokenId: t.id,
           message: `Token "${t.id}" is pure black. DESIGN.md NO BLACK rule — use the ink scale (#111827) or the accent instead.`,
-          autoFixHint: "lighten-22",
+          autoFixHint: setHint("#111827"),
         });
       }
       if (darkValue !== undefined && isPureBlack(darkValue)) {

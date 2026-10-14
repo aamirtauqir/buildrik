@@ -12,7 +12,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useBuildTab } from "../useBuildTab";
-import type { InsertSearchHit } from "../../utils/search";
+import type { InsertSearchHit } from "@/editor/sidebar/tabs/build/utils/search";
 import type { ComponentDefinition } from "@/shared/types/components";
 
 const labels = (hits: InsertSearchHit[]): string[] => hits.map((h) => h.label);

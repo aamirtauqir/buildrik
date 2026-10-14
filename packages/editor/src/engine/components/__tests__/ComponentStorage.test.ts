@@ -10,12 +10,12 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { ComponentDefinition } from "../../../shared/types/components";
-import type { ElementData } from "../../../shared/types";
+import type { ComponentDefinition } from "@/shared/types/components";
+import type { ElementData } from "@/shared/types";
 import {
   installFakeIndexedDB,
   type FakeIndexedDBEnv,
-} from "../../storage/__tests__/fakeIndexedDB";
+} from "@/engine/storage/__tests__/fakeIndexedDB";
 
 const DB_NAME = "aquibra-components";
 const STORE_NAME = "components";

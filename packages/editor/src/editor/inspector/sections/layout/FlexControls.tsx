@@ -16,7 +16,7 @@
 
 import * as React from "react";
 import { Button, Checkbox, Label } from "@/editor/chrome-ui";
-import { ButtonGroup, MoreSettingsToggle, SelectRow } from "../../shared/controls";
+import { ButtonGroup, MoreSettingsToggle, SelectRow } from "@/editor/inspector/shared/controls";
 import { GapRow } from "./GapRow";
 
 export interface FlexControlsProps {

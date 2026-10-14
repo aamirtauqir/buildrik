@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { InputWithUnit } from "../../shared/controls";
+import { InputWithUnit } from "@/editor/inspector/shared/controls";
 
 const GAP_UNITS = ["px", "rem", "em", "%"];
 

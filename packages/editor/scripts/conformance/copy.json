@@ -54,11 +54,11 @@
     },
     {
       "surface": "Layers · empty page",
-      "copy": "No layers yet. Add an element to start building this page.",
+      "copy": "Add an element to start building this page.",
       "status": "ships",
       "file": "src/editor/panels/layers/components/LayersEmptyState.tsx",
       "shipsInstead": null,
-      "note": "v3 board 4418:83911 draws the sentence with the trailing \"this page.\" — ae9975a4e brought the component to the board; this manifest line still had the pre-v3 spec wording and was never updated in that commit."
+      "note": "L2-031 (owner 2026-10-10): board 4418:83911 now draws the heading \"No layers yet\" and this sentence beneath it (instance 6598:149601), so the failed-search state (\"No matching layers\", 4418:83498) no longer shares the empty tree's wording. Before that the sentence read \"No layers yet. Add an element to start building this page.\" under a generic \"Nothing here yet\" heading."
     },
     {
       "surface": "Media · no assets",

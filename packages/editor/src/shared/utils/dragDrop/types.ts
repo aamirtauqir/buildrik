@@ -6,11 +6,11 @@
  * @license BSD-3-Clause
  */
 
-import type { Element } from "../../../engine/elements/Element";
-import type { ElementType, Point, Rect } from "../../types";
+import type { Element } from "@/engine/elements/Element";
+import type { ElementType, Point, Rect } from "@/shared/types";
 
 // Re-export geometry types for convenience
-export type { Point, Rect } from "../../types";
+export type { Point, Rect } from "@/shared/types";
 
 // =============================================================================
 // CORE TYPES
@@ -63,7 +63,7 @@ export interface DragDataElement extends DragDataBase {
 /** Drag data for new block from panel */
 export interface DragDataBlock extends DragDataBase {
   type: "block";
-  block: Partial<import("../../types").ElementData>;
+  block: Partial<import("@/shared/types").ElementData>;
 }
 
 /** Multi-element drag item */

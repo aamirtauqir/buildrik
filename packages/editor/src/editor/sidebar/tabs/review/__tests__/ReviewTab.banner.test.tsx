@@ -17,7 +17,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const fetchCurrentRound = vi.fn();
 const fetchReviewComments = vi.fn();
 
-vi.mock("../../../../../services/ReviewService", () => ({
+vi.mock("@/services/ReviewService", () => ({
   fetchRounds: vi.fn(() => Promise.resolve([])),
   fetchCurrentRound: (...a: unknown[]) => fetchCurrentRound(...a),
   fetchReviewComments: (...a: unknown[]) => fetchReviewComments(...a),
@@ -29,7 +29,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
 // A-22: RoleService (which ReviewTab asks for the role) now resolves the
 // site id through BuildrikSyncProvider.getSiteIdFromUrl (currentSiteId was
 // a duplicate, deleted).
-vi.mock("../../../../../services/BuildrikSyncProvider", () => ({
+vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: () => "site_test",
 }));
 

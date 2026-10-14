@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import { devWarn } from "../../shared/utils/devLogger";
+import { devWarn } from "@/shared/utils/devLogger";
 
 // ============================================================================
 // TYPES

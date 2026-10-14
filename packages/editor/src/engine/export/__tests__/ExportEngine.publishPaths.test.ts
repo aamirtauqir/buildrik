@@ -8,7 +8,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { publishPathError } from "@buildrik/shared/schemas/publish";
-import { pageFileNames } from "../ExportEngine";
+import { pageFileNames } from "../pageFiles";
 import { normalizeSlug } from "@/editor/sidebar/tabs/pages/utils/slug";
 
 describe("exported page file names pass the server's publish path check", () => {

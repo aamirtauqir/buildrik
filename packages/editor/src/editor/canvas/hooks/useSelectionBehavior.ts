@@ -14,9 +14,9 @@
  */
 
 import * as React from "react";
-import type { Composer, Element } from "../../../engine";
+import type { Composer, Element } from "@/engine";
 import { useToast } from "@/editor/chrome-ui";
-import { getElementId } from "../../../shared/utils/dragDrop";
+import { getElementId } from "@/shared/utils/dragDrop";
 import { buildElementStack, findElementWithHitExpansion } from "../shared/hitTesting";
 
 /** Distance threshold for "same click position" detection */

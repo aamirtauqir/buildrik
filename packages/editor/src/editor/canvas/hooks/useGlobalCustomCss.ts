@@ -8,9 +8,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants";
-import type { ProjectSettings } from "../../../shared/types";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
+import type { ProjectSettings } from "@/shared/types";
 
 export function useGlobalCustomCss(composer: Composer | null): string {
   const [css, setCss] = React.useState(

@@ -6,10 +6,10 @@
  */
 
 import * as React from "react";
-import type { ImageEditorOptions } from "../../../shell/hooks/useStudioModals";
+import type { ImageEditorOptions } from "@/editor/shell/hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
 import { PanelFrame, useToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
@@ -22,8 +22,8 @@ import { StockSourceModal } from "./components/StockSourceModal";
 import { PickModePanel } from "./components/PickModePanel";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
-import { createAssetVersion } from "../../../../services/MediaVersionService";
-import { regenerateAltText } from "../../../../services/AltTextService";
+import { createAssetVersion } from "@/services/MediaVersionService";
+import { regenerateAltText } from "@/services/AltTextService";
 import { displayNameFor } from "./data/mediaUtils";
 import type { IconConfig } from "@shared/types/media";
 
@@ -90,10 +90,6 @@ function MediaTabWithComposer({
   React.useEffect(() => {
     if (initialStockQuery) void discSearchAll(initialStockQuery);
   }, [initialStockQuery, discSearchAll]);
-
-  const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
-    addToast({ description: msg, tone: type });
-  }, [addToast]);
 
   /* Clone 3681:20026 / 3695:45529 (Phase 6): a saved edit is a VERSION of the
      same asset — the file lands flagged `versionOf` (hidden from the grid) with
@@ -302,7 +298,7 @@ function MediaTabWithComposer({
         onBulkMoveTo={(folderId) => {
           const keys = [...state.selectedKeys];
           void Promise.all(keys.map((k) => state.moveAsset(k, folderId))).then(() => {
-            showToast(`Moved ${keys.length} file${keys.length === 1 ? "" : "s"}`, "success");
+            addToast({ description: `Moved ${keys.length} file${keys.length === 1 ? "" : "s"}`, tone: "success" });
             state.toggleSelMode();
           });
         }}
@@ -335,7 +331,7 @@ function MediaTabWithComposer({
           const saved = await state.saveToLibrary(type, item);
           if (saved) {
             setStockBrowserOpen(false);
-            showToast("Stock image saved", "success");
+            addToast({ description: "Stock image saved", tone: "success" });
           }
         }}
       />
@@ -345,9 +341,9 @@ function MediaTabWithComposer({
           onPick={(icon) => {
             try {
               const result = composer.mediaOps.insertMedia(icon.name, "icon");
-              if (result) showToast(`${icon.name} icon added ✓`, "success");
+              if (result) addToast({ description: `${icon.name} icon added ✓`, tone: "success" });
             } catch {
-              showToast("Could not add icon", "error");
+              addToast({ description: "Could not add icon", tone: "error" });
             }
           }}
         />

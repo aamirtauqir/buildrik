@@ -7,13 +7,13 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { BoundsCalculator } from "../BoundsCalculator";
-import { EVENTS } from "../../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 function createFakeElement(id: string) {
   return {
     getId: () => id,
     getChildren: () => [],
-  } as unknown as import("../../../elements/Element").Element;
+  } as unknown as import("@/engine/elements/Element").Element;
 }
 
 function createFakeComposer(activePageId?: string) {
@@ -36,7 +36,7 @@ function createFakeComposer(activePageId?: string) {
           : undefined
       ),
     },
-  } as unknown as import("../../../Composer").Composer;
+  } as unknown as import("@/engine/Composer").Composer;
 }
 
 function setupDom(elementId: string) {
@@ -131,7 +131,7 @@ describe("BoundsCalculator — cache invalidation", () => {
   it.each(DROPS)("drops cached bounds on %s", (event) => {
     const composer = createFakeComposer("page-1") as unknown as {
       _emit(ev: string): void;
-    } & import("../../../Composer").Composer;
+    } & import("@/engine/Composer").Composer;
     const calc = new BoundsCalculator(composer);
     setupDom("el-1");
 

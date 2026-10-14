@@ -4,9 +4,9 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants";
-import type { SelectionBox } from "../../shared/types/canvas";
-import { devLog } from "../../shared/utils/devLogger";
+import { EVENTS } from "@/shared/constants";
+import type { SelectionBox } from "@/shared/types/canvas";
+import { devLog } from "@/shared/utils/devLogger";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 import { getElementBounds, getElementRotation } from "./canvasGeometry";
@@ -17,7 +17,7 @@ import {
   DEFAULT_BORDER_HIT_WIDTH,
   MOVE_THROTTLE_MS,
 } from "./resize/constants";
-import { DEFAULT_SNAP_CONFIG } from "../../shared/constants/canvas";
+import { DEFAULT_SNAP_CONFIG } from "@/shared/constants/canvas";
 import { getBoundaryConstraints } from "./resize/ConstraintManager";
 import {
   applyBoundsToDOM,

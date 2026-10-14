@@ -10,7 +10,7 @@ import { describe, it, expect } from "vitest";
 import { isAllowedElementTag } from "@buildrik/shared/schemas/element-markup";
 import { isSafeAttrValue, sanitizeHTML, sanitizeElementTreeContent } from "../sanitization";
 import { TYPE_TO_TAG_MAP } from "../typeMapping";
-import type { ElementData } from "../../../types";
+import type { ElementData } from "@/shared/types";
 
 describe("sanitizeHTML — XSS invariants", () => {
   it("strips on* event-handler attributes", () => {

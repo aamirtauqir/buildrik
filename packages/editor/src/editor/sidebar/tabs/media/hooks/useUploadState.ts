@@ -6,9 +6,9 @@
 
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Composer } from "../../../../../engine/Composer";
-import { MEDIA_EVENTS, STORAGE_QUOTA_BYTES } from "../../../../../shared/constants/media";
-import type { UploadProgress, UploadResult } from "../../../../../shared/types/media";
+import type { Composer } from "@/engine/Composer";
+import { MEDIA_EVENTS, STORAGE_QUOTA_BYTES } from "@/shared/constants/media";
+import type { UploadProgress, UploadResult } from "@/shared/types/media";
 import type { FailedUpload, UploadStateResult } from "../data/mediaTypes";
 
 type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning", opts?: { duration?: number }) => void;

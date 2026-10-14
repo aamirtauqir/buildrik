@@ -18,8 +18,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { isSettingsScreenId } from "@/editor/sidebar/tabs/settings/constants";
 

@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 
 /**
  * Top-level History destinations — board 4418:73791's tab row, Session ·

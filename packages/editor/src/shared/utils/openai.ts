@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import { aiCache } from "../../services/ai/AICache";
-import { AIError, AIErrorCode, createAIError } from "../../services/ai/AIErrors";
+import { aiCache } from "@/services/ai/AICache";
+import { AIError, AIErrorCode, createAIError } from "@/services/ai/AIErrors";
 import {
   ContentType,
   ToneType,
@@ -21,8 +21,8 @@ import {
   buildEnhancedPrompt,
   TONE_INSTRUCTIONS,
   CONTENT_TYPE_PROMPTS,
-} from "../../services/ai/AIPromptLibrary";
-import { aiTrpcClient, type AIRequestOptions, type AIResponse } from "../../services/ai/AiTrpcClient";
+} from "@/services/ai/AIPromptLibrary";
+import { aiTrpcClient, type AIRequestOptions, type AIResponse } from "@/services/ai/AiTrpcClient";
 
 // Re-exports
 export type {

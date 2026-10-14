@@ -85,13 +85,13 @@ describe("StudioPanels — ui:switch-tab respects the VIEWER rail gate", () => {
 
 describe("isTabAllowedForViewer", () => {
   it("a non-viewer may open any tab", async () => {
-    const { isTabAllowedForViewer } = await import("../../rail/tabsConfig");
+    const { isTabAllowedForViewer } = await import("@/editor/rail/tabsConfig");
     expect(isTabAllowedForViewer("add" as never, false)).toBe(true);
     expect(isTabAllowedForViewer("content" as never, false)).toBe(true);
   });
 
   it("a viewer may only open layers/assets/history/review/activity (FC-9)", async () => {
-    const { isTabAllowedForViewer } = await import("../../rail/tabsConfig");
+    const { isTabAllowedForViewer } = await import("@/editor/rail/tabsConfig");
     expect(isTabAllowedForViewer("layers" as never, true)).toBe(true);
     expect(isTabAllowedForViewer("assets" as never, true)).toBe(true);
     expect(isTabAllowedForViewer("history" as never, true)).toBe(true);

@@ -6,12 +6,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { displayNameFor } from "../data/mediaUtils";
-import type { Composer } from "../../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import {
   stockService,
   StockSearchError,
   type StockFailureReason,
-} from "../../../../../services/stock/StockService";
+} from "@/services/stock/StockService";
 import type {
   DiscFont,
   DiscIcon,

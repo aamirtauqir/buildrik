@@ -14,9 +14,9 @@ import "@testing-library/jest-dom";
 import type {
   LibraryItem,
   MediaStateResult,
-} from "../../../sidebar/tabs/media/data/mediaTypes";
+} from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { AssetGrid } from "../AssetGrid";
-import { makeMediaState } from "../../__tests__/libraryFixture";
+import { makeMediaState } from "@/editor/media/__tests__/libraryFixture";
 
 function makeItem(over: Partial<LibraryItem> = {}): LibraryItem {
   return {

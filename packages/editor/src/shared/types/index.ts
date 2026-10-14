@@ -8,7 +8,7 @@
 
 // Forward declaration for Composer to avoid circular imports
 // The actual Composer class is in src/engine/Composer.ts
-import type { Composer } from "../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 // ProjectData is defined in project.ts (canonical) — imported here for use in this file's interfaces
 import type { ProjectData } from "./project";
 // ElementData is defined in element.ts (canonical) — imported here for use in BlockData & ComposerEventMap

@@ -6,16 +6,16 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementData } from "../../shared/types";
-import type { DataBinding } from "../../shared/types/data";
-import { isSelfClosing, buildAttributeString } from "../../shared/utils/html";
+import type { ElementData } from "@/shared/types";
+import type { DataBinding } from "@/shared/types/data";
+import { isSelfClosing, buildAttributeString } from "@/shared/utils/html";
 import {
   canHaveChildren as canHaveChildrenUtil,
   isContainerType,
   isVoidType,
   ELEMENT_CATEGORIES,
-} from "../../shared/utils/nesting";
-import type { ElementCategory } from "../../shared/utils/nesting/types";
+} from "@/shared/utils/nesting";
+import type { ElementCategory } from "@/shared/utils/nesting/types";
 import type { Composer } from "../Composer";
 import type { Element } from "./Element";
 

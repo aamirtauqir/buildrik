@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ComponentDefinition, StoredComponent } from "../../shared/types/components";
+import type { ComponentDefinition, StoredComponent } from "@/shared/types/components";
 
 // ============================================
 // Database Configuration

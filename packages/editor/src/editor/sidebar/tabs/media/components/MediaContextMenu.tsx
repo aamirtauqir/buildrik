@@ -16,7 +16,7 @@
  */
 
 import * as React from "react";
-import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
+import { useClickOutside } from "@/shared/hooks/useClickOutside";
 import type { LibraryItem } from "../data/mediaTypes";
 import { useMediaWriteAccess } from "../hooks/useMediaWriteAccess";
 import { Button, Tooltip } from "@/editor/chrome-ui";

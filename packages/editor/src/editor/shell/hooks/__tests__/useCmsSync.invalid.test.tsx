@@ -12,7 +12,7 @@ import { describe, expect, it, vi } from "vitest";
 
 let invalidCb: ((i: { kind: "collection" | "entry"; id: string; message: string }) => void) | null = null;
 
-vi.mock("../../../../services/cmsSync", () => ({
+vi.mock("@/services/cmsSync", () => ({
   bindCmsEngine: () => () => {},
   hydrateCmsFromServer: () => Promise.resolve(),
   flushCmsOutbox: () => Promise.resolve(),

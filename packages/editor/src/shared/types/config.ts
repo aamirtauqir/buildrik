@@ -8,7 +8,7 @@
 
 // Forward declaration for Composer to avoid circular imports
 // The actual Composer class is in src/engine/Composer.ts
-import type { Composer } from "../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import type { ProjectData } from "./project";
 
 // ============================================

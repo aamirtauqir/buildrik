@@ -4,7 +4,7 @@
  */
 
 import type * as React from "react";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import type { ProjectSettings } from "@/shared/types/project";
 import type { SiteColumnPatch } from "@/services/BuildrikSyncProvider";
 

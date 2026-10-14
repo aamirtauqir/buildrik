@@ -8,7 +8,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { InputRow, SelectRow } from "../InputControls";
 import { ControlRow } from "../ControlRow";
-import { FontPicker } from "../../../sections/typography/FontPicker";
+import { FontPicker } from "@/editor/inspector/sections/typography/FontPicker";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "../InspectorFieldContext";
 
 const ctx = (over: Partial<InspectorFieldContextValue> = {}): InspectorFieldContextValue => ({

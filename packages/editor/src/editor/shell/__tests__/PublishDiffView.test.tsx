@@ -9,7 +9,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const fetchPublishDiff = vi.fn();
-vi.mock("../../../services/PublishService", () => ({
+vi.mock("@/services/PublishService", () => ({
   fetchPublishDiff: (...a: unknown[]) => fetchPublishDiff(...a),
 }));
 

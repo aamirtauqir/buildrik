@@ -24,7 +24,7 @@ import * as React from "react";
 import { ChevronDown } from "lucide-react";
 import { resolveTokenLiteral, type TokenUsageCount } from "@buildrik/shared/tokens";
 import { Button, OverlayMount } from "@/editor/chrome-ui";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { displayValue } from "../colors/ColorTokenList";
 
 export interface TokenDeleteDialogProps {

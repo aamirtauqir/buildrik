@@ -10,7 +10,7 @@
  */
 
 import type { FlatElEntry } from "../catalog/types";
-import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
+import type { BlockDefinition } from "@/blocks/blockRegistry";
 import type { ComponentDefinition } from "@/shared/types/components";
 
 /** One flat search hit — the payload field matches `group`. */

@@ -48,7 +48,12 @@ const defined = new Set();
 const refs = new Map(); // name -> [{file, line, hasFallback}]
 let dynamicRefs = 0;
 
-const DEF_RE = /(?:^|[{;\s"'`])(--[a-zA-Z0-9-]+)\s*:/g;
+/* A style-object key is quoted — `{ "--drawer-w": w }`, or computed with a
+   cast, `{ ["--slider-fill" as string]: pct }` — so the name can be followed
+   by its closing quote (and the cast) before the colon. Before DQ-024 only
+   the unquoted CSS form counted, and every inline-set custom property read
+   as an "undefined token" warning. */
+const DEF_RE = /(?:^|[{;\s"'`\[])(--[a-zA-Z0-9-]+)["'`]?(?:\s+as\s+\w+)?\]?\s*:/g;
 const SET_PROP_RE = /setProperty\(\s*["'`](--[a-zA-Z0-9-]+)["'`]/g;
 const REF_RE = /var\(\s*(--[a-zA-Z0-9-]+)\s*(,)?/g;
 const DYNAMIC_REF_RE = /var\(\s*--[a-zA-Z0-9-]*\$\{/g;
@@ -113,6 +118,17 @@ if (warns.length) {
 }
 if (dynamicRefs) {
   console.log(`[token-resolution] ${dynamicRefs} dynamic var(--\${…}) ref(s) skipped (statically unresolvable)`);
+}
+
+/* Fallback-only refs are locked at 0 (DQ-024, 2026-10-10): the last ten
+   were three inline-set custom properties this scanner could not see and four
+   `--bk-*` names nobody ever generated — which rendered their hard-coded
+   fallback, so a Figma token change could never reach them. A new one is a
+   failure, not a warning. */
+const WARN_BASELINE = 0;
+if (warns.length > WARN_BASELINE) {
+  console.error(`[token-resolution] FAIL — fallback-only refs ${warns.length} > baseline ${WARN_BASELINE}. Use a generated token, or define the property where it is set.`);
+  process.exit(1);
 }
 
 if (errors.length) {

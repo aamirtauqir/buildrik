@@ -14,8 +14,8 @@ const mockGetSiteId = vi.hoisted(() => vi.fn((): string | null => null));
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: mockGetSiteId }));
 
 import { useAutoMilestone } from "../useAutoMilestone";
-import { EVENTS } from "../../constants/events";
-import type { Composer } from "../../../engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine";
 
 type Handler = (payload?: unknown) => void;
 

@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { FlatElEntry } from "../../catalog/types";
+import type { FlatElEntry } from "@/editor/sidebar/tabs/build/catalog/types";
 import { searchInsert } from "../search";
 
 const el = (name: string, tags: string[] = []): FlatElEntry =>

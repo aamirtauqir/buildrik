@@ -6,8 +6,6 @@
 export interface ElEntry {
   /** Display name */
   name: string;
-  /** SVG inner HTML (rendered inside <svg viewBox="0 0 24 24">) */
-  iconHtml: string;
   /** Block registry ID for canvas insertion */
   blockId: string;
   /** One-line description shown in tooltip and search */
@@ -25,7 +23,6 @@ export interface CatEntry {
   id: string;
   name: string;
   sub: string;
-  iconHtml: string;
   elements: ElEntry[];
   /**
    * Visual tier grouping. "basic" = core building blocks (default).

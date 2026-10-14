@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { buildDefaultCommands } from "../defaultCommands";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 import type { CommandData } from "@/shared/types";
 
 interface MockElement {
@@ -541,6 +541,7 @@ describe("one registry — ids are unique, the merged canvas rows are here", () 
   it("carries the Insert and Tools rows the canvas palette used to own", () => {
     for (const [id, event, payload] of [
       ["add-text", EVENTS.ELEMENT_QUICK_ADD, { type: "text" }],
+      ["add-heading", EVENTS.ELEMENT_QUICK_ADD, { type: "heading" }],
       ["add-image", EVENTS.ELEMENT_QUICK_ADD, { type: "image" }],
       ["add-button", EVENTS.ELEMENT_QUICK_ADD, { type: "button" }],
       ["add-container", EVENTS.ELEMENT_QUICK_ADD, { type: "container" }],

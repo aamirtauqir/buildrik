@@ -12,13 +12,13 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 const loadServerMediaMock = vi.fn();
-vi.mock("../../../../../../services/BuildrikSyncProvider", () => ({
+vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: () => "s1",
   loadServerMedia: (...a: unknown[]) => loadServerMediaMock(...a),
 }));
 
 import { useLibraryState } from "../useLibraryState";
-import type { Composer } from "../../../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 
 function makeComposer(page: { nextCursor: string | null; total: number; loaded: number } | null) {
   let current = page;

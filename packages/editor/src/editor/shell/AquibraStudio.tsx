@@ -10,11 +10,11 @@
  */
 
 import * as React from "react";
-import { getBlockDefinitions } from "../../blocks/blockRegistry";
-import type { Composer } from "../../engine";
-import { useElementFlash } from "../../shared/hooks";
-import { EVENTS } from "../../shared/constants";
-import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
+import type { Composer } from "@/engine";
+import { useElementFlash } from "@/shared/hooks";
+import { EVENTS } from "@/shared/constants";
+import { useActivePageId } from "@/editor/shared/useActivePageId";
+import type { ComposerConfig, ProjectData } from "@/shared/types";
 import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { SessionExpiredModal } from "./modals/SessionExpiredModal";
@@ -26,7 +26,7 @@ import { useLifecycle } from "./hooks/useLifecycle";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { CompareHost } from "./CompareHost";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
-import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
+import { migrateStorageKeys, migrateAqbKeys } from "@/shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { OnboardingMount } from "../onboarding/OnboardingMount";
@@ -50,7 +50,7 @@ import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
 import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
-import { submitForReview } from "../../services/ReviewService";
+import { submitForReview } from "@/services/ReviewService";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { IMPROVE_ELEMENT_PROMPT } from "@/editor/sidebar/tabs/ai/types";
 import { openPublishCheckFix } from "@/editor/sidebar/tabs/publish/PublishTab";
@@ -84,7 +84,6 @@ migrateStorageKeys();
 migrateAqbKeys();
 
 export interface AquibraStudioProps {
-  licenseKey?: string;
   options?: Partial<ComposerConfig> & {
     project?: { type?: string; default?: { pages?: Array<{ name: string; component: string }> } };
   };
@@ -156,7 +155,6 @@ const DISCARD_SURFACE: Record<DirtyDomain, string> = {
 };
 
 const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
-  licenseKey: _licenseKey,
   options,
   onEditor,
   onReady,
@@ -171,7 +169,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // Use extracted hooks
   const state = useStudioState();
   const modals = useStudioModals();
-  const blocks: BlockData[] = React.useMemo(() => getBlockDefinitions(), []);
 
   /* B-1: every left-panel tab-switch door gets these two guarded sinks, never
      the raw `state.setLeftPanelTab` / `state.openLeftPanelToTab` — the rail,
@@ -301,9 +298,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     };
   }, [composer]);
 
-  // 4 composer-driven side-effects (wizard hide, COMPONENT_CREATE_REQUESTED,
-  // SHOW_IN_LAYERS, overlay-defaults init) extracted into useEditorEventListeners
-  // — D2 stage 3.
+  // Composer-driven side-effects (COMPONENT_CREATE_REQUESTED, overlay-defaults
+  // init, …) live in useEditorEventListeners — D2 stage 3.
   // E7: mirror local CMS changes to the server (best-effort + retryable toast on failure).
   useCmsSync(composer, addToast);
 
@@ -323,9 +319,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   useEditorEventListeners({
     composer,
     modals,
+    addToast,
     state: {
-      setLeftPanelTab: guardedSetLeftPanelTab,
-      setIsLeftPanelOpen: state.setIsLeftPanelOpen,
       openLeftPanelToTab: guardedOpenLeftPanelToTab,
       setShowSpacingIndicators: state.setShowSpacingIndicators,
       setShowBadges: state.setShowBadges,
@@ -376,18 +371,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // T10 (topbar plan): the Issues panel's page scope needs to know which page
   // the user is on, reactively — a page switch must re-scope the list.
-  const [activePageId, setActivePageId] = React.useState<string | null>(null);
-  React.useEffect(() => {
-    if (!composer) return;
-    const read = () => setActivePageId(composer.elements.getActivePage()?.id ?? null);
-    read();
-    composer.on(EVENTS.PAGE_CHANGED, read);
-    composer.on(EVENTS.PROJECT_LOADED, read);
-    return () => {
-      composer.off(EVENTS.PAGE_CHANGED, read);
-      composer.off(EVENTS.PROJECT_LOADED, read);
-    };
-  }, [composer]);
+  const activePageId = useActivePageId(composer);
 
   // 60-save-states: track connectivity so the topbar can reassure "changes
   // queued, will sync" instead of looking like a failed/lost save.
@@ -749,11 +733,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         leftPanelTab={state.leftPanelTab}
         leftPanelSubTab={state.leftPanelSubTabs[state.leftPanelTab]}
         onLeftPanelTabChange={guardedSetLeftPanelTab}
-        onLeftPanelSubTabChange={(subTab) =>
-          state.setLeftPanelSubTabs((prev) => ({ ...prev, [state.leftPanelTab]: subTab }))
-        }
-        blocks={blocks}
-        onQuickAdd={handlers.handleQuickAdd}
         showSpacingIndicators={state.overlays.showSpacingIndicators}
         showBadges={state.overlays.showBadges}
         showGuides={state.overlays.showGuides}

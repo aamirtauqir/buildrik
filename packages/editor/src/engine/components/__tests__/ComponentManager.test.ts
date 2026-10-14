@@ -13,11 +13,11 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EVENTS } from "../../../shared/constants/events";
-import type { ComponentDefinition } from "../../../shared/types/components";
-import type { ElementData } from "../../../shared/types";
-import { makeEngine, emitsOf, type FakeComposer } from "../../elements/__tests__/harness";
-import type { Composer } from "../../Composer";
+import { EVENTS } from "@/shared/constants/events";
+import type { ComponentDefinition } from "@/shared/types/components";
+import type { ElementData } from "@/shared/types";
+import { makeEngine, emitsOf, type FakeComposer } from "@/engine/elements/__tests__/harness";
+import type { Composer } from "@/engine/Composer";
 
 const saveComponent = vi.fn().mockResolvedValue(undefined);
 const loadComponents = vi.fn().mockResolvedValue([]);

@@ -13,6 +13,12 @@ import React from "react";
 const FOCUSABLE =
   'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
+const isShown = (d: HTMLElement) => {
+  if (d.hidden || d.getAttribute("aria-hidden") === "true") return false;
+  const cs = getComputedStyle(d);
+  return cs.display !== "none" && cs.visibility !== "hidden";
+};
+
 export function useFocusTrap(active: boolean, onEscape?: () => void) {
   const ref = React.useRef<HTMLDivElement | null>(null);
 
@@ -70,10 +76,17 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
        instead of "dialog". A query scoped to "dialog" alone never saw them
        stacked against a real dialog, and never saw them at all for
        isModalOpen() below. */
+    /* DQ-019: a dialog that is mounted but CLOSED (hidden, aria-hidden, or
+       display / visibility off) is not on top of anything. Several surfaces
+       keep theirs mounted while closed, and counting them made the trap
+       beneath swallow every Escape — which is why the Media drill-in carried
+       its own trap rather than this one. */
     const isTopmost = () => {
-      const dialogs = document.querySelectorAll(
-        '[role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]',
-      );
+      const dialogs = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          '[role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]',
+        ),
+      ).filter((d) => d === container || isShown(d));
       return dialogs.length === 0 || dialogs[dialogs.length - 1] === container;
     };
 

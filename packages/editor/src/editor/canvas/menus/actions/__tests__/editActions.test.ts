@@ -12,9 +12,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Composer } from "../../../../../engine/Composer";
-import type { Element } from "../../../../../engine/elements/Element";
-import type { ElementData } from "../../../../../shared/types";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
+import type { ElementData } from "@/shared/types";
 import { editSubmenu } from "../editActions";
 
 type Ctx = Parameters<NonNullable<(typeof editSubmenu)[number]["handler"]>>[0];

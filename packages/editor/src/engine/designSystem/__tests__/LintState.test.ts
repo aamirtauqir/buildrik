@@ -17,7 +17,7 @@ describe("LintState", () => {
       type: "banned-hue",
       severity: "warning",
       message: "2.8:1 vs surface",
-      autoFixHint: "darken-22",
+      autoFixHint: "contrast:#FFFFFF",
     };
     state.setIssues("color.accent.yellow", [issue]);
     expect(state.getIssues("color.accent.yellow")).toEqual([issue]);

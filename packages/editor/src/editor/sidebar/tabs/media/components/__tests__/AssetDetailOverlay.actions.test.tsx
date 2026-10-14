@@ -10,7 +10,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { AssetDetailOverlay } from "../AssetDetailOverlay";
-import type { LibraryItem } from "../../data/mediaTypes";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 const item: LibraryItem = {
   key: "a1",

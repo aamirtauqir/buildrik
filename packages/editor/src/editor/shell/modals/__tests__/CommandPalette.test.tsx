@@ -20,11 +20,11 @@ import { render, screen, fireEvent, cleanup, within, waitFor } from "@testing-li
    the real fetchMyRole → network path. Defaults to false (non-viewer) so
    every pre-existing test in this file keeps seeing the full command set. */
 const mockViewerChrome = vi.hoisted(() => vi.fn<() => boolean>(() => false));
-vi.mock("../../hooks/useEditorRole", () => ({ useViewerChrome: () => mockViewerChrome() }));
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({ useViewerChrome: () => mockViewerChrome() }));
 
 import { CommandPalette } from "../CommandPalette";
-import { EVENTS } from "../../../../shared/constants/events";
-import type { Composer } from "../../../../engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine";
 
 type Reg = {
   id: string;
@@ -304,10 +304,39 @@ describe("CommandPalette — search", () => {
     expect(screen.getByTestId("cmdk-label-cmd-ungroup")).toHaveTextContent("select a group");
   });
 
+  /* L1-033: ⌘0 worked and the palette's Reset zoom printed no chord. One row,
+     not the registry's chordless copy beside it. */
+  it("Reset zoom prints ⌘0 / Ctrl+0 and appears once", () => {
+    const { composer } = renderPalette(
+      makeComposer({ registry: [...BOARD_REGISTRY, { id: "zoom-reset", label: "Reset zoom" }] }),
+    );
+    type("reset zoom");
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    expect(screen.getByTestId("cmdk-kbd-view-zoom-100").textContent).toMatch(/0$/);
+    fireEvent.click(screen.getByTestId("cmdk-row-view-zoom-100"));
+    expect(composer!.setZoom).toHaveBeenCalledWith(100);
+  });
+
+  /* L1-033: "heading" offered "Add text" only. */
+  it("'heading' finds Add heading", () => {
+    renderPalette(makeComposer({ registry: [...BOARD_REGISTRY, { id: "add-heading", label: "Add heading" }] }));
+    type("heading");
+    expect(screen.getByTestId("cmdk-row-cmd-add-heading")).toBeInTheDocument();
+  });
+
   it("Zoom to fit prints ⌘1 / Ctrl+1, not Ctrl+0", () => {
     renderPalette();
     type("fit");
     expect(screen.getByTestId("cmdk-kbd-view-fit").textContent).toMatch(/1$/);
+  });
+
+  /* DQ-003: Canvas listened for ZOOM_SELECTION and nothing emitted it. */
+  it("Zoom to selection emits ZOOM_SELECTION and prints Ctrl+2", () => {
+    const { composer } = renderPalette();
+    type("zoom to selection");
+    expect(screen.getByTestId("cmdk-kbd-view-zoom-selection").textContent).toMatch(/2$/);
+    fireEvent.click(screen.getByTestId("cmdk-row-view-zoom-selection"));
+    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.ZOOM_SELECTION, {});
   });
 
   /* PD-38 / C-6 (A14-3): "Clear history" used to emit HISTORY_CLEARED as pure

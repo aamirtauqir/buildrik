@@ -188,6 +188,19 @@ describe('scanSelectorDuplicates', () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
+  /* DQ-031: a rule inside @media (reduced-motion, say) is a gated override
+     of the base rule, not a second canonical home. */
+  it('does not flag a selector repeated inside an @media block', () => {
+    const dir = makeFixture({
+      'src/themes/a.css': '.bd-badge { font-family: x; }',
+      'src/themes/b.css': '@media (prefers-reduced-motion: reduce) {\n  .bd-badge { opacity: 1; }\n}',
+    });
+    const results = run(dir, ['--category=4']);
+    const cat4 = results.find((r) => r.category === 'selectorDuplicates');
+    expect(cat4.violations).toHaveLength(0);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
   it('flags simple head + ignores wrapped head in same comma-list', () => {
     const dir = makeFixture({
       'src/themes/atoms/x.css': '.bd-helper-text { color: gray; }',
@@ -280,6 +293,25 @@ describe('scanLegacyResiduals', () => {
     const cat7 = results.find((r) => r.category === 'legacyResiduals');
     expect(cat7.violations).toHaveLength(2);
     expect(cat7.violations[0].severity).toBe('minor');
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  /* DQ-031: every rule was reported "needs annotation" whether or not it
+     carried one — the walker stopped at the comment and never read it. */
+  it('does not flag a rule whose preceding comment says keep:', () => {
+    const dir = makeFixture({
+      'src/themes/legacy-components.css': `/* keep: engine container */
+.foo { color: red; }
+/* keep: vendor pseudo-elements
+   need element selectors */
+.bar,
+.baz { color: blue; }
+/* something else */
+.qux { color: green; }`,
+    });
+    const results = run(dir, ['--category=7']);
+    const cat7 = results.find((r) => r.category === 'legacyResiduals');
+    expect(cat7.violations.map((v) => v.message)).toEqual([expect.stringMatching(/\.qux/)]);
     rmSync(dir, { recursive: true, force: true });
   });
 

@@ -8,8 +8,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { RESET_CSS, camelToKebab, escapeHTML, stylesToString, stylesToCSS, minifyCSS, downloadHTML, downloadCSS } from "../ExportHelpers";
-import { getDefaultTagName } from "../../../shared/utils/html";
-import { THEME } from "../../../shared/constants/defaultStyles";
+import { getDefaultTagName } from "@/shared/utils/html";
+import { THEME } from "@/shared/constants/defaultStyles";
 
 describe("RESET_CSS", () => {
   it("ships the core reset rules", () => {

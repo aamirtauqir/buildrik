@@ -12,7 +12,7 @@
  * @license BSD-3-Clause
  */
 import { vi, type Mock } from "vitest";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 import { ElementManager } from "../ElementManager";
 
 export interface FakeSelection {

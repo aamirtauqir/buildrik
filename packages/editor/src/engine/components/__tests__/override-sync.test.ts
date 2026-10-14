@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { applyOverridesToTree } from "../ComponentInstance";
-import type { ElementData } from "../../../shared/types";
-import type { Patch } from "../../utils/JsonPatch";
+import type { ElementData } from "@/shared/types";
+import type { Patch } from "@/engine/utils/JsonPatch";
 
 /**
  * F1a regression suite — the component override-survival fix.

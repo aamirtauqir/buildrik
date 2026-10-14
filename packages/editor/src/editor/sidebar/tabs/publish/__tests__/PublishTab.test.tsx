@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
-import type { UsePublishJobResult } from "../../../../shell/hooks/usePublishJob";
+import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 
 /**
  * Only `useToast` is stubbed, and only for what this file renders directly.
@@ -24,7 +24,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
-import { deriveLifecycleState } from "../../../../shell/lifecycle";
+import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 
 /* A site with no review in the path and nothing blocking — the plain `confirm`
    gate. Every case here is about the panel's wiring, not the gate; the gate's

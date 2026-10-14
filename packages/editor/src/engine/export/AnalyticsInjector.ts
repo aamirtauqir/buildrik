@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { AnalyticsConfig } from "../../shared/types";
+import type { AnalyticsConfig } from "@/shared/types";
 
 /* I-1b: provider ids come from project settings (a direct API write reaches
    them too) and land inside inline <script> bodies and URL attributes. A JS

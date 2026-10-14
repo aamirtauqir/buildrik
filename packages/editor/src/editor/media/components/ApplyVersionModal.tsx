@@ -22,7 +22,7 @@
  */
 
 import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
-import { namePages } from "../../sidebar/tabs/media/data/mediaUtils";
+import { namePages } from "@/editor/sidebar/tabs/media/data/mediaUtils";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,

@@ -5,7 +5,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { TokenAddDialog, newTokenId, valueError } from "../TokenAddDialog";
-import type { DesignToken } from "../../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 
 describe("TokenAddDialog", () => {
   it("draws Name, Properties, Cancel · Save to draft", () => {

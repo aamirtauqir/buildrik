@@ -14,8 +14,8 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
-import type { VersionEntry } from "../../../sidebar/tabs/media/data/mediaTypes";
-import { makeItem } from "../../__tests__/libraryFixture";
+import type { VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
+import { makeItem } from "@/editor/media/__tests__/libraryFixture";
 import { VersionsModal } from "../VersionsModal";
 
 const EDITS = {

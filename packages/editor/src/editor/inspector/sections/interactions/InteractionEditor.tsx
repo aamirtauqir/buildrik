@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import { SelectField } from "../../../../shared/forms";
-import type { AnimationPreset } from "../../../../engine/interactions/types";
+import { SelectField } from "@/shared/forms";
+import type { AnimationPreset } from "@/engine/interactions/types";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
 import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================

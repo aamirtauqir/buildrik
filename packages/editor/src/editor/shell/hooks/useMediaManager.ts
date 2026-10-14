@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { MEDIA_EVENTS } from "../../../shared/constants/media";
-import type { MediaAsset, MediaAssetType, UploadResult } from "../../../shared/types/media";
+import type { Composer } from "@/engine";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
+import type { MediaAsset, MediaAssetType, UploadResult } from "@/shared/types/media";
 
 export interface UseMediaManagerResult {
   /** All media assets */

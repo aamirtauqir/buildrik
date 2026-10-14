@@ -13,13 +13,13 @@
  */
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import JSZip from "jszip";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "../ExportEngine";
-import { devWarn } from "../../../shared/utils/devLogger";
+import { devWarn } from "@/shared/utils/devLogger";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
-vi.mock("../../../shared/utils/devLogger", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../../../shared/utils/devLogger")>()),
+vi.mock("@/shared/utils/devLogger", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shared/utils/devLogger")>()),
   devWarn: vi.fn(),
 }));
 

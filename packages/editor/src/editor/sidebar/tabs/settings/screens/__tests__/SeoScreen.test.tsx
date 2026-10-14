@@ -32,7 +32,7 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
 
 import { SeoScreen, robotsPreview } from "../SeoScreen";
 import { siteOrigin } from "@buildrik/shared/seo/urls";
-import type { SettingsFlush } from "../../types";
+import type { SettingsFlush } from "@/editor/sidebar/tabs/settings/types";
 
 const getMock = api.siteDetail.settings.get.query;
 const domainsMock = api.siteDetail.domains.list.query;

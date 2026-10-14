@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { dropSessionMediaUrls } from "../sanitization";
-import type { ElementData } from "../../../types";
+import type { ElementData } from "@/shared/types";
 
 const tree = (): ElementData =>
   ({

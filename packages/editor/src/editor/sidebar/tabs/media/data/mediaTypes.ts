@@ -9,10 +9,10 @@ import type {
   StockVideo,
   DiscIcon,
   DiscFont,
-} from "../../../../../engine/media/MediaManager";
-import type { EditsSnapshot, MediaSortBy, SortDirection, UploadProgress, UploadResult } from "../../../../../shared/types/media";
-import type { MediaAsset } from "../../../../../shared/types/media";
-import type { StockFailureReason } from "../../../../../services/stock/StockService";
+} from "@/engine/media/MediaManager";
+import type { EditsSnapshot, MediaSortBy, SortDirection, UploadProgress, UploadResult } from "@/shared/types/media";
+import type { MediaAsset } from "@/shared/types/media";
+import type { StockFailureReason } from "@/services/stock/StockService";
 import type { AssetPickRequest } from "./assetPick";
 
 export type { MediaSortBy, SortDirection, UploadProgress, MediaAsset };

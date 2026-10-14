@@ -286,9 +286,9 @@
   background: var(--bk-accent-tint);
   color: var(--bk-accent);
 }
-.bd-pg-chip.live      { background: #DCFCE7; color: #166534; }
+.bd-pg-chip.live      { background: var(--bk-success-tint); color: var(--bk-success-text); }
 .bd-pg-chip.draft     { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
-.bd-pg-chip.scheduled { background: #FEF3C7; color: #92400E; }
+.bd-pg-chip.scheduled { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
 .bd-pg-chip.hidden    { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); } /* contrast-fix per design review */
 .bd-pg-chip.error     { background: var(--bk-error-tint); color: var(--bk-error); }
 .bd-pg-chip .dot,

@@ -13,7 +13,7 @@ import * as React from "react";
 // The real icon set ships 300+ Lucide components; rendering it per mount makes
 // this file take ~90s. Mock a tiny deterministic set — the modal's behavior
 // (search / category / recents / select) is what we exercise, not the catalog.
-vi.mock("../../../shared/constants/icons", () => {
+vi.mock("@/shared/constants/icons", () => {
   const Stub = (props: Record<string, unknown>) =>
     React.createElement("svg", { "data-icon": true, ...props });
   const ICONS = [

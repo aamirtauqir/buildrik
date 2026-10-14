@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { PageSEO, SiteSEO, PageData } from "../../shared/types";
+import type { PageSEO, SiteSEO, PageData } from "@/shared/types";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
 import { SOCIAL_NETWORKS } from "@buildrik/shared/schemas/site-detail";
 

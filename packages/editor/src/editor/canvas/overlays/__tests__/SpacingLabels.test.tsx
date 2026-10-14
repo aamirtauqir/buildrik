@@ -9,7 +9,7 @@ import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect } from "vitest";
 import { SpacingLabels } from "../SpacingLabels";
-import type { BoxSpacing } from "../../utils/elementInfo";
+import type { BoxSpacing } from "@/editor/canvas/utils/elementInfo";
 
 const rect = { left: 100, top: 200, width: 50, height: 40 } as DOMRect;
 const box = (v: Partial<BoxSpacing>): BoxSpacing =>

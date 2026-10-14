@@ -28,7 +28,7 @@ import * as React from "react";
 import type { Composer } from "@/engine/Composer";
 import type { ConnectSuggestion } from "@/engine/designSystem/connectTokens";
 import { Button } from "@/editor/chrome-ui";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { candidateLabel } from "./TokenDeleteDialog";
 import { displayValue } from "../colors/ColorTokenList";
 import { NOTICE, SMALL_ACTION } from "./UsageHighlight";

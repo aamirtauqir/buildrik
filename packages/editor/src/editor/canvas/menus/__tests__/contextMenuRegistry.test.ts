@@ -11,8 +11,8 @@ import {
   makeElementStub,
   asComposer,
   type ElementStub,
-} from "../../__tests__/testHarness";
-import type { Element } from "../../../../engine";
+} from "@/editor/canvas/__tests__/testHarness";
+import type { Element } from "@/engine";
 
 function makeCtx(overrides: Partial<{ element: ElementStub; isRoot: boolean; selectedIds: string[] }> = {}): ActionContext {
   const parent = makeElementStub({ id: "parent-1", type: "container" });

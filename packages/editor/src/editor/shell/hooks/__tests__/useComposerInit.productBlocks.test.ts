@@ -44,10 +44,10 @@ const composer = {
   destroy: vi.fn(),
 };
 
-vi.mock("../../../../engine", () => ({ createComposer: vi.fn(() => composer), Composer: class {} }));
+vi.mock("@/engine", () => ({ createComposer: vi.fn(() => composer), Composer: class {} }));
 /* A class, not `vi.fn(() => ({…}))`: the hook calls `new
    ProductCollectionService(...)`, and an arrow function is not constructible. */
-vi.mock("../../../../engine/cms", () => ({
+vi.mock("@/engine/cms", () => ({
   ProductCollectionService: class {
     hasProductsCollection() {
       return Promise.resolve(false);

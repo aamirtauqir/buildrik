@@ -30,7 +30,7 @@ import {
   toAllowedElementTag,
 } from "@buildrik/shared/schemas/element-markup";
 import { sanitizeCmsRichText } from "@buildrik/shared/content/cmsRichText";
-import type { ElementData } from "../../types";
+import type { ElementData } from "@/shared/types";
 import { generateId } from "../helpers/id";
 import {
   ALLOWED_URL_SCHEMES,

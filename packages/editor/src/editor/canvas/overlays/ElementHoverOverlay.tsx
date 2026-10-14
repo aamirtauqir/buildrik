@@ -10,7 +10,7 @@
 
 import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
-import { Z_LAYERS } from "../../../shared/constants/canvas";
+import { Z_LAYERS } from "@/shared/constants/canvas";
 import { getBoxModel, getElementInfo } from "../utils/elementInfo";
 import type { BoxModel, ElementInfo } from "../utils/elementInfo";
 import { DragHandle } from "./DragHandle";

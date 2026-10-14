@@ -12,8 +12,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 import * as React from "react";
-import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
-import { useResetAllPresets } from "../../state/StylePresetRegistryContext";
+import { StylePresetRegistryProvider } from "@/editor/design-system/state/StylePresetRegistryContext";
+import { useResetAllPresets } from "@/editor/design-system/state/StylePresetRegistryContext";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { installDomShims, makeFakeComposer, renderWorkspace } from "./brandWorkspaceHarness";
 

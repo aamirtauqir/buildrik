@@ -65,6 +65,7 @@ function Harness({ composer }: { composer: ReturnType<typeof makeComposer> }) {
   });
   useEditorEventListeners({
     composer: c,
+    addToast: vi.fn(() => "toast-id"),
     modals: {
       openCreateComponent: vi.fn(),
       openSaveAsComponent: vi.fn(),
@@ -72,8 +73,6 @@ function Harness({ composer }: { composer: ReturnType<typeof makeComposer> }) {
       toggleShortcuts: vi.fn(),
     },
     state: {
-      setLeftPanelTab: guarded.setLeftPanelTab,
-      setIsLeftPanelOpen: vi.fn(),
       openLeftPanelToTab: guarded.openLeftPanelToTab,
       setShowSpacingIndicators: vi.fn(),
       setShowBadges: vi.fn(),

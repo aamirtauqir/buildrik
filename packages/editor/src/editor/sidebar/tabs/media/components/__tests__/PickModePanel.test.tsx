@@ -11,8 +11,8 @@ import "@testing-library/jest-dom";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PickModePanel } from "../PickModePanel";
-import type { LibraryItem } from "../../data/mediaTypes";
-import type { AssetPickRequest } from "../../data/assetPick";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
+import type { AssetPickRequest } from "@/editor/sidebar/tabs/media/data/assetPick";
 
 vi.mock("@/editor/media/UploadAssetModal", () => ({
   UploadAssetModal: ({ open, pane, forLabel }: { open: boolean; pane: string; forLabel?: string }) =>

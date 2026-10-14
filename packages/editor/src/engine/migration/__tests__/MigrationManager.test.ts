@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { MigrationManager } from "../MigrationManager";
-import { EventEmitter } from "../../EventEmitter";
-import type { ProjectPayload } from "../../designSystem/migrations/projectMigrations";
+import { EventEmitter } from "@/engine/EventEmitter";
+import type { ProjectPayload } from "@/engine/designSystem/migrations/projectMigrations";
 /* Read the target, never retype it — these assertions are about "the chain ran
    to completion" and "already at target", not about the number 2. Adding
    migration 0003 broke both by moving a literal out from under them. */
-import { TARGET_PROJECT_VERSION } from "../../designSystem/migrations/projectMigrations";
+import { TARGET_PROJECT_VERSION } from "@/engine/designSystem/migrations/projectMigrations";
 
 describe("MigrationManager", () => {
   beforeEach(() => localStorage.clear());

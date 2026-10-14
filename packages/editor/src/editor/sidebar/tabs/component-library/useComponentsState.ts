@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants";
-import type { ComponentDefinition } from "../../../../shared/types/components";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
+import type { ComponentDefinition } from "@/shared/types/components";
 import { takePendingMaster, type OpenMasterRequest } from "./openMasterRequest";
 import { deleteComponentWithUndo } from "./ComponentDetailScreen";
 import { useComponentList } from "./useComponentList";

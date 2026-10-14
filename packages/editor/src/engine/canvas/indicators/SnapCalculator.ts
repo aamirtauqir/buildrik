@@ -11,9 +11,9 @@ import type {
   SmartGuide,
   CanvasGuide,
   ElementBounds,
-} from "../../../shared/types/canvas";
-import type { Composer } from "../../Composer";
-import type { Element } from "../../elements/Element";
+} from "@/shared/types/canvas";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
 import { SNAP_THRESHOLD } from "../constants";
 import { BoundsCalculator } from "./BoundsCalculator";
 import type { SimpleBounds } from "./types";

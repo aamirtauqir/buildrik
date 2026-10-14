@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "../ExportEngine";
 
 /**

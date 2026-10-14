@@ -33,7 +33,7 @@ import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { EVENTS } from "@/shared/constants/events";
 import { isValidBreakpoint } from "@/shared/constants/breakpoints";
 import type { BreakpointId } from "@/shared/types/breakpoints";
-import { useSaveConflict } from "../../shell/hooks/useSaveConflict";
+import { useSaveConflict } from "@/editor/shell/hooks/useSaveConflict";
 import { computeEffectiveStyles, deriveCssContext, getPropertyStates } from "../config/cssContext";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
 import { resolveDisplayMode, useInspectorSections } from "../hooks/useInspectorSections";

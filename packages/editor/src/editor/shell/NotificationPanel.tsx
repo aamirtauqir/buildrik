@@ -23,7 +23,7 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
   type EditorNotification,
-} from "../../services/NotificationService";
+} from "@/services/NotificationService";
 
 /** U1: one relative-time SSOT — shared/utils/relativeTime, days fallback. */
 function relTime(iso: string | Date): string {

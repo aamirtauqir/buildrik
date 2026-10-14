@@ -438,7 +438,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               onClick={() => setFolderMenuOpen((v) => !v)}
             >
               <span className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5">
-                <Folder size={13} className="tw:flex-none tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
+                <Folder size={14} className="tw:flex-none tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
                 <span className="tw:truncate">{currentFolderName}</span>
                 <ChevronDown size={12} className="tw:flex-none tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
                 <span className="tw:ml-auto tw:text-[11px] tw:text-[var(--bk-ink-muted)]">change…</span>
@@ -866,7 +866,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             <Menu label="Add from" className={DRAWER_MENU}>
               <DrawerMenuHeading>ADD FROM</DrawerMenuHeading>
               <MenuItem
-                icon={<Cloud size={13} aria-hidden="true" />}
+                icon={<Cloud size={14} aria-hidden="true" />}
                 data-testid="media-stock-action"
                 onClick={() => { setAddFromOpen(false); onOpenStock(); }}
               >
@@ -874,7 +874,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               </MenuItem>
               {props.onOpenIconPicker ? (
                 <MenuItem
-                  icon={<Shapes size={13} aria-hidden="true" />}
+                  icon={<Shapes size={14} aria-hidden="true" />}
                   data-testid="media-icons-action"
                   onClick={() => { setAddFromOpen(false); props.onOpenIconPicker?.(); }}
                 >

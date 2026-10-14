@@ -239,7 +239,7 @@ describe("insertToCanvas — a local-only asset", () => {
    nothing is inserted or replaced on the canvas. */
 describe("applyPick — pick mode's Use selected image", () => {
   it("hands the asset to the field's onSelect, leaves pick mode, and touches no element", async () => {
-    const { endAssetPick } = await import("../../data/assetPick");
+    const { endAssetPick } = await import("@/editor/sidebar/tabs/media/data/assetPick");
     const composer = composerWith({ id: "a1", src: "https://cdn/share.jpg", type: "image", name: "share.jpg" });
     (composer as unknown as { mediaOps: Record<string, unknown> }).mediaOps.replaceMedia = vi.fn();
     const { result } = renderHook(() => useMediaState(composer as never));
@@ -255,7 +255,7 @@ describe("applyPick — pick mode's Use selected image", () => {
   });
 
   it("a request made before the drawer mounts is waiting for it (the drawer is lazy)", async () => {
-    const { requestAssetPick, endAssetPick } = await import("../../data/assetPick");
+    const { requestAssetPick, endAssetPick } = await import("@/editor/sidebar/tabs/media/data/assetPick");
     const composer = composerWith({});
     requestAssetPick(composer as never, { elementId: "el-9", label: "Hero" });
     const { result } = renderHook(() => useMediaState(composer as never));

@@ -18,7 +18,7 @@ import * as React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PublishTab } from "../PublishTab";
-import { deriveLifecycleState } from "../../../../shell/lifecycle";
+import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 
 const OPEN_MOVE = deriveLifecycleState({
   reviewState: "none",
@@ -31,14 +31,14 @@ const OPEN_MOVE = deriveLifecycleState({
   offline: false,
   errorCount: 0,
 });
-import type { UsePublishJobResult } from "../../../../shell/hooks/usePublishJob";
+import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import { ToastProvider } from "@/editor/chrome-ui";
 /* PublishTab hosts the unpublish confirm and reports its outcome through the
    toast context the studio always provides; these renders were bare. */
 const renderTab = (ui: React.ReactElement) => render(<ToastProvider>{ui}</ToastProvider>);
 
 
-vi.mock("../../../../../services/PublishService", async () => {
+vi.mock("@/services/PublishService", async () => {
   const actual = await vi.importActual<Record<string, unknown>>(
     "../../../../../services/PublishService",
   );

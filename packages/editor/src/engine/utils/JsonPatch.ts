@@ -81,6 +81,13 @@ export function createPatch(oldObj: unknown, newObj: unknown, path: string = "")
     return patch;
   }
 
+  /* L1-009: a Date is not a plain object, so it fell to the replace below
+     even when unchanged — a server page's `updatedAt` turned every harmless
+     change event into a recorded step. */
+  if (oldObj instanceof Date && newObj instanceof Date && oldObj.getTime() === newObj.getTime()) {
+    return patch;
+  }
+
   // Arrays
   if (Array.isArray(oldObj) && Array.isArray(newObj)) {
     return createArrayPatch(oldObj, newObj, path);

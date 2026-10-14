@@ -21,7 +21,7 @@ const MAX: Record<string, number> = { "el-1": 1000, "el-2": 40 };
 vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-vi.mock("../../tabs/InspectorTabContent", () => ({
+vi.mock("@/editor/inspector/tabs/InspectorTabContent", () => ({
   InspectorTabContent: ({ selectedElement }: { selectedElement: { id: string } | null }) => {
     const ref = React.useRef<HTMLDivElement>(null);
     React.useLayoutEffect(() => {
@@ -36,7 +36,7 @@ vi.mock("../../tabs/InspectorTabContent", () => ({
     return <div ref={ref} data-testid="inspector-body" />;
   },
 }));
-vi.mock("../../sections/ComponentRow", () => ({ ComponentRow: () => null }));
+vi.mock("@/editor/inspector/sections/ComponentRow", () => ({ ComponentRow: () => null }));
 vi.mock("../InspectorElementMenu", () => ({ InspectorElementMenu: () => null }));
 vi.mock("../DeleteConfirmModal", () => ({ DeleteConfirmModal: () => null }));
 

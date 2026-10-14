@@ -4,7 +4,8 @@
  * @license BSD-3-Clause
  */
 
-export { ExportEngine, isPageLive, pageFileNames } from "./ExportEngine";
+export { ExportEngine } from "./ExportEngine";
+export { isPageLive, pageFileNames } from "./pageFiles";
 export { ReactExporter } from "./ReactExporter";
 export { AssetBundler } from "./AssetBundler";
 export { generateStripeScripts, isValidStripePublishableKey } from "./StripeInjector";
@@ -29,6 +30,6 @@ export type {
   DeviceDimensions,
   CodeTab,
   CodePreviewState,
-} from "../../shared/types/export";
+} from "@/shared/types/export";
 
-export { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
+export { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "@/shared/types/export";

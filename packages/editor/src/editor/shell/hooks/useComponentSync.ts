@@ -8,13 +8,13 @@
  */
 import * as React from "react";
 import { ToastInput, dismissToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import type {
   ComponentCreatedPayload,
   ComponentUpdatedPayload,
   ComponentDeletedPayload,
-} from "../../../shared/types/components";
+} from "@/shared/types/components";
 import {
   mirrorComponentUpsert,
   mirrorComponentDelete,
@@ -23,7 +23,7 @@ import {
   onComponentSyncError,
   getComponentSyncPendingCount,
   retryComponentSync,
-} from "../../../services/componentSync";
+} from "@/services/componentSync";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { captureComponentThumbnail } from "@/editor/sidebar/tabs/component-library/captureComponentThumbnail";
 

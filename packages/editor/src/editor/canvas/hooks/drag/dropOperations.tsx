@@ -7,21 +7,21 @@
  */
 
 import * as React from "react";
-import { getBlockById, insertBlock } from "../../../../blocks/blockRegistry";
-import { CATALOG } from "../../../components-catalog/catalog";
-import { placeCatalogComponent } from "../../../components-catalog/placeCatalogComponent";
-import type { Composer } from "../../../../engine";
-import type { ElementType, GrapesElement } from "../../../../shared/types";
-import { devError } from "../../../../shared/utils/devLogger";
+import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
+import { CATALOG } from "@/editor/components-catalog/catalog";
+import { placeCatalogComponent } from "@/editor/components-catalog/placeCatalogComponent";
+import type { Composer } from "@/engine";
+import type { ElementType, GrapesElement } from "@/shared/types";
+import { devError } from "@/shared/utils/devLogger";
 import {
   findDropTargetElement,
   getElementId,
   findValidDOMTarget,
   findValidDropTargetWithFallback,
-} from "../../../../shared/utils/dragDrop";
-import { animateDropSuccess } from "../../../../shared/utils/dragDrop/animations";
-import type { MultiDragElement } from "../../../../shared/utils/dragDrop/types";
-import { canNestElement } from "../../../../shared/utils/nesting";
+} from "@/shared/utils/dragDrop";
+import { animateDropSuccess } from "@/shared/utils/dragDrop/animations";
+import type { MultiDragElement } from "@/shared/utils/dragDrop/types";
+import { canNestElement } from "@/shared/utils/nesting";
 import type { DropError, DropSuccess } from "../useCanvasDragDrop";
 import type { DropPosition } from "../useDragSession";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
@@ -186,6 +186,12 @@ export function handleElementDrop(
     const descendants = sourceEl.getDescendants?.() || [];
     const descendantIds = new Set(descendants.map((d: GrapesElement) => d.getId()));
     const skipIds = new Set([elementId, ...descendantIds]);
+    /* L2-038: released over itself (the pointer never left it — a near-miss
+       on the resize edge), the drop is no move. Walking up from here reached
+       the element's own parent, which the resolver skips as "the current
+       parent", and the fallback sent it to the end of the page root. */
+    const under = getElementId(dropTargetEl);
+    if (under && skipIds.has(under)) return true;
     dropTargetEl = findValidDOMTarget(dropTargetEl, skipIds);
 
     if (!dropTargetEl) {

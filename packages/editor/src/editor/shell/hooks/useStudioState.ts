@@ -8,7 +8,7 @@
 
 import * as React from "react";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
-import type { DeviceType } from "../../../shared/types";
+import type { DeviceType } from "@/shared/types";
 import { migrateLegacyPanelState } from "./panelStateMigration";
 import { getTabMode, isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
 import { useViewerChrome } from "./useEditorRole";

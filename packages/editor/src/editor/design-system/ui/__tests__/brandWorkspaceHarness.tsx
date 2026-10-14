@@ -11,9 +11,9 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import * as React from "react";
 import { BrandWorkspace, type BrandPageId } from "../BrandWorkspace";
-import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
-import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
-import { DSModeProvider } from "../../state/DSModeContext";
+import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
+import { StylePresetRegistryProvider } from "@/editor/design-system/state/StylePresetRegistryContext";
+import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { validateTokens } from "@buildrik/shared/schemas/design-tokens";
 

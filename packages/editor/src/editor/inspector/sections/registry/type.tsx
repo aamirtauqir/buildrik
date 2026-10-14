@@ -8,7 +8,7 @@
 
 import { defineSection, type AnySectionEntry } from "./_shared";
 import { TypeBlockSection } from "../typeBlock/TypeBlockSection";
-import { TYPE_BLOCKS } from "../../config/typeBlocks";
+import { TYPE_BLOCKS } from "@/editor/inspector/config/typeBlocks";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 export const TYPE_SECTIONS: Record<string, AnySectionEntry> = {

@@ -22,8 +22,8 @@
 
 import * as React from "react";
 import { Copy, MoreHorizontal, Trash2 } from "lucide-react";
-import type { Composer } from "../../../engine";
-import { Z_LAYERS } from "../../../shared/constants/canvas";
+import type { Composer } from "@/engine";
+import { Z_LAYERS } from "@/shared/constants/canvas";
 import { IconButton } from "@/editor/chrome-ui";
 import { canvasScale } from "../utils/canvasScale";
 

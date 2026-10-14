@@ -14,9 +14,9 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { StorageAdapter } from "../StorageAdapter";
-import { EVENTS, THRESHOLDS } from "../../../shared/constants";
-import type { Composer } from "../../Composer";
-import type { ProjectData, ProjectSettings, StorageConfig } from "../../../shared/types";
+import { EVENTS, THRESHOLDS } from "@/shared/constants";
+import type { Composer } from "@/engine/Composer";
+import type { ProjectData, ProjectSettings, StorageConfig } from "@/shared/types";
 import { installFakeIndexedDB, quotaExceededError } from "./fakeIndexedDB";
 
 // ============================================

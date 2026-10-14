@@ -9,10 +9,11 @@
  * all blind to the class because each half is internally valid; in 5 of 11
  * cases a test was asserting the broken half.
  *
- * WARN-mode (eng-review 3A): exits 0 always, prints deltas against
- * .seam-baseline.json. Ratchet to ERROR per-category once a category holds
- * at baseline for a full phase. Update the baseline with --update after
- * triaging every new finding — a quietly raised baseline is not a ratchet.
+ * Growth ratchet (DQ-004, 2026-10-09): exits 1 when any category rises over
+ * .seam-baseline.json, so verify:ds fails. It ran WARN-only until then, and
+ * the counts sat over baseline (8>4, 20>12) with nobody acting on them. A
+ * count that drops is reported so the baseline can be lowered with --update
+ * after triage — a quietly raised baseline is not a ratchet.
  *
  * Categories:
  *   listeners-without-emitter  — the killer class (12 defects). Colon-
@@ -85,7 +86,11 @@ for (const p of files) {
   const isEvents = p.endsWith("constants/events.ts");
 
   if (!isEvents) {
-    for (const m of s.matchAll(/\.emit\??\(\s*(?:EVENTS\.([A-Z0-9_]+)|"([^"\n]+)"|'([^'\n]+)')/g)) {
+    /* `.emit(`, the optional `?.emit?.(` (DQ-004: BRAND_CHECKS_RUN and
+       AI_SUGGESTION_APPLIED were reported orphaned because `\.emit\??\(`
+       never matched `emit?.(`), and helper emitters named emit* that take the
+       EVENTS constant first (ResizeHandler.emitResizeEvent). */
+    for (const m of s.matchAll(/\bemit\w*(?:\?\.)?\(\s*(?:EVENTS\.([A-Z0-9_]+)|"([^"\n]+)"|'([^'\n]+)')/g)) {
       const lit = m[2] ?? m[3];
       const key = m[1] ?? val2const[lit] ?? (lit?.includes(":") ? `LIT:${lit}` : null);
       if (key) push(emitted, key, rel(p));
@@ -93,7 +98,7 @@ for (const p of files) {
         emitLiteralDrift.push(`${rel(p)} .emit("${lit}") — not an EVENTS value`);
       }
     }
-    for (const m of s.matchAll(/\.(?:on|off)\??\(\s*(?:EVENTS\.([A-Z0-9_]+)|"([^"\n]+)"|'([^'\n]+)')/g)) {
+    for (const m of s.matchAll(/\.(?:on|off)(?:\?\.)?\(\s*(?:EVENTS\.([A-Z0-9_]+)|"([^"\n]+)"|'([^'\n]+)')/g)) {
       const lit = m[2] ?? m[3];
       const key = m[1] ?? val2const[lit] ?? (lit?.includes(":") ? `LIT:${lit}` : null);
       if (key) push(listened, key, rel(p));
@@ -151,7 +156,7 @@ if (UPDATE) {
 
 const baseline = existsSync(BASELINE_PATH) ? JSON.parse(read(BASELINE_PATH)) : null;
 let regressed = false;
-console.log("[seam-scan] WARN-mode (eng-review 3A) — informational until ratcheted");
+console.log("[seam-scan] growth ratchet — a category over baseline fails");
 for (const [cat, n] of Object.entries(counts)) {
   const base = baseline?.[cat];
   const mark = base == null ? "??" : n > base ? "UP" : n < base ? "ok" : "ok";
@@ -168,5 +173,8 @@ if (regressed || !baseline) {
   detail("listeners without emitter", orphanListeners);
   detail("emit/on literals not in EVENTS", emitLiteralDrift.slice(0, 15));
 }
-if (regressed) console.log("\n[seam-scan] WARN: growth over baseline — triage before --update. (Exit 0: WARN-mode.)");
+if (regressed) {
+  console.log("\n[seam-scan] FAIL: growth over baseline — fix the new seam, or triage it and run --update.");
+  process.exit(1);
+}
 process.exit(0);

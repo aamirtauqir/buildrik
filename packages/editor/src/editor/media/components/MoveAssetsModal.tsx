@@ -24,7 +24,7 @@
  */
 
 import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
-import type { LibraryItem, MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { LibraryItem, MediaFolder } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_SECONDARY,

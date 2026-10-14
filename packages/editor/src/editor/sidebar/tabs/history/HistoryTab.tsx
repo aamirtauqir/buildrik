@@ -15,12 +15,12 @@
 import * as React from "react";
 import { PanelFrame, Button, ConfirmDialog, Menu, MenuItem, Popover, TextField } from "@/editor/chrome-ui";
 import { MoreHorizontal } from "lucide-react";
-import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
-import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
-import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
+import { useHistoryState } from "@/shared/hooks/useHistoryState";
+import { useAutoMilestone } from "@/shared/hooks/useAutoMilestone";
+import { VersionHistoryPanel } from "@/editor/panels/VersionHistoryPanel";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
-import { SaveVersionFooter } from "../../../panels/version-history/SaveVersionFooter";
-import { PublishHistory } from "../../../shell/PublishHistory";
+import { SaveVersionFooter } from "@/editor/panels/version-history/SaveVersionFooter";
+import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";

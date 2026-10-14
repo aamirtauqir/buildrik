@@ -13,7 +13,7 @@
 export { Canvas } from "./Canvas";
 export type { CanvasProps, CanvasRef } from "./Canvas";
 export { DEVICE_SIZES } from "./Canvas.types";
-// DeviceType lives in types/ — import from "../../shared/types" if you need it
+// DeviceType lives in types/ — import from "@/shared/types" if you need it
 
 // Footer toolbar (overlays + zoom, IA Redesign 2026)
 export { CanvasFooterToolbar } from "./CanvasFooterToolbar";

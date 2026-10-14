@@ -10,10 +10,10 @@ import type {
   CMSField,
   CMSQueryOptions,
   CMSQueryResult,
-} from "../../shared/types/cms";
-import { validateFieldValue } from "../../shared/types/cms";
+} from "@/shared/types/cms";
+import { validateFieldValue } from "@/shared/types/cms";
 import { cmsRecordClash, cmsSlugField } from "@buildrik/shared/schemas/cms";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import { EventEmitter } from "../EventEmitter";
 import * as Storage from "./CollectionStorage";
 

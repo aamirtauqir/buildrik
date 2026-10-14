@@ -12,7 +12,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ConfirmFolderDeleteModal } from "../ConfirmFolderDeleteModal";
-import type { ConfirmFolderDeletePayload } from "../../data/mediaTypes";
+import type { ConfirmFolderDeletePayload } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 const payload = (over: Partial<ConfirmFolderDeletePayload> = {}): ConfirmFolderDeletePayload => ({
   folderId: "f1",

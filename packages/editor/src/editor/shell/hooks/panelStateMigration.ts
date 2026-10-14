@@ -5,7 +5,7 @@
  */
 
 import type { PanelState } from "./useStudioState";
-import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
+import { GROUPED_TABS_CONFIG } from "@/editor/rail/tabsConfig";
 
 /** Every id the tab registry knows about. */
 const VALID_TABS = new Set<string>(GROUPED_TABS_CONFIG.map((t) => t.id));

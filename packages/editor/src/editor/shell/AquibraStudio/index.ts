@@ -5,5 +5,5 @@
  */
 
 // Re-export from root types module (these exist)
-export type { DeviceType, ProjectData, ComposerConfig } from "../../../shared/types";
-export type { Composer } from "../../../engine";
+export type { DeviceType, ProjectData, ComposerConfig } from "@/shared/types";
+export type { Composer } from "@/engine";

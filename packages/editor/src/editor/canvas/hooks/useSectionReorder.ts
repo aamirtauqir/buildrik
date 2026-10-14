@@ -8,8 +8,8 @@
 
 import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 

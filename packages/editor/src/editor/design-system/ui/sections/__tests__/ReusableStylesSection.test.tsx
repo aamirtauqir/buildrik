@@ -5,7 +5,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { ReusableStylesSection, presetLine, reusableStylesCount } from "../ReusableStylesSection";
-import { DEFAULT_PRESETS } from "../../../constants";
+import { DEFAULT_PRESETS } from "@/editor/design-system/constants";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const TYPE = [

@@ -14,7 +14,7 @@ import { ComponentRow } from "../ComponentRow";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import type { ComponentDefinition, ComponentInstance } from "@/shared/types/components";
-import { InspectorFieldContext, type InspectorFieldContextValue } from "../../shared/controls/InspectorFieldContext";
+import { InspectorFieldContext, type InspectorFieldContextValue } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 
 const makeComponent = (overrides: Partial<ComponentDefinition> = {}): ComponentDefinition => ({
   id: "comp-1",

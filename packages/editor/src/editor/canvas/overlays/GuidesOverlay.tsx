@@ -6,9 +6,9 @@
  */
 
 import * as React from "react";
-import { Z_LAYERS } from "../../../shared/constants/canvas";
-import type { CanvasGuide } from "../../../shared/types/canvas";
-import { canvasTokens } from "../../../styles/tokens";
+import { Z_LAYERS } from "@/shared/constants/canvas";
+import type { CanvasGuide } from "@/shared/types/canvas";
+import { canvasTokens } from "@/styles/tokens";
 
 export interface GuidesOverlayProps {
   /** Current guides */

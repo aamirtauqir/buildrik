@@ -9,11 +9,11 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { LintIssue } from "../../../engine/designSystem/linter";
-import type { LintIssue as StoredLintIssue } from "../../../engine/designSystem/LintState";
+import type { Composer } from "@/engine";
+import type { LintIssue } from "@/engine/designSystem/linter";
+import type { LintIssue as StoredLintIssue } from "@/engine/designSystem/LintState";
 import { buildContrastIssues, buildDarkPairIssues, contrastLintMode } from "../utils/contrastLint";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { siteHasThemeToggle } from "@/engine/export/themeToggleRuntime";
 import {

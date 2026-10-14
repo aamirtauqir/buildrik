@@ -12,13 +12,13 @@
 import * as React from "react";
 import type { ImageEditorOptions } from "./hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode, isColumnTabOpen, isInspectorColumnOpen, isTabAllowedForViewer, RIGHT_COLUMN_TABS, VIEWER_TABS } from "../rail/tabsConfig";
-import type { BlockData, DeviceType } from "../../shared/types";
-import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
+import type { DeviceType } from "@/shared/types";
+import type { MediaAsset, MediaAssetType, IconConfig } from "@/shared/types/media";
 import { Button, useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
@@ -89,9 +89,6 @@ export interface StudioPanelsProps {
    *  actually happens — not while its unsaved-changes confirm is pending, and
    *  never if the user keeps editing. */
   onLeftPanelTabChange?: (tab: string, onSwitched?: () => void) => void;
-  onLeftPanelSubTabChange?: (tab: string) => void;
-  blocks: BlockData[];
-  onQuickAdd: (block: BlockData) => void;
   showSpacingIndicators?: boolean;
   showBadges?: boolean;
   showGuides?: boolean;
@@ -233,9 +230,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   leftPanelTab,
   leftPanelSubTab,
   onLeftPanelTabChange,
-  onLeftPanelSubTabChange: _onLeftPanelSubTabChange,
-  blocks: _blocks,
-  onQuickAdd: _onQuickAdd,
   showSpacingIndicators = false,
   showBadges = false,
   showGuides = true,

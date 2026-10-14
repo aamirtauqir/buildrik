@@ -46,7 +46,8 @@ describe("the paths that create a default page route through the helper", () => 
   const CALLERS = [
     "engine/Composer.ts",
     "editor/shell/hooks/useComposerInit.ts",
-    "editor/shell/hooks/useStudioHandlers.ts",
+    /* useStudioHandlers' quick-add fallback was deleted with the discarded
+       onQuickAdd prop (DQ-014). */
     /* PageTabBar and usePages no longer create pages: since C4 #19 every
        Add-page door asks for the New-page modal, which is the one creator
        (and names the page through the helper). */

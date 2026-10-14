@@ -2,7 +2,7 @@ import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach } from "vitest";
 import * as React from "react";
 import { DSModeToggle } from "../DSModeToggle";
-import { DSModeProvider, useDSMode } from "../../state/DSModeContext";
+import { DSModeProvider, useDSMode } from "@/editor/design-system/state/DSModeContext";
 
 function wrap(children: React.ReactNode) {
   return <DSModeProvider>{children}</DSModeProvider>;

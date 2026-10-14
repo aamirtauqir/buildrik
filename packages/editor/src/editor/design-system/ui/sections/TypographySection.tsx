@@ -31,11 +31,11 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
-import { getDefaultStyles } from "../../../../shared/constants/defaultStyles";
-import { DEFAULT_TOKENS } from "../../constants";
-import type { DesignToken } from "../../types";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import { getDefaultStyles } from "@/shared/constants/defaultStyles";
+import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
+import type { DesignToken } from "@/editor/design-system/types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 

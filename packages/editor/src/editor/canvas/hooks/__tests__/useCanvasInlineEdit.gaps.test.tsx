@@ -8,7 +8,7 @@
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Composer } from "../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import { useCanvasInlineEdit } from "../useCanvasInlineEdit";
 
 function makeMockComposer() {

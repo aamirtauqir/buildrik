@@ -9,7 +9,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { MediaCommandLayer } from "../MediaCommandLayer";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 
 type El = { id: string; src: string; alt?: string; locked?: boolean };
 

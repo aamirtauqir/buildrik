@@ -10,7 +10,7 @@
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { shellDirty, type DirtyDomain } from "../../shellDirtyRegistry";
+import { shellDirty, type DirtyDomain } from "@/editor/shell/shellDirtyRegistry";
 import { useTabSwitchGuard } from "../useTabSwitchGuard";
 
 const DOMAINS: DirtyDomain[] = ["settings", "cms-record"];

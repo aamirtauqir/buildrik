@@ -6,9 +6,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { Element } from "../../../engine/elements/Element";
-import { SNAP_THRESHOLD } from "../../../engine/canvas/constants";
+import type { Composer } from "@/engine";
+import type { Element } from "@/engine/elements/Element";
+import { SNAP_THRESHOLD } from "@/engine/canvas/constants";
 
 interface SiblingRect {
   id: string;

@@ -6,15 +6,15 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../../shared/constants";
-import type { ElementData } from "../../../shared/types";
-import { devWarn } from "../../../shared/utils/devLogger";
-import { generateId } from "../../../shared/utils/helpers";
-import { getDefaultTagName, getDefaultAttributes, CONTAINER_TYPES } from "../../../shared/utils/html";
+import { EVENTS } from "@/shared/constants";
+import type { ElementData } from "@/shared/types";
+import { devWarn } from "@/shared/utils/devLogger";
+import { generateId } from "@/shared/utils/helpers";
+import { getDefaultTagName, getDefaultAttributes, CONTAINER_TYPES } from "@/shared/utils/html";
 import { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
 import { resolvePlacement } from "./placement";
-import { LAYER_NAME_KEY, nextCopyName } from "../../../shared/constants/elementTypeLabels";
+import { LAYER_NAME_KEY, nextCopyName } from "@/shared/constants/elementTypeLabels";
 
 /**
  * Manages element CRUD operations
@@ -266,13 +266,15 @@ export class ElementCRUD {
   /**
    * Paste element from clipboard data. `announce: false` mounts the tree
    * without CLIPBOARD_PASTE — component instances are placed through here,
-   * and their toast is the component's, not "Element pasted".
+   * and their toast is the component's, not "Element pasted". `keepIds`
+   * mounts the data's own ids — an instance re-sync rebuilding a subtree it
+   * has just removed (L2-015); every other caller pastes a fresh copy.
    */
-  pasteElement(data: ElementData, target: Element, index?: number, announce = true): Element | null {
+  pasteElement(data: ElementData, target: Element, index?: number, announce = true, keepIds = false): Element | null {
     if (!data) return null;
 
     // Clone with new IDs
-    const clonedData = this.ctx.cloneElementData(data);
+    const clonedData = keepIds ? data : this.ctx.cloneElementData(data);
 
     // Build the entire element tree from cloned data
     // This creates and registers all elements including children

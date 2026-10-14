@@ -14,7 +14,7 @@ import { render, screen, fireEvent, act, waitFor } from "@testing-library/react"
 import "@testing-library/jest-dom";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PageSettingsDrawer } from "../PageSettingsDrawer";
-import type { PageItem } from "../../types";
+import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 
 const page: PageItem = { id: "p1", name: "Menu", slug: "menu", isHome: false };
 

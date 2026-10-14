@@ -11,7 +11,7 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants";
+import { EVENTS } from "@/shared/constants";
 import type {
   ComponentDefinition,
   ComponentInstance,
@@ -19,9 +19,9 @@ import type {
   ComponentVariant,
   VariantProperty,
   OverrideType,
-} from "../../shared/types/components";
-import { deepClone } from "../../shared/utils/helpers";
-import { sanitizeElementTreeContent } from "../../shared/utils/html/sanitization";
+} from "@/shared/types/components";
+import { deepClone } from "@/shared/utils/helpers";
+import { sanitizeElementTreeContent } from "@/shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
 import { ComponentInstanceUtils, usableOverrides } from "./ComponentInstance";
 import {

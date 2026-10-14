@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent, act } from "@testing-library/react";
 import { FormStateOverlay } from "../FormStateOverlay";
-import type { FormState } from "../../../engine/forms/FormHandler";
+import type { FormState } from "@/engine/forms/FormHandler";
 
 afterEach(() => {
   cleanup();

@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useState } from "react";
-import type { Composer } from "../../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 import type { AssetUsage, ConfirmDeletePayload, LibraryItem, SelectionStateResult } from "../data/mediaTypes";
 
 type ShowToast = (

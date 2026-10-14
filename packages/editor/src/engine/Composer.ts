@@ -29,14 +29,11 @@ import { CollaborationManager } from "./collaboration/CollaborationManager";
 import { CommandCenter } from "./commands/CommandCenter";
 import { ComponentManager } from "./components/ComponentManager";
 import { DataManager } from "./data/DataManager";
-import { StyleDataBinding } from "./data/StyleDataBinding";
-import { TextDataBinding } from "./data/TextDataBinding";
-import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
 import { RESET_CSS, siteFontCSS, siteFontFaceCSS, emitSiteTokenCss, googleFontsHeadLinks, siteFontsFromSettings } from "./export/ExportHelpers";
-import { pageFileNames } from "./export/ExportEngine";
+import { pageFileNames } from "./export/pageFiles";
 import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
@@ -46,7 +43,6 @@ import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
-import { emailMarketingService } from "./integrations";
 import { InteractionManager } from "./interactions/InteractionManager";
 import { MediaManager } from "./media/MediaManager";
 import { MediaCommandLayer } from "./media/MediaCommandLayer";
@@ -55,23 +51,21 @@ import { RecoveryManager } from "./recovery/RecoveryManager";
 import { PageRouter } from "./routing/PageRouter";
 import { SelectionManager } from "./SelectionManager";
 import { StorageAdapter } from "./storage/StorageAdapter";
-import { GlobalStyleManager } from "./styles/GlobalStyleManager";
 import { StyleEngine } from "./styles/StyleEngine";
 import type { Patch } from "./utils/JsonPatch";
 import { MigrationManager } from "./migration/MigrationManager";
 import { AliasResolver } from "./aliasResolver";
-import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
 import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
-import { findConnectSuggestions, type ConnectRef, type ConnectSuggestion } from "./designSystem/connectTokens";
+import { findConnectSuggestions, type ConnectRef } from "./designSystem/connectTokens";
 import { LintState } from "./designSystem/LintState";
 import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
+import type { DesignSystemFacade } from "./designSystem/facade";
 import { applyContrastFix } from "./designSystem/contrastFix";
 import { isAiEditableTokenValue } from "./designSystem/tokenValueGuard";
 import { mergeProjectTokens } from "./designSystem/projectTokens";
-import type { BrandPreview, DarkMode, DesignToken } from "./designSystem/types";
+import type { DesignToken } from "./designSystem/types";
 import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
-import { CSSBundler } from "./designSystem/bundler";
 import { DSLinter } from "./designSystem/linter";
 import { AIAssistService } from "./designSystem/services";
 import { VersionTimelineManager } from "./VersionTimelineManager";
@@ -155,10 +149,6 @@ export class Composer extends EventEmitter {
   readonly viewport!: Viewport;
   readonly plugins!: PluginManager;
   readonly data!: DataManager;
-  readonly globalStyles!: GlobalStyleManager;
-  readonly styleBindings!: StyleDataBinding;
-  readonly traitBindings!: TraitDataBinding;
-  readonly textBindings!: TextDataBinding;
   readonly fonts!: FontManager;
   readonly components!: ComponentManager;
   readonly media!: MediaManager;
@@ -168,9 +158,7 @@ export class Composer extends EventEmitter {
   readonly recovery!: RecoveryManager;
   readonly migration!: MigrationManager;
   readonly aliasResolver!: AliasResolver;
-  readonly darkResolver!: DarkResolver;
   readonly colorMode!: ColorMode;
-  readonly cssBundler!: CSSBundler;
   readonly dsLinter!: DSLinter;
   readonly aiAssistService!: AIAssistService;
 
@@ -192,101 +180,13 @@ export class Composer extends EventEmitter {
     readonly drag: DragManager;
     readonly interactions: InteractionManager;
   };
-  readonly designSystem!: {
-    /** True when the site's tokens failed to migrate on load: Brand shows the
-     *  old tokens and refuses edits. Set by the load path, announced with
-     *  `EVENTS.DESIGN_SYSTEM_READ_ONLY`. */
-    readOnly: boolean;
-    /** Why `readOnly` is set (null when it is not): selects the Brand notice. */
-    readOnlyReason: string | null;
-    /** The server's brand-token switch for this site (`brandTokensV2`), set by
-     *  the load path. False: a pre-v6 site's tokens are emitted (canvas,
-     *  export, publish) as saved, never migrated in memory. True when nothing
-     *  loaded from the server (standalone editor). */
-    brandTokensV2: boolean;
-    readonly tokenUsage: TokenUsageTracker;
-    readonly lintState: LintState;
-    readonly tokenBindingResolver: TokenBindingResolver;
-    /**
-     * Resolves a LintIssue `autoFixHint` into a suggested next hex value.
-     *
-     * Pure compute helper — does NOT mutate the token registry (the
-     * registries live React-side in `TokenRegistryContext`, not in the
-     * engine). Callers chain this with `onColorChange` / `updateToken` to
-     * actually apply the fix, then call `lintState.suppress(id)` to clear
-     * the row.
-     *
-     * Naming intent: `compute*` signals "pure, no side effects". Use
-     * `applyAutoFix` below for the history-aware path that mutates
-     * projectSettings inside a transaction.
-     */
-    readonly computeAutoFix: (currentValue: string, hint: string | undefined) => string;
-    /**
-     * History-aware Auto-fix entry (Arc D6.c, 2026-05-16). Computes the
-     * fixed value, then writes it to `projectSettings.designTokens` inside
-     * a labeled transaction so HistoryManager captures ONE undoable entry.
-     *
-     * Returns the fixed value when the token was found and the value
-     * actually changed, otherwise `null` (caller may decide whether to
-     * still suppress the lint row).
-     *
-     * React-side registries follow this update via the existing
-     * `project:changed` event — TokensSection re-hydrates all 14 kind
-     * registries on every emission, so Cmd+Z roundtrips back into the UI.
-     */
-    readonly applyAutoFix: (tokenId: string, hint: string | undefined) => string | null;
-    /**
-     * AI token write (W4 set-token). Models on `applyAutoFix`: looks the token up
-     * in `projectSettings.designTokens`, validates the value against the token's
-     * `type` (the trust boundary — see tokenValueGuard), and writes it inside a
-     * labeled transaction so the `project:changed` re-hydration in TokensSection
-     * re-applies the live CSS var AND Cmd+Z roundtrips through the same path.
-     *
-     * Returns the new value on success, or `null` when the id is unknown, the
-     * type is not AI-editable, the value fails its format guard, or it is a no-op.
-     * The single engine write path means the AI never touches the React hooks.
-     */
-    readonly setDesignToken: (tokenId: string, value: string) => string | null;
-    /**
-     * THE token write (spec §4: one undo stack). Validates the whole v6 set
-     * and writes `projectSettings.designTokens` + schema version 6 inside one
-     * labelled transaction, so a multi-token edit is one ⌘Z step shared with
-     * canvas history. Brand, "Update everywhere", import, starters, auto-fix
-     * and the AI write all land here. Returns false and writes nothing when
-     * the tokens are read-only or the set does not validate. A successful
-     * write announces `EVENTS.BRAND_APPLIED` (onboarding's "Set your brand").
-     * Also refuses a write that would remove a token the site still uses, or
-     * whose usage cannot be counted yet (spec §6) — soft delete via
-     * `replacedBy` keeps the token and is never refused for that.
-     */
-    readonly setTokens: (next: DesignToken[], label: string) => boolean;
-    /** The canvas preview, or null. Set only through `setPreview`. */
-    preview: BrandPreview | null;
-    /** Paint `p` on the canvas instead of the saved tokens (null = back to the
-     *  saved ones). Touches neither settings nor history. */
-    readonly setPreview: (p: BrandPreview | null) => void;
-    /**
-     * Writes the site's Dark mode AND its tokens in ONE transaction (one ⌘Z).
-     * Tokens are always written — `tokens` when given, else the current merged
-     * set — because the save path keeps the stored darkMode when a payload
-     * carries no designTokens (sites.service withCheckedTokens). False, and
-     * nothing written, when read-only or the token write is refused.
-     */
-    readonly setDarkMode: (mode: DarkMode, label: string, tokens?: DesignToken[]) => boolean;
-    /** Connect to tokens (spec §3): exact-match suggestions over every page,
-     *  or one. Skips component instances and masters (owner, OQ-5). */
-    readonly connectSuggestions: (pageId?: string) => ConnectSuggestion[];
-    /** Binds the picked suggestions (base styles and breakpoint overrides) in
-     *  ONE transaction; returns the style writes made — 0 when read-only or
-     *  nothing applies. No restore point (owner, OQ-4): ⌘Z covers it. */
-    readonly applyConnect: (picks: ReadonlyArray<{ key: string; tokenId: string }>) => number;
-  };
+  readonly designSystem!: DesignSystemFacade;
 
   constructor(config: ComposerConfig) {
     super();
     this.config = this.normalizeConfig(config);
     this.state = this.createInitialState();
-    this.applyProjectSettings({}, this.projectSettings, {
+    this.applyProjectSettings(this.projectSettings, {
       emitProjectChanged: false,
       emitSettingsChange: false,
     });
@@ -302,10 +202,6 @@ export class Composer extends EventEmitter {
     this.viewport = new Viewport(this);
     this.plugins = new PluginManager(this);
     this.data = new DataManager(this);
-    this.globalStyles = new GlobalStyleManager(this);
-    this.styleBindings = new StyleDataBinding(this);
-    this.traitBindings = new TraitDataBinding(this);
-    this.textBindings = new TextDataBinding(this);
     this.fonts = new FontManager(this);
     this.components = new ComponentManager(this);
     this.media = new MediaManager(this.config.remoteSync);
@@ -315,9 +211,7 @@ export class Composer extends EventEmitter {
     this.recovery = new RecoveryManager(this);
     this.migration = new MigrationManager(this);
     this.aliasResolver = new AliasResolver(this);
-    this.darkResolver = new DarkResolver();
     this.colorMode = new ColorMode(this);
-    this.cssBundler = new CSSBundler();
     this.dsLinter = new DSLinter();
     this.aiAssistService = new AIAssistService(this, config.aiClient ?? null);
 
@@ -345,7 +239,6 @@ export class Composer extends EventEmitter {
           sources: [
             this.elements.exportPages(),
             this.styles.exportStyles(),
-            this.globalStyles.getAll(),
             components ?? [],
             this.getProjectSettings().designPresets ?? [],
           ],
@@ -832,7 +725,7 @@ export class Composer extends EventEmitter {
     }
 
     // Import project settings
-    this.applyProjectSettings(this.projectSettings, data.settings ?? {}, {
+    this.applyProjectSettings(data.settings ?? {}, {
       emitProjectChanged: false,
     });
 
@@ -1019,20 +912,15 @@ ${html}${interactionScript}
    * Apply project settings and update dependent integrations
    */
   private applyProjectSettings(
-    prev: ProjectSettings,
     settings: ProjectSettings,
     options?: { emitProjectChanged?: boolean; emitSettingsChange?: boolean }
   ): void {
     this.projectSettings = settings ?? {};
 
-    // Only reconfigure email marketing when the email integration settings actually changed
     const emailConfig = this.projectSettings.integrations?.email || {
       provider: "none",
       enabled: false,
     };
-    if (JSON.stringify(prev.integrations?.email) !== JSON.stringify(settings.integrations?.email)) {
-      emailMarketingService.configure(emailConfig);
-    }
 
     // Configure form email notification service
     // Maps project settings to the form email service format
@@ -1092,9 +980,8 @@ ${html}${interactionScript}
    * Set project-wide settings (analytics, integrations, design tokens)
    */
   setProjectSettings(settings: ProjectSettings): void {
-    const prev = this.projectSettings;
     this.markDirty(); // Mark dirty BEFORE applyProjectSettings emits PROJECT_CHANGED
-    this.applyProjectSettings(prev, settings);
+    this.applyProjectSettings(settings);
   }
 
   /**
@@ -1105,7 +992,7 @@ ${html}${interactionScript}
    * again (`sites.saveProject`) for a change that is already saved.
    */
   adoptSavedProjectSettings(settings: ProjectSettings): void {
-    this.applyProjectSettings(this.projectSettings, settings, { emitProjectChanged: false });
+    this.applyProjectSettings(settings, { emitProjectChanged: false });
   }
 
   /**
@@ -1432,9 +1319,6 @@ ${html}${interactionScript}
 
     if (this.plugins?.destroy) await this.plugins.destroy();
     if (this.data?.destroy) this.data.destroy();
-    if (this.globalStyles?.destroy) this.globalStyles.destroy();
-    if (this.styleBindings?.destroy) this.styleBindings.destroy();
-    if (this.traitBindings?.destroy) this.traitBindings.destroy();
     if (this.canvas.indicators?.destroy) this.canvas.indicators.destroy();
     if (this.fonts?.destroy) this.fonts.destroy();
     if (this.components?.destroy) this.components.destroy();

@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll, vi } from "vitest";
-import { Composer } from "../../../engine";
+import { Composer } from "@/engine";
 import { exportPublishPages } from "../exportPublishPages";
 
 /* Task 8 — publish renders CMS content from the server, not this browser.

@@ -41,7 +41,7 @@
 | L5-074 | High | Save › reload recovery | Reload after a failed save shows contradictory recovery surfaces | BROKEN FUNCTIONALITY | FIXED wave 2 `9579895f2` + wave 3 `53346a2ec` · live: false "Recovered" banner gone; Retry after reload re-sent the kept edits (98 elements, save 200), record cleared only after that save; server holds 98 after reload | L5 |
 | L5-075 | High | Save › reload recovery | "Restore my edits" and "Keep changes" do not save the restored edits | BROKEN FUNCTIONALITY | FIXED wave 2 `2bc953a43` · live: Restore → saveProject 200 at 1.5 s, 100 elements kept | L5 |
 | FG-001 | High | Review / right-column Review panel / whole panel | Review panel v2 redesign (03 Oct) is not implemented | CODE ONLY ISSUE, INCOMPLETE FUNCTIONALITY | DECISION wave6 · NOT DONE (wave 2): 28-board rebuild; blocked on FG-002 owner call | FG |
-| FG-002 | High | Review / topbar `chip/review` / prototype routing | Two "CURRENT DESIGN" Review designs; shells link only the old one | FIGMA ONLY ISSUE | DECISION NEEDED (wave 2, Figma-only): confirm v2 supersedes old Review family | FG |
+| FG-002 | High | Review / topbar `chip/review` / prototype routing | Two "CURRENT DESIGN" Review designs; shells link only the old one | FIGMA ONLY ISSUE | DECISION wave6 · DECISION NEEDED (wave 2, Figma-only): confirm v2 supersedes old Review family | FG |
 | FG-007 | High | SEO (page) / Pages ⋯ → Page settings / analysis | Page SEO drawer: no Readability, focus keyphrase, schema type or canonical validation | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION wave6 · NOT DONE (wave 2): SEO arc; container (drawer vs modal) + save verbs need owner call | FG |
 | FG-009 | High | SEO (site) / Settings › SEO | Site SEO: no structured data, sitemap, pages overview or search/social previews | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION wave6 · NOT DONE (wave 2): SEO arc, schedule with FG-007 | FG |
 | L1-005 | Medium | Canvas lock × drag-move | A locked element can be drag-moved | BROKEN FUNCTIONALITY | ALREADY-FIXED wave4 fc052ec41 · PHASE-1 CONFIRMED LIVE (fix parked on br | L1 |
@@ -52,7 +52,7 @@
 | L1-012 | Medium | Canvas viewport / Zoom | At 1440 px, 100% zoom clips 272 px of the Desktop page; no fit-to-width by default | INCOMPLETE FUNCTIONALITY | DECISION wave4 · LIVE-VERIFIED | L1 |
 | L1-013 | Medium | Breakpoints / Preview / Export | "Desktop" is three different widths: canvas 1024, Preview 1320, Export 1440 | INTEGRATION ISSUE, FIGMA + CODE ISSUE | DECISION wave4 · LIVE-VERIFIED | L1 |
 | L1-014 | Medium | Help rail → Keyboard legend | The Help-rail "Keyboard" legend contradicts the real bindings and the shortcuts sheet | CODE ONLY ISSUE | FIXED wave4 1a78e115e · LIVE-VERIFIED | L1 |
-| L1-015 | Medium | Onboarding (rail pill, Site menu → Getting started) | Getting started says "Done · 7 of 7" on a brand-new site while its checklist says 0/7 | BROKEN FUNCTIONALITY, INTEGRATION ISSUE | NOT-DONE wave4 · LIVE-VERIFIED (root cause CODE-ONLY) | L1 |
+| L1-015 | Medium | Onboarding (rail pill, Site menu → Getting started) | Getting started says "Done · 7 of 7" on a brand-new site while its checklist says 0/7 | BROKEN FUNCTIONALITY, INTEGRATION ISSUE | DECISION not-done · LIVE-VERIFIED (root cause CODE-ONLY) | L1 |
 | L1-016 | Medium | Add → Image; canvas; export | An image with no src renders and ships as a broken `<img>` | INCOMPLETE FUNCTIONALITY | FIXED wave4 552c0243e, c5107bf94 · LIVE-VERIFIED | L1 |
 | L1-019 | Medium | Canvas resize handles | Short elements have no left/right resize edge, so a horizontal resize also fixes the height | INCOMPLETE FUNCTIONALITY | FIXED wave4 8195b5628 · LIVE-VERIFIED | L1 |
 | L1-022 | Medium | Add panel catalog | The Add panel lists the same things three times under different names | FIGMA + CODE ISSUE | DECISION wave4 · LIVE-VERIFIED | L1 |
@@ -62,16 +62,16 @@
 | L2-012 | Medium | Layers · eye (Dim in editor) | Layers "Dim in editor" is lost on the next canvas edit while the row still says dimmed | BROKEN FUNCTIONALITY | ALREADY-FIXED wave4 948197059 · PHASE-1 CONFIRMED LIVE (fix parked on br | L2 |
 | L2-013 | Medium | Layers · double-click rename | Renaming a layer cannot be undone | INCOMPLETE FUNCTIONALITY | FIXED wave4 51d5fa8a8 (test), 967164e6a (fix) · LIVE-VERIFIED | L2 |
 | L2-014 | Medium | Templates · Preview (built-in and saved) | The template preview renders raw `{{token…}}` placeholders, so primary CTAs look grey with invisible text | BROKEN FUNCTIONALITY · CODE ONLY ISSUE | FIXED wave4 b874b9a88 · LIVE-VERIFIED | L2 |
-| L2-015 | Medium | Components · Update from selection | Updating a component master gives every instance element a new id | INTEGRATION ISSUE | NOT-DONE wave4 · LIVE-VERIFIED | L2 |
+| L2-015 | Medium | Components · Update from selection | Updating a component master gives every instance element a new id | INTEGRATION ISSUE | FIXED not-done `c34bf7eea` · LIVE-VERIFIED | L2 |
 | L2-017 | Medium | updated` listener) | A console error during component update: Layers lock resync throws `el.getId is not a function` | CODE ONLY ISSUE | ALREADY-FIXED wave4 cfbfda1b0 (wave 3) · FIXED wave 3 `cfbfda1b0` (ElementStyles emitted itself) · live: 0 getId console errors across style edits | L2 |
-| L2-018 | Medium | Inspector · breakpoint / state editing | On Tablet/Mobile and in pseudo-states the Inspector shows type defaults, not the inherited values | INCOMPLETE FUNCTIONALITY | NOT-DONE wave4 · LIVE-VERIFIED | L2 |
+| L2-018 | Medium | Inspector · breakpoint / state editing | On Tablet/Mobile and in pseudo-states the Inspector shows type defaults, not the inherited values | INCOMPLETE FUNCTIONALITY | FIXED not-done `dcc133d5c` · LIVE-VERIFIED | L2 |
 | L2-020 | Medium | Components · detail › "Master preview" | The component master preview is blank for light-on-dark components | FIGMA + CODE ISSUE | DECISION wave4 · LIVE-VERIFIED | L2 |
 | L2-021 | Medium | Add panel › SAVED COMPONENTS / FROM LIBRARY · Components  | Saved components have inconsistent counts and identical library entries | FIGMA + CODE ISSUE | DECISION wave4 · LIVE-VERIFIED | L2 |
 | L2-022 | Medium | Components · Inspector "Edit master ↗" | There is no in-place master editing; "Edit master" opens a management screen | INCOMPLETE FUNCTIONALITY · FIGMA + CODE ISSUE | DECISION wave4 · LIVE-VERIFIED | L2 |
 | L2-023 | Medium | Add › Image → Inspector Image section | A newly inserted Image is a broken `<img>` with alt "Image" | INCOMPLETE FUNCTIONALITY | FIXED wave4 552c0243e, c5107bf94 · LIVE-VERIFIED | L2 |
 | L2-025 | Medium | Templates apply / `importHTMLToActivePage` · Layers | Template import turns `<br>` into a 63-px "Container" layer | BROKEN FUNCTIONALITY · CODE ONLY ISSUE | FIXED wave4 1dc4c1d43 · LIVE-VERIFIED | L2 |
 | L2-033 | Medium | Layers · row menu Duplicate / Group / Move to page | Layers Duplicate, Group and Move to page bypass the engine commands and the lock gate (one row) | CODE ONLY ISSUE | FIXED wave4 4b44ae405 · CODE-ONLY (Phase-1 P2-1) | L2 |
-| L2-038 | Medium | Canvas selected element · resize handle vs move | Dragging near a selected element's edge moved it to the end of the page root | BROKEN FUNCTIONALITY | NOT-DONE wave4 · LIVE-VERIFIED (single occurrence; may de | L2 |
+| L2-038 | Medium | Canvas selected element · resize handle vs move | Dragging near a selected element's edge moved it to the end of the page root | BROKEN FUNCTIONALITY | FIXED not-done `8ad1841d7` · LIVE-VERIFIED (single occurrence; may de | L2 |
 | L3-003 | Medium | Add panel / nesting rules (found while testing pages) | Divider can be nested inside a Button (`<hr>` in `<button>`) | BROKEN FUNCTIONALITY · CODE ONLY ISSUE | FIXED wave5 `ed2b9546e` · LIVE-VERIFIED | L3 |
 | L3-004 | Medium | Pages · history | Undo on a non-first page jumps the canvas to the first page | BROKEN FUNCTIONALITY · CODE ONLY ISSUE | ALREADY-FIXED wave5 `39081ed5f` (L1-007) · PHASE-1 CONFIRMED LIVE (fix parked on br | L3 |
 | L3-005 | Medium | Pages rename → Settings › Redirects | Rename "Update URL" offers, and saves, a redirect that hijacks another live page | BROKEN FUNCTIONALITY · INTEGRATION ISSUE | FIXED wave5 `3f1779cc5`, `23a53638d` · LIVE-VERIFIED | L3 |
@@ -101,13 +101,13 @@
 | L4-025 | Medium | Inspector Fill → "Brand colours" picker; Delete-token repl | Colour pickers list internal primitives and duplicate names | CODE ONLY ISSUE | FIXED wave5 `d7ebd6b25` · LIVE-VERIFIED | L4 |
 | L4-026 | Medium | Brand → Review changes popover | "Review changes" ignores ⌘Z: undone edits still show as applied | BROKEN FUNCTIONALITY | FIXED wave5 `f61bf0b96` · LIVE-VERIFIED | L4 |
 | L4-028 | Medium | Brand → Starters | Starters ship banned indigo/violet accents and real-brand names | FIGMA + CODE ISSUE | DECISION wave5 · LIVE-VERIFIED | L4 |
-| L4-030 | Medium | Inspector → Fill → Colour on a template button | The Inspector Fill shows a token colour that is not the element's actual fill | INTEGRATION ISSUE | NOT-DONE wave5 · LIVE-VERIFIED | L4 |
+| L4-030 | Medium | Inspector → Fill → Colour on a template button | The Inspector Fill shows a token colour that is not the element's actual fill | INTEGRATION ISSUE | CANNOT-REPRODUCE not-done · LIVE-VERIFIED | L4 |
 | L4-031 | Medium | Brand → publish path | The BRAND_TOKENS_V2 kill switch is bypassed by the scratch composer (CMS publish, share, compare, time travel) | CODE ONLY ISSUE, INTEGRATION ISSUE | FIXED wave5 `6ea0d9acb` · CODE-ONLY (no publish allowed) | L4 |
 | L4-035 | Medium | Issues → "No favicon set…" row | Clicking a server-check issue (Favicon, SEO, Domain) opens Brand | BROKEN FUNCTIONALITY | FIXED wave5 `798428e06` · PHASE-1 CONFIRMED LIVE | L4 |
 | L4-036 | Medium | Issues panel (opened by "Fix issues first" from the open-err | Issues are not sorted by severity, so the one blocking error is buried | CODE ONLY ISSUE | FIXED wave5 `5988eff9b` · LIVE-VERIFIED | L4 |
 | L4-037 | Medium | Issues row click → Inspector | Locate replaces the Issues panel with the Inspector (no way back) and does not reveal off-viewport elements | INCOMPLETE FUNCTIONALITY | PARTLY wave5 `da223041b` · LIVE-VERIFIED | L4 |
 | L4-038 | Medium | Topbar / Site menu "Issues" row | The issue count is only visible inside the Site menu row's tooltip | FIGMA + CODE ISSUE | DECISION wave5 · LIVE-VERIFIED | L4 |
-| L4-040 | Medium | Accessibility checks (Issues feed) | The a11y checker covers only alt text, links and token-vs-page contrast | MISSING FUNCTIONALITY | NOT-DONE wave5 · LIVE-VERIFIED + CODE | L4 |
+| L4-040 | Medium | Accessibility checks (Issues feed) | The a11y checker covers only alt text, links and token-vs-page contrast | MISSING FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED + CODE | L4 |
 | L4-041 | Medium | Issues feed ↔ Publish panel | Server-check rows in Issues are fetched once and never refreshed | INTEGRATION ISSUE | ALREADY-FIXED wave5 `eb0d2ba24` · UNVERIFIED (needs a Vercel/pages state c | L4 |
 | L5-005 | Medium | AI › agent run summary | An AI step that applied nothing is reported as applied ("2 changes applied") | AI ISSUE, INCOMPLETE FUNCTIONALITY | ALREADY-FIXED wave6 `3915996bd` · LIVE-VERIFIED | L5 |
 | L5-006 | Medium | AI › AI column › Stop run | Stop in the AI agent does not cancel the in-flight request | AI ISSUE, INCOMPLETE FUNCTIONALITY | ALREADY-FIXED wave6 `675830d02` · PHASE-1 CONFIRMED LIVE (fix parked on br | L5 |
@@ -120,7 +120,7 @@
 | L5-019 | Medium | AI › Brand › Component styles | Brand "✦ Generate with AI" is disabled everywhere, its tooltip blames the workspace, and the result has nowhere to go even when the flag is on | AI ISSUE, INCOMPLETE FUNCTIONALITY | FIXED wave6 `c339df0e6` · PHASE-1 CONFIRMED LIVE | L5 |
 | L5-021 | Medium | AI / History › AI summary | The History AI summary is wrong and unreadable because it is fed raw element ids | AI ISSUE | FIXED wave6 `0836dc9ce` (+ `cbd25db61`) · LIVE-VERIFIED | L5 |
 | L5-025 | Medium | AI › Assets › alt text | Alt-text generation spends no AI quota and runs automatically on every image upload | AI ISSUE, INTEGRATION ISSUE | ALREADY-FIXED wave6 `6883950e8` · UNVERIFIED (no assets; avoided a product | L5 |
-| L5-031 | Medium | Review & Comments | Comments have no replies or threads | MISSING FUNCTIONALITY | NOT-DONE wave6 · LIVE-VERIFIED + CODE | L5 |
+| L5-031 | Medium | Review & Comments | Comments have no replies or threads | MISSING FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED + CODE | L5 |
 | L5-034 | Medium | Review panel header | Review status copy contradicts itself for an internal (no-client) round | CODE ONLY ISSUE | FIXED wave6 `69f28edb3` · LIVE-VERIFIED | L5 |
 | L5-040 | Medium | History › Saves › row menu › Compare with current | "Compare with current" does not compare with the current draft | BROKEN FUNCTIONALITY | FIXED wave6 `20e3920a7` · LIVE-VERIFIED | L5 |
 | L5-042 | Medium | History › Compare (Semantic) and Session entry expand | The semantic diff and Session history expose raw internals (element ids, "other · element", "updatedAt") | CODE ONLY ISSUE | FIXED wave6 `cbd25db61` · LIVE-VERIFIED | L5 |
@@ -132,9 +132,9 @@
 | L5-071 | Medium | Save › offline state | The dashboard offline banner promises "Auto-retrying in Ns" inside the editor, but retries nothing | INTEGRATION ISSUE | FIXED wave6 `fd0c48732` · LIVE-VERIFIED | L5 |
 | L5-076 | Medium | Save › recovery marker | The "Some work never reached the server" toast never expires, outlives success, and leaks into other tabs | BROKEN FUNCTIONALITY | ALREADY-FIXED wave6 main EDT-018; wave-6 `5ab08c625` superseded at merge `3d8a57ac1` · LIVE-VERIFIED | L5 |
 | FG-003 | Medium | Review / topbar Publish / gating | Review v2 "not-sent" dims Publish regardless of approval policy | FIGMA ONLY ISSUE, MISSING FUNCTIONALITY | WONTFIX-REASON wave6 · LIVE-VERIFIED | FG |
-| FG-004 | Medium | Review / panel states | Review v2 states with no code state | CODE ONLY ISSUE, MISSING FUNCTIONALITY | NOT-DONE wave6 · CODE-ONLY | FG |
-| FG-006 | Medium | Review / dashboard `/review/<token>` / client feedback | Client viewer cannot place located pins (owner decision C-03) | CODE ONLY ISSUE, MISSING FUNCTIONALITY | NOT-DONE wave6 · CODE-ONLY | FG |
-| FG-010 | Medium | SEO / page drawer → canvas | SEO "Fix" hand-off to the element (with dirty guard) missing | CODE ONLY ISSUE, MISSING FUNCTIONALITY | NOT-DONE wave6 · CODE-ONLY | FG |
+| FG-004 | Medium | Review / panel states | Review v2 states with no code state | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION not-done · CODE-ONLY | FG |
+| FG-006 | Medium | Review / dashboard `/review/<token>` / client feedback | Client viewer cannot place located pins (owner decision C-03) | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION not-done · CODE-ONLY | FG |
+| FG-010 | Medium | SEO / page drawer → canvas | SEO "Fix" hand-off to the element (with dirty guard) missing | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION not-done · CODE-ONLY | FG |
 | FG-012 | Medium | Pages / Page settings | Page settings container and save verbs differ from the board | CODE ONLY ISSUE | DECISION wave6 · LIVE-VERIFIED | FG |
 | FG-013 | Medium | Settings, SEO, CMS / prototype | 51 of 84 new Settings/SEO boards are unreachable; new Settings states cannot navigate | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · LIVE-VERIFIED (Figma read; caveat on laz | FG |
 | FG-014 | Medium | Brand / Part 1 flows | Brand Part 1 error and edge branches are unreachable | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · LIVE-VERIFIED (Figma read) | FG |
@@ -146,25 +146,25 @@
 | FG-015g | Medium | Brand / token delete | Safe delete states partial | CODE ONLY ISSUE, MISSING FUNCTIONALITY | ALREADY-FIXED wave6 `8fd2f3404` · CODE-ONLY | FG |
 | FG-019 | Medium | Brand / Colours | Brand Colours "unsaved change (dirty)" board contradicts autosave and Part 1 "Header without Save" | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · LIVE-VERIFIED | FG |
 | FG-020 | Medium | Inspector / tab strip | ~500 shells label the inspector's middle tab "Settings"; Inspector v4 and code say "Behaviour" | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · LIVE-VERIFIED (Figma read) | FG |
-| FG-021 | Medium | Inspector / Behaviour / visibility | Inspector "Visibility condition" (CMS-conditional visibility) has no code | CODE ONLY ISSUE, MISSING FUNCTIONALITY | NOT-DONE wave6 · CODE-ONLY | FG |
+| FG-021 | Medium | Inspector / Behaviour / visibility | Inspector "Visibility condition" (CMS-conditional visibility) has no code | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION not-done · CODE-ONLY | FG |
 | FG-023 | Medium | AI / assistant → canvas | AI "Applied draft · Canvas" state missing | CODE ONLY ISSUE, AI ISSUE, MISSING FUNCTIONALITY | FIXED wave6 `ac9df1753` · CODE-ONLY (no live AI call made, by budg | FG |
-| FG-026 | Medium | Accessibility / Preview + Issues | No accessibility checker in either Figma or code as a coherent module | FIGMA + CODE ISSUE, MISSING FUNCTIONALITY | NOT-DONE wave6 · CODE-ONLY | FG |
+| FG-026 | Medium | Accessibility / Preview + Issues | No accessibility checker in either Figma or code as a coherent module | FIGMA + CODE ISSUE, MISSING FUNCTIONALITY | DECISION not-done · CODE-ONLY | FG |
 | FG-029 | Medium | Responsive / breakpoint menu | Wide breakpoint drawn in Figma, absent from the code's breakpoint menu | FIGMA + CODE ISSUE | DECISION wave6 · CODE-ONLY | FG |
 | FG-031 | Medium | Forms / submissions | Forms submissions have two homes in Figma; code has one | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · LIVE-VERIFIED (nav) | FG |
 | FG-032b | Medium | Forms / element + published form | Form build / submit failure states are missing in both | FIGMA + CODE ISSUE, MISSING FUNCTIONALITY | FIXED wave6 `8b25300b2` · UNVERIFIED (no submission made) | FG |
 | FG-034 | Medium | Domains / DNS | Domain DNS management ships with no boards (DNS-M1…M12 paused) | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · CODE-ONLY | FG |
 | FG-036 | Medium | Onboarding / tips | Onboarding (checklist, achievement prompt, rail coach) ships with no boards | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · LIVE-VERIFIED (menu row) + CODE-ONLY | FG |
-| DQ-001 | Medium | Publish › Publish confirm facts (topbar fast path + wizard | Pre-publish confirm treats a failed checks request as "no blockers" | CODE ONLY ISSUE | BROKEN FUNCTIONALITY | INTEGRATION ISSUE | CODE-ONLY (forcing a tRPC failure live n | DQ |
-| DQ-002 | Medium | Layers panel › row context menu | Layers right-click Delete / Duplicate / Lock bypass the engine command layer (lock gate + read-only refusal) | CODE ONLY ISSUE | BROKEN FUNCTIONALITY | CODE-ONLY (destructive; my session was r | DQ |
-| DQ-005 | Medium | Engine → shell error surfacing | Engine failure events are emitted with no listener — save/load/command errors are silent in the UI (Phase-1 re-verified) | CODE ONLY ISSUE | MISSING FUNCTIONALITY | INTEGRATION ISSUE | CODE-ONLY (PHASE-1, re-verified on main) | DQ |
-| DQ-006 | Medium | Whole package | 919 `../../` relative imports despite the CLAUDE.md ban — no gate enforces it | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-007 | Medium | Engine + chrome | 26 source files over 800 lines mixing concerns | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-010 | Medium | Brand › lint Auto-fix vs colour token "Fix all" | Two contrast auto-fix algorithms that disagree | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-011 | Medium | History › Time travel › Restore | Time-travel Restore silently proceeds when the safety checkpoint fails | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-018 | Medium | Site menu, panel ⋯ menu, canvas right-click menu, ⌘K pal | Menus: four different row specs and three hand-rolled context menus | CODE ONLY ISSUE | LIVE-VERIFIED | DQ |
-| DQ-020 | Medium | All panels | Control-height and input-height spread across panels | CODE ONLY ISSUE | LIVE-VERIFIED | DQ |
-| L1-009 | Low | History / load | A brand-new site opens with a phantom "Updated page" undo step and an automatic save | BROKEN FUNCTIONALITY | NOT-DONE wave4 · LIVE-VERIFIED (root cause CODE-ONLY) | L1 |
-| L1-017 | Low | Add panel → Image | Inserting an Image switches the left panel to Assets, with no pick mode | INCOMPLETE FUNCTIONALITY | NOT-DONE wave4 · LIVE-VERIFIED | L1 |
+| DQ-001 | Medium | Publish › Publish confirm facts (topbar fast path + wizard | Pre-publish confirm treats a failed checks request as "no blockers" | CODE ONLY ISSUE | FIXED dq-code `64c02cecc` · BROKEN FUNCTIONALITY | INTEGRATION ISSUE | CODE-ONLY (forcing a tRPC failure live n | DQ |
+| DQ-002 | Medium | Layers panel › row context menu | Layers right-click Delete / Duplicate / Lock bypass the engine command layer (lock gate + read-only refusal) | CODE ONLY ISSUE | FIXED dq-code `6c3bf6866`, `14e38a572` · BROKEN FUNCTIONALITY | CODE-ONLY (destructive; my session was r | DQ |
+| DQ-005 | Medium | Engine → shell error surfacing | Engine failure events are emitted with no listener — save/load/command errors are silent in the UI (Phase-1 re-verified) | CODE ONLY ISSUE | FIXED dq-code `bf5656311` · MISSING FUNCTIONALITY | INTEGRATION ISSUE | CODE-ONLY (PHASE-1, re-verified on main) | DQ |
+| DQ-006 | Medium | Whole package | 919 `../../` relative imports despite the CLAUDE.md ban — no gate enforces it | CODE ONLY ISSUE | PARTLY dq-code `38e8088e7`, `9fcdbc36e` · CODE-ONLY | DQ |
+| DQ-007 | Medium | Engine + chrome | 26 source files over 800 lines mixing concerns | CODE ONLY ISSUE | PARTLY dq-code `3ad639e14`, `767552120`, `96d2613e6`, `fcf266e49`, `11c877462` · CODE-ONLY | DQ |
+| DQ-010 | Medium | Brand › lint Auto-fix vs colour token "Fix all" | Two contrast auto-fix algorithms that disagree | CODE ONLY ISSUE | FIXED dq-code `2ae680666` · CODE-ONLY | DQ |
+| DQ-011 | Medium | History › Time travel › Restore | Time-travel Restore silently proceeds when the safety checkpoint fails | CODE ONLY ISSUE | FIXED dq-code `9e1ce5450` · CODE-ONLY | DQ |
+| DQ-018 | Medium | Site menu, panel ⋯ menu, canvas right-click menu, ⌘K pal | Menus: four different row specs and three hand-rolled context menus | CODE ONLY ISSUE | PARTLY-FIXED dq-chrome `3aaf24f47` · LIVE-VERIFIED | DQ |
+| DQ-020 | Medium | All panels | Control-height and input-height spread across panels | CODE ONLY ISSUE | PARTLY-FIXED dq-chrome `8a565c73d` · LIVE-VERIFIED | DQ |
+| L1-009 | Low | History / load | A brand-new site opens with a phantom "Updated page" undo step and an automatic save | BROKEN FUNCTIONALITY | FIXED not-done `37664078d` · LIVE-VERIFIED (root cause CODE-ONLY) | L1 |
+| L1-017 | Low | Add panel → Image | Inserting an Image switches the left panel to Assets, with no pick mode | INCOMPLETE FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED | L1 |
 | L1-018 | Low | Canvas context menu | Context menu: Copy/Cut/Paste are buried under "Structure"; Paste is enabled with an empty clipboard; disabled rows give no reason | INCOMPLETE FUNCTIONALITY | FIXED wave4 d6c066144 · LIVE-VERIFIED | L1 |
 | L1-020 | Low | Keyboard shortcuts | ⌘G and ⌘⇧G on a single element are silent no-ops; Cut and Group give no feedback | INCOMPLETE FUNCTIONALITY | FIXED wave4 94e259c21 · LIVE-VERIFIED | L1 |
 | L1-021 | Low | Footer selection readout | The footer readout calls the page root "Container"; the inspector calls it "Home · Page" | CODE ONLY ISSUE | FIXED wave4 ffe303b3a · LIVE-VERIFIED | L1 |
@@ -173,17 +173,17 @@
 | L1-026 | Low | Dashboard sites → card ⋯ → Delete | The Delete site dialog says "cannot be undone"; the toast then says it can be restored for 30 days | CODE ONLY ISSUE | FIXED wave4 fa1dd8fba · LIVE-VERIFIED | L1 |
 | L1-027 | Low | Rail full-page modes (CMS) | The CMS full-page workspace persists across reload, covers the canvas, and Escape doesn't leave it | INCOMPLETE FUNCTIONALITY | FIXED wave4 d8b5bb518 · LIVE-VERIFIED | L1 |
 | L1-028 | Low | Shell load | A "Project loaded · Loaded from dashboard." toast on every open | CODE ONLY ISSUE | FIXED wave4 8839e959c · LIVE-VERIFIED | L1 |
-| L1-029 | Low | Onboarding tips | Onboarding tips and coach marks pop over the canvas repeatedly | INCOMPLETE FUNCTIONALITY | NOT-DONE wave4 · LIVE-VERIFIED | L1 |
+| L1-029 | Low | Onboarding tips | Onboarding tips and coach marks pop over the canvas repeatedly | INCOMPLETE FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED | L1 |
 | L1-030 | Low | Canvas hooks | Dead code: `useToolbarPosition` | CODE ONLY ISSUE | FIXED wave4 957cd5dbd · CODE-ONLY | L1 |
 | L1-031 | Low | Add → Blocks → Hero | The Hero block ships "Welcome to Buildrick" product copy and an unstyled "Get Started" link | INCOMPLETE FUNCTIONALITY | DECISION wave4 · LIVE-VERIFIED | L1 |
 | L1-032 | Low | History panel | The History empty state says "Use Ctrl+Z" on macOS | CODE ONLY ISSUE | FIXED wave4 54c73d706 · LIVE-VERIFIED | L1 |
-| L1-033 | Low | ⌘K palette | Command palette gaps: no "Add heading", fuzzy false hits, inconsistent zoom rows | INCOMPLETE FUNCTIONALITY | NOT-DONE wave4 · LIVE-VERIFIED | L1 |
+| L1-033 | Low | ⌘K palette | Command palette gaps: no "Add heading", fuzzy false hits, inconsistent zoom rows | INCOMPLETE FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED | L1 |
 | L1-034 | Low | Site menu → Issues; pre-publish | A brand-new site opens with 11 Issues, 8 of them about default Brand tokens | INCOMPLETE FUNCTIONALITY | ALREADY-FIXED wave4 c6063ed14 (wave 3) · LIVE-VERIFIED | L1 |
 | L1-036 | Low | Comments toggle | A click into the page while in comment mode also selects the element under it | INCOMPLETE FUNCTIONALITY | FIXED wave4 48314ce07 · LIVE-VERIFIED | L1 |
 | L1-037 | Low | Add → click-insert with a Section selected | Click-insert into a Section lands next to its inner Container, not inside it | INCOMPLETE FUNCTIONALITY | FIXED wave4 58adfd87a · LIVE-VERIFIED | L1 |
 | L1-038 | Low | Keyboard nudge | Keyboard move feedback is inconsistent: ⇧+Arrow explains, ⌘+Arrow is silent | INCOMPLETE FUNCTIONALITY | FIXED wave4 dcaa0aa54 · LIVE-VERIFIED | L1 |
 | L2-016 | Low | Canvas/Layers keyboard Delete on an instance child | Deleting an instance child says "Locked elements were skipped" | CODE ONLY ISSUE | FIXED wave4 d334fb887 · LIVE-VERIFIED | L2 |
-| L2-019 | Low | Inspector · every typed field / slider | Inspector edits reach the canvas about 300 ms late | INCOMPLETE FUNCTIONALITY | NOT-DONE wave4 · PHASE-1 CONFIRMED LIVE | L2 |
+| L2-019 | Low | Inspector · every typed field / slider | Inspector edits reach the canvas about 300 ms late | INCOMPLETE FUNCTIONALITY | FIXED not-done `0850e2874` · PHASE-1 CONFIRMED LIVE | L2 |
 | L2-024 | Low | Add › Form | The default Form block is unstyled: borderless inputs, Submit as plain text | INCOMPLETE FUNCTIONALITY | DECISION wave4 · LIVE-VERIFIED | L2 |
 | L2-026 | Low | Templates · Replace page modal | Replace-page copy contradicts the token behaviour | FIGMA + CODE ISSUE | FIXED wave4 f0cb5640d · LIVE-VERIFIED | L2 |
 | L2-027 | Low | Inspector › Behaviour › + Add interaction | The interaction trigger picker uses emoji as icons | CODE ONLY ISSUE | FIXED wave4 c89d33686 · LIVE-VERIFIED | L2 |
@@ -195,16 +195,16 @@
 | L2-034 | Low | Inspector · page panel header ⋯ and footer link | The page Inspector ⋯ menu has one item, and "SEO & social" shows an external-link icon but opens in-editor | FIGMA + CODE ISSUE | DECISION wave4 · LIVE-VERIFIED | L2 |
 | L2-035 | Low | Canvas selection toolbar hints ("Duplicate ⌘D · Delete � | Toolbar hint labels render under the toolbar on top of canvas content | CODE ONLY ISSUE | DECISION wave4 · LIVE-VERIFIED | L2 |
 | L2-036 | Low | Templates catalogue | Template catalogue: no search or filter despite the component's own comment | INCOMPLETE FUNCTIONALITY | FIXED wave4 3eacf8490 · LIVE-VERIFIED | L2 |
-| L2-037 | Low | Inspector ✦ AI › "Make it more concise" | ✦ AI chip: "The AI service didn’t respond" while `ai.streamPrompt` returned 200; adoption still logged | AI ISSUE | NOT-DONE wave4 · LIVE-VERIFIED (UI and network); cause UN | L2 |
+| L2-037 | Low | Inspector ✦ AI › "Make it more concise" | ✦ AI chip: "The AI service didn’t respond" while `ai.streamPrompt` returned 200; adoption still logged | AI ISSUE | FIXED not-done `5358a0b63` · LIVE-VERIFIED (UI and network); cause UN | L2 |
 | L3-009 | Low | Pages panel row status | Page rows tell screen readers "Live" on a site that has never been published; "Unpublished" means unsaved | CODE ONLY ISSUE | DECISION wave5 · LIVE-VERIFIED | L3 |
 | L3-010 | Low | Page settings · SEO tab | Page settings preview shows `/about.html` while the slug field shows `/about`, both on a placeholder "yoursite.com" | FIGMA + CODE ISSUE | DECISION wave5 · LIVE-VERIFIED | L3 |
 | L3-011 | Low | Page settings | Page indexing is set in two places (SEO "Search indexing" and Advanced "Allow indexing") | FIGMA + CODE ISSUE | DECISION wave5 · LIVE-VERIFIED | L3 |
 | L3-012 | Low | Pages panel / inspector Page panel | Small Pages rough edges: New folder skips the naming step; the inspector link icon misleads; cryptic note | CODE ONLY ISSUE | PARTLY wave5 `c9adfc3a8` · LIVE-VERIFIED | L3 |
 | L3-014 | Low | Dashboard create-site → editor | "Start from Scratch" lands on the dashboard overview, not the editor | CODE ONLY ISSUE | DECISION wave5 · LIVE-VERIFIED | L3 |
 | L3-020 | Low | CMS records | Deleting a record has no guard (Figma requires typed DELETE), and the Records table has no status column or row actions | FIGMA + CODE ISSUE | DECISION wave5 · LIVE-VERIFIED | L3 |
-| L3-021 | Low | CMS record sheet · CONFLICT | The CMS conflict banner hides what "theirs" contains | INCOMPLETE FUNCTIONALITY | NOT-DONE wave5 · LIVE-VERIFIED | L3 |
+| L3-021 | Low | CMS record sheet · CONFLICT | The CMS conflict banner hides what "theirs" contains | INCOMPLETE FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED | L3 |
 | L3-022 | Low | `cms.entries.upsert` | The CMS server accepts blind writes; the conflict check is opt-in | CODE ONLY ISSUE · INTEGRATION ISSUE | DECISION wave5 · LIVE-VERIFIED | L3 |
-| L3-023 | Low | CMS UI | Small CMS rough edges: field picker, wizard stepper, empty workspace, tab label | CODE ONLY ISSUE | NOT-DONE wave5 · LIVE-VERIFIED | L3 |
+| L3-023 | Low | CMS UI | Small CMS rough edges: field picker, wizard stepper, empty workspace, tab label | CODE ONLY ISSUE | DECISION not-done · LIVE-VERIFIED | L3 |
 | L3-030 | Low | Form inspector | The form's Behaviour tab fetches `forms.getBlock` twice per open, and forms can't be named | CODE ONLY ISSUE | WONTFIX-REASON wave5 · LIVE-VERIFIED | L3 |
 | L3-033 | Low | Settings › Domains › Add a domain | The Add-a-domain dialog shows hard-coded registrar nameservers as facts | CODE ONLY ISSUE | DECISION wave5 · LIVE-VERIFIED | L3 |
 | L3-034 | Low | Settings › Overview "Needs attention" | Settings Overview flags a workspace webhook failure from 28 Sep on a site created today | CODE ONLY ISSUE | FIXED wave5 `7c8526979` · LIVE-VERIFIED | L3 |
@@ -230,10 +230,10 @@
 | L5-022 | Low | History › Session | Every AI edit in Session history has the same generic label, "Ai Edit" | CODE ONLY ISSUE | FIXED wave6 `f1fbc6319` · LIVE-VERIFIED | L5 |
 | L5-023 | Low | AI › client transport | Three AI transports with three error, retry and cache behaviours (duplicate AI plumbing) | CODE ONLY ISSUE | WONTFIX-REASON wave6 · CODE-ONLY (behaviour difference LIVE) | L5 |
 | L5-024 | Low | AI › AI column mount | `ai.quota` is fetched twice per AI open (duplicate request in one batch) | CODE ONLY ISSUE | FIXED wave6 `f3d0c159f` · LIVE-VERIFIED | L5 |
-| L5-026 | Low | AI × Issues | "Missing alt" in Issues has no AI fix, although a vision alt-text service exists | MISSING FUNCTIONALITY, AI ISSUE | NOT-DONE wave6 · CODE-ONLY | L5 |
-| L5-027 | Low | AI × Review | Review comments cannot be handed to AI ("Apply this comment") | MISSING FUNCTIONALITY, AI ISSUE | NOT-DONE wave6 · LIVE-VERIFIED (absence) | L5 |
-| L5-032 | Low | Review & Comments › New comment | There are no @mentions in comments | MISSING FUNCTIONALITY | NOT-DONE wave6 · LIVE-VERIFIED | L5 |
-| L5-033 | Low | Review & Comments | Comments cannot be edited or deleted | MISSING FUNCTIONALITY | NOT-DONE wave6 · LIVE-VERIFIED | L5 |
+| L5-026 | Low | AI × Issues | "Missing alt" in Issues has no AI fix, although a vision alt-text service exists | MISSING FUNCTIONALITY, AI ISSUE | DECISION not-done · CODE-ONLY | L5 |
+| L5-027 | Low | AI × Review | Review comments cannot be handed to AI ("Apply this comment") | MISSING FUNCTIONALITY, AI ISSUE | DECISION not-done · LIVE-VERIFIED (absence) | L5 |
+| L5-032 | Low | Review & Comments › New comment | There are no @mentions in comments | MISSING FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED | L5 |
+| L5-033 | Low | Review & Comments | Comments cannot be edited or deleted | MISSING FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED | L5 |
 | L5-035 | Low | Review panel comment row | The comment author is rendered twice ("You · you") | CODE ONLY ISSUE | FIXED wave6 `4c2fa911a` · LIVE-VERIFIED | L5 |
 | L5-041 | Low | History › Saves | The compare panel goes stale after a new version is saved | CODE ONLY ISSUE | FIXED wave6 `9d8c6641a` · LIVE-VERIFIED | L5 |
 | L5-045 | Low | History › Saves list | Version rows and the "N changes" link are not clickable; everything is in a hover-only "…" menu | CODE ONLY ISSUE | FIXED wave6 `f2e13db09` · LIVE-VERIFIED | L5 |
@@ -243,15 +243,15 @@
 | L5-077 | Low | Save › two-tab conflict | "Reload latest" in the conflict dialog triggers the browser's native "Leave site?" prompt | CODE ONLY ISSUE | FIXED wave6 `d6056e93a` · LIVE-VERIFIED | L5 |
 | L5-078 | Low | Save › multi-tab | No warning when the same site is open in another tab; a conflict is discovered only on save | MISSING FUNCTIONALITY | FIXED wave6 `aea5b9d78` + `92717c0c6` · LIVE-VERIFIED | L5 |
 | L5-079 | Low | Save › offline | The editor crashed once to "This page couldn't load" after offline → edit → online (not reproduced) | BROKEN FUNCTIONALITY | WONTFIX-REASON wave6 · UNVERIFIED (one occurrence; likely harne | L5 |
-| FG-008 | Low | Pages / page row / SEO health indicator | Pages panel SEO dot missing | CODE ONLY ISSUE, MISSING FUNCTIONALITY | NOT-DONE wave6 · LIVE-VERIFIED | FG |
-| FG-011 | Low | SEO (page) / Social tab | Social tab: no explicit linked vs independent X switch | CODE ONLY ISSUE, INCOMPLETE FUNCTIONALITY | NOT-DONE wave6 · CODE-ONLY | FG |
+| FG-008 | Low | Pages / page row / SEO health indicator | Pages panel SEO dot missing | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION not-done · LIVE-VERIFIED | FG |
+| FG-011 | Low | SEO (page) / Social tab | Social tab: no explicit linked vs independent X switch | CODE ONLY ISSUE, INCOMPLETE FUNCTIONALITY | DECISION not-done · CODE-ONLY | FG |
 | FG-015c | Low | Brand / Colours | Colour scale generator not built | CODE ONLY ISSUE, MISSING FUNCTIONALITY | ALREADY-FIXED wave6 `068bf133c` · CODE-ONLY | FG |
-| FG-015h | Low | Brand / theme push | Theme push results not built | CODE ONLY ISSUE, MISSING FUNCTIONALITY | NOT-DONE wave6 · CODE-ONLY | FG |
+| FG-015h | Low | Brand / theme push | Theme push results not built | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION not-done · CODE-ONLY | FG |
 | FG-015i | Low | Brand / header + token detail | Review-changes empty state and token-usage "unknown" missing | CODE ONLY ISSUE, MISSING FUNCTIONALITY | ALREADY-FIXED wave6 Brand 1b · CODE-ONLY | FG |
 | FG-016 | Low | Brand / AI | Brand AI shared-style proposal boards have no code | CODE ONLY ISSUE, AI ISSUE, MISSING FUNCTIONALITY | DECISION wave6 · CODE-ONLY | FG |
 | FG-017 | Low | Brand / Brand checks | A brand-new site opens Brand with 8 Brand-check warnings from its own default tokens | CODE ONLY ISSUE | ALREADY-FIXED wave6 `c6063ed14` · LIVE-VERIFIED | FG |
 | FG-018 | Low | Brand / Radius, Shadow, Motion, … Imagery | Brand token-kind pages: Figma draws 11 loose boards, code hides them behind a disclosure with a stale comment | FIGMA + CODE ISSUE | DECISION wave6 · LIVE-VERIFIED (nav) + Figma read | FG |
-| FG-022 | Low | Inspector / Effects | Effects "MORE EFFECTS" expander vs code's flat section split | CODE ONLY ISSUE | NOT-DONE wave6 · CODE-ONLY | FG |
+| FG-022 | Low | Inspector / Effects | Effects "MORE EFFECTS" expander vs code's flat section split | CODE ONLY ISSUE | DECISION not-done · CODE-ONLY | FG |
 | FG-024 | Low | AI / unavailable state | "Connect AI provider" boards contradict the shipped owner-managed AI model | FIGMA ONLY ISSUE, AI ISSUE | WONTFIX-REASON wave6 · CODE-ONLY | FG |
 | FG-025 | Low | AI / inspector | "AI pending · Hero Inspector" board superseded by Inspector v4 "AI column" | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · CODE-ONLY | FG |
 | FG-027 | Low | Issues / empty state | Issues empty state says "No brand issues." while the panel also carries content issues | CODE ONLY ISSUE | ALREADY-FIXED wave6 main L4-042; wave-6 `5c1f8d1a2` superseded at merge · CODE-ONLY | FG |
@@ -263,38 +263,38 @@
 | FG-037 | Low | Commerce | Commerce is incomplete in both | FIGMA + CODE ISSUE, INCOMPLETE FUNCTIONALITY | DECISION wave6 · CODE-ONLY | FG |
 | FG-038 | Low | Templates | Template replace confirm: code adds backup option the board lacks | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · CODE-ONLY | FG |
 | FG-040 | Low | Canvas / footer toolbar | Review v2 boards draw the floating canvas footer the 10-04 change docked | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · LIVE-VERIFIED | FG |
-| FG-041 | Low | Add | Add panel has no loading / error rows | CODE ONLY ISSUE, MISSING FUNCTIONALITY | NOT-DONE wave6 · CODE-ONLY | FG |
+| FG-041 | Low | Add | Add panel has no loading / error rows | CODE ONLY ISSUE, MISSING FUNCTIONALITY | DECISION not-done · CODE-ONLY | FG |
 | FG-042 | Low | Drag & Drop | Drag & drop: the invalid-drop state ships with no board | FIGMA ONLY ISSUE | WONTFIX-REASON wave6 · CODE-ONLY | FG |
-| FG-043 | Low | CMS / field config | CMS Date field has no type-specific configuration; code comment says "no boards" | CODE ONLY ISSUE | NOT-DONE wave6 · CODE-ONLY | FG |
-| FG-044 | Low | Onboarding / dashboard create flow → editor | Create site "Start from Scratch" lands on the dashboard site page, not the editor | INTEGRATION ISSUE | NOT-DONE wave6 · LIVE-VERIFIED | FG |
+| FG-043 | Low | CMS / field config | CMS Date field has no type-specific configuration; code comment says "no boards" | CODE ONLY ISSUE | DECISION not-done · CODE-ONLY | FG |
+| FG-044 | Low | Onboarding / dashboard create flow → editor | Create site "Start from Scratch" lands on the dashboard site page, not the editor | INTEGRATION ISSUE | DECISION not-done · LIVE-VERIFIED | FG |
 | FG-045 | Low | Sites (dashboard) / row ⋯ › Delete / delete confirm | Dashboard "Delete Site" says "cannot be undone", but delete is a 30-day restorable soft delete | CODE ONLY ISSUE, INTEGRATION ISSUE | FIXED wave6 `a3881498d` + merge · LIVE-VERIFIED | FG |
-| DQ-003 | Low | Shell event wiring | Dead event subscriptions — "Show in Layers", Layers toggle, zoom-to-selection, templates toggle (Phase-1 re-verified on main) | CODE ONLY ISSUE | INCOMPLETE FUNCTIONALITY | CODE-ONLY (PHASE-1 finding, re-verified  | DQ |
-| DQ-004 | Low | Tooling › `scripts/conformance/seam-scan.mjs` | seam-scan reports false orphans and its growth is not enforced | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-008 | Low | Engine › Composer | Six Composer managers constructed and never used (Phase-1 re-verified) | CODE ONLY ISSUE | CODE-ONLY (PHASE-1, still present) | DQ |
-| DQ-009 | Low | Engine › integrations / forms | Email-marketing integration is a DEAD/SIMULATED stub still wired into Composer and FormHandler | CODE ONLY ISSUE | INCOMPLETE FUNCTIONALITY | CODE-ONLY | DQ |
-| DQ-012 | Low | Cross-cutting | Swallowed promise rejections (25) — notable ones mask state | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-013 | Low | Shell / Pages / Page tab bar / Zoom | Same engine state mirrored in several React states with different subscriptions | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-014 | Low | Shell | Discarded props / dead prop API on the shell | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-015 | Low | Inspector › Spacing box model | Inspector spacing box: labels "Margin"/"Padding" render in Geist Mono (data face) — values are correct | CODE ONLY ISSUE (possibly FIGMA + CODE — board not checked) | LIVE-VERIFIED | DQ |
-| DQ-016 | Low | Add panel › Elements › Heading row icon | Add panel "Heading" icon renders in Times (serif) at weight 700 | CODE ONLY ISSUE | LIVE-VERIFIED | DQ |
-| DQ-017 | Low | Add panel, Layers, History, Pages, Topbar | Two element-icon systems + 62 hand-rolled inline SVGs; icon sizes on 12 different values | CODE ONLY ISSUE | LIVE-VERIFIED (sizes) + CODE-ONLY (sourc | DQ |
-| DQ-019 | Low | AI plan, Page settings drawer, Media replace-across, Asset d | Hand-rolled dialogs and drawers outside chrome-ui overlay primitives | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-021 | Low | Brand empty state, publish/unpublish modals, page bulk bar,  | Weight 700 reaches chrome through `<strong>`/`<b>` and CSS `bold` (the gate is blind to it) | CODE ONLY ISSUE | LIVE-VERIFIED | DQ |
-| DQ-022 | Low | Canvas › inline text edit outline; locked-element outline | Indigo `#667eea` / `rgba(102,126,234,…)` and a pink lock outline in canvas chrome CSS | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-023 | Low | Pages status chips, Export code preview, Device frame previe | Off-token hex and near-black surfaces in chrome components | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-024 | Low | Slider, inspector PropertyField, Library manager, LeftSideba | 10 references to undefined `--bk-*` tokens that render via hard-coded fallbacks | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-025 | Low | Tokens / canvas overlays / DS modals | Mono font stack: named fallbacks, two definitions, and raw `monospace` in canvas overlays | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-026 | Low | Add panel › FirstUseTip ("💡 Tip 1/4") | Emoji as a design element in the first-use tip | FIGMA + CODE ISSUE | LIVE-VERIFIED | DQ |
-| DQ-027 | Low | Left panels, CMS, Brand, Inspector | Panel header heights and patterns vary across surfaces | CODE ONLY ISSUE | LIVE-VERIFIED | DQ |
-| DQ-028 | Low | Inspector heading-level segmented control, colour swatches,  | Off-scale radii in chrome (2/3/5/12px) | CODE ONLY ISSUE | LIVE-VERIFIED | DQ |
-| DQ-029 | Low | Assets / Media tab | Duplicate `showToast` pass-through wrappers in Media | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-030 | Low | Docs-in-code | Stale headers: StockService "stub" comment and CLAUDE.md's "closed 2-wrapper set" | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-031 | Low | shared/utils, CSS | ssot-scan residuals: pass-through predicates, duplicate selector, unannotated legacy rules, dead test utils | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-032 | Low | Canvas drag, overlays, AI client, activity list | Residual `any` / `@ts-ignore` in drag and AI paths | CODE ONLY ISSUE | CODE-ONLY | DQ |
-| DQ-033 | Low | Chrome | Inline style objects still widespread (345 literal + 109 hoisted) | CODE ONLY ISSUE | CODE-ONLY | DQ |
+| DQ-003 | Low | Shell event wiring | Dead event subscriptions — "Show in Layers", Layers toggle, zoom-to-selection, templates toggle (Phase-1 re-verified on main) | CODE ONLY ISSUE | FIXED dq-code `979a77e3e`, `6b8d00530` · INCOMPLETE FUNCTIONALITY | CODE-ONLY (PHASE-1 finding, re-verified  | DQ |
+| DQ-004 | Low | Tooling › `scripts/conformance/seam-scan.mjs` | seam-scan reports false orphans and its growth is not enforced | CODE ONLY ISSUE | FIXED dq-code `94bdcf9c3` · CODE-ONLY | DQ |
+| DQ-008 | Low | Engine › Composer | Six Composer managers constructed and never used (Phase-1 re-verified) | CODE ONLY ISSUE | FIXED dq-code `e91914da6` · CODE-ONLY (PHASE-1, still present) | DQ |
+| DQ-009 | Low | Engine › integrations / forms | Email-marketing integration is a DEAD/SIMULATED stub still wired into Composer and FormHandler | CODE ONLY ISSUE | FIXED dq-code `05cf74109` · INCOMPLETE FUNCTIONALITY | CODE-ONLY | DQ |
+| DQ-012 | Low | Cross-cutting | Swallowed promise rejections (25) — notable ones mask state | CODE ONLY ISSUE | PARTLY dq-code `47738032c`, `3a9b0e015` · CODE-ONLY | DQ |
+| DQ-013 | Low | Shell / Pages / Page tab bar / Zoom | Same engine state mirrored in several React states with different subscriptions | CODE ONLY ISSUE | PARTLY dq-code `85c018a84` · CODE-ONLY | DQ |
+| DQ-014 | Low | Shell | Discarded props / dead prop API on the shell | CODE ONLY ISSUE | FIXED dq-code `959686c6c` · CODE-ONLY | DQ |
+| DQ-015 | Low | Inspector › Spacing box model | Inspector spacing box: labels "Margin"/"Padding" render in Geist Mono (data face) — values are correct | CODE ONLY ISSUE (possibly FIGMA + CODE — board not checked) | DECISION dq-chrome · LIVE-VERIFIED | DQ |
+| DQ-016 | Low | Add panel › Elements › Heading row icon | Add panel "Heading" icon renders in Times (serif) at weight 700 | CODE ONLY ISSUE | FIXED dq-chrome `d99ac5a32` · LIVE-VERIFIED | DQ |
+| DQ-017 | Low | Add panel, Layers, History, Pages, Topbar | Two element-icon systems + 62 hand-rolled inline SVGs; icon sizes on 12 different values | CODE ONLY ISSUE | FIXED dq-chrome `200a6b585` · LIVE-VERIFIED (sizes) + CODE-ONLY (sourc | DQ |
+| DQ-019 | Low | AI plan, Page settings drawer, Media replace-across, Asset d | Hand-rolled dialogs and drawers outside chrome-ui overlay primitives | CODE ONLY ISSUE | PARTLY-FIXED dq-chrome `15345cbcc` · CODE-ONLY | DQ |
+| DQ-021 | Low | Brand empty state, publish/unpublish modals, page bulk bar,  | Weight 700 reaches chrome through `<strong>`/`<b>` and CSS `bold` (the gate is blind to it) | CODE ONLY ISSUE | FIXED dq-chrome `53e252b92`, `728d2655c` · LIVE-VERIFIED | DQ |
+| DQ-022 | Low | Canvas › inline text edit outline; locked-element outline | Indigo `#667eea` / `rgba(102,126,234,…)` and a pink lock outline in canvas chrome CSS | CODE ONLY ISSUE | FIXED dq-chrome `3363bc147` · CODE-ONLY | DQ |
+| DQ-023 | Low | Pages status chips, Export code preview, Device frame previe | Off-token hex and near-black surfaces in chrome components | CODE ONLY ISSUE | PARTLY-FIXED dq-chrome `d4965809a` (+ `3363bc147`) · CODE-ONLY | DQ |
+| DQ-024 | Low | Slider, inspector PropertyField, Library manager, LeftSideba | 10 references to undefined `--bk-*` tokens that render via hard-coded fallbacks | CODE ONLY ISSUE | FIXED dq-chrome `eb5c59f67` · CODE-ONLY | DQ |
+| DQ-025 | Low | Tokens / canvas overlays / DS modals | Mono font stack: named fallbacks, two definitions, and raw `monospace` in canvas overlays | CODE ONLY ISSUE | FIXED dq-chrome `9a107ab60` · CODE-ONLY | DQ |
+| DQ-026 | Low | Add panel › FirstUseTip ("💡 Tip 1/4") | Emoji as a design element in the first-use tip | FIGMA + CODE ISSUE | DECISION dq-chrome · LIVE-VERIFIED | DQ |
+| DQ-027 | Low | Left panels, CMS, Brand, Inspector | Panel header heights and patterns vary across surfaces | CODE ONLY ISSUE | FIXED dq-chrome `6fb31dc0f` · LIVE-VERIFIED | DQ |
+| DQ-028 | Low | Inspector heading-level segmented control, colour swatches,  | Off-scale radii in chrome (2/3/5/12px) | CODE ONLY ISSUE | FIXED dq-chrome `4cbe53819` · LIVE-VERIFIED | DQ |
+| DQ-029 | Low | Assets / Media tab | Duplicate `showToast` pass-through wrappers in Media | CODE ONLY ISSUE | FIXED dq-code `b96a11e53` · CODE-ONLY | DQ |
+| DQ-030 | Low | Docs-in-code | Stale headers: StockService "stub" comment and CLAUDE.md's "closed 2-wrapper set" | CODE ONLY ISSUE | FIXED dq-code `23b21655a` · CODE-ONLY | DQ |
+| DQ-031 | Low | shared/utils, CSS | ssot-scan residuals: pass-through predicates, duplicate selector, unannotated legacy rules, dead test utils | CODE ONLY ISSUE | FIXED dq-code `cf18f2650`, `2a99deb2b`, `b1a14d3bb`, `9fce1544a` · CODE-ONLY | DQ |
+| DQ-032 | Low | Canvas drag, overlays, AI client, activity list | Residual `any` / `@ts-ignore` in drag and AI paths | CODE ONLY ISSUE | FIXED dq-code `f77621a36`, `c11f33f91` · CODE-ONLY | DQ |
+| DQ-033 | Low | Chrome | Inline style objects still widespread (345 literal + 109 hoisted) | CODE ONLY ISSUE | PARTLY-FIXED dq-chrome see row note · CODE-ONLY | DQ |
 | 4a. |  |  | Boards with no code (designed, not built) |  |  | FG |
 | 4b. |  |  | Code features with no board |  |  | FG |
 | 4c. |  |  | Boards that are incomplete or logically wrong |  |  | FG |
 | 4d. |  |  | Screens / states missing in both |  |  | FG |
-| FG-005 |  |  | (withdrawn: the v2 "email failed → keep round + Copy link" rule is already met by `shell/modals/ReviewSentModal.tsx:61-100`) |  | — wave6 ·  | FG |
-| FG-039 |  |  | (not filed: page-tab "+" opens the Pages panel in both code and the base shell's prototype (`4418:92256`); consistent) |  | — wave6 ·  | FG |
+| FG-005 |  |  | (withdrawn: the v2 "email failed → keep round + Copy link" rule is already met by `shell/modals/ReviewSentModal.tsx:61-100`) |  |  wave6 · — wave6 · | FG |
+| FG-039 |  |  | (not filed: page-tab "+" opens the Pages panel in both code and the base shell's prototype (`4418:92256`); consistent) |  |  wave6 · — wave6 · | FG |

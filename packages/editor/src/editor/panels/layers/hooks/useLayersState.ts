@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { findById, countDescendants } from "../data/layerUtils";
 import type { LayerContextMenuState, LayerDisplayPrefs, LayerItem } from "../types";
 import { useLayerActions, type UseLayerActionsReturn } from "./useLayerActions";

@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
+import { trackSidebar } from "@/shared/utils/sidebarAnalytics";
 import { TextInput } from "@/editor/chrome-ui";
 
 export interface SearchBarProps {

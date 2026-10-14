@@ -5,7 +5,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { SpacingBox } from "../SpacingControls";
-import { EVENTS } from "../../../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 const mockEmit = vi.fn();
 const fakeComposer = { emit: mockEmit } as unknown as Parameters<typeof SpacingBox>[0]["composer"];

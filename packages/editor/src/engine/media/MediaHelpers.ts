@@ -4,8 +4,8 @@
  * @license BSD-3-Clause
  */
 
-import { MEDIA_SIZE_LIMITS, getMaxFileSize, isAllowedMimeType, mimeTypeForFile } from "../../shared/constants/media";
-import { formatBytes } from "../../shared/utils/helpers/number";
+import { MEDIA_SIZE_LIMITS, getMaxFileSize, isAllowedMimeType, mimeTypeForFile } from "@/shared/constants/media";
+import { formatBytes } from "@/shared/utils/helpers/number";
 
 /**
  * Validate a file for upload. `limit` is set only when the size was the

@@ -12,8 +12,8 @@ import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import * as React from "react";
 import { TokenDetailView } from "../TokenDetailView";
-import { DSModeProvider } from "../../../state/DSModeContext";
-import type { DesignToken } from "../../../types";
+import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
+import type { DesignToken } from "@/editor/design-system/types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const colorToken: DesignToken = v6Token({

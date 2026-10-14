@@ -9,10 +9,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
-import type { ElementType } from "../../../shared/types";
-import { canNestElement } from "../../../shared/utils/nesting";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { ElementType } from "@/shared/types";
+import { canNestElement } from "@/shared/utils/nesting";
 
 // =============================================================================
 // TYPES

@@ -12,7 +12,7 @@
 import * as React from "react";
 import type { TemplateItem } from "./templatesData";
 import { Button } from "@/editor/chrome-ui";
-import { DEFAULT_TOKENS } from "../../../design-system/constants";
+import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import { resolveTokens } from "./utils/resolveTemplateTokens";
 import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 

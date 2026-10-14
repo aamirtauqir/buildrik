@@ -16,10 +16,10 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { STARTER_DS_REGISTRY } from "../../starters";
-import { useApplyStarter } from "../../state/useApplyStarter";
-import { useTypeRegistry } from "../../state/TokenRegistryContext";
-import type { StarterDS } from "../../starters/types";
+import { STARTER_DS_REGISTRY } from "@/editor/design-system/starters";
+import { useApplyStarter } from "@/editor/design-system/state/useApplyStarter";
+import { useTypeRegistry } from "@/editor/design-system/state/TokenRegistryContext";
+import type { StarterDS } from "@/editor/design-system/starters/types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 

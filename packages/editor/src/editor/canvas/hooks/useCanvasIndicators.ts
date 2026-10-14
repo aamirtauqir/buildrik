@@ -7,9 +7,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
-import type { SpacingIndicator, ElementBadge } from "../../../shared/types/canvas";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { SpacingIndicator, ElementBadge } from "@/shared/types/canvas";
 
 export interface UseCanvasIndicatorsOptions {
   composer: Composer | null;

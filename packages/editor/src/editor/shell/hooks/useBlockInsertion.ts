@@ -8,17 +8,17 @@
  */
 
 import * as React from "react";
-import { getBlockDefinitions, insertBlock } from "../../../blocks/blockRegistry";
-import type { Composer } from "../../../engine";
-import type { BlockData, ElementType } from "../../../shared/types";
+import { getBlockDefinitions, insertBlock } from "@/blocks/blockRegistry";
+import type { Composer } from "@/engine";
+import type { BlockData, ElementType } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
-import { animateDropSuccess } from "../../../shared/utils/dragDrop/animations";
+import { animateDropSuccess } from "@/shared/utils/dragDrop/animations";
 import {
   canNestElement,
   ELEMENT_CATEGORIES,
   ElementCategory,
   getSuggestedParents,
-} from "../../../shared/utils/nesting";
+} from "@/shared/utils/nesting";
 import { writableElements } from "@/engine/commands/commandOperations";
 import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { elementLocation, getElementNameFromType } from "@/editor/canvas/utils/elementInfo";

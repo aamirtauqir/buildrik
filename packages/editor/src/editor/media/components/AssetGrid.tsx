@@ -56,7 +56,7 @@ import type {
   MediaBucket,
   MediaSortBy,
   MediaStateResult,
-} from "../../sidebar/tabs/media/data/mediaTypes";
+} from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { MEDIA_ACCEPTED_FORMATS_LABEL, MEDIA_SIZE_LIMITS_LABEL } from "@shared/constants/media";
@@ -757,7 +757,7 @@ export function AssetGrid({
                   else state.selectAll();
                 }}
               >
-                {all ? <Check size={10} /> : null}
+                {all ? <Check size={12} /> : null}
               </span>
             );
           })()}

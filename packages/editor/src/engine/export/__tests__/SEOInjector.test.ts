@@ -9,7 +9,7 @@
 
 import { describe, it, expect } from "vitest";
 import { SEOInjector } from "../SEOInjector";
-import type { PageData } from "../../../shared/types";
+import type { PageData } from "@/shared/types";
 
 function makePage(overrides: Partial<PageData>): PageData {
   return {

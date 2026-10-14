@@ -9,14 +9,9 @@
  */
 
 import * as React from "react";
-import type { ColorHSB } from "../../types";
-import {
-  hexToHsb,
-  hsbToHex,
-  isValidHex,
-  expandShorthand,
-  calcContrastRatio,
-} from "../../utils/colorUtils";
+import type { ColorHSB } from "@/editor/design-system/types";
+import { isValidHex } from "@/editor/design-system/utils/colorUtils";
+import { hexToHsb, hsbToHex, expandShorthand, calcContrastRatio } from "@/engine/designSystem/colorMath";
 import { Button, TextField } from "@/editor/chrome-ui";
 
 export interface ColorPickerProps {

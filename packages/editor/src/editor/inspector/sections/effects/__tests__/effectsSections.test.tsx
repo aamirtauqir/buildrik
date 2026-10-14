@@ -9,7 +9,7 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { SECTION_REGISTRY } from "../../registry";
+import { SECTION_REGISTRY } from "@/editor/inspector/sections/registry";
 import { EffectsAdvancedSection } from "../EffectsAdvancedSection";
 import { FiltersSection } from "../FiltersSection";
 import { OpacitySection } from "../OpacitySection";

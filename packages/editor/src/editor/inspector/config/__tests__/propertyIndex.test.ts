@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { buildPropertyIndex } from "../propertyIndex";
-import { SECTION_REGISTRY } from "../../sections/registry";
+import { SECTION_REGISTRY } from "@/editor/inspector/sections/registry";
 
 const find = (type: string, label: string) => buildPropertyIndex(type).filter((r) => r.label === label);
 

@@ -11,7 +11,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { AddLocaleDialog } from "../AddLocaleDialog";
-import { SITE_LOCALES } from "../../constants";
+import { SITE_LOCALES } from "@/editor/sidebar/tabs/settings/constants";
 
 function mount(over: Partial<React.ComponentProps<typeof AddLocaleDialog>> = {}) {
   const props = {

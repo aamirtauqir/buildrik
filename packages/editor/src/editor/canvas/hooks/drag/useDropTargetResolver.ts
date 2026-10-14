@@ -13,29 +13,31 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { findDropTargetElement, getElementId } from "../../../../shared/utils/dragDrop";
+import type { Composer } from "@/engine";
+import { findDropTargetElement, getElementId } from "@/shared/utils/dragDrop";
 import {
   buildBreadcrumbPath,
   calculateDropPositionFromCursor,
   calculateDropSlotRect,
   validateDropOperation,
 } from "./dragCalculations";
+import type { DragSessionActions, DropPosition } from "@/editor/canvas/hooks/useDragSession";
 
-// Session-shape subset the resolver mutates. Match the public surface of
-// useDragSession; passing the full session object keeps mocking simple.
-export interface ResolverSession {
-  setDropTargetId: (id: string | null) => void;
-  setDropPosition: (pos: any) => void;
-  setIsValidDrop: (v: boolean) => void;
-  setInvalidDropReason: (r: any) => void;
-  setDropSlotRect: (r: any) => void;
-  setDropTargetPath: (p: any[]) => void;
-}
+// Session-shape subset the resolver mutates — typed off useDragSession's own
+// actions, so the drop-position shape is checked (DQ-032: these were `any`).
+export type ResolverSession = Pick<
+  DragSessionActions,
+  | "setDropTargetId"
+  | "setDropPosition"
+  | "setIsValidDrop"
+  | "setInvalidDropReason"
+  | "setDropSlotRect"
+  | "setDropTargetPath"
+>;
 
 // Visuals subset the resolver calls.
 export interface ResolverVisuals {
-  showDropTarget: (el: HTMLElement, position: any) => void;
+  showDropTarget: (el: HTMLElement, position: DropPosition) => void;
   showInvalidTarget: (el: HTMLElement) => void;
   clearDropTarget: () => void;
   clearInvalidTarget: () => void;

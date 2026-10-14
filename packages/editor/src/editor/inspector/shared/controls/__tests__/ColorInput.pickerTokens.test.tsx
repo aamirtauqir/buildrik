@@ -25,7 +25,7 @@ const token = (id: string, name: string, layer: string, extra: Record<string, un
   ...extra,
 });
 
-vi.mock("../../../../design-system/state/TokenRegistryContext", () => ({
+vi.mock("@/editor/design-system/state/TokenRegistryContext", () => ({
   useColorRegistry: () => ({
     tokens: [
       token("color-primary", "Primary", "semantic"),

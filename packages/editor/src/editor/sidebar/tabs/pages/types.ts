@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 
-import type { PageSEO } from "../../../../shared/types";
+import type { PageSEO } from "@/shared/types";
 
 /** Visibility/publication state of a page — stored in page.settings.visibility */
 /* No "password" (C4 #26): Password pages are removed; a page saved as one

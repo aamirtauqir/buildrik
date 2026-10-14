@@ -8,7 +8,8 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { ExportEngine, pageFileNames } from "../ExportEngine";
+import { ExportEngine } from "../ExportEngine";
+import { pageFileNames } from "../pageFiles";
 
 const link = (id: string, href: string) => ({ id, type: "link", tagName: "a", content: "About", children: [], attributes: { href } });
 const page = (id: string, slug: string, extra: Record<string, unknown> = {}) => ({

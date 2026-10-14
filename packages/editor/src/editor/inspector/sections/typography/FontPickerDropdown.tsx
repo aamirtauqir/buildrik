@@ -20,7 +20,7 @@ import {
   searchGoogleFonts,
   type GoogleFont,
   type FontCategory,
-} from "../../../../services/GoogleFontsService";
+} from "@/services/GoogleFontsService";
 import type { SystemFont } from "./FontPicker";
 import { Button, TextInput } from "@/editor/chrome-ui";
 // Category labels for display

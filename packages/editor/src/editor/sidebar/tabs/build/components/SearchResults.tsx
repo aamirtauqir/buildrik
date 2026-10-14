@@ -12,7 +12,7 @@
 import * as React from "react";
 import type { InsertSearchHit } from "../utils/search";
 import type { BlockDragStartFn, DragStartFn, ElClickFn } from "../hooks/useBuildTab";
-import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
+import type { BlockDefinition } from "@/blocks/blockRegistry";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { Button } from "@/editor/chrome-ui";
 import { themeToggleBlockConfig } from "@/blocks/Basic/ThemeToggle";

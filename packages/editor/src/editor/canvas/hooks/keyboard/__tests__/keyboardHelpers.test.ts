@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import type { Composer } from "../../../../../engine/Composer";
-import type { Element } from "../../../../../engine/elements/Element";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
 import {
   getAllNavigableElements,
   getNavigationTargets,

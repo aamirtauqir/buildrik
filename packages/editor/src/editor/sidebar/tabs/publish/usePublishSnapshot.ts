@@ -15,10 +15,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
-import { fetchPublishHistory } from "../../../../services/PublishService";
-import type { PublishHistoryRow } from "../../../../services/PublishService";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import { fetchPublishHistory } from "@/services/PublishService";
+import type { PublishHistoryRow } from "@/services/PublishService";
 import { isPageLive } from "@/engine/export";
 
 export interface PublishChange {

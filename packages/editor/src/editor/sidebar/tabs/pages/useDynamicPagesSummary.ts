@@ -16,7 +16,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getBuildrikClient } from "@/services/api-client";

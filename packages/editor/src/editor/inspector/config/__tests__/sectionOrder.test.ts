@@ -6,8 +6,8 @@
  */
 import { describe, expect, it } from "vitest";
 import { SECTION_ORDER } from "../sectionOrder";
-import { ALL_REGISTRY_SECTION_IDS, SECTION_REGISTRY, type SectionId, type TabId } from "../../sections/registry";
-import { visibleSectionIds } from "../../tabs/InspectorTabContent";
+import { ALL_REGISTRY_SECTION_IDS, SECTION_REGISTRY, type SectionId, type TabId } from "@/editor/inspector/sections/registry";
+import { visibleSectionIds } from "@/editor/inspector/tabs/InspectorTabContent";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import type { CssContext } from "../cssContext";
 

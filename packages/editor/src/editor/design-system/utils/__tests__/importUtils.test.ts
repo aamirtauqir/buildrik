@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { parseImportJSON, diffTokens } from "../importUtils";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import type { LegacyDesignToken } from "@/engine/designSystem/types";
 import { v6Token, type V6TokenSpec } from "@/engine/__tests__/test-utils/v6Token";
 

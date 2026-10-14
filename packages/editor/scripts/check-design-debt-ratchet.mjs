@@ -108,9 +108,77 @@ const RATCHETS = [
        ramp doesn't define). 6 → 0 (B-11 decision-free fix, 2026-09-26):
        `tw:font-bold` (Tailwind's 700 utility) and inline `fontWeight: 700`
        snapped onto `tw:font-semibold` / `fontWeight: 600`. Locked at 0. */
-    pattern: String.raw`tw:font-bold|fontWeight: ?700\b`,
+    /* DQ-021 (2026-10-10): the pattern saw `700` but not the word — an
+       inline `fontWeight: "bold"` on the rich-text toolbar's B glyph passed
+       straight through. `<strong>`/`<b>` are capped by chrome-reset.css. */
+    pattern: String.raw`tw:font-(bold|extrabold|black)|fontWeight: ?(700|800|900|["']bold(er)?["'])`,
     baseline: 0,
     excludeDesignSystem: true,
+  },
+  {
+    id: "named-mono-fallback",
+    /* DQ-025 (2026-10-10): DESIGN.md rule 8 bans named fallbacks, and the
+       mono token itself named SF Mono / Menlo / Consolas. Call sites carried
+       their own stacks on top (`var(--bk-font-mono, ui-monospace, Menlo…)`)
+       and two canvas overlays used bare `monospace`, which skipped Geist Mono
+       entirely. Every chrome mono goes through var(--bk-font-mono). */
+    pattern: String.raw`SF ?Mono|SFMono|Menlo|Consolas|Fira Code|ui-monospace|fontFamily: ?["']monospace|--bk-font-mono, `,
+    baseline: 0,
+  },
+  {
+    id: "css-named-mono-fallback",
+    pattern: String.raw`SF ?Mono|SFMono|Menlo|Consolas|Fira Code|ui-monospace|font-family: ?monospace|--bk-font-mono, `,
+    baseline: 0,
+    css: true,
+  },
+  {
+    id: "offscale-radius",
+    /* DQ-028 (2026-10-10): DESIGN.md's radius scale is 4 / 6 / 8 / 12
+       (modals) / full. Off-scale literals stay only where a board draws them
+       (the inspector's 3px colour swatch and level chips, the spacing box's
+       2px content chip) — a ratchet, so new ones fail and these drain. */
+    pattern: String.raw`rounded-\[(1|2|3|5|7|9|10|11|14|16)px\]|[rR]adius: ?["']?(1|2|3|5|7|9|10|11|14|16)(px)?["']?[,;]`,
+    baseline: 47,
+  },
+  {
+    id: "css-offscale-radius",
+    pattern: String.raw`border-radius: ?(1|2|3|5|7|9|10|11|14|16)px`,
+    baseline: 32,
+    css: true,
+  },
+  {
+    id: "offscale-icon-size",
+    /* DQ-017 (2026-10-10): lucide `size` took twelve values. The scale is
+       10 / 12 / 14 / 16 / 18 / 20 / 24 (+ 32 / 48 empty-state art); 10 is
+       the Inspector v4 boards' micro-glyph (stepper chevrons). What is left
+       sits in inspector controls no board has been read for yet. */
+    pattern: String.raw`\bsize=\{(8|9|11|13|15|17|19|21|22|23)\}`,
+    baseline: 3,
+  },
+  {
+    id: "inline-svg",
+    /* DQ-017: hand-drawn <svg> beside lucide. 62 at the audit; the dead
+       history icon set (8) and lucide paths copied inline (footer undo/redo)
+       are gone. Drains toward lucide; never grows. */
+    pattern: String.raw`<svg( |>|$)`,
+    baseline: 50,
+  },
+  {
+    id: "icon-stroke-override",
+    /* DQ-017: one stroke — lucide's default 2. */
+    pattern: String.raw`strokeWidth=\{(1|1\.5|1\.75|2\.5|3)\}`,
+    baseline: 0,
+  },
+  {
+    id: "css-font-weight-700",
+    /* DQ-021: the CSS half. `Canvas.css` set `font-weight: bold` on the
+       clone-mode badge (chrome, despite the file) and no gate scanned CSS
+       for weight at all. `site-content.css` is the CUSTOMER's default
+       heading weights inside the canvas, not chrome — excluded. */
+    pattern: String.raw`font-weight: ?(bold|bolder|[7-9]00)`,
+    baseline: 0,
+    css: true,
+    exclude: "site-content.css",
   },
 ];
 
@@ -144,7 +212,7 @@ function countUnsizedButtons() {
   return unsized;
 }
 
-function count(pattern, css = false, excludeDesignSystem = false) {
+function count(pattern, css = false, excludeDesignSystem = false, exclude = null) {
   try {
     // B-11 fix-round-1 (controller finding): `/design-system/` is scoped to
     // whichever ratchet passes excludeDesignSystem — NOT applied to the
@@ -155,7 +223,8 @@ function count(pattern, css = false, excludeDesignSystem = false) {
     // pre-existing ratchets never needed this exclusion because their one
     // real design-system/ hit, BrandPreview.tsx's offscale font size, was
     // already covered by the specimen-rendering exclusion above).
-    const designSystemExclude = excludeDesignSystem ? "| grep -v '/design-system/' " : "";
+    const designSystemExclude =
+      (excludeDesignSystem ? "| grep -v '/design-system/' " : "") + (exclude ? `| grep -v ${JSON.stringify(exclude)} ` : "");
     const out = execSync(
       `grep -rEn ${JSON.stringify(pattern)} src/editor ${css ? "src/themes --include='*.css'" : "--include='*.tsx' --include='*.ts'"} | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx ${designSystemExclude}| wc -l`,
       { cwd: ROOT, encoding: "utf8", shell: "/bin/bash" },
@@ -168,7 +237,7 @@ function count(pattern, css = false, excludeDesignSystem = false) {
 
 let failed = false;
 for (const r of RATCHETS) {
-  const n = count(r.pattern, r.css, r.excludeDesignSystem === true);
+  const n = count(r.pattern, r.css, r.excludeDesignSystem === true, r.exclude ?? null);
   if (n > r.baseline) {
     console.error(
       `[design-debt-ratchet] FAIL — ${r.id}: ${n} > baseline ${r.baseline}. ` +

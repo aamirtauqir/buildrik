@@ -5,8 +5,8 @@
  */
 
 import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
-import { THEME } from "../../shared/constants/defaultStyles";
-import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
+import { THEME } from "@/shared/constants/defaultStyles";
+import { GOOGLE_FONT_CATALOGUE } from "@/shared/constants/googleFonts";
 import { resolveTokenLiteral, emitTokenCss } from "@buildrik/shared/tokens";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import { PAGE_BACKGROUND_TOKEN } from "@buildrik/shared/content/elementIds";

@@ -9,9 +9,9 @@ import type {
   GapHighlight,
   EqualSpacingIndicator,
   ElementBounds,
-} from "../../../shared/types/canvas";
-import { parseNumericValue } from "../../../shared/utils/helpers";
-import type { Composer } from "../../Composer";
+} from "@/shared/types/canvas";
+import { parseNumericValue } from "@/shared/utils/helpers";
+import type { Composer } from "@/engine/Composer";
 import { BoundsCalculator } from "./BoundsCalculator";
 
 /** Manages auto-layout, gap, and equal spacing indicators */

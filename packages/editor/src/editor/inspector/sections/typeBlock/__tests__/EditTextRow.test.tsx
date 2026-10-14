@@ -10,7 +10,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { EditTextRow } from "../EditTextRow";
-import { InspectorFieldContext } from "../../../shared/controls/InspectorFieldContext";
+import { InspectorFieldContext } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 
 describe("EditTextRow", () => {
   it("asks the canvas for the inline edit of this element", () => {

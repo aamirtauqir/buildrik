@@ -16,7 +16,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { MoveAssetsModal } from "../MoveAssetsModal";
-import { TEN, makeFolder } from "../../__tests__/libraryFixture";
+import { TEN, makeFolder } from "@/editor/media/__tests__/libraryFixture";
 
 const FOLDERS = [
   makeFolder({ id: "f1", name: "Products" }),

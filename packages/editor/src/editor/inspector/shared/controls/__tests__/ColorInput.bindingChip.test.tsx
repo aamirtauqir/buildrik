@@ -5,9 +5,9 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { ColorInput } from "../ColorInput";
-import { EVENTS } from "../../../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
-vi.mock("../../../../design-system/state/TokenRegistryContext", () => ({
+vi.mock("@/editor/design-system/state/TokenRegistryContext", () => ({
   useColorRegistry: () => ({
     tokens: [
       {

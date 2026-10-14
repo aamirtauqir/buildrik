@@ -15,7 +15,7 @@ import { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import type { SpacingIndicator } from "@/shared/types/canvas";
 import { moveElementPosition, reorderElement } from "../keyboardHelpers";
-import { CanvasSpotSpacing } from "../../../spots/CanvasSpotSpacing";
+import { CanvasSpotSpacing } from "@/editor/canvas/spots/CanvasSpotSpacing";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({

@@ -8,14 +8,14 @@
 
 import * as React from "react";
 import { ToastInput, dismissToast, dismissToastKey } from "@/editor/chrome-ui";
-import { createComposer, Composer } from "../../../engine";
-import { ProductCollectionService } from "../../../engine/cms";
-import { THRESHOLDS } from "../../../shared/constants/config";
+import { createComposer, Composer } from "@/engine";
+import { ProductCollectionService } from "@/engine/cms";
+import { THRESHOLDS } from "@/shared/constants/config";
 import { BRAND_READ_ONLY_FAILED, BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "@/shared/constants/brandReadOnly";
-import { EVENTS, isNavigationOnlyChange } from "../../../shared/constants/events";
+import { EVENTS, isNavigationOnlyChange } from "@/shared/constants/events";
 import type { SaveState } from "./useStudioState";
-import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
-import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
+import { attachAdoptionRevertListener } from "@/services/ai/adoptionTracker";
+import type { ComposerConfig, ProjectData, DeviceType } from "@/shared/types";
 import { importMigratedProject } from "@/editor/design-system";
 import { migrateTokensToV6, TokenMigrationError } from "@buildrik/shared/tokens";
 import { TOKENS_SCHEMA_VERSION, validateTokens } from "@buildrik/shared/schemas/design-tokens";
@@ -202,14 +202,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // unconfigured. siteId scopes asset rows when known.
     const remoteSync = createRemoteAssetSync({ siteId: getSiteIdFromUrl() });
     // Phase C.2: ai.componentSchema mutation returns single-shot JSON via
-    // ComponentSchemaAIClient. Adapter uses hand-rolled types so it stays
-    // test-injectable; cast at the impedance boundary preserves type-safety
-    // on both sides.
+    // ComponentSchemaAIClient. The adapter's args are the router's input
+    // shape, so the call is type-checked end to end (DQ-032: was `as any`).
     const aiClient = isFeatureEnabled("dsAi")
       ? new ComponentSchemaAIClient({
-          mutate: (args, options) =>
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (getAiSubscriptionClient().ai.componentSchema.mutate as any)(args, options),
+          mutate: (args, options) => getAiSubscriptionClient().ai.componentSchema.mutate(args, options),
         })
       : null;
     const instance = createComposer({
@@ -556,10 +553,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       // History state is managed in the dedicated undo/redo useEffect
     };
 
-    // Templates is one surface now — the TemplatesTab drawer. The ⌘⇧T command
-    // emits ui:toggle:templates; translate it to opening the "templates" tab
-    // (StudioPanels listens for ui:switch-tab) instead of the retired modal.
-    const toggleTemplatesHandler = () => instance.emit("ui:switch-tab", { tab: "templates" });
     const toggleExporterHandler = () => setShowExporter((v) => !v);
     // AI is one surface now — the AITab rail panel. The ⌘K "AI" command emits
     // ui:toggle:ai; translate it to opening the "ai" tab (StudioPanels listens
@@ -572,7 +565,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     instance.on("composer:ready", composerReadyHandler);
     instance.on("project:changed", projectChangedHandler);
     instance.on("history:recorded", historyRecordedHandler);
-    instance.on("ui:toggle:templates", toggleTemplatesHandler);
     instance.on("ui:toggle:exporter", toggleExporterHandler);
     instance.on("ui:toggle:ai", toggleAIHandler);
     /* The engine names these BREAKPOINT_CHANGED and VIEWPORT_ZOOM (Viewport.ts
@@ -596,7 +588,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       instance.off("composer:ready", composerReadyHandler);
       instance.off("project:changed", projectChangedHandler);
       instance.off("history:recorded", historyRecordedHandler);
-      instance.off("ui:toggle:templates", toggleTemplatesHandler);
       instance.off("ui:toggle:exporter", toggleExporterHandler);
       instance.off("ui:toggle:ai", toggleAIHandler);
       instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);

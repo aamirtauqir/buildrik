@@ -38,8 +38,8 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants/events";
-import type { DataBinding } from "../../shared/types/data";
+import { EVENTS } from "@/shared/constants/events";
+import type { DataBinding } from "@/shared/types/data";
 import type { Composer } from "../Composer";
 
 /** Bindings stored in the registry — every concrete binding wraps a DataBinding. */

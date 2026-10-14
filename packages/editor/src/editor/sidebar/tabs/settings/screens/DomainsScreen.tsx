@@ -59,6 +59,7 @@ import type { ScreenProps } from "../types";
 import { AddDomainDialog, type AddDomainSubmission } from "../components/AddDomainDialog";
 import { RemoveDomainDialog } from "../components/RemoveDomainDialog";
 import { SetPrimaryDomainDialog } from "../components/SetPrimaryDomainDialog";
+import { devWarn } from "@/shared/utils/devLogger";
 
 export interface DnsRecordRow {
   type: string;
@@ -188,7 +189,10 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
       .then((r) => {
         if (!stale) setVercelConnected(r.vercelConnected);
       })
-      .catch(() => {});
+      /* Unknown stays "not connected", which only adds the TXT ownership row
+         to the expected records — the conservative answer. Logged, not
+         silent (DQ-012). */
+      .catch((error) => devWarn("DomainsScreen", "Vercel connection check failed", error));
     return () => {
       stale = true;
     };

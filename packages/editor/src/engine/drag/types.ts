@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { Point } from "../../shared/types";
-import type { DragData, DropPosition } from "../../shared/utils/dragDrop/types";
+import type { Point } from "@/shared/types";
+import type { DragData, DropPosition } from "@/shared/utils/dragDrop/types";
 
 // =============================================================================
 // STATE MACHINE

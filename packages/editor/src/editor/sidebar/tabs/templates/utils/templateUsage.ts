@@ -14,7 +14,7 @@
  *
  * @license BSD-3-Clause
  */
-import type { Composer } from "../../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 
 export interface TemplateUsageEntry {
   pageId: string;

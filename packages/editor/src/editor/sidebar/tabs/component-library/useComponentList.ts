@@ -15,10 +15,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
 import { inPageScope } from "@/engine/components/ComponentManager";
-import type { ComponentDefinition } from "../../../../shared/types/components";
+import type { ComponentDefinition } from "@/shared/types/components";
 import { fetchComponentLibrary, type LibraryComponentEntry } from "@/services/componentSync";
 
 export interface UseComponentListResult {

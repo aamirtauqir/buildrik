@@ -8,7 +8,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { PositionControls } from "../PositionControls";
-import { InspectorFieldContext, type InspectorFieldContextValue } from "../../../shared/controls/InspectorFieldContext";
+import { InspectorFieldContext, type InspectorFieldContextValue } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 
 type Props = React.ComponentProps<typeof PositionControls>;
 

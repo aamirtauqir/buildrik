@@ -104,8 +104,6 @@ export interface FormEmailOptions {
   notificationRecipients?: string[];
   /** Notification email subject */
   notificationSubject?: string;
-  /** Subscribe form submitter to mailing list via EmailMarketingService */
-  subscribeToList?: boolean;
 }
 
 // ============================================================================

@@ -15,8 +15,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { Z_INDEX } from "../../../shared/constants/canvas";
+import type { Composer } from "@/engine";
+import { Z_INDEX } from "@/shared/constants/canvas";
 import { canvasScale } from "../utils/canvasScale";
 import { getElementNameFromType } from "../utils/elementInfo";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";

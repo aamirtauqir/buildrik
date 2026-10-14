@@ -11,7 +11,7 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { TypeBlockSection } from "../TypeBlockSection";
-import { AttributesSection, attributesSummary } from "../../attributes/AttributesSection";
+import { AttributesSection, attributesSummary } from "@/editor/inspector/sections/attributes/AttributesSection";
 import { makeMockElement, makeMockComposer } from "@/editor/inspector/__tests__/harness";
 import type { MockElementOptions } from "@/editor/inspector/__tests__/harness";
 

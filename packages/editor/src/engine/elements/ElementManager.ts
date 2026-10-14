@@ -6,9 +6,9 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants/events";
-import type { ElementData, PageData, ExportOptions } from "../../shared/types";
-import { generateId } from "../../shared/utils/helpers";
+import { EVENTS } from "@/shared/constants/events";
+import type { ElementData, PageData, ExportOptions } from "@/shared/types";
+import { generateId } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import { Element } from "./Element";
 import { PreviewLayer } from "./PreviewLayer";
@@ -304,8 +304,8 @@ export class ElementManager {
   }
 
   /** Paste element from clipboard data */
-  pasteElement(data: ElementData, target: Element, index?: number, announce = true): Element | null {
-    return this.elementCRUD.pasteElement(data, target, index, announce);
+  pasteElement(data: ElementData, target: Element, index?: number, announce = true, keepIds = false): Element | null {
+    return this.elementCRUD.pasteElement(data, target, index, announce, keepIds);
   }
 
   // ============================================

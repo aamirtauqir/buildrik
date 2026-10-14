@@ -12,7 +12,7 @@ import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ToastProvider } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 
 vi.mock("../components/SlimLauncher", () => ({ SlimLauncher: () => null }));
 vi.mock("../components/AssetDetailOverlay", () => ({ AssetDetailOverlay: () => null }));

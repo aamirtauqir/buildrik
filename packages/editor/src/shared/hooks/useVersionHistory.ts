@@ -6,10 +6,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 import type { NamedVersion, CompareResult } from "../types/versions";
 import { EVENTS } from "../constants/events";
-import { mirrorVersionRename } from "../../services/versionSync";
+import { mirrorVersionRename } from "@/services/versionSync";
 
 export interface UseVersionHistoryReturn {
   /** List of saved versions */

@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 
 /**
  * Plugin options - configuration passed to plugins

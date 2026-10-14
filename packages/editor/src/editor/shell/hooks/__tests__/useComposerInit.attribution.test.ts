@@ -49,11 +49,11 @@ const mockComposer = {
   destroy: vi.fn(),
 };
 
-vi.mock("../../../../engine", () => ({
+vi.mock("@/engine", () => ({
   createComposer: vi.fn(() => mockComposer),
   Composer: class {},
 }));
-vi.mock("../../../../engine/cms", () => ({
+vi.mock("@/engine/cms", () => ({
   ProductCollectionService: function ProductCollectionServiceMock(this: unknown) {
     return {
       hasProductsCollection: vi.fn(() => Promise.resolve(false)),

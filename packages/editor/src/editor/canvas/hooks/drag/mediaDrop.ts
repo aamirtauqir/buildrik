@@ -14,9 +14,9 @@
  *
  * @license BSD-3-Clause
  */
-import type { Composer, Element } from "../../../../engine";
-import { writableElements } from "../../../../engine/commands/commandOperations";
-import type { MediaInsertType } from "../../../../engine/media/MediaCommandLayer";
+import type { Composer, Element } from "@/engine";
+import { writableElements } from "@/engine/commands/commandOperations";
+import type { MediaInsertType } from "@/engine/media/MediaCommandLayer";
 
 export type MediaDropOutcome =
   | { kind: "replaced" | "added"; elementId: string }

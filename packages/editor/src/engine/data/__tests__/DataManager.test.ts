@@ -7,7 +7,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { DataManager } from "../DataManager";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 import type { DataBinding, DataSource } from "@/shared/types/data";
 
 function makeManager(): DataManager {

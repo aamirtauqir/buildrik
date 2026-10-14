@@ -3,11 +3,11 @@ import * as React from "react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { SelectionBoxOverlay } from "../SelectionBoxOverlay";
 
 // vi.mock calls are hoisted by vitest at runtime — order relative to imports does not matter
-vi.mock("../../hooks/useCanvasResize", () => ({
+vi.mock("@/editor/canvas/hooks/useCanvasResize", () => ({
   default: () => ({
     startResize: vi.fn(),
     startRotation: vi.fn(),

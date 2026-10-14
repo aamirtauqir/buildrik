@@ -107,7 +107,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
   });
 
   // Pre-seed a color token + matching lint issue so Auto-fix has work to do.
-  // Hex chosen so applyContrastFix("darken-22") returns a different value.
+  // #3B82F6 is ~3.7:1 on white, so the contrast fix returns a different value.
   const seedToken = v6Token({
     id: "color-primary",
     name: "Primary",
@@ -130,7 +130,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
       type: "banned-hue",
       severity: "warning",
       message: "Contrast 2.8:1 vs surface — WCAG AA needs 4.5",
-      autoFixHint: "darken-22",
+      autoFixHint: "contrast:#FFFFFF",
     };
     composer.designSystem.lintState.setIssues(seedToken.id, [issue]);
   }

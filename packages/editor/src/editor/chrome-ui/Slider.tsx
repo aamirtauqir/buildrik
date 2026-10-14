@@ -9,7 +9,7 @@
  * flowbite's `RangeSlider` renders only a bare unfilled track (`bg-gray-200`,
  * no accent-fill styling, no numeric field, no unit suffix) — none of that
  * exists in the library, so the Figma look (accent fill bar driven by a
- * `--bk-slider-fill` percentage custom property, drag-grow thumb, mono
+ * `--slider-fill` percentage custom property (component-local, set inline — not a generated `--bk-*` token), drag-grow thumb, mono
  * number field) is reproduced via `./slider.css`, a plain **unlayered**
  * stylesheet imported directly here (not routed through `themes/default.css`'s
  * `@layer` chain) — same precedent as `layers-v2.css`/`inspector.css`:
@@ -60,7 +60,7 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(function S
         step={step}
         disabled={disabled}
         aria-label={label}
-        style={{ ["--bk-slider-fill" as string]: `${pct}%` }}
+        style={{ ["--slider-fill" as string]: `${pct}%` }}
         onChange={(e) => onChange(clamp(Number(e.target.value)))}
         theme={{ field: { input: { base: "bk-slider__range" } } }}
       />

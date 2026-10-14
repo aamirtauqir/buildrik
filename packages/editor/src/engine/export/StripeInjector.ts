@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import type { StripeConfig } from "../../shared/types";
+import type { StripeConfig } from "@/shared/types";
 
 /**
  * Generate Stripe.js SDK script tag

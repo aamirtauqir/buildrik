@@ -6,8 +6,8 @@ import { ToastProvider } from "@/editor/chrome-ui";
 /* ExportModal reports ready / failed through the toast (C5 G3-113). */
 const renderT = (ui: React.ReactElement) => render(ui, { wrapper: ToastProvider });
 import { ExportModal } from "../ExportModal";
-import { resolvePageTitle } from "../../../engine/export/SEOInjector";
-import type { PageData } from "../../../shared/types";
+import { resolvePageTitle } from "@/engine/export/SEOInjector";
+import type { PageData } from "@/shared/types";
 
 /**
  * The download modal seeded its config from DEFAULT_EXPORT_CONFIG, whose
@@ -15,7 +15,7 @@ import type { PageData } from "../../../shared/types";
  * Site menu → Export code → Download: the file came down titled with OUR
  * name, for every customer who did not notice the Options field.
  */
-vi.mock("../../../engine/export/ExportEngine", () => ({
+vi.mock("@/engine/export/ExportEngine", () => ({
   ExportEngine: class {
     private cfg: { pageTitle?: string };
     constructor(_c: unknown, cfg: { pageTitle?: string }) { this.cfg = cfg; }

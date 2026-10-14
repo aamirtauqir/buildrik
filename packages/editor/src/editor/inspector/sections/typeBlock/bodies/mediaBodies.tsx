@@ -22,15 +22,15 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { IconConfig } from "@/shared/types/media";
-import type { TypeBlockBodyProps } from "../../../config/typeBlocks";
+import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { ButtonGroup, InputRow, SelectRow } from "../../../shared/controls";
+import { ButtonGroup, InputRow, SelectRow } from "@/editor/inspector/shared/controls";
 import { SourceRow } from "../SourceRow";
 import { getCurrentIconConfig, handleIconSelectAction, handleVideoPosterChange, runTxn, writeAttribute } from "../attributeWriter";
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 import { Note, Warning, useElementVersion } from "./bodyRows";
-import { CheckRow } from "../../../shared/controls/CheckRow";
+import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 
 const FIT_OPTIONS = [
   { value: "cover", label: "Cover" },

@@ -14,7 +14,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll } from "vitest";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "../ExportEngine";
 import { resolvePageTitle } from "../SEOInjector";
 import type { PageData, SiteSEO } from "@/shared/types/project";

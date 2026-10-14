@@ -23,7 +23,7 @@ const resolveReviewComment = vi.fn();
 const revokeReview = vi.fn();
 const reattachReviewComment = vi.fn();
 
-vi.mock("../../../../../services/ReviewService", () => ({
+vi.mock("@/services/ReviewService", () => ({
   fetchRounds: vi.fn(() => Promise.resolve([])),
   fetchCurrentRound: (...a: unknown[]) => fetchCurrentRound(...a),
   fetchReviewComments: (...a: unknown[]) => fetchReviewComments(...a),
@@ -38,7 +38,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
    A-22: currentSiteId was a duplicate, deleted), and the panel now asks for
    the role so a VIEWER gets the send control disabled with its reason — the
    gating that did not travel with the control when it moved here. */
-vi.mock("../../../../../services/BuildrikSyncProvider", () => ({
+vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: () => "site_test",
 }));
 /* FC-9 (fix-all 2026-09-25): mocked directly (rather than left to the real
@@ -51,7 +51,7 @@ vi.mock("@/editor/shell/hooks/useEditorRole", () => ({
   useEditorRole: () => mockRole(),
 }));
 
-import { fetchRounds } from "../../../../../services/ReviewService";
+import { fetchRounds } from "@/services/ReviewService";
 import { ReviewTab } from "../ReviewTab";
 import { ToastProvider } from "@/editor/chrome-ui";
 

@@ -6,8 +6,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { Element } from "../../../engine/elements/Element";
+import type { Composer } from "@/engine";
+import type { Element } from "@/engine/elements/Element";
 import { getContextMenuActions, type ContextAction, type AddToastFn } from "../menus";
 
 // ============================================================================

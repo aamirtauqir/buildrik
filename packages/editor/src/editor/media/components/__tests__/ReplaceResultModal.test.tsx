@@ -15,7 +15,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { makeSitePages } from "../../__tests__/libraryFixture";
+import { makeSitePages } from "@/editor/media/__tests__/libraryFixture";
 import { ReplaceResultModal, replacingLabel, resultIds, summarizeByPage } from "../ReplaceResultModal";
 
 /** Home ×2 (hero, gallery) · Menu ×1 (Hero image) — the prototype's three uses. */

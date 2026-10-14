@@ -1,7 +1,6 @@
 /**
  * useEditorEventListeners.test.ts — covers the 4 composer-driven
- * side-effects + composer-null guards + cleanup-on-unmount + the
- * delayed SHOW_IN_LAYERS scroll dispatch.
+ * side-effects + composer-null guards + cleanup-on-unmount.
  *
  * @license BSD-3-Clause
  */
@@ -12,7 +11,7 @@ import {
   useEditorEventListeners,
   type UseEditorEventListenersOptions,
 } from "../useEditorEventListeners";
-import { EVENTS } from "../../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 // Lightweight composer mock with on/off/emit + canvas facade. Post-D3,
 // indicators live under composer.canvas.indicators.
@@ -69,13 +68,12 @@ interface MockOpts {
     openSaveAsComponent: ReturnType<typeof vi.fn>;
   };
   state: {
-    setLeftPanelTab: ReturnType<typeof vi.fn>;
-    setIsLeftPanelOpen: ReturnType<typeof vi.fn>;
     setShowSpacingIndicators: ReturnType<typeof vi.fn>;
     setShowBadges: ReturnType<typeof vi.fn>;
     setShowGuides: ReturnType<typeof vi.fn>;
     setShowGrid: ReturnType<typeof vi.fn>;
   };
+  addToast: ReturnType<typeof vi.fn>;
 }
 
 function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
@@ -87,13 +85,12 @@ function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
         openSaveAsComponent: vi.fn(),
       },
     state: overrides.state ?? {
-      setLeftPanelTab: vi.fn(),
-      setIsLeftPanelOpen: vi.fn(),
       setShowSpacingIndicators: vi.fn(),
       setShowBadges: vi.fn(),
       setShowGuides: vi.fn(),
       setShowGrid: vi.fn(),
     },
+    addToast: overrides.addToast ?? vi.fn(() => "toast-id"),
   };
 }
 
@@ -104,6 +101,7 @@ function mount(opts: MockOpts) {
         composer: opts.composer,
         modals: opts.modals,
         state: opts.state,
+        addToast: opts.addToast,
       } as unknown) as UseEditorEventListenersOptions,
     ),
   );
@@ -154,48 +152,65 @@ describe("useEditorEventListeners", () => {
     });
   });
 
-  // 3) SHOW_IN_LAYERS ----------------------------------------------------------
-  describe("SHOW_IN_LAYERS → switch tab + open drawer + delayed scroll", () => {
-    it("switches to layers tab and opens drawer immediately", () => {
+  // ENGINE FAILURES ------------------------------------------------------------
+  /* DQ-005: ERROR, STORAGE_ERROR and COMMAND_ERROR were emitted with no
+     listener anywhere, so a refused command or a failed local save said
+     nothing at all. */
+  describe("engine failure events → one toast each", () => {
+    it("a read-only refusal says the editor is view-only", () => {
       mount(opts);
-      act(() => {
-        opts.composer._fire(EVENTS.SHOW_IN_LAYERS);
-      });
-      expect(opts.state.setLeftPanelTab).toHaveBeenCalledWith("layers");
-      expect(opts.state.setIsLeftPanelOpen).toHaveBeenCalledWith(true);
-    });
-
-    it("emits LAYERS_SCROLL_TO_SELECTION after 100ms delay", () => {
-      vi.useFakeTimers();
-      mount(opts);
-      act(() => {
-        opts.composer._fire(EVENTS.SHOW_IN_LAYERS);
-      });
-      // Pre-tick: scroll has not fired
-      expect(opts.composer.emit).not.toHaveBeenCalledWith(
-        EVENTS.LAYERS_SCROLL_TO_SELECTION,
-        expect.anything(),
+      act(() =>
+        opts.composer._fire(EVENTS.COMMAND_ERROR, {
+          id: "delete",
+          error: new Error("read-only: this command changes the document"),
+        }),
       );
-      act(() => {
-        vi.advanceTimersByTime(100);
-      });
-      expect(opts.composer.emit).toHaveBeenCalledWith(
-        EVENTS.LAYERS_SCROLL_TO_SELECTION,
-        {},
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: "View only", key: "engine-command-readonly" }),
       );
     });
 
-    it("registers + cleans up the listener", () => {
+    it("a command that throws reports it", () => {
+      mount(opts);
+      act(() => opts.composer._fire(EVENTS.COMMAND_ERROR, { id: "paste", error: new Error("boom") }));
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Couldn't complete that action", description: "boom" }),
+      );
+    });
+
+    it("a failed local autosave reports it", () => {
+      mount(opts);
+      act(() => opts.composer._fire(EVENTS.STORAGE_ERROR, { error: new Error("quota"), operation: "auto-save" }));
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Couldn't save a local copy", description: "quota" }),
+      );
+    });
+
+    it.each([
+      ["save", "Couldn't save"],
+      ["load", "Couldn't load the project"],
+      ["init", "The editor didn't start properly"],
+    ])("ERROR on %s reports it", (operation, title) => {
+      mount(opts);
+      act(() => opts.composer._fire(EVENTS.ERROR, { error: new Error("disk"), operation }));
+      expect(opts.addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "error", title, description: "disk" }));
+    });
+
+    it("the page-root delete refusal reads as a sentence", () => {
+      mount(opts);
+      act(() =>
+        opts.composer._fire(EVENTS.ERROR, { type: "invalid_operation", message: "Cannot delete page root element" }),
+      );
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ description: "The page itself can't be deleted — select an element inside it." }),
+      );
+    });
+
+    it("unsubscribes on unmount", () => {
       const { unmount } = mount(opts);
-      expect(opts.composer.on).toHaveBeenCalledWith(
-        EVENTS.SHOW_IN_LAYERS,
-        expect.any(Function),
-      );
       unmount();
-      expect(opts.composer.off).toHaveBeenCalledWith(
-        EVENTS.SHOW_IN_LAYERS,
-        expect.any(Function),
-      );
+      act(() => opts.composer._fire(EVENTS.STORAGE_ERROR, { error: new Error("quota") }));
+      expect(opts.addToast).not.toHaveBeenCalled();
     });
   });
 
@@ -245,7 +260,6 @@ describe("useEditorEventListeners", () => {
       );
       // Cannot register anything — composer.on doesn't exist.
       expect(opts.modals.openCreateComponent).not.toHaveBeenCalled();
-      expect(opts.state.setLeftPanelTab).not.toHaveBeenCalled();
       expect(opts.state.setShowSpacingIndicators).not.toHaveBeenCalled();
     });
   });

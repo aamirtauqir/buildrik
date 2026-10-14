@@ -8,7 +8,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { nudgeSelected, reorderElement } from "../commandOperations";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 
 interface Sel {
   getId: () => string;

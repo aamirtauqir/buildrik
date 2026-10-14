@@ -16,7 +16,7 @@ const rollbackToVersion = vi.fn();
    not carry — the panel reads it separately. */
 const fetchSitePublishState = vi.fn();
 
-vi.mock("../../../services/PublishService", () => ({
+vi.mock("@/services/PublishService", () => ({
   fetchPublishHistory: (...a: unknown[]) => fetchPublishHistory(...a),
   fetchSitePublishState: (...a: unknown[]) => fetchSitePublishState(...a),
   rollbackToVersion: (...a: unknown[]) => rollbackToVersion(...a),

@@ -6,11 +6,11 @@
 
 import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
 import type JSZip from "jszip";
-import type { ElementData, PageData } from "../../shared/types";
+import type { ElementData, PageData } from "@/shared/types";
 import type { Composer } from "../Composer";
-import type { ExportResult, ExportedFile } from "../../shared/types/export";
+import type { ExportResult, ExportedFile } from "@/shared/types/export";
 import { camelToKebab, escapeHTML } from "./ExportHelpers";
-import { getDefaultTagName } from "../../shared/utils/html";
+import { getDefaultTagName } from "@/shared/utils/html";
 
 // ============================================================================
 // TYPES

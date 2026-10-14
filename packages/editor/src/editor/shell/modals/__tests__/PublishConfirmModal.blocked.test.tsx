@@ -113,11 +113,31 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
     expect(screen.queryByText(/warning.*none block/)).not.toBeInTheDocument();
   });
 
-  it("does not invent a verdict when the checks call fails", async () => {
+  /* DQ-001: a failed checks call used to collapse into "no failing checks"
+     (`null?.checks ?? []`), which cleared the blockers and ENABLED Publish on
+     any transient tRPC failure. A check that did not run is not a pass. */
+  it("blocks the publish when the checks call fails", async () => {
     fetchPrePublishChecks.mockRejectedValue(new Error("offline"));
-    mount();
-    await waitFor(() => expect(screen.getByText("your connected Vercel project")).toBeInTheDocument());
-    expect(screen.getByText("Publish now")).not.toBeDisabled();
+    const onConfirm = vi.fn();
+    mount(onConfirm);
+    await waitFor(() => expect(screen.getByText(/Couldn't run the pre-publish checks/)).toBeInTheDocument());
+    expect(screen.getByText("Publish now")).toBeDisabled();
+    expect(screen.queryByText("your connected Vercel project")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText("Publish now"));
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it("re-runs the checks on the next open instead of remembering the failure", async () => {
+    fetchPrePublishChecks.mockRejectedValueOnce(new Error("offline")).mockResolvedValue(green);
+    const view = mount();
+    await waitFor(() => expect(screen.getByText("Publish now")).toBeDisabled());
+    view.rerender(
+      <PublishConfirmModal isOpen={false} composer={null} isPublished={false} publishedUrl={null} siteId="site-1" onConfirm={vi.fn()} onClose={vi.fn()} />,
+    );
+    view.rerender(
+      <PublishConfirmModal isOpen composer={null} isPublished={false} publishedUrl={null} siteId="site-1" onConfirm={vi.fn()} onClose={vi.fn()} />,
+    );
+    await waitFor(() => expect(screen.getByText("Publish now")).not.toBeDisabled());
   });
 
   /* v3 FC-8: this door used to read only the FIRST failing check

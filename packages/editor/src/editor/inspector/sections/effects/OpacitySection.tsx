@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Section, SliderInput } from "../../shared/controls";
+import { Section, SliderInput } from "@/editor/inspector/shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
 
 export const OpacitySection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => {

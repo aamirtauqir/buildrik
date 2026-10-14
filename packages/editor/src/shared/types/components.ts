@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { Patch } from "../../engine/utils/JsonPatch";
+import type { Patch } from "@/engine/utils/JsonPatch";
 import type { ElementData } from "./index";
 
 // ============================================

@@ -12,7 +12,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { MediaContextMenu } from "../MediaContextMenu";
-import type { LibraryItem } from "../../data/mediaTypes";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 function makeItem(overrides: Partial<LibraryItem> = {}): LibraryItem {
   return {

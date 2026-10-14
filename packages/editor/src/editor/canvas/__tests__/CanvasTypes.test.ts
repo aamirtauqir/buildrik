@@ -8,8 +8,8 @@
  */
 
 import { describe, it, expect } from "vitest";
-import type { Composer } from "../../../engine";
-import { Viewport } from "../../../engine/Viewport";
+import type { Composer } from "@/engine";
+import { Viewport } from "@/engine/Viewport";
 import { DEVICE_SIZES } from "../Canvas.types";
 
 describe("DEVICE_SIZES", () => {

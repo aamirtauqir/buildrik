@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
+import { useClickOutside } from "@/shared/hooks/useClickOutside";
 import type { LayerDisplayPrefs } from "../types";
 import { ToggleSwitch } from "@/editor/chrome-ui";
 

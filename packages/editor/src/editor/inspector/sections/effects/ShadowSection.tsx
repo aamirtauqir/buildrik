@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { InputRow, MoreSettingsToggle, Section, SelectRow } from "../../shared/controls";
+import { InputRow, MoreSettingsToggle, Section, SelectRow } from "@/editor/inspector/shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
 import { composeShadow, extractInnerShadow, extractOuterShadow } from "./effectValues";
 

@@ -10,8 +10,8 @@
  * @license BSD-3-Clause
  */
 
-import type { CommandData, CommandOptions, CommandResult } from "../../shared/types";
-import { EVENTS } from "../../shared/constants/events";
+import type { CommandData, CommandOptions, CommandResult } from "@/shared/types";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../Composer";
 import { buildDefaultCommands } from "./defaultCommands";
 import { KeybindingManager } from "./KeybindingManager";

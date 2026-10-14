@@ -11,9 +11,9 @@
 
 import * as React from "react";
 import { EVENTS } from "@/shared/constants/events";
-import { useVersionHistory } from "../../shared/hooks/useVersionHistory";
-import type { CompareResult } from "../../shared/types/versions";
-import type { Composer } from "../../engine";
+import { useVersionHistory } from "@/shared/hooks/useVersionHistory";
+import type { CompareResult } from "@/shared/types/versions";
+import type { Composer } from "@/engine";
 // D3 Stage 1 (audit-remediation 2026-05-08): list virtualization +
 // VersionRow + EmptyState lifted into version-history/VersionList.tsx.
 // The orchestrator passes filteredVersions + per-row handlers down.

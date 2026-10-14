@@ -34,5 +34,6 @@
      Nothing uses `tw:font-sans` today; this is the trap disarmed, not a
      defect fixed. Mirrors --bk-font-ui. */
   --font-sans: Inter, "Inter Tight", sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
+  /* One mono definition (DQ-025): this was a second, different stack. */
+  --font-mono: var(--bk-font-mono);
 }

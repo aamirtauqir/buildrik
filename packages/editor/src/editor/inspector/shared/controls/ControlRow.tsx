@@ -98,7 +98,7 @@ export const ControlRow: React.FC<ControlRowProps> = ({
           {icon}
           {label}
         </label>
-        <div style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 0 }}>
+        <div className="tw:flex tw:items-center tw:gap-1 tw:min-w-0">
           {children}
         </div>
       </div>

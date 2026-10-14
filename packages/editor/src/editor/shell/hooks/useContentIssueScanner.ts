@@ -25,7 +25,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import type { Issue } from "./useStudioState";
-import { isPageLive } from "@/engine/export/ExportEngine";
+import { isPageLive } from "@/engine/export/pageFiles";
 
 export type ContentScanState = "idle" | "scanning" | "error";
 

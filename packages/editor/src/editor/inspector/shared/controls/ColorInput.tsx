@@ -13,15 +13,15 @@ import { useInspectorField } from "./InspectorFieldContext";
 import { FieldDot } from "./FieldDot";
 import { ErrorLine, useFieldError } from "./Section";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
-import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
+import { useColorRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
 import { ColorFillPopover } from "../ColorFillPopover";
 import { useUpdateColorEverywhere } from "@/editor/design-system/ui/colors/useUpdateColorEverywhere";
-import { useDSModeOptional } from "../../../design-system/state/DSModeContext";
-import { DSBindingChip } from "../../sections/DSBindingChip";
+import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
+import { DSBindingChip } from "@/editor/inspector/sections/DSBindingChip";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 // ============================================================================

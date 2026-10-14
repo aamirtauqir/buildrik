@@ -36,7 +36,7 @@ vi.mock("@/services/api-client", () => ({
 }));
 
 import { DomainsScreen } from "../DomainsScreen";
-import { SAVE_ERROR_MESSAGES } from "../../constants";
+import { SAVE_ERROR_MESSAGES } from "@/editor/sidebar/tabs/settings/constants";
 import type { DomainRow } from "../DomainsScreen";
 
 const d = api.siteDetail.domains;

@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import type { CollaborationEvent } from "../../shared/types/collaboration";
+import type { CollaborationEvent } from "@/shared/types/collaboration";
 
 /**
  * Transport interface for collaboration communication

@@ -17,7 +17,6 @@ import * as React from "react";
 import { TokenRegistryProvider, useColorRegistry } from "../TokenRegistryContext";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
-import type { DesignToken } from "@/editor/design-system/types";
 
 type Listener = (payload: unknown) => void;
 
@@ -32,9 +31,6 @@ function makeComposer(primary: string, readOnly = false) {
     off: vi.fn((evt: string, cb: Listener) => listeners.set(evt, (listeners.get(evt) ?? []).filter((x) => x !== cb))),
     emit: (evt: string) => (listeners.get(evt) ?? []).forEach((c) => c(undefined)),
     colorMode: { resolved: () => "light" as const },
-    darkResolver: {
-      resolve: (t: DesignToken, tokens: readonly DesignToken[]) => resolveTokenLiteral(tokens, t.id, "light") ?? "",
-    },
     getProjectSettings: () => settings,
     designSystem: { readOnly, setTokens: vi.fn(() => false) },
     setPrimary(value: string) {

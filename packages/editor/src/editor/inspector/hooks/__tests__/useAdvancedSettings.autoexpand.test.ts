@@ -25,7 +25,7 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useAdvancedSettings } from "../useAdvancedSettings";
-import { buildAdvancedPropsMapFromRegistry } from "../../sections/registry";
+import { buildAdvancedPropsMapFromRegistry } from "@/editor/inspector/sections/registry";
 
 const MAP = {
   size: ["min-width", "max-height"],

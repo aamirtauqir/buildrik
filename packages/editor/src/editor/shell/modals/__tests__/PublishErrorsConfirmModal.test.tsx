@@ -13,7 +13,7 @@ import * as React from "react";
 import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PublishErrorsConfirmModal } from "../PublishErrorsConfirmModal";
-import type { Issue } from "../../hooks/useStudioState";
+import type { Issue } from "@/editor/shell/hooks/useStudioState";
 
 const err = (id: string, message: string): Issue => ({ id, type: "error", message });
 const warn = (id: string, message: string): Issue => ({ id, type: "warning", message });

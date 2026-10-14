@@ -10,8 +10,8 @@ import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as React from "react";
 import { TokensSection } from "../TokensSection";
-import { TokenRegistryProvider } from "../../../state/TokenRegistryContext";
-import { DSModeProvider } from "../../../state/DSModeContext";
+import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
+import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 

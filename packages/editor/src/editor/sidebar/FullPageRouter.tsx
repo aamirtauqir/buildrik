@@ -48,9 +48,9 @@
 import * as React from "react";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
-import type { Composer } from "../../engine";
+import type { Composer } from "@/engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
-import type { IconConfig } from "../../shared/types/media";
+import type { IconConfig } from "@/shared/types/media";
 import { Portal } from "@/editor/chrome-ui";
 import type { SettingsOpenRequest } from "./tabs/settings/types";
 import type { TemplatesOpenRequest } from "./tabs/templates/TemplatesTab";

@@ -10,8 +10,8 @@ import { render, fireEvent, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { ComponentDetailScreen } from "../ComponentDetailScreen";
-import type { Composer } from "../../../../../engine";
-import type { ComponentDefinition } from "../../../../../shared/types/components";
+import type { Composer } from "@/engine";
+import type { ComponentDefinition } from "@/shared/types/components";
 
 function makeComponent(): ComponentDefinition {
   return {

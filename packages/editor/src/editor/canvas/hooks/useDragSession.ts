@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
+import type { InvalidDropReason } from "@/shared/utils/dragDrop/dropValidation";
 
 // =============================================================================
 // TYPES

@@ -48,9 +48,9 @@
 
 import * as React from "react";
 import { isModalOpen } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 import { cycleRegion } from "../regionCycle";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 // Modals subset the shortcut handler reads. Match the public surface of
 // useStudioModals; passing the full modals object keeps mocking simple.

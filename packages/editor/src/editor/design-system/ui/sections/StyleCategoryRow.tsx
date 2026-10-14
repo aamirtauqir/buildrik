@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import type { PresetCategory } from "../../types";
+import type { PresetCategory } from "@/editor/design-system/types";
 import { BrandChevron, BrandRow } from "../BrandCard";
 
 export interface StyleCategoryRowProps {

@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { HandlePosition, TransformBounds } from "../../../engine/canvas/ResizeHandler";
-import { devLog, devError } from "../../../shared/utils/devLogger";
+import type { Composer } from "@/engine";
+import type { HandlePosition, TransformBounds } from "@/engine/canvas/ResizeHandler";
+import { devLog, devError } from "@/shared/utils/devLogger";
 
 export interface UseCanvasResizeOptions {
   onResizeStart?: () => void;

@@ -10,8 +10,8 @@
  */
 
 import * as React from "react";
-import { devLog } from "../../../shared/utils/devLogger";
-import { isSafeUrl } from "../../../shared/utils/html";
+import { devLog } from "@/shared/utils/devLogger";
+import { isSafeUrl } from "@/shared/utils/html";
 
 interface UseCanvasInlineCommandsParams {
   canvasRef: React.RefObject<HTMLDivElement | null>;

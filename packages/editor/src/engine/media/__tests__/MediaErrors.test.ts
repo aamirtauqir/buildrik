@@ -17,7 +17,7 @@ import {
   MediaNoActivePageError,
   MediaReplacePartialError,
 } from "../MediaStorageTypes";
-import { MEDIA_EVENTS } from "../../../shared/constants/media";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
 
 describe("MediaError hierarchy", () => {
   it("MediaError subclasses are instanceof Error and MediaError", () => {

@@ -6,10 +6,10 @@
  * @license BSD-3-Clause
  */
 
-import { snapToGrid } from "../../shared/utils/dragDrop";
-import { EVENTS } from "../../shared/constants/events";
-import { isValidBreakpoint } from "../../shared/constants/breakpoints";
-import type { BreakpointId } from "../../shared/types/breakpoints";
+import { snapToGrid } from "@/shared/utils/dragDrop";
+import { EVENTS } from "@/shared/constants/events";
+import { isValidBreakpoint } from "@/shared/constants/breakpoints";
+import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 
@@ -123,6 +123,9 @@ export function nudgeSelected(composer: Composer, deltaX: number, deltaY: number
 export function reorderElement(composer: Composer, direction: ReorderDirection): void {
   const selected = composer.selection.getSelected();
   if (!selected) return;
+  /* A locked element keeps its place — the same gate as the keyboard reorder
+     (keyboardHelpers.moveElementInParent); it raises the "locked" toast. */
+  if (writableElements(composer, [selected]).length === 0) return;
 
   const parent = selected.getParent();
   if (!parent) return;

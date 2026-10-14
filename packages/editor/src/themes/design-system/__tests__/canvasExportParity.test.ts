@@ -16,7 +16,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { RESET_CSS } from "../../../engine/export/ExportHelpers";
+import { RESET_CSS } from "@/engine/export/ExportHelpers";
 
 const css = readFileSync(join(__dirname, "..", "site-content.css"), "utf8");
 /** Just the canvas-restore block — the rest of the file is site DS defaults. */

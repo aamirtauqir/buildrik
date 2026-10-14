@@ -14,10 +14,10 @@
  * @license BSD-3-Clause
  */
 import { beforeAll, describe, it, expect, vi } from "vitest";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { activeBreakpoint, stylesAt, writeCanvasStyles } from "../commandOperations";
-import { applyBoundsToModel } from "../../canvas/resize/DOMUpdater";
+import { applyBoundsToModel } from "@/engine/canvas/resize/DOMUpdater";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({

@@ -13,7 +13,7 @@
  */
 
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
-import type { DesignToken } from "../../../../design-system/types";
+import type { DesignToken } from "@/editor/design-system/types";
 
 export interface TokenSnapshot {
   colors: Record<string, string>;

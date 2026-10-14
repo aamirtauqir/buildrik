@@ -14,7 +14,7 @@
  */
 
 import * as React from "react";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/editor/design-system/types";
 import { TokenTable, TokenTableRow, TOKEN_CELL_NAME, TOKEN_CELL_PREVIEW, TOKEN_CELL_VALUE } from "./TokenTable";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 

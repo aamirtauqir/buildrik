@@ -17,7 +17,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { HistoryManager } from "../HistoryManager";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 /* `record()` diffs the captured snapshot against the cached one, so a fixture
    that returns the same project twice can never manufacture an undoable step.

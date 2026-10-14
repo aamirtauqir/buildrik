@@ -15,8 +15,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../engine";
-import { SelectRow, ButtonGroup, ColorInput, InputWithUnit } from "../../shared/controls";
+import type { Composer } from "@/engine";
+import { SelectRow, ButtonGroup, ColorInput, InputWithUnit } from "@/editor/inspector/shared/controls";
 
 /** Board 1 reads the weight as its number ("600"). */
 export const FONT_WEIGHTS = ["100", "200", "300", "400", "500", "600", "700", "800", "900"].map((v) => ({ value: v, label: v }));

@@ -54,14 +54,8 @@ export { PluginManager } from "./PluginManager";
 // Data Sources
 export { DataManager } from "./data/DataManager";
 export { TemplateEngine } from "./data/TemplateEngine";
-export { StyleDataBinding } from "./data/StyleDataBinding";
-export { TraitDataBinding } from "./data/TraitDataBinding";
-export type { StyleBinding } from "./data/StyleDataBinding";
-export type { TraitBinding } from "./data/TraitDataBinding";
 
 // Global Styles
-export { GlobalStyleManager } from "./styles/GlobalStyleManager";
-export type { GlobalStyle } from "./styles/GlobalStyleManager";
 
 // Templates
 

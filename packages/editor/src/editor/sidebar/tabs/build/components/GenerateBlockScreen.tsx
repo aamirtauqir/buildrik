@@ -20,15 +20,15 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { Button, PanelBackRow, Textarea, useToast } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { WORKSPACE_LINKS } from "../../settings/constants";
+import { WORKSPACE_LINKS } from "@/editor/sidebar/tabs/settings/constants";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
-import { applyAiEdit } from "../../ai/applySetStyle";
-import { runPromptOnce, AiRunError, type AiErrorKind, type ServerEdit } from "../../ai/hooks/runPromptOnce";
-import { gatherTokens, gatherMediaAssets, toElementRef } from "../../ai/hooks/aiScopeContext";
-import { activePageElements } from "../../ai/hooks/useAIScope";
-import { DEFAULT_MODEL } from "../../ai/types";
-import { useAiQuota, quotaLeftLabel } from "../../ai/hooks/useAiQuota";
+import { applyAiEdit } from "@/editor/sidebar/tabs/ai/applySetStyle";
+import { runPromptOnce, AiRunError, type AiErrorKind, type ServerEdit } from "@/editor/sidebar/tabs/ai/hooks/runPromptOnce";
+import { gatherTokens, gatherMediaAssets, toElementRef } from "@/editor/sidebar/tabs/ai/hooks/aiScopeContext";
+import { activePageElements } from "@/editor/sidebar/tabs/ai/hooks/useAIScope";
+import { DEFAULT_MODEL } from "@/editor/sidebar/tabs/ai/types";
+import { useAiQuota, quotaLeftLabel } from "@/editor/sidebar/tabs/ai/hooks/useAiQuota";
 
 /** Where the new block goes: after this top-level element of the page. */
 export interface GenerateTarget {

@@ -49,7 +49,7 @@ vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
 }));
 
 import { RedirectsScreen, renamedDay, type RedirectRow } from "../RedirectsScreen";
-import { SAVE_ERROR_MESSAGES } from "../../constants";
+import { SAVE_ERROR_MESSAGES } from "@/editor/sidebar/tabs/settings/constants";
 import type { RedirectSuggestion } from "@buildrik/shared/schemas/site-detail";
 
 const r = api.siteDetail.redirects;

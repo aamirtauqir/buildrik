@@ -8,12 +8,12 @@
  */
 import * as React from "react";
 import { ToastInput, dismissToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import type {
   VersionCreatedPayload,
   VersionDeletedPayload,
-} from "../../../shared/types/versions";
+} from "@/shared/types/versions";
 import {
   mirrorVersionCreate,
   mirrorVersionDelete,
@@ -21,7 +21,7 @@ import {
   onVersionSyncError,
   getVersionSyncPendingCount,
   retryVersionSync,
-} from "../../../services/versionSync";
+} from "@/services/versionSync";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 
 export function useVersionSync(

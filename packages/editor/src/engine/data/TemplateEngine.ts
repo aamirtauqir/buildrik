@@ -17,7 +17,7 @@ import type {
   TemplateExportOptions,
   ConditionExpression,
   LogicGroup,
-} from "../../shared/types/data";
+} from "@/shared/types/data";
 import type { Element } from "../elements/Element";
 
 /**

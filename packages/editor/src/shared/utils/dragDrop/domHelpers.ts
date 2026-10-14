@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { DATA_ATTRIBUTES, THRESHOLDS } from "../../constants";
+import { DATA_ATTRIBUTES, THRESHOLDS } from "@/shared/constants";
 
 // =============================================================================
 // CONSTANTS

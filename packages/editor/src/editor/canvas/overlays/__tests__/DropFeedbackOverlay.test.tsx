@@ -1,11 +1,11 @@
 import { render } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
-import type { InvalidDropReason } from "../../../../shared/utils/dragDrop/dropValidation";
+import type { InvalidDropReason } from "@/shared/utils/dragDrop/dropValidation";
 import { DropFeedbackOverlay } from "../DropFeedbackOverlay";
 
 // Mock getFriendlyName — jsdom does not compute layout, so we short-circuit it
-vi.mock("../../utils/elementInfo", () => ({
+vi.mock("@/editor/canvas/utils/elementInfo", () => ({
   getFriendlyName: () => "Container",
 }));
 

@@ -420,7 +420,6 @@ export const EVENTS = {
    *  lazy and unmounted until rail CMS is active. */
   UI_CMS_OPEN: "ui:cms-open",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
-  UI_TOGGLE_LAYERS: "ui:toggle:layers",
   UI_TOGGLE_ASSETS: "ui:toggle:assets",
   UI_TOGGLE_CODE: "ui:toggle:code",
   UI_TOGGLE_PREVIEW: "ui:toggle:preview",
@@ -610,10 +609,6 @@ export const EVENTS = {
   // ============================================
   // Navigation Events (UX Audit 2026)
   // ============================================
-  /** Navigate to Layers tab and scroll to selected element */
-  SHOW_IN_LAYERS: "ui:show-in-layers",
-  /** Trigger scroll to selected element in Layers panel */
-  LAYERS_SCROLL_TO_SELECTION: "layers:scroll-to-selection",
   /** Open the Build/Add panel in the left sidebar */
   /* (UI_TEMPLATES_NEWPAGE_ON deleted 2026-08-28 — the mode is a prop now.
      The event could never be heard: TabRouter mounts one tab at a time, so
@@ -861,7 +856,7 @@ export function getEventsByPrefix(prefix: string): EventName[] {
  */
 export interface EventPayloads {
   // Composer Events
-  [EVENTS.COMPOSER_READY]: import("../../engine/Composer").Composer | undefined;
+  [EVENTS.COMPOSER_READY]: import("@/engine/Composer").Composer | undefined;
   [EVENTS.COMPOSER_DESTROY]: void;
 
   // Project Events
@@ -883,22 +878,22 @@ export interface EventPayloads {
   [EVENTS.SETTINGS_CHANGE]: import("../types").ProjectSettings;
 
   // Element Events
-  [EVENTS.ELEMENT_SELECTED]: { element: import("../../engine/elements/Element").Element };
-  [EVENTS.ELEMENT_DESELECTED]: { element: import("../../engine/elements/Element").Element };
-  [EVENTS.ELEMENT_CREATED]: import("../../engine/elements/Element").Element;
+  [EVENTS.ELEMENT_SELECTED]: { element: import("@/engine/elements/Element").Element };
+  [EVENTS.ELEMENT_DESELECTED]: { element: import("@/engine/elements/Element").Element };
+  [EVENTS.ELEMENT_CREATED]: import("@/engine/elements/Element").Element;
   [EVENTS.ELEMENT_DELETED]: {
     id: string;
-    element: import("../../engine/elements/Element").Element;
+    element: import("@/engine/elements/Element").Element;
   };
   [EVENTS.ELEMENT_MOVED]: {
-    element: import("../../engine/elements/Element").Element;
-    parent: import("../../engine/elements/Element").Element;
+    element: import("@/engine/elements/Element").Element;
+    parent: import("@/engine/elements/Element").Element;
   };
   [EVENTS.ELEMENT_RESIZED]: {
-    element: import("../../engine/elements/Element").Element;
+    element: import("@/engine/elements/Element").Element;
     dimensions: { width: number; height: number };
   };
-  [EVENTS.ELEMENT_UPDATED]: import("../../engine/elements/Element").Element;
+  [EVENTS.ELEMENT_UPDATED]: import("@/engine/elements/Element").Element;
 
   // Layer Panel Events
   [EVENTS.LAYER_HOVER]: { id: string | null };
@@ -983,7 +978,7 @@ export interface EventPayloads {
   [EVENTS.BRAND_PREVIEW_CHANGED]: void;
   [EVENTS.BRAND_CONNECT_SUGGESTED]: {
     pageId: string;
-    suggestions: import("../../engine/designSystem/connectTokens").ConnectSuggestion[];
+    suggestions: import("@/engine/designSystem/connectTokens").ConnectSuggestion[];
   };
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;

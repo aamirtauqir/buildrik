@@ -6,8 +6,8 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { standaloneActions } from "../standaloneActions";
-import { EVENTS } from "../../../../../shared/constants/events";
-import type { ActionContext } from "../../contextMenuRegistry";
+import { EVENTS } from "@/shared/constants/events";
+import type { ActionContext } from "@/editor/canvas/menus/contextMenuRegistry";
 import {
   makeComposer,
   makeElementStub,
@@ -15,8 +15,8 @@ import {
   asComposer,
   type ComposerStub,
   type ElementStub,
-} from "../../../__tests__/testHarness";
-import type { Element } from "../../../../../engine";
+} from "@/editor/canvas/__tests__/testHarness";
+import type { Element } from "@/engine";
 import { BINDABLE_TYPES, capabilitiesFor } from "@/shared/constants/elementCapabilities";
 
 function action(id: string) {
@@ -95,11 +95,6 @@ describe("standaloneActions", () => {
       expect(action("save-as-component").isVisible!({ ...ctx, isRoot: true })).toBe(false);
     });
   });
-
-  /* This asserted "layers:reveal", which nothing in the app listens for — the
-     shell listens for SHOW_IN_LAYERS. The test passed for as long as the menu
-     item did nothing. */
-
 
   describe("group / ungroup", () => {
     it("group-elements groups the selection and selects the new group", () => {

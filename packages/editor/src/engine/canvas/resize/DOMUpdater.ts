@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../Composer";
-import { activeBreakpoint, stylesAt, writeCanvasStyles } from "../../commands/commandOperations";
+import type { Composer } from "@/engine/Composer";
+import { activeBreakpoint, stylesAt, writeCanvasStyles } from "@/engine/commands/commandOperations";
 import { scaleBounds } from "./resizeMath";
 import type { TransformBounds, ResizeState } from "./types";
 import { getDOMElement } from "./utils";

@@ -14,10 +14,10 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import type { DesignToken, PresetCategory, StylePreset } from "../../types";
+import type { DesignToken, PresetCategory, StylePreset } from "@/editor/design-system/types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 import { typeStyleRows } from "./TypographySection";
-import { DEFAULT_TOKENS } from "../../constants";
+import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 const CATEGORY: Record<PresetCategory, string> = {

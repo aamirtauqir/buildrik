@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Z_LAYERS } from "../../../shared/constants/canvas";
+import { Z_LAYERS } from "@/shared/constants/canvas";
 import type { SnapLine } from "../hooks/useCanvasSnapping";
 
 interface SmartGuidesOverlayProps {
@@ -48,7 +48,7 @@ export const SmartGuidesOverlay: React.FC<SmartGuidesOverlayProps> = ({ snapLine
            tokenised fill in the drawing beats an untokenised number in a
            caption: the drawing is the design, the caption describes it. */
         const isSpacing = Boolean(line.kind);
-        const color = isSpacing ? "#E02424" : "#FF00FF";
+        const color = isSpacing ? "var(--bk-error)" : "#FF00FF";
         const style: React.CSSProperties = {
           position: "absolute",
           backgroundColor: color,

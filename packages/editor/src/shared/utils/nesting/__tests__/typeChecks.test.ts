@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import type { ElementType } from "../../../types";
+import type { ElementType } from "@/shared/types";
 import { ElementCategory } from "../types";
 import {
   isInteractiveType,

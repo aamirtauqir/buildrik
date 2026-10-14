@@ -12,7 +12,7 @@
 
 import { Link } from "lucide-react";
 import * as React from "react";
-import type { Composer } from "../../../engine";
+import type { Composer } from "@/engine";
 import { Button } from "@/editor/chrome-ui";
 import { Section, SpacingBox } from "../shared/controls";
 import { parseCssShorthand } from "../shared/utils/parseCssShorthand";

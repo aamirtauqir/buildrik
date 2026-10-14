@@ -8,10 +8,10 @@
 
 import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { ROTATION_HANDLE_OFFSET } from "../../../engine/canvas/constants";
-import type { HandlePosition } from "../../../engine/canvas/ResizeHandler";
-import { Z_LAYERS } from "../../../shared/constants/canvas";
+import type { Composer } from "@/engine";
+import { ROTATION_HANDLE_OFFSET } from "@/engine/canvas/constants";
+import type { HandlePosition } from "@/engine/canvas/ResizeHandler";
+import { Z_LAYERS } from "@/shared/constants/canvas";
 import { useCanvasResize } from "../hooks";
 import { SelectionHandles } from "./SelectionHandles";
 
@@ -537,7 +537,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
             padding: "2px 8px",
             borderRadius: "4px",
             fontSize: "11px",
-            fontFamily: "monospace",
+            fontFamily: "var(--bk-font-mono)",
             whiteSpace: "nowrap",
             pointerEvents: "none",
           }}

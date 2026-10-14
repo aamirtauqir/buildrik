@@ -16,7 +16,7 @@ vi.mock("@/editor/design-system/state/useBrandRestorePoints", () => ({ takeResto
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "s1" }));
 
 import { DarkModeCard } from "../DarkModeCard";
-import { wrap } from "../../__tests__/brandWorkspaceHarness";
+import { wrap } from "@/editor/design-system/ui/__tests__/brandWorkspaceHarness";
 
 /* The seed with every semantic colour already given a dark value. */
 const FILLED = proposeMissingDarks(DEFAULT_TOKENS).tokens;

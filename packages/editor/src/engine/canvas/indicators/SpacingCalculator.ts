@@ -6,9 +6,9 @@
  * @license BSD-3-Clause
  */
 
-import type { SpacingIndicator } from "../../../shared/types/canvas";
-import type { Composer } from "../../Composer";
-import type { Element } from "../../elements/Element";
+import type { SpacingIndicator } from "@/shared/types/canvas";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
 import { BoundsCalculator } from "./BoundsCalculator";
 
 /**

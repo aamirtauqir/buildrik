@@ -3,7 +3,7 @@
  * Neutral defaults: colours come from the page and the Brand tokens.
  * @license BSD-3-Clause
  */
-import type { BlockData, ElementType } from "../../shared/types";
+import type { BlockData, ElementType } from "@/shared/types";
 
 export const menuGridBlockConfig: BlockData & { elementType: ElementType } = {
   id: "menu-grid",

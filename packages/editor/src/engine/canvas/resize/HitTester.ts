@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { SelectionBox } from "../../../shared/types/canvas";
+import type { SelectionBox } from "@/shared/types/canvas";
 import { DEFAULT_HANDLE_HIT_AREA, DEFAULT_BORDER_HIT_WIDTH } from "./constants";
 import type { HandlePosition, AnyHandle } from "./types";
 

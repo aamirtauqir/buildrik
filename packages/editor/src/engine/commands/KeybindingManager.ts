@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { CommandData } from "../../shared/types";
+import type { CommandData } from "@/shared/types";
 
 /** Stored DOM listener for cleanup */
 interface StoredListener {

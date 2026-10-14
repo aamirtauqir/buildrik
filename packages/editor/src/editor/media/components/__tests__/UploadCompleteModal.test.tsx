@@ -9,7 +9,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { UploadCompleteModal } from "../UploadCompleteModal";
-import { makeAsset } from "../../__tests__/libraryFixture";
+import { makeAsset } from "@/editor/media/__tests__/libraryFixture";
 
 function mount(over: Partial<React.ComponentProps<typeof UploadCompleteModal>> = {}) {
   const props = {

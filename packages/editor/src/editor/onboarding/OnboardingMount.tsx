@@ -9,8 +9,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
-import { EVENTS } from "../../shared/constants";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
 import { fetchCurrentRound } from "@/services/ReviewService";
 import { getEditorViewMode } from "@/shared/utils/editorViewMode";
 import { OnboardingChecklist } from "./OnboardingChecklist";

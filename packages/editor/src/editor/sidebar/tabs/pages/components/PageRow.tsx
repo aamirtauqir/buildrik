@@ -14,7 +14,7 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../../../engine";
+import type { Composer } from "@/engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
 import { Button, TextField } from "@/editor/chrome-ui";
@@ -345,7 +345,7 @@ export const PageRow = React.memo<Props>(
             </>
           )}
 
-          {!isRenaming && <span style={{ flex: 1 }} aria-hidden="true" />}
+          {!isRenaming && <span className="tw:flex-1" aria-hidden="true" />}
 
           {searchContext && (
             <span

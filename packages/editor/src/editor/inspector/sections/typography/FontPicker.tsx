@@ -8,14 +8,14 @@
 
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
-import { loadGoogleFont, type GoogleFont } from "../../../../services/GoogleFontsService";
+import { loadGoogleFont, type GoogleFont } from "@/services/GoogleFontsService";
 import { FontPickerPanel, namesFont, primaryFamily } from "./FontPickerDropdown";
 import { Button } from "@/editor/chrome-ui";
-import { fieldTestId, labelTestId, rowTestId } from "../../shared/controls";
-import { FieldDot } from "../../shared/controls/FieldDot";
-import { useInspectorField, mixedName } from "../../shared/controls/InspectorFieldContext";
+import { fieldTestId, labelTestId, rowTestId } from "@/editor/inspector/shared/controls";
+import { FieldDot } from "@/editor/inspector/shared/controls/FieldDot";
+import { useInspectorField, mixedName } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import { EVENTS } from "@/shared/constants/events";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 // ============================================================================
 // TYPES
 // ============================================================================

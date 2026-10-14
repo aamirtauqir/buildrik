@@ -72,7 +72,7 @@ import {
   type CurrentRound,
   type RoundListRow,
   type ReviewComment,
-} from "../../../../services/ReviewService";
+} from "@/services/ReviewService";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface ReviewTabProps {

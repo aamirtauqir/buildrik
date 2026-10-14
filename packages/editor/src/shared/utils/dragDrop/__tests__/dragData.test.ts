@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import { MIME_TYPES } from "../../../constants";
+import { MIME_TYPES } from "@/shared/constants";
 import {
   generateDragSessionId,
   parseDragData,

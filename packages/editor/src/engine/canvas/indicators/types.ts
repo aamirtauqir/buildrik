@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementBounds } from "../../../shared/types/canvas";
-import type { Composer } from "../../Composer";
+import type { ElementBounds } from "@/shared/types/canvas";
+import type { Composer } from "@/engine/Composer";
 
 /**
  * Simple bounds interface without spacing info

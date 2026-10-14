@@ -19,13 +19,13 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 
 const runPromptOnce = vi.fn();
-vi.mock("../../../ai/hooks/runPromptOnce", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../../../ai/hooks/runPromptOnce")>()),
+vi.mock("@/editor/sidebar/tabs/ai/hooks/runPromptOnce", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/sidebar/tabs/ai/hooks/runPromptOnce")>()),
   runPromptOnce: (...a: unknown[]) => runPromptOnce(...a),
 }));
 const applyAiEdit = vi.fn();
-vi.mock("../../../ai/applySetStyle", () => ({ applyAiEdit: (...a: unknown[]) => applyAiEdit(...a) }));
-vi.mock("../../../ai/hooks/useAiQuota", () => ({ useAiQuota: () => null, quotaLeftLabel: () => null }));
+vi.mock("@/editor/sidebar/tabs/ai/applySetStyle", () => ({ applyAiEdit: (...a: unknown[]) => applyAiEdit(...a) }));
+vi.mock("@/editor/sidebar/tabs/ai/hooks/useAiQuota", () => ({ useAiQuota: () => null, quotaLeftLabel: () => null }));
 
 import { GenerateBlockScreen } from "../GenerateBlockScreen";
 

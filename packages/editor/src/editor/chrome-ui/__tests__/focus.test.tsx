@@ -109,3 +109,29 @@ describe("useFocusTrap — the opening focus", () => {
     expect(document.activeElement?.getAttribute("aria-label")).toBe("Close");
   });
 });
+
+/* DQ-019: a dialog that stays MOUNTED while closed is not on top. Counting it
+   made the trap beneath swallow every Escape — the Media drill-in carried its
+   own trap for exactly that reason. */
+describe("useFocusTrap — a mounted-but-closed dialog is not topmost", () => {
+  it("answers Escape under a hidden aria-modal dialog", () => {
+    let escaped = 0;
+    function Under() {
+      const ref = useFocusTrap(true, () => { escaped += 1; });
+      return (
+        <div ref={ref} role="dialog" aria-modal="true">
+          <button>ok</button>
+        </div>
+      );
+    }
+    render(
+      <>
+        <Under />
+        <div role="dialog" aria-modal="true" style={{ display: "none" }} />
+        <div role="dialog" aria-modal="true" hidden />
+      </>,
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(escaped).toBe(1);
+  });
+});

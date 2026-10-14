@@ -19,16 +19,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // MOCK EXTERNAL UTILITIES
 // ---------------------------------------------------------------------------
 
-vi.mock("../../../../../blocks/blockRegistry", () => ({
+vi.mock("@/blocks/blockRegistry", () => ({
   getBlockById: vi.fn(),
   insertBlock: vi.fn(),
 }));
 
-vi.mock("../../../../../shared/utils/nesting", () => ({
+vi.mock("@/shared/utils/nesting", () => ({
   canNestElement: vi.fn(() => true),
 }));
 
-vi.mock("../../../../../shared/utils/dragDrop", () => ({
+vi.mock("@/shared/utils/dragDrop", () => ({
   findDropTargetElement: vi.fn(() => null),
   getElementId: vi.fn((el: HTMLElement | null) =>
     el?.getAttribute?.("data-buildrick-id") ?? null,
@@ -40,23 +40,23 @@ vi.mock("../../../../../shared/utils/dragDrop", () => ({
   })),
 }));
 
-vi.mock("../../../../../shared/utils/dragDrop/animations", () => ({
+vi.mock("@/shared/utils/dragDrop/animations", () => ({
   animateDropSuccess: vi.fn(),
 }));
 
-vi.mock("../../../../../shared/utils/devLogger", () => ({
+vi.mock("@/shared/utils/devLogger", () => ({
   devError: vi.fn(),
   devLog: vi.fn(),
   devWarn: vi.fn(),
 }));
 
-import { getBlockById, insertBlock } from "../../../../../blocks/blockRegistry";
-import { canNestElement } from "../../../../../shared/utils/nesting";
+import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
+import { canNestElement } from "@/shared/utils/nesting";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import {
   findDropTargetElement,
   findValidDropTargetWithFallback,
-} from "../../../../../shared/utils/dragDrop";
+} from "@/shared/utils/dragDrop";
 
 // Now safe to import the SUT — its imports resolve through the mocks above.
 import {
@@ -880,6 +880,32 @@ describe("handleElementDrop", () => {
     expect(handleElementDrop(e, ctx, null)).toBe(true);
     expect(order.join(",")).toBe("b,c,d,el1");
     vi.runAllTimers();
+  });
+
+  /* L2-038: a drag that never left the element (a near-miss on its resize
+     edge, 60px sideways) walked up to its own parent, skipped it as "the
+     current parent", and fell back to the page root — the heading left its
+     card for the end of the page. Released over itself, nothing moves. */
+  it("a drop released over the dragged element itself moves nothing", () => {
+    const parent = makeStubElement({ id: "p2" });
+    const sourceEl = makeStubElement({ id: "el1", getType: () => "heading", getParent: () => parent });
+    const root = makeStubElement({ id: "r1" });
+    const composer = makeStubComposer({
+      activePage: { id: "p1", root: { id: "r1" } },
+      elements: new Map([["el1", sourceEl], ["p2", parent], ["r1", root]]),
+    });
+    const ctx = makeDropContext(composer, { freshTargetId: "el1" });
+    const self = document.createElement("h2");
+    self.setAttribute("data-buildrick-id", "el1");
+    vi.mocked(findDropTargetElement).mockReturnValue(self);
+    vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
+      success: true,
+      result: { parent: root as any, index: 5, position: "inside" },
+      elementsChecked: 1,
+    });
+
+    expect(handleElementDrop(makeDragEvent({ element: JSON.stringify({ elementId: "el1" }) }), ctx, null)).toBe(true);
+    expect(composer.elements.moveElement).not.toHaveBeenCalled();
   });
 
   it("returns true when resolved target id has no element record", () => {

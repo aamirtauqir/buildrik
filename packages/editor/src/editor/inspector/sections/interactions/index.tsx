@@ -5,13 +5,13 @@
  */
 
 import * as React from "react";
-import { Section } from "../../shared/controls";
+import { Section } from "@/editor/inspector/shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
 import { ElementAnimationRow, ElementAnimationEditor, animationTriggerLabel } from "./ElementAnimationRow";
 import { InteractionEditor } from "./InteractionEditor";
 import { getTriggerInfo } from "./types";
-import { DEFAULT_ANIMATION_CONFIG } from "../../../../engine/interactions/types";
+import { DEFAULT_ANIMATION_CONFIG } from "@/engine/interactions/types";
 import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button } from "@/editor/chrome-ui";

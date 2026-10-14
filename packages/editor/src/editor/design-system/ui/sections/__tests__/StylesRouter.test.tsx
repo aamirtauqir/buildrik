@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { render, fireEvent, act } from "@testing-library/react";
 import * as React from "react";
 import { StylesRouter } from "../StylesRouter";
-import { StylePresetRegistryProvider } from "../../../state/StylePresetRegistryContext";
+import { StylePresetRegistryProvider } from "@/editor/design-system/state/StylePresetRegistryContext";
 
 const PROJECT_ID = "styles-router-test";
 

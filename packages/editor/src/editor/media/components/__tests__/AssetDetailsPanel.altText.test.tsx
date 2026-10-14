@@ -12,7 +12,7 @@ import { render, fireEvent, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { AssetDetailsPanel } from "../AssetDetailsPanel";
-import type { LibraryItem } from "../../../sidebar/tabs/media/data/mediaTypes";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 
 function makeImage(overrides: Partial<LibraryItem> = {}): LibraryItem {
   return {

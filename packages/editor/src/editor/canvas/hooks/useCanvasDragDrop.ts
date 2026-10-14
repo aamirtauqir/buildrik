@@ -6,8 +6,8 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
+import type { Composer } from "@/engine";
+import type { InvalidDropReason } from "@/shared/utils/dragDrop/dropValidation";
 import { useDragAutoScroll } from "./useDragAutoScroll";
 import { useDragSession } from "./useDragSession";
 import type { DropPosition, DropSlotRect, BreadcrumbItem } from "./useDragSession";

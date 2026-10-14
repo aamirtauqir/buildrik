@@ -14,7 +14,7 @@ import {
   isValidClarityProjectId,
   isValidGTMContainerId,
 } from "../AnalyticsInjector";
-import type { AnalyticsConfig } from "../../../shared/types";
+import type { AnalyticsConfig } from "@/shared/types";
 
 describe("generateAnalyticsScripts — gate conditions", () => {
   it("returns '' when config is undefined", () => {

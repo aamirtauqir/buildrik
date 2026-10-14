@@ -6,9 +6,9 @@
 
 import * as React from "react";
 import { TextField } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import { writeCanvasStyles } from "../../../engine/commands/commandOperations";
-import type { SpacingIndicator } from "../../../shared/types/canvas";
+import type { Composer } from "@/engine";
+import { writeCanvasStyles } from "@/engine/commands/commandOperations";
+import type { SpacingIndicator } from "@/shared/types/canvas";
 import "./CanvasSpotSpacing.css";
 
 export interface CanvasSpotSpacingProps {

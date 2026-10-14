@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementData, PageData } from "../../../shared/types";
-import type { Composer } from "../../Composer";
+import type { ElementData, PageData } from "@/shared/types";
+import type { Composer } from "@/engine/Composer";
 import type { Element } from "../Element";
 
 /**

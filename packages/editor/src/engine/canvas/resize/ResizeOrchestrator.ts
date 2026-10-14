@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 import { applyConstraints, applyBoundaryConstraints } from "./ConstraintManager";
 import { expandParent } from "./DOMUpdater";
 import {

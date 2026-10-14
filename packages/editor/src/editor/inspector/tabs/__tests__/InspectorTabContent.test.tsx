@@ -10,8 +10,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { InspectorTabContent } from "../InspectorTabContent";
-import type { UseAdvancedSettingsReturn } from "../../hooks/useAdvancedSettings";
-import type { CssContext } from "../../config/cssContext";
+import type { UseAdvancedSettingsReturn } from "@/editor/inspector/hooks/useAdvancedSettings";
+import type { CssContext } from "@/editor/inspector/config/cssContext";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Test fixtures

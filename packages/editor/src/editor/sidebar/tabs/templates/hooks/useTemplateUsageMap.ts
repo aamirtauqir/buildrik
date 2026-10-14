@@ -13,8 +13,8 @@
  * @license BSD-3-Clause
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Composer } from "../../../../../engine/Composer";
-import { EVENTS } from "../../../../../shared/constants/events";
+import type { Composer } from "@/engine/Composer";
+import { EVENTS } from "@/shared/constants/events";
 import {
   getTemplateUsageMap,
   type TemplateUsageEntry,

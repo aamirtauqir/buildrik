@@ -8,12 +8,12 @@
  */
 import { describe, it, expect, beforeAll, vi } from "vitest";
 
-vi.mock("../../cms/CollectionStorage", async () => {
-  const { createInMemoryCollectionStorage } = await import("../../cms/__tests__/inMemoryCollectionStorage");
+vi.mock("@/engine/cms/CollectionStorage", async () => {
+  const { createInMemoryCollectionStorage } = await import("@/engine/cms/__tests__/inMemoryCollectionStorage");
   return createInMemoryCollectionStorage();
 });
 
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "../ExportEngine";
 
 beforeAll(() => {

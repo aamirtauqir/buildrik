@@ -18,7 +18,7 @@ import { FieldDot } from "./FieldDot";
 import { useInspectorField, mixedName } from "./InspectorFieldContext";
 import { unitWords } from "./InputControls";
 import { TextField, Button, TextInput, IconButton } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine";
+import type { Composer } from "@/engine";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import { isTokenVar, extractVarName, cssVarToTokenId, resolveTokenVar } from "../tokenBindingDetection";
 
@@ -55,7 +55,7 @@ const CELL = "tw:relative tw:inline-flex tw:items-center tw:justify-center tw:h-
    the nested margin / padding rings leave no room for 24px rows without
    redrawing the box. Every side is also reachable by Tab and ↑ / ↓. */
 const AXIS_INPUT =
-  "tw:h-4! tw:min-w-7! tw:max-w-14! tw:w-auto! tw:[field-sizing:content] tw:px-0! tw:py-0! tw:rounded-[2px]! tw:border-transparent! tw:bg-transparent! tw:text-center " +
+  "tw:h-4! tw:min-w-7! tw:max-w-14! tw:w-auto! tw:[field-sizing:content] tw:px-0! tw:py-0! tw:rounded-[var(--bk-radius-sm)]! tw:border-transparent! tw:bg-transparent! tw:text-center " +
   "tw:[font-family:var(--bk-font-mono)]! tw:text-[12px]! tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]! " +
   "tw:hover:border-[var(--bk-border)]! tw:focus:border-[var(--bk-accent)]! tw:focus:bg-[var(--bk-bg-panel)]! " +
   "tw:read-only:hover:border-transparent!";
@@ -194,7 +194,9 @@ export interface SpacingBoxProps {
   composer?: Composer | null;
 }
 
-const BOX_TAG = "tw:absolute tw:left-0 tw:top-0 tw:[font-family:var(--bk-font-mono)] tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* Ring labels are words, not data: Inter 11/500 (board 8092:211005/211011,
+   DQ-015, owner 2026-10-10). The numbers beside them stay Geist Mono. */
+const BOX_TAG = "tw:absolute tw:left-0 tw:top-0 tw:[font-family:var(--bk-font-ui)] tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /** One ring: its label, top number, [left · inner · right], bottom number. */
 function Ring(p: {
@@ -291,7 +293,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
             color: linked ? "var(--bk-accent)" : "var(--bk-ink-muted)",
           }}
         >
-          {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
+          {linked ? <Link size={12} aria-hidden="true" /> : <Unlink size={12} aria-hidden="true" />}
         </Button>
       )}
     </div>

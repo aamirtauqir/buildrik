@@ -10,14 +10,14 @@
 import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry, type SectionContext } from "./_shared";
 import { TypographySection } from "../typography";
 import { primaryFamily } from "../typography/FontPickerDropdown";
-import { cssVarToTokenId, extractVarName, resolveTokenVar } from "../../shared/tokenBindingDetection";
+import { cssVarToTokenId, extractVarName, resolveTokenVar } from "@/editor/inspector/shared/tokenBindingDetection";
 import { getDOMElement } from "@/engine/canvas/resize/utils";
 import { parseColor } from "@/shared/utils/parsers/colorParser";
 import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
 import { mergeProjectTokens } from "@/engine/designSystem/projectTokens";
 import type { DesignToken } from "@/engine/designSystem/types";
 import type { Composer } from "@/engine";
-import { colourTokenLabel } from "../../shared/controls/ColorInput";
+import { colourTokenLabel } from "@/editor/inspector/shared/controls/ColorInput";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 const SUMMARY_KEYS = ["font-family", "font-size", "color"] as const;

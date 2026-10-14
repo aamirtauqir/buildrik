@@ -7,11 +7,11 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { EVENTS } from "../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 import { InteractionManager } from "../InteractionManager";
 import { InteractionRuntime } from "../InteractionRuntime";
 import { DEFAULT_ANIMATION_CONFIG, type Interaction } from "../types";
-import type { Composer } from "../../Composer";
+import type { Composer } from "@/engine/Composer";
 
 vi.mock("../InteractionRuntime", () => ({
   // Regular function (not arrow) so `new InteractionRuntime()` works; the

@@ -113,7 +113,7 @@ describe("token write paths route through setTokens (read-only refuses them all)
     const c = withTokens();
     const before = c.getProjectSettings().designTokens;
     c.designSystem.readOnly = true;
-    expect(c.designSystem.applyAutoFix("color-primary", "darken-22")).toBeNull();
+    expect(c.designSystem.applyAutoFix("color-primary", "contrast:#FFFFFF")).toBeNull();
     expect(c.getProjectSettings().designTokens).toBe(before);
   });
 });

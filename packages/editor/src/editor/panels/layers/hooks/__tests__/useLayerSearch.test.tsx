@@ -8,7 +8,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { useLayerSearch } from "../useLayerSearch";
-import type { LayerItem } from "../../types";
+import type { LayerItem } from "@/editor/panels/layers/types";
 
 const item = (
   id: string,

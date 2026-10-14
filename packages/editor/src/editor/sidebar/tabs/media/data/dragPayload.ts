@@ -14,7 +14,7 @@
  */
 
 import type { LibraryItem } from "./mediaTypes";
-import type { MediaInsertType } from "../../../../../engine/media/MediaCommandLayer";
+import type { MediaInsertType } from "@/engine/media/MediaCommandLayer";
 
 /** Map a LibraryItem's `type` (img/vid/ico/fnt) to the engine MediaInsertType. */
 export function libraryTypeToInsertType(type: LibraryItem["type"]): MediaInsertType {

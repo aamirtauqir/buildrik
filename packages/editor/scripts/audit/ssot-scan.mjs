@@ -156,11 +156,18 @@ export function scanSelectorDuplicates(root) {
     // Audit Appendix fix #1 — JSDoc comments mention selectors that aren't real defs.
     content = content.replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, ' '));
     const lines = content.split('\n');
+    /* DQ-031: a rule nested in an at-rule block (@media reduced-motion, say)
+       is a gated override of the base rule, not a second canonical home.
+       Track brace depth and count only top-level heads. */
+    let depth = 0;
     lines.forEach((line, i) => {
+      const depthBefore = depth;
+      depth += (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+      if (depthBefore > 0) return;
       if (PSEUDO_STATES.some((p) => line.includes(p))) return;
       // Match opening of rule (text before {). Extract every comma-separated head.
       const ruleHeadMatch = line.match(/^(.+?)\{/);
-      if (!ruleHeadMatch) return;
+      if (!ruleHeadMatch || ruleHeadMatch[1].trim().startsWith('@')) return;
       const heads = ruleHeadMatch[1].split(',');
       for (const head of heads) {
         const segments = head.trim().split(/\s+|\s*[>+~]\s*/).filter(Boolean);
@@ -546,7 +553,16 @@ export function scanLegacyResiduals(root) {
       }
       const fullSelector = selectorLines.join(' ').replace(/\s*,\s*/g, ', ').trim();
       const startLine = topLineIdx + 1;
-      if (fullSelector && !fullSelector.startsWith('@')) {
+      /* DQ-031: the walker stopped at the comment above the rule and never
+         read it, so every rule was reported whether or not it said keep:.
+         Read the whole comment block that ends right above the selector. */
+      let annotated = false;
+      if (lineIdx >= 0 && inCommentByLine[lineIdx]) {
+        let c = lineIdx;
+        while (c > 0 && inCommentByLine[c - 1] && !lines[c].includes('/*')) c--;
+        annotated = /\bkeep:/.test(lines.slice(c, lineIdx + 1).join('\n'));
+      }
+      if (fullSelector && !fullSelector.startsWith('@') && !annotated) {
         violations.push({
           path: relative(root, file),
           line: startLine,

@@ -1,8 +1,9 @@
 /**
- * v3 board 4418:83498 (Layers · no results): the state glyph, "Nothing here
- * yet", "No layers match your search." and one outlined hand-off to ⌘K,
- * "Search everywhere for “carousel”". The board draws no Clear search — the
- * topbar field's ✕ / Escape clears the query.
+ * v3 board 4418:83498 (Layers · no results), redrawn 2026-10-10 for L2-031:
+ * the state glyph, "No matching layers", "Try a different name, or clear the
+ * search.", a "Clear search" button, and the outlined hand-off to ⌘K,
+ * "Search everywhere for “carousel”". The empty tree ("No layers yet") no
+ * longer shares this heading.
  *
  * @license BSD-3-Clause
  */
@@ -12,13 +13,16 @@ import "@testing-library/jest-dom";
 import { LayersNoResults } from "../components/LayersStateBlocks";
 
 describe("LayersNoResults", () => {
-  it("says nothing matches and hands the query to Search everywhere", () => {
+  it("names the failed search, clears it, and hands the query to Search everywhere", () => {
     const onSearchEverywhere = vi.fn();
-    render(<LayersNoResults search="carousel" onSearchEverywhere={onSearchEverywhere} />);
-    expect(screen.getByTestId("layers-no-results")).toHaveTextContent("Nothing here yet");
-    expect(screen.getByTestId("layers-no-results-text")).toHaveTextContent("No layers match your search.");
+    const onClear = vi.fn();
+    render(<LayersNoResults search="carousel" onSearchEverywhere={onSearchEverywhere} onClear={onClear} />);
+    expect(screen.getByTestId("layers-no-results-title")).toHaveTextContent("No matching layers");
+    expect(screen.getByTestId("layers-no-results")).not.toHaveTextContent("Nothing here yet");
+    expect(screen.getByTestId("layers-no-results-text")).toHaveTextContent("Try a different name, or clear the search.");
+    fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+    expect(onClear).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole("button", { name: "Search everywhere for “carousel”" }));
     expect(onSearchEverywhere).toHaveBeenCalledWith("carousel");
-    expect(screen.queryByRole("button", { name: "Clear search" })).toBeNull();
   });
 });

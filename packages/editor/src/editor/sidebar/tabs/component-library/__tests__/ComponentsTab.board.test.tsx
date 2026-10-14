@@ -10,11 +10,11 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
-import { createMockComposer } from "../../../__tests__/test-utils/mockComposer";
+import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 
 vi.mock("@/services/componentSync", () => ({ fetchComponentLibrary: vi.fn(async () => []) }));
 
-import { ComponentsTab } from "../../ComponentsTab";
+import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 
 const c = (id: string, name: string) => ({ id, name, masterTree: {}, createdAt: 1, updatedAt: 1, version: 1 }) as never;
 

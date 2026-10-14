@@ -15,7 +15,7 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementType } from "../../types";
+import type { ElementType } from "@/shared/types";
 import { canNestElement } from "./validator";
 import { canHaveChildren, isInteractiveType, isVoidType } from "./typeChecks";
 import { CAN_HAVE_CHILDREN_SET, ELEMENT_CATEGORIES } from "./derived";

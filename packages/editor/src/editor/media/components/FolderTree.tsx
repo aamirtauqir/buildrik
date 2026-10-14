@@ -27,7 +27,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import * as React from "react";
-import type { MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { MediaFolder } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import { Button, Tooltip, Popover, Menu, MenuItem, MenuLabel, MenuSeparator } from "@/editor/chrome-ui";
 /* `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported — so
@@ -206,7 +206,7 @@ function TreeNode({
           }}
           aria-label="Delete folder"
         >
-          <Trash2 size={11} />
+          <Trash2 size={12} />
         </Button>
       )}
       {onDelete && deleteViewOnlyReason && (
@@ -217,7 +217,7 @@ function TreeNode({
             aria-disabled="true"
             onClick={(e) => e.stopPropagation()}
           >
-            <Trash2 size={11} />
+            <Trash2 size={12} />
           </Button>
         </Tooltip>
       )}

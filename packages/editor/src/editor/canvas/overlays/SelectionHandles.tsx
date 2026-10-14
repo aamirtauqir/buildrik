@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { SELECTION_HANDLE_SIZE, HANDLE_SIZE } from "../../../engine/canvas/constants";
-import type { HandlePosition } from "../../../engine/canvas/ResizeHandler";
-import { Z_INDEX, SELECTION_COLORS, SHADOWS } from "../../../shared/constants/canvas";
+import { SELECTION_HANDLE_SIZE, HANDLE_SIZE } from "@/engine/canvas/constants";
+import type { HandlePosition } from "@/engine/canvas/ResizeHandler";
+import { Z_INDEX, SELECTION_COLORS, SHADOWS } from "@/shared/constants/canvas";
 
 export interface SelectionHandlesProps {
   /** Selection rectangle position */

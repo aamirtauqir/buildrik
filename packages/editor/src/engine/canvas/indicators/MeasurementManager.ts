@@ -10,8 +10,8 @@ import type {
   DistanceMeasurement,
   DimensionOverlay,
   ElementBounds,
-} from "../../../shared/types/canvas";
-import type { Composer } from "../../Composer";
+} from "@/shared/types/canvas";
+import type { Composer } from "@/engine/Composer";
 import { BoundsCalculator } from "./BoundsCalculator";
 
 /**

@@ -17,7 +17,7 @@ import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import * as React from "react";
 
 // Mock the heavy panels/hooks so this test focuses on shell behavior.
-vi.mock("../../../../panels/VersionHistoryPanel", () => ({
+vi.mock("@/editor/panels/VersionHistoryPanel", () => ({
   VersionHistoryPanel: ({ onMatchCount }: { onMatchCount?: (shown: number, total: number) => void }) => {
     React.useEffect(() => onMatchCount?.(1, 4), [onMatchCount]);
     return <div data-testid="saves-panel">SAVES</div>;
@@ -39,16 +39,12 @@ vi.mock("../components/MilestoneSuggestionBanner", () => ({
   MilestoneSuggestionBanner: () => <div data-testid="milestone-banner" />,
 }));
 
-vi.mock("../../../shared/PanelHeader", () => ({
-  PanelHeader: ({ title }: { title: string }) => <header>{title}</header>,
-}));
-
 /* FC-9 (fix-all 2026-09-25): canUndo controllable per-test so the "Clear
    undo history…" viewer-gating tests can enable the item without touching
    every pre-existing test in this file, which relies on the false default. */
 const historyStateFixture = vi.hoisted(() => ({ canUndo: false }));
 const clearMock = vi.hoisted(() => vi.fn());
-vi.mock("../../../../../shared/hooks/useHistoryState", () => ({
+vi.mock("@/shared/hooks/useHistoryState", () => ({
   useHistoryState: () => ({
     historyStack: [],
     canUndo: historyStateFixture.canUndo,
@@ -66,7 +62,7 @@ vi.mock("../../../../../shared/hooks/useHistoryState", () => ({
 const savesState = vi.hoisted(() => ({ isLoading: false, loadError: false }));
 /* Relative, matching this file's other hook mocks — an alias path here
    resolves to a second module identity and the mock silently does not apply. */
-vi.mock("../../../../../shared/hooks/useVersionHistory", () => ({
+vi.mock("@/shared/hooks/useVersionHistory", () => ({
   useVersionHistory: () => ({
     versions: [],
     isAvailable: true,
@@ -82,7 +78,7 @@ vi.mock("../../../../../shared/hooks/useVersionHistory", () => ({
   }),
 }));
 
-vi.mock("../../../../../shared/hooks/useAutoMilestone", () => ({
+vi.mock("@/shared/hooks/useAutoMilestone", () => ({
   useAutoMilestone: () => ({
     suggestion: null,
     isLoading: false,
@@ -106,7 +102,7 @@ import { HistoryTab } from "../HistoryTab";
 import { EVENTS } from "@/shared/constants/events";
 import { ToastProvider } from "@/editor/chrome-ui";
 
-vi.mock("../../../../shell/PublishHistory", () => ({
+vi.mock("@/editor/shell/PublishHistory", () => ({
   PublishHistory: ({ siteId }: { siteId: string }) => (
     <div data-testid="published-panel">PUBLISHED:{siteId}</div>
   ),

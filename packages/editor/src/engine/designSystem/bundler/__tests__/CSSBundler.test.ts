@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { CSSBundler } from "../CSSBundler";
-import type { DesignToken } from "../../types";
+import type { DesignToken } from "@/engine/designSystem/types";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const tokens: DesignToken[] = [

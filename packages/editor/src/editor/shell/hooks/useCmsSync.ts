@@ -7,9 +7,9 @@
  */
 import * as React from "react";
 import { ToastInput, dismissToast } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
-import type { CMSCollection, CMSContentItem } from "../../../shared/types/cms";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import {
   syncCollectionUpsert,
   syncCollectionDelete,
@@ -24,7 +24,7 @@ import {
   retryCmsSync,
   bindCmsEngine,
   consumeDirectSync,
-} from "../../../services/cmsSync";
+} from "@/services/cmsSync";
 
 export function useCmsSync(
   composer: Composer | null,

@@ -8,9 +8,9 @@
 
 import * as React from "react";
 import { ToastActionPayload, ToastTone } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine/Composer";
-import type { Element } from "../../../engine/elements/Element";
-import { devLogger } from "../../../shared/utils/devLogger";
+import type { Composer } from "@/engine/Composer";
+import type { Element } from "@/engine/elements/Element";
+import { devLogger } from "@/shared/utils/devLogger";
 import {
   getNavigationTargets,
   getAllNavigableElements,

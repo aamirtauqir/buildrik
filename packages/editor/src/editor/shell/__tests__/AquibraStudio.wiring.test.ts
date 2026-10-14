@@ -82,7 +82,8 @@ describe("AquibraStudio — every tab-switch door passes through the guard", () 
 
   it("the composer listeners (UI_PANEL_OPEN, ui:switch-tab via StudioPanels) get the guarded sinks", () => {
     const listeners = source.match(/useEditorEventListeners\(\{[\s\S]*?\}\);/)?.[0] ?? "";
-    expect(listeners).toContain("setLeftPanelTab: guardedSetLeftPanelTab");
+    /* setLeftPanelTab left the listener sinks with SHOW_IN_LAYERS /
+       UI_TOGGLE_LAYERS, which nothing emitted (DQ-003). */
     expect(listeners).toContain("openLeftPanelToTab: guardedOpenLeftPanelToTab");
     expect(source).toContain("onLeftPanelTabChange={guardedSetLeftPanelTab}");
   });

@@ -22,7 +22,7 @@
  */
 
 import { useMemo } from "react";
-import type { Composer } from "../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 
 // ============================================================================
 // HELPERS

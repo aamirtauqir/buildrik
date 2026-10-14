@@ -6,12 +6,12 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../shared/constants";
-import { stepZoom } from "../../shared/constants/canvas";
-import type { CommandData, CommandOptions, ElementType } from "../../shared/types";
+import { EVENTS } from "@/shared/constants";
+import { stepZoom } from "@/shared/constants/canvas";
+import type { CommandData, CommandOptions, ElementType } from "@/shared/types";
 /* Explicit: without it `Element` in this file resolves to the DOM one. */
 import type { Element } from "../elements/Element";
-import { canNestElement } from "../../shared/utils/nesting";
+import { canNestElement } from "@/shared/utils/nesting";
 import type { Composer } from "../Composer";
 import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement } from "./commandOperations";
 
@@ -657,8 +657,16 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       id: "add-text",
       label: "Add text",
       group: "Insert",
-      keywords: ["paragraph", "heading"],
+      keywords: ["paragraph"],
       run: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "text" }),
+    },
+    /* L1-033: "heading" offered only "Add text". */
+    {
+      id: "add-heading",
+      label: "Add heading",
+      group: "Insert",
+      keywords: ["title", "h1", "h2"],
+      run: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "heading" }),
     },
     {
       id: "add-image",

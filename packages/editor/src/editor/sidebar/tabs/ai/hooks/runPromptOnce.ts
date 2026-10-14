@@ -116,6 +116,39 @@ interface PromptResult {
 }
 
 /**
+ * The most the encoded input may take (L2-037). The subscription is an SSE
+ * GET, so the input rides in the URL; Node refuses a request line past 16 KB
+ * (431) and proxies sit lower. A site with a full token set sent ~17 KB, and
+ * the panel could only say "The AI service didn't respond".
+ */
+export const AI_URL_BUDGET = 7000;
+
+const encodedLength = (input: unknown) => encodeURIComponent(JSON.stringify(input)).length;
+
+/** Halve the largest recall list (tokens, assets, page elements) until the
+ *  input fits. Lists keep their order, so the site's own tokens (sorted first
+ *  by gatherTokens) are the last to go, and a short list is left alone while a
+ *  longer one can still give way. */
+function fitToUrl<T extends { scope: RunScope }>(input: T): T {
+  if (encodedLength(input) <= AI_URL_BUDGET) return input;
+  const scope: RunScope = { ...input.scope };
+  const fitted = { ...input, scope };
+  const half = <V,>(list: V[]): V[] => list.slice(0, Math.floor(list.length / 2));
+  while (encodedLength(fitted) > AI_URL_BUDGET) {
+    const lists = [
+      { list: scope.tokens, halve: () => (scope.tokens = half(scope.tokens ?? [])) },
+      { list: scope.assets, halve: () => (scope.assets = half(scope.assets ?? [])) },
+      ...(scope.kind === "page"
+        ? [{ list: scope.elements, halve: () => (scope.elements = half(scope.elements ?? [])) }]
+        : []),
+    ].filter((l) => (l.list?.length ?? 0) > 0);
+    if (lists.length === 0) break;
+    lists.reduce((a, b) => (encodedLength(b.list) > encodedLength(a.list) ? b : a)).halve();
+  }
+  return fitted;
+}
+
+/**
  * Fire one streamPrompt subscription and resolve when it completes (`done`),
  * accumulating text and capturing the first edit / plan chunk. Rejects with an
  * `AiRunError` on stream error (quota, provider failure, auth), once the
@@ -141,7 +174,7 @@ export function runPromptOnce(args: PromptArgs): Promise<PromptResult> {
       reject(stopped());
     };
     const sub = getAiSubscriptionClient().ai.streamPrompt.subscribe(
-      { prompt: args.prompt, scope: args.scope, model: args.model, intent: args.intent },
+      fitToUrl({ prompt: args.prompt, scope: args.scope, model: args.model, intent: args.intent }),
       {
         onData: (chunk: {
           type: string;

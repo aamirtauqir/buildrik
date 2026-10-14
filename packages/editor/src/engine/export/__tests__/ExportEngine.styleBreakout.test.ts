@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import { beforeAll, describe, it, expect } from "vitest";
-import { Composer } from "../../Composer";
+import { Composer } from "@/engine/Composer";
 import { ExportEngine } from "../ExportEngine";
 import { stylesToCSS } from "../ExportHelpers";
 

@@ -34,7 +34,7 @@ vi.mock("@/services/ReviewService", () => ({
   submitForReview: (...a: unknown[]) => submitForReview(...a),
 }));
 
-vi.mock("../../exportPublishPages", () => ({
+vi.mock("@/editor/shell/exportPublishPages", () => ({
   exportPublishPages: vi.fn(() =>
     Promise.resolve([
       { path: "index.html", html: "<h1>new hero</h1>" }, // edited

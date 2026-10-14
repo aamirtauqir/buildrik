@@ -41,7 +41,6 @@ const App: React.FC = () => {
       }}
     >
       <AquibraStudio
-        licenseKey="DEMO"
         onEditor={(composer) => {
           composerRef.current = composer;
           // Dev-only probe: live verification reads engine state through the

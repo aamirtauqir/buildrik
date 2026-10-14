@@ -16,7 +16,7 @@
  */
 import * as React from "react";
 import { Button, Modal } from "@/editor/chrome-ui";
-import type { CurrentRound, RoundListRow } from "../../../../services/ReviewService";
+import type { CurrentRound, RoundListRow } from "@/services/ReviewService";
 
 export interface RoundHistoryModalProps {
   open: boolean;

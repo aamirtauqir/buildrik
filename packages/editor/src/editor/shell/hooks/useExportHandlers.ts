@@ -23,8 +23,8 @@
 
 import * as React from "react";
 import { ToastInput } from "@/editor/chrome-ui";
-import type { Composer } from "../../../engine";
-import { ExportEngine } from "../../../engine/export";
+import type { Composer } from "@/engine";
+import { ExportEngine } from "@/engine/export";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL as dashboardUrlFromEnv } from "@/shared/utils/runtimeEnv";
 import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";

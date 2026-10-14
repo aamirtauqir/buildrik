@@ -5,9 +5,8 @@
  *
  *   1. COMPONENT_CREATE_REQUESTED → open the Create-Component modal
  *      with the requested element id.
- *   2. SHOW_IN_LAYERS  → switch to Layers tab + open left drawer +
- *      emit LAYERS_SCROLL_TO_SELECTION (delayed 100ms so the tab
- *      switch lands first).
+ *   2. Engine failure events (ERROR / STORAGE_ERROR / COMMAND_ERROR) →
+ *      one keyed toast each (DQ-005).
  *   3. Overlay defaults init → seed the overlay toggles from
  *      composer.canvasIndicators.getOverlay() once the composer is
  *      ready.
@@ -22,16 +21,15 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
-import { EVENTS } from "../../../shared/constants/events";
-import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
+import { GROUPED_TABS_CONFIG } from "@/editor/rail/tabsConfig";
 import type { UseStudioModalsReturn } from "./useStudioModals";
 import { requestPasteHtml } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import type { ToastInput } from "@/editor/chrome-ui";
 
 // Subset of useStudioState setters we touch — keeps the dep list tight.
 export interface EditorEventListenerStateSetters {
-  setLeftPanelTab: (tab: string) => void;
-  setIsLeftPanelOpen: (open: boolean) => void;
   openLeftPanelToTab: (primaryTab: string, subTab?: string) => void;
   setShowSpacingIndicators: (v: boolean) => void;
   setShowBadges: (v: boolean) => void;
@@ -46,15 +44,84 @@ export interface UseEditorEventListenersOptions {
     "openCreateComponent" | "openSaveAsComponent" | "openSaveTemplate" | "toggleShortcuts"
   >;
   state: EditorEventListenerStateSetters;
-  /** Tracks whether the user has manually toggled spacing indicators
-   *  (so we don't clobber their choice when overlay defaults arrive). */
+  /** Engine failure events surface here (DQ-005). */
+  addToast: (input: ToastInput) => string;
 }
+
+/* What the engine's failure events say, as one toast each. ERROR carries
+   `{ error, operation }`, except the page-root delete refusal, which sends
+   `{ type, message }` (ElementCRUD.removeElement). */
+const ERROR_TITLES: Record<string, string> = {
+  save: "Couldn't save",
+  load: "Couldn't load the project",
+  init: "The editor didn't start properly",
+};
+const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error ?? "Unknown error"));
 
 export function useEditorEventListeners({
   composer,
   modals,
   state,
+  addToast,
 }: UseEditorEventListenersOptions): void {
+  /* 0) Engine failures → toast (DQ-005). ERROR, STORAGE_ERROR and
+     COMMAND_ERROR were emitted with no listener in src: a command refused in
+     view mode, a failed local autosave and a failed load all said nothing.
+     Keyed, so a held key or a retry loop replaces one card instead of
+     stacking them. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onError = (event: { error?: unknown; operation?: string; type?: string; message?: string }) => {
+      if (event?.type === "invalid_operation") {
+        addToast({
+          tone: "error",
+          key: "engine-invalid-operation",
+          description: "The page itself can't be deleted — select an element inside it.",
+        });
+        return;
+      }
+      const op = event?.operation ?? "unknown";
+      addToast({
+        tone: "error",
+        key: `engine-error-${op}`,
+        title: ERROR_TITLES[op] ?? "Something went wrong",
+        description: messageOf(event?.error),
+      });
+    };
+    const onStorageError = (event: { error?: unknown }) =>
+      addToast({
+        tone: "error",
+        key: "engine-storage-error",
+        title: "Couldn't save a local copy",
+        description: messageOf(event?.error),
+      });
+    const onCommandError = (event: { id?: string; error?: unknown }) => {
+      const message = messageOf(event?.error);
+      if (message.startsWith("read-only:")) {
+        addToast({
+          key: "engine-command-readonly",
+          title: "View only",
+          description: "This editor is read-only, so nothing was changed.",
+        });
+        return;
+      }
+      addToast({
+        tone: "error",
+        key: `engine-command-${event?.id ?? "unknown"}`,
+        title: "Couldn't complete that action",
+        description: message,
+      });
+    };
+    composer.on(EVENTS.ERROR, onError);
+    composer.on(EVENTS.STORAGE_ERROR, onStorageError);
+    composer.on(EVENTS.COMMAND_ERROR, onCommandError);
+    return () => {
+      composer.off(EVENTS.ERROR, onError);
+      composer.off(EVENTS.STORAGE_ERROR, onStorageError);
+      composer.off(EVENTS.COMMAND_ERROR, onCommandError);
+    };
+  }, [composer, addToast]);
+
   // 1) COMPONENT_CREATE_REQUESTED → open the create-component modal.
   const { openCreateComponent, openSaveAsComponent, openSaveTemplate, toggleShortcuts } = modals;
   React.useEffect(() => {
@@ -131,24 +198,6 @@ export function useEditorEventListeners({
     };
   }, [composer, toggleShortcuts]);
 
-  // 3) SHOW_IN_LAYERS → switch tab + open drawer + scroll-to-selection.
-  const { setLeftPanelTab, setIsLeftPanelOpen } = state;
-  React.useEffect(() => {
-    if (!composer) return;
-    const handle = () => {
-      setLeftPanelTab("layers");
-      setIsLeftPanelOpen(true);
-      // Small delay so the tab switch lands before LayersPanel scrolls.
-      setTimeout(() => {
-        composer.emit(EVENTS.LAYERS_SCROLL_TO_SELECTION, {});
-      }, 100);
-    };
-    composer.on(EVENTS.SHOW_IN_LAYERS, handle);
-    return () => {
-      composer.off(EVENTS.SHOW_IN_LAYERS, handle);
-    };
-  }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
-
   // 3b) UI_PANEL_OPEN → open the requested left-panel tab (and optional sub-screen).
   // Emitters: command palette navigation, canvas cmd palette (SmartSuggestions,
   // deleted 2026-09-02, never rendered). Allowlist on panel id — it historically emitted inspector
@@ -182,19 +231,6 @@ export function useEditorEventListeners({
       composer.off(EVENTS.UI_PANEL_OPEN, handle);
     };
   }, [composer, openLeftPanelToTab, VALID_LEFT_TABS]);
-
-  // 3c) UI_TOGGLE_LAYERS → switch to layers tab + open drawer.
-  React.useEffect(() => {
-    if (!composer) return;
-    const handle = () => {
-      setLeftPanelTab("layers");
-      setIsLeftPanelOpen(true);
-    };
-    composer.on(EVENTS.UI_TOGGLE_LAYERS, handle);
-    return () => {
-      composer.off(EVENTS.UI_TOGGLE_LAYERS, handle);
-    };
-  }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
 
   /* 3d) UI_TOGGLE_PREVIEW used to flip `composer.setPreviewMode` here, which
      starts the canvas interaction runtime, emits PREVIEW_MODE_CHANGED (no

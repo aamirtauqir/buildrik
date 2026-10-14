@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { AssetBundler } from "../AssetBundler";
 
-vi.mock("../../../shared/utils/devLogger", () => ({
+vi.mock("@/shared/utils/devLogger", () => ({
   devWarn: vi.fn(),
 }));
 

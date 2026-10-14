@@ -9,7 +9,7 @@
  */
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import { Composer } from "../Composer";
-import { EVENTS } from "../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({

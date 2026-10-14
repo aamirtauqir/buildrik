@@ -6,10 +6,10 @@
 import { listNames } from "@shared/utils/helpers/string";
 import * as React from "react";
 import "./styles/layers-v2.css";
-import type { Element } from "../../../engine/elements/Element";
-import type { ElementType } from "../../../shared/types";
+import type { Element } from "@/engine/elements/Element";
+import type { ElementType } from "@/shared/types";
 import { LayersEmptyState } from "./components/LayersEmptyState";
-import { canNestElement, canHaveChildren } from "../../../shared/utils/nesting";
+import { canNestElement, canHaveChildren } from "@/shared/utils/nesting";
 import { LayerContextMenu, elementsLabel } from "./components/LayerContextMenu";
 import { LayerDisplaySettings } from "./components/LayerDisplaySettings";
 import { MoveToPageDialog } from "./components/MoveToPageDialog";
@@ -32,6 +32,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   onLayerHover,
   canvasHoveredId,
   search,
+  onClearSearch,
   selecting = false,
   displaySettingsOpen,
   onDisplaySettingsToggle,
@@ -213,16 +214,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     const scrollTimeout = setTimeout(scrollToSelection, 50);
     return () => clearTimeout(scrollTimeout);
   }, [selectedElement?.id, composer, expandIds, scrollToSelection]);
-
-  // Listen for explicit scroll requests ("Show in Layers" button)
-  React.useEffect(() => {
-    if (!composer) return;
-    const onScroll = () => setTimeout(scrollToSelection, 50);
-    composer.on("layers:scroll-to-selection", onScroll);
-    return () => {
-      composer.off("layers:scroll-to-selection", onScroll);
-    };
-  }, [composer, scrollToSelection]);
 
   // Drag handlers
   const handleDragStart = React.useCallback(
@@ -515,6 +506,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           <LayersNoResults
             search={state.search}
             onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
+            onClear={onClearSearch}
           />
         )}
 
