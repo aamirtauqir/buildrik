@@ -172,7 +172,10 @@ function sanitizeNode(node: Record<string, unknown>, onChange?: OnSanitizeChange
     node.tagName = "div";
   }
 
-  if (typeof node.content === "string" && node.content.length > 0) {
+  /* "text" content is never parsed as HTML: every render path (canvas,
+     export, publish) escapes it. Purifying it rewrote the user's words —
+     "&" came back as "&amp;", "a<b" lost everything after the "<". */
+  if (typeof node.content === "string" && node.content.length > 0 && node.contentFormat !== "text") {
     const clean = purify(node.content);
     if (onChange && clean !== node.content) onChange("content", node.content.slice(0, 80));
     node.content = clean;
