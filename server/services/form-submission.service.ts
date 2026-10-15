@@ -11,6 +11,7 @@ import type {
 import { isAbsoluteHttpUrl, isSitePath } from "@buildrik/shared/schemas/element-markup";
 import { resolveSiteOrigins } from "@/lib/publish-urls";
 import { resolveVercelProjectName } from "@/lib/vercel";
+import { hasLiveDeployment } from "@/server/services/publish.service";
 import type { DiscoveredForm, FormBlockWireSettings } from "@/lib/publish-forms";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
@@ -96,7 +97,16 @@ export async function submitForm(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { workspaceId: true, name: true, deletedAt: true, canonicalUrl: true, slug: true, vercelProjectName: true },
+    select: {
+      workspaceId: true,
+      name: true,
+      deletedAt: true,
+      canonicalUrl: true,
+      slug: true,
+      vercelProjectName: true,
+      status: true,
+      publishedUrl: true,
+    },
   });
   if (!site || site.deletedAt) throw new FormError("NOT_FOUND", "FORM_NOT_FOUND");
 
@@ -177,10 +187,15 @@ export async function submitForm(
     });
   }
 
+  /* D10: the deployment origins count only while the site is live. After an
+     unpublish (or the project's deletion) `<project>.vercel.app` is a dead
+     page, and as the first origin it was where "show message" sent visitors. */
+  const live = hasLiveDeployment(site);
   const origins = resolveSiteOrigins({
     canonicalUrl: site.canonicalUrl,
     verifiedDomain: verifiedDomain?.domain ?? null,
-    vercelProjectName: site.slug ? resolveVercelProjectName(site) : null,
+    publishedUrl: live ? site.publishedUrl : null,
+    vercelProjectName: live && site.slug ? resolveVercelProjectName(site) : null,
   });
   const returnUrl = safeUrlOnOrigins(input.returnUrl, origins);
 

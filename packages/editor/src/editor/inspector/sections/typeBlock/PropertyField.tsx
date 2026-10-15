@@ -120,6 +120,13 @@ const PropertyField: React.FC<PropertyFieldProps> = ({
           Try &ldquo;full{value.trim().toLowerCase() === "name" ? "name" : "_" + value.trim().toLowerCase()}&rdquo;.
         </p>
       )}
+      {/* BK-44: a form with its own action is left as it is at publish, so its
+          answers never reach Submissions — that happened without a word. */}
+      {prop.id === "action" && selectedElement.type === "form" && value.trim() && (
+        <p style={styles.nameWarning} role="status">
+          Answers go to this URL instead of Submissions. Clear it to collect them in Buildrick.
+        </p>
+      )}
     </>
   );
 };

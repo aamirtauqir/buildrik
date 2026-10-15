@@ -23,6 +23,19 @@ describe("wireForms", () => {
     expect(forms[0].blockId).toBe("f1");
   });
 
+  /* BK-44: Method GET put the visitor's details in the URL and got a 405;
+     multipart and text/plain bodies were refused as "Invalid JSON". */
+  it.each([
+    ['method="get"', 'method="get" enctype="multipart/form-data"'],
+    ["method=GET", "method=GET enctype='text/plain'"],
+  ])("sends urlencoded POST whatever Method/Encoding the inspector set (%s)", (_label, attrs) => {
+    const { html } = wireForms(`<form data-buildrick-id="f1" ${attrs}><input name="email"></form>`, opts);
+    const open = /<form\b[^>]*>/i.exec(html)![0];
+    expect(open.match(/\bmethod=/gi)).toHaveLength(1);
+    expect(open).toContain('method="POST"');
+    expect(open).not.toMatch(/enctype=/i);
+  });
+
   it("reports the fields, skipping the submit and anything unnamed", () => {
     const { forms } = wireForms(FORM, opts);
     expect(forms[0].fields).toEqual([

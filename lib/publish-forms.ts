@@ -137,8 +137,14 @@ export function wireForms(
     const action = `${opts.appOrigin.replace(/\/+$/, "")}/api/public/forms/${opts.siteId}/${blockId}`;
     let attrs = ` action="${action}" method="POST"`;
     if (successMessage) attrs += ` data-success-message="${escapeAttr(successMessage)}"`;
+    /* BK-44: the inspector's Method / Encoding were left on the tag, and the
+       first duplicate attribute wins — GET put the visitor's name and email
+       in the URL and got a 405; multipart/plain bodies were refused as
+       "Invalid JSON". The endpoint takes urlencoded POST, so that is what is
+       sent. */
+    const bare = open.replace(/\s(method|enctype)=("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
     const rewritten =
-      open.replace(/>$/, `${attrs}>`) + RETURN_FIELD + (spamProtection ? HONEYPOT_FIELD : "");
+      bare.replace(/>$/, `${attrs}>`) + RETURN_FIELD + (spamProtection ? HONEYPOT_FIELD : "");
     out = out.replace(open, rewritten);
 
     found.push({

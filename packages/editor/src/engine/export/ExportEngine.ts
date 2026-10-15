@@ -55,7 +55,7 @@ import {
   THEME_BOOT_SCRIPT,
   THEME_TOGGLE_ATTR,
 } from "./themeToggleRuntime";
-import { classTokens, contentToHTML, isSafeAttrValue } from "@/shared/utils/html/sanitization";
+import { classTokens, contentToHTML, isSafeAttrValue, stripAllTags } from "@/shared/utils/html/sanitization";
 import { embedFrameHTML } from "@/shared/utils/embed/embedFrameHTML";
 
 // ============================================================================
@@ -143,6 +143,33 @@ function readPageNode(el: PageData["root"]): LinkNodeView<PageData["root"]> {
     href: el.attributes?.href,
     children: el.children ?? [],
   };
+}
+
+/**
+ * BK-44: what a radio or checkbox submits when it has no value of its own —
+ * the text of the label it sits in. Without a value the browser sends "on",
+ * so every answer to a three-option question was stored as "on". `null` when
+ * the input already has a value, is not a choice, or has no label text.
+ */
+function choiceDefaultValue(
+  tag: string,
+  attrs: Record<string, string> | undefined,
+  choiceLabel: string | undefined,
+): string | null {
+  if (tag !== "input" || !choiceLabel) return null;
+  if (!/^(radio|checkbox)$/i.test(attrs?.type ?? "") || attrs?.value) return null;
+  return choiceLabel;
+}
+
+/** The label text of a radio/checkbox choice: its children's text, not its input. */
+function choiceLabelText(parts: Array<{ tag: string; content: string; format?: "text" | "html" }>): string | undefined {
+  const text = parts
+    .filter((p) => p.tag !== "input")
+    .map((p) => (p.format === "text" ? p.content : stripAllTags(p.content)))
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text || undefined;
 }
 
 /** A URL that exists only in the browser session that created it. */
@@ -354,7 +381,8 @@ export class ExportEngine {
   private elementToHTML(
     element: ReturnType<typeof this.composer.elements.getElement>,
     config: ExportConfig,
-    indent = 0
+    indent = 0,
+    choiceLabel?: string,
   ): string {
     if (!element) return "";
 
@@ -410,6 +438,8 @@ export class ExportEngine {
       }
       attrParts.push(`${key}="${escapeHTML(out)}"`);
     }
+    const choiceValue = choiceDefaultValue(tag, attrs, choiceLabel);
+    if (choiceValue) attrParts.push(`value="${escapeHTML(choiceValue)}"`);
     // No wrapper when the href itself was refused as unsafe — an <a> without
     // one would only restyle the section's cursor and focus order.
     const openLink =
@@ -434,6 +464,16 @@ export class ExportEngine {
     // Build children content — an embed with a valid URL renders its iframe
     // in place of its placeholder children (embedFrameHTML).
     const embedFrame = embedFrameHTML(type, attrs);
+    const childChoiceLabel =
+      type === "radio" || type === "checkbox"
+        ? choiceLabelText(
+            children.map((c) => ({
+              tag: c?.getTagName?.() ?? "",
+              content: c?.getContent?.() ?? "",
+              format: c?.getData?.().contentFormat,
+            })),
+          )
+        : undefined;
     let childContent = "";
     if (embedFrame) {
       childContent = embedFrame;
@@ -443,7 +483,7 @@ export class ExportEngine {
       if (children.length > 0) {
         childContent +=
           newline +
-          children.map((child) => this.elementToHTML(child, config, indent + 1)).join("") +
+          children.map((child) => this.elementToHTML(child, config, indent + 1, childChoiceLabel)).join("") +
           indentStr;
       }
     }
@@ -1070,7 +1110,7 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
     );
   }
 
-  private renderPageElement(element: PageData["root"], indent = 1): string {
+  private renderPageElement(element: PageData["root"], indent = 1, choiceLabel?: string): string {
     if (!element) return "";
 
     // Same rule as the live-element writer: a stored "div" defers to the type.
@@ -1154,6 +1194,9 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
         : "";
     const closeLink = openLink ? "</a>" : "";
 
+    const choiceValue = choiceDefaultValue(tag, element.attributes, choiceLabel);
+    if (choiceValue) attrParts.push(`value="${escapeHTML(choiceValue)}"`);
+
     // Interactions live on element.data.interactions, NOT element.attributes
     // (toJSON serializes raw data.attributes; the computed interactions attr is
     // only added by the live element's getAttributes()). Emit it here so the
@@ -1173,6 +1216,10 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
     // Build children content — an embed with a valid URL renders its iframe
     // in place of its placeholder children (embedFrameHTML).
     const embedFrame = embedFrameHTML(element.type, element.attributes);
+    const childChoiceLabel =
+      element.type === "radio" || element.type === "checkbox"
+        ? choiceLabelText(children.map((c) => ({ tag: c.tagName ?? "", content: c.content ?? "", format: c.contentFormat })))
+        : undefined;
     let childContent = "";
     if (embedFrame) {
       childContent = embedFrame;
@@ -1182,7 +1229,7 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
       if (children.length > 0) {
         childContent +=
           "\n" +
-          children.map((child) => this.renderPageElement(child, indent + 1)).join("") +
+          children.map((child) => this.renderPageElement(child, indent + 1, childChoiceLabel)).join("") +
           indentStr;
       }
     }

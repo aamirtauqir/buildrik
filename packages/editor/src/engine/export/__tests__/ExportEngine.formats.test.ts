@@ -346,6 +346,30 @@ describe("ExportEngine.generateHTML — config knobs", () => {
 
   // Text content stays escaped. This is the safe default and the reason the
   // escape exists: a user who types markup must not get markup on their site.
+  /* BK-44: a radio or checkbox with no value submits "on" — every answer to
+     a three-option question was stored as "on". With no value of its own it
+     publishes its label's text; a value the user set wins. */
+  it("a radio or checkbox without a value submits its label's text", () => {
+    const choice = (id: string, label: string, extra: Record<string, string> = {}) => ({
+      id,
+      type: "radio",
+      tagName: "label",
+      children: [
+        { id: `${id}-in`, type: "input", tagName: "input", attributes: { type: "radio", name: "size", ...extra } },
+        { id: `${id}-t`, type: "text", tagName: "span", content: label, contentFormat: "text" as const },
+      ],
+    });
+    const root: LiveNode = {
+      id: "root",
+      children: [choice("r1", "Small"), choice("r2", "Tom & Jerry"), choice("r3", "Large", { value: "lg" })],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+    expect(html).toMatch(/<input[^>]*value="Small"/);
+    expect(html).toMatch(/<input[^>]*value="Tom &amp; Jerry"/);
+    expect(html).toMatch(/<input[^>]*value="lg"/);
+    expect(html.match(/value="/g)).toHaveLength(3);
+  });
+
   /* BK-42: a `blob:` URL is this tab's Object URL — published, it is a broken
      image for every visitor. */
   it("never writes a session-only blob: URL", () => {

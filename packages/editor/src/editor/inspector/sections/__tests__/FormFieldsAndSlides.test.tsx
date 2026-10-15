@@ -89,6 +89,20 @@ describe("Form › FIELDS", () => {
     expect(kids[4].getId()).toBe("go");
     expect(screen.getAllByTestId("form-field-row")).toHaveLength(4);
   });
+
+  /* BK-44: the name came from the field count, so a field added after a
+     delete repeated an existing name and the two answers merged into one. */
+  it("+ Add field never repeats a name already in the form", () => {
+    const composer = project([{ id: "f", type: "form", tagName: "form", children: [
+      input("a", "text", "A", { name: "field-2" }),
+      input("b", "text", "B", { name: "field-3" }),
+    ] }]);
+    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
+    act(() => { fireEvent.click(screen.getByTestId("form-add-field")); });
+    act(() => { fireEvent.click(screen.getByTestId("form-add-field")); });
+    const names = composer.elements.getElement("f")!.getChildren().map((el) => el.getAttribute("name"));
+    expect(names).toEqual(["field-2", "field-3", "field-4", "field-5"]);
+  });
 });
 
 describe("Slider › SLIDES", () => {

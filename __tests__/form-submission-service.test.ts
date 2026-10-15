@@ -149,6 +149,7 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         workspaceId: "ws1", name: "Site", canonicalUrl: null, slug: "renamed", vercelProjectName: "buildrik-site-original",
+        status: "PUBLISHED", publishedUrl: "https://buildrik-site-original.vercel.app",
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
@@ -195,6 +196,52 @@ describe("Form Submission Service", () => {
 
       const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
       expect(result.siteOrigin).toBe("https://mysite.example.com");
+    });
+
+    /* D10: the fallback for a rejected `_return` must never be a dead
+       deployment. The project origin counts only while the site is live, and
+       the URL it is live at comes before the slug-derived guess. */
+    it("an unpublished site's Vercel project is not an origin — the fallback is never a dead deployment", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: null, slug: "gone", vercelProjectName: "buildrik-site-gone",
+        status: "DRAFT", publishedUrl: null,
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub-d10a" } as any);
+
+      const result = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://buildrik-site-gone.vercel.app/contact" }, "1.2.3.4",
+      );
+      expect(result.returnUrl).toBeNull();
+      expect(result.siteOrigin).toBeNull();
+    });
+
+    it("a live site falls back to where it is published, and still accepts a _return from there", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as any);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: null, slug: "live", vercelProjectName: null,
+        status: "PUBLISHED", publishedUrl: "https://live-site.vercel.app",
+      } as any);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub-d10b" } as any);
+
+      const rejected = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "http://localhost:4000/contact" }, "1.2.3.4",
+      );
+      expect(rejected.returnUrl).toBeNull();
+      expect(rejected.siteOrigin).toBe("https://live-site.vercel.app");
+
+      const accepted = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://live-site.vercel.app/contact" }, "1.2.3.4",
+      );
+      expect(accepted.returnUrl).toBe("https://live-site.vercel.app/contact");
     });
 
     it("logs (not swallows) a failed notification email — the submission is already saved", async () => {
