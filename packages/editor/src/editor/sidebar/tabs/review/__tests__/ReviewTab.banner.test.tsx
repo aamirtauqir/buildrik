@@ -32,6 +32,15 @@ vi.mock("@/services/ReviewService", () => ({
 vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: () => "site_test",
 }));
+// locateComment polls getDOMElement for up to 5 s until the anchor renders.
+// No canvas mounts here, so the poll outlived the test and threw "document is
+// not defined" after jsdom was torn down — 2 unhandled errors that failed a
+// fully green run (Dashboard tests, de87e3a32). Scrolling is locate.test.ts's
+// subject; here the anchor is simply on screen.
+vi.mock("@/engine/canvas/resize/utils", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/engine/canvas/resize/utils")>()),
+  getDOMElement: () => ({ scrollIntoView: () => {} }),
+}));
 
 import { ReviewTab } from "../ReviewTab";
 import { ToastProvider } from "@/editor/chrome-ui";
