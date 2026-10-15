@@ -36,6 +36,23 @@ describe("wireForms", () => {
     expect(open).not.toMatch(/enctype=/i);
   });
 
+  /* Security review of the BK-44 change: removing method/enctype by a search
+     across the tag also cut text inside another attribute's value, shifting
+     its quotes so the rest parsed as a new (event handler) attribute. */
+  it("drops method/enctype only as attributes, never text inside another value", () => {
+    const open =
+      '<form data-buildrick-id="f1" title="x method=y" data-q=" onmouseover=alert(1) " ' +
+      "aria-label='a enctype=b' method=\"get\">";
+    const { html } = wireForms(`${open}<input name="email"></form>`, opts);
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const form = doc.querySelector("form")!;
+    expect(form.getAttribute("title")).toBe("x method=y");
+    expect(form.getAttribute("data-q")).toBe(" onmouseover=alert(1) ");
+    expect(form.getAttribute("aria-label")).toBe("a enctype=b");
+    expect(form.getAttribute("method")).toBe("POST");
+    expect([...form.attributes].some((a) => a.name.startsWith("on"))).toBe(false);
+  });
+
   it("reports the fields, skipping the submit and anything unnamed", () => {
     const { forms } = wireForms(FORM, opts);
     expect(forms[0].fields).toEqual([

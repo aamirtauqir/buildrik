@@ -112,6 +112,36 @@ f.replaceWith(el);
 }catch(e){}
 })();</script>`;
 
+/** What wiring writes itself, so a value already on the tag must go. */
+const SENT_BY_WIRING = new Set(["method", "enctype"]);
+
+/* One attribute, read the way the browser reads it: name, then an optional
+   double-quoted, single-quoted or unquoted value. Sticky, so it only ever
+   starts where the previous attribute ended. */
+const NEXT_ATTRIBUTE = /\s*([^\s"'>/=]+)(\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*))?/y;
+
+/**
+ * The open tag without the named attributes. Walks the attributes from the
+ * tag name on — a pattern searched across the whole tag also matches text
+ * INSIDE another attribute's value, and cutting there shifts the quotes so
+ * the rest of that value parses as new attributes (an `onmouseover` the
+ * `on*` filter never saw).
+ */
+function withoutAttributes(open: string, drop: ReadonlySet<string>): string {
+  const head = /^<[a-z][^\s/>]*/i.exec(open);
+  if (!head) return open;
+  let out = head[0];
+  let at = head[0].length;
+  for (;;) {
+    NEXT_ATTRIBUTE.lastIndex = at;
+    const m = NEXT_ATTRIBUTE.exec(open);
+    if (!m || m[0].length === 0) break;
+    if (!drop.has(m[1].toLowerCase())) out += m[0];
+    at = NEXT_ATTRIBUTE.lastIndex;
+  }
+  return out + open.slice(at);
+}
+
 /**
  * Point every actionless form at the public endpoint and report what was found.
  * A form that already has an action (Formspree, a custom webhook, anything the
@@ -142,7 +172,7 @@ export function wireForms(
        in the URL and got a 405; multipart/plain bodies were refused as
        "Invalid JSON". The endpoint takes urlencoded POST, so that is what is
        sent. */
-    const bare = open.replace(/\s(method|enctype)=("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+    const bare = withoutAttributes(open, SENT_BY_WIRING);
     const rewritten =
       bare.replace(/>$/, `${attrs}>`) + RETURN_FIELD + (spamProtection ? HONEYPOT_FIELD : "");
     out = out.replace(open, rewritten);
