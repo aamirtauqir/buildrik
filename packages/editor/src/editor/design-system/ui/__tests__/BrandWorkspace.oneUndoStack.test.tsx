@@ -33,10 +33,9 @@ beforeEach(installDomShims);
 type RealComposer = ReturnType<typeof createTestComposer>;
 
 const modals = { setShowShortcuts: () => {} };
-const save = () => {};
 
 function Shell({ composer, brandOpen }: { composer: RealComposer; brandOpen: boolean }) {
-  useEditorShortcuts({ composer, modals, saveProject: save });
+  useEditorShortcuts({ composer, modals });
   /* Mounted the way FullPageRouter mounts it: a full-page surface that keeps
      ⌘Z for its own token edits (D36). */
   return brandOpen ? (

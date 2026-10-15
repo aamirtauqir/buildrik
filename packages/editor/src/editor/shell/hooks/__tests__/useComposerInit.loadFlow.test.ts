@@ -32,6 +32,12 @@ const mockComposer = {
   off: vi.fn(),
   emit: vi.fn(),
   saveProject: vi.fn(() => Promise.resolve()),
+  /* BK-11: siteless autosave writes storage directly; same mock. */
+  get saveToStorage() {
+    return this.saveProject;
+  },
+  getChangeSeq: () => 0,
+  setSaveHandler: vi.fn(),
   markSaved: vi.fn(),
   loadProject: vi.fn(() => Promise.resolve(null)),
   importProject: vi.fn(),

@@ -27,6 +27,12 @@ const mockComposer = {
     (eventHandlers[event] ?? []).forEach((h) => h(...args));
   }),
   saveProject: vi.fn(() => Promise.resolve()),
+  /* BK-11: siteless autosave writes storage directly; same mock. */
+  get saveToStorage() {
+    return this.saveProject;
+  },
+  getChangeSeq: () => 0,
+  setSaveHandler: vi.fn(),
   loadProject: vi.fn(() => Promise.resolve(null)),
   importProject: vi.fn(),
   /* The hook announces the dashboard fetch through the composer so the canvas

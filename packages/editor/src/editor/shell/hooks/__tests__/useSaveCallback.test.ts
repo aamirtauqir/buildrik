@@ -32,6 +32,13 @@ function makeOpts() {
   const setIsDirty = vi.fn();
   const composer = {
     saveProject,
+    /* BK-11: the siteless branch writes storage directly (saveProject is the
+       registry entry that routes back here); same mock, so the assertions on
+       `saveProject` keep meaning "storage was written". */
+    saveToStorage: saveProject,
+    getChangeSeq: vi.fn(() => 0),
+    setSaveHandler: vi.fn(),
+    markSaved: vi.fn(),
     exportProject: vi.fn(() => ({ pages: [] })),
   } as unknown as UseSaveCallbackOptions["composer"];
   return { composer, addToast, setSaveState, setIsDirty, saveProject };
@@ -677,5 +684,49 @@ describe("useSaveCallback — TOKENS_INVALID", () => {
     } finally {
       Object.defineProperty(window, "location", { value: original, writable: true });
     }
+  });
+});
+
+
+/* BK-11: an edit made while a save travelled is not on the server — it stays
+   Unsaved until its own save returns. */
+describe("useSaveCallback — edits during an in-flight save (BK-11)", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", "/");
+    svc.saveProject.mockResolvedValue(undefined);
+  });
+
+  it("keeps the document dirty when it changed while the save was in flight", async () => {
+    window.history.replaceState(null, "", "/edit/site-1?siteId=site-1");
+    let seq = 1;
+    let release!: () => void;
+    svc.saveProject.mockImplementationOnce(() => new Promise<void>((r) => (release = r)));
+    const opts = makeOpts();
+    (opts.composer as unknown as { getChangeSeq: () => number }).getChangeSeq = () => seq;
+    const { result } = renderHook(() =>
+      useSaveCallback({ composer: opts.composer, addToast: opts.addToast, setSaveState: opts.setSaveState, setIsDirty: opts.setIsDirty }),
+    );
+    let done!: Promise<unknown>;
+    act(() => {
+      done = result.current();
+    });
+    seq = 2; // an edit lands while the save is travelling
+    await act(async () => {
+      release();
+      await done;
+    });
+    expect(opts.setIsDirty).not.toHaveBeenCalledWith(false);
+    expect((opts.composer as unknown as { markSaved: ReturnType<typeof vi.fn> }).markSaved).not.toHaveBeenCalled();
+  });
+
+  it("installs itself as the composer's save, and removes itself on unmount", () => {
+    const opts = makeOpts();
+    const setSaveHandler = (opts.composer as unknown as { setSaveHandler: ReturnType<typeof vi.fn> }).setSaveHandler;
+    const { unmount } = renderHook(() =>
+      useSaveCallback({ composer: opts.composer, addToast: opts.addToast, setSaveState: opts.setSaveState, setIsDirty: opts.setIsDirty }),
+    );
+    expect(setSaveHandler).toHaveBeenCalledWith(expect.any(Function));
+    unmount();
+    expect(setSaveHandler).toHaveBeenLastCalledWith(null);
   });
 });

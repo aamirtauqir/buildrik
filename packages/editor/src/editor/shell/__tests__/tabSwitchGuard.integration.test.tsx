@@ -59,7 +59,6 @@ function Harness({ composer }: { composer: ReturnType<typeof makeComposer> }) {
   useEditorShortcuts({
     composer: c,
     modals: { setShowShortcuts: vi.fn() },
-    saveProject: vi.fn(),
     openLeftPanelToTab: guarded.openLeftPanelToTab,
     openSiteSettings: () => guarded.openLeftPanelToTab("settings"),
   });

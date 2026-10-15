@@ -703,7 +703,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
         setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
         const savePromise = snapshot
           ? saveProject(siteId!, snapshot).then(() => undefined)
-          : composer.saveProject();
+          : composer.saveToStorage();
 
         savePromise
           .then(() => {

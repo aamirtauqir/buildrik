@@ -635,10 +635,39 @@ export class Composer extends EventEmitter {
     }
   }
 
+  /* BK-11: the shell's one save (the dashboard RPC for a site-bound editor,
+     with conflict, offline and recovery handling). ⌘S, the palette and every
+     other caller of saveProject() go through it, so a project has ONE save
+     path. Unset (tests, the standalone demo) = write to storage. */
+  private saveHandler: (() => Promise<void>) | null = null;
+  /* Counts document changes, so a save in flight can tell whether what it
+     sent is still the current document (BK-11): an edit made while a save
+     travelled stays Unsaved until its own save returns. */
+  private changeSeq = 0;
+
+  /** Install (or clear, with null) the shell's save — see saveHandler. */
+  setSaveHandler(handler: (() => Promise<void>) | null): void {
+    this.saveHandler = handler;
+  }
+
+  /** Increases on every document change (markDirty). */
+  getChangeSeq(): number {
+    return this.changeSeq;
+  }
+
   /**
-   * Save current project
+   * Save the project through the shell's save when one is installed,
+   * otherwise to storage.
    */
   async saveProject(): Promise<void> {
+    if (this.saveHandler) return this.saveHandler();
+    return this.saveToStorage();
+  }
+
+  /**
+   * Write the project to this composer's storage adapter and announce it.
+   */
+  async saveToStorage(): Promise<void> {
     /* PROJECT_SAVING, not PROJECT_SAVED-with-a-flag. Listeners read the event
        NAME: useDirtyPages clears every dirty page marker on PROJECT_SAVED, so
        announcing the save before storage.save() ran cleared the markers up
@@ -1149,6 +1178,7 @@ ${html}${interactionScript}
     if (!this.state.dirty) {
       this.state.dirty = true;
     }
+    this.changeSeq += 1;
     if (this.transactionDepth > 0) {
       this.transactionDirty = true;
       return;

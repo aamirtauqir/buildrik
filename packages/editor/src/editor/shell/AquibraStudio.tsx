@@ -462,7 +462,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   useEditorShortcuts({
     composer,
     modals,
-    saveProject,
     openLeftPanelToTab: guardedOpenLeftPanelToTab,
     /* FC-11: same door the site menu's "Site settings" row uses — both go
        straight to the Settings tab now, the way S and ⌘K already did. This

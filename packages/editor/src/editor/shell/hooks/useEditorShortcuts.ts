@@ -3,7 +3,8 @@
  * stage 1). Owns the global window keydown handler that drives the
  * editor's keyboard shortcuts:
  *
- *   Cmd/Ctrl+S            → saveProject()
+ *   (Cmd/Ctrl+S is the command registry's `save`, which runs the shell's save
+ *    through composer.saveProject() — one handler everywhere, BK-11.)
  *   Cmd/Ctrl+Z            → composer.history.undo()
  *   Cmd/Ctrl+Shift+Z      → composer.history.redo()
  *   Cmd/Ctrl+Y            → composer.history.redo()
@@ -65,7 +66,6 @@ const isQuestionMark = (e: KeyboardEvent) => e.key === "?" && !e.metaKey && !e.c
 export interface UseEditorShortcutsOptions {
   composer: Composer | null;
   modals: ShortcutModals;
-  saveProject: () => void;
   /** Opens a left-panel destination; the site menu prints these shortcuts. */
   openLeftPanelToTab?: (primaryTab: string, subTab?: string) => void;
   /**
@@ -83,7 +83,6 @@ export interface UseEditorShortcutsOptions {
 export function useEditorShortcuts({
   composer,
   modals,
-  saveProject,
   openLeftPanelToTab,
   openSiteSettings,
   reviewsEnabled = true,
@@ -165,11 +164,6 @@ export function useEditorShortcuts({
       // the one table (it also feeds the keyboard-shortcuts sheet), so this
       // one stands down.
 
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault();
-        saveProject();
-      }
-
       /* ⌘P — Preview. Printed in two places (the ⌘K palette's Preview row and
          the keyboard-shortcuts panel) and bound nowhere, so the chord fell
          through to the browser and opened its PRINT dialog over the editor.
@@ -227,5 +221,5 @@ export function useEditorShortcuts({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [saveProject, composer, modals, openLeftPanelToTab, openSiteSettings, reviewsEnabled]);
+  }, [composer, modals, openLeftPanelToTab, openSiteSettings, reviewsEnabled]);
 }
