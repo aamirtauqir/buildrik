@@ -68,3 +68,12 @@ Return exactly this structure, concise:
    each with who or what can resolve it.
 
 No praise, no restating the request, no reasoning transcript.
+
+When you run as part of a factory task (the PM gives you a task ID), end with exactly:
+
+```
+TASK: <ID>
+ROLE: design-guard-reviewer
+READINESS: PROPOSAL | DESIGN READY | IMPLEMENTATION VERIFIED | PARTIALLY VERIFIED | BLOCKED
+VERDICT: PASS | FAIL
+```

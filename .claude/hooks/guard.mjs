@@ -70,6 +70,32 @@ try { input = JSON.parse(readFileSync(0, "utf8")); } catch { process.exit(0); }
 const tool = input.tool_name ?? "";
 const ti = input.tool_input ?? {};
 
+// ── Factory roles (input.agent_type is set when a subagent makes the call) ──
+// Who-may-write is enforced here, not only in each agent's tool list: a role
+// that cannot edit has nothing to defend when its work is reviewed.
+const ROLE = input.agent_type ?? "";
+const READ_ONLY_ROLES = new Set(["factory-qa", "factory-code-reviewer", "factory-security", "design-guard-reviewer"]);
+const WRITE_SCOPE = {
+  "factory-analyst": [/^docs\/factory\/tasks\/T-\d+\/(?!task\.md$)[^/]+$/, "its task folder (spec.md), never task.md"],
+  "factory-designer": [/^docs\/factory\/tasks\/T-\d+\/design\//, "docs/factory/tasks/<ID>/design/"],
+};
+const isFactory = ROLE.startsWith("factory-") || READ_ONLY_ROLES.has(ROLE);
+const WRITE_TOOLS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
+
+if (isFactory && WRITE_TOOLS.has(tool) && READ_ONLY_ROLES.has(ROLE)) {
+  decide("deny", `${ROLE} is read-only — it reports, it does not change files`);
+}
+if (isFactory && tool === "Bash") {
+  const raw = String(ti.command ?? "");
+  if (/\bgh\s+pr\s+merge\b/.test(raw)) decide("deny", `${ROLE} cannot merge — the PM merges after every gate passes`);
+  if (/\bgit\b[^\n]*\bpush\b/.test(raw) && !/\bgit\b[^\n]*\bpush\b[^\n]*\bfactory\/T-\d+\b/.test(raw)) {
+    decide("deny", `${ROLE} may push only its own factory/<ID> branch, never main`);
+  }
+  if (READ_ONLY_ROLES.has(ROLE) && /\bgit\s+(commit|push|add|reset|checkout\s+--|restore)\b/.test(raw)) {
+    decide("deny", `${ROLE} is read-only — no commits, staging or resets`);
+  }
+}
+
 if (tool === "Bash") {
   // Match what runs, not what is written: a commit message that MENTIONS
   // `git stash` is not a stash. Only message text is dropped — the quoted
@@ -93,6 +119,10 @@ if (file) {
   const rel = (isAbsolute(file) ? relative(root, file) : file).split("\\").join("/")
     .replace(/^(\.claude\/)?\.?worktrees\/[^/]+\//, "");
   if (rel.startsWith("..")) process.exit(0);
+  if (isFactory && /^docs\/factory\/tasks\/[^/]+\/task\.md$/.test(rel)) decide("deny", "only the PM (main session) edits task.md — return your result instead");
+  if (isFactory && /^docs\/factory\/(RULES|README)\.md$|^\.claude\//.test(rel)) decide("deny", `${ROLE} cannot change the factory's own rules, agents or hooks`);
+  const scope = WRITE_SCOPE[ROLE];
+  if (scope && !scope[0].test(rel)) decide("deny", `${ROLE} may write only in ${scope[1]} (tried ${rel})`);
   for (const [re, why] of ASK_PATHS) if (re.test(rel)) decide("ask", `${rel} is ${why} — confirm before editing`);
 }
 process.exit(0);
