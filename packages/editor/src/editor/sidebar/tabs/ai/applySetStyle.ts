@@ -7,6 +7,7 @@ import { placeCatalogComponent } from "@/editor/components-catalog/placeCatalogC
 import { canWrite } from "@/engine/commands/commandOperations";
 import { EVENTS } from "@/shared/constants/events";
 import { isDangerousUrl } from "@buildrik/shared/schemas/element-markup";
+import { elementSelector } from "@/shared/utils/elementSelector";
 
 /**
  * v1 in-canvas AI command: `set-style`. Desktop / normal-state inline styles
@@ -376,7 +377,6 @@ export function applySetAttribute(composer: Composer, args: SetAttributeArgs): v
  * (`[data-buildrick-id="<id>"]`) and routing: pseudo → setRule with the pseudo
  * + media query; breakpoint-only → setBreakpointStyle.
  */
-const elementSelector = (id: string) => `[data-buildrick-id="${id}"]`;
 
 export const setStyleVariantArgsSchema = z
   .object({

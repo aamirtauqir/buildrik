@@ -19,6 +19,7 @@ import { devWarn } from "@/shared/utils/devLogger";
 import { generateId, camelToKebab } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
+import { elementSelector } from "@/shared/utils/elementSelector";
 
 /** The Inspector State menu's states (Base · :hover · :focus · :active · :disabled). */
 const STATE_PSEUDO = /:(hover|focus|focus-visible|focus-within|active|disabled)\b/;
@@ -202,7 +203,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
     const mediaQuery = getBreakpointQuery(breakpoint);
 
     // For desktop (base styles), use regular setRule without media query
@@ -225,7 +226,7 @@ export class StyleEngine {
    */
   getBreakpointStyles(elementId: string): BreakpointStyles {
     const result: BreakpointStyles = {};
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
 
     for (const breakpoint of BREAKPOINT_ORDER) {
       const mediaQuery = getBreakpointQuery(breakpoint);
@@ -250,7 +251,7 @@ export class StyleEngine {
       return {};
     }
 
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
     const mediaQuery = getBreakpointQuery(breakpoint);
     const style = this.findRule(selector, mediaQuery ?? undefined);
 
@@ -272,7 +273,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
     const mediaQuery = getBreakpointQuery(breakpoint);
     const style = this.findRule(selector, mediaQuery ?? undefined);
 
@@ -310,7 +311,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
     const mediaQuery = getBreakpointQuery(breakpoint);
     this.removeRule(selector, mediaQuery ?? undefined);
 
@@ -728,7 +729,7 @@ export class StyleEngine {
     // Batched: setProperty calls are coalesced into a single RAF flush
     propsToInherit.forEach((prop) => {
       if (fromStyles.properties[prop]) {
-        this.setProperty(`[data-buildrick-id="${to.getId()}"]`, prop, fromStyles.properties[prop]);
+        this.setProperty(elementSelector(to.getId()), prop, fromStyles.properties[prop]);
       }
     });
 
@@ -777,7 +778,7 @@ export class StyleEngine {
    * Get styles for an element ID
    */
   getStyles(elementId: string): StyleData | undefined {
-    return this.findRule(`[data-buildrick-id="${elementId}"]`);
+    return this.findRule(elementSelector(elementId));
   }
 
   /**

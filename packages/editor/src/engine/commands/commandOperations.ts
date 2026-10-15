@@ -8,7 +8,10 @@
 
 import { snapToGrid } from "@/shared/utils/dragDrop";
 import { EVENTS } from "@/shared/constants/events";
-import { isValidBreakpoint } from "@/shared/constants/breakpoints";
+import { getBreakpointQuery, isValidBreakpoint } from "@/shared/constants/breakpoints";
+import { elementSelector } from "@/shared/utils/elementSelector";
+import type { PseudoStateId } from "@/shared/types";
+import { resolveStyle, type StyleLayerSource } from "../styles/ResolvedStyle";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
@@ -247,18 +250,33 @@ export function activeBreakpoint(composer: Pick<Composer, "device">): Breakpoint
   return device && isValidBreakpoint(device) ? device : "desktop";
 }
 
+/** One element's style layers, read from its own data and the composer's rules. */
+function styleLayers(composer: Pick<Composer, "styles"> | null | undefined, el: Element): StyleLayerSource {
+  // The id is read only when a breakpoint or state layer is asked for: a
+  // desktop/normal read needs the element's own styles and nothing else.
+  return {
+    base: () => ({ ...(el.getStyles?.() || {}) }),
+    breakpoint: (bp) => composer?.styles?.getBreakpointStyle(el.getId(), bp) ?? {},
+    state: (state, bp) =>
+      composer?.styles?.getRule(`${elementSelector(el.getId())}:${state}`, getBreakpointQuery(bp) ?? undefined)
+        ?.properties ?? {},
+  };
+}
+
 /**
- * The element's styles as they apply at `breakpoint`: the base, with that
- * breakpoint's override on top. The read side of setStyleAt.
+ * The element's styles as they apply at `breakpoint` (and, optionally, in a
+ * pseudo-state), by the published cascade — see ResolvedStyle. The read side
+ * of setStyleAt. Mobile includes the tablet layer, as a phone viewport also
+ * matches the tablet query; it used to read base + mobile only, so a tablet
+ * value the canvas showed on Mobile was missing from the inspector (BK-10).
  */
 export function stylesAt(
   composer: Pick<Composer, "styles"> | null | undefined,
   el: Element,
   breakpoint: BreakpointId,
+  state: PseudoStateId = "normal",
 ): Record<string, string> {
-  const base = { ...(el.getStyles?.() || {}) };
-  if (breakpoint === "desktop" || !composer?.styles) return base;
-  return { ...base, ...composer.styles.getBreakpointStyle(el.getId(), breakpoint) };
+  return resolveStyle(styleLayers(composer, el), breakpoint, state);
 }
 
 /**

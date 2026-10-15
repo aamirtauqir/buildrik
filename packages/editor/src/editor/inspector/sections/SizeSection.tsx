@@ -28,6 +28,7 @@ import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER } from "../shared/controls/controlClasses";
 import { ItemControls, type ParentLayout } from "./layout/ItemControls";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
+import { elementSelector } from "@/shared/utils/elementSelector";
 
 // ============================================================================
 // FIXED · FILL · HUG
@@ -127,7 +128,7 @@ function useRenderedSize(elementId: string | undefined): { width: number; height
   const [size, setSize] = React.useState<{ width: number; height: number } | null>(null);
   React.useLayoutEffect(() => {
     if (!elementId || typeof document === "undefined") return undefined;
-    const selector = `[data-buildrick-id="${elementId.replace(/["\\]/g, "\\$&")}"]`;
+    const selector = elementSelector(elementId);
     let node: HTMLElement | null = null;
     const read = () =>
       node && (node.offsetWidth || node.offsetHeight) ? setSize({ width: node.offsetWidth, height: node.offsetHeight }) : setSize(null);
