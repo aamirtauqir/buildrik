@@ -94,8 +94,17 @@ if (isFactory && tool === "Bash") {
   // Upstream and push-config rewrites are denied so a bare push cannot be aimed
   // elsewhere. GitHub cannot tell an agent from the founder (same token, admin
   // bypass), so this hook is the control for agents — keep it strict.
-  const pushes = raw.replace(/\s*\d?>&\d/g, "").replace(/\s*\d?>>?\s*\S+/g, "")
-    .match(/\bgit\b[^\n;&|]*\bpush\b[^\n;&|]*/g) ?? [];
+  // Config can also arrive through the environment or `git -c`; for an agent
+  // there is no legitimate reason to set either.
+  if (/\bGIT_[A-Z_]+=|\bexport\s+GIT_|\benv\b[^\n]*\bgit\b|\bgit\s+(-c|--config-env)\b/i.test(raw)) {
+    decide("deny", `${ROLE} cannot run git with injected config (GIT_* env, env …, git -c)`);
+  }
+  const unredirected = raw.replace(/\s*\d?>&\d/g, "").replace(/\s*\d?>>?\s*\S+/g, "");
+  const pushes = unredirected.match(/\bgit\b[^\n;&|]*\bpush\b[^\n;&|]*/g) ?? [];
+  // A push not at a command position (after a prefix such as `nice`, `xargs`,
+  // `sh -c`) is not one this rule can read — deny it rather than guess.
+  const atCommandPos = unredirected.match(/(^|[;&|(]\s*|\n\s*)git\s+push\b/g) ?? [];
+  if (pushes.length !== atCommandPos.length) decide("deny", `${ROLE} may only run git push directly, not through a wrapper`);
   const PUSH_OK = /^git\s+push(\s+(-u|--set-upstream))?\s+origin\s+(factory\/T-\d+)(:\3)?\s*$/;
   for (const p of pushes) {
     if (!PUSH_OK.test(p.trim())) decide("deny", `${ROLE} may only run: git push -u origin factory/<ID> (got: ${p.trim()})`);

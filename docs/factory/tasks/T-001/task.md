@@ -2,8 +2,8 @@
 
 <!-- Ledger. Only the PM (main session) edits this file. -->
 
-- **Status:** spec
-- **Stage owner:** founder (spec approval)
+- **Status:** spec-approved
+- **Stage owner:** factory-developer
 - **Created:** 2026-10-15
 - **Founder issue (verbatim):** "(factory pilot, from the 2026-10-15 readiness audit) packages/editor/CLAUDE.md §ENV says prod values live in 'Vercel project settings'; prod is cPanel."
 - **Guarded areas touched:** none
@@ -16,7 +16,11 @@ Agents reading packages/editor/CLAUDE.md are told the true place production env 
 
 ## Done-condition
 
-(pending founder approval — see spec.md §Done-condition)
+- [ ] `grep -n -i "vercel project settings" packages/editor/CLAUDE.md` → no output (exit 1)
+- [ ] `sed -n 511,520p packages/editor/CLAUDE.md` → names cPanel, references root CLAUDE.md "Where the values live", mentions NEXT_PUBLIC_* baked at build
+- [ ] `git diff --stat main` → only packages/editor/CLAUDE.md (plus task docs); only the ~:513-515 paragraph
+- [ ] `pnpm run audit:rules` → no new finding for packages/editor/CLAUDE.md
+- [ ] Old behaviour: ENV table, Notes and every other section byte-identical
 
 ## Stage log
 
@@ -26,9 +30,9 @@ Agents reading packages/editor/CLAUDE.md are told the true place production env 
 
 ## Founder decisions
 
+- 2026-10-15 spec approved: "Approve, run the pipeline" (follow-ups stay out of scope).
 - 2026-10-15 founder asked for the full team workflow to be built and piloted ("complate workflow banoo pori team rakhoo is project ka lia").
 
 ## Open questions
 
-- Spec approval (founder).
 - Follow-ups proposed by analyst, not in scope: editor CLAUDE.md:513 `VITE_`-only prefix claim; :521 "once Vercel pipeline live".

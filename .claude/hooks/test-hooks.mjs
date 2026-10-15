@@ -77,6 +77,10 @@ for (const [label, command] of [
   ["git -C", "git -C . push origin factory/T-001:main"], ["push config", "git config remote.origin.push refs/heads/x:refs/heads/main"],
   ["set upstream", "git branch --set-upstream-to=origin/main"], ["remote set-url", "git remote set-url origin x"],
   ["chained", "git push -u origin factory/T-001 && git push origin HEAD:main"], ["tags", "git push --tags"],
+  ["GIT_CONFIG env", "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=remote.origin.push GIT_CONFIG_VALUE_0=refs/heads/factory/T-001:refs/heads/main git push origin factory/T-001"],
+  ["export GIT_", "export GIT_CONFIG_PARAMETERS=x; git push origin factory/T-001"], ["env prefix", "env FOO=1 git push origin factory/T-001"],
+  ["git -c", "git -c remote.origin.push=x push origin factory/T-001"], ["wrapper", "nice git push origin factory/T-001"],
+  ["sh -c", "sh -c 'git push origin factory/T-001'"], ["xargs", "echo x | xargs git push origin factory/T-001"],
 ]) expect(`dev push bypass: ${label}`, guard("factory-developer", "Bash", { command }), "deny");
 expect("dev push -u ok", guard("factory-developer", "Bash", { command: "git push -u origin factory/T-001 2>&1 | tail -3" }), "allow");
 for (const [label, command] of [
