@@ -190,10 +190,20 @@ export function parseScript(src, depth = 0) {
       for (; k < words.length; k++) {
         const w = words[k];
         if (w === "--") { k++; break; }
-        if (/^[-+][oO]$/.test(w)) { k++; continue; }
         if (w === "--rcfile" || w === "--init-file") { k++; continue; }
         if (/^--/.test(w)) { if (/^--(norc|noprofile|posix|login|noediting|restricted|verbose)$/.test(w)) continue; return null; }
-        if (/^[-+][a-zA-Z]+$/.test(w)) { if (w[0] === "-" && w.includes("c")) hasC = true; if (w[0] === "-" && w.includes("s")) return null; continue; }
+        if (/^[-+][a-zA-Z]+$/.test(w)) {
+          // like bash: every o/O in a cluster consumes one following word
+          let need = 0;
+          for (const ch of w.slice(1)) {
+            if (ch === "o" || ch === "O") need++;
+            else if (ch === "c" && w[0] === "-") hasC = true;
+            else if (ch === "s" && w[0] === "-") return null;
+          }
+          if (k + need >= words.length) return null;
+          k += need;
+          continue;
+        }
         break;
       }
       const operand = words[k];

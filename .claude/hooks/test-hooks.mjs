@@ -88,6 +88,7 @@ for (const [label, command] of [
   ["GIT_ via raw", "X=GIT_DIR; git status"], ["xargs gh", "echo 31 | xargs gh pr merge"],
   ["bash -ec", "bash -ec 'git push origin main'"], ["here-string", "bash <<< 'git push origin main'"], ["pipe to bash", "echo 'git push origin main' | bash"],
   ["bash -c -x", "bash -c -x 'git push origin main'"], ["bash -o opt -c", "bash -o errexit -c 'git push origin main'"], ["bash -c -- code", "bash -c -- 'git push origin main'"],
+  ["bash -oc", "bash -oc errexit 'git push origin main'"], ["bash -eo pipefail -c", "bash -eo pipefail -c 'git push origin main'"],
   ["bash /dev/stdin", "echo x | bash /dev/stdin"], ["bash -", "echo x | bash -"], ["bare bash", "bash"], ["bash unknown --opt", "bash --weird -c 'git push origin main'"],
   ["ansi-c quote", "git push origin $'main'"], ["bash < file", "bash < /tmp/x.sh"], ["sh -s", "printf x | sh -s"],
   ["heredoc to bash", "bash <<'EOF'\ngit push origin main\nEOF"], ["unbalanced quote", "git push origin 'factory/T-001"],
