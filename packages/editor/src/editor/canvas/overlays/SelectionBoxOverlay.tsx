@@ -472,6 +472,9 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
           width={width}
           height={height}
           onHandleMouseDown={handleMouseDown}
+          onHandleKeyResize={(direction, amount) => {
+            if (elementId) composer?.canvas.resize?.keyboardResize(elementId, direction, amount);
+          }}
         />
       )}
 

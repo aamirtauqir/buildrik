@@ -9,7 +9,7 @@ import type { SelectionBox } from "@/shared/types/canvas";
 import { devLog } from "@/shared/utils/devLogger";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
-import { getElementBounds, getElementRotation } from "./canvasGeometry";
+import { getCanvasScale, getElementBounds, getElementRotation } from "./canvasGeometry";
 import {
   DEFAULT_CONSTRAINTS,
   ELEMENT_CONSTRAINTS,
@@ -24,7 +24,9 @@ import {
   applyMultiResizeToDOM,
   applyBoundsToModel,
   applyMultiResizeToModel,
+  axesForHandle,
   releaseGestureStyles,
+  toCssBounds,
 } from "./resize/DOMUpdater";
 import { hitTestHandles, hitTestRotation, hitTestBorder, hitTest } from "./resize/HitTester";
 import { ResizeInputManager, InputModifiers } from "./resize/ResizeInputManager";
@@ -93,6 +95,15 @@ export class ResizeHandler extends EventEmitter {
     mouseY: number,
     options: ResizeOptions = {}
   ): boolean {
+    /* OV-E4: one gesture at a time. A second start while one is open (a lost
+       mouseup, a handle pressed again) used to open a second transaction and
+       leave the first one holding autosave for the rest of the session. The
+       open gesture is committed as it stands first. */
+    if (this.resizeState) {
+      const open = this.resizeState;
+      this.finishResize(open.currentMouse.x, open.currentMouse.y);
+    }
+
     const element = this.composer.elements.getElement(elementId);
     if (!element) return false;
 
@@ -101,16 +112,27 @@ export class ResizeHandler extends EventEmitter {
 
     const bounds = getElementBounds(domElement);
     if (!bounds) return false;
+    if (![mouseX, mouseY].every(Number.isFinite)) return false;
 
     // Get element type for constraints
     const elementType = element.getType?.() || "container";
     const typeConstraints = ELEMENT_CONSTRAINTS[elementType] || {};
 
     // Merge configurations
-    const constraints: SizeConstraints = {
+    const merged: SizeConstraints = {
       ...DEFAULT_CONSTRAINTS,
       ...typeConstraints,
       ...options.constraints,
+    };
+    /* The gesture works in screen px; the limits are CSS px. Unscaled, a 40px
+       minimum stopped a 50 %-zoom drag at 80 CSS px (BK-01). */
+    const scale = getCanvasScale();
+    const constraints: SizeConstraints = {
+      ...merged,
+      minWidth: merged.minWidth * scale,
+      minHeight: merged.minHeight * scale,
+      maxWidth: merged.maxWidth * scale,
+      maxHeight: merged.maxHeight * scale,
     };
 
     /* The project's own snap setting is the base. It used to be DEFAULT_SNAP_CONFIG
@@ -163,6 +185,9 @@ export class ResizeHandler extends EventEmitter {
       lastAppliedBounds: null,
       rafId: null,
       boundaryConstraints,
+      scale,
+      moved: false,
+      modelTouched: false,
     };
 
     this.isResizing = true;
@@ -227,24 +252,20 @@ export class ResizeHandler extends EventEmitter {
     const bounds = getElementBounds(domElement);
     if (!bounds) return false;
 
-    const newBounds = { ...bounds };
+    /* BK-02: measured on screen, written in CSS px, one axis per key, and
+       never a non-finite value (applyBoundsToModel refuses those). */
+    const css = toCssBounds(bounds, getCanvasScale());
+    const vertical = direction === "up" || direction === "down";
+    const sign = direction === "down" || direction === "right" ? 1 : -1;
+    if (vertical) css.height = Math.max(10, css.height + sign * amount);
+    else css.width = Math.max(10, css.width + sign * amount);
 
-    switch (direction) {
-      case "up":
-        newBounds.height = Math.max(10, bounds.height - amount);
-        break;
-      case "down":
-        newBounds.height = bounds.height + amount;
-        break;
-      case "left":
-        newBounds.width = Math.max(10, bounds.width - amount);
-        break;
-      case "right":
-        newBounds.width = bounds.width + amount;
-        break;
-    }
-
-    applyBoundsToModel(elementId, newBounds, this.composer);
+    applyBoundsToModel(elementId, css, this.composer, {
+      width: !vertical,
+      height: vertical,
+      left: false,
+      top: false,
+    });
     // The model change reaches the canvas through its stylesheet; nothing
     // inline to write or leave behind.
     releaseGestureStyles(this.composer);
@@ -261,16 +282,15 @@ export class ResizeHandler extends EventEmitter {
 
     if (state.rafId !== null) cancelAnimationFrame(state.rafId);
 
+    /* BK-03: cancelling called history.undo() — which undid whatever came
+       BEFORE the gesture (a saved Align change) and autosaved the loss. The
+       gesture only ever changed its own transaction: closed untouched it
+       records nothing; if it grew a parent, that transaction is rolled back. */
     if (state.options.useTransaction !== false) {
-      try {
-        this.composer.endTransaction?.();
-        this.composer.history?.undo?.();
-      } catch {
-        /* ignore */
-      }
+      if (state.modelTouched) this.composer.rollbackTransaction?.();
+      else this.composer.endTransaction?.();
     }
-    // The undo restored the model; drop the drag's inline feedback so the
-    // stylesheet's (restored) values show.
+    // Drop the drag's inline feedback so the stylesheet's values show.
     releaseGestureStyles(this.composer);
     this.composer.canvas.indicators?.createSelectionBox(state.elementId);
     this.emit(EVENTS.RESIZE_CANCEL, { elementId: state.elementId });
@@ -325,6 +345,7 @@ export class ResizeHandler extends EventEmitter {
 
     const state = this.resizeState;
     state.currentMouse = { x: mouseX, y: mouseY };
+    if (mouseX !== state.startMouse.x || mouseY !== state.startMouse.y) state.moved = true;
 
     if (state.rafId !== null) {
       cancelAnimationFrame(state.rafId);
@@ -339,7 +360,7 @@ export class ResizeHandler extends EventEmitter {
         ? calculateRotationBounds(state, mouseX, mouseY)
         : calculateResizeBounds(state, mouseX, mouseY, this.composer);
 
-      applyBoundsToDOM(state.elementId, newBounds);
+      applyBoundsToDOM(state.elementId, newBounds, state.scale);
 
       if (state.additionalElementIds.length > 0) {
         applyMultiResizeToDOM(state, newBounds);
@@ -361,14 +382,24 @@ export class ResizeHandler extends EventEmitter {
       cancelAnimationFrame(state.rafId);
     }
 
+    if (mouseX !== state.startMouse.x || mouseY !== state.startMouse.y) state.moved = true;
     const finalBounds = this.isRotating
       ? calculateRotationBounds(state, mouseX, mouseY)
       : calculateResizeBounds(state, mouseX, mouseY, this.composer);
 
-    applyBoundsToModel(state.elementId, finalBounds, this.composer);
-
-    if (state.additionalElementIds.length > 0) {
-      applyMultiResizeToModel(state, finalBounds, this.composer);
+    /* BK-01: a press-and-release with no movement is not a resize — it wrote
+       both axes from a measured (and, zoomed, halved) box. Otherwise only the
+       dragged handle's axes are written, in CSS px. */
+    if (state.moved && Object.values(finalBounds).every((v) => v === undefined || Number.isFinite(v))) {
+      applyBoundsToModel(
+        state.elementId,
+        toCssBounds(finalBounds, state.scale),
+        this.composer,
+        axesForHandle(String(state.handle)),
+      );
+      if (state.additionalElementIds.length > 0) {
+        applyMultiResizeToModel(state, finalBounds, this.composer);
+      }
     }
 
     if (state.options.useTransaction !== false) {

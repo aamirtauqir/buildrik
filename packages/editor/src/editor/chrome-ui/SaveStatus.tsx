@@ -16,8 +16,9 @@ import React from "react";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 /* The LOCAL Tooltip — see HelpTooltip.tsx. */
 import { Tooltip } from "./Tooltip";
+import { Popover } from "./Popover";
 
-export type SaveState = "saved" | "saving" | "unsaved" | "conflict" | "offline" | "error";
+export type SaveState = "saved" | "saving" | "unsaved" | "stalled" | "conflict" | "offline" | "error";
 
 export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
   state: SaveState;
@@ -37,6 +38,11 @@ export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
    * 7563:233691's tooltip). Rendered as a tooltip on the plain pill.
    */
   hint?: string;
+  /** `stalled` only: how long the oldest unsaved change has waited (ms). */
+  stalledFor?: number;
+  /** A panel the pill opens (the stalled state's "Autosave is stuck"). The
+   *  pill becomes its trigger; open/close are the container's. */
+  panel?: { open: boolean; onClose: () => void; label: string; content: React.ReactNode };
 }
 
 /** U1: one relative-time SSOT — seconds granularity preserved for saves.
@@ -65,7 +71,17 @@ const COPY: Record<Exclude<SaveState, "saved">, string> = {
      The announcement was the true one. */
   offline: "Offline — not saved",
   error: "Save failed — retry",
+  /* Design decision 4: dirty for 30 s with no save attempt. The age is added
+     by `stalledLabel`. */
+  stalled: "Not saving",
 };
+
+/** "Not saving · unsaved for 45 s" / "… for 3 min". */
+function stalledLabel(ms: number | undefined): string {
+  if (!ms || !Number.isFinite(ms)) return COPY.stalled;
+  const s = Math.round(ms / 1000);
+  return `${COPY.stalled} · unsaved for ${s < 120 ? `${s} s` : `${Math.round(s / 60)} min`}`;
+}
 
 /* `leading-[normal]` is the board's value (all five label nodes on 813:4836)
    and it has to be said out loud: `text-xs` carries a 16px line-height of its
@@ -94,6 +110,7 @@ const STATE_CLASS: Record<SaveState, string> = {
   saved: "tw:bg-transparent tw:text-[var(--bk-success-text)]",
   saving: "tw:bg-transparent tw:text-[var(--bk-ink-soft)]",
   unsaved: "tw:bg-transparent tw:text-[var(--bk-warning-text)]",
+  stalled: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
   conflict: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
   offline: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
   error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
@@ -106,16 +123,18 @@ const DOT_CLASS: Record<SaveState, string> = {
   saved: "tw:bg-[var(--bk-success)]",
   saving: "tw:bg-[var(--bk-gray-500)]",
   unsaved: "tw:bg-[var(--bk-warning)]",
+  stalled: "tw:bg-[var(--bk-warning)]",
   conflict: "tw:bg-[var(--bk-warning)]",
   offline: "tw:bg-[var(--bk-warning)]",
   error: "tw:bg-[var(--bk-error)]",
 };
 
-export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }: SaveStatusProps) {
+export function SaveStatus({ state, savedAt, onClick, hint, stalledFor, panel, className, ...rest }: SaveStatusProps) {
   /* Board 4418:123573 (v3 IA): the settled pill IS the History door —
      "● History ›" — when it has one; the saved time moves to its title.
      Without a door (view mode) it stays "Saved". */
-  const label = state === "saved" ? (onClick ? "History ›" : "Saved") : COPY[state];
+  const label =
+    state === "saved" ? (onClick ? "History ›" : "Saved") : state === "stalled" ? stalledLabel(stalledFor) : COPY[state];
   const actionable = Boolean(onClick);
   /* Board 4418:123573: the door reads as a link — blue text, green dot. */
   const stateClass = state === "saved" && onClick ? "tw:bg-transparent tw:text-[var(--bk-accent)]" : STATE_CLASS[state];
@@ -155,7 +174,7 @@ export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }
      caller passed — id, aria-describedby, a test hook — was silently dropped
      for exactly the two states that are actionable. */
   if (actionable) {
-    return (
+    const button = (
       <button
         type="button"
         className={classes}
@@ -168,6 +187,13 @@ export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }
         {label}
         {stamp}
       </button>
+    );
+    return panel ? (
+      <Popover open={panel.open} onClose={panel.onClose} placement="bottom" label={panel.label} trigger={button}>
+        {panel.content}
+      </Popover>
+    ) : (
+      button
     );
   }
   const pill = (

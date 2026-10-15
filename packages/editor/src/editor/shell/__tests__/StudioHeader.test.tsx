@@ -230,7 +230,7 @@ describe("StudioHeader", () => {
     it("the breadcrumb: site opens Pages, page is the current crumb and closes the drawer", () => {
       const onOpenPages = vi.fn();
       const onCloseDrawer = vi.fn();
-      const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Menu" }) } };
+      const composer = { getChangeSeq: () => 0, isDirty: () => false, isTransactionActive: () => false,  on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Menu" }) } };
       render(<StudioHeader {...makeProps({ onOpenPages, onCloseDrawer, composer: composer as never })} />);
       expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
       expect(screen.getByTestId("topbar-crumb-page").getAttribute("aria-current")).toBe("page");
@@ -245,7 +245,7 @@ describe("StudioHeader", () => {
        through ui:crumb-context; null gives it back to the page. */
     it("the page crumb follows ui:crumb-context", () => {
       const handlers = new Map<string, (p: unknown) => void>();
-      const composer = {
+      const composer = { getChangeSeq: () => 0, isDirty: () => false, isTransactionActive: () => false,
         on: vi.fn((ev: string, fn: (p: unknown) => void) => handlers.set(ev, fn)),
         off: vi.fn(),
         emit: vi.fn(),
@@ -609,7 +609,7 @@ describe("StudioHeader", () => {
     /* The topbar's resting ⌘K search button was removed (owner decision
        2026-10-03, overriding board 4418:123573) — in view mode it was already
        withheld (gap walk 93 #7); now the ordinary editor draws none either. */
-    const searchComposer = () => ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Home" }) } });
+    const searchComposer = () => ({ getChangeSeq: () => 0, isDirty: () => false, isTransactionActive: () => false, on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Home" }) } });
 
     it("draws no ⌘K search button in view mode", () => {
       render(<StudioHeader {...makeProps({ composer: searchComposer() as never })} />);
@@ -725,7 +725,7 @@ describe("StudioHeader", () => {
          preview step never ticked on the most common path. It emits
          UI_TOGGLE_PREVIEW now; the shell's handler builds and sanitizes. */
       const emit = vi.fn();
-      const composer = {
+      const composer = { getChangeSeq: () => 0, isDirty: () => false, isTransactionActive: () => false,
         on: vi.fn(), off: vi.fn(), emit,
         getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
       } as unknown as StudioHeaderProps["composer"];
@@ -740,7 +740,7 @@ describe("StudioHeader", () => {
       const emit = vi.fn((ev: string, p?: unknown) => {
         handlers.get(ev)?.forEach((fn) => fn(p));
       });
-      const composer = {
+      const composer = { getChangeSeq: () => 0, isDirty: () => false, isTransactionActive: () => false,
         on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
           if (!handlers.has(ev)) handlers.set(ev, new Set());
           handlers.get(ev)!.add(fn);
@@ -768,7 +768,7 @@ describe("StudioHeader", () => {
     });
 
     it("A-8/PD-7/PD-8: reviewsEnabled false disables the Comments toggle — a review-flow tool with nowhere to review from", () => {
-      const composer = {
+      const composer = { getChangeSeq: () => 0, isDirty: () => false, isTransactionActive: () => false,
         on: vi.fn(),
         off: vi.fn(),
         emit: vi.fn(),
@@ -1219,6 +1219,9 @@ describe("F7 perf pair", () => {
   function makeComposer(meta: { name: string }) {
     const handlers = new Map<string, Set<(...args: unknown[]) => void>>();
     return {
+      getChangeSeq: () => 0,
+      isDirty: () => false,
+      isTransactionActive: () => false,
       on: vi.fn((ev: string, fn: (...args: unknown[]) => void) => {
         if (!handlers.has(ev)) handlers.set(ev, new Set());
         handlers.get(ev)!.add(fn);
@@ -1275,8 +1278,10 @@ describe("F7 perf pair", () => {
       fireEvent.click(screen.getByTestId("topbar-preview"));
       expect(onSetPreviewLoading).toHaveBeenCalledWith(true);
       expect(emitSpy).not.toHaveBeenCalledWith("ui:toggle:preview", {});
+      /* A bounded advance, not runAllTimers: the save-stall poll (useSaveStall)
+         is an interval, which runAllTimers reads as an infinite loop. */
       act(() => {
-        vi.runAllTimers();
+        vi.advanceTimersByTime(100);
       });
       expect(emitSpy).toHaveBeenCalledWith("ui:toggle:preview", {});
       expect(onSetPreviewLoading).toHaveBeenLastCalledWith(false);

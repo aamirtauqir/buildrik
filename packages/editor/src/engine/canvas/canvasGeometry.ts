@@ -42,6 +42,18 @@ export function getCanvasRect():
   return canvas?.getBoundingClientRect() || { left: 0, top: 0, width: 0, height: 0 };
 }
 
+/**
+ * Screen pixels per CSS pixel on the canvas — the zoom, read off the page
+ * itself (its rendered width over its layout width), so it holds however the
+ * zoom is applied. 1 when it cannot be read.
+ */
+export function getCanvasScale(): number {
+  const canvas = _getCanvasContainer();
+  if (!canvas || !canvas.offsetWidth) return 1;
+  const scale = canvas.getBoundingClientRect().width / canvas.offsetWidth;
+  return Number.isFinite(scale) && scale > 0 ? scale : 1;
+}
+
 // ============================================
 // Bounds Calculation
 // ============================================

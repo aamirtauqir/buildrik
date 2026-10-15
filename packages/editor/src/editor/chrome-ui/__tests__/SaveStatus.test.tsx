@@ -72,3 +72,27 @@ describe("SaveStatus", () => {
     expect(btn.querySelector('[aria-hidden="true"]')!.className).toContain("--bk-success");
   });
 });
+
+/* Design decision 4 / DR-T3: "Not saving · unsaved for 45 s", and the pill
+   opens the stuck-save panel. */
+describe("SaveStatus — stalled", () => {
+  it("says how long the oldest change has waited", () => {
+    const { rerender } = render(<SaveStatus state="stalled" stalledFor={45_000} />);
+    expect(screen.getByTestId("save-status-stalled")).toHaveTextContent("Not saving · unsaved for 45 s");
+    rerender(<SaveStatus state="stalled" stalledFor={190_000} />);
+    expect(screen.getByTestId("save-status-stalled")).toHaveTextContent("Not saving · unsaved for 3 min");
+  });
+
+  it("the pill is the trigger of its panel", () => {
+    render(
+      <SaveStatus
+        state="stalled"
+        stalledFor={31_000}
+        onClick={() => {}}
+        panel={{ open: true, onClose: () => {}, label: "Autosave is stuck", content: <p>Your changes are only in this tab.</p> }}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /Not saving/ })).toBeTruthy();
+    expect(screen.getByText("Your changes are only in this tab.")).toBeTruthy();
+  });
+});

@@ -11,6 +11,45 @@ import { activeBreakpoint, stylesAt, writeCanvasStyles } from "@/engine/commands
 import { scaleBounds } from "./resizeMath";
 import type { TransformBounds, ResizeState } from "./types";
 import { getDOMElement } from "./utils";
+import { trackEvent } from "@/shared/utils/errorTracking";
+
+// =============================================================================
+// SCREEN → CSS PIXELS
+// =============================================================================
+
+/**
+ * Bounds measured on screen (getBoundingClientRect, pointer deltas) in the
+ * CSS pixels the page is written in. At 50 % zoom a 296 px box measures
+ * 148 on screen; writing the screen number halved it on every click (BK-01).
+ */
+export function toCssBounds(bounds: TransformBounds, scale: number): TransformBounds {
+  const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
+  return { ...bounds, x: bounds.x / s, y: bounds.y / s, width: bounds.width / s, height: bounds.height / s };
+}
+
+const isFiniteBounds = (b: TransformBounds) =>
+  [b.x, b.y, b.width, b.height].every((v) => Number.isFinite(v));
+
+/** Which of a box's values a handle moves. */
+export interface ResizeAxes {
+  width: boolean;
+  height: boolean;
+  left: boolean;
+  top: boolean;
+}
+
+/** BK-01: an E handle changes width only, never height; a corner both. */
+export function axesForHandle(handle: string): ResizeAxes {
+  if (handle === "rotation") return { width: false, height: false, left: false, top: false };
+  return {
+    width: handle.includes("e") || handle.includes("w"),
+    height: handle.includes("n") || handle.includes("s"),
+    left: handle.includes("w"),
+    top: handle.includes("n"),
+  };
+}
+
+const ALL_AXES: ResizeAxes = { width: true, height: true, left: true, top: true };
 
 // =============================================================================
 // DOM STYLE APPLICATION
@@ -47,17 +86,19 @@ export function releaseGestureStyles(composer: Pick<Composer, "styles"> | null |
  * Apply bounds to DOM element styles
  * Updates width, height, position, and rotation
  */
-export function applyBoundsToDOM(elementId: string, bounds: TransformBounds): void {
+export function applyBoundsToDOM(elementId: string, bounds: TransformBounds, scale = 1): void {
   const domElement = getDOMElement(elementId);
   if (!domElement) return;
+  const css = toCssBounds(bounds, scale);
+  if (!isFiniteBounds(css)) return;
 
-  setGestureStyle(domElement, "width", `${bounds.width}px`);
-  setGestureStyle(domElement, "height", `${bounds.height}px`);
+  setGestureStyle(domElement, "width", `${css.width}px`);
+  setGestureStyle(domElement, "height", `${css.height}px`);
 
   const position = window.getComputedStyle(domElement).position;
   if (position === "absolute" || position === "fixed") {
-    setGestureStyle(domElement, "left", `${bounds.x}px`);
-    setGestureStyle(domElement, "top", `${bounds.y}px`);
+    setGestureStyle(domElement, "left", `${css.x}px`);
+    setGestureStyle(domElement, "top", `${css.y}px`);
   }
 
   if (bounds.rotation !== undefined) {
@@ -75,7 +116,7 @@ export function applyMultiResizeToDOM(state: ResizeState, primaryBounds: Transfo
     if (!elStartBounds) continue;
 
     const newBounds = scaleBounds(elStartBounds, state.startBounds, primaryBounds);
-    applyBoundsToDOM(elId, newBounds);
+    applyBoundsToDOM(elId, newBounds, state.scale);
   }
 }
 
@@ -135,25 +176,39 @@ function clampToConstraints(
  * Tablet is a tablet override, and a locked element is not resized. It wrote
  * the base styles at every device, unchecked, until audit 2026-10-08 P1-2.
  */
-export function applyBoundsToModel(elementId: string, bounds: TransformBounds, composer: Composer): void {
+export function applyBoundsToModel(
+  elementId: string,
+  bounds: TransformBounds,
+  composer: Composer,
+  axes: ResizeAxes = ALL_AXES,
+): void {
   const element = composer.elements.getElement(elementId);
   if (!element) return;
 
   const current = stylesAt(composer, element, activeBreakpoint(composer));
-  const styles: Record<string, string> = {
-    width: `${clampToConstraints(Math.round(bounds.width), current["min-width"], current["max-width"])}px`,
-    height: `${clampToConstraints(Math.round(bounds.height), current["min-height"], current["max-height"])}px`,
-  };
-
+  const candidate: Record<string, number> = {};
+  if (axes.width) candidate.width = clampToConstraints(Math.round(bounds.width), current["min-width"], current["max-width"]);
+  if (axes.height) candidate.height = clampToConstraints(Math.round(bounds.height), current["min-height"], current["max-height"]);
   if (current.position === "absolute" || current.position === "fixed") {
-    styles.left = `${Math.round(bounds.x)}px`;
-    styles.top = `${Math.round(bounds.y)}px`;
+    if (axes.left) candidate.left = Math.round(bounds.x);
+    if (axes.top) candidate.top = Math.round(bounds.y);
   }
 
-  if (bounds.rotation !== undefined && bounds.rotation !== 0) {
+  /* BK-02: a size that is not a number was stored ("NaNpx") and survived a
+     reload. Nothing non-finite is written; the refusal is counted (D8). */
+  const styles: Record<string, string> = {};
+  let refused = 0;
+  for (const [prop, value] of Object.entries(candidate)) {
+    if (Number.isFinite(value)) styles[prop] = `${value}px`;
+    else refused++;
+  }
+  if (refused > 0) trackEvent("geometry.refused", { refused });
+
+  if (bounds.rotation !== undefined && bounds.rotation !== 0 && Number.isFinite(bounds.rotation)) {
     styles.transform = `rotate(${bounds.rotation}deg)`;
   }
 
+  if (Object.keys(styles).length === 0) return;
   writeCanvasStyles(composer, element, "resize-element", styles);
 }
 
@@ -171,7 +226,7 @@ export function applyMultiResizeToModel(
     if (!elStartBounds) continue;
 
     const newBounds = scaleBounds(elStartBounds, state.startBounds, primaryBounds);
-    applyBoundsToModel(elId, newBounds, composer);
+    applyBoundsToModel(elId, toCssBounds(newBounds, state.scale), composer, axesForHandle(String(state.handle)));
   }
 }
 
