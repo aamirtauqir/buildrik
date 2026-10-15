@@ -403,7 +403,7 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([
         { id: "sub1", data: { name: "John" }, isRead: false, createdAt: new Date() },
       ] as any);
-      const result = await listSubmissions({ siteId: "s1", page: 1, perPage: 20 });
+      const result = await listSubmissions({ siteId: "s1", page: 1, perPage: 20 }, { technical: true });
       expect(result.data).toHaveLength(1);
       expect(result.total).toBe(5);
     });
@@ -448,7 +448,7 @@ describe("Form Submission Service", () => {
         { id: "s1sub", createdAt: new Date("2026-06-01"), data: { email: "a@b.com" }, formBlock: { name: "Contact" } },
       ] as any);
 
-      const csv = await exportSubmissions("s1", undefined, "csv");
+      const csv = await exportSubmissions("s1", undefined, "csv", { technical: true });
 
       expect(prisma.formSubmission.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { siteId: "s1" } }),
@@ -461,7 +461,7 @@ describe("Form Submission Service", () => {
     it("scopes to one form block when formBlockId is provided", async () => {
       const { exportSubmissions } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([] as any);
-      await exportSubmissions("s1", "fb1", "csv");
+      await exportSubmissions("s1", "fb1", "csv", { technical: true });
       expect(prisma.formSubmission.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { siteId: "s1", formBlockId: "fb1" } }),
       );
@@ -478,12 +478,29 @@ describe("Form Submission Service", () => {
         },
       ] as any);
 
-      const csv = await exportSubmissions("s1", undefined, "csv");
+      const csv = await exportSubmissions("s1", undefined, "csv", { technical: true });
       // formula-leading cells get an apostrophe prefix inside the quotes
       expect(csv).toContain(`"'=cmd|' /C calc'!A0"`);
       expect(csv).toContain(`"'+SUM(1)"`);
       expect(csv).toContain(`"'=evil()"`); // header row too
       expect(csv).not.toMatch(/(^|,)"=/m); // no cell starts with a live "="
     });
+  });
+});
+
+describe("submitter IP and device below ADMIN (D7)", () => {
+  it("list and JSON export drop ip and deviceInfo without the technical grant; CSV never had them", async () => {
+    const { listSubmissions, exportSubmissions } = await import("@/server/services/form-submission.service");
+    const row = { id: "x", data: { email: "a@b.c" }, ip: "203.0.113.9", deviceInfo: "Mac", createdAt: new Date(), formBlock: { name: "F" } };
+    vi.mocked(prisma.formSubmission.count).mockResolvedValue(1);
+    vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([row] as any);
+    const listed = await listSubmissions({ siteId: "s1", page: 1, perPage: 20 } as any, { technical: false });
+    expect(listed.data[0]).not.toHaveProperty("ip");
+    expect(listed.data[0]).not.toHaveProperty("deviceInfo");
+    const json = await exportSubmissions("s1", undefined, "json", { technical: false });
+    expect(json).not.toContain("203.0.113.9");
+    expect(json).not.toContain('"ip"');
+    const admin = await exportSubmissions("s1", undefined, "json", { technical: true });
+    expect(admin).toContain("203.0.113.9");
   });
 });

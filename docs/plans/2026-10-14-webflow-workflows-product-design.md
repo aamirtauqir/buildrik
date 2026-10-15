@@ -2009,6 +2009,8 @@ REALITY: pr-count pass no ship-policy file; one PR per lane (4), S0 merged first
 
 | — | DR-T1: RecoveryBanner stays a banner, not folded into the restore dialog | It shows only when the server load FAILED and the local draft is on screen (`localDraftShown`); the restore dialog only follows a SUCCESSFUL load. They never coexist, so the "never two overlays" rule holds without merging a load-failure surface into the conflict dialog. Order verified: restore dialog → repair scan → repair toast → Issues (useLoadRepair waits for the restore choice; unit + live). | within decision 1 |
 
+| — | Decision 10's "IP addresses are hidden for your role." note is not shown | Both export doors (editor Forms › Export CSV, dashboard Submissions › Export CSV) export CSV only, and the CSV has never carried an IP column for any role — the note would claim a difference that does not exist. The server now strips ip/deviceInfo below ADMIN from the list and the JSON export (D7); the note belongs on a future JSON/IP-bearing export door. | within D7 / decision 10 |
+
 **D8 runbook lines (proposed; owner to confirm):**
 - `repair.undone` / `repair.applied` above 5 % over a week → the non-finite-size rule is removing values people want; set `EDITOR_LOAD_REPAIR=off`, restart, and read the "Before automatic repair" versions of the affected sites.
 - `component.overrides_dropped` above 0 after Phase 3 ships → the component format migration is losing overrides; stop the rollout and diff a dropped instance against its master.

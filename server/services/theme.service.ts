@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { siteScopeWhere } from "@/server/services/permission.service";
 import { sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { validateTokens, TOKENS_SCHEMA_VERSION, DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { DarkMode } from "@buildrik/shared/schemas/design-tokens";
@@ -203,9 +204,12 @@ async function readSourceTokens(workspaceId: string, sourceSiteId: string): Prom
 }
 
 /** Every site in the workspace with its push-relevant state (drives the UI). */
-export async function listThemeTargets(workspaceId: string): Promise<ThemeTarget[]> {
+export async function listThemeTargets(workspaceId: string, userId: string): Promise<ThemeTarget[]> {
+  /* BK-08: the sites this member may open — a member scoped to one site was
+     handed the name and lock state of every site in the workspace. */
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
   const rows = await prisma.site.findMany({
-    where: { workspaceId, deletedAt: null },
+    where: { workspaceId, deletedAt: null, ...scope },
     orderBy: { name: "asc" },
     select: { id: true, name: true, clientId: true, themeLocked: true, dsSchemaVersion: true },
   });

@@ -227,7 +227,13 @@ export async function submitForm(
   };
 }
 
-export async function listSubmissions(input: ListSubmissionsInput) {
+/** D7: a submitter's IP and device are technical data — ADMIN and up only. */
+function withoutTechnical<T extends { ip?: string | null; deviceInfo?: string | null }>(row: T): Omit<T, "ip" | "deviceInfo"> {
+  const { ip: _ip, deviceInfo: _device, ...rest } = row;
+  return rest;
+}
+
+export async function listSubmissions(input: ListSubmissionsInput, opts: { technical: boolean }) {
   const { siteId, formBlockId, isRead, isSpam, isArchived, page, perPage } = input;
 
   const where = {
@@ -249,7 +255,7 @@ export async function listSubmissions(input: ListSubmissionsInput) {
     }),
   ]);
 
-  return { data, total, page, perPage };
+  return { data: opts.technical ? data : data.map(withoutTechnical), total, page, perPage };
 }
 
 export async function updateSubmission(input: UpdateInput) {
@@ -404,6 +410,7 @@ export async function exportSubmissions(
   // button) rather than a single form block — the full dataset, not one page.
   formBlockId: string | null | undefined,
   format: "csv" | "json",
+  opts: { technical: boolean },
 ): Promise<string> {
   const submissions = await prisma.formSubmission.findMany({
     where: { siteId, ...(formBlockId ? { formBlockId } : {}) },
@@ -412,7 +419,7 @@ export async function exportSubmissions(
   });
 
   if (format === "json") {
-    return JSON.stringify(submissions, null, 2);
+    return JSON.stringify(opts.technical ? submissions : submissions.map(withoutTechnical), null, 2);
   }
 
   if (submissions.length === 0) return "";
