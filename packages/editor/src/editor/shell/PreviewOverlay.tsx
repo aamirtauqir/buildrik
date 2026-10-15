@@ -39,8 +39,16 @@ import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
 
 interface PreviewOverlayProps {
-  /** Sanitized page HTML. null → overlay hidden. */
+  /** Sanitized page HTML of a finished build. null with no `status` → hidden. */
   html: string | null;
+  /** Design decision 9: the build is running, or it failed. A preview that
+   *  failed used to show nothing at all — the promise rejected silently. */
+  status?: "building" | "error";
+  /** The failure's short cause. */
+  error?: string;
+  /** Failed builds in a row: the second says "Still failing". */
+  attempts?: number;
+  onRetry?: () => void;
   onDone: () => void;
   /** The site whose share link the Share button mints; no site, no button. */
   siteId?: string | null;
@@ -108,6 +116,10 @@ const SCREEN_FRAME_CLASS = "tw:w-full tw:h-full tw:border-0 tw:bg-[var(--bk-bg-e
 
 export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   html,
+  status,
+  error,
+  attempts = 0,
+  onRetry,
   onDone,
   siteId,
   siteName,
@@ -127,9 +139,16 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
      answers its clicks: a page of this site opens in the preview, another
      site opens in a new tab, anything else stays put — it used to navigate
      the srcdoc frame to nothing (L5-051). */
+  const doneRef = React.useRef(onDone);
+  doneRef.current = onDone;
   const onFrameLoad = React.useCallback((e: React.SyntheticEvent<HTMLIFrameElement>) => {
     const doc = e.currentTarget.contentDocument;
     if (!doc) return;
+    /* Decision 9: Escape closes even with focus inside the frame — keys typed
+       there never reach the shell's window listener. */
+    doc.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && !isModalOpen()) doneRef.current();
+    });
     doc.addEventListener("click", (ev) => {
       const link = (ev.target as Element | null)?.closest?.("a[href]");
       if (!link) return;
@@ -142,8 +161,18 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
     });
   }, []);
 
+  const open = html != null || status != null;
+  const headingRef = React.useRef<HTMLHeadingElement>(null);
+  const backRef = React.useRef<HTMLButtonElement>(null);
+  /* Focus lands on what the overlay is saying: the state heading while it
+     builds or failed, the way back once the page is up. */
   React.useEffect(() => {
-    if (html == null) return;
+    if (!open) return;
+    (status ? headingRef.current : backRef.current)?.focus({ preventScroll: true });
+  }, [open, status]);
+
+  React.useEffect(() => {
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       /* The Share modal's own trap answers Escape (focus.ts `isModalOpen`
@@ -157,9 +186,9 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [html, onDone]);
+  }, [open, onDone]);
 
-  if (html == null) return null;
+  if (!open) return null;
 
   /* `wide` and `desktop` have no bezel — DeviceFramePreview passes children
      straight through for them, which is also what `active` says here. */
@@ -173,7 +202,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
       className={REGION_CLASS}
     >
       <div className={DEVICE_BAR_CLASS}>
-        <Button color="light" size="xs" onClick={onDone} className={BACK_CLASS} data-testid="preview-back">
+        <Button ref={backRef} color="light" size="xs" onClick={onDone} className={BACK_CLASS} data-testid="preview-back">
           ‹ Back to canvas
         </Button>
         <div className={DEVICE_BAR_INNER_CLASS}>
@@ -203,17 +232,54 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
         </div>
       </div>
       <div className={STAGE_CLASS}>
+        {status ? (
+          /* Never the last page's output: a stale frame read as the current
+             build (decision 9). */
+          <div className="tw:m-auto tw:flex tw:max-w-[420px] tw:flex-col tw:items-start tw:gap-2 tw:p-6" data-testid={`preview-${status}`}>
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)] tw:outline-none"
+            >
+              {status === "building" ? "Building preview…" : attempts > 1 ? "Still failing" : "Preview couldn’t be built"}
+            </h2>
+            {status === "error" && (
+              <>
+                {error && <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">{error}</p>}
+                <div className="tw:mt-2 tw:flex tw:gap-2">
+                  <Button size="xs" data-testid="preview-retry" onClick={onRetry}>
+                    Try again
+                  </Button>
+                  {attempts > 1 && error && (
+                    <Button
+                      size="xs"
+                      color="light"
+                      data-testid="preview-copy-error"
+                      onClick={() => void navigator.clipboard?.writeText(error)}
+                    >
+                      Copy error details
+                    </Button>
+                  )}
+                  <Button size="xs" color="light" data-testid="preview-back-to-editor" onClick={onDone}>
+                    Back to editor
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
         <DeviceFramePreview device={device as DeviceType} active={framed}>
           <iframe
             title="Site preview"
             /* No allow-scripts: nothing in the frame runs. allow-same-origin
                only lets onFrameLoad answer its link clicks. */
             sandbox="allow-same-origin"
-            srcDoc={html}
+            srcDoc={html ?? ""}
             onLoad={onFrameLoad}
             className={framed ? SCREEN_FRAME_CLASS : PAGE_FRAME_CLASS}
           />
         </DeviceFramePreview>
+        )}
       </div>
       {siteId && shareOpen && (
         <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} pageName={pageName} />

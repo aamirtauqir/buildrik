@@ -60,6 +60,7 @@ import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useServerConflict } from "./hooks/useServerConflict";
 import { useLoadRepair } from "./hooks/useLoadRepair";
+import { trackEvent } from "@/shared/utils/errorTracking";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
@@ -222,6 +223,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // In-shell preview (shell state 7) — sanitized page HTML below the topbar.
   const [previewHtml, setPreviewHtml] = React.useState<string | null>(null);
+  /* Decision 9: the build's own state — building, or failed (with its cause
+     and how many times in a row). A failed build showed nothing. */
+  const [previewBuild, setPreviewBuild] = React.useState<
+    { status: "building"; attempts: number } | { status: "error"; error: string; attempts: number } | null
+  >(null);
 
 
   // Initialize composer with hooks
@@ -275,29 +281,50 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
    * the overlay now, and toggle it closed if it is already up.
    */
   const previewOpenRef = React.useRef(false);
-  previewOpenRef.current = previewHtml != null;
+  const previewRun = React.useRef(0);
+  const buildPreview = React.useCallback(() => {
+    if (!composer) return;
+    const mine = ++previewRun.current;
+    setPreviewHtml(null);
+    setPreviewBuild((b) => ({ status: "building", attempts: b?.status === "error" ? b.attempts : 0 }));
+    renderPreviewHtml(composer).then(
+      (html) => {
+        if (mine !== previewRun.current) return;
+        setPreviewBuild(null);
+        setPreviewHtml(sanitizeHTMLForPreview(html));
+      },
+      (err: unknown) => {
+        if (mine !== previewRun.current) return;
+        const error = err instanceof Error && err.message ? err.message : "Something on this page couldn't be rendered.";
+        setPreviewBuild((b) => {
+          const attempts = (b?.attempts ?? 0) + 1;
+          trackEvent("preview.build_failed", { attempt: attempts });
+          return { status: "error", error, attempts };
+        });
+      },
+    );
+  }, [composer]);
+  const closePreview = React.useCallback(() => {
+    previewRun.current += 1;
+    setPreviewBuild(null);
+    setPreviewHtml(null);
+  }, []);
+  previewOpenRef.current = previewHtml != null || previewBuild != null;
   React.useEffect(() => {
     if (!composer) return;
-    /* Building is async now — CMS bindings resolve as publish resolves them
+    /* Building is async — CMS bindings resolve as publish resolves them
        (renderPreviewHtml) — so a toggle that lands while one is building
-       supersedes it instead of opening a stale preview. */
-    let run = 0;
+       supersedes it (previewRun) instead of opening a stale preview. */
     const handle = () => {
-      const mine = ++run;
-      if (previewOpenRef.current) {
-        setPreviewHtml(null);
-        return;
-      }
-      void renderPreviewHtml(composer).then((html) => {
-        if (mine === run) setPreviewHtml(sanitizeHTMLForPreview(html));
-      });
+      if (previewOpenRef.current) closePreview();
+      else buildPreview();
     };
     composer.on(EVENTS.UI_TOGGLE_PREVIEW, handle);
     return () => {
-      run += 1;
+      previewRun.current += 1;
       composer.off(EVENTS.UI_TOGGLE_PREVIEW, handle);
     };
-  }, [composer]);
+  }, [composer, buildPreview, closePreview]);
 
   // Composer-driven side-effects (COMPONENT_CREATE_REQUESTED, overlay-defaults
   // init, …) live in useEditorEventListeners — D2 stage 3.
@@ -812,7 +839,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       <PreviewOverlay
         html={previewHtml}
-        onDone={() => setPreviewHtml(null)}
+        status={previewBuild?.status}
+        error={previewBuild?.status === "error" ? previewBuild.error : undefined}
+        attempts={previewBuild?.attempts}
+        onRetry={buildPreview}
+        onDone={closePreview}
         siteId={getSiteIdFromUrl()}
         siteName={previewHtml ? composer.getProjectMetadata?.()?.name : null}
         pageName={previewHtml ? composer.elements.getActivePage?.()?.name : null}
@@ -823,7 +854,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            was being previewed (L5-051). */
         onShowPage={(pageId) => {
           composer.elements.setActivePage(pageId);
-          void renderPreviewHtml(composer).then((html) => setPreviewHtml(sanitizeHTMLForPreview(html)));
+          buildPreview();
         }}
       />
       {/* B8: the one Compare, opened by every Compare door via UI_COMPARE_OPEN. */}
