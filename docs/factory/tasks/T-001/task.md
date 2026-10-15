@@ -2,13 +2,13 @@
 
 <!-- Ledger. Only the PM (main session) edits this file. -->
 
-- **Status:** blocked
-- **Stage owner:** founder (push of factory/T-001)
+- **Status:** qa
+- **Stage owner:** factory-qa
 - **Created:** 2026-10-15
 - **Founder issue (verbatim):** "(factory pilot, from the 2026-10-15 readiness audit) packages/editor/CLAUDE.md §ENV says prod values live in 'Vercel project settings'; prod is cPanel."
 - **Guarded areas touched:** none
 - **UI change:** no
-- **Branch / PR:** factory/T-001 · —
+- **Branch / PR:** factory/T-001 · https://github.com/aamirtauqir/buildrik/pull/31
 
 ## Goal
 
@@ -28,6 +28,7 @@ Agents reading packages/editor/CLAUDE.md are told the true place production env 
 |---|---|---|---|---|---|
 | 1 | spec | factory-analyst | READY (reproduced: n/a, open questions: 0, 2 follow-ups) | spec.md | 2026-10-15 |
 | 2 | build | factory-developer | BLOCKED — commit 4660acf3e on factory/T-001 not pushed; pre-push hook `editor=0 dashboard=0 figma=0 orphans=0 spec-age=1 button-variants=0`; all 5 done-condition checks PASS locally | worktree .claude/worktrees/agent-ab748a6868414a496 | 2026-10-15 |
+| 3 | push + PR | PM (interactive) | pushed with the spec-age-only bypass after re-running the hook in the dev worktree (`editor=0 dashboard=0 figma=0 orphans=0 spec-age=1 button-variants=0`); PR opened | https://github.com/aamirtauqir/buildrik/pull/31 | 2026-10-15 |
 
 ## Founder decisions
 
@@ -36,5 +37,5 @@ Agents reading packages/editor/CLAUDE.md are told the true place production env 
 
 ## Open questions
 
-- 2026-10-15 PM re-ran the normal push of factory/T-001 from the dev worktree: pre-push hook failed again ONLY on spec-age (inspector-v4-* specs 17d old, limit 14d). PM then tried the hook-bypass push under the recorded spec-age-only founder approval; the repo guard's ask tier refused it (`[guard] bypasses the pre-push / pre-commit gates — say why`) and this non-interactive session cannot answer an ask. Founder to choose: push commit 4660acf3e yourself from `.claude/worktrees/agent-ab748a6868414a496` with the hook bypass, approve the bypass in an interactive session, or re-extract the Figma specs. QA and code review wait on the PR.
+- Resolved 2026-10-15: the headless PM could not push (in a non-interactive session the guard's ask tier acts as deny). The interactive PM pushed under the founder's standing spec-age-only approval.
 - Follow-ups proposed by analyst, not in scope: editor CLAUDE.md:513 `VITE_`-only prefix claim; :521 "once Vercel pipeline live".
