@@ -212,11 +212,15 @@ export function parseScript(src, depth = 0) {
       const hereStrings = c.redirects.filter((r) => r.op === "<<<").map((r) => r.target);
       // stdin and fd paths are opaque code
       if (!hasC && operand && /^(-|\/dev\/(stdin|fd\/\d+)|\/proc\/self\/fd\/\d+)$/.test(operand)) return null;
-      const prevHeredoc = pending[pending.indexOf(c) - 1]?.heredocBodies?.length; // parsed below
       // No -c, no script path, no own heredoc / here-string: code comes from
-      // stdin we cannot see (a pipe, a `<` redirect, an inherited stdin) — fail
-      // closed, unless the previous command is a heredoc we parse below.
-      if (!hasC && !operand && !c.heredocBodies.length && !hereStrings.length && !(c.prevOp === "|" && prevHeredoc)) return null;
+      // stdin we cannot see — fail closed. The one exemption is a literal
+      // pass-through, `cat <<EOF | sh`: any other producer (sed, awk, tr …)
+      // can rewrite the heredoc before the shell runs it.
+      const prev = pending[pending.indexOf(c) - 1];
+      const passthru = c.prevOp === "|" && prev && prev.words[0] === "cat" && prev.words.slice(1).every((w) => w === "-") &&
+        prev.heredocBodies.length === 1 && prev.redirects.length === 0 && prev.assigns.length === 0;
+      if (!hasC && !operand && !c.heredocBodies.length && !hereStrings.length && !passthru) return null;
+      if (passthru) { const sub = parseScript(prev.heredocBodies[0].body, depth + 1); if (!sub) return null; commands.push(...sub.commands); }
       for (const s of [code, ...hereStrings, ...c.heredocBodies.map((h) => h.body)].filter((x) => x != null)) {
         const sub = parseScript(s, depth + 1); if (!sub) return null; commands.push(...sub.commands);
       }
@@ -224,13 +228,6 @@ export function parseScript(src, depth = 0) {
       const sub = parseScript(words.slice(1).join(" "), depth + 1); if (!sub) return null; commands.push(...sub.commands);
     }
     sc.heredocBodies = c.heredocBodies.map((h) => h.body);
-  }
-  // `cat <<EOF | sh` — a heredoc piped into a shell: the next command is the shell
-  for (let k = 0; k + 1 < pending.length; k++) {
-    const nextProg = (unwrap(pending[k + 1].words, []).at(0) ?? "").split("/").pop();
-    if (SHELLS.has(nextProg) && pending[k].heredocBodies.length) {
-      for (const h of pending[k].heredocBodies) { const sub = parseScript(h.body, depth + 1); if (!sub) return null; commands.push(...sub.commands); }
-    }
   }
   return { commands };
 }
