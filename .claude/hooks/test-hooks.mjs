@@ -78,13 +78,30 @@ for (const [label, command] of [
   ["set upstream", "git branch --set-upstream-to=origin/main"], ["remote set-url", "git remote set-url origin x"],
   ["chained", "git push -u origin factory/T-001 && git push origin HEAD:main"], ["tags", "git push --tags"],
   ["GIT_CONFIG env", "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=remote.origin.push GIT_CONFIG_VALUE_0=refs/heads/factory/T-001:refs/heads/main git push origin factory/T-001"],
-  ["export GIT_", "export GIT_CONFIG_PARAMETERS=x; git push origin factory/T-001"], ["env prefix", "env FOO=1 git push origin factory/T-001"],
-  ["git -c", "git -c remote.origin.push=x push origin factory/T-001"], ["wrapper", "nice git push origin factory/T-001"],
-  ["sh -c", "sh -c 'git push origin factory/T-001'"], ["xargs", "echo x | xargs git push origin factory/T-001"],
+  ["export GIT_", "export GIT_CONFIG_PARAMETERS=x; git push origin factory/T-001"], ["env GIT_ prefix", "env GIT_DIR=x git push origin factory/T-001"],
+  ["git -c", "git -c remote.origin.push=x push origin factory/T-001"], ["wrapper to main", "nice git push origin main"],
+  ["sh -c to main", "sh -c 'git push origin main'"], ["xargs appends args", "echo main | xargs git push origin factory/T-001"],
+  ["find -exec push", "find . -maxdepth 0 -exec git push origin main \;"], ["subst push", "echo $(git push origin main)"], ["eval push", "eval git push origin HEAD:main"],
+  ["heredoc to bash", "bash <<'EOF'\ngit push origin main\nEOF"], ["unbalanced quote", "git push origin 'factory/T-001"],
   ["declare", "declare -x GIT_CONFIG_COUNT=1; git push origin factory/T-001"], ["printf -v", "printf -v GIT_DIR x; git push origin factory/T-001"],
   ["quoted name", "export 'GIT''_CONFIG_PARAMETERS'=x; git push origin factory/T-001"], ["backslash", "G\\IT_DIR=x git push origin factory/T-001"],
-  ["push after cd", "cd /tmp && git push origin factory/T-001"],
+
 ]) expect(`dev push bypass: ${label}`, guard("factory-developer", "Bash", { command }), "deny");
+// resolved by the parser: these push only the factory branch, so they are fine
+for (const command of ["env FOO=1 git push origin factory/T-001", "nice git push origin factory/T-001", "sh -c 'git push origin factory/T-001'", "cd /tmp && git push origin factory/T-001"]) {
+  expect(`dev push via wrapper, factory branch: ${command}`, guard("factory-developer", "Bash", { command }), "allow");
+}
+// false positives the raw-text matcher had (investigation 2026-10-15)
+for (const [role, command] of [
+  ["factory-qa", "pnpm install --frozen-lockfile"], ["factory-qa", "npx playwright install chromium"], ["factory-qa", 'grep -rn "rm -rf" scripts/'],
+  ["factory-qa", "grep -n 'touch' x.ts"], ["factory-qa", "awk -F, '$3 > 5' data.csv"], ["factory-qa", "node -e 'console.log(1 > 0)'"],
+  ["factory-qa", "git log --format='%h > %s' -5"], ["factory-qa", "gh pr diff 31 | grep -n 'cp '"], ["factory-code-reviewer", 'git log -p -S"git push" -- scripts/'],
+  ["factory-security", "grep -rn 'GIT_DIR' scripts/"], ["factory-developer", 'git commit -m "feat(notifications): push toasts to the panel"'],
+  ["factory-developer", 'git commit -m "docs: explain the git push hook"'], ["factory-analyst", "grep -rn 'install' package.json"], ["factory-qa", "find . -name '*.test.ts' -newer x"],
+]) expect(`no false positive: ${role} ${command}`, guard(role, "Bash", { command }), "allow");
+expect("qa find -delete", guard("factory-qa", "Bash", { command: "find . -name x -delete" }), "deny");
+expect("qa find -exec rm", guard("factory-qa", "Bash", { command: "find . -name x -exec rm {} +" }), "deny");
+expect("qa node fs write", guard("factory-qa", "Bash", { command: "node -e 'require(\"fs\").writeFileSync(\"a\",\"b\")'" }), "deny");
 expect("dev push -u ok", guard("factory-developer", "Bash", { command: "git push -u origin factory/T-001 2>&1 | tail -3" }), "allow");
 for (const [label, command] of [
   ["redirect", "echo hacked > packages/editor/src/a.ts"], ["append", "printf x >> server/a.ts"], ["sed -i", "sed -i '' s/a/b/ lib/x.ts"],

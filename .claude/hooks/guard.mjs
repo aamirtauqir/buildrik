@@ -17,6 +17,7 @@
  */
 import { readFileSync } from "node:fs";
 import { relative, isAbsolute } from "node:path";
+import { parseScript, programOf } from "./shell-parse.mjs";
 
 // `git` plus any global options (`git -C dir`, `git -c k=v`, `git --no-pager`)
 // before the subcommand — otherwise `git -C . stash` walks past every rule.
@@ -86,48 +87,71 @@ if (isFactory && WRITE_TOOLS.has(tool) && READ_ONLY_ROLES.has(ROLE)) {
   decide("deny", `${ROLE} is read-only — it reports, it does not change files`);
 }
 if (isFactory && tool === "Bash") {
-  const raw = String(ti.command ?? "");
-  if (/\bgh\s+pr\s+merge\b/.test(raw)) decide("deny", `${ROLE} cannot merge — the PM merges after every gate passes`);
-  // Push is an ALLOWLIST, not a denylist: every `git push` in the command must be
-  // exactly `git push [-u|--set-upstream] origin factory/T-NNN[:factory/T-NNN]`.
-  // A denylist was walked twice (`factory/T-001:main`, then quotes / `+ref`).
-  // Upstream and push-config rewrites are denied so a bare push cannot be aimed
-  // elsewhere. GitHub cannot tell an agent from the founder (same token, admin
-  // bypass), so this hook is the control for agents — keep it strict.
-  // Git config can arrive through the environment in more syntaxes than a
-  // rule can list (assignments, export, declare, printf -v, read, set -a …).
-  // A factory agent has no reason to name any GIT_* variable or pass git -c,
-  // so after dropping quotes and backslashes, ANY mention is denied.
-  const norm = raw.replace(/[\\'"]/g, "");
-  if (/GIT_[A-Z_]+/i.test(norm) || /\bgit\s+(-c|--config-env)\b/i.test(norm)) {
-    decide("deny", `${ROLE} cannot name GIT_* variables or pass git -c`);
-  }
-  // A command that pushes must be NOTHING BUT the allowed push (optionally
-  // `2>&1` and `| tail -N`). No chaining, wrappers or prefixes to reason about.
-  if (/\bpush\b/.test(norm) && /\bgit\b/.test(norm)) {
-    const PUSH_ONLY = /^git\s+push(\s+(-u|--set-upstream))?\s+origin\s+(factory\/T-\d+)(:\3)?(\s+2>&1)?(\s*\|\s*tail\s+-n?\s*\d+)?\s*$/;
-    if (!PUSH_ONLY.test(raw.trim())) decide("deny", `${ROLE} may push only with a command that is exactly: git push -u origin factory/<ID>`);
-  }
-  if (/\bgit\b[^\n]*\bconfig\b[^\n]*\b(remote\.|push\.|branch\.|url\.)/.test(raw) ||
-      /\bgit\b[^\n]*\b(branch\s+(-u|--set-upstream-to)|remote\s+(add|set-url|rename))\b|--set-upstream-to/.test(raw)) {
-    decide("deny", `${ROLE} cannot change remotes, upstreams or push config`);
-  }
-  if (READ_ONLY_ROLES.has(ROLE) && /\bgit\s+(commit|push|add|reset|checkout\s+--|restore|apply|am|rebase|merge|cherry-pick)\b/.test(raw)) {
-    decide("deny", `${ROLE} is read-only — no commits, staging or resets`);
-  }
-  // Roles without free write access cannot write through the shell either:
-  // redirection (except to /dev/null or a temp dir), in-place editors, file
-  // movers, and scripted writes. Their files go through Write/Edit, which the
-  // path rules below scope. Still a backstop — code built at runtime can write.
-  if (READ_ONLY_ROLES.has(ROLE) || WRITE_SCOPE[ROLE]) {
-    const shellWrite = raw
-      .replace(/\d?>>?\s*(\/dev\/null|&\d)/g, "")
-      .replace(/\d?>>?\s*("|')?(\/tmp\/|\/private\/tmp\/|\/var\/folders\/|\$TMPDIR|\$\{TMPDIR\})/g, "");
-    if (/(^|[^<>=-])>>?\s*[^\s&|]/.test(shellWrite) ||
-        /\b(tee|truncate|touch|rm|mv|cp|ln|install|dd|patch)\b/.test(shellWrite) ||
-        /\bsed\s+(-[a-zA-Z]*i|--in-place)|\bperl\s+-[a-zA-Z]*i/.test(shellWrite) ||
-        /\b(writeFile|appendFile|createWriteStream|copyFile|rename|unlink|rmSync|mkdirSync)\w*\s*\(|open\([^)]*['"][wa]/.test(shellWrite)) {
-      decide("deny", `${ROLE} cannot write files from the shell — use the Write tool (scoped) or report it`);
+  // Rules read the PARSED command (shell-parse.mjs): program + argv per simple
+  // command, with $(…), sh -c, eval, shell-fed heredocs and wrappers unwrapped.
+  // Matching raw text denied `grep 'touch' f`, `pnpm install` and commit
+  // messages that said "push"; parsing also closes the quoting / prefix bypasses
+  // the raw rules kept chasing. An agent's command that cannot be parsed is denied.
+  const parsed = parseScript(String(ti.command ?? ""));
+  if (!parsed) decide("deny", `${ROLE}: command could not be parsed (unbalanced quotes or parens) — split it into simple commands`);
+  const readOnly = READ_ONLY_ROLES.has(ROLE);
+  const noShellWrites = readOnly || Boolean(WRITE_SCOPE[ROLE]);
+  const TMP = /^(\/dev\/null|\/dev\/std(out|err)|&\d+|&-|\/tmp\/|\/private\/tmp\/|\/var\/folders\/|\$TMPDIR|\$\{TMPDIR\})/;
+  const WRITERS = new Set(["tee", "truncate", "touch", "rm", "rmdir", "mv", "cp", "ln", "install", "dd", "patch", "rsync", "unlink", "shred"]);
+  const SCRIPTERS = new Set(["node", "python", "python3", "ruby", "perl", "deno", "bun", "php"]);
+  const FS_WRITE = /\b(writeFile|appendFile|createWriteStream|copyFile|rename|unlink|rmSync|rm\s*\(|mkdirSync|truncate|symlink)\w*\s*\(|open\([^)]*['"][wa+]|\.write_text|\.write_bytes|shutil\./;
+
+  for (const sc of parsed.commands) {
+    const prog = programOf(sc);
+    const args = sc.words.slice(1);
+
+    // Git config via the environment, or variables named for it.
+    const envNames = sc.assigns.map((a) => a.split("=")[0]);
+    if (envNames.some((n) => /^GIT_/i.test(n))) decide("deny", `${ROLE} cannot set GIT_* variables`);
+    if (["export", "declare", "typeset", "readonly", "local", "printf", "read", "set", "unset"].includes(prog) && args.some((a) => /(^|=|-v)GIT_|^GIT_/i.test(a))) {
+      decide("deny", `${ROLE} cannot set GIT_* variables`);
+    }
+
+    if (prog === "gh" && args[0] === "pr" && args[1] === "merge") decide("deny", `${ROLE} cannot merge — the PM merges after every gate passes`);
+
+    if (prog === "git") {
+      // global options before the subcommand
+      let k = 0;
+      while (k < args.length && args[k].startsWith("-")) {
+        const o = args[k];
+        if (o === "-c" || o.startsWith("--config-env")) decide("deny", `${ROLE} cannot pass git -c / --config-env`);
+        k += /^(-C|--git-dir|--work-tree|--namespace|--exec-path)$/.test(o) ? 2 : 1;
+      }
+      const sub = args[k];
+      const rest = args.slice(k + 1);
+      if (sub === "push") {
+        // Allowlist: exactly [-u|--set-upstream] origin factory/T-NNN[:factory/T-NNN]
+        const r = rest.filter((a) => a !== "-u" && a !== "--set-upstream");
+        const ok = !sc.openArgs && rest.length - r.length <= 1 && r.length === 2 && r[0] === "origin" &&
+          /^factory\/T-\d+$/.test(r[1].split(":")[0]) && (!r[1].includes(":") || r[1].split(":")[1] === r[1].split(":")[0]);
+        if (!ok) decide("deny", `${ROLE} may only push: git push -u origin factory/<ID> (got: git ${args.join(" ")})`);
+      }
+      if (sub === "config" && rest.some((a) => /^(remote|push|branch|url)\./i.test(a))) decide("deny", `${ROLE} cannot change remotes, upstreams or push config`);
+      if (sub === "remote" && ["add", "set-url", "rename"].includes(rest[0])) decide("deny", `${ROLE} cannot change remotes`);
+      if (sub === "branch" && rest.some((a) => a === "-u" || a.startsWith("--set-upstream-to"))) decide("deny", `${ROLE} cannot change upstreams`);
+      if (readOnly && ["commit", "push", "add", "reset", "restore", "apply", "am", "rebase", "merge", "cherry-pick", "revert", "rm", "mv", "clean"].includes(sub)) {
+        decide("deny", `${ROLE} is read-only — no commits, staging or resets`);
+      }
+      if (readOnly && sub === "checkout" && rest.includes("--")) decide("deny", `${ROLE} is read-only — no checkout of files`);
+    }
+
+    if (noShellWrites) {
+      const bad = (why) => decide("deny", `${ROLE} cannot write files from the shell (${why}) — use the Write tool (scoped) or report it`);
+      for (const r of sc.redirects) if ((r.op === ">" || r.op === ">>") && !TMP.test(r.target)) bad(`${r.op} ${r.target}`);
+      if (WRITERS.has(prog)) bad(prog);
+      if (prog === "find" && args.includes("-delete")) bad("find -delete");
+      if (prog === "sed" && args.some((a) => /^-[a-zA-Z]*i/.test(a) || a.startsWith("--in-place"))) bad("sed -i");
+      if (SCRIPTERS.has(prog)) {
+        if (prog === "perl" && args.some((a) => /^-[a-zA-Z]*i/.test(a))) bad("perl -i");
+        const ci = args.findIndex((a) => /^-(e|c|p|-eval|-print)$/.test(a));
+        const code = ci !== -1 ? args.slice(ci + 1).join(" ") : "";
+        if (FS_WRITE.test(code)) bad(`${prog} script writes files`);
+      }
     }
   }
 }
