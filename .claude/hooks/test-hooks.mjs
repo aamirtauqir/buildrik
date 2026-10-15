@@ -81,6 +81,9 @@ for (const [label, command] of [
   ["export GIT_", "export GIT_CONFIG_PARAMETERS=x; git push origin factory/T-001"], ["env prefix", "env FOO=1 git push origin factory/T-001"],
   ["git -c", "git -c remote.origin.push=x push origin factory/T-001"], ["wrapper", "nice git push origin factory/T-001"],
   ["sh -c", "sh -c 'git push origin factory/T-001'"], ["xargs", "echo x | xargs git push origin factory/T-001"],
+  ["declare", "declare -x GIT_CONFIG_COUNT=1; git push origin factory/T-001"], ["printf -v", "printf -v GIT_DIR x; git push origin factory/T-001"],
+  ["quoted name", "export 'GIT''_CONFIG_PARAMETERS'=x; git push origin factory/T-001"], ["backslash", "G\\IT_DIR=x git push origin factory/T-001"],
+  ["push after cd", "cd /tmp && git push origin factory/T-001"],
 ]) expect(`dev push bypass: ${label}`, guard("factory-developer", "Bash", { command }), "deny");
 expect("dev push -u ok", guard("factory-developer", "Bash", { command: "git push -u origin factory/T-001 2>&1 | tail -3" }), "allow");
 for (const [label, command] of [
