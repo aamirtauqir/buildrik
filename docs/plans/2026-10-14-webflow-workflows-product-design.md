@@ -1520,18 +1520,487 @@ Outside voices: Codex (gpt-6-astra) completed, 9 findings, 0 hard rejections; Cl
 
 None.
 
+## Eng re-review (2026-10-15, after design review)
+
+Target: this plan, focused on design tasks DR-T1…DR-T8 and design decisions 1–17 against E-T1…E-T10, lanes and architecture. Baseline: `docs/webflow-editor-audit-2026-10-14` @ 855c8b08b (code = origin/main lineage, HEAD 65163bb0d + docs commit).
+
+### Scope record (re-review)
+
+feature answers: none proposed (design decisions 1–17 kept as approved); structure: B — Smaller arrangement (D21, owner 2026-10-15); accepted scope: `ConflictModal.tsx` gains `variant: "save" | "restore"` (one footer, one vocabulary, decisions 5/11/16); load order lives in `useComposerInit.ts` where the restore offer already is (decision 1); only new file `chrome-ui/FullPageHost.tsx` (already approved in eng D2); no `RestoreChoiceModal.tsx`, no `ServerNewerFooter.tsx`, no `useLoadSequence.ts`; pending remedies: A1, A2, A3 (and any found in Sections 1–4).
+
+### Re-review decision ledger
+
+#### A1: Who saved the server version (data for decision 5)
+Finding: A1, P1, confidence 9/10, `prisma/schema.prisma:332` `lastEditedAt      DateTime  @default(now())` — Site stores when, not who; saves set only `lastEditedAt: new Date()` (`server/services/sites.service.ts:237,266,514`). Reviewer: Claude (eng re-review).
+Plan baseline: design decision 5 (owner, 2026-10-15) — copy variants "Sara Khan saved changes 3 minutes ago", "You saved from another tab 3 minutes ago", legacy "We can't confirm what changed since your edits".
+Runtime evidence: no editor id is stored on Site; the restore check reads only `fetchSitePublishState.lastEditedAt` (`RecoveryBanner.tsx`). Names and same-user detection have no data source today.
+Comparison grid:
+| Choice | Current | A | B |
+|---|---|---|---|
+| A1 attribution source | none | additive `Site.lastEditedById` (nullable FK to User), set on every content save, returned with `lastEditedAt` | none; copy without names |
+| Decision 5 copy | approved, unimplementable | as approved | reopened: "This site was saved elsewhere 3 minutes ago" for teammate and same user |
+| Legacy copy | approved | unchanged | unchanged |
+Question D22:
+D22 — Server version kis ne save kiya, yeh kahan se pata chale? Project: docs/webflow-editor-audit-2026-10-14, Phase 1. ELI10: Design decision 5 ne restore dialog mein naam dikhana manzoor kiya ("Sara Khan saved…", "You saved from another tab…"). Lekin database mein Site sirf waqt rakhta hai (`schema.prisma:332`), kis ne save kiya yeh nahi. Har save sirf `lastEditedAt` likhta hai (`sites.service.ts:237,266,514`). Stakes if we pick wrong: ya to dialog naam ka wada poora nahi karega, ya ek chhota DB field joda jaega. Recommendation: A because ek nullable column aur teen save jagahon par ek line se approved copy sach ban jati hai. Completeness: A=10/10, B=6/10. Net: ek additive migration vs design faisla wapas kholna.
+Header: Attribution
+Options:
+A) Add lastEditedById (recommended)
+Additive nullable `Site.lastEditedById` (FK User, `onDelete: SetNull`), set in every content-save path, returned with `lastEditedAt`; dialog shows teammate name or "You … from another tab"; null (old rows) → legacy copy. Effort human ~4h / CC ~30min, risk low (additive migration, prod needs `migrate deploy`). ✅ Decision 5 copy works exactly as approved. ✅ Same field later serves History and presence labels. ❌ One more migration to deploy with Phase 1.
+B) No names
+Keep schema; dialog says "This site was saved elsewhere 3 minutes ago" for both teammate and same user. Effort ~0, risk low. ✅ No migration. ✅ Copy still true. ❌ Reopens design decision 5; users cannot tell a teammate from their own other tab.
+
+State: approved
+Actual answer: A) Add lastEditedById (recommended) — owner, D22, 2026-10-15
+Accepted scope: additive nullable `Site.lastEditedById` (FK User, `onDelete: SetNull`) + migration; set in every content-save path in `sites.service.ts`; returned with `lastEditedAt` to the editor; restore/conflict dialog picks teammate name, "You … from another tab or device" when it equals the current user, legacy copy when null. Tests: service test that each save path writes it; dialog unit test per variant.
+History: none
+
+#### A2: Where the design tasks run (lanes and dependencies)
+Finding: A2, P1, confidence 8/10, plan "Worktree parallelization" table (Lane A: S2 → S3 → S7; Lane B: S1; Lane C: S4; Lane D: S5 → S6) lists no DR task. Reviewer: Claude (eng re-review).
+Plan baseline: DR-T1…DR-T8 approved as tasks (design review, 2026-10-15) with no lane or dependency.
+Runtime evidence: DR-T3 needs the `autosave.stalled` signal from E-T2/E-T9; DR-T4 and DR-T6 need E-T6's server results and Preview-through-publish path; DR-T5 needs E-T9's scanner output (before/after); DR-T1/DR-T2 touch `useComposerInit.ts` and `ConflictModal.tsx`, the same files as E-T4; DR-T7 shares `FullPageHost.tsx` with E-T8.
+Comparison grid:
+| Choice | Current | A | B |
+|---|---|---|---|
+| A2 lane placement | none | each DR task joins the lane that owns its dependency: DR-T1, DR-T2 → Lane A after S3; DR-T5 → Lane A after S7; DR-T3 → Lane B after S1; DR-T7 → Lane C with S4; DR-T4, DR-T6 → Lane D after S6; DR-T8 docs → Lane C, VIEWER note → Lane D with S5 | new Lane E (UI) that starts after Lanes A, B, D merge |
+Question D23:
+D23 — Design tasks kis lane mein chalein? Project: docs/webflow-editor-audit-2026-10-14, Phase 1. ELI10: Eng plan ke 4 lanes (A–D) hain, lekin 8 design tasks kisi lane mein nahi. Har design task kisi eng task par tika hai: "Not saving" pill ko resize/autosave signal chahiye (Lane B), publish panel ko server results (Lane D), repair rows ko scanner (Lane A). Agar alag chalein to woh cheez bana lenge jo abhi bani hi nahi, aur `useComposerInit.ts`/`ConflictModal.tsx` par do lanes takrayenge. Stakes if we pick wrong: merge conflicts aur UI jo fake data par bana ho. Recommendation: A because har UI usi lane mein jo uska data banati hai, ek hi PR mein test hota hai. Completeness: A=10/10, B=7/10. Net: lanes thore lambe vs ek alag UI lane jo sab ke baad aaye.
+Header: DR lanes
+Options:
+A) Join owning lanes (recommended)
+DR-T1, DR-T2 → Lane A after S3; DR-T5 → Lane A after S7; DR-T3 → Lane B after S1; DR-T7 → Lane C with S4; DR-T4, DR-T6 → Lane D after S6; DR-T8 docs → Lane C, VIEWER note → Lane D with S5. Effort: no extra, risk low. ✅ Each UI ships with the data it shows, tested together. ✅ No second lane editing `useComposerInit.ts` / `ConflictModal.tsx`. ❌ Lanes A and D get longer; their merge comes later.
+B) Separate UI lane E
+New Lane E for all DR tasks, starting after A, B and D merge. Effort: same work, +1 merge wave, risk medium. ✅ UI work reviewed as one PR by one person. ✅ Eng lanes stay as approved. ❌ UI waits for everything; one more merge wave; engine PRs ship without their user-facing states.
+
+State: approved
+Actual answer: A) Join owning lanes (recommended) — owner, D23, 2026-10-15
+Accepted scope: DR-T1, DR-T2 → Lane A after S3; DR-T5 → Lane A after S7; DR-T3 → Lane B after S1 (the stall detector lives with the resize/autosave work in Lane B; E-T9 only emits `autosave.stalled` from it); DR-T7 → Lane C with S4; DR-T4, DR-T6 → Lane D after S6; DR-T8 docs → Lane C, VIEWER IP note → Lane D with S5. Dependency table and execution order updated below.
+History: none
+
+#### A3: Where form-activation status lives (decision 7)
+Finding: A3, P1, confidence 9/10, `server/services/publish.service.ts:631-649` — `completePublish` sets the job `status: "COMPLETED"` and the site `status: "PUBLISHED"` in one transaction; `prisma/schema.prisma:1440-1465` `PublishBuildJob` has no forms field, and its partial unique index allows one ACTIVE (QUEUED/BUILDING/DEPLOYING) job per site. Reviewer: Claude (eng re-review).
+Plan baseline: eng D9 (form activation only after deploy success, idempotent retry); design decision 7 ("Website live" and "Updating forms…" as separate lines; failure "Forms couldn't update · Retry form update"; survives reload; "the job is complete only when forms are").
+Runtime evidence: no place stores forms status; keeping the job out of COMPLETED until forms finish would keep it ACTIVE under the unique index (blocking the next publish) and hide it from the rollback list, which reads COMPLETED jobs.
+Comparison grid:
+| Choice | Current | A | B | C |
+|---|---|---|---|---|
+| A3 storage | none | additive `PublishBuildJob.formsStatus` (`PENDING`/`ACTIVE`/`FAILED`, null when the bundle has no forms) + `formsError` | a `"forms"` entry inside the existing `steps` JSON | new job status `ACTIVATING_FORMS` before COMPLETED |
+| Meaning of COMPLETED | website live | unchanged (website live) | unchanged | only after forms |
+| Decision 7 "complete only when forms are" | approved | UI shows the publish as finished only when `formsStatus` is ACTIVE or null | same, read from steps | job status itself |
+| Retry form update | approved | endpoint sets PENDING → re-runs activation for that job | same, rewrites steps | re-enters status |
+Question D24:
+D24 — Forms ki activation status kahan save ho? Project: docs/webflow-editor-audit-2026-10-14, Phase 1 publish. ELI10: Decision 7 kehta hai "Website live" aur "Updating forms…" alag dikhen, fail ho to Retry mile, aur reload ke baad bhi dikhe. Lekin publish job mein forms ke liye koi jagah nahi, aur `completePublish` (`publish.service.ts:631`) website live hote hi job COMPLETED kar deta hai. Agar job ko forms tak rok kar rakhein to woh "active" ginna jayega aur agla publish block ho jaega (ek site par ek hi active job ka index). Stakes if we pick wrong: ya to agla publish atak jaega, ya forms ki failure reload par gum ho jayegi. Recommendation: A because ek alag column COMPLETED ka matlab ("website live") nahi chhedta aur rollback/unique index waise hi chalte hain. Note: options differ in kind, not coverage — no completeness score. Net: ek additive column vs mojooda JSON ya status machine ko chhedna.
+Header: Forms status
+Options:
+A) formsStatus column (recommended)
+Additive `PublishBuildJob.formsStatus` (PENDING/ACTIVE/FAILED, null = no forms) + `formsError`; COMPLETED keeps meaning "website live"; the panel treats the publish as finished only when formsStatus is ACTIVE or null; "Retry form update" sets PENDING and re-runs activation for that job. Effort human ~1d / CC ~1h, risk low. ✅ Unique index, rollback list and COMPLETED semantics unchanged. ✅ Survives reload; queryable for the D8 events. ❌ One more additive migration.
+B) Inside steps JSON
+Store a "forms" entry in the existing `steps` JSON. Effort ~half of A, risk medium. ✅ No migration. ✅ Reuses the progress UI's data. ❌ `buildSteps()` rewrites the array on each phase, so a later write can erase the forms entry; not queryable.
+C) New job status
+Add `ACTIVATING_FORMS` before COMPLETED. Effort human ~2d / CC ~2h, risk high. ✅ One status tells the whole story. ✅ No extra column. ❌ Changes the active-job unique index and rollback list; a stuck activation blocks the next publish.
+
+State: approved
+Actual answer: A) formsStatus column (recommended) — owner, D24, 2026-10-15
+Accepted scope: additive `PublishBuildJob.formsStatus` (`PENDING`/`ACTIVE`/`FAILED`, null when the bundle has no forms) + `formsError` + migration; `completePublish` keeps COMPLETED = website live and sets `formsStatus: PENDING` when the bundle has forms; activation (eng D9) writes ACTIVE or FAILED; "Retry form update" endpoint (site-scoped, ADMIN+) sets PENDING and re-runs activation for that job; the panel shows the publish as finished only when `formsStatus` is ACTIVE or null. Unique index, rollback list and COMPLETED semantics unchanged. Tests: worker/service tests for PENDING→ACTIVE, PENDING→FAILED→retry→ACTIVE, and next publish not blocked while PENDING.
+History: none
+
+#### C1: Diff for "Review differences" (decision 16)
+Finding: C1, P2, confidence 9/10, `packages/editor/src/engine/VersionTimelineManager.ts:720` `private compareSnapshots(currentData: ProjectData, targetData: ProjectData, currentName: string, targetName: string): CompareResult` — an existing diff of two whole projects, used by History compare (`:698`, `:714`), but private. Reviewer: Claude (eng re-review).
+Plan baseline: design decision 16 (inline list of changed pages/elements, "yours / server" line each, "+ N more" after 8, labelled "Compares element content only").
+Runtime evidence: the restore dialog holds two `ProjectData` (kept local copy, loaded server project) — exactly this method's inputs. No other project diff exists in `src/`.
+Comparison grid:
+| Choice | Current | A | B |
+|---|---|---|---|
+| C1 diff source | private method | make `compareSnapshots` public on `VersionTimelineManager` (reached through the composer); dialog maps `CompareResult` to the inline list | new diff written for the dialog |
+| History compare | uses it | unchanged | unchanged |
+Question D25:
+D25 — "Review differences" ke liye fark kaun nikale? Project: docs/webflow-editor-audit-2026-10-14, Phase 1. ELI10: Restore dialog ko do poore projects ka fark dikhana hai (aapki kept copy vs server). History ka compare yahi kaam pehle se karta hai: `VersionTimelineManager.ts:720` mein `compareSnapshots(a, b, …)` do ProjectData leta hai, bas woh private hai. Stakes if we pick wrong: naya diff likha to History aur restore alag alag "fark" batayenge. Recommendation: A because ek lafz (`private` hatao) aur ek test se mojooda, istemal-shuda diff mil jata hai. Completeness: A=10/10, B=7/10. Net: mojooda diff kholna vs doosra diff likhna.
+Header: Diff source
+Options:
+A) Reuse compareSnapshots (recommended)
+Make `compareSnapshots` public on `VersionTimelineManager` (reached through the composer); the dialog maps `CompareResult` to the decision-16 list. Effort human ~1h / CC ~10min, risk low. ✅ One diff for History and restore; same "element content only" scope as the label says. ✅ Already exercised by History compare. ❌ A previously private method becomes part of the manager's surface.
+B) New dialog diff
+Write a page/element diff inside the restore flow. Effort human ~1d / CC ~1h, risk medium. ✅ Can be shaped exactly for the list. ✅ No change to VersionTimelineManager. ❌ Duplicate logic; History and restore can disagree about what changed.
+
+State: approved
+Actual answer: A) Reuse compareSnapshots (recommended) — owner, D25, 2026-10-15
+Accepted scope: `compareSnapshots` becomes public on `VersionTimelineManager` (reached through the composer); the restore dialog maps its `CompareResult` to the decision-16 list. Test: one unit test comparing two ProjectData fixtures (changed text, changed price, server-only section) and asserting the three rows.
+History: none
+
+#### T1: Regression contract for `ConflictModal` gaining a restore variant (IRON RULE)
+Finding: T1, P1 (regression risk), confidence 9/10, `packages/editor/src/editor/shell/modals/__tests__/ConflictModal.test.tsx:61-252` — 18 tests protect today's conflict dialog; D21 (variant) and design decision 11 (renamed actions) rewrite the component they cover. Reviewer: Claude (eng re-review).
+Plan baseline: D21 structure B; design decisions 5, 11, 16; BK-59 (snapshot server before Overwrite, E-T4).
+Runtime evidence: the 18 tests assert brand-format (no Overwrite), two-step Overwrite and its reset on reopen, no scrim dismiss + Escape, focus on the least destructive action with Tab trapped, `role=dialog` naming, `discardUnsaved` on Reload/Backup, keep on Overwrite, and three autosave-hold races.
+Comparison grid:
+| Choice | Current | A | B |
+|---|---|---|---|
+| Behaviours kept | 18 tests | all 18 kept as the `save` variant contract, labels renamed only | all 18 kept for `save`; `restore` gets new tests only |
+| Same table run for `restore` | n/a | yes — every non-copy behaviour asserted for both variants (table-driven) | no |
+| Intended changes | — | labels per decision 11; Overwrite snapshots server first (BK-59); restore copy variants (decision 5); inline differences (decision 16) | same |
+| Retired tests | — | `RecoveryBanner.test.tsx` (folded, decision 1) and the restore-toast assertions in `useComposerInit` tests move to the restore variant | same |
+Question D26:
+D26 — ConflictModal badalne par kaunsa purana behaviour test se bachaya jaye? Project: docs/webflow-editor-audit-2026-10-14, Phase 1. ELI10: ConflictModal ke 18 tests aaj data bachate hain: brand conflict par Overwrite nahi, Overwrite do qadam mein, scrim click se band nahi, focus sabse mehfooz button par, Reload/Backup par purani copy saaf, aur autosave ki teen race conditions. Ab isi file mein restore variant aur naye button naam aa rahe hain. Stakes if we pick wrong: restore variant mein yeh hifazat chhoot sakti hai aur ek click se teammate ka kaam ud sakta hai. Recommendation: A because restore variant bhi wahi khatarnak button rakhta hai, to wahi table dono par chale. Completeness: A=10/10, B=7/10. Net: ek table-driven suite vs restore ko kam hifazat.
+Header: Modal tests
+Options:
+A) Same contract both variants (recommended)
+Keep all 18 as the `save` contract (only labels renamed per decision 11); run every non-copy behaviour table-driven for `restore` too; add BK-59 snapshot-before-Overwrite and decision 5/16 copy tests; move `RecoveryBanner.test.tsx` and the restore-toast assertions into the restore variant. Effort human ~1d / CC ~1h (tests ~50x), risk low. ✅ Restore can never lose the two-step Overwrite, focus or discard rules. ✅ One table, so a future third variant inherits the contract. ❌ Larger test diff in the same PR.
+B) Save contract only
+Keep the 18 for `save`; `restore` gets only new copy/diff tests. Effort human ~4h / CC ~30min, risk medium. ✅ Smaller test diff. ✅ Existing suite untouched beyond labels. ❌ Restore's Overwrite path, focus and discard rules have no regression test.
+
+State: approved
+Actual answer: A) Same contract both variants (recommended) — owner, D26, 2026-10-15
+Accepted scope: the 18 tests in `ConflictModal.test.tsx` stay as the `save` contract with labels renamed per decision 11; every non-copy behaviour (two-step Replace, reset on reopen, no scrim dismiss + Escape, focus on "Keep the server version" with Tab trapped, `role=dialog` naming, discard on Keep/Download, keep on Replace, three autosave-hold races) runs table-driven for `restore` too; new tests for BK-59 snapshot-before-Replace, decision-5 copy variants, decision-16 list; `RecoveryBanner.test.tsx` and the restore-toast assertions move into the restore variant.
+History: none
+
+#### Re-review test coverage (DR tasks)
+
+```
+CODE PATHS (proposed, DR tasks)                         USER FLOWS
+[+] ConflictModal variant save|restore                  [+] Reload after failed save, teammate saved
+  ├── [★★★ TESTED] save contract — ConflictModal.test:61-252 ├── [GAP] [→E2E] dialog only, then repair toast (decision 1)
+  ├── [GAP] restore table run (T1)                        ├── [GAP] [→E2E] Replace with mine → server snapshot exists
+  ├── [GAP] copy variants teammate/self/legacy (A1)       └── [GAP] [→E2E] Escape defers; both copies kept
+  └── [GAP] differences list via compareSnapshots (C1)  [+] Autosave stuck
+[+] SaveStatus priority + Not saving                       ├── [GAP] [→E2E] resize Enter×2 + click → Not saving → Save now
+  ├── [★★ TESTED] 6 states — SaveStatus.test.tsx           └── [GAP] popover once, reopen on click, again after 2 min
+  └── [GAP] priority table + stalled variant            [+] Publish
+[+] Publish panel gate                                     ├── [GAP] [→E2E] blocked → topbar opens panel → Fix
+  ├── [GAP] server refusal rows + "live site unchanged"    ├── [GAP] [→E2E] refused by server after client pass
+  └── [GAP] formsStatus PENDING/ACTIVE/FAILED/retry (A3)   └── [GAP] [→E2E] forms failed → reload → still shown → retry
+[+] IssuesPanel damage rows                             [+] Preview
+  ├── [★★ TESTED] scan/failed/retry — IssuesPanel.test     ├── [GAP] build fails twice → Copy error details
+  └── [GAP] before→after, Keep as written, VIEWER          └── [GAP] Escape from inside iframe
+[+] Site.lastEditedById on every save (A1) — [GAP] service test per save path
+[+] Button aria-disabled + reason; FullPageHost focus — [GAP] unit + keyboard walk
+
+COVERAGE: 3/22 paths tested  |  GAPS: 19 (8 E2E) — all carried as required tests in DR-T1…DR-T8 and A1/A3/C1/T1 scope
+```
+Tests to retire/move: `RecoveryBanner.test.tsx` (into restore variant, T1); restore-toast assertions in `useComposerInit` tests (T1).
+
+#### R1: Restore check uses the token already loaded
+Finding: R1, P2, confidence 8/10, `packages/editor/src/services/BuildrikSyncProvider.ts:759` `const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;` — the project load already carries the server CAS token; `RecoveryBanner.tsx` makes a second `fetchSitePublishState` call (`services/PublishService.ts:208`, no timeout) and hides itself when that call fails. Reviewer: Claude (eng re-review).
+Plan baseline: OV-1 (restore by base CAS token), design decision 5 / Pass 2 table ("Checking the server…"; unreachable → "Can't reach the server. Your edits stay in this browser." + Try again).
+Runtime evidence: two network reads at load for one comparison; the second has no timeout bound.
+Comparison grid:
+| Choice | Current | A | B |
+|---|---|---|---|
+| R1 token source | second `sites.get` via `fetchSitePublishState` | the load response (`BuildrikSyncProvider.ts:759`), extended with `lastEditedById` (A1) | keep the second call, add a 5 s timeout |
+| "Checking the server…" state | approved | shown only while the project load itself is pending | shown up to 5 s |
+| Unreachable copy | approved | shown when the project load fails (existing load-error path) | shown after 5 s timeout |
+Question D27:
+D27 — Restore check server ka token kahan se le? Project: docs/webflow-editor-audit-2026-10-14, Phase 1. ELI10: Restore ka faisla server ke "last saved" token se hota hai (OV-1). Yeh token project load ke saath pehle hi aa jata hai (`BuildrikSyncProvider.ts:759`). Lekin aaj RecoveryBanner wahi cheez ek doosri request se dobara mangta hai (`PublishService.ts:208`), jis ka koi timeout nahi, aur fail hone par chupchap chhup jata hai. Stakes if we pick wrong: dialog bila wajah intezar karega ya slow network par ghaib ho jaega. Recommendation: A because ek hi load ka token use karna tez bhi hai aur us waqt ka sach bhi hai jis par editor khula. Note: options differ in kind, not coverage — no completeness score. Net: ek request kam vs mojooda raasta + timeout.
+Header: Token source
+Options:
+A) Use load token (recommended)
+Restore check compares the kept copy's base token with the token from the project load (extended with `lastEditedById`); no second request; "Checking the server…" only while load is pending; unreachable copy rides the existing load-error path. Effort human ~2h / CC ~15min, risk low. ✅ One request, no extra wait or timeout to tune. ✅ Compares against exactly the version the editor shows. ❌ RecoveryBanner's separate fetch and its tests are removed (already folded by decision 1).
+B) Second call + 5 s timeout
+Keep `fetchSitePublishState` for the check and bound it at 5 s, then show the unreachable copy. Effort human ~2h / CC ~15min, risk medium. ✅ Smallest change to today's code path. ✅ Fresh read at decision time. ❌ Extra request on every load with unsaved work; a newer server value than the loaded project can mismatch the screen.
+
+State: approved
+Actual answer: A) Use load token (recommended) — owner, D27, 2026-10-15
+Accepted scope: the restore check compares the kept copy's base token with the token from the project load (`BuildrikSyncProvider.ts:759`), whose select is extended with `lastEditedById` (A1); no second `fetchSitePublishState` call for restore; "Checking the server…" shows only while the project load is pending; the unreachable copy uses the existing load-error path. Test: restore decision unit test with loaded token equal / older / newer / missing (legacy).
+History: none
+
+#### Outside voice (codex gpt-6-astra, re-review) — 7 findings, all verified in code
+
+#### O1: "Download my edits" must download the kept copy and destroy nothing
+Finding: O1, High, confidence 9/10, codex; `ConflictModal.tsx:61-64` `discardThen` calls `discardUnsaved(siteId)` before the callback; `AquibraStudio.tsx:818-830` `onSaveBackup` downloads `composer.exportProject()` then reloads. In the restore variant the composer holds the SERVER project, so it would download the wrong copy after deleting the kept one.
+Plan baseline: T1 (D26) kept "discard on Keep/Download" as shared contract; design decisions 5/11.
+Runtime evidence: verified by reading both lines.
+Comparison grid:
+| Choice | Current (T1) | A | B | C | D |
+|---|---|---|---|---|---|
+| Download source | composer (server copy in restore) | the kept local snapshot in restore; composer in save variant (local copy there) | unchanged | investigate | unresolved |
+| Discard timing | before download | only after the download is written; never on failure; Download is non-destructive (no reload) in restore | unchanged | — | — |
+| T1 shared contract row "discard on Download" | approved | replaced for restore by "Download keeps the kept copy" | unchanged | — | — |
+Question D28:
+D28 — Restore mein "Download my edits" sahi copy kaise download kare? Project: docs/webflow-editor-audit-2026-10-14, Phase 1. ELI10: Aaj backup button pehle local copy mita deta hai (`ConflictModal.tsx:61`), phir jo editor mein khula hai woh download karta hai (`AquibraStudio.tsx:818`). Conflict ke waqt editor mein aapki copy hoti hai, is liye yeh theek chalta hai. Lekin restore ke waqt editor mein server ki copy hogi: button ghalat file dega aur aapki asli edits mita dega. Stakes if we pick wrong: user "download" daba kar apna kaam kho dega. Recommendation: A because download hamesha woh copy de jo khatre mein hai, aur mitaye kuch nahi. Note: options differ in kind, not coverage — no completeness score. Net: download ka source aur mitane ka waqt theek karna vs T1 jaisa chhorna.
+Header: Download fix
+Options:
+A) Apply this change (recommended)
+Restore variant downloads the kept local snapshot (not the composer), deletes nothing and does not reload; the dialog stays open. Save variant keeps downloading the composer but discards only after the file is written, never on failure. T1's "discard on Download" row is replaced for restore. Tests assert the downloaded JSON content and the failure path. Effort human ~3h / CC ~20min, risk low. ✅ The button gives exactly the copy at risk. ✅ A failed download never loses work. ❌ The two variants' Download behave differently (by design).
+B) Keep this row's current value
+Keep T1 as approved: discard first, download the composer. Effort 0. ✅ No change. ✅ Simpler shared contract. ❌ Restore downloads the server copy and deletes the user's edits.
+C) Investigate before choosing
+Bounded: read every `onSaveBackup` caller and the kept-copy storage (`unsavedRecovery.ts`) for 1h, then return with a choice; T1 stays as approved meanwhile. ✅ Full picture of callers. ✅ No commitment yet. ❌ The known data-loss path stays in the plan until then.
+D) Defer this proposed change only
+Leave O1 unresolved; T1 unchanged. ✅ No plan change now. ✅ Can revisit at build. ❌ An approved test contract encodes a data-loss behaviour.
+
+State: approved
+Actual answer: A) Apply this change (recommended) — owner, D28, 2026-10-15
+Accepted scope: restore variant downloads the kept local snapshot (not the composer), deletes nothing, does not reload, dialog stays open; save variant downloads the composer and discards only after the file is written, never on failure; T1 row "discard on Download" replaced for restore by "Download keeps the kept copy"; tests assert downloaded JSON content and the failure path in both variants.
+History: T1 (D26) contract row "discard on Keep/Download" — superseded for Download by this answer.
+
+#### O2: Project load must be one consistent server snapshot
+Finding: O2, High, confidence 9/10, codex; `BuildrikSyncProvider.ts:740-745` `const [site, pages, settingsResult] = await Promise.all([client.sites.get.query(...), client.pages.list.query(...), readSiteColumns()...])` then `:759` takes the CAS baseline from `site.lastEditedAt`. A teammate save between the two reads pairs old pages with a new token; the next save then passes CAS and overwrites unseen work. This exists in today's code, independent of Phase 1.
+Plan baseline: OV-1 (restore by base CAS token), R1 (D27: restore uses the load token).
+Runtime evidence: verified by reading the lines; not reproduced live.
+Comparison grid:
+| Choice | Current | A | B | C | D |
+|---|---|---|---|---|---|
+| Load consistency | 3 independent reads | one tRPC procedure returning site token, `lastEditedById`, pages and settings from one DB transaction (REPEATABLE READ) | unchanged | investigate | unresolved |
+| R1 / OV-1 guarantees | assume consistent load | hold | do not hold under concurrent saves | — | — |
+| Regression test | none | concurrency test: save lands between reads → load returns either all-old or all-new | none | — | — |
+Question D29:
+D29 — Project load ko ek hi waqt ki tasveer banayein? Project: docs/webflow-editor-audit-2026-10-14, Phase 1 (aur aaj ka bug). ELI10: Editor khulte waqt teen alag requests ek saath jaati hain: site (jis mein "last saved" token hai), pages, aur settings (`BuildrikSyncProvider.ts:740`). Agar inke beech teammate save kar de to editor ko purane pages aur naya token mil sakta hai. Phir aapka agla save conflict pakre baghair teammate ka kaam mita dega. Restore (R1) bhi isi token par tika hai. Stakes if we pick wrong: chup-chaap data loss, jo aaj bhi ho sakta hai. Recommendation: A because ek transaction mein parhna hi token aur content ko ek doosre se baandhta hai. Note: options differ in kind, not coverage — no completeness score. Net: ek naya load procedure vs mojooda race chhorna.
+Header: Load snapshot
+Options:
+A) Apply this change (recommended)
+New `sites.loadForEditor` procedure (router → service) reads site token, `lastEditedById`, pages and settings in one REPEATABLE READ transaction; `loadProject` uses it; concurrency test proves all-old or all-new. Effort human ~1d / CC ~1h, risk medium (load path). ✅ Closes a silent overwrite that exists today. ✅ R1 and OV-1 become true as written. ❌ Touches the editor's load path; needs a careful regression run.
+B) Keep this row's current value
+Keep three parallel reads. Effort 0. ✅ No load-path change. ✅ Smaller Phase 1. ❌ Token and content can disagree; saves can overwrite unseen teammate work.
+C) Investigate before choosing
+Bounded: 2h to reproduce the race against the local DB with two contexts and measure the window; plan stays as is meanwhile. ✅ Evidence of real-world likelihood. ✅ No load change yet. ❌ R1/OV-1 rest on an unproven assumption until then.
+D) Defer this proposed change only
+Leave O2 unresolved. ✅ No change now. ✅ Revisit during Lane A. ❌ A known data-loss race stays open under an approved restore design.
+
+State: approved
+Actual answer: A) Apply this change (recommended) — owner, D29, 2026-10-15
+Accepted scope: new `sites.loadForEditor` tRPC procedure (router → service, Prisma `$transaction` at REPEATABLE READ) returning site token, `lastEditedById`, pages and settings together; `BuildrikSyncProvider.loadProject` uses it instead of three parallel reads; DB-tier concurrency test (save committed between reads → load is all-old or all-new). Lane A, before DR-T1/DR-T2.
+History: none
+
+#### O3: Form activation must not overwrite a newer deployment
+Finding: O3, High, confidence 9/10, codex; `server/services/form-submission.service.ts:360-384` `recordPublishedForms(siteId, forms, deactivateMissing)` upserts site-wide `formBlock` rows and deactivates absent ones with no deployment identity. With A3, publish A (PENDING) → publish B → retry A re-applies A's fields and disables B's forms.
+Plan baseline: A3 (D24) — next publish not blocked while PENDING; "Retry form update" re-runs activation for that job; eng D9 idempotent activation.
+Runtime evidence: verified by reading the function.
+Comparison grid:
+| Choice | Current (A3) | A | B | C | D |
+|---|---|---|---|---|---|
+| Ordering guard | none | activation runs only if its job is still the site's current live job (`Site.liveJobId` or latest COMPLETED non-superseded), checked in the same transaction as the writes; an older job's PENDING/retry becomes `SUPERSEDED` | none | investigate | unresolved |
+| Rollback / unpublish | n/a | rollback makes its job current and re-activates its forms; unpublish supersedes pending activation | unchanged | — | — |
+Question D30:
+D30 — Purane publish ki forms activation naye publish ko kharab na kare? Project: docs/webflow-editor-audit-2026-10-14, Phase 1 publish. ELI10: Forms ko live karne wala function (`form-submission.service.ts:360`) poori site ke forms badalta hai aur yeh nahi dekhta ke yeh kis publish ka hai. A3 ne kaha tha forms ke dauran agla publish ho sakta hai, aur fail hone par purane publish ka Retry. To: publish A (forms pending) → publish B → A ka Retry, aur B ke forms band ho jayenge. Stakes if we pick wrong: live site ke forms chup-chaap purane ho jayenge ya band. Recommendation: A because sirf mojooda live publish ko forms badalne ka haq ho, ek hi transaction mein check. Note: options differ in kind, not coverage — no completeness score. Net: ek ordering check vs purana publish naye ko overwrite kar sake.
+Header: Form order
+Options:
+A) Apply this change (recommended)
+Activation and retry run only if the job is still the site's current live job, checked in the same transaction as the form writes; otherwise the job's formsStatus becomes `SUPERSEDED` and nothing is written; rollback makes its job current and re-activates its forms; unpublish supersedes pending work. Tests: A→B→retry A leaves B's forms; rollback restores A's forms. Effort human ~1d / CC ~1h, risk medium. ✅ Live forms always match the live deployment. ✅ Retry can never undo a newer publish. ❌ Adds a SUPERSEDED state and a current-job lookup.
+B) Keep this row's current value
+A3 as approved, no ordering guard. Effort 0. ✅ Simpler. ✅ No new state. ❌ An old retry can disable the current site's forms.
+C) Investigate before choosing
+Bounded: 2h to map every caller of `recordPublishedForms` (publish, rollback, unpublish) and how "current deployment" is stored today; A3 unchanged meanwhile. ✅ Exact picture of rollback/unpublish. ✅ No commitment yet. ❌ The overwrite path stays in the plan until then.
+D) Defer this proposed change only
+Leave O3 unresolved. ✅ No change now. ✅ Revisit in Lane D. ❌ Approved retry design can corrupt live forms.
+
+State: approved
+Actual answer: A) Apply this change (recommended) — owner, D30, 2026-10-15
+Accepted scope: form activation and "Retry form update" run only if the job is still the site's current live job, checked in the same transaction as the `formBlock` writes; otherwise `formsStatus = SUPERSEDED` and nothing is written; rollback makes its job current and re-activates its forms; unpublish supersedes pending activation. Tests: A→B→retry A leaves B's forms; rollback to A restores A's forms; unpublish during PENDING writes nothing.
+History: A3 (D24) status set extended with SUPERSEDED.
+
+#### O4: Removing the last form still needs tracked deactivation
+Finding: O4, High, confidence 8/10, codex; `form-submission.service.ts:378-383` deactivates forms absent from the new set when `deactivateMissing` is true, including an empty set. A3 sets `formsStatus = null` when the bundle has no forms, which declares done without running or tracking that sweep.
+Plan baseline: A3 (D24) "null when the bundle has no forms"; eng D9.
+Runtime evidence: verified by reading the sweep.
+Comparison grid:
+| Choice | Current (A3) | A | B | C | D |
+|---|---|---|---|---|---|
+| Meaning of null | bundle has no forms | the site had no active forms before and the bundle has none (nothing to reconcile) | unchanged | investigate | unresolved |
+| Empty bundle on a site with active forms | null (untracked) | PENDING → sweep → ACTIVE / FAILED / retry, like any reconciliation | null | — | — |
+Question D31:
+D31 — Aakhri form hatane par bhi forms ka kaam track ho? Project: docs/webflow-editor-audit-2026-10-14, Phase 1 publish. ELI10: A3 mein likha tha "forms nahi to status null", yaani kuch karna nahi. Lekin agar site par pehle forms the aur aapne sab hata diye, to purane forms band karne ka kaam hota hai (`form-submission.service.ts:378`). Null likhne se woh kaam na dikhega na fail par Retry milega, aur purane forms entries lete rahenge. Stakes if we pick wrong: hataye hue form chup-chaap submissions lete rahenge. Recommendation: A because "forms nahi" aur "kuch badalna nahi" do alag baatein hain. Note: options differ in kind, not coverage — no completeness score. Net: ek shart badalna vs ek ghaib kaam.
+Header: Empty forms
+Options:
+A) Apply this change (recommended)
+null only when the site had no active forms and the bundle has none; an empty bundle on a site with active forms goes PENDING → sweep → ACTIVE/FAILED with retry. Test: remove last form → publish → old form rejects submissions; sweep failure shows retry. Effort human ~2h / CC ~15min, risk low. ✅ Removed forms really stop. ✅ Failure is visible and retryable. ❌ One more condition in the activation path.
+B) Keep this row's current value
+null whenever the bundle has no forms. Effort 0. ✅ Simpler status rule. ✅ Fewer PENDING states. ❌ The sweep runs untracked; a failure leaves deleted forms live.
+C) Investigate before choosing
+Bounded: 1h to check how `deactivateMissing` is decided (`planFormWiring`) for empty bundles; A3 unchanged meanwhile. ✅ Confirms whether the sweep even runs today. ✅ No commitment. ❌ Gap stays until then.
+D) Defer this proposed change only
+Leave O4 unresolved. ✅ No change now. ✅ Revisit in Lane D. ❌ Removed forms may keep accepting entries.
+
+State: approved
+Actual answer: A) Apply this change (recommended) — owner, D31, 2026-10-15
+Accepted scope: `formsStatus = null` only when the site had no active forms and the bundle has none; an empty bundle on a site with active forms runs PENDING → deactivation sweep → ACTIVE/FAILED with retry (under the O3 guard). Test: remove last form → publish → the old form rejects submissions; a sweep failure shows "Forms couldn't update · Retry form update".
+History: A3 (D24) null rule narrowed.
+
+#### O5: Abandoned form activation must recover
+Finding: O5, High, confidence 8/10, codex; `packages/dashboard/app/api/workers/publish/[jobId]/route.ts:65` rejects non-QUEUED jobs, and `packages/editor/src/editor/shell/hooks/usePublishJob.ts:200` stops polling at COMPLETED. A worker that dies after `completePublish` leaves `formsStatus = PENDING` forever: never FAILED, so no retry is offered, and the client stopped watching.
+Plan baseline: A3 (D24), O3 (D30), O4 (D31); design decision 7 ("Taking longer than usual" after 60 s; survives reload).
+Runtime evidence: verified the worker guard and the polling stop by reading the lines; an existing cron `packages/dashboard/app/api/cron/publish-job-cleanup/` already sweeps publish jobs.
+Comparison grid:
+| Choice | Current (A3) | A | B | C | D |
+|---|---|---|---|---|---|
+| Stuck PENDING | stays forever | `publish-job-cleanup` cron re-runs activation (O3 guard) for PENDING older than 2 min, up to 3 attempts, then FAILED with `formsError` | unchanged | investigate | unresolved |
+| Client polling | stops at COMPLETED | continues until `formsStatus` is ACTIVE / FAILED / SUPERSEDED / null | unchanged | — | — |
+| Test | none | kill worker after `completePublish` → cron recovers → ACTIVE; 3 failures → FAILED + retry shown | none | — | — |
+Question D32:
+D32 — Worker beech mein mar jaye to forms ka kaam kaise bache? Project: docs/webflow-editor-audit-2026-10-14, Phase 1 publish. ELI10: Website live hone ke baad forms ka kaam shuru hota hai. Agar us waqt server process mar jaye, job "PENDING" mein atka rehta hai. Worker sirf QUEUED job uthata hai (`route.ts:65`) aur editor COMPLETED par dekhna band kar deta hai (`usePublishJob.ts:200`), to na Retry aata hai na koi theek karta hai. Ek cron (`publish-job-cleanup`) pehle se maujood hai. Stakes if we pick wrong: hamesha "Updating forms…" aur forms kabhi live nahi. Recommendation: A because mojooda cron ko 2 minute se purane PENDING jobs dobara chalane dena sabse chhota pakka hal hai. Note: options differ in kind, not coverage — no completeness score. Net: cron mein ek kaam vs hamesha atka status.
+Header: Stuck forms
+Options:
+A) Apply this change (recommended)
+`publish-job-cleanup` cron re-runs activation (with the O3 guard) for PENDING older than 2 min, max 3 attempts, then FAILED with `formsError`; the editor keeps polling until formsStatus is terminal or null. Test: worker killed after `completePublish` → cron → ACTIVE; 3 failures → FAILED + retry. Effort human ~4h / CC ~30min, risk low. ✅ No job stays stuck; failures always reach the retry UI. ✅ Reuses an existing cron and its secret. ❌ Recovery waits up to the cron interval.
+B) Keep this row's current value
+No recovery; PENDING can stick. Effort 0. ✅ No cron change. ✅ Simpler. ❌ A crash leaves forms inactive with a spinner forever.
+C) Investigate before choosing
+Bounded: 1h to read the cron's schedule and the worker's process model on cPanel; plan unchanged meanwhile. ✅ Right timing for the 2-minute rule. ✅ No commitment. ❌ Stuck state stays possible until decided.
+D) Defer this proposed change only
+Leave O5 unresolved. ✅ No change now. ✅ Revisit in Lane D. ❌ Decision 7's "survives reload" can show a spinner that never ends.
+
+State: approved
+Actual answer: A) Apply this change (recommended) — owner, D32, 2026-10-15
+Accepted scope: `publish-job-cleanup` cron re-runs activation (O3 guard) for `formsStatus = PENDING` older than 2 min, max 3 attempts, then FAILED with `formsError`; `usePublishJob` keeps polling after COMPLETED until formsStatus is ACTIVE / FAILED / SUPERSEDED / null. Tests: worker killed after `completePublish` → cron run → ACTIVE; three failures → FAILED and the retry line shows.
+History: none
+
+#### O6: "Your live site wasn't changed" only when that is known
+Finding: O6, High, confidence 7/10, codex; `server/services/publish.service.ts:~992-1037` — after the deployment reaches `READY`, later steps (password protection, connection checks) can still throw; the worker's catch (`packages/dashboard/app/api/workers/publish/[jobId]/route.ts:189-208`) marks the job FAILED even though production may already serve the new deployment.
+Plan baseline: design decision 6 (every failure line carries "Your live site wasn't changed."; deploy failure → "Deploy failed · Retry" same bundle).
+Runtime evidence: verified the post-READY throw sites by reading; whether Vercel aliased production at that point was not checked live.
+Comparison grid:
+| Choice | Current (decision 6) | A | B | C | D |
+|---|---|---|---|---|---|
+| "Live site wasn't changed" | on every failure | only for failures before a deployment is created (server checks, bundle build, upload) | unchanged | investigate | unresolved |
+| Failure after READY | FAILED, "Deploy failed · Retry" | job records `deploymentId` + phase; panel shows "Your site may have been updated · Checking…", worker reconciles with the deployment's real state, then shows "Website live · <step> couldn't finish · Retry <step>" or the pre-deploy copy | unchanged | — | — |
+| Retry of a post-READY failure | redeploy same bundle | retry only the failed step after reconciliation | unchanged | — | — |
+Question D33:
+D33 — "Your live site wasn't changed" sirf tab kahein jab yeh pakka ho? Project: docs/webflow-editor-audit-2026-10-14, Phase 1 publish. ELI10: Decision 6 ne har failure par "Your live site wasn't changed" likhne ko kaha. Lekin deploy READY hone ke baad bhi kuch steps (jaise password protection) fail ho sakte hain (`publish.service.ts:~1000`), aur worker phir bhi job FAILED kar deta hai, halaanke live site badal chuki ho sakti hai. Stakes if we pick wrong: hum user ko jhooti tasalli denge, aur "Retry" poori site dobara deploy karega. Recommendation: A because yeh jumla sirf deploy shuru hone se pehle ki failures par sach hai; baad ki failures ko asal halat dekh kar batana chahiye. Note: options differ in kind, not coverage — no completeness score. Net: failures ko do qisam mein baantna vs ek jaisa jhoota jumla.
+Header: Live claim
+Options:
+A) Apply this change (recommended)
+"Your live site wasn't changed." only for failures before a deployment exists; after READY the job keeps `deploymentId` and phase, the panel shows "Your site may have been updated · Checking…", the worker reconciles with the deployment's real state, then shows "Website live · <step> couldn't finish · Retry <step>" (retry only that step) or the pre-deploy copy. Tests: throw before create → pre-deploy copy; throw after READY → reconcile → step retry. Effort human ~1d / CC ~1h, risk medium. ✅ Every sentence on screen is true. ✅ Retry no longer redeploys a site that is already live. ❌ One more failure phase to model and test.
+B) Keep this row's current value
+Decision 6 as approved. Effort 0. ✅ Simple, one failure copy. ✅ No worker change. ❌ Can tell users nothing changed when production did.
+C) Investigate before choosing
+Bounded: 2h to list every throw after `createVercelDeployment` and check whether production is aliased at READY; decision 6 stands meanwhile. ✅ Exact list of post-deploy failure points. ✅ No commitment. ❌ False claim stays in the approved copy until then.
+D) Defer this proposed change only
+Leave O6 unresolved. ✅ No change now. ✅ Revisit in Lane D. ❌ Approved UI copy may be false in production.
+
+State: approved
+Actual answer: A) Apply this change (recommended) — owner, D33, 2026-10-15
+Accepted scope: "Your live site wasn't changed." only for failures before a deployment exists (server checks, bundle build, upload); after READY the job keeps `deploymentId` and a failure phase, the panel shows "Your site may have been updated · Checking…", the worker reconciles with the deployment's real state and then shows "Website live · <step> couldn't finish · Retry <step>" (retries only that step) or the pre-deploy copy. Tests: throw before create → pre-deploy copy; throw after READY → reconcile → step retry, no redeploy.
+History: design decision 6 copy narrowed (pre-deploy failures only).
+
+#### O7: Save-time conflict needs a fresh server snapshot for names and differences
+Finding: O7, Medium, confidence 9/10, codex; `packages/editor/src/services/BuildrikSyncProvider.ts:205-210` `announceConflict(serverToken, brandFormat)` dispatches `{ serverLastEditedAt: serverToken, brandFormat }` only — no server project, no author. Decision 11 gives both dialog variants the same structure (who/when + comparison), but A1/C1/R1 supply that data only at load time.
+Plan baseline: design decisions 5, 11, 16; A1 (D22), C1 (D25), O2 (D29 `sites.loadForEditor`).
+Runtime evidence: verified by reading the event payload.
+Comparison grid:
+| Choice | Current | A | B | C | D |
+|---|---|---|---|---|---|
+| Save-variant data | timestamp only | on conflict the dialog opens at once with "Checking what changed…", calls `sites.loadForEditor` (O2) for the server project + `lastEditedById`, then fills who/when and Review differences | timestamp only; save variant shows "This site changed somewhere else" with no names/diff | investigate | unresolved |
+| Fetch failure | n/a | dialog keeps all three actions, shows "Couldn't load what changed" and no diff | n/a | — | — |
+| Decision 11 structure in save variant | approved | met | reopened (save variant without who/comparison) | — | — |
+Question D34:
+D34 — Save ke waqt conflict mein bhi naam aur fark dikhayein? Project: docs/webflow-editor-audit-2026-10-14, Phase 1. ELI10: Decision 11 ne dono dialogs (restore aur conflict) ki ek jaisi banawat manzoor ki: kis ne kab save kiya + kya badla. Restore ke liye yeh data load se aata hai. Lekin save ke waqt conflict mein editor ko sirf ek timestamp milta hai (`BuildrikSyncProvider.ts:205`), na server ka project na save karne wale ka naam. Stakes if we pick wrong: conflict dialog ya to khali jagah dikhayega ya decision 11 adhoora rahega. Recommendation: A because O2 ka naya load procedure yahi data ek call mein deta hai, aur actions intezar ke dauran bhi kaam karte hain. Note: options differ in kind, not coverage — no completeness score. Net: conflict par ek extra read vs save variant ko kam jaankari.
+Header: Conflict data
+Options:
+A) Apply this change (recommended)
+On conflict the dialog opens immediately with "Checking what changed…", calls `sites.loadForEditor` (O2) for the server project + `lastEditedById`, then fills who/when and Review differences; if the read fails it shows "Couldn't load what changed" with all three actions still usable. Tests: conflict → names + diff; read failure → actions still work. Effort human ~3h / CC ~20min, risk low. ✅ Both variants say the same true things. ✅ Reuses O2's procedure and C1's diff. ❌ One extra read when a conflict happens.
+B) Keep this row's current value
+Save variant stays timestamp-only: "This site changed somewhere else", no names or diff. Effort 0. ✅ No extra read. ✅ Smaller change. ❌ Reopens decision 11 for the save variant; users choose blind.
+C) Investigate before choosing
+Bounded: 1h to check what the conflict response from `saveContent` could return instead of a second read; decisions stand meanwhile. ✅ Might avoid a second call. ✅ No commitment. ❌ Save-variant content stays undefined until then.
+D) Defer this proposed change only
+Leave O7 unresolved. ✅ No change now. ✅ Revisit in Lane A. ❌ The approved save-variant layout has no data source.
+
+State: approved
+Actual answer: A) Apply this change (recommended) — owner, D34, 2026-10-15
+Accepted scope: on a save conflict the dialog opens at once with "Checking what changed…", calls `sites.loadForEditor` (O2) for the server project + `lastEditedById`, then fills who/when and Review differences (C1); on read failure it shows "Couldn't load what changed" with all three actions usable. Tests: conflict → names + diff; read failure → actions still work.
+History: none
+
+Re-review TODOS.md updates: none — every finding became approved Phase 1 work; nothing deferred.
+
+Approval readiness: PASS — checked D21 (structure B), A1 (D22), A2 (D23), A3 (D24), C1 (D25), T1 (D26), R1 (D27), O1 (D28), O2 (D29), O3 (D30), O4 (D31), O5 (D32), O6 (D33), O7 (D34); each cites the owner's AskUserQuestion answer of 2026-10-15. No pending rows.
+
+### Re-review required outputs
+
+#### Updated worktree parallelization (supersedes the table in "Eng required outputs")
+
+| Step | Modules touched | Depends on |
+|---|---|---|
+| S0 Consistent load + attribution (O2, A1) | `server/trpc/routers` (sites), `server/services` (sites), `prisma/`, `editor/services` (BuildrikSyncProvider) | — |
+| S1 Canvas gestures + stall detector (E-T2, DR-T3) | `engine/canvas/`, `editor/canvas/overlays`, `editor/chrome-ui` (SaveStatus) | — |
+| S2 Precedence + ResolvedStyle (E-T1, E-T3) | `engine/styles/`, `editor/inspector/`, `shared/utils` | — |
+| S3 Clone/undo/save/recovery + restore/conflict dialog (E-T4, DR-T1, DR-T2, C1, T1, R1, O1, O7) | `engine/elements/`, `engine/VersionTimelineManager`, `editor/shell/hooks`, `editor/shell/modals` | S0, S2 |
+| S4 Locks, menus, FullPageHost, a11y pattern (E-T8, DR-T7, DR-T8 docs) | `editor/canvas/menus`, `engine/commands`, `editor/chrome-ui`, `editor/sidebar/FullPageRouter`, `DESIGN.md` | — |
+| S5 Server authz + forms + IP note (E-T5, DR-T8 note) | `server/trpc/routers`, `server/services`, export UI | — |
+| S6 Publish bundle + gate + forms status + Preview (E-T6, DR-T4, DR-T6, A3, O3, O4, O5, O6) | `server/services/publish*`, `server/services/form-submission`, `packages/dashboard/app/api/workers/publish`, `packages/dashboard/app/api/cron/publish-job-cleanup`, `prisma/`, `editor/shell` (gate, Preview), `editor/sidebar/tabs/publish` | S2, S5, S0 (shared migration file order) |
+| S7 Content/media/paste + DamageScanner + events + damage rows (E-T7, E-T9, DR-T5) | `engine/export/`, `engine/elements/manager`, `services/AssetUploadService`, `engine/recovery/`, `editor/shell/IssuesPanel`, `shared/utils/errorTracking` | S2 |
+
+Parallel lanes:
+- Lane A: S0 → S2 → S3 → S7
+- Lane B: S1
+- Lane C: S4
+- Lane D: S5 → S6 (S6 waits for A's S0 and S2)
+
+Execution order: launch A (S0) + B + C + D (S5). Merge S0 first (it carries the load procedure and the `lastEditedById` migration). Merge B, C, S5. When A's S2 merges, start S6. Merge A, then S6.
+Conflict flags: `prisma/schema.prisma` + migrations (S0 `lastEditedById`, S6 `formsStatus`/bundle table): one migration per lane, merged in S0 → S6 order. `editor/shell` (S3, S4, S6) and `editor/chrome-ui` (S1 SaveStatus, S4 Button/FullPageHost): rebase per merge.
+
+#### Re-review implementation tasks (add to E-T1…E-T10 and DR-T1…DR-T8)
+
+- [ ] **ER-T1 (P1, human: ~1.5d / CC: ~1.5h)** — load/server — `sites.loadForEditor` in one REPEATABLE READ transaction; `Site.lastEditedById` written on every content save; `loadProject` uses the new procedure
+  - Surfaced by: O2 (D29), A1 (D22)
+  - Files: `server/trpc/routers/sites.ts`, `server/services/sites.service.ts`, `prisma/schema.prisma` (+ additive migration), `packages/editor/src/services/BuildrikSyncProvider.ts`
+  - Verify: DB-tier concurrency test (all-old or all-new); service test per save path; editor load test
+- [ ] **ER-T2 (P1, human: ~1.5d / CC: ~1.5h)** — shell — `ConflictModal` variant `save | restore` with table-driven contract, non-destructive restore Download of the kept copy, fresh conflict snapshot, differences via public `compareSnapshots`, restore check on the load token
+  - Surfaced by: D21, T1 (D26), O1 (D28), O7 (D34), C1 (D25), R1 (D27)
+  - Files: `editor/shell/modals/ConflictModal.tsx` (+ tests), `editor/shell/AquibraStudio.tsx` (callbacks only, coordinate with founder edits), `editor/shell/hooks/useComposerInit.ts`, `engine/VersionTimelineManager.ts`, retire `editor/shell/RecoveryBanner.tsx`
+  - Verify: 18-test contract green for both variants; downloaded JSON equals the kept copy; download failure deletes nothing
+- [ ] **ER-T3 (P1, human: ~2d / CC: ~2h)** — publish — `formsStatus` (PENDING/ACTIVE/FAILED/SUPERSEDED) + `formsError`; current-live-job guard on activation and retry; empty-set sweep tracked; cron recovery of stale PENDING; client polls until terminal
+  - Surfaced by: A3 (D24), O3 (D30), O4 (D31), O5 (D32)
+  - Files: `prisma/schema.prisma` (+ migration), `server/services/publish.service.ts`, `server/services/form-submission.service.ts`, `packages/dashboard/app/api/workers/publish/[jobId]/route.ts`, `packages/dashboard/app/api/cron/publish-job-cleanup/`, `packages/editor/src/editor/shell/hooks/usePublishJob.ts`
+  - Verify: A→B→retry A keeps B's forms; remove last form deactivates; worker killed after COMPLETED recovers by cron; next publish not blocked while PENDING
+- [ ] **ER-T4 (P1, human: ~1d / CC: ~1h)** — publish — failure phases: pre-deploy vs post-READY; reconcile with the deployment's real state; step-only retry; copy per phase
+  - Surfaced by: O6 (D33)
+  - Files: `server/services/publish.service.ts`, `packages/dashboard/app/api/workers/publish/[jobId]/route.ts`, `editor/sidebar/tabs/publish/*`
+  - Verify: throw before create → "Your live site wasn't changed."; throw after READY → "Checking…" → step retry, no redeploy
+
+#### Re-review NOT in scope
+- Live reproduction of the O2 load race (accepted on code reading; the DB-tier test proves the fix).
+- A third `ConflictModal` variant — the table-driven contract covers future variants but none is planned.
+
+#### Re-review what already exists (reused)
+`VersionTimelineManager.compareSnapshots` (C1), `publish-job-cleanup` cron (O5), `recordPublishedForms` sweep (O3/O4, guarded), `ConflictModal` 18-test suite (T1), `BuildrikSyncProvider` CAS baseline (R1, now from the consistent load), `PublishBuildJob` retention and unique index (unchanged by A3).
+
+#### Re-review failure modes
+
+| New path | Realistic failure | Test | Handling | User sees |
+|---|---|---|---|---|
+| Consistent load | transaction aborted under contention | yes | retry once, then existing load-error path | load error with retry |
+| Restore Download | blob/download fails | yes | nothing deleted, dialog stays | download error, copy kept |
+| Conflict snapshot read | network failure | yes | actions still usable | "Couldn't load what changed" |
+| Form activation | older job retried after newer publish | yes | SUPERSEDED, no writes | old job shows superseded |
+| Form activation | worker dies after COMPLETED | yes | cron re-runs, then FAILED | "Forms couldn't update · Retry" |
+| Post-READY step | password protection throws | yes | reconcile, step retry | "Website live · … couldn't finish · Retry" |
+
+Critical gaps: 0.
+
+#### Re-review completion summary
+- Step 0: Scope Challenge — scope accepted as-is (structure: Smaller arrangement, D21)
+- Reality rows: 7/7 applicable rows emitted, 0 unverified premises
+- Architecture Review: 3 issues found (A1, A2, A3)
+- Code Quality Review: 1 issue found (C1)
+- Test Review: diagram produced, 19 gaps identified (all required tests in DR/ER tasks); regression contract T1
+- Performance Review: 1 issue found (R1)
+- NOT in scope: written
+- What already exists: written
+- TODOS.md updates: 0 items proposed to user
+- Failure modes: 0 critical gaps flagged
+- Unresolved decisions: 0 in this review
+- Outside voice: codex (gpt-6-astra) completed — 7 findings (6 High, 1 Medium), all verified in code, all applied (D28–D34)
+- Parallelization: 4 lanes (A: S0→S2→S3→S7; B; C; D: S5→S6), 3 parallel / 1 cross-lane dependency (S6 on S0+S2)
+- Lake Score: 4/4 (D22, D23, D25, D26 scored; all chose the 10/10 option)
+
+```
+REALITY: premise-table pass every factual claim in A1–R1 and O1–O7 carries a file:line receipt; unverified=0 — prisma/schema.prisma:332
+REALITY: already-done pass git log origin/main (fb1697cbd) --since=2026-10-14 on ConflictModal, BuildrikSyncProvider, form-submission, publish.service, schema, SaveStatus, PreviewOverlay: no commits — packages/editor/src/services/BuildrikSyncProvider.ts:740
+REALITY: surface-check pass tRPC/routes named exist: sites.get, pages.list, siteDetail.settings.get (BuildrikSyncProvider.ts:740-745), worker route.ts:65, cron publish-job-cleanup — packages/dashboard/app/api/workers/publish/[jobId]/route.ts:65
+REALITY: binding-decisions pass design decisions 1–17 kept; 5, 6, 11 narrowed only by explicit owner answers D28/D33/D34; CEO D9/D11 and eng D8/D9 unchanged — docs/plans/2026-10-14-webflow-workflows-product-design.md:551
+REALITY: numbers pass 30 s stall is a design decision (docs/plans/2026-10-14-webflow-workflows-product-design.md:1421); 2 min / 3 attempts is an approved bound (docs/plans/2026-10-14-webflow-workflows-product-design.md:1815); 18 tests [measured: packages/editor/src/editor/shell/modals/__tests__/ConflictModal.test.tsx:61-252]
+REALITY: deferred-asks pass nothing deferred; re-review NOT in scope lists two explicit exclusions — docs/plans/2026-10-14-webflow-workflows-product-design.md:568
+REALITY: pr-count pass no ship-policy file; one PR per lane (4), S0 merged first — 855c8b08b
+```
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/plan-ceo-review` | Scope & strategy | 57 | CLEAR (2026-10-15) | mode: HOLD_SCOPE, 0 critical gaps; 11 decisions (D1–D11) answered |
-| Outside Review | codex (gpt-6-astra) via `/plan-ceo-review`, `/plan-eng-review` and `/plan-design-review` outside voices | Independent 2nd opinion | 36 | completed (CEO, Eng and Design phases) | CEO 5 findings, all resolved; Eng 5 findings, all resolved or carried; Design 9 findings, 0 hard rejections, all resolved by design decisions 1–16 |
-| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 43 | ISSUES OPEN (2026-10-15, FULL_REVIEW) | 37 issues, 0 critical gaps — all mapped to Phase 1 tasks E-T1…E-T10, none deferred |
-| Design Review | `/plan-design-review` | UI/UX gaps | 42 | CLEAR (this run, 2026-10-15) | score: 4/10 → 9/10, 17 decisions |
+| Outside Review | codex (gpt-6-astra) via `/plan-ceo-review`, `/plan-eng-review` (×2) and `/plan-design-review` outside voices | Independent 2nd opinion | 37 | completed (CEO, Eng, Design, Eng re-review) | re-review: 7 findings (6 High, 1 Medium), all verified and applied (D28–D34); earlier phases all resolved |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 44 | ISSUES OPEN (this run, 2026-10-15, FULL_REVIEW) | 24 issues, 0 critical gaps — all approved as Phase 1 work (ER-T1…ER-T4 + DR/E tasks), 0 unresolved |
+| Design Review | `/plan-design-review` | UI/UX gaps | 42 | CLEAR (2026-10-15) | score: 4/10 → 9/10, 17 decisions |
 | DX Review | `/plan-devex-review` | Developer experience gaps | 1 | — (not for this plan) | — |
 
-- **OUTSIDE COVERAGE:** codex, design phase, completed 2026-10-15: 9 findings (7 High, 2 Medium), 0 hard rejections. Earlier codex phases: CEO (2026-10-14, 5 findings) and Eng (2026-10-15, 5 findings), both completed.
-- **CROSS-MODEL:** Codex and the native Claude subagent agreed on the main design gaps: load-time ordering, save-pill priority and truthful stalled copy, the publish gate's owner surface, form-activation failure, restore-dialog differences, and disabled-with-reason accessibility. Claude alone flagged the duplicated publish verdict and the restore/conflict vocabulary split. Codex alone flagged the DESIGN.md ink/elevation contradiction, which was verified in `tokens.generated.css:77`. Model identities: native = Claude Opus 5.5; outside = gpt-6-astra.
-- **VERDICT:** CEO + DESIGN CLEARED. ENG has 37 findings, all mapped to Phase 1 tasks with 0 unresolved; its status is recorded as ISSUES OPEN. The plan is ready to implement once the owner accepts it. Eng review required (status ISSUES OPEN by the log rule; re-run `/plan-eng-review` after Phase 1 tasks land to clear it).
+- **OUTSIDE COVERAGE:** codex, plan-review phase (eng re-review), completed 2026-10-15: 7 findings. They covered restore Download sourcing, the load-path race, form-activation ordering, the empty set, stuck PENDING, the post-READY live claim and conflict-time data. All were verified by reading the cited lines, and all were applied. Earlier codex phases (CEO, Eng, Design) also completed.
+- **CROSS-MODEL:** The native re-review found the data-model gaps: attribution (A1), forms storage (A3), the lanes (A2), reusing the diff (C1) and the restore token source (R1). Codex found the failure and race paths under those decisions (O1–O7), which the native pass missed. There was no disagreement; Codex built on A3 and T1 instead of contradicting them. Model identities: native = Claude Opus 5.5; outside = gpt-6-astra.
+- **VERDICT:** CEO + DESIGN CLEARED. ENG has 24 findings, all approved as Phase 1 tasks with 0 unresolved and 0 critical gaps; its log status is ISSUES OPEN because every finding became work. The plan is ready to implement. Eng review required (by the log rule, the status clears only on a review with zero findings).
 
 NO UNRESOLVED DECISIONS
