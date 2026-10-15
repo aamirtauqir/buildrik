@@ -67,6 +67,22 @@ expect("dev push main", guard("factory-developer", "Bash", { command: "git push 
 expect("dev push HEAD", guard("factory-developer", "Bash", { command: "git push" }), "deny");
 expect("dev merge", guard("factory-developer", "Bash", { command: "gh pr merge 12 --squash" }), "deny");
 expect("dev pr create", guard("factory-developer", "Bash", { command: "gh pr create --base main --head factory/T-001 --title x --body-file -" }), "allow");
+// bypass forms (security review of 6665b109f)
+expect("dev push branch:main", guard("factory-developer", "Bash", { command: "git push origin factory/T-001:main" }), "deny");
+expect("dev push refs/heads/main", guard("factory-developer", "Bash", { command: "git push origin factory/T-001:refs/heads/main" }), "deny");
+expect("dev push branch to its own name", guard("factory-developer", "Bash", { command: "git push origin factory/T-001:factory/T-001" }), "allow");
+for (const [label, command] of [
+  ["redirect", "echo hacked > packages/editor/src/a.ts"], ["append", "printf x >> server/a.ts"], ["sed -i", "sed -i '' s/a/b/ lib/x.ts"],
+  ["tee", "echo x | tee lib/x.ts"], ["cp", "cp /tmp/x lib/x.ts"], ["node writeFile", "node -e 'require(\"fs\").writeFileSync(\"a\",\"b\")'"],
+  ["perl -pi", "perl -pi -e s/a/b/ x.ts"], ["git apply", "git apply /tmp/p.diff"],
+]) expect(`qa shell write: ${label}`, guard("factory-qa", "Bash", { command }), "deny");
+expect("analyst shell write", guard("factory-analyst", "Bash", { command: "echo x > server/a.ts" }), "deny");
+for (const [label, command] of [
+  ["2>&1", "npx vitest run a.test.ts 2>&1 | tail -5"], ["/dev/null", "pnpm lint > /dev/null"], ["tmp log", "pnpm lint > /tmp/lint.log 2>&1"],
+  ["worktree add", "git worktree add ../qa-T-001 factory/T-001"], ["arrow in text", "grep -n 'a -> b' x"], ["gh pr view", "gh pr view 3 --json files"],
+]) expect(`qa allowed: ${label}`, guard("factory-qa", "Bash", { command }), "allow");
+expect("dev shell write allowed", guard("factory-developer", "Bash", { command: "echo x > packages/editor/src/a.ts" }), "allow");
+
 // main session (PM) unaffected by role rules
 expect("PM task.md", guard(undefined, "Edit", { file_path: `${root}/docs/factory/tasks/T-001/task.md` }), "allow");
 expect("PM merge", guard(undefined, "Bash", { command: "gh pr merge 12 --squash" }), "allow");

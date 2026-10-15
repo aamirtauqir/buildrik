@@ -91,8 +91,28 @@ if (isFactory && tool === "Bash") {
   if (/\bgit\b[^\n]*\bpush\b/.test(raw) && !/\bgit\b[^\n]*\bpush\b[^\n]*\bfactory\/T-\d+\b/.test(raw)) {
     decide("deny", `${ROLE} may push only its own factory/<ID> branch, never main`);
   }
-  if (READ_ONLY_ROLES.has(ROLE) && /\bgit\s+(commit|push|add|reset|checkout\s+--|restore)\b/.test(raw)) {
+  // A factory/T-NNN branch name in the command is not enough: `factory/T-001:main`
+  // pushes that branch INTO main.
+  if (/\bgit\b[^\n]*\bpush\b[^\n]*(:|\s)(refs\/heads\/)?(main|master)\b/.test(raw)) {
+    decide("deny", `${ROLE} may push only to its own factory/<ID> branch, never into main`);
+  }
+  if (READ_ONLY_ROLES.has(ROLE) && /\bgit\s+(commit|push|add|reset|checkout\s+--|restore|apply|am|rebase|merge|cherry-pick)\b/.test(raw)) {
     decide("deny", `${ROLE} is read-only — no commits, staging or resets`);
+  }
+  // Roles without free write access cannot write through the shell either:
+  // redirection (except to /dev/null or a temp dir), in-place editors, file
+  // movers, and scripted writes. Their files go through Write/Edit, which the
+  // path rules below scope. Still a backstop — code built at runtime can write.
+  if (READ_ONLY_ROLES.has(ROLE) || WRITE_SCOPE[ROLE]) {
+    const shellWrite = raw
+      .replace(/\d?>>?\s*(\/dev\/null|&\d)/g, "")
+      .replace(/\d?>>?\s*("|')?(\/tmp\/|\/private\/tmp\/|\/var\/folders\/|\$TMPDIR|\$\{TMPDIR\})/g, "");
+    if (/(^|[^<>=-])>>?\s*[^\s&|]/.test(shellWrite) ||
+        /\b(tee|truncate|touch|rm|mv|cp|ln|install|dd|patch)\b/.test(shellWrite) ||
+        /\bsed\s+(-[a-zA-Z]*i|--in-place)|\bperl\s+-[a-zA-Z]*i/.test(shellWrite) ||
+        /\b(writeFile|appendFile|createWriteStream|copyFile|rename|unlink|rmSync|mkdirSync)\w*\s*\(|open\([^)]*['"][wa]/.test(shellWrite)) {
+      decide("deny", `${ROLE} cannot write files from the shell — use the Write tool (scoped) or report it`);
+    }
   }
 }
 
