@@ -282,6 +282,22 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   /* Board 4418:98663 — the run was cancelled. Only a job THIS session started
      can be cancelled, so a job id is implied; nothing was deployed. */
   const wasCancelled = publishJob?.uiState === "cancelled";
+  const serverBlockers = publishJob?.serverBlockers ?? null;
+  const liveFollowUp =
+    publishJob?.jobId != null &&
+    publishJob.uiState === "published" &&
+    (publishJob.formsStatus === "PENDING" ||
+      publishJob.formsStatus === "FAILED" ||
+      publishJob.failedPhase === "post-deploy");
+  /* Design decision 7: past a minute the forms line says so. */
+  const formsPending = publishJob?.formsStatus === "PENDING";
+  const [formsSlow, setFormsSlow] = React.useState(false);
+  React.useEffect(() => {
+    setFormsSlow(false);
+    if (!formsPending) return;
+    const t = setTimeout(() => setFormsSlow(true), 60_000);
+    return () => clearTimeout(t);
+  }, [formsPending]);
   /* The build log behind board 784:4403's "View log". A pre-job failure never
      reaches the worker, so there are no steps and the link stays away rather
      than opening an empty list. */
@@ -387,6 +403,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   React.useEffect(() => {
     if (uiState === "published" || uiState === "failed") void loadChecks();
   }, [uiState, loadChecks]);
+  /* DR-T4: the server refused — its rows replace whatever the list showed. */
+  const refusedBy = publishJob?.serverBlockers;
+  React.useEffect(() => {
+    if (refusedBy) void loadChecks();
+  }, [refusedBy, loadChecks]);
 
   const blocking = React.useMemo(
     () => (checks?.checks ?? []).filter((c) => c.status === "fail"),
@@ -538,7 +559,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       <h2 className={RESULT_TITLE_ERROR}>Publish failed.</h2>
       <p className={`${META} tw:mt-2 tw:leading-[18px]`}>
         {error}
-        {error && !/nothing was deployed|unchanged/i.test(error)
+        {/* O6: the job says where it stopped; before the deploy finished the
+            live site is untouched, whatever the error text reads. */}
+        {error && publishJob?.failedPhase && publishJob.failedPhase !== "post-deploy"
+          ? " Your live site wasn't changed."
+          : error && !/nothing was deployed|unchanged/i.test(error)
           ? snapshot.lastDeploy?.isLive
             ? " The previous live version is unchanged."
             : " Nothing was deployed."
@@ -853,6 +878,41 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         )}
 
+        {/* ER-T3 / O6 (decision 7): a live publish whose forms are still
+            switching over, or whose after-deploy step failed. The website
+            line comes first: the site IS live either way. */}
+        {liveFollowUp && (
+          <section className={`${SECTION} tw:px-2 tw:pb-4`} aria-label="After publishing" data-testid="publish-followup">
+            <p className={`${META} tw:text-[var(--bk-ink)]`}>
+              Website live
+              {publishJob?.failedPhase === "post-deploy" ? " · Password protection couldn't update" : ""}
+            </p>
+            {publishJob?.formsStatus === "PENDING" && (
+              <p className={META} role="status" data-testid="publish-forms-pending">
+                {formsSlow ? "Updating forms… Taking longer than usual." : "Updating forms…"}
+              </p>
+            )}
+            {publishJob?.formsStatus === "FAILED" && (
+              <p className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-forms-failed">
+                Forms couldn't update.{publishJob.formsError ? ` ${publishJob.formsError}` : ""} Submissions still go to the
+                previous forms.
+              </p>
+            )}
+            <div className="tw:mt-2 tw:flex tw:items-center tw:gap-4">
+              {publishJob?.formsStatus === "FAILED" && (
+                <Button size="xs" className="tw:h-7 tw:px-3" onClick={() => void publishJob.retryForms()} data-testid="publish-forms-retry">
+                  Retry form update
+                </Button>
+              )}
+              {publishJob?.failedPhase === "post-deploy" && (
+                <Button size="xs" className="tw:h-7 tw:px-3" onClick={() => void publishJob.retryPostDeploy()} data-testid="publish-postdeploy-retry">
+                  Retry
+                </Button>
+              )}
+            </div>
+          </section>
+        )}
+
         {/* Board B3-10 opens on the checks. They gate the publish, so they
             sit where the user decides to publish — in the panel, not behind
             the CTA (they were a wizard step; owner decision 2026-09-21). The
@@ -1072,6 +1132,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 {ctaReason}
               </p>
             ) : null}
+            {serverBlockers && !isPublishing && (
+              <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]" role="alert" data-testid="publish-server-blocked">
+                Publish stopped · {serverBlockers.length} new blocker{serverBlockers.length === 1 ? "" : "s"}: {serverBlockers.join(", ")}.
+              </p>
+            )}
             {blockedByChecks && !isPublishing && (
               <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]" data-testid="publish-blocked-by-checks">
                 {blocking.map((c) => c.detail).join(" ")}

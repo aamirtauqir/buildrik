@@ -13,6 +13,7 @@ import {
   fetchPublishStatus,
   cancelPublish,
   fetchSitePublishState,
+  retryFormsActivation,
   type PublishStatus,
 } from "@/services/PublishService";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -24,6 +25,8 @@ vi.mock("@/services/PublishService", () => ({
   fetchPublishStatus: vi.fn(),
   cancelPublish: vi.fn(),
   fetchSitePublishState: vi.fn(),
+  retryFormsActivation: vi.fn(),
+  retryPostDeploy: vi.fn(),
 }));
 
 vi.mock("@/services/BuildrikSyncProvider", () => ({
@@ -786,5 +789,59 @@ describe("unpublished() — the server took the site down, the hook stops saying
     expect(result.current.publishedUrl).toBeNull();
     expect(result.current.uiState).toBe("idle");
     expect(mockFetchSiteState).toHaveBeenCalledTimes(1); // no re-fetch: the caller just wrote the truth
+  });
+
+  /* ER-T3 (decision 7): a live publish is not finished while its forms are
+     still switching over. */
+  describe("after the deploy goes live", () => {
+    it("keeps polling while forms are PENDING, stops once they settle", async () => {
+      mockFetchStatus
+        .mockResolvedValueOnce(statusOf("COMPLETED", { formsStatus: "PENDING" }))
+        .mockResolvedValueOnce(statusOf("COMPLETED", { formsStatus: "ACTIVE" }));
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+      expect(result.current.uiState).toBe("published");
+      expect(result.current.formsStatus).toBe("PENDING");
+      await advance(2000);
+      expect(result.current.formsStatus).toBe("ACTIVE");
+      await advance(4000);
+      expect(mockFetchStatus).toHaveBeenCalledTimes(2);
+    });
+
+    it("Retry form update calls the server for THIS job and resumes polling", async () => {
+      mockGetSiteId.mockReturnValue("site-1");
+      vi.mocked(retryFormsActivation).mockResolvedValue(undefined);
+      mockFetchStatus
+        .mockResolvedValueOnce(statusOf("COMPLETED", { formsStatus: "FAILED", formsError: "db down" }))
+        .mockResolvedValueOnce(statusOf("COMPLETED", { formsStatus: "ACTIVE" }));
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+      expect(result.current.formsStatus).toBe("FAILED");
+      await act(async () => {
+        await result.current.retryForms();
+      });
+      await flushMicrotasks();
+      expect(retryFormsActivation).toHaveBeenCalledWith("site-1", "job-1");
+      expect(result.current.formsStatus).toBe("ACTIVE");
+    });
+  });
+
+  it("the server's own checks refusing is a list of blockers, not a red error (DR-T4)", async () => {
+    mockPublishSite.mockRejectedValueOnce(new Error("Publish stopped: Pages ready, Collection lists."));
+    const { result } = renderHook(() => usePublishJob());
+    await act(async () => {
+      await result.current.publish("site-1", PAGES);
+    });
+    expect(result.current.serverBlockers).toEqual(["Pages ready", "Collection lists"]);
+    expect(result.current.error).toBeNull();
+    expect(result.current.uiState).toBe("idle");
+    act(() => result.current.dismissBlock());
+    expect(result.current.serverBlockers).toBeNull();
   });
 });

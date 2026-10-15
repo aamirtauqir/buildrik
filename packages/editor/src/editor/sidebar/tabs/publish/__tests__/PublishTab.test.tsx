@@ -64,6 +64,8 @@ function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     uiState: "idle", jobId: null, progress: 0, publishedUrl: null, error: null,
     steps: null,
     blockedReason: null,
+    formsStatus: null, formsError: null, failedPhase: null,
+    retryForms: vi.fn(), retryPostDeploy: vi.fn(), serverBlockers: null,
     lastPublishedAt: null,
     hasUnpublishedChanges: null,
     unpublished: vi.fn(),
@@ -160,5 +162,53 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     expect(queryByText("Try again")).toBeNull();
     fireEvent.click(getByTestId("publish-check-status"));
     expect(track).toHaveBeenCalledWith("job-9");
+  });
+
+  /* ER-T3 / O6 / decision 7: what follows a live deploy. */
+  it("a live publish with forms still switching says so; FAILED offers its own retry", () => {
+    const retryForms = vi.fn();
+    const live = { uiState: "published" as const, jobId: "job-3", publishedUrl: "https://x.vercel.app" };
+    const pending = renderTab(
+      <PublishTab composer={composer} publishJob={makeJob({ ...live, formsStatus: "PENDING" })} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />,
+    );
+    expect(pending.getByTestId("publish-followup").textContent).toContain("Website live");
+    expect(pending.getByTestId("publish-forms-pending").textContent).toBe("Updating forms…");
+    pending.unmount();
+
+    const failed = renderTab(
+      <PublishTab composer={composer} publishJob={makeJob({ ...live, formsStatus: "FAILED", formsError: "db down", retryForms })} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />,
+    );
+    expect(failed.getByTestId("publish-forms-failed").textContent).toContain("Forms couldn't update. db down");
+    fireEvent.click(failed.getByTestId("publish-forms-retry"));
+    expect(retryForms).toHaveBeenCalled();
+  });
+
+  it("a step that failed after going live keeps the site live and retries alone", () => {
+    const retryPostDeploy = vi.fn();
+    const { getByTestId } = renderTab(
+      <PublishTab
+        composer={composer}
+        publishJob={makeJob({ uiState: "published", jobId: "job-4", publishedUrl: "https://x.vercel.app", failedPhase: "post-deploy", retryPostDeploy })}
+        nextMove={OPEN_MOVE}
+        onRequestPublish={vi.fn()}
+      />,
+    );
+    expect(getByTestId("publish-followup").textContent).toContain("Website live · Password protection couldn't update");
+    fireEvent.click(getByTestId("publish-postdeploy-retry"));
+    expect(retryPostDeploy).toHaveBeenCalled();
+  });
+
+  it("a failure before the deploy finished says the live site wasn't changed", () => {
+    const { container } = renderTab(
+      <PublishTab composer={composer} publishJob={makeJob({ uiState: "failed", jobId: "job-5", error: "Vercel said no.", failedPhase: "deploy" })} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />,
+    );
+    expect(container.textContent).toContain("Vercel said no. Your live site wasn't changed.");
+  });
+
+  it("the server's refusal names its blockers", () => {
+    const { getByTestId } = renderTab(
+      <PublishTab composer={composer} publishJob={makeJob({ serverBlockers: ["Pages ready", "Collection lists"] })} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />,
+    );
+    expect(getByTestId("publish-server-blocked").textContent).toBe("Publish stopped · 2 new blockers: Pages ready, Collection lists.");
   });
 });

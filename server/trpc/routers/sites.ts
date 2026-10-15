@@ -533,6 +533,7 @@ export const sitesRouter = router({
             cause: { reason: "VERCEL_NOT_CONNECTED" },
           });
         /* D11: the server's checks refused it — the rows go back so the panel
+           (`parseServerBlockers` in usePublishJob.ts reads this message)
            shows the SERVER's result (decision 6), not its own guess. */
         if (e instanceof PublishBlockedError)
           throw new TRPCError({

@@ -14,8 +14,12 @@ import {
   fetchPublishStatus,
   cancelPublish as cancelPublishCall,
   fetchSitePublishState,
+  retryFormsActivation,
+  retryPostDeploy,
   type SitePublishState,
   type PublishPagePayload,
+  type FormsStatus,
+  type PublishFailedPhase,
   type PublishStatus,
   type PublishStep,
 } from "@/services/PublishService";
@@ -80,6 +84,14 @@ function classifyPublishBlock(msg: string): PublishBlockReason {
   return null;
 }
 
+/* DR-T4: when startPublish's own checks fail, the sites router refuses with
+   `Publish stopped: <label>, <label>.` — the same rows the panel's check list
+   draws, so the refusal names them instead of a red "publish failed". */
+function parseServerBlockers(msg: string): string[] | null {
+  const m = /Publish stopped: (.+?)\.?$/.exec(msg);
+  return m ? m[1].split(", ").map((l) => l.trim()).filter(Boolean) : null;
+}
+
 export interface UsePublishJobResult {
   uiState: PublishUiState;
   jobId: string | null;
@@ -88,6 +100,17 @@ export interface UsePublishJobResult {
   error: string | null;
   /** The failed job's per-step build log — board 784:4403's "View log". */
   steps: PublishStep[] | null;
+  /** A3: the forms switch-over after a live deploy. Null = no forms work. */
+  formsStatus: FormsStatus | null;
+  formsError: string | null;
+  /** O6: where a publish stopped — before the live site changed, or after. */
+  failedPhase: PublishFailedPhase | null;
+  /** Decision 7: retry a failed forms switch-over (never redeploys). */
+  retryForms: () => Promise<void>;
+  /** O6: retry the step that failed after going live (never redeploys). */
+  retryPostDeploy: () => Promise<void>;
+  /** DR-T4: the server's own checks refused the publish; their labels. */
+  serverBlockers: string[] | null;
   /** Set when the approval gate blocked the publish; drives the acknowledge UX. */
   blockedReason: PublishBlockReason;
   publish: (
@@ -138,6 +161,7 @@ export function usePublishJob(): UsePublishJobResult {
   const [status, setStatus] = React.useState<PublishStatus | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [blockedReason, setBlockedReason] = React.useState<PublishBlockReason>(null);
+  const [serverBlockers, setServerBlockers] = React.useState<string[] | null>(null);
   // Server-hydrated state separate from in-session job state so a returning
   // user sees the correct "Published" Topbar without poisoning the publish()
   // re-entrancy guard (which keys on jobId).
@@ -197,7 +221,10 @@ export function usePublishJob(): UsePublishJobResult {
       if (abortRef.current || gen !== pollGenRef.current) return;
       pollFailCountRef.current = 0;
       setStatus(next);
-      if (TERMINAL.has(next.status)) {
+      /* ER-T3: a live publish is not finished while its forms are still
+         switching over — keep reading until they are (decision 7). */
+      const formsSettling = next.status === "COMPLETED" && next.formsStatus === "PENDING";
+      if (TERMINAL.has(next.status) && !formsSettling) {
         stopPolling();
         if (next.status === "FAILED" && next.error) setError(next.error);
       }
@@ -250,6 +277,7 @@ export function usePublishJob(): UsePublishJobResult {
       inFlightRef.current = true;
       setError(null);
       setBlockedReason(null);
+      setServerBlockers(null);
       try {
         // Only pass the 3rd arg when acknowledging — a normal publish stays a
         // two-arg call so the server gate can still block.
@@ -270,7 +298,9 @@ export function usePublishJob(): UsePublishJobResult {
         // stayed "idle", so the toast effect never fired and Publish appeared
         // to do nothing at all.
         const reason = classifyPublishBlock(msg);
+        const blockers = parseServerBlockers(msg);
         if (reason) setBlockedReason(reason);
+        else if (blockers) setServerBlockers(blockers);
         else setError(msg);
       } finally {
         inFlightRef.current = false;
@@ -287,7 +317,10 @@ export function usePublishJob(): UsePublishJobResult {
     startPolling(id);
   }, [startPolling]);
 
-  const dismissBlock = React.useCallback(() => setBlockedReason(null), []);
+  const dismissBlock = React.useCallback(() => {
+    setBlockedReason(null);
+    setServerBlockers(null);
+  }, []);
 
   const cancel = React.useCallback(async () => {
     if (!jobId) return;
@@ -382,6 +415,24 @@ export function usePublishJob(): UsePublishJobResult {
         ? "published"
         : "idle";
 
+  /* Decision 7 / O6: the two retries that never redeploy. Polling resumes so
+     the panel follows the outcome; a failed retry is the job's error. */
+  const retryOnJob = React.useCallback(
+    async (call: (siteId: string, jobId: string) => Promise<void>) => {
+      const siteId = getSiteIdFromUrl();
+      if (!jobId || !siteId) return;
+      try {
+        await call(siteId, jobId);
+      } catch (e) {
+        setStatus((s) => (s ? { ...s, formsError: e instanceof Error ? e.message : "Retry failed" } : s));
+      }
+      startPolling(jobId);
+    },
+    [jobId, startPolling],
+  );
+  const retryForms = React.useCallback(() => retryOnJob(retryFormsActivation), [retryOnJob]);
+  const retryPostDeployStep = React.useCallback(() => retryOnJob(retryPostDeploy), [retryOnJob]);
+
   const unpublished = React.useCallback(() => {
     stopPolling();
     setStatus(null);
@@ -400,6 +451,12 @@ export function usePublishJob(): UsePublishJobResult {
     hasUnpublishedChanges: hydrated?.hasUnpublishedChanges ?? null,
     error,
     steps: status?.steps ?? null,
+    formsStatus: status?.formsStatus ?? null,
+    formsError: status?.formsError ?? null,
+    failedPhase: status?.failedPhase ?? null,
+    retryForms,
+    retryPostDeploy: retryPostDeployStep,
+    serverBlockers,
     blockedReason,
     publish,
     cancel,

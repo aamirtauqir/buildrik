@@ -36,10 +36,18 @@ export interface PublishStep {
   status: "pending" | "running" | "done" | "failed" | string;
 }
 
+export type FormsStatus = "PENDING" | "ACTIVE" | "FAILED" | "SUPERSEDED";
+/** Where a publish stopped (O6): before the live site changed, or after. */
+export type PublishFailedPhase = "checks" | "build" | "deploy" | "post-deploy";
+
 export interface PublishStatus {
   jobId: string;
   status: "QUEUED" | "BUILDING" | "DEPLOYING" | "COMPLETED" | "FAILED" | "CANCELLED" | string;
   progress: number;
+  /** A3: the forms switch-over that follows a live deploy; null = no forms work. */
+  formsStatus?: FormsStatus | null;
+  formsError?: string | null;
+  failedPhase?: PublishFailedPhase | null;
   publishedUrl?: string | null;
   error?: string | null;
   deploymentId?: string | null;
@@ -117,6 +125,9 @@ export async function fetchPublishStatus(jobId: string): Promise<PublishStatus> 
     error: string | null;
     siteId: string;
     steps: unknown;
+    formsStatus?: string | null;
+    formsError?: string | null;
+    failedPhase?: string | null;
   };
 
   // Resolve publishedUrl by reading the site after job completes.
@@ -136,7 +147,20 @@ export async function fetchPublishStatus(jobId: string): Promise<PublishStatus> 
     error: job.error,
     deploymentId: job.deploymentId,
     steps: parseSteps(job.steps),
+    formsStatus: (job.formsStatus as FormsStatus | null | undefined) ?? null,
+    formsError: job.formsError ?? null,
+    failedPhase: (job.failedPhase as PublishFailedPhase | null | undefined) ?? null,
   };
+}
+
+/** Decision 7: retry the forms switch-over of a live publish on its own. */
+export async function retryFormsActivation(siteId: string, jobId: string): Promise<void> {
+  await getClient().sites.retryFormsActivation.mutate({ siteId, jobId });
+}
+
+/** O6: retry the step that failed after the deployment went live — no redeploy. */
+export async function retryPostDeploy(siteId: string, jobId: string): Promise<void> {
+  await getClient().sites.retryPostDeploy.mutate({ siteId, jobId });
 }
 
 /** `steps` is a jsonb column, so it arrives as `unknown` and is narrowed here
