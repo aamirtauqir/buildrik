@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { checkCronAuth } from "@/lib/cron-auth";
+import { recoverPendingForms } from "@/server/services/publish-bundle.service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -61,5 +62,9 @@ export async function GET(req: NextRequest) {
     await prisma.$transaction(ops);
   }
 
-  return Response.json({ ok: true, cleaned: stale.length });
+  /* O5: a forms switch-over left PENDING — the worker died after COMPLETED,
+     or an attempt failed — is retried here (three attempts, then FAILED). */
+  const formsRecovered = await recoverPendingForms();
+
+  return Response.json({ ok: true, cleaned: stale.length, formsRecovered });
 }

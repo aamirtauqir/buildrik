@@ -27,9 +27,15 @@ const { db, runVercelDeploy, assertProjectNameFree } = vi.hoisted(() => ({
 vi.mock("@/lib/prisma", () => ({ prisma: db }));
 vi.mock("@/lib/cron-auth", () => ({ checkWorkerAuth: () => null }));
 vi.mock("@/server/services/webhook.service", () => ({ deliverWebhook: vi.fn() }));
-vi.mock("@/lib/publish-files", () => ({ buildDeployFiles: () => [], verifiedPrimaryDomain: () => null }));
+vi.mock("@/lib/publish-files", () => ({
+  buildDeployFiles: () => [{ file: "index.html", data: "<html></html>" }],
+  verifiedPrimaryDomain: () => null,
+}));
+const formPlan = vi.hoisted(() => ({
+  next: null as null | { forms: unknown[]; deactivateMissing: boolean },
+}));
 vi.mock("@/lib/publish-forms", () => ({
-  planFormWiring: (pages: unknown) => ({ pages, forms: [], deactivateMissing: false }),
+  planFormWiring: (pages: unknown) => ({ pages, forms: [], deactivateMissing: false, ...(formPlan.next ?? {}) }),
 }));
 vi.mock("@/lib/publish-sliders", () => ({ wireSliders: (html: string) => html }));
 vi.mock("@/server/services/form-submission.service", () => ({
@@ -42,6 +48,7 @@ vi.mock("@/server/services/publish.service", () => ({
   runVercelDeploy: (...a: unknown[]) => runVercelDeploy(...a),
   assertProjectNameFree: (...a: unknown[]) => assertProjectNameFree(...a),
   completePublish: vi.fn(async () => {}),
+  applyPublishedPassword: vi.fn(async () => {}),
 }));
 vi.mock("@/server/services/site-settings.service", () => ({ decryptPublishedPassword: () => null }));
 vi.mock("@/server/services/marketplace.service", () => ({ getWorkspaceAppScripts: vi.fn(async () => "") }));
@@ -109,6 +116,7 @@ beforeEach(() => {
   );
   runVercelDeploy.mockReset();
   assertProjectNameFree.mockReset().mockResolvedValue(undefined);
+  formPlan.next = null;
 });
 
 describe("publish worker — pinned Vercel project (SA-06)", () => {
@@ -119,7 +127,7 @@ describe("publish worker — pinned Vercel project (SA-06)", () => {
     const res = await run();
 
     expect(res.status).toBe(200);
-    expect(runVercelDeploy).toHaveBeenCalledWith("ws1", slugifyProjectName("renamed"), [], null);
+    expect(runVercelDeploy).toHaveBeenCalledWith("ws1", slugifyProjectName("renamed"), [{ file: "index.html", data: "<html></html>" }]);
     expect(pinWrites()).toEqual([[{ where: { id: "s1" }, data: { vercelProjectName: slugifyProjectName("renamed") } }]]);
   });
 
@@ -129,7 +137,7 @@ describe("publish worker — pinned Vercel project (SA-06)", () => {
 
     await run();
 
-    expect(runVercelDeploy).toHaveBeenCalledWith("ws1", "buildrik-site-original", [], null);
+    expect(runVercelDeploy).toHaveBeenCalledWith("ws1", "buildrik-site-original", [{ file: "index.html", data: "<html></html>" }]);
     expect(pinWrites()).toEqual([]);
   });
 
@@ -216,5 +224,54 @@ describe("publish worker — claiming the job", () => {
     expect(runVercelDeploy).not.toHaveBeenCalled();
     expect(db.publishBuildJob.update).not.toHaveBeenCalled();
     expect(db.$transaction).not.toHaveBeenCalled();
+  });
+});
+
+/* D11 / O6 / A3: the worker ships a hashed bundle, records where a failure
+   stopped, and switches forms over only once the deploy is live. */
+describe("publish worker — bundle, failure phase, forms after deploy", () => {
+  const jobWrites = () => db.publishBuildJob.update.mock.calls.map(([a]) => a.data as Record<string, unknown>);
+
+  it("stores the bundle and its hash before deploying the same files", async () => {
+    setup("p1");
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
+    await run();
+    const bundleWrite = jobWrites().find((d) => "bundleHash" in d)!;
+    expect(bundleWrite.bundleHash).toMatch(/^[0-9a-f]{64}$/);
+    expect(bundleWrite.bundle).toEqual({ files: [{ file: "index.html", data: "<html></html>" }] });
+    expect(runVercelDeploy.mock.calls[0][2]).toEqual([{ file: "index.html", data: "<html></html>" }]);
+  });
+
+  it("a failed deploy is FAILED in the deploy phase and switches no forms on", async () => {
+    setup("p1");
+    formPlan.next = { forms: [{ blockId: "f1" }], deactivateMissing: true };
+    db.$transaction.mockResolvedValue([]);
+    runVercelDeploy.mockRejectedValue(new Error("VERCEL_DEPLOY_ERROR"));
+    const res = await run();
+    expect(res.status).toBe(500);
+    const failed = db.publishBuildJob.update.mock.calls.map(([a]) => a.data).find((d) => d.status === "FAILED");
+    expect(failed).toMatchObject({ failedPhase: "deploy", error: "VERCEL_DEPLOY_ERROR" });
+    expect(jobWrites().some((d) => d.formsStatus)).toBe(false);
+  });
+
+  it("a step failing after the deployment went live leaves the publish complete (post-deploy)", async () => {
+    setup("p1");
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
+    db.publishBuildJob.update.mockImplementation(async (a: { data: Record<string, unknown> }) => {
+      if ("deploymentId" in a.data) throw new Error("db blip");
+      return {};
+    });
+    const res = await run();
+    expect(res.status).toBe(200);
+    expect(jobWrites().find((d) => d.failedPhase === "post-deploy")).toMatchObject({ error: "deployment id: db blip" });
+  });
+
+  it("a live deploy with forms marks them PENDING and switches them over", async () => {
+    setup("p1");
+    formPlan.next = { forms: [{ blockId: "f1" }], deactivateMissing: true };
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
+    await run();
+    expect(jobWrites().some((d) => d.formsStatus === "PENDING")).toBe(true);
+    expect(jobWrites().find((d) => "formsPlan" in d)?.formsPlan).toEqual({ forms: [{ blockId: "f1" }], deactivateMissing: true });
   });
 });

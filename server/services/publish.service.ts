@@ -327,6 +327,14 @@ async function dispatchWorker(
   return { reached: false, claimed: false };
 }
 
+/** The server's checks refused this publish; `blockers` are their rows. */
+export class PublishBlockedError extends Error {
+  constructor(readonly blockers: Array<{ label: string; detail: string }>) {
+    super(`PUBLISH_BLOCKED: ${blockers.map((b) => b.label).join(", ")}`);
+    this.name = "PublishBlockedError";
+  }
+}
+
 export async function startPublish(
   siteId: string,
   userId: string,
@@ -337,7 +345,14 @@ export async function startPublish(
   /** P1 rollback: `bypassApproval` skips the approval gate — an ADMIN restoring
    *  a previously-shipped version is not a new change needing sign-off.
    *  `rolledBackFrom` tags the new job with the version it re-deployed. */
-  opts?: { bypassApproval?: boolean; rolledBackFrom?: string; expectedLastEditedAt?: string | null },
+  opts?: {
+    bypassApproval?: boolean;
+    rolledBackFrom?: string;
+    expectedLastEditedAt?: string | null;
+    /** D11 rollback: the stored bundle that already shipped — redeployed as
+     *  is, never rebuilt from today's settings. */
+    rollbackOf?: { bundle: Prisma.InputJsonValue; bundleHash: string; formsPlan: Prisma.InputJsonValue | null; log: Prisma.InputJsonValue };
+  },
 ) {
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
@@ -487,6 +502,16 @@ export async function startPublish(
     if (!vercel) throw new Error("VERCEL_NOT_CONNECTED");
   }
 
+  /* D11 / DR-T4: the server's checks gate EVERY publish door. They ran only
+     as a query the editor's button read, so the API, the AI action and the
+     scheduled publish shipped a blocked site. (The Vercel row has its own
+     error above.) A rollback re-ships a version that already passed them. */
+  if (!opts?.rolledBackFrom) {
+    const { checks } = await runPrePublishChecks(siteId);
+    const blockers = checks.filter((c) => c.status === "fail" && c.label !== VERCEL_CHECK_LABEL);
+    if (blockers.length > 0) throw new PublishBlockedError(blockers.map((b) => ({ label: b.label, detail: b.detail })));
+  }
+
   // Persist HTML payload (if provided) on the job so the worker can deploy
   // without re-fetching from the editor. `log` is an existing Json column.
   // Pages omitted = worker falls back to dev simulation (current behavior).
@@ -499,7 +524,7 @@ export async function startPublish(
   // Expand the page-set with CMS dynamic pages (one per entry of a page-generating
   // collection). No-op for sites without such a collection — existing publishes
   // are unaffected.
-  const finalPages = pages ? await appendDynamicPagesToPublish(siteId, pages) : pages;
+  const finalPages = opts?.rollbackOf ? undefined : pages ? await appendDynamicPagesToPublish(siteId, pages) : pages;
 
   let job;
   try {
@@ -514,8 +539,15 @@ export async function startPublish(
         status: "QUEUED",
         progress: 0,
         steps: [],
-        log: finalPages ? { pages: finalPages } : undefined,
+        log: opts?.rollbackOf ? opts.rollbackOf.log : finalPages ? { pages: finalPages } : undefined,
         ...(opts?.rolledBackFrom ? { rolledBackFrom: opts.rolledBackFrom } : {}),
+        ...(opts?.rollbackOf
+          ? {
+              bundle: opts.rollbackOf.bundle,
+              bundleHash: opts.rollbackOf.bundleHash,
+              ...(opts.rollbackOf.formsPlan ? { formsPlan: opts.rollbackOf.formsPlan } : {}),
+            }
+          : {}),
       },
     });
   } catch (err) {
@@ -579,12 +611,17 @@ export async function getPublishStatus(jobId: string) {
       steps: true,
       deploymentId: true,
       error: true,
+      failedPhase: true,
+      formsStatus: true,
+      formsError: true,
+      bundleHash: true,
       startedAt: true,
       completedAt: true,
       createdAt: true,
     },
   });
 }
+
 
 export async function cancelPublish(jobId: string) {
   const job = await prisma.publishBuildJob.findUnique({
@@ -661,7 +698,8 @@ export async function completePublish(
   if (stale.length > 0) {
     await prisma.publishBuildJob.updateMany({
       where: { id: { in: stale.map((j) => j.id) } },
-      data: { log: Prisma.DbNull },
+      // The bundle goes with the payload: a pruned version is not rollbackable.
+      data: { log: Prisma.DbNull, bundle: Prisma.DbNull },
     });
   }
 
@@ -808,10 +846,25 @@ export async function rollbackPublish(siteId: string, jobId: string, userId: str
   // caller's session workspace refused a member of two workspaces (NOT_FOUND).
   const target = await prisma.publishBuildJob.findFirst({
     where: { id: jobId, siteId },
-    select: { id: true, status: true, log: true },
+    select: { id: true, status: true, log: true, bundle: true, bundleHash: true, formsPlan: true },
   });
   if (!target) throw new Error("NOT_FOUND");
   if (target.status !== "COMPLETED") throw new Error("NOT_ROLLBACKABLE");
+  /* D11: a version that kept its bundle is redeployed byte for byte (same
+     hash), forms included; an older one, from before bundles, rebuilds from
+     its pages as it always did. */
+  if (target.bundle && target.bundleHash && target.log) {
+    return startPublish(siteId, userId, undefined, false, {
+      bypassApproval: true,
+      rolledBackFrom: jobId,
+      rollbackOf: {
+        bundle: target.bundle as Prisma.InputJsonValue,
+        bundleHash: target.bundleHash,
+        formsPlan: (target.formsPlan as Prisma.InputJsonValue | null) ?? null,
+        log: target.log as Prisma.InputJsonValue,
+      },
+    });
+  }
   const pages = (target.log as { pages?: PublishPage[] } | null)?.pages;
   if (!pages) throw new Error("NOT_ROLLBACKABLE");
   return startPublish(siteId, userId, pages, false, {
@@ -952,6 +1005,42 @@ export async function takeDownSiteForDeletion(
   return { ok: true };
 }
 
+/* Reconcile published-site password protection on the live URL. Best-effort:
+   password protection is a Vercel Pro/Enterprise feature, so 402/403 means
+   "not available on this plan". Clearing protection (password=null) on a
+   project that has none returns 404 "Password Protection not found" — that
+   is the desired end state already, so it's an idempotent success. */
+async function setPasswordTolerant(
+  conn: { token: string; teamId: string | null },
+  projectName: string,
+  password: string | null,
+): Promise<void> {
+  try {
+    await setProjectPasswordProtection({ token: conn.token, teamId: conn.teamId, projectName, password });
+  } catch (err) {
+    if (err instanceof VercelApiError && (err.status === 402 || err.status === 403 || err.status === 404)) {
+      console.warn(`[publish] Vercel password protection skipped for ${projectName} (${err.status})`);
+      return;
+    }
+    throw err;
+  }
+}
+
+/**
+ * O6: the published password, applied AFTER the deployment is live, as its
+ * own step — a failure here leaves the site live and is retried alone, never
+ * by a redeploy. No connection (simulation) = nothing to protect.
+ */
+export async function applyPublishedPassword(
+  workspaceId: string,
+  projectName: string,
+  password: string | null,
+): Promise<void> {
+  const conn = await getActiveVercelConnection(workspaceId);
+  if (!conn) return;
+  await setPasswordTolerant(conn, projectName, password);
+}
+
 /**
  * Run a real Vercel deployment for the workspace's active OAuth connection.
  * Returns null when there's no active connection in development mode
@@ -992,32 +1081,8 @@ export async function runVercelDeploy(
     if (ready.readyState !== "READY") {
       throw new Error(`VERCEL_DEPLOY_${ready.readyState}`);
     }
-    // Reconcile published-site password protection on the live URL. Best-effort:
-    // password protection is a Vercel Pro/Enterprise feature, so 402/403 means
-    // "not available on this plan". Clearing protection (password=null) on a
-    // project that has none returns 404 "Password Protection not found" — that
-    // is the desired end state already, so it's an idempotent success. None of
-    // these must fail an otherwise-good deploy.
     if (publishedPasswordPlain !== undefined) {
-      try {
-        await setProjectPasswordProtection({
-          token: conn.token,
-          teamId: conn.teamId,
-          projectName,
-          password: publishedPasswordPlain,
-        });
-      } catch (err) {
-        if (
-          err instanceof VercelApiError &&
-          (err.status === 402 || err.status === 403 || err.status === 404)
-        ) {
-          console.warn(
-            `[publish] Vercel password protection skipped for ${projectName} (${err.status})`,
-          );
-        } else {
-          throw err;
-        }
-      }
+      await setPasswordTolerant(conn, projectName, publishedPasswordPlain);
     }
     return { url: pickPublicUrl(ready, projectName), deploymentId: ready.id };
   } catch (err) {

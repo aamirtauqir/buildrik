@@ -161,7 +161,8 @@ describe("the publish job's workspace", () => {
     siteUpdate.mockResolvedValue({});
     const { startPublish } = await import("@server/services/publish.service");
     // bypassApproval keeps this on the job write; the gate has its own suite.
-    await startPublish("s1", "u1", [{ path: "index.html", html: "x" }], false, { bypassApproval: true });
+    // rolledBackFrom skips the pre-publish checks (D11), which have theirs.
+    await startPublish("s1", "u1", [{ path: "index.html", html: "x" }], false, { bypassApproval: true, rolledBackFrom: "j0" });
     expect(jobCreate.mock.calls[0][0].data.workspaceId).toBe("ws-site");
   });
 

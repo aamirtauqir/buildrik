@@ -33,6 +33,7 @@ import {
 import {
   runPrePublishChecks,
   startPublish,
+  PublishBlockedError,
   getPublishStatus,
   cancelPublish,
   unpublishSite,
@@ -41,6 +42,7 @@ import {
   getPublishHistory,
   rollbackPublish,
 } from "@/server/services/publish.service";
+import { retryFormsActivation, retryPostDeployStep } from "@/server/services/publish-bundle.service";
 import {
   listSitesSchema,
   createSiteSchema,
@@ -530,6 +532,14 @@ export const sitesRouter = router({
             message: "Connect this workspace to Vercel before publishing.",
             cause: { reason: "VERCEL_NOT_CONNECTED" },
           });
+        /* D11: the server's checks refused it — the rows go back so the panel
+           shows the SERVER's result (decision 6), not its own guess. */
+        if (e instanceof PublishBlockedError)
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: `Publish stopped: ${e.blockers.map((b) => b.label).join(", ")}.`,
+            cause: { reason: "PUBLISH_BLOCKED", blockers: e.blockers },
+          });
         // m-approval gate (publish.service startPublish): a member in an
         // approval-required workspace without an APPROVED review gets a clear
         // reason, not a 500.
@@ -750,6 +760,47 @@ export const sitesRouter = router({
   // P1: roll back = re-publish a prior version as a NEW job (contract §5).
   // ADMIN — a destructive/cross-history action (§2). Bypasses the approval gate
   // in the service (restoring an already-shipped version). Activity-logged.
+  /* Decision 7: "Retry form update" — the forms switch-over of the live
+     publish, on its own (A3/O3). Only the job that is live can switch. */
+  retryFormsActivation: protectedProcedure
+    .input(rollbackInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return { formsStatus: await retryFormsActivation(input.siteId, input.jobId) };
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "That publish was not found." });
+        throw e;
+      }
+    }),
+
+  /* O6: a step that failed after the deployment went live is retried on its
+     own — never a redeploy. */
+  retryPostDeploy: protectedProcedure
+    .input(rollbackInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        await retryPostDeployStep(input.siteId, input.jobId);
+        return { ok: true as const };
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Nothing to retry on that publish." });
+        throw e;
+      }
+    }),
+
   rollback: protectedProcedure
     .input(rollbackInput)
     .mutation(async ({ ctx, input }) => {

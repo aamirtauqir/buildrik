@@ -1458,6 +1458,23 @@ model PublishBuildJob {
   /// Rollback provenance (P1): the COMPLETED job id this publish re-deployed,
   /// so the history can label it "↩ from vN". Null for a normal publish.
   rolledBackFrom String?
+  /// D11: the files this publish shipped — final, after every transform —
+  /// { files: { file: string; data: string }[] }. Checks, the deploy and a
+  /// rollback all use these bytes; a rollback never rebuilds. Pruned with log.
+  bundle         Json?
+  /// sha256 of the bundle (sorted path + content).
+  bundleHash     String?
+  /// Where a FAILED job stopped (O6): "checks" | "build" | "deploy" — all
+  /// before the live site changed — or "post-deploy" (the site IS live; a
+  /// later step failed and is retried on its own, never by a redeploy).
+  failedPhase    String?
+  /// A3/O3: forms switch over only after the deploy is live.
+  /// PENDING | ACTIVE | FAILED | SUPERSEDED; null = no form work.
+  formsStatus    String?
+  formsError     String?
+  /// What activation applies: { forms: DiscoveredForm[]; deactivateMissing }.
+  formsPlan      Json?
+  formsAttempts  Int       @default(0)
   startedAt      DateTime?
   completedAt    DateTime?
   createdAt      DateTime  @default(now())
