@@ -32,7 +32,7 @@ const DENY_COMMANDS = [
   [/\bprisma\s+migrate\s+reset\b/, "migrate reset drops the database"],
   [/\benv:set:prod\b|set-prod-env\.mjs/, "rewrites the entire production env map over SSH — founder step"],
   [/\bcloudlinux-selector\s+set\b/, "replaces the entire production env map — founder step"],
-  [git(String.raw`add\b[^\n]*(\.env(?!\.example)(\.[\w.-]+)?(['"\s]|$)|auth\.json|\.pem\b|\.p12\b)`), "staging a secrets file in a public repo"],
+  [git(String.raw`add\b[^\n]*(\.env(?![\w.-]*\.example(['"\s]|$))(\.[\w.-]+)?(['"\s]|$)|auth\.json|\.pem\b|\.p12\b)`), "staging a secrets file in a public repo"],
 ];
 
 const ASK_COMMANDS = [
@@ -55,7 +55,7 @@ const ASK_PATHS = [
   [/^DESIGN\.md$|design-tokens\.css$|tokens\.generated\.|engine\/designSystem\/(defaultTokens|projectTokens)\.ts$|packages\/shared\/schemas\/(design-tokens|designToken)\.ts$/, "design tokens"],
   [/\.tsc-baselines\.json$|e2e\/baselines\/|-snapshots\/|ratchet.*baseline|baseline.*\.json$/, "gate / test baseline"],
   [/^scripts\/(check-prod-env|set-prod-env)|^\.github\/workflows\/|scripts\/hooks\/pre-(push|commit)$|^\.claude\/(settings\.json|hooks\/)/, "CI / deploy / gate config"],
-  [/(^|\/)\.env(?!\.example)(\.|$)|(^|\/)auth\.json$/, "secrets file"],
+  [/(^|\/)\.env(?![\w.-]*\.example$)(\.|$)|(^|\/)auth\.json$/, "secrets file"],
 ];
 
 function decide(decision, reason) {

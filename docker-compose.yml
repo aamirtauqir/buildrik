@@ -1,0 +1,22 @@
+# Local Postgres for the dashboard (same major version as CI's service container).
+#   docker compose up -d db
+# Matches DATABASE_URL in .env.local.example. A Postgres you already run works too.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: buildrik
+      POSTGRES_PASSWORD: buildrik
+      POSTGRES_DB: buildrik
+    ports:
+      - "5432:5432"
+    volumes:
+      - buildrik-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U buildrik"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  buildrik-pg:
