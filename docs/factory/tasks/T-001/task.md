@@ -2,7 +2,7 @@
 
 <!-- Ledger. Only the PM (main session) edits this file. -->
 
-- **Status:** spec-approved
+- **Status:** build
 - **Stage owner:** factory-developer
 - **Created:** 2026-10-15
 - **Founder issue (verbatim):** "(factory pilot, from the 2026-10-15 readiness audit) packages/editor/CLAUDE.md §ENV says prod values live in 'Vercel project settings'; prod is cPanel."
@@ -27,6 +27,7 @@ Agents reading packages/editor/CLAUDE.md are told the true place production env 
 | # | Stage | Agent | Verdict | Evidence (file / command / URL) | Date |
 |---|---|---|---|---|---|
 | 1 | spec | factory-analyst | READY (reproduced: n/a, open questions: 0, 2 follow-ups) | spec.md | 2026-10-15 |
+| 2 | build | factory-developer | BLOCKED — commit 4660acf3e on factory/T-001 not pushed; pre-push hook `editor=0 dashboard=0 figma=0 orphans=0 spec-age=1 button-variants=0`; all 5 done-condition checks PASS locally | worktree .claude/worktrees/agent-ab748a6868414a496 | 2026-10-15 |
 
 ## Founder decisions
 
