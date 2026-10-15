@@ -1989,6 +1989,15 @@ REALITY: deferred-asks pass nothing deferred; re-review NOT in scope lists two e
 REALITY: pr-count pass no ship-policy file; one PR per lane (4), S0 merged first — 855c8b08b
 ```
 
+### Implementation decisions (during build)
+
+| # | Decision | Why | Approved |
+|---|---|---|---|
+| D35 | Canvas picks the breakpoint from the active device: the previewed breakpoint's rules are written unwrapped, in publish order, at publish specificity. Container queries (D5's mechanism) are dropped. | The canvas content has 20px padding and the frame can show a classic scrollbar, so a container's inline size is 15–40px narrower than the device: Tablet (768) matched the Mobile rules and Desktop the Tablet ones. The D5/D10 outcome (one cascade, no `!important`, base styles as sheet rules) is unchanged. | owner, 2026-10-15 (AskUserQuestion D35) |
+| — | Canvas base-rule cache per element (id + serialized styles) | Full rewrite measured p90 34 ms at 500 elements, above D7's 8 ms budget. With the cache: p50 ~4 ms, p90 2–6 ms across four live runs. CSSOM was not needed. | within D7 ("CSSOM only if it fails") |
+
+Built so far on `feat/phase1-s2-precedence` (worktree `~/Desktop/buildrik-worktrees/phase1-s0`): S0 / ER-T1 `93484937d`; S2 / E-T1 + E-T3 part `89367e913`, `bee52ba1c`.
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
