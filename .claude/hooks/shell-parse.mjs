@@ -213,14 +213,10 @@ export function parseScript(src, depth = 0) {
       // stdin and fd paths are opaque code
       if (!hasC && operand && /^(-|\/dev\/(stdin|fd\/\d+)|\/proc\/self\/fd\/\d+)$/.test(operand)) return null;
       // No -c, no script path, no own heredoc / here-string: code comes from
-      // stdin we cannot see — fail closed. The one exemption is a literal
-      // pass-through, `cat <<EOF | sh`: any other producer (sed, awk, tr …)
-      // can rewrite the heredoc before the shell runs it.
-      const prev = pending[pending.indexOf(c) - 1];
-      const passthru = c.prevOp === "|" && prev && prev.words[0] === "cat" && prev.words.slice(1).every((w) => w === "-") &&
-        prev.heredocBodies.length === 1 && prev.redirects.length === 0 && prev.assigns.length === 0;
-      if (!hasC && !operand && !c.heredocBodies.length && !hereStrings.length && !passthru) return null;
-      if (passthru) { const sub = parseScript(prev.heredocBodies[0].body, depth + 1); if (!sub) return null; commands.push(...sub.commands); }
+      // stdin we cannot see — fail closed. That includes `cat <<EOF | sh`:
+      // `cat` itself can be a function or alias, and any producer can rewrite
+      // the text. Use the shell's own heredoc (`sh <<'EOF'`), parsed directly.
+      if (!hasC && !operand && !c.heredocBodies.length && !hereStrings.length) return null;
       for (const s of [code, ...hereStrings, ...c.heredocBodies.map((h) => h.body)].filter((x) => x != null)) {
         const sub = parseScript(s, depth + 1); if (!sub) return null; commands.push(...sub.commands);
       }
