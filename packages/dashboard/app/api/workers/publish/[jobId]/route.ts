@@ -9,7 +9,9 @@ import { planFormWiring } from "@lib/publish-forms";
 import { getPublishedFormSettings } from "@server/services/form-submission.service";
 import {
   activatePublishedForms,
+  bundleContext,
   bundleHash,
+  bundleStillEntitled,
   checkBundle,
   type Bundle,
   type FormsPlan,
@@ -401,7 +403,11 @@ async function runVercelDeployJob(
 
   let files: VercelFile[];
   let formsPlan: FormsPlan | null;
-  if (storedBundle) {
+  const context = bundleContext(showBadge, appScripts);
+  /* A rollback's stored bytes ship only under the entitlements they were
+     built with; otherwise it rebuilds from its pages with today's (no badge
+     dodged after a downgrade, no uninstalled app's script). */
+  if (storedBundle && bundleStillEntitled(storedBundle, context)) {
     files = storedBundle.files;
     formsPlan = storedFormsPlan;
   } else {
@@ -458,7 +464,7 @@ async function runVercelDeployJob(
   await prisma.publishBuildJob.update({
     where: { id: jobId },
     data: {
-      bundle: { files } as unknown as Prisma.InputJsonValue,
+      bundle: { files, context } as unknown as Prisma.InputJsonValue,
       bundleHash: hash,
       ...(formsPlan ? { formsPlan: formsPlan as unknown as Prisma.InputJsonValue } : {}),
     },

@@ -12,7 +12,14 @@ vi.mock("@/server/services/form-submission.service", () => forms);
 vi.mock("@/server/services/publish.service", () => ({ applyPublishedPassword: vi.fn() }));
 vi.mock("@/server/services/site-settings.service", () => ({ decryptPublishedPassword: () => null }));
 
-import { activatePublishedForms, bundleHash, checkBundle, recoverPendingForms } from "../publish-bundle.service";
+import {
+  activatePublishedForms,
+  bundleContext,
+  bundleHash,
+  bundleStillEntitled,
+  checkBundle,
+  recoverPendingForms,
+} from "../publish-bundle.service";
 
 const PLAN = { forms: [{ blockId: "f1", path: "/", name: "Contact", fields: [] }], deactivateMissing: true };
 const job = (over: Record<string, unknown> = {}) => ({
@@ -44,6 +51,22 @@ describe("bundle (D11)", () => {
     expect(checkBundle([])).toEqual(["There are no pages to publish."]);
     expect(checkBundle([{ file: "about.html", data: "x" }])[0]).toMatch(/home page/);
     expect(checkBundle([{ file: "index.html", data: '<img src="blob:https://app/1">' }])[0]).toMatch(/never uploaded/);
+  });
+});
+
+describe("a stored bundle ships only under today's entitlements", () => {
+  const files = [{ file: "index.html", data: "<p>ok</p>" }];
+  it("same plan and same app scripts → the stored bytes ship", () => {
+    expect(bundleStillEntitled({ files, context: bundleContext(false, "<s>") }, bundleContext(false, "<s>"))).toBe(true);
+  });
+  it("a paid-era bundle (no badge) never ships on FREE", () => {
+    expect(bundleStillEntitled({ files, context: bundleContext(false, "") }, bundleContext(true, ""))).toBe(false);
+  });
+  it("an uninstalled app's script never ships", () => {
+    expect(bundleStillEntitled({ files, context: bundleContext(false, "<chat>") }, bundleContext(false, ""))).toBe(false);
+  });
+  it("a bundle from before contexts were recorded rebuilds", () => {
+    expect(bundleStillEntitled({ files }, bundleContext(false, ""))).toBe(false);
   });
 });
 

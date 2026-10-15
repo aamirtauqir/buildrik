@@ -26,8 +26,30 @@ export interface BundleFile {
   data: string;
 }
 
+/**
+ * The workspace entitlements a bundle was built under. A rollback redeploys
+ * stored bytes only while these still hold: a paid-era bundle has no badge and
+ * may carry an app's scripts, so shipping it after a downgrade or an uninstall
+ * would hand the site what the workspace no longer has.
+ */
+export interface BundleContext {
+  showBadge: boolean;
+  appScriptsHash: string;
+}
+
 export interface Bundle {
   files: BundleFile[];
+  context?: BundleContext;
+}
+
+export function bundleContext(showBadge: boolean, appScripts: string): BundleContext {
+  return { showBadge, appScriptsHash: createHash("sha256").update(appScripts).digest("hex") };
+}
+
+/** A stored bundle may ship as-is only when it was built under today's
+ *  entitlements. One from before contexts were recorded never matches. */
+export function bundleStillEntitled(bundle: Bundle, now: BundleContext): boolean {
+  return bundle.context?.showBadge === now.showBadge && bundle.context.appScriptsHash === now.appScriptsHash;
 }
 
 export interface FormsPlan {
