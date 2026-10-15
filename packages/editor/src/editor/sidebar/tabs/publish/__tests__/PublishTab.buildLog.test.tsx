@@ -70,6 +70,8 @@ const failedJob = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => 
   formsStatus: null,
   formsError: null,
   failedPhase: null,
+  postDeployError: null,
+  retryError: null,
   retryForms: vi.fn(),
   retryPostDeploy: vi.fn(),
   serverBlockers: null,

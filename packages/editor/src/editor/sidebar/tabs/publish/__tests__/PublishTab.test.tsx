@@ -64,7 +64,7 @@ function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     uiState: "idle", jobId: null, progress: 0, publishedUrl: null, error: null,
     steps: null,
     blockedReason: null,
-    formsStatus: null, formsError: null, failedPhase: null,
+    formsStatus: null, formsError: null, failedPhase: null, postDeployError: null, retryError: null,
     retryForms: vi.fn(), retryPostDeploy: vi.fn(), serverBlockers: null,
     lastPublishedAt: null,
     hasUnpublishedChanges: null,
@@ -183,19 +183,46 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     expect(retryForms).toHaveBeenCalled();
   });
 
-  it("a step that failed after going live keeps the site live and retries alone", () => {
+  it("a step that failed after going live keeps the site live, names the step and retries alone", () => {
     const retryPostDeploy = vi.fn();
     const { getByTestId } = renderTab(
       <PublishTab
         composer={composer}
-        publishJob={makeJob({ uiState: "published", jobId: "job-4", publishedUrl: "https://x.vercel.app", failedPhase: "post-deploy", retryPostDeploy })}
+        publishJob={makeJob({
+          uiState: "published",
+          jobId: "job-4",
+          publishedUrl: "https://x.vercel.app",
+          failedPhase: "post-deploy",
+          postDeployError: "password protection: vercel 500",
+          retryPostDeploy,
+        })}
         nextMove={OPEN_MOVE}
         onRequestPublish={vi.fn()}
       />,
     );
-    expect(getByTestId("publish-followup").textContent).toContain("Website live · Password protection couldn't update");
+    expect(getByTestId("publish-followup").textContent).toContain("Website live");
+    expect(getByTestId("publish-postdeploy-failed").textContent).toBe("Password protection couldn't update — the site is live without it.");
     fireEvent.click(getByTestId("publish-postdeploy-retry"));
+    expect(getByTestId("publish-postdeploy-retry").textContent).toBe("Retry password protection");
     expect(retryPostDeploy).toHaveBeenCalled();
+  });
+
+  it("a retry that fails says so on its own line", () => {
+    const { getByTestId } = renderTab(
+      <PublishTab
+        composer={composer}
+        publishJob={makeJob({
+          uiState: "published",
+          jobId: "job-4",
+          publishedUrl: "https://x.vercel.app",
+          formsStatus: "FAILED",
+          retryError: { kind: "forms", message: "That publish was not found." },
+        })}
+        nextMove={OPEN_MOVE}
+        onRequestPublish={vi.fn()}
+      />,
+    );
+    expect(getByTestId("publish-retry-failed").textContent).toBe("Retry didn't work: That publish was not found.");
   });
 
   it("a failure before the deploy finished says the live site wasn't changed", () => {

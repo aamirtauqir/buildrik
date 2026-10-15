@@ -27,6 +27,11 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 
 const POLL_INTERVAL_MS = 2000;
+/* A live publish whose forms are still switching over: the cron retries
+   hourly, so a tab need not ask every 2s — and stops asking after a while
+   (the panel keeps saying "Taking longer than usual"). */
+const FORMS_POLL_INTERVAL_MS = 15_000;
+const FORMS_POLL_MAX_MS = 10 * 60_000;
 const MAX_CONSECUTIVE_POLL_FAILURES = 3;
 const TERMINAL = new Set(["COMPLETED", "FAILED", "CANCELLED"]);
 
@@ -105,6 +110,10 @@ export interface UsePublishJobResult {
   formsError: string | null;
   /** O6: where a publish stopped — before the live site changed, or after. */
   failedPhase: PublishFailedPhase | null;
+  /** O6: what failed after the deployment went live (`<step>: <reason>`). */
+  postDeployError: string | null;
+  /** The last of the two retries below that failed, and why. */
+  retryError: { kind: "forms" | "post-deploy"; message: string } | null;
   /** Decision 7: retry a failed forms switch-over (never redeploys). */
   retryForms: () => Promise<void>;
   /** O6: retry the step that failed after going live (never redeploys). */
@@ -162,6 +171,7 @@ export function usePublishJob(): UsePublishJobResult {
   const [error, setError] = React.useState<string | null>(null);
   const [blockedReason, setBlockedReason] = React.useState<PublishBlockReason>(null);
   const [serverBlockers, setServerBlockers] = React.useState<string[] | null>(null);
+  const [retryError, setRetryError] = React.useState<UsePublishJobResult["retryError"]>(null);
   // Server-hydrated state separate from in-session job state so a returning
   // user sees the correct "Published" Topbar without poisoning the publish()
   // re-entrancy guard (which keys on jobId).
@@ -201,6 +211,10 @@ export function usePublishJob(): UsePublishJobResult {
   // request is still in flight — a slow BUILDING landing after COMPLETED left
   // the UI "publishing" forever.
   const pollGenRef = React.useRef(0);
+  /** When this job's forms were first seen PENDING, and the poll generation
+   *  already slowed for it. */
+  const formsSinceRef = React.useRef<number | null>(null);
+  const pollSlowRef = React.useRef<number | null>(null);
   const tickBusyGenRef = React.useRef<number | null>(null);
 
   const stopPolling = React.useCallback(() => {
@@ -224,6 +238,18 @@ export function usePublishJob(): UsePublishJobResult {
       /* ER-T3: a live publish is not finished while its forms are still
          switching over — keep reading until they are (decision 7). */
       const formsSettling = next.status === "COMPLETED" && next.formsStatus === "PENDING";
+      if (formsSettling) {
+        formsSinceRef.current ??= Date.now();
+        if (Date.now() - formsSinceRef.current > FORMS_POLL_MAX_MS) {
+          stopPolling();
+          return;
+        }
+        if (pollTimer.current && pollSlowRef.current !== gen) {
+          clearInterval(pollTimer.current);
+          pollSlowRef.current = gen;
+          pollTimer.current = setInterval(() => void tick(id), FORMS_POLL_INTERVAL_MS);
+        }
+      }
       if (TERMINAL.has(next.status) && !formsSettling) {
         stopPolling();
         if (next.status === "FAILED" && next.error) setError(next.error);
@@ -246,6 +272,7 @@ export function usePublishJob(): UsePublishJobResult {
 
   const startPolling = React.useCallback((id: string) => {
     stopPolling();
+    formsSinceRef.current = null;
     abortRef.current = false;
     pollFailCountRef.current = 0;
     pollLostRef.current = false;
@@ -278,6 +305,7 @@ export function usePublishJob(): UsePublishJobResult {
       setError(null);
       setBlockedReason(null);
       setServerBlockers(null);
+      setRetryError(null);
       try {
         // Only pass the 3rd arg when acknowledging — a normal publish stays a
         // two-arg call so the server gate can still block.
@@ -339,6 +367,7 @@ export function usePublishJob(): UsePublishJobResult {
     setStatus(null);
     setError(null);
     setBlockedReason(null);
+    setRetryError(null);
     setPollLost(false);
   }, [stopPolling]);
 
@@ -418,20 +447,21 @@ export function usePublishJob(): UsePublishJobResult {
   /* Decision 7 / O6: the two retries that never redeploy. Polling resumes so
      the panel follows the outcome; a failed retry is the job's error. */
   const retryOnJob = React.useCallback(
-    async (call: (siteId: string, jobId: string) => Promise<void>) => {
+    async (kind: "forms" | "post-deploy", call: (siteId: string, jobId: string) => Promise<void>) => {
       const siteId = getSiteIdFromUrl();
       if (!jobId || !siteId) return;
+      setRetryError(null);
       try {
         await call(siteId, jobId);
       } catch (e) {
-        setStatus((s) => (s ? { ...s, formsError: e instanceof Error ? e.message : "Retry failed" } : s));
+        setRetryError({ kind, message: e instanceof Error ? e.message : "Retry failed" });
       }
       startPolling(jobId);
     },
     [jobId, startPolling],
   );
-  const retryForms = React.useCallback(() => retryOnJob(retryFormsActivation), [retryOnJob]);
-  const retryPostDeployStep = React.useCallback(() => retryOnJob(retryPostDeploy), [retryOnJob]);
+  const retryForms = React.useCallback(() => retryOnJob("forms", retryFormsActivation), [retryOnJob]);
+  const retryPostDeployStep = React.useCallback(() => retryOnJob("post-deploy", retryPostDeploy), [retryOnJob]);
 
   const unpublished = React.useCallback(() => {
     stopPolling();
@@ -454,6 +484,8 @@ export function usePublishJob(): UsePublishJobResult {
     formsStatus: status?.formsStatus ?? null,
     formsError: status?.formsError ?? null,
     failedPhase: status?.failedPhase ?? null,
+    postDeployError: status?.failedPhase === "post-deploy" ? status.error ?? null : null,
+    retryError,
     retryForms,
     retryPostDeploy: retryPostDeployStep,
     serverBlockers,

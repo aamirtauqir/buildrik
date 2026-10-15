@@ -247,7 +247,9 @@ export class ElementManager {
    */
   ungroupElement(id: string): boolean {
     const group = this.getElement(id);
-    if (!group) return false;
+    /* BK-13: ungrouping removes the container — a locked one stays, from
+       every door (menu, ⌘⇧G, palette). */
+    if (!group || group.isLocked?.()) return false;
     const parent = group.getParent();
     if (!parent) return false;
     const parentId = parent.getId();

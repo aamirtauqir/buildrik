@@ -113,6 +113,10 @@ export function ConflictModal({
   brandFormat = false,
 }: ConflictModalProps) {
   const [confirmReplace, setConfirmReplace] = React.useState(false);
+  const confirmRef = React.useRef<HTMLButtonElement>(null);
+  React.useEffect(() => {
+    if (confirmReplace) confirmRef.current?.focus();
+  }, [confirmReplace]);
   const [showDiff, setShowDiff] = React.useState(false);
   const [downloadFailed, setDownloadFailed] = React.useState(false);
   React.useEffect(() => {
@@ -128,7 +132,13 @@ export function ConflictModal({
   const canReplace = !brandFormat;
 
   const keep = () => {
-    if (siteId) discardUnsaved(siteId);
+    if (siteId) {
+      discardUnsaved(siteId);
+      /* The save variant's Keep reloads, so nothing may be kept after it.
+         The restore variant stays on this page: the old copy is gone, but
+         later unsaved work (offline, a held conflict) must still be kept. */
+      if (restore) resumeKeepingUnsaved();
+    }
     onKeep();
   };
   const download = async () => {
@@ -243,7 +253,11 @@ export function ConflictModal({
             <>
               {canReplace &&
                 (confirmReplace ? (
-                  <Button color="red" onClick={replace}>Yes, replace</Button>
+                  /* Stays where "Replace with mine…" was, and takes its focus —
+                     the clicked button unmounts. */
+                  <Button ref={confirmRef} color="red" onClick={replace} className="tw:mr-auto">
+                    Yes, replace
+                  </Button>
                 ) : (
                   <Button
                     color="light"

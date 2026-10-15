@@ -10,6 +10,7 @@ import {
   installEngineBrowserStubs,
   removeEngineBrowserStubs,
 } from "./test-utils/realComposer";
+import { buildDefaultCommands } from "@/engine/commands/defaultCommands";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -61,5 +62,18 @@ describe("groupElements / ungroupElement", () => {
     expect(ok).toBe(true);
     // back to [heading, paragraph, paragraph]
     expect(childTypes(composer)).toEqual(["heading", "paragraph", "paragraph"]);
+  });
+
+  /* BK-13: the context menu refused a locked group, but ⌘⇧G and the command
+     palette reached the engine directly and removed it. The engine refuses. */
+  it("a locked group is never ungrouped, whatever door asks", () => {
+    const { composer, a, b } = setup();
+    const group = composer.elements.groupElements([a.getId(), b.getId()])!;
+    group.setLocked(true);
+    expect(composer.elements.ungroupElement(group.getId())).toBe(false);
+    expect(composer.elements.getElement(group.getId())).toBeTruthy();
+    composer.selection.select(group);
+    buildDefaultCommands(composer).find((c) => c.id === "ungroup")!.run!(composer);
+    expect(composer.elements.getElement(group.getId())).toBeTruthy();
   });
 });

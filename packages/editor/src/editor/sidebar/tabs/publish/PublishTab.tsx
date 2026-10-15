@@ -100,6 +100,21 @@ const FIX_TARGETS: Record<string, FixTarget> = {
 /** Open the pane that fixes a pre-publish check (by its label). False when
  *  the check has no fix door. Shared by this panel's row buttons and the
  *  Issues panel's server-check rows, which opened Brand (L4-035). */
+/* O6: the worker records a post-deploy failure as `<step>: <reason>`. */
+const POST_DEPLOY_STEPS: Record<string, string> = {
+  "password protection": "password protection",
+  "project pin": "project link",
+  progress: "status update",
+  "after going live": "after-publish step",
+};
+function postDeployStepName(error: string): string {
+  return POST_DEPLOY_STEPS[error.split(":")[0].trim()] ?? "after-publish step";
+}
+function postDeployLabel(error: string): string {
+  const step = postDeployStepName(error);
+  return `${step.charAt(0).toUpperCase()}${step.slice(1)} couldn't update`;
+}
+
 export function openPublishCheckFix(composer: Composer | null | undefined, label: string): boolean {
   const target = FIX_TARGETS[label];
   if (!target || !composer) return false;
@@ -288,7 +303,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     publishJob.uiState === "published" &&
     (publishJob.formsStatus === "PENDING" ||
       publishJob.formsStatus === "FAILED" ||
-      publishJob.failedPhase === "post-deploy");
+      publishJob.postDeployError != null);
   /* Design decision 7: past a minute the forms line says so. */
   const formsPending = publishJob?.formsStatus === "PENDING";
   const [formsSlow, setFormsSlow] = React.useState(false);
@@ -883,10 +898,12 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             line comes first: the site IS live either way. */}
         {liveFollowUp && (
           <section className={`${SECTION} tw:px-2 tw:pb-4`} aria-label="After publishing" data-testid="publish-followup">
-            <p className={`${META} tw:text-[var(--bk-ink)]`}>
-              Website live
-              {publishJob?.failedPhase === "post-deploy" ? " · Password protection couldn't update" : ""}
-            </p>
+            <p className={`${META} tw:text-[var(--bk-ink)]`}>Website live</p>
+            {publishJob?.postDeployError && (
+              <p className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-postdeploy-failed">
+                {postDeployLabel(publishJob.postDeployError)} — the site is live without it.
+              </p>
+            )}
             {publishJob?.formsStatus === "PENDING" && (
               <p className={META} role="status" data-testid="publish-forms-pending">
                 {formsSlow ? "Updating forms… Taking longer than usual." : "Updating forms…"}
@@ -898,15 +915,20 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 previous forms.
               </p>
             )}
+            {publishJob?.retryError && (
+              <p className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-retry-failed">
+                Retry didn't work: {publishJob.retryError.message}
+              </p>
+            )}
             <div className="tw:mt-2 tw:flex tw:items-center tw:gap-4">
               {publishJob?.formsStatus === "FAILED" && (
-                <Button size="xs" className="tw:h-7 tw:px-3" onClick={() => void publishJob.retryForms()} data-testid="publish-forms-retry">
+                <Button color="light" size="xs" className="tw:h-7 tw:px-3" onClick={() => void publishJob.retryForms()} data-testid="publish-forms-retry">
                   Retry form update
                 </Button>
               )}
-              {publishJob?.failedPhase === "post-deploy" && (
-                <Button size="xs" className="tw:h-7 tw:px-3" onClick={() => void publishJob.retryPostDeploy()} data-testid="publish-postdeploy-retry">
-                  Retry
+              {publishJob?.postDeployError && (
+                <Button color="light" size="xs" className="tw:h-7 tw:px-3" onClick={() => void publishJob.retryPostDeploy()} data-testid="publish-postdeploy-retry">
+                  Retry {postDeployStepName(publishJob.postDeployError)}
                 </Button>
               )}
             </div>

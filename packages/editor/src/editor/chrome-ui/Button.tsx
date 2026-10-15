@@ -42,6 +42,10 @@ const VARIANT_COLOR: Record<ButtonVariant, string | undefined> = {
   danger: "red",
 };
 
+const DISABLED_REASON_CLASS =
+  "tw:cursor-not-allowed tw:aria-disabled:bg-[var(--bk-bg-subtle)] tw:aria-disabled:text-[var(--bk-ink-muted)] " +
+  "tw:aria-disabled:border-transparent tw:aria-disabled:shadow-none tw:aria-disabled:hover:bg-[var(--bk-bg-subtle)]";
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant, color, theme, disabledReason, ...props },
   ref,
@@ -59,7 +63,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
             disabled: false,
             "aria-disabled": true,
             "aria-describedby": [props["aria-describedby"], reasonId].filter(Boolean).join(" "),
-            className: [props.className, "tw:cursor-not-allowed tw:opacity-60"].filter(Boolean).join(" "),
+            /* The theme's disabled look, keyed on aria-disabled (the button
+               stays focusable so its reason is read): grey chip, muted ink,
+               no hover. Opacity left the primary as faded brand blue — about
+               3:1, an AA fail, and it still darkened on hover. */
+            className: [props.className, DISABLED_REASON_CLASS].filter(Boolean).join(" "),
             onClick: (e: React.MouseEvent<HTMLButtonElement>) => e.preventDefault(),
           }
         : {})}

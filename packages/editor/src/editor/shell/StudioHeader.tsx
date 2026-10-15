@@ -222,6 +222,9 @@ const SAVE_ANNOUNCEMENTS: Partial<Record<SaveState, { assertive: boolean; msg: s
      carries CMS, components, templates and versions — never the project.
      Proven by blocking the save and reloading: the edit was gone. */
   offline: { assertive: false, msg: "Offline — changes not saved" },
+  /* DR-T3: the stall panel opens on its own without taking focus — the live
+     region is how a screen reader hears that the work is only in this tab. */
+  stalled: { assertive: false, msg: "Autosave is stuck — changes are only in this tab" },
 };
 
 /** The strings the save effect owns, so it clears only its own stale text. */

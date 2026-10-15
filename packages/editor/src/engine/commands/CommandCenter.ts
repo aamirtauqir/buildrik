@@ -87,8 +87,8 @@ function isTextEntry(el: HTMLElement | null): boolean {
  * shortcut may act on a document the user is not looking at. DOM query, not
  * an import — engine/ must not depend on editor/.
  */
-export function isFullPageSurfaceOpen(): boolean {
-  return typeof document !== "undefined" && document.querySelector('[data-bk-surface="fullpage"]') !== null;
+export function getFullPageSurface(): Element | null {
+  return typeof document !== "undefined" ? document.querySelector('[data-bk-surface="fullpage"]') : null;
 }
 
 export class CommandCenter {
@@ -233,7 +233,7 @@ export class CommandCenter {
     // keyboard while mounted — the canvas stays mounted behind it but is not
     // what the user is looking at. DOM query, not an import — engine/ must
     // not depend on editor/, same contract as the modal carve-out below.
-    if (!UNIVERSAL_COMMANDS.has(commandId) && isFullPageSurfaceOpen()) {
+    if (!UNIVERSAL_COMMANDS.has(commandId) && getFullPageSurface() !== null) {
       return false;
     }
 

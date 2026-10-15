@@ -155,7 +155,9 @@ describe.each(VARIANTS)("ConflictModal — $variant variant", ({ variant, extra,
     expect(localStorage.getItem(KEY)).toBe(kept());
   });
 
-  it("an autosave hold that fires after Keep cannot write the copy back", () => {
+  /* The save variant's Keep hands over to a reload: nothing may be kept
+     after it. (The restore variant stays on the page — see below.) */
+  it.runIf(variant === "save")("an autosave hold that fires after Keep cannot write the copy back", () => {
     render(<ConflictModal {...props()} />);
     fireEvent.click(screen.getByRole("button", { name: "Keep the server version" }));
     keepUnsaved("s1", EMPTY_PROJECT, null);
@@ -244,9 +246,33 @@ describe("ConflictModal — save variant only", () => {
   });
 });
 
+describe("ConflictModal — replace confirm", () => {
+  it("Yes, replace takes the place and the focus of Replace with mine…", () => {
+    render(<ConflictModal {...makeProps({ variant: "save" })} />);
+    fireEvent.click(screen.getByRole("button", { name: "Replace with mine…" }));
+    const yes = screen.getByRole("button", { name: "Yes, replace" });
+    expect(document.activeElement).toBe(yes);
+    expect(yes.className).toContain("tw:mr-auto");
+  });
+});
+
 describe("ConflictModal — restore variant only", () => {
   const restore = (over: Partial<ConflictModalProps> = {}) =>
     makeProps({ variant: "restore", relation: "unchanged", keptAt: new Date().toISOString(), ...over });
+
+  /* Keep here does not reload: the user goes on editing the server's copy.
+     Latching the discard stopped every later recovery copy for the rest of
+     the session — offline, a held conflict, an expired session. */
+  it("Keep drops the old copy but later unsaved work is still kept", () => {
+    localStorage.setItem(KEY, kept());
+    const p = restore({ relation: "server-newer" });
+    render(<ConflictModal {...p} />);
+    fireEvent.click(screen.getByRole("button", { name: "Keep the server version" }));
+    expect(p.onKeep).toHaveBeenCalledTimes(1);
+    expect(readUnsaved("s1")).toBeNull();
+    keepUnsaved("s1", EMPTY_PROJECT, null);
+    expect(readUnsaved("s1")).not.toBeNull();
+  });
 
   it("a written download keeps the kept copy and the dialog", async () => {
     localStorage.setItem(KEY, kept());

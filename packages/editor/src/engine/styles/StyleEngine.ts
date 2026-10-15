@@ -547,14 +547,13 @@ export class StyleEngine {
   /**
    * Generate a single style rule
    */
-  private generateStyleRule(style: StyleData, scope?: string, important = false): string {
+  private generateStyleRule(style: StyleData, scope?: string): string {
     const selector = scope ? `${scope} ${style.selector}` : style.selector;
-    const bang = important ? " !important" : "";
     // Exported into a published <style>: a declaration that could leave the
     // rule or the element is not written (A19-1 class).
     const props = Object.entries(style.properties ?? {})
       .filter(([key, value]) => isSafeCssDeclaration(key, value))
-      .map(([key, value]) => `  ${camelToKebab(key)}: ${value}${bang};`)
+      .map(([key, value]) => `  ${camelToKebab(key)}: ${value};`)
       .join("\n");
 
     return `${selector} {\n${props}\n}`;

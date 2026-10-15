@@ -54,6 +54,7 @@ import { cycleRegion } from "../regionCycle";
 import { EVENTS } from "@/shared/constants/events";
 import { CONNECT_TOKENS_LABEL } from "@/engine/designSystem/facade";
 import { trackEvent } from "@/shared/utils/errorTracking";
+import { getFullPageSurface } from "@/engine/commands/CommandCenter";
 
 // Modals subset the shortcut handler reads. Match the public surface of
 // useStudioModals; passing the full modals object keeps mocking simple.
@@ -188,8 +189,7 @@ export function useEditorShortcuts({
          Assets) — there they undid canvas edits nobody could see. A surface
          marked `data-bk-history="tokens"` (Brand, D36) keeps ⌘Z for its own
          token edits only; a canvas change next in line is left alone. */
-      const surface =
-        typeof document !== "undefined" ? document.querySelector('[data-bk-surface="fullpage"]') : null;
+      const surface = getFullPageSurface();
       const tokensOnly = surface?.getAttribute("data-bk-history") === "tokens";
       const historyBlocked = composer.readOnly || (surface !== null && !tokensOnly);
       if ((isUndo || isRedo) && historyBlocked && surface) trackEvent("undo.blocked_surface", { redo: isRedo });
