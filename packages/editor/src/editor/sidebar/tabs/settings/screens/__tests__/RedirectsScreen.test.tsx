@@ -119,8 +119,12 @@ const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-redirect-
 const cell = (id: string) => within(screen.getByTestId(`set-rd-row-${id}`)).getAllByRole("cell").map((c) => c.textContent);
 const dialog = () => screen.getByTestId("set-rd-dialog");
 
-/** The node the screen hands the shell's header slot, mounted where a test can click it. */
-function mountHeader(register: ReturnType<typeof vi.fn>) {
+/** The node the screen hands the shell's header slot, mounted where a test can click it.
+ *  Waits for a non-null registration: the screen registers only once its load
+ *  state is `ready`, which can land after the cards render — on CI the last
+ *  call was still `null` and the slot rendered empty. */
+async function mountHeader(register: ReturnType<typeof vi.fn>) {
+  await waitFor(() => expect(register.mock.calls.at(-1)?.[0]).toBeTruthy());
   const node: React.ReactNode = register.mock.calls.at(-1)?.[0];
   return render(<div data-testid="header-slot">{node}</div>);
 }
@@ -211,7 +215,7 @@ describe("8136:214826 — the Redirect rules card and the 404 suggester", () => 
     r.list.query.mockResolvedValue([]);
     setup({ registerHeaderAction });
     await loaded();
-    mountHeader(registerHeaderAction);
+    await mountHeader(registerHeaderAction);
     const slot = screen.getByTestId("header-slot");
     expect(within(slot).getByTestId("set-rd-import")).toBeEnabled();
     expect(within(slot).getByTestId("set-rd-export")).toBeDisabled();
@@ -358,7 +362,7 @@ describe("CSV — Import (8136:215047 / 215307 / 215568) and Export", () => {
     const registerHeaderAction = vi.fn();
     setup({ registerHeaderAction });
     await loaded();
-    mountHeader(registerHeaderAction);
+    await mountHeader(registerHeaderAction);
     fireEvent.click(within(screen.getByTestId("header-slot")).getByTestId("set-rd-import"));
     expect(screen.getByTestId("set-rd-csv")).toBeInTheDocument();
   }
@@ -435,7 +439,7 @@ describe("CSV — Import (8136:215047 / 215307 / 215568) and Export", () => {
     const registerHeaderAction = vi.fn();
     setup({ registerHeaderAction });
     await loaded();
-    mountHeader(registerHeaderAction);
+    await mountHeader(registerHeaderAction);
     fireEvent.click(within(screen.getByTestId("header-slot")).getByTestId("set-rd-export"));
     await waitFor(() => expect(r.export_csv.query).toHaveBeenCalledWith({ siteId: "s1" }));
     await waitFor(() => expect(click).toHaveBeenCalled());
@@ -449,7 +453,7 @@ describe("the header's Add redirect → 4254:75736 → redirects.create → re-l
     const registerHeaderAction = vi.fn();
     const { unmount } = setup({ registerHeaderAction });
     await loaded();
-    mountHeader(registerHeaderAction);
+    await mountHeader(registerHeaderAction);
     const slot = screen.getByTestId("header-slot");
     expect(within(slot).getAllByRole("button").map((b) => b.textContent)).toEqual(["Import CSV", "Export CSV", "Add redirect"]);
     expect(within(slot).getByTestId("set-rd-import")).toHaveAttribute("id", "rd-import-csv");
@@ -462,7 +466,7 @@ describe("the header's Add redirect → 4254:75736 → redirects.create → re-l
     const registerHeaderAction = vi.fn();
     setup({ registerHeaderAction });
     await loaded();
-    mountHeader(registerHeaderAction);
+    await mountHeader(registerHeaderAction);
     fireEvent.click(screen.getByTestId("set-rd-add"));
     expect(dialog()).toHaveAttribute("data-mode", "add");
     expect(within(dialog()).getByTestId("set-rd-dialog-scope")).toHaveTextContent("Bella Cucina · Redirects");
@@ -488,7 +492,7 @@ describe("the header's Add redirect → 4254:75736 → redirects.create → re-l
     const registerHeaderAction = vi.fn();
     setup({ registerHeaderAction });
     await loaded();
-    mountHeader(registerHeaderAction);
+    await mountHeader(registerHeaderAction);
     fireEvent.click(screen.getByTestId("set-rd-add"));
     fireEvent.change(screen.getByTestId("set-rd-from"), { target: { value: "/menu-old" } });
     fireEvent.change(screen.getByTestId("set-rd-to"), { target: { value: "/menu" } });
