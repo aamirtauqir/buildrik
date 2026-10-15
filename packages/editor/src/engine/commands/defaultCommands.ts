@@ -13,7 +13,7 @@ import type { CommandData, CommandOptions, ElementType } from "@/shared/types";
 import type { Element } from "../elements/Element";
 import { canNestElement } from "@/shared/utils/nesting";
 import type { Composer } from "../Composer";
-import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement } from "./commandOperations";
+import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement, writableElements } from "./commandOperations";
 
 /**
  * Build the full list of default commands.
@@ -368,10 +368,15 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
           if (!target) continue;
           plan.push({ data, target, index });
         }
-        if (plan.length === 0) return;
+        /* BK-13: pasting INTO a locked element changes it — those steps are
+           refused, with one "locked" toast (writableElements). */
+        const targets = [...new Set(plan.map((step) => step.target))];
+        const open = new Set(writableElements(c, targets));
+        const allowed = plan.filter((step) => open.has(step.target));
+        if (allowed.length === 0) return;
 
         c.beginTransaction("paste");
-        for (const step of plan) {
+        for (const step of allowed) {
           /* `pasteElement` announces CLIPBOARD_PASTE itself, with the element,
              target and index. Emitting a second, thinner one here gave every
              paste two "Element pasted" toasts — and one paste can place N

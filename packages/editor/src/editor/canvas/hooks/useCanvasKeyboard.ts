@@ -52,6 +52,9 @@ export interface UseCanvasKeyboardResult {
  * Hook for handling keyboard navigation and shortcuts on the canvas.
  * Pure helper functions are in ./keyboard/keyboardHelpers.ts.
  */
+/** Controls that own their keys even inside the canvas column. */
+const CONTROL_SELECTOR = 'button, a[href], select, [role="button"], [role="menu"], [role="menuitem"], [role="dialog"], [role="listbox"]';
+
 /** A held arrow repeats every ~30 ms; a gap this long is a new press. */
 const REFUSED_NUDGE_MS = 1500;
 
@@ -71,6 +74,12 @@ export function useCanvasKeyboard({
     (e: React.KeyboardEvent) => {
       if (!composer || editingId) return;
       if ((e.target as HTMLElement)?.closest("input, textarea, [contenteditable]")) return;
+      /* BK-28: the canvas keys are the canvas's. A key pressed on a control
+         inside the canvas column — the footer's Zoom, a resize handle, a menu
+         — belongs to that control: Tab on Zoom cycled the canvas selection and
+         never left the button. */
+      const target = e.target as HTMLElement | null;
+      if (target && target !== e.currentTarget && target.closest(CONTROL_SELECTOR)) return;
 
       /* The command registry listens capture-phase on window and calls
          preventDefault() on anything it owns, which means it has already RUN by

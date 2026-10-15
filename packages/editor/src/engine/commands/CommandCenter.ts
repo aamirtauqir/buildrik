@@ -223,6 +223,12 @@ export class CommandCenter {
     // A read-only composer runs no command that changes the document.
     if (this.composer.readOnly && MUTATING_COMMANDS.has(commandId)) return false;
 
+    // BK-28: a focused control that owns its shortcuts (a page row's ⌘D / ⌫)
+    // keeps them — this capture-phase listener ran first and duplicated the
+    // canvas selection instead. DOM attribute, not an import (engine/ must
+    // not depend on editor/).
+    if (target?.closest?.("[data-bk-owns-keys]")) return false;
+
     // A full-page surface (Templates, Asset library, Settings) owns the
     // keyboard while mounted — the canvas stays mounted behind it but is not
     // what the user is looking at. DOM query, not an import — engine/ must

@@ -51,7 +51,7 @@ import type { EditsSnapshot } from "@shared/types/media";
 import type { Composer } from "@/engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "@/shared/types/media";
-import { Portal } from "@/editor/chrome-ui";
+import { FullPageHost } from "@/editor/chrome-ui";
 import type { SettingsOpenRequest } from "./tabs/settings/types";
 import type { TemplatesOpenRequest } from "./tabs/templates/TemplatesTab";
 
@@ -113,21 +113,15 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
        (the view owns its Escape and its dialogs). */
     case "templates":
       return (
-        <Portal>
-          <div
-            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
-            data-testid="tpl-host"
-            data-bk-surface="fullpage"
-          >
-            <TemplatesTab
-              composer={composer}
-              onTemplateUsed={onSwitchToAdd}
-              onSwitchTab={onTemplatesSwitchTab}
-              request={templatesOpen}
-              onClose={commonTabProps.onClose}
-            />
-          </div>
-        </Portal>
+        <FullPageHost data-testid="tpl-host">
+          <TemplatesTab
+            composer={composer}
+            onTemplateUsed={onSwitchToAdd}
+            onSwitchTab={onTemplatesSwitchTab}
+            request={templatesOpen}
+            onClose={commonTabProps.onClose}
+          />
+        </FullPageHost>
       );
 
     /* Clone 3695:45155 — the Asset library is edge-to-edge: no rail, no
@@ -140,15 +134,13 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
        it on a stray click). */
     case "assets":
       return composer ? (
-        <Portal>
-          <div className="mgr-host" data-testid="mgr-host" data-bk-surface="fullpage">
-            <LibraryManager
-              composer={composer}
-              onClose={commonTabProps.onClose}
-              onOpenImageEditor={commonTabProps.onOpenImageEditor}
-            />
-          </div>
-        </Portal>
+        <FullPageHost className="mgr-host" data-testid="mgr-host">
+          <LibraryManager
+            composer={composer}
+            onClose={commonTabProps.onClose}
+            onOpenImageEditor={commonTabProps.onOpenImageEditor}
+          />
+        </FullPageHost>
       ) : null;
 
     /* Clone 3397:32011 — Settings is edge-to-edge the same way the library
@@ -159,22 +151,16 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
        Escape, its guard and its dialogs. */
     case "settings":
       return (
-        <Portal>
-          <div
-            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
-            data-testid="set-host"
-            data-bk-surface="fullpage"
-          >
-            <SettingsTab
-              initialScreen={activeSubTab}
-              composer={composer}
-              projectId={projectId}
-              openRequest={settingsOpen}
-              onOpenDesignTab={onSwitchToDesign}
-              onClose={commonTabProps.onClose}
-            />
-          </div>
-        </Portal>
+        <FullPageHost data-testid="set-host">
+          <SettingsTab
+            initialScreen={activeSubTab}
+            composer={composer}
+            projectId={projectId}
+            openRequest={settingsOpen}
+            onOpenDesignTab={onSwitchToDesign}
+            onClose={commonTabProps.onClose}
+          />
+        </FullPageHost>
       );
 
     /* Board 7315:80955 — Brand is a full-canvas workspace (owner decision
@@ -184,24 +170,17 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
        its unsaved-draft guard and its dialogs. */
     case "design":
       return (
-        <Portal>
-          <div
-            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
-            data-testid="brand-host"
-            /* BK-05 / D36: Brand owns the keyboard like the other full-page
-               surfaces, but keeps ⌘Z for its own token edits — never for a
-               canvas edit behind it. */
-            data-bk-surface="fullpage"
-            data-bk-history="tokens"
-          >
-            <BrandWorkspace
-              composer={composer}
-              projectId={projectId}
-              initialPage={activeSubTab}
-              onClose={commonTabProps.onClose}
-            />
-          </div>
-        </Portal>
+        /* BK-05 / D36: Brand owns the keyboard like the other full-page
+           surfaces, but keeps ⌘Z for its own token edits — never for a canvas
+           edit behind it. */
+        <FullPageHost data-testid="brand-host" history="tokens">
+          <BrandWorkspace
+            composer={composer}
+            projectId={projectId}
+            initialPage={activeSubTab}
+            onClose={commonTabProps.onClose}
+          />
+        </FullPageHost>
       );
 
     default:

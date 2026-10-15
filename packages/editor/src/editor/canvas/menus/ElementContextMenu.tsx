@@ -129,6 +129,7 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({ x, y, actions, co
       rows.push(<div key={`rule-${action.id}`} role="separator" className={RULE} />);
     }
     const enabled = enabledFor(action, context);
+    const reason = enabled ? undefined : action.disabledReason?.(context);
     const hasSub = Boolean(action.submenu?.length);
     const open = sub?.id === action.id;
     rows.push(
@@ -137,6 +138,8 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({ x, y, actions, co
         data-testid={`canvas-ctx-item-${action.id}`}
         className={open ? `${ROW} ${ROW_OPEN}` : ROW}
         disabled={!enabled}
+        title={reason}
+        aria-description={reason}
         aria-haspopup={hasSub ? "menu" : undefined}
         aria-expanded={hasSub ? open : undefined}
         icon={action.icon === "sparkles" ? <Sparkles size={14} aria-hidden="true" /> : undefined}
@@ -163,7 +166,13 @@ const ContextMenuPanel: React.FC<ElementContextMenuProps> = ({ x, y, actions, co
       >
         <span className="tw:flex tw:w-full tw:items-center">
           <span>{action.label}</span>
-          {action.shortcut ? <span className={HINT}>{formatShortcutHint(action.shortcut, isMac())}</span> : null}
+          {/* Decision 13: a disabled row says why — the short form here, the
+              sentence in its title and accessible description. */}
+          {reason ? (
+            <span className={HINT}>Locked</span>
+          ) : action.shortcut ? (
+            <span className={HINT}>{formatShortcutHint(action.shortcut, isMac())}</span>
+          ) : null}
           {hasSub ? (
             <span aria-hidden="true" className={HINT}>
               {">"}

@@ -689,17 +689,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               <p className="tw:mt-1 tw:mb-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
                 Your changes are only in this tab.
               </p>
-              {gestureOpen && (
-                <p className="tw:mt-1 tw:mb-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-warning-text)]">
-                  Finish the resize first — release the mouse or press Escape.
-                </p>
-              )}
-              <div className="tw:mt-3 tw:flex tw:gap-2">
+              <div className="tw:mt-3 tw:flex tw:items-start tw:gap-2">
                 <Button
                   size="xs"
                   data-testid="save-stall-save-now"
-                  disabled={gestureOpen}
-                  aria-disabled={gestureOpen}
+                  disabledReason={gestureOpen ? "Finish resizing to save" : undefined}
                   onClick={() => {
                     setStallPanelOpen(false);
                     void onSave();

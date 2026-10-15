@@ -479,6 +479,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onBulkDelete={handleBulkDelete}
             onClearSelection={leaveSelectMode}
             onContextMenu={p.openContextMenu}
+            onPageShortcut={(id, action) => (action === "duplicate" ? p.duplicatePage(id) : handleDeleteRequest(id))}
             dirtyPages={dirtyPages}
             onRenameStart={p.startRename}
             onRenameCommit={handleRenameCommit}
