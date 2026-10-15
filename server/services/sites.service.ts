@@ -13,7 +13,8 @@ import type {
 } from "@buildrik/shared/schemas/sites";
 import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS, SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
-import { SITE_SETTINGS_COLUMNS, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
+import { SITE_SETTINGS_COLUMNS, getSiteSettings, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
+import { listPages } from "@/server/services/page.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
@@ -235,6 +236,7 @@ export async function createSite(
           templateId: input.templateId,
           pages: templatePageCount,
           lastEditedAt: new Date(),
+          lastEditedById: userId,
         },
       });
 
@@ -264,6 +266,7 @@ export async function createSite(
         createdBy: userId,
         pages: 1,
         lastEditedAt: new Date(),
+        lastEditedById: userId,
       },
     });
 
@@ -388,18 +391,52 @@ export function redactSitePassword<T extends { publishedPassword: string | null 
   return { ...rest, hasPublishedPassword: Boolean(publishedPassword) };
 }
 
-export async function getSite(siteId: string) {
-  const site = await prisma.site.findFirst({
+export async function getSite(siteId: string, db: Prisma.TransactionClient = prisma) {
+  const site = await db.site.findFirst({
     where: { id: siteId, deletedAt: null },
     include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
   });
   return site ? redactSitePassword(site) : null;
 }
 
-export async function renameSite(siteId: string, name: string) {
+/**
+ * Everything the editor loads, read as ONE snapshot. It used to be three
+ * parallel requests (`sites.get`, `pages.list`, `siteDetail.settings.get`): a
+ * save landing between them paired the old pages with the new `lastEditedAt`,
+ * and the editor's next save then passed the CAS check and overwrote work it
+ * never saw. REPEATABLE READ makes every read in the transaction see the same
+ * committed state, so the token always matches the content it came with.
+ *
+ * `lastEditedBy.isViewer` lets the restore/conflict dialog say "You … from
+ * another tab" instead of naming the viewer.
+ */
+export async function loadSiteForEditor(siteId: string, viewerId: string) {
+  return prisma.$transaction(
+    async (tx) => {
+      const site = await getSite(siteId, tx);
+      if (!site) return null;
+      const pages = await listPages(siteId, tx);
+      const settings = await getSiteSettings(siteId, tx);
+      const editor = site.lastEditedById
+        ? await tx.user.findUnique({ where: { id: site.lastEditedById }, select: { id: true, displayName: true, fullName: true } })
+        : null;
+      return {
+        site,
+        pages,
+        settings,
+        lastEditedBy: editor
+          ? { name: editor.displayName || editor.fullName, isViewer: editor.id === viewerId }
+          : null,
+      };
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+  );
+}
+
+export async function renameSite(siteId: string, name: string, editorId: string) {
   return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
-    data: { name, lastEditedAt: new Date() },
+    data: { name, lastEditedAt: new Date(), lastEditedById: editorId },
   }));
 }
 
@@ -512,6 +549,7 @@ export async function duplicateSite(
         projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
         projectCmsBindings: copyCmsBindings(original.projectCmsBindings, reid.renames),
         lastEditedAt: new Date(),
+        lastEditedById: userId,
       },
     });
 
@@ -757,6 +795,7 @@ export async function saveProjectFromEditor(
     cmsBindings?: CmsBindingsInput;
   },
   expectedLastEditedAt?: string,
+  editorId?: string,
 ) {
   // 2026-05-23: array-level cast — Zod's passthrough output type
   // (`objectOutputType<{...},...,"passthrough">`) for the `meta` field
@@ -786,7 +825,7 @@ export async function saveProjectFromEditor(
     settings: projectData.settings,
     dsSchemaVersion: projectData.dsSchemaVersion,
     cmsBindings: projectData.cmsBindings,
-  }, expectedLastEditedAt);
+  }, expectedLastEditedAt, editorId);
 }
 
 export async function bulkAction(
@@ -986,7 +1025,9 @@ async function assertPageLimit(siteId: string, workspaceId: string, incoming: nu
   if (incoming > stored) throw new Error(`PAGE_LIMIT:${limit}`);
 }
 
-export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
+/** `editorId` is the user making the save; it lands in `Site.lastEditedById`
+ *  next to `lastEditedAt`. Omitted (internal callers, older tests) = unknown. */
+export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string, editorId?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
     select: {
@@ -1079,6 +1120,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
         // stored bindings alone; the editor always sends its full map.
         projectCmsBindings: cmsBindings as Prisma.InputJsonValue | undefined,
         lastEditedAt: savedAt,
+        lastEditedById: editorId ?? null,
         ...(isFullSnapshot ? { pages: input.pages.length } : {}),
       },
     });

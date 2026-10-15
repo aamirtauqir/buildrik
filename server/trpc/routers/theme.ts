@@ -118,7 +118,7 @@ export const themeRouter = router({
       await requireAgencyLayer(workspaceId);
       await requireAdmin(ctx, workspaceId);
       try {
-        return await pushSharedTheme(workspaceId, input.siteIds);
+        return await pushSharedTheme(workspaceId, input.siteIds, ctx.session.user.id);
       } catch (e) {
         translateThemeError(e);
       }
@@ -146,7 +146,7 @@ export const themeRouter = router({
       await requireAgencyLayer(workspaceId);
       await requireAdmin(ctx, workspaceId);
       try {
-        return await rollbackSiteTheme(workspaceId, input.siteId);
+        return await rollbackSiteTheme(workspaceId, input.siteId, ctx.session.user.id);
       } catch (e) {
         translateThemeError(e);
       }

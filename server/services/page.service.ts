@@ -21,11 +21,11 @@ function slugify(name: string): string {
     .replace(/[^a-z0-9-]/g, "");
 }
 
-export async function listPages(siteId: string) {
+export async function listPages(siteId: string, db: Prisma.TransactionClient = prisma) {
   // Phase -1: full page hydration. BuildrikSyncProvider.loadProject expects
   // blocks/settings/slugHistory/meta/slugManuallySet for applied-template
   // state + slug-redirect history to survive reload.
-  return prisma.page.findMany({
+  return db.page.findMany({
     where: { siteId },
     select: {
       id: true,

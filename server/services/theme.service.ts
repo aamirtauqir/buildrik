@@ -237,6 +237,7 @@ export async function setSiteThemeLock(
 export async function pushSharedTheme(
   workspaceId: string,
   siteIds?: string[],
+  actorId?: string,
 ): Promise<PushResult[]> {
   const theme = await requireTokenTheme(workspaceId);
 
@@ -292,6 +293,7 @@ export async function pushSharedTheme(
             projectSettings: withTokens(site.projectSettings, final.theme, pushed.version),
             dsSchemaVersion: site.dsSchemaVersion + 1,
             lastEditedAt: savedAt,
+            lastEditedById: actorId ?? null,
           },
         });
         if (claimed.count === 0) throw new Error("This site changed while pushing — push again.");
@@ -507,6 +509,7 @@ export async function previewSharedThemePush(
 export async function rollbackSiteTheme(
   workspaceId: string,
   siteId: string,
+  actorId?: string,
 ): Promise<{ rolledBackTo: Date }> {
   const site = await prisma.site.findFirst({
     where: { id: siteId, workspaceId },
@@ -545,6 +548,7 @@ export async function rollbackSiteTheme(
             }),
         dsSchemaVersion: site.dsSchemaVersion + 1,
         lastEditedAt: new Date(),
+        lastEditedById: actorId ?? null,
       },
     });
     if (claimed.count === 0) {
@@ -625,6 +629,7 @@ export async function rollbackTokenMigration(siteId: string): Promise<{ restored
       dsSchemaVersion: site.dsSchemaVersion + 1,
       tokensMigrationHold: true,
       lastEditedAt: new Date(),
+      lastEditedById: null,
     },
   });
   if (claimed.count === 0) {

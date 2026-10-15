@@ -118,12 +118,6 @@ const MEDIA_PAGE_SIZE = 200;
    fallback project has a child, so it counts as content. */
 const _loadedSites = new Set<string>();
 
-/* SA-01: sites whose Site-column settings did not load this session (the read
-   failed twice). The columns are the only source of the column-backed
-   settings, so such a session renders pages without their title template,
-   icons, OG image or head/body code — publishing it is refused. */
-const _siteColumnsMissing = new Set<string>();
-
 /* Sites whose STORED v6 tokens failed validation at load (Brand opens
    read-only, reason "failed"). Their saves send `designTokens: undefined`, so
    the server carries the stored token state forward (ruling C2) instead of
@@ -137,12 +131,6 @@ export function keepStoredTokensOnSave(siteId: string): void {
   _storedTokensKept.add(siteId);
 }
 
-/** Whether the open site's Site-column settings loaded. Publish reads it.
- *  A site no load ever reached has no columns either — this answered true for
- *  it, so a failed project load published the fallback with an empty <head>. */
-export function siteColumnsLoaded(siteId: string): boolean {
-  return _loadedSites.has(siteId) && !_siteColumnsMissing.has(siteId);
-}
 
 /* Sites the server says do not exist. A refused save is not the same story for
    these: "Reload to get the real site" is the right advice for a load that
@@ -732,23 +720,13 @@ export function projectDataFromRows(
 export async function loadProject(siteId: string): Promise<ProjectData> {
   try {
     const client = getClient();
-    // P0.2b: pull Site columns alongside core site + pages so editor's view
-    // of metaTitle/etc reflects what the dashboard saved.
-    // SA-01: retried once — a failed read leaves the column-backed settings empty.
-    const readSiteColumns = () => client.siteDetail.settings.get.query({ siteId });
-    let columnsLoaded = true;
-    const [site, pages, settingsResult] = await Promise.all([
-      client.sites.get.query({ id: siteId }),
-      client.pages.list.query({ siteId }),
-      readSiteColumns()
-        .catch(readSiteColumns)
-        .catch(() => {
-          columnsLoaded = false;
-          return null;
-        }),
-    ]);
-    if (columnsLoaded) _siteColumnsMissing.delete(siteId);
-    else _siteColumnsMissing.add(siteId);
+    /* One snapshot: site row (with the CAS token), pages and Site-column
+       settings come from a single REPEATABLE READ transaction. Three parallel
+       reads let a save land between them, pairing old pages with the new
+       token — the next save then passed CAS and overwrote unseen work.
+       SA-01: retried once, as the settings read alone used to be. */
+    const readSnapshot = () => client.sites.loadForEditor.query({ siteId });
+    const { site, pages, settings: settingsResult } = await readSnapshot().catch(readSnapshot);
     const data = projectDataFromRows(site, pages, settingsResult);
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.

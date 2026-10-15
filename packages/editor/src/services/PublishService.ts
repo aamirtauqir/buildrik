@@ -11,7 +11,6 @@ import { createBuildrikApiClient } from "./api-client";
 import {
   settledBaselineLastEditedAt,
   raiseSaveConflict,
-  siteColumnsLoaded,
   hasProjectLoaded,
 } from "./BuildrikSyncProvider";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
@@ -76,13 +75,11 @@ export async function publishSite(
   // on since this tab last loaded or saved it.
   // A tab whose project never loaded shows the fallback (a stale local copy or
   // the default project); publishing it would replace the live site with that.
-  // Same invariant the save boundary enforces (ProjectNotLoadedError).
+  // Same invariant the save boundary enforces (ProjectNotLoadedError). The
+  // Site columns (the pages' <head> settings) come in the same load snapshot,
+  // so a loaded project always has them (SA-01).
   if (!hasProjectLoaded(siteId)) {
     throw new Error("This site didn't load. Reload the editor before publishing.");
-  }
-  // SA-01: without the Site columns the rendered pages carry an empty <head>.
-  if (!siteColumnsLoaded(siteId)) {
-    throw new Error("Site settings didn't load. Reload the editor before publishing.");
   }
   const expectedLastEditedAt = await settledBaselineLastEditedAt();
   try {

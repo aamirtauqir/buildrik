@@ -6,6 +6,7 @@ import {
   listSites,
   createSite,
   getSite,
+  loadSiteForEditor,
   renameSite,
   duplicateSite,
   archiveSite,
@@ -88,6 +89,22 @@ export const sitesRouter = router({
       return site;
     }),
 
+  /** The editor's load: site, pages and settings as one consistent snapshot
+   *  (see loadSiteForEditor). Same access rule as `get` — VIEWER may read. */
+  loadForEditor: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      const loaded = await loadSiteForEditor(input.siteId, ctx.session.user.id);
+      if (!loaded) throw new TRPCError({ code: "NOT_FOUND" });
+      return loaded;
+    }),
+
   create: protectedProcedure
     .input(createSiteSchema)
     .mutation(async ({ ctx, input }) => {
@@ -125,7 +142,7 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      return renameSite(input.id, input.name);
+      return renameSite(input.id, input.name, ctx.session.user.id);
     }),
 
   duplicate: protectedProcedure
@@ -373,7 +390,7 @@ export const sitesRouter = router({
       }
 
       try {
-        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined);
+        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined, ctx.session.user.id);
       } catch (e: unknown) {
         /* I-2: a page id in the save belongs to another site. BAD_REQUEST, not
            FORBIDDEN — the editor treats FORBIDDEN as a revoked role. */

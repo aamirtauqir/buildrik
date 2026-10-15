@@ -132,6 +132,27 @@ describe("saveProjectFromEditor — editor save path (positional args)", () => {
     );
   });
 
+  /* The restore/conflict dialogs name who saved the server copy; the save
+     writes that next to lastEditedAt in the same CAS update. */
+  it("records the saving user as lastEditedById, and null when none is given", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "site-1", name: "Test Site" } as any);
+    const { txPage, txSite, txFormBlock } = makeTx();
+    vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
+    );
+    const project = { version: "1.0", pages: [], styles: [], assets: [] };
+
+    await saveProjectFromEditor("site-1", project, undefined, "u_7");
+    expect(txSite.updateMany).toHaveBeenLastCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ lastEditedById: "u_7" }) })
+    );
+
+    await saveProjectFromEditor("site-1", project);
+    expect(txSite.updateMany).toHaveBeenLastCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ lastEditedById: null }) })
+    );
+  });
+
   it("throws SITE_NOT_FOUND when site does not exist", async () => {
     vi.mocked(prisma.site.findUnique).mockResolvedValue(null);
     await expect(
