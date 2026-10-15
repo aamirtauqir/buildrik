@@ -511,8 +511,12 @@ so, because the gates exist to catch what tests do not.
 ## ENV VARIABLES (Vite — `import.meta.env.*`)
 
 All editor-runtime env vars must be prefixed `VITE_` so Vite inlines them at
-build time. Dev-time defaults live in `.env.local`. Production values must be
-set in the host platform (Vercel project settings → Environment Variables).
+build time. Dev-time defaults live in `.env.local` at the repo root. Production
+runs on the **cPanel Node.js app**, not Vercel — see root `CLAUDE.md` §Where the
+values live for how to read and set its env. The shipping editor is bundled into
+Next and reads the `NEXT_PUBLIC_*` names, which are baked into the bundle at
+`next build` time (`.env.production.local`); setting them only in the server's
+runtime env does nothing for the client.
 
 | Var | Purpose | Dev default | Production value |
 |-----|---------|-------------|-----------------|
