@@ -234,7 +234,7 @@ describe("applyAiEdit", () => {
       ]),
     );
     expect(r.applied).toBe(1);
-    expect(setContent).toHaveBeenCalledWith("Welcome");
+    expect(setContent).toHaveBeenCalledWith("Welcome", "text");
   });
 
   it("applies a mixed style + text batch in one transaction", async () => {
@@ -249,7 +249,7 @@ describe("applyAiEdit", () => {
     );
     expect(r.applied).toBe(2);
     expect(setStyle).toHaveBeenCalledOnce();
-    expect(setContent).toHaveBeenCalledWith("Hello");
+    expect(setContent).toHaveBeenCalledWith("Hello", "text");
     expect(beginTransaction).toHaveBeenCalledOnce();
     expect(endTransaction).toHaveBeenCalledOnce();
   });
@@ -272,7 +272,7 @@ describe("applySetText", () => {
     const setContent = vi.fn();
     const composer = makeComposer({ setContent });
     applySetText(composer, { elementId: "el-1", text: "Hi there" });
-    expect(setContent).toHaveBeenCalledWith("Hi there");
+    expect(setContent).toHaveBeenCalledWith("Hi there", "text");
   });
 
   it("throws when the element is not found", () => {

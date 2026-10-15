@@ -10,7 +10,7 @@ import type { ElementData } from "@/shared/types";
 import { camelToKebab } from "../helpers";
 import { escapeAttr } from "./encoding";
 import { toAllowedElementTag } from "@buildrik/shared/schemas/element-markup";
-import { classTokens, isSafeAttrValue } from "./sanitization";
+import { classTokens, contentToHTML, isSafeAttrValue } from "./sanitization";
 import { isSelfClosing } from "./tagCategories";
 import { embedFrameHTML } from "../embed/embedFrameHTML";
 
@@ -136,7 +136,7 @@ export function elementDataToHTML(data: ElementData, options: HTMLGenerationOpti
 
   const tag = toAllowedElementTag(data.tagName || "div");
   const attrs = buildAttributeString(data, options);
-  const content = data.content || "";
+  const content = data.content ? contentToHTML(data.content, data.contentFormat) : "";
   const indent = prettyPrint ? indentString.repeat(indentLevel) : "";
   const newline = prettyPrint ? "\n" : "";
 

@@ -346,15 +346,31 @@ describe("ExportEngine.generateHTML — config knobs", () => {
 
   // Text content stays escaped. This is the safe default and the reason the
   // escape exists: a user who types markup must not get markup on their site.
-  it("escapes plain text content verbatim", () => {
+  it("escapes plain-text content verbatim", () => {
     const root: LiveNode = {
       id: "root",
-      children: [{ id: "t1", type: "text", content: '<b>bold</b> & "quotes"' }],
+      children: [{ id: "t1", type: "text", content: '<b>bold</b> & "quotes"', contentFormat: "text" }],
     };
     const html = new ExportEngine(makeComposer({ root })).generateHTML();
 
-    expect(html).toContain("&lt;b&gt;bold&lt;/b&gt; &amp; &quot;quotes&quot;");
+    expect(html).toContain(`&lt;b&gt;bold&lt;/b&gt; &amp; "quotes"`);
     expect(html).not.toContain("<b>bold</b>");
+  });
+
+  /* BK-40: content with no format is what inline editing stores (innerHTML,
+     "&" already "&amp;") and what the canvas mounts as markup. Escaping it
+     here published "<strong>bold</strong>" and "Q&amp;A" as visible text. */
+  it("writes content with no format as the canvas does: sanitized markup", () => {
+    const root: LiveNode = {
+      id: "root",
+      children: [{ id: "t1", type: "text", content: 'Q&amp;A <strong>bold</strong><img src=x onerror="alert(1)">' }],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+
+    expect(html).toContain("Q&amp;A <strong>bold</strong>");
+    expect(html).not.toContain("&amp;amp;");
+    expect(html).not.toContain("&lt;strong&gt;");
+    expect(html).not.toContain("onerror");
   });
 
   // Regression: every AI-generated site published as visible angle brackets.

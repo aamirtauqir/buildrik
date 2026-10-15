@@ -248,7 +248,14 @@ export class HTMLParser {
        that element's own content — it imported as layers, a <br> in a hero
        <h1> as a 63-px "Container". Links stay elements: they are edited. */
     if (isTextOnlyTag(tagName) && el.children.length > 0 && [...el.children].every(isInlinePhrasing)) {
-      const data: ElementData = { id: generateId("el"), type, tagName, children: [], content: el.innerHTML };
+      const data: ElementData = {
+        id: generateId("el"),
+        type,
+        tagName,
+        children: [],
+        content: el.innerHTML,
+        contentFormat: "html",
+      };
       if (Object.keys(attributes).length > 0) data.attributes = attributes;
       if (classes.length > 0) data.classes = classes;
       if (styles && Object.keys(styles).length > 0) data.styles = styles;
@@ -285,7 +292,9 @@ export class HTMLParser {
       type,
       tagName,
       children,
-      ...(isTextOnlyElement && { content: textBuffer }),
+      /* Decoded text: an escaped "&lt;img onerror…&gt;" in the source is TEXT,
+         and stored as markup it would become a tag (BK-51). */
+      ...(isTextOnlyElement && { content: textBuffer, contentFormat: "text" as const }),
     };
 
     if (Object.keys(attributes).length > 0) {
@@ -321,6 +330,7 @@ export class HTMLParser {
       type: "text",
       tagName: "span",
       content: text,
+      contentFormat: "text",
       children: [],
     };
   }

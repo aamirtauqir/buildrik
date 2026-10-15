@@ -143,8 +143,11 @@ export class Element {
     this.parent = parent;
   }
 
-  setContent(content: string): void {
+  /** `format` says how the content is written into the page (BK-40,
+   *  `ElementData.contentFormat`); omitted, the element keeps its format. */
+  setContent(content: string, format?: "text" | "html"): void {
     this.data.content = content;
+    if (format) this.data.contentFormat = format;
     // L2-005: text typed into an instance is an override like a style, or the
     // next master update re-clones over it without a word.
     this.composer.components?.recordInstanceOverride(this.getId(), "content", "", content);

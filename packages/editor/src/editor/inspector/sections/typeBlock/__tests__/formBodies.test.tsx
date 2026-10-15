@@ -80,7 +80,7 @@ describe("Input (board 14)", () => {
     renderBlock(makeMockComposer({ element: el }), { id: "e1", type: "select" });
     const area = screen.getByLabelText("Options (one per line)") as HTMLTextAreaElement;
     fireEvent.change(area, { target: { value: "Red\nBlue" } });
-    expect(el.setContent).toHaveBeenCalledWith("<option>Red</option><option>Blue</option>");
+    expect(el.setContent).toHaveBeenCalledWith("<option>Red</option><option>Blue</option>", "html");
   });
 });
 

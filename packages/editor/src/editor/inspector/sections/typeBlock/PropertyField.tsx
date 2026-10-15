@@ -168,7 +168,7 @@ function writeRow(composer: Composer, el: Element, type: string, id: string, val
       .filter((line) => line.length > 0)
       .map((line) => `<option>${escapeHTML(line)}</option>`)
       .join("");
-    el.setContent?.(html);
+    el.setContent?.(html, "html");
     return;
   }
   handleGenericAttributeChange(el, id, value);

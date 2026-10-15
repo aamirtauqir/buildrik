@@ -110,7 +110,7 @@ export const handleColumnsGapChange = (el: Element, value: string): void => {
 // ============================================================================
 
 export const handleTextareaDefaultChange = (el: Element, value: string): void => {
-  el.setContent?.(value || "");
+  el.setContent?.(value || "", "text");
   if (value) {
     el.setAttribute?.("value", value);
   } else {

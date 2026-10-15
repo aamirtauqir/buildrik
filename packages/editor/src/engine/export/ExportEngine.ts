@@ -55,7 +55,7 @@ import {
   THEME_BOOT_SCRIPT,
   THEME_TOGGLE_ATTR,
 } from "./themeToggleRuntime";
-import { classTokens, isSafeAttrValue, sanitizeHTML } from "@/shared/utils/html/sanitization";
+import { classTokens, contentToHTML, isSafeAttrValue } from "@/shared/utils/html/sanitization";
 import { embedFrameHTML } from "@/shared/utils/embed/embedFrameHTML";
 
 // ============================================================================
@@ -433,7 +433,7 @@ export class ExportEngine {
       childContent = embedFrame;
     } else {
       // Own text first, then children — the canvas renders both, in this order.
-      if (content) childContent = this.renderContent(content, contentFormat, type);
+      if (content) childContent = this.renderContent(content, contentFormat);
       if (children.length > 0) {
         childContent +=
           newline +
@@ -1037,30 +1037,16 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
    * Render a page element to HTML string (simplified for multi-page export)
    */
   /**
-   * Emit an element's `content` for export.
-   *
-   * Plain text is escaped. That is what every hand-authored element relies on —
-   * without it a user who types `<script>` gets markup on their published site.
-   *
-   * `contentFormat: "html"` means `content` is already markup. AI site
-   * generation stores whole generated sections that way and the canvas mounts
-   * them un-escaped, so escaping them here published every AI-generated site as
-   * visible angle brackets. Those are emitted as markup — but sanitized first,
-   * because model output is untrusted input like any other. Export runs in the
-   * editor client, so DOMPurify has a real DOM here.
+   * Emit an element's `content` for export — by `contentToHTML`, the rule the
+   * canvas mounts it with, so what the canvas shows is what publishes (BK-40).
+   * Plain text (`"text"`) is escaped; anything else is markup, sanitized:
+   * a typed `<script>` never reaches a published page either way. Export runs
+   * in the editor client, so DOMPurify has a real DOM here.
    */
-  private renderContent(content: string, contentFormat?: "text" | "html", type?: string): string {
-    // A real tag (`<h1>…`), not plain text like "a < b". Template & AI page
-    // seeds store raw HTML in a container's `content` without stamping
-    // contentFormat, so an unset format on a container with tag-shaped content
-    // is treated as markup. The type gate is load-bearing: a hand-authored
-    // `text` element that literally contains `<script>` must still be escaped,
-    // never rendered — that is the safety guarantee the escape default exists for.
-    const looksLikeHtml = /<[a-z][\s\S]*>/i.test(content);
-    if (contentFormat === "html" || (contentFormat == null && type === "container" && looksLikeHtml)) {
-      return sanitizeHTML(this.withSiteVariables(content, escapeHTML));
-    }
-    return escapeHTML(this.withSiteVariables(content));
+  private renderContent(content: string, contentFormat?: "text" | "html"): string {
+    return contentFormat === "text"
+      ? contentToHTML(this.withSiteVariables(content), "text")
+      : contentToHTML(this.withSiteVariables(content, escapeHTML), contentFormat);
   }
 
   /**
@@ -1183,7 +1169,7 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
       childContent = embedFrame;
     } else {
       // Own text first, then children — the canvas renders both, in this order.
-      if (content) childContent = this.renderContent(content, contentFormat, element.type);
+      if (content) childContent = this.renderContent(content, contentFormat);
       if (children.length > 0) {
         childContent +=
           "\n" +

@@ -295,7 +295,7 @@ export class ElementManager {
       if (links.some((a) => a.getAttribute("href") === href)) continue;
       const copy = this.duplicateElement(links[links.length - 1].getId());
       if (!copy) continue;
-      copy.setContent(page.name);
+      copy.setContent(page.name, "text");
       copy.setAttribute("href", href);
       added++;
     }

@@ -250,3 +250,39 @@ describe("HTMLParser.toHTML", () => {
     expect(html).toContain('data-buildrick-type="paragraph"');
   });
 });
+
+/* BK-40 / BK-51: the canvas writes content by the same rule as export —
+   "text" escaped, anything else sanitized markup — and HTML import says which
+   one each content is. */
+describe("HTMLParser — content format (BK-40, BK-51)", () => {
+  it("stamps decoded text as text, inline phrasing as html", () => {
+    const { kids } = importInto("<h2>Tom &amp; Jerry</h2><p>Hello <strong>World</strong></p>");
+    expect(kids[0].getContent()).toBe("Tom & Jerry");
+    expect(kids[0].getData().contentFormat).toBe("text");
+    expect(kids[1].getData().contentFormat).toBe("html");
+  });
+
+  it("escaped markup in pasted HTML stays text on the canvas — it never becomes a tag", () => {
+    const { manager } = importInto("<p>&lt;img src=x onerror=&quot;window.__x=1&quot;&gt;</p>");
+    const html = manager.toHTML();
+    expect(html).toContain("&lt;img");
+    expect(html).not.toMatch(/<img[^>]*onerror/);
+  });
+
+  it("the canvas sanitizes markup content before it is mounted", () => {
+    const { manager, kids } = importInto("<p>hi</p>");
+    kids[0].setContent('<b>ok</b><img src=x onerror="window.__x=1"><script>window.__y=1</script>', "html");
+    const html = manager.toHTML();
+    expect(html).toContain("<b>ok</b>");
+    expect(html).not.toContain("onerror");
+    expect(html).not.toContain("<script");
+  });
+
+  it("setContent with a format records it; without one keeps the element's", () => {
+    const { kids } = importInto("<h2>Plain</h2>");
+    kids[0].setContent("Still plain");
+    expect(kids[0].getData().contentFormat).toBe("text");
+    kids[0].setContent("Q&amp;A <strong>now</strong>", "html");
+    expect(kids[0].getData().contentFormat).toBe("html");
+  });
+});

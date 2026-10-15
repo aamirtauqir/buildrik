@@ -161,7 +161,7 @@ export function applySetText(composer: Composer, args: SetTextArgs): void {
   if (!el || typeof el.setContent !== "function") {
     throw new Error(`set-text: element not found (${args.elementId})`);
   }
-  el.setContent(args.text);
+  el.setContent(args.text, "text");
 }
 
 /**
