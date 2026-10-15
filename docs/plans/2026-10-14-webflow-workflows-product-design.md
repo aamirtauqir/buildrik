@@ -2066,6 +2066,64 @@ too fast to see PENDING), the server-refusal line, and any real Vercel deploy
 Production needs `prisma migrate deploy` for both migrations above before
 this code ships.
 
+## Pre-landing review (2026-10-16) and Phase 1.5 TODOs
+
+`/review` on the whole chain: 8 specialists + red team + adversarial pass.
+Fixed on `feat/phase1-s6-publish` (owner chose "fix all", "write the tests",
+"fix the design items"):
+
+- **Text corruption (critical, live-confirmed).** `lib/sanitize-blocks.ts`
+  purified `contentFormat: "text"` content on every save: "Tom & Jerry a<b"
+  came back as "Tom &amp; Jerry a". Text is never parsed as HTML on any render
+  path, so it is no longer purified. Two QA elements on the test site still
+  hold the corrupted text — the load scan lists them.
+- Worker: anything that throws after the deploy is live is recorded as
+  `post-deploy`, never FAILED, and never wipes the stored copy; the
+  deployment id lands with COMPLETED (unpublish could take down the previous
+  deployment); forms are PENDING from the bundle write (a worker dying after
+  COMPLETED left forms off for good); failed / cancelled / swept jobs drop
+  their bundle and forms state.
+- Post-deploy retry re-runs the project pin and the password (it re-applied
+  only the password and cleared everything); the panel names the step.
+- Restore dialog "Keep" no longer stops recovery copies for the session.
+- `forms.updateSubmission` / `deleteSubmission` no longer return IP and
+  device to an EDITOR (D7).
+- ⌘⇧G / palette could ungroup a locked group — refused in the engine.
+- `loadSiteForEditor` transaction ceilings (2s/5s defaults failed large sites).
+- AI `actions.confirm` returns the publish refusal as PRECONDITION_FAILED.
+- `blob:` check matches URL positions only; forms polling backs off (15s,
+  stops after 10 min); narrow `select`s on bundle-carrying rows.
+- Design: `disabledReason` uses the theme's disabled look (was 60% faded
+  brand blue, ~3:1); "Yes, replace" keeps its place and focus; "Autosave is
+  stuck" is announced; dashboard hides the IP row below ADMIN.
+- Tests added for the stored-bundle worker branch, rollback bundle branch,
+  retry routers (VIEWER refused), theme snapshots/targets authz, the refusal
+  message, and the server-side retries.
+
+Security-review false positive: radio/checkbox `value` XSS — ExportEngine's
+`escapeHTML` comes from `ExportHelpers.ts`, which escapes quotes.
+
+**Phase 1.5 TODOs (owner decision D4: record, decide later)**
+
+| # | Item | Why it matters | Options |
+|---|---|---|---|
+| P15-1 | Rollback bundle context covers badge + app scripts only | Tightened CSP/HSTS/robots/redirects or a sanitizer fix is undone by rolling back to an older bundle | add a settings + build-version hash to `BundleContext` (rebuild on change), or regenerate `vercel.json`/`robots.txt` from today's settings when reusing HTML |
+| P15-2 | Password protection is applied after the deploy goes live | A failed apply leaves a password-protected site public with a COMPLETED job (shown as a red post-deploy line) | apply protection to the project before the production deploy; or fail the publish when a password is set and cannot be applied |
+| P15-3 | New forms refuse submissions until activation lands | From go-live until the switch-over (minutes on the cron path; indefinitely after 3 failures) visitors get FORM_NOT_FOUND | upsert new forms active before deploy, deactivate only missing ones after; or accept a blockId present in the live job's formsPlan; notify the owner on FAILED |
+| P15-4 | "Before overwrite / restore / repair" copies live in one browser | The teammate whose work was replaced cannot recover it | write the replaced server copy as a server-side site version |
+| P15-5 | Scheduled publish and dashboard publish send no pages | They pass the new checks, then the worker fails "No page content to deploy" | render pages server-side, or refuse at startPublish before queueing and have schedules follow the job's result |
+| P15-6 | Concurrent forms activation has no compare-and-set | worker, cron and a user retry racing can let an older job deactivate the newer one's forms | activate inside a transaction that re-checks the live job |
+| P15-7 | Restore dialog decides "save a Before restore version" from the relation computed at open | after autosave moved the server, a later Restore can replace newer on-screen work without a version | recompute the relation at click time |
+| P15-8 | ⌘S imports kept edits without a prompt when their base still matches | typed-but-not-autosaved changes on the server copy are discarded | ask, or merge |
+| P15-9 | AI regeneration writes lastEditedAt without lastEditedById | the conflict dialog credits the previous human | write the actor (or a system marker) in every lastEditedAt writer |
+| P15-10 | Load repair can run before the role is known | a VIEWER session can apply repairs, then autosave is FORBIDDEN | gate on the resolved role |
+| P15-11 | Retained publish payload roughly doubles (log + bundle, 20 versions) | table/TOAST growth on cPanel Postgres | measure `pg_total_relation_size('publish_build_jobs')` after deploy; drop `log.pages` once a bundle exists |
+| P15-12 | `sites.lastEditedById` FK has no index | user deletion scans `sites` | `@@index([lastEditedById])` |
+
+Deploy order for this release: `prisma migrate deploy` (after the pg_dump
+backup) **before** the new build serves traffic, even on staging — default
+`findUnique` reads every column and would fail against an unmigrated DB.
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
