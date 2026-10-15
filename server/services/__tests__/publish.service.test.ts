@@ -42,7 +42,7 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 // Import after mocks
-import { runVercelDeploy, getPublishStatus, unpublishSite } from "@server/services/publish.service";
+import { applyPublishedPassword, runVercelDeploy, getPublishStatus, unpublishSite, PublishBlockedError } from "@server/services/publish.service";
 
 describe("unpublishSite — takes the deployment down on Vercel", () => {
   beforeEach(() => {
@@ -172,31 +172,29 @@ describe("publish.service Vercel connection gating", () => {
 
   // Clearing password protection (password=null) on a project that has none
   // returns Vercel 404 "Password Protection not found". That is the desired end
-  // state already, so it must NOT fail the deploy.
-  it("swallows Vercel 404 from password-protection clear and still returns the URL", async () => {
-    vi.stubEnv("NODE_ENV", "production");
+  // state already, so it must NOT fail. (Applied after the deploy goes live, O6.)
+  it("swallows Vercel 404 from password-protection clear", async () => {
     getConnMock.mockResolvedValueOnce({ id: "intg_1", token: "vt_abc", teamId: "team_x" });
-    createDepMock.mockResolvedValueOnce({ id: "dep_1", url: "x.vercel.app", readyState: "READY" });
     const { VercelApiError } = await import("@/lib/vercel");
     setPwMock.mockRejectedValueOnce(new VercelApiError(404, "not_found", "Password Protection not found."));
 
-    const result = await runVercelDeploy(
-      "ws_1", "buildrik-site-test", [{ file: "index.html", data: "<p>hi</p>" }], null,
-    );
-
-    expect(result).toEqual({ url: "https://x.vercel.app", deploymentId: "dep_1" });
+    await expect(applyPublishedPassword("ws_1", "buildrik-site-test", null)).resolves.toBeUndefined();
     expect(setPwMock).toHaveBeenCalledWith(expect.objectContaining({ password: null }));
   });
 
   it("re-throws a non-plan-gating password-protection error (e.g. 500)", async () => {
-    vi.stubEnv("NODE_ENV", "production");
     getConnMock.mockResolvedValueOnce({ id: "intg_1", token: "vt_abc", teamId: "team_x" });
-    createDepMock.mockResolvedValueOnce({ id: "dep_1", url: "x.vercel.app", readyState: "READY" });
     const { VercelApiError } = await import("@/lib/vercel");
     setPwMock.mockRejectedValueOnce(new VercelApiError(500, "internal", "Vercel API 500"));
 
-    await expect(
-      runVercelDeploy("ws_1", "buildrik-site-test", [{ file: "index.html", data: "<p>hi</p>" }], "secret"),
-    ).rejects.toThrow("Vercel API 500");
+    await expect(applyPublishedPassword("ws_1", "buildrik-site-test", "secret")).rejects.toThrow("Vercel API 500");
+  });
+});
+
+/* DR-T4: one sentence for every door; the editor parses it back. */
+describe("PublishBlockedError", () => {
+  it("names its blockers in the sentence every door returns", () => {
+    const e = new PublishBlockedError([{ label: "Pages ready", detail: "x" }, { label: "Collection lists", detail: "y" }]);
+    expect(e.userMessage).toBe("Publish stopped: Pages ready, Collection lists.");
   });
 });

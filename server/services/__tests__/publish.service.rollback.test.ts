@@ -140,6 +140,45 @@ describe("rollbackPublish", () => {
     expect(wsFindUnique).not.toHaveBeenCalled();
     expect(reviewFindFirst).not.toHaveBeenCalled();
   });
+
+  /* D11: a version that kept its bundle is redeployed from it — same bytes,
+     same hash, its forms plan — never re-expanded from today's CMS. */
+  it("a version with a stored bundle re-ships that bundle, hash and forms plan", async () => {
+    const target = {
+      id: "j1",
+      status: "COMPLETED",
+      log: { pages: [{ path: "/", html: "<h1>v1</h1>" }] },
+      bundle: { files: [{ file: "index.html", data: "<h1>v1</h1>" }], context: { showBadge: false, appScriptsHash: "h" } },
+      bundleHash: "abc",
+      formsPlan: { forms: [], deactivateMissing: true },
+    };
+    jobFindFirst.mockResolvedValueOnce(target);
+    jobFindFirst.mockResolvedValue(null);
+    jobUpdateMany.mockResolvedValue({ count: 0 });
+    siteFindUnique.mockResolvedValue({ name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws1", lastEditedAt: new Date(), workspace: { deletionScheduledAt: null } });
+    jobCreate.mockResolvedValue({ id: "jNew" });
+    siteUpdate.mockResolvedValue({});
+    const { appendDynamicPagesToPublish } = await import("@/server/services/cms.service");
+    vi.mocked(appendDynamicPagesToPublish).mockClear();
+    await rollbackPublish("s1", "j1", "u1");
+    const data = jobCreate.mock.calls[0][0].data;
+    expect(data).toMatchObject({ rolledBackFrom: "j1", bundle: target.bundle, bundleHash: "abc", formsPlan: target.formsPlan });
+    expect(data.log).toEqual(target.log);
+    expect(appendDynamicPagesToPublish).not.toHaveBeenCalled();
+  });
+
+  it("a version from before bundles still rebuilds from its pages", async () => {
+    jobFindFirst.mockResolvedValueOnce({ id: "j1", status: "COMPLETED", log: { pages: [{ path: "/", html: "<h1>old</h1>" }] }, bundle: null, bundleHash: null, formsPlan: null });
+    jobFindFirst.mockResolvedValue(null);
+    jobUpdateMany.mockResolvedValue({ count: 0 });
+    siteFindUnique.mockResolvedValue({ name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws1", lastEditedAt: new Date(), workspace: { deletionScheduledAt: null } });
+    jobCreate.mockResolvedValue({ id: "jNew" });
+    siteUpdate.mockResolvedValue({});
+    await rollbackPublish("s1", "j1", "u1");
+    const data = jobCreate.mock.calls[0][0].data;
+    expect(data.bundle).toBeUndefined();
+    expect(data.log.pages[0].html).toContain("old");
+  });
 });
 
 /* P1-1 (2026-10-08 audit): every workspace-scoped decision the worker makes —

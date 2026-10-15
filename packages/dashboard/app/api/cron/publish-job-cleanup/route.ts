@@ -43,7 +43,9 @@ export async function GET(req: NextRequest) {
       prisma.publishBuildJob.update({
         where: { id: job.id },
         // Clear `log` — terminal-state rule, it holds raw page HTML at rest.
-        data: { status: "FAILED", error, log: Prisma.DbNull },
+        // The bundle and a pending forms switch-over go with it.
+        data: { status: "FAILED", error, log: Prisma.DbNull, bundle: Prisma.DbNull, formsStatus: null },
+        select: { id: true },
       }),
     ];
     // Only touch the site if this dead job left it stuck in PUBLISHING —

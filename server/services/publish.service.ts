@@ -333,6 +333,12 @@ export class PublishBlockedError extends Error {
     super(`PUBLISH_BLOCKED: ${blockers.map((b) => b.label).join(", ")}`);
     this.name = "PublishBlockedError";
   }
+
+  /** The sentence every door returns — the editor's parseServerBlockers
+   *  (usePublishJob.ts) reads it back, so there is one copy of it. */
+  get userMessage(): string {
+    return `Publish stopped: ${this.blockers.map((b) => b.label).join(", ")}.`;
+  }
 }
 
 export async function startPublish(
@@ -626,7 +632,7 @@ export async function getPublishStatus(jobId: string) {
 export async function cancelPublish(jobId: string) {
   const job = await prisma.publishBuildJob.findUnique({
     where: { id: jobId },
-    include: { site: { select: { publishedUrl: true } } },
+    select: { status: true, siteId: true, site: { select: { publishedUrl: true } } },
   });
   if (!job || !["QUEUED", "BUILDING"].includes(job.status)) {
     throw new Error("NOT_CANCELLABLE");
@@ -637,7 +643,10 @@ export async function cancelPublish(jobId: string) {
       // Clear `log` — it holds the raw page HTML payload from startPublish.
       // Once the job is terminal we don't need it; leaving it bloats the
       // row and keeps the rendered HTML at rest forever.
-      data: { status: "CANCELLED", log: Prisma.DbNull },
+      // The bundle goes too (a rollback job carries one from creation), and
+      // its forms never switch over.
+      data: { status: "CANCELLED", log: Prisma.DbNull, bundle: Prisma.DbNull, formsStatus: null },
+      select: { id: true, siteId: true, status: true },
     }),
     // A cancelled RE-publish leaves the previous deployment serving — keep the
     // site PUBLISHED, same rule as the dispatch-failure and worker-failure exits.
@@ -657,9 +666,10 @@ const PUBLISH_HISTORY_RETAINED = 20;
 export async function completePublish(
   jobId: string,
   publicUrl: string,
-  extra?: { progress?: number; steps?: Prisma.InputJsonValue },
+  extra?: { progress?: number; steps?: Prisma.InputJsonValue; deploymentId?: string | null },
 ) {
-  const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
+  /* siteId only — the row now carries the whole bundle. */
+  const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId }, select: { siteId: true } });
   if (!job) throw new Error("JOB_NOT_FOUND");
 
   const [updated] = await prisma.$transaction([
@@ -675,7 +685,9 @@ export async function completePublish(
         // them through here now that the worker calls this instead.
         ...(extra?.progress !== undefined ? { progress: extra.progress } : {}),
         ...(extra?.steps !== undefined ? { steps: extra.steps } : {}),
+        ...(extra?.deploymentId ? { deploymentId: extra.deploymentId } : {}),
       },
+      select: { id: true, siteId: true, status: true, completedAt: true, deploymentId: true },
     }),
     prisma.site.update({
       where: { id: job.siteId },
@@ -1052,9 +1064,6 @@ export async function runVercelDeploy(
   workspaceId: string,
   projectName: string,
   files: VercelFile[],
-  // Plaintext published password to enforce via Vercel deployment protection
-  // (string = set, null = clear). undefined = leave protection untouched.
-  publishedPasswordPlain?: string | null,
 ): Promise<{ url: string; deploymentId: string } | null> {
   const conn = await getActiveVercelConnection(workspaceId);
   if (!conn) {
@@ -1080,9 +1089,6 @@ export async function runVercelDeploy(
     });
     if (ready.readyState !== "READY") {
       throw new Error(`VERCEL_DEPLOY_${ready.readyState}`);
-    }
-    if (publishedPasswordPlain !== undefined) {
-      await setPasswordTolerant(conn, projectName, publishedPasswordPlain);
     }
     return { url: pickPublicUrl(ready, projectName), deploymentId: ready.id };
   } catch (err) {

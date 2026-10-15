@@ -538,7 +538,7 @@ export const sitesRouter = router({
         if (e instanceof PublishBlockedError)
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
-            message: `Publish stopped: ${e.blockers.map((b) => b.label).join(", ")}.`,
+            message: e.userMessage,
             cause: { reason: "PUBLISH_BLOCKED", blockers: e.blockers },
           });
         // m-approval gate (publish.service startPublish): a member in an
@@ -758,9 +758,6 @@ export const sitesRouter = router({
       }
     }),
 
-  // P1: roll back = re-publish a prior version as a NEW job (contract §5).
-  // ADMIN — a destructive/cross-history action (§2). Bypasses the approval gate
-  // in the service (restoring an already-shipped version). Activity-logged.
   /* Decision 7: "Retry form update" — the forms switch-over of the live
      publish, on its own (A3/O3). Only the job that is live can switch. */
   retryFormsActivation: protectedProcedure
@@ -802,6 +799,9 @@ export const sitesRouter = router({
       }
     }),
 
+  // P1: roll back = re-publish a prior version as a NEW job (contract §5).
+  // ADMIN — a destructive/cross-history action (§2). Bypasses the approval gate
+  // in the service (restoring an already-shipped version). Activity-logged.
   rollback: protectedProcedure
     .input(rollbackInput)
     .mutation(async ({ ctx, input }) => {

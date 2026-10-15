@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { NextRequest } from "next/server";
 
-const { db, runVercelDeploy, assertProjectNameFree } = vi.hoisted(() => ({
+const { db, runVercelDeploy, assertProjectNameFree, completePublish, applyPublishedPassword, recordPublishedForms } = vi.hoisted(() => ({
   db: {
     publishBuildJob: { findUnique: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     site: { findUnique: vi.fn(), update: vi.fn() },
@@ -22,6 +22,9 @@ const { db, runVercelDeploy, assertProjectNameFree } = vi.hoisted(() => ({
   },
   runVercelDeploy: vi.fn(),
   assertProjectNameFree: vi.fn(),
+  completePublish: vi.fn(),
+  applyPublishedPassword: vi.fn(),
+  recordPublishedForms: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({ prisma: db }));
@@ -40,19 +43,20 @@ vi.mock("@/lib/publish-forms", () => ({
 vi.mock("@/lib/publish-sliders", () => ({ wireSliders: (html: string) => html }));
 vi.mock("@/server/services/form-submission.service", () => ({
   getPublishedFormSettings: vi.fn(async () => ({})),
-  recordPublishedForms: vi.fn(async () => {}),
+  recordPublishedForms: (...a: unknown[]) => recordPublishedForms(...a),
 }));
 vi.mock("@/server/services/activity-log.service", () => ({ record: vi.fn(async () => {}) }));
 vi.mock("@/server/services/notification.trigger", () => ({ notifyWorkspaceOwner: vi.fn(async () => {}) }));
 vi.mock("@/server/services/publish.service", () => ({
   runVercelDeploy: (...a: unknown[]) => runVercelDeploy(...a),
   assertProjectNameFree: (...a: unknown[]) => assertProjectNameFree(...a),
-  completePublish: vi.fn(async () => {}),
-  applyPublishedPassword: vi.fn(async () => {}),
+  completePublish: (...a: unknown[]) => completePublish(...a),
+  applyPublishedPassword: (...a: unknown[]) => applyPublishedPassword(...a),
 }));
 vi.mock("@/server/services/site-settings.service", () => ({ decryptPublishedPassword: () => null }));
 vi.mock("@/server/services/marketplace.service", () => ({ getWorkspaceAppScripts: vi.fn(async () => "") }));
 
+import { createHash } from "node:crypto";
 import { slugifyProjectName } from "@/lib/vercel";
 import { POST } from "./route";
 
@@ -117,6 +121,9 @@ beforeEach(() => {
   runVercelDeploy.mockReset();
   assertProjectNameFree.mockReset().mockResolvedValue(undefined);
   formPlan.next = null;
+  completePublish.mockReset().mockResolvedValue(undefined);
+  applyPublishedPassword.mockReset().mockResolvedValue(undefined);
+  recordPublishedForms.mockReset().mockResolvedValue(undefined);
 });
 
 describe("publish worker — pinned Vercel project (SA-06)", () => {
@@ -238,40 +245,105 @@ describe("publish worker — bundle, failure phase, forms after deploy", () => {
     await run();
     const bundleWrite = jobWrites().find((d) => "bundleHash" in d)!;
     expect(bundleWrite.bundleHash).toMatch(/^[0-9a-f]{64}$/);
-    expect(bundleWrite.bundle).toEqual({ files: [{ file: "index.html", data: "<html></html>" }] });
+    /* The entitlements it was built under go with it: a rollback ships these
+       bytes only while they still hold (PRO → no badge, no app scripts). */
+    expect(bundleWrite.bundle).toEqual({
+      files: [{ file: "index.html", data: "<html></html>" }],
+      context: { showBadge: false, appScriptsHash: createHash("sha256").update("").digest("hex") },
+    });
     expect(runVercelDeploy.mock.calls[0][2]).toEqual([{ file: "index.html", data: "<html></html>" }]);
   });
 
-  it("a failed deploy is FAILED in the deploy phase and switches no forms on", async () => {
+  it("a failed deploy is FAILED in the deploy phase, clears its forms switch-over and switches nothing on", async () => {
     setup("p1");
     formPlan.next = { forms: [{ blockId: "f1" }], deactivateMissing: true };
     db.$transaction.mockResolvedValue([]);
     runVercelDeploy.mockRejectedValue(new Error("VERCEL_DEPLOY_ERROR"));
     const res = await run();
     expect(res.status).toBe(500);
-    const failed = db.publishBuildJob.update.mock.calls.map(([a]) => a.data).find((d) => d.status === "FAILED");
-    expect(failed).toMatchObject({ failedPhase: "deploy", error: "VERCEL_DEPLOY_ERROR" });
-    expect(jobWrites().some((d) => d.formsStatus)).toBe(false);
+    const failed = jobWrites().find((d) => d.status === "FAILED");
+    expect(failed).toMatchObject({ failedPhase: "deploy", error: "VERCEL_DEPLOY_ERROR", formsStatus: null });
+    expect(recordPublishedForms).not.toHaveBeenCalled();
+  });
+
+  it("the deployment id lands with COMPLETED, never as a step that may fail", async () => {
+    setup("p1");
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
+    await run();
+    expect(completePublish).toHaveBeenCalledWith("job1", "https://x.vercel.app", expect.objectContaining({ deploymentId: "d1" }));
+    expect(jobWrites().some((d) => "deploymentId" in d)).toBe(false);
   });
 
   it("a step failing after the deployment went live leaves the publish complete (post-deploy)", async () => {
     setup("p1");
     runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
-    db.publishBuildJob.update.mockImplementation(async (a: { data: Record<string, unknown> }) => {
-      if ("deploymentId" in a.data) throw new Error("db blip");
-      return {};
-    });
+    applyPublishedPassword.mockRejectedValue(new Error("vercel 500"));
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const res = await run();
+    errSpy.mockRestore();
     expect(res.status).toBe(200);
-    expect(jobWrites().find((d) => d.failedPhase === "post-deploy")).toMatchObject({ error: "deployment id: db blip" });
+    expect(jobWrites().find((d) => d.failedPhase === "post-deploy")).toMatchObject({ error: "password protection: vercel 500" });
   });
 
-  it("a live deploy with forms marks them PENDING and switches them over", async () => {
+  /* Anything that throws once the deploy is live — a DB read, completePublish
+     itself — never marks the job FAILED or wipes the copy that is serving. */
+  it("an error after going live is recorded as post-deploy and keeps the stored copy", async () => {
+    setup("p1");
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
+    db.domain.findFirst.mockRejectedValue(new Error("pool exhausted"));
+    db.$transaction.mockResolvedValue([]);
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await run();
+    errSpy.mockRestore();
+    expect(res.status).toBe(500);
+    expect(jobWrites().some((d) => d.status === "FAILED")).toBe(false);
+    expect(jobWrites().some((d) => "log" in d)).toBe(false); // the stored copy is never wiped
+    expect(completePublish).toHaveBeenCalledWith("job1", "https://x.vercel.app", expect.objectContaining({ deploymentId: "d1" }));
+    expect(jobWrites().find((d) => d.failedPhase === "post-deploy")?.error).toBe("after going live: pool exhausted");
+  });
+
+  it("forms are PENDING from the bundle write, so a worker that dies after COMPLETED is recovered", async () => {
     setup("p1");
     formPlan.next = { forms: [{ blockId: "f1" }], deactivateMissing: true };
     runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d1" });
     await run();
-    expect(jobWrites().some((d) => d.formsStatus === "PENDING")).toBe(true);
-    expect(jobWrites().find((d) => "formsPlan" in d)?.formsPlan).toEqual({ forms: [{ blockId: "f1" }], deactivateMissing: true });
+    const bundleWrite = jobWrites().find((d) => "bundleHash" in d)!;
+    expect(bundleWrite).toMatchObject({ formsStatus: "PENDING", formsPlan: { forms: [{ blockId: "f1" }], deactivateMissing: true } });
+  });
+});
+
+/* A rollback's stored bundle ships byte for byte only under the entitlements
+   it was built with (security review 2026-10-16). */
+describe("publish worker — stored bundle (rollback)", () => {
+  const stored = (showBadge: boolean) => ({
+    files: [{ file: "index.html", data: "STORED" }],
+    context: { showBadge, appScriptsHash: createHash("sha256").update("").digest("hex") },
+  });
+  function withStored(bundle: unknown) {
+    setup("p1");
+    const job = { ...JOB, bundle, formsPlan: null };
+    db.publishBuildJob.findUnique.mockImplementation(async (args: { select?: { status?: boolean } }) =>
+      args.select?.status ? { status: "DEPLOYING" } : job,
+    );
+    runVercelDeploy.mockResolvedValue({ url: "https://x.vercel.app", deploymentId: "d2" });
+  }
+
+  it("ships the stored bytes when the workspace still has what built them", async () => {
+    withStored(stored(false)); // PRO → no badge, as built
+    await run();
+    expect(runVercelDeploy.mock.calls[0][2]).toEqual([{ file: "index.html", data: "STORED" }]);
+  });
+
+  it("rebuilds from the version's pages when the plan changed (no badge dodged on FREE)", async () => {
+    withStored(stored(false));
+    db.workspace.findUnique.mockResolvedValue({ plan: "FREE" });
+    await run();
+    expect(runVercelDeploy.mock.calls[0][2]).toEqual([{ file: "index.html", data: "<html></html>" }]);
+  });
+
+  it("rebuilds a bundle stored before contexts were recorded", async () => {
+    withStored({ files: [{ file: "index.html", data: "STORED" }] });
+    await run();
+    expect(runVercelDeploy.mock.calls[0][2]).toEqual([{ file: "index.html", data: "<html></html>" }]);
   });
 });

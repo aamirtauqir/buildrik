@@ -5,11 +5,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const db = vi.hoisted(() => ({
   publishBuildJob: { findUnique: vi.fn(), findFirst: vi.fn(), findMany: vi.fn(), update: vi.fn() },
+  site: { update: vi.fn() },
 }));
+const pw = vi.hoisted(() => ({ applyPublishedPassword: vi.fn() }));
 const forms = vi.hoisted(() => ({ recordPublishedForms: vi.fn() }));
 vi.mock("@/lib/prisma", () => ({ prisma: db }));
 vi.mock("@/server/services/form-submission.service", () => forms);
-vi.mock("@/server/services/publish.service", () => ({ applyPublishedPassword: vi.fn() }));
+vi.mock("@/server/services/publish.service", () => pw);
 vi.mock("@/server/services/site-settings.service", () => ({ decryptPublishedPassword: () => null }));
 
 import {
@@ -19,6 +21,8 @@ import {
   bundleStillEntitled,
   checkBundle,
   recoverPendingForms,
+  retryFormsActivation,
+  retryPostDeployStep,
 } from "../publish-bundle.service";
 
 const PLAN = { forms: [{ blockId: "f1", path: "/", name: "Contact", fields: [] }], deactivateMissing: true };
@@ -33,6 +37,8 @@ const job = (over: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   Object.values(db.publishBuildJob).forEach((m) => m.mockReset());
+  db.site.update.mockReset();
+  pw.applyPublishedPassword.mockReset();
   forms.recordPublishedForms.mockReset();
 });
 
@@ -51,6 +57,9 @@ describe("bundle (D11)", () => {
     expect(checkBundle([])).toEqual(["There are no pages to publish."]);
     expect(checkBundle([{ file: "about.html", data: "x" }])[0]).toMatch(/home page/);
     expect(checkBundle([{ file: "index.html", data: '<img src="blob:https://app/1">' }])[0]).toMatch(/never uploaded/);
+    expect(checkBundle([{ file: "index.html", data: '<div style="background:url(blob:https://app/2)">' }])[0]).toMatch(/never uploaded/);
+    // The word in page text is not an image.
+    expect(checkBundle([{ file: "index.html", data: "<p>Azure blob: storage tiers</p>" }])).toEqual([]);
   });
 });
 
@@ -114,7 +123,60 @@ describe("forms switch over after the deploy (A3/O3)", () => {
     db.publishBuildJob.findUnique.mockResolvedValue(job());
     db.publishBuildJob.findFirst.mockResolvedValue({ id: "j2" });
     expect(await recoverPendingForms(120_000)).toBe(1);
-    expect(db.publishBuildJob.findMany.mock.calls[0][0].where.formsStatus).toBe("PENDING");
+    expect(db.publishBuildJob.findMany.mock.calls[0][0].where).toMatchObject({ status: "COMPLETED", formsStatus: "PENDING" });
+    expect(db.publishBuildJob.findMany.mock.calls[0][0].orderBy).toEqual({ completedAt: "asc" });
     expect(forms.recordPublishedForms).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("the user's retries never redeploy", () => {
+  it("Retry form update only touches a live job whose switch-over has not landed", async () => {
+    db.publishBuildJob.findFirst.mockResolvedValueOnce(null);
+    await expect(retryFormsActivation("s1", "j2")).rejects.toThrow("NOT_FOUND");
+    expect(db.publishBuildJob.findFirst.mock.calls[0][0].where).toEqual({
+      id: "j2",
+      siteId: "s1",
+      status: "COMPLETED",
+      formsStatus: { in: ["FAILED", "PENDING"] },
+    });
+    expect(db.publishBuildJob.update).not.toHaveBeenCalled();
+  });
+
+  it("Retry form update resets the attempts and switches the forms over", async () => {
+    db.publishBuildJob.findFirst.mockResolvedValueOnce({ id: "j2" }).mockResolvedValueOnce({ id: "j2" });
+    db.publishBuildJob.findUnique.mockResolvedValue(job({ formsAttempts: 0 }));
+    expect(await retryFormsActivation("s1", "j2")).toBe("ACTIVE");
+    expect(db.publishBuildJob.update.mock.calls[0][0].data).toEqual({ formsAttempts: 0 });
+  });
+
+  it("the post-deploy retry re-runs the pin and the password, then clears the step", async () => {
+    db.publishBuildJob.findFirst.mockResolvedValue({
+      id: "j2",
+      workspaceId: "w1",
+      site: { slug: "my-site", vercelProjectName: null, name: "My site", publishedPassword: null },
+    });
+    await retryPostDeployStep("s1", "j2");
+    expect(db.publishBuildJob.findFirst.mock.calls[0][0].where).toEqual({ id: "j2", siteId: "s1", status: "COMPLETED", failedPhase: "post-deploy" });
+    expect(db.site.update.mock.calls[0][0]).toMatchObject({ where: { id: "s1" }, data: { vercelProjectName: expect.any(String) } });
+    expect(pw.applyPublishedPassword).toHaveBeenCalledWith("w1", expect.any(String), null);
+    expect(db.publishBuildJob.update.mock.calls.at(-1)![0].data).toEqual({ failedPhase: null, error: null });
+  });
+
+  it("the post-deploy retry leaves the step recorded when it fails again", async () => {
+    db.publishBuildJob.findFirst.mockResolvedValue({
+      id: "j2",
+      workspaceId: "w1",
+      site: { slug: "my-site", vercelProjectName: "pinned", name: "My site", publishedPassword: null },
+    });
+    pw.applyPublishedPassword.mockRejectedValue(new Error("vercel 500"));
+    await expect(retryPostDeployStep("s1", "j2")).rejects.toThrow("vercel 500");
+    expect(db.site.update).not.toHaveBeenCalled();
+    expect(db.publishBuildJob.update).not.toHaveBeenCalled();
+  });
+
+  it("a retry on a job without a post-deploy failure is NOT_FOUND", async () => {
+    db.publishBuildJob.findFirst.mockResolvedValue(null);
+    await expect(retryPostDeployStep("s1", "j2")).rejects.toThrow("NOT_FOUND");
+    expect(pw.applyPublishedPassword).not.toHaveBeenCalled();
   });
 });

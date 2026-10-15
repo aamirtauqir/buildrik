@@ -158,7 +158,7 @@ export async function POST(
 
     const outcome = useVercel
       ? await runVercelDeployJob(jobId, job.siteId, job.workspaceId, pages, storedBundle, job.formsPlan as FormsPlan | null, progress)
-      : { url: await runSimulation(jobId, job.siteId), postDeployError: null, hasForms: false };
+      : { url: await runSimulation(jobId, job.siteId), deploymentId: null, postDeployError: null, hasForms: false };
     const publicUrl = outcome.url;
 
     // D-1: the worker was the only live COMPLETED writer, and it duplicated
@@ -166,7 +166,14 @@ export async function POST(
     // nulling `log` here, which made every real publish NOT_ROLLBACKABLE
     // despite the service and the UI already shipping rollback (PD-41: keep
     // the payload, bounded by completePublish's own 20-version prune).
-    await completePublish(jobId, publicUrl, { progress: 100, steps: buildSteps(STEPS.length) });
+    /* The deployment id lands with COMPLETED in one write: unpublish and the
+       deletion take-down pick the latest COMPLETED job that has one, so a
+       live job without it would take down the PREVIOUS deployment. */
+    await completePublish(jobId, publicUrl, {
+      progress: 100,
+      steps: buildSteps(STEPS.length),
+      deploymentId: outcome.deploymentId,
+    });
 
     /* O6: a step after the deployment went live failed — the site IS live
        (not FAILED, never demoted); the step is retried on its own. */
@@ -174,13 +181,14 @@ export async function POST(
       await prisma.publishBuildJob.update({
         where: { id: jobId },
         data: { failedPhase: "post-deploy", error: outcome.postDeployError },
+        select: { id: true },
       });
     }
 
     /* A3/O3: forms switch over now that the deploy is live — never before.
-       A failure here stays PENDING for the cron (O5); the publish is done. */
+       PENDING was written with the bundle, so a worker that dies here is
+       picked up by the cron (O5); the publish is done. */
     if (outcome.hasForms) {
-      await prisma.publishBuildJob.update({ where: { id: jobId }, data: { formsStatus: "PENDING" } });
       await activatePublishedForms(jobId).catch((e: unknown) => {
         console.error(`[publish-worker] forms activation for job=${jobId}:`, e instanceof Error ? e.message : e);
       });
@@ -229,6 +237,31 @@ export async function POST(
       return new Response("Cancelled", { status: 200 });
     }
     const message = err instanceof Error ? err.message : "Unknown error";
+    /* The deployment went live before this threw: the publish is not FAILED
+       and its stored copy stays (it is what serves, and what a rollback to
+       it needs). Make sure it reads COMPLETED, record the step, stop. */
+    if (progress.phase === "live") {
+      console.error(`[publish-worker] job=${jobId} after the deploy went live:`, message);
+      try {
+        const current = await prisma.publishBuildJob.findUnique({ where: { id: jobId }, select: { status: true } });
+        if (current?.status !== "COMPLETED" && progress.liveUrl) {
+          await completePublish(jobId, progress.liveUrl, {
+            progress: 100,
+            steps: buildSteps(STEPS.length),
+            deploymentId: progress.deploymentId,
+          });
+        }
+        await prisma.publishBuildJob.update({
+          where: { id: jobId },
+          data: { failedPhase: "post-deploy", error: `after going live: ${message}` },
+          select: { id: true },
+        });
+        if (current?.status === "COMPLETED" || progress.liveUrl) await activatePublishedForms(jobId).catch(() => null);
+      } catch (e: unknown) {
+        console.error(`[publish-worker] job=${jobId} could not record the post-deploy failure:`, e instanceof Error ? e.message : e);
+      }
+      return new Response("Live with a failed step", { status: 500 });
+    }
     // Preserve PUBLISHED status on republish failure — the live deployment
     // from a prior successful publish is still serving. Discriminator is
     // publishedUrl presence (not site.status, which is "PUBLISHING" during
@@ -252,6 +285,7 @@ export async function POST(
           steps: buildSteps(0, true),
           log: Prisma.DbNull,
           bundle: Prisma.DbNull,
+          formsStatus: null,
         },
       }),
       prisma.site.update({
@@ -314,26 +348,32 @@ async function setStep(jobId: string, stepIndex: number): Promise<void> {
       progress: stepProgress(stepIndex),
       steps: buildSteps(stepIndex + 1),
     },
+    select: { id: true },
   });
 }
 
-/**
- * Real Vercel deployment path. Orchestrates steps/progress tracking,
- * delegates actual Vercel HTTP work to runVercelDeploy in publish.service.
- * Returns the public URL on success. Throws on failure.
- */
 interface PublishProgress {
-  phase: "build" | "checks" | "deploy";
+  /** "live": the deployment serves — nothing after it may mark the job FAILED. */
+  phase: "build" | "checks" | "deploy" | "live";
+  liveUrl?: string;
+  deploymentId?: string | null;
 }
 
 interface DeployOutcome {
   url: string;
+  deploymentId: string | null;
   /** A step after the deployment went live failed (O6). */
   postDeployError: string | null;
   /** This publish carries a forms plan to switch over once live. */
   hasForms: boolean;
 }
 
+/**
+ * Real Vercel deployment path. Builds (or reuses) the bundle, checks it,
+ * deploys it through runVercelDeploy, then runs the post-deploy steps. Throws
+ * before the deploy goes live; after it, a failed step comes back as
+ * `postDeployError` (O6), never as a throw from those steps.
+ */
 async function runVercelDeployJob(
   jobId: string,
   siteId: string,
@@ -466,7 +506,10 @@ async function runVercelDeployJob(
     data: {
       bundle: { files, context } as unknown as Prisma.InputJsonValue,
       bundleHash: hash,
-      ...(formsPlan ? { formsPlan: formsPlan as unknown as Prisma.InputJsonValue } : {}),
+      /* PENDING from here: a worker that dies after COMPLETED is still
+         picked up by the cron, which only reads PENDING (O5). A failed or
+         cancelled job clears it. */
+      ...(formsPlan ? { formsPlan: formsPlan as unknown as Prisma.InputJsonValue, formsStatus: "PENDING" } : {}),
     },
   });
 
@@ -485,8 +528,11 @@ async function runVercelDeployJob(
   const result = await runVercelDeploy(workspaceId, projectName, files);
   if (result === null) {
     // dev mode + no workspace connection → fall through to simulation
-    return { url: await runSimulation(jobId, siteId), postDeployError: null, hasForms: Boolean(formsPlan) };
+    return { url: await runSimulation(jobId, siteId), deploymentId: null, postDeployError: null, hasForms: Boolean(formsPlan) };
   }
+  progress.phase = "live";
+  progress.liveUrl = result.url;
+  progress.deploymentId = result.deploymentId;
 
   /* O6: the deployment is live from here. A step that fails now does not
      make the publish FAILED (and never demotes the site) — it is reported
@@ -501,9 +547,6 @@ async function runVercelDeployJob(
       postDeployError ??= `${name}: ${msg}`;
     }
   };
-  await step("deployment id", () =>
-    prisma.publishBuildJob.update({ where: { id: jobId }, data: { deploymentId: result.deploymentId } }),
-  );
   // SA-06: pin the project this site now lives on, so a later slug change
   // keeps deploying here instead of creating a new project.
   if (!site.vercelProjectName) {
@@ -525,6 +568,7 @@ async function runVercelDeployJob(
   });
   return {
     url: domain?.domain ? `https://${domain.domain}` : result.url,
+    deploymentId: result.deploymentId,
     postDeployError,
     hasForms: Boolean(formsPlan),
   };
