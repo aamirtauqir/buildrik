@@ -37,7 +37,13 @@ const save = () => {};
 
 function Shell({ composer, brandOpen }: { composer: RealComposer; brandOpen: boolean }) {
   useEditorShortcuts({ composer, modals, saveProject: save });
-  return brandOpen ? <BrandWorkspace composer={composer as unknown as ComposerProp} /> : null;
+  /* Mounted the way FullPageRouter mounts it: a full-page surface that keeps
+     ⌘Z for its own token edits (D36). */
+  return brandOpen ? (
+    <div data-bk-surface="fullpage" data-bk-history="tokens">
+      <BrandWorkspace composer={composer as unknown as ComposerProp} />
+    </div>
+  ) : null;
 }
 
 /** A page with three blocks added as three separate, flushed history steps. */
@@ -102,7 +108,10 @@ describe("one undo stack — Brand edits and canvas edits", { timeout: 60_000 },
     expect(utils.queryByText(/unsaved/i)).toBeNull();
   });
 
-  it("⌘Z with Brand open undoes the Brand edit — and only it; the next ⌘Z undoes the canvas", async () => {
+  /* D36 (owner, 2026-10-15): Brand's ⌘Z undoes Brand edits only. The canvas
+     edit next in line used to be undone behind the workspace, out of sight,
+     and saved (BK-05); now ⌘Z leaves it and Brand says why. */
+  it("⌘Z with Brand open undoes the Brand edit — and only it; the next ⌘Z leaves the canvas alone", async () => {
     const c = seededComposer();
     const elements = count(c);
     const utils = render(wrap(<Shell composer={c} brandOpen />, c as unknown as ComposerProp));
@@ -124,7 +133,8 @@ describe("one undo stack — Brand edits and canvas edits", { timeout: 60_000 },
       chord(document.body, { key: "z", metaKey: true });
     });
     c.history.flushPending();
-    expect(count(c)).toBe(elements - 1);
+    expect(count(c)).toBe(elements);
+    await waitFor(() => expect(utils.getByText(/Canvas edits undo on the canvas/)).toBeTruthy(), WAIT);
   });
 
   it("⇧⌘Z redoes the Brand edit", async () => {

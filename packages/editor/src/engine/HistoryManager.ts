@@ -734,6 +734,16 @@ export class HistoryManager {
     return patch.every((op) => pathPrefixes.some((prefix) => op.path.startsWith(prefix)));
   }
 
+  /** The redo-side twin of nextUndoTouchesOnly. */
+  nextRedoTouchesOnly(pathPrefixes: string[], labels: string[] = []): boolean {
+    this.flushPending();
+    if (!this.canRedo()) return false;
+    const top = this.redoStack[this.redoStack.length - 1];
+    if (top.label && labels.includes(top.label)) return true;
+    const patch = top.type === "patch" ? top.patch : createPatch(this.getCurrentState(), (top as CheckpointEntry).snapshot);
+    return patch.every((op) => pathPrefixes.some((prefix) => op.path.startsWith(prefix)));
+  }
+
   /** A feature changed the project outside history. Undo stops offering
    *  until the next recorded action, and a refusal names `label`. The label
    *  is user-facing copy, said the way the toast will say it. */

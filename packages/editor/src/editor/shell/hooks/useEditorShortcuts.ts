@@ -204,9 +204,11 @@ export function useEditorShortcuts({
         } else {
           composer.history.undo();
         }
-      } else if (isRedo && !historyBlocked && !tokensOnly) {
+      } else if (isRedo && !historyBlocked) {
         e.preventDefault();
-        composer.history.redo();
+        if (!tokensOnly || composer.history.nextRedoTouchesOnly(["/settings/"], [CONNECT_TOKENS_LABEL])) {
+          composer.history.redo();
+        }
       }
 
       if ((e.ctrlKey || e.metaKey) && e.key === "/") {
