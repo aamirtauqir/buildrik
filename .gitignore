@@ -25,7 +25,17 @@ packages/editor/coverage/
 # Session / tooling scratch
 .context/
 .superpowers/
-.claude/
+# .claude/ is local EXCEPT the shared gate config: settings.json (deny rules +
+# guard hook), hooks/, agents/ and skills/. Per-user permissions stay local in
+# settings.local.json. `**/.claude/*` ignores the children (not the dir), so
+# the negations below can re-include them; nested .claude dirs stay ignored.
+**/.claude/*
+!/.claude/settings.json
+!/.claude/hooks/
+!/.claude/agents/
+!/.claude/skills/
+# Playwright storageState (session cookies) written by local browser runs.
+auth.json
 packages/*.zip
 packages/editor.zip
 packages/editor/*.zip
