@@ -76,6 +76,7 @@ function tokenize(src) {
       }
       add(s); continue;
     }
+    if (c === "$" && (src[i + 1] === "'" || src[i + 1] === '"')) return null; // ANSI-C / locale quoting: not resolved
     if (c === "$" && src[i + 1] === "(") { i += 2; if (!readSubst("(", ")")) return null; add("$SUBST"); continue; }
     if (c === "`") { i++; if (!readSubst("`", "`")) return null; add("$SUBST"); continue; }
     if (c === "<" && src[i + 1] === "<" && src[i + 2] !== "<") { // heredoc
@@ -137,15 +138,16 @@ export function parseScript(src, depth = 0) {
   const tz = tokenize(String(src));
   if (!tz) return null;
   const commands = [];
-  let cur = { words: [], assigns: [], redirects: [], heredocBodies: [] };
+  let cur = { words: [], assigns: [], redirects: [], heredocBodies: [], prevOp: null };
   const pending = [];
+  let lastOp = null;
   const end = () => {
-    if (cur.words.length || cur.assigns.length || cur.redirects.length) pending.push(cur);
-    cur = { words: [], assigns: [], redirects: [], heredocBodies: [] };
+    if (cur.words.length || cur.assigns.length || cur.redirects.length || cur.heredocBodies.length) pending.push(cur);
+    cur = { words: [], assigns: [], redirects: [], heredocBodies: [], prevOp: lastOp };
   };
   for (let k = 0; k < tz.toks.length; k++) {
     const t = tz.toks[k];
-    if (t.t === "op") { end(); continue; }
+    if (t.t === "op") { lastOp = t.v; end(); continue; }
     if (t.t === "heredoc") { cur.heredocBodies.push(t); continue; }
     if (t.t === "redir") {
       if (t.target) cur.redirects.push({ op: t.op, target: t.target });
@@ -179,9 +181,17 @@ export function parseScript(src, depth = 0) {
     }
     // code that a shell will execute
     if (SHELLS.has(prog)) {
-      const ci = words.indexOf("-c");
+      // -c may sit in a cluster (`-ec`, `-xc`); the code is the next word.
+      const ci = words.findIndex((w, k) => k > 0 && /^-[a-zA-Z]*c[a-zA-Z]*$/.test(w));
       const code = ci !== -1 ? words[ci + 1] : null;
-      for (const s of [code, ...c.heredocBodies.map((h) => h.body)].filter((x) => x != null)) {
+      if (ci !== -1 && code == null) return null;
+      const hereStrings = c.redirects.filter((r) => r.op === "<<<").map((r) => r.target);
+      const scriptArg = words.slice(1).find((w) => !w.startsWith("-"));
+      const prevHeredoc = pending[pending.indexOf(c) - 1]?.heredocBodies?.length;
+      // A shell reading code from stdin that is not a literal we can see: fail closed.
+      if (ci === -1 && !scriptArg && !c.heredocBodies.length && !hereStrings.length &&
+          (c.prevOp === "|" || words.includes("-s") || c.redirects.some((r) => r.op === "<")) && !prevHeredoc) return null;
+      for (const s of [code, ...hereStrings, ...c.heredocBodies.map((h) => h.body)].filter((x) => x != null)) {
         const sub = parseScript(s, depth + 1); if (!sub) return null; commands.push(...sub.commands);
       }
     } else if (prog === "eval") {

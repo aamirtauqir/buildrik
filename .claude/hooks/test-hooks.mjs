@@ -86,13 +86,15 @@ for (const [label, command] of [
   ["push var ref", "B=main; git push origin factory/T-001:$B"], ["node child_process", "node -e 'require(\"child_process\").execSync(\"git push origin main\")'"],
   ["python subprocess", "python3 -c 'import subprocess; subprocess.run([\"git\",\"push\",\"origin\",\"main\"])'"], ["source", "source ./x.sh"],
   ["GIT_ via raw", "X=GIT_DIR; git status"], ["xargs gh", "echo 31 | xargs gh pr merge"],
+  ["bash -ec", "bash -ec 'git push origin main'"], ["here-string", "bash <<< 'git push origin main'"], ["pipe to bash", "echo 'git push origin main' | bash"],
+  ["ansi-c quote", "git push origin $'main'"], ["bash < file", "bash < /tmp/x.sh"], ["sh -s", "printf x | sh -s"],
   ["heredoc to bash", "bash <<'EOF'\ngit push origin main\nEOF"], ["unbalanced quote", "git push origin 'factory/T-001"],
   ["declare", "declare -x GIT_CONFIG_COUNT=1; git push origin factory/T-001"], ["printf -v", "printf -v GIT_DIR x; git push origin factory/T-001"],
   ["quoted name", "export 'GIT''_CONFIG_PARAMETERS'=x; git push origin factory/T-001"], ["backslash", "G\\IT_DIR=x git push origin factory/T-001"],
 
 ]) expect(`dev push bypass: ${label}`, guard("factory-developer", "Bash", { command }), "deny");
 // resolved by the parser: these push only the factory branch, so they are fine
-for (const command of ["env FOO=1 git push origin factory/T-001", "nice git push origin factory/T-001", "sh -c 'git push origin factory/T-001'", "cd /tmp && git push origin factory/T-001"]) {
+for (const command of ["bash -ec 'git push origin factory/T-001'", "bash <<< 'git push origin factory/T-001'", "env FOO=1 git push origin factory/T-001", "nice git push origin factory/T-001", "sh -c 'git push origin factory/T-001'", "cd /tmp && git push origin factory/T-001"]) {
   expect(`dev push via wrapper, factory branch: ${command}`, guard("factory-developer", "Bash", { command }), "allow");
 }
 // false positives the raw-text matcher had (investigation 2026-10-15)
